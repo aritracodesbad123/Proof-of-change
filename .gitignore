@@ -1,0 +1,16 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+build/
+dist/
+# run outputs: large and machine-specific
+data/
+runs/
+cache/
+eval-results*.json
+reports/runs/*.md
+!reports/runs/.gitkeep

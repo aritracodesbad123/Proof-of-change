@@ -1,0 +1,61 @@
+name: ci
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main, "feat/**"]
+
+permissions:
+  contents: read   # read-only token: CI never posts, files or pushes anything
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.11", "3.12"]
+    env:
+      OMP_NUM_THREADS: "1"
+      OPENBLAS_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+      NUMEXPR_NUM_THREADS: "1"
+      BR_MACHINE: github-actions
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Record runner machine type
+        run: |
+          python -m harness.machine | tee machine-type.json
+          {
+            echo "### Runner machine type (Python ${{ matrix.python }})"
+            echo '```json'; cat machine-type.json; echo '```'
+            echo "nproc: $(nproc); $(grep -m1 'model name' /proc/cpuinfo || true)"
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Install
+        run: python -m pip install -e ".[dev]"
+      - name: Lint
+        run: ruff check .
+      - name: Guardrail - no external side effects
+        run: python -m guardrails.no_external .
+      - name: Tests
+        run: pytest -q
+      - name: Evals (strict schema, golden cases)
+        run: python -m evals.run_evals --observations evals/fixtures/observations_ci.jsonl --out eval-results.json
+      - name: Approver report
+        if: always()
+        run: |
+          python -m reports.generate eval-results.json -o reports/runs/ci-py${{ matrix.python }}.md
+          cat reports/runs/ci-py${{ matrix.python }}.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: approver-report-py${{ matrix.python }}
+          path: |
+            machine-type.json
+            eval-results.json
+            reports/runs/ci-py${{ matrix.python }}.md

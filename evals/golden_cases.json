@@ -1,0 +1,44 @@
+{
+  "_comment": "Golden eval cases. Expected values come from Jonathan (baseline/protocol owner). Every case marked status=TODO still needs Jonathan's final pinned data (exact versions, test selection, expected counts) before it becomes a hard gate. Until then a TODO case is reported but never fails a run on its own.",
+  "cases": [
+    {
+      "name": "golden-sklearn160rc1-imblearn-import-failure",
+      "status": "TODO",
+      "todo": "Jonathan to deliver exact pinned versions, test selection and exact expected counts. Only 'import fails' is agreed so far.",
+      "match": {"upstream": "scikit-learn", "new_version": "1.6.0rc1", "dependent": "imbalanced-learn"},
+      "expect": {
+        "min": {"import_failure": 1},
+        "exact": {},
+        "matches_expected": "yes",
+        "signature_contains": []
+      },
+      "reference": "imbalanced-learn 0.12.4 cannot import `_safe_tags` from sklearn.utils._tags on 1.6.0rc1; fixed upstream in imbalanced-learn PR #1109. Dev calibration run cal-sklearn160rc1-imblearn0124 (2026-10-10) showed import_failure=13, real_break=280, lost_tests=1713; NOT yet adopted as golden numbers."
+    },
+    {
+      "name": "golden-pandas300rc0-upsetplot-cow",
+      "status": "TODO",
+      "todo": "Counts (67 real breaks, 6 already broken) are agreed; Jonathan to confirm the final pinned environment (pandas 2.3.3 vs 3.0.0rc0, UpSetPlot 0.9.0, numpy 2.3.5, matplotlib 3.10.8, pytest 9.1.1).",
+      "match": {"upstream": "pandas", "new_version": "3.0.0rc0", "dependent": "UpSetPlot"},
+      "expect": {
+        "min": {},
+        "exact": {"real_break": 67, "already_broken": 6, "import_failure": 0},
+        "matches_expected": "yes",
+        "signature_contains": ["Invalid RGBA argument: nan"]
+      },
+      "reference": "pandas 3.0 Copy-on-Write makes chained assignment in upsetplot/plotting.py a no-op; UpSetPlot issue #303."
+    },
+    {
+      "name": "golden-clean-pair-zero-breaks",
+      "status": "TODO",
+      "todo": "Jonathan to choose the clean (upstream old/new, dependent) pair. The match below is a placeholder that matches nothing until he does.",
+      "match": {"upstream": "TODO", "new_version": "TODO", "dependent": "TODO"},
+      "expect": {
+        "min": {},
+        "exact": {"real_break": 0, "import_failure": 0, "lost_tests": 0},
+        "matches_expected": "yes",
+        "signature_contains": []
+      },
+      "reference": "A pair where nothing should break; guards against false positives."
+    }
+  ]
+}

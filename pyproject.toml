@@ -1,0 +1,29 @@
+[project]
+name = "blast-radius"
+version = "0.1.0"
+description = "Test NumPy, pandas and scikit-learn pre-releases against their dependents, with evals, guardrails and approver reports."
+requires-python = ">=3.11"
+dependencies = []  # stdlib only; the runner shells out to uv and git
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "ruff>=0.6"]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["harness", "evals", "guardrails", "reports"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+
+[tool.ruff]
+line-length = 140
+target-version = "py311"
+extend-exclude = ["harness/br_run.py"]  # Jonathan's runner, linted by its owner
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I"]
+ignore = ["E702"]
