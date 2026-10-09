@@ -45,7 +45,7 @@ jobs:
       - name: Tests
         run: pytest -q
       - name: Evals (strict schema, golden cases)
-        run: python -m evals.run_evals --observations evals/fixtures/observations_ci.jsonl --out eval-results.json
+        run: python -m evals.run_evals --observations evals/fixtures/observations_ci.jsonl --runs-root evals/fixtures --require-golden --out eval-results.json
       - name: Approver report
         if: always()
         run: |

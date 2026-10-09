@@ -26,3 +26,12 @@ def upset(ci_records):
 @pytest.fixture
 def imblearn(ci_records):
     return next(r for r in ci_records if r["dependent"] == "imbalanced-learn")
+
+
+@pytest.fixture
+def dev_imblearn(legacy_records):
+    """Jonathan's dev calibration record (runner miscount; must fail the raw-reproduction gates)."""
+    return next(r for r in legacy_records if r["dependent"] == "imbalanced-learn")
+
+
+FIXTURE_RUNS = REPO / "evals" / "fixtures"

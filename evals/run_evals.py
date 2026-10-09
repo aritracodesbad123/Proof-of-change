@@ -15,7 +15,8 @@ from evals.checks import evaluate_record, golden_coverage, load_golden, recommen
 from harness.machine import detect_machine_type
 
 
-def run(observations: Path, runs_root: Path | None, require_ci_fields: bool, golden: Path | None = None) -> dict:
+def run(observations: Path, runs_root: Path | None, require_ci_fields: bool, golden: Path | None = None,
+        require_golden: bool = False) -> dict:
     cases = load_golden(golden) if golden else load_golden()
     records = [json.loads(line) for line in Path(observations).read_text().splitlines() if line.strip()]
     per_record = []
@@ -25,7 +26,7 @@ def run(observations: Path, runs_root: Path | None, require_ci_fields: bool, gol
         all_results += res
         per_record.append({"id": rec.get("id"), "record": rec, "results": [r.to_dict() for r in res],
                            "recommendation": recommendation(res)})
-    cov = golden_coverage(records, cases)
+    cov = golden_coverage(records, cases, require_golden)
     all_results += cov
     counts: dict[str, int] = {}
     for r in all_results:
@@ -42,10 +43,11 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--runs-root", default=None, help="directory that record['logs'] paths are relative to")
     ap.add_argument("--golden", default=None)
     ap.add_argument("--legacy", action="store_true", help="do not require machine_type/thread_env (pre-harness records)")
+    ap.add_argument("--require-golden", action="store_true", help="golden batch: every active golden case must be present")
     ap.add_argument("--out", default=None)
     a = ap.parse_args(argv)
     out = run(Path(a.observations), Path(a.runs_root) if a.runs_root else None, not a.legacy,
-              Path(a.golden) if a.golden else None)
+              Path(a.golden) if a.golden else None, a.require_golden)
     txt = json.dumps(out, indent=1)
     if a.out:
         Path(a.out).write_text(txt)

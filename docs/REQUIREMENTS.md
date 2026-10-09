@@ -1,6 +1,6 @@
 # Blast Radius: requirements
 
-Status: draft v0.1 (2026-10-10), by Nathan (ops/QA/dev). Awaiting review by Aritra and Jonathan.
+Status: draft v0.2 (2026-10-10; v0.2 applies Jonathan's golden-case update), by Nathan (ops/QA/dev). Awaiting review by Aritra and Jonathan.
 Sources: Jonathan's runner (`br_run.py`), his two dev calibration records (`research/dev-runs/observations-dev.jsonl`,
 2026-10-10), the reproductions in `/workspace/br-repro`, and the project plan
 (`nvidia-nebius-hackathon/blast-radius-pydata-plan.md`). Items marked **[ASSUMED]** are not stated in those sources
@@ -90,14 +90,20 @@ by `br_run.py` today (verified against both dev records); 38 and 39 are added by
 
 ## 6. Golden eval cases (from Jonathan)
 
-Stored in `evals/golden_cases.json`. All three are `status: TODO` until Jonathan delivers the final pinned data. A TODO
-case that is missing from a batch is reported, not failed; a case that is present and misses its numbers always fails.
+Stored in `evals/golden_cases.json`. Statuses:
+- `active`: hard gate. If the pair is in a batch and misses any expected value, the run is REJECTED. In a golden batch
+  (`--require-golden`, used by CI) a missing active case also fails.
+- `TODO`: values agreed, final pinned data still to come. Enforced when the pair is present; never required.
+- `pending`: candidate only, not golden. Mismatches are WARN, never FAIL.
 
-| Case | Pair | Expected |
-|---|---|---|
-| G1 `golden-sklearn160rc1-imblearn-import-failure` | scikit-learn 1.5.2 -> 1.6.0rc1 vs imbalanced-learn 0.12.4 | import fails: `import_failure >= 1`, prediction matches. Exact counts TODO. (Dev run showed import_failure 13, real_break 280, lost_tests 1713; not adopted yet.) |
-| G2 `golden-pandas300rc0-upsetplot-cow` | pandas 2.3.3 -> 3.0.0rc0 vs UpSetPlot 0.9.0 | exactly 67 real_break, 6 already_broken, 0 import_failure; top signatures include `Invalid RGBA argument: nan` |
-| G3 `golden-clean-pair-zero-breaks` | TODO (Jonathan picks the pair) | 0 real_break, 0 import_failure, 0 lost_tests |
+Per-run counts are read from pytest's own summary line (`per_run[].pytest_summary`), because the JUnit-derived
+`per_run[].passed` counts xpassed tests as passed (e.g. 2243 = 2238 passed + 5 xpassed).
+
+| Case | Status | Pair | Expected |
+|---|---|---|---|
+| G1 `golden-sklearn160rc1-imblearn-import-failure` | active | scikit-learn 1.5.2 -> 1.6.0rc1 vs imbalanced-learn 0.12.4 | Gated on the raw reproduction (`/workspace/br-repro`): every old run `2238 passed`; every new run `0 passed` and `525 errors` (all 525 test modules fail to load), 3 runs per side; the new-side import failure message contains `_safe_tags` (E5b); prediction matches. Per-category classification counts: **TODO** (Jonathan; the dev-run 280 real_break / 1,713 lost_tests were a runner miscount and are dropped). |
+| G2 `golden-pandas300rc0-upsetplot-cow` | TODO | pandas 2.3.3 -> 3.0.0rc0 vs UpSetPlot 0.9.0 | exactly 67 real_break, 6 already_broken, 0 import_failure; top signatures include `Invalid RGBA argument: nan` |
+| C1 `candidate-clean-pair-sklearn151-152-imblearn` | pending, **not golden** | scikit-learn 1.5.1 -> 1.5.2 vs imbalanced-learn | 0 real_break, 0 import_failure, 0 lost_tests. Becomes golden only after Jonathan confirms zero breaks over 3 runs per side; pins TODO. |
 
 ## 7. Evals (enforced on every record: `python -m evals.run_evals`)
 
@@ -107,10 +113,11 @@ case that is missing from a batch is reported, not failed; a case that is presen
 | E2 | versions_installed | new version != requested; `env_diff` has anything other than the upstream pins; freeze files disagree. WARN if `pip check` on the new env reports conflicts |
 | E3 | runs_per_side | not exactly 3 runs per side, not alternating, or any run timed out. WARN if counts vary within a side |
 | E4 | single_thread | `thread_env` present with a value other than 1. WARN if not recorded |
-| E5 | golden cases | a golden pair is in the batch and misses its expected values |
+| E5 | golden cases | an active/TODO golden pair is in the batch and misses its expected values (class counts, per-run pytest summary counts, signatures). Pending candidates only WARN |
+| E5b | golden import message | G1 is in the batch and no new-side import error mentions `_safe_tags`. Sources in order: record `import_failure_messages` (planned runner field), break signatures, then `runs/<id>/pytest-new-N.log` (must hit in every new run). SKIP if none is available |
 | E6 | llm_citations | any Nemotron claim has no citation, cites a file outside `runs/<id>/`, a missing line, or a line that does not contain the quoted text |
 | E7 | matches_expected | WARN only: a mismatch is either a finding or a wrong prediction; the approver decides |
-| E8 | golden coverage | a non-TODO golden case is absent from an eval batch |
+| E8 | golden coverage | golden batch only (`--require-golden`, CI): an active case is absent. Daily batches: SKIP |
 
 ## 8. Guardrails
 
@@ -138,7 +145,7 @@ Rule: any FAIL means REJECT; WARN and TODO are shown but do not block. Sample:
 - Work on `feat/*` branches, opened as PRs into `main`. Aritra approves and merges.
 - `.github/workflows/ci.yml` on push to `main`/`feat/**` and on PRs: matrix Python 3.11 and 3.12 on `ubuntu-latest`,
   single-thread env; records the runner machine type (JSON + step summary); ruff; no-external guardrail; pytest; strict
-  evals on `evals/fixtures/observations_ci.jsonl`; approver report to the step summary and as an artifact.
+  evals with `--require-golden` on `evals/fixtures/observations_ci.jsonl` (G2 dev record + a G1 record built from the raw reproduction, with log excerpts); approver report to the step summary and as an artifact.
 - Heavy suites (real dependent runs) are not in PR CI **[ASSUMED]**; they run on the box or a scheduled/Nebius job and
   their records go through the same evals.
 
@@ -163,14 +170,15 @@ tests/                      pytest
 
 ## 13. Open questions and assumptions
 
-1. G1 exact numbers: the dev run gives import_failure 13 / real_break 280 / lost_tests 1713, while the first
-   reproduction (`br-repro`, 8 workers) saw 525 collection errors. Which numbers are golden? Is `lost_tests: 1713`
-   expected (tests not collected because the import fails)?
-2. G3 clean pair: which pair?
+1. ~~G1 exact numbers~~ **Resolved (v0.2):** G1 gates on the raw reproduction (2238 passed old; 0 passed and 525
+   errors new, x3; `_safe_tags`). The dev-run numbers were a runner miscount and are dropped. Per-category counts
+   remain TODO from Jonathan.
+2. ~~G3 clean pair~~ **Resolved (v0.2):** candidate scikit-learn 1.5.1 vs 1.5.2 on imbalanced-learn, `pending` until
+   Jonathan confirms zero breaks over 3 runs per side.
 3. G2 environment: confirm pins (numpy 2.3.5, matplotlib 3.10.8, pytest 9.1.1, Python 3.13).
 4. CI matrix is 3.11/3.12 as requested, but the calibration runs used Python 3.13.5. Should real runs pin 3.13? **[ASSUMED: CI matrix only tests our tooling; runs keep the runner's `--python 3.13`.]**
-5. Should `br_run.py` itself write `machine_type`/`thread_env`, so the wrapper is not needed? Until then, records from
-   direct `br_run.py` calls fail strict E1.
+5. **Decided:** Jonathan is adding `machine_type` and `thread_env` to `br_run.py`; strict E1 stays on. Until his
+   runner writes them, records from direct `br_run.py` calls fail E1 (records via `harness/run.py` pass).
 6. Workers: records use `workers: "4"`. Does "single-thread" also mean `--workers 0`? **[ASSUMED: no; single-thread
    applies to BLAS/OpenMP inside each worker.]**
 7. Is a matches_expected mismatch WARN (current) or FAIL?
@@ -178,3 +186,11 @@ tests/                      pytest
    exception to G-ext.
 9. Nemotron: model/endpoint, and the exact claim/citation format (draft in section 5).
 10. Per-day reporting deadline and who approves when Aritra is away.
+11. Schema convergence: Jonathan's new runner writes schema v1 (`harness/schema/observation.schema.json`: adds
+    `schema_version`, `gates`, `accepted`, `network`, `report`, `explanation`, `stability`, ...; drops `hand_check`
+    and `upstream_issue`). `guardrails/schema.py` must be aligned to it (one shared schema file) once it settles.
+12. G1 dev run vs raw reproduction: the dev run's pytest summary itself reads `280 failed, 250 passed, 13 errors`, so the
+    difference from the raw `525 errors` is in how tests were run (likely `--import-mode=importlib`/`-P`, 4 vs 8
+    workers), not only in counting. Jonathan to confirm the runner reproduces `525 errors` before G1 can pass on a
+    runner record. Old side also differs by one test (2239 vs 2238 passed, 32 vs 33 skipped).
+13. Runner should record import-failure messages (`import_failure_messages`); JUnit only says `collection failure`.

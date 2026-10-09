@@ -8,6 +8,7 @@ status is one of: pass, fail, warn, skip, todo.
 from __future__ import annotations
 
 import json
+import re
 from collections import Counter
 from dataclasses import asdict, dataclass
 from pathlib import Path
@@ -130,7 +131,8 @@ def golden_for(rec: dict, cases: list[dict]) -> dict | None:
     for c in cases:
         m = c["match"]
         if (_norm(rec.get("upstream", "")) == _norm(m["upstream"]) and rec.get("new_version") == m["new_version"]
-                and _norm(rec.get("dependent", "")) == _norm(m["dependent"])):
+                and _norm(rec.get("dependent", "")) == _norm(m["dependent"])
+                and ("old_version" not in m or rec.get("old_version") == m["old_version"])):
             return c
     return None
 
@@ -150,12 +152,90 @@ def check_golden_case(rec: dict, case: dict) -> Result:
     for s in exp.get("signature_contains", []):
         if s not in sigs:
             problems.append(f"top break signatures lack {s!r}")
-    name = case["name"] + (" [TODO data]" if case.get("status") == "TODO" else "")
+    problems += _per_run_summary_problems(rec, exp.get("per_run_summary", {}))
+    status = case.get("status", "active")
+    name = case["name"] + {"TODO": " [TODO data]", "pending": " [PENDING, not golden yet]"}.get(status, "")
+    if problems and status == "pending":
+        return Result(f"golden:{case['name']}", "warn", f"{name}: " + "; ".join(problems),
+                      "Candidate pair does not hold yet; Jonathan to confirm or replace it before it becomes golden.")
     if problems:
         return Result(f"golden:{case['name']}", "fail", f"{name}: " + "; ".join(problems),
                       "A known break was missed or miscounted: the classifier or environment regressed. Diff this "
                       "run's freeze files and class-*.txt against the golden run before approving anything.")
     return Result(f"golden:{case['name']}", "pass", f"{name}: all expected values hold")
+
+
+SUMMARY_RE = re.compile(r"(\d+) (passed|failed|errors?|skipped|xfailed|xpassed)\b")
+
+
+def parse_pytest_summary(line: str) -> dict:
+    """'2238 passed, 33 skipped, 1 xfailed' -> {'passed': 2238, 'skipped': 33, 'xfailed': 1}. 'error' -> 'errors'."""
+    out = {}
+    for n, k in SUMMARY_RE.findall(line or ""):
+        out["errors" if k.startswith("error") else k] = int(n)
+    return out
+
+
+def _per_run_summary_problems(rec: dict, spec: dict) -> list[str]:
+    """spec = {"old": {"passed": 2238}, "new": {"passed": 0, "errors": 525}}; every run on that side must match.
+
+    Counts come from pytest's own summary line (per_run[].pytest_summary), not from the JUnit-derived
+    per_run counts, because JUnit counts xpassed as passed. Missing keys in the summary count as 0.
+    """
+    problems = []
+    for side, want in spec.items():
+        runs = [r for r in rec.get("per_run", []) if r.get("side") == side]
+        if len(runs) != REQUIRED_RUNS_PER_SIDE:
+            problems.append(f"{side}: {len(runs)} runs, gate needs {REQUIRED_RUNS_PER_SIDE}")
+        for r in runs:
+            got = parse_pytest_summary(r.get("pytest_summary", ""))
+            for k, v in want.items():
+                if got.get(k, 0) != v:
+                    problems.append(f"{side} run {r.get('run')}: pytest says {k}={got.get(k, 0)} (gate {v})")
+    return problems
+
+
+IMPORT_ERR_RE = re.compile(r"^E\s+(ImportError|ModuleNotFoundError)\b.*")
+
+
+def check_import_message(rec: dict, needle: str, run_dir: Path | None, case_name: str) -> Result:
+    """The import failure on the new side must mention `needle` (e.g. `_safe_tags`) in every new-side run.
+
+    Sources, in order: record field `import_failure_messages` (planned runner field), the record's break
+    signatures, then the run's pytest-new-N.log files. If none is available the check is skipped.
+    """
+    cid = f"golden:{case_name}:import_message"
+    msgs = rec.get("import_failure_messages")
+    if isinstance(msgs, list) and msgs:
+        ok = any(needle in str(m) for m in msgs)
+        return Result(cid, "pass" if ok else "fail",
+                      f"record import_failure_messages {'mention' if ok else 'do not mention'} {needle!r}",
+                      "" if ok else "The import fails for a different reason than the golden case; inspect the new-side logs.")
+    sigs = [s for s, _ in rec.get("top_error_signatures_breaks", []) if needle in s]
+    if sigs:
+        return Result(cid, "pass", f"break signature mentions {needle!r}: {sigs[0][:100]}")
+    if run_dir is not None:
+        new_runs = sorted(r.get("run") for r in rec.get("per_run", []) if r.get("side") == "new")
+        missing, cited = [], []
+        for n in new_runs:
+            f = run_dir / f"pytest-new-{n}.log"
+            hit = None
+            if f.is_file():
+                with f.open(errors="replace") as fh:
+                    for ln, line in enumerate(fh, 1):
+                        if IMPORT_ERR_RE.match(line) and needle in line:
+                            hit = f"{f.name}:{ln}"
+                            break
+            (cited if hit else missing).append(hit or f.name)
+        if new_runs and not missing:
+            return Result(cid, "pass", f"import error mentioning {needle!r} found in every new-side log ({', '.join(cited)}); "
+                          "record itself does not carry the message")
+        if new_runs:
+            return Result(cid, "fail", f"no import error mentioning {needle!r} in {missing}",
+                          "The import fails for a different reason (or not at all); inspect the new-side logs.")
+    return Result(cid, "skip", f"cannot check {needle!r}: record has no import_failure_messages field, the break signatures "
+                  "do not carry it, and the run logs are not available",
+                  "Runner should record import-failure messages (planned), or keep runs/<id>/ next to the record.")
 
 
 def check_citations(claims: list[dict], log_root: Path) -> Result:
@@ -203,6 +283,9 @@ def evaluate_record(rec: dict, runs_root: Path | None = None, cases: list[dict] 
     case = golden_for(rec, cases)
     if case:
         res.append(check_golden_case(rec, case))
+        needle = case["expect"].get("import_failure_message_contains")
+        if needle:
+            res.append(check_import_message(rec, needle, run_dir, case["name"]))
     claims = rec.get("explanations")
     if claims is None:
         res.append(Result("llm_citations", "skip", "no Nemotron explanations in this record yet"))
@@ -214,18 +297,23 @@ def evaluate_record(rec: dict, runs_root: Path | None = None, cases: list[dict] 
     return res
 
 
-def golden_coverage(records: list[dict], cases: list[dict] | None = None) -> list[Result]:
+def golden_coverage(records: list[dict], cases: list[dict] | None = None, require: bool = False) -> list[Result]:
+    """Which golden cases this batch covers. With require=True (golden eval batch, CI) a missing active case fails;
+    otherwise (daily batches) it is skipped. TODO/pending cases are never required."""
     cases = load_golden() if cases is None else cases
     out = []
     for c in cases:
         hit = [r for r in records if golden_for(r, [c])]
-        if not hit:
-            st = "todo" if c.get("status") == "TODO" else "fail"
-            out.append(Result(f"golden-coverage:{c['name']}", st, f"no record in this batch for {c['name']}"
-                              + (f" (TODO: {c.get('todo')})" if st == "todo" else ""),
-                              "Run the golden case in the eval batch." if st == "fail" else ""))
-        else:
+        if hit:
             out.append(Result(f"golden-coverage:{c['name']}", "pass", f"covered by {[r['id'] for r in hit]}"))
+        elif c.get("status") in ("TODO", "pending"):
+            out.append(Result(f"golden-coverage:{c['name']}", "todo",
+                              f"no record in this batch ({c.get('status')}: {c.get('todo')})"))
+        elif require:
+            out.append(Result(f"golden-coverage:{c['name']}", "fail", "active golden case missing from this golden batch",
+                              "Run the golden case in the eval batch."))
+        else:
+            out.append(Result(f"golden-coverage:{c['name']}", "skip", "not in this batch (daily batch; not required)"))
     return out
 
 
