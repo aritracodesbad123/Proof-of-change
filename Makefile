@@ -18,7 +18,7 @@ help:
 	@echo "  make test                               self-check: lint, guardrail, tests, evals"
 
 setup:
-	@$(PYTHON) -c 'import sys; v=sys.version_info; sys.exit(0 if v >= (3, 11) else "Python " + ".".join(map(str, v[:3])) + " is too old: Proof-of-Change needs Python 3.11 or newer. See README, step 1.")'
+	@$(PYTHON) -c 'import sys; v=sys.version_info; sys.exit(0 if v >= (3, 11) else "Python " + ".".join(map(str, v[:3])) + " is too old: Proof-of-Change needs Python 3.11 or newer. See README, setup step 2 (Install Python).")'
 	$(PYTHON) -m venv $(VENV)
 	$(PY) -m pip install --quiet --upgrade pip
 	$(PY) -m pip install --quiet -e ".[dev,ops]"

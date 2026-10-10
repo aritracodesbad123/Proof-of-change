@@ -65,12 +65,14 @@ git clone https://github.com/aritracodesbad123/Proof-of-change.git
 cd Proof-of-change
 ```
 
-- **What you should see:** `Cloning into 'Proof-of-change'...` and then `done.` lines.
+- **What you should see:** `Cloning into 'Proof-of-change'...`, possibly a few progress lines, and then the prompt
+  comes back with no error.
 - **If it says** `destination path 'Proof-of-change' already exists`: you downloaded it before. Just run
   `cd ~/Proof-of-change` and then `git pull` to get the newest version.
 
 > Until pull request #1 is merged, the code lives on a branch. Also type `git switch feat/integrate-golden`.
-> You should see `Switched to a new branch 'feat/integrate-golden'`. After the merge, skip this.
+> You should see `Switched to a new branch 'feat/integrate-golden'` (and a line saying it is set up to track
+> `origin/feat/integrate-golden`). After the merge, skip this.
 
 ### Step 4: Install Proof-of-Change
 
