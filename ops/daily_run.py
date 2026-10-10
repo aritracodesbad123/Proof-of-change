@@ -82,6 +82,7 @@ LIBS = {
 TEST_EXTRA_NAMES = ("test", "tests", "testing")
 # tzdata: some machines have no system zoneinfo; pandas/xarray tests need IANA zones.
 BASE_TEST_DEPS = ["pytest", "pytest-timeout", "pytest-xdist", "tzdata"]
+XDIST_MISMATCH = "Different tests were collected between"
 
 
 def now_ist() -> dt.datetime:
@@ -399,6 +400,36 @@ def pyproject_test_extras(checkout: Path) -> list[str]:
     return test_extras(list(opt))
 
 
+def pyproject_test_groups(checkout: Path) -> list[str]:
+    """Requirements from PEP 735 [dependency-groups] named test/tests/testing (include-group resolved).
+    Anything that looks like a command-line option is dropped: these strings come from the checkout."""
+    pp = checkout / "pyproject.toml"
+    if not pp.exists():
+        return []
+    import tomllib
+    try:
+        groups = tomllib.loads(pp.read_text()).get("dependency-groups", {})
+    except Exception:  # noqa: BLE001
+        return []
+    if not isinstance(groups, dict):
+        return []
+
+    def expand(name: str, seen: frozenset) -> list[str]:
+        out: list[str] = []
+        for r in groups.get(name, []) if name not in seen else []:
+            if isinstance(r, str):
+                out.append(r)
+            elif isinstance(r, dict) and isinstance(r.get("include-group"), str):
+                out += expand(r["include-group"], seen | {name})
+        return out
+
+    reqs: list[str] = []
+    for g in groups:
+        if g.lower() in TEST_EXTRA_NAMES:
+            reqs += [r.strip() for r in expand(g, frozenset()) if r.strip() and not r.strip().startswith("-")]
+    return list(dict.fromkeys(reqs))
+
+
 def with_test_extras(proj: list[str], checkout: Path) -> list[str]:
     """['-e', '/x[a]'] -> ['-e', '/x[a,test]'] when the project declares a test extra not already requested."""
     extras = pyproject_test_extras(checkout)
@@ -419,7 +450,8 @@ def install_side(venv: Path, checkout: Path, chosen: dict | None, log: Path, pyt
     proj, extra = side_install_args(chosen, checkout)
     proj = with_test_extras(proj, checkout)
     cmds = [["uv", "venv", "-q", "-p", python, venv],
-            ["uv", "pip", "install", "-q", "-p", venv / "bin/python", *proj, *extra, *BASE_TEST_DEPS]
+            ["uv", "pip", "install", "-q", "-p", venv / "bin/python", *proj, *extra, *BASE_TEST_DEPS,
+             *pyproject_test_groups(checkout)]
             + (["-c", constraints] if constraints else [])]
     sbx = side_sandbox(venv, network=True, ro=(constraints,) if constraints else ())
     sbx["rw"].append(checkout)
@@ -794,6 +826,12 @@ def run_tests(side_venvs: dict, targets_by_side: dict, rdir: Path, workdir: Path
                 cmd += ["-n", workers]
             rc, secs = run(cmd, lg, cwd=(cwds[side] if cwds else side_cwd(venv)), env=envs[side],
                            timeout=run_timeout, sbx=side_sandbox(venv))
+            if workers != "0" and XDIST_MISMATCH in lg.read_text(errors="replace"):
+                # pytest-xdist refuses suites whose test ids differ between worker processes; rerun serially
+                jin.unlink(missing_ok=True)
+                rc, s2 = run(cmd[:-2], lg, cwd=(cwds[side] if cwds else side_cwd(venv)), env=envs[side],
+                             timeout=run_timeout, sbx=side_sandbox(venv))
+                secs += s2
             jx.unlink(missing_ok=True)
             if jin.exists():
                 shutil.move(jin, jx)

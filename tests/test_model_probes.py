@@ -460,3 +460,32 @@ def test_src_layout_files_count_as_package_code():
     f = daily_run.classify_files(["src/marshmallow/utils.py", "tests/test_utils.py", "README.md"], "marshmallow")
     assert f["package_py"] == ["src/marshmallow/utils.py"] and f["other"] == ["tests/test_utils.py", "README.md"]
     assert daily_run.classify_files(["pandas/core/x.py"], "pandas")["package_py"] == ["pandas/core/x.py"]
+
+
+def test_pep735_test_dependency_groups_are_installed(tmp_path):
+    (tmp_path / "pyproject.toml").write_text(
+        '[dependency-groups]\ntests = ["pytest", "simplejson", "--index-url=http://x"]\n'
+        'docs = ["sphinx"]\ntest = [{include-group = "tests"}, "hypothesis"]\n')
+    assert daily_run.pyproject_test_groups(tmp_path) == ["pytest", "simplejson", "hypothesis"]
+    (tmp_path / "pyproject.toml").write_text("[project]\nname='x'\n")
+    assert daily_run.pyproject_test_groups(tmp_path) == []
+
+
+def test_xdist_collection_mismatch_reruns_serially(tmp_path, monkeypatch):
+    calls = []
+
+    def fake_run(cmd, log, **kw):
+        calls.append(list(map(str, cmd)))
+        with open(log, "a") as fh:
+            fh.write("ERROR gw1 - Different tests were collected between gw0 and gw1\n" if "-n" in calls[-1]
+                     else "3 passed in 0.1s\n")
+        return (1 if "-n" in calls[-1] else 0), 0.1
+
+    monkeypatch.setattr(daily_run, "run", fake_run)
+    venvs = {s: tmp_path / f"venv-{s}" for s in ("main", "pr")}
+    for v in venvs.values():
+        v.mkdir()
+    per_run, _ = daily_run.run_tests(venvs, {"main": ["t.py"], "pr": ["t.py"]}, tmp_path, tmp_path, 1, "4", 60, 60,
+                                     cwds={"main": tmp_path, "pr": tmp_path})
+    assert [("-n" in c) for c in calls] == [True, False, True, False]
+    assert all(e["exit"] == 0 and e["pytest_summary"] == "3 passed in 0.1s" for e in per_run)
