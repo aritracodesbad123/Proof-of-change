@@ -70,9 +70,16 @@ cd Proof-of-change
 - **If it says** `destination path 'Proof-of-change' already exists`: you downloaded it before. Just run
   `cd ~/Proof-of-change` and then `git pull` to get the newest version.
 
-> Until pull request #1 is merged, the code lives on a branch. Also type `git switch feat/integrate-golden`.
-> You should see `Switched to a new branch 'feat/integrate-golden'` (and a line saying it is set up to track
-> `origin/feat/integrate-golden`). After the merge, skip this.
+Check that the download is complete:
+
+```bash
+ls Makefile
+```
+
+- **What you should see:** `Makefile`.
+- **If you see** `No such file or directory`: the newest version hasn't reached the `main` branch yet. Type
+  `git switch feat/integrate-golden`. You should see `Switched to a new branch 'feat/integrate-golden'` (and a line
+  saying it is set up to track `origin/feat/integrate-golden`).
 
 ### Step 4: Install Proof-of-Change
 
@@ -232,6 +239,13 @@ to open one PR's report. Each report reads top to bottom:
 | **Reject** | Don't approve as is. Something changed that the PR doesn't explain. |
 | **Re-run** | Don't decide yet. Fix the problem described in the report and run the check again. |
 
+**Known-answer tests can override everything.** Three cases where we already know the right answer are re-run
+regularly. Jonathan's Validation Center does this (button 2; see the [Validation Center guide](docs/VALIDATION_GUIDE.md)).
+If the latest re-run failed, **every report says COULD NOT VERIFY / Re-run, with Low confidence**, whatever it found.
+The reason starts with "Forced: the known-answer tests failed on ...". A tool that gets known answers wrong can't be
+trusted on new ones. Once the known-answer tests pass again, run the check again (or regenerate the report) to get a
+real verdict. The "Known-answer replay" line under the report's checks shows the latest result.
+
 **Confidence:** *High* means every safety check passed. *Medium* means some warnings, listed in the report. *Low*
 means the check didn't finish.
 
@@ -277,7 +291,7 @@ Everything is inside the `Proof-of-change` folder (on your Mac: `~/Proof-of-chan
 | `ops/runs/<date>/REPORT.md` | The run's technical log (what was picked, skipped, how long it took). |
 | `ops/tracked-libraries.csv` | The starting list of libraries for `make daily` on your Mac. |
 | `reports/samples/golden-v1/` | Example reports for three known cases, kept in git. |
-| `docs/` | Technical documents (see section 9). |
+| `docs/` | Technical documents and the Validation Center guide (see section 9). |
 
 A check made with `make check` goes in a folder named like `2026-10-10-check-0621` (date, then the time). The daily
 run uses just the date. These folders stay on your computer only. They are never uploaded.
@@ -301,6 +315,7 @@ run uses just the date. These folders stay on your computer only. They are never
 | `note: no Chrome/Chromium found, so no PDFs` | Chrome isn't installed. HTML reports are still made. | Install Google Chrome (setup step 5) and run the check again. |
 | Verdict **COULD NOT VERIFY**, reason `source build ... failed` | The PR changes C code and couldn't be compiled. | Normal for some PRs. The report says why. Try again in a day or two (a newer nightly build may help). |
 | Verdict **COULD NOT VERIFY**, reason `patch does not apply` | The PR is based on older code than today's nightly build. | Nothing to fix on your side. Try again later. |
+| Every report says COULD NOT VERIFY, reason "Forced: the known-answer tests failed on ..." | The latest known-answer re-run failed, so no verdict is trusted (section 5). | Tell Jonathan or Nathan. Once the Validation Center's button 2 passes again, run `make check` again. |
 | `make open` prints a path but no browser opens | The browser didn't start. | In Finder, press `⌘ Shift G`, paste the printed path, and double-click the file. |
 | The first `make check` is slow | It downloads test environments (several hundred MB). | Later checks are much faster. |
 | Anything else | | Copy the last 20 lines from Terminal and send them to Nathan. |
@@ -322,6 +337,9 @@ run uses just the date. These folders stay on your computer only. They are never
 
 ## 9. Technical details
 
+- [docs/VALIDATION_GUIDE.md](docs/VALIDATION_GUIDE.md): **Jonathan's 1-page guide to the Validation Center**, the
+  place to check that Proof-of-Change gives true answers (re-check a report, known-answer tests, spot checks, weekly
+  blind check, prediction tracker). Non-technical, with screenshots.
 - [docs/OPERATIONS.md](docs/OPERATIONS.md): how PRs are selected and built, every flag, every file a run writes.
 - [docs/REPORT_SPEC.md](docs/REPORT_SPEC.md): the report format and verdict rules.
 - [docs/DEVELOPER.md](docs/DEVELOPER.md): code layout, the self-check, the downstream-test harness and golden

@@ -114,3 +114,11 @@ def test_default_registry(monkeypatch, tmp_path):
     assert dr.default_registry() == str(p)
     rows = list(__import__("csv").DictReader(open(ROOT / "ops" / "tracked-libraries.csv")))
     assert {r["repo"] for r in rows} == {"numpy/numpy", "pandas-dev/pandas", "scikit-learn/scikit-learn"}
+
+
+def test_failed_known_answer_replay_forces_could_not_verify(run, tmp_path, monkeypatch):
+    p = tmp_path / "golden-status.json"
+    p.write_text(json.dumps({"date_ist": "2026-10-10 06:30 IST", "all_passed": False, "results": [{"case": "x", "passed": False}]}))
+    monkeypatch.setenv("BR_GOLDEN_STATUS", str(p))
+    rows = pr_report.render_run(run, tmp_path / "out", formats=("md",))
+    assert {(r["verdict"], r["action"], r["confidence"]) for r in rows} == {("COULD NOT VERIFY", "Re-run", "Low")}

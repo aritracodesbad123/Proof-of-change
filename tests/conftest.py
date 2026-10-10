@@ -57,3 +57,9 @@ def g_pandas(golden_v1_records):
 @pytest.fixture
 def g_clean(golden_v1_records):
     return next(r for r in golden_v1_records if r["old_version"] == "1.5.1")
+
+
+@pytest.fixture(autouse=True)
+def _no_box_replay(monkeypatch):
+    """Tests never read the Validation Center's replay file on the box; tests that need one set BR_GOLDEN_STATUS."""
+    monkeypatch.setenv("BR_GOLDEN_STATUS", "")

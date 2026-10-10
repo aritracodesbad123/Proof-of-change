@@ -81,6 +81,11 @@ Same section order, renderers and verdict vocabulary as the golden-record report
   All citations are re-read from disk and must match (`verify`), otherwise the check fails.
 - **Evals and guardrails:** 3 runs per side, single-thread env, machine type recorded, nothing posted upstream,
   citations verified (FAIL -> Re-run); flaky tests, PR moved since tested, `pip check` (WARN -> lower confidence).
+- **Known-answer replay (ported from Jonathan's render_report.py):** if the latest replay in
+  `$BR_GOLDEN_STATUS` (default: the Validation Center's `research/validation/golden-status.json` on the box) has
+  `all_passed: false`, every report is COULD NOT VERIFY / Re-run with Low confidence. The same applies to the
+  golden-record reports (`reports/reviewer.py`), where a record's own failed `golden_check` also forces it. Tests set
+  `BR_GOLDEN_STATUS` to empty so they never depend on the box file.
 - **PDF:** headless Chrome/Chromium (`$BR_CHROME`, PATH, or `/Applications/Google Chrome.app`). Without it, HTML and
   Markdown are still written and a note is printed.
 

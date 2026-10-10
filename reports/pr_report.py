@@ -134,6 +134,9 @@ def checks(rec: dict) -> list[list]:
     if cur and head and cur != head:
         out.append(["PR unchanged since tested", "WARN", f"tested {head[:12]}, PR now at {cur[:12]}",
                     "Run the check again to test the PR's latest commit."])
+    rr = rv.replay_row(rv.latest_replay())
+    out.append([rr[0], {"all passed": "PASS", "FAILED": "FAIL"}.get(rr[1][2], "SKIP"), rr[2],
+                "Run the known-answer tests again (Validation Center, button 2) and fix what fails." if rr[1][2] == "FAILED" else ""])
     pc = (rec.get("main_side") or {}).get("pip_check")
     if pc and pc != "ok":
         out.append(["Main-side packages consistent (pip check)", "WARN", str(pc)[:120], "Usually harmless; see setup-main.log."])
@@ -142,6 +145,10 @@ def checks(rec: dict) -> list[list]:
 
 def decide(rec: dict, chk: list[list]) -> dict:
     v = rec.get("verdict", "could_not_verify")
+    bad_replay = rv.replay_failure(None, rv.latest_replay())
+    if bad_replay:  # Jonathan's rule: a failed known-answer replay means no report is trusted
+        return dict(verdict="COULD NOT VERIFY", colour="grey", action="Re-run", confidence="Low",
+                    conf_why="The known-answer tests failed in the latest replay.", why=bad_replay)
     fails = [c for c in chk if c[1] == "FAIL"]
     warns = [c for c in chk if c[1] == "WARN"]
     if v == "could_not_verify" or fails:
@@ -367,7 +374,7 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("run_dir", help="an ops/runs/<date> folder written by ops/daily_run.py")
-    ap.add_argument("--out", required=True)
+    ap.add_argument("-o", "--out", required=True)
     ap.add_argument("--formats", default="md,html,pdf")
     ap.add_argument("--title", default=None)
     a = ap.parse_args(argv)
