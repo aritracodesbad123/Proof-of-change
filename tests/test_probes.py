@@ -126,10 +126,10 @@ def test_run_probe_alternates_saves_and_cites(tmp_path):
                      'side = os.environ["PROBE_SIDE"]\n'
                      'print(json.dumps({"observations": {"side": side, "const": 42, '
                      '"has_token": any("TOKEN" in k for k in os.environ)}}))\n')
-    env = base_env()
+    envs = {s: base_env(tmp_path / f"home-{s}") for s in ("main", "pr")}
     out = tmp_path / "out"
     out.mkdir()
-    item = probes.run_probe(probe, {s: _side_python(tmp_path, s) for s in ("main", "pr")}, out, tmp_path / "cwd", env)
+    item = probes.run_probe(probe, {s: _side_python(tmp_path, s) for s in ("main", "pr")}, out, tmp_path / "cwd", envs)
     assert [(x["side"], x["run"]) for x in item["per_run"]] == [(s, i) for i in (1, 2, 3) for s in ("main", "pr")]
     assert labels(item["observations"]) == {"const": "no_difference", "has_token": "no_difference", "side": "unmentioned"}
     side = next(o for o in item["observations"] if o["name"] == "side")
@@ -138,13 +138,6 @@ def test_run_probe_alternates_saves_and_cites(tmp_path):
         c = side["citations"][s]
         assert c["quote"] in (out / c["file"]).read_text().splitlines()[c["line"] - 1]
     assert probes.rejudge_entry(item)["observations"] == item["observations"]
-
-
-def test_base_env_drops_credentials(monkeypatch):
-    for k in ("GITHUB_TOKEN", "GITHUB_POC_TOKEN", "AWS_SECRET_ACCESS_KEY", "SOME_API_KEY", "DB_PASSWORD"):
-        monkeypatch.setenv(k, "secret")
-    env = base_env()
-    assert not any(v == "secret" for v in env.values()) and env["OMP_NUM_THREADS"] == "1"
 
 
 # ---------------------------------------------------------------- recorded mlxtend#1229 outputs (fixtures)

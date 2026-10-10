@@ -7,7 +7,8 @@
 All arguments after the wrapper's own are passed to br_run.py unchanged, except that:
   * --runs is forced to 3 (the protocol); other values are refused,
   * --root defaults to ./data so records and runs stay inside this repo's ignored data dir,
-  * the single-thread env vars are forced, and --machine is set from the detected machine type.
+  * the runner gets only the allowlisted environment (guardrails.isolation.untrusted_env: single-thread vars forced,
+    HOME set to <data-root>/home, no credentials), and --machine is set from the detected machine type.
 After the runner finishes, the record gets `machine_type` and `thread_env`, is schema-validated,
 and is rewritten in place (record.json and the last line of observations.jsonl).
 """
@@ -20,7 +21,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-from guardrails.isolation import SINGLE_THREAD_ENV, single_thread_env
+from guardrails.isolation import SINGLE_THREAD_ENV, untrusted_env
 from guardrails.schema import REQUIRED_RUNS_PER_SIDE, validate_record
 from harness.machine import detect_machine_type
 
@@ -71,7 +72,8 @@ def main(argv: list[str] | None = None) -> int:
     root.mkdir(parents=True, exist_ok=True)
     obs = root / "observations.jsonl"
     before = obs.read_text().splitlines() if obs.exists() else []
-    rc = subprocess.call(cmd, env=single_thread_env())
+    # The runner installs and tests third-party code: it gets only the allowlisted environment, with its own HOME.
+    rc = subprocess.call(cmd, env=untrusted_env(root / "home", install=True))
     after = obs.read_text().splitlines() if obs.exists() else []
     if rc != 0 or len(after) != len(before) + 1:
         print(f"[harness] runner failed (rc={rc}); no record accepted", file=sys.stderr)

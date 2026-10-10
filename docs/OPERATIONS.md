@@ -50,8 +50,8 @@ There is no scheduler in this repo; run `make daily` (or `ops/daily_run.py`) fro
 
 Tests: test files mapped from the touched modules (or the chosen-PRs file's subset), **3 alternating runs per side**
 (main 1, PR 1, main 2, ...), `OMP/OPENBLAS/MKL/NUMEXPR_NUM_THREADS=1`, pytest `-q -rfE --timeout=120` with JUnit XML,
-`--run-timeout` 900 s per run, `-n 4` workers. `GITHUB_TOKEN` (optional, read-only API calls) is removed from the
-environment of PR code. The comparison is plain code: `poc/diff.py confirm()` per test over the 3 runs, then
+`--run-timeout` 900 s per run, `-n 4` workers. PR code never sees our environment (see "Environment of untrusted
+code" below). The comparison is plain code: `poc/diff.py confirm()` per test over the 3 runs, then
 `poc/verdict.py pr_verdict()`.
 
 Both sides get the library's test extras plus `optional_test_deps` (per library in `LIBS`), so tests don't skip
@@ -117,6 +117,33 @@ module"; it does not prove the test reaches the changed C lines, and a test with
 A PR mixing Python and compiled changes gets both rules. Lines run only by import (module-level code) count as
 covered. The coverage run adds roughly one more test run per PR (about 15-60 s on day-1 PRs).
 
+## Environment of untrusted code (`guardrails/isolation.py`)
+
+Every subprocess that may run code from a PR or a package gets an **allowlisted** environment built by
+`untrusted_env()`, never a filtered copy of ours. That covers installs and builds of either side, pytest, the coverage
+run, probes, `uv pip freeze`, `patch` and every start of a venv Python (installed `.pth` files run on startup). It
+applies to `make check` and the daily run (`ops/daily_run.py`, `base_env()`), and to the release-pair runner
+started by `harness/run.py`.
+
+| Variable | Value |
+|---|---|
+| `PATH`, `LANG`, `LC_ALL`, `TERM`, `TMPDIR`, `SOURCE_DATE_EPOCH`, `SSL_CERT_FILE` | passed through, only if set |
+| `HOME` | a per-environment temporary home (`work/home-main`, `work/home-pr`, `work/home-git`), never the real one |
+| `OMP_NUM_THREADS`, `OPENBLAS_NUM_THREADS`, `MKL_NUM_THREADS`, `NUMEXPR_NUM_THREADS`, `VECLIB_MAXIMUM_THREADS`, `BLIS_NUM_THREADS` | `1` |
+| `PYTHONHASHSEED` / `PYTHONDONTWRITEBYTECODE` / `MPLBACKEND` | `0` / `1` / `Agg` |
+| installs only: `UV_CACHE_DIR`, `UV_PYTHON_INSTALL_DIR` | the real uv cache and managed-Python dirs (so a temporary HOME does not re-download everything) |
+| installs only: `UV_LINK_MODE` / `UV_NO_CONFIG` | `copy` (installed files never share inodes with the cache) / `1` (no uv config files) |
+| installs only, per call: `SETUPTOOLS_SCM_PRETEND_VERSION` | `9999.0.0` for checkouts without tags |
+
+Everything else is dropped: tokens, API keys, database URLs, proxies, `PIP_*`/`UV_INDEX_*`, `PYTHONPATH`, `CI`,
+`DISPLAY`, `XDG_*`. A second, independent check (`SECRET_NAME`: TOKEN, SECRET, PASSWORD, KEY, AUTH, PAT, DSN,
+DATABASE_URL, COOKIE, SESSION, ...) fails loudly at import time if a credential-looking name is ever added to the
+allowlist, and again on every environment built (also for values that are URLs with a password). `run()` refuses
+to start anything without an explicit environment. Proxies are not passed through: on a machine that needs one,
+installs fail visibly instead of handing proxy credentials to PR code. The temporary HOME hides files such as
+`~/.netrc` and `~/.git-credentials` by default. It is not a filesystem sandbox: code can still read absolute paths
+the user can read.
+
 ## Probes (`poc/probes.py`, `probes/`)
 
 Tests only show what the test suite checks. A **probe** checks one specific behaviour of a PR directly: a small,
@@ -128,8 +155,8 @@ Interface. The file starts with a literal `PROBE` dict (read with `ast.literal_e
 `id`, `target` (`owner/repo#pr`), `about`, `timeout_s` (optional, default 120 s), and `claims`: what the PR says,
 each `{id, text, source, covers: [glob patterns over observation names], expect: "same" | "differs"}`. Its last
 stdout line is `{"observations": {"<name>": <JSON value>, ...}}`. Each side runs 3 times, alternating, with that
-side's venv Python, an empty working directory and the same scrubbed environment as the tests (thread limits set,
-credentials removed). Each run's observations are saved one per line as `probe-<id>-<side>-<n>.jsonl` (plus a `.log`
+side's venv Python, an empty working directory and that side's allowlisted environment (see above; same as the
+tests). Each run's observations are saved one per line as `probe-<id>-<side>-<n>.jsonl` (plus a `.log`
 with the full output), and every observation in the record cites its line in run 1 of each side.
 
 Labels, per observation:

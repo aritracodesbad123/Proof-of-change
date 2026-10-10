@@ -47,6 +47,7 @@ from pathlib import Path, PurePosixPath
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO_ROOT))
+from guardrails.isolation import untrusted_env  # noqa: E402
 from harness.machine import detect_machine_type  # noqa: E402
 from poc import coverage_gate, local_config, probes  # noqa: E402
 from poc.diff import confirm  # noqa: E402
@@ -60,7 +61,6 @@ THREAD_ENV = {k: "1" for k in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_N
                                "VECLIB_MAXIMUM_THREADS", "BLIS_NUM_THREADS")}
 SCHEMA_PATH = REPO_ROOT / "harness" / "schema" / "observation.schema.json"
 WHO = "ops/daily_run.py"
-SECRET_ENV = re.compile(r"TOKEN|SECRET|PASSWORD|PASSWD|CREDENTIAL|API_KEY|ACCESS_KEY|PRIVATE_KEY", re.I)
 COMPILED_EXT = (".c", ".h", ".cpp", ".hpp", ".cc", ".cxx", ".pyx", ".pxd", ".pxi", ".tp", ".src", ".f", ".f90", ".cu")
 COMPILED_NAMES = ("meson.build", "meson.options", "meson_options.txt", "setup.py", "pyproject.toml")
 
@@ -341,7 +341,7 @@ def source_pair(repo: str, item: dict, work: Path, log: Path, python: str, timeo
     """Pure-Python library without nightly wheels: build both sides from git.
     Conflicting PR (mergeable false / state dirty): main = merge-base(PR head, base branch), PR = PR head.
     Mergeable PR: main = current base-branch tip, PR = GitHub's test merge commit (refs/pull/N/merge)."""
-    env = base_env()
+    env = base_env(work / "home-git")
     src = work / "src"
     res: dict = {}
     steps = [["git", "clone", "-q", "--filter=blob:none", "--no-checkout", f"https://github.com/{repo}.git", src],
@@ -353,10 +353,10 @@ def source_pair(repo: str, item: dict, work: Path, log: Path, python: str, timeo
     head = item["head_sha"]
     run(["git", "-C", src, "fetch", "-q", "origin", head], log, env=env, timeout=300)  # pinned head, if it moved
     conflicting = item.get("mergeable") is False or item.get("mergeable_state") == "dirty"
-    base_tip = subprocess.run(["git", "-C", src, "rev-parse", f"origin/{item['base_ref']}"], capture_output=True,
+    base_tip = subprocess.run(["git", "-C", src, "rev-parse", f"origin/{item['base_ref']}"], env=env, capture_output=True,
                               text=True).stdout.strip()
     if conflicting or head != item.get("current_head_sha", head):
-        mb = subprocess.run(["git", "-C", src, "merge-base", head, base_tip], capture_output=True, text=True).stdout.strip()
+        mb = subprocess.run(["git", "-C", src, "merge-base", head, base_tip], env=env, capture_output=True, text=True).stdout.strip()
         if not mb:
             return {"ok": False, "why": "could not compute merge-base of PR head and base branch"}
         res |= {"comparison_basis": "merge-base vs PR head" + (" (PR conflicts with base)" if conflicting else
@@ -364,13 +364,13 @@ def source_pair(repo: str, item: dict, work: Path, log: Path, python: str, timeo
                 "main_sha": mb, "pr_sha": head}
     else:
         rc, _ = run(["git", "-C", src, "fetch", "-q", "origin", f"pull/{item['pr']}/merge"], log, env=env, timeout=300)
-        merge = subprocess.run(["git", "-C", src, "rev-parse", "FETCH_HEAD"], capture_output=True, text=True).stdout.strip()
+        merge = subprocess.run(["git", "-C", src, "rev-parse", "FETCH_HEAD"], env=env, capture_output=True, text=True).stdout.strip()
         if rc != 0 or not merge:
-            mb = subprocess.run(["git", "-C", src, "merge-base", head, base_tip], capture_output=True, text=True).stdout.strip()
+            mb = subprocess.run(["git", "-C", src, "merge-base", head, base_tip], env=env, capture_output=True, text=True).stdout.strip()
             res |= {"comparison_basis": "merge-base vs PR head (no merge ref available)", "main_sha": mb, "pr_sha": head}
         else:
-            parent1 = subprocess.run(["git", "-C", src, "rev-parse", f"{merge}^1"], capture_output=True, text=True).stdout.strip()
-            parent2 = subprocess.run(["git", "-C", src, "rev-parse", f"{merge}^2"], capture_output=True,
+            parent1 = subprocess.run(["git", "-C", src, "rev-parse", f"{merge}^1"], env=env, capture_output=True, text=True).stdout.strip()
+            parent2 = subprocess.run(["git", "-C", src, "rev-parse", f"{merge}^2"], env=env, capture_output=True,
                                      text=True).stdout.strip()
             res |= {"comparison_basis": "base tip vs GitHub test merge (refs/pull/N/merge)", "main_sha": parent1,
                     "pr_sha": merge, "merge_commit": merge, "merge_parents": [parent1, parent2],
@@ -410,9 +410,9 @@ def with_test_extras(proj: list[str], checkout: Path) -> list[str]:
 
 def install_side(venv: Path, checkout: Path, chosen: dict | None, log: Path, python: str, timeout: int,
                  constraints: Path | None) -> tuple[bool, str]:
-    env = base_env()
-    if subprocess.run(["git", "-C", checkout, "describe", "--tags"], capture_output=True).returncode != 0:
-        env["SETUPTOOLS_SCM_PRETEND_VERSION"] = "9999.0.0"
+    env = base_env(side_home(venv), install=True)
+    if subprocess.run(["git", "-C", checkout, "describe", "--tags"], capture_output=True, env=env).returncode != 0:
+        env = base_env(side_home(venv), install=True, SETUPTOOLS_SCM_PRETEND_VERSION="9999.0.0")
     proj, extra = side_install_args(chosen, checkout)
     proj = with_test_extras(proj, checkout)
     cmds = [["uv", "venv", "-q", "-p", python, venv],
@@ -427,6 +427,9 @@ def install_side(venv: Path, checkout: Path, chosen: dict | None, log: Path, pyt
 
 # ---------------------------------------------------------------- execution helpers
 def run(cmd, log_path: Path, cwd=None, env=None, timeout=None) -> tuple[int | str, float]:
+    """Run cmd with output to log_path. env is required: always an allowlisted base_env(...)."""
+    if env is None:
+        raise ValueError("run() needs an explicit allowlisted env (base_env)")
     t0 = time.time()
     with open(log_path, "a") as fh:
         fh.write(f"\n$ {' '.join(map(str, cmd))}\n"); fh.flush()
@@ -444,13 +447,16 @@ def site_packages(venv: Path) -> Path:
     return Path(glob.glob(str(venv / "lib" / "python3*" / "site-packages"))[0])
 
 
-def base_env() -> dict:
-    env = dict(os.environ, **THREAD_ENV, MPLBACKEND="Agg", PYTHONDONTWRITEBYTECODE="1", UV_LINK_MODE="copy",
-               PYTHONHASHSEED="0")
-    env.pop("PYTHONPATH", None)
-    for k in [k for k in env if SECRET_ENV.search(k)]:
-        env.pop(k)  # never expose tokens or other credentials to PR code (tests and probes run it)
-    return env
+def base_env(home: Path, install: bool = False, **extra) -> dict:
+    """Allowlisted environment for anything that may run PR or package code (guardrails.isolation.untrusted_env):
+    nothing from our own environment except PATH, locale, terminal and temp settings; HOME is `home`, a per-environment
+    temporary home. install=True adds the uv cache and settings for installs and builds."""
+    return untrusted_env(home, install=install, extra=extra or None)
+
+
+def side_home(venv: Path) -> Path:
+    """Per-environment temporary HOME, next to the venv: work/venv-main -> work/home-main."""
+    return venv.parent / f"home-{venv.name.removeprefix('venv-')}"
 
 
 def nightly_wheel(gh_get, dist: str, python: str) -> dict:
@@ -524,7 +530,8 @@ def dist_extras(venv: Path, dist: str, env: dict) -> list[str]:
 
 
 def freeze(venv: Path, out: Path) -> str:
-    txt = subprocess.run(["uv", "pip", "freeze", "-p", venv / "bin/python"], capture_output=True, text=True).stdout
+    txt = subprocess.run(["uv", "pip", "freeze", "-p", venv / "bin/python"], capture_output=True, text=True,
+                         env=base_env(side_home(venv), install=True)).stdout
     out.write_text(txt)
     return out.name
 
@@ -533,7 +540,7 @@ def build_main_env(cfg: dict, venv: Path, log: Path, python: str, timeout: int, 
     """Stable release of the library with its test extra + test deps + optional test deps (so tests do not skip for
     missing optional modules), then the exact nightly wheel file, pinned by sha256, reinstalled without deps.
     UV_LINK_MODE=copy so patching the PR copy can never modify the shared uv cache."""
-    env = base_env()
+    env = base_env(side_home(venv), install=True)
     py = venv / "bin/python"
     steps = [["uv", "venv", "-q", "-p", python, venv],
              ["uv", "pip", "install", "-q", "-p", py, cfg["dist"], *cfg["deps"], *BASE_TEST_DEPS, *cfg["test_deps"]]]
@@ -580,16 +587,17 @@ def apply_patch(pdiff: str, site: Path, log: Path) -> tuple[bool, str]:
     pf = site.parent / "pr.diff"
     pf.write_text(pdiff)
     base = ["patch", "-p1", "-F0", "-N", "--no-backup-if-mismatch", "-d", site, "-i", pf]
-    rc, _ = run(base + ["--dry-run"], log)
+    env = base_env(side_home(site.parents[2]))   # site = <venv>/lib/pythonX.Y/site-packages
+    rc, _ = run(base + ["--dry-run"], log, env=env)
     if rc != 0:
         return False, "PR diff does not apply cleanly to the current nightly (main has moved or the files differ)"
-    rc, _ = run(base, log)
+    rc, _ = run(base, log, env=env)
     return rc == 0, "" if rc == 0 else "patch failed after a clean dry run"
 
 
 def source_build(repo: str, item: dict, cfg: dict, venv: Path, workdir: Path, log: Path, python: str,
                  timeout: int, main_extra_reqs: tuple = ()) -> dict:
-    env = base_env()
+    env = base_env(side_home(venv), install=True)
     src = workdir / "src"
     steps = [["git", "init", "-q", src],
              ["git", "-C", src, "fetch", "-q", "--depth", "1", f"https://github.com/{repo}.git",
@@ -711,7 +719,7 @@ def run_tests(side_venvs: dict, targets_by_side: dict, rdir: Path, workdir: Path
               test_timeout: int, run_timeout: int, cwds: dict | None = None) -> tuple[list[dict], dict]:
     """targets are relative to site-packages (nightly routes) or to the side's checkout (cwds given).
     per_run entries use the shared schema shape (side old/new, all counts present)."""
-    env = base_env()
+    envs = {side: base_env(side_home(v)) for side, v in side_venvs.items()}
     per_run, results = [], {"main": [], "pr": []}
     cwd = workdir / "cwd"; cwd.mkdir(exist_ok=True)
     for i in range(1, runs + 1):
@@ -729,7 +737,8 @@ def run_tests(side_venvs: dict, targets_by_side: dict, rdir: Path, workdir: Path
                    f"--timeout={test_timeout}", "-o", "addopts=", "-o", "junit_family=xunit2", f"--junitxml={jx}"]
             if workers != "0":
                 cmd += ["-n", workers]
-            rc, secs = run(cmd, lg, cwd=(cwds[side] if cwds else cwd), env=env, timeout=run_timeout)
+            rc, secs = run(cmd, lg, cwd=(cwds[side] if cwds else cwd), env=envs[side],
+                            timeout=run_timeout)
             parsed = parse_junit(jx)
             results[side].append(parsed)
             for o, _ in parsed.values():
@@ -768,7 +777,7 @@ def coverage_run(item: dict, venv: Path, main_root: Path, pr_root: Path, targets
         return {"status": "failed", "why": "none of the changed Python files exist on the PR side"}
     log = prdir / "coverage-pr.log"
     rc, _ = run(["uv", "pip", "install", "-q", "-p", venv / "bin/python", "coverage>=7", "pytest-cov>=5"], log,
-                timeout=600)
+                env=base_env(side_home(venv), install=True), timeout=600)
     if rc != 0:
         return {"status": "failed", "why": f"installing coverage failed ({rc}); see coverage-pr.log"}
     out = prdir / "coverage-pr.json"
@@ -779,7 +788,7 @@ def coverage_run(item: dict, venv: Path, main_root: Path, pr_root: Path, targets
     if a.workers != "0":
         cmd += ["-n", a.workers]
     (workdir / "cwd").mkdir(exist_ok=True)
-    rc, secs = run(cmd, prdir / "coverage-pytest.log", cwd=cwd or (workdir / "cwd"), env=base_env(),
+    rc, secs = run(cmd, prdir / "coverage-pytest.log", cwd=cwd or (workdir / "cwd"), env=base_env(side_home(venv)),
                    timeout=a.run_timeout)
     if not out.exists():
         return {"status": "failed", "why": f"coverage run produced no data (exit {rc}); see coverage-pytest.log",
@@ -1103,9 +1112,10 @@ def run_probes(repo: str, pr: int, pythons: dict, prdir: Path, work: Path, a) ->
     if not paths:
         return {"status": "none", "items": []}
     items, errors = [], []
+    envs = {side: base_env(side_home(Path(py).parent.parent)) for side, py in pythons.items()}  # <venv>/bin/python
     for path in paths:
         try:
-            items.append(probes.run_probe(path, pythons, prdir, work / "probe-cwd", base_env(), runs=a.runs))
+            items.append(probes.run_probe(path, pythons, prdir, work / "probe-cwd", envs, runs=a.runs))
             items[-1]["path"] = repo_relative(path)
         except probes.ProbeError as e:
             errors.append(str(e).replace(str(REPO_ROOT) + "/", ""))
@@ -1164,7 +1174,7 @@ def new_record(repo: str, cfg: dict, item: dict, a, machine: dict, run_date: str
 
 def venv_python_version(venv: Path) -> str | None:
     out = subprocess.run([venv / "bin/python", "-c", "import platform;print(platform.python_version())"],
-                         capture_output=True, text=True).stdout.strip()
+                         capture_output=True, text=True, env=base_env(side_home(venv))).stdout.strip()
     return out or None
 
 
@@ -1188,7 +1198,7 @@ def confirm_missing(cmp: dict, venv: Path) -> None:
     for d in cmp.get("skipped_missing_dependency", []):
         ok = subprocess.run([venv / "bin/python", "-c", f"import importlib.util as u,sys;"
                              f"sys.exit(0 if u.find_spec({d['module']!r}) is None else 1)"],
-                            capture_output=True, cwd=venv).returncode == 0
+                            capture_output=True, cwd=venv, env=base_env(side_home(venv))).returncode == 0
         if ok:
             keep.append(d)
         else:
@@ -1313,7 +1323,8 @@ def test_source_pair(repo: str, cfg: dict, item: dict, prdir: Path, work: Path, 
         ok, why = install_side(vm, cm, item.get("chosen"), prdir / "setup-main.log", a.python, a.build_timeout, None)
         if ok:
             rec["python"] = venv_python_version(vm) or rec["python"]
-            frz = subprocess.run(["uv", "pip", "freeze", "-p", vm / "bin/python"], capture_output=True, text=True).stdout
+            frz = subprocess.run(["uv", "pip", "freeze", "-p", vm / "bin/python"], capture_output=True, text=True,
+                                 env=base_env(side_home(vm), install=True)).stdout
             pkgname = cfg["dist"].lower().replace("_", "-")
             cons = work / "constraints.txt"
             cons.write_text("\n".join(ln for ln in frz.splitlines() if ln and not ln.startswith(("-e", "#"))

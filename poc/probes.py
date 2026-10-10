@@ -176,9 +176,10 @@ def run_once(path: Path, python: Path, cwd: Path, env: dict, timeout: int) -> tu
     return observations_of(out, code), log, round(time.time() - t0, 1)
 
 
-def run_probe(path: Path, pythons: dict, outdir: Path, cwd: Path, env: dict, runs: int = 3,
+def run_probe(path: Path, pythons: dict, outdir: Path, cwd: Path, envs: dict, runs: int = 3,
               source: str = "library") -> dict:
-    """Run one probe file `runs` times per side, alternating main/PR; save outputs; judge. Returns the record entry."""
+    """Run one probe file `runs` times per side, alternating main/PR; save outputs; judge. Returns the record entry.
+    envs: {"main": env, "pr": env}, each side's own allowlisted environment (guardrails.isolation.untrusted_env)."""
     spec = read_spec(path)
     cwd.mkdir(parents=True, exist_ok=True)
     got: dict = {"main": [], "pr": []}
@@ -186,7 +187,7 @@ def run_probe(path: Path, pythons: dict, outdir: Path, cwd: Path, env: dict, run
     per_run = []
     for i in range(1, runs + 1):
         for side in ("main", "pr"):
-            obs, log, secs = run_once(path, pythons[side], cwd, env, int(spec["timeout_s"]))
+            obs, log, secs = run_once(path, pythons[side], cwd, envs[side], int(spec["timeout_s"]))
             fname = f"probe-{spec['id']}-{side}-{i}.jsonl"
             write_output(outdir / fname, obs)
             (outdir / f"probe-{spec['id']}-{side}-{i}.log").write_text(log)
