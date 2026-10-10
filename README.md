@@ -1,9 +1,11 @@
-# Blast Radius
+# Proof-of-Change
 
-Test NumPy, pandas and scikit-learn pre-releases against the projects that depend on them, and find breaking
-changes before the release. Every run is checked by evals and guardrails and ends in an approver report
-(what went right, what went wrong, how to fix, APPROVE/REJECT).
+Don't just read the PR. Run it. Proof-of-Change reads what a pull request claims, writes probes, runs them on main and
+on the PR in forked Nebius Token Factory Sandboxes, and returns a verdict (verified / needs attention / could not
+verify) plus a behavior map. Verdicts never block merges. Built for the Nebius x NVIDIA Global AI Hackathon.
 
+This repo currently holds the deterministic core (`poc/`), the downstream-test harness used as one of its checks
+(NumPy, pandas and scikit-learn are the test subjects), and the evals, guardrails and approver reports.
 See `docs/REQUIREMENTS.md`.
 
 ## Quick start
@@ -29,6 +31,7 @@ BR_RUNNER=/path/to/br_run.py .venv/bin/python -m harness.run --upstream pandas -
 
 | Path | Owner | What |
 |---|---|---|
+| `poc/` | Nathan | Verdict enum and rule, deterministic main-vs-PR comparison |
 | `harness/` | Jonathan: `br_run.py`, `PROTOCOL.md` (pending). Nathan: `run.py`, `machine.py` | Runner + protocol-enforcing wrapper |
 | `evals/` | Nathan (golden data: Jonathan) | Checks, golden cases, eval CLI |
 | `guardrails/` | Nathan | Schema, isolation/timeouts, no-external scan |

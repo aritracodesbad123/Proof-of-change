@@ -5,7 +5,6 @@ import pytest
 from evals.run_evals import run as run_evals
 from harness import run as hr
 from harness.machine import detect_machine_type
-from reports.generate import render
 
 
 def test_machine_type_ci_env():
@@ -34,10 +33,13 @@ def test_dry_run(capsys):
     assert out["env"]["OMP_NUM_THREADS"] == "1"
 
 
-def test_report_sections(tmp_path, legacy_records):
+def test_report_from_eval_results(tmp_path, legacy_records):
+    """The eval result JSON is a valid input to the single report generator (CI uses this path)."""
+    from reports.generate import main
     obs = tmp_path / "o.jsonl"
     obs.write_text("\n".join(json.dumps(r) for r in legacy_records) + "\n")
-    md = render(run_evals(obs, None, True))
-    for s in ("Recommendation: **REJECT**", "What went right", "What went wrong", "How to fix", "Golden eval coverage",
-              "machine_type"):
-        assert s in md
+    ev = tmp_path / "ev.json"
+    ev.write_text(json.dumps(run_evals(obs, None, True)))
+    assert main([str(ev), "--out", str(tmp_path / "rep"), "--formats", "md,html"]) == 0
+    md = (tmp_path / "rep" / "SUMMARY.md").read_text()
+    assert md.count("COULD NOT VERIFY / Re-run") == 2  # legacy records fail strict evals -> not trustworthy

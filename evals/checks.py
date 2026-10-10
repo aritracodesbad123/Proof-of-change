@@ -8,11 +8,12 @@ status is one of: pass, fail, warn, skip, todo.
 from __future__ import annotations
 
 import json
+import re
 from collections import Counter
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
-from guardrails.schema import CLASS_KEYS, REQUIRED_RUNS_PER_SIDE, SINGLE_THREAD_VARS, validate_record
+from guardrails.schema import CLASS_KEYS, REQUIRED_RUNS_PER_SIDE, SCHEMA_ID, SINGLE_THREAD_VARS, mode_for, validate_record
 
 GOLDEN_PATH = Path(__file__).with_name("golden_cases.json")
 
@@ -32,10 +33,12 @@ def _norm(name: str) -> str:
     return name.lower().replace("_", "-")
 
 
-def check_schema(rec: dict, require_ci_fields: bool = True) -> Result:
-    errs = validate_record(rec, require_ci_fields=require_ci_fields)
+def check_schema(rec: dict, require_ci_fields: bool = True, require_v1: bool | None = None) -> Result:
+    errs = validate_record(rec, require_ci_fields=require_ci_fields, require_v1=require_v1)
+    mode = mode_for(rec, require_ci_fields, require_v1)
     if not errs:
-        return Result("schema", "pass", "record matches the schema" + (" (incl. machine_type)" if require_ci_fields else ""))
+        ref = " (schema reference verified by sha256)" if rec.get("schema_sha256") else ""
+        return Result("schema", "pass", f"record matches the shared schema {SCHEMA_ID}, mode {mode}{ref}")
     return Result("schema", "fail", "; ".join(errs[:6]) + (f" (+{len(errs) - 6} more)" if len(errs) > 6 else ""),
                   "Run through `python -m harness.run` so machine_type/thread_env are added, or fix the runner output.")
 
@@ -130,13 +133,14 @@ def golden_for(rec: dict, cases: list[dict]) -> dict | None:
     for c in cases:
         m = c["match"]
         if (_norm(rec.get("upstream", "")) == _norm(m["upstream"]) and rec.get("new_version") == m["new_version"]
-                and _norm(rec.get("dependent", "")) == _norm(m["dependent"])):
+                and _norm(rec.get("dependent", "")) == _norm(m["dependent"])
+                and ("old_version" not in m or rec.get("old_version") == m["old_version"])):
             return c
     return None
 
 
 def check_golden_case(rec: dict, case: dict) -> Result:
-    cls, exp = rec.get("classification", {}), case["expect"]
+    cls, exp = rec.get("classification") or {}, case["expect"]
     problems = []
     for k, v in exp.get("exact", {}).items():
         if cls.get(k) != v:
@@ -144,18 +148,135 @@ def check_golden_case(rec: dict, case: dict) -> Result:
     for k, v in exp.get("min", {}).items():
         if not isinstance(cls.get(k), int) or cls[k] < v:
             problems.append(f"{k}={cls.get(k)} (expected >= {v})")
+    if "accepted" in exp and rec.get("accepted") is not exp["accepted"]:
+        problems.append(f"accepted={rec.get('accepted')} (expected {exp['accepted']})")
     if exp.get("matches_expected") and rec.get("matches_expected") != exp["matches_expected"]:
         problems.append(f"matches_expected={rec.get('matches_expected')}")
-    sigs = " | ".join(s for s, _ in rec.get("top_error_signatures_breaks", []))
+    sigs = " | ".join(normalise_error_line(s) for s, _ in rec.get("top_error_signatures_breaks", []))
     for s in exp.get("signature_contains", []):
         if s not in sigs:
             problems.append(f"top break signatures lack {s!r}")
-    name = case["name"] + (" [TODO data]" if case.get("status") == "TODO" else "")
+    problems += _per_run_summary_problems(rec, exp.get("per_run_summary", {}))
+    status = case.get("status", "active")
+    name = case["name"] + {"TODO": " [TODO data]", "pending": " [PENDING, not golden yet]"}.get(status, "")
+    if problems and status == "pending":
+        return Result(f"golden:{case['name']}", "warn", f"{name}: " + "; ".join(problems),
+                      "Candidate pair does not hold yet; Jonathan to confirm or replace it before it becomes golden.")
     if problems:
         return Result(f"golden:{case['name']}", "fail", f"{name}: " + "; ".join(problems),
                       "A known break was missed or miscounted: the classifier or environment regressed. Diff this "
                       "run's freeze files and class-*.txt against the golden run before approving anything.")
     return Result(f"golden:{case['name']}", "pass", f"{name}: all expected values hold")
+
+
+PYTEST_E_PREFIX_RE = re.compile(r"^\s*E(?:\s+|$)")
+IMPORT_ERR_NAMES = ("ImportError", "ModuleNotFoundError")
+
+
+def normalise_error_line(line: str) -> str:
+    """Strip pytest's failure-line prefix (`E   `) and surrounding whitespace, so messages are compared by
+    content, not by how the log happened to render them. 'E   ImportError: x' -> 'ImportError: x'."""
+    return PYTEST_E_PREFIX_RE.sub("", str(line or ""), count=1).strip()
+
+
+def is_import_error_mentioning(line: str, needle: str) -> bool:
+    """True if `line` (with or without the `E   ` prefix, possibly after a 'package import x: ' label)
+    is an ImportError/ModuleNotFoundError whose text contains `needle`."""
+    msg = normalise_error_line(line)
+    return needle in msg and any(re.search(rf"\b{n}\b", msg) for n in IMPORT_ERR_NAMES)
+
+
+SUMMARY_RE = re.compile(r"(\d+) (passed|failed|errors?|skipped|xfailed|xpassed)\b")
+
+
+def parse_pytest_summary(line: str) -> dict:
+    """'2238 passed, 33 skipped, 1 xfailed' -> {'passed': 2238, 'skipped': 33, 'xfailed': 1}. 'error' -> 'errors'."""
+    out = {}
+    for n, k in SUMMARY_RE.findall(line or ""):
+        out["errors" if k.startswith("error") else k] = int(n)
+    return out
+
+
+def run_summary_counts(r: dict) -> tuple[dict, str | None]:
+    """Raw pytest counts for one run, keyed like parse_pytest_summary. Uses the runner's `summary_counts`
+    when present (normalised: error->errors, warning dropped) and cross-checks it against `pytest_summary`."""
+    parsed = parse_pytest_summary(r.get("pytest_summary", ""))
+    sc = r.get("summary_counts")
+    if not isinstance(sc, dict):
+        return parsed, None
+    norm = {("errors" if k.startswith("error") else k): v for k, v in sc.items() if not k.startswith("warning")}
+    clash = None
+    if {k: v for k, v in norm.items() if v} != {k: v for k, v in parsed.items() if v}:
+        clash = f"summary_counts {norm} disagree with pytest_summary {parsed}"
+    return norm, clash
+
+
+def _per_run_summary_problems(rec: dict, spec: dict) -> list[str]:
+    """spec = {"old": {"passed": 2238}, "new": {"passed": 0, "errors": 525}}; every run on that side must match.
+
+    Counts come from pytest's own summary line (per_run[].pytest_summary), not from the JUnit-derived
+    per_run counts, because JUnit counts xpassed as passed. Missing keys in the summary count as 0.
+    """
+    problems = []
+    for side, want in spec.items():
+        runs = [r for r in rec.get("per_run", []) if r.get("side") == side]
+        if len(runs) != REQUIRED_RUNS_PER_SIDE:
+            problems.append(f"{side}: {len(runs)} runs, gate needs {REQUIRED_RUNS_PER_SIDE}")
+        for r in runs:
+            got, clash = run_summary_counts(r)
+            if clash:
+                problems.append(f"{side} run {r.get('run')}: {clash}")
+            for k, v in want.items():
+                if got.get(k, 0) != v:
+                    problems.append(f"{side} run {r.get('run')}: pytest says {k}={got.get(k, 0)} (gate {v})")
+    return problems
+
+
+def check_import_message(rec: dict, needle: str, run_dir: Path | None, case_name: str) -> Result:
+    """The import failure on the new side must mention `needle` (e.g. `_safe_tags`) in every new-side run.
+
+    Sources, in order: record field `import_failure_messages` (planned runner field), the runner's new-side
+    import probe (`dependent_import.new`), the record's break signatures, then the run's pytest-new-N.log files.
+    If none is available the check is skipped. Messages are matched by content: pytest's `E   ` prefix and
+    whitespace are stripped first (normalise_error_line), so a signature that starts with `E   ` still matches.
+    """
+    cid = f"golden:{case_name}:import_message"
+    msgs = rec.get("import_failure_messages")
+    if isinstance(msgs, list) and msgs:
+        ok = any(needle in normalise_error_line(m) for m in msgs)
+        return Result(cid, "pass" if ok else "fail",
+                      f"record import_failure_messages {'mention' if ok else 'do not mention'} {needle!r}",
+                      "" if ok else "The import fails for a different reason than the golden case; inspect the new-side logs.")
+    probe = (rec.get("dependent_import") or {}).get("new") if isinstance(rec.get("dependent_import"), dict) else None
+    probe_hits = [f"{k}: {v}" for k, v in (probe or {}).items() if is_import_error_mentioning(str(v), needle)]
+    sigs = [normalise_error_line(s) for s, _ in rec.get("top_error_signatures_breaks", [])
+            if is_import_error_mentioning(s, needle)]
+    if probe_hits or sigs:
+        src = (f"new-side import probe ({probe_hits[0][:90]})" if probe_hits else "") + \
+              ("; " if probe_hits and sigs else "") + (f"break signature ({sigs[0][:90]})" if sigs else "")
+        return Result(cid, "pass", f"import error mentioning {needle!r} found in {src}")
+    if run_dir is not None:
+        new_runs = sorted(r.get("run") for r in rec.get("per_run", []) if r.get("side") == "new")
+        missing, cited = [], []
+        for n in new_runs:
+            f = run_dir / f"pytest-new-{n}.log"
+            hit = None
+            if f.is_file():
+                with f.open(errors="replace") as fh:
+                    for ln, line in enumerate(fh, 1):
+                        if is_import_error_mentioning(line, needle):
+                            hit = f"{f.name}:{ln}"
+                            break
+            (cited if hit else missing).append(hit or f.name)
+        if new_runs and not missing:
+            return Result(cid, "pass", f"import error mentioning {needle!r} found in every new-side log ({', '.join(cited)}); "
+                          "record itself does not carry the message")
+        if new_runs:
+            return Result(cid, "fail", f"no import error mentioning {needle!r} in {missing}",
+                          "The import fails for a different reason (or not at all); inspect the new-side logs.")
+    return Result(cid, "skip", f"cannot check {needle!r}: record has no import_failure_messages field, the break signatures "
+                  "do not carry it, and the run logs are not available",
+                  "Runner should record import-failure messages (planned), or keep runs/<id>/ next to the record.")
 
 
 def check_citations(claims: list[dict], log_root: Path) -> Result:
@@ -192,17 +313,20 @@ def check_citations(claims: list[dict], log_root: Path) -> Result:
 
 
 def evaluate_record(rec: dict, runs_root: Path | None = None, cases: list[dict] | None = None,
-                    require_ci_fields: bool = True) -> list[Result]:
+                    require_ci_fields: bool = True, require_v1: bool | None = None) -> list[Result]:
     cases = load_golden() if cases is None else cases
     run_dir = (Path(runs_root) / rec["logs"]) if runs_root and rec.get("logs") else None
     if run_dir is not None and not run_dir.is_dir():
         alt = Path(runs_root) / Path(rec["logs"]).name  # runs moved/flattened, e.g. research/dev-runs/<id>
         run_dir = alt if alt.is_dir() else None
-    res = [check_schema(rec, require_ci_fields), check_versions(rec, run_dir), check_runs_per_side(rec),
+    res = [check_schema(rec, require_ci_fields, require_v1), check_versions(rec, run_dir), check_runs_per_side(rec),
            check_single_thread(rec), check_expected(rec)]
     case = golden_for(rec, cases)
     if case:
         res.append(check_golden_case(rec, case))
+        needle = case["expect"].get("import_failure_message_contains")
+        if needle:
+            res.append(check_import_message(rec, needle, run_dir, case["name"]))
     claims = rec.get("explanations")
     if claims is None:
         res.append(Result("llm_citations", "skip", "no Nemotron explanations in this record yet"))
@@ -214,18 +338,23 @@ def evaluate_record(rec: dict, runs_root: Path | None = None, cases: list[dict] 
     return res
 
 
-def golden_coverage(records: list[dict], cases: list[dict] | None = None) -> list[Result]:
+def golden_coverage(records: list[dict], cases: list[dict] | None = None, require: bool = False) -> list[Result]:
+    """Which golden cases this batch covers. With require=True (golden eval batch, CI) a missing active case fails;
+    otherwise (daily batches) it is skipped. TODO/pending cases are never required."""
     cases = load_golden() if cases is None else cases
     out = []
     for c in cases:
         hit = [r for r in records if golden_for(r, [c])]
-        if not hit:
-            st = "todo" if c.get("status") == "TODO" else "fail"
-            out.append(Result(f"golden-coverage:{c['name']}", st, f"no record in this batch for {c['name']}"
-                              + (f" (TODO: {c.get('todo')})" if st == "todo" else ""),
-                              "Run the golden case in the eval batch." if st == "fail" else ""))
-        else:
+        if hit:
             out.append(Result(f"golden-coverage:{c['name']}", "pass", f"covered by {[r['id'] for r in hit]}"))
+        elif c.get("status") in ("TODO", "pending"):
+            out.append(Result(f"golden-coverage:{c['name']}", "todo",
+                              f"no record in this batch ({c.get('status')}: {c.get('todo')})"))
+        elif require:
+            out.append(Result(f"golden-coverage:{c['name']}", "fail", "active golden case missing from this golden batch",
+                              "Run the golden case in the eval batch."))
+        else:
+            out.append(Result(f"golden-coverage:{c['name']}", "skip", "not in this batch (daily batch; not required)"))
     return out
 
 

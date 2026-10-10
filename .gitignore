@@ -8,9 +8,13 @@ venv/
 build/
 dist/
 # run outputs: large and machine-specific
-data/
-runs/
-cache/
+/data/
+/runs/
+/cache/
 eval-results*.json
 reports/runs/*.md
 !reports/runs/.gitkeep
+
+# generated reviewer reports (CI and daily ops output)
+reports/runs/
+reports/daily/

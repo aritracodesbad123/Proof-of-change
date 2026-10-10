@@ -1,0 +1,12 @@
+{
+  "subject": {"kind": "release (proxy for PR)", "title": "scikit-learn 1.5.2 to 1.6.0rc1 (contains PR #29677)", "pr": null},
+  "says": "PR #29677 \"API Revamp estimator tags\" replaces the old estimator tags with a new tags API",
+  "says_source": "PR title, github.com/scikit-learn/scikit-learn/pull/29677, verified via the GitHub API on 2026-10-10",
+  "claims": [
+    {"id": "C1", "text": "Revamps the estimator tags API", "source": "PR #29677 title",
+     "check": {"kind": "none"},
+     "why_not_testable": "the dependent's tests show whether existing code still works; they cannot show the new tags API is correct",
+     "explains_signatures": ["_safe_tags"],
+     "link_source": "the PR #29677 diff, which deletes _safe_tags (checked in git on 2026-10-10)"}
+  ]
+}

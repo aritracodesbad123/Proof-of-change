@@ -1,7 +1,7 @@
 [project]
 name = "blast-radius"
 version = "0.1.0"
-description = "Test NumPy, pandas and scikit-learn pre-releases against their dependents, with evals, guardrails and approver reports."
+description = "Proof-of-Change: prove what a PR claims by running it on main and on the PR. Plus the downstream-test harness, evals, guardrails and approver reports."
 requires-python = ">=3.11"
 dependencies = []  # stdlib only; the runner shells out to uv and git
 
@@ -13,7 +13,7 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
-packages = ["harness", "evals", "guardrails", "reports"]
+packages = ["poc", "harness", "evals", "guardrails", "reports"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

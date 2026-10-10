@@ -1,0 +1,40 @@
+<!doctype html><html lang='en'><head><meta charset='utf-8'><title>Proof-of-Change reviewer summary: golden records, 2026-10-10</title><style>
+:root{--green:#1e7e34;--green-bg:#e6f4ea;--amber:#9a5b00;--amber-bg:#fff4e0;--red:#b3261e;--red-bg:#fdecea;
+--grey:#555;--grey-bg:#eef0f2;--blue:#1a5fb4;--blue-bg:#e8f0fc;--ink:#1f2328;--line:#d0d7de}
+*{box-sizing:border-box}body{font:14px/1.5 -apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--ink);
+max-width:1000px;margin:24px auto;padding:0 24px}
+h1{font-size:22px;margin:0 0 4px}h2{font-size:17px;border-bottom:2px solid var(--line);padding-bottom:4px;margin-top:28px}
+h3{font-size:15px;margin:18px 0 6px}p.meta{color:#57606a;margin-top:0;font-size:12px}
+table{border-collapse:collapse;width:100%;margin:8px 0 12px;font-size:12.5px}
+th,td{border:1px solid var(--line);padding:5px 7px;text-align:left;vertical-align:top;overflow-wrap:anywhere}
+th{background:#f6f8fa}tr:nth-child(even) td{background:#fbfbfc}
+code{font:12px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:#f3f4f6;padding:1px 4px;border-radius:3px}
+pre{font:11.5px/1.45 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:#f6f8fa;border:1px solid var(--line);
+padding:10px;border-radius:6px;white-space:pre-wrap;word-break:break-all}
+.badge{display:inline-block;padding:1px 8px;border-radius:10px;font-weight:600;font-size:11.5px;white-space:nowrap}
+.b-green{color:var(--green);background:var(--green-bg)}.b-amber{color:var(--amber);background:var(--amber-bg)}
+.b-red{color:var(--red);background:var(--red-bg)}
+.b-grey{color:var(--grey);background:var(--grey-bg)}.b-blue{color:var(--blue);background:var(--blue-bg)}
+.banner{border-radius:10px;padding:14px 18px;margin:14px 0 6px;border:2px solid}
+.banner .v{font-size:24px;font-weight:800;letter-spacing:.5px}.banner .row{margin-top:6px;font-size:14px}
+.banner.green{border-color:var(--green);background:var(--green-bg)}.banner.green .v{color:var(--green)}
+.banner.amber{border-color:var(--amber);background:var(--amber-bg)}.banner.amber .v{color:var(--amber)}
+.banner.red{border-color:var(--red);background:var(--red-bg)}.banner.red .v{color:var(--red)}
+.banner.grey{border-color:var(--grey);background:var(--grey-bg)}.banner.grey .v{color:var(--grey)}
+.action{display:inline-block;font-weight:700;padding:2px 10px;border-radius:6px;background:#fff;border:1px solid var(--line)}
+.scope{font-size:12.5px;color:#57606a;margin-top:6px}
+ul.check{list-style:none;padding-left:4px}ul.check li:before{content:"\2610  ";font-size:16px}
+p.decision{border:1px dashed #8c959f;padding:10px;border-radius:6px;font-size:14px}
+@page{size:A4;margin:14mm 12mm}
+@media print{body{margin:0;max-width:none;padding:0}h2{break-after:avoid}pre,.banner{break-inside:avoid}tr{break-inside:avoid}
+thead{display:table-header-group}}
+</style></head><body>
+<h1>Proof-of-Change reviewer summary: golden records, 2026-10-10</h1>
+<p class="meta">Generated 2026-10-10 05:54 IST. 3 report(s): 2 need attention, 0 could not be verified, 1 verified. Items that need a decision are listed first.</p>
+<h2>Needs attention first</h2>
+<ul><li><strong>NEEDS ATTENTION / Reject</strong> (High confidence): pandas 2.3.3 to 3.0.0rc0 (contains PR #56633), tested against UpSetPlot 0.9.0. 67 test(s) of the dependent now fail. <a href='golden-pandas300rc0-upsetplot090/REPORT.html'>Open report</a> (<a href='golden-pandas300rc0-upsetplot090/REPORT.pdf'>PDF</a>)</li><li><strong>NEEDS ATTENTION / Reject</strong> (High confidence): scikit-learn 1.5.2 to 1.6.0rc1 (contains PR #29677), tested against imbalanced-learn 0.12.4. 46 test module(s) of the dependent can no longer be imported. <a href='golden-sklearn160rc1-imblearn0124/REPORT.html'>Open report</a> (<a href='golden-sklearn160rc1-imblearn0124/REPORT.pdf'>PDF</a>)</li></ul>
+<h2>All reports</h2>
+<table><thead><tr><th>Verdict</th><th>Action</th><th>Confidence</th><th>Subject</th><th>Tested against</th><th>Why</th><th>Evals</th><th>Report</th></tr></thead><tbody><tr><td><span class="badge b-amber">NEEDS ATTENTION</span></td><td><span class="badge b-red">Reject</span></td><td>High</td><td>pandas 2.3.3 to 3.0.0rc0 (contains PR #56633)</td><td>UpSetPlot 0.9.0</td><td>67 test(s) of the dependent now fail</td><td><span class="badge b-green">APPROVE</span></td><td><a href='golden-pandas300rc0-upsetplot090/REPORT.html'>HTML</a> · <a href='golden-pandas300rc0-upsetplot090/REPORT.pdf'>PDF</a> · <a href='golden-pandas300rc0-upsetplot090/REPORT.md'>MD</a></td></tr><tr><td><span class="badge b-amber">NEEDS ATTENTION</span></td><td><span class="badge b-red">Reject</span></td><td>High</td><td>scikit-learn 1.5.2 to 1.6.0rc1 (contains PR #29677)</td><td>imbalanced-learn 0.12.4</td><td>46 test module(s) of the dependent can no longer be imported</td><td><span class="badge b-green">APPROVE</span></td><td><a href='golden-sklearn160rc1-imblearn0124/REPORT.html'>HTML</a> · <a href='golden-sklearn160rc1-imblearn0124/REPORT.pdf'>PDF</a> · <a href='golden-sklearn160rc1-imblearn0124/REPORT.md'>MD</a></td></tr><tr><td><span class="badge b-green">VERIFIED</span></td><td><span class="badge b-green">Approve</span></td><td>High</td><td>scikit-learn 1.5.1 to 1.5.2</td><td>imbalanced-learn 0.12.4</td><td>no test of the dependent changed result between old and new</td><td><span class="badge b-green">APPROVE</span></td><td><a href='golden-clean-sklearn151to152-imblearn0124/REPORT.html'>HTML</a> · <a href='golden-clean-sklearn151to152-imblearn0124/REPORT.pdf'>PDF</a> · <a href='golden-clean-sklearn151to152-imblearn0124/REPORT.md'>MD</a></td></tr></tbody></table>
+<h2>Verdict meanings</h2>
+<table><thead><tr><th>Verdict</th><th>Meaning</th></tr></thead><tbody><tr><td><span class="badge b-amber">NEEDS ATTENTION</span></td><td>The run is trustworthy and found a problem: breaks, import failures, or a false claim.</td></tr><tr><td><span class="badge b-grey">COULD NOT VERIFY</span></td><td>The run failed its own trust checks or Nathan's evals. No conclusion; re-run after fixing.</td></tr><tr><td><span class="badge b-green">VERIFIED</span></td><td>The run is trustworthy and found no behavior change.</td></tr></tbody></table>
+</body></html>

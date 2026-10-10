@@ -1,0 +1,779 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "$id": "blast-radius/observation/v1",
+ "title": "Blast Radius observation record v1, revision 2 (shared by Jonathan br_run.py and Nathan harness/run.py)",
+ "type": "object",
+ "required": [
+  "accepted",
+  "classification",
+  "cpu_count",
+  "date_ist",
+  "dependent",
+  "dependent_version",
+  "duration_s",
+  "env_diff",
+  "expected",
+  "expected_class",
+  "gates",
+  "hand_check",
+  "host",
+  "id",
+  "logs",
+  "machine",
+  "machine_type",
+  "matches_expected",
+  "network",
+  "new_direct_url",
+  "new_version",
+  "new_version_requested",
+  "notes",
+  "old_version",
+  "per_run",
+  "pip_check_new",
+  "platform",
+  "python",
+  "report",
+  "run_timeout_s",
+  "runs_per_side",
+  "schema_version",
+  "subset_note",
+  "test_selection",
+  "test_source",
+  "test_timeout_s",
+  "thread_env",
+  "top_error_signatures_already_broken",
+  "top_error_signatures_breaks",
+  "upstream",
+  "upstream_issue",
+  "who",
+  "workers"
+ ],
+ "properties": {
+  "schema_version": {
+   "type": "string",
+   "enum": [
+    "1"
+   ]
+  },
+  "id": {
+   "type": "string",
+   "pattern": "^[A-Za-z0-9._-]+$"
+  },
+  "date_ist": {
+   "type": "string",
+   "pattern": "^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2} IST$"
+  },
+  "who": {
+   "type": "string",
+   "minLength": 1
+  },
+  "machine": {
+   "type": "string",
+   "minLength": 1
+  },
+  "upstream": {
+   "type": "string",
+   "minLength": 1
+  },
+  "old_version": {
+   "type": "string",
+   "minLength": 1
+  },
+  "new_version": {
+   "type": "string",
+   "minLength": 1
+  },
+  "new_version_requested": {
+   "type": "string"
+  },
+  "dependent": {
+   "type": "string",
+   "minLength": 1
+  },
+  "dependent_version": {
+   "type": "string",
+   "minLength": 1
+  },
+  "test_source": {
+   "type": "string",
+   "minLength": 1
+  },
+  "test_selection": {
+   "type": "string"
+  },
+  "subset_note": {
+   "type": [
+    "string",
+    "null"
+   ]
+  },
+  "python": {
+   "type": "string",
+   "pattern": "^3\\.\\d+\\.\\d+"
+  },
+  "runs_per_side": {
+   "type": "integer",
+   "minimum": 1
+  },
+  "workers": {
+   "type": "string"
+  },
+  "pin_overridden": {
+   "type": "boolean"
+  },
+  "env_diff": {
+   "type": "array",
+   "items": {
+    "type": "string"
+   }
+  },
+  "pip_check_new": {
+   "type": "string"
+  },
+  "per_run": {
+   "type": "array",
+   "items": {
+    "type": "object",
+    "required": [
+     "collection_errors",
+     "error",
+     "exit",
+     "failed",
+     "passed",
+     "pytest_summary",
+     "run",
+     "seconds",
+     "side",
+     "skipped"
+    ],
+    "properties": {
+     "side": {
+      "type": "string",
+      "enum": [
+       "old",
+       "new"
+      ]
+     },
+     "run": {
+      "type": "integer",
+      "minimum": 1
+     },
+     "exit": {
+      "type": [
+       "integer",
+       "string"
+      ]
+     },
+     "seconds": {
+      "type": "number",
+      "minimum": 0
+     },
+     "passed": {
+      "type": "integer",
+      "minimum": 0
+     },
+     "failed": {
+      "type": "integer",
+      "minimum": 0
+     },
+     "error": {
+      "type": "integer",
+      "minimum": 0
+     },
+     "skipped": {
+      "type": "integer",
+      "minimum": 0
+     },
+     "collection_errors": {
+      "type": "integer",
+      "minimum": 0
+     },
+     "pytest_summary": {
+      "type": "string"
+     },
+     "junit": {
+      "type": "boolean"
+     }
+    }
+   }
+  },
+  "gates": {
+   "type": "object"
+  },
+  "accepted": {
+   "type": "boolean"
+  },
+  "classification": {
+   "type": [
+    "object",
+    "null"
+   ],
+   "properties": {
+    "real_break": {
+     "type": "integer",
+     "minimum": 0
+    },
+    "already_broken": {
+     "type": "integer",
+     "minimum": 0
+    },
+    "flaky": {
+     "type": "integer",
+     "minimum": 0
+    },
+    "import_failure": {
+     "type": "integer",
+     "minimum": 0
+    },
+    "fixed_by_new": {
+     "type": "integer",
+     "minimum": 0
+    },
+    "lost_tests": {
+     "type": "integer",
+     "minimum": 0
+    }
+   },
+   "required": [
+    "real_break",
+    "already_broken",
+    "flaky",
+    "import_failure",
+    "fixed_by_new",
+    "lost_tests"
+   ]
+  },
+  "stability": {
+   "type": [
+    "object",
+    "null"
+   ]
+  },
+  "top_error_signatures_breaks": {
+   "type": "array"
+  },
+  "top_error_signatures_already_broken": {
+   "type": "array"
+  },
+  "expected": {
+   "type": "string",
+   "minLength": 1
+  },
+  "expected_class": {
+   "type": "string",
+   "enum": [
+    "no_break",
+    "break",
+    "unknown"
+   ]
+  },
+  "matches_expected": {
+   "type": "string",
+   "enum": [
+    "yes",
+    "no",
+    "n/a"
+   ]
+  },
+  "duration_s": {
+   "type": "object",
+   "required": [
+    "total_wall"
+   ]
+  },
+  "network": {
+   "type": "string"
+  },
+  "explanation": {
+   "type": [
+    "object",
+    "null"
+   ]
+  },
+  "notes": {
+   "type": [
+    "string",
+    "null"
+   ]
+  },
+  "logs": {
+   "type": "string"
+  },
+  "report": {
+   "type": "string"
+  },
+  "harness_version": {
+   "type": "string"
+  },
+  "host": {
+   "type": "string"
+  },
+  "cpu_count": {
+   "type": "integer",
+   "minimum": 1
+  },
+  "platform": {
+   "type": "string"
+  },
+  "test_timeout_s": {
+   "type": "integer",
+   "minimum": 1
+  },
+  "run_timeout_s": {
+   "type": "integer",
+   "minimum": 1
+  },
+  "new_direct_url": {
+   "type": [
+    "string",
+    "null"
+   ]
+  },
+  "hand_check": {
+   "type": [
+    "string",
+    "object",
+    "null"
+   ]
+  },
+  "upstream_issue": {
+   "type": [
+    "string",
+    "null"
+   ]
+  },
+  "machine_type": {
+   "type": "object",
+   "required": [
+    "arch",
+    "os"
+   ],
+   "properties": {
+    "arch": {
+     "type": "string",
+     "minLength": 1
+    },
+    "os": {
+     "type": "string",
+     "minLength": 1
+    },
+    "platform": {
+     "type": "string"
+    },
+    "cpu_count": {
+     "type": [
+      "integer",
+      "null"
+     ]
+    },
+    "cpu_model": {
+     "type": [
+      "string",
+      "null"
+     ]
+    },
+    "ram_gb": {
+     "type": [
+      "number",
+      "null"
+     ]
+    },
+    "ci": {
+     "type": [
+      "string",
+      "null"
+     ]
+    },
+    "runner_name": {
+     "type": [
+      "string",
+      "null"
+     ]
+    },
+    "runner_os": {
+     "type": [
+      "string",
+      "null"
+     ]
+    },
+    "runner_arch": {
+     "type": [
+      "string",
+      "null"
+     ]
+    },
+    "runner_environment": {
+     "type": [
+      "string",
+      "null"
+     ]
+    },
+    "image": {
+     "type": [
+      "string",
+      "null"
+     ]
+    },
+    "label": {
+     "type": [
+      "string",
+      "null"
+     ]
+    }
+   }
+  },
+  "thread_env": {
+   "type": "object",
+   "required": [
+    "OMP_NUM_THREADS",
+    "OPENBLAS_NUM_THREADS",
+    "MKL_NUM_THREADS"
+   ],
+   "properties": {
+    "OMP_NUM_THREADS": {
+     "type": "string",
+     "enum": [
+      "1"
+     ]
+    },
+    "OPENBLAS_NUM_THREADS": {
+     "type": "string",
+     "enum": [
+      "1"
+     ]
+    },
+    "MKL_NUM_THREADS": {
+     "type": "string",
+     "enum": [
+      "1"
+     ]
+    },
+    "NUMEXPR_NUM_THREADS": {
+     "type": "string",
+     "enum": [
+      "1"
+     ]
+    },
+    "VECLIB_MAXIMUM_THREADS": {
+     "type": "string",
+     "enum": [
+      "1"
+     ]
+    },
+    "BLIS_NUM_THREADS": {
+     "type": "string",
+     "enum": [
+      "1"
+     ]
+    }
+   }
+  },
+  "dependent_import": {
+   "type": "object"
+  },
+  "pip_check_old": {
+   "type": "string"
+  },
+  "cpus": {
+   "type": "string"
+  },
+  "mem_cap_gb": {
+   "type": "number"
+  },
+  "explanations": {
+   "type": "array",
+   "items": {
+    "type": "object",
+    "required": [
+     "text",
+     "citations"
+    ],
+    "properties": {
+     "text": {
+      "type": "string"
+     },
+     "citations": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "required": [
+        "file",
+        "line",
+        "quote"
+       ]
+      }
+     }
+    }
+   }
+  },
+  "pr": {
+   "type": [
+    "object",
+    "null"
+   ],
+   "description": "OPTIONAL (rev 2). The PR under test when the run is a PR run, not a release pair.",
+   "required": [
+    "repo",
+    "number"
+   ],
+   "properties": {
+    "repo": {
+     "type": "string",
+     "pattern": "^[\\w.-]+/[\\w.-]+$"
+    },
+    "number": {
+     "type": "integer",
+     "minimum": 1
+    },
+    "url": {
+     "type": [
+      "string",
+      "null"
+     ]
+    },
+    "title": {
+     "type": [
+      "string",
+      "null"
+     ]
+    },
+    "base_sha": {
+     "type": [
+      "string",
+      "null"
+     ],
+     "pattern": "^[0-9a-f]{7,40}$"
+    },
+    "head_sha": {
+     "type": [
+      "string",
+      "null"
+     ],
+     "pattern": "^[0-9a-f]{7,40}$"
+    },
+    "merge_commit": {
+     "type": [
+      "string",
+      "null"
+     ],
+     "pattern": "^[0-9a-f]{7,40}$"
+    }
+   }
+  },
+  "claims": {
+   "type": [
+    "object",
+    "null"
+   ],
+   "description": "OPTIONAL (rev 2). What the PR or release says it does; same shape as a <run id>.claims.json file (docs/REPORT_SPEC.md). Statuses are computed by the report, never stored here.",
+   "required": [
+    "claims"
+   ],
+   "properties": {
+    "subject": {
+     "type": "object"
+    },
+    "says": {
+     "type": [
+      "string",
+      "null"
+     ]
+    },
+    "says_source": {
+     "type": [
+      "string",
+      "null"
+     ]
+    },
+    "claims": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "required": [
+       "id",
+       "text"
+      ],
+      "properties": {
+       "id": {
+        "type": "string",
+        "minLength": 1
+       },
+       "text": {
+        "type": "string",
+        "minLength": 1
+       },
+       "source": {
+        "type": [
+         "string",
+         "null"
+        ]
+       },
+       "check": {
+        "type": "object",
+        "required": [
+         "kind"
+        ],
+        "properties": {
+         "kind": {
+          "type": "string",
+          "enum": [
+           "none",
+           "no_breaks",
+           "breaks_contain"
+          ]
+         },
+         "text": {
+          "type": "string"
+         }
+        }
+       },
+       "why_not_testable": {
+        "type": [
+         "string",
+         "null"
+        ]
+       },
+       "explains_signatures": {
+        "type": "array",
+        "items": {
+         "type": "string"
+        }
+       },
+       "link_source": {
+        "type": [
+         "string",
+         "null"
+        ]
+       }
+      }
+     }
+    }
+   }
+  },
+  "upstream_commit_old": {
+   "type": [
+    "string",
+    "null"
+   ],
+   "pattern": "^[0-9a-f]{7,40}$",
+   "description": "OPTIONAL (rev 2). Exact upstream commit on the old side."
+  },
+  "upstream_commit_new": {
+   "type": [
+    "string",
+    "null"
+   ],
+   "pattern": "^[0-9a-f]{7,40}$",
+   "description": "OPTIONAL (rev 2). Exact upstream commit on the new side."
+  },
+  "per_test_outcomes": {
+   "type": [
+    "string",
+    "null"
+   ],
+   "description": "OPTIONAL (rev 2). Path (relative to logs) or sha256 digest of a per-test outcome table."
+  },
+  "old_output": {
+   "type": [
+    "object",
+    "null"
+   ],
+   "description": "OPTIONAL (rev 2). Test id -> old-side output for tests that broke (a passing test usually has none: empty string)."
+  },
+  "golden_check": {
+   "type": [
+    "object",
+    "null"
+   ],
+   "description": "OPTIONAL (rev 2). Golden cases actually re-run with this harness version (not just re-read from stored records).",
+   "required": [
+    "harness_version",
+    "passed",
+    "total",
+    "date"
+   ],
+   "properties": {
+    "harness_version": {
+     "type": "string"
+    },
+    "passed": {
+     "type": "integer",
+     "minimum": 0
+    },
+    "total": {
+     "type": "integer",
+     "minimum": 0
+    },
+    "date": {
+     "type": "string",
+     "pattern": "^\\d{4}-\\d{2}-\\d{2}"
+    },
+    "cases": {
+     "type": "array",
+     "items": {
+      "type": "string"
+     }
+    }
+   }
+  },
+  "reviewer_decision": {
+   "type": [
+    "object",
+    "null"
+   ],
+   "description": "OPTIONAL (rev 2). The human approver's decision, written back after review.",
+   "required": [
+    "decision",
+    "reviewer",
+    "date"
+   ],
+   "properties": {
+    "decision": {
+     "type": "string",
+     "enum": [
+      "approve",
+      "approve_with_notes",
+      "reject",
+      "re_run"
+     ]
+    },
+    "reviewer": {
+     "type": "string",
+     "minLength": 1
+    },
+    "date": {
+     "type": "string",
+     "pattern": "^\\d{4}-\\d{2}-\\d{2}"
+    },
+    "note": {
+     "type": [
+      "string",
+      "null"
+     ]
+    }
+   }
+  }
+ },
+ "description": "One JSON object per (upstream, old, new, dependent) tuple, one line in observations.jsonl and research/runs/<id>/record.json. Merged 2026-10-10 from Jonathan v1 (gates, accepted, network, report, stability, dependent_import) and Nathan guardrails/schema.py (hand_check, upstream_issue, machine_type, thread_env, per_run.collection_errors, per_run.pytest_summary). Cross-field rules not expressible here are listed in x-cross-field-rules and enforced by harness/brlib.py validate(). Revision 2 (2026-10-10, Nathan, from Jonathan's docs/REPORT_SPEC.md): adds OPTIONAL pr, claims, upstream_commit_old/new, per_test_outcomes, old_output, golden_check, reviewer_decision for the reviewer report. Purely additive: every rev 1 record stays valid, schema_version stays \"1\". hand_check and upstream_issue were already present (required, nullable) and are unchanged. Accepted schema_sha256 values for rev 1 and rev 2 are listed in harness/schema/README.md and guardrails/schema.py.",
+ "x-cross-field-rules": [
+  "per_run has exactly runs_per_side entries for each side, and runs_per_side >= 3 when classification is not null",
+  "classification is null only when accepted is false (the runner refused to classify)",
+  "accepted is true only if every gate with required != false has pass == true",
+  "env_diff is exactly [upstream==old_version, upstream==new_version] (or empty for an A/A control with old == new)",
+  "import_failure counts test MODULES, not tests; lost_tests are not counted as real_break"
+ ],
+ "x-revisions": [
+  {
+   "rev": 1,
+   "date": "2026-10-10",
+   "by": "Jonathan + Nathan",
+   "change": "initial shared schema (feat/shared-schema ed75df4)"
+  },
+  {
+   "rev": 2,
+   "date": "2026-10-10",
+   "by": "Nathan",
+   "change": "optional reviewer-report fields: pr, claims, upstream_commit_old, upstream_commit_new, per_test_outcomes, old_output, golden_check, reviewer_decision"
+  }
+ ]
+}

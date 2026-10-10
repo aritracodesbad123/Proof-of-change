@@ -1,7 +1,16 @@
 # reports/
 
-- `generate.py` (Nathan): turns an eval result (`python -m evals.run_evals --out ...`) into a Markdown approver
-  report: what went right, what went wrong, how to fix it, and an APPROVE / REJECT recommendation.
-- `runs/` : one approver report per run (Jonathan's runs and CI runs land here; generated files are not committed
-  except samples).
-- `samples/`: example reports generated from the dev calibration records.
+One report generator for the human approver (spec: `docs/REPORT_SPEC.md`):
+
+- `generate.py`: entry point. `python -m reports.generate <inputs> --out <dir>`; inputs are record.json files,
+  observations .jsonl or an eval result .json. Writes `<dir>/<run id>/REPORT.md|html|pdf` and the daily summary
+  `<dir>/SUMMARY.md|html|pdf` (needs-attention items first). PDF via headless Chrome/Chromium (`BR_CHROME` to override).
+- `reviewer.py`: the report itself (verdict banner, recommended action, confidence, 3-line summary, claims vs reality
+  with a cited log line per claim, what changed, what went right, what went wrong + how to fix, trust checks, Nathan's
+  evals and guardrails, checklist, rerun command, evidence links, appendix, glossary). Ported from Jonathan's
+  `harness/report/render_report.py` (now a shim).
+- `daily/<date>/`: daily ops output (not committed).
+- `runs/`: CI and ad-hoc output (not committed).
+- `samples/golden-v1/`: committed samples for Jonathan's three golden records, generated with
+  `--runs-root /workspace/blast-radius-research --claims-dir evals/fixtures/claims --require-v1`. Their links point at
+  the run artifacts in `/workspace/blast-radius-research` (relative paths, valid on the box).
