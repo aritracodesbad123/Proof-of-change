@@ -33,7 +33,7 @@ never seen. If you write a check after you know the answer, the check will tend 
    ("fixed" by hand or "model" plus the model id), the time, and a fingerprint of everything the writer was shown.
    On the PR side, a probe is refused if its fingerprint no longer matches or it was written after PR-side work
    started. A model is never shown PR-side code, only the description and the base side.
-3. **`--baseline`**, which picks how much checking to do:
+3. **`--baseline`**, which chooses how much checking to do:
    - `tests`: tests only.
    - `tests+diff`: tests plus generic **differential probes**. These call the public functions the PR touches
      with a fixed set of simple inputs and compare the results. No model is involved.
@@ -65,7 +65,7 @@ they are kept out of blind scores, and a test makes sure blind scoring rejects t
 
 - Generate probes only from the PR text and the base side, then freeze them, then run the PR side. The order is
   enforced in code, not just written down as a rule.
-- Treat model-written code as untrusted. It runs only inside the sandbox (an isolated box with no network
+- Treat model-written code as untrusted. It runs only inside the sandbox (an isolated environment with no network
   access), with a time limit and a limit on how much output it may produce. Its output must match a fixed format,
   or the result is thrown away.
 - The API key stays in the process that coordinates the run and is never passed into the sandbox. A test checks
