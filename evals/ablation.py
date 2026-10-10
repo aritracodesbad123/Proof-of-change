@@ -22,7 +22,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-from evals.pr_metrics import LABELS_PATH, load_cases, score_records
+from evals.pr_metrics import LABELS_PATH, blind_score, case_for, load_cases, non_blind_probes, record_is_blind, score, score_records
 
 BASELINES = ("tests", "tests+diff", "tests+probes", "full")
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -39,35 +39,40 @@ def _rate(n: int, d: int) -> str:
     return f"{n}/{d}" if d else "n/a"
 
 
+def _metrics(cases: list[dict], recs: list[dict], blind: bool) -> dict:
+    """Rates over the labelled cases that HAVE a verdict here (a case without a record is not a miss)."""
+    v = {c["id"]: r["verdict"] for r in recs if (c := case_for(cases, r))}
+    matched = [c for c in cases if c["id"] in v]
+    s = blind_score(matched, [r for r in recs if case_for(cases, r)]) if blind else score(matched, v)
+    return {"records": len(recs), "labelled": len(v), "unlabelled": len(recs) - len(v),
+            "catch": _rate(len(s["caught"]), s["scored_regressions"]),
+            "false_alarms": _rate(len(s["false_alarms"]), s["scored_safe"]),
+            "could_not_verify": _rate(len(s["could_not_verify"]), len(v)), "detail": s}
+
+
 def row(baseline: str, cases: list[dict], records: list[dict]) -> dict:
-    s = score_records(cases, records)
-    b, nb = s["blind"], s["not_blind"]
-    scored_b = [r for r in records if r.get("id") not in nb["records"]]
-    cnv_b = len(b["could_not_verify"])
-    return {"baseline": baseline, "records": len(records),
-            "blind": {"catch": _rate(len(b["caught"]), b["scored_regressions"]),
-                      "false_alarms": _rate(len(b["false_alarms"]), b["scored_safe"]),
-                      "could_not_verify": _rate(cnv_b, len(scored_b)), "detail": b},
-            "not_blind": {"records": len(nb["records"]),
-                          "catch": _rate(len(nb["caught"]), nb["scored_regressions"] if nb["records"] else 0),
-                          "false_alarms": _rate(len(nb["false_alarms"]), nb["scored_safe"] if nb["records"] else 0),
-                          "could_not_verify": _rate(len(nb["could_not_verify"]), len(nb["records"])),
-                          "label": nb["label"], "detail": nb}}
+    blind = [r for r in records if record_is_blind(r)]
+    other = [r for r in records if not record_is_blind(r)]
+    nb = _metrics(cases, other, False)
+    nb["label"] = score_records(cases, other)["not_blind"]["label"]
+    nb["why"] = {r.get("id"): non_blind_probes(r) for r in other}
+    return {"baseline": baseline, "records": len(records), "blind": _metrics(cases, blind, True), "not_blind": nb}
 
 
 def table(rows: list[dict]) -> str:
-    out = ["| Baseline | Records | Catch (blind) | False alarms (blind) | Could not verify (blind) | "
-           "NOT BLIND: records, catch, false alarms, could not verify |", "|---|---|---|---|---|---|"]
+    out = ["| Baseline | Records (labelled) | Catch (blind) | False alarms (blind) | Could not verify (blind) | "
+           "NOT BLIND: records (labelled), catch, false alarms, could not verify |", "|---|---|---|---|---|---|"]
     for r in rows:
-        nb = r["not_blind"]
-        out.append(f"| {r['baseline']} | {r['records']} | {r['blind']['catch']} | {r['blind']['false_alarms']} | "
-                   f"{r['blind']['could_not_verify']} | {nb['records']}, {nb['catch']}, {nb['false_alarms']}, "
-                   f"{nb['could_not_verify']} |")
+        b, nb = r["blind"], r["not_blind"]
+        out.append(f"| {r['baseline']} | {r['records']} ({b['labelled'] + nb['labelled']}) | {b['catch']} | "
+                   f"{b['false_alarms']} | {b['could_not_verify']} | {nb['records']} ({nb['labelled']}), {nb['catch']}, "
+                   f"{nb['false_alarms']}, {nb['could_not_verify']} |")
     out += ["", "Blind columns count only verdicts that no non-blind probe could decide (live model probes that "
             "passed the freeze rule, or no deciding probe). The NOT BLIND column covers post-hoc fixed probes, "
             "recorded model fixtures and differential probes: known-answer data, not blind results. Catch = "
             "needs_attention on a caused_regression case; false alarm = needs_attention on a safe case; could not "
-            "verify is never counted as a catch."]
+            "verify is never counted as a catch. Rates use only labelled cases that have a record; unlabelled records "
+            "are counted but not scored."]
     return "\n".join(out) + "\n"
 
 

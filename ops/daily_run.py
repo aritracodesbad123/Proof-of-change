@@ -153,7 +153,7 @@ def diff_files(diff: str) -> list[str]:
 
 
 def classify_files(files: list[str], pkg: str) -> dict:
-    in_pkg = [f for f in files if f.startswith(pkg + "/")]
+    in_pkg = [f for f in files if f.startswith((pkg + "/", f"src/{pkg}/"))]   # flat or src layout
     py = [f for f in in_pkg if f.endswith((".py", ".pyi"))]
     compiled = [f for f in in_pkg if f.endswith(COMPILED_EXT) or os.path.basename(f) in COMPILED_NAMES]
     build_cfg = [f for f in files if os.path.basename(f) in COMPILED_NAMES and "/" not in f.strip("/")]

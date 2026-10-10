@@ -443,7 +443,20 @@ def test_ablation_table(tmp_path):
     assert ablation.main(["--records-root", str(tmp_path)]) == 0
     out = json.loads((tmp_path / "ablation.json").read_text())
     rows = {r["baseline"]: r for r in out["rows"]}
-    assert rows["tests"]["blind"]["catch"] == "0/3" and rows["full"]["blind"]["catch"] == "1/3"
-    assert rows["tests+probes"]["blind"]["catch"] == "0/3" and rows["tests+probes"]["not_blind"]["catch"] == "1/3"
+    assert rows["tests"]["blind"]["catch"] == "0/1" and rows["full"]["blind"]["catch"] == "1/1"
+    assert rows["tests+probes"]["blind"]["catch"] == "n/a" and rows["tests+probes"]["not_blind"]["catch"] == "1/1"
+    assert rows["tests"]["blind"]["could_not_verify"] == "0/1"
     md = (tmp_path / "ablation.md").read_text()
-    assert "NOT BLIND" in md and "| tests+probes | 1 | 0/3 |" in md
+    assert "NOT BLIND" in md and "| tests+probes | 1 (1) | n/a | n/a | n/a | 1 (1), 1/1," in md
+    unl = tmp_path / "unl"
+    (unl / "full").mkdir(parents=True)                      # an unlabelled PR is counted, never scored
+    (unl / "full" / "records.jsonl").write_text(json.dumps(_rec("u", "needs_attention", [], repo="o/r", pr=1)) + "\n")
+    ablation.main(["--records-root", str(unl)])
+    r = json.loads((unl / "ablation.json").read_text())["rows"][0]["blind"]
+    assert r["unlabelled"] == 1 and r["catch"] == "n/a"
+
+
+def test_src_layout_files_count_as_package_code():
+    f = daily_run.classify_files(["src/marshmallow/utils.py", "tests/test_utils.py", "README.md"], "marshmallow")
+    assert f["package_py"] == ["src/marshmallow/utils.py"] and f["other"] == ["tests/test_utils.py", "README.md"]
+    assert daily_run.classify_files(["pandas/core/x.py"], "pandas")["package_py"] == ["pandas/core/x.py"]
