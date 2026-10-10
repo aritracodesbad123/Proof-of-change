@@ -1,0 +1,52 @@
+{
+ "source": "xarray PR 11663, source-pair route, 3 runs per side (JUnit files as written by the runner; hostname replaced)",
+ "per_run": [
+  {
+   "side": "old",
+   "run": 1,
+   "exit": 1
+  },
+  {
+   "side": "new",
+   "run": 1,
+   "exit": 1
+  },
+  {
+   "side": "old",
+   "run": 2,
+   "exit": 1
+  },
+  {
+   "side": "new",
+   "run": 2,
+   "exit": 1
+  },
+  {
+   "side": "old",
+   "run": 3,
+   "exit": 1
+  },
+  {
+   "side": "new",
+   "run": 3,
+   "exit": 1
+  }
+ ],
+ "files": {
+  "all": [
+   "doc/user-guide/io.md",
+   "doc/whats-new.rst",
+   "xarray/backends/zarr.py",
+   "xarray/tests/backends/test_datatree.py"
+  ],
+  "package_py": [
+   "xarray/backends/zarr.py",
+   "xarray/tests/backends/test_datatree.py"
+  ],
+  "compiled": [],
+  "other": [
+   "doc/user-guide/io.md",
+   "doc/whats-new.rst"
+  ]
+ }
+}

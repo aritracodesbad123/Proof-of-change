@@ -39,9 +39,9 @@ def test_machine_type_needs_arch_and_os(upset):
 def test_schema_is_the_shared_file():
     from guardrails.schema import COMPATIBLE_SCHEMA_SHA256, SCHEMA_REVISION
     assert SCHEMA_PATH.parts[-3:] == ("harness", "schema", "observation.schema.json")
-    assert SCHEMA_SHA256 == "0a706f00904fa34ab8ad8bc7f79f53da08dd51576aa2800a3274befb95f7608d"  # rev 4
-    assert SCHEMA_REVISION == 4
-    assert sorted(COMPATIBLE_SCHEMA_SHA256.values()) == ["rev 1", "rev 2", "rev 3", "rev 4"]
+    assert SCHEMA_SHA256 == "f6c4e7ba5cd74c5c6259cf3311295a2cc909de20a6802d4b7c4496356c1448ea"  # rev 5
+    assert SCHEMA_REVISION == 5
+    assert sorted(COMPATIBLE_SCHEMA_SHA256.values()) == ["rev 1", "rev 2", "rev 3", "rev 4", "rev 5"]
     assert COMPATIBLE_SCHEMA_SHA256["5a3c3d36b7730ce74d0f23b03c88ea862ea35cc327c7d79481fca8b972e8383e"] == "rev 1"
     readme = (SCHEMA_PATH.parent / "README.md").read_text()
     assert all(sha in readme for sha in COMPATIBLE_SCHEMA_SHA256)  # documented
@@ -52,7 +52,7 @@ def test_rev1_records_still_valid_under_current_rev(golden_v1_records):
     for r in golden_v1_records:
         assert r["schema_sha256"].startswith("5a3c3d36")  # the golden records were written against rev 1
         assert validate_record(r, require_v1=True) == []
-        assert "valid under current rev 4" in schema_reference_note(r)
+        assert "valid under current rev 5" in schema_reference_note(r)
 
 
 def test_rev2_optional_fields(golden_v1_records):

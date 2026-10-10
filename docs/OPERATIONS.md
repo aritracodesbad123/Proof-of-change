@@ -21,7 +21,10 @@ Plain-language version: the [README](../README.md). This page is the detail behi
 - **Chosen PRs (optional):** a `<date>.md` file naming specific PRs per library, with install and test commands and
   an expected verdict. Resolution: `--chosen-prs`, else `<chosen_prs_dir>/<date>.md` (`$POC_CHOSEN_PRS_DIR` or
   `ops/local.json`), else `<libraries file folder>/chosen-prs/<date>.md`.
-- **Independent verification (optional):** `<verification_dir>/<date>/verification.jsonl`, scored after all verdicts.
+- **Independent verification (optional):** `<verification_dir>/<date>/verification.jsonl` (or, if present, a
+  `verification*.jsonl` file of schema-rev-5 `verification` records), scored after all verdicts. For rev-5 records
+  only `verification.checker_verdict` is scored; `verdict_under_review` (the checked run's own verdict) never is, and
+  records with `check_status` `unverified` are skipped.
 
 `ops/local.json` is git-ignored and holds machine-local paths (keys: `libraries_file`, `chosen_prs_dir`,
 `verification_dir`, `golden_status`, `research_dir`; see `poc/local_config.py`). Environment variables override it.
@@ -60,9 +63,28 @@ Comparison: rename-aware. An id that disappears is only `removed_tests` if no ne
 appeared; otherwise it is listed under `reparametrized` and the new ids are judged by their own outcomes. Failures
 identical on both sides are `preexisting_failures`. Unexplained pytest exit codes give `could_not_verify`.
 
-Verdict: `could_not_verify` if setup/build/patch failed, a run timed out, no tests ran, an exit code is unexplained, or
-new/changed tests were skipped because an optional dependency is missing; `needs_attention` for regressions, new
-failing tests, tests missing on the PR side or other outcome changes; `verified` otherwise. Then the coverage gate.
+Test modules that fail to load (collection errors: JUnit testcases with an empty classname) are tracked as modules,
+never as tests: their ids are made side-independent on every route (the environment / `site-packages.` prefix is
+dropped), and they are listed as `load_failed_both`, `load_failed_pr` (with the number of main-side tests that no
+longer run) or `load_failed_main`. They never count as "unchanged", removed or new. `executed` records the fewest tests
+that actually ran (passed, failed or errored; not skipped, not load failures) in any run of each side.
+
+Verdict, in order:
+
+1. `could_not_verify` if setup/build/patch failed, a run timed out or a side produced no results;
+2. `needs_attention` for regressions or new failing tests (nothing below can hide them);
+3. `could_not_verify` if no test actually ran on a side (every test skipped, or every module failed to load);
+4. `could_not_verify` if a test module loads on one side only ("test module X fails to load on the PR side (N
+   test(s) no longer run)");
+5. `could_not_verify` if a test module of the changed code (`test_<stem>.py` of a changed source file, or a changed
+   test file; every module when the changed files are unknown) fails to load on both sides, even if unrelated tests
+   pass;
+6. `could_not_verify` if an exit code is unexplained, or new/changed tests were skipped because an optional
+   dependency is missing;
+7. otherwise `needs_attention` for tests missing on the PR side or other outcome changes, `verified` if nothing differs.
+
+Then the coverage gate. The reason says how many tests ran on each side, how many were unchanged (and how many of
+those were skipped on both sides), flaky tests, and every module that failed to load.
 
 ## Coverage gate (`poc/coverage_gate.py`)
 
@@ -85,8 +107,9 @@ non-test Python files that ship with the library count (not `tests/`, `test_*.py
 
 Record fields (schema rev 4, all optional): `changed_lines_total`, `changed_lines_covered` (null = not measured),
 `coverage` (raw run), `coverage_gate` {kind, changed, confidence, note}, `verdict_before_coverage_gate`,
-`reason_before_coverage_gate`. The gate is idempotent and is re-applied in memory by `--report-only` and by
-`reports/pr_report.py`; saved records are never rewritten.
+`reason_before_coverage_gate`. The gate is idempotent. Records are gated before they are written, so
+`records.jsonl`, each `record.json` and `REPORT.md` state the same final verdict; `reports/pr_report.py` re-applies
+the gate when rendering.
 
 **Limitations.** coverage.py cannot measure compiled code, so the compiled rule is a heuristic: a changed test file
 named after the module (`item_selection.c` -> `test_item_selection.py`) counts as "a test that calls into the changed
@@ -146,7 +169,11 @@ Same section order, renderers and verdict vocabulary as the golden-record report
 `--scan-limit 15`, `--runs 3`, `--workers 4`, `--python 3.12`, `--test-timeout 120`, `--run-timeout 900`,
 `--build-timeout 1800`, `--min-free-gb 20`, `--select-only`, `--resume`, `--reselect`, `--rerun-note TEXT`,
 `--report-only` (rebuild REPORT.md and the reviewer reports from `records.jsonl`, `run_meta.json` and
-`selection.json`; nothing is re-tested), `--date`, `--ops-dir`, `--work-dir`, `--report-dir`, `--no-report`,
+`selection.json`; nothing is re-tested. Saved records are first brought up to the current rules: a calendar date in
+`run_date` and the gated final verdict. Changed `records.jsonl` / `record.json` files are rewritten and the originals
+kept once under `pre-migration/`), `--rejudge` (with `--report-only`: also recompute each verdict from the saved
+JUnit files with the current comparison rules; the previous verdict is kept under `rejudged`), `--date` (run folder,
+may be nested, e.g. `<date>/<name>`; `run_date` is the folder's calendar date), `--ops-dir`, `--work-dir`, `--report-dir`, `--no-report`,
 `--no-coverage` (skip the coverage run; the gate then says "not measured").
 
 A full daily run takes about 15-20 minutes (day 1: 15 PRs in 16.4 min wall time, before the coverage run existed).

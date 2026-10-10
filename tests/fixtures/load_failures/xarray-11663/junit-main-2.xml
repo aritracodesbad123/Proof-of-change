@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="8" failures="0" skipped="0" tests="8" time="2.923" timestamp="2026-10-10T05:52:00.183769+00:00" hostname="runner"><testcase classname="" name="xarray.tests.backends.test_datatree" time="0.000"><error message="collection failure">xarray/tests/backends/test_datatree.py:29: in &lt;module&gt;
+    from xarray.tests.backends.test_netCDF4 import TestNetCDF4Data as _TestNetCDF4Data
+&lt;frozen importlib._bootstrap&gt;:1360: in _find_and_load
+    ???
+&lt;frozen importlib._bootstrap&gt;:1331: in _find_and_load_unlocked
+    ???
+&lt;frozen importlib._bootstrap&gt;:935: in _load_unlocked
+    ???
+../venv-main/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:188: in exec_module
+    exec(co, module.__dict__)
+xarray/tests/backends/test_netCDF4.py:32: in &lt;module&gt;
+    from xarray.tests.backends.base import (
+xarray/tests/backends/base.py:270: in &lt;module&gt;
+    class NetCDF3Only:
+xarray/tests/backends/base.py:273: in NetCDF3Only
+    @pytest.mark.asyncio
+     ^^^^^^^^^^^^^^^^^^^
+../venv-main/lib/python3.12/site-packages/_pytest/mark/structures.py:628: in __getattr__
+    warnings.warn(
+E   pytest.PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html</error><error message="collection failure">xarray/tests/backends/test_datatree.py:29: in &lt;module&gt;
+    from xarray.tests.backends.test_netCDF4 import TestNetCDF4Data as _TestNetCDF4Data
+&lt;frozen importlib._bootstrap&gt;:1360: in _find_and_load
+    ???
+&lt;frozen importlib._bootstrap&gt;:1331: in _find_and_load_unlocked
+    ???
+&lt;frozen importlib._bootstrap&gt;:935: in _load_unlocked
+    ???
+../venv-main/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:188: in exec_module
+    exec(co, module.__dict__)
+xarray/tests/backends/test_netCDF4.py:32: in &lt;module&gt;
+    from xarray.tests.backends.base import (
+xarray/tests/backends/base.py:270: in &lt;module&gt;
+    class NetCDF3Only:
+xarray/tests/backends/base.py:273: in NetCDF3Only
+    @pytest.mark.asyncio
+     ^^^^^^^^^^^^^^^^^^^
+../venv-main/lib/python3.12/site-packages/_pytest/mark/structures.py:628: in __getattr__
+    warnings.warn(
+E   pytest.PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html</error><error message="collection failure">xarray/tests/backends/test_datatree.py:29: in &lt;module&gt;
+    from xarray.tests.backends.test_netCDF4 import TestNetCDF4Data as _TestNetCDF4Data
+&lt;frozen importlib._bootstrap&gt;:1360: in _find_and_load
+    ???
+&lt;frozen importlib._bootstrap&gt;:1331: in _find_and_load_unlocked
+    ???
+&lt;frozen importlib._bootstrap&gt;:935: in _load_unlocked
+    ???
+../venv-main/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:188: in exec_module
+    exec(co, module.__dict__)
+xarray/tests/backends/test_netCDF4.py:32: in &lt;module&gt;
+    from xarray.tests.backends.base import (
+xarray/tests/backends/base.py:270: in &lt;module&gt;
+    class NetCDF3Only:
+xarray/tests/backends/base.py:273: in NetCDF3Only
+    @pytest.mark.asyncio
+     ^^^^^^^^^^^^^^^^^^^
+../venv-main/lib/python3.12/site-packages/_pytest/mark/structures.py:628: in __getattr__
+    warnings.warn(
+E   pytest.PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html</error><error message="collection failure">xarray/tests/backends/test_datatree.py:29: in &lt;module&gt;
+    from xarray.tests.backends.test_netCDF4 import TestNetCDF4Data as _TestNetCDF4Data
+&lt;frozen importlib._bootstrap&gt;:1360: in _find_and_load
+    ???
+&lt;frozen importlib._bootstrap&gt;:1331: in _find_and_load_unlocked
+    ???
+&lt;frozen importlib._bootstrap&gt;:935: in _load_unlocked
+    ???
+../venv-main/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:188: in exec_module
+    exec(co, module.__dict__)
+xarray/tests/backends/test_netCDF4.py:32: in &lt;module&gt;
+    from xarray.tests.backends.base import (
+xarray/tests/backends/base.py:270: in &lt;module&gt;
+    class NetCDF3Only:
+xarray/tests/backends/base.py:273: in NetCDF3Only
+    @pytest.mark.asyncio
+     ^^^^^^^^^^^^^^^^^^^
+../venv-main/lib/python3.12/site-packages/_pytest/mark/structures.py:628: in __getattr__
+    warnings.warn(
+E   pytest.PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html</error></testcase><testcase classname="" name="xarray.tests.backends.test_zarr" time="0.000"><error message="collection failure">xarray/tests/backends/test_zarr.py:60: in &lt;module&gt;
+    from xarray.tests.backends.base import (
+xarray/tests/backends/base.py:270: in &lt;module&gt;
+    class NetCDF3Only:
+xarray/tests/backends/base.py:273: in NetCDF3Only
+    @pytest.mark.asyncio
+     ^^^^^^^^^^^^^^^^^^^
+../venv-main/lib/python3.12/site-packages/_pytest/mark/structures.py:628: in __getattr__
+    warnings.warn(
+E   pytest.PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html</error><error message="collection failure">xarray/tests/backends/test_zarr.py:60: in &lt;module&gt;
+    from xarray.tests.backends.base import (
+xarray/tests/backends/base.py:270: in &lt;module&gt;
+    class NetCDF3Only:
+xarray/tests/backends/base.py:273: in NetCDF3Only
+    @pytest.mark.asyncio
+     ^^^^^^^^^^^^^^^^^^^
+../venv-main/lib/python3.12/site-packages/_pytest/mark/structures.py:628: in __getattr__
+    warnings.warn(
+E   pytest.PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html</error><error message="collection failure">xarray/tests/backends/test_zarr.py:60: in &lt;module&gt;
+    from xarray.tests.backends.base import (
+xarray/tests/backends/base.py:270: in &lt;module&gt;
+    class NetCDF3Only:
+xarray/tests/backends/base.py:273: in NetCDF3Only
+    @pytest.mark.asyncio
+     ^^^^^^^^^^^^^^^^^^^
+../venv-main/lib/python3.12/site-packages/_pytest/mark/structures.py:628: in __getattr__
+    warnings.warn(
+E   pytest.PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html</error><error message="collection failure">xarray/tests/backends/test_zarr.py:60: in &lt;module&gt;
+    from xarray.tests.backends.base import (
+xarray/tests/backends/base.py:270: in &lt;module&gt;
+    class NetCDF3Only:
+xarray/tests/backends/base.py:273: in NetCDF3Only
+    @pytest.mark.asyncio
+     ^^^^^^^^^^^^^^^^^^^
+../venv-main/lib/python3.12/site-packages/_pytest/mark/structures.py:628: in __getattr__
+    warnings.warn(
+E   pytest.PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html</error></testcase></testsuite></testsuites>

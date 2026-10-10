@@ -35,6 +35,9 @@ CATEGORIES = [  # comparison key, plain-English label, how bad
     ("skipped_missing_dependency", "are new or changed but were skipped because an optional module is missing",
      "check"),
     ("reparametrized", "were re-parametrized (same test, new parameter ids; not counted as removed)", "note"),
+    ("load_failed_pr", "fail to load on the PR side only (their tests no longer run)", "check"),
+    ("load_failed_main", "fail to load on main only (no baseline for their tests)", "check"),
+    ("load_failed_both", "fail to load on both sides (their tests did not run)", "note"),
     ("preexisting_failures", "fail identically on both sides (already broken on main)", "note"),
 ]
 SUMMARY_RE = re.compile(r"\b\d+ (passed|failed|errors?|skipped)\b.* in [0-9.]+s")
@@ -68,9 +71,15 @@ def side_of(x: dict) -> str:
     return {"old": "main", "new": "pr"}.get(x.get("side"), x.get("side"))
 
 
+def noun(key: str) -> str:
+    return "test module(s)" if key.startswith("load_failed") else "test(s)"
+
+
 def item_str(x) -> str:
     """A comparison entry as text: plain test ids, or dicts (re-parametrized / skipped-for-dependency entries)."""
     if isinstance(x, dict):
+        if "tests_affected" in x:
+            return f"{x['module']} ({x['tests_affected']} test(s) on the other side)"
         if "removed_ids" in x:
             return f"{x['test']} ({len(x['removed_ids'])} -> {len(x['added_ids'])} ids)"
         return f"{x.get('test', '?')} (needs {x['module']})" if x.get("module") else str(x.get("test", x))
@@ -278,7 +287,7 @@ def claims(rec: dict, logs: Logs) -> list[dict]:
         first = item_str(items[0]).split(": ")[0].split(" (")[0]
         cit = logs.test_line(first) if kind == "bad" else (logs.summary("main", 1) if key == "removed_tests" else summ)
         rows.append(dict(id="-", text="Change not in the PR description", source="this run", status="unmentioned change",
-                         evidence=f"{len(items)} test(s) {label}, e.g. {item_str(items[0])}", citation=cit))
+                         evidence=f"{len(items)} {noun(key)} {label}, e.g. {item_str(items[0])}", citation=cit))
     return rows
 
 
@@ -334,8 +343,10 @@ def build(rec: dict, prdir: Path, out_dir: Path, decision: dict | None = None) -
     R.h(2, "What changed in behavior", "changes")
     if c:
         R.table(["What", "Count", "Examples"],
-                [["Tests unchanged", str(c.get("same", 0)), "-"], ["New tests that pass", str(c.get("new_tests_passing", 0)), "-"]]
-                + [[f"Tests that {label}", str(len(c.get(k) or [])),
+                ([["Tests that actually ran (main / PR, fewest of the runs)",
+                   f"{c['executed'].get('main', '?')} / {c['executed'].get('pr', '?')}", "-"]] if c.get("executed") else [])
+                + [["Tests unchanged", str(c.get("same", 0)), "-"], ["New tests that pass", str(c.get("new_tests_passing", 0)), "-"]]
+                + [[f"{'Test modules' if k.startswith('load_failed') else 'Tests'} that {label}", str(len(c.get(k) or [])),
                     ", ".join(f"`{item_str(t)}`" for t in (c.get(k) or [])[:5]) or "-"]
                    for k, label, _ in CATEGORIES])
         for t, m in list((c.get("messages") or {}).items())[:3]:

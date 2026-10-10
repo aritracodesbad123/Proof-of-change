@@ -32,5 +32,20 @@
    "run": 3,
    "exit": 1
   }
- ]
+ ],
+ "files": {
+  "all": [
+   "pandera/engines/utils.py",
+   "tests/pandas/test_engine_utils.py",
+   "tests/pandas/test_schemas.py"
+  ],
+  "package_py": [
+   "pandera/engines/utils.py"
+  ],
+  "compiled": [],
+  "other": [
+   "tests/pandas/test_engine_utils.py",
+   "tests/pandas/test_schemas.py"
+  ]
+ }
 }
