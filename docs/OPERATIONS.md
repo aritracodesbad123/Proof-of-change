@@ -117,6 +117,37 @@ module"; it does not prove the test reaches the changed C lines, and a test with
 A PR mixing Python and compiled changes gets both rules. Lines run only by import (module-level code) count as
 covered. The coverage run adds roughly one more test run per PR (about 15-60 s on day-1 PRs).
 
+## Sandbox (`guardrails/sandbox.py`)
+
+Untrusted code never runs directly on the machine. Every install and build (PR build code such as `setup.py` or meson
+runs here), pytest run, coverage run, probe, `uv pip freeze`, `patch` and every start of a venv Python runs inside a
+**bubblewrap** sandbox (`bwrap`, unprivileged user namespaces, no root daemon). Each side (main, PR) has its own:
+
+| Inside the sandbox | Source |
+|---|---|
+| `/usr`, `/bin` `/lib` `/lib64` `/sbin` (links or read-only binds) | host, read-only |
+| `/etc`: `ld.so.cache`, `ld.so.conf(.d)`, `alternatives`, `ssl`, `ca-certificates`, `localtime`, `timezone`, `os-release`, `protocols`, `services`, `mime.types`; a one-user `passwd`/`group` | host files, read-only; `passwd`/`group` generated |
+| `/etc/resolv.conf`, `hosts`, `nsswitch.conf`, `gai.conf`, `host.conf` | only in the install/build phase |
+| `/opt/uv-python` | the uv-managed Pythons, read-only (venvs are created inside, so they point here) |
+| `/opt/uv-cache` (install phase only) | the shared uv cache as a read-only lower layer plus a private tmpfs layer that is thrown away on exit (`--overlay-src`/`--tmp-overlay`): builds can use the cache but never write to it. bwrap older than 0.10 has no overlays; then each side gets its own empty cache in its temporary home |
+| the side's own dirs, at their real paths | read-write: `work/venv-<side>`, `work/home-<side>` (HOME; TMPDIR is `HOME/.tmp`), `work/out-<side>`, `work/cwd-<side>`, the side's checkout (`work/side-<side>`, or `work/src` for the PR side of a source build) |
+| `work/src/.git` (worktree checkouts) | read-only, so `git describe` works for version tools |
+| a wheel, a probe file, a constraints file | read-only, only the one file a step needs |
+| `/tmp`, `/proc`, `/dev` | fresh tmpfs, new procfs, minimal devices |
+
+Options: `--unshare-all` (user, mount, PID, IPC, UTS, cgroup and network namespaces), `--die-with-parent`,
+`--new-session`, `--cap-drop ALL`, and the allowlisted environment below. Nothing else exists inside: no `/home`, no
+other worktrees or agent data, no `/sys`, not the other side's venv. **Network:** only the install/build phase
+shares the host network (`--share-net`); the test, coverage, probe, freeze and version-check phases have none (only
+their own loopback interface, so not even services on the host's 127.0.0.1). JUnit and coverage files are written
+inside the side's `out-` dir and moved to the run folder afterwards. git on our own fresh clones runs outside.
+
+**Fail closed:** at the start of every PR the sandbox is test-started; if it cannot start, the PR is not run and gets
+**could_not_verify** with the reason `sandbox unavailable: ...`. `--unsafe-no-sandbox` skips the sandbox; the daily
+run and `make check` never pass it. `run_meta.json` records the sandbox used (`"sandbox"`). The tests in
+`tests/test_sandbox.py` start real sandboxes with dummy secret files planted outside and fake credentials in the
+environment, and check every phase (a hostile build backend, pytest, a probe) and the shared cache.
+
 ## Environment of untrusted code (`guardrails/isolation.py`)
 
 Every subprocess that may run code from a PR or a package gets an **allowlisted** environment built by
@@ -242,7 +273,7 @@ Same section order, renderers and verdict vocabulary as the golden-record report
 kept once under `pre-migration/`), `--rejudge` (with `--report-only`: also recompute each verdict from the saved
 JUnit files with the current comparison rules; the previous verdict is kept under `rejudged`), `--date` (run folder,
 may be nested, e.g. `<date>/<name>`; `run_date` is the folder's calendar date), `--ops-dir`, `--work-dir`, `--report-dir`, `--no-report`,
-`--no-coverage` (skip the coverage run; the gate then says "not measured"), `--no-probes` (do not run probe files;
+`--unsafe-no-sandbox` (run PR code without the sandbox; never used by the daily run), `--no-coverage` (skip the coverage run; the gate then says "not measured"), `--no-probes` (do not run probe files;
 the record says `"probes": {"status": "none"}`).
 
 A full daily run takes about 15-20 minutes (day 1: 15 PRs in 16.4 min wall time, before the coverage run existed).

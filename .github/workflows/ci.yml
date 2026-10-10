@@ -37,9 +37,15 @@ jobs:
             echo "nproc: $(nproc); $(grep -m1 'model name' /proc/cpuinfo || true)"
           } >> "$GITHUB_STEP_SUMMARY"
       - name: Install
-        run: python -m pip install -e ".[dev]"
-      - name: Install pdftotext (the public-hygiene test reads PDF text)
-        run: sudo apt-get update -q && sudo apt-get install -y -q poppler-utils
+        run: python -m pip install -e ".[dev]" uv
+      - name: Install pdftotext (the public-hygiene test reads PDF text) and bubblewrap (the sandbox)
+        run: sudo apt-get update -q && sudo apt-get install -y -q poppler-utils bubblewrap
+      - name: Allow unprivileged user namespaces for bubblewrap (Ubuntu restricts them through AppArmor)
+        run: |
+          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0 || true
+          bwrap --version
+          bwrap --unshare-all --die-with-parent --ro-bind /usr /usr --symlink usr/lib /lib --symlink usr/lib64 /lib64 \
+            --symlink usr/bin /bin --proc /proc --dev /dev --tmpfs /tmp -- /bin/true && echo "sandbox works" || echo "::warning::bubblewrap cannot start here; the sandbox tests will skip"
       - name: Lint
         run: ruff check .
       - name: Guardrail - no external side effects

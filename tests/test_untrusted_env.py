@@ -8,6 +8,7 @@ from pathlib import Path
 import pytest
 
 import guardrails.isolation as iso
+from guardrails import sandbox
 from ops import daily_run
 from poc import probes
 
@@ -22,6 +23,15 @@ RUN_KEYS = {"PATH", "HOME", "LANG", "LC_ALL", "PYTHONHASHSEED", "PYTHONDONTWRITE
             "OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS", "NUMEXPR_NUM_THREADS",
             "VECLIB_MAXIMUM_THREADS", "BLIS_NUM_THREADS"}
 INSTALL_KEYS = RUN_KEYS | {"UV_CACHE_DIR", "UV_PYTHON_INSTALL_DIR", "UV_LINK_MODE", "UV_NO_CONFIG"}
+
+
+@pytest.fixture
+def no_sandbox():
+    """The allowlist alone (these run anywhere, also where bubblewrap cannot start); test_sandbox.py repeats the
+    subprocess checks inside the real sandbox."""
+    sandbox.configure(False)
+    yield
+    sandbox.configure(True)
 
 
 @pytest.fixture
@@ -113,7 +123,7 @@ DUMP_PROBE = ('import json, os\nPROBE = {"id": "env-dump", "target": "o/r#1", "a
               'print(json.dumps({"observations": {"env": dict(os.environ)}}))\n')
 
 
-def test_probe_subprocess_sees_only_the_allowlist(hostile_env, tmp_path, monkeypatch):
+def test_probe_subprocess_sees_only_the_allowlist(hostile_env, no_sandbox, tmp_path, monkeypatch):
     work, prdir = tmp_path / "work", tmp_path / "run"
     prdir.mkdir()
     pythons = {s: _fake_venv(work, s) for s in ("main", "pr")}
@@ -132,7 +142,7 @@ def test_probe_subprocess_sees_only_the_allowlist(hostile_env, tmp_path, monkeyp
         assert seen["HOME"] == str(work / f"home-{side}")                # per-side temporary home
 
 
-def test_pytest_subprocess_sees_only_the_allowlist(hostile_env, tmp_path):
+def test_pytest_subprocess_sees_only_the_allowlist(hostile_env, no_sandbox, tmp_path):
     work, rdir = tmp_path / "work", tmp_path / "run"
     rdir.mkdir()
     venvs = {s: _fake_venv(work, s).parent.parent for s in ("main", "pr")}
@@ -158,7 +168,7 @@ def test_install_subprocess_sees_only_the_allowlist(hostile_env, tmp_path, monke
     """install_side's commands (uv venv / uv pip install of the PR checkout) run with the install allowlist."""
     calls = []
 
-    def fake_run(cmd, log, cwd=None, env=None, timeout=None):
+    def fake_run(cmd, log, cwd=None, env=None, timeout=None, sbx=None):
         calls.append(env)
         return 0, 0.0
     monkeypatch.setattr(daily_run, "run", fake_run)

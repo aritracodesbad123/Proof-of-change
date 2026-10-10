@@ -165,10 +165,15 @@ def judge(spec: dict, runs: dict, files: dict | None = None) -> list[dict]:
     return out
 
 
-def run_once(path: Path, python: Path, cwd: Path, env: dict, timeout: int) -> tuple[dict, str, float]:
+def run_once(path: Path, python: Path, cwd: Path, env: dict, timeout: int, launch=None) -> tuple[dict, str, float]:
+    """launch(argv, env, cwd) -> (argv, env, cwd) wraps the command, e.g. into the sandbox (guardrails/sandbox.py)."""
     t0 = time.time()
+    argv = [str(python), str(path)]
+    if launch:
+        argv, env, cwd = launch(argv, env, cwd)
     try:
-        cp = subprocess.run([str(python), str(path)], cwd=cwd, env=env, capture_output=True, text=True, timeout=timeout)
+        cp = subprocess.run(argv, cwd=cwd, env=env, capture_output=True, text=True, timeout=timeout,
+                            start_new_session=True)
         out, code, log = cp.stdout, cp.returncode, cp.stdout[-4000:] + ("\n--- stderr ---\n" + cp.stderr[-4000:]
                                                                         if cp.stderr else "")
     except subprocess.TimeoutExpired:
@@ -176,18 +181,21 @@ def run_once(path: Path, python: Path, cwd: Path, env: dict, timeout: int) -> tu
     return observations_of(out, code), log, round(time.time() - t0, 1)
 
 
-def run_probe(path: Path, pythons: dict, outdir: Path, cwd: Path, envs: dict, runs: int = 3,
-              source: str = "library") -> dict:
+def run_probe(path: Path, pythons: dict, outdir: Path, cwd: Path | dict, envs: dict, runs: int = 3,
+              source: str = "library", launchers: dict | None = None) -> dict:
     """Run one probe file `runs` times per side, alternating main/PR; save outputs; judge. Returns the record entry.
     envs: {"main": env, "pr": env}, each side's own allowlisted environment (guardrails.isolation.untrusted_env)."""
     spec = read_spec(path)
-    cwd.mkdir(parents=True, exist_ok=True)
+    cwds = cwd if isinstance(cwd, dict) else {"main": cwd, "pr": cwd}
+    for c in cwds.values():
+        c.mkdir(parents=True, exist_ok=True)
     got: dict = {"main": [], "pr": []}
     files: dict = {"main": [], "pr": []}
     per_run = []
     for i in range(1, runs + 1):
         for side in ("main", "pr"):
-            obs, log, secs = run_once(path, pythons[side], cwd, envs[side], int(spec["timeout_s"]))
+            obs, log, secs = run_once(path, pythons[side], cwds[side], envs[side], int(spec["timeout_s"]),
+                                         (launchers or {}).get(side))
             fname = f"probe-{spec['id']}-{side}-{i}.jsonl"
             write_output(outdir / fname, obs)
             (outdir / f"probe-{spec['id']}-{side}-{i}.log").write_text(log)

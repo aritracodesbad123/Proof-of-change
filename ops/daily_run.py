@@ -47,6 +47,7 @@ from pathlib import Path, PurePosixPath
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO_ROOT))
+from guardrails import sandbox  # noqa: E402
 from guardrails.isolation import untrusted_env  # noqa: E402
 from harness.machine import detect_machine_type  # noqa: E402
 from poc import coverage_gate, local_config, probes  # noqa: E402
@@ -418,21 +419,31 @@ def install_side(venv: Path, checkout: Path, chosen: dict | None, log: Path, pyt
     cmds = [["uv", "venv", "-q", "-p", python, venv],
             ["uv", "pip", "install", "-q", "-p", venv / "bin/python", *proj, *extra, *BASE_TEST_DEPS]
             + (["-c", constraints] if constraints else [])]
+    sbx = side_sandbox(venv, network=True, ro=(constraints,) if constraints else ())
+    sbx["rw"].append(checkout)
     for c in cmds:
-        rc, _ = run(c, log, env=env, timeout=timeout)
+        rc, _ = run(c, log, env=env, timeout=timeout, sbx=sbx)
         if rc != 0:
             return False, f"install failed ({rc}); see {log.name}"
     return True, ""
 
 
 # ---------------------------------------------------------------- execution helpers
-def run(cmd, log_path: Path, cwd=None, env=None, timeout=None) -> tuple[int | str, float]:
-    """Run cmd with output to log_path. env is required: always an allowlisted base_env(...)."""
+HOST = None   # sbx=HOST: a trusted tool on our own files (git on our clones); everything else runs in a side's sandbox
+
+
+def run(cmd, log_path: Path, cwd=None, env=None, timeout=None, sbx=HOST) -> tuple[int | str, float]:
+    """Run cmd with output to log_path. env is required: always an allowlisted base_env(...). sbx: the sandbox of a
+    side (side_sandbox(...)); every command that may run PR or package code passes one."""
     if env is None:
         raise ValueError("run() needs an explicit allowlisted env (base_env)")
     t0 = time.time()
+    shown = list(map(str, cmd))
+    if sbx is not None:
+        cmd, env, cwd = sandbox.wrap(cmd, env, sbx["rw"], sbx["ro"], sbx["network"], cwd)
     with open(log_path, "a") as fh:
-        fh.write(f"\n$ {' '.join(map(str, cmd))}\n"); fh.flush()
+        fh.write(f"\n$ {' '.join(shown)}" + (f"   [sandbox: {'network' if sbx['network'] else 'no network'}]"
+                                              if sbx is not None and sandbox.enabled() else "") + "\n"); fh.flush()
         p = subprocess.Popen(list(map(str, cmd)), cwd=cwd, env=env, stdout=fh, stderr=subprocess.STDOUT,
                              start_new_session=True)
         try:
@@ -457,6 +468,48 @@ def base_env(home: Path, install: bool = False, **extra) -> dict:
 def side_home(venv: Path) -> Path:
     """Per-environment temporary HOME, next to the venv: work/venv-main -> work/home-main."""
     return venv.parent / f"home-{venv.name.removeprefix('venv-')}"
+
+
+def side_sandbox(venv: Path, network: bool = False, ro: tuple = (), rw: tuple = ()) -> dict:
+    """The sandbox of one side (guardrails/sandbox.py): read-write only that side's own dirs under the PR's work dir
+    (venv, temporary home, output and cwd dirs, its checkout), read-only the shared clone's .git for worktree
+    checkouts, plus `ro`/`rw` extras. The PR side of a source build also gets the PR source (work/src)."""
+    work, side = venv.parent, venv.name.removeprefix("venv-")
+    rwl = [venv, side_out(venv), side_cwd(venv)]
+    rol = list(ro)
+    co = work / f"side-{side}"
+    if co.exists():
+        rwl.append(co)
+        if (work / "src" / ".git").is_dir():
+            rol.append(work / "src" / ".git")
+    elif side == "pr" and (work / "src").exists():
+        rwl.append(work / "src")
+    return {"rw": rwl + list(rw), "ro": rol, "network": network}
+
+
+def side_out(venv: Path) -> Path:
+    d = venv.parent / f"out-{venv.name.removeprefix('venv-')}"
+    d.mkdir(parents=True, exist_ok=True)
+    return d
+
+
+def side_cwd(venv: Path) -> Path:
+    d = venv.parent / f"cwd-{venv.name.removeprefix('venv-')}"
+    d.mkdir(parents=True, exist_ok=True)
+    return d
+
+
+def in_side(venv: Path, cmd: list, install: bool = False, network: bool = False, cwd=None, ro: tuple = (),
+            timeout: int | None = 600) -> subprocess.CompletedProcess:
+    """Captured run of cmd in the side's sandbox (venv Python and uv calls: freeze, version checks, imports)."""
+    env = base_env(side_home(venv), install=install)
+    argv, env, cwd2 = sandbox.wrap([str(c) for c in cmd], env, **{k: v for k, v in
+                                   side_sandbox(venv, network=network, ro=ro).items()}, cwd=cwd or side_cwd(venv))
+    try:
+        return subprocess.run(argv, capture_output=True, text=True, env=env, cwd=cwd2, timeout=timeout,
+                              start_new_session=True)
+    except subprocess.TimeoutExpired as e:
+        return subprocess.CompletedProcess(argv, "timeout", e.stdout or "", e.stderr or "")
 
 
 def nightly_wheel(gh_get, dist: str, python: str) -> dict:
@@ -508,8 +561,7 @@ def nightly_commit(version: str, venv: Path, cfg: dict, env: dict) -> tuple[str 
     """Upstream commit the nightly was built from, if the wheel says so."""
     commit, how = None, "not embedded in the wheel"
     if cfg.get("commit_expr"):
-        out = subprocess.run([venv / "bin/python", "-c", cfg["commit_expr"]], capture_output=True, text=True,
-                             env=env, cwd=venv).stdout.strip()
+        out = in_side(venv, [venv / "bin/python", "-c", cfg["commit_expr"]]).stdout.strip()
         if re.fullmatch(r"[0-9a-f]{7,40}", out or ""):
             commit, how = out, "embedded git revision"
     if not commit:
@@ -525,13 +577,12 @@ def test_extras(meta_extras: list[str]) -> list[str]:
 
 def dist_extras(venv: Path, dist: str, env: dict) -> list[str]:
     code = f"import importlib.metadata as m;print('\\n'.join(m.metadata({dist!r}).get_all('Provides-Extra') or []))"
-    out = subprocess.run([venv / "bin/python", "-c", code], capture_output=True, text=True, env=env, cwd=venv).stdout
+    out = in_side(venv, [venv / "bin/python", "-c", code]).stdout
     return [x.strip() for x in out.splitlines() if x.strip()]
 
 
 def freeze(venv: Path, out: Path) -> str:
-    txt = subprocess.run(["uv", "pip", "freeze", "-p", venv / "bin/python"], capture_output=True, text=True,
-                         env=base_env(side_home(venv), install=True)).stdout
+    txt = in_side(venv, ["uv", "pip", "freeze", "-p", venv / "bin/python"], install=True).stdout
     out.write_text(txt)
     return out.name
 
@@ -544,15 +595,16 @@ def build_main_env(cfg: dict, venv: Path, log: Path, python: str, timeout: int, 
     py = venv / "bin/python"
     steps = [["uv", "venv", "-q", "-p", python, venv],
              ["uv", "pip", "install", "-q", "-p", py, cfg["dist"], *cfg["deps"], *BASE_TEST_DEPS, *cfg["test_deps"]]]
+    sbx = side_sandbox(venv, network=True)
     for c in steps:
-        rc, _ = run(c, log, env=env, timeout=timeout)
+        rc, _ = run(c, log, env=env, timeout=timeout, sbx=sbx)
         if rc != 0:
             return {"ok": False, "why": f"main env setup failed ({rc}) at: {' '.join(map(str, c[:4]))}"}
     extras = test_extras(dist_extras(venv, cfg["dist"], env))
     opt = list(cfg.get("optional_test_deps", []))
     if extras or opt:
         spec = f"{cfg['dist']}[{','.join(extras)}]" if extras else cfg["dist"]
-        rc, _ = run(["uv", "pip", "install", "-q", "-p", py, spec, *opt], log, env=env, timeout=timeout)
+        rc, _ = run(["uv", "pip", "install", "-q", "-p", py, spec, *opt], log, env=env, timeout=timeout, sbx=sbx)
         if rc != 0:
             return {"ok": False, "why": f"installing test extras/optional test deps failed ({rc}); see setup log"}
     try:
@@ -562,13 +614,12 @@ def build_main_env(cfg: dict, venv: Path, log: Path, python: str, timeout: int, 
     except Exception as e:  # noqa: BLE001
         return {"ok": False, "why": f"could not fetch the nightly wheel: {e}"}
     rc, _ = run(["uv", "pip", "install", "-q", "-p", py, "--no-deps", "--reinstall", whl["path"]], log, env=env,
-                timeout=timeout)
+                timeout=timeout, sbx=side_sandbox(venv, ro=(whl["path"],)))   # local file: no network needed
     if rc != 0:
         return {"ok": False, "why": f"installing the nightly wheel failed ({rc})"}
-    ver = subprocess.run([py, "-c", f"import {cfg['pkg']} as m;print(m.__version__)"],
-                         capture_output=True, text=True, env=env, cwd=venv).stdout.strip()
+    ver = in_side(venv, [py, "-c", f"import {cfg['pkg']} as m;print(m.__version__)"]).stdout.strip()
     commit, how = nightly_commit(whl["version"], venv, cfg, env)
-    rc, _ = run(["uv", "pip", "check", "-p", py], log, env=env, timeout=120)
+    rc, _ = run(["uv", "pip", "check", "-p", py], log, env=env, timeout=120, sbx=side_sandbox(venv))
     whl.pop("path")
     return {"ok": bool(ver), "version": ver, "pip_check": "ok" if rc == 0 else "conflicts (see setup log)",
             "build": whl | {"commit": commit, "commit_source": how},
@@ -587,11 +638,12 @@ def apply_patch(pdiff: str, site: Path, log: Path) -> tuple[bool, str]:
     pf = site.parent / "pr.diff"
     pf.write_text(pdiff)
     base = ["patch", "-p1", "-F0", "-N", "--no-backup-if-mismatch", "-d", site, "-i", pf]
-    env = base_env(side_home(site.parents[2]))   # site = <venv>/lib/pythonX.Y/site-packages
-    rc, _ = run(base + ["--dry-run"], log, env=env)
+    venv = site.parents[2]   # site = <venv>/lib/pythonX.Y/site-packages
+    env, sbx = base_env(side_home(venv)), side_sandbox(venv)
+    rc, _ = run(base + ["--dry-run"], log, env=env, sbx=sbx)
     if rc != 0:
         return False, "PR diff does not apply cleanly to the current nightly (main has moved or the files differ)"
-    rc, _ = run(base, log, env=env)
+    rc, _ = run(base, log, env=env, sbx=sbx)
     return rc == 0, "" if rc == 0 else "patch failed after a clean dry run"
 
 
@@ -607,19 +659,20 @@ def source_build(repo: str, item: dict, cfg: dict, venv: Path, workdir: Path, lo
              ["uv", "venv", "-q", "-p", python, venv],
              ["uv", "pip", "install", "-q", "-p", venv / "bin/python", *cfg["deps"], *BASE_TEST_DEPS, *cfg["test_deps"],
               *cfg.get("optional_test_deps", []), *main_extra_reqs]]
-    for c in steps:
-        rc, _ = run(c, log, env=env, timeout=900)
+    for c in steps:   # git on our own fresh clone runs on the host; uv steps (package code) in the PR side's sandbox
+        sbx = side_sandbox(venv, network=True) if c[0] == "uv" else HOST
+        rc, _ = run(c, log, env=env if c[0] == "uv" else base_env(workdir / "home-git"), timeout=900, sbx=sbx)
         if rc != 0:
             return {"ok": False, "why": f"source checkout/setup failed ({rc}) at: {' '.join(map(str, c[:3]))}"}
     t0 = time.time()
-    rc, secs = run(["uv", "pip", "install", "-p", venv / "bin/python", "--no-cache", src], log, env=env, timeout=timeout)
+    rc, secs = run(["uv", "pip", "install", "-p", venv / "bin/python", "--no-cache", src], log, env=env, timeout=timeout,
+                   sbx=side_sandbox(venv, network=True))
     if rc != 0:
         tail = log.read_text(errors="replace").strip().splitlines()[-15:]
         hint = next((ln for ln in reversed(tail) if re.search(r"error|not found|ERROR", ln)), tail[-1] if tail else "")
         return {"ok": False, "build_seconds": round(time.time() - t0, 1),
                 "why": f"source build of PR head {'timed out' if rc == 'timeout' else 'failed'} after {secs}s: {hint.strip()[:200]}"}
-    ver = subprocess.run([venv / "bin/python", "-c", f"import {cfg['pkg']} as m;print(m.__version__)"],
-                         capture_output=True, text=True, env=env, cwd=workdir).stdout.strip()
+    ver = in_side(venv, [venv / "bin/python", "-c", f"import {cfg['pkg']} as m;print(m.__version__)"]).stdout.strip()
     return {"ok": bool(ver), "version": ver, "build_seconds": secs, "why": "" if ver else "built package does not import"}
 
 
@@ -721,24 +774,27 @@ def run_tests(side_venvs: dict, targets_by_side: dict, rdir: Path, workdir: Path
     per_run entries use the shared schema shape (side old/new, all counts present)."""
     envs = {side: base_env(side_home(v)) for side, v in side_venvs.items()}
     per_run, results = [], {"main": [], "pr": []}
-    cwd = workdir / "cwd"; cwd.mkdir(exist_ok=True)
     for i in range(1, runs + 1):
         for side in ("main", "pr"):
             venv = side_venvs[side]
             base = cwds[side] if cwds else site_packages(venv)
             tg = [str(base / t) for t in targets_by_side[side]]
             jx = rdir / f"junit-{side}-{i}.xml"; lg = rdir / f"pytest-{side}-{i}.log"
+            jin = side_out(venv) / jx.name   # written inside the side's sandbox, then moved to the run folder
             entry = {"side": SIDE_KEY[side], "run": i, "passed": 0, "failed": 0, "error": 0, "skipped": 0,
                      "collection_errors": 0}
             if not tg:
                 results[side].append({}); per_run.append(entry | {"exit": "no-targets", "seconds": 0,
                                                                    "pytest_summary": "", "junit": False}); continue
             cmd = [venv / "bin/python", "-m", "pytest", *tg, "-p", "no:cacheprovider", "-q", "-rfE",
-                   f"--timeout={test_timeout}", "-o", "addopts=", "-o", "junit_family=xunit2", f"--junitxml={jx}"]
+                   f"--timeout={test_timeout}", "-o", "addopts=", "-o", "junit_family=xunit2", f"--junitxml={jin}"]
             if workers != "0":
                 cmd += ["-n", workers]
-            rc, secs = run(cmd, lg, cwd=(cwds[side] if cwds else cwd), env=envs[side],
-                            timeout=run_timeout)
+            rc, secs = run(cmd, lg, cwd=(cwds[side] if cwds else side_cwd(venv)), env=envs[side],
+                           timeout=run_timeout, sbx=side_sandbox(venv))
+            jx.unlink(missing_ok=True)
+            if jin.exists():
+                shutil.move(jin, jx)
             parsed = parse_junit(jx)
             results[side].append(parsed)
             for o, _ in parsed.values():
@@ -777,19 +833,22 @@ def coverage_run(item: dict, venv: Path, main_root: Path, pr_root: Path, targets
         return {"status": "failed", "why": "none of the changed Python files exist on the PR side"}
     log = prdir / "coverage-pr.log"
     rc, _ = run(["uv", "pip", "install", "-q", "-p", venv / "bin/python", "coverage>=7", "pytest-cov>=5"], log,
-                env=base_env(side_home(venv), install=True), timeout=600)
+                env=base_env(side_home(venv), install=True), timeout=600, sbx=side_sandbox(venv, network=True))
     if rc != 0:
         return {"status": "failed", "why": f"installing coverage failed ({rc}); see coverage-pr.log"}
     out = prdir / "coverage-pr.json"
+    oin = side_out(venv) / out.name
     base = cwd or pr_root
     cmd = [venv / "bin/python", "-m", "pytest", *[str(base / t) for t in targets], "-p", "no:cacheprovider", "-q",
            f"--timeout={a.test_timeout}", "-o", "addopts=", *[f"--cov={s}" for s in sorted(sources)],
-           f"--cov-report=json:{out}"]
+           f"--cov-report=json:{oin}"]
     if a.workers != "0":
         cmd += ["-n", a.workers]
-    (workdir / "cwd").mkdir(exist_ok=True)
-    rc, secs = run(cmd, prdir / "coverage-pytest.log", cwd=cwd or (workdir / "cwd"), env=base_env(side_home(venv)),
-                   timeout=a.run_timeout)
+    rc, secs = run(cmd, prdir / "coverage-pytest.log", cwd=cwd or side_cwd(venv), env=base_env(side_home(venv)),
+                   timeout=a.run_timeout, sbx=side_sandbox(venv))
+    out.unlink(missing_ok=True)
+    if oin.exists():
+        shutil.move(oin, out)
     if not out.exists():
         return {"status": "failed", "why": f"coverage run produced no data (exit {rc}); see coverage-pytest.log",
                 "seconds": secs}
@@ -1105,6 +1164,14 @@ def tests_verdict(cmp: dict | None, cnv_reason: str | None, exits: dict | None =
 
 
 # ---------------------------------------------------------------- per-PR driver
+def probe_launcher(venv: Path, path: Path):
+    """Probes run in the side's sandbox without network; the probe file is mounted read-only."""
+    def launch(argv, env, cwd):
+        b = side_sandbox(venv, ro=(path,))
+        return sandbox.wrap(argv, env, b["rw"], b["ro"], b["network"], cwd)
+    return launch
+
+
 def run_probes(repo: str, pr: int, pythons: dict, prdir: Path, work: Path, a) -> dict:
     """Run the fixed probes of this PR (probes/<owner>/<repo>/<pr>.py, see poc/probes.py) on both sides, 3 alternating
     runs each, in the sides' own environments. {"status": "none"} when the PR has no probe."""
@@ -1112,10 +1179,13 @@ def run_probes(repo: str, pr: int, pythons: dict, prdir: Path, work: Path, a) ->
     if not paths:
         return {"status": "none", "items": []}
     items, errors = [], []
-    envs = {side: base_env(side_home(Path(py).parent.parent)) for side, py in pythons.items()}  # <venv>/bin/python
+    venvs = {side: Path(py).parent.parent for side, py in pythons.items()}   # <venv>/bin/python
+    envs = {side: base_env(side_home(v)) for side, v in venvs.items()}
+    cwds = {side: side_cwd(v) for side, v in venvs.items()}
     for path in paths:
         try:
-            items.append(probes.run_probe(path, pythons, prdir, work / "probe-cwd", envs, runs=a.runs))
+            items.append(probes.run_probe(path, pythons, prdir, cwds, envs, runs=a.runs,
+                                          launchers={side: probe_launcher(v, path) for side, v in venvs.items()}))
             items[-1]["path"] = repo_relative(path)
         except probes.ProbeError as e:
             errors.append(str(e).replace(str(REPO_ROOT) + "/", ""))
@@ -1173,8 +1243,7 @@ def new_record(repo: str, cfg: dict, item: dict, a, machine: dict, run_date: str
 
 
 def venv_python_version(venv: Path) -> str | None:
-    out = subprocess.run([venv / "bin/python", "-c", "import platform;print(platform.python_version())"],
-                         capture_output=True, text=True, env=base_env(side_home(venv))).stdout.strip()
+    out = in_side(venv, [venv / "bin/python", "-c", "import platform;print(platform.python_version())"]).stdout.strip()
     return out or None
 
 
@@ -1196,14 +1265,21 @@ def confirm_missing(cmp: dict, venv: Path) -> None:
     outcome change."""
     keep = []
     for d in cmp.get("skipped_missing_dependency", []):
-        ok = subprocess.run([venv / "bin/python", "-c", f"import importlib.util as u,sys;"
-                             f"sys.exit(0 if u.find_spec({d['module']!r}) is None else 1)"],
-                            capture_output=True, cwd=venv, env=base_env(side_home(venv))).returncode == 0
+        ok = in_side(venv, [venv / "bin/python", "-c", f"import importlib.util as u,sys;"
+                            f"sys.exit(0 if u.find_spec({d['module']!r}) is None else 1)"]).returncode == 0
         if ok:
             keep.append(d)
         else:
             cmp["other_changes"].append(f"{d['test']}: {d['main']} -> skipped (skip names {d['module']}, which is installed)")
     cmp["skipped_missing_dependency"] = keep
+
+
+def sandbox_refusal() -> str | None:
+    """Reason to refuse running PR code: the sandbox is on (default) but cannot start here."""
+    if not sandbox.enabled():
+        return None
+    ok, why = sandbox.check()
+    return None if ok else why
 
 
 def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, machine: dict) -> dict:
@@ -1214,6 +1290,10 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
     shutil.rmtree(work, ignore_errors=True); work.mkdir(parents=True)
     (prdir / "pr.diff").write_text(item["diff"])
     rec = new_record(repo, cfg, item, a, machine, rdir.name, run_date_for(rdir))
+    refusal = sandbox_refusal()
+    if refusal:   # fail closed: no PR code runs without the sandbox (unless --unsafe-no-sandbox)
+        rec["verdict"], rec["reason"], _ = verdict_for(None, refusal)
+        return finish(rec, prdir, work, t0)
     if not cfg.get("nightly"):
         return finish(test_source_pair(repo, cfg, item, prdir, work, a, rec), prdir, work, t0)
     cnv, ex = None, None
@@ -1323,8 +1403,7 @@ def test_source_pair(repo: str, cfg: dict, item: dict, prdir: Path, work: Path, 
         ok, why = install_side(vm, cm, item.get("chosen"), prdir / "setup-main.log", a.python, a.build_timeout, None)
         if ok:
             rec["python"] = venv_python_version(vm) or rec["python"]
-            frz = subprocess.run(["uv", "pip", "freeze", "-p", vm / "bin/python"], capture_output=True, text=True,
-                                 env=base_env(side_home(vm), install=True)).stdout
+            frz = in_side(vm, ["uv", "pip", "freeze", "-p", vm / "bin/python"], install=True).stdout
             pkgname = cfg["dist"].lower().replace("_", "-")
             cons = work / "constraints.txt"
             cons.write_text("\n".join(ln for ln in frz.splitlines() if ln and not ln.startswith(("-e", "#"))
@@ -1762,6 +1841,9 @@ def main(argv=None) -> int:
     ap.add_argument("--report-dir", default=None,
                     help="where the HTML/PDF reviewer reports go (default: reports/daily/<run folder name>)")
     ap.add_argument("--no-report", action="store_true", help="skip the HTML/PDF reviewer reports")
+    ap.add_argument("--unsafe-no-sandbox", action="store_true",
+                    help="run PR code WITHOUT the filesystem/network sandbox (never used by the daily run; only for "
+                         "machines where bubblewrap cannot work, and only for trusted PRs)")
     ap.add_argument("--no-probes", action="store_true", help="do not run the PR's probes (probes/<owner>/<repo>/<pr>.py)")
     ap.add_argument("--no-coverage", action="store_true",
                     help="skip the extra coverage run (the coverage gate then reports 'not measured')")
@@ -1796,6 +1878,7 @@ def main(argv=None) -> int:
     ap.add_argument("--report-only", action="store_true",
                     help="rebuild REPORT.md from records.jsonl, selection.json and run_meta.json; test nothing")
     a = ap.parse_args(argv)
+    sandbox.configure(not a.unsafe_no_sandbox)
     if a.runs != 3:
         print("note: protocol requires 3 runs per side; using", a.runs, file=sys.stderr)
 
@@ -1912,6 +1995,8 @@ def main(argv=None) -> int:
             "wall_min": round((finished - started).total_seconds() / 60, 1), "runs": a.runs,
             "machine": f"{machine['label']} {machine['arch']} {machine['cpu_count']} cpus",
             "api_calls": gh.calls, "auth": "token" if gh.token else "unauthenticated",
+            "sandbox": (sandbox.check()[1] + " (bwrap: per-side filesystem, no network outside installs)"
+                        if sandbox.enabled() else "DISABLED (--unsafe-no-sandbox)"),
             "git": git + (" (with uncommitted changes)" if dirty else "")}
     (rdir / "run_meta.json").write_text(json.dumps(meta | {"problems": problems}, indent=1))
     # Expectations and independent verification are read only now, after every verdict above is final.
