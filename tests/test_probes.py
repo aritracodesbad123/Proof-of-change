@@ -292,5 +292,5 @@ def test_report_without_probes_says_so(tmp_path):
     (d / "record.json").write_text(json.dumps(rec))
     render_run(tmp_path / "run", tmp_path / "out", formats=("md",))
     md = (tmp_path / "out" / "mlxtend-1229" / "REPORT.md").read_text()
-    assert "No probe exists for this PR" in md
+    assert "No probe ran for this PR" in md
 

@@ -12,7 +12,8 @@ from guardrails import sandbox
 from ops import daily_run
 from poc import probes
 
-FAKE_SECRETS = {"NEBIUS_KEY": "fake-nebius", "TAVILY_KEY": "fake-tavily", "OPENAI_APIKEY": "fake-openai",
+FAKE_SECRETS = {"NEBIUS_KEY": "fake-nebius", "NEBIUS_API_KEY": "fake-nebius-api-key", "TAVILY_KEY": "fake-tavily",
+                "OPENAI_APIKEY": "fake-openai",
                 "GH_PAT": "fake-pat", "DATABASE_URL": "postgres://u:fake-pw@db/x", "NPM_AUTH": "fake-npm",
                 "GITHUB_POC_TOKEN": "fake-poc", "GITHUB_TOKEN": "fake-gh", "AWS_SECRET_ACCESS_KEY": "fake-aws"}
 NOISE = {"PYTHONPATH": "/somewhere", "PIP_INDEX_URL": "https://example.invalid/simple", "UV_INDEX_URL": "https://x",

@@ -236,6 +236,54 @@ and adds the claims as rows `P-C1`, ... in the claims table; observations no cla
 (`evals/fixtures/golden_pr_v1.jsonl`) is part of `--require-golden`: tests alone pass on that PR (verified), the
 probe finds two unclaimed behaviour changes, so the expected verdict is needs_attention.
 
+## Baselines, model-written probes and the freeze rule
+
+**`--baseline`** says what may decide the verdict; each record stores it (`baseline`, schema rev 7; records without
+it are `full`), and the reviewer report prints it under the title.
+
+| Baseline | Decides the verdict | Not used |
+|---|---|---|
+| `tests` | the test comparison only | probes, coverage gate, claim flagging |
+| `tests+diff` | tests + **differential probes** | claim probes, coverage gate, claim flagging |
+| `tests+probes` | tests + **claim probes** (fixed and/or model-written) | differential probes, coverage gate, claim flagging |
+| `full` (default) | tests + claim probes + coverage gate + claim flagging | differential probes run and are shown, but do not decide |
+
+**Differential probes** (`poc/diff_probes.py`) are a deliberately simple, model-free baseline. From the base-side code
+and the diff's old-side line numbers they pick the module-level public functions the PR touches, call each with the
+same simple inputs on both sides (`1, 0, -1, 2.5, "abc", [1, 2, 3], None` for every required argument; `random`
+and NumPy seeded) and compare canonical summaries of the results (an exception becomes `{"raises": "<type>"}`). They
+have no claims, so under `tests+diff` any difference needs attention.
+
+**Model-written probes** (`--model-provider`, `poc/model_provider.py`, `poc/model_probes.py`):
+
+| Provider | What it does |
+|---|---|
+| `none` (default) | fixed probes only; the record and report say so |
+| `nebius` | Nebius Token Factory (`https://api.tokenfactory.nebius.com/v1`, OpenAI-compatible, structured JSON output). Model ids: `--claims-model` and `--probe-model`, default `nvidia/nemotron-3-super-120b-a12b` (REQUIREMENTS section 4a). The key is read from `NEBIUS_API_KEY` by the orchestrator only; without it the run falls back to fixed probes and says so |
+| `recorded` | answers from `evals/fixtures/model_responses/<owner>/<repo>/<pr>.json`. These are **test fixtures**: every probe written from them is labelled `model (recorded fixture, not blind)` |
+
+The model first extracts claims, and each claim must quote the PR text exactly. It then writes probe code, which is
+validated: at most 20,000 characters, it must parse, it may not define its own `PROBE`, and its claim ids must be
+known. Model code is untrusted. It runs only in the side's sandbox, without network, with a 60 s timeout. Its output
+is capped at 256 kB (every probe's files are also capped by a file-size limit), with at most 200 observations.
+
+**Freeze rule** (`poc/freeze.py`, hard):
+
+1. Probes are generated only from the PR title and description and from **base-side** code. Any input path on the
+   PR side is rejected.
+2. Before the first PR-side execution (its install, build or patch), every probe is **frozen**. Its content sha256,
+   generator, time and the sha256 of its generation inputs go into `probe_plan` and the probe's `freeze`.
+3. The runner re-checks the freeze before every PR-side run. A probe whose content changed, or which was frozen or
+   written after PR-side execution started, is refused (`probes.refused`) and not run.
+
+**Blind or not.** Only a live `nebius` probe that passed the freeze rule is blind. The following are never blind:
+fixed probes (the mlxtend #1229 probe has `"provenance": "post-hoc"`: it was written after the results were known),
+recorded fixtures and differential probes. They are kept as known-answer regression cases.
+`evals/pr_metrics.score_records` scores any verdict they could decide in a separate NOT BLIND column, and
+`blind_score` refuses such records. `python -m evals.ablation --records-root DIR` (or `--run --out-dir DIR`) writes
+`ablation.md` and `ablation.json`: for each baseline, the catch rate, false alarms and could-not-verify rate (blind),
+plus a NOT BLIND column.
+
 ## Behaviour-preservation claims (`poc/behaviour_claims.py`)
 
 Tests check what a PR changes, rarely that everything else stayed the same. When the PR title or description claims
@@ -309,6 +357,8 @@ Same section order, renderers and verdict vocabulary as the golden-record report
 kept once under `pre-migration/`), `--rejudge` (with `--report-only`: also recompute each verdict from the saved
 JUnit files with the current comparison rules; the previous verdict is kept under `rejudged`), `--date` (run folder,
 may be nested, e.g. `<date>/<name>`; `run_date` is the folder's calendar date), `--ops-dir`, `--work-dir`, `--report-dir`, `--no-report`,
+`--baseline tests|tests+diff|tests+probes|full` (what decides the verdict, default `full`; see "Baselines"),
+`--model-provider nebius|recorded|none` (default `none`), `--claims-model ID`, `--probe-model ID`, `--recorded-dir DIR`,
 `--unsafe-no-sandbox` (run PR code without the sandbox; never used by the daily run), `--no-coverage` (skip the coverage run; the gate then says "not measured"), `--no-probes` (do not run probe files;
 the record says `"probes": {"status": "none"}`).
 

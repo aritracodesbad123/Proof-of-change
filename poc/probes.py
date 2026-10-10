@@ -24,7 +24,15 @@ A probe is one Python file. It must:
   network) and must not assert: it reports what it saw.
 
 Fixed probes live in ``probes/<owner>/<repo>/<pr>.py`` (more probes for the same PR: ``<pr>-<name>.py``).
-A model-written probe is the same kind of file, saved in the run folder and passed in with source "model".
+A model-written probe (poc/model_probes.py) is the same kind of file, saved in the run folder with source "model";
+a differential probe (poc/diff_probes.py, the tests+diff baseline) has source "diff".
+
+Freeze rule (poc/freeze.py): every probe is frozen before any PR-side execution and `guard` re-checks it before each
+PR-side run; a probe that fails the check is not run on the PR side.
+
+Output contract (checked for every probe, `observations_of`): stdout at most MAX_OUTPUT_BYTES; the last line one JSON
+object {"observations": {...}} with at most MAX_OBSERVATIONS names, each a string of at most 200 characters. A run
+that breaks the contract becomes one PROBE_ERROR observation saying why.
 
 Judging (``judge``): each observation is compared over 3 alternating runs per side with ``poc.diff.confirm``
 (same / differs / flaky). Field-level differences come from ``poc.diff.compare``. Labels:
@@ -42,7 +50,9 @@ import ast
 import fnmatch
 import hashlib
 import json
+import resource
 import subprocess
+import tempfile
 import time
 from pathlib import Path
 
@@ -53,6 +63,9 @@ PROBES_DIR = Path(__file__).resolve().parent.parent / "probes"
 PROBE_ERROR = "probe.error"   # observation name used when a run printed no usable observations
 ABSENT = "<absent>"
 DEFAULT_TIMEOUT = 120
+MAX_TIMEOUT = 300
+MAX_OUTPUT_BYTES = 256_000
+MAX_OBSERVATIONS = 200
 
 
 class ProbeError(ValueError):
@@ -76,6 +89,9 @@ def read_spec(path: Path) -> dict:
         if not {"id", "text", "covers", "expect"} <= set(c) or c["expect"] not in ("same", "differs"):
             raise ProbeError(f"{path}: claim {c.get('id')!r} needs id, text, covers and expect (same|differs)")
     spec.setdefault("timeout_s", DEFAULT_TIMEOUT)
+    if not isinstance(spec["timeout_s"], int) or spec["timeout_s"] < 1:
+        raise ProbeError(f"{path}: timeout_s must be a positive integer")
+    spec["timeout_s"] = min(spec["timeout_s"], MAX_TIMEOUT)
     spec["sha256"] = hashlib.sha256(src.encode()).hexdigest()
     return spec
 
@@ -90,10 +106,15 @@ def find_probes(repo: str, pr: int, root: Path = PROBES_DIR) -> list[Path]:
 
 def observations_of(stdout: str, exit_code) -> dict:
     """{name: value} from one probe run. A run without usable observations becomes one PROBE_ERROR observation."""
+    if len(stdout.encode(errors="replace")) > MAX_OUTPUT_BYTES:
+        return {PROBE_ERROR: {"contract": f"output larger than {MAX_OUTPUT_BYTES} bytes", "exit_code": exit_code}}
     obj = parse_probe_output(stdout, exit_code)
     obs = obj.get("observations") if isinstance(obj, dict) else None
     if not isinstance(obs, dict) or "crash" in obj or "timeout" in obj:
         return {PROBE_ERROR: {k: v for k, v in obj.items() if k != "observations"} or {"crash": "no observations"}}
+    if len(obs) > MAX_OBSERVATIONS or not all(isinstance(k, str) and 0 < len(k) <= 200 for k in obs):
+        return {PROBE_ERROR: {"contract": f"observations must be at most {MAX_OBSERVATIONS} names of 1-200 characters",
+                              "exit_code": exit_code}}
     if exit_code not in (0, "0"):
         obs = dict(obs, **{PROBE_ERROR: {"exit_code": exit_code}})
     return obs
@@ -171,20 +192,37 @@ def run_once(path: Path, python: Path, cwd: Path, env: dict, timeout: int, launc
     argv = [str(python), str(path)]
     if launch:
         argv, env, cwd = launch(argv, env, cwd)
-    try:
-        cp = subprocess.run(argv, cwd=cwd, env=env, capture_output=True, text=True, timeout=timeout,
-                            start_new_session=True)
-        out, code, log = cp.stdout, cp.returncode, cp.stdout[-4000:] + ("\n--- stderr ---\n" + cp.stderr[-4000:]
-                                                                        if cp.stderr else "")
-    except subprocess.TimeoutExpired:
-        out, code, log = "", "timeout", f"timed out after {timeout}s"
+    with tempfile.TemporaryFile() as fo, tempfile.TemporaryFile() as fe:
+        try:
+            cp = subprocess.run(argv, cwd=cwd, env=env, stdout=fo, stderr=fe, timeout=timeout,
+                                start_new_session=True, preexec_fn=_limit_files)
+            code = cp.returncode
+        except subprocess.TimeoutExpired:
+            code = "timeout"
+        out, err = _head(fo, MAX_OUTPUT_BYTES + 1), _head(fe, 8000)
+    if code == "timeout":
+        return observations_of("", code), f"timed out after {timeout}s", round(time.time() - t0, 1)
+    log = out[-4000:] + ("\n--- stderr ---\n" + err[-4000:] if err else "")
     return observations_of(out, code), log, round(time.time() - t0, 1)
 
 
+FILE_LIMIT_BYTES = 64_000_000   # RLIMIT_FSIZE of a probe: caps its stdout/stderr files and anything it writes
+
+
+def _limit_files():
+    resource.setrlimit(resource.RLIMIT_FSIZE, (FILE_LIMIT_BYTES, FILE_LIMIT_BYTES))
+
+
+def _head(f, n: int) -> str:
+    f.seek(0)
+    return f.read(n).decode(errors="replace")
+
+
 def run_probe(path: Path, pythons: dict, outdir: Path, cwd: Path | dict, envs: dict, runs: int = 3,
-              source: str = "library", launchers: dict | None = None) -> dict:
+              source: str = "library", launchers: dict | None = None, guard=None) -> dict:
     """Run one probe file `runs` times per side, alternating main/PR; save outputs; judge. Returns the record entry.
-    envs: {"main": env, "pr": env}, each side's own allowlisted environment (guardrails.isolation.untrusted_env)."""
+    envs: {"main": env, "pr": env}, each side's own allowlisted environment (guardrails.isolation.untrusted_env).
+    guard(path) is called before every PR-side run and raises (poc.freeze.FreezeError) to stop it."""
     spec = read_spec(path)
     cwds = cwd if isinstance(cwd, dict) else {"main": cwd, "pr": cwd}
     for c in cwds.values():
@@ -194,6 +232,8 @@ def run_probe(path: Path, pythons: dict, outdir: Path, cwd: Path | dict, envs: d
     per_run = []
     for i in range(1, runs + 1):
         for side in ("main", "pr"):
+            if side == "pr" and guard:
+                guard(path)
             obs, log, secs = run_once(path, pythons[side], cwds[side], envs[side], int(spec["timeout_s"]),
                                          (launchers or {}).get(side))
             fname = f"probe-{spec['id']}-{side}-{i}.jsonl"

@@ -1,7 +1,7 @@
 {
  "$schema": "https://json-schema.org/draft/2020-12/schema",
  "$id": "blast-radius/observation/v1",
- "title": "Blast Radius observation record v1, revision 6 (shared by the downstream-test runner br_run.py and harness/run.py, plus Proof-of-Change PR runs)",
+ "title": "Blast Radius observation record v1, revision 7 (shared by the downstream-test runner br_run.py and harness/run.py, plus Proof-of-Change PR runs)",
  "type": "object",
  "properties": {
   "schema_version": {
@@ -1219,7 +1219,7 @@
     "status",
     "items"
    ],
-   "description": "OPTIONAL (rev 6). Probes run on both sides of a PR (poc/probes.py): small deterministic scripts whose JSON observations are compared by plain code. status none = the PR has no probe.",
+   "description": "OPTIONAL (rev 6; rev 7 adds generator, freeze, refused and source diff). Probes run on both sides of a PR (poc/probes.py): small deterministic scripts whose JSON observations are compared by plain code. status none = the PR has no probe.",
    "properties": {
     "status": {
      "type": "string",
@@ -1250,9 +1250,10 @@
         "type": "string",
         "enum": [
          "library",
-         "model"
+         "model",
+         "diff"
         ],
-        "description": "library: a fixed probe from probes/<owner>/<repo>/<pr>.py; model: a model-written probe"
+        "description": "library: a fixed probe from probes/<owner>/<repo>/<pr>.py; model: a model-written probe; diff: a model-free differential probe (rev 7, baseline tests+diff)"
        },
        "path": {
         "type": [
@@ -1513,6 +1514,142 @@
           }
          }
         }
+       },
+       "generator": {
+        "type": "object",
+        "required": [
+         "kind",
+         "label",
+         "blind"
+        ],
+        "description": "OPTIONAL (rev 7). Who wrote the probe (poc/freeze.py generator). Only kind model with provider nebius that passed the freeze rule is blind; fixed probes (post-hoc or hand-written), recorded fixtures and differential probes are not.",
+        "properties": {
+         "kind": {
+          "type": "string",
+          "enum": [
+           "fixed",
+           "model",
+           "diff"
+          ]
+         },
+         "label": {
+          "type": "string",
+          "minLength": 1
+         },
+         "model": {
+          "type": [
+           "string",
+           "null"
+          ]
+         },
+         "provider": {
+          "type": [
+           "string",
+           "null"
+          ]
+         },
+         "provenance": {
+          "type": "string",
+          "enum": [
+           "post-hoc",
+           "pre-registered",
+           "live",
+           "recorded fixture",
+           "auto-derived"
+          ]
+         },
+         "blind": {
+          "type": "boolean"
+         }
+        }
+       },
+       "freeze": {
+        "type": "object",
+        "required": [
+         "sha256",
+         "generator",
+         "frozen_at"
+        ],
+        "description": "OPTIONAL (rev 7). Freeze of the probe before any PR-side execution (poc/freeze.py): content sha256, generator, time, and the sha256 of the generation inputs (PR text and base-side files; null for hand-written probes). verified: the probe matched its freeze before every PR-side run.",
+        "properties": {
+         "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+         },
+         "generator": {
+          "type": "object",
+          "required": [
+           "kind",
+           "label",
+           "blind"
+          ],
+          "description": "OPTIONAL (rev 7). Who wrote the probe (poc/freeze.py generator). Only kind model with provider nebius that passed the freeze rule is blind; fixed probes (post-hoc or hand-written), recorded fixtures and differential probes are not.",
+          "properties": {
+           "kind": {
+            "type": "string",
+            "enum": [
+             "fixed",
+             "model",
+             "diff"
+            ]
+           },
+           "label": {
+            "type": "string",
+            "minLength": 1
+           },
+           "model": {
+            "type": [
+             "string",
+             "null"
+            ]
+           },
+           "provider": {
+            "type": [
+             "string",
+             "null"
+            ]
+           },
+           "provenance": {
+            "type": "string",
+            "enum": [
+             "post-hoc",
+             "pre-registered",
+             "live",
+             "recorded fixture",
+             "auto-derived"
+            ]
+           },
+           "blind": {
+            "type": "boolean"
+           }
+          }
+         },
+         "frozen_at": {
+          "type": "string",
+          "minLength": 1
+         },
+         "inputs_sha256": {
+          "type": [
+           "string",
+           "null"
+          ]
+         },
+         "inputs": {
+          "type": [
+           "object",
+           "null"
+          ]
+         },
+         "verified": {
+          "type": "boolean"
+         },
+         "pr_started_at": {
+          "type": [
+           "string",
+           "null"
+          ]
+         }
+        }
        }
       }
      }
@@ -1557,6 +1694,28 @@
      "items": {
       "type": "string"
      }
+    },
+    "refused": {
+     "type": "array",
+     "description": "OPTIONAL (rev 7). Probes not run on the PR side because they failed the freeze rule.",
+     "items": {
+      "type": "object",
+      "required": [
+       "path",
+       "why"
+      ],
+      "properties": {
+       "path": {
+        "type": "string"
+       },
+       "source": {
+        "type": "string"
+       },
+       "why": {
+        "type": "string"
+       }
+      }
+     }
     }
    }
   },
@@ -1586,6 +1745,71 @@
      }
     }
    }
+  },
+  "baseline": {
+   "type": "string",
+   "enum": [
+    "tests",
+    "tests+diff",
+    "tests+probes",
+    "full"
+   ],
+   "description": "OPTIONAL (rev 7). What decided the verdict (ops/daily_run.py --baseline): tests = test comparison only; tests+diff = plus model-free differential probes; tests+probes = plus claim probes (fixed and/or model); full = everything (claim probes, coverage gate, claim flagging; differential probes informational). Records without it are full."
+  },
+  "model_provider": {
+   "type": "object",
+   "required": [
+    "requested",
+    "note"
+   ],
+   "description": "OPTIONAL (rev 7). Model provider of the run (--model-provider) and what was actually used; note says when the run fell back to fixed probes only.",
+   "properties": {
+    "requested": {
+     "type": "string",
+     "enum": [
+      "nebius",
+      "recorded",
+      "none"
+     ]
+    },
+    "used": {
+     "type": [
+      "string",
+      "null"
+     ]
+    },
+    "note": {
+     "type": "string"
+    },
+    "blind": {
+     "type": "boolean"
+    }
+   }
+  },
+  "probe_plan": {
+   "type": "object",
+   "description": "OPTIONAL (rev 7). Probes written and frozen before PR-side execution: baseline, model note, extracted/rejected model claims, differential targets, frozen probes, errors.",
+   "properties": {
+    "baseline": {
+     "type": "string"
+    },
+    "frozen": {
+     "type": "array",
+     "items": {
+      "type": "object"
+     }
+    },
+    "errors": {
+     "type": "array",
+     "items": {
+      "type": "string"
+     }
+    }
+   }
+  },
+  "pr_side_started_at": {
+   "type": "string",
+   "description": "OPTIONAL (rev 7). When the first PR-side execution (install, build or patch) started; probes frozen later are refused."
   }
  },
  "description": "One JSON object per (upstream, old, new, dependent) tuple, one line in observations.jsonl and research/runs/<id>/record.json. Merged 2026-10-10 from runner v1 (gates, accepted, network, report, stability, dependent_import) and guardrails/schema.py (hand_check, upstream_issue, machine_type, thread_env, per_run.collection_errors, per_run.pytest_summary). Cross-field rules not expressible here are listed in x-cross-field-rules and enforced by harness/brlib.py validate(). Revision 2 (2026-10-10, from docs/REPORT_SPEC.md): adds OPTIONAL pr, claims, upstream_commit_old/new, per_test_outcomes, old_output, golden_check, reviewer_decision for the reviewer report. Purely additive: every rev 1 record stays valid, schema_version stays \"1\". hand_check and upstream_issue were already present (required, nullable) and are unchanged. Accepted schema_sha256 values for rev 1 and rev 2 are listed in harness/schema/README.md and guardrails/schema.py.",
@@ -1628,6 +1852,11 @@
    "rev": 6,
    "date": "2026-10-10",
    "change": "optional pr_run properties `probes` (probe results: claims, recorded runs, per-observation state, label, field differences and citations) and `behaviour_claims` (behaviour-preservation claims quoted from the PR title or description), and optional coverage_gate.measurement (measured | not measured: predates gate | not measured | not needed). Nothing becomes required; rev 1-5 records stay valid."
+  },
+  {
+   "rev": 7,
+   "date": "2026-10-11",
+   "change": "optional pr_run properties `baseline` (tests | tests+diff | tests+probes | full), `model_provider`, `probe_plan` and `pr_side_started_at`; probe items gain optional `generator` and `freeze` (freeze rule) and source `diff`; probes gain optional `refused`. Nothing becomes required; rev 1-6 records stay valid."
   }
  ],
  "if": {

@@ -411,7 +411,11 @@ run uses just the date. These folders stay on your computer only. They are never
 
 ## 8. Technical details
 
-- [docs/OPERATIONS.md](docs/OPERATIONS.md): how PRs are selected and built, every flag, every file a run writes.
+- [docs/OPERATIONS.md](docs/OPERATIONS.md): how PRs are selected and built, every flag, every file a run writes,
+  including the baselines (`--baseline tests|tests+diff|tests+probes|full`), model-written probes
+  (`--model-provider nebius|recorded|none`; NVIDIA Nemotron 3 Super 120B on Nebius Token Factory, key in
+  `NEBIUS_API_KEY`) and the probe freeze rule (probes are written from the PR text and base-side code only and frozen
+  before any PR code runs).
 - [docs/REPORT_SPEC.md](docs/REPORT_SPEC.md): the report format and verdict rules.
 - [docs/DEVELOPER.md](docs/DEVELOPER.md): code layout, the self-check, the downstream-test harness and golden
   records, and the contribution workflow.

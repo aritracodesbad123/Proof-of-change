@@ -1,0 +1,49 @@
+{
+ "_fixture": "TEST FIXTURE: a hand-made stand-in for a model response; no model was called. Probes written from it are labelled 'model (recorded fixture, not blind)' in records and reports and never count in blind-eval scoring. Used by tests, CI and smoke runs of --model-provider recorded.",
+ "model": null,
+ "target": "rasbt/mlxtend#1229",
+ "claims": {
+  "claims": [
+   {
+    "id": "C1",
+    "text": "A feature group given as a list or range permutes its own columns, not the first columns of X.",
+    "source_quote": "Each group is now permuted by applying one row permutation to all of its columns",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C2",
+    "text": "For integer groups the results do not change for a given seed.",
+    "source_quote": "so those results don't change for a given seed.",
+    "testable": true,
+    "expect": "same"
+   }
+  ]
+ },
+ "probes": {
+  "probes": [
+   {
+    "id": "groups-columns",
+    "about": "Columns each feature group permutes, and integer-group importances for a fixed seed.",
+    "claims": [
+     {
+      "id": "C1",
+      "covers": [
+       "list_groups.*",
+       "range_group.*"
+      ],
+      "expect": "differs"
+     },
+     {
+      "id": "C2",
+      "covers": [
+       "int_groups.*"
+      ],
+      "expect": "same"
+     }
+    ],
+    "code": "import json\n\nimport numpy as np\nfrom mlxtend.evaluate import feature_importance_permutation as fip\n\nrs = np.random.RandomState(7)\nX0 = rs.normal(size=(30, 4))\nW = np.array([2.0, -1.0, 0.5, 0.25])\nY = X0 @ W\n\n\ndef predict(X):\n    return X @ W\n\n\ndef columns_touched(groups):\n    seen = []\n\n    def pm(Z):\n        seen.append([int(c) for c in range(X0.shape[1]) if not np.array_equal(Z[:, c], X0[:, c])])\n        return predict(Z)\n    try:\n        fip(X0.copy(), Y, pm, metric=\"r2\", num_rounds=1, seed=1, feature_groups=groups)\n    except Exception as e:  # noqa: BLE001\n        return {\"raises\": type(e).__name__}\n    return seen[1:]\n\n\ndef importances(groups):\n    try:\n        mean, _ = fip(X0.copy(), Y, predict, metric=\"r2\", num_rounds=2, seed=1, feature_groups=groups)\n    except Exception as e:  # noqa: BLE001\n        return {\"raises\": type(e).__name__}\n    return [round(float(v), 8) for v in mean]\n\n\nobs = {\n    \"list_groups.columns_touched\": columns_touched([[1], [2], [3]]),\n    \"range_group.columns_touched\": columns_touched([0, range(2, 4)]),\n    \"int_groups.importances\": importances([0, 1, 2, 3]),\n}\nprint(json.dumps({\"observations\": obs}, sort_keys=True))\n"
+   }
+  ]
+ }
+}
