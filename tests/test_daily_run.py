@@ -96,7 +96,8 @@ def _verdict(case):
     from ops.daily_run import compare_sides, exit_check, verdict_for
     res, per_run = _day1(case)
     cmp = compare_sides(res)
-    return cmp, verdict_for(cmp, None, exit_check(per_run, res, cmp))
+    files = _json.loads((DAY1 / case / "meta.json").read_text()).get("files")
+    return cmp, verdict_for(cmp, None, exit_check(per_run, res, cmp), files)
 
 
 # fix 1: re-parametrized tests are not "removed"
@@ -318,7 +319,8 @@ def test_fix7_failed_build_record_says_zero_runs():
 def test_fix7_pandera_identical_errors_explained_and_stated():
     cmp, (v, reason, _) = _verdict("pandera-2552")
     assert v == "verified"
-    assert "fail to collect on both sides (tests.pandas.test_dtypes)" in reason
+    assert "fail to load on both sides (tests.pandas.test_dtypes)" in reason   # unrelated to the changed files
+    assert cmp["load_failed_both"] == ["tests.pandas.test_dtypes"] and "unchanged" in reason
 
 
 def test_fix7_unexplained_exit_is_not_verified():

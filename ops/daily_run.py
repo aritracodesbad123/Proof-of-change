@@ -43,7 +43,7 @@ import urllib.error
 import urllib.request
 import xml.etree.ElementTree as ET
 import zipfile
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO_ROOT))
@@ -657,8 +657,15 @@ MISSING_DEP_RE = re.compile(
     r"|'?([\w.-]+)'? (?:is )?not installed", re.I)
 
 
+def side_independent(dotted: str) -> str:
+    """Drop the environment prefix of a dotted path ('...venv-main.lib.python3.12.site-packages.pkg.tests.t'
+    -> 'pkg.tests.t'), so main and PR runs of the same test or module get the same id on every route."""
+    return dotted.split("site-packages.", 1)[1] if "site-packages." in dotted else dotted
+
+
 def parse_junit(path: Path) -> dict:
-    """{test id: (outcome, message)}. outcome: passed | failed | error | skipped (pytest.skip and xfail).
+    """{test id: (outcome, message)}. outcome: passed | failed | error | skipped (pytest.skip and xfail) |
+    load_error (a test module that failed to load/collect; its id is '::<module>').
     Skip messages are kept as '<type>: <message>' so missing-dependency skips can be recognised."""
     res = {}
     if not path.exists():
@@ -668,16 +675,15 @@ def parse_junit(path: Path) -> dict:
     except ET.ParseError:
         return res
     for tc in root.iter("testcase"):
-        cls = tc.get("classname") or ""
-        # Make ids side-independent: drop the venv/site-packages prefix (nightly routes)
-        # so main and PR runs of the same test get the same id.
-        if "site-packages." in cls:
-            cls = cls.split("site-packages.", 1)[1]
-        tid = cls + "::" + (tc.get("name") or "")
+        cls = side_independent(tc.get("classname") or "")
+        name = tc.get("name") or ""
+        if not cls:   # collection error: empty classname, the module path (with the env prefix) is in name
+            name = side_independent(name)
+        tid = cls + "::" + name
         outcome, msg = "passed", ""
         for ch in tc:
             if ch.tag in ("failure", "error"):
-                outcome = "failed" if ch.tag == "failure" else "error"
+                outcome = "failed" if ch.tag == "failure" else ("load_error" if not cls else "error")
                 m = (ch.get("message") or ch.text or "").strip()
                 msg = m.splitlines()[0][:200] if m else ch.tag
                 break
@@ -725,7 +731,7 @@ def run_tests(side_venvs: dict, targets_by_side: dict, rdir: Path, workdir: Path
             parsed = parse_junit(jx)
             results[side].append(parsed)
             for o, _ in parsed.values():
-                entry[o] += 1
+                entry["error" if o == "load_error" else o] += 1
             text = lg.read_text(errors="replace")
             entry["collection_errors"] = len(re.findall(r"^ERROR collecting ", text, re.M))
             tail = (text.strip().splitlines() or [""])[-1][:200]
@@ -790,21 +796,78 @@ def base_name(test_id: str) -> str:
     return test_id.split("[", 1)[0]
 
 
+EXECUTED = ("passed", "failed", "error")   # outcomes of a test that actually ran (not skipped, not a load failure)
+
+
+def module_of(test_id: str) -> str:
+    return test_id.split("::", 1)[0]
+
+
+def in_module(test_id: str, module: str) -> bool:
+    m = module_of(test_id)
+    return m == module or m.startswith(module + ".")
+
+
+def executed_counts(results: dict) -> dict:
+    """{side: fewest tests that actually ran in any run of that side}."""
+    return {side: min((sum(1 for o, _ in r.values() if o in EXECUTED) for r in runs), default=0)
+            for side, runs in results.items()}
+
+
+def normalize_load_errors(run: dict) -> dict:
+    """'::<module>' ids (empty classname) are module load failures whatever outcome they were stored with, and their
+    module path is made side-independent (results not produced by parse_junit, e.g. older saved results)."""
+    out = {}
+    for t, (o, m) in run.items():
+        if t.startswith("::"):
+            t, o = "::" + side_independent(t[2:]), ("load_error" if o in ("error", "failed") else o)
+        out[t] = (o, m)
+    return out
+
+
 def compare_sides(results: dict) -> dict:
     """Plain-code comparison of per-test outcomes over the 3 runs per side (poc.diff.confirm).
 
     Rename-aware: a test id that disappears is only 'removed' if no new id with the same base test name appeared.
     Otherwise it is re-parametrized (its parametrize ids changed); the new ids are judged by their own outcomes.
-    New/changed tests that are skipped because an optional dependency is missing are listed separately."""
+    New/changed tests that are skipped because an optional dependency is missing are listed separately.
+    Test modules that fail to load are tracked as modules, never as tests: on both sides (load_failed_both), only on the
+    PR side (load_failed_pr, with the main-side tests that no longer run) or only on main (load_failed_main); their
+    tests are not counted as removed, new or unchanged."""
+    results = {side: [normalize_load_errors(r) for r in runs] for side, runs in results.items()}
     ids = set()
     for r in results["main"] + results["pr"]:
         ids |= set(r)
-    out = {"same": 0, "regressions": [], "fixed": [], "new_tests_passing": 0, "new_tests_failing": [],
-           "removed_tests": [], "reparametrized": [], "skipped_missing_dependency": [], "flaky": [],
-           "other_changes": [], "preexisting_failures": []}
+    out = {"same": 0, "same_skipped_both": 0, "regressions": [], "fixed": [], "new_tests_passing": 0,
+           "new_tests_failing": [], "removed_tests": [], "reparametrized": [], "skipped_missing_dependency": [],
+           "flaky": [], "other_changes": [], "preexisting_failures": [], "load_failed_both": [], "load_failed_pr": [],
+           "load_failed_main": []}
     msgs, removed, added = {}, [], []
     bad = ("failed", "error")
+
+    def load_state(runs, t):
+        os_ = {r.get(t, ("absent", ""))[0] for r in runs}
+        return "all" if os_ == {"load_error"} else ("some" if "load_error" in os_ else "none")
+    one_side = {}
+    for t in sorted(i for i in ids if i.startswith("::")):
+        lm, lp = load_state(results["main"], t), load_state(results["pr"], t)
+        if lm == lp == "all":
+            out["load_failed_both"].append(t[2:])
+        elif lp == "all" and lm == "none":
+            one_side[t[2:]] = "pr"
+        elif lm == "all" and lp == "none":
+            one_side[t[2:]] = "main"
+    for mod, side in sorted(one_side.items()):
+        other = results["main" if side == "pr" else "pr"]
+        tests = sorted({t for r in other for t in r if not t.startswith("::") and in_module(t, mod)})
+        out["load_failed_" + side].append({"module": mod, "tests_affected": len(tests)})
+    handled = {"::" + m for m in out["load_failed_both"]} | {"::" + m for m in one_side}
+
+    def skip_id(t):
+        return t in handled or any(in_module(t, m) for m in one_side)
     for t in sorted(ids):
+        if skip_id(t):
+            continue
         m = [{"o": r.get(t, ("absent", ""))[0]} for r in results["main"]]
         p = [{"o": r.get(t, ("absent", ""))[0]} for r in results["pr"]]
         state = confirm(m, p)
@@ -812,6 +875,8 @@ def compare_sides(results: dict) -> dict:
             out["same"] += 1
             if m[0]["o"] in bad:
                 out["preexisting_failures"].append(t)
+            elif m[0]["o"] == "skipped":
+                out["same_skipped_both"] += 1
             continue
         if state == "flaky":
             out["flaky"].append(t); continue
@@ -846,12 +911,13 @@ def compare_sides(results: dict) -> dict:
             out["reparametrized"].append({"test": b, "removed_ids": gone, "added_ids": added_by_base[b]})
         else:
             out["removed_tests"].extend(gone)
+    out["executed"] = executed_counts(results)
     out["messages"] = {t: msgs[t] for t in (out["regressions"] + out["new_tests_failing"])[:20] if t in msgs}
     return out
 
 
 def failing_ids(run_result: dict) -> set:
-    return {t for t, (o, _) in run_result.items() if o in ("failed", "error")}
+    return {t for t, (o, _) in run_result.items() if o in ("failed", "error", "load_error")}
 
 
 def exit_check(per_run: list[dict], results: dict, cmp: dict) -> dict:
@@ -883,23 +949,72 @@ def exit_check(per_run: list[dict], results: dict, cmp: dict) -> dict:
     return {"explained": not problems, "problems": problems, "detail": detail}
 
 
-def verdict_for(cmp: dict | None, cnv_reason: str | None, exits: dict | None = None) -> tuple[str, str, list[str]]:
+def touched_stems(files: dict | None) -> tuple[set, set]:
+    """(stems of changed source files, dotted module paths of changed test files) for matching test modules."""
+    stems, tests = set(), set()
+    for f in (files or {}).get("all", []):
+        p = PurePosixPath(f)
+        if p.suffix not in (".py", ".pyx", ".pxd", ".c", ".cpp", ".h", ".cc"):
+            continue
+        if coverage_gate.is_test(f):
+            if p.suffix == ".py" and p.name.startswith("test_"):
+                tests.add(".".join(p.with_suffix("").parts))
+        else:
+            stem = p.name.split(".")[0].lstrip("_")
+            if stem and stem not in ("init", "conftest", "setup"):
+                stems.add(stem)
+    return stems, tests
+
+
+def touches(module: str, files: dict | None) -> bool:
+    """Does this test module test a file the PR changed? Without file information every module counts (conservative).
+    Match: tests/test_<stem>.py of a changed source file, or a changed test file itself."""
+    if not files or not files.get("all"):
+        return True
+    stems, tests = touched_stems(files)
+    leaf = module.rsplit(".", 1)[-1]
+    return (any(leaf == f"test_{st}" or leaf.startswith(f"test_{st}_") for st in stems)
+            or any(module == t or module.endswith("." + t) or t.endswith("." + module) for t in tests))
+
+
+def load_failure_text(x: dict, side: str) -> str:
+    n = x["tests_affected"]
+    if side == "pr":
+        return f"test module {x['module']} fails to load on the PR side ({n} test(s) no longer run)"
+    return f"test module {x['module']} fails to load on the main side ({n} test(s) on the PR side have no baseline)"
+
+
+def _modules(xs: list, n: int = 3) -> str:
+    return ", ".join(xs[:n]) + (f" (+{len(xs) - n})" if len(xs) > n else "")
+
+
+def verdict_for(cmp: dict | None, cnv_reason: str | None, exits: dict | None = None,
+                files: dict | None = None) -> tuple[str, str, list[str]]:
     """No Nemotron claim extraction yet: no claims, findings come from test differences only.
 
-    Order: could-not-verify reasons of the run; real findings (regressions, new failing tests) -> needs attention;
-    unexplained pytest exit codes -> could not verify; new/changed tests skipped for a missing optional dependency
-    -> could not verify (the change was not exercised; never needs attention); otherwise poc.verdict.pr_verdict."""
+    Order:
+      1. could-not-verify reasons of the run itself;
+      2. real findings (regressions, new failing tests) -> needs attention (nothing below can hide them);
+      3. no test actually ran on a side (all skipped, or every module failed to load) -> could not verify;
+      4. a test module loads on one side only -> could not verify, naming the module;
+      5. a test module of the changed code fails to load on both sides -> could not verify;
+      6. unexplained pytest exit codes -> could not verify;
+      7. new/changed tests skipped for a missing optional dependency -> could not verify (never needs attention);
+      8. otherwise poc.verdict.pr_verdict."""
     if cnv_reason:
         return Verdict.COULD_NOT_VERIFY.value, cnv_reason, []
     deps = sorted({d["module"] for d in cmp.get("skipped_missing_dependency", [])})
     dep_note = (f"{len(cmp['skipped_missing_dependency'])} new/changed test(s) skipped because optional "
                 f"dependenc{'y' if len(deps) == 1 else 'ies'} {', '.join(deps)} not installed") if deps else ""
+    executed = cmp.get("executed") or {}
+    ran_main, ran_pr = executed.get("main"), executed.get("pr")
+    nothing_ran = ran_main == 0 or ran_pr == 0
     findings = []
     findings += [FindingLabel.UNMENTIONED_CHANGE] * (len(cmp["regressions"]) + len(cmp["new_tests_failing"]))
     findings += [FindingLabel.FLAKY] * len(cmp["flaky"])
     findings += [FindingLabel.NEEDS_HUMAN] * (len(cmp["removed_tests"]) + len(cmp["other_changes"]))
     findings += [FindingLabel.PROVEN] * len(cmp["fixed"])
-    if cmp["same"] or cmp["new_tests_passing"]:
+    if (cmp["same"] or cmp["new_tests_passing"]) and not nothing_ran:
         findings.append(FindingLabel.NO_DIFFERENCE)
     bits = []
     if cmp["regressions"]:
@@ -918,43 +1033,71 @@ def verdict_for(cmp: dict | None, cnv_reason: str | None, exits: dict | None = N
         n_old = sum(len(x["removed_ids"]) for x in cmp["reparametrized"])
         n_new = sum(len(x["added_ids"]) for x in cmp["reparametrized"])
         bits.append(f"{len(cmp['reparametrized'])} test(s) re-parametrized ({n_old} -> {n_new} ids)")
-    bits.append(f"{cmp['new_tests_passing']} new test(s) pass, {cmp['same']} unchanged")
     pre = cmp.get("preexisting_failures", [])
-    uncollected = [t[2:] for t in pre if t.startswith("::")]   # JUnit collection errors have an empty classname
-    if len(pre) > len(uncollected):
-        bits.append(f"{len(pre) - len(uncollected)} test failure(s) pre-existing and identical on both sides")
-    if uncollected:
-        bits.append(f"{len(uncollected)} test module(s) fail to collect on both sides ({', '.join(uncollected[:3])}), "
-                    "so their tests did not run")
+    if ran_main is not None:
+        bits.append("0 tests ran" if (ran_main == 0 and ran_pr == 0) else f"{ran_main} test(s) ran on main, {ran_pr} on the PR")
+    unchanged = cmp["same"] - len(pre)   # tests with the same outcome on both sides (passed or skipped), never modules
+    skipped_both = cmp.get("same_skipped_both", 0)
+    bits.append(f"{cmp['new_tests_passing']} new test(s) pass, {unchanged} unchanged"
+                + (f" ({skipped_both} of them skipped on both sides)" if skipped_both else ""))
+    if pre:
+        bits.append(f"{len(pre)} test failure(s) pre-existing and identical on both sides")
+    both = cmp.get("load_failed_both", [])
+    if both:
+        bits.append(f"{len(both)} test module(s) fail to load on both sides ({_modules(both)}), so their tests did not run")
+    for x in cmp.get("load_failed_pr", []):
+        bits.append(load_failure_text(x, "pr"))
+    for x in cmp.get("load_failed_main", []):
+        bits.append(load_failure_text(x, "main"))
     reason = "; ".join(bits)
-    real_ran = cmp["same"] + cmp["new_tests_passing"] - len(pre) + len(cmp["fixed"])
-    if uncollected and real_ran <= 0 and not (cmp["regressions"] or cmp["new_tests_failing"]):
-        # Guardrail: every mapped test module failed to collect, so no real test ran; never call that verified.
-        return (Verdict.COULD_NOT_VERIFY.value, "no mapped test actually ran: " + reason,
-                [f.value for f in findings])
+    fl = [f.value for f in findings]
+    cnv = Verdict.COULD_NOT_VERIFY.value
     if cmp["regressions"] or cmp["new_tests_failing"]:
         v = pr_verdict(RunSummary(build_ok=True, claims=[Claim("tests", testable=True, probed=True, proven=True)],
                                   findings=findings))
-        return v.value, reason + (f"; {dep_note}" if dep_note else ""), [f.value for f in findings]
+        return v.value, reason + (f"; {dep_note}" if dep_note else ""), fl
+    if nothing_ran:
+        where = ("on either side" if ran_main == 0 and ran_pr == 0 else "on main" if ran_main == 0 else "on the PR side")
+        return cnv, f"no test actually ran {where}: {reason}" + (f"; {dep_note}" if dep_note else ""), fl
+    one_side = [(x, "pr") for x in cmp.get("load_failed_pr", [])] + [(x, "main") for x in cmp.get("load_failed_main", [])]
+    if one_side:
+        return cnv, f"{load_failure_text(*one_side[0])}: {reason}", fl
+    related = [m for m in both if touches(m, files)]
+    if related:
+        return cnv, (f"not fully verified: the changed code's test module(s) {_modules(related)} failed to load on both "
+                     f"sides, so they did not run: {reason}"), fl
     if exits and not exits["explained"]:
-        return (Verdict.COULD_NOT_VERIFY.value,
-                "pytest exit code(s) not explained by identical failures on both sides: " + "; ".join(exits["problems"][:3])
-                + f" ({reason})", [f.value for f in findings])
+        return (cnv, "pytest exit code(s) not explained by identical failures on both sides: "
+                + "; ".join(exits["problems"][:3]) + f" ({reason})", fl)
     if dep_note:
-        return Verdict.COULD_NOT_VERIFY.value, f"not fully verified: {dep_note} ({reason})", [f.value for f in findings]
-
+        return cnv, f"not fully verified: {dep_note} ({reason})", fl
     v = pr_verdict(RunSummary(build_ok=True, claims=[Claim("tests", testable=True, probed=True, proven=True)],
                               findings=findings))
-    return v.value, reason, [f.value for f in findings]
+    return v.value, reason, fl
 
 
 # ---------------------------------------------------------------- per-PR driver
-def new_record(repo: str, cfg: dict, item: dict, a, machine: dict, run_date: str) -> dict:
-    """PR-run record (record_kind 'pr_run' of the shared observation schema, harness/schema/observation.schema.json)."""
+DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}")
+
+
+def run_date_for(rdir: Path, fallback: str | None = None) -> str:
+    """Calendar date (YYYY-MM-DD) of a run folder: its own name if it starts with a date ('2026-10-10',
+    '2026-10-10-check-0930'), else its parent's ('2026-10-10/incremental-1130'), else fallback / today (IST)."""
+    for name in (rdir.name, rdir.parent.name):
+        if DATE_RE.match(name):
+            return name[:10]
+    return fallback if fallback and DATE_RE.match(fallback) else now_ist().strftime("%Y-%m-%d")
+
+
+def new_record(repo: str, cfg: dict, item: dict, a, machine: dict, run_date: str, day: str | None = None) -> dict:
+    """PR-run record (record_kind 'pr_run' of the shared observation schema, harness/schema/observation.schema.json).
+    run_date names the run folder (used in the id); day is the calendar date stored in run_date."""
     tested = now_ist()
+    day = day if day and DATE_RE.match(day) else (run_date[:10] if DATE_RE.match(run_date)
+                                                  else tested.strftime("%Y-%m-%d"))
     rec = {"schema_version": "1", "record_kind": "pr_run",
            "id": f"pr-{repo.replace('/', '-')}-{item['pr']}-{item['head_sha'][:12]}-{run_date}",
-           "date_ist": tested.strftime("%Y-%m-%d %H:%M IST"), "run_date": run_date[:10], "who": WHO, "repo": repo, "library": cfg["dist"],
+           "date_ist": tested.strftime("%Y-%m-%d %H:%M IST"), "run_date": day[:10], "who": WHO, "repo": repo, "library": cfg["dist"],
            "pr": {"repo": repo, "number": item["pr"], "url": item["url"], "title": item["title"],
                   "base_sha": item.get("base_sha"), "head_sha": item["head_sha"], "merge_commit": None},
            "author": item["author"], "base_ref": item["base_ref"], "updated_at_utc": item["updated_at_utc"],
@@ -1015,7 +1158,7 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
     work = workroot / tag
     shutil.rmtree(work, ignore_errors=True); work.mkdir(parents=True)
     (prdir / "pr.diff").write_text(item["diff"])
-    rec = new_record(repo, cfg, item, a, machine, rdir.name)
+    rec = new_record(repo, cfg, item, a, machine, rdir.name, run_date_for(rdir))
     if not cfg.get("nightly"):
         return finish(test_source_pair(repo, cfg, item, prdir, work, a, rec), prdir, work, t0)
     cnv, ex = None, None
@@ -1072,7 +1215,7 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
                 confirm_missing(cmp, vp)
                 rec["coverage"] = coverage_run(item, vp, site_packages(vm), site_packages(vp), targets["pr"], prdir,
                                                work, a)
-    rec["verdict"], rec["reason"], _ = verdict_for(cmp, cnv, ex)
+    rec["verdict"], rec["reason"], _ = verdict_for(cmp, cnv, ex, rec.get("files"))
     return finish(gate(rec), prdir, work, t0)
 
 
@@ -1149,7 +1292,7 @@ def test_source_pair(repo: str, cfg: dict, item: dict, prdir: Path, work: Path, 
                 if cmp:
                     confirm_missing(cmp, vp)
                     rec["coverage"] = coverage_run(item, vp, cm, cp, targets["pr"], prdir, work, a, cwd=cp)
-    rec["verdict"], rec["reason"], _ = verdict_for(cmp, cnv, ex)
+    rec["verdict"], rec["reason"], _ = verdict_for(cmp, cnv, ex, rec.get("files"))
     return gate(rec)
 
 
@@ -1239,19 +1382,35 @@ def frozen_items(gh: GitHub, repo: str, cfg: dict, frozen: dict) -> list[dict]:
     return items
 
 
+def verification_entry(v: dict) -> tuple | None:
+    """((repo, pr), (verdict, checker, note)) of one independent-verification line, or None if the checker did not
+    re-check the PR. Schema rev 5 'verification' records: the checker's own verdict is verification.checker_verdict;
+    verdict_under_review is the verdict being checked and is never used for scoring. Older lines: '<name>_verdict' or
+    'verdict', with a 'status'."""
+    if v.get("record_kind") == "verification":
+        x = v.get("verification") or {}
+        t = x.get("target") or {}
+        verdict = x.get("checker_verdict")
+        if not verdict or x.get("check_status") == "unverified":
+            return None
+        return (t["repo"], int(t["pr_number"])), (verdict, (x.get("checker") or {}).get("name", "?"), x.get("summary", ""))
+    verdict = next((v[k] for k in v if k.endswith("_verdict") and v[k]), None) or v.get("verdict")
+    if not verdict or v.get("status") == "unverified":   # only PRs the checker actually re-checked
+        return None
+    return (v["repo"], int(v["pr"])), (verdict, v.get("checked_by", "?"), v.get("note", ""))
+
+
 def read_verification(path: Path) -> dict:
-    """Independent verification lines (verification.jsonl): {(repo, pr): (verdict, checker, note)} for entries with a
-    verdict. Call ONLY after all verdicts are final."""
+    """Independent verification lines: {(repo, pr): (verdict, checker, note)} for PRs the checker re-checked.
+    Call ONLY after all verdicts are final."""
     out = {}
     if not path or not path.exists():
         return out
     for ln in path.read_text().splitlines():
-        if not ln.strip():
-            continue
-        v = json.loads(ln)
-        verdict = next((v[k] for k in v if k.endswith("_verdict") and v[k]), None) or v.get("verdict")
-        if verdict and v.get("status") != "unverified":   # only PRs the checker actually re-checked
-            out[(v["repo"], int(v["pr"]))] = (verdict, v.get("checked_by", "?"), v.get("note", ""))
+        if ln.strip():
+            e = verification_entry(json.loads(ln))
+            if e:
+                out[e[0]] = e[1]
     return out
 
 
@@ -1320,7 +1479,13 @@ def write_report(rdir: Path, meta: dict, records: list[dict], skipped: dict, pro
             fix.append(f"{tag}: fix the record writer or the pr_run schema branch.")
         if r["verdict"] == "could_not_verify":
             wrong.append(f"{tag}: could not verify: {r['reason']}")
-            if r["reason"].startswith("not fully verified: compiled"):
+            if r["reason"].startswith("no test actually ran"):
+                fix.append(f"{tag}: no test ran on a side (every test skipped, or every test module failed to load); "
+                           "read the pytest logs, install what the tests need, and rerun.")
+            elif "fails to load on" in r["reason"] or "failed to load on both sides" in r["reason"]:
+                fix.append(f"{tag}: a test module did not load; read its traceback in the pytest logs "
+                           "(missing test dependency or plugin, or an import broken by the PR).")
+            elif r["reason"].startswith("not fully verified: compiled"):
                 fix.append(f"{tag}: compiled change without a test for it; a human should check it, or the PR should "
                            "add a test that calls the changed module.")
             elif r["reason"].startswith("not fully verified"):
@@ -1507,7 +1672,22 @@ def verification_path(a, rdir: Path) -> Path:
     if a.verification:
         return Path(a.verification)
     d = local_config.get("verification_dir")
-    return (Path(d) if d else Path(a.libraries_file).parent / "verification") / rdir.name / "verification.jsonl"
+    folder = (Path(d) if d else Path(a.libraries_file).parent / "verification") / rdir.name
+    return pick_verification_file(folder)
+
+
+def pick_verification_file(folder: Path) -> Path:
+    """verification.jsonl, unless the folder also has a file of schema-rev-5 'verification' records
+    (verification*.jsonl); then the newest-named such file."""
+    rev5 = []
+    for f in sorted(folder.glob("verification*.jsonl")) if folder.is_dir() else []:
+        first = next((ln for ln in f.read_text().splitlines() if ln.strip()), "")
+        try:
+            if json.loads(first).get("record_kind") == "verification":
+                rev5.append(f)
+        except ValueError:
+            continue
+    return rev5[-1] if rev5 else folder / "verification.jsonl"
 
 
 def main(argv=None) -> int:
@@ -1548,6 +1728,9 @@ def main(argv=None) -> int:
     ap.add_argument("--reselect", action="store_true",
                     help="same-day re-run: select afresh instead of re-testing the frozen selection of earlier attempts")
     ap.add_argument("--rerun-note", default=None, help="why the previous attempt is superseded (kept in its NOTE.md)")
+    ap.add_argument("--rejudge", action="store_true",
+                    help="with --report-only: recompute verdicts from the saved JUnit files with the current rules "
+                         "(the previous verdict is kept in each record under 'rejudged'; originals are backed up)")
     ap.add_argument("--report-only", action="store_true",
                     help="rebuild REPORT.md from records.jsonl, selection.json and run_meta.json; test nothing")
     a = ap.parse_args(argv)
@@ -1637,7 +1820,7 @@ def main(argv=None) -> int:
             if rec is None:
                 print(f"  testing #{c['pr']} {c['title'][:60]} ...", flush=True)
             try:
-                rec = rec or test_pr(repo, cfg, c, rdir, workroot, a, machine)
+                rec = gate(rec or test_pr(repo, cfg, c, rdir, workroot, a, machine))   # final verdict in records.jsonl
             except Exception as e:  # noqa: BLE001
                 problems.append(f"{repo}#{c['pr']}: harness error: {type(e).__name__}: {e}")
                 continue
@@ -1691,11 +1874,74 @@ def scoring_inputs(rdir: Path, a, chosen_path: Path) -> tuple[dict, dict]:
     return read_expectations(chosen_path), read_verification(verification_path(a, rdir))
 
 
+def rejudge(rec: dict, prdir: Path) -> dict:
+    """Recompute the comparison and verdict of a saved record from its JUnit files with the current rules. Only records
+    whose tests ran (they have a comparison) are recomputed; dependency-skip decisions made with the PR environment
+    (confirm_missing) are replayed from the saved comparison, because the environments are gone."""
+    old = rec.get("comparison")
+    n = rec.get("runs_per_side") or 0
+    files = [prdir / f"junit-{s}-{i}.xml" for s in ("main", "pr") for i in range(1, n + 1)]
+    if not old or not n or not all(f.exists() for f in files):
+        return rec
+    results = {s: [parse_junit(prdir / f"junit-{s}-{i}.xml") for i in range(1, n + 1)] for s in ("main", "pr")}
+    cmp = compare_sides(results)
+    kept = {d["test"] for d in old.get("skipped_missing_dependency", [])}
+    for d in [d for d in cmp["skipped_missing_dependency"] if d["test"] not in kept]:
+        cmp["other_changes"].append(f"{d['test']}: {d['main']} -> skipped (skip names {d['module']}, which is installed)")
+    cmp["skipped_missing_dependency"] = [d for d in cmp["skipped_missing_dependency"] if d["test"] in kept]
+    ex = exit_check(rec.get("per_run", []), results, cmp)
+    v, reason, _ = verdict_for(cmp, None, ex, rec.get("files"))
+    out = {k: x for k, x in rec.items() if k not in ("verdict_before_coverage_gate", "reason_before_coverage_gate")}
+    out.update(comparison=cmp, exit_check=ex, verdict=v, reason=reason)
+    out = gate(out)
+    if (out["verdict"], out["reason"]) != (rec.get("verdict"), rec.get("reason")):
+        out["rejudged"] = {"at_ist": now_ist().strftime("%Y-%m-%d %H:%M IST"),
+                           "previous_verdict": rec.get("verdict"), "previous_reason": rec.get("reason", "")}
+    return out
+
+
+def migrate_record(rec: dict, rdir: Path, redo: bool = False) -> dict:
+    """Bring a saved record up to the current rules: a real calendar date in run_date, the final (gated) verdict and,
+    with redo, verdicts recomputed from the JUnit files. Schema errors are re-checked."""
+    out = dict(rec)
+    if not DATE_RE.fullmatch(str(out.get("run_date", ""))):
+        out["run_date"] = run_date_for(rdir, str(out.get("date_ist", ""))[:10])
+    out = rejudge(out, rdir / (out.get("logs") or "").strip("/")) if redo and out.get("logs") else gate(out)
+    if out.get("record_kind") == "pr_run":
+        out.pop("schema_errors", None)
+        errs = validate_record(out)
+        if errs:
+            out["schema_errors"] = errs[:20]
+    return out
+
+
 def report_only(rdir: Path, a) -> int:
-    """Rebuild REPORT.md and the reviewer reports from saved records. The coverage gate is re-applied in memory
-    (records written before it existed get the compiled / docs-only rules; Python coverage shows 'not measured');
-    records.jsonl and record.json files are never rewritten."""
-    records = [gate(json.loads(ln)) for ln in (rdir / "records.jsonl").read_text().splitlines() if ln.strip()]
+    """Rebuild REPORT.md and the reviewer reports from saved records; nothing is re-tested. Records are migrated
+    first (migrate_record; with --rejudge also re-judged from the saved JUnit files) so records.jsonl, each record.json
+    and the report state the same final verdict. Changed files are rewritten; the originals are kept once under
+    pre-migration/."""
+    raw = [json.loads(ln) for ln in (rdir / "records.jsonl").read_text().splitlines() if ln.strip()]
+    records = [migrate_record(r, rdir, getattr(a, "rejudge", False)) for r in raw]
+    if records != raw:
+        backup = rdir / "pre-migration"
+        if not backup.exists():
+            backup.mkdir()
+            shutil.copy2(rdir / "records.jsonl", backup / "records.jsonl")
+            for r in raw:
+                f = rdir / (r.get("logs") or "").strip("/") / "record.json"
+                if r.get("logs") and f.exists():
+                    shutil.copy2(f, backup / f"{f.parent.name}.record.json")
+        with open(rdir / "records.jsonl", "w") as fh:
+            for r in records:
+                fh.write(json.dumps(r) + "\n")
+        for old, r in zip(raw, records):
+            f = rdir / (r.get("logs") or "").strip("/") / "record.json"
+            if r != old and r.get("logs") and f.exists():
+                f.write_text(json.dumps(r, indent=1))
+        changed = [f"{r['repo']}#{prn(r)}: {o.get('verdict')} -> {r['verdict']}" for o, r in zip(raw, records)
+                   if o.get("verdict") != r["verdict"]]
+        print(f"records migrated ({len(changed)} verdict change(s)); originals in {backup}"
+              + "".join(f"\n  {c}" for c in changed), flush=True)
     meta = json.loads((rdir / "run_meta.json").read_text())
     problems = meta.pop("problems", [])
     skipped = json.loads((rdir / "selection.json").read_text()).get("skipped", {})

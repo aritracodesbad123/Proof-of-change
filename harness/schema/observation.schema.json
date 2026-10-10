@@ -1,7 +1,7 @@
 {
  "$schema": "https://json-schema.org/draft/2020-12/schema",
  "$id": "blast-radius/observation/v1",
- "title": "Blast Radius observation record v1, revision 4 (shared by the downstream-test runner br_run.py and harness/run.py, plus Proof-of-Change PR runs)",
+ "title": "Blast Radius observation record v1, revision 5 (shared by the downstream-test runner br_run.py and harness/run.py, plus Proof-of-Change PR runs)",
  "type": "object",
  "properties": {
   "schema_version": {
@@ -713,9 +713,10 @@
    "type": "string",
    "enum": [
     "observation",
-    "pr_run"
+    "pr_run",
+    "verification"
    ],
-   "description": "OPTIONAL (rev 3). Absent or 'observation': a release-pair observation (the original v1 record, all v1 fields required). 'pr_run': one Proof-of-Change run of an open PR, main vs PR (ops/daily_run.py); required fields are listed in the 'then' branch."
+   "description": "OPTIONAL (rev 3). Absent or 'observation': a release-pair observation (the original v1 record, all v1 fields required). 'pr_run': one Proof-of-Change run of an open PR, main vs PR (ops/daily_run.py); required fields are listed in the 'then' branch. 'verification' (rev 5): an independent checker's verdict on another record; required fields in the nested 'then'."
   },
   "run_date": {
    "type": "string",
@@ -1005,6 +1006,203 @@
   "chosen": {
    "type": "object",
    "description": "OPTIONAL (rev 3, pr_run records; renamed in rev 4). Chosen-PR entry (install/test commands) when the PR was chosen by name for the day."
+  },
+  "verification": {
+   "type": "object",
+   "description": "OPTIONAL (rev 5; required when record_kind == 'verification'). An independent checker's verdict on ONE existing record (normally a pr_run). The checked run's verdict (verdict_under_review) and the checker's own verdict (checker_verdict) live in separately named fields so neither can be read as the other; there is no top-level verdict.",
+   "required": [
+    "checker",
+    "target",
+    "verdict_under_review",
+    "checker_verdict",
+    "check_status",
+    "evidence"
+   ],
+   "properties": {
+    "checker": {
+     "type": "object",
+     "required": [
+      "name"
+     ],
+     "description": "Who did the independent check (not the author of the checked run).",
+     "properties": {
+      "name": {
+       "type": "string",
+       "minLength": 1
+      },
+      "role": {
+       "type": "string"
+      }
+     }
+    },
+    "target": {
+     "type": "object",
+     "required": [
+      "record_id",
+      "repo",
+      "pr_number",
+      "head_sha"
+     ],
+     "description": "The record being checked. record_id is the checked record's 'id' (for pr_run: pr-<owner>-<repo>-<number>-<head12>-<run_date>).",
+     "properties": {
+      "record_id": {
+       "type": "string",
+       "pattern": "^[A-Za-z0-9._-]+$"
+      },
+      "record_author": {
+       "type": "string",
+       "minLength": 1
+      },
+      "record_path": {
+       "type": "string"
+      },
+      "report_path": {
+       "type": "string"
+      },
+      "repo": {
+       "type": "string",
+       "pattern": "^[\\w.-]+/[\\w.-]+$"
+      },
+      "pr_number": {
+       "type": "integer",
+       "minimum": 1
+      },
+      "head_sha": {
+       "type": "string",
+       "pattern": "^[0-9a-f]{40}$"
+      }
+     }
+    },
+    "verdict_under_review": {
+     "type": "object",
+     "required": [
+      "verdict",
+      "as_of"
+     ],
+     "description": "The CHECKED RUN's verdict (the run author's), exactly as it stood when the check was made. Never the checker's verdict.",
+     "properties": {
+      "verdict": {
+       "type": "string",
+       "enum": [
+        "verified",
+        "needs_attention",
+        "could_not_verify"
+       ]
+      },
+      "reason": {
+       "type": "string"
+      },
+      "as_of": {
+       "type": "string",
+       "description": "Report or record version the verdict was read from, with an IST time."
+      }
+     }
+    },
+    "checker_verdict": {
+     "type": [
+      "string",
+      "null"
+     ],
+     "enum": [
+      "verified",
+      "needs_attention",
+      "could_not_verify",
+      null
+     ],
+     "description": "The CHECKER's own verdict. null = the checker did not re-check this record (check_status 'unverified')."
+    },
+    "check_status": {
+     "type": "string",
+     "enum": [
+      "verified_by_checker",
+      "mismatch",
+      "unverified"
+     ],
+     "description": "verified_by_checker: checker re-ran/probed and agrees with verdict_under_review. mismatch: checker re-checked and checker_verdict differs from verdict_under_review.verdict. unverified: not re-checked (checker_verdict null)."
+    },
+    "mismatch_on": {
+     "type": "array",
+     "items": {
+      "type": "string",
+      "enum": [
+       "verdict",
+       "reason",
+       "counts",
+       "protocol"
+      ]
+     },
+     "description": "What differed when check_status is mismatch."
+    },
+    "counts_reproduced": {
+     "type": [
+      "boolean",
+      "null"
+     ],
+     "description": "Checker's re-run reproduced the run's per-side test counts exactly (null = not re-run)."
+    },
+    "summary": {
+     "type": "string",
+     "minLength": 1,
+     "description": "One plain sentence naming both sides, e.g. 'The run said needs_attention; the checker says verified.'"
+    },
+    "evidence": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "required": [
+       "kind",
+       "detail"
+      ],
+      "properties": {
+       "kind": {
+        "type": "string",
+        "enum": [
+         "rerun",
+         "probe",
+         "diff_read",
+         "record_audit",
+         "log_read",
+         "extra_check"
+        ]
+       },
+       "detail": {
+        "type": "string",
+        "minLength": 1
+       },
+       "path": {
+        "type": "string"
+       }
+      }
+     }
+    },
+    "later_run_verdict": {
+     "type": "object",
+     "required": [
+      "verdict",
+      "as_of"
+     ],
+     "description": "OPTIONAL. The checked record's verdict at a later time (same record id), so readers can see whether the run author has since changed it.",
+     "properties": {
+      "verdict": {
+       "type": "string",
+       "enum": [
+        "verified",
+        "needs_attention",
+        "could_not_verify"
+       ]
+      },
+      "as_of": {
+       "type": "string"
+      },
+      "agrees_with_checker": {
+       "type": [
+        "boolean",
+        "null"
+       ]
+      }
+     }
+    }
+   }
   }
  },
  "description": "One JSON object per (upstream, old, new, dependent) tuple, one line in observations.jsonl and research/runs/<id>/record.json. Merged 2026-10-10 from runner v1 (gates, accepted, network, report, stability, dependent_import) and guardrails/schema.py (hand_check, upstream_issue, machine_type, thread_env, per_run.collection_errors, per_run.pytest_summary). Cross-field rules not expressible here are listed in x-cross-field-rules and enforced by harness/brlib.py validate(). Revision 2 (2026-10-10, from docs/REPORT_SPEC.md): adds OPTIONAL pr, claims, upstream_commit_old/new, per_test_outcomes, old_output, golden_check, reviewer_decision for the reviewer report. Purely additive: every rev 1 record stays valid, schema_version stays \"1\". hand_check and upstream_issue were already present (required, nullable) and are unchanged. Accepted schema_sha256 values for rev 1 and rev 2 are listed in harness/schema/README.md and guardrails/schema.py.",
@@ -1037,6 +1235,11 @@
    "rev": 4,
    "date": "2026-10-10",
    "change": "optional coverage-gate fields: changed_lines_total, changed_lines_covered, coverage, coverage_gate, verdict_before_coverage_gate, reason_before_coverage_gate. Nothing becomes required. Also: the optional chosen-PR property was renamed `chosen` (optional, so older records stay valid), descriptions and revision authors made neutral."
+  },
+  {
+   "rev": 5,
+   "date": "2026-10-10",
+   "change": "optional record kind 'verification' with one new optional property 'verification' (checker, target, verdict_under_review, checker_verdict, check_status, evidence; no top-level verdict). The rev 3/4 'else' branch (observation records) moved unchanged one level down into a nested if/then/else, so observation and pr_run records validate exactly as before. Keywords unchanged (if/then/else/const/enum/type)."
   }
  ],
  "if": {
@@ -1088,54 +1291,76 @@
   }
  },
  "else": {
-  "required": [
-   "accepted",
-   "classification",
-   "cpu_count",
-   "date_ist",
-   "dependent",
-   "dependent_version",
-   "duration_s",
-   "env_diff",
-   "expected",
-   "expected_class",
-   "gates",
-   "hand_check",
-   "host",
-   "id",
-   "logs",
-   "machine",
-   "machine_type",
-   "matches_expected",
-   "network",
-   "new_direct_url",
-   "new_version",
-   "new_version_requested",
-   "notes",
-   "old_version",
-   "per_run",
-   "pip_check_new",
-   "platform",
-   "python",
-   "report",
-   "run_timeout_s",
-   "runs_per_side",
-   "schema_version",
-   "subset_note",
-   "test_selection",
-   "test_source",
-   "test_timeout_s",
-   "thread_env",
-   "top_error_signatures_already_broken",
-   "top_error_signatures_breaks",
-   "upstream",
-   "upstream_issue",
-   "who",
-   "workers"
-  ],
-  "properties": {
-   "runs_per_side": {
-    "minimum": 1
+  "if": {
+   "properties": {
+    "record_kind": {
+     "const": "verification"
+    }
+   },
+   "required": [
+    "record_kind"
+   ]
+  },
+  "then": {
+   "required": [
+    "schema_version",
+    "record_kind",
+    "id",
+    "date_ist",
+    "who",
+    "verification"
+   ]
+  },
+  "else": {
+   "required": [
+    "accepted",
+    "classification",
+    "cpu_count",
+    "date_ist",
+    "dependent",
+    "dependent_version",
+    "duration_s",
+    "env_diff",
+    "expected",
+    "expected_class",
+    "gates",
+    "hand_check",
+    "host",
+    "id",
+    "logs",
+    "machine",
+    "machine_type",
+    "matches_expected",
+    "network",
+    "new_direct_url",
+    "new_version",
+    "new_version_requested",
+    "notes",
+    "old_version",
+    "per_run",
+    "pip_check_new",
+    "platform",
+    "python",
+    "report",
+    "run_timeout_s",
+    "runs_per_side",
+    "schema_version",
+    "subset_note",
+    "test_selection",
+    "test_source",
+    "test_timeout_s",
+    "thread_env",
+    "top_error_signatures_already_broken",
+    "top_error_signatures_breaks",
+    "upstream",
+    "upstream_issue",
+    "who",
+    "workers"
+   ],
+   "properties": {
+    "runs_per_side": {
+     "minimum": 1
+    }
    }
   }
  }
