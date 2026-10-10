@@ -1,0 +1,67 @@
+{
+  "_comment": "Labelled PR set for Proof-of-Change evals. Jonathan owns the set; Nathan owns the harness. Each case has an 'input' block (all Proof-of-Change may see) and an 'answer' block (withheld from the run, used only for scoring). label: caused_regression | safe. verification: verified (checked against primary sources, see 'evidence') | unverified | TODO.",
+  "cases": [
+    {
+      "id": "requests-6655",
+      "input": {"repo": "psf/requests", "pr": 6655, "base_sha": "eea3bbf", "head_sha": "c0813a2",
+                "title": "Use TLS settings in selecting connection pool"},
+      "answer": {
+        "label": "caused_regression",
+        "regression": "HTTPAdapter.send() calls _get_connection() instead of the public, overridable get_connection(); adapters that override get_connection() (docker-py) fail with 'Not supported URL scheme http+docker'.",
+        "expected_verdict": "needs_attention",
+        "expected_findings": ["claim C1 proven (verify=True no longer reuses an unverified connection)", "unmentioned change: get_connection() override no longer called"],
+        "evidence": ["https://github.com/psf/requests/pull/6655", "https://github.com/docker/docker-py/issues/3256", "https://github.com/docker/docker-py/pull/3257", "https://github.com/psf/requests/issues/6707", "spec section 7.4; local probes in nvidia-nebius-hackathon/poc-artifacts (29 Sep 2026)"],
+        "verification": "verified",
+        "role": "main demo"
+      }
+    },
+    {
+      "id": "scikit-learn-29677",
+      "input": {"repo": "scikit-learn/scikit-learn", "pr": 29677, "base_sha": "0bfebf4235f37c09625e07d9fb0060210b3e0fdd",
+                "head_sha": "e04142cbe0f4f854272f877eb9692053b0a6bcf8", "title": "API Revamp estimator tags"},
+      "answer": {
+        "label": "caused_regression",
+        "regression": "Removed sklearn.utils._tags._safe_tags (and BaseEstimator._validate_data); imbalanced-learn 0.12.4 fails at import on 1.6.0rc1 with ImportError: cannot import name '_safe_tags'.",
+        "expected_verdict": "needs_attention",
+        "expected_findings": ["unmentioned change: public-ish helper _safe_tags removed; downstream import fails"],
+        "downstream_check": {"golden_case": "golden-sklearn160rc1-imblearn-import-failure", "dependent": "imbalanced-learn==0.12.4"},
+        "evidence": [
+          "https://github.com/scikit-learn/scikit-learn/pull/29677 (merged 2024-09-04 15:25 UTC = 20:55 IST, merge commit e04142cb)",
+          "sklearn/utils/_tags.py has 'def _safe_tags' at parent 0bfebf42 and not at e04142cb; absent at tag 1.6.0rc1; re-added (deprecated) at 1.6.0 by PR #30327",
+          "imbalanced-learn PR #1109 (fix, released 0.13.0); raw reproduction /workspace/br-repro"
+        ],
+        "verification": "verified",
+        "notes": "Description says '_get_tags and _more_tags' are removed; it does not mention _safe_tags. _safe_tags was restored (deprecated) before 1.6.0 final, but _validate_data moved and imbalanced-learn still needed PR #1109."
+      }
+    },
+    {
+      "id": "pandas-cow-default-TODO",
+      "input": {"repo": "pandas-dev/pandas", "pr": null, "base_sha": null, "head_sha": null,
+                "title": "TODO: the PR that made Copy-on-Write mandatory for pandas 3.0"},
+      "answer": {
+        "label": "caused_regression",
+        "regression": "Chained assignment becomes a no-op under Copy-on-Write; UpSetPlot 0.9.0 plotting gets NaN colours: ValueError: Invalid RGBA argument: nan (UpSetPlot issue #303).",
+        "expected_verdict": "needs_attention",
+        "downstream_check": {"golden_case": "golden-pandas300rc0-upsetplot-cow", "dependent": "UpSetPlot==0.9.0"},
+        "evidence": ["UpSetPlot issue #303", "dev run cal-pandas300rc0-upsetplot090 (67 real breaks, 6 already broken)"],
+        "verification": "TODO",
+        "notes": "PR number not identified yet (Jonathan). The break is reproduced at release level (2.3.3 vs 3.0.0rc0), not yet at PR level."
+      }
+    },
+    {
+      "id": "safe-TODO-1",
+      "input": {"repo": "TODO", "pr": null, "base_sha": null, "head_sha": null, "title": "TODO: merged PR (to be supplied by Jonathan)"},
+      "answer": {"label": "safe", "expected_verdict": "verified", "evidence": [], "verification": "TODO",
+                 "notes": "Jonathan to supply safe PRs from NumPy/pandas/scikit-learn; candidate source: the scikit-learn 1.5.1 -> 1.5.2 pair (pending clean-pair case)."}
+    }
+  ],
+  "example_data": {
+    "_comment": "Constructed demo (spec 7.5): poc-demo-bookstore, FastAPI + SQLite. EXAMPLE DATA, not real history; never counted in catch/false-alarm rates.",
+    "cases": [
+      {"id": "bookstore-1-pagination", "label": "safe", "expected_verdict": "verified"},
+      {"id": "bookstore-2-rate-limit", "label": "caused_regression", "expected_verdict": "needs_attention", "kind": "false claim"},
+      {"id": "bookstore-3-date-refactor", "label": "caused_regression", "expected_verdict": "needs_attention", "kind": "unmentioned change"},
+      {"id": "bookstore-4-discount-rounding", "label": "caused_regression", "expected_verdict": "needs_attention", "kind": "edge input"}
+    ]
+  }
+}
