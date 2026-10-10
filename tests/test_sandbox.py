@@ -74,6 +74,34 @@ EVIL_BACKEND = r'''
 import base64, hashlib, json, os, socket, zipfile
 from pathlib import Path
 
+def _view():
+    """What the sandbox shows: its mount points (from mountinfo) and a walk of everything that is NOT inside a mount,
+    i.e. the skeleton directories bwrap creates to hold the mount points."""
+    import re
+    mounts = set()
+    for line in open("/proc/self/mountinfo"):
+        mounts.add(re.sub(r"\\([0-7]{3})", lambda m: chr(int(m.group(1), 8)), line.split()[4]))
+    skeleton, odd, links = {}, [], {}
+    def walk(d):
+        try:
+            names = sorted(os.listdir(d))
+        except OSError as e:
+            odd.append([d, "unlistable: " + type(e).__name__])
+            return
+        skeleton[d] = names
+        for n in names:
+            q = os.path.join(d, n)
+            if q in mounts:
+                continue
+            if os.path.islink(q):
+                links[q] = os.readlink(q)
+            elif os.path.isdir(q):
+                walk(q)
+            else:
+                odd.append([q, "not inside any mount"])
+    walk("/")
+    return {"mounts": sorted(mounts), "skeleton": skeleton, "odd": odd, "links": links}
+
 def _attempts():
     cfg = json.loads(Path(__file__).with_name("targets.json").read_text())
     out = {"read": {}, "listing": {}}
@@ -92,6 +120,7 @@ def _attempts():
         except (OSError, TypeError) as e:
             out.setdefault("cache_write", {})[str(where)] = type(e).__name__
     out["env"] = dict(os.environ)
+    out["view"] = _view()
     Path(__file__).with_name("build-attempts.json").write_text(json.dumps(out))
 
 def _wheel(wheel_directory):
@@ -124,6 +153,34 @@ def get_requires_for_build_editable(config_settings=None):
 ATTEMPTS = r'''
 import json, os, socket, sys
 from pathlib import Path
+
+def _view():
+    """What the sandbox shows: its mount points (from mountinfo) and a walk of everything that is NOT inside a mount,
+    i.e. the skeleton directories bwrap creates to hold the mount points."""
+    import re
+    mounts = set()
+    for line in open("/proc/self/mountinfo"):
+        mounts.add(re.sub(r"\\([0-7]{3})", lambda m: chr(int(m.group(1), 8)), line.split()[4]))
+    skeleton, odd, links = {}, [], {}
+    def walk(d):
+        try:
+            names = sorted(os.listdir(d))
+        except OSError as e:
+            odd.append([d, "unlistable: " + type(e).__name__])
+            return
+        skeleton[d] = names
+        for n in names:
+            q = os.path.join(d, n)
+            if q in mounts:
+                continue
+            if os.path.islink(q):
+                links[q] = os.readlink(q)
+            elif os.path.isdir(q):
+                walk(q)
+            else:
+                odd.append([q, "not inside any mount"])
+    walk("/")
+    return {"mounts": sorted(mounts), "skeleton": skeleton, "odd": odd, "links": links}
 cfg = json.loads(Path(sys.argv[1] if len(sys.argv) > 1 else os.environ["T"]).read_text())
 out = {"read": {}, "listing": {}, "net": {}}
 for p in cfg["secrets"]:
@@ -144,6 +201,7 @@ for host, port in (("1.1.1.1", 53), ("127.0.0.1", cfg["port"])):
     finally:
         s.close()
 out["env"] = dict(os.environ)
+out["view"] = _view()
 '''
 
 
@@ -173,9 +231,40 @@ def work(tmp_path_factory, secrets):
     return {"dir": w, "tag": tag, "real_cache": real_cache}
 
 
-def _assert_contained(att: dict, secrets: list):
+SYSTEM_MOUNTS = ("/", "/usr", "/proc", "/dev", "/tmp", sandbox.INSIDE_PYTHON, sandbox.INSIDE_CACHE, "/opt/uv-bin/uv",
+                 "/bin", "/lib", "/lib64", "/lib32", "/libx32", "/sbin")
+SYSTEM_TREES = ("/proc/", "/dev/", "/etc/")
+
+
+def _under(p: str, root) -> bool:
+    return p == str(root) or p.startswith(str(root).rstrip("/") + "/")
+
+
+def _assert_view(view: dict, allowed: list):
+    """Nothing outside the bound dirs is visible: every mount is a system mount or lies under an allowed dir (the
+    side's work dir, single read-only files of the test), there are no files outside mounts, symlinks only at the
+    root and into /usr, and every skeleton directory contains only the path components that lead to mounts."""
+    mounts = view["mounts"]
+    bad = [m for m in mounts if m not in SYSTEM_MOUNTS and not m.startswith(SYSTEM_TREES)
+           and not any(_under(m, Path(a).resolve()) for a in allowed)]
+    assert bad == [], bad
+    assert view["odd"] == [], view["odd"]
+    links = view["links"]
+    assert all(os.path.dirname(k) == "/" and t.lstrip("/").startswith("usr/") for k, t in links.items()), links
+    for d, names in view["skeleton"].items():
+        leads = {m[len(d.rstrip("/")) + 1:].split("/")[0] for m in mounts if m != d and _under(m, d)}
+        if d == "/":
+            leads |= {os.path.basename(k) for k in links}
+        assert set(names) <= leads, (d, sorted(set(names) - leads))
+        assert d == "/" or leads, ("skeleton dir with no mount below it", d)
+
+
+def _assert_contained(att: dict, secrets: list, allowed: list):
     assert all(v in ("FileNotFoundError", "PermissionError") for v in att["read"].values()), att["read"]
-    assert not any(att["listing"].values()), att["listing"]
+    _assert_view(att["view"], allowed)
+    # a probed path may exist only as skeleton around a bound dir (e.g. a parent shared with the work dir)
+    shown = {d: e for d, e in att["listing"].items() if e and d not in att["view"]["skeleton"]}
+    assert shown == {}, shown
 
 
 def _assert_env(env: dict, extra: set = frozenset()):
@@ -188,7 +277,7 @@ def _assert_env(env: dict, extra: set = frozenset()):
 def test_build_backend_cannot_read_secrets_or_write_the_shared_cache(work, secrets):
     for side in ("main", "pr"):
         att = json.loads((work["dir"] / f"side-{side}" / "build-attempts.json").read_text())
-        _assert_contained(att, secrets)
+        _assert_contained(att, secrets, [work["dir"]])
         cw = att["cache_write"]
         # the shared cache's real path does not exist inside; UV_CACHE_DIR is a private layer, discarded on exit
         assert cw[work["real_cache"]] in ("FileNotFoundError", "PermissionError", "OSError"), cw
@@ -232,8 +321,9 @@ def test_probe_cannot_read_secrets_and_has_no_network(work, secrets, listener, f
     for side in ("main", "pr"):
         att = probes.read_output(prdir / f"probe-escape-{side}-1.jsonl")["attempts"]
         assert all(v in ("FileNotFoundError", "PermissionError") for v in att["read"].values()), att["read"]
-        assert att["listing"]["/home"] is False and att["listing"][str(REPO)] is False
         assert att["listing"][str(w / "venv-main")] is (side == "main")   # the other side's venv is not there
+        _assert_contained({**att, "listing": {d: e for d, e in att["listing"].items() if d != str(w / "venv-main")}},
+                          secrets, [w, probe, cfg])
         assert all(v != "CONNECTED" for v in att["net"].values()), att["net"]
         _assert_env(att["env"])
         assert att["env"]["HOME"] == str(w / f"home-{side}")
@@ -250,7 +340,7 @@ def test_pytest_cannot_read_secrets_and_has_no_network(work, secrets, listener, 
             ATTEMPTS.replace('sys.argv[1] if len(sys.argv) > 1 else os.environ["T"]', 'Path(__file__).with_name("t.json")')
             .replace("out = {", "OUT = out = {", 1)
             + "\ndef test_dump():\n    Path(__file__).with_name('attempts.json').write_text(json.dumps(OUT | "
-              "{'env': dict(os.environ)}))\n")
+              "{'env': dict(os.environ), 'view': _view()}))\n")
     rdir = tmp_path / "run"
     rdir.mkdir()
     per_run, _ = daily_run.run_tests({s: w / f"venv-{s}" for s in ("main", "pr")},
@@ -260,7 +350,7 @@ def test_pytest_cannot_read_secrets_and_has_no_network(work, secrets, listener, 
     assert (rdir / "junit-pr-1.xml").exists()   # written inside the sandbox, moved out
     for side in ("main", "pr"):
         att = json.loads((w / f"side-{side}" / "attempts.json").read_text())
-        _assert_contained(att, secrets)
+        _assert_contained(att, secrets, [w])
         assert all(v != "CONNECTED" for v in att["net"].values()), att["net"]
         _assert_env(att["env"])
 
@@ -322,3 +412,62 @@ def test_run_without_sandbox_argument_is_host_only_for_trusted_tools():
     host_ok = ('["uv", "python", "find"',)   # resolve_python: asks uv which base interpreter it would use
     assert [c for c in calls if ("venv" in c or '"uv"' in c) and not c.startswith(tuple("subprocess.run(" + h
                                                                                          for h in host_ok))] == []
+
+
+# ---------------------------------------------------------------- layout: work dir sharing a parent with the repo
+@pytest.fixture
+def sibling_dir():
+    """A dir next to the repo (like `pytest --basetemp=<repo's parent>/...`): its parent is visible inside the
+    sandbox, but only as the empty skeleton bwrap creates around the bound work dir."""
+    if not os.access(REPO.parent, os.W_OK):
+        pytest.skip(f"the repo's parent is not writable here: {REPO.parent}")
+    import shutil
+    d = REPO.parent / f".poc-sandbox-layout-{uuid.uuid4().hex[:8]}"
+    d.mkdir()
+    yield d
+    shutil.rmtree(d, ignore_errors=True)
+
+
+def _attempts_in(venv: Path, cfg: dict, network: bool = False, ro_extra: tuple = ()) -> dict:
+    venv.parent.mkdir(parents=True, exist_ok=True)
+    f = venv.parent / "t.json"
+    f.write_text(json.dumps(cfg))
+    cp = daily_run.in_side(venv, ["/usr/bin/python3", "-c", ATTEMPTS + "\nprint(json.dumps(out))", str(f)],
+                           network=network, ro=(f, *ro_extra), timeout=120)
+    assert cp.returncode == 0, cp.stderr[-2000:]
+    return json.loads(cp.stdout)
+
+
+def test_work_dir_sharing_the_repos_parent_is_still_contained(sibling_dir, secrets, listener):
+    w = sibling_dir / "work"
+    venv = w / "venv-pr"
+    att = _attempts_in(venv, {"secrets": secrets, "repo": str(REPO), "repo_parent": str(REPO.parent),
+                              "port": listener, "other_side": str(w / "venv-main")})
+    parent = str(REPO.parent.resolve())
+    assert att["listing"][str(REPO.parent)] is True                        # the shared parent exists ...
+    assert att["view"]["skeleton"][parent] == [sibling_dir.name]           # ... holding only the path to the work dir
+    assert att["listing"][str(REPO)] is False                             # the repo next to it is not there
+    _assert_contained(att, secrets, [w])
+    assert all(v != "CONNECTED" for v in att["net"].values()), att["net"]
+
+
+def test_the_check_catches_an_exposed_parent(sibling_dir, secrets, listener):
+    """Negative control: binding the repo's parent read-only makes the repo and its planted secret visible, and the
+    containment check must fail."""
+    w = sibling_dir / "work"
+    att = _attempts_in(w / "venv-pr", {"secrets": secrets, "repo": str(REPO), "repo_parent": str(REPO.parent),
+                                       "port": listener, "other_side": str(w / "venv-main")}, ro_extra=(REPO.parent,))
+    assert att["listing"][str(REPO)] is True
+    with pytest.raises(AssertionError):
+        _assert_contained(att, secrets, [w])
+
+
+def test_whole_module_passes_with_basetemp_next_to_the_repo(sibling_dir):
+    """The reported layout end to end: this module under `pytest --basetemp=<repo's parent>/<dir>`."""
+    import subprocess
+    import sys
+    cp = subprocess.run([sys.executable, "-m", "pytest", "-q", "-p", "no:cacheprovider", str(Path(__file__)),
+                         f"--basetemp={sibling_dir / 'basetemp'}", "-k", "not basetemp_next_to_the_repo"],
+                        cwd=REPO, capture_output=True, text=True, timeout=1800)
+    assert cp.returncode == 0, cp.stdout[-4000:] + cp.stderr[-2000:]
+    assert " passed" in cp.stdout and " failed" not in cp.stdout

@@ -153,6 +153,21 @@ run and `make check` never pass it. `run_meta.json` records the sandbox used (`"
 `tests/test_sandbox.py` start real sandboxes with dummy secret files planted outside and fake credentials in the
 environment, and check every phase (a hostile build backend, pytest, a probe) and the shared cache.
 
+To mount a dir at its real path, bwrap creates its ancestors as empty directories on the sandbox's own tmpfs, so a
+parent of the work dir (for example a parent it shares with the repo) exists inside, but only as that skeleton. The
+containment check reads the mount table inside the sandbox and walks everything outside the mounts: every mount is a
+system mount or lies under the side's own dirs, no file exists outside a mount, and each skeleton directory contains
+only the path components that lead to mounts. `tests/test_sandbox.py` also runs itself with `--basetemp` next to the
+repo, and has a negative control that exposes the repo's parent and expects the check to fail.
+
+> **TODO (open issue): sandbox the release-pair runner.** `harness/run.py` (release pairs) gets the allowlisted
+> environment but does **not** run inside the sandbox yet: its installs, tests and coverage run directly on the
+> machine with the runner's filesystem access and network. That is acceptable only because it installs **published
+> releases** from the package index. Before it is pointed at anything else (a branch, a PR, a git URL, a local
+> checkout, an unpublished or nightly build), route its subprocesses through `guardrails/sandbox.py` the same way
+> `ops/daily_run.py` does (per-side read-write dirs, read-only shared cache, network only for installs, fail closed),
+> and extend `tests/test_sandbox.py` to cover it.
+
 ## Environment of untrusted code (`guardrails/isolation.py`)
 
 Every subprocess that may run code from a PR or a package gets an **allowlisted** environment built by
