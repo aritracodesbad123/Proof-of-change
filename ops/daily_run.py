@@ -927,6 +927,11 @@ def verdict_for(cmp: dict | None, cnv_reason: str | None, exits: dict | None = N
         bits.append(f"{len(uncollected)} test module(s) fail to collect on both sides ({', '.join(uncollected[:3])}), "
                     "so their tests did not run")
     reason = "; ".join(bits)
+    real_ran = cmp["same"] + cmp["new_tests_passing"] - len(pre) + len(cmp["fixed"])
+    if uncollected and real_ran <= 0 and not (cmp["regressions"] or cmp["new_tests_failing"]):
+        # Guardrail: every mapped test module failed to collect, so no real test ran; never call that verified.
+        return (Verdict.COULD_NOT_VERIFY.value, "no mapped test actually ran: " + reason,
+                [f.value for f in findings])
     if cmp["regressions"] or cmp["new_tests_failing"]:
         v = pr_verdict(RunSummary(build_ok=True, claims=[Claim("tests", testable=True, probed=True, proven=True)],
                                   findings=findings))
