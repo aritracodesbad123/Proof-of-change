@@ -25,6 +25,8 @@ jobs:
       BR_MACHINE: github-actions
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # full history, so the decision-log check can compare with the base branch
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
@@ -46,6 +48,11 @@ jobs:
           bwrap --version
           bwrap --unshare-all --die-with-parent --ro-bind /usr /usr --symlink usr/lib /lib --symlink usr/lib64 /lib64 \
             --symlink usr/bin /bin --proc /proc --dev /dev --tmpfs /tmp -- /bin/true && echo "sandbox works" || echo "::warning::bubblewrap cannot start here; the sandbox tests will skip"
+      - name: Decision log - a PR that changes code adds docs/decisions/YYYY-MM-DD-<topic>.md
+        if: github.event_name == 'pull_request'
+        run: |
+          git fetch --no-tags origin "${{ github.base_ref }}"
+          python -m guardrails.decision_log --base "origin/${{ github.base_ref }}"
       - name: Lint
         run: ruff check .
       - name: Guardrail - no external side effects
