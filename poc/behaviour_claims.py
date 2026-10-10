@@ -68,8 +68,11 @@ def find(title: str, body: str | None) -> list[dict]:
 
 def probe_covers(probe_results: dict | None) -> bool:
     """A probe that ran and has at least one claim expecting 'same' checks behaviour preservation; its result then
-    decides (probes never get overruled by this rule)."""
+    decides (probes never get overruled by this rule). A probe that ran none of the changed lines on the main side
+    (probe_changed_line_coverage adequacy not_adequate, poc/probe_adequacy.py) does not count."""
     for it in (probe_results or {}).get("items") or []:
+        if (it.get("probe_changed_line_coverage") or {}).get("adequacy") == "not_adequate":
+            continue
         if any(c.get("expect") == "same" for c in it.get("claims") or []):
             return True
     return False
