@@ -1,7 +1,7 @@
 """Reviewer reports for the human approver: the single report generator for Blast Radius / Proof-of-Change.
 
     python -m reports.generate INPUT [INPUT ...] --out reports/daily/2026-10-11 \
-        [--runs-root /workspace/blast-radius-research] [--claims-dir DIR] [--formats md,html,pdf] [--require-v1]
+        [--runs-root DIR] [--claims-dir DIR] [--formats md,html,pdf] [--require-v1]
 
 INPUT is any mix of:
   * a record.json (its own directory is used as the run directory when --runs-root does not resolve it),
@@ -10,7 +10,7 @@ INPUT is any mix of:
 
 Output: <out>/<run id>/REPORT.md|html|pdf for every record, and <out>/SUMMARY.md|html|pdf (the daily summary,
 needs-attention items first). Report content and rules: docs/REPORT_SPEC.md; code: reports/reviewer.py (ported
-from Jonathan's harness/report/render_report.py, which is now a thin shim to this module).
+from harness/report/render_report.py, which is now a thin shim to this module).
 Exit code: 0 on success, 2 if a PDF was requested but could not be rendered.
 """
 from __future__ import annotations

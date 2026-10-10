@@ -1,6 +1,6 @@
 # Reviewer report: pandas 2.3.3 to 3.0.0rc0 (contains PR #56633)
 
-Run `golden-pandas300rc0-upsetplot090`, tested against UpSetPlot 0.9.0. Report generated 2026-10-10 06:40 IST by reports/generate.py 1.0 (from Jonathan's render_report.py 0.1).
+Run `golden-pandas300rc0-upsetplot090`, tested against UpSetPlot 0.9.0. Report generated 2026-10-10 07:02 IST by reports/generate.py 1.0 (from render_report.py 0.1).
 
 > ## 🟠 NEEDS ATTENTION
 >
@@ -19,12 +19,12 @@ Run `golden-pandas300rc0-upsetplot090`, tested against UpSetPlot 0.9.0. Report g
 
 | # | Claim (source) | Status | What we observed | Log line |
 |---|---|---|---|---|
-| C1 | Copy-on-Write is enabled by default (PR #56633 title) | ⚪ **not testable** | the dependent's tests do not check the pandas setting itself; they show its effect on dependent code | [pytest-new-1.log:2104](../../../../../blast-radius-research/research/runs/golden-pandas300rc0-upsetplot090/pytest-new-1.log) «Invalid RGBA argument: nan» |
-| - | Change not in the PR description (this run) | 🟠 **unmentioned change** | 36 test(s) now fail with: ValueError: Invalid RGBA argument: nan (linked to C1 by UpSetPlot issue #303 (github.com/jnothman/UpSetPlot/issues/303)) | [pytest-new-1.log:2104](../../../../../blast-radius-research/research/runs/golden-pandas300rc0-upsetplot090/pytest-new-1.log) «ValueError: Invalid RGBA argument: nan» |
-| - | Change not in the PR description (this run) | 🟠 **unmentioned change** | 16 test(s) now fail with: AssertionError: DataFrame.index level [N] are different (no claim mentions this) | [pytest-new-1.log:35](../../../../../blast-radius-research/research/runs/golden-pandas300rc0-upsetplot090/pytest-new-1.log) «AssertionError: DataFrame.index level [» |
-| - | Change not in the PR description (this run) | 🟠 **unmentioned change** | 13 test(s) now fail with: ValueError: Do not know how to convert N    NaN (no claim mentions this) | [pytest-new-1.log:2510](../../../../../blast-radius-research/research/runs/golden-pandas300rc0-upsetplot090/pytest-new-1.log) «ValueError: Do not know how to convert» |
-| - | Change not in the PR description (this run) | 🟠 **unmentioned change** | 1 test(s) now fail with: ValueError: 'c' argument must be a color, a sequence of colors, or a sequence of numbers, not N     #0000002e (no claim mentions this) | [pytest-new-1.log:9372](../../../../../blast-radius-research/research/runs/golden-pandas300rc0-upsetplot090/pytest-new-1.log) «ValueError: 'c' argument must be a color, a sequence of colors, or a sequence of numbers, not» |
-| - | Change not in the PR description (this run) | 🟠 **unmentioned change** | 1 test(s) now fail with: ValueError: 'c' argument must be a color, a sequence of colors, or a sequence of numbers, not N           NaN (no claim mentions this) | [pytest-new-1.log:9372](../../../../../blast-radius-research/research/runs/golden-pandas300rc0-upsetplot090/pytest-new-1.log) «ValueError: 'c' argument must be a color, a sequence of colors, or a sequence of numbers, not» |
+| C1 | Copy-on-Write is enabled by default (PR #56633 title) | ⚪ **not testable** | the dependent's tests do not check the pandas setting itself; they show its effect on dependent code | [pytest-new-1.log:2104](../../../research/research/runs/golden-pandas300rc0-upsetplot090/pytest-new-1.log) «Invalid RGBA argument: nan» |
+| - | Change not in the PR description (this run) | 🟠 **unmentioned change** | 36 test(s) now fail with: ValueError: Invalid RGBA argument: nan (linked to C1 by UpSetPlot issue #303 (github.com/jnothman/UpSetPlot/issues/303)) | [pytest-new-1.log:2104](../../../research/research/runs/golden-pandas300rc0-upsetplot090/pytest-new-1.log) «ValueError: Invalid RGBA argument: nan» |
+| - | Change not in the PR description (this run) | 🟠 **unmentioned change** | 16 test(s) now fail with: AssertionError: DataFrame.index level [N] are different (no claim mentions this) | [pytest-new-1.log:35](../../../research/research/runs/golden-pandas300rc0-upsetplot090/pytest-new-1.log) «AssertionError: DataFrame.index level [» |
+| - | Change not in the PR description (this run) | 🟠 **unmentioned change** | 13 test(s) now fail with: ValueError: Do not know how to convert N    NaN (no claim mentions this) | [pytest-new-1.log:2510](../../../research/research/runs/golden-pandas300rc0-upsetplot090/pytest-new-1.log) «ValueError: Do not know how to convert» |
+| - | Change not in the PR description (this run) | 🟠 **unmentioned change** | 1 test(s) now fail with: ValueError: 'c' argument must be a color, a sequence of colors, or a sequence of numbers, not N     #0000002e (no claim mentions this) | [pytest-new-1.log:9372](../../../research/research/runs/golden-pandas300rc0-upsetplot090/pytest-new-1.log) «ValueError: 'c' argument must be a color, a sequence of colors, or a sequence of numbers, not» |
+| - | Change not in the PR description (this run) | 🟠 **unmentioned change** | 1 test(s) now fail with: ValueError: 'c' argument must be a color, a sequence of colors, or a sequence of numbers, not N           NaN (no claim mentions this) | [pytest-new-1.log:9372](../../../research/research/runs/golden-pandas300rc0-upsetplot090/pytest-new-1.log) «ValueError: 'c' argument must be a color, a sequence of colors, or a sequence of numbers, not» |
 
 Citation check (PASS): 6 claim(s), every one backed by a real log line
 
@@ -34,17 +34,17 @@ Citation check (PASS): 6 claim(s), every one backed by a real log line
 
 | # | Error after the change | Tests | Log line |
 |---|---|---|---|
-| 1 | ValueError: Invalid RGBA argument: nan | 36 | [pytest-new-1.log:2104](../../../../../blast-radius-research/research/runs/golden-pandas300rc0-upsetplot090/pytest-new-1.log) «ValueError: Invalid RGBA argument: nan» |
-| 2 | AssertionError: DataFrame.index level [N] are different | 16 | [pytest-new-1.log:35](../../../../../blast-radius-research/research/runs/golden-pandas300rc0-upsetplot090/pytest-new-1.log) «AssertionError: DataFrame.index level [» |
-| 3 | ValueError: Do not know how to convert N    NaN | 13 | [pytest-new-1.log:2510](../../../../../blast-radius-research/research/runs/golden-pandas300rc0-upsetplot090/pytest-new-1.log) «ValueError: Do not know how to convert» |
-| 4 | ValueError: 'c' argument must be a color, a sequence of colors, or a sequence of numbers, not N     #0000002e | 1 | [pytest-new-1.log:9372](../../../../../blast-radius-research/research/runs/golden-pandas300rc0-upsetplot090/pytest-new-1.log) «ValueError: 'c' argument must be a color, a sequence of colors, or a sequence of numbers, not» |
-| 5 | ValueError: 'c' argument must be a color, a sequence of colors, or a sequence of numbers, not N           NaN | 1 | [pytest-new-1.log:9372](../../../../../blast-radius-research/research/runs/golden-pandas300rc0-upsetplot090/pytest-new-1.log) «ValueError: 'c' argument must be a color, a sequence of colors, or a sequence of numbers, not» |
+| 1 | ValueError: Invalid RGBA argument: nan | 36 | [pytest-new-1.log:2104](../../../research/research/runs/golden-pandas300rc0-upsetplot090/pytest-new-1.log) «ValueError: Invalid RGBA argument: nan» |
+| 2 | AssertionError: DataFrame.index level [N] are different | 16 | [pytest-new-1.log:35](../../../research/research/runs/golden-pandas300rc0-upsetplot090/pytest-new-1.log) «AssertionError: DataFrame.index level [» |
+| 3 | ValueError: Do not know how to convert N    NaN | 13 | [pytest-new-1.log:2510](../../../research/research/runs/golden-pandas300rc0-upsetplot090/pytest-new-1.log) «ValueError: Do not know how to convert» |
+| 4 | ValueError: 'c' argument must be a color, a sequence of colors, or a sequence of numbers, not N     #0000002e | 1 | [pytest-new-1.log:9372](../../../research/research/runs/golden-pandas300rc0-upsetplot090/pytest-new-1.log) «ValueError: 'c' argument must be a color, a sequence of colors, or a sequence of numbers, not» |
+| 5 | ValueError: 'c' argument must be a color, a sequence of colors, or a sequence of numbers, not N           NaN | 1 | [pytest-new-1.log:9372](../../../research/research/runs/golden-pandas300rc0-upsetplot090/pytest-new-1.log) «ValueError: 'c' argument must be a color, a sequence of colors, or a sequence of numbers, not» |
 
 ### Group 1: 36 test(s)
 
 **Error:** ValueError: Invalid RGBA argument: nan
 
-**Affected tests:** `test_add_stacked_bars[False-horizontal]`, `test_add_stacked_bars[False-vertical]`, `test_add_stacked_bars[True-horizontal]`, `test_add_stacked_bars[True-vertical]`, `test_add_stacked_bars_colors[<lambda>-expected4]`, `test_add_stacked_bars_colors[Pastel1-expected2]`, and 30 more (full list: [class-real_break.txt](../../../../../blast-radius-research/research/runs/golden-pandas300rc0-upsetplot090/class-real_break.txt))
+**Affected tests:** `test_add_stacked_bars[False-horizontal]`, `test_add_stacked_bars[False-vertical]`, `test_add_stacked_bars[True-horizontal]`, `test_add_stacked_bars[True-vertical]`, `test_add_stacked_bars_colors[<lambda>-expected4]`, `test_add_stacked_bars_colors[Pastel1-expected2]`, and 30 more (full list: [class-real_break.txt](../../../research/research/runs/golden-pandas300rc0-upsetplot090/class-real_break.txt))
 
 **Example:** `upsetplot.tests.test_upsetplot::test_add_stacked_bars[False-horizontal]`. Before: passed, passed, passed (old runs). After: failed, failed, failed (new runs).
 
@@ -59,7 +59,7 @@ ValueError: Invalid RGBA argument: nan
 
 **Error:** AssertionError: DataFrame.index level [N] are different
 
-**Affected tests:** `test_from_contents_vs_memberships[blah-iter-None]`, `test_from_contents_vs_memberships[blah-iter-data1]`, `test_from_contents_vs_memberships[blah-list-None]`, `test_from_contents_vs_memberships[blah-list-data1]`, `test_from_contents_vs_memberships[blah-set-None]`, `test_from_contents_vs_memberships[blah-set-data1]`, and 10 more (full list: [class-real_break.txt](../../../../../blast-radius-research/research/runs/golden-pandas300rc0-upsetplot090/class-real_break.txt))
+**Affected tests:** `test_from_contents_vs_memberships[blah-iter-None]`, `test_from_contents_vs_memberships[blah-iter-data1]`, `test_from_contents_vs_memberships[blah-list-None]`, `test_from_contents_vs_memberships[blah-list-data1]`, `test_from_contents_vs_memberships[blah-set-None]`, `test_from_contents_vs_memberships[blah-set-data1]`, and 10 more (full list: [class-real_break.txt](../../../research/research/runs/golden-pandas300rc0-upsetplot090/class-real_break.txt))
 
 **Example:** `upsetplot.tests.test_data::test_from_contents_vs_memberships[blah-iter-None]`. Before: passed, passed, passed (old runs). After: failed, failed, failed (new runs).
 
@@ -77,7 +77,7 @@ Attribute "dtype" are different
 
 **Error:** ValueError: Do not know how to convert N    NaN
 
-**Affected tests:** `test_two_sets[set20-set11]`, `test_two_sets[set20-set12]`, `test_two_sets[set21-set10]`, `test_two_sets[set21-set11]`, `test_two_sets[set21-set12]`, `test_two_sets[set21-set13]`, and 7 more (full list: [class-real_break.txt](../../../../../blast-radius-research/research/runs/golden-pandas300rc0-upsetplot090/class-real_break.txt))
+**Affected tests:** `test_two_sets[set20-set11]`, `test_two_sets[set20-set12]`, `test_two_sets[set21-set10]`, `test_two_sets[set21-set11]`, `test_two_sets[set21-set12]`, `test_two_sets[set21-set13]`, and 7 more (full list: [class-real_break.txt](../../../research/research/runs/golden-pandas300rc0-upsetplot090/class-real_break.txt))
 
 **Example:** `upsetplot.tests.test_upsetplot::test_two_sets[set20-set11]`. Before: passed, passed, passed (old runs). After: failed, failed, failed (new runs).
 
@@ -98,7 +98,7 @@ Name: linestyles, dtype: object to dashes
 
 **Error:** ValueError: 'c' argument must be a color, a sequence of colors, or a sequence of numbers, not N     #0000002e
 
-**Affected tests:** `test_style_subsets_artists[horizontal]` (full list: [class-real_break.txt](../../../../../blast-radius-research/research/runs/golden-pandas300rc0-upsetplot090/class-real_break.txt))
+**Affected tests:** `test_style_subsets_artists[horizontal]` (full list: [class-real_break.txt](../../../research/research/runs/golden-pandas300rc0-upsetplot090/class-real_break.txt))
 
 **Example:** `upsetplot.tests.test_upsetplot::test_style_subsets_artists[horizontal]`. Before: passed, passed, passed (old runs). After: failed, failed, failed (new runs).
 
@@ -120,7 +120,7 @@ Name: facecolors, dtype: object
 
 **Error:** ValueError: 'c' argument must be a color, a sequence of colors, or a sequence of numbers, not N           NaN
 
-**Affected tests:** `test_style_subsets_artists[vertical]` (full list: [class-real_break.txt](../../../../../blast-radius-research/research/runs/golden-pandas300rc0-upsetplot090/class-real_break.txt))
+**Affected tests:** `test_style_subsets_artists[vertical]` (full list: [class-real_break.txt](../../../research/research/runs/golden-pandas300rc0-upsetplot090/class-real_break.txt))
 
 **Example:** `upsetplot.tests.test_upsetplot::test_style_subsets_artists[vertical]`. Before: passed, passed, passed (old runs). After: failed, failed, failed (new runs).
 
@@ -154,7 +154,7 @@ Name: facecolors, dtype: object
 | 🟢 **pass** | Runs per side | 3 (minimum 3), alternating old and new |
 | 🟢 **pass** | Guardrails respected | tests ran with no network; nothing was posted or filed by the runner |
 | 🟢 **pass** | Matches the prediction written before the run | break: 67 real breaks from Copy-on-Write (Invalid RGBA argument: nan) and 6 already broken (pytest.warns(None)) |
-| 🟢 **pass** | Nathan's evals | 6 of 7 eval checks passed (see 'Evals and guardrails') |
+| 🟢 **pass** | Evals | 6 of 7 eval checks passed (see 'Evals and guardrails') |
 | 🟢 **pass** | Every claim cites a log line | 6 claim(s), every one backed by a real log line |
 
 ## What went wrong and how to fix it
@@ -181,7 +181,7 @@ Name: facecolors, dtype: object
 |---|---|---|
 | Required checks (gates) | 🟢 **7 of 7 passed** | all passed |
 | Advisory checks | 🟢 **2 of 2 passed** | all passed |
-| Evals (Nathan) | 🟢 **APPROVE** | no failures or warnings |
+| Evals | 🟢 **APPROVE** | no failures or warnings |
 | Golden cases (stored records) | 🟢 **3 of 3 hold** | checked against the stored golden records (harness 1.0) with the eval gate's code, not re-run for this report. This run is itself one of the golden cases, so this check is partly circular for it |
 | Golden cases (re-run) | ⚪ **not available** | no golden re-run recorded in this record (golden_check) |
 | Known-answer replay (fresh re-run) | 🟢 **all passed** | replayed 2026-10-10 06:30:21 IST, harness 1.0 |
@@ -189,7 +189,7 @@ Name: facecolors, dtype: object
 | Flaky rate | 🟢 **0 of 251 (0.0%)** | stability old 1.0, new 1.0 |
 | Network during tests | 🟢 **off** | install: allowed (uv from PyPI/nightly index, git clone of the tag); tests: no network (unshare -rn, private network namespace) |
 | Threads | 🟢 **pinned to 1** | OMP_NUM_THREADS=1, OPENBLAS_NUM_THREADS=1, MKL_NUM_THREADS=1, NUMEXPR_NUM_THREADS=1, VECLIB_MAXIMUM_THREADS=1, BLIS_NUM_THREADS=1 |
-| Machine | 🔵 **box** | Intel(R) Xeon(R) Processor, 8 CPUs, 15.6 GB RAM, Linux x86_64, CI: not available |
+| Machine | 🔵 **local** | Intel(R) Xeon(R) Processor, 8 CPUs, 15.6 GB RAM, Linux x86_64, CI: not available |
 | Report matches the record | 🟢 **consistent** | break and import-failure counts recomputed from class-*.txt and JUnit equal the record |
 | Prediction before the run | 🟢 **yes** | break: 67 real breaks from Copy-on-Write (Invalid RGBA argument: nan) and 6 already broken (pytest.warns(None)) |
 
@@ -199,9 +199,9 @@ Name: facecolors, dtype: object
 | golden-pandas300rc0-upsetplot-cow | 🟢 **holds** | golden-pandas300rc0-upsetplot-cow: all expected values hold |
 | golden-clean-sklearn151-152-imblearn | 🟢 **holds** | golden-clean-sklearn151-152-imblearn: all expected values hold |
 
-## Evals and guardrails (Nathan)
+## Evals and guardrails
 
-Independent checks of this record by evals/checks.py and guardrails/schema.py against the shared schema `blast-radius/observation/v1` (written against rev 1 (sha256 5a3c3d36b773...); valid under current rev 2 (additive)). Eval recommendation: **APPROVE**. Any FAIL here makes the verdict COULD NOT VERIFY.
+Independent checks of this record by evals/checks.py and guardrails/schema.py against the shared schema `blast-radius/observation/v1` (written against rev 1 (sha256 5a3c3d36b773...); valid under current rev 4 (additive)). Eval recommendation: **APPROVE**. Any FAIL here makes the verdict COULD NOT VERIFY.
 
 | Check | Status | Detail | How to fix |
 |---|---|---|---|
@@ -219,7 +219,7 @@ Independent checks of this record by evals/checks.py and guardrails/schema.py ag
 - [ ] I read the verdict, the recommended action and the confidence.
 - [ ] I checked the claims vs reality table for any 'false' or 'unmentioned change' rows, and opened at least one cited log line.
 - [ ] I looked at the largest behavior-change group and its example error.
-- [ ] I confirmed the required checks and Nathan's evals passed (Trust checks, Evals and guardrails).
+- [ ] I confirmed the required checks and the evals passed (Trust checks, Evals and guardrails).
 - [ ] I am satisfied the environment issues (if any) do not change the decision.
 
 **Decision:** ☐ Approve ☐ Approve with notes ☐ Reject ☐ Re-run    Reviewer: ________  Date: ________
@@ -229,7 +229,7 @@ Independent checks of this record by evals/checks.py and guardrails/schema.py ag
 From the blast-radius repo root. The wrapper forces 3 alternating runs per side and the single-thread env, records machine_type, writes under ./data and never posts anything:
 
 ```
-BR_RUNNER=/workspace/blast-radius-research/harness/br_run.py python -m harness.run \
+BR_RUNNER=<path to br_run.py> python -m harness.run \
   --upstream pandas \
   --old 2.3.3 \
   --new 3.0.0rc0 \
@@ -250,23 +250,23 @@ Needs Linux x86_64, uv 0.12 or newer, git and unshare.
 | What | Link (relative to this report) |
 |---|---|
 | Where the description comes from | PR title, github.com/pandas-dev/pandas/pull/56633, verified via the GitHub API on 2026-10-10 |
-| Claim C1 | [pytest-new-1.log:2104](../../../../../blast-radius-research/research/runs/golden-pandas300rc0-upsetplot090/pytest-new-1.log) «Invalid RGBA argument: nan» |
-| Unmentioned change | [pytest-new-1.log:2104](../../../../../blast-radius-research/research/runs/golden-pandas300rc0-upsetplot090/pytest-new-1.log) «ValueError: Invalid RGBA argument: nan» |
-| Unmentioned change | [pytest-new-1.log:35](../../../../../blast-radius-research/research/runs/golden-pandas300rc0-upsetplot090/pytest-new-1.log) «AssertionError: DataFrame.index level [» |
-| Unmentioned change | [pytest-new-1.log:2510](../../../../../blast-radius-research/research/runs/golden-pandas300rc0-upsetplot090/pytest-new-1.log) «ValueError: Do not know how to convert» |
-| Unmentioned change | [pytest-new-1.log:9372](../../../../../blast-radius-research/research/runs/golden-pandas300rc0-upsetplot090/pytest-new-1.log) «ValueError: 'c' argument must be a color, a sequence of colors, or a sequence of numbers, not» |
-| Unmentioned change | [pytest-new-1.log:9372](../../../../../blast-radius-research/research/runs/golden-pandas300rc0-upsetplot090/pytest-new-1.log) «ValueError: 'c' argument must be a color, a sequence of colors, or a sequence of numbers, not» |
-| pytest summary, old side run 1 | [pytest-old-1.log:475](../../../../../blast-radius-research/research/runs/golden-pandas300rc0-upsetplot090/pytest-old-1.log) «6 failed, 233 passed, 12 skipped, 414 warnings in 6.59s» |
-| pytest summary, new side run 1 | [pytest-new-1.log:10087](../../../../../blast-radius-research/research/runs/golden-pandas300rc0-upsetplot090/pytest-new-1.log) «73 failed, 166 passed, 12 skipped, 212 warnings in 10.62s» |
-| Full record | [record.json](../../../../../blast-radius-research/research/runs/golden-pandas300rc0-upsetplot090/record.json) |
-| Run arguments | [args.json](../../../../../blast-radius-research/research/runs/golden-pandas300rc0-upsetplot090/args.json) |
-| Setup log | [setup.log](../../../../../blast-radius-research/research/runs/golden-pandas300rc0-upsetplot090/setup.log) |
-| Installed packages, old | [freeze-old.txt](../../../../../blast-radius-research/research/runs/golden-pandas300rc0-upsetplot090/freeze-old.txt) |
-| Installed packages, new | [freeze-new.txt](../../../../../blast-radius-research/research/runs/golden-pandas300rc0-upsetplot090/freeze-new.txt) |
-| Package difference | [freeze-diff.txt](../../../../../blast-radius-research/research/runs/golden-pandas300rc0-upsetplot090/freeze-diff.txt) |
-| pytest logs | [pytest-new-1.log](../../../../../blast-radius-research/research/runs/golden-pandas300rc0-upsetplot090/pytest-new-1.log), [pytest-new-2.log](../../../../../blast-radius-research/research/runs/golden-pandas300rc0-upsetplot090/pytest-new-2.log), [pytest-new-3.log](../../../../../blast-radius-research/research/runs/golden-pandas300rc0-upsetplot090/pytest-new-3.log), [pytest-old-1.log](../../../../../blast-radius-research/research/runs/golden-pandas300rc0-upsetplot090/pytest-old-1.log), [pytest-old-2.log](../../../../../blast-radius-research/research/runs/golden-pandas300rc0-upsetplot090/pytest-old-2.log), [pytest-old-3.log](../../../../../blast-radius-research/research/runs/golden-pandas300rc0-upsetplot090/pytest-old-3.log) |
-| JUnit XML | [junit-new-1.xml](../../../../../blast-radius-research/research/runs/golden-pandas300rc0-upsetplot090/junit-new-1.xml), [junit-new-2.xml](../../../../../blast-radius-research/research/runs/golden-pandas300rc0-upsetplot090/junit-new-2.xml), [junit-new-3.xml](../../../../../blast-radius-research/research/runs/golden-pandas300rc0-upsetplot090/junit-new-3.xml), [junit-old-1.xml](../../../../../blast-radius-research/research/runs/golden-pandas300rc0-upsetplot090/junit-old-1.xml), [junit-old-2.xml](../../../../../blast-radius-research/research/runs/golden-pandas300rc0-upsetplot090/junit-old-2.xml), [junit-old-3.xml](../../../../../blast-radius-research/research/runs/golden-pandas300rc0-upsetplot090/junit-old-3.xml) |
-| Test lists per class | [class-already_broken.txt](../../../../../blast-radius-research/research/runs/golden-pandas300rc0-upsetplot090/class-already_broken.txt), [class-fixed_by_new.txt](../../../../../blast-radius-research/research/runs/golden-pandas300rc0-upsetplot090/class-fixed_by_new.txt), [class-flaky.txt](../../../../../blast-radius-research/research/runs/golden-pandas300rc0-upsetplot090/class-flaky.txt), [class-import_failure.txt](../../../../../blast-radius-research/research/runs/golden-pandas300rc0-upsetplot090/class-import_failure.txt), [class-lost_tests.txt](../../../../../blast-radius-research/research/runs/golden-pandas300rc0-upsetplot090/class-lost_tests.txt), [class-real_break.txt](../../../../../blast-radius-research/research/runs/golden-pandas300rc0-upsetplot090/class-real_break.txt) |
+| Claim C1 | [pytest-new-1.log:2104](../../../research/research/runs/golden-pandas300rc0-upsetplot090/pytest-new-1.log) «Invalid RGBA argument: nan» |
+| Unmentioned change | [pytest-new-1.log:2104](../../../research/research/runs/golden-pandas300rc0-upsetplot090/pytest-new-1.log) «ValueError: Invalid RGBA argument: nan» |
+| Unmentioned change | [pytest-new-1.log:35](../../../research/research/runs/golden-pandas300rc0-upsetplot090/pytest-new-1.log) «AssertionError: DataFrame.index level [» |
+| Unmentioned change | [pytest-new-1.log:2510](../../../research/research/runs/golden-pandas300rc0-upsetplot090/pytest-new-1.log) «ValueError: Do not know how to convert» |
+| Unmentioned change | [pytest-new-1.log:9372](../../../research/research/runs/golden-pandas300rc0-upsetplot090/pytest-new-1.log) «ValueError: 'c' argument must be a color, a sequence of colors, or a sequence of numbers, not» |
+| Unmentioned change | [pytest-new-1.log:9372](../../../research/research/runs/golden-pandas300rc0-upsetplot090/pytest-new-1.log) «ValueError: 'c' argument must be a color, a sequence of colors, or a sequence of numbers, not» |
+| pytest summary, old side run 1 | [pytest-old-1.log:475](../../../research/research/runs/golden-pandas300rc0-upsetplot090/pytest-old-1.log) «6 failed, 233 passed, 12 skipped, 414 warnings in 6.59s» |
+| pytest summary, new side run 1 | [pytest-new-1.log:10087](../../../research/research/runs/golden-pandas300rc0-upsetplot090/pytest-new-1.log) «73 failed, 166 passed, 12 skipped, 212 warnings in 10.62s» |
+| Full record | [record.json](../../../research/research/runs/golden-pandas300rc0-upsetplot090/record.json) |
+| Run arguments | [args.json](../../../research/research/runs/golden-pandas300rc0-upsetplot090/args.json) |
+| Setup log | [setup.log](../../../research/research/runs/golden-pandas300rc0-upsetplot090/setup.log) |
+| Installed packages, old | [freeze-old.txt](../../../research/research/runs/golden-pandas300rc0-upsetplot090/freeze-old.txt) |
+| Installed packages, new | [freeze-new.txt](../../../research/research/runs/golden-pandas300rc0-upsetplot090/freeze-new.txt) |
+| Package difference | [freeze-diff.txt](../../../research/research/runs/golden-pandas300rc0-upsetplot090/freeze-diff.txt) |
+| pytest logs | [pytest-new-1.log](../../../research/research/runs/golden-pandas300rc0-upsetplot090/pytest-new-1.log), [pytest-new-2.log](../../../research/research/runs/golden-pandas300rc0-upsetplot090/pytest-new-2.log), [pytest-new-3.log](../../../research/research/runs/golden-pandas300rc0-upsetplot090/pytest-new-3.log), [pytest-old-1.log](../../../research/research/runs/golden-pandas300rc0-upsetplot090/pytest-old-1.log), [pytest-old-2.log](../../../research/research/runs/golden-pandas300rc0-upsetplot090/pytest-old-2.log), [pytest-old-3.log](../../../research/research/runs/golden-pandas300rc0-upsetplot090/pytest-old-3.log) |
+| JUnit XML | [junit-new-1.xml](../../../research/research/runs/golden-pandas300rc0-upsetplot090/junit-new-1.xml), [junit-new-2.xml](../../../research/research/runs/golden-pandas300rc0-upsetplot090/junit-new-2.xml), [junit-new-3.xml](../../../research/research/runs/golden-pandas300rc0-upsetplot090/junit-new-3.xml), [junit-old-1.xml](../../../research/research/runs/golden-pandas300rc0-upsetplot090/junit-old-1.xml), [junit-old-2.xml](../../../research/research/runs/golden-pandas300rc0-upsetplot090/junit-old-2.xml), [junit-old-3.xml](../../../research/research/runs/golden-pandas300rc0-upsetplot090/junit-old-3.xml) |
+| Test lists per class | [class-already_broken.txt](../../../research/research/runs/golden-pandas300rc0-upsetplot090/class-already_broken.txt), [class-fixed_by_new.txt](../../../research/research/runs/golden-pandas300rc0-upsetplot090/class-fixed_by_new.txt), [class-flaky.txt](../../../research/research/runs/golden-pandas300rc0-upsetplot090/class-flaky.txt), [class-import_failure.txt](../../../research/research/runs/golden-pandas300rc0-upsetplot090/class-import_failure.txt), [class-lost_tests.txt](../../../research/research/runs/golden-pandas300rc0-upsetplot090/class-lost_tests.txt), [class-real_break.txt](../../../research/research/runs/golden-pandas300rc0-upsetplot090/class-real_break.txt) |
 
 ## Appendix
 
@@ -283,8 +283,8 @@ Needs Linux x86_64, uv 0.12 or newer, git and unshare.
 | Python | 3.13.5 |
 | Environment difference | pandas==2.3.3, pandas==3.0.0rc0 |
 | Runner | harness 1.0, 4 workers, import mode importlib, per-test timeout 300 s, memory cap 6.0 GB |
-| Record schema | v1; written against rev 1 (sha256 5a3c3d36b773...); valid under current rev 2 (additive) |
-| Run by | Jonathan on box, 2026-10-10 05:36 IST |
+| Record schema | v1; written against rev 1 (sha256 5a3c3d36b773...); valid under current rev 4 (additive) |
+| Run by | runner on local, 2026-10-10 05:36 IST |
 | Hand check | not available |
 | Upstream issue | not available |
 | Per-test outcomes | not available |
@@ -317,7 +317,7 @@ Total wall time 56.5 s; mean test time old 7.3 s, new 9.8 s.
 | Flaky | Tests whose result changes between runs on the same side. They are not trusted either way. |
 | Error signature | The error message with numbers and file paths removed, so identical failures group together. |
 | Gate | An automatic check by the runner that the run itself is trustworthy (right versions, same environment, enough runs). Required gates must pass for the result to count. |
-| Eval | Nathan's independent check of the record (schema, versions, runs per side, threads, golden cases, citations). Any eval failure means the run cannot be trusted. |
+| Eval | Independent check of the record (schema, versions, runs per side, threads, golden cases, citations). Any eval failure means the run cannot be trusted. |
 | Golden case | A known example with a known answer. If the tool still gets the golden cases right, its answers on new cases are more believable. |
 | Stability | Share of tests that gave the same result in every run on one side. 1.0 means fully repeatable. |
 | Citation | A file name, line number and quoted text from a run log that backs a statement in the report. |

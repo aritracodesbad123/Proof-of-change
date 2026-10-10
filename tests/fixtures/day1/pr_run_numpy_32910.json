@@ -1,0 +1,246 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-numpy-numpy-32910-b763e9ccec4b-2026-10-10",
+ "date_ist": "2026-10-10 06:38 IST",
+ "run_date": "2026-10-10",
+ "who": "ops/daily_run.py",
+ "repo": "numpy/numpy",
+ "library": "numpy",
+ "pr": {
+  "repo": "numpy/numpy",
+  "number": 32910,
+  "url": "https://github.com/numpy/numpy/pull/32910",
+  "title": "ENH: Release GIL in np.repeat when Python API is not needed",
+  "base_sha": "4530cd44016be1d1c3dafd3bae584c01830114ab",
+  "head_sha": "b763e9ccec4bcc3fd4b735ee59a551d807de791b",
+  "merge_commit": null
+ },
+ "author": "lakshayg",
+ "base_ref": "main",
+ "updated_at_utc": "2026-10-09T22:35:33Z",
+ "updated_at_ist": "2026-10-10 04:05 IST",
+ "ci_state": "passing",
+ "ci_detail": "89 check runs completed without failure",
+ "tested_at_ist": "2026-10-10 06:38 IST",
+ "files": {
+  "all": [
+   "benchmarks/benchmarks/bench_itemselection.py",
+   "numpy/_core/src/multiarray/item_selection.c"
+  ],
+  "package_py": [],
+  "compiled": [
+   "numpy/_core/src/multiarray/item_selection.c"
+  ],
+  "other": [
+   "benchmarks/benchmarks/bench_itemselection.py"
+  ]
+ },
+ "machine_type": {
+  "arch": "x86_64",
+  "os": "Linux",
+  "platform": "Linux-6.12.94+-x86_64-with-glibc2.41",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "cpu_model": "Intel(R) Xeon(R) Processor",
+  "ram_gb": 15.6
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1"
+ },
+ "runs_per_side": 3,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.15",
+ "test_selection": "mapped from touched modules: numpy/_core/tests/test_item_selection.py",
+ "per_run": [
+  {
+   "side": "old",
+   "run": 1,
+   "passed": 302,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 2.9,
+   "pytest_summary": "302 passed in 1.63s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 1,
+   "passed": 302,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 3.0,
+   "pytest_summary": "302 passed in 1.77s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 2,
+   "passed": 302,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 2.8,
+   "pytest_summary": "302 passed in 1.56s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 2,
+   "passed": 302,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 2.9,
+   "pytest_summary": "302 passed in 1.65s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 3,
+   "passed": 302,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 2.8,
+   "pytest_summary": "302 passed in 1.49s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 3,
+   "passed": 302,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 3.3,
+   "pytest_summary": "302 passed in 2.06s",
+   "junit": true
+  }
+ ],
+ "notes": "main = nightly wheel, PR = source build of the PR head; differences can include main-branch drift between the PR's base and the nightly",
+ "network": "allowed (installs and PR fetch); tests not network-isolated",
+ "posted_upstream": false,
+ "logs": "numpy-32910/",
+ "freeze": {
+  "main": "freeze-main.txt",
+  "pr": "freeze-pr.txt"
+ },
+ "route": "source-build",
+ "head_moved": false,
+ "current_head_sha": "b763e9ccec4bcc3fd4b735ee59a551d807de791b",
+ "frozen_from": "attempt-2",
+ "state": "open",
+ "main_side": {
+  "source": "scientific-python nightly wheel (exact file, pinned by sha256)",
+  "version": "2.6.0.dev0+git20261006.286e698",
+  "pip_check": "ok",
+  "build": {
+   "url": "https://pypi.anaconda.org/scientific-python-nightly-wheels/simple/numpy/2.6.0.dev0/numpy-2.6.0.dev0-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl",
+   "filename": "numpy-2.6.0.dev0-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl",
+   "version": "2.6.0.dev0",
+   "sha256": "3a07b8fb8bcb35a83dfbef703c8ec940d75ff8b5b6fc443efa8439a4cdb0cae1",
+   "size": 17174928,
+   "build_date_from_wheel": "2026-10-07 03:01 (zip entry time, as stamped by the build)",
+   "uploaded_ist": "2026-10-07 09:29 IST",
+   "commit": "286e698f1dcf601648b165f48485ceaeec9c6231",
+   "commit_source": "embedded git revision"
+  },
+  "test_extras": [],
+  "optional_test_deps": [],
+  "why": ""
+ },
+ "main_build": {
+  "url": "https://pypi.anaconda.org/scientific-python-nightly-wheels/simple/numpy/2.6.0.dev0/numpy-2.6.0.dev0-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl",
+  "filename": "numpy-2.6.0.dev0-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl",
+  "version": "2.6.0.dev0",
+  "sha256": "3a07b8fb8bcb35a83dfbef703c8ec940d75ff8b5b6fc443efa8439a4cdb0cae1",
+  "size": 17174928,
+  "build_date_from_wheel": "2026-10-07 03:01 (zip entry time, as stamped by the build)",
+  "uploaded_ist": "2026-10-07 09:29 IST",
+  "commit": "286e698f1dcf601648b165f48485ceaeec9c6231",
+  "commit_source": "embedded git revision"
+ },
+ "pr_side": {
+  "source": "source build of b763e9ccec4b",
+  "version": "2.6.0.dev0+git20261006.b763e9c",
+  "build_seconds": 84.3,
+  "why": ""
+ },
+ "tested": {
+  "main": "nightly 2.6.0.dev0+git20261006.286e698 (commit 286e698f1dcf601648b165f48485ceaeec9c6231, sha256 3a07b8fb8bcb)",
+  "pr": "PR head b763e9ccec4b built from source"
+ },
+ "test_targets": {
+  "main": [
+   "numpy/_core/tests/test_item_selection.py"
+  ],
+  "pr": [
+   "numpy/_core/tests/test_item_selection.py"
+  ]
+ },
+ "comparison": {
+  "same": 302,
+  "regressions": [],
+  "fixed": [],
+  "new_tests_passing": 0,
+  "new_tests_failing": [],
+  "removed_tests": [],
+  "reparametrized": [],
+  "skipped_missing_dependency": [],
+  "flaky": [],
+  "other_changes": [],
+  "preexisting_failures": [],
+  "messages": {}
+ },
+ "exit_check": {
+  "explained": true,
+  "problems": [],
+  "detail": "all runs exited 0"
+ },
+ "verdict": "verified",
+ "reason": "0 new test(s) pass, 302 unchanged",
+ "what_changed": {
+  "package_python_files": [],
+  "compiled_files": [
+   "numpy/_core/src/multiarray/item_selection.c"
+  ],
+  "other_files": [
+   "benchmarks/benchmarks/bench_itemselection.py"
+  ]
+ },
+ "duration_s": {
+  "total_wall": 111.2,
+  "tests": 17.7,
+  "build": 84.3
+ }
+}

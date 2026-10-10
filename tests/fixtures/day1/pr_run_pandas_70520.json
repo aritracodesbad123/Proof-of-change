@@ -1,0 +1,301 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-pandas-dev-pandas-70520-21633c2bcaf3-2026-10-10",
+ "date_ist": "2026-10-10 06:43 IST",
+ "run_date": "2026-10-10",
+ "who": "ops/daily_run.py",
+ "repo": "pandas-dev/pandas",
+ "library": "pandas",
+ "pr": {
+  "repo": "pandas-dev/pandas",
+  "number": 70520,
+  "url": "https://github.com/pandas-dev/pandas/pull/70520",
+  "title": "DEPR: negative min_count in reductions (GH#50022)",
+  "base_sha": "fc908e17ebf7087e6a36e866768d3bb35e96a760",
+  "head_sha": "21633c2bcaf391c37a458105cf3a11ded8f3478e",
+  "merge_commit": null
+ },
+ "author": "jbrockmendel",
+ "base_ref": "main",
+ "updated_at_utc": "2026-10-10T00:30:58Z",
+ "updated_at_ist": "2026-10-10 06:00 IST",
+ "ci_state": "pending",
+ "ci_detail": "2/54 still running",
+ "tested_at_ist": "2026-10-10 06:43 IST",
+ "files": {
+  "all": [
+   "doc/source/whatsnew/v3.2.0.rst",
+   "pandas/core/arrays/arrow/array.py",
+   "pandas/core/generic.py",
+   "pandas/core/groupby/groupby.py",
+   "pandas/core/indexes/timedeltas.py",
+   "pandas/core/resample.py",
+   "pandas/tests/groupby/test_missing.py",
+   "pandas/tests/groupby/test_reductions.py",
+   "pandas/tests/reductions/test_reductions.py",
+   "pandas/tests/resample/test_base.py",
+   "pandas/util/_validators.py"
+  ],
+  "package_py": [
+   "pandas/core/arrays/arrow/array.py",
+   "pandas/core/generic.py",
+   "pandas/core/groupby/groupby.py",
+   "pandas/core/indexes/timedeltas.py",
+   "pandas/core/resample.py",
+   "pandas/tests/groupby/test_missing.py",
+   "pandas/tests/groupby/test_reductions.py",
+   "pandas/tests/reductions/test_reductions.py",
+   "pandas/tests/resample/test_base.py",
+   "pandas/util/_validators.py"
+  ],
+  "compiled": [],
+  "other": [
+   "doc/source/whatsnew/v3.2.0.rst"
+  ]
+ },
+ "machine_type": {
+  "arch": "x86_64",
+  "os": "Linux",
+  "platform": "Linux-6.12.94+-x86_64-with-glibc2.41",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "cpu_model": "Intel(R) Xeon(R) Processor",
+  "ram_gb": 15.6
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1"
+ },
+ "runs_per_side": 3,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.15",
+ "test_selection": "mapped from touched modules: pandas/tests/groupby/test_missing.py, pandas/tests/groupby/test_reductions.py, pandas/tests/reductions/test_reductions.py, pandas/tests/resample/test_base.py, pandas/tests/arithmetic/test_array_ops.py, pandas/tests/arrays/sparse/test_array.py",
+ "per_run": [
+  {
+   "side": "old",
+   "run": 1,
+   "passed": 3278,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 10.2,
+   "pytest_summary": "3278 passed in 7.98s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 1,
+   "passed": 3323,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 9.3,
+   "pytest_summary": "3323 passed in 7.10s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 2,
+   "passed": 3278,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 9.3,
+   "pytest_summary": "3278 passed in 7.25s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 2,
+   "passed": 3323,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 9.4,
+   "pytest_summary": "3323 passed in 7.16s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 3,
+   "passed": 3278,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 9.5,
+   "pytest_summary": "3278 passed in 7.29s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 3,
+   "passed": 3323,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 8.9,
+   "pytest_summary": "3323 passed in 6.83s",
+   "junit": true
+  }
+ ],
+ "notes": null,
+ "network": "allowed (installs and PR fetch); tests not network-isolated",
+ "posted_upstream": false,
+ "logs": "pandas-70520/",
+ "freeze": {
+  "main": "freeze-main.txt",
+  "pr": "freeze-pr.txt"
+ },
+ "route": "nightly+patch",
+ "head_moved": false,
+ "current_head_sha": "21633c2bcaf391c37a458105cf3a11ded8f3478e",
+ "frozen_from": "attempt-4",
+ "state": "open",
+ "main_side": {
+  "source": "scientific-python nightly wheel (exact file, pinned by sha256)",
+  "version": "3.2.0.dev0+139.gff72b53688",
+  "pip_check": "ok",
+  "build": {
+   "url": "https://pypi.anaconda.org/scientific-python-nightly-wheels/simple/pandas/3.2.0.dev0+139.gff72b53688/pandas-3.2.0.dev0+139.gff72b53688-cp312-cp312-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl",
+   "filename": "pandas-3.2.0.dev0+139.gff72b53688-cp312-cp312-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl",
+   "version": "3.2.0.dev0+139.gff72b53688",
+   "sha256": "a221b7b9551ef647c38395af0bcc20c4d5bbfec12029e6b373a9cf92bbb64276",
+   "size": 12044913,
+   "build_date_from_wheel": "2026-10-09 03:48 (zip entry time, as stamped by the build)",
+   "uploaded_ist": "2026-10-09 09:38 IST",
+   "commit": "ff72b53688b8ebc2e6989f4b187ac326a7cdf5cb",
+   "commit_source": "embedded git revision"
+  },
+  "test_extras": [
+   "test"
+  ],
+  "optional_test_deps": [
+   "pyarrow",
+   "scipy"
+  ],
+  "why": ""
+ },
+ "main_build": {
+  "url": "https://pypi.anaconda.org/scientific-python-nightly-wheels/simple/pandas/3.2.0.dev0+139.gff72b53688/pandas-3.2.0.dev0+139.gff72b53688-cp312-cp312-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl",
+  "filename": "pandas-3.2.0.dev0+139.gff72b53688-cp312-cp312-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl",
+  "version": "3.2.0.dev0+139.gff72b53688",
+  "sha256": "a221b7b9551ef647c38395af0bcc20c4d5bbfec12029e6b373a9cf92bbb64276",
+  "size": 12044913,
+  "build_date_from_wheel": "2026-10-09 03:48 (zip entry time, as stamped by the build)",
+  "uploaded_ist": "2026-10-09 09:38 IST",
+  "commit": "ff72b53688b8ebc2e6989f4b187ac326a7cdf5cb",
+  "commit_source": "embedded git revision"
+ },
+ "pr_side": {
+  "source": "copy of main side + PR diff applied to the installed package",
+  "patched": true
+ },
+ "tested": {
+  "main": "nightly 3.2.0.dev0+139.gff72b53688 (commit ff72b53688b8ebc2e6989f4b187ac326a7cdf5cb, sha256 a221b7b9551e)",
+  "pr": "PR head 21633c2bcaf3 diff applied to that nightly"
+ },
+ "test_targets": {
+  "main": [
+   "pandas/tests/groupby/test_missing.py",
+   "pandas/tests/groupby/test_reductions.py",
+   "pandas/tests/reductions/test_reductions.py",
+   "pandas/tests/resample/test_base.py",
+   "pandas/tests/arithmetic/test_array_ops.py",
+   "pandas/tests/arrays/sparse/test_array.py"
+  ],
+  "pr": [
+   "pandas/tests/groupby/test_missing.py",
+   "pandas/tests/groupby/test_reductions.py",
+   "pandas/tests/reductions/test_reductions.py",
+   "pandas/tests/resample/test_base.py",
+   "pandas/tests/arithmetic/test_array_ops.py",
+   "pandas/tests/arrays/sparse/test_array.py"
+  ]
+ },
+ "comparison": {
+  "same": 3274,
+  "regressions": [],
+  "fixed": [],
+  "new_tests_passing": 49,
+  "new_tests_failing": [],
+  "removed_tests": [],
+  "reparametrized": [
+   {
+    "test": "tests.groupby.test_missing::test_min_count",
+    "removed_ids": [
+     "tests.groupby.test_missing::test_min_count[first--1-1.0]",
+     "tests.groupby.test_missing::test_min_count[last--1-1.0]",
+     "tests.groupby.test_missing::test_min_count[max--1-1.0]",
+     "tests.groupby.test_missing::test_min_count[min--1-1.0]"
+    ],
+    "added_ids": [
+     "tests.groupby.test_missing::test_min_count[first-0-1.0]",
+     "tests.groupby.test_missing::test_min_count[last-0-1.0]",
+     "tests.groupby.test_missing::test_min_count[max-0-1.0]",
+     "tests.groupby.test_missing::test_min_count[min-0-1.0]"
+    ]
+   }
+  ],
+  "skipped_missing_dependency": [],
+  "flaky": [],
+  "other_changes": [],
+  "preexisting_failures": [],
+  "messages": {}
+ },
+ "exit_check": {
+  "explained": true,
+  "problems": [],
+  "detail": "all runs exited 0"
+ },
+ "verdict": "verified",
+ "reason": "1 test(s) re-parametrized (4 -> 4 ids); 49 new test(s) pass, 3274 unchanged",
+ "what_changed": {
+  "package_python_files": [
+   "pandas/core/arrays/arrow/array.py",
+   "pandas/core/generic.py",
+   "pandas/core/groupby/groupby.py",
+   "pandas/core/indexes/timedeltas.py",
+   "pandas/core/resample.py",
+   "pandas/tests/groupby/test_missing.py",
+   "pandas/tests/groupby/test_reductions.py",
+   "pandas/tests/reductions/test_reductions.py",
+   "pandas/tests/resample/test_base.py",
+   "pandas/util/_validators.py"
+  ],
+  "compiled_files": [],
+  "other_files": [
+   "doc/source/whatsnew/v3.2.0.rst"
+  ]
+ },
+ "duration_s": {
+  "total_wall": 63.1,
+  "tests": 56.6
+ }
+}

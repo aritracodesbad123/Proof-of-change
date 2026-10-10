@@ -6,7 +6,7 @@ requires-python = ">=3.11"
 dependencies = []  # stdlib only; the runner shells out to uv and git
 
 [project.optional-dependencies]
-dev = ["pytest>=8", "ruff>=0.6"]
+dev = ["pytest>=8", "ruff>=0.6", "jsonschema>=4", "coverage>=7"]  # jsonschema: cross-checks the stdlib validators in tests
 ops = ["uv>=0.4"]  # the PR runner creates its test environments with uv
 
 [build-system]
@@ -23,7 +23,7 @@ pythonpath = ["."]
 [tool.ruff]
 line-length = 140
 target-version = "py311"
-extend-exclude = ["harness/br_run.py"]  # Jonathan's runner, linted by its owner
+extend-exclude = ["harness/br_run.py"]  # external runner, linted upstream
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I"]

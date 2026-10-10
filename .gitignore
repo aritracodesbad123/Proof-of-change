@@ -18,7 +18,8 @@ reports/runs/*.md
 # generated reviewer reports (CI and daily ops output)
 reports/runs/
 reports/daily/
-# ops run outputs (kept on the box, not in git)
+# ops run outputs (kept locally, not in git)
+ops/local.json
 ops/runs/
 ops/work/
 ops/seen_prs.json

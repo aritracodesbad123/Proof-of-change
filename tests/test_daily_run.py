@@ -6,7 +6,7 @@ spec = importlib.util.spec_from_file_location("daily_run", ROOT / "ops" / "daily
 dr = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(dr)
 
-PICKS = """# picks
+CHOSEN = """# chosen PRs
 ## 1. demo
 - **Repo:** https://github.com/acme/widget (default branch `main`)
 - **Open PR:** #12, "Fix thing"
@@ -17,13 +17,13 @@ PICKS = """# picks
 """
 
 
-def test_parse_picks_has_no_expectations(tmp_path):
-    p = tmp_path / "p.md"; p.write_text(PICKS)
-    picks = dr.parse_picks(p)
-    pk = picks["acme/widget"][0]
+def test_parse_chosen_has_no_expectations(tmp_path):
+    p = tmp_path / "p.md"; p.write_text(CHOSEN)
+    chosen = dr.parse_chosen(p)
+    pk = chosen["acme/widget"][0]
     assert pk["pr"] == 12 and pk["head_sha"].startswith("0123")
     assert "expected" not in str(pk).lower()  # expectations are never part of the test inputs
-    assert dr.pick_test_targets(pk) == ["tests/test_a.py", "tests/test_b.py"]
+    assert dr.chosen_test_targets(pk) == ["tests/test_a.py", "tests/test_b.py"]
     assert dr.side_install_args(pk, Path("/c")) == (["-e", "/c[x]"], ["pytest", "hypothesis"])
     assert dr.read_expectations(p) == {("acme/widget", 12): "needs_attention"}
 
@@ -71,3 +71,290 @@ def test_same_day_rerun_ignores_own_state():
     assert since is None and list(prs["a/b"]) == ["2"]
     prs, since = baseline_for(seen, "a/b", "2026-10-11")
     assert since == "2026-10-10T00:25:57Z" and set(prs["a/b"]) == {"1", "2"}
+
+
+# ---------------------------------------------------------------- regression tests for the day-1 fixes
+# Fixtures: real JUnit files of day 1 (ops/runs/2026-10-10/superseded/attempt-4), trimmed to the relevant testcases.
+import json as _json  # noqa: E402
+import zipfile as _zipfile  # noqa: E402
+from pathlib import Path as _Path  # noqa: E402
+
+DAY1 = _Path(__file__).parent / "fixtures" / "day1"
+SCHEMA = _json.loads((_Path(__file__).parent.parent / "harness" / "schema" / "observation.schema.json").read_text())
+
+
+def _day1(case):
+    from ops.daily_run import parse_junit
+    res = {s: [parse_junit(DAY1 / case / f"junit-{s}-{i}.xml") for i in (1, 2, 3)] for s in ("main", "pr")}
+    meta = _json.loads((DAY1 / case / "meta.json").read_text())
+    per_run = [{"side": {"main": "old", "pr": "new"}.get(x["side"], x["side"]), "run": x["run"], "exit": x["exit"]}
+               for x in meta["per_run"]]
+    return res, per_run
+
+
+def _verdict(case):
+    from ops.daily_run import compare_sides, exit_check, verdict_for
+    res, per_run = _day1(case)
+    cmp = compare_sides(res)
+    return cmp, verdict_for(cmp, None, exit_check(per_run, res, cmp))
+
+
+# fix 1: re-parametrized tests are not "removed"
+def test_fix1_pandas_70520_min_count_renamed_not_removed():
+    cmp, (v, reason, _) = _verdict("pandas-70520")
+    assert cmp["removed_tests"] == []
+    rp = {x["test"]: x for x in cmp["reparametrized"]}
+    t = "tests.groupby.test_missing::test_min_count"
+    assert t in rp and len(rp[t]["removed_ids"]) == 4 and all("-0-1.0]" in i for i in rp[t]["added_ids"])
+    assert "re-parametrized" in reason and v != "needs_attention"
+
+
+def test_fix1_sklearn_35114_categoricalnb_split_into_5_variants():
+    cmp, (v, reason, _) = _verdict("sklearn-35114")
+    assert cmp["removed_tests"] == []
+    (rp,) = cmp["reparametrized"]
+    assert rp["test"].endswith("::test_categoricalnb") and len(rp["removed_ids"]) == 1 and len(rp["added_ids"]) == 5
+    assert v == "verified", reason
+
+
+def test_fix1_truly_removed_test_still_flagged():
+    from ops.daily_run import compare_sides, verdict_for
+    main = {"m::test_gone[a]": ("passed", ""), "m::test_keep": ("passed", "")}
+    pr = {"m::test_keep": ("passed", "")}
+    cmp = compare_sides({"main": [main] * 3, "pr": [pr] * 3})
+    assert cmp["removed_tests"] == ["m::test_gone[a]"] and cmp["reparametrized"] == []
+    assert verdict_for(cmp, None, None)[0] == "needs_attention"
+
+
+# fix 2: missing optional dependency -> could not verify, never needs attention
+def test_fix2_pandas_70989_scipy_skips_are_could_not_verify():
+    cmp, (v, reason, _) = _verdict("pandas-70989")
+    assert {d["module"] for d in cmp["skipped_missing_dependency"]} == {"scipy"}
+    assert v == "could_not_verify" and "scipy" in reason and reason.count("not installed") == 1
+
+
+def test_fix2_pandas_70520_pyarrow_skips_are_could_not_verify_without_pyarrow():
+    cmp, (v, reason, _) = _verdict("pandas-70520")
+    assert {d["module"] for d in cmp["skipped_missing_dependency"]} == {"pyarrow"}
+    assert v == "could_not_verify" and "pyarrow" in reason
+
+
+def test_fix2_missing_dependency_messages():
+    from ops.daily_run import missing_dependency
+    assert missing_dependency("pytest.skip: Could not import 'scipy'") == "scipy"
+    assert missing_dependency("pytest.skip: could not import 'pyarrow': No module named 'pyarrow'") == "pyarrow"
+    assert missing_dependency("pytest.skip: requires pyarrow") == "pyarrow"
+    assert missing_dependency("pytest.xfail: EA.fillna does not handle 'linear' method") is None
+    assert missing_dependency("pytest.skip: not relevant on windows") is None
+
+
+def test_fix2_regression_beats_dependency_skip():
+    from ops.daily_run import compare_sides, verdict_for
+    main = {"m::a": ("passed", ""), "m::b": ("passed", "")}
+    pr = {"m::a": ("failed", "boom"), "m::b": ("skipped", "pytest.skip: Could not import 'scipy'")}
+    v, reason, _ = verdict_for(compare_sides({"main": [main] * 3, "pr": [pr] * 3}), None, None)
+    assert v == "needs_attention" and "scipy" in reason
+
+
+def test_fix2_test_extras_added_to_install_spec(tmp_path):
+    from ops.daily_run import with_test_extras
+    (tmp_path / "pyproject.toml").write_text('[project]\nname="x"\n[project.optional-dependencies]\n'
+                                             'testing=["pytest"]\ndocs=["sphinx"]\n')
+    assert with_test_extras(["-e", f"{tmp_path}[io]"], tmp_path) == ["-e", f"{tmp_path}[io,testing]"]
+    assert with_test_extras(["-e", str(tmp_path)], tmp_path) == ["-e", f"{tmp_path}[testing]"]
+
+
+def test_fix2_pandas_config_installs_pyarrow_and_scipy():
+    from ops.daily_run import LIBS
+    assert {"pyarrow", "scipy"} <= set(LIBS["pandas-dev/pandas"]["optional_test_deps"])
+
+
+# fix 3: pin the nightly
+def test_fix3_nightly_commit_from_real_version_strings(tmp_path):
+    from ops.daily_run import nightly_commit
+    cfg = {"commit_expr": ""}
+    assert nightly_commit("3.2.0.dev0+139.gff72b53688", tmp_path, cfg, {})[0] == "ff72b53688"
+    assert nightly_commit("2.6.0.dev0+git20261006.286e698", tmp_path, cfg, {})[0] == "286e698"
+    assert nightly_commit("1.10.dev0", tmp_path, cfg, {}) == (None, "not embedded in the wheel")
+
+
+def test_fix3_nightly_wheel_chooses_newest_matching_wheel():
+    from ops.daily_run import nightly_wheel
+    html = ('<a href="/s/pandas/3.2.0.dev0+120.gaaaaaaa/pandas-3.2.0.dev0+120.gaaaaaaa-cp312-cp312-manylinux_2_28_x86_64.whl">x</a>'
+            '<a href="/s/pandas/3.2.0.dev0+139.gff72b53688/pandas-3.2.0.dev0+139.gff72b53688-cp312-cp312-'
+            'manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl">x</a>'
+            '<a href="/s/pandas/3.2.0.dev0+139.gff72b53688/pandas-3.2.0.dev0+139.gff72b53688-cp313-cp313-manylinux_2_28_x86_64.whl">x</a>'
+            '<a href="/s/pandas/3.2.0.dev0+150.gbbbbbbb/pandas-3.2.0.dev0+150.gbbbbbbb-cp312-cp312-macosx_11_0_arm64.whl">x</a>')
+    w = nightly_wheel(lambda u: html.encode(), "pandas", "3.12")
+    assert w["version"] == "3.2.0.dev0+139.gff72b53688" and "cp312" in w["filename"]
+
+
+def test_fix3_fetch_wheel_hashes_and_dates(tmp_path):
+    import hashlib
+
+    from ops.daily_run import fetch_wheel
+    whl = tmp_path / "src" / "x-1.0-cp312-cp312-manylinux_2_28_x86_64.whl"
+    whl.parent.mkdir()
+    with _zipfile.ZipFile(whl, "w") as z:
+        z.writestr(_zipfile.ZipInfo("x/__init__.py", date_time=(2026, 10, 6, 3, 59, 0)), "")
+    info = {"url": whl.as_uri(), "filename": whl.name, "version": "1.0"}
+    m = fetch_wheel(info, tmp_path / "cache")
+    assert m["sha256"] == hashlib.sha256(whl.read_bytes()).hexdigest()
+    assert m["build_date_from_wheel"].startswith("2026-10-06 03:59")
+    assert fetch_wheel(info, tmp_path / "cache")["sha256"] == m["sha256"]   # cached: same build for the whole run
+
+
+# fix 4 + 5: merge commit recorded; pr_run records validate; old records still validate
+def _pr_record(**kw):
+    rec = {"schema_version": "1", "record_kind": "pr_run", "id": "pr-rasbt-mlxtend-1229-296459ec1712-2026-10-10",
+           "date_ist": "2026-10-10 06:40 IST", "run_date": "2026-10-10", "who": "ops/daily_run.py", "repo": "rasbt/mlxtend",
+           "pr": {"repo": "rasbt/mlxtend", "number": 1229, "url": "https://github.com/rasbt/mlxtend/pull/1229",
+                  "title": "t", "base_sha": "1aee767ef57b84a8191511a08955c583b65de382",
+                  "head_sha": "296459ec17120e757a56c7bb08c831469b0e5aa4",
+                  "merge_commit": "1af398f8e6305b25d59fba572ec21d51da1fe692"},
+           "route": "source-pair", "verdict": "verified", "reason": "1 new test(s) pass, 9 unchanged",
+           "files": {"all": [], "package_py": [], "compiled": [], "other": []},
+           "machine_type": {"arch": "x86_64", "os": "Linux"},
+           "thread_env": {k: "1" for k in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS",
+                                           "NUMEXPR_NUM_THREADS", "VECLIB_MAXIMUM_THREADS", "BLIS_NUM_THREADS")},
+           "python": "3.12.15", "runs_per_side": 3, "runs_per_side_planned": 3,
+           "per_run": [{"side": s, "run": i, "exit": 0, "seconds": 7.0, "passed": 9, "failed": 0, "error": 0,
+                        "skipped": 0, "collection_errors": 0, "pytest_summary": "9 passed"}
+                       for i in (1, 2, 3) for s in ("old", "new")],
+           "duration_s": {"total_wall": 50.6}, "network": "allowed", "posted_upstream": False,
+           "logs": "mlxtend-1229/", "tested_at_ist": "2026-10-10 06:40 IST"}
+    rec.update(kw)
+    return rec
+
+
+def test_fix5_pr_run_record_validates_and_bad_one_does_not():
+    from ops.schema_check import validate
+    assert validate(_pr_record(), SCHEMA) == []
+    assert any("verdict" in e for e in validate(_pr_record(verdict="maybe"), SCHEMA))
+    bad = _pr_record(); del bad["per_run"]
+    assert validate(bad, SCHEMA) == ["$: missing required field 'per_run'"]
+
+
+def test_fix5_existing_observation_record_still_valid():
+    from ops.schema_check import validate
+    obs = _json.loads((DAY1 / "observation-golden-clean-sklearn.json").read_text())
+    assert "record_kind" not in obs and validate(obs, SCHEMA) == []
+    broken = dict(obs); del broken["gates"]
+    assert "$: missing required field 'gates'" in validate(broken, SCHEMA)
+    assert any("runs_per_side" in e for e in validate(dict(obs, runs_per_side=0), SCHEMA))  # still >= 1 for observations
+
+
+def test_fix5_stdlib_validator_agrees_with_jsonschema():
+    import pytest
+    jsonschema = pytest.importorskip("jsonschema")
+    from ops.schema_check import validate
+    v = jsonschema.Draft202012Validator(SCHEMA)
+    obs = _json.loads((DAY1 / "observation-golden-clean-sklearn.json").read_text())
+    for rec in (_pr_record(), _pr_record(verdict="x"), _pr_record(runs_per_side=0), obs, dict(obs, accepted="no")):
+        assert (not list(v.iter_errors(rec))) == (not validate(rec, SCHEMA))
+
+
+def test_fix4_report_shows_merge_commit(tmp_path):
+    from ops.daily_run import write_report
+    rec = _pr_record(author="a", updated_at_ist="x", ci_state="none", ci_detail="-",
+                     sides={"merge_parents": ["1aee767ef57b84a8191511a08955c583b65de382",
+                                              "296459ec17120e757a56c7bb08c831469b0e5aa4"]},
+                     tested={"main": "master @ 1aee767ef57b", "pr": "GitHub test merge commit 1af398f8e630"})
+    meta = {"date": "2026-10-10", "started_ist": "s", "finished_ist": "f", "wall_min": 1, "runs": 3, "machine": "m",
+            "api_calls": 0, "auth": "none"}
+    md = write_report(tmp_path, meta, [rec], {}, []).read_text()
+    assert "Merge commit tested: `1af398f8e6305b25d59fba572ec21d51da1fe692`" in md
+    assert "APPROVE" in md
+
+
+# fix 6: superseded attempts kept, selection frozen, dropped PRs listed
+def test_fix6_supersede_freeze_and_rerun_section(tmp_path):
+    from ops.daily_run import attempt_history, frozen_selection, supersede_previous, write_report
+    rdir = tmp_path / "2026-10-10"
+    for n, sel in ((2, "selection-attempt-2.json"), (4, "selection-attempt-4.json")):
+        d = rdir / "superseded" / f"attempt-{n}"; d.mkdir(parents=True)
+        (d / "selection.json").write_text((DAY1 / sel).read_text())
+        (d / "NOTE.md").write_text(f"# Attempt {n}\n")
+    (rdir / "pandas-70520").mkdir(); (rdir / "records.jsonl").write_text("")
+    (rdir / "console.log").write_text("live")
+    moved = supersede_previous(rdir, "bug x")
+    assert moved.name == "attempt-5" and (moved / "pandas-70520").is_dir() and (rdir / "console.log").exists()
+    assert "bug x" in (moved / "NOTE.md").read_text()
+    frozen = frozen_selection(rdir)
+    assert set(frozen["pandas-dev/pandas"]) == {70812, 70977, 70976, 70520, 70915, 70989}
+    assert frozen["pandas-dev/pandas"][70812]["first_attempt"] == "attempt-2"
+    meta = {"date": "2026-10-10", "started_ist": "s", "finished_ist": "f", "wall_min": 1, "runs": 3, "machine": "m",
+            "api_calls": 0, "auth": "none"}
+    md = write_report(rdir, meta, [], {}, [], history=attempt_history(rdir)).read_text()
+    assert "## Re-runs" in md
+    for n in (70812, 70977, 70976):
+        assert f"pandas-dev/pandas#{n}: selected in attempt-2, dropped in attempt-4" in md
+
+
+# fix 7: thread env, 0 runs on a failed build, unexplained exit codes
+def test_fix7_six_thread_vars_pinned():
+    from ops.daily_run import THREAD_ENV, base_env
+    assert set(THREAD_ENV) == {"OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS", "NUMEXPR_NUM_THREADS",
+                               "VECLIB_MAXIMUM_THREADS", "BLIS_NUM_THREADS"}
+    assert all(base_env()[k] == "1" for k in THREAD_ENV)
+
+
+def test_fix7_failed_build_record_says_zero_runs():
+    from types import SimpleNamespace
+
+    from ops.daily_run import new_record
+    old = _json.loads((DAY1 / "numpy-32910-attempt4-record.json").read_text())
+    assert old["runs_per_side"] == 3 and "per_run" not in old           # the day-1 bug
+    item = {k: old[k] for k in ("pr", "title", "url", "author", "head_sha", "base_sha", "base_ref", "updated_at_utc",
+                                "updated_at_ist", "ci_state", "ci_detail", "files")}
+    a = SimpleNamespace(runs=3, workers="4", test_timeout=120, run_timeout=900, build_timeout=1800, python="3.12",
+                        python_full="3.12.15")
+    rec = new_record("numpy/numpy", {"dist": "numpy", "pkg": "numpy", "nightly": True}, item, a,
+                     {"arch": "x86_64", "os": "Linux"}, "2026-10-10")
+    assert rec["runs_per_side"] == 0 and rec["runs_per_side_planned"] == 3 and rec["per_run"] == []
+    assert rec["route"] == "source-build"
+
+
+def test_fix7_pandera_identical_errors_explained_and_stated():
+    cmp, (v, reason, _) = _verdict("pandera-2552")
+    assert v == "verified"
+    assert "fail to collect on both sides (tests.pandas.test_dtypes)" in reason
+
+
+def test_fix7_unexplained_exit_is_not_verified():
+    from ops.daily_run import compare_sides, exit_check, verdict_for
+    same = {"m::a": ("passed", "")}
+    res = {"main": [same] * 3, "pr": [same] * 3}
+    cmp = compare_sides(res)
+    per_run = [{"side": s, "run": i, "exit": (2 if (s, i) == ("new", 2) else 0)} for i in (1, 2, 3) for s in ("old", "new")]
+    ex = exit_check(per_run, res, cmp)
+    assert not ex["explained"]
+    assert verdict_for(cmp, None, ex)[0] == "could_not_verify"
+    per_run = [{"side": s, "run": i, "exit": (1 if s == "new" else 0)} for i in (1, 2, 3) for s in ("old", "new")]
+    assert verdict_for(cmp, None, exit_check(per_run, res, cmp))[0] == "could_not_verify"   # exit 1, nothing failed
+
+
+def test_fix7_map_tests_walks_up_for_compiled_sources(tmp_path):
+    from ops.daily_run import map_tests
+    t = tmp_path / "numpy" / "_core" / "tests" / "test_item_selection.py"
+    t.parent.mkdir(parents=True); t.write_text("")
+    files = {"package_py": [], "compiled": ["numpy/_core/src/multiarray/item_selection.c"]}
+    assert map_tests(files, "numpy", tmp_path, {}) == ["numpy/_core/tests/test_item_selection.py"]
+
+
+def test_verification_scoring_ignores_entries_not_rechecked(tmp_path):
+    from ops.daily_run import read_verification
+    f = tmp_path / "v.jsonl"
+    f.write_text("\n".join(_json.dumps(x) for x in (
+        {"repo": "rasbt/mlxtend", "pr": 1229, "status": "mismatch", "checker_verdict": "needs_attention"},
+        {"repo": "numpy/numpy", "pr": 32910, "status": "unverified", "checker_verdict": "could_not_verify"},
+        {"repo": "pandas-dev/pandas", "pr": 70915, "status": "unverified", "checker_verdict": None})))
+    assert set(read_verification(f)) == {("rasbt/mlxtend", 1229)}
+
+
+def test_unchanged_dependency_skips_reported_not_scored(tmp_path):
+    from ops.daily_run import unchanged_dependency_skips
+    (tmp_path / "junit-pr-1.xml").write_text(
+        '<testsuite><testcase classname="m" name="a"><skipped type="pytest.skip" message="Could not import \'torch\'"/>'
+        '</testcase><testcase classname="m" name="b"/></testsuite>')
+    assert unchanged_dependency_skips(tmp_path, {}) == {"torch": 1}

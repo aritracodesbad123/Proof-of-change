@@ -1,7 +1,7 @@
 """Reviewer reports for Proof-of-Change PR runs (records written by ops/daily_run.py).
 
     python -m reports.pr_report ops/runs/2026-10-10 --out reports/daily/2026-10-10
-    python -m reports.pr_report decide reports/daily/2026-10-10/pandas-70520 approve --by Aritra --note "ok"
+    python -m reports.pr_report decide reports/daily/2026-10-10/pandas-70520 approve --by reviewer --note "ok"
 
 One run folder in, one REPORT.md/.html/.pdf per PR plus SUMMARY.md/.html/.pdf (needs-attention first) out. Same
 sections, renderers and verdict vocabulary as reports/reviewer.py (docs/REPORT_SPEC.md), adapted to a main-vs-PR
@@ -19,6 +19,7 @@ import re
 import sys
 from pathlib import Path
 
+from poc import coverage_gate
 from reports import reviewer as rv
 from reports.reviewer import Report, badge, link
 
@@ -31,6 +32,10 @@ CATEGORIES = [  # comparison key, plain-English label, how bad
     ("other_changes", "changed result in another way (for example passed -> skipped)", "check"),
     ("flaky", "gave different results between the 3 runs of the same side (flaky)", "note"),
     ("fixed", "fail on main and pass on the PR", "good"),
+    ("skipped_missing_dependency", "are new or changed but were skipped because an optional module is missing",
+     "check"),
+    ("reparametrized", "were re-parametrized (same test, new parameter ids; not counted as removed)", "note"),
+    ("preexisting_failures", "fail identically on both sides (already broken on main)", "note"),
 ]
 SUMMARY_RE = re.compile(r"\b\d+ (passed|failed|errors?|skipped)\b.* in [0-9.]+s")
 DECISIONS = {"approve": "Approve", "approve_with_notes": "Approve with notes", "reject": "Reject", "re_run": "Re-run"}
@@ -38,6 +43,53 @@ DECISIONS = {"approve": "Approve", "approve_with_notes": "Approve with notes", "
 
 def run_id(rec: dict) -> str:
     return rec.get("_dir") or f"{rec.get('library', 'pr')}-{rec['pr']}"
+
+
+def normalize(rec: dict, dirname: str | None = None) -> dict:
+    """Flat view of a record. pr_run records (schema rev 3+, ops/daily_run.py) keep the PR in a `pr` object and the
+    durations in a `duration_s` object; older synthetic records were flat. The coverage gate is applied here too
+    (idempotent), so reports rebuilt from records written before the gate existed follow the same rules."""
+    r = dict(rec)
+    p = rec.get("pr")
+    if isinstance(p, dict):
+        r.update(repo=p.get("repo", rec.get("repo")), pr=p.get("number"), title=p.get("title", rec.get("title", "")),
+                 url=p.get("url", rec.get("url", "")), head_sha=p.get("head_sha", rec.get("head_sha")),
+                 merge_commit=p.get("merge_commit"))
+        r.setdefault("current_head_sha", rec.get("current_head_sha"))
+    logs = (rec.get("logs") or "").strip("/")
+    r.setdefault("_dir", dirname or logs or None)
+    if not r["_dir"]:
+        r.pop("_dir")
+    return coverage_gate.apply(r)
+
+
+def side_of(x: dict) -> str:
+    """per_run side: pr_run records use the schema's old/new, older records main/pr."""
+    return {"old": "main", "new": "pr"}.get(x.get("side"), x.get("side"))
+
+
+def item_str(x) -> str:
+    """A comparison entry as text: plain test ids, or dicts (re-parametrized / skipped-for-dependency entries)."""
+    if isinstance(x, dict):
+        if "removed_ids" in x:
+            return f"{x['test']} ({len(x['removed_ids'])} -> {len(x['added_ids'])} ids)"
+        return f"{x.get('test', '?')} (needs {x['module']})" if x.get("module") else str(x.get("test", x))
+    return str(x)
+
+
+def dependency_gaps(rec: dict, prdir: Path) -> tuple[dict, dict]:
+    """({module: n} new/changed tests skipped for a missing optional module,
+        {module: n} unchanged tests skipped on both sides for the same reason)."""
+    c = rec.get("comparison") or {}
+    changed: dict = {}
+    for d in c.get("skipped_missing_dependency") or []:
+        changed[d.get("module", "?")] = changed.get(d.get("module", "?"), 0) + 1
+    try:
+        from ops.daily_run import unchanged_dependency_skips
+        unchanged = unchanged_dependency_skips(prdir, c)
+    except Exception:  # noqa: BLE001  (the runner is optional for rendering)
+        unchanged = {}
+    return changed, unchanged
 
 
 # ---------------------------------------------------------------- log citations
@@ -103,17 +155,44 @@ def cite_text(c: dict | None, rel) -> str:
 
 # ---------------------------------------------------------------- checks and verdict
 def checks(rec: dict) -> list[list]:
-    """Nathan's evals and guardrails for one PR run: [name, status, detail, how to fix]."""
+    """Evals and guardrails for one PR run: [name, status, detail, how to fix]."""
     out = []
     pr = rec.get("per_run") or []
     n = rec.get("runs_per_side", 3)
     if pr:
-        sides = {s: sum(1 for x in pr if x["side"] == s and x.get("exit") not in ("no-targets", "timeout")) for s in ("main", "pr")}
+        sides = {s: sum(1 for x in pr if side_of(x) == s and x.get("exit") not in ("no-targets", "timeout"))
+                 for s in ("main", "pr")}
         ok = sides["main"] == sides["pr"] == n == 3
         out.append(["3 alternating runs per side", "PASS" if ok else "FAIL", f"main {sides['main']}, PR {sides['pr']} of {n}",
                     "" if ok else "Re-run with the default --runs 3 and look for timeouts in the pytest logs."])
     elif rec.get("verdict") != "could_not_verify":
         out.append(["3 alternating runs per side", "FAIL", "no test runs recorded", "Re-run; see setup logs."])
+    ec = rec.get("exit_check")
+    if ec:
+        out.append(["pytest exit codes explained", "PASS" if ec.get("explained") else "FAIL", ec.get("detail", ""),
+                    "" if ec.get("explained") else "Read the pytest logs: " + "; ".join(ec.get("problems", [])[:2])])
+    g = rec.get("coverage_gate") or {}
+    if g:
+        note = g.get("note") or "-"
+        if g.get("changed") and "compiled" in (g.get("kind") or ""):
+            st, fix = "WARN", "Ask for (or add) a test that calls the changed compiled module, or review it by hand."
+        elif g.get("changed"):
+            st, fix = "WARN", "Widen the test mapping, or ask the author for a test that runs the changed lines."
+        elif g.get("confidence") == "lower" and "not measured" in note:
+            st, fix = "WARN", "Run the check again with the current ops/daily_run.py to measure it."
+        elif g.get("confidence") == "lower":
+            st, fix = "WARN", "Under half of the changed lines ran: ask for a test that covers the rest."
+        else:
+            st, fix = "PASS", ""
+        out.append(["Changed code was exercised (coverage gate)", st, note, fix])
+    changed, unchanged = dependency_gaps(rec, Path(rec.get("_prdir", ".")))
+    if changed or unchanged:
+        out.append(["Optional modules installed", "WARN",
+                    "; ".join(x for x in [
+                        ("new/changed tests skipped: " + ", ".join(f"{m} ({n})" for m, n in changed.items())) if changed else "",
+                        ("unchanged tests skipped on both sides: " + ", ".join(f"{m} ({n})" for m, n in unchanged.items()))
+                        if unchanged else ""] if x),
+                    "Add the module(s) to optional_test_deps for this library in ops/daily_run.py and run again."])
     te = rec.get("thread_env") or {}
     ok = bool(te) and all(v == "1" for v in te.values())
     out.append(["Single-thread environment", "PASS" if ok else "FAIL", ", ".join(f"{k}={v}" for k, v in te.items()) or "not recorded",
@@ -136,7 +215,7 @@ def checks(rec: dict) -> list[list]:
                     "Run the check again to test the PR's latest commit."])
     rr = rv.replay_row(rv.latest_replay())
     out.append([rr[0], {"all passed": "PASS", "FAILED": "FAIL"}.get(rr[1][2], "SKIP"), rr[2],
-                "Run the known-answer tests again (Validation Center, button 2) and fix what fails." if rr[1][2] == "FAILED" else ""])
+                "Run the known-answer tests again and fix what fails." if rr[1][2] == "FAILED" else ""])
     pc = (rec.get("main_side") or {}).get("pip_check")
     if pc and pc != "ok":
         out.append(["Main-side packages consistent (pip check)", "WARN", str(pc)[:120], "Usually harmless; see setup-main.log."])
@@ -146,11 +225,16 @@ def checks(rec: dict) -> list[list]:
 def decide(rec: dict, chk: list[list]) -> dict:
     v = rec.get("verdict", "could_not_verify")
     bad_replay = rv.replay_failure(None, rv.latest_replay())
-    if bad_replay:  # Jonathan's rule: a failed known-answer replay means no report is trusted
+    if bad_replay:  # rule: a failed known-answer replay means no report is trusted
         return dict(verdict="COULD NOT VERIFY", colour="grey", action="Re-run", confidence="Low",
                     conf_why="The known-answer tests failed in the latest replay.", why=bad_replay)
     fails = [c for c in chk if c[1] == "FAIL"]
     warns = [c for c in chk if c[1] == "WARN"]
+    g = rec.get("coverage_gate") or {}
+    if v == "could_not_verify" and g.get("changed") and not fails:
+        return dict(verdict="COULD NOT VERIFY", colour="grey", action="Review by hand", confidence="Low",
+                    conf_why="The tests ran cleanly but did not exercise the changed code, so they say little about "
+                             "this change.", why=rec.get("reason", ""), gate=True)
     if v == "could_not_verify" or fails:
         why = rec.get("reason") if v == "could_not_verify" else "the run failed its own checks: " + "; ".join(c[0] for c in fails)
         return dict(verdict="COULD NOT VERIFY", colour="grey", action="Re-run", confidence="Low",
@@ -179,7 +263,8 @@ def claims(rec: dict, logs: Logs) -> list[dict]:
                  citation=summ)]
     if c:
         broke = (c.get("regressions") or []) + (c.get("new_tests_failing") or [])
-        rows.append(dict(id="C2", text="Existing behavior is kept: tests that pass on main still pass", source="implied by every PR",
+        rows.append(dict(id="C2", text="Existing behavior is kept: tests that pass on main still pass",
+                         source="implied by every PR",
                          status="false" if broke else "proven",
                          evidence=(f"{len(broke)} test(s) fail on the PR, e.g. {broke[0]}" if broke else
                                    f"no test that passes on main fails on the PR ({c.get('same', 0)} unchanged, 3 runs per side)"),
@@ -188,15 +273,18 @@ def claims(rec: dict, logs: Logs) -> list[dict]:
         items = c.get(key) or []
         if not items or key == "fixed":
             continue
-        first = items[0].split(": ")[0]
+        if kind == "note":
+            continue  # re-parametrized / pre-existing: shown under 'What changed', not a change the PR introduced
+        first = item_str(items[0]).split(": ")[0].split(" (")[0]
         cit = logs.test_line(first) if kind == "bad" else (logs.summary("main", 1) if key == "removed_tests" else summ)
         rows.append(dict(id="-", text="Change not in the PR description", source="this run", status="unmentioned change",
-                         evidence=f"{len(items)} test(s) {label}, e.g. {items[0]}", citation=cit))
+                         evidence=f"{len(items)} test(s) {label}, e.g. {item_str(items[0])}", citation=cit))
     return rows
 
 
 # ---------------------------------------------------------------- build
 def build(rec: dict, prdir: Path, out_dir: Path, decision: dict | None = None) -> tuple[Report, dict]:
+    rec = normalize(rec, prdir.name) | {"_prdir": str(prdir)}
     logs = Logs(prdir)
     c = rec.get("comparison") or {}
     chk = checks(rec)
@@ -218,6 +306,8 @@ def build(rec: dict, prdir: Path, out_dir: Path, decision: dict | None = None) -
     reason = {"VERIFIED": "The PR's tests behave the same or better than on main, in all 3 runs per side.",
               "NEEDS ATTENTION": "The run is trustworthy and found a difference a person should look at.",
               "COULD NOT VERIFY": "The run did not produce a usable comparison, so there is no conclusion about the PR."}[d["verdict"]]
+    if d.get("gate"):
+        reason = "Not fully verified: the tests ran cleanly, but the changed code never ran under them."
     R.banner(d["verdict"], d["action"], d["confidence"], reason + " " + d["conf_why"], d["colour"],
              "Advice only: Proof-of-Change never blocks a merge and never posts on GitHub.")
 
@@ -225,7 +315,9 @@ def build(rec: dict, prdir: Path, out_dir: Path, decision: dict | None = None) -
     todo = {"Approve": "Nothing to fix. You can approve.",
             "Approve with notes": "You can approve; read the notes under 'What went wrong' first.",
             "Reject": "Do not approve as is. Read 'What changed in behavior' and decide with the PR author.",
-            "Re-run": "Do not decide yet. Fix the problem under 'How to fix' and run the check again."}[d["action"]]
+            "Re-run": "Do not decide yet. Fix the problem under 'How to fix' and run the check again.",
+            "Review by hand": "The tests did not exercise this change. Read the diff yourself, or ask the author for "
+                              "a test that runs the changed code; re-running will not change this."}[d["action"]]
     R.bullets([f"**What it says it does:** {rec.get('title', '?')} ({link(pr_ref, rec.get('url', ''))}).",
                f"**What we observed:** {d['why']}.",
                f"**What you should do:** {todo}"])
@@ -243,21 +335,45 @@ def build(rec: dict, prdir: Path, out_dir: Path, decision: dict | None = None) -
     if c:
         R.table(["What", "Count", "Examples"],
                 [["Tests unchanged", str(c.get("same", 0)), "-"], ["New tests that pass", str(c.get("new_tests_passing", 0)), "-"]]
-                + [[f"Tests that {label}", str(len(c.get(k) or [])), ", ".join(f"`{t}`" for t in (c.get(k) or [])[:5]) or "-"]
+                + [[f"Tests that {label}", str(len(c.get(k) or [])),
+                    ", ".join(f"`{item_str(t)}`" for t in (c.get(k) or [])[:5]) or "-"]
                    for k, label, _ in CATEGORIES])
         for t, m in list((c.get("messages") or {}).items())[:3]:
             R.p(f"`{t}` fails with: `{str(m).splitlines()[0][:200] if m else ''}`")
     else:
         R.p(f"Not measured: {rec.get('reason', 'no comparison')}.")
 
+    R.h(2, "Was the changed code exercised?", "coverage")
+    g, cov = rec.get("coverage_gate") or {}, rec.get("coverage") or {}
+    R.p(f"Coverage gate ({g.get('kind', '-')}, confidence {g.get('confidence', '-')}): {g.get('note') or '-'}."
+        + (f" This changed the verdict from {rec.get('verdict_before_coverage_gate')} to {rec.get('verdict')}."
+           if g.get("changed") else ""))
+    if cov.get("status") == "measured" and cov.get("files"):
+        R.table(["Changed file", "Changed executable lines", "Of those, ran"],
+                [[f"`{f['file']}`", "-" if f.get("changed_lines_total") is None else str(f["changed_lines_total"]),
+                  f.get("note") or str(f.get("changed_lines_covered"))] for f in cov["files"]])
+    R.p("How this is measured: one extra, untimed run of the PR side's tests under coverage.py. Changed lines come "
+        "from comparing the tested main and PR files. Compiled code (C, C++, Cython) is invisible to coverage.py; such "
+        "a change only counts as verified when the PR adds or changes a test for that module.", "meta")
+    changed, unchanged = dependency_gaps(rec, prdir)
+    if changed or unchanged:
+        R.h(2, "Missing optional modules", "optional")
+        R.bullets(([f"{n} new/changed test(s) skipped because `{m}` is not installed: the change was not exercised "
+                    "(could not verify)." for m, n in changed.items()]) +
+                  [f"{n} unchanged test(s) skipped on both sides because `{m}` is not installed (coverage gap, verdict "
+                   "unaffected)." for m, n in sorted(unchanged.items(), key=lambda kv: -kv[1])])
+
     R.h(2, "What went right", "right")
-    right = [f"Tested `{rec.get('head_sha', '?')[:12]}` of the PR against main ({rec.get('route', '-')} route)."]
+    right = [f"Tested `{(rec.get('head_sha') or '?')[:12]}` of the PR against main ({rec.get('route', '-')} route)."]
     right += [f"{x[0]}: {x[2]}." for x in chk if x[1] == "PASS"]
     R.bullets(right)
 
     R.h(2, "What went wrong and how to fix it", "wrong")
     wrong = [[x[0], badge("red" if x[1] == "FAIL" else "amber", x[1]), x[2], x[3]] for x in chk if x[1] in ("FAIL", "WARN")]
-    if rec.get("verdict") == "could_not_verify":
+    if d.get("gate"):
+        wrong.insert(0, ["Changed code not exercised", badge("grey", "NOT FULLY VERIFIED"), rec.get("reason", ""),
+                         "Read the diff by hand, or ask for a test that runs the changed code."])
+    elif rec.get("verdict") == "could_not_verify":
         wrong.insert(0, ["Run did not finish", badge("grey", "COULD NOT VERIFY"), rec.get("reason", ""),
                          "Read the setup/build log under Evidence links; build failures usually need a compiler or a newer nightly."])
     if d["verdict"] == "NEEDS ATTENTION":
@@ -268,7 +384,7 @@ def build(rec: dict, prdir: Path, out_dir: Path, decision: dict | None = None) -
     else:
         R.p("Nothing went wrong.")
 
-    R.h(2, "Evals and guardrails (Nathan)", "evals")
+    R.h(2, "Evals and guardrails", "evals")
     R.table(["Check", "Result", "Detail"],
             [[x[0], badge({"PASS": "green", "FAIL": "red", "WARN": "amber"}.get(x[1], "grey"), x[1]), x[2]] for x in chk])
 
@@ -290,7 +406,8 @@ def build(rec: dict, prdir: Path, out_dir: Path, decision: dict | None = None) -
     R.h(2, "Evidence links", "evidence")
     ev = [link(f"Pull request {pr_ref}", rec.get("url", ""))]
     for name in ["record.json", "pr.diff", "setup-main.log", "setup-pr.log", "build-pr.log", "patch.log", "git.log"] + \
-            [f"pytest-{s}-{i}.log" for i in (1, 2, 3) for s in ("main", "pr")] + [f"junit-{s}-1.xml" for s in ("main", "pr")]:
+            [f"pytest-{s}-{i}.log" for i in (1, 2, 3) for s in ("main", "pr")] + [f"junit-{s}-1.xml" for s in ("main", "pr")] + \
+            ["coverage-pytest.log", "coverage-pr.json"]:
         if (prdir / name).exists():
             ev.append(link(name, rel(name)))
     for side in ("main", "pr"):
@@ -306,7 +423,9 @@ def build(rec: dict, prdir: Path, out_dir: Path, decision: dict | None = None) -
         ["run", "One full pass of the selected tests. We do 3 per side, alternating main and PR."],
         ["flaky", "A test that gives different results when nothing changed; it is ignored as evidence."],
         ["log line", "A line in a pytest-*.log file: the raw output the verdict is based on."],
-        ["route", "How the two sides were built: nightly+patch, source-build or source-pair (see docs/OPERATIONS.md)."]])
+        ["route", "How the two sides were built: nightly+patch, source-build or source-pair (see docs/OPERATIONS.md)."],
+        ["changed lines covered", "How many of the PR's changed, executable Python lines ran during the PR side's tests."],
+        ["re-parametrized", "A test whose parameter ids changed (renamed cases); the new ids are judged on their own."]])
 
     summary = dict(id=run_id(rec), subject=subject, dependent="its own tests", verdict=d["verdict"], action=d["action"],
                    confidence=d["confidence"], colour=d["colour"], why=d["why"] or "-",
@@ -320,9 +439,7 @@ def render_run(run_dir: str | Path, out: str | Path, formats=("md", "html", "pdf
     run_dir, out = Path(run_dir).resolve(), Path(out).resolve()
     recs = []
     for p in sorted(run_dir.glob("*/record.json")):
-        rec = json.loads(p.read_text())
-        rec.setdefault("_dir", p.parent.name)
-        recs.append((rec, p.parent))
+        recs.append((normalize(json.loads(p.read_text()), p.parent.name), p.parent))
     if not recs:
         raise SystemExit(f"no */record.json under {run_dir}: is this an ops/runs/<date> folder?")
     if "pdf" in formats and not rv.find_chrome():
@@ -342,9 +459,32 @@ def render_run(run_dir: str | Path, out: str | Path, formats=("md", "html", "pdf
             s["pdf_error"] = rv.to_pdf(str(od / "REPORT.html"), str(od / "REPORT.pdf"))
         rows.append(s)
         print(f"{s['id']}: {s['verdict']} | {s['action']} | confidence {s['confidence']} | citations {s['citations']}")
-    rv.write_summary(rows, str(out), title or f"Proof-of-Change daily summary: {run_dir.name}", formats)
+    gated = [(r, s) for (r, _), s in zip(recs, rows) if (r.get("coverage_gate") or {}).get("changed")]
+
+    def extra(R):
+        if gated:
+            R.h(2, "Changed by the coverage gate")
+            R.bullets([f"{s['subject']}: {r.get('verdict_before_coverage_gate')} -> {r['verdict']} "
+                       f"({(r.get('coverage_gate') or {}).get('note')})" for r, s in gated])
+        hist = run_history(run_dir)
+        if hist:
+            R.h(2, "Re-runs")
+            R.p("Earlier attempts of this run date are kept under superseded/attempt-N/. The day's PR selection is "
+                "frozen: the final attempt re-tests every PR that any earlier attempt selected.")
+            R.bullets([f"{h['attempt']}: {(h['note'].splitlines() or [''])[0].lstrip('# ')}. Selected "
+                       f"{len(h['selected'])} PR(s), {len(h['verdicts'])} record(s)." for h in hist])
+
+    rv.write_summary(rows, str(out), title or f"Proof-of-Change daily summary: {run_dir.name}", formats, extra)
     print(f"summary: {out / 'SUMMARY.html'}")
     return rows
+
+
+def run_history(run_dir: Path) -> list[dict]:
+    try:
+        from ops.daily_run import attempt_history
+        return attempt_history(run_dir)
+    except Exception:  # noqa: BLE001
+        return []
 
 
 def record_decision(report_dir: str | Path, decision: str, by: str, note: str = "") -> Path:

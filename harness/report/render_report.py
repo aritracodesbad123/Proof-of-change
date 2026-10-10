@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Compatibility shim. The reviewer report generator now lives in reports/ (reports/reviewer.py, entry point
-`python -m reports.generate`), so the team has one report generator. This keeps Jonathan's documented command working:
+`python -m reports.generate`), so there is one report generator. This keeps the documented command working:
 
     python3 harness/report/render_report.py <record.json> ... --out DIR [--root R] [--claims-dir D] [--formats md,html,pdf]
 

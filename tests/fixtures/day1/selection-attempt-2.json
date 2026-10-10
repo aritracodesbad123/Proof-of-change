@@ -1,0 +1,138 @@
+{
+ "selected": {
+  "numpy/numpy": [
+   {
+    "pr": 32967,
+    "title": "DOC: remove obsolete 'like' parameter version notices",
+    "url": "https://github.com/numpy/numpy/pull/32967",
+    "author": "TensorDevLJ",
+    "head_sha": "ed0199b5b0f6ac5a157c53a22ac8ed044c560f20",
+    "updated_at_ist": "2026-10-10 04:26 IST",
+    "ci_state": "passing",
+    "route": "nightly+patch"
+   },
+   {
+    "pr": 32940,
+    "title": "BUG: fix nanquantile dtype for all-NaN first slice",
+    "url": "https://github.com/numpy/numpy/pull/32940",
+    "author": "dave123981",
+    "head_sha": "ab85348dcc7f454ce120ee2f68605c041c41f126",
+    "updated_at_ist": "2026-10-09 16:45 IST",
+    "ci_state": "none",
+    "route": "nightly+patch"
+   },
+   {
+    "pr": 32910,
+    "title": "ENH: Release GIL in np.repeat when Python API is not needed",
+    "url": "https://github.com/numpy/numpy/pull/32910",
+    "author": "lakshayg",
+    "head_sha": "b763e9ccec4bcc3fd4b735ee59a551d807de791b",
+    "updated_at_ist": "2026-10-10 04:05 IST",
+    "ci_state": "passing",
+    "route": "source-build"
+   }
+  ],
+  "pandas-dev/pandas": [
+   {
+    "pr": 70812,
+    "title": "ENH: add literal separator mode to str.get_dummies",
+    "url": "https://github.com/pandas-dev/pandas/pull/70812",
+    "author": "AntsiferovBogdan",
+    "head_sha": "3c2691f28f9e6f215f70aabdb19588a4b9655b49",
+    "updated_at_ist": "2026-10-10 05:50 IST",
+    "ci_state": "passing",
+    "route": "nightly+patch"
+   },
+   {
+    "pr": 70976,
+    "title": "DOC: explain why Series.autocorr and autocorrelation_plot differ (GH#24608)",
+    "url": "https://github.com/pandas-dev/pandas/pull/70976",
+    "author": "jbrockmendel",
+    "head_sha": "89aed80f1479bafcab17aef73f2539e9f124c7ce",
+    "updated_at_ist": "2026-10-10 05:49 IST",
+    "ci_state": "pending",
+    "route": "nightly+patch"
+   },
+   {
+    "pr": 70977,
+    "title": "BUG: to_csv MultiIndex columns first row dropped by read_csv (GH#21995)",
+    "url": "https://github.com/pandas-dev/pandas/pull/70977",
+    "author": "jbrockmendel",
+    "head_sha": "93e804a32c4395ab6415762e440be8689d015cc8",
+    "updated_at_ist": "2026-10-10 05:49 IST",
+    "ci_state": "pending",
+    "route": "nightly+patch"
+   }
+  ],
+  "scikit-learn/scikit-learn": [
+   {
+    "pr": 34219,
+    "title": "ENH Add replace_undefined_by to matthews_corrcoef",
+    "url": "https://github.com/scikit-learn/scikit-learn/pull/34219",
+    "author": "yuanx749",
+    "head_sha": "eb5a54cb28f256c714f748c90efcf0d822aa76ee",
+    "updated_at_ist": "2026-10-10 02:05 IST",
+    "ci_state": "passing",
+    "route": "nightly+patch"
+   },
+   {
+    "pr": 35112,
+    "title": "DOC cosine_similarity and cosine_distances behavior for zero vectors",
+    "url": "https://github.com/scikit-learn/scikit-learn/pull/35112",
+    "author": "roydonsequeira",
+    "head_sha": "c2b59a43070e7a1049100a3e8cdaf00db7af0b24",
+    "updated_at_ist": "2026-10-09 22:02 IST",
+    "ci_state": "passing",
+    "route": "nightly+patch"
+   },
+   {
+    "pr": 35114,
+    "title": "ENH add sparse input support to CategoricalNB",
+    "url": "https://github.com/scikit-learn/scikit-learn/pull/35114",
+    "author": "jayzuccarelli",
+    "head_sha": "2f4979c654077a2bdae0a3bedd12a386538839a5",
+    "updated_at_ist": "2026-10-10 00:20 IST",
+    "ci_state": "passing",
+    "route": "nightly+patch"
+   }
+  ],
+  "pydata/xarray": [
+   {
+    "pr": 11696,
+    "title": "Don't count the padding in the indices of rolling argmin/argmax",
+    "url": "https://github.com/pydata/xarray/pull/11696",
+    "author": "headtr1ck",
+    "head_sha": "47eab9120949a30d9f582be6632297059283fbd7",
+    "updated_at_ist": "2026-10-09 13:12 IST",
+    "ci_state": "not checked (chosen PR)",
+    "route": "source-pair"
+   }
+  ],
+  "unionai-oss/pandera": [
+   {
+    "pr": 2552,
+    "title": "fix(pandas): normalize coercion mask to bool for categorical series",
+    "url": "https://github.com/unionai-oss/pandera/pull/2552",
+    "author": "cpruijsen",
+    "head_sha": "b9dde5efaf7e210a6d3df99e8faf2fc5206f80b4",
+    "updated_at_ist": "2026-10-08 15:58 IST",
+    "ci_state": "not checked (chosen PR)",
+    "route": "source-pair"
+   }
+  ],
+  "rasbt/mlxtend": [
+   {
+    "pr": 1229,
+    "title": "Fix feature_importance_permutation permuting the wrong columns for feature_groups",
+    "url": "https://github.com/rasbt/mlxtend/pull/1229",
+    "author": "raashish1601",
+    "head_sha": "296459ec17120e757a56c7bb08c831469b0e5aa4",
+    "updated_at_ist": "2026-10-06 18:49 IST",
+    "ci_state": "not checked (chosen PR)",
+    "route": "source-pair"
+   }
+  ]
+ },
+ "skipped": {},
+ "reconstructed": "selection.json of attempt 2 was overwritten by attempt 3/4; rebuilt from attempt-2 record.json files plus the PRs that attempt 2 reused via --resume (console.log lists the same set)"
+}

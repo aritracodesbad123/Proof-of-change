@@ -39,19 +39,20 @@ def test_machine_type_needs_arch_and_os(upset):
 def test_schema_is_the_shared_file():
     from guardrails.schema import COMPATIBLE_SCHEMA_SHA256, SCHEMA_REVISION
     assert SCHEMA_PATH.parts[-3:] == ("harness", "schema", "observation.schema.json")
-    assert SCHEMA_SHA256 == "088cd395004de286c5f1df76fe94a0dc523738be194166cd3b616c77b6298183"  # rev 2
-    assert SCHEMA_REVISION == 2
+    assert SCHEMA_SHA256 == "0a706f00904fa34ab8ad8bc7f79f53da08dd51576aa2800a3274befb95f7608d"  # rev 4
+    assert SCHEMA_REVISION == 4
+    assert sorted(COMPATIBLE_SCHEMA_SHA256.values()) == ["rev 1", "rev 2", "rev 3", "rev 4"]
     assert COMPATIBLE_SCHEMA_SHA256["5a3c3d36b7730ce74d0f23b03c88ea862ea35cc327c7d79481fca8b972e8383e"] == "rev 1"
     readme = (SCHEMA_PATH.parent / "README.md").read_text()
     assert all(sha in readme for sha in COMPATIBLE_SCHEMA_SHA256)  # documented
 
 
-def test_rev1_records_still_valid_under_rev2(golden_v1_records):
+def test_rev1_records_still_valid_under_current_rev(golden_v1_records):
     from guardrails.schema import schema_reference_note
     for r in golden_v1_records:
-        assert r["schema_sha256"].startswith("5a3c3d36")  # Jonathan's records were written against rev 1
+        assert r["schema_sha256"].startswith("5a3c3d36")  # the golden records were written against rev 1
         assert validate_record(r, require_v1=True) == []
-        assert "valid under current rev 2" in schema_reference_note(r)
+        assert "valid under current rev 4" in schema_reference_note(r)
 
 
 def test_rev2_optional_fields(golden_v1_records):
@@ -113,3 +114,24 @@ def test_shared_schema_rules(g_sklearn):
     assert any("accepted is false" in e for e in validate_record(r))
     r["accepted"] = False
     assert validate_record(r) == []
+
+
+def test_rev4_coverage_fields_optional_and_typed():
+    """rev 4 adds optional coverage-gate fields; they validate when present and are type-checked."""
+    import copy
+    import json
+
+    from conftest import REPO
+    rec = json.loads((REPO / "tests/fixtures/day1/pr_run_numpy_32910.json").read_text())
+    assert validate_record(rec) == []
+    for k in ("changed_lines_total", "changed_lines_covered", "coverage", "coverage_gate"):
+        assert k not in rec  # a pre-gate record: the fields are optional
+    from poc import coverage_gate
+    gated = coverage_gate.apply(rec)
+    assert validate_record(gated) == []
+    bad = copy.deepcopy(gated)
+    bad["coverage_gate"]["confidence"] = "maybe"
+    assert validate_record(bad)
+    bad = copy.deepcopy(gated)
+    bad["changed_lines_total"] = -1
+    assert validate_record(bad)

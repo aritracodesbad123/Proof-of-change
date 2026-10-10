@@ -1,11 +1,11 @@
-"""Run one Blast Radius tuple through Jonathan's br_run.py with Nathan's guardrails applied.
+"""Run one Blast Radius tuple through the runner (br_run.py) with the guardrails applied.
 
     python -m harness.run --upstream pandas --old 2.3.3 --new 3.0.0rc0 --dependent UpSetPlot \
         --tests repo:https://github.com/jnothman/UpSetPlot:upsetplot/tests --expected "break: ..." \
         --expected-class break
 
 All arguments after the wrapper's own are passed to br_run.py unchanged, except that:
-  * --runs is forced to 3 (Jonathan's protocol); other values are refused,
+  * --runs is forced to 3 (the protocol); other values are refused,
   * --root defaults to ./data so records and runs stay inside this repo's ignored data dir,
   * the single-thread env vars are forced, and --machine is set from the detected machine type.
 After the runner finishes, the record gets `machine_type` and `thread_env`, is schema-validated,
@@ -31,7 +31,7 @@ def find_runner() -> Path:
     for cand in (os.environ.get("BR_RUNNER"), REPO / "harness" / "br_run.py"):
         if cand and Path(cand).is_file():
             return Path(cand)
-    raise SystemExit("br_run.py not found: set BR_RUNNER or add harness/br_run.py (Jonathan's runner)")
+    raise SystemExit("br_run.py not found: set BR_RUNNER or add harness/br_run.py (the runner)")
 
 
 def build_command(runner: Path, passthrough: list[str], root: Path, machine: dict) -> list[str]:

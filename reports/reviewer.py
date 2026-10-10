@@ -1,11 +1,11 @@
 """Reviewer report: one report per observation record, for a human approver.
 
-Ported from Jonathan's reference generator (feat/reviewer-report @ 3734001, harness/report/render_report.py,
+Ported from the reference generator (feat/reviewer-report @ 3734001, harness/report/render_report.py,
 spec docs/REPORT_SPEC.md) and folded into this package so there is one report generator. Entry point:
 `python -m reports.generate` (see reports/generate.py). Changes from the reference are listed in
-docs/REPORT_SPEC.md, section "Adopted by Nathan":
+docs/REPORT_SPEC.md, section "Adopted":
 
-* Nathan's evals and guardrails (evals.checks.evaluate_record) are a section of every report. Any eval FAIL makes
+* The evals and guardrails (evals.checks.evaluate_record) are a section of every report. Any eval FAIL makes
   the verdict COULD NOT VERIFY / Re-run, because the run itself is not trustworthy.
 * Golden cases come from evals/golden_cases.json, checked against the stored golden records
   (evals/fixtures/golden_v1.jsonl by default) with the same code as the eval gate.
@@ -36,13 +36,13 @@ from pathlib import Path
 from evals.checks import Result, check_citations, check_golden_case, evaluate_record, golden_for, load_golden, recommendation
 from guardrails.schema import SCHEMA_ID, schema_reference_note
 
-GENERATOR_VERSION = "1.0 (from Jonathan's render_report.py 0.1)"
+GENERATOR_VERSION = "1.0 (from render_report.py 0.1)"
 NA = "not available"
 IST = datetime.timezone(datetime.timedelta(hours=5, minutes=30))
 REPO = Path(__file__).resolve().parent.parent
 GOLDEN_RECORDS = REPO / "evals" / "fixtures" / "golden_v1.jsonl"
 
-# Fix advice per runner gate (copy of Jonathan's harness/brlib.py FIXES).
+# Fix advice per runner gate (copy of the runner's harness/brlib.py FIXES).
 GATE_FIXES = {
     "env_identical_except_upstream": "freeze-diff.txt shows more than the upstream line. Usually the new upstream pulled in a "
                                      "dependency. Rerun; if it persists, add the dependency pin to --extra-pkgs so both sides get it.",
@@ -81,7 +81,7 @@ GLOSSARY = [
     ("Error signature", "The error message with numbers and file paths removed, so identical failures group together."),
     ("Gate", "An automatic check by the runner that the run itself is trustworthy (right versions, same environment, enough "
              "runs). Required gates must pass for the result to count."),
-    ("Eval", "Nathan's independent check of the record (schema, versions, runs per side, threads, golden cases, citations). "
+    ("Eval", "Independent check of the record (schema, versions, runs per side, threads, golden cases, citations). "
              "Any eval failure means the run cannot be trusted."),
     ("Golden case", "A known example with a known answer. If the tool still gets the golden cases right, its answers on new "
                     "cases are more believable."),
@@ -93,8 +93,10 @@ GLOSSARY = [
 EMOJI = {"green": "🟢", "amber": "🟠", "red": "🔴", "grey": "⚪", "blue": "🔵"}
 STATUS_COLOUR = {"proven": "green", "false": "red", "unmentioned change": "amber", "not testable": "grey"}
 EVAL_COLOUR = {"pass": "green", "fail": "red", "warn": "amber", "skip": "grey", "todo": "grey"}
-ACTION_COLOUR = {"Approve": "green", "Approve with notes": "green", "Reject": "red", "Re-run": "grey"}
+ACTION_COLOUR = {"Approve": "green", "Approve with notes": "green", "Reject": "red", "Re-run": "grey",
+                 "Review by hand": "amber"}
 ORDER = {("NEEDS ATTENTION", "Reject"): 0, ("NEEDS ATTENTION", "Approve with notes"): 1, ("COULD NOT VERIFY", "Re-run"): 2,
+         ("COULD NOT VERIFY", "Review by hand"): 2,
          ("VERIFIED", "Approve with notes"): 3, ("VERIFIED", "Approve"): 4}
 
 
@@ -446,14 +448,14 @@ def verify_citations(claims_eval: list[dict], rd: str | None) -> Result:
     return Result("report_citations", res.status, res.detail, res.fix)
 
 
-GOLDEN_STATUS_DEFAULT = "/workspace/blast-radius-research/research/validation/golden-status.json"
 
 
 def latest_replay() -> dict | None:
-    """Latest known-answer (golden) replay written by Jonathan's Validation Center (button 2), or None.
+    """Latest known-answer (golden) replay status file, or None.
 
-    $BR_GOLDEN_STATUS names the file (empty = none); otherwise the Validation Center's file on the box, if present."""
-    p = os.environ.get("BR_GOLDEN_STATUS", GOLDEN_STATUS_DEFAULT)
+    $BR_GOLDEN_STATUS names the file (empty = none); otherwise golden_status in ops/local.json, if set."""
+    from poc import local_config
+    p = local_config.get("golden_status")
     try:
         return json.loads(Path(p).read_text()) if p else None
     except (OSError, ValueError):
@@ -461,11 +463,11 @@ def latest_replay() -> dict | None:
 
 
 def replay_failure(rec: dict | None = None, replay: dict | None = None) -> str | None:
-    """Ported from Jonathan's render_report.py: if the latest known-answer replay failed, nothing this tool says is
+    """Ported from render_report.py: if the latest known-answer replay failed, nothing this tool says is
     trusted until it passes again, so every report is COULD NOT VERIFY / Re-run. A record's own golden_check counts too."""
     if replay and not replay.get("all_passed"):
         failed = [r.get("case", "?") for r in replay.get("results", []) if not r.get("passed")]
-        return (f"the known-answer tests failed on {replay.get('date_ist', '?')} ({', '.join(failed) or 'see Validation Center'}), "
+        return (f"the known-answer tests failed on {replay.get('date_ist', '?')} ({', '.join(failed) or 'see the replay status file'}), "
                 "so no result from this tool is trusted until they pass again")
     gc = (rec or {}).get("golden_check")
     if gc and gc.get("passed") != gc.get("total"):
@@ -475,9 +477,9 @@ def replay_failure(rec: dict | None = None, replay: dict | None = None) -> str |
 
 
 def replay_row(replay: dict | None) -> list:
-    """Trust-check row for the latest known-answer replay (Validation Center)."""
+    """Trust-check row for the latest known-answer replay."""
     if not replay:
-        return ["Known-answer replay (fresh re-run)", badge("grey", NA), "not replayed yet (Validation Center, button 2)"]
+        return ["Known-answer replay (fresh re-run)", badge("grey", NA), "not replayed yet"]
     if replay.get("all_passed"):
         return ["Known-answer replay (fresh re-run)", badge("green", "all passed"),
                 f"replayed {replay.get('date_ist', '?')}, harness {replay.get('harness_version', '?')}"]
@@ -579,7 +581,7 @@ RUN_DEFAULTS = {"dep_extras": "", "extra_pkgs": "", "override_pins": False, "pyt
 RUN_ORDER = ["upstream", "old", "new", "dependent", "dep_version", "dep_extras", "tests", "extra_pkgs", "override_pins",
              "pytest_args", "import_mode", "keep_addopts", "workers", "cpus", "mem_gb", "test_timeout",
              "run_timeout", "no_net_isolation", "python", "expected", "expected_class", "subset_note"]
-RUNNER_PATH = "/workspace/blast-radius-research/harness/br_run.py"
+RUNNER_PATH = "<path to br_run.py>"
 
 
 def repro_command(args: dict | None, rec: dict) -> str | None:
@@ -753,7 +755,7 @@ def _build_bottom(R: Report, x: dict) -> dict:
         right.append([badge("green", "pass"), "Matches the prediction written before the run", fmt(rec.get("expected"))])
     n_pass = sum(1 for r in evals if r.status == "pass")
     if n_pass:
-        right.append([badge("green", "pass"), "Nathan's evals",
+        right.append([badge("green", "pass"), "Evals",
                       f"{n_pass} of {len(evals)} eval checks passed (see 'Evals and guardrails')"])
     if cites.status == "pass":
         right.append([badge("green", "pass"), "Every claim cites a log line", cites.detail])
@@ -777,7 +779,7 @@ def _build_bottom(R: Report, x: dict) -> dict:
     rb_why = replay_failure(rec, latest_replay())
     if rb_why:
         env_issues.append([f"Known-answer tests failed: {rb_why}",
-                           "Re-run the known-answer tests (Validation Center, button 2). Fix whatever made them fail, then "
+                           "Re-run the known-answer tests. Fix whatever made them fail, then "
                            "regenerate this report. Until then no verdict from this tool is trusted."])
     for g in d["req_fail"] + d["adv_fail"]:
         env_issues.append([f"Check failed: {GATE_LABELS.get(g, g)} ({get(gates, g, 'detail') or NA})", GATE_FIXES.get(g, NA)])
@@ -842,7 +844,7 @@ def _build_bottom(R: Report, x: dict) -> dict:
          ", ".join(d["req_fail"]) or "all passed"],
         ["Advisory checks", badge("green" if not d["adv_fail"] else "amber", f"{len(adv) - len(d['adv_fail'])} of {len(adv)} passed"),
          ", ".join(d["adv_fail"]) or "all passed"],
-        ["Evals (Nathan)", badge("red" if d["eval_fail"] else ("amber" if d["eval_warn"] else "green"), recommendation(evals)),
+        ["Evals", badge("red" if d["eval_fail"] else ("amber" if d["eval_warn"] else "green"), recommendation(evals)),
          ", ".join(d["eval_fail"] + d["eval_warn"]) or "no failures or warnings"],
         ["Golden cases (stored records)", golden_badge, golden_note],
         ["Golden cases (re-run)", badge("green" if gc and gc["passed"] == gc["total"] else ("grey" if not gc else "red"),
@@ -870,8 +872,8 @@ def _build_bottom(R: Report, x: dict) -> dict:
                 [[g["case"], badge("green" if g["ok"] else ("grey" if g["ok"] is None else "red"),
                                    "holds" if g["ok"] else (NA if g["ok"] is None else "fails")), g["detail"]] for g in golden])
 
-    # 7a) evals and guardrails (Nathan)
-    R.h(2, "Evals and guardrails (Nathan)", "evals")
+    # 7a) evals and guardrails
+    R.h(2, "Evals and guardrails", "evals")
     R.p(f"Independent checks of this record by evals/checks.py and guardrails/schema.py against the shared schema "
         f"`{SCHEMA_ID}` ({schema_reference_note(rec)}). Eval recommendation: **{recommendation(evals)}**. Any FAIL here "
         "makes the verdict COULD NOT VERIFY.")
@@ -891,7 +893,7 @@ def _build_tail(R: Report, x: dict) -> None:
         "I read the verdict, the recommended action and the confidence.",
         "I checked the claims vs reality table for any 'false' or 'unmentioned change' rows, and opened at least one cited log line.",
         "I looked at the largest behavior-change group and its example error." if changed else "I confirmed there are no behavior changes.",
-        "I confirmed the required checks and Nathan's evals passed (Trust checks, Evals and guardrails).",
+        "I confirmed the required checks and the evals passed (Trust checks, Evals and guardrails).",
         "I am satisfied the environment issues (if any) do not change the decision.",
     ])
     dec = rec.get("reviewer_decision")
@@ -1136,7 +1138,8 @@ def sort_summaries(summaries: list[dict]) -> list[dict]:
     return sorted(summaries, key=lambda s: (ORDER.get((s["verdict"], s["action"]), 9), s["id"]))
 
 
-def write_summary(summaries: list[dict], out_dir: str, title: str, formats) -> str | None:
+def write_summary(summaries: list[dict], out_dir: str, title: str, formats, extra=None) -> str | None:
+    """extra: optional callable(Report) that adds run-level sections (e.g. Re-runs) before 'Verdict meanings'."""
     s = sort_summaries(summaries)
     R = Report()
     R.h(1, title)
@@ -1162,10 +1165,13 @@ def write_summary(summaries: list[dict], out_dir: str, title: str, formats) -> s
               x["subject"], x["dependent"], x["why"], badge("green" if x["evals"] == "APPROVE" else "red", x["evals"]),
               link("HTML", f"{x['id']}/REPORT.html") + " · " + link("PDF", f"{x['id']}/REPORT.pdf") + " · "
               + link("MD", f"{x['id']}/REPORT.md")] for x in s])
+    if extra:
+        extra(R)
     R.h(2, "Verdict meanings")
     R.table(["Verdict", "Meaning"], [
         [badge("amber", "NEEDS ATTENTION"), "The run is trustworthy and found a problem: breaks, import failures, or a false claim."],
-        [badge("grey", "COULD NOT VERIFY"), "The run failed its own trust checks or Nathan's evals. No conclusion; re-run after fixing."],
+        [badge("grey", "COULD NOT VERIFY"), "The run failed its own trust checks or the evals (no conclusion; re-run after "
+                                            "fixing), or, for PR runs, the tests never exercised the changed code (review by hand)."],
         [badge("green", "VERIFIED"), "The run is trustworthy and found no behavior change."]])
     os.makedirs(out_dir, exist_ok=True)
     if "md" in formats:

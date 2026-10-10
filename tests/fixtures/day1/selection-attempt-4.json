@@ -1,0 +1,182 @@
+{
+ "selected": {
+  "pydata/xarray": [
+   {
+    "pr": 11696,
+    "title": "Don't count the padding in the indices of rolling argmin/argmax",
+    "url": "https://github.com/pydata/xarray/pull/11696",
+    "author": "headtr1ck",
+    "head_sha": "47eab9120949a30d9f582be6632297059283fbd7",
+    "updated_at_ist": "2026-10-09 13:12 IST",
+    "ci_state": "not checked (chosen PR)",
+    "route": "source-pair"
+   }
+  ],
+  "unionai-oss/pandera": [
+   {
+    "pr": 2552,
+    "title": "fix(pandas): normalize coercion mask to bool for categorical series",
+    "url": "https://github.com/unionai-oss/pandera/pull/2552",
+    "author": "cpruijsen",
+    "head_sha": "b9dde5efaf7e210a6d3df99e8faf2fc5206f80b4",
+    "updated_at_ist": "2026-10-08 15:58 IST",
+    "ci_state": "not checked (chosen PR)",
+    "route": "source-pair"
+   }
+  ],
+  "rasbt/mlxtend": [
+   {
+    "pr": 1229,
+    "title": "Fix feature_importance_permutation permuting the wrong columns for feature_groups",
+    "url": "https://github.com/rasbt/mlxtend/pull/1229",
+    "author": "raashish1601",
+    "head_sha": "296459ec17120e757a56c7bb08c831469b0e5aa4",
+    "updated_at_ist": "2026-10-06 18:49 IST",
+    "ci_state": "not checked (chosen PR)",
+    "route": "source-pair"
+   }
+  ],
+  "numpy/numpy": [
+   {
+    "pr": 32967,
+    "title": "DOC: remove obsolete 'like' parameter version notices",
+    "url": "https://github.com/numpy/numpy/pull/32967",
+    "author": "TensorDevLJ",
+    "head_sha": "ed0199b5b0f6ac5a157c53a22ac8ed044c560f20",
+    "updated_at_ist": "2026-10-10 04:26 IST",
+    "ci_state": "passing",
+    "route": "nightly+patch"
+   },
+   {
+    "pr": 32940,
+    "title": "BUG: fix nanquantile dtype for all-NaN first slice",
+    "url": "https://github.com/numpy/numpy/pull/32940",
+    "author": "dave123981",
+    "head_sha": "ab85348dcc7f454ce120ee2f68605c041c41f126",
+    "updated_at_ist": "2026-10-09 16:45 IST",
+    "ci_state": "none",
+    "route": "nightly+patch"
+   },
+   {
+    "pr": 32910,
+    "title": "ENH: Release GIL in np.repeat when Python API is not needed",
+    "url": "https://github.com/numpy/numpy/pull/32910",
+    "author": "lakshayg",
+    "head_sha": "b763e9ccec4bcc3fd4b735ee59a551d807de791b",
+    "updated_at_ist": "2026-10-10 04:05 IST",
+    "ci_state": "passing",
+    "route": "source-build"
+   }
+  ],
+  "pandas-dev/pandas": [
+   {
+    "pr": 70520,
+    "title": "DEPR: negative min_count in reductions (GH#50022)",
+    "url": "https://github.com/pandas-dev/pandas/pull/70520",
+    "author": "jbrockmendel",
+    "head_sha": "21633c2bcaf391c37a458105cf3a11ded8f3478e",
+    "updated_at_ist": "2026-10-10 06:00 IST",
+    "ci_state": "pending",
+    "route": "nightly+patch"
+   },
+   {
+    "pr": 70915,
+    "title": "BUG: MultiIndex.rename rejects the name keyword (GH#33778)",
+    "url": "https://github.com/pandas-dev/pandas/pull/70915",
+    "author": "jbrockmendel",
+    "head_sha": "dd80cced22706879a293dd799f60f8decda68afd",
+    "updated_at_ist": "2026-10-10 06:00 IST",
+    "ci_state": "pending",
+    "route": "nightly+patch"
+   },
+   {
+    "pr": 70989,
+    "title": "BUG: interpolate precision loss on nanosecond DatetimeIndex (GH#34601)",
+    "url": "https://github.com/pandas-dev/pandas/pull/70989",
+    "author": "jbrockmendel",
+    "head_sha": "0bcb2ebb6bfcb6110b77a57e32ed9638147c7bbf",
+    "updated_at_ist": "2026-10-10 06:00 IST",
+    "ci_state": "pending",
+    "route": "nightly+patch"
+   }
+  ],
+  "scikit-learn/scikit-learn": [
+   {
+    "pr": 34219,
+    "title": "ENH Add replace_undefined_by to matthews_corrcoef",
+    "url": "https://github.com/scikit-learn/scikit-learn/pull/34219",
+    "author": "yuanx749",
+    "head_sha": "eb5a54cb28f256c714f748c90efcf0d822aa76ee",
+    "updated_at_ist": "2026-10-10 02:05 IST",
+    "ci_state": "passing",
+    "route": "nightly+patch"
+   },
+   {
+    "pr": 35114,
+    "title": "ENH add sparse input support to CategoricalNB",
+    "url": "https://github.com/scikit-learn/scikit-learn/pull/35114",
+    "author": "jayzuccarelli",
+    "head_sha": "2f4979c654077a2bdae0a3bedd12a386538839a5",
+    "updated_at_ist": "2026-10-10 00:20 IST",
+    "ci_state": "passing",
+    "route": "nightly+patch"
+   },
+   {
+    "pr": 35112,
+    "title": "DOC cosine_similarity and cosine_distances behavior for zero vectors",
+    "url": "https://github.com/scikit-learn/scikit-learn/pull/35112",
+    "author": "roydonsequeira",
+    "head_sha": "c2b59a43070e7a1049100a3e8cdaf00db7af0b24",
+    "updated_at_ist": "2026-10-09 22:02 IST",
+    "ci_state": "passing",
+    "route": "nightly+patch"
+   }
+  ]
+ },
+ "skipped": {
+  "pydata/xarray": [],
+  "unionai-oss/pandera": [],
+  "rasbt/mlxtend": [],
+  "numpy/numpy": [
+   {
+    "pr": 32895,
+    "title": "PERF: reuse insertion result for equivalent searchsorted queries",
+    "updated_at_ist": "2026-10-10 05:58 IST",
+    "why": "draft"
+   },
+   {
+    "pr": 32969,
+    "title": "REL: Prepare for the NumPy 2.5.4 release.",
+    "updated_at_ist": "2026-10-10 05:35 IST",
+    "why": "no Python/compiled code in the package (docs, CI or tooling only)"
+   },
+   {
+    "pr": 32966,
+    "title": "BLD: `build` and `dev-cli` dependency groups",
+    "updated_at_ist": "2026-10-10 04:36 IST",
+    "why": "no Python/compiled code in the package (docs, CI or tooling only)"
+   },
+   {
+    "pr": 30117,
+    "title": "ENH: Speedup `np.vectorize` wrapped functions when keyword args are present",
+    "updated_at_ist": "2026-10-09 23:00 IST",
+    "why": "upstream CI failing (3/77 failing: azure-pipeline numpy.numpy, lint, azure-pipeline numpy.numpy (ComprehensiveTests Lint))"
+   }
+  ],
+  "pandas-dev/pandas": [],
+  "scikit-learn/scikit-learn": [
+   {
+    "pr": 35111,
+    "title": "DOC Add information on `sample_weight` auto-routing to glossary and user guide",
+    "updated_at_ist": "2026-10-09 23:00 IST",
+    "why": "no Python/compiled code in the package (docs, CI or tooling only)"
+   },
+   {
+    "pr": 35113,
+    "title": "FIX Fix TypeError in HDBSCAN when using cluster_selection_epsilon",
+    "updated_at_ist": "2026-10-09 22:04 IST",
+    "why": "draft"
+   }
+  ]
+ }
+}

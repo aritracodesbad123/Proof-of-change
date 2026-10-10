@@ -1,0 +1,36 @@
+{
+ "source": "ops/runs/2026-10-10/superseded/attempt-4/pandera-2552 (day 1, attempt 4), trimmed to the relevant testcases",
+ "verdict_attempt4": "verified",
+ "per_run": [
+  {
+   "side": "main",
+   "run": 1,
+   "exit": 1
+  },
+  {
+   "side": "pr",
+   "run": 1,
+   "exit": 1
+  },
+  {
+   "side": "main",
+   "run": 2,
+   "exit": 1
+  },
+  {
+   "side": "pr",
+   "run": 2,
+   "exit": 1
+  },
+  {
+   "side": "main",
+   "run": 3,
+   "exit": 1
+  },
+  {
+   "side": "pr",
+   "run": 3,
+   "exit": 1
+  }
+ ]
+}

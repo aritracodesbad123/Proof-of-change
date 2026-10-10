@@ -1,53 +1,8 @@
 {
  "$schema": "https://json-schema.org/draft/2020-12/schema",
  "$id": "blast-radius/observation/v1",
- "title": "Blast Radius observation record v1, revision 2 (shared by Jonathan br_run.py and Nathan harness/run.py)",
+ "title": "Blast Radius observation record v1, revision 4 (shared by the downstream-test runner br_run.py and harness/run.py, plus Proof-of-Change PR runs)",
  "type": "object",
- "required": [
-  "accepted",
-  "classification",
-  "cpu_count",
-  "date_ist",
-  "dependent",
-  "dependent_version",
-  "duration_s",
-  "env_diff",
-  "expected",
-  "expected_class",
-  "gates",
-  "hand_check",
-  "host",
-  "id",
-  "logs",
-  "machine",
-  "machine_type",
-  "matches_expected",
-  "network",
-  "new_direct_url",
-  "new_version",
-  "new_version_requested",
-  "notes",
-  "old_version",
-  "per_run",
-  "pip_check_new",
-  "platform",
-  "python",
-  "report",
-  "run_timeout_s",
-  "runs_per_side",
-  "schema_version",
-  "subset_note",
-  "test_selection",
-  "test_source",
-  "test_timeout_s",
-  "thread_env",
-  "top_error_signatures_already_broken",
-  "top_error_signatures_breaks",
-  "upstream",
-  "upstream_issue",
-  "who",
-  "workers"
- ],
  "properties": {
   "schema_version": {
    "type": "string",
@@ -113,7 +68,8 @@
   },
   "runs_per_side": {
    "type": "integer",
-   "minimum": 1
+   "minimum": 0,
+   "description": "Completed runs per side. rev 3: minimum 0 here (a pr_run whose build failed ran 0 times); observation records still need >= 1 (else branch)."
   },
   "workers": {
    "type": "string"
@@ -752,28 +708,435 @@
      ]
     }
    }
+  },
+  "record_kind": {
+   "type": "string",
+   "enum": [
+    "observation",
+    "pr_run"
+   ],
+   "description": "OPTIONAL (rev 3). Absent or 'observation': a release-pair observation (the original v1 record, all v1 fields required). 'pr_run': one Proof-of-Change run of an open PR, main vs PR (ops/daily_run.py); required fields are listed in the 'then' branch."
+  },
+  "run_date": {
+   "type": "string",
+   "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+   "description": "OPTIONAL (rev 3, pr_run records). Run folder date (YYYY-MM-DD, IST)."
+  },
+  "repo": {
+   "type": "string",
+   "pattern": "^[\\w.-]+/[\\w.-]+$",
+   "description": "OPTIONAL (rev 3, pr_run records). owner/name of the upstream repository."
+  },
+  "library": {
+   "type": "string",
+   "description": "OPTIONAL (rev 3, pr_run records). Distribution name."
+  },
+  "author": {
+   "type": "string",
+   "description": "OPTIONAL (rev 3, pr_run records). PR author login."
+  },
+  "base_ref": {
+   "type": "string",
+   "description": "OPTIONAL (rev 3, pr_run records). PR base branch."
+  },
+  "updated_at_utc": {
+   "type": "string",
+   "description": "OPTIONAL (rev 3, pr_run records). PR updated_at as given by GitHub (UTC)."
+  },
+  "updated_at_ist": {
+   "type": "string",
+   "description": "OPTIONAL (rev 3, pr_run records). PR updated_at converted to IST."
+  },
+  "tested_at_ist": {
+   "type": "string",
+   "description": "OPTIONAL (rev 3, pr_run records). When the PR was tested (IST)."
+  },
+  "ci_state": {
+   "type": "string",
+   "description": "OPTIONAL (rev 3, pr_run records). Upstream CI state seen at selection (passing, pending, failing, none, or a note)."
+  },
+  "ci_detail": {
+   "type": "string",
+   "description": "OPTIONAL (rev 3, pr_run records). Free-text detail for ci_state."
+  },
+  "files": {
+   "type": "object",
+   "required": [
+    "all",
+    "package_py",
+    "compiled",
+    "other"
+   ],
+   "description": "OPTIONAL (rev 3, pr_run records). Touched files, classified."
+  },
+  "what_changed": {
+   "type": "object",
+   "description": "OPTIONAL (rev 3, pr_run records). Touched files for the report."
+  },
+  "route": {
+   "type": "string",
+   "enum": [
+    "nightly+patch",
+    "source-build",
+    "source-pair"
+   ],
+   "description": "OPTIONAL (rev 3, pr_run records). How main and PR sides were built."
+  },
+  "runs_per_side_planned": {
+   "type": "integer",
+   "minimum": 1,
+   "description": "OPTIONAL (rev 3, pr_run records). Runs per side the protocol asked for (3)."
+  },
+  "build_timeout_s": {
+   "type": "integer",
+   "minimum": 1,
+   "description": "OPTIONAL (rev 3, pr_run records). Timeout for source builds."
+  },
+  "posted_upstream": {
+   "type": "boolean",
+   "enum": [
+    false
+   ],
+   "description": "OPTIONAL (rev 3, pr_run records). Always false: the runner never posts to GitHub."
+  },
+  "freeze": {
+   "type": "object",
+   "description": "OPTIONAL (rev 3, pr_run records). pip freeze file names per side (main, pr), inside the PR's log folder."
+  },
+  "main_side": {
+   "type": "object",
+   "description": "OPTIONAL (rev 3, pr_run records). How the main side was set up (version, pip check, test extras, optional test deps)."
+  },
+  "main_build": {
+   "type": "object",
+   "required": [
+    "filename",
+    "sha256"
+   ],
+   "properties": {
+    "filename": {
+     "type": "string"
+    },
+    "sha256": {
+     "type": "string",
+     "pattern": "^[0-9a-f]{64}$"
+    },
+    "commit": {
+     "type": [
+      "string",
+      "null"
+     ],
+     "pattern": "^[0-9a-f]{7,40}$"
+    }
+   },
+   "description": "OPTIONAL (rev 3, pr_run records). Exact nightly wheel used for main: filename, url, sha256, size, build date, upload time, commit."
+  },
+  "pr_side": {
+   "type": "object",
+   "description": "OPTIONAL (rev 3, pr_run records). How the PR side was set up."
+  },
+  "sides": {
+   "type": "object",
+   "description": "OPTIONAL (rev 3, pr_run records). source-pair route: comparison basis, main_sha, pr_sha, merge_commit, merge_parents."
+  },
+  "tested": {
+   "type": "object",
+   "properties": {
+    "main": {
+     "type": "string"
+    },
+    "pr": {
+     "type": "string"
+    }
+   },
+   "description": "OPTIONAL (rev 3, pr_run records). Human-readable statement of exactly what was tested on each side."
+  },
+  "test_targets": {
+   "type": "object",
+   "description": "OPTIONAL (rev 3, pr_run records). Test files run per side (main, pr)."
+  },
+  "test_extras": {
+   "type": "array",
+   "description": "OPTIONAL (rev 3, pr_run records). Test extras of the project installed on both sides (source-pair route)."
+  },
+  "comparison": {
+   "type": "object",
+   "description": "OPTIONAL (rev 3, pr_run records). Per-test comparison: same, regressions, fixed, new_tests_passing, new_tests_failing, removed_tests, reparametrized, skipped_missing_dependency, flaky, other_changes, preexisting_failures, messages."
+  },
+  "exit_check": {
+   "type": "object",
+   "required": [
+    "explained"
+   ],
+   "description": "OPTIONAL (rev 3, pr_run records). Whether every non-zero pytest exit is explained by identical failures on both sides."
+  },
+  "verdict": {
+   "type": "string",
+   "enum": [
+    "verified",
+    "needs_attention",
+    "could_not_verify"
+   ],
+   "description": "OPTIONAL (rev 3, pr_run records). Proof-of-Change verdict."
+  },
+  "reason": {
+   "type": "string",
+   "minLength": 1,
+   "description": "OPTIONAL (rev 3, pr_run records). One-line reason for the verdict."
+  },
+  "head_moved": {
+   "type": "boolean",
+   "description": "OPTIONAL (rev 3, pr_run records). True when the PR head moved after the day's selection; the pinned head was tested."
+  },
+  "current_head_sha": {
+   "type": [
+    "string",
+    "null"
+   ],
+   "pattern": "^[0-9a-f]{7,40}$",
+   "description": "OPTIONAL (rev 3, pr_run records). PR head at test time."
+  },
+  "frozen_from": {
+   "type": [
+    "string",
+    "null"
+   ],
+   "description": "OPTIONAL (rev 3, pr_run records). Earlier attempt of the same run date that first selected this PR."
+  },
+  "state": {
+   "type": [
+    "string",
+    "null"
+   ],
+   "description": "OPTIONAL (rev 3, pr_run records). PR state at test time."
+  },
+  "mergeable": {
+   "type": [
+    "boolean",
+    "null"
+   ],
+   "description": "OPTIONAL (rev 3, pr_run records). GitHub mergeable flag."
+  },
+  "mergeable_state": {
+   "type": [
+    "string",
+    "null"
+   ],
+   "description": "OPTIONAL (rev 3, pr_run records). GitHub mergeable_state."
+  },
+  "schema_errors": {
+   "type": "array",
+   "description": "OPTIONAL (rev 3, pr_run records). Validation errors found by the runner when writing the record (should be absent)."
+  },
+  "changed_lines_total": {
+   "type": [
+    "integer",
+    "null"
+   ],
+   "minimum": 0,
+   "description": "OPTIONAL (rev 4, coverage gate). Changed or added executable lines in the PR's non-test Python files (coverage.py's executable lines, PR side). null = not measured."
+  },
+  "changed_lines_covered": {
+   "type": [
+    "integer",
+    "null"
+   ],
+   "minimum": 0,
+   "description": "OPTIONAL (rev 4, coverage gate). How many of changed_lines_total were executed by the PR side's test subset (one extra, untimed coverage run). null = not measured."
+  },
+  "coverage": {
+   "type": "object",
+   "description": "OPTIONAL (rev 4, coverage gate). Raw result of the coverage run: status (measured|failed|not needed|skipped), why, seconds, log, changed_lines_total, changed_lines_covered, files[{file, changed_lines_total, changed_lines_covered, note}].",
+   "properties": {
+    "status": {
+     "type": "string",
+     "enum": [
+      "measured",
+      "failed",
+      "not needed",
+      "skipped"
+     ]
+    }
+   }
+  },
+  "coverage_gate": {
+   "type": "object",
+   "description": "OPTIONAL (rev 4, coverage gate). What the coverage gate decided (poc/coverage_gate.py): kind (python|compiled|compiled+python|no-executable-change|unknown), changed (did it change the verdict), confidence (normal|lower|none), note.",
+   "properties": {
+    "kind": {
+     "type": "string",
+     "enum": [
+      "python",
+      "compiled",
+      "compiled+python",
+      "no-executable-change",
+      "unknown"
+     ]
+    },
+    "changed": {
+     "type": "boolean"
+    },
+    "confidence": {
+     "type": "string",
+     "enum": [
+      "normal",
+      "lower",
+      "none"
+     ]
+    },
+    "note": {
+     "type": "string"
+    }
+   }
+  },
+  "verdict_before_coverage_gate": {
+   "type": "string",
+   "enum": [
+    "verified",
+    "needs_attention",
+    "could_not_verify"
+   ],
+   "description": "OPTIONAL (rev 4, coverage gate). Verdict from the test comparison alone, before the coverage gate."
+  },
+  "reason_before_coverage_gate": {
+   "type": "string",
+   "description": "OPTIONAL (rev 4, coverage gate). Reason from the test comparison alone, before the coverage gate."
+  },
+  "chosen": {
+   "type": "object",
+   "description": "OPTIONAL (rev 3, pr_run records; renamed in rev 4). Chosen-PR entry (install/test commands) when the PR was chosen by name for the day."
   }
  },
- "description": "One JSON object per (upstream, old, new, dependent) tuple, one line in observations.jsonl and research/runs/<id>/record.json. Merged 2026-10-10 from Jonathan v1 (gates, accepted, network, report, stability, dependent_import) and Nathan guardrails/schema.py (hand_check, upstream_issue, machine_type, thread_env, per_run.collection_errors, per_run.pytest_summary). Cross-field rules not expressible here are listed in x-cross-field-rules and enforced by harness/brlib.py validate(). Revision 2 (2026-10-10, Nathan, from Jonathan's docs/REPORT_SPEC.md): adds OPTIONAL pr, claims, upstream_commit_old/new, per_test_outcomes, old_output, golden_check, reviewer_decision for the reviewer report. Purely additive: every rev 1 record stays valid, schema_version stays \"1\". hand_check and upstream_issue were already present (required, nullable) and are unchanged. Accepted schema_sha256 values for rev 1 and rev 2 are listed in harness/schema/README.md and guardrails/schema.py.",
+ "description": "One JSON object per (upstream, old, new, dependent) tuple, one line in observations.jsonl and research/runs/<id>/record.json. Merged 2026-10-10 from runner v1 (gates, accepted, network, report, stability, dependent_import) and guardrails/schema.py (hand_check, upstream_issue, machine_type, thread_env, per_run.collection_errors, per_run.pytest_summary). Cross-field rules not expressible here are listed in x-cross-field-rules and enforced by harness/brlib.py validate(). Revision 2 (2026-10-10, from docs/REPORT_SPEC.md): adds OPTIONAL pr, claims, upstream_commit_old/new, per_test_outcomes, old_output, golden_check, reviewer_decision for the reviewer report. Purely additive: every rev 1 record stays valid, schema_version stays \"1\". hand_check and upstream_issue were already present (required, nullable) and are unchanged. Accepted schema_sha256 values for rev 1 and rev 2 are listed in harness/schema/README.md and guardrails/schema.py.",
  "x-cross-field-rules": [
   "per_run has exactly runs_per_side entries for each side, and runs_per_side >= 3 when classification is not null",
   "classification is null only when accepted is false (the runner refused to classify)",
   "accepted is true only if every gate with required != false has pass == true",
   "env_diff is exactly [upstream==old_version, upstream==new_version] (or empty for an A/A control with old == new)",
-  "import_failure counts test MODULES, not tests; lost_tests are not counted as real_break"
+  "import_failure counts test MODULES, not tests; lost_tests are not counted as real_break",
+  "pr_run: runs_per_side counts completed runs (0 when the build failed); verdict is could_not_verify when runs_per_side < runs_per_side_planned",
+  "changed_lines_covered <= changed_lines_total when both are integers (rev 4)."
  ],
  "x-revisions": [
   {
    "rev": 1,
    "date": "2026-10-10",
-   "by": "Jonathan + Nathan",
    "change": "initial shared schema (feat/shared-schema ed75df4)"
   },
   {
    "rev": 2,
    "date": "2026-10-10",
-   "by": "Nathan",
    "change": "optional reviewer-report fields: pr, claims, upstream_commit_old, upstream_commit_new, per_test_outcomes, old_output, golden_check, reviewer_decision"
+  },
+  {
+   "rev": 3,
+   "date": "2026-10-10",
+   "change": "optional record kind 'pr_run' (record_kind field; Proof-of-Change PR runs from ops/daily_run.py). The v1 required list moved into the 'else' branch unchanged, so records without record_kind validate exactly as before; runs_per_side minimum 1 also moved there (pr_run allows 0). New keywords: if/then/else/const."
+  },
+  {
+   "rev": 4,
+   "date": "2026-10-10",
+   "change": "optional coverage-gate fields: changed_lines_total, changed_lines_covered, coverage, coverage_gate, verdict_before_coverage_gate, reason_before_coverage_gate. Nothing becomes required. Also: the optional chosen-PR property was renamed `chosen` (optional, so older records stay valid), descriptions and revision authors made neutral."
   }
- ]
+ ],
+ "if": {
+  "properties": {
+   "record_kind": {
+    "const": "pr_run"
+   }
+  },
+  "required": [
+   "record_kind"
+  ]
+ },
+ "then": {
+  "required": [
+   "schema_version",
+   "record_kind",
+   "id",
+   "date_ist",
+   "run_date",
+   "who",
+   "repo",
+   "pr",
+   "route",
+   "verdict",
+   "reason",
+   "files",
+   "machine_type",
+   "thread_env",
+   "python",
+   "runs_per_side",
+   "runs_per_side_planned",
+   "per_run",
+   "duration_s",
+   "network",
+   "posted_upstream",
+   "logs",
+   "tested_at_ist"
+  ],
+  "properties": {
+   "pr": {
+    "type": "object",
+    "required": [
+     "repo",
+     "number",
+     "url",
+     "head_sha"
+    ]
+   }
+  }
+ },
+ "else": {
+  "required": [
+   "accepted",
+   "classification",
+   "cpu_count",
+   "date_ist",
+   "dependent",
+   "dependent_version",
+   "duration_s",
+   "env_diff",
+   "expected",
+   "expected_class",
+   "gates",
+   "hand_check",
+   "host",
+   "id",
+   "logs",
+   "machine",
+   "machine_type",
+   "matches_expected",
+   "network",
+   "new_direct_url",
+   "new_version",
+   "new_version_requested",
+   "notes",
+   "old_version",
+   "per_run",
+   "pip_check_new",
+   "platform",
+   "python",
+   "report",
+   "run_timeout_s",
+   "runs_per_side",
+   "schema_version",
+   "subset_note",
+   "test_selection",
+   "test_source",
+   "test_timeout_s",
+   "thread_env",
+   "top_error_signatures_already_broken",
+   "top_error_signatures_breaks",
+   "upstream",
+   "upstream_issue",
+   "who",
+   "workers"
+  ],
+  "properties": {
+   "runs_per_side": {
+    "minimum": 1
+   }
+  }
+ }
 }
