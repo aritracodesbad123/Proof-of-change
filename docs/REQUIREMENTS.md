@@ -74,6 +74,47 @@ in the upstream; **3 alternating runs per side**; **single thread** (`OMP/OPENBL
 Its result becomes a finding like any other probe. **[ASSUMED]** It runs in the same Sandboxes checkpoints in
 production, and on the box or CI for the eval set until the Sandbox runner exists.
 
+## 4a. NVIDIA and Nebius stack
+
+Source: Jonathan's `blast-radius-research/docs/NVIDIA_NEBIUS_STACK.md`, based on the [hackathon rules](https://nebiusglobalaihackathon.devpost.com/rules) and spec §6. The README must name every NVIDIA model and Nebius service listed under Required.
+
+### Hard rule from the hackathon
+The project must run on Nebius Token Factory or Nebius AI Cloud **and** use at least one NVIDIA open model (Nemotron, GR00T, Cosmos or Sonic). The README must name every NVIDIA model and Nebius service used. Proof-of-Change meets this through the Nemotron models below, served on Token Factory.
+
+### Required (MVP)
+
+| Tool | Owner | What it does in Proof-of-Change | Pipeline step |
+|---|---|---|---|
+| **NVIDIA Nemotron 3 Super 120B** (`nvidia/nemotron-3-super-120b-a12b`) | NVIDIA, served on Token Factory | Reads the PR and extracts testable claims (JSON schema output); writes the probe scripts; writes the plain-language report summary, quoting real outputs only | 4, 5, 9 |
+| **NVIDIA Nemotron 3 Ultra 550B** (`nvidia/Nemotron-3-Ultra-550b-a55b`) | NVIDIA, served on Token Factory | Judges each main-vs-PR difference: proven, false, unmentioned, or needs a human, with a one-sentence reason | 8 |
+| **NVIDIA Nemotron 3.5 Lightning** (`nvidia/Nemotron-3_5-Lightning`), fallback **Nemotron 3 Nano 30B** (`nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B`) | NVIDIA, served on Token Factory | Cheap, fast work: working out how to install and test a repo, spotting new output noise patterns, short summaries | 1, 7 |
+| **Nebius Token Factory API** (OpenAI-compatible, structured output) | Nebius | Serves all the Nemotron models above | all model steps |
+| **Nebius Token Factory Sandboxes** (Contree SDK, beta) | Nebius | Builds main once and saves a checkpoint, forks it for the PR, and runs every probe and test suite on both sides in parallel, isolated. Beta limit: 50 operations at once | 2, 3, 6 |
+| **Nebius Serverless AI endpoint** | Nebius | Hosts the Proof-of-Change service: webhook/API, queue, orchestrator, run store, web report | 0, 9 |
+| **Nebius Serverless AI job** | Nebius | Batch runs: daily ops over all tracked libraries' open PRs, and offline evaluation replays | 10, daily ops |
+
+Model IDs must be confirmed at build time with `GET https://api.tokenfactory.nebius.com/v1/models`. Do not use Nemotron 3 Nano Omni: it was scheduled to leave Token Factory Serverless on 31 Aug 2026.
+
+### Recommended (strengthens guardrails and the pitch)
+
+| Tool | Why |
+|---|---|
+| **NVIDIA NemoClaw / OpenShell** | Runs the always-on ops agent (the daily PR-testing run) under an enforced policy: which hosts it may reach, which files it may touch, and no posting. This makes the "never posts upstream" guardrail enforced by the platform, not only by our code. Shown in the hackathon materials as NVIDIA's stack for private, always-on agents. |
+| **Contree MCP server** (Nebius Sandboxes) | Lets Cursor or Claude call Proof-of-Change sandboxes directly. Needed only for the MCP stretch goal. |
+| **Token Factory preloaded SWE environments** (SWE-bench Verified, SWE-rebench) | Ready-made environments to measure false alarms on known-good fixes. |
+
+### Optional, not NVIDIA
+- **Tavily** web search: fetch current docs or changelogs for a probe. Adds eligibility for the $3,000 Best Use of Tavily bonus (needs a live Tavily call at runtime).
+
+### Not needed for this project
+- NVIDIA Cosmos, GR00T, Sonic, Isaac and the Physical AI Workbench, and Jetson hardware. These are for the Physical AI track.
+- NVIDIA NIM and NeMo are not named in the hackathon materials, so we don't depend on them.
+
+### Open items
+1. Nebius API key and credits ($25 with code NEBIUS-DEVPOST-GLOBAL26, plus $25 through the Builders Program). Until then everything runs on our own machine, and records say `machine: box`.
+2. Whether credits cover a Serverless AI endpoint, and Ultra 550B call volume.
+3. Per-run network isolation in Sandboxes: not documented; ask Nebius.
+
 ## 5. Verdict rules (spec §6.7; implemented in `poc/verdict.py`)
 
 Per finding (behavior-map colour): **green** proven (or unchanged where "no change" was claimed); **red** false claim,
