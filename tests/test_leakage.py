@@ -118,3 +118,32 @@ def test_any_answer_key_csv_and_no_pr(tmp_path):
     with pytest.raises(LeakageError, match="phrase"):
         check_bundle(rel, leakage.fingerprints(key, skip_columns=("case", "outcome")))
     assert check_bundle({"text": {"release_notes": "Faster resample."}}, key)["ok"]
+
+
+@pytest.mark.parametrize("extra", [
+    {"pr_text": "fail with 'Unsupported handle scheme zebra'"},     # an answer under an unknown key
+    {"pr_text": "harmless"},                                         # unknown keys are refused even when clean
+    {"notes": ["widgets#4242"]},
+])
+def test_unknown_keys_are_refused(extra):
+    with pytest.raises(LeakageError, match="unexpected key"):
+        check_bundle(bundle() | extra, ANSWERS)
+
+
+def test_nested_text_values_are_scanned():
+    with pytest.raises(LeakageError, match="phrase"):
+        check_bundle(bundle(parts=["ok", {"deep": "fail with 'Unsupported handle scheme zebra'"}]), ANSWERS)
+    with pytest.raises(LeakageError, match="reference"):
+        check_bundle(bundle(parts={"see widgets#4242": "x"}), ANSWERS)    # keys are scanned too
+
+
+@pytest.mark.parametrize("bad", [{"text": "a string"}, {"files": ["a.py"]}, {"pr": 4100},
+                                 {"files": {"a.py": b"bytes"}}])
+def test_malformed_bundles_are_refused(bad):
+    with pytest.raises(LeakageError):
+        check_bundle(bundle() | bad, ANSWERS)
+
+
+def test_paraphrase_is_a_known_limit():
+    # documented limit: exact matching cannot catch a paraphrase of the answer
+    assert check_bundle(bundle(body="Subclasses that override the handle getter now break on zebra URLs."), ANSWERS)["ok"]

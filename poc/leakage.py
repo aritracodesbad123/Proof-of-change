@@ -22,8 +22,15 @@ any answer-key CSV.
   least 3 non-trivial words, or any quoted string of 3+ words (case and punctuation ignored). A file whose content
   is byte-identical to the base tree (base_root given) is exempt from the PHRASE rule only: it existed before the
   PR, so a match there is the library's own text, not a leak. URLs and references are still checked;
+* the bundle has any key other than "pr", "text" and "files" (an unknown key could carry text past the checks);
+  nested values under "text" are scanned string by string;
 * a file in the bundle exists only on the new side (in pr_files but not in base_files), or is missing from the old
   (base) tree when base_root is given.
+
+Limit: matching is EXACT (after normalising case, punctuation and spacing). A paraphrase of the answer ("the adapter
+no longer calls the overridable method" for "stopped calling the public, overridable get_connection()") is not
+caught. The firewall is a backstop; the real protection is that generator inputs are built only from PR text (or
+release notes trimmed to their own version) and old-side code, never from anything written after the change.
 
 The answer key is read only to build `Fingerprints`: SHA-256 hashes of the normalised terms. The plain text is not
 kept, not returned and never printed; a refusal names the rule, the bundle part and a short hash, not the term.
@@ -173,6 +180,24 @@ def scan_text(part: str, text: str, fp: Fingerprints, own: tuple | None, phrases
     return sorted(set(out))
 
 
+BUNDLE_KEYS = ("pr", "text", "files")
+
+
+def strings_in(value, where: str):
+    """Every string inside value (str, numbers, or nested lists/tuples/dicts, keys included), with its location."""
+    if isinstance(value, str):
+        yield where, value
+    elif isinstance(value, dict):
+        for k, v in value.items():
+            yield f"{where}.key", str(k)
+            yield from strings_in(v, f"{where}[{k}]")
+    elif isinstance(value, (list, tuple, set)):
+        for i, v in enumerate(value):
+            yield from strings_in(v, f"{where}[{i}]")
+    elif value is not None:
+        yield where, str(value)
+
+
 def check_bundle(bundle: dict, answers: str | Path | Fingerprints, base_files: set[str] | list[str] | None = None,
                  pr_files: set[str] | list[str] | None = None, base_root: str | Path | None = None) -> dict:
     """Raise LeakageError listing every problem; return {"ok": True, "checked": {...}} for a clean bundle.
@@ -180,14 +205,31 @@ def check_bundle(bundle: dict, answers: str | Path | Fingerprints, base_files: s
     side (a bundle file only on the PR side is refused). base_root: the base checkout; bundle files must exist there,
     and those identical to it are exempt from the phrase rule."""
     fp = answers if isinstance(answers, Fingerprints) else fingerprints(answers)
-    own = _own(bundle.get("pr"))
-    problems: list[str] = []
-    for k, v in sorted((bundle.get("text") or {}).items()):
-        problems += scan_text(f"text[{k}]", str(v or ""), fp, own)
+    if not isinstance(bundle, dict):
+        raise LeakageError("prompt bundle refused (answer-key firewall): a bundle must be a dict")
+    problems: list[str] = [f"{k!r}: unexpected key (allowed: {', '.join(BUNDLE_KEYS)}); nothing may reach a "
+                           "generator unchecked" for k in sorted(map(str, set(bundle) - set(BUNDLE_KEYS)))]
+    pr = bundle.get("pr")
+    if pr is not None and not isinstance(pr, str):
+        problems.append("'pr': must be a string such as owner/repo#123")
+    own = _own(pr if isinstance(pr, str) else None)
+    text = bundle.get("text") or {}
+    if not isinstance(text, dict):
+        problems.append("'text': must be a dict of named text parts")
+        text = {}
+    for k, v in sorted(text.items(), key=lambda kv: str(kv[0])):
+        for where, piece in strings_in(v, f"text[{k}]"):    # nested lists/dicts: every string is scanned
+            problems += scan_text(where, piece, fp, own)
+    if not isinstance(bundle.get("files") or {}, dict):
+        problems.append("'files': must be a dict of relative path -> content")
+        bundle = dict(bundle, files={})
     base_set = set(base_files) if base_files is not None else None
     pr_set = set(pr_files) if pr_files is not None else None
     exempt = []
     for rel, content in sorted((bundle.get("files") or {}).items()):
+        if not isinstance(rel, str) or not isinstance(content, str):
+            problems.append(f"files[{rel!r}]: path and content must be strings")
+            continue
         if ".." in Path(rel).parts or Path(rel).is_absolute():
             problems.append(f"files[{rel}]: path must be repo-relative")
             continue
