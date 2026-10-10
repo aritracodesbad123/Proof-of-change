@@ -13,7 +13,8 @@ Two files describe a benchmark:
 
 `check_bundle(bundle, answers, base_files=..., pr_files=..., base_root=...)` refuses a prompt bundle (PR text plus
 files) that contains any URL, issue or PR reference, or phrase from the answer key, or any file that exists only on
-the PR side. The answer key is turned into SHA-256 fingerprints first; refusals never print the matched text.
+the new side. It takes any answer-key CSV, and works for any old/new pair (a merge commit and its first parent, or two
+releases). The answer key is turned into SHA-256 fingerprints first; refusals never print the matched text.
 
 ```
 python -m poc.leakage fingerprint <answer-key.csv> --out fingerprints.json   # hashes only, no plain text
@@ -28,7 +29,8 @@ changed. It parses the probe; it never imports or runs it.
 
 ## Scorer (`evals/score_bench.py`, standard library only)
 
-Joins result files with the answer key on the case ID only. Reports regression recall, false-alarm rate,
+Joins result files with any answer key on a case ID only (`--id-column`, `--label-column`; defaults `id` and
+`label`; a result's case ID is its `bench.id`, `case.id` or `case_id`). Reports regression recall, false-alarm rate,
 abstention and precision with Wilson 95% intervals, and compares two baselines with an exact two-sided McNemar test
 on the paired regression cases.
 

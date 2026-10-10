@@ -78,3 +78,25 @@ def test_baselines_and_paired_comparison(tmp_path, capsys):
 def test_result_files_named_answers_are_ignored(tmp_path):
     _write(tmp_path, "answers-copy.json", "B01", "needs_attention")
     assert sb.read_results(tmp_path) == {}
+
+
+def test_generic_id_and_label_columns_and_any_case_ids(tmp_path):
+    key = tmp_path / "release-answers.csv"
+    key.write_text("case,outcome,notes\nR-numpy-2.3,regression,x\nR-pandas-3.0,safe,y\n")
+    ans = sb.read_answers(key, id_column="case", label_column="outcome")
+    assert ans == {"R-numpy-2.3": "pos", "R-pandas-3.0": "neg"}
+    res = tmp_path / "res"
+    res.mkdir()
+    (res / "a.json").write_text(json.dumps({"case_id": "R-numpy-2.3", "verdict": "needs_attention", "id": "run-1"}))
+    (res / "b.json").write_text(json.dumps({"case": {"id": "R-pandas-3.0"}, "verdict": "verified"}))
+    s = sb.score(ans, sb.read_results(res))
+    assert s["regression_recall"]["k"] == 1 and s["false_alarm_rate"]["k"] == 0
+    with pytest.raises(ValueError, match="no column"):
+        sb.read_answers(key)                       # default id/label columns are not there
+    assert sb.main(["--answers", str(key), "--id-column", "case", "--label-column", "outcome",
+                    "--results", str(res)]) == 0
+
+
+def test_record_run_id_is_not_a_case_id(tmp_path):
+    (tmp_path / "r.json").write_text(json.dumps({"id": "B01", "verdict": "needs_attention"}))
+    assert sb.read_results(tmp_path) == {}

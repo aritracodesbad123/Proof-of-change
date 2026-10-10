@@ -109,3 +109,12 @@ def test_fingerprints_hold_no_plain_text_and_round_trip(tmp_path):
 def test_generic_phrases_are_not_refused():
     # common words shared with the answer key ('the', 'with', 'now') do not form a 5-word phrase with 3 content words
     assert check_bundle(bundle(body="Now the pool is picked with the settings of the handle."), ANSWERS)["ok"]
+
+
+def test_any_answer_key_csv_and_no_pr(tmp_path):
+    key = tmp_path / "release-answers.csv"
+    key.write_text("case,outcome,what_broke\nR1,regression,Calling resample with closed equals left drops the final bin\n")
+    rel = {"text": {"release_notes": "Faster resample. calling resample with closed equals left drops the final bin."}}
+    with pytest.raises(LeakageError, match="phrase"):
+        check_bundle(rel, leakage.fingerprints(key, skip_columns=("case", "outcome")))
+    assert check_bundle({"text": {"release_notes": "Faster resample."}}, key)["ok"]

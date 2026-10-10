@@ -3,10 +3,15 @@
 A prompt bundle is everything a probe or claim generator is about to see:
 
     bundle = {
-        "pr": "owner/repo#123",                 # the PR the bundle is for (its own URL and number are allowed)
-        "text": {"title": "...", "body": "...", "instructions": "..."},   # free text, any keys
-        "files": {"pkg/mod.py": "<content>"},  # repository files, repo-relative paths
+        "pr": "owner/repo#123",                 # optional: the PR the bundle is for (its own URL/number are allowed)
+        "text": {"title": "...", "body": "...", "instructions": "..."},   # free text, any keys (PR text,
+                                                                         # release notes, ...)
+        "files": {"pkg/mod.py": "<content>"},  # source files, relative paths
     }
+
+Nothing here assumes a PR merge commit or a particular benchmark: "base" means the OLD side (merge first parent,
+base branch, or an old release) and "PR side" the NEW side (merge commit, PR head, or a new release); `answers` is
+any answer-key CSV.
 
 `check_bundle(bundle, answers, base_files=..., pr_files=..., base_root=...)` raises `LeakageError` when:
 
@@ -17,8 +22,8 @@ A prompt bundle is everything a probe or claim generator is about to see:
   least 3 non-trivial words, or any quoted string of 3+ words (case and punctuation ignored). A file whose content
   is byte-identical to the base tree (base_root given) is exempt from the PHRASE rule only: it existed before the
   PR, so a match there is the library's own text, not a leak. URLs and references are still checked;
-* a file in the bundle exists only on the PR side (in pr_files but not in base_files), or is missing from the base
-  tree when base_root is given.
+* a file in the bundle exists only on the new side (in pr_files but not in base_files), or is missing from the old
+  (base) tree when base_root is given.
 
 The answer key is read only to build `Fingerprints`: SHA-256 hashes of the normalised terms. The plain text is not
 kept, not returned and never printed; a refusal names the rule, the bundle part and a short hash, not the term.
@@ -38,7 +43,7 @@ from pathlib import Path
 
 SHINGLE = 5
 MIN_CONTENT_WORDS = 3
-ID_COL, LABEL_COL = "id", "label"
+SKIP_COLUMNS = ("id", "label")   # a case ID such as B01 and a label such as 'regression' are not secrets
 STOP = frozenset("""a an and are as at be been but by can could did do does for from had has have if in into is it its
 of on or so such than that the their then there these this those to was were will with would not no""".split())
 URL_RE = re.compile(r"https?://[^\s<>\"'`;,)\]]+", re.I)
@@ -96,14 +101,14 @@ def _ref_keys(owner: str, repo: str, n: str) -> list[str]:
     return [f"{o}/{r}#{n}", f"{r}#{n}", f"issues/{n}@{o}/{r}", f"pull/{n}@{o}/{r}", f"#{n}@{o}/{r}"]
 
 
-def fingerprints(answers_csv: str | Path) -> Fingerprints:
-    """Hash every URL, issue/PR reference and phrase of the answer key. The id and label columns are skipped (an ID
-    such as B01 and a label such as 'regression' are not secrets)."""
+def fingerprints(answers_csv: str | Path, skip_columns: tuple[str, ...] = SKIP_COLUMNS) -> Fingerprints:
+    """Hash every URL, issue/PR reference and phrase of any answer-key CSV (benchmark, release pairs, ...). Every
+    column is read except skip_columns (by default the case ID and label columns)."""
     fp = Fingerprints(source=Path(answers_csv).name)
     with open(answers_csv, newline="") as fh:
         for row in csv.DictReader(fh):
             for col, val in row.items():
-                if col in (ID_COL, LABEL_COL) or not val:
+                if col is None or col in skip_columns or not val:
                     continue
                 for u in URL_RE.findall(val):
                     fp.urls.add(_h(norm_url(u)))

@@ -1,11 +1,14 @@
-"""Benchmark scorer (stdlib only): joins result files with the answer key ON ID ONLY and reports recall, false-alarm
-rate and abstention with Wilson 95% intervals, plus an exact McNemar test for two systems on the same cases.
+"""Benchmark scorer (stdlib only): joins result files with an answer key ON A CASE ID ONLY and reports recall,
+false-alarm rate and abstention with Wilson 95% intervals, plus an exact McNemar test for two systems on the same
+cases.
 
-This is the ONLY module that reads the answer key (`*answers*.csv`, columns id,label,...). Nothing it reads from the
-answer key is passed back to a generator: it prints aggregate numbers and per-ID outcomes only.
+Generic: any answer-key CSV with an ID column (default `id`, `--id-column`) and a label column (default `label`,
+`--label-column`); any case IDs (B01, R-numpy-2.3, ...). It is the ONLY module that reads an answer key. Nothing it
+reads from the key is passed back to a generator: it prints aggregate numbers and per-ID outcomes only.
 
-Result files: one JSON per case and baseline, as written by benchmark mode (`ops/daily_run.py --bench`). A result
-counts by its `bench.id` (falling back to an `id` field of the form B01) and its `verdict`:
+Result files: one JSON per case and baseline (benchmark mode, `ops/daily_run.py --bench`, or any other mode that
+writes the same fields). A result counts by its case ID, taken from the first of `bench.id`, `case.id`, `case_id`
+that is set (never from repo or PR fields), and by its `verdict`:
 
     needs_attention   -> flagged
     verified          -> not flagged
@@ -27,7 +30,7 @@ import sys
 from pathlib import Path
 
 Z95 = 1.959963984540054
-ID_RE = re.compile(r"^B\d{2,}$")
+ID_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.:-]*$")
 FLAGGED, CLEAN, ABSTAIN = "needs_attention", "verified", "could_not_verify"
 
 
@@ -60,12 +63,16 @@ def pct(x: float) -> str:
     return f"{100 * x:.1f}%"
 
 
-def read_answers(path: str | Path) -> dict[str, str]:
-    """{id: 'pos' | 'neg'} from the answer key. Only the id and label columns are used."""
+def read_answers(path: str | Path, id_column: str = "id", label_column: str = "label") -> dict[str, str]:
+    """{case id: 'pos' | 'neg'} from an answer key. Only the ID and label columns are used."""
     out = {}
     with open(path, newline="") as fh:
-        for row in csv.DictReader(fh):
-            rid, label = (row.get("id") or "").strip(), (row.get("label") or "").strip().lower()
+        rd = csv.DictReader(fh)
+        missing = [c for c in (id_column, label_column) if c not in (rd.fieldnames or [])]
+        if missing:
+            raise ValueError(f"{Path(path).name}: no column(s) {', '.join(missing)}")
+        for row in rd:
+            rid, label = (row.get(id_column) or "").strip(), (row.get(label_column) or "").strip().lower()
             if not ID_RE.match(rid):
                 continue
             if label.startswith("regression"):
@@ -76,7 +83,8 @@ def read_answers(path: str | Path) -> dict[str, str]:
 
 
 def result_id(rec: dict) -> str | None:
-    rid = (rec.get("bench") or {}).get("id") or rec.get("id")
+    """The case ID of a result: bench.id, case.id or case_id (the record's own `id` is a run id, not a case id)."""
+    rid = (rec.get("bench") or {}).get("id") or (rec.get("case") or {}).get("id") or rec.get("case_id")
     return rid if isinstance(rid, str) and ID_RE.match(rid) else None
 
 
@@ -147,13 +155,15 @@ def table(name: str, s: dict) -> str:
 
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--answers", required=True, help="the answer key CSV (id,label,...); read by this scorer only")
+    ap.add_argument("--answers", required=True, help="an answer-key CSV (ID and label columns); read by this scorer only")
+    ap.add_argument("--id-column", default="id", help="answer-key column holding the case ID (default: id)")
+    ap.add_argument("--label-column", default="label", help="answer-key column holding the label (default: label)")
     ap.add_argument("--results", required=True, help="folder of result JSON files (one per case and baseline)")
     ap.add_argument("--baseline", default=None, help="score only results of this baseline")
     ap.add_argument("--vs", default=None, help="second baseline in the same folder: paired exact McNemar test")
     ap.add_argument("--json", default=None, help="also write the numbers to this JSON file")
     a = ap.parse_args(argv)
-    answers = read_answers(a.answers)
+    answers = read_answers(a.answers, a.id_column, a.label_column)
     res = read_results(a.results, a.baseline)
     s = score(answers, res)
     out = {"baseline": a.baseline, "score": s}

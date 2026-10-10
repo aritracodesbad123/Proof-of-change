@@ -12,7 +12,8 @@ the code the PR changed. Checked on the parsed AST (the probe is never imported 
     no processes    no import of subprocess, multiprocessing, pty; no os.system / os.popen / os.exec* / os.spawn* /
                     os.fork* / os.posix_spawn*
     no writes out   no open(<absolute literal path outside /tmp>, <write mode>)
-    relevant        imports at least one changed module of the PR, or a package on the path to one
+    relevant        imports at least one changed module, or a package on the path to one (changed_files is any
+                    list of paths that differ between the old and new side: a PR diff, or two releases)
                     (`from mlxtend.evaluate import x` is relevant to mlxtend/evaluate/feature_importance.py)
 
 `lint(src, changed_files)` returns {"ok", "problems": [{"rule", "line", "detail"}], "imports",
