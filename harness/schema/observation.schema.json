@@ -1,7 +1,7 @@
 {
  "$schema": "https://json-schema.org/draft/2020-12/schema",
  "$id": "blast-radius/observation/v1",
- "title": "Blast Radius observation record v1, revision 5 (shared by the downstream-test runner br_run.py and harness/run.py, plus Proof-of-Change PR runs)",
+ "title": "Blast Radius observation record v1, revision 6 (shared by the downstream-test runner br_run.py and harness/run.py, plus Proof-of-Change PR runs)",
  "type": "object",
  "properties": {
   "schema_version": {
@@ -962,7 +962,7 @@
   },
   "coverage_gate": {
    "type": "object",
-   "description": "OPTIONAL (rev 4, coverage gate). What the coverage gate decided (poc/coverage_gate.py): kind (python|compiled|compiled+python|no-executable-change|unknown), changed (did it change the verdict), confidence (normal|lower|none), note.",
+   "description": "OPTIONAL (rev 4, coverage gate). What the coverage gate decided (poc/coverage_gate.py): kind (python|compiled|compiled+python|no-executable-change|unknown), changed (did it change the verdict), confidence (normal|lower|none), note. Rev 6 adds measurement: measured | not measured: predates gate | not measured | not needed.",
    "properties": {
     "kind": {
      "type": "string",
@@ -987,6 +987,15 @@
     },
     "note": {
      "type": "string"
+    },
+    "measurement": {
+     "type": "string",
+     "enum": [
+      "measured",
+      "not measured: predates gate",
+      "not measured",
+      "not needed"
+     ]
     }
    }
   },
@@ -1203,6 +1212,380 @@
      }
     }
    }
+  },
+  "probes": {
+   "type": "object",
+   "required": [
+    "status",
+    "items"
+   ],
+   "description": "OPTIONAL (rev 6). Probes run on both sides of a PR (poc/probes.py): small deterministic scripts whose JSON observations are compared by plain code. status none = the PR has no probe.",
+   "properties": {
+    "status": {
+     "type": "string",
+     "enum": [
+      "ran",
+      "none",
+      "error"
+     ]
+    },
+    "items": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "required": [
+       "id",
+       "source",
+       "target",
+       "claims",
+       "runs_per_side",
+       "observations"
+      ],
+      "properties": {
+       "id": {
+        "type": "string",
+        "minLength": 1
+       },
+       "source": {
+        "type": "string",
+        "enum": [
+         "library",
+         "model"
+        ],
+        "description": "library: a fixed probe from probes/<owner>/<repo>/<pr>.py; model: a model-written probe"
+       },
+       "path": {
+        "type": [
+         "string",
+         "null"
+        ]
+       },
+       "sha256": {
+        "type": [
+         "string",
+         "null"
+        ],
+        "pattern": "^[0-9a-f]{64}$"
+       },
+       "target": {
+        "type": "string",
+        "minLength": 1
+       },
+       "about": {
+        "type": "string"
+       },
+       "claims": {
+        "type": "array",
+        "items": {
+         "type": "object",
+         "required": [
+          "id",
+          "text",
+          "covers",
+          "expect"
+         ],
+         "properties": {
+          "id": {
+           "type": "string",
+           "minLength": 1
+          },
+          "source": {
+           "type": "string"
+          },
+          "text": {
+           "type": "string",
+           "minLength": 1
+          },
+          "covers": {
+           "type": "array",
+           "items": {
+            "type": "string",
+            "minLength": 1
+           },
+           "description": "fnmatch patterns over observation names"
+          },
+          "expect": {
+           "type": "string",
+           "enum": [
+            "same",
+            "differs"
+           ],
+           "description": "What the claim says about main vs PR for the covered observations."
+          }
+         }
+        }
+       },
+       "runs_per_side": {
+        "type": "integer",
+        "minimum": 1
+       },
+       "per_run": {
+        "type": "array",
+        "items": {
+         "type": "object",
+         "required": [
+          "side",
+          "run"
+         ],
+         "properties": {
+          "side": {
+           "type": "string",
+           "enum": [
+            "main",
+            "pr"
+           ]
+          },
+          "run": {
+           "type": "integer",
+           "minimum": 1
+          },
+          "seconds": {
+           "type": [
+            "number",
+            "null"
+           ]
+          },
+          "ok": {
+           "type": "boolean"
+          }
+         }
+        }
+       },
+       "outputs": {
+        "type": "object",
+        "properties": {
+         "main": {
+          "type": "array",
+          "items": {
+           "type": "string"
+          }
+         },
+         "pr": {
+          "type": "array",
+          "items": {
+           "type": "string"
+          }
+         }
+        },
+        "description": "Saved output files (one observation per line), relative to the PR's run folder"
+       },
+       "runs": {
+        "type": "object",
+        "required": [
+         "main",
+         "pr"
+        ],
+        "properties": {
+         "main": {
+          "type": "array",
+          "items": {
+           "type": "object"
+          }
+         },
+         "pr": {
+          "type": "array",
+          "items": {
+           "type": "object"
+          }
+         }
+        },
+        "description": "Recorded observations of every run, {name: value} per run, so results can be re-judged without the environments"
+       },
+       "observations": {
+        "type": "array",
+        "items": {
+         "type": "object",
+         "required": [
+          "name",
+          "state",
+          "label"
+         ],
+         "properties": {
+          "name": {
+           "type": "string",
+           "minLength": 1
+          },
+          "state": {
+           "type": "string",
+           "enum": [
+            "same",
+            "differs",
+            "flaky"
+           ],
+           "description": "poc.diff.confirm over the runs of both sides."
+          },
+          "label": {
+           "type": "string",
+           "enum": [
+            "proven",
+            "false_claim",
+            "unmentioned",
+            "needs_human",
+            "flaky",
+            "not_testable",
+            "no_difference"
+           ],
+           "description": "poc.verdict.FindingLabel value (see poc/probes.py for the rules)."
+          },
+          "claim": {
+           "type": [
+            "string",
+            "null"
+           ],
+           "description": "id of the claim that covers this observation, null if none does"
+          },
+          "main": {
+           "description": "value on main (first run)"
+          },
+          "pr": {
+           "description": "value on the PR (first run)"
+          },
+          "diffs": {
+           "type": "array",
+           "items": {
+            "type": "object",
+            "required": [
+             "field"
+            ],
+            "properties": {
+             "field": {
+              "type": "string"
+             }
+            }
+           },
+           "description": "poc.diff.compare field-level differences (field relative to the observation value)"
+          },
+          "citations": {
+           "type": "object",
+           "properties": {
+            "main": {
+             "type": [
+              "object",
+              "null"
+             ],
+             "required": [
+              "file",
+              "line",
+              "quote"
+             ],
+             "properties": {
+              "file": {
+               "type": "string",
+               "minLength": 1
+              },
+              "line": {
+               "type": "integer",
+               "minimum": 1
+              },
+              "quote": {
+               "type": "string",
+               "minLength": 1
+              }
+             }
+            },
+            "pr": {
+             "type": [
+              "object",
+              "null"
+             ],
+             "required": [
+              "file",
+              "line",
+              "quote"
+             ],
+             "properties": {
+              "file": {
+               "type": "string",
+               "minLength": 1
+              },
+              "line": {
+               "type": "integer",
+               "minimum": 1
+              },
+              "quote": {
+               "type": "string",
+               "minLength": 1
+              }
+             }
+            }
+           },
+           "description": "Line of the observation in the saved probe output of run 1 of each side."
+          }
+         }
+        }
+       }
+      }
+     }
+    },
+    "summary": {
+     "type": "object",
+     "properties": {
+      "labels": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "enum": [
+         "proven",
+         "false_claim",
+         "unmentioned",
+         "needs_human",
+         "flaky",
+         "not_testable",
+         "no_difference"
+        ]
+       }
+      },
+      "flagged": {
+       "type": "array",
+       "items": {
+        "type": "object"
+       }
+      },
+      "proven_claims": {
+       "type": "array",
+       "items": {
+        "type": "string"
+       }
+      },
+      "reason": {
+       "type": "string"
+      }
+     }
+    },
+    "errors": {
+     "type": "array",
+     "items": {
+      "type": "string"
+     }
+    }
+   }
+  },
+  "behaviour_claims": {
+   "type": "array",
+   "description": "OPTIONAL (rev 6). Behaviour-preservation claims found in the PR title or description (poc/behaviour_claims.py), each {source, quote, pattern}. Without a probe whose claims expect 'same', a verified PR with such a claim becomes could_not_verify.",
+   "items": {
+    "type": "object",
+    "required": [
+     "source",
+     "quote",
+     "pattern"
+    ],
+    "properties": {
+     "source": {
+      "type": "string",
+      "enum": [
+       "title",
+       "PR description"
+      ]
+     },
+     "quote": {
+      "type": "string"
+     },
+     "pattern": {
+      "type": "string"
+     }
+    }
+   }
   }
  },
  "description": "One JSON object per (upstream, old, new, dependent) tuple, one line in observations.jsonl and research/runs/<id>/record.json. Merged 2026-10-10 from runner v1 (gates, accepted, network, report, stability, dependent_import) and guardrails/schema.py (hand_check, upstream_issue, machine_type, thread_env, per_run.collection_errors, per_run.pytest_summary). Cross-field rules not expressible here are listed in x-cross-field-rules and enforced by harness/brlib.py validate(). Revision 2 (2026-10-10, from docs/REPORT_SPEC.md): adds OPTIONAL pr, claims, upstream_commit_old/new, per_test_outcomes, old_output, golden_check, reviewer_decision for the reviewer report. Purely additive: every rev 1 record stays valid, schema_version stays \"1\". hand_check and upstream_issue were already present (required, nullable) and are unchanged. Accepted schema_sha256 values for rev 1 and rev 2 are listed in harness/schema/README.md and guardrails/schema.py.",
@@ -1240,6 +1623,11 @@
    "rev": 5,
    "date": "2026-10-10",
    "change": "optional record kind 'verification' with one new optional property 'verification' (checker, target, verdict_under_review, checker_verdict, check_status, evidence; no top-level verdict). The rev 3/4 'else' branch (observation records) moved unchanged one level down into a nested if/then/else, so observation and pr_run records validate exactly as before. Keywords unchanged (if/then/else/const/enum/type)."
+  },
+  {
+   "rev": 6,
+   "date": "2026-10-10",
+   "change": "optional pr_run properties `probes` (probe results: claims, recorded runs, per-observation state, label, field differences and citations) and `behaviour_claims` (behaviour-preservation claims quoted from the PR title or description), and optional coverage_gate.measurement (measured | not measured: predates gate | not measured | not needed). Nothing becomes required; rev 1-5 records stay valid."
   }
  ],
  "if": {

@@ -103,6 +103,21 @@ def _fmt(cov: dict) -> str:
     return f"{h} of {t} changed executable line(s) ran ({round(100 * h / t)}%)" if t else "no changed executable lines"
 
 
+MEASUREMENTS = ("measured", "not measured: predates gate", "not measured", "not needed")
+
+
+def measurement(rec: dict, has_python: bool = True) -> str:
+    """Where the coverage numbers come from: 'measured' (a real coverage.py run of the PR side), 'not measured:
+    predates gate' (the record was made before the coverage gate existed; there is no run at all), 'not measured'
+    (the run was skipped or failed; see coverage.why), 'not needed' (no changed Python lines)."""
+    cov = rec.get("coverage")
+    if cov and cov.get("status") == "measured":
+        return "measured"
+    if not has_python or (cov or {}).get("status") == "not needed":
+        return "not needed"
+    return "not measured" if cov else "not measured: predates gate"
+
+
 def assess(rec: dict) -> dict:
     """The gate's view of one record: kind, measured numbers, verdict to use, note, confidence."""
     files = rec.get("files")
@@ -110,6 +125,7 @@ def assess(rec: dict) -> dict:
     base_reason = rec.get("reason_before_coverage_gate", rec.get("reason", ""))
     if not isinstance(files, dict) or "all" not in files:
         return {"kind": "unknown", "verdict": base, "reason": base_reason, "changed": False, "confidence": "normal",
+                "measurement": measurement(rec),
                 "changed_lines_total": None, "changed_lines_covered": None, "python_files": [], "compiled_files": [],
                 "note": "the record does not list the changed files, so the coverage gate could not be applied"}
     py, comp = python_sources(files), compiled_sources(files)
@@ -130,10 +146,13 @@ def assess(rec: dict) -> dict:
     else:
         g["kind"] = "no-executable-change"
         notes.append("no executable code changed (docs, tests or config only), so there was nothing to cover")
+    g["measurement"] = measurement(rec, bool(py))
     if py:
         if not measured:
-            notes.append("coverage of the changed Python lines was not measured"
-                         + (f" ({cov['why']})" if cov.get("why") else " (record predates the coverage gate)"))
+            notes.append("coverage of the changed Python lines was NOT MEASURED"
+                         + (f" ({cov['why']})" if cov.get("why") else
+                            " (record predates the coverage gate: no coverage run exists for it, so this is not a "
+                            "measurement result)"))
             g["confidence"] = "lower"
         elif not cov.get("changed_lines_total"):
             notes.append("the changed Python lines are not executable (comments, docstrings, blank lines)")
@@ -163,5 +182,5 @@ def apply(rec: dict) -> dict:
     out.setdefault("reason_before_coverage_gate", rec.get("reason", ""))
     out["verdict"], out["reason"] = g["verdict"], g["reason"]
     out["changed_lines_total"], out["changed_lines_covered"] = g["changed_lines_total"], g["changed_lines_covered"]
-    out["coverage_gate"] = {k: g[k] for k in ("kind", "changed", "confidence", "note")}
+    out["coverage_gate"] = {k: g[k] for k in ("kind", "changed", "confidence", "note", "measurement")}
     return out

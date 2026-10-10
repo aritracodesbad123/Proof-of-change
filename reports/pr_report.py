@@ -187,8 +187,11 @@ def checks(rec: dict) -> list[list]:
             st, fix = "WARN", "Ask for (or add) a test that calls the changed compiled module, or review it by hand."
         elif g.get("changed"):
             st, fix = "WARN", "Widen the test mapping, or ask the author for a test that runs the changed lines."
-        elif g.get("confidence") == "lower" and "not measured" in note:
-            st, fix = "WARN", "Run the check again with the current ops/daily_run.py to measure it."
+        elif "predates the coverage gate" in note:
+            st, fix = "WARN", ("Not a measurement: this record is older than the coverage gate. Re-run the PR with the "
+                               "current ops/daily_run.py to measure it.")
+        elif g.get("confidence") == "lower" and "NOT MEASURED" in note.upper():
+            st, fix = "WARN", "The coverage run did not produce data (see coverage.why); run the check again."
         elif g.get("confidence") == "lower":
             st, fix = "WARN", "Under half of the changed lines ran: ask for a test that covers the rest."
         else:
@@ -202,6 +205,18 @@ def checks(rec: dict) -> list[list]:
                         ("unchanged tests skipped on both sides: " + ", ".join(f"{m} ({n})" for m, n in unchanged.items()))
                         if unchanged else ""] if x),
                     "Add the module(s) to optional_test_deps for this library in ops/daily_run.py and run again."])
+    p = rec.get("probes")
+    if p:
+        its = p.get("items") or []
+        bad = [f"{it['id']} {x['side']}#{x['run']}" for it in its for x in it.get("per_run", []) if not x.get("ok", True)]
+        if p.get("status") == "none":
+            out.append(["Probes ran on both sides", "SKIP", "no probe for this PR", ""])
+        elif p.get("status") == "error" or bad:
+            out.append(["Probes ran on both sides", "WARN", "; ".join(p.get("errors", []) + bad[:3]) or "probe error",
+                        "Read the probe-*.log files; a probe that cannot run is not evidence either way."])
+        else:
+            out.append(["Probes ran on both sides", "PASS", f"{len(its)} probe(s), "
+                        f"{its[0].get('runs_per_side', 3)} alternating runs per side, every run printed its observations", ""])
     te = rec.get("thread_env") or {}
     ok = bool(te) and all(v == "1" for v in te.values())
     out.append(["Single-thread environment", "PASS" if ok else "FAIL", ", ".join(f"{k}={v}" for k, v in te.items()) or "not recorded",
@@ -278,6 +293,10 @@ def claims(rec: dict, logs: Logs) -> list[dict]:
                          evidence=(f"{len(broke)} test(s) fail on the PR, e.g. {broke[0]}" if broke else
                                    f"no test that passes on main fails on the PR ({c.get('same', 0)} unchanged, 3 runs per side)"),
                          citation=logs.test_line(broke[0]) if broke else summ))
+    prows = probe_claim_rows(rec)
+    if any(r["id"].startswith("P-") for r in prows):
+        rows = rows[1:]   # the PR's claims are checked by the probe rows; drop the 'title: not testable' placeholder
+    rows += prows
     for key, label, kind in CATEGORIES:
         items = c.get(key) or []
         if not items or key == "fixed":
@@ -291,6 +310,95 @@ def claims(rec: dict, logs: Logs) -> list[dict]:
     return rows
 
 
+# ---------------------------------------------------------------- probes
+PROBE_STATUS = {"proven": "proven", "false_claim": "false", "needs_human": "not observed", "flaky": "flaky",
+                "unmentioned": "unmentioned change", "not_testable": "not testable", "no_difference": "proven"}
+PROBE_RESULT = {"proven": ("green", "as claimed"), "no_difference": ("green", "same on both sides"),
+                "false_claim": ("red", "contradicts the claim"), "unmentioned": ("amber", "differs, not in the PR description"),
+                "needs_human": ("amber", "no change although the claim says it changes"),
+                "flaky": ("amber", "flaky between runs"), "not_testable": ("grey", "probe could not run")}
+LABEL_RANK = ["false_claim", "flaky", "needs_human", "not_testable", "proven", "no_difference"]
+
+
+def probe_items(rec: dict) -> list[dict]:
+    return (rec.get("probes") or {}).get("items") or []
+
+
+def num(v):
+    return round(v, 6) if isinstance(v, float) else [num(x) for x in v] if isinstance(v, list) else (
+        {k: num(x) for k, x in v.items()} if isinstance(v, dict) else v)
+
+
+def short(v, n: int = 90) -> str:
+    t = json.dumps(num(v), sort_keys=True)
+    return t if len(t) <= n else t[:n - 3] + "..."
+
+
+def observed(o: dict) -> str:
+    """What the probe saw, in one line: the field-level differences, or the shared value."""
+    if o["state"] == "same":
+        return f"same on both sides: `{short(o['main'])}`"
+    ds = o.get("diffs") or []
+    return "; ".join(f"`{d['field'] or 'value'}`: {short(d.get('main'), 40)} -> {short(d.get('pr'), 40)}" for d in ds[:4]) + (
+        f" (+{len(ds) - 4} more)" if len(ds) > 4 else "")
+
+
+def probe_claim_rows(rec: dict) -> list[dict]:
+    """Claims-table rows from the probes: one per claim a probe checks, and one per difference no claim covers."""
+    rows = []
+    for it in probe_items(rec):
+        for cl in it.get("claims", []):
+            obs = [o for o in it["observations"] if o.get("claim") == cl["id"]]
+            if not obs:
+                rows.append(dict(id=f"P-{cl['id']}", text=cl["text"], source=cl.get("source", "probe"), status="not testable",
+                                 evidence=f"probe {it['id']} has no observation for this claim", citation=None))
+                continue
+            worst = min(obs, key=lambda o: LABEL_RANK.index(o["label"]) if o["label"] in LABEL_RANK else 0)
+            rows.append(dict(id=f"P-{cl['id']}", text=cl["text"], source=cl.get("source", "probe"),
+                             status=PROBE_STATUS[worst["label"]],
+                             evidence=f"probe {it['id']}, {worst['name']}: {observed(worst)}",
+                             citation=(worst.get("citations") or {}).get("pr")))
+        for o in it["observations"]:
+            if o["label"] == "unmentioned":
+                rows.append(dict(id="-", text="Change not in the PR description", source=f"probe {it['id']}",
+                                 status="unmentioned change", evidence=f"{o['name']}: {observed(o)}",
+                                 citation=(o.get("citations") or {}).get("pr")))
+    return rows
+
+
+def probes_section(R, rec: dict, rel) -> list[dict]:
+    """The 'Probes' section. Returns the citations shown (for the citation check)."""
+    p = rec.get("probes")
+    R.h(2, "Probes", "probes")
+    if not p:
+        R.p("This record predates probes.")
+        return []
+    items = probe_items(rec)
+    if not items:
+        R.p("No probe exists for this PR (probes/<owner>/<repo>/<pr>.py), so only the tests were compared."
+            + (" Probe errors: " + "; ".join(p.get("errors", [])) if p.get("errors") else ""))
+        return []
+    R.p("A probe is a small deterministic script run on both sides in the same environments as the tests, "
+        f"{items[0].get('runs_per_side', 3)} alternating runs per side. It prints JSON observations; plain code "
+        "(poc/diff.py) compares them. A difference that no claim of the PR covers needs attention.", "meta")
+    cits = []
+    for it in items:
+        R.p(f"**{it['id']}** ({'fixed probe' if it.get('source') == 'library' else 'model-written probe'}"
+            + (f", `{it['path']}`" if it.get("path") else "") + f"): {it.get('about', '')}")
+        if it.get("claims"):
+            R.bullets([f"P-{c['id']} ({c.get('source', 'claim')}): {c['text']} Expects the covered observations to "
+                       f"{'differ' if c['expect'] == 'differs' else 'stay the same'}." for c in it["claims"]])
+        rows = []
+        for o in it["observations"]:
+            colour, txt = PROBE_RESULT.get(o["label"], ("grey", o["label"]))
+            cm, cp = (o.get("citations") or {}).get("main"), (o.get("citations") or {}).get("pr")
+            cits += [cm, cp]
+            rows.append([f"`{o['name']}`", f"P-{o['claim']}" if o.get("claim") else "-", badge(colour, txt), observed(o),
+                         cite_text(cm, rel) + "<br>" + cite_text(cp, rel)])
+        R.table(["Observation", "Claim", "Result", "What the probe saw (main -> PR)", "Log lines (main, PR)"], rows)
+    return cits
+
+
 # ---------------------------------------------------------------- build
 def build(rec: dict, prdir: Path, out_dir: Path, decision: dict | None = None) -> tuple[Report, dict]:
     rec = normalize(rec, prdir.name) | {"_prdir": str(prdir)}
@@ -301,6 +409,11 @@ def build(rec: dict, prdir: Path, out_dir: Path, decision: dict | None = None) -
     cstat, cdetail = verify([r["citation"] for r in rows], prdir)
     chk.append(["Every claim cites a real log line", cstat, cdetail,
                 "" if cstat in ("PASS", "SKIP") else "Regenerate the report; if it persists, the logs were edited or truncated."])
+    probe_cits = [c for it in probe_items(rec) for o in it["observations"] for c in (o.get("citations") or {}).values()]
+    pstat, pdetail = verify(probe_cits, prdir) if probe_cits else ("SKIP", "")
+    if probe_cits:
+        chk.append(["Every probe observation cites its output line", pstat, pdetail,
+                    "" if pstat in ("PASS", "SKIP") else "Regenerate the report; the probe outputs were edited or are missing."])
     d = decide(rec, chk)
     pr_ref = f"{rec['repo']}#{rec['pr']}"
     subject = f"{pr_ref}: {rec.get('title', '')}"
@@ -354,8 +467,17 @@ def build(rec: dict, prdir: Path, out_dir: Path, decision: dict | None = None) -
     else:
         R.p(f"Not measured: {rec.get('reason', 'no comparison')}.")
 
+    if probes_section(R, rec, rel):
+        R.p(f"Citation check ({pstat}): {pdetail}.", "meta")
+
     R.h(2, "Was the changed code exercised?", "coverage")
     g, cov = rec.get("coverage_gate") or {}, rec.get("coverage") or {}
+    m = g.get("measurement") or coverage_gate.measurement(rec, bool((rec.get("files") or {}).get("package_py")))
+    R.p({"measured": f"**Coverage: MEASURED** by coverage.py on the PR side ({cov.get('seconds', '?')} s run).",
+         "not measured: predates gate": "**Coverage: NOT MEASURED, record predates the coverage gate.** No coverage "
+                                        "run exists for this record; nothing below is a measurement.",
+         "not measured": f"**Coverage: NOT MEASURED** ({cov.get('why') or cov.get('status') or 'no data'}).",
+         "not needed": "**Coverage: not needed** (no changed Python lines)."}.get(m, f"Coverage: {m}."))
     R.p(f"Coverage gate ({g.get('kind', '-')}, confidence {g.get('confidence', '-')}): {g.get('note') or '-'}."
         + (f" This changed the verdict from {rec.get('verdict_before_coverage_gate')} to {rec.get('verdict')}."
            if g.get("changed") else ""))
@@ -389,7 +511,9 @@ def build(rec: dict, prdir: Path, out_dir: Path, decision: dict | None = None) -
                          "Read the setup/build log under Evidence links; build failures usually need a compiler or a newer nightly."])
     if d["verdict"] == "NEEDS ATTENTION":
         wrong.append(["Behavior difference found", badge("amber", "finding"), rec.get("reason", ""),
-                      "This is about the PR, not the run: read the failing tests and their log lines, then decide."])
+                      "This is about the PR, not the run: read the failing tests and their log lines"
+                      + (" and the Probes section" if (rec.get("probes") or {}).get("summary", {}).get("flagged") else "")
+                      + ", then decide."])
     if wrong:
         R.table(["Issue", "Status", "Detail", "How to fix"], wrong)
     else:
@@ -418,7 +542,8 @@ def build(rec: dict, prdir: Path, out_dir: Path, decision: dict | None = None) -
     ev = [link(f"Pull request {pr_ref}", rec.get("url", ""))]
     for name in ["record.json", "pr.diff", "setup-main.log", "setup-pr.log", "build-pr.log", "patch.log", "git.log"] + \
             [f"pytest-{s}-{i}.log" for i in (1, 2, 3) for s in ("main", "pr")] + [f"junit-{s}-1.xml" for s in ("main", "pr")] + \
-            ["coverage-pytest.log", "coverage-pr.json"]:
+            ["coverage-pytest.log", "coverage-pr.json"] + \
+            [f for it in probe_items(rec) for side in ("main", "pr") for f in (it.get("outputs") or {}).get(side, [])[:1]]:
         if (prdir / name).exists():
             ev.append(link(name, rel(name)))
     for side in ("main", "pr"):

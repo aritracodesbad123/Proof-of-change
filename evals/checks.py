@@ -16,6 +16,7 @@ from pathlib import Path
 from guardrails.schema import CLASS_KEYS, REQUIRED_RUNS_PER_SIDE, SCHEMA_ID, SINGLE_THREAD_VARS, mode_for, validate_record
 
 GOLDEN_PATH = Path(__file__).with_name("golden_cases.json")
+GOLDEN_PR_BATCH = Path(__file__).parent / "fixtures" / "golden_pr_v1.jsonl"   # known-answer PR runs (record_kind pr_run)
 
 
 @dataclass
@@ -130,8 +131,17 @@ def load_golden(path: Path = GOLDEN_PATH) -> list[dict]:
 
 
 def golden_for(rec: dict, cases: list[dict]) -> dict | None:
+    is_pr = rec.get("record_kind") == "pr_run"
     for c in cases:
         m = c["match"]
+        if (c.get("kind") == "pr_run") != is_pr:
+            continue
+        if is_pr:
+            pr = rec.get("pr") or {}
+            if (pr.get("repo", rec.get("repo")) == m["repo"] and pr.get("number") == m["pr"]
+                    and pr.get("head_sha") == m["head_sha"]):
+                return c
+            continue
         if (_norm(rec.get("upstream", "")) == _norm(m["upstream"]) and rec.get("new_version") == m["new_version"]
                 and _norm(rec.get("dependent", "")) == _norm(m["dependent"])
                 and ("old_version" not in m or rec.get("old_version") == m["old_version"])):
@@ -312,9 +322,73 @@ def check_citations(claims: list[dict], log_root: Path) -> Result:
     return Result("llm_citations", "pass", f"{len(claims)} claim(s), every one backed by a real log line")
 
 
+def _value_at(v, field: str):
+    return v if field == "" else (v.get(field, "<absent>") if isinstance(v, dict) else "<absent>")
+
+
+def check_golden_pr_case(rec: dict, case: dict) -> Result:
+    """Known-answer PR run. The verdict is re-derived from the recorded data with the current rules, never read from
+    the record alone: probes re-judged from their recorded runs (poc/probes.py), the tests' verdict from the recorded
+    comparison, both combined (ops/daily_run.verdict_for) and passed through the coverage gate."""
+    from ops.daily_run import rejudge_probes, verdict_for
+    from poc import coverage_gate
+    exp, problems = case["expect"], []
+    pp = rejudge_probes(rec.get("probes"))
+    cmp = rec.get("comparison")
+    cnv = None if cmp else (rec.get("reason") or "no comparison")
+    v_tests = verdict_for(cmp, cnv, rec.get("exit_check"), rec.get("files"))
+    v_all = verdict_for(cmp, cnv, rec.get("exit_check"), rec.get("files"), pp, rec.get("behaviour_claims"))
+    gated = coverage_gate.apply({k: x for k, x in rec.items() if not k.endswith("_before_coverage_gate")}
+                                | {"verdict": v_all[0], "reason": v_all[1]})["verdict"]
+    if "tests_verdict" in exp and v_tests[0] != exp["tests_verdict"]:
+        problems.append(f"tests alone give {v_tests[0]} (expected {exp['tests_verdict']})")
+    if gated != exp["verdict"]:
+        problems.append(f"re-derived verdict {gated} (expected {exp['verdict']})")
+    if rec.get("verdict") != exp["verdict"]:
+        problems.append(f"recorded verdict {rec.get('verdict')} (expected {exp['verdict']})")
+    if not pp or not pp.get("items"):
+        problems.append("record has no probe results")
+    else:
+        summ = pp["summary"]
+        flagged = sorted(f["name"] for f in summ["flagged"])
+        if "probe_flagged" in exp and flagged != sorted(exp["probe_flagged"]):
+            problems.append(f"probe observations needing attention {flagged} (expected {sorted(exp['probe_flagged'])})")
+        if "probe_proven_claims" in exp and sorted(summ["proven_claims"]) != sorted(exp["probe_proven_claims"]):
+            problems.append(f"proven claims {summ['proven_claims']} (expected {exp['probe_proven_claims']})")
+        obs = {o["name"]: o for it in pp["items"] for o in it["observations"]}
+        for name, fields in exp.get("probe_values", {}).items():
+            o = obs.get(name)
+            if not o:
+                problems.append(f"observation {name} missing"); continue
+            for field, want in fields.items():
+                for side in ("main", "pr"):
+                    got = _value_at(o[side], field)
+                    if got != want[side]:
+                        problems.append(f"{name}[{field!r}] on {side} = {got!r} (expected {want[side]!r})")
+    name = case["name"] + {"TODO": " [TODO data]", "pending": " [PENDING, not golden yet]"}.get(case.get("status", "active"), "")
+    if problems:
+        return Result(f"golden:{case['name']}", "warn" if case.get("status") == "pending" else "fail",
+                      f"{name}: " + "; ".join(problems),
+                      "A known PR finding was missed: the probe runner, the comparison or the verdict rule regressed. "
+                      "Re-run the probe on both sides and diff its observations against the golden record.")
+    return Result(f"golden:{case['name']}", "pass", f"{name}: verdict {gated} re-derived from the recorded probe and "
+                  f"test results; probe flags {flagged}")
+
+
+def evaluate_pr_record(rec: dict, cases: list[dict], require_v1: bool | None = None) -> list[Result]:
+    """Evals for a Proof-of-Change PR run (record_kind pr_run): schema, protocol, golden case."""
+    res = [check_schema(rec, True, require_v1), check_runs_per_side(rec), check_single_thread(rec)]
+    case = golden_for(rec, cases)
+    if case:
+        res.append(check_golden_pr_case(rec, case))
+    return res
+
+
 def evaluate_record(rec: dict, runs_root: Path | None = None, cases: list[dict] | None = None,
                     require_ci_fields: bool = True, require_v1: bool | None = None) -> list[Result]:
     cases = load_golden() if cases is None else cases
+    if rec.get("record_kind") == "pr_run":
+        return evaluate_pr_record(rec, cases, require_v1)
     run_dir = (Path(runs_root) / rec["logs"]) if runs_root and rec.get("logs") else None
     if run_dir is not None and not run_dir.is_dir():
         alt = Path(runs_root) / Path(rec["logs"]).name  # runs moved/flattened, e.g. research/dev-runs/<id>

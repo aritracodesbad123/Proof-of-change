@@ -35,7 +35,8 @@ def test_numpy_32910_is_not_fully_verified():
     assert g["verdict"] == "could_not_verify"
     assert g["reason"].startswith("not fully verified: compiled code changed (numpy/_core/src/multiarray/item_selection.c)")
     assert g["verdict_before_coverage_gate"] == "verified"
-    assert g["coverage_gate"] == {"kind": "compiled", "changed": True, "confidence": "none", "note": g["coverage_gate"]["note"]}
+    assert g["coverage_gate"] == {"kind": "compiled", "changed": True, "confidence": "none", "note": g["coverage_gate"]["note"],
+                                  "measurement": "not needed"}
     assert g["changed_lines_total"] is None and g["changed_lines_covered"] is None  # not measurable for C
     assert cg.apply(g) == g  # idempotent: a report rebuilt from a gated record gives the same answer
 
@@ -91,7 +92,8 @@ def test_docs_only_stays_verified_with_a_note():
 def test_python_not_measured_on_old_records():
     g = cg.apply(_day1("pr_run_pandas_70520.json"))
     assert g["verdict"] == "verified" and g["coverage_gate"]["confidence"] == "lower"
-    assert "not measured (record predates the coverage gate)" in g["coverage_gate"]["note"]
+    assert "NOT MEASURED (record predates the coverage gate" in g["coverage_gate"]["note"]
+    assert g["coverage_gate"]["measurement"] == "not measured: predates gate"
 
 
 def test_record_without_file_list_is_left_alone():

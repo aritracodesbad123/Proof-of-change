@@ -119,6 +119,65 @@
       },
       "source_record": "golden-clean-sklearn151to152-imblearn0124",
       "reference": "Clean pair, promoted from candidate on 10 Oct 2026 after a verified run: scikit-learn 1.5.1 -> 1.5.2 (patch release), imbalanced-learn 0.12.4, numpy 2.1.3, scipy 1.14.1, pandas 2.2.3, Python 3.12 (1.5.1 has no cp313 wheel). 2238 passed on both sides in every run, 0 in every class, stability 1.0. Guards against false alarms; same dependent and test command as the known-break case."
+    },
+    {
+      "name": "golden-pr-mlxtend-1229-probe",
+      "status": "active",
+      "kind": "pr_run",
+      "match": {
+        "repo": "rasbt/mlxtend",
+        "pr": 1229,
+        "head_sha": "296459ec17120e757a56c7bb08c831469b0e5aa4"
+      },
+      "expect": {
+        "verdict": "needs_attention",
+        "tests_verdict": "verified",
+        "probe_flagged": [
+          "caller_x_after_call.changed_columns",
+          "int_groups_after_multi_group.importances"
+        ],
+        "probe_proven_claims": [
+          "C1",
+          "C2"
+        ],
+        "probe_values": {
+          "int_groups_after_multi_group.importances": {
+            "3": {
+              "main": [
+                0.1185770248176875
+              ],
+              "pr": [
+                0.19149488806888038
+              ]
+            }
+          },
+          "caller_x_after_call.changed_columns": {
+            "": {
+              "main": [
+                0,
+                1
+              ],
+              "pr": []
+            }
+          },
+          "int_groups_only.importances": {
+            "3": {
+              "main": [
+                0.1185770248176875,
+                0.17930090046389513,
+                0.17809896469894626
+              ],
+              "pr": [
+                0.1185770248176875,
+                0.17930090046389513,
+                0.17809896469894626
+              ]
+            }
+          }
+        }
+      },
+      "source_record": "evals/fixtures/golden_pr_v1.jsonl",
+      "reference": "rasbt/mlxtend#1229 (base master 1aee767 vs GitHub test merge commit 1af398f of head 296459e, source-pair route, 3 alternating runs per side, probe probes/rasbt/mlxtend/1229.py). The touched tests all pass on both sides (9 unchanged, 1 new passing), so tests alone say verified. The probe shows two differences the PR description does not mention: with seed 123 and feature_groups [range(0, 2), 2, 3, 4], group 3's importance changes from 0.118577 to 0.191495 (the old code drew one shuffle per column of a multi-column group from the shared RandomState, the new code one permutation per group, so later groups get different random numbers); and with [0, 1, range(2, 4), 4] the caller's X is no longer left with columns 0 and 1 shuffled. The PR's two claims hold: list groups now permute their own columns, and integer-only groups give identical results for the same seed. Expected verdict: needs_attention."
     }
   ]
 }

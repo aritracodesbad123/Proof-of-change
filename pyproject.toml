@@ -6,7 +6,7 @@ requires-python = ">=3.11"
 dependencies = []  # stdlib only; the runner shells out to uv and git
 
 [project.optional-dependencies]
-dev = ["pytest>=8", "ruff>=0.6", "jsonschema>=4", "coverage>=7"]  # jsonschema: cross-checks the stdlib validators in tests
+dev = ["pytest>=8", "pytest-timeout>=2", "ruff>=0.6", "jsonschema>=4", "coverage>=7"]  # jsonschema: cross-checks the stdlib validators in tests
 ops = ["uv>=0.4"]  # the PR runner creates its test environments with uv
 
 [build-system]

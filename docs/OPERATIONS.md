@@ -50,8 +50,8 @@ There is no scheduler in this repo; run `make daily` (or `ops/daily_run.py`) fro
 
 Tests: test files mapped from the touched modules (or the chosen-PRs file's subset), **3 alternating runs per side**
 (main 1, PR 1, main 2, ...), `OMP/OPENBLAS/MKL/NUMEXPR_NUM_THREADS=1`, pytest `-q -rfE --timeout=120` with JUnit XML,
-`--run-timeout` 900 s per run, `-n 4` workers. `GITHUB_TOKEN` (optional, read-only API calls) is removed from the
-environment of PR code. The comparison is plain code: `poc/diff.py confirm()` per test over the 3 runs, then
+`--run-timeout` 900 s per run, `-n 4` workers. PR code never sees our environment (see "Environment of untrusted
+code" below). The comparison is plain code: `poc/diff.py confirm()` per test over the 3 runs, then
 `poc/verdict.py pr_verdict()`.
 
 Both sides get the library's test extras plus `optional_test_deps` (per library in `LIBS`), so tests don't skip
@@ -88,6 +88,11 @@ those were skipped on both sides), flaky tests, and every module that failed to 
 
 ## Coverage gate (`poc/coverage_gate.py`)
 
+Every gated record says where its coverage numbers come from (`coverage_gate.measurement`): `measured` (a real
+coverage.py run of the PR side), `not measured: predates gate` (the record is older than the coverage gate; there is
+no coverage run at all, so nothing is a measurement), `not measured` (the run was skipped or failed; see
+`coverage.why`) or `not needed` (no changed Python lines). The reviewer report states this first, in bold.
+
 "Verified" must mean the changed code was exercised. After the 3 timed runs, `coverage_run()` installs `coverage` and
 `pytest-cov` into the PR venv and runs the PR side's test subset once more under `--cov=<dirs of the changed
 files>` (untimed, so the 3 timed runs stay clean; logs `coverage-pytest.log`, data `coverage-pr.json`). Changed lines
@@ -116,6 +121,136 @@ named after the module (`item_selection.c` -> `test_item_selection.py`) counts a
 module"; it does not prove the test reaches the changed C lines, and a test with an unrelated name is not recognised.
 A PR mixing Python and compiled changes gets both rules. Lines run only by import (module-level code) count as
 covered. The coverage run adds roughly one more test run per PR (about 15-60 s on day-1 PRs).
+
+## Sandbox (`guardrails/sandbox.py`)
+
+Untrusted code never runs directly on the machine. Every install and build (PR build code such as `setup.py` or meson
+runs here), pytest run, coverage run, probe, `uv pip freeze`, `patch` and every start of a venv Python runs inside a
+**bubblewrap** sandbox (`bwrap`, unprivileged user namespaces, no root daemon). Each side (main, PR) has its own:
+
+| Inside the sandbox | Source |
+|---|---|
+| `/usr`, `/bin` `/lib` `/lib64` `/sbin` (links or read-only binds) | host, read-only |
+| `/etc`: `ld.so.cache`, `ld.so.conf(.d)`, `alternatives`, `ssl`, `ca-certificates`, `localtime`, `timezone`, `os-release`, `protocols`, `services`, `mime.types`; a one-user `passwd`/`group` | host files, read-only; `passwd`/`group` generated |
+| `/etc/resolv.conf`, `hosts`, `nsswitch.conf`, `gai.conf`, `host.conf` | only in the install/build phase |
+| `/opt/uv-python` | the uv-managed Pythons, read-only (venvs are created inside, so they point here) |
+| `/opt/uv-cache` (install phase only) | the shared uv cache as a read-only lower layer plus a private tmpfs layer that is thrown away on exit (`--overlay-src`/`--tmp-overlay`): builds can use the cache but never write to it. bwrap older than 0.10 has no overlays; then each side gets its own empty cache in its temporary home |
+| the side's own dirs, at their real paths | read-write: `work/venv-<side>`, `work/home-<side>` (HOME; TMPDIR is `HOME/.tmp`), `work/out-<side>`, `work/cwd-<side>`, the side's checkout (`work/side-<side>`, or `work/src` for the PR side of a source build) |
+| `work/src/.git` (worktree checkouts) | read-only, so `git describe` works for version tools |
+| a wheel, a probe file, a constraints file | read-only, only the one file a step needs |
+| `/tmp`, `/proc`, `/dev` | fresh tmpfs, new procfs, minimal devices |
+
+Options: `--unshare-all` (user, mount, PID, IPC, UTS, cgroup and network namespaces), `--die-with-parent`,
+`--new-session`, `--cap-drop ALL`, and the allowlisted environment below. Nothing else exists inside: no `/home`, no
+other worktrees or agent data, no `/sys`, not the other side's venv. **Network:** only the install/build phase
+shares the host network (`--share-net`); the test, coverage, probe, freeze and version-check phases have none (only
+their own loopback interface, so not even services on the host's 127.0.0.1). JUnit and coverage files are written
+inside the side's `out-` dir and moved to the run folder afterwards. git on our own fresh clones runs outside.
+
+**Fail closed:** at the start of every PR the sandbox is test-started; if it cannot start, the PR is not run and gets
+**could_not_verify** with the reason `sandbox unavailable: ...`. `--unsafe-no-sandbox` skips the sandbox; the daily
+run and `make check` never pass it. `run_meta.json` records the sandbox used (`"sandbox"`). The tests in
+`tests/test_sandbox.py` start real sandboxes with dummy secret files planted outside and fake credentials in the
+environment, and check every phase (a hostile build backend, pytest, a probe) and the shared cache.
+
+To mount a dir at its real path, bwrap creates its ancestors as empty directories on the sandbox's own tmpfs, so a
+parent of the work dir (for example a parent it shares with the repo) exists inside, but only as that skeleton. The
+containment check reads the mount table inside the sandbox and walks everything outside the mounts: every mount is a
+system mount or lies under the side's own dirs, no file exists outside a mount, and each skeleton directory contains
+only the path components that lead to mounts. `tests/test_sandbox.py` also runs itself with `--basetemp` next to the
+repo, and has a negative control that exposes the repo's parent and expects the check to fail.
+
+> **TODO (open issue): sandbox the release-pair runner.** `harness/run.py` (release pairs) gets the allowlisted
+> environment but does **not** run inside the sandbox yet: its installs, tests and coverage run directly on the
+> machine with the runner's filesystem access and network. That is acceptable only because it installs **published
+> releases** from the package index. Before it is pointed at anything else (a branch, a PR, a git URL, a local
+> checkout, an unpublished or nightly build), route its subprocesses through `guardrails/sandbox.py` the same way
+> `ops/daily_run.py` does (per-side read-write dirs, read-only shared cache, network only for installs, fail closed),
+> and extend `tests/test_sandbox.py` to cover it.
+
+## Environment of untrusted code (`guardrails/isolation.py`)
+
+Every subprocess that may run code from a PR or a package gets an **allowlisted** environment built by
+`untrusted_env()`, never a filtered copy of ours. That covers installs and builds of either side, pytest, the coverage
+run, probes, `uv pip freeze`, `patch` and every start of a venv Python (installed `.pth` files run on startup). It
+applies to `make check` and the daily run (`ops/daily_run.py`, `base_env()`), and to the release-pair runner
+started by `harness/run.py`.
+
+| Variable | Value |
+|---|---|
+| `PATH`, `LANG`, `LC_ALL`, `TERM`, `TMPDIR`, `SOURCE_DATE_EPOCH`, `SSL_CERT_FILE` | passed through, only if set |
+| `HOME` | a per-environment temporary home (`work/home-main`, `work/home-pr`, `work/home-git`), never the real one |
+| `OMP_NUM_THREADS`, `OPENBLAS_NUM_THREADS`, `MKL_NUM_THREADS`, `NUMEXPR_NUM_THREADS`, `VECLIB_MAXIMUM_THREADS`, `BLIS_NUM_THREADS` | `1` |
+| `PYTHONHASHSEED` / `PYTHONDONTWRITEBYTECODE` / `MPLBACKEND` | `0` / `1` / `Agg` |
+| installs only: `UV_CACHE_DIR`, `UV_PYTHON_INSTALL_DIR` | the real uv cache and managed-Python dirs (so a temporary HOME does not re-download everything) |
+| installs only: `UV_LINK_MODE` / `UV_NO_CONFIG` | `copy` (installed files never share inodes with the cache) / `1` (no uv config files) |
+| installs only, per call: `SETUPTOOLS_SCM_PRETEND_VERSION` | `9999.0.0` for checkouts without tags |
+
+Everything else is dropped: tokens, API keys, database URLs, proxies, `PIP_*`/`UV_INDEX_*`, `PYTHONPATH`, `CI`,
+`DISPLAY`, `XDG_*`. A second, independent check (`SECRET_NAME`: TOKEN, SECRET, PASSWORD, KEY, AUTH, PAT, DSN,
+DATABASE_URL, COOKIE, SESSION, ...) fails loudly at import time if a credential-looking name is ever added to the
+allowlist, and again on every environment built (also for values that are URLs with a password). `run()` refuses
+to start anything without an explicit environment. Proxies are not passed through: on a machine that needs one,
+installs fail visibly instead of handing proxy credentials to PR code. The temporary HOME hides files such as
+`~/.netrc` and `~/.git-credentials` by default. It is not a filesystem sandbox: code can still read absolute paths
+the user can read.
+
+## Probes (`poc/probes.py`, `probes/`)
+
+Tests only show what the test suite checks. A **probe** checks one specific behaviour of a PR directly: a small,
+deterministic Python script that runs on both sides (main and PR) in the same isolated environments the tests used,
+prints observations as JSON, and plain code compares them. Only fixed probes exist today, one file per PR under
+`probes/<owner>/<repo>/<pr>.py` (more than one: `<pr>-<name>.py`). Model-written probes will use the same interface.
+
+Interface. The file starts with a literal `PROBE` dict (read with `ast.literal_eval`, never imported):
+`id`, `target` (`owner/repo#pr`), `about`, `timeout_s` (optional, default 120 s), and `claims`: what the PR says,
+each `{id, text, source, covers: [glob patterns over observation names], expect: "same" | "differs"}`. Its last
+stdout line is `{"observations": {"<name>": <JSON value>, ...}}`. Each side runs 3 times, alternating, with that
+side's venv Python, an empty working directory and that side's allowlisted environment (see above; same as the
+tests). Each run's observations are saved one per line as `probe-<id>-<side>-<n>.jsonl` (plus a `.log`
+with the full output), and every observation in the record cites its line in run 1 of each side.
+
+Labels, per observation:
+
+| Observation | Claim covering it | Label | Verdict effect |
+|---|---|---|---|
+| same on both sides | expects same | `proven` | none |
+| same on both sides | none | `no_difference` | none |
+| same on both sides | expects differs | `needs_human` | needs_attention |
+| differs | expects differs | `proven` | none |
+| differs | expects same | `false_claim` | needs_attention |
+| differs | none | `unmentioned` | needs_attention |
+| varies between runs of one side | any | `flaky` | needs_attention |
+| probe crashed on both sides | - | `not_testable` | none (reported) |
+
+A probe that crashes on one side only shows up as the `probe.error` observation differing (`unmentioned`).
+
+Verdict rule. The tests decide first (comparison, then the rules above); then any probe observation needing
+attention makes the verdict needs_attention, also over could_not_verify, because a difference was actually seen.
+Green probes never upgrade a verdict. The coverage gate runs after this and never lowers needs_attention. A PR
+without a probe file gets exactly the tests' verdict and reason; its record says `"probes": {"status": "none"}`.
+The record (schema rev 6, additive) keeps every run's observations, so `--rejudge` recomputes the labels without
+environments. The reviewer report has a **Probes** section (each observation with both values and its citations)
+and adds the claims as rows `P-C1`, ... in the claims table; observations no claim covers are listed as
+"Change not in the PR description". The golden known-answer case `golden-pr-mlxtend-1229-probe`
+(`evals/fixtures/golden_pr_v1.jsonl`) is part of `--require-golden`: tests alone pass on that PR (verified), the
+probe finds two unclaimed behaviour changes, so the expected verdict is needs_attention.
+
+## Behaviour-preservation claims (`poc/behaviour_claims.py`)
+
+Tests check what a PR changes, rarely that everything else stayed the same. When the PR title or description claims
+that results stay the same and no probe checks it, the PR cannot be **verified**: the verdict becomes
+**could_not_verify** with the reason `unverified behaviour claim: "<quote>"; needs a probe (tests: ...)`. When a
+probe for the PR has a claim that expects `same`, the probe decides (it can confirm the claim, or contradict it, which
+gives needs_attention). The rule never upgrades a verdict and never hides needs_attention.
+
+The regex list (`PATTERNS`, case-insensitive) is deliberately small: results/output/behaviour/values/predictions/
+importances/scores + "unchanged / identical / preserved", "do(es) not change" / "don't change", "the same output /
+results / behaviour", "for a given / the same / a fixed seed", "backward(s) compatible / compatibility", "no
+behaviour(al) / functional / user-facing / API change", "no change in/to the results". A match right after a negation
+("not backwards compatible", "breaks backward compatibility", "no longer") is ignored, and so are Markdown headings,
+HTML comments (PR templates) and code blocks. The quotes are stored in the record (`behaviour_claims`) so a re-judge
+gives the same answer.
 
 ## Files a run writes
 
@@ -174,6 +309,7 @@ Same section order, renderers and verdict vocabulary as the golden-record report
 kept once under `pre-migration/`), `--rejudge` (with `--report-only`: also recompute each verdict from the saved
 JUnit files with the current comparison rules; the previous verdict is kept under `rejudged`), `--date` (run folder,
 may be nested, e.g. `<date>/<name>`; `run_date` is the folder's calendar date), `--ops-dir`, `--work-dir`, `--report-dir`, `--no-report`,
-`--no-coverage` (skip the coverage run; the gate then says "not measured").
+`--unsafe-no-sandbox` (run PR code without the sandbox; never used by the daily run), `--no-coverage` (skip the coverage run; the gate then says "not measured"), `--no-probes` (do not run probe files;
+the record says `"probes": {"status": "none"}`).
 
 A full daily run takes about 15-20 minutes (day 1: 15 PRs in 16.4 min wall time, before the coverage run existed).

@@ -293,11 +293,12 @@ def test_fix6_supersede_freeze_and_rerun_section(tmp_path):
 
 
 # fix 7: thread env, 0 runs on a failed build, unexplained exit codes
-def test_fix7_six_thread_vars_pinned():
+def test_fix7_six_thread_vars_pinned(tmp_path):
+    from guardrails.isolation import UNTRUSTED_THREAD_ENV
     from ops.daily_run import THREAD_ENV, base_env
     assert set(THREAD_ENV) == {"OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS", "NUMEXPR_NUM_THREADS",
                                "VECLIB_MAXIMUM_THREADS", "BLIS_NUM_THREADS"}
-    assert all(base_env()[k] == "1" for k in THREAD_ENV)
+    assert all(base_env(tmp_path)[k] == "1" for k in THREAD_ENV) and UNTRUSTED_THREAD_ENV == THREAD_ENV
 
 
 def test_fix7_failed_build_record_says_zero_runs():
