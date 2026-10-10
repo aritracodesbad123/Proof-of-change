@@ -1048,11 +1048,17 @@ def to_html(R: Report, title: str) -> str:
     return "\n".join(out)
 
 
+MAC_CHROMES = ("/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+               "/Applications/Chromium.app/Contents/MacOS/Chromium",
+               "/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge")
+
+
 def find_chrome() -> str | None:
-    for name in (os.environ.get("BR_CHROME"), "google-chrome", "chromium", "chromium-browser"):
+    """Headless Chrome/Chromium for PDFs: $BR_CHROME, then the PATH, then the usual macOS app locations."""
+    for name in (os.environ.get("BR_CHROME"), "google-chrome", "google-chrome-stable", "chromium", "chromium-browser"):
         if name and shutil.which(name):
             return shutil.which(name)
-    return None
+    return next((p for p in MAC_CHROMES if os.access(p, os.X_OK)), None)
 
 
 def to_pdf(html_path: str, pdf_path: str) -> str | None:

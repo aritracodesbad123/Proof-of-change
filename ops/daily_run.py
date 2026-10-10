@@ -4,6 +4,9 @@
     python3 ops/daily_run.py                       # normal daily run
     python3 ops/daily_run.py --select-only         # pick PRs, print them, test nothing
     python3 ops/daily_run.py --max-per-library 3 --libraries numpy,pandas
+    python3 ops/daily_run.py --pr https://github.com/pandas-dev/pandas/pull/12345   # check one PR
+
+After the run, reviewer reports (HTML, PDF, Markdown) are written to reports/daily/<run folder>/ (reports/pr_report.py).
 
 Read-only towards GitHub: it only GETs public API/diff URLs. It never comments, reviews or posts.
 Uses $GITHUB_TOKEN for read-only API calls if it is set; otherwise unauthenticated (60 requests/hour).
@@ -859,9 +862,40 @@ def write_report(rdir: Path, meta: dict, records: list[dict], skipped: dict, pro
 
 
 # ---------------------------------------------------------------- main
+PR_URL = re.compile(r"^https?://github\.com/([\w.-]+/[\w.-]+)/pull/(\d+)/?(?:[#?].*|/.*)?$")
+
+
+def parse_pr_urls(urls: list[str]) -> dict:
+    """['https://github.com/o/r/pull/12', ...] -> {'o/r': [12, ...]}. Exits with a plain message on a bad URL."""
+    out: dict = {}
+    for u in urls:
+        m = PR_URL.match(u.strip())
+        if not m:
+            raise SystemExit(f"not a GitHub pull request link: {u!r}\n"
+                             "It should look like https://github.com/pandas-dev/pandas/pull/12345")
+        out.setdefault(m.group(1), []).append(int(m.group(2)))
+    return out
+
+
+def default_registry() -> str:
+    for cand in (os.environ.get("POC_REGISTRY"), "/workspace/blast-radius-research/registry/tracked-libraries.csv",
+                 str(REPO_ROOT / "ops" / "tracked-libraries.csv")):
+        if cand and Path(cand).exists():
+            return cand
+    raise SystemExit("no tracked-libraries CSV found; set POC_REGISTRY or pass --registry")
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--registry", default="/workspace/blast-radius-research/registry/tracked-libraries.csv")
+    ap.add_argument("--registry", default=None,
+                    help="tracked-libraries CSV (default: $POC_REGISTRY, else Jonathan's registry on the box if present, "
+                         "else ops/tracked-libraries.csv)")
+    ap.add_argument("--pr", action="append", default=[], metavar="URL",
+                    help="check just this PR (https://github.com/OWNER/REPO/pull/N); repeatable. Skips the registry, "
+                         "writes to ops/runs/<date>-check-<HHMM> and does not move the daily run's 'seen' state")
+    ap.add_argument("--report-dir", default=None,
+                    help="where the HTML/PDF reviewer reports go (default: reports/daily/<run folder name>)")
+    ap.add_argument("--no-report", action="store_true", help="skip the HTML/PDF reviewer reports")
     ap.add_argument("--ops-dir", default=str(REPO_ROOT / "ops"))
     ap.add_argument("--work-dir", default=None, help="scratch for venvs/builds (default: <ops-dir>/work)")
     ap.add_argument("--date", default=None, help="run folder name (default: today IST)")
@@ -884,7 +918,9 @@ def main(argv=None) -> int:
         print("note: protocol requires 3 runs per side; using", a.runs, file=sys.stderr)
 
     started = now_ist()
-    ops = Path(a.ops_dir); rdir = ops / "runs" / (a.date or started.strftime("%Y-%m-%d"))
+    single = parse_pr_urls(a.pr)
+    default_name = started.strftime("%Y-%m-%d") + (started.strftime("-check-%H%M") if single else "")
+    ops = Path(a.ops_dir); rdir = ops / "runs" / (a.date or default_name)
     rdir.mkdir(parents=True, exist_ok=True)
     workroot = Path(a.work_dir or ops / "work")
     seen_path = ops / "seen_prs.json"
@@ -892,9 +928,15 @@ def main(argv=None) -> int:
     free_gb = shutil.disk_usage(ops).free / 1e9
     problems = []
     if free_gb < a.min_free_gb:
-        print(f"only {free_gb:.0f} GB free (< {a.min_free_gb}); aborting", file=sys.stderr)
+        print(f"Stopped: only {free_gb:.0f} GB of free disk space; a run needs at least {a.min_free_gb:.0f} GB "
+              f"(test environments are large). Free some space, or delete the {ops / 'work'} folder.", file=sys.stderr)
         return 2
-    rows = [r for r in csv.DictReader(open(a.registry)) if r.get("status", "active") == "active"]
+    if single:  # one-off check: no registry, no picks file; Jonathan's picks never apply
+        rows = [{"library": repo.split("/")[1], "repo": repo, "priority": "1"} for repo in single]
+        a.registry = a.picks = str(rdir / "no-picks")
+    else:
+        a.registry = a.registry or default_registry()
+        rows = [r for r in csv.DictReader(open(a.registry)) if r.get("status", "active") == "active"]
     rows.sort(key=lambda r: (int(r.get("priority") or 9), r.get("added_on_ist", "") and -int(r["added_on_ist"].replace("-", ""))))
     if a.libraries:
         want = set(a.libraries.split(","))
@@ -909,7 +951,10 @@ def main(argv=None) -> int:
         cfg = LIBS.get(repo) or {"dist": row["library"], "pkg": row["library"].lower().replace("-", "_"), "deps": [],
                                  "test_deps": [], "nightly": False}
         try:
-            if repo in picks:   # registry picks: Jonathan chose the PRs; selection filters do not apply
+            if single:
+                chosen, sk = pick_items(gh, repo, cfg, [{"pr": n, "head_sha": None, "install": None, "test_cmd": None}
+                                                        for n in single[repo]]), []
+            elif repo in picks:   # registry picks: Jonathan chose the PRs; selection filters do not apply
                 chosen, sk = pick_items(gh, repo, cfg, picks[repo]), []
             else:
                 sel_seen, sel_since = baseline_for(seen, repo, rdir.name)
@@ -942,6 +987,8 @@ def main(argv=None) -> int:
             print(f"    -> {rec['verdict']}: {rec['reason'][:120]} ({rec['duration_s']}s)", flush=True)
             seen["prs"].setdefault(repo, {})[str(c["pr"])] = {"head_sha": c["head_sha"], "tested_at_ist": rec["tested_at_ist"],
                                                               "verdict": rec["verdict"], "run": rdir.name}
+        if single:  # a one-off check must not move the daily run's cut-off
+            continue
         if run_date_of(seen, repo) != rdir.name:   # keep the previous day's cut-off so same-day re-runs reselect
             seen.setdefault("prior_run_utc", {})[repo] = seen["last_run_utc"].get(repo)
         seen["last_run_utc"][repo] = started.astimezone(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -963,7 +1010,12 @@ def main(argv=None) -> int:
     # Expectations are read only now, after every verdict above is final.
     expectations = read_expectations(picks_path)
     rp = write_report(rdir, meta, records, skipped, problems, expectations)
-    print(f"report: {rp}")
+    print(f"run log: {rp}")
+    if records and not a.no_report:
+        from reports.pr_report import render_run
+        out = Path(a.report_dir) if a.report_dir else REPO_ROOT / "reports" / "daily" / rdir.name
+        render_run(rdir, out, title=f"Proof-of-Change {'check' if single else 'daily summary'}: {rdir.name}")
+        print(f"\nDONE. Open this file to read the results:\n  {out / 'SUMMARY.html'}")
     return 0 if not problems else 1
 
 

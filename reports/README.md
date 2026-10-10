@@ -1,6 +1,10 @@
 # reports/
 
-One report generator for the human approver (spec: `docs/REPORT_SPEC.md`):
+Reviewer reports for the human approver (spec: `docs/REPORT_SPEC.md`). Two inputs, one format:
+
+- `pr_report.py`: reports for PR runs written by `ops/daily_run.py` (`make check PR=<url>`, `make daily`). Writes
+  `reports/daily/<run folder>/<pr>/REPORT.html|pdf|md` and `SUMMARY.*`; `make decide` records a reviewer decision.
+  Details: `docs/OPERATIONS.md`.
 
 - `generate.py`: entry point. `python -m reports.generate <inputs> --out <dir>`; inputs are record.json files,
   observations .jsonl or an eval result .json. Writes `<dir>/<run id>/REPORT.md|html|pdf` and the daily summary
@@ -9,7 +13,7 @@ One report generator for the human approver (spec: `docs/REPORT_SPEC.md`):
   with a cited log line per claim, what changed, what went right, what went wrong + how to fix, trust checks, Nathan's
   evals and guardrails, checklist, rerun command, evidence links, appendix, glossary). Ported from Jonathan's
   `harness/report/render_report.py` (now a shim).
-- `daily/<date>/`: daily ops output (not committed).
+- `daily/<run folder>/`: PR check and daily run reports (not committed).
 - `runs/`: CI and ad-hoc output (not committed).
 - `samples/golden-v1/`: committed samples for Jonathan's three golden records, generated with
   `--runs-root /workspace/blast-radius-research --claims-dir evals/fixtures/claims --require-v1`. Their links point at
