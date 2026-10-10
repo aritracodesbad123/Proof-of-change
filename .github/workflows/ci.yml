@@ -46,16 +46,16 @@ jobs:
         run: pytest -q
       - name: Evals (strict v1 schema, all golden cases required)
         run: python -m evals.run_evals --observations evals/fixtures/golden_v1.jsonl --require-golden --require-v1 --out eval-results.json
-      - name: Approver report
+      - name: Reviewer reports (HTML + daily summary)
         if: always()
         run: |
-          python -m reports.generate eval-results.json -o reports/runs/ci-py${{ matrix.python }}.md
-          cat reports/runs/ci-py${{ matrix.python }}.md >> "$GITHUB_STEP_SUMMARY"
+          python -m reports.generate eval-results.json --out reports/runs/ci-py${{ matrix.python }} --claims-dir evals/fixtures/claims --formats md,html --require-v1 --title "CI golden batch (Python ${{ matrix.python }})"
+          cat reports/runs/ci-py${{ matrix.python }}/SUMMARY.md >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: approver-report-py${{ matrix.python }}
+          name: reviewer-reports-py${{ matrix.python }}
           path: |
             machine-type.json
             eval-results.json
-            reports/runs/ci-py${{ matrix.python }}.md
+            reports/runs/ci-py${{ matrix.python }}/

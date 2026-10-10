@@ -1,0 +1,12 @@
+{
+  "subject": {"kind": "release (proxy for PR)", "title": "pandas 2.3.3 to 3.0.0rc0 (contains PR #56633)", "pr": null},
+  "says": "PR #56633 \"CoW: Enable CoW by default and remove warning build\" makes Copy-on-Write the default",
+  "says_source": "PR title, github.com/pandas-dev/pandas/pull/56633, verified via the GitHub API on 2026-10-10",
+  "claims": [
+    {"id": "C1", "text": "Copy-on-Write is enabled by default", "source": "PR #56633 title",
+     "check": {"kind": "none"},
+     "why_not_testable": "the dependent's tests do not check the pandas setting itself; they show its effect on dependent code",
+     "explains_signatures": ["Invalid RGBA argument: nan"],
+     "link_source": "UpSetPlot issue #303 (github.com/jnothman/UpSetPlot/issues/303)"}
+  ]
+}

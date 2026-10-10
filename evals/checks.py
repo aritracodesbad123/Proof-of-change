@@ -140,7 +140,7 @@ def golden_for(rec: dict, cases: list[dict]) -> dict | None:
 
 
 def check_golden_case(rec: dict, case: dict) -> Result:
-    cls, exp = rec.get("classification", {}), case["expect"]
+    cls, exp = rec.get("classification") or {}, case["expect"]
     problems = []
     for k, v in exp.get("exact", {}).items():
         if cls.get(k) != v:

@@ -1,7 +1,8 @@
 # Proof-of-Change: requirements
 
-Status: draft v0.3.1 (2026-10-10 IST), by Nathan (ops/QA/dev). v0.3.1 integrates §4a (NVIDIA and Nebius stack), the
-shared v1 observation schema and Jonathan's final golden records (G1–G3). Replaces v0.2 (Blast Radius downstream testing), which is
+Status: draft v0.3.2 (2026-10-10 IST), by Nathan (ops/QA/dev). v0.3.1 integrates §4a (NVIDIA and Nebius stack), the
+shared v1 observation schema and Jonathan's final golden records (G1–G3). v0.3.2 adopts Jonathan's reviewer report
+(§8) and schema rev 2 (optional report fields). Replaces v0.2 (Blast Radius downstream testing), which is
 kept here as one of Proof-of-Change's checks and as its eval source.
 
 **Source of truth:** `nvidia-nebius-hackathon/proof-of-change-spec.md` (Proof-of-Change Product Specification v1.0,
@@ -183,12 +184,23 @@ probe code and the model's reasoning next to the raw outputs.
 
 ## 8. Approver report (every run)
 
-Every run (a Proof-of-Change run on a PR, a downstream-test record, or an eval batch) produces a Markdown approver
-report: header (source, machine type, schema mode), overall **APPROVE / REJECT**, then per item: what was run and
-where, the verdict/class counts, **What went right**, **What went wrong**, **How to fix**, pending/TODO items.
-Rule: any FAIL → REJECT; WARN and TODO are shown but do not block. Generator: `reports/generate.py` (today it covers
-downstream records and eval batches; PR-run reports with verdict and behavior-map summary are **TODO**). The approver
-recommendation is about trusting the run, not about merging the PR.
+Every run (a Proof-of-Change run on a PR, a downstream-test record, or an eval batch) produces a reviewer report for
+a busy, possibly non-engineer approver, as **HTML and PDF** (plus Markdown), and every batch or day produces a
+**daily summary** listing needs-attention items first. One generator: `python -m reports.generate` (`reports/reviewer.py`,
+adopted from Jonathan's `harness/report/render_report.py`; format in `docs/REPORT_SPEC.md`). Order, from Aritra:
+
+1. **Verdict banner** (VERIFIED / NEEDS ATTENTION / COULD NOT VERIFY), **recommended action** (Approve / Approve with
+   notes / Reject / Re-run) and **confidence** (High / Medium / Low, with the reason).
+2. **3-line plain-English summary**: what it says it does, what we observed, what to do.
+3. **Claims vs reality** table; **every claim cites its log line** (file:line + quote), re-verified by the report.
+4. What changed in behavior; **what went right**; **what went wrong and how to fix it**; trust checks.
+5. **Evals and guardrails (Nathan)**: my eval/guardrail results for that record. Any eval FAIL → COULD NOT VERIFY / Re-run.
+6. **Checklist**, **rerun command**, **evidence links**, appendix, glossary.
+
+The recommendation is about trusting the run and the change, not an instruction to merge; a person decides. Golden
+reports (10 Oct): scikit-learn 1.6.0rc1 / imbalanced-learn and pandas 3.0.0rc0 / UpSetPlot are NEEDS ATTENTION /
+Reject; the scikit-learn 1.5.1 → 1.5.2 clean pair is VERIFIED / Approve, all High confidence
+(`reports/samples/golden-v1/`).
 
 ## 9. Evals
 
@@ -270,7 +282,7 @@ poc/                     verdict.py (enums + rule), diff.py (normalise/compare/c
 harness/                 downstream-test runner wrapper (Jonathan's br_run.py + PROTOCOL.md go here); schema/observation.schema.json (shared v1)
 evals/                   labelled_prs.json, pr_metrics.py (catch/false-alarm), golden_cases.json, checks, fixtures
 guardrails/              schema, isolation/timeouts, no-external scan
-reports/                 approver report generator, samples
+reports/                 reviewer report generator (HTML/PDF/MD + daily summary), samples
 tests/                   pytest
 ```
 Not built yet: claim extraction, probe generation, the Sandbox runner, GitHub App, web report, MCP server.

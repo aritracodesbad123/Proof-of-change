@@ -1,7 +1,8 @@
 """Schema validation for observation records.
 
 Single source of truth: the shared JSON Schema `harness/schema/observation.schema.json`
-(`$id` blast-radius/observation/v1, agreed with Jonathan, merged from feat/shared-schema @ ed75df4).
+(`$id` blast-radius/observation/v1, agreed with Jonathan, merged from feat/shared-schema @ ed75df4;
+revision 2 adds OPTIONAL reviewer-report fields, see harness/schema/README.md).
 This module loads that file and validates against it with a small stdlib-only JSON Schema subset
 (type, required, properties, items, enum, pattern, minimum, minLength), so it runs anywhere the
 runner runs without a jsonschema dependency. Keywords outside that subset fail loudly at import.
@@ -16,7 +17,8 @@ docs/REQUIREMENTS.md section 9 "Schema"):
       may be null only when accepted is false; import_failure/real_break are separate classes.
   E3  Schema reference by checksum. A record may name `schema_path` (often an absolute path in
       another checkout, e.g. /workspace/blast-radius/harness/schema/...). The path is NEVER opened;
-      `schema_sha256` must equal the sha256 of this repo's copy instead.
+      `schema_sha256` must be one of COMPATIBLE_SCHEMA_SHA256: this repo's copy, or an earlier
+      revision that the current file only extends with optional fields (so the record is still valid).
   E4  JSON booleans are never accepted where an integer/number is required (JSON Schema semantics).
 """
 from __future__ import annotations
@@ -31,6 +33,16 @@ SCHEMA_BYTES = SCHEMA_PATH.read_bytes()
 SCHEMA: dict = json.loads(SCHEMA_BYTES)
 SCHEMA_SHA256 = hashlib.sha256(SCHEMA_BYTES).hexdigest()
 SCHEMA_ID = SCHEMA.get("$id")
+SCHEMA_REVISION = max(r["rev"] for r in SCHEMA.get("x-revisions", [{"rev": 1}]))
+
+# sha256 of every schema revision a record may name. Later revisions only ADD optional fields, so a record
+# written against an earlier one is valid under the current file. Keep in sync with harness/schema/README.md.
+SCHEMA_SHA256_REV1 = "5a3c3d36b7730ce74d0f23b03c88ea862ea35cc327c7d79481fca8b972e8383e"  # ed75df4
+SCHEMA_SHA256_REV2 = "088cd395004de286c5f1df76fe94a0dc523738be194166cd3b616c77b6298183"  # + reviewer-report fields
+COMPATIBLE_SCHEMA_SHA256 = {SCHEMA_SHA256_REV1: "rev 1", SCHEMA_SHA256_REV2: "rev 2"}
+if SCHEMA_SHA256 not in COMPATIBLE_SCHEMA_SHA256:
+    raise RuntimeError(f"{SCHEMA_PATH} has sha256 {SCHEMA_SHA256}, which is not listed in COMPATIBLE_SCHEMA_SHA256; "
+                       "add the new revision here and in harness/schema/README.md")
 
 PROPS: dict = SCHEMA["properties"]
 REQUIRED: tuple[str, ...] = tuple(SCHEMA["required"])
@@ -45,7 +57,7 @@ V1_ONLY_FIELDS = ("schema_version", "accepted", "gates", "network", "report")  #
 MODES = ("v1", "ci", "legacy")
 
 _SUPPORTED = {"$schema", "$id", "title", "description", "type", "required", "properties", "items", "enum",
-              "pattern", "minimum", "minLength", "x-cross-field-rules"}
+              "pattern", "minimum", "minLength", "x-cross-field-rules", "x-revisions"}
 _TYPES = {"object": dict, "array": list, "string": str, "integer": int, "number": (int, float),
           "boolean": bool, "null": type(None)}
 
@@ -112,12 +124,24 @@ def check_schema_reference(rec: dict) -> list[str]:
     rid = rec.get("id", "<no id>")
     errs = []
     sha = rec.get("schema_sha256")
-    if sha is not None and sha != SCHEMA_SHA256:
-        errs.append(f"{rid}: schema_sha256 {str(sha)[:12]}... does not match the shared schema in this repo "
-                    f"({SCHEMA_SHA256[:12]}...); record was written against a different schema version")
+    if sha is not None and sha not in COMPATIBLE_SCHEMA_SHA256:
+        errs.append(f"{rid}: schema_sha256 {str(sha)[:12]}... is not a known revision of the shared schema "
+                    f"(current {SCHEMA_SHA256[:12]}...); record was written against an incompatible schema")
     if rec.get("schema_path") and sha is None:
         errs.append(f"{rid}: schema_path given without schema_sha256; cannot verify the reference")
     return errs
+
+
+def schema_reference_note(rec: dict) -> str:
+    """Human-readable note on which schema revision a record names (for reports)."""
+    sha = rec.get("schema_sha256")
+    if not sha:
+        return "no schema_sha256 in record"
+    rev = COMPATIBLE_SCHEMA_SHA256.get(sha)
+    if rev is None:
+        return f"unknown schema sha256 {sha[:12]}..."
+    cur = COMPATIBLE_SCHEMA_SHA256[SCHEMA_SHA256]
+    return f"written against {rev} (sha256 {sha[:12]}...)" + ("" if rev == cur else f"; valid under current {cur} (additive)")
 
 
 def validate_record(rec: dict, require_ci_fields: bool = True, require_v1: bool | None = None) -> list[str]:

@@ -1,10 +1,10 @@
 # Reviewer report format (proposal)
 
-Status: proposal from Jonathan, 10 Oct 2026. Nathan owns the approver report in aritracodesbad123/blast-radius; adopt, change, or reject any part of this.
+Status: proposal from Jonathan, 10 Oct 2026; **adopted by Nathan on 10 Oct 2026 with the changes listed at the end** ("Adopted by Nathan"). Nathan owns the approver report in aritracodesbad123/blast-radius.
 
 Goal: a busy approver who may not be an engineer decides in under 2 minutes from the top of page 1, and drills down only if needed.
 
-Generator: `harness/report/render_report.py` (standard library only; PDF via headless Chrome or Chromium).
+Generator: `python -m reports.generate` (code in `reports/reviewer.py`, ported from Jonathan's `harness/report/render_report.py`, which is now a shim to it). Standard library only; PDF via headless Chrome or Chromium.
 
 ```
 python3 harness/report/render_report.py <record.json> [<record.json> ...] \
@@ -105,3 +105,47 @@ Proposed schema additions (optional fields, so v1 records stay valid):
 | `golden_check` {harness_version, passed, total, date} | golden results from a real re-run, not from stored records | stored records only |
 | `explanation` (LLM) | plain-English cause with citations | status "not yet wired" |
 | `reviewer_decision` {decision, reviewer, date, note} | close the loop after approval | not recorded |
+
+## Adopted by Nathan (10 Oct 2026)
+
+The team has one report generator: `reports/generate.py` (entry point) + `reports/reviewer.py`. The old Markdown-only
+approver report was removed; `harness/report/render_report.py` is kept as a shim so the command above still works
+(`--root` maps to `--runs-root`; `--golden-dir` and `--observations` are ignored, see below).
+
+```
+python -m reports.generate <record.json | observations.jsonl | eval-results.json> ... --out reports/daily/<date> \
+  [--runs-root /workspace/blast-radius-research] [--claims-dir evals/fixtures/claims] [--formats md,html,pdf] [--require-v1]
+```
+
+Changes from the proposal:
+
+1. **Evals and guardrails section** (after Trust checks): every report runs `evals.checks.evaluate_record` (shared v1
+   schema with checksum check, versions, runs per side, single thread, prediction, golden case, `_safe_tags` import
+   message, LLM citations) plus the report's own citation check, with How-to-fix per row. **Any eval FAIL makes the
+   verdict COULD NOT VERIFY / Re-run** (new first rule in the verdict table); eval warnings give Approve with notes
+   and lower confidence.
+2. **Every claim cites its log line.** Each claim row and each unmentioned-change row has a "Log line" column:
+   `pytest-new-N.log:<line>` plus the quoted text, linked to the file. Breaks and import failures are found by the
+   longest literal fragment of their signature (pytest `E ` lines preferred); not-testable claims cite the observed
+   signature they explain, otherwise the new-side pytest summary line. The report re-verifies all of them with
+   `evals.checks.check_citations`; an unverified or missing citation is a FAIL in that section and lowers confidence.
+   The evidence links also cite the pytest summary line of old and new run 1.
+3. **Golden cases** come from `evals/golden_cases.json` checked against the stored records in
+   `evals/fixtures/golden_v1.jsonl` (`--golden-records` to change) with the eval gate's own code, so the report and
+   CI cannot disagree. Case names are ours (e.g. `golden-clean-sklearn151-152-imblearn`), not the file names in
+   `blast-radius-research/evals/golden/`.
+4. **Rerun command** uses this repo's wrapper: `BR_RUNNER=.../br_run.py python -m harness.run ...`, which forces 3
+   runs per side and the single-thread env. Section renamed "Rerun command".
+5. **Evidence links** is its own section (was "Artifacts" in the appendix) and adds PR and claim citations.
+6. **Daily summary** gains a "Needs attention first" list above the table and an Evals column; rows link to HTML,
+   PDF and MD.
+7. **Inputs:** a record.json, an observations .jsonl, or an eval result .json. Claims come from `--claims-dir`
+   or, new, from the record's `claims` field.
+8. **Schema:** the proposed fields were added to `harness/schema/observation.schema.json` as OPTIONAL fields (rev 2,
+   sha256 `088cd395...`): `pr` {repo, number, url, title, base_sha, head_sha, merge_commit}, `claims`,
+   `upstream_commit_old`, `upstream_commit_new`, `per_test_outcomes`, `old_output`, `golden_check`
+   {harness_version, passed, total, date, cases}, `reviewer_decision` {decision, reviewer, date, note}. `hand_check`
+   and `upstream_issue` already existed. `explanation` already existed. Rev 1 records stay valid; see
+   `harness/schema/README.md`. The report reads them: `pr` sets the subject and drops the release-scope note,
+   `old_output` fills "Before", `golden_check` adds a "Golden cases (re-run)" trust row, `reviewer_decision`
+   replaces the blank decision line.

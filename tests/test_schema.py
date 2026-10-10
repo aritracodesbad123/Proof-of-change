@@ -37,8 +37,39 @@ def test_machine_type_needs_arch_and_os(upset):
 
 
 def test_schema_is_the_shared_file():
+    from guardrails.schema import COMPATIBLE_SCHEMA_SHA256, SCHEMA_REVISION
     assert SCHEMA_PATH.parts[-3:] == ("harness", "schema", "observation.schema.json")
-    assert SCHEMA_SHA256 == "5a3c3d36b7730ce74d0f23b03c88ea862ea35cc327c7d79481fca8b972e8383e"
+    assert SCHEMA_SHA256 == "088cd395004de286c5f1df76fe94a0dc523738be194166cd3b616c77b6298183"  # rev 2
+    assert SCHEMA_REVISION == 2
+    assert COMPATIBLE_SCHEMA_SHA256["5a3c3d36b7730ce74d0f23b03c88ea862ea35cc327c7d79481fca8b972e8383e"] == "rev 1"
+    readme = (SCHEMA_PATH.parent / "README.md").read_text()
+    assert all(sha in readme for sha in COMPATIBLE_SCHEMA_SHA256)  # documented
+
+
+def test_rev1_records_still_valid_under_rev2(golden_v1_records):
+    from guardrails.schema import schema_reference_note
+    for r in golden_v1_records:
+        assert r["schema_sha256"].startswith("5a3c3d36")  # Jonathan's records were written against rev 1
+        assert validate_record(r, require_v1=True) == []
+        assert "valid under current rev 2" in schema_reference_note(r)
+
+
+def test_rev2_optional_fields(golden_v1_records):
+    import json
+
+    from conftest import REPO
+    ex = json.loads((REPO / "evals" / "fixtures" / "record_rev2_example.json").read_text())
+    assert validate_record(ex, require_v1=True) == []
+    for f in ("pr", "claims", "old_output", "golden_check", "reviewer_decision", "upstream_commit_old", "upstream_commit_new"):
+        assert f in ex and all(f not in r for r in golden_v1_records)  # optional: absent in rev 1 records
+    bad = copy.deepcopy(ex)
+    bad["reviewer_decision"]["decision"] = "maybe"
+    bad["pr"]["number"] = "29677"
+    bad["claims"]["claims"][0]["check"]["kind"] = "guess"
+    bad["golden_check"]["passed"] = True
+    errs = " ".join(validate_record(bad))
+    for s in ("reviewer_decision.decision", "pr.number", "claims.claims[0].check.kind", "golden_check.passed"):
+        assert s in errs, s
 
 
 def test_golden_v1_records_valid_in_v1_mode(golden_v1_records):

@@ -1,0 +1,326 @@
+{
+ "schema_version": "1",
+ "schema_path": "/workspace/blast-radius/harness/schema/observation.schema.json",
+ "schema_sha256": "088cd395004de286c5f1df76fe94a0dc523738be194166cd3b616c77b6298183",
+ "harness_version": "1.0",
+ "id": "example-rev2-sklearn160rc1-imblearn0124",
+ "date_ist": "2026-10-10 05:36 IST",
+ "who": "Jonathan",
+ "machine": "box",
+ "host": "grok-bot-vm-345453355",
+ "cpu_count": 8,
+ "platform": "Linux-6.12.94+-x86_64-with-glibc2.41",
+ "upstream": "scikit-learn",
+ "old_version": "1.5.2",
+ "new_version": "1.6.0rc1",
+ "new_version_requested": "1.6.0rc1",
+ "new_direct_url": null,
+ "dependent": "imbalanced-learn",
+ "dependent_version": "0.12.4",
+ "test_source": "wheel (tests shipped in the installed package: imblearn)",
+ "test_selection": "imblearn",
+ "subset_note": null,
+ "python": "3.13.5",
+ "runs_per_side": 3,
+ "workers": "4",
+ "import_mode": "prepend",
+ "cpus": "0-3",
+ "mem_cap_gb": 6.0,
+ "test_timeout_s": 300,
+ "run_timeout_s": 1500,
+ "pin_overridden": false,
+ "env_diff": [
+  "scikit-learn==1.5.2",
+  "scikit-learn==1.6.0rc1"
+ ],
+ "pip_check_new": "ok",
+ "pip_check_old": "ok",
+ "machine_type": {
+  "arch": "x86_64",
+  "os": "Linux",
+  "platform": "Linux-6.12.94+-x86_64-with-glibc2.41",
+  "cpu_count": 8,
+  "cpu_model": "Intel(R) Xeon(R) Processor",
+  "ram_gb": 15.6,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "box"
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1"
+ },
+ "dependent_import": {
+  "old": {
+   "imblearn": "ok"
+  },
+  "new": {
+   "imblearn": "ImportError: cannot import name '_safe_tags' from 'sklearn.utils._tags' (/workspace/blast-radius-research/research/runs/golden-sklearn160rc1-imblearn0124/venv-new/lib/python3.13/site-packages/sklearn/utils/_tags.py)"
+  }
+ },
+ "network": "install: allowed (uv from PyPI/nightly index, git clone of the tag); tests: no network (unshare -rn, private network namespace)",
+ "per_run": [
+  {
+   "side": "old",
+   "run": 1,
+   "exit": 0,
+   "seconds": 43.22,
+   "passed": 2243,
+   "failed": 0,
+   "error": 0,
+   "collection_errors": 0,
+   "skipped": 34,
+   "junit": true,
+   "pytest_summary": "2238 passed, 33 skipped, 1 xfailed, 5 xpassed, 62 warnings in 42.45s",
+   "summary_counts": {
+    "passed": 2238,
+    "skipped": 33,
+    "xfailed": 1,
+    "xpassed": 5,
+    "warning": 62
+   }
+  },
+  {
+   "side": "new",
+   "run": 1,
+   "exit": 1,
+   "seconds": 14.98,
+   "passed": 0,
+   "failed": 0,
+   "error": 525,
+   "collection_errors": 525,
+   "skipped": 0,
+   "junit": true,
+   "pytest_summary": "525 errors in 14.44s",
+   "summary_counts": {
+    "error": 525
+   }
+  },
+  {
+   "side": "old",
+   "run": 2,
+   "exit": 0,
+   "seconds": 47.55,
+   "passed": 2243,
+   "failed": 0,
+   "error": 0,
+   "collection_errors": 0,
+   "skipped": 34,
+   "junit": true,
+   "pytest_summary": "2238 passed, 33 skipped, 1 xfailed, 5 xpassed, 62 warnings in 46.64s",
+   "summary_counts": {
+    "passed": 2238,
+    "skipped": 33,
+    "xfailed": 1,
+    "xpassed": 5,
+    "warning": 62
+   }
+  },
+  {
+   "side": "new",
+   "run": 2,
+   "exit": 1,
+   "seconds": 16.09,
+   "passed": 0,
+   "failed": 0,
+   "error": 525,
+   "collection_errors": 525,
+   "skipped": 0,
+   "junit": true,
+   "pytest_summary": "525 errors in 15.52s",
+   "summary_counts": {
+    "error": 525
+   }
+  },
+  {
+   "side": "old",
+   "run": 3,
+   "exit": 0,
+   "seconds": 43.68,
+   "passed": 2243,
+   "failed": 0,
+   "error": 0,
+   "collection_errors": 0,
+   "skipped": 34,
+   "junit": true,
+   "pytest_summary": "2238 passed, 33 skipped, 1 xfailed, 5 xpassed, 62 warnings in 42.85s",
+   "summary_counts": {
+    "passed": 2238,
+    "skipped": 33,
+    "xfailed": 1,
+    "xpassed": 5,
+    "warning": 62
+   }
+  },
+  {
+   "side": "new",
+   "run": 3,
+   "exit": 1,
+   "seconds": 15.43,
+   "passed": 0,
+   "failed": 0,
+   "error": 525,
+   "collection_errors": 525,
+   "skipped": 0,
+   "junit": true,
+   "pytest_summary": "525 errors in 14.87s",
+   "summary_counts": {
+    "error": 525
+   }
+  }
+ ],
+ "gates": {
+  "versions_verified": {
+   "pass": true,
+   "detail": "old scikit-learn==1.5.2, new scikit-learn==1.6.0rc1, imbalanced-learn==0.12.4 on both sides (freeze + import probe)"
+  },
+  "env_identical_except_upstream": {
+   "pass": true,
+   "detail": "freeze diff: ['scikit-learn==1.5.2', 'scikit-learn==1.6.0rc1']"
+  },
+  "venv_isolated": {
+   "pass": true,
+   "detail": "both venvs created by uv without system site-packages (checked sys.prefix and sys.path)"
+  },
+  "threads_pinned": {
+   "pass": true,
+   "detail": "OMP_NUM_THREADS, OPENBLAS_NUM_THREADS, MKL_NUM_THREADS, NUMEXPR_NUM_THREADS, VECLIB_MAXIMUM_THREADS, BLIS_NUM_THREADS = 1 in both envs"
+  },
+  "runs_complete": {
+   "pass": true,
+   "detail": "3 runs per side requested (minimum 3); JUnit XML present and no suite timeout on every run"
+  },
+  "old_side_healthy": {
+   "pass": true,
+   "detail": "dependent imports on old: {'imblearn': 'ok'}; old side passed [2243, 2243, 2243] tests with collection errors [0, 0, 0]"
+  },
+  "stability": {
+   "pass": true,
+   "required": false,
+   "detail": "share of tests with the same outcome in every run: old 1.0, new 1.0 (advisory threshold 0.99)"
+  },
+  "no_secrets_in_logs": {
+   "pass": true,
+   "required": false,
+   "detail": "scrubbed env; no credential-like strings found in logs"
+  },
+  "schema_valid": {
+   "pass": true,
+   "detail": "record matches harness/schema/observation.schema.json"
+  }
+ },
+ "accepted": true,
+ "classification": {
+  "real_break": 0,
+  "already_broken": 0,
+  "flaky": 0,
+  "import_failure": 46,
+  "fixed_by_new": 0,
+  "lost_tests": 2243
+ },
+ "stability": {
+  "tests": 2295,
+  "old_stable_rate": 1.0,
+  "new_stable_rate": 1.0
+ },
+ "top_error_signatures_breaks": [
+  [
+   "E   ImportError: cannot import name '_safe_tags' from 'sklearn.utils._tags' (<path>",
+   505
+  ],
+  [
+   "package import imblearn: ImportError: cannot import name '_safe_tags' from 'sklearn.utils._tags' (<path>",
+   46
+  ],
+  [
+   "ImportError: cannot import name '_safe_tags' from 'sklearn.utils._tags' (<path>",
+   19
+  ],
+  [
+   "ImportError: cannot import name 'assert_no_warnings' from 'sklearn.utils._testing' (<path>",
+   1
+  ]
+ ],
+ "top_error_signatures_already_broken": [],
+ "duration_s": {
+  "total_wall": 189.1,
+  "tests_old_mean": 44.8,
+  "tests_new_mean": 15.5
+ },
+ "expected": "break: imbalanced-learn 0.12.4 cannot be imported on 1.6.0rc1 (ImportError on sklearn.utils._tags._safe_tags). Expect old 2238 passed (pytest summary), new 0 passed / 525 errors, import_failure 46 modules, lost_tests 2243, real_break 0.",
+ "expected_class": "break",
+ "matches_expected": "yes",
+ "explanation": {
+  "status": "not yet wired",
+  "groundedness": null
+ },
+ "hand_check": null,
+ "upstream_issue": null,
+ "notes": "CONSTRUCTED EXAMPLE (Nathan, 2026-10-10) to exercise the optional schema rev 2 fields; copied from Jonathan's golden record golden-sklearn160rc1-imblearn0124 with id, schema_sha256 and the rev 2 fields added. NOT a real PR run: the pr block names the PR behind the break, but the run itself compared the 1.5.2 and 1.6.0rc1 release wheels. Never use for scoring.",
+ "logs": "research/runs/golden-sklearn160rc1-imblearn0124",
+ "report": "reports/golden-sklearn160rc1-imblearn0124/REPORT.md",
+ "pr": {
+  "repo": "scikit-learn/scikit-learn",
+  "number": 29677,
+  "url": "https://github.com/scikit-learn/scikit-learn/pull/29677",
+  "title": "API Revamp estimator tags",
+  "base_sha": "0bfebf4235f37c09625e07d9fb0060210b3e0fdd",
+  "head_sha": "e04142cbe0f4f854272f877eb9692053b0a6bcf8",
+  "merge_commit": "e04142cbe0f4f854272f877eb9692053b0a6bcf8"
+ },
+ "claims": {
+  "says": "PR #29677 \"API Revamp estimator tags\" replaces the old estimator tags with a new tags API",
+  "says_source": "PR title, verified via the GitHub API on 2026-10-10",
+  "claims": [
+   {
+    "id": "C1",
+    "text": "Revamps the estimator tags API",
+    "source": "PR #29677 title",
+    "check": {
+     "kind": "none"
+    },
+    "why_not_testable": "the dependent's tests cannot show the new tags API is correct",
+    "explains_signatures": [
+     "_safe_tags"
+    ],
+    "link_source": "the PR #29677 diff"
+   },
+   {
+    "id": "C2",
+    "text": "Existing downstream code keeps working",
+    "source": "constructed example claim",
+    "check": {
+     "kind": "no_breaks"
+    }
+   }
+  ]
+ },
+ "upstream_commit_old": null,
+ "upstream_commit_new": null,
+ "old_output": {},
+ "golden_check": {
+  "harness_version": "1.0",
+  "passed": 3,
+  "total": 3,
+  "date": "2026-10-10",
+  "cases": [
+   "golden-sklearn160rc1-imblearn-import-failure",
+   "golden-pandas300rc0-upsetplot-cow",
+   "golden-clean-sklearn151-152-imblearn"
+  ]
+ },
+ "reviewer_decision": {
+  "decision": "reject",
+  "reviewer": "example reviewer",
+  "date": "2026-10-10",
+  "note": "constructed example"
+ }
+}

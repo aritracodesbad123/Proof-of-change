@@ -14,3 +14,7 @@ dist/
 eval-results*.json
 reports/runs/*.md
 !reports/runs/.gitkeep
+
+# generated reviewer reports (CI and daily ops output)
+reports/runs/
+reports/daily/
