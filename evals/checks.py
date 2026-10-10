@@ -3,7 +3,7 @@
 status is one of: pass, fail, warn, skip, todo.
   fail -> the run must be rejected
   warn -> approver should look, but the run is not rejected for it
-  todo -> the check is not active yet (missing data from Jonathan)
+  todo -> the check is not active yet (missing data from the protocol owner)
 """
 from __future__ import annotations
 
@@ -161,7 +161,7 @@ def check_golden_case(rec: dict, case: dict) -> Result:
     name = case["name"] + {"TODO": " [TODO data]", "pending": " [PENDING, not golden yet]"}.get(status, "")
     if problems and status == "pending":
         return Result(f"golden:{case['name']}", "warn", f"{name}: " + "; ".join(problems),
-                      "Candidate pair does not hold yet; Jonathan to confirm or replace it before it becomes golden.")
+                      "Candidate pair does not hold yet; the protocol owner to confirm or replace it before it becomes golden.")
     if problems:
         return Result(f"golden:{case['name']}", "fail", f"{name}: " + "; ".join(problems),
                       "A known break was missed or miscounted: the classifier or environment regressed. Diff this "

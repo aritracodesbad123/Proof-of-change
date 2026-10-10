@@ -13,25 +13,28 @@ Plain-language version: the [README](../README.md). This page is the detail behi
 
 `make` puts `.venv/bin` first on `PATH`, so the `uv` installed by `make setup` (extra `ops`) is the one the runner uses.
 
-## Daily schedule (IST)
+## Inputs of a daily run
 
-- **10:15** Jonathan updates the registry on the shared machine: `/workspace/blast-radius-research/registry/tracked-libraries.csv`
-  (one row per library: `library,repo,added_on_ist,added_by,priority,status,why_added,test_notes`) and, optionally, a
-  picks file `registry/picks/<date>.md` naming specific PRs, with install and test commands and an expected verdict.
-- **11:15** the ops worker runs `ops/daily_run.py` (equivalent to `make daily`) in the main checkout. The schedule
-  lives in the bot's routine, not in this repo (there is no cron file here).
+- **Tracked libraries:** a CSV, one row per library: `library,repo,added_on_ist,added_by,priority,status,why_added,
+  test_notes`. Resolution: `--libraries-file`, else `$POC_LIBRARIES_FILE`, else `libraries_file` in `ops/local.json`,
+  else the committed seed list `ops/tracked-libraries.csv` (numpy, pandas, scikit-learn).
+- **Chosen PRs (optional):** a `<date>.md` file naming specific PRs per library, with install and test commands and
+  an expected verdict. Resolution: `--chosen-prs`, else `<chosen_prs_dir>/<date>.md` (`$POC_CHOSEN_PRS_DIR` or
+  `ops/local.json`), else `<libraries file folder>/chosen-prs/<date>.md`.
+- **Independent verification (optional):** `<verification_dir>/<date>/verification.jsonl`, scored after all verdicts.
 
-Registry resolution: `--registry`, else `$POC_REGISTRY`, else Jonathan's registry if that path exists, else the
-committed seed list `ops/tracked-libraries.csv` (numpy, pandas, scikit-learn).
+`ops/local.json` is git-ignored and holds machine-local paths (keys: `libraries_file`, `chosen_prs_dir`,
+`verification_dir`, `golden_status`, `research_dir`; see `poc/local_config.py`). Environment variables override it.
+There is no scheduler in this repo; run `make daily` (or `ops/daily_run.py`) from whatever scheduler you use.
 
 ## Selecting PRs
 
-- **Picks file present for a repo:** exactly those PRs, at the pinned head SHA; selection filters do not apply.
+- **Chosen-PRs file names PRs for a repo:** exactly those PRs, at the pinned head SHA; selection filters do not apply.
   Expected verdicts are read only after every verdict is final (`read_expectations`), so they cannot steer the run;
   `REPORT.md` then scores expected vs actual (match / miss / false alarm).
 - **Otherwise:** open PRs updated since the last run (`ops/seen_prs.json`), not drafts, upstream CI not failing,
   touching Python or compiled code inside the package; pure-Python first; at most `--max-per-library` (3).
-- **`--pr <url>`:** exactly that PR (repeatable), no registry, no picks, and `seen_prs.json` cut-offs are not moved,
+- **`--pr <url>`:** exactly that PR (repeatable), no library list, no chosen-PRs file, and `seen_prs.json` cut-offs are not moved,
   so a manual check never changes what the next daily run selects.
 
 ## How a PR is tested (routes)
@@ -42,14 +45,54 @@ committed seed list `ops/tracked-libraries.csv` (numpy, pandas, scikit-learn).
 | `source-build` | same libraries, PR touches compiled code | nightly wheel | PR head built from source (`--build-timeout`, 1800 s) |
 | `source-pair` | any other library | base-branch tip (or merge-base if the PR conflicts) built from git | GitHub's test merge commit (or the PR head) |
 
-Tests: test files mapped from the touched modules (or the picks file's subset), **3 alternating runs per side**
+Tests: test files mapped from the touched modules (or the chosen-PRs file's subset), **3 alternating runs per side**
 (main 1, PR 1, main 2, ...), `OMP/OPENBLAS/MKL/NUMEXPR_NUM_THREADS=1`, pytest `-q -rfE --timeout=120` with JUnit XML,
 `--run-timeout` 900 s per run, `-n 4` workers. `GITHUB_TOKEN` (optional, read-only API calls) is removed from the
 environment of PR code. The comparison is plain code: `poc/diff.py confirm()` per test over the 3 runs, then
 `poc/verdict.py pr_verdict()`.
 
-Verdict: `could_not_verify` if setup/build/patch failed, a run timed out, or no tests ran; `needs_attention` for
-regressions, new failing tests, tests missing on the PR side or other outcome changes; `verified` otherwise.
+Both sides get the library's test extras plus `optional_test_deps` (per library in `LIBS`), so tests don't skip
+for missing optional modules. The nightly wheel is pinned (exact file, sha256, build date and commit are recorded);
+source-pair records the GitHub test merge commit. Thread env: `OMP`, `OPENBLAS`, `MKL`, `NUMEXPR`, `VECLIB_MAXIMUM`,
+`BLIS` thread counts all 1.
+
+Comparison: rename-aware. An id that disappears is only `removed_tests` if no new id with the same base test name
+appeared; otherwise it is listed under `reparametrized` and the new ids are judged by their own outcomes. Failures
+identical on both sides are `preexisting_failures`. Unexplained pytest exit codes give `could_not_verify`.
+
+Verdict: `could_not_verify` if setup/build/patch failed, a run timed out, no tests ran, an exit code is unexplained, or
+new/changed tests were skipped because an optional dependency is missing; `needs_attention` for regressions, new
+failing tests, tests missing on the PR side or other outcome changes; `verified` otherwise. Then the coverage gate.
+
+## Coverage gate (`poc/coverage_gate.py`)
+
+"Verified" must mean the changed code was exercised. After the 3 timed runs, `coverage_run()` installs `coverage` and
+`pytest-cov` into the PR venv and runs the PR side's test subset once more under `--cov=<dirs of the changed
+files>` (untimed, so the 3 timed runs stay clean; logs `coverage-pytest.log`, data `coverage-pr.json`). Changed lines
+are computed by `difflib` between the main-side file and the PR-side file that was actually tested (exact for every
+route, including a diff applied with offsets); executable lines are coverage.py's executed + missing lines. Only
+non-test Python files that ship with the library count (not `tests/`, `test_*.py`, `conftest.py`, docs, benchmarks,
+`setup.py`).
+
+| Case | Effect |
+|---|---|
+| Python changes, 0% of changed executable lines ran | `verified` -> `could_not_verify`, reason "not fully verified: changed code never ran: 0 of N ..." |
+| Python changes, under 50% | verdict kept; `coverage_gate.confidence = lower` (report: WARN, Medium confidence) |
+| Python changes, coverage not measured (old record, `--no-coverage`, or the coverage run failed) | verdict kept; confidence lower; note says why |
+| Compiled sources (`.c .h .cpp .pyx .pxd ...`, not build config) and no changed test file whose name contains the module stem | `verified` -> `could_not_verify`, "not fully verified: compiled code changed (...)" |
+| No executable change (docs/tests/config) | stays `verified`, note "no executable code changed" |
+| `needs_attention` / `could_not_verify` | never changed |
+
+Record fields (schema rev 4, all optional): `changed_lines_total`, `changed_lines_covered` (null = not measured),
+`coverage` (raw run), `coverage_gate` {kind, changed, confidence, note}, `verdict_before_coverage_gate`,
+`reason_before_coverage_gate`. The gate is idempotent and is re-applied in memory by `--report-only` and by
+`reports/pr_report.py`; saved records are never rewritten.
+
+**Limitations.** coverage.py cannot measure compiled code, so the compiled rule is a heuristic: a changed test file
+named after the module (`item_selection.c` -> `test_item_selection.py`) counts as "a test that calls into the changed
+module"; it does not prove the test reaches the changed C lines, and a test with an unrelated name is not recognised.
+A PR mixing Python and compiled changes gets both rules. Lines run only by import (module-level code) count as
+covered. The coverage run adds roughly one more test run per PR (about 15-60 s on day-1 PRs).
 
 ## Files a run writes
 
@@ -57,8 +100,11 @@ regressions, new failing tests, tests missing on the PR side or other outcome ch
 ops/runs/<folder>/                         (git-ignored)
   REPORT.md            run log for operators: per-PR lines, what went right/wrong, skipped PRs, expected vs actual
   records.jsonl        one record per PR;  selection.json  what was picked and skipped
-  <pkg>-<pr>/          record.json, pr.diff, setup-*.log, build-pr.log / patch.log / git.log,
-                       pytest-{main,pr}-{1,2,3}.log, junit-{main,pr}-{1,2,3}.xml
+  run_meta.json        timings, machine, problems (needed by --report-only)
+  superseded/attempt-N/ earlier attempts of the same date (records, logs, NOTE.md); the selection stays frozen
+  <pkg>-<pr>/          record.json, pr.diff, setup-*.log, build-pr.log / patch.log / git.log, freeze-{main,pr}.txt,
+                       pytest-{main,pr}-{1,2,3}.log, junit-{main,pr}-{1,2,3}.xml,
+                       coverage-pytest.log, coverage-pr.json (coverage gate)
 ops/work/                                  scratch venvs and checkouts, deleted after each PR (git-ignored)
 ops/seen_prs.json                          incremental state for the daily selection (git-ignored)
 reports/daily/<folder>/                    (git-ignored)
@@ -74,6 +120,11 @@ Same section order, renderers and verdict vocabulary as the golden-record report
 - **Verdict mapping:** `verified` -> VERIFIED / Approve (Approve with notes if a check warned or tests were fixed);
   `needs_attention` -> NEEDS ATTENTION / Reject; `could_not_verify` -> COULD NOT VERIFY / Re-run. **Any failed
   check below also gives COULD NOT VERIFY / Re-run** (the run cannot be trusted).
+- **Coverage gate:** a gated `could_not_verify` (reason "not fully verified ...") is COULD NOT VERIFY / **Review by
+  hand** (a re-run would not change it), Low confidence. Low coverage or "not measured" is a WARN. The summary lists
+  every verdict the gate changed under "Changed by the coverage gate", and earlier attempts under "Re-runs".
+- **Record shape:** pr_run records (schema rev 3+) keep the PR in a `pr` object and durations in `duration_s`;
+  `normalize()` flattens them (older flat records still render).
 - **Confidence:** High when every check passes, Medium with warnings, Low for COULD NOT VERIFY.
 - **Claims:** C1 is the PR title (not testable until Nemotron claim extraction exists); C2 is the implicit claim
   "tests that pass on main still pass"; one "unmentioned change" row per kind of difference. Each row cites a log
@@ -81,16 +132,21 @@ Same section order, renderers and verdict vocabulary as the golden-record report
   All citations are re-read from disk and must match (`verify`), otherwise the check fails.
 - **Evals and guardrails:** 3 runs per side, single-thread env, machine type recorded, nothing posted upstream,
   citations verified (FAIL -> Re-run); flaky tests, PR moved since tested, `pip check` (WARN -> lower confidence).
-- **Known-answer replay (ported from Jonathan's render_report.py):** if the latest replay in
-  `$BR_GOLDEN_STATUS` (default: the Validation Center's `research/validation/golden-status.json` on the box) has
+- **Known-answer replay (ported from render_report.py):** if the latest replay status file (`$BR_GOLDEN_STATUS`,
+  else `golden_status` in `ops/local.json`; JSON with `all_passed`, `date_ist`, `failed`) has
   `all_passed: false`, every report is COULD NOT VERIFY / Re-run with Low confidence. The same applies to the
   golden-record reports (`reports/reviewer.py`), where a record's own failed `golden_check` also forces it. Tests set
-  `BR_GOLDEN_STATUS` to empty so they never depend on the box file.
+  `BR_GOLDEN_STATUS` to empty so they never depend on a machine-local file.
 - **PDF:** headless Chrome/Chromium (`$BR_CHROME`, PATH, or `/Applications/Google Chrome.app`). Without it, HTML and
   Markdown are still written and a note is printed.
 
 ## Flags (ops/daily_run.py)
 
-`--pr URL` (repeatable), `--registry`, `--picks`, `--libraries a,b`, `--max-per-library 3`, `--scan-limit 15`,
-`--runs 3`, `--workers 4`, `--python 3.12`, `--test-timeout 120`, `--run-timeout 900`, `--build-timeout 1800`,
-`--min-free-gb 20`, `--select-only`, `--resume`, `--date`, `--ops-dir`, `--work-dir`, `--report-dir`, `--no-report`.
+`--pr URL` (repeatable), `--libraries-file`, `--chosen-prs`, `--verification`, `--libraries a,b`, `--max-per-library 3`,
+`--scan-limit 15`, `--runs 3`, `--workers 4`, `--python 3.12`, `--test-timeout 120`, `--run-timeout 900`,
+`--build-timeout 1800`, `--min-free-gb 20`, `--select-only`, `--resume`, `--reselect`, `--rerun-note TEXT`,
+`--report-only` (rebuild REPORT.md and the reviewer reports from `records.jsonl`, `run_meta.json` and
+`selection.json`; nothing is re-tested), `--date`, `--ops-dir`, `--work-dir`, `--report-dir`, `--no-report`,
+`--no-coverage` (skip the coverage run; the gate then says "not measured").
+
+A full daily run takes about 15-20 minutes (day 1: 15 PRs in 16.4 min wall time, before the coverage run existed).

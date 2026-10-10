@@ -1,6 +1,6 @@
-# Proof-of-Change reviewer summary: golden records, 2026-10-10
+# Proof-of-Change reviewer summary
 
-Generated 2026-10-10 06:40 IST. 3 report(s): 2 need attention, 0 could not be verified, 1 verified. Items that need a decision are listed first.
+Generated 2026-10-10 07:03 IST. 3 report(s): 2 need attention, 0 could not be verified, 1 verified. Items that need a decision are listed first.
 
 ## Needs attention first
 
@@ -20,5 +20,5 @@ Generated 2026-10-10 06:40 IST. 3 report(s): 2 need attention, 0 could not be ve
 | Verdict | Meaning |
 |---|---|
 | 🟠 **NEEDS ATTENTION** | The run is trustworthy and found a problem: breaks, import failures, or a false claim. |
-| ⚪ **COULD NOT VERIFY** | The run failed its own trust checks or Nathan's evals. No conclusion; re-run after fixing. |
+| ⚪ **COULD NOT VERIFY** | The run failed its own trust checks or the evals (no conclusion; re-run after fixing), or, for PR runs, the tests never exercised the changed code (review by hand). |
 | 🟢 **VERIFIED** | The run is trustworthy and found no behavior change. |

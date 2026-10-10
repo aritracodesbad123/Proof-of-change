@@ -30,7 +30,7 @@ def imblearn(ci_records):
 
 @pytest.fixture
 def dev_imblearn(legacy_records):
-    """Jonathan's dev calibration record (runner miscount; must fail the raw-reproduction gates)."""
+    """The runner's dev calibration record (runner miscount; must fail the raw-reproduction gates)."""
     return next(r for r in legacy_records if r["dependent"] == "imbalanced-learn")
 
 
@@ -39,7 +39,7 @@ FIXTURE_RUNS = REPO / "evals" / "fixtures"
 
 @pytest.fixture
 def golden_v1_records():
-    """Jonathan's three final golden records (shared schema v1, HARNESS_VERSION 1.0, 10 Oct 2026 IST)."""
+    """The three final golden records (shared schema v1, HARNESS_VERSION 1.0, 10 Oct 2026 IST)."""
     p = REPO / "evals" / "fixtures" / "golden_v1.jsonl"
     return [json.loads(x) for x in p.read_text().splitlines() if x.strip()]
 
@@ -61,5 +61,5 @@ def g_clean(golden_v1_records):
 
 @pytest.fixture(autouse=True)
 def _no_box_replay(monkeypatch):
-    """Tests never read the Validation Center's replay file on the box; tests that need one set BR_GOLDEN_STATUS."""
+    """Tests never read a machine-local replay status file; tests that need one set BR_GOLDEN_STATUS."""
     monkeypatch.setenv("BR_GOLDEN_STATUS", "")

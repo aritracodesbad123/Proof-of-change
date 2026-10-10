@@ -1,10 +1,10 @@
 # Reviewer report format (proposal)
 
-Status: proposal from Jonathan, 10 Oct 2026; **adopted by Nathan on 10 Oct 2026 with the changes listed at the end** ("Adopted by Nathan"). Nathan owns the approver report in aritracodesbad123/blast-radius.
+Status: proposal of 10 Oct 2026; **adopted on 10 Oct 2026 with the changes listed at the end** ("Adopted").
 
 Goal: a busy approver who may not be an engineer decides in under 2 minutes from the top of page 1, and drills down only if needed.
 
-Generator: `python -m reports.generate` (code in `reports/reviewer.py`, ported from Jonathan's `harness/report/render_report.py`, which is now a shim to it). Standard library only; PDF via headless Chrome or Chromium.
+Generator: `python -m reports.generate` (code in `reports/reviewer.py`, ported from `harness/report/render_report.py`, which is now a shim to it). Standard library only; PDF via headless Chrome or Chromium.
 
 ```
 python3 harness/report/render_report.py <record.json> [<record.json> ...] \
@@ -106,15 +106,15 @@ Proposed schema additions (optional fields, so v1 records stay valid):
 | `explanation` (LLM) | plain-English cause with citations | status "not yet wired" |
 | `reviewer_decision` {decision, reviewer, date, note} | close the loop after approval | not recorded |
 
-## Adopted by Nathan (10 Oct 2026)
+## Adopted (10 Oct 2026)
 
-The team has one report generator: `reports/generate.py` (entry point) + `reports/reviewer.py`. The old Markdown-only
+There is one report generator: `reports/generate.py` (entry point) + `reports/reviewer.py`. The old Markdown-only
 approver report was removed; `harness/report/render_report.py` is kept as a shim so the command above still works
 (`--root` maps to `--runs-root`; `--golden-dir` and `--observations` are ignored, see below).
 
 ```
 python -m reports.generate <record.json | observations.jsonl | eval-results.json> ... --out reports/daily/<date> \
-  [--runs-root /workspace/blast-radius-research] [--claims-dir evals/fixtures/claims] [--formats md,html,pdf] [--require-v1]
+  [--runs-root DIR] [--claims-dir evals/fixtures/claims] [--formats md,html,pdf] [--require-v1]
 ```
 
 Changes from the proposal:
@@ -132,8 +132,7 @@ Changes from the proposal:
    The evidence links also cite the pytest summary line of old and new run 1.
 3. **Golden cases** come from `evals/golden_cases.json` checked against the stored records in
    `evals/fixtures/golden_v1.jsonl` (`--golden-records` to change) with the eval gate's own code, so the report and
-   CI cannot disagree. Case names are ours (e.g. `golden-clean-sklearn151-152-imblearn`), not the file names in
-   `blast-radius-research/evals/golden/`.
+   CI cannot disagree. Case names are ours (e.g. `golden-clean-sklearn151-152-imblearn`), not the runner's own file names.
 4. **Rerun command** uses this repo's wrapper: `BR_RUNNER=.../br_run.py python -m harness.run ...`, which forces 3
    runs per side and the single-thread env. Section renamed "Rerun command".
 5. **Evidence links** is its own section (was "Artifacts" in the appendix) and adds PR and claim citations.
@@ -149,7 +148,7 @@ Changes from the proposal:
    `harness/schema/README.md`. The report reads them: `pr` sets the subject and drops the release-scope note,
    `old_output` fills "Before", `golden_check` adds a "Golden cases (re-run)" trust row, `reviewer_decision`
    replaces the blank decision line.
-9. **Known-answer replay rule** (Jonathan, ported 10 Oct): a failed latest replay of the golden cases
-   (`research/validation/golden-status.json`, or `$BR_GOLDEN_STATUS`) forces COULD NOT VERIFY / Re-run with Low
+9. **Known-answer replay rule** (ported 10 Oct): a failed latest replay of the golden cases
+   (the status file named by `$BR_GOLDEN_STATUS` or `golden_status` in `ops/local.json`) forces COULD NOT VERIFY / Re-run with Low
    confidence on every report and adds a "Known-answer replay (fresh re-run)" trust row; so does a record's own
    failed `golden_check`.

@@ -1,0 +1,36 @@
+{
+ "source": "ops/runs/2026-10-10/superseded/attempt-4/pandas-70520 (day 1, attempt 4), trimmed to the relevant testcases",
+ "verdict_attempt4": "needs_attention",
+ "per_run": [
+  {
+   "side": "main",
+   "run": 1,
+   "exit": 0
+  },
+  {
+   "side": "pr",
+   "run": 1,
+   "exit": 0
+  },
+  {
+   "side": "main",
+   "run": 2,
+   "exit": 0
+  },
+  {
+   "side": "pr",
+   "run": 2,
+   "exit": 0
+  },
+  {
+   "side": "main",
+   "run": 3,
+   "exit": 0
+  },
+  {
+   "side": "pr",
+   "run": 3,
+   "exit": 0
+  }
+ ]
+}

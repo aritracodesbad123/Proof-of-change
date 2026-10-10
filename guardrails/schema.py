@@ -1,13 +1,13 @@
 """Schema validation for observation records.
 
 Single source of truth: the shared JSON Schema `harness/schema/observation.schema.json`
-(`$id` blast-radius/observation/v1, agreed with Jonathan, merged from feat/shared-schema @ ed75df4;
+(`$id` blast-radius/observation/v1, merged from feat/shared-schema @ ed75df4;
 revision 2 adds OPTIONAL reviewer-report fields, see harness/schema/README.md).
 This module loads that file and validates against it with a small stdlib-only JSON Schema subset
-(type, required, properties, items, enum, pattern, minimum, minLength), so it runs anywhere the
+(type, required, properties, items, enum, const, pattern, minimum, minLength, if/then/else), so it runs anywhere the
 runner runs without a jsonschema dependency. Keywords outside that subset fail loudly at import.
 
-Nathan extensions (kept here because the shared schema does not express them; documented in
+Extensions (kept here because the shared schema does not express them; documented in
 docs/REQUIREMENTS.md section 9 "Schema"):
   E1  Validation modes. `v1` = the full shared schema. `ci` = records written by harness/run.py
       before v1 (no schema_version/accepted/gates/network/report) but with machine_type/thread_env.
@@ -16,7 +16,7 @@ docs/REQUIREMENTS.md section 9 "Schema"):
   E2  Cross-field rules from the schema's `x-cross-field-rules` that matter for evals: classification
       may be null only when accepted is false; import_failure/real_break are separate classes.
   E3  Schema reference by checksum. A record may name `schema_path` (often an absolute path in
-      another checkout, e.g. /workspace/blast-radius/harness/schema/...). The path is NEVER opened;
+      another checkout, e.g. /path/to/checkout/harness/schema/...). The path is NEVER opened;
       `schema_sha256` must be one of COMPATIBLE_SCHEMA_SHA256: this repo's copy, or an earlier
       revision that the current file only extends with optional fields (so the record is still valid).
   E4  JSON booleans are never accepted where an integer/number is required (JSON Schema semantics).
@@ -39,13 +39,18 @@ SCHEMA_REVISION = max(r["rev"] for r in SCHEMA.get("x-revisions", [{"rev": 1}]))
 # written against an earlier one is valid under the current file. Keep in sync with harness/schema/README.md.
 SCHEMA_SHA256_REV1 = "5a3c3d36b7730ce74d0f23b03c88ea862ea35cc327c7d79481fca8b972e8383e"  # ed75df4
 SCHEMA_SHA256_REV2 = "088cd395004de286c5f1df76fe94a0dc523738be194166cd3b616c77b6298183"  # + reviewer-report fields
-COMPATIBLE_SCHEMA_SHA256 = {SCHEMA_SHA256_REV1: "rev 1", SCHEMA_SHA256_REV2: "rev 2"}
+SCHEMA_SHA256_REV3 = "2aafe631c82773d3258d531fb0e07c80ed7823d32fa3f4586d0d9e4a8e8916ca"  # + record_kind pr_run (if/then/else)
+SCHEMA_SHA256_REV4 = "0a706f00904fa34ab8ad8bc7f79f53da08dd51576aa2800a3274befb95f7608d"  # + coverage-gate fields
+COMPATIBLE_SCHEMA_SHA256 = {SCHEMA_SHA256_REV1: "rev 1", SCHEMA_SHA256_REV2: "rev 2", SCHEMA_SHA256_REV3: "rev 3",
+                            SCHEMA_SHA256_REV4: "rev 4"}
 if SCHEMA_SHA256 not in COMPATIBLE_SCHEMA_SHA256:
     raise RuntimeError(f"{SCHEMA_PATH} has sha256 {SCHEMA_SHA256}, which is not listed in COMPATIBLE_SCHEMA_SHA256; "
                        "add the new revision here and in harness/schema/README.md")
 
 PROPS: dict = SCHEMA["properties"]
-REQUIRED: tuple[str, ...] = tuple(SCHEMA["required"])
+# rev 3: observation fields are required under `else` (records without record_kind "pr_run"); rev <= 2: top level
+REQUIRED: tuple[str, ...] = tuple(SCHEMA.get("required") or SCHEMA.get("else", {}).get("required", ()))
+PR_RUN_REQUIRED: tuple[str, ...] = tuple(SCHEMA.get("then", {}).get("required", ()))
 CLASS_KEYS: tuple[str, ...] = tuple(PROPS["classification"]["required"])
 SINGLE_THREAD_VARS: tuple[str, ...] = tuple(PROPS["thread_env"]["required"])
 EXPECTED_CLASSES = set(PROPS["expected_class"]["enum"])
@@ -53,11 +58,11 @@ MATCHES = set(PROPS["matches_expected"]["enum"])
 REQUIRED_RUNS_PER_SIDE = 3  # protocol (x-cross-field-rules: runs_per_side >= 3); harness enforces exactly 3
 
 CI_FIELDS = ("machine_type", "thread_env")
-V1_ONLY_FIELDS = ("schema_version", "accepted", "gates", "network", "report")  # added by Jonathan's v1 runner
+V1_ONLY_FIELDS = ("schema_version", "accepted", "gates", "network", "report")  # added by the v1 runner
 MODES = ("v1", "ci", "legacy")
 
 _SUPPORTED = {"$schema", "$id", "title", "description", "type", "required", "properties", "items", "enum",
-              "pattern", "minimum", "minLength", "x-cross-field-rules", "x-revisions"}
+              "pattern", "minimum", "minLength", "const", "if", "then", "else", "x-cross-field-rules", "x-revisions"}
 _TYPES = {"object": dict, "array": list, "string": str, "integer": int, "number": (int, float),
           "boolean": bool, "null": type(None)}
 
@@ -71,8 +76,8 @@ def _check_supported(node, where="$"):
             if k == "properties":
                 for pk, pv in v.items():
                     _check_supported(pv, f"{where}.properties.{pk}")
-            elif k == "items":
-                _check_supported(v, f"{where}.items")
+            elif k in ("items", "if", "then", "else"):
+                _check_supported(v, f"{where}.{k}")
 
 
 _check_supported(SCHEMA)
@@ -91,6 +96,8 @@ def _validate(v, node: dict, where: str, skip_required: frozenset = frozenset())
         tl = [types] if isinstance(types, str) else types
         if not any(_is_type(v, t) for t in tl):
             return [f"{where}: has type {type(v).__name__}, expected {'/'.join(tl)}"]
+    if "const" in node and v != node["const"]:
+        errs.append(f"{where}: must be {node['const']!r}, got {v!r}")
     if "enum" in node and v not in node["enum"]:
         errs.append(f"{where}: must be one of {node['enum']}, got {v!r}")
     if isinstance(v, str):
@@ -110,6 +117,10 @@ def _validate(v, node: dict, where: str, skip_required: frozenset = frozenset())
     if isinstance(v, list) and isinstance(node.get("items"), dict):
         for i, item in enumerate(v):
             errs += _validate(item, node["items"], f"{where}[{i}]")
+    if "if" in node:  # rev 3: record_kind "pr_run" -> `then`, otherwise the observation rules in `else`
+        branch = node.get("then") if not _validate(v, node["if"], where) else node.get("else")
+        if branch:
+            errs += _validate(v, branch, where, skip_required)
     return errs
 
 

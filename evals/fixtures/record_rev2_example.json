@@ -1,13 +1,13 @@
 {
  "schema_version": "1",
- "schema_path": "/workspace/blast-radius/harness/schema/observation.schema.json",
+ "schema_path": "/data/checkout/harness/schema/observation.schema.json",
  "schema_sha256": "088cd395004de286c5f1df76fe94a0dc523738be194166cd3b616c77b6298183",
  "harness_version": "1.0",
  "id": "example-rev2-sklearn160rc1-imblearn0124",
  "date_ist": "2026-10-10 05:36 IST",
- "who": "Jonathan",
- "machine": "box",
- "host": "grok-bot-vm-345453355",
+ "who": "runner",
+ "machine": "local",
+ "host": "runner-01",
  "cpu_count": 8,
  "platform": "Linux-6.12.94+-x86_64-with-glibc2.41",
  "upstream": "scikit-learn",
@@ -48,7 +48,7 @@
   "runner_arch": null,
   "runner_environment": null,
   "image": null,
-  "label": "box"
+  "label": "local"
  },
  "thread_env": {
   "OMP_NUM_THREADS": "1",
@@ -63,7 +63,7 @@
    "imblearn": "ok"
   },
   "new": {
-   "imblearn": "ImportError: cannot import name '_safe_tags' from 'sklearn.utils._tags' (/workspace/blast-radius-research/research/runs/golden-sklearn160rc1-imblearn0124/venv-new/lib/python3.13/site-packages/sklearn/utils/_tags.py)"
+   "imblearn": "ImportError: cannot import name '_safe_tags' from 'sklearn.utils._tags' (/data/research/research/runs/golden-sklearn160rc1-imblearn0124/venv-new/lib/python3.13/site-packages/sklearn/utils/_tags.py)"
   }
  },
  "network": "install: allowed (uv from PyPI/nightly index, git clone of the tag); tests: no network (unshare -rn, private network namespace)",
@@ -264,7 +264,7 @@
  },
  "hand_check": null,
  "upstream_issue": null,
- "notes": "CONSTRUCTED EXAMPLE (Nathan, 2026-10-10) to exercise the optional schema rev 2 fields; copied from Jonathan's golden record golden-sklearn160rc1-imblearn0124 with id, schema_sha256 and the rev 2 fields added. NOT a real PR run: the pr block names the PR behind the break, but the run itself compared the 1.5.2 and 1.6.0rc1 release wheels. Never use for scoring.",
+ "notes": "CONSTRUCTED EXAMPLE (2026-10-10) to exercise the optional schema rev 2 fields; copied from the golden record golden-sklearn160rc1-imblearn0124 with id, schema_sha256 and the rev 2 fields added. NOT a real PR run: the pr block names the PR behind the break, but the run itself compared the 1.5.2 and 1.6.0rc1 release wheels. Never use for scoring.",
  "logs": "research/runs/golden-sklearn160rc1-imblearn0124",
  "report": "reports/golden-sklearn160rc1-imblearn0124/REPORT.md",
  "pr": {

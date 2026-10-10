@@ -38,6 +38,8 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
       - name: Install
         run: python -m pip install -e ".[dev]"
+      - name: Install pdftotext (the public-hygiene test reads PDF text)
+        run: sudo apt-get update -q && sudo apt-get install -y -q poppler-utils
       - name: Lint
         run: ruff check .
       - name: Guardrail - no external side effects

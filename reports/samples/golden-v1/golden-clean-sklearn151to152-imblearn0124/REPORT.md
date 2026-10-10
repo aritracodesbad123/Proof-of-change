@@ -1,6 +1,6 @@
 # Reviewer report: scikit-learn 1.5.1 to 1.5.2
 
-Run `golden-clean-sklearn151to152-imblearn0124`, tested against imbalanced-learn 0.12.4. Report generated 2026-10-10 06:40 IST by reports/generate.py 1.0 (from Jonathan's render_report.py 0.1).
+Run `golden-clean-sklearn151to152-imblearn0124`, tested against imbalanced-learn 0.12.4. Report generated 2026-10-10 07:03 IST by reports/generate.py 1.0 (from render_report.py 0.1).
 
 > ## 🟢 VERIFIED
 >
@@ -39,7 +39,7 @@ No behavior change: no test went from passing to failing, and every test module 
 | 🟢 **pass** | Runs per side | 3 (minimum 3), alternating old and new |
 | 🟢 **pass** | Guardrails respected | tests ran with no network; nothing was posted or filed by the runner |
 | 🟢 **pass** | Matches the prediction written before the run | no break: 1.5.2 is a bug-fix release; imbalanced-learn 0.12.4 was the current release for the 1.5 series |
-| 🟢 **pass** | Nathan's evals | 6 of 7 eval checks passed (see 'Evals and guardrails') |
+| 🟢 **pass** | Evals | 6 of 7 eval checks passed (see 'Evals and guardrails') |
 
 ## What went wrong and how to fix it
 
@@ -57,7 +57,7 @@ None found.
 |---|---|---|
 | Required checks (gates) | 🟢 **7 of 7 passed** | all passed |
 | Advisory checks | 🟢 **2 of 2 passed** | all passed |
-| Evals (Nathan) | 🟢 **APPROVE** | no failures or warnings |
+| Evals | 🟢 **APPROVE** | no failures or warnings |
 | Golden cases (stored records) | 🟢 **3 of 3 hold** | checked against the stored golden records (harness 1.0) with the eval gate's code, not re-run for this report. This run is itself one of the golden cases, so this check is partly circular for it |
 | Golden cases (re-run) | ⚪ **not available** | no golden re-run recorded in this record (golden_check) |
 | Known-answer replay (fresh re-run) | 🟢 **all passed** | replayed 2026-10-10 06:30:21 IST, harness 1.0 |
@@ -65,7 +65,7 @@ None found.
 | Flaky rate | 🟢 **0 of 2277 (0.0%)** | stability old 1.0, new 1.0 |
 | Network during tests | 🟢 **off** | install: allowed (uv from PyPI/nightly index, git clone of the tag); tests: no network (unshare -rn, private network namespace) |
 | Threads | 🟢 **pinned to 1** | OMP_NUM_THREADS=1, OPENBLAS_NUM_THREADS=1, MKL_NUM_THREADS=1, NUMEXPR_NUM_THREADS=1, VECLIB_MAXIMUM_THREADS=1, BLIS_NUM_THREADS=1 |
-| Machine | 🔵 **box** | Intel(R) Xeon(R) Processor, 8 CPUs, 15.6 GB RAM, Linux x86_64, CI: not available |
+| Machine | 🔵 **local** | Intel(R) Xeon(R) Processor, 8 CPUs, 15.6 GB RAM, Linux x86_64, CI: not available |
 | Report matches the record | 🟢 **consistent** | break and import-failure counts recomputed from class-*.txt and JUnit equal the record |
 | Prediction before the run | 🟢 **yes** | no break: 1.5.2 is a bug-fix release; imbalanced-learn 0.12.4 was the current release for the 1.5 series |
 
@@ -75,9 +75,9 @@ None found.
 | golden-pandas300rc0-upsetplot-cow | 🟢 **holds** | golden-pandas300rc0-upsetplot-cow: all expected values hold |
 | golden-clean-sklearn151-152-imblearn | 🟢 **holds** | golden-clean-sklearn151-152-imblearn: all expected values hold |
 
-## Evals and guardrails (Nathan)
+## Evals and guardrails
 
-Independent checks of this record by evals/checks.py and guardrails/schema.py against the shared schema `blast-radius/observation/v1` (written against rev 1 (sha256 5a3c3d36b773...); valid under current rev 2 (additive)). Eval recommendation: **APPROVE**. Any FAIL here makes the verdict COULD NOT VERIFY.
+Independent checks of this record by evals/checks.py and guardrails/schema.py against the shared schema `blast-radius/observation/v1` (written against rev 1 (sha256 5a3c3d36b773...); valid under current rev 4 (additive)). Eval recommendation: **APPROVE**. Any FAIL here makes the verdict COULD NOT VERIFY.
 
 | Check | Status | Detail | How to fix |
 |---|---|---|---|
@@ -95,7 +95,7 @@ Independent checks of this record by evals/checks.py and guardrails/schema.py ag
 - [ ] I read the verdict, the recommended action and the confidence.
 - [ ] I checked the claims vs reality table for any 'false' or 'unmentioned change' rows, and opened at least one cited log line.
 - [ ] I confirmed there are no behavior changes.
-- [ ] I confirmed the required checks and Nathan's evals passed (Trust checks, Evals and guardrails).
+- [ ] I confirmed the required checks and the evals passed (Trust checks, Evals and guardrails).
 - [ ] I am satisfied the environment issues (if any) do not change the decision.
 
 **Decision:** ☐ Approve ☐ Approve with notes ☐ Reject ☐ Re-run    Reviewer: ________  Date: ________
@@ -105,7 +105,7 @@ Independent checks of this record by evals/checks.py and guardrails/schema.py ag
 From the blast-radius repo root. The wrapper forces 3 alternating runs per side and the single-thread env, records machine_type, writes under ./data and never posts anything:
 
 ```
-BR_RUNNER=/workspace/blast-radius-research/harness/br_run.py python -m harness.run \
+BR_RUNNER=<path to br_run.py> python -m harness.run \
   --upstream scikit-learn \
   --old 1.5.1 \
   --new 1.5.2 \
@@ -126,17 +126,17 @@ Needs Linux x86_64, uv 0.12 or newer, git and unshare.
 
 | What | Link (relative to this report) |
 |---|---|
-| pytest summary, old side run 1 | [pytest-old-1.log:123](../../../../../blast-radius-research/research/runs/golden-clean-sklearn151to152-imblearn0124/pytest-old-1.log) «2238 passed, 33 skipped, 1 xfailed, 5 xpassed, 62 warnings in 45.39s» |
-| pytest summary, new side run 1 | [pytest-new-1.log:123](../../../../../blast-radius-research/research/runs/golden-clean-sklearn151to152-imblearn0124/pytest-new-1.log) «2238 passed, 33 skipped, 1 xfailed, 5 xpassed, 62 warnings in 44.26s» |
-| Full record | [record.json](../../../../../blast-radius-research/research/runs/golden-clean-sklearn151to152-imblearn0124/record.json) |
-| Run arguments | [args.json](../../../../../blast-radius-research/research/runs/golden-clean-sklearn151to152-imblearn0124/args.json) |
-| Setup log | [setup.log](../../../../../blast-radius-research/research/runs/golden-clean-sklearn151to152-imblearn0124/setup.log) |
-| Installed packages, old | [freeze-old.txt](../../../../../blast-radius-research/research/runs/golden-clean-sklearn151to152-imblearn0124/freeze-old.txt) |
-| Installed packages, new | [freeze-new.txt](../../../../../blast-radius-research/research/runs/golden-clean-sklearn151to152-imblearn0124/freeze-new.txt) |
-| Package difference | [freeze-diff.txt](../../../../../blast-radius-research/research/runs/golden-clean-sklearn151to152-imblearn0124/freeze-diff.txt) |
-| pytest logs | [pytest-new-1.log](../../../../../blast-radius-research/research/runs/golden-clean-sklearn151to152-imblearn0124/pytest-new-1.log), [pytest-new-2.log](../../../../../blast-radius-research/research/runs/golden-clean-sklearn151to152-imblearn0124/pytest-new-2.log), [pytest-new-3.log](../../../../../blast-radius-research/research/runs/golden-clean-sklearn151to152-imblearn0124/pytest-new-3.log), [pytest-old-1.log](../../../../../blast-radius-research/research/runs/golden-clean-sklearn151to152-imblearn0124/pytest-old-1.log), [pytest-old-2.log](../../../../../blast-radius-research/research/runs/golden-clean-sklearn151to152-imblearn0124/pytest-old-2.log), [pytest-old-3.log](../../../../../blast-radius-research/research/runs/golden-clean-sklearn151to152-imblearn0124/pytest-old-3.log) |
-| JUnit XML | [junit-new-1.xml](../../../../../blast-radius-research/research/runs/golden-clean-sklearn151to152-imblearn0124/junit-new-1.xml), [junit-new-2.xml](../../../../../blast-radius-research/research/runs/golden-clean-sklearn151to152-imblearn0124/junit-new-2.xml), [junit-new-3.xml](../../../../../blast-radius-research/research/runs/golden-clean-sklearn151to152-imblearn0124/junit-new-3.xml), [junit-old-1.xml](../../../../../blast-radius-research/research/runs/golden-clean-sklearn151to152-imblearn0124/junit-old-1.xml), [junit-old-2.xml](../../../../../blast-radius-research/research/runs/golden-clean-sklearn151to152-imblearn0124/junit-old-2.xml), [junit-old-3.xml](../../../../../blast-radius-research/research/runs/golden-clean-sklearn151to152-imblearn0124/junit-old-3.xml) |
-| Test lists per class | [class-already_broken.txt](../../../../../blast-radius-research/research/runs/golden-clean-sklearn151to152-imblearn0124/class-already_broken.txt), [class-fixed_by_new.txt](../../../../../blast-radius-research/research/runs/golden-clean-sklearn151to152-imblearn0124/class-fixed_by_new.txt), [class-flaky.txt](../../../../../blast-radius-research/research/runs/golden-clean-sklearn151to152-imblearn0124/class-flaky.txt), [class-import_failure.txt](../../../../../blast-radius-research/research/runs/golden-clean-sklearn151to152-imblearn0124/class-import_failure.txt), [class-lost_tests.txt](../../../../../blast-radius-research/research/runs/golden-clean-sklearn151to152-imblearn0124/class-lost_tests.txt), [class-real_break.txt](../../../../../blast-radius-research/research/runs/golden-clean-sklearn151to152-imblearn0124/class-real_break.txt) |
+| pytest summary, old side run 1 | [pytest-old-1.log:123](../../../research/research/runs/golden-clean-sklearn151to152-imblearn0124/pytest-old-1.log) «2238 passed, 33 skipped, 1 xfailed, 5 xpassed, 62 warnings in 45.39s» |
+| pytest summary, new side run 1 | [pytest-new-1.log:123](../../../research/research/runs/golden-clean-sklearn151to152-imblearn0124/pytest-new-1.log) «2238 passed, 33 skipped, 1 xfailed, 5 xpassed, 62 warnings in 44.26s» |
+| Full record | [record.json](../../../research/research/runs/golden-clean-sklearn151to152-imblearn0124/record.json) |
+| Run arguments | [args.json](../../../research/research/runs/golden-clean-sklearn151to152-imblearn0124/args.json) |
+| Setup log | [setup.log](../../../research/research/runs/golden-clean-sklearn151to152-imblearn0124/setup.log) |
+| Installed packages, old | [freeze-old.txt](../../../research/research/runs/golden-clean-sklearn151to152-imblearn0124/freeze-old.txt) |
+| Installed packages, new | [freeze-new.txt](../../../research/research/runs/golden-clean-sklearn151to152-imblearn0124/freeze-new.txt) |
+| Package difference | [freeze-diff.txt](../../../research/research/runs/golden-clean-sklearn151to152-imblearn0124/freeze-diff.txt) |
+| pytest logs | [pytest-new-1.log](../../../research/research/runs/golden-clean-sklearn151to152-imblearn0124/pytest-new-1.log), [pytest-new-2.log](../../../research/research/runs/golden-clean-sklearn151to152-imblearn0124/pytest-new-2.log), [pytest-new-3.log](../../../research/research/runs/golden-clean-sklearn151to152-imblearn0124/pytest-new-3.log), [pytest-old-1.log](../../../research/research/runs/golden-clean-sklearn151to152-imblearn0124/pytest-old-1.log), [pytest-old-2.log](../../../research/research/runs/golden-clean-sklearn151to152-imblearn0124/pytest-old-2.log), [pytest-old-3.log](../../../research/research/runs/golden-clean-sklearn151to152-imblearn0124/pytest-old-3.log) |
+| JUnit XML | [junit-new-1.xml](../../../research/research/runs/golden-clean-sklearn151to152-imblearn0124/junit-new-1.xml), [junit-new-2.xml](../../../research/research/runs/golden-clean-sklearn151to152-imblearn0124/junit-new-2.xml), [junit-new-3.xml](../../../research/research/runs/golden-clean-sklearn151to152-imblearn0124/junit-new-3.xml), [junit-old-1.xml](../../../research/research/runs/golden-clean-sklearn151to152-imblearn0124/junit-old-1.xml), [junit-old-2.xml](../../../research/research/runs/golden-clean-sklearn151to152-imblearn0124/junit-old-2.xml), [junit-old-3.xml](../../../research/research/runs/golden-clean-sklearn151to152-imblearn0124/junit-old-3.xml) |
+| Test lists per class | [class-already_broken.txt](../../../research/research/runs/golden-clean-sklearn151to152-imblearn0124/class-already_broken.txt), [class-fixed_by_new.txt](../../../research/research/runs/golden-clean-sklearn151to152-imblearn0124/class-fixed_by_new.txt), [class-flaky.txt](../../../research/research/runs/golden-clean-sklearn151to152-imblearn0124/class-flaky.txt), [class-import_failure.txt](../../../research/research/runs/golden-clean-sklearn151to152-imblearn0124/class-import_failure.txt), [class-lost_tests.txt](../../../research/research/runs/golden-clean-sklearn151to152-imblearn0124/class-lost_tests.txt), [class-real_break.txt](../../../research/research/runs/golden-clean-sklearn151to152-imblearn0124/class-real_break.txt) |
 
 ## Appendix
 
@@ -153,8 +153,8 @@ Needs Linux x86_64, uv 0.12 or newer, git and unshare.
 | Python | 3.12.15 |
 | Environment difference | scikit-learn==1.5.1, scikit-learn==1.5.2 |
 | Runner | harness 1.0, 4 workers, import mode prepend, per-test timeout 300 s, memory cap 6.0 GB |
-| Record schema | v1; written against rev 1 (sha256 5a3c3d36b773...); valid under current rev 2 (additive) |
-| Run by | Jonathan on box, 2026-10-10 05:36 IST |
+| Record schema | v1; written against rev 1 (sha256 5a3c3d36b773...); valid under current rev 4 (additive) |
+| Run by | runner on local, 2026-10-10 05:36 IST |
 | Hand check | not available |
 | Upstream issue | not available |
 | Per-test outcomes | not available |
@@ -187,7 +187,7 @@ Total wall time 258.2 s; mean test time old 40.5 s, new 43.6 s.
 | Flaky | Tests whose result changes between runs on the same side. They are not trusted either way. |
 | Error signature | The error message with numbers and file paths removed, so identical failures group together. |
 | Gate | An automatic check by the runner that the run itself is trustworthy (right versions, same environment, enough runs). Required gates must pass for the result to count. |
-| Eval | Nathan's independent check of the record (schema, versions, runs per side, threads, golden cases, citations). Any eval failure means the run cannot be trusted. |
+| Eval | Independent check of the record (schema, versions, runs per side, threads, golden cases, citations). Any eval failure means the run cannot be trusted. |
 | Golden case | A known example with a known answer. If the tool still gets the golden cases right, its answers on new cases are more believable. |
 | Stability | Share of tests that gave the same result in every run on one side. 1.0 means fully repeatable. |
 | Citation | A file name, line number and quoted text from a run log that backs a statement in the report. |

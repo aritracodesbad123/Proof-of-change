@@ -1,12 +1,12 @@
 """Reviewer reports (reports/generate.py + reports/reviewer.py)."""
 import copy
 import json
-import os
 import shutil
 from pathlib import Path
 
 import pytest
 
+from poc import local_config
 from reports import reviewer
 from reports.generate import generate, load_inputs, main
 
@@ -14,15 +14,15 @@ REPO = Path(__file__).resolve().parent.parent
 GOLDEN = REPO / "evals" / "fixtures" / "golden_v1.jsonl"
 CLAIMS = REPO / "evals" / "fixtures" / "claims"
 REV2 = REPO / "evals" / "fixtures" / "record_rev2_example.json"
-RESEARCH = Path(os.environ.get("BR_RESEARCH_DIR", "/workspace/blast-radius-research"))  # box-only; tests skip without it
+RESEARCH = Path(local_config.get("research_dir") or "/nonexistent")  # machine-local; tests skip without it
 HAVE_ARTIFACTS = (RESEARCH / "research" / "runs" / "golden-sklearn160rc1-imblearn0124" / "pytest-new-1.log").exists()
-EXPECTED = {  # Jonathan's samples (blast-radius-research/reports/samples) and Aritra's acceptance list
+EXPECTED = {  # reference samples and the acceptance list
     "golden-sklearn160rc1-imblearn0124": ("NEEDS ATTENTION", "Reject"),
     "golden-pandas300rc0-upsetplot090": ("NEEDS ATTENTION", "Reject"),
     "golden-clean-sklearn151to152-imblearn0124": ("VERIFIED", "Approve"),
 }
 SECTIONS = ["Summary in plain English", "Claims vs reality", "What changed in behavior", "What went right",
-            "What went wrong and how to fix it", "Trust checks", "Evals and guardrails (Nathan)", "Reviewer checklist",
+            "What went wrong and how to fix it", "Trust checks", "Evals and guardrails", "Reviewer checklist",
             "Rerun command", "Evidence links", "Appendix", "Glossary"]
 
 
@@ -45,7 +45,7 @@ def test_golden_verdicts_without_artifacts(tmp_path):
         assert (tmp_path / rid / "REPORT.html").read_text().startswith("<!doctype html>")
 
 
-@pytest.mark.skipif(not HAVE_ARTIFACTS, reason="run artifacts of the golden records are only on the box")
+@pytest.mark.skipif(not HAVE_ARTIFACTS, reason="run artifacts of the golden records are machine-local (research_dir)")
 def test_golden_reports_with_artifacts_cite_every_claim(tmp_path):
     sums = {s["id"]: s for s in _golden(tmp_path, RESEARCH)}
     assert {k: (v["verdict"], v["action"], v["confidence"]) for k, v in sums.items()} == \
@@ -57,7 +57,7 @@ def test_golden_reports_with_artifacts_cite_every_claim(tmp_path):
     sk = sums["golden-sklearn160rc1-imblearn0124"]["claims"]
     assert [c["status"] for c in sk] == ["not testable", "unmentioned change"]
     pd = sums["golden-pandas300rc0-upsetplot090"]["claims"]
-    assert len([c for c in pd if c["status"] == "unmentioned change"]) == 5  # 5 break groups, as in Jonathan's sample
+    assert len([c for c in pd if c["status"] == "unmentioned change"]) == 5  # 5 break groups, as in the reference sample
     md = (tmp_path / "golden-pandas300rc0-upsetplot090" / "REPORT.md").read_text()
     assert "67 real break(s) in 5 group(s)" in md and "consistent" in md
     clean = (tmp_path / "golden-clean-sklearn151to152-imblearn0124" / "REPORT.md").read_text()
@@ -167,7 +167,7 @@ def test_load_inputs_kinds(tmp_path, g_pandas):
     assert got[3][1] == rec
 
 
-def test_jonathans_command_still_works(tmp_path):
+def test_documented_render_command_still_works(tmp_path):
     import runpy
     import sys
     argv = sys.argv
@@ -205,7 +205,7 @@ def _replay(tmp_path, ok):
 
 
 def test_failed_known_answer_replay_forces_could_not_verify(tmp_path, monkeypatch):
-    """Jonathan's rule: if the latest known-answer replay failed, every report is COULD NOT VERIFY / Re-run."""
+    """Rule: if the latest known-answer replay failed, every report is COULD NOT VERIFY / Re-run."""
     monkeypatch.setenv("BR_GOLDEN_STATUS", str(_replay(tmp_path, False)))
     sums = _golden(tmp_path / "out", formats=("md",))
     assert {(s["verdict"], s["action"], s["confidence"]) for s in sums} == {("COULD NOT VERIFY", "Re-run", "Low")}

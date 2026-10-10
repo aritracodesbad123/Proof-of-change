@@ -1,4 +1,4 @@
-"""reports/pr_report.py and the ops/daily_run.py single-PR mode, on synthetic run folders (no network, no box paths)."""
+"""reports/pr_report.py and the ops/daily_run.py single-PR mode, on synthetic run folders (no network, no machine-local paths)."""
 import importlib.util
 import json
 from pathlib import Path
@@ -18,7 +18,7 @@ THREADS = {k: "1" for k in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_
 
 def _rec(pr, verdict, reason, cmp=None, per_run=True, **kw):
     r = {"pr": pr, "repo": "acme/widget", "library": "widget", "title": f"Change {pr}", "url": f"https://github.com/acme/widget/pull/{pr}",
-         "head_sha": "a" * 40, "route": "source-pair", "tested_at_ist": "2026-01-01 11:15 IST", "verdict": verdict, "reason": reason,
+         "head_sha": "a" * 40, "route": "source-pair", "tested_at_ist": "2026-01-01 12:00 IST", "verdict": verdict, "reason": reason,
          "comparison": cmp, "machine_type": MACHINE, "thread_env": THREADS, "runs_per_side": 3, "posted_upstream": False,
          "files": {"package_py": [], "compiled": [], "other": []}}
     if per_run:
@@ -66,11 +66,11 @@ def test_report_sections_and_citation(run, tmp_path):
     pr_report.render_run(run, tmp_path / "out", formats=("md",))
     md = (tmp_path / "out" / "widget-2" / "REPORT.md").read_text()
     heads = ["Summary in plain English", "Claims vs reality", "What changed in behavior", "What went right",
-             "What went wrong and how to fix it", "Evals and guardrails (Nathan)", "Checklist", "Rerun command", "Evidence links"]
+             "What went wrong and how to fix it", "Evals and guardrails", "Checklist", "Rerun command", "Evidence links"]
     assert [md.index("## " + h) for h in heads] == sorted(md.index("## " + h) for h in heads)
     assert "pytest-pr-1.log:2" in md and "«FAILED t/test_a.py::test_round" in md   # the claim cites the FAILED line
     assert "make check PR=https://github.com/acme/widget/pull/2" in md
-    assert "/workspace" not in md
+    assert "/data" not in md
 
 
 def test_tampered_log_means_could_not_verify(run, tmp_path):
@@ -93,11 +93,11 @@ def test_missing_guardrail_fields_mean_could_not_verify(tmp_path):
 def test_record_decision(run, tmp_path):
     out = tmp_path / "out"
     pr_report.render_run(run, out, formats=("md",))
-    pr_report.record_decision(out / "widget-2", "reject", "Aritra", "breaks rounding")
+    pr_report.record_decision(out / "widget-2", "reject", "Reviewer", "breaks rounding")
     md = (out / "widget-2" / "REPORT.md").read_text()
-    assert "**Decision recorded:** Reject by Aritra" in md and "breaks rounding" in md
+    assert "**Decision recorded:** Reject by Reviewer" in md and "breaks rounding" in md
     with pytest.raises(SystemExit):
-        pr_report.record_decision(out / "widget-2", "maybe", "Aritra")
+        pr_report.record_decision(out / "widget-2", "maybe", "Reviewer")
 
 
 def test_parse_pr_urls():
@@ -107,11 +107,11 @@ def test_parse_pr_urls():
         dr.parse_pr_urls(["https://github.com/numpy/numpy/issues/1"])
 
 
-def test_default_registry(monkeypatch, tmp_path):
+def test_default_libraries_file(monkeypatch, tmp_path):
     p = tmp_path / "reg.csv"
     p.write_text("library,repo\n")
-    monkeypatch.setenv("POC_REGISTRY", str(p))
-    assert dr.default_registry() == str(p)
+    monkeypatch.setenv("POC_LIBRARIES_FILE", str(p))
+    assert dr.default_libraries_file() == str(p)
     rows = list(__import__("csv").DictReader(open(ROOT / "ops" / "tracked-libraries.csv")))
     assert {r["repo"] for r in rows} == {"numpy/numpy", "pandas-dev/pandas", "scikit-learn/scikit-learn"}
 

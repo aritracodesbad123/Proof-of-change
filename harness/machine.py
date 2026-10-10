@@ -1,4 +1,4 @@
-"""Detect the machine type a run executed on (Jonathan's constraint: recorded in every record)."""
+"""Detect the machine type a run executed on (protocol constraint: recorded in every record)."""
 from __future__ import annotations
 
 import os
@@ -19,7 +19,7 @@ def detect_machine_type(environ: dict | None = None) -> dict:
         "runner_arch": e.get("RUNNER_ARCH"),
         "runner_environment": e.get("RUNNER_ENVIRONMENT"),   # github-hosted / self-hosted
         "image": (f"{e['ImageOS']} {e.get('ImageVersion', '')}".strip() if e.get("ImageOS") else None),
-        "label": e.get("BR_MACHINE") or ("github-actions" if in_ci else "box"),
+        "label": e.get("BR_MACHINE") or ("github-actions" if in_ci else "local"),
     }
 
 

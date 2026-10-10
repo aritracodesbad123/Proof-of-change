@@ -1,7 +1,7 @@
 """Guardrail: Blast Radius must never post, file or push anything externally.
 
 Static scan of the repository's Python and workflow files for calls that would
-create something outside the box (issues, PRs, comments, pushes, emails, HTTP writes).
+create something outside this machine (issues, PRs, comments, pushes, emails, HTTP writes).
 Reading (git clone, git ls-remote, pip/uv installs) is allowed.
 A line can be exempted with the marker `# br-allow-external: <reason>` (reviewed in PRs).
 """

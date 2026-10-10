@@ -5,15 +5,15 @@ For the plain-language guide see the [README](../README.md); for the PR check an
 
 ## Layout
 
-| Path | Owner | What |
+| Path | Notes | What |
 |---|---|---|
-| `Makefile` | Nathan | One-word commands (`make setup`, `make check`, `make daily`, `make test`, ...) |
-| `ops/daily_run.py` | Nathan | PR check and daily run: select PRs, test main vs PR, write records and run log |
-| `poc/` | Nathan | Verdict enum and rule, deterministic main-vs-PR comparison |
-| `reports/` | Nathan (Jonathan's design) | `pr_report.py` (PR runs), `reviewer.py` + `generate.py` (observation records) |
-| `harness/` | Jonathan: `br_run.py` (on the box). Nathan: `run.py`, `machine.py` | Downstream-test runner wrapper, shared schema |
-| `evals/` | Nathan (golden data: Jonathan) | Checks, golden cases G1-G3, eval CLI, labelled PRs |
-| `guardrails/` | Nathan | Schema validation, isolation/timeouts, no-external-side-effects scan |
+| `Makefile` | | One-word commands (`make setup`, `make check`, `make daily`, `make test`, ...) |
+| `ops/daily_run.py` | | PR check and daily run: select PRs, test main vs PR, write records and run log |
+| `poc/` | | Verdict enum and rule, deterministic main-vs-PR comparison, coverage gate (`coverage_gate.py`) |
+| `reports/` | | `pr_report.py` (PR runs), `reviewer.py` + `generate.py` (observation records) |
+| `harness/` | `run.py`, `machine.py` (the runner `br_run.py` is external) | Downstream-test runner wrapper, shared schema |
+| `evals/` | | Checks, golden cases G1-G3, eval CLI, labelled PRs |
+| `guardrails/` | | Schema validation, isolation/timeouts, no-external-side-effects scan |
 | `docs/` | both | Requirements, report spec, operations |
 
 ## Self-check (what CI runs)
@@ -22,9 +22,8 @@ For the plain-language guide see the [README](../README.md); for the PR check an
 make test        # = ruff check . ; python -m guardrails.no_external . ; pytest -q ; strict evals
 ```
 
-Tests never depend on files that exist only on the shared machine: tests that need the golden run artifacts in
-`/workspace/blast-radius-research` skip without them (`BR_RESEARCH_DIR` overrides that path; set it to a missing
-path to reproduce CI).
+Tests never depend on machine-local files: tests that need the golden run artifacts skip unless `research_dir` is
+set (`BR_RESEARCH_DIR` or `ops/local.json`). CI has neither.
 
 ## Downstream-test harness (golden records)
 
@@ -36,10 +35,10 @@ BR_RUNNER=/path/to/br_run.py .venv/bin/python -m harness.run --upstream pandas -
 .venv/bin/python -m reports.generate eval.json --out reports/runs/local --claims-dir evals/fixtures/claims
 ```
 
-Records follow `harness/schema/observation.schema.json` (rev 2; see `harness/schema/README.md`). Report format:
+Records follow `harness/schema/observation.schema.json` (rev 4; see `harness/schema/README.md`). Report format:
 [REPORT_SPEC.md](REPORT_SPEC.md). Samples: `reports/samples/golden-v1/`.
 
 ## Workflow
 
 `main` is protected: open a PR from `feat/<topic>`; CI (lint, guardrail, tests, strict evals, reviewer reports on
-Python 3.11 and 3.12) must pass; Aritra merges. Nothing in this repo posts, comments or files anything externally.
+Python 3.11 and 3.12) must pass; a maintainer merges. Nothing in this repo posts, comments or files anything externally.

@@ -1,1 +1,1 @@
-"""Thin wrapper around Jonathan's runner (br_run.py). The runner and PROTOCOL.md are owned by Jonathan."""
+"""Thin wrapper around the downstream-test runner (br_run.py, kept outside this repo) and its PROTOCOL.md."""

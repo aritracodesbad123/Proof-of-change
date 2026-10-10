@@ -1,4 +1,4 @@
 library,repo,added_on_ist,added_by,priority,status,why_added,test_notes
-numpy,numpy/numpy,2026-10-10,Aritra (seed),2,active,Day 1 seed library,Source build needed for PR heads; prefer CI wheel artifacts or nightly wheels where possible
-pandas,pandas-dev/pandas,2026-10-10,Aritra (seed),2,active,Day 1 seed library,"Source build needed for PR heads (meson); heavy suite, use targeted subsets"
-scikit-learn,scikit-learn/scikit-learn,2026-10-10,Aritra (seed),2,active,Day 1 seed library,"Source build needed for PR heads (meson, Cython); heavy suite, use targeted subsets"
+numpy,numpy/numpy,2026-10-10,seed,2,active,Day 1 seed library,Source build needed for PR heads; prefer CI wheel artifacts or nightly wheels where possible
+pandas,pandas-dev/pandas,2026-10-10,seed,2,active,Day 1 seed library,"Source build needed for PR heads (meson); heavy suite, use targeted subsets"
+scikit-learn,scikit-learn/scikit-learn,2026-10-10,seed,2,active,Day 1 seed library,"Source build needed for PR heads (meson, Cython); heavy suite, use targeted subsets"
