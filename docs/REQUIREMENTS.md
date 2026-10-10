@@ -1,6 +1,7 @@
 # Proof-of-Change: requirements
 
-Status: draft v0.3 (2026-10-10 IST), by Nathan (ops/QA/dev). Replaces v0.2 (Blast Radius downstream testing), which is
+Status: draft v0.3.1 (2026-10-10 IST), by Nathan (ops/QA/dev). v0.3.1 integrates §4a (NVIDIA and Nebius stack), the
+shared v1 observation schema and Jonathan's final golden records (G1–G3). Replaces v0.2 (Blast Radius downstream testing), which is
 kept here as one of Proof-of-Change's checks and as its eval source.
 
 **Source of truth:** `nvidia-nebius-hackathon/proof-of-change-spec.md` (Proof-of-Change Product Specification v1.0,
@@ -71,6 +72,15 @@ Model IDs are confirmed at build time with `GET /v1/models` (spec §6.2): `nvidi
 runs a dependent project's test suite against main and against the PR, with the v0.2 rules: two envs that differ only
 in the upstream; **3 alternating runs per side**; **single thread** (`OMP/OPENBLAS/MKL/NUMEXPR_NUM_THREADS=1`);
 **`machine_type` and `thread_env` in every record**; per-test and per-invocation timeouts; strict schema validation.
+**Installed (wheel) packages are tested with pytest `--import-mode=prepend`** (`--pyargs`); `importlib` only for tests
+run from a git checkout. A collection error counts **once per test module as `import_failure`**, never as a real
+break; the tests that vanish with it are `lost_tests`.
+
+> **Root cause, G1 mismatch (found by Jonathan, 10 Oct 2026, `research/LOG.md` "import-mode root cause").** The dev
+> runner reported 280 failed / 250 passed / 13 errors on scikit-learn 1.6.0rc1 instead of the raw `525 errors`. It
+> was not the worker count or `python -P`: under `--import-mode=importlib` a failed `import imblearn` leaves the
+> package **half-loaded** in `sys.modules`, so later modules import the broken half and produce fake failures and
+> fake passes. With `prepend` every run reproduces the raw result (old 2238 passed; new 0 passed, 525 errors).
 Its result becomes a finding like any other probe. **[ASSUMED]** It runs in the same Sandboxes checkpoints in
 production, and on the box or CI for the eval set until the Sandbox runner exists.
 
@@ -159,6 +169,15 @@ probe code and the model's reasoning next to the raw outputs.
   `guardrails/no_external.py` fails CI on posting/pushing code. The App's write path is a reviewed exception
   (`# br-allow-external:`) **[ASSUMED]**.
 - **G-schema.** Every record (downstream run, probe result, eval result) is schema-validated before it counts.
+  **Single source of truth:** the shared JSON Schema `harness/schema/observation.schema.json` (`$id`
+  `blast-radius/observation/v1`, sha256 `5a3c3d36…8383e`, agreed with Jonathan, merged from `feat/shared-schema` @
+  `ed75df4`). `guardrails/schema.py` loads that file and validates it with a stdlib-only subset of JSON Schema; it
+  no longer keeps its own field list. Nathan extensions, documented in the module docstring:
+  E1 modes: `v1` (full schema; forced for golden batches with `--require-v1`, and automatic for any record that
+  declares `schema_version`), `ci` (pre-v1 harness records: no `schema_version/accepted/gates/network/report`),
+  `legacy` (`--legacy`: also no `machine_type/thread_env`); E2 cross-field rule `classification` may be null only
+  when `accepted` is false; E3 a record's `schema_path` is **never opened** (it may name another checkout), the
+  reference is verified by `schema_sha256` against this repo's copy; E4 JSON booleans never count as integers.
 - **G-blind.** Eval runs get the PR without the answer (§9); `evals/pr_metrics.blind_input` refuses inputs that leak
   the label.
 
@@ -190,17 +209,27 @@ Proof-of-Change sees) and an `answer` block (withheld; used only for scoring).
 |---|---|---|---|
 | psf/requests #6655 (base `eea3bbf`, head `c0813a2`) | caused_regression (docker-py override of `get_connection()`) | verified (spec §7.4; local probes 29 Sep 2026) | not applicable |
 | scikit-learn/scikit-learn #29677 "API Revamp estimator tags" (merged 4 Sep 2024, 20:55 IST, merge `e04142cb`) | caused_regression (removed `_safe_tags`; imbalanced-learn 0.12.4 fails at import) | **verified by me**: `def _safe_tags` exists in `sklearn/utils/_tags.py` at parent `0bfebf42`, is gone at `e04142cb` and at tag 1.6.0rc1, and comes back (deprecated) at 1.6.0 via PR #30327 | golden G1 (below) |
-| pandas: PR that made Copy-on-Write mandatory | caused_regression (UpSetPlot #303) | **TODO**: PR number not identified | golden G2 |
-| Safe PRs | safe | **TODO** (Jonathan); candidate source: scikit-learn 1.5.1 → 1.5.2 | candidate C1 |
+| pandas-dev/pandas #56633 "CoW: Enable CoW by default and remove warning build" (merged 1 Feb 2024, 14:34 IST, merge `3b57972c`, base `c3014abb`) | caused_regression (CoW mandatory; UpSetPlot #303) | **verified**: found by Jonathan; PR, merge commit and base re-checked against the GitHub API 10 Oct 2026; downstream break reproduced at release level (2.3.3 → 3.0.0rc0) | golden G2 |
+| Safe PRs | safe | **TODO** (Jonathan). The clean pair G3 is a release pair, not a PR, so it does not fill this slot | n/a |
 | poc-demo-bookstore PRs 1–4 | 1 safe, 3 regressions | **example data**, never scored | n/a |
 
-**Golden downstream cases (kept from v0.2, `evals/golden_cases.json`):**
-- G1 (active): scikit-learn 1.5.2 → 1.6.0rc1 vs imbalanced-learn 0.12.4. Old side `2238 passed` x3; new side
-  `0 passed, 525 errors` x3; the import error mentions `_safe_tags`. Per-category counts TODO.
-- G2 (TODO data): pandas 2.3.3 → 3.0.0rc0 vs UpSetPlot 0.9.0: exactly 67 real breaks, 6 already broken.
-- C1 (pending, not golden): scikit-learn 1.5.1 → 1.5.2 vs imbalanced-learn: 0 breaks once Jonathan confirms.
+**Golden downstream cases (`evals/golden_cases.json`; records `evals/fixtures/golden_v1.jsonl`, Jonathan's final
+runner, HARNESS_VERSION 1.0, 10 Oct 2026 IST; all three active, all three required in a golden batch):**
+- G1 (active): scikit-learn 1.5.2 → 1.6.0rc1 vs imbalanced-learn 0.12.4 (Python 3.13). Old side `2238 passed, 33
+  skipped, 1 xfailed, 5 xpassed` x3; new side `0 passed, 525 errors` x3; the import error mentions `_safe_tags`
+  (matched by content: pytest's `E   ` prefix is stripped first). Exact classes: **import_failure 46 (modules),
+  lost_tests 2243, real_break 0**, every other class 0. The 525 errors are 20 module collection errors plus 505
+  xdist "CollectError" setup failures, counted once per module.
+- G2 (active): pandas 2.3.3 → 3.0.0rc0 vs UpSetPlot 0.9.0 (numpy 2.3.5, matplotlib 3.10.8, pytest 9.1.1): exactly
+  **67 real breaks, 6 already broken** (unchanged), every other class 0; old `233 passed, 6 failed` x3, new `166
+  passed, 73 failed` x3; top signature "Invalid RGBA argument: nan". Answer key: pandas PR #56633.
+- G3 (active, promoted from candidate C1 on 10 Oct): scikit-learn 1.5.1 → 1.5.2 vs imbalanced-learn 0.12.4
+  (Python 3.12; 1.5.1 has no cp313 wheel): **2238 passed on both sides in every run, 0 in every class**. Guards
+  against false alarms.
+- Raw pytest counts are asserted from `per_run[].summary_counts`, cross-checked against `pytest_summary`; never from
+  JUnit counts (JUnit counts xpassed as passed: 2243 = 2238 + 5).
 
-**Per-record evals (v0.2, unchanged):** schema incl. `machine_type`/`thread_env` (strict); versions installed; 3
+**Per-record evals:** schema (shared v1 schema; strict); versions installed; 3
 alternating runs per side; single thread; golden cases; LLM citations; prediction match (warn); golden coverage in
 golden batches.
 
@@ -217,7 +246,7 @@ cases accumulate.
   protected: PR required, CI must pass, no force push. Work happens on `feat/*` branches; Aritra approves and merges.
 - `.github/workflows/ci.yml` (push to `main`/`feat/**`, PRs): ubuntu-latest, Python 3.11 and 3.12, single-thread env;
   records the runner machine type; ruff; no-external guardrail; pytest (verdict rules, deterministic diff, metrics,
-  schema, evals); strict golden evals on fixtures; approver report to the step summary and as an artifact.
+  schema, evals); strict golden evals (`--require-golden --require-v1`) on `evals/fixtures/golden_v1.jsonl`; approver report to the step summary and as an artifact.
 - Heavy work (Sandbox runs, downstream suites, the labelled-PR replay) runs outside PR CI: on the box now, as a
   Serverless AI job later (spec §6.2 step 10). Its results go through the same evals.
 - Submission needs a public repo with an open-source license (Apache-2.0 proposed) and a README naming every NVIDIA
@@ -238,7 +267,7 @@ cases accumulate.
 ```
 docs/REQUIREMENTS.md     this document
 poc/                     verdict.py (enums + rule), diff.py (normalise/compare/confirm) - deterministic core
-harness/                 downstream-test runner wrapper (Jonathan's br_run.py + PROTOCOL.md go here)
+harness/                 downstream-test runner wrapper (Jonathan's br_run.py + PROTOCOL.md go here); schema/observation.schema.json (shared v1)
 evals/                   labelled_prs.json, pr_metrics.py (catch/false-alarm), golden_cases.json, checks, fixtures
 guardrails/              schema, isolation/timeouts, no-external scan
 reports/                 approver report generator, samples
@@ -263,12 +292,18 @@ From Aritra / spec §14:
 Added by Nathan:
 9. Repo name: keep `aritracodesbad123/blast-radius` or rename to Proof-of-Change before going public?
 10. Week-1 milestone status: has anything run in Sandboxes yet? Are there Nebius API keys and credits?
-11. pandas answer key: which pandas PR made Copy-on-Write mandatory? Its label stays TODO until identified.
+11. ~~pandas answer key: which pandas PR made Copy-on-Write mandatory?~~ **Resolved 10 Oct:** pandas PR #56633,
+    merge commit `3b57972c` (Jonathan; re-checked against the GitHub API). `evals/labelled_prs.json` case `pandas-56633`.
 12. **Is scikit-learn #29677 a fair "caused regression" label?** `_safe_tags` was a private helper and was restored
     (deprecated) before 1.6.0 final. Downstream still broke on `_validate_data`.
 13. Daily routine: 3 PRs a day blind. Where do reports go (chat, files)? Is same-day turnaround expected?
 14. Downstream check in production: does it run inside the Sandboxes, or only for the eval set on the box/CI?
-15. Schema convergence with Jonathan's v1 schema (`feat/shared-schema` in progress; not touched here).
-16. Carried from v0.2: Jonathan's runner must reproduce `525 errors` for G1. It must also record `machine_type`,
-    `thread_env` and import-failure messages. Should a prediction mismatch be WARN or FAIL? Who approves when Aritra
-    is away?
+15. ~~Schema convergence with Jonathan's v1 schema~~ **Resolved 10 Oct:** `feat/shared-schema` (`ed75df4`) merged;
+    `harness/schema/observation.schema.json` is the single source of truth and `guardrails/schema.py` reads it (§7
+    G-schema). Remaining: Jonathan's three golden records name `schema_path` in the main checkout
+    (`/workspace/blast-radius/harness/...`); evals verify them by `schema_sha256` instead of opening that path.
+16. Carried from v0.2, **partly resolved 10 Oct:** Jonathan's runner now reproduces `525 errors` for G1 (root
+    cause: importlib import mode, §4) and records `machine_type` and `thread_env`. It still has no
+    `import_failure_messages` field; the eval reads the new-side import probe (`dependent_import.new`) and signatures
+    instead. **Still open:** should a prediction mismatch be WARN or FAIL? Who approves when Aritra is away?
+17. Golden G1 per-category counts and the G3 clean pair: **resolved 10 Oct** (§9).

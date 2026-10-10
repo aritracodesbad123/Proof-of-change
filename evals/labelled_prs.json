@@ -35,24 +35,29 @@
       }
     },
     {
-      "id": "pandas-cow-default-TODO",
-      "input": {"repo": "pandas-dev/pandas", "pr": null, "base_sha": null, "head_sha": null,
-                "title": "TODO: the PR that made Copy-on-Write mandatory for pandas 3.0"},
+      "id": "pandas-56633",
+      "input": {"repo": "pandas-dev/pandas", "pr": 56633, "base_sha": "c3014abb3bf2e15fa66d194ebd2867161527c497",
+                "head_sha": "3b57972ceb49c11198eb0bec6be0006260d48085", "title": "CoW: Enable CoW by default and remove warning build"},
       "answer": {
         "label": "caused_regression",
-        "regression": "Chained assignment becomes a no-op under Copy-on-Write; UpSetPlot 0.9.0 plotting gets NaN colours: ValueError: Invalid RGBA argument: nan (UpSetPlot issue #303).",
+        "regression": "Makes Copy-on-Write mandatory: pandas/_config/__init__.py using_copy_on_write() returns True unconditionally. Chained assignment becomes a no-op; UpSetPlot 0.9.0 plotting gets NaN colours: ValueError: Invalid RGBA argument: nan (UpSetPlot issue #303).",
         "expected_verdict": "needs_attention",
+        "expected_findings": ["unmentioned change: chained assignment silently stops writing through (CoW is no longer opt-in)"],
         "downstream_check": {"golden_case": "golden-pandas300rc0-upsetplot-cow", "dependent": "UpSetPlot==0.9.0"},
-        "evidence": ["UpSetPlot issue #303", "dev run cal-pandas300rc0-upsetplot090 (67 real breaks, 6 already broken)"],
-        "verification": "TODO",
-        "notes": "PR number not identified yet (Jonathan). The break is reproduced at release level (2.3.3 vs 3.0.0rc0), not yet at PR level."
+        "evidence": [
+          "https://github.com/pandas-dev/pandas/pull/56633 (merged 2024-02-01 09:04:05 UTC = 14:34 IST, merge commit 3b57972c, base c3014abb, PR head e9e8e4a5; 13 files, +26/-123; first tag v3.0.0rc0)",
+          "https://github.com/jnothman/UpSetPlot/issues/303",
+          "golden record golden-pandas300rc0-upsetplot090 (pandas 2.3.3 vs 3.0.0rc0, UpSetPlot 0.9.0): 67 real breaks, 6 already broken, 3 runs per side"
+        ],
+        "verification": "verified",
+        "notes": "Identified by Jonathan (research/LOG.md, pr-eval-set.jsonl); PR number, title, merge time, merge commit and base re-checked by Nathan against the GitHub API on 10 Oct 2026 IST. head_sha here is the merge commit (what main looked like after the PR), matching the scikit-learn-29677 convention. The downstream break is reproduced at release level (2.3.3 vs 3.0.0rc0); a commit-exact run needs a pandas source build."
       }
     },
     {
       "id": "safe-TODO-1",
       "input": {"repo": "TODO", "pr": null, "base_sha": null, "head_sha": null, "title": "TODO: merged PR (to be supplied by Jonathan)"},
       "answer": {"label": "safe", "expected_verdict": "verified", "evidence": [], "verification": "TODO",
-                 "notes": "Jonathan to supply safe PRs from NumPy/pandas/scikit-learn; candidate source: the scikit-learn 1.5.1 -> 1.5.2 pair (pending clean-pair case)."}
+                 "notes": "Jonathan to supply safe PRs from NumPy/pandas/scikit-learn. The scikit-learn 1.5.1 -> 1.5.2 clean pair is now golden (golden-clean-sklearn151-152-imblearn) but is a release pair, not a single PR, so it does not fill this slot."}
     }
   ],
   "example_data": {

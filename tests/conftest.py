@@ -35,3 +35,25 @@ def dev_imblearn(legacy_records):
 
 
 FIXTURE_RUNS = REPO / "evals" / "fixtures"
+
+
+@pytest.fixture
+def golden_v1_records():
+    """Jonathan's three final golden records (shared schema v1, HARNESS_VERSION 1.0, 10 Oct 2026 IST)."""
+    p = REPO / "evals" / "fixtures" / "golden_v1.jsonl"
+    return [json.loads(x) for x in p.read_text().splitlines() if x.strip()]
+
+
+@pytest.fixture
+def g_sklearn(golden_v1_records):
+    return next(r for r in golden_v1_records if r["new_version"] == "1.6.0rc1")
+
+
+@pytest.fixture
+def g_pandas(golden_v1_records):
+    return next(r for r in golden_v1_records if r["dependent"] == "UpSetPlot")
+
+
+@pytest.fixture
+def g_clean(golden_v1_records):
+    return next(r for r in golden_v1_records if r["old_version"] == "1.5.1")

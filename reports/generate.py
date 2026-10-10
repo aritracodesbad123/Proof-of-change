@@ -14,6 +14,12 @@ IST = datetime.timezone(datetime.timedelta(hours=5, minutes=30))
 ICON = {"pass": "PASS", "fail": "FAIL", "warn": "WARN", "skip": "SKIP", "todo": "TODO"}
 
 
+
+def _schema_mode(ev: dict) -> str:
+    if ev.get("require_v1"):
+        return "strict v1 (full shared schema harness/schema/observation.schema.json)"
+    return "strict (machine_type required)" if ev.get("require_ci_fields") else "legacy (machine_type not required)"
+
 def _machine(mt: dict | None, rec: dict) -> str:
     if not mt:
         return f"NOT RECORDED (legacy field machine={rec.get('machine')!r}, host={rec.get('host')!r}, cpus={rec.get('cpu_count')})"
@@ -57,7 +63,7 @@ def render(ev: dict) -> str:
     c = ev.get("counts", {})
     L = ["# Blast Radius approver report", "",
          f"Generated {now} from `{ev.get('observations')}`. Evaluated on: {_machine(ev.get('evaluator_machine_type'), {})}.",
-         f"Schema mode: {'strict (machine_type required)' if ev.get('require_ci_fields') else 'legacy (machine_type not required)'}.",
+         f"Schema mode: {_schema_mode(ev)}.",
          "", f"## Recommendation: **{ev['recommendation']}**", "",
          "Check totals: " + ", ".join(f"{k} {v}" for k, v in sorted(c.items())), "",
          "| Run | Recommendation | Fail | Warn |", "|---|---|---|---|"]

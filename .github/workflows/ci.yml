@@ -44,8 +44,8 @@ jobs:
         run: python -m guardrails.no_external .
       - name: Tests
         run: pytest -q
-      - name: Evals (strict schema, golden cases)
-        run: python -m evals.run_evals --observations evals/fixtures/observations_ci.jsonl --runs-root evals/fixtures --require-golden --out eval-results.json
+      - name: Evals (strict v1 schema, all golden cases required)
+        run: python -m evals.run_evals --observations evals/fixtures/golden_v1.jsonl --require-golden --require-v1 --out eval-results.json
       - name: Approver report
         if: always()
         run: |

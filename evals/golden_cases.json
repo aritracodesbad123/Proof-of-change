@@ -1,10 +1,9 @@
 {
-  "_comment": "Golden eval cases. Expected values come from Jonathan (baseline/protocol owner). status: 'active' = hard gate; 'TODO' = gate is enforced when the pair is in a batch, but a missing pair is not a failure; 'pending' = candidate only, mismatches are warnings and it never fails a run. Per-run counts are read from pytest's own summary line.",
+  "_comment": "Golden eval cases. Expected values come from Jonathan (baseline/protocol owner); records in evals/fixtures/golden_v1.jsonl (Jonathan's final runner, HARNESS_VERSION 1.0, 10 Oct 2026 IST). status: 'active' = hard gate; 'TODO' = gate is enforced when the pair is in a batch, but a missing pair is not a failure; 'pending' = candidate only, mismatches are warnings and it never fails a run. Per-run counts are the raw pytest summary (per_run[].summary_counts, cross-checked against pytest_summary), never the JUnit counts (JUnit counts xpassed as passed). Counting rules: a collection error counts once per test MODULE as import_failure (never real_break); tests that vanish because their module failed to import are lost_tests. Installed (wheel) packages are tested with pytest --import-mode=prepend.",
   "cases": [
     {
       "name": "golden-sklearn160rc1-imblearn-import-failure",
       "status": "active",
-      "todo": "Exact per-category classification counts: Jonathan to deliver after fixing the runner miscount (dropped: 280 real_break / 1713 lost_tests from dev run cal-sklearn160rc1-imblearn0124).",
       "match": {
         "upstream": "scikit-learn",
         "old_version": "1.5.2",
@@ -12,9 +11,13 @@
         "dependent": "imbalanced-learn"
       },
       "expect": {
+        "accepted": true,
         "per_run_summary": {
           "old": {
-            "passed": 2238
+            "passed": 2238,
+            "skipped": 33,
+            "xfailed": 1,
+            "xpassed": 5
           },
           "new": {
             "passed": 0,
@@ -23,40 +26,65 @@
         },
         "import_failure_message_contains": "_safe_tags",
         "min": {},
-        "exact": {},
-        "exact_todo": "per-category counts (real_break, import_failure, lost_tests, ...) TODO from Jonathan",
+        "exact": {
+          "real_break": 0,
+          "already_broken": 0,
+          "flaky": 0,
+          "import_failure": 46,
+          "fixed_by_new": 0,
+          "lost_tests": 2243
+        },
         "matches_expected": "yes",
-        "signature_contains": []
+        "signature_contains": [
+          "cannot import name '_safe_tags' from 'sklearn.utils._tags'"
+        ]
       },
-      "reference": "Raw reproduction /workspace/br-repro (2026-10-09/10, imbalanced-learn 0.12.4, numpy 2.1.3, scipy 1.14.1, pandas 2.2.3, Python 3.13.5): old side '2238 passed, 33 skipped, 1 xfailed, 5 xpassed' x3; new side '525 errors' x3, every test module fails to import with ImportError: cannot import name '_safe_tags' from 'sklearn.utils._tags'. Fixed upstream in imbalanced-learn PR #1109."
+      "source_record": "golden-sklearn160rc1-imblearn0124",
+      "reference": "Jonathan golden record golden-sklearn160rc1-imblearn0124 (box, 10 Oct 2026 IST; imbalanced-learn 0.12.4, numpy 2.1.3, scipy 1.14.1, pandas 2.2.3, Python 3.13.5, wheel tests with --import-mode=prepend). Old side '2238 passed, 33 skipped, 1 xfailed, 5 xpassed' x3; new side '525 errors' x3 = 20 module collection errors + 505 xdist 'failed on setup with CollectError'; 46 test modules fail to import with ImportError: cannot import name '_safe_tags' from 'sklearn.utils._tags' -> import_failure 46, lost_tests 2243 (= 2238 passed + 5 xpassed), real_break 0. Matches the raw reproduction in /workspace/br-repro. Root cause of the earlier 280 failed / 250 passed dev numbers: --import-mode=importlib left imblearn half-imported. Upstream cause: scikit-learn PR #29677; fixed downstream in imbalanced-learn PR #1109."
     },
     {
       "name": "golden-pandas300rc0-upsetplot-cow",
-      "status": "TODO",
-      "todo": "Counts (67 real breaks, 6 already broken) are agreed; Jonathan to confirm the final pinned environment (pandas 2.3.3 vs 3.0.0rc0, UpSetPlot 0.9.0, numpy 2.3.5, matplotlib 3.10.8, pytest 9.1.1).",
+      "status": "active",
       "match": {
         "upstream": "pandas",
+        "old_version": "2.3.3",
         "new_version": "3.0.0rc0",
         "dependent": "UpSetPlot"
       },
       "expect": {
+        "accepted": true,
+        "per_run_summary": {
+          "old": {
+            "passed": 233,
+            "failed": 6,
+            "skipped": 12
+          },
+          "new": {
+            "passed": 166,
+            "failed": 73,
+            "skipped": 12
+          }
+        },
         "min": {},
         "exact": {
           "real_break": 67,
           "already_broken": 6,
-          "import_failure": 0
+          "flaky": 0,
+          "import_failure": 0,
+          "fixed_by_new": 0,
+          "lost_tests": 0
         },
         "matches_expected": "yes",
         "signature_contains": [
           "Invalid RGBA argument: nan"
         ]
       },
-      "reference": "pandas 3.0 Copy-on-Write makes chained assignment in upsetplot/plotting.py a no-op; UpSetPlot issue #303."
+      "source_record": "golden-pandas300rc0-upsetplot090",
+      "reference": "pandas 3.0 Copy-on-Write (pandas PR #56633, merge 3b57972c) makes chained assignment in upsetplot/plotting.py a no-op; UpSetPlot issue #303. Environment confirmed by Jonathan: pandas 2.3.3 vs 3.0.0rc0, UpSetPlot 0.9.0 (tests from git tag 0.9.0), numpy 2.3.5, matplotlib 3.10.8, pytest 9.1.1, Python 3.13. 67 real breaks and 6 already broken, unchanged from the calibration run."
     },
     {
-      "name": "candidate-clean-pair-sklearn151-152-imblearn",
-      "status": "pending",
-      "todo": "Candidate only, NOT golden: Jonathan to confirm zero breaks over 3 runs per side. Pins (imbalanced-learn version, numpy/scipy/pandas) also TODO.",
+      "name": "golden-clean-sklearn151-152-imblearn",
+      "status": "active",
       "match": {
         "upstream": "scikit-learn",
         "old_version": "1.5.1",
@@ -64,16 +92,33 @@
         "dependent": "imbalanced-learn"
       },
       "expect": {
+        "accepted": true,
+        "per_run_summary": {
+          "old": {
+            "passed": 2238,
+            "failed": 0,
+            "errors": 0
+          },
+          "new": {
+            "passed": 2238,
+            "failed": 0,
+            "errors": 0
+          }
+        },
         "min": {},
         "exact": {
           "real_break": 0,
+          "already_broken": 0,
+          "flaky": 0,
           "import_failure": 0,
+          "fixed_by_new": 0,
           "lost_tests": 0
         },
         "matches_expected": "yes",
         "signature_contains": []
       },
-      "reference": "A patch release pair where nothing should break; guards against false positives."
+      "source_record": "golden-clean-sklearn151to152-imblearn0124",
+      "reference": "Clean pair, promoted from candidate on 10 Oct 2026 after Jonathan's verified run: scikit-learn 1.5.1 -> 1.5.2 (patch release), imbalanced-learn 0.12.4, numpy 2.1.3, scipy 1.14.1, pandas 2.2.3, Python 3.12 (1.5.1 has no cp313 wheel). 2238 passed on both sides in every run, 0 in every class, stability 1.0. Guards against false alarms; same dependent and test command as the known-break case."
     }
   ]
 }

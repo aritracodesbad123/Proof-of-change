@@ -70,7 +70,11 @@ def test_known_cases_present_and_marked():
     by_id = {c["id"]: c for c in load_cases()}
     assert by_id["requests-6655"]["answer"]["verification"] == "verified"
     assert by_id["scikit-learn-29677"]["answer"]["downstream_check"]["golden_case"] == "golden-sklearn160rc1-imblearn-import-failure"
-    assert by_id["pandas-cow-default-TODO"]["answer"]["verification"] == "TODO"
+    cow = by_id["pandas-56633"]
+    assert cow["answer"]["verification"] == "verified"
+    assert cow["input"]["head_sha"].startswith("3b57972c") and cow["input"]["base_sha"].startswith("c3014abb")
+    assert cow["answer"]["downstream_check"]["golden_case"] == "golden-pandas300rc0-upsetplot-cow"
+    assert not any(c["id"].startswith("pandas-cow-default") for c in load_cases())
 
 
 def test_score_catch_and_false_alarm():
