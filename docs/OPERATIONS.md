@@ -88,6 +88,11 @@ those were skipped on both sides), flaky tests, and every module that failed to 
 
 ## Coverage gate (`poc/coverage_gate.py`)
 
+Every gated record says where its coverage numbers come from (`coverage_gate.measurement`): `measured` (a real
+coverage.py run of the PR side), `not measured: predates gate` (the record is older than the coverage gate; there is
+no coverage run at all, so nothing is a measurement), `not measured` (the run was skipped or failed; see
+`coverage.why`) or `not needed` (no changed Python lines). The reviewer report states this first, in bold.
+
 "Verified" must mean the changed code was exercised. After the 3 timed runs, `coverage_run()` installs `coverage` and
 `pytest-cov` into the PR venv and runs the PR side's test subset once more under `--cov=<dirs of the changed
 files>` (untimed, so the 3 timed runs stay clean; logs `coverage-pytest.log`, data `coverage-pr.json`). Changed lines
@@ -215,6 +220,22 @@ and adds the claims as rows `P-C1`, ... in the claims table; observations no cla
 "Change not in the PR description". The golden known-answer case `golden-pr-mlxtend-1229-probe`
 (`evals/fixtures/golden_pr_v1.jsonl`) is part of `--require-golden`: tests alone pass on that PR (verified), the
 probe finds two unclaimed behaviour changes, so the expected verdict is needs_attention.
+
+## Behaviour-preservation claims (`poc/behaviour_claims.py`)
+
+Tests check what a PR changes, rarely that everything else stayed the same. When the PR title or description claims
+that results stay the same and no probe checks it, the PR cannot be **verified**: the verdict becomes
+**could_not_verify** with the reason `unverified behaviour claim: "<quote>"; needs a probe (tests: ...)`. When a
+probe for the PR has a claim that expects `same`, the probe decides (it can confirm the claim, or contradict it, which
+gives needs_attention). The rule never upgrades a verdict and never hides needs_attention.
+
+The regex list (`PATTERNS`, case-insensitive) is deliberately small: results/output/behaviour/values/predictions/
+importances/scores + "unchanged / identical / preserved", "do(es) not change" / "don't change", "the same output /
+results / behaviour", "for a given / the same / a fixed seed", "backward(s) compatible / compatibility", "no
+behaviour(al) / functional / user-facing / API change", "no change in/to the results". A match right after a negation
+("not backwards compatible", "breaks backward compatibility", "no longer") is ignored, and so are Markdown headings,
+HTML comments (PR templates) and code blocks. The quotes are stored in the record (`behaviour_claims`) so a re-judge
+gives the same answer.
 
 ## Files a run writes
 

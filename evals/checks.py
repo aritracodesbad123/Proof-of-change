@@ -337,7 +337,7 @@ def check_golden_pr_case(rec: dict, case: dict) -> Result:
     cmp = rec.get("comparison")
     cnv = None if cmp else (rec.get("reason") or "no comparison")
     v_tests = verdict_for(cmp, cnv, rec.get("exit_check"), rec.get("files"))
-    v_all = verdict_for(cmp, cnv, rec.get("exit_check"), rec.get("files"), pp)
+    v_all = verdict_for(cmp, cnv, rec.get("exit_check"), rec.get("files"), pp, rec.get("behaviour_claims"))
     gated = coverage_gate.apply({k: x for k, x in rec.items() if not k.endswith("_before_coverage_gate")}
                                 | {"verdict": v_all[0], "reason": v_all[1]})["verdict"]
     if "tests_verdict" in exp and v_tests[0] != exp["tests_verdict"]:

@@ -50,7 +50,7 @@ sys.path.insert(0, str(REPO_ROOT))
 from guardrails import sandbox  # noqa: E402
 from guardrails.isolation import untrusted_env  # noqa: E402
 from harness.machine import detect_machine_type  # noqa: E402
-from poc import coverage_gate, local_config, probes  # noqa: E402
+from poc import behaviour_claims, coverage_gate, local_config, probes  # noqa: E402
 from poc.diff import confirm  # noqa: E402
 from poc.verdict import Claim, FindingLabel, RunSummary, Verdict, pr_verdict  # noqa: E402
 
@@ -214,7 +214,8 @@ def select_prs(gh: GitHub, repo: str, cfg: dict, seen: dict, last_run_utc: str |
         in_pkg_compiled = [f for f in fc["compiled"] if f.startswith(cfg["pkg"] + "/")]
         if not fc["package_py"] and not in_pkg_compiled:
             skipped.append(base | {"why": "no Python/compiled code in the package (docs, CI or tooling only)"}); continue
-        item = {"pr": n, "title": p["title"], "url": p["html_url"], "author": p["user"]["login"], "head_sha": sha,
+        item = {"pr": n, "title": p["title"], "body": p.get("body") or "", "url": p["html_url"],
+                "author": p["user"]["login"], "head_sha": sha,
                 "base_sha": p["base"]["sha"], "base_ref": p["base"]["ref"], "updated_at_utc": p["updated_at"],
                 "updated_at_ist": to_ist(p["updated_at"]), "files": fc, "diff": d,
                 "additions_hint": d.count("\n+") - d.count("\n+++")}
@@ -281,7 +282,8 @@ def chosen_items(gh: GitHub, repo: str, cfg: dict, chosen: list[dict]) -> list[d
     for pk in chosen:
         p = gh.json(f"/repos/{repo}/pulls/{pk['pr']}")
         d = gh.diff(repo, pk["pr"])
-        items.append({"pr": p["number"], "title": p["title"], "url": p["html_url"], "author": p["user"]["login"],
+        items.append({"pr": p["number"], "title": p["title"], "body": p.get("body") or "", "url": p["html_url"],
+                      "author": p["user"]["login"],
                       "head_sha": pk["head_sha"] or p["head"]["sha"], "current_head_sha": p["head"]["sha"],
                       "base_sha": p["base"]["sha"], "base_ref": p["base"]["ref"], "updated_at_utc": p["updated_at"],
                       "updated_at_ist": to_ist(p["updated_at"]), "files": classify_files(diff_files(d), cfg["pkg"]),
@@ -1059,6 +1061,20 @@ def _modules(xs: list, n: int = 3) -> str:
 
 
 def verdict_for(cmp: dict | None, cnv_reason: str | None, exits: dict | None = None, files: dict | None = None,
+                probe_results: dict | None = None, claims: list | None = None) -> tuple[str, str, list[str]]:
+    """tests, then probes (with_probes), then behaviour-preservation claims (poc/behaviour_claims.py): a 'verified'
+    PR whose title or description claims results stay the same, with no probe checking that, becomes
+    could_not_verify ('unverified behaviour claim: "<quote>"; needs a probe'). With a probe, the probe decides."""
+    v, reason, fl = with_probes(cmp, cnv_reason, exits, files, probe_results)
+    if claims and v == Verdict.VERIFIED.value and not behaviour_claims.probe_covers(probe_results):
+        q = claims[0]["quote"]
+        more = f" (+{len(claims) - 1} more)" if len(claims) > 1 else ""
+        return (Verdict.COULD_NOT_VERIFY.value, f'unverified behaviour claim: "{q}"{more}; needs a probe ({reason})',
+                fl + ["unverified_claim"])
+    return v, reason, fl
+
+
+def with_probes(cmp: dict | None, cnv_reason: str | None, exits: dict | None = None, files: dict | None = None,
                 probe_results: dict | None = None) -> tuple[str, str, list[str]]:
     """The PR verdict: the tests' verdict (tests_verdict), then the probes (poc/probes.py). An observation that needs
     attention (it differs and no claim covers it, it contradicts a claim, or it is flaky) makes the verdict
@@ -1232,7 +1248,10 @@ def new_record(repo: str, cfg: dict, item: dict, a, machine: dict, run_date: str
            "runs_per_side": 0, "runs_per_side_planned": a.runs, "workers": str(a.workers),
            "test_timeout_s": a.test_timeout, "run_timeout_s": a.run_timeout, "build_timeout_s": a.build_timeout,
            "python": getattr(a, "python_full", None) or a.python, "test_selection": "", "per_run": [], "notes": None,
-           "network": "allowed (installs and PR fetch); tests not network-isolated",
+           "network": ("installs/builds only, inside the sandbox; tests, coverage and probes have no network"
+                       if sandbox.enabled() else "allowed (installs and PR fetch); tests not network-isolated "
+                                                 "(--unsafe-no-sandbox)"),
+           "behaviour_claims": behaviour_claims.find(item["title"], item.get("body")),
            "posted_upstream": False, "logs": f"{cfg['pkg']}-{item['pr']}/", "freeze": {}}
     rec["route"] = ("source-pair" if not cfg.get("nightly") else
                     "source-build" if item["files"]["compiled"] else "nightly+patch")
@@ -1353,7 +1372,8 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
                                                work, a)
     if envs_ok:
         rec["probes"] = run_probes(repo, item["pr"], {"main": vm / "bin/python", "pr": vp / "bin/python"}, prdir, work, a)
-    rec["verdict"], rec["reason"], _ = verdict_for(cmp, cnv, ex, rec.get("files"), rec.get("probes"))
+    rec["verdict"], rec["reason"], _ = verdict_for(cmp, cnv, ex, rec.get("files"), rec.get("probes"),
+                                              rec.get("behaviour_claims"))
     return finish(gate(rec), prdir, work, t0)
 
 
@@ -1432,7 +1452,8 @@ def test_source_pair(repo: str, cfg: dict, item: dict, prdir: Path, work: Path, 
                     rec["coverage"] = coverage_run(item, vp, cm, cp, targets["pr"], prdir, work, a, cwd=cp)
             rec["probes"] = run_probes(repo, item["pr"], {"main": vm / "bin/python", "pr": vp / "bin/python"}, prdir,
                                        work, a)
-    rec["verdict"], rec["reason"], _ = verdict_for(cmp, cnv, ex, rec.get("files"), rec.get("probes"))
+    rec["verdict"], rec["reason"], _ = verdict_for(cmp, cnv, ex, rec.get("files"), rec.get("probes"),
+                                              rec.get("behaviour_claims"))
     return gate(rec)
 
 
@@ -1513,7 +1534,8 @@ def frozen_items(gh: GitHub, repo: str, cfg: dict, frozen: dict) -> list[dict]:
             raise
         except Exception as e:  # noqa: BLE001
             state, detail = "none", f"CI not readable: {e}"
-        items.append({"pr": n, "title": p["title"], "url": p["html_url"], "author": p["user"]["login"],
+        items.append({"pr": n, "title": p["title"], "body": p.get("body") or "", "url": p["html_url"],
+                      "author": p["user"]["login"],
                       "head_sha": pinned, "current_head_sha": p["head"]["sha"], "head_moved": moved,
                       "base_sha": p["base"]["sha"], "base_ref": p["base"]["ref"], "updated_at_utc": p["updated_at"],
                       "updated_at_ist": to_ist(p["updated_at"]), "files": classify_files(diff_files(d), cfg["pkg"]),
@@ -2038,7 +2060,7 @@ def rejudge(rec: dict, prdir: Path) -> dict:
     cmp["skipped_missing_dependency"] = [d for d in cmp["skipped_missing_dependency"] if d["test"] in kept]
     ex = exit_check(rec.get("per_run", []), results, cmp)
     pr_probes = rejudge_probes(rec.get("probes"))
-    v, reason, _ = verdict_for(cmp, None, ex, rec.get("files"), pr_probes)
+    v, reason, _ = verdict_for(cmp, None, ex, rec.get("files"), pr_probes, rec.get("behaviour_claims"))
     out = {k: x for k, x in rec.items() if k not in ("verdict_before_coverage_gate", "reason_before_coverage_gate")}
     out.update(comparison=cmp, exit_check=ex, verdict=v, reason=reason)
     if pr_probes:

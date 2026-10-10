@@ -42,7 +42,7 @@ SCHEMA_SHA256_REV2 = "088cd395004de286c5f1df76fe94a0dc523738be194166cd3b616c77b6
 SCHEMA_SHA256_REV3 = "2aafe631c82773d3258d531fb0e07c80ed7823d32fa3f4586d0d9e4a8e8916ca"  # + record_kind pr_run (if/then/else)
 SCHEMA_SHA256_REV4 = "0a706f00904fa34ab8ad8bc7f79f53da08dd51576aa2800a3274befb95f7608d"  # + coverage-gate fields
 SCHEMA_SHA256_REV5 = "f6c4e7ba5cd74c5c6259cf3311295a2cc909de20a6802d4b7c4496356c1448ea"  # + record_kind verification
-SCHEMA_SHA256_REV6 = "330b04158d66aade74ef583b00b0be3c3055b2b8187a08a1417249e128935287"  # + pr_run probes
+SCHEMA_SHA256_REV6 = "682cba10a01f6ce60c5eae18183fe7fac968d99dd29ce9244cf50873fa3f9677"  # + probes, behaviour_claims, gate measurement
 COMPATIBLE_SCHEMA_SHA256 = {SCHEMA_SHA256_REV1: "rev 1", SCHEMA_SHA256_REV2: "rev 2", SCHEMA_SHA256_REV3: "rev 3",
                             SCHEMA_SHA256_REV4: "rev 4", SCHEMA_SHA256_REV5: "rev 5",
                             SCHEMA_SHA256_REV6: "rev 6"}

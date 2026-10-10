@@ -187,8 +187,11 @@ def checks(rec: dict) -> list[list]:
             st, fix = "WARN", "Ask for (or add) a test that calls the changed compiled module, or review it by hand."
         elif g.get("changed"):
             st, fix = "WARN", "Widen the test mapping, or ask the author for a test that runs the changed lines."
-        elif g.get("confidence") == "lower" and "not measured" in note:
-            st, fix = "WARN", "Run the check again with the current ops/daily_run.py to measure it."
+        elif "predates the coverage gate" in note:
+            st, fix = "WARN", ("Not a measurement: this record is older than the coverage gate. Re-run the PR with the "
+                               "current ops/daily_run.py to measure it.")
+        elif g.get("confidence") == "lower" and "NOT MEASURED" in note.upper():
+            st, fix = "WARN", "The coverage run did not produce data (see coverage.why); run the check again."
         elif g.get("confidence") == "lower":
             st, fix = "WARN", "Under half of the changed lines ran: ask for a test that covers the rest."
         else:
@@ -469,6 +472,12 @@ def build(rec: dict, prdir: Path, out_dir: Path, decision: dict | None = None) -
 
     R.h(2, "Was the changed code exercised?", "coverage")
     g, cov = rec.get("coverage_gate") or {}, rec.get("coverage") or {}
+    m = g.get("measurement") or coverage_gate.measurement(rec, bool((rec.get("files") or {}).get("package_py")))
+    R.p({"measured": f"**Coverage: MEASURED** by coverage.py on the PR side ({cov.get('seconds', '?')} s run).",
+         "not measured: predates gate": "**Coverage: NOT MEASURED, record predates the coverage gate.** No coverage "
+                                        "run exists for this record; nothing below is a measurement.",
+         "not measured": f"**Coverage: NOT MEASURED** ({cov.get('why') or cov.get('status') or 'no data'}).",
+         "not needed": "**Coverage: not needed** (no changed Python lines)."}.get(m, f"Coverage: {m}."))
     R.p(f"Coverage gate ({g.get('kind', '-')}, confidence {g.get('confidence', '-')}): {g.get('note') or '-'}."
         + (f" This changed the verdict from {rec.get('verdict_before_coverage_gate')} to {rec.get('verdict')}."
            if g.get("changed") else ""))

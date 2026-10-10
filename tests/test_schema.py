@@ -39,7 +39,7 @@ def test_machine_type_needs_arch_and_os(upset):
 def test_schema_is_the_shared_file():
     from guardrails.schema import COMPATIBLE_SCHEMA_SHA256, SCHEMA_REVISION
     assert SCHEMA_PATH.parts[-3:] == ("harness", "schema", "observation.schema.json")
-    assert SCHEMA_SHA256 == "330b04158d66aade74ef583b00b0be3c3055b2b8187a08a1417249e128935287"  # rev 6
+    assert SCHEMA_SHA256 == "682cba10a01f6ce60c5eae18183fe7fac968d99dd29ce9244cf50873fa3f9677"  # rev 6
     assert SCHEMA_REVISION == 6
     assert sorted(COMPATIBLE_SCHEMA_SHA256.values()) == ["rev 1", "rev 2", "rev 3", "rev 4", "rev 5", "rev 6"]
     assert COMPATIBLE_SCHEMA_SHA256["5a3c3d36b7730ce74d0f23b03c88ea862ea35cc327c7d79481fca8b972e8383e"] == "rev 1"

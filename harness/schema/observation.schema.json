@@ -962,7 +962,7 @@
   },
   "coverage_gate": {
    "type": "object",
-   "description": "OPTIONAL (rev 4, coverage gate). What the coverage gate decided (poc/coverage_gate.py): kind (python|compiled|compiled+python|no-executable-change|unknown), changed (did it change the verdict), confidence (normal|lower|none), note.",
+   "description": "OPTIONAL (rev 4, coverage gate). What the coverage gate decided (poc/coverage_gate.py): kind (python|compiled|compiled+python|no-executable-change|unknown), changed (did it change the verdict), confidence (normal|lower|none), note. Rev 6 adds measurement: measured | not measured: predates gate | not measured | not needed.",
    "properties": {
     "kind": {
      "type": "string",
@@ -987,6 +987,15 @@
     },
     "note": {
      "type": "string"
+    },
+    "measurement": {
+     "type": "string",
+     "enum": [
+      "measured",
+      "not measured: predates gate",
+      "not measured",
+      "not needed"
+     ]
     }
    }
   },
@@ -1550,6 +1559,33 @@
      }
     }
    }
+  },
+  "behaviour_claims": {
+   "type": "array",
+   "description": "OPTIONAL (rev 6). Behaviour-preservation claims found in the PR title or description (poc/behaviour_claims.py), each {source, quote, pattern}. Without a probe whose claims expect 'same', a verified PR with such a claim becomes could_not_verify.",
+   "items": {
+    "type": "object",
+    "required": [
+     "source",
+     "quote",
+     "pattern"
+    ],
+    "properties": {
+     "source": {
+      "type": "string",
+      "enum": [
+       "title",
+       "PR description"
+      ]
+     },
+     "quote": {
+      "type": "string"
+     },
+     "pattern": {
+      "type": "string"
+     }
+    }
+   }
   }
  },
  "description": "One JSON object per (upstream, old, new, dependent) tuple, one line in observations.jsonl and research/runs/<id>/record.json. Merged 2026-10-10 from runner v1 (gates, accepted, network, report, stability, dependent_import) and guardrails/schema.py (hand_check, upstream_issue, machine_type, thread_env, per_run.collection_errors, per_run.pytest_summary). Cross-field rules not expressible here are listed in x-cross-field-rules and enforced by harness/brlib.py validate(). Revision 2 (2026-10-10, from docs/REPORT_SPEC.md): adds OPTIONAL pr, claims, upstream_commit_old/new, per_test_outcomes, old_output, golden_check, reviewer_decision for the reviewer report. Purely additive: every rev 1 record stays valid, schema_version stays \"1\". hand_check and upstream_issue were already present (required, nullable) and are unchanged. Accepted schema_sha256 values for rev 1 and rev 2 are listed in harness/schema/README.md and guardrails/schema.py.",
@@ -1591,7 +1627,7 @@
   {
    "rev": 6,
    "date": "2026-10-10",
-   "change": "optional pr_run property `probes` (probe results: claims, recorded runs, per-observation state, label, field differences and citations). Nothing becomes required; rev 1-5 records stay valid."
+   "change": "optional pr_run properties `probes` (probe results: claims, recorded runs, per-observation state, label, field differences and citations) and `behaviour_claims` (behaviour-preservation claims quoted from the PR title or description), and optional coverage_gate.measurement (measured | not measured: predates gate | not measured | not needed). Nothing becomes required; rev 1-5 records stay valid."
   }
  ],
  "if": {
