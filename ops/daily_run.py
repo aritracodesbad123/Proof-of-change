@@ -48,7 +48,7 @@ from pathlib import Path, PurePosixPath
 REPO_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO_ROOT))
 from harness.machine import detect_machine_type  # noqa: E402
-from poc import coverage_gate, local_config  # noqa: E402
+from poc import coverage_gate, local_config, probes  # noqa: E402
 from poc.diff import confirm  # noqa: E402
 from poc.verdict import Claim, FindingLabel, RunSummary, Verdict, pr_verdict  # noqa: E402
 
@@ -60,6 +60,7 @@ THREAD_ENV = {k: "1" for k in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_N
                                "VECLIB_MAXIMUM_THREADS", "BLIS_NUM_THREADS")}
 SCHEMA_PATH = REPO_ROOT / "harness" / "schema" / "observation.schema.json"
 WHO = "ops/daily_run.py"
+SECRET_ENV = re.compile(r"TOKEN|SECRET|PASSWORD|PASSWD|CREDENTIAL|API_KEY|ACCESS_KEY|PRIVATE_KEY", re.I)
 COMPILED_EXT = (".c", ".h", ".cpp", ".hpp", ".cc", ".cxx", ".pyx", ".pxd", ".pxi", ".tp", ".src", ".f", ".f90", ".cu")
 COMPILED_NAMES = ("meson.build", "meson.options", "meson_options.txt", "setup.py", "pyproject.toml")
 
@@ -447,7 +448,8 @@ def base_env() -> dict:
     env = dict(os.environ, **THREAD_ENV, MPLBACKEND="Agg", PYTHONDONTWRITEBYTECODE="1", UV_LINK_MODE="copy",
                PYTHONHASHSEED="0")
     env.pop("PYTHONPATH", None)
-    env.pop("GITHUB_TOKEN", None)  # never expose the token to PR code
+    for k in [k for k in env if SECRET_ENV.search(k)]:
+        env.pop(k)  # never expose tokens or other credentials to PR code (tests and probes run it)
     return env
 
 
@@ -988,9 +990,26 @@ def _modules(xs: list, n: int = 3) -> str:
     return ", ".join(xs[:n]) + (f" (+{len(xs) - n})" if len(xs) > n else "")
 
 
-def verdict_for(cmp: dict | None, cnv_reason: str | None, exits: dict | None = None,
-                files: dict | None = None) -> tuple[str, str, list[str]]:
-    """No Nemotron claim extraction yet: no claims, findings come from test differences only.
+def verdict_for(cmp: dict | None, cnv_reason: str | None, exits: dict | None = None, files: dict | None = None,
+                probe_results: dict | None = None) -> tuple[str, str, list[str]]:
+    """The PR verdict: the tests' verdict (tests_verdict), then the probes (poc/probes.py). An observation that needs
+    attention (it differs and no claim covers it, it contradicts a claim, or it is flaky) makes the verdict
+    needs_attention, also when the tests alone could not verify the PR. Probes never upgrade a verdict: all-green
+    probes leave it as the tests decided. Without probes the verdict is exactly the tests' verdict."""
+    v, reason, fl = tests_verdict(cmp, cnv_reason, exits, files)
+    items = (probe_results or {}).get("items") or []
+    if not items:
+        return v, reason, fl
+    s = probes.summarize(items)
+    fl = fl + s["labels"]
+    if s["flagged"] and v != Verdict.NEEDS_ATTENTION.value:
+        return Verdict.NEEDS_ATTENTION.value, f"{s['reason']}; tests: {reason}", fl
+    return v, (f"{reason}; {s['reason']}" if s["reason"] else reason), fl
+
+
+def tests_verdict(cmp: dict | None, cnv_reason: str | None, exits: dict | None = None,
+                  files: dict | None = None) -> tuple[str, str, list[str]]:
+    """Verdict from the test comparison alone (claims are checked by probes, see verdict_for).
 
     Order:
       1. could-not-verify reasons of the run itself;
@@ -1077,6 +1096,32 @@ def verdict_for(cmp: dict | None, cnv_reason: str | None, exits: dict | None = N
 
 
 # ---------------------------------------------------------------- per-PR driver
+def run_probes(repo: str, pr: int, pythons: dict, prdir: Path, work: Path, a) -> dict:
+    """Run the fixed probes of this PR (probes/<owner>/<repo>/<pr>.py, see poc/probes.py) on both sides, 3 alternating
+    runs each, in the sides' own environments. {"status": "none"} when the PR has no probe."""
+    paths = [] if getattr(a, "no_probes", False) else probes.find_probes(repo, pr)
+    if not paths:
+        return {"status": "none", "items": []}
+    items, errors = [], []
+    for path in paths:
+        try:
+            items.append(probes.run_probe(path, pythons, prdir, work / "probe-cwd", base_env(), runs=a.runs))
+            items[-1]["path"] = repo_relative(path)
+        except probes.ProbeError as e:
+            errors.append(str(e).replace(str(REPO_ROOT) + "/", ""))
+    out = {"status": "ran" if items else "error", "items": items, "summary": probes.summarize(items)}
+    if errors:
+        out["errors"] = errors
+    return out
+
+
+def repo_relative(path: Path) -> str:
+    try:
+        return str(Path(path).resolve().relative_to(REPO_ROOT))
+    except ValueError:
+        return Path(path).name
+
+
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}")
 
 
@@ -1198,6 +1243,7 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
                      "pr": (f"PR head {item['head_sha'][:12]} " +
                             ("built from source" if rec.get("route") == "source-build" else "diff applied to that nightly"))}
     cmp = None
+    envs_ok = not cnv
     if not cnv:
         tm = map_tests(item["files"], cfg["pkg"], site_packages(vm), cfg)
         tp = map_tests(item["files"], cfg["pkg"], site_packages(vp), cfg)
@@ -1215,7 +1261,9 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
                 confirm_missing(cmp, vp)
                 rec["coverage"] = coverage_run(item, vp, site_packages(vm), site_packages(vp), targets["pr"], prdir,
                                                work, a)
-    rec["verdict"], rec["reason"], _ = verdict_for(cmp, cnv, ex, rec.get("files"))
+    if envs_ok:
+        rec["probes"] = run_probes(repo, item["pr"], {"main": vm / "bin/python", "pr": vp / "bin/python"}, prdir, work, a)
+    rec["verdict"], rec["reason"], _ = verdict_for(cmp, cnv, ex, rec.get("files"), rec.get("probes"))
     return finish(gate(rec), prdir, work, t0)
 
 
@@ -1292,7 +1340,9 @@ def test_source_pair(repo: str, cfg: dict, item: dict, prdir: Path, work: Path, 
                 if cmp:
                     confirm_missing(cmp, vp)
                     rec["coverage"] = coverage_run(item, vp, cm, cp, targets["pr"], prdir, work, a, cwd=cp)
-    rec["verdict"], rec["reason"], _ = verdict_for(cmp, cnv, ex, rec.get("files"))
+            rec["probes"] = run_probes(repo, item["pr"], {"main": vm / "bin/python", "pr": vp / "bin/python"}, prdir,
+                                       work, a)
+    rec["verdict"], rec["reason"], _ = verdict_for(cmp, cnv, ex, rec.get("files"), rec.get("probes"))
     return gate(rec)
 
 
@@ -1701,6 +1751,7 @@ def main(argv=None) -> int:
     ap.add_argument("--report-dir", default=None,
                     help="where the HTML/PDF reviewer reports go (default: reports/daily/<run folder name>)")
     ap.add_argument("--no-report", action="store_true", help="skip the HTML/PDF reviewer reports")
+    ap.add_argument("--no-probes", action="store_true", help="do not run the PR's probes (probes/<owner>/<repo>/<pr>.py)")
     ap.add_argument("--no-coverage", action="store_true",
                     help="skip the extra coverage run (the coverage gate then reports 'not measured')")
     ap.add_argument("--ops-dir", default=str(REPO_ROOT / "ops"))
@@ -1890,14 +1941,25 @@ def rejudge(rec: dict, prdir: Path) -> dict:
         cmp["other_changes"].append(f"{d['test']}: {d['main']} -> skipped (skip names {d['module']}, which is installed)")
     cmp["skipped_missing_dependency"] = [d for d in cmp["skipped_missing_dependency"] if d["test"] in kept]
     ex = exit_check(rec.get("per_run", []), results, cmp)
-    v, reason, _ = verdict_for(cmp, None, ex, rec.get("files"))
+    pr_probes = rejudge_probes(rec.get("probes"))
+    v, reason, _ = verdict_for(cmp, None, ex, rec.get("files"), pr_probes)
     out = {k: x for k, x in rec.items() if k not in ("verdict_before_coverage_gate", "reason_before_coverage_gate")}
     out.update(comparison=cmp, exit_check=ex, verdict=v, reason=reason)
+    if pr_probes:
+        out["probes"] = pr_probes
     out = gate(out)
     if (out["verdict"], out["reason"]) != (rec.get("verdict"), rec.get("reason")):
         out["rejudged"] = {"at_ist": now_ist().strftime("%Y-%m-%d %H:%M IST"),
                            "previous_verdict": rec.get("verdict"), "previous_reason": rec.get("reason", "")}
     return out
+
+
+def rejudge_probes(pr_probes: dict | None) -> dict | None:
+    """Probe results recomputed from their recorded runs with the current rules (poc/probes.py)."""
+    if not pr_probes or not pr_probes.get("items"):
+        return pr_probes
+    items = [probes.rejudge_entry(it) for it in pr_probes["items"]]
+    return dict(pr_probes, items=items, summary=probes.summarize(items))
 
 
 def migrate_record(rec: dict, rdir: Path, redo: bool = False) -> dict:

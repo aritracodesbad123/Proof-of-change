@@ -195,9 +195,13 @@ def test_clean_pair_promoted_to_golden(g_clean):
 
 
 def test_golden_coverage_modes(golden_v1_records, ci_records):
-    cov = {x.check.split(":")[1]: x.status for x in golden_coverage(golden_v1_records, require=True)}
+    from evals.checks import GOLDEN_PR_BATCH
+    pr_records = [json.loads(x) for x in GOLDEN_PR_BATCH.read_text().splitlines() if x.strip()]
+    cov = {x.check.split(":")[1]: x.status for x in golden_coverage(golden_v1_records + pr_records, require=True)}
     assert cov == {"golden-sklearn160rc1-imblearn-import-failure": "pass", "golden-pandas300rc0-upsetplot-cow": "pass",
-                   "golden-clean-sklearn151-152-imblearn": "pass"}
+                   "golden-clean-sklearn151-152-imblearn": "pass", "golden-pr-mlxtend-1229-probe": "pass"}
+    only_v1 = {x.check.split(":")[1]: x.status for x in golden_coverage(golden_v1_records, require=True)}
+    assert only_v1["golden-pr-mlxtend-1229-probe"] == "fail"   # the golden PR case is required in a golden batch
     req = {x.check.split(":")[1]: x.status for x in golden_coverage(ci_records, require=True)}
     assert req["golden-clean-sklearn151-152-imblearn"] == "fail"  # pre-v1 CI fixtures no longer cover every case
     upset_only = [r for r in golden_v1_records if r["dependent"] == "UpSetPlot"]
@@ -226,6 +230,10 @@ def test_run_evals_cli_golden_strict(tmp_path):
     ev = json.loads(out.read_text())
     assert ev["recommendation"] == "APPROVE" and ev["require_v1"] is True
     assert "fail" not in ev["counts"]
+    assert ev["pr_observations"].endswith("golden_pr_v1.jsonl")            # the golden PR batch is folded in
+    assert [r["recommendation"] for r in ev["pr_records"]] == ["APPROVE"]
+    assert {"golden-coverage:golden-pr-mlxtend-1229-probe"} <= {x["check"] for x in ev["golden_coverage"]
+                                                                 if x["status"] == "pass"}
 
 
 def test_run_evals_cli_rejects_pre_v1_golden_batch(tmp_path, ci_records):

@@ -91,7 +91,8 @@ GLOSSARY = [
     ("Freeze", "The exact list of installed packages and versions on each side."),
 ]
 EMOJI = {"green": "🟢", "amber": "🟠", "red": "🔴", "grey": "⚪", "blue": "🔵"}
-STATUS_COLOUR = {"proven": "green", "false": "red", "unmentioned change": "amber", "not testable": "grey"}
+STATUS_COLOUR = {"proven": "green", "false": "red", "unmentioned change": "amber", "not testable": "grey",
+                 "not observed": "amber", "flaky": "amber"}
 EVAL_COLOUR = {"pass": "green", "fail": "red", "warn": "amber", "skip": "grey", "todo": "grey"}
 ACTION_COLOUR = {"Approve": "green", "Approve with notes": "green", "Reject": "red", "Re-run": "grey",
                  "Review by hand": "amber"}

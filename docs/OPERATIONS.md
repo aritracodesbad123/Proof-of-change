@@ -117,6 +117,47 @@ module"; it does not prove the test reaches the changed C lines, and a test with
 A PR mixing Python and compiled changes gets both rules. Lines run only by import (module-level code) count as
 covered. The coverage run adds roughly one more test run per PR (about 15-60 s on day-1 PRs).
 
+## Probes (`poc/probes.py`, `probes/`)
+
+Tests only show what the test suite checks. A **probe** checks one specific behaviour of a PR directly: a small,
+deterministic Python script that runs on both sides (main and PR) in the same isolated environments the tests used,
+prints observations as JSON, and plain code compares them. Only fixed probes exist today, one file per PR under
+`probes/<owner>/<repo>/<pr>.py` (more than one: `<pr>-<name>.py`). Model-written probes will use the same interface.
+
+Interface. The file starts with a literal `PROBE` dict (read with `ast.literal_eval`, never imported):
+`id`, `target` (`owner/repo#pr`), `about`, `timeout_s` (optional, default 120 s), and `claims`: what the PR says,
+each `{id, text, source, covers: [glob patterns over observation names], expect: "same" | "differs"}`. Its last
+stdout line is `{"observations": {"<name>": <JSON value>, ...}}`. Each side runs 3 times, alternating, with that
+side's venv Python, an empty working directory and the same scrubbed environment as the tests (thread limits set,
+credentials removed). Each run's observations are saved one per line as `probe-<id>-<side>-<n>.jsonl` (plus a `.log`
+with the full output), and every observation in the record cites its line in run 1 of each side.
+
+Labels, per observation:
+
+| Observation | Claim covering it | Label | Verdict effect |
+|---|---|---|---|
+| same on both sides | expects same | `proven` | none |
+| same on both sides | none | `no_difference` | none |
+| same on both sides | expects differs | `needs_human` | needs_attention |
+| differs | expects differs | `proven` | none |
+| differs | expects same | `false_claim` | needs_attention |
+| differs | none | `unmentioned` | needs_attention |
+| varies between runs of one side | any | `flaky` | needs_attention |
+| probe crashed on both sides | - | `not_testable` | none (reported) |
+
+A probe that crashes on one side only shows up as the `probe.error` observation differing (`unmentioned`).
+
+Verdict rule. The tests decide first (comparison, then the rules above); then any probe observation needing
+attention makes the verdict needs_attention, also over could_not_verify, because a difference was actually seen.
+Green probes never upgrade a verdict. The coverage gate runs after this and never lowers needs_attention. A PR
+without a probe file gets exactly the tests' verdict and reason; its record says `"probes": {"status": "none"}`.
+The record (schema rev 6, additive) keeps every run's observations, so `--rejudge` recomputes the labels without
+environments. The reviewer report has a **Probes** section (each observation with both values and its citations)
+and adds the claims as rows `P-C1`, ... in the claims table; observations no claim covers are listed as
+"Change not in the PR description". The golden known-answer case `golden-pr-mlxtend-1229-probe`
+(`evals/fixtures/golden_pr_v1.jsonl`) is part of `--require-golden`: tests alone pass on that PR (verified), the
+probe finds two unclaimed behaviour changes, so the expected verdict is needs_attention.
+
 ## Files a run writes
 
 ```
@@ -174,6 +215,7 @@ Same section order, renderers and verdict vocabulary as the golden-record report
 kept once under `pre-migration/`), `--rejudge` (with `--report-only`: also recompute each verdict from the saved
 JUnit files with the current comparison rules; the previous verdict is kept under `rejudged`), `--date` (run folder,
 may be nested, e.g. `<date>/<name>`; `run_date` is the folder's calendar date), `--ops-dir`, `--work-dir`, `--report-dir`, `--no-report`,
-`--no-coverage` (skip the coverage run; the gate then says "not measured").
+`--no-coverage` (skip the coverage run; the gate then says "not measured"), `--no-probes` (do not run probe files;
+the record says `"probes": {"status": "none"}`).
 
 A full daily run takes about 15-20 minutes (day 1: 15 PRs in 16.4 min wall time, before the coverage run existed).
