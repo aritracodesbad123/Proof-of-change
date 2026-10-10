@@ -1,0 +1,4 @@
+id,label,ground_truth_links,what_broke,attribution_strength,category,overlap_with_testora
+B01,regression,https://github.com/example-org/widgets/issues/4242 ; https://github.com/downstream-org/gadgets/pull/77,"Frobnicate.send() stopped calling the overridable fetch_handle(); subclasses overriding it fail with 'Unsupported handle scheme zebra'",strong: issue reports the break,unmentioned change (extension point),not in comparison set
+B02,regression,https://github.com/example-org/widgets/issues/5150,Sorting a widget table with duplicate keys now drops the trailing rows silently,medium: bisected,unmentioned change,in comparison set
+B03,safe (negative control),,,weak: no later report,control,not in comparison set
