@@ -389,9 +389,10 @@ def cite_text(cit: dict | None, rel) -> str:
 
 # ---------------------------------------------------------------- claims and verdict
 
-def eval_claims(claims, groups, imp, logs: LogIndex) -> list[dict]:
+def eval_claims(claims, groups, imp, logs: LogIndex, cls: dict | None = None) -> list[dict]:
     """Claim statuses: proven / false / not testable, plus one 'unmentioned change' row per observed change group.
-    Status is computed from the evidence, never taken from the claims file. Every row gets a log-line citation."""
+    Status is computed from the evidence, never taken from the claims file. Every row gets a log-line citation.
+    Without run artifacts (groups is None) the record's classification counts are the evidence."""
     rows = []
     sigs = [s for s, _ in (groups or [])] + ([imp["signature"]] if imp else [])
     covered = {}
@@ -400,11 +401,13 @@ def eval_claims(claims, groups, imp, logs: LogIndex) -> list[dict]:
         cid = cl.get("id") or f"C{i}"
         chk = (cl.get("check") or {}).get("kind", "none")
         if chk == "no_breaks":
-            ok = not groups and not imp
+            if groups is None:  # no artifacts: use the record's own counts
+                n_brk, n_imp = (cls or {}).get("real_break") or 0, (cls or {}).get("import_failure") or 0
+            else:
+                n_brk, n_imp = sum(len(g["tests"]) for _, g in groups), len(imp["modules"]) if imp else 0
+            ok = not n_brk and not n_imp
             status = "proven" if ok else "false"
-            ev = "no test changed result" if ok else (
-                f"{sum(len(g['tests']) for _, g in groups or [])} real break(s), {len(imp['modules']) if imp else 0} "
-                "import failure(s) observed")
+            ev = "no test changed result" if ok else f"{n_brk} real break(s), {n_imp} import failure(s) observed"
             cit = summary_cit if ok or not sigs else logs.find(search_key(sigs[0]))
         elif chk == "breaks_contain":
             needle = cl["check"]["text"]
@@ -599,7 +602,7 @@ def _build_top(rec: dict, rd: str | None, claims: dict | None, golden: list[dict
     def rel(p: str) -> str:
         return os.path.relpath(os.path.join(rd, p), out_dir) if rd else p
 
-    claims_eval = eval_claims(claims, groups, imp, logs)
+    claims_eval = eval_claims(claims, groups, imp, logs, rec.get("classification") or {})
     cites = verify_citations(claims_eval, rd)
     evals = evaluate_record(rec, runs_root, None, True, require_v1)
     d = decide(rec, claims_eval, golden, evals, cites)

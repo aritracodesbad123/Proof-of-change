@@ -47,7 +47,7 @@ jobs:
       - name: Evals (strict v1 schema, all golden cases required)
         run: python -m evals.run_evals --observations evals/fixtures/golden_v1.jsonl --require-golden --require-v1 --out eval-results.json
       - name: Reviewer reports (HTML + daily summary)
-        if: always()
+        if: always() && hashFiles('eval-results.json') != ''
         run: |
           python -m reports.generate eval-results.json --out reports/runs/ci-py${{ matrix.python }} --claims-dir evals/fixtures/claims --formats md,html --require-v1 --title "CI golden batch (Python ${{ matrix.python }})"
           cat reports/runs/ci-py${{ matrix.python }}/SUMMARY.md >> "$GITHUB_STEP_SUMMARY"

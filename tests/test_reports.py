@@ -1,6 +1,7 @@
 """Reviewer reports (reports/generate.py + reports/reviewer.py)."""
 import copy
 import json
+import os
 import shutil
 from pathlib import Path
 
@@ -13,7 +14,7 @@ REPO = Path(__file__).resolve().parent.parent
 GOLDEN = REPO / "evals" / "fixtures" / "golden_v1.jsonl"
 CLAIMS = REPO / "evals" / "fixtures" / "claims"
 REV2 = REPO / "evals" / "fixtures" / "record_rev2_example.json"
-RESEARCH = Path("/workspace/blast-radius-research")
+RESEARCH = Path(os.environ.get("BR_RESEARCH_DIR", "/workspace/blast-radius-research"))  # box-only; tests skip without it
 HAVE_ARTIFACTS = (RESEARCH / "research" / "runs" / "golden-sklearn160rc1-imblearn0124" / "pytest-new-1.log").exists()
 EXPECTED = {  # Jonathan's samples (blast-radius-research/reports/samples) and Aritra's acceptance list
     "golden-sklearn160rc1-imblearn0124": ("NEEDS ATTENTION", "Reject"),
@@ -186,3 +187,10 @@ def test_pdf_rendered(tmp_path):
     assert main([str(tmp_path / "rec.json"), "--out", str(tmp_path / "o"), "--formats", "md,html,pdf"]) == 0
     for p in (tmp_path / "o" / "example-rev2-sklearn160rc1-imblearn0124" / "REPORT.pdf", tmp_path / "o" / "SUMMARY.pdf"):
         assert p.read_bytes()[:5] == b"%PDF-"
+
+
+def test_no_breaks_claim_without_artifacts_uses_record_counts(tmp_path):
+    """CI has no run artifacts: a 'no breaks' claim must still be false when the record shows import failures."""
+    s = generate([str(REV2)], tmp_path, None, None, ("md",), require_v1=True)[0]
+    c2 = [c for c in s["claims"] if c["id"] == "C2"][0]
+    assert c2["status"] == "false"
