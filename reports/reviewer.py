@@ -446,8 +446,48 @@ def verify_citations(claims_eval: list[dict], rd: str | None) -> Result:
     return Result("report_citations", res.status, res.detail, res.fix)
 
 
+GOLDEN_STATUS_DEFAULT = "/workspace/blast-radius-research/research/validation/golden-status.json"
+
+
+def latest_replay() -> dict | None:
+    """Latest known-answer (golden) replay written by Jonathan's Validation Center (button 2), or None.
+
+    $BR_GOLDEN_STATUS names the file (empty = none); otherwise the Validation Center's file on the box, if present."""
+    p = os.environ.get("BR_GOLDEN_STATUS", GOLDEN_STATUS_DEFAULT)
+    try:
+        return json.loads(Path(p).read_text()) if p else None
+    except (OSError, ValueError):
+        return None
+
+
+def replay_failure(rec: dict | None = None, replay: dict | None = None) -> str | None:
+    """Ported from Jonathan's render_report.py: if the latest known-answer replay failed, nothing this tool says is
+    trusted until it passes again, so every report is COULD NOT VERIFY / Re-run. A record's own golden_check counts too."""
+    if replay and not replay.get("all_passed"):
+        failed = [r.get("case", "?") for r in replay.get("results", []) if not r.get("passed")]
+        return (f"the known-answer tests failed on {replay.get('date_ist', '?')} ({', '.join(failed) or 'see Validation Center'}), "
+                "so no result from this tool is trusted until they pass again")
+    gc = (rec or {}).get("golden_check")
+    if gc and gc.get("passed") != gc.get("total"):
+        return (f"the golden re-run recorded with this run failed ({gc.get('passed')} of {gc.get('total')} on {gc.get('date', '?')}), "
+                "so this result is not trusted until it passes again")
+    return None
+
+
+def replay_row(replay: dict | None) -> list:
+    """Trust-check row for the latest known-answer replay (Validation Center)."""
+    if not replay:
+        return ["Known-answer replay (fresh re-run)", badge("grey", NA), "not replayed yet (Validation Center, button 2)"]
+    if replay.get("all_passed"):
+        return ["Known-answer replay (fresh re-run)", badge("green", "all passed"),
+                f"replayed {replay.get('date_ist', '?')}, harness {replay.get('harness_version', '?')}"]
+    return ["Known-answer replay (fresh re-run)", badge("red", "FAILED"),
+            f"replayed {replay.get('date_ist', '?')}; verdict forced to COULD NOT VERIFY"]
+
+
 def decide(rec: dict, claims_eval: list[dict], golden: list[dict], evals: list[Result], cites: Result) -> dict:
     c = rec.get("classification") or {}
+    replay_bad = replay_failure(rec, latest_replay())
     gates = rec.get("gates") or {}
     req_fail = [k for k, g in gates.items() if g.get("required", True) and not g.get("pass")]
     adv_fail = [k for k, g in gates.items() if not g.get("required", True) and not g.get("pass")]
@@ -456,7 +496,9 @@ def decide(rec: dict, claims_eval: list[dict], golden: list[dict], evals: list[R
     rb, imp, fl = c.get("real_break", 0), c.get("import_failure", 0), c.get("flaky", 0)
     false_claims = [x for x in claims_eval if x["status"] == "false"]
 
-    if not rec.get("accepted") or not c or eval_fail:
+    if replay_bad:
+        verdict, colour, action, why = "COULD NOT VERIFY", "grey", "Re-run", replay_bad
+    elif not rec.get("accepted") or not c or eval_fail:
         verdict, colour, action = "COULD NOT VERIFY", "grey", "Re-run"
         bits = []
         if req_fail or not c or not rec.get("accepted"):
@@ -515,6 +557,9 @@ def decide(rec: dict, claims_eval: list[dict], golden: list[dict], evals: list[R
         elif cites.status == "skip" and claims_eval:
             down.append("run logs not available, so claims could not cite log lines")
         conf = "High" if not down else ("Medium" if len(down) <= 2 else "Low")
+    if replay_bad:
+        conf = "Low"
+        down.insert(0, "known-answer tests failed in the latest replay")
     if down:
         conf_reason = "Lowered because: " + "; ".join(down) + "."
     else:
@@ -618,7 +663,9 @@ def _build_top(rec: dict, rd: str | None, claims: dict | None, golden: list[dict
     R.p(f"Run `{rec['id']}`, tested against {dep} {dv}. Report generated {now} by reports/generate.py {GENERATOR_VERSION}.", "meta")
     scope = None if pr else ("Scope: this run compares two released versions, not a single PR's commits. "
                              "Any change between the two versions can cause what is shown here.")
-    R.banner(d["verdict"], d["action"], d["confidence"], d["confidence_reason"], d["colour"], scope)
+    R.banner(d["verdict"], d["action"], d["confidence"],
+             (f"Forced: {d['why']}. " if d["why"].startswith("the known-answer") or d["why"].startswith("the golden re-run") else "")
+             + d["confidence_reason"], d["colour"], scope)
 
     # 2) summary, 3 lines
     R.h(2, "Summary in plain English", "summary")
@@ -727,6 +774,11 @@ def _build_bottom(R: Report, x: dict) -> dict:
         if c["status"] == "false":
             pr_issues.append([f"Claim {c['id']} is contradicted: {c['text']}",
                               "Correct the PR description or fix the code so the claim holds."])
+    rb_why = replay_failure(rec, latest_replay())
+    if rb_why:
+        env_issues.append([f"Known-answer tests failed: {rb_why}",
+                           "Re-run the known-answer tests (Validation Center, button 2). Fix whatever made them fail, then "
+                           "regenerate this report. Until then no verdict from this tool is trusted."])
     for g in d["req_fail"] + d["adv_fail"]:
         env_issues.append([f"Check failed: {GATE_LABELS.get(g, g)} ({get(gates, g, 'detail') or NA})", GATE_FIXES.get(g, NA)])
     for r in evals:
@@ -797,6 +849,7 @@ def _build_bottom(R: Report, x: dict) -> dict:
                                         f"{gc['passed']} of {gc['total']}" if gc else NA),
          f"re-run with harness {gc['harness_version']} on {gc['date']}" if gc
          else "no golden re-run recorded in this record (golden_check)"],
+        replay_row(latest_replay()),
         ["Report citations", badge(EVAL_COLOUR[cites.status], cites.status), cites.detail],
         ["Flaky rate", badge("green" if (fl == 0 and tot) else ("grey" if not tot else "amber"),
                              f"{fl} of {tot} ({fl / tot:.1%})" if tot else NA),
@@ -1048,11 +1101,17 @@ def to_html(R: Report, title: str) -> str:
     return "\n".join(out)
 
 
+MAC_CHROMES = ("/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+               "/Applications/Chromium.app/Contents/MacOS/Chromium",
+               "/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge")
+
+
 def find_chrome() -> str | None:
-    for name in (os.environ.get("BR_CHROME"), "google-chrome", "chromium", "chromium-browser"):
+    """Headless Chrome/Chromium for PDFs: $BR_CHROME, then the PATH, then the usual macOS app locations."""
+    for name in (os.environ.get("BR_CHROME"), "google-chrome", "google-chrome-stable", "chromium", "chromium-browser"):
         if name and shutil.which(name):
             return shutil.which(name)
-    return None
+    return next((p for p in MAC_CHROMES if os.access(p, os.X_OK)), None)
 
 
 def to_pdf(html_path: str, pdf_path: str) -> str | None:

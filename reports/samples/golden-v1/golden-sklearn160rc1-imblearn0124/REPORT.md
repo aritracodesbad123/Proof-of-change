@@ -1,6 +1,6 @@
 # Reviewer report: scikit-learn 1.5.2 to 1.6.0rc1 (contains PR #29677)
 
-Run `golden-sklearn160rc1-imblearn0124`, tested against imbalanced-learn 0.12.4. Report generated 2026-10-10 05:53 IST by reports/generate.py 1.0 (from Jonathan's render_report.py 0.1).
+Run `golden-sklearn160rc1-imblearn0124`, tested against imbalanced-learn 0.12.4. Report generated 2026-10-10 06:40 IST by reports/generate.py 1.0 (from Jonathan's render_report.py 0.1).
 
 > ## 🟠 NEEDS ATTENTION
 >
@@ -78,6 +78,7 @@ None found.
 | Evals (Nathan) | 🟢 **APPROVE** | no failures or warnings |
 | Golden cases (stored records) | 🟢 **3 of 3 hold** | checked against the stored golden records (harness 1.0) with the eval gate's code, not re-run for this report. This run is itself one of the golden cases, so this check is partly circular for it |
 | Golden cases (re-run) | ⚪ **not available** | no golden re-run recorded in this record (golden_check) |
+| Known-answer replay (fresh re-run) | 🟢 **all passed** | replayed 2026-10-10 06:30:21 IST, harness 1.0 |
 | Report citations | 🟢 **pass** | 2 claim(s), every one backed by a real log line |
 | Flaky rate | 🟢 **0 of 2295 (0.0%)** | stability old 1.0, new 1.0 |
 | Network during tests | 🟢 **off** | install: allowed (uv from PyPI/nightly index, git clone of the tag); tests: no network (unshare -rn, private network namespace) |

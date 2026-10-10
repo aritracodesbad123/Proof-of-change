@@ -56,7 +56,7 @@ def generate(paths: list[str], out: str | Path, runs_root: str | Path | None = N
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("inputs", nargs="+", help="record.json, observations .jsonl, or eval-results .json")
-    ap.add_argument("--out", required=True, help="output dir: one subdir per run id plus SUMMARY.*")
+    ap.add_argument("-o", "--out", required=True, help="output dir: one subdir per run id plus SUMMARY.* (-o is an alias)")
     ap.add_argument("--runs-root", default=None, help="directory that record['logs'] paths are relative to")
     ap.add_argument("--claims-dir", default=None, help="dir with <run id>.claims.json files (else the record's `claims` field)")
     ap.add_argument("--golden-records", default=None, help=f"stored golden records (default {reviewer.GOLDEN_RECORDS})")

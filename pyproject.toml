@@ -7,6 +7,7 @@ dependencies = []  # stdlib only; the runner shells out to uv and git
 
 [project.optional-dependencies]
 dev = ["pytest>=8", "ruff>=0.6"]
+ops = ["uv>=0.4"]  # the PR runner creates its test environments with uv
 
 [build-system]
 requires = ["setuptools>=68"]

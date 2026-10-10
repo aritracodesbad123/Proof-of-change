@@ -149,3 +149,7 @@ Changes from the proposal:
    `harness/schema/README.md`. The report reads them: `pr` sets the subject and drops the release-scope note,
    `old_output` fills "Before", `golden_check` adds a "Golden cases (re-run)" trust row, `reviewer_decision`
    replaces the blank decision line.
+9. **Known-answer replay rule** (Jonathan, ported 10 Oct): a failed latest replay of the golden cases
+   (`research/validation/golden-status.json`, or `$BR_GOLDEN_STATUS`) forces COULD NOT VERIFY / Re-run with Low
+   confidence on every report and adds a "Known-answer replay (fresh re-run)" trust row; so does a record's own
+   failed `golden_check`.

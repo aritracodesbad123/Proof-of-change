@@ -194,3 +194,36 @@ def test_no_breaks_claim_without_artifacts_uses_record_counts(tmp_path):
     s = generate([str(REV2)], tmp_path, None, None, ("md",), require_v1=True)[0]
     c2 = [c for c in s["claims"] if c["id"] == "C2"][0]
     assert c2["status"] == "false"
+
+
+def _replay(tmp_path, ok):
+    p = tmp_path / "golden-status.json"
+    p.write_text(json.dumps({"date_ist": "2026-10-10 06:30:21 IST", "harness_version": "1.0", "all_passed": ok,
+                             "results": [{"case": "clean-sklearn151to152-imblearn0124", "passed": True},
+                                         {"case": "known-break-pandas300rc0-upsetplot090", "passed": ok}]}))
+    return p
+
+
+def test_failed_known_answer_replay_forces_could_not_verify(tmp_path, monkeypatch):
+    """Jonathan's rule: if the latest known-answer replay failed, every report is COULD NOT VERIFY / Re-run."""
+    monkeypatch.setenv("BR_GOLDEN_STATUS", str(_replay(tmp_path, False)))
+    sums = _golden(tmp_path / "out", formats=("md",))
+    assert {(s["verdict"], s["action"], s["confidence"]) for s in sums} == {("COULD NOT VERIFY", "Re-run", "Low")}
+    md = (tmp_path / "out" / "golden-clean-sklearn151to152-imblearn0124" / "REPORT.md").read_text()
+    assert "known-answer tests failed on 2026-10-10 06:30:21 IST (known-break-pandas300rc0-upsetplot090)" in md
+    assert "verdict forced to COULD NOT VERIFY" in md
+
+
+def test_passed_replay_keeps_verdicts(tmp_path, monkeypatch):
+    monkeypatch.setenv("BR_GOLDEN_STATUS", str(_replay(tmp_path, True)))
+    sums = {s["id"]: s for s in _golden(tmp_path / "out", formats=("md",))}
+    assert {k: (v["verdict"], v["action"]) for k, v in sums.items()} == EXPECTED
+    md = (tmp_path / "out" / "golden-clean-sklearn151to152-imblearn0124" / "REPORT.md").read_text()
+    assert "Known-answer replay (fresh re-run)" in md
+
+
+def test_failed_golden_check_in_record_forces_could_not_verify(tmp_path):
+    r = json.loads(REV2.read_text())
+    r["golden_check"]["passed"] = r["golden_check"]["total"] - 1
+    s = reviewer.render_record(r, str(tmp_path), formats=("md",))
+    assert (s["verdict"], s["action"], s["confidence"]) == ("COULD NOT VERIFY", "Re-run", "Low")
