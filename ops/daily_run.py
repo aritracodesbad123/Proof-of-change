@@ -344,7 +344,10 @@ def map_repo_tests(files: dict, checkout: Path, max_targets: int = 6) -> list[st
 def source_pair(repo: str, item: dict, work: Path, log: Path, python: str, timeout: int) -> dict:
     """Pure-Python library without nightly wheels: build both sides from git.
     Conflicting PR (mergeable false / state dirty): main = merge-base(PR head, base branch), PR = PR head.
-    Mergeable PR: main = current base-branch tip, PR = GitHub's test merge commit (refs/pull/N/merge)."""
+    Mergeable PR: main = current base-branch tip, PR = GitHub's test merge commit (refs/pull/N/merge).
+    Benchmark mode (ops/bench.py) checks both sides out at pinned SHAs beforehand and passes them in item["bench_sides"]."""
+    if item.get("bench_sides"):
+        return item["bench_sides"]
     env = base_env(work / "home-git")
     src = work / "src"
     res: dict = {}
@@ -1156,11 +1159,14 @@ def with_probes(cmp: dict | None, cnv_reason: str | None, exits: dict | None = N
     attention (it differs and no claim covers it, it contradicts a claim, or it is flaky) makes the verdict
     needs_attention, also when the tests alone could not verify the PR. Probes never upgrade a verdict: all-green
     probes leave it as the tests decided. Without probes the verdict is exactly the tests' verdict."""
+    from poc import probe_adequacy
     v, reason, fl = tests_verdict(cmp, cnv_reason, exits, files)
     items = (probe_results or {}).get("items") or []
     if not items:
         return v, reason, fl
+    items, notes = probe_adequacy.deciding_items(items)   # a not_adequate probe never leads to verified
     s = probes.summarize(items)
+    s["reason"] = "; ".join([s["reason"]] * bool(s["reason"]) + notes)
     fl = fl + s["labels"]
     if s["flagged"] and v != Verdict.NEEDS_ATTENTION.value:
         return Verdict.NEEDS_ATTENTION.value, f"{s['reason']}; tests: {reason}", fl
@@ -1378,6 +1384,65 @@ def run_date_for(rdir: Path, fallback: str | None = None) -> str:
     return fallback if fallback and DATE_RE.match(fallback) else now_ist().strftime("%Y-%m-%d")
 
 
+def probe_coverage(item: dict, probe_results: dict | None, vm: Path, main_root: Path, pr_root: Path, prdir: Path,
+                   a) -> dict:
+    """Probe adequacy (poc/probe_adequacy.py): run each probe ONCE more on the main side under coverage.py, after the
+    timed probe runs, and record which changed lines it executes. Adds `probe_changed_line_coverage` to every probe
+    entry (adequate / not_adequate / unmeasured) and returns the record-level summary. main_root / pr_root: the
+    folder the PR's repo-relative paths resolve against on each side (site-packages, or the checkout)."""
+    from poc import probe_adequacy
+    items = (probe_results or {}).get("items") or []
+    if not items:
+        return probe_adequacy.summary([])
+
+    def unmeasured(why: str) -> dict:
+        for it in items:
+            it["probe_changed_line_coverage"] = probe_adequacy.assess({"status": "not measured", "why": why})
+        return probe_adequacy.summary(items)
+
+    if getattr(a, "no_coverage", False):
+        return unmeasured("--no-coverage")
+    changed = {}
+    for rel in coverage_gate.python_sources(item["files"]):
+        old, new = Path(main_root) / rel, Path(pr_root) / rel
+        changed[rel] = probe_adequacy.main_side_lines(old.read_text(errors="replace") if old.is_file() else None,
+                                                      new.read_text(errors="replace") if new.is_file() else None)
+    if not changed:
+        return unmeasured("no changed non-test Python files")
+    log = prdir / "probe-coverage.log"
+    py = vm / "bin" / "python"
+    if in_side(vm, [py, "-c", "import coverage"]).returncode != 0:
+        rc, _ = run(["uv", "pip", "install", "-q", "-p", py, "coverage>=7"], log,
+                    env=base_env(side_home(vm), install=True), timeout=600, sbx=side_sandbox(vm, network=True))
+        if rc != 0:
+            return unmeasured(f"installing coverage on the main side failed ({rc}); see probe-coverage.log")
+    include = ",".join(str(Path(main_root) / rel) for rel, lines in changed.items() if (Path(main_root) / rel).is_file())
+    for it in items:
+        path = Path(it["path"]) if Path(it["path"]).is_absolute() else REPO_ROOT / it["path"]
+        if not path.is_file() and (prdir / it["path"]).is_file():
+            path = prdir / it["path"]
+        if not include:
+            it["probe_changed_line_coverage"] = probe_adequacy.measure(changed, {})
+            continue
+        out = side_out(vm)
+        data, js = out / f".probe-cov-{it['id']}", out / f"probe-cov-{it['id']}.json"
+        sbx = side_sandbox(vm, ro=(path,))
+        env = base_env(side_home(vm))
+        rc, _ = run([py, "-m", "coverage", "run", f"--data-file={data}", f"--include={include}", path], log,
+                    cwd=side_cwd(vm), env=env, timeout=int(probes.read_spec(path).get("timeout_s", 120)), sbx=sbx)
+        run([py, "-m", "coverage", "json", f"--data-file={data}", "-o", js, "-q"], log, cwd=side_cwd(vm), env=env,
+            timeout=300, sbx=sbx)
+        if not js.exists():
+            it["probe_changed_line_coverage"] = probe_adequacy.assess(
+                {"status": "not measured", "why": f"coverage produced no data (exit {rc}); see probe-coverage.log"})
+            continue
+        dest = prdir / js.name
+        shutil.move(js, dest)
+        it["probe_changed_line_coverage"] = probe_adequacy.measure(changed, json.loads(dest.read_text()).get("files", {})) | {
+            "exit": rc, "data": dest.name}
+    return probe_adequacy.summary(items)
+
+
 def new_record(repo: str, cfg: dict, item: dict, a, machine: dict, run_date: str, day: str | None = None) -> dict:
     """PR-run record (record_kind 'pr_run' of the shared observation schema, harness/schema/observation.schema.json).
     run_date names the run folder (used in the id); day is the calendar date stored in run_date."""
@@ -1529,6 +1594,8 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
     if envs_ok:
         rec["probes"] = run_probes(repo, item["pr"], {"main": vm / "bin/python", "pr": vp / "bin/python"}, prdir, work,
                                    a, plan, pr_started)
+        rec["probe_changed_line_coverage"] = probe_coverage(item, rec["probes"], vm, site_packages(vm), site_packages(vp),
+                                                            prdir, a)
     rec["verdict"], rec["reason"], _ = verdict_for(cmp, cnv, ex, rec.get("files"), rec.get("probes"),
                                               rec.get("behaviour_claims"), rec.get("baseline"))
     return finish(gate(rec), prdir, work, t0)
@@ -1612,6 +1679,7 @@ def test_source_pair(repo: str, cfg: dict, item: dict, prdir: Path, work: Path, 
                     rec["coverage"] = coverage_run(item, vp, cm, cp, targets["pr"], prdir, work, a, cwd=cp)
             rec["probes"] = run_probes(repo, item["pr"], {"main": vm / "bin/python", "pr": vp / "bin/python"}, prdir,
                                        work, a, plan, pr_started)
+            rec["probe_changed_line_coverage"] = probe_coverage(item, rec["probes"], vm, cm, cp, prdir, a)
     rec["verdict"], rec["reason"], _ = verdict_for(cmp, cnv, ex, rec.get("files"), rec.get("probes"),
                                               rec.get("behaviour_claims"), rec.get("baseline"))
     return gate(rec)
@@ -2072,6 +2140,11 @@ def main(argv=None) -> int:
                          "(the previous verdict is kept in each record under 'rejudged'; originals are backed up)")
     ap.add_argument("--report-only", action="store_true",
                     help="rebuild REPORT.md from records.jsonl, selection.json and run_meta.json; test nothing")
+    ap.add_argument("--bench", default=None, metavar="CSV",
+                    help="benchmark mode (ops/bench.py): test historical PRs from a benchmark INPUTS file, main = first "
+                         "parent of the merge commit, PR = the merge commit. Refuses any file named *answers*")
+    ap.add_argument("--ids", default=None, help="with --bench: comma-separated case IDs (default: all), e.g. B01,B14")
+    ap.add_argument("--bench-out", default=None, help="with --bench: result folder (default: runs/bench-v0)")
     a = ap.parse_args(argv)
     sandbox.configure(not a.unsafe_no_sandbox)
     a.provider, a.model_note = model_provider.select(
@@ -2082,6 +2155,9 @@ def main(argv=None) -> int:
         a.provider = None
     if a.runs != 3:
         print("note: protocol requires 3 runs per side; using", a.runs, file=sys.stderr)
+    if a.bench:
+        from ops import bench
+        return bench.run(a, sys.modules[__name__])
 
     started = now_ist()
     single = parse_pr_urls(a.pr)

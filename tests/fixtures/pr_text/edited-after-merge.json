@@ -1,0 +1,7 @@
+{"body": "Speeds up widget sorting.\r\n\r\nUpdate after release: this caused a regression, see the follow-up issue.",
+ "mergedAt": "2024-05-01T10:00:00Z", "createdAt": "2024-04-20T08:00:00Z", "lastEditedAt": "2024-07-15T09:30:00Z",
+ "userContentEdits": {"totalCount": 3, "nodes": [
+   {"editedAt": "2024-07-15T09:30:00Z", "deletedAt": null,
+    "diff": "Speeds up widget sorting.\r\n\r\nUpdate after release: this caused a regression, see the follow-up issue."},
+   {"editedAt": "2024-04-25T12:00:00Z", "deletedAt": null, "diff": "Speeds up widget sorting.\r\n\r\nBenchmarks attached."},
+   {"editedAt": "2024-04-20T08:00:00Z", "deletedAt": null, "diff": "WIP: faster sort"}]}}
