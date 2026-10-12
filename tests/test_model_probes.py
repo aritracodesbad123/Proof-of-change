@@ -258,6 +258,10 @@ def test_ungrounded_claims_and_bad_probe_code_are_rejected():
     assert "bad probe id" in model_probes.validate_probe(ok | {"id": "../x"}, {"C1"})
     assert "covers no observation" in model_probes.validate_probe(
         ok | {"claims": [{"id": "C1", "covers": [], "expect": "same"}]}, {"C1"})
+    # Nemotron often returns P1; normalize to a lowercase slug the runner accepts.
+    upper = ok | {"id": "P1"}
+    assert model_probes.validate_probe(upper, {"C1"}) is None and upper["id"] == "p1"
+    assert model_probes.normalize_probe_id("Feature_Groups") == "feature-groups"
 
 
 def test_probe_output_contract_and_size_cap():

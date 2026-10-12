@@ -60,8 +60,9 @@ and description, the claims, and BASE-side source code. Rules for "code": standa
 test only; fixed seeds; no network, no files outside the current directory, no clock, no randomness without a seed;
 never assert or raise on purpose: record what you see. The LAST line printed must be one JSON object
 {"observations": {"<name>": <JSON value>, ...}} with at most 50 short dotted observation names. Wrap calls that may
-fail and record the exception type name instead. "claims" maps claim ids to the observation names they cover (fnmatch
-patterns) and what the claim expects for them (same | differs). Answer with JSON only."""
+fail and record the exception type name instead. Each probe "id" must be a short lowercase slug (letters, digits,
+hyphens only), e.g. p1 or feature-groups — not P1. "claims" maps claim ids to the observation names they cover
+(fnmatch patterns) and what the claim expects for them (same | differs). Answer with JSON only."""
 
 
 class ProviderError(RuntimeError):

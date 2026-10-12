@@ -33,6 +33,12 @@ def _norm(s: str) -> str:
     return re.sub(r"\s+", " ", s or "").strip()
 
 
+def normalize_probe_id(raw) -> str:
+    """Nemotron often returns P1 / Feature_Groups; store lowercase slug ids the runner accepts."""
+    s = re.sub(r"[^a-z0-9]+", "-", str(raw or "").strip().lower()).strip("-")
+    return s[:40]
+
+
 def grounded_claims(raw: dict, title: str, body: str | None) -> tuple[list, list]:
     """(kept, rejected): a claim is kept only if its source_quote is found in the title or description."""
     text = _norm(title) + " \n " + _norm(body)
@@ -46,8 +52,13 @@ def grounded_claims(raw: dict, title: str, body: str | None) -> tuple[list, list
 
 def validate_probe(p: dict, claim_ids: set) -> str | None:
     """None if the model's probe is acceptable, else why not."""
-    if not ID_RE.match(str(p.get("id", ""))):
-        return f"bad probe id {p.get('id')!r}"
+    raw_id = str(p.get("id", ""))
+    if "/" in raw_id or "\\" in raw_id or ".." in raw_id:
+        return f"bad probe id {raw_id!r}"
+    pid = normalize_probe_id(raw_id)
+    if not ID_RE.match(pid):
+        return f"bad probe id {raw_id!r}"
+    p["id"] = pid
     code = p.get("code") or ""
     if len(code) > MAX_CODE_CHARS:
         return f"code too long ({len(code)} chars > {MAX_CODE_CHARS})"
