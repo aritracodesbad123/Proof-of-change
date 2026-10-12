@@ -25,7 +25,8 @@ if not OK and os.environ.get("GITHUB_ACTIONS"):
 elif not OK:
     pytest.fail(f"the sandbox must work on this machine: {WHY}", pytrace=False)
 
-FAKE_SECRETS = {"NEBIUS_KEY": "fake-nebius", "TAVILY_KEY": "fake-tavily", "OPENAI_APIKEY": "fake-openai",
+FAKE_SECRETS = {"NEBIUS_KEY": "fake-nebius", "NEBIUS_API_KEY": "fake-nebius-api-key", "TAVILY_KEY": "fake-tavily",
+                "OPENAI_APIKEY": "fake-openai",
                 "GH_PAT": "fake-pat", "DATABASE_URL": "postgres://u:fake-pw@db/x", "NPM_AUTH": "fake-npm",
                 "GITHUB_POC_TOKEN": "fake-poc"}
 RUN_KEYS = {"PATH", "HOME", "TMPDIR", "PYTHONHASHSEED", "PYTHONDONTWRITEBYTECODE", "MPLBACKEND",
@@ -471,3 +472,30 @@ def test_whole_module_passes_with_basetemp_next_to_the_repo(sibling_dir):
                         cwd=REPO, capture_output=True, text=True, timeout=1800)
     assert cp.returncode == 0, cp.stdout[-4000:] + cp.stderr[-2000:]
     assert " passed" in cp.stdout and " failed" not in cp.stdout
+
+
+# ---------------------------------------------------------------- the model provider's key stays in the orchestrator
+def test_nebius_api_key_never_reaches_a_build_or_a_probe(work, monkeypatch, tmp_path):
+    """NEBIUS_API_KEY is read by the orchestrator (poc/model_provider.py) only. With it set here, neither the PR's
+    build backend (install phase, which ran with it exported) nor a probe or test process sees it."""
+    from poc import model_provider
+    monkeypatch.setenv(model_provider.KEY_ENV, "fake-nebius-api-key")
+    prov, note = model_provider.select("nebius")
+    assert prov is not None and "live" in note           # the orchestrator can read it ...
+    for side in ("main", "pr"):                           # ... the build backend could not
+        env = json.loads((work["dir"] / f"side-{side}" / "build-attempts.json").read_text())["env"]
+        assert model_provider.KEY_ENV not in env and "fake-nebius-api-key" not in json.dumps(env)
+    cp = daily_run.in_side(work["dir"] / "venv-pr", ["/usr/bin/python3", "-c",
+                                                     "import json,os;print(json.dumps(dict(os.environ)))"])
+    env = json.loads(cp.stdout)
+    assert model_provider.KEY_ENV not in env and "fake-nebius-api-key" not in cp.stdout
+    probe = tmp_path / "p.py"
+    probe.write_text('PROBE = {"id": "env", "target": "o/r#1", "about": "env", "claims": []}\n'
+                     'import json, os\nprint(json.dumps({"observations": {"env": sorted(os.environ)}}))\n')
+    res = daily_run.run_probes("o/r", 1, {s: work["dir"] / f"venv-{s}" / "bin/python" for s in ("main", "pr")},
+                               tmp_path, work["dir"], type("A", (), {"runs": 1})(),
+                               plan=[{"path": probe, "source": "library",
+                                      "freeze": daily_run.freeze.freeze(probe, daily_run.freeze.generator("fixed"), None)}],
+                               pr_started=daily_run.freeze.now())
+    seen = res["items"][0]["runs"]["pr"][0]["env"]
+    assert res["status"] == "ran" and model_provider.KEY_ENV not in seen and "HOME" in seen

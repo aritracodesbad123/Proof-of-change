@@ -50,7 +50,7 @@ sys.path.insert(0, str(REPO_ROOT))
 from guardrails import sandbox  # noqa: E402
 from guardrails.isolation import untrusted_env  # noqa: E402
 from harness.machine import detect_machine_type  # noqa: E402
-from poc import behaviour_claims, coverage_gate, local_config, probes  # noqa: E402
+from poc import behaviour_claims, coverage_gate, diff_probes, freeze, local_config, model_probes, model_provider, probes  # noqa: E402,E501
 from poc.diff import confirm  # noqa: E402
 from poc.verdict import Claim, FindingLabel, RunSummary, Verdict, pr_verdict  # noqa: E402
 
@@ -82,6 +82,7 @@ LIBS = {
 TEST_EXTRA_NAMES = ("test", "tests", "testing")
 # tzdata: some machines have no system zoneinfo; pandas/xarray tests need IANA zones.
 BASE_TEST_DEPS = ["pytest", "pytest-timeout", "pytest-xdist", "tzdata"]
+XDIST_MISMATCH = "Different tests were collected between"
 
 
 def now_ist() -> dt.datetime:
@@ -153,7 +154,7 @@ def diff_files(diff: str) -> list[str]:
 
 
 def classify_files(files: list[str], pkg: str) -> dict:
-    in_pkg = [f for f in files if f.startswith(pkg + "/")]
+    in_pkg = [f for f in files if f.startswith((pkg + "/", f"src/{pkg}/"))]   # flat or src layout
     py = [f for f in in_pkg if f.endswith((".py", ".pyi"))]
     compiled = [f for f in in_pkg if f.endswith(COMPILED_EXT) or os.path.basename(f) in COMPILED_NAMES]
     build_cfg = [f for f in files if os.path.basename(f) in COMPILED_NAMES and "/" not in f.strip("/")]
@@ -402,6 +403,36 @@ def pyproject_test_extras(checkout: Path) -> list[str]:
     return test_extras(list(opt))
 
 
+def pyproject_test_groups(checkout: Path) -> list[str]:
+    """Requirements from PEP 735 [dependency-groups] named test/tests/testing (include-group resolved).
+    Anything that looks like a command-line option is dropped: these strings come from the checkout."""
+    pp = checkout / "pyproject.toml"
+    if not pp.exists():
+        return []
+    import tomllib
+    try:
+        groups = tomllib.loads(pp.read_text()).get("dependency-groups", {})
+    except Exception:  # noqa: BLE001
+        return []
+    if not isinstance(groups, dict):
+        return []
+
+    def expand(name: str, seen: frozenset) -> list[str]:
+        out: list[str] = []
+        for r in groups.get(name, []) if name not in seen else []:
+            if isinstance(r, str):
+                out.append(r)
+            elif isinstance(r, dict) and isinstance(r.get("include-group"), str):
+                out += expand(r["include-group"], seen | {name})
+        return out
+
+    reqs: list[str] = []
+    for g in groups:
+        if g.lower() in TEST_EXTRA_NAMES:
+            reqs += [r.strip() for r in expand(g, frozenset()) if r.strip() and not r.strip().startswith("-")]
+    return list(dict.fromkeys(reqs))
+
+
 def with_test_extras(proj: list[str], checkout: Path) -> list[str]:
     """['-e', '/x[a]'] -> ['-e', '/x[a,test]'] when the project declares a test extra not already requested."""
     extras = pyproject_test_extras(checkout)
@@ -422,7 +453,8 @@ def install_side(venv: Path, checkout: Path, chosen: dict | None, log: Path, pyt
     proj, extra = side_install_args(chosen, checkout)
     proj = with_test_extras(proj, checkout)
     cmds = [["uv", "venv", "-q", "-p", python, venv],
-            ["uv", "pip", "install", "-q", "-p", venv / "bin/python", *proj, *extra, *BASE_TEST_DEPS]
+            ["uv", "pip", "install", "-q", "-p", venv / "bin/python", *proj, *extra, *BASE_TEST_DEPS,
+             *pyproject_test_groups(checkout)]
             + (["-c", constraints] if constraints else [])]
     sbx = side_sandbox(venv, network=True, ro=(constraints,) if constraints else ())
     sbx["rw"].append(checkout)
@@ -586,7 +618,7 @@ def dist_extras(venv: Path, dist: str, env: dict) -> list[str]:
     return [x.strip() for x in out.splitlines() if x.strip()]
 
 
-def freeze(venv: Path, out: Path) -> str:
+def freeze_env(venv: Path, out: Path) -> str:
     txt = in_side(venv, ["uv", "pip", "freeze", "-p", venv / "bin/python"], install=True).stdout
     out.write_text(txt)
     return out.name
@@ -797,6 +829,12 @@ def run_tests(side_venvs: dict, targets_by_side: dict, rdir: Path, workdir: Path
                 cmd += ["-n", workers]
             rc, secs = run(cmd, lg, cwd=(cwds[side] if cwds else side_cwd(venv)), env=envs[side],
                            timeout=run_timeout, sbx=side_sandbox(venv))
+            if workers != "0" and XDIST_MISMATCH in lg.read_text(errors="replace"):
+                # pytest-xdist refuses suites whose test ids differ between worker processes; rerun serially
+                jin.unlink(missing_ok=True)
+                rc, s2 = run(cmd[:-2], lg, cwd=(cwds[side] if cwds else side_cwd(venv)), env=envs[side],
+                             timeout=run_timeout, sbx=side_sandbox(venv))
+                secs += s2
             jx.unlink(missing_ok=True)
             if jin.exists():
                 shutil.move(jin, jx)
@@ -822,6 +860,8 @@ def coverage_run(item: dict, venv: Path, main_root: Path, pr_root: Path, targets
     nightly routes, the checkout for source-pair)."""
     if getattr(a, "no_coverage", False):
         return {"status": "skipped", "why": "--no-coverage"}
+    if not uses(getattr(a, "baseline", None), "coverage"):
+        return {"status": "skipped", "why": f"baseline {a.baseline} does not use the coverage gate"}
     py = coverage_gate.python_sources(item["files"])
     if not py:
         return {"status": "not needed", "why": "no changed non-test Python files"}
@@ -862,7 +902,9 @@ def coverage_run(item: dict, venv: Path, main_root: Path, pr_root: Path, targets
 
 
 def gate(rec: dict) -> dict:
-    """Apply the coverage gate (poc/coverage_gate.py) to a finished record."""
+    """Apply the coverage gate (poc/coverage_gate.py) to a finished record; baselines without coverage skip it."""
+    if not uses(rec.get("baseline"), "coverage"):
+        return rec
     return coverage_gate.apply(rec)
 
 
@@ -1063,12 +1105,46 @@ def _modules(xs: list, n: int = 3) -> str:
     return ", ".join(xs[:n]) + (f" (+{len(xs) - n})" if len(xs) > n else "")
 
 
+BASELINES = ("tests", "tests+diff", "tests+probes", "full")
+BASELINE_PARTS = {"tests": frozenset(),
+                  "tests+diff": frozenset({"diff"}),
+                  "tests+probes": frozenset({"claim_probes"}),
+                  "full": frozenset({"claim_probes", "diff_info", "coverage", "claim_flags"})}
+BASELINE_TEXT = {"tests": "test comparison only",
+                 "tests+diff": "test comparison + differential probes (model-free, they decide)",
+                 "tests+probes": "test comparison + claim probes (fixed and/or model-written)",
+                 "full": "test comparison + claim probes + coverage gate + claim flagging "
+                         "(differential probes shown, informational)"}
+
+
+def uses(baseline: str | None, part: str) -> bool:
+    """Whether a baseline (default full; records without one are full) uses a part:
+    claim_probes, diff (differential probes decide), diff_info (run and shown only), coverage, claim_flags."""
+    return part in BASELINE_PARTS[baseline or "full"]
+
+
+def probe_items(probe_results: dict | None, baseline: str | None) -> dict | None:
+    """The probe results that may decide the verdict under a baseline: claim probes (library/model sources) for
+    tests+probes and full, differential probes (source diff) for tests+diff, none for tests."""
+    if not probe_results:
+        return probe_results
+    want = ({"library", "model"} if uses(baseline, "claim_probes") else set()) | (
+        {"diff"} if uses(baseline, "diff") else set())
+    items = [it for it in probe_results.get("items") or [] if it.get("source", "library") in want]
+    return dict(probe_results, items=items)
+
+
 def verdict_for(cmp: dict | None, cnv_reason: str | None, exits: dict | None = None, files: dict | None = None,
-                probe_results: dict | None = None, claims: list | None = None) -> tuple[str, str, list[str]]:
+                probe_results: dict | None = None, claims: list | None = None,
+                baseline: str | None = None) -> tuple[str, str, list[str]]:
     """tests, then probes (with_probes), then behaviour-preservation claims (poc/behaviour_claims.py): a 'verified'
     PR whose title or description claims results stay the same, with no probe checking that, becomes
-    could_not_verify ('unverified behaviour claim: "<quote>"; needs a probe'). With a probe, the probe decides."""
+    could_not_verify ('unverified behaviour claim: "<quote>"; needs a probe'). With a probe, the probe decides.
+    baseline (BASELINES, default full) selects which probes decide and whether claims are flagged."""
+    probe_results = probe_items(probe_results, baseline)
     v, reason, fl = with_probes(cmp, cnv_reason, exits, files, probe_results)
+    if not uses(baseline, "claim_flags"):
+        return v, reason, fl
     if claims and v == Verdict.VERIFIED.value and not behaviour_claims.probe_covers(probe_results):
         q = claims[0]["quote"]
         more = f" (+{len(claims) - 1} more)" if len(claims) > 1 else ""
@@ -1194,27 +1270,99 @@ def probe_launcher(venv: Path, path: Path):
     return launch
 
 
-def run_probes(repo: str, pr: int, pythons: dict, prdir: Path, work: Path, a) -> dict:
-    """Run the fixed probes of this PR (probes/<owner>/<repo>/<pr>.py, see poc/probes.py) on both sides, 3 alternating
-    runs each, in the sides' own environments. {"status": "none"} when the PR has no probe."""
-    paths = [] if getattr(a, "no_probes", False) else probes.find_probes(repo, pr)
-    if not paths:
+def plan_probes(repo: str, item: dict, rec: dict, base_root: Path, pr_roots: list, prdir: Path, a) -> list[dict]:
+    """Write and FREEZE every probe of this PR before any PR-side execution (poc/freeze.py). Inputs: the PR title and
+    description and base-side code only (base_root). Returns [{path, source, freeze}]; notes go to rec["probe_plan"].
+    Claim probes (baselines tests+probes, full): fixed probes (probes/<owner>/<repo>/<pr>.py) and model-written
+    probes (--model-provider). Differential probes (tests+diff decides with them; full shows them)."""
+    bl = getattr(a, "baseline", None)
+    plan, note = [], {"baseline": bl or "full", "model": getattr(a, "model_note", None), "errors": []}
+    if uses(bl, "claim_probes") and not getattr(a, "no_probes", False):
+        for path in probes.find_probes(repo, item["pr"]):
+            try:
+                spec = probes.read_spec(path)
+            except probes.ProbeError as e:
+                note["errors"].append(str(e).replace(str(REPO_ROOT) + "/", ""))
+                continue
+            gen = freeze.generator("fixed", provenance=spec.get("provenance"))
+            plan.append({"path": path, "source": "library", "freeze": freeze.freeze(path, gen, None)})
+        provider = getattr(a, "provider", None)
+        if provider is not None:
+            base_files = {rel: Path(base_root) / rel for rel in coverage_gate.python_sources(item["files"])
+                          if (Path(base_root) / rel).is_file()}
+            try:
+                res = model_probes.generate(provider, repo, item["pr"], item["title"], item.get("body"), base_files,
+                                            base_root, pr_roots, prdir / "model-probes")
+            except freeze.FreezeError as e:
+                res = {"errors": [str(e)], "probes": [], "claims": [], "rejected_claims": []}
+            note["model_claims"] = res.get("claims", [])
+            note["model_rejected_claims"] = res.get("rejected_claims", [])
+            note["errors"] += res.get("errors", [])
+            plan += [{"path": x["path"], "source": "model", "freeze": x["freeze"]} for x in res.get("probes", [])]
+    if (uses(bl, "diff") or uses(bl, "diff_info")) and not getattr(a, "no_probes", False):
+        try:
+            d = diff_probes.derive(item.get("diff", ""), coverage_gate.python_sources(item["files"]), base_root,
+                                   pr_roots)
+            if d["targets"]:
+                path = diff_probes.write(d["targets"], prdir / "diff-probes" / "diff-api.py", f"{repo}#{item['pr']}")
+                plan.append({"path": path, "source": "diff",
+                             "freeze": freeze.freeze(path, freeze.generator("diff"), d["inputs"])})
+            note["diff_targets"] = [".".join(t) for t in d["targets"]]
+        except (freeze.FreezeError, SyntaxError, OSError) as e:
+            note["errors"].append(f"differential probe: {e}")
+    rec["probe_plan"] = note | {"frozen": [{"path": repo_relative(x["path"]) if x["source"] == "library"
+                                           else str(Path(x["path"]).relative_to(prdir)), "source": x["source"],
+                                           **x["freeze"]} for x in plan]}
+    return plan
+
+
+def run_probes(repo: str, pr: int, pythons: dict, prdir: Path, work: Path, a, plan: list | None = None,
+               pr_started: str | None = None) -> dict:
+    """Run the frozen probes of this PR (plan_probes) on both sides, 3 alternating runs each, in the sides' own
+    sandboxed environments. A probe runs on the PR side only if it still matches its freeze (content sha256) and was
+    frozen before PR-side execution started (pr_started); otherwise it is refused. Without a plan (callers outside
+    the per-PR driver) the fixed probes are frozen now. {"status": "none"} when the PR has no probe."""
+    if plan is None:
+        plan = [] if getattr(a, "no_probes", False) else [
+            {"path": p, "source": "library",
+             "freeze": freeze.freeze(p, freeze.generator("fixed", provenance=_provenance(p)), None)}
+            for p in probes.find_probes(repo, pr)]
+        pr_started = pr_started or freeze.now()
+    if not plan:
         return {"status": "none", "items": []}
-    items, errors = [], []
+    items, errors, refused = [], [], []
     venvs = {side: Path(py).parent.parent for side, py in pythons.items()}   # <venv>/bin/python
     envs = {side: base_env(side_home(v)) for side, v in venvs.items()}
     cwds = {side: side_cwd(v) for side, v in venvs.items()}
-    for path in paths:
+    for x in plan:
+        path, fz = Path(x["path"]), x["freeze"]
+        def guard(p, fz=fz):
+            freeze.verify(p, fz, pr_started)
         try:
-            items.append(probes.run_probe(path, pythons, prdir, cwds, envs, runs=a.runs,
-                                          launchers={side: probe_launcher(v, path) for side, v in venvs.items()}))
-            items[-1]["path"] = repo_relative(path)
+            guard(path)
+            it = probes.run_probe(path, pythons, prdir, cwds, envs, runs=a.runs, source=x["source"],
+                                  launchers={side: probe_launcher(v, path) for side, v in venvs.items()}, guard=guard)
+            it["path"] = repo_relative(path) if x["source"] == "library" else str(path.relative_to(prdir))
+            it["generator"] = fz["generator"]
+            it["freeze"] = fz | {"verified": True, "pr_started_at": pr_started}
+            items.append(it)
+        except freeze.FreezeError as e:
+            refused.append({"path": path.name, "source": x["source"], "why": str(e)})
         except probes.ProbeError as e:
             errors.append(str(e).replace(str(REPO_ROOT) + "/", ""))
     out = {"status": "ran" if items else "error", "items": items, "summary": probes.summarize(items)}
     if errors:
         out["errors"] = errors
+    if refused:
+        out["refused"] = refused
     return out
+
+
+def _provenance(path: Path) -> str | None:
+    try:
+        return probes.read_spec(path).get("provenance")
+    except probes.ProbeError:
+        return None
 
 
 def repo_relative(path: Path) -> str:
@@ -1316,7 +1464,13 @@ def new_record(repo: str, cfg: dict, item: dict, a, machine: dict, run_date: str
            "network": ("installs/builds only, inside the sandbox; tests, coverage and probes have no network"
                        if sandbox.enabled() else "allowed (installs and PR fetch); tests not network-isolated "
                                                  "(--unsafe-no-sandbox)"),
-           "behaviour_claims": behaviour_claims.find(item["title"], item.get("body")),
+           "behaviour_claims": (behaviour_claims.find(item["title"], item.get("body"))
+                                if uses(getattr(a, "baseline", None), "claim_flags") else []),
+           "baseline": getattr(a, "baseline", None) or "full",
+           "model_provider": {"requested": getattr(a, "model_provider", None) or "none",
+                              "used": getattr(getattr(a, "provider", None), "name", None),
+                              "note": getattr(a, "model_note", None) or "model provider: none: fixed probes only",
+                              "blind": bool(getattr(getattr(a, "provider", None), "blind", False))},
            "posted_upstream": False, "logs": f"{cfg['pkg']}-{item['pr']}/", "freeze": {}}
     rec["route"] = ("source-pair" if not cfg.get("nightly") else
                     "source-build" if item["files"]["compiled"] else "nightly+patch")
@@ -1391,7 +1545,9 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
     if not main["ok"]:
         cnv = f"main side could not be set up: {main['why']}"
     else:
-        rec["freeze"]["main"] = freeze(vm, prdir / "freeze-main.txt")
+        rec["freeze"]["main"] = freeze_env(vm, prdir / "freeze-main.txt")
+        plan = plan_probes(repo, item, rec, site_packages(vm), [vp, work / "src"], prdir, a)
+        rec["pr_side_started_at"] = pr_started = freeze.now()   # nothing below may create or change a probe
         if item["files"]["compiled"]:
             rec["route"] = "source-build"
             extra = [f"{cfg['dist']}[{','.join(main['test_extras'])}]"] if main.get("test_extras") else []
@@ -1410,7 +1566,7 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
             if not ok:
                 cnv = why + " (see patch.log)"
         if vp.exists():
-            rec["freeze"]["pr"] = freeze(vp, prdir / "freeze-pr.txt")
+            rec["freeze"]["pr"] = freeze_env(vp, prdir / "freeze-pr.txt")
     rec["tested"] = {"main": f"nightly {main.get('version', '?')} "
                              f"(commit {(main.get('build') or {}).get('commit') or 'unknown'}, "
                              f"sha256 {((main.get('build') or {}).get('sha256') or '?')[:12]})",
@@ -1436,11 +1592,12 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
                 rec["coverage"] = coverage_run(item, vp, site_packages(vm), site_packages(vp), targets["pr"], prdir,
                                                work, a)
     if envs_ok:
-        rec["probes"] = run_probes(repo, item["pr"], {"main": vm / "bin/python", "pr": vp / "bin/python"}, prdir, work, a)
+        rec["probes"] = run_probes(repo, item["pr"], {"main": vm / "bin/python", "pr": vp / "bin/python"}, prdir, work,
+                                   a, plan, pr_started)
         rec["probe_changed_line_coverage"] = probe_coverage(item, rec["probes"], vm, site_packages(vm), site_packages(vp),
                                                             prdir, a)
     rec["verdict"], rec["reason"], _ = verdict_for(cmp, cnv, ex, rec.get("files"), rec.get("probes"),
-                                              rec.get("behaviour_claims"))
+                                              rec.get("behaviour_claims"), rec.get("baseline"))
     return finish(gate(rec), prdir, work, t0)
 
 
@@ -1488,18 +1645,21 @@ def test_source_pair(repo: str, cfg: dict, item: dict, prdir: Path, work: Path, 
         vm, vp = work / "venv-main", work / "venv-pr"
         cm, cp = work / "side-main", work / "side-pr"
         ok, why = install_side(vm, cm, item.get("chosen"), prdir / "setup-main.log", a.python, a.build_timeout, None)
+        plan, pr_started = [], None
         if ok:
+            plan = plan_probes(repo, item, rec, cm, [cp, work / "src"], prdir, a)
             rec["python"] = venv_python_version(vm) or rec["python"]
             frz = in_side(vm, ["uv", "pip", "freeze", "-p", vm / "bin/python"], install=True).stdout
             pkgname = cfg["dist"].lower().replace("_", "-")
             cons = work / "constraints.txt"
             cons.write_text("\n".join(ln for ln in frz.splitlines() if ln and not ln.startswith(("-e", "#"))
                                        and ln.split("==")[0].lower().replace("_", "-") != pkgname) + "\n")
-            rec["freeze"]["main"] = freeze(vm, prdir / "freeze-main.txt")
+            rec["freeze"]["main"] = freeze_env(vm, prdir / "freeze-main.txt")
             rec["test_extras"] = pyproject_test_extras(cm)
+            rec["pr_side_started_at"] = pr_started = freeze.now()   # nothing below may create or change a probe
             ok, why = install_side(vp, cp, item.get("chosen"), prdir / "setup-pr.log", a.python, a.build_timeout, cons)
             if ok:
-                rec["freeze"]["pr"] = freeze(vp, prdir / "freeze-pr.txt")
+                rec["freeze"]["pr"] = freeze_env(vp, prdir / "freeze-pr.txt")
         if not ok:
             cnv = why
         else:
@@ -1518,10 +1678,10 @@ def test_source_pair(repo: str, cfg: dict, item: dict, prdir: Path, work: Path, 
                     confirm_missing(cmp, vp)
                     rec["coverage"] = coverage_run(item, vp, cm, cp, targets["pr"], prdir, work, a, cwd=cp)
             rec["probes"] = run_probes(repo, item["pr"], {"main": vm / "bin/python", "pr": vp / "bin/python"}, prdir,
-                                       work, a)
+                                       work, a, plan, pr_started)
             rec["probe_changed_line_coverage"] = probe_coverage(item, rec["probes"], vm, cm, cp, prdir, a)
     rec["verdict"], rec["reason"], _ = verdict_for(cmp, cnv, ex, rec.get("files"), rec.get("probes"),
-                                              rec.get("behaviour_claims"))
+                                              rec.get("behaviour_claims"), rec.get("baseline"))
     return gate(rec)
 
 
@@ -1935,6 +2095,19 @@ def main(argv=None) -> int:
                     help="run PR code WITHOUT the filesystem/network sandbox (never used by the daily run; only for "
                          "machines where bubblewrap cannot work, and only for trusted PRs)")
     ap.add_argument("--no-probes", action="store_true", help="do not run the PR's probes (probes/<owner>/<repo>/<pr>.py)")
+    ap.add_argument("--baseline", choices=BASELINES, default="full",
+                    help="what decides the verdict: tests (test comparison only), tests+diff (+ model-free "
+                         "differential probes), tests+probes (+ claim probes: fixed and/or model-written), full "
+                         "(everything: claim probes, coverage gate, claim flagging; differential probes shown). "
+                         "Default: full")
+    ap.add_argument("--model-provider", choices=model_provider.PROVIDERS, default="none",
+                    help="who writes claim probes in addition to the fixed ones: nebius (Token Factory, key from "
+                         "NEBIUS_API_KEY; without it: fixed probes only), recorded (recorded responses: TEST FIXTURE, "
+                         "not blind), none (default: fixed probes only)")
+    ap.add_argument("--claims-model", default=model_provider.DEFAULT_MODELS["claims"], help="model id for claims")
+    ap.add_argument("--probe-model", default=model_provider.DEFAULT_MODELS["probes"], help="model id for probes")
+    ap.add_argument("--recorded-dir", default=None,
+                    help="recorded model responses (default: evals/fixtures/model_responses)")
     ap.add_argument("--no-coverage", action="store_true",
                     help="skip the extra coverage run (the coverage gate then reports 'not measured')")
     ap.add_argument("--ops-dir", default=str(REPO_ROOT / "ops"))
@@ -1974,6 +2147,12 @@ def main(argv=None) -> int:
     ap.add_argument("--bench-out", default=None, help="with --bench: result folder (default: runs/bench-v0)")
     a = ap.parse_args(argv)
     sandbox.configure(not a.unsafe_no_sandbox)
+    a.provider, a.model_note = model_provider.select(
+        a.model_provider, models={"claims": a.claims_model, "probes": a.probe_model},
+        recorded_dir=Path(a.recorded_dir) if a.recorded_dir else None)
+    if not uses(a.baseline, "claim_probes") and a.provider is not None:
+        a.model_note += f" (not used: baseline {a.baseline} has no claim probes)"
+        a.provider = None
     if a.runs != 3:
         print("note: protocol requires 3 runs per side; using", a.runs, file=sys.stderr)
     if a.bench:
@@ -2095,7 +2274,8 @@ def main(argv=None) -> int:
             "api_calls": gh.calls, "auth": "token" if gh.token else "unauthenticated",
             "sandbox": (sandbox.check()[1] + " (bwrap: per-side filesystem, no network outside installs)"
                         if sandbox.enabled() else "DISABLED (--unsafe-no-sandbox)"),
-            "git": git + (" (with uncommitted changes)" if dirty else "")}
+            "git": git + (" (with uncommitted changes)" if dirty else ""),
+            "baseline": a.baseline, "model_provider": a.model_note}
     (rdir / "run_meta.json").write_text(json.dumps(meta | {"problems": problems}, indent=1))
     # Expectations and independent verification are read only now, after every verdict above is final.
     rp = write_report(rdir, meta, records, skipped, problems, *scoring_inputs(rdir, a, chosen_path),
@@ -2136,7 +2316,8 @@ def rejudge(rec: dict, prdir: Path) -> dict:
     cmp["skipped_missing_dependency"] = [d for d in cmp["skipped_missing_dependency"] if d["test"] in kept]
     ex = exit_check(rec.get("per_run", []), results, cmp)
     pr_probes = rejudge_probes(rec.get("probes"))
-    v, reason, _ = verdict_for(cmp, None, ex, rec.get("files"), pr_probes, rec.get("behaviour_claims"))
+    v, reason, _ = verdict_for(cmp, None, ex, rec.get("files"), pr_probes, rec.get("behaviour_claims"),
+                               rec.get("baseline"))
     out = {k: x for k, x in rec.items() if k not in ("verdict_before_coverage_gate", "reason_before_coverage_gate")}
     out.update(comparison=cmp, exit_check=ex, verdict=v, reason=reason)
     if pr_probes:

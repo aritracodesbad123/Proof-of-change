@@ -330,16 +330,27 @@ def check_golden_pr_case(rec: dict, case: dict) -> Result:
     """Known-answer PR run. The verdict is re-derived from the recorded data with the current rules, never read from
     the record alone: probes re-judged from their recorded runs (poc/probes.py), the tests' verdict from the recorded
     comparison, both combined (ops/daily_run.verdict_for) and passed through the coverage gate."""
-    from ops.daily_run import rejudge_probes, verdict_for
+    from evals.pr_metrics import record_is_blind
+    from ops.daily_run import rejudge_probes, uses, verdict_for
     from poc import coverage_gate
     exp, problems = case["expect"], []
     pp = rejudge_probes(rec.get("probes"))
     cmp = rec.get("comparison")
     cnv = None if cmp else (rec.get("reason") or "no comparison")
     v_tests = verdict_for(cmp, cnv, rec.get("exit_check"), rec.get("files"))
-    v_all = verdict_for(cmp, cnv, rec.get("exit_check"), rec.get("files"), pp, rec.get("behaviour_claims"))
-    gated = coverage_gate.apply({k: x for k, x in rec.items() if not k.endswith("_before_coverage_gate")}
-                                | {"verdict": v_all[0], "reason": v_all[1]})["verdict"]
+    def derive(baseline):
+        v = verdict_for(cmp, cnv, rec.get("exit_check"), rec.get("files"), pp, rec.get("behaviour_claims"), baseline)
+        if not uses(baseline, "coverage"):
+            return v[0]
+        return coverage_gate.apply({k: x for k, x in rec.items() if not k.endswith("_before_coverage_gate")}
+                                   | {"verdict": v[0], "reason": v[1], "baseline": baseline})["verdict"]
+    gated = derive(rec.get("baseline"))
+    for bl, want in exp.get("baseline_verdicts", {}).items():
+        got = derive(bl)
+        if got != want:
+            problems.append(f"baseline {bl}: re-derived verdict {got} (expected {want})")
+    if "blind" in exp and record_is_blind(rec) != exp["blind"]:
+        problems.append(f"blind {record_is_blind(rec)} (expected {exp['blind']})")
     if "tests_verdict" in exp and v_tests[0] != exp["tests_verdict"]:
         problems.append(f"tests alone give {v_tests[0]} (expected {exp['tests_verdict']})")
     if gated != exp["verdict"]:
@@ -375,9 +386,35 @@ def check_golden_pr_case(rec: dict, case: dict) -> Result:
                   f"test results; probe flags {flagged}")
 
 
+def check_baseline(rec: dict) -> Result:
+    """The record's baseline (schema rev 7; none = full) matches what it contains, and no probe that is not blind is
+    labelled blind (only live model probes that passed the freeze rule are, poc/freeze.py)."""
+    from ops.daily_run import BASELINES, uses
+    bl = rec.get("baseline") or "full"
+    problems = []
+    if bl not in BASELINES:
+        problems.append(f"unknown baseline {bl!r}")
+    else:
+        srcs = {it.get("source", "library") for it in (rec.get("probes") or {}).get("items") or []}
+        if not uses(bl, "claim_probes") and srcs & {"library", "model"}:
+            problems.append(f"baseline {bl} but the record has claim probe results")
+        if not (uses(bl, "diff") or uses(bl, "diff_info")) and "diff" in srcs:
+            problems.append(f"baseline {bl} but the record has differential probe results")
+        if not uses(bl, "coverage") and rec.get("baseline") and rec.get("coverage_gate"):
+            problems.append(f"baseline {bl} but the coverage gate was applied")
+    for it in (rec.get("probes") or {}).get("items") or []:
+        g = it.get("generator") or {}
+        if g.get("blind") and not (g.get("kind") == "model" and g.get("provider") == "nebius"):
+            problems.append(f"probe {it.get('id')} is labelled blind but was written by {g.get('label')!r}")
+    if problems:
+        return Result("baseline", "fail", "; ".join(problems), "Record and baseline disagree: check --baseline handling "
+                      "in ops/daily_run.py and the generator labels in poc/freeze.py.")
+    return Result("baseline", "pass", f"baseline {bl}" + ("" if rec.get("baseline") else " (record predates baselines)"))
+
+
 def evaluate_pr_record(rec: dict, cases: list[dict], require_v1: bool | None = None) -> list[Result]:
-    """Evals for a Proof-of-Change PR run (record_kind pr_run): schema, protocol, golden case."""
-    res = [check_schema(rec, True, require_v1), check_runs_per_side(rec), check_single_thread(rec)]
+    """Evals for a Proof-of-Change PR run (record_kind pr_run): schema, protocol, baseline, golden case."""
+    res = [check_schema(rec, True, require_v1), check_runs_per_side(rec), check_single_thread(rec), check_baseline(rec)]
     case = golden_for(rec, cases)
     if case:
         res.append(check_golden_pr_case(rec, case))

@@ -209,6 +209,10 @@ def checks(rec: dict) -> list[list]:
     if p:
         its = p.get("items") or []
         bad = [f"{it['id']} {x['side']}#{x['run']}" for it in its for x in it.get("per_run", []) if not x.get("ok", True)]
+        if p.get("refused"):
+            out.append(["Probes passed the freeze rule", "WARN",
+                        "; ".join(f"{x['path']}: {x['why']}" for x in p["refused"][:3]),
+                        "A probe changed or appeared after PR-side execution started, so it was not run; re-run the check."])
         if p.get("status") == "none":
             out.append(["Probes ran on both sides", "SKIP", "no probe for this PR", ""])
         elif p.get("status") == "error" or bad:
@@ -283,7 +287,8 @@ def claims(rec: dict, logs: Logs) -> list[dict]:
     c = rec.get("comparison") or {}
     summ = logs.summary("pr", 1)
     rows = [dict(id="C1", text=rec.get("title", "?"), source="PR title", status="not testable",
-                 evidence="reading claims out of the PR description is not built yet (needs Nemotron); the tests below check behavior",
+                 evidence=("claims are read out of the PR description only by model-written probes (--model-provider, "
+                           "see Probes); the tests below check behavior"),
                  citation=summ)]
     if c:
         broke = (c.get("regressions") or []) + (c.get("new_tests_failing") or [])
@@ -324,6 +329,20 @@ def probe_items(rec: dict) -> list[dict]:
     return (rec.get("probes") or {}).get("items") or []
 
 
+def deciding_ids(rec: dict) -> set:
+    """Ids of the probes that could decide the verdict under the record's baseline (ops/daily_run.probe_items)."""
+    from ops.daily_run import probe_items as deciding
+    return {it["id"] for it in (deciding(rec.get("probes"), rec.get("baseline")) or {}).get("items") or []}
+
+
+def generator_label(it: dict) -> str:
+    g = (it.get("freeze") or {}).get("generator") or it.get("generator") or {}
+    if g.get("label"):
+        return g["label"]
+    return "fixed probe (no generator recorded; treated as post-hoc)" if it.get("source", "library") == "library" \
+        else f"{it.get('source')} probe"
+
+
 def num(v):
     return round(v, 6) if isinstance(v, float) else [num(x) for x in v] if isinstance(v, list) else (
         {k: num(x) for k, x in v.items()} if isinstance(v, dict) else v)
@@ -346,7 +365,10 @@ def observed(o: dict) -> str:
 def probe_claim_rows(rec: dict) -> list[dict]:
     """Claims-table rows from the probes: one per claim a probe checks, and one per difference no claim covers."""
     rows = []
+    decide_ids = deciding_ids(rec)
     for it in probe_items(rec):
+        if it["id"] not in decide_ids:
+            continue   # informational under this baseline (e.g. differential probes under full)
         for cl in it.get("claims", []):
             obs = [o for o in it["observations"] if o.get("claim") == cl["id"]]
             if not obs:
@@ -370,21 +392,35 @@ def probes_section(R, rec: dict, rel) -> list[dict]:
     """The 'Probes' section. Returns the citations shown (for the citation check)."""
     p = rec.get("probes")
     R.h(2, "Probes", "probes")
+    mp = rec.get("model_provider") or {}
+    if mp.get("note"):
+        R.p(f"Model-written probes: {mp['note']}.", "meta")
     if not p:
-        R.p("This record predates probes.")
+        R.p("No probes ran: " + (f"baseline {rec['baseline']} uses none." if rec.get("baseline") == "tests"
+                                 else "this record predates probes."))
         return []
     items = probe_items(rec)
+    for x in p.get("refused") or []:
+        R.p(f"**Refused ({x.get('source', 'probe')}): `{x['path']}`**: {x['why']}. It was not run on the PR side.")
     if not items:
-        R.p("No probe exists for this PR (probes/<owner>/<repo>/<pr>.py), so only the tests were compared."
+        R.p("No probe ran for this PR (no fixed probe in probes/<owner>/<repo>/<pr>.py and no model-written or "
+            "differential probe), so only the tests were compared."
             + (" Probe errors: " + "; ".join(p.get("errors", [])) if p.get("errors") else ""))
         return []
     R.p("A probe is a small deterministic script run on both sides in the same environments as the tests, "
         f"{items[0].get('runs_per_side', 3)} alternating runs per side. It prints JSON observations; plain code "
-        "(poc/diff.py) compares them. A difference that no claim of the PR covers needs attention.", "meta")
+        "(poc/diff.py) compares them. A difference that no claim of the PR covers needs attention. Every probe was "
+        "frozen (content sha256) before any PR-side code ran, and checked against that freeze before each PR-side run. "
+        "Only a live model probe is blind; fixed probes and recorded model fixtures are known-answer cases.", "meta")
     cits = []
+    decide_ids = deciding_ids(rec)
     for it in items:
-        R.p(f"**{it['id']}** ({'fixed probe' if it.get('source') == 'library' else 'model-written probe'}"
-            + (f", `{it['path']}`" if it.get("path") else "") + f"): {it.get('about', '')}")
+        fz = it.get("freeze") or {}
+        role = "" if it["id"] in decide_ids else f"; informational under baseline {rec.get('baseline') or 'full'}"
+        R.p(f"**{it['id']}** ({generator_label(it)}{role}"
+            + (f", `{it['path']}`" if it.get("path") else "")
+            + (f", frozen `{fz['sha256'][:12]}` at {fz.get('frozen_at', '?')}" if fz.get("sha256") else "")
+            + f"): {it.get('about', '')}")
         if it.get("claims"):
             R.bullets([f"P-{c['id']} ({c.get('source', 'claim')}): {c['text']} Expects the covered observations to "
                        f"{'differ' if c['expect'] == 'differs' else 'stay the same'}." for c in it["claims"]])
@@ -425,6 +461,10 @@ def build(rec: dict, prdir: Path, out_dir: Path, decision: dict | None = None) -
     R.h(1, f"Reviewer report: {subject}")
     R.p(f"Run `{run_id(rec)}`, tested {rec.get('tested_at_ist', '?')} by ops/daily_run.py (route {rec.get('route', '-')}). "
         f"Report generated {datetime.datetime.now(rv.IST).strftime('%Y-%m-%d %H:%M IST')} by reports/pr_report.py.", "meta")
+    from ops.daily_run import BASELINE_TEXT
+    bl = rec.get("baseline") or "full"
+    R.p(f"Baseline: **{bl}** ({BASELINE_TEXT.get(bl, bl)})" + ("" if rec.get("baseline") else
+                                                               ", recorded before baselines existed") + ".", "meta")
     reason = {"VERIFIED": "The PR's tests behave the same or better than on main, in all 3 runs per side.",
               "NEEDS ATTENTION": "The run is trustworthy and found a difference a person should look at.",
               "COULD NOT VERIFY": "The run did not produce a usable comparison, so there is no conclusion about the PR."}[d["verdict"]]

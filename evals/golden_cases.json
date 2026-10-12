@@ -132,6 +132,8 @@
       "expect": {
         "verdict": "needs_attention",
         "tests_verdict": "verified",
+        "baseline_verdicts": {"tests": "verified", "tests+diff": "verified", "tests+probes": "needs_attention", "full": "needs_attention"},
+        "blind": false,
         "probe_flagged": [
           "caller_x_after_call.changed_columns",
           "int_groups_after_multi_group.importances"

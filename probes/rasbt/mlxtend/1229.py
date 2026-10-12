@@ -22,6 +22,8 @@ PROBE = {
          "covers": ["int_groups_only.importances"], "expect": "same"},
     ],
     "timeout_s": 120,
+    # Written after this PR's test results were known: a known-answer regression case, never a blind result.
+    "provenance": "post-hoc",
 }
 
 SEED = 123
