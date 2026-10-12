@@ -149,15 +149,20 @@ def checkout(dr, row: dict, work: Path, log: Path) -> dict:
 
 def pr_text(dr, row: dict) -> dict:
     """PR title, description and author from the GitHub API (read-only); the inputs file's title if offline. The PR
-    text is a permitted generator input; review comments and later issues are not fetched."""
+    text is a permitted generator input; review comments and later issues are not fetched. The description is the one
+    in force at merge time when GitHub's edit history can be read (poc/pr_text.py); otherwise the current one, and
+    pr_text_source says "current, may be edited after merge"."""
+    from poc import pr_text as prt
     try:
         p = dr.GitHub(None).json(f"/repos/{row['repo']}/pulls/{row['pr']}")
-        return {"title": p.get("title") or row["pr_title"], "body": p.get("body") or "",
-                "author": (p.get("user") or {}).get("login") or "unknown", "base_ref": (p.get("base") or {}).get("ref") or "",
-                "source": "GitHub API (title, description, author)"}
     except Exception as e:  # noqa: BLE001
         return {"title": row["pr_title"], "body": "", "author": "unknown", "base_ref": "",
-                "source": f"inputs file title only (GitHub API unavailable: {type(e).__name__})"}
+                "source": f"inputs file title only (GitHub API unavailable: {type(e).__name__})",
+                "pr_text_source": "none: inputs file title only"}
+    body, src = prt.description_at_merge(row["repo"], int(row["pr"]), p.get("body") or "")
+    return {"title": p.get("title") or row["pr_title"], "body": body,
+            "author": (p.get("user") or {}).get("login") or "unknown", "base_ref": (p.get("base") or {}).get("ref") or "",
+            "source": "GitHub API (title, author); description " + src, "pr_text_source": src}
 
 
 def make_item(dr, row: dict, co: dict, text: dict) -> tuple[dict, dict]:
@@ -206,7 +211,9 @@ def run_case(dr, a, row: dict, inputs_meta: dict, out: Path, workroot: Path, mac
     rec["case_id"] = rid
     rec["bench"] = {"id": rid, **inputs_meta, "main_sha_merge_first_parent": row["main_sha_merge_first_parent"],
                     "pr_side_sha_merge_commit": row["pr_side_sha_merge_commit"],
-                    "first_parent_verified": bool(co.get("first_parent_verified")), "pr_text_source": text["source"],
+                    "first_parent_verified": bool(co.get("first_parent_verified")),
+                    "pr_text_source": text.get("pr_text_source", text["source"]),
+                    "pr_text_detail": text["source"],
                     "answer_key_read": False}
     if not co.get("ok"):
         rec["verdict"], rec["reason"], _ = dr.verdict_for(None, co["why"])

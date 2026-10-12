@@ -50,6 +50,10 @@ opens a network connection is not repeatable. A probe that never imports the cha
 - *Phrase matching* can refuse a bundle that is innocent but happens to share a five-word run with the answer key.
   We prefer a false refusal to a leak. Library files that are byte-identical to the old version are exempt from the
   phrase rule, because they existed before anyone wrote the answers.
+- *Exact matching cannot catch paraphrases.* The firewall only finds the answer key's own web addresses, numbers
+  and wording. If a fact is reworded, for example "the adapter no longer calls the overridable method", it passes.
+  So the firewall is a backstop, not the main defence. The main defence is building generator inputs only from text
+  that existed before the outcome was known.
 - *Lint by regular expressions* would be shorter, but it is easy to fool and gives false hits inside strings.
 
 ## What it means for you

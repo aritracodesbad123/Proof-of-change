@@ -80,3 +80,29 @@ def test_module_of():
 def test_reasons_text():
     assert pq.reasons(pq.lint(OK, CHANGED)) == "ok"
     assert pq.reasons(pq.lint("import widgets.adapters\nassert 1\n", CHANGED)).startswith("rejected: assert (line 2)")
+
+
+@pytest.mark.parametrize("src", [
+    "import widgets.adapters as a\nif a.Pool().size != 3:\n    raise AssertionError('size')\n",
+    "import widgets.adapters\nraise AssertionError\n",
+    "import builtins\nimport widgets.adapters\nraise builtins.AssertionError('x')\n",
+    "import widgets.adapters\nclass Bad(AssertionError):\n    pass\n",
+    "import widgets.adapters\nclass A(AssertionError): pass\nclass B(A): pass\n",
+    "import unittest\nimport widgets.adapters as a\nclass T(unittest.TestCase):\n    def t(self):\n"
+    "        self.assertEqual(a.Pool().size, 3)\n",
+    "import unittest\nimport widgets.adapters as a\nunittest.TestCase().assertTrue(a.Pool())\n",
+    "import widgets.adapters as a\na.Pool().assertValid()\n",
+    "import numpy as np\nimport widgets.adapters as a\nnp.testing.assert_allclose(a.Pool().size, 3)\n",
+    "from numpy.testing import assert_array_equal\nimport widgets.adapters as a\nassert_array_equal(a.x, a.y)\n",
+    "from unittest import mock\nimport widgets.adapters as a\nm = mock.Mock()\nm.assert_called_once()\n",
+])
+def test_rejects_other_assertion_forms(src):
+    assert "assert" in rules(src)
+
+
+def test_assert_like_names_that_are_not_calls_or_asserts_are_fine():
+    # an observation key or variable that merely contains the word is not an assertion
+    src = ("import json\nimport widgets.adapters as a\nasserted = a.Pool().size\nassertion_count = 0\n"
+           "print(json.dumps({'observations': {'assertions': asserted}}))\n")
+    assert pq.lint(src, CHANGED)["ok"]
+    assert "assert" not in rules("import widgets.adapters\ntry:\n    pass\nexcept AssertionError as e:\n    print(e)\n")

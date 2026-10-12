@@ -4,7 +4,11 @@ A probe reports what it sees; plain code compares the two sides (poc/probes.py).
 not reach the network or start processes, must not write outside its temporary folder, and must actually touch
 the code the PR changed. Checked on the parsed AST (the probe is never imported or run here):
 
-    non-asserting   no `assert` statement; no `pytest.raises` (attribute, `from pytest import raises`, or alias)
+    non-asserting   no `assert` statement; no `pytest.raises` (attribute, `from pytest import raises`, or alias);
+                    no `raise AssertionError` (bare or called) and no class derived from AssertionError (nor raising
+                    one); no assert-style method or function calls: `self.assertEqual`, `TestCase.assertTrue`, any
+                    `.assertX(...)` / `.assert_x(...)` call (unittest, numpy.testing, mock), or a name imported as
+                    `assert_allclose`/`assertEqual` and called
     no network      no import of socket, ssl, http, urllib, ftplib, mail clients, telnetlib, requests, httpx, aiohttp,
                     urllib3 (also through __import__ / importlib.import_module with a literal name), unless that
                     package is the library under test (a probe for a requests PR imports requests; the sandbox
@@ -32,6 +36,7 @@ PROCESS = frozenset({"subprocess", "multiprocessing", "pty"})
 OS_PROCESS = ("system", "popen", "exec", "spawn", "fork", "posix_spawn", "kill")
 SRC_PREFIXES = ("src", "lib", "python")
 WRITE_MODES = set("wax+")
+ASSERT_CALL_RE = __import__("re").compile(r"^assert(?:[A-Z_]\w*)$")
 
 
 def module_of(path: str) -> str | None:
@@ -128,7 +133,28 @@ def lint(src: str, changed_files: list[str]) -> dict:
             bad("network", node, f"imports {mod}")
         if _root(mod) in PROCESS:
             bad("process", node, f"imports {mod}")
+    assertion_classes = {"AssertionError"}
+    changed_set = True
+    while changed_set:   # classes derived (directly or through each other) from AssertionError
+        changed_set = False
+        for n in ast.walk(tree):
+            if isinstance(n, ast.ClassDef) and n.name not in assertion_classes and any(
+                    (isinstance(b, ast.Name) and b.id in assertion_classes)
+                    or (isinstance(b, ast.Attribute) and b.attr == "AssertionError") for b in n.bases):
+                assertion_classes.add(n.name)
+                changed_set = True
+                bad("assert", n, f"class {n.name} derives from AssertionError")
     for n in ast.walk(tree):
+        if isinstance(n, ast.Raise) and n.exc is not None:
+            target = n.exc.func if isinstance(n.exc, ast.Call) else n.exc
+            tname = target.id if isinstance(target, ast.Name) else target.attr if isinstance(target, ast.Attribute) else ""
+            if tname in assertion_classes:
+                bad("assert", n, f"raise {tname} (a probe reports, it does not judge)")
+        if isinstance(n, ast.Call):
+            f = n.func
+            fname = f.attr if isinstance(f, ast.Attribute) else f.id if isinstance(f, ast.Name) else ""
+            if ASSERT_CALL_RE.match(fname):
+                bad("assert", n, f"{fname}(...) is an assertion call")
         if isinstance(n, ast.Assert):
             bad("assert", n, "assert statement (a probe reports, it does not judge)")
         elif isinstance(n, ast.Attribute) and n.attr == "raises" and isinstance(n.value, ast.Name) \

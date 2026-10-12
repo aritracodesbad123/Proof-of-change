@@ -16,6 +16,16 @@ files) that contains any URL, issue or PR reference, or phrase from the answer k
 the new side. It takes any answer-key CSV, and works for any old/new pair (a merge commit and its first parent, or two
 releases). The answer key is turned into SHA-256 fingerprints first; refusals never print the matched text.
 
+**Limit: exact matching cannot catch paraphrases.** The firewall matches web addresses, issue numbers and 5-word
+phrases exactly (ignoring case, punctuation and spacing). If the same fact is reworded, for example "the adapter no
+longer calls the overridable method" instead of the answer key's wording, it is not caught. The firewall is a
+backstop. The main protection is what goes in: only the PR text as it was at merge time (or release notes trimmed to
+their own version, `poc/release_notes.py`) and old-side code, never anything written after the change. A bundle with
+any key other than `pr`, `text` and `files` is refused, and nested text is scanned piece by piece.
+
+Every request to a model goes through one choke point, `poc/model_gate.py`. A provider's only public call checks
+the bundle first, and a refused bundle never reaches the provider.
+
 ```
 python -m poc.leakage fingerprint <answer-key.csv> --out fingerprints.json   # hashes only, no plain text
 python -m poc.leakage check bundle.json --fingerprints fingerprints.json     # exit 1 = refused
