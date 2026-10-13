@@ -15,6 +15,27 @@ RATES = {  # model: (USD per 1M input tokens, USD per 1M output tokens)
 }
 _RATES_LOWER = {k.lower(): v for k, v in RATES.items()}
 
+# Computer time is priced at a cloud machine comparable to the test machine the runs use (8 vCPU Intel Xeon, ~16 GiB RAM).
+# Matched: Nebius CPU-only Intel Ice Lake platform (cpu-d3), preset 8vcpu-32gb, the smallest preset with 8 vCPUs:
+# 8 x $0.012 per vCPU-hour + 32 x $0.0045 per GiB-hour = $0.24 per hour. Override with POC_MACHINE_USD_PER_HOUR.
+MACHINE_RATE_DEFAULT = 0.24
+MACHINE_RATE_SOURCE = ("Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked "
+                       "2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, "
+                       "8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h")
+
+
+def machine_rate() -> tuple[float, str]:
+    import os
+    v = os.environ.get("POC_MACHINE_USD_PER_HOUR")
+    if v:
+        return float(v), "POC_MACHINE_USD_PER_HOUR (set by the operator)"
+    return MACHINE_RATE_DEFAULT, MACHINE_RATE_SOURCE
+
+
+def computer_cost(seconds: float | None) -> float:
+    return round((seconds or 0) / 3600 * machine_rate()[0], 6)
+
+
 _ledger: list[dict] = []
 
 
@@ -52,6 +73,11 @@ def summarize(calls: list[dict], compute_seconds: dict | None = None) -> dict:
         out["thinking_tokens"] += t[2]
         out["cost_usd"] += p
     out["cost_usd"] = round(out["cost_usd"], 6)
+    out["ai_cost_usd"] = out["cost_usd"]
+    rate, src = machine_rate()
+    out["machine_usd_per_hour"], out["machine_rate_source"] = rate, src
+    out["computer_cost_usd"] = computer_cost((compute_seconds or {}).get("total_wall"))
+    out["total_cost_usd"] = round(out["ai_cost_usd"] + out["computer_cost_usd"], 6)
     out["cost_complete"] = out["calls_without_usage"] == 0
     return out
 
@@ -72,10 +98,17 @@ def peek(compute_seconds: dict | None = None) -> dict:
 
 
 def per_pr(records: list[dict]) -> dict:
-    """The two headline numbers. Every attempt counts toward spend; only verified / needs_attention count as a
-    final verdict."""
-    spend = sum(r.get("cost_usd") or 0 for r in records)
+    """The headline numbers. Each record gives cost_usd (AI) and optionally computer_cost_usd. Every attempt counts
+    toward spend; only verified / needs_attention count as a final verdict."""
+    ai = sum(r.get("cost_usd") or 0 for r in records)
+    comp = sum(r.get("computer_cost_usd") or 0 for r in records)
+    n = len(records)
     final = sum(1 for r in records if r.get("verdict") in ("verified", "needs_attention"))
-    return {"attempted": len(records), "with_final_verdict": final, "total_usd": round(spend, 6),
-            "per_pr_attempted_usd": round(spend / len(records), 6) if records else None,
-            "per_pr_with_final_verdict_usd": round(spend / final, 6) if final else None}
+    div = lambda x, d: round(x / d, 6) if d else None   # noqa: E731
+    return {"attempted": n, "with_final_verdict": final, "verdict_rate": div(final, n),
+            "total_usd": round(ai, 6), "ai_usd": round(ai, 6), "computer_usd": round(comp, 6),
+            "total_all_usd": round(ai + comp, 6),
+            "per_pr_attempted_usd": div(ai, n), "per_pr_with_final_verdict_usd": div(ai, final),
+            "ai_per_attempted": div(ai, n), "computer_per_attempted": div(comp, n), "total_per_attempted": div(ai + comp, n),
+            "ai_per_final": div(ai, final), "computer_per_final": div(comp, final),
+            "total_per_final": div(ai + comp, final)}

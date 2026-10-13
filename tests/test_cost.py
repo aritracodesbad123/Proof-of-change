@@ -66,18 +66,46 @@ def test_patchguru_chat_logs_each_call(tmp_path):
     assert cost.take()["ai_calls"] == 2
 
 
-def test_cost_report_counts_attempts_and_flags_missing_raw(tmp_path):
+def test_cost_report_counts_attempts_matched_set_and_flags_missing_raw(tmp_path, monkeypatch):
     from ops import cost_report
+    monkeypatch.setenv("POC_MACHINE_USD_PER_HOUR", "3.6")      # $0.001 per second
     rd = tmp_path / "run"
     (rd / "full" / "raw").mkdir(parents=True)
     (rd / "tests").mkdir()
     (rd / "score").mkdir()
-    (rd / "full" / "B01-full.json").write_text(json.dumps({"verdict": "verified", "duration_s": {"total_wall": 60}}))
-    (rd / "full" / "B02-full.json").write_text(json.dumps({"verdict": "could_not_verify"}))
-    (rd / "tests" / "B01-tests.json").write_text(json.dumps({"verdict": "verified"}))
-    (rd / "score" / "B01-full.json").write_text(json.dumps({"verdict": "verified"}))   # copy: skipped
-    (rd / "full" / "raw" / "1-claims.json").write_text(json.dumps({"server_model": SUPER, "usage": U}))
+    pg = rd / "pg"
+    (pg / "logs" / "B01" / "patchguru" / "raw").mkdir(parents=True)
+    rec = lambda v, wall: json.dumps({"verdict": v, "tested_at_ist": "2026-10-13 10:00 IST",  # noqa: E731
+                                      "duration_s": {"total_wall": wall}})
+    (rd / "full" / "B01-full.json").write_text(rec("verified", 100))
+    (rd / "full" / "B02-full.json").write_text(rec("could_not_verify", 100))
+    (rd / "tests" / "B01-tests.json").write_text(rec("verified", 100))
+    (rd / "score" / "B01-full.json").write_text(rec("verified", 100))   # copy: skipped
+    (rd / "full" / "raw" / "100030-claims-1.json").write_text(json.dumps({"server_model": SUPER, "usage": U}))
+    (pg / "B01-patchguru_post_review.json").write_text(json.dumps({"verdict": "could_not_verify", "elapsed_s": 50}))
+    (pg / "logs" / "B01" / "patchguru" / "raw" / "001-chat.json").write_text(
+        json.dumps({"request": {"model": SUPER}, "response": {"model": SUPER, "usage": U}}))
     t = cost_report.collect([rd])
-    assert len(t["ours"]["records"]) == 3 and len(t["ours"]["calls"]) == 1 and t["ours"]["tests_only"]
+    assert len(t["ours"]["records"]) == 3 and t["ours"]["tests_only"] and not t["ours"]["untied"]
     md = cost_report.render(t, [rd])
-    assert "$0.4000" in md and "$0.6000" in md   # $1.20 / 3 attempted, / 2 with a final verdict
+    assert "PILOT" in md and "some data missing" in md and "Matched comparison" in md and "All runs" in md
+    assert "Cases both tools attempted: B01." in md
+    # all runs, ours: AI $1.20 + computer 300 s x $0.001 = $1.50 over 3 attempted / 2 final (rate 67%)
+    assert "$0.5000" in md and "$0.7500" in md and "67%" in md
+    # PatchGuru: no final verdict -> per-final is n/a, rate 0%
+    assert "0%" in md and "n/a" in md
+
+
+def test_record_cost_block_has_ai_computer_and_total(monkeypatch):
+    monkeypatch.delenv("POC_MACHINE_USD_PER_HOUR", raising=False)
+    cost.reset()
+    cost.record_call(SUPER, U)
+    s = cost.take({"total_wall": 3600})
+    assert s["ai_cost_usd"] == 1.2 and s["computer_cost_usd"] == 0.24 and s["total_cost_usd"] == 1.44
+    assert "docs.nebius.com/compute/resources/pricing" in s["machine_rate_source"]
+
+
+def test_per_pr_reports_verdict_rate_and_total():
+    p = cost.per_pr([{"verdict": "verified", "cost_usd": 1, "computer_cost_usd": 1},
+                     {"verdict": "could_not_verify", "cost_usd": 1, "computer_cost_usd": 1}])
+    assert p["verdict_rate"] == 0.5 and p["total_per_attempted"] == 2 and p["total_per_final"] == 4

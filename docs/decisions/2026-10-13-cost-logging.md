@@ -29,3 +29,24 @@ numbers are reported and why runs that could not verify still count toward the s
   same cost, marked as shared, and the report counts it once.
 - Today's runs were reconstructed from saved AI replies. Where no replies were saved, the report says so instead
   of guessing.
+
+## Addendum: computer time has a price too, and a fair side-by-side view
+
+AI tokens are only part of the bill: building the library and running its tests keeps a machine busy, which also
+costs money. Every record now shows three amounts: AI cost, computer cost and total cost.
+
+- **How computer time is priced.** At an hourly rate for a cloud machine like the one our runs use (8 Intel
+  vCPUs, about 16 GiB of memory). We matched Nebius's CPU-only Intel Ice Lake machine, preset "8vcpu-32gb", the
+  smallest one with 8 vCPUs: 8 x $0.012 per vCPU-hour + 32 x $0.0045 per GiB-hour = **$0.24 per hour**. Source:
+  Nebius compute pricing page, https://docs.nebius.com/compute/resources/pricing, checked 13 Oct 2026 (prices in
+  effect from 1 Oct 2026). The rate can be changed with the `POC_MACHINE_USD_PER_HOUR` setting.
+- **Trade-off.** That preset has twice our memory, so it slightly over-prices computer time; it is the closest
+  published machine. Only time inside a review is priced; idle time between runs and disk space are not.
+- **Matched comparison.** The two tools did not try the same set of PRs, so their overall totals are not a fair
+  comparison. The report now has a separate section with only the PRs both tools attempted, and keeps the all-runs
+  totals in their own section.
+- **Verdict rate.** Next to "cost per PR with a final verdict" the report shows the verdict rate (PRs that got a
+  final verdict divided by PRs attempted), because a low cost per verdict means little if few PRs get one.
+- **Tying AI spend to runs.** Our tool saves AI replies per mode folder, not per PR, so for today's runs a reply is
+  tied to the PR whose run time contains it. Replies that fit no run still count in the all-runs totals and are
+  listed as "not tied to a run". New records carry their own cost, so this guess is only needed for today.
