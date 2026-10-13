@@ -44,6 +44,31 @@ def grounded_claims(raw: dict, title: str, body: str | None) -> tuple[list, list
     return kept, rejected
 
 
+def _unescape_code(code):
+    """Some replies double-escape the script, so it arrives as ONE line with literal backslash-n sequences. If it
+    does not parse as is but parses after turning those into real line breaks, use the unescaped version."""
+    if not isinstance(code, str) or "\n" in code or "\\n" not in code:
+        return code
+    try:
+        ast.parse(code)
+        return code
+    except SyntaxError:
+        pass
+    fixed = code.replace("\\n", "\n").replace("\\t", "\t").replace('\\"', '"')
+    try:
+        ast.parse(fixed)
+        return fixed
+    except SyntaxError:
+        return code
+
+
+def _tidy_id(x):
+    """'P1' -> 'p1', 'probe_get_x' -> 'probe-get-x'; non-strings are returned unchanged (and then rejected)."""
+    if not isinstance(x, str):
+        return x
+    return re.sub(r"[^a-z0-9-]+", "-", x.lower()).strip("-")[:40] or x
+
+
 def validate_probe(p: dict, claim_ids: set) -> str | None:
     """None if the model's probe is acceptable, else why not."""
     if not ID_RE.match(str(p.get("id", ""))):
@@ -105,21 +130,48 @@ def generate(provider: Provider, repo: str, pr: int, title: str, body: str | Non
     kept, rejected = grounded_claims(raw, title, body)
     out["claims"], out["rejected_claims"] = kept, rejected
     testable = [c for c in kept if c.get("testable")]
-    if not testable:
+    if not testable and not base_files:
         return out
-    user = (pr_text + "\n\nClaims:\n" + json.dumps(testable, indent=1) + "\n\n" + _context(base_files))
+    if testable:
+        user = (pr_text + "\n\nClaims:\n" + json.dumps(testable, indent=1) + "\n\n" + _context(base_files))
+    else:
+        # The PR changes source files but its text gave no testable claim: still ask for at least one probe that
+        # records the behaviour of the functions in those files (no claims; plain code compares the outputs).
+        out["no_claims_probe"] = True
+        user = (pr_text + "\n\nClaims: none were testable. Still write at least one probe that calls the functions "
+                "in the BASE-side files below with representative and edge-case inputs; give it an empty claims "
+                "list.\n\n" + _context(base_files))
     try:
         resp = provider.complete_json("probes", PROBES_PROMPT, user, PROBES_SCHEMA, ctx)
     except ProviderError as e:
         out["errors"].append(str(e))
         return out
-    gen = freeze.generator("model", model=provider.models["probes"], provider=provider.name)
     by_id = {c["id"]: c for c in testable}
+    usable = [p for p in (resp or {}).get("probes", [])[:MAX_PROBES] if isinstance(p, dict)
+              and not validate_probe(dict(p, id=_tidy_id(p.get("id")), code=_unescape_code(p.get("code"))),
+                                     set(by_id))]
+    if not usable:
+        # One retry, same gate and same BASE-side inputs: say why the first answer was unusable (generic reasons only)
+        reasons = [validate_probe(dict(p, id=_tidy_id(p.get("id")), code=_unescape_code(p.get("code"))),
+                                  set(by_id)) for p in
+                   (resp or {}).get("probes", [])[:MAX_PROBES] if isinstance(p, dict)] or ["the probes list was empty"]
+        out["retried"] = {"why": reasons[:5]}
+        retry_user = (user + "\n\nYour previous answer contained no usable probe (" + "; ".join(map(str, reasons[:5]))
+                      + "). Follow the coverage rule: write at least one probe per testable claim.")
+        try:
+            resp = provider.complete_json("probes", PROBES_PROMPT, retry_user, PROBES_SCHEMA, ctx)
+        except ProviderError as e:
+            out["errors"].append(f"retry: {e}")
+    gen = freeze.generator("model", model=provider.models["probes"], provider=provider.name)
     outdir.mkdir(parents=True, exist_ok=True)
     for p in (resp or {}).get("probes", [])[:MAX_PROBES]:
         # Models name probes "P1" or "probe_x"; the id is only a file name, so normalise it rather than drop the probe
         if isinstance(p, dict) and isinstance(p.get("id"), str):
-            p["id"] = re.sub(r"[^a-z0-9-]+", "-", p["id"].lower()).strip("-")[:40] or p["id"]
+            p["id"] = _tidy_id(p["id"])
+        if isinstance(p, dict):
+            p["code"] = _unescape_code(p.get("code"))
+            if not str(p.get("about") or "").strip():   # the probe runner requires a non-empty description
+                p["about"] = "model-written probe of the changed files (no description given)"
         why = validate_probe(p, set(by_id))
         if why:
             out["errors"].append(f"probe {p.get('id')!r} rejected: {why}")
