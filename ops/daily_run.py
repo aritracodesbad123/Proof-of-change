@@ -1134,7 +1134,25 @@ def gate(rec: dict) -> dict:
     """Apply the coverage gate (poc/coverage_gate.py) to a finished record; baselines without coverage skip it."""
     if not uses(rec.get("baseline"), "coverage"):
         return rec
-    return coverage_gate.apply(rec)
+    return ai_probe_gate(coverage_gate.apply(rec))
+
+
+def ai_probe_gate(rec: dict) -> dict:
+    """In modes that use AI-written probes: never 'verified' unless at least one AI-written (model) probe actually
+    executed a changed line (its measured changed-line coverage). Otherwise could_not_verify. Idempotent."""
+    if rec.get("verdict") != Verdict.VERIFIED.value or not uses(rec.get("baseline"), "claim_probes"):
+        return rec
+    items = (rec.get("probes") or {}).get("items") or []
+    ran = [it.get("id") for it in items if it.get("source") == "model"
+           and ((it.get("probe_changed_line_coverage") or {}).get("changed_lines_covered") or 0) > 0]
+    if ran:
+        return rec
+    out = dict(rec)
+    out.setdefault("verdict_before_ai_probe_gate", rec["verdict"])
+    out["verdict"] = Verdict.COULD_NOT_VERIFY.value
+    out["reason"] = ("not verified: no AI-written probe ran any changed line, so the change itself was not "
+                     "exercised by a probe; " + (rec.get("reason") or ""))
+    return out
 
 
 def base_name(test_id: str) -> str:
