@@ -32,7 +32,7 @@ CATEGORIES = [  # comparison key, plain-English label, how bad
     ("other_changes", "changed result in another way (for example passed -> skipped)", "check"),
     ("flaky", "gave different results between the 3 runs of the same side (flaky)", "note"),
     ("fixed", "fail on main and pass on the PR", "good"),
-    ("skipped_missing_dependency", "are new or changed but were skipped because an optional module is missing",
+    ("skipped_missing_dependency", "are new or changed but did not run because an optional module is missing",
      "check"),
     ("reparametrized", "were re-parametrized (same test, new parameter ids; not counted as removed)", "note"),
     ("load_failed_pr", "fail to load on the PR side only (their tests no longer run)", "check"),
@@ -201,7 +201,7 @@ def checks(rec: dict) -> list[list]:
     if changed or unchanged:
         out.append(["Optional modules installed", "WARN",
                     "; ".join(x for x in [
-                        ("new/changed tests skipped: " + ", ".join(f"{m} ({n})" for m, n in changed.items())) if changed else "",
+                        ("new/changed tests blocked: " + ", ".join(f"{m} ({n})" for m, n in changed.items())) if changed else "",
                         ("unchanged tests skipped on both sides: " + ", ".join(f"{m} ({n})" for m, n in unchanged.items()))
                         if unchanged else ""] if x),
                     "Add the module(s) to optional_test_deps for this library in ops/daily_run.py and run again."])
@@ -235,8 +235,11 @@ def checks(rec: dict) -> list[list]:
                 "" if posted is False else "Stop and investigate: the run must never post."])
     flaky = (rec.get("comparison") or {}).get("flaky") or []
     if flaky:
-        out.append(["No flaky tests", "WARN", f"{len(flaky)} test(s) changed result between runs of the same side",
-                    "Read them under 'What changed'; a flaky test is not evidence either way."])
+        shown = ", ".join(f"`{t}`" for t in flaky[:5])
+        more = f" (+{len(flaky) - 5})" if len(flaky) > 5 else ""
+        out.append(["No flaky tests", "WARN",
+                    f"{len(flaky)} test(s) changed result between runs of the same side: {shown}{more}",
+                    "Listed for the record. A flaky test is not a regression and is not evidence either way."])
     cur, head = rec.get("current_head_sha"), rec.get("head_sha")
     if cur and head and cur != head:
         out.append(["PR unchanged since tested", "WARN", f"tested {head[:12]}, PR now at {cur[:12]}",
@@ -459,7 +462,10 @@ def build(rec: dict, prdir: Path, out_dir: Path, decision: dict | None = None) -
 
     R = Report()
     R.h(1, f"Reviewer report: {subject}")
-    R.p(f"Run `{run_id(rec)}`, tested {rec.get('tested_at_ist', '?')} by ops/daily_run.py (route {rec.get('route', '-')}). "
+    commit = rec.get("poc_commit")
+    commit_bit = f" Proof-of-Change commit `{commit}`." if commit else ""
+    R.p(f"Run `{run_id(rec)}`, tested {rec.get('tested_at_ist', '?')} by ops/daily_run.py (route {rec.get('route', '-')})."
+        f"{commit_bit} "
         f"Report generated {datetime.datetime.now(rv.IST).strftime('%Y-%m-%d %H:%M IST')} by reports/pr_report.py.", "meta")
     from ops.daily_run import BASELINE_TEXT
     bl = rec.get("baseline") or "full"
@@ -531,7 +537,7 @@ def build(rec: dict, prdir: Path, out_dir: Path, decision: dict | None = None) -
     changed, unchanged = dependency_gaps(rec, prdir)
     if changed or unchanged:
         R.h(2, "Missing optional modules", "optional")
-        R.bullets(([f"{n} new/changed test(s) skipped because `{m}` is not installed: the change was not exercised "
+        R.bullets(([f"{n} new/changed test(s) did not run because `{m}` is not installed: the change was not exercised "
                     "(could not verify)." for m, n in changed.items()]) +
                   [f"{n} unchanged test(s) skipped on both sides because `{m}` is not installed (coverage gap, verdict "
                    "unaffected)." for m, n in sorted(unchanged.items(), key=lambda kv: -kv[1])])

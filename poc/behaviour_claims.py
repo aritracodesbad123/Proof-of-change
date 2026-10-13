@@ -9,7 +9,9 @@ that expects "same". Without one, the PR cannot be 'verified' (ops/daily_run.ver
 
 PATTERNS is the whole list, deliberately small; a match preceded by a negation ("not backwards compatible",
 "this breaks backward compatibility") is ignored, and so are Markdown headings ("## Backward compatibility"), HTML
-comments (PR templates) and code blocks."""
+comments, fenced code blocks, unticked checklist items ("- [ ] ...", including a wrapped continuation line) and
+template boilerplate (the stock instruction lines a pull-request template pastes in, such as "Please make sure ..."
+or "Thanks for contributing"). A ticked item ("- [x]") is the author's own line and can still be a claim."""
 from __future__ import annotations
 
 import re
@@ -27,12 +29,41 @@ PATTERNS: list[tuple[str, str]] = [
 ]
 COMPILED = [(name, re.compile(p, re.I)) for name, p in PATTERNS]
 NEGATION = re.compile(r"(?:\bnot|n['’]t|\bno\s+longer|\bbreaks?|\bbreaking|\bwithout)\W+(?:\w+\W+){0,2}$", re.I)
+# An unticked task ("- [ ]", "* [ ]", "1. [ ]"). A ticked item is the author speaking, so it stays.
+_UNTICKED = re.compile(r"^\s*(?:[-*+]|\d+[.)])\s+\[\s\]")
+# Stock lines a pull-request template pastes in. Anchored at the start so a real sentence that merely mentions
+# the same words later ("Results are unchanged. Please run the tests.") is kept.
+_BOILERPLATE = re.compile(
+    r"(?i)^\s*(?:#+\s*)?(?:"
+    r"(?:thanks|thank you) for (?:contributing|your contribution|submitting|opening)|"
+    r"please (?:fill|complete|update|include|describe|make sure|ensure|check|mark|tick|select|delete|replace|"
+    r"remove this)|"
+    r"(?:delete|replace) (?:this|the) (?:line|text|placeholder|section)|"
+    r"(?:code of conduct|pull request checklist)\b"
+    r")"
+)
+
+
+def _drop_template(text: str) -> str:
+    """Drop unticked checklist items (and their indented continuation) and template boilerplate lines."""
+    kept, skip = [], False
+    for line in text.splitlines():
+        if _UNTICKED.match(line):
+            skip = True
+            continue
+        if skip and line[:1] in (" ", "\t") and line.strip():
+            continue
+        skip = False
+        if _BOILERPLATE.match(line):
+            continue
+        kept.append(line)
+    return "\n".join(kept)
 
 
 def _clean(text: str) -> str:
     text = re.sub(r"<!--.*?-->", " ", text or "", flags=re.S)
     text = re.sub(r"```.*?```", " ", text, flags=re.S)
-    return text
+    return _drop_template(text)
 
 
 _BOUNDARY = re.compile(r"[.!?](?=\s)|\n")

@@ -47,6 +47,50 @@ def test_not_claims(text):
     assert bc.find("A title", text) == [], bc.find("A title", text)
 
 
+# Modelled on rasbt/mlxtend #1246: the unticked checklist line says behaviour is unchanged, and that is template
+# text, not an author claim. A real sentence in the description is still a claim.
+MLXTEND_1246 = """\
+### Code of Conduct
+
+Reviewed the repository's Code of Conduct.
+
+### Description
+
+`plot_learning_curves(scoring="log_loss")` passes hard class predictions to `sklearn.metrics.log_loss`.
+On current master, a balanced `DummyClassifier(strategy="prior")` produces a loss of about **18.02**
+instead of **log(2) = 0.693**.
+
+Select `predict_proba` only for log loss and retain the existing metric dispatch.
+This preserves positive loss values, the `clf` parameter, the default metric and all other scoring paths.
+
+The broader exclusion and existing test commands are unchanged.
+
+### Pull Request Checklist
+
+- [x] Added a changelog entry and updated the function's API documentation.
+- [x] Added regression tests in `mlxtend/plotting/tests/test_learning_curves.py`.
+- [ ] Modified the User Guide notebook: not applicable; its existing examples and default behavior are unchanged.
+  The updated API text was rendered with the repository's documentation helper.
+- [x] Ran the focused test file: **30 passed**.
+"""
+
+
+def test_mlxtend_1246_unticked_checklist_is_not_a_claim():
+    assert bc.find("Fix probability scoring for learning-curve log loss", MLXTEND_1246) == []
+    with_claim = MLXTEND_1246.replace(
+        "This preserves positive loss values",
+        "Results are unchanged for every other scorer. This preserves positive loss values")
+    found = bc.find("Fix probability scoring for learning-curve log loss", with_claim)
+    assert [c["quote"] for c in found] == ["Results are unchanged for every other scorer."]
+    wrapped = ("- [ ] not applicable; its existing examples and default\n"
+               "  behavior are unchanged.\n"
+               "Please make sure the results are unchanged before submitting.\n"
+               "Results will not change.\n")
+    assert [c["quote"] for c in bc.find("t", wrapped)] == ["Results will not change."]
+    ticked = bc.find("t", "- [x] Results are unchanged for existing callers.")
+    assert ticked and ticked[0]["pattern"] == "unchanged"
+
+
 def test_claim_in_title_and_quote_is_the_whole_sentence():
     c = bc.find("MAINT: refactor loop, no behavior change", "Uses `rng.permutation(n)`. So the results don't change.")
     assert [x["source"] for x in c] == ["title", "PR description"]

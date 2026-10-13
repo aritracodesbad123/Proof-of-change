@@ -13,6 +13,22 @@ Plain-language version: the [README](../README.md). This page is the detail behi
 
 `make` puts `.venv/bin` first on `PATH`, so the `uv` installed by `make setup` (extra `ops`) is the one the runner uses.
 
+## Start of a run
+
+Every run of `ops/daily_run.py` begins by fetching `origin` and fast-forwarding the checkout to `origin/main`.
+That commit is the Proof-of-Change code the run actually used. Its full SHA is stored on every record as
+`poc_commit` (schema rev 8; optional in the schema so an older record still validates) and printed in the run-log
+header next to the words "Proof-of-Change commit". The reviewer report header shows the same SHA when the record has it.
+
+The run stops, before it selects or tests anything, when it cannot do that update:
+
+- the checkout has uncommitted changes;
+- local history has diverged from `origin/main`, so a fast-forward is impossible;
+- `git fetch origin main` fails.
+
+`check_record` (the record check used when a record is written) fails a `pr_run` record that omits `poc_commit` or
+gives a value that is not a 40-character commit id.
+
 ## Inputs of a daily run
 
 - **Tracked libraries:** a CSV, one row per library: `library,repo,added_on_ist,added_by,priority,status,why_added,
@@ -79,9 +95,14 @@ Verdict, in order:
 5. `could_not_verify` if a test module of the changed code (`test_<stem>.py` of a changed source file, or a changed
    test file; every module when the changed files are unknown) fails to load on both sides, even if unrelated tests
    pass;
-6. `could_not_verify` if an exit code is unexplained, or new/changed tests were skipped because an optional
-   dependency is missing;
-7. otherwise `needs_attention` for tests missing on the PR side or other outcome changes, `verified` if nothing differs.
+6. `could_not_verify` if an exit code is unexplained, or new/changed tests were skipped or failed only because
+   an optional dependency is missing (a new test whose failure is `ModuleNotFoundError: No module named 'X'`,
+   or another missing-dependency message the comparison already recognises, is blocked, not a pull-request break);
+7. `could_not_verify` if the only remaining difference is flaky tests. A test that passes and fails across the 3
+   runs of one side (main or the pull request) is listed in the record and the report, and the reason names it.
+   It is not a regression and does not, on its own, produce `needs_attention`. A real regression or a new failing
+   test still produces `needs_attention` when another test is flaky;
+8. otherwise `needs_attention` for tests missing on the PR side or other outcome changes, `verified` if nothing differs.
 
 Then the coverage gate. The reason says how many tests ran on each side, how many were unchanged (and how many of
 those were skipped on both sides), flaky tests, and every module that failed to load.
@@ -297,8 +318,10 @@ importances/scores + "unchanged / identical / preserved", "do(es) not change" / 
 results / behaviour", "for a given / the same / a fixed seed", "backward(s) compatible / compatibility", "no
 behaviour(al) / functional / user-facing / API change", "no change in/to the results". A match right after a negation
 ("not backwards compatible", "breaks backward compatibility", "no longer") is ignored, and so are Markdown headings,
-HTML comments (PR templates) and code blocks. The quotes are stored in the record (`behaviour_claims`) so a re-judge
-gives the same answer.
+HTML comments, fenced code blocks, unticked checklist items (`- [ ]`, including a wrapped continuation line) and
+template boilerplate (stock instruction lines such as "Please make sure ..." or "Thanks for contributing"). A ticked
+item (`- [x]`) is the author's own line and can still be a claim. The quotes are stored in the record
+(`behaviour_claims`) so a re-judge gives the same answer.
 
 ## Files a run writes
 

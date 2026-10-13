@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Proof-of-Change daily run: tracked libraries -> new open PRs -> main-vs-PR test -> log + approver report.
 
-    python3 ops/daily_run.py                       # normal daily run
+    python3 ops/daily_run.py                       # normal daily run (fetches origin and fast-forwards to origin/main first)
     python3 ops/daily_run.py --select-only         # chosen PRs, print them, test nothing
     python3 ops/daily_run.py --max-per-library 3 --libraries numpy,pandas
     python3 ops/daily_run.py --pr https://github.com/pandas-dev/pandas/pull/12345   # check one PR (make check PR=...)
@@ -62,6 +62,7 @@ THREAD_ENV = {k: "1" for k in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_N
                                "VECLIB_MAXIMUM_THREADS", "BLIS_NUM_THREADS")}
 SCHEMA_PATH = REPO_ROOT / "harness" / "schema" / "observation.schema.json"
 WHO = "ops/daily_run.py"
+_COMMIT = re.compile(r"^[0-9a-f]{40}$")
 COMPILED_EXT = (".c", ".h", ".cpp", ".hpp", ".cc", ".cxx", ".pyx", ".pxd", ".pxi", ".tp", ".src", ".f", ".f90", ".cu")
 COMPILED_NAMES = ("meson.build", "meson.options", "meson_options.txt", "setup.py", "pyproject.toml")
 
@@ -241,8 +242,77 @@ def select_prs(gh: GitHub, repo: str, cfg: dict, seen: dict, last_run_utc: str |
 
 
 # ---------------------------------------------------------------- chosen PRs
+_SECTION_RE = re.compile(r"(?m)^## \d+\. ")
+_PR_HEADING_RE = re.compile(r"(?m)^### .*?#(\d+)")
+_OPEN_PR_RE = re.compile(r"\*\*Open PR:\*\* #(\d+)")
+_REPO_RE = re.compile(r"https://github\.com/([\w.-]+/[\w.-]+)")
+_HEAD_SHA_RE = re.compile(r"Head SHA: `([0-9a-f]{40})`")
+_INSTALL_RE = re.compile(r"- Install: `([^`]+)`")
+_TEST_SUBSET_RE = re.compile(r"- Test \(subset[^)]*\): `([^`]+)`")
+_TEST_LINE_RE = re.compile(r"- Test: `([^`]+)`")
+_EXPECT_RE = re.compile(r"Expected Proof-of-Change verdict: `([^`]+)`")
+
+
+def _library_sections(text: str) -> list[str]:
+    return _SECTION_RE.split(text)[1:]
+
+
+def _repo_of(sec: str) -> str | None:
+    m = _REPO_RE.search(sec)
+    return m.group(1).rstrip(".") if m else None
+
+
+def _group1(pattern: re.Pattern, text: str) -> str | None:
+    m = pattern.search(text) if text else None
+    return m.group(1) if m else None
+
+
+def _pr_blocks(sec: str) -> list[tuple[int, str, str]]:
+    """[(pr number, this pull request's own text, preamble shared by the library section)].
+
+    A `###` sub-heading that names a pull request number (`### Primary PR: #8946`) opens that pull request.
+    Text before the first such heading is the preamble (repo line, shared setup notes) and is not part of any
+    pull request's own text. With no such heading, `**Open PR:** #N` is the one pull request and its text is
+    the whole section.
+    """
+    marks = list(_PR_HEADING_RE.finditer(sec))
+    if marks:
+        preamble = sec[:marks[0].start()]
+        out = []
+        for i, m in enumerate(marks):
+            end = marks[i + 1].start() if i + 1 < len(marks) else len(sec)
+            out.append((int(m.group(1)), sec[m.start():end], preamble))
+        return out
+    m = _OPEN_PR_RE.search(sec)
+    if not m:
+        return []
+    return [(int(m.group(1)), sec, "")]
+
+
+def _test_cmd(block: str, preamble: str) -> str | None:
+    """The subset command: a Test (subset) line if present, else the first backticked command on a `- Test:` line.
+
+    A sub-section's own line wins over the shared preamble. On a line that names two commands, only the first
+    backtick pair is used.
+    """
+    for text in (block, preamble):
+        if not text:
+            continue
+        cmd = _group1(_TEST_SUBSET_RE, text)
+        if cmd:
+            return cmd
+        cmd = _group1(_TEST_LINE_RE, text)
+        if cmd:
+            return cmd
+    return None
+
+
 def parse_chosen(path: Path) -> dict:
-    """Chosen-PRs file (<date>.md, written by whoever curates the day's PRs) -> {repo: [ {pr, head_sha, install, test_cmd} ]}.
+    """Chosen-PRs file (<date>.md) -> {repo: [ {pr, head_sha, install, test_cmd} ]}.
+
+    A library section (`## N. name`) is one `**Open PR:** #N` entry, or several `###` sub-headings that each name
+    a pull request. Each sub-heading keeps its own head SHA. Install and test commands may sit in the preamble or
+    in a sub-section; a sub-section's own command wins.
 
     Expected verdicts are deliberately NOT read here. They are read by read_expectations() only after every verdict
     of the run has been computed (see main()), so they cannot influence selection, testing or verdicts.
@@ -250,31 +320,35 @@ def parse_chosen(path: Path) -> dict:
     out: dict = {}
     if not path.exists():
         return out
-    for sec in re.split(r"(?m)^## \d+\. ", path.read_text())[1:]:
-        repo = re.search(r"https://github\.com/([\w.-]+/[\w.-]+)", sec)
-        pr = re.search(r"\*\*Open PR:\*\* #(\d+)", sec)
-        if not (repo and pr):
+    for sec in _library_sections(path.read_text()):
+        repo = _repo_of(sec)
+        if not repo:
             continue
-        head = re.search(r"Head SHA: `([0-9a-f]{40})`", sec)
-        inst = re.search(r"- Install: `([^`]+)`", sec)
-        test = re.search(r"- Test \(subset[^)]*\): `([^`]+)`", sec)
-        out.setdefault(repo.group(1).rstrip("."), []).append({
-            "pr": int(pr.group(1)), "head_sha": head.group(1) if head else None,
-            "install": inst.group(1) if inst else None, "test_cmd": test.group(1) if test else None})
+        for pr, block, preamble in _pr_blocks(sec):
+            out.setdefault(repo, []).append({
+                "pr": pr, "head_sha": _group1(_HEAD_SHA_RE, block),
+                "install": _group1(_INSTALL_RE, block) or _group1(_INSTALL_RE, preamble),
+                "test_cmd": _test_cmd(block, preamble)})
     return out
 
 
 def read_expectations(path: Path) -> dict:
-    """{(repo, pr): expected_verdict}. Call ONLY after all verdicts are final."""
+    """{(repo, pr): expected_verdict}. Call ONLY after all verdicts are final.
+
+    Only a line of the form "Expected Proof-of-Change verdict: `...`" counts, and only inside that pull request's
+    own text. A sub-section without that line stays unscored; it does not borrow another pull request's value.
+    """
     exp = {}
     if not path.exists():
         return exp
-    for sec in re.split(r"(?m)^## \d+\. ", path.read_text())[1:]:
-        repo = re.search(r"https://github\.com/([\w.-]+/[\w.-]+)", sec)
-        pr = re.search(r"\*\*Open PR:\*\* #(\d+)", sec)
-        v = re.search(r"Expected Proof-of-Change verdict: `([^`]+)`", sec)
-        if repo and pr and v:
-            exp[(repo.group(1).rstrip("."), int(pr.group(1)))] = v.group(1).strip().replace(" ", "_")
+    for sec in _library_sections(path.read_text()):
+        repo = _repo_of(sec)
+        if not repo:
+            continue
+        for pr, block, _preamble in _pr_blocks(sec):
+            v = _EXPECT_RE.search(block)
+            if v:
+                exp[(repo, pr)] = v.group(1).strip().replace(" ", "_")
     return exp
 
 
@@ -326,18 +400,31 @@ def chosen_test_targets(chosen: dict | None) -> list[str]:
     return out
 
 
+def _repo_test_file(name: str) -> bool:
+    """A test module in either common layout: test_foo.py or foo_test.py."""
+    return name.endswith(".py") and (name.startswith("test_") or name.endswith("_test.py"))
+
+
 def map_repo_tests(files: dict, checkout: Path, max_targets: int = 6) -> list[str]:
     targets: list[str] = []
     for f in files["all"]:
         b = os.path.basename(f)
-        if b.startswith("test_") and b.endswith(".py") and (checkout / f).is_file():
+        if _repo_test_file(b) and (checkout / f).is_file():
             targets.append(f)
     for f in files["package_py"]:
         stem = os.path.splitext(os.path.basename(f))[0].lstrip("_")
-        for hit in sorted(glob.glob(str(checkout / "**" / f"test_{stem}.py"), recursive=True))[:2]:
-            rel = os.path.relpath(hit, checkout)
-            if rel not in targets:
-                targets.append(rel)
+        patterns = [f"test_{stem}.py"] + ([f"{stem}_test.py"] if stem else [])
+        added = 0
+        for pat in patterns:
+            if added >= 2:
+                break
+            for hit in sorted(glob.glob(str(checkout / "**" / pat), recursive=True)):
+                if added >= 2:
+                    break
+                rel = os.path.relpath(hit, checkout)
+                if rel not in targets:
+                    targets.append(rel)
+                    added += 1
     return targets[:max_targets]
 
 
@@ -948,6 +1035,9 @@ def compare_sides(results: dict) -> dict:
     Rename-aware: a test id that disappears is only 'removed' if no new id with the same base test name appeared.
     Otherwise it is re-parametrized (its parametrize ids changed); the new ids are judged by their own outcomes.
     New/changed tests that are skipped because an optional dependency is missing are listed separately.
+    A test that is new on the PR side and fails only with a missing-dependency message (ModuleNotFoundError:
+    No module named 'X', or the same messages missing_dependency() already recognises) is listed there too,
+    not under new_tests_failing. confirm_missing() drops that classification when the module is installed.
     Test modules that fail to load are tracked as modules, never as tests: on both sides (load_failed_both), only on the
     PR side (load_failed_pr, with the main-side tests that no longer run) or only on main (load_failed_main); their
     tests are not counted as removed, new or unchanged."""
@@ -1003,8 +1093,14 @@ def compare_sides(results: dict) -> dict:
             msgs[t] = pmsg
         if mo == "absent":
             added.append(t)
-        if po == "skipped" and mo != "skipped" and missing_dependency(pmsg):
-            out["skipped_missing_dependency"].append({"test": t, "module": missing_dependency(pmsg), "main": mo})
+        dep = missing_dependency(pmsg) if (po == "skipped" or (mo == "absent" and po in bad)) else None
+        # A brand-new test that fails only because an optional module is missing is blocked, not a PR break.
+        # A test that passed on main and fails on the PR stays a regression even if the message names a module.
+        if dep and ((po == "skipped" and mo != "skipped") or (mo == "absent" and po in bad)):
+            entry = {"test": t, "module": dep, "main": mo, "pr": po}
+            if pmsg:
+                entry["message"] = pmsg
+            out["skipped_missing_dependency"].append(entry)
         elif mo == "passed" and po in bad:
             out["regressions"].append(t)
         elif mo in bad and po == "passed":
@@ -1040,8 +1136,10 @@ def failing_ids(run_result: dict) -> set:
 def exit_check(per_run: list[dict], results: dict, cmp: dict) -> dict:
     """Is every non-zero pytest exit explained? Exit 1 on a run is explained when each failing test of that run fails
     identically on the other side's run with the same index, or is already a reported finding (regression, new
-    failing test, flaky). Any other exit code (interrupted, internal or usage error) is never explained."""
-    flagged = set(cmp["regressions"]) | set(cmp["new_tests_failing"]) | set(cmp["flaky"])
+    failing test, flaky, or blocked by a missing optional dependency). Any other exit code (interrupted, internal
+    or usage error) is never explained."""
+    flagged = (set(cmp["regressions"]) | set(cmp["new_tests_failing"]) | set(cmp["flaky"])
+               | {d["test"] for d in cmp.get("skipped_missing_dependency", [])})
     problems = []
     for e in per_run:
         side = "main" if e["side"] == "old" else "pr"
@@ -1184,12 +1282,17 @@ def tests_verdict(cmp: dict | None, cnv_reason: str | None, exits: dict | None =
       4. a test module loads on one side only -> could not verify, naming the module;
       5. a test module of the changed code fails to load on both sides -> could not verify;
       6. unexplained pytest exit codes -> could not verify;
-      7. new/changed tests skipped for a missing optional dependency -> could not verify (never needs attention);
-      8. otherwise poc.verdict.pr_verdict."""
+      7. new/changed tests skipped, or new tests that fail only because an optional dependency is missing
+         -> could not verify (never needs attention);
+      8. flaky tests, and nothing else that needs attention -> could not verify, naming those tests.
+         A test that passes and fails across the 3 runs of one side is listed. It is not a regression and
+         does not, on its own, produce needs attention. Flaky labels are not passed to pr_verdict, because
+         that rule treats every amber finding as needs attention (probes still use that rule);
+      9. otherwise poc.verdict.pr_verdict."""
     if cnv_reason:
         return Verdict.COULD_NOT_VERIFY.value, cnv_reason, []
     deps = sorted({d["module"] for d in cmp.get("skipped_missing_dependency", [])})
-    dep_note = (f"{len(cmp['skipped_missing_dependency'])} new/changed test(s) skipped because optional "
+    dep_note = (f"{len(cmp['skipped_missing_dependency'])} new/changed test(s) skipped or blocked because optional "
                 f"dependenc{'y' if len(deps) == 1 else 'ies'} {', '.join(deps)} not installed") if deps else ""
     executed = cmp.get("executed") or {}
     ran_main, ran_pr = executed.get("main"), executed.get("pr")
@@ -1207,7 +1310,9 @@ def tests_verdict(cmp: dict | None, cnv_reason: str | None, exits: dict | None =
     if cmp["new_tests_failing"]:
         bits.append(f"{len(cmp['new_tests_failing'])} new test(s) fail on the PR")
     if cmp["flaky"]:
-        bits.append(f"{len(cmp['flaky'])} flaky test(s)")
+        shown = ", ".join(cmp["flaky"][:5])
+        more = f" (+{len(cmp['flaky']) - 5})" if len(cmp["flaky"]) > 5 else ""
+        bits.append(f"{len(cmp['flaky'])} flaky test(s): {shown}{more}")
     if cmp["removed_tests"]:
         bits.append(f"{len(cmp['removed_tests'])} test(s) removed on the PR side")
     if cmp["other_changes"]:
@@ -1236,10 +1341,13 @@ def tests_verdict(cmp: dict | None, cnv_reason: str | None, exits: dict | None =
         bits.append(load_failure_text(x, "main"))
     reason = "; ".join(bits)
     fl = [f.value for f in findings]
+    # Flaky is amber, and pr_verdict turns every amber finding into needs attention. A flaky test is listed
+    # (comparison["flaky"] and the label above) but must not, on its own, produce that verdict.
+    verdict_findings = [f for f in findings if f is not FindingLabel.FLAKY]
     cnv = Verdict.COULD_NOT_VERIFY.value
     if cmp["regressions"] or cmp["new_tests_failing"]:
         v = pr_verdict(RunSummary(build_ok=True, claims=[Claim("tests", testable=True, probed=True, proven=True)],
-                                  findings=findings))
+                                  findings=verdict_findings))
         return v.value, reason + (f"; {dep_note}" if dep_note else ""), fl
     if nothing_ran:
         where = ("on either side" if ran_main == 0 and ran_pr == 0 else "on main" if ran_main == 0 else "on the PR side")
@@ -1257,7 +1365,9 @@ def tests_verdict(cmp: dict | None, cnv_reason: str | None, exits: dict | None =
     if dep_note:
         return cnv, f"not fully verified: {dep_note} ({reason})", fl
     v = pr_verdict(RunSummary(build_ok=True, claims=[Claim("tests", testable=True, probed=True, proven=True)],
-                              findings=findings))
+                              findings=verdict_findings))
+    if cmp["flaky"] and v == Verdict.VERIFIED:
+        return cnv, f"could not verify: {reason}", fl
     return v.value, reason, fl
 
 
@@ -1472,6 +1582,9 @@ def new_record(repo: str, cfg: dict, item: dict, a, machine: dict, run_date: str
                               "note": getattr(a, "model_note", None) or "model provider: none: fixed probes only",
                               "blind": bool(getattr(getattr(a, "provider", None), "blind", False))},
            "posted_upstream": False, "logs": f"{cfg['pkg']}-{item['pr']}/", "freeze": {}}
+    sha = getattr(a, "poc_commit", None)
+    if isinstance(sha, str) and _COMMIT.fullmatch(sha):
+        rec["poc_commit"] = sha
     rec["route"] = ("source-pair" if not cfg.get("nightly") else
                     "source-build" if item["files"]["compiled"] else "nightly+patch")
     for k in ("head_moved", "current_head_sha", "frozen_from", "state", "mergeable", "mergeable_state"):
@@ -1498,9 +1611,26 @@ def finalize_tests(rec: dict, per_run: list[dict], results: dict, a) -> tuple[di
     return cmp, None, ex
 
 
+def _unconfirmed_dependency(cmp: dict, d: dict) -> None:
+    """Put back a missing-dependency classification the environment did not confirm.
+
+    A failure (the test ran and raised ModuleNotFoundError, or the same messages) returns to new_tests_failing:
+    the module is installed, so the failure is a real result. A skip returns to other_changes, as before.
+    """
+    if d.get("pr") in ("failed", "error"):
+        cmp["new_tests_failing"].append(d["test"])
+        msg = d.get("message")
+        if msg:
+            msgs = cmp.setdefault("messages", {})
+            if d["test"] not in msgs and len(msgs) < 20:
+                msgs[d["test"]] = msg
+        return
+    cmp["other_changes"].append(
+        f"{d['test']}: {d['main']} -> skipped (skip names {d['module']}, which is installed)")
+
+
 def confirm_missing(cmp: dict, venv: Path) -> None:
-    """Keep a dependency skip only if the module really does not import on the PR side; otherwise it is an ordinary
-    outcome change."""
+    """Keep a dependency skip or blocked failure only if the module really does not import on the PR side."""
     keep = []
     for d in cmp.get("skipped_missing_dependency", []):
         ok = in_side(venv, [venv / "bin/python", "-c", f"import importlib.util as u,sys;"
@@ -1508,8 +1638,9 @@ def confirm_missing(cmp: dict, venv: Path) -> None:
         if ok:
             keep.append(d)
         else:
-            cmp["other_changes"].append(f"{d['test']}: {d['main']} -> skipped (skip names {d['module']}, which is installed)")
+            _unconfirmed_dependency(cmp, d)
     cmp["skipped_missing_dependency"] = keep
+    cmp["new_tests_failing"] = sorted(cmp["new_tests_failing"])
 
 
 def sandbox_refusal() -> str | None:
@@ -1608,7 +1739,7 @@ def finish(rec: dict, prdir: Path, work: Path, t0: float) -> dict:
                          "tests": round(sum(e.get("seconds") or 0 for e in rec.get("per_run", [])), 1)}
     if rec.get("pr_side", {}).get("build_seconds") is not None:
         rec["duration_s"]["build"] = rec["pr_side"]["build_seconds"]
-    errs = validate_record(rec)
+    errs = check_record(rec)
     if errs:
         rec["schema_errors"] = errs[:20]
     shutil.rmtree(work, ignore_errors=True)
@@ -1622,6 +1753,24 @@ def validate_record(rec: dict) -> list[str]:
         return validate(rec, json.loads(SCHEMA_PATH.read_text()))
     except FileNotFoundError:
         return [f"schema not found at {SCHEMA_PATH}"]
+
+
+def check_record(rec: dict) -> list[str]:
+    """The record check: the shared schema, plus poc_commit on a pr_run record.
+
+    poc_commit is optional in the schema so a record written before rev 8 still validates. A record this run
+    writes must name the Proof-of-Change commit it used (the full SHA of origin/main after the fast-forward).
+    A missing or malformed value fails this check."""
+    errs = validate_record(rec)
+    if not isinstance(rec, dict) or rec.get("record_kind") != "pr_run":
+        return errs
+    sha = rec.get("poc_commit")
+    rid = rec.get("id", "<no id>")
+    if not isinstance(sha, str) or not sha:
+        errs.append(f"{rid}: missing poc_commit (the Proof-of-Change commit this run used)")
+    elif not _COMMIT.fullmatch(sha):
+        errs.append(f"{rid}: poc_commit must be the 40-character commit the run used, got {sha!r}")
+    return errs
 
 
 def test_source_pair(repo: str, cfg: dict, item: dict, prdir: Path, work: Path, a, rec: dict) -> dict:
@@ -1907,7 +2056,7 @@ def write_report(rdir: Path, meta: dict, records: list[dict], skipped: dict, pro
     md = [f"# Proof-of-Change daily ops run: {meta['date']}", "",
           f"Started {meta['started_ist']}, finished {meta['finished_ist']}, wall time {meta['wall_min']} min. "
           f"Machine: {meta['machine']}. GitHub API calls: {meta['api_calls']} ({meta['auth']}). "
-          f"Runner: ops/daily_run.py @ {meta.get('git', '?')}.", "",
+          f"Runner: ops/daily_run.py. Proof-of-Change commit: `{meta.get('poc_commit') or 'not recorded'}`.", "",
           f"## Recommendation: **{rec}**", "",
           "The recommendation is about whether this run can be trusted, not about merging any PR. Verdicts never block merges.", "",
           "| PR | Title | Route | Verdict | Reason |", "|---|---|---|---|---|"] + [line(r) for r in records] + [""]
@@ -1980,7 +2129,7 @@ def write_report(rdir: Path, meta: dict, records: list[dict], skipped: dict, pro
                           f"(e.g. `{x['removed_ids'][0].split('::')[-1]}` -> `{x['added_ids'][0].split('::')[-1]}`)")
             deps = c.get("skipped_missing_dependency", [])
             if deps:
-                md.append(f"  - skipped for a missing optional dependency: {len(deps)} "
+                md.append(f"  - skipped or blocked for a missing optional dependency: {len(deps)} "
                           f"({', '.join(sorted({d['module'] for d in deps}))})")
             for t, m in list(c.get("messages", {}).items())[:3]:
                 md.append(f"  - `{t}`: `{m[:150]}`")
@@ -2080,6 +2229,62 @@ def pick_verification_file(folder: Path) -> Path:
     return rev5[-1] if rev5 else folder / "verification.jsonl"
 
 
+def _git(root: Path, *args: str) -> subprocess.CompletedProcess:
+    return subprocess.run(["git", "-C", str(root), *args], capture_output=True, text=True)
+
+
+def sync_to_origin_main(root: Path | None = None) -> str:
+    """Fetch origin and fast-forward this checkout to origin/main. Return that commit's full SHA.
+
+    Stops (SystemExit) when the work tree has uncommitted changes, when local history has diverged from
+    origin/main so a fast-forward is impossible, or when the fetch itself fails. A daily run calls this
+    before it selects or tests anything, so every record is produced by one known Proof-of-Change commit.
+    """
+    root = root or REPO_ROOT
+    status = _git(root, "status", "--porcelain")
+    if status.returncode != 0:
+        detail = (status.stderr or status.stdout).strip()
+        raise SystemExit("Stopped: could not read the git status of this checkout"
+                         + (f": {detail}" if detail else "") + ".")
+    if status.stdout.strip():
+        raise SystemExit("Stopped: the checkout has uncommitted changes, so it cannot be fast-forwarded to "
+                         "origin/main. Commit or discard them, then run again.")
+    fetch = _git(root, "fetch", "--no-tags", "origin", "main")
+    if fetch.returncode != 0:
+        detail = (fetch.stderr or fetch.stdout).strip()
+        raise SystemExit("Stopped: fetching origin main failed" + (f": {detail}" if detail else "") + ".")
+    branch = _git(root, "rev-parse", "--abbrev-ref", "HEAD")
+    if branch.returncode != 0:
+        detail = (branch.stderr or branch.stdout).strip()
+        raise SystemExit("Stopped: could not read the current branch" + (f": {detail}" if detail else "") + ".")
+    if branch.stdout.strip() != "main":
+        has_main = _git(root, "show-ref", "--verify", "--quiet", "refs/heads/main")
+        if has_main.returncode != 0:
+            switched = _git(root, "checkout", "--quiet", "-b", "main", "origin/main")
+        else:
+            switched = _git(root, "checkout", "--quiet", "main")
+        if switched.returncode != 0:
+            detail = (switched.stderr or switched.stdout).strip()
+            raise SystemExit("Stopped: could not check out main in order to fast-forward to origin/main"
+                             + (f": {detail}" if detail else "") + ".")
+    head = _git(root, "rev-parse", "HEAD").stdout.strip()
+    origin_sha = _git(root, "rev-parse", "origin/main").stdout.strip()
+    if not _COMMIT.fullmatch(origin_sha):
+        raise SystemExit("Stopped: origin/main is not a commit after the fetch.")
+    if _git(root, "merge-base", "--is-ancestor", "HEAD", "origin/main").returncode != 0:
+        raise SystemExit("Stopped: cannot fast-forward to origin/main; the local history has diverged "
+                         f"(HEAD {head[:12]}, origin/main {origin_sha[:12]}).")
+    forward = _git(root, "merge", "--ff-only", "origin/main")
+    if forward.returncode != 0:
+        detail = (forward.stderr or forward.stdout).strip()
+        raise SystemExit("Stopped: cannot fast-forward to origin/main; the local history has diverged"
+                         + (f": {detail}" if detail else "") + ".")
+    got = _git(root, "rev-parse", "HEAD").stdout.strip()
+    if got != origin_sha or not _COMMIT.fullmatch(got):
+        raise SystemExit("Stopped: the checkout is not at origin/main after the fast-forward.")
+    return got
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--libraries-file", default=None,
@@ -2146,6 +2351,7 @@ def main(argv=None) -> int:
     ap.add_argument("--ids", default=None, help="with --bench: comma-separated case IDs (default: all), e.g. B01,B14")
     ap.add_argument("--bench-out", default=None, help="with --bench: result folder (default: runs/bench-v0)")
     a = ap.parse_args(argv)
+    a.poc_commit = sync_to_origin_main(REPO_ROOT)
     sandbox.configure(not a.unsafe_no_sandbox)
     a.provider, a.model_note = model_provider.select(
         a.model_provider, models={"claims": a.claims_model, "probes": a.probe_model},
@@ -2264,9 +2470,6 @@ def main(argv=None) -> int:
     if not single:  # a one-off check never changes what the daily run selects
         seen_path.write_text(json.dumps(seen, indent=1))
     finished = now_ist()
-    git = subprocess.run(["git", "-C", REPO_ROOT, "rev-parse", "--short", "HEAD"], capture_output=True, text=True).stdout.strip()
-    dirty = subprocess.run(["git", "-C", REPO_ROOT, "status", "--porcelain", "--", "ops", "poc", "harness"],
-                           capture_output=True, text=True).stdout.strip()
     meta = {"date": rdir.name, "started_ist": started.strftime("%Y-%m-%d %H:%M IST"),
             "finished_ist": finished.strftime("%Y-%m-%d %H:%M IST"),
             "wall_min": round((finished - started).total_seconds() / 60, 1), "runs": a.runs,
@@ -2274,7 +2477,7 @@ def main(argv=None) -> int:
             "api_calls": gh.calls, "auth": "token" if gh.token else "unauthenticated",
             "sandbox": (sandbox.check()[1] + " (bwrap: per-side filesystem, no network outside installs)"
                         if sandbox.enabled() else "DISABLED (--unsafe-no-sandbox)"),
-            "git": git + (" (with uncommitted changes)" if dirty else ""),
+            "git": a.poc_commit, "poc_commit": a.poc_commit,
             "baseline": a.baseline, "model_provider": a.model_note}
     (rdir / "run_meta.json").write_text(json.dumps(meta | {"problems": problems}, indent=1))
     # Expectations and independent verification are read only now, after every verdict above is final.
@@ -2312,8 +2515,9 @@ def rejudge(rec: dict, prdir: Path) -> dict:
     cmp = compare_sides(results)
     kept = {d["test"] for d in old.get("skipped_missing_dependency", [])}
     for d in [d for d in cmp["skipped_missing_dependency"] if d["test"] not in kept]:
-        cmp["other_changes"].append(f"{d['test']}: {d['main']} -> skipped (skip names {d['module']}, which is installed)")
+        _unconfirmed_dependency(cmp, d)
     cmp["skipped_missing_dependency"] = [d for d in cmp["skipped_missing_dependency"] if d["test"] in kept]
+    cmp["new_tests_failing"] = sorted(cmp["new_tests_failing"])
     ex = exit_check(rec.get("per_run", []), results, cmp)
     pr_probes = rejudge_probes(rec.get("probes"))
     v, reason, _ = verdict_for(cmp, None, ex, rec.get("files"), pr_probes, rec.get("behaviour_claims"),
@@ -2346,7 +2550,7 @@ def migrate_record(rec: dict, rdir: Path, redo: bool = False) -> dict:
     out = rejudge(out, rdir / (out.get("logs") or "").strip("/")) if redo and out.get("logs") else gate(out)
     if out.get("record_kind") == "pr_run":
         out.pop("schema_errors", None)
-        errs = validate_record(out)
+        errs = check_record(out)
         if errs:
             out["schema_errors"] = errs[:20]
     return out

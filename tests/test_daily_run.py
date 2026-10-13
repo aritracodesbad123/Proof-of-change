@@ -1,5 +1,8 @@
 import importlib.util
+import subprocess
 from pathlib import Path
+
+import pytest
 
 ROOT = Path(__file__).parent.parent
 spec = importlib.util.spec_from_file_location("daily_run", ROOT / "ops" / "daily_run.py")
@@ -145,6 +148,8 @@ def test_fix2_missing_dependency_messages():
     assert missing_dependency("pytest.skip: Could not import 'scipy'") == "scipy"
     assert missing_dependency("pytest.skip: could not import 'pyarrow': No module named 'pyarrow'") == "pyarrow"
     assert missing_dependency("pytest.skip: requires pyarrow") == "pyarrow"
+    assert missing_dependency("ModuleNotFoundError: No module named 'pandas'") == "pandas"
+    assert missing_dependency("ImportError: No module named 'pandas.core'") == "pandas"
     assert missing_dependency("pytest.xfail: EA.fillna does not handle 'linear' method") is None
     assert missing_dependency("pytest.skip: not relevant on windows") is None
 
@@ -361,3 +366,308 @@ def test_unchanged_dependency_skips_reported_not_scored(tmp_path):
         '<testsuite><testcase classname="m" name="a"><skipped type="pytest.skip" message="Could not import \'torch\'"/>'
         '</testcase><testcase classname="m" name="b"/></testsuite>')
     assert unchanged_dependency_skips(tmp_path, {}) == {"torch": 1}
+
+
+# ---------------------------------------------------------------- chosen-PRs file: several PRs, plain `- Test:` lines, *_test.py names
+CHOSEN_FIXTURE = _Path(__file__).parent / "fixtures" / "chosen" / "day.md"
+PANDAS_MISSING = "ModuleNotFoundError: No module named 'pandas'"
+
+
+def _sides(main, pr):
+    return {"main": [main] * 3, "pr": [pr] * 3}
+
+
+def _per_run(main_exit, pr_exit):
+    return [{"side": side, "run": i, "exit": main_exit if side == "old" else pr_exit}
+            for i in (1, 2, 3) for side in ("old", "new")]
+
+
+def test_parse_chosen_fixture_keeps_old_format_and_subsections():
+    chosen = dr.parse_chosen(CHOSEN_FIXTURE)
+    assert "expected" not in str(chosen).lower()
+    old = chosen["acme/widget"][0]
+    assert old["pr"] == 12 and old["head_sha"].startswith("0123")
+    assert old["test_cmd"].startswith("pytest tests/test_a.py")
+    assert dr.chosen_test_targets(old) == ["tests/test_a.py", "tests/test_b.py"]
+    nw = chosen["narwhals-dev/narwhals"][0]
+    assert nw["pr"] == 4062 and nw["head_sha"] == "a" * 40
+    assert nw["test_cmd"] == "pytest tests/expr_and_series/division_by_zero_test.py"
+    assert dr.chosen_test_targets(nw) == ["tests/expr_and_series/division_by_zero_test.py"]
+    assert nw["install"] == 'pip install -e ".[dev]"'
+    nxs = {x["pr"]: x for x in chosen["networkx/networkx"]}
+    assert set(nxs) == {8946, 8862}
+    assert nxs[8946]["head_sha"] == "56e4499e8f61da4180e2451e8140acf459cf95cc"
+    assert nxs[8862]["head_sha"] == "636941793808cba5f84239470afcac2cf336b3eb"
+    assert nxs[8946]["install"] == nxs[8862]["install"] == 'pip install -e ".[test]" pytest'
+    exp = dr.read_expectations(CHOSEN_FIXTURE)
+    assert exp[("acme/widget", 12)] == "needs_attention"
+    assert exp[("narwhals-dev/narwhals", 4062)] == "verified"
+    assert exp[("networkx/networkx", 8946)] == "verified"
+    assert ("networkx/networkx", 8862) not in exp   # non-standard line must not borrow the primary verdict
+
+
+def test_subsection_install_overrides_the_preamble(tmp_path):
+    p = tmp_path / "c.md"
+    p.write_text("""## 1. demo
+- **Repo:** https://github.com/acme/widget
+- Install: `pip install -e .`
+- Test: `pytest tests/test_shared.py`
+### Primary PR: #1, "a"
+  - Head SHA: `1111111111111111111111111111111111111111`
+### Secondary PR: #2, "b"
+  - Head SHA: `2222222222222222222222222222222222222222`
+  - Install: `pip install -e ".[x]"`
+- Test (subset, fast): `pytest tests/test_own.py`
+""")
+    rows = {x["pr"]: x for x in dr.parse_chosen(p)["acme/widget"]}
+    assert rows[1]["head_sha"].startswith("1111") and rows[1]["install"] == "pip install -e ."
+    assert rows[1]["test_cmd"] == "pytest tests/test_shared.py"
+    assert rows[2]["install"] == 'pip install -e ".[x]"'
+    assert rows[2]["test_cmd"] == "pytest tests/test_own.py"
+    assert dr.read_expectations(p) == {}
+
+
+def test_map_repo_tests_finds_suffix_test_files(tmp_path):
+    for rel in ("tests/expr_and_series/division_by_zero_test.py", "tests/test_graph.py", "tests/graph_test.py",
+                "a/test_item.py", "b/test_item.py", "c/item_test.py", "pkg/division_by_zero.py", "pkg/graph.py",
+                "pkg/item.py"):
+        f = tmp_path / rel
+        f.parent.mkdir(parents=True, exist_ok=True)
+        f.write_text("")
+    touched = dr.map_repo_tests({"all": ["tests/expr_and_series/division_by_zero_test.py"], "package_py": []}, tmp_path)
+    assert touched == ["tests/expr_and_series/division_by_zero_test.py"]
+    by_stem = dr.map_repo_tests({"all": ["pkg/division_by_zero.py"], "package_py": ["pkg/division_by_zero.py"]}, tmp_path)
+    assert by_stem == ["tests/expr_and_series/division_by_zero_test.py"]
+    prefix = dr.map_repo_tests({"all": ["tests/test_graph.py"], "package_py": []}, tmp_path)
+    assert prefix == ["tests/test_graph.py"]
+    both = dr.map_repo_tests({"all": ["pkg/graph.py"], "package_py": ["pkg/graph.py"]}, tmp_path)
+    assert both == ["tests/test_graph.py", "tests/graph_test.py"]
+    capped = dr.map_repo_tests({"all": ["pkg/item.py"], "package_py": ["pkg/item.py"]}, tmp_path)
+    assert capped == ["a/test_item.py", "b/test_item.py"]   # two test_*.py hits fill the per-file cap
+
+
+def test_new_import_failures_are_blocked_not_breaks():
+    old, new1, new2 = ("m::test_old[pandas]", "m::test_new[pandas-0]", "m::test_new[pandas-1]")
+    ok = "m::test_ok"
+    main = {old: ("failed", PANDAS_MISSING), ok: ("passed", "")}
+    pr = {old: ("failed", PANDAS_MISSING), ok: ("passed", ""), new1: ("failed", PANDAS_MISSING),
+          new2: ("error", "requires pyarrow")}
+    res = _sides(main, pr)
+    cmp = dr.compare_sides(res)
+    assert cmp["new_tests_failing"] == []
+    assert {d["test"]: d["module"] for d in cmp["skipped_missing_dependency"]} == {new1: "pandas", new2: "pyarrow"}
+    assert cmp["preexisting_failures"] == [old]
+    v, reason, _ = dr.verdict_for(cmp, None, dr.exit_check(_per_run(1, 1), res, cmp))
+    assert v == "could_not_verify"
+    assert "not installed" in reason and "pandas" in reason and "pyarrow" in reason
+    assert "new test(s) fail" not in reason and "not explained" not in reason
+
+
+def test_real_new_failure_and_import_regression_still_need_attention():
+    bug, reg = "m::test_bug", "m::test_reg"
+    main = {reg: ("passed", ""), "m::test_ok": ("passed", "")}
+    pr = {reg: ("failed", PANDAS_MISSING), "m::test_ok": ("passed", ""), bug: ("failed", "AssertionError: expected 1")}
+    res = _sides(main, pr)
+    cmp = dr.compare_sides(res)
+    assert cmp["regressions"] == [reg] and cmp["new_tests_failing"] == [bug]
+    assert cmp["skipped_missing_dependency"] == []
+    v, reason, _ = dr.verdict_for(cmp, None, dr.exit_check(_per_run(0, 1), res, cmp))
+    assert v == "needs_attention" and "new test(s) fail" in reason and "pass on main but fail" in reason
+
+
+def test_confirm_missing_checks_the_environment(monkeypatch, tmp_path):
+    from types import SimpleNamespace
+    new = "m::test_new"
+    blocked = dr.compare_sides(_sides({}, {new: ("failed", PANDAS_MISSING)}))
+    monkeypatch.setattr(dr, "in_side", lambda *a, **k: SimpleNamespace(returncode=0))
+    dr.confirm_missing(blocked, tmp_path)
+    assert [d["test"] for d in blocked["skipped_missing_dependency"]] == [new]
+    assert blocked["new_tests_failing"] == []
+    restored = dr.compare_sides(_sides({}, {new: ("failed", PANDAS_MISSING)}))
+    monkeypatch.setattr(dr, "in_side", lambda *a, **k: SimpleNamespace(returncode=1))
+    dr.confirm_missing(restored, tmp_path)
+    assert restored["skipped_missing_dependency"] == [] and restored["new_tests_failing"] == [new]
+    assert restored["messages"][new] == PANDAS_MISSING
+    skipped = dr.compare_sides(_sides({"m::t": ("passed", "")}, {"m::t": ("skipped", "pytest.skip: requires pyarrow")}))
+    dr.confirm_missing(skipped, tmp_path)
+    assert skipped["new_tests_failing"] == [] and skipped["skipped_missing_dependency"] == []
+    assert any("pyarrow" in x and "installed" in x for x in skipped["other_changes"])
+
+
+def _junit(cases):
+    parts = []
+    for cls, name, kind, message in cases:
+        if kind == "passed":
+            parts.append(f'<testcase classname="{cls}" name="{name}"/>')
+        else:
+            parts.append(f'<testcase classname="{cls}" name="{name}"><failure message="{message}"/></testcase>')
+    return "<testsuite>" + "".join(parts) + "</testsuite>"
+
+
+def test_rejudge_keeps_unconfirmed_import_failures_as_breaks(tmp_path):
+    prdir = tmp_path / "pr"
+    prdir.mkdir()
+    (prdir / "junit-main-1.xml").write_text(_junit([("m", "test_ok", "passed", "")]))
+    (prdir / "junit-pr-1.xml").write_text(_junit([("m", "test_ok", "passed", ""),
+                                                  ("m", "test_new", "failed", PANDAS_MISSING)]))
+    base = {"runs_per_side": 1, "per_run": [{"side": "old", "run": 1, "exit": 0}, {"side": "new", "run": 1, "exit": 1}],
+            "files": {"all": ["pkg/a.py"], "package_py": ["pkg/a.py"], "compiled": []}}
+    fresh = dr.rejudge(base | {"comparison": {"skipped_missing_dependency": []}, "verdict": "needs_attention",
+                               "reason": "1 new test(s) fail on the PR"}, prdir)
+    assert fresh["comparison"]["new_tests_failing"] == ["m::test_new"]
+    assert fresh["comparison"]["skipped_missing_dependency"] == []
+    assert fresh["verdict"] == "needs_attention"
+    kept = dr.rejudge(base | {"comparison": {"skipped_missing_dependency": [
+        {"test": "m::test_new", "module": "pandas", "main": "absent"}]}, "verdict": "could_not_verify",
+        "reason": "not fully verified: missing pandas"}, prdir)
+    assert kept["comparison"]["new_tests_failing"] == []
+    assert [d["test"] for d in kept["comparison"]["skipped_missing_dependency"]] == ["m::test_new"]
+    assert kept["verdict"] == "could_not_verify" and "not installed" in kept["reason"]
+
+
+# ---------------------------------------------------------------- flaky tests are listed, and are not a regression (numpy #32992)
+DOC_ONLY = {"all": ["doc/source/reference/routines.io.rst"], "package_py": [], "compiled": [],
+            "other": ["doc/source/reference/routines.io.rst"]}
+NPZ = "numpy/lib/tests/test_io.py::test_npz_docs"
+
+
+def _flaky_sides(main_runs, pr_runs):
+    return dr.compare_sides({"main": main_runs, "pr": pr_runs})
+
+
+def test_numpy_32992_docs_only_flaky_test_is_could_not_verify():
+    """A documentation-only pull request with one test that passes and fails across the 3 runs (numpy #32992)."""
+    from poc import coverage_gate
+    passed = {NPZ: ("passed", "")}
+    failed = {NPZ: ("failed", "intermittent")}
+    cmp = _flaky_sides([passed] * 3, [passed, failed, passed])
+    assert cmp["flaky"] == [NPZ] and cmp["regressions"] == [] and cmp["new_tests_failing"] == []
+    v, reason, labels = dr.verdict_for(cmp, None, None, DOC_ONLY)
+    assert v == "could_not_verify"
+    assert NPZ in reason and "flaky" in reason
+    assert "flaky" in labels
+    gated = coverage_gate.apply({"verdict": v, "reason": reason, "files": DOC_ONLY, "comparison": cmp})
+    assert gated["verdict"] == "could_not_verify"
+    # The same test disagreeing with itself on main is also flaky, not a regression.
+    cmp_main = _flaky_sides([passed, failed, passed], [passed] * 3)
+    assert cmp_main["flaky"] == [NPZ]
+    v_main, reason_main, _ = dr.verdict_for(cmp_main, None, None, DOC_ONLY)
+    assert v_main == "could_not_verify" and NPZ in reason_main
+
+
+def test_flaky_test_does_not_hide_a_real_regression():
+    reg = "numpy/lib/tests/test_io.py::test_real"
+    main = {NPZ: ("passed", ""), reg: ("passed", "")}
+    pr = [{NPZ: ("passed", ""), reg: ("failed", "boom")},
+          {NPZ: ("failed", "intermittent"), reg: ("failed", "boom")},
+          {NPZ: ("passed", ""), reg: ("failed", "boom")}]
+    cmp = _flaky_sides([main] * 3, pr)
+    assert cmp["regressions"] == [reg] and cmp["flaky"] == [NPZ]
+    v, reason, _ = dr.verdict_for(cmp, None, None, DOC_ONLY)
+    assert v == "needs_attention" and "pass on main but fail on the PR" in reason and NPZ in reason
+
+
+def test_report_lists_a_flaky_test_and_the_header_names_the_commit(tmp_path):
+    from ops.daily_run import write_report
+    sha = "ab" * 20
+    rec = _pr_record(author="a", updated_at_ist="x", ci_state="none", ci_detail="-", poc_commit=sha,
+                     verdict="could_not_verify",
+                     reason=f"could not verify: 1 flaky test(s): {NPZ}",
+                     comparison={"flaky": [NPZ], "regressions": [], "new_tests_failing": [], "removed_tests": [],
+                                 "other_changes": []},
+                     files=DOC_ONLY)
+    meta = {"date": "2026-10-13", "started_ist": "s", "finished_ist": "f", "wall_min": 1, "runs": 3, "machine": "m",
+            "api_calls": 0, "auth": "none", "poc_commit": sha}
+    md = write_report(tmp_path, meta, [rec], {}, []).read_text()
+    header = md.split("##", 1)[0]
+    assert f"Proof-of-Change commit: `{sha}`" in header
+    assert NPZ in md and "**could_not_verify**" in md
+
+
+def test_record_check_fails_a_pr_run_without_poc_commit():
+    from ops.schema_check import validate
+    bare = _pr_record()
+    assert validate(bare, SCHEMA) == []                       # schema rev 8 leaves the field optional
+    errs = dr.check_record(bare)
+    assert any("missing poc_commit" in e for e in errs)
+    bad = _pr_record(poc_commit="not-a-commit")
+    assert any("poc_commit" in e for e in validate(bad, SCHEMA))
+    assert any("40-character" in e for e in dr.check_record(bad))
+    sha = "cd" * 20
+    assert dr.check_record(_pr_record(poc_commit=sha)) == []
+    obs = _json.loads((DAY1 / "observation-golden-clean-sklearn.json").read_text())
+    assert dr.check_record(obs) == []                         # an observation record does not carry poc_commit
+
+
+def test_new_record_stores_the_commit_the_run_used():
+    from types import SimpleNamespace
+    sha = "ef" * 20
+    item = {"pr": 32992, "title": "DOC: clarify NpzFile", "url": "https://github.com/numpy/numpy/pull/32992",
+            "author": "a", "head_sha": "a" * 40, "base_sha": "b" * 40, "base_ref": "main",
+            "updated_at_utc": "2026-10-12T20:03:29Z", "updated_at_ist": "2026-10-13 01:33 IST",
+            "ci_state": "none", "ci_detail": "-", "files": DOC_ONLY}
+    a = SimpleNamespace(runs=3, workers="4", test_timeout=120, run_timeout=900, build_timeout=1800, python="3.12",
+                        python_full="3.12.15", poc_commit=sha, baseline="full")
+    rec = dr.new_record("numpy/numpy", {"dist": "numpy", "pkg": "numpy", "nightly": True}, item, a,
+                        {"arch": "x86_64", "os": "Linux"}, "2026-10-13")
+    assert rec["poc_commit"] == sha
+    missing = dr.new_record("numpy/numpy", {"dist": "numpy", "pkg": "numpy", "nightly": True}, item,
+                            SimpleNamespace(runs=3, workers="4", test_timeout=120, run_timeout=900, build_timeout=1800,
+                                            python="3.12"),
+                            {"arch": "x86_64", "os": "Linux"}, "2026-10-13")
+    assert "poc_commit" not in missing
+
+
+def _git(repo, *args):
+    cp = subprocess.run(["git", "-C", str(repo), *args], capture_output=True, text=True)
+    if cp.returncode != 0:
+        raise AssertionError(f"git {' '.join(args)} failed: {cp.stderr}")
+    return cp.stdout.strip()
+
+
+def _origin_and_clone(tmp_path):
+    origin = tmp_path / "origin"
+    origin.mkdir()
+    _git(origin, "init", "-b", "main")
+    _git(origin, "config", "user.email", "proof-of-change@users.noreply.github.com")
+    _git(origin, "config", "user.name", "Proof-of-Change")
+    (origin / "README").write_text("one\n")
+    _git(origin, "add", "README")
+    _git(origin, "commit", "-m", "one")
+    clone = tmp_path / "clone"
+    subprocess.run(["git", "clone", str(origin), str(clone)], check=True, capture_output=True, text=True)
+    _git(clone, "config", "user.email", "proof-of-change@users.noreply.github.com")
+    _git(clone, "config", "user.name", "Proof-of-Change")
+    return origin, clone
+
+
+def test_daily_run_fast_forwards_to_origin_main(tmp_path):
+    origin, clone = _origin_and_clone(tmp_path)
+    (origin / "README").write_text("two\n")
+    _git(origin, "add", "README")
+    _git(origin, "commit", "-m", "two")
+    _git(clone, "checkout", "-b", "feature")
+    sha = dr.sync_to_origin_main(clone)
+    assert sha == _git(origin, "rev-parse", "HEAD")
+    assert _git(clone, "rev-parse", "HEAD") == sha
+    assert _git(clone, "rev-parse", "--abbrev-ref", "HEAD") == "main"
+    assert dr.sync_to_origin_main(clone) == sha                         # already there: still that commit
+
+
+def test_daily_run_stops_when_it_cannot_fast_forward(tmp_path):
+    origin, clone = _origin_and_clone(tmp_path)
+    (clone / "README").write_text("dirty\n")
+    with pytest.raises(SystemExit, match="uncommitted changes"):
+        dr.sync_to_origin_main(clone)
+    _git(clone, "checkout", "--", "README")
+    (clone / "local-only").write_text("x\n")
+    _git(clone, "add", "local-only")
+    _git(clone, "commit", "-m", "local only")
+    (origin / "remote-only").write_text("y\n")
+    _git(origin, "add", "remote-only")
+    _git(origin, "commit", "-m", "remote only")
+    with pytest.raises(SystemExit, match="diverged"):
+        dr.sync_to_origin_main(clone)
+    _git(clone, "remote", "set-url", "origin", str(tmp_path / "missing.git"))
+    with pytest.raises(SystemExit, match="fetching origin main failed"):
+        dr.sync_to_origin_main(clone)
