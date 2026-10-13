@@ -38,7 +38,7 @@ CLAIMS_SCHEMA = {
 
 PROBES_SCHEMA = {
     "type": "object", "additionalProperties": False, "required": ["probes"],
-    "properties": {"probes": {"type": "array", "items": {
+    "properties": {"probes": {"type": "array", "minItems": 1, "items": {
         "type": "object", "additionalProperties": False, "required": ["id", "about", "claims", "code"],
         "properties": {"id": {"type": "string"}, "about": {"type": "string"},
                        "claims": {"type": "array", "items": {
@@ -61,7 +61,13 @@ test only; fixed seeds; no network, no files outside the current directory, no c
 never assert or raise on purpose: record what you see. The LAST line printed must be one JSON object
 {"observations": {"<name>": <JSON value>, ...}} with at most 50 short dotted observation names. Wrap calls that may
 fail and record the exception type name instead. "claims" maps claim ids to the observation names they cover (fnmatch
-patterns) and what the claim expects for them (same | differs). Answer with JSON only."""
+patterns) and what the claim expects for them (same | differs).
+Coverage rule: the BASE-side files shown are the files the pull request changes. Write at least one probe for every
+testable claim; an empty "probes" list is not an acceptable answer. Each probe must call the functions or methods the
+claim is about directly, with several representative inputs and edge cases chosen generically from the code you see
+(for example: zero, negative and positive numbers, whole and fractional values, empty and non-empty containers,
+boundary sizes, each accepted input type), so that a change in behaviour would show up in the observations. If you
+are unsure whether behaviour changes, still record the outputs: plain code decides. Answer with JSON only."""
 
 
 class ProviderError(RuntimeError):

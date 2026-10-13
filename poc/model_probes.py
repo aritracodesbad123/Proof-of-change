@@ -44,6 +44,13 @@ def grounded_claims(raw: dict, title: str, body: str | None) -> tuple[list, list
     return kept, rejected
 
 
+def _tidy_id(x):
+    """'P1' -> 'p1', 'probe_get_x' -> 'probe-get-x'; non-strings are returned unchanged (and then rejected)."""
+    if not isinstance(x, str):
+        return x
+    return re.sub(r"[^a-z0-9-]+", "-", x.lower()).strip("-")[:40] or x
+
+
 def validate_probe(p: dict, claim_ids: set) -> str | None:
     """None if the model's probe is acceptable, else why not."""
     if not ID_RE.match(str(p.get("id", ""))):
@@ -113,13 +120,26 @@ def generate(provider: Provider, repo: str, pr: int, title: str, body: str | Non
     except ProviderError as e:
         out["errors"].append(str(e))
         return out
-    gen = freeze.generator("model", model=provider.models["probes"], provider=provider.name)
     by_id = {c["id"]: c for c in testable}
+    usable = [p for p in (resp or {}).get("probes", [])[:MAX_PROBES] if isinstance(p, dict)
+              and not validate_probe(dict(p, id=_tidy_id(p.get("id"))), set(by_id))]
+    if not usable:
+        # One retry, same gate and same BASE-side inputs: say why the first answer was unusable (generic reasons only)
+        reasons = [validate_probe(dict(p, id=_tidy_id(p.get("id"))), set(by_id)) for p in
+                   (resp or {}).get("probes", [])[:MAX_PROBES] if isinstance(p, dict)] or ["the probes list was empty"]
+        out["retried"] = {"why": reasons[:5]}
+        retry_user = (user + "\n\nYour previous answer contained no usable probe (" + "; ".join(map(str, reasons[:5]))
+                      + "). Follow the coverage rule: write at least one probe per testable claim.")
+        try:
+            resp = provider.complete_json("probes", PROBES_PROMPT, retry_user, PROBES_SCHEMA, ctx)
+        except ProviderError as e:
+            out["errors"].append(f"retry: {e}")
+    gen = freeze.generator("model", model=provider.models["probes"], provider=provider.name)
     outdir.mkdir(parents=True, exist_ok=True)
     for p in (resp or {}).get("probes", [])[:MAX_PROBES]:
         # Models name probes "P1" or "probe_x"; the id is only a file name, so normalise it rather than drop the probe
         if isinstance(p, dict) and isinstance(p.get("id"), str):
-            p["id"] = re.sub(r"[^a-z0-9-]+", "-", p["id"].lower()).strip("-")[:40] or p["id"]
+            p["id"] = _tidy_id(p["id"])
         why = validate_probe(p, set(by_id))
         if why:
             out["errors"].append(f"probe {p.get('id')!r} rejected: {why}")
