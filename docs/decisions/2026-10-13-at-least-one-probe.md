@@ -53,3 +53,7 @@ change those do not exercise slips through as "verified".
 - **Probes with no description.** A probe the model wrote with an empty description was accepted when written but
   refused when it was about to run, so it never ran. It now gets a fixed default description at writing time
   (before it is fingerprinted), so it runs.
+- **Optional extras that cannot build here.** Some libraries list optional test helpers that need extra system
+  tools to build (for example a helper that needs the "swig" program). An optional overrides file
+  (`POC_INSTALL_OVERRIDES`) can now leave such a helper out. As with the pins file, the same overrides are used on
+  both sides and by both comparison tools, and the records say which file was used.

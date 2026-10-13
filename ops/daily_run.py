@@ -673,7 +673,13 @@ def install_side(venv: Path, checkout: Path, chosen: dict | None, log: Path, pyt
         pins = (["-c", bc] if bc and Path(bc).is_file() else []) + (["-c", constraints] if constraints else [])
         cmds.insert(1, ["uv", "pip", "install", "-q", "-p", venv / "bin/python", *breq, "ninja", *pins])
         cmds[-1].insert(cmds[-1].index("-p"), "--no-build-isolation")
-    ro_files = tuple(x for x in (constraints, bc if bc and Path(bc).is_file() else None) if x)
+    # Optional overrides (POC_INSTALL_OVERRIDES): e.g. drop an optional test extra that cannot build on this machine
+    # ("scikit-umfpack; python_version < '0'"). Same file for both sides and every tool.
+    ov = os.environ.get("POC_INSTALL_OVERRIDES")
+    ov = ov if ov and Path(ov).is_file() else None
+    if ov:
+        cmds[-1] += ["--override", ov]
+    ro_files = tuple(x for x in (constraints, bc if bc and Path(bc).is_file() else None, ov) if x)
     sbx = side_sandbox(venv, network=True, ro=ro_files)
     sbx["rw"].append(checkout)
     for c in cmds:
