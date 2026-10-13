@@ -37,6 +37,7 @@ import types
 import urllib.request
 from pathlib import Path
 
+from poc import cost
 from poc.leakage import Fingerprints
 from poc.model_gate import Gate, GatedProvider
 
@@ -154,7 +155,12 @@ class NebiusChat(GatedProvider):
                 "max_tokens": ctx.get("max_tokens", 16384), "messages": [{"role": "user", "content": user}]}
         n = len(self.calls) + 1
         t0 = time.time()
-        data = self._transport(body)
+        try:
+            data = self._transport(body)
+        except Exception:
+            cost.record_call(body["model"], None, ok=False)
+            raise
+        cost.record_call(data.get("model") or body["model"], data.get("usage"))
         path = self.raw_dir / f"{n:03d}-{task}.json"
         path.write_text(json.dumps({"request": {k: v for k, v in body.items() if k != "messages"},
                                     "prompt": user, "response": data}, indent=1))
@@ -270,6 +276,7 @@ def run_case(row: dict, a, fp: Fingerprints, key: str, out: Path, machine: dict)
     from ops import daily_run as dr
     rid = row["id"]
     t0 = time.time()
+    cost.reset()
     logd = out / "logs" / rid
     pgd = logd / "patchguru"
     pgd.mkdir(parents=True, exist_ok=True)
@@ -291,6 +298,8 @@ def run_case(row: dict, a, fp: Fingerprints, key: str, out: Path, machine: dict)
             r = dict(base, **extra, baseline=bl, verdict=v, reason=why,
                      id=f"bench-{rid}-{row['repo'].replace('/', '-')}-{row['pr']}-{bl}",
                      elapsed_s=round(time.time() - t0, 1))
+            # One PatchGuru run gives both records (before and after self-review): the same calls, counted once.
+            r["cost"] = dict(cost.peek({"total_wall": r["elapsed_s"]}), shared_with_other_baseline=True)
             (out / f"{rid}-{bl.replace('-', '_')}.json").write_text(json.dumps(r, indent=1))
             recs.append(r)
         return recs
