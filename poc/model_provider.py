@@ -92,7 +92,7 @@ class NebiusProvider(Provider):
 
     def complete_json(self, task: str, system: str, user: str, schema: dict, ctx: dict) -> dict:
         body = {"model": self.models[task], "temperature": 0,
-                "max_tokens": int(os.environ.get("POC_MAX_TOKENS", "8000")),
+                "max_tokens": int(os.environ.get("POC_MAX_TOKENS", "32000")),
                 "messages": [{"role": "system", "content": system}, {"role": "user", "content": user}],
                 "response_format": {"type": "json_schema",
                                     "json_schema": {"name": task, "schema": schema, "strict": True}}}
@@ -105,7 +105,15 @@ class NebiusProvider(Provider):
         try:
             with urllib.request.urlopen(req, timeout=self.timeout) as r:   # noqa: S310 (fixed https URL)
                 data = json.loads(r.read())
-            return json.loads(data["choices"][0]["message"]["content"])
+            ch = data["choices"][0]
+            if ch["message"].get("content") is None:
+                # Nemotron reasons before answering; if reasoning uses the whole token budget the answer is empty
+                err = f"no answer (finish_reason={ch.get('finish_reason')}, usage={data.get('usage')})"
+                raise ProviderError(f"{self.name} {task}: model returned no answer "
+                                    f"(finish_reason={ch.get('finish_reason')}; token limit {body['max_tokens']})")
+            return json.loads(ch["message"]["content"])
+        except ProviderError:
+            raise
         except Exception as e:  # noqa: BLE001
             err = f"{type(e).__name__}: {e}"
             raise ProviderError(f"{self.name} {task} request failed: {type(e).__name__}") from None
