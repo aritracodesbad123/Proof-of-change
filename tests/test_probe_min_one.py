@@ -59,3 +59,12 @@ def test_retry_prompt_has_no_pr_side_or_answer_text(tmp_path):
     prov, _ = _run(tmp_path, [{"probes": []}, GOOD])
     retry = prov.prompts[-1][1]
     assert retry.startswith(prov.prompts[1][1]) and Path(tmp_path / "pr").as_posix() not in retry
+
+
+def test_no_testable_claims_still_asks_for_a_probe(tmp_path, monkeypatch):
+    monkeypatch.setattr(Scripted, "complete_json", lambda self, task, system, user, schema, ctx: (
+        self.prompts.append((task, user)) or ({"claims": []} if task == "claims" else self.answers.pop(0))))
+    nc = {"probes": [dict(GOOD["probes"][0], claims=[])]}
+    prov, out = _run(tmp_path, [nc])
+    assert out.get("no_claims_probe") and len(out["probes"]) == 1
+    assert "none were testable" in prov.prompts[-1][1]

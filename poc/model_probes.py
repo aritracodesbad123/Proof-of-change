@@ -112,9 +112,17 @@ def generate(provider: Provider, repo: str, pr: int, title: str, body: str | Non
     kept, rejected = grounded_claims(raw, title, body)
     out["claims"], out["rejected_claims"] = kept, rejected
     testable = [c for c in kept if c.get("testable")]
-    if not testable:
+    if not testable and not base_files:
         return out
-    user = (pr_text + "\n\nClaims:\n" + json.dumps(testable, indent=1) + "\n\n" + _context(base_files))
+    if testable:
+        user = (pr_text + "\n\nClaims:\n" + json.dumps(testable, indent=1) + "\n\n" + _context(base_files))
+    else:
+        # The PR changes source files but its text gave no testable claim: still ask for at least one probe that
+        # records the behaviour of the functions in those files (no claims; plain code compares the outputs).
+        out["no_claims_probe"] = True
+        user = (pr_text + "\n\nClaims: none were testable. Still write at least one probe that calls the functions "
+                "in the BASE-side files below with representative and edge-case inputs; give it an empty claims "
+                "list.\n\n" + _context(base_files))
     try:
         resp = provider.complete_json("probes", PROBES_PROMPT, user, PROBES_SCHEMA, ctx)
     except ProviderError as e:

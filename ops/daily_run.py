@@ -645,7 +645,13 @@ def install_side(venv: Path, checkout: Path, chosen: dict | None, log: Path, pyt
             ["uv", "pip", "install", "-q", "-p", venv / "bin/python", *proj, *extra, *BASE_TEST_DEPS,
              *pyproject_test_groups(checkout)]
             + (["-c", constraints] if constraints else [])]
-    sbx = side_sandbox(venv, network=True, ro=(constraints,) if constraints else ())
+    # Optional build constraints (POC_BUILD_CONSTRAINTS, read here in the orchestrator): pins for the isolated build
+    # environment and the installed one, e.g. "numpy<2" for checkouts older than NumPy 2. Same file for both sides and every tool.
+    bc = os.environ.get("POC_BUILD_CONSTRAINTS")
+    if bc and Path(bc).is_file():
+        cmds[-1] += ["--build-constraint", bc, "-c", bc]   # same pins at build time and at run time
+    ro_files = tuple(x for x in (constraints, bc if bc and Path(bc).is_file() else None) if x)
+    sbx = side_sandbox(venv, network=True, ro=ro_files)
     sbx["rw"].append(checkout)
     for c in cmds:
         rc, _ = run(c, log, env=env, timeout=timeout, sbx=sbx)

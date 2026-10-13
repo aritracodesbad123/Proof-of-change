@@ -32,3 +32,14 @@ change those do not exercise slips through as "verified".
 - A forced probe may sometimes be weak. That is acceptable: the existing checks (does it run the changed lines,
   is it informative) still mark weak probes, and plain code still decides the verdict.
 - The retry can add one more model call (time and cost) on the cases where the first answer was empty.
+
+## Addendum: pull requests with no testable claim, and older builds
+
+- **No testable claim.** Sometimes the model finds nothing checkable in a pull request's text, even though the
+  pull request changes source files. Before, that meant no probe at all. Now the model is still asked for at least
+  one probe that calls the functions in the changed files with ordinary and edge-case inputs. That probe has no
+  claim attached, so it does not "expect" anything; plain code just compares the old and new outputs.
+- **Building older versions.** Building an older library version from source can fail when the build tools pick up
+  today's packages (for example a NumPy 2 release that the old code cannot build against). An optional pins file
+  (`POC_BUILD_CONSTRAINTS`) can now be given. The same pins are used to build and to install, on both sides, and by
+  both comparison tools, so the comparison stays fair.
