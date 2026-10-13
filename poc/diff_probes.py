@@ -8,12 +8,15 @@ functions (no leading underscore, in a public module) whose base-side lines inte
 ranges. Only base-side code and old-side line numbers are used (poc/freeze.py rules); new functions that exist only
 on the PR side are not probed.
 
-What it observes: each function is called with the same small set of simple deterministic inputs on both sides
-(every required positional argument gets the same candidate: 1, 0, -1, 2.5, "abc", [1, 2, 3], None), with random
-and NumPy seeded before each call. Each result is reduced to a canonical JSON summary; an exception becomes
-{"raises": "<type name>"}. Observations are named <module>.<function>.input<k>. The probe has no claims, so any
-difference is "unmentioned". It is a deliberately simple baseline: it finds behaviour changes on trivial inputs, not
-whether a change was intended.
+What it observes: each function is called with the same deterministic inputs on both sides. A parameter whose name
+or annotation asks for a graph, an array, labels or a fitted estimator gets one of those (a 4-node path graph, a
+small numeric array, labels 0/1, or a fitted logistic regression). A function whose parameters have no such hint is
+called with the small scalar set (1, 0, -1, 2.5, "abc", [1, 2, 3], None). If a required domain object cannot be
+built, that function is not called: the observation is {"skipped": "no type-aware input"} and the probe does not
+count as having run. Random and NumPy are seeded before each call. Each result is reduced to a canonical JSON
+summary; an exception becomes {"raises": "<type name>"}. Observations are named <module>.<function>.input<k>. The
+probe has no claims, so any difference is "unmentioned". It is a deliberately simple baseline: it finds behaviour
+changes on inputs of the right kind, not whether a change was intended.
 """
 from __future__ import annotations
 
@@ -97,6 +100,11 @@ import random
 import re
 
 CANDIDATES = [1, 0, -1, 2.5, "abc", [1, 2, 3], None]
+GRAPH_NAMES = {"g", "g1", "g2", "h", "graph"}
+ARRAY_NAMES = {"x_train", "x_test", "data", "features"}
+LABEL_NAMES = {"y", "y_train", "y_test", "labels", "target"}
+EST_NAMES = {"clf", "estimator", "model", "classifier", "regressor"}
+SKIPPED = {"skipped": "no type-aware input"}
 
 
 def canon(x, depth=0):
@@ -128,12 +136,82 @@ def seed():
         pass
 
 
-def required(f):
+def annotation_text(p):
+    ann = p.annotation
+    if ann is inspect.Signature.empty:
+        return ""
+    return getattr(ann, "__name__", str(ann)).lower()
+
+
+def domain_kind(name, ann):
+    n = (name or "").lower()
+    if n in GRAPH_NAMES or n.endswith("graph") or "graph" in ann:
+        return "graph"
+    if n in EST_NAMES or "estimator" in ann or "classifier" in ann:
+        return "estimator"
+    if n in LABEL_NAMES:
+        return "labels"
+    if n in ARRAY_NAMES or "ndarray" in ann or ann == "array":
+        return "array"
+    return None
+
+
+def build_graph():
     try:
-        return sum(1 for p in inspect.signature(f).parameters.values()
-                   if p.default is p.empty and p.kind in (p.POSITIONAL_ONLY, p.POSITIONAL_OR_KEYWORD))
+        import networkx as nx
+        return nx.path_graph(4)
+    except Exception:  # noqa: BLE001
+        return None
+
+
+def build_array():
+    try:
+        import numpy as np
+        return np.array([[0.0, 0.0], [1.0, 1.0], [0.0, 1.0], [1.0, 0.0]])
+    except Exception:  # noqa: BLE001
+        return [[0.0, 0.0], [1.0, 1.0], [0.0, 1.0], [1.0, 0.0]]
+
+
+def build_labels():
+    return [0, 1, 0, 1]
+
+
+def build_estimator():
+    try:
+        from sklearn.linear_model import LogisticRegression
+        return LogisticRegression().fit(build_array(), build_labels())
+    except Exception:  # noqa: BLE001
+        return None
+
+
+BUILDERS = {"graph": build_graph, "array": build_array, "labels": build_labels, "estimator": build_estimator}
+
+
+def positional(f):
+    try:
+        return [p for p in inspect.signature(f).parameters.values()
+                if p.kind in (p.POSITIONAL_ONLY, p.POSITIONAL_OR_KEYWORD)]
     except (TypeError, ValueError):
-        return 1
+        return []
+
+
+def call_plan(params):
+    """'candidates' for an untyped function, 'skip' when a required domain object cannot be built, else one arg list."""
+    if not any(domain_kind(p.name, annotation_text(p)) for p in params):
+        return "candidates"
+    args = []
+    for p in params:
+        kind = domain_kind(p.name, annotation_text(p))
+        if kind:
+            value = BUILDERS[kind]()
+            if value is None:
+                if p.default is inspect.Parameter.empty:
+                    return "skip"
+                continue
+            args.append(value)
+        elif p.default is inspect.Parameter.empty:
+            args.append(1)
+    return [args]
 
 
 obs = {}
@@ -143,11 +221,20 @@ for mod, fn in TARGETS:
     except Exception as e:  # noqa: BLE001
         obs[f"{mod}.{fn}.import"] = {"raises": type(e).__name__}
         continue
-    n = required(f)
-    for k, c in enumerate(CANDIDATES if n else CANDIDATES[:1]):
+    params = positional(f)
+    plan = call_plan(params)
+    if plan == "skip":
+        obs[f"{mod}.{fn}.input0"] = dict(SKIPPED)
+        continue
+    if plan == "candidates":
+        n = sum(1 for p in params if p.default is inspect.Parameter.empty)
+        calls = [[copy.deepcopy(c) for _ in range(n)] for c in (CANDIDATES if n else CANDIDATES[:1])]
+    else:
+        calls = plan
+    for k, args in enumerate(calls):
         seed()
         try:
-            r = canon(f(*[copy.deepcopy(c) for _ in range(n)]))
+            r = canon(f(*[copy.deepcopy(a) for a in args]))
         except Exception as e:  # noqa: BLE001
             r = {"raises": type(e).__name__}
         obs[f"{mod}.{fn}.input{k}"] = r
@@ -157,7 +244,7 @@ print(json.dumps({"observations": obs}, sort_keys=True, default=str))
 
 def write(targets: list, path: Path, target: str) -> Path:
     spec = {"id": "diff-api", "target": target,
-            "about": "Public functions touched by the PR, called with simple deterministic inputs on both sides.",
+            "about": "Public functions touched by the PR, called with type-appropriate inputs on both sides.",
             "claims": [], "timeout_s": 60, "generator": freeze.DIFF}
     Path(path).parent.mkdir(parents=True, exist_ok=True)
     Path(path).write_text('"""Differential probe (model-free baseline, poc/diff_probes.py)."""\n'

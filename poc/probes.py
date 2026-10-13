@@ -259,6 +259,89 @@ def rejudge_entry(item: dict) -> dict:
     return dict(item, observations=judge(spec, item["runs"], item.get("outputs")))
 
 
+def _exception_name(value) -> str | None:
+    """The exception type when a probe observation is only ``{"raises": "Name"}``."""
+    if isinstance(value, dict) and set(value) == {"raises"} and isinstance(value.get("raises"), str):
+        return value["raises"]
+    return None
+
+
+def _no_type_aware_input(value) -> bool:
+    return isinstance(value, dict) and value.get("skipped") == "no type-aware input"
+
+
+def classify_item(item: dict) -> dict:
+    """Mark a probe uninformative or not_run.
+
+    uninformative: every observation is the same exception type on both sides (for example AttributeError on every
+    input). That probe did not observe the function, so it must not count as ran or as adequate.
+    not_run: every observation says no type-aware input could be built, so the probe did not call the function.
+    """
+    obs = item.get("observations") or []
+    out = dict(item)
+    if not obs:
+        out["status"] = "error"
+        return out
+    if all(_no_type_aware_input(o.get("main")) and _no_type_aware_input(o.get("pr")) for o in obs):
+        reason = "no type-aware input could be built, so the probe did not run"
+        out["status"] = "not_run"
+        out["uninformative_reason"] = reason
+        _downgrade_coverage(out, reason)
+        return out
+    names = []
+    for o in obs:
+        if o.get("state") != "same":
+            out["status"] = "ran"
+            return out
+        main_exc, pr_exc = _exception_name(o.get("main")), _exception_name(o.get("pr"))
+        if not main_exc or main_exc != pr_exc:
+            out["status"] = "ran"
+            return out
+        names.append(main_exc)
+    if len(set(names)) != 1:
+        out["status"] = "ran"
+        return out
+    reason = f"uninformative: every input raised {names[0]} on both sides"
+    out["status"] = "uninformative"
+    out["uninformative_reason"] = reason
+    _downgrade_coverage(out, reason + "; not counted as ran or adequate")
+    return out
+
+
+def _downgrade_coverage(item: dict, note: str) -> None:
+    """A probe that did not observe the change is not adequate, even if a line counter moved."""
+    cov = item.get("probe_changed_line_coverage")
+    if not isinstance(cov, dict):
+        return
+    cov = dict(cov)
+    cov["adequacy"] = "not_adequate"
+    cov["note"] = note
+    item["probe_changed_line_coverage"] = cov
+
+
+def apply_status(probe_results: dict | None) -> dict | None:
+    """Set each item's status and the overall status. Overall is uninformative only when every item is."""
+    if not probe_results or not probe_results.get("items"):
+        return probe_results
+    items = [classify_item(it) for it in probe_results["items"]]
+    statuses = [it.get("status") for it in items]
+    if any(s == "ran" for s in statuses):
+        status = "ran"
+    elif statuses and all(s == "uninformative" for s in statuses):
+        status = "uninformative"
+    elif statuses and all(s == "not_run" for s in statuses):
+        status = "none"
+    elif statuses and all(s == "error" for s in statuses):
+        status = "error"
+    else:
+        status = "ran"
+    summary = summarize([it for it in items if it.get("status") == "ran"])
+    notes = [it["uninformative_reason"] for it in items if it.get("uninformative_reason")]
+    if notes:
+        summary = dict(summary, reason="; ".join([summary["reason"]] * bool(summary["reason"]) + notes))
+    return dict(probe_results, items=items, status=status, summary=summary)
+
+
 def summarize(items: list[dict]) -> dict:
     """Findings over all probes of a PR: labels, red/amber observations, proven claims, reason text."""
     obs = [o | {"probe": it["id"]} for it in items for o in it["observations"]]

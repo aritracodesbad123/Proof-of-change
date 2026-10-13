@@ -15,6 +15,7 @@ The verdict before the gate is kept in the record (verdict_before_coverage_gate)
 """
 from __future__ import annotations
 
+import ast
 import difflib
 import re
 from pathlib import PurePosixPath
@@ -65,6 +66,32 @@ def tests_for_compiled(files: dict) -> dict:
         keys = {_stem(c), PurePosixPath(c).parent.name.lstrip("_").lower()} - {"", "src", "include", "core", "lib"}
         out[c] = [t for t in tests if any(k in PurePosixPath(t).name.lower() for k in keys)]
     return out
+
+
+def _strip_docstrings(node: ast.AST) -> None:
+    """Drop a module, class or function docstring so two files that differ only there compare equal."""
+    for child in ast.walk(node):
+        body = getattr(child, "body", None)
+        if not body or not isinstance(body, list):
+            continue
+        first = body[0]
+        if isinstance(first, ast.Expr) and isinstance(getattr(first, "value", None), ast.Constant):
+            if isinstance(first.value.value, str):
+                del body[0]
+
+
+def ast_equal_ignoring_docstrings(old_text: str, new_text: str) -> bool:
+    """True when the two Python sources have the same AST once docstrings are removed.
+
+    A change that only rewrites a docstring (the text of a function, class or module string) does not change
+    behaviour. Syntax that does not parse is not treated as docstring-only."""
+    try:
+        old, new = ast.parse(old_text), ast.parse(new_text)
+    except SyntaxError:
+        return False
+    _strip_docstrings(old)
+    _strip_docstrings(new)
+    return ast.dump(old) == ast.dump(new)
 
 
 def changed_lines(old_text: str | None, new_text: str) -> set[int]:

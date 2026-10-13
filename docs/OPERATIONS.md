@@ -316,7 +316,9 @@ gives needs_attention). The rule never upgrades a verdict and never hides needs_
 The regex list (`PATTERNS`, case-insensitive) is deliberately small: results/output/behaviour/values/predictions/
 importances/scores + "unchanged / identical / preserved", "do(es) not change" / "don't change", "the same output /
 results / behaviour", "for a given / the same / a fixed seed", "backward(s) compatible / compatibility", "no
-behaviour(al) / functional / user-facing / API change", "no change in/to the results". A match right after a negation
+behaviour(al) / functional / user-facing / API change", "no change in/to the results", plus "passed through",
+"left unchanged", "returned unchanged", "exactly as before" and "untouched". The same list is applied to added
+changelog lines and added docstring lines in the diff, not only the title and description. A match right after a negation
 ("not backwards compatible", "breaks backward compatibility", "no longer") is ignored, and so are Markdown headings,
 HTML comments, fenced code blocks, unticked checklist items (`- [ ]`, including a wrapped continuation line) and
 template boilerplate (stock instruction lines such as "Please make sure ..." or "Thanks for contributing"). A ticked
@@ -329,7 +331,11 @@ item (`- [x]`) is the author's own line and can still be a claim. The quotes are
 ops/runs/<folder>/                         (git-ignored)
   REPORT.md            run log for operators: per-PR lines, what went right/wrong, skipped PRs, expected vs actual
   records.jsonl        one record per PR;  selection.json  what was picked and skipped
-  run_meta.json        timings, machine, problems (needed by --report-only)
+  run_meta.json        timings, machine, problems (needed by --report-only). Wall time is the sum of each
+                       pull request's own time. The first start time is kept across --resume.
+  schema_check.log    first line is `N/N valid` (how many records validate)
+  invocations/invocation-N/run_meta.json
+                       that invocation's own timings; --resume does not overwrite an earlier one
   superseded/attempt-N/ earlier attempts of the same date (records, logs, NOTE.md); the selection stays frozen
   <pkg>-<pr>/          record.json, pr.diff, setup-*.log, build-pr.log / patch.log / git.log, freeze-{main,pr}.txt,
                        pytest-{main,pr}-{1,2,3}.log, junit-{main,pr}-{1,2,3}.xml,
