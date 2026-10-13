@@ -44,9 +44,10 @@ SCHEMA_SHA256_REV4 = "0a706f00904fa34ab8ad8bc7f79f53da08dd51576aa2800a3274befb95
 SCHEMA_SHA256_REV5 = "f6c4e7ba5cd74c5c6259cf3311295a2cc909de20a6802d4b7c4496356c1448ea"  # + record_kind verification
 SCHEMA_SHA256_REV6 = "682cba10a01f6ce60c5eae18183fe7fac968d99dd29ce9244cf50873fa3f9677"  # + probes, behaviour_claims, gate measurement
 SCHEMA_SHA256_REV7 = "afd0e56152b8098849d01be50f0ac607349d41cd7fae395548760205d7aa46a4"  # + baseline, model provider, probe freeze
+SCHEMA_SHA256_REV8 = "fb37345818ade4d61be979dfbaa6fba17ef4808de5ff36cfd0159b8bbe85fc43"  # + poc_commit
 COMPATIBLE_SCHEMA_SHA256 = {SCHEMA_SHA256_REV1: "rev 1", SCHEMA_SHA256_REV2: "rev 2", SCHEMA_SHA256_REV3: "rev 3",
                             SCHEMA_SHA256_REV4: "rev 4", SCHEMA_SHA256_REV5: "rev 5",
-                            SCHEMA_SHA256_REV6: "rev 6", SCHEMA_SHA256_REV7: "rev 7"}
+                            SCHEMA_SHA256_REV6: "rev 6", SCHEMA_SHA256_REV7: "rev 7", SCHEMA_SHA256_REV8: "rev 8"}
 if SCHEMA_SHA256 not in COMPATIBLE_SCHEMA_SHA256:
     raise RuntimeError(f"{SCHEMA_PATH} has sha256 {SCHEMA_SHA256}, which is not listed in COMPATIBLE_SCHEMA_SHA256; "
                        "add the new revision here and in harness/schema/README.md")

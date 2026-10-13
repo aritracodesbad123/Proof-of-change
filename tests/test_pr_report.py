@@ -62,6 +62,17 @@ def test_verdicts_and_summary_order(run, tmp_path):
     assert (tmp_path / "out" / "widget-2" / "REPORT.html").exists()
 
 
+def test_report_header_names_the_proof_of_change_commit(run, tmp_path):
+    d = run / "widget-1"
+    rec = json.loads((d / "record.json").read_text())
+    sha = "ab" * 20
+    rec["poc_commit"] = sha
+    (d / "record.json").write_text(json.dumps(rec))
+    pr_report.render_run(run, tmp_path / "out", formats=("md",))
+    header = (tmp_path / "out" / "widget-1" / "REPORT.md").read_text().split("##", 1)[0]
+    assert f"Proof-of-Change commit `{sha}`" in header
+
+
 def test_report_sections_and_citation(run, tmp_path):
     pr_report.render_run(run, tmp_path / "out", formats=("md",))
     md = (tmp_path / "out" / "widget-2" / "REPORT.md").read_text()

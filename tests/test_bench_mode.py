@@ -90,7 +90,8 @@ def test_rejects_short_shas(tmp_path, bad, match):
         assert bench.read_inputs(p)
 
 
-def test_cli_refuses_answers_file(tmp_path, capsys):
+def test_cli_refuses_answers_file(tmp_path, capsys, monkeypatch):
+    monkeypatch.setattr(dr, "sync_to_origin_main", lambda root=None: "a" * 40)
     p = tmp_path / "x-answers.csv"
     p.write_text(SYN.read_text())
     assert dr.main(["--bench", str(p), "--ids", "B01", "--unsafe-no-sandbox"]) == 2
@@ -172,6 +173,7 @@ def test_run_writes_one_result_per_id_and_never_opens_the_answer_key(tmp_path, m
     cols = list(rows[0])
     inputs.write_text(",".join(cols) + "\n" + "\n".join(",".join(r[c] for c in cols) for r in rows) + "\n")
     (tmp_path / "benchmark-v0-answers.csv").write_text("id,label\nB01,regression\n")
+    monkeypatch.setattr(dr, "sync_to_origin_main", lambda root=None: "a" * 40)
     monkeypatch.setattr(bench, "CLONE_URL", str(merged_repo["path"]))
     monkeypatch.setattr(bench, "pr_text", lambda _dr, row: {"title": row["pr_title"], "body": "Changes f.",
                                                              "author": "someone", "base_ref": "main", "source": "test"})

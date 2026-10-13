@@ -26,6 +26,23 @@ Four behaviours changed:
 
 The older layout, one `**Open PR:** #N` under each library heading, is unchanged.
 
+Three further behaviours changed:
+
+5. A test that passes on some runs and fails on others, across the three runs of one side, is called *flaky*. It is
+   written into the record and shown in the report, and the reason names it. It is not treated as a break caused by
+   the pull request. On its own it does not produce needs attention. If nothing else is wrong, the verdict is could
+   not verify, because a test that disagrees with itself is not evidence either way. A test that really passes on
+   the current code and fails on the pull request is still needs attention, even when a different test is flaky.
+6. Each daily run starts by downloading the latest `origin/main` and moving the checkout forward to that commit,
+   but only when that move is a fast-forward (a straight step forward, with no local commits that the remote does
+   not have). If the checkout has uncommitted edits, if the histories have split, or if the download fails, the run
+   stops and says why. The full commit id of that Proof-of-Change snapshot is stored on every record as `poc_commit`
+   and printed in the report header. The record check rejects a pull-request record that does not have it. Older
+   records stay valid against the shared schema, because the new field is optional there (schema revision 8).
+7. Text that a pull-request template puts in for the author to fill in is not a claim that behaviour stayed the
+   same. Unticked checklist lines (`- [ ]`), the stock instruction lines of a template, and HTML comments are
+   skipped. A ticked line (`- [x]`) is the author's own text and can still be a claim.
+
 Expected verdicts (a result written down ahead of time, used only to score the check afterwards) are still ignored
 while the check runs. Only the scorer reads them, and only from the standard line inside that pull request's own
 section (`Expected Proof-of-Change verdict`, followed by the verdict in backticks). A section that uses different
@@ -46,6 +63,18 @@ the pull request. Tests that already existed, and failed the same way on both si
 pre-existing. The new ones pushed the verdict to needs attention ("N new test(s) fail on the PR") even though the
 pull request did not break them. The environment simply did not have the module.
 
+A flaky test was also counted as a finding that needs attention. On a documentation-only change, one test that
+passed and failed across the three runs was enough to report needs attention, even though the pull request had not
+broken it. The right result is could not verify: the run cannot say the pull request is fine, and it also cannot
+say the pull request caused a break.
+
+A daily run could test with whatever commit happened to be checked out, including local edits, and the record did
+not say which Proof-of-Change commit produced it. A later reader could not tell which rules the verdict used.
+
+A checklist line left unticked, including the stock wording of a pull-request template, was read as the author
+claiming that behaviour stayed the same. That forced could not verify ("needs a probe") for a sentence the author
+did not write as a claim.
+
 ## Decision
 
 - Keep one reader for the chosen-PRs file. A library section is either the old single `**Open PR:**` entry or a
@@ -62,6 +91,15 @@ pull request did not break them. The environment simply did not have the module.
   failure goes back to the new-failure list, because the message was not caused by a missing install. When an old
   result is scored again and the environment is gone, a failure that was not confirmed at the time stays a new
   failure, so an old result is not quietly rewritten.
+- Do not pass a flaky test to the rule that turns every amber finding into needs attention. List it, name it in
+  the reason, and use could not verify when it is the only finding. Keep needs attention when a regression or a
+  new failing test is also present.
+- Fast-forward to `origin/main` before any selection or testing. Refuse a dirty tree, a split history, and a failed
+  download, each with a message that says which of those happened. Store the full commit id in `poc_commit` and in
+  the report header. Keep the field optional in the shared schema, and require it in the record check that runs
+  when a record is written.
+- When reading behaviour claims, skip unticked checklist items (and a following indented continuation), template
+  instruction lines, and HTML comments. Leave ticked checklist items in place.
 
 ## Alternatives and tradeoffs
 
@@ -79,6 +117,12 @@ pull request did not break them. The environment simply did not have the module.
 - Trusting the failure message without checking that the module is absent would mis-label a real bug that happens
   to raise `ModuleNotFoundError` for a module that is installed. The environment check prevents that on a live
   run. A later rescore cannot repeat the check, so it keeps the earlier decision.
+- Treating a flaky test as "the same as a pass" would let a documentation change come out verified while a test was
+  still disagreeing with itself. Could not verify says the comparison is incomplete, which is the honest result.
+- Resetting a split checkout onto `origin/main` would throw away local commits. Stopping is safer: the person
+  running the check decides what to do with that history.
+- Ignoring every checklist line, ticked or not, would also drop a claim the author checked on purpose. Only the
+  unticked lines, the template's own instructions, and HTML comments are skipped.
 
 ## What it means for you
 
@@ -92,3 +136,10 @@ pull request did not break them. The environment simply did not have the module.
   check should install it, then run the check again.
 - A test that passed before and fails on the pull request is still needs attention, even when the message names
   a module.
+- If the only problem is a flaky test, the verdict is could not verify and the reason names that test. It is still
+  listed in the record and the report. It does not, by itself, mean needs attention.
+- Run the daily check from a clean checkout of this repository. It moves that checkout forward to `origin/main`
+  and records the commit id. If it cannot, it stops and tells you whether the tree is dirty, the history has
+  split, or the download failed.
+- An unticked checklist line in a pull-request description is not read as a claim that results stayed the same.
+  A sentence the author actually wrote, including a ticked checklist line, still is.

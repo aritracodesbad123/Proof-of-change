@@ -235,8 +235,11 @@ def checks(rec: dict) -> list[list]:
                 "" if posted is False else "Stop and investigate: the run must never post."])
     flaky = (rec.get("comparison") or {}).get("flaky") or []
     if flaky:
-        out.append(["No flaky tests", "WARN", f"{len(flaky)} test(s) changed result between runs of the same side",
-                    "Read them under 'What changed'; a flaky test is not evidence either way."])
+        shown = ", ".join(f"`{t}`" for t in flaky[:5])
+        more = f" (+{len(flaky) - 5})" if len(flaky) > 5 else ""
+        out.append(["No flaky tests", "WARN",
+                    f"{len(flaky)} test(s) changed result between runs of the same side: {shown}{more}",
+                    "Listed for the record. A flaky test is not a regression and is not evidence either way."])
     cur, head = rec.get("current_head_sha"), rec.get("head_sha")
     if cur and head and cur != head:
         out.append(["PR unchanged since tested", "WARN", f"tested {head[:12]}, PR now at {cur[:12]}",
@@ -459,7 +462,10 @@ def build(rec: dict, prdir: Path, out_dir: Path, decision: dict | None = None) -
 
     R = Report()
     R.h(1, f"Reviewer report: {subject}")
-    R.p(f"Run `{run_id(rec)}`, tested {rec.get('tested_at_ist', '?')} by ops/daily_run.py (route {rec.get('route', '-')}). "
+    commit = rec.get("poc_commit")
+    commit_bit = f" Proof-of-Change commit `{commit}`." if commit else ""
+    R.p(f"Run `{run_id(rec)}`, tested {rec.get('tested_at_ist', '?')} by ops/daily_run.py (route {rec.get('route', '-')})."
+        f"{commit_bit} "
         f"Report generated {datetime.datetime.now(rv.IST).strftime('%Y-%m-%d %H:%M IST')} by reports/pr_report.py.", "meta")
     from ops.daily_run import BASELINE_TEXT
     bl = rec.get("baseline") or "full"

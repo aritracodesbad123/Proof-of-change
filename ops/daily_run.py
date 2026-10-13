@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Proof-of-Change daily run: tracked libraries -> new open PRs -> main-vs-PR test -> log + approver report.
 
-    python3 ops/daily_run.py                       # normal daily run
+    python3 ops/daily_run.py                       # normal daily run (fetches origin and fast-forwards to origin/main first)
     python3 ops/daily_run.py --select-only         # chosen PRs, print them, test nothing
     python3 ops/daily_run.py --max-per-library 3 --libraries numpy,pandas
     python3 ops/daily_run.py --pr https://github.com/pandas-dev/pandas/pull/12345   # check one PR (make check PR=...)
@@ -62,6 +62,7 @@ THREAD_ENV = {k: "1" for k in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_N
                                "VECLIB_MAXIMUM_THREADS", "BLIS_NUM_THREADS")}
 SCHEMA_PATH = REPO_ROOT / "harness" / "schema" / "observation.schema.json"
 WHO = "ops/daily_run.py"
+_COMMIT = re.compile(r"^[0-9a-f]{40}$")
 COMPILED_EXT = (".c", ".h", ".cpp", ".hpp", ".cc", ".cxx", ".pyx", ".pxd", ".pxi", ".tp", ".src", ".f", ".f90", ".cu")
 COMPILED_NAMES = ("meson.build", "meson.options", "meson_options.txt", "setup.py", "pyproject.toml")
 
@@ -1283,7 +1284,11 @@ def tests_verdict(cmp: dict | None, cnv_reason: str | None, exits: dict | None =
       6. unexplained pytest exit codes -> could not verify;
       7. new/changed tests skipped, or new tests that fail only because an optional dependency is missing
          -> could not verify (never needs attention);
-      8. otherwise poc.verdict.pr_verdict."""
+      8. flaky tests, and nothing else that needs attention -> could not verify, naming those tests.
+         A test that passes and fails across the 3 runs of one side is listed. It is not a regression and
+         does not, on its own, produce needs attention. Flaky labels are not passed to pr_verdict, because
+         that rule treats every amber finding as needs attention (probes still use that rule);
+      9. otherwise poc.verdict.pr_verdict."""
     if cnv_reason:
         return Verdict.COULD_NOT_VERIFY.value, cnv_reason, []
     deps = sorted({d["module"] for d in cmp.get("skipped_missing_dependency", [])})
@@ -1305,7 +1310,9 @@ def tests_verdict(cmp: dict | None, cnv_reason: str | None, exits: dict | None =
     if cmp["new_tests_failing"]:
         bits.append(f"{len(cmp['new_tests_failing'])} new test(s) fail on the PR")
     if cmp["flaky"]:
-        bits.append(f"{len(cmp['flaky'])} flaky test(s)")
+        shown = ", ".join(cmp["flaky"][:5])
+        more = f" (+{len(cmp['flaky']) - 5})" if len(cmp["flaky"]) > 5 else ""
+        bits.append(f"{len(cmp['flaky'])} flaky test(s): {shown}{more}")
     if cmp["removed_tests"]:
         bits.append(f"{len(cmp['removed_tests'])} test(s) removed on the PR side")
     if cmp["other_changes"]:
@@ -1334,10 +1341,13 @@ def tests_verdict(cmp: dict | None, cnv_reason: str | None, exits: dict | None =
         bits.append(load_failure_text(x, "main"))
     reason = "; ".join(bits)
     fl = [f.value for f in findings]
+    # Flaky is amber, and pr_verdict turns every amber finding into needs attention. A flaky test is listed
+    # (comparison["flaky"] and the label above) but must not, on its own, produce that verdict.
+    verdict_findings = [f for f in findings if f is not FindingLabel.FLAKY]
     cnv = Verdict.COULD_NOT_VERIFY.value
     if cmp["regressions"] or cmp["new_tests_failing"]:
         v = pr_verdict(RunSummary(build_ok=True, claims=[Claim("tests", testable=True, probed=True, proven=True)],
-                                  findings=findings))
+                                  findings=verdict_findings))
         return v.value, reason + (f"; {dep_note}" if dep_note else ""), fl
     if nothing_ran:
         where = ("on either side" if ran_main == 0 and ran_pr == 0 else "on main" if ran_main == 0 else "on the PR side")
@@ -1355,7 +1365,9 @@ def tests_verdict(cmp: dict | None, cnv_reason: str | None, exits: dict | None =
     if dep_note:
         return cnv, f"not fully verified: {dep_note} ({reason})", fl
     v = pr_verdict(RunSummary(build_ok=True, claims=[Claim("tests", testable=True, probed=True, proven=True)],
-                              findings=findings))
+                              findings=verdict_findings))
+    if cmp["flaky"] and v == Verdict.VERIFIED:
+        return cnv, f"could not verify: {reason}", fl
     return v.value, reason, fl
 
 
@@ -1570,6 +1582,9 @@ def new_record(repo: str, cfg: dict, item: dict, a, machine: dict, run_date: str
                               "note": getattr(a, "model_note", None) or "model provider: none: fixed probes only",
                               "blind": bool(getattr(getattr(a, "provider", None), "blind", False))},
            "posted_upstream": False, "logs": f"{cfg['pkg']}-{item['pr']}/", "freeze": {}}
+    sha = getattr(a, "poc_commit", None)
+    if isinstance(sha, str) and _COMMIT.fullmatch(sha):
+        rec["poc_commit"] = sha
     rec["route"] = ("source-pair" if not cfg.get("nightly") else
                     "source-build" if item["files"]["compiled"] else "nightly+patch")
     for k in ("head_moved", "current_head_sha", "frozen_from", "state", "mergeable", "mergeable_state"):
@@ -1724,7 +1739,7 @@ def finish(rec: dict, prdir: Path, work: Path, t0: float) -> dict:
                          "tests": round(sum(e.get("seconds") or 0 for e in rec.get("per_run", [])), 1)}
     if rec.get("pr_side", {}).get("build_seconds") is not None:
         rec["duration_s"]["build"] = rec["pr_side"]["build_seconds"]
-    errs = validate_record(rec)
+    errs = check_record(rec)
     if errs:
         rec["schema_errors"] = errs[:20]
     shutil.rmtree(work, ignore_errors=True)
@@ -1738,6 +1753,24 @@ def validate_record(rec: dict) -> list[str]:
         return validate(rec, json.loads(SCHEMA_PATH.read_text()))
     except FileNotFoundError:
         return [f"schema not found at {SCHEMA_PATH}"]
+
+
+def check_record(rec: dict) -> list[str]:
+    """The record check: the shared schema, plus poc_commit on a pr_run record.
+
+    poc_commit is optional in the schema so a record written before rev 8 still validates. A record this run
+    writes must name the Proof-of-Change commit it used (the full SHA of origin/main after the fast-forward).
+    A missing or malformed value fails this check."""
+    errs = validate_record(rec)
+    if not isinstance(rec, dict) or rec.get("record_kind") != "pr_run":
+        return errs
+    sha = rec.get("poc_commit")
+    rid = rec.get("id", "<no id>")
+    if not isinstance(sha, str) or not sha:
+        errs.append(f"{rid}: missing poc_commit (the Proof-of-Change commit this run used)")
+    elif not _COMMIT.fullmatch(sha):
+        errs.append(f"{rid}: poc_commit must be the 40-character commit the run used, got {sha!r}")
+    return errs
 
 
 def test_source_pair(repo: str, cfg: dict, item: dict, prdir: Path, work: Path, a, rec: dict) -> dict:
@@ -2023,7 +2056,7 @@ def write_report(rdir: Path, meta: dict, records: list[dict], skipped: dict, pro
     md = [f"# Proof-of-Change daily ops run: {meta['date']}", "",
           f"Started {meta['started_ist']}, finished {meta['finished_ist']}, wall time {meta['wall_min']} min. "
           f"Machine: {meta['machine']}. GitHub API calls: {meta['api_calls']} ({meta['auth']}). "
-          f"Runner: ops/daily_run.py @ {meta.get('git', '?')}.", "",
+          f"Runner: ops/daily_run.py. Proof-of-Change commit: `{meta.get('poc_commit') or 'not recorded'}`.", "",
           f"## Recommendation: **{rec}**", "",
           "The recommendation is about whether this run can be trusted, not about merging any PR. Verdicts never block merges.", "",
           "| PR | Title | Route | Verdict | Reason |", "|---|---|---|---|---|"] + [line(r) for r in records] + [""]
@@ -2196,6 +2229,62 @@ def pick_verification_file(folder: Path) -> Path:
     return rev5[-1] if rev5 else folder / "verification.jsonl"
 
 
+def _git(root: Path, *args: str) -> subprocess.CompletedProcess:
+    return subprocess.run(["git", "-C", str(root), *args], capture_output=True, text=True)
+
+
+def sync_to_origin_main(root: Path | None = None) -> str:
+    """Fetch origin and fast-forward this checkout to origin/main. Return that commit's full SHA.
+
+    Stops (SystemExit) when the work tree has uncommitted changes, when local history has diverged from
+    origin/main so a fast-forward is impossible, or when the fetch itself fails. A daily run calls this
+    before it selects or tests anything, so every record is produced by one known Proof-of-Change commit.
+    """
+    root = root or REPO_ROOT
+    status = _git(root, "status", "--porcelain")
+    if status.returncode != 0:
+        detail = (status.stderr or status.stdout).strip()
+        raise SystemExit("Stopped: could not read the git status of this checkout"
+                         + (f": {detail}" if detail else "") + ".")
+    if status.stdout.strip():
+        raise SystemExit("Stopped: the checkout has uncommitted changes, so it cannot be fast-forwarded to "
+                         "origin/main. Commit or discard them, then run again.")
+    fetch = _git(root, "fetch", "--no-tags", "origin", "main")
+    if fetch.returncode != 0:
+        detail = (fetch.stderr or fetch.stdout).strip()
+        raise SystemExit("Stopped: fetching origin main failed" + (f": {detail}" if detail else "") + ".")
+    branch = _git(root, "rev-parse", "--abbrev-ref", "HEAD")
+    if branch.returncode != 0:
+        detail = (branch.stderr or branch.stdout).strip()
+        raise SystemExit("Stopped: could not read the current branch" + (f": {detail}" if detail else "") + ".")
+    if branch.stdout.strip() != "main":
+        has_main = _git(root, "show-ref", "--verify", "--quiet", "refs/heads/main")
+        if has_main.returncode != 0:
+            switched = _git(root, "checkout", "--quiet", "-b", "main", "origin/main")
+        else:
+            switched = _git(root, "checkout", "--quiet", "main")
+        if switched.returncode != 0:
+            detail = (switched.stderr or switched.stdout).strip()
+            raise SystemExit("Stopped: could not check out main in order to fast-forward to origin/main"
+                             + (f": {detail}" if detail else "") + ".")
+    head = _git(root, "rev-parse", "HEAD").stdout.strip()
+    origin_sha = _git(root, "rev-parse", "origin/main").stdout.strip()
+    if not _COMMIT.fullmatch(origin_sha):
+        raise SystemExit("Stopped: origin/main is not a commit after the fetch.")
+    if _git(root, "merge-base", "--is-ancestor", "HEAD", "origin/main").returncode != 0:
+        raise SystemExit("Stopped: cannot fast-forward to origin/main; the local history has diverged "
+                         f"(HEAD {head[:12]}, origin/main {origin_sha[:12]}).")
+    forward = _git(root, "merge", "--ff-only", "origin/main")
+    if forward.returncode != 0:
+        detail = (forward.stderr or forward.stdout).strip()
+        raise SystemExit("Stopped: cannot fast-forward to origin/main; the local history has diverged"
+                         + (f": {detail}" if detail else "") + ".")
+    got = _git(root, "rev-parse", "HEAD").stdout.strip()
+    if got != origin_sha or not _COMMIT.fullmatch(got):
+        raise SystemExit("Stopped: the checkout is not at origin/main after the fast-forward.")
+    return got
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--libraries-file", default=None,
@@ -2262,6 +2351,7 @@ def main(argv=None) -> int:
     ap.add_argument("--ids", default=None, help="with --bench: comma-separated case IDs (default: all), e.g. B01,B14")
     ap.add_argument("--bench-out", default=None, help="with --bench: result folder (default: runs/bench-v0)")
     a = ap.parse_args(argv)
+    a.poc_commit = sync_to_origin_main(REPO_ROOT)
     sandbox.configure(not a.unsafe_no_sandbox)
     a.provider, a.model_note = model_provider.select(
         a.model_provider, models={"claims": a.claims_model, "probes": a.probe_model},
@@ -2380,9 +2470,6 @@ def main(argv=None) -> int:
     if not single:  # a one-off check never changes what the daily run selects
         seen_path.write_text(json.dumps(seen, indent=1))
     finished = now_ist()
-    git = subprocess.run(["git", "-C", REPO_ROOT, "rev-parse", "--short", "HEAD"], capture_output=True, text=True).stdout.strip()
-    dirty = subprocess.run(["git", "-C", REPO_ROOT, "status", "--porcelain", "--", "ops", "poc", "harness"],
-                           capture_output=True, text=True).stdout.strip()
     meta = {"date": rdir.name, "started_ist": started.strftime("%Y-%m-%d %H:%M IST"),
             "finished_ist": finished.strftime("%Y-%m-%d %H:%M IST"),
             "wall_min": round((finished - started).total_seconds() / 60, 1), "runs": a.runs,
@@ -2390,7 +2477,7 @@ def main(argv=None) -> int:
             "api_calls": gh.calls, "auth": "token" if gh.token else "unauthenticated",
             "sandbox": (sandbox.check()[1] + " (bwrap: per-side filesystem, no network outside installs)"
                         if sandbox.enabled() else "DISABLED (--unsafe-no-sandbox)"),
-            "git": git + (" (with uncommitted changes)" if dirty else ""),
+            "git": a.poc_commit, "poc_commit": a.poc_commit,
             "baseline": a.baseline, "model_provider": a.model_note}
     (rdir / "run_meta.json").write_text(json.dumps(meta | {"problems": problems}, indent=1))
     # Expectations and independent verification are read only now, after every verdict above is final.
@@ -2463,7 +2550,7 @@ def migrate_record(rec: dict, rdir: Path, redo: bool = False) -> dict:
     out = rejudge(out, rdir / (out.get("logs") or "").strip("/")) if redo and out.get("logs") else gate(out)
     if out.get("record_kind") == "pr_run":
         out.pop("schema_errors", None)
-        errs = validate_record(out)
+        errs = check_record(out)
         if errs:
             out["schema_errors"] = errs[:20]
     return out

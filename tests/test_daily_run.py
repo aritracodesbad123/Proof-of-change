@@ -1,5 +1,8 @@
 import importlib.util
+import subprocess
 from pathlib import Path
+
+import pytest
 
 ROOT = Path(__file__).parent.parent
 spec = importlib.util.spec_from_file_location("daily_run", ROOT / "ops" / "daily_run.py")
@@ -520,3 +523,151 @@ def test_rejudge_keeps_unconfirmed_import_failures_as_breaks(tmp_path):
     assert kept["comparison"]["new_tests_failing"] == []
     assert [d["test"] for d in kept["comparison"]["skipped_missing_dependency"]] == ["m::test_new"]
     assert kept["verdict"] == "could_not_verify" and "not installed" in kept["reason"]
+
+
+# ---------------------------------------------------------------- flaky tests are listed, and are not a regression (numpy #32992)
+DOC_ONLY = {"all": ["doc/source/reference/routines.io.rst"], "package_py": [], "compiled": [],
+            "other": ["doc/source/reference/routines.io.rst"]}
+NPZ = "numpy/lib/tests/test_io.py::test_npz_docs"
+
+
+def _flaky_sides(main_runs, pr_runs):
+    return dr.compare_sides({"main": main_runs, "pr": pr_runs})
+
+
+def test_numpy_32992_docs_only_flaky_test_is_could_not_verify():
+    """A documentation-only pull request with one test that passes and fails across the 3 runs (numpy #32992)."""
+    from poc import coverage_gate
+    passed = {NPZ: ("passed", "")}
+    failed = {NPZ: ("failed", "intermittent")}
+    cmp = _flaky_sides([passed] * 3, [passed, failed, passed])
+    assert cmp["flaky"] == [NPZ] and cmp["regressions"] == [] and cmp["new_tests_failing"] == []
+    v, reason, labels = dr.verdict_for(cmp, None, None, DOC_ONLY)
+    assert v == "could_not_verify"
+    assert NPZ in reason and "flaky" in reason
+    assert "flaky" in labels
+    gated = coverage_gate.apply({"verdict": v, "reason": reason, "files": DOC_ONLY, "comparison": cmp})
+    assert gated["verdict"] == "could_not_verify"
+    # The same test disagreeing with itself on main is also flaky, not a regression.
+    cmp_main = _flaky_sides([passed, failed, passed], [passed] * 3)
+    assert cmp_main["flaky"] == [NPZ]
+    v_main, reason_main, _ = dr.verdict_for(cmp_main, None, None, DOC_ONLY)
+    assert v_main == "could_not_verify" and NPZ in reason_main
+
+
+def test_flaky_test_does_not_hide_a_real_regression():
+    reg = "numpy/lib/tests/test_io.py::test_real"
+    main = {NPZ: ("passed", ""), reg: ("passed", "")}
+    pr = [{NPZ: ("passed", ""), reg: ("failed", "boom")},
+          {NPZ: ("failed", "intermittent"), reg: ("failed", "boom")},
+          {NPZ: ("passed", ""), reg: ("failed", "boom")}]
+    cmp = _flaky_sides([main] * 3, pr)
+    assert cmp["regressions"] == [reg] and cmp["flaky"] == [NPZ]
+    v, reason, _ = dr.verdict_for(cmp, None, None, DOC_ONLY)
+    assert v == "needs_attention" and "pass on main but fail on the PR" in reason and NPZ in reason
+
+
+def test_report_lists_a_flaky_test_and_the_header_names_the_commit(tmp_path):
+    from ops.daily_run import write_report
+    sha = "ab" * 20
+    rec = _pr_record(author="a", updated_at_ist="x", ci_state="none", ci_detail="-", poc_commit=sha,
+                     verdict="could_not_verify",
+                     reason=f"could not verify: 1 flaky test(s): {NPZ}",
+                     comparison={"flaky": [NPZ], "regressions": [], "new_tests_failing": [], "removed_tests": [],
+                                 "other_changes": []},
+                     files=DOC_ONLY)
+    meta = {"date": "2026-10-13", "started_ist": "s", "finished_ist": "f", "wall_min": 1, "runs": 3, "machine": "m",
+            "api_calls": 0, "auth": "none", "poc_commit": sha}
+    md = write_report(tmp_path, meta, [rec], {}, []).read_text()
+    header = md.split("##", 1)[0]
+    assert f"Proof-of-Change commit: `{sha}`" in header
+    assert NPZ in md and "**could_not_verify**" in md
+
+
+def test_record_check_fails_a_pr_run_without_poc_commit():
+    from ops.schema_check import validate
+    bare = _pr_record()
+    assert validate(bare, SCHEMA) == []                       # schema rev 8 leaves the field optional
+    errs = dr.check_record(bare)
+    assert any("missing poc_commit" in e for e in errs)
+    bad = _pr_record(poc_commit="not-a-commit")
+    assert any("poc_commit" in e for e in validate(bad, SCHEMA))
+    assert any("40-character" in e for e in dr.check_record(bad))
+    sha = "cd" * 20
+    assert dr.check_record(_pr_record(poc_commit=sha)) == []
+    obs = _json.loads((DAY1 / "observation-golden-clean-sklearn.json").read_text())
+    assert dr.check_record(obs) == []                         # an observation record does not carry poc_commit
+
+
+def test_new_record_stores_the_commit_the_run_used():
+    from types import SimpleNamespace
+    sha = "ef" * 20
+    item = {"pr": 32992, "title": "DOC: clarify NpzFile", "url": "https://github.com/numpy/numpy/pull/32992",
+            "author": "a", "head_sha": "a" * 40, "base_sha": "b" * 40, "base_ref": "main",
+            "updated_at_utc": "2026-10-12T20:03:29Z", "updated_at_ist": "2026-10-13 01:33 IST",
+            "ci_state": "none", "ci_detail": "-", "files": DOC_ONLY}
+    a = SimpleNamespace(runs=3, workers="4", test_timeout=120, run_timeout=900, build_timeout=1800, python="3.12",
+                        python_full="3.12.15", poc_commit=sha, baseline="full")
+    rec = dr.new_record("numpy/numpy", {"dist": "numpy", "pkg": "numpy", "nightly": True}, item, a,
+                        {"arch": "x86_64", "os": "Linux"}, "2026-10-13")
+    assert rec["poc_commit"] == sha
+    missing = dr.new_record("numpy/numpy", {"dist": "numpy", "pkg": "numpy", "nightly": True}, item,
+                            SimpleNamespace(runs=3, workers="4", test_timeout=120, run_timeout=900, build_timeout=1800,
+                                            python="3.12"),
+                            {"arch": "x86_64", "os": "Linux"}, "2026-10-13")
+    assert "poc_commit" not in missing
+
+
+def _git(repo, *args):
+    cp = subprocess.run(["git", "-C", str(repo), *args], capture_output=True, text=True)
+    if cp.returncode != 0:
+        raise AssertionError(f"git {' '.join(args)} failed: {cp.stderr}")
+    return cp.stdout.strip()
+
+
+def _origin_and_clone(tmp_path):
+    origin = tmp_path / "origin"
+    origin.mkdir()
+    _git(origin, "init", "-b", "main")
+    _git(origin, "config", "user.email", "proof-of-change@users.noreply.github.com")
+    _git(origin, "config", "user.name", "Proof-of-Change")
+    (origin / "README").write_text("one\n")
+    _git(origin, "add", "README")
+    _git(origin, "commit", "-m", "one")
+    clone = tmp_path / "clone"
+    subprocess.run(["git", "clone", str(origin), str(clone)], check=True, capture_output=True, text=True)
+    _git(clone, "config", "user.email", "proof-of-change@users.noreply.github.com")
+    _git(clone, "config", "user.name", "Proof-of-Change")
+    return origin, clone
+
+
+def test_daily_run_fast_forwards_to_origin_main(tmp_path):
+    origin, clone = _origin_and_clone(tmp_path)
+    (origin / "README").write_text("two\n")
+    _git(origin, "add", "README")
+    _git(origin, "commit", "-m", "two")
+    _git(clone, "checkout", "-b", "feature")
+    sha = dr.sync_to_origin_main(clone)
+    assert sha == _git(origin, "rev-parse", "HEAD")
+    assert _git(clone, "rev-parse", "HEAD") == sha
+    assert _git(clone, "rev-parse", "--abbrev-ref", "HEAD") == "main"
+    assert dr.sync_to_origin_main(clone) == sha                         # already there: still that commit
+
+
+def test_daily_run_stops_when_it_cannot_fast_forward(tmp_path):
+    origin, clone = _origin_and_clone(tmp_path)
+    (clone / "README").write_text("dirty\n")
+    with pytest.raises(SystemExit, match="uncommitted changes"):
+        dr.sync_to_origin_main(clone)
+    _git(clone, "checkout", "--", "README")
+    (clone / "local-only").write_text("x\n")
+    _git(clone, "add", "local-only")
+    _git(clone, "commit", "-m", "local only")
+    (origin / "remote-only").write_text("y\n")
+    _git(origin, "add", "remote-only")
+    _git(origin, "commit", "-m", "remote only")
+    with pytest.raises(SystemExit, match="diverged"):
+        dr.sync_to_origin_main(clone)
+    _git(clone, "remote", "set-url", "origin", str(tmp_path / "missing.git"))
+    with pytest.raises(SystemExit, match="fetching origin main failed"):
+        dr.sync_to_origin_main(clone)
