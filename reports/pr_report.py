@@ -32,7 +32,7 @@ CATEGORIES = [  # comparison key, plain-English label, how bad
     ("other_changes", "changed result in another way (for example passed -> skipped)", "check"),
     ("flaky", "gave different results between the 3 runs of the same side (flaky)", "note"),
     ("fixed", "fail on main and pass on the PR", "good"),
-    ("skipped_missing_dependency", "are new or changed but were skipped because an optional module is missing",
+    ("skipped_missing_dependency", "are new or changed but did not run because an optional module is missing",
      "check"),
     ("reparametrized", "were re-parametrized (same test, new parameter ids; not counted as removed)", "note"),
     ("load_failed_pr", "fail to load on the PR side only (their tests no longer run)", "check"),
@@ -201,7 +201,7 @@ def checks(rec: dict) -> list[list]:
     if changed or unchanged:
         out.append(["Optional modules installed", "WARN",
                     "; ".join(x for x in [
-                        ("new/changed tests skipped: " + ", ".join(f"{m} ({n})" for m, n in changed.items())) if changed else "",
+                        ("new/changed tests blocked: " + ", ".join(f"{m} ({n})" for m, n in changed.items())) if changed else "",
                         ("unchanged tests skipped on both sides: " + ", ".join(f"{m} ({n})" for m, n in unchanged.items()))
                         if unchanged else ""] if x),
                     "Add the module(s) to optional_test_deps for this library in ops/daily_run.py and run again."])
@@ -531,7 +531,7 @@ def build(rec: dict, prdir: Path, out_dir: Path, decision: dict | None = None) -
     changed, unchanged = dependency_gaps(rec, prdir)
     if changed or unchanged:
         R.h(2, "Missing optional modules", "optional")
-        R.bullets(([f"{n} new/changed test(s) skipped because `{m}` is not installed: the change was not exercised "
+        R.bullets(([f"{n} new/changed test(s) did not run because `{m}` is not installed: the change was not exercised "
                     "(could not verify)." for m, n in changed.items()]) +
                   [f"{n} unchanged test(s) skipped on both sides because `{m}` is not installed (coverage gap, verdict "
                    "unaffected)." for m, n in sorted(unchanged.items(), key=lambda kv: -kv[1])])

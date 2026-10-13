@@ -145,6 +145,8 @@ def test_fix2_missing_dependency_messages():
     assert missing_dependency("pytest.skip: Could not import 'scipy'") == "scipy"
     assert missing_dependency("pytest.skip: could not import 'pyarrow': No module named 'pyarrow'") == "pyarrow"
     assert missing_dependency("pytest.skip: requires pyarrow") == "pyarrow"
+    assert missing_dependency("ModuleNotFoundError: No module named 'pandas'") == "pandas"
+    assert missing_dependency("ImportError: No module named 'pandas.core'") == "pandas"
     assert missing_dependency("pytest.xfail: EA.fillna does not handle 'linear' method") is None
     assert missing_dependency("pytest.skip: not relevant on windows") is None
 
@@ -361,3 +363,160 @@ def test_unchanged_dependency_skips_reported_not_scored(tmp_path):
         '<testsuite><testcase classname="m" name="a"><skipped type="pytest.skip" message="Could not import \'torch\'"/>'
         '</testcase><testcase classname="m" name="b"/></testsuite>')
     assert unchanged_dependency_skips(tmp_path, {}) == {"torch": 1}
+
+
+# ---------------------------------------------------------------- chosen-PRs file: several PRs, plain `- Test:` lines, *_test.py names
+CHOSEN_FIXTURE = _Path(__file__).parent / "fixtures" / "chosen" / "day.md"
+PANDAS_MISSING = "ModuleNotFoundError: No module named 'pandas'"
+
+
+def _sides(main, pr):
+    return {"main": [main] * 3, "pr": [pr] * 3}
+
+
+def _per_run(main_exit, pr_exit):
+    return [{"side": side, "run": i, "exit": main_exit if side == "old" else pr_exit}
+            for i in (1, 2, 3) for side in ("old", "new")]
+
+
+def test_parse_chosen_fixture_keeps_old_format_and_subsections():
+    chosen = dr.parse_chosen(CHOSEN_FIXTURE)
+    assert "expected" not in str(chosen).lower()
+    old = chosen["acme/widget"][0]
+    assert old["pr"] == 12 and old["head_sha"].startswith("0123")
+    assert old["test_cmd"].startswith("pytest tests/test_a.py")
+    assert dr.chosen_test_targets(old) == ["tests/test_a.py", "tests/test_b.py"]
+    nw = chosen["narwhals-dev/narwhals"][0]
+    assert nw["pr"] == 4062 and nw["head_sha"] == "a" * 40
+    assert nw["test_cmd"] == "pytest tests/expr_and_series/division_by_zero_test.py"
+    assert dr.chosen_test_targets(nw) == ["tests/expr_and_series/division_by_zero_test.py"]
+    assert nw["install"] == 'pip install -e ".[dev]"'
+    nxs = {x["pr"]: x for x in chosen["networkx/networkx"]}
+    assert set(nxs) == {8946, 8862}
+    assert nxs[8946]["head_sha"] == "56e4499e8f61da4180e2451e8140acf459cf95cc"
+    assert nxs[8862]["head_sha"] == "636941793808cba5f84239470afcac2cf336b3eb"
+    assert nxs[8946]["install"] == nxs[8862]["install"] == 'pip install -e ".[test]" pytest'
+    exp = dr.read_expectations(CHOSEN_FIXTURE)
+    assert exp[("acme/widget", 12)] == "needs_attention"
+    assert exp[("narwhals-dev/narwhals", 4062)] == "verified"
+    assert exp[("networkx/networkx", 8946)] == "verified"
+    assert ("networkx/networkx", 8862) not in exp   # non-standard line must not borrow the primary verdict
+
+
+def test_subsection_install_overrides_the_preamble(tmp_path):
+    p = tmp_path / "c.md"
+    p.write_text("""## 1. demo
+- **Repo:** https://github.com/acme/widget
+- Install: `pip install -e .`
+- Test: `pytest tests/test_shared.py`
+### Primary PR: #1, "a"
+  - Head SHA: `1111111111111111111111111111111111111111`
+### Secondary PR: #2, "b"
+  - Head SHA: `2222222222222222222222222222222222222222`
+  - Install: `pip install -e ".[x]"`
+- Test (subset, fast): `pytest tests/test_own.py`
+""")
+    rows = {x["pr"]: x for x in dr.parse_chosen(p)["acme/widget"]}
+    assert rows[1]["head_sha"].startswith("1111") and rows[1]["install"] == "pip install -e ."
+    assert rows[1]["test_cmd"] == "pytest tests/test_shared.py"
+    assert rows[2]["install"] == 'pip install -e ".[x]"'
+    assert rows[2]["test_cmd"] == "pytest tests/test_own.py"
+    assert dr.read_expectations(p) == {}
+
+
+def test_map_repo_tests_finds_suffix_test_files(tmp_path):
+    for rel in ("tests/expr_and_series/division_by_zero_test.py", "tests/test_graph.py", "tests/graph_test.py",
+                "a/test_item.py", "b/test_item.py", "c/item_test.py", "pkg/division_by_zero.py", "pkg/graph.py",
+                "pkg/item.py"):
+        f = tmp_path / rel
+        f.parent.mkdir(parents=True, exist_ok=True)
+        f.write_text("")
+    touched = dr.map_repo_tests({"all": ["tests/expr_and_series/division_by_zero_test.py"], "package_py": []}, tmp_path)
+    assert touched == ["tests/expr_and_series/division_by_zero_test.py"]
+    by_stem = dr.map_repo_tests({"all": ["pkg/division_by_zero.py"], "package_py": ["pkg/division_by_zero.py"]}, tmp_path)
+    assert by_stem == ["tests/expr_and_series/division_by_zero_test.py"]
+    prefix = dr.map_repo_tests({"all": ["tests/test_graph.py"], "package_py": []}, tmp_path)
+    assert prefix == ["tests/test_graph.py"]
+    both = dr.map_repo_tests({"all": ["pkg/graph.py"], "package_py": ["pkg/graph.py"]}, tmp_path)
+    assert both == ["tests/test_graph.py", "tests/graph_test.py"]
+    capped = dr.map_repo_tests({"all": ["pkg/item.py"], "package_py": ["pkg/item.py"]}, tmp_path)
+    assert capped == ["a/test_item.py", "b/test_item.py"]   # two test_*.py hits fill the per-file cap
+
+
+def test_new_import_failures_are_blocked_not_breaks():
+    old, new1, new2 = ("m::test_old[pandas]", "m::test_new[pandas-0]", "m::test_new[pandas-1]")
+    ok = "m::test_ok"
+    main = {old: ("failed", PANDAS_MISSING), ok: ("passed", "")}
+    pr = {old: ("failed", PANDAS_MISSING), ok: ("passed", ""), new1: ("failed", PANDAS_MISSING),
+          new2: ("error", "requires pyarrow")}
+    res = _sides(main, pr)
+    cmp = dr.compare_sides(res)
+    assert cmp["new_tests_failing"] == []
+    assert {d["test"]: d["module"] for d in cmp["skipped_missing_dependency"]} == {new1: "pandas", new2: "pyarrow"}
+    assert cmp["preexisting_failures"] == [old]
+    v, reason, _ = dr.verdict_for(cmp, None, dr.exit_check(_per_run(1, 1), res, cmp))
+    assert v == "could_not_verify"
+    assert "not installed" in reason and "pandas" in reason and "pyarrow" in reason
+    assert "new test(s) fail" not in reason and "not explained" not in reason
+
+
+def test_real_new_failure_and_import_regression_still_need_attention():
+    bug, reg = "m::test_bug", "m::test_reg"
+    main = {reg: ("passed", ""), "m::test_ok": ("passed", "")}
+    pr = {reg: ("failed", PANDAS_MISSING), "m::test_ok": ("passed", ""), bug: ("failed", "AssertionError: expected 1")}
+    res = _sides(main, pr)
+    cmp = dr.compare_sides(res)
+    assert cmp["regressions"] == [reg] and cmp["new_tests_failing"] == [bug]
+    assert cmp["skipped_missing_dependency"] == []
+    v, reason, _ = dr.verdict_for(cmp, None, dr.exit_check(_per_run(0, 1), res, cmp))
+    assert v == "needs_attention" and "new test(s) fail" in reason and "pass on main but fail" in reason
+
+
+def test_confirm_missing_checks_the_environment(monkeypatch, tmp_path):
+    from types import SimpleNamespace
+    new = "m::test_new"
+    blocked = dr.compare_sides(_sides({}, {new: ("failed", PANDAS_MISSING)}))
+    monkeypatch.setattr(dr, "in_side", lambda *a, **k: SimpleNamespace(returncode=0))
+    dr.confirm_missing(blocked, tmp_path)
+    assert [d["test"] for d in blocked["skipped_missing_dependency"]] == [new]
+    assert blocked["new_tests_failing"] == []
+    restored = dr.compare_sides(_sides({}, {new: ("failed", PANDAS_MISSING)}))
+    monkeypatch.setattr(dr, "in_side", lambda *a, **k: SimpleNamespace(returncode=1))
+    dr.confirm_missing(restored, tmp_path)
+    assert restored["skipped_missing_dependency"] == [] and restored["new_tests_failing"] == [new]
+    assert restored["messages"][new] == PANDAS_MISSING
+    skipped = dr.compare_sides(_sides({"m::t": ("passed", "")}, {"m::t": ("skipped", "pytest.skip: requires pyarrow")}))
+    dr.confirm_missing(skipped, tmp_path)
+    assert skipped["new_tests_failing"] == [] and skipped["skipped_missing_dependency"] == []
+    assert any("pyarrow" in x and "installed" in x for x in skipped["other_changes"])
+
+
+def _junit(cases):
+    parts = []
+    for cls, name, kind, message in cases:
+        if kind == "passed":
+            parts.append(f'<testcase classname="{cls}" name="{name}"/>')
+        else:
+            parts.append(f'<testcase classname="{cls}" name="{name}"><failure message="{message}"/></testcase>')
+    return "<testsuite>" + "".join(parts) + "</testsuite>"
+
+
+def test_rejudge_keeps_unconfirmed_import_failures_as_breaks(tmp_path):
+    prdir = tmp_path / "pr"
+    prdir.mkdir()
+    (prdir / "junit-main-1.xml").write_text(_junit([("m", "test_ok", "passed", "")]))
+    (prdir / "junit-pr-1.xml").write_text(_junit([("m", "test_ok", "passed", ""),
+                                                  ("m", "test_new", "failed", PANDAS_MISSING)]))
+    base = {"runs_per_side": 1, "per_run": [{"side": "old", "run": 1, "exit": 0}, {"side": "new", "run": 1, "exit": 1}],
+            "files": {"all": ["pkg/a.py"], "package_py": ["pkg/a.py"], "compiled": []}}
+    fresh = dr.rejudge(base | {"comparison": {"skipped_missing_dependency": []}, "verdict": "needs_attention",
+                               "reason": "1 new test(s) fail on the PR"}, prdir)
+    assert fresh["comparison"]["new_tests_failing"] == ["m::test_new"]
+    assert fresh["comparison"]["skipped_missing_dependency"] == []
+    assert fresh["verdict"] == "needs_attention"
+    kept = dr.rejudge(base | {"comparison": {"skipped_missing_dependency": [
+        {"test": "m::test_new", "module": "pandas", "main": "absent"}]}, "verdict": "could_not_verify",
+        "reason": "not fully verified: missing pandas"}, prdir)
+    assert kept["comparison"]["new_tests_failing"] == []
+    assert [d["test"] for d in kept["comparison"]["skipped_missing_dependency"]] == ["m::test_new"]
+    assert kept["verdict"] == "could_not_verify" and "not installed" in kept["reason"]

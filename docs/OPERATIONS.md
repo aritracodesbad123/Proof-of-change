@@ -79,8 +79,9 @@ Verdict, in order:
 5. `could_not_verify` if a test module of the changed code (`test_<stem>.py` of a changed source file, or a changed
    test file; every module when the changed files are unknown) fails to load on both sides, even if unrelated tests
    pass;
-6. `could_not_verify` if an exit code is unexplained, or new/changed tests were skipped because an optional
-   dependency is missing;
+6. `could_not_verify` if an exit code is unexplained, or new/changed tests were skipped or failed only because
+   an optional dependency is missing (a new test whose failure is `ModuleNotFoundError: No module named 'X'`,
+   or another missing-dependency message the comparison already recognises, is blocked, not a pull-request break);
 7. otherwise `needs_attention` for tests missing on the PR side or other outcome changes, `verified` if nothing differs.
 
 Then the coverage gate. The reason says how many tests ran on each side, how many were unchanged (and how many of

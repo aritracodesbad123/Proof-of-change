@@ -241,8 +241,77 @@ def select_prs(gh: GitHub, repo: str, cfg: dict, seen: dict, last_run_utc: str |
 
 
 # ---------------------------------------------------------------- chosen PRs
+_SECTION_RE = re.compile(r"(?m)^## \d+\. ")
+_PR_HEADING_RE = re.compile(r"(?m)^### .*?#(\d+)")
+_OPEN_PR_RE = re.compile(r"\*\*Open PR:\*\* #(\d+)")
+_REPO_RE = re.compile(r"https://github\.com/([\w.-]+/[\w.-]+)")
+_HEAD_SHA_RE = re.compile(r"Head SHA: `([0-9a-f]{40})`")
+_INSTALL_RE = re.compile(r"- Install: `([^`]+)`")
+_TEST_SUBSET_RE = re.compile(r"- Test \(subset[^)]*\): `([^`]+)`")
+_TEST_LINE_RE = re.compile(r"- Test: `([^`]+)`")
+_EXPECT_RE = re.compile(r"Expected Proof-of-Change verdict: `([^`]+)`")
+
+
+def _library_sections(text: str) -> list[str]:
+    return _SECTION_RE.split(text)[1:]
+
+
+def _repo_of(sec: str) -> str | None:
+    m = _REPO_RE.search(sec)
+    return m.group(1).rstrip(".") if m else None
+
+
+def _group1(pattern: re.Pattern, text: str) -> str | None:
+    m = pattern.search(text) if text else None
+    return m.group(1) if m else None
+
+
+def _pr_blocks(sec: str) -> list[tuple[int, str, str]]:
+    """[(pr number, this pull request's own text, preamble shared by the library section)].
+
+    A `###` sub-heading that names a pull request number (`### Primary PR: #8946`) opens that pull request.
+    Text before the first such heading is the preamble (repo line, shared setup notes) and is not part of any
+    pull request's own text. With no such heading, `**Open PR:** #N` is the one pull request and its text is
+    the whole section.
+    """
+    marks = list(_PR_HEADING_RE.finditer(sec))
+    if marks:
+        preamble = sec[:marks[0].start()]
+        out = []
+        for i, m in enumerate(marks):
+            end = marks[i + 1].start() if i + 1 < len(marks) else len(sec)
+            out.append((int(m.group(1)), sec[m.start():end], preamble))
+        return out
+    m = _OPEN_PR_RE.search(sec)
+    if not m:
+        return []
+    return [(int(m.group(1)), sec, "")]
+
+
+def _test_cmd(block: str, preamble: str) -> str | None:
+    """The subset command: a Test (subset) line if present, else the first backticked command on a `- Test:` line.
+
+    A sub-section's own line wins over the shared preamble. On a line that names two commands, only the first
+    backtick pair is used.
+    """
+    for text in (block, preamble):
+        if not text:
+            continue
+        cmd = _group1(_TEST_SUBSET_RE, text)
+        if cmd:
+            return cmd
+        cmd = _group1(_TEST_LINE_RE, text)
+        if cmd:
+            return cmd
+    return None
+
+
 def parse_chosen(path: Path) -> dict:
-    """Chosen-PRs file (<date>.md, written by whoever curates the day's PRs) -> {repo: [ {pr, head_sha, install, test_cmd} ]}.
+    """Chosen-PRs file (<date>.md) -> {repo: [ {pr, head_sha, install, test_cmd} ]}.
+
+    A library section (`## N. name`) is one `**Open PR:** #N` entry, or several `###` sub-headings that each name
+    a pull request. Each sub-heading keeps its own head SHA. Install and test commands may sit in the preamble or
+    in a sub-section; a sub-section's own command wins.
 
     Expected verdicts are deliberately NOT read here. They are read by read_expectations() only after every verdict
     of the run has been computed (see main()), so they cannot influence selection, testing or verdicts.
@@ -250,31 +319,35 @@ def parse_chosen(path: Path) -> dict:
     out: dict = {}
     if not path.exists():
         return out
-    for sec in re.split(r"(?m)^## \d+\. ", path.read_text())[1:]:
-        repo = re.search(r"https://github\.com/([\w.-]+/[\w.-]+)", sec)
-        pr = re.search(r"\*\*Open PR:\*\* #(\d+)", sec)
-        if not (repo and pr):
+    for sec in _library_sections(path.read_text()):
+        repo = _repo_of(sec)
+        if not repo:
             continue
-        head = re.search(r"Head SHA: `([0-9a-f]{40})`", sec)
-        inst = re.search(r"- Install: `([^`]+)`", sec)
-        test = re.search(r"- Test \(subset[^)]*\): `([^`]+)`", sec)
-        out.setdefault(repo.group(1).rstrip("."), []).append({
-            "pr": int(pr.group(1)), "head_sha": head.group(1) if head else None,
-            "install": inst.group(1) if inst else None, "test_cmd": test.group(1) if test else None})
+        for pr, block, preamble in _pr_blocks(sec):
+            out.setdefault(repo, []).append({
+                "pr": pr, "head_sha": _group1(_HEAD_SHA_RE, block),
+                "install": _group1(_INSTALL_RE, block) or _group1(_INSTALL_RE, preamble),
+                "test_cmd": _test_cmd(block, preamble)})
     return out
 
 
 def read_expectations(path: Path) -> dict:
-    """{(repo, pr): expected_verdict}. Call ONLY after all verdicts are final."""
+    """{(repo, pr): expected_verdict}. Call ONLY after all verdicts are final.
+
+    Only a line of the form "Expected Proof-of-Change verdict: `...`" counts, and only inside that pull request's
+    own text. A sub-section without that line stays unscored; it does not borrow another pull request's value.
+    """
     exp = {}
     if not path.exists():
         return exp
-    for sec in re.split(r"(?m)^## \d+\. ", path.read_text())[1:]:
-        repo = re.search(r"https://github\.com/([\w.-]+/[\w.-]+)", sec)
-        pr = re.search(r"\*\*Open PR:\*\* #(\d+)", sec)
-        v = re.search(r"Expected Proof-of-Change verdict: `([^`]+)`", sec)
-        if repo and pr and v:
-            exp[(repo.group(1).rstrip("."), int(pr.group(1)))] = v.group(1).strip().replace(" ", "_")
+    for sec in _library_sections(path.read_text()):
+        repo = _repo_of(sec)
+        if not repo:
+            continue
+        for pr, block, _preamble in _pr_blocks(sec):
+            v = _EXPECT_RE.search(block)
+            if v:
+                exp[(repo, pr)] = v.group(1).strip().replace(" ", "_")
     return exp
 
 
@@ -326,18 +399,31 @@ def chosen_test_targets(chosen: dict | None) -> list[str]:
     return out
 
 
+def _repo_test_file(name: str) -> bool:
+    """A test module in either common layout: test_foo.py or foo_test.py."""
+    return name.endswith(".py") and (name.startswith("test_") or name.endswith("_test.py"))
+
+
 def map_repo_tests(files: dict, checkout: Path, max_targets: int = 6) -> list[str]:
     targets: list[str] = []
     for f in files["all"]:
         b = os.path.basename(f)
-        if b.startswith("test_") and b.endswith(".py") and (checkout / f).is_file():
+        if _repo_test_file(b) and (checkout / f).is_file():
             targets.append(f)
     for f in files["package_py"]:
         stem = os.path.splitext(os.path.basename(f))[0].lstrip("_")
-        for hit in sorted(glob.glob(str(checkout / "**" / f"test_{stem}.py"), recursive=True))[:2]:
-            rel = os.path.relpath(hit, checkout)
-            if rel not in targets:
-                targets.append(rel)
+        patterns = [f"test_{stem}.py"] + ([f"{stem}_test.py"] if stem else [])
+        added = 0
+        for pat in patterns:
+            if added >= 2:
+                break
+            for hit in sorted(glob.glob(str(checkout / "**" / pat), recursive=True)):
+                if added >= 2:
+                    break
+                rel = os.path.relpath(hit, checkout)
+                if rel not in targets:
+                    targets.append(rel)
+                    added += 1
     return targets[:max_targets]
 
 
@@ -948,6 +1034,9 @@ def compare_sides(results: dict) -> dict:
     Rename-aware: a test id that disappears is only 'removed' if no new id with the same base test name appeared.
     Otherwise it is re-parametrized (its parametrize ids changed); the new ids are judged by their own outcomes.
     New/changed tests that are skipped because an optional dependency is missing are listed separately.
+    A test that is new on the PR side and fails only with a missing-dependency message (ModuleNotFoundError:
+    No module named 'X', or the same messages missing_dependency() already recognises) is listed there too,
+    not under new_tests_failing. confirm_missing() drops that classification when the module is installed.
     Test modules that fail to load are tracked as modules, never as tests: on both sides (load_failed_both), only on the
     PR side (load_failed_pr, with the main-side tests that no longer run) or only on main (load_failed_main); their
     tests are not counted as removed, new or unchanged."""
@@ -1003,8 +1092,14 @@ def compare_sides(results: dict) -> dict:
             msgs[t] = pmsg
         if mo == "absent":
             added.append(t)
-        if po == "skipped" and mo != "skipped" and missing_dependency(pmsg):
-            out["skipped_missing_dependency"].append({"test": t, "module": missing_dependency(pmsg), "main": mo})
+        dep = missing_dependency(pmsg) if (po == "skipped" or (mo == "absent" and po in bad)) else None
+        # A brand-new test that fails only because an optional module is missing is blocked, not a PR break.
+        # A test that passed on main and fails on the PR stays a regression even if the message names a module.
+        if dep and ((po == "skipped" and mo != "skipped") or (mo == "absent" and po in bad)):
+            entry = {"test": t, "module": dep, "main": mo, "pr": po}
+            if pmsg:
+                entry["message"] = pmsg
+            out["skipped_missing_dependency"].append(entry)
         elif mo == "passed" and po in bad:
             out["regressions"].append(t)
         elif mo in bad and po == "passed":
@@ -1040,8 +1135,10 @@ def failing_ids(run_result: dict) -> set:
 def exit_check(per_run: list[dict], results: dict, cmp: dict) -> dict:
     """Is every non-zero pytest exit explained? Exit 1 on a run is explained when each failing test of that run fails
     identically on the other side's run with the same index, or is already a reported finding (regression, new
-    failing test, flaky). Any other exit code (interrupted, internal or usage error) is never explained."""
-    flagged = set(cmp["regressions"]) | set(cmp["new_tests_failing"]) | set(cmp["flaky"])
+    failing test, flaky, or blocked by a missing optional dependency). Any other exit code (interrupted, internal
+    or usage error) is never explained."""
+    flagged = (set(cmp["regressions"]) | set(cmp["new_tests_failing"]) | set(cmp["flaky"])
+               | {d["test"] for d in cmp.get("skipped_missing_dependency", [])})
     problems = []
     for e in per_run:
         side = "main" if e["side"] == "old" else "pr"
@@ -1184,12 +1281,13 @@ def tests_verdict(cmp: dict | None, cnv_reason: str | None, exits: dict | None =
       4. a test module loads on one side only -> could not verify, naming the module;
       5. a test module of the changed code fails to load on both sides -> could not verify;
       6. unexplained pytest exit codes -> could not verify;
-      7. new/changed tests skipped for a missing optional dependency -> could not verify (never needs attention);
+      7. new/changed tests skipped, or new tests that fail only because an optional dependency is missing
+         -> could not verify (never needs attention);
       8. otherwise poc.verdict.pr_verdict."""
     if cnv_reason:
         return Verdict.COULD_NOT_VERIFY.value, cnv_reason, []
     deps = sorted({d["module"] for d in cmp.get("skipped_missing_dependency", [])})
-    dep_note = (f"{len(cmp['skipped_missing_dependency'])} new/changed test(s) skipped because optional "
+    dep_note = (f"{len(cmp['skipped_missing_dependency'])} new/changed test(s) skipped or blocked because optional "
                 f"dependenc{'y' if len(deps) == 1 else 'ies'} {', '.join(deps)} not installed") if deps else ""
     executed = cmp.get("executed") or {}
     ran_main, ran_pr = executed.get("main"), executed.get("pr")
@@ -1498,9 +1596,26 @@ def finalize_tests(rec: dict, per_run: list[dict], results: dict, a) -> tuple[di
     return cmp, None, ex
 
 
+def _unconfirmed_dependency(cmp: dict, d: dict) -> None:
+    """Put back a missing-dependency classification the environment did not confirm.
+
+    A failure (the test ran and raised ModuleNotFoundError, or the same messages) returns to new_tests_failing:
+    the module is installed, so the failure is a real result. A skip returns to other_changes, as before.
+    """
+    if d.get("pr") in ("failed", "error"):
+        cmp["new_tests_failing"].append(d["test"])
+        msg = d.get("message")
+        if msg:
+            msgs = cmp.setdefault("messages", {})
+            if d["test"] not in msgs and len(msgs) < 20:
+                msgs[d["test"]] = msg
+        return
+    cmp["other_changes"].append(
+        f"{d['test']}: {d['main']} -> skipped (skip names {d['module']}, which is installed)")
+
+
 def confirm_missing(cmp: dict, venv: Path) -> None:
-    """Keep a dependency skip only if the module really does not import on the PR side; otherwise it is an ordinary
-    outcome change."""
+    """Keep a dependency skip or blocked failure only if the module really does not import on the PR side."""
     keep = []
     for d in cmp.get("skipped_missing_dependency", []):
         ok = in_side(venv, [venv / "bin/python", "-c", f"import importlib.util as u,sys;"
@@ -1508,8 +1623,9 @@ def confirm_missing(cmp: dict, venv: Path) -> None:
         if ok:
             keep.append(d)
         else:
-            cmp["other_changes"].append(f"{d['test']}: {d['main']} -> skipped (skip names {d['module']}, which is installed)")
+            _unconfirmed_dependency(cmp, d)
     cmp["skipped_missing_dependency"] = keep
+    cmp["new_tests_failing"] = sorted(cmp["new_tests_failing"])
 
 
 def sandbox_refusal() -> str | None:
@@ -1980,7 +2096,7 @@ def write_report(rdir: Path, meta: dict, records: list[dict], skipped: dict, pro
                           f"(e.g. `{x['removed_ids'][0].split('::')[-1]}` -> `{x['added_ids'][0].split('::')[-1]}`)")
             deps = c.get("skipped_missing_dependency", [])
             if deps:
-                md.append(f"  - skipped for a missing optional dependency: {len(deps)} "
+                md.append(f"  - skipped or blocked for a missing optional dependency: {len(deps)} "
                           f"({', '.join(sorted({d['module'] for d in deps}))})")
             for t, m in list(c.get("messages", {}).items())[:3]:
                 md.append(f"  - `{t}`: `{m[:150]}`")
@@ -2312,8 +2428,9 @@ def rejudge(rec: dict, prdir: Path) -> dict:
     cmp = compare_sides(results)
     kept = {d["test"] for d in old.get("skipped_missing_dependency", [])}
     for d in [d for d in cmp["skipped_missing_dependency"] if d["test"] not in kept]:
-        cmp["other_changes"].append(f"{d['test']}: {d['main']} -> skipped (skip names {d['module']}, which is installed)")
+        _unconfirmed_dependency(cmp, d)
     cmp["skipped_missing_dependency"] = [d for d in cmp["skipped_missing_dependency"] if d["test"] in kept]
+    cmp["new_tests_failing"] = sorted(cmp["new_tests_failing"])
     ex = exit_check(rec.get("per_run", []), results, cmp)
     pr_probes = rejudge_probes(rec.get("probes"))
     v, reason, _ = verdict_for(cmp, None, ex, rec.get("files"), pr_probes, rec.get("behaviour_claims"),
