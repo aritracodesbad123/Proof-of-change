@@ -91,7 +91,8 @@ class NebiusProvider(Provider):
         self._key, self.base_url, self.timeout = api_key, base_url.rstrip("/"), timeout
 
     def complete_json(self, task: str, system: str, user: str, schema: dict, ctx: dict) -> dict:
-        body = {"model": self.models[task], "temperature": 0, "max_tokens": 8000,
+        body = {"model": self.models[task], "temperature": 0,
+                "max_tokens": int(os.environ.get("POC_MAX_TOKENS", "8000")),
                 "messages": [{"role": "system", "content": system}, {"role": "user", "content": user}],
                 "response_format": {"type": "json_schema",
                                     "json_schema": {"name": task, "schema": schema, "strict": True}}}
@@ -99,12 +100,25 @@ class NebiusProvider(Provider):
                                      headers={"Content-Type": "application/json",
                                               "Authorization": f"Bearer {self._key}"},
                                      method="POST")  # br-allow-external: model inference call, creates nothing
+        raw_dir = os.environ.get("POC_RAW_DIR")
+        data, err = None, None
         try:
             with urllib.request.urlopen(req, timeout=self.timeout) as r:   # noqa: S310 (fixed https URL)
                 data = json.loads(r.read())
             return json.loads(data["choices"][0]["message"]["content"])
         except Exception as e:  # noqa: BLE001
+            err = f"{type(e).__name__}: {e}"
             raise ProviderError(f"{self.name} {task} request failed: {type(e).__name__}") from None
+        finally:
+            if raw_dir:
+                import time as _t
+                d = Path(raw_dir)
+                d.mkdir(parents=True, exist_ok=True)
+                ch = ((data or {}).get("choices") or [{}])[0]
+                (d / f"{_t.strftime('%H%M%S')}-{task}-{os.getpid()}.json").write_text(json.dumps({
+                    "task": task, "requested_model": body["model"], "max_tokens": body["max_tokens"],
+                    "server_model": (data or {}).get("model"), "finish_reason": ch.get("finish_reason"),
+                    "usage": (data or {}).get("usage"), "error": err, "raw": data}, indent=1))
 
 
 class RecordedProvider(Provider):
