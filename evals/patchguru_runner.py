@@ -450,7 +450,17 @@ def main(argv=None) -> int:
     machine = dict(dr.detect_machine_type())
     for row in rows:
         print(f"[{row['id']}] {row['repo']}#{row['pr']} ...", flush=True)
-        for r in run_case(row, a, fp, key, out, machine):
+        try:
+            recs = run_case(row, a, fp, key, out, machine)
+        except Exception as e:  # noqa: BLE001  (e.g. a model call that timed out): record it, go on
+            why = f"runner error: {type(e).__name__}: {str(e)[:200]}"
+            recs = []
+            for bl in BASELINES:
+                r = {"case_id": row["id"], "bench": {"id": row["id"], "answer_key_read": False}, "baseline": bl,
+                     "verdict": "could_not_verify", "reason": why, "label": "pilot", "poc_commit": _git_head()}
+                (out / f"{row['id']}-{bl.replace('-', '_')}.json").write_text(json.dumps(r, indent=1))
+                recs.append(r)
+        for r in recs:
             print(f"    {r['baseline']}: {r['verdict']} ({r.get('label')}): {r['reason'][:140]}", flush=True)
     return 0
 
