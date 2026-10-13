@@ -537,6 +537,22 @@ def source_pair(repo: str, item: dict, work: Path, log: Path, python: str, timeo
     return res
 
 
+def meson_build_requires(checkout: Path) -> list[str] | None:
+    """[build-system].requires of a meson-python project (None for other build backends). Strings that look like
+    command-line options are dropped: they come from the checkout."""
+    pp = checkout / "pyproject.toml"
+    if not pp.exists():
+        return None
+    import tomllib
+    try:
+        bs = tomllib.loads(pp.read_text()).get("build-system", {})
+    except Exception:  # noqa: BLE001
+        return None
+    if bs.get("build-backend") != "mesonpy":
+        return None
+    return [r for r in bs.get("requires", []) if isinstance(r, str) and not r.startswith("-")]
+
+
 def pyproject_test_extras(checkout: Path) -> list[str]:
     pp = checkout / "pyproject.toml"
     if not pp.exists():
@@ -650,6 +666,13 @@ def install_side(venv: Path, checkout: Path, chosen: dict | None, log: Path, pyt
     bc = os.environ.get("POC_BUILD_CONSTRAINTS")
     if bc and Path(bc).is_file():
         cmds[-1] += ["--build-constraint", bc, "-c", bc]   # same pins at build time and at run time
+    breq = meson_build_requires(checkout)
+    if breq is not None and "-e" in proj:
+        # meson-python editable installs rebuild on import with the build tools (ninja, meson, cython); with build
+        # isolation those live in a temporary dir that is gone by test time. Install them into the venv instead.
+        pins = (["-c", bc] if bc and Path(bc).is_file() else []) + (["-c", constraints] if constraints else [])
+        cmds.insert(1, ["uv", "pip", "install", "-q", "-p", venv / "bin/python", *breq, "ninja", *pins])
+        cmds[-1].insert(cmds[-1].index("-p"), "--no-build-isolation")
     ro_files = tuple(x for x in (constraints, bc if bc and Path(bc).is_file() else None) if x)
     sbx = side_sandbox(venv, network=True, ro=ro_files)
     sbx["rw"].append(checkout)

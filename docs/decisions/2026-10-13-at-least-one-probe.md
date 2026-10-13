@@ -46,3 +46,7 @@ change those do not exercise slips through as "verified".
 - **Scripts that arrive as one long line.** Sometimes the model escapes its script twice, so it arrives as a single
   line full of literal "\n" sequences and does not run. If a script fails to parse as is but parses once those
   sequences are turned into real line breaks, the fixed version is used. Otherwise it is rejected as before.
+- **Libraries built with meson (pandas, scipy, scikit-learn).** Their "editable" install rebuilds parts of the
+  library the first time it is imported, using build tools that, by default, only exist during the install and are
+  deleted afterwards. Tests then failed to start. For these libraries the build tools are now installed into the
+  test environment first, so the rebuild works. Other libraries are installed exactly as before.

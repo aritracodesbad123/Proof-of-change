@@ -76,3 +76,12 @@ def test_double_escaped_code_is_unescaped():
     assert "\n" in fixed and "json.dumps" in fixed
     good = "x = 'a\\nb'\n"
     assert model_probes._unescape_code(good) == good
+
+
+def test_meson_build_requires(tmp_path):
+    from ops import daily_run
+    (tmp_path / "pyproject.toml").write_text('[build-system]\nbuild-backend = "mesonpy"\n'
+                                             'requires = ["meson-python==0.13.1", "-e evil", "Cython>=3"]\n')
+    assert daily_run.meson_build_requires(tmp_path) == ["meson-python==0.13.1", "Cython>=3"]
+    (tmp_path / "pyproject.toml").write_text('[build-system]\nbuild-backend = "setuptools.build_meta"\n')
+    assert daily_run.meson_build_requires(tmp_path) is None
