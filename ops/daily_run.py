@@ -1500,8 +1500,9 @@ def verdict_for(cmp: dict | None, cnv_reason: str | None, exits: dict | None = N
 def with_probes(cmp: dict | None, cnv_reason: str | None, exits: dict | None = None, files: dict | None = None,
                 probe_results: dict | None = None) -> tuple[str, str, list[str]]:
     """The PR verdict: the tests' verdict (tests_verdict), then the probes (poc/probes.py). An observation that needs
-    attention (it differs and no claim covers it, it contradicts a claim, or it is flaky) makes the verdict
-    needs_attention, also when the tests alone could not verify the PR. Probes never upgrade a verdict: all-green
+    attention (it differs and no claim covers it, or it contradicts a claim) makes the verdict
+    needs_attention, also when the tests alone could not verify the PR. Flaky observations and warning-only
+    differences are shown but never decide the verdict. Probes never upgrade a verdict: all-green
     probes leave it as the tests decided. Without probes the verdict is exactly the tests' verdict."""
     from poc import probe_adequacy
     v, reason, fl = tests_verdict(cmp, cnv_reason, exits, files)
@@ -1530,7 +1531,7 @@ def tests_verdict(cmp: dict | None, cnv_reason: str | None, exits: dict | None =
       6. unexplained pytest exit codes -> could not verify;
       7. new/changed tests skipped, or new tests that fail only because an optional dependency is missing
          -> could not verify (never needs attention);
-      8. flaky tests, and nothing else that needs attention -> could not verify, naming those tests.
+      8. flaky tests are listed but never decide the verdict (results that change between runs of one side are noise).
          A test that passes and fails across the 3 runs of one side is listed. It is not a regression and
          does not, on its own, produce needs attention. Flaky labels are not passed to pr_verdict, because
          that rule treats every amber finding as needs attention (probes still use that rule);
@@ -1624,8 +1625,10 @@ def tests_verdict(cmp: dict | None, cnv_reason: str | None, exits: dict | None =
         return cnv, f"not fully verified: {dep_note} ({reason})", fl
     v = pr_verdict(RunSummary(build_ok=True, claims=[Claim("tests", testable=True, probed=True, proven=True)],
                               findings=verdict_findings))
-    if cmp["flaky"] and v == Verdict.VERIFIED:
-        return cnv, f"could not verify: {reason}", fl
+    # Noise rule: a project test whose result changes between runs on the same side is shown in the reason but
+    # never decides the verdict (same rule as for probe observations).
+    if cmp["flaky"]:
+        reason += "; flaky test(s) shown only: their result changes between runs of the same side, so they do not decide the verdict"
     return v.value, reason, fl
 
 

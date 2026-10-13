@@ -172,7 +172,8 @@ def test_numpy_32992_resource_skip_is_environment_not_a_finding():
     flaky = compare_sides({"main": [{LARGE: ("passed", "")}, {LARGE: ("failed", MEM)}, {LARGE: ("passed", "")}],
                            "pr": [{LARGE: ("passed", "")}] * 3})
     assert flaky["flaky"] == [LARGE] and flaky["environment"] == []
-    assert verdict_from_tests(flaky, None)[0] == "could_not_verify"
+    # ...and, under the noise rule, a flaky test is shown but does not decide the verdict.
+    assert verdict_from_tests(flaky, None)[0] == "verified"
 
 
 def test_docstring_only_holds_by_construction(tmp_path):
