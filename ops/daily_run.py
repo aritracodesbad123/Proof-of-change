@@ -673,7 +673,13 @@ def install_side(venv: Path, checkout: Path, chosen: dict | None, log: Path, pyt
         pins = (["-c", bc] if bc and Path(bc).is_file() else []) + (["-c", constraints] if constraints else [])
         cmds.insert(1, ["uv", "pip", "install", "-q", "-p", venv / "bin/python", *breq, "ninja", *pins])
         cmds[-1].insert(cmds[-1].index("-p"), "--no-build-isolation")
-    ro_files = tuple(x for x in (constraints, bc if bc and Path(bc).is_file() else None) if x)
+    # Optional overrides (POC_INSTALL_OVERRIDES): e.g. drop an optional test extra that cannot build on this machine
+    # ("scikit-umfpack; python_version < '0'"). Same file for both sides and every tool.
+    ov = os.environ.get("POC_INSTALL_OVERRIDES")
+    ov = ov if ov and Path(ov).is_file() else None
+    if ov:
+        cmds[-1] += ["--override", ov]
+    ro_files = tuple(x for x in (constraints, bc if bc and Path(bc).is_file() else None, ov) if x)
     sbx = side_sandbox(venv, network=True, ro=ro_files)
     sbx["rw"].append(checkout)
     for c in cmds:
@@ -1128,7 +1134,25 @@ def gate(rec: dict) -> dict:
     """Apply the coverage gate (poc/coverage_gate.py) to a finished record; baselines without coverage skip it."""
     if not uses(rec.get("baseline"), "coverage"):
         return rec
-    return coverage_gate.apply(rec)
+    return ai_probe_gate(coverage_gate.apply(rec))
+
+
+def ai_probe_gate(rec: dict) -> dict:
+    """In modes that use AI-written probes: never 'verified' unless at least one AI-written (model) probe actually
+    executed a changed line (its measured changed-line coverage). Otherwise could_not_verify. Idempotent."""
+    if rec.get("verdict") != Verdict.VERIFIED.value or not uses(rec.get("baseline"), "claim_probes"):
+        return rec
+    items = (rec.get("probes") or {}).get("items") or []
+    ran = [it.get("id") for it in items if it.get("source") == "model"
+           and ((it.get("probe_changed_line_coverage") or {}).get("changed_lines_covered") or 0) > 0]
+    if ran:
+        return rec
+    out = dict(rec)
+    out.setdefault("verdict_before_ai_probe_gate", rec["verdict"])
+    out["verdict"] = Verdict.COULD_NOT_VERIFY.value
+    out["reason"] = ("not verified: no AI-written probe ran any changed line, so the change itself was not "
+                     "exercised by a probe; " + (rec.get("reason") or ""))
+    return out
 
 
 def base_name(test_id: str) -> str:
@@ -1476,8 +1500,9 @@ def verdict_for(cmp: dict | None, cnv_reason: str | None, exits: dict | None = N
 def with_probes(cmp: dict | None, cnv_reason: str | None, exits: dict | None = None, files: dict | None = None,
                 probe_results: dict | None = None) -> tuple[str, str, list[str]]:
     """The PR verdict: the tests' verdict (tests_verdict), then the probes (poc/probes.py). An observation that needs
-    attention (it differs and no claim covers it, it contradicts a claim, or it is flaky) makes the verdict
-    needs_attention, also when the tests alone could not verify the PR. Probes never upgrade a verdict: all-green
+    attention (it differs and no claim covers it, or it contradicts a claim) makes the verdict
+    needs_attention, also when the tests alone could not verify the PR. Flaky observations and warning-only
+    differences are shown but never decide the verdict. Probes never upgrade a verdict: all-green
     probes leave it as the tests decided. Without probes the verdict is exactly the tests' verdict."""
     from poc import probe_adequacy
     v, reason, fl = tests_verdict(cmp, cnv_reason, exits, files)
@@ -1506,7 +1531,7 @@ def tests_verdict(cmp: dict | None, cnv_reason: str | None, exits: dict | None =
       6. unexplained pytest exit codes -> could not verify;
       7. new/changed tests skipped, or new tests that fail only because an optional dependency is missing
          -> could not verify (never needs attention);
-      8. flaky tests, and nothing else that needs attention -> could not verify, naming those tests.
+      8. flaky tests are listed but never decide the verdict (results that change between runs of one side are noise).
          A test that passes and fails across the 3 runs of one side is listed. It is not a regression and
          does not, on its own, produce needs attention. Flaky labels are not passed to pr_verdict, because
          that rule treats every amber finding as needs attention (probes still use that rule);
@@ -1600,8 +1625,10 @@ def tests_verdict(cmp: dict | None, cnv_reason: str | None, exits: dict | None =
         return cnv, f"not fully verified: {dep_note} ({reason})", fl
     v = pr_verdict(RunSummary(build_ok=True, claims=[Claim("tests", testable=True, probed=True, proven=True)],
                               findings=verdict_findings))
-    if cmp["flaky"] and v == Verdict.VERIFIED:
-        return cnv, f"could not verify: {reason}", fl
+    # Noise rule: a project test whose result changes between runs on the same side is shown in the reason but
+    # never decides the verdict (same rule as for probe observations).
+    if cmp["flaky"]:
+        reason += "; flaky test(s) shown only: their result changes between runs of the same side, so they do not decide the verdict"
     return v.value, reason, fl
 
 

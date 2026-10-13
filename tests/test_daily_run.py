@@ -535,24 +535,25 @@ def _flaky_sides(main_runs, pr_runs):
     return dr.compare_sides({"main": main_runs, "pr": pr_runs})
 
 
-def test_numpy_32992_docs_only_flaky_test_is_could_not_verify():
-    """A documentation-only pull request with one test that passes and fails across the 3 runs (numpy #32992)."""
+def test_docs_only_flaky_test_does_not_decide_the_verdict():
+    """A documentation-only pull request with one test that passes and fails across the 3 runs: the flaky test is
+    shown, but a result that changes between runs of one side is noise and does not decide the verdict."""
     from poc import coverage_gate
     passed = {NPZ: ("passed", "")}
     failed = {NPZ: ("failed", "intermittent")}
     cmp = _flaky_sides([passed] * 3, [passed, failed, passed])
     assert cmp["flaky"] == [NPZ] and cmp["regressions"] == [] and cmp["new_tests_failing"] == []
     v, reason, labels = dr.verdict_for(cmp, None, None, DOC_ONLY)
-    assert v == "could_not_verify"
-    assert NPZ in reason and "flaky" in reason
+    assert v == "verified"
+    assert NPZ in reason and "flaky" in reason and "do not decide the verdict" in reason
     assert "flaky" in labels
     gated = coverage_gate.apply({"verdict": v, "reason": reason, "files": DOC_ONLY, "comparison": cmp})
-    assert gated["verdict"] == "could_not_verify"
+    assert gated["verdict"] != "needs_attention"
     # The same test disagreeing with itself on main is also flaky, not a regression.
     cmp_main = _flaky_sides([passed, failed, passed], [passed] * 3)
     assert cmp_main["flaky"] == [NPZ]
     v_main, reason_main, _ = dr.verdict_for(cmp_main, None, None, DOC_ONLY)
-    assert v_main == "could_not_verify" and NPZ in reason_main
+    assert v_main == "verified" and NPZ in reason_main
 
 
 def test_flaky_test_does_not_hide_a_real_regression():
@@ -671,3 +672,12 @@ def test_daily_run_stops_when_it_cannot_fast_forward(tmp_path):
     _git(clone, "remote", "set-url", "origin", str(tmp_path / "missing.git"))
     with pytest.raises(SystemExit, match="fetching origin main failed"):
         dr.sync_to_origin_main(clone)
+
+
+def test_flaky_project_test_on_both_sides_never_flags():
+    """Memory-dependent skip: a test that passes on some runs and is skipped on others, on BOTH sides."""
+    t = "pkg/tests/test_big.py::test_large"
+    p, k = {t: ("passed", "")}, {t: ("skipped", "not enough memory")}
+    cmp = _flaky_sides([p, p, k], [p, k, k])
+    v, reason, _ = dr.verdict_for(cmp, None, None, DOC_ONLY)
+    assert v != "needs_attention" and t in reason
