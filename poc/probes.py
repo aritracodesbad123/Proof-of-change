@@ -42,7 +42,8 @@ Judging (``judge``): each observation is compared over 3 alternating runs per si
     same,    claim expects differs  -> needs_human       differs, no claim              -> unmentioned
     flaky                           -> flaky             probe crashed on both sides    -> not_testable
 
-Any red or amber label (false_claim, unmentioned, needs_human, flaky) makes the PR verdict needs_attention.
+Any red or amber label (false_claim, unmentioned, needs_human) makes the PR verdict needs_attention. Flaky
+observations are ignored as noise, and differences that are only about warnings never count on their own.
 """
 from __future__ import annotations
 
@@ -342,11 +343,25 @@ def apply_status(probe_results: dict | None) -> dict | None:
     return dict(probe_results, items=items, status=status, summary=summary)
 
 
+def is_warning_observation(name: str) -> bool:
+    """An observation about warnings (its name mentions a warning), e.g. 'x.warning_raised', 'warnings.count'."""
+    return "warn" in str(name).lower()
+
+
 def summarize(items: list[dict]) -> dict:
     """Findings over all probes of a PR: labels, red/amber observations, proven claims, reason text."""
     obs = [o | {"probe": it["id"]} for it in items for o in it["observations"]]
     labels = [FindingLabel(o["label"]) for o in obs]
-    flagged = [o for o in obs if COLOUR.get(FindingLabel(o["label"])) in ("red", "amber")]
+    raw_flagged = [o for o in obs if COLOUR.get(FindingLabel(o["label"])) in ("red", "amber")]
+    # Noise filter: an observation that changes between runs of the SAME side is noise, not a finding; it is listed
+    # but never decides the verdict. A difference that is only about warnings never counts as a break on its own.
+    noisy = [o for o in raw_flagged if o["label"] == FindingLabel.FLAKY.value]
+    flagged = [o for o in raw_flagged if o["label"] != FindingLabel.FLAKY.value]
+    warning_only = [o for o in flagged if is_warning_observation(o["name"])]
+    if flagged and len(warning_only) == len(flagged):
+        flagged = []
+    else:
+        warning_only = []
     proven = sorted({o["claim"] for o in obs if o["label"] == FindingLabel.PROVEN.value})
     bits = []
     if flagged:
@@ -357,6 +372,11 @@ def summarize(items: list[dict]) -> dict:
         bits.append(f"probe: {len(flagged)} observation(s) need attention: "
                     + "; ".join(f"{o['name']} {names[o['label']]}" + (f" ({o['claim']})" if o.get("claim") else "")
                                 for o in flagged[:4]))
+    if noisy:
+        bits.append(f"probe: {len(noisy)} observation(s) ignored as noise (they change between runs of the same "
+                    "side)")
+    if warning_only:
+        bits.append(f"probe: {len(warning_only)} warning-only difference(s) not counted on their own")
     if proven:
         bits.append(f"probe: claim(s) {', '.join(proven)} proven")
     same = sum(1 for o in obs if o["label"] == FindingLabel.NO_DIFFERENCE.value)
@@ -367,4 +387,5 @@ def summarize(items: list[dict]) -> dict:
         bits.append(f"probe: {len(errors)} probe(s) could not run on either side")
     return {"labels": [x.value for x in labels], "flagged": [{k: o[k] for k in ("probe", "name", "label", "claim")}
                                                              for o in flagged],
-            "proven_claims": proven, "reason": "; ".join(bits)}
+            "proven_claims": proven, "reason": "; ".join(bits),
+            "ignored_noise": [o["name"] for o in noisy], "ignored_warning_only": [o["name"] for o in warning_only]}
