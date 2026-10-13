@@ -170,6 +170,8 @@ def generate(provider: Provider, repo: str, pr: int, title: str, body: str | Non
             p["id"] = _tidy_id(p["id"])
         if isinstance(p, dict):
             p["code"] = _unescape_code(p.get("code"))
+            if not str(p.get("about") or "").strip():   # the probe runner requires a non-empty description
+                p["about"] = "model-written probe of the changed files (no description given)"
         why = validate_probe(p, set(by_id))
         if why:
             out["errors"].append(f"probe {p.get('id')!r} rejected: {why}")

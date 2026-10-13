@@ -50,3 +50,6 @@ change those do not exercise slips through as "verified".
   library the first time it is imported, using build tools that, by default, only exist during the install and are
   deleted afterwards. Tests then failed to start. For these libraries the build tools are now installed into the
   test environment first, so the rebuild works. Other libraries are installed exactly as before.
+- **Probes with no description.** A probe the model wrote with an empty description was accepted when written but
+  refused when it was about to run, so it never ran. It now gets a fixed default description at writing time
+  (before it is fingerprinted), so it runs.

@@ -85,3 +85,10 @@ def test_meson_build_requires(tmp_path):
     assert daily_run.meson_build_requires(tmp_path) == ["meson-python==0.13.1", "Cython>=3"]
     (tmp_path / "pyproject.toml").write_text('[build-system]\nbuild-backend = "setuptools.build_meta"\n')
     assert daily_run.meson_build_requires(tmp_path) is None
+
+
+def test_empty_about_gets_a_default(tmp_path):
+    nc = {"probes": [dict(GOOD["probes"][0], about="")]}
+    prov, out = _run(tmp_path, [nc])
+    assert len(out["probes"]) == 1
+    assert "no description given" in out["probes"][0]["path"].read_text()
