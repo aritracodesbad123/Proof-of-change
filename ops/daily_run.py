@@ -50,7 +50,7 @@ sys.path.insert(0, str(REPO_ROOT))
 from guardrails import sandbox  # noqa: E402
 from guardrails.isolation import untrusted_env  # noqa: E402
 from harness.machine import detect_machine_type  # noqa: E402
-from poc import behaviour_claims, coverage_gate, diff_probes, freeze, local_config, model_probes, model_provider, probes  # noqa: E402,E501
+from poc import behaviour_claims, cost, coverage_gate, diff_probes, freeze, local_config, model_probes, model_provider, probes  # noqa: E402,E501
 from poc.diff import confirm  # noqa: E402
 from poc.verdict import Claim, FindingLabel, RunSummary, Verdict, pr_verdict  # noqa: E402
 
@@ -2044,6 +2044,7 @@ def sandbox_refusal() -> str | None:
 
 def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, machine: dict) -> dict:
     t0 = time.time()
+    cost.reset()
     tag = f"{cfg['pkg']}-{item['pr']}"
     prdir = rdir / tag; prdir.mkdir(parents=True, exist_ok=True)
     work = workroot / tag
@@ -2135,6 +2136,7 @@ def finish(rec: dict, prdir: Path, work: Path, t0: float) -> dict:
                          "tests": round(sum(e.get("seconds") or 0 for e in rec.get("per_run", [])), 1)}
     if rec.get("pr_side", {}).get("build_seconds") is not None:
         rec["duration_s"]["build"] = rec["pr_side"]["build_seconds"]
+    rec["cost"] = cost.take(rec["duration_s"])
     errs = check_record(rec)
     if errs:
         rec["schema_errors"] = errs[:20]

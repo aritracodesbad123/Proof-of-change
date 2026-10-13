@@ -124,6 +124,8 @@ class NebiusProvider(Provider):
             err = f"{type(e).__name__}: {e}"
             raise ProviderError(f"{self.name} {task} request failed: {type(e).__name__}") from None
         finally:
+            from poc import cost as _cost
+            _cost.record_call((data or {}).get("model") or body["model"], (data or {}).get("usage"), ok=err is None)
             if raw_dir:
                 import time as _t
                 d = Path(raw_dir)
