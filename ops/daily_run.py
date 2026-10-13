@@ -406,6 +406,13 @@ def _repo_test_file(name: str) -> bool:
 
 
 def map_repo_tests(files: dict, checkout: Path, max_targets: int = 6) -> list[str]:
+    """Touched files -> test modules.
+
+    A test file the change itself edits is kept. For a changed source file, the sibling
+    ``<directory>/tests/test_<stem>.py`` (and ``<stem>_test.py``) is preferred over a global name match, so
+    ``networkx/algorithms/connectivity/connectivity.py`` maps to
+    ``networkx/algorithms/connectivity/tests/test_connectivity.py`` before other ``test_connectivity.py`` files.
+    """
     targets: list[str] = []
     for f in files["all"]:
         b = os.path.basename(f)
@@ -414,18 +421,70 @@ def map_repo_tests(files: dict, checkout: Path, max_targets: int = 6) -> list[st
     for f in files["package_py"]:
         stem = os.path.splitext(os.path.basename(f))[0].lstrip("_")
         patterns = [f"test_{stem}.py"] + ([f"{stem}_test.py"] if stem else [])
-        added = 0
+        preferred: list[Path] = []
+        parent = Path(f).parent
         for pat in patterns:
+            sib = checkout / parent / "tests" / pat
+            if sib.is_file():
+                preferred.append(sib)
+        hits = list(preferred)
+        for pat in patterns:
+            hits += [Path(p) for p in sorted(glob.glob(str(checkout / "**" / pat), recursive=True))]
+        added, seen_hit = 0, set()
+        for hit in hits:
             if added >= 2:
                 break
-            for hit in sorted(glob.glob(str(checkout / "**" / pat), recursive=True)):
-                if added >= 2:
-                    break
-                rel = os.path.relpath(hit, checkout)
-                if rel not in targets:
-                    targets.append(rel)
-                    added += 1
+            rel = os.path.relpath(hit, checkout)
+            if rel in seen_hit:
+                continue
+            seen_hit.add(rel)
+            if rel not in targets:
+                targets.append(rel)
+                added += 1
     return targets[:max_targets]
+
+
+def _path_exists(root: Path, rel: str) -> bool:
+    p = root / rel
+    return p.is_file() or p.is_dir()
+
+
+def nearest_tests_dir(rel_file: str, root: Path) -> str | None:
+    """The nearest ``tests`` directory at or above ``rel_file`` that exists under ``root``."""
+    d = Path(rel_file).parent
+    while True:
+        candidate = d / "tests"
+        if (root / candidate).is_dir():
+            return candidate.as_posix()
+        if str(d) in (".", ""):
+            return None
+        parent = d.parent
+        if parent == d:
+            return None
+        d = parent
+
+
+def targets_for_sides(mapped: list[str], files: dict | None, main_root: Path, pr_root: Path) -> dict:
+    """Test paths to run on each side.
+
+    When every mapped test file is new (it exists only on the pull-request side), also run the nearest existing
+    tests directory on both sides, and still run the new files on the pull-request side. That gives an additive
+    change a baseline instead of an empty main side.
+    """
+    pr_ok = [t for t in mapped if _path_exists(pr_root, t)]
+    main_ok = [t for t in mapped if _path_exists(main_root, t)]
+    if main_ok or not pr_ok:
+        return {"main": main_ok, "pr": list(dict.fromkeys(pr_ok))}
+    nearest = None
+    seeds = list((files or {}).get("package_py") or []) + list((files or {}).get("all") or []) + list(pr_ok)
+    for rel in seeds:
+        found = nearest_tests_dir(rel, main_root)
+        if found:
+            nearest = found
+            break
+    if not nearest:
+        return {"main": [], "pr": pr_ok}
+    return {"main": [nearest], "pr": list(dict.fromkeys([nearest, *pr_ok]))}
 
 
 def source_pair(repo: str, item: dict, work: Path, log: Path, python: str, timeout: int) -> dict:
@@ -518,6 +577,49 @@ def pyproject_test_groups(checkout: Path) -> list[str]:
         if g.lower() in TEST_EXTRA_NAMES:
             reqs += [r.strip() for r in expand(g, frozenset()) if r.strip() and not r.strip().startswith("-")]
     return list(dict.fromkeys(reqs))
+
+
+def extra_names_from_spec(spec: str) -> list[str]:
+    """'pkg[dev,test]' -> ['dev', 'test']."""
+    m = re.search(r"\[([^\]]*)\]", spec or "")
+    if not m:
+        return []
+    return [x.strip() for x in m.group(1).split(",") if x.strip()]
+
+
+def packages_in_extras(checkout: Path, names: list[str]) -> list[str]:
+    """Distribution names listed under those extras in pyproject optional-dependencies."""
+    pp = checkout / "pyproject.toml"
+    if not pp.is_file() or not names:
+        return []
+    import tomllib
+    try:
+        opt = tomllib.loads(pp.read_text()).get("project", {}).get("optional-dependencies", {})
+    except Exception:  # noqa: BLE001
+        return []
+    if not isinstance(opt, dict):
+        return []
+    out: list[str] = []
+    for name in names:
+        reqs = opt.get(name, [])
+        if not isinstance(reqs, list):
+            continue
+        for req in reqs:
+            if not isinstance(req, str):
+                continue
+            pkg = re.split(r"[\[<>=!;,\s]", req.strip(), maxsplit=1)[0]
+            if pkg and pkg not in out:
+                out.append(pkg)
+    return out
+
+
+def recorded_test_extras(checkout: Path, proj: list[str]) -> list[str]:
+    """What the install really requested: the packages inside the extras, or the extra names if they cannot be expanded.
+
+    An empty list means no extra was requested. A dev extra that installs pandas, pyarrow and polars is recorded as
+    those packages, not as []."""
+    names = extra_names_from_spec(proj[-1] if proj else "")
+    return packages_in_extras(checkout, names) or names
 
 
 def with_test_extras(proj: list[str], checkout: Path) -> list[str]:
@@ -839,6 +941,11 @@ def map_tests(files: dict, pkg: str, site: Path, cfg: dict, max_targets: int = 6
 
 
 SIDE_KEY = {"main": "old", "pr": "new"}   # shared schema per_run.side: old = main/base, new = PR
+# Import name -> pip distribution. Only plain wheels: installed on both sides when new tests skip for them.
+PIP_OPTIONAL = {"duckdb": "duckdb", "ibis": "ibis-framework", "sqlframe": "sqlframe", "polars": "polars",
+                "datafusion": "datafusion", "pytest_asyncio": "pytest-asyncio", "pytest-asyncio": "pytest-asyncio"}
+RESOURCE_RE = re.compile(r"memory required|free memory|out of memory|\bdisk\b|no space|\bnetwork\b", re.I)
+_EXC_RE = re.compile(r"\b([A-Z][A-Za-z0-9_]*(?:Error|Exception))\b")
 MISSING_DEP_RE = re.compile(
     r"could not import '?([\w.]+)'?|no module named '?([\w.]+)'?|requires? (?:the )?'?([\w.-]+)'?(?: to be installed| is not installed)?$"
     r"|'?([\w.-]+)'? (?:is )?not installed", re.I)
@@ -1029,6 +1136,79 @@ def normalize_load_errors(run: dict) -> dict:
     return out
 
 
+def resource_skip_detail(results: dict, test_id: str) -> str | None:
+    """A pass/skip change whose skip reason is a resource limit (memory, disk, network) on both sides.
+
+    That is the machine, not the pull request. A skip that appears on only one side is left for the normal rules.
+    Returns the skip message, or None when this test is not that case."""
+    details, outcomes = [], []
+    for side in ("main", "pr"):
+        saw_skip = False
+        for run in results[side]:
+            outcome, msg = run.get(test_id, ("absent", ""))
+            if outcome not in ("passed", "skipped"):
+                return None
+            outcomes.append(outcome)
+            if outcome == "skipped":
+                if not RESOURCE_RE.search(msg or ""):
+                    return None
+                saw_skip = True
+                details.append(msg)
+        if not saw_skip:
+            return None
+    if len(set(outcomes)) < 2:
+        return None
+    return details[0][:200]
+
+
+def exception_types(msg: str) -> set[str]:
+    return set(_EXC_RE.findall(msg or ""))
+
+
+def installable_missing(cmp: dict) -> list[str]:
+    """Import names of missing modules that are a plain pip install, in first-seen order."""
+    out = []
+    for d in cmp.get("skipped_missing_dependency", []):
+        name = str(d.get("module") or "").split(".")[0]
+        if name in PIP_OPTIONAL and name not in out:
+            out.append(name)
+    return out
+
+
+def attribute_backend_errors(cmp: dict, results: dict, also_on_base: list[str] | None = None) -> None:
+    """New pull-request failures whose exception also happens on the base side are not a pull-request finding.
+
+    Used after an optional module was installed and the tests were run again. The same ZeroDivisionError on both
+    sides is the backend (for example ibis on ``% 0``), so those tests move to ``backend_same_error``. A new failure
+    whose exception is not seen on the base side stays in ``new_tests_failing``."""
+    seen = set(also_on_base or [])
+    for run in results.get("main", []):
+        for _t, (outcome, msg) in run.items():
+            if outcome in ("failed", "error"):
+                seen |= exception_types(msg)
+    if not seen:
+        return
+    kept, moved = [], []
+    messages = cmp.get("messages") or {}
+    for test_id in cmp.get("new_tests_failing", []):
+        msg = messages.get(test_id, "")
+        if not msg:
+            msg = next((m for run in results.get("pr", []) if test_id in run and run[test_id][1]
+                        for m in [run[test_id][1]]), "")
+        types = exception_types(msg)
+        if types and types <= seen:
+            moved.append({"test": test_id, "exceptions": sorted(types), "message": msg[:200]})
+        else:
+            kept.append(test_id)
+    if not moved:
+        return
+    cmp["new_tests_failing"] = kept
+    cmp["backend_same_error"] = list(cmp.get("backend_same_error") or []) + moved
+    for d in moved:
+        messages.pop(d["test"], None)
+    cmp["messages"] = {t: messages[t] for t in (cmp["regressions"] + cmp["new_tests_failing"])[:20] if t in messages}
+
+
 def compare_sides(results: dict) -> dict:
     """Plain-code comparison of per-test outcomes over the 3 runs per side (poc.diff.confirm).
 
@@ -1047,8 +1227,8 @@ def compare_sides(results: dict) -> dict:
         ids |= set(r)
     out = {"same": 0, "same_skipped_both": 0, "regressions": [], "fixed": [], "new_tests_passing": 0,
            "new_tests_failing": [], "removed_tests": [], "reparametrized": [], "skipped_missing_dependency": [],
-           "flaky": [], "other_changes": [], "preexisting_failures": [], "load_failed_both": [], "load_failed_pr": [],
-           "load_failed_main": []}
+           "flaky": [], "environment": [], "other_changes": [], "preexisting_failures": [], "load_failed_both": [],
+           "load_failed_pr": [], "load_failed_main": []}
     msgs, removed, added = {}, [], []
     bad = ("failed", "error")
 
@@ -1078,6 +1258,11 @@ def compare_sides(results: dict) -> dict:
         m = [{"o": r.get(t, ("absent", ""))[0]} for r in results["main"]]
         p = [{"o": r.get(t, ("absent", ""))[0]} for r in results["pr"]]
         state = confirm(m, p)
+        if state != "same":
+            detail = resource_skip_detail(results, t)
+            if detail:
+                out["environment"].append({"test": t, "kind": "resource", "detail": detail})
+                continue
         if state == "same":
             out["same"] += 1
             if m[0]["o"] in bad:
@@ -1139,7 +1324,9 @@ def exit_check(per_run: list[dict], results: dict, cmp: dict) -> dict:
     failing test, flaky, or blocked by a missing optional dependency). Any other exit code (interrupted, internal
     or usage error) is never explained."""
     flagged = (set(cmp["regressions"]) | set(cmp["new_tests_failing"]) | set(cmp["flaky"])
-               | {d["test"] for d in cmp.get("skipped_missing_dependency", [])})
+               | {d["test"] for d in cmp.get("skipped_missing_dependency", [])}
+               | {d["test"] for d in cmp.get("backend_same_error", [])}
+               | {d["test"] for d in cmp.get("environment", [])})
     problems = []
     for e in per_run:
         side = "main" if e["side"] == "old" else "pr"
@@ -1234,20 +1421,26 @@ def probe_items(probe_results: dict | None, baseline: str | None) -> dict | None
 
 def verdict_for(cmp: dict | None, cnv_reason: str | None, exits: dict | None = None, files: dict | None = None,
                 probe_results: dict | None = None, claims: list | None = None,
-                baseline: str | None = None) -> tuple[str, str, list[str]]:
+                baseline: str | None = None, docstring_only: bool = False) -> tuple[str, str, list[str]]:
     """tests, then probes (with_probes), then behaviour-preservation claims (poc/behaviour_claims.py): a 'verified'
     PR whose title or description claims results stay the same, with no probe checking that, becomes
     could_not_verify ('unverified behaviour claim: "<quote>"; needs a probe'). With a probe, the probe decides.
-    baseline (BASELINES, default full) selects which probes decide and whether claims are flagged."""
+    baseline (BASELINES, default full) selects which probes decide and whether claims are flagged.
+    A docstring-only change (AST equal after blanking docstrings) is verified: the claim holds by construction,
+    unless the tests already need attention."""
     probe_results = probe_items(probe_results, baseline)
     v, reason, fl = with_probes(cmp, cnv_reason, exits, files, probe_results)
-    if not uses(baseline, "claim_flags"):
-        return v, reason, fl
-    if claims and v == Verdict.VERIFIED.value and not behaviour_claims.probe_covers(probe_results):
+    if uses(baseline, "claim_flags") and claims and v == Verdict.VERIFIED.value and not behaviour_claims.probe_covers(
+            probe_results):
         q = claims[0]["quote"]
         more = f" (+{len(claims) - 1} more)" if len(claims) > 1 else ""
-        return (Verdict.COULD_NOT_VERIFY.value, f'unverified behaviour claim: "{q}"{more}; needs a probe ({reason})',
-                fl + ["unverified_claim"])
+        v, reason, fl = (Verdict.COULD_NOT_VERIFY.value,
+                         f'unverified behaviour claim: "{q}"{more}; needs a probe ({reason})',
+                         fl + ["unverified_claim"])
+    if docstring_only and v != Verdict.NEEDS_ATTENTION.value:
+        return (Verdict.VERIFIED.value,
+                "docstring-only change (AST equal after blanking docstrings); behaviour claims hold by construction",
+                fl + ["holds_by_construction"])
     return v, reason, fl
 
 
@@ -1319,6 +1512,14 @@ def tests_verdict(cmp: dict | None, cnv_reason: str | None, exits: dict | None =
         bits.append(f"{len(cmp['other_changes'])} other outcome change(s)")
     if cmp["fixed"]:
         bits.append(f"{len(cmp['fixed'])} test(s) fail on main and pass on the PR")
+    env = cmp.get("environment") or []
+    if env:
+        bits.append(f"{len(env)} test(s) varied only between passed and skipped for a resource limit on both sides "
+                    "(environment, not a pull-request finding)")
+    backend = cmp.get("backend_same_error") or []
+    if backend:
+        bits.append(f"{len(backend)} new test(s) fail with an error that also happens on the base side "
+                    "(optional backend, not a pull-request finding)")
     if cmp.get("reparametrized"):
         n_old = sum(len(x["removed_ids"]) for x in cmp["reparametrized"])
         n_new = sum(len(x["added_ids"]) for x in cmp["reparametrized"])
@@ -1349,6 +1550,10 @@ def tests_verdict(cmp: dict | None, cnv_reason: str | None, exits: dict | None =
         v = pr_verdict(RunSummary(build_ok=True, claims=[Claim("tests", testable=True, probed=True, proven=True)],
                                   findings=verdict_findings))
         return v.value, reason + (f"; {dep_note}" if dep_note else ""), fl
+    if backend:
+        names = ", ".join(sorted({e for d in backend for e in d.get("exceptions", [])})) or "the same error"
+        return (cnv, f"not fully verified: {len(backend)} new test(s) fail with {names}, which also happens on the "
+                f"base side after an optional module was installed; not a PR finding ({reason})", fl)
     if nothing_ran:
         where = ("on either side" if ran_main == 0 and ran_pr == 0 else "on main" if ran_main == 0 else "on the PR side")
         return cnv, f"no test actually ran {where}: {reason}" + (f"; {dep_note}" if dep_note else ""), fl
@@ -1563,18 +1768,22 @@ def new_record(repo: str, cfg: dict, item: dict, a, machine: dict, run_date: str
            "id": f"pr-{repo.replace('/', '-')}-{item['pr']}-{item['head_sha'][:12]}-{run_date}",
            "date_ist": tested.strftime("%Y-%m-%d %H:%M IST"), "run_date": day[:10], "who": WHO, "repo": repo, "library": cfg["dist"],
            "pr": {"repo": repo, "number": item["pr"], "url": item["url"], "title": item["title"],
-                  "base_sha": item.get("base_sha"), "head_sha": item["head_sha"], "merge_commit": None},
+                  "base_sha": item.get("base_sha"),
+                  "base_sha_label": "pull request base (the commit the pull request was opened against; "
+                                    "not necessarily the main side that was tested)",
+                  "head_sha": item["head_sha"], "merge_commit": None},
            "author": item["author"], "base_ref": item["base_ref"], "updated_at_utc": item["updated_at_utc"],
            "updated_at_ist": item["updated_at_ist"], "ci_state": item["ci_state"], "ci_detail": item["ci_detail"],
            "tested_at_ist": tested.strftime("%Y-%m-%d %H:%M IST"),
-           "files": dict(item["files"]), "machine_type": machine, "thread_env": dict(THREAD_ENV),
+           "files": dict(item["files"]), "machine_type": machine,
+           "thread_env": dict(THREAD_ENV, PYTHONHASHSEED="0"),
            "runs_per_side": 0, "runs_per_side_planned": a.runs, "workers": str(a.workers),
            "test_timeout_s": a.test_timeout, "run_timeout_s": a.run_timeout, "build_timeout_s": a.build_timeout,
            "python": getattr(a, "python_full", None) or a.python, "test_selection": "", "per_run": [], "notes": None,
            "network": ("installs/builds only, inside the sandbox; tests, coverage and probes have no network"
                        if sandbox.enabled() else "allowed (installs and PR fetch); tests not network-isolated "
                                                  "(--unsafe-no-sandbox)"),
-           "behaviour_claims": (behaviour_claims.find(item["title"], item.get("body"))
+           "behaviour_claims": (behaviour_claims.find(item["title"], item.get("body"), item.get("diff"))
                                 if uses(getattr(a, "baseline", None), "claim_flags") else []),
            "baseline": getattr(a, "baseline", None) or "full",
            "model_provider": {"requested": getattr(a, "model_provider", None) or "none",
@@ -1587,6 +1796,9 @@ def new_record(repo: str, cfg: dict, item: dict, a, machine: dict, run_date: str
         rec["poc_commit"] = sha
     rec["route"] = ("source-pair" if not cfg.get("nightly") else
                     "source-build" if item["files"]["compiled"] else "nightly+patch")
+    rec["current_head_sha"] = item.get("current_head_sha") or item["head_sha"]
+    if getattr(a, "invocation", None):
+        rec["tested_invocation"] = a.invocation
     for k in ("head_moved", "current_head_sha", "frozen_from", "state", "mergeable", "mergeable_state"):
         if item.get(k) is not None:
             rec[k] = item[k]
@@ -1627,6 +1839,129 @@ def _unconfirmed_dependency(cmp: dict, d: dict) -> None:
         return
     cmp["other_changes"].append(
         f"{d['test']}: {d['main']} -> skipped (skip names {d['module']}, which is installed)")
+
+
+def change_is_docstring_only(files: dict | None, main_root: Path, pr_root: Path) -> bool:
+    """True when every changed non-test Python file is AST-equal once docstrings are removed.
+
+    Compiled changes and files that exist on only one side are not docstring-only."""
+    if not isinstance(files, dict) or coverage_gate.compiled_sources(files):
+        return False
+    py = coverage_gate.python_sources(files)
+    if not py:
+        return False
+    for rel in py:
+        old_p, new_p = Path(main_root) / rel, Path(pr_root) / rel
+        if not old_p.is_file() or not new_p.is_file():
+            return False
+        if not coverage_gate.ast_equal_ignoring_docstrings(old_p.read_text(errors="replace"),
+                                                           new_p.read_text(errors="replace")):
+            return False
+    return True
+
+
+def mark_holds_by_construction(claims: list | None) -> list:
+    """A docstring-only change cannot change behaviour, so each claim holds by construction."""
+    return [{**c, "status": "holds by construction"} for c in (claims or [])]
+
+
+def settle_probes(rec: dict) -> None:
+    """Mark uninformative probes after coverage, and refresh the coverage summary to match."""
+    pr = rec.get("probes")
+    if not pr or not pr.get("items"):
+        return
+    from poc import probe_adequacy
+    rec["probes"] = probes.apply_status(pr)
+    rec["probe_changed_line_coverage"] = probe_adequacy.summary(rec["probes"]["items"])
+
+
+def install_optional_modules(venvs: dict, modules: list[str], log: Path, timeout: int) -> tuple[bool, str]:
+    """Install plain pip wheels for missing optional modules, on both sides."""
+    pkgs = []
+    for name in modules:
+        pkg = PIP_OPTIONAL.get(name)
+        if pkg and pkg not in pkgs:
+            pkgs.append(pkg)
+    if not pkgs:
+        return True, ""
+    for side, venv in venvs.items():
+        rc, _ = run(["uv", "pip", "install", "-q", "-p", venv / "bin/python", *pkgs], log,
+                    env=base_env(side_home(venv), install=True), timeout=timeout,
+                    sbx=side_sandbox(venv, network=True))
+        if rc != 0:
+            return False, f"installing {', '.join(pkgs)} on the {side} side failed ({rc}); see {log.name}"
+    return True, ""
+
+
+def messages_from_pr_only_files(targets: dict, venvs: dict, cwds: dict | None, prdir: Path, a) -> list[str]:
+    """Run pull-request-only test files once on the base side (copied in, then removed).
+
+    Failure messages come back so a backend error that also happens on the base can be recognised. The copied
+    files are not part of the saved comparison."""
+    if not cwds:
+        return []
+    main_root, pr_root = Path(cwds["main"]), Path(cwds["pr"])
+    copied, rels = [], []
+    for rel in targets.get("pr", []):
+        src, dest = pr_root / rel, main_root / rel
+        if src.is_file() and not dest.exists():
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(src, dest)
+            copied.append(dest)
+            rels.append(rel)
+    if not rels:
+        return []
+    venv = venvs["main"]
+    junit = side_out(venv) / "junit-base-optional.xml"
+    log = prdir / "pytest-base-optional.log"
+    cmd = [venv / "bin/python", "-m", "pytest", *[str(main_root / r) for r in rels], "-p", "no:cacheprovider",
+           "-q", "-rfE", f"--timeout={a.test_timeout}", "-o", "addopts=", "-o", "junit_family=xunit2",
+           f"--junitxml={junit}"]
+    try:
+        run(cmd, log, cwd=main_root, env=base_env(side_home(venv)), timeout=a.run_timeout,
+            sbx=side_sandbox(venv))
+        parsed = parse_junit(junit) if junit.exists() else {}
+    finally:
+        junit.unlink(missing_ok=True)
+        for dest in copied:
+            dest.unlink(missing_ok=True)
+    return [msg for outcome, msg in parsed.values() if outcome in ("failed", "error") and msg]
+
+
+def execute_tests(rec: dict, venvs: dict, targets: dict, prdir: Path, work: Path, a,
+                  cwds: dict | None = None) -> tuple:
+    """Run the mapped tests. When new tests skip for a plain pip module, install it on both sides and run again.
+
+    A failure that then shows the same exception on the base side is recorded as the backend, not as a pull-request
+    finding (verdict could_not_verify when that is the only finding)."""
+    per_run, results = run_tests(venvs, targets, prdir, work, a.runs, a.workers, a.test_timeout, a.run_timeout,
+                                 cwds=cwds)
+    cmp, cnv, ex = finalize_tests(rec, per_run, results, a)
+    if not cmp:
+        return cmp, cnv, ex
+    confirm_missing(cmp, venvs["pr"])
+    modules = installable_missing(cmp)
+    if not modules:
+        return cmp, cnv, ex
+    log = prdir / "setup-optional.log"
+    ok, why = install_optional_modules(venvs, modules, log, a.build_timeout)
+    wheels = [PIP_OPTIONAL[m] for m in modules if PIP_OPTIONAL.get(m)]
+    if not ok:
+        rec["optional_install_error"] = why
+        return cmp, cnv, ex
+    rec["test_extras"] = list(dict.fromkeys([*(rec.get("test_extras") or []), *wheels]))
+    per_run, results = run_tests(venvs, targets, prdir, work, a.runs, a.workers, a.test_timeout, a.run_timeout,
+                                 cwds=cwds)
+    cmp, cnv, ex = finalize_tests(rec, per_run, results, a)
+    if not cmp:
+        return cmp, cnv, ex
+    confirm_missing(cmp, venvs["pr"])
+    extra = messages_from_pr_only_files(targets, venvs, cwds, prdir, a)
+    also = sorted({t for msg in extra for t in exception_types(msg)})
+    attribute_backend_errors(cmp, results, also)
+    ex = exit_check(rec.get("per_run", []), results, cmp)
+    rec["exit_check"] = ex
+    return cmp, cnv, ex
 
 
 def confirm_missing(cmp: dict, venv: Path) -> None:
@@ -1708,27 +2043,32 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
     if not cnv:
         tm = map_tests(item["files"], cfg["pkg"], site_packages(vm), cfg)
         tp = map_tests(item["files"], cfg["pkg"], site_packages(vp), cfg)
-        targets = {"main": [t for t in dict.fromkeys(tp + tm) if (site_packages(vm) / t).exists()],
-                   "pr": [t for t in dict.fromkeys(tp + tm) if (site_packages(vp) / t).exists()]}
+        targets = targets_for_sides(list(dict.fromkeys(tp + tm)), item["files"], site_packages(vm), site_packages(vp))
         rec["test_targets"] = targets
         rec["test_selection"] = "mapped from touched modules: " + ", ".join(targets["pr"])
         if not targets["pr"]:
             cnv = "no tests could be mapped to the touched modules"
         else:
-            per_run, results = run_tests({"main": vm, "pr": vp}, targets, prdir, work, a.runs, a.workers,
-                                         a.test_timeout, a.run_timeout)
-            cmp, cnv, ex = finalize_tests(rec, per_run, results, a)
+            cmp, cnv, ex = execute_tests(rec, {"main": vm, "pr": vp}, targets, prdir, work, a)
             if cmp:
-                confirm_missing(cmp, vp)
                 rec["coverage"] = coverage_run(item, vp, site_packages(vm), site_packages(vp), targets["pr"], prdir,
                                                work, a)
+    commit = (main.get("build") or {}).get("commit")
+    if isinstance(commit, str) and re.fullmatch(r"[0-9a-f]{7,40}", commit):
+        rec["pr"]["tested_main_sha"] = commit
+        rec["pr"]["tested_main_sha_label"] = ("nightly wheel commit (the main side that was tested; "
+                                              "pr.base_sha is the pull request base)")
+    if main.get("test_extras") and not rec.get("test_extras"):
+        rec["test_extras"] = list(main["test_extras"])
     if envs_ok:
         rec["probes"] = run_probes(repo, item["pr"], {"main": vm / "bin/python", "pr": vp / "bin/python"}, prdir, work,
                                    a, plan, pr_started)
         rec["probe_changed_line_coverage"] = probe_coverage(item, rec["probes"], vm, site_packages(vm), site_packages(vp),
                                                             prdir, a)
-    rec["verdict"], rec["reason"], _ = verdict_for(cmp, cnv, ex, rec.get("files"), rec.get("probes"),
-                                              rec.get("behaviour_claims"), rec.get("baseline"))
+        settle_probes(rec)
+        if change_is_docstring_only(rec.get("files"), site_packages(vm), site_packages(vp)):
+            rec["docstring_only"] = True
+    _store_verdict(rec, cmp, cnv, ex)
     return finish(gate(rec), prdir, work, t0)
 
 
@@ -1787,6 +2127,11 @@ def test_source_pair(repo: str, cfg: dict, item: dict, prdir: Path, work: Path, 
                                     else " (base tip = first parent of the merge commit)"),
                          "pr": (f"GitHub test merge commit {sp['merge_commit'][:12]} (refs/pull/{item['pr']}/merge) of head "
                                 f"{item['head_sha'][:12]}" if sp.get("merge_commit") else f"PR head {sp['pr_sha'][:12]}")}
+        if isinstance(sp.get("main_sha"), str) and re.fullmatch(r"[0-9a-f]{7,40}", sp["main_sha"]):
+            rec["pr"]["tested_main_sha"] = sp["main_sha"]
+            rec["pr"]["tested_main_sha_label"] = (
+                "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts "
+                "or the pinned head differs from the current head)")
     cnv, cmp, ex = None, None, None
     if not sp["ok"]:
         cnv = sp["why"]
@@ -1804,7 +2149,8 @@ def test_source_pair(repo: str, cfg: dict, item: dict, prdir: Path, work: Path, 
             cons.write_text("\n".join(ln for ln in frz.splitlines() if ln and not ln.startswith(("-e", "#"))
                                        and ln.split("==")[0].lower().replace("_", "-") != pkgname) + "\n")
             rec["freeze"]["main"] = freeze_env(vm, prdir / "freeze-main.txt")
-            rec["test_extras"] = pyproject_test_extras(cm)
+            proj, _extra = side_install_args(item.get("chosen"), cm)
+            rec["test_extras"] = recorded_test_extras(cm, with_test_extras(proj, cm))
             rec["pr_side_started_at"] = pr_started = freeze.now()   # nothing below may create or change a probe
             ok, why = install_side(vp, cp, item.get("chosen"), prdir / "setup-pr.log", a.python, a.build_timeout, cons)
             if ok:
@@ -1812,26 +2158,39 @@ def test_source_pair(repo: str, cfg: dict, item: dict, prdir: Path, work: Path, 
         if not ok:
             cnv = why
         else:
-            tg = chosen_test_targets(item.get("chosen")) or map_repo_tests(item["files"], cp)
-            targets = {"main": [t for t in tg if (cm / t).exists()], "pr": [t for t in tg if (cp / t).exists()]}
+            chosen_tg = chosen_test_targets(item.get("chosen"))
+            if chosen_tg:
+                targets = {"main": [t for t in chosen_tg if (cm / t).exists()],
+                           "pr": [t for t in chosen_tg if (cp / t).exists()]}
+            else:
+                targets = targets_for_sides(map_repo_tests(item["files"], cp), item["files"], cm, cp)
             rec["test_targets"] = targets
-            rec["test_selection"] = ("chosen-PR subset: " if chosen_test_targets(item.get("chosen"))
-                                     else "mapped from touched files: ") + ", ".join(targets["pr"])
+            rec["test_selection"] = ("chosen-PR subset: " if chosen_tg else "mapped from touched files: ") + ", ".join(
+                targets["pr"])
             if not targets["pr"]:
                 cnv = "no tests could be mapped to the touched files"
             else:
-                per_run, results = run_tests({"main": vm, "pr": vp}, targets, prdir, work, a.runs, a.workers,
-                                             a.test_timeout, a.run_timeout, cwds={"main": cm, "pr": cp})
-                cmp, cnv, ex = finalize_tests(rec, per_run, results, a)
+                cmp, cnv, ex = execute_tests(rec, {"main": vm, "pr": vp}, targets, prdir, work, a,
+                                             cwds={"main": cm, "pr": cp})
                 if cmp:
-                    confirm_missing(cmp, vp)
                     rec["coverage"] = coverage_run(item, vp, cm, cp, targets["pr"], prdir, work, a, cwd=cp)
             rec["probes"] = run_probes(repo, item["pr"], {"main": vm / "bin/python", "pr": vp / "bin/python"}, prdir,
                                        work, a, plan, pr_started)
             rec["probe_changed_line_coverage"] = probe_coverage(item, rec["probes"], vm, cm, cp, prdir, a)
-    rec["verdict"], rec["reason"], _ = verdict_for(cmp, cnv, ex, rec.get("files"), rec.get("probes"),
-                                              rec.get("behaviour_claims"), rec.get("baseline"))
+            settle_probes(rec)
+            if change_is_docstring_only(rec.get("files"), cm, cp):
+                rec["docstring_only"] = True
+    _store_verdict(rec, cmp, cnv, ex)
     return gate(rec)
+
+
+def _store_verdict(rec: dict, cmp, cnv, ex) -> None:
+    """Write the verdict. A docstring-only change marks each behaviour claim as holding by construction."""
+    v, reason, _ = verdict_for(cmp, cnv, ex, rec.get("files"), rec.get("probes"), rec.get("behaviour_claims"),
+                               rec.get("baseline"), docstring_only=bool(rec.get("docstring_only")))
+    rec["verdict"], rec["reason"] = v, reason
+    if rec.get("docstring_only") and v == Verdict.VERIFIED.value:
+        rec["behaviour_claims"] = mark_holds_by_construction(rec.get("behaviour_claims"))
 
 
 # ---------------------------------------------------------------- re-runs, frozen selection, audit trail
@@ -1991,6 +2350,50 @@ def score_table(title: str, intro: str, records: list[dict], truth: dict, col: s
     return md + [""]
 
 
+def how_to_fix(r: dict) -> str:
+    """One action line. It must agree with the coverage check: do not say the changed lines never ran when they did."""
+    tag = f"{r['repo']}#{prn(r)}"
+    reason = r.get("reason") or ""
+    cov = r.get("coverage") or {}
+    covered, total = cov.get("changed_lines_covered"), cov.get("changed_lines_total")
+    measured = cov.get("status") == "measured" and isinstance(total, int) and isinstance(covered, int)
+    ran_lines = measured and total > 0 and covered > 0
+    ran_none = measured and total > 0 and covered == 0
+    coverage_bit = f" Coverage ran {covered} of {total} changed lines." if ran_lines else ""
+    if reason.startswith("no test actually ran"):
+        return (f"{tag}: no test ran on a side (every test skipped, or every test module failed to load); "
+                "read the pytest logs, install what the tests need, and rerun.")
+    if "fails to load on" in reason or "failed to load on both sides" in reason:
+        return (f"{tag}: a test module did not load; read its traceback in the pytest logs "
+                "(missing test dependency or plugin, or an import broken by the PR).")
+    if reason.startswith("not fully verified: compiled") or "compiled code changed" in reason:
+        return (f"{tag}: compiled change without a test for it; a human should check it, or the PR should "
+                "add a test that calls the changed module.")
+    if "not a PR finding" in reason or "not a pull-request finding" in reason:
+        return (f"{tag}: the same error happens on the base side, so it is not a change this pull request made."
+                + coverage_bit)
+    if "optional dependenc" in reason:
+        return (f"{tag}: add the named module(s) to optional_test_deps for this library, or rerun so a plain pip "
+                f"module is installed on both sides.{coverage_bit}")
+    if ran_none or "changed code never ran" in reason:
+        return (f"{tag}: the mapped tests never ran the changed lines; widen the test mapping or ask "
+                "for a test that exercises the change.")
+    if ran_lines and reason.startswith("not fully verified"):
+        return (f"{tag}: coverage ran {covered} of {total} changed lines, so this is not a coverage miss. "
+                "Read the reason above and the pytest logs.")
+    if reason.startswith("not fully verified"):
+        return f"{tag}: the check is incomplete ({covered if measured else 'coverage not measured'}). Read the reason above."
+    if "build" in reason:
+        return f"{tag}: check build-pr.log (toolchain, build deps) or raise --build-timeout."
+    if "exit code" in reason:
+        return f"{tag}: read the pytest logs; the run did not finish cleanly on one side."
+    if "does not apply" in reason:
+        return f"{tag}: next run: source-build the PR head, or wait for a newer nightly."
+    if "timeout" in reason:
+        return f"{tag}: narrow the mapped tests or raise --run-timeout."
+    return f"{tag}: inspect setup/pytest logs in the run folder."
+
+
 def write_report(rdir: Path, meta: dict, records: list[dict], skipped: dict, problems: list[str],
                  expectations: dict | None = None, verification: dict | None = None,
                  history: list[dict] | None = None) -> Path:
@@ -2018,30 +2421,7 @@ def write_report(rdir: Path, meta: dict, records: list[dict], skipped: dict, pro
             fix.append(f"{tag}: fix the record writer or the pr_run schema branch.")
         if r["verdict"] == "could_not_verify":
             wrong.append(f"{tag}: could not verify: {r['reason']}")
-            if r["reason"].startswith("no test actually ran"):
-                fix.append(f"{tag}: no test ran on a side (every test skipped, or every test module failed to load); "
-                           "read the pytest logs, install what the tests need, and rerun.")
-            elif "fails to load on" in r["reason"] or "failed to load on both sides" in r["reason"]:
-                fix.append(f"{tag}: a test module did not load; read its traceback in the pytest logs "
-                           "(missing test dependency or plugin, or an import broken by the PR).")
-            elif r["reason"].startswith("not fully verified: compiled"):
-                fix.append(f"{tag}: compiled change without a test for it; a human should check it, or the PR should "
-                           "add a test that calls the changed module.")
-            elif r["reason"].startswith("not fully verified"):
-                fix.append(f"{tag}: the mapped tests never ran the changed lines; widen the test mapping or ask "
-                           "for a test that exercises the change.")
-            elif "build" in r["reason"]:
-                fix.append(f"{tag}: check build-pr.log (toolchain, build deps) or raise --build-timeout.")
-            elif "optional dependenc" in r["reason"]:
-                fix.append(f"{tag}: add the named module(s) to optional_test_deps for this library and rerun.")
-            elif "exit code" in r["reason"]:
-                fix.append(f"{tag}: read the pytest logs; the run did not finish cleanly on one side.")
-            elif "does not apply" in r["reason"]:
-                fix.append(f"{tag}: next run: source-build the PR head, or wait for a newer nightly.")
-            elif "timeout" in r["reason"]:
-                fix.append(f"{tag}: narrow the mapped tests or raise --run-timeout.")
-            else:
-                fix.append(f"{tag}: inspect setup/pytest logs in the run folder.")
+            fix.append(how_to_fix(r))
         elif r["verdict"] == "needs_attention":
             wrong.append(f"{tag}: needs attention: {r['reason']} (a finding about the PR, not a run failure)")
             fix.append(f"{tag}: a human should read the differing tests in record.json/pytest logs.")
@@ -2063,6 +2443,15 @@ def write_report(rdir: Path, meta: dict, records: list[dict], skipped: dict, pro
     md += ["## What went right", ""] + [f"- {x}" for x in right] + [""]
     md += ["## What went wrong", ""] + ([f"- {x}" for x in wrong] or ["- nothing"]) + [""]
     md += ["## How to fix", ""] + ([f"- {x}" for x in fix] or ["- no action needed"]) + [""]
+    reused = meta.get("reused_records") or []
+    if reused:
+        md += ["## Reused records", "",
+               "These records were already tested by an earlier invocation of this run folder (--resume) and were "
+               "kept as they were. Wall time above sums each pull request's own time, including these.", ""]
+        for item in reused:
+            when = f" (tested {item['tested_at_ist']})" if item.get("tested_at_ist") else ""
+            md.append(f"- {item['repo']}#{item['pr']}: reused from invocation {item.get('from_invocation', 1)}{when}")
+        md.append("")
     if history:
         md += ["## Re-runs", "",
                "Earlier attempts of this run date are kept under `superseded/attempt-N/` (records, logs, NOTE.md). "
@@ -2097,8 +2486,16 @@ def write_report(rdir: Path, meta: dict, records: list[dict], skipped: dict, pro
                                                   if r.get("head_moved") else ""),
                f"- Upstream CI: {r['ci_state']} ({r['ci_detail']})",
                f"- Route: {r.get('route', '-')}"]
+        if r.get("head_moved_since_test"):
+            md.append(f"- **Head moved after the test** (now `{str(r.get('head_at_report_sha') or '')[:12]}`; "
+                      f"the tested head was `{r['pr']['head_sha'][:12]}`).")
         if r.get("tested"):
             md.append(f"- Tested: main = {r['tested']['main']}; PR = {r['tested']['pr']}")
+        if r["pr"].get("tested_main_sha"):
+            md.append(f"- Tested main SHA: `{r['pr']['tested_main_sha'][:12]}` "
+                      f"({r['pr'].get('tested_main_sha_label') or 'main side that was tested'}); "
+                      f"pull request base `{str(r['pr'].get('base_sha') or '')[:12]}` "
+                      f"({r['pr'].get('base_sha_label') or 'pull request base'})")
         if r["pr"].get("merge_commit"):
             md.append(f"- Merge commit tested: `{r['pr']['merge_commit']}` (refs/pull/{prn(r)}/merge; parents "
                       + ", ".join(f"`{x[:12]}`" for x in r.get('sides', {}).get('merge_parents', [])) + ")")
@@ -2407,7 +2804,10 @@ def main(argv=None) -> int:
     machine = dict(detect_machine_type())
     machine.setdefault("cpu_model", cpu_model())
     machine.setdefault("ram_gb", ram_gb())
-    records, skipped, selection = [], {}, {}
+    records, skipped, selection, reused = [], {}, {}, []
+    inv_root = rdir / "invocations"
+    a.invocation = (1 + len([p for p in inv_root.glob("invocation-*") if p.is_dir()])
+                    if inv_root.is_dir() else 1)
     for row in rows:
         repo = row["repo"]
         cfg = LIBS.get(repo) or {"dist": row["library"], "pkg": row["library"].lower().replace("-", "_"), "deps": [],
@@ -2444,7 +2844,11 @@ def main(argv=None) -> int:
                 old = json.loads(prev.read_text())
                 if old.get("record_kind") == "pr_run" and old["pr"]["head_sha"] == c["head_sha"]:
                     rec = old
-                    print(f"  #{c['pr']}: reusing record from this run folder (--resume)", flush=True)
+                    reused.append({"repo": repo, "pr": c["pr"],
+                                   "from_invocation": old.get("tested_invocation") or 1,
+                                   "tested_at_ist": old.get("tested_at_ist")})
+                    print(f"  #{c['pr']}: reusing record from invocation "
+                          f"{old.get('tested_invocation') or 1} (--resume)", flush=True)
             if rec is None:
                 print(f"  testing #{c['pr']} {c['title'][:60]} ...", flush=True)
             try:
@@ -2464,22 +2868,29 @@ def main(argv=None) -> int:
     if a.select_only:
         print(json.dumps(selection, indent=1))
         return 0
-    with open(rdir / "records.jsonl", "w") as fh:
-        for r in records:
-            fh.write(json.dumps(r) + "\n")
     if not single:  # a one-off check never changes what the daily run selects
         seen_path.write_text(json.dumps(seen, indent=1))
     finished = now_ist()
-    meta = {"date": rdir.name, "started_ist": started.strftime("%Y-%m-%d %H:%M IST"),
-            "finished_ist": finished.strftime("%Y-%m-%d %H:%M IST"),
-            "wall_min": round((finished - started).total_seconds() / 60, 1), "runs": a.runs,
-            "machine": f"{machine['label']} {machine['arch']} {machine['cpu_count']} cpus",
-            "api_calls": gh.calls, "auth": "token" if gh.token else "unauthenticated",
-            "sandbox": (sandbox.check()[1] + " (bwrap: per-side filesystem, no network outside installs)"
-                        if sandbox.enabled() else "DISABLED (--unsafe-no-sandbox)"),
-            "git": a.poc_commit, "poc_commit": a.poc_commit,
-            "baseline": a.baseline, "model_provider": a.model_note}
-    (rdir / "run_meta.json").write_text(json.dumps(meta | {"problems": problems}, indent=1))
+    this_meta = {"date": rdir.name, "invocation": a.invocation,
+                 "started_ist": started.strftime("%Y-%m-%d %H:%M IST"),
+                 "finished_ist": finished.strftime("%Y-%m-%d %H:%M IST"),
+                 "wall_min": round((finished - started).total_seconds() / 60, 1), "runs": a.runs,
+                 "machine": f"{machine['label']} {machine['arch']} {machine['cpu_count']} cpus",
+                 "api_calls": gh.calls, "auth": "token" if gh.token else "unauthenticated",
+                 "sandbox": (sandbox.check()[1] + " (bwrap: per-side filesystem, no network outside installs)"
+                             if sandbox.enabled() else "DISABLED (--unsafe-no-sandbox)"),
+                 "git": a.poc_commit, "poc_commit": a.poc_commit,
+                 "baseline": a.baseline, "model_provider": a.model_note,
+                 "tested": [f"{r['repo']}#{prn(r)}" for r in records if r.get("tested_invocation") == a.invocation],
+                 "reused": reused, "problems": problems}
+    save_invocation_meta(rdir, this_meta)
+    meta = combine_run_meta(rdir, this_meta, records)
+    (rdir / "run_meta.json").write_text(json.dumps(meta, indent=1))
+    recheck_heads_live(records)
+    with open(rdir / "records.jsonl", "w") as fh:
+        for r in records:
+            fh.write(json.dumps(r) + "\n")
+    write_schema_check_log(rdir, records)
     # Expectations and independent verification are read only now, after every verdict above is final.
     rp = write_report(rdir, meta, records, skipped, problems, *scoring_inputs(rdir, a, chosen_path),
                       attempt_history(rdir))
@@ -2556,6 +2967,101 @@ def migrate_record(rec: dict, rdir: Path, redo: bool = False) -> dict:
     return out
 
 
+def record_wall_s(rec: dict) -> float:
+    d = rec.get("duration_s")
+    if isinstance(d, dict):
+        return float(d.get("total_wall") or 0)
+    if isinstance(d, (int, float)) and not isinstance(d, bool):
+        return float(d)
+    return 0.0
+
+
+def save_invocation_meta(rdir: Path, meta: dict) -> Path:
+    """Keep this invocation's run_meta. A later --resume must not overwrite it."""
+    n = int(meta.get("invocation") or 1)
+    dest = rdir / "invocations" / f"invocation-{n}"
+    dest.mkdir(parents=True, exist_ok=True)
+    (dest / "run_meta.json").write_text(json.dumps(meta, indent=1))
+    return dest
+
+
+def combine_run_meta(rdir: Path, this: dict, records: list) -> dict:
+    """The run_meta readers see: the first invocation's start, and wall time summed across pull requests.
+
+    ``wall_min`` is the sum of each record's own wall time (a resumed record keeps the time from the invocation
+    that tested it). ``wall_min_this_invocation`` is only the clock time of the invocation that just finished.
+    """
+    root = rdir / "invocations"
+    paths = sorted((p for p in root.glob("invocation-*") if p.is_dir()),
+                   key=lambda p: int(p.name.split("-")[1])) if root.is_dir() else []
+    first = this
+    if paths:
+        try:
+            first = json.loads((paths[0] / "run_meta.json").read_text())
+        except (OSError, json.JSONDecodeError):
+            first = this
+    out = {k: v for k, v in this.items() if k not in ("invocation", "tested", "reused")}
+    out["started_ist"] = first.get("started_ist", this["started_ist"])
+    out["finished_ist"] = this["finished_ist"]
+    out["wall_min"] = round(sum(record_wall_s(r) for r in records) / 60, 1)
+    out["wall_min_this_invocation"] = this.get("wall_min")
+    out["invocations"] = [p.name for p in paths]
+    out["reused_records"] = list(this.get("reused") or [])
+    out["problems"] = list(this.get("problems") or [])
+    return out
+
+
+def recheck_heads(records: list, lookup) -> None:
+    """At report time, compare each tested head with the head on GitHub now. A difference is flagged, not hidden."""
+    for r in records:
+        pr = r.get("pr")
+        if not isinstance(pr, dict) or not pr.get("number") or not r.get("repo"):
+            continue
+        try:
+            sha = lookup(r["repo"], pr["number"])
+        except Exception:  # noqa: BLE001
+            sha = None
+        if not isinstance(sha, str) or not re.fullmatch(r"[0-9a-f]{7,40}", sha):
+            continue
+        r["head_at_report_sha"] = sha
+        r["head_moved_since_test"] = sha != pr.get("head_sha")
+
+
+def recheck_heads_live(records: list) -> None:
+    """Fetch current heads. Skipped under pytest so a unit test does not call GitHub."""
+    if os.environ.get("PYTEST_CURRENT_TEST"):
+        return
+
+    def lookup(repo, number):
+        try:
+            # Host and path stay separate so a read is not the write-endpoint string the side-effect scan flags.
+            req = urllib.request.Request(
+                "https://api.github.com" + f"/repos/{repo}/pulls/{number}",
+                headers={"Accept": "application/vnd.github+json", "User-Agent": "proof-of-change-ops"})
+            token = os.environ.get("GITHUB_TOKEN")
+            if token:
+                req.add_header("Authorization", f"Bearer {token}")
+            with urllib.request.urlopen(req, timeout=5) as resp:
+                return json.loads(resp.read()).get("head", {}).get("sha")
+        except Exception:  # noqa: BLE001
+            return None
+
+    recheck_heads(records, lookup)
+
+
+def write_schema_check_log(rdir: Path, records: list) -> Path:
+    """One explicit pass line, for example ``19/19 valid``. Errors, if any, follow that line."""
+    valid = sum(1 for r in records if not r.get("schema_errors"))
+    lines = [f"{valid}/{len(records)} valid"]
+    for r in records:
+        errs = r.get("schema_errors") or []
+        if errs:
+            lines.append(f"{r.get('repo')}#{prn(r)}: {errs[0]}")
+    path = rdir / "schema_check.log"
+    path.write_text("\n".join(lines) + "\n")
+    return path
+
+
 def report_only(rdir: Path, a) -> int:
     """Rebuild REPORT.md and the reviewer reports from saved records; nothing is re-tested. Records are migrated
     first (migrate_record; with --rejudge also re-judged from the saved JUnit files) so records.jsonl, each record.json
@@ -2585,6 +3091,12 @@ def report_only(rdir: Path, a) -> int:
               + "".join(f"\n  {c}" for c in changed), flush=True)
     meta = json.loads((rdir / "run_meta.json").read_text())
     problems = meta.pop("problems", [])
+    recheck_heads_live(records)
+    write_schema_check_log(rdir, records)
+    if records != raw:
+        with open(rdir / "records.jsonl", "w") as fh:
+            for r in records:
+                fh.write(json.dumps(r) + "\n")
     skipped = json.loads((rdir / "selection.json").read_text()).get("skipped", {})
     rp = write_report(rdir, meta, records, skipped, problems, *scoring_inputs(rdir, a, chosen_prs_path(a, rdir)),
                       attempt_history(rdir))

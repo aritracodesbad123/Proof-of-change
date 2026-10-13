@@ -1,7 +1,7 @@
 {
  "$schema": "https://json-schema.org/draft/2020-12/schema",
  "$id": "blast-radius/observation/v1",
- "title": "Blast Radius observation record v1, revision 8 (shared by the downstream-test runner br_run.py and harness/run.py, plus Proof-of-Change PR runs)",
+ "title": "Blast Radius observation record v1, revision 9 (shared by the downstream-test runner br_run.py and harness/run.py, plus Proof-of-Change PR runs)",
  "type": "object",
  "properties": {
   "schema_version": {
@@ -426,6 +426,11 @@
      "enum": [
       "1"
      ]
+    },
+    "PYTHONHASHSEED": {
+     "type": "string",
+     "const": "0",
+     "description": "OPTIONAL (rev 9). Recorded as 0, matching the fixed environment the tests run under. Absent on older records."
     }
    }
   },
@@ -518,6 +523,22 @@
       "null"
      ],
      "pattern": "^[0-9a-f]{7,40}$"
+    },
+    "base_sha_label": {
+     "type": "string",
+     "description": "OPTIONAL (rev 9). Says base_sha is the pull request's base, which is not necessarily the main side that was tested."
+    },
+    "tested_main_sha": {
+     "type": [
+      "string",
+      "null"
+     ],
+     "pattern": "^[0-9a-f]{7,40}$",
+     "description": "OPTIONAL (rev 9). The main-side commit that was actually tested."
+    },
+    "tested_main_sha_label": {
+     "type": "string",
+     "description": "OPTIONAL (rev 9). What tested_main_sha is (base-branch tip, merge-base, or a nightly wheel commit)."
     }
    }
   },
@@ -867,7 +888,7 @@
   },
   "comparison": {
    "type": "object",
-   "description": "OPTIONAL (rev 3, pr_run records). Per-test comparison: same, regressions, fixed, new_tests_passing, new_tests_failing, removed_tests, reparametrized, skipped_missing_dependency, flaky, other_changes, preexisting_failures, messages."
+   "description": "OPTIONAL (rev 3, pr_run records). Per-test comparison: same, regressions, fixed, new_tests_passing, new_tests_failing, removed_tests, reparametrized, skipped_missing_dependency, flaky, other_changes, preexisting_failures, messages. Rev 9 adds environment (a pass/skip change for a resource limit on both sides) and backend_same_error (a new failure whose exception also happens on the base side after an optional module was installed)."
   },
   "exit_check": {
    "type": "object",
@@ -1224,14 +1245,15 @@
     "status",
     "items"
    ],
-   "description": "OPTIONAL (rev 6; rev 7 adds generator, freeze, refused and source diff). Probes run on both sides of a PR (poc/probes.py): small deterministic scripts whose JSON observations are compared by plain code. status none = the PR has no probe.",
+   "description": "OPTIONAL (rev 6; rev 7 adds generator, freeze, refused and source diff; rev 9 adds status uninformative). Probes run on both sides of a PR (poc/probes.py): small deterministic scripts whose JSON observations are compared by plain code. status none = the PR has no probe. status uninformative = every probe saw only the same exception on both sides, so it did not count as ran.",
    "properties": {
     "status": {
      "type": "string",
      "enum": [
       "ran",
       "none",
-      "error"
+      "error",
+      "uninformative"
      ]
     },
     "items": {
@@ -1279,6 +1301,20 @@
        },
        "about": {
         "type": "string"
+       },
+       "status": {
+        "type": "string",
+        "enum": [
+         "ran",
+         "uninformative",
+         "not_run",
+         "error"
+        ],
+        "description": "OPTIONAL (rev 9). ran = the probe observed the function; uninformative = every input raised the same exception on both sides; not_run = no type-aware input could be built; error = the probe produced no observations."
+       },
+       "uninformative_reason": {
+        "type": "string",
+        "description": "OPTIONAL (rev 9). Why this probe did not count as ran."
        },
        "claims": {
         "type": "array",
@@ -1726,7 +1762,7 @@
   },
   "behaviour_claims": {
    "type": "array",
-   "description": "OPTIONAL (rev 6). Behaviour-preservation claims found in the PR title or description (poc/behaviour_claims.py), each {source, quote, pattern}. Without a probe whose claims expect 'same', a verified PR with such a claim becomes could_not_verify.",
+   "description": "OPTIONAL (rev 6; rev 9 adds sources changelog and docstring, and an optional status). Behaviour-preservation claims (poc/behaviour_claims.py), each {source, quote, pattern}. Without a probe whose claims expect 'same', a verified PR with such a claim becomes could_not_verify. status 'holds by construction' means a docstring-only change.",
    "items": {
     "type": "object",
     "required": [
@@ -1739,7 +1775,9 @@
       "type": "string",
       "enum": [
        "title",
-       "PR description"
+       "PR description",
+       "changelog",
+       "docstring"
       ]
      },
      "quote": {
@@ -1747,6 +1785,13 @@
      },
      "pattern": {
       "type": "string"
+     },
+     "status": {
+      "type": "string",
+      "enum": [
+       "holds by construction"
+      ],
+      "description": "OPTIONAL (rev 9). Set when a docstring-only change makes the claim hold by construction."
      }
     }
    }
@@ -1815,6 +1860,27 @@
   "pr_side_started_at": {
    "type": "string",
    "description": "OPTIONAL (rev 7). When the first PR-side execution (install, build or patch) started; probes frozen later are refused."
+  },
+  "head_at_report_sha": {
+   "type": [
+    "string",
+    "null"
+   ],
+   "pattern": "^[0-9a-f]{7,40}$",
+   "description": "OPTIONAL (rev 9). Pull-request head on the forge when the report was written."
+  },
+  "head_moved_since_test": {
+   "type": "boolean",
+   "description": "OPTIONAL (rev 9). True when head_at_report_sha differs from the head that was tested."
+  },
+  "tested_invocation": {
+   "type": "integer",
+   "minimum": 1,
+   "description": "OPTIONAL (rev 9). Which invocation of this run folder tested the pull request. A later --resume keeps the earlier record."
+  },
+  "docstring_only": {
+   "type": "boolean",
+   "description": "OPTIONAL (rev 9). True when every changed Python file has the same AST after docstrings are removed."
   }
  },
  "description": "One JSON object per (upstream, old, new, dependent) tuple, one line in observations.jsonl and research/runs/<id>/record.json. Merged 2026-10-10 from runner v1 (gates, accepted, network, report, stability, dependent_import) and guardrails/schema.py (hand_check, upstream_issue, machine_type, thread_env, per_run.collection_errors, per_run.pytest_summary). Cross-field rules not expressible here are listed in x-cross-field-rules and enforced by harness/brlib.py validate(). Revision 2 (2026-10-10, from docs/REPORT_SPEC.md): adds OPTIONAL pr, claims, upstream_commit_old/new, per_test_outcomes, old_output, golden_check, reviewer_decision for the reviewer report. Purely additive: every rev 1 record stays valid, schema_version stays \"1\". hand_check and upstream_issue were already present (required, nullable) and are unchanged. Accepted schema_sha256 values for rev 1 and rev 2 are listed in harness/schema/README.md and guardrails/schema.py.",
@@ -1867,6 +1933,11 @@
    "rev": 8,
    "date": "2026-10-13",
    "change": "optional pr_run property `poc_commit`: the full git commit of Proof-of-Change (origin/main) that the daily run fast-forwarded to before testing. Nothing becomes required in the schema, so rev 1-7 records stay valid. The daily run's record check requires the field on a pr_run record."
+  },
+  {
+   "rev": 9,
+   "date": "2026-10-13",
+   "change": "optional additions only: probes.status uninformative; probe item status (ran, uninformative, not_run, error) and uninformative_reason; behaviour_claims sources changelog and docstring, plus optional status 'holds by construction'; thread_env.PYTHONHASHSEED const 0; pr.base_sha_label, pr.tested_main_sha, pr.tested_main_sha_label; head_at_report_sha, head_moved_since_test, tested_invocation, docstring_only. Nothing becomes required, so rev 1-8 records stay valid."
   }
  ],
  "if": {
