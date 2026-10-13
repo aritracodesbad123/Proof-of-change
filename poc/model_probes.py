@@ -117,6 +117,9 @@ def generate(provider: Provider, repo: str, pr: int, title: str, body: str | Non
     by_id = {c["id"]: c for c in testable}
     outdir.mkdir(parents=True, exist_ok=True)
     for p in (resp or {}).get("probes", [])[:MAX_PROBES]:
+        # Models name probes "P1" or "probe_x"; the id is only a file name, so normalise it rather than drop the probe
+        if isinstance(p, dict) and isinstance(p.get("id"), str):
+            p["id"] = re.sub(r"[^a-z0-9-]+", "-", p["id"].lower()).strip("-")[:40] or p["id"]
         why = validate_probe(p, set(by_id))
         if why:
             out["errors"].append(f"probe {p.get('id')!r} rejected: {why}")

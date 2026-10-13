@@ -175,13 +175,20 @@ class NebiusChat(GatedProvider):
                 "blind": all_gated and all_raw, "call_log": self.calls}
 
 
+_CURRENT: dict = {}
+
+
 def install_query_llm(chat: NebiusChat) -> None:
     """Replace PatchGuru's OpenAI module with one whose query_llm goes through `chat`. Must run before any other
     PatchGuru module is imported (they import query_llm by name)."""
+    _CURRENT["chat"] = chat
+    if "patchguru.llms.OpenAI" in sys.modules and getattr(sys.modules["patchguru.llms.OpenAI"], "_poc", False):
+        return   # already installed; PatchGuru modules hold query_llm by name, so it reads _CURRENT on each call
     mod = types.ModuleType("patchguru.llms.OpenAI")
+    mod._poc = True
 
     def query_llm(prompt, model=None, temperature=0.7, max_tokens=16384):
-        return chat.complete_json("patchguru", "", prompt, {}, {"temperature": temperature,
+        return _CURRENT["chat"].complete_json("patchguru", "", prompt, {}, {"temperature": temperature,
                                                                "max_tokens": max_tokens})["text"]
 
     mod.query_llm = query_llm
@@ -344,8 +351,21 @@ def run_case(row: dict, a, fp: Fingerprints, key: str, out: Path, machine: dict)
 
     # pre-PR environment (PatchGuru's 'pre_commit container')
     venv = work / "venv-main"
-    ok, why = dr.install_side(venv, work / "side-main", None, logd / "setup-main.log", a.python_full,
-                              a.build_timeout, None)
+    wheels = dict(x.split("=", 1) for x in (a.wheel or []))
+    if rid in wheels:   # no compiler for a source build: approximate the pre-PR env with a released wheel
+        base["environment"] = f"released wheel {wheels[rid]} (approximation of the pre-PR commit)"
+        env = dr.base_env(dr.side_home(venv), install=True)
+        sbx = dr.side_sandbox(venv, network=True)
+        ok, why = True, ""
+        for c in (["uv", "venv", "-q", "-p", a.python_full, venv],
+                  ["uv", "pip", "install", "-q", "-p", venv / "bin/python", wheels[rid]]):
+            rc, _ = dr.run(c, logd / "setup-main.log", env=env, timeout=a.build_timeout, sbx=sbx)
+            if rc != 0:
+                ok, why = False, f"wheel install failed ({rc})"
+                break
+    else:
+        ok, why = dr.install_side(venv, work / "side-main", None, logd / "setup-main.log", a.python_full,
+                                  a.build_timeout, None)
     if not ok:
         return records(("could_not_verify", why), ("could_not_verify", why), {"eligibility": elig})
 
@@ -412,6 +432,8 @@ def main(argv=None) -> int:
     ap.add_argument("--python", default="3.12")
     ap.add_argument("--build-timeout", type=int, default=1800)
     ap.add_argument("--spec-timeout", type=int, default=300)
+    ap.add_argument("--wheel", action="append", metavar="ID=REQ",
+                    help="use a released wheel for the pre-PR environment, e.g. B02=pandas==2.1.4")
     ap.add_argument("--eligibility-only", action="store_true", help="report which cases qualify; no model calls")
     a = ap.parse_args(argv)
     rows = bench.select(bench.read_inputs(a.bench), a.ids)
@@ -428,7 +450,17 @@ def main(argv=None) -> int:
     machine = dict(dr.detect_machine_type())
     for row in rows:
         print(f"[{row['id']}] {row['repo']}#{row['pr']} ...", flush=True)
-        for r in run_case(row, a, fp, key, out, machine):
+        try:
+            recs = run_case(row, a, fp, key, out, machine)
+        except Exception as e:  # noqa: BLE001  (e.g. a model call that timed out): record it, go on
+            why = f"runner error: {type(e).__name__}: {str(e)[:200]}"
+            recs = []
+            for bl in BASELINES:
+                r = {"case_id": row["id"], "bench": {"id": row["id"], "answer_key_read": False}, "baseline": bl,
+                     "verdict": "could_not_verify", "reason": why, "label": "pilot", "poc_commit": _git_head()}
+                (out / f"{row['id']}-{bl.replace('-', '_')}.json").write_text(json.dumps(r, indent=1))
+                recs.append(r)
+        for r in recs:
             print(f"    {r['baseline']}: {r['verdict']} ({r.get('label')}): {r['reason'][:140]}", flush=True)
     return 0
 
