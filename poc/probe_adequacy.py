@@ -82,6 +82,11 @@ def deciding_items(items: list[dict]) -> tuple[list[dict], list[str]]:
     red/amber observations (they still flag the PR); its green ones are dropped so it cannot lead to 'verified'."""
     out, notes = [], []
     for it in items:
+        if it.get("status") in ("uninformative", "not_run"):
+            why = it.get("uninformative_reason") or it.get("status")
+            notes.append(f"probe {it['id']} is {it['status']} ({why}); its matching results do not count")
+            out.append(dict(it, observations=[]))
+            continue
         if adequacy_of(it) != NOT_ADEQUATE:
             out.append(it)
             continue
