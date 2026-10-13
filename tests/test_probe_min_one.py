@@ -68,3 +68,11 @@ def test_no_testable_claims_still_asks_for_a_probe(tmp_path, monkeypatch):
     prov, out = _run(tmp_path, [nc])
     assert out.get("no_claims_probe") and len(out["probes"]) == 1
     assert "none were testable" in prov.prompts[-1][1]
+
+
+def test_double_escaped_code_is_unescaped():
+    one_line = "import json\\nprint(json.dumps({\\\"observations\\\": {\\\"a\\\": 1}}))\\n"
+    fixed = model_probes._unescape_code(one_line)
+    assert "\n" in fixed and "json.dumps" in fixed
+    good = "x = 'a\\nb'\n"
+    assert model_probes._unescape_code(good) == good

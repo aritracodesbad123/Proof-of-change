@@ -44,6 +44,24 @@ def grounded_claims(raw: dict, title: str, body: str | None) -> tuple[list, list
     return kept, rejected
 
 
+def _unescape_code(code):
+    """Some replies double-escape the script, so it arrives as ONE line with literal backslash-n sequences. If it
+    does not parse as is but parses after turning those into real line breaks, use the unescaped version."""
+    if not isinstance(code, str) or "\n" in code or "\\n" not in code:
+        return code
+    try:
+        ast.parse(code)
+        return code
+    except SyntaxError:
+        pass
+    fixed = code.replace("\\n", "\n").replace("\\t", "\t").replace('\\"', '"')
+    try:
+        ast.parse(fixed)
+        return fixed
+    except SyntaxError:
+        return code
+
+
 def _tidy_id(x):
     """'P1' -> 'p1', 'probe_get_x' -> 'probe-get-x'; non-strings are returned unchanged (and then rejected)."""
     if not isinstance(x, str):
@@ -130,10 +148,12 @@ def generate(provider: Provider, repo: str, pr: int, title: str, body: str | Non
         return out
     by_id = {c["id"]: c for c in testable}
     usable = [p for p in (resp or {}).get("probes", [])[:MAX_PROBES] if isinstance(p, dict)
-              and not validate_probe(dict(p, id=_tidy_id(p.get("id"))), set(by_id))]
+              and not validate_probe(dict(p, id=_tidy_id(p.get("id")), code=_unescape_code(p.get("code"))),
+                                     set(by_id))]
     if not usable:
         # One retry, same gate and same BASE-side inputs: say why the first answer was unusable (generic reasons only)
-        reasons = [validate_probe(dict(p, id=_tidy_id(p.get("id"))), set(by_id)) for p in
+        reasons = [validate_probe(dict(p, id=_tidy_id(p.get("id")), code=_unescape_code(p.get("code"))),
+                                  set(by_id)) for p in
                    (resp or {}).get("probes", [])[:MAX_PROBES] if isinstance(p, dict)] or ["the probes list was empty"]
         out["retried"] = {"why": reasons[:5]}
         retry_user = (user + "\n\nYour previous answer contained no usable probe (" + "; ".join(map(str, reasons[:5]))
@@ -148,6 +168,8 @@ def generate(provider: Provider, repo: str, pr: int, title: str, body: str | Non
         # Models name probes "P1" or "probe_x"; the id is only a file name, so normalise it rather than drop the probe
         if isinstance(p, dict) and isinstance(p.get("id"), str):
             p["id"] = _tidy_id(p["id"])
+        if isinstance(p, dict):
+            p["code"] = _unescape_code(p.get("code"))
         why = validate_probe(p, set(by_id))
         if why:
             out["errors"].append(f"probe {p.get('id')!r} rejected: {why}")

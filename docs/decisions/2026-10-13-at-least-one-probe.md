@@ -43,3 +43,6 @@ change those do not exercise slips through as "verified".
   today's packages (for example a NumPy 2 release that the old code cannot build against). An optional pins file
   (`POC_BUILD_CONSTRAINTS`) can now be given. The same pins are used to build and to install, on both sides, and by
   both comparison tools, so the comparison stays fair.
+- **Scripts that arrive as one long line.** Sometimes the model escapes its script twice, so it arrives as a single
+  line full of literal "\n" sequences and does not run. If a script fails to parse as is but parses once those
+  sequences are turned into real line breaks, the fixed version is used. Otherwise it is rejected as before.
