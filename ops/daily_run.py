@@ -827,21 +827,25 @@ def paired_git_dependencies(checkout: Path) -> list[dict]:
 
 
 def install_paired(venvs: dict, paired: list[dict], log: Path, timeout: int) -> tuple[bool, str, dict]:
-    """Install each pinned git companion on both sides, then check the installed commit (direct_url.json)."""
+    """Install each pinned git companion on the PR side only, then check that commit (direct_url.json).
+
+    The base side keeps the release a normal install chose. The base checkout is written for that release;
+    installing the unreleased pin there makes its tests fail to load."""
     commits: dict = {}
-    for side, venv in venvs.items():
-        reqs = [f"{p['name']} @ git+{p['git']}@{p['rev']}" for p in paired]
-        reinstall = [x for p in paired for x in ("--reinstall-package", p["name"])]
-        rc, _ = run(["uv", "pip", "install", "-q", *reinstall, "-p", venv / "bin/python", *reqs], log,
-                    env=base_env(side_home(venv), install=True),
-                    timeout=timeout, sbx=side_sandbox(venv, network=True))
-        if rc != 0:
-            return False, f"installing the pinned {', '.join(reqs)} on the {side} side failed ({rc}); see {log.name}", commits
-        for p in paired:
-            good, info = check_installed_commit(venv, p["name"], p["rev"])
-            commits.setdefault(side, {})[p["name"]] = {k: v for k, v in info.items() if k != "direct_url"} | {"ok": good}
-            if not good:
-                return False, f"wrong-commit guard ({side} side): {info.get('why')}", commits
+    venv = venvs["pr"]
+    reqs = [f"{p['name']} @ git+{p['git']}@{p['rev']}" for p in paired]
+    reinstall = [x for p in paired for x in ("--reinstall-package", p["name"])]
+    rc, _ = run(["uv", "pip", "install", "-q", *reinstall, "-p", venv / "bin/python", *reqs], log,
+                env=base_env(side_home(venv), install=True),
+                timeout=timeout, sbx=side_sandbox(venv, network=True))
+    if rc != 0:
+        return False, (f"installing the pinned {', '.join(reqs)} on the PR side failed ({rc}); "
+                       f"see {log.name}"), commits
+    for p in paired:
+        good, info = check_installed_commit(venv, p["name"], p["rev"])
+        commits.setdefault("pr", {})[p["name"]] = {k: v for k, v in info.items() if k != "direct_url"} | {"ok": good}
+        if not good:
+            return False, f"wrong-commit guard (PR side): {info.get('why')}", commits
     return True, "", commits
 
 
@@ -2523,10 +2527,11 @@ def test_source_pair(repo: str, cfg: dict, item: dict, prdir: Path, work: Path, 
 
 def run_paired_variant(rec: dict, paired: list[dict], first: tuple, venvs: dict, targets: dict, prdir: Path,
                        work: Path, a, cwds: dict) -> tuple:
-    """Second run with the project's pinned git companion(s) installed on both sides (docs/decisions/2026-10-14-...).
+    """Second run with the project's pinned git companion(s) installed on the PR side only.
 
-    The first run (pip-resolved companion) is kept in rec["paired_dependency_runs"][0] with its test verdict; the
-    second run becomes the record's comparison, and the probes and coverage use that environment."""
+    The base side keeps the release a normal install chose (docs/decisions/2026-10-14-paired-dependency-and-hypothesis-cap.md).
+    The first run (pip-resolved companion, both sides) is kept in rec["paired_dependency_runs"][0] with its test
+    verdict; the second run becomes the record's comparison, and the probes and coverage use that environment."""
     cmp, cnv, ex = first
     v1, r1, _ = tests_verdict(cmp, cnv, ex, rec.get("files"))
     pip_versions = {p["name"]: (in_side(venvs["pr"], ["uv", "pip", "show", "-p", venvs["pr"] / "bin/python", p["name"]],

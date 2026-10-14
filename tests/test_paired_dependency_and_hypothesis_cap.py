@@ -30,6 +30,35 @@ def test_rejects_non_https_and_branch_revs(tmp_path):
     assert d.paired_git_dependencies(tmp_path) == []
 
 
+def test_pinned_companion_is_installed_only_on_the_pr_side(tmp_path, monkeypatch):
+    main, pr = tmp_path / "venv-main", tmp_path / "venv-pr"
+    main.mkdir()
+    pr.mkdir()
+    seen = []
+
+    def fake_run(cmd, log, **kw):
+        seen.append([str(c) for c in cmd])
+        return 0, 0.1
+
+    def fake_check(venv, dist, expected, checkout=None):
+        assert venv == pr
+        return True, {"dist": dist, "expected": expected, "installed": expected}
+
+    monkeypatch.setattr(d, "run", fake_run)
+    monkeypatch.setattr(d, "check_installed_commit", fake_check)
+    monkeypatch.setattr(d, "base_env", lambda *a, **k: {})
+    monkeypatch.setattr(d, "side_sandbox", lambda *a, **k: {"rw": [], "ro": [], "network": True})
+    paired = [{"name": "janitor-rs", "git": "https://github.com/pyjanitor-devs/janitor-rs.git", "rev": "5449683",
+               "source": "tool.pixi.pypi-dependencies"}]
+    ok, why, commits = d.install_paired({"main": main, "pr": pr}, paired, tmp_path / "setup-paired.log", 30)
+    assert ok and why == "" and len(seen) == 1
+    assert str(pr / "bin" / "python") in seen[0]
+    assert str(main / "bin" / "python") not in "".join(seen[0])
+    assert "janitor-rs @ git+https://github.com/pyjanitor-devs/janitor-rs.git@5449683" in seen[0]
+    assert set(commits) == {"pr"}
+    assert commits["pr"]["janitor-rs"]["ok"] and commits["pr"]["janitor-rs"]["installed"] == "5449683"
+
+
 def test_combine_both_runs():
     def verdict(a, b):
         return d.combine_paired_verdicts([
