@@ -73,6 +73,41 @@ def _clean(text: str) -> str:
     return _drop_template(text)
 
 
+# A sentence about the PR's own tests or about a tool's output is not a claim about the product's behaviour:
+# "Add regressions for ... untouched columns, and unchanged inputs" describes what a test covers, and "mypy's output
+# is identical on the unmodified base" describes a type checker. Two narrow shapes are dropped:
+#   1. the sentence starts by adding/describing tests ("Add tests ...", "Added regression tests ...", "New tests ...");
+#   2. the sentence names a checking tool (mypy, pyright, ruff, flake8, pylint, pre-commit, linter, type checker).
+# Lines under a "Test plan" / "Testing" / "Tests" / "Type checking" heading are dropped for the same reason.
+_TEST_SENTENCE = re.compile(
+    r"(?i)^\W*(?:i\s+|we\s+)?(?:add(?:s|ed)?|extend(?:s|ed)?|new|includ(?:e|es|ed)|cover(?:s|ed)?)\s+"
+    r"(?:\w+\s+){0,2}?(?:regression\s+tests?|regressions?|tests?|test\s+cases?|unit\s+tests?)\b")
+_TOOL_SENTENCE = re.compile(
+    r"(?i)\b(?:mypy|pyright|ruff|flake8|pylint|pre-commit|linters?|lint(?:ing)?|type[-\s]?check(?:er|ing)?s?)\b")
+_TEST_HEADING = re.compile(
+    r"(?i)^\s*(?:#+\s*|\*\*)(?:test(?:s|ing)?(?:\s+plan)?|how\s+(?:this\s+was\s+|i\s+)?tested|"
+    r"type[-\s]?checking|verification)\b")
+_ANY_HEADING = re.compile(r"^\s*(?:#+\s|\*\*[^*]+\*\*\s*:?\s*$)")
+
+
+def _drop_test_sections(text: str) -> str:
+    kept, skip = [], False
+    for line in text.splitlines():
+        if _TEST_HEADING.match(line):
+            skip = True
+            continue
+        if skip and _ANY_HEADING.match(line):
+            skip = False
+        if not skip:
+            kept.append(line)
+    return "\n".join(kept)
+
+
+def about_tests_or_tools(sentence: str) -> bool:
+    """True when a matched sentence describes the PR's tests or a tool's output, not product behaviour."""
+    return bool(_TEST_SENTENCE.search(sentence) or _TOOL_SENTENCE.search(sentence))
+
+
 _BOUNDARY = re.compile(r"[.!?](?=\s)|\n")
 
 
@@ -143,7 +178,7 @@ def find(title: str, body: str | None, diff: str | None = None) -> list[dict]:
     Sources are the title, the pull-request description, and (when a diff is given) added changelog lines and
     added docstring lines. A match in any of those is a claim."""
     out, seen = [], set()
-    texts = [("title", title or ""), ("PR description", _clean(body or "")), *diff_texts(diff)]
+    texts = [("title", title or ""), ("PR description", _drop_test_sections(_clean(body or ""))), *diff_texts(diff)]
     for source, text in texts:
         for name, rx in COMPILED:
             for m in rx.finditer(text):
@@ -153,6 +188,8 @@ def find(title: str, body: str | None, diff: str | None = None) -> list[dict]:
                 if text[line_start:].lstrip().startswith("#"):   # a Markdown heading names a topic, not a claim
                     continue
                 q = _sentence(text, m.start(), m.end())
+                if q and about_tests_or_tools(_sentence(text, m.start(), m.end(), width=10**6)):
+                    continue
                 if q and (source, q) not in seen:
                     seen.add((source, q))
                     out.append({"source": source, "quote": q, "pattern": name,
