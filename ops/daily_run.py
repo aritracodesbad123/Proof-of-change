@@ -789,6 +789,74 @@ def check_installed_commit(venv: Path, dist: str, expected_sha: str, checkout: P
     return False, info
 
 
+_GIT_URL = re.compile(r"^https://[\w.-]+/[\w.-]+/[\w.-]+?(?:\.git)?$")
+_REV = re.compile(r"^[0-9a-f]{7,40}$")
+
+
+def paired_git_dependencies(checkout: Path) -> list[dict]:
+    """Runtime dependencies the project pins to a git commit in its own tool settings
+    ([tool.pixi.pypi-dependencies] or [tool.uv.sources]): [{name, git, rev, source}].
+
+    Only packages that are also in [project].dependencies count (a companion package whose matching release may not
+    exist yet, e.g. janitor-rs for pyjanitor). Only https git URLs and hex commit revs are accepted, because these
+    strings come from the checkout."""
+    pp = checkout / "pyproject.toml"
+    if not pp.is_file():
+        return []
+    import tomllib
+    try:
+        d = tomllib.loads(pp.read_text())
+    except Exception:  # noqa: BLE001
+        return []
+    deps = {_norm(_req_name(r)) for r in d.get("project", {}).get("dependencies", []) if isinstance(r, str)}
+    tool = d.get("tool", {}) if isinstance(d.get("tool"), dict) else {}
+    sources = [("tool.pixi.pypi-dependencies", (tool.get("pixi") or {}).get("pypi-dependencies") or {}),
+               ("tool.uv.sources", (tool.get("uv") or {}).get("sources") or {})]
+    out, seen = [], set()
+    for where, table in sources:
+        if not isinstance(table, dict):
+            continue
+        for name, spec in table.items():
+            if not isinstance(spec, dict) or _norm(name) not in deps or _norm(name) in seen:
+                continue
+            git, rev = str(spec.get("git") or ""), str(spec.get("rev") or "")
+            if _GIT_URL.match(git) and _REV.match(rev):
+                seen.add(_norm(name))
+                out.append({"name": name, "git": git, "rev": rev, "source": where})
+    return out
+
+
+def install_paired(venvs: dict, paired: list[dict], log: Path, timeout: int) -> tuple[bool, str, dict]:
+    """Install each pinned git companion on both sides, then check the installed commit (direct_url.json)."""
+    commits: dict = {}
+    for side, venv in venvs.items():
+        reqs = [f"{p['name']} @ git+{p['git']}@{p['rev']}" for p in paired]
+        reinstall = [x for p in paired for x in ("--reinstall-package", p["name"])]
+        rc, _ = run(["uv", "pip", "install", "-q", *reinstall, "-p", venv / "bin/python", *reqs], log, env=base_env(side_home(venv), install=True),
+                    timeout=timeout, sbx=side_sandbox(venv, network=True))
+        if rc != 0:
+            return False, f"installing the pinned {', '.join(reqs)} on the {side} side failed ({rc}); see {log.name}", commits
+        for p in paired:
+            good, info = check_installed_commit(venv, p["name"], p["rev"])
+            commits.setdefault(side, {})[p["name"]] = {k: v for k, v in info.items() if k != "direct_url"} | {"ok": good}
+            if not good:
+                return False, f"wrong-commit guard ({side} side): {info.get('why')}", commits
+    return True, "", commits
+
+
+def combine_paired_verdicts(runs: list[dict]) -> tuple[str, str]:
+    """Final verdict over the pip-resolved run and the pinned-git run: needs_attention if either needs attention,
+    verified only if both are verified, otherwise could_not_verify. The reason names both runs."""
+    vs = [r["verdict"] for r in runs]
+    if Verdict.NEEDS_ATTENTION.value in vs:
+        v = Verdict.NEEDS_ATTENTION.value
+    elif all(x == Verdict.VERIFIED.value for x in vs):
+        v = Verdict.VERIFIED.value
+    else:
+        v = Verdict.COULD_NOT_VERIFY.value
+    return v, " | ".join(f"{r['variant']}: {r['verdict']}: {r['reason']}" for r in runs)
+
+
 def install_side(venv: Path, checkout: Path, chosen: dict | None, log: Path, python: str, timeout: int,
                  constraints: Path | None) -> tuple[bool, str]:
     env = base_env(side_home(venv), install=True)
@@ -1173,10 +1241,50 @@ def missing_dependency(skip_msg: str) -> str | None:
     return next(g for g in m.groups() if g).split(".")[0]
 
 
+HYPOTHESIS_CAP_PLUGIN = '''"""Proof-of-Change: cap Hypothesis work per test (written by the runner, same on both sides).
+
+Shrinking a failing example can take minutes per test when many examples fail the same way, and pushes a whole run
+past its timeout so the first failure is never reported. The shrink phase is skipped; every other setting of the
+project's own active profile is kept."""
+
+
+def pytest_configure(config):
+    try:
+        from hypothesis import Phase, settings
+    except Exception:  # noqa: BLE001
+        return
+    phases = tuple(p for p in settings.default.phases if p is not Phase.shrink)
+    settings.register_profile("proof-of-change-cap", parent=settings.default, phases=phases)
+    settings.load_profile("proof-of-change-cap")
+'''
+HYPOTHESIS_CAP_MODULE = "poc_hypothesis_cap"
+
+
+def install_hypothesis_cap(venv: Path) -> Path | None:
+    """Write the cap plugin into the side's own site-packages (identical on both sides) and return its path.
+    None when the venv has no site-packages (then pytest runs without the plugin)."""
+    found = glob.glob(str(venv / "lib" / "python3*" / "site-packages"))
+    if not found:
+        return None
+    f = Path(found[0]) / f"{HYPOTHESIS_CAP_MODULE}.py"
+    f.write_text(HYPOTHESIS_CAP_PLUGIN)
+    return f
+
+
+_FIRST_FAIL = re.compile(r"^E\s+([A-Za-z_][\w.]*(?:Error|Exception|Failure|Exit))\b[: ]?(.*)$", re.M)
+
+
+def first_failure(log_text: str) -> str | None:
+    """The first exception line of a (possibly cut-off) pytest log: 'AttributeError: ...'."""
+    m = _FIRST_FAIL.search(log_text or "")
+    return f"{m.group(1)}: {m.group(2).strip()[:160]}".rstrip(": ") if m else None
+
+
 def run_tests(side_venvs: dict, targets_by_side: dict, rdir: Path, workdir: Path, runs: int, workers: str,
               test_timeout: int, run_timeout: int, cwds: dict | None = None) -> tuple[list[dict], dict]:
     """targets are relative to site-packages (nightly routes) or to the side's checkout (cwds given).
     per_run entries use the shared schema shape (side old/new, all counts present)."""
+    capped = {side: install_hypothesis_cap(v) is not None for side, v in side_venvs.items()}
     envs = {side: base_env(side_home(v)) for side, v in side_venvs.items()}
     per_run, results = [], {"main": [], "pr": []}
     for i in range(1, runs + 1):
@@ -1191,7 +1299,7 @@ def run_tests(side_venvs: dict, targets_by_side: dict, rdir: Path, workdir: Path
             if not tg:
                 results[side].append({}); per_run.append(entry | {"exit": "no-targets", "seconds": 0,
                                                                    "pytest_summary": "", "junit": False}); continue
-            cmd = [venv / "bin/python", "-m", "pytest", *tg, "-p", "no:cacheprovider", "-q", "-rfE",
+            cmd = [venv / "bin/python", "-m", "pytest", *tg, "-p", "no:cacheprovider", *(["-p", HYPOTHESIS_CAP_MODULE] if capped[side] else []), "-q", "-rfE",
                    f"--timeout={test_timeout}", "-o", "addopts=", "-o", "junit_family=xunit2", f"--junitxml={jin}"]
             if workers != "0":
                 cmd += ["-n", workers]
@@ -1213,7 +1321,8 @@ def run_tests(side_venvs: dict, targets_by_side: dict, rdir: Path, workdir: Path
             text = lg.read_text(errors="replace")
             entry["collection_errors"] = len(re.findall(r"^ERROR collecting ", text, re.M))
             tail = (text.strip().splitlines() or [""])[-1][:200]
-            per_run.append(entry | {"exit": rc, "seconds": secs, "pytest_summary": tail, "junit": jx.exists()})
+            extra_info = {"first_failure": first_failure(text)} if rc == "timeout" else {}
+            per_run.append(entry | {"exit": rc, "seconds": secs, "pytest_summary": tail, "junit": jx.exists()} | extra_info)
     return per_run, results
 
 
@@ -2008,8 +2117,12 @@ def venv_python_version(venv: Path) -> str | None:
 def finalize_tests(rec: dict, per_run: list[dict], results: dict, a) -> tuple[dict | None, str | None, dict | None]:
     rec["per_run"] = per_run
     rec["runs_per_side"] = sum(1 for e in per_run if e["side"] == "old" and e.get("junit"))
-    if any(r.get("exit") == "timeout" for r in per_run):
-        return None, f"a test run exceeded the {a.run_timeout}s run timeout", None
+    timed = [r for r in per_run if r.get("exit") == "timeout"]
+    if timed:
+        firsts = [f"{'main' if r['side'] == 'old' else 'PR'} run {r['run']}: {r['first_failure']}"
+                  for r in timed if r.get("first_failure")]
+        return None, (f"a test run exceeded the {a.run_timeout}s run timeout"
+                      + (f"; first failure before the cut-off: {firsts[0]}" if firsts else "")), None
     if not any(results["pr"]) or not any(results["main"]):
         return None, "tests produced no results on one side (collection failed; see pytest logs)", None
     cmp = compare_sides(results)
@@ -2390,6 +2503,10 @@ def test_source_pair(repo: str, cfg: dict, item: dict, prdir: Path, work: Path, 
             else:
                 cmp, cnv, ex = execute_tests(rec, {"main": vm, "pr": vp}, targets, prdir, work, a,
                                              cwds={"main": cm, "pr": cp})
+                paired = paired_git_dependencies(cp)
+                if paired:
+                    cmp, cnv, ex = run_paired_variant(rec, paired, (cmp, cnv, ex), {"main": vm, "pr": vp}, targets,
+                                                      prdir, work, a, {"main": cm, "pr": cp})
                 if cmp:
                     rec["coverage"] = coverage_run(item, vp, cm, cp, targets["pr"], prdir, work, a, cwd=cp)
             rec["probes"] = run_probes(repo, item["pr"], {"main": vm / "bin/python", "pr": vp / "bin/python"}, prdir,
@@ -2399,7 +2516,63 @@ def test_source_pair(repo: str, cfg: dict, item: dict, prdir: Path, work: Path, 
             if change_is_docstring_only(rec.get("files"), cm, cp):
                 rec["docstring_only"] = True
     _store_verdict(rec, cmp, cnv, ex)
-    return gate(rec)
+    return paired_final(gate(rec))
+
+
+def run_paired_variant(rec: dict, paired: list[dict], first: tuple, venvs: dict, targets: dict, prdir: Path,
+                       work: Path, a, cwds: dict) -> tuple:
+    """Second run with the project's pinned git companion(s) installed on both sides (docs/decisions/2026-10-14-...).
+
+    The first run (pip-resolved companion) is kept in rec["paired_dependency_runs"][0] with its test verdict; the
+    second run becomes the record's comparison, and the probes and coverage use that environment."""
+    cmp, cnv, ex = first
+    v1, r1, _ = tests_verdict(cmp, cnv, ex, rec.get("files"))
+    pip_versions = {p["name"]: (in_side(venvs["pr"], ["uv", "pip", "show", "-p", venvs["pr"] / "bin/python", p["name"]],
+                                        install=True).stdout or "").partition("Version:")[2].split("\n")[0].strip()
+                    for p in paired}
+    runs = [{"variant": "pip-resolved", "companions": pip_versions, "verdict": v1, "reason": r1,
+             "per_run": rec.get("per_run"), "comparison_counts": _counts(cmp)}]
+    ok, why, commits = install_paired(venvs, paired, prdir / "setup-paired.log", a.build_timeout)
+    second = {"variant": "pinned git", "companions": {p["name"]: f"{p['git']}@{p['rev']} ({p['source']})" for p in paired},
+              "installed_commit": commits}
+    if not ok:
+        runs.append(second | {"verdict": Verdict.COULD_NOT_VERIFY.value, "reason": why})
+        rec["paired_dependency_runs"] = runs
+        return cmp, cnv, ex
+    rec["freeze"]["main_paired"] = freeze_env(venvs["main"], prdir / "freeze-main-paired.txt")
+    rec["freeze"]["pr_paired"] = freeze_env(venvs["pr"], prdir / "freeze-pr-paired.txt")
+    paired_dir = prdir / "paired"
+    paired_dir.mkdir(exist_ok=True)
+    cmp2, cnv2, ex2 = execute_tests(rec, venvs, targets, paired_dir, work, a, cwds=cwds)
+    v2, r2, _ = tests_verdict(cmp2, cnv2, ex2, rec.get("files"))
+    runs.append(second | {"verdict": v2, "reason": r2, "comparison_counts": _counts(cmp2), "logs": "paired/"})
+    rec["paired_dependency_runs"] = runs
+    return cmp2, cnv2, ex2
+
+
+def _counts(cmp: dict | None) -> dict | None:
+    if not cmp:
+        return None
+    return {k: (len(v) if isinstance(v, list) else v) for k, v in cmp.items()
+            if k in ("same", "regressions", "new_tests_passing", "new_tests_failing", "new_tests_skipped", "flaky",
+                     "other_changes", "executed")}
+
+
+def paired_final(rec: dict) -> dict:
+    """Combine the pip-resolved run with the final (pinned) verdict: needs attention if either needs attention,
+    verified only if both are verified."""
+    runs = rec.get("paired_dependency_runs")
+    if not runs or len(runs) < 2:
+        return rec
+    runs[-1] = dict(runs[-1], final_verdict=rec.get("verdict"), final_reason=rec.get("reason"))
+    v, _ = combine_paired_verdicts([runs[0], {"variant": "pinned git", "verdict": rec.get("verdict"),
+                                              "reason": rec.get("reason")}])
+    if v != rec.get("verdict"):
+        rec.setdefault("verdict_before_paired_combination", rec.get("verdict"))
+        rec["verdict"] = v
+    rec["reason"] = (f"paired companion {', '.join(runs[-1]['companions'])}: pip-resolved run {runs[0]['verdict']} "
+                     f"({runs[0]['reason'][:300]}); pinned git run: {rec.get('reason')}")
+    return rec
 
 
 def _store_verdict(rec: dict, cmp, cnv, ex) -> None:
