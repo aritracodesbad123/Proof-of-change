@@ -832,7 +832,8 @@ def install_paired(venvs: dict, paired: list[dict], log: Path, timeout: int) -> 
     for side, venv in venvs.items():
         reqs = [f"{p['name']} @ git+{p['git']}@{p['rev']}" for p in paired]
         reinstall = [x for p in paired for x in ("--reinstall-package", p["name"])]
-        rc, _ = run(["uv", "pip", "install", "-q", *reinstall, "-p", venv / "bin/python", *reqs], log, env=base_env(side_home(venv), install=True),
+        rc, _ = run(["uv", "pip", "install", "-q", *reinstall, "-p", venv / "bin/python", *reqs], log,
+                    env=base_env(side_home(venv), install=True),
                     timeout=timeout, sbx=side_sandbox(venv, network=True))
         if rc != 0:
             return False, f"installing the pinned {', '.join(reqs)} on the {side} side failed ({rc}); see {log.name}", commits
@@ -1299,7 +1300,8 @@ def run_tests(side_venvs: dict, targets_by_side: dict, rdir: Path, workdir: Path
             if not tg:
                 results[side].append({}); per_run.append(entry | {"exit": "no-targets", "seconds": 0,
                                                                    "pytest_summary": "", "junit": False}); continue
-            cmd = [venv / "bin/python", "-m", "pytest", *tg, "-p", "no:cacheprovider", *(["-p", HYPOTHESIS_CAP_MODULE] if capped[side] else []), "-q", "-rfE",
+            hyp = ["-p", HYPOTHESIS_CAP_MODULE] if capped[side] else []
+            cmd = [venv / "bin/python", "-m", "pytest", *tg, "-p", "no:cacheprovider", *hyp, "-q", "-rfE",
                    f"--timeout={test_timeout}", "-o", "addopts=", "-o", "junit_family=xunit2", f"--junitxml={jin}"]
             if workers != "0":
                 cmd += ["-n", workers]

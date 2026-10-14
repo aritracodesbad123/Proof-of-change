@@ -31,12 +31,15 @@ def test_rejects_non_https_and_branch_revs(tmp_path):
 
 
 def test_combine_both_runs():
-    v = lambda a, b: d.combine_paired_verdicts([{"variant": "pip-resolved", "verdict": a, "reason": "r"},
-                                                {"variant": "pinned git", "verdict": b, "reason": "s"}])[0]
-    assert v("needs_attention", "verified") == "needs_attention"
-    assert v("could_not_verify", "needs_attention") == "needs_attention"
-    assert v("verified", "verified") == "verified"
-    assert v("could_not_verify", "verified") == "could_not_verify"
+    def verdict(a, b):
+        return d.combine_paired_verdicts([
+            {"variant": "pip-resolved", "verdict": a, "reason": "r"},
+            {"variant": "pinned git", "verdict": b, "reason": "s"}])[0]
+
+    assert verdict("needs_attention", "verified") == "needs_attention"
+    assert verdict("could_not_verify", "needs_attention") == "needs_attention"
+    assert verdict("verified", "verified") == "verified"
+    assert verdict("could_not_verify", "verified") == "could_not_verify"
 
 
 def test_paired_final_keeps_both_in_reason():
