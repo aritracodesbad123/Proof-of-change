@@ -9,7 +9,7 @@ from poc import model_provider
 
 def _a(**kw):
     base = dict(baseline="full", provider=None, model_note="model provider: none", select_only=False,
-                report_only=False, rejudge=False)
+                report_only=False, rejudge=False, bench=None)
     return argparse.Namespace(**(base | kw))
 
 
@@ -35,6 +35,13 @@ def test_select_and_report_only_allowed_but_rejudge_refused():
     assert daily_run.model_refusal(_a(select_only=True)) is None
     assert daily_run.model_refusal(_a(report_only=True)) is None
     assert daily_run.model_refusal(_a(report_only=True, rejudge=True))
+
+
+def test_benchmark_mode_is_not_stopped():
+    """Benchmark mode is not the daily run. It is not stopped for a missing model, including when the caller
+    names none and turns the AI-probe gate off."""
+    assert daily_run.model_refusal(_a(bench="inputs.csv")) is None
+    assert daily_run.model_refusal(_a(bench="inputs.csv", baseline="tests", model_note="model provider: none")) is None
 
 
 def test_default_provider_is_nebius(monkeypatch):

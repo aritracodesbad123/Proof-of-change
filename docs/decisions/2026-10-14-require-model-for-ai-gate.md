@@ -3,9 +3,10 @@
 ## What changed
 
 - A run now uses the AI model (Nemotron on Nebius) by default. Before, it used no model unless asked.
-- If the run's mode only allows "verified" when an AI-written probe ran a changed line (the default "full"
+- If the daily run's mode only allows "verified" when an AI-written probe ran a changed line (the default "full"
   mode), and no model is available (for example the key is missing), the run stops before testing anything and
-  says why in plain words. Only picking PRs or rebuilding a report still works without a model.
+  says why in plain words. Picking PRs, rebuilding a report, or benchmark mode still works without a model.
+  Passing a model, or choosing a mode without that rule (including an explicit "none"), also runs.
 
 ## Why
 
@@ -19,3 +20,5 @@ AI-written probe ran the changed code. With no model there are no such probes, s
 - A run with a missing or broken key now produces nothing instead of a weak result. That is on purpose: a loud
   stop is easier to notice and fix than a quiet wall of "could not verify".
 - Runs that should not use a model can still choose a mode without the AI-probe rule.
+- Benchmark mode is not stopped by this check. A benchmark that keeps the default "full" mode and has no model
+  can still come out "could not verify" for each case, instead of stopping first.

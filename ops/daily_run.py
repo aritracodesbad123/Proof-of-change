@@ -1143,12 +1143,16 @@ def ai_probe_gate_on(baseline: str | None) -> bool:
 
 
 def model_refusal(a) -> str | None:
-    """Refuse a run that would test PRs with the AI-probe gate on but no model to write probes.
+    """Refuse a daily run that would test PRs with the AI-probe gate on but no model to write probes.
 
     With no model, no AI-written probe can run, so the gate turns every otherwise clean PR into could_not_verify
     (the 2026-10-14 daily run: 0 of 23 verified). Selecting PRs or rebuilding a report tests nothing and is allowed.
+    Benchmark mode is not the daily run, so it is not stopped here. An explicit provider is allowed, including
+    none when the AI-probe gate is off.
     Returns the message to stop with, or None."""
     if getattr(a, "select_only", False) or (getattr(a, "report_only", False) and not getattr(a, "rejudge", False)):
+        return None
+    if getattr(a, "bench", None):
         return None
     if not ai_probe_gate_on(getattr(a, "baseline", None)) or getattr(a, "provider", None) is not None:
         return None
@@ -2786,7 +2790,7 @@ def main(argv=None) -> int:
     ap.add_argument("--model-provider", choices=model_provider.PROVIDERS, default="nebius",
                     help="who writes claim probes in addition to the fixed ones: nebius (default; Token Factory, key "
                          "from NEBIUS_API_KEY), recorded (recorded responses: TEST FIXTURE, not blind), none (fixed "
-                         "probes only). A run whose baseline has the AI-probe gate (full) refuses to start without a "
+                         "probes only). The daily run, not benchmark mode, refuses to start on the full baseline without a "
                          "working model, because that gate would turn every clean PR into could_not_verify")
     ap.add_argument("--claims-model", default=model_provider.DEFAULT_MODELS["claims"], help="model id for claims")
     ap.add_argument("--probe-model", default=model_provider.DEFAULT_MODELS["probes"], help="model id for probes")
