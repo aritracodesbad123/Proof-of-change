@@ -1137,6 +1137,29 @@ def gate(rec: dict) -> dict:
     return ai_probe_gate(coverage_gate.apply(rec))
 
 
+def ai_probe_gate_on(baseline: str | None) -> bool:
+    """Whether the AI-probe gate (ai_probe_gate) can demote a verdict under this baseline."""
+    return uses(baseline, "coverage") and uses(baseline, "claim_probes")
+
+
+def model_refusal(a) -> str | None:
+    """Refuse a run that would test PRs with the AI-probe gate on but no model to write probes.
+
+    With no model, no AI-written probe can run, so the gate turns every otherwise clean PR into could_not_verify
+    (the 2026-10-14 daily run: 0 of 23 verified). Selecting PRs or rebuilding a report tests nothing and is allowed.
+    Returns the message to stop with, or None."""
+    if getattr(a, "select_only", False) or (getattr(a, "report_only", False) and not getattr(a, "rejudge", False)):
+        return None
+    if not ai_probe_gate_on(getattr(a, "baseline", None)) or getattr(a, "provider", None) is not None:
+        return None
+    note = getattr(a, "model_note", None) or "no model provider"
+    return ("STOPPED: no AI model is available, but baseline "
+            f"{getattr(a, 'baseline', None) or 'full'} only allows 'verified' when an AI-written probe ran a changed "
+            f"line. Every PR would come out could_not_verify. ({note}.) Fix: set NEBIUS_API_KEY and pass "
+            "--model-provider nebius (the default), or choose a baseline without the AI-probe gate "
+            "(--baseline tests, tests+diff or tests+probes).")
+
+
 def ai_probe_gate(rec: dict) -> dict:
     """In modes that use AI-written probes: never 'verified' unless at least one AI-written (model) probe actually
     executed a changed line (its measured changed-line coverage). Otherwise could_not_verify. Idempotent."""
@@ -2760,10 +2783,11 @@ def main(argv=None) -> int:
                          "differential probes), tests+probes (+ claim probes: fixed and/or model-written), full "
                          "(everything: claim probes, coverage gate, claim flagging; differential probes shown). "
                          "Default: full")
-    ap.add_argument("--model-provider", choices=model_provider.PROVIDERS, default="none",
-                    help="who writes claim probes in addition to the fixed ones: nebius (Token Factory, key from "
-                         "NEBIUS_API_KEY; without it: fixed probes only), recorded (recorded responses: TEST FIXTURE, "
-                         "not blind), none (default: fixed probes only)")
+    ap.add_argument("--model-provider", choices=model_provider.PROVIDERS, default="nebius",
+                    help="who writes claim probes in addition to the fixed ones: nebius (default; Token Factory, key "
+                         "from NEBIUS_API_KEY), recorded (recorded responses: TEST FIXTURE, not blind), none (fixed "
+                         "probes only). A run whose baseline has the AI-probe gate (full) refuses to start without a "
+                         "working model, because that gate would turn every clean PR into could_not_verify")
     ap.add_argument("--claims-model", default=model_provider.DEFAULT_MODELS["claims"], help="model id for claims")
     ap.add_argument("--probe-model", default=model_provider.DEFAULT_MODELS["probes"], help="model id for probes")
     ap.add_argument("--recorded-dir", default=None,
@@ -2814,6 +2838,10 @@ def main(argv=None) -> int:
     if not uses(a.baseline, "claim_probes") and a.provider is not None:
         a.model_note += f" (not used: baseline {a.baseline} has no claim probes)"
         a.provider = None
+    refusal = model_refusal(a)
+    if refusal:
+        print(refusal, file=sys.stderr)
+        raise SystemExit(refusal)
     if a.runs != 3:
         print("note: protocol requires 3 runs per side; using", a.runs, file=sys.stderr)
     if a.bench:

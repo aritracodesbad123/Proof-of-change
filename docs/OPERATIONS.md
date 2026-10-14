@@ -387,7 +387,7 @@ kept once under `pre-migration/`), `--rejudge` (with `--report-only`: also recom
 JUnit files with the current comparison rules; the previous verdict is kept under `rejudged`), `--date` (run folder,
 may be nested, e.g. `<date>/<name>`; `run_date` is the folder's calendar date), `--ops-dir`, `--work-dir`, `--report-dir`, `--no-report`,
 `--baseline tests|tests+diff|tests+probes|full` (what decides the verdict, default `full`; see "Baselines"),
-`--model-provider nebius|recorded|none` (default `none`), `--claims-model ID`, `--probe-model ID`, `--recorded-dir DIR`,
+`--model-provider nebius|recorded|none` (default `nebius`; with the default `full` baseline a run refuses to start when no model is available, see docs/decisions/2026-10-14-require-model-for-ai-gate.md), `--claims-model ID`, `--probe-model ID`, `--recorded-dir DIR`,
 `--unsafe-no-sandbox` (run PR code without the sandbox; never used by the daily run), `--no-coverage` (skip the coverage run; the gate then says "not measured"), `--no-probes` (do not run probe files;
 the record says `"probes": {"status": "none"}`).
 
