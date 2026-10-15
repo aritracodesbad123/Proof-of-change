@@ -92,7 +92,10 @@ _RESULT = (r"(?:run(?:s|ning)?|ran|pass(?:es|ed|ing)?|fail(?:s|ed|ing|ures?)?|ch
            r"warnings?|reports?|clean|succeed(?:s|ed)?|green)")
 _TOOL_SENTENCE = re.compile(
     rf"(?i)\b{_TOOL}['`’]*(?:s)?\W+(?:\w+\W+){{0,3}}?{_RESULT}\b|"
-    rf"\b(?:run(?:s|ning)?|ran|pass(?:es|ed|ing)?|fail(?:s|ed|ing)?|by|with|via)\W+(?:\w+\W+)?{_TOOL}\b")
+    rf"\b(?:run(?:s|ning)?|ran|pass(?:es|ed|ing)?|fail(?:s|ed|ing)?)\W+(?:\w+\W+)?{_TOOL}\b")
+# A sentence about a CI workflow or a .yml file describes the project's own automation (the change itself),
+# so "The lint workflow was running ... twice" is kept.
+_WORKFLOW = re.compile(r"(?i)\bworkflows?\b|\.ya?ml\b")
 _PRESERVE = re.compile(
     r"(?i)\b(?:unaffected|unchanged|untouched|without\s+(?:affecting|changing|breaking)|"
     r"no\s+(?:other\s+)?(?:behaviou?r(?:al)?\s+)?changes?|nothing\s+else\s+changes|"
@@ -114,6 +117,8 @@ def keeps_nothing_else_changes(sentence: str) -> bool:
 
 
 def _drop_test_sections(text: str) -> str:
+    # Known limit: a wrapped list item whose continuation line has no indent counts as new prose and ends the
+    # section early. That fails safe: the remaining test lines are kept and only reach the claim finder.
     kept, skip, fence, seen_item = [], False, False, False
     for line in text.splitlines():
         bare = _QUOTE.sub("", line, count=1)
@@ -145,7 +150,8 @@ def about_tests_or_tools(sentence: str) -> bool:
     """True when a matched sentence describes the PR's tests or a tool's output, not product behaviour."""
     if _TEST_SENTENCE.search(sentence):
         return True
-    return bool(_TOOL_SENTENCE.search(sentence)) and not keeps_nothing_else_changes(sentence)
+    return (bool(_TOOL_SENTENCE.search(sentence)) and not keeps_nothing_else_changes(sentence)
+            and not _WORKFLOW.search(sentence))
 
 
 _BOUNDARY = re.compile(r"[.!?](?=\s)|\n")
