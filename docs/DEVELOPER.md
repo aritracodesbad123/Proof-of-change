@@ -35,7 +35,7 @@ BR_RUNNER=/path/to/br_run.py .venv/bin/python -m harness.run --upstream pandas -
 .venv/bin/python -m reports.generate eval.json --out reports/runs/local --claims-dir evals/fixtures/claims
 ```
 
-Records follow `harness/schema/observation.schema.json` (rev 9; see `harness/schema/README.md`). Report format:
+Records follow `harness/schema/observation.schema.json` (rev 10; see `harness/schema/README.md`). Report format:
 [REPORT_SPEC.md](REPORT_SPEC.md). Samples: `reports/samples/golden-v1/`.
 
 ## Workflow

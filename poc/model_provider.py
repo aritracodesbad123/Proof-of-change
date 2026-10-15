@@ -9,8 +9,10 @@
               every record and report, and never count in blind-eval scoring. Used by tests and CI.
     none      No model: fixed probes only.
 
-`select(name)` returns (provider or None, note). With nebius and no key, the run falls back to fixed probes only and
-the note says so (it is copied into the record and the report).
+`select(name)` returns (provider or None, note). It never includes the API key. A run that is set to nebius must
+not start when the key is missing or empty: `key_refusal` names the variable and how to fix it, and the daily run
+and the eval runners stop there. `select` still returns no provider and a note in that case, so a caller can see
+why. Only an explicit `none` is a run with the AI off.
 """
 from __future__ import annotations
 
@@ -80,6 +82,11 @@ class Provider:
 
     def __init__(self, models: dict | None = None):
         self.models = dict(DEFAULT_MODELS, **(models or {}))
+        self.calls: list[dict] = []  # {"task", "ok"} for calls this object actually made
+
+    def _remember(self, task: str, ok: bool) -> None:
+        """Record that this provider attempted one call. The entry never contains an API key."""
+        self.calls.append({"task": task, "ok": bool(ok)})
 
     def complete_json(self, task: str, system: str, user: str, schema: dict, ctx: dict) -> dict:
         raise NotImplementedError
@@ -124,6 +131,7 @@ class NebiusProvider(Provider):
             err = f"{type(e).__name__}: {e}"
             raise ProviderError(f"{self.name} {task} request failed: {type(e).__name__}") from None
         finally:
+            self._remember(task, err is None)
             from poc import cost as _cost
             _cost.record_call((data or {}).get("model") or body["model"], (data or {}).get("usage"), ok=err is None)
             if raw_dir:
@@ -157,25 +165,94 @@ class RecordedProvider(Provider):
         return d
 
     def complete_json(self, task: str, system: str, user: str, schema: dict, ctx: dict) -> dict:
-        d = self.fixture(ctx["repo"], ctx["pr"])
-        if d is None or task not in d:
-            raise ProviderError(f"no recorded {task} response for {ctx['repo']}#{ctx['pr']}")
-        if d.get("model"):
-            self.models = {k: d["model"] for k in self.models}
-        return d[task]
+        try:
+            d = self.fixture(ctx["repo"], ctx["pr"])
+            if d is None or task not in d:
+                raise ProviderError(f"no recorded {task} response for {ctx['repo']}#{ctx['pr']}")
+            if d.get("model"):
+                self.models = {k: d["model"] for k in self.models}
+            out = d[task]
+        except ProviderError:
+            self._remember(task, False)
+            raise
+        self._remember(task, True)
+        return out
 
 
 def select(name: str, env: dict | None = None, models: dict | None = None,
            recorded_dir: Path | None = None) -> tuple[Provider | None, str]:
     env = os.environ if env is None else env
     if name == "none":
-        return None, "model provider: none (--model-provider none): fixed probes only"
+        return None, "model provider: none (--model-provider none): the AI was off; fixed probes only"
     if name == "recorded":
         return RecordedProvider(recorded_dir or RECORDED_DIR, models), (
             "model provider: recorded responses (TEST FIXTURE, not blind)")
     if name == "nebius":
-        key = env.get(KEY_ENV)
-        if not key:
+        raw = env.get(KEY_ENV) if KEY_ENV in env else None
+        if raw is None:
             return None, f"model provider: nebius requested but {KEY_ENV} is not set: fixed probes only"
-        return NebiusProvider(key, models), "model provider: nebius (Token Factory, live)"
+        if str(raw).strip() == "":
+            return None, f"model provider: nebius requested but {KEY_ENV} is empty: fixed probes only"
+        return NebiusProvider(raw if isinstance(raw, str) else str(raw), models), (
+            "model provider: nebius (Token Factory, live)")
     raise ValueError(f"unknown model provider {name!r}; one of {PROVIDERS}")
+
+
+def key_refusal(provider: str, env: dict | None = None) -> str | None:
+    """Plain-language stop message when a Nebius run has no usable key. None if the run may start.
+
+    `none` and `recorded` do not use the Nebius key. Only an explicit `none` is a run with the AI off.
+    The message names the variable and how to fix it, and it never contains the key.
+    """
+    if provider != "nebius":
+        return None
+    env = os.environ if env is None else env
+    raw = env.get(KEY_ENV) if KEY_ENV in env else None
+    if raw is None:
+        state = f"{KEY_ENV} is not set"
+    elif str(raw).strip() == "":
+        state = f"{KEY_ENV} is empty"
+    else:
+        return None
+    return (
+        f"STOPPED: this run is set to use the Nebius model provider, but {state}. "
+        "The run will not start, because a run must not go ahead with the AI turned off. "
+        f"Fix: set {KEY_ENV} to your Nebius Token Factory API key and run again, "
+        "or pass --model-provider none if you mean to run with the AI off. "
+        "The key is never printed."
+    )
+
+
+def describe_use(requested: str | None, provider, skipped: str | None = None,
+                 fallback: str | None = None) -> dict:
+    """What a result record should say about the provider that actually ran.
+
+    `model_provider_used` is the provider that completed a call (`nebius`, `recorded`, or `none`).
+    It is not the provider the run was asked for. `model_provider_fallback` is set when the AI was
+    off, a call was skipped, or a call failed. Nothing here contains an API key.
+    """
+    requested = requested or "none"
+    calls = list(getattr(provider, "calls", None) or [])
+    ok = [c for c in calls if c.get("ok")]
+    bad = [c for c in calls if not c.get("ok")]
+    used = (getattr(provider, "name", None) or "none") if ok else "none"
+    parts: list[str] = []
+    if requested == "none":
+        parts.append("the AI was off")
+    if skipped:
+        parts.append(skipped)
+    if bad:
+        tasks = ", ".join(dict.fromkeys(str(c.get("task") or "call") for c in bad))
+        parts.append(f"AI call fell back or failed ({tasks})")
+    if fallback:
+        parts.append(fallback)
+    if not parts and used == "none" and requested != "none":
+        parts.append(f"no AI call ran (asked for {requested})")
+    out = {"model_provider_used": used}
+    seen: list[str] = []
+    for part in parts:
+        if part not in seen:
+            seen.append(part)
+    if seen:
+        out["model_provider_fallback"] = "; ".join(seen)
+    return out

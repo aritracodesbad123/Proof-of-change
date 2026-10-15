@@ -280,7 +280,7 @@ have no claims, so under `tests+diff` any difference needs attention.
 | Provider | What it does |
 |---|---|
 | `none` (default) | fixed probes only; the record and report say so |
-| `nebius` | Nebius Token Factory (`https://api.tokenfactory.nebius.com/v1`, OpenAI-compatible, structured JSON output). Model ids: `--claims-model` and `--probe-model`, default `nvidia/nemotron-3-super-120b-a12b` (REQUIREMENTS section 4a). The key is read from `NEBIUS_API_KEY` by the orchestrator only; without it the run falls back to fixed probes and says so |
+| `nebius` | Nebius Token Factory (`https://api.tokenfactory.nebius.com/v1`, OpenAI-compatible, structured JSON output). Model ids: `--claims-model` and `--probe-model`, default `nvidia/nemotron-3-super-120b-a12b` (REQUIREMENTS section 4a). The key is read from `NEBIUS_API_KEY` by the orchestrator only. If that variable is missing or empty, the run stops before it starts and says how to set it. It never prints the key. `--model-provider none` is how you run with the AI off |
 | `recorded` | answers from `evals/fixtures/model_responses/<owner>/<repo>/<pr>.json`. These are **test fixtures**: every probe written from them is labelled `model (recorded fixture, not blind)` |
 
 The model first extracts claims, and each claim must quote the PR text exactly. It then writes probe code, which is
@@ -387,7 +387,7 @@ kept once under `pre-migration/`), `--rejudge` (with `--report-only`: also recom
 JUnit files with the current comparison rules; the previous verdict is kept under `rejudged`), `--date` (run folder,
 may be nested, e.g. `<date>/<name>`; `run_date` is the folder's calendar date), `--ops-dir`, `--work-dir`, `--report-dir`, `--no-report`,
 `--baseline tests|tests+diff|tests+probes|full` (what decides the verdict, default `full`; see "Baselines"),
-`--model-provider nebius|recorded|none` (default `nebius`; with the default `full` baseline the daily run, not benchmark mode, refuses to start when no model is available, see docs/decisions/2026-10-14-require-model-for-ai-gate.md), `--claims-model ID`, `--probe-model ID`, `--recorded-dir DIR`,
+`--model-provider nebius|recorded|none` (default `nebius`; a missing or empty `NEBIUS_API_KEY` stops the run before it starts, including a benchmark or an eval that uses this default. `--model-provider none` runs with the AI off. The full baseline still refuses to test when no model is available, see docs/decisions/2026-10-14-require-model-for-ai-gate.md), `--claims-model ID`, `--probe-model ID`, `--recorded-dir DIR`,
 `--unsafe-no-sandbox` (run PR code without the sandbox; never used by the daily run), `--no-coverage` (skip the coverage run; the gate then says "not measured"), `--no-probes` (do not run probe files;
 the record says `"probes": {"status": "none"}`).
 

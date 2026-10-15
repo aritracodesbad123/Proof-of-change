@@ -198,6 +198,7 @@ def write_result(out: Path, rid: str, rec: dict) -> Path:
 
 def run_case(dr, a, row: dict, inputs_meta: dict, out: Path, workroot: Path, machine: dict) -> dict:
     t0 = time.time()
+    dr.begin_pr(a)
     rid = row["id"]
     tag = result_name(rid, getattr(a, "baseline", None))[:-5]
     prdir = out / "logs" / tag
@@ -228,7 +229,7 @@ def run_case(dr, a, row: dict, inputs_meta: dict, out: Path, workroot: Path, mac
         rec["tested"] = {"main": f"first parent of the merge commit @ {co['main_sha'][:12]}",
                          "pr": f"merge commit @ {co['pr_sha'][:12]} (what landed)"}
         rec["pr"]["merge_commit"] = co["pr_sha"]
-    rec = dr.finish(rec, prdir, work, t0)
+    rec = dr.finish(rec, prdir, work, t0, a)
     write_result(out, rid, rec)
     return rec
 

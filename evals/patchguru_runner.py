@@ -37,7 +37,7 @@ import types
 import urllib.request
 from pathlib import Path
 
-from poc import cost
+from poc import cost, model_provider
 from poc.leakage import Fingerprints
 from poc.model_gate import Gate, GatedProvider
 
@@ -295,9 +295,15 @@ def run_case(row: dict, a, fp: Fingerprints, key: str, out: Path, machine: dict)
     def records(pre, post, extra) -> list[dict]:
         recs = []
         for bl, (v, why) in zip(BASELINES, (pre, post)):
+            extra = dict(extra)
+            ai_note = extra.pop("ai_note", None)
+            calls = (extra.get("model_calls") or {}).get("calls") or 0
             r = dict(base, **extra, baseline=bl, verdict=v, reason=why,
                      id=f"bench-{rid}-{row['repo'].replace('/', '-')}-{row['pr']}-{bl}",
-                     elapsed_s=round(time.time() - t0, 1))
+                     elapsed_s=round(time.time() - t0, 1),
+                     model_provider_used="nebius" if calls else "none")
+            if not calls:
+                r["model_provider_fallback"] = ai_note or "AI calls were skipped"
             # One PatchGuru run gives both records (before and after self-review): the same calls, counted once.
             r["cost"] = dict(cost.peek({"total_wall": r["elapsed_s"]}), shared_with_other_baseline=True)
             (out / f"{rid}-{bl.replace('-', '_')}.json").write_text(json.dumps(r, indent=1))
@@ -307,7 +313,8 @@ def run_case(row: dict, a, fp: Fingerprints, key: str, out: Path, machine: dict)
     co = bench.checkout(dr, row, work, logd / "git.log")
     if not co.get("ok"):
         why = co.get("why", "checkout failed")
-        return records(("could_not_verify", why), ("could_not_verify", why), {"label": "pilot"})
+        return records(("could_not_verify", why), ("could_not_verify", why),
+                       {"label": "pilot", "ai_note": "AI calls were skipped: the checkout failed before any model call"})
     src = work / "src"
     files = co["files"]
     before = {f: _file_at(src, co["main_sha"], f) for f in files}
@@ -317,7 +324,8 @@ def run_case(row: dict, a, fp: Fingerprints, key: str, out: Path, machine: dict)
     if not elig["eligible"]:
         why = "not eligible for PatchGuru: " + elig["why"]
         return records(("could_not_verify", why), ("could_not_verify", why),
-                       {"eligibility": elig, "label": "not run"})
+                       {"eligibility": elig, "label": "not run",
+                        "ai_note": "AI calls were skipped: this case is not eligible"})
 
     # PatchGuru inputs, built the way its PullRequest/SpecInfer code builds them
     path, qname = elig["functions"][0]
@@ -445,6 +453,11 @@ def main(argv=None) -> int:
                     help="use a released wheel for the pre-PR environment, e.g. B02=pandas==2.1.4")
     ap.add_argument("--eligibility-only", action="store_true", help="report which cases qualify; no model calls")
     a = ap.parse_args(argv)
+    if not a.eligibility_only:
+        stop = model_provider.key_refusal("nebius")
+        if stop:
+            print(stop, file=sys.stderr)
+            return 1
     rows = bench.select(bench.read_inputs(a.bench), a.ids)
     out = Path(a.out)
     out.mkdir(parents=True, exist_ok=True)
@@ -452,9 +465,9 @@ def main(argv=None) -> int:
         return _eligibility(rows, a, out)
     fp = Fingerprints.from_json(json.loads(Path(a.fingerprints).read_text()))
     key = os.environ.pop(KEY_ENV, "")   # held here only; PatchGuru's code and the sandbox never see it in env
-    if not key:
-        print(f"Stopped: {KEY_ENV} is not set", file=sys.stderr)
-        return 2
+    if not str(key).strip():
+        print(model_provider.key_refusal("nebius") or f"STOPPED: {KEY_ENV} is not set", file=sys.stderr)
+        return 1
     a.python_full = dr.resolve_python(a.python)
     machine = dict(dr.detect_machine_type())
     for row in rows:
@@ -466,7 +479,10 @@ def main(argv=None) -> int:
             recs = []
             for bl in BASELINES:
                 r = {"case_id": row["id"], "bench": {"id": row["id"], "answer_key_read": False}, "baseline": bl,
-                     "verdict": "could_not_verify", "reason": why, "label": "pilot", "poc_commit": _git_head()}
+                     "verdict": "could_not_verify", "reason": why, "label": "pilot", "poc_commit": _git_head(),
+                     "model_provider_used": "none",
+                     "model_provider_fallback": "AI call failed or was skipped; the case was recorded instead of "
+                                                "continuing with the AI off"}
                 (out / f"{row['id']}-{bl.replace('-', '_')}.json").write_text(json.dumps(r, indent=1))
                 recs.append(r)
         for r in recs:
