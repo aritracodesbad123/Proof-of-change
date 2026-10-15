@@ -375,7 +375,7 @@ def test_baseline_flag_and_default(monkeypatch):
     monkeypatch.setattr(argparse.ArgumentParser, "parse_args", spy)
     with pytest.raises(SystemExit):
         daily_run.main(["--select-only"])
-    assert seen == {"baseline": "full", "provider": "none"}
+    assert seen == {"baseline": "full", "provider": "nebius"}
     with pytest.raises(SystemExit):
         daily_run.main(["--select-only", "--baseline", "tests+diff", "--model-provider", "recorded"])
     assert seen == {"baseline": "tests+diff", "provider": "recorded"}

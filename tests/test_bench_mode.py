@@ -159,6 +159,28 @@ def test_checkout_builds_main_from_first_parent_and_pr_from_merge(tmp_path, merg
     assert dr.source_pair("example-org/widgets", {"bench_sides": co}, work, tmp_path / "x.log", "3.12", 1) is co
 
 
+def test_checkout_fetches_submodules_on_both_sides(tmp_path, merged_repo, monkeypatch):
+    monkeypatch.setattr(bench, "CLONE_URL", str(merged_repo["path"]))
+    seen, real = [], dr.run
+    monkeypatch.setattr(dr, "run", lambda c, log, **kw: (seen.append([str(x) for x in c]), real(c, log, **kw))[1])
+    work = tmp_path / "work"
+    work.mkdir()
+    co = bench.checkout(dr, row_for(merged_repo), work, tmp_path / "git.log")
+    assert co["ok"], co
+    subs = [c for c in seen if c[3:] == ["submodule", "update", "--init", "--recursive"]]
+    assert [c[2] for c in subs] == [str(work / "side-main"), str(work / "side-pr")]
+
+
+def test_checkout_fails_clearly_when_submodules_cannot_be_fetched(tmp_path, merged_repo, monkeypatch):
+    monkeypatch.setattr(bench, "CLONE_URL", str(merged_repo["path"]))
+    real = dr.run
+    monkeypatch.setattr(dr, "run", lambda c, log, **kw: (1, 0.0) if "submodule" in map(str, c) else real(c, log, **kw))
+    work = tmp_path / "work"
+    work.mkdir()
+    co = bench.checkout(dr, row_for(merged_repo), work, tmp_path / "git.log")
+    assert not co["ok"] and "submodules of the main side" in co["why"]
+
+
 def test_checkout_refuses_inconsistent_first_parent(tmp_path, merged_repo, monkeypatch):
     monkeypatch.setattr(bench, "CLONE_URL", str(merged_repo["path"]))
     work = tmp_path / "work"

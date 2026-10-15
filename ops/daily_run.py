@@ -40,6 +40,7 @@ import subprocess
 import sys
 import time
 import urllib.error
+import urllib.parse
 import urllib.request
 import xml.etree.ElementTree as ET
 import zipfile
@@ -650,6 +651,144 @@ def with_test_extras(proj: list[str], checkout: Path) -> list[str]:
     return proj[:-1] + [f"{m.group(1)}[{','.join(allx)}]"]
 
 
+def _norm(name: str) -> str:
+    return re.sub(r"[-_.]+", "-", name).lower()
+
+
+def _req_name(req: str) -> str:
+    return re.split(r"[\[<>=!~;,@\s]", req.strip(), maxsplit=1)[0]
+
+
+def declared_requirements(checkout: Path) -> dict:
+    """{'extras': {name: [req, ...]}, 'groups': {name: [req, ...]}} from pyproject.toml (strings only; anything that
+    looks like a command-line option is dropped, because these strings come from the checkout)."""
+    pp = checkout / "pyproject.toml"
+    out: dict = {"extras": {}, "groups": {}}
+    if not pp.is_file():
+        return out
+    import tomllib
+    try:
+        d = tomllib.loads(pp.read_text())
+    except Exception:  # noqa: BLE001
+        return out
+    for key, src in (("extras", d.get("project", {}).get("optional-dependencies", {})), ("groups", d.get("dependency-groups", {}))):
+        if isinstance(src, dict):
+            for n, reqs in src.items():
+                if isinstance(reqs, list):
+                    out[key][str(n)] = [r.strip() for r in reqs if isinstance(r, str) and r.strip()
+                                        and not r.strip().startswith("-")]
+    return out
+
+
+# Declared pytest plugins that change how tests are collected or run are needed for a faithful run; coverage and
+# type-checking plugins are not.
+_PLUGIN_SKIP = ("pytest-cov", "pytest-mypy", "pytest-mypy-plugins", "pytest-benchmark", "pytest-codspeed")
+
+
+def declared_test_deps(checkout: Path, targets: list[str], self_dist: str) -> list[str]:
+    """Test requirements the project declares that a run of `targets` needs (docs/decisions/2026-10-14-...):
+
+    1. every pytest plugin listed in any extra or dependency group (pytest-asyncio, pytest-env, ...), except
+       coverage/type-check/benchmark plugins;
+    2. an extra whose name matches a directory or file name of a target (tests/pandas/... -> extra "pandas");
+    3. a declared package whose name matches a directory or test-file name of a target
+       (xarray/tests/backends/test_zarr.py -> zarr, declared in the "io" extra).
+    References to the project itself (xarray[complete]) are not installed."""
+    decl = declared_requirements(checkout)
+    allreqs = [r for kind in ("extras", "groups") for reqs in decl[kind].values() for r in reqs]
+    me = _norm(self_dist)
+    names = set()
+    for t in targets:
+        for part in Path(t).parts:
+            stem = Path(part).stem
+            for x in (part, stem, stem.removeprefix("test_"), stem.removesuffix("_test")):
+                if x and x not in ("tests", "test", "testing", "."):
+                    names.add(_norm(x))
+    out: list[str] = []
+
+    def add(req: str) -> None:
+        if _norm(_req_name(req)) != me and req not in out:
+            out.append(req)
+    for r in allreqs:
+        n = _norm(_req_name(r))
+        if n.startswith("pytest-") and n not in _PLUGIN_SKIP:
+            add(r)
+    for n, reqs in decl["extras"].items():
+        if _norm(n) in names:
+            for r in reqs:
+                add(r)
+    for r in allreqs:
+        if _norm(_req_name(r)) in names:
+            add(r)
+    return out
+
+
+def install_declared_test_deps(venvs: dict, reqs: list[str], log: Path, timeout: int) -> tuple[bool, str]:
+    """Install the same declared test requirements on both sides."""
+    if not reqs:
+        return True, ""
+    for side, venv in venvs.items():
+        rc, _ = run(["uv", "pip", "install", "-q", "-p", venv / "bin/python", *reqs], log,
+                    env=base_env(side_home(venv), install=True), timeout=timeout, sbx=side_sandbox(venv, network=True))
+        if rc != 0:
+            return False, f"installing declared test requirements on the {side} side failed ({rc}); see {log.name}"
+    return True, ""
+
+
+def direct_url(venv: Path, dist: str) -> dict | None:
+    """The installed distribution's direct_url.json (PEP 610), or None when it has none."""
+    want = _norm(dist)
+    for di in glob.glob(str(site_packages(venv) / "*.dist-info")):
+        name = os.path.basename(di)[:-len(".dist-info")].rsplit("-", 1)[0]
+        if _norm(name) == want:
+            f = Path(di) / "direct_url.json"
+            if f.is_file():
+                try:
+                    return json.loads(f.read_text())
+                except ValueError:
+                    return {"_unreadable": True}
+            return None
+    return None
+
+
+def check_installed_commit(venv: Path, dist: str, expected_sha: str, checkout: Path | None = None) -> tuple[bool, dict]:
+    """Does the installed `dist` come from `expected_sha`? Fails closed.
+
+    A VCS install (vcs_info.commit_id) must name that commit. A local install (dir_info) must point at `checkout`, and
+    that checkout must be at `expected_sha` (git rev-parse HEAD). Anything else (no direct_url.json, another
+    directory, another commit) fails. Short expected SHAs (7+ hex) match by prefix."""
+    du = direct_url(venv, dist)
+    info: dict = {"dist": dist, "expected": expected_sha, "direct_url": du}
+
+    def same(got: str | None) -> bool:
+        return bool(got) and len(expected_sha) >= 7 and (got.startswith(expected_sha) or expected_sha.startswith(got))
+    if not du:
+        info["why"] = f"{dist} has no direct_url.json, so the installed commit cannot be checked"
+        return False, info
+    vcs = du.get("vcs_info") or {}
+    if vcs.get("commit_id"):
+        info["installed"] = vcs["commit_id"]
+        ok = same(vcs["commit_id"])
+        if not ok:
+            info["why"] = f"{dist} installed from commit {vcs['commit_id'][:12]}, not the requested {expected_sha[:12]}"
+        return ok, info
+    url = du.get("url") or ""
+    if checkout is not None and "dir_info" in du:
+        here = Path(urllib.parse.unquote(url.removeprefix("file://"))).resolve() if url.startswith("file://") else None
+        if here != Path(checkout).resolve():
+            info["why"] = f"{dist} was installed from {url}, not from the checked-out side"
+            return False, info
+        head = subprocess.run(["git", "-C", str(checkout), "rev-parse", "HEAD"], capture_output=True, text=True,
+                              env=base_env(Path(checkout).parent / "home-git")).stdout.strip()
+        info["installed"] = head
+        ok = same(head)
+        if not ok:
+            info["why"] = f"{dist} checkout is at {head[:12] or 'unknown'}, not the requested {expected_sha[:12]}"
+        return ok, info
+    info["why"] = f"{dist} was installed from {url or 'an unknown source'} with no commit to check"
+    return False, info
+
+
 def install_side(venv: Path, checkout: Path, chosen: dict | None, log: Path, python: str, timeout: int,
                  constraints: Path | None) -> tuple[bool, str]:
     env = base_env(side_home(venv), install=True)
@@ -1135,6 +1274,33 @@ def gate(rec: dict) -> dict:
     if not uses(rec.get("baseline"), "coverage"):
         return rec
     return ai_probe_gate(coverage_gate.apply(rec))
+
+
+def ai_probe_gate_on(baseline: str | None) -> bool:
+    """Whether the AI-probe gate (ai_probe_gate) can demote a verdict under this baseline."""
+    return uses(baseline, "coverage") and uses(baseline, "claim_probes")
+
+
+def model_refusal(a) -> str | None:
+    """Refuse a daily run that would test PRs with the AI-probe gate on but no model to write probes.
+
+    With no model, no AI-written probe can run, so the gate turns every otherwise clean PR into could_not_verify
+    (the 2026-10-14 daily run: 0 of 23 verified). Selecting PRs or rebuilding a report tests nothing and is allowed.
+    Benchmark mode is not the daily run, so it is not stopped here. An explicit provider is allowed, including
+    none when the AI-probe gate is off.
+    Returns the message to stop with, or None."""
+    if getattr(a, "select_only", False) or (getattr(a, "report_only", False) and not getattr(a, "rejudge", False)):
+        return None
+    if getattr(a, "bench", None):
+        return None
+    if not ai_probe_gate_on(getattr(a, "baseline", None)) or getattr(a, "provider", None) is not None:
+        return None
+    note = getattr(a, "model_note", None) or "no model provider"
+    return ("STOPPED: no AI model is available, but baseline "
+            f"{getattr(a, 'baseline', None) or 'full'} only allows 'verified' when an AI-written probe ran a changed "
+            f"line. Every PR would come out could_not_verify. ({note}.) Fix: set NEBIUS_API_KEY and pass "
+            "--model-provider nebius (the default), or choose a baseline without the AI-probe gate "
+            "(--baseline tests, tests+diff or tests+probes).")
 
 
 def ai_probe_gate(rec: dict) -> dict:
@@ -2232,7 +2398,28 @@ def test_source_pair(repo: str, cfg: dict, item: dict, prdir: Path, work: Path, 
             rec["test_targets"] = targets
             rec["test_selection"] = ("chosen-PR subset: " if chosen_tg else "mapped from touched files: ") + ", ".join(
                 targets["pr"])
-            if not targets["pr"]:
+            commits = {}
+            for side, venv, co in (("main", vm, cm), ("pr", vp, cp)):
+                good, info = check_installed_commit(venv, cfg["dist"], sp[f"{side}_sha"], co)
+                commits[side] = {k: v for k, v in info.items() if k != "direct_url"} | {"ok": good}
+                if not good and not cnv:
+                    cnv = f"wrong-commit guard ({side} side): {info.get('why')}"
+            rec["installed_commit"] = commits
+            decl = [] if cnv else declared_test_deps(cm, list(dict.fromkeys(targets["main"] + targets["pr"])),
+                                                       cfg["dist"])
+            if decl:
+                good, why2 = install_declared_test_deps({"main": vm, "pr": vp}, decl, prdir / "setup-declared.log",
+                                                        a.build_timeout)
+                rec["declared_test_deps"] = {"requested": decl, "installed": good}
+                if good:
+                    rec["test_extras"] = list(dict.fromkeys([*(rec.get("test_extras") or []), *decl]))
+                    rec["freeze"]["main"] = freeze_env(vm, prdir / "freeze-main.txt")
+                    rec["freeze"]["pr"] = freeze_env(vp, prdir / "freeze-pr.txt")
+                else:
+                    rec["optional_install_error"] = why2
+            if cnv:
+                pass
+            elif not targets["pr"]:
                 cnv = "no tests could be mapped to the touched files"
             else:
                 cmp, cnv, ex = execute_tests(rec, {"main": vm, "pr": vp}, targets, prdir, work, a,
@@ -2767,10 +2954,11 @@ def main(argv=None) -> int:
                          "differential probes), tests+probes (+ claim probes: fixed and/or model-written), full "
                          "(everything: claim probes, coverage gate, claim flagging; differential probes shown). "
                          "Default: full")
-    ap.add_argument("--model-provider", choices=model_provider.PROVIDERS, default="none",
-                    help="who writes claim probes in addition to the fixed ones: nebius (Token Factory, key from "
-                         "NEBIUS_API_KEY; without it: fixed probes only), recorded (recorded responses: TEST FIXTURE, "
-                         "not blind), none (default: fixed probes only)")
+    ap.add_argument("--model-provider", choices=model_provider.PROVIDERS, default="nebius",
+                    help="who writes claim probes in addition to the fixed ones: nebius (default; Token Factory, key "
+                         "from NEBIUS_API_KEY), recorded (recorded responses: TEST FIXTURE, not blind), none (fixed "
+                         "probes only). The daily run, not benchmark mode, refuses to start on the full baseline without a "
+                         "working model, because that gate would turn every clean PR into could_not_verify")
     ap.add_argument("--claims-model", default=model_provider.DEFAULT_MODELS["claims"], help="model id for claims")
     ap.add_argument("--probe-model", default=model_provider.DEFAULT_MODELS["probes"], help="model id for probes")
     ap.add_argument("--recorded-dir", default=None,
@@ -2821,6 +3009,10 @@ def main(argv=None) -> int:
     if not uses(a.baseline, "claim_probes") and a.provider is not None:
         a.model_note += f" (not used: baseline {a.baseline} has no claim probes)"
         a.provider = None
+    refusal = model_refusal(a)
+    if refusal:
+        print(refusal, file=sys.stderr)
+        raise SystemExit(refusal)
     if a.runs != 3:
         print("note: protocol requires 3 runs per side; using", a.runs, file=sys.stderr)
     if a.bench:
