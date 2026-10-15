@@ -1445,7 +1445,7 @@ def compare_sides(results: dict) -> dict:
     for r in results["main"] + results["pr"]:
         ids |= set(r)
     out = {"same": 0, "same_skipped_both": 0, "regressions": [], "fixed": [], "new_tests_passing": 0,
-           "new_tests_failing": [], "removed_tests": [], "reparametrized": [], "skipped_missing_dependency": [],
+           "new_tests_failing": [], "new_tests_skipped": [], "removed_tests": [], "reparametrized": [], "skipped_missing_dependency": [],
            "flaky": [], "environment": [], "other_changes": [], "preexisting_failures": [], "load_failed_both": [],
            "load_failed_pr": [], "load_failed_main": []}
     msgs, removed, added = {}, [], []
@@ -1513,6 +1513,10 @@ def compare_sides(results: dict) -> dict:
             out["new_tests_passing"] += 1
         elif mo == "absent" and po in bad:
             out["new_tests_failing"].append(t)
+        elif mo == "absent" and po == "skipped":
+            # A test that did not exist before and skips on the PR (e.g. a parametrization the code rejects with a
+            # skip) did not change any behaviour that ran before. Listed, never a finding.
+            out["new_tests_skipped"].append(t)
         elif po == "absent":
             removed.append(t)
         else:
@@ -1732,6 +1736,9 @@ def tests_verdict(cmp: dict | None, cnv_reason: str | None, exits: dict | None =
         bits.append(f"{len(cmp['other_changes'])} other outcome change(s)")
     if cmp["fixed"]:
         bits.append(f"{len(cmp['fixed'])} test(s) fail on main and pass on the PR")
+    if cmp.get("new_tests_skipped"):
+        bits.append(f"{len(cmp['new_tests_skipped'])} new test(s) skipped on the PR (they did not exist before; "
+                    "listed, not a finding)")
     env = cmp.get("environment") or []
     if env:
         bits.append(f"{len(env)} test(s) varied only between passed and skipped for a resource limit on both sides "
