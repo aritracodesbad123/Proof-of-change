@@ -1,8 +1,8 @@
 """The test/tool filter must not swallow product sentences (2026-10-15 decision).
 
 The 17 sentences below were wrongly dropped by the first version of the filter on four pull-request
-descriptions (these four were used to tune this narrower rule, so they are regressions, not held-out cases). They describe the product change, the bug, or that nothing else changes, so they must reach the
-claim extractor."""
+descriptions (these four were used to tune this narrower rule, so they are regressions, not held-out cases).
+They describe the product change, the bug, or that nothing else changes, so they must reach the claim extractor."""
 import json
 import pathlib
 import re
@@ -105,3 +105,83 @@ def test_unindented_wrapped_list_line_ends_test_section():
     kept = b._drop_test_sections("## Testing\n- `pytest -q` on the parser\nsuite with defaults\n- `ruff check`\n")
     assert "pytest" not in kept
     assert "suite with defaults" in kept and "ruff check" in kept
+
+
+def _passing_comparison():
+    from ops.daily_run import compare_sides
+    passed = {"t::a": ("passed", ""), "t::b": ("passed", "")}
+    return compare_sides({"main": [passed] * 3, "pr": [passed] * 3})
+
+
+def _kept_unchanged_claim():
+    """A behaviour sentence written after a test list. The narrower filter keeps it, so it is a real claim."""
+    body = "## Testing\n- `pytest -q`\n\nResults are unchanged for existing callers."
+    claims = b.find("Keep the parser", body)
+    assert len(claims) == 1 and claims[0]["pattern"] == "unchanged"
+    assert claims[0]["quote"] == "Results are unchanged for existing callers."
+    return claims
+
+
+_SAME = [{"id": "C1", "text": "results unchanged", "covers": ["r"], "expect": "same"}]
+_STALE_COVERAGE = {"status": "measured", "changed_lines_total": 4, "changed_lines_covered": 2,
+                   "adequacy": "adequate"}
+
+
+def test_kept_claim_whose_only_probe_crashed_is_not_verified():
+    """The filter keeps the promise, and a crashed probe must not turn that promise into 'verified'."""
+    from ops.daily_run import verdict_for
+    from poc import probes
+
+    claims = _kept_unchanged_claim()
+    err = probes.PROBE_ERROR
+    item = probes.classify_item({
+        "id": "model-x", "source": "model", "claims": _SAME,
+        "runs": {"main": [{err: {"crash": "boom"}}] * 3, "pr": [{err: {"crash": "boom"}}] * 3},
+        "observations": [{"name": err, "state": "same", "label": "not_testable",
+                          "main": {"crash": "boom"}, "pr": {"crash": "boom"}}],
+        "probe_changed_line_coverage": dict(_STALE_COVERAGE),
+    })
+    assert item["status"] == "crashed"
+    assert item["probe_changed_line_coverage"]["changed_lines_covered"] == 0
+    assert not b.probe_covers({"items": [item]})
+    v, reason, _ = verdict_for(_passing_comparison(), None, probe_results={"items": [item]}, claims=claims)
+    assert v == "could_not_verify"
+    assert reason.startswith('unverified behaviour claim: "Results are unchanged for existing callers."')
+
+
+@pytest.mark.parametrize("status", ["crashed", "error", "uninformative", "not_run"])
+def test_stale_coverage_on_a_probe_that_did_not_run_does_not_verify(status):
+    """A coverage block left over from before the crash still does not check the claim."""
+    from ops.daily_run import verdict_for
+
+    claims = _kept_unchanged_claim()
+    item = {"id": "model-x", "source": "model", "status": status, "claims": _SAME,
+            "observations": [{"name": "r", "state": "same", "label": "proven", "claim": "C1", "main": 1, "pr": 1}],
+            "probe_changed_line_coverage": dict(_STALE_COVERAGE)}
+    assert not b.probe_covers({"items": [item]})
+    v, reason, _ = verdict_for(_passing_comparison(), None, probe_results={"items": [item]}, claims=claims)
+    assert v == "could_not_verify" and "unverified behaviour claim" in reason
+
+
+def test_kept_claim_with_a_probe_that_ran_a_changed_line_is_verified():
+    from ops.daily_run import verdict_for
+
+    claims = _kept_unchanged_claim()
+    item = {"id": "model-x", "source": "model", "status": "ran", "claims": _SAME,
+            "observations": [{"name": "r", "state": "same", "label": "proven", "claim": "C1", "main": 1, "pr": 1}],
+            "probe_changed_line_coverage": dict(_STALE_COVERAGE)}
+    assert b.probe_covers({"items": [item]})
+    assert verdict_for(_passing_comparison(), None, probe_results={"items": [item]}, claims=claims)[0] == "verified"
+
+
+def test_measured_zero_covered_lines_do_not_check_a_kept_claim():
+    from ops.daily_run import verdict_for
+
+    claims = _kept_unchanged_claim()
+    item = {"id": "model-x", "source": "model", "status": "ran", "claims": _SAME,
+            "observations": [{"name": "r", "state": "same", "label": "proven", "claim": "C1", "main": 1, "pr": 1}],
+            "probe_changed_line_coverage": {"status": "measured", "changed_lines_total": 4,
+                                            "changed_lines_covered": 0, "adequacy": "adequate"}}
+    assert not b.probe_covers({"items": [item]})
+    v, reason, _ = verdict_for(_passing_comparison(), None, probe_results={"items": [item]}, claims=claims)
+    assert v == "could_not_verify" and "unverified behaviour claim" in reason

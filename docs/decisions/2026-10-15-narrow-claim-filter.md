@@ -49,3 +49,11 @@ different for the wrong reason.
 
 - Some boilerplate (links, sign-up blurbs) and a few borderline test notes, such as "test linter and LSP behavior
   for file creation", now reach the promise finder. They contain no promise words, so no extra promises appear.
+
+## A kept promise still needs a probe that ran
+
+A sentence this filter keeps can be a real promise, such as "Results are unchanged" written after a test list.
+That promise supports a verified result only when a probe that expects the same outcome actually ran a changed
+line. A probe that crashed, came back empty, was uninformative, or did not run covers no changed lines. A coverage
+count left over from before that failure, still saying the probe was adequate, does not override this. The promise
+stays unchecked, and the result is could not verify.
