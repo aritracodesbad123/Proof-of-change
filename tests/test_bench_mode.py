@@ -11,6 +11,7 @@ import pytest
 from guardrails import sandbox
 from ops import bench
 from ops import daily_run as dr
+from poc import model_provider
 
 ROOT = Path(__file__).resolve().parent.parent
 SYN = ROOT / "tests" / "fixtures" / "bench" / "inputs-synthetic.csv"
@@ -91,6 +92,7 @@ def test_rejects_short_shas(tmp_path, bad, match):
 
 
 def test_cli_refuses_answers_file(tmp_path, capsys, monkeypatch):
+    monkeypatch.setenv(model_provider.KEY_ENV, "test-key")
     monkeypatch.setattr(dr, "sync_to_origin_main", lambda root=None: "a" * 40)
     p = tmp_path / "x-answers.csv"
     p.write_text(SYN.read_text())
@@ -195,6 +197,7 @@ def test_run_writes_one_result_per_id_and_never_opens_the_answer_key(tmp_path, m
     cols = list(rows[0])
     inputs.write_text(",".join(cols) + "\n" + "\n".join(",".join(r[c] for c in cols) for r in rows) + "\n")
     (tmp_path / "benchmark-v0-answers.csv").write_text("id,label\nB01,regression\n")
+    monkeypatch.setenv(model_provider.KEY_ENV, "test-key")
     monkeypatch.setattr(dr, "sync_to_origin_main", lambda root=None: "a" * 40)
     monkeypatch.setattr(bench, "CLONE_URL", str(merged_repo["path"]))
     monkeypatch.setattr(bench, "pr_text", lambda _dr, row: {"title": row["pr_title"], "body": "Changes f.",
@@ -224,6 +227,8 @@ def test_run_writes_one_result_per_id_and_never_opens_the_answer_key(tmp_path, m
     files = sorted(p.name for p in out.glob("*.json"))
     assert files == ["B01-full.json", "B02-full.json"]
     res = json.loads((out / "B01-full.json").read_text())
+    assert "test-key" not in (out / "B01-full.json").read_text()
+    assert res["model_provider_used"] == "none"  # the stub never called the model
     assert res["bench"]["id"] == "B01" and res["bench"]["answer_key_read"] is False
     assert res["bench"]["first_parent_verified"] and res["pr"]["merge_commit"] == merged_repo["merge"]
     assert res["verdict"] == "verified" and res["tested"]["main"].startswith("first parent of the merge commit")

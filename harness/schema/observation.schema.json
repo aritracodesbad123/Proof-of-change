@@ -1,7 +1,7 @@
 {
  "$schema": "https://json-schema.org/draft/2020-12/schema",
  "$id": "blast-radius/observation/v1",
- "title": "Blast Radius observation record v1, revision 9 (shared by the downstream-test runner br_run.py and harness/run.py, plus Proof-of-Change PR runs)",
+ "title": "Blast Radius observation record v1, revision 10 (shared by the downstream-test runner br_run.py and harness/run.py, plus Proof-of-Change PR runs)",
  "type": "object",
  "properties": {
   "schema_version": {
@@ -1836,6 +1836,19 @@
     }
    }
   },
+  "model_provider_used": {
+   "type": "string",
+   "enum": [
+    "nebius",
+    "recorded",
+    "none"
+   ],
+   "description": "OPTIONAL (rev 10). The model provider that actually completed a call. none means the AI did not run: it was turned off, a call was skipped, or a call failed. This is what ran, not the provider the run was asked to use."
+  },
+  "model_provider_fallback": {
+   "type": "string",
+   "description": "OPTIONAL (rev 10). Set when the AI was off, a call was skipped, or a call failed. Absent when the provider that was asked for completed its calls. Never contains an API key."
+  },
   "probe_plan": {
    "type": "object",
    "description": "OPTIONAL (rev 7). Probes written and frozen before PR-side execution: baseline, model note, extracted/rejected model claims, differential targets, frozen probes, errors.",
@@ -1938,6 +1951,11 @@
    "rev": 9,
    "date": "2026-10-13",
    "change": "optional additions only: probes.status uninformative; probe item status (ran, uninformative, not_run, error) and uninformative_reason; behaviour_claims sources changelog and docstring, plus optional status 'holds by construction'; thread_env.PYTHONHASHSEED const 0; pr.base_sha_label, pr.tested_main_sha, pr.tested_main_sha_label; head_at_report_sha, head_moved_since_test, tested_invocation, docstring_only. Nothing becomes required, so rev 1-8 records stay valid."
+  },
+  {
+   "rev": 10,
+   "date": "2026-10-15",
+   "change": "optional pr_run properties model_provider_used (nebius, recorded, or none: the provider that actually completed a call) and model_provider_fallback (set when the AI was off, a call was skipped, or a call failed). Nothing becomes required, so rev 1-9 records stay valid."
   }
  ],
  "if": {

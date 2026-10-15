@@ -1844,6 +1844,11 @@ def plan_probes(repo: str, item: dict, rec: dict, base_root: Path, pr_roots: lis
             note["model_rejected_claims"] = res.get("rejected_claims", [])
             note["errors"] += res.get("errors", [])
             plan += [{"path": x["path"], "source": "model", "freeze": x["freeze"]} for x in res.get("probes", [])]
+            made = [c for c in getattr(provider, "calls", []) if c.get("ok")]
+            if res.get("errors") and made and not res.get("probes"):
+                a.model_fallback = "the AI answered but no probe was usable, so only fixed probes ran"
+            elif res.get("errors") and made:
+                a.model_fallback = "some AI probes were rejected"
     if (uses(bl, "diff") or uses(bl, "diff_info")) and not getattr(a, "no_probes", False):
         try:
             d = diff_probes.derive(item.get("diff", ""), coverage_gate.python_sources(item["files"]), base_root,
@@ -1988,6 +1993,27 @@ def probe_coverage(item: dict, probe_results: dict | None, vm: Path, main_root: 
     return probe_adequacy.summary(items)
 
 
+def stamp_model_use(rec: dict, a) -> None:
+    """Write which provider actually completed a call, and any skip or fallback.
+
+    `model_provider_used` comes from calls that succeeded, not from the provider the run was asked to use.
+    The API key is never written.
+    """
+    info = model_provider.describe_use(
+        getattr(a, "model_provider", None), getattr(a, "provider", None),
+        getattr(a, "model_skipped", None), getattr(a, "model_fallback", None))
+    rec["model_provider_used"] = info["model_provider_used"]
+    if info.get("model_provider_fallback"):
+        rec["model_provider_fallback"] = info["model_provider_fallback"]
+    else:
+        rec.pop("model_provider_fallback", None)
+    mp = rec.get("model_provider")
+    if isinstance(mp, dict):
+        mp["used"] = None if info["model_provider_used"] == "none" else info["model_provider_used"]
+        if info["model_provider_used"] == "none":
+            mp["blind"] = False
+
+
 def new_record(repo: str, cfg: dict, item: dict, a, machine: dict, run_date: str, day: str | None = None) -> dict:
     """PR-run record (record_kind 'pr_run' of the shared observation schema, harness/schema/observation.schema.json).
     run_date names the run folder (used in the id); day is the calendar date stored in run_date."""
@@ -2018,7 +2044,7 @@ def new_record(repo: str, cfg: dict, item: dict, a, machine: dict, run_date: str
            "baseline": getattr(a, "baseline", None) or "full",
            "model_provider": {"requested": getattr(a, "model_provider", None) or "none",
                               "used": getattr(getattr(a, "provider", None), "name", None),
-                              "note": getattr(a, "model_note", None) or "model provider: none: fixed probes only",
+                              "note": getattr(a, "model_note", None) or "model provider: none: the AI was off; fixed probes only",
                               "blind": bool(getattr(getattr(a, "provider", None), "blind", False))},
            "posted_upstream": False, "logs": f"{cfg['pkg']}-{item['pr']}/", "freeze": {}}
     sha = getattr(a, "poc_commit", None)
@@ -2029,6 +2055,7 @@ def new_record(repo: str, cfg: dict, item: dict, a, machine: dict, run_date: str
     rec["current_head_sha"] = item.get("current_head_sha") or item["head_sha"]
     if getattr(a, "invocation", None):
         rec["tested_invocation"] = a.invocation
+    stamp_model_use(rec, a)
     for k in ("head_moved", "current_head_sha", "frozen_from", "state", "mergeable", "mergeable_state"):
         if item.get(k) is not None:
             rec[k] = item[k]
@@ -2228,9 +2255,9 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
     refusal = sandbox_refusal()
     if refusal:   # fail closed: no PR code runs without the sandbox (unless --unsafe-no-sandbox)
         rec["verdict"], rec["reason"], _ = verdict_for(None, refusal)
-        return finish(rec, prdir, work, t0)
+        return finish(rec, prdir, work, t0, a)
     if not cfg.get("nightly"):
-        return finish(test_source_pair(repo, cfg, item, prdir, work, a, rec), prdir, work, t0)
+        return finish(test_source_pair(repo, cfg, item, prdir, work, a, rec), prdir, work, t0, a)
     cnv, ex = None, None
     vm, vp = work / "venv-main", work / "venv-pr"
     main = build_main_env(cfg, vm, prdir / "setup-main.log", a.python, a.build_timeout, workroot / "wheels" / rdir.name)
@@ -2300,10 +2327,12 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
         if change_is_docstring_only(rec.get("files"), site_packages(vm), site_packages(vp)):
             rec["docstring_only"] = True
     _store_verdict(rec, cmp, cnv, ex)
-    return finish(gate(rec), prdir, work, t0)
+    return finish(gate(rec), prdir, work, t0, a)
 
 
-def finish(rec: dict, prdir: Path, work: Path, t0: float) -> dict:
+def finish(rec: dict, prdir: Path, work: Path, t0: float, runner=None) -> dict:
+    if runner is not None:
+        stamp_model_use(rec, runner)
     rec["what_changed"] = {"package_python_files": rec["files"]["package_py"], "compiled_files": rec["files"]["compiled"],
                            "other_files": rec["files"]["other"]}
     rec["duration_s"] = {"total_wall": round(time.time() - t0, 1),
@@ -2957,9 +2986,10 @@ def main(argv=None) -> int:
                          "Default: full")
     ap.add_argument("--model-provider", choices=model_provider.PROVIDERS, default="nebius",
                     help="who writes claim probes in addition to the fixed ones: nebius (default; Token Factory, key "
-                         "from NEBIUS_API_KEY), recorded (recorded responses: TEST FIXTURE, not blind), none (fixed "
-                         "probes only). The daily run, not benchmark mode, refuses to start on the full baseline without a "
-                         "working model, because that gate would turn every clean PR into could_not_verify")
+                         "from NEBIUS_API_KEY), recorded (recorded responses: TEST FIXTURE, not blind), none (the AI "
+                         "was off; fixed probes only). A missing or empty NEBIUS_API_KEY stops a nebius run before it "
+                         "starts. The daily run also refuses the full baseline when no model is available, because "
+                         "that gate would turn every clean PR into could_not_verify")
     ap.add_argument("--claims-model", default=model_provider.DEFAULT_MODELS["claims"], help="model id for claims")
     ap.add_argument("--probe-model", default=model_provider.DEFAULT_MODELS["probes"], help="model id for probes")
     ap.add_argument("--recorded-dir", default=None,
@@ -3002,14 +3032,23 @@ def main(argv=None) -> int:
     ap.add_argument("--ids", default=None, help="with --bench: comma-separated case IDs (default: all), e.g. B01,B14")
     ap.add_argument("--bench-out", default=None, help="with --bench: result folder (default: runs/bench-v0)")
     a = ap.parse_args(argv)
+    stop = model_provider.key_refusal(a.model_provider)
+    if stop:
+        print(stop, file=sys.stderr)
+        raise SystemExit(1)
     a.poc_commit = sync_to_origin_main(REPO_ROOT)
     sandbox.configure(not a.unsafe_no_sandbox)
     a.provider, a.model_note = model_provider.select(
         a.model_provider, models={"claims": a.claims_model, "probes": a.probe_model},
         recorded_dir=Path(a.recorded_dir) if a.recorded_dir else None)
+    a.model_skipped = None
+    a.model_fallback = None
     if not uses(a.baseline, "claim_probes") and a.provider is not None:
+        a.model_skipped = f"AI calls skipped: baseline {a.baseline} does not use claim probes"
         a.model_note += f" (not used: baseline {a.baseline} has no claim probes)"
         a.provider = None
+    if a.no_probes and a.provider is not None and not a.model_skipped:
+        a.model_skipped = "AI calls skipped because --no-probes was set"
     refusal = model_refusal(a)
     if refusal:
         print(refusal, file=sys.stderr)

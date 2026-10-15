@@ -23,6 +23,7 @@ import sys
 from pathlib import Path
 
 from evals.pr_metrics import LABELS_PATH, blind_score, case_for, load_cases, non_blind_probes, record_is_blind, score, score_records
+from poc import model_provider
 
 BASELINES = ("tests", "tests+diff", "tests+probes", "full")
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -99,6 +100,10 @@ def main(argv=None) -> int:
     if not str(root):
         ap.error("give --records-root, or --run with --out-dir")
     if a.run:
+        stop = model_provider.key_refusal(a.model_provider)
+        if stop:
+            print(stop, file=sys.stderr)
+            return 1
         run_cases([c for c in cases if c["input"].get("repo") not in (None, "TODO")], root, a.model_provider)
     rows = [row(b, cases, load_records(root / b)) for b in BASELINES if (root / b).is_dir()]
     out = Path(a.out or root)
