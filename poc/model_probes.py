@@ -27,6 +27,12 @@ MAX_PROBES = 4
 MAX_CONTEXT_CHARS = 60_000
 MODEL_TIMEOUT_S = 60
 ID_RE = re.compile(r"^[a-z0-9][a-z0-9-]{0,39}$")
+# The probe contract says the last printed line is a JSON object, so every probe needs the json module. Models
+# sometimes call json.dumps without importing it, and then the probe fails the same way on both sides and tests
+# nothing. The harness adds the import itself; it changes no behaviour of the code under test.
+JSON_IMPORT = "import json  # added by the harness: the observations line is printed as JSON\n"
+UNLINKED_REASON = ("no probe listed the claim ids it checks, so its results could not be tied to any claim; in each "
+                   "probe, \"claims\" must name the claim ids it checks and the observation names that cover them")
 
 
 def _norm(s: str) -> str:
@@ -98,7 +104,7 @@ def probe_file(p: dict, target: str, claims_by_id: dict, gen_label: str) -> str:
             "timeout_s": MODEL_TIMEOUT_S, "generator": gen_label}
     return (f'"""Model-written probe for {target} ({gen_label}). Generated from the PR text and base-side code only;\n'
             'frozen before any PR-side execution. Untrusted: runs only in the sandbox without network."""\n'
-            f"PROBE = {spec!r}\n\n" + p["code"].rstrip() + "\n")
+            f"PROBE = {spec!r}\n\n" + JSON_IMPORT + p["code"].rstrip() + "\n")
 
 
 def _context(base_files: dict) -> str:
@@ -114,6 +120,12 @@ def _context(base_files: dict) -> str:
         if used >= MAX_CONTEXT_CHARS:
             break
     return "\n\n".join(parts)
+
+
+def _usable(resp, claim_ids: set) -> list:
+    """The probes of a reply that pass validate_probe (after tidying ids and unescaping code)."""
+    return [p for p in (resp or {}).get("probes", [])[:MAX_PROBES] if isinstance(p, dict)
+            and not validate_probe(dict(p, id=_tidy_id(p.get("id")), code=_unescape_code(p.get("code"))), claim_ids)]
 
 
 def generate(provider: Provider, repo: str, pr: int, title: str, body: str | None, base_files: dict,
@@ -147,9 +159,7 @@ def generate(provider: Provider, repo: str, pr: int, title: str, body: str | Non
         out["errors"].append(str(e))
         return out
     by_id = {c["id"]: c for c in testable}
-    usable = [p for p in (resp or {}).get("probes", [])[:MAX_PROBES] if isinstance(p, dict)
-              and not validate_probe(dict(p, id=_tidy_id(p.get("id")), code=_unescape_code(p.get("code"))),
-                                     set(by_id))]
+    usable = _usable(resp, set(by_id))
     if not usable:
         # One retry, same gate and same BASE-side inputs: say why the first answer was unusable (generic reasons only)
         reasons = [validate_probe(dict(p, id=_tidy_id(p.get("id")), code=_unescape_code(p.get("code"))),
@@ -162,6 +172,23 @@ def generate(provider: Provider, repo: str, pr: int, title: str, body: str | Non
             resp = provider.complete_json("probes", PROBES_PROMPT, retry_user, PROBES_SCHEMA, ctx)
         except ProviderError as e:
             out["errors"].append(f"retry: {e}")
+    elif by_id and not any(p.get("claims") for p in usable):
+        # Testable claims exist but no probe says which claim it checks. Its differences would then all look
+        # unclaimed. Ask once more (same gate, same BASE-side inputs); keep the first answer unless the retry is
+        # usable and links at least one claim, so no probe is lost.
+        out["retried"] = {"why": [UNLINKED_REASON]}
+        retry_user = (user + "\n\nYour previous answer had probes, but " + UNLINKED_REASON
+                      + ". Follow the coverage rule: write at least one probe per testable claim.")
+        try:
+            again = provider.complete_json("probes", PROBES_PROMPT, retry_user, PROBES_SCHEMA, ctx)
+        except ProviderError as e:
+            out["errors"].append(f"retry: {e}")
+        else:
+            linked = [p for p in _usable(again, set(by_id)) if p.get("claims")]
+            if linked:
+                resp = again
+            else:
+                out["retried"]["kept_first_answer"] = "the retry linked no claim either"
     gen = freeze.generator("model", model=provider.models["probes"], provider=provider.name)
     outdir.mkdir(parents=True, exist_ok=True)
     for p in (resp or {}).get("probes", [])[:MAX_PROBES]:
