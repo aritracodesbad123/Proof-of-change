@@ -1,3 +1,5 @@
+This project is [MIT licensed](LICENSE).
+
 # Proof-of-Change
 
 **Don't just read a pull request. Run it.**
@@ -9,6 +11,13 @@ a recommended action, and a link to the exact log line behind every statement. I
 comments on GitHub and never blocks anyone's change.
 
 > New words are explained the first time they appear. There is also a [glossary](#glossary) at the end.
+
+## Built with NVIDIA Nemotron on Nebius Token Factory
+
+Proof-of-Change calls NVIDIA Nemotron 3 Super, model id `nvidia/nemotron-3-super-120b-a12b`, through the Nebius
+Token Factory API. The model pulls behaviour claims out of the pull request description and writes targeted test
+probes for those claims. Plain code then runs the project's real tests, and those probes, on both the base and the
+pull request. Comparing those runs is what decides the verdict.
 
 ## Proven results
 
