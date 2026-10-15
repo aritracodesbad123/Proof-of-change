@@ -244,14 +244,22 @@ def find(title: str, body: str | None, diff: str | None = None) -> list[dict]:
     return out
 
 
+# A probe in one of these states covered no changed lines (poc/probes.classify_item). A stale coverage block that
+# still says "adequate" does not put those lines back.
+_NO_COVER_STATUS = frozenset({"crashed", "error", "uninformative", "not_run"})
+
+
 def probe_covers(probe_results: dict | None) -> bool:
     """A probe that ran and has at least one claim expecting 'same' checks behaviour preservation; its result then
     decides (probes never get overruled by this rule). A probe that ran none of the changed lines on the main side
-    (probe_changed_line_coverage adequacy not_adequate, poc/probe_adequacy.py) does not count."""
+    does not count: not_adequate, a measured coverage of 0, or a crashed, empty, uninformative or not_run probe."""
     for it in (probe_results or {}).get("items") or []:
-        if it.get("status") in ("uninformative", "not_run"):
+        if it.get("status") in _NO_COVER_STATUS:
             continue
-        if (it.get("probe_changed_line_coverage") or {}).get("adequacy") == "not_adequate":
+        cov = it.get("probe_changed_line_coverage") or {}
+        if cov.get("adequacy") == "not_adequate":
+            continue
+        if cov.get("status") == "measured" and not (cov.get("changed_lines_covered") or 0):
             continue
         if any(c.get("expect") == "same" for c in it.get("claims") or []):
             return True
