@@ -222,7 +222,10 @@ def checks(rec: dict) -> list[list]:
             out.append(["Probes ran on both sides", "PASS", f"{len(its)} probe(s), "
                         f"{its[0].get('runs_per_side', 3)} alternating runs per side, every run printed its observations", ""])
     te = rec.get("thread_env") or {}
-    ok = bool(te) and all(v == "1" for v in te.values())
+    # Thread-count variables must be 1. PYTHONHASHSEED is recorded in the same block (fixed hash seed) and must be 0;
+    # it is not a thread count, so it is checked against its own value.
+    threads = {k: v for k, v in te.items() if k != "PYTHONHASHSEED"}
+    ok = bool(threads) and all(v == "1" for v in threads.values()) and te.get("PYTHONHASHSEED", "0") == "0"
     out.append(["Single-thread environment", "PASS" if ok else "FAIL", ", ".join(f"{k}={v}" for k, v in te.items()) or "not recorded",
                 "" if ok else "Run through ops/daily_run.py, which pins all thread counts to 1."])
     mt = rec.get("machine_type") or {}
