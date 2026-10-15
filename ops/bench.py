@@ -138,6 +138,11 @@ def checkout(dr, row: dict, work: Path, log: Path) -> dict:
     for side in ("main", "pr"):
         if not git_ok(dr, ["git", "-C", src, "worktree", "add", "-q", "--detach", work / f"side-{side}", s[side]], log, env):
             return {"ok": False, "why": f"checkout of {side} side failed"}
+        # Projects such as SciPy keep parts of their source in git submodules; without them the build fails.
+        # Both sides get them the same way, at the versions each commit records. A no-op without submodules.
+        if not git_ok(dr, ["git", "-C", work / f"side-{side}", "submodule", "update", "--init", "--recursive"],
+                      log, env, timeout=1800):
+            return {"ok": False, "why": f"git submodules of the {side} side could not be fetched (see git.log)"}
     names = subprocess.run(["git", "-C", src, "diff", "--name-only", s["main"], s["pr"]], env=env, capture_output=True,
                            text=True).stdout.split()
     diff = subprocess.run(["git", "-C", src, "diff", s["main"], s["pr"]], env=env, capture_output=True,
