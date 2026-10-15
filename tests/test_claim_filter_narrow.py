@@ -1,7 +1,7 @@
 """The test/tool filter must not swallow product sentences (2026-10-15 decision).
 
-The 17 sentences below were wrongly dropped by the first version of the filter on four held-out pull-request
-descriptions. They describe the product change, the bug, or that nothing else changes, so they must reach the
+The 17 sentences below were wrongly dropped by the first version of the filter on four pull-request
+descriptions (these four were used to tune this narrower rule, so they are regressions, not held-out cases). They describe the product change, the bug, or that nothing else changes, so they must reach the
 claim extractor."""
 import json
 import pathlib
@@ -11,7 +11,7 @@ import pytest
 
 from poc import behaviour_claims as b
 
-BODIES = json.loads((pathlib.Path(__file__).parent / "fixtures" / "claim_filter_held_out.json").read_text())
+BODIES = json.loads((pathlib.Path(__file__).parent / "fixtures" / "claim_filter_pr19_regressions.json").read_text())
 
 WRONGLY_DROPPED = [
     ("pr_1", "extend linter Fix to support creating files"),
@@ -43,7 +43,7 @@ def _sentence_with(text, fragment):
     return None
 
 
-def test_seventeen_held_out_sentences():
+def test_seventeen_regression_sentences():
     assert len(WRONGLY_DROPPED) == 17
 
 
@@ -87,3 +87,21 @@ def test_tool_word_needs_run_pass_or_fail():
     assert b.about_tests_or_tools("mypy output is identical")
     assert not b.about_tests_or_tools("extend linter Fix to support creating files")
     assert not b.about_tests_or_tools("The linter now accepts empty config files")
+
+
+def test_lint_workflow_and_linting_rules_sentences_kept():
+    # Two product sentences from unseen pull requests: the product here is the project's own lint setup.
+    assert not b.about_tests_or_tools(
+        "The lint workflow was running `dev/check_function_signatures.py` on both Ubuntu and macOS matrix entries, "
+        "producing duplicate warnings since the function signature comparison logic is identical regardless of "
+        "operating system")
+    assert not b.about_tests_or_tools("keep `tools/check_env_table.py` aligned with linting rules")
+    assert not b.about_tests_or_tools("Run ruff only once in `.github/workflows/lint.yml`")
+    assert b.about_tests_or_tools("ruff check passes")
+
+
+def test_unindented_wrapped_list_line_ends_test_section():
+    # Known limit, fails safe: the wrapped tail and anything after it are kept, not dropped.
+    kept = b._drop_test_sections("## Testing\n- `pytest -q` on the parser\nsuite with defaults\n- `ruff check`\n")
+    assert "pytest" not in kept
+    assert "suite with defaults" in kept and "ruff check" in kept
