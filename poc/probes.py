@@ -282,6 +282,13 @@ def classify_item(item: dict) -> dict:
     out = dict(item)
     if not obs:
         out["status"] = "error"
+        _downgrade_coverage(out, "the probe produced no observations; not counted as ran or adequate", zero=True)
+        return out
+    why = crash_reason(item)
+    if why:
+        out["status"] = "crashed"
+        out["uninformative_reason"] = why
+        _downgrade_coverage(out, why + "; not counted as ran or adequate", zero=True)
         return out
     if all(_no_type_aware_input(o.get("main")) and _no_type_aware_input(o.get("pr")) for o in obs):
         reason = "no type-aware input could be built, so the probe did not run"
@@ -309,14 +316,29 @@ def classify_item(item: dict) -> dict:
     return out
 
 
-def _downgrade_coverage(item: dict, note: str) -> None:
-    """A probe that did not observe the change is not adequate, even if a line counter moved."""
+def crash_reason(item: dict) -> str | None:
+    """Why a probe's runs give no usable evidence, or None. A probe crashed when every main-side run ended in
+    PROBE_ERROR (an exception, non-JSON output, a timeout or a non-zero exit). Coverage is measured on the main side,
+    so lines it touched there before failing say nothing about the change and must not count. A probe that works on
+    main but crashes on the PR side is a finding, not a crash of the probe, and is left alone."""
+    rs = (item.get("runs") or {}).get("main") or []
+    if rs and all(isinstance(o, dict) and PROBE_ERROR in o for o in rs):
+        return "the probe crashed or printed no parsed output on every main-side run"
+    return None
+
+
+def _downgrade_coverage(item: dict, note: str, zero: bool = False) -> None:
+    """A probe that did not observe the change is not adequate, even if a line counter moved. zero=True also stops
+    its touched lines counting as covered (the raw count is kept as changed_lines_touched)."""
     cov = item.get("probe_changed_line_coverage")
     if not isinstance(cov, dict):
-        return
+        cov = {"status": "not measured", "why": note}
     cov = dict(cov)
     cov["adequacy"] = "not_adequate"
     cov["note"] = note
+    if zero and cov.get("changed_lines_covered"):
+        cov["changed_lines_touched"] = cov["changed_lines_covered"]
+        cov["changed_lines_covered"] = 0
     item["probe_changed_line_coverage"] = cov
 
 
@@ -332,7 +354,7 @@ def apply_status(probe_results: dict | None) -> dict | None:
         status = "uninformative"
     elif statuses and all(s == "not_run" for s in statuses):
         status = "none"
-    elif statuses and all(s == "error" for s in statuses):
+    elif statuses and all(s in ("error", "crashed") for s in statuses):
         status = "error"
     else:
         status = "ran"
