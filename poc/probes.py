@@ -294,7 +294,7 @@ def classify_item(item: dict) -> dict:
         reason = "no type-aware input could be built, so the probe did not run"
         out["status"] = "not_run"
         out["uninformative_reason"] = reason
-        _downgrade_coverage(out, reason)
+        _downgrade_coverage(out, reason, zero=True)
         return out
     names = []
     for o in obs:
@@ -312,7 +312,7 @@ def classify_item(item: dict) -> dict:
     reason = f"uninformative: every input raised {names[0]} on both sides"
     out["status"] = "uninformative"
     out["uninformative_reason"] = reason
-    _downgrade_coverage(out, reason + "; not counted as ran or adequate")
+    _downgrade_coverage(out, reason + "; not counted as ran or adequate", zero=True)
     return out
 
 

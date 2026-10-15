@@ -61,6 +61,22 @@ def test_gate_ignores_crashed_status_even_with_stale_counts():
     assert daily_run.ai_probe_gate(rec)["verdict"] == "could_not_verify"
 
 
+def test_uninformative_and_not_run_cover_nothing_and_cannot_verify():
+    exc = {"raises": "AttributeError"}
+    uninf = probes.classify_item(_item([{"f": exc}] * 3, [{"f": exc}] * 3,
+                                       [{"name": "f", "state": "same", "label": "no_difference",
+                                         "main": exc, "pr": exc}]))
+    skip = {"skipped": "no type-aware input"}
+    notrun = probes.classify_item(_item([{"f": skip}] * 3, [{"f": skip}] * 3,
+                                        [{"name": "f", "state": "same", "label": "no_difference",
+                                          "main": skip, "pr": skip}]))
+    for it, status in ((uninf, "uninformative"), (notrun, "not_run")):
+        assert it["status"] == status
+        assert it["probe_changed_line_coverage"]["changed_lines_covered"] == 0
+        rec = {"verdict": "verified", "baseline": "full", "reason": "tests pass", "probes": {"items": [it]}}
+        assert daily_run.ai_probe_gate(rec)["verdict"] == "could_not_verify"
+
+
 def test_crashed_probe_keeps_red_findings_in_verdict():
     item = probes.classify_item(_item([{ERR: {"crash": "x"}}] * 3, [{"a": 1}] * 3,
                                       [{"name": "a", "state": "differs", "label": "unmentioned", "main": "ABSENT",
