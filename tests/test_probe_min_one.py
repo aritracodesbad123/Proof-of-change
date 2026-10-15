@@ -1,4 +1,6 @@
 """At least one probe per testable claim: prompt rule, schema minItems, and one retry on an empty/unusable answer."""
+import subprocess
+import sys
 from pathlib import Path
 
 from poc import model_probes, model_provider
@@ -92,3 +94,41 @@ def test_empty_about_gets_a_default(tmp_path):
     prov, out = _run(tmp_path, [nc])
     assert len(out["probes"]) == 1
     assert "no description given" in out["probes"][0]["path"].read_text()
+
+
+NO_IMPORT = "print(json.dumps({'observations': {'f.a': 1}}))\n"
+
+
+def test_probe_file_always_imports_json(tmp_path):
+    ans = {"probes": [dict(GOOD["probes"][0], code=NO_IMPORT)]}
+    _, out = _run(tmp_path, [ans])
+    (x,) = out["probes"]
+    text = x["path"].read_text()
+    assert model_probes.JSON_IMPORT in text and text.index(model_probes.JSON_IMPORT) < text.index(NO_IMPORT)
+    run = subprocess.run([sys.executable, str(x["path"])], capture_output=True, text=True, timeout=30)
+    assert run.returncode == 0 and '"f.a": 1' in run.stdout.splitlines()[-1]
+
+
+UNLINKED = {"probes": [dict(GOOD["probes"][0], claims=[])]}
+
+
+def test_probes_linking_no_claim_are_retried_once(tmp_path):
+    prov, out = _run(tmp_path, [UNLINKED, GOOD])
+    assert [t for t, _ in prov.prompts] == ["claims", "probes", "probes"]
+    assert "could not be tied to any claim" in prov.prompts[-1][1]
+    assert out["retried"]["why"] == [model_probes.UNLINKED_REASON]
+    (x,) = out["probes"]
+    assert "'id': 'C1'" in x["path"].read_text()
+
+
+def test_unlinked_first_answer_is_kept_when_the_retry_links_nothing(tmp_path):
+    prov, out = _run(tmp_path, [UNLINKED, {"probes": []}])
+    assert len(prov.prompts) == 3 and len(out["probes"]) == 1
+    assert out["retried"]["kept_first_answer"]
+
+
+def test_partly_linked_answer_is_not_retried(tmp_path):
+    both = {"probes": [GOOD["probes"][0], dict(GOOD["probes"][0], id="p2", claims=[])]}
+    prov, out = _run(tmp_path, [both])
+    assert [t for t, _ in prov.prompts] == ["claims", "probes"] and "retried" not in out
+    assert len(out["probes"]) == 2
