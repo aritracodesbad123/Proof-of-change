@@ -11,7 +11,11 @@ import pytest
 
 ROOT = Path(__file__).resolve().parent.parent
 SELF = Path(__file__).resolve()
-ALLOWED = [re.compile(r"github\.com/aritracodesbad123/proof-of-change(\.git)?", re.I)]
+ALLOWED = [
+    re.compile(r"github\.com/aritracodesbad123/proof-of-change(\.git)?", re.I),
+    # The licence file carries this copyright line on purpose. The name still fails anywhere else.
+    re.compile(r"Copyright \(c\) 2026 Aritra Chakraborty"),
+]
 BANNED = {
     "team member name": r"\b(nathan|jonathan|aritra)\b|aritra(?!codesbad123/proof-of-change)",
     "bot": r"\bbots?\b|grok",
@@ -78,6 +82,6 @@ def test_guard_catches(text):
 
 @pytest.mark.parametrize("text", ["git clone https://github.com/aritracodesbad123/Proof-of-change.git",
                                   "*{box-sizing:border-box}", "a checkbox", "pick the tests", "cloud credits",
-                                  "Nemotron robot-free"])
+                                  "Nemotron robot-free", "Copyright (c) 2026 Aritra Chakraborty"])
 def test_guard_allows(text):
     assert not findings(text)
