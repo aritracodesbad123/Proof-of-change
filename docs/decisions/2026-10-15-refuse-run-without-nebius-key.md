@@ -13,6 +13,9 @@ Every result record now has `model_provider_used`. That field is the provider th
 such as `nebius` or `none`, not the provider the run was asked to use. If a call was skipped or failed, the
 record also has `model_provider_fallback` saying so.
 
+Each pull request is stamped from the calls it made itself. Its token counts and dollar cost come from the cost
+ledger for that same pull request. A later pull request does not keep an earlier one's success, failure, or spend.
+
 ## Why
 
 An earlier run went ahead with the AI off and still looked successful. The key was missing, so the tool quietly
@@ -28,6 +31,10 @@ tell that the model had never been called.
   as fixtures.
 - On each result, store the provider that completed a call. If the baseline does not use model probes, if probes
   were switched off, or if a call failed, write that down too.
+- Do that per pull request. At the start of each one, clear the call list, the fallback note, and the cost ledger.
+  A skip that applies to the whole run stays in place. Token and dollar cost come from that ledger. The daily runner
+  already cleared it at the start of each pull request, so earlier daily-run cost figures were not raised by calls
+  from other pull requests in the same run. A benchmark case now clears the ledger at its start too.
 
 ## Alternatives and tradeoffs
 

@@ -198,6 +198,7 @@ def write_result(out: Path, rid: str, rec: dict) -> Path:
 
 def run_case(dr, a, row: dict, inputs_meta: dict, out: Path, workroot: Path, machine: dict) -> dict:
     t0 = time.time()
+    dr.begin_pr(a)
     rid = row["id"]
     tag = result_name(rid, getattr(a, "baseline", None))[:-5]
     prdir = out / "logs" / tag

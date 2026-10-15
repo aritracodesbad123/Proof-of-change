@@ -1993,6 +1993,20 @@ def probe_coverage(item: dict, probe_results: dict | None, vm: Path, main_root: 
     return probe_adequacy.summary(items)
 
 
+def begin_pr(a) -> None:
+    """Start one pull request.
+
+    The provider's call list, the fallback note, and the cost ledger are for this pull request only.
+    A skip that applies to the whole run (`model_skipped`) is left as it is.
+    """
+    provider = getattr(a, "provider", None)
+    calls = getattr(provider, "calls", None)
+    if isinstance(calls, list):
+        calls.clear()
+    a.model_fallback = None
+    cost.reset()
+
+
 def stamp_model_use(rec: dict, a) -> None:
     """Write which provider actually completed a call, and any skip or fallback.
 
@@ -2245,7 +2259,7 @@ def sandbox_refusal() -> str | None:
 
 def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, machine: dict) -> dict:
     t0 = time.time()
-    cost.reset()
+    begin_pr(a)
     tag = f"{cfg['pkg']}-{item['pr']}"
     prdir = rdir / tag; prdir.mkdir(parents=True, exist_ok=True)
     work = workroot / tag
