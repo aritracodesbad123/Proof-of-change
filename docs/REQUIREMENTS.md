@@ -254,7 +254,7 @@ runs per side, the coverage gate, and one reviewer report per PR plus a summary.
   schema, evals); strict golden evals (`--require-golden --require-v1`) on `evals/fixtures/golden_v1.jsonl`; approver report to the step summary and as an artifact.
 - Heavy work (Sandbox runs, downstream suites, the labelled-PR replay) runs outside PR CI: locally now, as a
   Serverless AI job later (**Planned, not yet built**, spec §6.2 step 10). Its results go through the same evals.
-- Submission needs a public repo with an open-source license (Apache-2.0 proposed; the repository uses the MIT licence, see `docs/decisions/2026-10-15-mit-licence.md`) and a README naming every NVIDIA
+- Submission needs a public repo with the MIT licence (see `docs/decisions/2026-10-15-mit-licence.md`) and a README naming every NVIDIA
   model and Nebius service used (spec §11.3).
 
 ## 12. Plan to 30 Oct 2026 (spec §8.2)
@@ -265,7 +265,7 @@ runs per side, the coverage gate, and one reviewer report per PR plus a summary.
 | 2: Wed 7 – Tue 13 Oct (current) | A PR link alone → claims → probes → both sides → correct verdict JSON for requests #6655 and ≥3 of 4 bookstore PRs. |
 | 3: Wed 14 – Tue 20 Oct | GitHub App (webhook, check run, comment, `/prove`) + hosted web report with the behavior map. **Planned, not yet built.** |
 | 4: Wed 21 – Tue 27 Oct | Demo runs 5 times in a row without manual fixes; eval table filled with real counts; rough video cut. |
-| Final: Wed 28 – Fri 30 Oct | Code freeze Wed 28 end of day; video under 3:00; **submit by 12:00 noon IST Fri 30 Oct**. |
+| Final: Wed 28 – Fri 30 Oct | Code freeze Wed 28 end of day; video under 3:00; **submit by 10:30 pm IST Fri 30 Oct**. |
 
 ## 13. Repository layout
 
@@ -278,8 +278,6 @@ guardrails/              schema, isolation/timeouts, no-external scan
 reports/                 reviewer report generator (HTML/PDF/MD + daily summary), samples
 tests/                   pytest
 ```
-Not built yet: claim extraction, probe generation, the Sandbox runner, GitHub App, web report, MCP server.
-
 Checked against the code: claim extraction and probe generation run on main (Nemotron 3 Super on the Nebius Token Factory API). Local HTML reviewer reports are generated. Still **Planned, not yet built:** Nebius Token Factory Sandboxes, the GitHub App, a hosted web report with the behavior map, and Tavily.
 
 ## 14. Open questions
