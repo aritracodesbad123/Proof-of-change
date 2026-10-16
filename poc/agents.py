@@ -165,6 +165,14 @@ def run_swarm(provider: Provider | None, rec: dict, ctx: dict | None = None,
             user = "Record excerpt:\n" + _record_excerpt(rec)
             raw = _call(provider, "summary", SUMMARY_PROMPT, user, SUMMARY_SCHEMA, ctx)
             text = str(raw.get("text") or raw.get("summary") or "").strip()
+            # Super sometimes double-encodes: {"text": "{\"summary\": \"...\"}"}
+            if text.startswith("{") and ("summary" in text or "text" in text):
+                try:
+                    inner = json.loads(text)
+                    if isinstance(inner, dict):
+                        text = str(inner.get("summary") or inner.get("text") or text).strip()
+                except json.JSONDecodeError:
+                    pass
             quotes = [q for q in (raw.get("quotes") or []) if isinstance(q, str)]
             excerpt = _record_excerpt(rec)
             # only keep quotes that actually appear in the excerpt we sent

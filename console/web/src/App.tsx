@@ -450,9 +450,22 @@ function agentRoles(record: Record<string, unknown>): Array<Record<string, unkno
   return ((record.agents as { roles?: Array<Record<string, unknown>> }) || {}).roles || []
 }
 
+function unwrapSummary(raw: string): string {
+  const t = raw.trim()
+  if (!t.startsWith('{')) return t
+  try {
+    const inner = JSON.parse(t) as { summary?: unknown; text?: unknown }
+    const s = inner.summary ?? inner.text
+    if (typeof s === 'string' && s.trim()) return s.trim()
+  } catch {
+    /* keep raw */
+  }
+  return t
+}
+
 function summaryText(record: Record<string, unknown>): string {
   const expl = (record.explanation as { text?: string }) || {}
-  if (typeof expl.text === 'string' && expl.text.trim()) return expl.text.trim()
+  if (typeof expl.text === 'string' && expl.text.trim()) return unwrapSummary(expl.text)
   const helper = agentRoles(record).find((r) => r.role === 'helper')
   const notes = Array.isArray(helper?.notes) ? (helper!.notes as string[]) : []
   const claims = claimsFromRecord(record)
