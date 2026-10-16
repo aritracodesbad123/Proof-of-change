@@ -2382,9 +2382,14 @@ def confirm_missing(cmp: dict, venv: Path) -> None:
     cmp["new_tests_failing"] = sorted(cmp["new_tests_failing"])
 
 
-def sandbox_refusal() -> str | None:
-    """Reason to refuse running PR code: the sandbox is on (default) but cannot start here."""
+def sandbox_refusal(backend: str | None = None) -> str | None:
+    """Reason to refuse running PR code: the sandbox is on (default) but cannot start here.
+
+    Contree runs PR code remotely — local bubblewrap is not required when that backend is selected.
+    """
     if not sandbox.enabled():
+        return None
+    if backend == "contree":
         return None
     ok, why = sandbox.check()
     return None if ok else why
@@ -2401,7 +2406,7 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
     shutil.rmtree(work, ignore_errors=True); work.mkdir(parents=True)
     (prdir / "pr.diff").write_text(item["diff"])
     rec = new_record(repo, cfg, item, a, machine, rdir.name, run_date_for(rdir))
-    refusal = sandbox_refusal()
+    refusal = sandbox_refusal(getattr(a, "sandbox_backend", None))
     if refusal:   # fail closed: no PR code runs without the sandbox (unless --unsafe-no-sandbox)
         rec["verdict"], rec["reason"], _ = verdict_for(None, refusal)
         return finish(rec, prdir, work, t0, a)

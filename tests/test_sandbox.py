@@ -370,6 +370,7 @@ def test_refuses_without_a_working_sandbox(monkeypatch):
     assert daily_run.sandbox_refusal() == "sandbox unavailable: bwrap is not installed"
     v, reason, _ = daily_run.verdict_for(None, daily_run.sandbox_refusal())
     assert v == "could_not_verify" and reason.startswith("sandbox unavailable")
+    assert daily_run.sandbox_refusal("contree") is None  # Contree is remote; local bwrap not required
     sandbox.configure(False)
     try:
         assert daily_run.sandbox_refusal() is None   # only with --unsafe-no-sandbox
