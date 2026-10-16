@@ -7,6 +7,7 @@ They must run wherever bubblewrap works (the default). Only on GitHub runners, i
 import json
 import os
 import socket
+import sys
 import threading
 import uuid
 from pathlib import Path
@@ -20,8 +21,10 @@ from poc import probes
 
 REPO = Path(__file__).resolve().parent.parent
 OK, WHY = sandbox.check()
-if not OK and os.environ.get("GITHUB_ACTIONS"):
-    pytestmark = pytest.mark.skip(reason=f"bubblewrap cannot start on this CI runner: {WHY}")
+# Skip when bwrap cannot start on CI, or on non-Linux hosts (macOS has no bubblewrap).
+# On Linux developer machines, fail hard: the daily path expects a working sandbox.
+if not OK and (os.environ.get("GITHUB_ACTIONS") or sys.platform != "linux"):
+    pytestmark = pytest.mark.skip(reason=f"bubblewrap unavailable here: {WHY}")
 elif not OK:
     pytest.fail(f"the sandbox must work on this machine: {WHY}", pytrace=False)
 

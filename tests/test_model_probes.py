@@ -165,7 +165,7 @@ def test_provider_selection_and_fallback():
     prov, note = model_provider.select("recorded", env={})
     assert prov.name == "recorded" and not prov.blind and "TEST FIXTURE" in note
     custom, _ = model_provider.select("nebius", env={"NEBIUS_API_KEY": "k"}, models={"probes": "nvidia/other"})
-    assert custom.models == {"claims": "nvidia/nemotron-3-super-120b-a12b", "probes": "nvidia/other"}
+    assert custom.models == {**model_provider.DEFAULT_MODELS, "probes": "nvidia/other"}
 
 
 def test_nebius_request_uses_structured_output_and_keeps_the_key_in_the_header(monkeypatch):

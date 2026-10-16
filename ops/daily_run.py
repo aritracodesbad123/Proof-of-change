@@ -51,7 +51,7 @@ sys.path.insert(0, str(REPO_ROOT))
 from guardrails import sandbox  # noqa: E402
 from guardrails.isolation import untrusted_env  # noqa: E402
 from harness.machine import detect_machine_type  # noqa: E402
-from poc import behaviour_claims, cost, coverage_gate, diff_probes, freeze, local_config, model_probes, model_provider, probes  # noqa: E402,E501
+from poc import agents, behaviour_claims, cost, coverage_gate, diff_probes, freeze, local_config, model_probes, model_provider, probes  # noqa: E402,E501
 from poc.diff import confirm  # noqa: E402
 from poc.verdict import Claim, FindingLabel, RunSummary, Verdict, pr_verdict  # noqa: E402
 
@@ -2060,6 +2060,8 @@ def new_record(repo: str, cfg: dict, item: dict, a, machine: dict, run_date: str
                               "used": getattr(getattr(a, "provider", None), "name", None),
                               "note": getattr(a, "model_note", None) or "model provider: none: the AI was off; fixed probes only",
                               "blind": bool(getattr(getattr(a, "provider", None), "blind", False))},
+           "sandbox_backend": getattr(a, "sandbox_backend", None) or "local",
+           "machine": ("contree" if getattr(a, "sandbox_backend", None) == "contree" else "local"),
            "posted_upstream": False, "logs": f"{cfg['pkg']}-{item['pr']}/", "freeze": {}}
     sha = getattr(a, "poc_commit", None)
     if isinstance(sha, str) and _COMMIT.fullmatch(sha):
@@ -2345,6 +2347,14 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
 
 
 def finish(rec: dict, prdir: Path, work: Path, t0: float, runner=None) -> dict:
+    # Agent swarm (judge/helper/summary) after the code verdict; advisory only — never changes rec["verdict"].
+    # Skip when model_skipped is set (--no-probes / baseline without claim probes) so the stamp stays honest.
+    if (runner is not None and getattr(runner, "provider", None) is not None
+            and not getattr(runner, "model_skipped", None)):
+        agents.run_swarm(runner.provider, rec)
+    elif runner is not None and getattr(runner, "model_skipped", None) and "agents" not in rec:
+        rec["agents"] = {"status": "skipped", "note": runner.model_skipped, "roles": []}
+        rec.setdefault("explanation", {"status": "not yet wired", "why": runner.model_skipped})
     if runner is not None:
         stamp_model_use(rec, runner)
     rec["what_changed"] = {"package_python_files": rec["files"]["package_py"], "compiled_files": rec["files"]["compiled"],
@@ -3006,6 +3016,14 @@ def main(argv=None) -> int:
                          "that gate would turn every clean PR into could_not_verify")
     ap.add_argument("--claims-model", default=model_provider.DEFAULT_MODELS["claims"], help="model id for claims")
     ap.add_argument("--probe-model", default=model_provider.DEFAULT_MODELS["probes"], help="model id for probes")
+    ap.add_argument("--judge-model", default=model_provider.DEFAULT_MODELS["judge"],
+                    help="model id for advisory finding labels (Ultra)")
+    ap.add_argument("--helper-model", default=model_provider.DEFAULT_MODELS["helper"],
+                    help="model id for advisory noise/install notes (Lightning; Nano fallback)")
+    ap.add_argument("--summary-model", default=model_provider.DEFAULT_MODELS["summary"],
+                    help="model id for plain-language report summary (Super)")
+    ap.add_argument("--sandbox-backend", choices=("local", "contree"), default="local",
+                    help="where PR code runs: local bubblewrap (default) or Contree Token Factory Sandboxes")
     ap.add_argument("--recorded-dir", default=None,
                     help="recorded model responses (default: evals/fixtures/model_responses)")
     ap.add_argument("--no-coverage", action="store_true",
@@ -3052,8 +3070,11 @@ def main(argv=None) -> int:
         raise SystemExit(1)
     a.poc_commit = sync_to_origin_main(REPO_ROOT)
     sandbox.configure(not a.unsafe_no_sandbox)
+    from poc import contree_sandboxes
+    a.sandbox_backend, a.sandbox_backend_note = contree_sandboxes.select(a.sandbox_backend)
     a.provider, a.model_note = model_provider.select(
-        a.model_provider, models={"claims": a.claims_model, "probes": a.probe_model},
+        a.model_provider,
+        models=agents.models_for_args(a.claims_model, a.probe_model, a.judge_model, a.helper_model, a.summary_model),
         recorded_dir=Path(a.recorded_dir) if a.recorded_dir else None)
     a.model_skipped = None
     a.model_fallback = None
@@ -3190,6 +3211,8 @@ def main(argv=None) -> int:
                  "api_calls": gh.calls, "auth": "token" if gh.token else "unauthenticated",
                  "sandbox": (sandbox.check()[1] + " (bwrap: per-side filesystem, no network outside installs)"
                              if sandbox.enabled() else "DISABLED (--unsafe-no-sandbox)"),
+                 "sandbox_backend": a.sandbox_backend,
+                 "sandbox_backend_note": getattr(a, "sandbox_backend_note", None),
                  "git": a.poc_commit, "poc_commit": a.poc_commit,
                  "baseline": a.baseline, "model_provider": a.model_note,
                  "tested": [f"{r['repo']}#{prn(r)}" for r in records if r.get("tested_invocation") == a.invocation],

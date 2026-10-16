@@ -204,12 +204,14 @@ def test_each_pull_request_keeps_its_own_stamp_and_cost(monkeypatch, tmp_path, f
     assert records["bad"]["model_provider_used"] == "none"
     assert "fell back or failed" in records["bad"]["model_provider_fallback"]
     assert PROBE_NOTE in records["bad"]["model_provider_fallback"]
-    assert good["ai_calls"] == 2 and good["failed_ai_calls"] == 0
-    assert good["input_tokens"] == 2_000_000 and good["output_tokens"] == 2_000_000
-    assert good["thinking_tokens"] == 1_200_000 and good["ai_cost_usd"] == 2.4
-    assert bad["ai_calls"] == 2 and bad["failed_ai_calls"] == 2
+    # claims+probes from the pair stub, plus judge/helper/summary from the agent swarm in finish()
+    assert good["ai_calls"] == 5 and good["failed_ai_calls"] == 0
+    assert good["input_tokens"] == 5_000_000 and good["output_tokens"] == 5_000_000
+    assert good["thinking_tokens"] == 3_000_000 and good["ai_cost_usd"] == 6.0
+    # helper retries once on Nano after Lightning fails → one extra failed call
+    assert bad["ai_calls"] == 6 and bad["failed_ai_calls"] == 6
     assert bad["input_tokens"] == 0 and bad["output_tokens"] == 0 and bad["thinking_tokens"] == 0
-    assert bad["ai_cost_usd"] == 0.0 and bad["calls_without_usage"] == 2
+    assert bad["ai_cost_usd"] == 0.0 and bad["calls_without_usage"] == 6
 
 
 def test_patchguru_refuses_a_missing_or_empty_key(monkeypatch, tmp_path, capsys):

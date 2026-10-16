@@ -965,7 +965,13 @@ def _build_tail(R: Report, x: dict) -> None:
         ["Hand check", json.dumps(hc) if isinstance(hc, dict) else fmt(hc)],
         ["Upstream issue", fmt(rec.get("upstream_issue"))],
         ["Per-test outcomes", fmt(rec.get("per_test_outcomes"))],
-        ["AI explanation", fmt(get(rec, "explanation", "status"))],
+        ["AI explanation", (
+            (get(rec, "explanation", "text") or get(rec, "explanation", "status") or NA)
+            if get(rec, "explanation", "status") == "wired"
+            else fmt(get(rec, "explanation", "status")))],
+        ["Agent swarm", (
+            ", ".join(f"{r.get('role')}={r.get('status')}" for r in ((rec.get("agents") or {}).get("roles") or []))
+            or fmt((rec.get("agents") or {}).get("status")))],
     ])
     R.h(3, "Timings")
     du = rec.get("duration_s") or {}
