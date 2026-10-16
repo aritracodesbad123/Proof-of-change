@@ -309,7 +309,7 @@ def apply(plan: dict, *, dry_run: bool | None = None, env: dict | None = None,
     pr_url = f"https://github.com/{repo}/pull/{int(pr)}"
     argv = ["--pr", pr_url, "--model-provider", env.get("POC_MODEL_PROVIDER") or "nebius"]
     if plan.get("claim"):
-        # claim text is advisory for logs; daily_run picks claims from PR body
+        # claim text is advisory for logs; daily_run reads claims from PR body
         pass
 
     run_exit = None

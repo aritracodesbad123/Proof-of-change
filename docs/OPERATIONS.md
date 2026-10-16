@@ -188,11 +188,11 @@ Do **not** rewrite to Streamlit — you’d lose the swarm theater and still nee
 
 Token Factory (`NEBIUS_API_KEY`) is for models only. A Nebius **navigable website** needs a **Serverless AI Endpoint** (Compute billing) ([docs](https://docs.nebius.com/serverless/endpoints/manage)).
 
-1. Prerequisites: Docker, [Nebius CLI](https://docs.nebius.com/cli/) logged in, `jq`, a VPC **subnet id**, a container registry you can push to.
+1. Prerequisites: Docker, [Nebius CLI](https://docs.nebius.com/cli/) logged in, `jq`, a VPC **subnet id**, an image host you can push to.
 2. Build and push the image:
 
 ```bash
-export IMAGE=docker.io/<you>/poc-console:latest   # or any registry Nebius can pull
+export IMAGE=docker.io/<you>/poc-console:latest   # or any image host Nebius can pull
 make docker-console IMAGE="$IMAGE"
 ```
 

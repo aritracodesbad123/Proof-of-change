@@ -78,7 +78,9 @@ MAKE_TARGETS = set(re.findall(r"^([a-z][\w-]*):", (ROOT / "Makefile").read_text(
 @pytest.mark.parametrize("toks", list(_commands()))
 def test_documented_command_matches_code(toks, monkeypatch):
     if toks[0] == "make":
-        targets = [t for t in toks[1:] if "=" not in t and not t.startswith("-")]
+        # allow chained shells: `make a && make b`
+        targets = [t for t in toks[1:] if "=" not in t and not t.startswith("-")
+                   and t not in ("&&", "||", ";", "make")]
         assert all(t in MAKE_TARGETS for t in targets), f"unknown make target in {toks}"
         if "check" in targets:
             assert any(t.startswith("PR=") for t in toks) or "<" in " ".join(toks) or len(toks) == 2

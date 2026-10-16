@@ -64,7 +64,7 @@ console-build:
 console-host: console-build | $(PY)
 	POC_CONSOLE_HOST=0.0.0.0 POC_CONSOLE_PORT=$${POC_CONSOLE_PORT:-8787} $(PY) -m poc.console_api --host 0.0.0.0 --port $${POC_CONSOLE_PORT:-8787}
 
-# Container image for Nebius Serverless AI Endpoint (or any registry)
+# Container image for Nebius Serverless AI Endpoint (or any image host)
 docker-console:
 	@test -n "$(IMAGE)" || { echo 'Usage: make docker-console IMAGE=docker.io/<you>/poc-console:latest'; exit 1; }
 	docker build -t "$(IMAGE)" .
