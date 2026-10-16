@@ -475,6 +475,123 @@ button[type='submit']:disabled {
   color: var(--muted);
 }
 
+.analysis {
+  display: grid;
+  gap: 1.75rem;
+  margin-top: 1.5rem;
+}
+
+.analysis h2 {
+  margin: 0 0 0.4rem;
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+}
+
+.analysis .hint {
+  margin: 0 0 0.75rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.summary-block {
+  margin: 0;
+  padding: 1rem 1.1rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--ink);
+}
+
+.claim-list,
+.probe-list,
+.glance-list,
+.agent-findings,
+.obs-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.claim-card,
+.probe-card {
+  padding: 0.85rem 1rem;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+}
+
+.claim-card header,
+.probe-card header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.75rem;
+  align-items: baseline;
+  margin-bottom: 0.45rem;
+}
+
+.claim-text {
+  margin: 0 0 0.5rem;
+  line-height: 1.45;
+}
+
+.claim-quote {
+  margin: 0 0 0.5rem;
+  padding-left: 0.75rem;
+  border-left: 2px solid var(--nvidia-green);
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.claim-badge {
+  font-size: 0.75rem;
+  padding: 0.15rem 0.45rem;
+  border-radius: 2px;
+  border: 1px solid var(--line);
+  text-transform: lowercase;
+}
+
+.claim-badge.proven {
+  color: var(--ok);
+  border-color: rgba(118, 185, 0, 0.45);
+}
+
+.claim-badge.needs-attention {
+  color: var(--warn);
+  border-color: rgba(232, 163, 23, 0.45);
+}
+
+.claim-expect,
+.probe-claims,
+.muted {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.obs-list {
+  gap: 0.35rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.glance-list li,
+.agent-findings li {
+  padding: 0.35rem 0;
+  border-bottom: 1px solid var(--line);
+  line-height: 1.4;
+}
+
+.main.narrow {
+  max-width: 720px;
+}
+
 table {
   width: 100%;
   border-collapse: collapse;

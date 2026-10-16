@@ -261,14 +261,27 @@ export default function App() {
           <button type="button" className="ghost back" onClick={() => setView({ name: 'home' })}>
             ← Back
           </button>
+          <p className="job-kicker">
+            {String(detail.record.repo)}
+            {prNumber(detail.record) != null ? `#${prNumber(detail.record)}` : ''} ·{" "}
+            {String(
+              (detail.record.pr as { title?: string } | undefined)?.title ||
+                detail.record.title ||
+                detail.record.id ||
+                '',
+            )}
+          </p>
           <h1 className={verdictClass(String(detail.record.verdict))}>
-            {String(detail.record.verdict || '')}
+            {plainVerdict(String(detail.record.verdict || ''))}
           </h1>
           <p className="lede">{String(detail.record.reason || '')}</p>
           <p className="meta-line">
-            {String(detail.record.repo)} · folder <code>{detail.folder}</code>
+            Code verdict <code>{String(detail.record.verdict || '')}</code>
+            {detail.record.machine ? <> · ran on <code>{String(detail.record.machine)}</code></> : null}
+            {' · '}
+            folder <code>{detail.folder}</code>
           </p>
-          <BehaviorMap record={detail.record} />
+          <RunAnalysis record={detail.record} />
           {detail.hosted_report && (
             <p className="meta-line">
               Hosted report file: <code>{detail.hosted_report}</code>
@@ -342,61 +355,284 @@ function StageRunway({ stages, current }: { stages: StageEvent[]; current?: stri
   )
 }
 
-function BehaviorMap({ record }: { record: Record<string, unknown> }) {
-  const claims = (record.behaviour_claims as Array<Record<string, unknown>>) || []
-  const probes = ((record.probes as { items?: Array<Record<string, unknown>> }) || {}).items || []
+function prNumber(record: Record<string, unknown>): number | null {
+  const pr = record.pr
+  if (typeof pr === 'number') return pr
+  if (pr && typeof pr === 'object' && typeof (pr as { number?: unknown }).number === 'number') {
+    return (pr as { number: number }).number
+  }
+  return null
+}
+
+function plainVerdict(v: string): string {
+  if (v === 'verified') return 'Verified — behaviour matches the claims'
+  if (v === 'needs_attention') return 'Needs attention — review the findings below'
+  if (v === 'could_not_verify') return 'Could not verify — the check could not finish safely'
+  return v || 'No verdict'
+}
+
+type ClaimRow = {
+  id: string
+  text: string
+  expect?: string
+  source_quote?: string
+  source?: string
+}
+
+type ObsRow = {
+  name?: string
+  state?: string
+  label?: string
+  claim?: string | null
+}
+
+function claimsFromRecord(record: Record<string, unknown>): ClaimRow[] {
+  const plan = record.probe_plan as { model_claims?: ClaimRow[] } | undefined
+  if (Array.isArray(plan?.model_claims) && plan!.model_claims!.length) {
+    return plan!.model_claims!.map((c) => ({
+      id: String(c.id || ''),
+      text: String(c.text || ''),
+      expect: c.expect ? String(c.expect) : undefined,
+      source_quote: c.source_quote ? String(c.source_quote) : undefined,
+      source: c.source ? String(c.source) : undefined,
+    }))
+  }
+  const top = record.behaviour_claims as ClaimRow[] | undefined
+  if (Array.isArray(top) && top.length) {
+    return top.map((c) => ({
+      id: String(c.id || ''),
+      text: String(c.text || ''),
+      expect: c.expect ? String(c.expect) : undefined,
+      source_quote: c.source_quote ? String(c.source_quote) : undefined,
+      source: c.source ? String(c.source) : undefined,
+    }))
+  }
+  const seen = new Map<string, ClaimRow>()
+  for (const p of probeItems(record)) {
+    for (const c of (p.claims as ClaimRow[] | undefined) || []) {
+      const id = String(c.id || '')
+      if (!id || seen.has(id)) continue
+      seen.set(id, {
+        id,
+        text: String(c.text || ''),
+        expect: c.expect ? String(c.expect) : undefined,
+        source: c.source ? String(c.source) : undefined,
+      })
+    }
+  }
+  return [...seen.values()]
+}
+
+function probeItems(record: Record<string, unknown>): Array<Record<string, unknown>> {
+  return ((record.probes as { items?: Array<Record<string, unknown>> }) || {}).items || []
+}
+
+function observationsForClaim(record: Record<string, unknown>, claimId: string): ObsRow[] {
+  const out: ObsRow[] = []
+  for (const p of probeItems(record)) {
+    for (const o of (p.observations as ObsRow[] | undefined) || []) {
+      if (String(o.claim || '') === claimId) out.push(o)
+    }
+  }
+  return out
+}
+
+function claimResultLabel(obs: ObsRow[]): string {
+  if (!obs.length) return 'not probed'
+  if (obs.some((o) => ['needs_attention', 'needs_human', 'false'].includes(String(o.label || '')))) {
+    return 'needs attention'
+  }
+  if (obs.some((o) => o.label === 'proven')) return 'proven'
+  return String(obs[0]?.label || obs[0]?.state || 'checked')
+}
+
+function agentRoles(record: Record<string, unknown>): Array<Record<string, unknown>> {
+  return ((record.agents as { roles?: Array<Record<string, unknown>> }) || {}).roles || []
+}
+
+function summaryText(record: Record<string, unknown>): string {
   const expl = (record.explanation as { text?: string }) || {}
+  if (typeof expl.text === 'string' && expl.text.trim()) return expl.text.trim()
+  const helper = agentRoles(record).find((r) => r.role === 'helper')
+  const notes = Array.isArray(helper?.notes) ? (helper!.notes as string[]) : []
+  const claims = claimsFromRecord(record)
+  const lines = [
+    `Code verdict: ${String(record.verdict || 'unknown')}.`,
+    String(record.reason || '').trim(),
+  ]
+  if (claims.length) {
+    lines.push('Claims under test:')
+    for (const c of claims) {
+      const obs = observationsForClaim(record, c.id)
+      lines.push(`• ${c.id} (${claimResultLabel(obs)}): ${c.text}`)
+    }
+  }
+  if (notes.length) {
+    lines.push('Lightning notes:')
+    for (const n of notes.slice(0, 5)) lines.push(`• ${n}`)
+  }
+  return lines.filter(Boolean).join('\n')
+}
+
+function testGlance(record: Record<string, unknown>): string[] {
+  const c = (record.comparison as Record<string, unknown>) || {}
+  const rows: string[] = []
+  const n = (k: string) => (Array.isArray(c[k]) ? (c[k] as unknown[]).length : 0)
+  if (n('new_tests_passing')) rows.push(`${n('new_tests_passing')} new test(s) passed on the PR`)
+  if (n('new_tests_failing')) rows.push(`${n('new_tests_failing')} new test(s) failed on the PR`)
+  if (n('regressions')) rows.push(`${n('regressions')} regression(s) vs main`)
+  if (n('fixed')) rows.push(`${n('fixed')} previously failing test(s) now pass`)
+  if (n('reparametrized')) rows.push(`${n('reparametrized')} re-parametrized test(s)`)
+  if (n('same_skipped_both')) rows.push(`${n('same_skipped_both')} skipped on both sides`)
+  const dur = record.duration_s as { total_wall?: number; tests?: number } | undefined
+  if (dur?.total_wall) rows.push(`Wall time ~${Math.round(Number(dur.total_wall) / 60)} min`)
+  return rows
+}
+
+function RunAnalysis({ record }: { record: Record<string, unknown> }) {
+  const claims = claimsFromRecord(record)
+  const probes = probeItems(record)
+  const roles = agentRoles(record)
+  const judge = roles.find((r) => r.role === 'judge')
+  const helper = roles.find((r) => r.role === 'helper')
+  const labels = (Array.isArray(judge?.labels) ? judge!.labels : []) as Array<Record<string, unknown>>
+  const notes = (Array.isArray(helper?.notes) ? helper!.notes : []) as string[]
+  const glance = testGlance(record)
+  const summary = summaryText(record)
+
   return (
-    <div className="map">
-      <h2>Behavior map</h2>
-      <h3>Claims</h3>
-      {claims.length === 0 ? (
-        <p className="empty">None</p>
-      ) : (
-        <table>
-          <thead>
-            <tr>
-              <th>Id</th>
-              <th>Claim</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {claims.map((c, i) => (
-              <tr key={String(c.id ?? i)}>
-                <td>{String(c.id ?? '')}</td>
-                <td>{String(c.text || c.claim || '')}</td>
-                <td>{String(c.status ?? '')}</td>
-              </tr>
+    <div className="map analysis">
+      <section>
+        <h2>In plain English</h2>
+        <pre className="summary-block">{summary}</pre>
+      </section>
+
+      <section>
+        <h2>Claims under test</h2>
+        <p className="hint">
+          Each claim (C1, C2, …) is a behaviour statement extracted from the PR. Probes check whether
+          main vs PR match what the claim says should stay the same or change.
+        </p>
+        {claims.length === 0 ? (
+          <p className="empty">No claims were extracted for this run.</p>
+        ) : (
+          <ul className="claim-list">
+            {claims.map((c) => {
+              const obs = observationsForClaim(record, c.id)
+              return (
+                <li key={c.id} className="claim-card">
+                  <header>
+                    <strong>{c.id}</strong>
+                    <span className={`claim-badge ${claimResultLabel(obs).replace(/\s+/g, '-')}`}>
+                      {claimResultLabel(obs)}
+                    </span>
+                    {c.expect ? <span className="claim-expect">expect: {c.expect}</span> : null}
+                  </header>
+                  <p className="claim-text">{c.text}</p>
+                  {c.source_quote ? (
+                    <blockquote className="claim-quote">From the PR: {c.source_quote}</blockquote>
+                  ) : null}
+                  {obs.length > 0 && (
+                    <ul className="obs-list">
+                      {obs.map((o, i) => (
+                        <li key={`${o.name}-${i}`}>
+                          <code>{String(o.name || 'observation')}</code>
+                          {' — '}
+                          {String(o.label || o.state || '')}
+                          {o.state ? ` (state: ${o.state})` : ''}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </li>
+              )
+            })}
+          </ul>
+        )}
+      </section>
+
+      <section>
+        <h2>Probes (how claims were checked)</h2>
+        <p className="hint">
+          A probe is a small dual-run script: same inputs on main and on the PR. The observation says
+          whether the result differed.
+        </p>
+        {probes.length === 0 ? (
+          <p className="empty">No probes ran.</p>
+        ) : (
+          <ul className="probe-list">
+            {probes.map((p, i) => (
+              <li key={String(p.id ?? i)} className="probe-card">
+                <header>
+                  <code>{String(p.id ?? '')}</code>
+                  <span className="muted">{String(p.status ?? '')}</span>
+                </header>
+                <p>{String(p.about ?? '')}</p>
+                {Array.isArray(p.claims) && (p.claims as ClaimRow[]).length > 0 && (
+                  <p className="probe-claims">
+                    Covers{' '}
+                    {(p.claims as ClaimRow[]).map((c) => c.id).filter(Boolean).join(', ')}
+                  </p>
+                )}
+                {Array.isArray(p.observations) && (p.observations as ObsRow[]).length > 0 && (
+                  <ul className="obs-list">
+                    {(p.observations as ObsRow[]).map((o, j) => (
+                      <li key={`${String(p.id)}-${j}`}>
+                        <code>{String(o.name || '')}</code>
+                        {o.claim ? <> · claim {String(o.claim)}</> : null}
+                        {' — '}
+                        <strong>{String(o.label || o.state || '')}</strong>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </li>
             ))}
-          </tbody>
-        </table>
-      )}
-      <h3>Probes</h3>
-      {probes.length === 0 ? (
-        <p className="empty">None</p>
-      ) : (
-        <table>
-          <thead>
-            <tr>
-              <th>Id</th>
-              <th>About</th>
-              <th>Labels</th>
-            </tr>
-          </thead>
-          <tbody>
-            {probes.slice(0, 40).map((p, i) => (
-              <tr key={String(p.id ?? i)}>
-                <td>{String(p.id ?? '')}</td>
-                <td>{String(p.about ?? '')}</td>
-                <td>{Array.isArray(p.labels) ? p.labels.join(', ') : ''}</td>
-              </tr>
+          </ul>
+        )}
+      </section>
+
+      {glance.length > 0 && (
+        <section>
+          <h2>Project tests</h2>
+          <ul className="glance-list">
+            {glance.map((g) => (
+              <li key={g}>{g}</li>
             ))}
-          </tbody>
-        </table>
+          </ul>
+        </section>
       )}
-      <h3>Summary</h3>
-      <p>{expl.text || '(no AI summary)'}</p>
+
+      <section>
+        <h2>Agent swarm (advisory)</h2>
+        <p className="hint">Ultra / Lightning / Super do not change the code verdict; they explain it.</p>
+        {labels.length > 0 && (
+          <>
+            <h3>Ultra (judge)</h3>
+            <ul className="agent-findings">
+              {labels.map((lab, i) => (
+                <li key={String(lab.id ?? i)}>
+                  <strong>{String(lab.label ?? '')}</strong> on <code>{String(lab.id ?? '')}</code>
+                  {lab.reason ? <> — {String(lab.reason)}</> : null}
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
+        {notes.length > 0 && (
+          <>
+            <h3>Lightning (helper)</h3>
+            <ul className="agent-findings">
+              {notes.map((n) => (
+                <li key={n}>{n}</li>
+              ))}
+            </ul>
+          </>
+        )}
+        {labels.length === 0 && notes.length === 0 && (
+          <p className="empty">No agent notes recorded for this run.</p>
+        )}
+      </section>
     </div>
   )
 }

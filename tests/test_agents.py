@@ -46,6 +46,27 @@ def test_run_swarm_recorded_fills_explanation_without_changing_verdict(tmp_path)
     assert rec["explanation"].get("advisory") is True
 
 
+def test_run_swarm_fills_empty_summary_from_verdict(monkeypatch):
+    class EmptySummary(model_provider.Provider):
+        name = "nebius"
+        blind = True
+
+        def complete_json(self, task, system, user, schema, ctx):
+            if task == "summary":
+                return {"text": "", "quotes": []}
+            if task == "judge":
+                return {"labels": []}
+            if task == "helper":
+                return {"notes": []}
+            return {}
+
+    rec = {"verdict": "needs_attention", "reason": "C3 mismatch", "repo": "o/r", "pr": {"number": 1}}
+    agents.run_swarm(EmptySummary(), rec)
+    assert "needs_attention" in rec["explanation"]["text"]
+    assert "C3 mismatch" in rec["explanation"]["text"]
+    assert rec["agents"]["roles"][-1].get("note")
+
+
 def test_run_swarm_none_provider_skips():
     rec = {"verdict": "needs_attention", "reason": "x"}
     agents.run_swarm(None, rec)
