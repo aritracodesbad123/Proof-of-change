@@ -26,8 +26,8 @@ def orchestrate(event: dict, env: dict | None = None) -> dict[str, Any]:
     if not pr_url:
         return {"ok": False, "error": "need pr_url or repo+pr"}
 
-    from poc.github_app import may_post
     from poc.console_api import PR_RE
+    from poc.github_app import may_post
 
     m = PR_RE.search(pr_url)
     if not m:
