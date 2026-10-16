@@ -27,6 +27,25 @@ def test_start_check_rejects_bad_url():
         assert "github.com" in str(e)
 
 
+def test_console_run_flags_prefers_contree(monkeypatch):
+    monkeypatch.setenv("NEBIUS_API_KEY", "k")
+    monkeypatch.setenv("NEBIUS_PROJECT_ID", "p")
+    flags, note = console_api.console_run_flags()
+    assert flags == ["--sandbox-backend", "contree"]
+    assert note and "Contree" in note
+
+
+def test_console_run_flags_unsafe_when_bwrap_down(monkeypatch):
+    monkeypatch.delenv("NEBIUS_API_KEY", raising=False)
+    monkeypatch.delenv("NEBIUS_PROJECT_ID", raising=False)
+    monkeypatch.delenv("POC_UNSAFE_NO_SANDBOX", raising=False)
+    import guardrails.sandbox as sb
+    monkeypatch.setattr(sb, "check", lambda: (False, "bwrap: uid map not permitted"))
+    flags, note = console_api.console_run_flags()
+    assert flags == ["--unsafe-no-sandbox"]
+    assert note and "unsafe" in note
+
+
 def test_start_check_queues_job(monkeypatch):
     class FakeThread:
         def __init__(self, target=None, daemon=None):
