@@ -27,7 +27,7 @@ COPY reports/ reports/
 COPY ops/ ops/
 COPY --from=web /web/dist console/web/dist
 
-RUN pip install --no-cache-dir -e ".[ops]"
+RUN pip install --no-cache-dir -e ".[ops,contree]"
 
 ENV POC_CONSOLE_HOST=0.0.0.0 \
     POC_CONSOLE_PORT=8787 \

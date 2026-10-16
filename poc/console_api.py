@@ -35,14 +35,25 @@ _jobs: dict[str, dict[str, Any]] = {}
 _jobs_lock = threading.Lock()
 
 
+def contree_usable() -> bool:
+    """True only when Contree can actually start (creds + SDK). Env alone is not enough."""
+    if not (os.environ.get("NEBIUS_API_KEY") and os.environ.get("NEBIUS_PROJECT_ID")):
+        return False
+    try:
+        import contree_sdk  # noqa: F401
+    except ImportError:
+        return False
+    return True
+
+
 def console_run_flags() -> tuple[list[str], str | None]:
     """Extra daily_run flags for hosted console (Render blocks bwrap uid maps).
 
-    Prefer Contree when configured. Otherwise, if bubblewrap cannot start here,
+    Prefer Contree when it can actually run. Otherwise, if bubblewrap cannot start here,
     pass --unsafe-no-sandbox so a public-PR demo can still run (recorded in the job note).
     Set POC_UNSAFE_NO_SANDBOX=0 to refuse instead of falling back.
     """
-    if os.environ.get("NEBIUS_API_KEY") and os.environ.get("NEBIUS_PROJECT_ID"):
+    if contree_usable():
         return ["--sandbox-backend", "contree"], "using Contree sandboxes"
     refuse = (os.environ.get("POC_UNSAFE_NO_SANDBOX") or "").strip().lower() in ("0", "false", "no")
     force = (os.environ.get("POC_UNSAFE_NO_SANDBOX") or "").strip().lower() in ("1", "true", "yes")
@@ -56,8 +67,11 @@ def console_run_flags() -> tuple[list[str], str | None]:
     if ok and not force:
         return [], None
     if refuse:
-        return [], f"sandbox unavailable ({why}); set Contree (NEBIUS_PROJECT_ID) or POC_UNSAFE_NO_SANDBOX=1"
-    # ponytail: auto unsafe on PaaS without bwrap; Contree or local bubblewrap when available
+        return [], (
+            f"sandbox unavailable ({why}); install contree-sdk + NEBIUS_PROJECT_ID, "
+            "or set POC_UNSAFE_NO_SANDBOX=1"
+        )
+    # ponytail: auto unsafe on PaaS without working Contree/bwrap — console motif requires a runnable path
     return ["--unsafe-no-sandbox"], f"sandbox unavailable ({why}); running with --unsafe-no-sandbox"
 
 
@@ -261,11 +275,11 @@ class Handler(BaseHTTPRequestHandler):
             return self._json(200, {
                 "ok": True,
                 "service": "proof-of-change-console",
-                "build": "sandbox-fallback-v1",
+                "build": "sandbox-fallback-v2",
                 "has_git": (REPO_ROOT / ".git").is_dir(),
                 "poc_commit_env": bool(
                     (os.environ.get("POC_COMMIT") or os.environ.get("RENDER_GIT_COMMIT") or "").strip()),
-                "contree_ready": bool(os.environ.get("NEBIUS_API_KEY") and os.environ.get("NEBIUS_PROJECT_ID")),
+                "contree_ready": contree_usable(),
                 "run_flags": flags,
                 "run_note": note,
             })
