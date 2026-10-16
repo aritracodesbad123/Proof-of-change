@@ -655,6 +655,20 @@ def test_daily_run_fast_forwards_to_origin_main(tmp_path):
     assert dr.sync_to_origin_main(clone) == sha                         # already there: still that commit
 
 
+def test_resolve_poc_commit_uses_env_when_no_git(tmp_path, monkeypatch):
+    bare = tmp_path / "image"
+    bare.mkdir()
+    sha = "a" * 40
+    monkeypatch.delenv("POC_COMMIT", raising=False)
+    monkeypatch.delenv("RENDER_GIT_COMMIT", raising=False)
+    with pytest.raises(SystemExit, match=r"no \.git"):
+        dr.resolve_poc_commit(bare)
+    monkeypatch.setenv("RENDER_GIT_COMMIT", sha)
+    assert dr.resolve_poc_commit(bare) == sha
+    monkeypatch.setenv("POC_COMMIT", "b" * 40)
+    assert dr.resolve_poc_commit(bare) == "b" * 40  # POC_COMMIT wins
+
+
 def test_daily_run_stops_when_it_cannot_fast_forward(tmp_path):
     origin, clone = _origin_and_clone(tmp_path)
     (clone / "README").write_text("dirty\n")

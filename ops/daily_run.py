@@ -3142,6 +3142,26 @@ def sync_to_origin_main(root: Path | None = None) -> str:
     return got
 
 
+def resolve_poc_commit(root: Path | None = None) -> str:
+    """Stamp every run with a known Proof-of-Change commit.
+
+    Local checkout: fast-forward to origin/main. Docker/Render images ship without .git
+    (.dockerignore); use POC_COMMIT or Render's RENDER_GIT_COMMIT instead.
+    """
+    root = root or REPO_ROOT
+    if (root / ".git").is_dir():
+        return sync_to_origin_main(root)
+    for key in ("POC_COMMIT", "RENDER_GIT_COMMIT"):
+        sha = (os.environ.get(key) or "").strip().lower()
+        if _COMMIT.fullmatch(sha):
+            return sha
+    raise SystemExit(
+        "Stopped: this checkout has no .git (typical for a Docker/Render image). "
+        "Set POC_COMMIT (or RENDER_GIT_COMMIT) to the 40-character Proof-of-Change "
+        "commit this image was built from."
+    )
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--libraries-file", default=None,
@@ -3225,7 +3245,7 @@ def main(argv=None) -> int:
     if stop:
         print(stop, file=sys.stderr)
         raise SystemExit(1)
-    a.poc_commit = sync_to_origin_main(REPO_ROOT)
+    a.poc_commit = resolve_poc_commit(REPO_ROOT)
     sandbox.configure(not a.unsafe_no_sandbox)
     from poc import contree_sandboxes
     try:
