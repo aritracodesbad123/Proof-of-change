@@ -176,7 +176,7 @@ def test_each_pull_request_keeps_its_own_stamp_and_cost(monkeypatch, tmp_path, f
         return rec
 
     monkeypatch.setattr(model_provider.urllib.request, "urlopen", fake)
-    monkeypatch.setattr(daily_run, "sandbox_refusal", lambda: None)
+    monkeypatch.setattr(daily_run, "sandbox_refusal", lambda *_a, **_k: None)
     monkeypatch.setattr(daily_run, "test_source_pair", fake_pair)
     prov, note = model_provider.select("nebius")
     state["ok"] = True
