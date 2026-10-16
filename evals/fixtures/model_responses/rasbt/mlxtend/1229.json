@@ -45,5 +45,21 @@
     "code": "import json\n\nimport numpy as np\nfrom mlxtend.evaluate import feature_importance_permutation as fip\n\nrs = np.random.RandomState(7)\nX0 = rs.normal(size=(30, 4))\nW = np.array([2.0, -1.0, 0.5, 0.25])\nY = X0 @ W\n\n\ndef predict(X):\n    return X @ W\n\n\ndef columns_touched(groups):\n    seen = []\n\n    def pm(Z):\n        seen.append([int(c) for c in range(X0.shape[1]) if not np.array_equal(Z[:, c], X0[:, c])])\n        return predict(Z)\n    try:\n        fip(X0.copy(), Y, pm, metric=\"r2\", num_rounds=1, seed=1, feature_groups=groups)\n    except Exception as e:  # noqa: BLE001\n        return {\"raises\": type(e).__name__}\n    return seen[1:]\n\n\ndef importances(groups):\n    try:\n        mean, _ = fip(X0.copy(), Y, predict, metric=\"r2\", num_rounds=2, seed=1, feature_groups=groups)\n    except Exception as e:  # noqa: BLE001\n        return {\"raises\": type(e).__name__}\n    return [round(float(v), 8) for v in mean]\n\n\nobs = {\n    \"list_groups.columns_touched\": columns_touched([[1], [2], [3]]),\n    \"range_group.columns_touched\": columns_touched([0, range(2, 4)]),\n    \"int_groups.importances\": importances([0, 1, 2, 3]),\n}\nprint(json.dumps({\"observations\": obs}, sort_keys=True))\n"
    }
   ]
+ },
+ "judge": {
+  "labels": [
+   {"id": "probe-groups-columns", "label": "proven", "reason": "Observations match the claimed column permutation behaviour."},
+   {"id": "F1", "label": "needs_human", "reason": "Code finding needs a reviewer glance."}
+  ]
+ },
+ "helper": {
+  "notes": [
+   "Ignore numpy floating-point noise in importance vectors beyond 1e-8.",
+   "Install tip: pip install 'mlxtend[all-tests]' when extras are declared."
+  ]
+ },
+ "summary": {
+  "text": "The PR claims feature groups permute their own columns; the recorded check verdict and reason below are authoritative.",
+  "quotes": ["verified", "needs_attention", "could_not_verify"]
  }
 }

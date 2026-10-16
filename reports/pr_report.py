@@ -492,6 +492,26 @@ def build(rec: dict, prdir: Path, out_dir: Path, decision: dict | None = None) -
     R.bullets([f"**What it says it does:** {rec.get('title', '?')} ({link(pr_ref, rec.get('url', ''))}).",
                f"**What we observed:** {d['why']}.",
                f"**What you should do:** {todo}"])
+    expl = rec.get("explanation") or {}
+    if expl.get("status") == "wired" and expl.get("text"):
+        R.p(str(expl["text"]))
+        if expl.get("quotes"):
+            R.p("Quoted from the record: " + "; ".join(f"`{q}`" for q in expl["quotes"][:5]), "meta")
+        R.p("Model summary is advisory; the code verdict above is authoritative.", "meta")
+    agents = rec.get("agents") or {}
+    roles = agents.get("roles") if isinstance(agents, dict) else None
+    if roles:
+        R.h(3, "Agent swarm (advisory)")
+        rows_a = []
+        for role in roles:
+            note = role.get("note") or ""
+            if role.get("labels"):
+                note = f"{len(role['labels'])} labels" + (f"; {note}" if note else "")
+            if role.get("notes"):
+                note = "; ".join(str(n) for n in role["notes"][:3]) + (f"; {note}" if note else "")
+            rows_a.append([role.get("role", "?"), role.get("model") or "-", role.get("status") or "-", note or "-"])
+        R.table(["Role", "Model", "Status", "Notes"], rows_a)
+        R.p(agents.get("note") or "judge/helper/summary are advisory; code owns the verdict", "meta")
 
     R.h(2, "Claims vs reality", "claims")
     if rows:

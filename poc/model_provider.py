@@ -23,8 +23,15 @@ from pathlib import Path
 
 BASE_URL = "https://api.tokenfactory.nebius.com/v1"
 KEY_ENV = "NEBIUS_API_KEY"
-# docs/REQUIREMENTS.md section 4a: Nemotron 3 Super 120B extracts claims and writes probes.
-DEFAULT_MODELS = {"claims": "nvidia/nemotron-3-super-120b-a12b", "probes": "nvidia/nemotron-3-super-120b-a12b"}
+# docs/REQUIREMENTS.md section 4a: Nemotron roles on Token Factory.
+DEFAULT_MODELS = {
+    "claims": "nvidia/nemotron-3-super-120b-a12b",
+    "probes": "nvidia/nemotron-3-super-120b-a12b",
+    "judge": "nvidia/Nemotron-3-Ultra-550b-a55b",
+    "helper": "nvidia/Nemotron-3_5-Lightning",
+    "summary": "nvidia/nemotron-3-super-120b-a12b",
+}
+HELPER_FALLBACK = "nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B"
 RECORDED_DIR = Path(__file__).resolve().parent.parent / "evals" / "fixtures" / "model_responses"
 FIXTURE_MARK = "TEST FIXTURE"
 PROVIDERS = ("nebius", "recorded", "none")
