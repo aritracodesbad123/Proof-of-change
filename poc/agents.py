@@ -164,11 +164,18 @@ def run_swarm(provider: Provider | None, rec: dict, ctx: dict | None = None,
         try:
             user = "Record excerpt:\n" + _record_excerpt(rec)
             raw = _call(provider, "summary", SUMMARY_PROMPT, user, SUMMARY_SCHEMA, ctx)
-            text = str(raw.get("text") or "").strip()
+            text = str(raw.get("text") or raw.get("summary") or "").strip()
             quotes = [q for q in (raw.get("quotes") or []) if isinstance(q, str)]
             excerpt = _record_excerpt(rec)
             # only keep quotes that actually appear in the excerpt we sent
             kept = [q for q in quotes if q and q in excerpt]
+            if not text:
+                # Model sometimes returns empty text; never leave the console blank.
+                text = (
+                    f"Verdict: {rec.get('verdict') or 'unknown'}. "
+                    f"{(rec.get('reason') or '')[:700]}"
+                ).strip()
+                role["note"] = "model returned empty text; filled from code verdict/reason"
             role["status"] = "ok"
             rec["explanation"] = {
                 "status": "wired",
