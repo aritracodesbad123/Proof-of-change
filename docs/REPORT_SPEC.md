@@ -103,7 +103,7 @@ Proposed schema additions (optional fields, so v1 records stay valid):
 | `per_test_outcomes` path or digest | before/after per test without re-parsing JUnit | parsed from JUnit |
 | `old_output` for broken tests | "before" output; a passing test has none, so the report says so | not captured |
 | `golden_check` {harness_version, passed, total, date} | golden results from a real re-run, not from stored records | stored records only |
-| `explanation` (LLM) | plain-English cause with citations | status "not yet wired" |
+| `explanation` (LLM) | plain-English cause with citations | filled by `poc/agents.run_swarm` summary role after the code verdict (advisory; quotes must appear in the record) |
 | `reviewer_decision` {decision, reviewer, date, note} | close the loop after approval | not recorded |
 
 ## Adopted (10 Oct 2026)

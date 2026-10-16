@@ -12,8 +12,8 @@ marked **[ASSUMED]** need confirmation; see §14.
 
 Every pull request should come with proof. Proof-of-Change reads what a PR claims, writes small probes for each claim
 and for changed public code, runs them on **main** and on **the PR** side by side in forked Nebius Token Factory
-Sandboxes (**Planned, not yet built**), and gives the reviewer a **verdict** and a **behavior map**
-(**Planned, not yet built**): what is proven, what is false, and what changed
+Sandboxes (Contree optional; local bubblewrap default), and gives the reviewer a **verdict** and a **behavior map**
+(hosted HTML on demo repos via `poc/github_app.write_hosted_report`): what is proven, what is false, and what changed
 that nobody mentioned (spec §1). Tagline: "Don't just read the PR. Run it."
 
 Built for the Nebius x NVIDIA Global AI Hackathon, Coding and Agentic Engineering track (Devpost deadline 30 Oct 2026,
@@ -28,7 +28,8 @@ In scope (MVP, spec §7.1):
 - Claim extraction with source quotes. Probe generation (claim, no-change and extension-point probes). Build main
   once, fork for the PR, run probes on both sides in parallel in Sandboxes (**Planned, not yet built**). Normalise, rerun on difference, verdict.
 - Output: GitHub check run (never failing), one summary comment, a web report with the behavior map, finding detail
-  and raw outputs. GitHub check run, summary comment, behavior map, and a hosted web report: **Planned, not yet built.**
+  and raw outputs. GitHub check run, summary comment, and hosted behavior-map report: wired for `POC_DEMO_REPOS`
+  (`poc/github_app.py`).
   Local HTML reviewer reports, with finding detail, are already generated.
 - Demos: the real psf/requests PR #6655 replay (main), and the constructed `poc-demo-bookstore` (FastAPI + SQLite)
   with 4 planted PRs, **labelled as example data** everywhere it appears.
@@ -281,12 +282,12 @@ guardrails/              schema, isolation/timeouts, no-external scan
 reports/                 reviewer report generator (HTML/PDF/MD + daily summary), samples
 tests/                   pytest
 ```
-Checked against the code: claim extraction and probe generation run on main (Nemotron 3 Super on the Nebius Token Factory API). Local HTML reviewer reports are generated. Still **Planned, not yet built:** Nebius Token Factory Sandboxes, the GitHub App, a hosted web report with the behavior map, and Tavily.
+Checked against the code: claim extraction and probe generation run on main (Nemotron 3 Super on the Nebius Token Factory API). Advisory agent swarm (Ultra judge / Lightning helper / Super summary) runs after the code verdict via `poc/agents.py`. Local HTML reviewer reports and demo-repo hosted behavior maps are generated. Contree sandboxes and the GitHub App are wired (credentials optional; local/dry-run fallback). Still **Planned, not yet built:** live Nebius Serverless deploy, Contree MCP process hosting, and Tavily-by-default.
 
 ## 14. Open questions
 
 From spec §14:
-1. **Ownership.** Who builds the agent loop, the Sandbox runner, the GitHub App and the web report? GitHub App, Sandbox runner and hosted web report: **Planned, not yet built.** Spec
+1. **Ownership.** Agent swarm (`poc/agents.py`), Contree sandbox runner, GitHub App, and hosted behavior-map report are in-tree. Live Nebius Serverless host and Contree MCP process deploy still need cloud wiring. Spec
    §8.1 says that with 2 people, the MCP server and the timeline are cut first.
 2. **Python only for the MVP?** Spec recommends yes. This draft assumes yes.
 3. **Second demo: a real repo or the constructed bookstore?** Spec recommends the constructed one, clearly labelled.
@@ -294,8 +295,8 @@ From spec §14:
 4. **Tavily for the $3k bonus?** Spec: only if a probe genuinely needs current third-party docs. **Planned, not yet built.**
 5. Hosting: a Serverless AI endpoint, or a free host with Token Factory? Do the credits cover Compute? A Serverless AI endpoint is **Planned, not yet built.**
 6. License: Apache-2.0 or MIT? Resolved: MIT. See `docs/decisions/2026-10-15-mit-licence.md`.
-7. Credit budget for Ultra calls per run. Ultra is **Planned, not yet built.**
-8. Ask Nebius about per-run network isolation, the 50-operation limit and extra credits (the network-cutoff risk, §7). Sandboxes are **Planned, not yet built.**
+7. Credit budget for Ultra calls per run. Ultra advisory path is wired (`poc/agents.py` judge role); live cost caps are an ops question.
+8. Ask Nebius about per-run network isolation, the 50-operation limit and extra credits (the network-cutoff risk, §7). Contree dual-run is wired; confirm network cutoff behavior in production.
 
 Further:
 9. ~~Repo name~~ **Resolved:** Proof-of-change.

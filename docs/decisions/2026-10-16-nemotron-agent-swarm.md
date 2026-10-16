@@ -28,7 +28,7 @@ REQUIREMENTS §4a asks for a multi-model swarm. Feeding Ultra into the score bef
 ## Alternatives and tradeoffs
 
 - Wire Ultra into `poc/verdict.py` now — rejected until PatchGuru / blind evals agree.
-- Contree SDK dual-run in this PR — deferred: key + SDK checkpoint/fork still stubbed; local bubblewrap remains the executor.
+- Contree SDK dual-run was deferred in the swarm PR; it later landed separately (`poc/contree_sandboxes.py`, `--sandbox-backend contree`).
 
 ## What it means for you
 
