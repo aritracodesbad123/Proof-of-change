@@ -2391,8 +2391,10 @@ def sandbox_refusal() -> str | None:
 
 
 def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, machine: dict) -> dict:
+    from poc import run_progress
     t0 = time.time()
     begin_pr(a)
+    run_progress.emit("fetch_pr", detail=f"{repo}#{item['pr']}")
     tag = f"{cfg['pkg']}-{item['pr']}"
     prdir = rdir / tag; prdir.mkdir(parents=True, exist_ok=True)
     work = workroot / tag
@@ -2407,6 +2409,7 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
         return finish(test_source_pair(repo, cfg, item, prdir, work, a, rec), prdir, work, t0, a)
     cnv, ex = None, None
     vm, vp = work / "venv-main", work / "venv-pr"
+    run_progress.emit("install_main", detail="installing main (nightly) side")
     main = build_main_env(cfg, vm, prdir / "setup-main.log", a.python, a.build_timeout, workroot / "wheels" / rdir.name)
     rec["main_side"] = {"source": "scientific-python nightly wheel (exact file, pinned by sha256)",
                         **{k: v for k, v in main.items() if k not in ("ok",)}}
@@ -2422,6 +2425,7 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
         if item["files"]["compiled"]:
             rec["route"] = "source-build"
             extra = [f"{cfg['dist']}[{','.join(main['test_extras'])}]"] if main.get("test_extras") else []
+            run_progress.emit("install_pr", detail="building PR from source")
             b = source_build(repo, item, cfg, vp, work, prdir / "build-pr.log", a.python, a.build_timeout, tuple(extra))
             rec["pr_side"] = {"source": f"source build of {item['head_sha'][:12]}",
                               **{k: v for k, v in b.items() if k != "ok"}}
@@ -2431,6 +2435,7 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
                 cnv = b["why"] + " (build log: build-pr.log)"
         else:
             rec["route"] = "nightly+patch"
+            run_progress.emit("install_pr", detail="patching PR onto nightly")
             shutil.copytree(vm, vp, symlinks=True)
             ok, why = apply_patch(package_diff(item["diff"], cfg["pkg"]), site_packages(vp), prdir / "patch.log")
             rec["pr_side"] = {"source": "copy of main side + PR diff applied to the installed package", "patched": ok}
@@ -2454,6 +2459,7 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
         if not targets["pr"]:
             cnv = "no tests could be mapped to the touched modules"
         else:
+            run_progress.emit("pytest", "code", "dual-run pytest on main and PR")
             cmp, cnv, ex = execute_tests(rec, {"main": vm, "pr": vp}, targets, prdir, work, a)
             if cmp:
                 rec["coverage"] = coverage_run(item, vp, site_packages(vm), site_packages(vp), targets["pr"], prdir,
@@ -2466,6 +2472,7 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
     if main.get("test_extras") and not rec.get("test_extras"):
         rec["test_extras"] = list(main["test_extras"])
     if envs_ok:
+        run_progress.emit("probes", "super", "running behaviour probes")
         rec["probes"] = run_probes(repo, item["pr"], {"main": vm / "bin/python", "pr": vp / "bin/python"}, prdir, work,
                                    a, plan, pr_started)
         rec["probe_changed_line_coverage"] = probe_coverage(item, rec["probes"], vm, site_packages(vm), site_packages(vp),
@@ -2473,6 +2480,7 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
         settle_probes(rec)
         if change_is_docstring_only(rec.get("files"), site_packages(vm), site_packages(vp)):
             rec["docstring_only"] = True
+    run_progress.emit("verdict", "code", "computing code verdict")
     _store_verdict(rec, cmp, cnv, ex)
     return finish(gate(rec), prdir, work, t0, a)
 
@@ -2480,7 +2488,7 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
 def finish(rec: dict, prdir: Path, work: Path, t0: float, runner=None) -> dict:
     # Agent swarm (judge/helper/summary) after the code verdict; advisory only — never changes rec["verdict"].
     # Skip when model_skipped is set (--no-probes / baseline without claim probes) so the stamp stays honest.
-    from poc import contree_sandboxes
+    from poc import contree_sandboxes, run_progress
     contree_sandboxes.clear_session()
     if (runner is not None and getattr(runner, "provider", None) is not None
             and not getattr(runner, "model_skipped", None)):
@@ -2488,6 +2496,7 @@ def finish(rec: dict, prdir: Path, work: Path, t0: float, runner=None) -> dict:
     elif runner is not None and getattr(runner, "model_skipped", None) and "agents" not in rec:
         rec["agents"] = {"status": "skipped", "note": runner.model_skipped, "roles": []}
         rec.setdefault("explanation", {"status": "not yet wired", "why": runner.model_skipped})
+    run_progress.emit("report", detail="writing record")
     if runner is not None:
         stamp_model_use(rec, runner)
     rec["what_changed"] = {"package_python_files": rec["files"]["package_py"], "compiled_files": rec["files"]["compiled"],
@@ -2532,9 +2541,11 @@ def check_record(rec: dict) -> list[str]:
 
 
 def test_source_pair(repo: str, cfg: dict, item: dict, prdir: Path, work: Path, a, rec: dict) -> dict:
+    from poc import run_progress
     rec["route"] = "source-pair"
     if item.get("chosen"):
         rec["chosen"] = {k: v for k, v in item["chosen"].items()}
+    run_progress.emit("fetch_pr", detail="checking out main / PR sides")
     sp = source_pair(repo, item, work, prdir / "git.log", a.python, a.build_timeout)
     rec["sides"] = {k: v for k, v in sp.items() if k != "ok"}
     if sp.get("merge_commit"):
@@ -2556,9 +2567,11 @@ def test_source_pair(repo: str, cfg: dict, item: dict, prdir: Path, work: Path, 
     else:
         vm, vp = work / "venv-main", work / "venv-pr"
         cm, cp = work / "side-main", work / "side-pr"
+        run_progress.emit("install_main", detail="installing main side")
         ok, why = install_side(vm, cm, item.get("chosen"), prdir / "setup-main.log", a.python, a.build_timeout, None)
         plan, pr_started = [], None
         if ok:
+            run_progress.emit("claims", "super", "planning behaviour claims / probes")
             plan = plan_probes(repo, item, rec, cm, [cp, work / "src"], prdir, a)
             rec["python"] = venv_python_version(vm) or rec["python"]
             frz = in_side(vm, ["uv", "pip", "freeze", "-p", vm / "bin/python"], install=True).stdout
@@ -2570,6 +2583,7 @@ def test_source_pair(repo: str, cfg: dict, item: dict, prdir: Path, work: Path, 
             proj, _extra = side_install_args(item.get("chosen"), cm)
             rec["test_extras"] = recorded_test_extras(cm, with_test_extras(proj, cm))
             rec["pr_side_started_at"] = pr_started = freeze.now()   # nothing below may create or change a probe
+            run_progress.emit("install_pr", detail="installing PR side")
             ok, why = install_side(vp, cp, item.get("chosen"), prdir / "setup-pr.log", a.python, a.build_timeout, cons)
             if ok:
                 rec["freeze"]["pr"] = freeze_env(vp, prdir / "freeze-pr.txt")
@@ -2612,17 +2626,20 @@ def test_source_pair(repo: str, cfg: dict, item: dict, prdir: Path, work: Path, 
             elif not targets["pr"]:
                 cnv = "no tests could be mapped to the touched files"
             else:
+                run_progress.emit("pytest", "code", "dual-run pytest on main and PR")
                 cmp, cnv, ex = execute_tests(rec, {"main": vm, "pr": vp}, targets, prdir, work, a,
                                              cwds={"main": cm, "pr": cp})
                 if cmp:
                     # Coverage stays on the local sides (Contree disposable runs do not keep coverage data).
                     rec["coverage"] = coverage_run(item, vp, cm, cp, targets["pr"], prdir, work, a, cwd=cp)
+            run_progress.emit("probes", "super", "running behaviour probes")
             rec["probes"] = run_probes(repo, item["pr"], {"main": vm / "bin/python", "pr": vp / "bin/python"}, prdir,
                                        work, a, plan, pr_started)
             rec["probe_changed_line_coverage"] = probe_coverage(item, rec["probes"], vm, cm, cp, prdir, a)
             settle_probes(rec)
             if change_is_docstring_only(rec.get("files"), cm, cp):
                 rec["docstring_only"] = True
+    run_progress.emit("verdict", "code", "computing code verdict")
     _store_verdict(rec, cmp, cnv, ex)
     return gate(rec)
 

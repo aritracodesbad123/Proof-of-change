@@ -118,6 +118,24 @@ def test_serverless_orchestrate_dry_run():
     assert out["ok"] and out["dry_run"]
 
 
+def test_serverless_orchestrate_enqueues(monkeypatch):
+    from poc import console_api
+
+    class FakeThread:
+        def __init__(self, target=None, daemon=None):
+            self.target = target
+
+        def start(self):
+            pass
+
+    monkeypatch.setattr(console_api.threading, "Thread", FakeThread)
+    out = serverless.orchestrate(
+        {"pr_url": "https://github.com/me/demo/pull/9", "allow_any_repo": True},
+        env={"POC_DEMO_REPOS": ""})
+    assert out["ok"] and out["queued"] and out["job"]["pr"] == 9
+    assert out["job"]["current_stage"] == "queued"
+
+
 def test_mcp_tools_and_prove_dry():
     names = {t["name"] for t in mcp_server.list_tools()}
     assert names == {"prove_change", "run_probe"}

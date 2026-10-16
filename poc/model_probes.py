@@ -130,10 +130,13 @@ def _usable(resp, claim_ids: set) -> list:
 
 def generate(provider: Provider, repo: str, pr: int, title: str, body: str | None, base_files: dict,
              base_root: Path, pr_roots: list, outdir: Path) -> dict:
+    from poc import run_progress
+
     inputs = freeze.base_inputs(title, body, base_files, base_root, pr_roots)   # raises on PR-side input paths
     ctx = {"repo": repo, "pr": pr}
     out: dict = {"provider": provider.describe(), "claims": [], "rejected_claims": [], "probes": [], "errors": []}
     pr_text = f"Title: {title}\n\nDescription:\n{body or ''}"
+    run_progress.emit("claims", "super", "Super is extracting behaviour claims")
     try:
         raw = provider.complete_json("claims", CLAIMS_PROMPT, pr_text, CLAIMS_SCHEMA, ctx)
     except ProviderError as e:
@@ -153,6 +156,7 @@ def generate(provider: Provider, repo: str, pr: int, title: str, body: str | Non
         user = (pr_text + "\n\nClaims: none were testable. Still write at least one probe that calls the functions "
                 "in the BASE-side files below with representative and edge-case inputs; give it an empty claims "
                 "list.\n\n" + _context(base_files))
+    run_progress.emit("probes", "super", "Super is writing behaviour probes")
     try:
         resp = provider.complete_json("probes", PROBES_PROMPT, user, PROBES_SCHEMA, ctx)
     except ProviderError as e:

@@ -143,6 +143,75 @@ module"; it does not prove the test reaches the changed C lines, and a test with
 A PR mixing Python and compiled changes gets both rules. Lines run only by import (module-level code) count as
 covered. The coverage run adds roughly one more test run per PR (about 15-60 s on day-1 PRs).
 
+## Operator console (browse + start checks)
+
+React UI (`console/web`, NVIDIA green/dark) talks to a stdlib JSON API (`poc/console_api.py`). Live jobs expose stage + agent swarm progress via `POC_PROGRESS_PATH` JSONL (`poc/run_progress.py`).
+
+| Endpoint | Purpose |
+|---|---|
+| `GET /api/health` | liveness |
+| `GET /api/runs` | recent `ops/runs/**/record.json` summaries |
+| `GET /api/runs/<id>` | full record + folder |
+| `POST /api/checks` | `{ "pr_url", "model_provider?" }` → background `daily_run --pr` |
+| `GET /api/jobs/<id>` | status, `stages[]`, `current_stage` / `current_agent`, `swarm` map, log tail |
+
+```bash
+make console-api    # :8787
+make console-web    # :5173 (Vite proxies /api → :8787)
+# or: make console-build && make console-api  → open :8787
+```
+
+Jobs run in a daemon thread. Poll `/api/jobs/<id>` while `daily_run` writes progress events (install → pytest → Ultra/Lightning/Super → done).
+
+### Free public URL (recommended — no Nebius Compute bill)
+
+Builder **Token Factory** credits pay for Nemotron calls, not for hosting. Skip Nebius Serverless AI Endpoint if you want $0 hosting.
+
+**Option A — Render (free tier, easiest)**
+
+1. Push this repo to GitHub.
+2. [Render](https://dashboard.render.com) → **New** → **Blueprint** → select the repo (`render.yaml`).
+3. Set secret env **`NEBIUS_API_KEY`** (Token Factory). Optional: `NEBIUS_PROJECT_ID`, `POC_DEMO_REPOS`.
+4. Deploy → open `https://<service>.onrender.com` (same console UI). Free instances sleep when idle.
+
+**Option B — local + share link (truly free)**
+
+```bash
+make console-build && make console-api   # :8787
+# other terminal: cloudflared tunnel --url http://127.0.0.1:8787
+# or: npx localtunnel --port 8787
+```
+
+Do **not** rewrite to Streamlit — you’d lose the swarm theater and still need a Python backend for `daily_run`.
+
+### Nebius host (paid Compute — only if you have AI Cloud credits)
+
+Token Factory (`NEBIUS_API_KEY`) is for models only. A Nebius **navigable website** needs a **Serverless AI Endpoint** (Compute billing) ([docs](https://docs.nebius.com/serverless/endpoints/manage)).
+
+1. Prerequisites: Docker, [Nebius CLI](https://docs.nebius.com/cli/) logged in, `jq`, a VPC **subnet id**, a container registry you can push to.
+2. Build and push the image:
+
+```bash
+export IMAGE=docker.io/<you>/poc-console:latest   # or any registry Nebius can pull
+make docker-console IMAGE="$IMAGE"
+```
+
+3. Create the Endpoint (`--auth none` so a browser can open it without a Bearer header):
+
+```bash
+export SUBNET_ID=…                    # Nebius VPC subnet
+export NEBIUS_API_KEY=…               # Token Factory — swarm + probes inside the container
+# optional: NEBIUS_PROJECT_ID, POC_DEMO_REPOS
+make nebius-console IMAGE="$IMAGE" SUBNET_ID="$SUBNET_ID"
+```
+
+4. The script prints a managed **`https://…`** URL (also under Serverless AI → Endpoints → Public endpoints). Open it — same SPA as local: paste a PR, watch Ultra / Lightning / Super.
+5. Health: `curl -sS "$URL/api/health"`.
+
+Local-only (no Nebius URL): `make console-host` on `0.0.0.0:8787`.
+
+Progress files live under `ops/runs/_jobs/<job_id>.jsonl` inside the container (ephemeral unless you mount a volume).
+
 ## GitHub App (demo/mirror repos only)
 
 Optional path so Proof-of-Change can answer on GitHub itself — **only** for repos listed in `POC_DEMO_REPOS`

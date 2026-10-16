@@ -82,6 +82,7 @@ those gaps are easier to catch. We still report misses like the early study open
 ---
 
 **Contents:** [Proven results](#proven-results) · [Setup](#1-one-time-setup-on-a-mac) · [Check one PR](#2-check-one-pr) ·
+[Operator console](#2b-operator-console-browse--start-checks) ·
 [How a report is made](#3-exactly-how-a-report-gets-generated) ·
 [Read a report](#4-how-to-read-a-report) · [Where files live](#5-where-files-live) ·
 [Troubleshooting](#6-troubleshooting) · [What it never does](#7-what-it-never-does) · [Technical docs](#8-technical-details)
@@ -282,6 +283,28 @@ Your browser opens the summary page. Click **HTML** (or **PDF**) next to the PR 
   It also happens when the PR's new or changed tests were skipped because an optional module (such as `scipy`) is not
   installed, or when the reason starts with **"not fully verified"**: the tests ran fine, but they never ran the
   code the PR changed (see "Was the changed code exercised?" in section 4). None of these is a judgement of the PR.
+
+### 2b. Operator console (browse + start checks)
+
+Web console (NVIDIA-themed React UI + local API): paste a GitHub PR link, watch the **pipeline stages** and the **Nemotron swarm** (Ultra · Lightning · Super) light up for that PR, then open the verdict and behavior map.
+
+```bash
+make console-api    # terminal 1 — http://127.0.0.1:8787
+make console-web    # terminal 2 — http://127.0.0.1:5173
+```
+
+Open **http://127.0.0.1:5173**. Needs Node.js for the UI (`npm` under `console/web/`). Or build once and serve UI from the API:
+
+```bash
+make console-build && make console-api
+# then open http://127.0.0.1:8787
+```
+
+**Public website without paying Nebius Compute:** use **Render free** (Blueprint = [`render.yaml`](render.yaml)) or a local tunnel — details in [docs/OPERATIONS.md](docs/OPERATIONS.md) (Free public URL). Keep `NEBIUS_API_KEY` for models only.
+
+**Nebius Endpoint** (only if you have AI Cloud credits): `make docker-console` + `make nebius-console`. Local bind: `make console-host`.
+
+`make check` still works the same; the console calls that same path.
 
 Works best for **numpy, pandas and scikit-learn** (the default libraries). Other pure-Python libraries on GitHub
 usually work too. They are downloaded and built from their source code, which takes longer.

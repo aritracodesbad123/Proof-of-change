@@ -26,7 +26,7 @@ In scope (MVP, spec §7.1):
 - Any repo in principle. NumPy, pandas and scikit-learn are **test subjects** that prove it works, not the product.
 - Triggers: GitHub App on new or updated PRs, and a `/prove` PR comment (`/prove "claim"` adds a claim). Wired in `poc/github_app.py` for `POC_DEMO_REPOS` only (`python -m poc.github_app`).
 - Claim extraction with source quotes. Probe generation (claim, no-change and extension-point probes). Build main
-  once, fork for the PR, run probes on both sides in parallel in Sandboxes (**Planned, not yet built**). Normalise, rerun on difference, verdict.
+  once, fork for the PR, run probes on both sides (Contree when configured; else local sandbox). Normalise, rerun on difference, verdict.
 - Output: GitHub check run (never failing), one summary comment, a web report with the behavior map, finding detail
   and raw outputs. GitHub check run, summary comment, and hosted behavior-map report: wired for `POC_DEMO_REPOS`
   (`poc/github_app.py`).
@@ -94,8 +94,9 @@ The project must run on Nebius Token Factory or Nebius AI Cloud **and** use at l
 | **NVIDIA Nemotron 3.5 Lightning** (`nvidia/Nemotron-3_5-Lightning`), fallback **Nemotron 3 Nano 30B** (`nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B`) | NVIDIA, served on Token Factory | Helper agent: noise / install notes (advisory). Full auto env-setup script still hand-checked for demos. | 1, 7 |
 | **Nebius Token Factory API** (OpenAI-compatible, structured output) | Nebius | Serves all the Nemotron models above | all model steps |
 | **Nebius Token Factory Sandboxes** (Contree SDK 0.3.6, beta) | Nebius | Optional remote dual-run for source-pair PRs (`--sandbox-backend contree`, `NEBIUS_API_KEY` + `NEBIUS_PROJECT_ID`, `pip install -e '.[contree]'`). Checkpoint/fork/probe/pytest via `poc/contree_sandboxes.py`; local bubblewrap is the default and the fallback. | 2, 3, 6 |
-| **Nebius Serverless AI endpoint** | Nebius | Orchestrator plan entry (`poc/serverless.orchestrate`). Live Nebius deploy still needs cloud wiring. | 0, 9 |
+| **Nebius Serverless AI endpoint** | Nebius | `poc/serverless.orchestrate` enqueues the same check as the operator console (`start_check`). Deploy as HTTP handler or pair with long-lived `console_http`. | 0, 9 |
 | **Nebius Serverless AI job** | Nebius | Daily batch entry (`poc/serverless.daily_job` → `ops.daily_run`). Live job schedule still needs cloud wiring. | 10, daily ops |
+| **Operator console (SPA + API)** | Nebius / local | Paste PR URL; live stages + Ultra/Lightning/Super theater; `python -m poc.console_api` or `serverless.console_http`. | 0, 9 |
 
 Model IDs must be confirmed at build time with `GET https://api.tokenfactory.nebius.com/v1/models`. Do not use Nemotron 3 Nano Omni: it was scheduled to leave Token Factory Serverless on 31 Aug 2026.
 
@@ -282,7 +283,7 @@ guardrails/              schema, isolation/timeouts, no-external scan
 reports/                 reviewer report generator (HTML/PDF/MD + daily summary), samples
 tests/                   pytest
 ```
-Checked against the code: claim extraction and probe generation run on main (Nemotron 3 Super on the Nebius Token Factory API). Advisory agent swarm (Ultra judge / Lightning helper / Super summary) runs after the code verdict via `poc/agents.py`. Local HTML reviewer reports and demo-repo hosted behavior maps are generated. Contree sandboxes and the GitHub App are wired (credentials optional; local/dry-run fallback). Still **Planned, not yet built:** live Nebius Serverless deploy, Contree MCP process hosting, and Tavily-by-default.
+Checked against the code: claim extraction and probe generation run on main (Nemotron 3 Super on the Nebius Token Factory API). Advisory agent swarm (Ultra judge / Lightning helper / Super summary) runs after the code verdict via `poc/agents.py`. Operator console (React + API) shows live stages and swarm theater; Nebius host entry is `poc.serverless.console_http` / `orchestrate`. Local HTML reviewer reports and demo-repo hosted behavior maps are generated. Contree sandboxes and the GitHub App are wired (credentials optional; local/dry-run fallback). Still **Planned, not yet built:** managed Nebius schedule for `daily_job`, Contree MCP process hosting, and Tavily-by-default.
 
 ## 14. Open questions
 
