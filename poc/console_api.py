@@ -35,6 +35,32 @@ _jobs: dict[str, dict[str, Any]] = {}
 _jobs_lock = threading.Lock()
 
 
+def console_run_flags() -> tuple[list[str], str | None]:
+    """Extra daily_run flags for hosted console (Render blocks bwrap uid maps).
+
+    Prefer Contree when configured. Otherwise, if bubblewrap cannot start here,
+    pass --unsafe-no-sandbox so a public-PR demo can still run (recorded in the job note).
+    Set POC_UNSAFE_NO_SANDBOX=0 to refuse instead of falling back.
+    """
+    if os.environ.get("NEBIUS_API_KEY") and os.environ.get("NEBIUS_PROJECT_ID"):
+        return ["--sandbox-backend", "contree"], "using Contree sandboxes"
+    refuse = (os.environ.get("POC_UNSAFE_NO_SANDBOX") or "").strip().lower() in ("0", "false", "no")
+    force = (os.environ.get("POC_UNSAFE_NO_SANDBOX") or "").strip().lower() in ("1", "true", "yes")
+    ok = False
+    why = "sandbox check skipped"
+    try:
+        from guardrails import sandbox
+        ok, why = sandbox.check()
+    except Exception as e:  # noqa: BLE001
+        ok, why = False, f"{type(e).__name__}: {e}"
+    if ok and not force:
+        return [], None
+    if refuse:
+        return [], f"sandbox unavailable ({why}); set Contree (NEBIUS_PROJECT_ID) or POC_UNSAFE_NO_SANDBOX=1"
+    # ponytail: auto unsafe on PaaS without bwrap; Contree or local bubblewrap when available
+    return ["--unsafe-no-sandbox"], f"sandbox unavailable ({why}); running with --unsafe-no-sandbox"
+
+
 def list_runs(limit: int = 50) -> list[dict]:
     rows: list[tuple[float, dict]] = []
     if not RUNS_ROOT.is_dir():
@@ -137,8 +163,11 @@ def start_check(pr_url: str, *, model_provider: str = "nebius") -> dict:
             job["started_at"] = time.time()
         os.environ["POC_PROGRESS_PATH"] = str(progress_path)
         rp.emit("fetch_pr", detail="loading pull request")
+        flags, note = console_run_flags()
+        if note:
+            rp.emit("fetch_pr", detail=note[:200])
         argv = [str(REPO_ROOT / ".venv" / "bin" / "python"), str(REPO_ROOT / "ops" / "daily_run.py"),
-                "--pr", pr_url.strip(), "--model-provider", model_provider]
+                "--pr", pr_url.strip(), "--model-provider", model_provider, *flags]
         if not (REPO_ROOT / ".venv" / "bin" / "python").is_file():
             argv[0] = os.environ.get("PYTHON", "python3")
         try:
@@ -228,7 +257,18 @@ class Handler(BaseHTTPRequestHandler):
         path = parsed.path.rstrip("/") or "/"
 
         if path == "/api/health":
-            return self._json(200, {"ok": True, "service": "proof-of-change-console"})
+            flags, note = console_run_flags()
+            return self._json(200, {
+                "ok": True,
+                "service": "proof-of-change-console",
+                "build": "sandbox-fallback-v1",
+                "has_git": (REPO_ROOT / ".git").is_dir(),
+                "poc_commit_env": bool(
+                    (os.environ.get("POC_COMMIT") or os.environ.get("RENDER_GIT_COMMIT") or "").strip()),
+                "contree_ready": bool(os.environ.get("NEBIUS_API_KEY") and os.environ.get("NEBIUS_PROJECT_ID")),
+                "run_flags": flags,
+                "run_note": note,
+            })
         if path == "/api/runs":
             return self._json(200, {"runs": list_runs()})
         if path.startswith("/api/runs/"):
