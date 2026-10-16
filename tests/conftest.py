@@ -63,3 +63,14 @@ def g_clean(golden_v1_records):
 def _no_box_replay(monkeypatch):
     """Tests never read a machine-local replay status file; tests that need one set BR_GOLDEN_STATUS."""
     monkeypatch.setenv("BR_GOLDEN_STATUS", "")
+
+
+@pytest.fixture(autouse=True)
+def _reset_contree_bridge():
+    """Contree select/session is process-global; clear so one test cannot make later run_tests/run_probes go remote."""
+    from poc import contree_sandboxes
+    contree_sandboxes.select("local")
+    contree_sandboxes.clear_session()
+    yield
+    contree_sandboxes.select("local")
+    contree_sandboxes.clear_session()
