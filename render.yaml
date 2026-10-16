@@ -1,5 +1,6 @@
 # Free-tier web service: https://dashboard.render.com → New → Blueprint
 # Set secret NEBIUS_API_KEY in the Render dashboard (Token Factory).
+# RENDER_GIT_COMMIT is injected by Render (stamps runs; image has no .git).
 # After deploy you get https://<name>.onrender.com — open it like GCP.
 #
 # Note: free instances sleep when idle (~1 min cold start). Heavy PR checks
