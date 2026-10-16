@@ -58,4 +58,4 @@ def daily_job(config: dict | None = None) -> dict[str, Any]:
 
 def health() -> dict:
     return {"service": "proof-of-change", "nebius_key_set": bool(os.environ.get("NEBIUS_API_KEY")),
-            "contree_key_set": bool(os.environ.get("CONTREE_API_KEY"))}
+            "contree_ready": bool(os.environ.get("NEBIUS_API_KEY") and os.environ.get("NEBIUS_PROJECT_ID"))}

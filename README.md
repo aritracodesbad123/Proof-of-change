@@ -8,16 +8,34 @@ Proof-of-Change takes a proposed change to an open-source Python library (a *pul
 library's own tests twice: once without the change and once with it, three times each. It compares the results test by
 test and writes a short report for a person to read, with a verdict (VERIFIED, NEEDS ATTENTION or COULD NOT VERIFY),
 a recommended action, and a link to the exact log line behind every statement. It only gives advice: it never
-comments on GitHub and never blocks anyone's change.
+blocks anyone's change. On **demo/mirror repos you allowlist**, it can also reply on GitHub with a check and a
+comment; it never posts to random upstream projects.
 
 > New words are explained the first time they appear. There is also a [glossary](#glossary) at the end.
 
 ## Built with NVIDIA Nemotron on Nebius Token Factory
 
-Proof-of-Change calls NVIDIA Nemotron 3 Super, model id `nvidia/nemotron-3-super-120b-a12b`, through the Nebius
-Token Factory API. The model pulls behaviour claims out of the pull request description and writes targeted test
-probes for those claims. Plain code then runs the project's real tests, and those probes, on both the base and the
-pull request. Comparing those runs is what decides the verdict.
+Proof-of-Change uses **Nebius Token Factory** for models and optional remote sandboxes, and can also reply on
+**your demo GitHub repos**:
+
+1. **NVIDIA Nemotron models** that help read the pull request and explain the report.
+2. **Optional Nebius sandboxes** — private cloud boxes that run untrusted PR code away from your computer
+   (your Mac can still run checks locally if you prefer, or if remote sandboxes are not set up).
+3. **Optional GitHub replies on demo repos** — comment `/prove` (or open a PR) on an allowlisted demo/mirror repo;
+   Proof-of-Change runs the check and posts an advice-only check plus a short comment with a link to a
+   *behavior-map* report. It does not post on repos outside that list.
+
+Several Nemotron models share the work (exact model names are in [Technical details](#8-technical-details)):
+
+| Model | What it does |
+|---|---|
+| **Super** | Reads the PR, lists what it claims, and writes small check scripts (*probes*). Also writes a short plain-English report summary that may only quote real lines from the run. |
+| **Ultra** | Suggests a label for each finding (proven, false, not mentioned, or needs a person) with one sentence. **Advice only** — it does not change the verdict. |
+| **Lightning** (with a smaller **Nano** backup) | Suggests install tips or “ignore this noise” notes. **Advice only.** |
+
+Plain code then runs the project's real tests, and those probes, on both *main* (today's code) and the PR — either on
+your machine or in a Nebius sandbox. **Comparing those runs is what decides the verdict.** The AI may explain and
+suggest labels; it never decides pass or fail.
 
 ## Proven results
 
@@ -57,8 +75,9 @@ Verdict: VERIFIED.
 **Being honest about what tests can't see**
 In our first open-PR study, one PR ([mlxtend#1229](https://github.com/rasbt/mlxtend/pull/1229)) changed results for
 some inputs under a fixed random seed, and every existing test still passed, so the check said VERIFIED. An
-independent re-check found the change. Running tests alone can't catch this kind of change; the claim-checking step is
-being built for it. We report misses like this openly.
+independent re-check found the change. Running the project's tests alone can miss that kind of change. When a Nebius
+API key is set, Proof-of-Change also runs *claim probes* (small scripts written from what the PR says it does) so
+those gaps are easier to catch. We still report misses like the early study openly.
 
 ---
 
@@ -152,7 +171,67 @@ make setup
 Reports are always made as web pages (HTML). If **Google Chrome** is installed in your Applications folder, a PDF copy
 is made too. Get it from <https://www.google.com/chrome/> if you want PDFs.
 
-### Step 6 (optional): Self-check
+### Step 6: Nebius API key (for normal checks)
+
+A normal `make check` uses Nebius for the Nemotron models. You need an API key from the
+[Nebius Token Factory](https://tokenfactory.nebius.com/) console.
+
+In Terminal (same session where you will run the check):
+
+```bash
+export NEBIUS_API_KEY="paste-your-key-here"
+```
+
+- Do not put the key in a chat, a screenshot, or a commit.
+- **What you should see:** nothing (setting a variable is silent). Check it is set with
+  `test -n "$NEBIUS_API_KEY" && echo ok` — you should see `ok`.
+- **If the key is missing**, the run stops at once with a short message that names `NEBIUS_API_KEY`. That is on purpose.
+- To run **without** AI on purpose (fixed probes only): see [Technical details](#8-technical-details) for
+  `--model-provider none`.
+
+### Step 7 (optional): Nebius sandboxes (run PR code in the cloud)
+
+By default, untrusted PR code runs in a *sandbox* on your computer (a private place that cannot touch the rest of
+your Mac). To run those checks in **Nebius sandboxes** instead:
+
+1. In the Nebius Token Factory console, copy your **project id**.
+2. In Terminal:
+
+```bash
+export NEBIUS_PROJECT_ID="paste-your-project-id-here"
+.venv/bin/pip install -e ".[contree]"
+```
+
+3. Pass `--sandbox-backend contree` when you run a check (see [Technical details](#8-technical-details)).
+
+- **If the project id is missing**, Proof-of-Change still works: it runs on your computer with the local sandbox, and
+  the report says so.
+
+### Step 8 (optional): GitHub replies on a demo repo
+
+The usual path is still `make check` on your Mac. If you want Proof-of-Change to answer on GitHub itself:
+
+1. Put only **your** demo or mirror repos in an allowlist (never a random upstream project):
+
+```bash
+export POC_DEMO_REPOS="your-org/your-demo-repo"
+```
+
+2. Install the GitHub App on that repo, set the webhook secret and an installation token (or App id + key — see
+   [Technical details](#8-technical-details) / [OPERATIONS](docs/OPERATIONS.md)), and run:
+
+```bash
+.venv/bin/python -m poc.github_app
+```
+
+3. On a PR in that demo repo, comment `/prove` or `/prove "one claim in quotes"`.
+
+- **What you should see:** an advice-only GitHub check (it never fails the check or blocks merge), a short comment
+  with the verdict, and a behavior-map HTML report under `reports/hosted/` (linkable if you set a public report base
+  URL).
+- **Without App credentials**, the same code can dry-run: it plans the reply but does not post.
+
+### Step 9 (optional): Self-check
 
 ```bash
 make test
@@ -161,8 +240,8 @@ make test
 - **What you should see** at the end: `SELF-CHECK OK`. Before that, lines such as `All checks passed!`,
   `no external side effects found`, `... passed` and `"recommendation": "APPROVE"`.
 
-**Every time you come back later:** open Terminal and type `cd ~/Proof-of-change` first. That's all; setup is
-never needed again.
+**Every time you come back later:** open Terminal and type `cd ~/Proof-of-change` first. Re-export `NEBIUS_API_KEY`
+(and `NEBIUS_PROJECT_ID` if you use Nebius sandboxes) in that Terminal session. Setup itself is never needed again.
 
 ---
 
@@ -251,13 +330,14 @@ flowchart TD
    (the *diff*) from GitHub. It only reads; it never writes to GitHub.
 2. **Decide how to build the two sides.** *main* is the library as it is today, and *PR* is the library with the
    change. Step 3 is chosen automatically from the files the PR touches.
-3. **Build both sides** in throw-away environments under `ops/work/`, which are deleted afterwards.
+3. **Build both sides.** It saves a clean copy of *main*, then a copy for the *PR* (with the change applied). That
+   happens in a throw-away folder under `ops/work/` on your Mac, or in a Nebius sandbox if you asked for one.
 4. **Pick tests.** It uses the test files that belong to the changed code, for example `test_rolling.py` for
    `rolling.py`.
    The test extras and the optional modules the tests use (for example `scipy` and `pyarrow` for pandas) are
    installed on both sides, so tests aren't skipped for a missing module.
-5. **Run the tests 3 times per side,** alternating, with one CPU thread, so a test that fails only now and then
-   (*flaky*) is caught and not mistaken for a real change.
+5. **Run claim probes and the project's tests** on both sides (tests: 3 times per side, alternating, one CPU thread)
+   so a test that fails only now and then (*flaky*) is caught and not mistaken for a real change.
 6. **Compare.** Each test's result on main is compared with its result on the PR. Rules written as plain code (not AI)
    decide the verdict. A test whose parameters were renamed by the PR (for example `test_min_count[first--1-1.0]`
    became `test_min_count[first-0-1.0]`) is recognised as **re-parametrized**, not reported as a missing test. If the
@@ -268,8 +348,9 @@ flowchart TD
 7. **Save the evidence:** `record.json` (what was done and found) and every raw test log.
 8. **Write the report.** For each PR it builds the claims table, finds the exact log line behind every claim, re-reads
    each line to make sure it is really there, runs its own safety checks, and chooses the verdict, recommended action
-   and confidence. Then it writes the HTML, the PDF (if Chrome is installed) and a Markdown copy, plus one summary
-   page for the whole run.
+   and confidence. The report may also include a short **AI summary** and suggested labels — helpful extras, not the
+   decision. Then it writes the HTML, the PDF (if Chrome is installed) and a Markdown copy, plus one summary page for
+   the whole run.
 
 ---
 
@@ -332,7 +413,7 @@ example under half of the changed lines ran, or coverage was not measured). *Low
 
 | Section | What it tells you |
 |---|---|
-| Summary in plain English | Three lines: what the PR says it does, what we saw, what you should do. |
+| Summary in plain English | Three lines: what the PR says it does, what we saw, what you should do. May be followed by an AI summary (advice only) that quotes real lines from the run. |
 | Claims vs reality | Each claim, whether it held up (*proven*, *false*, *not testable*, or an *unmentioned change*), and the **log line** that proves it. Click the log line to see the raw evidence. |
 | What changed in behavior | Counts of tests that stayed the same, newly pass, newly fail, went missing, were flaky, were re-parametrized (renamed cases), were skipped for a missing optional module, or already fail on main, with examples. |
 | Was the changed code exercised? | The coverage gate: how many of the PR's changed lines ran, per file, and whether that changed the verdict. |
@@ -402,19 +483,27 @@ run uses just the date. These folders stay on your computer only. They are never
 | Every report says COULD NOT VERIFY, reason "Forced: the known-answer tests failed on ..." | The latest known-answer re-run failed, so no verdict is trusted (section 4). | Fix what made the known-answer re-run fail. Once it passes again, run `make check` again. |
 | `make open` prints a path but no browser opens | The browser didn't start. | In Finder, press `⌘ Shift G`, paste the printed path, and double-click the file. |
 | The first `make check` is slow | It downloads test environments (several hundred MB). | Later checks are much faster. |
+| `STOPPED: ... NEBIUS_API_KEY is not set` | The run needs a Nebius API key for the models. | Set `NEBIUS_API_KEY` (setup step 6), or pass `--model-provider none` if you mean to run without AI. |
+| Report says it ran on `local` even though I asked for Nebius sandboxes | Project id missing, or the sandbox helper is not installed. | Set `NEBIUS_PROJECT_ID`, run `.venv/bin/pip install -e ".[contree]"`, and pass `--sandbox-backend contree`. |
+| No GitHub comment or check after `/prove` | Repo not in the demo allowlist, webhook not running, or App credentials missing. | Set `POC_DEMO_REPOS`, run `python -m poc.github_app`, and set the installation token / webhook secret (see OPERATIONS). |
 | Anything else | | Copy the last 20 lines from Terminal and open an issue on this repository with them. |
 
 ---
 
 ## 7. What it never does
 
-- **Never posts to GitHub:** no comments, reviews, labels or pull requests on the projects it tests. It only reads
-  public information. A guardrail test (`make test`) checks the code for anything that could post.
-- **Never blocks a merge.** Its verdict is advice for a person. Merging is always someone's own decision on GitHub.
-- **Never gives your GitHub token to the code under test.** If a token is set, it's used only to read from GitHub
-  and is removed before any PR code runs.
-- **Never uploads reports or logs.** Everything stays in the folder on the computer that ran the check.
-- **Never uses AI to decide the verdict.** Test comparison and verdicts are plain, testable code.
+- **Never posts to upstream or random repos.** Comments and check runs go only to demo/mirror repos you put in
+  `POC_DEMO_REPOS`. Everywhere else it only *reads* public information. The CLI path (`make check`) never posts.
+- **Never blocks a merge.** The GitHub check is advice only (`success` or `neutral` — never a failing check). Merging
+  is always someone's own decision on GitHub.
+- **Never gives your GitHub token to the code under test.** Tokens are used only by the orchestrator (read API, or
+  App posts on demo repos) and are removed before any PR code runs.
+- **Never uploads reports or logs** unless you host the static behavior-map HTML yourself (optional public base URL).
+  Default reports stay in the folder on the computer that ran the check.
+- **Never uses AI to decide the verdict.** Test comparison and verdicts are plain, testable code. AI may write a
+  short summary and suggest labels; those are advice only.
+- **Never sends your Nebius key or GitHub token into the sandbox where PR code runs.** Keys stay in the orchestrator
+  process only.
 
 ---
 
@@ -422,9 +511,29 @@ run uses just the date. These folders stay on your computer only. They are never
 
 - [docs/OPERATIONS.md](docs/OPERATIONS.md): how PRs are selected and built, every flag, every file a run writes,
   including the baselines (`--baseline tests|tests+diff|tests+probes|full`), model-written probes
-  (`--model-provider nebius|recorded|none`; NVIDIA Nemotron 3 Super 120B on Nebius Token Factory, key in
-  `NEBIUS_API_KEY`) and the probe freeze rule (probes are written from the PR text and base-side code only and frozen
-  before any PR code runs).
+  (`--model-provider nebius|recorded|none`; key in `NEBIUS_API_KEY`), optional model ids
+  (`--claims-model`, `--probe-model`, `--judge-model`, `--helper-model`, `--summary-model`), where untrusted code
+  runs (`--sandbox-backend local|contree`; Nebius sandboxes also need `NEBIUS_PROJECT_ID` and
+  `.venv/bin/pip install -e ".[contree]"`), the probe freeze rule, and the optional GitHub App
+  (`POC_DEMO_REPOS`, webhook secret, installation token, `POC_REPORT_BASE_URL`, `python -m poc.github_app`).
+- Model ids on Token Factory: `nvidia/nemotron-3-super-120b-a12b` (claims, probes, summary),
+  `nvidia/Nemotron-3-Ultra-550b-a55b` (advisory labels), `nvidia/Nemotron-3_5-Lightning` with fallback
+  `nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B` (advisory tips).
+- Example with Nebius sandboxes (after setup steps 6–7):
+
+```bash
+.venv/bin/python ops/daily_run.py --pr "https://github.com/rasbt/mlxtend/pull/1229" --sandbox-backend contree
+```
+
+- Example GitHub App webhook server (after setup step 8; demo repos only):
+
+```bash
+export POC_DEMO_REPOS="your-org/your-demo-repo"
+export GITHUB_WEBHOOK_SECRET="…"
+export GITHUB_APP_INSTALLATION_TOKEN="…"
+.venv/bin/python -m poc.github_app --port 8080
+```
+
 - [docs/REPORT_SPEC.md](docs/REPORT_SPEC.md): the report format and verdict rules.
 - [docs/DEVELOPER.md](docs/DEVELOPER.md): code layout, the self-check, the downstream-test harness and golden
   records, and the contribution workflow.
@@ -441,10 +550,18 @@ All commands: type `make` on its own to list them.
 | PR (pull request) | A proposed change to a project on GitHub, waiting for the project's maintainers to accept it. |
 | main | The project as it is today, without the PR. |
 | diff | The exact lines a PR adds and removes. |
+| claim | One behaviour the PR says is true, taken from its title or description. |
+| probe | A small script that records what the code does on main and on the PR (it prints observations; it does not assert). |
 | test | A small program, written by the project, that checks one behavior and passes or fails. |
 | pytest | The tool that runs Python tests and writes the logs we cite. |
 | log line | One line of a test log. Every statement in a report points to one. |
 | flaky | A test that sometimes passes and sometimes fails with nothing changed. It's never used as evidence. |
+| sandbox | A private place that runs PR code so it cannot touch the rest of your computer. |
+| Nebius sandbox | The same idea, but on Nebius's machines instead of yours. |
+| `/prove` | A PR comment on a demo repo that asks Proof-of-Change to run and reply. |
+| demo repo | A GitHub repo you own (or a mirror) listed in `POC_DEMO_REPOS`; the only place the App may post. |
+| behavior map | An HTML page that shows claims, probes, and advisory labels for one PR check. |
+| check run (advice only) | A GitHub check that reports the verdict but never fails or blocks merge. |
 | nightly build | A version of a library built automatically every night from its newest code. |
 | venv | A private folder of Python add-ons for one project (`.venv`). |
 | Terminal | The Mac app where you type commands. |
