@@ -1,8 +1,6 @@
 """run_progress JSONL + swarm map."""
 from __future__ import annotations
 
-import os
-
 from poc import run_progress
 
 

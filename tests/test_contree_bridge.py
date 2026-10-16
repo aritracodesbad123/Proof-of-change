@@ -1,15 +1,14 @@
 """Contree bridge in ops/daily_run: mock session drives pytest + probe dual-run helpers."""
 from __future__ import annotations
 
-from pathlib import Path
-
 from poc import contree_sandboxes
 
 
 def test_contree_pytest_once_parses_markers(tmp_path, monkeypatch):
     monkeypatch.setenv("NEBIUS_API_KEY", "fake")
     monkeypatch.setenv("NEBIUS_PROJECT_ID", "proj")
-    import sys, types
+    import sys
+    import types
     sys.modules.setdefault("contree_sdk", types.ModuleType("contree_sdk"))
     contree_sandboxes.select("contree")
 
@@ -35,7 +34,8 @@ def test_contree_pytest_once_parses_markers(tmp_path, monkeypatch):
 def test_contree_probe_once_uploads(tmp_path, monkeypatch):
     monkeypatch.setenv("NEBIUS_API_KEY", "fake")
     monkeypatch.setenv("NEBIUS_PROJECT_ID", "proj")
-    import sys, types
+    import sys
+    import types
     sys.modules.setdefault("contree_sdk", types.ModuleType("contree_sdk"))
     contree_sandboxes.select("contree")
 
