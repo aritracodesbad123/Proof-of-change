@@ -12,7 +12,7 @@ A thin coordinator (`poc/agents.py`) routes post-verdict work to role-specific N
 
 Claims and probes stay on Super via `poc/model_probes.py`. The code verdict in `poc/verdict.py` remains authoritative: Ultra labels are stored on the record and shown in the report as advisory. `ops/daily_run.finish` runs the swarm after the verdict and before the record is written. CLI flags: `--judge-model`, `--helper-model`, `--summary-model`. Recorded fixtures cover the new tasks so CI needs no live key.
 
-Phases B–D land as thin, gated surfaces in the same change set: Contree backend select (`--sandbox-backend`, `CONTREE_API_KEY`), GitHub App allowlist + hosted HTML report, Serverless plan entrypoints, Contree MCP tool contract, optional Tavily lookup (`TAVILY_API_KEY`).
+Later surfaces in the same change set: Contree backend select (`--sandbox-backend`, `NEBIUS_API_KEY` + `NEBIUS_PROJECT_ID`; Contree dual-run wired separately), GitHub App allowlist + hosted HTML report, Serverless plan entrypoints, Contree MCP tool contract, optional Tavily lookup (`TAVILY_API_KEY`).
 
 ## Why
 
@@ -22,13 +22,13 @@ REQUIREMENTS §4a asks for a multi-model swarm. Feeding Ultra into the score bef
 
 - Ultra / Lightning / Super-summary are advisory until evals show Ultra is safe to feed the score.
 - Swarm runs only when a model provider is selected; recorded fixtures exercise the path in CI.
-- Contree without a key falls back to local bubblewrap; machine field records `contree` vs `local` when selected.
+- Contree without Nebius credentials falls back to local bubblewrap; machine field records `contree` vs `local` when selected.
 - GitHub App writes only to `POC_DEMO_REPOS` (G-ext).
 
 ## Alternatives and tradeoffs
 
 - Wire Ultra into `poc/verdict.py` now — rejected until PatchGuru / blind evals agree.
-- Contree SDK dual-run in this PR — deferred: key + SDK checkpoint/fork still stubbed; local bubblewrap remains the executor.
+- Contree SDK dual-run was deferred in the swarm PR; it later landed separately (`poc/contree_sandboxes.py`, `--sandbox-backend contree`).
 
 ## What it means for you
 

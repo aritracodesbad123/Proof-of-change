@@ -1,0 +1,22 @@
+# Free-tier web service: https://dashboard.render.com → New → Blueprint
+# Set secret NEBIUS_API_KEY in the Render dashboard (Token Factory).
+# After deploy you get https://<name>.onrender.com — open it like GCP.
+#
+# Note: free instances sleep when idle (~1 min cold start). Heavy PR checks
+# may hit the free timeout; fine for demos / short runs.
+
+services:
+  - type: web
+    name: poc-console
+    runtime: docker
+    plan: free
+    healthCheckPath: /api/health
+    envVars:
+      - key: NEBIUS_API_KEY
+        sync: false
+      - key: NEBIUS_PROJECT_ID
+        sync: false
+      - key: POC_DEMO_REPOS
+        sync: false
+      - key: PORT
+        value: "8787"

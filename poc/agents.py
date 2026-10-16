@@ -103,8 +103,11 @@ def run_swarm(provider: Provider | None, rec: dict, ctx: dict | None = None,
         rec.setdefault("explanation", {"status": "not yet wired", "why": "no model provider"})
         return out
 
+    from poc import run_progress
+
     # --- judge (Ultra), advisory
     if run_judge:
+        run_progress.emit("agent_judge", "ultra", "Ultra is judging findings for this PR")
         role = _role(provider, "judge")
         agents.append(role)
         try:
@@ -119,6 +122,7 @@ def run_swarm(provider: Provider | None, rec: dict, ctx: dict | None = None,
 
     # --- helper (Lightning / Nano fallback), advisory
     if run_helper:
+        run_progress.emit("agent_helper", "lightning", "Lightning is drafting remediation notes")
         role = _role(provider, "helper")
         agents.append(role)
         try:
@@ -154,6 +158,7 @@ def run_swarm(provider: Provider | None, rec: dict, ctx: dict | None = None,
 
     # --- summary (Super)
     if run_summary:
+        run_progress.emit("agent_summary", "super", "Super is writing the PR summary")
         role = _role(provider, "summary")
         agents.append(role)
         try:

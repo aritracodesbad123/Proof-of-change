@@ -34,7 +34,10 @@ def tracked_files() -> list[Path]:
         files = [ROOT / p for p in out.decode().split("\0") if p]
     except (OSError, subprocess.CalledProcessError):
         files = [p for p in ROOT.rglob("*") if p.is_file() and ".git" not in p.parts and ".venv" not in p.parts]
-    return [p for p in files if p.exists() and p.resolve() != SELF]
+    skip = {".lock", ".png", ".jpg", ".jpeg", ".gif", ".ico", ".woff", ".woff2"}
+    skip_names = {"package-lock.json", "yarn.lock", "pnpm-lock.yaml"}
+    return [p for p in files if p.exists() and p.resolve() != SELF
+            and p.suffix.lower() not in skip and p.name not in skip_names]
 
 
 def text_of(p: Path) -> str | None:

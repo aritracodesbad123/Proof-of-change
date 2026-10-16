@@ -1173,17 +1173,98 @@ def missing_dependency(skip_msg: str) -> str | None:
     return next(g for g in m.groups() if g).split(".")[0]
 
 
+def _contree_ready() -> bool:
+    from poc import contree_sandboxes
+    sess = contree_sandboxes.session()
+    return (contree_sandboxes.backend() == "contree" and sess is not None
+            and bool(sess.main_uuid) and bool(sess.pr_uuid))
+
+
+def _maybe_prepare_contree(a, repo: str, main_sha: str, pr_sha: str, rec: dict, timeout: int) -> None:
+    """Build Contree main/PR checkpoints for source-pair; on failure fall back to local with an explicit note."""
+    from poc import contree_sandboxes
+    if getattr(a, "sandbox_backend", None) != "contree":
+        return
+    contree_sandboxes.clear_session()
+    try:
+        sess = contree_sandboxes.prepare_source_pair(repo, main_sha, pr_sha, timeout=timeout)
+        rec["contree"] = sess.describe()
+        rec["machine"] = "contree"
+        rec["sandbox_backend"] = "contree"
+        rec["sandbox_backend_note"] = contree_sandboxes.note()
+    except contree_sandboxes.ContreeError as e:
+        contree_sandboxes.clear_session()
+        note = f"contree checkpoint failed ({e}); using local bubblewrap"
+        contree_sandboxes.select("local")  # keep module backend in sync with the fallback
+        a.sandbox_backend = "local"
+        a.sandbox_backend_note = note
+        rec["sandbox_backend"] = "local"
+        rec["sandbox_backend_note"] = note
+        rec["machine"] = "local"
+        rec["contree"] = {"fallback": note}
+
+
+def _contree_pytest_once(side: str, targets: list[str], test_timeout: int, run_timeout: int,
+                         workers: str, jx: Path, lg: Path) -> tuple[int | str, float]:
+    """One Contree disposable pytest; junit+log written locally from the remote shell output."""
+    from poc import contree_sandboxes
+    sess = contree_sandboxes.session()
+    assert sess is not None
+    tg = " ".join(shlex.quote(t) for t in targets)
+    nflag = f"-n {shlex.quote(workers)} " if workers != "0" else ""
+    shell = (
+        "set +e\ncd /work/src\n"
+        f"python -m pytest {tg} -p no:cacheprovider -q -rfE --timeout={int(test_timeout)} "
+        f"-o addopts= -o junit_family=xunit2 --junitxml=/tmp/poc-junit.xml {nflag}"
+        ">/tmp/poc-pytest.log 2>&1\n"
+        "ec=$?\n"
+        "if grep -q 'different tests were collected' /tmp/poc-pytest.log 2>/dev/null && "
+        f"[ {shlex.quote(workers)} != 0 ]; then\n"
+        f"  python -m pytest {tg} -p no:cacheprovider -q -rfE --timeout={int(test_timeout)} "
+        "-o addopts= -o junit_family=xunit2 --junitxml=/tmp/poc-junit.xml "
+        ">/tmp/poc-pytest.log 2>&1\n  ec=$?\nfi\n"
+        "printf '___POC_EXIT___%s\\n' \"$ec\"\n"
+        "printf '___POC_JUNIT___\\n'\ncat /tmp/poc-junit.xml 2>/dev/null\n"
+        "printf '___POC_LOG___\\n'\ncat /tmp/poc-pytest.log 2>/dev/null\n"
+    )
+    t0 = time.time()
+    raw = sess.run_op(side, shell, disposable=True, timeout=run_timeout)
+    secs = round(time.time() - t0, 1)
+    out = (raw.get("stdout") or "") + "\n" + (raw.get("stderr") or "")
+    exit_m = re.search(r"___POC_EXIT___(\S+)", out)
+    junit = out.split("___POC_JUNIT___\n", 1)[-1].split("___POC_LOG___\n", 1)[0] if "___POC_JUNIT___" in out else ""
+    log = out.split("___POC_LOG___\n", 1)[-1] if "___POC_LOG___" in out else out
+    lg.write_text(f"$ contree pytest ({side})\n{log}")
+    jx.unlink(missing_ok=True)
+    if junit.strip().startswith("<?xml") or "<testsuite" in junit:
+        jx.write_text(junit.strip())
+    if exit_m is None:
+        rc: int | str = raw.get("exit_code") if raw.get("exit_code") is not None else "error"
+    else:
+        try:
+            rc = int(exit_m.group(1))
+        except ValueError:
+            rc = "timeout" if exit_m.group(1) == "timeout" else exit_m.group(1)
+    return rc, secs
+
+
 def run_tests(side_venvs: dict, targets_by_side: dict, rdir: Path, workdir: Path, runs: int, workers: str,
               test_timeout: int, run_timeout: int, cwds: dict | None = None) -> tuple[list[dict], dict]:
     """targets are relative to site-packages (nightly routes) or to the side's checkout (cwds given).
-    per_run entries use the shared schema shape (side old/new, all counts present)."""
-    envs = {side: base_env(side_home(v)) for side, v in side_venvs.items()}
+    per_run entries use the shared schema shape (side old/new, all counts present).
+    When a Contree session with main/PR checkpoints is active, pytest runs remotely (source-pair)."""
+    use_contree = _contree_ready() and cwds is not None
+    envs = ({side: base_env(side_home(v)) for side, v in side_venvs.items()} if not use_contree else {})
     per_run, results = [], {"main": [], "pr": []}
     for i in range(1, runs + 1):
         for side in ("main", "pr"):
             venv = side_venvs[side]
-            base = cwds[side] if cwds else site_packages(venv)
-            tg = [str(base / t) for t in targets_by_side[side]]
+            tg_rel = list(targets_by_side[side])
+            if use_contree:
+                tg = tg_rel  # paths relative to /work/src
+            else:
+                base = cwds[side] if cwds else site_packages(venv)
+                tg = [str(base / t) for t in tg_rel]
             jx = rdir / f"junit-{side}-{i}.xml"; lg = rdir / f"pytest-{side}-{i}.log"
             jin = side_out(venv) / jx.name   # written inside the side's sandbox, then moved to the run folder
             entry = {"side": SIDE_KEY[side], "run": i, "passed": 0, "failed": 0, "error": 0, "skipped": 0,
@@ -1191,21 +1272,24 @@ def run_tests(side_venvs: dict, targets_by_side: dict, rdir: Path, workdir: Path
             if not tg:
                 results[side].append({}); per_run.append(entry | {"exit": "no-targets", "seconds": 0,
                                                                    "pytest_summary": "", "junit": False}); continue
-            cmd = [venv / "bin/python", "-m", "pytest", *tg, "-p", "no:cacheprovider", "-q", "-rfE",
-                   f"--timeout={test_timeout}", "-o", "addopts=", "-o", "junit_family=xunit2", f"--junitxml={jin}"]
-            if workers != "0":
-                cmd += ["-n", workers]
-            rc, secs = run(cmd, lg, cwd=(cwds[side] if cwds else side_cwd(venv)), env=envs[side],
-                           timeout=run_timeout, sbx=side_sandbox(venv))
-            if workers != "0" and XDIST_MISMATCH in lg.read_text(errors="replace"):
-                # pytest-xdist refuses suites whose test ids differ between worker processes; rerun serially
-                jin.unlink(missing_ok=True)
-                rc, s2 = run(cmd[:-2], lg, cwd=(cwds[side] if cwds else side_cwd(venv)), env=envs[side],
-                             timeout=run_timeout, sbx=side_sandbox(venv))
-                secs += s2
-            jx.unlink(missing_ok=True)
-            if jin.exists():
-                shutil.move(jin, jx)
+            if use_contree:
+                rc, secs = _contree_pytest_once(side, tg, test_timeout, run_timeout, workers, jx, lg)
+            else:
+                cmd = [venv / "bin/python", "-m", "pytest", *tg, "-p", "no:cacheprovider", "-q", "-rfE",
+                       f"--timeout={test_timeout}", "-o", "addopts=", "-o", "junit_family=xunit2", f"--junitxml={jin}"]
+                if workers != "0":
+                    cmd += ["-n", workers]
+                rc, secs = run(cmd, lg, cwd=(cwds[side] if cwds else side_cwd(venv)), env=envs[side],
+                               timeout=run_timeout, sbx=side_sandbox(venv))
+                if workers != "0" and XDIST_MISMATCH in lg.read_text(errors="replace"):
+                    # pytest-xdist refuses suites whose test ids differ between worker processes; rerun serially
+                    jin.unlink(missing_ok=True)
+                    rc, s2 = run(cmd[:-2], lg, cwd=(cwds[side] if cwds else side_cwd(venv)), env=envs[side],
+                                 timeout=run_timeout, sbx=side_sandbox(venv))
+                    secs += s2
+                jx.unlink(missing_ok=True)
+                if jin.exists():
+                    shutil.move(jin, jx)
             parsed = parse_junit(jx)
             results[side].append(parsed)
             for o, _ in parsed.values():
@@ -1815,6 +1899,26 @@ def probe_launcher(venv: Path, path: Path):
     return launch
 
 
+def _contree_probe_once(side: str, path: Path, timeout: int) -> tuple[dict, str, float]:
+    """Run one probe file on a Contree checkpoint (upload probe, disposable run)."""
+    from poc import contree_sandboxes
+    sess = contree_sandboxes.session()
+    assert sess is not None
+    remote = f"/work/probes/{path.name}"
+    t0 = time.time()
+    raw = sess.run_op(
+        side,
+        f"set -euo pipefail\ncd /work/src 2>/dev/null || cd /work\npython {shlex.quote(remote)}",
+        disposable=True, timeout=timeout, files={remote: path})
+    secs = round(time.time() - t0, 1)
+    out, err = raw.get("stdout") or "", raw.get("stderr") or ""
+    code = raw.get("exit_code")
+    if code is None:
+        code = "error"
+    log = out[-4000:] + ("\n--- stderr ---\n" + err[-4000:] if err else "")
+    return probes.observations_of(out, code), log, secs
+
+
 def plan_probes(repo: str, item: dict, rec: dict, base_root: Path, pr_roots: list, prdir: Path, a) -> list[dict]:
     """Write and FREEZE every probe of this PR before any PR-side execution (poc/freeze.py). Inputs: the PR title and
     description and base-side code only (base_root). Returns [{path, source, freeze}]; notes go to rec["probe_plan"].
@@ -1884,14 +1988,19 @@ def run_probes(repo: str, pr: int, pythons: dict, prdir: Path, work: Path, a, pl
     venvs = {side: Path(py).parent.parent for side, py in pythons.items()}   # <venv>/bin/python
     envs = {side: base_env(side_home(v)) for side, v in venvs.items()}
     cwds = {side: side_cwd(v) for side, v in venvs.items()}
+    use_contree = _contree_ready()
     for x in plan:
         path, fz = Path(x["path"]), x["freeze"]
         def guard(p, fz=fz):
             freeze.verify(p, fz, pr_started)
         try:
             guard(path)
-            it = probes.run_probe(path, pythons, prdir, cwds, envs, runs=a.runs, source=x["source"],
-                                  launchers={side: probe_launcher(v, path) for side, v in venvs.items()}, guard=guard)
+            if use_contree:
+                it = _contree_run_probe(path, prdir, a.runs, x["source"], guard)
+            else:
+                it = probes.run_probe(path, pythons, prdir, cwds, envs, runs=a.runs, source=x["source"],
+                                      launchers={side: probe_launcher(v, path) for side, v in venvs.items()},
+                                      guard=guard)
             it["path"] = repo_relative(path) if x["source"] == "library" else str(path.relative_to(prdir))
             it["generator"] = fz["generator"]
             it["freeze"] = fz | {"verified": True, "pr_started_at": pr_started}
@@ -1906,6 +2015,27 @@ def run_probes(repo: str, pr: int, pythons: dict, prdir: Path, work: Path, a, pl
     if refused:
         out["refused"] = refused
     return out
+
+
+def _contree_run_probe(path: Path, outdir: Path, runs: int, source: str, guard) -> dict:
+    """Contree dual-run of one frozen probe (same alternating schedule as probes.run_probe)."""
+    spec = probes.read_spec(path)
+    got: dict = {"main": [], "pr": []}
+    files: dict = {"main": [], "pr": []}
+    per_run = []
+    timeout = int(spec.get("timeout_s", 120))
+    for i in range(1, runs + 1):
+        for side in ("main", "pr"):
+            if side == "pr" and guard:
+                guard(path)
+            obs, log, secs = _contree_probe_once(side, path, timeout)
+            fname = f"probe-{spec['id']}-{side}-{i}.jsonl"
+            probes.write_output(outdir / fname, obs)
+            (outdir / f"probe-{spec['id']}-{side}-{i}.log").write_text(log)
+            got[side].append(obs)
+            files[side].append(fname)
+            per_run.append({"side": side, "run": i, "seconds": secs, "ok": probes.PROBE_ERROR not in obs})
+    return probes.entry(spec, got, files, per_run, source, path)
 
 
 def _provenance(path: Path) -> str | None:
@@ -2061,6 +2191,7 @@ def new_record(repo: str, cfg: dict, item: dict, a, machine: dict, run_date: str
                               "note": getattr(a, "model_note", None) or "model provider: none: the AI was off; fixed probes only",
                               "blind": bool(getattr(getattr(a, "provider", None), "blind", False))},
            "sandbox_backend": getattr(a, "sandbox_backend", None) or "local",
+           "sandbox_backend_note": getattr(a, "sandbox_backend_note", None),
            "machine": ("contree" if getattr(a, "sandbox_backend", None) == "contree" else "local"),
            "posted_upstream": False, "logs": f"{cfg['pkg']}-{item['pr']}/", "freeze": {}}
     sha = getattr(a, "poc_commit", None)
@@ -2260,8 +2391,10 @@ def sandbox_refusal() -> str | None:
 
 
 def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, machine: dict) -> dict:
+    from poc import run_progress
     t0 = time.time()
     begin_pr(a)
+    run_progress.emit("fetch_pr", detail=f"{repo}#{item['pr']}")
     tag = f"{cfg['pkg']}-{item['pr']}"
     prdir = rdir / tag; prdir.mkdir(parents=True, exist_ok=True)
     work = workroot / tag
@@ -2276,6 +2409,7 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
         return finish(test_source_pair(repo, cfg, item, prdir, work, a, rec), prdir, work, t0, a)
     cnv, ex = None, None
     vm, vp = work / "venv-main", work / "venv-pr"
+    run_progress.emit("install_main", detail="installing main (nightly) side")
     main = build_main_env(cfg, vm, prdir / "setup-main.log", a.python, a.build_timeout, workroot / "wheels" / rdir.name)
     rec["main_side"] = {"source": "scientific-python nightly wheel (exact file, pinned by sha256)",
                         **{k: v for k, v in main.items() if k not in ("ok",)}}
@@ -2291,6 +2425,7 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
         if item["files"]["compiled"]:
             rec["route"] = "source-build"
             extra = [f"{cfg['dist']}[{','.join(main['test_extras'])}]"] if main.get("test_extras") else []
+            run_progress.emit("install_pr", detail="building PR from source")
             b = source_build(repo, item, cfg, vp, work, prdir / "build-pr.log", a.python, a.build_timeout, tuple(extra))
             rec["pr_side"] = {"source": f"source build of {item['head_sha'][:12]}",
                               **{k: v for k, v in b.items() if k != "ok"}}
@@ -2300,6 +2435,7 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
                 cnv = b["why"] + " (build log: build-pr.log)"
         else:
             rec["route"] = "nightly+patch"
+            run_progress.emit("install_pr", detail="patching PR onto nightly")
             shutil.copytree(vm, vp, symlinks=True)
             ok, why = apply_patch(package_diff(item["diff"], cfg["pkg"]), site_packages(vp), prdir / "patch.log")
             rec["pr_side"] = {"source": "copy of main side + PR diff applied to the installed package", "patched": ok}
@@ -2323,6 +2459,7 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
         if not targets["pr"]:
             cnv = "no tests could be mapped to the touched modules"
         else:
+            run_progress.emit("pytest", "code", "dual-run pytest on main and PR")
             cmp, cnv, ex = execute_tests(rec, {"main": vm, "pr": vp}, targets, prdir, work, a)
             if cmp:
                 rec["coverage"] = coverage_run(item, vp, site_packages(vm), site_packages(vp), targets["pr"], prdir,
@@ -2335,6 +2472,7 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
     if main.get("test_extras") and not rec.get("test_extras"):
         rec["test_extras"] = list(main["test_extras"])
     if envs_ok:
+        run_progress.emit("probes", "super", "running behaviour probes")
         rec["probes"] = run_probes(repo, item["pr"], {"main": vm / "bin/python", "pr": vp / "bin/python"}, prdir, work,
                                    a, plan, pr_started)
         rec["probe_changed_line_coverage"] = probe_coverage(item, rec["probes"], vm, site_packages(vm), site_packages(vp),
@@ -2342,6 +2480,7 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
         settle_probes(rec)
         if change_is_docstring_only(rec.get("files"), site_packages(vm), site_packages(vp)):
             rec["docstring_only"] = True
+    run_progress.emit("verdict", "code", "computing code verdict")
     _store_verdict(rec, cmp, cnv, ex)
     return finish(gate(rec), prdir, work, t0, a)
 
@@ -2349,12 +2488,15 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
 def finish(rec: dict, prdir: Path, work: Path, t0: float, runner=None) -> dict:
     # Agent swarm (judge/helper/summary) after the code verdict; advisory only — never changes rec["verdict"].
     # Skip when model_skipped is set (--no-probes / baseline without claim probes) so the stamp stays honest.
+    from poc import contree_sandboxes, run_progress
+    contree_sandboxes.clear_session()
     if (runner is not None and getattr(runner, "provider", None) is not None
             and not getattr(runner, "model_skipped", None)):
         agents.run_swarm(runner.provider, rec)
     elif runner is not None and getattr(runner, "model_skipped", None) and "agents" not in rec:
         rec["agents"] = {"status": "skipped", "note": runner.model_skipped, "roles": []}
         rec.setdefault("explanation", {"status": "not yet wired", "why": runner.model_skipped})
+    run_progress.emit("report", detail="writing record")
     if runner is not None:
         stamp_model_use(rec, runner)
     rec["what_changed"] = {"package_python_files": rec["files"]["package_py"], "compiled_files": rec["files"]["compiled"],
@@ -2399,9 +2541,11 @@ def check_record(rec: dict) -> list[str]:
 
 
 def test_source_pair(repo: str, cfg: dict, item: dict, prdir: Path, work: Path, a, rec: dict) -> dict:
+    from poc import run_progress
     rec["route"] = "source-pair"
     if item.get("chosen"):
         rec["chosen"] = {k: v for k, v in item["chosen"].items()}
+    run_progress.emit("fetch_pr", detail="checking out main / PR sides")
     sp = source_pair(repo, item, work, prdir / "git.log", a.python, a.build_timeout)
     rec["sides"] = {k: v for k, v in sp.items() if k != "ok"}
     if sp.get("merge_commit"):
@@ -2423,9 +2567,11 @@ def test_source_pair(repo: str, cfg: dict, item: dict, prdir: Path, work: Path, 
     else:
         vm, vp = work / "venv-main", work / "venv-pr"
         cm, cp = work / "side-main", work / "side-pr"
+        run_progress.emit("install_main", detail="installing main side")
         ok, why = install_side(vm, cm, item.get("chosen"), prdir / "setup-main.log", a.python, a.build_timeout, None)
         plan, pr_started = [], None
         if ok:
+            run_progress.emit("claims", "super", "planning behaviour claims / probes")
             plan = plan_probes(repo, item, rec, cm, [cp, work / "src"], prdir, a)
             rec["python"] = venv_python_version(vm) or rec["python"]
             frz = in_side(vm, ["uv", "pip", "freeze", "-p", vm / "bin/python"], install=True).stdout
@@ -2437,6 +2583,7 @@ def test_source_pair(repo: str, cfg: dict, item: dict, prdir: Path, work: Path, 
             proj, _extra = side_install_args(item.get("chosen"), cm)
             rec["test_extras"] = recorded_test_extras(cm, with_test_extras(proj, cm))
             rec["pr_side_started_at"] = pr_started = freeze.now()   # nothing below may create or change a probe
+            run_progress.emit("install_pr", detail="installing PR side")
             ok, why = install_side(vp, cp, item.get("chosen"), prdir / "setup-pr.log", a.python, a.build_timeout, cons)
             if ok:
                 rec["freeze"]["pr"] = freeze_env(vp, prdir / "freeze-pr.txt")
@@ -2471,21 +2618,28 @@ def test_source_pair(repo: str, cfg: dict, item: dict, prdir: Path, work: Path, 
                     rec["freeze"]["pr"] = freeze_env(vp, prdir / "freeze-pr.txt")
                 else:
                     rec["optional_install_error"] = why2
+            # Contree checkpoints before dual-runs (probes + pytest); local venvs stay for mapping/coverage.
+            if not cnv:
+                _maybe_prepare_contree(a, repo, sp["main_sha"], sp["pr_sha"], rec, a.build_timeout)
             if cnv:
                 pass
             elif not targets["pr"]:
                 cnv = "no tests could be mapped to the touched files"
             else:
+                run_progress.emit("pytest", "code", "dual-run pytest on main and PR")
                 cmp, cnv, ex = execute_tests(rec, {"main": vm, "pr": vp}, targets, prdir, work, a,
                                              cwds={"main": cm, "pr": cp})
                 if cmp:
+                    # Coverage stays on the local sides (Contree disposable runs do not keep coverage data).
                     rec["coverage"] = coverage_run(item, vp, cm, cp, targets["pr"], prdir, work, a, cwd=cp)
+            run_progress.emit("probes", "super", "running behaviour probes")
             rec["probes"] = run_probes(repo, item["pr"], {"main": vm / "bin/python", "pr": vp / "bin/python"}, prdir,
                                        work, a, plan, pr_started)
             rec["probe_changed_line_coverage"] = probe_coverage(item, rec["probes"], vm, cm, cp, prdir, a)
             settle_probes(rec)
             if change_is_docstring_only(rec.get("files"), cm, cp):
                 rec["docstring_only"] = True
+    run_progress.emit("verdict", "code", "computing code verdict")
     _store_verdict(rec, cmp, cnv, ex)
     return gate(rec)
 
@@ -3023,7 +3177,10 @@ def main(argv=None) -> int:
     ap.add_argument("--summary-model", default=model_provider.DEFAULT_MODELS["summary"],
                     help="model id for plain-language report summary (Super)")
     ap.add_argument("--sandbox-backend", choices=("local", "contree"), default="local",
-                    help="where PR code runs: local bubblewrap (default) or Contree Token Factory Sandboxes")
+                    help="where probe/pytest dual-runs execute for source-pair PRs: local bubblewrap (default) or "
+                         "Nebius Token Factory Sandboxes (needs NEBIUS_API_KEY, NEBIUS_PROJECT_ID, and "
+                         "pip install -e '.[contree]'; falls back to local with a note if those are missing; "
+                         "set POC_REQUIRE_CONTREE=1 to refuse instead)")
     ap.add_argument("--recorded-dir", default=None,
                     help="recorded model responses (default: evals/fixtures/model_responses)")
     ap.add_argument("--no-coverage", action="store_true",
@@ -3071,7 +3228,13 @@ def main(argv=None) -> int:
     a.poc_commit = sync_to_origin_main(REPO_ROOT)
     sandbox.configure(not a.unsafe_no_sandbox)
     from poc import contree_sandboxes
-    a.sandbox_backend, a.sandbox_backend_note = contree_sandboxes.select(a.sandbox_backend)
+    try:
+        a.sandbox_backend, a.sandbox_backend_note = contree_sandboxes.select(a.sandbox_backend)
+    except contree_sandboxes.ContreeError as e:
+        print(str(e), file=sys.stderr)
+        raise SystemExit(1)
+    if a.sandbox_backend_note and a.sandbox_backend == "local" and "contree requested" in a.sandbox_backend_note:
+        print(f"note: {a.sandbox_backend_note}", file=sys.stderr)
     a.provider, a.model_note = model_provider.select(
         a.model_provider,
         models=agents.models_for_args(a.claims_model, a.probe_model, a.judge_model, a.helper_model, a.summary_model),

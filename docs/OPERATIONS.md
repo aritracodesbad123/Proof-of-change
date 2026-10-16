@@ -143,9 +143,113 @@ module"; it does not prove the test reaches the changed C lines, and a test with
 A PR mixing Python and compiled changes gets both rules. Lines run only by import (module-level code) count as
 covered. The coverage run adds roughly one more test run per PR (about 15-60 s on day-1 PRs).
 
+## Operator console (browse + start checks)
+
+React UI (`console/web`, NVIDIA green/dark) talks to a stdlib JSON API (`poc/console_api.py`). Live jobs expose stage + agent swarm progress via `POC_PROGRESS_PATH` JSONL (`poc/run_progress.py`).
+
+| Endpoint | Purpose |
+|---|---|
+| `GET /api/health` | liveness |
+| `GET /api/runs` | recent `ops/runs/**/record.json` summaries |
+| `GET /api/runs/<id>` | full record + folder |
+| `POST /api/checks` | `{ "pr_url", "model_provider?" }` → background `daily_run --pr` |
+| `GET /api/jobs/<id>` | status, `stages[]`, `current_stage` / `current_agent`, `swarm` map, log tail |
+
+```bash
+make console-api    # :8787
+make console-web    # :5173 (Vite proxies /api → :8787)
+# or: make console-build && make console-api  → open :8787
+```
+
+Jobs run in a daemon thread. Poll `/api/jobs/<id>` while `daily_run` writes progress events (install → pytest → Ultra/Lightning/Super → done).
+
+### Free public URL (recommended — no Nebius Compute bill)
+
+Builder **Token Factory** credits pay for Nemotron calls, not for hosting. Skip Nebius Serverless AI Endpoint if you want $0 hosting.
+
+**Option A — Render (free tier, easiest)**
+
+1. Push this repo to GitHub.
+2. [Render](https://dashboard.render.com) → **New** → **Blueprint** → select the repo (`render.yaml`).
+3. Set secret env **`NEBIUS_API_KEY`** (Token Factory). Optional: `NEBIUS_PROJECT_ID`, `POC_DEMO_REPOS`.
+4. Deploy → open `https://<service>.onrender.com` (same console UI). Free instances sleep when idle.
+
+**Option B — local + share link (truly free)**
+
+```bash
+make console-build && make console-api   # :8787
+# other terminal: cloudflared tunnel --url http://127.0.0.1:8787
+# or: npx localtunnel --port 8787
+```
+
+Do **not** rewrite to Streamlit — you’d lose the swarm theater and still need a Python backend for `daily_run`.
+
+### Nebius host (paid Compute — only if you have AI Cloud credits)
+
+Token Factory (`NEBIUS_API_KEY`) is for models only. A Nebius **navigable website** needs a **Serverless AI Endpoint** (Compute billing) ([docs](https://docs.nebius.com/serverless/endpoints/manage)).
+
+1. Prerequisites: Docker, [Nebius CLI](https://docs.nebius.com/cli/) logged in, `jq`, a VPC **subnet id**, an image host you can push to.
+2. Build and push the image:
+
+```bash
+export IMAGE=docker.io/<you>/poc-console:latest   # or any image host Nebius can pull
+make docker-console IMAGE="$IMAGE"
+```
+
+3. Create the Endpoint (`--auth none` so a browser can open it without a Bearer header):
+
+```bash
+export SUBNET_ID=…                    # Nebius VPC subnet
+export NEBIUS_API_KEY=…               # Token Factory — swarm + probes inside the container
+# optional: NEBIUS_PROJECT_ID, POC_DEMO_REPOS
+make nebius-console IMAGE="$IMAGE" SUBNET_ID="$SUBNET_ID"
+```
+
+4. The script prints a managed **`https://…`** URL (also under Serverless AI → Endpoints → Public endpoints). Open it — same SPA as local: paste a PR, watch Ultra / Lightning / Super.
+5. Health: `curl -sS "$URL/api/health"`.
+
+Local-only (no Nebius URL): `make console-host` on `0.0.0.0:8787`.
+
+Progress files live under `ops/runs/_jobs/<job_id>.jsonl` inside the container (ephemeral unless you mount a volume).
+
+## GitHub App (demo/mirror repos only)
+
+Optional path so Proof-of-Change can answer on GitHub itself — **only** for repos listed in `POC_DEMO_REPOS`
+(G-ext). Upstream libraries stay read-only.
+
+| Env | Purpose |
+|---|---|
+| `POC_DEMO_REPOS` | Comma-separated `owner/repo` allowlist (required to post) |
+| `GITHUB_WEBHOOK_SECRET` | HMAC for `POST /webhook` |
+| `GITHUB_APP_INSTALLATION_TOKEN` | Pre-minted installation token (simplest for demos) |
+| `GITHUB_APP_ID`, `GITHUB_APP_PRIVATE_KEY`, `GITHUB_APP_INSTALLATION_ID` | Mint a token via JWT (`pip install -e '.[github]'`) |
+| `POC_REPORT_BASE_URL` | Optional public base for behavior-map links in comments/checks |
+
+```bash
+export POC_DEMO_REPOS="your-org/your-demo-repo"
+export GITHUB_WEBHOOK_SECRET="…"
+export GITHUB_APP_INSTALLATION_TOKEN="…"
+.venv/bin/python -m poc.github_app --host 0.0.0.0 --port 8080
+```
+
+- `GET /health` — liveness JSON.
+- `POST /webhook` — verifies signature, `handle_event`, then `apply` (runs `daily_run --pr`, writes
+  `reports/hosted/<id>.html`, posts check run + comment when a token is present).
+- Check-run conclusion is never `failure`. Without a token, `apply(..., dry_run=True)` writes HTML only.
+- MVP runs the PR check inline after acknowledging the webhook (long runs may hit GitHub's delivery timeout; queue later if needed).
+
+## Sandbox backends (`--sandbox-backend`)
+
+| Backend | When | What runs remotely |
+|---|---|---|
+| `local` (default) | always available | nothing — bubblewrap on the operator machine (`guardrails/sandbox.py`) |
+| `contree` | `NEBIUS_API_KEY` + `NEBIUS_PROJECT_ID` set, and `pip install -e '.[contree]'` (`contree-sdk==0.3.6`) | source-pair **probe** and **pytest** dual-runs on Nebius Token Factory Sandboxes |
+
+Contree flow (`poc/contree_sandboxes.py`): OCI `python:3.12-slim-bookworm` → main checkpoint at the base SHA (`disposable=False`) → fork PR checkpoint at the head SHA → disposable dual-runs (semaphore ≤40 via `CONTREE_MAX_OPS`). Record fields: `machine`, `sandbox_backend`, `sandbox_backend_note`, `contree.{main_uuid,pr_uuid}`. Missing credentials or SDK → **explicit** fallback to local (never silent). `POC_REQUIRE_CONTREE=1` refuses instead. Keys stay in the orchestrator process; they are not passed into Contree shell env. Optional live smoke: `POC_CONTREE_SMOKE=1` python -c 'from poc.contree_sandboxes import smoke; print(smoke())'. Nightly/source-build routes stay on local bubblewrap.
+
 ## Sandbox (`guardrails/sandbox.py`)
 
-Untrusted code never runs directly on the machine. Every install and build (PR build code such as `setup.py` or meson
+Untrusted code never runs directly on the machine (unless Contree owns the dual-run — see above). Every install and build (PR build code such as `setup.py` or meson
 runs here), pytest run, coverage run, probe, `uv pip freeze`, `patch` and every start of a venv Python runs inside a
 **bubblewrap** sandbox (`bwrap`, unprivileged user namespaces, no root daemon). Each side (main, PR) has its own:
 
@@ -388,7 +492,7 @@ JUnit files with the current comparison rules; the previous verdict is kept unde
 may be nested, e.g. `<date>/<name>`; `run_date` is the folder's calendar date), `--ops-dir`, `--work-dir`, `--report-dir`, `--no-report`,
 `--baseline tests|tests+diff|tests+probes|full` (what decides the verdict, default `full`; see "Baselines"),
 `--model-provider nebius|recorded|none` (default `nebius`; a missing or empty `NEBIUS_API_KEY` stops the run before it starts, including a benchmark or an eval that uses this default. `--model-provider none` runs with the AI off. The full baseline still refuses to test when no model is available, see docs/decisions/2026-10-14-require-model-for-ai-gate.md), `--claims-model ID`, `--probe-model ID`, `--recorded-dir DIR`,
-`--unsafe-no-sandbox` (run PR code without the sandbox; never used by the daily run), `--no-coverage` (skip the coverage run; the gate then says "not measured"), `--no-probes` (do not run probe files;
+`--unsafe-no-sandbox` (run PR code without the sandbox; never used by the daily run), `--sandbox-backend local|contree` (default `local`; Contree needs `NEBIUS_API_KEY`, `NEBIUS_PROJECT_ID`, and `.[contree]`), `--no-coverage` (skip the coverage run; the gate then says "not measured"), `--no-probes` (do not run probe files;
 the record says `"probes": {"status": "none"}`).
 
 A full daily run takes about 15-20 minutes (day 1: 15 PRs in 16.4 min wall time, before the coverage run existed).

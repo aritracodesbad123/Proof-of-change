@@ -1,41 +1,74 @@
-"""Contree Token Factory Sandboxes backend (REQUIREMENTS §4 steps 2/3/6).
+"""Nebius Token Factory Sandboxes (Contree) for probe and pytest dual-runs.
 
---sandbox-backend local   bubblewrap via guardrails/sandbox.py (default)
---sandbox-backend contree Contree SDK when CONTREE_API_KEY is set; otherwise falls back to local
+--sandbox-backend local    bubblewrap via guardrails/sandbox.py (default)
+--sandbox-backend contree  Contree when NEBIUS_API_KEY + NEBIUS_PROJECT_ID are set and contree-sdk is installed
 
-Secrets never enter the sandbox env (reuse guardrails/isolation.py). Concurrent Contree ops
-are capped at CONTREE_MAX_OPS (default 40, under the 50-op beta limit).
+Secrets never enter Contree shell env. Concurrent ops are capped at CONTREE_MAX_OPS (default 40).
 """
 from __future__ import annotations
 
 import os
+import shlex
 import threading
 from pathlib import Path
+from typing import Any, Callable
 
-KEY_ENV = "CONTREE_API_KEY"
+KEY_ENV = "NEBIUS_API_KEY"
+PROJECT_ENV = "NEBIUS_PROJECT_ID"
+REQUIRE_ENV = "POC_REQUIRE_CONTREE"
 MAX_OPS = int(os.environ.get("CONTREE_MAX_OPS", "40"))
 BACKENDS = ("local", "contree")
+BASE_IMAGE = os.environ.get("POC_CONTREE_BASE_IMAGE", "docker.io/library/python:3.12-slim-bookworm")
+SDK_VERSION = "0.3.6"
 
 _sem = threading.Semaphore(MAX_OPS)
-_state = {"backend": "local", "note": "local bubblewrap"}
+_state: dict[str, Any] = {"backend": "local", "note": "local bubblewrap", "session": None}
+
+
+class ContreeError(RuntimeError):
+    """Contree failed; message must never contain API keys."""
 
 
 def select(name: str, env: dict | None = None) -> tuple[str, str]:
-    """Return (backend, note). contree without a key falls back to local."""
+    """Return (backend, note). contree without credentials/SDK falls back to local unless POC_REQUIRE_CONTREE=1."""
     env = os.environ if env is None else env
     if name == "local":
-        _state.update(backend="local", note="local bubblewrap")
+        _state.update(backend="local", note="local bubblewrap", session=None)
         return "local", _state["note"]
     if name != "contree":
         raise ValueError(f"unknown sandbox backend {name!r}; one of {BACKENDS}")
-    raw = env.get(KEY_ENV)
-    if raw is None or str(raw).strip() == "":
-        note = f"contree requested but {KEY_ENV} missing/empty: using local bubblewrap"
-        _state.update(backend="local", note=note)
+
+    key = env.get(KEY_ENV)
+    project = env.get(PROJECT_ENV)
+    missing = []
+    if key is None or str(key).strip() == "":
+        missing.append(KEY_ENV)
+    if project is None or str(project).strip() == "":
+        missing.append(PROJECT_ENV)
+    if missing:
+        note = f"contree requested but {' and '.join(missing)} missing/empty: using local bubblewrap"
+        if str(env.get(REQUIRE_ENV) or "").strip().lower() in ("1", "true", "yes"):
+            raise ContreeError(
+                f"STOPPED: --sandbox-backend contree requires {' and '.join(missing)}. "
+                "Set them and run again, or pass --sandbox-backend local."
+            )
+        _state.update(backend="local", note=note, session=None)
         return "local", note
-    # ponytail: Contree SDK not installed yet; record intent and keep local execution until SDK lands
-    note = ("contree selected (key present); dual-run still uses local bubblewrap until Contree SDK "
-            "checkpoint/fork is wired — machine field records intent")
+
+    try:
+        import contree_sdk  # noqa: F401
+    except ImportError:
+        note = ("contree requested but contree-sdk is not installed: using local bubblewrap "
+                "(pip install -e '.[contree]')")
+        if str(env.get(REQUIRE_ENV) or "").strip().lower() in ("1", "true", "yes"):
+            raise ContreeError(
+                "STOPPED: contree-sdk is not installed. pip install -e '.[contree]', "
+                "or pass --sandbox-backend local."
+            )
+        _state.update(backend="local", note=note, session=None)
+        return "local", note
+
+    note = f"contree (Token Factory Sandboxes, sdk {SDK_VERSION})"
     _state.update(backend="contree", note=note)
     return "contree", note
 
@@ -48,23 +81,199 @@ def note() -> str:
     return _state["note"]
 
 
-def with_slot(fn):
-    """Run fn under the Contree concurrency semaphore (≤ MAX_OPS)."""
+def with_slot(fn: Callable[[], Any]) -> Any:
     with _sem:
         return fn()
 
 
+def _text(val) -> str:
+    if val is None:
+        return ""
+    if isinstance(val, (bytes, bytearray)):
+        return val.decode("utf-8", "replace")
+    return str(val)
+
+
+class ContreeSession:
+    """One PR's Contree checkpoints (main + PR) and disposable runs."""
+
+    def __init__(self, *, base_image: str = BASE_IMAGE, runner: Callable | None = None):
+        self.base_image = base_image
+        self.main_uuid: str | None = None
+        self.pr_uuid: str | None = None
+        # runner(shell, disposable, image_ref|None, timeout, files) -> {exit_code,stdout,stderr,uuid}
+        self._runner = runner
+        self._client = None
+
+    def describe(self) -> dict:
+        return {"main_uuid": self.main_uuid, "pr_uuid": self.pr_uuid, "max_ops": MAX_OPS,
+                "sdk": SDK_VERSION, "base_image": self.base_image}
+
+    def _client_sync(self):
+        if self._client is not None:
+            return self._client
+        try:
+            from contree_sdk import ContreeSync
+        except ImportError as e:
+            raise ContreeError("contree-sdk is not installed; pip install -e '.[contree]'") from e
+        self._client = ContreeSync()
+        return self._client
+
+    def _run_on(self, image_ref: str | None, shell: str, *, disposable: bool, timeout: int,
+                files: dict | None = None) -> dict:
+        if self._runner is not None:
+            return self._runner(shell, disposable, image_ref, timeout, files)
+
+        client = self._client_sync()
+        try:
+            if image_ref:
+                img = client.images.use(image_ref, strict=True)
+            else:
+                img = client.images.oci(self.base_image)
+            result = img.run(shell=shell, disposable=disposable, timeout=timeout,
+                             files=files or None).wait()
+        except ContreeError:
+            raise
+        except Exception as e:  # noqa: BLE001 — never leak tokens from SDK messages
+            raise ContreeError(f"contree request failed: {type(e).__name__}") from None
+
+        uuid = getattr(result, "uuid", None)
+        return {
+            "exit_code": getattr(result, "exit_code", None),
+            "stdout": _text(getattr(result, "stdout", None)),
+            "stderr": _text(getattr(result, "stderr", None)),
+            "uuid": str(uuid) if uuid is not None else None,
+        }
+
+    def run_op(self, side: str, shell: str, *, disposable: bool = True, timeout: int = 600,
+               files: dict | None = None) -> dict:
+        """Run shell on main or pr checkpoint (or base image if building a checkpoint)."""
+        if side not in ("main", "pr", "base"):
+            raise ContreeError(f"unknown side {side!r}")
+        uuid = None if side == "base" else (self.main_uuid if side == "main" else self.pr_uuid)
+        if disposable and side != "base" and not uuid:
+            raise ContreeError(f"no {side} checkpoint yet; call checkpoint_main / fork_pr first")
+        return with_slot(lambda: self._run_on(uuid, shell, disposable=disposable, timeout=timeout, files=files))
+
+    def checkpoint_main(self, install_shell: str, *, timeout: int = 1800) -> dict:
+        """Build/save main checkpoint from BASE_IMAGE + install_shell (disposable=False)."""
+        shell = f"set -euo pipefail\nmkdir -p /work\ncd /work\n{install_shell}"
+        raw = self.run_op("base", shell, disposable=False, timeout=timeout)
+        if raw.get("exit_code") != 0:
+            raise ContreeError(f"main checkpoint install failed (exit {raw.get('exit_code')})")
+        uuid = raw.get("uuid")
+        if not uuid:
+            raise ContreeError("main checkpoint returned no reusable image id")
+        self.main_uuid = str(uuid)
+        return {"backend": "contree", "kind": "main", "uuid": self.main_uuid, "disposable": False}
+
+    def fork_pr(self, install_shell: str, *, timeout: int = 1800) -> dict:
+        """Fork from main checkpoint, apply PR install, save PR checkpoint."""
+        if not self.main_uuid:
+            raise ContreeError("fork_pr needs checkpoint_main first")
+        shell = f"set -euo pipefail\ncd /work 2>/dev/null || {{ mkdir -p /work && cd /work; }}\n{install_shell}"
+        raw = self.run_op("main", shell, disposable=False, timeout=timeout)
+        if raw.get("exit_code") != 0:
+            raise ContreeError(f"PR checkpoint install failed (exit {raw.get('exit_code')})")
+        uuid = raw.get("uuid")
+        if not uuid:
+            # filesystem may be unchanged; reuse main as starting point only if install was a no-op — refuse
+            raise ContreeError("PR checkpoint returned no reusable image id")
+        self.pr_uuid = str(uuid)
+        return {"backend": "contree", "kind": "pr", "uuid": self.pr_uuid, "from": self.main_uuid,
+                "disposable": False}
+
+    def run_argv(self, side: str, argv: list, *, timeout: int = 600, cwd: str = "/work/src",
+                 files: dict | None = None) -> dict:
+        """Run argv on a side checkpoint; returns exit_code/stdout/stderr like a local subprocess."""
+        cmd = " ".join(shlex.quote(str(a)) for a in argv)
+        shell = f"set -euo pipefail\ncd {shlex.quote(cwd)}\n{cmd}"
+        return self.run_op(side, shell, disposable=True, timeout=timeout, files=files)
+
+
+def new_session(**kw) -> ContreeSession:
+    sess = ContreeSession(**kw)
+    _state["session"] = sess
+    return sess
+
+
+def session() -> ContreeSession | None:
+    return _state.get("session")
+
+
+def clear_session() -> None:
+    _state["session"] = None
+
+
+def install_shell_source(repo: str, sha: str) -> str:
+    """Clone a public GitHub SHA into /work/src and pip-install editable + pytest (source-pair style)."""
+    # slim image needs git; network is available during checkpoint builds
+    return (
+        "export DEBIAN_FRONTEND=noninteractive\n"
+        "(command -v git >/dev/null || (apt-get update -qq && apt-get install -y -qq git >/dev/null))\n"
+        "python -m pip install -q --upgrade pip\n"
+        "rm -rf /work/src\n"
+        "mkdir -p /work/src && cd /work/src\n"
+        "git init -q\n"
+        f"git remote add origin https://github.com/{repo}.git\n"
+        f"git fetch -q --depth 1 origin {sha}\n"
+        "git checkout -q FETCH_HEAD\n"
+        "python -m pip install -q -e '.[dev]' 2>/dev/null "
+        "|| python -m pip install -q -e '.[test]' 2>/dev/null "
+        "|| python -m pip install -q -e '.[tests]' 2>/dev/null "
+        "|| python -m pip install -q -e .\n"
+        "python -m pip install -q pytest pytest-timeout pytest-xdist coverage\n"
+    )
+
+
+def prepare_source_pair(repo: str, main_sha: str, pr_sha: str, *, timeout: int = 1800,
+                        runner: Callable | None = None) -> ContreeSession:
+    """Build main + PR Contree checkpoints for a source-pair style PR."""
+    sess = new_session(runner=runner) if runner is not None else new_session()
+    sess.checkpoint_main(install_shell_source(repo, main_sha), timeout=timeout)
+    sess.fork_pr(install_shell_source(repo, pr_sha), timeout=timeout)
+    return sess
+
+
+def smoke(env: dict | None = None) -> dict:
+    """Live Contree smoke: write a file, save checkpoint, read it back. Needs credentials + SDK."""
+    env = os.environ if env is None else env
+    be, n = select("contree", env)
+    if be != "contree":
+        return {"ok": False, "skipped": True, "note": n}
+    sess = ContreeSession()
+    prep = sess.checkpoint_main("printf 'ready\\n' > /work/status.txt", timeout=120)
+    got = sess.run_op("main", "cat /work/status.txt", disposable=True, timeout=60)
+    ok = got.get("exit_code") == 0 and "ready" in (got.get("stdout") or "")
+    return {"ok": ok, "checkpoint": prep, "read": got, "note": n}
+
+
+# Marker helpers (local filesystem) — used when Contree session is not live
 def checkpoint_main(base_sha: str, work: Path) -> dict:
-    """Build/save the main checkpoint. Contree path is stubbed; local returns a filesystem marker."""
+    sess = session()
+    if sess and backend() == "contree" and sess.main_uuid:
+        return {"backend": "contree", "kind": "main", "sha": base_sha, "uuid": sess.main_uuid, "disposable": False}
     marker = work / f"checkpoint-main-{base_sha[:12]}"
     marker.mkdir(parents=True, exist_ok=True)
-    return {"backend": backend(), "kind": "main", "sha": base_sha, "path": str(marker),
-            "disposable": False}
+    return {"backend": backend(), "kind": "main", "sha": base_sha, "path": str(marker), "disposable": False}
 
 
 def fork_pr(main_cp: dict, head_sha: str, work: Path) -> dict:
-    """Fork main checkpoint for the PR side."""
+    sess = session()
+    if sess and backend() == "contree" and sess.pr_uuid:
+        return {"backend": "contree", "kind": "pr", "sha": head_sha, "uuid": sess.pr_uuid,
+                "from": sess.main_uuid or main_cp.get("uuid"), "disposable": False}
     marker = work / f"checkpoint-pr-{head_sha[:12]}"
     marker.mkdir(parents=True, exist_ok=True)
     return {"backend": backend(), "kind": "pr", "sha": head_sha, "path": str(marker),
-            "from": main_cp.get("path"), "disposable": True}
+            "from": main_cp.get("path") or main_cp.get("uuid"), "disposable": True}
+
+
+if __name__ == "__main__":
+    # ponytail: assert-based self-check for select() fallback (no live Contree)
+    be, n = select("contree", env={})
+    assert be == "local" and KEY_ENV in n and PROJECT_ENV in n, (be, n)
+    be, n = select("contree", env={KEY_ENV: "x", PROJECT_ENV: "y"})
+    # SDK may or may not be installed in the invoking interpreter
+    assert be in ("local", "contree"), be
+    print("contree_sandboxes self-check ok")

@@ -12,8 +12,8 @@ marked **[ASSUMED]** need confirmation; see §14.
 
 Every pull request should come with proof. Proof-of-Change reads what a PR claims, writes small probes for each claim
 and for changed public code, runs them on **main** and on **the PR** side by side in forked Nebius Token Factory
-Sandboxes (**Planned, not yet built**), and gives the reviewer a **verdict** and a **behavior map**
-(**Planned, not yet built**): what is proven, what is false, and what changed
+Sandboxes (Contree optional; local bubblewrap default), and gives the reviewer a **verdict** and a **behavior map**
+(hosted HTML on demo repos via `poc/github_app.write_hosted_report`): what is proven, what is false, and what changed
 that nobody mentioned (spec §1). Tagline: "Don't just read the PR. Run it."
 
 Built for the Nebius x NVIDIA Global AI Hackathon, Coding and Agentic Engineering track (Devpost deadline 30 Oct 2026,
@@ -24,11 +24,12 @@ Built for the Nebius x NVIDIA Global AI Hackathon, Coding and Agentic Engineerin
 In scope (MVP, spec §7.1):
 - Python projects that install with pip (pyproject or requirements file). **Python only.**
 - Any repo in principle. NumPy, pandas and scikit-learn are **test subjects** that prove it works, not the product.
-- Triggers: GitHub App on new or updated PRs, and a `/prove` PR comment (`/prove "claim"` adds a claim). **Planned, not yet built.**
+- Triggers: GitHub App on new or updated PRs, and a `/prove` PR comment (`/prove "claim"` adds a claim). Wired in `poc/github_app.py` for `POC_DEMO_REPOS` only (`python -m poc.github_app`).
 - Claim extraction with source quotes. Probe generation (claim, no-change and extension-point probes). Build main
-  once, fork for the PR, run probes on both sides in parallel in Sandboxes (**Planned, not yet built**). Normalise, rerun on difference, verdict.
+  once, fork for the PR, run probes on both sides (Contree when configured; else local sandbox). Normalise, rerun on difference, verdict.
 - Output: GitHub check run (never failing), one summary comment, a web report with the behavior map, finding detail
-  and raw outputs. GitHub check run, summary comment, behavior map, and a hosted web report: **Planned, not yet built.**
+  and raw outputs. GitHub check run, summary comment, and hosted behavior-map report: wired for `POC_DEMO_REPOS`
+  (`poc/github_app.py`).
   Local HTML reviewer reports, with finding detail, are already generated.
 - Demos: the real psf/requests PR #6655 replay (main), and the constructed `poc-demo-bookstore` (FastAPI + SQLite)
   with 4 planted PRs, **labelled as example data** everywhere it appears.
@@ -44,17 +45,17 @@ private repos and secrets; GitLab/Bitbucket; blocking merges by default; **posti
 
 | # | Step | Powered by | Deterministic? |
 |---|---|---|---|
-| 0 | Trigger: webhook, `/prove` or MCP call creates a run with repo, base SHA, head SHA and PR text | Service on a Nebius Serverless AI endpoint (fallback host: §14). **Planned, not yet built.** | yes |
+| 0 | Trigger: webhook, `/prove` or MCP call creates a run with repo, base SHA, head SHA and PR text | GitHub App webhook + `/prove` (`poc/github_app`, demo repos). MCP / Serverless live host still optional. | yes |
 | 1 | Environment setup script (pyproject, requirements, CI config) | Nemotron 3.5 Lightning (fallback Nemotron 3 Nano 30B). Helper agent proposes short install hints (advisory; `poc/agents.py`). Full auto-setup script: still hand-checked for demos. | model, hand-checked for demos |
-| 2 | Build main at base SHA, keep the image as the "main" checkpoint (`disposable=False`) | Sandboxes (Contree SDK). Backend select + checkpoint markers in `poc/contree_sandboxes.py` (`--sandbox-backend contree`); executor still local bubblewrap until Contree SDK is wired. | yes |
-| 3 | Fork the main checkpoint, apply the PR, save the "PR" checkpoint | Sandboxes branching. Fork marker in `poc/contree_sandboxes.py`; dual-run still local. | yes |
+| 2 | Build main at base SHA, keep the image as the "main" checkpoint (`disposable=False`) | Sandboxes (Contree SDK 0.3.6). `--sandbox-backend contree` with `NEBIUS_API_KEY` + `NEBIUS_PROJECT_ID` builds a real main checkpoint (`poc/contree_sandboxes.prepare_source_pair`); falls back to local bubblewrap with an explicit note if credentials/SDK are missing. | yes |
+| 3 | Fork the main checkpoint, apply the PR, save the "PR" checkpoint | Sandboxes branching. Contree `fork_pr` saves the PR checkpoint from main; source-pair install clones the head SHA into `/work/src`. | yes |
 | 4 | Claim extraction: atomic claims, each with a `source_quote` copied from the PR text; untestable claims marked grey; `unclaimed_surfaces` listed | Nemotron 3 Super 120B, JSON-schema output | model |
 | 5 | Probe generation: claim, no-change, extension-point, edge-input, contract probes | Nemotron 3 Super; the extension-point rule is deterministic | model + rule |
-| 6 | Dual run: every probe on both checkpoints in parallel with a timeout; 3 reruns per side on any difference | Contree semaphore ≤40 (`CONTREE_MAX_OPS`); dual-run still local bubblewrap. Contree remote dual-run: **partial (select + cap), not yet remote.** | yes |
+| 6 | Dual run: every probe on both checkpoints in parallel with a timeout; 3 reruns per side on any difference | Contree semaphore ≤40 (`CONTREE_MAX_OPS`). With Contree backend, probes and mapped pytest run as disposable ops on both checkpoint UUIDs (`ops/daily_run.py`); local bubblewrap otherwise. | yes |
 | 7 | Normalise and diff field by field | **Code** (`poc/diff.py`); Lightning helper may *propose* noise rules / notes (`poc/agents.py`, advisory only). | yes |
 | 8 | Label each finding (proven / false / unmentioned / needs human) with a one-sentence reason | Code labels own the verdict path; Ultra 550B adds **advisory** labels via `poc/agents.py` (stored + shown; does not override score). | model + code |
 | 9 | PR verdict | **Code** (`poc/verdict.py`) | yes |
-| 10 | Report: behavior map, check run, comment, web report | Local HTML reports + Super summary wired (`explanation`); hosted behavior-map HTML (`poc/github_app.write_hosted_report`); GitHub App check/comment surfaces gated by `POC_DEMO_REPOS`. Live App deploy still needs credentials. | mostly |
+| 10 | Report: behavior map, check run, comment, web report | Local HTML + Super summary; hosted behavior-map HTML (`reports/hosted/`); App posts check run + comment on `POC_DEMO_REPOS` when an installation token is set (else dry-run). | mostly |
 
 Model IDs are confirmed at build time with `GET /v1/models` (spec §6.2): `nvidia/nemotron-3-super-120b-a12b`,
 `nvidia/Nemotron-3-Ultra-550b-a55b`, `nvidia/Nemotron-3_5-Lightning`, `nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B`.
@@ -75,7 +76,7 @@ break; the tests that vanish with it are `lost_tests`.
 > package **half-loaded** in `sys.modules`, so later modules import the broken half and produce fake failures and
 > fake passes. With `prepend` every run reproduces the raw result (old 2238 passed; new 0 passed, 525 errors).
 Its result becomes a finding like any other probe. **[ASSUMED]** It runs in the same Sandboxes checkpoints in
-production, and locally or in CI for the eval set until the Sandbox runner exists. Sandboxes checkpoints: **Planned, not yet built.**
+production when Contree is selected; locally or in CI the eval set uses bubblewrap until Contree is configured.
 
 ## 4a. NVIDIA and Nebius stack
 
@@ -92,9 +93,10 @@ The project must run on Nebius Token Factory or Nebius AI Cloud **and** use at l
 | **NVIDIA Nemotron 3 Ultra 550B** (`nvidia/Nemotron-3-Ultra-550b-a55b`) | NVIDIA, served on Token Factory | Advisory labels on findings (proven / false / unmentioned / needs_human) via `poc/agents.py`. Code still owns the PR verdict. | 8 |
 | **NVIDIA Nemotron 3.5 Lightning** (`nvidia/Nemotron-3_5-Lightning`), fallback **Nemotron 3 Nano 30B** (`nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B`) | NVIDIA, served on Token Factory | Helper agent: noise / install notes (advisory). Full auto env-setup script still hand-checked for demos. | 1, 7 |
 | **Nebius Token Factory API** (OpenAI-compatible, structured output) | Nebius | Serves all the Nemotron models above | all model steps |
-| **Nebius Token Factory Sandboxes** (Contree SDK, beta) | Nebius | Backend select + semaphore (`poc/contree_sandboxes.py`). Remote checkpoint/fork dual-run still uses local bubblewrap until Contree SDK is wired. | 2, 3, 6 |
-| **Nebius Serverless AI endpoint** | Nebius | Orchestrator plan entry (`poc/serverless.orchestrate`). Live Nebius deploy still needs cloud wiring. | 0, 9 |
+| **Nebius Token Factory Sandboxes** (Contree SDK 0.3.6, beta) | Nebius | Optional remote dual-run for source-pair PRs (`--sandbox-backend contree`, `NEBIUS_API_KEY` + `NEBIUS_PROJECT_ID`, `pip install -e '.[contree]'`). Checkpoint/fork/probe/pytest via `poc/contree_sandboxes.py`; local bubblewrap is the default and the fallback. | 2, 3, 6 |
+| **Nebius Serverless AI endpoint** | Nebius | `poc/serverless.orchestrate` enqueues the same check as the operator console (`start_check`). Deploy as HTTP handler or pair with long-lived `console_http`. | 0, 9 |
 | **Nebius Serverless AI job** | Nebius | Daily batch entry (`poc/serverless.daily_job` → `ops.daily_run`). Live job schedule still needs cloud wiring. | 10, daily ops |
+| **Operator console (SPA + API)** | Nebius / local | Paste PR URL; live stages + Ultra/Lightning/Super theater; `python -m poc.console_api` or `serverless.console_http`. | 0, 9 |
 
 Model IDs must be confirmed at build time with `GET https://api.tokenfactory.nebius.com/v1/models`. Do not use Nemotron 3 Nano Omni: it was scheduled to leave Token Factory Serverless on 31 Aug 2026.
 
@@ -163,9 +165,9 @@ probe code and the model's reasoning next to the raw outputs.
   The local/CI downstream harness already runs tests without network where it can (`unshare -rn` in the runner).
 - **G-ext (no external posting).** Nothing posts to a real upstream repo, issue tracker, chat or email. The GitHub App
   only writes check runs and comments on **our own demo/mirror repos** (`POC_DEMO_REPOS`; `poc/github_app.may_post`).
-  Surfaces for check runs, `/prove`, and summary comments live in `poc/github_app.py`; live App credentials still need
-  install. CI uses a read-only token, and `guardrails/no_external.py` fails CI on posting/pushing code. The App's write
-  path is a reviewed exception (`# br-allow-external:`) **[ASSUMED]**.
+  Surfaces for check runs, `/prove`, and summary comments live in `poc/github_app.py` (`may_post`, `apply`, webhook
+  server). CI uses a read-only token; `guardrails/no_external.py` fails CI on posting/pushing code except reviewed
+  `# br-allow-external:` lines on the App write path.
 - **G-schema.** Every record (downstream run, probe result, eval result) is schema-validated before it counts.
   **Single source of truth:** the shared JSON Schema `harness/schema/observation.schema.json` (`$id`
   `blast-radius/observation/v1`, sha256 `5a3c3d36…8383e` at rev 1, merged from `feat/shared-schema` @
@@ -266,7 +268,7 @@ runs per side, the coverage gate, and one reviewer report per PR plus a summary.
 |---|---|
 | 1: Wed 30 Sep – Tue 6 Oct | requests #6655 probes run on both commits **inside Sandboxes** from one main checkpoint and one PR fork; a CLI prints the difference. **Status:** only a local (non-Sandbox) probe run from 29 Sep exists. Nebius Token Factory Sandboxes: **Planned, not yet built.** |
 | 2: Wed 7 – Tue 13 Oct (current) | A PR link alone → claims → probes → both sides → correct verdict JSON for requests #6655 and ≥3 of 4 bookstore PRs. |
-| 3: Wed 14 – Tue 20 Oct | GitHub App (webhook, check run, comment, `/prove`) + hosted web report with the behavior map. **Planned, not yet built.** |
+| 3: Wed 14 – Tue 20 Oct | GitHub App (webhook, check run, comment, `/prove`) + hosted web report with the behavior map. **Shipped** in `poc/github_app.py` (demo repos / dry-run without credentials). |
 | 4: Wed 21 – Tue 27 Oct | Demo runs 5 times in a row without manual fixes; eval table filled with real counts; rough video cut. |
 | Final: Wed 28 – Fri 30 Oct | Code freeze Wed 28 end of day; video under 3:00; **submit by 10:30 pm IST Fri 30 Oct**. |
 
@@ -281,12 +283,12 @@ guardrails/              schema, isolation/timeouts, no-external scan
 reports/                 reviewer report generator (HTML/PDF/MD + daily summary), samples
 tests/                   pytest
 ```
-Checked against the code: claim extraction and probe generation run on main (Nemotron 3 Super on the Nebius Token Factory API). Local HTML reviewer reports are generated. Still **Planned, not yet built:** Nebius Token Factory Sandboxes, the GitHub App, a hosted web report with the behavior map, and Tavily.
+Checked against the code: claim extraction and probe generation run on main (Nemotron 3 Super on the Nebius Token Factory API). Advisory agent swarm (Ultra judge / Lightning helper / Super summary) runs after the code verdict via `poc/agents.py`. Operator console (React + API) shows live stages and swarm theater; Nebius host entry is `poc.serverless.console_http` / `orchestrate`. Local HTML reviewer reports and demo-repo hosted behavior maps are generated. Contree sandboxes and the GitHub App are wired (credentials optional; local/dry-run fallback). Still **Planned, not yet built:** managed Nebius schedule for `daily_job`, Contree MCP process hosting, and Tavily-by-default.
 
 ## 14. Open questions
 
 From spec §14:
-1. **Ownership.** Who builds the agent loop, the Sandbox runner, the GitHub App and the web report? GitHub App, Sandbox runner and hosted web report: **Planned, not yet built.** Spec
+1. **Ownership.** Agent swarm (`poc/agents.py`), Contree sandbox runner, GitHub App, and hosted behavior-map report are in-tree. Live Nebius Serverless host and Contree MCP process deploy still need cloud wiring. Spec
    §8.1 says that with 2 people, the MCP server and the timeline are cut first.
 2. **Python only for the MVP?** Spec recommends yes. This draft assumes yes.
 3. **Second demo: a real repo or the constructed bookstore?** Spec recommends the constructed one, clearly labelled.
@@ -294,8 +296,8 @@ From spec §14:
 4. **Tavily for the $3k bonus?** Spec: only if a probe genuinely needs current third-party docs. **Planned, not yet built.**
 5. Hosting: a Serverless AI endpoint, or a free host with Token Factory? Do the credits cover Compute? A Serverless AI endpoint is **Planned, not yet built.**
 6. License: Apache-2.0 or MIT? Resolved: MIT. See `docs/decisions/2026-10-15-mit-licence.md`.
-7. Credit budget for Ultra calls per run. Ultra is **Planned, not yet built.**
-8. Ask Nebius about per-run network isolation, the 50-operation limit and extra credits (the network-cutoff risk, §7). Sandboxes are **Planned, not yet built.**
+7. Credit budget for Ultra calls per run. Ultra advisory path is wired (`poc/agents.py` judge role); live cost caps are an ops question.
+8. Ask Nebius about per-run network isolation, the 50-operation limit and extra credits (the network-cutoff risk, §7). Contree dual-run is wired; confirm network cutoff behavior in production.
 
 Further:
 9. ~~Repo name~~ **Resolved:** Proof-of-change.
