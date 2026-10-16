@@ -30,7 +30,8 @@ def test_start_check_rejects_bad_url():
 def test_console_run_flags_prefers_contree(monkeypatch):
     monkeypatch.setattr(console_api, "contree_usable", lambda: True)
     flags, note = console_api.console_run_flags()
-    assert flags == ["--sandbox-backend", "contree"]
+    assert flags[:2] == ["--sandbox-backend", "contree"]
+    assert "--unsafe-no-sandbox" in flags
     assert note and "Contree" in note
 
 
