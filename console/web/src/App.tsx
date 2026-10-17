@@ -2,6 +2,38 @@ import { useCallback, useEffect, useState } from 'react'
 import { api, type Job, type RunRow, type StageEvent, type SwarmStatus } from './api'
 import './App.css'
 
+const LOCAL_RUNS_KEY = 'poc-console-runs-v1'
+
+type CachedRun = {
+  id: string
+  row: RunRow
+  record: Record<string, unknown>
+  folder: string
+  saved_at: number
+}
+
+function loadLocalRuns(): CachedRun[] {
+  try {
+    const raw = localStorage.getItem(LOCAL_RUNS_KEY)
+    const parsed = raw ? (JSON.parse(raw) as CachedRun[]) : []
+    return Array.isArray(parsed) ? parsed : []
+  } catch {
+    return []
+  }
+}
+
+function saveLocalRun(entry: CachedRun) {
+  const rest = loadLocalRuns().filter((r) => r.id !== entry.id)
+  const next = [entry, ...rest].slice(0, 30)
+  localStorage.setItem(LOCAL_RUNS_KEY, JSON.stringify(next))
+}
+
+function mergeRunLists(apiRuns: RunRow[], local: CachedRun[]): RunRow[] {
+  const seen = new Set(apiRuns.map((r) => r.id))
+  const extra = local.filter((c) => !seen.has(c.id)).map((c) => ({ ...c.row, source: 'browser' }))
+  return [...apiRuns, ...extra]
+}
+
 type View =
   | { name: 'home' }
   | { name: 'run'; id: string }
@@ -71,10 +103,13 @@ export default function App() {
   const refresh = useCallback(async () => {
     try {
       setApiOk((await api.health()).ok)
-      setRuns((await api.runs()).runs)
+      const remote = (await api.runs()).runs
+      setRuns(mergeRunLists(remote, loadLocalRuns()))
       setErr(null)
     } catch (e) {
       setApiOk(false)
+      // Disk may be empty after Render sleep — still show browser-cached runs.
+      setRuns(mergeRunLists([], loadLocalRuns()))
       setErr(e instanceof Error ? e.message : String(e))
     }
   }, [])
@@ -87,8 +122,39 @@ export default function App() {
     if (view.name !== 'run') return
     void api
       .run(view.id)
-      .then(setDetail)
-      .catch((e) => setErr(e instanceof Error ? e.message : String(e)))
+      .then((d) => {
+        setDetail(d)
+        if (d.record && d.record.id) {
+          const pr = d.record.pr as { number?: number; url?: string; title?: string } | undefined
+          saveLocalRun({
+            id: String(d.record.id),
+            row: {
+              id: String(d.record.id),
+              repo: String(d.record.repo || ''),
+              pr: pr?.number,
+              url: pr?.url,
+              title: pr?.title || String(d.record.title || ''),
+              verdict: String(d.record.verdict || ''),
+              reason: String(d.record.reason || '').slice(0, 240),
+              tested_at_ist: String(d.record.tested_at_ist || d.record.date_ist || ''),
+              machine: String(d.record.machine || 'local'),
+              folder: d.folder,
+            },
+            record: d.record,
+            folder: d.folder,
+            saved_at: Date.now(),
+          })
+        }
+      })
+      .catch((e) => {
+        const cached = loadLocalRuns().find((c) => c.id === view.id)
+        if (cached) {
+          setDetail({ record: cached.record, folder: cached.folder, hosted_report: null })
+          setErr(null)
+          return
+        }
+        setErr(e instanceof Error ? e.message : String(e))
+      })
   }, [view])
 
   useEffect(() => {
@@ -99,8 +165,40 @@ export default function App() {
         const j = await api.job(view.id)
         if (stop) return
         setJob(j)
+        if (j.status === 'failed') setLogOpen(true)
         if (j.status === 'done' || j.status === 'failed') {
+          if (j.record && j.run_id) {
+            const pr = j.record.pr as { number?: number; url?: string; title?: string } | undefined
+            saveLocalRun({
+              id: j.run_id,
+              row: {
+                id: j.run_id,
+                repo: String(j.record.repo || j.repo || ''),
+                pr: pr?.number ?? j.pr,
+                url: pr?.url || j.pr_url,
+                title: pr?.title || String(j.record.title || ''),
+                verdict: String(j.record.verdict || ''),
+                reason: String(j.record.reason || '').slice(0, 240),
+                tested_at_ist: String(j.record.tested_at_ist || ''),
+                machine: String(j.record.machine || 'local'),
+                folder: j.folder || '',
+              },
+              record: j.record,
+              folder: j.folder || '',
+              saved_at: Date.now(),
+            })
+          }
           void refresh()
+          if (j.status === 'done' && j.run_id) {
+            setView({ name: 'run', id: j.run_id })
+            if (j.record) {
+              setDetail({
+                record: j.record,
+                folder: j.folder || '',
+                hosted_report: null,
+              })
+            }
+          }
           return
         }
         window.setTimeout(() => void tick(), 1500)
@@ -189,7 +287,10 @@ export default function App() {
               </button>
             </div>
             {runs.length === 0 ? (
-              <p className="empty">No runs yet. Start a check above, or run <code>make check</code>.</p>
+              <p className="empty">
+                No runs yet. Start a check above. Finished analyses are kept in this browser too — Render
+                free disk is wiped when the service sleeps.
+              </p>
             ) : (
               <ul className="run-list">
                 {runs.map((r) => (
@@ -226,8 +327,10 @@ export default function App() {
               (job.status === 'running'
                 ? 'Pipeline running — swarm stands by until the code verdict.'
                 : job.status === 'done'
-                  ? 'Check finished.'
-                  : 'Waiting…')}
+                  ? 'Check finished — opening the analysis…'
+                  : job.status === 'failed'
+                    ? 'Check failed before a full analysis was saved.'
+                    : 'Waiting…')}
           </p>
 
           <SwarmTheater
@@ -237,21 +340,33 @@ export default function App() {
           />
           <StageRunway stages={job.stages || []} current={job.current_stage} />
 
-          {job.error && <p className="banner err">{job.error}</p>}
+          {job.error && (
+            <p className="banner err" role="alert">
+              {job.error}
+            </p>
+          )}
+          {job.warning && !job.error && (
+            <p className="banner warn" role="status">
+              {job.warning}
+            </p>
+          )}
           {job.run_id && (
             <p>
               <button type="button" className="linkish" onClick={() => setView({ name: 'run', id: job.run_id! })}>
-                Open run {job.run_id}
+                Open analysis {job.run_id}
               </button>
             </p>
           )}
           <button type="button" className="ghost log-toggle" onClick={() => setLogOpen((o) => !o)}>
             {logOpen ? 'Hide log' : 'Show log tail'}
           </button>
-          {logOpen && job.log_tail && (
+          {(logOpen || job.status === 'failed') && job.log_tail && (
             <pre className="log" tabIndex={0}>
               {job.log_tail}
             </pre>
+          )}
+          {job.status === 'failed' && !job.log_tail && (
+            <p className="empty">No log captured. Re-run the check; failures now keep stderr in this panel.</p>
           )}
         </main>
       )}

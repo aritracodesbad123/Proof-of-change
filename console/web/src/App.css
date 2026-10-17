@@ -282,12 +282,22 @@ button[type='submit']:disabled {
   color: var(--muted);
 }
 
-.banner.err {
+.banner.err,
+.banner.warn {
   padding: 0.75rem 1rem;
+  border-radius: 4px;
+}
+
+.banner.err {
   background: rgba(232, 93, 93, 0.12);
   border: 1px solid rgba(232, 93, 93, 0.4);
   color: #ffb4b4;
-  border-radius: 4px;
+}
+
+.banner.warn {
+  background: rgba(232, 163, 23, 0.12);
+  border: 1px solid rgba(232, 163, 23, 0.4);
+  color: #f0c36a;
 }
 
 /* Swarm theater */
