@@ -278,6 +278,31 @@ button[type='submit']:disabled {
   font-size: 0.85rem;
 }
 
+.report-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+  margin: 0.75rem 0 1rem;
+}
+
+a.btn-report {
+  display: inline-block;
+  padding: 0.45rem 0.9rem;
+  border-radius: 4px;
+  background: var(--accent, #76b900);
+  color: #0b0f0a;
+  font-weight: 600;
+  text-decoration: none;
+  border: 1px solid transparent;
+}
+
+a.btn-report.ghost {
+  background: transparent;
+  color: var(--text, #e8eee4);
+  border-color: var(--muted, #6a7464);
+}
+
 .empty {
   color: var(--muted);
 }

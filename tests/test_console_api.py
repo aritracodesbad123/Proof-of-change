@@ -19,6 +19,23 @@ def test_list_runs_reads_record(tmp_path, monkeypatch):
     assert rows and rows[0]["id"] == "pr-demo-1" and rows[0]["verdict"] == "verified"
 
 
+def test_find_reviewer_report_under_daily(tmp_path, monkeypatch):
+    monkeypatch.setattr(console_api, "REPO_ROOT", tmp_path)
+    monkeypatch.setattr(console_api, "REPORTS_DAILY", tmp_path / "reports" / "daily")
+    day = tmp_path / "reports" / "daily" / "2026-10-17-check-1200"
+    rid = "marshmallow-3079"
+    (day / rid).mkdir(parents=True)
+    pdf = day / rid / "REPORT.pdf"
+    html = day / rid / "REPORT.html"
+    pdf.write_bytes(b"%PDF-1.4 fake")
+    html.write_text("<html>ok</html>")
+    assert console_api.find_reviewer_report_file(rid, "pdf") == pdf
+    assert console_api.find_reviewer_report_file("pr-other-id", "html", folder=f"ops/runs/x/{rid}") == html
+    links = console_api.report_links(rid)
+    assert links["report_pdf"] and links["report_pdf"].endswith("/report.pdf")
+    assert links["report_html"] and links["report_html"].endswith("/report.html")
+
+
 def test_github_reads_gh_token_alias(monkeypatch):
     from ops import daily_run
     monkeypatch.delenv("GITHUB_TOKEN", raising=False)

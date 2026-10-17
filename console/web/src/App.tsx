@@ -96,6 +96,8 @@ export default function App() {
     record: Record<string, unknown>
     folder: string
     hosted_report: string | null
+    report_pdf?: string | null
+    report_html?: string | null
   } | null>(null)
   const [job, setJob] = useState<Job | null>(null)
   const [logOpen, setLogOpen] = useState(false)
@@ -123,7 +125,13 @@ export default function App() {
     void api
       .run(view.id)
       .then((d) => {
-        setDetail(d)
+        setDetail({
+          record: d.record,
+          folder: d.folder,
+          hosted_report: d.hosted_report,
+          report_pdf: d.report_pdf,
+          report_html: d.report_html,
+        })
         if (d.record && d.record.id) {
           const pr = d.record.pr as { number?: number; url?: string; title?: string } | undefined
           saveLocalRun({
@@ -196,6 +204,8 @@ export default function App() {
                 record: j.record,
                 folder: j.folder || '',
                 hosted_report: null,
+                report_pdf: j.report_pdf,
+                report_html: j.report_html,
               })
             }
           }
@@ -351,10 +361,20 @@ export default function App() {
             </p>
           )}
           {job.run_id && (
-            <p>
+            <p className="report-links">
               <button type="button" className="linkish" onClick={() => setView({ name: 'run', id: job.run_id! })}>
                 Open analysis {job.run_id}
               </button>
+              {job.report_pdf ? (
+                <a className="btn-report" href={job.report_pdf} target="_blank" rel="noreferrer">
+                  Open PDF report
+                </a>
+              ) : null}
+              {job.report_html ? (
+                <a className="btn-report ghost" href={job.report_html} target="_blank" rel="noreferrer">
+                  Open HTML report
+                </a>
+              ) : null}
             </p>
           )}
           <button type="button" className="ghost log-toggle" onClick={() => setLogOpen((o) => !o)}>
@@ -396,6 +416,20 @@ export default function App() {
             {' · '}
             folder <code>{detail.folder}</code>
           </p>
+          {(detail.report_pdf || detail.report_html) && (
+            <p className="report-links">
+              {detail.report_pdf ? (
+                <a className="btn-report" href={detail.report_pdf} target="_blank" rel="noreferrer">
+                  Open PDF report
+                </a>
+              ) : null}
+              {detail.report_html ? (
+                <a className="btn-report ghost" href={detail.report_html} target="_blank" rel="noreferrer">
+                  Open HTML report
+                </a>
+              ) : null}
+            </p>
+          )}
           <RunAnalysis record={detail.record} />
           {detail.hosted_report && (
             <p className="meta-line">

@@ -13,8 +13,11 @@ COPY console/web/ ./
 RUN npm run build
 
 FROM python:3.12-slim-bookworm
+# chromium: headless PDF for golden-format REPORT.pdf (reports/reviewer.to_pdf)
 RUN apt-get update \
-  && apt-get install -y --no-install-recommends git curl ca-certificates bubblewrap \
+  && apt-get install -y --no-install-recommends \
+    git curl ca-certificates bubblewrap \
+    chromium fonts-liberation fonts-dejavu-core \
   && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
@@ -32,7 +35,8 @@ RUN pip install --no-cache-dir -e ".[ops,contree]"
 ENV POC_CONSOLE_HOST=0.0.0.0 \
     POC_CONSOLE_PORT=8787 \
     PORT=8787 \
-    PYTHONUNBUFFERED=1
+    PYTHONUNBUFFERED=1 \
+    BR_CHROME=/usr/bin/chromium
 
 EXPOSE 8787
 # Render / many PaaS set PORT; Nebius uses 8787. Shell form so ${PORT} expands.
