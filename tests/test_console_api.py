@@ -29,6 +29,33 @@ def test_job_log_and_error_prefers_stderr_and_stopped_line():
     assert "free disk" in (err or "")
 
 
+def test_remember_run_under_jobs_lock_does_not_deadlock(tmp_path, monkeypatch):
+    """Job finish used to call remember_run while holding _jobs_lock (non-reentrant Lock → wedge)."""
+    import threading
+
+    monkeypatch.setattr(console_api, "REPO_ROOT", tmp_path)
+    console_api._recent_runs.clear()
+    rec = {
+        "record_kind": "pr_run",
+        "id": "pr-lock-nest",
+        "repo": "me/demo",
+        "verdict": "verified",
+        "reason": "ok",
+        "pr": {"number": 1, "url": "https://github.com/me/demo/pull/1", "title": "t"},
+    }
+    done = threading.Event()
+
+    def hold_and_remember():
+        with console_api._jobs_lock:
+            console_api.remember_run(rec)
+        done.set()
+
+    t = threading.Thread(target=hold_and_remember)
+    t.start()
+    assert done.wait(2), "remember_run deadlocked under _jobs_lock"
+    t.join(1)
+
+
 def test_remember_run_survives_empty_disk(tmp_path, monkeypatch):
     monkeypatch.setattr(console_api, "RUNS_ROOT", tmp_path / "missing")
     monkeypatch.setattr(console_api, "REPO_ROOT", tmp_path)
