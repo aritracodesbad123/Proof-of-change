@@ -33,6 +33,10 @@ PR_RE = re.compile(r"https?://github\.com/([^/]+/[^/]+)/pull/(\d+)", re.I)
 
 _jobs: dict[str, dict[str, Any]] = {}
 _jobs_lock = threading.Lock()
+# ponytail: Render free disk is wiped on sleep/redeploy; keep last finished runs in RAM for this process.
+_recent_runs: dict[str, dict[str, Any]] = {}
+_RECENT_MAX = 30
+_RUN_LOG_RE = re.compile(r"run log:\s*(\S+/ops/runs/[^/\s]+)/REPORT\.md")
 
 
 def contree_usable() -> bool:
@@ -78,33 +82,69 @@ def console_run_flags() -> tuple[list[str], str | None]:
     return ["--unsafe-no-sandbox"], f"sandbox unavailable ({why}); running with --unsafe-no-sandbox"
 
 
+def _row_from_record(rec: dict, path: Path | None = None) -> dict:
+    rid = rec.get("id") or (path.parent.name if path else "unknown")
+    pr = rec.get("pr") if isinstance(rec.get("pr"), dict) else {}
+    folder = str(path.parent.relative_to(REPO_ROOT)) if path else f"(memory)/{rid}"
+    return {
+        "id": rid,
+        "repo": rec.get("repo"),
+        "pr": pr.get("number"),
+        "url": pr.get("url"),
+        "title": (pr.get("title") or rec.get("title")),
+        "verdict": rec.get("verdict"),
+        "reason": (rec.get("reason") or "")[:240],
+        "tested_at_ist": rec.get("tested_at_ist") or rec.get("date_ist"),
+        "machine": rec.get("machine") or "local",
+        "path": str(path.relative_to(REPO_ROOT)) if path else None,
+        "folder": folder,
+        "source": "disk" if path else "memory",
+    }
+
+
+def remember_run(rec: dict, path: Path | None = None) -> dict:
+    """Keep a finished PR record in RAM so the console still lists it after Render wipes disk."""
+    row = _row_from_record(rec, path)
+    rid = row["id"]
+    hosted = HOSTED / f"{rid}.html"
+    snap = {
+        "row": row,
+        "record": rec,
+        "folder": row["folder"],
+        "hosted_report": str(hosted.relative_to(REPO_ROOT)) if hosted.is_file() else None,
+        "saved_at": time.time(),
+    }
+    with _jobs_lock:
+        _recent_runs[rid] = snap
+        while len(_recent_runs) > _RECENT_MAX:
+            oldest = min(_recent_runs.items(), key=lambda kv: kv[1].get("saved_at") or 0)
+            _recent_runs.pop(oldest[0], None)
+    return row
+
+
 def list_runs(limit: int = 50) -> list[dict]:
     rows: list[tuple[float, dict]] = []
-    if not RUNS_ROOT.is_dir():
-        return []
-    for path in RUNS_ROOT.rglob("record.json"):
-        try:
-            rec = json.loads(path.read_text())
-            mtime = path.stat().st_mtime
-        except (OSError, json.JSONDecodeError):
+    seen: set[str] = set()
+    if RUNS_ROOT.is_dir():
+        for path in RUNS_ROOT.rglob("record.json"):
+            try:
+                rec = json.loads(path.read_text())
+                mtime = path.stat().st_mtime
+            except (OSError, json.JSONDecodeError):
+                continue
+            if rec.get("record_kind") and rec.get("record_kind") != "pr_run":
+                continue
+            row = _row_from_record(rec, path)
+            seen.add(row["id"])
+            rows.append((mtime, row))
+            remember_run(rec, path)
+    with _jobs_lock:
+        mem = list(_recent_runs.values())
+    for snap in mem:
+        row = snap["row"]
+        if row["id"] in seen:
             continue
-        if rec.get("record_kind") and rec.get("record_kind") != "pr_run":
-            continue
-        rid = rec.get("id") or path.parent.name
-        pr = rec.get("pr") if isinstance(rec.get("pr"), dict) else {}
-        rows.append((mtime, {
-            "id": rid,
-            "repo": rec.get("repo"),
-            "pr": pr.get("number"),
-            "url": pr.get("url"),
-            "title": (pr.get("title") or rec.get("title")),
-            "verdict": rec.get("verdict"),
-            "reason": (rec.get("reason") or "")[:240],
-            "tested_at_ist": rec.get("tested_at_ist") or rec.get("date_ist"),
-            "machine": rec.get("machine") or "local",
-            "path": str(path.relative_to(REPO_ROOT)),
-            "folder": str(path.parent.relative_to(REPO_ROOT)),
-        }))
+        rows.append((float(snap.get("saved_at") or 0), row))
     rows.sort(key=lambda x: x[0], reverse=True)
     return [r for _, r in rows[:limit]]
 
@@ -117,6 +157,7 @@ def get_run(run_id: str) -> dict | None:
         except (OSError, json.JSONDecodeError):
             continue
         if rec.get("id") == run_id or path.parent.name == run_id:
+            remember_run(rec, path)
             hosted = HOSTED / f"{rec.get('id') or run_id}.html"
             return {
                 "record": rec,
@@ -124,7 +165,73 @@ def get_run(run_id: str) -> dict | None:
                 "folder": str(path.parent.relative_to(REPO_ROOT)),
                 "hosted_report": str(hosted.relative_to(REPO_ROOT)) if hosted.is_file() else None,
             }
+    with _jobs_lock:
+        snap = _recent_runs.get(run_id)
+    if snap:
+        return {
+            "record": snap["record"],
+            "path": snap["row"].get("path"),
+            "folder": snap["folder"],
+            "hosted_report": snap.get("hosted_report"),
+            "source": "memory",
+        }
     return None
+
+
+def job_log_and_error(stdout: str, stderr: str, returncode: int) -> tuple[str, str | None]:
+    """Build a useful log tail; prefer stderr / Stopped lines when the process failed."""
+    out, err = (stdout or "").strip(), (stderr or "").strip()
+    parts: list[str] = []
+    if returncode and err:
+        parts.append("--- stderr ---\n" + err[-3500:])
+    if out:
+        parts.append("--- stdout ---\n" + out[-3500:])
+    elif err and not parts:
+        parts.append(err[-4000:])
+    tail = "\n\n".join(parts)[-6000:]
+    reason = None
+    for line in (err + "\n" + out).splitlines():
+        s = line.strip()
+        if s.startswith("Stopped:") or "PR selection failed" in s or "harness error" in s:
+            reason = s
+    m = _RUN_LOG_RE.search(out + "\n" + err)
+    if m:
+        meta_path = Path(m.group(1)) / "run_meta.json"
+        try:
+            meta = json.loads(meta_path.read_text())
+            probs = meta.get("problems") or []
+            if probs and not reason:
+                reason = "; ".join(str(p) for p in probs[:5])
+        except (OSError, json.JSONDecodeError):
+            pass
+    if returncode and not reason:
+        reason = f"check exited {returncode} (see log tail)"
+    return tail, reason
+
+
+def find_record_for_pr(repo: str, pr: int) -> tuple[dict, Path] | None:
+    """Newest matching pr_run record on disk for this repo/PR."""
+    best: tuple[float, dict, Path] | None = None
+    if not RUNS_ROOT.is_dir():
+        return None
+    for path in RUNS_ROOT.rglob("record.json"):
+        try:
+            rec = json.loads(path.read_text())
+            mtime = path.stat().st_mtime
+        except (OSError, json.JSONDecodeError):
+            continue
+        if rec.get("record_kind") and rec.get("record_kind") != "pr_run":
+            continue
+        if rec.get("repo") != repo:
+            continue
+        prd = rec.get("pr") if isinstance(rec.get("pr"), dict) else {}
+        if prd.get("number") != pr:
+            continue
+        if best is None or mtime > best[0]:
+            best = (mtime, rec, path)
+    if not best:
+        return None
+    return best[1], best[2]
 
 
 def start_check(pr_url: str, *, model_provider: str = "nebius") -> dict:
@@ -191,22 +298,30 @@ def start_check(pr_url: str, *, model_provider: str = "nebius") -> dict:
             # ponytail: one check at a time in-process thread; job queue if operators run many in parallel
             p = subprocess.run(argv, cwd=str(REPO_ROOT), capture_output=True, text=True,
                                timeout=None, env=env)
-            tail = ((p.stdout or "") + "\n" + (p.stderr or ""))[-4000:]
+            tail, fail_reason = job_log_and_error(p.stdout or "", p.stderr or "", p.returncode)
             os.environ["POC_PROGRESS_PATH"] = str(progress_path)
-            if p.returncode == 0:
-                rp.emit("done", detail="check finished")
+            found = find_record_for_pr(m.group(1), int(m.group(2)))
+            # A written record means the check produced analysis — surface it even if exit!=0 (problems list).
+            ok = p.returncode == 0 or found is not None
+            if ok:
+                rp.emit("done", detail="check finished" if p.returncode == 0 else "finished with problems")
             else:
-                rp.emit("failed", detail=f"exit {p.returncode}")
+                rp.emit("failed", detail=(fail_reason or f"exit {p.returncode}")[:200])
             with _jobs_lock:
                 job["exit"] = p.returncode
                 job["log_tail"] = tail
-                job["status"] = "done" if p.returncode == 0 else "failed"
+                job["status"] = "done" if ok else "failed"
                 job["finished_at"] = time.time()
-            for row in list_runs(20):
-                if row.get("repo") == m.group(1) and row.get("pr") == int(m.group(2)):
-                    with _jobs_lock:
-                        job["run_id"] = row["id"]
-                    break
+                if fail_reason and not ok:
+                    job["error"] = fail_reason
+                elif fail_reason and p.returncode != 0:
+                    job["warning"] = fail_reason
+                if found:
+                    rec, path = found
+                    row = remember_run(rec, path)
+                    job["run_id"] = row["id"]
+                    job["record"] = rec
+                    job["folder"] = row["folder"]
         except Exception as e:  # noqa: BLE001
             os.environ["POC_PROGRESS_PATH"] = str(progress_path)
             rp.emit("failed", detail=f"{type(e).__name__}: {e}"[:200])
@@ -278,7 +393,7 @@ class Handler(BaseHTTPRequestHandler):
             return self._json(200, {
                 "ok": True,
                 "service": "proof-of-change-console",
-                "build": "sandbox-fallback-v3",
+                "build": "sandbox-fallback-v4",
                 "has_git": (REPO_ROOT / ".git").is_dir(),
                 "poc_commit_env": bool(
                     (os.environ.get("POC_COMMIT") or os.environ.get("RENDER_GIT_COMMIT") or "").strip()),

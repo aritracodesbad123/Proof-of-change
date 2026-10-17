@@ -21,6 +21,7 @@ export type RunRow = {
   tested_at_ist?: string
   machine?: string
   folder?: string
+  source?: string
 }
 
 export type StageEvent = {
@@ -44,8 +45,11 @@ export type Job = {
   pr?: number
   exit?: number | null
   error?: string | null
+  warning?: string | null
   run_id?: string | null
   log_tail?: string
+  folder?: string
+  record?: Record<string, unknown>
   stages?: StageEvent[]
   current_stage?: string | null
   current_agent?: string | null

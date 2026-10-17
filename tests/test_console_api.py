@@ -19,6 +19,35 @@ def test_list_runs_reads_record(tmp_path, monkeypatch):
     assert rows and rows[0]["id"] == "pr-demo-1" and rows[0]["verdict"] == "verified"
 
 
+def test_job_log_and_error_prefers_stderr_and_stopped_line():
+    tail, err = console_api.job_log_and_error(
+        "run log: /app/ops/runs/x/REPORT.md\n",
+        "Stopped: only 0 GB of free disk space; a run needs at least 5 GB.\n",
+        2,
+    )
+    assert "stderr" in tail and "Stopped:" in (err or "")
+    assert "free disk" in (err or "")
+
+
+def test_remember_run_survives_empty_disk(tmp_path, monkeypatch):
+    monkeypatch.setattr(console_api, "RUNS_ROOT", tmp_path / "missing")
+    monkeypatch.setattr(console_api, "REPO_ROOT", tmp_path)
+    console_api._recent_runs.clear()
+    rec = {
+        "record_kind": "pr_run",
+        "id": "pr-demo-memory",
+        "repo": "me/demo",
+        "verdict": "needs_attention",
+        "reason": "x",
+        "pr": {"number": 9, "url": "https://github.com/me/demo/pull/9", "title": "t"},
+    }
+    console_api.remember_run(rec)
+    rows = console_api.list_runs()
+    assert any(r["id"] == "pr-demo-memory" for r in rows)
+    got = console_api.get_run("pr-demo-memory")
+    assert got and got["record"]["verdict"] == "needs_attention" and got.get("source") == "memory"
+
+
 def test_start_check_rejects_bad_url():
     try:
         console_api.start_check("not-a-url")
