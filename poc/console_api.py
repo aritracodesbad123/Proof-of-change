@@ -371,16 +371,21 @@ def start_check(pr_url: str, *, model_provider: str = "nebius") -> dict:
         progress_path.unlink()
     if console_log.exists():
         console_log.unlink()
+    flags, run_note = console_run_flags()
     job = {
         "id": job_id,
         "status": "queued",
         "pr_url": pr_url.strip(),
         "repo": m.group(1),
         "pr": int(m.group(2)),
+        "model_provider": model_provider,
+        "run_flags": list(flags),
+        "run_note": run_note,
         "started_at": None,
         "finished_at": None,
         "exit": None,
         "error": None,
+        "warning": None,
         "run_id": None,
         "log_tail": "",
         "progress_path": str(progress_path),
@@ -418,8 +423,13 @@ def start_check(pr_url: str, *, model_provider: str = "nebius") -> dict:
             job["started_at"] = time.time()
         os.environ["POC_PROGRESS_PATH"] = str(progress_path)
         rp.emit("fetch_pr", detail="loading pull request")
-        flags, note = console_run_flags()
+        flags, note = job.get("run_flags") or [], job.get("run_note")
+        if flags is None:
+            flags, note = console_run_flags()
         if note:
+            with _jobs_lock:
+                job["run_note"] = note
+                job["warning"] = note if "unsafe" in note.lower() else job.get("warning")
             rp.emit("fetch_pr", detail=note[:200])
         argv = [str(REPO_ROOT / ".venv" / "bin" / "python"), str(REPO_ROOT / "ops" / "daily_run.py"),
                 "--pr", pr_url.strip(), "--model-provider", model_provider, *flags]

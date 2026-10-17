@@ -65,12 +65,25 @@ export type HitlApprovalBody = {
   skip_business_followup: boolean
 }
 
+export type Health = {
+  ok: boolean
+  service?: string
+  contree_ready?: boolean
+  run_flags?: string[]
+  run_note?: string | null
+  github_token?: boolean
+  chrome?: boolean
+}
+
 export type Job = {
   id: string
   status: string
   pr_url: string
   repo?: string
   pr?: number
+  model_provider?: string
+  run_flags?: string[]
+  run_note?: string | null
   exit?: number | null
   error?: string | null
   warning?: string | null
@@ -90,7 +103,7 @@ export type Job = {
 }
 
 export const api = {
-  health: () => json<{ ok: boolean }>('/api/health'),
+  health: () => json<Health>('/api/health'),
   runs: () => json<{ runs: RunRow[] }>('/api/runs'),
   run: (id: string) =>
     json<{

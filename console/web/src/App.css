@@ -213,6 +213,70 @@ button[type='submit']:disabled {
   cursor: not-allowed;
 }
 
+.cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+  align-items: center;
+}
+
+button.ghost.sample {
+  padding: 0.65rem 0.9rem;
+  border: 1px solid rgba(118, 185, 0, 0.45);
+  border-radius: 4px;
+  text-decoration: none;
+  color: var(--nvidia-green);
+  background: transparent;
+}
+
+button.ghost.sample:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.hint {
+  margin: 0.85rem 0 0;
+  color: var(--muted);
+  font-size: 0.85rem;
+  line-height: 1.45;
+}
+
+.hint code {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+}
+
+.badge {
+  display: inline-block;
+  margin-left: 0.5rem;
+  padding: 0.15rem 0.45rem;
+  border-radius: 3px;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  vertical-align: middle;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.badge.fixture {
+  color: #f0c36a;
+  border: 1px solid rgba(232, 163, 23, 0.45);
+  background: rgba(232, 163, 23, 0.1);
+}
+
+.badge.live {
+  color: var(--nvidia-green);
+  border: 1px solid rgba(118, 185, 0, 0.45);
+  background: rgba(118, 185, 0, 0.1);
+}
+
+.badge.muted {
+  color: var(--muted);
+  border: 1px solid var(--line);
+  background: var(--panel-2);
+}
+
 .ghost,
 .back,
 .linkish,

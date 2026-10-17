@@ -84,11 +84,28 @@ const STAGE_LABEL: Record<string, string> = {
 
 const MAX_SCENARIOS = 20
 
+/** Credential-free sample: recorded fixture at evals/fixtures/model_responses/rasbt/mlxtend/1229.json */
+const SAMPLE_PR_URL = 'https://github.com/rasbt/mlxtend/pull/1229'
+const SAMPLE_PROVIDER = 'recorded'
+
 const AGENTS: { key: keyof SwarmStatus; name: string; role: string }[] = [
   { key: 'ultra', name: 'Ultra', role: 'Judge — labels findings' },
   { key: 'lightning', name: 'Lightning', role: 'Helper — remediation notes' },
   { key: 'super', name: 'Super', role: 'Summary — PR narrative' },
 ]
+
+function providerBadge(provider?: string) {
+  if (provider === 'recorded') {
+    return { className: 'badge fixture', label: 'Prerecorded fixture (not blind)' }
+  }
+  if (provider === 'none') {
+    return { className: 'badge muted', label: 'No AI (fixed probes only)' }
+  }
+  if (provider === 'nebius') {
+    return { className: 'badge live', label: 'Live Nebius / Nemotron' }
+  }
+  return null
+}
 
 function verdictClass(v?: string) {
   if (v === 'verified') return 'v-ok'
@@ -101,6 +118,8 @@ export default function App() {
   const [runs, setRuns] = useState<RunRow[]>([])
   const [err, setErr] = useState<string | null>(null)
   const [apiOk, setApiOk] = useState<boolean | null>(null)
+  const [healthNote, setHealthNote] = useState<string | null>(null)
+  const [contreeReady, setContreeReady] = useState<boolean | null>(null)
   const [prUrl, setPrUrl] = useState('')
   const [provider, setProvider] = useState('nebius')
   const [busy, setBusy] = useState(false)
@@ -118,12 +137,17 @@ export default function App() {
   const refresh = useCallback(async () => {
     setRefreshing(true)
     try {
-      setApiOk((await api.health()).ok)
+      const h = await api.health()
+      setApiOk(h.ok)
+      setContreeReady(Boolean(h.contree_ready))
+      setHealthNote(h.run_note || null)
       const remote = (await api.runs()).runs
       setRuns(mergeRunLists(remote, loadLocalRuns()))
       setErr(null)
     } catch (e) {
       setApiOk(false)
+      setHealthNote(null)
+      setContreeReady(null)
       // Keep prior runs on failure; only fill from browser cache when we have none yet.
       setRuns((prev) => (prev.length ? prev : mergeRunLists([], loadLocalRuns())))
       setErr(e instanceof Error ? e.message : String(e))
@@ -261,12 +285,11 @@ export default function App() {
     }
   }
 
-  async function onStart(e: React.FormEvent) {
-    e.preventDefault()
+  async function startWith(url: string, prov: string) {
     setBusy(true)
     setErr(null)
     try {
-      const j = await api.startCheck(prUrl.trim(), provider)
+      const j = await api.startCheck(url.trim(), prov)
       setView({ name: 'job', id: j.id })
       setJob(j)
     } catch (ex) {
@@ -275,6 +298,25 @@ export default function App() {
       setBusy(false)
     }
   }
+
+  async function onStart(e: React.FormEvent) {
+    e.preventDefault()
+    await startWith(prUrl, provider)
+  }
+
+  async function onSampleDemo() {
+    setPrUrl(SAMPLE_PR_URL)
+    setProvider(SAMPLE_PROVIDER)
+    await startWith(SAMPLE_PR_URL, SAMPLE_PROVIDER)
+  }
+
+  const jobBadge = providerBadge(job?.model_provider)
+  const jobTitle =
+    job?.model_provider === 'recorded'
+      ? 'Prerecorded check'
+      : job?.model_provider === 'none'
+        ? 'Check (AI off)'
+        : 'Live check'
 
   return (
     <div className="shell">
@@ -295,12 +337,20 @@ export default function App() {
         </p>
       )}
 
+      {healthNote && (
+        <p className="banner warn" role="status">
+          Sandbox: {healthNote}
+          {contreeReady === false ? ' Contree not ready.' : ''}
+        </p>
+      )}
+
       {view.name === 'home' && (
         <main className="main">
           <section className="panel start">
             <h1>Check a pull request</h1>
             <p className="lede">
               Paste a GitHub PR URL. Pipeline + advisory agent swarm run for that PR only.
+              The code verdict is deterministic; Ultra · Lightning · Super are advisory.
             </p>
             <form onSubmit={onStart} className="form">
               <label>
@@ -316,15 +366,31 @@ export default function App() {
               <label>
                 Model provider
                 <select value={provider} onChange={(e) => setProvider(e.target.value)}>
-                  <option value="nebius">nebius</option>
+                  <option value="nebius">nebius (live Nemotron)</option>
                   <option value="none">none (no AI)</option>
-                  <option value="recorded">recorded</option>
+                  <option value="recorded">recorded (prerecorded fixture)</option>
                 </select>
               </label>
-              <button type="submit" disabled={busy || !prUrl.trim()}>
-                {busy ? 'Starting…' : 'Run check'}
-              </button>
+              <div className="cta-row">
+                <button type="submit" disabled={busy || !prUrl.trim()}>
+                  {busy ? 'Starting…' : 'Run check'}
+                </button>
+                <button
+                  type="button"
+                  className="ghost sample"
+                  disabled={busy}
+                  onClick={() => void onSampleDemo()}
+                  title="Uses recorded Nebius fixture responses — no API key required"
+                >
+                  Try sample (mlxtend#1229, prerecorded)
+                </button>
+              </div>
             </form>
+            <p className="hint">
+              Sample path uses a committed fixture under{' '}
+              <code>evals/fixtures/model_responses/</code> and is labelled not blind.
+              Live Nebius needs <code>NEBIUS_API_KEY</code>.
+            </p>
           </section>
 
           <section className="panel">
@@ -373,14 +439,20 @@ export default function App() {
           </div>
           <p className="job-kicker">
             {job.repo}#{job.pr} · <strong>{job.status}</strong>
+            {jobBadge && <span className={jobBadge.className}>{jobBadge.label}</span>}
           </p>
-          <h1>Live check</h1>
+          <h1>{jobTitle}</h1>
+          {(job.run_note || job.warning) && (
+            <p className="banner warn" role="status">
+              {job.run_note || job.warning}
+            </p>
+          )}
           <p className="lede">
             {job.current_detail ||
               (job.status === 'awaiting_human'
                 ? 'AI drafted claims and probes — approve, drop, or add business scenarios to continue.'
                 : job.status === 'running'
-                  ? 'Pipeline running — swarm stands by until the code verdict.'
+                  ? 'Pipeline running — advisory swarm stands by until the code verdict.'
                   : job.status === 'done'
                     ? 'Check finished — opening the analysis…'
                     : job.status === 'failed'
@@ -744,7 +816,9 @@ function prNumber(record: Record<string, unknown>): number | null {
 function plainVerdict(v: string): string {
   if (v === 'verified') return 'Verified — behaviour matches the claims'
   if (v === 'needs_attention') return 'Needs attention — review the findings below'
-  if (v === 'could_not_verify') return 'Could not verify — the check could not finish safely'
+  if (v === 'could_not_verify') {
+    return 'Could not verify — inconclusive: missing evidence, timeout, or unsafe to finish (not a pass)'
+  }
   return v || 'No verdict'
 }
 

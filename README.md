@@ -13,6 +13,32 @@ comment; it never posts to random upstream projects.
 
 > New words are explained the first time they appear. There is also a [glossary](#glossary) at the end.
 
+## For hackathon judges (quick answers)
+
+| Question | Answer |
+|---|---|
+| **Problem?** | Green CI tests can miss behavioral drift. Proof-of-Change dual-runs base vs PR and compares evidence. |
+| **What is different?** | Models may write claims/probes and explanations, but **plain code owns the verdict**. |
+| **What does the swarm do?** | After the code verdict: **Ultra** labels findings, **Lightning** suggests noise/install notes, **Super** writes a quote-checked summary. Those three roles are **advisory**. **Super** also extracts claims and writes probes earlier (that path *can* affect the verdict via executed probe diffs). |
+| **NVIDIA Nemotron?** | Super / Ultra / Lightning (Nano fallback) via configured model IDs in `poc/model_provider.py`. |
+| **Nebius at runtime?** | OpenAI-compatible chat completions at `https://api.tokenfactory.nebius.com/v1` using `NEBIUS_API_KEY` in the orchestrator only. Optional Contree sandboxes need `NEBIUS_PROJECT_ID`. |
+| **Try it?** | Local console: `make setup` then `make console-api` and `make console-web` → open http://127.0.0.1:5173. Use **Try sample (mlxtend#1229, prerecorded)** — no API key. Live Nebius needs `NEBIUS_API_KEY`. Hosted URL: pending deploy (see [`reports/SUBMISSION_CHECKLIST.md`](reports/SUBMISSION_CHECKLIST.md)). |
+| **Reproduce evaluation?** | See [`reports/AGENT_SWARM_EVALUATION.md`](reports/AGENT_SWARM_EVALUATION.md). Quick gate: `make test` (or `python -m evals.run_evals --observations evals/fixtures/golden_v1.jsonl --require-golden --require-v1`). |
+| **Demo video** | _TODO: public YouTube ≤3 min_ — script in [`reports/DEMO_SCRIPT_3MIN.md`](reports/DEMO_SCRIPT_3MIN.md). |
+
+```mermaid
+flowchart TD
+  prInput[PR_URL] --> claimsProbes[Super_claims_and_probes]
+  claimsProbes --> dualRun[Base_vs_PR_pytest_and_probes]
+  dualRun --> codeVerdict[verdict_for_plus_gates]
+  codeVerdict --> swarm[advisory_Ultra_Lightning_Super]
+  swarm --> report[record_and_report]
+```
+
+**Untrusted code:** PR installs and tests run under bubblewrap when available (no orchestrator secrets in the sandbox env). Hosted paths without Contree may fall back to `--unsafe-no-sandbox`; the console surfaces that note. Do not treat a prompt as a sandbox.
+
+**Hackathon delta (this prep):** judge console sample + live/fixture badges + sandbox honesty; audit/eval/demo/checklist under `reports/`; README judge path. No invented accuracy claims; live Token Factory metrics require your API key.
+
 ## Built with NVIDIA Nemotron on Nebius Token Factory
 
 Proof-of-Change uses **Nebius Token Factory** for models and optional remote sandboxes, and can also reply on
@@ -287,6 +313,8 @@ Your browser opens the summary page. Click **HTML** (or **PDF**) next to the PR 
 ### 2b. Operator console (browse + start checks)
 
 Web console (NVIDIA-themed React UI + local API): paste a GitHub PR link, watch the **pipeline stages** and the **Nemotron swarm** (Ultra · Lightning · Super) light up for that PR, then open the verdict and behavior map.
+
+**No API key?** Use **Try sample (mlxtend#1229, prerecorded)** — the UI labels it as a fixture (not blind). Live Nebius runs show a separate **Live Nebius / Nemotron** badge. Sandbox fallbacks (for example `--unsafe-no-sandbox` on hosts without bubblewrap/Contree) appear as a warning banner from `/api/health`.
 
 ```bash
 make console-api    # terminal 1 — http://127.0.0.1:8787

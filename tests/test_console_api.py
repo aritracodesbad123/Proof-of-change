@@ -200,10 +200,16 @@ def test_start_check_queues_job(monkeypatch):
             pass  # do not run daily_run in unit tests
 
     monkeypatch.setattr(console_api.threading, "Thread", FakeThread)
-    job = console_api.start_check("https://github.com/me/demo/pull/3", model_provider="none")
+    monkeypatch.setattr(console_api, "console_run_flags",
+                        lambda: (["--unsafe-no-sandbox"], "sandbox unavailable (test); running with --unsafe-no-sandbox"))
+    job = console_api.start_check("https://github.com/me/demo/pull/3", model_provider="recorded")
     assert job["status"] == "queued" and job["pr"] == 3
     assert job["current_stage"] == "queued"
+    assert job["model_provider"] == "recorded"
+    assert job["run_flags"] == ["--unsafe-no-sandbox"]
+    assert job["run_note"] and "unsafe" in job["run_note"]
     assert "ultra" in job["swarm"]
     got = console_api.get_job(job["id"])
     assert got["repo"] == "me/demo"
     assert got["stages"] and got["stages"][0]["stage"] == "queued"
+    assert got["model_provider"] == "recorded"
