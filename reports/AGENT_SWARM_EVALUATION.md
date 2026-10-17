@@ -1,6 +1,7 @@
 # Agent swarm evaluation
 
-**Evaluation commit:** `422788984d0df19499861f69a5234ab0cd598627` (see `git rev-parse HEAD` on the branch for later commits)  
+**Evaluation commit (baseline / golden evals):** `422788984d0df19499861f69a5234ab0cd598627`  
+**Branch tip (includes this report + console UX):** see `git rev-parse HEAD` on `cursor/hackathon-submission-prep-81ec`  
 **Date:** 2026-10-17  
 **Models configured** ([`poc/model_provider.py`](../poc/model_provider.py)):
 
