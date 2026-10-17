@@ -95,7 +95,8 @@ def _report_dir_names(run_id: str, folder: str | None = None, rec: dict | None =
     names.append(run_id)
     if rec:
         try:
-            from reports.pr_report import normalize, run_id as pr_run_id
+            from reports.pr_report import normalize
+            from reports.pr_report import run_id as pr_run_id
             names.append(pr_run_id(normalize(rec, Path(folder).name if folder else None)))
         except Exception:  # noqa: BLE001
             pass
