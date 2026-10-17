@@ -398,8 +398,10 @@ class Handler(BaseHTTPRequestHandler):
             return self._json(200, {
                 "ok": True,
                 "service": "proof-of-change-console",
-                "build": "deadlock-fix-v5",
+                "build": "github-token-v6",
                 "has_git": (REPO_ROOT / ".git").is_dir(),
+                "github_token": bool(
+                    (os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN") or "").strip()),
                 "poc_commit_env": bool(
                     (os.environ.get("POC_COMMIT") or os.environ.get("RENDER_GIT_COMMIT") or "").strip()),
                 "contree_ready": contree_usable(),

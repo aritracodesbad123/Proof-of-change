@@ -19,6 +19,13 @@ def test_list_runs_reads_record(tmp_path, monkeypatch):
     assert rows and rows[0]["id"] == "pr-demo-1" and rows[0]["verdict"] == "verified"
 
 
+def test_github_reads_gh_token_alias(monkeypatch):
+    from ops import daily_run
+    monkeypatch.delenv("GITHUB_TOKEN", raising=False)
+    monkeypatch.setenv("GH_TOKEN", "ghp_test_alias")
+    assert daily_run.GitHub(None).token == "ghp_test_alias"
+
+
 def test_job_log_and_error_prefers_stderr_and_stopped_line():
     tail, err = console_api.job_log_and_error(
         "run log: /app/ops/runs/x/REPORT.md\n",

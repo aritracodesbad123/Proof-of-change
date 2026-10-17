@@ -495,7 +495,7 @@ run uses just the date. These folders stay on your computer only. They are never
 | `make: *** No rule to make target 'check'` or `No such file or directory` | You're not in the project folder. | `cd ~/Proof-of-change` and try again. |
 | `Give the pull request link, e.g.: make check PR=...` | `PR=` was left out. | Add `PR=` and the link, with no spaces around `=`. |
 | `not a GitHub pull request link` | The link isn't a PR link. | Copy the link from the PR page; it must contain `/pull/<number>`. |
-| `GitHub rate limit hit` | GitHub allows 60 anonymous reads per hour. | Wait an hour. If it happens often, set a read-only `GITHUB_TOKEN` (see docs/OPERATIONS.md). |
+| `GitHub rate limit hit` | GitHub allows 60 anonymous reads per hour (worse on shared Render IPs). | Set a read-only `GITHUB_TOKEN` on the host (Render secret / local env), then redeploy or restart. See docs/OPERATIONS.md. |
 | `Stopped: only N GB of free disk space` | Test environments need about 20 GB free. | Free up disk space and try again. |
 | `note: no Chrome/Chromium found, so no PDFs` | Chrome isn't installed. HTML reports are still made. | Install Google Chrome (setup step 5) and run the check again. |
 | Verdict **COULD NOT VERIFY**, reason `source build ... failed` | The PR changes C code and couldn't be compiled. | Normal for some PRs. The report says why. Try again in a day or two (a newer nightly build may help). |

@@ -99,7 +99,8 @@ def to_ist(iso_utc: str) -> str:
 # ---------------------------------------------------------------- GitHub (read-only)
 class GitHub:
     def __init__(self, log):
-        self.token = os.environ.get("GITHUB_TOKEN")
+        # Authenticated = 5k/hour; anonymous = 60/hour (shared across Render IPs).
+        self.token = (os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN") or "").strip() or None
         self.calls = 0
         self.remaining = None
         self.log = log
@@ -117,7 +118,17 @@ class GitHub:
                     return r.read()
             except urllib.error.HTTPError as e:
                 if e.code in (403, 429) and api:
-                    raise RuntimeError(f"GitHub rate limit hit at {url} (remaining={self.remaining})") from e
+                    rem = e.headers.get("X-RateLimit-Remaining") if e.headers else None
+                    if rem is not None:
+                        try:
+                            self.remaining = int(rem)
+                        except ValueError:
+                            pass
+                    hint = ("" if self.token else
+                            "; set GITHUB_TOKEN on the host (read-only PAT) — anonymous limit is 60/hour")
+                    raise RuntimeError(
+                        f"GitHub rate limit hit at {url} (remaining={self.remaining}){hint}"
+                    ) from e
                 if attempt == 2 or e.code == 404:
                     raise
             except urllib.error.URLError:
