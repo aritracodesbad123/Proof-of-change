@@ -1118,8 +1118,13 @@ MAC_CHROMES = ("/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
 def find_chrome() -> str | None:
     """Headless Chrome/Chromium for PDFs: $BR_CHROME, then the PATH, then the usual macOS app locations."""
     for name in (os.environ.get("BR_CHROME"), "google-chrome", "google-chrome-stable", "chromium", "chromium-browser"):
-        if name and shutil.which(name):
-            return shutil.which(name)
+        if not name:
+            continue
+        if os.path.isabs(name) and os.access(name, os.X_OK):
+            return name
+        found = shutil.which(name)
+        if found:
+            return found
     return next((p for p in MAC_CHROMES if os.access(p, os.X_OK)), None)
 
 

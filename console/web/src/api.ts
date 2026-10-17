@@ -50,6 +50,8 @@ export type Job = {
   log_tail?: string
   folder?: string
   record?: Record<string, unknown>
+  report_pdf?: string | null
+  report_html?: string | null
   stages?: StageEvent[]
   current_stage?: string | null
   current_agent?: string | null
@@ -61,9 +63,13 @@ export const api = {
   health: () => json<{ ok: boolean }>('/api/health'),
   runs: () => json<{ runs: RunRow[] }>('/api/runs'),
   run: (id: string) =>
-    json<{ record: Record<string, unknown>; folder: string; hosted_report: string | null }>(
-      `/api/runs/${encodeURIComponent(id)}`,
-    ),
+    json<{
+      record: Record<string, unknown>
+      folder: string
+      hosted_report: string | null
+      report_pdf?: string | null
+      report_html?: string | null
+    }>(`/api/runs/${encodeURIComponent(id)}`),
   startCheck: (pr_url: string, model_provider = 'nebius') =>
     json<Job>('/api/checks', {
       method: 'POST',

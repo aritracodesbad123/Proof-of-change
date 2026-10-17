@@ -6,6 +6,8 @@ Endpoints:
   GET  /api/health
   GET  /api/runs
   GET  /api/runs/<id>
+  GET  /api/runs/<id>/report.pdf
+  GET  /api/runs/<id>/report.html
   POST /api/checks   JSON {"pr_url": "https://github.com/o/r/pull/N"}
   GET  /api/jobs/<job_id>
 
@@ -28,8 +30,10 @@ from urllib.parse import unquote, urlparse
 REPO_ROOT = Path(__file__).resolve().parent.parent
 RUNS_ROOT = Path(os.environ.get("POC_OPS_RUNS", REPO_ROOT / "ops" / "runs"))
 HOSTED = REPO_ROOT / "reports" / "hosted"
+REPORTS_DAILY = REPO_ROOT / "reports" / "daily"
 WEB_DIST = REPO_ROOT / "console" / "web" / "dist"
 PR_RE = re.compile(r"https?://github\.com/([^/]+/[^/]+)/pull/(\d+)", re.I)
+_REPORT_FILE_RE = re.compile(r"^/api/runs/(.+)/report\.(pdf|html)$")
 
 _jobs: dict[str, dict[str, Any]] = {}
 # RLock: job finish must not nest Lock via remember_run (that wedged the whole console).
@@ -83,6 +87,67 @@ def console_run_flags() -> tuple[list[str], str | None]:
     return ["--unsafe-no-sandbox"], f"sandbox unavailable ({why}); running with --unsafe-no-sandbox"
 
 
+def _report_dir_names(run_id: str, folder: str | None = None, rec: dict | None = None) -> list[str]:
+    """Candidate directory names under reports/daily/<day>/ for this run."""
+    names: list[str] = []
+    if folder:
+        names.append(Path(folder).name)
+    names.append(run_id)
+    if rec:
+        try:
+            from reports.pr_report import normalize, run_id as pr_run_id
+            names.append(pr_run_id(normalize(rec, Path(folder).name if folder else None)))
+        except Exception:  # noqa: BLE001
+            pass
+        pr = rec.get("pr") if isinstance(rec.get("pr"), dict) else {}
+        num = pr.get("number")
+        repo = str(rec.get("repo") or "")
+        lib = rec.get("library") or (repo.split("/")[-1] if repo else "")
+        if num is not None and lib:
+            names.append(f"{lib}-{num}")
+            names.append(f"{str(lib).lower().replace('-', '_')}-{num}")
+    # unique, preserve order
+    out: list[str] = []
+    seen: set[str] = set()
+    for n in names:
+        if n and n not in seen:
+            seen.add(n)
+            out.append(n)
+    return out
+
+
+def find_reviewer_report_file(run_id: str, ext: str, *,
+                              folder: str | None = None, rec: dict | None = None) -> Path | None:
+    """Locate REPORT.pdf|html written by reports/pr_report.render_run."""
+    if ext not in ("pdf", "html", "md"):
+        return None
+    names = _report_dir_names(run_id, folder, rec)
+    if not REPORTS_DAILY.is_dir():
+        return None
+    for name in names:
+        for cand in REPORTS_DAILY.glob(f"*/{name}/REPORT.{ext}"):
+            if cand.is_file() and cand.stat().st_size > 0:
+                return cand
+    want = set(names)
+    for cand in REPORTS_DAILY.rglob(f"REPORT.{ext}"):
+        if cand.parent.name in want and cand.is_file() and cand.stat().st_size > 0:
+            return cand
+    return None
+
+
+def report_links(run_id: str, *, folder: str | None = None, rec: dict | None = None) -> dict[str, str | None]:
+    """Public API paths for golden-format reviewer reports (None if not generated yet)."""
+    from urllib.parse import quote
+
+    q = quote(run_id, safe="")
+    pdf = find_reviewer_report_file(run_id, "pdf", folder=folder, rec=rec)
+    html = find_reviewer_report_file(run_id, "html", folder=folder, rec=rec)
+    return {
+        "report_pdf": f"/api/runs/{q}/report.pdf" if pdf else None,
+        "report_html": f"/api/runs/{q}/report.html" if html else None,
+    }
+
+
 def _row_from_record(rec: dict, path: Path | None = None) -> dict:
     rid = rec.get("id") or (path.parent.name if path else "unknown")
     pr = rec.get("pr") if isinstance(rec.get("pr"), dict) else {}
@@ -108,11 +173,14 @@ def remember_run(rec: dict, path: Path | None = None) -> dict:
     row = _row_from_record(rec, path)
     rid = row["id"]
     hosted = HOSTED / f"{rid}.html"
+    links = report_links(rid, folder=row["folder"], rec=rec)
     snap = {
         "row": row,
         "record": rec,
         "folder": row["folder"],
         "hosted_report": str(hosted.relative_to(REPO_ROOT)) if hosted.is_file() else None,
+        "report_pdf": links.get("report_pdf"),
+        "report_html": links.get("report_html"),
         "saved_at": time.time(),
     }
     with _jobs_lock:
@@ -159,21 +227,28 @@ def get_run(run_id: str) -> dict | None:
             continue
         if rec.get("id") == run_id or path.parent.name == run_id:
             remember_run(rec, path)
-            hosted = HOSTED / f"{rec.get('id') or run_id}.html"
+            rid = str(rec.get("id") or run_id)
+            folder = str(path.parent.relative_to(REPO_ROOT))
+            hosted = HOSTED / f"{rid}.html"
+            links = report_links(rid, folder=folder, rec=rec)
             return {
                 "record": rec,
                 "path": str(path.relative_to(REPO_ROOT)),
-                "folder": str(path.parent.relative_to(REPO_ROOT)),
+                "folder": folder,
                 "hosted_report": str(hosted.relative_to(REPO_ROOT)) if hosted.is_file() else None,
+                **links,
             }
     with _jobs_lock:
         snap = _recent_runs.get(run_id)
     if snap:
+        links = report_links(run_id, folder=snap.get("folder"), rec=snap.get("record"))
         return {
             "record": snap["record"],
             "path": snap["row"].get("path"),
             "folder": snap["folder"],
             "hosted_report": snap.get("hosted_report"),
+            "report_pdf": links.get("report_pdf") or snap.get("report_pdf"),
+            "report_html": links.get("report_html") or snap.get("report_html"),
             "source": "memory",
         }
     return None
@@ -327,6 +402,7 @@ def start_check(pr_url: str, *, model_provider: str = "nebius") -> dict:
                     job["run_id"] = row["id"]
                     job["record"] = rec
                     job["folder"] = row["folder"]
+                    job.update(report_links(row["id"], folder=row["folder"], rec=rec))
         except Exception as e:  # noqa: BLE001
             os.environ["POC_PROGRESS_PATH"] = str(progress_path)
             rp.emit("failed", detail=f"{type(e).__name__}: {e}"[:200])
@@ -395,21 +471,39 @@ class Handler(BaseHTTPRequestHandler):
 
         if path == "/api/health":
             flags, note = console_run_flags()
+            chrome = None
+            try:
+                from reports.reviewer import find_chrome
+                chrome = find_chrome()
+            except Exception:  # noqa: BLE001
+                chrome = None
             return self._json(200, {
                 "ok": True,
                 "service": "proof-of-change-console",
-                "build": "github-token-v6",
+                "build": "report-pdf-v7",
                 "has_git": (REPO_ROOT / ".git").is_dir(),
                 "github_token": bool(
                     (os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN") or "").strip()),
                 "poc_commit_env": bool(
                     (os.environ.get("POC_COMMIT") or os.environ.get("RENDER_GIT_COMMIT") or "").strip()),
+                "chrome": bool(chrome),
                 "contree_ready": contree_usable(),
                 "run_flags": flags,
                 "run_note": note,
             })
         if path == "/api/runs":
             return self._json(200, {"runs": list_runs()})
+        rm = _REPORT_FILE_RE.match(path)
+        if rm:
+            rid, ext = unquote(rm.group(1)), rm.group(2)
+            got = get_run(rid)
+            folder = (got or {}).get("folder")
+            rec = (got or {}).get("record")
+            fpath = find_reviewer_report_file(rid, ext, folder=folder, rec=rec)
+            if not fpath:
+                return self._json(404, {"error": f"REPORT.{ext} not found"})
+            ctype = "application/pdf" if ext == "pdf" else "text/html; charset=utf-8"
+            return self._file(fpath, ctype)
         if path.startswith("/api/runs/"):
             rid = path[len("/api/runs/"):]
             got = get_run(rid)
