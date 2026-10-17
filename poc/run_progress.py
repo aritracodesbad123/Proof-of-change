@@ -19,6 +19,7 @@ STAGES = (
     "install_main",
     "install_pr",
     "claims",
+    "await_human",
     "probes",
     "pytest",
     "verdict",

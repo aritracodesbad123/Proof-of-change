@@ -10,6 +10,7 @@ Endpoints:
   GET  /api/runs/<id>/report.html
   POST /api/checks   JSON {"pr_url": "https://github.com/o/r/pull/N"}
   GET  /api/jobs/<job_id>
+  POST /api/jobs/<job_id>/scenarios   HITL approval (approve / extra_scenarios / business_answers)
 
 Serves console/web/dist when built. CORS open for local Vite (5173).
 """
@@ -193,21 +194,33 @@ def remember_run(rec: dict, path: Path | None = None) -> dict:
 
 
 def list_runs(limit: int = 50) -> list[dict]:
-    rows: list[tuple[float, dict]] = []
-    seen: set[str] = set()
+    """Newest `limit` runs only. Does not remember_run every record on each list (disk scan is mtime-bounded)."""
+    candidates: list[tuple[float, Path]] = []
     if RUNS_ROOT.is_dir():
         for path in RUNS_ROOT.rglob("record.json"):
             try:
-                rec = json.loads(path.read_text())
                 mtime = path.stat().st_mtime
-            except (OSError, json.JSONDecodeError):
+            except OSError:
                 continue
-            if rec.get("record_kind") and rec.get("record_kind") != "pr_run":
-                continue
-            row = _row_from_record(rec, path)
-            seen.add(row["id"])
-            rows.append((mtime, row))
-            remember_run(rec, path)
+            candidates.append((mtime, path))
+    candidates.sort(key=lambda x: x[0], reverse=True)
+
+    rows: list[tuple[float, dict]] = []
+    seen: set[str] = set()
+    for mtime, path in candidates[: max(limit, 1) * 2]:
+        # Read a small multiple of limit to skip non-pr_run records without scanning the whole tree into RAM.
+        if len(rows) >= limit:
+            break
+        try:
+            rec = json.loads(path.read_text())
+        except (OSError, json.JSONDecodeError):
+            continue
+        if rec.get("record_kind") and rec.get("record_kind") != "pr_run":
+            continue
+        row = _row_from_record(rec, path)
+        seen.add(row["id"])
+        rows.append((mtime, row))
+
     with _jobs_lock:
         mem = list(_recent_runs.values())
     for snap in mem:
@@ -217,6 +230,37 @@ def list_runs(limit: int = 50) -> list[dict]:
         rows.append((float(snap.get("saved_at") or 0), row))
     rows.sort(key=lambda x: x[0], reverse=True)
     return [r for _, r in rows[:limit]]
+
+
+def _tail_bytes(path: Path, n: int = 8192) -> str:
+    try:
+        data = path.read_bytes()
+    except OSError:
+        return ""
+    if len(data) > n:
+        data = data[-n:]
+    return data.decode("utf-8", errors="replace")
+
+
+def submit_job_scenarios(job_id: str, body: dict) -> dict:
+    """Validate business answers and write hitl_approval.json for a live job."""
+    from poc import hitl
+
+    with _jobs_lock:
+        job = _jobs.get(job_id)
+        if not job:
+            raise KeyError("job not found")
+        hitl_path = job.get("hitl_dir")
+    if not hitl_path:
+        raise ValueError("job has no HITL directory")
+    hdir = Path(hitl_path)
+    draft = hitl.read_draft(hdir)
+    if not draft:
+        raise ValueError("no hitl_draft.json yet — wait until claims/probes are drafted")
+    err = hitl.validate_approval(draft, body)
+    if err:
+        raise ValueError(err)
+    return hitl.write_approval(hdir, body)
 
 
 def get_run(run_id: str) -> dict | None:
@@ -318,10 +362,15 @@ def start_check(pr_url: str, *, model_provider: str = "nebius") -> dict:
     if not m:
         raise ValueError("pr_url must look like https://github.com/owner/repo/pull/123")
     job_id = uuid.uuid4().hex[:12]
-    progress_path = REPO_ROOT / "ops" / "runs" / "_jobs" / f"{job_id}.jsonl"
-    progress_path.parent.mkdir(parents=True, exist_ok=True)
+    jobs_dir = REPO_ROOT / "ops" / "runs" / "_jobs" / job_id
+    jobs_dir.mkdir(parents=True, exist_ok=True)
+    progress_path = jobs_dir / "progress.jsonl"
+    console_log = jobs_dir / "console.log"
+    hitl_dir = jobs_dir
     if progress_path.exists():
         progress_path.unlink()
+    if console_log.exists():
+        console_log.unlink()
     job = {
         "id": job_id,
         "status": "queued",
@@ -335,6 +384,8 @@ def start_check(pr_url: str, *, model_provider: str = "nebius") -> dict:
         "run_id": None,
         "log_tail": "",
         "progress_path": str(progress_path),
+        "console_log": str(console_log),
+        "hitl_dir": str(hitl_dir),
         "stages": [],
         "current_stage": "queued",
         "current_agent": None,
@@ -359,6 +410,9 @@ def start_check(pr_url: str, *, model_provider: str = "nebius") -> dict:
 
         env = os.environ.copy()
         env["POC_PROGRESS_PATH"] = str(progress_path)
+        # Console always enables HITL mid-check; bench/CLI leave these unset.
+        env["POC_HITL"] = "1"
+        env["POC_HITL_DIR"] = str(hitl_dir)
         with _jobs_lock:
             job["status"] = "running"
             job["started_at"] = time.time()
@@ -372,31 +426,48 @@ def start_check(pr_url: str, *, model_provider: str = "nebius") -> dict:
         if not (REPO_ROOT / ".venv" / "bin" / "python").is_file():
             argv[0] = os.environ.get("PYTHON", "python3")
         try:
-            # ponytail: one check at a time in-process thread; job queue if operators run many in parallel
-            p = subprocess.run(argv, cwd=str(REPO_ROOT), capture_output=True, text=True,
-                               timeout=None, env=env)
-            tail, fail_reason = job_log_and_error(p.stdout or "", p.stderr or "", p.returncode)
+            # Live tee: write console.log while the check runs; polls read the last ~8KB.
+            collected: list[str] = []
+            with console_log.open("w", encoding="utf-8") as logf:
+                proc = subprocess.Popen(
+                    argv, cwd=str(REPO_ROOT), stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                    text=True, env=env, bufsize=1,
+                )
+                assert proc.stdout is not None
+                for line in proc.stdout:
+                    logf.write(line)
+                    logf.flush()
+                    collected.append(line)
+                    if len(collected) > 4000:
+                        collected = collected[-2000:]
+                returncode = proc.wait()
+            stdout_blob = "".join(collected)
+            tail, fail_reason = job_log_and_error(stdout_blob, "", returncode)
+            # Prefer file tail so the UI matches what was teed.
+            file_tail = _tail_bytes(console_log, 8192)
+            if file_tail:
+                tail = file_tail
             os.environ["POC_PROGRESS_PATH"] = str(progress_path)
             found = find_record_for_pr(m.group(1), int(m.group(2)))
             # A written record means the check produced analysis — surface it even if exit!=0 (problems list).
-            ok = p.returncode == 0 or found is not None
+            ok = returncode == 0 or found is not None
             if ok:
-                rp.emit("done", detail="check finished" if p.returncode == 0 else "finished with problems")
+                rp.emit("done", detail="check finished" if returncode == 0 else "finished with problems")
             else:
-                rp.emit("failed", detail=(fail_reason or f"exit {p.returncode}")[:200])
+                rp.emit("failed", detail=(fail_reason or f"exit {returncode}")[:200])
             # remember_run takes _jobs_lock — must not run while we hold it (deadlocks Lock).
             saved = None
             if found:
                 rec, path = found
                 saved = (remember_run(rec, path), rec)
             with _jobs_lock:
-                job["exit"] = p.returncode
+                job["exit"] = returncode
                 job["log_tail"] = tail
                 job["status"] = "done" if ok else "failed"
                 job["finished_at"] = time.time()
                 if fail_reason and not ok:
                     job["error"] = fail_reason
-                elif fail_reason and p.returncode != 0:
+                elif fail_reason and returncode != 0:
                     job["warning"] = fail_reason
                 if saved:
                     row, rec = saved
@@ -417,12 +488,33 @@ def start_check(pr_url: str, *, model_provider: str = "nebius") -> dict:
 
 
 def _job_public(job: dict) -> dict:
-    from poc import run_progress
+    from poc import hitl, run_progress
 
     out = dict(job)
     prog = run_progress.job_progress(job.get("progress_path"))
     out.update(prog)
+    # Live log: last ~8KB of the teed console.log on every poll.
+    clog = job.get("console_log")
+    if clog:
+        live = _tail_bytes(Path(clog), 8192)
+        if live:
+            out["log_tail"] = live
+    hdir = job.get("hitl_dir")
+    if hdir:
+        draft = hitl.read_draft(Path(hdir))
+        if draft:
+            out["hitl_draft"] = draft
+        approval = hitl.read_approval(Path(hdir))
+        if approval:
+            out["hitl_approval"] = approval
+        # Surface mid-check pause even while the worker thread is blocked in wait_for_approval.
+        if draft and not approval and out.get("status") not in ("done", "failed"):
+            out["status"] = "awaiting_human"
+            if out.get("current_stage") != "await_human":
+                out["current_stage"] = "await_human"
     out.pop("progress_path", None)
+    out.pop("console_log", None)
+    out.pop("hitl_dir", None)
     return out
 
 
@@ -551,6 +643,15 @@ class Handler(BaseHTTPRequestHandler):
             except ValueError as e:
                 return self._json(400, {"error": str(e)})
             return self._json(202, job)
+        if path.startswith("/api/jobs/") and path.endswith("/scenarios"):
+            jid = path[len("/api/jobs/"):-len("/scenarios")].strip("/")
+            try:
+                approval = submit_job_scenarios(jid, body)
+            except KeyError:
+                return self._json(404, {"error": "not found"})
+            except ValueError as e:
+                return self._json(400, {"error": str(e)})
+            return self._json(200, {"ok": True, "approval": approval})
         return self._json(404, {"error": "not found"})
 
 
