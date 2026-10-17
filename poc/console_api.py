@@ -32,7 +32,8 @@ WEB_DIST = REPO_ROOT / "console" / "web" / "dist"
 PR_RE = re.compile(r"https?://github\.com/([^/]+/[^/]+)/pull/(\d+)", re.I)
 
 _jobs: dict[str, dict[str, Any]] = {}
-_jobs_lock = threading.Lock()
+# RLock: job finish must not nest Lock via remember_run (that wedged the whole console).
+_jobs_lock = threading.RLock()
 # ponytail: Render free disk is wiped on sleep/redeploy; keep last finished runs in RAM for this process.
 _recent_runs: dict[str, dict[str, Any]] = {}
 _RECENT_MAX = 30
@@ -307,6 +308,11 @@ def start_check(pr_url: str, *, model_provider: str = "nebius") -> dict:
                 rp.emit("done", detail="check finished" if p.returncode == 0 else "finished with problems")
             else:
                 rp.emit("failed", detail=(fail_reason or f"exit {p.returncode}")[:200])
+            # remember_run takes _jobs_lock — must not run while we hold it (deadlocks Lock).
+            saved = None
+            if found:
+                rec, path = found
+                saved = (remember_run(rec, path), rec)
             with _jobs_lock:
                 job["exit"] = p.returncode
                 job["log_tail"] = tail
@@ -316,9 +322,8 @@ def start_check(pr_url: str, *, model_provider: str = "nebius") -> dict:
                     job["error"] = fail_reason
                 elif fail_reason and p.returncode != 0:
                     job["warning"] = fail_reason
-                if found:
-                    rec, path = found
-                    row = remember_run(rec, path)
+                if saved:
+                    row, rec = saved
                     job["run_id"] = row["id"]
                     job["record"] = rec
                     job["folder"] = row["folder"]
@@ -393,7 +398,7 @@ class Handler(BaseHTTPRequestHandler):
             return self._json(200, {
                 "ok": True,
                 "service": "proof-of-change-console",
-                "build": "sandbox-fallback-v4",
+                "build": "deadlock-fix-v5",
                 "has_git": (REPO_ROOT / ".git").is_dir(),
                 "poc_commit_env": bool(
                     (os.environ.get("POC_COMMIT") or os.environ.get("RENDER_GIT_COMMIT") or "").strip()),
