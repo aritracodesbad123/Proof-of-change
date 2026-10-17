@@ -171,7 +171,10 @@ Builder **Token Factory** credits pay for Nemotron calls, not for hosting. Skip 
 
 1. Push this repo to GitHub.
 2. [Render](https://dashboard.render.com) → **New** → **Blueprint** → select the repo (`render.yaml`).
-3. Set secret env **`NEBIUS_API_KEY`** (Token Factory). Optional: `NEBIUS_PROJECT_ID`, `POC_DEMO_REPOS`.
+3. Set secrets in the dashboard:
+   - **`NEBIUS_API_KEY`** (Token Factory / models)
+   - **`GITHUB_TOKEN`** — read-only PAT for public repos. Without it, paste-a-PR hits GitHub’s anonymous **60/hour** limit on Render’s shared IP (`PR selection failed: GitHub rate limit`).
+   - Optional: `NEBIUS_PROJECT_ID`, `POC_DEMO_REPOS`
 4. Deploy → open `https://<service>.onrender.com` (same console UI). Free instances sleep when idle.
 
 **Option B — local + share link (truly free)**
