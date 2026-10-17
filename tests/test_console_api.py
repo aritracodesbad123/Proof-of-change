@@ -19,6 +19,62 @@ def test_list_runs_reads_record(tmp_path, monkeypatch):
     assert rows and rows[0]["id"] == "pr-demo-1" and rows[0]["verdict"] == "verified"
 
 
+def test_list_runs_bounded_does_not_remember_every_file(tmp_path, monkeypatch):
+    monkeypatch.setattr(console_api, "RUNS_ROOT", tmp_path / "runs")
+    monkeypatch.setattr(console_api, "REPO_ROOT", tmp_path)
+    console_api._recent_runs.clear()
+    remembered: list[str] = []
+
+    def spy_remember(rec, path=None):
+        remembered.append(str(rec.get("id")))
+        return console_api._row_from_record(rec, path)
+
+    monkeypatch.setattr(console_api, "remember_run", spy_remember)
+    root = tmp_path / "runs"
+    for i in range(12):
+        d = root / "day" / f"run-{i}"
+        d.mkdir(parents=True)
+        (d / "record.json").write_text(json.dumps({
+            "record_kind": "pr_run", "id": f"pr-{i}", "repo": "me/demo", "verdict": "verified",
+            "reason": "ok", "pr": {"number": i, "url": f"https://github.com/me/demo/pull/{i}", "title": "t"},
+        }))
+        # Distinct mtimes so newest-N ordering is stable.
+        import os
+        os.utime(d / "record.json", (1_700_000_000 + i, 1_700_000_000 + i))
+    rows = console_api.list_runs(limit=5)
+    assert len(rows) == 5
+    assert remembered == []  # list_runs must not remember_run every file
+    assert {r["id"] for r in rows} == {f"pr-{i}" for i in range(7, 12)}
+
+
+def test_tail_bytes_and_console_log_tee(tmp_path):
+    log = tmp_path / "console.log"
+    log.write_text("hello\n" + ("x" * 10_000) + "\ntail-line\n")
+    tail = console_api._tail_bytes(log, 8192)
+    assert "tail-line" in tail
+    assert len(tail.encode()) <= 8192 + 32  # decode may expand slightly; still bounded source read
+
+
+def test_start_check_sets_hitl_env(tmp_path, monkeypatch):
+    class FakeThread:
+        def __init__(self, target=None, daemon=None):
+            self.target = target
+
+        def start(self):
+            pass
+
+    monkeypatch.setattr(console_api.threading, "Thread", FakeThread)
+    monkeypatch.setattr(console_api, "REPO_ROOT", tmp_path)
+    (tmp_path / "ops" / "runs" / "_jobs").mkdir(parents=True)
+    (tmp_path / "ops" / "daily_run.py").write_text("# stub\n")
+    job = console_api.start_check("https://github.com/me/demo/pull/3", model_provider="none")
+    assert job["status"] == "queued"
+    with console_api._jobs_lock:
+        raw = console_api._jobs[job["id"]]
+    assert raw.get("hitl_dir")
+    assert (tmp_path / "ops" / "runs" / "_jobs" / job["id"]).is_dir()
+
+
 def test_find_reviewer_report_under_daily(tmp_path, monkeypatch):
     monkeypatch.setattr(console_api, "REPO_ROOT", tmp_path)
     monkeypatch.setattr(console_api, "REPORTS_DAILY", tmp_path / "reports" / "daily")

@@ -1,5 +1,13 @@
 import { useCallback, useEffect, useState } from 'react'
-import { api, type Job, type RunRow, type StageEvent, type SwarmStatus } from './api'
+import {
+  api,
+  type HitlApprovalBody,
+  type HitlDraft,
+  type Job,
+  type RunRow,
+  type StageEvent,
+  type SwarmStatus,
+} from './api'
 import './App.css'
 
 const LOCAL_RUNS_KEY = 'poc-console-runs-v1'
@@ -45,6 +53,7 @@ const STAGE_ORDER = [
   'install_main',
   'install_pr',
   'claims',
+  'await_human',
   'probes',
   'pytest',
   'verdict',
@@ -61,6 +70,7 @@ const STAGE_LABEL: Record<string, string> = {
   install_main: 'Install main',
   install_pr: 'Install PR',
   claims: 'Claims',
+  await_human: 'Human review',
   probes: 'Probes',
   pytest: 'Pytest',
   verdict: 'Code verdict',
@@ -71,6 +81,8 @@ const STAGE_LABEL: Record<string, string> = {
   done: 'Done',
   failed: 'Failed',
 }
+
+const MAX_SCENARIOS = 20
 
 const AGENTS: { key: keyof SwarmStatus; name: string; role: string }[] = [
   { key: 'ultra', name: 'Ultra', role: 'Judge — labels findings' },
@@ -100,9 +112,11 @@ export default function App() {
     report_html?: string | null
   } | null>(null)
   const [job, setJob] = useState<Job | null>(null)
-  const [logOpen, setLogOpen] = useState(false)
+  const [refreshing, setRefreshing] = useState(false)
+  const [jobRefreshing, setJobRefreshing] = useState(false)
 
   const refresh = useCallback(async () => {
+    setRefreshing(true)
     try {
       setApiOk((await api.health()).ok)
       const remote = (await api.runs()).runs
@@ -110,9 +124,11 @@ export default function App() {
       setErr(null)
     } catch (e) {
       setApiOk(false)
-      // Disk may be empty after Render sleep — still show browser-cached runs.
-      setRuns(mergeRunLists([], loadLocalRuns()))
+      // Keep prior runs on failure; only fill from browser cache when we have none yet.
+      setRuns((prev) => (prev.length ? prev : mergeRunLists([], loadLocalRuns())))
       setErr(e instanceof Error ? e.message : String(e))
+    } finally {
+      setRefreshing(false)
     }
   }, [])
 
@@ -168,12 +184,14 @@ export default function App() {
   useEffect(() => {
     if (view.name !== 'job') return
     let stop = false
+    let retries = 0
     const tick = async () => {
       try {
         const j = await api.job(view.id)
         if (stop) return
+        retries = 0
         setJob(j)
-        if (j.status === 'failed') setLogOpen(true)
+        setErr(null)
         if (j.status === 'done' || j.status === 'failed') {
           if (j.record && j.run_id) {
             const pr = j.record.pr as { number?: number; url?: string; title?: string } | undefined
@@ -213,7 +231,14 @@ export default function App() {
         }
         window.setTimeout(() => void tick(), 1500)
       } catch (e) {
-        if (!stop) setErr(e instanceof Error ? e.message : String(e))
+        if (stop) return
+        retries += 1
+        if (retries < 4) {
+          window.setTimeout(() => void tick(), 1000 * retries)
+          return
+        }
+        setErr(e instanceof Error ? e.message : String(e))
+        window.setTimeout(() => void tick(), 4000)
       }
     }
     void tick()
@@ -222,11 +247,24 @@ export default function App() {
     }
   }, [view, refresh])
 
+  async function refreshJob() {
+    if (view.name !== 'job') return
+    setJobRefreshing(true)
+    try {
+      const j = await api.job(view.id)
+      setJob(j)
+      setErr(null)
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : String(e))
+    } finally {
+      setJobRefreshing(false)
+    }
+  }
+
   async function onStart(e: React.FormEvent) {
     e.preventDefault()
     setBusy(true)
     setErr(null)
-    setLogOpen(false)
     try {
       const j = await api.startCheck(prUrl.trim(), provider)
       setView({ name: 'job', id: j.id })
@@ -292,8 +330,8 @@ export default function App() {
           <section className="panel">
             <div className="row">
               <h2>Recent runs</h2>
-              <button type="button" className="ghost" onClick={() => void refresh()}>
-                Refresh
+              <button type="button" className="ghost" onClick={() => void refresh()} disabled={refreshing}>
+                {refreshing ? 'Refreshing…' : 'Refresh'}
               </button>
             </div>
             {runs.length === 0 ? (
@@ -325,69 +363,84 @@ export default function App() {
 
       {view.name === 'job' && job && (
         <main className="main job-main">
-          <button type="button" className="ghost back" onClick={() => setView({ name: 'home' })}>
-            ← Back
-          </button>
+          <div className="job-toolbar">
+            <button type="button" className="ghost back" onClick={() => setView({ name: 'home' })}>
+              ← Back
+            </button>
+            <button type="button" className="ghost" onClick={() => void refreshJob()} disabled={jobRefreshing}>
+              {jobRefreshing ? 'Refreshing…' : 'Refresh'}
+            </button>
+          </div>
           <p className="job-kicker">
             {job.repo}#{job.pr} · <strong>{job.status}</strong>
           </p>
-          <h1>Agent swarm</h1>
+          <h1>Live check</h1>
           <p className="lede">
             {job.current_detail ||
-              (job.status === 'running'
-                ? 'Pipeline running — swarm stands by until the code verdict.'
-                : job.status === 'done'
-                  ? 'Check finished — opening the analysis…'
-                  : job.status === 'failed'
-                    ? 'Check failed before a full analysis was saved.'
-                    : 'Waiting…')}
+              (job.status === 'awaiting_human'
+                ? 'AI drafted claims and probes — approve, drop, or add business scenarios to continue.'
+                : job.status === 'running'
+                  ? 'Pipeline running — swarm stands by until the code verdict.'
+                  : job.status === 'done'
+                    ? 'Check finished — opening the analysis…'
+                    : job.status === 'failed'
+                      ? 'Check failed before a full analysis was saved.'
+                      : 'Waiting…')}
           </p>
 
-          <SwarmTheater
-            swarm={job.swarm}
-            currentAgent={job.current_agent}
-            detail={job.current_detail}
-          />
-          <StageRunway stages={job.stages || []} current={job.current_stage} />
+          <div className="job-grid">
+            <div className="job-left">
+              <SwarmTheater
+                swarm={job.swarm}
+                currentAgent={job.current_agent}
+                detail={job.current_detail}
+              />
+              {job.status === 'awaiting_human' && job.hitl_draft && (
+                <HitlPanel jobId={job.id} draft={job.hitl_draft} onSubmitted={(j) => setJob(j)} />
+              )}
+              {job.error && (
+                <p className="banner err" role="alert">
+                  {job.error}
+                </p>
+              )}
+              {job.warning && !job.error && (
+                <p className="banner warn" role="status">
+                  {job.warning}
+                </p>
+              )}
+              {job.run_id && (
+                <p className="report-links">
+                  <button type="button" className="linkish" onClick={() => setView({ name: 'run', id: job.run_id! })}>
+                    Open analysis {job.run_id}
+                  </button>
+                  {job.report_pdf ? (
+                    <a className="btn-report" href={job.report_pdf} target="_blank" rel="noreferrer">
+                      Open PDF report
+                    </a>
+                  ) : null}
+                  {job.report_html ? (
+                    <a className="btn-report ghost" href={job.report_html} target="_blank" rel="noreferrer">
+                      Open HTML report
+                    </a>
+                  ) : null}
+                </p>
+              )}
+            </div>
+            <aside className="job-right">
+              <ProcessFlow stages={job.stages || []} current={job.current_stage} />
+            </aside>
+          </div>
 
-          {job.error && (
-            <p className="banner err" role="alert">
-              {job.error}
-            </p>
-          )}
-          {job.warning && !job.error && (
-            <p className="banner warn" role="status">
-              {job.warning}
-            </p>
-          )}
-          {job.run_id && (
-            <p className="report-links">
-              <button type="button" className="linkish" onClick={() => setView({ name: 'run', id: job.run_id! })}>
-                Open analysis {job.run_id}
-              </button>
-              {job.report_pdf ? (
-                <a className="btn-report" href={job.report_pdf} target="_blank" rel="noreferrer">
-                  Open PDF report
-                </a>
-              ) : null}
-              {job.report_html ? (
-                <a className="btn-report ghost" href={job.report_html} target="_blank" rel="noreferrer">
-                  Open HTML report
-                </a>
-              ) : null}
-            </p>
-          )}
-          <button type="button" className="ghost log-toggle" onClick={() => setLogOpen((o) => !o)}>
-            {logOpen ? 'Hide log' : 'Show log tail'}
-          </button>
-          {(logOpen || job.status === 'failed') && job.log_tail && (
-            <pre className="log" tabIndex={0}>
-              {job.log_tail}
-            </pre>
-          )}
-          {job.status === 'failed' && !job.log_tail && (
-            <p className="empty">No log captured. Re-run the check; failures now keep stderr in this panel.</p>
-          )}
+          <section className="live-log" aria-label="Live console log">
+            <h2>Live log</h2>
+            {job.log_tail ? (
+              <pre className="log always-on" tabIndex={0}>
+                {job.log_tail}
+              </pre>
+            ) : (
+              <p className="empty">Waiting for process output…</p>
+            )}
+          </section>
         </main>
       )}
 
@@ -477,30 +530,205 @@ function SwarmTheater({
   )
 }
 
-function StageRunway({ stages, current }: { stages: StageEvent[]; current?: string | null }) {
+function ProcessFlow({ stages, current }: { stages: StageEvent[]; current?: string | null }) {
   const seen = new Set(stages.map((e) => e.stage))
   const failed = seen.has('failed')
+  const orderIdx = current ? STAGE_ORDER.indexOf(current as (typeof STAGE_ORDER)[number]) : -1
   return (
-    <ol className="runway">
-      {STAGE_ORDER.map((id) => {
-        let state = 'pending'
-        if (seen.has(id) && id !== current) state = 'done'
-        if (current === id) state = 'current'
-        if (failed && id === 'done') state = 'skipped'
-        return (
-          <li key={id} className={`runway-step ${state}`} data-stage={id}>
-            <span className="dot" />
-            <span className="label">{STAGE_LABEL[id] || id}</span>
+    <div className="process-flow" aria-label="Process flow">
+      <h2>Process flow</h2>
+      <ol className="flow-rail">
+        {STAGE_ORDER.map((id, i) => {
+          let state = 'pending'
+          if (seen.has(id) && id !== current) state = 'done'
+          if (current === id) state = 'current'
+          if (orderIdx >= 0 && i < orderIdx && !seen.has(id)) state = 'done'
+          if (failed && id === 'done') state = 'skipped'
+          return (
+            <li key={id} className={`flow-step ${state}`} data-stage={id}>
+              <span className="flow-marker" aria-hidden />
+              <span className="flow-label">{STAGE_LABEL[id] || id}</span>
+            </li>
+          )
+        })}
+        {failed && (
+          <li className="flow-step current" data-stage="failed">
+            <span className="flow-marker" aria-hidden />
+            <span className="flow-label">Failed</span>
           </li>
-        )
-      })}
-      {failed && (
-        <li className="runway-step current" data-stage="failed">
-          <span className="dot" />
-          <span className="label">Failed</span>
-        </li>
+        )}
+      </ol>
+    </div>
+  )
+}
+
+function HitlPanel({
+  jobId,
+  draft,
+  onSubmitted,
+}: {
+  jobId: string
+  draft: HitlDraft
+  onSubmitted: (j: Job) => void
+}) {
+  const probeIds = (draft.probe_ids || (draft.probes || []).map((p) => String(p.id || '')).filter(Boolean)) as string[]
+  const [approve, setApprove] = useState<Record<string, boolean>>(() =>
+    Object.fromEntries(probeIds.map((id) => [id, true])),
+  )
+  const [scenarios, setScenarios] = useState<string[]>([''])
+  const [answers, setAnswers] = useState<Record<string, string>>({})
+  const [skipBiz, setSkipBiz] = useState(false)
+  const [busy, setBusy] = useState(false)
+  const [localErr, setLocalErr] = useState<string | null>(null)
+
+  const questions = draft.business_questions || []
+  const needsBiz = Boolean(draft.needs_business_followup) && !skipBiz
+
+  async function onContinue(e: React.FormEvent) {
+    e.preventDefault()
+    setLocalErr(null)
+    const extras = scenarios.map((s) => s.trim()).filter(Boolean)
+    if (extras.length > MAX_SCENARIOS) {
+      setLocalErr(`At most ${MAX_SCENARIOS} scenarios`)
+      return
+    }
+    if (needsBiz) {
+      const missing = questions.filter((q) => !String(answers[q.id] || '').trim())
+      if (missing.length) {
+        setLocalErr('Answer business questions or skip follow-up')
+        return
+      }
+    }
+    const body: HitlApprovalBody = {
+      approve: probeIds.filter((id) => approve[id]),
+      extra_scenarios: extras,
+      business_answers: answers,
+      skip_business_followup: skipBiz,
+    }
+    setBusy(true)
+    try {
+      await api.submitScenarios(jobId, body)
+      const j = await api.job(jobId)
+      onSubmitted(j)
+    } catch (ex) {
+      setLocalErr(ex instanceof Error ? ex.message : String(ex))
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  return (
+    <section className="hitl panel" aria-label="Human review">
+      <h2>Human review</h2>
+      <p className="hint">
+        Approve or drop drafted probes, add business scenarios, then continue. Freeze happens after you
+        submit.
+      </p>
+
+      {(draft.claims || []).length > 0 && (
+        <div className="hitl-claims">
+          <h3>Claims</h3>
+          <ul>
+            {(draft.claims || []).map((c) => (
+              <li key={String(c.id)}>
+                <strong>{String(c.id)}</strong> — {String(c.text || '')}
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
-    </ol>
+
+      <form onSubmit={(e) => void onContinue(e)} className="hitl-form">
+        <h3>Draft probes</h3>
+        {probeIds.length === 0 ? (
+          <p className="empty">No draft probes — add scenarios below or continue empty.</p>
+        ) : (
+          <ul className="hitl-probes">
+            {probeIds.map((id) => {
+              const preview = (draft.probes || []).find((p) => p.id === id)
+              return (
+                <li key={id}>
+                  <label className="hitl-probe-row">
+                    <input
+                      type="checkbox"
+                      checked={Boolean(approve[id])}
+                      onChange={(e) => setApprove((a) => ({ ...a, [id]: e.target.checked }))}
+                    />
+                    <span>
+                      <code>{id}</code>
+                      {preview?.about ? <> — {preview.about}</> : null}
+                    </span>
+                  </label>
+                </li>
+              )
+            })}
+          </ul>
+        )}
+
+        <h3>Business scenarios</h3>
+        <p className="hint">Add one or more scenarios the probes should cover (max {MAX_SCENARIOS}).</p>
+        <div className="scenario-list">
+          {scenarios.map((s, i) => (
+            <div key={i} className="scenario-row">
+              <input
+                value={s}
+                onChange={(e) =>
+                  setScenarios((rows) => rows.map((x, j) => (j === i ? e.target.value : x)))
+                }
+                placeholder={`Scenario ${i + 1}`}
+                aria-label={`Scenario ${i + 1}`}
+              />
+              <button
+                type="button"
+                className="ghost"
+                disabled={scenarios.length <= 1}
+                onClick={() => setScenarios((rows) => rows.filter((_, j) => j !== i))}
+              >
+                Remove
+              </button>
+            </div>
+          ))}
+        </div>
+        <button
+          type="button"
+          className="ghost"
+          disabled={scenarios.length >= MAX_SCENARIOS}
+          onClick={() => setScenarios((rows) => (rows.length >= MAX_SCENARIOS ? rows : [...rows, '']))}
+        >
+          Add another
+        </button>
+
+        {Boolean(draft.needs_business_followup) && (
+          <div className="hitl-biz">
+            <h3>Business follow-up</h3>
+            <label className="hitl-probe-row">
+              <input type="checkbox" checked={skipBiz} onChange={(e) => setSkipBiz(e.target.checked)} />
+              <span>Skip business follow-up</span>
+            </label>
+            {!skipBiz &&
+              questions.map((q) => (
+                <label key={q.id}>
+                  {q.prompt}
+                  <input
+                    value={answers[q.id] || ''}
+                    onChange={(e) => setAnswers((a) => ({ ...a, [q.id]: e.target.value }))}
+                    required={needsBiz}
+                  />
+                </label>
+              ))}
+          </div>
+        )}
+
+        {localErr && (
+          <p className="banner err" role="alert">
+            {localErr}
+          </p>
+        )}
+        <button type="submit" disabled={busy}>
+          {busy ? 'Submitting…' : 'Continue check'}
+        </button>
+      </form>
+    </section>
   )
 }
 

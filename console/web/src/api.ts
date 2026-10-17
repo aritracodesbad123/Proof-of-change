@@ -37,6 +37,34 @@ export type SwarmStatus = {
   super: string
 }
 
+export type HitlQuestion = {
+  id: string
+  prompt: string
+}
+
+export type HitlProbePreview = {
+  id?: string
+  about?: string
+  claims?: unknown[]
+  code_preview?: string
+}
+
+export type HitlDraft = {
+  claims?: Array<Record<string, unknown>>
+  probes?: HitlProbePreview[]
+  probe_ids?: string[]
+  needs_business_followup?: boolean
+  business_questions?: HitlQuestion[]
+  rejected_claims?: unknown[]
+}
+
+export type HitlApprovalBody = {
+  approve: string[]
+  extra_scenarios: string[]
+  business_answers: Record<string, string>
+  skip_business_followup: boolean
+}
+
 export type Job = {
   id: string
   status: string
@@ -57,6 +85,8 @@ export type Job = {
   current_agent?: string | null
   current_detail?: string | null
   swarm?: SwarmStatus
+  hitl_draft?: HitlDraft | null
+  hitl_approval?: HitlApprovalBody | null
 }
 
 export const api = {
@@ -76,4 +106,9 @@ export const api = {
       body: JSON.stringify({ pr_url, model_provider }),
     }),
   job: (id: string) => json<Job>(`/api/jobs/${encodeURIComponent(id)}`),
+  submitScenarios: (id: string, body: HitlApprovalBody) =>
+    json<{ ok: boolean; approval: HitlApprovalBody }>(
+      `/api/jobs/${encodeURIComponent(id)}/scenarios`,
+      { method: 'POST', body: JSON.stringify(body) },
+    ),
 }

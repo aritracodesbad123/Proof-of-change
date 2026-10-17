@@ -193,8 +193,7 @@ def generate(provider: Provider, repo: str, pr: int, title: str, body: str | Non
                 resp = again
             else:
                 out["retried"]["kept_first_answer"] = "the retry linked no claim either"
-    gen = freeze.generator("model", model=provider.models["probes"], provider=provider.name)
-    outdir.mkdir(parents=True, exist_ok=True)
+    draft_probes: list = []
     for p in (resp or {}).get("probes", [])[:MAX_PROBES]:
         # Models name probes "P1" or "probe_x"; the id is only a file name, so normalise it rather than drop the probe
         if isinstance(p, dict) and isinstance(p.get("id"), str):
@@ -207,6 +206,22 @@ def generate(provider: Provider, repo: str, pr: int, title: str, body: str | Non
         if why:
             out["errors"].append(f"probe {p.get('id')!r} rejected: {why}")
             continue
+        draft_probes.append(p)
+
+    # Console HITL: freeze only after the operator approves / adds scenarios.
+    from poc import hitl
+    if hitl.hitl_enabled():
+        return hitl.gate_and_materialize(
+            provider=provider, repo=repo, pr=pr, title=title, body=body,
+            draft_probes=draft_probes, claims=kept, rejected_claims=rejected,
+            base_files=base_files, base_root=base_root, pr_roots=pr_roots, outdir=outdir,
+            tidy_id=_tidy_id, unescape_code=_unescape_code, validate_probe=validate_probe,
+            probe_file=probe_file, errors=out["errors"],
+        )
+
+    gen = freeze.generator("model", model=provider.models["probes"], provider=provider.name)
+    outdir.mkdir(parents=True, exist_ok=True)
+    for p in draft_probes:
         path = outdir / f"model-{p['id']}.py"
         path.write_text(probe_file(p, f"{repo}#{pr}", by_id, gen["label"]))
         out["probes"].append({"path": path, "freeze": freeze.freeze(path, gen, inputs)})
