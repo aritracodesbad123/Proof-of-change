@@ -987,7 +987,7 @@
    "recommendation": "APPROVE"
   }
  ],
- "pr_observations": "/workspace/evals/fixtures/golden_pr_v1.jsonl",
+ "pr_observations": "evals/fixtures/golden_pr_v1.jsonl",
  "pr_records": [
   {
    "id": "pr-rasbt-mlxtend-1229-296459ec1712-2026-10-10-probes",

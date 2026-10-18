@@ -45,7 +45,7 @@ Deadline: **Friday, October 30, 2026, 10:00 am PT**
 2. **Record ≤3 min YouTube video** from [`DEMO_SCRIPT_3MIN.md`](DEMO_SCRIPT_3MIN.md).
 3. **Approve and execute hosted deploy** (proposal below) so the Devpost form has a demo URL.
 4. Fill labelled safe PR (`safe-TODO-1`) before quoting blind false-alarm rates.
-5. Confirm GitHub repo is **public** and license shows in the About box.
+5. Confirm GitHub repo is **public** and license shows in the About section.
 
 ---
 
