@@ -170,7 +170,7 @@ def test_checkout_fetches_submodules_on_both_sides(tmp_path, merged_repo, monkey
     co = bench.checkout(dr, row_for(merged_repo), work, tmp_path / "git.log")
     assert co["ok"], co
     subs = [c for c in seen if c[3:] == ["submodule", "update", "--init", "--recursive"]]
-    assert [c[2] for c in subs] == [str(work / "side-main"), str(work / "side-pr")]
+    assert [c[2] for c in subs] == [str((work / "side-main").resolve()), str((work / "side-pr").resolve())]
 
 
 def test_checkout_fails_clearly_when_submodules_cannot_be_fetched(tmp_path, merged_repo, monkeypatch):
