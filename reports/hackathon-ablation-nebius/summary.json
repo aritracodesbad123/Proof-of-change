@@ -1,0 +1,41 @@
+[
+  {
+    "baseline": "full",
+    "verdict": "needs_attention",
+    "provider": "nebius",
+    "ai_calls": 5,
+    "ai_cost_usd": 0.002891,
+    "total_cost_usd": 0.160464,
+    "wall_s": 2363.6,
+    "agents_status": "ran",
+    "advisory": true,
+    "reason": "probe: 2 observation(s) need attention: caller_x_after_call.changed_columns differs and no claim covers it; int_groups_after_multi_group.importances differs and no claim covers it; probe: claim(s) C1, C2 proven; probe: 1 other observation(s) identical on both sides; tests: 9 test(s) ran on main, 10 on the PR; 1 new test(s) pass, 9 unchanged",
+    "source": "ops/runs/hackathon-ablation-nebius/full/runs/2026-10-20-check-0205/mlxtend-1229/record.json"
+  },
+  {
+    "baseline": "tests",
+    "verdict": "verified",
+    "provider": "none",
+    "ai_calls": 0,
+    "ai_cost_usd": 0.0,
+    "total_cost_usd": 0.126427,
+    "wall_s": 1896.4,
+    "agents_status": "skipped",
+    "advisory": null,
+    "reason": "9 test(s) ran on main, 10 on the PR; 1 new test(s) pass, 9 unchanged",
+    "source": "ops/runs/hackathon-ablation-nebius/tests/runs/2026-10-20-check-0032/mlxtend-1229/record.json"
+  },
+  {
+    "baseline": "tests+probes",
+    "verdict": "needs_attention",
+    "provider": "nebius",
+    "ai_calls": 6,
+    "ai_cost_usd": 0.007275,
+    "total_cost_usd": 0.249502,
+    "wall_s": 3633.4,
+    "agents_status": "ran",
+    "advisory": true,
+    "reason": "probe: 2 observation(s) need attention: caller_x_after_call.changed_columns differs and no claim covers it; int_groups_after_multi_group.importances differs and no claim covers it; probe: claim(s) C1, C2 proven; probe: 1 other observation(s) identical on both sides; probe model-probe2 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequ",
+    "source": "ops/runs/hackathon-ablation-nebius/tests+probes/runs/2026-10-20-check-0104/mlxtend-1229/record.json"
+  }
+]

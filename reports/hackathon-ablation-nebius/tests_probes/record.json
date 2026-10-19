@@ -1,0 +1,122 @@
+{
+  "record_kind": "pr_run",
+  "verdict": "needs_attention",
+  "baseline": "tests+probes",
+  "reason": "probe: 2 observation(s) need attention: caller_x_after_call.changed_columns differs and no claim covers it; int_groups_after_multi_group.importances differs and no claim covers it; probe: claim(s) C1, C2 proven; probe: 1 other observation(s) identical on both sides; probe model-probe2 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count; probe model-probe3 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count; probe model-probe4 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count; tests: 9 test(s) ran on main, 10 on the PR; 1 new test(s) pass, 9 unchanged",
+  "model_provider_used": "nebius",
+  "poc_commit": "e86cca5c7dfc6984f897224daca0066837c75fe1",
+  "pr": {
+    "repo": "rasbt/mlxtend",
+    "number": 1229,
+    "url": "https://github.com/rasbt/mlxtend/pull/1229",
+    "title": "Fix feature_importance_permutation permuting the wrong columns for feature_groups",
+    "base_sha": "1aee767ef57b84a8191511a08955c583b65de382",
+    "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+    "head_sha": "296459ec17120e757a56c7bb08c831469b0e5aa4",
+    "merge_commit": "1af398f8e6305b25d59fba572ec21d51da1fe692",
+    "tested_main_sha": "1aee767ef57b84a8191511a08955c583b65de382",
+    "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+  },
+  "repo": "rasbt/mlxtend",
+  "cost": {
+    "ai_calls": 6,
+    "failed_ai_calls": 1,
+    "input_tokens": 3508,
+    "output_tokens": 6914,
+    "thinking_tokens": 5170,
+    "cost_usd": 0.007275,
+    "calls_without_usage": 3,
+    "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+    "compute_seconds": {
+      "total_wall": 3633.4,
+      "tests": 499.7
+    },
+    "ai_cost_usd": 0.007275,
+    "machine_usd_per_hour": 0.24,
+    "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+    "computer_cost_usd": 0.242227,
+    "total_cost_usd": 0.249502,
+    "cost_complete": false
+  },
+  "agents": {
+    "status": "ran",
+    "advisory": true,
+    "note": "judge/helper/summary are advisory; code owns the verdict",
+    "roles": [
+      {
+        "role": "judge",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+        "status": "ok",
+        "note": null,
+        "labels": [
+          {
+            "id": "probe-feature-groups-permutation",
+            "label": "needs_human",
+            "reason": "This probe tests feature group permutations and importances, requiring human evaluation to determine if results indicate a real issue or expected behavior."
+          },
+          {
+            "id": "probe-model-probe2",
+            "label": "needs_human",
+            "reason": "This probe tests list groups [2] and [3], needing human review to assess if the test reveals a genuine problem."
+          },
+          {
+            "id": "probe-model-probe3",
+            "label": "needs_human",
+            "reason": "This probe tests integer group [2], requiring human interpretation to determine significance."
+          },
+          {
+            "id": "probe-model-probe4",
+            "label": "needs_human",
+            "reason": "This probe tests one-hot group preservation, needing human judgment to evaluate if results indicate a defect."
+          }
+        ]
+      },
+      {
+        "role": "helper",
+        "model": "nvidia/Nemotron-3_5-Lightning",
+        "status": "ok",
+        "note": null,
+        "notes": [
+          "diff: caller_x_after_call.changed_columns uncovered by claims",
+          "diff: int_groups_after_multi_group.importances uncovered by claims",
+          "proven: claims C1, C2 established for feature_groups permutation",
+          "probe: model-probe2/3/4 consistently inadequate, output parsing issue",
+          "observation: 1 other metric identical on both sides"
+        ]
+      },
+      {
+        "role": "summary",
+        "model": "nvidia/nemotron-3-super-120b-a12b",
+        "status": "ok",
+        "note": "model returned empty text; filled from code verdict/reason"
+      }
+    ],
+    "provider": {
+      "provider": "nebius",
+      "models": {
+        "claims": "nvidia/nemotron-3-super-120b-a12b",
+        "probes": "nvidia/nemotron-3-super-120b-a12b",
+        "judge": "nvidia/Nemotron-3-Ultra-550b-a55b",
+        "helper": "nvidia/Nemotron-3_5-Lightning",
+        "summary": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "blind": true
+    }
+  },
+  "route": "source-pair",
+  "tested": {
+    "main": "master @ 1aee767ef57b (base tip = first parent of the merge commit)",
+    "pr": "GitHub test merge commit 1af398f8e630 (refs/pull/1229/merge) of head 296459ec1712"
+  },
+  "sides": {
+    "comparison_basis": "base tip vs GitHub test merge (refs/pull/N/merge)",
+    "main_sha": "1aee767ef57b84a8191511a08955c583b65de382",
+    "pr_sha": "1af398f8e6305b25d59fba572ec21d51da1fe692",
+    "merge_commit": "1af398f8e6305b25d59fba572ec21d51da1fe692",
+    "merge_parents": [
+      "1aee767ef57b84a8191511a08955c583b65de382",
+      "296459ec17120e757a56c7bb08c831469b0e5aa4"
+    ],
+    "merge_head_matches_pinned_head": true
+  }
+}

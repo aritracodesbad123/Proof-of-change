@@ -2,7 +2,7 @@
 
 **Evaluation commit (baseline / golden evals):** `422788984d0df19499861f69a5234ab0cd598627`  
 **Branch tip (includes this report + console UX):** see `git rev-parse HEAD` on `cursor/hackathon-submission-prep-81ec`  
-**Date:** 2026-10-17  
+**Date:** 2026-10-17 (offline); live Nebius section 2026-10-20  
 **Models configured** ([`poc/model_provider.py`](../poc/model_provider.py)):
 
 | Task | Model ID |
@@ -11,7 +11,7 @@
 | judge | `nvidia/Nemotron-3-Ultra-550b-a55b` |
 | helper | `nvidia/Nemotron-3_5-Lightning` (fallback `nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B`) |
 
-**Provider this run:** `recorded` for offline checks; **live `nebius` blocked** — `NEBIUS_API_KEY` unset in the evaluation environment.
+**Provider:** offline `recorded` (golden evals) + **live `nebius`** (mlxtend#1229 A/B/C on 2026-10-20, Mac `--unsafe-no-sandbox`, key from local `.env`).
 
 ## How A / B / C map to this codebase
 
@@ -91,28 +91,38 @@ Probe evidence expected (and checked by golden eval): differences on
 
 These are **not** re-executed live in this hackathon agent session; they are fixture-backed and CI-gated (`golden_v1` APPROVE).
 
+## Live Nebius A/B/C — mlxtend#1229 (2026-10-20)
+
+Source records (tracked): [`reports/hackathon-ablation-nebius/`](hackathon-ablation-nebius/) (`summary.json` + per-baseline `record.json`). Full local dual-run artifacts remain under gitignored `ops/runs/hackathon-ablation-nebius/`.
+Host: macOS, `--unsafe-no-sandbox` (no bubblewrap). Runner included a local fix so `git -C src worktree add` uses absolute paths (relative `--ops-dir` previously nested checkouts under `src/` and failed install).
+
+| Config | Baseline | Verdict | Provider | AI calls | Wall (s) | Total USD |
+|---|---|---|---|---|---|---|
+| A | `tests` | `verified` | none | 0 | 1896.4 | 0.126 |
+| B | `tests+probes` | `needs_attention` | nebius | 6 | 3633.4 | 0.250 |
+| C | `full` | `needs_attention` | nebius | 5 | 2363.6 | 0.160 |
+
+**A reason:** 9 tests on main, 10 on PR; 1 new test passes, 9 unchanged.
+
+**B/C reason (shared probe catch):** claims C1/C2 proven; 2 uncovered diffs — `caller_x_after_call.changed_columns`, `int_groups_after_multi_group.importances`. Advisory swarm ran (`agents.status=ran`, `advisory=True`); did not change the Super/probe verdict.
+
+**Interpretation (live matches fixture):** tests-only false-negatives the behavioral drift; Nebius Super probes recover `needs_attention`. Same A→B/C pattern as golden-pr.
+
 ## Swarm versus single-agent incremental value
 
 | Question | Result |
 |---|---|
-| Does Ultra/Lightning/Summary change catch rate vs B? | **Not measured as a verdict metric** — by design they cannot |
-| Does B/C improve over A on mlxtend#1229? | **Yes** — `verified` → `needs_attention` (fixture + golden eval) |
-| Live Nebius token/cost/latency table | **Not produced** — key unset |
-| Blind PR ablation table (`evals.ablation --run`) | **Not produced** — needs key + long dual-runs on labelled PRs |
+| Does Ultra/Lightning/Summary change catch rate vs B? | **Not a verdict metric** — advisory only; B and C same `needs_attention` live |
+| Does B/C improve over A on mlxtend#1229? | **Yes** — live + fixture: `verified` → `needs_attention` |
+| Live Nebius token/cost/latency | **Table above** (Token Factory + machine estimate in records) |
+| Blind multi-PR ablation (`evals.ablation --run`) | Still open — needs labelled set + time |
 
-## Blockers for a full live comparison
+## Remaining gaps
 
-1. Export `NEBIUS_API_KEY` (and optionally `NEBIUS_PROJECT_ID` for Contree).
-2. Re-run:
-
-```bash
-python -m evals.ablation --run --out-dir reports/hackathon-ablation-nebius \
-  --model-provider nebius
-# then open reports/hackathon-ablation-nebius/ablation.md
-```
-
-3. Fill a verified safe labelled PR (`safe-TODO-1`) before quoting blind FPR.
+1. Commit/push the absolute worktree-path fix in `ops/daily_run.py` / `ops/bench.py` (required for relative `--ops-dir`).
+2. Fill a verified safe labelled PR (`safe-TODO-1`) before quoting blind FPR.
+3. Optional Contree / Linux bwrap for production-like sandbox (this live run used `--unsafe-no-sandbox`).
 
 ## Honesty note
 
-No manufactured live Nebius metrics. Offline APPROVE results and the mlxtend A/B/C baseline table above are the measured evidence available in this environment.
+Live metrics above are from real Nebius Token Factory calls and dual-run pytest on mlxtend#1229. Offline golden APPROVE numbers remain the CI gate evidence.

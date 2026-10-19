@@ -541,7 +541,9 @@ def source_pair(repo: str, item: dict, work: Path, log: Path, python: str, timeo
                     "pr_sha": merge, "merge_commit": merge, "merge_parents": [parent1, parent2],
                     "merge_head_matches_pinned_head": parent2 == head}
     for side in ("main", "pr"):
-        rc, _ = run(["git", "-C", src, "worktree", "add", "-q", "--detach", work / f"side-{side}", res[f"{side}_sha"]],
+        # git -C resolves relative worktree paths against src/, not cwd.
+        rc, _ = run(["git", "-C", src, "worktree", "add", "-q", "--detach",
+                    (work / f"side-{side}").resolve(), res[f"{side}_sha"]],
                     log, env=env, timeout=900)
         if rc != 0:
             return {"ok": False, "why": f"checkout of {side} side failed"}
@@ -3296,7 +3298,7 @@ def main(argv=None) -> int:
     started = now_ist()
     single = parse_pr_urls(a.pr)
     default_name = started.strftime("%Y-%m-%d") + (started.strftime("-check-%H%M") if single else "")
-    ops = Path(a.ops_dir); rdir = ops / "runs" / (a.date or default_name)
+    ops = Path(a.ops_dir).resolve(); rdir = ops / "runs" / (a.date or default_name)
     if single:  # one-off check: no library list, chosen-PRs or verification file apply
         a.libraries_file = str(rdir / "no-libraries.csv")
         a.chosen_prs = str(rdir / "no-chosen-prs.md")
@@ -3306,7 +3308,7 @@ def main(argv=None) -> int:
     if a.report_only:
         return report_only(rdir, a)
     rdir.mkdir(parents=True, exist_ok=True)
-    workroot = Path(a.work_dir or ops / "work")
+    workroot = Path(a.work_dir or ops / "work").resolve()
     seen_path = ops / "seen_prs.json"
     seen = json.loads(seen_path.read_text()) if seen_path.exists() else {"last_run_utc": {}, "prs": {}}
     free_gb = shutil.disk_usage(ops).free / 1e9
