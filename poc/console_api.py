@@ -56,6 +56,19 @@ def contree_usable() -> bool:
     return True
 
 
+def console_daily_run_argv(pr_url: str, model_provider: str, extra_flags: list[str] | None = None) -> list[str]:
+    """The command the operator console uses to start one pull-request check.
+
+    ``--console-job`` is how that check may start with operator approval on. An environment
+    variable cannot take its place.
+    """
+    py = REPO_ROOT / ".venv" / "bin" / "python"
+    exe = str(py) if py.is_file() else os.environ.get("PYTHON", "python3")
+    return [exe, str(REPO_ROOT / "ops" / "daily_run.py"),
+            "--pr", pr_url.strip(), "--model-provider", model_provider,
+            "--swarm", "--console-job", *(extra_flags or [])]
+
+
 def console_run_flags() -> tuple[list[str], str | None]:
     """Extra daily_run flags for hosted console (Render blocks bwrap uid maps).
 
@@ -419,9 +432,12 @@ def start_check(pr_url: str, *, model_provider: str = "nebius") -> dict:
 
         env = os.environ.copy()
         env["POC_PROGRESS_PATH"] = str(progress_path)
-        # Console always enables HITL mid-check; bench/CLI leave these unset.
+        # The console asks for operator approval and turns the advisory swarm on itself.
+        # --console-job is what lets this single pull-request check start. POC_CONSOLE does not.
         env["POC_HITL"] = "1"
         env["POC_HITL_DIR"] = str(hitl_dir)
+        env["POC_CONSOLE"] = "1"
+        env["POC_SWARM"] = "1"
         with _jobs_lock:
             job["status"] = "running"
             job["started_at"] = time.time()
@@ -435,10 +451,7 @@ def start_check(pr_url: str, *, model_provider: str = "nebius") -> dict:
                 job["run_note"] = note
                 job["warning"] = note if "unsafe" in note.lower() else job.get("warning")
             rp.emit("fetch_pr", detail=note[:200])
-        argv = [str(REPO_ROOT / ".venv" / "bin" / "python"), str(REPO_ROOT / "ops" / "daily_run.py"),
-                "--pr", pr_url.strip(), "--model-provider", model_provider, *flags]
-        if not (REPO_ROOT / ".venv" / "bin" / "python").is_file():
-            argv[0] = os.environ.get("PYTHON", "python3")
+        argv = console_daily_run_argv(pr_url, model_provider, flags)
         try:
             # Live tee: write console.log while the check runs; polls read the last ~8KB.
             collected: list[str] = []

@@ -33,6 +33,7 @@ ANSWER_COLUMNS = ("label", "ground_truth_links", "what_broke", "attribution_stre
 SHA_RE = re.compile(r"^[0-9a-f]{40}$")
 ID_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.:-]*$")   # any case ID (B01, R-numpy-2.3, ...)
 DEFAULT_OUT = "runs/bench-v0"
+SWARM_ON_SUFFIX = "-swarm-on"
 CLONE_URL = "https://github.com/{repo}.git"
 SRC_DIRS = ("src", "lib", "python")
 # Extra test-time packages a project needs that its pyproject does not declare as a test extra (pip names).
@@ -190,6 +191,18 @@ def make_item(dr, row: dict, co: dict, text: dict) -> tuple[dict, dict]:
     return item, cfg
 
 
+def labelled_study_out(out: str | Path, swarm: bool) -> Path:
+    """Folder for one study run.
+
+    A swarm-on study writes beside the main folder, with ``-swarm-on`` on the name.
+    The main study scorer reads the other folder and does not see these files.
+    """
+    path = Path(out)
+    if not swarm or path.name.endswith(SWARM_ON_SUFFIX):
+        return path
+    return path.with_name(path.name + SWARM_ON_SUFFIX)
+
+
 def write_result(out: Path, rid: str, rec: dict) -> Path:
     out.mkdir(parents=True, exist_ok=True)
     p = out / result_name(rid, rec.get("baseline"))
@@ -222,6 +235,10 @@ def run_case(dr, a, row: dict, inputs_meta: dict, out: Path, workroot: Path, mac
                     "pr_text_source": text.get("pr_text_source", text["source"]),
                     "pr_text_detail": text["source"],
                     "answer_key_read": False}
+    if dr.mark_typing_only(rec, item.get("files")):
+        rec = dr.finish_typing_only(rec, prdir, work, t0, a)
+        write_result(out, rid, rec)
+        return rec
     if not co.get("ok"):
         rec["verdict"], rec["reason"], _ = dr.verdict_for(None, co["why"])
         rec["sides"] = {k: v for k, v in co.items() if k != "ok"}
@@ -237,14 +254,25 @@ def run_case(dr, a, row: dict, inputs_meta: dict, out: Path, workroot: Path, mac
 
 def run(a, dr) -> int:
     """Entry point from ops/daily_run.py main() (dr is that module)."""
+    from poc import hitl
+    stop = hitl.study_operator_approval_stop(
+        bench=True, console_job=bool(getattr(a, "console_job", False)), single_pr=bool(getattr(a, "pr", None)))
+    if stop:
+        print(stop, file=sys.stderr)
+        return 2
     try:
         rows = select(read_inputs(a.bench), a.ids)
     except (AnswerKeyRefused, BenchInputError, OSError) as e:
         print(f"Stopped: {e}", file=sys.stderr)
         return 2
+    from poc import model_provider
+    stop = model_provider.auth_refusal(getattr(a, "provider", None))
+    if stop:
+        print(stop, file=sys.stderr)
+        return 1
     raw = Path(a.bench).read_bytes()
     meta = {"inputs_file": Path(a.bench).name, "inputs_sha256": hashlib.sha256(raw).hexdigest()}
-    out = Path(a.bench_out or dr.REPO_ROOT / DEFAULT_OUT)
+    out = labelled_study_out(a.bench_out or dr.REPO_ROOT / DEFAULT_OUT, bool(getattr(a, "swarm", False)))
     workroot = Path(a.work_dir or Path(a.ops_dir) / "work")
     a.python_full = dr.resolve_python(a.python)
     machine = dict(dr.detect_machine_type())
@@ -254,6 +282,9 @@ def run(a, dr) -> int:
         try:
             rec = run_case(dr, a, row, meta, out, workroot, machine)
             print(f"    -> {rec['verdict']}: {rec['reason'][:160]}", flush=True)
+        except model_provider.ProviderRejected as e:
+            print(str(e), file=sys.stderr)
+            return 1
         except Exception as e:  # noqa: BLE001
             problems += 1
             print(f"    -> harness error: {type(e).__name__}: {e}", flush=True)

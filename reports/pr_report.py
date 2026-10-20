@@ -24,7 +24,7 @@ from reports import reviewer as rv
 from reports.reviewer import Report, badge, link
 
 VERDICT = {"verified": ("VERIFIED", "green"), "needs_attention": ("NEEDS ATTENTION", "amber"),
-           "could_not_verify": ("COULD NOT VERIFY", "grey")}
+           "could_not_verify": ("COULD NOT VERIFY", "grey"), "no_code_change": ("NO CODE CHANGE", "grey")}
 CATEGORIES = [  # comparison key, plain-English label, how bad
     ("regressions", "pass on main but fail on the PR", "bad"),
     ("new_tests_failing", "are new in the PR and fail", "bad"),
@@ -174,7 +174,7 @@ def checks(rec: dict) -> list[list]:
         ok = sides["main"] == sides["pr"] == n == 3
         out.append(["3 alternating runs per side", "PASS" if ok else "FAIL", f"main {sides['main']}, PR {sides['pr']} of {n}",
                     "" if ok else "Re-run with the default --runs 3 and look for timeouts in the pytest logs."])
-    elif rec.get("verdict") != "could_not_verify":
+    elif rec.get("verdict") not in ("could_not_verify", "no_code_change"):
         out.append(["3 alternating runs per side", "FAIL", "no test runs recorded", "Re-run; see setup logs."])
     ec = rec.get("exit_check")
     if ec:
@@ -262,6 +262,10 @@ def decide(rec: dict, chk: list[list]) -> dict:
     if bad_replay:  # rule: a failed known-answer replay means no report is trusted
         return dict(verdict="COULD NOT VERIFY", colour="grey", action="Re-run", confidence="Low",
                     conf_why="The known-answer tests failed in the latest replay.", why=bad_replay)
+    if v == "no_code_change":
+        return dict(verdict="NO CODE CHANGE", colour="grey", action="Approve with notes", confidence="High",
+                    conf_why="Every changed file is a type stub or a py.typed marker, so behaviour was not checked.",
+                    why=rec.get("reason", ""))
     fails = [c for c in chk if c[1] == "FAIL"]
     warns = [c for c in chk if c[1] == "WARN"]
     g = rec.get("coverage_gate") or {}

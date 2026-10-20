@@ -4,6 +4,8 @@ import json
 import pytest
 
 from evals import score_bench as sb
+from evals import score_swarm as swarm
+from ops import bench
 
 ANSWERS = "tests/fixtures/bench/answers-synthetic.csv"
 
@@ -33,8 +35,13 @@ def test_wilson_and_mcnemar_reject_bad_input():
     assert sb.wilson(0, 0) == (0.0, 1.0)
 
 
+def _study_off():
+    return {"swarm": "off", "operator_approval": "off",
+            "swarm_requested": False, "operator_approval_requested": False}
+
+
 def _write(d, name, rid, verdict, baseline=None, **extra):
-    rec = {"bench": {"id": rid}, "verdict": verdict, **extra}
+    rec = {"bench": {"id": rid}, "verdict": verdict, **_study_off(), **extra}
     if baseline:
         rec["baseline"] = baseline
     (d / name).write_text(json.dumps(rec))
@@ -87,8 +94,10 @@ def test_generic_id_and_label_columns_and_any_case_ids(tmp_path):
     assert ans == {"R-numpy-2.3": "pos", "R-pandas-3.0": "neg"}
     res = tmp_path / "res"
     res.mkdir()
-    (res / "a.json").write_text(json.dumps({"case_id": "R-numpy-2.3", "verdict": "needs_attention", "id": "run-1"}))
-    (res / "b.json").write_text(json.dumps({"case": {"id": "R-pandas-3.0"}, "verdict": "verified"}))
+    (res / "a.json").write_text(json.dumps({
+        "case_id": "R-numpy-2.3", "verdict": "needs_attention", "id": "run-1", **_study_off()}))
+    (res / "b.json").write_text(json.dumps({
+        "case": {"id": "R-pandas-3.0"}, "verdict": "verified", **_study_off()}))
     s = sb.score(ans, sb.read_results(res))
     assert s["regression_recall"]["k"] == 1 and s["false_alarm_rate"]["k"] == 0
     with pytest.raises(ValueError, match="no column"):
@@ -100,3 +109,136 @@ def test_generic_id_and_label_columns_and_any_case_ids(tmp_path):
 def test_record_run_id_is_not_a_case_id(tmp_path):
     (tmp_path / "r.json").write_text(json.dumps({"id": "B01", "verdict": "needs_attention"}))
     assert sb.read_results(tmp_path) == {}
+
+
+def test_study_scorer_refuses_when_a_switch_is_true_or_missing(tmp_path, capsys):
+    """A study score needs all four fields present and none of them true."""
+    _write(tmp_path, "B01-full.json", "B01", "needs_attention")
+    _write(tmp_path, "B02-full.json", "B02", "verified", swarm="on")
+    msg = sb.study_records_message(sb.result_records(tmp_path))
+    assert msg and "B02-full.json: swarm is true" in msg
+    assert sb.main(["--answers", ANSWERS, "--results", str(tmp_path)]) == 1
+    err = capsys.readouterr().err
+    assert "STOPPED" in err and "cannot be scored" in err and "swarm is true" in err
+    assert "Regression recall" not in capsys.readouterr().out
+
+    for key, value, phrase in (
+            ("swarm_requested", True, "swarm_requested is true"),
+            ("operator_approval_requested", True, "operator_approval_requested is true"),
+            ("operator_approval", "on", "operator_approval is true")):
+        _write(tmp_path, "B02-full.json", "B02", "verified", **{key: value})
+        assert sb.main(["--answers", ANSWERS, "--results", str(tmp_path)]) == 1
+        assert phrase in capsys.readouterr().err
+
+    (tmp_path / "B02-full.json").write_text(json.dumps(
+        {"bench": {"id": "B02"}, "verdict": "verified", "swarm": "off"}))
+    assert sb.main(["--answers", ANSWERS, "--results", str(tmp_path)]) == 1
+    err = capsys.readouterr().err
+    assert "operator_approval is missing" in err
+    assert "swarm_requested is missing" in err
+    assert "operator_approval_requested is missing" in err
+
+    _write(tmp_path, "B02-full.json", "B02", "verified")
+    assert sb.main(["--answers", ANSWERS, "--results", str(tmp_path)]) == 0
+    assert "Regression recall" in capsys.readouterr().out
+
+
+def test_scorer_refuses_an_invalid_model_record(tmp_path, capsys):
+    """A record with no usable AI call is refused. It is not counted as could_not_verify."""
+    _write(tmp_path, "B01-full.json", "B01", "could_not_verify", model_provider_used="nebius")
+    _write(tmp_path, "B02-full.json", "B02", "could_not_verify", model_provider_used="none")
+    assert sb.main(["--answers", ANSWERS, "--results", str(tmp_path)]) == 1
+    err = capsys.readouterr().err
+    assert "STOPPED" in err and "model_provider_used is none" in err
+    assert "must not be counted as could_not_verify" in err
+    assert "Regression recall" not in capsys.readouterr().out
+
+    _write(tmp_path, "B02-full.json", "B02", "verified", invalid=True,
+           invalid_reason="every AI call failed", model_provider_used="nebius")
+    assert sb.main(["--answers", ANSWERS, "--results", str(tmp_path)]) == 1
+    err = capsys.readouterr().err
+    assert "invalid (every AI call failed)" in err and "Regression recall" not in capsys.readouterr().out
+
+    _write(tmp_path, "B02-full.json", "B02", "could_not_verify", model_provider_used="nebius",
+           cost={"ai_calls": 2, "failed_ai_calls": 2, "swarm": {"ai_calls": 1, "failed_ai_calls": 1}})
+    assert sb.main(["--answers", ANSWERS, "--results", str(tmp_path)]) == 1
+    assert "every AI call failed" in capsys.readouterr().err
+
+    _write(tmp_path, "B02-full.json", "B02", "verified", model_provider_used="nebius",
+           cost={"ai_calls": 2, "failed_ai_calls": 1})
+    assert sb.main(["--answers", ANSWERS, "--results", str(tmp_path)]) == 0
+    assert "Regression recall" in capsys.readouterr().out
+
+    labelled = bench.labelled_study_out(tmp_path / "swarm", True)
+    labelled.mkdir(parents=True)
+    _write(labelled, "B01-full.json", "B01", "could_not_verify", **_swarm_on(model_provider_used="none"))
+    assert swarm.main(["--answers", ANSWERS, "--results", str(labelled)]) == 1
+    err = capsys.readouterr().err
+    assert "cannot be scored as a swarm study" in err and "model_provider_used is none" in err
+    assert "Regression recall" not in capsys.readouterr().out
+
+
+def test_no_code_change_is_counted_on_its_own_line(tmp_path, capsys):
+    """A no_code_change verdict is not an abstention and is not refused, even when the model was not called."""
+    _write(tmp_path, "B01-full.json", "B01", "needs_attention", model_provider_used="nebius")
+    _write(tmp_path, "B02-full.json", "B02", "no_code_change", model_provider_used="none",
+           no_code_change=True, no_code_change_reason="typing_only")
+    _write(tmp_path, "B03-full.json", "B03", "verified", model_provider_used="nebius")
+    s = sb.score(sb.read_answers(ANSWERS), sb.read_results(tmp_path))
+    assert s["no_code_change"]["k"] == 1 and s["no_code_change"]["n"] == 3
+    assert s["abstention_rate"]["k"] == 0 and s["abstention_rate"]["n"] == 2
+    assert s["regression_recall"]["k"] == 1 and s["regression_recall"]["n"] == 1
+    assert s["per_id"]["B02"]["verdict"] == "no_code_change"
+    assert sb.main(["--answers", ANSWERS, "--results", str(tmp_path)]) == 0
+    out = capsys.readouterr().out
+    assert "No code change | 1 / 3" in out
+    assert "Abstention (could not verify) | 0 / 2" in out
+    assert "Regression recall" in out
+
+    labelled = bench.labelled_study_out(tmp_path / "swarm", True)
+    labelled.mkdir(parents=True)
+    _write(labelled, "B01-full.json", "B01", "needs_attention", **_swarm_on(model_provider_used="nebius"))
+    _write(labelled, "B02-full.json", "B02", "no_code_change", model_provider_used="none",
+           no_code_change=True, no_code_change_reason="typing_only",
+           swarm_requested=False, swarm="off")
+    assert swarm.main(["--answers", ANSWERS, "--results", str(labelled)]) == 0
+    assert "No code change | 1 / 2" in capsys.readouterr().out
+
+
+def _swarm_on(**extra):
+    return {"swarm_requested": True, "swarm": "on", "operator_approval_requested": False,
+            "operator_approval": "off", **extra}
+
+
+def test_swarm_scorer_accepts_only_requested_and_run(tmp_path, capsys):
+    """The swarm path scores a swarm that was asked for and ran. The main scorer still refuses it."""
+    study = tmp_path / "bench-v0"
+    labelled = bench.labelled_study_out(study, True)
+    assert labelled == tmp_path / "bench-v0-swarm-on"
+    assert labelled.parent == study.parent
+    study.mkdir()
+    labelled.mkdir()
+    _write(study, "B01-full.json", "B01", "needs_attention")
+    _write(study, "B02-full.json", "B02", "verified")
+    _write(labelled, "B01-full.json", "B01", "needs_attention", **_swarm_on())
+    _write(labelled, "B02-full.json", "B02", "verified", **_swarm_on())
+
+    assert sb.main(["--answers", ANSWERS, "--results", str(study)]) == 0
+    assert "Regression recall" in capsys.readouterr().out
+    assert swarm.main(["--answers", ANSWERS, "--results", str(labelled)]) == 0
+    assert "Regression recall" in capsys.readouterr().out
+
+    assert sb.main(["--answers", ANSWERS, "--results", str(labelled)]) == 1
+    assert "swarm is true" in capsys.readouterr().err
+    assert swarm.main(["--answers", ANSWERS, "--results", str(study)]) == 1
+    err = capsys.readouterr().err
+    assert "cannot be scored as a swarm study" in err and "swarm_requested is not set" in err
+
+    _write(labelled, "B02-full.json", "B02", "verified", swarm_requested=True, swarm="off")
+    assert swarm.main(["--answers", ANSWERS, "--results", str(labelled)]) == 1
+    assert "the advisory swarm did not run" in capsys.readouterr().err
+
+    (labelled / "B02-full.json").write_text(json.dumps(
+        {"bench": {"id": "B02"}, "verdict": "verified", "swarm": "on"}))
+    assert swarm.main(["--answers", ANSWERS, "--results", str(labelled)]) == 1
+    assert "swarm_requested is missing" in capsys.readouterr().err

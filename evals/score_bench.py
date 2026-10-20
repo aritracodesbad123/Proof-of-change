@@ -13,6 +13,7 @@ that is set (never from repo or PR fields), and by its `verdict`:
     needs_attention   -> flagged
     verified          -> not flagged
     could_not_verify  -> abstained (counted as not flagged for recall and false alarms, and reported separately)
+    no_code_change    -> its own line (not an abstention, not a catch, and not a miss)
 
 Labels: a label starting with "regression" is a positive, one starting with "safe" (or "negative") is a negative.
 
@@ -31,7 +32,7 @@ from pathlib import Path
 
 Z95 = 1.959963984540054
 ID_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.:-]*$")
-FLAGGED, CLEAN, ABSTAIN = "needs_attention", "verified", "could_not_verify"
+FLAGGED, CLEAN, ABSTAIN, NO_CODE = "needs_attention", "verified", "could_not_verify", "no_code_change"
 
 
 def wilson(k: int, n: int, z: float = Z95) -> tuple[float, float]:
@@ -88,6 +89,108 @@ def result_id(rec: dict) -> str | None:
     return rid if isinstance(rid, str) and ID_RE.match(rid) else None
 
 
+# A study record must carry each of these, and none of them may be true.
+# swarm and operator_approval are on/off (on counts as true). The requested fields are booleans.
+STUDY_SWITCHES = (
+    "swarm_requested",
+    "operator_approval_requested",
+    "swarm",
+    "operator_approval",
+)
+
+
+def _call_count(value) -> int:
+    return value if isinstance(value, int) and not isinstance(value, bool) else 0
+
+
+def invalid_record_problems(name: str, rec: dict) -> list[str]:
+    """Why this result must not be scored. Empty when the record is a usable model run.
+
+    A record marked invalid, a record whose model_provider_used is exactly none, or a record whose
+    AI calls all failed must not be counted as could_not_verify. A record that simply omits
+    model_provider_used is left alone, so an older fixture still scores.
+    A record whose verdict is no_code_change never called the model on purpose. It is counted
+    on its own line and is not treated as a failed model run.
+    """
+    if rec.get("verdict") == NO_CODE or rec.get("no_code_change") is True:
+        return []
+    problems = []
+    if rec.get("invalid") is True:
+        why = rec.get("invalid_reason")
+        detail = f" ({why})" if isinstance(why, str) and why else ""
+        problems.append(f"{name}: invalid{detail}; it must not be counted as could_not_verify")
+    if rec.get("model_provider_used") == "none":
+        problems.append(f"{name}: model_provider_used is none; it must not be counted as could_not_verify")
+    cost = rec.get("cost")
+    if isinstance(cost, dict):
+        ai = _call_count(cost.get("ai_calls"))
+        failed = _call_count(cost.get("failed_ai_calls"))
+        swarm = cost.get("swarm")
+        if isinstance(swarm, dict):
+            ai += _call_count(swarm.get("ai_calls"))
+            failed += _call_count(swarm.get("failed_ai_calls"))
+        if ai > 0 and failed >= ai:
+            problems.append(f"{name}: every AI call failed; it must not be counted as could_not_verify")
+    return problems
+
+
+def study_record_problems(name: str, rec: dict) -> list[str]:
+    """Why this result cannot be scored as a study record. Empty when all four switches are off.
+
+    A true value, or a missing value, is not a study record. ``on`` counts as true.
+    Anything other than an explicit false or ``off`` counts as missing.
+    An invalid model record is refused as well, so it is not counted as could_not_verify.
+    A no_code_change verdict is accepted and counted on its own line.
+    """
+    if rec.get("verdict") == NO_CODE:
+        return []
+    problems = []
+    for key in STUDY_SWITCHES:
+        if key not in rec:
+            problems.append(f"{name}: {key} is missing")
+            continue
+        value = rec[key]
+        if value is True or value == "on":
+            problems.append(f"{name}: {key} is true")
+        elif value is False or value == "off":
+            continue
+        else:
+            problems.append(f"{name}: {key} is missing")
+    problems.extend(invalid_record_problems(name, rec))
+    return problems
+
+
+def study_records_message(records: list[tuple[str, dict]]) -> str | None:
+    """Plain refusal when any study record has one of the four switches true or missing, or is invalid."""
+    problems = [p for name, rec in records for p in study_record_problems(name, rec)]
+    if not problems:
+        return None
+    return (
+        "STOPPED: these results cannot be scored as a study. "
+        "Every study record must include swarm_requested, operator_approval_requested, "
+        "swarm, and operator_approval, and none of them may be true. "
+        "On counts as true. A missing value is not a study record. "
+        "A record whose AI calls all failed, whose model_provider_used is none, "
+        "or that is marked invalid is refused and is not counted as could_not_verify.\n"
+        + "\n".join(problems)
+    )
+
+
+def result_records(folder: str | Path) -> list[tuple[str, dict]]:
+    """Result files the scorer would use: (file name, record). Skips answer-key names and non-results."""
+    found = []
+    for f in sorted(Path(folder).glob("*.json")):
+        if "answers" in f.name.lower():
+            continue
+        try:
+            rec = json.loads(f.read_text())
+        except (OSError, ValueError):
+            continue
+        if isinstance(rec, dict) and result_id(rec):
+            found.append((f.name, rec))
+    return found
+
+
 def read_results(folder: str | Path, baseline: str | None = None) -> dict[str, str]:
     """{id: verdict} from the result JSON files in folder (not recursive). With baseline, only results of that
     baseline (records without one count as 'full'). Two results for one ID and baseline is an error."""
@@ -114,10 +217,12 @@ def read_results(folder: str | Path, baseline: str | None = None) -> dict[str, s
 def score(answers: dict[str, str], results: dict[str, str]) -> dict:
     """Metrics over the IDs present in both (joined on ID only). Missing results are listed, not guessed."""
     ids = sorted(set(answers) & set(results))
-    pos = [i for i in ids if answers[i] == "pos"]
-    neg = [i for i in ids if answers[i] == "neg"]
-    flagged = {i for i in ids if results[i] == FLAGGED}
-    abstained = {i for i in ids if results[i] == ABSTAIN}
+    no_code = {i for i in ids if results[i] == NO_CODE}
+    judged = [i for i in ids if i not in no_code]
+    pos = [i for i in judged if answers[i] == "pos"]
+    neg = [i for i in judged if answers[i] == "neg"]
+    flagged = {i for i in judged if results[i] == FLAGGED}
+    abstained = {i for i in judged if results[i] == ABSTAIN}
 
     def block(k: int, n: int) -> dict:
         lo, hi = wilson(k, n)
@@ -127,14 +232,15 @@ def score(answers: dict[str, str], results: dict[str, str]) -> dict:
             "unknown_ids": sorted(set(results) - set(answers)),
             "regression_recall": block(len(flagged & set(pos)), len(pos)),
             "false_alarm_rate": block(len(flagged & set(neg)), len(neg)),
-            "abstention_rate": block(len(abstained), len(ids)),
+            "abstention_rate": block(len(abstained), len(judged)),
+            "no_code_change": block(len(no_code), len(ids)),
             "precision_of_flags": block(len(flagged & set(pos)), len(flagged)),
             "per_id": {i: {"label": answers[i], "verdict": results[i]} for i in ids}}
 
 
 def compare(answers: dict[str, str], a: dict[str, str], b: dict[str, str]) -> dict:
     """Paired comparison on the regression cases both systems ran: correct = flagged. Exact McNemar."""
-    ids = sorted(i for i in set(a) & set(b) if answers.get(i) == "pos")
+    ids = sorted(i for i in set(a) & set(b) if answers.get(i) == "pos" and a[i] != NO_CODE and b[i] != NO_CODE)
     only_a = [i for i in ids if a[i] == FLAGGED and b[i] != FLAGGED]
     only_b = [i for i in ids if b[i] == FLAGGED and a[i] != FLAGGED]
     return {"paired_regressions": len(ids), "only_a_flagged": only_a, "only_b_flagged": only_b,
@@ -143,7 +249,9 @@ def compare(answers: dict[str, str], a: dict[str, str], b: dict[str, str]) -> di
 
 def table(name: str, s: dict) -> str:
     rows = [("Regression recall", s["regression_recall"]), ("False-alarm rate", s["false_alarm_rate"]),
-            ("Abstention (could not verify)", s["abstention_rate"]), ("Precision of flags", s["precision_of_flags"])]
+            ("Abstention (could not verify)", s["abstention_rate"]),
+            ("No code change", s["no_code_change"]),
+            ("Precision of flags", s["precision_of_flags"])]
     out = [f"### {name}", "", "| Metric | k / n | Rate | Wilson 95% CI |", "|---|---|---|---|"]
     for label, m in rows:
         rate = pct(m["rate"]) if m["rate"] is not None else "n/a"
@@ -163,6 +271,10 @@ def main(argv=None) -> int:
     ap.add_argument("--vs", default=None, help="second baseline in the same folder: paired exact McNemar test")
     ap.add_argument("--json", default=None, help="also write the numbers to this JSON file")
     a = ap.parse_args(argv)
+    refusal = study_records_message(result_records(a.results))
+    if refusal:
+        print(refusal, file=sys.stderr)
+        return 1
     answers = read_answers(a.answers, a.id_column, a.label_column)
     res = read_results(a.results, a.baseline)
     s = score(answers, res)

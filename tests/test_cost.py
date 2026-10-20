@@ -96,6 +96,21 @@ def test_cost_report_counts_attempts_matched_set_and_flags_missing_raw(tmp_path,
     assert "0%" in md and "n/a" in md
 
 
+def test_swarm_calls_are_a_separate_line_and_stay_out_of_the_total(monkeypatch):
+    monkeypatch.delenv("POC_MACHINE_USD_PER_HOUR", raising=False)
+    cost.reset()
+    cost.record_call(SUPER, U)
+    with cost.swarm_scope():
+        cost.record_call(SUPER, U)
+        cost.record_call(SUPER, None, ok=False)
+    s = cost.take({"total_wall": 3600})
+    assert s["ai_calls"] == 1 and s["ai_cost_usd"] == 1.2
+    assert s["computer_cost_usd"] == 0.24
+    assert s["total_cost_usd"] == 1.44
+    assert s["swarm"]["ai_calls"] == 2 and s["swarm"]["failed_ai_calls"] == 1
+    assert s["swarm"]["ai_cost_usd"] == 1.2 and s["swarm"]["calls_without_usage"] == 1
+
+
 def test_record_cost_block_has_ai_computer_and_total(monkeypatch):
     monkeypatch.delenv("POC_MACHINE_USD_PER_HOUR", raising=False)
     cost.reset()
