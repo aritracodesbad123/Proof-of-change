@@ -87,6 +87,30 @@ button.ghost.sample {
   color: var(--muted);
 }
 
+.who {
+  color: var(--muted);
+  font-size: var(--text-sm);
+  max-width: 14rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.auth-layout { max-width: 32rem; }
+.auth-card { display: grid; gap: 0.15rem; }
+.text-link {
+  margin-top: 1rem;
+  border: 0;
+  background: none;
+  color: var(--link);
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  font-size: var(--text-sm);
+}
+.text-link:hover { text-decoration: underline; }
+
 .pill.on { color: var(--ok); border-color: color-mix(in srgb, var(--nvidia-green) 55%, var(--line)); }
 .pill.off { color: var(--danger); border-color: color-mix(in srgb, var(--danger) 50%, var(--line)); }
 

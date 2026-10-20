@@ -25,3 +25,6 @@ ops/local.json
 ops/runs/
 ops/work/
 ops/seen_prs.json
+ops/console-accounts.sqlite
+ops/console-accounts.sqlite-wal
+ops/console-accounts.sqlite-shm

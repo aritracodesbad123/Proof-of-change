@@ -1,13 +1,35 @@
 const BASE = import.meta.env.VITE_API_BASE ?? ''
 
+let csrfToken = ''
+
+export function setCsrf(token: string) {
+  csrfToken = token
+}
+
 async function json<T>(path: string, init?: RequestInit): Promise<T> {
+  const method = (init?.method || 'GET').toUpperCase()
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    ...((init?.headers as Record<string, string> | undefined) || {}),
+  }
+  if (method !== 'GET' && method !== 'HEAD' && csrfToken && !headers['X-CSRF-Token']) {
+    headers['X-CSRF-Token'] = csrfToken
+  }
   const res = await fetch(`${BASE}${path}`, {
     ...init,
-    headers: { 'Content-Type': 'application/json', ...(init?.headers || {}) },
+    credentials: 'include',
+    headers,
   })
   const data = await res.json().catch(() => ({}))
   if (!res.ok) throw new Error((data as { error?: string }).error || res.statusText)
   return data as T
+}
+
+export type Account = {
+  id: string
+  email: string
+  role: string
+  csrf: string
 }
 
 export type RunRow = {
@@ -105,6 +127,19 @@ export type Job = {
 }
 
 export const api = {
+  csrf: () => json<{ csrf: string }>('/api/auth/csrf'),
+  me: () => json<Account>('/api/auth/me'),
+  signup: (email: string, password: string, invite: string) =>
+    json<Account>('/api/auth/signup', {
+      method: 'POST',
+      body: JSON.stringify({ email, password, invite }),
+    }),
+  login: (email: string, password: string) =>
+    json<Account>('/api/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ email, password }),
+    }),
+  logout: () => json<{ ok: boolean }>('/api/auth/logout', { method: 'POST', body: '{}' }),
   health: () => json<Health>('/api/health'),
   runs: () => json<{ runs: RunRow[] }>('/api/runs'),
   run: (id: string) =>

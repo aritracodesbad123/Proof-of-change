@@ -163,6 +163,8 @@ make console-web    # :5173 (Vite proxies /api → :8787)
 
 Jobs run in a daemon thread. Poll `/api/jobs/<id>` while `daily_run` writes progress events (install → pytest → Ultra/Lightning/Super → done).
 
+The website requires a sign-in. Set `POC_SESSION_SECRET` (16+ characters) before the API will accept one. Accounts live in a small SQLite file (`POC_ACCOUNTS_DB`, default `ops/console-accounts.sqlite`). Each check started from the website is stamped with that account, and the API returns 404 for someone else’s check, including the log, the PDF, and the behaviour map. `POC_ADMIN_EMAIL` or `python -m poc.console_accounts promote person@example.com` makes one admin who can see every check, including older checks with no account. `POC_SIGNUP_DISABLED=1` and an optional `POC_INVITE_CODE` keep a public demo from being flooded. Passwords are scrypt hashes. Render’s free disk does not keep the SQLite file across sleep. Command-line, benchmark, and study runs do not use these accounts.
+
 ### Free public URL (recommended — no Nebius Compute bill)
 
 Builder **Token Factory** credits pay for Nemotron calls, not for hosting. Skip Nebius Serverless AI Endpoint if you want $0 hosting.

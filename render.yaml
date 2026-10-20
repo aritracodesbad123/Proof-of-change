@@ -25,5 +25,18 @@ services:
         sync: false
       - key: POC_DEMO_REPOS
         sync: false
+      # Signs the session cookie. Generate a long random string in the dashboard.
+      # There is no default, and no password is stored here.
+      - key: POC_SESSION_SECRET
+        sync: false
+      - key: POC_ADMIN_EMAIL
+        sync: false
+      - key: POC_SIGNUP_DISABLED
+        sync: false
+      - key: POC_INVITE_CODE
+        sync: false
+      # Optional path. Free-plan disk is wiped when the service sleeps.
+      - key: POC_ACCOUNTS_DB
+        sync: false
       - key: PORT
         value: "8787"

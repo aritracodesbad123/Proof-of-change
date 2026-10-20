@@ -328,6 +328,30 @@ make console-build && make console-api
 # then open http://127.0.0.1:8787
 ```
 
+The console asks you to sign in. A person sees only the checks their account started. One admin sees every check, including older checks that have no account. Command-line checks (`make check`, `make daily`) do not sign in and are unchanged.
+
+Set these before starting the API. The session secret has no default.
+
+| Variable | What it does |
+|---|---|
+| `POC_SESSION_SECRET` | Long random string, at least 16 characters. Signs the session cookie. Required. |
+| `POC_ACCOUNTS_DB` | SQLite file for accounts. Default `ops/console-accounts.sqlite`. On Render’s free disk this file disappears when the instance sleeps. |
+| `POC_ADMIN_EMAIL` | This email is an admin. No password goes in the environment. |
+| `POC_SIGNUP_DISABLED` | Set to `1` to refuse new accounts. |
+| `POC_INVITE_CODE` | When set, sign-up must send this code. |
+| `POC_COOKIE_SECURE` | Set to `1` to mark the session cookie Secure. HTTPS does this on its own. |
+
+```bash
+export POC_SESSION_SECRET="$(python -c 'import secrets; print(secrets.token_urlsafe(32))')"
+export POC_ADMIN_EMAIL="you@example.com"
+```
+
+To make an existing account an admin later, without putting a password on the command line:
+
+```bash
+python -m poc.console_accounts promote you@example.com
+```
+
 **Public website without paying Nebius Compute:** use **Render free** (Blueprint = [`render.yaml`](render.yaml)) or a local tunnel — details in [docs/OPERATIONS.md](docs/OPERATIONS.md) (Free public URL). Keep `NEBIUS_API_KEY` for models only.
 
 **Nebius Endpoint** (only if you have AI Cloud credits): `make docker-console` + `make nebius-console`. Local bind: `make console-host`.

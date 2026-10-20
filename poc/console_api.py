@@ -174,9 +174,37 @@ def _row_from_record(rec: dict, path: Path | None = None) -> dict:
 
 
 
-def remember_run(rec: dict, path: Path | None = None) -> dict:
+def run_owner_of(folder: Path) -> str | None:
+    try:
+        text = (folder / "console_owner.txt").read_text().strip()
+    except OSError:
+        return None
+    return text or None
+
+
+def set_run_owner(folder: Path, owner: str) -> None:
+    folder.mkdir(parents=True, exist_ok=True)
+    (folder / "console_owner.txt").write_text(owner + "\n")
+
+
+def _can_see(owner: str | None, account: dict | None) -> bool:
+    """account None keeps the old unfiltered helpers for tests. The HTTP API always passes an account."""
+    if account is None:
+        return True
+    if account.get("role") == "admin":
+        return True
+    return bool(owner) and owner == account.get("id")
+
+
+def remember_run(rec: dict, path: Path | None = None, *, owner: str | None = None) -> dict:
     """Keep a finished PR record in RAM so the console still lists it after Render wipes disk."""
     row = _row_from_record(rec, path)
+    if owner:
+        row["owner"] = owner
+    elif path is not None:
+        stamp = run_owner_of(path.parent)
+        if stamp:
+            row["owner"] = stamp
     rid = row["id"]
     hosted = HOSTED / f"{rid}.html"
     links = report_links(rid, folder=row["folder"], rec=rec)
@@ -197,8 +225,12 @@ def remember_run(rec: dict, path: Path | None = None) -> dict:
     return row
 
 
-def list_runs(limit: int = 50) -> list[dict]:
-    """Newest `limit` runs only. Does not remember_run every record on each list (disk scan is mtime-bounded)."""
+def list_runs(limit: int = 50, account: dict | None = None) -> list[dict]:
+    """Newest `limit` runs only. Does not remember_run every record on each list (disk scan is mtime-bounded).
+
+    When `account` is set, a normal user only gets runs they started. An admin also
+    sees older runs that have no owner. Unset `account` is the unfiltered helper.
+    """
     candidates: list[tuple[float, Path]] = []
     if RUNS_ROOT.is_dir():
         for path in RUNS_ROOT.rglob("record.json"):
@@ -211,8 +243,8 @@ def list_runs(limit: int = 50) -> list[dict]:
 
     rows: list[tuple[float, dict]] = []
     seen: set[str] = set()
-    for mtime, path in candidates[: max(limit, 1) * 2]:
-        # Read a small multiple of limit to skip non-pr_run records without scanning the whole tree into RAM.
+    pool = candidates if account is not None else candidates[: max(limit, 1) * 2]
+    for mtime, path in pool:
         if len(rows) >= limit:
             break
         try:
@@ -222,6 +254,11 @@ def list_runs(limit: int = 50) -> list[dict]:
         if rec.get("record_kind") and rec.get("record_kind") != "pr_run":
             continue
         row = _row_from_record(rec, path)
+        stamp = run_owner_of(path.parent)
+        if stamp:
+            row["owner"] = stamp
+        if not _can_see(row.get("owner"), account):
+            continue
         seen.add(row["id"])
         rows.append((mtime, row))
 
@@ -231,9 +268,12 @@ def list_runs(limit: int = 50) -> list[dict]:
         row = snap["row"]
         if row["id"] in seen:
             continue
+        if not _can_see(row.get("owner"), account):
+            continue
         rows.append((float(snap.get("saved_at") or 0), row))
     rows.sort(key=lambda x: x[0], reverse=True)
-    return [r for _, r in rows[:limit]]
+    # Copies so a caller can drop the owner field without wiping the in-memory stamp.
+    return [dict(row) for _, row in rows[:limit]]
 
 
 def _tail_bytes(path: Path, n: int = 8192) -> str:
@@ -267,7 +307,7 @@ def submit_job_scenarios(job_id: str, body: dict) -> dict:
     return hitl.write_approval(hdir, body)
 
 
-def get_run(run_id: str) -> dict | None:
+def get_run(run_id: str, account: dict | None = None) -> dict | None:
     run_id = unquote(run_id)
     for path in RUNS_ROOT.rglob("record.json") if RUNS_ROOT.is_dir() else []:
         try:
@@ -275,7 +315,10 @@ def get_run(run_id: str) -> dict | None:
         except (OSError, json.JSONDecodeError):
             continue
         if rec.get("id") == run_id or path.parent.name == run_id:
-            remember_run(rec, path)
+            stamp = run_owner_of(path.parent)
+            if not _can_see(stamp, account):
+                return None
+            remember_run(rec, path, owner=stamp)
             rid = str(rec.get("id") or run_id)
             folder = str(path.parent.relative_to(REPO_ROOT))
             hosted = HOSTED / f"{rid}.html"
@@ -290,6 +333,8 @@ def get_run(run_id: str) -> dict | None:
     with _jobs_lock:
         snap = _recent_runs.get(run_id)
     if snap:
+        if not _can_see(snap["row"].get("owner"), account):
+            return None
         links = report_links(run_id, folder=snap.get("folder"), rec=snap.get("record"))
         return {
             "record": snap["record"],
@@ -359,7 +404,7 @@ def find_record_for_pr(repo: str, pr: int) -> tuple[dict, Path] | None:
     return best[1], best[2]
 
 
-def start_check(pr_url: str, *, model_provider: str = "nebius") -> dict:
+def start_check(pr_url: str, *, model_provider: str = "nebius", owner: str | None = None) -> dict:
     from poc import run_progress
 
     m = PR_RE.search(pr_url.strip())
@@ -400,6 +445,7 @@ def start_check(pr_url: str, *, model_provider: str = "nebius") -> dict:
         "current_agent": None,
         "current_detail": None,
         "swarm": {"ultra": "idle", "lightning": "idle", "super": "idle"},
+        "owner": owner,
     }
     with _jobs_lock:
         _jobs[job_id] = job
@@ -473,7 +519,9 @@ def start_check(pr_url: str, *, model_provider: str = "nebius") -> dict:
             saved = None
             if found:
                 rec, path = found
-                saved = (remember_run(rec, path), rec)
+                if job.get("owner"):
+                    set_run_owner(path.parent, job["owner"])
+                saved = (remember_run(rec, path, owner=job.get("owner")), rec)
             with _jobs_lock:
                 job["exit"] = returncode
                 job["log_tail"] = tail
@@ -529,13 +577,16 @@ def _job_public(job: dict) -> dict:
     out.pop("progress_path", None)
     out.pop("console_log", None)
     out.pop("hitl_dir", None)
+    out.pop("owner", None)
     return out
 
 
-def get_job(job_id: str) -> dict | None:
+def get_job(job_id: str, account: dict | None = None) -> dict | None:
     with _jobs_lock:
         j = _jobs.get(job_id)
         if not j:
+            return None
+        if not _can_see(j.get("owner"), account):
             return None
         return _job_public(j)
 
@@ -547,16 +598,91 @@ class Handler(BaseHTTPRequestHandler):
     def _cors(self):
         self.send_header("Access-Control-Allow-Origin", "*")
         self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-        self.send_header("Access-Control-Allow-Headers", "Content-Type")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type, X-CSRF-Token")
 
-    def _json(self, code: int, obj: Any):
+    def _json(self, code: int, obj: Any, *, cookies: list[str] | None = None):
         body = json.dumps(obj, default=str).encode()
         self.send_response(code)
         self._cors()
+        for cookie in cookies or []:
+            self.send_header("Set-Cookie", cookie)
         self.send_header("Content-Type", "application/json")
         self.send_header("Content-Length", str(len(body)))
         self.end_headers()
         self.wfile.write(body)
+
+    def _secure(self) -> bool:
+        from poc.console_accounts import secure_cookie
+        return secure_cookie(self.headers.get("X-Forwarded-Proto"))
+
+    def _session_account(self) -> dict | None:
+        from poc.console_accounts import SESSION_COOKIE, account_for_session, cookie_value
+        return account_for_session(cookie_value(self.headers.get("Cookie"), SESSION_COOKIE))
+
+    def _require_account(self) -> dict | None:
+        account = self._session_account()
+        if not account:
+            self._json(401, {"error": "Sign in first."})
+            return None
+        return account
+
+    def _require_csrf(self, account: dict) -> bool:
+        from poc.console_accounts import CSRF_MESSAGE, session_csrf_ok
+        if session_csrf_ok(account, self.headers.get("X-CSRF-Token") or ""):
+            return True
+        self._json(403, {"error": CSRF_MESSAGE})
+        return False
+
+    def _client_ip(self) -> str:
+        if self.client_address:
+            return str(self.client_address[0])
+        return ""
+
+    def _auth_post(self, path: str, body: dict):
+        from poc.console_accounts import (
+            SESSION_COOKIE,
+            AuthError,
+            clear_session_cookie,
+            cookie_value,
+            login,
+            logout,
+            session_cookie,
+            signup,
+        )
+
+        header = self.headers.get("X-CSRF-Token") or ""
+        try:
+            if path == "/api/auth/logout":
+                logout(cookie_value(self.headers.get("Cookie"), SESSION_COOKIE))
+                return self._json(200, {"ok": True}, cookies=[clear_session_cookie()])
+            if path == "/api/auth/signup":
+                result = signup(
+                    str(body.get("email") or ""),
+                    str(body.get("password") or ""),
+                    str(body.get("invite") or ""),
+                    header,
+                )
+            else:
+                result = login(
+                    str(body.get("email") or ""),
+                    str(body.get("password") or ""),
+                    header,
+                    ip=self._client_ip(),
+                )
+        except AuthError as exc:
+            return self._json(exc.status, {"error": str(exc)})
+        account = result["account"]
+        # The raw session token goes only in the HttpOnly cookie, never in JSON.
+        return self._json(
+            200,
+            {
+                "id": account["id"],
+                "email": account["email"],
+                "role": account["role"],
+                "csrf": account["csrf"],
+            },
+            cookies=[session_cookie(result["session"], secure=self._secure())],
+        )
 
     def _file(self, path: Path, content_type: str):
         data = path.read_bytes()
@@ -575,6 +701,19 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self):  # noqa: N802
         parsed = urlparse(self.path)
         path = parsed.path.rstrip("/") or "/"
+
+        if path == "/api/auth/csrf":
+            from poc.console_accounts import AuthError, issue_csrf
+            try:
+                token = issue_csrf()
+            except AuthError as exc:
+                return self._json(exc.status, {"error": str(exc)})
+            return self._json(200, {"csrf": token})
+        if path == "/api/auth/me":
+            account = self._session_account()
+            if not account:
+                return self._json(401, {"error": "Sign in first."})
+            return self._json(200, {"id": account["id"], "email": account["email"], "role": account["role"], "csrf": account["csrf"]})
 
         if path == "/api/health":
             flags, note = console_run_flags()
@@ -598,33 +737,45 @@ class Handler(BaseHTTPRequestHandler):
                 "run_flags": flags,
                 "run_note": note,
             })
-        if path == "/api/runs":
-            return self._json(200, {"runs": list_runs()})
-        rm = _REPORT_FILE_RE.match(path)
-        if rm:
-            rid, ext = unquote(rm.group(1)), rm.group(2)
-            got = get_run(rid)
-            folder = (got or {}).get("folder")
-            rec = (got or {}).get("record")
-            fpath = find_reviewer_report_file(rid, ext, folder=folder, rec=rec)
-            if not fpath:
-                return self._json(404, {"error": f"REPORT.{ext} not found"})
-            ctype = "application/pdf" if ext == "pdf" else "text/html; charset=utf-8"
-            return self._file(fpath, ctype)
-        if path.startswith("/api/runs/"):
-            rid = path[len("/api/runs/"):]
-            got = get_run(rid)
-            if not got:
-                return self._json(404, {"error": "not found"})
-            return self._json(200, got)
-        if path.startswith("/api/jobs/"):
-            jid = path[len("/api/jobs/"):]
-            job = get_job(jid)
-            if not job:
-                return self._json(404, {"error": "not found"})
-            return self._json(200, job)
+        if path.startswith("/api/"):
+            account = self._require_account()
+            if not account:
+                return None
+            if path == "/api/runs":
+                rows = []
+                for row in list_runs(account=account):
+                    public = dict(row)
+                    public.pop("owner", None)
+                    rows.append(public)
+                return self._json(200, {"runs": rows})
+            rm = _REPORT_FILE_RE.match(path)
+            if rm:
+                rid, ext = unquote(rm.group(1)), rm.group(2)
+                got = get_run(rid, account=account)
+                if not got:
+                    return self._json(404, {"error": "not found"})
+                folder = got.get("folder")
+                rec = got.get("record")
+                fpath = find_reviewer_report_file(rid, ext, folder=folder, rec=rec)
+                if not fpath:
+                    return self._json(404, {"error": f"REPORT.{ext} not found"})
+                ctype = "application/pdf" if ext == "pdf" else "text/html; charset=utf-8"
+                return self._file(fpath, ctype)
+            if path.startswith("/api/runs/"):
+                rid = path[len("/api/runs/"):]
+                got = get_run(rid, account=account)
+                if not got:
+                    return self._json(404, {"error": "not found"})
+                return self._json(200, got)
+            if path.startswith("/api/jobs/"):
+                jid = path[len("/api/jobs/"):]
+                job = get_job(jid, account=account)
+                if not job:
+                    return self._json(404, {"error": "not found"})
+                return self._json(200, job)
+            return self._json(404, {"error": "not found"})
 
-        # static SPA
+        # static SPA — public so the sign-in page can load before a session exists
         if WEB_DIST.is_dir():
             rel = path.lstrip("/") or "index.html"
             cand = (WEB_DIST / rel).resolve()
@@ -649,16 +800,27 @@ class Handler(BaseHTTPRequestHandler):
             body = json.loads(raw.decode() or "{}")
         except json.JSONDecodeError:
             return self._json(400, {"error": "bad json"})
+        if path in {"/api/auth/signup", "/api/auth/login", "/api/auth/logout"}:
+            return self._auth_post(path, body if isinstance(body, dict) else {})
+        account = self._require_account()
+        if not account:
+            return None
+        if not self._require_csrf(account):
+            return None
         if path == "/api/checks":
             pr_url = (body.get("pr_url") or "").strip()
             provider = (body.get("model_provider") or "nebius").strip() or "nebius"
             try:
-                job = start_check(pr_url, model_provider=provider)
+                job = start_check(pr_url, model_provider=provider, owner=account["id"])
             except ValueError as e:
                 return self._json(400, {"error": str(e)})
             return self._json(202, job)
         if path.startswith("/api/jobs/") and path.endswith("/scenarios"):
             jid = path[len("/api/jobs/"):-len("/scenarios")].strip("/")
+            with _jobs_lock:
+                owned = _jobs.get(jid)
+            if not owned or not _can_see(owned.get("owner"), account):
+                return self._json(404, {"error": "not found"})
             try:
                 approval = submit_job_scenarios(jid, body)
             except KeyError:

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react'
 import {
   api,
+  type Account,
   type HitlApprovalBody,
   type HitlDraft,
   type Job,
@@ -29,7 +30,6 @@ import {
 } from './ui'
 import './App.css'
 
-const LOCAL_RUNS_KEY = 'poc-console-runs-v1'
 const THEME_KEY = 'poc-console-theme'
 const MAX_SCENARIOS = 20
 const SAMPLE_PR_URL = 'https://github.com/rasbt/mlxtend/pull/1229'
@@ -46,9 +46,13 @@ type CachedRun = {
 
 type View = { name: 'home' } | { name: 'run'; id: string } | { name: 'job'; id: string }
 
-function loadLocalRuns(): CachedRun[] {
+function runsKey(accountId: string) {
+  return `poc-console-runs-v1:${accountId}`
+}
+
+function loadLocalRuns(accountId: string): CachedRun[] {
   try {
-    const raw = localStorage.getItem(LOCAL_RUNS_KEY)
+    const raw = localStorage.getItem(runsKey(accountId))
     const parsed = raw ? (JSON.parse(raw) as CachedRun[]) : []
     return Array.isArray(parsed) ? parsed : []
   } catch {
@@ -56,9 +60,9 @@ function loadLocalRuns(): CachedRun[] {
   }
 }
 
-function saveLocalRun(entry: CachedRun) {
-  const rest = loadLocalRuns().filter((run) => run.id !== entry.id)
-  localStorage.setItem(LOCAL_RUNS_KEY, JSON.stringify([entry, ...rest].slice(0, 30)))
+function saveLocalRun(accountId: string, entry: CachedRun) {
+  const rest = loadLocalRuns(accountId).filter((run) => run.id !== entry.id)
+  localStorage.setItem(runsKey(accountId), JSON.stringify([entry, ...rest].slice(0, 30)))
 }
 
 function mergeRunLists(apiRuns: RunRow[], local: CachedRun[]): RunRow[] {
@@ -117,7 +121,7 @@ function providerBadge(provider?: string) {
   return null
 }
 
-export default function App() {
+export default function App({ account, onLogout }: { account: Account; onLogout: () => void }) {
   const { theme, toggle } = useTheme()
   const [view, setView] = useState<View>(() => viewFromHash(window.location.hash))
   const [runs, setRuns] = useState<RunRow[]>([])
@@ -166,18 +170,18 @@ export default function App() {
       setContreeReady(Boolean(health.contree_ready))
       setHealthNote(health.run_note || null)
       const remote = (await api.runs()).runs
-      setRuns(mergeRunLists(remote, loadLocalRuns()))
+      setRuns(mergeRunLists(remote, loadLocalRuns(account.id)))
       setErr(null)
     } catch (error) {
       setApiOk(false)
       setHealthNote(null)
       setContreeReady(null)
-      setRuns((prev) => (prev.length ? prev : mergeRunLists([], loadLocalRuns())))
+      setRuns((prev) => (prev.length ? prev : mergeRunLists([], loadLocalRuns(account.id))))
       setErr(error instanceof Error ? error.message : String(error))
     } finally {
       setRefreshing(false)
     }
-  }, [])
+  }, [account.id])
 
   useEffect(() => {
     void refresh()
@@ -198,7 +202,7 @@ export default function App() {
         })
         if (payload.record && payload.record.id) {
           const pr = payload.record.pr as { number?: number; url?: string; title?: string } | undefined
-          saveLocalRun({
+          saveLocalRun(account.id, {
             id: String(payload.record.id),
             row: {
               id: String(payload.record.id),
@@ -221,7 +225,7 @@ export default function App() {
         }
       })
       .catch((error) => {
-        const cached = loadLocalRuns().find((entry) => entry.id === view.id)
+        const cached = loadLocalRuns(account.id).find((entry) => entry.id === view.id)
         if (cached) {
           setDetail({
             record: cached.record,
@@ -235,7 +239,7 @@ export default function App() {
         }
         setErr(error instanceof Error ? error.message : String(error))
       })
-  }, [view])
+  }, [view, account.id])
 
   useEffect(() => {
     if (view.name !== 'job') return
@@ -252,7 +256,7 @@ export default function App() {
         if (next.status === 'done' || next.status === 'failed') {
           if (next.record && next.run_id) {
             const pr = next.record.pr as { number?: number; url?: string; title?: string } | undefined
-            saveLocalRun({
+            saveLocalRun(account.id, {
               id: next.run_id,
               row: {
                 id: next.run_id,
@@ -304,7 +308,7 @@ export default function App() {
     return () => {
       stop = true
     }
-  }, [view, refresh, go])
+  }, [view, refresh, go, account.id])
 
   async function refreshJob() {
     if (view.name !== 'job') return
@@ -349,6 +353,7 @@ export default function App() {
           <p className="tag">NVIDIA Nemotron on Nebius. Paste a pull request and watch the check.</p>
         </div>
         <div className="top-actions">
+          <span className="who">{account.email}</span>
           <button
             type="button"
             className="theme-toggle"
@@ -356,6 +361,9 @@ export default function App() {
             onClick={toggle}
           >
             {theme === 'light' ? 'Dark theme' : 'Light theme'}
+          </button>
+          <button type="button" className="theme-toggle" onClick={onLogout}>
+            Sign out
           </button>
           <span className={`pill ${apiOk ? 'on' : 'off'}`}>{apiOk == null ? '…' : apiOk ? 'API up' : 'API down'}</span>
         </div>
@@ -437,12 +445,16 @@ export default function App() {
 
             <section className="panel runs-panel" aria-labelledby="runs-heading">
               <div className="row">
-                <h2 id="runs-heading">Past runs</h2>
+                <h2 id="runs-heading">{account.role === 'admin' ? 'All runs' : 'My runs'}</h2>
                 <button type="button" className="ghost" onClick={() => void refresh()} disabled={refreshing}>
                   {refreshing ? 'Refreshing…' : 'Refresh'}
                 </button>
               </div>
-              <div className="filters" role="toolbar" aria-label="Filter past runs">
+              <div
+                className="filters"
+                role="toolbar"
+                aria-label={account.role === 'admin' ? 'Filter all runs' : 'Filter my runs'}
+              >
                 <label className="filter-search" htmlFor="run-filter">
                   Search
                   <input
@@ -469,8 +481,9 @@ export default function App() {
               </div>
               {runs.length === 0 ? (
                 <p className="empty">
-                  No runs yet. Finished checks are also kept in this browser, because a free host may wipe its disk
-                  when it sleeps.
+                  {account.role === 'admin'
+                    ? 'No runs yet. Finished checks are also kept in this browser, because a free host may wipe its disk when it sleeps.'
+                    : 'No checks of yours yet. You only see the checks this account started.'}
                 </p>
               ) : visibleRuns.length === 0 ? (
                 <p className="empty">No runs match that filter.</p>
