@@ -22,6 +22,8 @@ export type RunRow = {
   machine?: string
   folder?: string
   source?: string
+  report_pdf?: string | null
+  report_html?: string | null
 }
 
 export type StageEvent = {

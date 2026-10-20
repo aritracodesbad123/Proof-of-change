@@ -154,6 +154,7 @@ def _row_from_record(rec: dict, path: Path | None = None) -> dict:
     rid = rec.get("id") or (path.parent.name if path else "unknown")
     pr = rec.get("pr") if isinstance(rec.get("pr"), dict) else {}
     folder = str(path.parent.relative_to(REPO_ROOT)) if path else f"(memory)/{rid}"
+    links = report_links(str(rid), folder=folder if path else None, rec=rec)
     return {
         "id": rid,
         "repo": rec.get("repo"),
@@ -167,7 +168,10 @@ def _row_from_record(rec: dict, path: Path | None = None) -> dict:
         "path": str(path.relative_to(REPO_ROOT)) if path else None,
         "folder": folder,
         "source": "disk" if path else "memory",
+        "report_pdf": links["report_pdf"],
+        "report_html": links["report_html"],
     }
+
 
 
 def remember_run(rec: dict, path: Path | None = None) -> dict:

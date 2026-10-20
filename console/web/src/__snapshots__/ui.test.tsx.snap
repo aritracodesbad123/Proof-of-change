@@ -1,0 +1,3 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`verdict badges render the four code labels 1`] = `"<div><span class="badge verdict-badge tone-verified">verified</span><span class="badge verdict-badge tone-needs_attention">needs attention</span><span class="badge verdict-badge tone-could_not_verify">could not verify</span><span class="badge verdict-badge tone-no_code_change">no code change</span></div>"`;
