@@ -53,7 +53,7 @@ export function Timeline({
         {steps.map((step, index) => (
           <li
             key={step.id}
-            className={`tl-step is-${step.state}`}
+            className={`tl-step is-${step.state}${step.id === 'advice' ? ' is-advice' : ''}`}
             style={{ ['--i' as string]: String(index) }}
             aria-current={!illustrative && step.state === 'current' ? 'step' : undefined}
             aria-label={
@@ -64,7 +64,11 @@ export function Timeline({
           >
             <span className="tl-dot" aria-hidden="true" />
             <span className="tl-label">{step.label}</span>
-            <span className="tl-hint">{step.hint}</span>
+            {step.id === 'advice' ? (
+              <span className="advice-flag tl-advice">Doesn't change the verdict</span>
+            ) : (
+              <span className="tl-hint">{step.hint}</span>
+            )}
           </li>
         ))}
       </ol>

@@ -1,6 +1,6 @@
 import { renderToStaticMarkup } from 'react-dom/server'
 import { expect, test } from 'vitest'
-import { illustrativeStates } from './present'
+import { illustrativeStates, timelineStates } from './present'
 import { SwarmTheater, Timeline, VerdictBadge } from './ui'
 
 test('verdict badges render the four code labels', () => {
@@ -26,6 +26,18 @@ test('the swarm is labelled as advice that does not change the verdict', () => {
   expect(html).toContain('Advice only')
   expect(html).toContain('doesn’t change the verdict')
   expect(html).toContain('Ultra')
+})
+
+test('a live timeline puts swarm stages on Advice, not Verdict', () => {
+  const html = renderToStaticMarkup(
+    <Timeline steps={timelineStates([{ stage: 'verdict' }, { stage: 'agent_judge' }], 'agent_judge')} />,
+  )
+  expect(html).toContain('Advice (swarm)')
+  expect(html).toContain('Doesn&#x27;t change the verdict')
+  expect(html.indexOf('Advice (swarm)')).toBeGreaterThan(html.indexOf('>Verdict<'))
+  const current = html.slice(html.indexOf('aria-current="step"'))
+  expect(current).toContain('Advice (swarm)')
+  expect(current).not.toContain('>Verdict<')
 })
 
 test('a live timeline marks the current stage for assistive tech', () => {

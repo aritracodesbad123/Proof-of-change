@@ -8,6 +8,7 @@ import {
   illustrativeStates,
   logSections,
   reasonPoints,
+  TIMELINE_SPEC,
   timelineStates,
   verdictLabel,
   verdictPlain,
@@ -37,7 +38,7 @@ describe('verdict badges stay labels for the code verdict', () => {
 describe('timeline follows real stage events', () => {
   test('starts pending', () => {
     expect(timelineStates([], null).map((step) => step.state)).toEqual([
-      'pending', 'pending', 'pending', 'pending', 'pending', 'pending',
+      'pending', 'pending', 'pending', 'pending', 'pending', 'pending', 'pending',
     ])
   })
 
@@ -65,6 +66,7 @@ describe('timeline follows real stage events', () => {
     expect(byId.probes).toBe('done')
     expect(byId.coverage).toBe('done')
     expect(byId.verdict).toBe('current')
+    expect(byId.advice).toBe('pending')
   })
 
   test('a failure marks the last reached stage and skips the rest', () => {
@@ -78,6 +80,24 @@ describe('timeline follows real stage events', () => {
     expect(byId.tests).toBe('failed')
     expect(byId.probes).toBe('skipped')
     expect(byId.verdict).toBe('skipped')
+    expect(byId.advice).toBe('skipped')
+  })
+
+  test('swarm stages land under Advice and never under Verdict', () => {
+    const verdict = TIMELINE_SPEC.find((step) => step.id === 'verdict')
+    const advice = TIMELINE_SPEC.find((step) => step.id === 'advice')
+    expect(advice?.label).toBe('Advice (swarm)')
+    expect(TIMELINE_SPEC.findIndex((step) => step.id === 'advice')).toBeGreaterThan(
+      TIMELINE_SPEC.findIndex((step) => step.id === 'verdict'),
+    )
+    for (const stage of ['agent_judge', 'agent_helper', 'agent_summary'] as const) {
+      expect(verdict?.stages).not.toContain(stage)
+      expect(advice?.stages).toContain(stage)
+      const steps = timelineStates([{ stage: 'verdict' }, { stage }], stage)
+      expect(steps.find((step) => step.id === 'verdict')?.state).toBe('done')
+      expect(steps.find((step) => step.id === 'advice')?.state).toBe('current')
+      expect(steps.find((step) => step.label === 'Verdict')?.state).not.toBe('current')
+    }
   })
 
   test('the landing illustration walks every stage then rests', () => {

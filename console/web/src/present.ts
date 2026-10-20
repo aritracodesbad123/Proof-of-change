@@ -20,7 +20,13 @@ export const TIMELINE_SPEC = [
     id: 'verdict',
     label: 'Verdict',
     hint: 'The code publishes the verdict',
-    stages: ['verdict', 'agent_judge', 'agent_helper', 'agent_summary', 'report', 'done'],
+    stages: ['verdict'],
+  },
+  {
+    id: 'advice',
+    label: 'Advice (swarm)',
+    hint: "Doesn't change the verdict",
+    stages: ['agent_judge', 'agent_helper', 'agent_summary'],
   },
 ] as const
 
@@ -57,6 +63,8 @@ const PAST_PROBES = new Set([
 const VERDICT_REACHED = new Set([
   'verdict', 'agent_judge', 'agent_helper', 'agent_summary', 'report', 'done',
 ])
+const PAST_VERDICT = new Set(['agent_judge', 'agent_helper', 'agent_summary', 'report', 'done'])
+const SWARM_STAGES = ['agent_judge', 'agent_helper', 'agent_summary'] as const
 
 function has(seen: Set<string>, names: Set<string>): boolean {
   for (const n of names) if (seen.has(n)) return true
@@ -124,11 +132,17 @@ function stateFor(id: string, seen: Set<string>, active: string | null): StepSta
     if (has(seen, VERDICT_REACHED)) return 'done'
     return 'pending'
   }
-  if (active === 'done' || (seen.has('done') && active !== 'verdict' && !on(['agent_judge', 'agent_helper', 'agent_summary', 'report']))) {
-    return seen.has('done') || active === 'done' ? 'done' : 'pending'
+  if (id === 'verdict') {
+    if (active === 'verdict') return 'current'
+    if ((seen.has('verdict') && active !== 'verdict') || has(seen, PAST_VERDICT)) return 'done'
+    return 'pending'
   }
-  if (on(['verdict', 'agent_judge', 'agent_helper', 'agent_summary', 'report'])) return 'current'
-  if (seen.has('done')) return 'done'
+  if (on(SWARM_STAGES)) return 'current'
+  const swarmSeen = SWARM_STAGES.some((stage) => seen.has(stage))
+  if (active === 'report' || active === 'done' || seen.has('report') || seen.has('done')) {
+    return swarmSeen ? 'done' : 'skipped'
+  }
+  if (swarmSeen) return 'started'
   return 'pending'
 }
 
