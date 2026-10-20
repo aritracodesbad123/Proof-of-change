@@ -2505,15 +2505,22 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
 
 def finish(rec: dict, prdir: Path, work: Path, t0: float, runner=None) -> dict:
     # Agent swarm (judge/helper/summary) after the code verdict; advisory only — never changes rec["verdict"].
-    # Skip when model_skipped is set (--no-probes / baseline without claim probes) so the stamp stays honest.
-    from poc import contree_sandboxes, run_progress
+    # Off unless the run asked (--swarm / POC_SWARM). Skip also when model_skipped is set
+    # (--no-probes / baseline without claim probes) so the stamp stays honest.
+    from poc import contree_sandboxes, hitl, run_progress
     contree_sandboxes.clear_session()
-    if (runner is not None and getattr(runner, "provider", None) is not None
+    swarm_on = bool(getattr(runner, "swarm", False))
+    rec["swarm"] = "on" if swarm_on else "off"
+    rec["operator_approval"] = "on" if hitl.hitl_enabled() else "off"
+    if (swarm_on and runner is not None and getattr(runner, "provider", None) is not None
             and not getattr(runner, "model_skipped", None)):
         agents.run_swarm(runner.provider, rec)
     elif runner is not None and getattr(runner, "model_skipped", None) and "agents" not in rec:
         rec["agents"] = {"status": "skipped", "note": runner.model_skipped, "roles": []}
         rec.setdefault("explanation", {"status": "not yet wired", "why": runner.model_skipped})
+    elif not swarm_on and "agents" not in rec:
+        rec["agents"] = {"status": "skipped", "note": "advisory swarm is off", "roles": []}
+        rec.setdefault("explanation", {"status": "not yet wired", "why": "advisory swarm is off"})
     run_progress.emit("report", detail="writing record")
     if runner is not None:
         stamp_model_use(rec, runner)
@@ -3214,6 +3221,11 @@ def main(argv=None) -> int:
                     help="model id for advisory noise/install notes (Lightning; Nano fallback)")
     ap.add_argument("--summary-model", default=model_provider.DEFAULT_MODELS["summary"],
                     help="model id for plain-language report summary (Super)")
+    ap.add_argument("--swarm", action="store_true",
+                    help="run the advisory agent swarm after the verdict (finding labels, notes, and a "
+                         "plain-language summary). Off by default for command-line and benchmark runs, so "
+                         "they make no swarm model calls. Also on when POC_SWARM is 1, true, yes, or on. "
+                         "The operator console turns this on itself.")
     ap.add_argument("--sandbox-backend", choices=("local", "contree"), default="local",
                     help="where probe/pytest dual-runs execute for source-pair PRs: local bubblewrap (default) or "
                          "Nebius Token Factory Sandboxes (needs NEBIUS_API_KEY, NEBIUS_PROJECT_ID, and "
@@ -3259,6 +3271,12 @@ def main(argv=None) -> int:
     ap.add_argument("--ids", default=None, help="with --bench: comma-separated case IDs (default: all), e.g. B01,B14")
     ap.add_argument("--bench-out", default=None, help="with --bench: result folder (default: runs/bench-v0)")
     a = ap.parse_args(argv)
+    from poc import hitl
+    stop = hitl.study_operator_approval_stop(bench=bool(a.bench))
+    if stop:
+        print(stop, file=sys.stderr)
+        raise SystemExit(1)
+    a.swarm = agents.swarm_enabled(bool(a.swarm))
     stop = model_provider.key_refusal(a.model_provider)
     if stop:
         print(stop, file=sys.stderr)

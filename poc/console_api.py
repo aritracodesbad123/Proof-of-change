@@ -415,9 +415,12 @@ def start_check(pr_url: str, *, model_provider: str = "nebius") -> dict:
 
         env = os.environ.copy()
         env["POC_PROGRESS_PATH"] = str(progress_path)
-        # Console always enables HITL mid-check; bench/CLI leave these unset.
+        # Console is the only place operator approval may run, and it turns the advisory swarm on
+        # itself. Command-line and benchmark runs leave both off (and refuse to start if POC_HITL is set).
         env["POC_HITL"] = "1"
         env["POC_HITL_DIR"] = str(hitl_dir)
+        env["POC_CONSOLE"] = "1"
+        env["POC_SWARM"] = "1"
         with _jobs_lock:
             job["status"] = "running"
             job["started_at"] = time.time()
@@ -432,7 +435,7 @@ def start_check(pr_url: str, *, model_provider: str = "nebius") -> dict:
                 job["warning"] = note if "unsafe" in note.lower() else job.get("warning")
             rp.emit("fetch_pr", detail=note[:200])
         argv = [str(REPO_ROOT / ".venv" / "bin" / "python"), str(REPO_ROOT / "ops" / "daily_run.py"),
-                "--pr", pr_url.strip(), "--model-provider", model_provider, *flags]
+                "--pr", pr_url.strip(), "--model-provider", model_provider, "--swarm", *flags]
         if not (REPO_ROOT / ".venv" / "bin" / "python").is_file():
             argv[0] = os.environ.get("PYTHON", "python3")
         try:

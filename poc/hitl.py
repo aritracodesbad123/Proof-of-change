@@ -1,8 +1,9 @@
 """Human-in-the-loop mid-check: pause after AI drafts claims/probes for operator approval.
 
-When POC_HITL=1 and POC_HITL_DIR is set (console always does), model_probes.generate writes
-hitl_draft.json, emits await_human, and polls for hitl_approval.json before freezing.
-Bench / CLI leave HITL off unless those env vars are set.
+When the operator console starts a check it sets POC_HITL, POC_HITL_DIR and POC_CONSOLE.
+model_probes.generate then writes hitl_draft.json, emits await_human, and polls for
+hitl_approval.json before freezing. Command-line and benchmark runs refuse to start if
+POC_HITL is set: approval can change which probes run, so it is not a study-run option.
 """
 from __future__ import annotations
 
@@ -41,8 +42,45 @@ _QUESTION_TEMPLATES = (
 )
 
 
+_ON = ("1", "true", "yes", "on")
+
+
+def _flag(name: str) -> bool:
+    return (os.environ.get(name) or "").strip().lower() in _ON
+
+
+def hitl_requested() -> bool:
+    """True when POC_HITL is set, whether or not this process may honour it."""
+    return _flag("POC_HITL")
+
+
+def console_job() -> bool:
+    """True when this process was started by the operator console."""
+    return _flag("POC_CONSOLE")
+
+
 def hitl_enabled() -> bool:
-    return (os.environ.get("POC_HITL") or "").strip().lower() in ("1", "true", "yes")
+    """Operator approval runs only inside a console job. A bare POC_HITL does not turn it on."""
+    return hitl_requested() and console_job()
+
+
+def study_operator_approval_stop(bench: bool) -> str | None:
+    """Plain-language refusal for a command-line or benchmark run that has POC_HITL set.
+
+    The console's own check is exempt (POC_CONSOLE, and not a benchmark). Anywhere else, including a
+    benchmark that also carries the console marker, the run must not start.
+    """
+    if not hitl_requested():
+        return None
+    if not bench and console_job():
+        return None
+    kind = "benchmark" if bench else "command-line"
+    return (
+        "STOPPED: operator approval is turned on (POC_HITL is set), but this is a "
+        f"{kind} run. That step lets a person add or drop probes, so it can change "
+        "which probes run. It is only available in the operator console. "
+        "Unset POC_HITL and start this run again."
+    )
 
 
 def hitl_dir() -> Path | None:
