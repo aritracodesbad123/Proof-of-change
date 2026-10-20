@@ -1748,7 +1748,9 @@ def verdict_for(cmp: dict | None, cnv_reason: str | None, exits: dict | None = N
     could_not_verify ('unverified behaviour claim: "<quote>"; needs a probe'). With a probe, the probe decides.
     baseline (BASELINES, default full) selects which probes decide and whether claims are flagged.
     A docstring-only change (AST equal after blanking docstrings) is verified: the claim holds by construction,
-    unless the tests already need attention."""
+    unless the tests already need attention.
+    A probe claim that expects a difference but matches no observation on that probe can only lower a verified
+    result to could_not_verify. It never raises a verdict."""
     probe_results = probe_items(probe_results, baseline)
     v, reason, fl = with_probes(cmp, cnv_reason, exits, files, probe_results)
     if uses(baseline, "claim_flags") and claims and v == Verdict.VERIFIED.value and not behaviour_claims.probe_covers(
@@ -1759,9 +1761,16 @@ def verdict_for(cmp: dict | None, cnv_reason: str | None, exits: dict | None = N
                          f'unverified behaviour claim: "{q}"{more}; needs a probe ({reason})',
                          fl + ["unverified_claim"])
     if docstring_only and v != Verdict.NEEDS_ATTENTION.value:
-        return (Verdict.VERIFIED.value,
-                "docstring-only change (AST equal after blanking docstrings); behaviour claims hold by construction",
-                fl + ["holds_by_construction"])
+        v = Verdict.VERIFIED.value
+        reason = ("docstring-only change (AST equal after blanking docstrings); behaviour claims hold by construction")
+        fl = fl + ["holds_by_construction"]
+    missing = probes.unmatched_differs_claims(probe_results)
+    if missing and v == Verdict.VERIFIED.value:
+        shown = ", ".join(missing[:4])
+        extra = f" (+{len(missing) - 4} more)" if len(missing) > 4 else ""
+        return (Verdict.COULD_NOT_VERIFY.value,
+                f"could not verify: claim(s) {shown}{extra} expect a difference but no observation matches ({reason})",
+                fl + ["unmatched_differs_claim"])
     return v, reason, fl
 
 

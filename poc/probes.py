@@ -148,7 +148,34 @@ def citation(fname: str, obs: dict, name: str) -> dict | None:
 
 
 def claim_for(spec: dict, name: str) -> dict | None:
-    return next((c for c in spec.get("claims", []) if any(fnmatch.fnmatchcase(name, pat) for pat in c["covers"])), None)
+    return next((c for c in spec.get("claims", []) if _covers_name(c.get("covers"), name)), None)
+
+
+def _covers_name(covers, name: str) -> bool:
+    return any(isinstance(pat, str) and fnmatch.fnmatchcase(name, pat) for pat in covers or [])
+
+
+def _observation_names(item: dict) -> list[str]:
+    return [o.get("name") for o in (item.get("observations") or [])
+            if isinstance(o, dict) and isinstance(o.get("name"), str)]
+
+
+def unmatched_differs_claims(probe_results: dict | None) -> list[str]:
+    """Claim ids that expect a difference and match no observation name on that same probe.
+
+    A claim in that state was never checked. It must not support a verified verdict."""
+    found = []
+    for it in (probe_results or {}).get("items") or []:
+        if not isinstance(it, dict):
+            continue
+        names = _observation_names(it)
+        for c in it.get("claims") or []:
+            if not isinstance(c, dict) or c.get("expect") != "differs":
+                continue
+            if any(_covers_name(c.get("covers"), n) for n in names):
+                continue
+            found.append(str(c.get("id") or "claim"))
+    return found
 
 
 def label_for(state: str, claim: dict | None, name: str, crashed_both: bool) -> str:
