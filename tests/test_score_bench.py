@@ -143,6 +143,41 @@ def test_study_scorer_refuses_when_a_switch_is_true_or_missing(tmp_path, capsys)
     assert "Regression recall" in capsys.readouterr().out
 
 
+def test_scorer_refuses_an_invalid_model_record(tmp_path, capsys):
+    """A record with no usable AI call is refused. It is not counted as could_not_verify."""
+    _write(tmp_path, "B01-full.json", "B01", "could_not_verify", model_provider_used="nebius")
+    _write(tmp_path, "B02-full.json", "B02", "could_not_verify", model_provider_used="none")
+    assert sb.main(["--answers", ANSWERS, "--results", str(tmp_path)]) == 1
+    err = capsys.readouterr().err
+    assert "STOPPED" in err and "model_provider_used is none" in err
+    assert "must not be counted as could_not_verify" in err
+    assert "Regression recall" not in capsys.readouterr().out
+
+    _write(tmp_path, "B02-full.json", "B02", "verified", invalid=True,
+           invalid_reason="every AI call failed", model_provider_used="nebius")
+    assert sb.main(["--answers", ANSWERS, "--results", str(tmp_path)]) == 1
+    err = capsys.readouterr().err
+    assert "invalid (every AI call failed)" in err and "Regression recall" not in capsys.readouterr().out
+
+    _write(tmp_path, "B02-full.json", "B02", "could_not_verify", model_provider_used="nebius",
+           cost={"ai_calls": 2, "failed_ai_calls": 2, "swarm": {"ai_calls": 1, "failed_ai_calls": 1}})
+    assert sb.main(["--answers", ANSWERS, "--results", str(tmp_path)]) == 1
+    assert "every AI call failed" in capsys.readouterr().err
+
+    _write(tmp_path, "B02-full.json", "B02", "verified", model_provider_used="nebius",
+           cost={"ai_calls": 2, "failed_ai_calls": 1})
+    assert sb.main(["--answers", ANSWERS, "--results", str(tmp_path)]) == 0
+    assert "Regression recall" in capsys.readouterr().out
+
+    labelled = bench.labelled_study_out(tmp_path / "swarm", True)
+    labelled.mkdir(parents=True)
+    _write(labelled, "B01-full.json", "B01", "could_not_verify", **_swarm_on(model_provider_used="none"))
+    assert swarm.main(["--answers", ANSWERS, "--results", str(labelled)]) == 1
+    err = capsys.readouterr().err
+    assert "cannot be scored as a swarm study" in err and "model_provider_used is none" in err
+    assert "Regression recall" not in capsys.readouterr().out
+
+
 def _swarm_on(**extra):
     return {"swarm_requested": True, "swarm": "on", "operator_approval_requested": False,
             "operator_approval": "off", **extra}

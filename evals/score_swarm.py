@@ -15,7 +15,7 @@ import json
 import sys
 from pathlib import Path
 
-from evals.score_bench import compare, read_answers, read_results, result_records, score, table
+from evals.score_bench import compare, invalid_record_problems, read_answers, read_results, result_records, score, table
 
 
 def swarm_record_problems(name: str, rec: dict) -> list[str]:
@@ -43,18 +43,21 @@ def swarm_record_problems(name: str, rec: dict) -> list[str]:
             continue
         else:
             problems.append(f"{name}: {key} is missing")
+    problems.extend(invalid_record_problems(name, rec))
     return problems
 
 
 def swarm_records_message(records: list[tuple[str, dict]]) -> str | None:
-    """Plain refusal unless every record has the swarm requested and run."""
+    """Plain refusal unless every record has the swarm requested and run, and none is an invalid model record."""
     problems = [p for name, rec in records for p in swarm_record_problems(name, rec)]
     if not problems:
         return None
     return (
         "STOPPED: these results cannot be scored as a swarm study. "
         "Every record must have the advisory swarm requested and run, "
-        "and operator approval must stay off.\n"
+        "and operator approval must stay off. "
+        "A record whose AI calls all failed, whose model_provider_used is none, "
+        "or that is marked invalid is refused and is not counted as could_not_verify.\n"
         + "\n".join(problems)
     )
 

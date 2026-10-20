@@ -147,6 +147,8 @@ def _run_swarm_roles(provider: Provider, rec: dict, ctx: dict, agents: list, out
             role["labels"] = raw.get("labels") or []
             out["judge"] = raw
         except Exception as e:  # noqa: BLE001
+            if isinstance(e, model_provider.ProviderRejected):
+                raise
             role["status"] = "error"
             role["note"] = f"{type(e).__name__}: {e}"[:200]
 
@@ -175,6 +177,8 @@ def _run_swarm_roles(provider: Provider, rec: dict, ctx: dict, agents: list, out
                     role["notes"] = raw.get("notes") or []
                     out["helper"] = raw
                 except Exception as e2:  # noqa: BLE001
+                    if isinstance(e2, model_provider.ProviderRejected):
+                        raise
                     role["status"] = "error"
                     role["note"] = f"{type(e2).__name__}: {e2}"[:200]
                 finally:
@@ -183,6 +187,8 @@ def _run_swarm_roles(provider: Provider, rec: dict, ctx: dict, agents: list, out
                 role["status"] = "error"
                 role["note"] = f"{type(e).__name__}: {e}"[:200]
         except Exception as e:  # noqa: BLE001
+            if isinstance(e, model_provider.ProviderRejected):
+                raise
             role["status"] = "error"
             role["note"] = f"{type(e).__name__}: {e}"[:200]
 
@@ -224,6 +230,8 @@ def _run_swarm_roles(provider: Provider, rec: dict, ctx: dict, agents: list, out
             }
             out["summary"] = rec["explanation"]
         except Exception as e:  # noqa: BLE001
+            if isinstance(e, model_provider.ProviderRejected):
+                raise
             role["status"] = "error"
             role["note"] = f"{type(e).__name__}: {e}"[:200]
             rec["explanation"] = {"status": "error", "why": role["note"]}

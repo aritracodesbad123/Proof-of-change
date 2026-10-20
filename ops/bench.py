@@ -261,6 +261,11 @@ def run(a, dr) -> int:
     except (AnswerKeyRefused, BenchInputError, OSError) as e:
         print(f"Stopped: {e}", file=sys.stderr)
         return 2
+    from poc import model_provider
+    stop = model_provider.auth_refusal(getattr(a, "provider", None))
+    if stop:
+        print(stop, file=sys.stderr)
+        return 1
     raw = Path(a.bench).read_bytes()
     meta = {"inputs_file": Path(a.bench).name, "inputs_sha256": hashlib.sha256(raw).hexdigest()}
     out = labelled_study_out(a.bench_out or dr.REPO_ROOT / DEFAULT_OUT, bool(getattr(a, "swarm", False)))
@@ -273,6 +278,9 @@ def run(a, dr) -> int:
         try:
             rec = run_case(dr, a, row, meta, out, workroot, machine)
             print(f"    -> {rec['verdict']}: {rec['reason'][:160]}", flush=True)
+        except model_provider.ProviderRejected as e:
+            print(str(e), file=sys.stderr)
+            return 1
         except Exception as e:  # noqa: BLE001
             problems += 1
             print(f"    -> harness error: {type(e).__name__}: {e}", flush=True)

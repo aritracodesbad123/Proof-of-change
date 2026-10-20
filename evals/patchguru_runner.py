@@ -34,6 +34,7 @@ import os
 import sys
 import time
 import types
+import urllib.error
 import urllib.request
 from pathlib import Path
 
@@ -147,8 +148,15 @@ class NebiusChat(GatedProvider):
                                      headers={"Content-Type": "application/json",
                                               "Authorization": f"Bearer {self._key}"},
                                      method="POST")  # br-allow-external: model inference call, creates nothing
-        with urllib.request.urlopen(req, timeout=self.timeout) as r:   # noqa: S310 (fixed https URL)
-            return json.loads(r.read())
+        try:
+            with urllib.request.urlopen(req, timeout=self.timeout) as r:   # noqa: S310 (fixed https URL)
+                return json.loads(r.read())
+        except urllib.error.HTTPError as e:
+            code = model_provider._auth_status(e)
+            e.close()
+            if code is not None:
+                raise model_provider.ProviderRejected(code, starting=False) from None
+            raise
 
     def _call(self, task: str, system: str, user: str, schema: dict, ctx: dict) -> dict:
         body = {"model": self.models["chat"], "temperature": ctx.get("temperature", 0.7),
@@ -468,12 +476,20 @@ def main(argv=None) -> int:
     if not str(key).strip():
         print(model_provider.key_refusal("nebius") or f"STOPPED: {KEY_ENV} is not set", file=sys.stderr)
         return 1
+    try:
+        model_provider.NebiusProvider(key).confirm_key()
+    except model_provider.ProviderRejected as e:
+        print(str(e), file=sys.stderr)
+        return 1
     a.python_full = dr.resolve_python(a.python)
     machine = dict(dr.detect_machine_type())
     for row in rows:
         print(f"[{row['id']}] {row['repo']}#{row['pr']} ...", flush=True)
         try:
             recs = run_case(row, a, fp, key, out, machine)
+        except model_provider.ProviderRejected as e:
+            print(str(e), file=sys.stderr)
+            return 1
         except Exception as e:  # noqa: BLE001  (e.g. a model call that timed out): record it, go on
             why = f"runner error: {type(e).__name__}: {str(e)[:200]}"
             recs = []

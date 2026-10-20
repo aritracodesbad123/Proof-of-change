@@ -2549,12 +2549,42 @@ def finish(rec: dict, prdir: Path, work: Path, t0: float, runner=None) -> dict:
     if rec.get("pr_side", {}).get("build_seconds") is not None:
         rec["duration_s"]["build"] = rec["pr_side"]["build_seconds"]
     rec["cost"] = cost.take(rec["duration_s"])
+    mark_bench_model_invalid(rec, runner)
     errs = check_record(rec)
     if errs:
         rec["schema_errors"] = errs[:20]
     shutil.rmtree(work, ignore_errors=True)
     (prdir / "record.json").write_text(json.dumps(rec, indent=1))
     return rec
+
+
+def _call_count(value) -> int:
+    return value if isinstance(value, int) and not isinstance(value, bool) else 0
+
+
+def mark_bench_model_invalid(rec: dict, runner) -> None:
+    """In a bench (study) run, flag a record the scorer must not count.
+
+    A record whose AI calls all failed, or whose model_provider_used is none, is marked invalid.
+    The verdict is left as it is. The study scorer refuses the record instead of counting
+    could_not_verify. Daily and ops runs are not marked here.
+    """
+    if runner is None or not getattr(runner, "bench", None):
+        return
+    calls = list(getattr(getattr(runner, "provider", None), "calls", None) or [])
+    all_failed = bool(calls) and all(not c.get("ok") for c in calls)
+    cost_info = rec.get("cost") if isinstance(rec.get("cost"), dict) else {}
+    ai = _call_count(cost_info.get("ai_calls"))
+    failed = _call_count(cost_info.get("failed_ai_calls"))
+    swarm = cost_info.get("swarm") if isinstance(cost_info.get("swarm"), dict) else {}
+    ai += _call_count(swarm.get("ai_calls"))
+    failed += _call_count(swarm.get("failed_ai_calls"))
+    if all_failed or (ai > 0 and failed >= ai):
+        rec["invalid"] = True
+        rec["invalid_reason"] = "every AI call failed"
+    elif rec.get("model_provider_used") == "none":
+        rec["invalid"] = True
+        rec["invalid_reason"] = "model_provider_used is none"
 
 
 def validate_record(rec: dict) -> list[str]:
@@ -3345,6 +3375,11 @@ def main(argv=None) -> int:
     if a.bench:
         from ops import bench
         return bench.run(a, sys.modules[__name__])
+    if not a.select_only and not a.report_only:
+        stop = model_provider.auth_refusal(a.provider)
+        if stop:
+            print(stop, file=sys.stderr)
+            return 1
 
     started = now_ist()
     single = parse_pr_urls(a.pr)
@@ -3437,6 +3472,9 @@ def main(argv=None) -> int:
                 print(f"  testing #{c['pr']} {c['title'][:60]} ...", flush=True)
             try:
                 rec = gate(rec or test_pr(repo, cfg, c, rdir, workroot, a, machine))   # final verdict in records.jsonl
+            except model_provider.ProviderRejected as e:
+                print(str(e), file=sys.stderr)
+                return 1
             except Exception as e:  # noqa: BLE001
                 problems.append(f"{repo}#{c['pr']}: harness error: {type(e).__name__}: {e}")
                 continue

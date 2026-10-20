@@ -98,11 +98,43 @@ STUDY_SWITCHES = (
 )
 
 
+def _call_count(value) -> int:
+    return value if isinstance(value, int) and not isinstance(value, bool) else 0
+
+
+def invalid_record_problems(name: str, rec: dict) -> list[str]:
+    """Why this result must not be scored. Empty when the record is a usable model run.
+
+    A record marked invalid, a record whose model_provider_used is exactly none, or a record whose
+    AI calls all failed must not be counted as could_not_verify. A record that simply omits
+    model_provider_used is left alone, so an older fixture still scores.
+    """
+    problems = []
+    if rec.get("invalid") is True:
+        why = rec.get("invalid_reason")
+        detail = f" ({why})" if isinstance(why, str) and why else ""
+        problems.append(f"{name}: invalid{detail}; it must not be counted as could_not_verify")
+    if rec.get("model_provider_used") == "none":
+        problems.append(f"{name}: model_provider_used is none; it must not be counted as could_not_verify")
+    cost = rec.get("cost")
+    if isinstance(cost, dict):
+        ai = _call_count(cost.get("ai_calls"))
+        failed = _call_count(cost.get("failed_ai_calls"))
+        swarm = cost.get("swarm")
+        if isinstance(swarm, dict):
+            ai += _call_count(swarm.get("ai_calls"))
+            failed += _call_count(swarm.get("failed_ai_calls"))
+        if ai > 0 and failed >= ai:
+            problems.append(f"{name}: every AI call failed; it must not be counted as could_not_verify")
+    return problems
+
+
 def study_record_problems(name: str, rec: dict) -> list[str]:
     """Why this result cannot be scored as a study record. Empty when all four switches are off.
 
     A true value, or a missing value, is not a study record. ``on`` counts as true.
     Anything other than an explicit false or ``off`` counts as missing.
+    An invalid model record is refused as well, so it is not counted as could_not_verify.
     """
     problems = []
     for key in STUDY_SWITCHES:
@@ -116,11 +148,12 @@ def study_record_problems(name: str, rec: dict) -> list[str]:
             continue
         else:
             problems.append(f"{name}: {key} is missing")
+    problems.extend(invalid_record_problems(name, rec))
     return problems
 
 
 def study_records_message(records: list[tuple[str, dict]]) -> str | None:
-    """Plain refusal when any study record has one of the four switches true or missing."""
+    """Plain refusal when any study record has one of the four switches true or missing, or is invalid."""
     problems = [p for name, rec in records for p in study_record_problems(name, rec)]
     if not problems:
         return None
@@ -128,7 +161,9 @@ def study_records_message(records: list[tuple[str, dict]]) -> str | None:
         "STOPPED: these results cannot be scored as a study. "
         "Every study record must include swarm_requested, operator_approval_requested, "
         "swarm, and operator_approval, and none of them may be true. "
-        "On counts as true. A missing value is not a study record.\n"
+        "On counts as true. A missing value is not a study record. "
+        "A record whose AI calls all failed, whose model_provider_used is none, "
+        "or that is marked invalid is refused and is not counted as could_not_verify.\n"
         + "\n".join(problems)
     )
 

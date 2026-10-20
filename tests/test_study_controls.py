@@ -137,10 +137,14 @@ def test_switches_record_what_ran(tmp_path, monkeypatch):
     assert sb.study_record_problems("hitl.json", held)
 
     # Both switches off: the four fields are present and the study scorer accepts them.
+    # One successful model call, so the record is not the "provider used: none" case the scorer refuses.
     monkeypatch.delenv("POC_HITL", raising=False)
-    off = finish_one(_runner(_Counting(), False))
+    ran = _Counting()
+    ran._remember("claims", True)
+    off = finish_one(_runner(ran, False))
     assert off["swarm_requested"] is False and off["operator_approval_requested"] is False
     assert off["swarm"] == "off" and off["operator_approval"] == "off"
+    assert off["model_provider_used"] == "nebius"
     assert sb.study_record_problems("off.json", off) == []
 
     hitl.note_approval_ran()

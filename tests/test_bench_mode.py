@@ -199,6 +199,7 @@ def test_run_writes_one_result_per_id_and_never_opens_the_answer_key(tmp_path, m
     (tmp_path / "benchmark-v0-answers.csv").write_text("id,label\nB01,regression\n")
     monkeypatch.setenv(model_provider.KEY_ENV, "test-key")
     monkeypatch.setattr(dr, "sync_to_origin_main", lambda root=None: "a" * 40)
+    monkeypatch.setattr(model_provider.NebiusProvider, "confirm_key", lambda self: None)
     monkeypatch.setattr(bench, "CLONE_URL", str(merged_repo["path"]))
     monkeypatch.setattr(bench, "pr_text", lambda _dr, row: {"title": row["pr_title"], "body": "Changes f.",
                                                              "author": "someone", "base_ref": "main", "source": "test"})
@@ -229,6 +230,7 @@ def test_run_writes_one_result_per_id_and_never_opens_the_answer_key(tmp_path, m
     res = json.loads((out / "B01-full.json").read_text())
     assert "test-key" not in (out / "B01-full.json").read_text()
     assert res["model_provider_used"] == "none"  # the stub never called the model
+    assert res["invalid"] is True and res["verdict"] == "verified"
     assert res["bench"]["id"] == "B01" and res["bench"]["answer_key_read"] is False
     assert res["bench"]["first_parent_verified"] and res["pr"]["merge_commit"] == merged_repo["merge"]
     assert res["verdict"] == "verified" and res["tested"]["main"].startswith("first parent of the merge commit")
