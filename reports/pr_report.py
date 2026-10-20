@@ -48,10 +48,23 @@ def run_id(rec: dict) -> str:
     return rec.get("_dir") or f"{rec.get('library', 'pr')}-{rec['pr']}"
 
 
+def _ai_probe_downgraded(rec: dict) -> bool:
+    """True when the stored record was already lowered because no AI-written probe ran a changed line.
+
+    Re-applying the coverage gate restores the verdict from before that gate, which would hide this downgrade.
+    The AI-probe gate is applied again only in that case, so a record that was not downgraded stays as it was."""
+    before = rec.get("verdict_before_ai_probe_gate")
+    if before and before != rec.get("verdict"):
+        return True
+    reason = rec.get("reason") or ""
+    return rec.get("verdict") == "could_not_verify" and "no AI-written probe" in reason
+
+
 def normalize(rec: dict, dirname: str | None = None) -> dict:
     """Flat view of a record. pr_run records (schema rev 3+, ops/daily_run.py) keep the PR in a `pr` object and the
     durations in a `duration_s` object; older synthetic records were flat. The coverage gate is applied here too
-    (idempotent), so reports rebuilt from records written before the gate existed follow the same rules."""
+    (idempotent), so reports rebuilt from records written before the gate existed follow the same rules.
+    A record the AI-probe gate already downgraded keeps that lower verdict (display only; this does not re-judge)."""
     r = dict(rec)
     p = rec.get("pr")
     if isinstance(p, dict):
@@ -63,7 +76,12 @@ def normalize(rec: dict, dirname: str | None = None) -> dict:
     r.setdefault("_dir", dirname or logs or None)
     if not r["_dir"]:
         r.pop("_dir")
-    return coverage_gate.apply(r)
+    downgraded = _ai_probe_downgraded(r)
+    out = coverage_gate.apply(r)
+    if downgraded:
+        from ops.daily_run import ai_probe_gate
+        out = ai_probe_gate(out)
+    return out
 
 
 def side_of(x: dict) -> str:
@@ -266,6 +284,12 @@ def decide(rec: dict, chk: list[list]) -> dict:
         return dict(verdict="NO CODE CHANGE", colour="grey", action="Approve with notes", confidence="High",
                     conf_why="Every changed file is a type stub or a py.typed marker, so behaviour was not checked.",
                     why=rec.get("reason", ""))
+    infra = rec.get("infrastructure_failure")
+    if isinstance(infra, dict) and infra.get("kind") == "oom":
+        return dict(verdict="COULD NOT VERIFY", colour="grey", action="Re-run", confidence="Low",
+                    conf_why="The compiler ran out of memory. That is an infrastructure failure, not a finding "
+                             "about the pull request.",
+                    why=rec.get("reason", ""))
     fails = [c for c in chk if c[1] == "FAIL"]
     warns = [c for c in chk if c[1] == "WARN"]
     g = rec.get("coverage_gate") or {}
@@ -396,6 +420,30 @@ def probe_claim_rows(rec: dict) -> list[dict]:
                                  status="unmentioned change", evidence=f"{o['name']}: {observed(o)}",
                                  citation=(o.get("citations") or {}).get("pr")))
     return rows
+
+
+def uncovered_diff_differences(rec: dict) -> list[dict]:
+    """Differential-probe observations that no claim covers. Display only: nothing here changes a verdict."""
+    rows = []
+    for it in probe_items(rec):
+        if it.get("source") != "diff":
+            continue
+        for o in it.get("observations") or []:
+            state = o.get("state")
+            if o.get("label") == "unmentioned" or (not o.get("claim") and state not in ("same", "flaky")):
+                rows.append({"probe": it.get("id") or "?", "name": o.get("name") or "?", "observation": o})
+    return rows
+
+
+def uncovered_diff_section(R, rec: dict) -> None:
+    rows = uncovered_diff_differences(rec)
+    if not rows:
+        return
+    R.h(2, "Differences no claim covers", "uncovered-diff")
+    R.p("These differences come from differential probes. No claim in the pull request covers them. "
+        "The list is for reading the report. It does not change the verdict.")
+    R.table(["Probe", "Observation", "What the probe saw (main -> PR)"],
+            [[r["probe"], f"`{r['name']}`", observed(r["observation"])] for r in rows])
 
 
 def probes_section(R, rec: dict, rel) -> list[dict]:
@@ -542,6 +590,7 @@ def build(rec: dict, prdir: Path, out_dir: Path, decision: dict | None = None) -
 
     if probes_section(R, rec, rel):
         R.p(f"Citation check ({pstat}): {pdetail}.", "meta")
+    uncovered_diff_section(R, rec)
 
     R.h(2, "Was the changed code exercised?", "coverage")
     g, cov = rec.get("coverage_gate") or {}, rec.get("coverage") or {}

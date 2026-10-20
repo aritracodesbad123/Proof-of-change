@@ -9,7 +9,6 @@ from __future__ import annotations
 import argparse
 import configparser
 import json
-import os
 import re
 import time
 import tomllib
@@ -95,6 +94,11 @@ def links_back(info: dict, owner: str, repo: str) -> bool:
     return any(link_matches(value, owner, repo) for value in _info_links(info))
 
 
+def _host_github_token() -> str | None:
+    from poc.pr_text import github_read_token
+    return github_read_token()
+
+
 def _request(url: str, token: str | None, accept: str) -> tuple[int, bytes]:
     headers = {"User-Agent": "proof-of-change-study-labels", "Accept": accept}
     if token and "api.github.com" in url:
@@ -124,7 +128,7 @@ class Index:
     """Public reads. Each method retries once on a network or API error."""
 
     def __init__(self, token: str | None = None, sleep=time.sleep):
-        self.token = token if token is not None else (os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN"))
+        self.token = token if token is not None else _host_github_token()
         self.sleep = sleep
 
     def repo(self, owner: str, repo: str):

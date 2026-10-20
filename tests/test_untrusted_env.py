@@ -172,12 +172,18 @@ def test_install_subprocess_sees_only_the_allowlist(hostile_env, tmp_path, monke
     def fake_run(cmd, log, cwd=None, env=None, timeout=None, sbx=None):
         calls.append(env)
         return 0, 0.0
+    monkeypatch.setenv("POC_BUILD_JOBS", "1")
     monkeypatch.setattr(daily_run, "run", fake_run)
     ok, _ = daily_run.install_side(tmp_path / "venv-pr", tmp_path, None, tmp_path / "log", "3.12", 60, None)
     assert ok and calls
     for env in calls:
         _no_secret_visible(env)
-        assert set(env) - {"SETUPTOOLS_SCM_PRETEND_VERSION"} == INSTALL_KEYS and env["HOME"] == str(tmp_path / "home-pr")
+        job_names = set(iso.BUILD_JOB_NAMES)
+        assert set(env) - {"SETUPTOOLS_SCM_PRETEND_VERSION"} - job_names == INSTALL_KEYS
+        assert env["HOME"] == str(tmp_path / "home-pr")
+        # Compiler job settings appear only on the command that builds the checkout, and never carry a secret.
+        if job_names & set(env):
+            assert set(env[k] for k in job_names if k in env) <= {"1", "-j1"}
 
 
 def test_release_pair_runner_gets_the_allowlist(hostile_env, tmp_path, monkeypatch):

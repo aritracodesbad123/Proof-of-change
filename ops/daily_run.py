@@ -11,7 +11,8 @@ After the run, reviewer reports (HTML, PDF, Markdown) are written to reports/dai
 reports/pr_report.py; ops/runs/<run folder>/REPORT.md stays as the operator's run log.
 
 Read-only towards GitHub: it only GETs public API/diff URLs. It never comments, reviews or posts.
-Uses $GITHUB_TOKEN for read-only API calls if it is set; otherwise unauthenticated (60 requests/hour).
+Uses $GITHUB_TOKEN, or $GITHUB_POC_TOKEN, or $GH_TOKEN, for read-only API calls if one is set; otherwise
+unauthenticated (60 requests/hour). A rate limit (403/429 with remaining 0) waits until reset, bounded, and retries once.
 
 How a PR is tested (route "nightly+patch", used for pure-Python PRs):
   main side = latest scientific-python nightly wheel of the library (main branch build)
@@ -28,6 +29,7 @@ from __future__ import annotations
 import argparse
 import csv
 import datetime as dt
+import fcntl
 import glob
 import hashlib
 import json
@@ -53,6 +55,7 @@ from guardrails.isolation import untrusted_env  # noqa: E402
 from harness.machine import detect_machine_type  # noqa: E402
 from poc import agents, behaviour_claims, cost, coverage_gate, diff_probes, freeze, local_config, model_probes, model_provider, probes  # noqa: E402,E501
 from poc.diff import confirm  # noqa: E402
+from poc.pr_text import github_read_token  # noqa: E402
 from poc.verdict import Claim, FindingLabel, RunSummary, Verdict, pr_verdict  # noqa: E402
 
 IST = dt.timezone(dt.timedelta(hours=5, minutes=30))
@@ -97,19 +100,71 @@ def to_ist(iso_utc: str) -> str:
 
 
 # ---------------------------------------------------------------- GitHub (read-only)
+def _rate_limit_max_wait_s() -> int:
+    raw = os.environ.get("POC_GITHUB_RATE_LIMIT_MAX_WAIT_S", "900")
+    try:
+        return max(0, int(raw))
+    except ValueError:
+        return 900
+
+
 class GitHub:
     def __init__(self, log):
         # Authenticated = 5k/hour; anonymous = 60/hour (shared across Render IPs).
-        self.token = (os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN") or "").strip() or None
+        # Host environment only. This value is never copied into an environment that runs pull-request code.
+        self.token = github_read_token()
         self.calls = 0
         self.remaining = None
         self.log = log
+
+    def _note(self, msg: str) -> None:
+        print(msg, file=sys.stderr, flush=True)
+        if self.log:
+            try:
+                with open(self.log, "a") as fh:
+                    fh.write(msg + "\n")
+            except OSError:
+                pass
+
+    def _remaining_is_zero(self, err: urllib.error.HTTPError) -> bool:
+        rem = err.headers.get("X-RateLimit-Remaining") if err.headers else None
+        if rem is None:
+            return False
+        try:
+            self.remaining = int(str(rem).strip())
+        except ValueError:
+            return False
+        return self.remaining == 0
+
+    def _wait_for_reset(self, err: urllib.error.HTTPError, url: str) -> bool:
+        """Wait until X-RateLimit-Reset when that wait fits the cap. Return False when it does not."""
+        raw = err.headers.get("X-RateLimit-Reset") if err.headers else None
+        try:
+            reset_at = int(str(raw).strip())
+        except (TypeError, ValueError):
+            self._note(f"GitHub rate limit at {url}: remaining=0 but no reset time; not waiting")
+            return False
+        delay = max(0, reset_at - int(time.time()) + 1)
+        cap = _rate_limit_max_wait_s()
+        if delay > cap:
+            self._note(f"GitHub rate limit at {url}: reset in {delay}s exceeds cap {cap}s; not waiting")
+            return False
+        self._note(f"GitHub rate limit at {url}: remaining=0, waiting {delay}s until reset")
+        time.sleep(delay)
+        return True
+
+    def _rate_error(self, url: str) -> RuntimeError:
+        hint = ("" if self.token else
+                "; set GITHUB_TOKEN on the host (read-only PAT) — anonymous limit is 60/hour")
+        return RuntimeError(f"GitHub rate limit hit at {url} (remaining={self.remaining}){hint}")
 
     def get(self, url: str, accept: str = "application/vnd.github+json", api: bool = True, timeout: int = 60):
         req = urllib.request.Request(url, headers={"Accept": accept, "User-Agent": "proof-of-change-ops"})
         if api and self.token:
             req.add_header("Authorization", f"Bearer {self.token}")
-        for attempt in range(3):
+        rate_retried = False
+        attempt = 0
+        while attempt < 3:
             try:
                 with urllib.request.urlopen(req, timeout=timeout) as r:
                     if api:
@@ -118,23 +173,18 @@ class GitHub:
                     return r.read()
             except urllib.error.HTTPError as e:
                 if e.code in (403, 429) and api:
-                    rem = e.headers.get("X-RateLimit-Remaining") if e.headers else None
-                    if rem is not None:
-                        try:
-                            self.remaining = int(rem)
-                        except ValueError:
-                            pass
-                    hint = ("" if self.token else
-                            "; set GITHUB_TOKEN on the host (read-only PAT) — anonymous limit is 60/hour")
-                    raise RuntimeError(
-                        f"GitHub rate limit hit at {url} (remaining={self.remaining}){hint}"
-                    ) from e
+                    if not rate_retried and self._remaining_is_zero(e) and self._wait_for_reset(e, url):
+                        rate_retried = True
+                        continue
+                    raise self._rate_error(url) from e
                 if attempt == 2 or e.code == 404:
                     raise
             except urllib.error.URLError:
                 if attempt == 2:
                     raise
-            time.sleep(3 * (attempt + 1))
+            attempt += 1
+            time.sleep(3 * attempt)
+        raise RuntimeError(f"GitHub request failed: {url}")
 
     def json(self, path: str):
         return json.loads(self.get(f"https://api.github.com{path}"))
@@ -808,6 +858,122 @@ def install_declared_test_deps(venvs: dict, reqs: list[str], log: Path, timeout:
     return True, ""
 
 
+_TEST_EXTRA_MARK = re.compile(r"""extra\s*==\s*['"](test|tests|testing)['"]""", re.I)
+
+
+def reqs_for_test_extras(lines: list[str], self_dist: str) -> list[str]:
+    """Requirement strings declared under a test, tests, or testing extra.
+
+    Pytest and the project itself are left out: those are not optional backends. A line may be a Requires-Dist
+    header or already be the requirement text."""
+    me = _norm(self_dist or "")
+    out: list[str] = []
+    for raw in lines:
+        line = raw.strip()
+        if line.lower().startswith("requires-dist:"):
+            line = line.split(":", 1)[1].strip()
+        if not line or not _TEST_EXTRA_MARK.search(line):
+            continue
+        req = line.split(";", 1)[0].strip()
+        if not req or req.startswith("-"):
+            continue
+        name = _norm(_req_name(req))
+        if not name or name.startswith("pytest") or name == me:
+            continue
+        if req not in out:
+            out.append(req)
+    return out
+
+
+def optional_backend_reqs(checkout: Path, self_dist: str | None = None) -> list[str]:
+    """Optional backends named by the checkout's test extras (pyproject optional-dependencies)."""
+    pp = checkout / "pyproject.toml"
+    if not pp.is_file():
+        return []
+    import tomllib
+    try:
+        proj = tomllib.loads(pp.read_text()).get("project", {})
+    except Exception:  # noqa: BLE001
+        return []
+    if not isinstance(proj, dict):
+        return []
+    name = self_dist or (proj.get("name") if isinstance(proj.get("name"), str) else "") or ""
+    opt = proj.get("optional-dependencies") or {}
+    lines: list[str] = []
+    if isinstance(opt, dict):
+        for extra, reqs in opt.items():
+            if str(extra).lower() not in TEST_EXTRA_NAMES or not isinstance(reqs, list):
+                continue
+            for req in reqs:
+                if isinstance(req, str) and req.strip() and not req.strip().startswith("-"):
+                    lines.append(f"{req.strip()}; extra == \"{extra}\"")
+    return reqs_for_test_extras(lines, name)
+
+
+def install_optional_backends(venvs: dict, reqs: list[str], log: Path, timeout: int) -> dict:
+    """Install each optional backend on each side. A failure is skipped; it does not stop the others."""
+    installed: list[str] = []
+    skipped: list[dict] = []
+    if not reqs:
+        return {"installed": installed, "skipped": skipped}
+    for req in reqs:
+        failed = False
+        for side, venv in venvs.items():
+            rc, _ = run(["uv", "pip", "install", "-q", "-p", venv / "bin/python", req], log,
+                        env=base_env(side_home(venv), install=True), timeout=timeout,
+                        sbx=side_sandbox(venv, network=True))
+            if rc != 0:
+                failed = True
+                skipped.append({"req": req, "side": side, "rc": rc if isinstance(rc, int) else str(rc)})
+        if not failed:
+            installed.append(req)
+    return {"installed": installed, "skipped": skipped}
+
+
+def attach_optional_backends(rec: dict, venvs: dict, checkout: Path, dist: str, log: Path, timeout: int) -> None:
+    """Best-effort install of test-extra backends. A skip is recorded and is not a verdict."""
+    reqs = optional_backend_reqs(checkout, dist)
+    if not reqs:
+        return
+    rec["optional_backends"] = install_optional_backends(venvs, reqs, log, timeout)
+
+
+def _strip_test_extras(spec: str) -> str:
+    m = re.match(r"^(.*?)(?:\[([^\]]*)\])?$", spec)
+    if not m or not m.group(2):
+        return spec
+    keep = [x for x in m.group(2).split(",") if x and x.lower() not in TEST_EXTRA_NAMES]
+    base = m.group(1)
+    return f"{base}[{','.join(keep)}]" if keep else base
+
+
+def _without_test_extras(cmd: list, checkout: Path) -> list | None:
+    """The same install command with test extras removed from the checkout spec, or None when nothing changes."""
+    out: list = []
+    changed = False
+    root = str(checkout)
+    for part in cmd:
+        text = str(part)
+        if root in text and "[" in text:
+            stripped = _strip_test_extras(text)
+            if stripped != text:
+                changed = True
+                out.append(stripped)
+                continue
+        out.append(part)
+    return out if changed else None
+
+
+def metadata_requires(venv: Path, dist: str) -> list[str]:
+    """Requires-Dist lines of an already-installed distribution (empty when metadata cannot be read)."""
+    code = f"import importlib.metadata as m; print('\\n'.join(m.requires({dist!r}) or []))"
+    try:
+        out = in_side(venv, [venv / "bin/python", "-c", code]).stdout
+    except Exception:  # noqa: BLE001
+        return []
+    return [ln.strip() for ln in out.splitlines() if ln.strip()]
+
+
 def direct_url(venv: Path, dist: str) -> dict | None:
     """The installed distribution's direct_url.json (PEP 610), or None when it has none."""
     want = _norm(dist)
@@ -895,14 +1061,163 @@ def install_side(venv: Path, checkout: Path, chosen: dict | None, log: Path, pyt
     sbx = side_sandbox(venv, network=True, ro=ro_files)
     sbx["rw"].append(checkout)
     for c in cmds:
-        rc, _ = run(c, log, env=env, timeout=timeout, sbx=sbx)
-        if rc != 0:
-            return False, f"install failed ({rc}); see {log.name}"
+        heavy = _compiles_checkout(c, checkout)
+        rc, _ = (run_heavy if heavy else run)(c, log, env=env, timeout=timeout, sbx=sbx)
+        if rc == 0:
+            continue
+        if rc == "oom":
+            return False, _oom_reason()
+        bare = _without_test_extras(c, checkout) if heavy and optional_backend_reqs(checkout) else None
+        if bare is not None:
+            rc2, _ = run_heavy(bare, log, env=env, timeout=timeout, sbx=sbx)
+            if rc2 == 0:
+                return True, ""
+            if rc2 == "oom":
+                return False, _oom_reason()
+        return False, f"install failed ({rc}); see {log.name}"
     return True, ""
 
 
 # ---------------------------------------------------------------- execution helpers
 HOST = None   # sbx=HOST: a trusted tool on our own files (git on our clones); everything else runs in a side's sandbox
+HEAVY_RAM_PER_BUILD_GB = 8
+HEAVY_RAM_PER_JOB_GB = 2
+OOM_PHRASE = "Killed signal terminated program"
+
+
+def _oom_reason() -> str:
+    return ("infrastructure failure: the compiler was killed for using too much memory. "
+            "This is not a result about the pull request; retry the run.")
+
+
+def heavy_build_limit(configured: int | None = None, ram: float | None = None) -> int:
+    """How many heavy source builds may run at once.
+
+    Default cap is 1 (or POC_MAX_HEAVY_BUILDS / the configured value). One slot per about 8 GB of RAM, never below 1,
+    never above the cap. Unknown RAM stays at 1."""
+    if configured is None:
+        raw = os.environ.get("POC_MAX_HEAVY_BUILDS", "1")
+        try:
+            configured = int(raw)
+        except ValueError:
+            configured = 1
+    cap = max(1, int(configured))
+    if ram is None:
+        return 1
+    slots = max(1, int(ram // HEAVY_RAM_PER_BUILD_GB))
+    return min(cap, slots)
+
+
+def compiler_jobs(ram: float | None = None, configured: int | None = None) -> int:
+    """Parallel compiler jobs for one heavy build. Default 1, clamped to about one job per 2 GB of RAM."""
+    if configured is None:
+        raw = os.environ.get("POC_BUILD_JOBS", "1")
+        try:
+            configured = int(raw)
+        except ValueError:
+            configured = 1
+    cap = max(1, int(configured))
+    if ram is None:
+        return 1
+    by_ram = max(1, int(ram // HEAVY_RAM_PER_JOB_GB))
+    return min(cap, by_ram)
+
+
+def with_compiler_jobs(env: dict, jobs: int | None = None) -> dict:
+    """Copy env and set the compiler job count. The added names are on the install allowlist; values are not secrets."""
+    from guardrails.isolation import INSTALL_ALLOWLIST, check_untrusted_env
+    n = compiler_jobs(ram_gb()) if jobs is None else max(1, int(jobs))
+    out = dict(env)
+    out["MAX_JOBS"] = str(n)
+    out["CMAKE_BUILD_PARALLEL_LEVEL"] = str(n)
+    out["NINJAFLAGS"] = f"-j{n}"
+    out["MAKEFLAGS"] = f"-j{n}"
+    check_untrusted_env(out, INSTALL_ALLOWLIST)
+    return out
+
+
+def _log_tail(path: Path, n: int = 40) -> str:
+    try:
+        return "\n".join(Path(path).read_text(errors="replace").splitlines()[-n:])
+    except OSError:
+        return ""
+
+
+def is_oom_kill(rc, log_text: str = "") -> bool:
+    """True for signal 9 / exit 137, or the compiler's 'Killed signal terminated program' line.
+
+    Our own timeout kills the process and records rc 'timeout'. That is not an out-of-memory kill."""
+    if rc == "timeout" or rc == "oom":
+        return False
+    if rc in (-9, 137):
+        return True
+    return OOM_PHRASE in (log_text or "")
+
+
+def _compiles_checkout(cmd, checkout: Path) -> bool:
+    text = " ".join(map(str, cmd))
+    return "pip" in text and "install" in text and str(checkout) in text
+
+
+class HeavyBuildSlots:
+    """Cross-process cap on heavy source builds. flock is per process, which matches one build per daily-run process."""
+
+    def __init__(self, directory: Path, limit: int):
+        self.directory = Path(directory)
+        self.limit = max(1, int(limit))
+        self._fh = None
+
+    def acquire(self, wait_s: float = 3600) -> None:
+        self.directory.mkdir(parents=True, exist_ok=True)
+        deadline = time.monotonic() + wait_s
+        while True:
+            for i in range(self.limit):
+                fh = open(self.directory / f"slot-{i}.lock", "a+")  # noqa: SIM115
+                try:
+                    fcntl.flock(fh.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+                except BlockingIOError:
+                    fh.close()
+                    continue
+                self._fh = fh
+                return
+            if time.monotonic() >= deadline:
+                raise TimeoutError("heavy build slot")
+            time.sleep(0.05)
+
+    def release(self) -> None:
+        fh, self._fh = self._fh, None
+        if fh is not None:
+            try:
+                fcntl.flock(fh.fileno(), fcntl.LOCK_UN)
+            finally:
+                fh.close()
+
+
+def _heavy_slot_dir() -> Path:
+    raw = os.environ.get("POC_HEAVY_BUILD_DIR")
+    return Path(raw) if raw else REPO_ROOT / "ops" / "work" / "heavy-builds"
+
+
+def run_heavy(cmd, log_path: Path, cwd=None, env=None, timeout=None, sbx=HOST,
+              slots: HeavyBuildSlots | None = None) -> tuple[int | str, float]:
+    """Run a source build under the heavy-build cap. An out-of-memory kill is retried once, then returned as 'oom'."""
+    env = with_compiler_jobs(env or {})
+    holder = slots or HeavyBuildSlots(_heavy_slot_dir(), heavy_build_limit(ram=ram_gb()))
+    holder.acquire()
+    try:
+        rc, secs = run(cmd, log_path, cwd=cwd, env=env, timeout=timeout, sbx=sbx)
+        if not is_oom_kill(rc, _log_tail(log_path)):
+            return rc, secs
+        with open(log_path, "a") as fh:
+            fh.write("\n[daily_run] infrastructure: compiler killed (out of memory); retrying once\n")
+        rc, secs = run(cmd, log_path, cwd=cwd, env=env, timeout=timeout, sbx=sbx)
+        if is_oom_kill(rc, _log_tail(log_path)):
+            with open(log_path, "a") as fh:
+                fh.write("\n[daily_run] infrastructure: compiler killed again (out of memory); not a pull-request result\n")
+            return "oom", secs
+        return rc, secs
+    finally:
+        holder.release()
 
 
 def run(cmd, log_path: Path, cwd=None, env=None, timeout=None, sbx=HOST) -> tuple[int | str, float]:
@@ -1075,11 +1390,18 @@ def build_main_env(cfg: dict, venv: Path, log: Path, python: str, timeout: int, 
             return {"ok": False, "why": f"main env setup failed ({rc}) at: {' '.join(map(str, c[:4]))}"}
     extras = test_extras(dist_extras(venv, cfg["dist"], env))
     opt = list(cfg.get("optional_test_deps", []))
+    optional_backends = {"installed": [], "skipped": []}
     if extras or opt:
         spec = f"{cfg['dist']}[{','.join(extras)}]" if extras else cfg["dist"]
         rc, _ = run(["uv", "pip", "install", "-q", "-p", py, spec, *opt], log, env=env, timeout=timeout, sbx=sbx)
         if rc != 0:
-            return {"ok": False, "why": f"installing test extras/optional test deps failed ({rc}); see setup log"}
+            reqs = list(dict.fromkeys(reqs_for_test_extras(metadata_requires(venv, cfg["dist"]), cfg["dist"]) + opt))
+            if not reqs:
+                return {"ok": False, "why": f"installing test extras/optional test deps failed ({rc}); see setup log"}
+            optional_backends = install_optional_backends({"main": venv}, reqs, log, timeout)
+        else:
+            bundled = reqs_for_test_extras(metadata_requires(venv, cfg["dist"]), cfg["dist"]) + opt
+            optional_backends = {"installed": bundled, "skipped": []}
     try:
         whl = fetch_wheel(nightly_wheel(lambda u: urllib.request.urlopen(
             urllib.request.Request(u, headers={"User-Agent": "proof-of-change-ops"}), timeout=120).read(),
@@ -1096,7 +1418,7 @@ def build_main_env(cfg: dict, venv: Path, log: Path, python: str, timeout: int, 
     whl.pop("path")
     return {"ok": bool(ver), "version": ver, "pip_check": "ok" if rc == 0 else "conflicts (see setup log)",
             "build": whl | {"commit": commit, "commit_source": how},
-            "test_extras": extras, "optional_test_deps": opt,
+            "test_extras": extras, "optional_test_deps": opt, "optional_backends": optional_backends,
             "why": "" if ver else "package does not import on main side"}
 
 
@@ -1130,23 +1452,30 @@ def source_build(repo: str, item: dict, cfg: dict, venv: Path, workdir: Path, lo
              ["git", "-C", src, "checkout", "-q", "FETCH_HEAD"],
              ["git", "-C", src, "submodule", "update", "-q", "--init", "--depth", "1", "--recursive"],
              ["uv", "venv", "-q", "-p", python, venv],
-             ["uv", "pip", "install", "-q", "-p", venv / "bin/python", *cfg["deps"], *BASE_TEST_DEPS, *cfg["test_deps"],
-              *cfg.get("optional_test_deps", []), *main_extra_reqs]]
+             ["uv", "pip", "install", "-q", "-p", venv / "bin/python", *cfg["deps"], *BASE_TEST_DEPS, *cfg["test_deps"]]]
     for c in steps:   # git on our own fresh clone runs on the host; uv steps (package code) in the PR side's sandbox
         sbx = side_sandbox(venv, network=True) if c[0] == "uv" else HOST
         rc, _ = run(c, log, env=env if c[0] == "uv" else base_env(workdir / "home-git"), timeout=900, sbx=sbx)
         if rc != 0:
             return {"ok": False, "why": f"source checkout/setup failed ({rc}) at: {' '.join(map(str, c[:3]))}"}
+    optional = [str(x) for x in list(cfg.get("optional_test_deps") or []) + list(main_extra_reqs)]
+    optional += [r for r in optional_backend_reqs(src, cfg["dist"]) if r not in optional]
+    backends = install_optional_backends({"pr": venv}, optional, log, timeout) if optional else {
+        "installed": [], "skipped": []}
     t0 = time.time()
-    rc, secs = run(["uv", "pip", "install", "-p", venv / "bin/python", "--no-cache", src], log, env=env, timeout=timeout,
-                   sbx=side_sandbox(venv, network=True))
+    rc, secs = run_heavy(["uv", "pip", "install", "-p", venv / "bin/python", "--no-cache", src], log, env=env,
+                         timeout=timeout, sbx=side_sandbox(venv, network=True))
+    if rc == "oom":
+        return {"ok": False, "build_seconds": round(time.time() - t0, 1),
+                "infrastructure_failure": {"kind": "oom", "action": "retry"}, "why": _oom_reason()}
     if rc != 0:
         tail = log.read_text(errors="replace").strip().splitlines()[-15:]
         hint = next((ln for ln in reversed(tail) if re.search(r"error|not found|ERROR", ln)), tail[-1] if tail else "")
         return {"ok": False, "build_seconds": round(time.time() - t0, 1),
                 "why": f"source build of PR head {'timed out' if rc == 'timeout' else 'failed'} after {secs}s: {hint.strip()[:200]}"}
     ver = in_side(venv, [venv / "bin/python", "-c", f"import {cfg['pkg']} as m;print(m.__version__)"]).stdout.strip()
-    return {"ok": bool(ver), "version": ver, "build_seconds": secs, "why": "" if ver else "built package does not import"}
+    return {"ok": bool(ver), "version": ver, "build_seconds": secs, "optional_backends": backends,
+            "why": "" if ver else "built package does not import"}
 
 
 def map_tests(files: dict, pkg: str, site: Path, cfg: dict, max_targets: int = 6) -> list[str]:
@@ -2523,7 +2852,11 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
             rec["notes"] = ("main = nightly wheel, PR = source build of the PR head; differences can include "
                             "main-branch drift between the PR's base and the nightly")
             if not b["ok"]:
-                cnv = b["why"] + " (build log: build-pr.log)"
+                if b.get("infrastructure_failure"):
+                    rec["infrastructure_failure"] = b["infrastructure_failure"]
+                    cnv = b["why"]
+                else:
+                    cnv = b["why"] + " (build log: build-pr.log)"
         else:
             rec["route"] = "nightly+patch"
             run_progress.emit("install_pr", detail="patching PR onto nightly")
@@ -2729,7 +3062,11 @@ def test_source_pair(repo: str, cfg: dict, item: dict, prdir: Path, work: Path, 
                 rec["freeze"]["pr"] = freeze_env(vp, prdir / "freeze-pr.txt")
         if not ok:
             cnv = why
+            if str(why).startswith("infrastructure failure:"):
+                rec["infrastructure_failure"] = {"kind": "oom", "action": "retry"}
         else:
+            attach_optional_backends(rec, {"main": vm, "pr": vp}, cm, cfg["dist"],
+                                     prdir / "setup-optional.log", a.build_timeout)
             chosen_tg = chosen_test_targets(item.get("chosen"))
             if chosen_tg:
                 targets = {"main": [t for t in chosen_tg if (cm / t).exists()],
@@ -3412,6 +3749,10 @@ def main(argv=None) -> int:
     ap.add_argument("--test-timeout", type=int, default=120)
     ap.add_argument("--run-timeout", type=int, default=900)
     ap.add_argument("--build-timeout", type=int, default=1800)
+    ap.add_argument("--max-heavy-builds", type=int, default=None,
+                    help="cap on concurrent source builds (default 1, or POC_MAX_HEAVY_BUILDS). "
+                         "Also limited by memory: about one heavy build per 8 GB. Host setting only; "
+                         "pull-request code does not see it.")
     ap.add_argument("--min-free-gb", type=float, default=20)
     ap.add_argument("--chosen-prs", default=None,
                     help="file naming the PRs to test today, per library (default: <chosen_prs_dir>/<date>.md, see "
@@ -3442,6 +3783,8 @@ def main(argv=None) -> int:
     ap.add_argument("--ids", default=None, help="with --bench: comma-separated case IDs (default: all), e.g. B01,B14")
     ap.add_argument("--bench-out", default=None, help="with --bench: result folder (default: runs/bench-v0)")
     a = ap.parse_args(argv)
+    if a.max_heavy_builds is not None:
+        os.environ["POC_MAX_HEAVY_BUILDS"] = str(max(1, a.max_heavy_builds))
     from poc import hitl
     stop = hitl.study_operator_approval_stop(
         bench=bool(a.bench), console_job=bool(a.console_job), single_pr=bool(a.pr))
@@ -3770,7 +4113,7 @@ def recheck_heads_live(records: list) -> None:
             req = urllib.request.Request(
                 "https://api.github.com" + f"/repos/{repo}/pulls/{number}",
                 headers={"Accept": "application/vnd.github+json", "User-Agent": "proof-of-change-ops"})
-            token = os.environ.get("GITHUB_TOKEN")
+            token = github_read_token()
             if token:
                 req.add_header("Authorization", f"Bearer {token}")
             with urllib.request.urlopen(req, timeout=5) as resp:

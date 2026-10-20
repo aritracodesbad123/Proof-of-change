@@ -4,7 +4,7 @@ from ops import daily_run as dr
 
 def _capture(monkeypatch):
     seen = []
-    monkeypatch.setattr(dr, "run", lambda c, log, env=None, timeout=None, sbx=None: seen.append((c, sbx)) or (0, 0.1))
+    monkeypatch.setattr(dr, "run", lambda c, log, env=None, timeout=None, sbx=None, **_kw: seen.append((c, sbx)) or (0, 0.1))
     return seen
 
 

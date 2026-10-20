@@ -582,6 +582,7 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
 
     def do_GET(self):  # noqa: N802
+        from poc.pr_text import github_read_token as _github_read_token
         parsed = urlparse(self.path)
         path = parsed.path.rstrip("/") or "/"
 
@@ -598,8 +599,7 @@ class Handler(BaseHTTPRequestHandler):
                 "service": "proof-of-change-console",
                 "build": "report-pdf-v7",
                 "has_git": (REPO_ROOT / ".git").is_dir(),
-                "github_token": bool(
-                    (os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN") or "").strip()),
+                "github_token": bool(_github_read_token()),
                 "poc_commit_env": bool(
                     (os.environ.get("POC_COMMIT") or os.environ.get("RENDER_GIT_COMMIT") or "").strip()),
                 "chrome": bool(chrome),
