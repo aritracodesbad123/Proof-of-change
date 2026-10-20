@@ -1,4 +1,8 @@
 """Verdict changes: a missing module, old-bug sentences, markdown quotes, import adequacy, extra cases, docstrings."""
+import os
+import sys
+from pathlib import Path
+
 from ops import daily_run
 from poc import behaviour_claims, model_probes, probe_adequacy, probes
 from reports import pr_report
@@ -129,3 +133,77 @@ def test_docstring_only_report_does_not_call_it_a_type_stub(monkeypatch):
     assert decision["verdict"] == "NO CODE CHANGE"
     assert "docstrings or comments" in decision["conf_why"]
     assert "type stub" not in decision["conf_why"]
+
+
+def test_a_differs_claim_that_does_not_reproduce_is_not_adequate():
+    claims = [{"id": "c", "text": "the bug changes", "covers": ["f.out"], "expect": "differs"}]
+    item = {"id": "p", "source": "model", "target": "pkg.f", "claims": claims,
+            "observations": [{"name": "f.out", "state": "same", "label": "needs_human", "claim": "c",
+                              "main": 1, "pr": 1}],
+            "probe_changed_line_coverage": _coverage()}
+    got = probes.classify_item(item)
+    assert got["probe_changed_line_coverage"]["adequacy"] == "not_adequate"
+    assert got["probe_changed_line_coverage"]["changed_lines_covered"] == 0
+    assert "didn't reproduce the bug" in got["uninformative_reason"]
+    assert got["observations"][0]["label"] == "not_testable"
+    verdict, reason, _ = daily_run.verdict_for(_same_cmp(), None, None, None, {"items": [item]},
+                                               baseline="tests+probes")
+    assert verdict == "verified"
+    assert "didn't reproduce the bug" in reason and "need attention" not in reason
+    shown = {"id": "q", "source": "model", "claims": claims,
+             "observations": [{"name": "f.out", "state": "differs", "label": "proven", "claim": "c",
+                               "main": 1, "pr": 2}],
+             "probe_changed_line_coverage": _coverage()}
+    kept = probes.classify_item(shown)
+    assert kept["status"] == "ran" and kept["probe_changed_line_coverage"]["adequacy"] == "adequate"
+    assert kept["observations"][0]["label"] == "proven"
+
+
+def test_a_failed_same_claim_still_counts_when_a_differs_claim_did_not_reproduce():
+    claims = [{"id": "c", "text": "bug", "covers": ["f.bug"], "expect": "differs"},
+              {"id": "s", "text": "stays", "covers": ["f.stay"], "expect": "same"}]
+    item = {"id": "p", "source": "model", "claims": claims, "probe_changed_line_coverage": _coverage(),
+            "observations": [
+                {"name": "f.bug", "state": "same", "label": "needs_human", "claim": "c", "main": 1, "pr": 1},
+                {"name": "f.stay", "state": "differs", "label": "false_claim", "claim": "s", "main": 1, "pr": 2}]}
+    assert daily_run.verdict_for(_same_cmp(), None, None, None, {"items": [item]},
+                                 baseline="tests+probes")[0] == "needs_attention"
+
+
+class _Arr:
+    def __init__(self, value, boom=False):
+        self.value, self.boom = value, boom
+
+    def tolist(self):
+        if self.boom:
+            raise RuntimeError("no")
+        return self.value
+
+    def __repr__(self):
+        return "Arr()"
+
+
+def test_json_default_uses_tolist_then_repr():
+    assert probes.json_default(_Arr([1, 2])) == [1, 2]
+    assert probes.json_default(_Arr(None, boom=True)) == "Arr()"
+    assert probes.json_default(3) == "3"
+
+
+def test_the_probe_harness_serialises_array_like_values(tmp_path):
+    probe = tmp_path / "p.py"
+    probe.write_text(
+        "import json\n"
+        "class Arr:\n"
+        "    def __init__(self, value, boom=False):\n"
+        "        self.value, self.boom = value, boom\n"
+        "    def tolist(self):\n"
+        "        if self.boom:\n"
+        "            raise RuntimeError('no')\n"
+        "        return self.value\n"
+        "    def __repr__(self):\n"
+        "        return 'Arr()'\n"
+        "PROBE = {'id': 'p', 'target': 'o/r#1', 'about': 's', 'claims': []}\n"
+        "print(json.dumps({'observations': {'ok': Arr([1, 2]), 'bad': Arr(None, boom=True)}}))\n")
+    obs, log, _ = probes.run_once(probe, Path(sys.executable), tmp_path, dict(os.environ), 30)
+    assert obs.get("ok") == [1, 2] and obs.get("bad") == "Arr()", log
+    assert probes.PROBE_JSON_PREAMBLE.startswith("import json")

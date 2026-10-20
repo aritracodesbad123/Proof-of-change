@@ -37,11 +37,12 @@ def test_working_probe_keeps_its_coverage():
     assert it["status"] == "ran" and it["probe_changed_line_coverage"]["changed_lines_covered"] == 2
 
 
-def test_crash_only_on_pr_side_is_a_finding_not_a_crash():
+def test_crash_only_on_pr_side_is_not_adequate():
     it = probes.classify_item(_item([{"a": 1}] * 3, [{ERR: {"crash": "boom"}}] * 3,
                                     [{"name": "a", "state": "differs", "label": "unmentioned", "main": 1,
                                       "pr": "ABSENT"}]))
-    assert it["status"] == "ran" and it["probe_changed_line_coverage"]["adequacy"] == "adequate"
+    assert it["status"] == "crashed" and it["probe_changed_line_coverage"]["adequacy"] == "not_adequate"
+    assert it["observations"][0]["label"] == "not_testable"
 
 
 def test_probe_with_no_observations_covers_nothing():
@@ -77,9 +78,19 @@ def test_uninformative_and_not_run_cover_nothing_and_cannot_verify():
         assert daily_run.ai_probe_gate(rec)["verdict"] == "could_not_verify"
 
 
-def test_crashed_probe_keeps_red_findings_in_verdict():
+def test_one_crashed_run_is_not_a_side_crash():
+    it = probes.classify_item(_item([{"a": 1}, {"a": 1}, {ERR: {"crash": "x"}}], [{"a": 1}] * 3,
+                                    [{"name": "a", "state": "same", "label": "no_difference", "main": 1, "pr": 1}]))
+    assert it["status"] == "ran" and it["probe_changed_line_coverage"]["adequacy"] == "adequate"
+
+
+def test_crashed_probe_does_not_count_as_an_unclaimed_difference():
     item = probes.classify_item(_item([{ERR: {"crash": "x"}}] * 3, [{"a": 1}] * 3,
                                       [{"name": "a", "state": "differs", "label": "unmentioned", "main": "ABSENT",
                                         "pr": 1}]))
     kept, notes = probe_adequacy.deciding_items([item])
-    assert kept[0]["observations"] and notes
+    assert kept[0]["observations"] == [] and notes
+    same = {"t::ok": ("passed", "")}
+    verdict = daily_run.verdict_for(daily_run.compare_sides({"main": [same] * 3, "pr": [same] * 3}), None,
+                                    probe_results={"items": [item]}, baseline="tests+probes")[0]
+    assert verdict == "verified"

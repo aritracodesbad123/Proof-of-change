@@ -21,6 +21,7 @@ from pathlib import Path
 
 from poc import freeze
 from poc.model_provider import CLAIMS_PROMPT, CLAIMS_SCHEMA, PROBES_PROMPT, PROBES_SCHEMA, Provider, ProviderError
+from poc.probes import PROBE_JSON_PREAMBLE
 
 MAX_CODE_CHARS = 20_000
 MAX_PROBES = 4
@@ -30,7 +31,7 @@ ID_RE = re.compile(r"^[a-z0-9][a-z0-9-]{0,39}$")
 # The probe contract says the last printed line is a JSON object, so every probe needs the json module. Models
 # sometimes call json.dumps without importing it, and then the probe fails the same way on both sides and tests
 # nothing. The harness adds the import itself; it changes no behaviour of the code under test.
-JSON_IMPORT = "import json  # added by the harness: the observations line is printed as JSON\n"
+JSON_IMPORT = PROBE_JSON_PREAMBLE
 UNLINKED_REASON = ("no probe listed the claim ids it checks, so its results could not be tied to any claim; in each "
                    "probe, \"claims\" must name the claim ids it checks and the observation names that cover them")
 

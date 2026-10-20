@@ -1872,6 +1872,7 @@ def with_probes(cmp: dict | None, cnv_reason: str | None, exits: dict | None = N
     items = (probe_results or {}).get("items") or []
     if not items:
         return v, reason, fl
+    items = [probes.classify_item(it) for it in items]
     items, notes = probe_adequacy.deciding_items(items)   # a not_adequate probe never leads to verified
     s = probes.summarize(items)
     s["reason"] = "; ".join([s["reason"]] * bool(s["reason"]) + notes)
@@ -2021,7 +2022,8 @@ def _contree_probe_once(side: str, path: Path, timeout: int) -> tuple[dict, str,
     t0 = time.time()
     raw = sess.run_op(
         side,
-        f"set -euo pipefail\ncd /work/src 2>/dev/null || cd /work\npython {shlex.quote(remote)}",
+        "set -euo pipefail\ncd /work/src 2>/dev/null || cd /work\n"
+        f"python -c {shlex.quote(probes.runner_source(remote))}",
         disposable=True, timeout=timeout, files={remote: path})
     secs = round(time.time() - t0, 1)
     out, err = raw.get("stdout") or "", raw.get("stderr") or ""
