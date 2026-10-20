@@ -88,33 +88,47 @@ def result_id(rec: dict) -> str | None:
     return rid if isinstance(rid, str) and ID_RE.match(rid) else None
 
 
-def study_record_problems(name: str, rec: dict) -> list[str]:
-    """Why this result cannot be scored as a study record. Empty when both switches are off.
+# A study record must carry each of these, and none of them may be true.
+# swarm and operator_approval are on/off (on counts as true). The requested fields are booleans.
+STUDY_SWITCHES = (
+    "swarm_requested",
+    "operator_approval_requested",
+    "swarm",
+    "operator_approval",
+)
 
-    ``on`` means that step ran. Anything else, including a missing field, is not a study record:
-    the file does not show that the step stayed off.
+
+def study_record_problems(name: str, rec: dict) -> list[str]:
+    """Why this result cannot be scored as a study record. Empty when all four switches are off.
+
+    A true value, or a missing value, is not a study record. ``on`` counts as true.
+    Anything other than an explicit false or ``off`` counts as missing.
     """
     problems = []
-    for key, plain in (("swarm", "the advisory swarm"), ("operator_approval", "operator approval")):
-        value = rec.get(key)
-        if value == "off":
+    for key in STUDY_SWITCHES:
+        if key not in rec:
+            problems.append(f"{name}: {key} is missing")
             continue
-        if value == "on":
-            problems.append(f"{name}: {plain} is on")
+        value = rec[key]
+        if value is True or value == "on":
+            problems.append(f"{name}: {key} is true")
+        elif value is False or value == "off":
+            continue
         else:
-            problems.append(f"{name}: {plain} is missing")
+            problems.append(f"{name}: {key} is missing")
     return problems
 
 
 def study_records_message(records: list[tuple[str, dict]]) -> str | None:
-    """Plain refusal when any study record has swarm or operator approval on or missing."""
+    """Plain refusal when any study record has one of the four switches true or missing."""
     problems = [p for name, rec in records for p in study_record_problems(name, rec)]
     if not problems:
         return None
     return (
         "STOPPED: these results cannot be scored as a study. "
-        "Every study record must say swarm: off and operator_approval: off. "
-        "On means that step ran. A missing value is not a study record.\n"
+        "Every study record must include swarm_requested, operator_approval_requested, "
+        "swarm, and operator_approval, and none of them may be true. "
+        "On counts as true. A missing value is not a study record.\n"
         + "\n".join(problems)
     )
 

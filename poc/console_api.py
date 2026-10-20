@@ -415,8 +415,9 @@ def start_check(pr_url: str, *, model_provider: str = "nebius") -> dict:
 
         env = os.environ.copy()
         env["POC_PROGRESS_PATH"] = str(progress_path)
-        # Console is the only place operator approval may run, and it turns the advisory swarm on
-        # itself. Command-line and benchmark runs leave both off (and refuse to start if POC_HITL is set).
+        # The console asks for operator approval and turns the advisory swarm on itself.
+        # A command-line or benchmark run still refuses to start when POC_HITL is set,
+        # including when POC_CONSOLE is set.
         env["POC_HITL"] = "1"
         env["POC_HITL_DIR"] = str(hitl_dir)
         env["POC_CONSOLE"] = "1"

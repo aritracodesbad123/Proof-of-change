@@ -1,9 +1,8 @@
 """Human-in-the-loop mid-check: pause after AI drafts claims/probes for operator approval.
 
-When the operator console starts a check it sets POC_HITL, POC_HITL_DIR and POC_CONSOLE.
-model_probes.generate then writes hitl_draft.json, emits await_human, and polls for
-hitl_approval.json before freezing. Command-line and benchmark runs refuse to start if
-POC_HITL is set: approval can change which probes run, so it is not a study-run option.
+When POC_HITL is set, a command-line run and a benchmark run refuse to start. The console
+marker does not waive that refusal. Approval can change which probes run, so it is not a
+study-run option.
 """
 from __future__ import annotations
 
@@ -94,19 +93,15 @@ def take_approval_ran() -> bool:
 def study_operator_approval_stop(bench: bool) -> str | None:
     """Plain-language refusal for a command-line or benchmark run that has POC_HITL set.
 
-    The console's own check is exempt (POC_CONSOLE, and not a benchmark). Anywhere else, including a
-    benchmark that also carries the console marker, the run must not start.
+    The console marker does not waive this. A study run and a command-line run both stop.
     """
     if not hitl_requested():
-        return None
-    if not bench and console_job():
         return None
     kind = "benchmark" if bench else "command-line"
     return (
         "STOPPED: operator approval is turned on (POC_HITL is set), but this is a "
         f"{kind} run. That step lets a person add or drop probes, so it can change "
-        "which probes run. It is only available in the operator console. "
-        "Unset POC_HITL and start this run again."
+        "which probes run. Unset POC_HITL and start this run again."
     )
 
 

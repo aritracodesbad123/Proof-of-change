@@ -2,54 +2,71 @@
 
 ## What changed
 
-Command-line runs and benchmark runs now leave the advisory model swarm off unless the run asks for it.
+Command-line runs and benchmark runs leave the advisory model swarm off unless the run asks for it.
 Ask with the `--swarm` flag, or by setting `POC_SWARM` to `1` (also `true`, `yes`, or `on`). When the swarm
-is off, the run makes no swarm model calls at all. The operator console still runs the swarm, and it turns
-that switch on itself.
+is off, the run makes no swarm model calls at all. The operator console still asks for the swarm, and it
+turns that switch on itself.
 
-Every result now says `swarm: on` or `swarm: off`, from whether the advisory swarm actually ran.
-Asking for it and then skipping it (for example because model probes are off) is recorded as off.
+Every result now carries four fields.
 
-The mid-check where a person approves probes, or adds scenarios, stays in the operator console only. A
-command-line run or a benchmark run stops immediately, with a short explanation, if `POC_HITL` is set. It
-does not ignore that setting and continue. Every result says `operator_approval: off` or
-`operator_approval: on`, from whether that approval step actually ran. Setting the switch
-without reaching the step is recorded as off.
+- `swarm_requested` is true when the run asked for the swarm, from `--swarm` or `POC_SWARM`.
+- `swarm` is `on` only when that step actually ran, and `off` when it did not.
+- `operator_approval_requested` is true when `POC_HITL` is set.
+- `operator_approval` is `on` only when that approval step was entered, and `off` when it was not.
+
+Asking for the swarm and then skipping it still records the request. That happens when there is no model,
+when `--no-probes` is set, or when the baseline does not use probes. Setting `POC_HITL` without the
+approval step being reached records the request as true and the step as off.
+
+A command-line run or a benchmark run stops immediately, with a short explanation, if `POC_HITL` is set.
+The console marker does not waive that stop.
 
 Swarm model calls are listed on their own line, `cost.swarm`, and are not added into the main cost of the
 pull request. The headline totals stay comparable with the cost figures in section 7.10 of the paper.
 
-The study scorer refuses a folder of results when any study record has `swarm` or `operator_approval`
-set to on, or does not say off. It stops with a short message and does not print a score.
+The study scorer refuses a folder of results when any of the four fields is true or missing. It stops
+with a short message and does not print a score.
+
+A benchmark run that asks for the swarm writes its results in a separate folder whose name ends in
+`-swarm-on`. The main study scorer does not read that folder. A separate swarm scorer reads it, and it
+accepts a record only when the swarm was requested and the swarm step ran. The main scorer still refuses
+a swarm-on record if one is placed in the main folder.
 
 ## Why
 
-The study has to measure the same work the paper measured. The advisory swarm and the operator approval
-step were added later. The swarm spends extra model calls. Operator approval can add or drop probes, which
-changes the result. Leaving either of those on during a study run would make the numbers impossible to
-compare.
+The study has to measure the same work the paper measured. Recording only whether a step ran hid a run
+that had the switch on and then skipped the step. That run could be scored as if the switch had been off.
+Operator approval can add or drop probes. A marker that let a command-line or study run start with
+approval on would change the result.
 
 ## Decision
 
 - Swarm off is the default for command-line and benchmark runs. The console turns it on explicitly.
-- Operator approval cannot be switched on for those runs. If `POC_HITL` is set, the run refuses to start.
-- Record both switches on every result, from what ran.
+- Operator approval cannot be switched on for those runs. If `POC_HITL` is set, the run refuses to start, including when the console marker is set.
+- Record the request and what ran, for both the swarm and operator approval, on every result.
+- Do not score a study folder unless every record has all four fields and none of them is true.
+- Put swarm-on study results in their own labelled folder and score them on their own path.
 - Keep swarm spend out of the main per-pull-request total.
-- Do not score a study folder unless every record says both switches are off.
 
 ## Alternatives and tradeoffs
 
+- Record only what ran. A skipped swarm would look the same as a swarm that was never requested, and the
+  study scorer would accept it. Recording the request as well makes that visible.
+- Let the console marker start a command-line run that has operator approval on. That is a way around
+  the stop, so the run stops anyway.
+- Score swarm-on results in the same folder as the main study. The main scorer would have to skip some
+  files and could pick one up by mistake. A separate folder keeps the two sets apart.
 - Leave the swarm on and subtract its cost afterwards. That still spends the calls, and a missed
   subtraction would inflate the study. Not calling the models is clearer.
-- Quietly ignore `POC_HITL` on a study run. A person could think approval had run, or a leftover setting
-  could change which probes run with no warning. Stopping is louder.
 - Fold swarm spend into the main total and footnote it. The headline number would no longer match section
   7.10 of the paper.
 
 ## What it means for you
 
 A normal check or a benchmark run does not call the advisory swarm and does not pause for approval. Pass
-`--swarm`, or set `POC_SWARM=1`, when you want the advisory labels and the plain-language summary. Use the
-operator console when you want to approve probes before they run. On the result, read `swarm` and
-`operator_approval`: on means that step ran. Read swarm spend under `cost.swarm`, not in the main total.
-A study score only includes records that say both are off.
+`--swarm`, or set `POC_SWARM=1`, when you want the advisory labels and the plain-language summary. On the
+result, `swarm_requested` says whether you asked, and `swarm` says whether the step ran. The same pair
+for operator approval is `operator_approval_requested` and `operator_approval`. A study score only includes
+records where all four say the switches were off. Swarm-on benchmark results are in the folder whose name
+ends with `-swarm-on`, and they are scored on their own. Read swarm spend under `cost.swarm`, not in the
+main total.

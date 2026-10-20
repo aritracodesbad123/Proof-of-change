@@ -2511,8 +2511,9 @@ def finish(rec: dict, prdir: Path, work: Path, t0: float, runner=None) -> dict:
     # (--no-probes / baseline without claim probes) so the stamp stays honest.
     from poc import contree_sandboxes, hitl, run_progress
     contree_sandboxes.clear_session()
-    # Record what ran, not what was requested. A switch that never reached its step stays off.
-    swarm_requested = bool(getattr(runner, "swarm", False))
+    # Requested comes from the settings (--swarm / POC_SWARM, and POC_HITL). Ran stays off when
+    # that step never started: no model, probes skipped, or the approval step was not entered.
+    swarm_requested = agents.swarm_enabled(bool(getattr(runner, "swarm", False)))
     ran_swarm = False
     if (swarm_requested and runner is not None and getattr(runner, "provider", None) is not None
             and not getattr(runner, "model_skipped", None)):
@@ -2525,6 +2526,8 @@ def finish(rec: dict, prdir: Path, work: Path, t0: float, runner=None) -> dict:
         why = "advisory swarm did not run" if swarm_requested else "advisory swarm is off"
         rec["agents"] = {"status": "skipped", "note": why, "roles": []}
         rec.setdefault("explanation", {"status": "not yet wired", "why": why})
+    rec["swarm_requested"] = swarm_requested
+    rec["operator_approval_requested"] = hitl.hitl_requested()
     rec["swarm"] = "on" if ran_swarm else "off"
     rec["operator_approval"] = "on" if hitl.take_approval_ran() else "off"
     run_progress.emit("report", detail="writing record")
@@ -3193,6 +3196,21 @@ def resolve_poc_commit(root: Path | None = None) -> str:
     )
 
 
+def skip_unused_model(a) -> None:
+    """Drop claim-probe model calls when this run will not use them.
+
+    A baseline without claim probes, or ``--no-probes``, skips those calls. The swarm
+    switch is left as it was. The result still records that the swarm was requested
+    and that the swarm step did not run.
+    """
+    if not uses(a.baseline, "claim_probes") and getattr(a, "provider", None) is not None:
+        a.model_skipped = f"AI calls skipped: baseline {a.baseline} does not use claim probes"
+        a.model_note += f" (not used: baseline {a.baseline} has no claim probes)"
+        a.provider = None
+    if getattr(a, "no_probes", False) and getattr(a, "provider", None) is not None and not a.model_skipped:
+        a.model_skipped = "AI calls skipped because --no-probes was set"
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--libraries-file", default=None,
@@ -3303,12 +3321,7 @@ def main(argv=None) -> int:
         recorded_dir=Path(a.recorded_dir) if a.recorded_dir else None)
     a.model_skipped = None
     a.model_fallback = None
-    if not uses(a.baseline, "claim_probes") and a.provider is not None:
-        a.model_skipped = f"AI calls skipped: baseline {a.baseline} does not use claim probes"
-        a.model_note += f" (not used: baseline {a.baseline} has no claim probes)"
-        a.provider = None
-    if a.no_probes and a.provider is not None and not a.model_skipped:
-        a.model_skipped = "AI calls skipped because --no-probes was set"
+    skip_unused_model(a)
     refusal = model_refusal(a)
     if refusal:
         print(refusal, file=sys.stderr)

@@ -206,7 +206,9 @@ def test_each_pull_request_keeps_its_own_stamp_and_cost(monkeypatch, tmp_path, f
     assert PROBE_NOTE in records["bad"]["model_provider_fallback"]
     # claims+probes stay on the study line. judge/helper/summary are on cost.swarm, not in the headline total.
     assert records["good"]["swarm"] == "on" and records["bad"]["swarm"] == "on"
+    assert records["good"]["swarm_requested"] is True and records["bad"]["swarm_requested"] is True
     assert records["good"]["operator_approval"] == "off"
+    assert records["good"]["operator_approval_requested"] is False
     assert good["ai_calls"] == 2 and good["failed_ai_calls"] == 0
     assert good["input_tokens"] == 2_000_000 and good["output_tokens"] == 2_000_000
     assert good["thinking_tokens"] == 1_200_000 and good["ai_cost_usd"] == 2.4

@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import argparse
 import json
+from pathlib import Path
 
 import pytest
 
@@ -72,7 +73,9 @@ def test_swarm_off_makes_no_swarm_calls_and_records_off(tmp_path, monkeypatch):
     rec = _rec()
     daily_run.finish(rec, tmp_path, tmp_path / "work", 0.0, _runner(prov, False))
     assert rec["swarm"] == "off"
+    assert rec["swarm_requested"] is False
     assert rec["operator_approval"] == "off"
+    assert rec["operator_approval_requested"] is False
     assert prov.calls == []
     assert rec["cost"]["ai_calls"] == 1
     assert rec["cost"]["swarm"]["ai_calls"] == 0
@@ -80,31 +83,66 @@ def test_swarm_off_makes_no_swarm_calls_and_records_off(tmp_path, monkeypatch):
 
 
 def test_switches_record_what_ran(tmp_path, monkeypatch):
-    """A requested swarm that never starts, and an approval env that never reaches the step, stay off."""
+    """A switch that is set is recorded even when the step is skipped."""
+    from evals import score_bench as sb
+
     _quiet_env(monkeypatch)
+
+    def finish_one(runner):
+        cost.reset()
+        rec = _rec()
+        daily_run.finish(rec, tmp_path, tmp_path / "work", 0.0, runner)
+        return rec
+
+    # No model: the swarm was requested and never started.
+    none = finish_one(_runner(None, True))
+    assert none["swarm_requested"] is True and none["swarm"] == "off"
+    assert none["operator_approval_requested"] is False and none["operator_approval"] == "off"
+    assert sb.study_record_problems("no-model.json", none)
+
+    # --no-probes skips the swarm call and still records the request.
+    probes = _runner(_Counting(), True)
+    probes.baseline = "full"
+    probes.no_probes = True
+    probes.model_note = "recorded"
+    daily_run.skip_unused_model(probes)
+    assert "no-probes" in probes.model_skipped
+    skipped = finish_one(probes)
+    assert skipped["swarm_requested"] is True and skipped["swarm"] == "off"
+    assert probes.provider.calls == []
+    assert sb.study_record_problems("no-probes.json", skipped)
+
+    # A baseline with no claim probes drops the provider. The request stays on the record.
+    base = _runner(_Counting(), True)
+    base.baseline = "tests"
+    base.no_probes = False
+    base.model_note = "recorded"
+    daily_run.skip_unused_model(base)
+    assert base.provider is None and "does not use claim probes" in base.model_skipped
+    recorded = finish_one(base)
+    assert recorded["swarm_requested"] is True and recorded["swarm"] == "off"
+    assert sb.study_record_problems("baseline.json", recorded)
+
+    # POC_HITL is set, but the approval step is never entered.
     monkeypatch.setenv("POC_HITL", "1")
     monkeypatch.setenv("POC_CONSOLE", "1")
     monkeypatch.setenv("POC_HITL_DIR", str(tmp_path))
-    cost.reset()
-    skipped = _rec()
-    runner = _runner(_Counting(), True)
-    runner.model_skipped = "AI calls skipped because --no-probes was set"
-    daily_run.finish(skipped, tmp_path, tmp_path / "work", 0.0, runner)
-    assert skipped["swarm"] == "off"
-    assert skipped["operator_approval"] == "off"
-    assert runner.provider.calls == []
+    held = finish_one(_runner(None, False))
+    assert held["operator_approval_requested"] is True and held["operator_approval"] == "off"
+    assert held["swarm_requested"] is False and held["swarm"] == "off"
+    assert sb.study_record_problems("hitl.json", held)
 
-    asked = _rec()
-    daily_run.finish(asked, tmp_path, tmp_path / "work", 0.0, _runner(None, True))
-    assert asked["swarm"] == "off"
-    assert asked["operator_approval"] == "off"
+    # Both switches off: the four fields are present and the study scorer accepts them.
+    monkeypatch.delenv("POC_HITL", raising=False)
+    off = finish_one(_runner(_Counting(), False))
+    assert off["swarm_requested"] is False and off["operator_approval_requested"] is False
+    assert off["swarm"] == "off" and off["operator_approval"] == "off"
+    assert sb.study_record_problems("off.json", off) == []
 
-    from poc import hitl
     hitl.note_approval_ran()
-    approved = _rec()
-    daily_run.finish(approved, tmp_path, tmp_path / "work", 0.0, _runner(None, False))
-    assert approved["operator_approval"] == "on"
-    assert approved["swarm"] == "off"
+    approved = finish_one(_runner(None, False))
+    assert approved["operator_approval"] == "on" and approved["operator_approval_requested"] is False
+    assert approved["swarm"] == "off" and approved["swarm_requested"] is False
     assert hitl.approval_ran() is False
 
 
@@ -117,6 +155,8 @@ def test_swarm_on_records_its_calls_separately(tmp_path, monkeypatch):
     rec = _rec()
     daily_run.finish(rec, tmp_path, tmp_path / "work", 0.0, _runner(prov, True))
     assert rec["swarm"] == "on"
+    assert rec["swarm_requested"] is True
+    assert rec["operator_approval_requested"] is False
     assert rec["verdict"] == "verified"
     assert [c["task"] for c in prov.calls] == ["judge", "helper", "summary"]
     assert rec["cost"]["ai_calls"] == 1
@@ -146,7 +186,9 @@ def test_recorded_fixture_verdict_is_identical_with_swarm_on_or_off(tmp_path, mo
     assert off["verdict"] == before_off == on["verdict"] == before_on
     assert off["reason"] == on["reason"]
     assert off["swarm"] == "off" and on["swarm"] == "on"
+    assert off["swarm_requested"] is False and on["swarm_requested"] is True
     assert off["operator_approval"] == "off" and on["operator_approval"] == "off"
+    assert off["operator_approval_requested"] is False and on["operator_approval_requested"] is False
     assert off_calls == []
     assert on_calls == ["judge", "helper", "summary"]
     saved = json.loads((tmp_path / "off" / "record.json").read_text())
@@ -191,7 +233,7 @@ def test_cli_and_benchmark_refuse_to_start_when_poc_hitl_is_on(monkeypatch, caps
         daily_run.main(["--model-provider", "none", "--select-only"])
     assert cli.value.code not in (0, None)
     err = capsys.readouterr().err
-    assert "STOPPED" in err and "POC_HITL" in err and "command-line" in err and "console" in err
+    assert "STOPPED" in err and "POC_HITL" in err and "command-line" in err
 
     monkeypatch.setenv("POC_HITL", "yes")
     monkeypatch.setenv("POC_CONSOLE", "1")  # the console marker must not unlock a benchmark
@@ -199,7 +241,7 @@ def test_cli_and_benchmark_refuse_to_start_when_poc_hitl_is_on(monkeypatch, caps
         daily_run.main(["--bench", "bench/benchmark-v0.csv", "--model-provider", "none"])
     assert bench_run.value.code not in (0, None)
     err = capsys.readouterr().err
-    assert "STOPPED" in err and "benchmark" in err and "POC_HITL" in err and "console" in err
+    assert "STOPPED" in err and "benchmark" in err and "POC_HITL" in err
 
     monkeypatch.setenv("POC_HITL", "on")
     code = bench.run(argparse.Namespace(), None)
@@ -222,12 +264,42 @@ def test_operator_approval_cannot_be_turned_on_outside_the_console(monkeypatch, 
     rec = _rec()
     daily_run.finish(rec, tmp_path, tmp_path / "work", 0.0, _runner(model_provider.RecordedProvider(FIX), True))
     assert rec["operator_approval"] == "off"
+    assert rec["operator_approval_requested"] is True
     assert rec["swarm"] == "on"
+    assert rec["swarm_requested"] is True
 
     monkeypatch.setenv("POC_CONSOLE", "1")
     assert hitl.hitl_enabled() is True
-    assert hitl.study_operator_approval_stop(bench=False) is None
+    stopped = hitl.study_operator_approval_stop(bench=False)
+    assert stopped and "command-line" in stopped and "POC_HITL" in stopped
     assert hitl.study_operator_approval_stop(bench=True)
+
+
+def test_poc_hitl_refuses_command_line_and_study_even_with_the_console_marker(monkeypatch, capsys):
+    """POC_CONSOLE must not let a command-line or study run start while POC_HITL is set."""
+    _quiet_env(monkeypatch)
+    monkeypatch.setenv("POC_HITL", "1")
+    monkeypatch.setenv("POC_CONSOLE", "1")
+    with pytest.raises(SystemExit) as cli:
+        daily_run.main(["--model-provider", "none", "--select-only"])
+    assert cli.value.code not in (0, None)
+    err = capsys.readouterr().err
+    assert "STOPPED" in err and "command-line" in err and "POC_HITL" in err
+
+    with pytest.raises(SystemExit) as study:
+        daily_run.main(["--bench", "bench/benchmark-v0.csv", "--model-provider", "none"])
+    assert study.value.code not in (0, None)
+    err = capsys.readouterr().err
+    assert "STOPPED" in err and "benchmark" in err and "POC_HITL" in err
+
+
+def test_swarm_on_study_uses_a_labelled_folder():
+    plain = Path("runs/bench-v0")
+    assert bench.labelled_study_out(plain, False) == plain
+    labelled = bench.labelled_study_out(plain, True)
+    assert labelled.name == "bench-v0-swarm-on"
+    assert labelled.parent == plain.parent
+    assert bench.labelled_study_out(labelled, True) == labelled
 
 
 def test_console_turns_swarm_and_approval_on_explicitly(monkeypatch, tmp_path):
