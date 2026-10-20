@@ -27,3 +27,32 @@ services:
         sync: false
       - key: PORT
         value: "8787"
+      # Sign-in. Leave unset until you have the values. Do not set POC_OTP_TEST_SINK.
+      - key: SMTP_HOST
+        sync: false
+      - key: SMTP_PORT
+        sync: false
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASSWORD
+        sync: false
+      - key: SMTP_FROM
+        sync: false
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: GITHUB_OAUTH_CLIENT_ID
+        sync: false
+      - key: GITHUB_OAUTH_CLIENT_SECRET
+        sync: false
+      - key: SECRET_KEY
+        sync: false
+      - key: POC_ADMIN_EMAIL
+        sync: false
+      - key: POC_SIGNUP_DISABLED
+        sync: false
+      - key: POC_INVITE_CODE
+        sync: false
+      - key: POC_PUBLIC_URL
+        sync: false

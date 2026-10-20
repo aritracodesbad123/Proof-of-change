@@ -162,10 +162,12 @@ test('behaviour map links claims to the probes that name them', () => {
   expect(map.claims[0].result).toBe('proven')
 })
 
-test('the stylesheet keeps both themes, the green accent, and reduced motion', () => {
+test('the stylesheet is the light console, with the green accent and reduced motion', () => {
   const css = readFileSync(new URL('./App.css', import.meta.url), 'utf8') + readFileSync(new URL('./index.css', import.meta.url), 'utf8')
   expect(css).toContain('--nvidia-green: #76b900')
-  expect(css).toContain("[data-theme='light']")
+  expect(css).toContain('--paper: #f4f6ef')
+  expect(css).toContain('--link: #3d6200')
+  expect(css).not.toContain("data-theme='dark'")
   expect(css).toContain('prefers-reduced-motion')
   expect(css).toContain('.tone-verified')
   expect(css).toContain('.tone-needs_attention')

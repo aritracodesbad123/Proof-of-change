@@ -1,11 +1,14 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react'
 import {
   api,
+  lostJobMessage,
+  type Account,
   type HitlApprovalBody,
   type HitlDraft,
   type Job,
   type RunRow,
 } from './api'
+import { ProcessDag } from './dag'
 import {
   TIMELINE_SPEC,
   costTime,
@@ -29,8 +32,6 @@ import {
 } from './ui'
 import './App.css'
 
-const LOCAL_RUNS_KEY = 'poc-console-runs-v1'
-const THEME_KEY = 'poc-console-theme'
 const MAX_SCENARIOS = 20
 const SAMPLE_PR_URL = 'https://github.com/rasbt/mlxtend/pull/1229'
 const SAMPLE_PROVIDER = 'recorded'
@@ -46,9 +47,13 @@ type CachedRun = {
 
 type View = { name: 'home' } | { name: 'run'; id: string } | { name: 'job'; id: string }
 
-function loadLocalRuns(): CachedRun[] {
+function runsStorageKey(accountId: string | null) {
+  return accountId ? `poc-console-runs-v1:${accountId}` : 'poc-console-runs-v1:signed-out'
+}
+
+function loadLocalRuns(accountId: string | null): CachedRun[] {
   try {
-    const raw = localStorage.getItem(LOCAL_RUNS_KEY)
+    const raw = localStorage.getItem(runsStorageKey(accountId))
     const parsed = raw ? (JSON.parse(raw) as CachedRun[]) : []
     return Array.isArray(parsed) ? parsed : []
   } catch {
@@ -56,9 +61,9 @@ function loadLocalRuns(): CachedRun[] {
   }
 }
 
-function saveLocalRun(entry: CachedRun) {
-  const rest = loadLocalRuns().filter((run) => run.id !== entry.id)
-  localStorage.setItem(LOCAL_RUNS_KEY, JSON.stringify([entry, ...rest].slice(0, 30)))
+function saveLocalRun(accountId: string | null, entry: CachedRun) {
+  const rest = loadLocalRuns(accountId).filter((run) => run.id !== entry.id)
+  localStorage.setItem(runsStorageKey(accountId), JSON.stringify([entry, ...rest].slice(0, 30)))
 }
 
 function mergeRunLists(apiRuns: RunRow[], local: CachedRun[]): RunRow[] {
@@ -82,21 +87,6 @@ function hashFor(view: View): string {
   return '#/'
 }
 
-function useTheme() {
-  const [theme, setTheme] = useState<'dark' | 'light'>(() =>
-    document.documentElement.dataset.theme === 'light' ? 'light' : 'dark',
-  )
-  useEffect(() => {
-    document.documentElement.dataset.theme = theme
-    try {
-      localStorage.setItem(THEME_KEY, theme)
-    } catch {
-      /* private mode */
-    }
-  }, [theme])
-  return { theme, toggle: () => setTheme((current) => (current === 'dark' ? 'light' : 'dark')) }
-}
-
 function useIllustrativeFrame(active: boolean) {
   const [frame, setFrame] = useState(-1)
   useEffect(() => {
@@ -118,7 +108,7 @@ function providerBadge(provider?: string) {
 }
 
 export default function App() {
-  const { theme, toggle } = useTheme()
+  const [account, setAccount] = useState<Account | null>(null)
   const [view, setView] = useState<View>(() => viewFromHash(window.location.hash))
   const [runs, setRuns] = useState<RunRow[]>([])
   const [query, setQuery] = useState('')
@@ -166,17 +156,21 @@ export default function App() {
       setContreeReady(Boolean(health.contree_ready))
       setHealthNote(health.run_note || null)
       const remote = (await api.runs()).runs
-      setRuns(mergeRunLists(remote, loadLocalRuns()))
+      setRuns(mergeRunLists(remote, loadLocalRuns(account?.id || null)))
       setErr(null)
     } catch (error) {
       setApiOk(false)
       setHealthNote(null)
       setContreeReady(null)
-      setRuns((prev) => (prev.length ? prev : mergeRunLists([], loadLocalRuns())))
+      setRuns((prev) => (prev.length ? prev : mergeRunLists([], loadLocalRuns(account?.id || null))))
       setErr(error instanceof Error ? error.message : String(error))
     } finally {
       setRefreshing(false)
     }
+  }, [account?.id])
+
+  useEffect(() => {
+    void api.me().then(setAccount).catch(() => setAccount(null))
   }, [])
 
   useEffect(() => {
@@ -198,7 +192,7 @@ export default function App() {
         })
         if (payload.record && payload.record.id) {
           const pr = payload.record.pr as { number?: number; url?: string; title?: string } | undefined
-          saveLocalRun({
+          saveLocalRun(account?.id || null, {
             id: String(payload.record.id),
             row: {
               id: String(payload.record.id),
@@ -221,7 +215,7 @@ export default function App() {
         }
       })
       .catch((error) => {
-        const cached = loadLocalRuns().find((entry) => entry.id === view.id)
+        const cached = loadLocalRuns(account?.id || null).find((entry) => entry.id === view.id)
         if (cached) {
           setDetail({
             record: cached.record,
@@ -235,7 +229,7 @@ export default function App() {
         }
         setErr(error instanceof Error ? error.message : String(error))
       })
-  }, [view])
+  }, [view, account?.id])
 
   useEffect(() => {
     if (view.name !== 'job') return
@@ -249,10 +243,10 @@ export default function App() {
         retries = 0
         setJob(next)
         setErr(null)
-        if (next.status === 'done' || next.status === 'failed') {
+        if (next.status === 'done' || next.status === 'failed' || next.status === 'timed out') {
           if (next.record && next.run_id) {
             const pr = next.record.pr as { number?: number; url?: string; title?: string } | undefined
-            saveLocalRun({
+            saveLocalRun(account?.id || null, {
               id: next.run_id,
               row: {
                 id: next.run_id,
@@ -291,6 +285,12 @@ export default function App() {
         window.setTimeout(() => void tick(), 1500)
       } catch (error) {
         if (stop) return
+        const lost = lostJobMessage(error)
+        if (lost) {
+          setErr(lost)
+          go({ name: 'home' })
+          return
+        }
         retries += 1
         if (retries < 4) {
           window.setTimeout(() => void tick(), 1000 * retries)
@@ -304,7 +304,7 @@ export default function App() {
     return () => {
       stop = true
     }
-  }, [view, refresh, go])
+  }, [view, refresh, go, account?.id])
 
   async function refreshJob() {
     if (view.name !== 'job') return
@@ -313,10 +313,26 @@ export default function App() {
       setJob(await api.job(view.id))
       setErr(null)
     } catch (error) {
+      const lost = lostJobMessage(error)
+      if (lost) {
+        setErr(lost)
+        go({ name: 'home' })
+        return
+      }
       setErr(error instanceof Error ? error.message : String(error))
     } finally {
       setJobRefreshing(false)
     }
+  }
+
+  async function signOut() {
+    try {
+      await api.logout()
+    } catch {
+      /* the cookie is cleared when the server accepts it */
+    }
+    window.location.hash = '#/'
+    window.location.reload()
   }
 
   async function startWith(url: string, prov: string) {
@@ -349,13 +365,9 @@ export default function App() {
           <p className="tag">NVIDIA Nemotron on Nebius. Paste a pull request and watch the check.</p>
         </div>
         <div className="top-actions">
-          <button
-            type="button"
-            className="theme-toggle"
-            aria-pressed={theme === 'light'}
-            onClick={toggle}
-          >
-            {theme === 'light' ? 'Dark theme' : 'Light theme'}
+          {account?.email ? <span className="pill">{account.email}</span> : null}
+          <button type="button" className="ghost" onClick={() => void signOut()}>
+            Log out
           </button>
           <span className={`pill ${apiOk ? 'on' : 'off'}`}>{apiOk == null ? '…' : apiOk ? 'API up' : 'API down'}</span>
         </div>
@@ -430,6 +442,7 @@ export default function App() {
             </section>
 
             <section className="panel" aria-labelledby="how-heading">
+              <ProcessDag />
               <h2 id="how-heading">How a check runs</h2>
               <p className="hint">An illustration of the stages. A live check replaces this with real progress.</p>
               <Timeline steps={illustrativeStates(frame)} illustrative />
@@ -437,7 +450,7 @@ export default function App() {
 
             <section className="panel runs-panel" aria-labelledby="runs-heading">
               <div className="row">
-                <h2 id="runs-heading">Past runs</h2>
+                <h2 id="runs-heading">{account?.role === 'admin' ? 'All runs' : 'My runs'}</h2>
                 <button type="button" className="ghost" onClick={() => void refresh()} disabled={refreshing}>
                   {refreshing ? 'Refreshing…' : 'Refresh'}
                 </button>
@@ -525,6 +538,7 @@ export default function App() {
                 {job.run_note || job.warning}
               </p>
             ) : null}
+            <ProcessDag events={job.stages} record={job.record} log={job.log_tail} />
             <Timeline
               steps={timelineStates(job.stages || [], job.current_stage)}
               caption={job.current_detail || job.status}
@@ -592,6 +606,7 @@ export default function App() {
                 </>
               ) : null}
             </p>
+            <ProcessDag record={detail.record} />
             <ReasonList reason={String(detail.record.reason || '')} />
             <h2>Cost and time</h2>
             <CostTimePanel cost={costTime(detail.record)} />
