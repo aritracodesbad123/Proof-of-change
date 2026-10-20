@@ -243,7 +243,9 @@ def test_console_and_swarm_share_the_verdict_code(tmp_path, monkeypatch):
     rec = {"verdict": v, "reason": reason, "repo": "me/demo", "pr": {"number": 3, "title": "Keep the parser"},
            "files": {"package_py": [], "compiled": [], "other": []}, "per_run": [], "baseline": "full"}
     monkeypatch.setattr(daily_run, "check_record", lambda record: [])
-    runner = type("Runner", (), {"provider": Stub(), "model_skipped": None})()
+    # The swarm is off unless this run asks for it. Asking still runs it only after the verdict, and it
+    # must not replace a could-not-verify that came from a crashed probe.
+    runner = type("Runner", (), {"provider": Stub(), "model_skipped": None, "swarm": True})()
     daily_run.finish(rec, tmp_path, tmp_path / "work", 0.0, runner)
     assert rec["verdict"] == v and rec["reason"] == reason
     assert rec["agents"]["advisory"] is True
