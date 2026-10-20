@@ -17,6 +17,7 @@ def test_list_runs_reads_record(tmp_path, monkeypatch):
     monkeypatch.setattr(console_api, "REPO_ROOT", tmp_path)
     rows = console_api.list_runs()
     assert rows and rows[0]["id"] == "pr-demo-1" and rows[0]["verdict"] == "verified"
+    assert rows[0]["report_pdf"] is None and rows[0]["report_html"] is None
 
 
 def test_list_runs_bounded_does_not_remember_every_file(tmp_path, monkeypatch):
