@@ -808,20 +808,49 @@ def install_declared_test_deps(venvs: dict, reqs: list[str], log: Path, timeout:
     return True, ""
 
 
-def direct_url(venv: Path, dist: str) -> dict | None:
-    """The installed distribution's direct_url.json (PEP 610), or None when it has none."""
+def _dist_info_dirs(venv: Path, dist: str) -> list[str]:
+    """*.dist-info directories installed under `dist` (PEP 503 name normalization)."""
     want = _norm(dist)
+    out = []
     for di in glob.glob(str(site_packages(venv) / "*.dist-info")):
         name = os.path.basename(di)[:-len(".dist-info")].rsplit("-", 1)[0]
         if _norm(name) == want:
-            f = Path(di) / "direct_url.json"
-            if f.is_file():
-                try:
-                    return json.loads(f.read_text())
-                except ValueError:
-                    return {"_unreadable": True}
-            return None
-    return None
+            out.append(di)
+    return out
+
+
+def direct_url(venv: Path, dist: str) -> dict | None:
+    """The installed distribution's direct_url.json (PEP 610), or None when it has none."""
+    dirs = _dist_info_dirs(venv, dist)
+    if not dirs:
+        return None
+    f = Path(dirs[0]) / "direct_url.json"
+    if not f.is_file():
+        return None
+    try:
+        return json.loads(f.read_text())
+    except ValueError:
+        return {"_unreadable": True}
+
+
+def declared_project_name(checkout: Path) -> str | None:
+    """The distribution name the checkout declares in pyproject.toml ([project] name), or None.
+
+    A repository label can differ from the name it installs under (the zarr-python repository installs as zarr).
+    A missing file, invalid TOML, or a blank name returns None."""
+    import tomllib
+    pp = Path(checkout) / "pyproject.toml"
+    try:
+        project = tomllib.loads(pp.read_text()).get("project") or {}
+    except (OSError, ValueError):
+        return None
+    if not isinstance(project, dict):
+        return None
+    name = project.get("name")
+    if not isinstance(name, str):
+        return None
+    name = name.strip()
+    return name or None
 
 
 def check_installed_commit(venv: Path, dist: str, expected_sha: str, checkout: Path | None = None) -> tuple[bool, dict]:
@@ -829,8 +858,19 @@ def check_installed_commit(venv: Path, dist: str, expected_sha: str, checkout: P
 
     A VCS install (vcs_info.commit_id) must name that commit. A local install (dir_info) must point at `checkout`, and
     that checkout must be at `expected_sha` (git rev-parse HEAD). Anything else (no direct_url.json, another
-    directory, another commit) fails. Short expected SHAs (7+ hex) match by prefix."""
+    directory, another commit) fails. Short expected SHAs (7+ hex) match by prefix.
+
+    When `dist` has no installed distribution and `checkout` declares a different [project] name, that declared name
+    is checked instead. The result's `dist` is the name that was checked. A distribution already installed under
+    `dist` is never replaced, so a missing record, another directory, or another commit still fails."""
     du = direct_url(venv, dist)
+    # Only when the label itself is not installed. A dist-info with no direct_url.json still fails closed.
+    if du is None and checkout is not None and not _dist_info_dirs(venv, dist):
+        declared = declared_project_name(checkout)
+        if declared and _norm(declared) != _norm(dist):
+            alt = direct_url(venv, declared)
+            if alt is not None:
+                dist, du = declared, alt
     info: dict = {"dist": dist, "expected": expected_sha, "direct_url": du}
 
     def same(got: str | None) -> bool:
