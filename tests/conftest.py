@@ -3,6 +3,17 @@ from pathlib import Path
 
 import pytest
 
+from poc import hitl as _hitl
+
+
+@pytest.fixture(autouse=True)
+def _reset_operator_approval_mark():
+    """The approval mark is per pull request. Tests must not inherit it."""
+    _hitl.reset_approval_ran()
+    yield
+    _hitl.reset_approval_ran()
+
+
 FIX = Path(__file__).parent / "fixtures"
 REPO = Path(__file__).parent.parent
 
