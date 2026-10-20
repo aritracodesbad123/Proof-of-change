@@ -1,5 +1,75 @@
-html,
-body,
-#root {
-  min-height: 100%;
+:root {
+  color-scheme: light;
+  --nvidia-green: #76b900;
+  --nvidia-ink: #102000;
+  --paper: #f4f6ef;
+  --ink: #14200c;
+  --muted: #3c4a32;
+  --panel: #ffffff;
+  --panel-2: #eef3e4;
+  --line: #c9d4bc;
+  --accent: #76b900;
+  --link: #3d6200;
+  --ok: #3d6200;
+  --warn: #8a5a00;
+  --warn-ink: #2a1c00;
+  --danger: #8d1d1d;
+  --danger-ink: #3a0a0a;
+  --info: #0d5f78;
+  --info-ink: #062028;
+  --slate: #3e4b5c;
+  --slate-ink: #10161f;
+  --shadow: 0 10px 28px rgba(20, 32, 12, 0.08);
+  --font-display: 'Space Grotesk', 'Avenir Next', 'Segoe UI', sans-serif;
+  --font-body: 'IBM Plex Sans', 'Segoe UI', sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-md: 1rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.75rem;
+  --text-2xl: clamp(2rem, 4vw, 2.6rem);
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --radius: 12px;
+}
+
+* { box-sizing: border-box; }
+
+html, body, #root { min-height: 100%; }
+
+body {
+  margin: 0;
+  color: var(--ink);
+  background:
+    radial-gradient(900px 420px at 8% -10%, color-mix(in srgb, var(--nvidia-green) 18%, transparent), transparent 60%),
+    var(--paper);
+  font-family: var(--font-body);
+  font-size: var(--text-md);
+  line-height: 1.5;
+}
+
+:focus-visible {
+  outline: 2px solid var(--link);
+  outline-offset: 2px;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

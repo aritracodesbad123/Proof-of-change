@@ -74,3 +74,20 @@ jobs:
             machine-type.json
             eval-results.json
             reports/runs/ci-py${{ matrix.python }}/
+
+  console-web:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: console/web/package-lock.json
+      - name: Install console UI
+        working-directory: console/web
+        run: npm ci
+      - name: Console UI tests and build
+        working-directory: console/web
+        run: npm test && npm run build
