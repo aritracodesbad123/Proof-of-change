@@ -10,4 +10,8 @@
 
 All 92 pairs stay in the list. The scope is Python repositories. Each repository gets a descriptive label from `library_label_rule.md`. The label does not add or remove a pair.
 
+`pair-labels.json` has one entry per pair (`repo`, `agent_pr`, `human_pr`, `label`). Its SHA-256 is `12b9a2f2c2a7adb3149f58e2ff07a671177094dccbdfc8ef3b0bff1cb61833c1`.
+
+Labels: library 53, non_library 39, unknown 0.
+
 Tuning cases were not excluded by any rule. A check after the run found none of them, or their repositories, among the candidates.

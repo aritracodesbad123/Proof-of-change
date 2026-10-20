@@ -1,0 +1,554 @@
+[
+  {
+    "repo": "ArcInstitute/state",
+    "agent_pr": 216,
+    "human_pr": 213,
+    "label": "non_library"
+  },
+  {
+    "repo": "PrunaAI/pruna",
+    "agent_pr": 143,
+    "human_pr": 140,
+    "label": "non_library"
+  },
+  {
+    "repo": "adamchainz/time-machine",
+    "agent_pr": 556,
+    "human_pr": 560,
+    "label": "library"
+  },
+  {
+    "repo": "JoshuaC215/agent-service-toolkit",
+    "agent_pr": 202,
+    "human_pr": 201,
+    "label": "non_library"
+  },
+  {
+    "repo": "earthobservations/wetterdienst",
+    "agent_pr": 1512,
+    "human_pr": 1514,
+    "label": "library"
+  },
+  {
+    "repo": "run-llama/llama-agents",
+    "agent_pr": 118,
+    "human_pr": 113,
+    "label": "non_library"
+  },
+  {
+    "repo": "yangkyeongmo/mcp-server-apache-airflow",
+    "agent_pr": 39,
+    "human_pr": 27,
+    "label": "library"
+  },
+  {
+    "repo": "geoalchemy/geoalchemy2",
+    "agent_pr": 567,
+    "human_pr": 564,
+    "label": "library"
+  },
+  {
+    "repo": "wwood/singlem",
+    "agent_pr": 240,
+    "human_pr": 259,
+    "label": "library"
+  },
+  {
+    "repo": "getsentry/sentry-python",
+    "agent_pr": 4476,
+    "human_pr": 4485,
+    "label": "non_library"
+  },
+  {
+    "repo": "lichess-org/berserk",
+    "agent_pr": 110,
+    "human_pr": 124,
+    "label": "library"
+  },
+  {
+    "repo": "jendrikseipp/vulture",
+    "agent_pr": 399,
+    "human_pr": 404,
+    "label": "library"
+  },
+  {
+    "repo": "pythermalcomfort/pythermalcomfort",
+    "agent_pr": 254,
+    "human_pr": 248,
+    "label": "library"
+  },
+  {
+    "repo": "intellectronica/skillz",
+    "agent_pr": 4,
+    "human_pr": 9,
+    "label": "library"
+  },
+  {
+    "repo": "altmenorg/HAsmartirrigation",
+    "agent_pr": 585,
+    "human_pr": 583,
+    "label": "non_library"
+  },
+  {
+    "repo": "subzeroid/instagrapi",
+    "agent_pr": 2218,
+    "human_pr": 2206,
+    "label": "library"
+  },
+  {
+    "repo": "microsoft/magentic-ui",
+    "agent_pr": 59,
+    "human_pr": 68,
+    "label": "library"
+  },
+  {
+    "repo": "project-numina/kimina-lean-server",
+    "agent_pr": 53,
+    "human_pr": 43,
+    "label": "non_library"
+  },
+  {
+    "repo": "microsoft/fabric-cicd",
+    "agent_pr": 347,
+    "human_pr": 353,
+    "label": "library"
+  },
+  {
+    "repo": "RobotWebTools/roslibpy",
+    "agent_pr": 142,
+    "human_pr": 146,
+    "label": "non_library"
+  },
+  {
+    "repo": "gerlero/foamlib",
+    "agent_pr": 468,
+    "human_pr": 456,
+    "label": "library"
+  },
+  {
+    "repo": "lidofinance/diffyscan",
+    "agent_pr": 90,
+    "human_pr": 83,
+    "label": "non_library"
+  },
+  {
+    "repo": "olucurious/PyFCM",
+    "agent_pr": 376,
+    "human_pr": 372,
+    "label": "library"
+  },
+  {
+    "repo": "wwood/singlem",
+    "agent_pr": 242,
+    "human_pr": 256,
+    "label": "library"
+  },
+  {
+    "repo": "567-labs/instructor",
+    "agent_pr": 1735,
+    "human_pr": 1758,
+    "label": "library"
+  },
+  {
+    "repo": "bolna-ai/bolna",
+    "agent_pr": 254,
+    "human_pr": 273,
+    "label": "non_library"
+  },
+  {
+    "repo": "a16z/halmos",
+    "agent_pr": 539,
+    "human_pr": 535,
+    "label": "library"
+  },
+  {
+    "repo": "PrefectHQ/marvin",
+    "agent_pr": 1162,
+    "human_pr": 1164,
+    "label": "non_library"
+  },
+  {
+    "repo": "codegen-sh/codegen",
+    "agent_pr": 701,
+    "human_pr": 702,
+    "label": "non_library"
+  },
+  {
+    "repo": "VRSEN/agency-swarm",
+    "agent_pr": 309,
+    "human_pr": 310,
+    "label": "library"
+  },
+  {
+    "repo": "roboflow/roboflow-python",
+    "agent_pr": 385,
+    "human_pr": 379,
+    "label": "non_library"
+  },
+  {
+    "repo": "mostly-ai/mostlyai",
+    "agent_pr": 608,
+    "human_pr": 607,
+    "label": "library"
+  },
+  {
+    "repo": "a16z/halmos",
+    "agent_pr": 551,
+    "human_pr": 531,
+    "label": "library"
+  },
+  {
+    "repo": "Archmonger/django-dbbackup",
+    "agent_pr": 604,
+    "human_pr": 628,
+    "label": "library"
+  },
+  {
+    "repo": "jeshraghian/snntorch",
+    "agent_pr": 382,
+    "human_pr": 380,
+    "label": "library"
+  },
+  {
+    "repo": "roboflow/roboflow-python",
+    "agent_pr": 395,
+    "human_pr": 392,
+    "label": "non_library"
+  },
+  {
+    "repo": "mrwadams/stride-gpt",
+    "agent_pr": 72,
+    "human_pr": 77,
+    "label": "library"
+  },
+  {
+    "repo": "unclecode/crawl4ai",
+    "agent_pr": 1192,
+    "human_pr": 1265,
+    "label": "library"
+  },
+  {
+    "repo": "jupytext/jupytext",
+    "agent_pr": 1454,
+    "human_pr": 1457,
+    "label": "library"
+  },
+  {
+    "repo": "stefanoamorelli/sec-edgar-mcp",
+    "agent_pr": 10,
+    "human_pr": 12,
+    "label": "library"
+  },
+  {
+    "repo": "groq/openbench",
+    "agent_pr": 261,
+    "human_pr": 276,
+    "label": "library"
+  },
+  {
+    "repo": "bespokelabsai/curator",
+    "agent_pr": 291,
+    "human_pr": 289,
+    "label": "non_library"
+  },
+  {
+    "repo": "mabel-dev/opteryx",
+    "agent_pr": 2800,
+    "human_pr": 2811,
+    "label": "library"
+  },
+  {
+    "repo": "bruin-data/ingestr",
+    "agent_pr": 256,
+    "human_pr": 257,
+    "label": "library"
+  },
+  {
+    "repo": "Archmonger/django-dbbackup",
+    "agent_pr": 623,
+    "human_pr": 631,
+    "label": "library"
+  },
+  {
+    "repo": "kaixxx/noScribe",
+    "agent_pr": 206,
+    "human_pr": 220,
+    "label": "non_library"
+  },
+  {
+    "repo": "gerlero/foamlib",
+    "agent_pr": 462,
+    "human_pr": 466,
+    "label": "library"
+  },
+  {
+    "repo": "reflex-dev/reflex-web",
+    "agent_pr": 1452,
+    "human_pr": 1451,
+    "label": "non_library"
+  },
+  {
+    "repo": "jupytext/jupytext",
+    "agent_pr": 1461,
+    "human_pr": 1455,
+    "label": "library"
+  },
+  {
+    "repo": "zfit/zfit",
+    "agent_pr": 643,
+    "human_pr": 647,
+    "label": "library"
+  },
+  {
+    "repo": "tomquist/AstraMeter",
+    "agent_pr": 135,
+    "human_pr": 125,
+    "label": "non_library"
+  },
+  {
+    "repo": "mll-lab-nu/RAGEN",
+    "agent_pr": 112,
+    "human_pr": 125,
+    "label": "non_library"
+  },
+  {
+    "repo": "Breakthrough/DVR-Scan",
+    "agent_pr": 236,
+    "human_pr": 235,
+    "label": "library"
+  },
+  {
+    "repo": "jendrikseipp/rednotebook",
+    "agent_pr": 841,
+    "human_pr": 845,
+    "label": "non_library"
+  },
+  {
+    "repo": "intellectronica/skillz",
+    "agent_pr": 6,
+    "human_pr": 10,
+    "label": "library"
+  },
+  {
+    "repo": "openatx/adbutils",
+    "agent_pr": 194,
+    "human_pr": 196,
+    "label": "library"
+  },
+  {
+    "repo": "intellectronica/skillz",
+    "agent_pr": 2,
+    "human_pr": 7,
+    "label": "library"
+  },
+  {
+    "repo": "meilisearch/meilisearch-mcp",
+    "agent_pr": 42,
+    "human_pr": 22,
+    "label": "non_library"
+  },
+  {
+    "repo": "PriorLabs/tabpfn-extensions",
+    "agent_pr": 145,
+    "human_pr": 140,
+    "label": "library"
+  },
+  {
+    "repo": "joshyattridge/smart-money-concepts",
+    "agent_pr": 88,
+    "human_pr": 75,
+    "label": "non_library"
+  },
+  {
+    "repo": "jimmc414/onefilellm",
+    "agent_pr": 57,
+    "human_pr": 41,
+    "label": "non_library"
+  },
+  {
+    "repo": "Rudra-ravi/wikipedia-mcp",
+    "agent_pr": 16,
+    "human_pr": 27,
+    "label": "library"
+  },
+  {
+    "repo": "roboflow/roboflow-python",
+    "agent_pr": 402,
+    "human_pr": 407,
+    "label": "non_library"
+  },
+  {
+    "repo": "martinblech/xmltodict",
+    "agent_pr": 389,
+    "human_pr": 378,
+    "label": "library"
+  },
+  {
+    "repo": "compas-dev/compas",
+    "agent_pr": 1481,
+    "human_pr": 1496,
+    "label": "library"
+  },
+  {
+    "repo": "PriorLabs/tabpfn-extensions",
+    "agent_pr": 159,
+    "human_pr": 165,
+    "label": "library"
+  },
+  {
+    "repo": "Uberi/speech_recognition",
+    "agent_pr": 846,
+    "human_pr": 847,
+    "label": "non_library"
+  },
+  {
+    "repo": "strawberry-graphql/strawberry",
+    "agent_pr": 3921,
+    "human_pr": 3923,
+    "label": "non_library"
+  },
+  {
+    "repo": "DLR-RM/stable-baselines3",
+    "agent_pr": 2170,
+    "human_pr": 2163,
+    "label": "library"
+  },
+  {
+    "repo": "Uberi/speech_recognition",
+    "agent_pr": 845,
+    "human_pr": 843,
+    "label": "non_library"
+  },
+  {
+    "repo": "xian-network/xian-contracting",
+    "agent_pr": 137,
+    "human_pr": 145,
+    "label": "non_library"
+  },
+  {
+    "repo": "mll-lab-nu/RAGEN",
+    "agent_pr": 113,
+    "human_pr": 127,
+    "label": "non_library"
+  },
+  {
+    "repo": "aws/bedrock-agentcore-starter-toolkit",
+    "agent_pr": 90,
+    "human_pr": 87,
+    "label": "library"
+  },
+  {
+    "repo": "openatx/adbutils",
+    "agent_pr": 188,
+    "human_pr": 184,
+    "label": "library"
+  },
+  {
+    "repo": "Kanaries/pygwalker",
+    "agent_pr": 701,
+    "human_pr": 699,
+    "label": "library"
+  },
+  {
+    "repo": "kazewong/flowMC",
+    "agent_pr": 233,
+    "human_pr": 235,
+    "label": "non_library"
+  },
+  {
+    "repo": "botingw/rulebook-ai",
+    "agent_pr": 26,
+    "human_pr": 30,
+    "label": "non_library"
+  },
+  {
+    "repo": "Hankanman/Area-Occupancy-Detection",
+    "agent_pr": 71,
+    "human_pr": 66,
+    "label": "non_library"
+  },
+  {
+    "repo": "altmenorg/HAsmartirrigation",
+    "agent_pr": 586,
+    "human_pr": 584,
+    "label": "non_library"
+  },
+  {
+    "repo": "mikumifa/biliTickerBuy",
+    "agent_pr": 808,
+    "human_pr": 819,
+    "label": "library"
+  },
+  {
+    "repo": "getzep/graphiti",
+    "agent_pr": 939,
+    "human_pr": 931,
+    "label": "non_library"
+  },
+  {
+    "repo": "Breakthrough/DVR-Scan",
+    "agent_pr": 233,
+    "human_pr": 230,
+    "label": "library"
+  },
+  {
+    "repo": "Stable-Baselines-Team/stable-baselines3-contrib",
+    "agent_pr": 307,
+    "human_pr": 318,
+    "label": "non_library"
+  },
+  {
+    "repo": "JusticeRage/Gepetto",
+    "agent_pr": 101,
+    "human_pr": 125,
+    "label": "non_library"
+  },
+  {
+    "repo": "microsoft/fabric-cicd",
+    "agent_pr": 587,
+    "human_pr": 580,
+    "label": "library"
+  },
+  {
+    "repo": "zauberzeug/nicegui",
+    "agent_pr": 4766,
+    "human_pr": 4769,
+    "label": "library"
+  },
+  {
+    "repo": "DonDebonair/slack-machine",
+    "agent_pr": 1254,
+    "human_pr": 1260,
+    "label": "library"
+  },
+  {
+    "repo": "microsoft/Olive",
+    "agent_pr": 1915,
+    "human_pr": 1919,
+    "label": "non_library"
+  },
+  {
+    "repo": "andrewm4894/anomstack",
+    "agent_pr": 175,
+    "human_pr": 176,
+    "label": "non_library"
+  },
+  {
+    "repo": "getzep/graphiti",
+    "agent_pr": 924,
+    "human_pr": 927,
+    "label": "non_library"
+  },
+  {
+    "repo": "swarmzero/swarmzero",
+    "agent_pr": 34,
+    "human_pr": 39,
+    "label": "library"
+  },
+  {
+    "repo": "mabel-dev/opteryx",
+    "agent_pr": 2816,
+    "human_pr": 2820,
+    "label": "library"
+  }
+]
