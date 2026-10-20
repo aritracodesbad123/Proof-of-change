@@ -1254,7 +1254,7 @@
     "status",
     "items"
    ],
-   "description": "OPTIONAL (rev 6; rev 7 adds generator, freeze, refused and source diff; rev 9 adds status uninformative). Probes run on both sides of a PR (poc/probes.py): small deterministic scripts whose JSON observations are compared by plain code. status none = the PR has no probe. status uninformative = every probe saw only the same exception on both sides, so it did not count as ran.",
+   "description": "OPTIONAL (rev 6; rev 7 adds generator, freeze, refused and source diff; rev 9 adds status uninformative; rev 14 adds crashed and rejected). Probes run on both sides of a PR (poc/probes.py): small deterministic scripts whose JSON observations are compared by plain code. status none = the PR has no probe. status uninformative = every probe saw only the same exception on both sides, so it did not count as ran. status crashed = a probe stopped on the main side. status rejected = every probe was rejected.",
    "properties": {
     "status": {
      "type": "string",
@@ -1262,7 +1262,9 @@
       "ran",
       "none",
       "error",
-      "uninformative"
+      "uninformative",
+      "crashed",
+      "rejected"
      ]
     },
     "items": {
@@ -1317,9 +1319,11 @@
          "ran",
          "uninformative",
          "not_run",
-         "error"
+         "error",
+         "crashed",
+         "rejected"
         ],
-        "description": "OPTIONAL (rev 9). ran = the probe observed the function; uninformative = every input raised the same exception on both sides; not_run = no type-aware input could be built; error = the probe produced no observations."
+        "description": "OPTIONAL (rev 9; rev 14 adds crashed and rejected). ran = the probe observed the function; uninformative = every input raised the same exception on both sides; not_run = no type-aware input could be built; error = the probe produced no observations; crashed = every main-side run stopped; rejected = the probe checked none of its claims."
        },
        "uninformative_reason": {
         "type": "string",
@@ -2004,6 +2008,11 @@
    "rev": 13,
    "date": "2026-10-20",
    "change": "optional machine_type.gxx (the g++ version line, or null). Nothing becomes required, so rev 1-12 records stay valid."
+  },
+  {
+   "rev": 14,
+   "date": "2026-10-20",
+   "change": "probes.status and each probe item status may be crashed or rejected. Nothing becomes required, so rev 1-13 records stay valid."
   }
  ],
  "if": {

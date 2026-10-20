@@ -24,8 +24,12 @@ FIXED_ENV = UNTRUSTED_THREAD_ENV | {"PYTHONHASHSEED": "0", "PYTHONDONTWRITEBYTEC
 INSTALL_DIRS = ("UV_CACHE_DIR", "UV_PYTHON_INSTALL_DIR")
 INSTALL_FIXED = {"UV_LINK_MODE": "copy", "UV_NO_CONFIG": "1"}
 INSTALL_EXTRA = ("SETUPTOOLS_SCM_PRETEND_VERSION",)   # set per call for checkouts without tags
+# Compiler job count for a heavy source build. Set only on that install, never on pytest. Values are small
+# integers or "-jN", never credentials.
+BUILD_JOB_NAMES = ("MAX_JOBS", "CMAKE_BUILD_PARALLEL_LEVEL", "NINJAFLAGS", "MAKEFLAGS")
 RUN_ALLOWLIST = frozenset(PASS_THROUGH) | {"HOME"} | set(FIXED_ENV)
-INSTALL_ALLOWLIST = RUN_ALLOWLIST | set(INSTALL_DIRS) | set(INSTALL_FIXED) | set(INSTALL_EXTRA)
+INSTALL_ALLOWLIST = (RUN_ALLOWLIST | set(INSTALL_DIRS) | set(INSTALL_FIXED) | set(INSTALL_EXTRA)
+                     | set(BUILD_JOB_NAMES))
 # Second, independent check: names that look like credentials. It must never match an allowlisted name.
 SECRET_NAME = re.compile(r"TOKEN|SECRET|PASSW|CREDENTIAL|API_?KEY|ACCESS_?KEY|PRIVATE|(^|_)KEY($|_)|_KEY|KEY_|AUTH"
                          r"|(^|_)PAT($|_)|DATABASE_URL|_DSN|^DSN|COOKIE|SESSION|SIGNING|WEBHOOK", re.I)

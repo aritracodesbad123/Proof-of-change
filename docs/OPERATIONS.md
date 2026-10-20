@@ -177,7 +177,7 @@ Builder **Token Factory** credits pay for Nemotron calls, not for hosting. Skip 
 2. [Render](https://dashboard.render.com) → **New** → **Blueprint** → select the repo (`render.yaml`).
 3. Set secrets in the dashboard:
    - **`NEBIUS_API_KEY`** (Token Factory / models)
-   - **`GITHUB_TOKEN`** — read-only PAT for public repos. Without it, paste-a-PR hits GitHub’s anonymous **60/hour** limit on Render’s shared IP (`PR selection failed: GitHub rate limit`).
+   - **`GITHUB_TOKEN`** — read-only PAT for public repos. `GITHUB_POC_TOKEN` is used when `GITHUB_TOKEN` is unset, then `GH_TOKEN`. The token is for API reads on the host only. A 403 or 429 with `X-RateLimit-Remaining: 0` waits until `X-RateLimit-Reset` (capped, default 15 minutes) and retries once instead of skipping that library.
    - Optional: `NEBIUS_PROJECT_ID`, `POC_DEMO_REPOS`
 4. Deploy → open `https://<service>.onrender.com` (same console UI). Free instances sleep when idle.
 

@@ -12,13 +12,23 @@ revision at or before `mergedAt`. Sources recorded in the result (`pr_text_sourc
     "at merge: edit history (revision of <time>)"    the revision in force at merge time
     "current, may be edited after merge"             no token, no history, or the history is incomplete
 
-The GraphQL request needs a token (GITHUB_TOKEN, read-only); it is a query, it changes nothing.
+The GraphQL request needs a token (GITHUB_TOKEN, or GITHUB_POC_TOKEN, or GH_TOKEN; read-only); it is a query, it changes nothing.
 """
 from __future__ import annotations
 
 import json
 import os
 import urllib.request
+
+
+def github_read_token() -> str | None:
+    """Host token for read-only GitHub API calls. Never put this into an environment that runs pull-request code."""
+    for key in ("GITHUB_TOKEN", "GITHUB_POC_TOKEN", "GH_TOKEN"):
+        val = (os.environ.get(key) or "").strip()
+        if val:
+            return val
+    return None
+
 
 CURRENT = "current, may be edited after merge"
 QUERY = """query($owner: String!, $name: String!, $number: Int!) {
@@ -49,7 +59,7 @@ def body_at_merge(pr: dict) -> tuple[str, str]:
 
 def fetch(repo: str, number: int, token: str | None = None, timeout: int = 60) -> dict:
     """The GraphQL pullRequest object (read-only query)."""
-    token = token or os.environ.get("GITHUB_TOKEN")
+    token = token or github_read_token()
     if not token:
         raise RuntimeError("no GITHUB_TOKEN: GitHub's GraphQL API needs a token to read edit history")
     owner, name = repo.split("/", 1)

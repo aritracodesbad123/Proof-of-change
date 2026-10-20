@@ -51,10 +51,10 @@ def test_gxx_version_is_optional(upset):
 def test_schema_is_the_shared_file():
     from guardrails.schema import COMPATIBLE_SCHEMA_SHA256, SCHEMA_REVISION
     assert SCHEMA_PATH.parts[-3:] == ("harness", "schema", "observation.schema.json")
-    assert SCHEMA_SHA256 == "ea940732e32829455ad11b0799b00634f30522415320684df5ae4244798de88e"  # rev 13
-    assert SCHEMA_REVISION == 13
+    assert SCHEMA_SHA256 == "b9630be02bf4491c4279fd355824aec3aedb013d96bd1d89011eef6590a88549"  # rev 14
+    assert SCHEMA_REVISION == 14
     got = sorted(COMPATIBLE_SCHEMA_SHA256.values(), key=lambda s: int(s.split()[-1]))
-    assert got == [f"rev {n}" for n in range(1, 14)]
+    assert got == [f"rev {n}" for n in range(1, 15)]
     assert COMPATIBLE_SCHEMA_SHA256["5a3c3d36b7730ce74d0f23b03c88ea862ea35cc327c7d79481fca8b972e8383e"] == "rev 1"
     readme = (SCHEMA_PATH.parent / "README.md").read_text()
     assert all(sha in readme for sha in COMPATIBLE_SCHEMA_SHA256)  # documented
@@ -65,7 +65,7 @@ def test_rev1_records_still_valid_under_current_rev(golden_v1_records):
     for r in golden_v1_records:
         assert r["schema_sha256"].startswith("5a3c3d36")  # the golden records were written against rev 1
         assert validate_record(r, require_v1=True) == []
-        assert "valid under current rev 13" in schema_reference_note(r)
+        assert "valid under current rev 14" in schema_reference_note(r)
 
 
 def test_rev2_optional_fields(golden_v1_records):
