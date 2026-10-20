@@ -1,7 +1,9 @@
 """Human-in-the-loop mid-check: pause after AI drafts claims/probes for operator approval.
 
-When POC_HITL is set, a command-line run and a benchmark run refuse to start. The console
-marker does not waive that refusal. Approval can change which probes run, so it is not a
+When POC_HITL is set, a command-line run and a benchmark run refuse to start. No environment
+variable waives that. The operator console passes ``--console-job`` on a single pull-request
+check; that flag is the only way such a check may start with approval on. A benchmark run
+still refuses, even with the flag. Approval can change which probes run, so it is not a
 study-run option.
 """
 from __future__ import annotations
@@ -90,12 +92,15 @@ def take_approval_ran() -> bool:
     return ran
 
 
-def study_operator_approval_stop(bench: bool) -> str | None:
+def study_operator_approval_stop(bench: bool, *, console_job: bool = False, single_pr: bool = False) -> str | None:
     """Plain-language refusal for a command-line or benchmark run that has POC_HITL set.
 
-    The console marker does not waive this. A study run and a command-line run both stop.
+    ``console_job`` is the ``--console-job`` flag, never an environment variable. It lets one
+    pull-request check start. A benchmark run stops even when the flag is set.
     """
     if not hitl_requested():
+        return None
+    if console_job and single_pr and not bench:
         return None
     kind = "benchmark" if bench else "command-line"
     return (

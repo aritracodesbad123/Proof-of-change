@@ -64,7 +64,8 @@ def main(argv=None) -> int:
     ap.add_argument("--answers", required=True, help="an answer-key CSV (ID and label columns); read by this scorer only")
     ap.add_argument("--id-column", default="id", help="answer-key column holding the case ID (default: id)")
     ap.add_argument("--label-column", default="label", help="answer-key column holding the label (default: label)")
-    ap.add_argument("--results", required=True, help="swarm-on result folder (name ends with -swarm-on)")
+    ap.add_argument("--results", required=True,
+                    help="folder of result JSON files; every record in the folder is checked")
     ap.add_argument("--baseline", default=None, help="score only results of this baseline")
     ap.add_argument("--vs", default=None, help="second baseline in the same folder: paired exact McNemar test")
     ap.add_argument("--json", default=None, help="also write the numbers to this JSON file")

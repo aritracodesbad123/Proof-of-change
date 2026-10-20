@@ -8,6 +8,9 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
+import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -15,6 +18,7 @@ import pytest
 from ops import bench, daily_run
 from poc import agents, console_api, cost, hitl, model_provider
 
+ROOT = Path(__file__).resolve().parents[1]
 FIX = model_provider.RECORDED_DIR
 SUPER = "nvidia/nemotron-3-super-120b-a12b"
 USAGE = {"prompt_tokens": 1_000_000, "completion_tokens": 1_000_000,
@@ -280,6 +284,7 @@ def test_poc_hitl_refuses_command_line_and_study_even_with_the_console_marker(mo
     _quiet_env(monkeypatch)
     monkeypatch.setenv("POC_HITL", "1")
     monkeypatch.setenv("POC_CONSOLE", "1")
+    monkeypatch.setenv("POC_CONSOLE_JOB", "1")  # an environment variable must not open the path
     with pytest.raises(SystemExit) as cli:
         daily_run.main(["--model-provider", "none", "--select-only"])
     assert cli.value.code not in (0, None)
@@ -291,6 +296,43 @@ def test_poc_hitl_refuses_command_line_and_study_even_with_the_console_marker(mo
     assert study.value.code not in (0, None)
     err = capsys.readouterr().err
     assert "STOPPED" in err and "benchmark" in err and "POC_HITL" in err
+
+    with pytest.raises(SystemExit) as flagged_bench:
+        daily_run.main(["--console-job", "--bench", "bench/benchmark-v0.csv", "--model-provider", "none"])
+    assert flagged_bench.value.code not in (0, None)
+    err = capsys.readouterr().err
+    assert "STOPPED" in err and "benchmark" in err and "POC_HITL" in err
+
+    with pytest.raises(SystemExit) as flagged_daily:
+        daily_run.main(["--console-job", "--model-provider", "none", "--select-only"])
+    assert flagged_daily.value.code not in (0, None)
+    assert "command-line" in capsys.readouterr().err
+
+
+def test_console_child_gets_past_the_operator_approval_stop(tmp_path):
+    """Start daily_run the way the console does, as a real process, and show it passes the stop."""
+    url = "https://github.com/me/demo/pull/3"
+    built = console_api.console_daily_run_argv(url, "none", [])
+    assert "--console-job" in built and "--swarm" in built and "--pr" in built
+    argv = [sys.executable, built[1], *built[2:]]
+    env = os.environ.copy()
+    env["POC_HITL"] = "1"
+    env["POC_HITL_DIR"] = str(tmp_path)
+    env["POC_CONSOLE"] = "1"
+    env["POC_SWARM"] = "1"
+    env["POC_PROGRESS_PATH"] = str(tmp_path / "progress.jsonl")
+    # A dirty checkout stops at the git check, which runs after the operator-approval check,
+    # and it keeps this test from fetching or switching branches.
+    marker = ROOT / "console-job-probe.txt"
+    marker.write_text("probe\n")
+    try:
+        proc = subprocess.run(argv, cwd=ROOT, env=env, capture_output=True, text=True, timeout=90)
+    finally:
+        marker.unlink(missing_ok=True)
+    text = proc.stderr + proc.stdout
+    assert "operator approval is turned on" not in text
+    assert "uncommitted changes" in text
+    assert proc.returncode != 0
 
 
 def test_swarm_on_study_uses_a_labelled_folder():
@@ -335,6 +377,7 @@ def test_console_turns_swarm_and_approval_on_explicitly(monkeypatch, tmp_path):
     assert job["status"] == "queued"
     holder["target"]()
     assert "--swarm" in captured["argv"]
+    assert "--console-job" in captured["argv"]
     env = captured["env"]
     assert env["POC_SWARM"] == "1"
     assert env["POC_HITL"] == "1"

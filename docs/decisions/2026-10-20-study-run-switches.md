@@ -19,7 +19,10 @@ when `--no-probes` is set, or when the baseline does not use probes. Setting `PO
 approval step being reached records the request as true and the step as off.
 
 A command-line run or a benchmark run stops immediately, with a short explanation, if `POC_HITL` is set.
-The console marker does not waive that stop.
+No environment variable waives that stop. The operator console starts one pull-request check with
+the `--console-job` flag. That flag is the only way such a check may start while operator approval
+is on. A benchmark run still stops if operator approval is on, even with the flag. The result still
+says operator approval was requested, so a study score still refuses it.
 
 Swarm model calls are listed on their own line, `cost.swarm`, and are not added into the main cost of the
 pull request. The headline totals stay comparable with the cost figures in section 7.10 of the paper.
@@ -42,7 +45,7 @@ approval on would change the result.
 ## Decision
 
 - Swarm off is the default for command-line and benchmark runs. The console turns it on explicitly.
-- Operator approval cannot be switched on for those runs. If `POC_HITL` is set, the run refuses to start, including when the console marker is set.
+- Operator approval cannot be switched on for a command-line or benchmark run. If `POC_HITL` is set, the run refuses to start. The console's single pull-request check passes `--console-job` and may start; nothing in the environment can do that, and a benchmark run still refuses.
 - Record the request and what ran, for both the swarm and operator approval, on every result.
 - Do not score a study folder unless every record has all four fields and none of them is true.
 - Put swarm-on study results in their own labelled folder and score them on their own path.
@@ -52,8 +55,9 @@ approval on would change the result.
 
 - Record only what ran. A skipped swarm would look the same as a swarm that was never requested, and the
   study scorer would accept it. Recording the request as well makes that visible.
-- Let the console marker start a command-line run that has operator approval on. That is a way around
-  the stop, so the run stops anyway.
+- Let an environment variable start a check that has operator approval on. Anyone could set that
+  variable and change which probes run. The console passes a flag instead, and a benchmark run
+  ignores the flag.
 - Score swarm-on results in the same folder as the main study. The main scorer would have to skip some
   files and could pick one up by mistake. A separate folder keeps the two sets apart.
 - Leave the swarm on and subtract its cost afterwards. That still spends the calls, and a missed
@@ -64,9 +68,11 @@ approval on would change the result.
 ## What it means for you
 
 A normal check or a benchmark run does not call the advisory swarm and does not pause for approval. Pass
-`--swarm`, or set `POC_SWARM=1`, when you want the advisory labels and the plain-language summary. On the
-result, `swarm_requested` says whether you asked, and `swarm` says whether the step ran. The same pair
-for operator approval is `operator_approval_requested` and `operator_approval`. A study score only includes
-records where all four say the switches were off. Swarm-on benchmark results are in the folder whose name
-ends with `-swarm-on`, and they are scored on their own. Read swarm spend under `cost.swarm`, not in the
-main total.
+`--swarm`, or set `POC_SWARM=1`, when you want the advisory labels and the plain-language summary. The
+operator console's own check passes `--console-job`, so it can pause for approval. That result still says
+operator approval was requested, and a study score refuses it. On the result, `swarm_requested` says
+whether you asked, and `swarm` says whether the step ran. The same pair for operator approval is
+`operator_approval_requested` and `operator_approval`. A study score only includes records where all four
+say the switches were off. Swarm-on benchmark results are in the folder whose name ends with `-swarm-on`,
+and they are scored on their own by checking every record, not the folder name. Read swarm spend under
+`cost.swarm`, not in the main total.

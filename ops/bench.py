@@ -251,7 +251,8 @@ def run_case(dr, a, row: dict, inputs_meta: dict, out: Path, workroot: Path, mac
 def run(a, dr) -> int:
     """Entry point from ops/daily_run.py main() (dr is that module)."""
     from poc import hitl
-    stop = hitl.study_operator_approval_stop(bench=True)
+    stop = hitl.study_operator_approval_stop(
+        bench=True, console_job=bool(getattr(a, "console_job", False)), single_pr=bool(getattr(a, "pr", None)))
     if stop:
         print(stop, file=sys.stderr)
         return 2

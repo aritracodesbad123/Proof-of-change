@@ -3250,6 +3250,10 @@ def main(argv=None) -> int:
                          "plain-language summary). Off by default for command-line and benchmark runs, so "
                          "they make no swarm model calls. Also on when POC_SWARM is 1, true, yes, or on. "
                          "The operator console turns this on itself.")
+    ap.add_argument("--console-job", action="store_true",
+                    help="passed only by the operator console, on a single pull-request check. "
+                         "With this flag that check may start while POC_HITL is set. "
+                         "No environment variable turns this on. Benchmark mode still refuses.")
     ap.add_argument("--sandbox-backend", choices=("local", "contree"), default="local",
                     help="where probe/pytest dual-runs execute for source-pair PRs: local bubblewrap (default) or "
                          "Nebius Token Factory Sandboxes (needs NEBIUS_API_KEY, NEBIUS_PROJECT_ID, and "
@@ -3296,7 +3300,8 @@ def main(argv=None) -> int:
     ap.add_argument("--bench-out", default=None, help="with --bench: result folder (default: runs/bench-v0)")
     a = ap.parse_args(argv)
     from poc import hitl
-    stop = hitl.study_operator_approval_stop(bench=bool(a.bench))
+    stop = hitl.study_operator_approval_stop(
+        bench=bool(a.bench), console_job=bool(a.console_job), single_pr=bool(a.pr))
     if stop:
         print(stop, file=sys.stderr)
         raise SystemExit(1)
