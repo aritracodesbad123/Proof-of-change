@@ -17,4 +17,20 @@ All 92 pairs stay in the list. The scope is Python repositories. Each repository
 
 Labels: library 53, non_library 39, unknown 0.
 
+`pair-labels-v2.json` has one entry per pair (`repo`, `agent_pr`, `human_pr`, `label`, `pypi_project`, `found_by`). Its SHA-256 is `5141a00db045be14ce39ec2caba743a3913c8374e83df9d55432d14659dd55b4`.
+
+Revised labels: library 62, non_library 30, unknown 0.
+
+Nine pairs changed from `non_library` in the first labelling to `library` under the revised rule. No pair moved the other way.
+
+- `getsentry/sentry-python` agent 4476, human 4485: `sentry-sdk`, found in `setup.py`
+- `project-numina/kimina-lean-server` agent 53, human 43: `kimina-client`, found in `pyproject.toml`
+- `Uberi/speech_recognition` agent 846, human 847: `SpeechRecognition`, found in `pyproject.toml`
+- `strawberry-graphql/strawberry` agent 3921, human 3923: `strawberry-graphql`, found in `pyproject.toml`
+- `Uberi/speech_recognition` agent 845, human 843: `SpeechRecognition`, found in `pyproject.toml`
+- `getzep/graphiti` agent 939, human 931: `graphiti-core`, found in `pyproject.toml`
+- `Stable-Baselines-Team/stable-baselines3-contrib` agent 307, human 318: `sb3_contrib`, found in `setup.py`
+- `microsoft/Olive` agent 1915, human 1919: `olive-ai`, found in `setup.py`
+- `getzep/graphiti` agent 924, human 927: `graphiti-core`, found in `pyproject.toml`
+
 Tuning cases were not excluded by any rule. A check after the run found none of them, or their repositories, among the candidates.
