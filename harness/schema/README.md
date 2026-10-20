@@ -21,6 +21,7 @@ earlier revision is still valid under the current file. `schema_version` stays `
 | 10 | 2026-10-15 | `a0042eef48d97408b9f8b3479f2c7f26530c453b3d506df836dd8ef6af21d716` | Optional pr_run properties `model_provider_used` (`nebius`, `recorded`, or `none`: the provider that actually completed a call) and `model_provider_fallback` (set when the AI was off, a call was skipped, or a call failed). Nothing becomes required, so rev 1-9 records stay valid. |
 | 11 | 2026-10-20 | `1d203fcc331bc84878c5d035ebb4849d3b9f13dc527787800011d4b466338752` | Optional pr_run properties `swarm_requested` and `operator_approval_requested` (whether the switch was set) plus `swarm` and `operator_approval` (`on` or `off`: whether that step ran). Nothing becomes required, so rev 1-10 records stay valid. |
 | 12 | 2026-10-20 | `fc02de9e9a2a2cd2c6f189fa818f76ba814039cb55d01c81d522f65301eb8937` | `verdict` and `verdict_before_coverage_gate` may be `no_code_change`. Nothing becomes required, so rev 1-11 records stay valid. |
+| 13 | 2026-10-20 | `ea940732e32829455ad11b0799b00634f30522415320684df5ae4244798de88e` | Optional `machine_type.gxx`: the `g++` version line, or null when `g++` is not installed. Nothing becomes required, so rev 1-12 records stay valid. |
 
 Changing the file: bump `x-revisions`, add the new sha256 to this table and to `COMPATIBLE_SCHEMA_SHA256` in
 `guardrails/schema.py` (import fails loudly otherwise), and only ever add optional fields within v1. A

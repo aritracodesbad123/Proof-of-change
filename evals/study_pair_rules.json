@@ -1,0 +1,9 @@
+{
+  "seed": 20261020,
+  "cap": 175,
+  "require_same_repo": true,
+  "require_distinct_prs": true,
+  "require_patch_file": true,
+  "require_shared_changed_file": true,
+  "reconstruct_missing_patch": false
+}
