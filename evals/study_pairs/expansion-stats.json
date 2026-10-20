@@ -1,0 +1,16 @@
+{
+ "repos": 266,
+ "agent_selected": 512,
+ "agent_size_fail": 17,
+ "searches": 252,
+ "human_found": 22075,
+ "excl_bot": 4406,
+ "excl_aidev_agent": 1575,
+ "excl_ai_text": 3810,
+ "excl_ai_commit": 72,
+ "excl_size": 1271,
+ "no_match": 174,
+ "skip_empty_patch_human": 7,
+ "skip_not_a_diff_human": 1,
+ "skip_not_a_diff_agent": 1
+}
