@@ -163,6 +163,8 @@ make console-web    # :5173 (Vite proxies /api → :8787)
 
 Jobs run in a daemon thread. Poll `/api/jobs/<id>` while `daily_run` writes progress events (install → pytest → Ultra/Lightning/Super → done).
 
+Sign-in is required before the run list. Password sign-in emails a code through `POC_SMTP_HOST`, `POC_SMTP_PORT`, `POC_SMTP_USER`, `POC_SMTP_PASSWORD`, and `POC_SMTP_FROM`. Google and GitHub use `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GITHUB_CLIENT_ID`, and `GITHUB_CLIENT_SECRET`, and skip the emailed code. Register `/api/auth/google/callback` and `/api/auth/github/callback` on the origin in `POC_PUBLIC_URL` (or the address the browser uses). Each person only sees checks they started. The README section "Operator console" lists every variable.
+
 ### Free public URL (recommended — no Nebius Compute bill)
 
 Builder **Token Factory** credits pay for Nemotron calls, not for hosting. Skip Nebius Serverless AI Endpoint if you want $0 hosting.

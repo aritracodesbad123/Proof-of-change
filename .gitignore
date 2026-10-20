@@ -25,3 +25,4 @@ ops/local.json
 ops/runs/
 ops/work/
 ops/seen_prs.json
+ops/console-accounts.json

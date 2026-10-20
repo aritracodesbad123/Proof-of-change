@@ -328,6 +328,17 @@ export default function App() {
         <span className={`pill ${apiOk ? 'on' : 'off'}`}>
           {apiOk == null ? '…' : apiOk ? 'API up' : 'API down'}
         </span>
+        <button
+          type="button"
+          className="ghost sign-out"
+          onClick={() => {
+            void api.logout().finally(() => {
+              window.location.href = '/'
+            })
+          }}
+        >
+          Sign out
+        </button>
       </header>
 
       {err && (

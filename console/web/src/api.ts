@@ -3,6 +3,7 @@ const BASE = import.meta.env.VITE_API_BASE ?? ''
 async function json<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${BASE}${path}`, {
     ...init,
+    credentials: 'include',
     headers: { 'Content-Type': 'application/json', ...(init?.headers || {}) },
   })
   const data = await res.json().catch(() => ({}))
@@ -102,8 +103,36 @@ export type Job = {
   hitl_approval?: HitlApprovalBody | null
 }
 
+export type AuthProviders = {
+  google: boolean
+  github: boolean
+  signup_disabled: boolean
+  invite_required: boolean
+}
+
+export type AuthStep = {
+  ok: string
+  step: 'code'
+  challenge_id: string
+  purpose: 'signup' | 'login'
+}
+
 export const api = {
   health: () => json<Health>('/api/health'),
+  providers: () => json<AuthProviders>('/api/auth/providers'),
+  me: () => json<{ email: string }>('/api/auth/me'),
+  signup: (email: string, password: string, invite_code = '') =>
+    json<AuthStep>('/api/auth/signup', { method: 'POST', body: JSON.stringify({ email, password, invite_code }) }),
+  login: (email: string, password: string) =>
+    json<AuthStep>('/api/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) }),
+  verify: (challenge_id: string, code: string) =>
+    json<{ ok: string; email: string }>('/api/auth/verify', {
+      method: 'POST',
+      body: JSON.stringify({ challenge_id, code }),
+    }),
+  resend: (challenge_id: string) =>
+    json<AuthStep>('/api/auth/resend', { method: 'POST', body: JSON.stringify({ challenge_id }) }),
+  logout: () => json<{ ok: boolean }>('/api/auth/logout', { method: 'POST', body: '{}' }),
   runs: () => json<{ runs: RunRow[] }>('/api/runs'),
   run: (id: string) =>
     json<{

@@ -321,7 +321,7 @@ make console-api    # terminal 1 — http://127.0.0.1:8787
 make console-web    # terminal 2 — http://127.0.0.1:5173
 ```
 
-Open **http://127.0.0.1:5173**. Needs Node.js for the UI (`npm` under `console/web/`). Or build once and serve UI from the API:
+Open **http://127.0.0.1:5173**. Needs Node.js for the UI (`npm` under `console/web/`). Sign in before the run list loads. Email and password always continue with a 6-digit code. Google and GitHub skip that code, because the provider has already checked the person. Or build once and serve UI from the API:
 
 ```bash
 make console-build && make console-api
@@ -333,6 +333,35 @@ make console-build && make console-api
 **Nebius Endpoint** (only if you have AI Cloud credits): `make docker-console` + `make nebius-console`. Local bind: `make console-host`.
 
 `make check` still works the same; the console calls that same path.
+
+**Email codes.** Password sign-in will not start until these are set. If they are missing, the console refuses the sign-in and tells an administrator what to set. It never prints the code.
+
+| Variable | Purpose |
+|---|---|
+| `POC_SMTP_HOST` | SMTP server |
+| `POC_SMTP_PORT` | SMTP port. Defaults to `587` |
+| `POC_SMTP_USER` | SMTP username |
+| `POC_SMTP_PASSWORD` | SMTP password |
+| `POC_SMTP_FROM` | From address on the code email |
+
+`POC_OTP_TEST_SINK=1` keeps the code in the server process for tests. It is off unless you set it, the API still does not return the code, and it is refused when `RENDER` or `RENDER_SERVICE_ID` is set (Render).
+
+**Google and GitHub.** A button is hidden when its client id or secret is missing. Register these callback paths on the provider, using the origin people open in the browser (`POC_PUBLIC_URL` if you set it):
+
+- `/api/auth/google/callback`
+- `/api/auth/github/callback`
+
+Examples: `http://127.0.0.1:5173/api/auth/google/callback` when you use the Vite dev server, `http://127.0.0.1:8787/api/auth/github/callback` when the API serves the built page, and `https://<service>.onrender.com/api/auth/google/callback` on Render.
+
+| Variable | Purpose |
+|---|---|
+| `GOOGLE_CLIENT_ID` | Google OAuth client id |
+| `GOOGLE_CLIENT_SECRET` | Google OAuth client secret |
+| `GITHUB_CLIENT_ID` | GitHub OAuth client id |
+| `GITHUB_CLIENT_SECRET` | GitHub OAuth client secret |
+| `POC_PUBLIC_URL` | Optional origin, with no trailing path, used to build the callbacks above |
+
+`POC_SIGNUP_DISABLED=1` stops new accounts (email or a provider). An existing account can still sign in. `POC_INVITE_CODE`, when set, is required only to create an account.
 
 Works best for **numpy, pandas and scikit-learn** (the default libraries). Other pure-Python libraries on GitHub
 usually work too. They are downloaded and built from their source code, which takes longer.

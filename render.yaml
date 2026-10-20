@@ -27,3 +27,27 @@ services:
         sync: false
       - key: PORT
         value: "8787"
+      # Password sign-in emails a code. Leave unset and password sign-in is refused.
+      # Do not set POC_OTP_TEST_SINK here. That test switch is refused on Render.
+      - key: POC_SMTP_HOST
+        sync: false
+      - key: POC_SMTP_PORT
+        sync: false
+      - key: POC_SMTP_USER
+        sync: false
+      - key: POC_SMTP_PASSWORD
+        sync: false
+      - key: POC_SMTP_FROM
+        sync: false
+      # Optional. A provider button stays hidden until both of its values are set.
+      # Register /api/auth/google/callback and /api/auth/github/callback on the provider.
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: GITHUB_CLIENT_ID
+        sync: false
+      - key: GITHUB_CLIENT_SECRET
+        sync: false
+      - key: POC_PUBLIC_URL
+        sync: false

@@ -11,6 +11,9 @@ Endpoints:
   POST /api/checks   JSON {"pr_url": "https://github.com/o/r/pull/N"}
   GET  /api/jobs/<job_id>
   POST /api/jobs/<job_id>/scenarios   HITL approval (approve / extra_scenarios / business_answers)
+  /api/auth/*                        sign-up, email code, Google and GitHub (see poc/console_auth.py)
+
+Runs and jobs are visible only to the signed-in account that started them.
 
 Serves console/web/dist when built. CORS open for local Vite (5173).
 """
@@ -26,7 +29,7 @@ import uuid
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from typing import Any
-from urllib.parse import unquote, urlparse
+from urllib.parse import parse_qs, unquote, urlparse
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 RUNS_ROOT = Path(os.environ.get("POC_OPS_RUNS", REPO_ROOT / "ops" / "runs"))
@@ -170,9 +173,28 @@ def _row_from_record(rec: dict, path: Path | None = None) -> dict:
     }
 
 
-def remember_run(rec: dict, path: Path | None = None) -> dict:
+def run_owner_of(folder: Path) -> str | None:
+    try:
+        text = (folder / "console_owner.txt").read_text().strip()
+    except OSError:
+        return None
+    return text or None
+
+
+def set_run_owner(folder: Path, owner: str) -> None:
+    folder.mkdir(parents=True, exist_ok=True)
+    (folder / "console_owner.txt").write_text(owner + "\n")
+
+
+def remember_run(rec: dict, path: Path | None = None, *, owner: str | None = None) -> dict:
     """Keep a finished PR record in RAM so the console still lists it after Render wipes disk."""
     row = _row_from_record(rec, path)
+    if owner:
+        row["owner"] = owner
+    elif path is not None:
+        stamp = run_owner_of(path.parent)
+        if stamp:
+            row["owner"] = stamp
     rid = row["id"]
     hosted = HOSTED / f"{rid}.html"
     links = report_links(rid, folder=row["folder"], rec=rec)
@@ -193,8 +215,11 @@ def remember_run(rec: dict, path: Path | None = None) -> dict:
     return row
 
 
-def list_runs(limit: int = 50) -> list[dict]:
-    """Newest `limit` runs only. Does not remember_run every record on each list (disk scan is mtime-bounded)."""
+def list_runs(limit: int = 50, owner: str | None = None) -> list[dict]:
+    """Newest `limit` runs only. Does not remember_run every record on each list (disk scan is mtime-bounded).
+
+    When `owner` is set, only runs stamped for that account are returned.
+    """
     candidates: list[tuple[float, Path]] = []
     if RUNS_ROOT.is_dir():
         for path in RUNS_ROOT.rglob("record.json"):
@@ -207,8 +232,7 @@ def list_runs(limit: int = 50) -> list[dict]:
 
     rows: list[tuple[float, dict]] = []
     seen: set[str] = set()
-    for mtime, path in candidates[: max(limit, 1) * 2]:
-        # Read a small multiple of limit to skip non-pr_run records without scanning the whole tree into RAM.
+    for mtime, path in candidates:
         if len(rows) >= limit:
             break
         try:
@@ -218,6 +242,11 @@ def list_runs(limit: int = 50) -> list[dict]:
         if rec.get("record_kind") and rec.get("record_kind") != "pr_run":
             continue
         row = _row_from_record(rec, path)
+        stamp = run_owner_of(path.parent)
+        if stamp:
+            row["owner"] = stamp
+        if owner is not None and row.get("owner") != owner:
+            continue
         seen.add(row["id"])
         rows.append((mtime, row))
 
@@ -226,6 +255,8 @@ def list_runs(limit: int = 50) -> list[dict]:
     for snap in mem:
         row = snap["row"]
         if row["id"] in seen:
+            continue
+        if owner is not None and row.get("owner") != owner:
             continue
         rows.append((float(snap.get("saved_at") or 0), row))
     rows.sort(key=lambda x: x[0], reverse=True)
@@ -263,7 +294,7 @@ def submit_job_scenarios(job_id: str, body: dict) -> dict:
     return hitl.write_approval(hdir, body)
 
 
-def get_run(run_id: str) -> dict | None:
+def get_run(run_id: str, owner: str | None = None) -> dict | None:
     run_id = unquote(run_id)
     for path in RUNS_ROOT.rglob("record.json") if RUNS_ROOT.is_dir() else []:
         try:
@@ -271,7 +302,10 @@ def get_run(run_id: str) -> dict | None:
         except (OSError, json.JSONDecodeError):
             continue
         if rec.get("id") == run_id or path.parent.name == run_id:
-            remember_run(rec, path)
+            stamp = run_owner_of(path.parent)
+            if owner is not None and stamp != owner:
+                return None
+            remember_run(rec, path, owner=stamp)
             rid = str(rec.get("id") or run_id)
             folder = str(path.parent.relative_to(REPO_ROOT))
             hosted = HOSTED / f"{rid}.html"
@@ -286,6 +320,8 @@ def get_run(run_id: str) -> dict | None:
     with _jobs_lock:
         snap = _recent_runs.get(run_id)
     if snap:
+        if owner is not None and snap["row"].get("owner") != owner:
+            return None
         links = report_links(run_id, folder=snap.get("folder"), rec=snap.get("record"))
         return {
             "record": snap["record"],
@@ -355,7 +391,7 @@ def find_record_for_pr(repo: str, pr: int) -> tuple[dict, Path] | None:
     return best[1], best[2]
 
 
-def start_check(pr_url: str, *, model_provider: str = "nebius") -> dict:
+def start_check(pr_url: str, *, model_provider: str = "nebius", owner: str | None = None) -> dict:
     from poc import run_progress
 
     m = PR_RE.search(pr_url.strip())
@@ -396,6 +432,7 @@ def start_check(pr_url: str, *, model_provider: str = "nebius") -> dict:
         "current_agent": None,
         "current_detail": None,
         "swarm": {"ultra": "idle", "lightning": "idle", "super": "idle"},
+        "owner": owner,
     }
     with _jobs_lock:
         _jobs[job_id] = job
@@ -469,7 +506,9 @@ def start_check(pr_url: str, *, model_provider: str = "nebius") -> dict:
             saved = None
             if found:
                 rec, path = found
-                saved = (remember_run(rec, path), rec)
+                if job.get("owner"):
+                    set_run_owner(path.parent, job["owner"])
+                saved = (remember_run(rec, path, owner=job.get("owner")), rec)
             with _jobs_lock:
                 job["exit"] = returncode
                 job["log_tail"] = tail
@@ -525,13 +564,16 @@ def _job_public(job: dict) -> dict:
     out.pop("progress_path", None)
     out.pop("console_log", None)
     out.pop("hitl_dir", None)
+    out.pop("owner", None)
     return out
 
 
-def get_job(job_id: str) -> dict | None:
+def get_job(job_id: str, owner: str | None = None) -> dict | None:
     with _jobs_lock:
         j = _jobs.get(job_id)
         if not j:
+            return None
+        if owner is not None and j.get("owner") != owner:
             return None
         return _job_public(j)
 
@@ -545,14 +587,45 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
         self.send_header("Access-Control-Allow-Headers", "Content-Type")
 
-    def _json(self, code: int, obj: Any):
+    def _json(self, code: int, obj: Any, *, cookies: list[str] | None = None):
         body = json.dumps(obj, default=str).encode()
         self.send_response(code)
         self._cors()
+        for cookie in cookies or []:
+            self.send_header("Set-Cookie", cookie)
         self.send_header("Content-Type", "application/json")
         self.send_header("Content-Length", str(len(body)))
         self.end_headers()
         self.wfile.write(body)
+
+    def _redirect(self, location: str, *, cookies: list[str] | None = None):
+        self.send_response(302)
+        self._cors()
+        self.send_header("Location", location)
+        for cookie in cookies or []:
+            self.send_header("Set-Cookie", cookie)
+        self.send_header("Content-Length", "0")
+        self.end_headers()
+
+    def _account(self) -> dict[str, Any] | None:
+        from poc import console_auth
+
+        token = console_auth.cookie_value(self.headers.get("Cookie"), console_auth.SESSION_COOKIE)
+        return console_auth.service_from_env().account_for_session(token)
+
+    def _auth(self, method: str, parsed: Any, body: dict | None):
+        from poc import console_auth
+
+        path = parsed.path.rstrip("/") or "/"
+        query = parse_qs(parsed.query) if parsed.query else {}
+        result = console_auth.handle_request(
+            method, path, query, body, self.headers,
+            host=self.headers.get("Host"),
+            proto=self.headers.get("X-Forwarded-Proto"),
+        )
+        if result.location is not None:
+            return self._redirect(result.location, cookies=result.cookies)
+        return self._json(result.status, result.body or {}, cookies=result.cookies)
 
     def _file(self, path: Path, content_type: str):
         data = path.read_bytes()
@@ -571,6 +644,8 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self):  # noqa: N802
         parsed = urlparse(self.path)
         path = parsed.path.rstrip("/") or "/"
+        if path.startswith("/api/auth"):
+            return self._auth("GET", parsed, None)
 
         if path == "/api/health":
             flags, note = console_run_flags()
@@ -594,14 +669,22 @@ class Handler(BaseHTTPRequestHandler):
                 "run_flags": flags,
                 "run_note": note,
             })
+        account = self._account()
+        if path.startswith("/api/") and not account:
+            return self._json(401, {"error": "Sign in first."})
         if path == "/api/runs":
-            return self._json(200, {"runs": list_runs()})
+            rows = list_runs(owner=account["id"] if account else None)
+            for row in rows:
+                row.pop("owner", None)
+            return self._json(200, {"runs": rows})
         rm = _REPORT_FILE_RE.match(path)
         if rm:
             rid, ext = unquote(rm.group(1)), rm.group(2)
-            got = get_run(rid)
-            folder = (got or {}).get("folder")
-            rec = (got or {}).get("record")
+            got = get_run(rid, owner=account["id"] if account else None)
+            if not got:
+                return self._json(404, {"error": f"REPORT.{ext} not found"})
+            folder = got.get("folder")
+            rec = got.get("record")
             fpath = find_reviewer_report_file(rid, ext, folder=folder, rec=rec)
             if not fpath:
                 return self._json(404, {"error": f"REPORT.{ext} not found"})
@@ -609,13 +692,13 @@ class Handler(BaseHTTPRequestHandler):
             return self._file(fpath, ctype)
         if path.startswith("/api/runs/"):
             rid = path[len("/api/runs/"):]
-            got = get_run(rid)
+            got = get_run(rid, owner=account["id"] if account else None)
             if not got:
                 return self._json(404, {"error": "not found"})
             return self._json(200, got)
         if path.startswith("/api/jobs/"):
             jid = path[len("/api/jobs/"):]
-            job = get_job(jid)
+            job = get_job(jid, owner=account["id"] if account else None)
             if not job:
                 return self._json(404, {"error": "not found"})
             return self._json(200, job)
@@ -645,16 +728,27 @@ class Handler(BaseHTTPRequestHandler):
             body = json.loads(raw.decode() or "{}")
         except json.JSONDecodeError:
             return self._json(400, {"error": "bad json"})
+        parsed_path = path
+        if parsed_path.startswith("/api/auth"):
+            return self._auth("POST", parsed, body if isinstance(body, dict) else {})
+        account = self._account()
+        if not account:
+            return self._json(401, {"error": "Sign in first."})
         if path == "/api/checks":
             pr_url = (body.get("pr_url") or "").strip()
             provider = (body.get("model_provider") or "nebius").strip() or "nebius"
             try:
-                job = start_check(pr_url, model_provider=provider)
+                job = start_check(pr_url, model_provider=provider, owner=account["id"])
             except ValueError as e:
                 return self._json(400, {"error": str(e)})
             return self._json(202, job)
         if path.startswith("/api/jobs/") and path.endswith("/scenarios"):
             jid = path[len("/api/jobs/"):-len("/scenarios")].strip("/")
+            with _jobs_lock:
+                owned = _jobs.get(jid)
+                owner_ok = bool(owned and owned.get("owner") == account["id"])
+            if not owner_ok:
+                return self._json(404, {"error": "not found"})
             try:
                 approval = submit_job_scenarios(jid, body)
             except KeyError:
