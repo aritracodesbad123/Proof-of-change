@@ -26,6 +26,22 @@ BANNED = {
     "personal credit": r"\bcredit(ed|s)? (to|by)\b",
 }
 PATTERNS = {k: re.compile(v, re.I) for k, v in BANNED.items()}
+# owner/name, or the same pair in a github.com URL. Used only to recognise an upstream repository name.
+UPSTREAM_REPO = re.compile(r"(?:https?://github\.com/)?[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+", re.I)
+
+
+def _under_study_pairs(path: Path | None) -> bool:
+    """True when path is a file inside evals/study_pairs/."""
+    if path is None:
+        return False
+    parts = path.parts
+    return any(parts[i] == "evals" and i + 1 < len(parts) and parts[i + 1] == "study_pairs"
+               for i in range(len(parts)))
+
+
+def _inside_upstream_repo(line: str, match: re.Match) -> bool:
+    """True when the match sits inside an upstream repository name on this line."""
+    return any(repo.start() <= match.start() and match.end() <= repo.end() for repo in UPSTREAM_REPO.finditer(line))
 
 
 def tracked_files() -> list[Path]:
@@ -52,15 +68,19 @@ def text_of(p: Path) -> str | None:
     return p.read_bytes().decode("utf-8", "replace")
 
 
-def findings(text: str) -> list[str]:
+def findings(text: str, path: Path | None = None) -> list[str]:
     for a in ALLOWED:
         text = a.sub("<repo-url>", text)
+    study_pairs = _under_study_pairs(path)
     out = []
     for i, line in enumerate(text.splitlines(), 1):
         for kind, pat in PATTERNS.items():
-            m = pat.search(line)
-            if m:
-                out.append(f"line {i}: {kind}: {m.group(0)!r}")
+            matches = list(pat.finditer(line))
+            if kind == "bot" and study_pairs:
+                # Repository names under the study-pair files may contain this word. Prose still fails.
+                matches = [m for m in matches if not _inside_upstream_repo(line, m)]
+            if matches:
+                out.append(f"line {i}: {kind}: {matches[0].group(0)!r}")
     return out
 
 
@@ -69,7 +89,7 @@ def test_no_internal_names_or_paths_in_tracked_files():
     for p in tracked_files():
         t = text_of(p)
         if t is not None:
-            f = findings(t)
+            f = findings(t, p)
             if f:
                 bad[str(p.relative_to(ROOT))] = f[:3]
     assert not bad, "internal names/paths found (the repo is public):\n" + "\n".join(
@@ -88,3 +108,19 @@ def test_guard_catches(text):
                                   "Nemotron robot-free", "Copyright (c) 2026 Aritra Chakraborty"])
 def test_guard_allows(text):
     assert not findings(text)
+
+
+def test_study_pair_repository_names_skip_only_that_word():
+    """An upstream repository name under evals/study_pairs/ may contain the word. The same text elsewhere,
+    and any other banned word in that folder, still fails."""
+    repo = '{"repo": "python-telegram-bot/python-telegram-bot"}\n'
+    inside = Path("evals/study_pairs/manifest.json")
+    outside = Path("docs/notes.md")
+    assert not findings(repo, inside)
+    assert findings(repo, outside)
+    assert findings(repo)  # no path: the exception does not apply
+    assert findings("the ops bot\n", inside)
+    assert findings('{"repo": "Acme/Nathan"}\n', inside)
+    assert findings("see python-telegram-bot here\n", inside)  # a bare name is not owner/name
+    mixed = "python-telegram-bot/python-telegram-bot and the ops bot\n"
+    assert findings(mixed, inside)
