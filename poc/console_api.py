@@ -480,9 +480,23 @@ def _kill_process_group(pid: int) -> None:
 
 
 def _read_child(proc: subprocess.Popen, logf, collected: list[str], deadline: float) -> tuple[int, bool]:
-    """Read stdout until the child exits or the deadline. A silent child still hits the deadline."""
+    """Read stdout until the child exits or the deadline. A silent child still hits the deadline.
+
+    A stand-in process with no real pipe (tests) is read line by line, the same as before the deadline existed.
+    """
     assert proc.stdout is not None
-    fd = proc.stdout.fileno()
+    try:
+        fd = proc.stdout.fileno()
+    except (AttributeError, OSError, ValueError):
+        fd = None
+    if not isinstance(fd, int) or fd < 0:
+        for line in proc.stdout:
+            logf.write(line)
+            logf.flush()
+            collected.append(line)
+            if len(collected) > 4000:
+                del collected[:-2000]
+        return proc.wait(), False
     while True:
         if time.monotonic() >= deadline:
             _kill_process_group(proc.pid)
