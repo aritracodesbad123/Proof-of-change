@@ -4,13 +4,36 @@ import pytest
 
 from evals.run_evals import run as run_evals
 from harness import run as hr
-from harness.machine import detect_machine_type
+from harness.machine import detect_machine_type, gxx_version, require_gxx
 
 
 def test_machine_type_ci_env():
     mt = detect_machine_type({"GITHUB_ACTIONS": "true", "RUNNER_NAME": "GitHub Actions 3", "RUNNER_OS": "Linux",
                               "RUNNER_ARCH": "X64", "ImageOS": "ubuntu24", "ImageVersion": "20261001.1"})
     assert mt["ci"] == "github-actions" and mt["image"] == "ubuntu24 20261001.1" and mt["arch"] and mt["os"]
+    assert "gxx" in mt
+
+
+def test_gxx_missing_stops_setup(monkeypatch):
+    monkeypatch.setattr("harness.machine.shutil.which", lambda _name: None)
+    assert gxx_version() is None
+    with pytest.raises(SystemExit, match="g\\+\\+"):
+        require_gxx()
+
+
+def test_gxx_version_is_recorded_on_the_machine(monkeypatch):
+    monkeypatch.setattr("harness.machine.shutil.which", lambda _name: "/usr/bin/g++")
+
+    class _Done:
+        stdout = "g++ (Ubuntu 13.3.0) 13.3.0\nCopyright line\n"
+        stderr = ""
+
+    monkeypatch.setattr("harness.machine.subprocess.run", lambda *_a, **_k: _Done())
+    assert gxx_version() == "g++ (Ubuntu 13.3.0) 13.3.0"
+    assert require_gxx() == "g++ (Ubuntu 13.3.0) 13.3.0"
+    mt = detect_machine_type({})
+    assert mt["gxx"] == "g++ (Ubuntu 13.3.0) 13.3.0"
+    assert mt["ci"] is None
 
 
 def test_build_command_forces_protocol(tmp_path):

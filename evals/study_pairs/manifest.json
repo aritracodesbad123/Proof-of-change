@@ -1,0 +1,1380 @@
+{
+  "cap": 175,
+  "exclusion_counts": {
+    "no_shared_file": 228
+  },
+  "exclusions": [
+    {
+      "agent_pr": "1783",
+      "human_pr": "1799",
+      "reason": "no_shared_file",
+      "repo": "567-labs/instructor"
+    },
+    {
+      "agent_pr": "1818",
+      "human_pr": "1782",
+      "reason": "no_shared_file",
+      "repo": "567-labs/instructor"
+    },
+    {
+      "agent_pr": "315",
+      "human_pr": "314",
+      "reason": "no_shared_file",
+      "repo": "APPFL/APPFL"
+    },
+    {
+      "agent_pr": "195",
+      "human_pr": "199",
+      "reason": "no_shared_file",
+      "repo": "AdnaneKhan/gato-x"
+    },
+    {
+      "agent_pr": "1230",
+      "human_pr": "1234",
+      "reason": "no_shared_file",
+      "repo": "AgentOps-AI/agentops"
+    },
+    {
+      "agent_pr": "228",
+      "human_pr": "221",
+      "reason": "no_shared_file",
+      "repo": "ArcInstitute/state"
+    },
+    {
+      "agent_pr": "624",
+      "human_pr": "596",
+      "reason": "no_shared_file",
+      "repo": "Archmonger/django-dbbackup"
+    },
+    {
+      "agent_pr": "2424",
+      "human_pr": "2434",
+      "reason": "no_shared_file",
+      "repo": "AstrBotDevs/AstrBot"
+    },
+    {
+      "agent_pr": "2429",
+      "human_pr": "2422",
+      "reason": "no_shared_file",
+      "repo": "AstrBotDevs/AstrBot"
+    },
+    {
+      "agent_pr": "141",
+      "human_pr": "1963",
+      "reason": "no_shared_file",
+      "repo": "BEDOLAGA-DEV/remnawave-bedolaga-telegram-bot"
+    },
+    {
+      "agent_pr": "146",
+      "human_pr": "1964",
+      "reason": "no_shared_file",
+      "repo": "BEDOLAGA-DEV/remnawave-bedolaga-telegram-bot"
+    },
+    {
+      "agent_pr": "247",
+      "human_pr": "260",
+      "reason": "no_shared_file",
+      "repo": "BeehiveInnovations/pal-mcp-server"
+    },
+    {
+      "agent_pr": "62",
+      "human_pr": "113",
+      "reason": "no_shared_file",
+      "repo": "BeehiveInnovations/pal-mcp-server"
+    },
+    {
+      "agent_pr": "48",
+      "human_pr": "52",
+      "reason": "no_shared_file",
+      "repo": "ChrisBuilds/terminaltexteffects"
+    },
+    {
+      "agent_pr": "1280",
+      "human_pr": "1334",
+      "reason": "no_shared_file",
+      "repo": "ChristianLempa/boilerplates"
+    },
+    {
+      "agent_pr": "82",
+      "human_pr": "79",
+      "reason": "no_shared_file",
+      "repo": "CravateRouge/bloodyAD"
+    },
+    {
+      "agent_pr": "84",
+      "human_pr": "108",
+      "reason": "no_shared_file",
+      "repo": "CravateRouge/bloodyAD"
+    },
+    {
+      "agent_pr": "1410",
+      "human_pr": "1398",
+      "reason": "no_shared_file",
+      "repo": "Cyberdrop-DL/cyberdrop-dl"
+    },
+    {
+      "agent_pr": "734",
+      "human_pr": "737",
+      "reason": "no_shared_file",
+      "repo": "EvolvingLMMs-Lab/lmms-eval"
+    },
+    {
+      "agent_pr": "10",
+      "human_pr": "16",
+      "reason": "no_shared_file",
+      "repo": "GetBindu/Bindu"
+    },
+    {
+      "agent_pr": "72",
+      "human_pr": "81",
+      "reason": "no_shared_file",
+      "repo": "Hankanman/Area-Occupancy-Detection"
+    },
+    {
+      "agent_pr": "681",
+      "human_pr": "703",
+      "reason": "no_shared_file",
+      "repo": "Josverl/micropython-stubber"
+    },
+    {
+      "agent_pr": "92",
+      "human_pr": "85",
+      "reason": "no_shared_file",
+      "repo": "JusticeRage/Gepetto"
+    },
+    {
+      "agent_pr": "94",
+      "human_pr": "111",
+      "reason": "no_shared_file",
+      "repo": "JusticeRage/Gepetto"
+    },
+    {
+      "agent_pr": "706",
+      "human_pr": "694",
+      "reason": "no_shared_file",
+      "repo": "Kanaries/pygwalker"
+    },
+    {
+      "agent_pr": "1665",
+      "human_pr": "1682",
+      "reason": "no_shared_file",
+      "repo": "KartoffelToby/better_thermostat"
+    },
+    {
+      "agent_pr": "612",
+      "human_pr": "620",
+      "reason": "no_shared_file",
+      "repo": "Lightning-AI/LitServe"
+    },
+    {
+      "agent_pr": "18",
+      "human_pr": "19",
+      "reason": "no_shared_file",
+      "repo": "MaximeRivest/attachments"
+    },
+    {
+      "agent_pr": "1036",
+      "human_pr": "1033",
+      "reason": "no_shared_file",
+      "repo": "NVIDIA-NeMo/Curator"
+    },
+    {
+      "agent_pr": "728",
+      "human_pr": "718",
+      "reason": "no_shared_file",
+      "repo": "NanmiCoder/MediaCrawler"
+    },
+    {
+      "agent_pr": "2467",
+      "human_pr": "2468",
+      "reason": "no_shared_file",
+      "repo": "Netflix/metaflow"
+    },
+    {
+      "agent_pr": "64",
+      "human_pr": "44",
+      "reason": "no_shared_file",
+      "repo": "OEvortex/llm4free"
+    },
+    {
+      "agent_pr": "68",
+      "human_pr": "67",
+      "reason": "no_shared_file",
+      "repo": "OEvortex/llm4free"
+    },
+    {
+      "agent_pr": "162",
+      "human_pr": "170",
+      "reason": "no_shared_file",
+      "repo": "OpenPipe/ART"
+    },
+    {
+      "agent_pr": "164",
+      "human_pr": "173",
+      "reason": "no_shared_file",
+      "repo": "OpenPipe/ART"
+    },
+    {
+      "agent_pr": "2",
+      "human_pr": "4",
+      "reason": "no_shared_file",
+      "repo": "Osly-AI/PocketManus"
+    },
+    {
+      "agent_pr": "1185",
+      "human_pr": "1724",
+      "reason": "no_shared_file",
+      "repo": "PrefectHQ/fastmcp"
+    },
+    {
+      "agent_pr": "489",
+      "human_pr": "1714",
+      "reason": "no_shared_file",
+      "repo": "PrefectHQ/fastmcp"
+    },
+    {
+      "agent_pr": "490",
+      "human_pr": "1722",
+      "reason": "no_shared_file",
+      "repo": "PrefectHQ/fastmcp"
+    },
+    {
+      "agent_pr": "1221",
+      "human_pr": "1209",
+      "reason": "no_shared_file",
+      "repo": "PrefectHQ/marvin"
+    },
+    {
+      "agent_pr": "19121",
+      "human_pr": "20124",
+      "reason": "no_shared_file",
+      "repo": "PrefectHQ/prefect"
+    },
+    {
+      "agent_pr": "703",
+      "human_pr": "817",
+      "reason": "no_shared_file",
+      "repo": "PrimeIntellect-ai/prime-rl"
+    },
+    {
+      "agent_pr": "705",
+      "human_pr": "810",
+      "reason": "no_shared_file",
+      "repo": "PrimeIntellect-ai/prime-rl"
+    },
+    {
+      "agent_pr": "425",
+      "human_pr": "415",
+      "reason": "no_shared_file",
+      "repo": "PrimeIntellect-ai/verifiers"
+    },
+    {
+      "agent_pr": "427",
+      "human_pr": "403",
+      "reason": "no_shared_file",
+      "repo": "PrimeIntellect-ai/verifiers"
+    },
+    {
+      "agent_pr": "462",
+      "human_pr": "464",
+      "reason": "no_shared_file",
+      "repo": "PrimeIntellect-ai/verifiers"
+    },
+    {
+      "agent_pr": "340",
+      "human_pr": "357",
+      "reason": "no_shared_file",
+      "repo": "PriorLabs/TabPFN"
+    },
+    {
+      "agent_pr": "347",
+      "human_pr": "335",
+      "reason": "no_shared_file",
+      "repo": "PriorLabs/TabPFN"
+    },
+    {
+      "agent_pr": "483",
+      "human_pr": "488",
+      "reason": "no_shared_file",
+      "repo": "PriorLabs/TabPFN"
+    },
+    {
+      "agent_pr": "144",
+      "human_pr": "150",
+      "reason": "no_shared_file",
+      "repo": "PrunaAI/pruna"
+    },
+    {
+      "agent_pr": "115",
+      "human_pr": "129",
+      "reason": "no_shared_file",
+      "repo": "QuinnDamerell/OctoPrint-OctoEverywhere"
+    },
+    {
+      "agent_pr": "145",
+      "human_pr": "148",
+      "reason": "no_shared_file",
+      "repo": "RobotWebTools/roslibpy"
+    },
+    {
+      "agent_pr": "4667",
+      "human_pr": "5165",
+      "reason": "no_shared_file",
+      "repo": "SQLMesh/sqlmesh"
+    },
+    {
+      "agent_pr": "4712",
+      "human_pr": "5167",
+      "reason": "no_shared_file",
+      "repo": "SQLMesh/sqlmesh"
+    },
+    {
+      "agent_pr": "5078",
+      "human_pr": "5166",
+      "reason": "no_shared_file",
+      "repo": "SQLMesh/sqlmesh"
+    },
+    {
+      "agent_pr": "3063",
+      "human_pr": "3747",
+      "reason": "no_shared_file",
+      "repo": "Skyvern-AI/skyvern"
+    },
+    {
+      "agent_pr": "1330",
+      "human_pr": "1326",
+      "reason": "no_shared_file",
+      "repo": "TorchIO-project/torchio"
+    },
+    {
+      "agent_pr": "1490",
+      "human_pr": "1725",
+      "reason": "no_shared_file",
+      "repo": "TracecatHQ/tracecat"
+    },
+    {
+      "agent_pr": "1518",
+      "human_pr": "1729",
+      "reason": "no_shared_file",
+      "repo": "TracecatHQ/tracecat"
+    },
+    {
+      "agent_pr": "1527",
+      "human_pr": "1728",
+      "reason": "no_shared_file",
+      "repo": "TracecatHQ/tracecat"
+    },
+    {
+      "agent_pr": "409",
+      "human_pr": "408",
+      "reason": "no_shared_file",
+      "repo": "Upsonic/Upsonic"
+    },
+    {
+      "agent_pr": "544",
+      "human_pr": "552",
+      "reason": "no_shared_file",
+      "repo": "a16z/halmos"
+    },
+    {
+      "agent_pr": "650",
+      "human_pr": "642",
+      "reason": "no_shared_file",
+      "repo": "airbytehq/PyAirbyte"
+    },
+    {
+      "agent_pr": "692",
+      "human_pr": "689",
+      "reason": "no_shared_file",
+      "repo": "airbytehq/PyAirbyte"
+    },
+    {
+      "agent_pr": "598",
+      "human_pr": "595",
+      "reason": "no_shared_file",
+      "repo": "allenai/open-instruct"
+    },
+    {
+      "agent_pr": "159",
+      "human_pr": "166",
+      "reason": "no_shared_file",
+      "repo": "andrewm4894/anomstack"
+    },
+    {
+      "agent_pr": "161",
+      "human_pr": "174",
+      "reason": "no_shared_file",
+      "repo": "andrewm4894/anomstack"
+    },
+    {
+      "agent_pr": "406",
+      "human_pr": "402",
+      "reason": "no_shared_file",
+      "repo": "apache/casbin-pycasbin"
+    },
+    {
+      "agent_pr": "1437",
+      "human_pr": "1434",
+      "reason": "no_shared_file",
+      "repo": "atopile/atopile"
+    },
+    {
+      "agent_pr": "5171",
+      "human_pr": "5173",
+      "reason": "no_shared_file",
+      "repo": "bentoml/BentoML"
+    },
+    {
+      "agent_pr": "5194",
+      "human_pr": "5197",
+      "reason": "no_shared_file",
+      "repo": "bentoml/BentoML"
+    },
+    {
+      "agent_pr": "5222",
+      "human_pr": "5223",
+      "reason": "no_shared_file",
+      "repo": "bentoml/BentoML"
+    },
+    {
+      "agent_pr": "255",
+      "human_pr": "263",
+      "reason": "no_shared_file",
+      "repo": "bolna-ai/bolna"
+    },
+    {
+      "agent_pr": "256",
+      "human_pr": "259",
+      "reason": "no_shared_file",
+      "repo": "bolna-ai/bolna"
+    },
+    {
+      "agent_pr": "2668",
+      "human_pr": "3164",
+      "reason": "no_shared_file",
+      "repo": "browser-use/browser-use"
+    },
+    {
+      "agent_pr": "1820",
+      "human_pr": "1815",
+      "reason": "no_shared_file",
+      "repo": "cartography-cncf/cartography"
+    },
+    {
+      "agent_pr": "1925",
+      "human_pr": "1923",
+      "reason": "no_shared_file",
+      "repo": "cartography-cncf/cartography"
+    },
+    {
+      "agent_pr": "1944",
+      "human_pr": "1948",
+      "reason": "no_shared_file",
+      "repo": "cartography-cncf/cartography"
+    },
+    {
+      "agent_pr": "3130",
+      "human_pr": "3164",
+      "reason": "no_shared_file",
+      "repo": "chaiNNer-org/chaiNNer"
+    },
+    {
+      "agent_pr": "3134",
+      "human_pr": "3129",
+      "reason": "no_shared_file",
+      "repo": "chaiNNer-org/chaiNNer"
+    },
+    {
+      "agent_pr": "3141",
+      "human_pr": "3174",
+      "reason": "no_shared_file",
+      "repo": "chaiNNer-org/chaiNNer"
+    },
+    {
+      "agent_pr": "2372",
+      "human_pr": "2374",
+      "reason": "no_shared_file",
+      "repo": "conda-forge/conda-smithy"
+    },
+    {
+      "agent_pr": "313",
+      "human_pr": "300",
+      "reason": "no_shared_file",
+      "repo": "coze-dev/coze-py"
+    },
+    {
+      "agent_pr": "809",
+      "human_pr": "805",
+      "reason": "no_shared_file",
+      "repo": "crestalnetwork/intentkit"
+    },
+    {
+      "agent_pr": "834",
+      "human_pr": "833",
+      "reason": "no_shared_file",
+      "repo": "crestalnetwork/intentkit"
+    },
+    {
+      "agent_pr": "842",
+      "human_pr": "840",
+      "reason": "no_shared_file",
+      "repo": "crestalnetwork/intentkit"
+    },
+    {
+      "agent_pr": "160",
+      "human_pr": "168",
+      "reason": "no_shared_file",
+      "repo": "crewAIInc/crewAI-tools"
+    },
+    {
+      "agent_pr": "162",
+      "human_pr": "173",
+      "reason": "no_shared_file",
+      "repo": "crewAIInc/crewAI-tools"
+    },
+    {
+      "agent_pr": "175",
+      "human_pr": "174",
+      "reason": "no_shared_file",
+      "repo": "crewAIInc/crewAI-tools"
+    },
+    {
+      "agent_pr": "1801",
+      "human_pr": "1785",
+      "reason": "no_shared_file",
+      "repo": "deepmodeling/dpgen"
+    },
+    {
+      "agent_pr": "1808",
+      "human_pr": "1787",
+      "reason": "no_shared_file",
+      "repo": "deepmodeling/dpgen"
+    },
+    {
+      "agent_pr": "2707",
+      "human_pr": "2708",
+      "reason": "no_shared_file",
+      "repo": "dlt-hub/dlt"
+    },
+    {
+      "agent_pr": "1926",
+      "human_pr": "1934",
+      "reason": "no_shared_file",
+      "repo": "docling-project/docling"
+    },
+    {
+      "agent_pr": "156",
+      "human_pr": "170",
+      "reason": "no_shared_file",
+      "repo": "doobidoo/mcp-memory-service"
+    },
+    {
+      "agent_pr": "99",
+      "human_pr": "98",
+      "reason": "no_shared_file",
+      "repo": "exa-labs/exa-py"
+    },
+    {
+      "agent_pr": "114",
+      "human_pr": "138",
+      "reason": "no_shared_file",
+      "repo": "featureform/enrichmcp"
+    },
+    {
+      "agent_pr": "145",
+      "human_pr": "77",
+      "reason": "no_shared_file",
+      "repo": "featureform/enrichmcp"
+    },
+    {
+      "agent_pr": "533",
+      "human_pr": "522",
+      "reason": "no_shared_file",
+      "repo": "fgmacedo/python-statemachine"
+    },
+    {
+      "agent_pr": "975",
+      "human_pr": "978",
+      "reason": "no_shared_file",
+      "repo": "frenck/spook"
+    },
+    {
+      "agent_pr": "458",
+      "human_pr": "465",
+      "reason": "no_shared_file",
+      "repo": "gerlero/foamlib"
+    },
+    {
+      "agent_pr": "101245",
+      "human_pr": "107408",
+      "reason": "no_shared_file",
+      "repo": "getsentry/sentry"
+    },
+    {
+      "agent_pr": "4474",
+      "human_pr": "4478",
+      "reason": "no_shared_file",
+      "repo": "getsentry/sentry-python"
+    },
+    {
+      "agent_pr": "998",
+      "human_pr": "993",
+      "reason": "no_shared_file",
+      "repo": "getzep/graphiti"
+    },
+    {
+      "agent_pr": "225",
+      "human_pr": "223",
+      "reason": "no_shared_file",
+      "repo": "gidgethub/gidgethub"
+    },
+    {
+      "agent_pr": "108",
+      "human_pr": "211",
+      "reason": "no_shared_file",
+      "repo": "gobii-ai/gobii-platform"
+    },
+    {
+      "agent_pr": "59",
+      "human_pr": "64",
+      "reason": "no_shared_file",
+      "repo": "grll/mcpadapt"
+    },
+    {
+      "agent_pr": "429",
+      "human_pr": "658",
+      "reason": "no_shared_file",
+      "repo": "harbor-framework/terminal-bench-1"
+    },
+    {
+      "agent_pr": "153521",
+      "human_pr": "161507",
+      "reason": "no_shared_file",
+      "repo": "home-assistant/core"
+    },
+    {
+      "agent_pr": "6079",
+      "human_pr": "6069",
+      "reason": "no_shared_file",
+      "repo": "home-assistant/supervisor"
+    },
+    {
+      "agent_pr": "6110",
+      "human_pr": "6119",
+      "reason": "no_shared_file",
+      "repo": "home-assistant/supervisor"
+    },
+    {
+      "agent_pr": "1376",
+      "human_pr": "1367",
+      "reason": "no_shared_file",
+      "repo": "huggingface/smolagents"
+    },
+    {
+      "agent_pr": "66",
+      "human_pr": "39",
+      "reason": "no_shared_file",
+      "repo": "jimmc414/onefilellm"
+    },
+    {
+      "agent_pr": "60",
+      "human_pr": "58",
+      "reason": "no_shared_file",
+      "repo": "jxnl/kura"
+    },
+    {
+      "agent_pr": "4561",
+      "human_pr": "4553",
+      "reason": "no_shared_file",
+      "repo": "jxxghp/MoviePilot"
+    },
+    {
+      "agent_pr": "4777",
+      "human_pr": "4790",
+      "reason": "no_shared_file",
+      "repo": "jxxghp/MoviePilot"
+    },
+    {
+      "agent_pr": "5101",
+      "human_pr": "5081",
+      "reason": "no_shared_file",
+      "repo": "keephq/keep"
+    },
+    {
+      "agent_pr": "949",
+      "human_pr": "958",
+      "reason": "no_shared_file",
+      "repo": "kyegomez/swarms"
+    },
+    {
+      "agent_pr": "98",
+      "human_pr": "106",
+      "reason": "no_shared_file",
+      "repo": "landing-ai/ade-cli"
+    },
+    {
+      "agent_pr": "1397",
+      "human_pr": "1408",
+      "reason": "no_shared_file",
+      "repo": "langbot-app/LangBot"
+    },
+    {
+      "agent_pr": "1610",
+      "human_pr": "1622",
+      "reason": "no_shared_file",
+      "repo": "langbot-app/LangBot"
+    },
+    {
+      "agent_pr": "12976",
+      "human_pr": "13033",
+      "reason": "no_shared_file",
+      "repo": "localstack/localstack"
+    },
+    {
+      "agent_pr": "366",
+      "human_pr": "356",
+      "reason": "no_shared_file",
+      "repo": "lordmauve/pgzero"
+    },
+    {
+      "agent_pr": "12",
+      "human_pr": "9",
+      "reason": "no_shared_file",
+      "repo": "lostleaf/binance-datatool"
+    },
+    {
+      "agent_pr": "2806",
+      "human_pr": "2809",
+      "reason": "no_shared_file",
+      "repo": "mabel-dev/opteryx"
+    },
+    {
+      "agent_pr": "301",
+      "human_pr": "314",
+      "reason": "no_shared_file",
+      "repo": "machinewrapped/llm-subtrans"
+    },
+    {
+      "agent_pr": "375",
+      "human_pr": "367",
+      "reason": "no_shared_file",
+      "repo": "machinewrapped/llm-subtrans"
+    },
+    {
+      "agent_pr": "107",
+      "human_pr": "109",
+      "reason": "no_shared_file",
+      "repo": "mandarons/icloudpy"
+    },
+    {
+      "agent_pr": "125",
+      "human_pr": "111",
+      "reason": "no_shared_file",
+      "repo": "mangiucugna/json_repair"
+    },
+    {
+      "agent_pr": "3467",
+      "human_pr": "4890",
+      "reason": "no_shared_file",
+      "repo": "marimo-team/marimo"
+    },
+    {
+      "agent_pr": "134",
+      "human_pr": "140",
+      "reason": "no_shared_file",
+      "repo": "marin-community/haliax"
+    },
+    {
+      "agent_pr": "167",
+      "human_pr": "164",
+      "reason": "no_shared_file",
+      "repo": "marin-community/haliax"
+    },
+    {
+      "agent_pr": "207",
+      "human_pr": "223",
+      "reason": "no_shared_file",
+      "repo": "marin-community/haliax"
+    },
+    {
+      "agent_pr": "1005",
+      "human_pr": "1019",
+      "reason": "no_shared_file",
+      "repo": "marin-community/levanter"
+    },
+    {
+      "agent_pr": "1009",
+      "human_pr": "1000",
+      "reason": "no_shared_file",
+      "repo": "marin-community/levanter"
+    },
+    {
+      "agent_pr": "1043",
+      "human_pr": "1046",
+      "reason": "no_shared_file",
+      "repo": "marin-community/levanter"
+    },
+    {
+      "agent_pr": "206",
+      "human_pr": "211",
+      "reason": "no_shared_file",
+      "repo": "meteostat/meteostat"
+    },
+    {
+      "agent_pr": "209",
+      "human_pr": "204",
+      "reason": "no_shared_file",
+      "repo": "meteostat/meteostat"
+    },
+    {
+      "agent_pr": "192",
+      "human_pr": "465",
+      "reason": "no_shared_file",
+      "repo": "mfat/sshpilot"
+    },
+    {
+      "agent_pr": "206",
+      "human_pr": "506",
+      "reason": "no_shared_file",
+      "repo": "mfat/sshpilot"
+    },
+    {
+      "agent_pr": "637",
+      "human_pr": "649",
+      "reason": "no_shared_file",
+      "repo": "mfat/sshpilot"
+    },
+    {
+      "agent_pr": "51",
+      "human_pr": "58",
+      "reason": "no_shared_file",
+      "repo": "microsoft/AIOpsLab"
+    },
+    {
+      "agent_pr": "73",
+      "human_pr": "84",
+      "reason": "no_shared_file",
+      "repo": "microsoft/AIOpsLab"
+    },
+    {
+      "agent_pr": "2078",
+      "human_pr": "2084",
+      "reason": "no_shared_file",
+      "repo": "microsoft/Olive"
+    },
+    {
+      "agent_pr": "7222",
+      "human_pr": "7318",
+      "reason": "no_shared_file",
+      "repo": "microsoft/Qcodes"
+    },
+    {
+      "agent_pr": "7333",
+      "human_pr": "7344",
+      "reason": "no_shared_file",
+      "repo": "microsoft/Qcodes"
+    },
+    {
+      "agent_pr": "148",
+      "human_pr": "145",
+      "reason": "no_shared_file",
+      "repo": "microsoft/agent-lightning"
+    },
+    {
+      "agent_pr": "12",
+      "human_pr": "19",
+      "reason": "no_shared_file",
+      "repo": "microsoft/amplifier"
+    },
+    {
+      "agent_pr": "2",
+      "human_pr": "8",
+      "reason": "no_shared_file",
+      "repo": "microsoft/amplifier"
+    },
+    {
+      "agent_pr": "126",
+      "human_pr": "135",
+      "reason": "no_shared_file",
+      "repo": "microsoft/debug-gym"
+    },
+    {
+      "agent_pr": "129",
+      "human_pr": "137",
+      "reason": "no_shared_file",
+      "repo": "microsoft/debug-gym"
+    },
+    {
+      "agent_pr": "466",
+      "human_pr": "451",
+      "reason": "no_shared_file",
+      "repo": "microsoft/fabric-cicd"
+    },
+    {
+      "agent_pr": "2383",
+      "human_pr": "2380",
+      "reason": "no_shared_file",
+      "repo": "microsoft/onnxscript"
+    },
+    {
+      "agent_pr": "2431",
+      "human_pr": "2434",
+      "reason": "no_shared_file",
+      "repo": "microsoft/onnxscript"
+    },
+    {
+      "agent_pr": "2574",
+      "human_pr": "2575",
+      "reason": "no_shared_file",
+      "repo": "microsoft/onnxscript"
+    },
+    {
+      "agent_pr": "103",
+      "human_pr": "100",
+      "reason": "no_shared_file",
+      "repo": "microsoft/sarif-tools"
+    },
+    {
+      "agent_pr": "2092",
+      "human_pr": "2086",
+      "reason": "no_shared_file",
+      "repo": "mikel-brostrom/boxmot"
+    },
+    {
+      "agent_pr": "2093",
+      "human_pr": "2085",
+      "reason": "no_shared_file",
+      "repo": "mikel-brostrom/boxmot"
+    },
+    {
+      "agent_pr": "102",
+      "human_pr": "97",
+      "reason": "no_shared_file",
+      "repo": "mistralai/mistral-common"
+    },
+    {
+      "agent_pr": "103",
+      "human_pr": "95",
+      "reason": "no_shared_file",
+      "repo": "mistralai/mistral-common"
+    },
+    {
+      "agent_pr": "926",
+      "human_pr": "930",
+      "reason": "no_shared_file",
+      "repo": "mlco2/codecarbon"
+    },
+    {
+      "agent_pr": "18362",
+      "human_pr": "20597",
+      "reason": "no_shared_file",
+      "repo": "mlflow/mlflow"
+    },
+    {
+      "agent_pr": "1132",
+      "human_pr": "1143",
+      "reason": "no_shared_file",
+      "repo": "openatx/uiautomator2"
+    },
+    {
+      "agent_pr": "1137",
+      "human_pr": "1128",
+      "reason": "no_shared_file",
+      "repo": "openatx/uiautomator2"
+    },
+    {
+      "agent_pr": "348",
+      "human_pr": "339",
+      "reason": "no_shared_file",
+      "repo": "optiland/optiland"
+    },
+    {
+      "agent_pr": "375",
+      "human_pr": "376",
+      "reason": "no_shared_file",
+      "repo": "optiland/optiland"
+    },
+    {
+      "agent_pr": "167",
+      "human_pr": "175",
+      "reason": "no_shared_file",
+      "repo": "oraios/serena"
+    },
+    {
+      "agent_pr": "24",
+      "human_pr": "17",
+      "reason": "no_shared_file",
+      "repo": "osori/korean-romanizer"
+    },
+    {
+      "agent_pr": "25",
+      "human_pr": "28",
+      "reason": "no_shared_file",
+      "repo": "osori/korean-romanizer"
+    },
+    {
+      "agent_pr": "1949",
+      "human_pr": "1946",
+      "reason": "no_shared_file",
+      "repo": "oumi-ai/oumi"
+    },
+    {
+      "agent_pr": "1974",
+      "human_pr": "1969",
+      "reason": "no_shared_file",
+      "repo": "oumi-ai/oumi"
+    },
+    {
+      "agent_pr": "5140",
+      "human_pr": "5298",
+      "reason": "no_shared_file",
+      "repo": "owid/etl"
+    },
+    {
+      "agent_pr": "1012",
+      "human_pr": "1015",
+      "reason": "no_shared_file",
+      "repo": "pastas/pastas"
+    },
+    {
+      "agent_pr": "1695",
+      "human_pr": "1696",
+      "reason": "no_shared_file",
+      "repo": "pazz/alot"
+    },
+    {
+      "agent_pr": "3575",
+      "human_pr": "3585",
+      "reason": "no_shared_file",
+      "repo": "pdm-project/pdm"
+    },
+    {
+      "agent_pr": "95",
+      "human_pr": "85",
+      "reason": "no_shared_file",
+      "repo": "princeton-pli/hal-harness"
+    },
+    {
+      "agent_pr": "56",
+      "human_pr": "63",
+      "reason": "no_shared_file",
+      "repo": "project-numina/kimina-lean-server"
+    },
+    {
+      "agent_pr": "10534",
+      "human_pr": "10535",
+      "reason": "no_shared_file",
+      "repo": "pylint-dev/pylint"
+    },
+    {
+      "agent_pr": "7928",
+      "human_pr": "7921",
+      "reason": "no_shared_file",
+      "repo": "pymc-devs/pymc"
+    },
+    {
+      "agent_pr": "1574",
+      "human_pr": "1582",
+      "reason": "no_shared_file",
+      "repo": "pymc-devs/pytensor"
+    },
+    {
+      "agent_pr": "1628",
+      "human_pr": "1629",
+      "reason": "no_shared_file",
+      "repo": "pymc-devs/pytensor"
+    },
+    {
+      "agent_pr": "1649",
+      "human_pr": "1646",
+      "reason": "no_shared_file",
+      "repo": "pymc-devs/pytensor"
+    },
+    {
+      "agent_pr": "279",
+      "human_pr": "277",
+      "reason": "no_shared_file",
+      "repo": "python-cachier/cachier"
+    },
+    {
+      "agent_pr": "812",
+      "human_pr": "802",
+      "reason": "no_shared_file",
+      "repo": "python-social-auth/social-app-django"
+    },
+    {
+      "agent_pr": "4908",
+      "human_pr": "4906",
+      "reason": "no_shared_file",
+      "repo": "python-telegram-bot/python-telegram-bot"
+    },
+    {
+      "agent_pr": "460",
+      "human_pr": "447",
+      "reason": "no_shared_file",
+      "repo": "ranaroussi/quantstats"
+    },
+    {
+      "agent_pr": "5575",
+      "human_pr": "5574",
+      "reason": "no_shared_file",
+      "repo": "reflex-dev/reflex"
+    },
+    {
+      "agent_pr": "5683",
+      "human_pr": "5687",
+      "reason": "no_shared_file",
+      "repo": "reflex-dev/reflex"
+    },
+    {
+      "agent_pr": "1485",
+      "human_pr": "1497",
+      "reason": "no_shared_file",
+      "repo": "reflex-dev/reflex-web"
+    },
+    {
+      "agent_pr": "1502",
+      "human_pr": "1506",
+      "reason": "no_shared_file",
+      "repo": "reflex-dev/reflex-web"
+    },
+    {
+      "agent_pr": "1508",
+      "human_pr": "1516",
+      "reason": "no_shared_file",
+      "repo": "roboflow/inference"
+    },
+    {
+      "agent_pr": "134",
+      "human_pr": "144",
+      "reason": "no_shared_file",
+      "repo": "roeniss/dhlottery-api"
+    },
+    {
+      "agent_pr": "622",
+      "human_pr": "623",
+      "reason": "no_shared_file",
+      "repo": "scikit-hep/hist"
+    },
+    {
+      "agent_pr": "988",
+      "human_pr": "995",
+      "reason": "no_shared_file",
+      "repo": "scoringengine/scoringengine"
+    },
+    {
+      "agent_pr": "5787",
+      "human_pr": "6875",
+      "reason": "no_shared_file",
+      "repo": "skypilot-org/skypilot"
+    },
+    {
+      "agent_pr": "540",
+      "human_pr": "546",
+      "reason": "no_shared_file",
+      "repo": "sooperset/mcp-atlassian"
+    },
+    {
+      "agent_pr": "8478",
+      "human_pr": "8479",
+      "reason": "no_shared_file",
+      "repo": "stanfordnlp/dspy"
+    },
+    {
+      "agent_pr": "8635",
+      "human_pr": "8638",
+      "reason": "no_shared_file",
+      "repo": "stanfordnlp/dspy"
+    },
+    {
+      "agent_pr": "8697",
+      "human_pr": "8707",
+      "reason": "no_shared_file",
+      "repo": "stanfordnlp/dspy"
+    },
+    {
+      "agent_pr": "564",
+      "human_pr": "559",
+      "reason": "no_shared_file",
+      "repo": "sunbeam-labs/sunbeam"
+    },
+    {
+      "agent_pr": "567",
+      "human_pr": "585",
+      "reason": "no_shared_file",
+      "repo": "sunbeam-labs/sunbeam"
+    },
+    {
+      "agent_pr": "38",
+      "human_pr": "37",
+      "reason": "no_shared_file",
+      "repo": "swarmzero/swarmzero"
+    },
+    {
+      "agent_pr": "2325",
+      "human_pr": "2329",
+      "reason": "no_shared_file",
+      "repo": "talmolab/sleap"
+    },
+    {
+      "agent_pr": "153",
+      "human_pr": "159",
+      "reason": "no_shared_file",
+      "repo": "tanganke/fusion_bench"
+    },
+    {
+      "agent_pr": "1152",
+      "human_pr": "1150",
+      "reason": "no_shared_file",
+      "repo": "temporalio/sdk-python"
+    },
+    {
+      "agent_pr": "10382",
+      "human_pr": "11802",
+      "reason": "no_shared_file",
+      "repo": "tinygrad/tinygrad"
+    },
+    {
+      "agent_pr": "126",
+      "human_pr": "150",
+      "reason": "no_shared_file",
+      "repo": "tomquist/AstraMeter"
+    },
+    {
+      "agent_pr": "134",
+      "human_pr": "153",
+      "reason": "no_shared_file",
+      "repo": "tomquist/AstraMeter"
+    },
+    {
+      "agent_pr": "5754",
+      "human_pr": "5781",
+      "reason": "no_shared_file",
+      "repo": "translate/translate"
+    },
+    {
+      "agent_pr": "5765",
+      "human_pr": "5804",
+      "reason": "no_shared_file",
+      "repo": "translate/translate"
+    },
+    {
+      "agent_pr": "406",
+      "human_pr": "411",
+      "reason": "no_shared_file",
+      "repo": "ucbepic/docetl"
+    },
+    {
+      "agent_pr": "413",
+      "human_pr": "409",
+      "reason": "no_shared_file",
+      "repo": "ucbepic/docetl"
+    },
+    {
+      "agent_pr": "427",
+      "human_pr": "428",
+      "reason": "no_shared_file",
+      "repo": "ucbepic/docetl"
+    },
+    {
+      "agent_pr": "1122",
+      "human_pr": "1170",
+      "reason": "no_shared_file",
+      "repo": "unclecode/crawl4ai"
+    },
+    {
+      "agent_pr": "1142",
+      "human_pr": "1133",
+      "reason": "no_shared_file",
+      "repo": "vespa-engine/pyvespa"
+    },
+    {
+      "agent_pr": "52",
+      "human_pr": "49",
+      "reason": "no_shared_file",
+      "repo": "vlm-run/vlmrun-hub"
+    },
+    {
+      "agent_pr": "58",
+      "human_pr": "66",
+      "reason": "no_shared_file",
+      "repo": "vlm-run/vlmrun-hub"
+    },
+    {
+      "agent_pr": "1130",
+      "human_pr": "1125",
+      "reason": "no_shared_file",
+      "repo": "weecology/DeepForest"
+    },
+    {
+      "agent_pr": "1181",
+      "human_pr": "1185",
+      "reason": "no_shared_file",
+      "repo": "weecology/DeepForest"
+    },
+    {
+      "agent_pr": "589",
+      "human_pr": "648",
+      "reason": "no_shared_file",
+      "repo": "willmiao/ComfyUI-Lora-Manager"
+    },
+    {
+      "agent_pr": "578",
+      "human_pr": "589",
+      "reason": "no_shared_file",
+      "repo": "wizarrrr/wizarr"
+    },
+    {
+      "agent_pr": "612",
+      "human_pr": "616",
+      "reason": "no_shared_file",
+      "repo": "wizarrrr/wizarr"
+    },
+    {
+      "agent_pr": "885",
+      "human_pr": "887",
+      "reason": "no_shared_file",
+      "repo": "writer/writer-framework"
+    },
+    {
+      "agent_pr": "927",
+      "human_pr": "930",
+      "reason": "no_shared_file",
+      "repo": "writer/writer-framework"
+    },
+    {
+      "agent_pr": "246",
+      "human_pr": "261",
+      "reason": "no_shared_file",
+      "repo": "wwood/singlem"
+    },
+    {
+      "agent_pr": "40",
+      "human_pr": "44",
+      "reason": "no_shared_file",
+      "repo": "yangkyeongmo/mcp-server-apache-airflow"
+    },
+    {
+      "agent_pr": "3677",
+      "human_pr": "3944",
+      "reason": "no_shared_file",
+      "repo": "zenml-io/zenml"
+    },
+    {
+      "agent_pr": "3678",
+      "human_pr": "3942",
+      "reason": "no_shared_file",
+      "repo": "zenml-io/zenml"
+    },
+    {
+      "agent_pr": "3997",
+      "human_pr": "3992",
+      "reason": "no_shared_file",
+      "repo": "zenml-io/zenml"
+    }
+  ],
+  "list_sha256": "00401f1fd6e72a820085fc66aa1ce1638c9e314ce17ca5c4aa192201e3566c54",
+  "matched": 92,
+  "rules_sha256": "2a3ed899da1652ec7bcb9e72e8e7808c9cbb6494418de35358fb7ea8e4e6c5a1",
+  "seed": 20261020
+}

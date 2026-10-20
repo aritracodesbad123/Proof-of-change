@@ -380,6 +380,13 @@
       "string",
       "null"
      ]
+    },
+    "gxx": {
+     "type": [
+      "string",
+      "null"
+     ],
+     "description": "OPTIONAL (rev 13). First line of g++ --version on the machine that ran, or null when g++ is not installed. pandas needs that compiler to build. It does not affect the verdict."
     }
    }
   },
@@ -1992,6 +1999,11 @@
    "rev": 12,
    "date": "2026-10-20",
    "change": "verdict and verdict_before_coverage_gate may be no_code_change. Nothing becomes required, so rev 1-11 records stay valid."
+  },
+  {
+   "rev": 13,
+   "date": "2026-10-20",
+   "change": "optional machine_type.gxx (the g++ version line, or null). Nothing becomes required, so rev 1-12 records stay valid."
   }
  ],
  "if": {

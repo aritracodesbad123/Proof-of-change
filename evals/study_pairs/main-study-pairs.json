@@ -1,0 +1,462 @@
+[
+  {
+    "repo": "ArcInstitute/state",
+    "agent_pr": 216,
+    "human_pr": 213
+  },
+  {
+    "repo": "PrunaAI/pruna",
+    "agent_pr": 143,
+    "human_pr": 140
+  },
+  {
+    "repo": "adamchainz/time-machine",
+    "agent_pr": 556,
+    "human_pr": 560
+  },
+  {
+    "repo": "JoshuaC215/agent-service-toolkit",
+    "agent_pr": 202,
+    "human_pr": 201
+  },
+  {
+    "repo": "earthobservations/wetterdienst",
+    "agent_pr": 1512,
+    "human_pr": 1514
+  },
+  {
+    "repo": "run-llama/llama-agents",
+    "agent_pr": 118,
+    "human_pr": 113
+  },
+  {
+    "repo": "yangkyeongmo/mcp-server-apache-airflow",
+    "agent_pr": 39,
+    "human_pr": 27
+  },
+  {
+    "repo": "geoalchemy/geoalchemy2",
+    "agent_pr": 567,
+    "human_pr": 564
+  },
+  {
+    "repo": "wwood/singlem",
+    "agent_pr": 240,
+    "human_pr": 259
+  },
+  {
+    "repo": "getsentry/sentry-python",
+    "agent_pr": 4476,
+    "human_pr": 4485
+  },
+  {
+    "repo": "lichess-org/berserk",
+    "agent_pr": 110,
+    "human_pr": 124
+  },
+  {
+    "repo": "jendrikseipp/vulture",
+    "agent_pr": 399,
+    "human_pr": 404
+  },
+  {
+    "repo": "pythermalcomfort/pythermalcomfort",
+    "agent_pr": 254,
+    "human_pr": 248
+  },
+  {
+    "repo": "intellectronica/skillz",
+    "agent_pr": 4,
+    "human_pr": 9
+  },
+  {
+    "repo": "altmenorg/HAsmartirrigation",
+    "agent_pr": 585,
+    "human_pr": 583
+  },
+  {
+    "repo": "subzeroid/instagrapi",
+    "agent_pr": 2218,
+    "human_pr": 2206
+  },
+  {
+    "repo": "microsoft/magentic-ui",
+    "agent_pr": 59,
+    "human_pr": 68
+  },
+  {
+    "repo": "project-numina/kimina-lean-server",
+    "agent_pr": 53,
+    "human_pr": 43
+  },
+  {
+    "repo": "microsoft/fabric-cicd",
+    "agent_pr": 347,
+    "human_pr": 353
+  },
+  {
+    "repo": "RobotWebTools/roslibpy",
+    "agent_pr": 142,
+    "human_pr": 146
+  },
+  {
+    "repo": "gerlero/foamlib",
+    "agent_pr": 468,
+    "human_pr": 456
+  },
+  {
+    "repo": "lidofinance/diffyscan",
+    "agent_pr": 90,
+    "human_pr": 83
+  },
+  {
+    "repo": "olucurious/PyFCM",
+    "agent_pr": 376,
+    "human_pr": 372
+  },
+  {
+    "repo": "wwood/singlem",
+    "agent_pr": 242,
+    "human_pr": 256
+  },
+  {
+    "repo": "567-labs/instructor",
+    "agent_pr": 1735,
+    "human_pr": 1758
+  },
+  {
+    "repo": "bolna-ai/bolna",
+    "agent_pr": 254,
+    "human_pr": 273
+  },
+  {
+    "repo": "a16z/halmos",
+    "agent_pr": 539,
+    "human_pr": 535
+  },
+  {
+    "repo": "PrefectHQ/marvin",
+    "agent_pr": 1162,
+    "human_pr": 1164
+  },
+  {
+    "repo": "codegen-sh/codegen",
+    "agent_pr": 701,
+    "human_pr": 702
+  },
+  {
+    "repo": "VRSEN/agency-swarm",
+    "agent_pr": 309,
+    "human_pr": 310
+  },
+  {
+    "repo": "roboflow/roboflow-python",
+    "agent_pr": 385,
+    "human_pr": 379
+  },
+  {
+    "repo": "mostly-ai/mostlyai",
+    "agent_pr": 608,
+    "human_pr": 607
+  },
+  {
+    "repo": "a16z/halmos",
+    "agent_pr": 551,
+    "human_pr": 531
+  },
+  {
+    "repo": "Archmonger/django-dbbackup",
+    "agent_pr": 604,
+    "human_pr": 628
+  },
+  {
+    "repo": "jeshraghian/snntorch",
+    "agent_pr": 382,
+    "human_pr": 380
+  },
+  {
+    "repo": "roboflow/roboflow-python",
+    "agent_pr": 395,
+    "human_pr": 392
+  },
+  {
+    "repo": "mrwadams/stride-gpt",
+    "agent_pr": 72,
+    "human_pr": 77
+  },
+  {
+    "repo": "unclecode/crawl4ai",
+    "agent_pr": 1192,
+    "human_pr": 1265
+  },
+  {
+    "repo": "jupytext/jupytext",
+    "agent_pr": 1454,
+    "human_pr": 1457
+  },
+  {
+    "repo": "stefanoamorelli/sec-edgar-mcp",
+    "agent_pr": 10,
+    "human_pr": 12
+  },
+  {
+    "repo": "groq/openbench",
+    "agent_pr": 261,
+    "human_pr": 276
+  },
+  {
+    "repo": "bespokelabsai/curator",
+    "agent_pr": 291,
+    "human_pr": 289
+  },
+  {
+    "repo": "mabel-dev/opteryx",
+    "agent_pr": 2800,
+    "human_pr": 2811
+  },
+  {
+    "repo": "bruin-data/ingestr",
+    "agent_pr": 256,
+    "human_pr": 257
+  },
+  {
+    "repo": "Archmonger/django-dbbackup",
+    "agent_pr": 623,
+    "human_pr": 631
+  },
+  {
+    "repo": "kaixxx/noScribe",
+    "agent_pr": 206,
+    "human_pr": 220
+  },
+  {
+    "repo": "gerlero/foamlib",
+    "agent_pr": 462,
+    "human_pr": 466
+  },
+  {
+    "repo": "reflex-dev/reflex-web",
+    "agent_pr": 1452,
+    "human_pr": 1451
+  },
+  {
+    "repo": "jupytext/jupytext",
+    "agent_pr": 1461,
+    "human_pr": 1455
+  },
+  {
+    "repo": "zfit/zfit",
+    "agent_pr": 643,
+    "human_pr": 647
+  },
+  {
+    "repo": "tomquist/AstraMeter",
+    "agent_pr": 135,
+    "human_pr": 125
+  },
+  {
+    "repo": "mll-lab-nu/RAGEN",
+    "agent_pr": 112,
+    "human_pr": 125
+  },
+  {
+    "repo": "Breakthrough/DVR-Scan",
+    "agent_pr": 236,
+    "human_pr": 235
+  },
+  {
+    "repo": "jendrikseipp/rednotebook",
+    "agent_pr": 841,
+    "human_pr": 845
+  },
+  {
+    "repo": "intellectronica/skillz",
+    "agent_pr": 6,
+    "human_pr": 10
+  },
+  {
+    "repo": "openatx/adbutils",
+    "agent_pr": 194,
+    "human_pr": 196
+  },
+  {
+    "repo": "intellectronica/skillz",
+    "agent_pr": 2,
+    "human_pr": 7
+  },
+  {
+    "repo": "meilisearch/meilisearch-mcp",
+    "agent_pr": 42,
+    "human_pr": 22
+  },
+  {
+    "repo": "PriorLabs/tabpfn-extensions",
+    "agent_pr": 145,
+    "human_pr": 140
+  },
+  {
+    "repo": "joshyattridge/smart-money-concepts",
+    "agent_pr": 88,
+    "human_pr": 75
+  },
+  {
+    "repo": "jimmc414/onefilellm",
+    "agent_pr": 57,
+    "human_pr": 41
+  },
+  {
+    "repo": "Rudra-ravi/wikipedia-mcp",
+    "agent_pr": 16,
+    "human_pr": 27
+  },
+  {
+    "repo": "roboflow/roboflow-python",
+    "agent_pr": 402,
+    "human_pr": 407
+  },
+  {
+    "repo": "martinblech/xmltodict",
+    "agent_pr": 389,
+    "human_pr": 378
+  },
+  {
+    "repo": "compas-dev/compas",
+    "agent_pr": 1481,
+    "human_pr": 1496
+  },
+  {
+    "repo": "PriorLabs/tabpfn-extensions",
+    "agent_pr": 159,
+    "human_pr": 165
+  },
+  {
+    "repo": "Uberi/speech_recognition",
+    "agent_pr": 846,
+    "human_pr": 847
+  },
+  {
+    "repo": "strawberry-graphql/strawberry",
+    "agent_pr": 3921,
+    "human_pr": 3923
+  },
+  {
+    "repo": "DLR-RM/stable-baselines3",
+    "agent_pr": 2170,
+    "human_pr": 2163
+  },
+  {
+    "repo": "Uberi/speech_recognition",
+    "agent_pr": 845,
+    "human_pr": 843
+  },
+  {
+    "repo": "xian-network/xian-contracting",
+    "agent_pr": 137,
+    "human_pr": 145
+  },
+  {
+    "repo": "mll-lab-nu/RAGEN",
+    "agent_pr": 113,
+    "human_pr": 127
+  },
+  {
+    "repo": "aws/bedrock-agentcore-starter-toolkit",
+    "agent_pr": 90,
+    "human_pr": 87
+  },
+  {
+    "repo": "openatx/adbutils",
+    "agent_pr": 188,
+    "human_pr": 184
+  },
+  {
+    "repo": "Kanaries/pygwalker",
+    "agent_pr": 701,
+    "human_pr": 699
+  },
+  {
+    "repo": "kazewong/flowMC",
+    "agent_pr": 233,
+    "human_pr": 235
+  },
+  {
+    "repo": "botingw/rulebook-ai",
+    "agent_pr": 26,
+    "human_pr": 30
+  },
+  {
+    "repo": "Hankanman/Area-Occupancy-Detection",
+    "agent_pr": 71,
+    "human_pr": 66
+  },
+  {
+    "repo": "altmenorg/HAsmartirrigation",
+    "agent_pr": 586,
+    "human_pr": 584
+  },
+  {
+    "repo": "mikumifa/biliTickerBuy",
+    "agent_pr": 808,
+    "human_pr": 819
+  },
+  {
+    "repo": "getzep/graphiti",
+    "agent_pr": 939,
+    "human_pr": 931
+  },
+  {
+    "repo": "Breakthrough/DVR-Scan",
+    "agent_pr": 233,
+    "human_pr": 230
+  },
+  {
+    "repo": "Stable-Baselines-Team/stable-baselines3-contrib",
+    "agent_pr": 307,
+    "human_pr": 318
+  },
+  {
+    "repo": "JusticeRage/Gepetto",
+    "agent_pr": 101,
+    "human_pr": 125
+  },
+  {
+    "repo": "microsoft/fabric-cicd",
+    "agent_pr": 587,
+    "human_pr": 580
+  },
+  {
+    "repo": "zauberzeug/nicegui",
+    "agent_pr": 4766,
+    "human_pr": 4769
+  },
+  {
+    "repo": "DonDebonair/slack-machine",
+    "agent_pr": 1254,
+    "human_pr": 1260
+  },
+  {
+    "repo": "microsoft/Olive",
+    "agent_pr": 1915,
+    "human_pr": 1919
+  },
+  {
+    "repo": "andrewm4894/anomstack",
+    "agent_pr": 175,
+    "human_pr": 176
+  },
+  {
+    "repo": "getzep/graphiti",
+    "agent_pr": 924,
+    "human_pr": 927
+  },
+  {
+    "repo": "swarmzero/swarmzero",
+    "agent_pr": 34,
+    "human_pr": 39
+  },
+  {
+    "repo": "mabel-dev/opteryx",
+    "agent_pr": 2816,
+    "human_pr": 2820
+  }
+]

@@ -36,13 +36,25 @@ def test_machine_type_needs_arch_and_os(upset):
     assert any("arch" in e for e in validate_record(r))
 
 
+def test_gxx_version_is_optional(upset):
+    r = copy.deepcopy(upset)
+    assert "gxx" not in r["machine_type"]
+    assert validate_record(r) == []
+    r["machine_type"]["gxx"] = None
+    assert validate_record(r) == []
+    r["machine_type"]["gxx"] = "g++ (Ubuntu 13.3.0) 13.3.0"
+    assert validate_record(r) == []
+    r["machine_type"]["gxx"] = 13
+    assert any("gxx" in e for e in validate_record(r))
+
+
 def test_schema_is_the_shared_file():
     from guardrails.schema import COMPATIBLE_SCHEMA_SHA256, SCHEMA_REVISION
     assert SCHEMA_PATH.parts[-3:] == ("harness", "schema", "observation.schema.json")
-    assert SCHEMA_SHA256 == "fc02de9e9a2a2cd2c6f189fa818f76ba814039cb55d01c81d522f65301eb8937"  # rev 12
-    assert SCHEMA_REVISION == 12
+    assert SCHEMA_SHA256 == "ea940732e32829455ad11b0799b00634f30522415320684df5ae4244798de88e"  # rev 13
+    assert SCHEMA_REVISION == 13
     got = sorted(COMPATIBLE_SCHEMA_SHA256.values(), key=lambda s: int(s.split()[-1]))
-    assert got == [f"rev {n}" for n in range(1, 13)]
+    assert got == [f"rev {n}" for n in range(1, 14)]
     assert COMPATIBLE_SCHEMA_SHA256["5a3c3d36b7730ce74d0f23b03c88ea862ea35cc327c7d79481fca8b972e8383e"] == "rev 1"
     readme = (SCHEMA_PATH.parent / "README.md").read_text()
     assert all(sha in readme for sha in COMPATIBLE_SCHEMA_SHA256)  # documented
@@ -53,7 +65,7 @@ def test_rev1_records_still_valid_under_current_rev(golden_v1_records):
     for r in golden_v1_records:
         assert r["schema_sha256"].startswith("5a3c3d36")  # the golden records were written against rev 1
         assert validate_record(r, require_v1=True) == []
-        assert "valid under current rev 12" in schema_reference_note(r)
+        assert "valid under current rev 13" in schema_reference_note(r)
 
 
 def test_rev2_optional_fields(golden_v1_records):
