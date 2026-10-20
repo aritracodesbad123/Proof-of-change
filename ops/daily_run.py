@@ -809,7 +809,10 @@ def install_declared_test_deps(venvs: dict, reqs: list[str], log: Path, timeout:
 
 
 def direct_url(venv: Path, dist: str) -> dict | None:
-    """The installed distribution's direct_url.json (PEP 610), or None when it has none."""
+    """The installed distribution's direct_url.json (PEP 610), or None when it has none.
+
+    Name lookup, used by the previous commit guard. The guard a source comparison runs matches the checkout
+    folder instead (`check_installed_commit`)."""
     want = _norm(dist)
     for di in glob.glob(str(site_packages(venv) / "*.dist-info")):
         name = os.path.basename(di)[:-len(".dist-info")].rsplit("-", 1)[0]
@@ -824,24 +827,86 @@ def direct_url(venv: Path, dist: str) -> dict | None:
     return None
 
 
-def check_installed_commit(venv: Path, dist: str, expected_sha: str, checkout: Path | None = None) -> tuple[bool, dict]:
-    """Does the installed `dist` come from `expected_sha`? Fails closed.
+def _sha_same(expected: str, got: str | None) -> bool:
+    """True when `got` is the requested commit. A short SHA (7+ hex) matches by prefix."""
+    return bool(got) and len(expected) >= 7 and (got.startswith(expected) or expected.startswith(got))
+
+
+def _checkout_head(checkout: Path) -> str:
+    """git rev-parse HEAD of a side checkout. The environment is the allowlist, so git does not see host secrets."""
+    return subprocess.run(["git", "-C", str(checkout), "rev-parse", "HEAD"], capture_output=True, text=True,
+                          env=base_env(Path(checkout).parent / "home-git")).stdout.strip()
+
+
+def _dist_info_name(di: Path) -> str:
+    """Distribution name from METADATA, or from the ``name-version.dist-info`` directory."""
+    meta = di / "METADATA"
+    try:
+        text = meta.read_text(errors="replace")
+    except OSError:
+        text = ""
+    for line in text.splitlines():
+        if not line.strip():
+            break
+        if line[:5].lower() == "name:":
+            name = line.split(":", 1)[1].strip()
+            if name:
+                return name
+    return di.name[:-len(".dist-info")].rsplit("-", 1)[0]
+
+
+def _load_direct_url(di: Path) -> dict | None:
+    f = di / "direct_url.json"
+    if not f.is_file():
+        return None
+    try:
+        parsed = json.loads(f.read_text())
+    except (OSError, ValueError):
+        return {"_unreadable": True}
+    return parsed if isinstance(parsed, dict) else {"_unreadable": True}
+
+
+def _file_url_path(url: object) -> Path | None:
+    """Local path of a PEP 610 ``file://`` URL, or None when the URL is not a local file URL."""
+    if not isinstance(url, str) or not url.startswith("file:"):
+        return None
+    parsed = urllib.parse.urlparse(url)
+    if parsed.scheme != "file" or parsed.netloc not in ("", "localhost"):
+        return None
+    raw = urllib.parse.unquote(parsed.path)
+    if not raw.startswith("/"):
+        return None
+    return Path(raw)
+
+
+def _same_folder(left: Path, right: Path) -> bool:
+    return os.path.realpath(left) == os.path.realpath(right)
+
+
+def _installed_records(venv: Path) -> list[tuple[str, dict | None]]:
+    """``(distribution name, direct_url.json or None)`` for every ``*.dist-info`` in the environment."""
+    pattern = str(Path(venv) / "lib" / "python3*" / "site-packages" / "*.dist-info")
+    return [(_dist_info_name(Path(di)), _load_direct_url(Path(di))) for di in sorted(glob.glob(pattern))]
+
+
+def check_installed_commit_by_name(venv: Path, dist: str, expected_sha: str, checkout: Path | None = None) -> tuple[bool, dict]:
+    """Does the installed `dist` come from `expected_sha`? Fails closed. Looks the distribution up by name.
 
     A VCS install (vcs_info.commit_id) must name that commit. A local install (dir_info) must point at `checkout`, and
     that checkout must be at `expected_sha` (git rev-parse HEAD). Anything else (no direct_url.json, another
-    directory, another commit) fails. Short expected SHAs (7+ hex) match by prefix."""
+    directory, another commit) fails. Short expected SHAs (7+ hex) match by prefix.
+
+    This is the previous check. A source comparison uses `check_installed_commit`, which matches the checkout folder
+    and does not look up a name. The dry run can still call this one."""
     du = direct_url(venv, dist)
     info: dict = {"dist": dist, "expected": expected_sha, "direct_url": du}
-
-    def same(got: str | None) -> bool:
-        return bool(got) and len(expected_sha) >= 7 and (got.startswith(expected_sha) or expected_sha.startswith(got))
     if not du:
         info["why"] = f"{dist} has no direct_url.json, so the installed commit cannot be checked"
         return False, info
     vcs = du.get("vcs_info") or {}
     if vcs.get("commit_id"):
         info["installed"] = vcs["commit_id"]
-        ok = same(vcs["commit_id"])
+        ok = _sha_same(expected_sha, vcs["commit_id"])
         if not ok:
             info["why"] = f"{dist} installed from commit {vcs['commit_id'][:12]}, not the requested {expected_sha[:12]}"
         return ok, info
@@ -851,15 +916,91 @@ def check_installed_commit(venv: Path, dist: str, expected_sha: str, checkout: P
         if here != Path(checkout).resolve():
             info["why"] = f"{dist} was installed from {url}, not from the checked-out side"
             return False, info
-        head = subprocess.run(["git", "-C", str(checkout), "rev-parse", "HEAD"], capture_output=True, text=True,
-                              env=base_env(Path(checkout).parent / "home-git")).stdout.strip()
+        head = _checkout_head(checkout)
         info["installed"] = head
-        ok = same(head)
+        ok = _sha_same(expected_sha, head)
         if not ok:
             info["why"] = f"{dist} checkout is at {head[:12] or 'unknown'}, not the requested {expected_sha[:12]}"
         return ok, info
     info["why"] = f"{dist} was installed from {url or 'an unknown source'} with no commit to check"
     return False, info
+
+
+def check_installed_commit(venv: Path, dist: str, expected_sha: str, checkout: Path | None = None) -> tuple[bool, dict]:
+    """Does the environment contain the checkout of `expected_sha`? Fails closed.
+
+    Every installed distribution is considered. A distribution matches when its PEP 610 direct_url.json ``url`` is a
+    ``file://`` path whose real path is the side's checkout folder. The name is not consulted: `dist` is accepted so
+    callers keep the same arguments, and it is not used to choose a distribution. The result's ``dist`` is the name
+    that matched.
+
+    Exactly one distribution must match. The checkout's git HEAD must be `expected_sha`. When that record also has
+    ``vcs_info.commit_id``, that commit must be `expected_sha` too. Zero matches, more than one, another folder, or
+    another commit fails. Short expected SHAs (7+ hex) match by prefix."""
+    del dist
+    info: dict = {"dist": None, "expected": expected_sha, "direct_url": None}
+    if checkout is None:
+        info["why"] = "no checkout folder was given, so the installed commit cannot be checked"
+        return False, info
+    checkout = Path(checkout)
+    matches: list[tuple[str, dict]] = []
+    elsewhere: list[tuple[str, str]] = []
+    for name, du in _installed_records(venv):
+        if not du or du.get("_unreadable"):
+            continue
+        url = du.get("url") or ""
+        folder = _file_url_path(url)
+        if folder is None:
+            continue
+        if _same_folder(folder, checkout):
+            matches.append((name, du))
+        else:
+            elsewhere.append((name, url if isinstance(url, str) else ""))
+    if not matches:
+        if len(elsewhere) == 1:
+            name, url = elsewhere[0]
+            info["dist"] = name
+            info["why"] = f"{name} was installed from {url}, not from the checked-out side"
+        elif elsewhere:
+            listed = "; ".join(f"{name} from {url}" for name, url in elsewhere)
+            info["why"] = ("no installed distribution points at the checked-out side "
+                           f"({listed})")
+        else:
+            info["why"] = ("no installed distribution points at the checked-out side, "
+                           "so the installed commit cannot be checked")
+        return False, info
+    if len(matches) > 1:
+        names = ", ".join(name for name, _du in matches)
+        info["dist"] = names
+        info["why"] = f"more than one installed distribution points at the checked-out side ({names})"
+        return False, info
+    name, du = matches[0]
+    info["dist"] = name
+    info["direct_url"] = du
+    vcs = du.get("vcs_info") or {}
+    commit_id = vcs.get("commit_id")
+    if isinstance(commit_id, str) and commit_id and not _sha_same(expected_sha, commit_id):
+        info["installed"] = commit_id
+        info["why"] = f"{name} installed from commit {commit_id[:12]}, not the requested {expected_sha[:12]}"
+        return False, info
+    head = _checkout_head(checkout)
+    info["installed"] = head
+    if not _sha_same(expected_sha, head):
+        info["why"] = f"{name} checkout is at {head[:12] or 'unknown'}, not the requested {expected_sha[:12]}"
+        return False, info
+    return True, info
+
+
+def pr_side_constraints(main_venv: Path, dist: str, dest: Path) -> Path:
+    """Pins for the pull-request install: the main side's freeze, without the project named `dist`.
+
+    Editable lines and comments are dropped. `dist` is the label the run already uses for this exclusion; it is
+    not the commit guard's lookup. The file is written to `dest`."""
+    frz = in_side(main_venv, ["uv", "pip", "freeze", "-p", main_venv / "bin/python"], install=True).stdout
+    pkgname = dist.lower().replace("_", "-")
+    dest.write_text("\n".join(ln for ln in frz.splitlines() if ln and not ln.startswith(("-e", "#"))
+                               and ln.split("==")[0].lower().replace("_", "-") != pkgname) + "\n")
+    return dest
 
 
 def install_side(venv: Path, checkout: Path, chosen: dict | None, log: Path, python: str, timeout: int,
@@ -2714,11 +2855,7 @@ def test_source_pair(repo: str, cfg: dict, item: dict, prdir: Path, work: Path, 
             run_progress.emit("claims", "super", "planning behaviour claims / probes")
             plan = plan_probes(repo, item, rec, cm, [cp, work / "src"], prdir, a)
             rec["python"] = venv_python_version(vm) or rec["python"]
-            frz = in_side(vm, ["uv", "pip", "freeze", "-p", vm / "bin/python"], install=True).stdout
-            pkgname = cfg["dist"].lower().replace("_", "-")
-            cons = work / "constraints.txt"
-            cons.write_text("\n".join(ln for ln in frz.splitlines() if ln and not ln.startswith(("-e", "#"))
-                                       and ln.split("==")[0].lower().replace("_", "-") != pkgname) + "\n")
+            cons = pr_side_constraints(vm, cfg["dist"], work / "constraints.txt")
             rec["freeze"]["main"] = freeze_env(vm, prdir / "freeze-main.txt")
             proj, _extra = side_install_args(item.get("chosen"), cm)
             rec["test_extras"] = recorded_test_extras(cm, with_test_extras(proj, cm))
