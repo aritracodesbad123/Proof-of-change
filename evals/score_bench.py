@@ -108,7 +108,11 @@ def invalid_record_problems(name: str, rec: dict) -> list[str]:
     A record marked invalid, a record whose model_provider_used is exactly none, or a record whose
     AI calls all failed must not be counted as could_not_verify. A record that simply omits
     model_provider_used is left alone, so an older fixture still scores.
+    A no_code_change record never called the model on purpose. It is counted from
+    no_code_change_reason and is not treated as a failed model run.
     """
+    if rec.get("no_code_change") is True:
+        return []
     problems = []
     if rec.get("invalid") is True:
         why = rec.get("invalid_reason")

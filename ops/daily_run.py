@@ -175,6 +175,66 @@ def classify_files(files: list[str], pkg: str) -> dict:
             "other": [f for f in files if f not in py and f not in compiled and f not in build_cfg]}
 
 
+def _is_typing_file(path: str) -> bool:
+    """A stub file or the package marker that says the package ships type information."""
+    name = str(path).replace("\\", "/").rsplit("/", 1)[-1]
+    return name.endswith(".pyi") or name == "py.typed"
+
+
+def typing_only_change(paths) -> bool:
+    """True only when every changed file is a .pyi stub or a py.typed marker.
+
+    An empty list is not this rule. A .py file is not this rule, even when its only edits are type hints.
+    One other file, of any kind, is enough to make the whole diff ordinary.
+    """
+    if not paths:
+        return False
+    return all(isinstance(p, str) and _is_typing_file(p) for p in paths)
+
+
+def selection_skip_for_files(fc: dict, pkg: str) -> str | None:
+    """Why a diff is not package code to test. None when the pull request should be tested.
+
+    A typing-only diff is not skipped here. The run records it as no_code_change instead.
+    An empty diff and a non-Python diff keep the existing skip.
+    """
+    if typing_only_change((fc or {}).get("all") or []):
+        return None
+    compiled = [f for f in (fc or {}).get("compiled") or [] if str(f).startswith(pkg + "/")]
+    if not (fc or {}).get("package_py") and not compiled:
+        return "no Python/compiled code in the package (docs, CI or tooling only)"
+    return None
+
+
+def mark_typing_only(rec: dict, files: dict | None) -> bool:
+    """Record a typing-only change. Return True when that rule applies.
+
+    The verdict function is not called. Any other diff returns False and the record is left
+    for the normal checks, including a .py file whose only edits are type hints.
+    """
+    paths = files.get("all") if isinstance(files, dict) else None
+    if not typing_only_change(paths):
+        return False
+    rec["no_code_change"] = True
+    rec["no_code_change_reason"] = "typing_only"
+    rec["verdict"] = Verdict.COULD_NOT_VERIFY.value
+    rec["reason"] = ("no code change: every changed file is a .pyi stub or a py.typed marker, "
+                     "so behaviour was not checked")
+    return True
+
+
+def finish_typing_only(rec: dict, prdir: Path, work: Path, t0: float, runner) -> dict:
+    """Write a typing-only record without calling the model or the verdict function."""
+    saved = getattr(runner, "model_skipped", None) if runner is not None else None
+    if runner is not None and not saved:
+        runner.model_skipped = "typing-only change; the model was not called"
+    try:
+        return finish(rec, prdir, work, t0, runner)
+    finally:
+        if runner is not None:
+            runner.model_skipped = saved
+
+
 
 def run_date_of(seen: dict, repo: str) -> str | None:
     """IST date of the last run recorded for repo (inferred from last_run_utc for older files)."""
@@ -225,9 +285,9 @@ def select_prs(gh: GitHub, repo: str, cfg: dict, seen: dict, last_run_utc: str |
         except Exception as e:  # noqa: BLE001
             skipped.append(base | {"why": f"diff not readable: {e}"}); continue
         fc = classify_files(diff_files(d), cfg["pkg"])
-        in_pkg_compiled = [f for f in fc["compiled"] if f.startswith(cfg["pkg"] + "/")]
-        if not fc["package_py"] and not in_pkg_compiled:
-            skipped.append(base | {"why": "no Python/compiled code in the package (docs, CI or tooling only)"}); continue
+        skip = selection_skip_for_files(fc, cfg["pkg"])
+        if skip:
+            skipped.append(base | {"why": skip}); continue
         item = {"pr": n, "title": p["title"], "body": p.get("body") or "", "url": p["html_url"],
                 "author": p["user"]["login"], "head_sha": sha,
                 "base_sha": p["base"]["sha"], "base_ref": p["base"]["ref"], "updated_at_utc": p["updated_at"],
@@ -2430,6 +2490,8 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
     shutil.rmtree(work, ignore_errors=True); work.mkdir(parents=True)
     (prdir / "pr.diff").write_text(item["diff"])
     rec = new_record(repo, cfg, item, a, machine, rdir.name, run_date_for(rdir))
+    if mark_typing_only(rec, item.get("files")):
+        return finish_typing_only(rec, prdir, work, t0, a)
     refusal = sandbox_refusal(getattr(a, "sandbox_backend", None))
     if refusal:   # fail closed: no PR code runs without the sandbox (unless --unsafe-no-sandbox)
         rec["verdict"], rec["reason"], _ = verdict_for(None, refusal)
@@ -2570,6 +2632,10 @@ def mark_bench_model_invalid(rec: dict, runner) -> None:
     could_not_verify. Daily and ops runs are not marked here.
     """
     if runner is None or not getattr(runner, "bench", None):
+        return
+    # A typing-only record never called the model on purpose. It is counted from no_code_change_reason,
+    # not refused as a failed model run.
+    if rec.get("no_code_change") is True:
         return
     calls = list(getattr(getattr(runner, "provider", None), "calls", None) or [])
     all_failed = bool(calls) and all(not c.get("ok") for c in calls)

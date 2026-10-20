@@ -235,6 +235,10 @@ def run_case(dr, a, row: dict, inputs_meta: dict, out: Path, workroot: Path, mac
                     "pr_text_source": text.get("pr_text_source", text["source"]),
                     "pr_text_detail": text["source"],
                     "answer_key_read": False}
+    if dr.mark_typing_only(rec, item.get("files")):
+        rec = dr.finish_typing_only(rec, prdir, work, t0, a)
+        write_result(out, rid, rec)
+        return rec
     if not co.get("ok"):
         rec["verdict"], rec["reason"], _ = dr.verdict_for(None, co["why"])
         rec["sides"] = {k: v for k, v in co.items() if k != "ok"}
