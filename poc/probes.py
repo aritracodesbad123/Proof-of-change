@@ -160,6 +160,34 @@ def _observation_names(item: dict) -> list[str]:
             if isinstance(o, dict) and isinstance(o.get("name"), str)]
 
 
+def rejection_reason(item: dict) -> str | None:
+    """Why this probe's claim patterns match none of its own observation names, or None if it may count.
+
+    A probe with no claims is not this case. One pattern that matches one observation name is enough to keep it.
+    """
+    claims = [c for c in (item.get("claims") or []) if isinstance(c, dict)]
+    if not claims:
+        return None
+    names = _observation_names(item)
+    for c in claims:
+        if any(_covers_name(c.get("covers"), n) for n in names):
+            return None
+    ids = ", ".join(str(c.get("id") or "claim") for c in claims)
+    return (f"rejected: claim pattern(s) {ids} match none of this probe's observation names, "
+            f"so the probe is not counted")
+
+
+def _counted_or_rejected(out: dict) -> dict:
+    """A probe that ran still does not count when its claim patterns match nothing it observed."""
+    why = rejection_reason(out)
+    if why:
+        out["status"] = "rejected"
+        out["rejected_reason"] = why
+        return out
+    out["status"] = "ran"
+    return out
+
+
 def unmatched_differs_claims(probe_results: dict | None) -> list[str]:
     """Claim ids that expect a difference and match no observation name on that same probe.
 
@@ -326,16 +354,13 @@ def classify_item(item: dict) -> dict:
     names = []
     for o in obs:
         if o.get("state") != "same":
-            out["status"] = "ran"
-            return out
+            return _counted_or_rejected(out)
         main_exc, pr_exc = _exception_name(o.get("main")), _exception_name(o.get("pr"))
         if not main_exc or main_exc != pr_exc:
-            out["status"] = "ran"
-            return out
+            return _counted_or_rejected(out)
         names.append(main_exc)
     if len(set(names)) != 1:
-        out["status"] = "ran"
-        return out
+        return _counted_or_rejected(out)
     reason = f"uninformative: every input raised {names[0]} on both sides"
     out["status"] = "uninformative"
     out["uninformative_reason"] = reason
@@ -377,6 +402,8 @@ def apply_status(probe_results: dict | None) -> dict | None:
     statuses = [it.get("status") for it in items]
     if any(s == "ran" for s in statuses):
         status = "ran"
+    elif statuses and all(s == "rejected" for s in statuses):
+        status = "rejected"
     elif statuses and all(s == "uninformative" for s in statuses):
         status = "uninformative"
     elif statuses and all(s == "not_run" for s in statuses):
@@ -387,6 +414,7 @@ def apply_status(probe_results: dict | None) -> dict | None:
         status = "ran"
     summary = summarize([it for it in items if it.get("status") == "ran"])
     notes = [it["uninformative_reason"] for it in items if it.get("uninformative_reason")]
+    notes += [it["rejected_reason"] for it in items if it.get("rejected_reason")]
     if notes:
         summary = dict(summary, reason="; ".join([summary["reason"]] * bool(summary["reason"]) + notes))
     return dict(probe_results, items=items, status=status, summary=summary)

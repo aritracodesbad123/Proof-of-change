@@ -22,6 +22,8 @@ Verdict rule (deciding_items, used by ops/daily_run.with_probes, and poc/behavio
 * not_adequate    -> it can never lead to 'verified': its green observations are dropped from the verdict and it
                      does not count as checking a behaviour claim. Its red and amber observations still count (a
                      difference is never hidden).
+* rejected        -> the probe's claim patterns match none of its observation names. It does not count. Red and
+                     amber observations still count, and the reason is recorded on the probe.
 * unmeasured      -> decides as before; the report says the probe's coverage was not measured.
 """
 from __future__ import annotations
@@ -77,9 +79,17 @@ def adequacy_of(item: dict) -> str | None:
     return (item.get("probe_changed_line_coverage") or {}).get("adequacy")
 
 
+def _red_amber(item: dict) -> list[dict]:
+    """Observations that still have to be reported. Dropping them could hide a difference and raise the verdict."""
+    return [o for o in item.get("observations", []) if COLOUR.get(FindingLabel(o["label"])) in ("red", "amber")]
+
+
 def deciding_items(items: list[dict]) -> tuple[list[dict], list[str]]:
-    """Probe entries as the verdict may use them, and notes for the reason text. A not_adequate probe keeps only its
-    red/amber observations (they still flag the PR); its green ones are dropped so it cannot lead to 'verified'."""
+    """Probe entries as the verdict may use them, and notes for the reason text.
+
+    A not_adequate probe, and a probe whose claim patterns match none of its observation names, keep only their
+    red/amber observations (they still flag the PR). Their green ones are dropped so they cannot lead to 'verified'."""
+    from poc import probes
     out, notes = [], []
     for it in items:
         if it.get("status") in ("uninformative", "not_run"):
@@ -87,14 +97,17 @@ def deciding_items(items: list[dict]) -> tuple[list[dict], list[str]]:
             notes.append(f"probe {it['id']} is {it['status']} ({why}); its matching results do not count")
             out.append(dict(it, observations=[]))
             continue
+        why_reject = it.get("rejected_reason") or probes.rejection_reason(it)
+        if it.get("status") not in ("crashed", "error") and (it.get("status") == "rejected" or probes.rejection_reason(it)):
+            notes.append(why_reject or f"probe {it['id']} is rejected; its matching results do not count")
+            out.append(dict(it, observations=_red_amber(it)))
+            continue
         if adequacy_of(it) != NOT_ADEQUATE:
             out.append(it)
             continue
-        keep = [o for o in it.get("observations", [])
-                if COLOUR.get(FindingLabel(o["label"])) in ("red", "amber")]
         notes.append(f"probe {it['id']} is not_adequate ({it['probe_changed_line_coverage'].get('note')}); its "
                      f"matching results do not count")
-        out.append(dict(it, observations=keep))
+        out.append(dict(it, observations=_red_amber(it)))
     return out, notes
 
 

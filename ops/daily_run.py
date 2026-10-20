@@ -1407,7 +1407,7 @@ def ai_probe_gate(rec: dict) -> dict:
         return rec
     items = (rec.get("probes") or {}).get("items") or []
     ran = [it.get("id") for it in items if it.get("source") == "model"
-           and it.get("status") not in ("crashed", "error", "uninformative", "not_run")
+           and it.get("status") not in ("crashed", "error", "uninformative", "not_run", "rejected")
            and ((it.get("probe_changed_line_coverage") or {}).get("changed_lines_covered") or 0) > 0]
     if ran:
         return rec
