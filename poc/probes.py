@@ -51,6 +51,7 @@ import ast
 import fnmatch
 import hashlib
 import json
+import re
 import resource
 import subprocess
 import tempfile
@@ -315,6 +316,31 @@ def rejudge_entry(item: dict) -> dict:
     return dict(item, observations=judge(spec, item["runs"], item.get("outputs")))
 
 
+_IMPORT_ERRORS = frozenset({"ImportError", "ModuleNotFoundError"})
+_IMPORT_TEXT = re.compile(r"\b(?:ImportError|ModuleNotFoundError)\b|cannot import|No module named", re.I)
+
+
+def _is_import_failure(value) -> bool:
+    """True when one side of an observation failed to import. Extra keys and either import exception count."""
+    if isinstance(value, dict):
+        name = value.get("raises")
+        return isinstance(name, str) and name in _IMPORT_ERRORS
+    if isinstance(value, str):
+        return bool(_IMPORT_TEXT.search(value))
+    return False
+
+
+def cannot_import_target(item: dict) -> bool:
+    """True when every observation failed to import the target on both sides.
+
+    One side importing and the other not is a real difference. One observation that returned a value is not this case.
+    """
+    obs = item.get("observations") or []
+    if not obs:
+        return False
+    return all(_is_import_failure(o.get("main")) and _is_import_failure(o.get("pr")) for o in obs)
+
+
 def _exception_name(value) -> str | None:
     """The exception type when a probe observation is only ``{"raises": "Name"}``."""
     if isinstance(value, dict) and set(value) == {"raises"} and isinstance(value.get("raises"), str):
@@ -344,6 +370,12 @@ def classify_item(item: dict) -> dict:
         out["status"] = "crashed"
         out["uninformative_reason"] = why
         _downgrade_coverage(out, why + "; not counted as ran or adequate", zero=True)
+        return out
+    if cannot_import_target(item):
+        reason = "uninformative: the probe cannot import its target on either side"
+        out["status"] = "uninformative"
+        out["uninformative_reason"] = reason
+        _downgrade_coverage(out, reason + "; not counted as ran or adequate", zero=True)
         return out
     if all(_no_type_aware_input(o.get("main")) and _no_type_aware_input(o.get("pr")) for o in obs):
         reason = "no type-aware input could be built, so the probe did not run"
@@ -425,9 +457,23 @@ def is_warning_observation(name: str) -> bool:
     return "warn" in str(name).lower()
 
 
+def _model_extra(item: dict, obs: dict) -> bool:
+    """A model probe's extra case, outside every claim on that probe. It does not count against a claim.
+
+    A differential probe has no claims, so its differences still count."""
+    return item.get("source") == "model" and bool(item.get("claims")) and not obs.get("claim")
+
+
 def summarize(items: list[dict]) -> dict:
     """Findings over all probes of a PR: labels, red/amber observations, proven claims, reason text."""
-    obs = [o | {"probe": it["id"]} for it in items for o in it["observations"]]
+    extras = 0
+    obs = []
+    for it in items:
+        for o in it["observations"]:
+            if _model_extra(it, o):
+                extras += 1
+                continue
+            obs.append(o | {"probe": it["id"]})
     labels = [FindingLabel(o["label"]) for o in obs]
     raw_flagged = [o for o in obs if COLOUR.get(FindingLabel(o["label"])) in ("red", "amber")]
     # Noise filter: an observation that changes between runs of the SAME side is noise, not a finding; it is listed
@@ -462,6 +508,8 @@ def summarize(items: list[dict]) -> dict:
     errors = [o for o in obs if o["label"] == FindingLabel.NOT_TESTABLE.value]
     if errors:
         bits.append(f"probe: {len(errors)} probe(s) could not run on either side")
+    if extras:
+        bits.append(f"probe: {extras} extra case(s) outside the claim are not counted")
     return {"labels": [x.value for x in labels], "flagged": [{k: o[k] for k in ("probe", "name", "label", "claim")}
                                                              for o in flagged],
             "proven_claims": proven, "reason": "; ".join(bits),

@@ -111,6 +111,23 @@ _SECTION_STOP = re.compile(r"(?i)^\s*(?:<details|<summary|\[!\w+\]|fixes\s+\S*#\
 _ITEM = re.compile(r"^\s*(?:[-*+]\s|\d+[.)]\s|`|\$\s|-{3,}\s*$|\*{3,}\s*$|_{3,}\s*$)")
 
 
+# A sentence that describes the bug being fixed (the old behaviour) is not a promise that results stay the same.
+# "Fixes the dtype. Results are unchanged." is two sentences; only the second is a claim. A sentence that merely
+# contains the word bug, such as "This bugfix keeps results unchanged", is still a claim.
+_OLD_BEHAVIOUR = re.compile(
+    r"(?i)\b(?:previously|formerly|used to|before this (?:fix|change|pr)|the old behaviou?r)\b"
+    r"|\b(?:was|were)\b(?:\s+\w+){0,6}\s+unchanged\b"
+    r"|\bbug\s+(?:where|that)\b"
+    r"|\b(?:incorrectly|wrongly)\b(?:\s+\w+){0,6}\s+(?:left\s+)?unchanged\b"
+    r"|\bfixes?\s+a\s+(?:bug|case)\s+where\b"
+)
+
+
+def describes_old_behaviour(sentence: str) -> bool:
+    """True when the sentence describes the bug or the old behaviour, not a promise that results stay the same."""
+    return bool(_OLD_BEHAVIOUR.search(sentence or ""))
+
+
 def keeps_nothing_else_changes(sentence: str) -> bool:
     """True for a 'nothing else changes' sentence that is about the product, not about the tests."""
     return bool(_PRESERVE.search(sentence)) and not _ABOUT_TESTS.search(sentence)
@@ -234,7 +251,8 @@ def find(title: str, body: str | None, diff: str | None = None) -> list[dict]:
                 if text[line_start:].lstrip().startswith("#"):   # a Markdown heading names a topic, not a claim
                     continue
                 q = _sentence(text, m.start(), m.end())
-                if q and about_tests_or_tools(_sentence(text, m.start(), m.end(), width=10**6)):
+                if q and (describes_old_behaviour(q) or about_tests_or_tools(
+                        _sentence(text, m.start(), m.end(), width=10**6))):
                     continue
                 if q and (source, q) not in seen:
                     seen.add((source, q))

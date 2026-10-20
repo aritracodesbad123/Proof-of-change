@@ -263,9 +263,12 @@ def decide(rec: dict, chk: list[list]) -> dict:
         return dict(verdict="COULD NOT VERIFY", colour="grey", action="Re-run", confidence="Low",
                     conf_why="The known-answer tests failed in the latest replay.", why=bad_replay)
     if v == "no_code_change":
+        if rec.get("no_code_change_reason") == "docstring_only":
+            conf_why = ("Only docstrings or comments changed, so behaviour was not checked.")
+        else:
+            conf_why = "Every changed file is a type stub or a py.typed marker, so behaviour was not checked."
         return dict(verdict="NO CODE CHANGE", colour="grey", action="Approve with notes", confidence="High",
-                    conf_why="Every changed file is a type stub or a py.typed marker, so behaviour was not checked.",
-                    why=rec.get("reason", ""))
+                    conf_why=conf_why, why=rec.get("reason", ""))
     fails = [c for c in chk if c[1] == "FAIL"]
     warns = [c for c in chk if c[1] == "WARN"]
     g = rec.get("coverage_gate") or {}
@@ -391,6 +394,8 @@ def probe_claim_rows(rec: dict) -> list[dict]:
                              evidence=f"probe {it['id']}, {worst['name']}: {observed(worst)}",
                              citation=(worst.get("citations") or {}).get("pr")))
         for o in it["observations"]:
+            if o["label"] == "unmentioned" and it.get("source") == "model" and it.get("claims") and not o.get("claim"):
+                continue
             if o["label"] == "unmentioned":
                 rows.append(dict(id="-", text="Change not in the PR description", source=f"probe {it['id']}",
                                  status="unmentioned change", evidence=f"{o['name']}: {observed(o)}",

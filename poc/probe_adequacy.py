@@ -102,6 +102,11 @@ def deciding_items(items: list[dict]) -> tuple[list[dict], list[str]]:
     from poc import probes
     out, notes = [], []
     for it in items:
+        if probes.cannot_import_target(it):
+            why = it.get("uninformative_reason") or "the probe cannot import its target on either side"
+            notes.append(f"probe {it['id']} is not adequate ({why}); its matching results do not count")
+            out.append(dict(it, observations=[]))
+            continue
         if it.get("status") in ("uninformative", "not_run"):
             why = it.get("uninformative_reason") or it.get("status")
             notes.append(f"probe {it['id']} is {it['status']} ({why}); its matching results do not count")
