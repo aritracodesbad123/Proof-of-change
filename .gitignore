@@ -23,5 +23,9 @@ reports/daily/
 # ops run outputs (kept locally, not in git)
 ops/local.json
 ops/runs/
+ops/console-accounts.json
+ops/console-accounts.sqlite
+ops/console-accounts.sqlite-wal
+ops/console-accounts.sqlite-shm
 ops/work/
 ops/seen_prs.json

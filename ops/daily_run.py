@@ -1046,6 +1046,40 @@ def install_side(venv: Path, checkout: Path, chosen: dict | None, log: Path, pyt
 HOST = None   # sbx=HOST: a trusted tool on our own files (git on our clones); everything else runs in a side's sandbox
 
 
+HEARTBEAT_S = 30
+
+
+def _heartbeat(elapsed: int) -> None:
+    """Tell the console the current stage is still going. Prints to stdout, never to the pytest log."""
+    if not os.environ.get("POC_PROGRESS_PATH"):
+        return
+    from poc import run_progress
+    events = run_progress.read_events(os.environ["POC_PROGRESS_PATH"])
+    stage = events[-1]["stage"] if events else "pytest"
+    agent = events[-1].get("agent") if events else None
+    run_progress.emit(stage, agent, f"still running ({elapsed}s)")
+    print(f"[daily_run] still running ({elapsed}s)", flush=True)
+
+
+def _wait_child(p: subprocess.Popen, timeout, t0: float):
+    """One wait when the console is not attached. With POC_PROGRESS_PATH, wake every HEARTBEAT_S."""
+    if not os.environ.get("POC_PROGRESS_PATH"):
+        return p.wait(timeout=timeout)
+    while True:
+        slice_s = HEARTBEAT_S
+        if timeout is not None:
+            remain = timeout - (time.time() - t0)
+            if remain <= 0:
+                raise subprocess.TimeoutExpired(p.args, timeout)
+            slice_s = min(slice_s, remain)
+        try:
+            return p.wait(timeout=slice_s)
+        except subprocess.TimeoutExpired:
+            if timeout is not None and (time.time() - t0) >= timeout:
+                raise
+            _heartbeat(int(time.time() - t0))
+
+
 def run(cmd, log_path: Path, cwd=None, env=None, timeout=None, sbx=HOST) -> tuple[int | str, float]:
     """Run cmd with output to log_path. env is required: always an allowlisted base_env(...). sbx: the sandbox of a
     side (side_sandbox(...)); every command that may run PR or package code passes one."""
@@ -1061,7 +1095,7 @@ def run(cmd, log_path: Path, cwd=None, env=None, timeout=None, sbx=HOST) -> tupl
         p = subprocess.Popen(list(map(str, cmd)), cwd=cwd, env=env, stdout=fh, stderr=subprocess.STDOUT,
                              start_new_session=True)
         try:
-            rc = p.wait(timeout=timeout)
+            rc = _wait_child(p, timeout, t0)
         except subprocess.TimeoutExpired:
             os.killpg(p.pid, signal.SIGKILL); p.wait(); rc = "timeout"
             fh.write(f"\n[daily_run] TIMEOUT after {timeout}s\n")
@@ -1467,11 +1501,13 @@ def run_tests(side_venvs: dict, targets_by_side: dict, rdir: Path, workdir: Path
     """targets are relative to site-packages (nightly routes) or to the side's checkout (cwds given).
     per_run entries use the shared schema shape (side old/new, all counts present).
     When a Contree session with main/PR checkpoints is active, pytest runs remotely (source-pair)."""
+    from poc import run_progress
     use_contree = _contree_ready() and cwds is not None
     envs = ({side: base_env(side_home(v)) for side, v in side_venvs.items()} if not use_contree else {})
     per_run, results = [], {"main": [], "pr": []}
     for i in range(1, runs + 1):
         for side in ("main", "pr"):
+            run_progress.emit("pytest", "code", f"before run {i}/{runs}")
             venv = side_venvs[side]
             tg_rel = list(targets_by_side[side])
             if use_contree:
@@ -1485,7 +1521,9 @@ def run_tests(side_venvs: dict, targets_by_side: dict, rdir: Path, workdir: Path
                      "collection_errors": 0}
             if not tg:
                 results[side].append({}); per_run.append(entry | {"exit": "no-targets", "seconds": 0,
-                                                                   "pytest_summary": "", "junit": False}); continue
+                                                                   "pytest_summary": "", "junit": False})
+                run_progress.emit("pytest", "code", f"after run {i}/{runs}")
+                continue
             if use_contree:
                 rc, secs = _contree_pytest_once(side, tg, test_timeout, run_timeout, workers, jx, lg)
             else:
@@ -1512,7 +1550,13 @@ def run_tests(side_venvs: dict, targets_by_side: dict, rdir: Path, workdir: Path
             entry["collection_errors"] = len(re.findall(r"^ERROR collecting ", text, re.M))
             tail = (text.strip().splitlines() or [""])[-1][:200]
             per_run.append(entry | {"exit": rc, "seconds": secs, "pytest_summary": tail, "junit": jx.exists()})
+            run_progress.emit("pytest", "code", f"after run {i}/{runs}")
     return per_run, results
+
+
+def _coverage_skipped_by_env() -> bool:
+    """Console recorded demos set POC_SKIP_COVERAGE. Study and CLI leave it unset."""
+    return (os.environ.get("POC_SKIP_COVERAGE") or "").strip().lower() in {"1", "true", "yes", "on"}
 
 
 def coverage_run(item: dict, venv: Path, main_root: Path, pr_root: Path, targets: list[str], prdir: Path,
@@ -1524,7 +1568,7 @@ def coverage_run(item: dict, venv: Path, main_root: Path, pr_root: Path, targets
     every route, including a diff applied with offsets); executable lines are coverage.py's executed + missing lines.
     main_root / pr_root: the folder the PR's repo-relative paths resolve against on each side (site-packages for the
     nightly routes, the checkout for source-pair)."""
-    if getattr(a, "no_coverage", False):
+    if getattr(a, "no_coverage", False) or _coverage_skipped_by_env():
         return {"status": "skipped", "why": "--no-coverage"}
     if not uses(getattr(a, "baseline", None), "coverage"):
         return {"status": "skipped", "why": f"baseline {a.baseline} does not use the coverage gate"}
@@ -2303,7 +2347,7 @@ def probe_coverage(item: dict, probe_results: dict | None, vm: Path, main_root: 
             it["probe_changed_line_coverage"] = probe_adequacy.assess({"status": "not measured", "why": why})
         return probe_adequacy.summary(items)
 
-    if getattr(a, "no_coverage", False):
+    if getattr(a, "no_coverage", False) or _coverage_skipped_by_env():
         return unmeasured("--no-coverage")
     changed = {}
     for rel in coverage_gate.python_sources(item["files"]):
@@ -2694,6 +2738,7 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
             run_progress.emit("pytest", "code", "dual-run pytest on main and PR")
             cmp, cnv, ex = execute_tests(rec, {"main": vm, "pr": vp}, targets, prdir, work, a)
             if cmp:
+                run_progress.emit("pytest", "code", "before coverage")
                 rec["coverage"] = coverage_run(item, vp, site_packages(vm), site_packages(vp), targets["pr"], prdir,
                                                work, a)
     commit = (main.get("build") or {}).get("commit")
@@ -2707,6 +2752,7 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
         run_progress.emit("probes", "super", "running behaviour probes")
         rec["probes"] = run_probes(repo, item["pr"], {"main": vm / "bin/python", "pr": vp / "bin/python"}, prdir, work,
                                    a, plan, pr_started)
+        run_progress.emit("pytest", "code", "before coverage")
         rec["probe_changed_line_coverage"] = probe_coverage(item, rec["probes"], vm, site_packages(vm), site_packages(vp),
                                                             prdir, a)
         settle_probes(rec)
@@ -2908,10 +2954,12 @@ def test_source_pair(repo: str, cfg: dict, item: dict, prdir: Path, work: Path, 
                                              cwds={"main": cm, "pr": cp})
                 if cmp:
                     # Coverage stays on the local sides (Contree disposable runs do not keep coverage data).
+                    run_progress.emit("pytest", "code", "before coverage")
                     rec["coverage"] = coverage_run(item, vp, cm, cp, targets["pr"], prdir, work, a, cwd=cp)
             run_progress.emit("probes", "super", "running behaviour probes")
             rec["probes"] = run_probes(repo, item["pr"], {"main": vm / "bin/python", "pr": vp / "bin/python"}, prdir,
                                        work, a, plan, pr_started)
+            run_progress.emit("pytest", "code", "before coverage")
             rec["probe_changed_line_coverage"] = probe_coverage(item, rec["probes"], vm, cm, cp, prdir, a)
             settle_probes(rec)
             if change_is_docstring_only(rec.get("files"), cm, cp):

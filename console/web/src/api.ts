@@ -1,14 +1,41 @@
 const BASE = import.meta.env.VITE_API_BASE ?? ''
 
+export class ApiError extends Error {
+  status: number
+  constructor(message: string, status: number) {
+    super(message)
+    this.name = 'ApiError'
+    this.status = status
+  }
+}
+
+export const LOST_JOB = 'This check was lost because the server restarted. Please start it again.'
+
+export function lostJobMessage(error: unknown): string | null {
+  return error instanceof ApiError && error.status === 404 ? LOST_JOB : null
+}
+
 async function json<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${BASE}${path}`, {
     ...init,
+    credentials: 'include',
     headers: { 'Content-Type': 'application/json', ...(init?.headers || {}) },
   })
   const data = await res.json().catch(() => ({}))
-  if (!res.ok) throw new Error((data as { error?: string }).error || res.statusText)
+  if (!res.ok) throw new ApiError((data as { error?: string }).error || res.statusText, res.status)
   return data as T
 }
+
+export type Account = { email: string; id: string; role: 'admin' | 'user' | string }
+
+export type AuthProviders = {
+  google: boolean
+  github: boolean
+  signup_disabled: boolean
+  invite_required: boolean
+}
+
+export type Challenge = { challenge_id: string; purpose: 'signup' | 'login' }
 
 export type RunRow = {
   id: string
@@ -22,6 +49,8 @@ export type RunRow = {
   machine?: string
   folder?: string
   source?: string
+  report_pdf?: string | null
+  report_html?: string | null
 }
 
 export type StageEvent = {
@@ -119,6 +148,17 @@ export const api = {
       body: JSON.stringify({ pr_url, model_provider }),
     }),
   job: (id: string) => json<Job>(`/api/jobs/${encodeURIComponent(id)}`),
+  me: () => json<Account>('/api/auth/me'),
+  providers: () => json<AuthProviders>('/api/auth/providers'),
+  signup: (email: string, password: string, invite_code = '') =>
+    json<Challenge>('/api/auth/signup', { method: 'POST', body: JSON.stringify({ email, password, invite_code }) }),
+  login: (email: string, password: string) =>
+    json<Challenge>('/api/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) }),
+  verify: (challenge_id: string, code: string) =>
+    json<{ email: string }>('/api/auth/verify', { method: 'POST', body: JSON.stringify({ challenge_id, code }) }),
+  resend: (challenge_id: string) =>
+    json<Challenge>('/api/auth/resend', { method: 'POST', body: JSON.stringify({ challenge_id }) }),
+  logout: () => json<{ ok: boolean }>('/api/auth/logout', { method: 'POST', body: '{}' }),
   submitScenarios: (id: string, body: HitlApprovalBody) =>
     json<{ ok: boolean; approval: HitlApprovalBody }>(
       `/api/jobs/${encodeURIComponent(id)}/scenarios`,

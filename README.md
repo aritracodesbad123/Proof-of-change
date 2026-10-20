@@ -321,7 +321,11 @@ make console-api    # terminal 1 — http://127.0.0.1:8787
 make console-web    # terminal 2 — http://127.0.0.1:5173
 ```
 
-Open **http://127.0.0.1:5173**. Needs Node.js for the UI (`npm` under `console/web/`). Or build once and serve UI from the API:
+Open **http://127.0.0.1:5173**. The page is light. Sign in before the run list loads. Needs Node.js for the UI (`npm` under `console/web/`). Or build once and serve UI from the API:
+
+Email sign-in needs `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, and `SMTP_FROM` (the older `POC_SMTP_*` names still work). Google uses `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`. GitHub sign-in uses `GITHUB_OAUTH_CLIENT_ID` and `GITHUB_OAUTH_CLIENT_SECRET` (not `GITHUB_TOKEN`). Set `SECRET_KEY` to a long random string so the session cookie is signed. `POC_ADMIN_EMAIL` names the one admin. `POC_SIGNUP_DISABLED=1` stops new accounts. `POC_INVITE_CODE`, when set, is required to create an account. Do not set `POC_OTP_TEST_SINK` on a host. Accounts are a file on disk (`POC_ACCOUNTS_FILE`); a free host wipes that file on restart.
+
+A free [Hugging Face Space](docs/deploy/huggingface.md) (Docker, port 7860, 2 CPU cores and 16 GB of RAM) is the place to run the sample when Render’s 512 MB restarts mid-test. If that Space cannot start bubblewrap, only the prerecorded sample plays back, and it does not run pull-request code.
 
 ```bash
 make console-build && make console-api
