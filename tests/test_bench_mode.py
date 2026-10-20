@@ -91,12 +91,17 @@ def test_rejects_short_shas(tmp_path, bad, match):
         assert bench.read_inputs(p)
 
 
+def _forbid_sync(*_a, **_k):
+    raise AssertionError("bench mode moved the checkout")
+
+
 def test_cli_refuses_answers_file(tmp_path, capsys, monkeypatch):
     monkeypatch.setenv(model_provider.KEY_ENV, "test-key")
-    monkeypatch.setattr(dr, "sync_to_origin_main", lambda root=None: "a" * 40)
+    monkeypatch.setattr(dr, "sync_to_origin_main", _forbid_sync)
+    monkeypatch.setattr(dr, "given_commit", lambda root, expected: "a" * 40)
     p = tmp_path / "x-answers.csv"
     p.write_text(SYN.read_text())
-    assert dr.main(["--bench", str(p), "--ids", "B01", "--unsafe-no-sandbox"]) == 2
+    assert dr.main(["--bench", str(p), "--ids", "B01", "--expect-commit", "a" * 40, "--unsafe-no-sandbox"]) == 2
     assert "never read an answer key" in capsys.readouterr().err
 
 
@@ -198,7 +203,15 @@ def test_run_writes_one_result_per_id_and_never_opens_the_answer_key(tmp_path, m
     inputs.write_text(",".join(cols) + "\n" + "\n".join(",".join(r[c] for c in cols) for r in rows) + "\n")
     (tmp_path / "benchmark-v0-answers.csv").write_text("id,label\nB01,regression\n")
     monkeypatch.setenv(model_provider.KEY_ENV, "test-key")
-    monkeypatch.setattr(dr, "sync_to_origin_main", lambda root=None: "a" * 40)
+    monkeypatch.setattr(dr, "sync_to_origin_main", _forbid_sync)
+    noted = {}
+
+    def fake_given(root, expected):
+        noted["expected"] = expected
+        return "a" * 40
+
+    monkeypatch.setattr(dr, "given_commit", fake_given)
+    monkeypatch.setattr(model_provider.NebiusProvider, "confirm_key", lambda self: None)
     monkeypatch.setattr(bench, "CLONE_URL", str(merged_repo["path"]))
     monkeypatch.setattr(bench, "pr_text", lambda _dr, row: {"title": row["pr_title"], "body": "Changes f.",
                                                              "author": "someone", "base_ref": "main", "source": "test"})
@@ -220,7 +233,7 @@ def test_run_writes_one_result_per_id_and_never_opens_the_answer_key(tmp_path, m
     monkeypatch.setattr(io, "open", guarded)
     out = tmp_path / "bench-v0"
     rc = dr.main(["--bench", str(inputs), "--ids", "B01,B02", "--bench-out", str(out), "--unsafe-no-sandbox",
-                  "--work-dir", str(tmp_path / "w"), "--python", "3"])
+                  "--expect-commit", "a" * 40, "--work-dir", str(tmp_path / "w"), "--python", "3"])
     monkeypatch.setattr(builtins, "open", real_open)
     monkeypatch.setattr(io, "open", real_io_open)
     assert rc == 0
@@ -229,8 +242,86 @@ def test_run_writes_one_result_per_id_and_never_opens_the_answer_key(tmp_path, m
     res = json.loads((out / "B01-full.json").read_text())
     assert "test-key" not in (out / "B01-full.json").read_text()
     assert res["model_provider_used"] == "none"  # the stub never called the model
+    assert res["invalid"] is True and res["verdict"] == "verified"
+    assert noted["expected"] == "a" * 40 and res["poc_commit"] == "a" * 40
     assert res["bench"]["id"] == "B01" and res["bench"]["answer_key_read"] is False
     assert res["bench"]["first_parent_verified"] and res["pr"]["merge_commit"] == merged_repo["merge"]
     assert res["verdict"] == "verified" and res["tested"]["main"].startswith("first parent of the merge commit")
     assert seen[0] == (merged_repo["first_parent"], merged_repo["merge"], ["widgets/core.py"], "widgets")
     assert (out / "logs" / "B01-full" / "record.json").exists()
+
+
+def _commit_repo(tmp_path):
+    repo = tmp_path / "poc"
+    repo.mkdir()
+    git(tmp_path, "init", "-q", "-b", "main", str(repo))
+    git(repo, "config", "user.email", "t@example.com")
+    git(repo, "config", "user.name", "t")
+    (repo / "README").write_text("one\n")
+    git(repo, "add", "README")
+    git(repo, "commit", "-q", "-m", "one")
+    return repo, git(repo, "rev-parse", "HEAD")
+
+
+def _spy_git(monkeypatch):
+    commands = []
+    real = dr._git
+
+    def spy(root, *args):
+        commands.append(args)
+        return real(root, *args)
+
+    monkeypatch.setattr(dr, "_git", spy)
+    return commands
+
+
+def test_bench_refuses_a_mismatched_commit(tmp_path, monkeypatch):
+    repo, sha = _commit_repo(tmp_path)
+    commands = _spy_git(monkeypatch)
+    other = "b" * 40
+    with pytest.raises(SystemExit, match="not the expected commit") as caught:
+        dr.given_commit(repo, other)
+    assert sha in str(caught.value) and other in str(caught.value) and "does not move" in str(caught.value)
+    assert git(repo, "rev-parse", "HEAD") == sha
+    assert commands == [("status", "--porcelain"), ("rev-parse", "HEAD")]
+
+
+def test_bench_refuses_a_dirty_tree(tmp_path, monkeypatch):
+    repo, sha = _commit_repo(tmp_path)
+    (repo / "README").write_text("dirty\n")
+    commands = _spy_git(monkeypatch)
+    with pytest.raises(SystemExit, match="uncommitted changes") as caught:
+        dr.given_commit(repo, sha)
+    assert "was not moved" in str(caught.value)
+    assert git(repo, "rev-parse", "HEAD") == sha
+    assert git(repo, "status", "--porcelain") != ""
+    assert commands == [("status", "--porcelain")]
+
+
+def test_bench_mode_does_not_move_the_checkout(tmp_path, monkeypatch, capsys):
+    """A benchmark run checks HEAD and stops. It does not fetch, check out, or merge."""
+    repo, sha = _commit_repo(tmp_path)
+    commands = _spy_git(monkeypatch)
+    monkeypatch.setattr(dr, "REPO_ROOT", repo)
+    monkeypatch.setattr(dr, "sync_to_origin_main", _forbid_sync)
+    monkeypatch.delenv("POC_EXPECT_COMMIT", raising=False)
+    answers = tmp_path / "x-answers.csv"
+    answers.write_text(SYN.read_text())
+
+    with pytest.raises(SystemExit, match="40-character commit"):
+        dr.main(["--bench", str(answers), "--model-provider", "none"])
+    assert git(repo, "rev-parse", "HEAD") == sha
+    assert all(c[0] not in ("fetch", "checkout", "merge", "switch") for c in commands)
+
+    commands.clear()
+    monkeypatch.setenv("POC_EXPECT_COMMIT", "c" * 40)
+    assert dr.main(["--bench", str(answers), "--expect-commit", sha, "--model-provider", "none"]) == 2
+    assert "never read an answer key" in capsys.readouterr().err
+    assert git(repo, "rev-parse", "HEAD") == sha
+    assert commands == [("status", "--porcelain"), ("rev-parse", "HEAD")]
+
+    commands.clear()
+    with pytest.raises(SystemExit, match="not the expected commit"):
+        dr.main(["--bench", str(answers), "--expect-commit", "d" * 40, "--model-provider", "none"])
+    assert git(repo, "rev-parse", "HEAD") == sha
+    assert all(c[0] not in ("fetch", "checkout", "merge", "switch") for c in commands)

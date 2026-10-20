@@ -22,7 +22,10 @@ Verdict rule (deciding_items, used by ops/daily_run.with_probes, and poc/behavio
 * not_adequate    -> it can never lead to 'verified': its green observations are dropped from the verdict and it
                      does not count as checking a behaviour claim. Its red and amber observations still count (a
                      difference is never hidden).
-* unmeasured      -> decides as before; the report says the probe's coverage was not measured.
+* rejected        -> the probe's claim patterns match none of its observation names. It does not count. Red and
+                     amber observations still count, and the reason is recorded on the probe.
+* unmeasured      -> no measured line coverage. It does not count as covering the change: green observations are
+                     dropped and it does not check a behaviour claim. Red and amber observations still count.
 """
 from __future__ import annotations
 
@@ -77,9 +80,26 @@ def adequacy_of(item: dict) -> str | None:
     return (item.get("probe_changed_line_coverage") or {}).get("adequacy")
 
 
+def has_measured_coverage(item: dict) -> bool:
+    """True only when line coverage was measured and at least one changed line ran."""
+    cov = item.get("probe_changed_line_coverage") or {}
+    if cov.get("adequacy") == NOT_ADEQUATE:
+        return False
+    return cov.get("status") == "measured" and (cov.get("changed_lines_covered") or 0) > 0
+
+
+def _red_amber(item: dict) -> list[dict]:
+    """Observations that still have to be reported. Dropping them could hide a difference and raise the verdict."""
+    return [o for o in item.get("observations", []) if COLOUR.get(FindingLabel(o["label"])) in ("red", "amber")]
+
+
 def deciding_items(items: list[dict]) -> tuple[list[dict], list[str]]:
-    """Probe entries as the verdict may use them, and notes for the reason text. A not_adequate probe keeps only its
-    red/amber observations (they still flag the PR); its green ones are dropped so it cannot lead to 'verified'."""
+    """Probe entries as the verdict may use them, and notes for the reason text.
+
+    A not_adequate probe, a probe with no measured line coverage, and a probe whose claim patterns match none of
+    its observation names, keep only their red/amber observations (they still flag the PR). Their green ones are
+    dropped so they cannot lead to 'verified'."""
+    from poc import probes
     out, notes = [], []
     for it in items:
         if it.get("status") in ("uninformative", "not_run"):
@@ -87,14 +107,24 @@ def deciding_items(items: list[dict]) -> tuple[list[dict], list[str]]:
             notes.append(f"probe {it['id']} is {it['status']} ({why}); its matching results do not count")
             out.append(dict(it, observations=[]))
             continue
-        if adequacy_of(it) != NOT_ADEQUATE:
-            out.append(it)
+        why_reject = it.get("rejected_reason") or probes.rejection_reason(it)
+        if it.get("status") not in ("crashed", "error") and (it.get("status") == "rejected" or probes.rejection_reason(it)):
+            notes.append(why_reject or f"probe {it['id']} is rejected; its matching results do not count")
+            out.append(dict(it, observations=_red_amber(it)))
             continue
-        keep = [o for o in it.get("observations", [])
-                if COLOUR.get(FindingLabel(o["label"])) in ("red", "amber")]
-        notes.append(f"probe {it['id']} is not_adequate ({it['probe_changed_line_coverage'].get('note')}); its "
-                     f"matching results do not count")
-        out.append(dict(it, observations=keep))
+        if adequacy_of(it) == NOT_ADEQUATE:
+            notes.append(f"probe {it['id']} is not_adequate ({it['probe_changed_line_coverage'].get('note')}); its "
+                         f"matching results do not count")
+            out.append(dict(it, observations=_red_amber(it)))
+            continue
+        if not has_measured_coverage(it):
+            cov = it.get("probe_changed_line_coverage") or {}
+            why = cov.get("why") or "no coverage data"
+            notes.append(f"probe {it['id']} has no measured line coverage ({why}); it does not count as covering "
+                         f"the change")
+            out.append(dict(it, observations=_red_amber(it)))
+            continue
+        out.append(it)
     return out, notes
 
 

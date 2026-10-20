@@ -1,11 +1,16 @@
 """Cost of one review: AI tokens (input, output, thinking), the Nebius price for them, how many AI calls were made
 (retries and review steps included) and how long the machine spent building and testing.
 
+Advisory swarm calls (judge, helper, summary) are tallied on `swarm` and left out of the headline totals, so a
+study run stays comparable with the paper's section 7.10 figures.
+
 Prices are Nebius Token Factory list prices in US dollars per 1 million tokens, from
 https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13).
 Thinking ("reasoning") tokens are part of the output tokens the server reports and are billed as output.
 """
 from __future__ import annotations
+
+from contextlib import contextmanager
 
 RATE_SOURCE = ("Nebius Token Factory list price, https://nebius.com/services/token-factory/models/"
                "nvidia-nemotron-models-inference (checked 2026-10-13)")
@@ -37,6 +42,7 @@ def computer_cost(seconds: float | None) -> float:
 
 
 _ledger: list[dict] = []
+_swarm_depth = 0
 
 
 def tokens(usage: dict | None) -> tuple[int, int, int] | None:
@@ -54,15 +60,29 @@ def price(model: str | None, usage: dict | None) -> float | None:
     return t[0] / 1e6 * r[0] + t[1] / 1e6 * r[1]
 
 
-def record_call(model: str | None, usage: dict | None, ok: bool = True) -> None:
-    """Note one AI call (also failed ones and retries) for the review that is running now."""
-    _ledger.append({"model": model, "usage": usage, "ok": ok})
+@contextmanager
+def swarm_scope():
+    """Mark AI calls recorded inside this block as advisory-swarm spend."""
+    global _swarm_depth
+    _swarm_depth += 1
+    try:
+        yield
+    finally:
+        _swarm_depth -= 1
 
 
-def summarize(calls: list[dict], compute_seconds: dict | None = None) -> dict:
+def record_call(model: str | None, usage: dict | None, ok: bool = True, swarm: bool = False) -> None:
+    """Note one AI call (also failed ones and retries) for the review that is running now.
+
+    Calls inside swarm_scope(), or passed swarm=True, are kept on the swarm line and left out of the headline total.
+    """
+    _ledger.append({"model": model, "usage": usage, "ok": ok, "swarm": bool(swarm) or _swarm_depth > 0})
+
+
+def _tally(calls: list[dict]) -> dict:
     out = {"ai_calls": len(calls), "failed_ai_calls": sum(1 for c in calls if not c.get("ok", True)),
            "input_tokens": 0, "output_tokens": 0, "thinking_tokens": 0, "cost_usd": 0.0,
-           "calls_without_usage": 0, "rate_source": RATE_SOURCE, "compute_seconds": compute_seconds or {}}
+           "calls_without_usage": 0}
     for c in calls:
         t, p = tokens(c.get("usage")), price(c.get("model"), c.get("usage"))
         if t is None or p is None:
@@ -74,11 +94,23 @@ def summarize(calls: list[dict], compute_seconds: dict | None = None) -> dict:
         out["cost_usd"] += p
     out["cost_usd"] = round(out["cost_usd"], 6)
     out["ai_cost_usd"] = out["cost_usd"]
+    out["cost_complete"] = out["calls_without_usage"] == 0
+    return out
+
+
+def summarize(calls: list[dict], compute_seconds: dict | None = None) -> dict:
+    main = [c for c in calls if not c.get("swarm")]
+    swarm = _tally([c for c in calls if c.get("swarm")])
+    swarm["rate_source"] = RATE_SOURCE
+    out = _tally(main)
+    out["rate_source"] = RATE_SOURCE
+    out["compute_seconds"] = compute_seconds or {}
     rate, src = machine_rate()
     out["machine_usd_per_hour"], out["machine_rate_source"] = rate, src
     out["computer_cost_usd"] = computer_cost((compute_seconds or {}).get("total_wall"))
+    # Headline total is study spend only: claims, probes and computer time. Swarm dollars stay on out["swarm"].
     out["total_cost_usd"] = round(out["ai_cost_usd"] + out["computer_cost_usd"], 6)
-    out["cost_complete"] = out["calls_without_usage"] == 0
+    out["swarm"] = swarm
     return out
 
 

@@ -77,10 +77,24 @@ def test_not_adequate_probe_cannot_lead_to_verified():
 def test_adequate_probe_still_decides():
     assert verdict_for(_cmp_verified(), None, probe_results=_probe(SAME, {"r": 1}, {"r": 1}, "adequate"),
                        claims=CLAIM)[0] == "verified"
-    assert verdict_for(_cmp_verified(), None, probe_results=_probe(SAME, {"r": 1}, {"r": 1}, "unmeasured"),
-                       claims=CLAIM)[0] == "verified"
-    assert verdict_for(_cmp_verified(), None, probe_results=_probe(SAME, {"r": 1}, {"r": 1}),
-                       claims=CLAIM)[0] == "verified"           # records from before this rule
+
+
+def test_unmeasured_coverage_does_not_cover_the_change():
+    v, reason, _ = verdict_for(_cmp_verified(), None, probe_results=_probe(SAME, {"r": 1}, {"r": 1}, "unmeasured"),
+                               claims=CLAIM)
+    assert v == "could_not_verify"
+    assert "no measured line coverage" in reason and "unverified behaviour claim" in reason
+    missing = _probe(SAME, {"r": 1}, {"r": 1})          # no coverage block at all
+    assert verdict_for(_cmp_verified(), None, probe_results=missing, claims=CLAIM)[0] == "could_not_verify"
+    assert not pa.has_measured_coverage(missing["items"][0])
+    # A difference is still needs attention, so this cannot hide a finding.
+    red = verdict_for(_cmp_verified(), None, probe_results=_probe([], {"c": 1}, {"c": 2}, "unmeasured"))
+    assert red[0] == "needs_attention" and "differs" in red[1]
+    # No behaviour claim: the tests were already verified. Dropping the probe holds that verdict.
+    assert verdict_for(_cmp_verified(), None, probe_results=_probe(SAME, {"r": 1}, {"r": 1}, "unmeasured"))[0] == "verified"
+    # A run that already could not verify is not raised.
+    assert verdict_for(None, "source build failed",
+                       probe_results=_probe(SAME, {"r": 1}, {"r": 1}, "unmeasured"))[0] == "could_not_verify"
 
 
 def test_not_adequate_probe_still_flags_differences():

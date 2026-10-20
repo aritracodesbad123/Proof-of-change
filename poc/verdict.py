@@ -12,6 +12,7 @@ class Verdict(str, Enum):
     VERIFIED = "verified"                  # green check
     NEEDS_ATTENTION = "needs_attention"    # neutral check
     COULD_NOT_VERIFY = "could_not_verify"  # neutral check
+    NO_CODE_CHANGE = "no_code_change"      # neutral check: type stubs or a py.typed marker only
 
 
 class FindingLabel(str, Enum):
@@ -33,7 +34,8 @@ COLOUR = {
 }
 
 # Check-run conclusions: never "failure" (verdicts do not block merges).
-CHECK_CONCLUSION = {Verdict.VERIFIED: "success", Verdict.NEEDS_ATTENTION: "neutral", Verdict.COULD_NOT_VERIFY: "neutral"}
+CHECK_CONCLUSION = {Verdict.VERIFIED: "success", Verdict.NEEDS_ATTENTION: "neutral",
+                    Verdict.COULD_NOT_VERIFY: "neutral", Verdict.NO_CODE_CHANGE: "neutral"}
 
 
 @dataclass

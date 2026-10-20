@@ -13,6 +13,7 @@ code verdict so the swarm cannot change the merge advice silently.
 from __future__ import annotations
 
 import json
+import os
 from typing import Any
 
 from poc import model_provider
@@ -49,6 +50,17 @@ install hints. Do not invent failures. At most 5 short notes. Answer with JSON o
 SUMMARY_PROMPT = """Write a short plain-English summary of this PR check for a human reviewer.
 Quote only strings that appear in the provided record excerpt (put those strings in "quotes").
 Do not invent log lines. Answer with JSON only."""
+
+
+def swarm_enabled(flag: bool = False) -> bool:
+    """True when this run should call the advisory swarm.
+
+    Command-line and benchmark runs default to off. ``--swarm`` or ``POC_SWARM``
+    (1, true, yes, or on) turns it on. The operator console passes ``--swarm`` itself.
+    """
+    if flag:
+        return True
+    return (os.environ.get("POC_SWARM") or "").strip().lower() in ("1", "true", "yes", "on")
 
 
 def _role(provider: Provider | None, task: str) -> dict:
@@ -103,6 +115,24 @@ def run_swarm(provider: Provider | None, rec: dict, ctx: dict | None = None,
         rec.setdefault("explanation", {"status": "not yet wired", "why": "no model provider"})
         return out
 
+    from poc import cost
+
+    with cost.swarm_scope():
+        _run_swarm_roles(provider, rec, ctx, agents, out, run_judge, run_helper, run_summary)
+    rec["agents"] = {
+        "status": "ran",
+        "advisory": True,
+        "note": "judge/helper/summary are advisory; code owns the verdict",
+        "roles": agents,
+        "provider": provider.describe(),
+    }
+    if "explanation" not in rec:
+        rec["explanation"] = {"status": "not yet wired"}
+    return out
+
+
+def _run_swarm_roles(provider: Provider, rec: dict, ctx: dict, agents: list, out: dict,
+                     run_judge: bool, run_helper: bool, run_summary: bool) -> None:
     from poc import run_progress
 
     # --- judge (Ultra), advisory
@@ -117,6 +147,8 @@ def run_swarm(provider: Provider | None, rec: dict, ctx: dict | None = None,
             role["labels"] = raw.get("labels") or []
             out["judge"] = raw
         except Exception as e:  # noqa: BLE001
+            if isinstance(e, model_provider.ProviderRejected):
+                raise
             role["status"] = "error"
             role["note"] = f"{type(e).__name__}: {e}"[:200]
 
@@ -145,6 +177,8 @@ def run_swarm(provider: Provider | None, rec: dict, ctx: dict | None = None,
                     role["notes"] = raw.get("notes") or []
                     out["helper"] = raw
                 except Exception as e2:  # noqa: BLE001
+                    if isinstance(e2, model_provider.ProviderRejected):
+                        raise
                     role["status"] = "error"
                     role["note"] = f"{type(e2).__name__}: {e2}"[:200]
                 finally:
@@ -153,6 +187,8 @@ def run_swarm(provider: Provider | None, rec: dict, ctx: dict | None = None,
                 role["status"] = "error"
                 role["note"] = f"{type(e).__name__}: {e}"[:200]
         except Exception as e:  # noqa: BLE001
+            if isinstance(e, model_provider.ProviderRejected):
+                raise
             role["status"] = "error"
             role["note"] = f"{type(e).__name__}: {e}"[:200]
 
@@ -194,20 +230,11 @@ def run_swarm(provider: Provider | None, rec: dict, ctx: dict | None = None,
             }
             out["summary"] = rec["explanation"]
         except Exception as e:  # noqa: BLE001
+            if isinstance(e, model_provider.ProviderRejected):
+                raise
             role["status"] = "error"
             role["note"] = f"{type(e).__name__}: {e}"[:200]
             rec["explanation"] = {"status": "error", "why": role["note"]}
-
-    rec["agents"] = {
-        "status": "ran",
-        "advisory": True,
-        "note": "judge/helper/summary are advisory; code owns the verdict",
-        "roles": agents,
-        "provider": provider.describe(),
-    }
-    if "explanation" not in rec:
-        rec["explanation"] = {"status": "not yet wired"}
-    return out
 
 
 def models_for_args(claims: str, probes: str, judge: str | None = None,

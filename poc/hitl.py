@@ -1,8 +1,10 @@
 """Human-in-the-loop mid-check: pause after AI drafts claims/probes for operator approval.
 
-When POC_HITL=1 and POC_HITL_DIR is set (console always does), model_probes.generate writes
-hitl_draft.json, emits await_human, and polls for hitl_approval.json before freezing.
-Bench / CLI leave HITL off unless those env vars are set.
+When POC_HITL is set, a command-line run and a benchmark run refuse to start. No environment
+variable waives that. The operator console passes ``--console-job`` on a single pull-request
+check; that flag is the only way such a check may start with approval on. A benchmark run
+still refuses, even with the flag. Approval can change which probes run, so it is not a
+study-run option.
 """
 from __future__ import annotations
 
@@ -41,8 +43,71 @@ _QUESTION_TEMPLATES = (
 )
 
 
+_ON = ("1", "true", "yes", "on")
+
+
+def _flag(name: str) -> bool:
+    return (os.environ.get(name) or "").strip().lower() in _ON
+
+
+def hitl_requested() -> bool:
+    """True when POC_HITL is set, whether or not this process may honour it."""
+    return _flag("POC_HITL")
+
+
+def console_job() -> bool:
+    """True when this process was started by the operator console."""
+    return _flag("POC_CONSOLE")
+
+
 def hitl_enabled() -> bool:
-    return (os.environ.get("POC_HITL") or "").strip().lower() in ("1", "true", "yes")
+    """Operator approval runs only inside a console job. A bare POC_HITL does not turn it on."""
+    return hitl_requested() and console_job()
+
+
+_approval_ran = False
+
+
+def reset_approval_ran() -> None:
+    """Clear the per-pull-request mark that the approval step ran."""
+    global _approval_ran
+    _approval_ran = False
+
+
+def note_approval_ran() -> None:
+    """The approval step was entered for the pull request that is running now."""
+    global _approval_ran
+    _approval_ran = True
+
+
+def approval_ran() -> bool:
+    """True after this pull request entered the approval step. False until then."""
+    return _approval_ran
+
+
+def take_approval_ran() -> bool:
+    """Whether the approval step ran, then clear the mark for the next pull request."""
+    ran = approval_ran()
+    reset_approval_ran()
+    return ran
+
+
+def study_operator_approval_stop(bench: bool, *, console_job: bool = False, single_pr: bool = False) -> str | None:
+    """Plain-language refusal for a command-line or benchmark run that has POC_HITL set.
+
+    ``console_job`` is the ``--console-job`` flag, never an environment variable. It lets one
+    pull-request check start. A benchmark run stops even when the flag is set.
+    """
+    if not hitl_requested():
+        return None
+    if console_job and single_pr and not bench:
+        return None
+    kind = "benchmark" if bench else "command-line"
+    return (
+        "STOPPED: operator approval is turned on (POC_HITL is set), but this is a "
+        f"{kind} run. That step lets a person add or drop probes, so it can change "
+        "which probes run. Unset POC_HITL and start this run again."
+    )
 
 
 def hitl_dir() -> Path | None:
@@ -305,6 +370,7 @@ def gate_and_materialize(
     """HITL pause then freeze approved + scenario probes. Mutates errors list; returns generate()-style out."""
     from poc.model_probes import _context
 
+    note_approval_ran()
     out: dict[str, Any] = {
         "provider": provider.describe(),
         "claims": claims,

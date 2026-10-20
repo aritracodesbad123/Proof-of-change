@@ -8,7 +8,7 @@ F = FindingLabel
 
 
 def test_verdict_values_and_never_block():
-    assert {v.value for v in Verdict} == {"verified", "needs_attention", "could_not_verify"}
+    assert {v.value for v in Verdict} == {"verified", "needs_attention", "could_not_verify", "no_code_change"}
     assert "failure" not in CHECK_CONCLUSION.values()
 
 

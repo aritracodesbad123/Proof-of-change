@@ -168,7 +168,10 @@ def _cmp_verified():
 
 
 def _probes(main, pr):
-    return {"status": "ran", "items": [probes.entry(SPEC, runs(main, pr), {"main": ["m"], "pr": ["p"]}, [], "library", None)]}
+    item = probes.entry(SPEC, runs(main, pr), {"main": ["m"], "pr": ["p"]}, [], "library", None)
+    item["probe_changed_line_coverage"] = {"status": "measured", "changed_lines_total": 2,
+                                           "changed_lines_covered": 1, "adequacy": "adequate"}
+    return {"status": "ran", "items": [item]}
 
 
 def test_probe_finding_turns_verified_into_needs_attention():

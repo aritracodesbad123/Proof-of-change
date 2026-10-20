@@ -75,37 +75,83 @@ def _clean(text: str) -> str:
 
 # A sentence about the PR's own tests or about a tool's output is not a claim about the product's behaviour:
 # "Add regressions for ... untouched columns, and unchanged inputs" describes what a test covers, and "mypy's output
-# is identical on the unmodified base" describes a type checker. Two narrow shapes are dropped:
+# is identical on the unmodified base" describes a type checker. Narrow shapes are dropped:
 #   1. the sentence starts by adding/describing tests ("Add tests ...", "Added regression tests ...", "New tests ...");
-#   2. the sentence names a checking tool (mypy, pyright, ruff, flake8, pylint, pre-commit, linter, type checker).
-# Lines under a "Test plan" / "Testing" / "Tests" / "Type checking" heading are dropped for the same reason.
+#   2. the sentence names a checking tool (mypy, ruff, linter, ...) right next to a run/pass/fail word
+#      ("ruff check", "linting passes", "mypy output"). A tool word on its own is not enough: "extend linter Fix"
+#      describes the product when the product is a linter.
+# List items and code lines under a "Test plan" / "Testing" / "Verification" heading are dropped for the same reason.
+# Such a section ends at the next heading, the next "**Label**:" line, a <details> block, a "Fixes #" line, or new
+# prose, so a summary written after the test list is kept. A "nothing else changes" sentence (unaffected, unchanged,
+# without affecting ...) is never dropped by the section or tool rules unless it talks about the tests or a tool themselves.
 _TEST_SENTENCE = re.compile(
     r"(?i)^\W*(?:i\s+|we\s+)?(?:add(?:s|ed)?|extend(?:s|ed)?|new|includ(?:e|es|ed)|cover(?:s|ed)?)\s+"
     r"(?:\w+\s+){0,2}?(?:regression\s+tests?|regressions?|tests?|test\s+cases?|unit\s+tests?)\b")
+_TOOL = r"(?:mypy|pyright|ruff|flake8|pylint|black|isort|pre-commit|linters?|lint(?:ing)?|type[-\s]?check(?:er|ing)?s?)"
+_RESULT = (r"(?:run(?:s|ning)?|ran|pass(?:es|ed|ing)?|fail(?:s|ed|ing|ures?)?|check(?:s|ed)?|outputs?|errors?|"
+           r"warnings?|reports?|clean|succeed(?:s|ed)?|green)")
 _TOOL_SENTENCE = re.compile(
-    r"(?i)\b(?:mypy|pyright|ruff|flake8|pylint|pre-commit|linters?|lint(?:ing)?|type[-\s]?check(?:er|ing)?s?)\b")
+    rf"(?i)\b{_TOOL}['`’]*(?:s)?\W+(?:\w+\W+){{0,3}}?{_RESULT}\b|"
+    rf"\b(?:run(?:s|ning)?|ran|pass(?:es|ed|ing)?|fail(?:s|ed|ing)?)\W+(?:\w+\W+)?{_TOOL}\b")
+# A sentence about a CI workflow or a .yml file describes the project's own automation (the change itself),
+# so "The lint workflow was running ... twice" is kept.
+_WORKFLOW = re.compile(r"(?i)\bworkflows?\b|\.ya?ml\b")
+_PRESERVE = re.compile(
+    r"(?i)\b(?:unaffected|unchanged|untouched|without\s+(?:affecting|changing|breaking)|"
+    r"no\s+(?:other\s+)?(?:behaviou?r(?:al)?\s+)?changes?|nothing\s+else\s+changes|"
+    r"(?:remain|remains|stay|stays|continue\s+to\s+work)\s+(?:the\s+same|as\s+before|unchanged))\b")
+_ABOUT_TESTS = re.compile(rf"(?i)\b(?:tests?|suite|pytest|ci|{_TOOL})\b")
+_QUOTE = re.compile(r"^\s*(?:>\s?)*")
 _TEST_HEADING = re.compile(
-    r"(?i)^\s*(?:#+\s*|\*\*)(?:test(?:s|ing)?(?:\s+plan)?|how\s+(?:this\s+was\s+|i\s+)?tested|"
+    r"(?i)^\s*(?:[-*+]\s+)?(?:#+\s*|\*\*)(?:test(?:s|ing)?(?:\s+plan)?|how\s+(?:this\s+was\s+|i\s+)?tested|"
     r"type[-\s]?checking|verification)\b")
 _ANY_HEADING = re.compile(r"^\s*(?:#+\s|\*\*[^*]+\*\*\s*:?\s*$)")
+_LABEL_LINE = re.compile(r"^\s*(?:[-*+]\s+)?\*\*[^*]+\*\*\s*:")
+_SECTION_STOP = re.compile(r"(?i)^\s*(?:<details|<summary|\[!\w+\]|fixes\s+\S*#\d+|(?:closes|resolves)\s+\S*#\d+)")
+_ITEM = re.compile(r"^\s*(?:[-*+]\s|\d+[.)]\s|`|\$\s|-{3,}\s*$|\*{3,}\s*$|_{3,}\s*$)")
+
+
+def keeps_nothing_else_changes(sentence: str) -> bool:
+    """True for a 'nothing else changes' sentence that is about the product, not about the tests."""
+    return bool(_PRESERVE.search(sentence)) and not _ABOUT_TESTS.search(sentence)
 
 
 def _drop_test_sections(text: str) -> str:
-    kept, skip = [], False
+    # Known limit: a wrapped list item whose continuation line has no indent counts as new prose and ends the
+    # section early. That fails safe: the remaining test lines are kept and only reach the claim finder.
+    kept, skip, fence, seen_item = [], False, False, False
     for line in text.splitlines():
-        if _TEST_HEADING.match(line):
-            skip = True
+        bare = _QUOTE.sub("", line, count=1)
+        if skip:
+            if bare.strip().startswith("```"):
+                fence = not fence
+                continue
+            if fence:
+                continue
+            if _TEST_HEADING.match(bare):
+                continue
+            if (_ANY_HEADING.match(bare) or _LABEL_LINE.match(bare) or _SECTION_STOP.match(bare)
+                    or (bare.strip() and seen_item and not _ITEM.match(bare) and not bare[:1].isspace())):
+                skip = False
+            else:
+                if bare.strip():
+                    seen_item = True
+                    if keeps_nothing_else_changes(bare):
+                        kept.append(line)
+                continue
+        if _TEST_HEADING.match(bare):
+            skip, fence, seen_item = True, False, False
             continue
-        if skip and _ANY_HEADING.match(line):
-            skip = False
-        if not skip:
-            kept.append(line)
+        kept.append(line)
     return "\n".join(kept)
 
 
 def about_tests_or_tools(sentence: str) -> bool:
     """True when a matched sentence describes the PR's tests or a tool's output, not product behaviour."""
-    return bool(_TEST_SENTENCE.search(sentence) or _TOOL_SENTENCE.search(sentence))
+    if _TEST_SENTENCE.search(sentence):
+        return True
+    return (bool(_TOOL_SENTENCE.search(sentence)) and not keeps_nothing_else_changes(sentence)
+            and not _WORKFLOW.search(sentence))
 
 
 _BOUNDARY = re.compile(r"[.!?](?=\s)|\n")
@@ -198,14 +244,26 @@ def find(title: str, body: str | None, diff: str | None = None) -> list[dict]:
     return out
 
 
+# A probe in one of these states covered no changed lines (poc/probes.classify_item). A stale coverage block that
+# still says "adequate" does not put those lines back.
+_NO_COVER_STATUS = frozenset({"crashed", "error", "uninformative", "not_run"})
+
+
 def probe_covers(probe_results: dict | None) -> bool:
     """A probe that ran and has at least one claim expecting 'same' checks behaviour preservation; its result then
     decides (probes never get overruled by this rule). A probe that ran none of the changed lines on the main side
-    (probe_changed_line_coverage adequacy not_adequate, poc/probe_adequacy.py) does not count."""
+    does not count: not_adequate, a measured coverage of 0, no measured line coverage at all, a crashed, empty,
+    uninformative or not_run probe, or a probe whose claim patterns match none of its own observation names."""
+    from poc import probes
     for it in (probe_results or {}).get("items") or []:
-        if it.get("status") in ("uninformative", "not_run"):
+        if it.get("status") in _NO_COVER_STATUS or it.get("status") == "rejected":
             continue
-        if (it.get("probe_changed_line_coverage") or {}).get("adequacy") == "not_adequate":
+        if probes.rejection_reason(it):
+            continue
+        cov = it.get("probe_changed_line_coverage") or {}
+        if cov.get("adequacy") == "not_adequate":
+            continue
+        if cov.get("status") != "measured" or not (cov.get("changed_lines_covered") or 0):
             continue
         if any(c.get("expect") == "same" for c in it.get("claims") or []):
             return True

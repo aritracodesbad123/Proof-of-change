@@ -11,13 +11,17 @@
 
 `select(name)` returns (provider or None, note). It never includes the API key. A run that is set to nebius must
 not start when the key is missing or empty: `key_refusal` names the variable and how to fix it, and the daily run
-and the eval runners stop there. `select` still returns no provider and a note in that case, so a caller can see
-why. Only an explicit `none` is a run with the AI off.
+and the eval runners stop there. Before any case starts, `auth_refusal` makes one cheap authenticated call. If the
+provider rejects the key (HTTP 401 or 403), the run stops, and the message never contains the key. A 401 or 403
+during a case is `ProviderRejected`, which is not a `ProviderError`, so a caller that records an ordinary model
+failure must let it through and stop the run. `select` still returns no provider and a note when the key is
+missing, so a caller can see why. Only an explicit `none` is a run with the AI off.
 """
 from __future__ import annotations
 
 import json
 import os
+import urllib.error
 import urllib.request
 from pathlib import Path
 
@@ -74,13 +78,48 @@ patterns) and what the claim expects for them (same | differs).
 Coverage rule: the BASE-side files shown are the files the pull request changes. Write at least one probe for every
 testable claim; an empty "probes" list is not an acceptable answer. Each probe must call the functions or methods the
 claim is about directly, with several representative inputs and edge cases chosen generically from the code you see
-(for example: zero, negative and positive numbers, whole and fractional values, empty and non-empty containers,
-boundary sizes, each accepted input type), so that a change in behaviour would show up in the observations. If you
+(for example: zero, negative and positive numbers, whole and fractional values, true and false, None, empty and
+non-empty containers, boundary sizes, each accepted input type, and a small numpy array or pandas value where the
+code uses those), so that a change in behaviour would show up in the observations. If you
 are unsure whether behaviour changes, still record the outputs: plain code decides. Answer with JSON only."""
 
 
 class ProviderError(RuntimeError):
     pass
+
+
+class ProviderRejected(Exception):
+    """The provider refused the API key (HTTP 401 or 403).
+
+    This is not a ProviderError. A caller that treats a failed model call as a per-case error must let this
+    through and stop the run. The message names the HTTP status and the environment variable, and it never
+    contains the key.
+    """
+
+    def __init__(self, status: int, *, starting: bool):
+        self.status = int(status)
+        self.starting = bool(starting)
+        super().__init__(rejection_message(self.status, starting=self.starting))
+
+
+def rejection_message(status: int, *, starting: bool) -> str:
+    """Plain stop message for a rejected key. It never contains the key."""
+    when = "before any case starts" if starting else "during the run"
+    return (
+        f"STOPPED: the Nebius provider rejected {KEY_ENV} (HTTP {int(status)}) {when}. "
+        "The run will not continue. "
+        f"Fix: set {KEY_ENV} to a key the provider accepts and run again, "
+        "or pass --model-provider none if you mean to run with the AI off. "
+        "The key is never printed."
+    )
+
+
+def _auth_status(exc: BaseException) -> int | None:
+    """HTTP status when the provider refused the key. None for any other failure."""
+    code = getattr(exc, "code", None)
+    if code in (401, 403):
+        return int(code)
+    return None
 
 
 class Provider:
@@ -110,6 +149,27 @@ class NebiusProvider(Provider):
         super().__init__(models)
         self._key, self.base_url, self.timeout = api_key, base_url.rstrip("/"), timeout
 
+    def confirm_key(self) -> None:
+        """One cheap authenticated call (GET /models) before any case starts.
+
+        HTTP 401 or 403 raises ProviderRejected. Any other failure is ignored: a later 401 or 403 still
+        stops the run. This call is not an AI case call, so it is not added to the call list or the cost ledger.
+        The key is sent only as the Authorization header and is never written into an error.
+        """
+        req = urllib.request.Request(f"{self.base_url}/models",
+                                     headers={"Authorization": f"Bearer {self._key}"},
+                                     method="GET")  # br-allow-external: key check, creates nothing
+        try:
+            with urllib.request.urlopen(req, timeout=min(int(self.timeout), 30)) as r:  # noqa: S310 (fixed https URL)
+                r.read()
+        except urllib.error.HTTPError as e:
+            code = _auth_status(e)
+            e.close()
+            if code is not None:
+                raise ProviderRejected(code, starting=True) from None
+        except Exception:  # noqa: BLE001 — a models-list outage is not a rejected key
+            return
+
     def complete_json(self, task: str, system: str, user: str, schema: dict, ctx: dict) -> dict:
         body = {"model": self.models[task], "temperature": 0,
                 "max_tokens": int(os.environ.get("POC_MAX_TOKENS", "32000")),
@@ -132,9 +192,15 @@ class NebiusProvider(Provider):
                 raise ProviderError(f"{self.name} {task}: model returned no answer "
                                     f"(finish_reason={ch.get('finish_reason')}; token limit {body['max_tokens']})")
             return json.loads(ch["message"]["content"])
+        except ProviderRejected:
+            raise
         except ProviderError:
             raise
         except Exception as e:  # noqa: BLE001
+            status = _auth_status(e)
+            if status is not None:
+                err = f"HTTP {status}"
+                raise ProviderRejected(status, starting=False) from None
             err = f"{type(e).__name__}: {e}"
             raise ProviderError(f"{self.name} {task} request failed: {type(e).__name__}") from None
         finally:
@@ -228,6 +294,22 @@ def key_refusal(provider: str, env: dict | None = None) -> str | None:
         "or pass --model-provider none if you mean to run with the AI off. "
         "The key is never printed."
     )
+
+
+def auth_refusal(provider) -> str | None:
+    """Plain stop message when a live Nebius provider rejects the key. None when the run may start.
+
+    One cheap authenticated call (the models list). Only HTTP 401 and 403 stop the run. Any other failure
+    of that call does not. `none` and `recorded` do not call the provider. The message never contains the key.
+    """
+    confirm = getattr(provider, "confirm_key", None)
+    if not callable(confirm):
+        return None
+    try:
+        confirm()
+    except ProviderRejected as e:
+        return str(e)
+    return None
 
 
 def describe_use(requested: str | None, provider, skipped: str | None = None,

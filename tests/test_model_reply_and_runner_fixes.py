@@ -107,6 +107,7 @@ def test_timeout_is_recorded_and_run_continues(tmp_path, monkeypatch):
     fpf = tmp_path / "fp.json"
     fpf.write_text(json.dumps(Fingerprints(source="t").to_json()))
     monkeypatch.setenv(pg.KEY_ENV, "k")
+    monkeypatch.setattr(model_provider.NebiusProvider, "confirm_key", lambda self: None)
     done = []
 
     def fake_case(row, a, fp, key, out, machine):

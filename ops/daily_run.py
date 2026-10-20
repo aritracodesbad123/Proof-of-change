@@ -175,6 +175,66 @@ def classify_files(files: list[str], pkg: str) -> dict:
             "other": [f for f in files if f not in py and f not in compiled and f not in build_cfg]}
 
 
+def _is_typing_file(path: str) -> bool:
+    """A stub file or the package marker that says the package ships type information."""
+    name = str(path).replace("\\", "/").rsplit("/", 1)[-1]
+    return name.endswith(".pyi") or name == "py.typed"
+
+
+def typing_only_change(paths) -> bool:
+    """True only when every changed file is a .pyi stub or a py.typed marker.
+
+    An empty list is not this rule. A .py file is not this rule, even when its only edits are type hints.
+    One other file, of any kind, is enough to make the whole diff ordinary.
+    """
+    if not paths:
+        return False
+    return all(isinstance(p, str) and _is_typing_file(p) for p in paths)
+
+
+def selection_skip_for_files(fc: dict, pkg: str) -> str | None:
+    """Why a diff is not package code to test. None when the pull request should be tested.
+
+    A typing-only diff is not skipped here. The run records it as no_code_change instead.
+    An empty diff and a non-Python diff keep the existing skip.
+    """
+    if typing_only_change((fc or {}).get("all") or []):
+        return None
+    compiled = [f for f in (fc or {}).get("compiled") or [] if str(f).startswith(pkg + "/")]
+    if not (fc or {}).get("package_py") and not compiled:
+        return "no Python/compiled code in the package (docs, CI or tooling only)"
+    return None
+
+
+def mark_typing_only(rec: dict, files: dict | None) -> bool:
+    """Record a typing-only change. Return True when that rule applies.
+
+    The verdict function is not called. Any other diff returns False and the record is left
+    for the normal checks, including a .py file whose only edits are type hints.
+    """
+    paths = files.get("all") if isinstance(files, dict) else None
+    if not typing_only_change(paths):
+        return False
+    rec["no_code_change"] = True
+    rec["no_code_change_reason"] = "typing_only"
+    rec["verdict"] = Verdict.NO_CODE_CHANGE.value
+    rec["reason"] = ("no code change: every changed file is a .pyi stub or a py.typed marker, "
+                     "so behaviour was not checked")
+    return True
+
+
+def finish_typing_only(rec: dict, prdir: Path, work: Path, t0: float, runner) -> dict:
+    """Write a typing-only record without calling the model or the verdict function."""
+    saved = getattr(runner, "model_skipped", None) if runner is not None else None
+    if runner is not None and not saved:
+        runner.model_skipped = "typing-only change; the model was not called"
+    try:
+        return finish(rec, prdir, work, t0, runner)
+    finally:
+        if runner is not None:
+            runner.model_skipped = saved
+
+
 
 def run_date_of(seen: dict, repo: str) -> str | None:
     """IST date of the last run recorded for repo (inferred from last_run_utc for older files)."""
@@ -225,9 +285,9 @@ def select_prs(gh: GitHub, repo: str, cfg: dict, seen: dict, last_run_utc: str |
         except Exception as e:  # noqa: BLE001
             skipped.append(base | {"why": f"diff not readable: {e}"}); continue
         fc = classify_files(diff_files(d), cfg["pkg"])
-        in_pkg_compiled = [f for f in fc["compiled"] if f.startswith(cfg["pkg"] + "/")]
-        if not fc["package_py"] and not in_pkg_compiled:
-            skipped.append(base | {"why": "no Python/compiled code in the package (docs, CI or tooling only)"}); continue
+        skip = selection_skip_for_files(fc, cfg["pkg"])
+        if skip:
+            skipped.append(base | {"why": skip}); continue
         item = {"pr": n, "title": p["title"], "body": p.get("body") or "", "url": p["html_url"],
                 "author": p["user"]["login"], "head_sha": sha,
                 "base_sha": p["base"]["sha"], "base_ref": p["base"]["ref"], "updated_at_utc": p["updated_at"],
@@ -1407,7 +1467,7 @@ def ai_probe_gate(rec: dict) -> dict:
         return rec
     items = (rec.get("probes") or {}).get("items") or []
     ran = [it.get("id") for it in items if it.get("source") == "model"
-           and it.get("status") not in ("crashed", "error", "uninformative", "not_run")
+           and it.get("status") not in ("crashed", "error", "uninformative", "not_run", "rejected")
            and ((it.get("probe_changed_line_coverage") or {}).get("changed_lines_covered") or 0) > 0]
     if ran:
         return rec
@@ -1748,7 +1808,9 @@ def verdict_for(cmp: dict | None, cnv_reason: str | None, exits: dict | None = N
     could_not_verify ('unverified behaviour claim: "<quote>"; needs a probe'). With a probe, the probe decides.
     baseline (BASELINES, default full) selects which probes decide and whether claims are flagged.
     A docstring-only change (AST equal after blanking docstrings) is verified: the claim holds by construction,
-    unless the tests already need attention."""
+    unless the tests already need attention.
+    A probe claim that expects a difference but matches no observation on that probe can only lower a verified
+    result to could_not_verify. It never raises a verdict."""
     probe_results = probe_items(probe_results, baseline)
     v, reason, fl = with_probes(cmp, cnv_reason, exits, files, probe_results)
     if uses(baseline, "claim_flags") and claims and v == Verdict.VERIFIED.value and not behaviour_claims.probe_covers(
@@ -1759,9 +1821,16 @@ def verdict_for(cmp: dict | None, cnv_reason: str | None, exits: dict | None = N
                          f'unverified behaviour claim: "{q}"{more}; needs a probe ({reason})',
                          fl + ["unverified_claim"])
     if docstring_only and v != Verdict.NEEDS_ATTENTION.value:
-        return (Verdict.VERIFIED.value,
-                "docstring-only change (AST equal after blanking docstrings); behaviour claims hold by construction",
-                fl + ["holds_by_construction"])
+        v = Verdict.VERIFIED.value
+        reason = ("docstring-only change (AST equal after blanking docstrings); behaviour claims hold by construction")
+        fl = fl + ["holds_by_construction"]
+    missing = probes.unmatched_differs_claims(probe_results)
+    if missing and v == Verdict.VERIFIED.value:
+        shown = ", ".join(missing[:4])
+        extra = f" (+{len(missing) - 4} more)" if len(missing) > 4 else ""
+        return (Verdict.COULD_NOT_VERIFY.value,
+                f"could not verify: claim(s) {shown}{extra} expect a difference but no observation matches ({reason})",
+                fl + ["unmatched_differs_claim"])
     return v, reason, fl
 
 
@@ -2148,6 +2217,8 @@ def begin_pr(a) -> None:
         calls.clear()
     a.model_fallback = None
     cost.reset()
+    from poc import hitl
+    hitl.reset_approval_ran()
 
 
 def stamp_model_use(rec: dict, a) -> None:
@@ -2419,6 +2490,8 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
     shutil.rmtree(work, ignore_errors=True); work.mkdir(parents=True)
     (prdir / "pr.diff").write_text(item["diff"])
     rec = new_record(repo, cfg, item, a, machine, rdir.name, run_date_for(rdir))
+    if mark_typing_only(rec, item.get("files")):
+        return finish_typing_only(rec, prdir, work, t0, a)
     refusal = sandbox_refusal(getattr(a, "sandbox_backend", None))
     if refusal:   # fail closed: no PR code runs without the sandbox (unless --unsafe-no-sandbox)
         rec["verdict"], rec["reason"], _ = verdict_for(None, refusal)
@@ -2505,15 +2578,29 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
 
 def finish(rec: dict, prdir: Path, work: Path, t0: float, runner=None) -> dict:
     # Agent swarm (judge/helper/summary) after the code verdict; advisory only — never changes rec["verdict"].
-    # Skip when model_skipped is set (--no-probes / baseline without claim probes) so the stamp stays honest.
-    from poc import contree_sandboxes, run_progress
+    # Off unless the run asked (--swarm / POC_SWARM). Skip also when model_skipped is set
+    # (--no-probes / baseline without claim probes) so the stamp stays honest.
+    from poc import contree_sandboxes, hitl, run_progress
     contree_sandboxes.clear_session()
-    if (runner is not None and getattr(runner, "provider", None) is not None
+    # Requested comes from the settings (--swarm / POC_SWARM, and POC_HITL). Ran stays off when
+    # that step never started: no model, probes skipped, or the approval step was not entered.
+    swarm_requested = agents.swarm_enabled(bool(getattr(runner, "swarm", False)))
+    ran_swarm = False
+    if (swarm_requested and runner is not None and getattr(runner, "provider", None) is not None
             and not getattr(runner, "model_skipped", None)):
         agents.run_swarm(runner.provider, rec)
+        ran_swarm = True
     elif runner is not None and getattr(runner, "model_skipped", None) and "agents" not in rec:
         rec["agents"] = {"status": "skipped", "note": runner.model_skipped, "roles": []}
         rec.setdefault("explanation", {"status": "not yet wired", "why": runner.model_skipped})
+    elif not ran_swarm and "agents" not in rec:
+        why = "advisory swarm did not run" if swarm_requested else "advisory swarm is off"
+        rec["agents"] = {"status": "skipped", "note": why, "roles": []}
+        rec.setdefault("explanation", {"status": "not yet wired", "why": why})
+    rec["swarm_requested"] = swarm_requested
+    rec["operator_approval_requested"] = hitl.hitl_requested()
+    rec["swarm"] = "on" if ran_swarm else "off"
+    rec["operator_approval"] = "on" if hitl.take_approval_ran() else "off"
     run_progress.emit("report", detail="writing record")
     if runner is not None:
         stamp_model_use(rec, runner)
@@ -2524,12 +2611,46 @@ def finish(rec: dict, prdir: Path, work: Path, t0: float, runner=None) -> dict:
     if rec.get("pr_side", {}).get("build_seconds") is not None:
         rec["duration_s"]["build"] = rec["pr_side"]["build_seconds"]
     rec["cost"] = cost.take(rec["duration_s"])
+    mark_bench_model_invalid(rec, runner)
     errs = check_record(rec)
     if errs:
         rec["schema_errors"] = errs[:20]
     shutil.rmtree(work, ignore_errors=True)
     (prdir / "record.json").write_text(json.dumps(rec, indent=1))
     return rec
+
+
+def _call_count(value) -> int:
+    return value if isinstance(value, int) and not isinstance(value, bool) else 0
+
+
+def mark_bench_model_invalid(rec: dict, runner) -> None:
+    """In a bench (study) run, flag a record the scorer must not count.
+
+    A record whose AI calls all failed, or whose model_provider_used is none, is marked invalid.
+    The verdict is left as it is. The study scorer refuses the record instead of counting
+    could_not_verify. Daily and ops runs are not marked here.
+    """
+    if runner is None or not getattr(runner, "bench", None):
+        return
+    # A typing-only record never called the model on purpose. It is counted from no_code_change_reason,
+    # not refused as a failed model run.
+    if rec.get("no_code_change") is True:
+        return
+    calls = list(getattr(getattr(runner, "provider", None), "calls", None) or [])
+    all_failed = bool(calls) and all(not c.get("ok") for c in calls)
+    cost_info = rec.get("cost") if isinstance(rec.get("cost"), dict) else {}
+    ai = _call_count(cost_info.get("ai_calls"))
+    failed = _call_count(cost_info.get("failed_ai_calls"))
+    swarm = cost_info.get("swarm") if isinstance(cost_info.get("swarm"), dict) else {}
+    ai += _call_count(swarm.get("ai_calls"))
+    failed += _call_count(swarm.get("failed_ai_calls"))
+    if all_failed or (ai > 0 and failed >= ai):
+        rec["invalid"] = True
+        rec["invalid_reason"] = "every AI call failed"
+    elif rec.get("model_provider_used") == "none":
+        rec["invalid"] = True
+        rec["invalid_reason"] = "model_provider_used is none"
 
 
 def validate_record(rec: dict) -> list[str]:
@@ -2544,7 +2665,8 @@ def check_record(rec: dict) -> list[str]:
     """The record check: the shared schema, plus poc_commit on a pr_run record.
 
     poc_commit is optional in the schema so a record written before rev 8 still validates. A record this run
-    writes must name the Proof-of-Change commit it used (the full SHA of origin/main after the fast-forward).
+    writes must name the Proof-of-Change commit it used (origin/main after the fast-forward for a daily run;
+    the expected commit for a benchmark run).
     A missing or malformed value fails this check."""
     errs = validate_record(rec)
     if not isinstance(rec, dict) or rec.get("record_kind") != "pr_run":
@@ -3160,6 +3282,37 @@ def sync_to_origin_main(root: Path | None = None) -> str:
     return got
 
 
+def given_commit(root: Path | None, expected: str) -> str:
+    """Bench mode: run this checkout as it stands. Never fetch, check out, or merge.
+
+    Refuse when the work tree is dirty, when `expected` is not a 40-character commit, or when HEAD is not
+    that commit. The checkout is left where it was.
+    """
+    root = root or REPO_ROOT
+    status = _git(root, "status", "--porcelain")
+    if status.returncode != 0:
+        detail = (status.stderr or status.stdout).strip()
+        raise SystemExit("Stopped: could not read the git status of this checkout"
+                         + (f": {detail}" if detail else "") + ". Bench mode did not move the checkout.")
+    if status.stdout.strip():
+        raise SystemExit("Stopped: the checkout has uncommitted changes, so bench mode will not start. "
+                         "The checkout was not moved. Commit or discard the changes, then run again.")
+    expected = (expected or "").strip().lower()
+    if not _COMMIT.fullmatch(expected):
+        raise SystemExit("Stopped: bench mode needs the commit it should run, as --expect-commit or "
+                         "POC_EXPECT_COMMIT, a 40-character commit. The checkout was not moved.")
+    head = _git(root, "rev-parse", "HEAD")
+    got = head.stdout.strip()
+    if head.returncode != 0 or not _COMMIT.fullmatch(got):
+        detail = (head.stderr or head.stdout).strip()
+        raise SystemExit("Stopped: could not read HEAD" + (f": {detail}" if detail else "")
+                         + ". Bench mode did not move the checkout.")
+    if got != expected:
+        raise SystemExit(f"Stopped: HEAD is {got}, not the expected commit {expected}. "
+                         "Bench mode runs the code it was given and does not move the checkout.")
+    return got
+
+
 def resolve_poc_commit(root: Path | None = None) -> str:
     """Stamp every run with a known Proof-of-Change commit.
 
@@ -3178,6 +3331,21 @@ def resolve_poc_commit(root: Path | None = None) -> str:
         "Set POC_COMMIT (or RENDER_GIT_COMMIT) to the 40-character Proof-of-Change "
         "commit this image was built from."
     )
+
+
+def skip_unused_model(a) -> None:
+    """Drop claim-probe model calls when this run will not use them.
+
+    A baseline without claim probes, or ``--no-probes``, skips those calls. The swarm
+    switch is left as it was. The result still records that the swarm was requested
+    and that the swarm step did not run.
+    """
+    if not uses(a.baseline, "claim_probes") and getattr(a, "provider", None) is not None:
+        a.model_skipped = f"AI calls skipped: baseline {a.baseline} does not use claim probes"
+        a.model_note += f" (not used: baseline {a.baseline} has no claim probes)"
+        a.provider = None
+    if getattr(a, "no_probes", False) and getattr(a, "provider", None) is not None and not a.model_skipped:
+        a.model_skipped = "AI calls skipped because --no-probes was set"
 
 
 def main(argv=None) -> int:
@@ -3214,6 +3382,15 @@ def main(argv=None) -> int:
                     help="model id for advisory noise/install notes (Lightning; Nano fallback)")
     ap.add_argument("--summary-model", default=model_provider.DEFAULT_MODELS["summary"],
                     help="model id for plain-language report summary (Super)")
+    ap.add_argument("--swarm", action="store_true",
+                    help="run the advisory agent swarm after the verdict (finding labels, notes, and a "
+                         "plain-language summary). Off by default for command-line and benchmark runs, so "
+                         "they make no swarm model calls. Also on when POC_SWARM is 1, true, yes, or on. "
+                         "The operator console turns this on itself.")
+    ap.add_argument("--console-job", action="store_true",
+                    help="passed only by the operator console, on a single pull-request check. "
+                         "With this flag that check may start while POC_HITL is set. "
+                         "No environment variable turns this on. Benchmark mode still refuses.")
     ap.add_argument("--sandbox-backend", choices=("local", "contree"), default="local",
                     help="where probe/pytest dual-runs execute for source-pair PRs: local bubblewrap (default) or "
                          "Nebius Token Factory Sandboxes (needs NEBIUS_API_KEY, NEBIUS_PROJECT_ID, and "
@@ -3255,15 +3432,32 @@ def main(argv=None) -> int:
                     help="rebuild REPORT.md from records.jsonl, selection.json and run_meta.json; test nothing")
     ap.add_argument("--bench", default=None, metavar="CSV",
                     help="benchmark mode (ops/bench.py): test historical PRs from a benchmark INPUTS file, main = first "
-                         "parent of the merge commit, PR = the merge commit. Refuses any file named *answers*")
+                         "parent of the merge commit, PR = the merge commit. Refuses any file named *answers*. "
+                         "Does not fetch or check out another commit: the checkout must already be the one named by "
+                         "--expect-commit (or POC_EXPECT_COMMIT), and the work tree must be clean")
+    ap.add_argument("--expect-commit", default=None, metavar="SHA",
+                    help="with --bench: the 40-character commit this checkout must already be on. "
+                         "Bench mode refuses to start if HEAD is different or the tree is dirty, and it never "
+                         "moves the checkout. POC_EXPECT_COMMIT is the same setting when this flag is omitted")
     ap.add_argument("--ids", default=None, help="with --bench: comma-separated case IDs (default: all), e.g. B01,B14")
     ap.add_argument("--bench-out", default=None, help="with --bench: result folder (default: runs/bench-v0)")
     a = ap.parse_args(argv)
+    from poc import hitl
+    stop = hitl.study_operator_approval_stop(
+        bench=bool(a.bench), console_job=bool(a.console_job), single_pr=bool(a.pr))
+    if stop:
+        print(stop, file=sys.stderr)
+        raise SystemExit(1)
+    a.swarm = agents.swarm_enabled(bool(a.swarm))
     stop = model_provider.key_refusal(a.model_provider)
     if stop:
         print(stop, file=sys.stderr)
         raise SystemExit(1)
-    a.poc_commit = resolve_poc_commit(REPO_ROOT)
+    if a.bench:
+        expected = (a.expect_commit or os.environ.get("POC_EXPECT_COMMIT") or "").strip().lower()
+        a.poc_commit = given_commit(REPO_ROOT, expected)
+    else:
+        a.poc_commit = resolve_poc_commit(REPO_ROOT)
     sandbox.configure(not a.unsafe_no_sandbox)
     from poc import contree_sandboxes
     try:
@@ -3279,12 +3473,7 @@ def main(argv=None) -> int:
         recorded_dir=Path(a.recorded_dir) if a.recorded_dir else None)
     a.model_skipped = None
     a.model_fallback = None
-    if not uses(a.baseline, "claim_probes") and a.provider is not None:
-        a.model_skipped = f"AI calls skipped: baseline {a.baseline} does not use claim probes"
-        a.model_note += f" (not used: baseline {a.baseline} has no claim probes)"
-        a.provider = None
-    if a.no_probes and a.provider is not None and not a.model_skipped:
-        a.model_skipped = "AI calls skipped because --no-probes was set"
+    skip_unused_model(a)
     refusal = model_refusal(a)
     if refusal:
         print(refusal, file=sys.stderr)
@@ -3294,6 +3483,11 @@ def main(argv=None) -> int:
     if a.bench:
         from ops import bench
         return bench.run(a, sys.modules[__name__])
+    if not a.select_only and not a.report_only:
+        stop = model_provider.auth_refusal(a.provider)
+        if stop:
+            print(stop, file=sys.stderr)
+            return 1
 
     started = now_ist()
     single = parse_pr_urls(a.pr)
@@ -3386,6 +3580,9 @@ def main(argv=None) -> int:
                 print(f"  testing #{c['pr']} {c['title'][:60]} ...", flush=True)
             try:
                 rec = gate(rec or test_pr(repo, cfg, c, rdir, workroot, a, machine))   # final verdict in records.jsonl
+            except model_provider.ProviderRejected as e:
+                print(str(e), file=sys.stderr)
+                return 1
             except Exception as e:  # noqa: BLE001
                 problems.append(f"{repo}#{c['pr']}: harness error: {type(e).__name__}: {e}")
                 continue
