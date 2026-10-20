@@ -182,7 +182,7 @@ def test_each_pull_request_keeps_its_own_stamp_and_cost(monkeypatch, tmp_path, f
     state["ok"] = True
     prov.complete_json("claims", "s", "u", {}, {})  # a call from before this run's first pull request
     a = _args(provider=prov, model_note=note, model_provider="nebius",
-              model_skipped="AI calls skipped because --no-probes was set")
+              model_skipped="AI calls skipped because --no-probes was set", swarm=True)
     daily_run.begin_pr(a)
     assert a.model_skipped == "AI calls skipped because --no-probes was set"
     assert prov.calls == []
@@ -204,14 +204,23 @@ def test_each_pull_request_keeps_its_own_stamp_and_cost(monkeypatch, tmp_path, f
     assert records["bad"]["model_provider_used"] == "none"
     assert "fell back or failed" in records["bad"]["model_provider_fallback"]
     assert PROBE_NOTE in records["bad"]["model_provider_fallback"]
-    # claims+probes from the pair stub, plus judge/helper/summary from the agent swarm in finish()
-    assert good["ai_calls"] == 5 and good["failed_ai_calls"] == 0
-    assert good["input_tokens"] == 5_000_000 and good["output_tokens"] == 5_000_000
-    assert good["thinking_tokens"] == 3_000_000 and good["ai_cost_usd"] == 6.0
-    # helper retries once on Nano after Lightning fails → one extra failed call
-    assert bad["ai_calls"] == 6 and bad["failed_ai_calls"] == 6
+    # claims+probes stay on the study line. judge/helper/summary are on cost.swarm, not in the headline total.
+    assert records["good"]["swarm"] == "on" and records["bad"]["swarm"] == "on"
+    assert records["good"]["swarm_requested"] is True and records["bad"]["swarm_requested"] is True
+    assert records["good"]["operator_approval"] == "off"
+    assert records["good"]["operator_approval_requested"] is False
+    assert good["ai_calls"] == 2 and good["failed_ai_calls"] == 0
+    assert good["input_tokens"] == 2_000_000 and good["output_tokens"] == 2_000_000
+    assert good["thinking_tokens"] == 1_200_000 and good["ai_cost_usd"] == 2.4
+    assert good["swarm"]["ai_calls"] == 3 and good["swarm"]["input_tokens"] == 3_000_000
+    assert good["swarm"]["ai_cost_usd"] == 3.6
+    assert good["total_cost_usd"] == round(good["ai_cost_usd"] + good["computer_cost_usd"], 6)
+    # helper retries once on Nano after Lightning fails → four failed swarm calls, none of them on the study line
+    assert bad["ai_calls"] == 2 and bad["failed_ai_calls"] == 2
     assert bad["input_tokens"] == 0 and bad["output_tokens"] == 0 and bad["thinking_tokens"] == 0
-    assert bad["ai_cost_usd"] == 0.0 and bad["calls_without_usage"] == 6
+    assert bad["ai_cost_usd"] == 0.0 and bad["calls_without_usage"] == 2
+    assert bad["swarm"]["ai_calls"] == 4 and bad["swarm"]["failed_ai_calls"] == 4
+    assert bad["swarm"]["ai_cost_usd"] == 0.0 and bad["swarm"]["calls_without_usage"] == 4
 
 
 def test_patchguru_refuses_a_missing_or_empty_key(monkeypatch, tmp_path, capsys):

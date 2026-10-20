@@ -2148,6 +2148,8 @@ def begin_pr(a) -> None:
         calls.clear()
     a.model_fallback = None
     cost.reset()
+    from poc import hitl
+    hitl.reset_approval_ran()
 
 
 def stamp_model_use(rec: dict, a) -> None:
@@ -2505,15 +2507,29 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
 
 def finish(rec: dict, prdir: Path, work: Path, t0: float, runner=None) -> dict:
     # Agent swarm (judge/helper/summary) after the code verdict; advisory only — never changes rec["verdict"].
-    # Skip when model_skipped is set (--no-probes / baseline without claim probes) so the stamp stays honest.
-    from poc import contree_sandboxes, run_progress
+    # Off unless the run asked (--swarm / POC_SWARM). Skip also when model_skipped is set
+    # (--no-probes / baseline without claim probes) so the stamp stays honest.
+    from poc import contree_sandboxes, hitl, run_progress
     contree_sandboxes.clear_session()
-    if (runner is not None and getattr(runner, "provider", None) is not None
+    # Requested comes from the settings (--swarm / POC_SWARM, and POC_HITL). Ran stays off when
+    # that step never started: no model, probes skipped, or the approval step was not entered.
+    swarm_requested = agents.swarm_enabled(bool(getattr(runner, "swarm", False)))
+    ran_swarm = False
+    if (swarm_requested and runner is not None and getattr(runner, "provider", None) is not None
             and not getattr(runner, "model_skipped", None)):
         agents.run_swarm(runner.provider, rec)
+        ran_swarm = True
     elif runner is not None and getattr(runner, "model_skipped", None) and "agents" not in rec:
         rec["agents"] = {"status": "skipped", "note": runner.model_skipped, "roles": []}
         rec.setdefault("explanation", {"status": "not yet wired", "why": runner.model_skipped})
+    elif not ran_swarm and "agents" not in rec:
+        why = "advisory swarm did not run" if swarm_requested else "advisory swarm is off"
+        rec["agents"] = {"status": "skipped", "note": why, "roles": []}
+        rec.setdefault("explanation", {"status": "not yet wired", "why": why})
+    rec["swarm_requested"] = swarm_requested
+    rec["operator_approval_requested"] = hitl.hitl_requested()
+    rec["swarm"] = "on" if ran_swarm else "off"
+    rec["operator_approval"] = "on" if hitl.take_approval_ran() else "off"
     run_progress.emit("report", detail="writing record")
     if runner is not None:
         stamp_model_use(rec, runner)
@@ -3180,6 +3196,21 @@ def resolve_poc_commit(root: Path | None = None) -> str:
     )
 
 
+def skip_unused_model(a) -> None:
+    """Drop claim-probe model calls when this run will not use them.
+
+    A baseline without claim probes, or ``--no-probes``, skips those calls. The swarm
+    switch is left as it was. The result still records that the swarm was requested
+    and that the swarm step did not run.
+    """
+    if not uses(a.baseline, "claim_probes") and getattr(a, "provider", None) is not None:
+        a.model_skipped = f"AI calls skipped: baseline {a.baseline} does not use claim probes"
+        a.model_note += f" (not used: baseline {a.baseline} has no claim probes)"
+        a.provider = None
+    if getattr(a, "no_probes", False) and getattr(a, "provider", None) is not None and not a.model_skipped:
+        a.model_skipped = "AI calls skipped because --no-probes was set"
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--libraries-file", default=None,
@@ -3214,6 +3245,15 @@ def main(argv=None) -> int:
                     help="model id for advisory noise/install notes (Lightning; Nano fallback)")
     ap.add_argument("--summary-model", default=model_provider.DEFAULT_MODELS["summary"],
                     help="model id for plain-language report summary (Super)")
+    ap.add_argument("--swarm", action="store_true",
+                    help="run the advisory agent swarm after the verdict (finding labels, notes, and a "
+                         "plain-language summary). Off by default for command-line and benchmark runs, so "
+                         "they make no swarm model calls. Also on when POC_SWARM is 1, true, yes, or on. "
+                         "The operator console turns this on itself.")
+    ap.add_argument("--console-job", action="store_true",
+                    help="passed only by the operator console, on a single pull-request check. "
+                         "With this flag that check may start while POC_HITL is set. "
+                         "No environment variable turns this on. Benchmark mode still refuses.")
     ap.add_argument("--sandbox-backend", choices=("local", "contree"), default="local",
                     help="where probe/pytest dual-runs execute for source-pair PRs: local bubblewrap (default) or "
                          "Nebius Token Factory Sandboxes (needs NEBIUS_API_KEY, NEBIUS_PROJECT_ID, and "
@@ -3259,6 +3299,13 @@ def main(argv=None) -> int:
     ap.add_argument("--ids", default=None, help="with --bench: comma-separated case IDs (default: all), e.g. B01,B14")
     ap.add_argument("--bench-out", default=None, help="with --bench: result folder (default: runs/bench-v0)")
     a = ap.parse_args(argv)
+    from poc import hitl
+    stop = hitl.study_operator_approval_stop(
+        bench=bool(a.bench), console_job=bool(a.console_job), single_pr=bool(a.pr))
+    if stop:
+        print(stop, file=sys.stderr)
+        raise SystemExit(1)
+    a.swarm = agents.swarm_enabled(bool(a.swarm))
     stop = model_provider.key_refusal(a.model_provider)
     if stop:
         print(stop, file=sys.stderr)
@@ -3279,12 +3326,7 @@ def main(argv=None) -> int:
         recorded_dir=Path(a.recorded_dir) if a.recorded_dir else None)
     a.model_skipped = None
     a.model_fallback = None
-    if not uses(a.baseline, "claim_probes") and a.provider is not None:
-        a.model_skipped = f"AI calls skipped: baseline {a.baseline} does not use claim probes"
-        a.model_note += f" (not used: baseline {a.baseline} has no claim probes)"
-        a.provider = None
-    if a.no_probes and a.provider is not None and not a.model_skipped:
-        a.model_skipped = "AI calls skipped because --no-probes was set"
+    skip_unused_model(a)
     refusal = model_refusal(a)
     if refusal:
         print(refusal, file=sys.stderr)
