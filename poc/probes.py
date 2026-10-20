@@ -51,6 +51,7 @@ import ast
 import fnmatch
 import hashlib
 import json
+import re
 import resource
 import subprocess
 import tempfile
@@ -242,10 +243,53 @@ def judge(spec: dict, runs: dict, files: dict | None = None) -> list[dict]:
     return out
 
 
+# Injected before a probe runs, and into a model-written probe file. json.dumps then accepts an array-like
+# value (tolist()) and falls back to repr, so a NumPy value does not crash the probe.
+PROBE_JSON_PREAMBLE = (
+    "import json  # added by the harness: the observations line is printed as JSON\n"
+    "def _poc_json_default(obj):\n"
+    "    tolist = getattr(obj, 'tolist', None)\n"
+    "    if callable(tolist):\n"
+    "        try:\n"
+    "            return tolist()\n"
+    "        except Exception:\n"
+    "            return repr(obj)\n"
+    "    return repr(obj)\n"
+    "_poc_json_dumps = json.dumps\n"
+    "def _poc_json_dumps_call(*args, **kwargs):\n"
+    "    kwargs.setdefault('default', _poc_json_default)\n"
+    "    return _poc_json_dumps(*args, **kwargs)\n"
+    "json.dumps = _poc_json_dumps_call\n"
+)
+
+
+def json_default(obj):
+    """Serialize one value the way a probe's json.dumps does: tolist() when it has one, else repr."""
+    tolist = getattr(obj, "tolist", None)
+    if callable(tolist):
+        try:
+            return tolist()
+        except Exception:
+            return repr(obj)
+    return repr(obj)
+
+
+def runner_source(script: str) -> str:
+    """Python source that runs a probe file with array-like values serializable as JSON."""
+    return (PROBE_JSON_PREAMBLE
+            + "import runpy, sys\n"
+            + f"sys.argv = [{script!r}]\n"
+            + f"runpy.run_path({script!r}, run_name='__main__')\n")
+
+
+def runner_argv(python, script) -> list[str]:
+    return [str(python), "-c", runner_source(str(script))]
+
+
 def run_once(path: Path, python: Path, cwd: Path, env: dict, timeout: int, launch=None) -> tuple[dict, str, float]:
     """launch(argv, env, cwd) -> (argv, env, cwd) wraps the command, e.g. into the sandbox (guardrails/sandbox.py)."""
     t0 = time.time()
-    argv = [str(python), str(path)]
+    argv = runner_argv(python, path)
     if launch:
         argv, env, cwd = launch(argv, env, cwd)
     with tempfile.TemporaryFile() as fo, tempfile.TemporaryFile() as fe:
@@ -315,6 +359,31 @@ def rejudge_entry(item: dict) -> dict:
     return dict(item, observations=judge(spec, item["runs"], item.get("outputs")))
 
 
+_IMPORT_ERRORS = frozenset({"ImportError", "ModuleNotFoundError"})
+_IMPORT_TEXT = re.compile(r"\b(?:ImportError|ModuleNotFoundError)\b|cannot import|No module named", re.I)
+
+
+def _is_import_failure(value) -> bool:
+    """True when one side of an observation failed to import. Extra keys and either import exception count."""
+    if isinstance(value, dict):
+        name = value.get("raises")
+        return isinstance(name, str) and name in _IMPORT_ERRORS
+    if isinstance(value, str):
+        return bool(_IMPORT_TEXT.search(value))
+    return False
+
+
+def cannot_import_target(item: dict) -> bool:
+    """True when every observation failed to import the target on both sides.
+
+    One side importing and the other not is a real difference. One observation that returned a value is not this case.
+    """
+    obs = item.get("observations") or []
+    if not obs:
+        return False
+    return all(_is_import_failure(o.get("main")) and _is_import_failure(o.get("pr")) for o in obs)
+
+
 def _exception_name(value) -> str | None:
     """The exception type when a probe observation is only ``{"raises": "Name"}``."""
     if isinstance(value, dict) and set(value) == {"raises"} and isinstance(value.get("raises"), str):
@@ -343,7 +412,14 @@ def classify_item(item: dict) -> dict:
     if why:
         out["status"] = "crashed"
         out["uninformative_reason"] = why
+        out["observations"] = [_crash_is_not_a_difference(o) for o in obs]
         _downgrade_coverage(out, why + "; not counted as ran or adequate", zero=True)
+        return out
+    if cannot_import_target(item):
+        reason = "uninformative: the probe cannot import its target on either side"
+        out["status"] = "uninformative"
+        out["uninformative_reason"] = reason
+        _downgrade_coverage(out, reason + "; not counted as ran or adequate", zero=True)
         return out
     if all(_no_type_aware_input(o.get("main")) and _no_type_aware_input(o.get("pr")) for o in obs):
         reason = "no type-aware input could be built, so the probe did not run"
@@ -351,6 +427,7 @@ def classify_item(item: dict) -> dict:
         out["uninformative_reason"] = reason
         _downgrade_coverage(out, reason, zero=True)
         return out
+    _mark_bug_not_reproduced(out)
     names = []
     for o in obs:
         if o.get("state") != "same":
@@ -368,15 +445,76 @@ def classify_item(item: dict) -> dict:
     return out
 
 
+def _side_crashed(runs) -> bool:
+    """True when every run on one side is a probe crash (PROBE_ERROR). One bad run of three is not this case."""
+    return bool(runs) and all(isinstance(o, dict) and PROBE_ERROR in o for o in runs)
+
+
 def crash_reason(item: dict) -> str | None:
-    """Why a probe's runs give no usable evidence, or None. A probe crashed when every main-side run ended in
-    PROBE_ERROR (an exception, non-JSON output, a timeout or a non-zero exit). Coverage is measured on the main side,
-    so lines it touched there before failing say nothing about the change and must not count. A probe that works on
-    main but crashes on the PR side is a finding, not a crash of the probe, and is left alone."""
-    rs = (item.get("runs") or {}).get("main") or []
-    if rs and all(isinstance(o, dict) and PROBE_ERROR in o for o in rs):
-        return "the probe crashed or printed no parsed output on every main-side run"
-    return None
+    """Why a probe's runs give no usable evidence, or None.
+
+    A side crashed when every run on that side ended in PROBE_ERROR (an exception, non-JSON output, a timeout or a
+    non-zero exit). A crash on the base side or the PR side makes the probe not adequate. It is not an unclaimed
+    difference."""
+    runs = item.get("runs") or {}
+    main_bad, pr_bad = _side_crashed(runs.get("main") or []), _side_crashed(runs.get("pr") or [])
+    if not main_bad and not pr_bad:
+        return None
+    where = "both sides" if main_bad and pr_bad else ("the base side" if main_bad else "the PR side")
+    return f"the probe crashed or printed no parsed output on {where}"
+
+
+def _crash_is_not_a_difference(obs) -> dict:
+    """A crash is not an unclaimed change, a failed claim, or a proven claim."""
+    if not isinstance(obs, dict):
+        return obs
+    if obs.get("label") in (FindingLabel.UNMENTIONED_CHANGE.value, FindingLabel.FALSE_CLAIM.value,
+                            FindingLabel.NEEDS_HUMAN.value, FindingLabel.PROVEN.value):
+        return dict(obs, label=FindingLabel.NOT_TESTABLE.value)
+    return obs
+
+
+def _unreproduced_differs_claims(item: dict) -> tuple[list, bool]:
+    """(claims that did not reproduce, whether every covered differs claim failed).
+
+    A differs claim that matches no observation name is a different rule (unmatched_differs_claims). One claim
+    that does differ keeps the probe adequate; only the claims that stayed the same are not failures."""
+    claims = [c for c in (item.get("claims") or []) if isinstance(c, dict) and c.get("expect") == "differs"]
+    obs = [o for o in (item.get("observations") or []) if isinstance(o, dict)]
+    missed, covered_any, reproduced = [], False, False
+    for c in claims:
+        cid = c.get("id")
+        covered = [o for o in obs if o.get("claim") == cid or (
+            not o.get("claim") and _covers_name(c.get("covers"), o.get("name") or ""))]
+        if not covered:
+            continue
+        covered_any = True
+        if any(o.get("state") == "differs" for o in covered):
+            reproduced = True
+        else:
+            missed.append(c)
+    return missed, covered_any and not reproduced
+
+
+def _mark_bug_not_reproduced(out: dict) -> None:
+    """A differs claim whose observations do not differ did not reproduce the bug. Do not fail that claim."""
+    missed, none_reproduced = _unreproduced_differs_claims(out)
+    if not missed:
+        return
+    missed_ids = {c.get("id") for c in missed}
+    relabeled = []
+    for o in out.get("observations") or []:
+        if (isinstance(o, dict) and o.get("label") == FindingLabel.NEEDS_HUMAN.value
+                and o.get("claim") in missed_ids):
+            relabeled.append(dict(o, label=FindingLabel.NOT_TESTABLE.value))
+        else:
+            relabeled.append(o)
+    out["observations"] = relabeled
+    if not none_reproduced:
+        return
+    reason = "not adequate: didn't reproduce the bug on the base side"
+    out["uninformative_reason"] = reason
+    _downgrade_coverage(out, reason, zero=True)
 
 
 def _downgrade_coverage(item: dict, note: str, zero: bool = False) -> None:
@@ -425,9 +563,23 @@ def is_warning_observation(name: str) -> bool:
     return "warn" in str(name).lower()
 
 
+def _model_extra(item: dict, obs: dict) -> bool:
+    """A model probe's extra case, outside every claim on that probe. It does not count against a claim.
+
+    A differential probe has no claims, so its differences still count."""
+    return item.get("source") == "model" and bool(item.get("claims")) and not obs.get("claim")
+
+
 def summarize(items: list[dict]) -> dict:
     """Findings over all probes of a PR: labels, red/amber observations, proven claims, reason text."""
-    obs = [o | {"probe": it["id"]} for it in items for o in it["observations"]]
+    extras = 0
+    obs = []
+    for it in items:
+        for o in it["observations"]:
+            if _model_extra(it, o):
+                extras += 1
+                continue
+            obs.append(o | {"probe": it["id"]})
     labels = [FindingLabel(o["label"]) for o in obs]
     raw_flagged = [o for o in obs if COLOUR.get(FindingLabel(o["label"])) in ("red", "amber")]
     # Noise filter: an observation that changes between runs of the SAME side is noise, not a finding; it is listed
@@ -462,6 +614,8 @@ def summarize(items: list[dict]) -> dict:
     errors = [o for o in obs if o["label"] == FindingLabel.NOT_TESTABLE.value]
     if errors:
         bits.append(f"probe: {len(errors)} probe(s) could not run on either side")
+    if extras:
+        bits.append(f"probe: {extras} extra case(s) outside the claim are not counted")
     return {"labels": [x.value for x in labels], "flagged": [{k: o[k] for k in ("probe", "name", "label", "claim")}
                                                              for o in flagged],
             "proven_claims": proven, "reason": "; ".join(bits),

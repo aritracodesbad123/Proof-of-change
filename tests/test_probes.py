@@ -100,11 +100,21 @@ def test_flaky_observation_is_flaky_never_unmentioned():
     assert labels(res) == {"c": "flaky"}
 
 
-def test_probe_crash_on_both_sides_is_not_testable_on_pr_only_is_a_difference():
+def test_probe_crash_on_one_side_is_not_an_unclaimed_difference():
     err = {PROBE_ERROR: {"crash": "non-json output", "exit_code": 1}}
     assert labels(probes.judge(SPEC, runs(err, err))) == {PROBE_ERROR: "not_testable"}
-    got = labels(probes.judge(SPEC, runs({"c": 1}, err)))
-    assert got[PROBE_ERROR] == "unmentioned" and got["c"] == "unmentioned"
+    judged = probes.judge(SPEC, runs({"c": 1}, err))
+    item = {"id": "p", "source": "model", "target": "o/r#1", "about": "x", "claims": [],
+            "runs": {"main": [{"c": 1}] * 3, "pr": [err] * 3}, "observations": judged,
+            "probe_changed_line_coverage": {"status": "measured", "changed_lines_total": 2,
+                                            "changed_lines_covered": 1, "adequacy": "adequate"}}
+    got = probes.classify_item(item)
+    assert got["status"] == "crashed" and got["probe_changed_line_coverage"]["adequacy"] == "not_adequate"
+    assert all(o["label"] != "unmentioned" for o in got["observations"])
+    same = {"t::ok": ("passed", "")}
+    verdict, reason, _ = verdict_for(compare_sides({"main": [same] * 3, "pr": [same] * 3}), None,
+                                     probe_results={"items": [item]}, baseline="tests+probes")
+    assert verdict == "verified" and "need attention" not in reason
 
 
 def test_field_level_differences():

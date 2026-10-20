@@ -192,7 +192,7 @@ def test_docstring_only_holds_by_construction(tmp_path):
     blocked, _, _ = verdict_for(cmp, None, None, files, claims=claims)
     assert blocked == "could_not_verify"
     v, reason, labels = verdict_for(cmp, None, None, files, claims=claims, docstring_only=True)
-    assert v == "verified" and "hold by construction" in reason and "holds_by_construction" in labels
+    assert v == "no_code_change" and "only docstrings or comments changed" in reason and "holds_by_construction" in labels
     assert mark_holds_by_construction(claims)[0]["status"] == "holds by construction"
     # A real regression is still needs attention.
     reg = {"t::ok": ("passed", "")}

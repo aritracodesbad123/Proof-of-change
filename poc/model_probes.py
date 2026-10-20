@@ -21,6 +21,7 @@ from pathlib import Path
 
 from poc import freeze
 from poc.model_provider import CLAIMS_PROMPT, CLAIMS_SCHEMA, PROBES_PROMPT, PROBES_SCHEMA, Provider, ProviderError
+from poc.probes import PROBE_JSON_PREAMBLE
 
 MAX_CODE_CHARS = 20_000
 MAX_PROBES = 4
@@ -30,13 +31,24 @@ ID_RE = re.compile(r"^[a-z0-9][a-z0-9-]{0,39}$")
 # The probe contract says the last printed line is a JSON object, so every probe needs the json module. Models
 # sometimes call json.dumps without importing it, and then the probe fails the same way on both sides and tests
 # nothing. The harness adds the import itself; it changes no behaviour of the code under test.
-JSON_IMPORT = "import json  # added by the harness: the observations line is printed as JSON\n"
+JSON_IMPORT = PROBE_JSON_PREAMBLE
 UNLINKED_REASON = ("no probe listed the claim ids it checks, so its results could not be tied to any claim; in each "
                    "probe, \"claims\" must name the claim ids it checks and the observation names that cover them")
 
 
+def _strip_markdown(s: str) -> str:
+    """Drop code fences, inline code marks, links and emphasis so a quote can match the pull-request text."""
+    s = s or ""
+    s = re.sub(r"```.*?```", " ", s, flags=re.S)
+    s = re.sub(r"`([^`]*)`", r"\1", s)
+    s = re.sub(r"\[([^\]]+)\]\([^)]*\)", r"\1", s)
+    s = re.sub(r"(\*\*|__)(.+?)\1", r"\2", s)
+    s = re.sub(r"(?<!\w)(\*|_)([^*_\n]+)\1(?!\w)", r"\2", s)
+    return s
+
+
 def _norm(s: str) -> str:
-    return re.sub(r"\s+", " ", s or "").strip()
+    return re.sub(r"\s+", " ", _strip_markdown(s)).strip()
 
 
 def grounded_claims(raw: dict, title: str, body: str | None) -> tuple[list, list]:

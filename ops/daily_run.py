@@ -1410,6 +1410,20 @@ def parse_junit(path: Path) -> dict:
     return res
 
 
+def import_failure_module(msg: str) -> str | None:
+    """Module named by an ImportError or ModuleNotFoundError, else None.
+
+    A passing test, an AssertionError, or any other failure is not this case. The name comes from the message
+    ('No module named X', or 'from pkg') when it is there, otherwise 'a missing module'."""
+    if not msg or not re.search(r"\b(?:ModuleNotFoundError|ImportError)\b", msg):
+        return None
+    named = missing_dependency(msg)
+    if named:
+        return named
+    m = re.search(r"""(?:from|named)\s+['"]([\w.]+)['"]""", msg)
+    return m.group(1).split(".")[0] if m else "a missing module"
+
+
 def missing_dependency(skip_msg: str) -> str | None:
     """Module named by a skip caused by a missing optional dependency ('could not import scipy', 'requires pyarrow'),
     else None. xfails are never dependency skips."""
@@ -1792,6 +1806,7 @@ def compare_sides(results: dict) -> dict:
            "flaky": [], "environment": [], "other_changes": [], "preexisting_failures": [], "load_failed_both": [],
            "load_failed_pr": [], "load_failed_main": []}
     msgs, removed, added = {}, [], []
+    import_both: list[tuple[str | None, str | None]] = []
     bad = ("failed", "error")
 
     def load_state(runs, t):
@@ -1829,6 +1844,9 @@ def compare_sides(results: dict) -> dict:
             out["same"] += 1
             if m[0]["o"] in bad:
                 out["preexisting_failures"].append(t)
+                mm = next((r[t][1] for r in results["main"] if t in r and r[t][1]), "")
+                pm = next((r[t][1] for r in results["pr"] if t in r and r[t][1]), "")
+                import_both.append((import_failure_module(mm), import_failure_module(pm)))
             elif m[0]["o"] == "skipped":
                 out["same_skipped_both"] += 1
             continue
@@ -1877,6 +1895,12 @@ def compare_sides(results: dict) -> dict:
             out["removed_tests"].extend(gone)
     out["executed"] = executed_counts(results)
     out["messages"] = {t: msgs[t] for t in (out["regressions"] + out["new_tests_failing"])[:20] if t in msgs}
+    passed_both = out["same"] - len(out["preexisting_failures"]) - out["same_skipped_both"]
+    if (import_both and passed_both <= 0 and not out["new_tests_passing"] and not out["fixed"]
+            and not out["regressions"] and not out["new_tests_failing"] and not out["flaky"]
+            and len(import_both) == len(out["preexisting_failures"])
+            and all(a and b for a, b in import_both)):
+        out["missing_dependency_all"] = sorted({a for a, _b in import_both})
     return out
 
 
@@ -1992,8 +2016,9 @@ def verdict_for(cmp: dict | None, cnv_reason: str | None, exits: dict | None = N
     PR whose title or description claims results stay the same, with no probe checking that, becomes
     could_not_verify ('unverified behaviour claim: "<quote>"; needs a probe'). With a probe, the probe decides.
     baseline (BASELINES, default full) selects which probes decide and whether claims are flagged.
-    A docstring-only change (AST equal after blanking docstrings) is verified: the claim holds by construction,
-    unless the tests already need attention.
+    A docstring-only or comment-only change (AST equal after blanking docstrings; comments are not in the AST)
+    is no_code_change, the same kind of result as a typing-only change, unless the tests already need attention
+    or every test failed for a missing module.
     A probe claim that expects a difference but matches no observation on that probe can only lower a verified
     result to could_not_verify. It never raises a verdict."""
     probe_results = probe_items(probe_results, baseline)
@@ -2005,9 +2030,10 @@ def verdict_for(cmp: dict | None, cnv_reason: str | None, exits: dict | None = N
         v, reason, fl = (Verdict.COULD_NOT_VERIFY.value,
                          f'unverified behaviour claim: "{q}"{more}; needs a probe ({reason})',
                          fl + ["unverified_claim"])
-    if docstring_only and v != Verdict.NEEDS_ATTENTION.value:
-        v = Verdict.VERIFIED.value
-        reason = ("docstring-only change (AST equal after blanking docstrings); behaviour claims hold by construction")
+    if docstring_only and v != Verdict.NEEDS_ATTENTION.value and "missing dependency" not in (reason or ""):
+        v = Verdict.NO_CODE_CHANGE.value
+        reason = ("no code change: only docstrings or comments changed "
+                  "(the code is the same once docstrings are removed); behaviour was not checked")
         fl = fl + ["holds_by_construction"]
     missing = probes.unmatched_differs_claims(probe_results)
     if missing and v == Verdict.VERIFIED.value:
@@ -2031,6 +2057,7 @@ def with_probes(cmp: dict | None, cnv_reason: str | None, exits: dict | None = N
     items = (probe_results or {}).get("items") or []
     if not items:
         return v, reason, fl
+    items = [probes.classify_item(it) for it in items]
     items, notes = probe_adequacy.deciding_items(items)   # a not_adequate probe never leads to verified
     s = probes.summarize(items)
     s["reason"] = "; ".join([s["reason"]] * bool(s["reason"]) + notes)
@@ -2148,6 +2175,11 @@ def tests_verdict(cmp: dict | None, cnv_reason: str | None, exits: dict | None =
                 + "; ".join(exits["problems"][:3]) + f" ({reason})", fl)
     if dep_note:
         return cnv, f"not fully verified: {dep_note} ({reason})", fl
+    missing_all = cmp.get("missing_dependency_all") or []
+    if missing_all:
+        shown = ", ".join(missing_all)
+        return (cnv, f"not verified: missing dependency ({shown}); every test failed on both sides with an import "
+                f"error, so this is not a result about the change ({reason})", fl)
     v = pr_verdict(RunSummary(build_ok=True, claims=[Claim("tests", testable=True, probed=True, proven=True)],
                               findings=verdict_findings))
     # Noise rule: a project test whose result changes between runs on the same side is shown in the reason but
@@ -2175,7 +2207,8 @@ def _contree_probe_once(side: str, path: Path, timeout: int) -> tuple[dict, str,
     t0 = time.time()
     raw = sess.run_op(
         side,
-        f"set -euo pipefail\ncd /work/src 2>/dev/null || cd /work\npython {shlex.quote(remote)}",
+        "set -euo pipefail\ncd /work/src 2>/dev/null || cd /work\n"
+        f"python -c {shlex.quote(probes.runner_source(remote))}",
         disposable=True, timeout=timeout, files={remote: path})
     secs = round(time.time() - t0, 1)
     out, err = raw.get("stdout") or "", raw.get("stderr") or ""
@@ -2974,7 +3007,9 @@ def _store_verdict(rec: dict, cmp, cnv, ex) -> None:
     v, reason, _ = verdict_for(cmp, cnv, ex, rec.get("files"), rec.get("probes"), rec.get("behaviour_claims"),
                                rec.get("baseline"), docstring_only=bool(rec.get("docstring_only")))
     rec["verdict"], rec["reason"] = v, reason
-    if rec.get("docstring_only") and v == Verdict.VERIFIED.value:
+    if rec.get("docstring_only") and v == Verdict.NO_CODE_CHANGE.value:
+        rec["no_code_change"] = True
+        rec["no_code_change_reason"] = "docstring_only"
         rec["behaviour_claims"] = mark_holds_by_construction(rec.get("behaviour_claims"))
 
 
