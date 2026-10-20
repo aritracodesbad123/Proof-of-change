@@ -217,7 +217,7 @@ def mark_typing_only(rec: dict, files: dict | None) -> bool:
         return False
     rec["no_code_change"] = True
     rec["no_code_change_reason"] = "typing_only"
-    rec["verdict"] = Verdict.COULD_NOT_VERIFY.value
+    rec["verdict"] = Verdict.NO_CODE_CHANGE.value
     rec["reason"] = ("no code change: every changed file is a .pyi stub or a py.typed marker, "
                      "so behaviour was not checked")
     return True

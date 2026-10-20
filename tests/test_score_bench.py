@@ -178,6 +178,33 @@ def test_scorer_refuses_an_invalid_model_record(tmp_path, capsys):
     assert "Regression recall" not in capsys.readouterr().out
 
 
+def test_no_code_change_is_counted_on_its_own_line(tmp_path, capsys):
+    """A no_code_change verdict is not an abstention and is not refused, even when the model was not called."""
+    _write(tmp_path, "B01-full.json", "B01", "needs_attention", model_provider_used="nebius")
+    _write(tmp_path, "B02-full.json", "B02", "no_code_change", model_provider_used="none",
+           no_code_change=True, no_code_change_reason="typing_only")
+    _write(tmp_path, "B03-full.json", "B03", "verified", model_provider_used="nebius")
+    s = sb.score(sb.read_answers(ANSWERS), sb.read_results(tmp_path))
+    assert s["no_code_change"]["k"] == 1 and s["no_code_change"]["n"] == 3
+    assert s["abstention_rate"]["k"] == 0 and s["abstention_rate"]["n"] == 2
+    assert s["regression_recall"]["k"] == 1 and s["regression_recall"]["n"] == 1
+    assert s["per_id"]["B02"]["verdict"] == "no_code_change"
+    assert sb.main(["--answers", ANSWERS, "--results", str(tmp_path)]) == 0
+    out = capsys.readouterr().out
+    assert "No code change | 1 / 3" in out
+    assert "Abstention (could not verify) | 0 / 2" in out
+    assert "Regression recall" in out
+
+    labelled = bench.labelled_study_out(tmp_path / "swarm", True)
+    labelled.mkdir(parents=True)
+    _write(labelled, "B01-full.json", "B01", "needs_attention", **_swarm_on(model_provider_used="nebius"))
+    _write(labelled, "B02-full.json", "B02", "no_code_change", model_provider_used="none",
+           no_code_change=True, no_code_change_reason="typing_only",
+           swarm_requested=False, swarm="off")
+    assert swarm.main(["--answers", ANSWERS, "--results", str(labelled)]) == 0
+    assert "No code change | 1 / 2" in capsys.readouterr().out
+
+
 def _swarm_on(**extra):
     return {"swarm_requested": True, "swarm": "on", "operator_approval_requested": False,
             "operator_approval": "off", **extra}

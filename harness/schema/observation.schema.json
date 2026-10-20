@@ -902,9 +902,10 @@
    "enum": [
     "verified",
     "needs_attention",
-    "could_not_verify"
+    "could_not_verify",
+    "no_code_change"
    ],
-   "description": "OPTIONAL (rev 3, pr_run records). Proof-of-Change verdict."
+   "description": "OPTIONAL (rev 3, pr_run records; rev 12 adds no_code_change). Proof-of-Change verdict."
   },
   "reason": {
    "type": "string",
@@ -1030,9 +1031,10 @@
    "enum": [
     "verified",
     "needs_attention",
-    "could_not_verify"
+    "could_not_verify",
+    "no_code_change"
    ],
-   "description": "OPTIONAL (rev 4, coverage gate). Verdict from the test comparison alone, before the coverage gate."
+   "description": "OPTIONAL (rev 4, coverage gate; rev 12 adds no_code_change). Verdict from the test comparison alone, before the coverage gate."
   },
   "reason_before_coverage_gate": {
    "type": "string",
@@ -1985,6 +1987,11 @@
    "rev": 11,
    "date": "2026-10-20",
    "change": "optional pr_run properties swarm_requested and operator_approval_requested (whether the switch was set) plus swarm and operator_approval (on or off: whether that step ran). Nothing becomes required, so rev 1-10 records stay valid."
+  },
+  {
+   "rev": 12,
+   "date": "2026-10-20",
+   "change": "verdict and verdict_before_coverage_gate may be no_code_change. Nothing becomes required, so rev 1-11 records stay valid."
   }
  ],
  "if": {

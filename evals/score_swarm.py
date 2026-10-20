@@ -22,7 +22,10 @@ def swarm_record_problems(name: str, rec: dict) -> list[str]:
     """Why this result cannot be scored as a swarm study. Empty only when the swarm was requested and ran.
 
     Operator approval must still be explicitly off. A missing swarm field is not a swarm study record.
+    A no_code_change verdict is accepted and counted on its own line.
     """
+    if rec.get("verdict") == "no_code_change":
+        return []
     problems = []
     if "swarm_requested" not in rec:
         problems.append(f"{name}: swarm_requested is missing")

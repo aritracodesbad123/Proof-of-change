@@ -102,7 +102,7 @@ def test_typing_only_bench_record_is_not_marked_invalid(monkeypatch, tmp_path):
                                 model_fallback=None, bench="inputs.csv")
     dr.finish_typing_only(rec, tmp_path, tmp_path / "work", 0.0, runner)
     assert rec["no_code_change"] is True and rec["no_code_change_reason"] == "typing_only"
-    assert rec["verdict"] == "could_not_verify"
+    assert rec["verdict"] == "no_code_change"
     assert "invalid" not in rec
     assert runner.model_skipped is None
     # The model was not called on purpose, so the study scorer still accepts the record.

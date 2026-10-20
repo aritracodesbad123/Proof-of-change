@@ -13,6 +13,7 @@ that is set (never from repo or PR fields), and by its `verdict`:
     needs_attention   -> flagged
     verified          -> not flagged
     could_not_verify  -> abstained (counted as not flagged for recall and false alarms, and reported separately)
+    no_code_change    -> its own line (not an abstention, not a catch, and not a miss)
 
 Labels: a label starting with "regression" is a positive, one starting with "safe" (or "negative") is a negative.
 
@@ -31,7 +32,7 @@ from pathlib import Path
 
 Z95 = 1.959963984540054
 ID_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.:-]*$")
-FLAGGED, CLEAN, ABSTAIN = "needs_attention", "verified", "could_not_verify"
+FLAGGED, CLEAN, ABSTAIN, NO_CODE = "needs_attention", "verified", "could_not_verify", "no_code_change"
 
 
 def wilson(k: int, n: int, z: float = Z95) -> tuple[float, float]:
@@ -108,10 +109,10 @@ def invalid_record_problems(name: str, rec: dict) -> list[str]:
     A record marked invalid, a record whose model_provider_used is exactly none, or a record whose
     AI calls all failed must not be counted as could_not_verify. A record that simply omits
     model_provider_used is left alone, so an older fixture still scores.
-    A no_code_change record never called the model on purpose. It is counted from
-    no_code_change_reason and is not treated as a failed model run.
+    A record whose verdict is no_code_change never called the model on purpose. It is counted
+    on its own line and is not treated as a failed model run.
     """
-    if rec.get("no_code_change") is True:
+    if rec.get("verdict") == NO_CODE or rec.get("no_code_change") is True:
         return []
     problems = []
     if rec.get("invalid") is True:
@@ -139,7 +140,10 @@ def study_record_problems(name: str, rec: dict) -> list[str]:
     A true value, or a missing value, is not a study record. ``on`` counts as true.
     Anything other than an explicit false or ``off`` counts as missing.
     An invalid model record is refused as well, so it is not counted as could_not_verify.
+    A no_code_change verdict is accepted and counted on its own line.
     """
+    if rec.get("verdict") == NO_CODE:
+        return []
     problems = []
     for key in STUDY_SWITCHES:
         if key not in rec:
@@ -213,10 +217,12 @@ def read_results(folder: str | Path, baseline: str | None = None) -> dict[str, s
 def score(answers: dict[str, str], results: dict[str, str]) -> dict:
     """Metrics over the IDs present in both (joined on ID only). Missing results are listed, not guessed."""
     ids = sorted(set(answers) & set(results))
-    pos = [i for i in ids if answers[i] == "pos"]
-    neg = [i for i in ids if answers[i] == "neg"]
-    flagged = {i for i in ids if results[i] == FLAGGED}
-    abstained = {i for i in ids if results[i] == ABSTAIN}
+    no_code = {i for i in ids if results[i] == NO_CODE}
+    judged = [i for i in ids if i not in no_code]
+    pos = [i for i in judged if answers[i] == "pos"]
+    neg = [i for i in judged if answers[i] == "neg"]
+    flagged = {i for i in judged if results[i] == FLAGGED}
+    abstained = {i for i in judged if results[i] == ABSTAIN}
 
     def block(k: int, n: int) -> dict:
         lo, hi = wilson(k, n)
@@ -226,14 +232,15 @@ def score(answers: dict[str, str], results: dict[str, str]) -> dict:
             "unknown_ids": sorted(set(results) - set(answers)),
             "regression_recall": block(len(flagged & set(pos)), len(pos)),
             "false_alarm_rate": block(len(flagged & set(neg)), len(neg)),
-            "abstention_rate": block(len(abstained), len(ids)),
+            "abstention_rate": block(len(abstained), len(judged)),
+            "no_code_change": block(len(no_code), len(ids)),
             "precision_of_flags": block(len(flagged & set(pos)), len(flagged)),
             "per_id": {i: {"label": answers[i], "verdict": results[i]} for i in ids}}
 
 
 def compare(answers: dict[str, str], a: dict[str, str], b: dict[str, str]) -> dict:
     """Paired comparison on the regression cases both systems ran: correct = flagged. Exact McNemar."""
-    ids = sorted(i for i in set(a) & set(b) if answers.get(i) == "pos")
+    ids = sorted(i for i in set(a) & set(b) if answers.get(i) == "pos" and a[i] != NO_CODE and b[i] != NO_CODE)
     only_a = [i for i in ids if a[i] == FLAGGED and b[i] != FLAGGED]
     only_b = [i for i in ids if b[i] == FLAGGED and a[i] != FLAGGED]
     return {"paired_regressions": len(ids), "only_a_flagged": only_a, "only_b_flagged": only_b,
@@ -242,7 +249,9 @@ def compare(answers: dict[str, str], a: dict[str, str], b: dict[str, str]) -> di
 
 def table(name: str, s: dict) -> str:
     rows = [("Regression recall", s["regression_recall"]), ("False-alarm rate", s["false_alarm_rate"]),
-            ("Abstention (could not verify)", s["abstention_rate"]), ("Precision of flags", s["precision_of_flags"])]
+            ("Abstention (could not verify)", s["abstention_rate"]),
+            ("No code change", s["no_code_change"]),
+            ("Precision of flags", s["precision_of_flags"])]
     out = [f"### {name}", "", "| Metric | k / n | Rate | Wilson 95% CI |", "|---|---|---|---|"]
     for label, m in rows:
         rate = pct(m["rate"]) if m["rate"] is not None else "n/a"
