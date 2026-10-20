@@ -2599,7 +2599,8 @@ def check_record(rec: dict) -> list[str]:
     """The record check: the shared schema, plus poc_commit on a pr_run record.
 
     poc_commit is optional in the schema so a record written before rev 8 still validates. A record this run
-    writes must name the Proof-of-Change commit it used (the full SHA of origin/main after the fast-forward).
+    writes must name the Proof-of-Change commit it used (origin/main after the fast-forward for a daily run;
+    the expected commit for a benchmark run).
     A missing or malformed value fails this check."""
     errs = validate_record(rec)
     if not isinstance(rec, dict) or rec.get("record_kind") != "pr_run":
@@ -3215,6 +3216,37 @@ def sync_to_origin_main(root: Path | None = None) -> str:
     return got
 
 
+def given_commit(root: Path | None, expected: str) -> str:
+    """Bench mode: run this checkout as it stands. Never fetch, check out, or merge.
+
+    Refuse when the work tree is dirty, when `expected` is not a 40-character commit, or when HEAD is not
+    that commit. The checkout is left where it was.
+    """
+    root = root or REPO_ROOT
+    status = _git(root, "status", "--porcelain")
+    if status.returncode != 0:
+        detail = (status.stderr or status.stdout).strip()
+        raise SystemExit("Stopped: could not read the git status of this checkout"
+                         + (f": {detail}" if detail else "") + ". Bench mode did not move the checkout.")
+    if status.stdout.strip():
+        raise SystemExit("Stopped: the checkout has uncommitted changes, so bench mode will not start. "
+                         "The checkout was not moved. Commit or discard the changes, then run again.")
+    expected = (expected or "").strip().lower()
+    if not _COMMIT.fullmatch(expected):
+        raise SystemExit("Stopped: bench mode needs the commit it should run, as --expect-commit or "
+                         "POC_EXPECT_COMMIT, a 40-character commit. The checkout was not moved.")
+    head = _git(root, "rev-parse", "HEAD")
+    got = head.stdout.strip()
+    if head.returncode != 0 or not _COMMIT.fullmatch(got):
+        detail = (head.stderr or head.stdout).strip()
+        raise SystemExit("Stopped: could not read HEAD" + (f": {detail}" if detail else "")
+                         + ". Bench mode did not move the checkout.")
+    if got != expected:
+        raise SystemExit(f"Stopped: HEAD is {got}, not the expected commit {expected}. "
+                         "Bench mode runs the code it was given and does not move the checkout.")
+    return got
+
+
 def resolve_poc_commit(root: Path | None = None) -> str:
     """Stamp every run with a known Proof-of-Change commit.
 
@@ -3334,7 +3366,13 @@ def main(argv=None) -> int:
                     help="rebuild REPORT.md from records.jsonl, selection.json and run_meta.json; test nothing")
     ap.add_argument("--bench", default=None, metavar="CSV",
                     help="benchmark mode (ops/bench.py): test historical PRs from a benchmark INPUTS file, main = first "
-                         "parent of the merge commit, PR = the merge commit. Refuses any file named *answers*")
+                         "parent of the merge commit, PR = the merge commit. Refuses any file named *answers*. "
+                         "Does not fetch or check out another commit: the checkout must already be the one named by "
+                         "--expect-commit (or POC_EXPECT_COMMIT), and the work tree must be clean")
+    ap.add_argument("--expect-commit", default=None, metavar="SHA",
+                    help="with --bench: the 40-character commit this checkout must already be on. "
+                         "Bench mode refuses to start if HEAD is different or the tree is dirty, and it never "
+                         "moves the checkout. POC_EXPECT_COMMIT is the same setting when this flag is omitted")
     ap.add_argument("--ids", default=None, help="with --bench: comma-separated case IDs (default: all), e.g. B01,B14")
     ap.add_argument("--bench-out", default=None, help="with --bench: result folder (default: runs/bench-v0)")
     a = ap.parse_args(argv)
@@ -3349,7 +3387,11 @@ def main(argv=None) -> int:
     if stop:
         print(stop, file=sys.stderr)
         raise SystemExit(1)
-    a.poc_commit = resolve_poc_commit(REPO_ROOT)
+    if a.bench:
+        expected = (a.expect_commit or os.environ.get("POC_EXPECT_COMMIT") or "").strip().lower()
+        a.poc_commit = given_commit(REPO_ROOT, expected)
+    else:
+        a.poc_commit = resolve_poc_commit(REPO_ROOT)
     sandbox.configure(not a.unsafe_no_sandbox)
     from poc import contree_sandboxes
     try:

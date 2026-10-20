@@ -5,9 +5,14 @@
 Runs the normal per-PR pipeline on PRs that were merged long ago and whose outcome is known.
 
 ```
-python3 ops/daily_run.py --bench bench/benchmark-v0.csv --ids B01,B14 [--bench-out runs/bench-v0]
+python3 ops/daily_run.py --bench bench/benchmark-v0.csv --ids B01,B14 \
+    --expect-commit <40-character commit> [--bench-out runs/bench-v0]
 ```
 
+- The tool runs the Proof-of-Change commit the checkout is already on. `--expect-commit` (or `POC_EXPECT_COMMIT`)
+  names that commit. If HEAD is different, or the work tree is dirty, the run stops and the checkout is left
+  where it was. Benchmark mode does not fetch `origin` and does not check out `main`.
+- Every result record stores that commit as `poc_commit`.
 - Main side = the first parent of the merge commit; PR side = the merge commit (what actually landed). Both are
   fetched by SHA. If the merge commit's first parent is not the main SHA in the inputs file, the case is refused.
 - Each case then takes the source-pair route: both sides installed from the checkout, mapped tests 3 times per
