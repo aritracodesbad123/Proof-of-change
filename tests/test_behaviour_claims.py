@@ -129,7 +129,10 @@ def test_claim_never_upgrades_or_hides_other_verdicts():
 
 def test_a_probe_with_a_same_claim_decides():
     same = [{"id": "C1", "text": "results unchanged", "covers": ["r"], "expect": "same"}]
-    assert verdict_for(_cmp_verified(), None, probe_results=_probe(same, {"r": 1}, {"r": 1}), claims=CLAIM)[0] == "verified"
+    covered = _probe(same, {"r": 1}, {"r": 1})
+    covered["items"][0]["probe_changed_line_coverage"] = {
+        "status": "measured", "changed_lines_total": 2, "changed_lines_covered": 1, "adequacy": "adequate"}
+    assert verdict_for(_cmp_verified(), None, probe_results=covered, claims=CLAIM)[0] == "verified"
     assert verdict_for(_cmp_verified(), None, probe_results=_probe(same, {"r": 1}, {"r": 2}),
                        claims=CLAIM)[0] == "needs_attention"                 # the probe contradicts the claim
     differs_only = [{"id": "C1", "text": "x changes", "covers": ["r"], "expect": "differs"}]

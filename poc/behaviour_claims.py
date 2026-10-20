@@ -252,8 +252,8 @@ _NO_COVER_STATUS = frozenset({"crashed", "error", "uninformative", "not_run"})
 def probe_covers(probe_results: dict | None) -> bool:
     """A probe that ran and has at least one claim expecting 'same' checks behaviour preservation; its result then
     decides (probes never get overruled by this rule). A probe that ran none of the changed lines on the main side
-    does not count: not_adequate, a measured coverage of 0, or a crashed, empty, uninformative or not_run probe.
-    A probe whose claim patterns match none of its own observation names does not count either."""
+    does not count: not_adequate, a measured coverage of 0, no measured line coverage at all, a crashed, empty,
+    uninformative or not_run probe, or a probe whose claim patterns match none of its own observation names."""
     from poc import probes
     for it in (probe_results or {}).get("items") or []:
         if it.get("status") in _NO_COVER_STATUS or it.get("status") == "rejected":
@@ -263,7 +263,7 @@ def probe_covers(probe_results: dict | None) -> bool:
         cov = it.get("probe_changed_line_coverage") or {}
         if cov.get("adequacy") == "not_adequate":
             continue
-        if cov.get("status") == "measured" and not (cov.get("changed_lines_covered") or 0):
+        if cov.get("status") != "measured" or not (cov.get("changed_lines_covered") or 0):
             continue
         if any(c.get("expect") == "same" for c in it.get("claims") or []):
             return True

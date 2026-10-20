@@ -27,8 +27,9 @@ value), and the record gains a summary under the same name.
 - **adequate**: it ran at least one changed line, so it decides as before.
 - **not_adequate**: it ran none. It can never lead to `verified`: its matching ("same", "proven") results are
   dropped and it does not count as checking a behaviour claim. Differences it finds are still flagged.
-- **unmeasured**: coverage could not be measured (for example with `--no-coverage`). It decides as before, and the
-  report says so.
+- **unmeasured**: coverage was not measured (for example with `--no-coverage`), or the probe has no coverage block.
+  It does not count as covering the change. Its green results are dropped and it does not check a behaviour claim.
+  Differences it finds are still flagged. This can only lower a verified result.
 
 On the main side, "changed lines" means the lines the change replaces or deletes. For pure insertions, the lines
 on either side of the insertion point stand in. A file that is new on the PR side has no main-side lines.

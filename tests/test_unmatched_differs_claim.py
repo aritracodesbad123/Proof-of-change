@@ -37,7 +37,10 @@ def test_verified_becomes_could_not_verify_when_a_differs_claim_matches_nothing(
 
 def test_a_matched_differs_claim_that_does_differ_stays_verified():
     claims = [{"id": "C1", "text": "the score changes", "covers": ["r"], "expect": "differs"}]
-    v, reason, _ = verdict_for(_cmp_verified(), None, probe_results=_probe(claims, {"r": 1}, {"r": 2}))
+    probed = _probe(claims, {"r": 1}, {"r": 2})
+    probed["items"][0]["probe_changed_line_coverage"] = {
+        "status": "measured", "changed_lines_total": 2, "changed_lines_covered": 1, "adequacy": "adequate"}
+    v, reason, _ = verdict_for(_cmp_verified(), None, probe_results=probed)
     assert v == "verified" and "C1 proven" in reason
 
 
