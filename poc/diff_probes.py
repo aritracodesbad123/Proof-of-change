@@ -11,7 +11,8 @@ on the PR side are not probed.
 What it observes: each function is called with the same deterministic inputs on both sides. A parameter whose name
 or annotation asks for a graph, an array, labels or a fitted estimator gets one of those (a 4-node path graph, a
 small numeric array, labels 0/1, or a fitted logistic regression). A function whose parameters have no such hint is
-called with the small scalar set (1, 0, -1, 2.5, "abc", [1, 2, 3], None). If a required domain object cannot be
+called with a mixed set: integers, a float, text, a list, None, true and false, and empty values, plus a
+small numpy array or pandas value when that library is installed. If a required domain object cannot be
 built, that function is not called: the observation is {"skipped": "no type-aware input"} and the probe does not
 count as having run. Random and NumPy are seeded before each call. Each result is reduced to a canonical JSON
 summary; an exception becomes {"raises": "<type name>"}. Observations are named <module>.<function>.input<k>. The
@@ -99,7 +100,28 @@ import math
 import random
 import re
 
-CANDIDATES = [1, 0, -1, 2.5, "abc", [1, 2, 3], None]
+CANDIDATES = [1, 0, -1, 2.5, "abc", [1, 2, 3], None, True, False, "", [], {}]
+
+
+def typed_candidates():
+    """The mixed set, plus a numpy array or a pandas value when that library imports.
+
+    A change that only shows up for one type (a bool, None, an empty container, an array) is then exercised.
+    """
+    extra = []
+    try:
+        import numpy as np
+        extra.append(np.array([0.0, 1.0]))
+    except Exception:  # noqa: BLE001
+        pass
+    try:
+        import pandas as pd
+        extra.append(pd.Series([0, 1], dtype="int64"))
+    except Exception:  # noqa: BLE001
+        pass
+    return CANDIDATES + extra
+
+
 GRAPH_NAMES = {"g", "g1", "g2", "h", "graph"}
 ARRAY_NAMES = {"x_train", "x_test", "data", "features"}
 LABEL_NAMES = {"y", "y_train", "y_test", "labels", "target"}
@@ -228,7 +250,8 @@ for mod, fn in TARGETS:
         continue
     if plan == "candidates":
         n = sum(1 for p in params if p.default is inspect.Parameter.empty)
-        calls = [[copy.deepcopy(c) for _ in range(n)] for c in (CANDIDATES if n else CANDIDATES[:1])]
+        pool = typed_candidates()
+        calls = [[copy.deepcopy(c) for _ in range(n)] for c in (pool if n else pool[:1])]
     else:
         calls = plan
     for k, args in enumerate(calls):

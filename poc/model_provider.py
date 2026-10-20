@@ -74,8 +74,9 @@ patterns) and what the claim expects for them (same | differs).
 Coverage rule: the BASE-side files shown are the files the pull request changes. Write at least one probe for every
 testable claim; an empty "probes" list is not an acceptable answer. Each probe must call the functions or methods the
 claim is about directly, with several representative inputs and edge cases chosen generically from the code you see
-(for example: zero, negative and positive numbers, whole and fractional values, empty and non-empty containers,
-boundary sizes, each accepted input type), so that a change in behaviour would show up in the observations. If you
+(for example: zero, negative and positive numbers, whole and fractional values, true and false, None, empty and
+non-empty containers, boundary sizes, each accepted input type, and a small numpy array or pandas value where the
+code uses those), so that a change in behaviour would show up in the observations. If you
 are unsure whether behaviour changes, still record the outputs: plain code decides. Answer with JSON only."""
 
 
