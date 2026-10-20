@@ -79,6 +79,35 @@ def test_swarm_off_makes_no_swarm_calls_and_records_off(tmp_path, monkeypatch):
     assert rec["verdict"] == "verified"
 
 
+def test_switches_record_what_ran(tmp_path, monkeypatch):
+    """A requested swarm that never starts, and an approval env that never reaches the step, stay off."""
+    _quiet_env(monkeypatch)
+    monkeypatch.setenv("POC_HITL", "1")
+    monkeypatch.setenv("POC_CONSOLE", "1")
+    monkeypatch.setenv("POC_HITL_DIR", str(tmp_path))
+    cost.reset()
+    skipped = _rec()
+    runner = _runner(_Counting(), True)
+    runner.model_skipped = "AI calls skipped because --no-probes was set"
+    daily_run.finish(skipped, tmp_path, tmp_path / "work", 0.0, runner)
+    assert skipped["swarm"] == "off"
+    assert skipped["operator_approval"] == "off"
+    assert runner.provider.calls == []
+
+    asked = _rec()
+    daily_run.finish(asked, tmp_path, tmp_path / "work", 0.0, _runner(None, True))
+    assert asked["swarm"] == "off"
+    assert asked["operator_approval"] == "off"
+
+    from poc import hitl
+    hitl.note_approval_ran()
+    approved = _rec()
+    daily_run.finish(approved, tmp_path, tmp_path / "work", 0.0, _runner(None, False))
+    assert approved["operator_approval"] == "on"
+    assert approved["swarm"] == "off"
+    assert hitl.approval_ran() is False
+
+
 def test_swarm_on_records_its_calls_separately(tmp_path, monkeypatch):
     _quiet_env(monkeypatch)
     cost.reset()

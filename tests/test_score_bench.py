@@ -34,7 +34,7 @@ def test_wilson_and_mcnemar_reject_bad_input():
 
 
 def _write(d, name, rid, verdict, baseline=None, **extra):
-    rec = {"bench": {"id": rid}, "verdict": verdict, **extra}
+    rec = {"bench": {"id": rid}, "verdict": verdict, "swarm": "off", "operator_approval": "off", **extra}
     if baseline:
         rec["baseline"] = baseline
     (d / name).write_text(json.dumps(rec))
@@ -87,8 +87,12 @@ def test_generic_id_and_label_columns_and_any_case_ids(tmp_path):
     assert ans == {"R-numpy-2.3": "pos", "R-pandas-3.0": "neg"}
     res = tmp_path / "res"
     res.mkdir()
-    (res / "a.json").write_text(json.dumps({"case_id": "R-numpy-2.3", "verdict": "needs_attention", "id": "run-1"}))
-    (res / "b.json").write_text(json.dumps({"case": {"id": "R-pandas-3.0"}, "verdict": "verified"}))
+    (res / "a.json").write_text(json.dumps({
+        "case_id": "R-numpy-2.3", "verdict": "needs_attention", "id": "run-1",
+        "swarm": "off", "operator_approval": "off"}))
+    (res / "b.json").write_text(json.dumps({
+        "case": {"id": "R-pandas-3.0"}, "verdict": "verified",
+        "swarm": "off", "operator_approval": "off"}))
     s = sb.score(ans, sb.read_results(res))
     assert s["regression_recall"]["k"] == 1 and s["false_alarm_rate"]["k"] == 0
     with pytest.raises(ValueError, match="no column"):
@@ -100,3 +104,27 @@ def test_generic_id_and_label_columns_and_any_case_ids(tmp_path):
 def test_record_run_id_is_not_a_case_id(tmp_path):
     (tmp_path / "r.json").write_text(json.dumps({"id": "B01", "verdict": "needs_attention"}))
     assert sb.read_results(tmp_path) == {}
+
+
+def test_study_scorer_refuses_when_a_switch_is_on_or_missing(tmp_path, capsys):
+    """A study score needs every record to say the swarm and operator approval stayed off."""
+    _write(tmp_path, "B01-full.json", "B01", "needs_attention")
+    _write(tmp_path, "B02-full.json", "B02", "verified", swarm="on")
+    msg = sb.study_records_message(sb.result_records(tmp_path))
+    assert msg and "B02-full.json: the advisory swarm is on" in msg
+    assert sb.main(["--answers", ANSWERS, "--results", str(tmp_path)]) == 1
+    err = capsys.readouterr().err
+    assert "STOPPED" in err and "cannot be scored" in err and "swarm is on" in err
+    assert "Regression recall" not in capsys.readouterr().out
+
+    (tmp_path / "B02-full.json").write_text(json.dumps(
+        {"bench": {"id": "B02"}, "verdict": "verified", "swarm": "off"}))
+    assert sb.main(["--answers", ANSWERS, "--results", str(tmp_path)]) == 1
+    err = capsys.readouterr().err
+    assert "operator approval is missing" in err
+
+    (tmp_path / "B02-full.json").write_text(json.dumps(
+        {"bench": {"id": "B02"}, "verdict": "verified", "operator_approval": "on"}))
+    assert sb.main(["--answers", ANSWERS, "--results", str(tmp_path)]) == 1
+    err = capsys.readouterr().err
+    assert "the advisory swarm is missing" in err and "operator approval is on" in err

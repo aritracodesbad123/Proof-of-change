@@ -88,6 +88,52 @@ def result_id(rec: dict) -> str | None:
     return rid if isinstance(rid, str) and ID_RE.match(rid) else None
 
 
+def study_record_problems(name: str, rec: dict) -> list[str]:
+    """Why this result cannot be scored as a study record. Empty when both switches are off.
+
+    ``on`` means that step ran. Anything else, including a missing field, is not a study record:
+    the file does not show that the step stayed off.
+    """
+    problems = []
+    for key, plain in (("swarm", "the advisory swarm"), ("operator_approval", "operator approval")):
+        value = rec.get(key)
+        if value == "off":
+            continue
+        if value == "on":
+            problems.append(f"{name}: {plain} is on")
+        else:
+            problems.append(f"{name}: {plain} is missing")
+    return problems
+
+
+def study_records_message(records: list[tuple[str, dict]]) -> str | None:
+    """Plain refusal when any study record has swarm or operator approval on or missing."""
+    problems = [p for name, rec in records for p in study_record_problems(name, rec)]
+    if not problems:
+        return None
+    return (
+        "STOPPED: these results cannot be scored as a study. "
+        "Every study record must say swarm: off and operator_approval: off. "
+        "On means that step ran. A missing value is not a study record.\n"
+        + "\n".join(problems)
+    )
+
+
+def result_records(folder: str | Path) -> list[tuple[str, dict]]:
+    """Result files the scorer would use: (file name, record). Skips answer-key names and non-results."""
+    found = []
+    for f in sorted(Path(folder).glob("*.json")):
+        if "answers" in f.name.lower():
+            continue
+        try:
+            rec = json.loads(f.read_text())
+        except (OSError, ValueError):
+            continue
+        if isinstance(rec, dict) and result_id(rec):
+            found.append((f.name, rec))
+    return found
+
+
 def read_results(folder: str | Path, baseline: str | None = None) -> dict[str, str]:
     """{id: verdict} from the result JSON files in folder (not recursive). With baseline, only results of that
     baseline (records without one count as 'full'). Two results for one ID and baseline is an error."""
@@ -163,6 +209,10 @@ def main(argv=None) -> int:
     ap.add_argument("--vs", default=None, help="second baseline in the same folder: paired exact McNemar test")
     ap.add_argument("--json", default=None, help="also write the numbers to this JSON file")
     a = ap.parse_args(argv)
+    refusal = study_records_message(result_records(a.results))
+    if refusal:
+        print(refusal, file=sys.stderr)
+        return 1
     answers = read_answers(a.answers, a.id_column, a.label_column)
     res = read_results(a.results, a.baseline)
     s = score(answers, res)

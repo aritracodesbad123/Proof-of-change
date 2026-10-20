@@ -64,6 +64,33 @@ def hitl_enabled() -> bool:
     return hitl_requested() and console_job()
 
 
+_approval_ran = False
+
+
+def reset_approval_ran() -> None:
+    """Clear the per-pull-request mark that the approval step ran."""
+    global _approval_ran
+    _approval_ran = False
+
+
+def note_approval_ran() -> None:
+    """The approval step was entered for the pull request that is running now."""
+    global _approval_ran
+    _approval_ran = True
+
+
+def approval_ran() -> bool:
+    """True after this pull request entered the approval step. False until then."""
+    return _approval_ran
+
+
+def take_approval_ran() -> bool:
+    """Whether the approval step ran, then clear the mark for the next pull request."""
+    ran = approval_ran()
+    reset_approval_ran()
+    return ran
+
+
 def study_operator_approval_stop(bench: bool) -> str | None:
     """Plain-language refusal for a command-line or benchmark run that has POC_HITL set.
 
@@ -343,6 +370,7 @@ def gate_and_materialize(
     """HITL pause then freeze approved + scenario probes. Mutates errors list; returns generate()-style out."""
     from poc.model_probes import _context
 
+    note_approval_ran()
     out: dict[str, Any] = {
         "provider": provider.describe(),
         "claims": claims,

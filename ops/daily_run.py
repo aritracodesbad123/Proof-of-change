@@ -2148,6 +2148,8 @@ def begin_pr(a) -> None:
         calls.clear()
     a.model_fallback = None
     cost.reset()
+    from poc import hitl
+    hitl.reset_approval_ran()
 
 
 def stamp_model_use(rec: dict, a) -> None:
@@ -2509,18 +2511,22 @@ def finish(rec: dict, prdir: Path, work: Path, t0: float, runner=None) -> dict:
     # (--no-probes / baseline without claim probes) so the stamp stays honest.
     from poc import contree_sandboxes, hitl, run_progress
     contree_sandboxes.clear_session()
-    swarm_on = bool(getattr(runner, "swarm", False))
-    rec["swarm"] = "on" if swarm_on else "off"
-    rec["operator_approval"] = "on" if hitl.hitl_enabled() else "off"
-    if (swarm_on and runner is not None and getattr(runner, "provider", None) is not None
+    # Record what ran, not what was requested. A switch that never reached its step stays off.
+    swarm_requested = bool(getattr(runner, "swarm", False))
+    ran_swarm = False
+    if (swarm_requested and runner is not None and getattr(runner, "provider", None) is not None
             and not getattr(runner, "model_skipped", None)):
         agents.run_swarm(runner.provider, rec)
+        ran_swarm = True
     elif runner is not None and getattr(runner, "model_skipped", None) and "agents" not in rec:
         rec["agents"] = {"status": "skipped", "note": runner.model_skipped, "roles": []}
         rec.setdefault("explanation", {"status": "not yet wired", "why": runner.model_skipped})
-    elif not swarm_on and "agents" not in rec:
-        rec["agents"] = {"status": "skipped", "note": "advisory swarm is off", "roles": []}
-        rec.setdefault("explanation", {"status": "not yet wired", "why": "advisory swarm is off"})
+    elif not ran_swarm and "agents" not in rec:
+        why = "advisory swarm did not run" if swarm_requested else "advisory swarm is off"
+        rec["agents"] = {"status": "skipped", "note": why, "roles": []}
+        rec.setdefault("explanation", {"status": "not yet wired", "why": why})
+    rec["swarm"] = "on" if ran_swarm else "off"
+    rec["operator_approval"] = "on" if hitl.take_approval_ran() else "off"
     run_progress.emit("report", detail="writing record")
     if runner is not None:
         stamp_model_use(rec, runner)
