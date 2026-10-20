@@ -54,6 +54,25 @@ different for the wrong reason.
 
 A sentence this filter keeps can be a real promise, such as "Results are unchanged" written after a test list.
 That promise supports a verified result only when a probe that expects the same outcome actually ran a changed
-line. A probe that crashed, came back empty, was uninformative, or did not run covers no changed lines. A coverage
-count left over from before that failure, still saying the probe was adequate, does not override this. The promise
-stays unchecked, and the result is could not verify.
+line. A probe that crashed, came back empty, was uninformative, or did not run covers no changed lines. A measured
+count of zero changed lines covers nothing either. A coverage note left over from before that failure, still
+saying the probe was adequate, does not override this. The promise stays unchecked, and the result is could not
+verify.
+
+## Brought forward onto the current main line
+
+This change was first approved against an earlier main line. Since then the project added an advisory model
+swarm, optional remote sandboxes, a GitHub reply on allowlisted demo repositories, an operator console, and a
+pause so a person can approve extra checks in the middle of a run.
+
+Replaying the change on the current main line did not overlap any edited lines, so the narrower filter and the
+probe rule did not have to be rewritten. They still hold:
+
+- A probe that crashed, came back empty, was uninformative, or did not run covers nothing.
+- A measured count of zero changed lines covers nothing.
+- Product sentences that come after a test list are still kept.
+
+The operator console starts the same check the command line starts. That check is the only place the verdict is
+decided, including the probe rule above. The swarm writes labels and a short summary only after that verdict is
+already stored, and it does not replace the verdict. The mid-run approval step sits inside the same check, before
+the verdict is decided.

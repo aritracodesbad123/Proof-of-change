@@ -185,3 +185,107 @@ def test_measured_zero_covered_lines_do_not_check_a_kept_claim():
     assert not b.probe_covers({"items": [item]})
     v, reason, _ = verdict_for(_passing_comparison(), None, probe_results={"items": [item]}, claims=claims)
     assert v == "could_not_verify" and "unverified behaviour claim" in reason
+
+
+def test_empty_probe_from_the_runner_does_not_cover_a_kept_claim():
+    """No observations is the runner's empty probe. It covers nothing, even with a leftover adequate count."""
+    from ops.daily_run import verdict_for
+    from poc import probes
+
+    claims = _kept_unchanged_claim()
+    item = probes.classify_item({
+        "id": "model-x", "source": "model", "claims": _SAME,
+        "runs": {"main": [], "pr": []}, "observations": [],
+        "probe_changed_line_coverage": dict(_STALE_COVERAGE),
+    })
+    assert item["status"] == "error"
+    assert item["probe_changed_line_coverage"]["changed_lines_covered"] == 0
+    assert not b.probe_covers({"items": [item]})
+    v, reason, _ = verdict_for(_passing_comparison(), None, probe_results={"items": [item]}, claims=claims)
+    assert v == "could_not_verify" and "unverified behaviour claim" in reason
+
+
+def test_console_and_swarm_share_the_verdict_code(tmp_path, monkeypatch):
+    """The console launches the same check that decides the verdict. The swarm runs after that verdict is stored
+    and does not replace it, including a could-not-verify from a crashed probe."""
+    import io
+    import os
+
+    from ops import daily_run
+    from poc import agents, console_api, model_provider
+
+    assert "probe_covers" in daily_run.verdict_for.__code__.co_names
+    assert "verdict_for" in daily_run._store_verdict.__code__.co_names
+    assert "run_swarm" in daily_run.finish.__code__.co_names
+    assert "verdict_for" not in daily_run.finish.__code__.co_names
+    assert "probe_covers" not in daily_run.finish.__code__.co_names
+    assert "verdict_for" not in agents.run_swarm.__code__.co_names
+    assert "probe_covers" not in agents.run_swarm.__code__.co_names
+
+    claims = _kept_unchanged_claim()
+    item = {"id": "model-x", "source": "model", "status": "crashed", "claims": _SAME,
+            "observations": [], "probe_changed_line_coverage": dict(_STALE_COVERAGE)}
+    v, reason, _ = daily_run.verdict_for(
+        _passing_comparison(), None, probe_results={"items": [item]}, claims=claims)
+    assert v == "could_not_verify"
+
+    class Stub(model_provider.Provider):
+        name = "recorded"
+        blind = False
+
+        def complete_json(self, task, system, user, schema, ctx):
+            if task == "judge":
+                return {"labels": []}
+            if task == "helper":
+                return {"notes": []}
+            return {"text": "Verdict stays with the check.", "quotes": []}
+
+    rec = {"verdict": v, "reason": reason, "repo": "me/demo", "pr": {"number": 3, "title": "Keep the parser"},
+           "files": {"package_py": [], "compiled": [], "other": []}, "per_run": [], "baseline": "full"}
+    monkeypatch.setattr(daily_run, "check_record", lambda record: [])
+    runner = type("Runner", (), {"provider": Stub(), "model_skipped": None})()
+    daily_run.finish(rec, tmp_path, tmp_path / "work", 0.0, runner)
+    assert rec["verdict"] == v and rec["reason"] == reason
+    assert rec["agents"]["advisory"] is True
+
+    captured = {}
+
+    class FakeProc:
+        def __init__(self):
+            self.stdout = io.StringIO("")
+
+        def wait(self):
+            return 0
+
+    def fake_popen(argv, **kwargs):
+        captured["argv"] = list(argv)
+        return FakeProc()
+
+    class ImmediateThread:
+        def __init__(self, target=None, daemon=None):
+            self.target = target
+
+        def start(self):
+            self.target()
+
+    root = tmp_path / "repo"
+    (root / "ops").mkdir(parents=True)
+    (root / "ops" / "daily_run.py").write_text("# stub\n")
+    monkeypatch.setattr(console_api, "REPO_ROOT", root)
+    monkeypatch.setattr(console_api.subprocess, "Popen", fake_popen)
+    monkeypatch.setattr(console_api.threading, "Thread", ImmediateThread)
+    monkeypatch.setattr(console_api, "console_run_flags", lambda: ([], None))
+    monkeypatch.setattr(console_api, "find_record_for_pr", lambda repo, pr: None)
+    saved = {k: os.environ.get(k) for k in ("POC_HITL", "POC_HITL_DIR", "POC_PROGRESS_PATH")}
+    try:
+        job = console_api.start_check("https://github.com/me/demo/pull/3", model_provider="recorded")
+    finally:
+        for key, val in saved.items():
+            if val is None:
+                os.environ.pop(key, None)
+            else:
+                os.environ[key] = val
+    argv = captured["argv"]
+    assert any(str(part).endswith("ops/daily_run.py") for part in argv)
+    assert "--pr" in argv and "https://github.com/me/demo/pull/3" in argv
+    assert job["status"] == "done"
