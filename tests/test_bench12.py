@@ -1,7 +1,9 @@
 """Known-answer benchmark (evals/bench12) and the AI-probe gate in the golden re-derivation (evals/checks)."""
 from __future__ import annotations
 
-import ast
+import builtins
+import json
+import re
 from pathlib import Path
 
 import pytest
@@ -26,15 +28,81 @@ def test_every_case_folder_is_scored():
     assert keyed == {p.name for p in (BENCH / "cases").iterdir() if p.is_dir()}
 
 
-def test_run_never_sees_the_answer_key():
+LABELS = re.compile(r"verified|needs[\s_-]*attention|could[\s_-]*not[\s_-]*verify|no[\s_-]*code[\s_-]*change|skipped",
+                    re.IGNORECASE)
+
+
+def _case_files():
+    return [p for case in (BENCH / "cases").iterdir() for p in case.rglob("*") if p.is_file()]
+
+
+# The recovery-rerun step reads a first-run and a rerun verdict as its inputs. Only these exact fields may hold a
+# label; the rerun's must differ from the case's answer, so it cannot leak it.
+ALLOWED = {case: {("first_run", "verdict"), ("rerun", "verdict")} for case in ("S11", "S11b", "S11c")}
+
+
+def _strings(obj, path=()):
+    if isinstance(obj, dict):
+        for k, v in obj.items():
+            yield path + (k,), str(k)
+            yield from _strings(v, path + (k,))
+    elif isinstance(obj, list):
+        for v in obj:
+            yield from _strings(v, path)
+    else:
+        yield path, str(obj)
+
+
+def _check(text, where, expected):
+    assert not re.search(r"answer|expected", text, re.IGNORECASE), where
+    assert not LABELS.search(text), f"{where} names a verdict label"
+    assert not any(v.lower() in text.lower() for v in expected), where
+
+
+def test_case_files_carry_no_hint_of_the_answer():
+    key = json.loads((BENCH / "answer_key.json").read_text())
+    expected = {e["expected"] for e in key["answers"]}
+    answer_of = {e["case"]: e["expected"] for e in key["answers"]}
+    assert _case_files()
+    for p in _case_files():
+        case = p.relative_to(BENCH / "cases").parts[0]
+        _check(str(p.relative_to(BENCH)), p, expected)
+        if p.name != "recorded.json":
+            _check(p.read_text(), p, expected)
+            continue
+        seen = set()
+        for path, text in _strings(json.loads(p.read_text())):
+            if path in ALLOWED.get(case, set()) and text == path[-1]:
+                continue  # the key name itself
+            if path in ALLOWED.get(case, set()):
+                seen.add(path)
+                if path[0] == "rerun":
+                    assert text != answer_of[case], f"{p}: rerun verdict equals the answer"
+                continue
+            _check(text, f"{p}:{'.'.join(path)}", expected)
+        assert seen == ALLOWED.get(case, set()), p
+
+
+def test_run_case_never_opens_the_answer_key(monkeypatch):
     with pytest.raises(ValueError):
         rc.run_case(BENCH / "answer_key.json")
-    src = (BENCH / "run_case.py").read_text()
-    names = {n.id for n in ast.walk(ast.parse(src)) if isinstance(n, ast.Name)}
-    assert "KEY" not in names and "answer_key" not in src.replace("never sees the answer key", "")
-    for case in (BENCH / "cases").iterdir():
-        assert not any("answer" in p.name.lower() or "expected" in p.read_text().lower()
-                       for p in case.rglob("*") if p.is_file())
+    opened: list[str] = []
+    real_open, real_read = builtins.open, Path.read_text
+
+    def spy_open(f, *a, **k):
+        opened.append(str(f))
+        return real_open(f, *a, **k)
+
+    def spy_read(self, *a, **k):
+        opened.append(str(self))
+        return real_read(self, *a, **k)
+
+    monkeypatch.setattr(builtins, "open", spy_open)
+    monkeypatch.setattr(Path, "read_text", spy_read)
+    for case in sorted((BENCH / "cases").iterdir()):
+        for bl, route in (("full", "single"), ("tests", "single"), ("full", "daily")):
+            rc.run_case(case, bl, route)
+    assert opened and not [f for f in opened if "answer" in f.lower()]
 
 
 # ---- AI-probe gate in derive_verdict -------------------------------------------------------------------------
