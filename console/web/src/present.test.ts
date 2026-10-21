@@ -8,12 +8,25 @@ import {
   illustrativeStates,
   logSections,
   reasonPoints,
+  demoHelperLines,
   TIMELINE_SPEC,
   timelineStates,
   verdictLabel,
   verdictPlain,
   verdictTone,
 } from './present'
+
+describe('demo helper notes stay background', () => {
+  test('lines come from the record and an empty record stays empty', () => {
+    expect(demoHelperLines({})).toEqual([])
+    expect(
+      demoHelperLines({
+        demo_helper: { notes: ['Looked up with Tavily: 1 results', 'Setup plan: install pytest on main and pr'] },
+        verdict: 'verified',
+      }),
+    ).toEqual(['Looked up with Tavily: 1 results', 'Setup plan: install pytest on main and pr'])
+  })
+})
 
 describe('verdict badges stay labels for the code verdict', () => {
   test('four tones keep their words', () => {

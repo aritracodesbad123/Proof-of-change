@@ -753,11 +753,12 @@ def start_check(pr_url: str, *, model_provider: str = "nebius", owner: str | Non
 
 
 def _job_public(job: dict) -> dict:
-    from poc import hitl, run_progress
+    from poc import demo_helper, hitl, run_progress
 
     out = dict(job)
     prog = run_progress.job_progress(job.get("progress_path"))
     out.update(prog)
+    out["helper_notes"] = demo_helper.public_notes(prog.get("stages"), job.get("record"))
     # Live log: last ~8KB of the teed console.log on every poll.
     clog = job.get("console_log")
     if clog:
