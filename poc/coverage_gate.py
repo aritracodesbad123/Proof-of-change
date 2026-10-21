@@ -201,8 +201,8 @@ def assess(rec: dict) -> dict:
                         + f" (tests: {base_reason})")
         return g
     if rec.get("product_check") and comp:
-        # Product checks only: coverage.py cannot see compiled code, so any change touching compiled code (even mixed with Python) has no measured
-        # coverage and cannot be verified. Study runs never set product_check, so their verdicts are unchanged.
+        # Product checks only: coverage.py cannot see compiled code, so any change touching compiled code
+        # (even mixed with Python) cannot be verified. Study runs never set product_check, so they are unchanged.
         g.update(verdict="could_not_verify", changed=True, confidence="none",
                  reason=f"{PRODUCT_COMPILED_ONLY} (compiled files: {', '.join(comp)}) (tests: {base_reason})")
         return g
