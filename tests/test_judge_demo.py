@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import json
 import os
+import subprocess
 from datetime import datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo
@@ -234,9 +235,13 @@ def test_codespace_start_turns_the_swarm_on():
     root = Path(__file__).resolve().parents[1]
     raw = (root / ".devcontainer" / "devcontainer.json").read_text()
     cfg = json.loads(raw)
-    start = cfg["postStartCommand"]
-    assert "POC_SWARM=1" in start
-    assert "poc.console_api" in start
+    assert cfg["portsAttributes"]["8787"]["visibility"] == "private"
+    assert "start-console.sh" in cfg["postStartCommand"]
+    script = (root / ".devcontainer" / "start-console.sh").read_text()
+    assert "POC_SWARM=1" in script
+    assert "POC_SINGLE_USER=1" in script
+    assert "poc.console_api" in script
+    assert "gh codespace ports" in script
     secret = cfg["secrets"]["TAVILY_API_KEY"]
     assert "Your own Tavily API key" in secret["description"]
     assert "lookup is skipped" in secret["description"]
@@ -244,6 +249,62 @@ def test_codespace_start_turns_the_swarm_on():
     assert "tvly-" not in raw
     argv = console_api.console_daily_run_argv("https://github.com/me/demo/pull/3", "recorded")
     assert "--swarm" in argv
+
+
+def _fake_gh(tmp_path: Path, listing: str) -> dict[str, str]:
+    bin_dir = tmp_path / "bin"
+    bin_dir.mkdir()
+    gh = bin_dir / "gh"
+    gh.write_text(f"#!/bin/sh\nprintf '%s\\n' '{listing}'\n")
+    gh.chmod(0o755)
+    env = os.environ.copy()
+    env["PATH"] = f"{bin_dir}{os.pathsep}{env['PATH']}"
+    env["POC_CONSOLE_DRY_RUN"] = "1"
+    env.pop("POC_SINGLE_USER", None)
+    return env
+
+
+def test_startup_refuses_a_public_console_port(tmp_path):
+    root = Path(__file__).resolve().parents[1]
+    env = _fake_gh(tmp_path, '[{"port":8787,"visibility":"public"}]')
+    proc = subprocess.run(
+        ["bash", str(root / ".devcontainer" / "start-console.sh")],
+        cwd=root, env=env, capture_output=True, text=True, check=False,
+    )
+    assert proc.returncode == 1
+    assert "Set port 8787 back to private" in proc.stderr
+    assert "start" not in proc.stdout
+
+
+def test_startup_starts_when_the_port_is_private_or_unknown(tmp_path):
+    root = Path(__file__).resolve().parents[1]
+    private = _fake_gh(tmp_path, '[{"port":8787,"visibility":"private"}]')
+    proc = subprocess.run(
+        ["bash", str(root / ".devcontainer" / "start-console.sh")],
+        cwd=root, env=private, capture_output=True, text=True, check=False,
+    )
+    assert proc.returncode == 0
+    assert proc.stdout.strip() == "start"
+    unknown = os.environ.copy()
+    unknown["PATH"] = "/usr/bin:/bin"
+    unknown["POC_CONSOLE_DRY_RUN"] = "1"
+    proc = subprocess.run(
+        ["bash", str(root / ".devcontainer" / "start-console.sh")],
+        cwd=root, env=unknown, capture_output=True, text=True, check=False,
+    )
+    assert proc.returncode == 0
+    assert proc.stdout.strip() == "start"
+
+
+def test_request_form_warns_and_names_the_running_label():
+    root = Path(__file__).resolve().parents[1]
+    warning = "Do not paste an email address, a key, or any private information into the issue. The issue is public."
+    template = (root / ".github" / "ISSUE_TEMPLATE" / "request-a-check.yml").read_text()
+    readme = (root / "README.md").read_text()
+    assert warning in template
+    assert warning in readme
+    assert "request-a-check" in readme and "request-running" in readme and "request-done" in readme
+    assert "Do not make port 8787 public" in readme
 
 
 def test_tavily_session_key_reaches_the_check_and_is_not_echoed(monkeypatch):

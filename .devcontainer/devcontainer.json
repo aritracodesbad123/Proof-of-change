@@ -10,11 +10,12 @@
   "portsAttributes": {
     "8787": {
       "label": "Proof-of-Change console",
-      "onAutoForward": "openBrowser"
+      "onAutoForward": "openBrowser",
+      "visibility": "private"
     }
   },
   "postCreateCommand": "sudo apt-get update && sudo apt-get install -y bubblewrap && (sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0 || true) && python -m pip install -e '.[dev]' && cd console/web && npm ci && npm run build",
-  "postStartCommand": "bash -lc 'POC_SWARM=1 nohup python -m poc.console_api --host 0.0.0.0 --port 8787 >/tmp/poc-console.log 2>&1 &'",
+  "postStartCommand": "bash .devcontainer/start-console.sh",
   "secrets": {
     "TAVILY_API_KEY": {
       "description": "Your own Tavily API key. The setup lookup needs it. This project does not ship or share a key. Tavily keys are free. Without a key the lookup is skipped and the check continues. The value is not stored in the repository.",
