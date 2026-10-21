@@ -21,9 +21,28 @@ def test_refuse_non_demo(monkeypatch):
     plan = github_app.handle_event(
         "issue_comment",
         {"action": "created", "comment": {"body": "/prove"}, "repository": {"full_name": "psf/requests"},
-         "issue": {"number": 1}},
+         "issue": {"number": 1, "pull_request": {}}},
         env={"POC_DEMO_REPOS": "me/demo"})
     assert plan["action"] == "refuse"
+
+
+def test_prove_on_a_plain_issue_is_ignored():
+    plan = github_app.handle_event(
+        "issue_comment",
+        {"action": "created", "comment": {"body": "/prove"}, "repository": {"full_name": "me/demo"},
+         "issue": {"number": 4}},
+        env={"POC_DEMO_REPOS": "me/demo"})
+    assert plan["action"] == "ignore"
+    assert "pull request" in plan["why"]
+
+
+def test_prove_on_a_pull_request_still_plans():
+    plan = github_app.handle_event(
+        "issue_comment",
+        {"action": "created", "comment": {"body": "/prove"}, "repository": {"full_name": "me/demo"},
+         "issue": {"number": 9, "pull_request": {}}},
+        env={"POC_DEMO_REPOS": "me/demo"})
+    assert plan == {"action": "prove", "repo": "me/demo", "claim": "", "pr": 9}
 
 
 def test_pull_request_plan():
