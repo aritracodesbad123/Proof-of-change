@@ -132,6 +132,7 @@ export type Job = {
   swarm?: SwarmStatus
   hitl_draft?: HitlDraft | null
   hitl_approval?: HitlApprovalBody | null
+  helper_notes?: string[]
 }
 
 export const api = {

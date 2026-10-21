@@ -24,6 +24,7 @@ import {
   CostTimePanel,
   DetailRail,
   EvidenceLinks,
+  HelperNotes,
   LiveLog,
   ReasonList,
   RunAnalysis,
@@ -597,6 +598,7 @@ export default function App() {
               steps={timelineStates(job.stages || [], job.current_stage)}
               caption={job.current_detail || job.status}
             />
+            <HelperNotes notes={job.helper_notes} />
             <SwarmTheater swarm={job.swarm} currentAgent={job.current_agent} detail={job.current_detail} />
             {job.status === 'awaiting_human' && job.hitl_draft ? (
               <HitlPanel jobId={job.id} draft={job.hitl_draft} onSubmitted={(next) => setJob(next)} />
