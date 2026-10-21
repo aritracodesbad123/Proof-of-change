@@ -188,13 +188,18 @@ def measurement(rec: dict, has_python: bool = True) -> str:
 
 
 def _reported_never_ran(cov: dict) -> list[str]:
-    """Files a (possibly partial) coverage report lists with changed executable lines, none of which ran."""
-    out = []
+    """Listed files of a partial report, when no changed executable line ran across all of them (else []).
+
+    Same total rule complete reports use: one listed file that ran some changed lines clears the cap."""
+    out, covered = [], 0
     for f in cov.get("files") or []:
-        if isinstance(f, dict) and isinstance(f.get("changed_lines_total"), int) and f["changed_lines_total"] > 0 \
-                and f.get("changed_lines_covered") == 0:
+        if isinstance(f, dict) and isinstance(f.get("changed_lines_total"), int) and f["changed_lines_total"] > 0:
+            c = f.get("changed_lines_covered")
+            if not isinstance(c, int):
+                return []
+            covered += c
             out.append(str(f.get("file")))
-    return out
+    return out if out and covered == 0 else []
 
 
 def assess(rec: dict) -> dict:
