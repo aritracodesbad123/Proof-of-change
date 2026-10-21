@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import ast
 import difflib
+import json
 import re
 from pathlib import PurePosixPath
 
@@ -106,23 +107,62 @@ def changed_lines(old_text: str | None, new_text: str) -> set[int]:
     return out
 
 
-def measure(changed: dict, cov_files: dict) -> dict:
+def _not_measured(why: str) -> dict:
+    return {"status": "not measured", "why": why, "changed_lines_total": None, "changed_lines_covered": None}
+
+
+def _int_lines(v) -> set[int] | None:
+    if not isinstance(v, list) or not all(isinstance(x, int) and not isinstance(x, bool) for x in v):
+        return None
+    return set(v)
+
+
+def measure(changed: dict, cov_files, require_all: bool = True) -> dict:
     """changed: {relative path: set(changed line numbers)}; cov_files: coverage.py JSON 'files' mapping.
-    Executable lines are coverage's executed + missing lines. Returns the record's coverage block."""
-    per_file, tot, hit = [], 0, 0
+    Executable lines are coverage's executed + missing lines, and only lines the PR changed are counted.
+
+    A report that is not a non-empty mapping, has a badly shaped entry, or (with require_all, the default) leaves
+    out any changed file is 'not measured', never 'measured, 0 of 0 lines'. Returns the record's coverage block."""
+    if not isinstance(cov_files, dict) or not cov_files:
+        return _not_measured("the coverage report lists no files")
+    per_file, tot, hit, missing = [], 0, 0, []
     for rel, lines in sorted(changed.items()):
-        key = next((k for k in cov_files if k == rel or k.replace("\\", "/").endswith("/" + rel)), None)
+        key = next((k for k in cov_files if isinstance(k, str)
+                    and (k == rel or k.replace("\\", "/").endswith("/" + rel))), None)
         if key is None:
+            missing.append(rel)
             per_file.append({"file": rel, "changed_lines_total": None, "changed_lines_covered": None,
                              "note": "file not measured by coverage"})
             continue
         f = cov_files[key]
-        execd = set(f.get("executed_lines", []))
-        exe = execd | set(f.get("missing_lines", []))
+        execd = _int_lines(f.get("executed_lines", [])) if isinstance(f, dict) else None
+        miss = _int_lines(f.get("missing_lines", [])) if isinstance(f, dict) else None
+        if execd is None or miss is None:
+            return _not_measured(f"the coverage report is badly shaped for {rel}")
+        lines = set(lines)
+        exe = execd | miss
         t, h = len(lines & exe), len(lines & execd)
         tot, hit = tot + t, hit + h
         per_file.append({"file": rel, "changed_lines_total": t, "changed_lines_covered": h})
+    if missing and (require_all or len(missing) == len(changed)):
+        return _not_measured("the coverage report leaves out changed file(s): " + ", ".join(missing)) | {
+            "files": per_file}
     return {"status": "measured", "changed_lines_total": tot, "changed_lines_covered": hit, "files": per_file}
+
+
+def parse_report(text) -> tuple[dict | None, str]:
+    """coverage.py JSON text -> ('files' mapping, '') or (None, plain reason)."""
+    if not isinstance(text, str) or not text.strip():
+        return None, "coverage run produced no data"
+    try:
+        data = json.loads(text)
+    except (ValueError, RecursionError):
+        return None, "the coverage report is not valid JSON"
+    if not isinstance(data, dict) or not isinstance(data.get("files"), dict):
+        return None, "the coverage report is badly shaped (no files mapping)"
+    if not data["files"]:
+        return None, "the coverage report lists no files"
+    return data["files"], ""
 
 
 def _fmt(cov: dict) -> str:
