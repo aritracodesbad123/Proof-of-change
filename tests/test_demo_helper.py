@@ -883,3 +883,12 @@ def test_provision_ignores_mirrors(monkeypatch):
     assert "UV_PYTHON_INSTALL_MIRROR" not in seen and "UV_PYTHON_DOWNLOADS_JSON_URL" not in seen
     shell = demo_helper.contree_python_shell("3.14")
     assert "unset UV_PYTHON_INSTALL_MIRROR" in shell and demo_helper.UV_PIN in shell
+
+
+def test_interpreter_the_sandbox_cannot_see_is_replaced_by_a_managed_one(tmp_path, monkeypatch):
+    root = _checkout(tmp_path, python=">=3.14")
+    monkeypatch.setattr(demo_helper, "_sandbox_can_see", lambda p: str(p).startswith("/usr/"))
+    plan = demo_helper.build_setup_plan(REPO, [root], {"text": ""}, "3.12", "local", "widget",
+                                        python_available=lambda _v: "/home/u/.local/bin/python3.14", pypi=_pypi,
+                                        provision=lambda v: v)
+    assert plan["python"]["switch"] == "3.14" and plan["python"]["auto_fix"] is True

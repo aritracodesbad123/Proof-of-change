@@ -989,6 +989,18 @@ def pypi_links_back(info, owner: str, repo: str) -> bool:
     return any(github_repo_url(value, owner, repo) for value in values)
 
 
+def _sandbox_can_see(path: str) -> bool:
+    """True when the local sandbox mounts this interpreter (/usr is mounted read-only; home folders are not)."""
+    try:
+        from guardrails import sandbox
+        if not sandbox.enabled():
+            return True
+    except Exception:  # noqa: BLE001
+        pass
+    real = os.path.realpath(str(path))
+    return real.startswith("/usr/") or not os.path.isabs(str(path))
+
+
 PYTHON_RULE = ("one Python version is used on both sides: the lowest version that meets the requirements of both "
                "main and the pull request; if none meets both, main's requirement wins")
 
@@ -1014,6 +1026,8 @@ def _python_decision(requested: str | None, current: str, sandbox: str, python_a
                            f"{current or 'another version'}, so Python {requested} is installed in the sandbox "
                            "during setup, the same on main and pr")}
     path = python_available(requested) if python_available else None
+    if path and auto_python and not _sandbox_can_see(path):
+        path = None   # an interpreter outside /usr is not mounted in the sandbox; use a managed one instead
     if path:
         return {"requested": requested, "current": current, "applied": True, "switch": path,
                 "reason": f"switched the local sandbox to {path}"}

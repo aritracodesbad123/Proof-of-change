@@ -1,12 +1,7 @@
-from pathlib import Path
 from types import SimpleNamespace
-import sys
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "ops"))
-
-from ops import daily_run  # noqa: E402
-from poc import demo_helper  # noqa: E402
+from ops import daily_run
+from poc import demo_helper
 
 
 def test_failed_python_setup_stops_before_any_install(tmp_path, monkeypatch):
