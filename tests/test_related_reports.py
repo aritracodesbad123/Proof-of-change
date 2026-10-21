@@ -63,7 +63,7 @@ def test_on_in_product_mode():
     app = github_app.check_argv("https://github.com/acme/widgets/pull/4", {})
     assert app[:4] == ["--pr", "https://github.com/acme/widgets/pull/4", "--model-provider", "nebius"]
     assert "--related-reports" in app
-    assert related_reports.product_flags() == ["--related-reports"]
+    assert related_reports.product_flags() == ["--product-check", "--related-reports"]
 
 
 def test_off_in_study_mode(tmp_path, monkeypatch):

@@ -18,6 +18,7 @@ import os
 from poc import tavily_docs
 
 FLAG = "--related-reports"
+PRODUCT_CHECK_FLAG = "--product-check"   # marks a product check for the coverage cap; separate from FLAG
 REPORT_LABEL = "Background (related public bug reports, not used for the verdict)"
 SKIP_LOG = "Related bug reports skipped: TAVILY_API_KEY is not set."
 FAIL_LOG = "Related bug reports skipped: lookup failed."
@@ -32,8 +33,11 @@ _LABEL = (
 
 
 def product_flags() -> list[str]:
-    """Arguments a product check adds. Study runs and the daily study do not add these."""
-    return [FLAG]
+    """Arguments a product check adds. Study runs and the daily study do not add these.
+
+    ``--product-check`` is what turns on the product coverage cap. It does not depend on ``--related-reports``,
+    so dropping the bug-report lookup cannot switch the cap off."""
+    return [PRODUCT_CHECK_FLAG, FLAG]
 
 
 def enabled(flag: bool = False, *, bench: bool = False, single_pr: bool = True) -> bool:

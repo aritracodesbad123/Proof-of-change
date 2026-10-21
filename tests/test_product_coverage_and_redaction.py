@@ -37,9 +37,9 @@ def test_product_check_with_measured_coverage_stays_verified():
 def test_study_path_is_unaffected_by_the_product_cap():
     rec = _rec(coverage={"status": "not measured", "why": "x"})
     assert cg.apply(rec)["verdict"] == "verified"
-    study = SimpleNamespace(bench="pairs.csv", pr="https://github.com/o/r/pull/1", related_reports=False)
-    daily_sweep = SimpleNamespace(bench=None, pr=None, related_reports=True)
-    product = SimpleNamespace(bench=None, pr="https://github.com/o/r/pull/1", related_reports=True)
+    study = SimpleNamespace(bench="pairs.csv", pr="https://github.com/o/r/pull/1", product_check=True)
+    daily_sweep = SimpleNamespace(bench=None, pr=None, product_check=True)
+    product = SimpleNamespace(bench=None, pr="https://github.com/o/r/pull/1", product_check=True)
     assert not daily_run.product_route(study) and not daily_run.product_route(daily_sweep)
     assert daily_run.product_route(product)
 
