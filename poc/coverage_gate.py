@@ -131,6 +131,7 @@ def _fmt(cov: dict) -> str:
 
 
 PRODUCT_NOT_MEASURED = "Coverage wasn't measured, so this can't be marked verified"
+PRODUCT_COMPILED_ONLY = "This change touches compiled code that coverage can't measure, so it can't be marked verified"
 MEASUREMENTS = ("measured", "not measured: predates gate", "not measured", "not needed")
 
 
@@ -191,6 +192,12 @@ def assess(rec: dict) -> dict:
                 g["confidence"] = "lower"
     g["note"] = "; ".join(notes)
     if base != "verified":
+        return g
+    if rec.get("product_check") and comp:
+        # Product checks only: coverage.py cannot see compiled code, so any change touching compiled code
+        # (even mixed with Python) cannot be verified. Study runs never set product_check, so they are unchanged.
+        g.update(verdict="could_not_verify", changed=True, confidence="none",
+                 reason=f"{PRODUCT_COMPILED_ONLY} (compiled files: {', '.join(comp)}) (tests: {base_reason})")
         return g
     if rec.get("product_check") and py and not measured:
         # Product checks only: a verified result needs coverage that was actually measured. Study runs never set
