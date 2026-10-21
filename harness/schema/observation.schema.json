@@ -1477,6 +1477,7 @@
             "unmentioned",
             "needs_human",
             "flaky",
+            "unstable_on_pr",
             "not_testable",
             "no_difference"
            ],
@@ -1721,6 +1722,7 @@
          "unmentioned",
          "needs_human",
          "flaky",
+         "unstable_on_pr",
          "not_testable",
          "no_difference"
         ]
@@ -2013,6 +2015,11 @@
    "rev": 14,
    "date": "2026-10-20",
    "change": "probes.status and each probe item status may be crashed or rejected. Nothing becomes required, so rev 1-13 records stay valid."
+  },
+  {
+   "rev": 15,
+   "date": "2026-10-21",
+   "change": "observation label and summary labels may be unstable_on_pr (stable on the base, unstable only on the pull request). Nothing becomes required, so rev 1-14 records stay valid."
   }
  ],
  "if": {

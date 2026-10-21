@@ -161,9 +161,12 @@ def test_unrelated_module_failing_to_load_on_both_sides_still_verifies():
 
 
 # ---------------------------------------------------------------- reason text
-def test_reason_mentions_flaky_tests():
-    _, (v, reason, _) = judge({"t::a": P, "t::b": P}, {"t::a": P, "t::b": P}, flaky_pr={"t::a": P, "t::b": F})
-    assert "1 flaky test(s)" in reason
+def test_reason_mentions_a_test_that_fails_only_on_the_pr():
+    """Base passes every run; one pull-request run fails. That is a possible regression, and the reason names it."""
+    cmp, (v, reason, _) = judge({"t::a": P, "t::b": P}, {"t::a": P, "t::b": P}, flaky_pr={"t::a": P, "t::b": F})
+    assert cmp["pr_unstable"] == ["t::b"] and cmp["flaky"] == []
+    assert v == "needs_attention"
+    assert "t::b" in reason and "fail on some pull-request runs" in reason
 
 
 def test_reason_counts_tests_that_ran():
