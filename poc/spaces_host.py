@@ -1,9 +1,10 @@
-"""Hugging Face Spaces host rules for the operator console.
+"""Host rules for the operator console when no sandbox can start.
 
-A Space container often cannot start bubblewrap (no unprivileged user namespaces).
+A container often cannot start bubblewrap (no unprivileged user namespaces).
 Pull-request code must not run in that case: an unsandboxed process could see secret
 keys and the network. The one exception is a playback of the pre-vetted sample
-(rasbt/mlxtend#1229). That playback does not clone, install, or execute the pull request.
+(rasbt/mlxtend#1229). That playback does not clone, install, or execute the pull request,
+and it runs on any host, not only a Hugging Face Space.
 """
 from __future__ import annotations
 
@@ -20,6 +21,12 @@ SPACES_MESSAGE = (
     "A pull request is not run here, because that would execute untrusted code without a sandbox, "
     "where it could see secret keys and the network. "
     "The prerecorded sample, mlxtend pull 1229, still plays back from the vetted fixture. "
+    "That playback does not run the pull-request code."
+)
+
+PLAYBACK_MESSAGE = (
+    "No sandbox is available, so this check does not run pull-request code. "
+    "The prerecorded sample, mlxtend pull 1229, plays back from the vetted fixture. "
     "That playback does not run the pull-request code."
 )
 
@@ -51,8 +58,11 @@ def sandbox_open() -> tuple[bool, str]:
 
 
 def playback_only(pr_url: str, model_provider: str) -> bool:
-    """The vetted sample is played back, not executed, when a Space has no sandbox."""
-    if not on_spaces() or model_provider != "recorded" or not is_vetted_sample(pr_url):
+    """Play back the vetted sample on any host when no sandbox can start.
+
+    The playback does not clone, install, or execute pull-request code.
+    """
+    if model_provider != "recorded" or not is_vetted_sample(pr_url):
         return False
     ok, _why = sandbox_open()
     return not ok

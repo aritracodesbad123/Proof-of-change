@@ -276,7 +276,7 @@ def test_console_and_swarm_share_the_verdict_code(tmp_path, monkeypatch):
     monkeypatch.setattr(console_api, "REPO_ROOT", root)
     monkeypatch.setattr(console_api.subprocess, "Popen", fake_popen)
     monkeypatch.setattr(console_api.threading, "Thread", ImmediateThread)
-    monkeypatch.setattr(console_api, "console_run_flags", lambda: ([], None))
+    monkeypatch.setattr(console_api, "console_run_flags", lambda: console_api.ConsoleRunPlan([], None, False, None))
     monkeypatch.setattr(console_api, "find_record_for_pr", lambda repo, pr: None)
     saved = {k: os.environ.get(k) for k in ("POC_HITL", "POC_HITL_DIR", "POC_PROGRESS_PATH")}
     try:

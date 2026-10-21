@@ -129,6 +129,7 @@ def test_serverless_orchestrate_enqueues(monkeypatch):
             pass
 
     monkeypatch.setattr(console_api.threading, "Thread", FakeThread)
+    monkeypatch.setattr(console_api, "console_run_flags", lambda: console_api.ConsoleRunPlan([], None, False, None))
     out = serverless.orchestrate(
         {"pr_url": "https://github.com/me/demo/pull/9", "allow_any_repo": True},
         env={"POC_DEMO_REPOS": ""})

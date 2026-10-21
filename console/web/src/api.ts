@@ -100,6 +100,8 @@ export type Health = {
   contree_ready?: boolean
   run_flags?: string[]
   run_note?: string | null
+  warning?: string | null
+  refused?: boolean
   github_token?: boolean
   chrome?: boolean
 }
