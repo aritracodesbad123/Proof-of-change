@@ -106,14 +106,15 @@ def test_python_and_system_hints_follow_the_sandbox(tmp_path):
     contree = demo_helper.build_setup_plan(
         REPO, [root], {"text": "apt-get install libhdf5-dev\n"}, "3.10", "contree", "widget",
         python_available=lambda version: "/usr/bin/python3.11", pypi=_pypi)
-    assert contree["python"]["switch"] is None and contree["python"]["applied"] is False
-    assert "Contree" in contree["python"]["reason"]
+    assert contree["python"]["switch"] is None and contree["python"]["applied"] is True
+    assert contree["python"]["provision"] == "3.11" and "auto-fix" in contree["python"]["reason"]
     applied = {item["name"]: item["applied"] for item in contree["system"]}
     assert applied == {"libxml2": True}
     assert "libhdf5-dev" not in json.dumps(contree)
     shell = demo_helper.contree_shell(contree)
     assert "apt-get install -y -qq libxml2" in shell
     assert "libhdf5-dev" not in shell and "pytest>=7" in shell
+    assert "uv python install -q 3.11" in shell and shell.index("uv python install") < shell.index("pytest>=7")
 
 
 def test_setup_plan_ignores_python_and_system_hints_from_tavily(tmp_path):
@@ -775,3 +776,72 @@ def test_live_tavily_call_is_recorded_without_the_key():
     assert got["live_call"] is True
     if not got["results"]:
         pytest.fail("live Tavily call returned no results")
+
+
+def test_missing_python_is_provisioned_automatically_on_the_local_sandbox(tmp_path):
+    root = _checkout(tmp_path, python=">=3.14")
+    asked = []
+    plan = demo_helper.build_setup_plan(
+        REPO, [root], {"text": ""}, "3.12", "local", "widget",
+        python_available=lambda _v: None, pypi=_pypi, provision=lambda v: asked.append(v) or v)
+    assert asked == ["3.14"]
+    assert plan["python"]["applied"] is True and plan["python"]["switch"] == "3.14"
+    assert any(line.startswith("Auto-fix: Python 3.14") for line in plan["lines"])
+    failed = demo_helper.build_setup_plan(
+        REPO, [root], {"text": ""}, "3.12", "local", "widget",
+        python_available=lambda _v: None, pypi=_pypi, provision=lambda v: None)
+    assert failed["python"]["applied"] is False and "not applied" in failed["python"]["reason"]
+
+
+def test_injected_lookup_never_downloads(tmp_path, monkeypatch):
+    root = _checkout(tmp_path, python=">=3.14")
+    monkeypatch.setattr(demo_helper, "provision_python", lambda v: (_ for _ in ()).throw(AssertionError("download")))
+    plan = demo_helper.build_setup_plan(REPO, [root], {"text": ""}, "3.12", "local", "widget",
+                                        python_available=lambda _v: None, pypi=_pypi)
+    assert plan["python"]["applied"] is False
+
+
+def test_python_version_file_and_ci_config_are_read(tmp_path):
+    root = tmp_path / "proj"
+    (root / ".github" / "workflows").mkdir(parents=True)
+    (root / ".python-version").write_text("3.14.7\n")
+    (root / ".github" / "workflows" / "ci.yml").write_text("with:\n  python-version: '3.13'\n")
+    (root / "tox.ini").write_text("[tox]\nenvlist = py311, py312\n")
+    specs, declared = demo_helper._python_from_checkout(root)
+    assert "==3.14.*" in specs
+    assert {"3.13", "3.11", "3.12"} <= set(declared)
+    assert demo_helper.choose_python(specs, declared, "3.12", lambda _v: None) == "3.14"
+
+
+def test_contree_python_shell_is_same_for_both_sides_and_rejects_bad_versions():
+    shell = demo_helper.contree_python_shell("3.14")
+    assert "sys.version_info[:2] == (3, 14)" in shell and "/usr/local/bin/python" in shell
+    assert "Auto-fix:" in shell
+    import pytest
+    for bad in ("3.14; rm -rf /", "latest", ""):
+        with pytest.raises(ValueError):
+            demo_helper.contree_python_shell(bad)
+
+
+def test_provision_python_strips_keys_and_validates(monkeypatch):
+    monkeypatch.setenv("NEBIUS_API_KEY", "x")
+    monkeypatch.setenv("GITHUB_POC_TOKEN", "y")
+    seen = {}
+
+    def runner(argv, env):
+        seen["argv"], seen["env"] = argv, env
+        return 0
+    got = demo_helper.provision_python("3.14", which=lambda _n: "/usr/bin/uv", runner=runner, install_dir="/x")
+    assert got == "3.14" and seen["argv"] == ["/usr/bin/uv", "python", "install", "-q", "3.14"]
+    assert "NEBIUS_API_KEY" not in seen["env"] and "GITHUB_POC_TOKEN" not in seen["env"]
+    assert seen["env"]["UV_PYTHON_INSTALL_DIR"] == "/x"
+    assert demo_helper.provision_python("3.14;id", which=lambda _n: "/usr/bin/uv", runner=runner) is None
+    assert demo_helper.provision_python("3.14", which=lambda _n: None, runner=runner) is None
+    assert demo_helper.provision_python("3.14", which=lambda _n: "/usr/bin/uv", runner=lambda a, e: 1,
+                                        install_dir="/x") is None
+
+
+def test_wrong_python_reads_install_errors():
+    assert demo_helper.wrong_python("error: the requested interpreter does not satisfy requires-python >=3.14.7") == "3.14"
+    assert demo_helper.wrong_python("No interpreter found for Python 3.13 in managed installations") == "3.13"
+    assert demo_helper.wrong_python("error: could not build wheels for lxml") is None

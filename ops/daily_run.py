@@ -1297,8 +1297,26 @@ def _install_with_helper(a, rec, step, venv, checkout, chosen, log, timeout, con
     from poc import demo_helper
     py = a.python if python is None else python
 
+    state = {"py": py}
+
     def once():
-        ok, why = install_side(venv, checkout, chosen, log, py, timeout, constraints, extra_reqs)
+        ok, why = install_side(venv, checkout, chosen, log, state["py"], timeout, constraints, extra_reqs)
+        if ok:
+            return ok, why
+        try:
+            text = log.read_text(errors="replace")[-20000:]
+        except OSError:
+            text = ""
+        wanted = demo_helper.wrong_python(text)
+        if wanted and wanted != state["py"] and not str(state["py"]).endswith(wanted):
+            got = demo_helper.find_python(wanted) or demo_helper.provision_python(wanted)
+            if got:
+                demo_helper.note_auto_fix(
+                    rec, f"Auto-fix: the {step} install said it needs Python {wanted}, so Python {wanted} "
+                         "was installed and the install was tried again.")
+                state["py"] = got
+                shutil.rmtree(venv, ignore_errors=True)
+                ok, why = install_side(venv, checkout, chosen, log, got, timeout, constraints, extra_reqs)
         return ok, why
 
     ok, why, _value, outcome = demo_helper.run_setup(
