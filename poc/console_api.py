@@ -87,20 +87,45 @@ def console_daily_run_argv(pr_url: str, model_provider: str, extra_flags: list[s
             "--swarm", "--console-job", *extra]
 
 
-def console_run_flags() -> tuple[list[str], str | None]:
-    """Extra daily_run flags for hosted console (Render blocks bwrap uid maps).
+_UNSAFE_WARNING = (
+    "Warning: POC_UNSAFE_NO_SANDBOX=1 is set, so this check runs with --unsafe-no-sandbox. "
+    "Pull-request code will run without a sandbox and can see this machine's files, keys, and network."
+)
 
-    Prefer Contree when it can actually run. Otherwise, if bubblewrap cannot start here,
-    pass --unsafe-no-sandbox so a public-PR demo can still run (recorded in the job note).
-    Set POC_UNSAFE_NO_SANDBOX=0 to refuse instead of falling back.
+
+def _unsafe_opt_in() -> bool:
+    """True only when the operator explicitly asked to run pull-request code unsandboxed."""
+    return (os.environ.get("POC_UNSAFE_NO_SANDBOX") or "").strip().lower() in ("1", "true", "yes")
+
+
+def blocks_unsandboxed_run(flags: list[str], note: str | None) -> str | None:
+    """The refusal text when these flags would run pull-request code with no sandbox.
+
+    ``--unsafe-no-sandbox`` is the explicit opt-in. ``--sandbox-backend`` selects Contree.
+    An empty flag list means local bubblewrap, which is fine only when the note does not
+    say the sandbox is missing.
     """
+    if "--unsafe-no-sandbox" in flags or "--sandbox-backend" in flags:
+        return None
+    if note and "will not run pull-request code" in note:
+        return note
+    return None
+
+
+def console_run_flags() -> tuple[list[str], str | None]:
+    """Extra daily_run flags for the operator console.
+
+    Prefer Contree when it can actually run. Otherwise bubblewrap is the sandbox.
+    If neither can start, do not run pull-request code. The only opt-in is
+    POC_UNSAFE_NO_SANDBOX=1, which adds --unsafe-no-sandbox and a visible warning.
+    """
+    force = _unsafe_opt_in()
     if contree_usable():
-        # Contree is remote; also disable the local bwrap gate (Render blocks uid maps).
-        # If Contree checkpoints fail mid-run, daily_run falls back to local — unsafe keeps that path alive.
-        return (["--sandbox-backend", "contree", "--unsafe-no-sandbox"],
-                "using Contree sandboxes (local bwrap skipped)")
-    refuse = (os.environ.get("POC_UNSAFE_NO_SANDBOX") or "").strip().lower() in ("0", "false", "no")
-    force = (os.environ.get("POC_UNSAFE_NO_SANDBOX") or "").strip().lower() in ("1", "true", "yes")
+        if force:
+            return ["--sandbox-backend", "contree", "--unsafe-no-sandbox"], (
+                "using Contree sandboxes. " + _UNSAFE_WARNING
+            )
+        return ["--sandbox-backend", "contree"], "using Contree sandboxes"
     ok = False
     why = "sandbox check skipped"
     try:
@@ -110,13 +135,14 @@ def console_run_flags() -> tuple[list[str], str | None]:
         ok, why = False, f"{type(e).__name__}: {e}"
     if ok and not force:
         return [], None
-    if refuse:
-        return [], (
-            f"sandbox unavailable ({why}); install contree-sdk + NEBIUS_PROJECT_ID, "
-            "or set POC_UNSAFE_NO_SANDBOX=1"
-        )
-    # ponytail: auto unsafe on PaaS without working Contree/bwrap — console motif requires a runnable path
-    return ["--unsafe-no-sandbox"], f"sandbox unavailable ({why}); running with --unsafe-no-sandbox"
+    if force:
+        return ["--unsafe-no-sandbox"], f"{_UNSAFE_WARNING} ({why})"
+    return [], (
+        f"sandbox unavailable ({why}). "
+        "Proof-of-Change will not run pull-request code without a sandbox. "
+        "Install bubblewrap, or set up Contree (a Nebius key, a project id, and contree-sdk). "
+        "Setting POC_UNSAFE_NO_SANDBOX=1 runs the code unsandboxed and shows a warning."
+    )
 
 
 def _report_dir_names(run_id: str, folder: str | None = None, rec: dict | None = None) -> list[str]:
@@ -533,6 +559,14 @@ def start_check(pr_url: str, *, model_provider: str = "nebius", owner: str | Non
     if blocked:
         raise ValueError(blocked)
     playback = spaces_host.playback_only(pr_url, model_provider)
+    flags, run_note = console_run_flags()
+    if playback:
+        # Playback reads a saved sample. It does not clone or run pull-request code.
+        flags, run_note = [], spaces_host.SPACES_MESSAGE
+    else:
+        refused = blocks_unsandboxed_run(flags, run_note)
+        if refused:
+            raise ValueError(refused)
     job_id = uuid.uuid4().hex[:12]
     # Tests retarget REPO_ROOT. POC_OPS_RUNS (a Space home directory) wins when it is set.
     if (os.environ.get("POC_OPS_RUNS") or "").strip():
@@ -547,9 +581,6 @@ def start_check(pr_url: str, *, model_provider: str = "nebius", owner: str | Non
         progress_path.unlink()
     if console_log.exists():
         console_log.unlink()
-    flags, run_note = console_run_flags()
-    if playback:
-        flags, run_note = [], spaces_host.SPACES_MESSAGE
     job = {
         "id": job_id,
         "status": "queued",
@@ -640,6 +671,14 @@ def start_check(pr_url: str, *, model_provider: str = "nebius", owner: str | Non
                 job["run_note"] = note
                 job["warning"] = note if note and "unsafe" in note.lower() else job.get("warning")
             rp.emit("fetch_pr", detail=note[:200])
+        refused = blocks_unsandboxed_run(list(flags), note)
+        if refused:
+            with _jobs_lock:
+                job["status"] = "failed"
+                job["error"] = refused
+                job["finished_at"] = time.time()
+            rp.emit("failed", detail=refused[:200])
+            return
         child_flags = list(flags)
         child_flags.extend(recorded_demo_flags(model_provider))
         if model_provider == "recorded":

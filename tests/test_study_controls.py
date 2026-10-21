@@ -377,6 +377,7 @@ def test_console_turns_swarm_and_approval_on_explicitly(monkeypatch, tmp_path):
 
     monkeypatch.setattr(console_api.subprocess, "Popen", fake_popen)
     monkeypatch.setattr(console_api.threading, "Thread", FakeThread)
+    monkeypatch.setattr(console_api, "console_run_flags", lambda: ([], None))
     job = console_api.start_check("https://github.com/me/demo/pull/3", model_provider="none")
     assert job["status"] == "queued"
     holder["target"]()

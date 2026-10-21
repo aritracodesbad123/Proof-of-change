@@ -404,6 +404,7 @@ def test_provider_login_keeps_run_isolation(accounts, monkeypatch, tmp_path):
 
     real_thread = console_api.threading.Thread
     monkeypatch.setattr(console_api.threading, "Thread", FakeThread)
+    monkeypatch.setattr(console_api, "console_run_flags", lambda: ([], None))
     (tmp_path / "ops" / "runs" / "_jobs").mkdir(parents=True)
     (tmp_path / "ops" / "daily_run.py").write_text("# stub\n")
     job = console_api.start_check("https://github.com/me/demo/pull/3", model_provider="none", owner=id_a)

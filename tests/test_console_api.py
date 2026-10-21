@@ -65,6 +65,7 @@ def test_start_check_sets_hitl_env(tmp_path, monkeypatch):
             pass
 
     monkeypatch.setattr(console_api.threading, "Thread", FakeThread)
+    monkeypatch.setattr(console_api, "console_run_flags", lambda: ([], None))
     monkeypatch.setattr(console_api, "REPO_ROOT", tmp_path)
     (tmp_path / "ops" / "runs" / "_jobs").mkdir(parents=True)
     (tmp_path / "ops" / "daily_run.py").write_text("# stub\n")
@@ -165,10 +166,11 @@ def test_start_check_rejects_bad_url():
 
 
 def test_console_run_flags_prefers_contree(monkeypatch):
+    monkeypatch.delenv("POC_UNSAFE_NO_SANDBOX", raising=False)
     monkeypatch.setattr(console_api, "contree_usable", lambda: True)
     flags, note = console_api.console_run_flags()
-    assert flags[:2] == ["--sandbox-backend", "contree"]
-    assert "--unsafe-no-sandbox" in flags
+    assert flags == ["--sandbox-backend", "contree"]
+    assert "--unsafe-no-sandbox" not in flags
     assert note and "Contree" in note
 
 
@@ -178,18 +180,70 @@ def test_console_run_flags_skips_contree_without_sdk(monkeypatch):
     import guardrails.sandbox as sb
     monkeypatch.setattr(sb, "check", lambda: (False, "bwrap down"))
     flags, note = console_api.console_run_flags()
-    assert flags == ["--unsafe-no-sandbox"]
+    assert flags == []
+    assert note and "will not run pull-request code" in note
 
 
-def test_console_run_flags_unsafe_when_bwrap_down(monkeypatch):
+def test_console_run_flags_refuses_when_bwrap_down(monkeypatch):
     monkeypatch.delenv("NEBIUS_API_KEY", raising=False)
     monkeypatch.delenv("NEBIUS_PROJECT_ID", raising=False)
     monkeypatch.delenv("POC_UNSAFE_NO_SANDBOX", raising=False)
     import guardrails.sandbox as sb
     monkeypatch.setattr(sb, "check", lambda: (False, "bwrap: uid map not permitted"))
     flags, note = console_api.console_run_flags()
+    assert flags == []
+    assert note and "will not run pull-request code" in note
+    assert "--unsafe-no-sandbox" not in (note or "")
+
+
+def test_explicit_unsafe_opt_in_warns(monkeypatch):
+    monkeypatch.setenv("POC_UNSAFE_NO_SANDBOX", "1")
+    monkeypatch.setattr(console_api, "contree_usable", lambda: False)
+    import guardrails.sandbox as sb
+    monkeypatch.setattr(sb, "check", lambda: (False, "bwrap down"))
+    flags, note = console_api.console_run_flags()
     assert flags == ["--unsafe-no-sandbox"]
-    assert note and "unsafe" in note
+    assert note and "Warning" in note and "POC_UNSAFE_NO_SANDBOX=1" in note
+
+    class FakeThread:
+        def __init__(self, target=None, daemon=None):
+            self.target = target
+
+        def start(self):
+            pass
+
+    monkeypatch.setattr(console_api.threading, "Thread", FakeThread)
+    job = console_api.start_check("https://github.com/me/demo/pull/3", model_provider="recorded")
+    assert job["status"] == "queued"
+    assert job["run_flags"] == ["--unsafe-no-sandbox"]
+    assert job["run_note"] and "Warning" in job["run_note"]
+
+
+def test_start_check_refuses_unsandboxed_pr_code(monkeypatch):
+    """Missing sandbox and no POC_UNSAFE_NO_SANDBOX=1: the child never starts."""
+    monkeypatch.delenv("SPACE_ID", raising=False)
+    monkeypatch.setattr(console_api, "contree_usable", lambda: False)
+    import guardrails.sandbox as sb
+    monkeypatch.setattr(sb, "check", lambda: (False, "bwrap down"))
+    started: list[str] = []
+
+    def refuse_process(*_args, **_kwargs):
+        started.append("popen")
+        raise AssertionError("pull-request code must not start without a sandbox")
+
+    monkeypatch.setattr(console_api.subprocess, "Popen", refuse_process)
+
+    for value in (None, "0", "false", "no", ""):
+        if value is None:
+            monkeypatch.delenv("POC_UNSAFE_NO_SANDBOX", raising=False)
+        else:
+            monkeypatch.setenv("POC_UNSAFE_NO_SANDBOX", value)
+        try:
+            console_api.start_check("https://github.com/me/demo/pull/3", model_provider="recorded")
+            raise AssertionError(f"expected refusal for POC_UNSAFE_NO_SANDBOX={value!r}")
+        except ValueError as exc:
+            assert "will not run pull-request code" in str(exc)
+    assert started == []
 
 
 def test_start_check_queues_job(monkeypatch):
