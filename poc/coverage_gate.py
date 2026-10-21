@@ -187,6 +187,16 @@ def measurement(rec: dict, has_python: bool = True) -> str:
     return "not measured" if cov else "not measured: predates gate"
 
 
+def _reported_never_ran(cov: dict) -> list[str]:
+    """Files a (possibly partial) coverage report lists with changed executable lines, none of which ran."""
+    out = []
+    for f in cov.get("files") or []:
+        if isinstance(f, dict) and isinstance(f.get("changed_lines_total"), int) and f["changed_lines_total"] > 0 \
+                and f.get("changed_lines_covered") == 0:
+            out.append(str(f.get("file")))
+    return out
+
+
 def assess(rec: dict) -> dict:
     """The gate's view of one record: kind, measured numbers, verdict to use, note, confidence."""
     files = rec.get("files")
@@ -238,6 +248,16 @@ def assess(rec: dict) -> dict:
         # (even mixed with Python) cannot be verified. Study runs never set product_check, so they are unchanged.
         g.update(verdict="could_not_verify", changed=True, confidence="none",
                  reason=f"{PRODUCT_COMPILED_ONLY} (compiled files: {', '.join(comp)}) (tests: {base_reason})")
+        return g
+    dead = _reported_never_ran(cov) if py and not measured else []
+    if dead:
+        # A partial report (some changed files missing) still shows a listed changed file whose changed executable
+        # lines never ran. That is evidence, not a gap: apply the 'never ran' cap on product and non-product runs.
+        why = "changed code never ran: 0 changed executable line(s) ran in " + ", ".join(dead)
+        if untested_compiled:
+            why += "; " + notes[0]
+        g.update(verdict="could_not_verify", changed=True, confidence="none",
+                 reason=f"not fully verified: {why} (tests: {base_reason})")
         return g
     if rec.get("product_check") and py and not measured:
         # Product checks only: a verified result needs coverage that was actually measured. Study runs never set
