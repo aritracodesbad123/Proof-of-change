@@ -1,0 +1,3 @@
+# toypkg
+
+A tiny package.
