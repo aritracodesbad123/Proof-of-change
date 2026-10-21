@@ -1398,9 +1398,26 @@ HOST = None   # sbx=HOST: a trusted tool on our own files (git on our clones); e
 # Contree-only mode: a console check chose --sandbox-backend contree and bubblewrap cannot start here. Every step that
 # runs pull-request or package code must then go through the Contree session; a local side command is refused.
 _CONTREE_ONLY = False
-LOCAL_REFUSED = "refused"
+
+
+class Refusal(int):
+    """Return code of a step that was refused, not run. A non-zero int, so every rc != 0 check fails safely, and it
+    carries an explicit ``refused`` flag so callers never have to compare against a magic string."""
+    refused = True
+
+    def __new__(cls, code: int = 126):
+        return super().__new__(cls, code)
+
+
+def is_refused(rc) -> bool:
+    """True when a return code (or a CompletedProcess) is a Contree-only refusal."""
+    return bool(getattr(rc, "refused", False))
+
+
+LOCAL_REFUSED = Refusal(126)
 CONTREE_ONLY_NOTE = ("Contree-only: bubblewrap cannot start on this machine, so no pull-request or package code runs "
                      "locally. This step needs a local side and was not run.")
+CONTREE_ONLY_COVERAGE_WHY = "Contree-only check: bubblewrap can't start here, so coverage wasn't run"
 NO_SANDBOX_FALLBACK = ("Contree could not prepare the main and PR sides ({why}), and bubblewrap cannot start on this "
                        "machine, so Proof-of-Change will not run pull-request code. Check your Nebius key and Contree "
                        "project ID and try again.")
@@ -1598,7 +1615,7 @@ def _wait_child(p: subprocess.Popen, timeout, t0: float):
             _heartbeat(int(time.time() - t0))
 
 
-def run(cmd, log_path: Path, cwd=None, env=None, timeout=None, sbx=HOST) -> tuple[int | str, float]:
+def run(cmd, log_path: Path, cwd=None, env=None, timeout=None, sbx=HOST) -> tuple[int, float]:
     """Run cmd with output to log_path. env is required: always an allowlisted base_env(...). sbx: the sandbox of a
     side (side_sandbox(...)); every command that may run PR or package code passes one."""
     if env is None:
@@ -1713,7 +1730,9 @@ def in_side(venv: Path, cmd: list, install: bool = False, network: bool = False,
             timeout: int | None = 600) -> subprocess.CompletedProcess:
     """Captured run of cmd in the side's sandbox (venv Python and uv calls: freeze, version checks, imports)."""
     if _CONTREE_ONLY:
-        return subprocess.CompletedProcess([str(c) for c in cmd], LOCAL_REFUSED, "", CONTREE_ONLY_NOTE)
+        cp = subprocess.CompletedProcess([str(c) for c in cmd], LOCAL_REFUSED, "", CONTREE_ONLY_NOTE)
+        cp.refused = True
+        return cp
     env = base_env(side_home(venv), install=install)
     argv, env, cwd2 = sandbox.wrap([str(c) for c in cmd], env, **{k: v for k, v in
                                    side_sandbox(venv, network=network, ro=ro).items()}, cwd=cwd or side_cwd(venv))
@@ -3340,6 +3359,7 @@ def _contree_only_pair(a, rec: dict, repo: str, cfg: dict, item: dict, sp: dict,
                            "declared_test_deps": decl, "optional_backends": optional,
                            "not_run_locally": ["local freeze", "installed-commit guard", "coverage",
                                                "probe coverage", "optional-module retry"]}
+    rec["coverage"] = {"status": "not measured", "why": CONTREE_ONLY_COVERAGE_WHY}
     run_progress.emit("install_main", detail="installing main and PR sides in Contree")
     cnv = _maybe_prepare_contree(a, repo, sp["main_sha"], sp["pr_sha"], rec, a.build_timeout,
                                  extra_shell=contree_only_extra_shell(decl, optional, base))
@@ -3373,6 +3393,14 @@ def _contree_only_pair(a, rec: dict, repo: str, cfg: dict, item: dict, sp: dict,
     return cmp, cnv, ex, targets
 
 
+def product_route(a) -> bool:
+    """True for a product check (console, request-a-check, Codespaces, GitHub App): a single pull request started with
+    the product flags. False for a study run and the daily study."""
+    from poc import related_reports
+    return related_reports.enabled(bool(getattr(a, "related_reports", False)), bench=bool(getattr(a, "bench", False)),
+                                   single_pr=bool(getattr(a, "pr", None)))
+
+
 def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, machine: dict) -> dict:
     from poc import run_progress
     t0 = time.time()
@@ -3384,6 +3412,8 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
     shutil.rmtree(work, ignore_errors=True); work.mkdir(parents=True)
     (prdir / "pr.diff").write_text(item["diff"])
     rec = new_record(repo, cfg, item, a, machine, rdir.name, run_date_for(rdir))
+    if product_route(a):
+        rec["product_check"] = True   # coverage gate: on a product check, verified needs measured coverage
     from poc import demo_helper
     if demo_helper.active(a):
         demo_helper.begin_check(a, rec, repo, cfg.get("dist") or cfg.get("pkg"), prdir)

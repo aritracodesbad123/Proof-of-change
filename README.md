@@ -21,7 +21,7 @@ comment; it never posts to random upstream projects.
 | **What is different?** | Models may write claims/probes and explanations, but **plain code owns the verdict**. |
 | **What does the swarm do?** | After the code verdict: **Ultra** labels findings, **Lightning** suggests noise/install notes, **Super** writes a quote-checked summary. Those three roles are **advisory**. **Super** also extracts claims and writes probes earlier (that path *can* affect the verdict via executed probe diffs). |
 | **NVIDIA Nemotron?** | Super / Ultra / Lightning (Nano fallback) via configured model IDs in `poc/model_provider.py`. |
-| **Nebius at runtime?** | OpenAI-compatible chat completions at `https://api.tokenfactory.nebius.com/v1` using `NEBIUS_API_KEY` in the orchestrator only. Optional Contree sandboxes need `NEBIUS_PROJECT_ID`. |
+| **Nebius at runtime?** | OpenAI-compatible chat completions at `https://api.tokenfactory.nebius.com/v1` using `NEBIUS_API_KEY` in the orchestrator only. Optional Contree sandboxes need the project ID as `CONTREE_PROJECT_ID` (Codespaces secret) or `NEBIUS_PROJECT_ID`. |
 | **Try it?** | Judges: see [For judges](#for-judges). The results page replays finished checks in the browser. A request issue can run a new check. A Codespace can try one, but live checks there are not confirmed yet. Live checks need Linux. |
 | **Reproduce evaluation?** | See [`reports/AGENT_SWARM_EVALUATION.md`](reports/AGENT_SWARM_EVALUATION.md). Quick gate: `make test` (or `python -m evals.run_evals --observations evals/fixtures/golden_v1.jsonl --require-golden --require-v1`). |
 | **Demo video** | _TODO: public YouTube ≤3 min_ — script in [`reports/DEMO_SCRIPT_3MIN.md`](reports/DEMO_SCRIPT_3MIN.md). |

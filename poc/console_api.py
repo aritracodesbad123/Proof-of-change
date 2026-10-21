@@ -94,6 +94,10 @@ def child_environment(base: dict[str, str], provider: str, session_token: str | 
         env["NEBIUS_API_KEY"], env["NEBIUS_PROJECT_ID"] = key, project
         if len(key) >= 8 and key not in secrets:
             secrets.append(key)
+    for name in ("NEBIUS_PROJECT_ID", "CONTREE_PROJECT_ID"):   # redact project IDs next to the Nebius key
+        project_id = (env.get(name) or "").strip()
+        if len(project_id) >= 8 and project_id not in secrets:
+            secrets.append(project_id)
     return env, secrets
 
 

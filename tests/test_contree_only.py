@@ -32,9 +32,9 @@ def test_local_side_commands_are_refused_in_contree_only_mode(tmp_path, monkeypa
     log = tmp_path / "log.txt"
     rc, _ = daily_run.run(["uv", "pip", "install", "x"], log, env={"PATH": "/usr/bin"},
                           sbx=daily_run.side_sandbox(venv, network=True))
-    assert rc == daily_run.LOCAL_REFUSED and "Contree-only" in log.read_text()
+    assert daily_run.is_refused(rc) and "Contree-only" in log.read_text()
     cp = daily_run.in_side(venv, ["python", "-c", "print(1)"])
-    assert cp.returncode == daily_run.LOCAL_REFUSED
+    assert daily_run.is_refused(cp)
     # The installs behind install_optional_backends / install_declared_test_deps go through run(): refused too.
     got = daily_run.install_optional_backends({"main": tmp_path / "venv-main", "pr": venv}, ["foo"], log, 10)
     assert got["installed"] == [] and got["skipped"]
@@ -89,4 +89,4 @@ def test_coverage_is_not_run_locally_in_contree_only_mode(tmp_path):
     log = tmp_path / "cov.log"
     rc, _ = daily_run.run(["python", "-m", "coverage", "run", "-m", "pytest"], log, env={"PATH": "/usr/bin"},
                           sbx=daily_run.side_sandbox(tmp_path / "venv-pr"))
-    assert rc == daily_run.LOCAL_REFUSED
+    assert daily_run.is_refused(rc)

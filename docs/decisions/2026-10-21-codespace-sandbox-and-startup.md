@@ -20,6 +20,7 @@ Loosening the container's seccomp or AppArmor profile would widen what any code 
 - Do not loosen the Codespace container. Run live Codespace checks in Contree with the judge's own key and project ID.
 - In Contree-only mode, refuse every local step that runs pull-request or package code. Fall back to bubblewrap after a Contree failure only when bubblewrap works.
 - Keys are never passed into the pull-request code's environment.
+- On product checks (console, request-a-check, Codespaces, GitHub App), a verified result needs coverage that was actually measured. When coverage wasn't measured, including Contree-only checks, the result is capped at could_not_verify with a plain reason. Study runs are unchanged.
 - The study stays on bubblewrap and is unchanged.
 - This has not been tested in a live Codespace. A human retest decides whether more is needed.
 
