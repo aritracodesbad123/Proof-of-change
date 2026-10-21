@@ -53,7 +53,7 @@ export function NebiusKeyField({
   )
 }
 
-/** Hidden field for an optional Tavily key. The value is not written to browser storage. */
+/** Hidden field for the judge's own Tavily key. The value is not written to browser storage. */
 export function TavilyKeyField({
   stored,
   onSave,
@@ -82,7 +82,7 @@ export function TavilyKeyField({
 
   return (
     <form className="key-form" onSubmit={(event) => void submit(event)}>
-      <label htmlFor="tavily-key">Tavily API key (optional)</label>
+      <label htmlFor="tavily-key">Tavily API key</label>
       <div className="url-row">
         <input
           id="tavily-key"
@@ -98,9 +98,10 @@ export function TavilyKeyField({
         </button>
       </div>
       <p className="hint">
-        Optional. The key stays in the server's memory for this sign-in and is sent only as TAVILY_API_KEY for that
-        check. It is not saved to disk, logs, or the report. Leave it blank and the lookup is skipped. A Codespace can
-        also supply this as the recommended secret TAVILY_API_KEY.
+        The lookup needs your own key. This project does not ship one. Tavily keys are free at https://app.tavily.com/.
+        The value stays in the server's memory for this sign-in and is sent only as TAVILY_API_KEY for that check. It
+        is not saved to disk, logs, or the report. Without a key, the lookup is skipped. A Codespace asks for the same
+        value as the recommended secret TAVILY_API_KEY.
       </p>
       {message ? <p className="hint">{message}</p> : null}
     </form>

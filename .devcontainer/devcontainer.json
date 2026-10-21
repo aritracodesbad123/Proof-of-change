@@ -17,8 +17,8 @@
   "postStartCommand": "bash -lc 'POC_SWARM=1 nohup python -m poc.console_api --host 0.0.0.0 --port 8787 >/tmp/poc-console.log 2>&1 &'",
   "secrets": {
     "TAVILY_API_KEY": {
-      "description": "Optional Tavily API key. A check looks up setup notes when this is set, and skips that lookup when it is empty. The value is not stored in the repository.",
-      "documentationUrl": "https://docs.tavily.com/"
+      "description": "Your own Tavily API key. The setup lookup needs it. This project does not ship or share a key. Tavily keys are free. Without a key the lookup is skipped and the check continues. The value is not stored in the repository.",
+      "documentationUrl": "https://app.tavily.com/"
     }
   },
   "customizations": {

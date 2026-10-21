@@ -9,7 +9,7 @@ The setup lookup is built. It finds missing-package and setup sources from the p
 
 A requested check reads that variable from the worker's environment. If it is missing, the worker logs a line that names the variable and does not print a key. The check still starts, with the advisory swarm on.
 
-A Codespace can supply the same variable as a recommended secret, also named `TAVILY_API_KEY`. The console also has an optional hidden field next to the Nebius key. A pasted value stays in the server's memory for that sign-in and is copied only into the check's environment. It is not written to disk, logs, reports, or replies.
+A Codespace asks the judge for the same variable as a recommended secret, also named `TAVILY_API_KEY`. The judge types their own key. Tavily keys are free. This project does not ship or share one. The console has a hidden field next to the Nebius key for the same value. A pasted value stays in the server's memory for that sign-in and is copied only into the check's environment. It is not written to disk, logs, reports, or replies. Without the key, the lookup is skipped and the check continues.
 
 Study runs and benchmark runs still leave the advisory swarm off unless they ask. The request-a-check daily cap stays 5.
 
@@ -30,4 +30,4 @@ Skipping the lookup whenever the key is missing keeps a check runnable on a mach
 
 ## What it means for you
 
-On the project machine, set `TAVILY_API_KEY` in the worker's environment if you want the lookup. If you do not, the log says the lookup was skipped. In a Codespace, add the recommended secret or paste the key into the hidden field. Leave it empty and the check still runs. Do not commit a key.
+On the project machine, set `TAVILY_API_KEY` in the worker's environment if you want the lookup. If you do not, the log says the lookup was skipped. In a Codespace, type your own key into the recommended secret, or paste it into the hidden field. Keys are free at https://app.tavily.com/. Without the key, the lookup is skipped and the check still runs. Do not commit a key.

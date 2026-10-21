@@ -9,8 +9,8 @@ from zoneinfo import ZoneInfo
 
 import pytest
 
-from ops import export_replay, request_worker
-from poc import console_api, session_key
+from ops import daily_run, export_replay, request_worker
+from poc import console_api, demo_helper, session_key
 
 IST = ZoneInfo("Asia/Kolkata")
 UTC = ZoneInfo("UTC")
@@ -237,7 +237,9 @@ def test_codespace_start_turns_the_swarm_on():
     assert "POC_SWARM=1" in start
     assert "poc.console_api" in start
     secret = cfg["secrets"]["TAVILY_API_KEY"]
-    assert "Optional" in secret["description"]
+    assert "Your own Tavily API key" in secret["description"]
+    assert "lookup is skipped" in secret["description"]
+    assert secret["documentationUrl"] == "https://app.tavily.com/"
     assert "tvly-" not in raw
     argv = console_api.console_daily_run_argv("https://github.com/me/demo/pull/3", "recorded")
     assert "--swarm" in argv
@@ -285,6 +287,67 @@ def test_worker_logs_a_missing_tavily_key_and_keeps_the_swarm(tmp_path, monkeypa
     assert "--swarm" in seen["argv"]
     assert "TAVILY_API_KEY" not in seen["env"]
     assert "TAVILY_API_KEY" not in result.reason
+
+
+def test_requested_check_runs_the_tavily_lookup(tmp_path, monkeypatch):
+    """A requested check is not a study, so the helper looks up when the key is set."""
+    secret = "tavily-host-secret-value"
+    monkeypatch.setenv("TAVILY_API_KEY", secret)
+    seen = {}
+    real_begin = demo_helper.begin_check
+
+    def begin_check(runner, rec, repo, project, cache_dir, env=None, fetch=None):
+        seen["active"] = demo_helper.active(runner)
+        real_begin(
+            runner, rec, repo, project, cache_dir, env=env,
+            fetch=lambda *_args, **_kwargs: {
+                "ok": True,
+                "query": "setup",
+                "results": [{"title": "setup notes", "url": "https://example.test/setup", "content": "install notes"}],
+                "answer": "",
+            },
+        )
+        seen["skipped"] = rec["demo_helper"]["tavily"]["skipped"]
+        seen["live"] = rec["demo_helper"]["tavily"]["live_call"]
+        raise RuntimeError("stop-after-tavily")
+
+    monkeypatch.setattr(demo_helper, "begin_check", begin_check)
+    runner = type("Run", (), {})()
+    runner.bench = None
+    runner.provider = None
+    runner.runs = 1
+    runner.workers = 1
+    runner.test_timeout = 30
+    runner.run_timeout = 30
+    runner.build_timeout = 30
+    runner.python = "python3"
+    runner.model_provider = "recorded"
+    runner.baseline = "full"
+    item = {
+        "pr": 9,
+        "diff": "",
+        "head_sha": "a" * 40,
+        "url": "https://example.test/me/demo/pull/9",
+        "title": "t",
+        "body": "",
+        "base_sha": "b" * 40,
+        "author": "dev",
+        "base_ref": "main",
+        "updated_at_utc": "2026-10-21T00:00:00Z",
+        "updated_at_ist": "2026-10-21 05:30 IST",
+        "ci_state": "unknown",
+        "ci_detail": "",
+        "files": {"all": ["pkg/__init__.py"], "package_py": ["pkg/__init__.py"], "compiled": []},
+    }
+    cfg = {"pkg": "pkg", "dist": "pkg"}
+    rdir = tmp_path / "run"
+    rdir.mkdir()
+    with pytest.raises(RuntimeError, match="stop-after-tavily"):
+        daily_run.test_pr("me/demo", cfg, item, rdir, tmp_path / "work", runner, {})
+    assert seen["active"] is True
+    assert seen["skipped"] is False
+    assert seen["live"] is True
+    assert runner.bench is None
 
 
 def test_worker_passes_the_tavily_key_without_printing_it(tmp_path, monkeypatch, capsys):
