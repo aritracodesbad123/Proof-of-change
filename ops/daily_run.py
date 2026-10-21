@@ -1037,6 +1037,8 @@ def install_side(venv: Path, checkout: Path, chosen: dict | None, log: Path, pyt
     sbx["rw"].append(checkout)
     for c in cmds:
         rc, _ = run(c, log, env=env, timeout=timeout, sbx=sbx)
+        if rc == "timeout":
+            return False, f"install timed out after {timeout}s (whole process tree killed); see {log.name}"
         if rc != 0:
             return False, f"install failed ({rc}); see {log.name}"
     return True, ""
@@ -1063,9 +1065,38 @@ def run(cmd, log_path: Path, cwd=None, env=None, timeout=None, sbx=HOST) -> tupl
         try:
             rc = p.wait(timeout=timeout)
         except subprocess.TimeoutExpired:
-            os.killpg(p.pid, signal.SIGKILL); p.wait(); rc = "timeout"
+            _kill_tree(p.pid); p.wait(); rc = "timeout"
             fh.write(f"\n[daily_run] TIMEOUT after {timeout}s\n")
     return rc, round(time.time() - t0, 1)
+
+
+def _descendants(pid: int) -> list[int]:
+    """All descendants of pid by /proc parent links, including ones that left the process group via setsid."""
+    kids: dict[int, list[int]] = {}
+    for d in os.listdir("/proc"):
+        if d.isdigit():
+            try:
+                ppid = int(open(f"/proc/{d}/stat").read().rsplit(")", 1)[1].split()[1])
+            except (OSError, IndexError, ValueError):
+                continue
+            kids.setdefault(ppid, []).append(int(d))
+    out, todo = [], [pid]
+    while todo:
+        for c in kids.get(todo.pop(), []):
+            out.append(c); todo.append(c)
+    return out
+
+
+def _kill_tree(pid: int) -> None:
+    """SIGSTOP the tree first so nothing forks or reparents while we collect it, then SIGKILL every member."""
+    procs = [pid] + _descendants(pid)
+    for sig in (signal.SIGSTOP, signal.SIGKILL):
+        for q in procs:
+            try: os.kill(q, sig)
+            except ProcessLookupError: pass
+        procs = [pid] + _descendants(pid) if sig == signal.SIGSTOP else procs
+    try: os.killpg(pid, signal.SIGKILL)
+    except ProcessLookupError: pass
 
 
 def site_packages(venv: Path) -> Path:
