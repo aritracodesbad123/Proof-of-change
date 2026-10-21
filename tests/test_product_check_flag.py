@@ -20,6 +20,7 @@ def test_compiled_only_change_is_capped_on_a_product_check():
     assert g["verdict"] == "could_not_verify"
     assert g["reason"].startswith(cg.PRODUCT_COMPILED_ONLY)
     assert "compiled code that coverage can't measure" in g["reason"]
+    assert "src/fast.c" in g["reason"] and "widget/_speed.pyx" in g["reason"]
 
 
 def test_compiled_only_change_is_unchanged_on_study_and_daily_records():
@@ -53,3 +54,16 @@ def test_study_and_daily_never_set_the_flag():
             text = path.read_text(errors="ignore")
             if "--bench" in text or "daily" in path.name:
                 assert "--product-check" not in text, path
+
+
+MIXED = {"all": ["src/fast.c", "widget/core.py", "tests/test_fast.py"], "package_py": ["widget/core.py"],
+         "compiled": ["src/fast.c"], "other": []}
+MEASURED = {"status": "measured", "changed_lines_total": 4, "changed_lines_covered": 4, "files": []}
+
+
+def test_mixed_compiled_and_python_change_is_capped_on_a_product_check():
+    rec = {"verdict": "verified", "reason": "r", "files": dict(MIXED), "coverage": dict(MEASURED)}
+    assert cg.apply(rec)["verdict"] == "verified"            # study/daily: unchanged
+    g = cg.apply({**rec, "product_check": True})
+    assert g["verdict"] == "could_not_verify"
+    assert g["reason"].startswith(cg.PRODUCT_COMPILED_ONLY) and "src/fast.c" in g["reason"]
