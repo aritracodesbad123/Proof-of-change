@@ -504,6 +504,14 @@ export function detailStageState(
   return 'pending'
 }
 
+export function demoHelperLines(record: Record<string, unknown>): string[] {
+  const helper = record.demo_helper
+  if (!helper || typeof helper !== 'object') return []
+  const notes = (helper as { notes?: unknown }).notes
+  if (!Array.isArray(notes)) return []
+  return notes.filter((line): line is string => typeof line === 'string' && line.trim().length > 0)
+}
+
 export function prNumber(record: Record<string, unknown>): number | null {
   const pr = record.pr
   if (typeof pr === 'number') return pr

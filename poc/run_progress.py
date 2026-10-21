@@ -23,6 +23,7 @@ STAGES = (
     "probes",
     "pytest",
     "verdict",
+    "demo_helper",
     "agent_judge",
     "agent_helper",
     "agent_summary",

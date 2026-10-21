@@ -1170,7 +1170,7 @@ def pr_side_constraints(main_venv: Path, dist: str, dest: Path) -> Path:
 
 
 def install_side(venv: Path, checkout: Path, chosen: dict | None, log: Path, python: str, timeout: int,
-                 constraints: Path | None) -> tuple[bool, str]:
+                 constraints: Path | None, extra_reqs=None) -> tuple[bool, str]:
     env = base_env(side_home(venv), install=True)
     if subprocess.run(["git", "-C", checkout, "describe", "--tags"], capture_output=True, env=env).returncode != 0:
         env = base_env(side_home(venv), install=True, SETUPTOOLS_SCM_PRETEND_VERSION="9999.0.0")
@@ -1198,6 +1198,8 @@ def install_side(venv: Path, checkout: Path, chosen: dict | None, log: Path, pyt
     ov = ov if ov and Path(ov).is_file() else None
     if ov:
         cmds[-1] += ["--override", ov]
+    if extra_reqs:
+        cmds[-1].extend(list(extra_reqs))
     ro_files = tuple(x for x in (constraints, bc if bc and Path(bc).is_file() else None, ov) if x)
     sbx = side_sandbox(venv, network=True, ro=ro_files)
     sbx["rw"].append(checkout)
@@ -1217,6 +1219,122 @@ def install_side(venv: Path, checkout: Path, chosen: dict | None, log: Path, pyt
                 return False, _oom_reason()
         return False, f"install failed ({rc}); see {log.name}"
     return True, ""
+
+
+def _dist_version(venv: Path, requirement: str) -> str:
+    """Installed version of one requirement, or "" when it is not there. The name is checked before it is used."""
+    name = _req_name(requirement)
+    if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]*", name):
+        return ""
+    code = ("import importlib.metadata as m\ntry:\n"
+            f"    print(m.version({name!r}))\nexcept Exception:\n    print('')\n")
+    out = in_side(venv, [venv / "bin/python", "-c", code], timeout=60)
+    text = (getattr(out, "stdout", None) or "").strip()
+    return text.splitlines()[-1] if text else ""
+
+
+def _product_plan(a, rec: dict, repo: str, cfg: dict, checkouts) -> dict | None:
+    """Setup plan for a console or daily check. None on a study run, which does not call this."""
+    from poc import demo_helper
+    if not demo_helper.active(a):
+        return None
+    tavily = (rec.get("demo_helper") or {}).get("tavily") or {}
+    plan = demo_helper.build_setup_plan(
+        repo, checkouts, tavily, getattr(a, "python", "") or "",
+        getattr(a, "sandbox_backend", None) or "local",
+        (cfg or {}).get("dist") or (cfg or {}).get("pkg") or "")
+    demo_helper.attach_plan(rec, plan)
+    demo_helper.announce(plan.get("lines") or [])
+    switch = (plan.get("python") or {}).get("switch")
+    if switch:
+        a.python = switch
+    return plan
+
+
+def _install_with_helper(a, rec, step, venv, checkout, chosen, log, timeout, constraints, extra_reqs):
+    """Retry one side's install. The caller uses the plain install_side call when the helper is off."""
+    from poc import demo_helper
+
+    def once():
+        ok, why = install_side(venv, checkout, chosen, log, a.python, timeout, constraints, extra_reqs)
+        return ok, why
+
+    ok, why, _value, outcome = demo_helper.run_setup(
+        step, once, cleanup=lambda: shutil.rmtree(venv, ignore_errors=True))
+    demo_helper.note_setup(rec, step, outcome)
+    return ok, why
+
+
+def _log_plan_installs(rec, plan, venvs: dict) -> None:
+    from poc import demo_helper
+    packages = [item for item in (plan or {}).get("packages") or [] if item.get("action") == "install"]
+    if not packages or not venvs:
+        return
+    versions = {}
+    for item in packages:
+        versions[item["requirement"]] = {side: _dist_version(venv, item["requirement"]) for side, venv in venvs.items()}
+    logs = []
+    for item in packages:
+        got = versions.get(item["requirement"]) or {}
+        main_v, pr_v = got.get("main", ""), got.get("pr", "")
+        logs.append({"package": item["name"], "requirement": item["requirement"],
+                     "version": main_v if main_v == pr_v else f"main {main_v}, pr {pr_v}",
+                     "versions": {"main": main_v, "pr": pr_v}, "source": item.get("source"),
+                     "reason": item.get("reason"), "sides": ["main", "pr"]})
+    demo_helper.note_installs(rec, logs)
+
+
+def _retry_setup_gap(a, rec, repo, prdir, venvs: dict, rerun) -> None:
+    """One setup-gap rerun on a console or daily check. A study run does not call this."""
+    from poc import demo_helper, tavily_docs
+    if not demo_helper.active(a):
+        return
+    plan = (rec.get("demo_helper") or {}).get("setup_plan") or {}
+    declared = [item.get("requirement") for item in (plan.get("packages") or []) if item.get("requirement")]
+    tavily = (rec.get("demo_helper") or {}).get("tavily") or {}
+
+    def install_one(side, requirement):
+        venv = venvs.get(side)
+        if venv is None:
+            return False, ""
+        rc, _ = run(["uv", "pip", "install", "-q", "-p", venv / "bin/python", requirement],
+                    prdir / "setup-gap.log", env=base_env(side_home(venv), install=True),
+                    timeout=getattr(a, "build_timeout", 1800), sbx=side_sandbox(venv, network=True))
+        return rc == 0, _dist_version(venv, requirement) if rc == 0 else ""
+
+    def install_system(name):
+        from poc import contree_sandboxes
+        sess = contree_sandboxes.session()
+        if sess is None or not demo_helper.safe_apt_name(name):
+            return False
+        shell = "export DEBIAN_FRONTEND=noninteractive\napt-get update -qq && apt-get install -y -qq " + shlex.quote(name)
+        for side in ("main", "pr"):
+            try:
+                got = sess.run_op(side, shell, disposable=False, timeout=300)
+            except Exception:  # noqa: BLE001 — a failed system install stays a setup gap
+                return False
+            if got.get("exit_code") != 0:
+                return False
+        return True
+
+    lookup = None
+    if tavily_docs.available():
+        cache = demo_helper.FileCache(prdir / "tavily-cache.json")
+
+        def lookup(query, _cache=cache):  # noqa: A001 — local lookup passed into the helper
+            hit = _cache.get(query)
+            if hit:
+                return hit
+            got = demo_helper.live_fetch(query)
+            stored = demo_helper.redact_obj(got)
+            stored["live_call"] = False
+            _cache.put(query, stored)
+            return got
+
+    demo_helper.retry_unverified(
+        rec, rerun, install_one, declared, tavily.get("text") or "", demo_helper.fetch_pypi, repo,
+        allow_system=getattr(a, "sandbox_backend", None) == "contree",
+        install_system=install_system, lookup=lookup)
 
 
 # ---------------------------------------------------------------- execution helpers
@@ -1757,14 +1875,18 @@ def _contree_ready() -> bool:
             and bool(sess.main_uuid) and bool(sess.pr_uuid))
 
 
-def _maybe_prepare_contree(a, repo: str, main_sha: str, pr_sha: str, rec: dict, timeout: int) -> None:
-    """Build Contree main/PR checkpoints for source-pair; on failure fall back to local with an explicit note."""
+def _maybe_prepare_contree(a, repo: str, main_sha: str, pr_sha: str, rec: dict, timeout: int,
+                           extra_shell: str = "") -> None:
+    """Build Contree main/PR checkpoints for source-pair; on failure fall back to local with an explicit note.
+
+    extra_shell is the same text for both checkpoints. Empty keeps the default install.
+    """
     from poc import contree_sandboxes
     if getattr(a, "sandbox_backend", None) != "contree":
         return
     contree_sandboxes.clear_session()
     try:
-        sess = contree_sandboxes.prepare_source_pair(repo, main_sha, pr_sha, timeout=timeout)
+        sess = contree_sandboxes.prepare_source_pair(repo, main_sha, pr_sha, timeout=timeout, extra_shell=extra_shell)
         rec["contree"] = sess.describe()
         rec["machine"] = "contree"
         rec["sandbox_backend"] = "contree"
@@ -3004,6 +3126,9 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
     shutil.rmtree(work, ignore_errors=True); work.mkdir(parents=True)
     (prdir / "pr.diff").write_text(item["diff"])
     rec = new_record(repo, cfg, item, a, machine, rdir.name, run_date_for(rdir))
+    from poc import demo_helper
+    if demo_helper.active(a):
+        demo_helper.begin_check(a, rec, repo, cfg.get("dist") or cfg.get("pkg"), prdir)
     if mark_typing_only(rec, item.get("files")):
         return finish_typing_only(rec, prdir, work, t0, a)
     refusal = sandbox_refusal(getattr(a, "sandbox_backend", None))
@@ -3014,8 +3139,23 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
         return finish(test_source_pair(repo, cfg, item, prdir, work, a, rec), prdir, work, t0, a)
     cnv, ex = None, None
     vm, vp = work / "venv-main", work / "venv-pr"
+    targets = None
+    plan, pr_started = [], None
+    helper_on = demo_helper.active(a)
+    setup_plan = _product_plan(a, rec, repo, cfg, []) if helper_on else None
     run_progress.emit("install_main", detail="installing main (nightly) side")
-    main = build_main_env(cfg, vm, prdir / "setup-main.log", a.python, a.build_timeout, workroot / "wheels" / rdir.name)
+    if helper_on:
+        def _build_main():
+            built = build_main_env(cfg, vm, prdir / "setup-main.log", a.python, a.build_timeout,
+                                   workroot / "wheels" / rdir.name)
+            return bool(built.get("ok")), built.get("why") or "", built
+        _ok, _why, main, outcome = demo_helper.run_setup(
+            "main install", _build_main, cleanup=lambda: shutil.rmtree(vm, ignore_errors=True))
+        demo_helper.note_setup(rec, "main install", outcome)
+        if not isinstance(main, dict):
+            main = {"ok": False, "why": _why}
+    else:
+        main = build_main_env(cfg, vm, prdir / "setup-main.log", a.python, a.build_timeout, workroot / "wheels" / rdir.name)
     rec["main_side"] = {"source": "scientific-python nightly wheel (exact file, pinned by sha256)",
                         **{k: v for k, v in main.items() if k not in ("ok",)}}
     if main.get("build"):
@@ -3031,7 +3171,18 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
             rec["route"] = "source-build"
             extra = [f"{cfg['dist']}[{','.join(main['test_extras'])}]"] if main.get("test_extras") else []
             run_progress.emit("install_pr", detail="building PR from source")
-            b = source_build(repo, item, cfg, vp, work, prdir / "build-pr.log", a.python, a.build_timeout, tuple(extra))
+            if helper_on:
+                def _build_pr():
+                    built = source_build(repo, item, cfg, vp, work, prdir / "build-pr.log", a.python,
+                                         a.build_timeout, tuple(extra))
+                    return bool(built.get("ok")), built.get("why") or "", built
+                _ok, _why, b, outcome = demo_helper.run_setup(
+                    "PR build", _build_pr, cleanup=lambda: shutil.rmtree(vp, ignore_errors=True))
+                demo_helper.note_setup(rec, "PR build", outcome)
+                if not isinstance(b, dict):
+                    b = {"ok": False, "why": _why}
+            else:
+                b = source_build(repo, item, cfg, vp, work, prdir / "build-pr.log", a.python, a.build_timeout, tuple(extra))
             rec["pr_side"] = {"source": f"source build of {item['head_sha'][:12]}",
                               **{k: v for k, v in b.items() if k != "ok"}}
             rec["notes"] = ("main = nightly wheel, PR = source build of the PR head; differences can include "
@@ -3059,6 +3210,16 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
                             ("built from source" if rec.get("route") == "source-build" else "diff applied to that nightly"))}
     cmp = None
     envs_ok = not cnv
+    if helper_on and setup_plan and envs_ok and vp.exists():
+        reqs = [pkg for pkg in setup_plan.get("packages") or [] if pkg.get("action") == "install"]
+        if reqs:
+            def _plan_install(side, requirement, _vm=vm, _vp=vp):
+                venv = _vm if side == "main" else _vp
+                rc, _ = run(["uv", "pip", "install", "-q", "-p", venv / "bin/python", requirement],
+                            prdir / "setup-plan.log", env=base_env(side_home(venv), install=True),
+                            timeout=a.build_timeout, sbx=side_sandbox(venv, network=True))
+                return rc == 0, _dist_version(venv, requirement) if rc == 0 else ""
+            demo_helper.note_installs(rec, demo_helper.install_same(reqs, _plan_install))
     if not cnv:
         tm = map_tests(item["files"], cfg["pkg"], site_packages(vm), cfg)
         tp = map_tests(item["files"], cfg["pkg"], site_packages(vp), cfg)
@@ -3093,6 +3254,20 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
             rec["docstring_only"] = True
     run_progress.emit("verdict", "code", "computing code verdict")
     _store_verdict(rec, cmp, cnv, ex)
+    if helper_on:
+        def _rerun_nightly():
+            nonlocal cmp, cnv, ex
+            cmp, cnv, ex = execute_tests(rec, {"main": vm, "pr": vp}, targets, prdir, work, a)
+            if cmp:
+                rec["coverage"] = coverage_run(item, vp, site_packages(vm), site_packages(vp), targets["pr"], prdir,
+                                               work, a)
+            rec["probes"] = run_probes(repo, item["pr"], {"main": vm / "bin/python", "pr": vp / "bin/python"}, prdir,
+                                       work, a, plan, pr_started)
+            settle_probes(rec)
+            _store_verdict(rec, cmp, cnv, ex)
+            return {"verdict": rec["verdict"], "reason": rec["reason"]}
+        ready = bool(targets and targets.get("pr") and vp.exists())
+        _retry_setup_gap(a, rec, repo, prdir, {"main": vm, "pr": vp}, _rerun_nightly if ready else None)
     return finish(gate(rec), prdir, work, t0, a)
 
 
@@ -3201,12 +3376,34 @@ def check_record(rec: dict) -> list[str]:
 
 
 def test_source_pair(repo: str, cfg: dict, item: dict, prdir: Path, work: Path, a, rec: dict) -> dict:
-    from poc import run_progress
+    from poc import demo_helper, run_progress
     rec["route"] = "source-pair"
     if item.get("chosen"):
         rec["chosen"] = {k: v for k, v in item["chosen"].items()}
+    vm = vp = cm = cp = None
+    targets = None
+    setup_plan = None
+    plan, pr_started = [], None
+    helper_on = demo_helper.active(a)
+    if helper_on and not (rec.get("demo_helper") or {}).get("tavily"):
+        demo_helper.begin_check(a, rec, repo, cfg.get("dist") or cfg.get("pkg"), prdir)
     run_progress.emit("fetch_pr", detail="checking out main / PR sides")
-    sp = source_pair(repo, item, work, prdir / "git.log", a.python, a.build_timeout)
+    if helper_on:
+        def _checkout():
+            got = source_pair(repo, item, work, prdir / "git.log", a.python, a.build_timeout)
+            return bool(got.get("ok")), str(got.get("why") or ""), got
+
+        def _clean_checkout():
+            shutil.rmtree(work / "src", ignore_errors=True)
+            shutil.rmtree(work / "side-main", ignore_errors=True)
+            shutil.rmtree(work / "side-pr", ignore_errors=True)
+
+        _ok, _detail, sp, outcome = demo_helper.run_setup("source checkout", _checkout, cleanup=_clean_checkout)
+        demo_helper.note_setup(rec, "source checkout", outcome)
+        if not isinstance(sp, dict):
+            sp = {"ok": False, "why": _detail or "source checkout failed"}
+    else:
+        sp = source_pair(repo, item, work, prdir / "git.log", a.python, a.build_timeout)
     rec["sides"] = {k: v for k, v in sp.items() if k != "ok"}
     if sp.get("merge_commit"):
         rec["pr"]["merge_commit"] = sp["merge_commit"]
@@ -3227,8 +3424,14 @@ def test_source_pair(repo: str, cfg: dict, item: dict, prdir: Path, work: Path, 
     else:
         vm, vp = work / "venv-main", work / "venv-pr"
         cm, cp = work / "side-main", work / "side-pr"
+        setup_plan = _product_plan(a, rec, repo, cfg, [cm, cp]) if helper_on else None
+        extra = list(setup_plan["extra_reqs"]) if setup_plan and setup_plan.get("extra_reqs") else None
         run_progress.emit("install_main", detail="installing main side")
-        ok, why = install_side(vm, cm, item.get("chosen"), prdir / "setup-main.log", a.python, a.build_timeout, None)
+        if helper_on:
+            ok, why = _install_with_helper(a, rec, "main install", vm, cm, item.get("chosen"),
+                                           prdir / "setup-main.log", a.build_timeout, None, extra)
+        else:
+            ok, why = install_side(vm, cm, item.get("chosen"), prdir / "setup-main.log", a.python, a.build_timeout, None)
         plan, pr_started = [], None
         if ok:
             run_progress.emit("claims", "super", "planning behaviour claims / probes")
@@ -3240,7 +3443,11 @@ def test_source_pair(repo: str, cfg: dict, item: dict, prdir: Path, work: Path, 
             rec["test_extras"] = recorded_test_extras(cm, with_test_extras(proj, cm))
             rec["pr_side_started_at"] = pr_started = freeze.now()   # nothing below may create or change a probe
             run_progress.emit("install_pr", detail="installing PR side")
-            ok, why = install_side(vp, cp, item.get("chosen"), prdir / "setup-pr.log", a.python, a.build_timeout, cons)
+            if helper_on:
+                ok, why = _install_with_helper(a, rec, "PR install", vp, cp, item.get("chosen"),
+                                               prdir / "setup-pr.log", a.build_timeout, cons, extra)
+            else:
+                ok, why = install_side(vp, cp, item.get("chosen"), prdir / "setup-pr.log", a.python, a.build_timeout, cons)
             if ok:
                 rec["freeze"]["pr"] = freeze_env(vp, prdir / "freeze-pr.txt")
         if not ok:
@@ -3248,6 +3455,8 @@ def test_source_pair(repo: str, cfg: dict, item: dict, prdir: Path, work: Path, 
             if str(why).startswith("infrastructure failure:"):
                 rec["infrastructure_failure"] = {"kind": "oom", "action": "retry"}
         else:
+            if helper_on and setup_plan:
+                _log_plan_installs(rec, setup_plan, {"main": vm, "pr": vp})
             attach_optional_backends(rec, {"main": vm, "pr": vp}, cm, cfg["dist"],
                                      prdir / "setup-optional.log", a.build_timeout)
             chosen_tg = chosen_test_targets(item.get("chosen"))
@@ -3280,7 +3489,11 @@ def test_source_pair(repo: str, cfg: dict, item: dict, prdir: Path, work: Path, 
                     rec["optional_install_error"] = why2
             # Contree checkpoints before dual-runs (probes + pytest); local venvs stay for mapping/coverage.
             if not cnv:
-                _maybe_prepare_contree(a, repo, sp["main_sha"], sp["pr_sha"], rec, a.build_timeout)
+                if helper_on:
+                    shell = demo_helper.contree_shell(setup_plan) if setup_plan else ""
+                    _maybe_prepare_contree(a, repo, sp["main_sha"], sp["pr_sha"], rec, a.build_timeout, extra_shell=shell)
+                else:
+                    _maybe_prepare_contree(a, repo, sp["main_sha"], sp["pr_sha"], rec, a.build_timeout)
             if cnv:
                 pass
             elif not targets["pr"]:
@@ -3303,6 +3516,21 @@ def test_source_pair(repo: str, cfg: dict, item: dict, prdir: Path, work: Path, 
                 rec["docstring_only"] = True
     run_progress.emit("verdict", "code", "computing code verdict")
     _store_verdict(rec, cmp, cnv, ex)
+    if helper_on:
+        def _rerun_pair():
+            nonlocal cmp, cnv, ex
+            run_progress.emit("pytest", "code", "rerun after a setup gap")
+            cmp, cnv, ex = execute_tests(rec, {"main": vm, "pr": vp}, targets, prdir, work, a,
+                                         cwds={"main": cm, "pr": cp})
+            if cmp:
+                rec["coverage"] = coverage_run(item, vp, cm, cp, targets["pr"], prdir, work, a, cwd=cp)
+            rec["probes"] = run_probes(repo, item["pr"], {"main": vm / "bin/python", "pr": vp / "bin/python"}, prdir,
+                                       work, a, plan, pr_started)
+            settle_probes(rec)
+            _store_verdict(rec, cmp, cnv, ex)
+            return {"verdict": rec["verdict"], "reason": rec["reason"]}
+        ready = bool(vm and vp and targets and targets.get("pr"))
+        _retry_setup_gap(a, rec, repo, prdir, {"main": vm, "pr": vp} if vm and vp else {}, _rerun_pair if ready else None)
     return gate(rec)
 
 
@@ -3458,8 +3686,11 @@ def score_expectation(expected: str, actual: str) -> str:
 
 def score_table(title: str, intro: str, records: list[dict], truth: dict, col: str) -> list[str]:
     md = [f"## {title}", "", intro, "", f"| PR | {col} | Actual | Score |", "|---|---|---|---|"]
+    from poc import demo_helper
     counts: dict = {}
     for r in records:
+        if not demo_helper.counts_as_verdict(r):
+            continue
         e = truth.get((r["repo"], prn(r)))
         if e:
             e = e[0] if isinstance(e, tuple) else e
@@ -3519,9 +3750,13 @@ def how_to_fix(r: dict) -> str:
 def write_report(rdir: Path, meta: dict, records: list[dict], skipped: dict, problems: list[str],
                  expectations: dict | None = None, verification: dict | None = None,
                  history: list[dict] | None = None) -> Path:
+    from poc import demo_helper
+
     def line(r):
+        shown = demo_helper.shown_outcome(r)
+        cell = f"**{shown}**" if demo_helper.counts_as_verdict(r) else shown
         return (f"| [{r['repo']}#{prn(r)}]({r['pr']['url']}) | {r['pr']['title'][:70]} | {r.get('route', '-')} | "
-                f"**{r['verdict']}** | {r['reason'][:200]} |")
+                f"{cell} | {r['reason'][:200]} |")
     right, wrong, fix = [], [], []
     tested = [r for r in records if r.get("per_run")]
     if records:
@@ -3541,7 +3776,10 @@ def write_report(rdir: Path, meta: dict, records: list[dict], skipped: dict, pro
         if r.get("schema_errors"):
             wrong.append(f"{tag}: record does not validate: {r['schema_errors'][0]}")
             fix.append(f"{tag}: fix the record writer or the pr_run schema branch.")
-        if r["verdict"] == "could_not_verify":
+        if not demo_helper.counts_as_verdict(r):
+            wrong.append(f"{tag}: {demo_helper.SETUP_LABEL} ({r.get('reason')})")
+            fix.append(f"{tag}: this was retried as a setup problem and is not counted as a verdict.")
+        elif r["verdict"] == "could_not_verify":
             wrong.append(f"{tag}: could not verify: {r['reason']}")
             fix.append(how_to_fix(r))
         elif r["verdict"] == "needs_attention":
@@ -3578,7 +3816,7 @@ def write_report(rdir: Path, meta: dict, records: list[dict], skipped: dict, pro
         md += ["## Re-runs", "",
                "Earlier attempts of this run date are kept under `superseded/attempt-N/` (records, logs, NOTE.md). "
                "The day's PR selection is frozen: this attempt re-tests every PR that any earlier attempt selected.", ""]
-        final = {(r["repo"], prn(r)): r["verdict"] for r in records}
+        final = {(r["repo"], prn(r)): demo_helper.shown_outcome(r) for r in records}
         for h in history:
             first = h["note"].splitlines()[0].lstrip("# ") if h["note"] else ""
             md.append(f"- **{h['attempt']}**: {first}. Selected {len(h['selected'])} PR(s), "
@@ -3633,7 +3871,11 @@ def write_report(rdir: Path, meta: dict, records: list[dict], skipped: dict, pro
             md.append(f"- Test extras installed on both sides: {extras or '-'}; optional test deps: {opt or '-'}")
         md += [f"- Touched package files: {', '.join((r['files']['package_py'] + r['files']['compiled'])[:8])}",
                f"- Tests run: {', '.join(r.get('test_targets', {}).get('pr', [])) or '-'}",
-               f"- **Verdict: {r['verdict']}**: {r['reason']}"]
+               f"- **Verdict: {r['verdict']}**: {r['reason']}" if demo_helper.counts_as_verdict(r)
+               else f"- **Not a verdict:** {demo_helper.SETUP_LABEL}"]
+        helper_md = demo_helper.markdown_for(r)
+        if helper_md:
+            md.append(helper_md.rstrip("\n"))
         cg = r.get("coverage_gate") or {}
         if cg:
             md.append(f"- Coverage gate ({cg.get('kind')}): {cg.get('note') or '-'}; confidence {cg.get('confidence')}"
@@ -4039,6 +4281,10 @@ def main(argv=None) -> int:
         print(f"Stopped: only {free_gb:.0f} GB of free disk space; a run needs at least {a.min_free_gb:.0f} GB "
               f"(test environments are large). Free some space, or delete the {ops / 'work'} folder.", file=sys.stderr)
         return 2
+    if not a.select_only:
+        from poc import demo_helper
+        if demo_helper.active(a):
+            demo_helper.announce(demo_helper.preflight(rdir, model_token=getattr(a, "model_provider", None))["lines"])
     if not a.resume and not a.select_only:
         moved = supersede_previous(rdir, a.rerun_note)
         if moved:
@@ -4154,6 +4400,9 @@ def main(argv=None) -> int:
     # Expectations and independent verification are read only now, after every verdict above is final.
     rp = write_report(rdir, meta, records, skipped, problems, *scoring_inputs(rdir, a, chosen_path),
                       attempt_history(rdir))
+    from poc import demo_helper
+    if demo_helper.attach_self_check(rp, meta, records, a):
+        (rdir / "run_meta.json").write_text(json.dumps(meta, indent=1))
     print(f"run log: {rp}")
     reviewer_reports(rdir, a, records, "check" if single else "daily summary")
     return 0 if not problems else 1
@@ -4360,6 +4609,9 @@ def report_only(rdir: Path, a) -> int:
     skipped = json.loads((rdir / "selection.json").read_text()).get("skipped", {})
     rp = write_report(rdir, meta, records, skipped, problems, *scoring_inputs(rdir, a, chosen_prs_path(a, rdir)),
                       attempt_history(rdir))
+    from poc import demo_helper
+    if demo_helper.attach_self_check(rp, meta, records, a):
+        (rdir / "run_meta.json").write_text(json.dumps(meta, indent=1))
     print(f"run log (rebuilt from records, nothing re-tested): {rp}")
     reviewer_reports(rdir, a, records, "daily summary (rebuilt)")
     return 0
