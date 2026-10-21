@@ -295,12 +295,14 @@ def _load_latest_record(repo: str, pr: int) -> dict | None:
 def check_argv(pr_url: str, env: dict | None = None) -> list[str]:
     """Arguments for one product check started by the GitHub App.
 
-    ``--related-reports`` is quoted background for the advisory AI. A study run does not use this.
+    ``--related-reports`` is quoted background for the advisory AI. ``--swarm`` turns the
+    advisory swarm on for every App check. A study run uses neither. The App does not set
+    ``POC_SWARM`` in the environment, so nothing else in the process is turned on.
     """
     env = os.environ if env is None else env
     from poc import related_reports
     provider = env.get("POC_MODEL_PROVIDER") or "nebius"
-    return ["--pr", pr_url, "--model-provider", provider, *related_reports.product_flags()]
+    return ["--pr", pr_url, "--model-provider", provider, "--swarm", *related_reports.product_flags()]
 
 
 def apply(plan: dict, *, dry_run: bool | None = None, env: dict | None = None,

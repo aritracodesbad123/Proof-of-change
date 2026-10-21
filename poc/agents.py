@@ -56,7 +56,8 @@ def swarm_enabled(flag: bool = False) -> bool:
     """True when this run should call the advisory swarm.
 
     Command-line, study, and benchmark runs default to off. ``--swarm`` or ``POC_SWARM``
-    (1, true, yes, or on) turns it on. The operator console passes ``--swarm`` itself.
+    (1, true, yes, or on) turns it on. The operator console and the GitHub App pass
+    ``--swarm`` themselves.
     A requested check and the Codespace console start do too. A study run does not.
     """
     if flag:
