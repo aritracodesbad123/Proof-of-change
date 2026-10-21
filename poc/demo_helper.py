@@ -724,23 +724,157 @@ def pip_suggestions(text: str) -> list[str]:
     return found
 
 
-def apt_suggestions(text: str) -> list[str]:
+_PY_CLAUSE = re.compile(r"^(==|!=|~=|>=|<=|>|<)\s*(\d+)\.(\d+)(?:\.\d+)*(?:\.\*)?$")
+_PY_CLASSIFIER = re.compile(r"Programming Language\s*::\s*Python\s*::\s*(\d+)\.(\d+)\b", re.I)
+_PY_PROBE = [(3, minor) for minor in range(6, 21)]
+
+
+def _py_clauses(text: str) -> list[tuple[str, tuple[int, int]]]:
+    clauses = []
+    for part in re.split(r"\s*,\s*", (text or "").strip()):
+        match = _PY_CLAUSE.fullmatch(part.strip())
+        if match:
+            clauses.append((match.group(1), (int(match.group(2)), int(match.group(3)))))
+    return clauses
+
+
+def _py_satisfies(minor: tuple[int, int], clauses: list[tuple[str, tuple[int, int]]]) -> bool:
+    for op, bound in clauses:
+        if op == ">=" and minor < bound:
+            return False
+        if op == ">" and minor <= bound:
+            return False
+        if op == "<=" and minor > bound:
+            return False
+        if op == "<" and minor >= bound:
+            return False
+        if op == "==" and minor != bound:
+            return False
+        if op == "!=" and minor == bound:
+            return False
+        if op == "~=" and (minor < bound or minor[0] != bound[0]):
+            return False
+    return True
+
+
+def _classifier_versions(text: str) -> list[str]:
     found = []
-    for match in re.finditer(r"apt(?:-get)?\s+install\b([^\n#]+)", text or "", re.I):
-        for tok in match.group(1).split():
-            if tok.startswith("-"):
-                continue
-            if safe_apt_name(tok) and tok not in found:
-                found.append(tok)
+    for match in _PY_CLASSIFIER.finditer(text or ""):
+        version = f"{match.group(1)}.{match.group(2)}"
+        if version not in found:
+            found.append(version)
     return found
 
 
-def python_hints(text: str) -> list[str]:
-    found = []
-    for match in re.finditer(r"python(?:\s*version)?\s*(?:>=|==|>|requires)?\s*(\d+\.\d+)", text or "", re.I):
-        if match.group(1) not in found:
-            found.append(match.group(1))
-    return found
+def _python_from_checkout(root: Path) -> tuple[list[str], list[str]]:
+    """requires-python and classifier versions from pyproject.toml, setup.cfg, and setup.py."""
+    specs: list[str] = []
+    declared: list[str] = []
+    project = _pyproject(root / "pyproject.toml").get("project")
+    if isinstance(project, dict):
+        if isinstance(project.get("requires-python"), str):
+            specs.append(project["requires-python"])
+        for item in project.get("classifiers") or []:
+            if isinstance(item, str):
+                declared.extend(_classifier_versions(item))
+    cfg = root / "setup.cfg"
+    if cfg.is_file():
+        import configparser
+        parser = configparser.ConfigParser()
+        try:
+            parser.read_string(_read(cfg))
+        except (configparser.Error, OSError):
+            parser = None
+        if parser is not None and parser.has_option("options", "python_requires"):
+            specs.append(parser.get("options", "python_requires"))
+        if parser is not None and parser.has_option("metadata", "classifiers"):
+            declared.extend(_classifier_versions(parser.get("metadata", "classifiers")))
+    setup_py = _read(root / "setup.py")
+    for match in re.finditer(r"""python_requires\s*=\s*['\"]([^'\"]+)['\"]""", setup_py):
+        specs.append(match.group(1))
+    declared.extend(_classifier_versions(setup_py))
+    return specs, declared
+
+
+def _python_from_pypi(info) -> tuple[list[str], list[str]]:
+    if not isinstance(info, dict):
+        return [], []
+    body = info.get("info") if isinstance(info.get("info"), dict) else info
+    specs = [body["requires_python"]] if isinstance(body.get("requires_python"), str) else []
+    declared: list[str] = []
+    for item in body.get("classifiers") or []:
+        if isinstance(item, str):
+            declared.extend(_classifier_versions(item))
+    return specs, declared
+
+
+def _python_requirement(checkouts, repo: str, self_dist: str, pypi) -> tuple[list[str], list[str]]:
+    """Versions the project itself declares. Lookup text is not a source."""
+    specs: list[str] = []
+    declared: list[str] = []
+    dist = (self_dist or "").strip()
+    for checkout in checkouts or []:
+        root = Path(checkout)
+        file_specs, file_declared = _python_from_checkout(root)
+        specs.extend(file_specs)
+        declared.extend(file_declared)
+        if not dist:
+            project = _pyproject(root / "pyproject.toml").get("project")
+            if isinstance(project, dict) and isinstance(project.get("name"), str):
+                dist = project["name"].strip()
+    parts = split_repo(repo or "")
+    owner, repo_name = parts if parts else ("", "")
+    if dist and pypi and owner and repo_name:
+        try:
+            info = pypi(dist)
+        except Exception:  # noqa: BLE001 — a metadata miss leaves the project files in charge
+            info = None
+        if pypi_links_back(info, owner, repo_name):
+            page_specs, page_declared = _python_from_pypi(info)
+            specs.extend(page_specs)
+            declared.extend(page_declared)
+    return specs, declared
+
+
+def choose_python(specs: list[str], declared: list[str], current: str, python_available) -> str | None:
+    """A version that satisfies requires-python and, when one is installed, is available.
+
+    The current interpreter wins when it already satisfies the requirement. Otherwise the
+    lowest declared or in-range version that is installed is used. Nothing is taken from
+    a web page.
+    """
+    clauses: list[tuple[str, tuple[int, int]]] = []
+    for text in specs:
+        clauses.extend(_py_clauses(text))
+    declared_versions = []
+    for item in declared:
+        minor = _minor(item)
+        if minor and _py_satisfies(minor, clauses):
+            version = f"{minor[0]}.{minor[1]}"
+            if version not in declared_versions:
+                declared_versions.append(version)
+    if not clauses and not declared_versions:
+        return None
+    current_minor = _minor(current)
+    current_version = f"{current_minor[0]}.{current_minor[1]}" if current_minor else ""
+    current_ok = bool(current_minor) and _py_satisfies(current_minor, clauses)
+    if current_ok and clauses:
+        return current_version
+    if current_ok and declared_versions:
+        oldest = min(declared_versions, key=lambda item: _minor(item) or (0, 0))
+        if current_version in declared_versions or current_minor >= (_minor(oldest) or (0, 0)):
+            return current_version
+    if declared_versions:
+        candidates = declared_versions
+    else:
+        candidates = [f"{major}.{minor}" for major, minor in _PY_PROBE if _py_satisfies((major, minor), clauses)]
+    candidates = sorted(set(candidates), key=lambda item: _minor(item) or (0, 0))
+    if not candidates:
+        return None
+    for version in candidates:
+        if python_available and python_available(version):
+            return version
+    return candidates[0]
 
 
 def _minor(version: str) -> tuple[int, int] | None:
@@ -801,15 +935,16 @@ def pypi_links_back(info, owner: str, repo: str) -> bool:
     return any(link_matches(value, owner, repo) for value in values)
 
 
-def _python_decision(requested: str | None, current: str, sandbox: str, python_available) -> dict:
+def _python_decision(requested: str | None, current: str, sandbox: str, python_available, requirement: str = "") -> dict:
     if not requested:
         return {"requested": None, "current": current, "applied": False, "switch": None,
                 "reason": "no Python version was requested"}
     current_minor = _minor(current)
     wanted = _minor(requested)
-    if current_minor and wanted and current_minor >= wanted:
+    if current_minor and wanted and current_minor == wanted:
+        met = requirement or requested
         return {"requested": requested, "current": current, "applied": True, "switch": None,
-                "reason": f"Python {current} already meets {requested}"}
+                "reason": f"Python {current} already meets {met}"}
     if sandbox == "contree":
         return {"requested": requested, "current": current, "applied": False, "switch": None,
                 "reason": "not applied: the Contree image keeps its Python"}
@@ -870,24 +1005,15 @@ def build_setup_plan(repo: str, checkouts, tavily, current_python: str, sandbox:
             refused.append({"name": name, "reason": "no network or the package was not found"})
         else:
             refused.append({"name": name, "reason": "its PyPI page does not link to this GitHub repository"})
-    versions = []
-    for checkout in checkouts or []:
-        project = (_pyproject(Path(checkout) / "pyproject.toml").get("project") or {})
-        if isinstance(project, dict) and project.get("requires-python"):
-            match = _PY_VER.search(str(project["requires-python"]))
-            if match:
-                versions.append(f"{match.group(1)}.{match.group(2)}")
-    versions.extend(python_hints(text))
-    requested = max(versions, key=lambda item: _minor(item) or (0, 0)) if versions else None
+    spec_texts, declared_versions = _python_requirement(checkouts, repo, self_dist, pypi)
+    requested = choose_python(spec_texts, declared_versions, current_python or "", python_available)
+    requirement = ", ".join(dict.fromkeys(item.strip() for item in spec_texts if item and item.strip()))
     system_names = []
     for checkout in checkouts or []:
         for name in _apt_from_tree(Path(checkout)):
             if name not in system_names:
                 system_names.append(name)
-    for name in apt_suggestions(text):
-        if name not in system_names:
-            system_names.append(name)
-    python = _python_decision(requested, current_python or "", sandbox or "local", python_available)
+    python = _python_decision(requested, current_python or "", sandbox or "local", python_available, requirement)
     system = _system_decision(system_names, sandbox or "local")
     extra = [item["requirement"] for item in packages if item["action"] == "install"]
     lines = ["Setup plan: the same packages on main and pr."]
@@ -1165,17 +1291,9 @@ def retry_unverified(rec: dict, rerun, install_one, declared, tavily_text: str, 
                 notes.append(f"Setup plan: refused {module}: its PyPI page does not link to this GitHub repository")
         else:
             notes.append(f"Setup plan: refused {module}: not listed by the project and not a link-back suggestion")
-    system_ok = False
-    if allow_system and install_system:
-        for lib in _libs(text):
-            stem = lib.split(".so", 1)[0]
-            for apt_name in apt_suggestions(tavily_text or ""):
-                if apt_name == stem or apt_name.startswith(stem):
-                    if install_system(apt_name):
-                        system_ok = True
-                        notes.append(f"Installed system package {apt_name} on main and pr.")
-                    break
-    if not specs and not system_ok:
+    # A system package comes from the project's own files, applied with the setup plan.
+    # Lookup text never adds one, even when the error names a missing library.
+    if not specs:
         rec["verdict"] = "could_not_verify"
         rec["reason"] = _gap_reason(name)
         notes.append(f"Before rerun: {before['verdict']}: {before['reason']}")
@@ -1195,7 +1313,7 @@ def retry_unverified(rec: dict, rerun, install_one, declared, tavily_text: str, 
     notes = list(block.get("notes") or [])
     installed = [row for row in logs if not str(row["versions"].get("main", "")).startswith("failed")
                  and not str(row["versions"].get("pr", "")).startswith("failed")]
-    if not installed and not system_ok:
+    if not installed:
         rec["verdict"] = "could_not_verify"
         rec["reason"] = _gap_reason(name)
         notes.append(f"Before rerun: {before['verdict']}: {before['reason']}")

@@ -86,10 +86,58 @@ def test_python_and_system_hints_follow_the_sandbox(tmp_path):
     assert contree["python"]["switch"] is None and contree["python"]["applied"] is False
     assert "Contree" in contree["python"]["reason"]
     applied = {item["name"]: item["applied"] for item in contree["system"]}
-    assert applied["libhdf5-dev"] is True and applied["libxml2"] is True
+    assert applied == {"libxml2": True}
+    assert "libhdf5-dev" not in json.dumps(contree)
     shell = demo_helper.contree_shell(contree)
-    assert "apt-get install -y -qq libhdf5-dev" in shell or "apt-get install -y -qq libxml2 libhdf5-dev" in shell
-    assert "apt-get" in shell and "libhdf5-dev" in shell and "pytest>=7" in shell
+    assert "apt-get install -y -qq libxml2" in shell
+    assert "libhdf5-dev" not in shell and "pytest>=7" in shell
+
+
+def test_setup_plan_ignores_python_and_system_hints_from_tavily(tmp_path):
+    root = _checkout(tmp_path, python=">=3.11")
+    tavily = {"answer": "Try Python 3.14 alpha", "results": [
+        {"title": "Python 3.14 support", "url": "https://github.com/acme/widget/issues/224",
+         "content": "widget fails on Python 3.14.0a1\napt-get install libhdf5-dev"}]}
+    plan = demo_helper.build_setup_plan(
+        REPO, [root], tavily, "3.12", "local", "widget",
+        python_available=lambda version: "/usr/bin/python3.12" if version == "3.12" else None, pypi=_pypi)
+    blob = json.dumps(plan)
+    assert "3.14" not in blob and "libhdf5-dev" not in blob
+    assert plan["python"]["requested"] == "3.12" and plan["python"]["switch"] is None
+    assert plan["python"]["applied"] is True
+    assert [item["name"] for item in plan["system"]] == ["libxml2"]
+
+    # The floor is not installed. A higher version that meets >=3.11 is. The issue's 3.14 is not.
+    picked = demo_helper.build_setup_plan(
+        REPO, [root], tavily, "3.10", "local", "widget",
+        python_available=lambda version: "/usr/bin/python3.12" if version == "3.12" else None, pypi=_pypi)
+    assert picked["python"]["requested"] == "3.12"
+    assert picked["python"]["switch"] == "/usr/bin/python3.12"
+    assert "3.14" not in json.dumps(picked)
+
+    cfg = tmp_path / "from-cfg"
+    cfg.mkdir()
+    (cfg / "setup.cfg").write_text(
+        "[metadata]\nname = widget\nclassifiers =\n    Programming Language :: Python :: 3.11\n"
+        "    Programming Language :: Python :: 3.14\n"
+        "[options]\npython_requires = >=3.11\n")
+    (cfg / "setup.py").write_text("setup(name='widget', python_requires='>=3.11')\n")
+    from_files = demo_helper.build_setup_plan(
+        REPO, [cfg], tavily, "3.10", "local", "widget",
+        python_available=lambda version: "/usr/bin/python3.11" if version == "3.11" else None,
+        pypi=lambda _name: {"requires_python": ">=3.14", "home_page": "https://github.com/other/mystery"})
+    assert from_files["python"]["requested"] == "3.11"
+    assert "3.14" not in json.dumps(from_files)
+
+    bare = tmp_path / "from-pypi"
+    bare.mkdir()
+    page = {"requires_python": ">=3.10", "classifiers": ["Programming Language :: Python :: 3.10"],
+            "home_page": "https://github.com/acme/widget"}
+    from_pypi = demo_helper.build_setup_plan(
+        REPO, [bare], tavily, "3.12", "local", "widget", python_available=lambda _version: None,
+        pypi=lambda _name: page)
+    assert from_pypi["python"]["requested"] == "3.12"
+    assert "3.14" not in json.dumps(from_pypi) and "libhdf5-dev" not in json.dumps(from_pypi)
 
 
 def test_same_install_list_on_both_sides_and_both_contree_shells():
