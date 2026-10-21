@@ -2230,7 +2230,10 @@ def coverage_run(item: dict, venv: Path, main_root: Path, pr_root: Path, targets
     if not out.exists():
         return {"status": "failed", "why": f"coverage run produced no data (exit {rc}); see coverage-pytest.log",
                 "seconds": secs}
-    res = coverage_gate.measure(changed, json.loads(out.read_text()).get("files", {}))
+    cov_files, why = coverage_gate.parse_report(out.read_text(errors="replace"))
+    if cov_files is None:
+        return {"status": "not measured", "why": f"{why}; see coverage-pytest.log", "seconds": secs}
+    res = coverage_gate.measure(changed, cov_files)
     return res | {"seconds": secs, "exit": rc, "log": "coverage-pytest.log"}
 
 
@@ -2284,7 +2287,13 @@ def contree_coverage_run(item: dict, main_root: Path, pr_root: Path, targets: li
         "printf '___POC_LOG___\\n'\ncat /tmp/poc-cov-pytest.log 2>/dev/null\n"
     )
     t0 = time.time()
-    raw = sess.run_op("pr", shell, disposable=True, timeout=int(a.run_timeout))
+    try:
+        raw = sess.run_op("pr", shell, disposable=True, timeout=int(a.run_timeout))
+    except Exception as e:  # Contree error or timeout: keep the cap instead of crashing the check
+        return {"status": "not measured", "why": f"the Contree coverage run failed ({type(e).__name__})",
+                "seconds": round(time.time() - t0, 1), "where": "contree"}
+    if not isinstance(raw, dict):
+        raw = {}
     secs = round(time.time() - t0, 1)
     out = (raw.get("stdout") or "") + "\n" + (raw.get("stderr") or "")
     log = out.split("___POC_LOG___\n", 1)[-1] if "___POC_LOG___" in out else out
@@ -2292,15 +2301,14 @@ def contree_coverage_run(item: dict, main_root: Path, pr_root: Path, targets: li
     blob = ""
     if "___POC_COV_START___\n" in out:
         blob = out.split("___POC_COV_START___\n", 1)[1].split("\n___POC_COV_END___", 1)[0]
-    try:
-        cov_files = json.loads(blob).get("files", {}) if blob.strip() else None
-    except json.JSONDecodeError:
-        cov_files = None
+    cov_files, why = coverage_gate.parse_report(blob)
     if cov_files is None:
-        return {"status": "not measured",
-                "why": "coverage run produced no data; see coverage-pytest.log", "seconds": secs}
+        return {"status": "not measured", "why": f"{why}; see coverage-pytest.log", "seconds": secs,
+                "where": "contree"}
     (prdir / "coverage-pr.json").write_text(blob.strip() + "\n")
-    res = coverage_gate.measure(changed, cov_files or {})
+    res = coverage_gate.measure(changed, cov_files)
+    if res.get("status") != "measured":
+        return res | {"seconds": secs, "where": "contree"}
     exit_m = re.search(r"___POC_EXIT___(\S+)", out)
     rc = int(exit_m.group(1)) if exit_m and exit_m.group(1).isdigit() else raw.get("exit_code")
     return res | {"seconds": secs, "exit": rc, "log": "coverage-pytest.log", "where": "contree"}

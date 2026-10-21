@@ -134,8 +134,9 @@ def test_measure_with_real_coverage_json(tmp_path):
 
 
 def test_unmeasured_file_is_reported():
-    res = cg.measure({"widget/core.py": {1, 2}}, {})
-    assert res["changed_lines_total"] == 0 and res["files"][0]["note"] == "file not measured by coverage"
+    res = cg.measure({"widget/core.py": {1, 2}}, {"other.py": {"executed_lines": [1], "missing_lines": []}})
+    assert res["status"] == "not measured" and "widget/core.py" in res["why"]
+    assert res["files"][0]["note"] == "file not measured by coverage"
 
 
 def test_report_shows_gate_and_summary_lists_changed_verdicts(tmp_path, monkeypatch):
