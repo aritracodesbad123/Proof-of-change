@@ -3395,10 +3395,10 @@ def _contree_only_pair(a, rec: dict, repo: str, cfg: dict, item: dict, sp: dict,
 
 def product_route(a) -> bool:
     """True for a product check (console, request-a-check, Codespaces, GitHub App): a single pull request started with
-    the product flags. False for a study run and the daily study."""
-    from poc import related_reports
-    return related_reports.enabled(bool(getattr(a, "related_reports", False)), bench=bool(getattr(a, "bench", False)),
-                                   single_pr=bool(getattr(a, "pr", None)))
+    ``--product-check`` (not inferred from ``--related-reports``). False for a study run and the daily study."""
+    if getattr(a, "bench", None) or not getattr(a, "pr", None):
+        return False
+    return bool(getattr(a, "product_check", False))
 
 
 def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, machine: dict) -> dict:
@@ -4510,6 +4510,10 @@ def main(argv=None) -> int:
                          "advisory AI as quoted background. Off for a study run and the daily study, even "
                          "if this flag is set on a benchmark. Skipped when TAVILY_API_KEY is not set. "
                          "Does not change the verdict and does not choose packages.")
+    ap.add_argument("--product-check", action="store_true",
+                    help="set only by product routes (console, request-a-check, Codespaces, GitHub App) on a single "
+                         "pull-request check: 'verified' then needs measured coverage. Ignored on a benchmark or "
+                         "the daily study. Independent of --related-reports.")
     ap.add_argument("--console-job", action="store_true",
                     help="passed only by the operator console, on a single pull-request check. "
                          "With this flag that check may start while POC_HITL is set. "
