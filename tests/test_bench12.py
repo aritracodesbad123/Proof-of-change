@@ -1,7 +1,9 @@
 """Known-answer benchmark (evals/bench12) and the AI-probe gate in the golden re-derivation (evals/checks)."""
 from __future__ import annotations
 
-import ast
+import builtins
+import json
+import re
 from pathlib import Path
 
 import pytest
@@ -26,15 +28,46 @@ def test_every_case_folder_is_scored():
     assert keyed == {p.name for p in (BENCH / "cases").iterdir() if p.is_dir()}
 
 
-def test_run_never_sees_the_answer_key():
+LABELS = re.compile(r"verified|needs[\s_-]*attention|could[\s_-]*not[\s_-]*verify|no[\s_-]*code[\s_-]*change|skipped",
+                    re.IGNORECASE)
+
+
+def _case_files():
+    return [p for case in (BENCH / "cases").iterdir() for p in case.rglob("*") if p.is_file()]
+
+
+def test_case_files_carry_no_hint_of_the_answer():
+    key = json.loads((BENCH / "answer_key.json").read_text())
+    expected = {e["expected"] for e in key["answers"]}
+    assert _case_files()
+    for p in _case_files():
+        text = p.read_text()
+        for where in (str(p.relative_to(BENCH)), text):
+            assert not re.search(r"answer|expected", where, re.IGNORECASE), p
+            assert not LABELS.search(where), f"{p} names a verdict label"
+            assert not any(v.lower() in where.lower() for v in expected), p
+
+
+def test_run_case_never_opens_the_answer_key(monkeypatch):
     with pytest.raises(ValueError):
         rc.run_case(BENCH / "answer_key.json")
-    src = (BENCH / "run_case.py").read_text()
-    names = {n.id for n in ast.walk(ast.parse(src)) if isinstance(n, ast.Name)}
-    assert "KEY" not in names and "answer_key" not in src.replace("never sees the answer key", "")
-    for case in (BENCH / "cases").iterdir():
-        assert not any("answer" in p.name.lower() or "expected" in p.read_text().lower()
-                       for p in case.rglob("*") if p.is_file())
+    opened: list[str] = []
+    real_open, real_read = builtins.open, Path.read_text
+
+    def spy_open(f, *a, **k):
+        opened.append(str(f))
+        return real_open(f, *a, **k)
+
+    def spy_read(self, *a, **k):
+        opened.append(str(self))
+        return real_read(self, *a, **k)
+
+    monkeypatch.setattr(builtins, "open", spy_open)
+    monkeypatch.setattr(Path, "read_text", spy_read)
+    for case in sorted((BENCH / "cases").iterdir()):
+        for bl, route in (("full", "single"), ("tests", "single"), ("full", "daily")):
+            rc.run_case(case, bl, route)
+    assert opened and not [f for f in opened if "answer" in f.lower()]
 
 
 # ---- AI-probe gate in derive_verdict -------------------------------------------------------------------------

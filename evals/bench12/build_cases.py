@@ -134,8 +134,8 @@ EXTRA = "import toyextra  # noqa: F401  (optional module, missing on the first r
 for cid, total, covered, ctotal in (("S11", 3, 0, 3), ("S11b", 3, 1, 250), ("S11c", 0, 0, 3)):
     C.append(case(cid, "Fix clip so values above hi are clipped to hi.",
                   {PKG: BASE_PKG}, {PKG: EXTRA + CLIP_FIX},
-                  {"first_run": {"verdict": "could_not_verify", "reason": "setup gap: No module named 'toyextra'"},
-                   "rerun": {"verdict": "verified", "reason": "rerun after installing toyextra: tests pass"},
+                  {"first_run_setup_gap": "No module named 'toyextra'",
+                   "rerun_tests": "all pass after installing toyextra",
                    "changed_lines_total": ctotal,
                    "probe_changed_line_coverage": {"changed_lines_total": total, "changed_lines_covered": covered}}))
 

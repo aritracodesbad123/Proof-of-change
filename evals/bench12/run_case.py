@@ -66,13 +66,16 @@ def run_case(case_dir: Path, baseline: str = "full", route: str = "single") -> d
         skip = dr.selection_skip_for_files(files, PKG_NAME)
         if skip:
             return {"verdict": "skipped", "reason": skip, "golden_verdict": None}
-    if "rerun" in rec_in:  # setup-helper recovery rerun (poc/demo_helper.py)
+    if "rerun_tests" in rec_in:  # setup-helper recovery rerun (poc/demo_helper.py)
+        # The recorded evidence: a first run stopped by a setup gap, then a rerun whose tests all passed.
         cov = rec_in["probe_changed_line_coverage"]
-        rec = dict(rec_in["first_run"], coverage={"changed_lines_total": rec_in["changed_lines_total"]},
+        first = {"verdict": "could_not_verify", "reason": "setup gap: " + rec_in["first_run_setup_gap"]}
+        rerun = {"verdict": "verified", "reason": "rerun: " + rec_in["rerun_tests"]}
+        rec = dict(first, coverage={"changed_lines_total": rec_in["changed_lines_total"]},
                    probes={"items": [{"id": "model-1", "source": "model", "status": "ran", "observations": [],
                                       "probe_changed_line_coverage": {"status": "measured", **cov}}]})
-        held = demo_helper._coverage_blocks_verified(rec, rec_in["rerun"]["verdict"], lambda: dict(rec_in["rerun"]))
-        v, why = held if held else (rec_in["rerun"]["verdict"], rec_in["rerun"]["reason"])
+        held = demo_helper._coverage_blocks_verified(rec, rerun["verdict"], lambda: dict(rerun))
+        v, why = held if held else (rerun["verdict"], rerun["reason"])
         return {"verdict": v, "reason": why, "golden_verdict": None}
     rec: dict = {"baseline": baseline, "files": files, "behaviour_claims": []}
     if dr.mark_typing_only(rec, files):
