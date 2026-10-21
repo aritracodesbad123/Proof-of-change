@@ -75,3 +75,54 @@ def test_contree_bad_or_partial_report_caps(tmp_path, monkeypatch, body):
     got = _run(tmp_path, monkeypatch, op)
     assert got["status"] == "not measured"
     assert _gate(got)["verdict"] == "could_not_verify"
+
+
+def _partial(product: bool, a_exec):
+    cov = coverage_gate.measure({"pkg/a.py": {1, 2}, "pkg/b.py": {3}},
+                                {"/x/pkg/a.py": {"executed_lines": a_exec,
+                                                 "missing_lines": [n for n in (1, 2) if n not in a_exec]}})
+    assert cov["status"] == "not measured" and "pkg/b.py" in cov["why"]
+    rec = {"verdict": "verified", "reason": "1 new test(s) pass", "files": {"all": ["pkg/a.py", "pkg/b.py"]},
+           "coverage": cov}
+    if product:
+        rec["product_check"] = True
+    return coverage_gate.apply(rec)
+
+
+@pytest.mark.parametrize("product", [False, True])
+def test_partial_report_with_listed_file_never_run_caps_never_ran(product):
+    out = _partial(product, [])
+    assert out["verdict"] == "could_not_verify"
+    assert "never ran" in out["reason"] and "pkg/a.py" in out["reason"]
+
+
+def test_partial_report_all_listed_ran_stays_not_measured_non_product():
+    out = _partial(False, [1, 2])
+    assert out["verdict"] == "verified" and out["coverage_gate"]["measurement"] == "not measured"
+    assert out["coverage_gate"]["confidence"] == "lower"
+
+
+def test_partial_report_all_listed_ran_product_stays_capped():
+    out = _partial(True, [1, 2])
+    assert out["verdict"] == "could_not_verify" and out["reason"].startswith(coverage_gate.PRODUCT_NOT_MEASURED)
+    assert "never ran" not in out["reason"]
+
+
+@pytest.mark.parametrize("product", [False, True])
+def test_partial_report_never_ran_uses_total_rule(product):
+    # x: 0 of 2 changed lines ran, y: 1 of 1 ran, z missing from the report. Some changed line ran in total,
+    # so the 'never ran' cap does not apply; the result matches the same PR with z present.
+    cov = coverage_gate.measure({"pkg/x.py": {1, 2}, "pkg/y.py": {3}, "pkg/z.py": {4}},
+                                {"/w/pkg/x.py": {"executed_lines": [], "missing_lines": [1, 2]},
+                                 "/w/pkg/y.py": {"executed_lines": [3], "missing_lines": []}})
+    assert cov["status"] == "not measured" and "pkg/z.py" in cov["why"]
+    rec = {"verdict": "verified", "reason": "1 new test(s) pass",
+           "files": {"all": ["pkg/x.py", "pkg/y.py", "pkg/z.py"]}, "coverage": cov}
+    if product:
+        rec["product_check"] = True
+    out = coverage_gate.apply(rec)
+    assert "never ran" not in out["reason"]
+    if product:
+        assert out["verdict"] == "could_not_verify" and out["reason"].startswith(coverage_gate.PRODUCT_NOT_MEASURED)
+    else:
+        assert out["verdict"] == "verified"
