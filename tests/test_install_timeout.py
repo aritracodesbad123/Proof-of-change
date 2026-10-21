@@ -1,15 +1,17 @@
 """A hanging install whose child never exits (and one that escapes via setsid) is killed with its whole tree at the
 limit, and install_side records it as 'timed out', not as a failed install."""
-import os, time
+import time
 from pathlib import Path
-import pytest
+
 from ops import daily_run as d
 
 HANG = "setsid sleep 1000 & echo $! > {pf}; sleep 1000 & echo $! >> {pf}; wait"
 
 def _alive(pid):
-    try: return Path(f"/proc/{pid}/stat").read_text().split(")")[-1].split()[0] != "Z"
-    except FileNotFoundError: return False
+    try:
+        return Path(f"/proc/{pid}/stat").read_text().split(")")[-1].split()[0] != "Z"
+    except FileNotFoundError:
+        return False
 
 def test_run_kills_whole_tree_at_limit(tmp_path):
     pf = tmp_path / "pids"
