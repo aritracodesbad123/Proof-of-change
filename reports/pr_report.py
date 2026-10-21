@@ -571,6 +571,12 @@ def build(rec: dict, prdir: Path, out_dir: Path, decision: dict | None = None) -
         R.p("These notes are background from the console and the daily check. They do not change the verdict.")
         R.p(demo_helper.RETRY_LIMITS)
         R.bullets([str(note) for note in helper_notes])
+    from poc import related_reports
+    background = rec.get("related_reports") if isinstance(rec.get("related_reports"), dict) else None
+    background_text = str((background or {}).get("text") or "").strip()
+    if background_text:
+        R.h(3, related_reports.REPORT_LABEL)
+        R.p(background_text)
 
     R.h(2, "Claims vs reality", "claims")
     if rows:

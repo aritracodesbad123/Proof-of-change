@@ -605,9 +605,11 @@ run uses just the date. These folders stay on your computer only. They are never
   runs (`--sandbox-backend local|contree`; Nebius sandboxes also need `NEBIUS_PROJECT_ID` and
   `.venv/bin/pip install -e ".[contree]"`), the probe freeze rule, and the optional GitHub App
   (`POC_DEMO_REPOS`, webhook secret, installation token, `POC_REPORT_BASE_URL`, `python -m poc.github_app`).
-  On a product check, `--related-reports` (passed by the operator console and the GitHub App) looks up a few
-  related public bug reports when `TAVILY_API_KEY` is set and passes them to the advisory AI as quoted background.
-  A study run leaves this off. Without the key, the check logs one line and continues. The key is never printed.
+  On a product check, `--related-reports` (passed by the operator console, request-a-check, and the GitHub App)
+  looks up a few related public bug reports when `TAVILY_API_KEY` is set and the advisory swarm will run, and
+  passes them to that AI as quoted background. The report labels the text
+  "Background (related public bug reports, not used for the verdict)". A study run leaves this off. When the
+  swarm is off, the lookup is not called. Without the key, the check logs one line and continues. The key is never printed.
 - Model ids on Token Factory: `nvidia/nemotron-3-super-120b-a12b` (claims, probes, summary),
   `nvidia/Nemotron-3-Ultra-550b-a55b` (advisory labels), `nvidia/Nemotron-3_5-Lightning` with fallback
   `nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B` (advisory tips).

@@ -3325,12 +3325,18 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
 
 
 def _attach_related_reports(rec: dict, runner) -> None:
-    """Store related bug reports when this product check asked. Never changes the verdict.
+    """Store related bug reports when this product check asked and the swarm will run.
 
-    A study run and the daily study leave the record alone. A missing key or a failed lookup
-    is one log line. The exception text is not printed, because it can contain the key.
+    The text is background for the advisory AI. A study run, the daily study, and a check
+    whose swarm is off leave the record alone and do not call Tavily. A missing key or a
+    failed lookup is one log line. The exception text is not printed, because it can
+    contain the key. This never changes the verdict.
     """
-    from poc import related_reports
+    from poc import agents, related_reports
+    if not agents.swarm_enabled(bool(getattr(runner, "swarm", False))):
+        return
+    if runner is None or getattr(runner, "provider", None) is None or getattr(runner, "model_skipped", None):
+        return
     if not related_reports.enabled(
             bool(getattr(runner, "related_reports", False)),
             bench=bool(getattr(runner, "bench", False)),
@@ -3349,15 +3355,15 @@ def finish(rec: dict, prdir: Path, work: Path, t0: float, runner=None) -> dict:
     # (--no-probes / baseline without claim probes) so the stamp stays honest.
     from poc import contree_sandboxes, hitl, run_progress
     contree_sandboxes.clear_session()
-    # Related bug reports are background for the advisory AI. They are attached before the swarm
-    # reads the record. The verdict above this function is already final and is not read back.
-    _attach_related_reports(rec, runner)
     # Requested comes from the settings (--swarm / POC_SWARM, and POC_HITL). Ran stays off when
     # that step never started: no model, probes skipped, or the approval step was not entered.
     swarm_requested = agents.swarm_enabled(bool(getattr(runner, "swarm", False)))
     ran_swarm = False
     if (swarm_requested and runner is not None and getattr(runner, "provider", None) is not None
             and not getattr(runner, "model_skipped", None)):
+        # Related bug reports are background for this advisory step only. The verdict above
+        # this function is already final. When the swarm is off, Tavily is not called.
+        _attach_related_reports(rec, runner)
         agents.run_swarm(runner.provider, rec)
         ran_swarm = True
     elif runner is not None and getattr(runner, "model_skipped", None) and "agents" not in rec:

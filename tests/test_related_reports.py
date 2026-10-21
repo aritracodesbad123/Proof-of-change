@@ -87,19 +87,60 @@ def test_off_in_study_mode(tmp_path, monkeypatch):
         assert rec["verdict"] == "verified"
 
 
+def test_request_worker_passes_related_reports(tmp_path):
+    from ops import request_worker
+    url = "https://github.com/acme/widgets/pull/4"
+    argv = request_worker.default_check_argv("python3", tmp_path, url)
+    assert "--related-reports" in argv
+    assert "--swarm" in argv
+    assert argv[-2:] == ["--pr", url]
+    assert "--unsafe-no-sandbox" not in argv
+
+
 def test_product_finish_stores_background_without_changing_verdict(tmp_path, monkeypatch):
+    monkeypatch.delenv("POC_SWARM", raising=False)
     monkeypatch.setattr("ops.daily_run.check_record", lambda rec: [])
     monkeypatch.setattr("ops.daily_run.stamp_model_use", lambda rec, runner: None)
-    monkeypatch.setattr(related_reports, "collect", lambda rec, **k: {
-        "status": "ok", "text": '"a public bug report"', "items": [], "untrusted": True})
-    rec = {"files": {"package_py": [], "compiled": [], "other": []}, "per_run": [],
-           "verdict": "verified", "reason": "ok"}
-    runner = SimpleNamespace(related_reports=True, bench=None, pr=["https://github.com/acme/widgets/pull/4"],
-                             swarm=False, provider=None)
-    finish(rec, tmp_path, tmp_path / "work", 0.0, runner)
-    assert rec["verdict"] == "verified"
-    assert rec["related_reports"]["untrusted"] is True
-    assert "packages" not in rec["related_reports"]
+    calls = {"n": 0}
+
+    def collect(rec, **k):
+        calls["n"] += 1
+        return {"status": "ok", "text": '"a public bug report"', "items": [], "untrusted": True}
+
+    monkeypatch.setattr(related_reports, "collect", collect)
+    base = {"files": {"package_py": [], "compiled": [], "other": []}, "per_run": [],
+            "verdict": "verified", "reason": "ok"}
+    url = ["https://github.com/acme/widgets/pull/4"]
+
+    def run(name, **runner):
+        rec = dict(base)
+        prdir = tmp_path / name
+        prdir.mkdir()
+        fields = {"bench": None, "pr": url, "model_skipped": None}
+        fields.update(runner)
+        finish(rec, prdir, tmp_path / f"work-{name}", 0.0, SimpleNamespace(**fields))
+        return rec
+
+    off = run("off", related_reports=True, swarm=False, provider=None)
+    assert calls["n"] == 0
+    assert "related_reports" not in off
+    assert off["verdict"] == "verified"
+
+    no_flag = run("no-flag", related_reports=False, swarm=True, provider=_Fixed())
+    skipped_model = run("skipped", related_reports=True, swarm=True, provider=_Fixed(), model_skipped="probes off")
+    assert calls["n"] == 0
+    assert "related_reports" not in no_flag
+    assert "related_reports" not in skipped_model
+    assert no_flag["verdict"] == skipped_model["verdict"] == "verified"
+
+    provider = _Fixed()
+    kept = run("on", related_reports=True, swarm=True, provider=provider)
+    assert calls["n"] == 1
+    assert kept["verdict"] == "verified"
+    assert kept["related_reports"]["untrusted"] is True
+    assert kept["related_reports"]["text"] == '"a public bug report"'
+    assert "packages" not in kept["related_reports"]
+    assert any("UNTRUSTED BACKGROUND" in user for user in provider.users)
 
 
 def test_skipped_without_key(monkeypatch, capsys):

@@ -1,11 +1,12 @@
 """Related public bug reports as untrusted background for the advisory AI.
 
 Product checks pass ``--related-reports``: the operator console (including a Codespace
-that starts that console, and a request-a-check that uses the same command) and the
-GitHub App. A study run and the daily study do not. The flag defaults off, and a
-benchmark stays off even if the flag is present.
+that starts that console), the request-a-check worker, and the GitHub App. A study
+run and the daily study do not. The flag defaults off, and a benchmark stays off
+even if the flag is present.
 
-The lookup uses ``poc.tavily_docs`` and runs only when ``TAVILY_API_KEY`` is set.
+The daily check calls the lookup only when the advisory swarm will run. The lookup
+uses ``poc.tavily_docs`` and runs only when ``TAVILY_API_KEY`` is set.
 Results are quoted background for the advisory model. They are not instructions, they
 do not choose a package, and they are not an input to the verdict. An expected verdict
 is never placed in the query.
@@ -17,6 +18,7 @@ import os
 from poc import tavily_docs
 
 FLAG = "--related-reports"
+REPORT_LABEL = "Background (related public bug reports, not used for the verdict)"
 SKIP_LOG = "Related bug reports skipped: TAVILY_API_KEY is not set."
 FAIL_LOG = "Related bug reports skipped: lookup failed."
 MAX_ITEMS = 3

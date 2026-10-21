@@ -234,6 +234,14 @@ def write_hosted_report(rec: dict, out_dir: Path | None = None) -> Path:
         f"<tr><td>{_esc(p.get('id'))}</td><td>{_esc(p.get('about'))}</td>"
         f"<td>{_esc(', '.join(p.get('labels') or []))}</td></tr>" for p in probes[:40])
     expl = (rec.get("explanation") or {}).get("text") or ""
+    from poc import related_reports
+    background = rec.get("related_reports") if isinstance(rec.get("related_reports"), dict) else None
+    background_text = str((background or {}).get("text") or "").strip()
+    background_html = ""
+    if background_text:
+        background_html = (
+            f"<h2>{_esc(related_reports.REPORT_LABEL)}</h2><p>{_esc(background_text)}</p>"
+        )
     html = f"""<!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Proof-of-Change {_esc(rid)}</title>
 <style>
@@ -255,6 +263,7 @@ sandbox {_esc(rec.get('sandbox_backend') or 'local')}</p>
 <h2>Summary</h2>
 <p>{_esc(expl) or '(no model summary)'}</p>
 <p class="meta">Agents: {_esc(json.dumps(agents.get('roles') or agents.get('status') or 'none'))}</p>
+{background_html}
 </body></html>"""
     path.write_text(html)
     return path
