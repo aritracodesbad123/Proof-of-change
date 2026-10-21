@@ -74,3 +74,20 @@ def test_failed_checkpoint_falls_back_only_when_bubblewrap_works(monkeypatch):
     a, rec = SimpleNamespace(sandbox_backend="contree"), {}
     assert daily_run._maybe_prepare_contree(a, "o/r", "a" * 40, "b" * 40, rec, 10) is None
     assert a.sandbox_backend == "local" and "using local bubblewrap" in rec["sandbox_backend_note"]
+
+
+def test_contree_never_falls_back_to_unsandboxed_local_code(monkeypatch):
+    from poc import contree_sandboxes
+    monkeypatch.setattr(daily_run.sandbox, "enabled", lambda: False)   # --unsafe-no-sandbox
+    assert daily_run.contree_only_wanted("contree") is True
+    monkeypatch.setattr(contree_sandboxes, "prepare_source_pair", _failing_prepare)
+    a, rec = SimpleNamespace(sandbox_backend="contree"), {}
+    assert "will not run pull-request code" in daily_run._maybe_prepare_contree(a, "o/r", "a" * 40, "b" * 40, rec, 10)
+
+
+def test_coverage_is_not_run_locally_in_contree_only_mode(tmp_path):
+    daily_run.set_contree_only(True)
+    log = tmp_path / "cov.log"
+    rc, _ = daily_run.run(["python", "-m", "coverage", "run", "-m", "pytest"], log, env={"PATH": "/usr/bin"},
+                          sbx=daily_run.side_sandbox(tmp_path / "venv-pr"))
+    assert rc == daily_run.LOCAL_REFUSED

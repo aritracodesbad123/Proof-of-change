@@ -1416,9 +1416,12 @@ def contree_only() -> bool:
 
 
 def contree_only_wanted(backend: str | None) -> bool:
-    """True when Contree was chosen and the local sandbox is on but cannot start (no local fallback)."""
-    if backend != "contree" or not sandbox.enabled():
+    """True when Contree was chosen and local PR code could not run inside bubblewrap: it cannot start here, or the
+    local sandbox was switched off. With Contree on, no pull-request code ever runs locally without a sandbox."""
+    if backend != "contree":
         return False
+    if not sandbox.enabled():
+        return True
     ok, _ = sandbox.check()
     return not ok
 HEAVY_RAM_PER_BUILD_GB = 8
@@ -2023,7 +2026,7 @@ def _maybe_prepare_contree(a, repo: str, main_sha: str, pr_sha: str, rec: dict, 
         return None
     except contree_sandboxes.ContreeError as e:
         contree_sandboxes.clear_session()
-        ok, _why = (True, "") if not sandbox.enabled() else sandbox.check()
+        ok, _why = (False, "local sandbox off") if not sandbox.enabled() else sandbox.check()
         if _CONTREE_ONLY or not ok:
             refusal = NO_SANDBOX_FALLBACK.format(why=e)
             rec["sandbox_backend"] = "contree"

@@ -22,3 +22,7 @@ Loosening the container's seccomp or AppArmor profile would widen what any code 
 - Keys are never passed into the pull-request code's environment.
 - The study stays on bubblewrap and is unchanged.
 - This has not been tested in a live Codespace. A human retest decides whether more is needed.
+
+## Supersedes
+
+This narrows two earlier Contree decisions. Coverage and installs no longer run locally when bubblewrap cannot start; they go into Contree or are not run. A Contree check that was started with the local sandbox switched off also never falls back to running pull-request code locally.
