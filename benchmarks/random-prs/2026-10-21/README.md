@@ -19,11 +19,15 @@ python3 draw.py pool.json
 ```
 This prints the same three PRs every time.
 
+## Results that count
+The official results are in `main-02a68ee/`, run on main `02a68eea38919fef2e1b537c3bf5a64bd7c771b5`. See `main-02a68ee/README.md` for the table. The `results/` folder below holds the earlier run on main `5492834`.
+
 ## Files
 - `pool.json`: the filters and all 61 eligible PRs.
 - `draw.py`: the draw script.
 - `drawn.json`: the three PRs drawn, with head and base commit SHAs at draw time.
-- `results/`: Proof-of-Change output for each PR drawn, one automatic and one human-review run each. Start with `results/SUMMARY.md`.
+- `main-02a68ee/`: the official reruns on main `02a68ee` (the ones that count).
+- `results/`: earlier Proof-of-Change output on main `5492834` for each PR drawn, one automatic and one human-review run each. Start with `results/SUMMARY.md`.
 - `ground_truth.json`: what the maintainers did later (merged, closed, reverted), to fill in afterwards.
 
 ## Known gap

@@ -1,0 +1,969 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-pahaz-sshtunnel-304-6ca35a37971a-2026-10-21-check-1951",
+ "date_ist": "2026-10-21 19:51 IST",
+ "run_date": "2026-10-21",
+ "who": "ops/daily_run.py",
+ "repo": "pahaz/sshtunnel",
+ "library": "sshtunnel",
+ "pr": {
+  "repo": "pahaz/sshtunnel",
+  "number": 304,
+  "url": "https://github.com/pahaz/sshtunnel/pull/304",
+  "title": "Migrate to PEP518",
+  "base_sha": "dc0732884379a19a21bf7a49650d0708519ec54f",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "6ca35a37971a3661c31c48e47270d4f778eac374",
+  "merge_commit": null,
+  "tested_main_sha": "dc0732884379a19a21bf7a49650d0708519ec54f",
+  "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+ },
+ "author": "nicolas-graves",
+ "base_ref": "master",
+ "updated_at_utc": "2026-10-21T08:54:50Z",
+ "updated_at_ist": "2026-10-21 14:24 IST",
+ "ci_state": "not checked (single-PR check)",
+ "ci_detail": "checked on request with --pr",
+ "tested_at_ist": "2026-10-21 19:51 IST",
+ "files": {
+  "all": [
+   "pyproject.toml",
+   "setup.cfg",
+   "setup.py"
+  ],
+  "package_py": [],
+  "compiled": [
+   "pyproject.toml",
+   "setup.py"
+  ],
+  "other": [
+   "setup.cfg"
+  ]
+ },
+ "machine_type": {
+  "arch": "x86_64",
+  "os": "Linux",
+  "platform": "Linux-6.12.94+-x86_64-with-glibc2.41",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": "g++ (Debian 14.2.0-19) 14.2.0",
+  "cpu_model": "Intel(R) Xeon(R) Processor",
+  "ram_gb": 15.6
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 0,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.15",
+ "test_selection": "mapped from touched files: ",
+ "per_run": [],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "local",
+ "sandbox_backend_note": "local bubblewrap",
+ "machine": "local",
+ "posted_upstream": false,
+ "logs": "sshtunnel-304/",
+ "freeze": {
+  "main": "freeze-main.txt",
+  "pr": "freeze-pr.txt"
+ },
+ "poc_commit": "02a68eea38919fef2e1b537c3bf5a64bd7c771b5",
+ "route": "source-pair",
+ "current_head_sha": "6ca35a37971a3661c31c48e47270d4f778eac374",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "state": "open",
+ "mergeable": false,
+ "mergeable_state": "dirty",
+ "product_check": true,
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": {
+   "ok": true,
+   "skipped": false,
+   "live_call": true,
+   "cached": false,
+   "queries": [
+    "sshtunnel python setup install instructions https://github.com/pahaz/sshtunnel site:github.com/pahaz/sshtunnel",
+    "sshtunnel python documentation install https://github.com/pahaz/sshtunnel site:github.com/pahaz/sshtunnel",
+    "sshtunnel python install requirements https://pypi.org/project/sshtunnel/ https://github.com/pahaz/sshtunnel site:pypi.org"
+   ],
+   "results": [
+    {
+     "title": "sshtunnel \u00b7 PyPI",
+     "url": "https://pypi.org/project/sshtunnel/",
+     "query": "sshtunnel python install requirements https://pypi.org/project/sshtunnel/ https://github.com/pahaz/sshtunnel site:pypi.org"
+    },
+    {
+     "title": "GitHub - pahaz/sshtunnel: SSH tunnels to remote server. \u00b7 GitHub",
+     "url": "https://github.com/pahaz/sshtunnel",
+     "query": "sshtunnel python setup install instructions https://github.com/pahaz/sshtunnel site:github.com/pahaz/sshtunnel"
+    },
+    {
+     "title": "sshtunnel/sshtunnel.py at master \u00b7 pahaz/sshtunnel \u00b7 GitHub",
+     "url": "https://github.com/pahaz/sshtunnel/blob/master/sshtunnel.py",
+     "query": "sshtunnel python setup install instructions https://github.com/pahaz/sshtunnel site:github.com/pahaz/sshtunnel"
+    },
+    {
+     "title": "psycopg2 conn.poll() hangs when used with sshtunnel \u00b7 Issue #135 \u00b7 pahaz/sshtunnel \u00b7 GitHub",
+     "url": "https://github.com/pahaz/sshtunnel/issues/135",
+     "query": "sshtunnel python setup install instructions https://github.com/pahaz/sshtunnel site:github.com/pahaz/sshtunnel"
+    }
+   ],
+   "text": "To install sshtunnel, you can use pip, easy_install, or conda. Simply run `pip install sshtunnel`, `easy_install sshtunnel`, or `conda install -c conda-forge sshtunnel`. For installing from source, clone the repository and run `python setup.py install`. The package version is 0.4.0.\nTo install the sshtunnel Python package, you can use pip, easy_install, or conda. The sources indicate that you can run `pip install sshtunnel`, `easy_install sshtunnel`, or `conda install -c conda-forge sshtunnel` to install it. For installing from source, clone the repository and run the necessary setup commands. The sshtunnel package version mentioned in the sources is 0.5.1.\nTo install the sshtunnel Python package, you can download the source distribution from PyPI. The latest version available is 0.0.7, which can be downloaded as sshtunnel-0.0.7.tar.gz. To install, you can use pip: `pip install sshtunnel-0.0.7.tar.gz`. The package supports Python 2 and 3, and includes various features such as SSH tunnel creation, remote bind address configuration, and local bind address configuration. The sshtunnel package is maintained on GitHub at https://github.com/pahaz/sshtunnel.\nTitle: sshtunnel \u00b7 PyPI\n\\*\\*Repo\\*\\*: https://github.com/pahaz/sshtunnel/. Inspired by https://github.com/jmagnusson/bgtunnel but it doesn't work on Windows. See also: https://github.com/paramiko/paramiko/blob/master/demos/forward.py. # Install #. # SSH tunnels to remote server #. Useful when you need to connect to local port on remote server throw ssh. It works by opening a port forwarding ssh connection in the. The connection(s) are closed when explicitly. calling the `close` method of the ret\n## Repository files navigation\n\nCircleCI AppVeyor Documentation Status coveralls version\n\npyversions license\n\nAuthor: Pahaz\n\nRepo: \n\nInspired by , which doesn't work on Windows.\n\nSee also: \n\n## Requirements\n\n paramiko\n\n### Installation\n\nsshtunnel is on PyPI, so simply run:\n\n```\npip install sshtunnel \n```\n\nor\n\n```\neasy_install sshtunnel \n```\n\nor\n\n```\nconda install -c conda-forge sshtunnel \n```\n\nto have it installed in your environment.\n\nFor installing from source, clone the repo and run: [...] ``\naddress\\_to\\_str(remote\\_address))\n\n)\n\nexcept IOError:\n\nself.\\_raise(\n\nBaseSSHTunnelForwarderError,\n\n\"Couldn't open tunnel {0} <> {1} might be in use or \"\n\n\"destination not reachable\".format(\n\naddress\\_to\\_str(local\\_bind\\_address),\n\naddress\\_to\\_str(remote\\_address)\n\n)\n\n)\n\ndef \\_\\_init\\_\\_(\n\nself,\n\nssh\\_address\\_or\\_host=None,\n\nssh\\_config\\_file=SSH\\_CONFIG\\_FILE,\n\nssh\\_host\\_key=None,\n\nssh\\_password=None,\n\nssh\\_pkey=None,\n\nssh\\_private\\_key\\_password=None,\n\nssh\\_proxy=None, [...] \\_StreamForwa\nimport psycopg2 import select import sys from sshtunnel import SSHTunnelForwarder, BaseSSHTunnelForwarderError import sshtunnel import logging import threading DATABASE_SERVER_IP = '127.0.0.1' DATABASE_SERVER_PORT = 5432 DATABASE_SERVER_USER_NAME = 'someuser' DATABASE_SERVER_PASSWORD = 'somepassword' DATABASE_NAME = 'main' SSH_SERVER_ADDRESS = ('165.22.66.44', 22) SSH_SERVER_USERNAME = 'root' ASYNC_OK = 1 ASYNC_READ_TIMEOUT = 2 ASYNC_WRITE_TIMEOUT = 3 ASYNC_TIMEOUT = 0.2 [...] [], []): return AS",
+   "errors": [],
+   "lines": [
+    "Looked up with Tavily: 4 results",
+    "Query: sshtunnel python setup install instructions https://github.com/pahaz/sshtunnel site:github.com/pahaz/sshtunnel",
+    "Query: sshtunnel python documentation install https://github.com/pahaz/sshtunnel site:github.com/pahaz/sshtunnel",
+    "Query: sshtunnel python install requirements https://pypi.org/project/sshtunnel/ https://github.com/pahaz/sshtunnel site:pypi.org",
+    "Source: sshtunnel \u00b7 PyPI \u2014 https://pypi.org/project/sshtunnel/",
+    "Source: GitHub - pahaz/sshtunnel: SSH tunnels to remote server. \u00b7 GitHub \u2014 https://github.com/pahaz/sshtunnel",
+    "Source: sshtunnel/sshtunnel.py at master \u00b7 pahaz/sshtunnel \u00b7 GitHub \u2014 https://github.com/pahaz/sshtunnel/blob/master/sshtunnel.py",
+    "Source: psycopg2 conn.poll() hangs when used with sshtunnel \u00b7 Issue #135 \u00b7 pahaz/sshtunnel \u00b7 GitHub \u2014 https://github.com/pahaz/sshtunnel/issues/135"
+   ]
+  },
+  "notes": [
+   "Setup check: GitHub token: present.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory 6.3 GB (of 15.6 GB).",
+   "Setup check: free disk 98.1 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: 4 results",
+   "Query: sshtunnel python setup install instructions https://github.com/pahaz/sshtunnel site:github.com/pahaz/sshtunnel",
+   "Query: sshtunnel python documentation install https://github.com/pahaz/sshtunnel site:github.com/pahaz/sshtunnel",
+   "Query: sshtunnel python install requirements https://pypi.org/project/sshtunnel/ https://github.com/pahaz/sshtunnel site:pypi.org",
+   "Source: sshtunnel \u00b7 PyPI \u2014 https://pypi.org/project/sshtunnel/",
+   "Source: GitHub - pahaz/sshtunnel: SSH tunnels to remote server. \u00b7 GitHub \u2014 https://github.com/pahaz/sshtunnel",
+   "Source: sshtunnel/sshtunnel.py at master \u00b7 pahaz/sshtunnel \u00b7 GitHub \u2014 https://github.com/pahaz/sshtunnel/blob/master/sshtunnel.py",
+   "Source: psycopg2 conn.poll() hangs when used with sshtunnel \u00b7 Issue #135 \u00b7 pahaz/sshtunnel \u00b7 GitHub \u2014 https://github.com/pahaz/sshtunnel/issues/135",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: paramiko is noted, installed with the project.",
+   "Setup plan: install docutils (listed in requirements.txt) on main and pr.",
+   "Setup plan: install sphinx (listed in requirements.txt) on main and pr.",
+   "Setup plan: install sphinxcontrib-napoleon (listed in requirements.txt) on main and pr.",
+   "Setup plan: install bashtest (listed in requirements-syntax.txt) on main and pr.",
+   "Setup plan: install check-manifest (listed in requirements-syntax.txt) on main and pr.",
+   "Setup plan: install flake8 (listed in requirements-syntax.txt) on main and pr.",
+   "Setup plan: install mccabe (listed in requirements-syntax.txt) on main and pr.",
+   "Setup plan: install pygments (listed in requirements-syntax.txt) on main and pr.",
+   "Setup plan: install readme (listed in requirements-syntax.txt) on main and pr.",
+   "Setup plan: install twine (listed in requirements-syntax.txt) on main and pr.",
+   "Setup plan: install coveralls (listed in requirements.txt) on main and pr.",
+   "Setup plan: install mock (listed in requirements.txt) on main and pr.",
+   "Setup plan: install pytest (listed in requirements.txt) on main and pr.",
+   "Setup plan: install pytest-cov (listed in requirements.txt) on main and pr.",
+   "Setup plan: install pytest-xdist (listed in requirements.txt) on main and pr.",
+   "Setup plan: install bleach<5.0.0 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install readme-renderer<25.0; python_version == '3.4' (listed in requirements.txt) on main and pr.",
+   "Setup plan: install importlib-metadata==1.7.0; python_version == '3.5' (listed in requirements.txt) on main and pr.",
+   "Setup plan: install tox>=1.8.1 (listed in the test extra) on main and pr.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >=2.7",
+   "Installed docutils 0.22.4 from requirements.txt (listed in requirements.txt) on main and pr.",
+   "Installed sphinx 9.1.1 from requirements.txt (listed in requirements.txt) on main and pr.",
+   "Installed sphinxcontrib-napoleon 0.7 from requirements.txt (listed in requirements.txt) on main and pr.",
+   "Installed bashtest 0.0.8 from requirements-syntax.txt (listed in requirements-syntax.txt) on main and pr.",
+   "Installed check-manifest 0.51 from requirements-syntax.txt (listed in requirements-syntax.txt) on main and pr.",
+   "Installed flake8 7.4.1 from requirements-syntax.txt (listed in requirements-syntax.txt) on main and pr.",
+   "Installed mccabe 0.7.0 from requirements-syntax.txt (listed in requirements-syntax.txt) on main and pr.",
+   "Installed pygments 2.21.0 from requirements-syntax.txt (listed in requirements-syntax.txt) on main and pr.",
+   "Installed readme 0.7.1 from requirements-syntax.txt (listed in requirements-syntax.txt) on main and pr.",
+   "Installed twine 7.0.0 from requirements-syntax.txt (listed in requirements-syntax.txt) on main and pr.",
+   "Installed coveralls 4.1.0 from requirements.txt (listed in requirements.txt) on main and pr.",
+   "Installed mock 5.2.0 from requirements.txt (listed in requirements.txt) on main and pr.",
+   "Installed pytest 9.1.1 from requirements.txt (listed in requirements.txt) on main and pr.",
+   "Installed pytest-cov 7.1.0 from requirements.txt (listed in requirements.txt) on main and pr.",
+   "Installed pytest-xdist 3.8.0 from requirements.txt (listed in requirements.txt) on main and pr.",
+   "Installed bleach 4.1.0 from requirements.txt (listed in requirements.txt) on main and pr.",
+   "Installed readme-renderer 46.0 from requirements.txt (listed in requirements.txt) on main and pr.",
+   "Installed importlib-metadata  from requirements.txt (listed in requirements.txt) on main and pr.",
+   "Installed tox 4.67.1 from pyproject (listed in the test extra) on main and pr."
+  ],
+  "setup_plan": {
+   "packages": [
+    {
+     "requirement": "paramiko>=2.7.2",
+     "name": "paramiko",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "setup.py",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "docutils",
+     "name": "docutils",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "sphinx",
+     "name": "sphinx",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "sphinxcontrib-napoleon",
+     "name": "sphinxcontrib-napoleon",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "bashtest",
+     "name": "bashtest",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements-syntax.txt",
+     "reason": "listed in requirements-syntax.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "check-manifest",
+     "name": "check-manifest",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements-syntax.txt",
+     "reason": "listed in requirements-syntax.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "flake8",
+     "name": "flake8",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements-syntax.txt",
+     "reason": "listed in requirements-syntax.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "mccabe",
+     "name": "mccabe",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements-syntax.txt",
+     "reason": "listed in requirements-syntax.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pygments",
+     "name": "pygments",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements-syntax.txt",
+     "reason": "listed in requirements-syntax.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "readme",
+     "name": "readme",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements-syntax.txt",
+     "reason": "listed in requirements-syntax.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "twine",
+     "name": "twine",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements-syntax.txt",
+     "reason": "listed in requirements-syntax.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "coveralls",
+     "name": "coveralls",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "mock",
+     "name": "mock",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest",
+     "name": "pytest",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest-cov",
+     "name": "pytest-cov",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest-xdist",
+     "name": "pytest-xdist",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "bleach<5.0.0",
+     "name": "bleach",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "readme-renderer<25.0; python_version == '3.4'",
+     "name": "readme-renderer",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "importlib-metadata==1.7.0; python_version == '3.5'",
+     "name": "importlib-metadata",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "tox>=1.8.1",
+     "name": "tox",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the test extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    }
+   ],
+   "extra_reqs": [
+    "docutils",
+    "sphinx",
+    "sphinxcontrib-napoleon",
+    "bashtest",
+    "check-manifest",
+    "flake8",
+    "mccabe",
+    "pygments",
+    "readme",
+    "twine",
+    "coveralls",
+    "mock",
+    "pytest",
+    "pytest-cov",
+    "pytest-xdist",
+    "bleach<5.0.0",
+    "readme-renderer<25.0; python_version == '3.4'",
+    "importlib-metadata==1.7.0; python_version == '3.5'",
+    "tox>=1.8.1"
+   ],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >=2.7"
+   },
+   "system": [],
+   "refused": []
+  },
+  "installs": [
+   {
+    "package": "docutils",
+    "requirement": "docutils",
+    "version": "0.22.4",
+    "versions": {
+     "main": "0.22.4",
+     "pr": "0.22.4"
+    },
+    "source": "requirements.txt",
+    "reason": "listed in requirements.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "sphinx",
+    "requirement": "sphinx",
+    "version": "9.1.1",
+    "versions": {
+     "main": "9.1.1",
+     "pr": "9.1.1"
+    },
+    "source": "requirements.txt",
+    "reason": "listed in requirements.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "sphinxcontrib-napoleon",
+    "requirement": "sphinxcontrib-napoleon",
+    "version": "0.7",
+    "versions": {
+     "main": "0.7",
+     "pr": "0.7"
+    },
+    "source": "requirements.txt",
+    "reason": "listed in requirements.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "bashtest",
+    "requirement": "bashtest",
+    "version": "0.0.8",
+    "versions": {
+     "main": "0.0.8",
+     "pr": "0.0.8"
+    },
+    "source": "requirements-syntax.txt",
+    "reason": "listed in requirements-syntax.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "check-manifest",
+    "requirement": "check-manifest",
+    "version": "0.51",
+    "versions": {
+     "main": "0.51",
+     "pr": "0.51"
+    },
+    "source": "requirements-syntax.txt",
+    "reason": "listed in requirements-syntax.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "flake8",
+    "requirement": "flake8",
+    "version": "7.4.1",
+    "versions": {
+     "main": "7.4.1",
+     "pr": "7.4.1"
+    },
+    "source": "requirements-syntax.txt",
+    "reason": "listed in requirements-syntax.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "mccabe",
+    "requirement": "mccabe",
+    "version": "0.7.0",
+    "versions": {
+     "main": "0.7.0",
+     "pr": "0.7.0"
+    },
+    "source": "requirements-syntax.txt",
+    "reason": "listed in requirements-syntax.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "pygments",
+    "requirement": "pygments",
+    "version": "2.21.0",
+    "versions": {
+     "main": "2.21.0",
+     "pr": "2.21.0"
+    },
+    "source": "requirements-syntax.txt",
+    "reason": "listed in requirements-syntax.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "readme",
+    "requirement": "readme",
+    "version": "0.7.1",
+    "versions": {
+     "main": "0.7.1",
+     "pr": "0.7.1"
+    },
+    "source": "requirements-syntax.txt",
+    "reason": "listed in requirements-syntax.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "twine",
+    "requirement": "twine",
+    "version": "7.0.0",
+    "versions": {
+     "main": "7.0.0",
+     "pr": "7.0.0"
+    },
+    "source": "requirements-syntax.txt",
+    "reason": "listed in requirements-syntax.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "coveralls",
+    "requirement": "coveralls",
+    "version": "4.1.0",
+    "versions": {
+     "main": "4.1.0",
+     "pr": "4.1.0"
+    },
+    "source": "requirements.txt",
+    "reason": "listed in requirements.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "mock",
+    "requirement": "mock",
+    "version": "5.2.0",
+    "versions": {
+     "main": "5.2.0",
+     "pr": "5.2.0"
+    },
+    "source": "requirements.txt",
+    "reason": "listed in requirements.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "pytest",
+    "requirement": "pytest",
+    "version": "9.1.1",
+    "versions": {
+     "main": "9.1.1",
+     "pr": "9.1.1"
+    },
+    "source": "requirements.txt",
+    "reason": "listed in requirements.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "pytest-cov",
+    "requirement": "pytest-cov",
+    "version": "7.1.0",
+    "versions": {
+     "main": "7.1.0",
+     "pr": "7.1.0"
+    },
+    "source": "requirements.txt",
+    "reason": "listed in requirements.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "pytest-xdist",
+    "requirement": "pytest-xdist",
+    "version": "3.8.0",
+    "versions": {
+     "main": "3.8.0",
+     "pr": "3.8.0"
+    },
+    "source": "requirements.txt",
+    "reason": "listed in requirements.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "bleach",
+    "requirement": "bleach<5.0.0",
+    "version": "4.1.0",
+    "versions": {
+     "main": "4.1.0",
+     "pr": "4.1.0"
+    },
+    "source": "requirements.txt",
+    "reason": "listed in requirements.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "readme-renderer",
+    "requirement": "readme-renderer<25.0; python_version == '3.4'",
+    "version": "46.0",
+    "versions": {
+     "main": "46.0",
+     "pr": "46.0"
+    },
+    "source": "requirements.txt",
+    "reason": "listed in requirements.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "importlib-metadata",
+    "requirement": "importlib-metadata==1.7.0; python_version == '3.5'",
+    "version": "",
+    "versions": {
+     "main": "",
+     "pr": ""
+    },
+    "source": "requirements.txt",
+    "reason": "listed in requirements.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "tox",
+    "requirement": "tox>=1.8.1",
+    "version": "4.67.1",
+    "versions": {
+     "main": "4.67.1",
+     "pr": "4.67.1"
+    },
+    "source": "pyproject",
+    "reason": "listed in the test extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   }
+  ]
+ },
+ "chosen": {
+  "pr": 304,
+  "head_sha": null,
+  "install": null,
+  "test_cmd": null
+ },
+ "sides": {
+  "comparison_basis": "merge-base vs PR head (PR conflicts with base)",
+  "main_sha": "dc0732884379a19a21bf7a49650d0708519ec54f",
+  "pr_sha": "6ca35a37971a3661c31c48e47270d4f778eac374"
+ },
+ "tested": {
+  "main": "master @ dc0732884379 (merge-base with the PR head)",
+  "pr": "PR head 6ca35a37971a"
+ },
+ "probe_plan": {
+  "baseline": "full",
+  "model": "model provider: nebius (Token Factory, live)",
+  "errors": [],
+  "model_claims": [],
+  "model_rejected_claims": [],
+  "diff_targets": [],
+  "frozen": []
+ },
+ "test_extras": [],
+ "pr_side_started_at": "2026-10-21T14:22:05.660304+00:00",
+ "test_targets": {
+  "main": [],
+  "pr": []
+ },
+ "installed_commit": {
+  "main": {
+   "dist": "sshtunnel",
+   "expected": "dc0732884379a19a21bf7a49650d0708519ec54f",
+   "installed": "dc0732884379a19a21bf7a49650d0708519ec54f",
+   "ok": true
+  },
+  "pr": {
+   "dist": "sshtunnel",
+   "expected": "6ca35a37971a3661c31c48e47270d4f778eac374",
+   "installed": "6ca35a37971a3661c31c48e47270d4f778eac374",
+   "ok": true
+  }
+ },
+ "probes": {
+  "status": "none",
+  "items": []
+ },
+ "probe_changed_line_coverage": {
+  "status": "no probes",
+  "probes": {}
+ },
+ "verdict": "could_not_verify",
+ "reason": "no tests could be mapped to the touched files",
+ "verdict_before_coverage_gate": "could_not_verify",
+ "reason_before_coverage_gate": "no tests could be mapped to the touched files",
+ "changed_lines_total": null,
+ "changed_lines_covered": null,
+ "coverage_gate": {
+  "kind": "no-executable-change",
+  "changed": false,
+  "confidence": "normal",
+  "note": "no executable code changed (docs, tests or config only), so there was nothing to cover",
+  "measurement": "not needed"
+ },
+ "related_reports": {
+  "status": "ok",
+  "text": "1. \"Issues \u00b7 pahaz/sshtunnel \u00b7 GitHub\"\n   https://github.com/pahaz/sshtunnel/issues\n   \"pahaz/sshtunnel#294 \u00b7 opened on Nov 6, 2024 ### Transfer the local port to remote server pahaz/sshtunnel#293 \u00b7 opened on Oct 29, 2024 ### Using sshtunnel on Mac? pahaz/sshtunnel#290 \u00b7 opened on Mar 20, 2024 1 ### SSH Tunnel Connection Drop...\"\n2. \"Welcome to sshtunnel\u2019s documentation! \u2014 sshtunnel 0.4.0 documentation\"\n   https://sshtunnel.readthedocs.io\n   \"v.0.0.4.1 (Pahaz) : + fix CLI issues #13 (Pahaz) v.0.0.4 (Pahaz) : + daemon mode by default for all threads (JM Fern\u00e1ndez, Pahaz) - incompatible + move `make_ssh_forward_server` to `SSHTunnelForwarder.make_ssh_forward_server` (Pahaz, JM Fer...\"\n3. \"python-sshtunnel(1) \u2014 Arch manual pages\"\n   https://man.archlinux.org/man/python-sshtunnel.1.en\n   \"daemon mode by default for all threads (JM Fern\u00e1ndez , Pahaz ) - incompatible move make\\_ssh\\_forward\\_s...",
+  "items": [
+   {
+    "title": "Issues \u00b7 pahaz/sshtunnel \u00b7 GitHub",
+    "url": "https://github.com/pahaz/sshtunnel/issues",
+    "content": "pahaz/sshtunnel#294 \u00b7 opened on Nov 6, 2024 ### Transfer the local port to remote server pahaz/sshtunnel#293 \u00b7 opened on Oct 29, 2024 ### Using sshtunnel on Mac? pahaz/sshtunnel#290 \u00b7 opened on Mar 20, 2024 1 ### SSH Tunnel Connection Drop..."
+   },
+   {
+    "title": "Welcome to sshtunnel\u2019s documentation! \u2014 sshtunnel 0.4.0 documentation",
+    "url": "https://sshtunnel.readthedocs.io",
+    "content": "v.0.0.4.1 (Pahaz) : + fix CLI issues #13 (Pahaz) v.0.0.4 (Pahaz) : + daemon mode by default for all threads (JM Fern\u00e1ndez, Pahaz) - incompatible + move `make_ssh_forward_server` to `SSHTunnelForwarder.make_ssh_forward_server` (Pahaz, JM Fer..."
+   },
+   {
+    "title": "python-sshtunnel(1) \u2014 Arch manual pages",
+    "url": "https://man.archlinux.org/man/python-sshtunnel.1.en",
+    "content": "daemon mode by default for all threads (JM Fern\u00e1ndez , Pahaz ) - incompatible move make\\_ssh\\_forward\\_server to SSHTunnelForwarder.make\\_ssh\\_forward\\_server (Pahaz , JM Fern\u00e1ndez ) - incompatible move make\\_ssh\\_forward\\_handler to SSHTun..."
+   }
+  ],
+  "query": "pahaz/sshtunnel Migrate to PEP518 bug report issue",
+  "untrusted": true
+ },
+ "explanation": {
+  "status": "wired",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "text": "The PR titled \"Migrate to PEP518\" resulted in a verdict of \"could_not_verify\" because no tests could be mapped to the touched files; the baseline used was \"full\".",
+  "quotes": [
+   "Migrate to PEP518",
+   "could_not_verify",
+   "no tests could be mapped to the touched files",
+   "full"
+  ],
+  "advisory": true
+ },
+ "agents": {
+  "status": "ran",
+  "advisory": true,
+  "note": "judge/helper/summary are advisory; code owns the verdict",
+  "roles": [
+   {
+    "role": "judge",
+    "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+    "status": "ok",
+    "note": null,
+    "labels": []
+   },
+   {
+    "role": "helper",
+    "model": "nvidia/Nemotron-3_5-Lightning",
+    "status": "ok",
+    "note": null,
+    "notes": [
+     "Ignore README changes if pyproject.toml is untouched",
+     "Ignore whitespace-only changes in pyproject.toml [build-system]",
+     "Install build backend: pip install build wheel for local PEP518 verification",
+     "Skip test mapping for files outside pyproject.toml and setup.py",
+     "Ignore .gitignore LICENSE CHANGELOG diffs when only pyproject.toml changes"
+    ]
+   },
+   {
+    "role": "summary",
+    "model": "nvidia/nemotron-3-super-120b-a12b",
+    "status": "ok",
+    "note": null
+   }
+  ],
+  "provider": {
+   "provider": "nebius",
+   "models": {
+    "claims": "nvidia/nemotron-3-super-120b-a12b",
+    "probes": "nvidia/nemotron-3-super-120b-a12b",
+    "judge": "nvidia/Nemotron-3-Ultra-550b-a55b",
+    "helper": "nvidia/Nemotron-3_5-Lightning",
+    "summary": "nvidia/nemotron-3-super-120b-a12b"
+   },
+   "blind": true
+  }
+ },
+ "swarm_requested": true,
+ "operator_approval_requested": true,
+ "swarm": "on",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [],
+  "compiled_files": [
+   "pyproject.toml",
+   "setup.py"
+  ],
+  "other_files": [
+   "setup.cfg"
+  ]
+ },
+ "duration_s": {
+  "total_wall": 59.7,
+  "tests": 0
+ },
+ "cost": {
+  "ai_calls": 1,
+  "failed_ai_calls": 0,
+  "input_tokens": 129,
+  "output_tokens": 201,
+  "thinking_tokens": 193,
+  "cost_usd": 0.00022,
+  "calls_without_usage": 0,
+  "ai_cost_usd": 0.00022,
+  "cost_complete": true,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 59.7,
+   "tests": 0
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.00398,
+  "total_cost_usd": 0.0042,
+  "swarm": {
+   "ai_calls": 3,
+   "failed_ai_calls": 0,
+   "input_tokens": 479,
+   "output_tokens": 303,
+   "thinking_tokens": 207,
+   "cost_usd": 0.000416,
+   "calls_without_usage": 2,
+   "ai_cost_usd": 0.000416,
+   "cost_complete": false,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ }
+}
