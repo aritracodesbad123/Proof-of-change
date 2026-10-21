@@ -11,7 +11,7 @@ A check a person starts in the operator console now follows this flow by default
 2. **Human review:** the person keeps or drops each drafted probe and can add up to 20 of their own test ideas. Nothing runs until they continue.
 3. The approved probes and the project tests run, and the code publishes the verdict.
 
-The review box on the start form is ticked by default, and the API treats a console check that does not say otherwise as review on. The person can untick it to skip the review for that one check. The default lives in the console's own per-check settings. No machine-wide environment variable turns it on or off, so `POC_CONSOLE_APPROVAL` no longer has any effect.
+The review option on the start form is ticked by default, and the API treats a console check that does not say otherwise as review on. The person can untick it to skip the review for that one check. The default lives in the console's own per-check settings. No machine-wide environment variable turns it on or off, so `POC_CONSOLE_APPROVAL` no longer has any effect.
 
 The process chart and the timeline show **Human review** as its own step between the AI probes and running them. It shows as skipped when a check did not use it.
 
@@ -35,4 +35,4 @@ Turning review on with an environment variable would affect every route on that 
 
 ## What it means for you
 
-When you run a check in the console, it stops after the AI drafts probes and asks you to review them. Untick the box before you start if you want it to run straight through.
+When you run a check in the console, it stops after the AI drafts probes and asks you to review them. Untick the review option before you start if you want it to run straight through.
