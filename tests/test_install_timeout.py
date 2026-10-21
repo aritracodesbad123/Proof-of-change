@@ -22,6 +22,9 @@ def test_run_kills_whole_tree_at_limit(tmp_path):
     assert [p for p in map(int, pf.read_text().split()) if _alive(p)] == []
     assert "TIMEOUT after 2s" in (tmp_path / "log").read_text()
 
+def test_descendants_without_proc(monkeypatch, tmp_path):
+    monkeypatch.setattr(d, "_PROC", str(tmp_path / "missing")); assert d._descendants(1) == []
+
 def test_install_side_records_timed_out(tmp_path, monkeypatch):
     monkeypatch.setattr(d, "run", lambda *a, **k: ("timeout", 2.0))
     venv, src = tmp_path / "venv-main", tmp_path / "side-main"; src.mkdir()
