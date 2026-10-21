@@ -27,7 +27,7 @@ import time
 import uuid
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from typing import Any
+from typing import Any, NamedTuple
 from urllib.parse import parse_qs, unquote, urlparse
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -98,21 +98,20 @@ def _unsafe_opt_in() -> bool:
     return (os.environ.get("POC_UNSAFE_NO_SANDBOX") or "").strip().lower() in ("1", "true", "yes")
 
 
-def blocks_unsandboxed_run(flags: list[str], note: str | None) -> str | None:
-    """The refusal text when these flags would run pull-request code with no sandbox.
+class ConsoleRunPlan(NamedTuple):
+    """How one console check should start.
 
-    ``--unsafe-no-sandbox`` is the explicit opt-in. ``--sandbox-backend`` selects Contree.
-    An empty flag list means local bubblewrap, which is fine only when the note does not
-    say the sandbox is missing.
+    ``refused`` is the decision. Do not infer it by searching the note text.
+    ``warning`` is the visible opt-in warning, separate from the status note.
     """
-    if "--unsafe-no-sandbox" in flags or "--sandbox-backend" in flags:
-        return None
-    if note and "will not run pull-request code" in note:
-        return note
-    return None
+
+    flags: list[str]
+    note: str | None
+    refused: bool
+    warning: str | None
 
 
-def console_run_flags() -> tuple[list[str], str | None]:
+def console_run_flags() -> ConsoleRunPlan:
     """Extra daily_run flags for the operator console.
 
     Prefer Contree when it can actually run. Otherwise bubblewrap is the sandbox.
@@ -122,10 +121,13 @@ def console_run_flags() -> tuple[list[str], str | None]:
     force = _unsafe_opt_in()
     if contree_usable():
         if force:
-            return ["--sandbox-backend", "contree", "--unsafe-no-sandbox"], (
-                "using Contree sandboxes. " + _UNSAFE_WARNING
+            return ConsoleRunPlan(
+                ["--sandbox-backend", "contree", "--unsafe-no-sandbox"],
+                "using Contree sandboxes",
+                False,
+                _UNSAFE_WARNING,
             )
-        return ["--sandbox-backend", "contree"], "using Contree sandboxes"
+        return ConsoleRunPlan(["--sandbox-backend", "contree"], "using Contree sandboxes", False, None)
     ok = False
     why = "sandbox check skipped"
     try:
@@ -134,14 +136,19 @@ def console_run_flags() -> tuple[list[str], str | None]:
     except Exception as e:  # noqa: BLE001
         ok, why = False, f"{type(e).__name__}: {e}"
     if ok and not force:
-        return [], None
+        return ConsoleRunPlan([], None, False, None)
     if force:
-        return ["--unsafe-no-sandbox"], f"{_UNSAFE_WARNING} ({why})"
-    return [], (
-        f"sandbox unavailable ({why}). "
-        "Proof-of-Change will not run pull-request code without a sandbox. "
-        "Install bubblewrap, or set up Contree (a Nebius key, a project id, and contree-sdk). "
-        "Setting POC_UNSAFE_NO_SANDBOX=1 runs the code unsandboxed and shows a warning."
+        return ConsoleRunPlan(["--unsafe-no-sandbox"], None, False, f"{_UNSAFE_WARNING} ({why})")
+    return ConsoleRunPlan(
+        [],
+        (
+            f"sandbox unavailable ({why}). "
+            "Proof-of-Change will not run pull-request code without a sandbox. "
+            "Install bubblewrap, or set up Contree (a Nebius key, a project id, and contree-sdk). "
+            "Setting POC_UNSAFE_NO_SANDBOX=1 runs the code unsandboxed and shows a warning."
+        ),
+        True,
+        None,
     )
 
 
@@ -559,14 +566,14 @@ def start_check(pr_url: str, *, model_provider: str = "nebius", owner: str | Non
     if blocked:
         raise ValueError(blocked)
     playback = spaces_host.playback_only(pr_url, model_provider)
-    flags, run_note = console_run_flags()
+    plan = console_run_flags()
     if playback:
         # Playback reads a saved sample. It does not clone or run pull-request code.
-        flags, run_note = [], spaces_host.SPACES_MESSAGE
+        flags, run_note, refused, warning = [], spaces_host.PLAYBACK_MESSAGE, False, None
     else:
-        refused = blocks_unsandboxed_run(flags, run_note)
+        flags, run_note, refused, warning = plan.flags, plan.note, plan.refused, plan.warning
         if refused:
-            raise ValueError(refused)
+            raise ValueError(run_note or "Proof-of-Change will not run pull-request code without a sandbox.")
     job_id = uuid.uuid4().hex[:12]
     # Tests retarget REPO_ROOT. POC_OPS_RUNS (a Space home directory) wins when it is set.
     if (os.environ.get("POC_OPS_RUNS") or "").strip():
@@ -596,7 +603,8 @@ def start_check(pr_url: str, *, model_provider: str = "nebius", owner: str | Non
         "finished_at": None,
         "exit": None,
         "error": None,
-        "warning": None,
+        "warning": warning,
+        "refused": refused,
         "run_id": None,
         "log_tail": "",
         "progress_path": str(progress_path),
@@ -663,21 +671,18 @@ def start_check(pr_url: str, *, model_provider: str = "nebius", owner: str | Non
                     job["finished_at"] = time.time()
             return
         rp.emit("fetch_pr", detail="loading pull request")
-        flags, note = job.get("run_flags") or [], job.get("run_note")
-        if flags is None:
-            flags, note = console_run_flags()
-        if note:
-            with _jobs_lock:
-                job["run_note"] = note
-                job["warning"] = note if note and "unsafe" in note.lower() else job.get("warning")
-            rp.emit("fetch_pr", detail=note[:200])
-        refused = blocks_unsandboxed_run(list(flags), note)
-        if refused:
+        flags = list(job.get("run_flags") or [])
+        note = job.get("run_note")
+        notice = job.get("warning") or note
+        if notice:
+            rp.emit("fetch_pr", detail=str(notice)[:200])
+        if job.get("refused"):
+            message = str(note or "Proof-of-Change will not run pull-request code without a sandbox.")
             with _jobs_lock:
                 job["status"] = "failed"
-                job["error"] = refused
+                job["error"] = message
                 job["finished_at"] = time.time()
-            rp.emit("failed", detail=refused[:200])
+            rp.emit("failed", detail=message[:200])
             return
         child_flags = list(flags)
         child_flags.extend(recorded_demo_flags(model_provider))
@@ -866,12 +871,15 @@ class Handler(BaseHTTPRequestHandler):
             return
 
         if path == "/api/health":
-            flags, note = console_run_flags()
+            plan = console_run_flags()
+            flags, note, warning = list(plan.flags), plan.note, plan.warning
+            refused = plan.refused
             from poc import spaces_host
             spaces_note = spaces_host.health_note()
             if spaces_note:
                 note = spaces_note
                 flags = []
+                warning = None
             chrome = None
             try:
                 from reports.reviewer import find_chrome
@@ -890,6 +898,8 @@ class Handler(BaseHTTPRequestHandler):
                 "contree_ready": contree_usable(),
                 "run_flags": flags,
                 "run_note": note,
+                "warning": warning,
+                "refused": refused,
             })
         if path.startswith("/api"):
             account = self._viewer()

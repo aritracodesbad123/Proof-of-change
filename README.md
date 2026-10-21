@@ -314,7 +314,7 @@ Your browser opens the summary page. Click **HTML** (or **PDF**) next to the PR 
 
 Web console (NVIDIA-themed React UI + local API): paste a GitHub PR link, watch the **pipeline stages** and the **Nemotron swarm** (Ultra · Lightning · Super) light up for that PR, then open the verdict and behavior map.
 
-**No API key?** Use **Try sample (mlxtend#1229, prerecorded)** — the UI labels it as a fixture (not blind). Live Nebius runs show a separate **Live Nebius / Nemotron** badge. If the host has no sandbox, the console refuses the check. Setting `POC_UNSAFE_NO_SANDBOX=1` is the only way to run unsandboxed, and that choice appears as a warning banner from `/api/health`. The vetted sample playback, which does not run pull-request code, still finishes.
+**No API key?** Use **Try sample (mlxtend#1229, prerecorded)** — the UI labels it as a fixture (not blind). Live Nebius runs show a separate **Live Nebius / Nemotron** badge. If the host has no sandbox, the console refuses to run pull-request code. On any such host, that same vetted sample still plays back, and the playback does not run pull-request code. Setting `POC_UNSAFE_NO_SANDBOX=1` is the only way to run unsandboxed, and that choice appears as a warning banner from `/api/health`.
 
 ```bash
 make console-api    # terminal 1 — http://127.0.0.1:8787

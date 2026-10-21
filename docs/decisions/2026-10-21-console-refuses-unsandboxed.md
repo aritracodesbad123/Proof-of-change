@@ -7,9 +7,9 @@
 
 The operator console no longer starts a check with `--unsafe-no-sandbox` just because bubblewrap cannot start and Contree is not available. Bubblewrap is the local sandbox that keeps untrusted code away from the machine's files and network. Contree is a remote sandbox. `--unsafe-no-sandbox` turns that protection off.
 
-The console now stops the check and says it will not run pull-request code. The only way to allow an unsandboxed run is to set the environment variable `POC_UNSAFE_NO_SANDBOX` to `1`. When that is set, the console still shows a warning on the health banner and on the check.
+The console now stops the check and says it will not run pull-request code. That decision is a flag on the run plan, not a phrase matched in the message. The only way to allow an unsandboxed run is to set the environment variable `POC_UNSAFE_NO_SANDBOX` to `1`. When that is set, the plan carries a separate warning, and the console shows it on the health banner and on the check.
 
-A playback of the vetted sample, which does not execute pull-request code, still runs on a host that has no sandbox.
+A playback of the vetted sample, which does not execute pull-request code, still runs on any host that has no sandbox. It is not limited to a Hugging Face Space.
 
 Choosing Contree no longer also passes `--unsafe-no-sandbox`. That extra flag used to keep a local fallback alive if a remote sandbox failed. The fallback is now off unless `POC_UNSAFE_NO_SANDBOX=1` is set.
 
@@ -23,7 +23,7 @@ Pull-request code is untrusted. Running it without a sandbox can expose files, k
 2. If bubblewrap can start, the console uses it and adds no extra flag.
 3. If neither can start, the console refuses. It does not launch the check.
 4. `POC_UNSAFE_NO_SANDBOX=1` (also `true` or `yes`) is the only opt-in. The console then passes `--unsafe-no-sandbox` and shows a warning that names the variable.
-5. The vetted sample playback, which does not run pull-request code, is unchanged.
+5. When bubblewrap and Contree are both unavailable, the vetted recorded sample (mlxtend pull 1229) plays back on any host. That playback does not run pull-request code. Any other check is refused.
 
 ## Alternatives and tradeoffs
 

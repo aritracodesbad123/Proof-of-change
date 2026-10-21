@@ -154,7 +154,7 @@ export default function App() {
       const health = await api.health()
       setApiOk(health.ok)
       setContreeReady(Boolean(health.contree_ready))
-      setHealthNote(health.run_note || null)
+      setHealthNote(health.warning || health.run_note || null)
       const remote = (await api.runs()).runs
       setRuns(mergeRunLists(remote, loadLocalRuns(account?.id || null)))
       setErr(null)
@@ -533,9 +533,14 @@ export default function App() {
               {jobBadge ? <span className={jobBadge.className}>{jobBadge.label}</span> : null}
             </p>
             <h1>{job.model_provider === 'recorded' ? 'Prerecorded check' : job.model_provider === 'none' ? 'Check (AI off)' : 'Live check'}</h1>
-            {(job.run_note || job.warning) && !job.error ? (
+            {job.warning && !job.error ? (
               <p className="banner warn" role="status">
-                {job.run_note || job.warning}
+                {job.warning}
+              </p>
+            ) : null}
+            {job.run_note && job.run_note !== job.warning && !job.error ? (
+              <p className="banner warn" role="status">
+                {job.run_note}
               </p>
             ) : null}
             <ProcessDag events={job.stages} record={job.record} log={job.log_tail} />
