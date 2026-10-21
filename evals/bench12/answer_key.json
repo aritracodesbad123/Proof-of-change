@@ -1,0 +1,215 @@
+{
+ "about": "Frozen expected verdicts. Read only by evals/bench12/score.py; never passed to a run.",
+ "answers": [
+  {
+   "case": "S01",
+   "baseline": "full",
+   "route": "single",
+   "expected": "verified"
+  },
+  {
+   "case": "S01",
+   "baseline": "tests",
+   "route": "single",
+   "expected": "verified"
+  },
+  {
+   "case": "S01b",
+   "baseline": "full",
+   "route": "single",
+   "expected": "could_not_verify"
+  },
+  {
+   "case": "S01b",
+   "baseline": "tests",
+   "route": "single",
+   "expected": "verified"
+  },
+  {
+   "case": "S02",
+   "baseline": "full",
+   "route": "single",
+   "expected": "needs_attention"
+  },
+  {
+   "case": "S02",
+   "baseline": "tests",
+   "route": "single",
+   "expected": "needs_attention"
+  },
+  {
+   "case": "S03",
+   "baseline": "full",
+   "route": "single",
+   "expected": "could_not_verify"
+  },
+  {
+   "case": "S03",
+   "baseline": "tests",
+   "route": "single",
+   "expected": "could_not_verify"
+  },
+  {
+   "case": "S04",
+   "baseline": "full",
+   "route": "single",
+   "expected": "no_code_change"
+  },
+  {
+   "case": "S04",
+   "baseline": "tests",
+   "route": "single",
+   "expected": "no_code_change"
+  },
+  {
+   "case": "S05",
+   "baseline": "full",
+   "route": "single",
+   "expected": "verified"
+  },
+  {
+   "case": "S05",
+   "baseline": "tests",
+   "route": "single",
+   "expected": "verified"
+  },
+  {
+   "case": "S06",
+   "baseline": "full",
+   "route": "single",
+   "expected": "needs_attention"
+  },
+  {
+   "case": "S06",
+   "baseline": "tests",
+   "route": "single",
+   "expected": "needs_attention"
+  },
+  {
+   "case": "S07",
+   "baseline": "full",
+   "route": "single",
+   "expected": "could_not_verify"
+  },
+  {
+   "case": "S07",
+   "baseline": "tests",
+   "route": "single",
+   "expected": "could_not_verify"
+  },
+  {
+   "case": "S08",
+   "baseline": "full",
+   "route": "single",
+   "expected": "could_not_verify"
+  },
+  {
+   "case": "S08",
+   "baseline": "tests",
+   "route": "single",
+   "expected": "verified"
+  },
+  {
+   "case": "S08b",
+   "baseline": "full",
+   "route": "single",
+   "expected": "needs_attention"
+  },
+  {
+   "case": "S08b",
+   "baseline": "tests",
+   "route": "single",
+   "expected": "verified"
+  },
+  {
+   "case": "S09",
+   "baseline": "full",
+   "route": "single",
+   "expected": "needs_attention"
+  },
+  {
+   "case": "S09",
+   "baseline": "tests",
+   "route": "single",
+   "expected": "needs_attention"
+  },
+  {
+   "case": "S10",
+   "baseline": "full",
+   "route": "single",
+   "expected": "needs_attention"
+  },
+  {
+   "case": "S10",
+   "baseline": "tests",
+   "route": "single",
+   "expected": "needs_attention"
+  },
+  {
+   "case": "S10b",
+   "baseline": "full",
+   "route": "single",
+   "expected": "could_not_verify"
+  },
+  {
+   "case": "S10b",
+   "baseline": "tests",
+   "route": "single",
+   "expected": "could_not_verify"
+  },
+  {
+   "case": "S12",
+   "baseline": "full",
+   "route": "single",
+   "expected": "could_not_verify"
+  },
+  {
+   "case": "S12",
+   "baseline": "tests",
+   "route": "single",
+   "expected": "verified"
+  },
+  {
+   "case": "S13",
+   "baseline": "full",
+   "route": "single",
+   "expected": "verified"
+  },
+  {
+   "case": "S13",
+   "baseline": "tests",
+   "route": "single",
+   "expected": "verified"
+  },
+  {
+   "case": "S12",
+   "baseline": "full",
+   "route": "daily",
+   "expected": "skipped"
+  },
+  {
+   "case": "S12",
+   "baseline": "tests",
+   "route": "daily",
+   "expected": "skipped"
+  },
+  {
+   "case": "S11",
+   "baseline": "full",
+   "route": "helper",
+   "expected": "could_not_verify"
+  },
+  {
+   "case": "S11b",
+   "baseline": "full",
+   "route": "helper",
+   "expected": "could_not_verify"
+  },
+  {
+   "case": "S11c",
+   "baseline": "full",
+   "route": "helper",
+   "expected": "could_not_verify"
+  }
+ ]
+}

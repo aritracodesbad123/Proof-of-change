@@ -326,24 +326,43 @@ def _value_at(v, field: str):
     return v if field == "" else (v.get(field, "<absent>") if isinstance(v, dict) else "<absent>")
 
 
+def derive_verdict(rec: dict, baseline: str | None, pp: dict | None = None) -> str:
+    """Re-derive a recorded PR run's final verdict under `baseline`, through the same gates as a real run
+    (ops/daily_run.gate): the verdict rules (ops/daily_run.verdict_for, docstring-only rule included), then, when the
+    baseline uses coverage, the coverage gate (poc/coverage_gate.apply) and the AI-probe gate
+    (ops/daily_run.ai_probe_gate). So under a baseline with claim probes, 'verified' needs a model-written probe that
+    actually executed a changed line; a docs-only or docstring-only change has no such line and cannot be verified.
+    pp: probe results already re-judged (rejudge_probes); re-judged here when omitted."""
+    from ops.daily_run import ai_probe_gate, rejudge_probes, uses, verdict_for
+    from poc import coverage_gate
+    if pp is None:
+        pp = rejudge_probes(rec.get("probes"))
+    cmp = rec.get("comparison")
+    cnv = None if cmp else (rec.get("reason") or "no comparison")
+    v = verdict_for(cmp, cnv, rec.get("exit_check"), rec.get("files"), pp, rec.get("behaviour_claims"), baseline,
+                    docstring_only=bool(rec.get("docstring_only")))
+    if not uses(baseline, "coverage"):
+        return v[0]
+    base = {k: x for k, x in rec.items() if not k.endswith(("_before_coverage_gate", "_before_ai_probe_gate"))}
+    gated = coverage_gate.apply(base | {"probes": pp if pp is not None else rec.get("probes"),
+                                        "verdict": v[0], "reason": v[1], "baseline": baseline})
+    return ai_probe_gate(gated)["verdict"]
+
+
 def check_golden_pr_case(rec: dict, case: dict) -> Result:
     """Known-answer PR run. The verdict is re-derived from the recorded data with the current rules, never read from
     the record alone: probes re-judged from their recorded runs (poc/probes.py), the tests' verdict from the recorded
-    comparison, both combined (ops/daily_run.verdict_for) and passed through the coverage gate."""
+    comparison, both combined (ops/daily_run.verdict_for) and passed through the coverage gate and the AI-probe gate
+    (derive_verdict), the same gates a real run applies."""
     from evals.pr_metrics import record_is_blind
-    from ops.daily_run import rejudge_probes, uses, verdict_for
-    from poc import coverage_gate
+    from ops.daily_run import rejudge_probes, verdict_for
     exp, problems = case["expect"], []
     pp = rejudge_probes(rec.get("probes"))
     cmp = rec.get("comparison")
     cnv = None if cmp else (rec.get("reason") or "no comparison")
     v_tests = verdict_for(cmp, cnv, rec.get("exit_check"), rec.get("files"))
     def derive(baseline):
-        v = verdict_for(cmp, cnv, rec.get("exit_check"), rec.get("files"), pp, rec.get("behaviour_claims"), baseline)
-        if not uses(baseline, "coverage"):
-            return v[0]
-        return coverage_gate.apply({k: x for k, x in rec.items() if not k.endswith("_before_coverage_gate")}
-                                   | {"verdict": v[0], "reason": v[1], "baseline": baseline})["verdict"]
+        return derive_verdict(rec, baseline, pp)
     gated = derive(rec.get("baseline"))
     for bl, want in exp.get("baseline_verdicts", {}).items():
         got = derive(bl)

@@ -1,0 +1,55 @@
+{
+ "probe": {
+  "changed_lines_covered": 1,
+  "changed_lines_total": 1,
+  "claims": [
+   {
+    "covers": [
+     "clip_high"
+    ],
+    "expect": "differs",
+    "id": "C1"
+   }
+  ],
+  "main": [
+   {
+    "clip_high": 11
+   },
+   {
+    "clip_high": 11
+   },
+   {
+    "clip_high": 11
+   }
+  ],
+  "pr": [
+   {
+    "clip_high": 10
+   },
+   {
+    "clip_high": 10
+   },
+   {
+    "clip_high": 10
+   }
+  ]
+ },
+ "runs": {
+  "add": [
+   "PPP",
+   "PPP"
+  ],
+  "clip_high": [
+   "---",
+   "PPP"
+  ],
+  "clip_low": [
+   "PPP",
+   "PPP"
+  ],
+  "mean": [
+   "PPP",
+   "PPP"
+  ]
+ }
+}
