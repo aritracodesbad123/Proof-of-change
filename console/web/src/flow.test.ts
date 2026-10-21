@@ -54,3 +54,29 @@ test('a stored verdict is not treated as a failed node by itself', () => {
   expect(marks.advice.state).toBe('skipped')
   expect(marks['install-head'].state).toBe('done')
 })
+
+test('human review is its own step between the AI probes and running them', () => {
+  const nodes = flowNodes(
+    [
+      { at: 1, stage: 'claims', detail: 'drafting' },
+      { at: 2, stage: 'await_human', detail: 'waiting for operator approval' },
+    ],
+    null,
+  )
+  const ids = nodes.map((node) => node.id)
+  expect(ids.indexOf('ai-write')).toBeLessThan(ids.indexOf('human-review'))
+  expect(ids.indexOf('human-review')).toBeLessThan(ids.indexOf('before-after'))
+  expect(nodes.find((node) => node.id === 'ai-write')?.state).toBe('done')
+  expect(nodes.find((node) => node.id === 'human-review')?.state).toBe('running')
+  expect(nodes.find((node) => node.id === 'before-after')?.state).toBe('pending')
+})
+
+test('a check that skipped the review shows that step as skipped', () => {
+  const marks = statesFromEvents([
+    { at: 1, stage: 'claims', detail: '' },
+    { at: 2, stage: 'probes', detail: '' },
+  ])
+  expect(marks['human-review'].state).toBe('skipped')
+  const reviewed = statesFromRecord({ repo: 'a/b', probes: { items: [] }, behaviour_claims: [1], operator_approval: 'on' })
+  expect(reviewed['human-review'].state).toBe('done')
+})

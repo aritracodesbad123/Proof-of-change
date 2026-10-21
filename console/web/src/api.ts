@@ -87,12 +87,14 @@ export type HitlDraft = {
   rejected_claims?: unknown[]
 }
 
-export type HitlApprovalBody = {
-  approve: string[]
-  extra_scenarios: string[]
-  business_answers: Record<string, string>
-  skip_business_followup: boolean
-}
+export type HitlApprovalBody =
+  | {
+      approve: string[]
+      extra_scenarios: string[]
+      business_answers: Record<string, string>
+      skip_business_followup: boolean
+    }
+  | { cancel: true }
 
 export type Health = {
   ok: boolean
@@ -146,7 +148,7 @@ export const api = {
       report_pdf?: string | null
       report_html?: string | null
     }>(`/api/runs/${encodeURIComponent(id)}`),
-  startCheck: (pr_url: string, model_provider = 'nebius', approval = false) =>
+  startCheck: (pr_url: string, model_provider = 'nebius', approval = true) =>
     json<Job>('/api/checks', {
       method: 'POST',
       body: JSON.stringify({ pr_url, model_provider, approval }),

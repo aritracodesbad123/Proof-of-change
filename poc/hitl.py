@@ -19,6 +19,9 @@ from poc import freeze, probe_quality, run_progress
 from poc.model_provider import PROBES_PROMPT, PROBES_SCHEMA, Provider, ProviderError
 
 MAX_EXTRA_SCENARIOS = 20
+MAX_IDEA_CHARS = 500
+MAX_REQUEST_BYTES = 64 * 1024
+HUMAN_REQUESTED = "human-requested"
 DEFAULT_TIMEOUT_S = 2 * 60 * 60
 POLL_S = 1.0
 
@@ -206,6 +209,14 @@ def validate_approval(draft: dict[str, Any], body: dict[str, Any]) -> str | None
     """None if ok, else error message (HTTP 400)."""
     if not isinstance(body, dict):
         return "approval body must be a JSON object"
+    try:
+        size = len(json.dumps(body).encode("utf-8"))
+    except (TypeError, ValueError):
+        return "approval body must be plain JSON"
+    if size > MAX_REQUEST_BYTES:
+        return f"the review is too large (over {MAX_REQUEST_BYTES // 1024} KB)"
+    if body.get("cancel") is True:
+        return None
     approve = body.get("approve")
     if not isinstance(approve, list) or not all(isinstance(x, str) for x in approve):
         return "approve must be an array of probe id strings"
@@ -213,7 +224,9 @@ def validate_approval(draft: dict[str, Any], body: dict[str, Any]) -> str | None
     if not isinstance(extras, list) or not all(isinstance(x, str) for x in extras):
         return "extra_scenarios must be an array of strings"
     if len(extras) > MAX_EXTRA_SCENARIOS:
-        return f"at most {MAX_EXTRA_SCENARIOS} extra_scenarios"
+        return f"at most {MAX_EXTRA_SCENARIOS} test ideas"
+    if any(len(x) > MAX_IDEA_CHARS for x in extras):
+        return f"each test idea must be at most {MAX_IDEA_CHARS} characters"
     skip = bool(body.get("skip_business_followup"))
     answers = body.get("business_answers") or {}
     if not isinstance(answers, dict):
@@ -233,6 +246,7 @@ def write_approval(outdir: Path, body: dict[str, Any]) -> dict[str, Any]:
         "extra_scenarios": [s.strip() for s in (body.get("extra_scenarios") or []) if str(s).strip()],
         "business_answers": dict(body.get("business_answers") or {}),
         "skip_business_followup": bool(body.get("skip_business_followup")),
+        "cancelled": body.get("cancel") is True,
         "written_at": time.time(),
     }
     if len(payload["extra_scenarios"]) > MAX_EXTRA_SCENARIOS:
@@ -242,7 +256,7 @@ def write_approval(outdir: Path, body: dict[str, Any]) -> dict[str, Any]:
 
 
 def wait_for_approval(outdir: Path, timeout_s: float = DEFAULT_TIMEOUT_S, poll_s: float = POLL_S) -> dict[str, Any]:
-    run_progress.emit("await_human", detail="waiting for operator approval of claims/probes")
+    run_progress.emit("await_human", detail="waiting for your review of the AI probes")
     deadline = time.time() + timeout_s
     path = outdir / "hitl_approval.json"
     while time.time() < deadline:
@@ -255,7 +269,17 @@ def wait_for_approval(outdir: Path, timeout_s: float = DEFAULT_TIMEOUT_S, poll_s
             if isinstance(data, dict):
                 return data
         time.sleep(poll_s)
-    raise TimeoutError(f"HITL approval timed out after {int(timeout_s)}s ({path})")
+    raise TimeoutError(f"review not completed: no answer within {int(timeout_s)}s, so no probe ran")
+
+
+class ReviewCancelled(RuntimeError):
+    """The person cancelled the check at the review step."""
+
+
+def uncovered_claims(claims: list[dict], probes: list[dict]) -> list[str]:
+    """Testable claim ids that no probe left after review checks."""
+    covered = {c.get("id") for p in probes for c in (p.get("claims") or []) if isinstance(c, dict)}
+    return [c["id"] for c in claims if c.get("testable") and c.get("id") and c["id"] not in covered]
 
 
 def scenario_texts(approval: dict[str, Any]) -> list[str]:
@@ -304,14 +328,14 @@ def generate_scenario_probes(
             pr_text
             + "\n\nClaims:\n"
             + json.dumps(claims, indent=1)
-            + f"\n\nOperator business scenario ({i + 1}/{len(scenarios)}):\n{scenario}\n"
-            + "Write exactly one probe that checks this scenario against the BASE-side code below.\n\n"
+            + f"\n\nTest idea from the reviewer ({i + 1}/{len(scenarios)}):\n{scenario}\n"
+            + "Write exactly one probe that checks this test idea against the BASE-side code below.\n\n"
             + base_ctx
         )
         try:
             resp = provider.complete_json("probes", PROBES_PROMPT, user, PROBES_SCHEMA, ctx)
         except ProviderError as e:
-            errors.append(f"scenario {i + 1}: {e}")
+            errors.append(f"test idea {i + 1}: {e}")
             continue
         for raw in (resp or {}).get("probes", [])[:1]:
             if not isinstance(raw, dict):
@@ -326,7 +350,7 @@ def generate_scenario_probes(
             p["id"] = tidy_id(f"hitl-{base_id}-{i + 1}")
             p["code"] = unescape_code(p.get("code"))
             if not str(p.get("about") or "").strip():
-                p["about"] = f"HITL scenario: {scenario[:200]}"
+                p["about"] = f"Human-requested test idea: {scenario[:200]}"
             # Drop claim links that are not in the extracted set so validate_probe can pass.
             if claim_ids:
                 p["claims"] = [c for c in (p.get("claims") or []) if isinstance(c, dict) and c.get("id") in claim_ids]
@@ -334,14 +358,14 @@ def generate_scenario_probes(
                 p["claims"] = []
             why = validate_probe(p, claim_ids)
             if why:
-                errors.append(f"scenario probe {p.get('id')!r} rejected: {why}")
+                errors.append(f"test-idea probe {p.get('id')!r} rejected: {why}")
                 continue
             lint = probe_quality.lint(p.get("code") or "", changed)
             if not lint.get("ok"):
                 detail = "; ".join(
                     f"{x.get('rule')}: {x.get('detail')}" for x in (lint.get("problems") or [])[:3]
                 )
-                errors.append(f"scenario probe {p.get('id')!r} lint: {detail or 'failed'}")
+                errors.append(f"test-idea probe {p.get('id')!r} lint: {detail or 'failed'}")
                 continue
             probes_out.append(p)
     return probes_out, errors
@@ -367,7 +391,7 @@ def gate_and_materialize(
     probe_file,
     errors: list[str],
 ) -> dict[str, Any]:
-    """HITL pause then freeze approved + scenario probes. Mutates errors list; returns generate()-style out."""
+    """HITL pause then freeze approved probes and probes from test ideas. Mutates errors list; returns generate()-style out."""
     from poc.model_probes import _context
 
     note_approval_ran()
@@ -388,6 +412,8 @@ def gate_and_materialize(
                         rejected_claims=rejected_claims)
     out["hitl_draft"] = {"probe_ids": draft.get("probe_ids"), "needs_business_followup": draft.get("needs_business_followup")}
     approval = wait_for_approval(hdir)
+    if approval.get("cancelled"):
+        raise ReviewCancelled("review cancelled: the check was stopped at the review step, so no probe ran")
     out["hitl_approval"] = {
         "approve": approval.get("approve"),
         "extra_scenarios": approval.get("extra_scenarios"),
@@ -399,7 +425,7 @@ def gate_and_materialize(
 
     scenarios = scenario_texts(approval)
     if scenarios:
-        run_progress.emit("probes", "super", f"Super writing {len(scenarios)} HITL scenario probe(s)")
+        run_progress.emit("probes", "super", f"Super writing {len(scenarios)} probe(s) from test ideas")
         extra, serr = generate_scenario_probes(
             provider,
             repo=repo,
@@ -415,6 +441,8 @@ def gate_and_materialize(
             validate_probe=validate_probe,
         )
         errors.extend(serr)
+        for p in extra:
+            p["origin"] = HUMAN_REQUESTED
         kept.extend(extra)
 
     inputs = freeze.base_inputs(title, body, base_files, base_root, pr_roots)
@@ -422,6 +450,7 @@ def gate_and_materialize(
     outdir.mkdir(parents=True, exist_ok=True)
     by_id = {c["id"]: c for c in claims if c.get("testable")}
     claim_ids = set(by_id)
+    frozen: list[dict] = []
     for p in kept:
         why = validate_probe(p, claim_ids)
         if why and claim_ids:
@@ -435,6 +464,16 @@ def gate_and_materialize(
                 continue
         path = outdir / f"model-{p['id']}.py"
         path.write_text(probe_file(p, f"{repo}#{pr}", by_id, gen["label"]))
-        out["probes"].append({"path": path, "freeze": freeze.freeze(path, gen, inputs)})
-    run_progress.emit("probes", "super", f"HITL approved {len(out['probes'])} probe(s)")
+        origin = p.get("origin") or "ai"
+        out["probes"].append({"path": path, "freeze": freeze.freeze(path, gen, inputs), "origin": origin})
+        frozen.append(p)
+    draft_ids = [str(p.get("id")) for p in draft_probes]
+    out["human_review"] = {
+        "kept_ai_probes": [i for i in draft_ids if i in approve_ids],
+        "dropped_ai_probes": [i for i in draft_ids if i not in approve_ids],
+        "test_ideas": scenarios,
+        "human_requested_probes": [str(p.get("id")) for p in frozen if p.get("origin") == HUMAN_REQUESTED],
+        "claims_without_probe": uncovered_claims(claims, frozen),
+    }
+    run_progress.emit("probes", "super", f"Review approved {len(out['probes'])} probe(s)")
     return out

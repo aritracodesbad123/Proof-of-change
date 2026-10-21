@@ -180,6 +180,30 @@ def link(text: str, href: str) -> str:
     return f"[{text}]({href})"
 
 
+def human_review_section(R, rec: dict) -> None:
+    """What the person changed at the review step: AI probes kept or dropped, and their own test ideas."""
+    hr = rec.get("human_review")
+    if not isinstance(hr, dict):
+        return
+    R.h(2, "Human review", "human-review")
+    R.p("A person reviewed the AI's probes before anything ran. Probes written from their test ideas are labelled "
+        "human-requested.", "meta")
+    none = "none"
+    rows = [
+        ["AI probes kept", ", ".join(hr.get("kept_ai_probes") or []) or none],
+        ["AI probes dropped", ", ".join(hr.get("dropped_ai_probes") or []) or none],
+        ["Test ideas added", str(len(hr.get("test_ideas") or []))],
+        ["Human-requested probes", ", ".join(hr.get("human_requested_probes") or []) or none],
+        ["Claims left with no probe", ", ".join(hr.get("claims_without_probe") or []) or none],
+    ]
+    R.table(["Item", "Value"], rows)
+    ideas = [str(x) for x in hr.get("test_ideas") or []]
+    if ideas:
+        R.bullets(ideas)
+    if hr.get("claims_without_probe"):
+        R.p("A claim with no probe after review cannot be verified, so the verdict is at most could not verify.")
+
+
 class Report:
     """Format-neutral list of blocks; the md and html renderers turn it into text."""
 
@@ -681,6 +705,7 @@ def _build_top(rec: dict, rd: str | None, claims: dict | None, golden: list[dict
     R.bullets([line1, f"**What we observed:** {_observed(rec, d, groups, lost)}", f"**What you should do:** {act}"])
 
     # 3) claims vs reality
+    human_review_section(R, rec)
     R.h(2, "Claims vs reality", "claims")
     if not claims_eval:
         R.p("Claims: not available (no PR or release description supplied). No behavior change was observed, so there is "

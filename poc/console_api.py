@@ -155,12 +155,18 @@ def _unsafe_opt_in() -> bool:
 def console_approval_on(explicit: bool | None = None) -> bool:
     """Whether this console check pauses for a person to approve probes.
 
-    The environment variable POC_CONSOLE_APPROVAL defaults to off. A per-check choice,
-    when the caller passes one, wins over that default.
+    Human review is the default flow for a check a person starts in the console: the AI
+    drafts probes, the person keeps or drops each one and adds their own test ideas, and
+    only then do the tests run. The default lives in this console's own per-check settings;
+    no machine-wide environment variable turns it on or off. A per-check choice, when the
+    caller passes one, wins over that default.
+
+    Only console checks use this. Study, daily, benchmark, command-line, GitHub App and
+    request-a-check runs never pause, because no person is there to answer.
     """
     if explicit is not None:
         return bool(explicit)
-    return (os.environ.get("POC_CONSOLE_APPROVAL") or "").strip().lower() in ("1", "true", "yes", "on")
+    return True
 
 
 class ConsoleRunPlan(NamedTuple):
@@ -707,7 +713,7 @@ def start_check(pr_url: str, *, model_provider: str = "nebius", owner: str | Non
         env = os.environ.copy()
         env["POC_PROGRESS_PATH"] = str(progress_path)
         # --console-job is what lets this single pull-request check start. POC_CONSOLE does not.
-        # Operator approval is off unless this check, or POC_CONSOLE_APPROVAL, turned it on.
+        # Human review is on by default for a console check; the person can skip it for this check.
         # A study run still refuses POC_HITL. This child is not a study run.
         env.pop("POC_HITL", None)
         env.pop("POC_HITL_DIR", None)

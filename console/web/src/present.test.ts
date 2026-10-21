@@ -51,7 +51,7 @@ describe('verdict badges stay labels for the code verdict', () => {
 describe('timeline follows real stage events', () => {
   test('starts pending', () => {
     expect(timelineStates([], null).map((step) => step.state)).toEqual([
-      'pending', 'pending', 'pending', 'pending', 'pending', 'pending', 'pending',
+      'pending', 'pending', 'pending', 'pending', 'pending', 'pending', 'pending', 'pending', 'pending',
     ])
   })
 
@@ -115,8 +115,8 @@ describe('timeline follows real stage events', () => {
 
   test('the landing illustration walks every stage then rests', () => {
     expect(illustrativeStates(0).map((step) => step.state)[0]).toBe('current')
-    expect(illustrativeStates(5).find((step) => step.id === 'verdict')?.state).toBe('current')
-    expect(illustrativeStates(8).every((step) => step.state === 'pending')).toBe(true)
+    expect(illustrativeStates(7).find((step) => step.id === 'verdict')?.state).toBe('current')
+    expect(illustrativeStates(10).every((step) => step.state === 'pending')).toBe(true)
   })
 })
 
@@ -186,4 +186,12 @@ test('the stylesheet is the light console, with the green accent and reduced mot
   expect(css).toContain('.tone-needs_attention')
   expect(css).toContain('.tone-could_not_verify')
   expect(css).toContain('.tone-no_code_change')
+})
+
+test('the timeline shows human review as a step of its own', () => {
+  const waiting = timelineStates([{ stage: 'claims' }, { stage: 'await_human' }])
+  expect(waiting.find((s) => s.id === 'review')?.state).toBe('current')
+  expect(waiting.find((s) => s.id === 'probes')?.state).toBe('done')
+  const skipped = timelineStates([{ stage: 'claims' }, { stage: 'probes' }, { stage: 'verdict' }])
+  expect(skipped.find((s) => s.id === 'review')?.state).toBe('skipped')
 })

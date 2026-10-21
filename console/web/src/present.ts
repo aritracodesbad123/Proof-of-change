@@ -14,7 +14,14 @@ export const TIMELINE_SPEC = [
   { id: 'fetch', label: 'Fetch', hint: 'Load the pull request', stages: ['queued', 'fetch_pr'] },
   { id: 'sandbox', label: 'Sandbox', hint: 'Install the base and the pull request', stages: ['install_main', 'install_pr'] },
   { id: 'tests', label: 'Base vs PR tests', hint: 'Run the project tests on both sides', stages: ['pytest'] },
-  { id: 'probes', label: 'AI probes', hint: 'Claims and behaviour probes', stages: ['claims', 'await_human', 'probes'] },
+  { id: 'probes', label: 'AI probes', hint: 'The AI drafts behaviour probes', stages: ['claims'] },
+  {
+    id: 'review',
+    label: 'Human review',
+    hint: 'Keep or drop probes and add test ideas',
+    stages: ['await_human'],
+  },
+  { id: 'run-probes', label: 'Run probes', hint: 'Approved probes run on both sides', stages: ['probes'] },
   { id: 'coverage', label: 'Coverage', hint: 'Check that changed lines actually ran', stages: [] as string[] },
   {
     id: 'verdict',
@@ -123,9 +130,21 @@ function stateFor(id: string, seen: Set<string>, active: string | null): StepSta
     return 'pending'
   }
   if (id === 'probes') {
-    if (on(['claims', 'await_human', 'probes'])) return 'current'
+    if (on(['claims'])) return 'current'
+    if ((seen.has('claims') || seen.has('probes')) && (seen.has('await_human') || seen.has('probes') || has(seen, PAST_PROBES))) return 'done'
+    if (seen.has('claims')) return 'started'
+    return 'pending'
+  }
+  if (id === 'review') {
+    if (active === 'await_human') return 'current'
+    if (seen.has('await_human')) return seen.has('probes') || has(seen, PAST_PROBES) ? 'done' : 'started'
+    if (seen.has('probes') || has(seen, PAST_PROBES)) return 'skipped'
+    return 'pending'
+  }
+  if (id === 'run-probes') {
+    if (active === 'probes') return 'current'
     if (seen.has('probes') && has(seen, PAST_PROBES)) return 'done'
-    if (seen.has('claims') || seen.has('await_human') || seen.has('probes')) return 'started'
+    if (seen.has('probes')) return 'started'
     return 'pending'
   }
   if (id === 'coverage') {

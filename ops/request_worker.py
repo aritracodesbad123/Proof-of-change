@@ -411,6 +411,10 @@ def run_check(pr_url: str, settings: Settings, secrets: list[str]) -> CheckResul
         print(notice, file=sys.stderr)
     argv = default_check_argv(settings.python, settings.root, pr_url)
     child_env = os.environ.copy()
+    # No person is present for a requested check, so it never pauses for human review,
+    # even on a host where the operator console has review turned on.
+    for name in ("POC_HITL", "POC_HITL_DIR", "POC_CONSOLE", "POC_CONSOLE_APPROVAL"):
+        child_env.pop(name, None)
     key = tavily_key()
     if key:
         child_env["TAVILY_API_KEY"] = key
