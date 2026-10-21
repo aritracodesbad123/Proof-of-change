@@ -29,7 +29,8 @@ export default defineConfig({
       transformIndexHtml(html) {
         if (!replay) return html
         return html
-          .replace(/<link rel="preconnect"[\s\S]*?<\/head>/, '</head>')
+          .replace(/\s*<link rel="preconnect"[^>]*>/g, '')
+          .replace(/\s*<link\s+href="https:\/\/fonts\.googleapis\.com[^>]*>/g, '')
           .replace('<title>Proof-of-Change console</title>', '<title>Proof-of-Change results</title>')
       },
     },
