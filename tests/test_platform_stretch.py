@@ -98,7 +98,7 @@ def test_github_app_g_ext_and_prove():
     plan = github_app.handle_event(
         "issue_comment",
         {"action": "created", "comment": {"body": "/prove"}, "repository": {"full_name": "me/demo"},
-         "issue": {"number": 3}},
+         "issue": {"number": 3, "pull_request": {}}},
         env={"POC_DEMO_REPOS": "me/demo"})
     assert plan["action"] == "prove" and plan["pr"] == 3
 

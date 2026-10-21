@@ -1,0 +1,87 @@
+{
+  "pr": {
+    "number": 32910,
+    "url": "https://github.com/numpy/numpy/pull/32910",
+    "title": "ENH: Release GIL in np.repeat when Python API is not needed",
+    "repo": "numpy/numpy"
+  },
+  "title": "ENH: Release GIL in np.repeat when Python API is not needed",
+  "url": "https://github.com/numpy/numpy/pull/32910",
+  "author": "lakshayg",
+  "head_sha": "b763e9ccec4bcc3fd4b735ee59a551d807de791b",
+  "base_sha": "4530cd44016be1d1c3dafd3bae584c01830114ab",
+  "base_ref": "main",
+  "updated_at_utc": "2026-10-09T22:35:33Z",
+  "updated_at_ist": "2026-10-10 04:05 IST",
+  "ci_state": "passing",
+  "ci_detail": "89 check runs completed without failure",
+  "library": "numpy",
+  "repo": "numpy/numpy",
+  "tested_at_ist": "2026-10-10 05:51 IST",
+  "files": {
+    "all": [
+      "benchmarks/benchmarks/bench_itemselection.py",
+      "numpy/_core/src/multiarray/item_selection.c"
+    ],
+    "package_py": [],
+    "compiled": [
+      "numpy/_core/src/multiarray/item_selection.c"
+    ],
+    "other": [
+      "benchmarks/benchmarks/bench_itemselection.py"
+    ]
+  },
+  "machine_type": {
+    "arch": "x86_64",
+    "os": "Linux",
+    "platform": "Linux-6.12.94+-x86_64-with-glibc2.41",
+    "cpu_count": 8,
+    "ci": null,
+    "runner_name": null,
+    "runner_os": null,
+    "runner_arch": null,
+    "runner_environment": null,
+    "image": null,
+    "label": "local"
+  },
+  "thread_env": {
+    "OMP_NUM_THREADS": "1",
+    "OPENBLAS_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1",
+    "NUMEXPR_NUM_THREADS": "1"
+  },
+  "runs_per_side": 3,
+  "workers": "4",
+  "test_timeout_s": 120,
+  "run_timeout_s": 900,
+  "build_timeout_s": 1800,
+  "python": "3.12",
+  "network": "allowed (installs and PR fetch); tests not network-isolated",
+  "posted_upstream": false,
+  "main_side": {
+    "source": "scientific-python nightly wheel",
+    "version": "2.6.0.dev0+git20261006.286e698",
+    "pip_check": "ok",
+    "why": ""
+  },
+  "route": "source-build",
+  "pr_side": {
+    "source": "source build of b763e9ccec4b",
+    "build_seconds": 2.3,
+    "why": "source build of PR head failed after 2.3s: ../meson.build:1:0: ERROR: Unknown compiler(s): [['c++'], ['g++'], ['clang++'], ['nvc++'], ['pgc++'], ['icpc'], ['icpx']]"
+  },
+  "notes": "main = nightly wheel, PR = source build of the PR head; differences can include main-branch drift between the PR's base and the nightly",
+  "verdict": "could_not_verify",
+  "reason": "source build of PR head failed after 2.3s: ../meson.build:1:0: ERROR: Unknown compiler(s): [['c++'], ['g++'], ['clang++'], ['nvc++'], ['pgc++'], ['icpc'], ['icpx']] (build log: build-pr.log)",
+  "what_changed": {
+    "package_python_files": [],
+    "compiled_files": [
+      "numpy/_core/src/multiarray/item_selection.c"
+    ],
+    "other_files": [
+      "benchmarks/benchmarks/bench_itemselection.py"
+    ]
+  },
+  "duration_s": 11.0,
+  "id": "numpy-numpy-32910"
+}

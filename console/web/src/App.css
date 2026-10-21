@@ -119,6 +119,8 @@ h3 { font-size: var(--text-md); margin: 0.8rem 0 0.35rem; color: var(--muted); }
 
 .form { display: grid; gap: 0.55rem; }
 label { font-size: var(--text-sm); color: var(--muted); display: grid; gap: 0.3rem; }
+.check-row { display: flex; align-items: center; gap: 0.5rem; color: var(--ink, inherit); }
+.check-row input { width: 1rem; height: 1rem; padding: 0; }
 
 .url-row { display: flex; gap: 0.6rem; flex-wrap: wrap; }
 .url-row input { flex: 1 1 16rem; }
@@ -472,6 +474,9 @@ a.btn-report {
 a.btn-report.ghost { background: transparent; color: var(--link); border: 1px solid var(--line); }
 
 .banner { padding: 0.7rem 0.85rem; border-radius: 8px; }
+.banner.note { background: var(--panel-2); color: var(--ink); border: 1px solid var(--line); margin: 0.6rem 1rem 0; }
+.report-frame { width: 100%; min-height: 70vh; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+.key-form { display: grid; gap: 0.35rem; }
 .banner.err { background: color-mix(in srgb, var(--danger) 16%, var(--panel)); color: var(--danger-ink); border: 1px solid color-mix(in srgb, var(--danger) 45%, var(--line)); }
 .banner.warn { background: color-mix(in srgb, #f0c36a 18%, var(--panel)); color: var(--warn-ink); border: 1px solid color-mix(in srgb, #f0c36a 45%, var(--line)); }
 
