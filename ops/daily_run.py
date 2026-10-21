@@ -1276,9 +1276,42 @@ def install_deps_only(venv: Path, checkout: Path, plan: dict, log: Path, python:
             (checkout / ".poc-declared-deps.txt").unlink(missing_ok=True)
             return False, f"dependency-only install failed ({rc}); see {log.name}"
     (checkout / ".poc-declared-deps.txt").unlink(missing_ok=True)
-    for site in (venv / "lib").glob("python*/site-packages"):
-        (site / "poc-project-path.pth").write_text(str(checkout) + "\n")
+    changed = checkout_changes(checkout)
+    if changed:
+        return False, ("setup problem: the dependency install changed the checked-out code ("
+                       + ", ".join(changed[:5]) + (" and more" if len(changed) > 5 else "") + "), so nothing was tested")
+    write_project_path(venv, checkout)
     return True, ""
+
+
+DEPS_FILE = ".poc-declared-deps.txt"
+
+
+def checkout_changes(checkout: Path) -> list[str]:
+    """Paths that differ from the checked-out commit, untracked files included. Only our own deps file is ignored.
+
+    A git error counts as a change, so this fails closed."""
+    got = subprocess.run(["git", "-C", str(checkout), "status", "--porcelain", "--untracked-files=all",
+                          "--ignored=no"], capture_output=True, text=True)
+    if got.returncode != 0:
+        return ["(git status failed)"]
+    out = []
+    for line in got.stdout.splitlines():
+        path = line[3:].strip()
+        if path and path != DEPS_FILE:
+            out.append(path)
+    return out
+
+
+def write_project_path(venv: Path, checkout: Path) -> None:
+    """Write our import-path entry after the install has finished, replacing whatever is there.
+
+    Nothing an install does can plant or change it: any existing file of that name is removed first."""
+    for site in (venv / "lib").glob("python*/site-packages"):
+        f = site / "poc-project-path.pth"
+        if f.is_symlink() or f.exists():
+            f.unlink()
+        f.write_text(str(checkout) + "\n")
 
 
 def _dist_version(venv: Path, requirement: str) -> str:

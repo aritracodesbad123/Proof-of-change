@@ -213,8 +213,10 @@ DEPS_ONLY_SHELL = (
     " --no-install-project --frozen -p \"$PYX\";"
     " elif [ -f pyproject.toml ]; then UV_PROJECT_ENVIRONMENT=\"$PFX\" python -m uv sync -q --no-install-project -p \"$PYX\";"
     " else for f in requirements*.txt; do if [ -f \"$f\" ]; then python -m pip install -q -r \"$f\"; fi; done; fi"
+    " && CHG=\"$(git status --porcelain --untracked-files=all --ignored=no | grep -v ' .poc-declared-deps.txt$' || true)\""
+    " && if [ -n \"$CHG\" ]; then echo \"setup problem: the dependency install changed the checked-out code: $CHG\"; exit 1; fi"
     " && SP=\"$(python -c 'import sysconfig; print(sysconfig.get_paths()[\"purelib\"])')\""
-    " && echo /work/src > \"$SP/poc-project-path.pth\"; }"
+    " && rm -f \"$SP/poc-project-path.pth\" && echo /work/src > \"$SP/poc-project-path.pth\"; }"
 )
 
 

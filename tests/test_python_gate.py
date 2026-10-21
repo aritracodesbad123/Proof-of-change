@@ -70,7 +70,17 @@ def test_flat_layout_is_left_alone_on_study_runs(tmp_path, monkeypatch):
     assert ok is False
 
 
+def _git_checkout(path):
+    import subprocess
+    path.mkdir(parents=True, exist_ok=True)
+    (path / "app.py").write_text("x = 1\n")
+    for c in (["init", "-q"], ["add", "-A"], ["-c", "user.name=t", "-c", "user.email=t@t", "commit", "-qm", "c"]):
+        subprocess.run(["git", "-C", str(path), *c], check=True, capture_output=True)
+    return path
+
+
 def test_deps_only_install_runs_uv_sync_in_the_sandbox_and_adds_the_path(tmp_path, monkeypatch):
+    _git_checkout(tmp_path / "src")
     cmds = []
 
     def fake_run(c, log, cwd=None, env=None, timeout=None, sbx=None):
@@ -111,3 +121,59 @@ def test_commit_guard_accepts_a_deps_only_checkout_at_the_right_commit(tmp_path,
     (site / "poc-project-path.pth").write_text(str(tmp_path / "elsewhere") + "\n")
     ok, _ = daily_run.check_installed_commit(venv, "x", "a" * 40, co)
     assert ok is False
+
+
+def _fake_install(tmp_path, during):
+    def fake_run(c, log, cwd=None, env=None, timeout=None, sbx=None):
+        if c[1] == "venv":
+            (tmp_path / "v" / "lib" / "python3.14" / "site-packages").mkdir(parents=True, exist_ok=True)
+        if c[1] == "export":
+            (tmp_path / "src" / ".poc-declared-deps.txt").write_text("django\n")
+        if c[:3] == ["uv", "pip", "install"] and "-r" in c:
+            during()
+        return 0, 0.0
+    return fake_run
+
+
+def test_a_file_changed_during_install_is_a_setup_problem(tmp_path, monkeypatch):
+    src = _git_checkout(tmp_path / "src")
+    monkeypatch.setattr(daily_run, "run", _fake_install(tmp_path, lambda: (src / "app.py").write_text("x = 2\n")))
+    ok, why = daily_run.install_deps_only(tmp_path / "v", src, {"kind": "uv-sync", "frozen": True},
+                                          tmp_path / "log", "3.14", 10)
+    assert ok is False and why.startswith("setup problem:") and "app.py" in why
+    assert not (tmp_path / "v" / "lib" / "python3.14" / "site-packages" / "poc-project-path.pth").exists()
+
+
+def test_an_untracked_file_from_install_is_a_setup_problem_but_our_deps_file_is_not(tmp_path, monkeypatch):
+    src = _git_checkout(tmp_path / "src")
+    monkeypatch.setattr(daily_run, "run", _fake_install(tmp_path, lambda: (src / "planted.py").write_text("")))
+    ok, why = daily_run.install_deps_only(tmp_path / "v", src, {"kind": "uv-sync", "frozen": True},
+                                          tmp_path / "log", "3.14", 10)
+    assert ok is False and "planted.py" in why and ".poc-declared-deps.txt" not in why
+
+
+def test_a_planted_pth_is_replaced_by_ours(tmp_path, monkeypatch):
+    src = _git_checkout(tmp_path / "src")
+    site = tmp_path / "v" / "lib" / "python3.14" / "site-packages"
+
+    def plant():
+        site.mkdir(parents=True, exist_ok=True)
+        (site / "poc-project-path.pth").write_text("/somewhere/else\nimport os\n")
+    monkeypatch.setattr(daily_run, "run", _fake_install(tmp_path, plant))
+    ok, _ = daily_run.install_deps_only(tmp_path / "v", src, {"kind": "uv-sync", "frozen": True},
+                                        tmp_path / "log", "3.14", 10)
+    assert ok is True
+    assert (site / "poc-project-path.pth").read_text() == str(src) + "\n"
+    planted_link = site / "poc-project-path.pth"
+    planted_link.unlink()
+    planted_link.symlink_to(tmp_path / "target.txt")
+    daily_run.write_project_path(tmp_path / "v", src)
+    assert not planted_link.is_symlink() and planted_link.read_text() == str(src) + "\n"
+
+
+def test_contree_deps_only_shell_checks_the_tree_and_writes_the_path_last():
+    from poc import contree_sandboxes
+    shell = contree_sandboxes.install_shell_source("a/b", "x", deps_only_fallback=True)
+    assert "git status --porcelain --untracked-files=all" in shell
+    assert shell.index("git status --porcelain") < shell.index("poc-project-path.pth")
+    assert 'rm -f "$SP/poc-project-path.pth"' in shell
