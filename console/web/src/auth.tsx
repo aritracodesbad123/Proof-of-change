@@ -38,6 +38,7 @@ type Mode = 'login' | 'signup' | 'code'
 
 export default function AuthGate({ children }: { children: ReactNode }) {
   const [email, setEmail] = useState<string | null | undefined>(undefined)
+  const [notice, setNotice] = useState<string | null>(null)
 
   useEffect(() => {
     let live = true
@@ -45,8 +46,11 @@ export default function AuthGate({ children }: { children: ReactNode }) {
       (me) => {
         if (live) setEmail(me.email)
       },
-      () => {
-        if (live) setEmail(null)
+      (error: unknown) => {
+        if (!live) return
+        setEmail(null)
+        const message = error instanceof Error ? error.message : ''
+        setNotice(message.includes('Port 8787 is public') ? message : null)
       },
     )
     return () => {
@@ -62,10 +66,10 @@ export default function AuthGate({ children }: { children: ReactNode }) {
     )
   }
   if (email) return children
-  return <AuthScreen onAuthed={setEmail} />
+  return <AuthScreen onAuthed={setEmail} notice={notice} />
 }
 
-function AuthScreen({ onAuthed }: { onAuthed: (email: string) => void }) {
+export function AuthScreen({ onAuthed, notice }: { onAuthed: (email: string) => void; notice?: string | null }) {
   const [mode, setMode] = useState<Mode>('login')
   const [providers, setProviders] = useState<AuthProviders>(EMPTY_PROVIDERS)
   const [email, setEmail] = useState('')
@@ -153,6 +157,11 @@ function AuthScreen({ onAuthed }: { onAuthed: (email: string) => void }) {
               </p>
             </>
           )}
+          {notice ? (
+            <p className="banner err" role="alert">
+              {notice}
+            </p>
+          ) : null}
           {error ? (
             <p className="banner err" role="alert">
               {error}

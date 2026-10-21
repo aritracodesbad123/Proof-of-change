@@ -1,0 +1,32 @@
+{
+  "name": "Proof-of-Change",
+  "image": "mcr.microsoft.com/devcontainers/python:3.12",
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "22"
+    }
+  },
+  "forwardPorts": [8787],
+  "portsAttributes": {
+    "8787": {
+      "label": "Proof-of-Change console",
+      "onAutoForward": "openBrowser",
+      "visibility": "private"
+    }
+  },
+  "postCreateCommand": "sudo apt-get update && sudo apt-get install -y bubblewrap && (sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0 || true) && python -m pip install -e '.[dev]' && cd console/web && npm ci && npm run build",
+  "postStartCommand": "bash .devcontainer/start-console.sh",
+  "secrets": {
+    "TAVILY_API_KEY": {
+      "description": "Your own Tavily API key. The setup lookup needs it. This project does not ship or share a key. Tavily keys are free. Without a key the lookup is skipped and the check continues. The value is not stored in the repository.",
+      "documentationUrl": "https://app.tavily.com/"
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash"
+      }
+    }
+  }
+}

@@ -378,7 +378,9 @@ def test_console_turns_swarm_and_approval_on_explicitly(monkeypatch, tmp_path):
     monkeypatch.setattr(console_api.subprocess, "Popen", fake_popen)
     monkeypatch.setattr(console_api.threading, "Thread", FakeThread)
     monkeypatch.setattr(console_api, "console_run_flags", lambda: console_api.ConsoleRunPlan([], None, False, None))
-    job = console_api.start_check("https://github.com/me/demo/pull/3", model_provider="none")
+    job = console_api.start_check(
+        "https://github.com/me/demo/pull/3", model_provider="none", approval=True,
+    )
     assert job["status"] == "queued"
     holder["target"]()
     assert "--swarm" in captured["argv"]
@@ -388,3 +390,56 @@ def test_console_turns_swarm_and_approval_on_explicitly(monkeypatch, tmp_path):
     assert env["POC_HITL"] == "1"
     assert env["POC_CONSOLE"] == "1"
     assert env.get("POC_HITL_DIR")
+    assert job["approval"] is True
+
+
+def test_console_approval_is_off_unless_this_check_asks(monkeypatch, tmp_path):
+    """Default off, including when the parent process has POC_HITL. A study run is unchanged."""
+    _quiet_env(monkeypatch)
+    monkeypatch.delenv("POC_CONSOLE_APPROVAL", raising=False)
+    monkeypatch.setenv("POC_HITL", "1")
+    monkeypatch.setattr(console_api, "REPO_ROOT", tmp_path)
+    monkeypatch.setattr(console_api, "find_record_for_pr", lambda *a, **k: None)
+    (tmp_path / "ops").mkdir()
+    captured = {}
+
+    class Proc:
+        stdout = iter(())
+
+        def wait(self):
+            return 0
+
+    def fake_popen(argv, **kw):
+        captured["argv"] = list(argv)
+        captured["env"] = kw.get("env") or {}
+        return Proc()
+
+    holder = {}
+
+    class FakeThread:
+        def __init__(self, target=None, daemon=None):
+            holder["target"] = target
+
+        def start(self):
+            pass
+
+    monkeypatch.setattr(console_api.subprocess, "Popen", fake_popen)
+    monkeypatch.setattr(console_api.threading, "Thread", FakeThread)
+    monkeypatch.setattr(console_api, "console_run_flags", lambda: console_api.ConsoleRunPlan([], None, False, None))
+    job = console_api.start_check("https://github.com/me/demo/pull/3", model_provider="none")
+    assert job["approval"] is False
+    holder["target"]()
+    assert "POC_HITL" not in captured["env"]
+    assert "POC_HITL_DIR" not in captured["env"]
+    assert "--swarm" in captured["argv"] and "--console-job" in captured["argv"]
+
+    monkeypatch.setenv("POC_CONSOLE_APPROVAL", "1")
+    job = console_api.start_check("https://github.com/me/demo/pull/4", model_provider="none")
+    assert job["approval"] is True
+    holder["target"]()
+    assert captured["env"]["POC_HITL"] == "1"
+
+    job = console_api.start_check("https://github.com/me/demo/pull/5", model_provider="none", approval=False)
+    assert job["approval"] is False
+    holder["target"]()
+    assert "POC_HITL" not in captured["env"]

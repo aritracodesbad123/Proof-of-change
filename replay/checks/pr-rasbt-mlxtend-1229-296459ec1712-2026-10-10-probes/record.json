@@ -1,0 +1,1223 @@
+{
+  "author": "raashish1601",
+  "base_ref": "master",
+  "build_timeout_s": 1800,
+  "changed_lines_covered": 1,
+  "changed_lines_total": 1,
+  "chosen": {
+    "head_sha": "296459ec17120e757a56c7bb08c831469b0e5aa4",
+    "install": "pip install -e . pytest pytest-xdist",
+    "pr": 1229,
+    "test_cmd": "pytest mlxtend/evaluate/tests/test_feature_importance.py"
+  },
+  "ci_detail": "chosen by name; selection filters not applied",
+  "ci_state": "not checked (chosen PR)",
+  "comparison": {
+    "executed": {
+      "main": 9,
+      "pr": 10
+    },
+    "fixed": [],
+    "flaky": [],
+    "load_failed_both": [],
+    "load_failed_main": [],
+    "load_failed_pr": [],
+    "messages": {},
+    "new_tests_failing": [],
+    "new_tests_passing": 1,
+    "other_changes": [],
+    "preexisting_failures": [],
+    "regressions": [],
+    "removed_tests": [],
+    "reparametrized": [],
+    "same": 9,
+    "same_skipped_both": 0,
+    "skipped_missing_dependency": []
+  },
+  "coverage": {
+    "changed_lines_covered": 1,
+    "changed_lines_total": 1,
+    "exit": 0,
+    "files": [
+      {
+        "changed_lines_covered": 1,
+        "changed_lines_total": 1,
+        "file": "mlxtend/evaluate/feature_importance.py"
+      }
+    ],
+    "log": "coverage-pytest.log",
+    "seconds": 7.7,
+    "status": "measured"
+  },
+  "coverage_gate": {
+    "changed": false,
+    "confidence": "normal",
+    "kind": "python",
+    "note": "1 of 1 changed executable line(s) ran (100%)"
+  },
+  "current_head_sha": "296459ec17120e757a56c7bb08c831469b0e5aa4",
+  "date_ist": "2026-10-10 11:54 IST",
+  "duration_s": {
+    "tests": 37.1,
+    "total_wall": 71.5
+  },
+  "exit_check": {
+    "detail": "all runs exited 0",
+    "explained": true,
+    "problems": []
+  },
+  "files": {
+    "all": [
+      "docs/sources/CHANGELOG.md",
+      "mlxtend/evaluate/feature_importance.py",
+      "mlxtend/evaluate/tests/test_feature_importance.py"
+    ],
+    "compiled": [],
+    "other": [
+      "docs/sources/CHANGELOG.md"
+    ],
+    "package_py": [
+      "mlxtend/evaluate/feature_importance.py",
+      "mlxtend/evaluate/tests/test_feature_importance.py"
+    ]
+  },
+  "freeze": {
+    "main": "freeze-main.txt",
+    "pr": "freeze-pr.txt"
+  },
+  "id": "pr-rasbt-mlxtend-1229-296459ec1712-2026-10-10-probes",
+  "library": "mlxtend",
+  "logs": "mlxtend-1229/",
+  "machine_type": {
+    "arch": "x86_64",
+    "ci": null,
+    "cpu_count": 8,
+    "cpu_model": "Intel(R) Xeon(R) Processor",
+    "image": null,
+    "label": "local",
+    "os": "Linux",
+    "platform": "Linux-6.12.94+-x86_64-with-glibc2.41",
+    "ram_gb": 15.6,
+    "runner_arch": null,
+    "runner_environment": null,
+    "runner_name": null,
+    "runner_os": null
+  },
+  "mergeable": true,
+  "mergeable_state": "clean",
+  "network": "allowed (installs and PR fetch); tests not network-isolated",
+  "notes": null,
+  "per_run": [
+    {
+      "collection_errors": 0,
+      "error": 0,
+      "exit": 0,
+      "failed": 0,
+      "junit": true,
+      "passed": 9,
+      "pytest_summary": "9 passed in 5.65s",
+      "run": 1,
+      "seconds": 6.1,
+      "side": "old",
+      "skipped": 0
+    },
+    {
+      "collection_errors": 0,
+      "error": 0,
+      "exit": 0,
+      "failed": 0,
+      "junit": true,
+      "passed": 10,
+      "pytest_summary": "10 passed in 5.79s",
+      "run": 1,
+      "seconds": 6.2,
+      "side": "new",
+      "skipped": 0
+    },
+    {
+      "collection_errors": 0,
+      "error": 0,
+      "exit": 0,
+      "failed": 0,
+      "junit": true,
+      "passed": 9,
+      "pytest_summary": "9 passed in 5.90s",
+      "run": 2,
+      "seconds": 6.3,
+      "side": "old",
+      "skipped": 0
+    },
+    {
+      "collection_errors": 0,
+      "error": 0,
+      "exit": 0,
+      "failed": 0,
+      "junit": true,
+      "passed": 10,
+      "pytest_summary": "10 passed in 5.76s",
+      "run": 2,
+      "seconds": 6.2,
+      "side": "new",
+      "skipped": 0
+    },
+    {
+      "collection_errors": 0,
+      "error": 0,
+      "exit": 0,
+      "failed": 0,
+      "junit": true,
+      "passed": 9,
+      "pytest_summary": "9 passed in 5.77s",
+      "run": 3,
+      "seconds": 6.2,
+      "side": "old",
+      "skipped": 0
+    },
+    {
+      "collection_errors": 0,
+      "error": 0,
+      "exit": 0,
+      "failed": 0,
+      "junit": true,
+      "passed": 10,
+      "pytest_summary": "10 passed in 5.64s",
+      "run": 3,
+      "seconds": 6.1,
+      "side": "new",
+      "skipped": 0
+    }
+  ],
+  "posted_upstream": false,
+  "pr": {
+    "base_sha": "1aee767ef57b84a8191511a08955c583b65de382",
+    "head_sha": "296459ec17120e757a56c7bb08c831469b0e5aa4",
+    "merge_commit": "1af398f8e6305b25d59fba572ec21d51da1fe692",
+    "number": 1229,
+    "repo": "rasbt/mlxtend",
+    "title": "Fix feature_importance_permutation permuting the wrong columns for feature_groups",
+    "url": "https://github.com/rasbt/mlxtend/pull/1229"
+  },
+  "probes": {
+    "items": [
+      {
+        "about": "Which columns each feature group permutes, importances for a fixed seed, and the caller's X after the call.",
+        "claims": [
+          {
+            "covers": [
+              "list_groups.columns_permuted"
+            ],
+            "expect": "differs",
+            "id": "C1",
+            "source": "PR description",
+            "text": "A group given as a list or range now permutes its own columns, not the first columns of X."
+          },
+          {
+            "covers": [
+              "int_groups_only.importances"
+            ],
+            "expect": "same",
+            "id": "C2",
+            "source": "PR description",
+            "text": "For integer groups the results do not change for a given seed."
+          }
+        ],
+        "id": "feature-groups-permutation",
+        "observations": [
+          {
+            "citations": {
+              "main": {
+                "file": "probe-feature-groups-permutation-main-1.jsonl",
+                "line": 1,
+                "quote": "\"observation\": \"caller_x_after_call.changed_columns\""
+              },
+              "pr": {
+                "file": "probe-feature-groups-permutation-pr-1.jsonl",
+                "line": 1,
+                "quote": "\"observation\": \"caller_x_after_call.changed_columns\""
+              }
+            },
+            "claim": null,
+            "diffs": [
+              {
+                "field": "",
+                "main": [
+                  0,
+                  1
+                ],
+                "pr": []
+              }
+            ],
+            "label": "unmentioned",
+            "main": [
+              0,
+              1
+            ],
+            "name": "caller_x_after_call.changed_columns",
+            "pr": [],
+            "state": "differs"
+          },
+          {
+            "citations": {
+              "main": {
+                "file": "probe-feature-groups-permutation-main-1.jsonl",
+                "line": 2,
+                "quote": "\"observation\": \"int_groups_after_multi_group.importances\""
+              },
+              "pr": {
+                "file": "probe-feature-groups-permutation-pr-1.jsonl",
+                "line": 2,
+                "quote": "\"observation\": \"int_groups_after_multi_group.importances\""
+              }
+            },
+            "claim": null,
+            "diffs": [
+              {
+                "field": "2",
+                "main": [
+                  0.20625622915149633
+                ],
+                "pr": [
+                  0.21936721672880444
+                ]
+              },
+              {
+                "field": "3",
+                "main": [
+                  0.1185770248176875
+                ],
+                "pr": [
+                  0.19149488806888038
+                ]
+              },
+              {
+                "field": "4",
+                "main": [
+                  0.024680012026446985
+                ],
+                "pr": [
+                  0.025431772308876166
+                ]
+              },
+              {
+                "field": "[0, 1]",
+                "main": [
+                  1.5396731935717969
+                ],
+                "pr": [
+                  1.4366142202405663
+                ]
+              }
+            ],
+            "label": "unmentioned",
+            "main": {
+              "2": [
+                0.20625622915149633
+              ],
+              "3": [
+                0.1185770248176875
+              ],
+              "4": [
+                0.024680012026446985
+              ],
+              "[0, 1]": [
+                1.5396731935717969
+              ]
+            },
+            "name": "int_groups_after_multi_group.importances",
+            "pr": {
+              "2": [
+                0.21936721672880444
+              ],
+              "3": [
+                0.19149488806888038
+              ],
+              "4": [
+                0.025431772308876166
+              ],
+              "[0, 1]": [
+                1.4366142202405663
+              ]
+            },
+            "state": "differs"
+          },
+          {
+            "citations": {
+              "main": {
+                "file": "probe-feature-groups-permutation-main-1.jsonl",
+                "line": 3,
+                "quote": "\"observation\": \"int_groups_only.importances\""
+              },
+              "pr": {
+                "file": "probe-feature-groups-permutation-pr-1.jsonl",
+                "line": 3,
+                "quote": "\"observation\": \"int_groups_only.importances\""
+              }
+            },
+            "claim": "C2",
+            "label": "proven",
+            "main": {
+              "0": [
+                1.2107617845661491,
+                1.2265491848376033,
+                1.0499957829847104
+              ],
+              "1": [
+                0.5465047454709713,
+                0.36803884766366457,
+                0.41978427998601997
+              ],
+              "2": [
+                0.20625622915149633,
+                0.17272734498656062,
+                0.24160978964439572
+              ],
+              "3": [
+                0.1185770248176875,
+                0.17930090046389513,
+                0.17809896469894626
+              ],
+              "4": [
+                0.024680012026446985,
+                0.023601990773227555,
+                0.02486090823753828
+              ]
+            },
+            "name": "int_groups_only.importances",
+            "pr": {
+              "0": [
+                1.2107617845661491,
+                1.2265491848376033,
+                1.0499957829847104
+              ],
+              "1": [
+                0.5465047454709713,
+                0.36803884766366457,
+                0.41978427998601997
+              ],
+              "2": [
+                0.20625622915149633,
+                0.17272734498656062,
+                0.24160978964439572
+              ],
+              "3": [
+                0.1185770248176875,
+                0.17930090046389513,
+                0.17809896469894626
+              ],
+              "4": [
+                0.024680012026446985,
+                0.023601990773227555,
+                0.02486090823753828
+              ]
+            },
+            "state": "same"
+          },
+          {
+            "citations": {
+              "main": {
+                "file": "probe-feature-groups-permutation-main-1.jsonl",
+                "line": 4,
+                "quote": "\"observation\": \"list_groups.columns_permuted\""
+              },
+              "pr": {
+                "file": "probe-feature-groups-permutation-pr-1.jsonl",
+                "line": 4,
+                "quote": "\"observation\": \"list_groups.columns_permuted\""
+              }
+            },
+            "claim": "C1",
+            "diffs": [
+              {
+                "field": "[2]",
+                "main": [
+                  0
+                ],
+                "pr": [
+                  2
+                ]
+              },
+              {
+                "field": "[3]",
+                "main": [
+                  0
+                ],
+                "pr": [
+                  3
+                ]
+              },
+              {
+                "field": "[4]",
+                "main": [
+                  0
+                ],
+                "pr": [
+                  4
+                ]
+              }
+            ],
+            "label": "proven",
+            "main": {
+              "[2]": [
+                0
+              ],
+              "[3]": [
+                0
+              ],
+              "[4]": [
+                0
+              ]
+            },
+            "name": "list_groups.columns_permuted",
+            "pr": {
+              "[2]": [
+                2
+              ],
+              "[3]": [
+                3
+              ],
+              "[4]": [
+                4
+              ]
+            },
+            "state": "differs"
+          },
+          {
+            "citations": {
+              "main": {
+                "file": "probe-feature-groups-permutation-main-1.jsonl",
+                "line": 5,
+                "quote": "\"observation\": \"no_groups.importances\""
+              },
+              "pr": {
+                "file": "probe-feature-groups-permutation-pr-1.jsonl",
+                "line": 5,
+                "quote": "\"observation\": \"no_groups.importances\""
+              }
+            },
+            "claim": null,
+            "label": "no_difference",
+            "main": {
+              "0": [
+                1.2107617845661491,
+                1.2265491848376033,
+                1.0499957829847104
+              ],
+              "1": [
+                0.5465047454709713,
+                0.36803884766366457,
+                0.41978427998601997
+              ],
+              "2": [
+                0.20625622915149633,
+                0.17272734498656062,
+                0.24160978964439572
+              ],
+              "3": [
+                0.1185770248176875,
+                0.17930090046389513,
+                0.17809896469894626
+              ],
+              "4": [
+                0.024680012026446985,
+                0.023601990773227555,
+                0.02486090823753828
+              ]
+            },
+            "name": "no_groups.importances",
+            "pr": {
+              "0": [
+                1.2107617845661491,
+                1.2265491848376033,
+                1.0499957829847104
+              ],
+              "1": [
+                0.5465047454709713,
+                0.36803884766366457,
+                0.41978427998601997
+              ],
+              "2": [
+                0.20625622915149633,
+                0.17272734498656062,
+                0.24160978964439572
+              ],
+              "3": [
+                0.1185770248176875,
+                0.17930090046389513,
+                0.17809896469894626
+              ],
+              "4": [
+                0.024680012026446985,
+                0.023601990773227555,
+                0.02486090823753828
+              ]
+            },
+            "state": "same"
+          }
+        ],
+        "outputs": {
+          "main": [
+            "probe-feature-groups-permutation-main-1.jsonl",
+            "probe-feature-groups-permutation-main-2.jsonl",
+            "probe-feature-groups-permutation-main-3.jsonl"
+          ],
+          "pr": [
+            "probe-feature-groups-permutation-pr-1.jsonl",
+            "probe-feature-groups-permutation-pr-2.jsonl",
+            "probe-feature-groups-permutation-pr-3.jsonl"
+          ]
+        },
+        "path": "probes/rasbt/mlxtend/1229.py",
+        "per_run": [
+          {
+            "ok": true,
+            "run": 1,
+            "seconds": 3.5,
+            "side": "main"
+          },
+          {
+            "ok": true,
+            "run": 1,
+            "seconds": 3.5,
+            "side": "pr"
+          },
+          {
+            "ok": true,
+            "run": 2,
+            "seconds": 3.5,
+            "side": "main"
+          },
+          {
+            "ok": true,
+            "run": 2,
+            "seconds": 3.5,
+            "side": "pr"
+          },
+          {
+            "ok": true,
+            "run": 3,
+            "seconds": 3.6,
+            "side": "main"
+          },
+          {
+            "ok": true,
+            "run": 3,
+            "seconds": 3.6,
+            "side": "pr"
+          }
+        ],
+        "runs": {
+          "main": [
+            {
+              "caller_x_after_call.changed_columns": [
+                0,
+                1
+              ],
+              "int_groups_after_multi_group.importances": {
+                "2": [
+                  0.20625622915149633
+                ],
+                "3": [
+                  0.1185770248176875
+                ],
+                "4": [
+                  0.024680012026446985
+                ],
+                "[0, 1]": [
+                  1.5396731935717969
+                ]
+              },
+              "int_groups_only.importances": {
+                "0": [
+                  1.2107617845661491,
+                  1.2265491848376033,
+                  1.0499957829847104
+                ],
+                "1": [
+                  0.5465047454709713,
+                  0.36803884766366457,
+                  0.41978427998601997
+                ],
+                "2": [
+                  0.20625622915149633,
+                  0.17272734498656062,
+                  0.24160978964439572
+                ],
+                "3": [
+                  0.1185770248176875,
+                  0.17930090046389513,
+                  0.17809896469894626
+                ],
+                "4": [
+                  0.024680012026446985,
+                  0.023601990773227555,
+                  0.02486090823753828
+                ]
+              },
+              "list_groups.columns_permuted": {
+                "[2]": [
+                  0
+                ],
+                "[3]": [
+                  0
+                ],
+                "[4]": [
+                  0
+                ]
+              },
+              "no_groups.importances": {
+                "0": [
+                  1.2107617845661491,
+                  1.2265491848376033,
+                  1.0499957829847104
+                ],
+                "1": [
+                  0.5465047454709713,
+                  0.36803884766366457,
+                  0.41978427998601997
+                ],
+                "2": [
+                  0.20625622915149633,
+                  0.17272734498656062,
+                  0.24160978964439572
+                ],
+                "3": [
+                  0.1185770248176875,
+                  0.17930090046389513,
+                  0.17809896469894626
+                ],
+                "4": [
+                  0.024680012026446985,
+                  0.023601990773227555,
+                  0.02486090823753828
+                ]
+              }
+            },
+            {
+              "caller_x_after_call.changed_columns": [
+                0,
+                1
+              ],
+              "int_groups_after_multi_group.importances": {
+                "2": [
+                  0.20625622915149633
+                ],
+                "3": [
+                  0.1185770248176875
+                ],
+                "4": [
+                  0.024680012026446985
+                ],
+                "[0, 1]": [
+                  1.5396731935717969
+                ]
+              },
+              "int_groups_only.importances": {
+                "0": [
+                  1.2107617845661491,
+                  1.2265491848376033,
+                  1.0499957829847104
+                ],
+                "1": [
+                  0.5465047454709713,
+                  0.36803884766366457,
+                  0.41978427998601997
+                ],
+                "2": [
+                  0.20625622915149633,
+                  0.17272734498656062,
+                  0.24160978964439572
+                ],
+                "3": [
+                  0.1185770248176875,
+                  0.17930090046389513,
+                  0.17809896469894626
+                ],
+                "4": [
+                  0.024680012026446985,
+                  0.023601990773227555,
+                  0.02486090823753828
+                ]
+              },
+              "list_groups.columns_permuted": {
+                "[2]": [
+                  0
+                ],
+                "[3]": [
+                  0
+                ],
+                "[4]": [
+                  0
+                ]
+              },
+              "no_groups.importances": {
+                "0": [
+                  1.2107617845661491,
+                  1.2265491848376033,
+                  1.0499957829847104
+                ],
+                "1": [
+                  0.5465047454709713,
+                  0.36803884766366457,
+                  0.41978427998601997
+                ],
+                "2": [
+                  0.20625622915149633,
+                  0.17272734498656062,
+                  0.24160978964439572
+                ],
+                "3": [
+                  0.1185770248176875,
+                  0.17930090046389513,
+                  0.17809896469894626
+                ],
+                "4": [
+                  0.024680012026446985,
+                  0.023601990773227555,
+                  0.02486090823753828
+                ]
+              }
+            },
+            {
+              "caller_x_after_call.changed_columns": [
+                0,
+                1
+              ],
+              "int_groups_after_multi_group.importances": {
+                "2": [
+                  0.20625622915149633
+                ],
+                "3": [
+                  0.1185770248176875
+                ],
+                "4": [
+                  0.024680012026446985
+                ],
+                "[0, 1]": [
+                  1.5396731935717969
+                ]
+              },
+              "int_groups_only.importances": {
+                "0": [
+                  1.2107617845661491,
+                  1.2265491848376033,
+                  1.0499957829847104
+                ],
+                "1": [
+                  0.5465047454709713,
+                  0.36803884766366457,
+                  0.41978427998601997
+                ],
+                "2": [
+                  0.20625622915149633,
+                  0.17272734498656062,
+                  0.24160978964439572
+                ],
+                "3": [
+                  0.1185770248176875,
+                  0.17930090046389513,
+                  0.17809896469894626
+                ],
+                "4": [
+                  0.024680012026446985,
+                  0.023601990773227555,
+                  0.02486090823753828
+                ]
+              },
+              "list_groups.columns_permuted": {
+                "[2]": [
+                  0
+                ],
+                "[3]": [
+                  0
+                ],
+                "[4]": [
+                  0
+                ]
+              },
+              "no_groups.importances": {
+                "0": [
+                  1.2107617845661491,
+                  1.2265491848376033,
+                  1.0499957829847104
+                ],
+                "1": [
+                  0.5465047454709713,
+                  0.36803884766366457,
+                  0.41978427998601997
+                ],
+                "2": [
+                  0.20625622915149633,
+                  0.17272734498656062,
+                  0.24160978964439572
+                ],
+                "3": [
+                  0.1185770248176875,
+                  0.17930090046389513,
+                  0.17809896469894626
+                ],
+                "4": [
+                  0.024680012026446985,
+                  0.023601990773227555,
+                  0.02486090823753828
+                ]
+              }
+            }
+          ],
+          "pr": [
+            {
+              "caller_x_after_call.changed_columns": [],
+              "int_groups_after_multi_group.importances": {
+                "2": [
+                  0.21936721672880444
+                ],
+                "3": [
+                  0.19149488806888038
+                ],
+                "4": [
+                  0.025431772308876166
+                ],
+                "[0, 1]": [
+                  1.4366142202405663
+                ]
+              },
+              "int_groups_only.importances": {
+                "0": [
+                  1.2107617845661491,
+                  1.2265491848376033,
+                  1.0499957829847104
+                ],
+                "1": [
+                  0.5465047454709713,
+                  0.36803884766366457,
+                  0.41978427998601997
+                ],
+                "2": [
+                  0.20625622915149633,
+                  0.17272734498656062,
+                  0.24160978964439572
+                ],
+                "3": [
+                  0.1185770248176875,
+                  0.17930090046389513,
+                  0.17809896469894626
+                ],
+                "4": [
+                  0.024680012026446985,
+                  0.023601990773227555,
+                  0.02486090823753828
+                ]
+              },
+              "list_groups.columns_permuted": {
+                "[2]": [
+                  2
+                ],
+                "[3]": [
+                  3
+                ],
+                "[4]": [
+                  4
+                ]
+              },
+              "no_groups.importances": {
+                "0": [
+                  1.2107617845661491,
+                  1.2265491848376033,
+                  1.0499957829847104
+                ],
+                "1": [
+                  0.5465047454709713,
+                  0.36803884766366457,
+                  0.41978427998601997
+                ],
+                "2": [
+                  0.20625622915149633,
+                  0.17272734498656062,
+                  0.24160978964439572
+                ],
+                "3": [
+                  0.1185770248176875,
+                  0.17930090046389513,
+                  0.17809896469894626
+                ],
+                "4": [
+                  0.024680012026446985,
+                  0.023601990773227555,
+                  0.02486090823753828
+                ]
+              }
+            },
+            {
+              "caller_x_after_call.changed_columns": [],
+              "int_groups_after_multi_group.importances": {
+                "2": [
+                  0.21936721672880444
+                ],
+                "3": [
+                  0.19149488806888038
+                ],
+                "4": [
+                  0.025431772308876166
+                ],
+                "[0, 1]": [
+                  1.4366142202405663
+                ]
+              },
+              "int_groups_only.importances": {
+                "0": [
+                  1.2107617845661491,
+                  1.2265491848376033,
+                  1.0499957829847104
+                ],
+                "1": [
+                  0.5465047454709713,
+                  0.36803884766366457,
+                  0.41978427998601997
+                ],
+                "2": [
+                  0.20625622915149633,
+                  0.17272734498656062,
+                  0.24160978964439572
+                ],
+                "3": [
+                  0.1185770248176875,
+                  0.17930090046389513,
+                  0.17809896469894626
+                ],
+                "4": [
+                  0.024680012026446985,
+                  0.023601990773227555,
+                  0.02486090823753828
+                ]
+              },
+              "list_groups.columns_permuted": {
+                "[2]": [
+                  2
+                ],
+                "[3]": [
+                  3
+                ],
+                "[4]": [
+                  4
+                ]
+              },
+              "no_groups.importances": {
+                "0": [
+                  1.2107617845661491,
+                  1.2265491848376033,
+                  1.0499957829847104
+                ],
+                "1": [
+                  0.5465047454709713,
+                  0.36803884766366457,
+                  0.41978427998601997
+                ],
+                "2": [
+                  0.20625622915149633,
+                  0.17272734498656062,
+                  0.24160978964439572
+                ],
+                "3": [
+                  0.1185770248176875,
+                  0.17930090046389513,
+                  0.17809896469894626
+                ],
+                "4": [
+                  0.024680012026446985,
+                  0.023601990773227555,
+                  0.02486090823753828
+                ]
+              }
+            },
+            {
+              "caller_x_after_call.changed_columns": [],
+              "int_groups_after_multi_group.importances": {
+                "2": [
+                  0.21936721672880444
+                ],
+                "3": [
+                  0.19149488806888038
+                ],
+                "4": [
+                  0.025431772308876166
+                ],
+                "[0, 1]": [
+                  1.4366142202405663
+                ]
+              },
+              "int_groups_only.importances": {
+                "0": [
+                  1.2107617845661491,
+                  1.2265491848376033,
+                  1.0499957829847104
+                ],
+                "1": [
+                  0.5465047454709713,
+                  0.36803884766366457,
+                  0.41978427998601997
+                ],
+                "2": [
+                  0.20625622915149633,
+                  0.17272734498656062,
+                  0.24160978964439572
+                ],
+                "3": [
+                  0.1185770248176875,
+                  0.17930090046389513,
+                  0.17809896469894626
+                ],
+                "4": [
+                  0.024680012026446985,
+                  0.023601990773227555,
+                  0.02486090823753828
+                ]
+              },
+              "list_groups.columns_permuted": {
+                "[2]": [
+                  2
+                ],
+                "[3]": [
+                  3
+                ],
+                "[4]": [
+                  4
+                ]
+              },
+              "no_groups.importances": {
+                "0": [
+                  1.2107617845661491,
+                  1.2265491848376033,
+                  1.0499957829847104
+                ],
+                "1": [
+                  0.5465047454709713,
+                  0.36803884766366457,
+                  0.41978427998601997
+                ],
+                "2": [
+                  0.20625622915149633,
+                  0.17272734498656062,
+                  0.24160978964439572
+                ],
+                "3": [
+                  0.1185770248176875,
+                  0.17930090046389513,
+                  0.17809896469894626
+                ],
+                "4": [
+                  0.024680012026446985,
+                  0.023601990773227555,
+                  0.02486090823753828
+                ]
+              }
+            }
+          ]
+        },
+        "runs_per_side": 3,
+        "sha256": "e96e9d283e778580c07e9eac986816372e9f6e18bba5fa7167a999371de1bf7c",
+        "source": "library",
+        "target": "rasbt/mlxtend#1229"
+      }
+    ],
+    "status": "ran",
+    "summary": {
+      "flagged": [
+        {
+          "claim": null,
+          "label": "unmentioned",
+          "name": "caller_x_after_call.changed_columns",
+          "probe": "feature-groups-permutation"
+        },
+        {
+          "claim": null,
+          "label": "unmentioned",
+          "name": "int_groups_after_multi_group.importances",
+          "probe": "feature-groups-permutation"
+        }
+      ],
+      "labels": [
+        "unmentioned",
+        "unmentioned",
+        "proven",
+        "proven",
+        "no_difference"
+      ],
+      "proven_claims": [
+        "C1",
+        "C2"
+      ],
+      "reason": "probe: 2 observation(s) need attention: caller_x_after_call.changed_columns differs and no claim covers it; int_groups_after_multi_group.importances differs and no claim covers it; probe: claim(s) C1, C2 proven; probe: 1 other observation(s) identical on both sides"
+    }
+  },
+  "python": "3.12.15",
+  "reason": "probe: 2 observation(s) need attention: caller_x_after_call.changed_columns differs and no claim covers it; int_groups_after_multi_group.importances differs and no claim covers it; probe: claim(s) C1, C2 proven; probe: 1 other observation(s) identical on both sides; tests: 9 test(s) ran on main, 10 on the PR; 1 new test(s) pass, 9 unchanged",
+  "reason_before_coverage_gate": "probe: 2 observation(s) need attention: caller_x_after_call.changed_columns differs and no claim covers it; int_groups_after_multi_group.importances differs and no claim covers it; probe: claim(s) C1, C2 proven; probe: 1 other observation(s) identical on both sides; tests: 9 test(s) ran on main, 10 on the PR; 1 new test(s) pass, 9 unchanged",
+  "record_kind": "pr_run",
+  "repo": "rasbt/mlxtend",
+  "route": "source-pair",
+  "run_date": "2026-10-10",
+  "run_timeout_s": 900,
+  "runs_per_side": 3,
+  "runs_per_side_planned": 3,
+  "schema_version": "1",
+  "sides": {
+    "comparison_basis": "base tip vs GitHub test merge (refs/pull/N/merge)",
+    "main_sha": "1aee767ef57b84a8191511a08955c583b65de382",
+    "merge_commit": "1af398f8e6305b25d59fba572ec21d51da1fe692",
+    "merge_head_matches_pinned_head": true,
+    "merge_parents": [
+      "1aee767ef57b84a8191511a08955c583b65de382",
+      "296459ec17120e757a56c7bb08c831469b0e5aa4"
+    ],
+    "pr_sha": "1af398f8e6305b25d59fba572ec21d51da1fe692"
+  },
+  "state": "open",
+  "test_extras": [
+    "testing"
+  ],
+  "test_selection": "chosen-PR subset: mlxtend/evaluate/tests/test_feature_importance.py",
+  "test_targets": {
+    "main": [
+      "mlxtend/evaluate/tests/test_feature_importance.py"
+    ],
+    "pr": [
+      "mlxtend/evaluate/tests/test_feature_importance.py"
+    ]
+  },
+  "test_timeout_s": 120,
+  "tested": {
+    "main": "master @ 1aee767ef57b (base tip = first parent of the merge commit)",
+    "pr": "GitHub test merge commit 1af398f8e630 (refs/pull/1229/merge) of head 296459ec1712"
+  },
+  "tested_at_ist": "2026-10-10 11:54 IST",
+  "thread_env": {
+    "BLIS_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1",
+    "NUMEXPR_NUM_THREADS": "1",
+    "OMP_NUM_THREADS": "1",
+    "OPENBLAS_NUM_THREADS": "1",
+    "VECLIB_MAXIMUM_THREADS": "1"
+  },
+  "updated_at_ist": "2026-10-06 18:49 IST",
+  "updated_at_utc": "2026-10-06T13:19:26Z",
+  "verdict": "needs_attention",
+  "verdict_before_coverage_gate": "needs_attention",
+  "what_changed": {
+    "compiled_files": [],
+    "other_files": [
+      "docs/sources/CHANGELOG.md"
+    ],
+    "package_python_files": [
+      "mlxtend/evaluate/feature_importance.py",
+      "mlxtend/evaluate/tests/test_feature_importance.py"
+    ]
+  },
+  "who": "ops/daily_run.py",
+  "workers": "4",
+  "behaviour_claims": [
+    {
+      "source": "PR description",
+      "quote": "For integer groups `rng.permutation(n)` gives the same ordering as the previous `rng.shuffle(X[:, feat])`, so those results don't change for a given seed.",
+      "pattern": "does not change"
+    }
+  ]
+}

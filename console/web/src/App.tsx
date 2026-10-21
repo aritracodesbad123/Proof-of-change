@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, type FormEvent } from 'react'
+import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react'
 import {
   api,
   lostJobMessage,
@@ -19,6 +19,7 @@ import {
   verdictPlain,
   verdictTone,
 } from './present'
+import { NebiusKeyField, TavilyKeyField } from './sessionKey'
 import {
   CostTimePanel,
   DetailRail,
@@ -120,6 +121,10 @@ export default function App() {
   const [contreeReady, setContreeReady] = useState<boolean | null>(null)
   const [prUrl, setPrUrl] = useState('')
   const [provider, setProvider] = useState('nebius')
+  const [approval, setApproval] = useState(false)
+  const approvalDefaultApplied = useRef(false)
+  const [keyStored, setKeyStored] = useState(false)
+  const [tavilyStored, setTavilyStored] = useState(false)
   const [busy, setBusy] = useState(false)
   const [detail, setDetail] = useState<{
     record: Record<string, unknown>
@@ -156,6 +161,10 @@ export default function App() {
       setApiOk(health.ok)
       setContreeReady(Boolean(health.contree_ready))
       setHealthNote(health.warning || health.run_note || null)
+      if (!approvalDefaultApplied.current && typeof health.approval_default === 'boolean') {
+        approvalDefaultApplied.current = true
+        setApproval(health.approval_default)
+      }
       const remote = (await api.runs()).runs
       setRuns(mergeRunLists(remote, loadLocalRuns(account?.id || null)))
       setErr(null)
@@ -173,6 +182,17 @@ export default function App() {
   useEffect(() => {
     void api.me().then(setAccount).catch(() => setAccount(null))
   }, [])
+
+  useEffect(() => {
+    if (!account) return
+    void api.sessionKey().then((status) => {
+      setKeyStored(status.nebius_key)
+      setTavilyStored(Boolean(status.tavily_key))
+    }).catch(() => {
+      setKeyStored(false)
+      setTavilyStored(false)
+    })
+  }, [account])
 
   useEffect(() => {
     void refresh()
@@ -340,7 +360,7 @@ export default function App() {
     setBusy(true)
     setErr(null)
     try {
-      const started = await api.startCheck(url.trim(), prov)
+      const started = await api.startCheck(url.trim(), prov, approval)
       setJob(started)
       go({ name: 'job', id: started.id })
     } catch (error) {
@@ -418,12 +438,41 @@ export default function App() {
                     {busy ? 'Starting…' : 'Run check'}
                   </button>
                 </div>
+                <label className="check-row" htmlFor="approval">
+                  <input
+                    id="approval"
+                    type="checkbox"
+                    checked={approval}
+                    onChange={(event) => setApproval(event.target.checked)}
+                  />
+                  Pause for approval before probes run
+                </label>
+                <p className="hint">
+                  Off by default, so the check runs straight through. Tick it, or set POC_CONSOLE_APPROVAL=1, to pause
+                  and review probes. A study run still refuses that step.
+                </p>
                 <label htmlFor="provider">Model provider</label>
                 <select id="provider" value={provider} onChange={(event) => setProvider(event.target.value)}>
                   <option value="nebius">nebius (live Nemotron)</option>
                   <option value="none">none (no AI)</option>
                   <option value="recorded">recorded (prerecorded fixture)</option>
                 </select>
+                <NebiusKeyField
+                  stored={keyStored}
+                  onSave={async (value) => {
+                    const saved = await api.setSessionKey(value)
+                    setKeyStored(saved.nebius_key)
+                    setTavilyStored(Boolean(saved.tavily_key))
+                  }}
+                />
+                <TavilyKeyField
+                  stored={tavilyStored}
+                  onSave={async (value) => {
+                    const saved = await api.setTavilyKey(value)
+                    setKeyStored(saved.nebius_key)
+                    setTavilyStored(Boolean(saved.tavily_key))
+                  }}
+                />
                 <button
                   type="button"
                   className="ghost sample"
