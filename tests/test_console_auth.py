@@ -727,11 +727,12 @@ def test_both_given_but_contree_cannot_start_does_not_ask_for_them_again(account
         server.shutdown()
 
 
-def test_sign_in_stays_on_when_port_visibility_cannot_be_read(monkeypatch):
+def test_sign_in_stays_on_when_port_visibility_cannot_be_read(monkeypatch, tmp_path):
     monkeypatch.setenv("CODESPACES", "true")
+    monkeypatch.setenv("POC_CONSOLE_CODE_FILE", str(tmp_path / "code"))
     console_auth.reset_port_cache()
     monkeypatch.setattr(console_auth.shutil, "which", lambda _name: None)          # gh missing
-    assert console_auth.sign_in_skip() == (False, console_auth.PORT_UNKNOWN_MESSAGE)
+    assert console_auth.sign_in_skip() == (False, console_auth.PORT_GH_MISSING_MESSAGE)
     assert console_auth.request_session_token(None) is None
     console_auth.reset_port_cache()
     monkeypatch.setattr(console_auth.shutil, "which", lambda _name: "/usr/bin/gh")
@@ -816,3 +817,84 @@ def test_unknown_pr_without_a_typed_key_is_refused_and_nothing_runs(accounts, mo
     finally:
         session_key_clear()
         server.shutdown()
+
+
+def test_codespace_port_check_names_the_codespace_with_c(monkeypatch):
+    monkeypatch.setenv("CODESPACE_NAME", "demo-space-123")
+    assert console_auth.codespace_ports_argv() == [
+        "gh", "codespace", "ports", "-c", "demo-space-123", "--json", "port,visibility"]
+    seen = []
+
+    class Ok:
+        returncode, stdout = 0, '[{"port": 8787, "visibility": "private"}]'
+
+    monkeypatch.setattr(console_auth.shutil, "which", lambda _name: "/usr/bin/gh")
+    monkeypatch.setattr(console_auth.subprocess, "run", lambda argv, **k: seen.append(argv) or Ok())
+    assert console_auth._read_codespace_port(8787) == "private"
+    assert seen[0][3:5] == ["-c", "demo-space-123"]
+    monkeypatch.delenv("CODESPACE_NAME")
+    assert "-c" not in console_auth.codespace_ports_argv()
+
+
+def test_start_script_passes_the_codespace_name():
+    from pathlib import Path
+    script = (Path(__file__).resolve().parents[1] / ".devcontainer" / "start-console.sh").read_text()
+    assert 'gh codespace ports -c "$CODESPACE_NAME" --json port,visibility' in script
+    cfg = json.loads((Path(__file__).resolve().parents[1] / ".devcontainer" / "devcontainer.json").read_text())
+    assert "ghcr.io/devcontainers/features/github-cli:1" in cfg["features"]
+    assert "privileged" not in cfg and "capAdd" not in cfg and "runArgs" not in cfg
+
+
+def _code_env(monkeypatch, tmp_path, visibility):
+    monkeypatch.setenv("CODESPACES", "true")
+    monkeypatch.setenv("POC_CONSOLE_CODE_FILE", str(tmp_path / "code"))
+    monkeypatch.setattr(console_auth, "codespace_port_visibility", lambda: visibility)
+    console_auth.reset_port_cache()
+    console_auth.reset_access_codes()
+
+
+def test_gh_missing_says_so_and_keeps_sign_in_on(monkeypatch, tmp_path):
+    monkeypatch.setenv("CODESPACES", "true")
+    monkeypatch.setenv("POC_CONSOLE_CODE_FILE", str(tmp_path / "code"))
+    console_auth.reset_port_cache()
+    monkeypatch.setattr(console_auth.shutil, "which", lambda _name: None)
+    skipped, why = console_auth.sign_in_skip()
+    assert skipped is False and why.startswith("GitHub CLI missing")
+    assert console_auth.viewer_account(None) is None
+    assert (tmp_path / "code").stat().st_mode & 0o077 == 0
+    console_auth.reset_port_cache()
+
+
+def test_console_code_fallback_is_fail_closed(accounts, monkeypatch, tmp_path):
+    _code_env(monkeypatch, tmp_path, None)
+    assert console_auth.sign_in_skip()[0] is False
+    code = (tmp_path / "code").read_text().strip()
+    assert len(code) == 32
+    me = console_auth.handle_request("GET", "/api/auth/me", {}, None, {}, host="127.0.0.1", proto="http")
+    assert me.status == 401 and me.body.get("console_code") is True and code not in json.dumps(me.body)
+    for wrong in ("", "nope", code[:-1]):
+        bad = console_auth.handle_request("POST", "/api/auth/console-code", {}, {"code": wrong}, {},
+                                          host="127.0.0.1", proto="http")
+        assert bad.status == 401 and not bad.cookies
+    ok = console_auth.handle_request("POST", "/api/auth/console-code", {}, {"code": code}, {},
+                                     host="127.0.0.1", proto="http")
+    assert ok.status == 200 and ok.body["id"] == "local"
+    token = ok.cookies[0].split(";")[0].split("=", 1)[1]
+    assert console_auth.viewer_account(token)["id"] == "local"
+    assert console_auth.request_session_token(token) == console_auth.LOCAL_SESSION
+    assert console_auth.viewer_account("forged-token") is None
+    # The port turning public revokes the code session and refuses new codes.
+    monkeypatch.setattr(console_auth, "codespace_port_visibility", lambda: "public")
+    assert console_auth.viewer_account(token) is None
+    again = console_auth.handle_request("POST", "/api/auth/console-code", {}, {"code": code}, {},
+                                        host="127.0.0.1", proto="http")
+    assert again.status == 401
+    # Off a Codespace the code route does nothing.
+    monkeypatch.delenv("CODESPACES")
+    monkeypatch.delenv("POC_SINGLE_USER", raising=False)
+    monkeypatch.setattr(console_auth, "codespace_port_visibility", lambda: None)
+    off = console_auth.handle_request("POST", "/api/auth/console-code", {}, {"code": code}, {},
+                                      host="127.0.0.1", proto="http")
+    assert off.status == 401
+    assert console_auth.viewer_account(token) is None
+    console_auth.reset_access_codes()
