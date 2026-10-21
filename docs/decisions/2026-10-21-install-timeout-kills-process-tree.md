@@ -17,8 +17,8 @@ A time limit that only signals the process group leaves a `setsid` child running
 
 ## Alternatives and tradeoffs
 
-Killing only the process group is simpler, and it misses processes that started their own session. Waiting for those children would hold the machine until they exit on their own. Freezing the tree before killing it closes the gap where a child forks while the list of processes is being collected.
+Killing only the process group is simpler, and it misses processes that started their own session. Waiting for those children would hold the machine until they exit on their own. Freezing the tree before killing it closes the gap where a child forks while the list of processes is being collected. A process that double-forks and is adopted by init can still escape. Init is the process that adopts a child whose parent has already exited, so that child is no longer listed under the install and the tree walk does not see it.
 
 ## What it means for you
 
-A hung install ends at the time limit, and its children do not keep running. The log and the failure text say the install timed out. Verdicts, guards, and scores are unchanged.
+A hung install ends at the time limit, and its children do not keep running. The log and the failure text say the install timed out. A process that double-forks and is adopted by init can still escape. Verdicts, guards, and scores are unchanged.

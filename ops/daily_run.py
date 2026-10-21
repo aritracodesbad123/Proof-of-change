@@ -1070,13 +1070,20 @@ def run(cmd, log_path: Path, cwd=None, env=None, timeout=None, sbx=HOST) -> tupl
     return rc, round(time.time() - t0, 1)
 
 
+_PROC = "/proc"
+
+
 def _descendants(pid: int) -> list[int]:
     """All descendants of pid by /proc parent links, including ones that left the process group via setsid."""
+    try:
+        entries = os.listdir(_PROC)
+    except FileNotFoundError:
+        return []
     kids: dict[int, list[int]] = {}
-    for d in os.listdir("/proc"):
+    for d in entries:
         if d.isdigit():
             try:
-                ppid = int(open(f"/proc/{d}/stat").read().rsplit(")", 1)[1].split()[1])
+                ppid = int(open(f"{_PROC}/{d}/stat").read().rsplit(")", 1)[1].split()[1])
             except (OSError, IndexError, ValueError):
                 continue
             kids.setdefault(ppid, []).append(int(d))
