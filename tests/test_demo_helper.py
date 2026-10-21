@@ -862,16 +862,7 @@ def test_missing_python_is_a_hard_gate_with_the_rule_recorded(tmp_path):
     plan = demo_helper.build_setup_plan(REPO, [root], {"text": ""}, "3.12", "local", "widget",
                                         python_available=lambda _v: None, pypi=_pypi, provision=lambda v: None)
     assert plan["python"]["gate_failed"] is True
-    assert any("Python rule:" in line and "main's requirement wins" in line for line in plan["lines"])
-
-
-def test_main_requirement_wins_when_sides_disagree(tmp_path):
-    main = _checkout(tmp_path / "m", python="<3.12")
-    pr = _checkout(tmp_path / "p", python=">=3.13")
-    plan = demo_helper.build_setup_plan(REPO, [main, pr], {"text": ""}, "3.12", "contree", "widget",
-                                        python_available=lambda _v: None, pypi=None, provision=False)
-    req = plan["python"]["requested"]
-    assert req and tuple(int(x) for x in req.split(".")) < (3, 12)
+    assert any("Python rule:" in line and "stops as a setup problem" in line for line in plan["lines"])
 
 
 def test_provision_ignores_mirrors(monkeypatch):
@@ -892,3 +883,34 @@ def test_interpreter_the_sandbox_cannot_see_is_replaced_by_a_managed_one(tmp_pat
                                         python_available=lambda _v: "/home/u/.local/bin/python3.14", pypi=_pypi,
                                         provision=lambda v: v)
     assert plan["python"]["switch"] == "3.14" and plan["python"]["auto_fix"] is True
+
+
+def test_sides_with_no_shared_python_stop_as_a_setup_problem(tmp_path):
+    main = _checkout(tmp_path / "m", python="<3.12")
+    pr = _checkout(tmp_path / "p", python=">=3.13")
+    plan = demo_helper.build_setup_plan(REPO, [main, pr], {"text": ""}, "3.12", "contree", "widget",
+                                        python_available=lambda _v: None, pypi=None, provision=False)
+    py = plan["python"]
+    assert py["gate_failed"] is True and py["requested"] is None
+    assert py["versions"]["main"]["requirement"] == "<3.12" and py["versions"]["pr"]["requirement"] == ">=3.13"
+    assert "setup problem" in py["reason"] and "<3.12" in py["reason"] and ">=3.13" in py["reason"]
+    assert "uv python install" not in demo_helper.contree_shell(plan)
+
+
+def test_not_a_package_and_deps_only_plan(tmp_path):
+    assert demo_helper.not_a_package("error: Multiple top-level packages discovered in a flat-layout: ['ee']")
+    assert not demo_helper.not_a_package("error: could not resolve numpy")
+    app = tmp_path / "app"
+    app.mkdir()
+    (app / "pyproject.toml").write_text('[project]\nname = "app"\ndependencies = ["django"]\n')
+    assert demo_helper.deps_only_plan(app) == {"kind": "uv-sync", "frozen": False, "source": "pyproject.toml"}
+    (app / "uv.lock").write_text("")
+    assert demo_helper.deps_only_plan(app)["frozen"] is True
+    reqs = tmp_path / "reqs"
+    reqs.mkdir()
+    (reqs / "requirements.txt").write_text("django\n")
+    (reqs / "requirements-dev.txt").write_text("pytest\n")
+    assert demo_helper.deps_only_plan(reqs)["files"] == ["requirements-dev.txt", "requirements.txt"]
+    empty = tmp_path / "empty"
+    empty.mkdir()
+    assert demo_helper.deps_only_plan(empty) is None

@@ -1225,6 +1225,40 @@ def install_side(venv: Path, checkout: Path, chosen: dict | None, log: Path, pyt
     return True, ""
 
 
+def install_deps_only(venv: Path, checkout: Path, plan: dict, log: Path, python: str, timeout: int,
+                      extra_reqs=None) -> tuple[bool, str]:
+    """Install only the dependencies a project declares (product checks), never the project itself.
+
+    Same commands on both sides. The checkout is added to the import path with a .pth file.
+    """
+    env = base_env(side_home(venv), install=True)
+    cmds = [["uv", "venv", "-q", "-p", python, venv]]
+    if plan.get("kind") == "uv-sync":
+        # same result as `uv sync --no-install-project`: the lock (or pyproject) exported without the project itself
+        reqs = side_home(venv) / "poc-declared-deps.txt"
+        export = ["uv", "export", "-q", "--no-emit-project", "--no-hashes", "--directory", checkout,
+                  "-p", venv / "bin/python", "-o", reqs]
+        cmds.append(export + (["--frozen"] if plan.get("frozen") else []))
+        cmds.append(["uv", "pip", "install", "-q", "-p", venv / "bin/python", "-r", reqs])
+    else:
+        for name in plan.get("files") or []:
+            cmds.append(["uv", "pip", "install", "-q", "-p", venv / "bin/python", "-r", checkout / name])
+    cmds.append(["uv", "pip", "install", "-q", "-p", venv / "bin/python", *BASE_TEST_DEPS, *(extra_reqs or [])])
+    sbx = side_sandbox(venv, network=True)
+    sbx["rw"].append(checkout)
+    for c in cmds:
+        rc, _ = run(c, log, env=env, timeout=timeout, sbx=sbx)
+        if rc == "timeout":
+            return False, f"dependency install timed out after {timeout}s; see {log.name}"
+        if rc == "oom":
+            return False, _oom_reason()
+        if rc != 0:
+            return False, f"dependency-only install failed ({rc}); see {log.name}"
+    for site in (venv / "lib").glob("python*/site-packages"):
+        (site / "poc-project-path.pth").write_text(str(checkout) + "\n")
+    return True, ""
+
+
 def _dist_version(venv: Path, requirement: str) -> str:
     """Installed version of one requirement, or "" when it is not there. The name is checked before it is used."""
     name = _req_name(requirement)
@@ -1304,7 +1338,7 @@ def _install_with_helper(a, rec, step, venv, checkout, chosen, log, timeout, con
     gate = ((rec.get("demo_helper") or {}).get("setup_plan") or {}).get("python") or {}
     if gate.get("gate_failed"):
         why = (f"setup problem: Python {gate.get('requested')} could not be installed for this check "
-               f"({gate.get('reason')}); nothing was tested")
+               f"({gate.get('reason')}); nothing was tested") if gate.get("requested") else str(gate.get("reason"))
         demo_helper.note_setup(rec, step, {"ok": False, "label": demo_helper.SETUP_LABEL, "counts_as_verdict": False,
                                            "attempts": 1, "detail": why, "retried": False, "step": step})
         return False, why
@@ -1331,6 +1365,23 @@ def _install_with_helper(a, rec, step, venv, checkout, chosen, log, timeout, con
                 state["py"] = got
                 shutil.rmtree(venv, ignore_errors=True)
                 ok, why = install_side(venv, checkout, chosen, log, got, timeout, constraints, extra_reqs)
+                if ok:
+                    return ok, why
+                try:
+                    text = log.read_text(errors="replace")[-20000:]
+                except OSError:
+                    text = ""
+        if product_route(a) and demo_helper.not_a_package(text):
+            plan = demo_helper.deps_only_plan(checkout)
+            if plan:
+                shutil.rmtree(venv, ignore_errors=True)
+                ok, why = install_deps_only(venv, checkout, plan, log, state["py"], timeout, extra_reqs)
+                if ok:
+                    demo_helper.note_auto_fix(
+                        rec, f"Auto-fix: the {step} could not build the project as a package, so only the "
+                             f"dependencies it declares ({plan['source']}) were installed, the same way on both "
+                             "sides, and the project's own folder was put on the import path.")
+                    rec.setdefault("demo_helper", {})["deps_only"] = plan
         return ok, why
 
     ok, why, _value, outcome = demo_helper.run_setup(
@@ -2069,7 +2120,8 @@ def _maybe_prepare_contree(a, repo: str, main_sha: str, pr_sha: str, rec: dict, 
         return None
     contree_sandboxes.clear_session()
     try:
-        sess = contree_sandboxes.prepare_source_pair(repo, main_sha, pr_sha, timeout=timeout, extra_shell=extra_shell)
+        sess = contree_sandboxes.prepare_source_pair(repo, main_sha, pr_sha, timeout=timeout, extra_shell=extra_shell,
+                                                     **({"deps_only_fallback": True} if product_route(a) else {}))
         rec["contree"] = sess.describe()
         rec["machine"] = "contree"
         rec["sandbox_backend"] = "contree"

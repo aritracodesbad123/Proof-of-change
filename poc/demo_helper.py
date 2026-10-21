@@ -1002,7 +1002,7 @@ def _sandbox_can_see(path: str) -> bool:
 
 
 PYTHON_RULE = ("one Python version is used on both sides: the lowest version that meets the requirements of both "
-               "main and the pull request; if none meets both, main's requirement wins")
+               "main and the pull request; if none meets both, the check stops as a setup problem and records both")
 
 
 def _python_decision(requested: str | None, current: str, sandbox: str, python_available, requirement: str = "",
@@ -1096,10 +1096,14 @@ def build_setup_plan(repo: str, checkouts, tavily, current_python: str, sandbox:
             refused.append({"name": name, "reason": "its PyPI page does not link to this GitHub repository"})
     spec_texts, declared_versions = _python_requirement(checkouts, repo, self_dist, pypi)
     requested = choose_python(spec_texts, declared_versions, current_python or "", python_available)
-    if requested is None and spec_texts and checkouts:
-        # main and the pull request disagree with no common version: main's requirement wins
-        main_specs, main_declared = _python_requirement(list(checkouts)[:1], repo, self_dist, None)
-        requested = choose_python(main_specs, main_declared, current_python or "", python_available)
+    conflict = None
+    if auto_python and requested is None and spec_texts and len(list(checkouts or [])) > 1:
+        sides = {}
+        for side, checkout in zip(SIDES, list(checkouts)[:2]):
+            side_specs, side_declared = _python_requirement([checkout], repo, self_dist, None)
+            sides[side] = {"requirement": ", ".join(side_specs) or "none",
+                           "version": choose_python(side_specs, side_declared, current_python or "", None)}
+        conflict = sides
     requirement = ", ".join(dict.fromkeys(item.strip() for item in spec_texts if item and item.strip()))
     system_names = []
     for checkout in checkouts or []:
@@ -1112,6 +1116,13 @@ def build_setup_plan(repo: str, checkouts, tavily, current_python: str, sandbox:
     if auto_python and requested:
         python["rule"] = PYTHON_RULE
         python["gate_failed"] = not python.get("applied")
+    if conflict:
+        python = {"requested": None, "current": current_python or "", "applied": False, "switch": None,
+                  "rule": PYTHON_RULE, "gate_failed": True, "versions": conflict,
+                  "reason": (f"setup problem: main needs Python {conflict['main']['requirement']} "
+                             f"(would use {conflict['main']['version'] or 'none'}) and the pull request needs "
+                             f"{conflict['pr']['requirement']} (would use {conflict['pr']['version'] or 'none'}); "
+                             "no single version meets both, so nothing was tested")}
     system = _system_decision(system_names, sandbox or "local")
     extra = [item["requirement"] for item in packages if item["action"] == "install"]
     lines = ["Setup plan: the same packages on main and pr."]
@@ -1122,6 +1133,8 @@ def build_setup_plan(repo: str, checkouts, tavily, current_python: str, sandbox:
             lines.append(f"Setup plan: {item['name']} is noted, installed with the project.")
     if requested:
         lines.append(f"Setup plan: Python {requested}: {python['reason']}")
+    if conflict:
+        lines.append(f"Setup plan: Python: {python['reason']}")
     if python.get("auto_fix"):
         lines.append(f"Auto-fix: Python {requested} is set up automatically for this check (no flag needed).")
     if python.get("rule"):
@@ -1226,6 +1239,35 @@ def provision_python(version: str, *, which=None, runner=None, install_dir: str 
     if runner([uv, "python", "install", "-q", version], env) != 0:
         return None
     return version
+
+
+_NOT_A_PACKAGE = re.compile(
+    r"multiple top-level packages discovered in a flat-layout|failed to build `|does not appear to be a python project|"
+    r"neither 'setup\.py' nor 'pyproject\.toml' found|no `project` table found|package-mode = false", re.I)
+
+
+def not_a_package(log_text: str) -> bool:
+    """True when an install failed because the project itself cannot be built as a package."""
+    return bool(_NOT_A_PACKAGE.search(log_text or ""))
+
+
+def deps_only_plan(checkout) -> dict | None:
+    """How to install only what the project declares, without building the project itself.
+
+    uv.lock (with pyproject): ``uv sync --no-install-project --frozen``. pyproject with [project]
+    dependencies: ``uv sync --no-install-project``. Otherwise requirements*.txt files. None when the
+    project declares nothing usable.
+    """
+    root = Path(checkout)
+    pyproject = _pyproject(root / "pyproject.toml")
+    if (root / "pyproject.toml").is_file() and isinstance(pyproject.get("project"), dict):
+        frozen = (root / "uv.lock").is_file()
+        return {"kind": "uv-sync", "frozen": frozen,
+                "source": "uv.lock" if frozen else "pyproject.toml"}
+    reqs = sorted(p.name for p in root.glob("requirements*.txt") if p.is_file())
+    if reqs:
+        return {"kind": "requirements", "files": reqs, "source": ", ".join(reqs)}
+    return None
 
 
 _WRONG_PYTHON = re.compile(

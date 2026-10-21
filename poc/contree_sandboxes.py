@@ -205,7 +205,20 @@ def clear_session() -> None:
     _state["session"] = None
 
 
-def install_shell_source(repo: str, sha: str, extra: str = "") -> str:
+DEPS_ONLY_SHELL = (
+    "{ echo 'Auto-fix: the project could not be built as a package, so only the dependencies it declares are installed';"
+    " python -m pip install -q uv==0.13.1 2>/dev/null || true;"
+    " PYX=\"$(python -c 'import sys; print(sys.executable)')\"; PFX=\"$(python -c 'import sys; print(sys.prefix)')\";"
+    " if [ -f pyproject.toml ] && [ -f uv.lock ]; then UV_PROJECT_ENVIRONMENT=\"$PFX\" python -m uv sync -q"
+    " --no-install-project --frozen -p \"$PYX\";"
+    " elif [ -f pyproject.toml ]; then UV_PROJECT_ENVIRONMENT=\"$PFX\" python -m uv sync -q --no-install-project -p \"$PYX\";"
+    " else for f in requirements*.txt; do if [ -f \"$f\" ]; then python -m pip install -q -r \"$f\"; fi; done; fi"
+    " && SP=\"$(python -c 'import sysconfig; print(sysconfig.get_paths()[\"purelib\"])')\""
+    " && echo /work/src > \"$SP/poc-project-path.pth\"; }"
+)
+
+
+def install_shell_source(repo: str, sha: str, extra: str = "", deps_only_fallback: bool = False) -> str:
     """Clone a public GitHub SHA into /work/src and pip-install editable + pytest (source-pair style).
 
     extra is the same shell on both sides (system packages and plan requirements). Empty leaves the
@@ -225,7 +238,7 @@ def install_shell_source(repo: str, sha: str, extra: str = "") -> str:
         "python -m pip install -q -e '.[dev]' 2>/dev/null "
         "|| python -m pip install -q -e '.[test]' 2>/dev/null "
         "|| python -m pip install -q -e '.[tests]' 2>/dev/null "
-        "|| python -m pip install -q -e .\n"
+        "|| python -m pip install -q -e ." + (" \\\n|| " + DEPS_ONLY_SHELL if deps_only_fallback else "") + "\n"
         "python -m pip install -q pytest pytest-timeout pytest-xdist coverage pytest-cov\n"
     )
     extra = (extra or "").strip()
@@ -236,14 +249,15 @@ def install_shell_source(repo: str, sha: str, extra: str = "") -> str:
 
 
 def prepare_source_pair(repo: str, main_sha: str, pr_sha: str, *, timeout: int = 1800,
-                        runner: Callable | None = None, extra_shell: str = "") -> ContreeSession:
+                        runner: Callable | None = None, extra_shell: str = "",
+                        deps_only_fallback: bool = False) -> ContreeSession:
     """Build main + PR Contree checkpoints for a source-pair style PR.
 
     extra_shell is applied to both SHAs. Empty keeps the default install shell.
     """
     sess = new_session(runner=runner) if runner is not None else new_session()
-    sess.checkpoint_main(install_shell_source(repo, main_sha, extra_shell), timeout=timeout)
-    sess.fork_pr(install_shell_source(repo, pr_sha, extra_shell), timeout=timeout)
+    sess.checkpoint_main(install_shell_source(repo, main_sha, extra_shell, deps_only_fallback), timeout=timeout)
+    sess.fork_pr(install_shell_source(repo, pr_sha, extra_shell, deps_only_fallback), timeout=timeout)
     return sess
 
 

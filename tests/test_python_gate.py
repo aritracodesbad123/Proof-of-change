@@ -39,3 +39,58 @@ def test_wrong_python_error_installs_it_and_retries_once(tmp_path, monkeypatch):
     ok, _ = daily_run._install_with_helper(study, {}, "main install", tmp_path / "v", tmp_path, None, log, 10, None,
                                            None)
     assert ok is False and set(seen) == {"3.12"}
+
+
+def _flat_layout(venv, checkout, chosen, lg, py, *rest):
+    lg.write_text("error: Multiple top-level packages discovered in a flat-layout: ['ee', 'posthog']\n")
+    return False, "install failed (1)"
+
+
+def test_flat_layout_installs_declared_dependencies_only(tmp_path, monkeypatch):
+    (tmp_path / "pyproject.toml").write_text('[project]\nname = "app"\ndependencies = []\n')
+    (tmp_path / "uv.lock").write_text("")
+    monkeypatch.setattr(daily_run, "install_side", _flat_layout)
+    got = []
+    monkeypatch.setattr(daily_run, "install_deps_only", lambda *a, **k: got.append(a[2]) or (True, ""))
+    rec = {}
+    a = SimpleNamespace(python="3.14", pr="https://github.com/a/b/pull/1", product_check=True, bench=None)
+    ok, _ = daily_run._install_with_helper(a, rec, "main install", tmp_path / "v", tmp_path, None, tmp_path / "log",
+                                           10, None, None)
+    assert ok is True and got == [{"kind": "uv-sync", "frozen": True, "source": "uv.lock"}]
+    assert any("only the dependencies it declares (uv.lock)" in n for n in rec["demo_helper"]["auto_fixes"])
+
+
+def test_flat_layout_is_left_alone_on_study_runs(tmp_path, monkeypatch):
+    (tmp_path / "pyproject.toml").write_text('[project]\nname = "app"\n')
+    monkeypatch.setattr(daily_run, "install_side", _flat_layout)
+    monkeypatch.setattr(daily_run, "install_deps_only", lambda *a, **k: (_ for _ in ()).throw(AssertionError()))
+    a = SimpleNamespace(python="3.12", pr="https://github.com/a/b/pull/1", product_check=False, bench=None)
+    ok, _ = daily_run._install_with_helper(a, {}, "main install", tmp_path / "v", tmp_path, None, tmp_path / "log",
+                                           10, None, None)
+    assert ok is False
+
+
+def test_deps_only_install_runs_uv_sync_in_the_sandbox_and_adds_the_path(tmp_path, monkeypatch):
+    cmds = []
+
+    def fake_run(c, log, env=None, timeout=None, sbx=None):
+        cmds.append([str(x) for x in c])
+        if c[1] == "venv":
+            (tmp_path / "v" / "lib" / "python3.14" / "site-packages").mkdir(parents=True)
+        assert sbx is not None
+        return 0, 0.0
+    monkeypatch.setattr(daily_run, "run", fake_run)
+    ok, _ = daily_run.install_deps_only(tmp_path / "v", tmp_path / "src", {"kind": "uv-sync", "frozen": True},
+                                        tmp_path / "log", "3.14", 10)
+    assert ok is True
+    assert any(c[:2] == ["uv", "export"] and "--no-emit-project" in c and "--frozen" in c for c in cmds)
+    assert any(c[:3] == ["uv", "pip", "install"] and "-r" in c for c in cmds)
+    pth = tmp_path / "v" / "lib" / "python3.14" / "site-packages" / "poc-project-path.pth"
+    assert pth.read_text().strip() == str(tmp_path / "src")
+
+
+def test_contree_shell_has_the_deps_only_fallback_only_when_asked():
+    from poc import contree_sandboxes
+    plain = contree_sandboxes.install_shell_source("a/b", "x")
+    product = contree_sandboxes.install_shell_source("a/b", "x", deps_only_fallback=True)
+    assert "--no-install-project" not in plain and "--no-install-project" in product
