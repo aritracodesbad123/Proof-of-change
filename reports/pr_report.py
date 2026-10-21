@@ -261,6 +261,22 @@ def checks(rec: dict) -> list[list]:
         out.append(["No flaky tests", "WARN",
                     f"{len(flaky)} test(s) changed result between runs of the same side: {shown}{more}",
                     "Listed for the record. A flaky test is not a regression and is not evidence either way."])
+    cmp = rec.get("comparison") or {}
+    pr_only = list(cmp.get("pr_unstable") or [])
+    pr_noisy = [t for t in (cmp.get("pr_unstable_noisy") or []) if t not in pr_only]
+    unstable = pr_only + pr_noisy
+    if unstable:
+        shown = ", ".join(f"`{t}`" for t in unstable[:5])
+        more = f" (+{len(unstable) - 5})" if len(unstable) > 5 else ""
+        if pr_only:
+            level = "FAIL"
+            fix = "A test that passes on every base run and fails on some pull-request runs is a possible regression."
+        else:
+            level = "WARN"
+            fix = "Every pull-request run differed, so this is too mixed to call a regression. It is not verified."
+        out.append(["Tests unstable only on the pull request", level,
+                    f"{len(unstable)} test(s) stable on the base and unstable only on the pull request: {shown}{more}",
+                    fix])
     cur, head = rec.get("current_head_sha"), rec.get("head_sha")
     if cur and head and cur != head:
         out.append(["PR unchanged since tested", "WARN", f"tested {head[:12]}, PR now at {cur[:12]}",
@@ -351,12 +367,15 @@ def claims(rec: dict, logs: Logs) -> list[dict]:
 
 # ---------------------------------------------------------------- probes
 PROBE_STATUS = {"proven": "proven", "false_claim": "false", "needs_human": "not observed", "flaky": "flaky",
+                "unstable_on_pr": "unstable on the pull request",
                 "unmentioned": "unmentioned change", "not_testable": "not testable", "no_difference": "proven"}
 PROBE_RESULT = {"proven": ("green", "as claimed"), "no_difference": ("green", "same on both sides"),
                 "false_claim": ("red", "contradicts the claim"), "unmentioned": ("amber", "differs, not in the PR description"),
                 "needs_human": ("amber", "no change although the claim says it changes"),
-                "flaky": ("amber", "flaky between runs"), "not_testable": ("grey", "probe could not run")}
-LABEL_RANK = ["false_claim", "flaky", "needs_human", "not_testable", "proven", "no_difference"]
+                "flaky": ("amber", "flaky between runs"),
+                "unstable_on_pr": ("amber", "unstable only on the pull request"),
+                "not_testable": ("grey", "probe could not run")}
+LABEL_RANK = ["false_claim", "flaky", "unstable_on_pr", "needs_human", "not_testable", "proven", "no_difference"]
 
 
 def probe_items(rec: dict) -> list[dict]:

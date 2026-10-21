@@ -27,6 +27,9 @@ RETRY_LIMITS = (
 TAVILY_TIMEOUT = 8
 PYPI_TIMEOUT = 8
 MAX_SUGGESTIONS = 8
+# Probe line coverage is measured again after a setup rerun only when the change is this small.
+# A larger change skips that measurement, and the rerun cannot raise could_not_verify to verified.
+SMALL_CHANGED_LINES = 200
 SIDES = ("main", "pr")
 TEST_EXTRAS = ("test", "tests", "testing")
 SECRET_ENVS = (
@@ -1315,9 +1318,80 @@ def _lookup_text(extra) -> str:
     return "\n".join(part for part in parts if part)
 
 
+def change_is_small(rec: dict) -> bool:
+    """True when the recorded change is small enough to measure probe line coverage again."""
+    total = (rec.get("coverage") or {}).get("changed_lines_total")
+    if isinstance(total, bool) or not isinstance(total, int):
+        return False
+    return total <= SMALL_CHANGED_LINES
+
+
+def _has_probe_items(rec: dict) -> bool:
+    probes = rec.get("probes") or {}
+    return bool(isinstance(probes, dict) and probes.get("items"))
+
+
+def probe_coverage_supports_verified(rec: dict) -> bool:
+    """True when a fresh measurement shows a changed line ran.
+
+    A measurement with no changed lines is not adequate, so it does not support verified.
+    """
+    items = (rec.get("probes") or {}).get("items") or []
+    if not items:
+        return True
+    totals = []
+    covered = False
+    for item in items:
+        if not isinstance(item, dict):
+            continue
+        cov = item.get("probe_changed_line_coverage") or {}
+        if cov.get("status") != "measured":
+            continue
+        total = cov.get("changed_lines_total") or 0
+        totals.append(total)
+        if (cov.get("changed_lines_covered") or 0) > 0:
+            covered = True
+    if not totals:
+        return False
+    if max(totals) == 0:
+        return False
+    return covered
+
+
+def _coverage_blocks_verified(rec: dict, after_verdict: str, recheck_coverage) -> tuple[str, str] | None:
+    """A replacement verdict when a rerun must not be taken as verified, or None to keep the rerun result.
+
+    Probe line coverage is recomputed only when the change is small. Otherwise the measurement is skipped.
+    """
+    if after_verdict != "verified" or not _has_probe_items(rec):
+        return None
+    if not change_is_small(rec):
+        return ("could_not_verify",
+                "could not verify: probe line coverage was not recomputed after the setup rerun "
+                "because the change is not small")
+    if recheck_coverage is None:
+        return ("could_not_verify",
+                "could not verify: probe line coverage was not recomputed after the setup rerun")
+    got = recheck_coverage() or {}
+    fresh = got.get("verdict")
+    if fresh in ("needs_attention", "could_not_verify"):
+        return fresh, got.get("reason") or rec.get("reason") or ""
+    if not probe_coverage_supports_verified(rec):
+        return ("could_not_verify",
+                "could not verify: probe line coverage after the setup rerun does not show a changed line ran")
+    if fresh == "verified" and got.get("reason"):
+        return "verified", got["reason"]
+    return None
+
+
 def retry_unverified(rec: dict, rerun, install_one, declared, tavily_text: str, pypi, repo: str,
-                     allow_system: bool, install_system=None, lookup=None) -> dict:
-    """One rerun when a could-not-verify result is a setup gap. Tavily text alone never changes the verdict."""
+                     allow_system: bool, install_system=None, lookup=None, recheck_coverage=None) -> dict:
+    """One rerun when a could-not-verify result is a setup gap. Tavily text alone never changes the verdict.
+
+    This is the only step that can raise could_not_verify to verified. When the record has probes, that raise
+    waits for a fresh probe line-coverage measurement. The measurement runs only when the change is small.
+    A larger change skips it, and the verdict stays could_not_verify.
+    """
     block = rec.setdefault("demo_helper", {})
     notes = list(block.get("notes") or [])
     setup = block.get("setup") or {}
@@ -1398,8 +1472,12 @@ def retry_unverified(rec: dict, rerun, install_one, declared, tavily_text: str, 
         rec["verdict"] = "could_not_verify"
         rec["reason"] = _gap_reason(gap_name(after_reason or text))
     else:
-        rec["verdict"] = after_verdict
-        rec["reason"] = after_reason
+        held = _coverage_blocks_verified(rec, after_verdict, recheck_coverage)
+        if held:
+            rec["verdict"], rec["reason"] = held
+        else:
+            rec["verdict"] = after_verdict
+            rec["reason"] = after_reason
     notes.append(f"Before rerun: {before['verdict']}: {before['reason']}")
     notes.append(f"After rerun: {rec['verdict']}: {rec['reason']}")
     block["notes"] = _unique(notes)
