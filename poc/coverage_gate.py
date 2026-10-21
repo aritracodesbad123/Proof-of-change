@@ -193,18 +193,18 @@ def assess(rec: dict) -> dict:
     g["note"] = "; ".join(notes)
     if base != "verified":
         return g
+    if rec.get("product_check") and comp:
+        # Product checks only: coverage.py cannot see compiled code, so any change touching compiled code
+        # (even mixed with Python) cannot be verified. Study runs never set product_check, so they are unchanged.
+        g.update(verdict="could_not_verify", changed=True, confidence="none",
+                 reason=f"{PRODUCT_COMPILED_ONLY} (compiled files: {', '.join(comp)}) (tests: {base_reason})")
+        return g
     if rec.get("product_check") and py and not measured:
         # Product checks only: a verified result needs coverage that was actually measured. Study runs never set
         # product_check, so their verdicts are unchanged.
         g.update(verdict="could_not_verify", changed=True, confidence="none",
                  reason=f"{PRODUCT_NOT_MEASURED}" + (f" ({cov['why']})" if cov.get("why") else "")
                         + f" (tests: {base_reason})")
-        return g
-    if rec.get("product_check") and comp:
-        # Product checks only: coverage.py cannot see compiled code, so any change touching compiled code
-        # (even mixed with Python) cannot be verified. Study runs never set product_check, so they are unchanged.
-        g.update(verdict="could_not_verify", changed=True, confidence="none",
-                 reason=f"{PRODUCT_COMPILED_ONLY} (compiled files: {', '.join(comp)}) (tests: {base_reason})")
         return g
     never_ran = py and measured and cov.get("changed_lines_total") and cov.get("changed_lines_covered") == 0
     if untested_compiled or never_ran:

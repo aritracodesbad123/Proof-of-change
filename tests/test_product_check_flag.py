@@ -67,3 +67,8 @@ def test_mixed_compiled_and_python_change_is_capped_on_a_product_check():
     g = cg.apply({**rec, "product_check": True})
     assert g["verdict"] == "could_not_verify"
     assert g["reason"].startswith(cg.PRODUCT_COMPILED_ONLY) and "src/fast.c" in g["reason"]
+
+
+def test_mixed_change_without_coverage_still_names_the_compiled_files():
+    g = cg.apply({"verdict": "verified", "reason": "r", "files": dict(MIXED), "product_check": True})
+    assert g["verdict"] == "could_not_verify" and "src/fast.c" in g["reason"]
