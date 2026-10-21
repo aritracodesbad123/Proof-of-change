@@ -165,7 +165,8 @@ def test_logged_check_output_drops_the_key(tmp_path, monkeypatch):
     session_key.clear_key("sess-log")
 
 
-def test_live_check_without_a_key_uses_recorded_answers(monkeypatch):
+@pytest.mark.real_key_gate
+def test_live_check_without_a_key_is_refused(monkeypatch):
     monkeypatch.delenv("NEBIUS_API_KEY", raising=False)
     monkeypatch.delenv("CODESPACES", raising=False)
 
@@ -181,10 +182,9 @@ def test_live_check_without_a_key_uses_recorded_answers(monkeypatch):
         console_api, "console_run_flags",
         lambda *_a, **_k: console_api.ConsoleRunPlan([], None, False, None),
     )
-    job = console_api.start_check("https://github.com/me/demo/pull/4", model_provider="nebius")
-    assert job["model_provider"] == "recorded"
-    assert "recorded AI answers" in (job.get("run_note") or "")
-    assert SECRET not in json.dumps(job)
+    for provider in ("nebius", "recorded", "none"):
+        with pytest.raises(console_api.CheckRefused, match="Add your Nebius API key to run a live check."):
+            console_api.start_check("https://github.com/me/demo/pull/4", model_provider=provider)
 
 
 def test_codespace_refuses_unsandboxed_pull_request_code(monkeypatch):
@@ -200,7 +200,7 @@ def test_codespace_refuses_unsandboxed_pull_request_code(monkeypatch):
     assert plan.flags == []
     assert plan.refused is True
     assert plan.note and "will not run pull-request code" in plan.note
-    with pytest.raises(ValueError, match="will not run pull-request code"):
+    with pytest.raises(ValueError, match="No sandbox available"):
         console_api.start_check("https://github.com/me/demo/pull/8", model_provider="recorded")
     monkeypatch.setenv("POC_UNSAFE_NO_SANDBOX", "1")
     opted = console_api.console_run_flags()
@@ -607,8 +607,9 @@ def test_codespace_container_is_not_loosened_and_setup_is_robust():
     cfg = json.loads((root / ".devcontainer" / "devcontainer.json").read_text())
     assert cfg.get("privileged") is not True and "runArgs" not in cfg and "capAdd" not in cfg
     assert "post-create.sh" in cfg["postCreateCommand"]
-    for name in ("NEBIUS_API_KEY", "CONTREE_PROJECT_ID"):
-        assert "Your own" in cfg["secrets"][name]["description"]
+    # Console checks use only keys typed into the form, so the Codespace does not ask for Nebius secrets.
+    for name in ("NEBIUS_API_KEY", "CONTREE_PROJECT_ID", "NEBIUS_PROJECT_ID"):
+        assert name not in cfg["secrets"]
     setup = (root / ".devcontainer" / "post-create.sh").read_text()
     assert "set -Eeuo pipefail" in setup and "npm run build" in setup and "poc-setup.log" in setup
     assert ".[dev,contree]" in setup
@@ -662,7 +663,8 @@ def test_sandbox_choice_uses_contree_with_the_judges_own_keys(monkeypatch):
         monkeypatch.delenv(k, raising=False)
     monkeypatch.setenv("NEBIUS_API_KEY", "secret-nebius-123")
     monkeypatch.setenv("CONTREE_PROJECT_ID", "proj-123")
-    assert _plan(monkeypatch, False).flags == ["--sandbox-backend", "contree"]
+    # Server environment values are never used for a user check.
+    assert _plan(monkeypatch, False).flags != ["--sandbox-backend", "contree"]
     monkeypatch.delenv("NEBIUS_API_KEY")
     monkeypatch.delenv("CONTREE_PROJECT_ID")
     token = "judge-contree"
@@ -684,7 +686,7 @@ def test_sandbox_choice_refuses_without_bubblewrap_or_keys(monkeypatch):
         monkeypatch.delenv(k, raising=False)
     plan = _plan(monkeypatch, False)
     assert plan.refused and plan.flags == []
-    assert "own Nebius key and Contree project ID" in plan.note
+    assert "own Nebius key and project ID into the start form" in plan.note
 
 
 def test_contree_keys_never_reach_pull_request_code(tmp_path, monkeypatch):

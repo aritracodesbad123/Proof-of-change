@@ -274,7 +274,7 @@ def test_start_check_refuses_unsandboxed_pr_code(monkeypatch):
             console_api.start_check("https://github.com/me/demo/pull/3", model_provider="recorded")
             raise AssertionError(f"expected refusal for POC_UNSAFE_NO_SANDBOX={value!r}")
         except ValueError as exc:
-            assert "will not run pull-request code" in str(exc)
+            assert str(exc).startswith("No sandbox available")
     assert started == []
 
 
