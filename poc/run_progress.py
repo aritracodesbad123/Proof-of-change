@@ -16,6 +16,8 @@ from typing import Any
 STAGES = (
     "queued",
     "fetch_pr",
+    "setup_python",
+    "install_deps",
     "install_main",
     "install_pr",
     "claims",

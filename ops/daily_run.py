@@ -1280,9 +1280,14 @@ def _product_plan(a, rec: dict, repo: str, cfg: dict, checkouts, pypi=None, pyth
         getattr(a, "sandbox_backend", None) or "local",
         (cfg or {}).get("dist") or (cfg or {}).get("pkg") or "",
         python_available=python_available, pypi=pypi,
-        allow_lookup_packages=bool(folders))
+        allow_lookup_packages=bool(folders), auto_python=product_route(a))
     demo_helper.attach_plan(rec, plan)
     demo_helper.announce(plan.get("lines") or [])
+    py = plan.get("python") or {}
+    if py.get("requested") and py.get("rule"):
+        from poc import run_progress
+        run_progress.emit("setup_python", detail=("failed: " if py.get("gate_failed") else "")
+                          + f"Python {py['requested']}: {py.get('reason')}")
     return plan
 
 
@@ -1296,6 +1301,15 @@ def _install_with_helper(a, rec, step, venv, checkout, chosen, log, timeout, con
     """Retry one side's install. The caller uses the plain install_side call when the helper is off."""
     from poc import demo_helper
     py = a.python if python is None else python
+    gate = ((rec.get("demo_helper") or {}).get("setup_plan") or {}).get("python") or {}
+    if gate.get("gate_failed"):
+        why = (f"setup problem: Python {gate.get('requested')} could not be installed for this check "
+               f"({gate.get('reason')}); nothing was tested")
+        demo_helper.note_setup(rec, step, {"ok": False, "label": demo_helper.SETUP_LABEL, "counts_as_verdict": False,
+                                           "attempts": 1, "detail": why, "retried": False, "step": step})
+        return False, why
+    from poc import run_progress
+    run_progress.emit("install_deps", detail=f"{step}: installing the project's declared dependencies")
 
     state = {"py": py}
 
@@ -1307,12 +1321,12 @@ def _install_with_helper(a, rec, step, venv, checkout, chosen, log, timeout, con
             text = log.read_text(errors="replace")[-20000:]
         except OSError:
             text = ""
-        wanted = demo_helper.wrong_python(text)
+        wanted = demo_helper.wrong_python(text) if product_route(a) else None
         if wanted and wanted != state["py"] and not str(state["py"]).endswith(wanted):
             got = demo_helper.find_python(wanted) or demo_helper.provision_python(wanted)
             if got:
                 demo_helper.note_auto_fix(
-                    rec, f"Auto-fix: the {step} install said it needs Python {wanted}, so Python {wanted} "
+                    rec, f"Auto-fix: the {step} said it needs Python {wanted}, so Python {wanted} "
                          "was installed and the install was tried again.")
                 state["py"] = got
                 shutil.rmtree(venv, ignore_errors=True)

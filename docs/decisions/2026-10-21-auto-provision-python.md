@@ -15,6 +15,11 @@ A random-PR check of a repository that needs Python 3.14 ended as "rerun, setup 
 - Contree: the setup shell, which runs while network is still allowed and before the checkpoints are saved, installs that Python with uv into the sandbox image and makes `python` point at it. The PR checkpoint is forked from main, so both sides use the same interpreter. Tests and probes then run offline as before.
 - If an install fails with an error that names a different Python, the runner installs that Python and tries the install once more before reporting a setup problem.
 - Every automatic fix is written into the report notes in plain words, starting with "Auto-fix:".
+- Where the interpreter comes from: only uv's own managed CPython builds (python-build-standalone), which uv checks against the SHA-256 in its built-in download list. Mirror and download-list settings are cleared before the download, and the uv used inside Contree is pinned. Nothing a pull request supplies (a URL, a script, a lock file entry) can choose the source.
+- Which version wins: one version is used on both sides, the lowest that meets the requirements of both main and the pull request. If no version meets both, main's requirement wins. The rule is written into the report.
+- Hard gate: if the Python setup fails, the check stops with "setup problem: Python X could not be installed" and nothing is tested. If the dependency install fails after its automatic retries, it also ends as a setup problem. A setup failure is never verified.
+- Product checks only: all of this applies only to checks started with `--product-check`. A study run keeps the earlier behaviour, so results from the v1.1 tag do not change.
+- The console's process graph shows two new steps before the tests, "Set up Python <version>" and "Install dependencies", each with its state and, when clicked, what was installed or fixed.
 - Only the interpreter is downloaded. Project packages still come only from the project's own files. The download runs with keys and tokens removed from its environment.
 
 ## Consequences

@@ -845,3 +845,41 @@ def test_wrong_python_reads_install_errors():
     assert demo_helper.wrong_python("error: the requested interpreter does not satisfy requires-python >=3.14.7") == "3.14"
     assert demo_helper.wrong_python("No interpreter found for Python 3.13 in managed installations") == "3.13"
     assert demo_helper.wrong_python("error: could not build wheels for lxml") is None
+
+
+def test_study_runs_keep_the_old_python_behaviour(tmp_path):
+    root = _checkout(tmp_path, python=">=3.14")
+    called = []
+    plan = demo_helper.build_setup_plan(REPO, [root], {"text": ""}, "3.12", "contree", "widget",
+                                        python_available=lambda _v: None, pypi=_pypi,
+                                        provision=lambda v: called.append(v) or v, auto_python=False)
+    assert called == [] and plan["python"]["applied"] is False and "rule" not in plan["python"]
+    assert "uv python install" not in demo_helper.contree_shell(plan)
+
+
+def test_missing_python_is_a_hard_gate_with_the_rule_recorded(tmp_path):
+    root = _checkout(tmp_path, python=">=3.14")
+    plan = demo_helper.build_setup_plan(REPO, [root], {"text": ""}, "3.12", "local", "widget",
+                                        python_available=lambda _v: None, pypi=_pypi, provision=lambda v: None)
+    assert plan["python"]["gate_failed"] is True
+    assert any("Python rule:" in line and "main's requirement wins" in line for line in plan["lines"])
+
+
+def test_main_requirement_wins_when_sides_disagree(tmp_path):
+    main = _checkout(tmp_path / "m", python="<3.12")
+    pr = _checkout(tmp_path / "p", python=">=3.13")
+    plan = demo_helper.build_setup_plan(REPO, [main, pr], {"text": ""}, "3.12", "contree", "widget",
+                                        python_available=lambda _v: None, pypi=None, provision=False)
+    req = plan["python"]["requested"]
+    assert req and tuple(int(x) for x in req.split(".")) < (3, 12)
+
+
+def test_provision_ignores_mirrors(monkeypatch):
+    monkeypatch.setenv("UV_PYTHON_INSTALL_MIRROR", "https://evil.example/")
+    monkeypatch.setenv("UV_PYTHON_DOWNLOADS_JSON_URL", "https://evil.example/x.json")
+    seen = {}
+    demo_helper.provision_python("3.14", which=lambda _n: "/usr/bin/uv",
+                                 runner=lambda a, e: seen.update(e) or 0, install_dir="/x")
+    assert "UV_PYTHON_INSTALL_MIRROR" not in seen and "UV_PYTHON_DOWNLOADS_JSON_URL" not in seen
+    shell = demo_helper.contree_python_shell("3.14")
+    assert "unset UV_PYTHON_INSTALL_MIRROR" in shell and demo_helper.UV_PIN in shell

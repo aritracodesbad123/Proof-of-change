@@ -989,8 +989,12 @@ def pypi_links_back(info, owner: str, repo: str) -> bool:
     return any(github_repo_url(value, owner, repo) for value in values)
 
 
+PYTHON_RULE = ("one Python version is used on both sides: the lowest version that meets the requirements of both "
+               "main and the pull request; if none meets both, main's requirement wins")
+
+
 def _python_decision(requested: str | None, current: str, sandbox: str, python_available, requirement: str = "",
-                     provision=None) -> dict:
+                     provision=None, auto_python: bool = True) -> dict:
     if not requested:
         return {"requested": None, "current": current, "applied": False, "switch": None,
                 "reason": "no Python version was requested"}
@@ -1000,6 +1004,9 @@ def _python_decision(requested: str | None, current: str, sandbox: str, python_a
         met = requirement or requested
         return {"requested": requested, "current": current, "applied": True, "switch": None,
                 "reason": f"Python {current} already meets {met}"}
+    if sandbox == "contree" and not auto_python:
+        return {"requested": requested, "current": current, "applied": False, "switch": None,
+                "reason": "not applied: the Contree image keeps its Python"}
     if sandbox == "contree":
         return {"requested": requested, "current": current, "applied": True, "switch": None,
                 "provision": requested, "auto_fix": True,
@@ -1037,7 +1044,7 @@ def _system_decision(names: list[str], sandbox: str) -> list[dict]:
 
 def build_setup_plan(repo: str, checkouts, tavily, current_python: str, sandbox: str, self_dist: str = "",
                      python_available=None, pypi=None, allow_lookup_packages: bool = True,
-                     provision=None) -> dict:
+                     provision=None, auto_python: bool = True) -> dict:
     """One plan for both sides. Only project-listed packages and link-back suggestions are added."""
     if python_available is not None and provision is None:
         provision = False   # an injected interpreter lookup (tests) never downloads anything
@@ -1075,6 +1082,10 @@ def build_setup_plan(repo: str, checkouts, tavily, current_python: str, sandbox:
             refused.append({"name": name, "reason": "its PyPI page does not link to this GitHub repository"})
     spec_texts, declared_versions = _python_requirement(checkouts, repo, self_dist, pypi)
     requested = choose_python(spec_texts, declared_versions, current_python or "", python_available)
+    if requested is None and spec_texts and checkouts:
+        # main and the pull request disagree with no common version: main's requirement wins
+        main_specs, main_declared = _python_requirement(list(checkouts)[:1], repo, self_dist, None)
+        requested = choose_python(main_specs, main_declared, current_python or "", python_available)
     requirement = ", ".join(dict.fromkeys(item.strip() for item in spec_texts if item and item.strip()))
     system_names = []
     for checkout in checkouts or []:
@@ -1082,7 +1093,11 @@ def build_setup_plan(repo: str, checkouts, tavily, current_python: str, sandbox:
             if name not in system_names:
                 system_names.append(name)
     python = _python_decision(requested, current_python or "", sandbox or "local", python_available, requirement,
-                              provision=provision_python if provision is None else (provision or None))
+                              provision=(provision_python if provision is None else (provision or None))
+                              if auto_python else None, auto_python=auto_python)
+    if auto_python and requested:
+        python["rule"] = PYTHON_RULE
+        python["gate_failed"] = not python.get("applied")
     system = _system_decision(system_names, sandbox or "local")
     extra = [item["requirement"] for item in packages if item["action"] == "install"]
     lines = ["Setup plan: the same packages on main and pr."]
@@ -1095,6 +1110,8 @@ def build_setup_plan(repo: str, checkouts, tavily, current_python: str, sandbox:
         lines.append(f"Setup plan: Python {requested}: {python['reason']}")
     if python.get("auto_fix"):
         lines.append(f"Auto-fix: Python {requested} is set up automatically for this check (no flag needed).")
+    if python.get("rule"):
+        lines.append(f"Setup plan: Python rule: {python['rule']}.")
     for item in system:
         lines.append(f"Setup plan: system package {item['name']}: {item['reason']}")
     for item in refused:
@@ -1127,6 +1144,11 @@ def contree_shell(plan: dict | None) -> str:
     return "\n".join(lines)
 
 
+# uv verifies each managed CPython download against the SHA-256 in its own built-in manifest.
+UV_PIN = "uv==0.13.1"
+_MIRROR_VARS = ("UV_PYTHON_INSTALL_MIRROR", "UV_PYTHON_DOWNLOADS_JSON_URL", "UV_PYPY_INSTALL_MIRROR")
+
+
 def contree_python_shell(version: str) -> str:
     """Setup shell (network on, before tests) that makes `python` the wanted version in a Contree checkpoint.
 
@@ -1140,7 +1162,8 @@ def contree_python_shell(version: str) -> str:
     return (
         f"if ! python -c 'import sys; sys.exit(0 if sys.version_info[:2] == ({major}, {minor}) else 1)'; then\n"
         f"  echo 'Auto-fix: installing Python {version} for this check (the project needs it)'\n"
-        "  python -m pip install -q uv\n"
+        "  unset UV_PYTHON_INSTALL_MIRROR UV_PYTHON_DOWNLOADS_JSON_URL UV_PYPY_INSTALL_MIRROR\n"
+        f"  python -m pip install -q {UV_PIN}\n"
         f"  UV_PYTHON_INSTALL_DIR=/opt/poc-python/install python -m uv python install -q {version}\n"
         f"  UV_PYTHON_INSTALL_DIR=/opt/poc-python/install python -m uv venv -q --seed -p {version} /opt/poc-python/venv\n"
         "  printf '#!/bin/sh\\nexec /opt/poc-python/venv/bin/python \"$@\"\\n' > /usr/local/bin/python\n"
@@ -1181,6 +1204,8 @@ def provision_python(version: str, *, which=None, runner=None, install_dir: str 
             install_dir = None
     if install_dir:
         env["UV_PYTHON_INSTALL_DIR"] = install_dir
+    for key in _MIRROR_VARS:   # only uv's own managed builds, never a mirror or a list a caller supplies
+        env.pop(key, None)
     for key in list(env):   # no keys reach the download
         if any(word in key.upper() for word in ("TOKEN", "KEY", "SECRET", "PASSWORD")):
             env.pop(key)
