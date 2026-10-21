@@ -1092,6 +1092,16 @@ def check_installed_commit_by_name(venv: Path, dist: str, expected_sha: str, che
     return False, info
 
 
+def _deps_only_path(venv: Path) -> Path | None:
+    """The folder a dependency-only install put on the import path, or None."""
+    for site in Path(venv).glob("lib/python*/site-packages"):
+        f = site / "poc-project-path.pth"
+        if f.is_file():
+            lines = [ln.strip() for ln in f.read_text(errors="replace").splitlines() if ln.strip()]
+            return Path(lines[0]) if len(lines) == 1 else None
+    return None
+
+
 def check_installed_commit(venv: Path, dist: str, expected_sha: str, checkout: Path | None = None) -> tuple[bool, dict]:
     """Does the environment contain the checkout of `expected_sha`? Fails closed.
 
@@ -1123,6 +1133,15 @@ def check_installed_commit(venv: Path, dist: str, expected_sha: str, checkout: P
         else:
             elsewhere.append((name, url if isinstance(url, str) else ""))
     if not matches:
+        pth = _deps_only_path(venv)
+        if pth is not None and _same_folder(pth, checkout):
+            # dependency-only install (the project could not be built): the import path names this checkout
+            head = _checkout_head(checkout)
+            info.update({"dist": "(project folder on the import path)", "installed": head, "deps_only": True})
+            ok = _sha_same(expected_sha, head)
+            if not ok:
+                info["why"] = f"the checkout on the import path is at {head[:12] or 'unknown'}, not {expected_sha[:12]}"
+            return ok, info
         if len(elsewhere) == 1:
             name, url = elsewhere[0]
             info["dist"] = name

@@ -95,3 +95,19 @@ def test_contree_shell_has_the_deps_only_fallback_only_when_asked():
     plain = contree_sandboxes.install_shell_source("a/b", "x")
     product = contree_sandboxes.install_shell_source("a/b", "x", deps_only_fallback=True)
     assert "--no-install-project" not in plain and "--no-install-project" in product
+
+
+def test_commit_guard_accepts_a_deps_only_checkout_at_the_right_commit(tmp_path, monkeypatch):
+    venv, co = tmp_path / "v", tmp_path / "co"
+    site = venv / "lib" / "python3.14" / "site-packages"
+    site.mkdir(parents=True)
+    co.mkdir()
+    (site / "poc-project-path.pth").write_text(str(co) + "\n")
+    monkeypatch.setattr(daily_run, "_checkout_head", lambda _c: "a" * 40)
+    ok, info = daily_run.check_installed_commit(venv, "x", "a" * 40, co)
+    assert ok is True and info["deps_only"] is True
+    ok, _ = daily_run.check_installed_commit(venv, "x", "b" * 40, co)
+    assert ok is False
+    (site / "poc-project-path.pth").write_text(str(tmp_path / "elsewhere") + "\n")
+    ok, _ = daily_run.check_installed_commit(venv, "x", "a" * 40, co)
+    assert ok is False
