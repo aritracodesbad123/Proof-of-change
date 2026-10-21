@@ -1,0 +1,58 @@
+Setup check: GitHub token: present.
+Setup check: Nebius token: present.
+Setup check: free memory 6.1 GB (of 15.6 GB).
+Setup check: free disk 98.2 GB.
+Demo helper: git is installed.
+Demo helper: python3 is installed.
+Demo helper: uv is installed.
+[pahaz/sshtunnel] priority 1: selected: [304]
+  testing #304 Migrate to PEP518 ...
+Setup check: GitHub token: present.
+Setup check: Nebius token: present.
+Setup check: free memory 6.1 GB (of 15.6 GB).
+Setup check: free disk 98.2 GB.
+Demo helper: git is installed.
+Demo helper: python3 is installed.
+Demo helper: uv is installed.
+Looked up with Tavily: 6 results
+Query: sshtunnel python setup install instructions https://github.com/pahaz/sshtunnel site:github.com/pahaz/sshtunnel
+Query: sshtunnel python documentation install https://github.com/pahaz/sshtunnel site:github.com/pahaz/sshtunnel
+Query: sshtunnel python install requirements https://pypi.org/project/sshtunnel/ https://github.com/pahaz/sshtunnel site:pypi.org
+Source: sshtunnel · PyPI — https://pypi.org/project/sshtunnel/
+Source: GitHub - pahaz/sshtunnel: SSH tunnels to remote server. · GitHub — https://github.com/pahaz/sshtunnel
+Source: does sshtunnel allow local port forwarded to remote host? — https://github.com/pahaz/sshtunnel/issues/111
+Source: How do I use key to connect? · Issue #105 · pahaz/sshtunnel — https://github.com/pahaz/sshtunnel/issues/105
+Source: sshtunnel/sshtunnel.py at master · pahaz/sshtunnel — https://github.com/pahaz/sshtunnel/blob/master/sshtunnel.py
+Source: psycopg2 conn.poll() hangs when used with sshtunnel · Issue #135 — https://github.com/pahaz/sshtunnel/issues/135
+Setup plan: the same packages on main and pr.
+Setup plan: paramiko is noted, installed with the project.
+Setup plan: install docutils (listed in requirements.txt) on main and pr.
+Setup plan: install sphinx (listed in requirements.txt) on main and pr.
+Setup plan: install sphinxcontrib-napoleon (listed in requirements.txt) on main and pr.
+Setup plan: install bashtest (listed in requirements-syntax.txt) on main and pr.
+Setup plan: install check-manifest (listed in requirements-syntax.txt) on main and pr.
+Setup plan: install flake8 (listed in requirements-syntax.txt) on main and pr.
+Setup plan: install mccabe (listed in requirements-syntax.txt) on main and pr.
+Setup plan: install pygments (listed in requirements-syntax.txt) on main and pr.
+Setup plan: install readme (listed in requirements-syntax.txt) on main and pr.
+Setup plan: install twine (listed in requirements-syntax.txt) on main and pr.
+Setup plan: install coveralls (listed in requirements.txt) on main and pr.
+Setup plan: install mock (listed in requirements.txt) on main and pr.
+Setup plan: install pytest (listed in requirements.txt) on main and pr.
+Setup plan: install pytest-cov (listed in requirements.txt) on main and pr.
+Setup plan: install pytest-xdist (listed in requirements.txt) on main and pr.
+Setup plan: install bleach<5.0.0 (listed in requirements.txt) on main and pr.
+Setup plan: install readme-renderer<25.0; python_version == '3.4' (listed in requirements.txt) on main and pr.
+Setup plan: install importlib-metadata==1.7.0; python_version == '3.5' (listed in requirements.txt) on main and pr.
+Setup plan: install tox>=1.8.1 (listed in the test extra) on main and pr.
+Setup plan: Python 3.12: Python 3.12 already meets >=2.7
+Related bug reports: 3 background item(s).
+    -> could_not_verify: no tests could be mapped to the touched files (23.9s)
+Self-check: the report matches the run records.
+run log: <run-folder>/ops/runs/2026-10-21-check-1929/REPORT.md
+sshtunnel-304: COULD NOT VERIFY | Re-run | confidence Low | citations SKIP
+summary: <run-folder>/report/SUMMARY.html
+
+DONE. Open this file to read the results:
+  <run-folder>/report/SUMMARY.html
+RUN_DONE exit=0 seconds=27

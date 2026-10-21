@@ -1,0 +1,32 @@
+{
+ "note": "Fill in after maintainers act. Do not edit until the PR is merged or closed.",
+ "prs": [
+  {
+   "repo": "pahaz/sshtunnel",
+   "number": 304,
+   "head_sha": "6ca35a37971a3661c31c48e47270d4f778eac374",
+   "maintainer_outcome": null,
+   "outcome_date": null,
+   "later_reverted_or_fixed": null,
+   "notes": "Still open on 2026-10-21 19:50 IST, head unchanged."
+  },
+  {
+   "repo": "home-assistant-libs/pychromecast",
+   "number": 1300,
+   "head_sha": "ab0d59ebe7559f8ea977df03072f20ca49196ac0",
+   "maintainer_outcome": null,
+   "outcome_date": null,
+   "later_reverted_or_fixed": null,
+   "notes": "Still open on 2026-10-21 19:50 IST. Head moved after the draw: ab0d59ebe755 at draw time, e863b6dfeeb6 when checked."
+  },
+  {
+   "repo": "PostHog/posthog",
+   "number": 120637,
+   "head_sha": "6de521c38ae9133e21c7a9ffa6ef3b466a894b7e",
+   "maintainer_outcome": "merged",
+   "outcome_date": "2026-10-21",
+   "later_reverted_or_fixed": null,
+   "notes": "Merged 2026-10-21 15:39 IST (10:09 UTC) through the merge queue, after the draw (14:40 IST). Merge commit e646a824909ac0eb33e2632dc8c161c4703e1520. Not reverted as of 2026-10-21 19:50 IST."
+  }
+ ]
+}

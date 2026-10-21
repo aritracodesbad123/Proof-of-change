@@ -1,0 +1,59 @@
+"""Model-written probe for home-assistant-libs/pychromecast#1300 (model (nvidia/nemotron-3-super-120b-a12b, live)). Generated from the PR text and base-side code only;
+frozen before any PR-side execution. Untrusted: runs only in the sandbox without network."""
+PROBE = {'id': 'model-hitl-unchanged-behavior-probe-4', 'target': 'home-assistant-libs/pychromecast#1300', 'about': 'Tests unchanged behavior of member management in MultizoneController by simulating MULTIZONE_STATUS and DEVICE_REMOVED messages and recording members and names.', 'claims': [], 'timeout_s': 60, 'generator': 'model (nvidia/nemotron-3-super-120b-a12b, live)'}
+
+import json  # added by the harness: the observations line is printed as JSON
+import json
+import uuid
+
+try:
+    from pychromecast.controllers.multizone import MultizoneController, MESSAGE_TYPE, TYPE_MULTIZONE_STATUS, TYPE_DEVICE_REMOVED
+except ImportError as e:
+    print(json.dumps({"observations": {"error": type(e).__name__}}))
+    exit(0)
+
+try:
+    # Create a controller with a random UUID
+    test_uuid = uuid.uuid4()
+    controller = MultizoneController(test_uuid)
+
+    # Build the MULTIZONE_STATUS data
+    data_status = {
+        MESSAGE_TYPE: TYPE_MULTIZONE_STATUS,
+        "status": {
+            "devices": [
+                {"deviceId": "be209f09-0f6a-4596-ac1a-16a77670692b", "name": "Kitchen"},
+                {"deviceId": "2b514019-b9fa-43b5-a740-b4c3f8882918", "name": "Back room"}
+            ]
+        }
+    }
+
+    # Process the MULTIZONE_STATUS
+    controller.receive_message(None, data_status)
+
+    # Record after status: sorted members and corresponding names
+    members_after_status = sorted(controller.members)
+    names_after_status = [controller._members[uid] for uid in members_after_status]
+
+    # Build the DEVICE_REMOVED data for Kitchen
+    data_removed = {
+        MESSAGE_TYPE: TYPE_DEVICE_REMOVED,
+        "deviceId": "be209f09-0f6a-4596-ac1a-16a77670692b"
+    }
+
+    # Process the DEVICE_REMOVED
+    controller.receive_message(None, data_removed)
+
+    # Record after remove: sorted members and corresponding names
+    members_after_remove = sorted(controller.members)
+    names_after_remove = [controller._members[uid] for uid in members_after_remove]
+
+    observations = {
+        "same.members_after_status": members_after_status,
+        "same.names_after_status": names_after_status,
+        "same.members_after_remove": members_after_remove,
+        "same.names_after_remove": names_after_remove
+    }
+    print(json.dumps({"observations": observations}))
+except Exception as e:
+    print(json.dumps({"observations": {"error": type(e).__name__}}))

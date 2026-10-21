@@ -1,0 +1,72 @@
+{
+  "claims": [
+    {
+      "id": "C1",
+      "text": "The PR parses playbackSession from MULTIZONE_STATUS (appAllowsGrouping, isVideoContent, streamTransferSupported) and exposes it as MultizoneController.playback_session, which is None when no session is attached and cleared on reset_members().",
+      "source_quote": "Parse `playbackSession` from `MULTIZONE_STATUS` (`appAllowsGrouping`, `isVideoContent`, `streamTransferSupported`) and expose it as `MultizoneController.playback_session`. It's `None` when no session is attached to the endpoint, and it's cleared on `reset_members()`.",
+      "testable": true,
+      "expect": "differs"
+    },
+    {
+      "id": "C2",
+      "text": "The PR parses PLAYBACK_SESSION_UPDATED messages into a PlaybackSessionUpdate object (name, changed_devices, failed_devices, optional session_endpoint) and passes it to listeners via a new MultiZoneControllerListener.multizone_playback_session_updated callback, which is not abstract so existing listener subclasses remain functional.",
+      "source_quote": "Parse `PLAYBACK_SESSION_UPDATED` (previously dropped) into a `PlaybackSessionUpdate` (`name`, `changed_devices`, `failed_devices`, optional `session_endpoint`). Pass it to listeners via a new `MultiZoneControllerListener.multizone_playback_session_updated` callback. The callback is not abstract, so existing listener subclasses keep working.",
+      "testable": true,
+      "expect": "differs"
+    },
+    {
+      "id": "C3",
+      "text": "Device IDs are normalized to the dashed form used for members, accommodating devices that also report dashless IDs.",
+      "source_quote": "Normalize device ids to the dashed form used for `members`, since devices also report dashless ids.",
+      "testable": true,
+      "expect": "differs"
+    }
+  ],
+  "rejected_claims": [],
+  "probes": [
+    {
+      "id": "probe1",
+      "about": "MultizoneController.playback_session attribute handling",
+      "claims": [
+        {
+          "id": "C1",
+          "covers": [
+            "c1.playback_session_initial_exists",
+            "c1.playback_session_initial_value",
+            "c1.playback_session_after_message_exists",
+            "c1.playback_session_after_message_value",
+            "c1.playback_session_after_reset_exists",
+            "c1.playback_session_after_reset_value"
+          ],
+          "expect": "differs"
+        },
+        {
+          "id": "C2",
+          "covers": [
+            "c2.listener_called",
+            "c2.listener_argument_name",
+            "c2.listener_argument_changed_devices",
+            "c2.listener_argument_failed_devices",
+            "c2.listener_argument_session_endpoint"
+          ],
+          "expect": "differs"
+        },
+        {
+          "id": "C3",
+          "covers": [
+            "c3.dashless_id_stored",
+            "c3.dashed_id_stored"
+          ],
+          "expect": "differs"
+        }
+      ],
+      "code_preview": "\nimport uuid\nfrom pychromecast.controllers.multizone import MultizoneController, MultiZoneControllerListener\n\nclass TestListener(MultiZoneControllerListener):\n    def __init__(self):\n        self.called = False\n        self.args = None\n    \n    def multizone_member_added(self, group_uuid: str) -> None:\n        pass\n    def multizone_member_removed(self, group_uuid: str) -> None:\n        pass\n    def multizone_status_received(self) -> None:\n        pass\n    def multizone_playback_session_updated(self, update) -> None:\n        self.called = True\n        self.args = update\n\n# Create controller\ncontroller = MultizoneController(uuid.UUID('12345678-1234-5678-1234-567812345678'))\n\n# Observations dictionary\nobs = {}\n\n# C1: playback_session attribute\ntry:\n    val = controller.playback_session\n    o\u2026"
+    }
+  ],
+  "probe_ids": [
+    "probe1"
+  ],
+  "needs_business_followup": false,
+  "business_questions": [],
+  "written_at": 1792591628.678307
+}

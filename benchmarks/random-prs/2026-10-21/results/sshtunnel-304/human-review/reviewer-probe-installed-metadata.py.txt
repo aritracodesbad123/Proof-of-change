@@ -1,0 +1,56 @@
+"""Reviewer-added probe (human review step) for pahaz/sshtunnel#304: does the PEP 518/621 migration keep the installed package the same?
+
+Runs on both sides in the side's own environment. Reads only the installed distribution's metadata and imports the
+module. No network, no files written. Prints one JSON object {"observations": {...}} as its last line.
+"""
+import json
+from importlib import metadata
+
+PROBE = {
+    "id": "reviewer-installed-metadata",
+    "target": "pahaz/sshtunnel#304",
+    "about": "Installed package metadata, console script and module import before vs after moving setup.py into pyproject.toml.",
+    "claims": [
+        {"id": "C1", "source": "PR title (Migrate to PEP518)",
+         "text": "Moving the build config to pyproject.toml keeps what users install the same: name, version, "
+                 "runtime dependency, extras, console script, classifiers and importable module.",
+         "covers": ["meta.name", "meta.version", "meta.requires_dist", "meta.provides_extra",
+                    "meta.console_scripts", "meta.classifiers", "meta.summary", "module.*"],
+         "expect": "same"},
+    ],
+    "timeout_s": 60,
+    # Written by the reviewer after the automatic run was known: post-hoc, never a blind result.
+    "provenance": "post-hoc",
+}
+
+obs = {}
+try:
+    d = metadata.distribution("sshtunnel")
+    m = d.metadata
+    obs["meta.name"] = m.get("Name")
+    obs["meta.version"] = m.get("Version")
+    obs["meta.requires_dist"] = sorted(m.get_all("Requires-Dist") or [])
+    obs["meta.provides_extra"] = sorted(m.get_all("Provides-Extra") or [])
+    obs["meta.console_scripts"] = sorted(f"{e.name}={e.value}" for e in d.entry_points if e.group == "console_scripts")
+    obs["meta.classifiers"] = sorted(m.get_all("Classifier") or [])
+    obs["meta.summary"] = m.get("Summary")
+    obs["meta.requires_python"] = m.get("Requires-Python")
+    obs["meta.download_url"] = m.get("Download-URL")
+    obs["meta.platform"] = sorted(m.get_all("Platform") or [])
+    obs["meta.license"] = m.get("License")
+    obs["meta.author"] = m.get("Author")
+    obs["meta.author_email"] = m.get("Author-email")
+    obs["meta.home_page"] = m.get("Home-page")
+    obs["meta.project_urls"] = sorted(m.get_all("Project-URL") or [])
+    obs["meta.keywords"] = m.get("Keywords")
+    obs["meta.description_length_nonzero"] = bool((m.get_payload() or m.get("Description") or "").strip())
+except Exception as e:  # noqa: BLE001
+    obs["meta.error"] = type(e).__name__
+try:
+    import sshtunnel
+    obs["module.version"] = sshtunnel.__version__
+    obs["module.has_cli_main"] = callable(getattr(sshtunnel, "_cli_main", None))
+    obs["module.has_forwarder"] = callable(getattr(sshtunnel, "SSHTunnelForwarder", None))
+except Exception as e:  # noqa: BLE001
+    obs["module.import_error"] = type(e).__name__
+print(json.dumps({"observations": obs}))

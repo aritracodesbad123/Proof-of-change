@@ -1,0 +1,35 @@
+{
+ "seed": 20261021,
+ "pool_size": 61,
+ "method": "random.Random(20261021).sample(range(pool_size), pool_size)[:3] over pool sorted by (repo lowercase, number)",
+ "redraws": [],
+ "drawn": [
+  {
+   "repo": "pahaz/sshtunnel",
+   "number": 304,
+   "url": "https://github.com/pahaz/sshtunnel/pull/304",
+   "title": "Migrate to PEP518",
+   "head_sha": "6ca35a37971a3661c31c48e47270d4f778eac374",
+   "base_sha": "dc0732884379a19a21bf7a49650d0708519ec54f",
+   "drawn_at": "2026-10-21T14:40:00+05:30"
+  },
+  {
+   "repo": "home-assistant-libs/pychromecast",
+   "number": 1300,
+   "url": "https://github.com/home-assistant-libs/pychromecast/pull/1300",
+   "title": "Expose multizone playback session info",
+   "head_sha": "ab0d59ebe7559f8ea977df03072f20ca49196ac0",
+   "base_sha": "38d0941b5de4244498f2b81d78be9ac163a592ed",
+   "drawn_at": "2026-10-21T14:40:00+05:30"
+  },
+  {
+   "repo": "PostHog/posthog",
+   "number": 120637,
+   "url": "https://github.com/PostHog/posthog/pull/120637",
+   "title": "fix(aio): warn only on slow thread waits in on_asyncify_pool",
+   "head_sha": "6de521c38ae9133e21c7a9ffa6ef3b466a894b7e",
+   "base_sha": "5ba7d7bb63e112110a4d1fbd614a2b31d41166ed",
+   "drawn_at": "2026-10-21T14:40:00+05:30"
+  }
+ ]
+}
