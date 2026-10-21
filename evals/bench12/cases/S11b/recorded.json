@@ -1,9 +1,15 @@
 {
  "changed_lines_total": 250,
- "first_run_setup_gap": "No module named 'toyextra'",
+ "first_run": {
+  "reason": "setup gap: No module named 'toyextra'",
+  "verdict": "could_not_verify"
+ },
  "probe_changed_line_coverage": {
   "changed_lines_covered": 1,
   "changed_lines_total": 3
  },
- "rerun_tests": "all pass after installing toyextra"
+ "rerun": {
+  "reason": "rerun after installing toyextra: tests pass",
+  "verdict": "verified"
+ }
 }

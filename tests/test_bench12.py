@@ -36,16 +36,51 @@ def _case_files():
     return [p for case in (BENCH / "cases").iterdir() for p in case.rglob("*") if p.is_file()]
 
 
+# The recovery-rerun step reads a first-run and a rerun verdict as its inputs. Only these exact fields may hold a
+# label; the rerun's must differ from the case's answer, so it cannot leak it.
+ALLOWED = {case: {("first_run", "verdict"), ("rerun", "verdict")} for case in ("S11", "S11b", "S11c")}
+
+
+def _strings(obj, path=()):
+    if isinstance(obj, dict):
+        for k, v in obj.items():
+            yield path + (k,), str(k)
+            yield from _strings(v, path + (k,))
+    elif isinstance(obj, list):
+        for v in obj:
+            yield from _strings(v, path)
+    else:
+        yield path, str(obj)
+
+
+def _check(text, where, expected):
+    assert not re.search(r"answer|expected", text, re.IGNORECASE), where
+    assert not LABELS.search(text), f"{where} names a verdict label"
+    assert not any(v.lower() in text.lower() for v in expected), where
+
+
 def test_case_files_carry_no_hint_of_the_answer():
     key = json.loads((BENCH / "answer_key.json").read_text())
     expected = {e["expected"] for e in key["answers"]}
+    answer_of = {e["case"]: e["expected"] for e in key["answers"]}
     assert _case_files()
     for p in _case_files():
-        text = p.read_text()
-        for where in (str(p.relative_to(BENCH)), text):
-            assert not re.search(r"answer|expected", where, re.IGNORECASE), p
-            assert not LABELS.search(where), f"{p} names a verdict label"
-            assert not any(v.lower() in where.lower() for v in expected), p
+        case = p.relative_to(BENCH / "cases").parts[0]
+        _check(str(p.relative_to(BENCH)), p, expected)
+        if p.name != "recorded.json":
+            _check(p.read_text(), p, expected)
+            continue
+        seen = set()
+        for path, text in _strings(json.loads(p.read_text())):
+            if path in ALLOWED.get(case, set()) and text == path[-1]:
+                continue  # the key name itself
+            if path in ALLOWED.get(case, set()):
+                seen.add(path)
+                if path[0] == "rerun":
+                    assert text != answer_of[case], f"{p}: rerun verdict equals the answer"
+                continue
+            _check(text, f"{p}:{'.'.join(path)}", expected)
+        assert seen == ALLOWED.get(case, set()), p
 
 
 def test_run_case_never_opens_the_answer_key(monkeypatch):
