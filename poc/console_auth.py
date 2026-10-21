@@ -32,8 +32,8 @@ import os
 import re
 import secrets
 import shutil
-import stat
 import smtplib  # br-allow-external: console emails a one-time sign-in code
+import stat
 import subprocess
 import sys
 import threading
