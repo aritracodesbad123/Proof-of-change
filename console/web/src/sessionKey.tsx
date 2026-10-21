@@ -52,3 +52,57 @@ export function NebiusKeyField({
     </form>
   )
 }
+
+/** Hidden field for an optional Tavily key. The value is not written to browser storage. */
+export function TavilyKeyField({
+  stored,
+  onSave,
+}: {
+  stored: boolean
+  onSave: (value: string) => Promise<void>
+}) {
+  const [value, setValue] = useState('')
+  const [busy, setBusy] = useState(false)
+  const [message, setMessage] = useState<string | null>(null)
+
+  async function submit(event: FormEvent) {
+    event.preventDefault()
+    setBusy(true)
+    setMessage(null)
+    try {
+      await onSave(value)
+      setValue('')
+      setMessage(value.trim() ? 'Saved for this session.' : 'Cleared for this session.')
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : String(error))
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  return (
+    <form className="key-form" onSubmit={(event) => void submit(event)}>
+      <label htmlFor="tavily-key">Tavily API key (optional)</label>
+      <div className="url-row">
+        <input
+          id="tavily-key"
+          type="password"
+          name="tavily-session-key"
+          autoComplete="off"
+          value={value}
+          onChange={(event) => setValue(event.target.value)}
+          placeholder={stored ? 'A key is stored for this session' : 'Paste a key for this session only'}
+        />
+        <button type="submit" disabled={busy}>
+          {busy ? 'Saving…' : 'Save key'}
+        </button>
+      </div>
+      <p className="hint">
+        Optional. The key stays in the server's memory for this sign-in and is sent only as TAVILY_API_KEY for that
+        check. It is not saved to disk, logs, or the report. Leave it blank and the lookup is skipped. A Codespace can
+        also supply this as the recommended secret TAVILY_API_KEY.
+      </p>
+      {message ? <p className="hint">{message}</p> : null}
+    </form>
+  )
+}

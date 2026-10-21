@@ -12,14 +12,15 @@ _MIN_LEN = 8
 _MAX_LEN = 500
 _lock = threading.Lock()
 _keys: dict[str, str] = {}
+_tavily_keys: dict[str, str] = {}
 _ASSIGNED = re.compile(
-    r"(?i)\b(NEBIUS_API_KEY|GITHUB_TOKEN|GH_TOKEN|AUTHORIZATION)\b(\s*[:=]\s*|\s+)(\S+)"
+    r"(?i)\b(NEBIUS_API_KEY|TAVILY_API_KEY|GITHUB_TOKEN|GH_TOKEN|AUTHORIZATION)\b(\s*[:=]\s*|\s+)(\S+)"
 )
 _BEARER = re.compile(r"(?i)\bBearer\s+\S+")
 
 
-def set_key(token: str | None, key: str) -> None:
-    """Remember ``key`` for ``token``. Refuses a missing session or a key that cannot be stored safely."""
+def _remember(bucket: dict[str, str], token: str | None, key: str) -> None:
+    """Remember ``key`` for ``token`` in ``bucket``. An empty value clears it. Never writes disk."""
     if not token or not str(token).strip():
         raise ValueError("Sign in first.")
     text = str(key)
@@ -30,9 +31,19 @@ def set_key(token: str | None, key: str) -> None:
         raise ValueError("The key was not stored.")
     with _lock:
         if not text:
-            _keys.pop(token, None)
+            bucket.pop(token, None)
             return
-        _keys[token] = text
+        bucket[token] = text
+
+
+def set_key(token: str | None, key: str) -> None:
+    """Remember a Nebius key for ``token``. Refuses a missing session or a key that cannot be stored safely."""
+    _remember(_keys, token, key)
+
+
+def set_tavily_key(token: str | None, key: str) -> None:
+    """Remember a Tavily key for ``token``. Same memory-only rules as the Nebius key."""
+    _remember(_tavily_keys, token, key)
 
 
 def clear_key(token: str | None) -> None:
@@ -40,6 +51,7 @@ def clear_key(token: str | None) -> None:
         return
     with _lock:
         _keys.pop(token, None)
+        _tavily_keys.pop(token, None)
 
 
 def get_key(token: str | None) -> str | None:
@@ -49,19 +61,31 @@ def get_key(token: str | None) -> str | None:
         return _keys.get(token)
 
 
+def get_tavily_key(token: str | None) -> str | None:
+    if not token:
+        return None
+    with _lock:
+        return _tavily_keys.get(token)
+
+
 def has_key(token: str | None) -> bool:
     return bool(get_key(token))
+
+
+def has_tavily_key(token: str | None) -> bool:
+    return bool(get_tavily_key(token))
 
 
 def known_secrets() -> list[str]:
     """Values currently in memory. Used only to strip them from replies."""
     with _lock:
-        return [value for value in _keys.values() if value and len(value) >= _MIN_LEN]
+        values = list(_keys.values()) + list(_tavily_keys.values())
+    return [value for value in values if value and len(value) >= _MIN_LEN]
 
 
 def public_status(token: str | None) -> dict[str, bool]:
     """What the API may return. Never the key."""
-    return {"nebius_key": has_key(token)}
+    return {"nebius_key": has_key(token), "tavily_key": has_tavily_key(token)}
 
 
 def scrub(text: str, secrets: list[str] | None = None) -> str:

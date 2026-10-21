@@ -19,7 +19,7 @@ import {
   verdictPlain,
   verdictTone,
 } from './present'
-import { NebiusKeyField } from './sessionKey'
+import { NebiusKeyField, TavilyKeyField } from './sessionKey'
 import {
   CostTimePanel,
   DetailRail,
@@ -123,6 +123,7 @@ export default function App() {
   const [approval, setApproval] = useState(false)
   const approvalDefaultApplied = useRef(false)
   const [keyStored, setKeyStored] = useState(false)
+  const [tavilyStored, setTavilyStored] = useState(false)
   const [busy, setBusy] = useState(false)
   const [detail, setDetail] = useState<{
     record: Record<string, unknown>
@@ -183,7 +184,13 @@ export default function App() {
 
   useEffect(() => {
     if (!account) return
-    void api.sessionKey().then((status) => setKeyStored(status.nebius_key)).catch(() => setKeyStored(false))
+    void api.sessionKey().then((status) => {
+      setKeyStored(status.nebius_key)
+      setTavilyStored(Boolean(status.tavily_key))
+    }).catch(() => {
+      setKeyStored(false)
+      setTavilyStored(false)
+    })
   }, [account])
 
   useEffect(() => {
@@ -454,6 +461,15 @@ export default function App() {
                   onSave={async (value) => {
                     const saved = await api.setSessionKey(value)
                     setKeyStored(saved.nebius_key)
+                    setTavilyStored(Boolean(saved.tavily_key))
+                  }}
+                />
+                <TavilyKeyField
+                  stored={tavilyStored}
+                  onSave={async (value) => {
+                    const saved = await api.setTavilyKey(value)
+                    setKeyStored(saved.nebius_key)
+                    setTavilyStored(Boolean(saved.tavily_key))
                   }}
                 />
                 <button

@@ -79,6 +79,13 @@ def child_environment(base: dict[str, str], provider: str, session_token: str | 
         env.pop("NEBIUS_API_KEY", None)
     elif pasted:
         env["NEBIUS_API_KEY"] = pasted
+    host_tavily = (env.get("TAVILY_API_KEY") or "").strip()
+    if len(host_tavily) >= 8:
+        secrets.append(host_tavily)
+    pasted_tavily = session_key.get_tavily_key(session_token)
+    if pasted_tavily and len(pasted_tavily) >= 8:
+        secrets.append(pasted_tavily)
+        env["TAVILY_API_KEY"] = pasted_tavily
     return env, secrets
 
 
@@ -863,6 +870,9 @@ def _scrub_public(obj: dict) -> dict:
     host = (os.environ.get("NEBIUS_API_KEY") or "").strip()
     if len(host) >= 8:
         secrets.append(host)
+    host_tavily = (os.environ.get("TAVILY_API_KEY") or "").strip()
+    if len(host_tavily) >= 8:
+        secrets.append(host_tavily)
     raw = session_key.scrub(json.dumps(obj, default=str), secrets)
     try:
         return json.loads(raw)
@@ -1069,11 +1079,19 @@ class Handler(BaseHTTPRequestHandler):
         from poc import console_auth
         session_token = console_auth.cookie_value(self.headers.get("Cookie"), console_auth.SESSION_COOKIE)
         if path == "/api/session/key":
-            raw_key = body.get("nebius_api_key", "")
-            if not isinstance(raw_key, str):
+            if "nebius_api_key" not in body and "tavily_api_key" not in body:
                 return self._json(400, {"error": "Send the key as text."})
             try:
-                session_key.set_key(session_token, raw_key)
+                if "nebius_api_key" in body:
+                    raw_key = body.get("nebius_api_key", "")
+                    if not isinstance(raw_key, str):
+                        return self._json(400, {"error": "Send the key as text."})
+                    session_key.set_key(session_token, raw_key)
+                if "tavily_api_key" in body:
+                    raw_key = body.get("tavily_api_key", "")
+                    if not isinstance(raw_key, str):
+                        return self._json(400, {"error": "Send the key as text."})
+                    session_key.set_tavily_key(session_token, raw_key)
             except ValueError as exc:
                 return self._json(400, {"error": str(exc)})
             return self._json(200, {"ok": True, **session_key.public_status(session_token)})

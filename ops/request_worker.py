@@ -5,9 +5,11 @@ Run this on the project Linux machine (not in GitHub Actions):
     GITHUB_TOKEN=... POC_GITHUB_REPOSITORY=owner/repo python ops/request_worker.py
 
 The token is read from the environment and sent only as a request header. It is never
-printed and never included in an issue comment. Each loop writes a heartbeat the
-offline notice can read. The check itself is ``ops/daily_run.py --pr <url>`` with the
-default flags, so pull-request code stays sandboxed.
+printed and never included in an issue comment. ``TAVILY_API_KEY`` is also read from
+the environment. When it is missing, the worker logs that the lookup was skipped and
+still runs the check. The key value is never printed. Each loop writes a heartbeat the
+offline notice can read. The check itself is ``ops/daily_run.py --swarm --pr <url>``,
+so pull-request code stays sandboxed and the advisory swarm is on.
 
 The worker does not start a check between 10:40 and 12:30 IST, stops after the daily
 cap (default 5, ``POC_DAILY_CAP``), and skips while the study lock says a study run
@@ -383,11 +385,36 @@ class GitHubClient:
         return self._put_file(path, markdown, "check report")
 
 
+TAVILY_MISSING = "Tavily lookup skipped: TAVILY_API_KEY is not set."
+
+
+def tavily_key(env: dict[str, str] | None = None) -> str:
+    """The Tavily key from the environment. Empty when the lookup should be skipped."""
+    env = os.environ if env is None else env
+    return (env.get("TAVILY_API_KEY") or "").strip()
+
+
+def tavily_notice(env: dict[str, str] | None = None) -> str | None:
+    """A log line when the key is missing. None when it is set. Never includes the key."""
+    if tavily_key(env):
+        return None
+    return TAVILY_MISSING
+
+
 def run_check(pr_url: str, settings: Settings, secrets: list[str]) -> CheckResult:
     """Run the normal check. Stdout is scrubbed before it can be shown."""
+    notice = tavily_notice()
+    if notice:
+        print(notice, file=sys.stderr)
     argv = default_check_argv(settings.python, settings.root, pr_url)
+    child_env = os.environ.copy()
+    key = tavily_key()
+    if key:
+        child_env["TAVILY_API_KEY"] = key
+    else:
+        child_env.pop("TAVILY_API_KEY", None)
     proc = subprocess.run(
-        argv, cwd=str(settings.root), capture_output=True, text=True, check=False,
+        argv, cwd=str(settings.root), env=child_env, capture_output=True, text=True, check=False,
     )
     output = scrub((proc.stdout or "") + "\n" + (proc.stderr or ""), secrets)
     record = None
@@ -547,6 +574,12 @@ def main(argv: list[str] | None = None) -> int:
     host_key = (os.environ.get("NEBIUS_API_KEY") or "").strip()
     if len(host_key) >= 8:
         secrets.append(host_key)
+    host_tavily = tavily_key()
+    if len(host_tavily) >= 8:
+        secrets.append(host_tavily)
+    notice = tavily_notice()
+    if notice:
+        print(notice, file=sys.stderr)
     lock_path = settings.state_path.with_suffix(".lock")
     lock_path.parent.mkdir(parents=True, exist_ok=True)
     lock_handle = lock_path.open("a+")

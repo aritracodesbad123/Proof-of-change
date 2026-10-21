@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import os
 from datetime import datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo
@@ -94,7 +95,7 @@ def test_session_key_is_not_written_or_echoed(tmp_path, monkeypatch):
     session_key.clear_key("sess-1")
     session_key.set_key("sess-1", SECRET)
     status = session_key.public_status("sess-1")
-    assert status == {"nebius_key": True}
+    assert status == {"nebius_key": True, "tavily_key": False}
     assert SECRET not in json.dumps(status)
     assert os_environ_clean()
     env, secrets = console_api.child_environment({"PATH": "/usr/bin"}, "nebius", "sess-1")
@@ -230,12 +231,88 @@ def test_worker_command_includes_the_swarm(tmp_path):
 def test_codespace_start_turns_the_swarm_on():
     """The Codespace one-command start sets POC_SWARM for the console, which also passes --swarm."""
     root = Path(__file__).resolve().parents[1]
-    cfg = json.loads((root / ".devcontainer" / "devcontainer.json").read_text())
+    raw = (root / ".devcontainer" / "devcontainer.json").read_text()
+    cfg = json.loads(raw)
     start = cfg["postStartCommand"]
     assert "POC_SWARM=1" in start
     assert "poc.console_api" in start
+    secret = cfg["secrets"]["TAVILY_API_KEY"]
+    assert "Optional" in secret["description"]
+    assert "tvly-" not in raw
     argv = console_api.console_daily_run_argv("https://github.com/me/demo/pull/3", "recorded")
     assert "--swarm" in argv
+
+
+def test_tavily_session_key_reaches_the_check_and_is_not_echoed(monkeypatch):
+    secret = "tavily-session-secret-value"
+    monkeypatch.delenv("TAVILY_API_KEY", raising=False)
+    session_key.clear_key("sess-t")
+    session_key.set_tavily_key("sess-t", secret)
+    status = session_key.public_status("sess-t")
+    assert status["tavily_key"] is True
+    assert status["nebius_key"] is False
+    assert secret not in json.dumps(status)
+    env, secrets = console_api.child_environment({"PATH": "/usr/bin"}, "recorded", "sess-t")
+    assert env["TAVILY_API_KEY"] == secret
+    assert secret in secrets
+    assert secret not in os.environ.get("TAVILY_API_KEY", "")
+    assert secret not in session_key.scrub(f"TAVILY_API_KEY={secret}", [secret])
+    session_key.clear_key("sess-t")
+    assert session_key.get_tavily_key("sess-t") is None
+
+
+def test_worker_logs_a_missing_tavily_key_and_keeps_the_swarm(tmp_path, monkeypatch, capsys):
+    monkeypatch.delenv("TAVILY_API_KEY", raising=False)
+    seen = {}
+
+    def fake_run(argv, **kwargs):
+        seen["argv"] = list(argv)
+        seen["env"] = kwargs.get("env") or {}
+
+        class Proc:
+            stdout = ""
+            stderr = ""
+            returncode = 0
+
+        return Proc()
+
+    monkeypatch.setattr(request_worker.subprocess, "run", fake_run)
+    monkeypatch.setattr(console_api, "find_record_for_pr", lambda *_args, **_kwargs: None)
+    url = "https://github.com/me/demo/pull/3"
+    result = request_worker.run_check(url, _settings(tmp_path), [])
+    err = capsys.readouterr().err
+    assert request_worker.TAVILY_MISSING in err
+    assert "--swarm" in seen["argv"]
+    assert "TAVILY_API_KEY" not in seen["env"]
+    assert "TAVILY_API_KEY" not in result.reason
+
+
+def test_worker_passes_the_tavily_key_without_printing_it(tmp_path, monkeypatch, capsys):
+    secret = "tavily-host-secret-value"
+    monkeypatch.setenv("TAVILY_API_KEY", secret)
+    seen = {}
+
+    def fake_run(argv, **kwargs):
+        seen["argv"] = list(argv)
+        seen["env"] = kwargs.get("env") or {}
+
+        class Proc:
+            stdout = f"saw {secret}"
+            stderr = ""
+            returncode = 0
+
+        return Proc()
+
+    monkeypatch.setattr(request_worker.subprocess, "run", fake_run)
+    monkeypatch.setattr(console_api, "find_record_for_pr", lambda *_args, **_kwargs: None)
+    url = "https://github.com/me/demo/pull/4"
+    result = request_worker.run_check(url, _settings(tmp_path), [secret])
+    err = capsys.readouterr().err
+    assert request_worker.TAVILY_MISSING not in err
+    assert secret not in err
+    assert seen["env"].get("TAVILY_API_KEY") == secret
+    assert "--swarm" in seen["argv"]
+    assert secret not in result.reason
 
 
 def test_quiet_window_cap_study_lock_and_offline():
