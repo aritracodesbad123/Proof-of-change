@@ -1,6 +1,5 @@
 """Contree-only console checks: when bubblewrap cannot start, nothing that runs PR code runs locally."""
 import subprocess
-from pathlib import Path
 from types import SimpleNamespace
 
 import pytest

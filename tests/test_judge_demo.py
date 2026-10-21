@@ -639,7 +639,9 @@ def test_sandbox_environment_never_holds_the_model_or_lookup_keys(tmp_path, monk
 
 
 def _plan(monkeypatch, bwrap_ok: bool, token=None):
-    import sys, types
+    import sys
+    import types
+
     import guardrails.sandbox as sb
     monkeypatch.delenv("POC_UNSAFE_NO_SANDBOX", raising=False)
     monkeypatch.setattr(sb, "check", lambda: (bwrap_ok, "ok" if bwrap_ok else "bwrap: No permissions"))
