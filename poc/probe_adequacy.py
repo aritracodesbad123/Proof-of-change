@@ -73,7 +73,7 @@ def assess(cov: dict | None) -> dict:
 
 def measure(changed_main: dict, cov_files: dict) -> dict:
     """changed_main: {rel path: main-side changed lines}; cov_files: coverage.py JSON 'files'."""
-    return assess(coverage_gate.measure(changed_main, cov_files))
+    return assess(coverage_gate.measure(changed_main, cov_files, require_all=False))
 
 
 def adequacy_of(item: dict) -> str | None:
