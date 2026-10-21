@@ -1248,7 +1248,7 @@ def install_deps_only(venv: Path, checkout: Path, plan: dict, log: Path, python:
     sbx = side_sandbox(venv, network=True)
     sbx["rw"].append(checkout)
     for c in cmds:
-        rc, _ = run(c, log, env=env, timeout=timeout, sbx=sbx)
+        rc, _ = run(c, log, cwd=checkout, env=env, timeout=timeout, sbx=sbx)   # lock paths are relative to it
         if rc == "timeout":
             return False, f"dependency install timed out after {timeout}s; see {log.name}"
         if rc == "oom":

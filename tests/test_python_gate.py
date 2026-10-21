@@ -73,7 +73,8 @@ def test_flat_layout_is_left_alone_on_study_runs(tmp_path, monkeypatch):
 def test_deps_only_install_runs_uv_sync_in_the_sandbox_and_adds_the_path(tmp_path, monkeypatch):
     cmds = []
 
-    def fake_run(c, log, env=None, timeout=None, sbx=None):
+    def fake_run(c, log, cwd=None, env=None, timeout=None, sbx=None):
+        assert cwd == tmp_path / "src"
         cmds.append([str(x) for x in c])
         if c[1] == "venv":
             (tmp_path / "v" / "lib" / "python3.14" / "site-packages").mkdir(parents=True)
