@@ -1,0 +1,146 @@
+{
+  "claims": [
+    {
+      "id": "C1",
+      "text": "Only parses messages devices already send; nothing new is sent.",
+      "source_quote": "Only parses messages devices already send; nothing new is sent.",
+      "testable": true,
+      "expect": "same"
+    },
+    {
+      "id": "C2",
+      "text": "Parse `playbackSession` from `MULTIZONE_STATUS` (`appAllowsGrouping`, `isVideoContent`, `streamTransferSupported`) and expose it as `MultizoneController.playback_session`.",
+      "source_quote": "Parse `playbackSession` from `MULTIZONE_STATUS` (`appAllowsGrouping`, `isVideoContent`, `streamTransferSupported`) and expose it as `MultizoneController.playback_session`.",
+      "testable": true,
+      "expect": "differs"
+    },
+    {
+      "id": "C3",
+      "text": "The `playback_session` attribute is `None` when no session is attached to the endpoint.",
+      "source_quote": "It's `None` when no session is attached to the endpoint",
+      "testable": true,
+      "expect": "differs"
+    },
+    {
+      "id": "C4",
+      "text": "The `playback_session` attribute is cleared on `reset_members()`.",
+      "source_quote": "and it's cleared on `reset_members()`",
+      "testable": true,
+      "expect": "differs"
+    },
+    {
+      "id": "C5",
+      "text": "Parse `PLAYBACK_SESSION_UPDATED` (previously dropped) into a `PlaybackSessionUpdate` (`name`, `changed_devices`, `failed_devices`, optional `session_endpoint`).",
+      "source_quote": "Parse `PLAYBACK_SESSION_UPDATED` (previously dropped) into a `PlaybackSessionUpdate` (`name`, `changed_devices`, `failed_devices`, optional `session_endpoint`)",
+      "testable": true,
+      "expect": "differs"
+    },
+    {
+      "id": "C6",
+      "text": "Pass the `PlaybackSessionUpdate` to listeners via a new `MultiZoneControllerListener.multizone_playback_session_updated` callback.",
+      "source_quote": "Pass it to listeners via a new `MultiZoneControllerListener.multizone_playback_session_updated` callback.",
+      "testable": true,
+      "expect": "differs"
+    },
+    {
+      "id": "C7",
+      "text": "The `multizone_playback_session_updated` callback is not abstract, so existing listener subclasses keep working.",
+      "source_quote": "The callback is not abstract, so existing listener subclasses keep working.",
+      "testable": true,
+      "expect": "differs"
+    },
+    {
+      "id": "C8",
+      "text": "Normalize device ids to the dashed form used for `members`, since devices also report dashless ids.",
+      "source_quote": "Normalize device ids to the dashed form used for `members`, since devices also report dashless ids.",
+      "testable": true,
+      "expect": "differs"
+    },
+    {
+      "id": "C9",
+      "text": "`changed_devices` is empty on copies sent to connections other than the sender that made the change.",
+      "source_quote": "`changed_devices` is empty on copies sent to connections other than the sender that made the change.",
+      "testable": true,
+      "expect": "differs"
+    }
+  ],
+  "rejected_claims": [],
+  "probes": [
+    {
+      "id": "probe1",
+      "about": "Exposes multizone playback session info",
+      "claims": [
+        {
+          "id": "C1",
+          "covers": [
+            "C1"
+          ],
+          "expect": "same"
+        },
+        {
+          "id": "C2",
+          "covers": [
+            "C2"
+          ],
+          "expect": "differs"
+        },
+        {
+          "id": "C3",
+          "covers": [
+            "C3"
+          ],
+          "expect": "differs"
+        },
+        {
+          "id": "C4",
+          "covers": [
+            "C4"
+          ],
+          "expect": "differs"
+        },
+        {
+          "id": "C5",
+          "covers": [
+            "C5"
+          ],
+          "expect": "differs"
+        },
+        {
+          "id": "C6",
+          "covers": [
+            "C6"
+          ],
+          "expect": "differs"
+        },
+        {
+          "id": "C7",
+          "covers": [
+            "C7"
+          ],
+          "expect": "differs"
+        },
+        {
+          "id": "C8",
+          "covers": [
+            "C8"
+          ],
+          "expect": "differs"
+        },
+        {
+          "id": "C9",
+          "covers": [
+            "C9"
+          ],
+          "expect": "differs"
+        }
+      ],
+      "code_preview": "\nimport uuid\ntry:\n    from pychromecast.controllers.multizone import (\n        MultizoneController,\n        MultiZoneControllerListener,\n        MESSAGE_TYPE,\n        TYPE_DEVICE_ADDED,\n        TYPE_DEVICE_REMOVED,\n        TYPE_DEVICE_UPDATED,\n        TYPE_GET_CASTING_GROUPS,\n        TYPE_GET_STATUS,\n        TYPE_MULTIZONE_STATUS,\n        TYPE_SESSION_UPDATED\n    )\nexcept Exception as e:\n    print({\"observations\": {\"import_error\": type(e).__name__}})\n    exit(0)\n\n# Constants for message types we use in tests\nGET_STATUS = \"GET_STATUS\"\nGET_CASTING_GROUPS = \"GET_CASTING_GROUPS\"\n\n# We'll collect observations in a dictionary\nobservations = {}\n\n# Test C1: Only parses messages devices already send; nothing new is sent.\ntry:\n    sent_messages = []\n    class TestController(MultizoneController):\n   \u2026"
+    }
+  ],
+  "probe_ids": [
+    "probe1"
+  ],
+  "needs_business_followup": false,
+  "business_questions": [],
+  "written_at": 1792592935.9238315
+}

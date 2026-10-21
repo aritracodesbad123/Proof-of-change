@@ -1,0 +1,14 @@
+{
+  "approve": [],
+  "extra_scenarios": [
+    "C1,C8: build MultizoneController(UUID('9a4683f8-a265-4ec7-aab1-a70cb50f4ca7')) and call receive_message(None, {'type':'MULTIZONE_STATUS','requestId':1,'status':{'devices':[],'isMultichannel':False,'playbackSession':{'appAllowsGrouping':True,'isVideoContent':False,'streamTransferSupported':True}}}). Record getattr(controller,'playback_session',<'missing'>) fields app_allows_grouping, is_video_content, stream_transfer_supported as observations 'session_fields.<field>'; on main record the string 'missing'. Do not import constants from pychromecast.const; use the literal message type strings.",
+    "C2,C3: same controller; send a MULTIZONE_STATUS with no playbackSession key and record whether playback_session is None ('session_none.without_session'); then send one with a playbackSession, call reset_members(), and record whether playback_session is None ('session_none.after_reset'). On main record 'missing' when the attribute does not exist.",
+    "C4,C5,C7: register a plain MultiZoneControllerListener subclass that appends each multizone_playback_session_updated argument to a list, then receive_message(None, {'type':'PLAYBACK_SESSION_UPDATED','name':'Group','changedDevices':['be209f090f6a4596ac1a16a77670692b'],'failedDevices':[],'sessionEndpoint':{'deviceId':'be209f090f6a4596ac1a16a77670692b','ipAddress':'192.168.1.5','port':8009,'sessionId':'abc'}}). Record the call count, update.name, update.changed_devices and update.session_endpoint.device_id as 'session_update.*' (count 0 on main). When no update was delivered, record the string 'no_update' for each update field so main and PR values are comparable.",
+    "C6: a listener subclass that only defines multizone_member_added/removed/status_received is registered; send PLAYBACK_SESSION_UPDATED and MULTIZONE_STATUS messages and record 'ok' or the exception type name for each as 'old_listener.update' and 'old_listener.status'. Expect the same on both sides.",
+    "Unchanged behaviour: send MULTIZONE_STATUS with devices Kitchen 'be209f09-0f6a-4596-ac1a-16a77670692b' and Back room '2b514019-b9fa-43b5-a740-b4c3f8882918', record sorted controller.members as 'members_unchanged.before', then send {'type':'DEVICE_REMOVED','deviceId':'be209f09-0f6a-4596-ac1a-16a77670692b'} and record members again as 'members_unchanged.after'. Expect the same on both sides."
+  ],
+  "business_answers": {},
+  "skip_business_followup": true,
+  "cancelled": false,
+  "written_at": 1792592955.0108814
+}

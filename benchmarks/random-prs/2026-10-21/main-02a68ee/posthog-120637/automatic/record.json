@@ -1,0 +1,2978 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-PostHog-posthog-120637-6de521c38ae9-2026-10-21-check-1940",
+ "date_ist": "2026-10-21 19:40 IST",
+ "run_date": "2026-10-21",
+ "who": "ops/daily_run.py",
+ "repo": "PostHog/posthog",
+ "library": "posthog",
+ "pr": {
+  "repo": "PostHog/posthog",
+  "number": 120637,
+  "url": "https://github.com/PostHog/posthog/pull/120637",
+  "title": "fix(aio): warn only on slow thread waits in on_asyncify_pool",
+  "base_sha": "5ba7d7bb63e112110a4d1fbd614a2b31d41166ed",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "6de521c38ae9133e21c7a9ffa6ef3b466a894b7e",
+  "merge_commit": null,
+  "tested_main_sha": "5ba7d7bb63e112110a4d1fbd614a2b31d41166ed",
+  "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+ },
+ "author": "bernatixer",
+ "base_ref": "master",
+ "updated_at_utc": "2026-10-21T10:56:07Z",
+ "updated_at_ist": "2026-10-21 16:26 IST",
+ "ci_state": "not checked (single-PR check)",
+ "ci_detail": "checked on request with --pr",
+ "tested_at_ist": "2026-10-21 19:40 IST",
+ "files": {
+  "all": [
+   "posthog/temporal/common/utils.py",
+   "posthog/temporal/tests/test_asyncify.py"
+  ],
+  "package_py": [
+   "posthog/temporal/common/utils.py",
+   "posthog/temporal/tests/test_asyncify.py"
+  ],
+  "compiled": [],
+  "other": []
+ },
+ "machine_type": {
+  "arch": "x86_64",
+  "os": "Linux",
+  "platform": "Linux-6.12.94+-x86_64-with-glibc2.41",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": "g++ (Debian 14.2.0-19) 14.2.0",
+  "cpu_model": "Intel(R) Xeon(R) Processor",
+  "ram_gb": 15.6
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 0,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.15",
+ "test_selection": "",
+ "per_run": [],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "local",
+ "sandbox_backend_note": "local bubblewrap",
+ "machine": "local",
+ "posted_upstream": false,
+ "logs": "posthog-120637/",
+ "freeze": {},
+ "poc_commit": "02a68eea38919fef2e1b537c3bf5a64bd7c771b5",
+ "route": "source-pair",
+ "current_head_sha": "6de521c38ae9133e21c7a9ffa6ef3b466a894b7e",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "state": "closed",
+ "mergeable_state": "unknown",
+ "product_check": true,
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": {
+   "ok": true,
+   "skipped": false,
+   "live_call": true,
+   "cached": false,
+   "queries": [
+    "posthog python setup install instructions https://github.com/PostHog/posthog site:github.com/PostHog/posthog",
+    "posthog python documentation install https://github.com/PostHog/posthog site:github.com/PostHog/posthog",
+    "posthog python install requirements https://pypi.org/project/posthog/ https://github.com/PostHog/posthog site:pypi.org"
+   ],
+   "results": [
+    {
+     "title": "posthog \u00b7 PyPI",
+     "url": "https://pypi.org/project/posthog/",
+     "query": "posthog python install requirements https://pypi.org/project/posthog/ https://github.com/PostHog/posthog site:pypi.org"
+    },
+    {
+     "title": "posthog-async \u00b7 PyPI",
+     "url": "https://pypi.org/project/posthog-async/",
+     "query": "posthog python install requirements https://pypi.org/project/posthog/ https://github.com/PostHog/posthog site:pypi.org"
+    },
+    {
+     "title": "GitHub - PostHog/posthog-demo-3000 \u00b7 GitHub",
+     "url": "https://github.com/PostHog/posthog-demo-3000",
+     "query": "posthog python setup install instructions https://github.com/PostHog/posthog site:github.com/PostHog/posthog"
+    },
+    {
+     "title": "GitHub - PostHog/posthog-python: Send usage data from your Python code to PostHog. \u00b7 GitHub",
+     "url": "https://github.com/PostHog/posthog-python",
+     "query": "posthog python setup install instructions https://github.com/PostHog/posthog site:github.com/PostHog/posthog"
+    },
+    {
+     "title": "posthog/Dockerfile.sandbox at master \u00b7 PostHog/posthog \u00b7 GitHub",
+     "url": "https://github.com/PostHog/posthog/blob/master/Dockerfile.sandbox",
+     "query": "posthog python setup install instructions https://github.com/PostHog/posthog site:github.com/PostHog/posthog"
+    },
+    {
+     "title": "posthog-live \u00b7 Releases \u00b7 PostHog/posthog \u00b7 GitHub",
+     "url": "https://github.com/PostHog/posthog/releases?q=posthog-live&amp%3Bexpanded=true",
+     "query": "posthog python documentation install https://github.com/PostHog/posthog site:github.com/PostHog/posthog"
+    },
+    {
+     "title": "posthog-live \u00b7 Releases \u00b7 PostHog/posthog \u00b7 GitHub",
+     "url": "https://github.com/PostHog/posthog/releases?q=posthog-live&expanded=true",
+     "query": "posthog python documentation install https://github.com/PostHog/posthog site:github.com/PostHog/posthog"
+    }
+   ],
+   "text": "To set up the PostHog Python SDK, you need Python 3.10+ and the uv tool. Install uv using `curl -LsSf | sh` or `brew install uv` on macOS. From the repository root, install dependencies with `make install` (runs `uv sync`). The PostHog Python SDK supports Python versions 3.10, 3.11, 3.12, 3.13, and 3.14. For more details, refer to the CONTRIBUTING.md file in the repository.\nTo install PostHog using Python, you can use the PyPI project page which links to the new website, owners-yaml.posthog.dev, as its homepage. The Dockerfile.sandbox for PostHog includes a list of system packages to install, such as brotli, build-essential, cmake, curl, git, jq, libclang-dev, libffi-dev, libpq-dev, libssl-dev, libxml2-dev, libxmlsec1-dev, libxslt1-dev, gosu, openssh-server, pkg-config, postgresql-client, protobuf-compiler, sudo, tmux, unzip, vim, zlib1g-dev. The install section warns that the PyPI project named `owners` is a different package. Always write `owners-yaml`.\nTo install PostHog in Python, you can use the `uv` command to create a virtual environment and install the package in develop mode with test dependencies. The PostHog Python SDK supports Python versions 3.10, 3.11, 3.12, 3.13, and 3.14. The latest version available on PyPI is 7.12.0, which can be downloaded as `posthog-7.12.0.tar.gz` or `posthog-7.12.0-py3-none-any.whl`. For async support, there is a separate package called `posthog-async`, version 0.1.0, which supports Python 2 and 3 and can be downloaded as `posthog_async-0.1.0.tar.gz` or `posthog_async-0.1.0-py2.py3-none-any.whl`.\nTitle: posthog \u00b7 PyPI\nIntegrate PostHog into any python application. # PostHog Python. Please see the Python integration docs for details. ## Python Version Support. | SDK Version | Python Versions Supported | Notes |. | 7.3.1+ | 3.10, 3.11, 3.12, 3.13, 3.14 | Added Python 3.14 support |. | 7.0.0 - 7.0.1 | 3.10, 3.11, 3.12, 3.13 | Dropped Python 3.9 support |. | 4.0.1 - 6.x | 3.9, 3.10, 3.11, 3.12, 3.13 | Python 3.9+ required |. 1. Run `uv venv env` (creates virtual environment called \"env\"). * \nTitle: posthog-async \u00b7 PyPI\nJoin the official Python Developers Survey 2026 and have a chance to win a prize. Integrate PostHog into any python application with async support! ### Navigation. ### Verified details. *These details have been verified by PyPI*. ###### Maintainers. Avatar for benrapport from gravatar.com. ### Unverified details. *These details have **not** been verified by PyPI*. ###### Project links. ###### Meta. * **License:** MIT License (MIT License). ###### Classifiers. ## Proje\nTo run the demo app locally you need Python 3.10+ and uv:\n\n1. Install uv: `curl -LsSf  | sh` (or `brew install uv` on macOS).\n2. From the root of this repository, install the dependencies: `make install` (runs `uv sync`).\n\n## Running the app\n\nThere are three ways to run the app: locally using Python, via Docker, or using GitHub Codespaces.\n\n### Option 1 - Run Locally with Python\n\nBefore running the app for the first time, you'll need to create and seed the local SQLite database: [...] `make inst\n| SDK Version | Python Versions Supported | Notes |\n --- \n| 7.3.1+ | 3.10, 3.11, 3.12, 3.13, 3.14 | Added Python 3.14 support |\n| 7.0.0 - 7.0.1 | 3.10, 3.11, 3.12, 3.13 | Dropped Python 3.9 support |\n| 4.0.1 - 6.x | 3.9, 3.10, 3.11, 3.12, 3.13 | Python 3.9+ required |\n\n Python library docs\n Django framework docs\n Flask framework docs\n OpenFeature provider docs \u2014 use PostHog flags through the OpenFeature Python SDK\n\n## Contributing\n\nSee CONTRIBUTING.md for local setup and test instructions. [...]\n# --- Rarely changes: system packages ---\n\nRUN apt-get update && apt-get install -y --no-install-recommends \\\n\nbrotli \\\n\nbuild-essential \\\n\ncmake \\\n\ncurl \\\n\ngit \\\n\njq \\\n\nlibclang-dev \\\n\nlibffi-dev \\\n\nlibpq-dev \\\n\nlibssl-dev \\\n\nlibxml2-dev \\\n\nlibxmlsec1-dev \\\n\nlibxslt1-dev \\\n\ngosu \\\n\nopenssh-server \\\n\npkg-config \\\n\npostgresql-client \\\n\nprotobuf-compiler \\\n\nsudo \\\n\ntmux \\\n\nunzip \\\n\nvim \\\n\nzlib1g-dev \\\n\n&& rm -rf /var/lib/apt/lists/\\ [...] RUN printf 'set -g default-terminal \"xterm-256color\"\\nset -\nThe PyPI project page links to the new website, owners-yaml.posthog.dev, as its homepage. The README links to it too.\n The `notifications` example in the README and the command next to it now agree: a per-producer mapping needs `--purpose notifications --producer review-[redacted]`. A plain channel string covers all automation.\n The install section warns that the PyPI project named `owners` is a different package. Always write `owners-yaml`. [...] Full Changelog: desktop-v0.60.349...desktop-v0.60.358\n\n\nThe PyPI project page links to the new website, owners-yaml.posthog.dev, as its homepage. The README links to it too.\n The `notifications` example in the README and the command next to it now agree: a per-producer mapping needs `--purpose notifications --producer review-[redacted]`. A plain channel string covers all automation.\n The install section warns that the PyPI project named `owners` is a different package. Always write `owners-yaml`. [...] Full Changelog: desktop-v0.60.349...desktop-v0.60.358\n\n",
+   "errors": [],
+   "lines": [
+    "Looked up with Tavily: 7 results",
+    "Query: posthog python setup install instructions https://github.com/PostHog/posthog site:github.com/PostHog/posthog",
+    "Query: posthog python documentation install https://github.com/PostHog/posthog site:github.com/PostHog/posthog",
+    "Query: posthog python install requirements https://pypi.org/project/posthog/ https://github.com/PostHog/posthog site:pypi.org",
+    "Source: posthog \u00b7 PyPI \u2014 https://pypi.org/project/posthog/",
+    "Source: posthog-async \u00b7 PyPI \u2014 https://pypi.org/project/posthog-async/",
+    "Source: GitHub - PostHog/posthog-demo-3000 \u00b7 GitHub \u2014 https://github.com/PostHog/posthog-demo-3000",
+    "Source: GitHub - PostHog/posthog-python: Send usage data from your Python code to PostHog. \u00b7 GitHub \u2014 https://github.com/PostHog/posthog-python",
+    "Source: posthog/Dockerfile.sandbox at master \u00b7 PostHog/posthog \u00b7 GitHub \u2014 https://github.com/PostHog/posthog/blob/master/Dockerfile.sandbox",
+    "Source: posthog-live \u00b7 Releases \u00b7 PostHog/posthog \u00b7 GitHub \u2014 https://github.com/PostHog/posthog/releases?q=posthog-live&amp%3Bexpanded=true",
+    "Source: posthog-live \u00b7 Releases \u00b7 PostHog/posthog \u00b7 GitHub \u2014 https://github.com/PostHog/posthog/releases?q=posthog-live&expanded=true"
+   ]
+  },
+  "notes": [
+   "Setup check: GitHub token: present.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory 5.8 GB (of 15.6 GB).",
+   "Setup check: free disk 98.0 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: 7 results",
+   "Query: posthog python setup install instructions https://github.com/PostHog/posthog site:github.com/PostHog/posthog",
+   "Query: posthog python documentation install https://github.com/PostHog/posthog site:github.com/PostHog/posthog",
+   "Query: posthog python install requirements https://pypi.org/project/posthog/ https://github.com/PostHog/posthog site:pypi.org",
+   "Source: posthog \u00b7 PyPI \u2014 https://pypi.org/project/posthog/",
+   "Source: posthog-async \u00b7 PyPI \u2014 https://pypi.org/project/posthog-async/",
+   "Source: GitHub - PostHog/posthog-demo-3000 \u00b7 GitHub \u2014 https://github.com/PostHog/posthog-demo-3000",
+   "Source: GitHub - PostHog/posthog-python: Send usage data from your Python code to PostHog. \u00b7 GitHub \u2014 https://github.com/PostHog/posthog-python",
+   "Source: posthog/Dockerfile.sandbox at master \u00b7 PostHog/posthog \u00b7 GitHub \u2014 https://github.com/PostHog/posthog/blob/master/Dockerfile.sandbox",
+   "Source: posthog-live \u00b7 Releases \u00b7 PostHog/posthog \u00b7 GitHub \u2014 https://github.com/PostHog/posthog/releases?q=posthog-live&amp%3Bexpanded=true",
+   "Source: posthog-live \u00b7 Releases \u00b7 PostHog/posthog \u00b7 GitHub \u2014 https://github.com/PostHog/posthog/releases?q=posthog-live&expanded=true",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: aioboto3 is noted, installed with the project.",
+   "Setup plan: aiohttp is noted, installed with the project.",
+   "Setup plan: aiokafka is noted, installed with the project.",
+   "Setup plan: anthropic is noted, installed with the project.",
+   "Setup plan: asyncstdlib is noted, installed with the project.",
+   "Setup plan: beautifulsoup4 is noted, installed with the project.",
+   "Setup plan: boto3 is noted, installed with the project.",
+   "Setup plan: brotli is noted, installed with the project.",
+   "Setup plan: celery is noted, installed with the project.",
+   "Setup plan: celery-redbeat is noted, installed with the project.",
+   "Setup plan: certifi is noted, installed with the project.",
+   "Setup plan: clickhouse-connect is noted, installed with the project.",
+   "Setup plan: clickhouse-driver is noted, installed with the project.",
+   "Setup plan: clickhouse-pool is noted, installed with the project.",
+   "Setup plan: circular-dict is noted, installed with the project.",
+   "Setup plan: cryptography is noted, installed with the project.",
+   "Setup plan: PyNaCl is noted, installed with the project.",
+   "Setup plan: dagster is noted, installed with the project.",
+   "Setup plan: dagster-cloud is noted, installed with the project.",
+   "Setup plan: dagster-aws is noted, installed with the project.",
+   "Setup plan: dagster-celery is noted, installed with the project.",
+   "Setup plan: dagster-docker is noted, installed with the project.",
+   "Setup plan: dagster-k8s is noted, installed with the project.",
+   "Setup plan: dagster-pipes is noted, installed with the project.",
+   "Setup plan: dagster-postgres is noted, installed with the project.",
+   "Setup plan: dagster-slack is noted, installed with the project.",
+   "Setup plan: dagster-webserver is noted, installed with the project.",
+   "Setup plan: deltalake is noted, installed with the project.",
+   "Setup plan: dj-database-url is noted, installed with the project.",
+   "Setup plan: django is noted, installed with the project.",
+   "Setup plan: django-axes is noted, installed with the project.",
+   "Setup plan: django-cors-headers is noted, installed with the project.",
+   "Setup plan: django-extensions is noted, installed with the project.",
+   "Setup plan: django-filter is noted, installed with the project.",
+   "Setup plan: django-loginas is noted, installed with the project.",
+   "Setup plan: django-prometheus is noted, installed with the project.",
+   "Setup plan: django-redis is noted, installed with the project.",
+   "Setup plan: django-structlog is noted, installed with the project.",
+   "Setup plan: django-two-factor-auth is noted, installed with the project.",
+   "Setup plan: djangorestframework is noted, installed with the project.",
+   "Setup plan: djangorestframework-csv is noted, installed with the project.",
+   "Setup plan: djangorestframework-dataclasses is noted, installed with the project.",
+   "Setup plan: dlt is noted, installed with the project.",
+   "Setup plan: dnspython is noted, installed with the project.",
+   "Setup plan: drf-exceptions-hog is noted, installed with the project.",
+   "Setup plan: drf-extensions is noted, installed with the project.",
+   "Setup plan: drf-spectacular is noted, installed with the project.",
+   "Setup plan: drf-spectacular-sidecar is noted, installed with the project.",
+   "Setup plan: geoip2 is noted, installed with the project.",
+   "Setup plan: google-ads is noted, installed with the project.",
+   "Setup plan: google-cloud-bigquery is noted, installed with the project.",
+   "Setup plan: google-cloud-bigquery-storage is noted, installed with the project.",
+   "Setup plan: google-cloud-iam is noted, installed with the project.",
+   "Setup plan: google-genai is noted, installed with the project.",
+   "Setup plan: granian is noted, installed with the project.",
+   "Setup plan: grimp is noted, installed with the project.",
+   "Setup plan: grpcio is noted, installed with the project.",
+   "Setup plan: gspread is noted, installed with the project.",
+   "Setup plan: hogql-parser is noted, installed with the project.",
+   "Setup plan: hogql-parser-rs is noted, installed with the project.",
+   "Setup plan: humanize is noted, installed with the project.",
+   "Setup plan: infi-clickhouse-orm is noted, installed with the project.",
+   "Setup plan: ipython is noted, installed with the project.",
+   "Setup plan: jsonref is noted, installed with the project.",
+   "Setup plan: kafka-python is noted, installed with the project.",
+   "Setup plan: kombu is noted, installed with the project.",
+   "Setup plan: jsonpatch is noted, installed with the project.",
+   "Setup plan: langchain is noted, installed with the project.",
+   "Setup plan: langchain-community is noted, installed with the project.",
+   "Setup plan: langchain-core is noted, installed with the project.",
+   "Setup plan: langchain-openai is noted, installed with the project.",
+   "Setup plan: langchain-anthropic is noted, installed with the project.",
+   "Setup plan: langgraph is noted, installed with the project.",
+   "Setup plan: langgraph-checkpoint is noted, installed with the project.",
+   "Setup plan: lxml is noted, installed with the project.",
+   "Setup plan: lzstring is noted, installed with the project.",
+   "Setup plan: markdown-it-py is noted, installed with the project.",
+   "Setup plan: mcp is noted, installed with the project.",
+   "Setup plan: mimesis is noted, installed with the project.",
+   "Setup plan: mistralai is noted, installed with the project.",
+   "Setup plan: more-itertools is noted, installed with the project.",
+   "Setup plan: nanoid is noted, installed with the project.",
+   "Setup plan: natsort is noted, installed with the project.",
+   "Setup plan: nh3 is noted, installed with the project.",
+   "Setup plan: numpy is noted, installed with the project.",
+   "Setup plan: openai is noted, installed with the project.",
+   "Setup plan: openpyxl is noted, installed with the project.",
+   "Setup plan: orjson is noted, installed with the project.",
+   "Setup plan: ormsgpack is noted, installed with the project.",
+   "Setup plan: pandas is noted, installed with the project.",
+   "Setup plan: paramiko is noted, installed with the project.",
+   "Setup plan: pillow is noted, installed with the project.",
+   "Setup plan: protobuf is noted, installed with the project.",
+   "Setup plan: posthoganalytics is noted, installed with the project.",
+   "Setup plan: polars is noted, installed with the project.",
+   "Setup plan: psycopg2-binary is noted, installed with the project.",
+   "Setup plan: psycopg is noted, installed with the project.",
+   "Setup plan: pyarrow is noted, installed with the project.",
+   "Setup plan: pydantic is noted, installed with the project.",
+   "Setup plan: pypdf is noted, installed with the project.",
+   "Setup plan: pyod is noted, installed with the project.",
+   "Setup plan: pyjwt is noted, installed with the project.",
+   "Setup plan: pymssql is noted, installed with the project.",
+   "Setup plan: pymysql is noted, installed with the project.",
+   "Setup plan: pymongo is noted, installed with the project.",
+   "Setup plan: pyroscope-io is noted, installed with the project.",
+   "Setup plan: croniter is noted, installed with the project.",
+   "Setup plan: python-dateutil is noted, installed with the project.",
+   "Setup plan: python-docx is noted, installed with the project.",
+   "Setup plan: python-snappy is noted, installed with the project.",
+   "Setup plan: python3-saml is noted, installed with the project.",
+   "Setup plan: pytz is noted, installed with the project.",
+   "Setup plan: rapidfuzz is noted, installed with the project.",
+   "Setup plan: redis is noted, installed with the project.",
+   "Setup plan: requests is noted, installed with the project.",
+   "Setup plan: retry is noted, installed with the project.",
+   "Setup plan: s3fs is noted, installed with the project.",
+   "Setup plan: scikit-learn is noted, installed with the project.",
+   "Setup plan: scipy is noted, installed with the project.",
+   "Setup plan: semantic-version is noted, installed with the project.",
+   "Setup plan: simple-salesforce is noted, installed with the project.",
+   "Setup plan: slack-sdk is noted, installed with the project.",
+   "Setup plan: snowflake-connector-python is noted, installed with the project.",
+   "Setup plan: social-auth-app-django is noted, installed with the project.",
+   "Setup plan: social-auth-core is noted, installed with the project.",
+   "Setup plan: django-scim2 is noted, installed with the project.",
+   "Setup plan: sqlparse is noted, installed with the project.",
+   "Setup plan: sshtunnel is noted, installed with the project.",
+   "Setup plan: statshog is noted, installed with the project.",
+   "Setup plan: stripe is noted, installed with the project.",
+   "Setup plan: structlog is noted, installed with the project.",
+   "Setup plan: temporalio is noted, installed with the project.",
+   "Setup plan: tenacity is noted, installed with the project.",
+   "Setup plan: tiktoken is noted, installed with the project.",
+   "Setup plan: tldextract is noted, installed with the project.",
+   "Setup plan: trafilatura is noted, installed with the project.",
+   "Setup plan: trino is noted, installed with the project.",
+   "Setup plan: types-cachetools is noted, installed with the project.",
+   "Setup plan: css-inline is noted, installed with the project.",
+   "Setup plan: click is noted, installed with the project.",
+   "Setup plan: owners-yaml is noted, installed with the project.",
+   "Setup plan: personhog-proto is noted, installed with the project.",
+   "Setup plan: umap-learn is noted, installed with the project.",
+   "Setup plan: tbb is noted, installed with the project.",
+   "Setup plan: whitenoise is noted, installed with the project.",
+   "Setup plan: xgboost is noted, installed with the project.",
+   "Setup plan: onnxruntime is noted, installed with the project.",
+   "Setup plan: xmlsec is noted, installed with the project.",
+   "Setup plan: zstd is noted, installed with the project.",
+   "Setup plan: zxcvbn is noted, installed with the project.",
+   "Setup plan: pyyaml is noted, installed with the project.",
+   "Setup plan: chdb is noted, installed with the project.",
+   "Setup plan: elevenlabs is noted, installed with the project.",
+   "Setup plan: django-oauth-toolkit is noted, installed with the project.",
+   "Setup plan: azure-ai-projects is noted, installed with the project.",
+   "Setup plan: azure-ai-inference is noted, installed with the project.",
+   "Setup plan: azure-storage-blob is noted, installed with the project.",
+   "Setup plan: opentelemetry-sdk is noted, installed with the project.",
+   "Setup plan: opentelemetry-instrumentation-aiokafka is noted, installed with the project.",
+   "Setup plan: opentelemetry-instrumentation-aiohttp-client is noted, installed with the project.",
+   "Setup plan: opentelemetry-instrumentation-asgi is noted, installed with the project.",
+   "Setup plan: opentelemetry-instrumentation-celery is noted, installed with the project.",
+   "Setup plan: opentelemetry-instrumentation-django is noted, installed with the project.",
+   "Setup plan: opentelemetry-instrumentation-kafka-python is noted, installed with the project.",
+   "Setup plan: opentelemetry-instrumentation-psycopg is noted, installed with the project.",
+   "Setup plan: opentelemetry-instrumentation-redis is noted, installed with the project.",
+   "Setup plan: opentelemetry-instrumentation-requests is noted, installed with the project.",
+   "Setup plan: opentelemetry-exporter-otlp-proto-grpc is noted, installed with the project.",
+   "Setup plan: asgiref is noted, installed with the project.",
+   "Setup plan: user-agents is noted, installed with the project.",
+   "Setup plan: django-admin-inline-paginator is noted, installed with the project.",
+   "Setup plan: fastavro is noted, installed with the project.",
+   "Setup plan: pydantic-avro is noted, installed with the project.",
+   "Setup plan: playwright is noted, installed with the project.",
+   "Setup plan: linkedin-api-client is noted, installed with the project.",
+   "Setup plan: glom is noted, installed with the project.",
+   "Setup plan: modal is noted, installed with the project.",
+   "Setup plan: databricks-sql-connector is noted, installed with the project.",
+   "Setup plan: databricks-sdk is noted, installed with the project.",
+   "Setup plan: free-email-domains is noted, installed with the project.",
+   "Setup plan: disposable-email-domains is noted, installed with the project.",
+   "Setup plan: pymediainfo is noted, installed with the project.",
+   "Setup plan: cachetools is noted, installed with the project.",
+   "Setup plan: gitpython is noted, installed with the project.",
+   "Setup plan: duckdb is noted, installed with the project.",
+   "Setup plan: bingads is noted, installed with the project.",
+   "Setup plan: markdown-to-mrkdwn is noted, installed with the project.",
+   "Setup plan: webauthn is noted, installed with the project.",
+   "Setup plan: botocore is noted, installed with the project.",
+   "Setup plan: defusedxml is noted, installed with the project.",
+   "Setup plan: confluent-kafka is noted, installed with the project.",
+   "Setup plan: blake3 is noted, installed with the project.",
+   "Setup plan: pixelhog is noted, installed with the project.",
+   "Setup plan: google-re2 is noted, installed with the project.",
+   "Setup plan: scrubadub is noted, installed with the project.",
+   "Setup plan: braintrust-core is noted, installed with the project.",
+   "Setup plan: wrapt is noted, installed with the project.",
+   "Setup plan: limits is noted, installed with the project.",
+   "Setup plan: deltalite is noted, installed with the project.",
+   "Setup plan: posthog-hogland is noted, installed with the project.",
+   "Setup plan: requests-oauthlib is noted, installed with the project.",
+   "Setup plan: Python 3.14: not applied: python3.14 is not available to the local sandbox",
+   "rerun, setup problem: main install failed after 3 tries.",
+   "Demo helper: setup failure already labelled; the probe was not rerun."
+  ],
+  "setup_plan": {
+   "packages": [
+    {
+     "requirement": "aioboto3==15.4.0",
+     "name": "aioboto3",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "aiohttp==3.13.5",
+     "name": "aiohttp",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "aiokafka~=0.13.0",
+     "name": "aiokafka",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "anthropic==0.80.0",
+     "name": "anthropic",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "asyncstdlib==3.13.1",
+     "name": "asyncstdlib",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "beautifulsoup4==4.12.3",
+     "name": "beautifulsoup4",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "boto3==1.40.49",
+     "name": "boto3",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "brotli==1.2.0",
+     "name": "brotli",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "celery==5.6.3",
+     "name": "celery",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "celery-redbeat==2.3.3",
+     "name": "celery-redbeat",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "certifi==2026.1.4",
+     "name": "certifi",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "clickhouse-connect==0.10.0",
+     "name": "clickhouse-connect",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "clickhouse-driver==0.2.10",
+     "name": "clickhouse-driver",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "clickhouse-pool==0.5.3",
+     "name": "clickhouse-pool",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "circular-dict==1.9",
+     "name": "circular-dict",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "cryptography==46.0.7",
+     "name": "cryptography",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "PyNaCl==1.5.0",
+     "name": "PyNaCl",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "dagster==1.12.11",
+     "name": "dagster",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "dagster-cloud==1.12.11",
+     "name": "dagster-cloud",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "dagster-aws==0.28.11",
+     "name": "dagster-aws",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "dagster-celery==0.28.11",
+     "name": "dagster-celery",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "dagster-docker==0.28.11",
+     "name": "dagster-docker",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "dagster-k8s==0.28.11",
+     "name": "dagster-k8s",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "dagster-pipes==1.12.11",
+     "name": "dagster-pipes",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "dagster-postgres==0.28.11",
+     "name": "dagster-postgres",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "dagster-slack==0.28.11",
+     "name": "dagster-slack",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "dagster-webserver==1.12.11",
+     "name": "dagster-webserver",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "deltalake[pyarrow]==1.6.1",
+     "name": "deltalake",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "dj-database-url~=3.0.0",
+     "name": "dj-database-url",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "django~=5.2.0",
+     "name": "django",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "django-axes[ipware]==8.3.1",
+     "name": "django-axes",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "django-cors-headers~=4.9.0",
+     "name": "django-cors-headers",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "django-extensions~=4.1.0",
+     "name": "django-extensions",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "django-filter~=26.1",
+     "name": "django-filter",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "django-loginas==0.3.14",
+     "name": "django-loginas",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "django-prometheus~=2.5.0",
+     "name": "django-prometheus",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "django-redis==7.0.0",
+     "name": "django-redis",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "django-structlog[celery]~=10.1.0",
+     "name": "django-structlog",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "django-two-factor-auth~=1.18.0",
+     "name": "django-two-factor-auth",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "djangorestframework~=3.17.2",
+     "name": "djangorestframework",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "djangorestframework-csv~=3.0.2",
+     "name": "djangorestframework-csv",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "djangorestframework-dataclasses~=1.4.0",
+     "name": "djangorestframework-dataclasses",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "dlt==1.18.2",
+     "name": "dlt",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "dnspython==2.6.1",
+     "name": "dnspython",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "drf-exceptions-hog==0.4.0",
+     "name": "drf-exceptions-hog",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "drf-extensions~=0.8.0",
+     "name": "drf-extensions",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "drf-spectacular~=0.30.0",
+     "name": "drf-spectacular",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "drf-spectacular-sidecar~=2026.9.1",
+     "name": "drf-spectacular-sidecar",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "geoip2==4.6.0",
+     "name": "geoip2",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "google-ads==31.2.0",
+     "name": "google-ads",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "google-cloud-bigquery==3.40.1",
+     "name": "google-cloud-bigquery",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "google-cloud-bigquery-storage==2.32.0",
+     "name": "google-cloud-bigquery-storage",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "google-cloud-iam==2.21",
+     "name": "google-cloud-iam",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "google-genai==1.75.0",
+     "name": "google-genai",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "granian[uvloop,reload,pname]==2.8.3",
+     "name": "granian",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "grimp~=3.14",
+     "name": "grimp",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "grpcio~=1.75.1",
+     "name": "grpcio",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "gspread==6.2.1",
+     "name": "gspread",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "hogql-parser==1.3.85",
+     "name": "hogql-parser",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "hogql-parser-rs==1.3.109",
+     "name": "hogql-parser-rs",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "humanize~=4.12.3",
+     "name": "humanize",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "infi-clickhouse-orm",
+     "name": "infi-clickhouse-orm",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "ipython~=9.3.0",
+     "name": "ipython",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "jsonref==1.1.0",
+     "name": "jsonref",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "kafka-python==2.3.0",
+     "name": "kafka-python",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "kombu==5.6.2",
+     "name": "kombu",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "jsonpatch~=1.33",
+     "name": "jsonpatch",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "langchain~=0.3.27",
+     "name": "langchain",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "langchain-community~=0.3.31",
+     "name": "langchain-community",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "langchain-core~=0.3.81",
+     "name": "langchain-core",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "langchain-openai~=0.3.35",
+     "name": "langchain-openai",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "langchain-anthropic~=0.3.22",
+     "name": "langchain-anthropic",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "langgraph==0.4.10",
+     "name": "langgraph",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "langgraph-checkpoint==4.1.1",
+     "name": "langgraph-checkpoint",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "lxml==6.0.2",
+     "name": "lxml",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "lzstring==1.0.4",
+     "name": "lzstring",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "markdown-it-py~=3.0.0",
+     "name": "markdown-it-py",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "mcp~=1.26.0",
+     "name": "mcp",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "mimesis==5.2.1",
+     "name": "mimesis",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "mistralai==1.6.0",
+     "name": "mistralai",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "more-itertools==9.0.0",
+     "name": "more-itertools",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "nanoid==2.0.0",
+     "name": "nanoid",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "natsort==8.4.0",
+     "name": "natsort",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "nh3==0.3.5",
+     "name": "nh3",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "numpy~=2.3.2",
+     "name": "numpy",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "openai==2.30.0",
+     "name": "openai",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "openpyxl==3.1.5",
+     "name": "openpyxl",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "orjson==3.11.9",
+     "name": "orjson",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "ormsgpack~=1.12",
+     "name": "ormsgpack",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pandas~=2.3.3",
+     "name": "pandas",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "paramiko~=3.5.0",
+     "name": "paramiko",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pillow==12.3.0",
+     "name": "pillow",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "protobuf~=6.31.1",
+     "name": "protobuf",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "posthoganalytics==7.73.1",
+     "name": "posthoganalytics",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "polars==1.37.1",
+     "name": "polars",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "psycopg2-binary==2.9.11",
+     "name": "psycopg2-binary",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "psycopg[binary]==3.2.10",
+     "name": "psycopg",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pyarrow==23.0.1",
+     "name": "pyarrow",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pydantic~=2.12.0",
+     "name": "pydantic",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pypdf==6.10.2",
+     "name": "pypdf",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pyod==2.0.7",
+     "name": "pyod",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pyjwt~=2.12.1",
+     "name": "pyjwt",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pymssql==2.3.8",
+     "name": "pymssql",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pymysql==1.1.1",
+     "name": "pymysql",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pymongo==4.15.2",
+     "name": "pymongo",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pyroscope-io~=1.2.4",
+     "name": "pyroscope-io",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "croniter~=6.0.0",
+     "name": "croniter",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "python-dateutil~=2.9.0",
+     "name": "python-dateutil",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "python-docx==1.2.0",
+     "name": "python-docx",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "python-snappy~=0.7.3",
+     "name": "python-snappy",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "python3-saml==1.16.0",
+     "name": "python3-saml",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytz==2023.3",
+     "name": "pytz",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "rapidfuzz==3.14.5",
+     "name": "rapidfuzz",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "redis==5.3.1",
+     "name": "redis",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "requests~=2.33.0",
+     "name": "requests",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "retry==0.9.2",
+     "name": "retry",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "s3fs==2025.9.0",
+     "name": "s3fs",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "scikit-learn~=1.7.0",
+     "name": "scikit-learn",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "scipy~=1.16.3",
+     "name": "scipy",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "semantic-version==2.8.5",
+     "name": "semantic-version",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "simple-salesforce~=1.12.9",
+     "name": "simple-salesforce",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "slack-sdk==3.42.0",
+     "name": "slack-sdk",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "snowflake-connector-python==4.4.0",
+     "name": "snowflake-connector-python",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "social-auth-app-django~=5.8.0",
+     "name": "social-auth-app-django",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "social-auth-core~=4.8.7",
+     "name": "social-auth-core",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "django-scim2==0.23.0",
+     "name": "django-scim2",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "sqlparse==0.5.4",
+     "name": "sqlparse",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "sshtunnel==0.4.0",
+     "name": "sshtunnel",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "statshog==1.0.6",
+     "name": "statshog",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "stripe==12.2.0",
+     "name": "stripe",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "structlog==25.5.0",
+     "name": "structlog",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "temporalio==1.33.0",
+     "name": "temporalio",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "tenacity==9.1.4",
+     "name": "tenacity",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "tiktoken==0.12.*",
+     "name": "tiktoken",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "tldextract~=5.1",
+     "name": "tldextract",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "trafilatura==2.0.0",
+     "name": "trafilatura",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "trino==0.338.0",
+     "name": "trino",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "types-cachetools==5.5.0.20240820",
+     "name": "types-cachetools",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "css-inline==0.18.0",
+     "name": "css-inline",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "click~=8.0",
+     "name": "click",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "owners-yaml",
+     "name": "owners-yaml",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "personhog-proto",
+     "name": "personhog-proto",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "umap-learn~=0.5.0",
+     "name": "umap-learn",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "tbb==2022.3.1; sys_platform == 'linux' and platform_machine == 'x86_64'",
+     "name": "tbb",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "whitenoise~=6.10.0",
+     "name": "whitenoise",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "xgboost==3.2.0",
+     "name": "xgboost",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "onnxruntime~=1.30.0",
+     "name": "onnxruntime",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "xmlsec==1.3.17",
+     "name": "xmlsec",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "zstd==1.5.7.2",
+     "name": "zstd",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "zxcvbn==4.5.0",
+     "name": "zxcvbn",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pyyaml~=6.0.2",
+     "name": "pyyaml",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "chdb==4.3.0",
+     "name": "chdb",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "elevenlabs~=2.1.0",
+     "name": "elevenlabs",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "django-oauth-toolkit~=3.2.0",
+     "name": "django-oauth-toolkit",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "azure-ai-projects~=1.0.0b11",
+     "name": "azure-ai-projects",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "azure-ai-inference~=1.0.0b9",
+     "name": "azure-ai-inference",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "azure-storage-blob~=12.27.0",
+     "name": "azure-storage-blob",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "opentelemetry-sdk==1.35.0",
+     "name": "opentelemetry-sdk",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "opentelemetry-instrumentation-aiokafka==0.56b0",
+     "name": "opentelemetry-instrumentation-aiokafka",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "opentelemetry-instrumentation-aiohttp-client==0.56b0",
+     "name": "opentelemetry-instrumentation-aiohttp-client",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "opentelemetry-instrumentation-asgi==0.56b0",
+     "name": "opentelemetry-instrumentation-asgi",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "opentelemetry-instrumentation-celery==0.56b0",
+     "name": "opentelemetry-instrumentation-celery",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "opentelemetry-instrumentation-django==0.56b0",
+     "name": "opentelemetry-instrumentation-django",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "opentelemetry-instrumentation-kafka-python==0.56b0",
+     "name": "opentelemetry-instrumentation-kafka-python",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "opentelemetry-instrumentation-psycopg==0.56b0",
+     "name": "opentelemetry-instrumentation-psycopg",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "opentelemetry-instrumentation-redis==0.56b0",
+     "name": "opentelemetry-instrumentation-redis",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "opentelemetry-instrumentation-requests==0.56b0",
+     "name": "opentelemetry-instrumentation-requests",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "opentelemetry-exporter-otlp-proto-grpc==1.35.0",
+     "name": "opentelemetry-exporter-otlp-proto-grpc",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "asgiref==3.11.0",
+     "name": "asgiref",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "user-agents~=2.2.0",
+     "name": "user-agents",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "django-admin-inline-paginator===0.4.0",
+     "name": "django-admin-inline-paginator",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "fastavro~=1.12.0",
+     "name": "fastavro",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pydantic-avro~=0.9.0",
+     "name": "pydantic-avro",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "playwright~=1.60.0",
+     "name": "playwright",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "linkedin-api-client~=0.3.0",
+     "name": "linkedin-api-client",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "glom~=24.11.0",
+     "name": "glom",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "modal[api-proxy-support]~=1.5.4",
+     "name": "modal",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "databricks-sql-connector~=4.3.0",
+     "name": "databricks-sql-connector",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "databricks-sdk~=0.118.0",
+     "name": "databricks-sdk",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "free-email-domains~=1.0.1",
+     "name": "free-email-domains",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "disposable-email-domains~=0.0.140",
+     "name": "disposable-email-domains",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pymediainfo~=7.0.1",
+     "name": "pymediainfo",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "cachetools~=5.5.2",
+     "name": "cachetools",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "gitpython~=3.1.44",
+     "name": "gitpython",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "duckdb~=1.5.2",
+     "name": "duckdb",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "bingads~=13.0.26",
+     "name": "bingads",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "markdown-to-mrkdwn~=0.2.0",
+     "name": "markdown-to-mrkdwn",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "webauthn>=2.1.0,<2.3.0",
+     "name": "webauthn",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "botocore[crt]~=1.40.49",
+     "name": "botocore",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "defusedxml~=0.7.1",
+     "name": "defusedxml",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "confluent-kafka~=2.13",
+     "name": "confluent-kafka",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "blake3>=1.0.8,<2",
+     "name": "blake3",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pixelhog~=1.3.1",
+     "name": "pixelhog",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "google-re2>=1.1.20251105,<2",
+     "name": "google-re2",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "scrubadub~=2.0.1",
+     "name": "scrubadub",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "braintrust-core>=0.0.59,<1",
+     "name": "braintrust-core",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "wrapt==1.17.3",
+     "name": "wrapt",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "limits==5.8.0",
+     "name": "limits",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "deltalite==0.1.12",
+     "name": "deltalite",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "posthog-hogland==0.4.1",
+     "name": "posthog-hogland",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "requests-oauthlib~=2.0.0",
+     "name": "requests-oauthlib",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    }
+   ],
+   "extra_reqs": [],
+   "python": {
+    "requested": "3.14",
+    "current": "3.12",
+    "applied": false,
+    "switch": null,
+    "reason": "not applied: python3.14 is not available to the local sandbox"
+   },
+   "system": [],
+   "refused": []
+  },
+  "setup": {
+   "label": "rerun, setup problem",
+   "counts_as_verdict": false,
+   "step": "main install",
+   "attempts": 3,
+   "detail": "install failed (1); see setup-main.log"
+  }
+ },
+ "chosen": {
+  "pr": 120637,
+  "head_sha": null,
+  "install": null,
+  "test_cmd": null
+ },
+ "sides": {
+  "comparison_basis": "merge-base vs PR head (no merge ref available)",
+  "main_sha": "5ba7d7bb63e112110a4d1fbd614a2b31d41166ed",
+  "pr_sha": "6de521c38ae9133e21c7a9ffa6ef3b466a894b7e"
+ },
+ "tested": {
+  "main": "master @ 5ba7d7bb63e1 (merge-base with the PR head)",
+  "pr": "PR head 6de521c38ae9"
+ },
+ "verdict": "could_not_verify",
+ "reason": "install failed (1); see setup-main.log",
+ "verdict_before_coverage_gate": "could_not_verify",
+ "reason_before_coverage_gate": "install failed (1); see setup-main.log",
+ "changed_lines_total": null,
+ "changed_lines_covered": null,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "lower",
+  "note": "coverage of the changed Python lines was NOT MEASURED (record predates the coverage gate: no coverage run exists for it, so this is not a measurement result)",
+  "measurement": "not measured: predates gate"
+ },
+ "related_reports": {
+  "status": "ok",
+  "text": "1. \"Slow response times \u00b7 Issue #2680 \u00b7 PostHog/posthog \u00b7 GitHub\"\n   https://github.com/PostHog/posthog/issues/2680\n   \"## How to reproduce 1. Run posthog in with docker-compose 2. Place posthog under reasonably high load ## Environment PostHog cloud or self-managed? self-managed PostHog version/commit - 1.18.0 (via docker hub's latest tag) ## Additional con...\"\n2. \"Product Analytics troubleshooting - Docs - PostHog\"\n   https://posthog.com/docs/product-analytics/troubleshooting\n   \"CIkbGliX3ZlcnNpb24iOiIxLjUzLjQiLCIkaW5zZXJ0X2lkIjoicnNsdm9pYXlocjEydXRvbSIsIiR0aW1lIjoxNjkxNDk2MjcxLjc5NywiZGlzdGluY3RfaWQiOiIxODlkNTA4YjBmNDRkNzAtMDBmN2E5MmRkNmE0MzgtMWE1MjU2MzQtMTNjNjgwLTE4OWQ1MDhiMGY1NTJlZSIsIiRkZXZpY2VfaWQiOiIxODlkMTM4Z...\"\n3. \"Error Tracking \u2013 Catch and fix issues faster with PostHog\"\n   https://posthog.com/error-tracking\n   \"Connect error tracking with experimentation platform \u2713 \u2713 ## Que...",
+  "items": [
+   {
+    "title": "Slow response times \u00b7 Issue #2680 \u00b7 PostHog/posthog \u00b7 GitHub",
+    "url": "https://github.com/PostHog/posthog/issues/2680",
+    "content": "## How to reproduce 1. Run posthog in with docker-compose 2. Place posthog under reasonably high load ## Environment PostHog cloud or self-managed? self-managed PostHog version/commit - 1.18.0 (via docker hub's latest tag) ## Additional con..."
+   },
+   {
+    "title": "Product Analytics troubleshooting - Docs - PostHog",
+    "url": "https://posthog.com/docs/product-analytics/troubleshooting",
+    "content": "CIkbGliX3ZlcnNpb24iOiIxLjUzLjQiLCIkaW5zZXJ0X2lkIjoicnNsdm9pYXlocjEydXRvbSIsIiR0aW1lIjoxNjkxNDk2MjcxLjc5NywiZGlzdGluY3RfaWQiOiIxODlkNTA4YjBmNDRkNzAtMDBmN2E5MmRkNmE0MzgtMWE1MjU2MzQtMTNjNjgwLTE4OWQ1MDhiMGY1NTJlZSIsIiRkZXZpY2VfaWQiOiIxODlkMTM4Z..."
+   },
+   {
+    "title": "Error Tracking \u2013 Catch and fix issues faster with PostHog",
+    "url": "https://posthog.com/error-tracking",
+    "content": "Connect error tracking with experimentation platform \u2713 \u2713 ## Questions? ### Answers There are a few ways you can get answers to specific questions about Error Tracking. 1. Check the docs We have an entire docs-wizard dedicated to docs garden..."
+   }
+  ],
+  "query": "PostHog/posthog fix(aio): warn only on slow thread waits in on_asyncify_pool bug report issue",
+  "untrusted": true
+ },
+ "explanation": {
+  "status": "wired",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "text": "The PR titled \"fix(aio): warn only on slow thread waits in on_asyncify_pool\" could not be verified because installation failed (see setup-main.log).",
+  "quotes": [
+   "fix(aio): warn only on slow thread waits in on_asyncify_pool",
+   "install failed (1); see setup-main.log"
+  ],
+  "advisory": true
+ },
+ "agents": {
+  "status": "ran",
+  "advisory": true,
+  "note": "judge/helper/summary are advisory; code owns the verdict",
+  "roles": [
+   {
+    "role": "judge",
+    "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+    "status": "ok",
+    "note": null,
+    "labels": []
+   },
+   {
+    "role": "helper",
+    "model": "nvidia/Nemotron-3_5-Lightning",
+    "status": "ok",
+    "note": null,
+    "notes": [
+     "Ensure asyncify runtime is loaded before on_asyncify_pool activates",
+     "Treat setup-main.log exit code 1 as pre-condition failure, not test failure",
+     "Filter thread-wait warning diffs when pool initialization status is unknown",
+     "Validate environment variables controlling asyncify thread behavior",
+     "Ignore transient thread-wait logs in diffs when pool is idle or uninitialized"
+    ]
+   },
+   {
+    "role": "summary",
+    "model": "nvidia/nemotron-3-super-120b-a12b",
+    "status": "ok",
+    "note": null
+   }
+  ],
+  "provider": {
+   "provider": "nebius",
+   "models": {
+    "claims": "nvidia/nemotron-3-super-120b-a12b",
+    "probes": "nvidia/nemotron-3-super-120b-a12b",
+    "judge": "nvidia/Nemotron-3-Ultra-550b-a55b",
+    "helper": "nvidia/Nemotron-3_5-Lightning",
+    "summary": "nvidia/nemotron-3-super-120b-a12b"
+   },
+   "blind": true
+  }
+ },
+ "swarm_requested": true,
+ "operator_approval_requested": false,
+ "swarm": "on",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [
+   "posthog/temporal/common/utils.py",
+   "posthog/temporal/tests/test_asyncify.py"
+  ],
+  "compiled_files": [],
+  "other_files": []
+ },
+ "duration_s": {
+  "total_wall": 109.7,
+  "tests": 0
+ },
+ "cost": {
+  "ai_calls": 0,
+  "failed_ai_calls": 0,
+  "input_tokens": 0,
+  "output_tokens": 0,
+  "thinking_tokens": 0,
+  "cost_usd": 0.0,
+  "calls_without_usage": 0,
+  "ai_cost_usd": 0.0,
+  "cost_complete": true,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 109.7,
+   "tests": 0
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.007313,
+  "total_cost_usd": 0.007313,
+  "swarm": {
+   "ai_calls": 3,
+   "failed_ai_calls": 0,
+   "input_tokens": 543,
+   "output_tokens": 1070,
+   "thinking_tokens": 988,
+   "cost_usd": 0.001126,
+   "calls_without_usage": 2,
+   "ai_cost_usd": 0.001126,
+   "cost_complete": false,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ }
+}
