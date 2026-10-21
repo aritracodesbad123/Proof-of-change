@@ -42,6 +42,15 @@ def _under_study_pairs(path: Path | None) -> bool:
                for i in range(len(parts)))
 
 
+def _under_random_prs(path: Path | None) -> bool:
+    """True when path is a file inside benchmarks/random-prs/ (lists of upstream PRs)."""
+    if path is None:
+        return False
+    parts = path.parts
+    return any(parts[i] == "benchmarks" and i + 1 < len(parts) and parts[i + 1] == "random-prs"
+               for i in range(len(parts)))
+
+
 def _inside_upstream_repo(line: str, match: re.Match) -> bool:
     """True when the match sits inside an upstream repository name on this line."""
     return any(repo.start() <= match.start() and match.end() <= repo.end() for repo in UPSTREAM_REPO.finditer(line))
@@ -74,7 +83,7 @@ def text_of(p: Path) -> str | None:
 def findings(text: str, path: Path | None = None) -> list[str]:
     for a in ALLOWED:
         text = a.sub("<repo-url>", text)
-    study_pairs = _under_study_pairs(path)
+    study_pairs = _under_study_pairs(path) or _under_random_prs(path)
     out = []
     for i, line in enumerate(text.splitlines(), 1):
         for kind, pat in PATTERNS.items():
