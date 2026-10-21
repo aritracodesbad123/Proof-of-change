@@ -31,7 +31,9 @@ import json
 import os
 import re
 import secrets
+import shutil
 import smtplib  # br-allow-external: console emails a one-time sign-in code
+import subprocess
 import sys
 import threading
 import time
@@ -393,6 +395,7 @@ def reset_for_tests() -> None:
     _store = None
     _transport = None
     _sink.outbox.clear()
+    reset_port_cache()
 
 
 def test_sink() -> MemoryMailer:
@@ -889,6 +892,118 @@ def _public_body(result: dict[str, str]) -> dict[str, str]:
     return {key: value for key, value in result.items() if key not in {"session", "account_id"}}
 
 
+CONSOLE_PORT = 8787
+LOCAL_SESSION = "local"
+LOCAL_ACCOUNT = {"id": "local", "email": "local", "role": "admin"}
+PORT_PUBLIC_MESSAGE = (
+    "Port 8787 is public. Set port 8787 back to private in the Ports panel, then start the console again. "
+    "Sign-in stays required while that port is public."
+)
+_PORT_CACHE_S = 15.0
+_port_seen: tuple[float, str | None] | None = None
+
+
+def reset_port_cache() -> None:
+    global _port_seen
+    _port_seen = None
+
+
+def _flag_on(env: dict[str, str] | os._Environ[str], name: str) -> bool:
+    return (env.get(name) or "").strip().lower() in {"1", "true", "yes", "on"}
+
+
+def single_user_requested(env: dict[str, str] | os._Environ[str] | None = None) -> bool:
+    """True only for a Codespace, or when the dev container set POC_SINGLE_USER."""
+    env = os.environ if env is None else env
+    return _flag_on(env, "CODESPACES") or _flag_on(env, "POC_SINGLE_USER")
+
+
+def _port_visibility(raw: str | None, port: int = CONSOLE_PORT) -> str | None:
+    """Visibility of one forwarded port, or None when the listing does not say."""
+    if not raw or not str(raw).strip():
+        return None
+    try:
+        rows = json.loads(raw)
+    except json.JSONDecodeError:
+        return None
+    if not isinstance(rows, list):
+        return None
+    for row in rows:
+        if not isinstance(row, dict):
+            continue
+        try:
+            number = int(row.get("port"))
+        except (TypeError, ValueError):
+            continue
+        if number != port:
+            continue
+        visibility = str(row.get("visibility") or "").strip().lower()
+        return visibility or None
+    return None
+
+
+def port_refusal(raw: str | None, port: int = CONSOLE_PORT) -> str | None:
+    """Message when the console port is public. None when it is private or unknown."""
+    if _port_visibility(raw, port) == "public":
+        return PORT_PUBLIC_MESSAGE
+    return None
+
+
+def codespace_port_visibility(port: int = CONSOLE_PORT) -> str | None:
+    """Ask `gh codespace ports` when the command is available. None if it cannot be read."""
+    global _port_seen
+    now = time.time()
+    if _port_seen is not None and now - _port_seen[0] < _PORT_CACHE_S:
+        return _port_seen[1]
+    visibility = _read_codespace_port(port)
+    _port_seen = (now, visibility)
+    return visibility
+
+
+def _read_codespace_port(port: int) -> str | None:
+    if shutil.which("gh") is None:
+        return None
+    try:
+        proc = subprocess.run(
+            ["gh", "codespace", "ports", "--json", "port,visibility"],
+            capture_output=True, text=True, timeout=8, check=False,
+        )
+    except (OSError, subprocess.TimeoutExpired):
+        return None
+    if proc.returncode != 0:
+        return None
+    return _port_visibility(proc.stdout, port)
+
+
+def sign_in_skip(env: dict[str, str] | os._Environ[str] | None = None) -> tuple[bool, str | None]:
+    """Whether this console may open without an account.
+
+    Other hosts stay signed-in. A public port 8787 refuses the skip.
+    """
+    env = os.environ if env is None else env
+    if not single_user_requested(env):
+        return False, None
+    if codespace_port_visibility() == "public":
+        return False, PORT_PUBLIC_MESSAGE
+    return True, None
+
+
+def viewer_account(token: str | None) -> dict[str, Any] | None:
+    """The signed-in account, or the local Codespace account when sign-in is skipped."""
+    if sign_in_skip()[0]:
+        return dict(LOCAL_ACCOUNT)
+    return service_from_env().account_for_session(token)
+
+
+def request_session_token(token: str | None) -> str | None:
+    """Cookie token, or the in-memory local slot when this console skipped sign-in."""
+    if token:
+        return token
+    if sign_in_skip()[0]:
+        return LOCAL_SESSION
+    return None
+
+
 def handle_request(method: str, path: str, query: dict[str, list[str]], body: dict[str, Any] | None,
                    headers: Any, *, host: str | None, proto: str | None) -> HttpResult:
     svc = service_from_env()
@@ -899,9 +1014,12 @@ def handle_request(method: str, path: str, query: dict[str, list[str]], body: di
         if method == "GET" and path == "/api/auth/providers":
             return HttpResult(200, provider_config(env))
         if method == "GET" and path == "/api/auth/me":
+            skipped, why = sign_in_skip()
+            if skipped:
+                return HttpResult(200, dict(LOCAL_ACCOUNT))
             account = svc.account_for_session(cookie_value(cookie_header, SESSION_COOKIE))
             if not account:
-                return HttpResult(401, {"error": "Sign in first."})
+                return HttpResult(401, {"error": why or "Sign in first."})
             return HttpResult(200, {"email": account["email"], "id": account["id"], "role": account.get("role") or "user"})
         if method == "POST" and path == "/api/auth/logout":
             svc.logout(cookie_value(cookie_header, SESSION_COOKIE))

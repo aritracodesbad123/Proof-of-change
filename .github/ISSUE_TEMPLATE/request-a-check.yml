@@ -8,6 +8,7 @@ body:
     attributes:
       value: |
         Paste one public GitHub pull request link for a Python library.
+        Do not paste an email address, a key, or any private information into the issue. The issue is public.
         The checker runs on the project machine, one request at a time.
         It does not start between 10:40 and 12:30 IST, and it stops after the daily limit.
         GitHub emails you when the verdict is posted. Finished checks are also on the results page.
