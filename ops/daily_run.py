@@ -1443,11 +1443,15 @@ def _kill_tree(pid: int) -> None:
     procs = [pid] + _descendants(pid)
     for sig in (signal.SIGSTOP, signal.SIGKILL):
         for q in procs:
-            try: os.kill(q, sig)
-            except ProcessLookupError: pass
+            try:
+                os.kill(q, sig)
+            except ProcessLookupError:
+                pass
         procs = [pid] + _descendants(pid) if sig == signal.SIGSTOP else procs
-    try: os.killpg(pid, signal.SIGKILL)
-    except ProcessLookupError: pass
+    try:
+        os.killpg(pid, signal.SIGKILL)
+    except ProcessLookupError:
+        pass
 
 
 def site_packages(venv: Path) -> Path:
