@@ -60,10 +60,27 @@ def compare(main: dict, pr: dict) -> list[dict]:
     return out
 
 
+def _fingerprints(runs: list) -> set[str]:
+    return {json.dumps(normalise(r), sort_keys=True) for r in runs}
+
+
 def confirm(main_runs: list[dict], pr_runs: list[dict]) -> str:
-    """After a difference, each side is rerun (3x). Returns 'same', 'differs' or 'flaky' (a side disagrees with itself)."""
-    nm = {json.dumps(normalise(r), sort_keys=True) for r in main_runs}
-    npr = {json.dumps(normalise(r), sort_keys=True) for r in pr_runs}
+    """Compare the runs of each side.
+
+    'same' or 'differs' when each side agrees with itself. 'flaky' when the base disagrees with itself, or both
+    sides do (that stays noise). 'pr_unstable' when the base is stable and only the pull request is not: a possible
+    regression, not noise.
+    """
+    nm, npr = _fingerprints(main_runs), _fingerprints(pr_runs)
+    if len(nm) == 1 and len(npr) > 1:
+        return "pr_unstable"
     if len(nm) > 1 or len(npr) > 1:
         return "flaky"
     return "same" if nm == npr else "differs"
+
+
+def pr_runs_too_noisy(pr_runs: list) -> bool:
+    """True when every pull-request run is its own result, so a regression cannot be called."""
+    if len(pr_runs) < 3:
+        return False
+    return len(_fingerprints(pr_runs)) == len(pr_runs)

@@ -63,6 +63,8 @@ Plain code then runs the project's real tests, and those probes, on both *main* 
 your machine or in a Nebius sandbox. **Comparing those runs is what decides the verdict.** The AI may explain and
 suggest labels; it never decides pass or fail.
 
+Tavily can suggest package names, but they're only installed if their PyPI page links back to the same repo. That check stops accidents, not a determined attacker.
+
 ## Proven results
 
 Each result below was reproduced 3 times on each side, with the same outcome every time. These are replays run after

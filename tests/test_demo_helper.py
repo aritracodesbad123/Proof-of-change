@@ -463,6 +463,76 @@ def test_unverified_setup_gap_installs_on_both_sides_and_reruns_once():
     assert blocked["reason"] == "could not verify: setup gap numpy"
 
 
+def _probe_record(lines, covered):
+    return {
+        "verdict": "could_not_verify",
+        "reason": "ModuleNotFoundError: No module named 'numpy'",
+        "coverage": {"status": "measured", "changed_lines_total": lines, "changed_lines_covered": covered},
+        "probes": {"status": "ran", "items": [{
+            "id": "p", "source": "model", "status": "ran",
+            "probe_changed_line_coverage": {
+                "status": "measured", "changed_lines_total": lines, "changed_lines_covered": covered,
+                "adequacy": "adequate" if covered else "not_adequate"}}]},
+    }
+
+
+def test_setup_rerun_does_not_accept_a_false_verified():
+    """A rerun that says verified is not accepted when fresh probe coverage ran no changed line."""
+    calls = []
+    rec = _probe_record(12, 4)
+
+    def install_one(side, requirement):
+        calls.append((side, requirement))
+        return True, "1.26"
+
+    def rerun():
+        calls.append("rerun")
+        return {"verdict": "verified", "reason": "the tests passed after the install"}
+
+    def recheck():
+        calls.append("recheck")
+        rec["probes"]["items"][0]["probe_changed_line_coverage"] = {
+            "status": "measured", "changed_lines_total": 12, "changed_lines_covered": 0, "adequacy": "not_adequate"}
+        return {"verdict": "verified", "reason": "the tests passed after the install"}
+
+    demo_helper.retry_unverified(rec, rerun, install_one, ["numpy>=1.24"], "", lambda _name: None, REPO, False,
+                                 recheck_coverage=recheck)
+    assert calls == [("main", "numpy>=1.24"), ("pr", "numpy>=1.24"), "rerun", "recheck"]
+    assert rec["verdict"] == "could_not_verify"
+    assert "changed line" in rec["reason"]
+
+
+def test_setup_rerun_can_verify_when_fresh_coverage_ran_a_changed_line():
+    rec = _probe_record(12, 0)
+
+    def recheck():
+        rec["probes"]["items"][0]["probe_changed_line_coverage"] = {
+            "status": "measured", "changed_lines_total": 12, "changed_lines_covered": 3, "adequacy": "adequate"}
+        return {"verdict": "verified", "reason": "covered after rerun"}
+
+    demo_helper.retry_unverified(
+        rec, lambda: {"verdict": "verified", "reason": "the tests passed"},
+        lambda *_a: (True, "1"), ["numpy"], "", lambda _name: None, REPO, False, recheck_coverage=recheck)
+    assert rec["verdict"] == "verified"
+    assert rec["reason"] == "covered after rerun"
+
+
+def test_large_change_skips_probe_coverage_recheck_and_stays_unverified():
+    calls = []
+    rec = _probe_record(demo_helper.SMALL_CHANGED_LINES + 1, 4)
+
+    def recheck():
+        calls.append("recheck")
+        return {"verdict": "verified", "reason": "should not be asked"}
+
+    demo_helper.retry_unverified(
+        rec, lambda: calls.append("rerun") or {"verdict": "verified", "reason": "tests passed"},
+        lambda *_a: (True, "1"), ["numpy"], "", lambda _name: None, REPO, False, recheck_coverage=recheck)
+    assert calls == ["rerun"]
+    assert rec["verdict"] == "could_not_verify"
+    assert "not small" in rec["reason"]
+
+
 def test_gap_retry_stops_when_lookup_fails_or_nothing_can_be_installed():
     calls = []
 

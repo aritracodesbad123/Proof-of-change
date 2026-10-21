@@ -109,7 +109,7 @@ Model IDs must be confirmed at build time with `GET https://api.tokenfactory.neb
 | **Token Factory preloaded SWE environments** (SWE-bench Verified, SWE-rebench) | Ready-made environments to measure false alarms on known-good fixes. |
 
 ### Optional, not NVIDIA
-- **Tavily** web search: optional probe-time doc lookup via `poc/tavily_docs.py` when `TAVILY_API_KEY` is set (off by default in the daily path).
+- **Tavily** web search: optional probe-time doc lookup via `poc/tavily_docs.py` when `TAVILY_API_KEY` is set (off by default in the daily path). Tavily can suggest package names, but they're only installed if their PyPI page links back to the same repo. That check stops accidents, not a determined attacker.
 
 ### Not needed for this project
 - NVIDIA Cosmos, GR00T, Sonic, Isaac and the Physical AI Workbench, and Jetson hardware. These are for the Physical AI track.
@@ -293,7 +293,7 @@ From spec §14:
 2. **Python only for the MVP?** Spec recommends yes. This draft assumes yes.
 3. **Second demo: a real repo or the constructed bookstore?** Spec recommends the constructed one, clearly labelled.
    Confirm.
-4. **Tavily for the $3k bonus?** Spec: only if a probe genuinely needs current third-party docs. **Planned, not yet built.**
+4. **Tavily for the $3k bonus?** Spec: only if a probe genuinely needs current third-party docs. **Planned, not yet built.** Tavily can suggest package names, but they're only installed if their PyPI page links back to the same repo. That check stops accidents, not a determined attacker.
 5. Hosting: a Serverless AI endpoint, or a free host with Token Factory? Do the credits cover Compute? A Serverless AI endpoint is **Planned, not yet built.**
 6. License: Apache-2.0 or MIT? Resolved: MIT. See `docs/decisions/2026-10-15-mit-licence.md`.
 7. Credit budget for Ultra calls per run. Ultra advisory path is wired (`poc/agents.py` judge role); live cost caps are an ops question.

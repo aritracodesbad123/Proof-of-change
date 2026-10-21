@@ -102,14 +102,17 @@ Verdict, in order:
 6. `could_not_verify` if an exit code is unexplained, or new/changed tests were skipped or failed only because
    an optional dependency is missing (a new test whose failure is `ModuleNotFoundError: No module named 'X'`,
    or another missing-dependency message the comparison already recognises, is blocked, not a pull-request break);
-7. `could_not_verify` if the only remaining difference is flaky tests. A test that passes and fails across the 3
-   runs of one side (main or the pull request) is listed in the record and the report, and the reason names it.
-   It is not a regression and does not, on its own, produce `needs_attention`. A real regression or a new failing
-   test still produces `needs_attention` when another test is flaky;
+7. A test that passes on every base run and fails on some pull-request runs is a possible regression:
+   `needs_attention` when a pull-request result repeats, `could_not_verify` when the pull-request runs are too
+   mixed to call. It is never `verified`. A test that is flaky on both sides, or only on the base, is listed
+   and does not, on its own, decide the verdict. A real regression or a new failing test still produces
+   `needs_attention` when another test is flaky;
 8. otherwise `needs_attention` for tests missing on the PR side or other outcome changes, `verified` if nothing differs.
 
 Then the coverage gate. The reason says how many tests ran on each side, how many were unchanged (and how many of
 those were skipped on both sides), flaky tests, and every module that failed to load.
+
+Limitation: after a setup rerun, probe line coverage is measured again only when the change is 200 lines or fewer. A larger change skips that measurement, and the rerun cannot raise the verdict to verified.
 
 ## Coverage gate (`poc/coverage_gate.py`)
 

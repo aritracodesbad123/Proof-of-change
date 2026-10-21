@@ -95,9 +95,18 @@ def test_judge_labels(main, pr, name, label):
     assert labels(probes.judge(SPEC, runs(main, pr)))[name] == label
 
 
-def test_flaky_observation_is_flaky_never_unmentioned():
+def test_pr_only_instability_is_not_ignored_as_flaky():
+    """Stable on the base, two values on the PR: a possible change, not noise."""
     res = probes.judge(SPEC, runs({"c": 1}, {"c": 1}, pr_alt={"c": 2}))
+    assert labels(res) == {"c": "unmentioned"}
+    assert res[0]["pr_only"] == "regression"
+
+
+def test_flaky_on_both_sides_stays_flaky():
+    got = {"main": [{"c": 1}, {"c": 2}, {"c": 1}], "pr": [{"c": 1}, {"c": 2}, {"c": 1}]}
+    res = probes.judge(SPEC, got)
     assert labels(res) == {"c": "flaky"}
+    assert "pr_only" not in res[0]
 
 
 def test_probe_crash_on_both_sides_is_not_testable_on_pr_only_is_a_difference():
