@@ -283,6 +283,17 @@ def _load_latest_record(repo: str, pr: int) -> dict | None:
     return json.loads(newest.read_text())
 
 
+def check_argv(pr_url: str, env: dict | None = None) -> list[str]:
+    """Arguments for one product check started by the GitHub App.
+
+    ``--related-reports`` is quoted background for the advisory AI. A study run does not use this.
+    """
+    env = os.environ if env is None else env
+    from poc import related_reports
+    provider = env.get("POC_MODEL_PROVIDER") or "nebius"
+    return ["--pr", pr_url, "--model-provider", provider, *related_reports.product_flags()]
+
+
 def apply(plan: dict, *, dry_run: bool | None = None, env: dict | None = None,
           runner: Callable[..., int] | None = None, hosted_dir: Path | None = None) -> dict[str, Any]:
     """Execute a handle_event plan: run daily_run for the PR, write hosted HTML, post check+comment if token."""
@@ -311,7 +322,7 @@ def apply(plan: dict, *, dry_run: bool | None = None, env: dict | None = None,
         note = None
 
     pr_url = f"https://github.com/{repo}/pull/{int(pr)}"
-    argv = ["--pr", pr_url, "--model-provider", env.get("POC_MODEL_PROVIDER") or "nebius"]
+    argv = check_argv(pr_url, env)
     if plan.get("claim"):
         # claim text is advisory for logs; daily_run reads claims from PR body
         pass

@@ -3324,12 +3324,34 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
     return finish(gate(rec), prdir, work, t0, a)
 
 
+def _attach_related_reports(rec: dict, runner) -> None:
+    """Store related bug reports when this product check asked. Never changes the verdict.
+
+    A study run and the daily study leave the record alone. A missing key or a failed lookup
+    is one log line. The exception text is not printed, because it can contain the key.
+    """
+    from poc import related_reports
+    if not related_reports.enabled(
+            bool(getattr(runner, "related_reports", False)),
+            bench=bool(getattr(runner, "bench", False)),
+            single_pr=bool(getattr(runner, "pr", None))):
+        return
+    try:
+        rec["related_reports"] = related_reports.collect(rec)
+    except Exception:  # noqa: BLE001 — do not print the message; it may contain the key
+        print(related_reports.FAIL_LOG, flush=True)
+        rec["related_reports"] = {"status": "error", "text": "", "items": [], "untrusted": True}
+
+
 def finish(rec: dict, prdir: Path, work: Path, t0: float, runner=None) -> dict:
     # Agent swarm (judge/helper/summary) after the code verdict; advisory only — never changes rec["verdict"].
     # Off unless the run asked (--swarm / POC_SWARM). Skip also when model_skipped is set
     # (--no-probes / baseline without claim probes) so the stamp stays honest.
     from poc import contree_sandboxes, hitl, run_progress
     contree_sandboxes.clear_session()
+    # Related bug reports are background for the advisory AI. They are attached before the swarm
+    # reads the record. The verdict above this function is already final and is not read back.
+    _attach_related_reports(rec, runner)
     # Requested comes from the settings (--swarm / POC_SWARM, and POC_HITL). Ran stays off when
     # that step never started: no model, probes skipped, or the approval step was not entered.
     swarm_requested = agents.swarm_enabled(bool(getattr(runner, "swarm", False)))
@@ -4205,6 +4227,11 @@ def main(argv=None) -> int:
                          "plain-language summary). Off by default for command-line and benchmark runs, so "
                          "they make no swarm model calls. Also on when POC_SWARM is 1, true, yes, or on. "
                          "The operator console turns this on itself.")
+    ap.add_argument("--related-reports", action="store_true",
+                    help="on a product check, look up a few related public bug reports and pass them to the "
+                         "advisory AI as quoted background. Off for a study run and the daily study, even "
+                         "if this flag is set on a benchmark. Skipped when TAVILY_API_KEY is not set. "
+                         "Does not change the verdict and does not choose packages.")
     ap.add_argument("--console-job", action="store_true",
                     help="passed only by the operator console, on a single pull-request check. "
                          "With this flag that check may start while POC_HITL is set. "
