@@ -180,6 +180,8 @@ export const api = {
     json<{ email: string }>('/api/auth/verify', { method: 'POST', body: JSON.stringify({ challenge_id, code }) }),
   resend: (challenge_id: string) =>
     json<Challenge>('/api/auth/resend', { method: 'POST', body: JSON.stringify({ challenge_id }) }),
+  consoleCode: (code: string) =>
+    json<Account>('/api/auth/console-code', { method: 'POST', body: JSON.stringify({ code }) }),
   logout: () => json<{ ok: boolean }>('/api/auth/logout', { method: 'POST', body: '{}' }),
   submitScenarios: (id: string, body: HitlApprovalBody) =>
     json<{ ok: boolean; approval: HitlApprovalBody }>(

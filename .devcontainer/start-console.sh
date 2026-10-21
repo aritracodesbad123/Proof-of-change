@@ -13,7 +13,17 @@ fi
 
 raw=""
 if command -v gh >/dev/null 2>&1; then
-  raw="$(gh codespace ports --json port,visibility 2>/dev/null || true)"
+  if [ -n "${CODESPACE_NAME:-}" ]; then
+    raw="$(gh codespace ports -c "$CODESPACE_NAME" --json port,visibility 2>/dev/null || true)"
+  else
+    raw="$(gh codespace ports --json port,visibility 2>/dev/null || true)"
+  fi
+else
+  echo "GitHub CLI missing, so port 8787 cannot be confirmed private. Sign-in stays on; open it with the code from: cat /tmp/poc-console-code" >&2
+fi
+if [ -z "$raw" ]; then
+  # Fail closed: an unread port list never skips sign-in. Create the owner-only console code instead.
+  "$PYTHON" -c 'from poc.console_auth import ensure_access_code; ensure_access_code()' || true
 fi
 
 refusal="$(printf '%s' "$raw" | "$PYTHON" -c 'import sys

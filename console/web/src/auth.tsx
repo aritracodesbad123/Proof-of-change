@@ -39,6 +39,7 @@ type Mode = 'login' | 'signup' | 'code'
 export default function AuthGate({ children }: { children: ReactNode }) {
   const [email, setEmail] = useState<string | null | undefined>(undefined)
   const [notice, setNotice] = useState<string | null>(null)
+  const [needsCode, setNeedsCode] = useState(false)
 
   useEffect(() => {
     let live = true
@@ -50,7 +51,9 @@ export default function AuthGate({ children }: { children: ReactNode }) {
         if (!live) return
         setEmail(null)
         const message = error instanceof Error ? error.message : ''
-        setNotice(message.includes('Port 8787 is public') ? message : null)
+        const codeCase = message.includes('poc-console-code')
+        setNeedsCode(codeCase)
+        setNotice(message.includes('Port 8787 is public') || codeCase ? message : null)
       },
     )
     return () => {
@@ -66,6 +69,7 @@ export default function AuthGate({ children }: { children: ReactNode }) {
     )
   }
   if (email) return children
+  if (needsCode) return <ConsoleCodeScreen notice={notice} onAuthed={setEmail} />
   return <AuthScreen onAuthed={setEmail} notice={notice} />
 }
 
@@ -247,6 +251,65 @@ export function AuthScreen({ onAuthed, notice }: { onAuthed: (email: string) => 
               {mode === 'login' ? 'Create an account' : 'Have an account? Sign in'}
             </button>
           )}
+        </section>
+      </main>
+    </div>
+  )
+}
+
+export function ConsoleCodeScreen({ notice, onAuthed }: { notice: string | null; onAuthed: (email: string) => void }) {
+  const [code, setCode] = useState('')
+  const [error, setError] = useState<string | null>(null)
+  const [busy, setBusy] = useState(false)
+
+  async function onSubmit(event: FormEvent) {
+    event.preventDefault()
+    setBusy(true)
+    setError(null)
+    try {
+      const me = await api.consoleCode(code)
+      onAuthed(me.email)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err))
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  return (
+    <div className="shell">
+      <header className="top">
+        <p className="brand">Proof-of-Change</p>
+      </header>
+      <main className="main">
+        <section className="panel start">
+          <h1>Enter the console code</h1>
+          {notice ? (
+            <p className="banner err" role="alert">
+              {notice}
+            </p>
+          ) : null}
+          {error ? (
+            <p className="banner err" role="alert">
+              {error}
+            </p>
+          ) : null}
+          <form className="form" onSubmit={(event) => void onSubmit(event)}>
+            <label>
+              Console code
+              <input
+                className="code-input"
+                autoComplete="off"
+                value={code}
+                onChange={(event) => setCode(event.target.value)}
+              />
+            </label>
+            <div className="cta-row">
+              <button type="submit" disabled={busy || !code.trim()}>
+                Open console
+              </button>
+            </div>
+          </form>
         </section>
       </main>
     </div>

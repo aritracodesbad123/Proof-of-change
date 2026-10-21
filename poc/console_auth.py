@@ -900,16 +900,91 @@ PORT_PUBLIC_MESSAGE = (
     "Sign-in stays required while that port is public."
 )
 PORT_UNKNOWN_MESSAGE = (
-    "Could not confirm that port 8787 is private (the gh command is missing or failed), so sign-in stays on. "
-    "Check the Ports panel shows 8787 as Private, then start the console again."
+    "Could not confirm that port 8787 is private (the GitHub CLI could not read the port list), so sign-in stays on. "
+    "To open the console, run `cat /tmp/poc-console-code` in the Codespace terminal and enter that code below."
 )
+PORT_GH_MISSING_MESSAGE = (
+    "GitHub CLI missing, so the console cannot confirm that port 8787 is private and sign-in stays on. "
+    "To open the console, run `cat /tmp/poc-console-code` in the Codespace terminal and enter that code below."
+)
+ACCESS_CODE_ERROR = "That console code is not right. Run `cat /tmp/poc-console-code` in the Codespace terminal and copy it exactly."
 _PORT_CACHE_S = 15.0
 _port_seen: tuple[float, str | None] | None = None
+_port_missing_gh = False
+_access_tokens: set[str] = set()
+_access_failures = 0
+_ACCESS_MAX_FAILURES = 20
+
+
+def access_code_path(env: dict[str, str] | os._Environ[str] | None = None) -> Path:
+    env = os.environ if env is None else env
+    return Path((env.get("POC_CONSOLE_CODE_FILE") or "").strip() or "/tmp/poc-console-code")
+
+
+def ensure_access_code(env: dict[str, str] | os._Environ[str] | None = None) -> None:
+    """Create the console code file (owner-only) when it does not exist. The code is never logged."""
+    path = access_code_path(env)
+    if path.exists():
+        return
+    try:
+        fd = os.open(str(path), os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+    except OSError:
+        return
+    with os.fdopen(fd, "w") as fh:
+        fh.write(secrets.token_hex(16) + "\n")
+
+
+def _read_access_code(env: dict[str, str] | os._Environ[str] | None = None) -> str:
+    try:
+        return access_code_path(env).read_text().strip()
+    except OSError:
+        return ""
+
+
+def redeem_access_code(code: str, env: dict[str, str] | os._Environ[str] | None = None) -> str:
+    """Trade the code from the Codespace terminal for a local session.
+
+    Only in a Codespace, only when the port is not known to be public. The code lives in an
+    owner-only file inside the Codespace, so presenting it proves the visitor can already use
+    the Codespace itself. It does not trust the port.
+    """
+    global _access_failures
+    env = os.environ if env is None else env
+    if not single_user_requested(env):
+        raise AuthError("Sign in first.", 401)
+    if codespace_port_visibility() == "public":
+        raise AuthError(PORT_PUBLIC_MESSAGE, 401)
+    if _access_failures >= _ACCESS_MAX_FAILURES:
+        raise AuthError("Too many wrong console codes. Restart the console to try again.", 429)
+    expected = _read_access_code(env)
+    presented = (code or "").strip()
+    if not expected or not presented or not hmac.compare_digest(expected.encode(), presented.encode()):
+        _access_failures += 1
+        raise AuthError(ACCESS_CODE_ERROR, 401)
+    token = secrets.token_urlsafe(32)
+    _access_tokens.add(_session_digest(token))
+    return token
+
+
+def _code_session(token: str | None, env: dict[str, str] | os._Environ[str] | None = None) -> bool:
+    env = os.environ if env is None else env
+    if not token or not single_user_requested(env):
+        return False
+    if _session_digest(token) not in _access_tokens:
+        return False
+    return codespace_port_visibility() != "public"
 
 
 def reset_port_cache() -> None:
-    global _port_seen
+    global _port_seen, _port_missing_gh
     _port_seen = None
+    _port_missing_gh = False
+
+
+def reset_access_codes() -> None:
+    global _access_failures
+    _access_tokens.clear()
+    _access_failures = 0
 
 
 def _flag_on(env: dict[str, str] | os._Environ[str], name: str) -> bool:
@@ -964,12 +1039,25 @@ def codespace_port_visibility(port: int = CONSOLE_PORT) -> str | None:
     return visibility
 
 
+def codespace_ports_argv(env: dict[str, str] | os._Environ[str] | None = None) -> list[str]:
+    """`gh codespace ports`, naming this Codespace with -c when CODESPACE_NAME is set."""
+    env = os.environ if env is None else env
+    argv = ["gh", "codespace", "ports"]
+    name = (env.get("CODESPACE_NAME") or "").strip()
+    if name:
+        argv += ["-c", name]
+    return argv + ["--json", "port,visibility"]
+
+
 def _read_codespace_port(port: int) -> str | None:
+    global _port_missing_gh
     if shutil.which("gh") is None:
+        _port_missing_gh = True
         return None
+    _port_missing_gh = False
     try:
         proc = subprocess.run(
-            ["gh", "codespace", "ports", "--json", "port,visibility"],
+            codespace_ports_argv(),
             capture_output=True, text=True, timeout=8, check=False,
         )
     except (OSError, subprocess.TimeoutExpired):
@@ -992,13 +1080,15 @@ def sign_in_skip(env: dict[str, str] | os._Environ[str] | None = None) -> tuple[
         return False, PORT_PUBLIC_MESSAGE
     if visibility is None:
         # gh missing or failing: we cannot prove the port is private, so sign-in stays on.
-        return False, PORT_UNKNOWN_MESSAGE
+        # The console code (see redeem_access_code) is the only way past it.
+        ensure_access_code(env)
+        return False, PORT_GH_MISSING_MESSAGE if _port_missing_gh else PORT_UNKNOWN_MESSAGE
     return True, None
 
 
 def viewer_account(token: str | None) -> dict[str, Any] | None:
     """The signed-in account, or the local Codespace account when sign-in is skipped."""
-    if sign_in_skip()[0]:
+    if sign_in_skip()[0] or _code_session(token):
         return dict(LOCAL_ACCOUNT)
     return service_from_env().account_for_session(token)
 
@@ -1010,7 +1100,7 @@ def request_session_token(token: str | None) -> str | None:
     local slot. A leftover or changed cookie must not move the keys to a new slot,
     or a page refresh would lose them. Otherwise the sign-in cookie is the slot.
     """
-    if sign_in_skip()[0]:
+    if sign_in_skip()[0] or _code_session(token):
         return LOCAL_SESSION
     if token:
         return token
@@ -1028,12 +1118,17 @@ def handle_request(method: str, path: str, query: dict[str, list[str]], body: di
             return HttpResult(200, provider_config(env))
         if method == "GET" and path == "/api/auth/me":
             skipped, why = sign_in_skip()
-            if skipped:
+            if skipped or _code_session(cookie_value(cookie_header, SESSION_COOKIE)):
                 return HttpResult(200, dict(LOCAL_ACCOUNT))
+            if why in (PORT_UNKNOWN_MESSAGE, PORT_GH_MISSING_MESSAGE):
+                return HttpResult(401, {"error": why, "console_code": True})
             account = svc.account_for_session(cookie_value(cookie_header, SESSION_COOKIE))
             if not account:
                 return HttpResult(401, {"error": why or "Sign in first."})
             return HttpResult(200, {"email": account["email"], "id": account["id"], "role": account.get("role") or "user"})
+        if method == "POST" and path == "/api/auth/console-code":
+            token = redeem_access_code(str((body or {}).get("code") or ""))
+            return HttpResult(200, dict(LOCAL_ACCOUNT), cookies=[session_cookie(token, secure=secure)])
         if method == "POST" and path == "/api/auth/logout":
             svc.logout(cookie_value(cookie_header, SESSION_COOKIE))
             return HttpResult(200, {"ok": True}, cookies=[clear_cookie(SESSION_COOKIE)])
