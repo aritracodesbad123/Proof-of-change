@@ -69,6 +69,14 @@ def test_pypi_link_back_requires_a_real_github_repo_url():
     assert not demo_helper.pypi_links_back({}, "acme", "widget")
 
 
+def test_github_repo_url_accepts_only_http_and_https():
+    assert demo_helper.github_repo_url("https://github.com/o/r", "o", "r")
+    assert demo_helper.github_repo_url("http://github.com/o/r", "o", "r")
+    assert not demo_helper.github_repo_url("ftp://github.com/o/r", "o", "r")
+    assert not demo_helper.github_repo_url("git+ssh://git@github.com/o/r.git", "o", "r")
+    assert not demo_helper.github_repo_url("git+ssh://github.com/o/r", "o", "r")
+
+
 def test_setup_plan_uses_project_files_and_link_back_only(tmp_path):
     text = "pip install mystery-pkg\npip install linked-pkg\napt-get install libhdf5-dev\nPython 3.11\n"
     plan = _plan(_checkout(tmp_path), text=text)

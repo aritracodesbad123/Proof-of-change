@@ -925,16 +925,18 @@ def fetch_pypi(name: str, timeout: float = PYPI_TIMEOUT):
 
 
 def github_repo_url(value: str, owner: str, repo: str) -> bool:
-    """True when the URL's host is github.com and its first two path segments are owner/repo.
+    """True when an http or https URL's host is github.com and its first two path segments are owner/repo.
 
     www.github.com is the same host. The match ignores case and one trailing .git.
-    A lookalike host, or a path that only contains the repository text, is not a match.
+    A lookalike host, a path that only contains the repository text, or any other scheme is not a match.
     """
     if not isinstance(value, str) or not owner or not repo:
         return False
     try:
         parsed = urllib.parse.urlsplit(value.strip())
     except ValueError:
+        return False
+    if (parsed.scheme or "").lower() not in {"http", "https"}:
         return False
     host = (parsed.hostname or "").lower()
     if host not in {"github.com", "www.github.com"}:
