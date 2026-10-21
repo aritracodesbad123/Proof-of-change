@@ -9,6 +9,8 @@ The operator console no longer starts a check with `--unsafe-no-sandbox` just be
 
 The console now stops the check and says it will not run pull-request code. That decision is a flag on the run plan, not a phrase matched in the message. The only way to allow an unsandboxed run is to set the environment variable `POC_UNSAFE_NO_SANDBOX` to `1`. When that is set, the plan carries a separate warning, and the console shows it on the health banner and on the check.
 
+![Check screen showing the unsandboxed warning](../images/check_screen_unsandboxed_warning.png)
+
 A playback of the vetted sample, which does not execute pull-request code, still runs on any host that has no sandbox. It is not limited to a Hugging Face Space.
 
 Choosing Contree no longer also passes `--unsafe-no-sandbox`. That extra flag used to keep a local fallback alive if a remote sandbox failed. The fallback is now off unless `POC_UNSAFE_NO_SANDBOX=1` is set.
@@ -23,7 +25,7 @@ Pull-request code is untrusted. Running it without a sandbox can expose files, k
 2. If bubblewrap can start, the console uses it and adds no extra flag.
 3. If neither can start, the console refuses. It does not launch the check.
 4. `POC_UNSAFE_NO_SANDBOX=1` (also `true` or `yes`) is the only opt-in. The console then passes `--unsafe-no-sandbox` and shows a warning that names the variable.
-5. When bubblewrap and Contree are both unavailable, the vetted recorded sample (mlxtend pull 1229) plays back on any host. That playback does not run pull-request code. Any other check is refused.
+5. When bubblewrap and Contree are both unavailable, the vetted recorded sample (mlxtend pull 1229) plays back on any host. That playback does not run pull-request code. Any other check is refused. With the unsafe opt-in on and no sandbox, the vetted recorded sample still plays back instead of running for real.
 
 ## Alternatives and tradeoffs
 
@@ -31,4 +33,4 @@ Leaving the automatic fallback would keep a public demo running on hosts that ca
 
 ## What it means for you
 
-On a machine where bubblewrap works, nothing changes. On a host where it does not, a check will not start until Contree is set up or you set `POC_UNSAFE_NO_SANDBOX=1`. If you set that variable, read the warning: pull-request code can see the machine. The prerecorded sample playback still finishes without running that code.
+On a machine where bubblewrap works, nothing changes. On a host where it does not, a check will not start until Contree is set up or you set `POC_UNSAFE_NO_SANDBOX=1`. If you set that variable, read the warning: pull-request code can see the machine. With that opt-in on and no sandbox, the vetted recorded sample still plays back instead of running for real.
