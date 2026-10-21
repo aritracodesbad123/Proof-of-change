@@ -1233,30 +1233,68 @@ def _dist_version(venv: Path, requirement: str) -> str:
     return text.splitlines()[-1] if text else ""
 
 
-def _product_plan(a, rec: dict, repo: str, cfg: dict, checkouts) -> dict | None:
-    """Setup plan for a console or daily check. None on a study run, which does not call this."""
+def _project_file_dirs(repo: str, item: dict, work: Path, log: Path) -> list[Path]:
+    """Directories that hold this project's packaging files.
+
+    A nightly check has not installed either side yet. Read a checkout that is already
+    there, or clone the base ref into work/packaging. An empty list means the files
+    could not be read, so the plan must not add packages from a lookup.
+    """
+    found = []
+    for name in ("side-main", "side-pr", "packaging"):
+        path = work / name
+        if path.is_dir() and any(path.iterdir()):
+            found.append(path)
+    if found:
+        return found
+    dest = work / "packaging"
+    shutil.rmtree(dest, ignore_errors=True)
+    ref = str((item or {}).get("base_ref") or "").strip()
+    cmd = ["git", "clone", "-q", "--depth", "1"]
+    if ref:
+        cmd.extend(["--branch", ref])
+    cmd.extend([f"https://github.com/{repo}.git", str(dest)])
+    rc, _ = run(cmd, log, env=base_env(work / "home-git"), timeout=900)
+    if rc != 0 or not dest.is_dir() or not any(dest.iterdir()):
+        shutil.rmtree(dest, ignore_errors=True)
+        return []
+    return [dest]
+
+
+def _product_plan(a, rec: dict, repo: str, cfg: dict, checkouts, pypi=None, python_available=None) -> dict | None:
+    """Setup plan for a console or daily check. None on a study run, which does not call this.
+
+    Does not change the runner's Python. The caller passes ``_check_python`` into this check's installs.
+    """
     from poc import demo_helper
     if not demo_helper.active(a):
         return None
     tavily = (rec.get("demo_helper") or {}).get("tavily") or {}
+    folders = [path for path in (checkouts or []) if path]
     plan = demo_helper.build_setup_plan(
-        repo, checkouts, tavily, getattr(a, "python", "") or "",
+        repo, folders, tavily, getattr(a, "python", "") or "",
         getattr(a, "sandbox_backend", None) or "local",
-        (cfg or {}).get("dist") or (cfg or {}).get("pkg") or "")
+        (cfg or {}).get("dist") or (cfg or {}).get("pkg") or "",
+        python_available=python_available, pypi=pypi,
+        allow_lookup_packages=bool(folders))
     demo_helper.attach_plan(rec, plan)
     demo_helper.announce(plan.get("lines") or [])
-    switch = (plan.get("python") or {}).get("switch")
-    if switch:
-        a.python = switch
     return plan
 
 
-def _install_with_helper(a, rec, step, venv, checkout, chosen, log, timeout, constraints, extra_reqs):
+def _check_python(a, plan) -> str:
+    """Python for this check only. A switch is not written back onto the runner."""
+    switch = ((plan or {}).get("python") or {}).get("switch")
+    return switch or getattr(a, "python", "") or ""
+
+
+def _install_with_helper(a, rec, step, venv, checkout, chosen, log, timeout, constraints, extra_reqs, python=None):
     """Retry one side's install. The caller uses the plain install_side call when the helper is off."""
     from poc import demo_helper
+    py = a.python if python is None else python
 
     def once():
-        ok, why = install_side(venv, checkout, chosen, log, a.python, timeout, constraints, extra_reqs)
+        ok, why = install_side(venv, checkout, chosen, log, py, timeout, constraints, extra_reqs)
         return ok, why
 
     ok, why, _value, outcome = demo_helper.run_setup(
@@ -1305,17 +1343,12 @@ def _retry_setup_gap(a, rec, repo, prdir, venvs: dict, rerun) -> None:
     def install_system(name):
         from poc import contree_sandboxes
         sess = contree_sandboxes.session()
-        if sess is None or not demo_helper.safe_apt_name(name):
-            return False
-        shell = "export DEBIAN_FRONTEND=noninteractive\napt-get update -qq && apt-get install -y -qq " + shlex.quote(name)
-        for side in ("main", "pr"):
-            try:
-                got = sess.run_op(side, shell, disposable=False, timeout=300)
-            except Exception:  # noqa: BLE001 — a failed system install stays a setup gap
-                return False
-            if got.get("exit_code") != 0:
-                return False
-        return True
+
+        def run_side(side, shell, _sess=sess):
+            got = _sess.run_op(side, shell, disposable=False, timeout=300)
+            return int(got.get("exit_code") or 0) if isinstance(got, dict) else 1
+
+        return _install_system_package(rec, name, run_side if sess is not None else None)
 
     lookup = None
     if tavily_docs.available():
@@ -1337,6 +1370,22 @@ def _retry_setup_gap(a, rec, repo, prdir, venvs: dict, rerun) -> None:
         rec, rerun, install_one, declared, tavily.get("text") or "", demo_helper.fetch_pypi, repo,
         allow_system=getattr(a, "sandbox_backend", None) == "contree",
         install_system=install_system, lookup=lookup)
+
+
+def _install_system_package(rec, name, run_side) -> bool:
+    """Install a system package on both sides, or on neither, and record a setup problem on failure."""
+    from poc import demo_helper
+    if run_side is None or not demo_helper.safe_apt_name(name):
+        detail = "no sandbox session" if run_side is None else f"not a safe system package name: {name}"
+        demo_helper.note_setup(rec, f"system package {name}", {
+            "ok": False, "counts_as_verdict": False, "attempts": 1, "detail": detail, "retried": False})
+        return False
+    result = demo_helper.install_system_both(run_side, name)
+    if result.get("ok"):
+        return True
+    demo_helper.note_setup(rec, f"system package {name}", {
+        "ok": False, "counts_as_verdict": False, "attempts": 1, "detail": result.get("detail"), "retried": False})
+    return False
 
 
 # ---------------------------------------------------------------- execution helpers
@@ -3144,11 +3193,13 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
     targets = None
     plan, pr_started = [], None
     helper_on = demo_helper.active(a)
-    setup_plan = _product_plan(a, rec, repo, cfg, []) if helper_on else None
+    file_dirs = _project_file_dirs(repo, item, work, prdir / "packaging.log") if helper_on else []
+    setup_plan = _product_plan(a, rec, repo, cfg, file_dirs) if helper_on else None
+    py = _check_python(a, setup_plan)
     run_progress.emit("install_main", detail="installing main (nightly) side")
     if helper_on:
         def _build_main():
-            built = build_main_env(cfg, vm, prdir / "setup-main.log", a.python, a.build_timeout,
+            built = build_main_env(cfg, vm, prdir / "setup-main.log", py, a.build_timeout,
                                    workroot / "wheels" / rdir.name)
             return bool(built.get("ok")), built.get("why") or "", built
         _ok, _why, main, outcome = demo_helper.run_setup(
@@ -3157,7 +3208,7 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
         if not isinstance(main, dict):
             main = {"ok": False, "why": _why}
     else:
-        main = build_main_env(cfg, vm, prdir / "setup-main.log", a.python, a.build_timeout, workroot / "wheels" / rdir.name)
+        main = build_main_env(cfg, vm, prdir / "setup-main.log", py, a.build_timeout, workroot / "wheels" / rdir.name)
     rec["main_side"] = {"source": "scientific-python nightly wheel (exact file, pinned by sha256)",
                         **{k: v for k, v in main.items() if k not in ("ok",)}}
     if main.get("build"):
@@ -3175,7 +3226,7 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
             run_progress.emit("install_pr", detail="building PR from source")
             if helper_on:
                 def _build_pr():
-                    built = source_build(repo, item, cfg, vp, work, prdir / "build-pr.log", a.python,
+                    built = source_build(repo, item, cfg, vp, work, prdir / "build-pr.log", py,
                                          a.build_timeout, tuple(extra))
                     return bool(built.get("ok")), built.get("why") or "", built
                 _ok, _why, b, outcome = demo_helper.run_setup(
@@ -3184,7 +3235,7 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
                 if not isinstance(b, dict):
                     b = {"ok": False, "why": _why}
             else:
-                b = source_build(repo, item, cfg, vp, work, prdir / "build-pr.log", a.python, a.build_timeout, tuple(extra))
+                b = source_build(repo, item, cfg, vp, work, prdir / "build-pr.log", py, a.build_timeout, tuple(extra))
             rec["pr_side"] = {"source": f"source build of {item['head_sha'][:12]}",
                               **{k: v for k, v in b.items() if k != "ok"}}
             rec["notes"] = ("main = nightly wheel, PR = source build of the PR head; differences can include "
@@ -3427,11 +3478,12 @@ def test_source_pair(repo: str, cfg: dict, item: dict, prdir: Path, work: Path, 
         vm, vp = work / "venv-main", work / "venv-pr"
         cm, cp = work / "side-main", work / "side-pr"
         setup_plan = _product_plan(a, rec, repo, cfg, [cm, cp]) if helper_on else None
+        py = _check_python(a, setup_plan)
         extra = list(setup_plan["extra_reqs"]) if setup_plan and setup_plan.get("extra_reqs") else None
         run_progress.emit("install_main", detail="installing main side")
         if helper_on:
             ok, why = _install_with_helper(a, rec, "main install", vm, cm, item.get("chosen"),
-                                           prdir / "setup-main.log", a.build_timeout, None, extra)
+                                           prdir / "setup-main.log", a.build_timeout, None, extra, python=py)
         else:
             ok, why = install_side(vm, cm, item.get("chosen"), prdir / "setup-main.log", a.python, a.build_timeout, None)
         plan, pr_started = [], None
@@ -3447,7 +3499,7 @@ def test_source_pair(repo: str, cfg: dict, item: dict, prdir: Path, work: Path, 
             run_progress.emit("install_pr", detail="installing PR side")
             if helper_on:
                 ok, why = _install_with_helper(a, rec, "PR install", vp, cp, item.get("chosen"),
-                                               prdir / "setup-pr.log", a.build_timeout, cons, extra)
+                                               prdir / "setup-pr.log", a.build_timeout, cons, extra, python=py)
             else:
                 ok, why = install_side(vp, cp, item.get("chosen"), prdir / "setup-pr.log", a.python, a.build_timeout, cons)
             if ok:

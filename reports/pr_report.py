@@ -19,7 +19,7 @@ import re
 import sys
 from pathlib import Path
 
-from poc import coverage_gate
+from poc import coverage_gate, demo_helper
 from reports import reviewer as rv
 from reports.reviewer import Report, badge, link
 
@@ -569,6 +569,7 @@ def build(rec: dict, prdir: Path, out_dir: Path, decision: dict | None = None) -
     if helper_notes:
         R.h(3, "Demo helper")
         R.p("These notes are background from the console and the daily check. They do not change the verdict.")
+        R.p(demo_helper.RETRY_LIMITS)
         R.bullets([str(note) for note in helper_notes])
 
     R.h(2, "Claims vs reality", "claims")

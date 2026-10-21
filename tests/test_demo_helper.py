@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import json
 import os
+from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
@@ -43,11 +44,25 @@ def _plan(root, *, sandbox="local", current="3.12", text="", python_available=No
         python_available=python_available or (lambda _version: None), pypi=_pypi)
 
 
-def test_pypi_link_back_matches_the_study_rule():
+def test_pypi_link_back_requires_a_real_github_repo_url():
+    assert demo_helper.github_repo_url("https://GitHub.com/Acme/Widget/", "acme", "widget")
+    assert demo_helper.github_repo_url("https://github.com/acme/widget.git", "acme", "widget")
+    assert demo_helper.github_repo_url("https://www.github.com/acme/widget", "acme", "widget")
+    assert demo_helper.github_repo_url("https://github.com/acme/widget/tree/main", "acme", "widget")
+    assert demo_helper.github_repo_url("https://github.com/acme/widget?foo=1", "acme", "widget")
+    assert demo_helper.github_repo_url("https://github.com/acme/widget#readme", "acme", "widget")
+    assert not demo_helper.github_repo_url("https://evil.com/github.com/jaraco/inflect", "jaraco", "inflect")
+    assert not demo_helper.github_repo_url("https://notgithub.com/jaraco/inflect", "jaraco", "inflect")
+    assert not demo_helper.github_repo_url("https://github.com.evil.com/jaraco/inflect", "jaraco", "inflect")
+    assert not demo_helper.github_repo_url("https://github.com/jaraco/inflect-extra", "jaraco", "inflect")
     assert demo_helper.pypi_links_back({"home_page": "https://GitHub.com/Acme/Widget/"}, "acme", "widget")
     assert demo_helper.pypi_links_back({"home_page": "https://github.com/acme/widget.git"}, "acme", "widget")
     assert demo_helper.pypi_links_back({"project_urls": {"Source": "https://github.com/acme/widget?foo=1"}}, "acme", "widget")
     assert demo_helper.pypi_links_back({"info": {"home_page": "https://github.com/acme/widget"}}, "acme", "widget")
+    assert demo_helper.pypi_links_back({"home_page": "https://www.github.com/acme/widget/"}, "acme", "widget")
+    assert not demo_helper.pypi_links_back({"home_page": "https://evil.com/github.com/jaraco/inflect"}, "jaraco", "inflect")
+    assert not demo_helper.pypi_links_back({"home_page": "https://notgithub.com/jaraco/inflect"}, "jaraco", "inflect")
+    assert not demo_helper.pypi_links_back({"project_urls": {"Home": "https://notgithub.com/acme/widget"}}, "acme", "widget")
     assert not demo_helper.pypi_links_back({"home_page": "https://github.com/acme/widget-extra"}, "acme", "widget")
     assert not demo_helper.pypi_links_back({"home_page": "https://github.com/other/widget"}, "acme", "widget")
     assert not demo_helper.pypi_links_back(None, "acme", "widget")
@@ -138,6 +153,108 @@ def test_setup_plan_ignores_python_and_system_hints_from_tavily(tmp_path):
         pypi=lambda _name: page)
     assert from_pypi["python"]["requested"] == "3.12"
     assert "3.14" not in json.dumps(from_pypi) and "libhdf5-dev" not in json.dumps(from_pypi)
+
+
+def test_python_switch_applies_to_one_check_only(tmp_path, monkeypatch):
+    from ops import daily_run
+    monkeypatch.setattr(demo_helper, "find_python",
+                        lambda version, which=None: "/opt/python3.11" if version == "3.11" else None)
+    a = SimpleNamespace(python="3.10", bench=None, sandbox_backend="local")
+    root = _checkout(tmp_path, python=">=3.11")
+    plan = daily_run._product_plan(a, {}, "acme/widget", {"dist": "widget"}, [root], pypi=_pypi)
+    assert a.python == "3.10"
+    assert plan["python"]["switch"] == "/opt/python3.11"
+    assert daily_run._check_python(a, plan) == "/opt/python3.11"
+    assert daily_run._check_python(a, None) == "3.10"
+    seen = {}
+
+    def fake_install(venv, checkout, chosen, log, python, timeout, constraints, extra_reqs=None):
+        seen["python"] = python
+        return True, ""
+
+    monkeypatch.setattr(daily_run, "install_side", fake_install)
+    daily_run._install_with_helper(
+        a, {}, "main install", tmp_path / "venv", root, None, tmp_path / "log", 10, None, None,
+        python=daily_run._check_python(a, plan))
+    assert seen["python"] == "/opt/python3.11"
+    assert a.python == "3.10"
+
+
+def test_system_package_installs_on_both_sides_or_neither():
+    from ops import daily_run
+    calls = []
+
+    def run_side(side, shell):
+        calls.append((side, shell.splitlines()[-1]))
+        if shell.startswith("apt-get install -s"):
+            return 0 if side == "main" else 1
+        raise AssertionError(shell)
+
+    rec = {}
+    assert daily_run._install_system_package(rec, "libxml2", run_side) is False
+    assert all(line.startswith("apt-get install -s") for _side, line in calls)
+    assert rec["demo_helper"]["setup"]["label"] == "rerun, setup problem"
+    assert rec["demo_helper"]["setup"]["counts_as_verdict"] is False
+    assert rec["demo_helper"]["setup"]["detail"] == "pr cannot install libxml2"
+
+    calls.clear()
+
+    def both_then_pr_fails(side, shell):
+        calls.append((side, "probe" if shell.startswith("apt-get install -s") else "install" if "install -y" in shell else "remove"))
+        if shell.startswith("apt-get install -s"):
+            return 0
+        if "remove" in shell:
+            return 0
+        return 0 if side == "main" else 1
+
+    failed = {}
+    assert daily_run._install_system_package(failed, "libxml2", both_then_pr_fails) is False
+    assert calls == [("main", "probe"), ("pr", "probe"), ("main", "install"), ("pr", "install"), ("main", "remove")]
+    assert failed["demo_helper"]["setup"]["label"] == "rerun, setup problem"
+
+    calls.clear()
+
+    def both_ok(side, shell):
+        calls.append((side, "probe" if shell.startswith("apt-get install -s") else "install"))
+        return 0
+
+    ok_rec = {}
+    assert daily_run._install_system_package(ok_rec, "libxml2", both_ok) is True
+    assert calls == [("main", "probe"), ("pr", "probe"), ("main", "install"), ("pr", "install")]
+    assert "setup" not in (ok_rec.get("demo_helper") or {})
+
+
+def test_nightly_plan_reads_project_files_and_skips_lookup_packages_without_them(tmp_path):
+    from ops import daily_run
+    work = tmp_path / "work"
+    root = work / "packaging"
+    _checkout(root)
+    dirs = daily_run._project_file_dirs("acme/widget", {"base_ref": "main"}, work, tmp_path / "unused.log")
+    assert dirs == [root]
+    a = SimpleNamespace(python="3.12", bench=None, sandbox_backend="local")
+    read = daily_run._product_plan(
+        a, {}, "acme/widget", {"dist": "widget"}, dirs, pypi=_pypi,
+        python_available=lambda _version: None)
+    assert "pytest>=7" in read["extra_reqs"]
+    assert a.python == "3.12"
+    missed = daily_run._product_plan(
+        a, {"demo_helper": {"tavily": {"text": "pip install linked-pkg\n"}}},
+        "acme/widget", {"dist": "widget"}, [], pypi=_pypi, python_available=lambda _version: None)
+    assert "linked-pkg" not in [item["name"] for item in missed["packages"]]
+    assert all(item.get("source") != "tavily" for item in missed["packages"])
+
+
+def test_report_states_the_retry_limits():
+    sentence = ("If setup fails, the helper retries the install up to 2 times. "
+                "If a test still can't be verified because something is missing, it installs what's missing "
+                "and reruns that test once.")
+    assert demo_helper.RETRY_LIMITS == sentence
+    assert demo_helper.MAX_SETUP_RETRIES == 2 and demo_helper.MAX_GAP_ROUNDS == 2
+    text = demo_helper.markdown_for({"demo_helper": {"notes": ["Setup plan: ok"]}})
+    assert text.count(sentence) == 1
+    import reports.pr_report as pr_report
+    assert sentence in Path("docs/decisions/2026-10-21-demo-helper.md").read_text()
+    assert pr_report.demo_helper.RETRY_LIMITS == sentence
 
 
 def test_same_install_list_on_both_sides_and_both_contree_shells():

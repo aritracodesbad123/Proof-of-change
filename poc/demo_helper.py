@@ -15,11 +15,15 @@ import urllib.parse
 import urllib.request
 from pathlib import Path
 
-from evals.label_study_pairs import link_matches, split_repo
+from evals.label_study_pairs import split_repo
 
 SETUP_LABEL = "rerun, setup problem"
-MAX_SETUP_RETRIES = 2
-MAX_GAP_ROUNDS = 2
+MAX_SETUP_RETRIES = 2  # further install attempts after the first failure
+MAX_GAP_ROUNDS = 2  # the first run plus one setup-gap rerun of that test
+RETRY_LIMITS = (
+    "If setup fails, the helper retries the install up to 2 times. "
+    "If a test still can't be verified because something is missing, it installs what's missing and reruns that test once."
+)
 TAVILY_TIMEOUT = 8
 PYPI_TIMEOUT = 8
 MAX_SUGGESTIONS = 8
@@ -920,8 +924,32 @@ def fetch_pypi(name: str, timeout: float = PYPI_TIMEOUT):
     return info if isinstance(info, dict) else None
 
 
+def github_repo_url(value: str, owner: str, repo: str) -> bool:
+    """True when the URL's host is github.com and its first two path segments are owner/repo.
+
+    www.github.com is the same host. The match ignores case and one trailing .git.
+    A lookalike host, or a path that only contains the repository text, is not a match.
+    """
+    if not isinstance(value, str) or not owner or not repo:
+        return False
+    try:
+        parsed = urllib.parse.urlsplit(value.strip())
+    except ValueError:
+        return False
+    host = (parsed.hostname or "").lower()
+    if host not in {"github.com", "www.github.com"}:
+        return False
+    parts = [urllib.parse.unquote(part) for part in (parsed.path or "").split("/") if part]
+    if len(parts) < 2:
+        return False
+    got_owner, got_repo = parts[0], parts[1]
+    if got_repo.lower().endswith(".git"):
+        got_repo = got_repo[:-4]
+    return got_owner.lower() == owner.lower() and got_repo.lower() == repo.lower()
+
+
 def pypi_links_back(info, owner: str, repo: str) -> bool:
-    """Same link-back rule as the study library label. info may be the info object or the full JSON."""
+    """True when this project's PyPI page links to that GitHub repository. info may be the info object or the full JSON."""
     if not isinstance(info, dict) or not owner or not repo:
         return False
     body = info.get("info") if isinstance(info.get("info"), dict) else info
@@ -932,7 +960,7 @@ def pypi_links_back(info, owner: str, repo: str) -> bool:
     urls = body.get("project_urls")
     if isinstance(urls, dict):
         values.extend(value for value in urls.values() if isinstance(value, str))
-    return any(link_matches(value, owner, repo) for value in values)
+    return any(github_repo_url(value, owner, repo) for value in values)
 
 
 def _python_decision(requested: str | None, current: str, sandbox: str, python_available, requirement: str = "") -> dict:
@@ -972,7 +1000,7 @@ def _system_decision(names: list[str], sandbox: str) -> list[dict]:
 
 
 def build_setup_plan(repo: str, checkouts, tavily, current_python: str, sandbox: str, self_dist: str = "",
-                     python_available=None, pypi=None) -> dict:
+                     python_available=None, pypi=None, allow_lookup_packages: bool = True) -> dict:
     """One plan for both sides. Only project-listed packages and link-back suggestions are added."""
     python_available = find_python if python_available is None else python_available
     pypi = fetch_pypi if pypi is None else pypi
@@ -989,7 +1017,8 @@ def build_setup_plan(repo: str, checkouts, tavily, current_python: str, sandbox:
     refused = []
     parts = split_repo(repo or "")
     owner, repo_name = parts if parts else ("", "")
-    for name in pip_suggestions(text):
+    suggestions = pip_suggestions(text) if allow_lookup_packages else []
+    for name in suggestions:
         if norm(name) in seen or (self_dist and norm(name) == norm(self_dist)):
             continue
         try:
@@ -1051,6 +1080,44 @@ def contree_shell(plan: dict | None) -> str:
     if reqs:
         lines.append("python -m pip install -q " + " ".join(shlex_quote(req) for req in reqs))
     return "\n".join(lines)
+
+
+def install_system_both(run_side, name: str) -> dict:
+    """Install one system package on main and pr, or on neither.
+
+    Probe both sides first. Install only when both probes succeed. If an install then
+    fails, remove the package from any side that received it.
+    """
+    if not safe_apt_name(name):
+        return {"ok": False, "installed": [], "label": SETUP_LABEL,
+                "detail": f"not a safe system package name: {name}"}
+    quoted = shlex_quote(name)
+    probe = f"apt-get install -s -y -qq {quoted}"
+    install = f"export DEBIAN_FRONTEND=noninteractive\napt-get update -qq && apt-get install -y -qq {quoted} >/dev/null"
+    remove = f"apt-get remove -y -qq {quoted} >/dev/null"
+
+    def _code(side: str, shell: str):
+        try:
+            return run_side(side, shell), ""
+        except Exception as exc:  # noqa: BLE001 — a sandbox error means this side cannot install
+            return 1, type(exc).__name__
+
+    for side in SIDES:
+        code, err = _code(side, probe)
+        if code != 0:
+            detail = f"{side} cannot install {name}" + (f" ({err})" if err else "")
+            return {"ok": False, "installed": [], "label": SETUP_LABEL, "detail": detail}
+    installed: list[str] = []
+    for side in SIDES:
+        code, err = _code(side, install)
+        if code != 0:
+            for done in installed:
+                _code(done, remove)
+            detail = f"{side} install of {name} failed" + (f" ({err})" if err else "")
+            return {"ok": False, "installed": [], "label": SETUP_LABEL, "detail": detail}
+        installed.append(side)
+    return {"ok": True, "installed": ["main", "pr"], "label": None,
+            "detail": f"installed {name} on main and pr"}
 
 
 def shlex_quote(value: str) -> str:
@@ -1408,7 +1475,8 @@ def markdown_for(rec: dict) -> str:
     if not notes:
         return ""
     lines = ["", "#### Demo helper", "",
-             "These notes are background for the console and the daily check. They do not change the verdict.", ""]
+             "These notes are background for the console and the daily check. They do not change the verdict.",
+             "", RETRY_LIMITS, ""]
     lines.extend(f"- {note}" for note in notes)
     lines.append("")
     return "\n".join(lines)
