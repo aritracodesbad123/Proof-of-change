@@ -96,7 +96,7 @@ def test_session_key_is_not_written_or_echoed(tmp_path, monkeypatch):
     session_key.clear_key("sess-1")
     session_key.set_key("sess-1", SECRET)
     status = session_key.public_status("sess-1")
-    assert status == {"nebius_key": True, "tavily_key": False}
+    assert status == {"nebius_key": True, "tavily_key": False, "contree_project": False}
     assert SECRET not in json.dumps(status)
     assert os_environ_clean()
     env, secrets = console_api.child_environment({"PATH": "/usr/bin"}, "nebius", "sess-1")
@@ -126,7 +126,7 @@ def test_logged_check_output_drops_the_key(tmp_path, monkeypatch):
     monkeypatch.setattr(console_api, "RUNS_ROOT", tmp_path / "ops" / "runs")
     monkeypatch.setattr(
         console_api, "console_run_flags",
-        lambda: console_api.ConsoleRunPlan([], None, False, None),
+        lambda *_a, **_k: console_api.ConsoleRunPlan([], None, False, None),
     )
     session_key.set_key("sess-log", SECRET)
 
@@ -179,7 +179,7 @@ def test_live_check_without_a_key_uses_recorded_answers(monkeypatch):
     monkeypatch.setattr(console_api.threading, "Thread", FakeThread)
     monkeypatch.setattr(
         console_api, "console_run_flags",
-        lambda: console_api.ConsoleRunPlan([], None, False, None),
+        lambda *_a, **_k: console_api.ConsoleRunPlan([], None, False, None),
     )
     job = console_api.start_check("https://github.com/me/demo/pull/4", model_provider="nebius")
     assert job["model_provider"] == "recorded"
@@ -195,7 +195,7 @@ def test_codespace_refuses_unsandboxed_pull_request_code(monkeypatch):
     monkeypatch.delenv("POC_UNSAFE_NO_SANDBOX", raising=False)
     import guardrails.sandbox as sb
     monkeypatch.setattr(sb, "check", lambda: (False, "bwrap missing"))
-    monkeypatch.setattr(console_api, "contree_usable", lambda: False)
+    monkeypatch.setattr(console_api, "contree_usable", lambda *_a, **_k: False)
     plan = console_api.console_run_flags()
     assert plan.flags == []
     assert plan.refused is True
@@ -212,7 +212,7 @@ def test_codespace_refuses_unsandboxed_pull_request_code(monkeypatch):
 def test_codespace_uses_contree_without_the_unsandboxed_flag(monkeypatch):
     monkeypatch.setenv("CODESPACES", "true")
     monkeypatch.delenv("POC_UNSAFE_NO_SANDBOX", raising=False)
-    monkeypatch.setattr(console_api, "contree_usable", lambda: True)
+    monkeypatch.setattr(console_api, "contree_usable", lambda *_a, **_k: True)
     plan = console_api.console_run_flags()
     assert plan.flags == ["--sandbox-backend", "contree"]
     assert "--unsafe-no-sandbox" not in plan.flags
@@ -602,15 +602,16 @@ def test_replay_export_and_committed_catalog_need_no_network(tmp_path, monkeypat
             assert "fonts.googleapis.com" not in html_path.read_text()
 
 
-def test_codespace_container_relaxes_only_seccomp_and_apparmor():
+def test_codespace_container_is_not_loosened_and_setup_is_robust():
     root = Path(__file__).resolve().parents[1]
     cfg = json.loads((root / ".devcontainer" / "devcontainer.json").read_text())
-    assert cfg.get("privileged") is not True
-    assert cfg["runArgs"] == ["--security-opt", "seccomp=unconfined", "--security-opt", "apparmor=unconfined"]
-    assert not any("cap-add" in a or "privileged" in a for a in cfg["runArgs"])
+    assert cfg.get("privileged") is not True and "runArgs" not in cfg and "capAdd" not in cfg
     assert "post-create.sh" in cfg["postCreateCommand"]
+    for name in ("NEBIUS_API_KEY", "CONTREE_PROJECT_ID"):
+        assert "Your own" in cfg["secrets"][name]["description"]
     setup = (root / ".devcontainer" / "post-create.sh").read_text()
     assert "set -Eeuo pipefail" in setup and "npm run build" in setup and "poc-setup.log" in setup
+    assert ".[dev,contree]" in setup
     start = (root / ".devcontainer" / "start-console.sh").read_text()
     assert "setsid" in start and "dist/index.html" in start and "listening" in start
 
@@ -633,5 +634,71 @@ def test_sandbox_environment_never_holds_the_model_or_lookup_keys(tmp_path, monk
                 assert "NEBIUS_API_KEY" not in env and "TAVILY_API_KEY" not in env
                 for v in ("host-nebius-key-123", "host-tavily-key-123", "typed-nebius-key-456", "typed-tavily-key-456"):
                     assert v not in dumped
+    finally:
+        session_key.clear_key(token)
+
+
+def _plan(monkeypatch, bwrap_ok: bool, token=None):
+    import sys, types
+    import guardrails.sandbox as sb
+    monkeypatch.delenv("POC_UNSAFE_NO_SANDBOX", raising=False)
+    monkeypatch.setattr(sb, "check", lambda: (bwrap_ok, "ok" if bwrap_ok else "bwrap: No permissions"))
+    monkeypatch.setitem(sys.modules, "contree_sdk", types.ModuleType("contree_sdk"))
+    return console_api.console_run_flags(token)
+
+
+def test_sandbox_choice_uses_bubblewrap_without_contree_keys(monkeypatch):
+    for k in ("NEBIUS_API_KEY", "NEBIUS_PROJECT_ID", "CONTREE_PROJECT_ID"):
+        monkeypatch.delenv(k, raising=False)
+    plan = _plan(monkeypatch, True)
+    assert plan.flags == [] and not plan.refused
+
+
+def test_sandbox_choice_uses_contree_with_the_judges_own_keys(monkeypatch):
+    from poc import session_key
+    for k in ("NEBIUS_API_KEY", "NEBIUS_PROJECT_ID", "CONTREE_PROJECT_ID"):
+        monkeypatch.delenv(k, raising=False)
+    monkeypatch.setenv("NEBIUS_API_KEY", "secret-nebius-123")
+    monkeypatch.setenv("CONTREE_PROJECT_ID", "proj-123")
+    assert _plan(monkeypatch, False).flags == ["--sandbox-backend", "contree"]
+    monkeypatch.delenv("NEBIUS_API_KEY")
+    monkeypatch.delenv("CONTREE_PROJECT_ID")
+    token = "judge-contree"
+    session_key.set_key(token, "typed-nebius-123")
+    session_key.set_contree_project(token, "typed-proj-1")
+    try:
+        assert session_key.public_status(token)["contree_project"] is True
+        assert _plan(monkeypatch, False, token).flags == ["--sandbox-backend", "contree"]
+        env, secrets = console_api.child_environment({"PATH": "/usr/bin"}, "recorded", token, contree=True)
+        assert env["NEBIUS_API_KEY"] == "typed-nebius-123" and env["NEBIUS_PROJECT_ID"] == "typed-proj-1"
+        assert "typed-nebius-123" in secrets
+    finally:
+        session_key.clear_key(token)
+    assert session_key.get_contree_project(token) is None
+
+
+def test_sandbox_choice_refuses_without_bubblewrap_or_keys(monkeypatch):
+    for k in ("NEBIUS_API_KEY", "NEBIUS_PROJECT_ID", "CONTREE_PROJECT_ID"):
+        monkeypatch.delenv(k, raising=False)
+    plan = _plan(monkeypatch, False)
+    assert plan.refused and plan.flags == []
+    assert "own Nebius key and Contree project ID" in plan.note
+
+
+def test_contree_keys_never_reach_pull_request_code(tmp_path, monkeypatch):
+    from guardrails.isolation import untrusted_env
+    from poc import session_key
+    monkeypatch.setenv("CONTREE_PROJECT_ID", "proj-xyz-999")
+    token = "judge-contree-2"
+    session_key.set_key(token, "typed-nebius-789")
+    session_key.set_contree_project(token, "typed-proj-789")
+    try:
+        child, _ = console_api.child_environment(dict(os.environ), "nebius", token, contree=True)
+        for install in (False, True):
+            env = untrusted_env(tmp_path / f"h{install}", install=install, base=child)
+            dumped = json.dumps(env)
+            for name in ("NEBIUS_API_KEY", "NEBIUS_PROJECT_ID", "CONTREE_PROJECT_ID", "TAVILY_API_KEY"):
+                assert name not in env
+            assert "typed-nebius-789" not in dumped and "typed-proj-789" not in dumped
     finally:
         session_key.clear_key(token)

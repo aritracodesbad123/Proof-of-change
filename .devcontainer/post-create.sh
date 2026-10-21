@@ -11,7 +11,7 @@ echo "== installing bubblewrap"
 sudo apt-get update -q
 sudo apt-get install -y -q bubblewrap
 echo "== installing the Python package"
-python -m pip install -q -e '.[dev]'
+python -m pip install -q -e '.[dev,contree]'
 echo "== building the console web page"
 (cd console/web && npm ci --no-audit --no-fund && npm run build)
 test -f console/web/dist/index.html
