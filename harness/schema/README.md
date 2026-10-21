@@ -23,6 +23,7 @@ earlier revision is still valid under the current file. `schema_version` stays `
 | 12 | 2026-10-20 | `fc02de9e9a2a2cd2c6f189fa818f76ba814039cb55d01c81d522f65301eb8937` | `verdict` and `verdict_before_coverage_gate` may be `no_code_change`. Nothing becomes required, so rev 1-11 records stay valid. |
 | 13 | 2026-10-20 | `ea940732e32829455ad11b0799b00634f30522415320684df5ae4244798de88e` | Optional `machine_type.gxx`: the `g++` version line, or null when `g++` is not installed. Nothing becomes required, so rev 1-12 records stay valid. |
 | 14 | 2026-10-20 | `b9630be02bf4491c4279fd355824aec3aedb013d96bd1d89011eef6590a88549` | Probe `status` and each probe item `status` may be `crashed` or `rejected`. Nothing becomes required, so rev 1-13 records stay valid. |
+| 15 | 2026-10-21 | `bf01b426e15b75b466aa14fa2fde396a3485e4f4bec6a89f4abc1445ab1b1fb2` | An observation label, and a summary label, may be `unstable_on_pr` (stable on the base, unstable only on the pull request). Nothing becomes required, so rev 1-14 records stay valid. |
 
 Changing the file: bump `x-revisions`, add the new sha256 to this table and to `COMPATIBLE_SCHEMA_SHA256` in
 `guardrails/schema.py` (import fails loudly otherwise), and only ever add optional fields within v1. A

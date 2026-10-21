@@ -517,6 +517,23 @@ def test_setup_rerun_can_verify_when_fresh_coverage_ran_a_changed_line():
     assert rec["reason"] == "covered after rerun"
 
 
+def test_setup_rerun_with_no_changed_lines_is_not_verified():
+    """No changed lines is not adequate, so a rerun that says verified stays could not verify."""
+    rec = _probe_record(0, 0)
+
+    def recheck():
+        rec["probes"]["items"][0]["probe_changed_line_coverage"] = {
+            "status": "measured", "changed_lines_total": 0, "changed_lines_covered": 0, "adequacy": "not_adequate"}
+        return {"verdict": "verified", "reason": "the tests passed"}
+
+    demo_helper.retry_unverified(
+        rec, lambda: {"verdict": "verified", "reason": "the tests passed"},
+        lambda *_a: (True, "1"), ["numpy"], "", lambda _name: None, REPO, False, recheck_coverage=recheck)
+    assert rec["verdict"] == "could_not_verify"
+    assert rec["verdict"] != "verified"
+    assert "changed line" in rec["reason"]
+
+
 def test_large_change_skips_probe_coverage_recheck_and_stays_unverified():
     calls = []
     rec = _probe_record(demo_helper.SMALL_CHANGED_LINES + 1, 4)

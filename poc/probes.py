@@ -236,7 +236,8 @@ def judge(spec: dict, runs: dict, files: dict | None = None) -> list[dict]:
             # Stored state stays "flaky" (the recorded vocabulary). The label is what the verdict reads.
             if pr_runs_too_noisy(p):
                 pr_only, state = "noisy", "flaky"
-                label = FindingLabel.FLAKY.value
+                # Not "flaky": that label is noise. This one stays visible to later checks.
+                label = FindingLabel.UNSTABLE_ON_PR.value
             else:
                 pr_only, state = "regression", "flaky"
                 if claim is None:
@@ -454,7 +455,9 @@ def summarize(items: list[dict]) -> dict:
     # but never decides the verdict. A difference that is only about warnings never counts as a break on its own.
     pr_only_noisy = [o for o in obs if o.get("pr_only") == "noisy"]
     noisy = [o for o in raw_flagged if o["label"] == FindingLabel.FLAKY.value and o.get("pr_only") != "noisy"]
-    flagged = [o for o in raw_flagged if o["label"] != FindingLabel.FLAKY.value]
+    # Flaky on one side is noise. Unstable only on the pull request is not, even when it is too mixed to call.
+    flagged = [o for o in raw_flagged
+               if o["label"] != FindingLabel.FLAKY.value and o.get("pr_only") != "noisy"]
     warning_only = [o for o in flagged if is_warning_observation(o["name"])]
     if flagged and len(warning_only) == len(flagged):
         flagged = []
@@ -466,7 +469,8 @@ def summarize(items: list[dict]) -> dict:
         names = {FindingLabel.UNMENTIONED_CHANGE.value: "differs and no claim covers it",
                  FindingLabel.FALSE_CLAIM.value: "differs although the claim says it does not",
                  FindingLabel.NEEDS_HUMAN.value: "does not differ although the claim says it does",
-                 FindingLabel.FLAKY.value: "gives different results between runs of the same side"}
+                 FindingLabel.FLAKY.value: "gives different results between runs of the same side",
+                 FindingLabel.UNSTABLE_ON_PR.value: "is stable on the base and unstable only on the pull request"}
         bits.append(f"probe: {len(flagged)} observation(s) need attention: "
                     + "; ".join(f"{o['name']} {names[o['label']]}" + (f" ({o['claim']})" if o.get("claim") else "")
                                 for o in flagged[:4]))

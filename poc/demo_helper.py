@@ -1332,7 +1332,10 @@ def _has_probe_items(rec: dict) -> bool:
 
 
 def probe_coverage_supports_verified(rec: dict) -> bool:
-    """True when a fresh measurement shows a changed line ran, or there is no changed line to miss."""
+    """True when a fresh measurement shows a changed line ran.
+
+    A measurement with no changed lines is not adequate, so it does not support verified.
+    """
     items = (rec.get("probes") or {}).get("items") or []
     if not items:
         return True
@@ -1351,7 +1354,7 @@ def probe_coverage_supports_verified(rec: dict) -> bool:
     if not totals:
         return False
     if max(totals) == 0:
-        return True
+        return False
     return covered
 
 

@@ -10,6 +10,10 @@ The setup rerun is the only step that can raise could not verify to verified. Be
 
 A web search can suggest package names. Those names are installed only when the package's page on the Python package index links back to the same repository. The package author writes that link. It stops an accident. It does not stop someone who is trying to get a bad package installed.
 
+A probe result that stays the same on the base and is too mixed to name on the pull request is labelled unstable on the pull request. It is not labelled flaky, so later checks do not drop it as noise. The report lists tests that are unstable only on the pull request on their own line.
+
+A measurement that finds no changed lines is not adequate. A setup rerun cannot become verified from that measurement. The same rule already applies when judging whether a probe reached the change.
+
 ## Why
 
 Ignoring a failure that shows up only on the pull request treats a possible break as noise. A setup rerun that reports success without measuring probe coverage again can call a change verified when the probes never ran the changed lines. The package-index link is written by the package author, so it is a guard against a mistake, not against an attack.
@@ -20,6 +24,8 @@ Ignoring a failure that shows up only on the pull request treats a possible brea
 - Keep today's handling when a result is flaky on both sides.
 - Recompute probe line coverage after a setup rerun, and only then allow could not verify to become verified. Skip that measurement when the change is larger than 200 lines, and do not raise the verdict in that case.
 - Say plainly that a suggested package is installed only when its package-index page links back to the same repository, and that this stops accidents, not a determined attacker.
+- Label a probe result that is stable on the base and too mixed to call on the pull request as unstable on the pull request, not as flaky.
+- Treat a measurement with no changed lines as not adequate, so a setup rerun cannot become verified from it.
 
 ## Alternatives and tradeoffs
 
@@ -30,4 +36,4 @@ Ignoring a failure that shows up only on the pull request treats a possible brea
 
 ## What it means for you
 
-A pull request whose tests pass on the current code and fail on only some runs of the change will no longer come out verified. If the runs are too mixed to name the failure, the verdict is could not verify. A test that wobbles on both sides is still listed and still does not decide. After a setup rerun, a small change is measured again before it can be verified. A larger change is not measured again, and it stays could not verify. A suggested package is still installed only when its package-index page links back to the repository, and that check is not a defence against someone trying to get past it.
+A pull request whose tests pass on the current code and fail on only some runs of the change will no longer come out verified. If the runs are too mixed to name the failure, the verdict is could not verify. A test that wobbles on both sides is still listed and still does not decide. After a setup rerun, a small change is measured again before it can be verified. A larger change is not measured again, and it stays could not verify. A measurement with no changed lines is not adequate, so that rerun stays could not verify too. A probe result that is too mixed to call on the pull request is labelled unstable on the pull request, and the report lists those tests on their own line. A suggested package is still installed only when its package-index page links back to the repository, and that check is not a defence against someone trying to get past it.

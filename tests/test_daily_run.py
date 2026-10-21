@@ -564,6 +564,20 @@ def test_stable_base_one_of_three_on_the_pr_is_not_verified():
     assert NPZ in reason and "fail on some pull-request runs" in reason
 
 
+def test_every_pr_run_different_is_could_not_verify():
+    """Base always passes. The pull request passes, fails, then errors. Too mixed to call, so not verified."""
+    passed = {NPZ: ("passed", "")}
+    failed = {NPZ: ("failed", "intermittent")}
+    errored = {NPZ: ("error", "boom")}
+    cmp = _flaky_sides([passed] * 3, [passed, failed, errored])
+    assert cmp["pr_unstable_noisy"] == [NPZ]
+    assert cmp["pr_unstable"] == [] and cmp["flaky"] == []
+    v, reason, _ = dr.verdict_for(cmp, None, None, DOC_ONLY)
+    assert v == "could_not_verify"
+    assert v != "verified"
+    assert NPZ in reason and "too mixed to call" in reason
+
+
 def test_flaky_on_both_sides_does_not_decide_the_verdict():
     """A test that passes and fails on both sides keeps today's handling: listed, and it does not decide."""
     passed = {NPZ: ("passed", "")}
@@ -602,6 +616,22 @@ def test_report_lists_a_flaky_test_and_the_header_names_the_commit(tmp_path):
     header = md.split("##", 1)[0]
     assert f"Proof-of-Change commit: `{sha}`" in header
     assert NPZ in md and "**could_not_verify**" in md
+
+
+def test_report_lists_pr_only_unstable_tests_on_their_own_line():
+    from reports import pr_report
+    rec = _pr_record(verdict="could_not_verify", reason="not fully verified",
+                     comparison={"flaky": ["pkg/test_other.py::test_wobble"],
+                                 "pr_unstable_noisy": [NPZ], "pr_unstable": [],
+                                 "regressions": [], "new_tests_failing": [], "removed_tests": [],
+                                 "other_changes": []},
+                     files=DOC_ONLY, thread_env={"OMP_NUM_THREADS": "1", "PYTHONHASHSEED": "0"},
+                     machine_type={"label": "local"}, posted_upstream=False)
+    rows = {r[0]: r for r in pr_report.checks(rec)}
+    assert "Tests unstable only on the pull request" in rows
+    unstable = rows["Tests unstable only on the pull request"]
+    assert unstable[1] == "WARN" and NPZ in unstable[2]
+    assert NPZ not in rows["No flaky tests"][2]
 
 
 def test_record_check_fails_a_pr_run_without_poc_commit():
