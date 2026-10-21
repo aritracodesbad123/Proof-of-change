@@ -19,7 +19,7 @@ import {
   verdictPlain,
   verdictTone,
 } from './present'
-import { ContreeProjectField, NebiusKeyField, TavilyKeyField } from './sessionKey'
+import { StartForm, submitStart } from './startForm'
 import {
   CostTimePanel,
   DetailRail,
@@ -120,14 +120,11 @@ export default function App() {
   const [apiOk, setApiOk] = useState<boolean | null>(null)
   const [healthNote, setHealthNote] = useState<string | null>(null)
   const [contreeReady, setContreeReady] = useState<boolean | null>(null)
-  const [prUrl, setPrUrl] = useState('')
-  const [provider, setProvider] = useState('nebius')
   const [approval, setApproval] = useState(true)
   const approvalDefaultApplied = useRef(false)
   const [keyStored, setKeyStored] = useState(false)
   const [tavilyStored, setTavilyStored] = useState(false)
-  const [contreeStored, setContreeStored] = useState(false)
-  const [busy, setBusy] = useState(false)
+  const [projectStored, setProjectStored] = useState(false)
   const [detail, setDetail] = useState<{
     record: Record<string, unknown>
     folder: string
@@ -185,17 +182,23 @@ export default function App() {
     void api.me().then(setAccount).catch(() => setAccount(null))
   }, [])
 
-  useEffect(() => {
-    if (!account) return
-    void api.sessionKey().then((status) => {
+  const refreshKeyStatus = useCallback(async () => {
+    try {
+      const status = await api.sessionKey()
       setKeyStored(status.nebius_key)
       setTavilyStored(Boolean(status.tavily_key))
-      setContreeStored(Boolean(status.contree_project))
-    }).catch(() => {
+      setProjectStored(Boolean(status.contree_project))
+    } catch {
       setKeyStored(false)
       setTavilyStored(false)
-    })
-  }, [account])
+      setProjectStored(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!account) return
+    void refreshKeyStatus()
+  }, [account, refreshKeyStatus])
 
   useEffect(() => {
     void refresh()
@@ -360,7 +363,6 @@ export default function App() {
   }
 
   async function startWith(url: string, prov: string) {
-    setBusy(true)
     setErr(null)
     try {
       const started = await api.startCheck(url.trim(), prov, approval)
@@ -368,8 +370,6 @@ export default function App() {
       go({ name: 'job', id: started.id })
     } catch (error) {
       setErr(error instanceof Error ? error.message : String(error))
-    } finally {
-      setBusy(false)
     }
   }
 
@@ -420,83 +420,22 @@ export default function App() {
                 The code verdict is computed by the checker. Ultra, Lightning and Super only advise — they do not
                 change it.
               </p>
-              <form
-                onSubmit={(event) => {
-                  event.preventDefault()
-                  void startWith(prUrl, provider)
+              <StartForm
+                stored={{ nebius_key: keyStored, tavily_key: tavilyStored, contree_project: projectStored }}
+                onStart={async (fields) => {
+                  const result = await submitStart(fields, api.startWithFields)
+                  if (result.ok) {
+                    setErr(null)
+                    setJob(result.job)
+                    go({ name: 'job', id: result.job.id })
+                  }
+                  void refreshKeyStatus()
+                  return result
                 }}
-                className="form"
-              >
-                <label htmlFor="pr-url">Pull request URL</label>
-                <div className="url-row">
-                  <input
-                    id="pr-url"
-                    value={prUrl}
-                    onChange={(event) => setPrUrl(event.target.value)}
-                    placeholder="https://github.com/owner/repo/pull/123"
-                    required
-                    autoComplete="off"
-                  />
-                  <button type="submit" disabled={busy || !prUrl.trim()}>
-                    {busy ? 'Starting…' : 'Run check'}
-                  </button>
-                </div>
-                <label className="check-row" htmlFor="approval">
-                  <input
-                    id="approval"
-                    type="checkbox"
-                    checked={approval}
-                    onChange={(event) => setApproval(event.target.checked)}
-                  />
-                  Review the AI's probes before tests run (recommended)
-                </label>
-                <p className="hint">
-                  On by default. The AI drafts behaviour probes, you keep or drop each one and add your own test
-                  ideas, then the tests run. Untick it to skip the review for this check. Study and benchmark runs never
-                  pause.
-                </p>
-                <label htmlFor="provider">Model provider</label>
-                <select id="provider" value={provider} onChange={(event) => setProvider(event.target.value)}>
-                  <option value="nebius">nebius (live Nemotron)</option>
-                  <option value="none">none (no AI)</option>
-                  <option value="recorded">recorded (prerecorded fixture)</option>
-                </select>
-                <NebiusKeyField
-                  stored={keyStored}
-                  onSave={async (value) => {
-                    const saved = await api.setSessionKey(value)
-                    setKeyStored(saved.nebius_key)
-                    setTavilyStored(Boolean(saved.tavily_key))
-                  }}
-                />
-                <ContreeProjectField
-                  stored={contreeStored}
-                  onSave={async (value) => {
-                    const saved = await api.setContreeProject(value)
-                    setContreeStored(Boolean(saved.contree_project))
-                  }}
-                />
-                <TavilyKeyField
-                  stored={tavilyStored}
-                  onSave={async (value) => {
-                    const saved = await api.setTavilyKey(value)
-                    setKeyStored(saved.nebius_key)
-                    setTavilyStored(Boolean(saved.tavily_key))
-                  }}
-                />
-                <button
-                  type="button"
-                  className="ghost sample"
-                  disabled={busy}
-                  onClick={() => {
-                    setPrUrl(SAMPLE_PR_URL)
-                    setProvider(SAMPLE_PROVIDER)
-                    void startWith(SAMPLE_PR_URL, SAMPLE_PROVIDER)
-                  }}
-                >
-                  Try sample (mlxtend#1229, prerecorded)
-                </button>
-              </form>
+                onSample={() => {
+                  void startWith(SAMPLE_PR_URL, SAMPLE_PROVIDER)
+                }}
+              />
               <p className="hint">
                 The sample uses a committed fixture and is labelled not blind. Live Nebius needs an API key.
               </p>

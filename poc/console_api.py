@@ -652,6 +652,60 @@ def _read_child(proc: subprocess.Popen, logf, collected: list[str], deadline: fl
     return proc.wait(), False
 
 
+class CheckRefused(ValueError):
+    """The check was refused before any pull-request code ran."""
+
+
+def _contree_sdk_installed() -> bool:
+    try:
+        import contree_sdk  # noqa: F401
+    except ImportError:
+        return False
+    return True
+
+
+def refusal_message(session_token: str | None = None) -> str:
+    """Plain words for a check refused because no sandbox can start. Never asks for a field already given."""
+    key, project = contree_credentials(session_token)
+    if key and project:
+        if not _contree_sdk_installed():
+            return ("No sandbox available: your Nebius key and project ID are set, but the Contree software is not "
+                    "installed on this console. Rebuild the Codespace, or install contree-sdk, then try again.")
+        return ("No sandbox available: your Nebius key and project ID are set, but Contree could not be reached. "
+                "Try again in a moment.")
+    if project and not key:
+        return "No sandbox available: add your Nebius API key so the cloud sandbox can start."
+    if key and not project:
+        return "No sandbox available: add your Nebius project ID."
+    return (
+        "No sandbox available: add your Nebius API key and Nebius project ID, "
+        "or run the console on a machine where bubblewrap works."
+    )
+
+
+_PROJECT_FIELDS = ("contree_project_id", "nebius_project_id")
+
+
+def apply_start_fields(session_token: str | None, body: dict) -> None:
+    """Keep keys sent with the start form in this session's memory. Blank fields keep the stored value.
+
+    Raises ValueError with a plain message. Values are never echoed, logged, or written to disk.
+    """
+    setters = [
+        ("nebius_api_key", session_key.set_key),
+        ("tavily_api_key", session_key.set_tavily_key),
+        *[(name, session_key.set_contree_project) for name in _PROJECT_FIELDS],
+    ]
+    for field, setter in setters:
+        raw = body.get(field)
+        if raw is None:
+            continue
+        if not isinstance(raw, str):
+            raise ValueError("Send the key as text.")
+        if raw.strip():
+            setter(session_token, raw)
+
+
 def start_check(pr_url: str, *, model_provider: str = "nebius", owner: str | None = None,
                 session_token: str | None = None, approval: bool | None = None) -> dict:
     from poc import run_progress, spaces_host
@@ -672,7 +726,7 @@ def start_check(pr_url: str, *, model_provider: str = "nebius", owner: str | Non
     else:
         flags, run_note, refused, warning = plan.flags, plan.note, plan.refused, plan.warning
         if refused:
-            raise ValueError(run_note or "Proof-of-Change will not run pull-request code without a sandbox.")
+            raise CheckRefused(refusal_message(session_token))
     if provider_note and not playback:
         run_note = f"{provider_note} {run_note}".strip() if run_note else provider_note
     approval_on = console_approval_on(approval)
@@ -1137,6 +1191,12 @@ class Handler(BaseHTTPRequestHandler):
             return self._json(200, {"ok": True, **session_key.public_status(session_token)})
         if path == "/api/checks":
             pr_url = (body.get("pr_url") or "").strip()
+            if not pr_url:
+                return self._json(400, {"error": "Add a pull request link."})
+            try:
+                apply_start_fields(session_token, body)
+            except ValueError as exc:
+                return self._json(400, {"error": session_key.scrub(str(exc))})
             provider = (body.get("model_provider") or "nebius").strip() or "nebius"
             approval = body.get("approval") if "approval" in body else None
             if approval is not None:
@@ -1146,8 +1206,16 @@ class Handler(BaseHTTPRequestHandler):
                     pr_url, model_provider=provider, owner=account["id"],
                     session_token=session_token, approval=approval,
                 )
+            except CheckRefused as e:
+                return self._json(400, {"error": session_key.scrub(str(e)), "refused": True,
+                                        **session_key.public_status(session_token)})
             except ValueError as e:
-                return self._json(400, {"error": session_key.scrub(str(e))})
+                msg = str(e)
+                if msg.startswith("pr_url must"):
+                    msg = "That link is not a pull request. Use one like https://github.com/owner/repo/pull/123"
+                return self._json(400, {"error": session_key.scrub(msg)})
+            except Exception as e:  # noqa: BLE001
+                return self._json(500, {"error": "The check could not start: " + session_key.scrub(str(e))})
             return self._json(202, job)
         if path.startswith("/api/jobs/") and path.endswith("/scenarios"):
             jid = path[len("/api/jobs/"):-len("/scenarios")].strip("/")

@@ -87,7 +87,7 @@ def test_recorded_playback_finishes_on_any_host_without_a_sandbox(tmp_path, monk
         raise AssertionError("pull-request code must not start without a sandbox")
 
     monkeypatch.setattr(console_api.subprocess, "Popen", refuse_process)
-    with pytest.raises(ValueError, match="will not run pull-request code"):
+    with pytest.raises(ValueError, match="No sandbox available"):
         console_api.start_check("https://github.com/me/demo/pull/9", model_provider="recorded")
 
     job = console_api.start_check(spaces_host.VETTED_URL, model_provider="recorded")

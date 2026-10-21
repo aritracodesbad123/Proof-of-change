@@ -93,7 +93,7 @@ def has_tavily_key(token: str | None) -> bool:
 def known_secrets() -> list[str]:
     """Values currently in memory. Used only to strip them from replies."""
     with _lock:
-        values = list(_keys.values()) + list(_tavily_keys.values())
+        values = list(_keys.values()) + list(_tavily_keys.values()) + list(_contree_projects.values())
     return [value for value in values if value and len(value) >= _MIN_LEN]
 
 

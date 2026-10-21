@@ -569,3 +569,155 @@ def test_http_sign_in_stays_required_when_the_port_is_public(accounts, monkeypat
         assert body["error"] == console_auth.PORT_PUBLIC_MESSAGE
     finally:
         server.shutdown()
+
+
+def _single_user_server(accounts, monkeypatch):
+    monkeypatch.setenv("POC_SINGLE_USER", "1")
+    monkeypatch.setattr(console_auth, "codespace_port_visibility", lambda: "private")
+    server = console_api.ThreadingHTTPServer(("127.0.0.1", 0), console_api.Handler)
+    threading.Thread(target=server.serve_forever, daemon=True).start()
+    return server
+
+
+def _post(port, path, body, cookie=None):
+    conn = http.client.HTTPConnection("127.0.0.1", port, timeout=5)
+    headers = {"Content-Type": "application/json"}
+    if cookie:
+        headers["Cookie"] = cookie
+    conn.request("POST", path, body=json.dumps(body).encode(), headers=headers)
+    resp = conn.getresponse()
+    return resp.status, resp.read()
+
+
+def test_one_submit_starts_a_check_with_keys_and_keeps_them_in_memory_only(accounts, monkeypatch, tmp_path):
+    from poc import session_key
+    secret = "nebius-start-form-secret"
+    project = "project-start-form-id"
+    seen = {}
+
+    def fake_start(pr_url, **kwargs):
+        token = kwargs["session_token"]
+        seen["key"] = session_key.get_key(token)
+        seen["project"] = session_key.get_contree_project(token)
+        seen["approval"] = kwargs["approval"]
+        return {"id": "job123", "status": "queued", "pr_url": pr_url}
+
+    monkeypatch.setattr(console_api, "start_check", fake_start)
+    before = {p for p in tmp_path.rglob("*")}
+    server = _single_user_server(accounts, monkeypatch)
+    try:
+        port = server.server_address[1]
+        status, raw = _post(port, "/api/checks", {
+            "pr_url": "https://github.com/o/r/pull/1", "approval": True,
+            "nebius_api_key": secret, "contree_project_id": project,
+        })
+        assert status == 202
+        assert json.loads(raw)["id"] == "job123"
+        assert secret.encode() not in raw and project.encode() not in raw
+        assert seen == {"key": secret, "project": project, "approval": True}
+        # A refresh may bring a different or stale cookie: the single-user slot keeps the key.
+        status, raw = _post(port, "/api/checks", {"pr_url": "https://github.com/o/r/pull/2"},
+                            cookie=f"{console_auth.SESSION_COOKIE}=stale-after-refresh")
+        assert status == 202 and seen["key"] == secret
+        assert {p for p in tmp_path.rglob("*")} == before
+    finally:
+        session_key_clear()
+        server.shutdown()
+
+
+def test_refused_start_returns_a_plain_reason(accounts, monkeypatch):
+    _clear_contree_env(monkeypatch)
+    monkeypatch.delenv("POC_UNSAFE_NO_SANDBOX", raising=False)
+    monkeypatch.setattr(console_api, "contree_usable", lambda *a, **k: False)
+    import guardrails.sandbox as sb
+    monkeypatch.setattr(sb, "check", lambda *a, **k: (False, "bwrap: No permissions to create a new namespace"))
+    monkeypatch.setattr(console_api.subprocess, "Popen", lambda *a, **k: (_ for _ in ()).throw(AssertionError("ran")))
+    server = _single_user_server(accounts, monkeypatch)
+    try:
+        port = server.server_address[1]
+        status, raw = _post(port, "/api/checks", {
+            "pr_url": "https://github.com/me/demo/pull/3", "model_provider": "recorded",
+            "nebius_api_key": "nebius-refused-secret",
+        })
+        body = json.loads(raw)
+        assert status == 400 and body["refused"] is True, body
+        assert body["error"] == "No sandbox available: add your Nebius project ID."
+        assert b"nebius-refused-secret" not in raw and "bwrap" not in body["error"]
+        status, raw = _post(port, "/api/checks", {"pr_url": "not a link"})
+        assert status == 400 and "not a pull request" in json.loads(raw)["error"]
+        status, raw = _post(port, "/api/checks", {"pr_url": ""})
+        assert status == 400 and json.loads(raw)["error"] == "Add a pull request link."
+    finally:
+        session_key_clear()
+        server.shutdown()
+
+
+def _clear_contree_env(monkeypatch):
+    for name in ("NEBIUS_API_KEY", "NEBIUS_PROJECT_ID", "CONTREE_PROJECT_ID", "POC_UNSAFE_NO_SANDBOX", "SPACE_ID"):
+        monkeypatch.delenv(name, raising=False)
+
+
+def test_form_key_and_project_turn_on_contree_only_mode(accounts, monkeypatch):
+    """Both typed into the form: the check runs with --sandbox-backend contree, Contree mocked, bwrap down."""
+    import sys
+    import types
+    _clear_contree_env(monkeypatch)
+    monkeypatch.setitem(sys.modules, "contree_sdk", types.ModuleType("contree_sdk"))
+    import guardrails.sandbox as sb
+    monkeypatch.setattr(sb, "check", lambda *a, **k: (False, "bwrap down"))
+    captured = {}
+
+    class FakeProc:
+        pid = 0
+
+    def fake_popen(cmd, *args, **kwargs):
+        captured["cmd"] = cmd
+        captured["env"] = kwargs.get("env") or {}
+        raise RuntimeError("stop after capture")
+
+    monkeypatch.setattr(console_api.subprocess, "Popen", fake_popen)
+    secret, project = "nebius-contree-only-key", "contree-only-project-id"
+    server = _single_user_server(accounts, monkeypatch)
+    try:
+        port = server.server_address[1]
+        status, raw = _post(port, "/api/checks", {
+            "pr_url": "https://github.com/me/demo/pull/7", "approval": False,
+            "nebius_api_key": secret, "contree_project_id": project,
+        })
+        assert status == 202, raw
+        body = json.loads(raw)
+        assert body["run_flags"][:2] == ["--sandbox-backend", "contree"]
+        assert secret.encode() not in raw and project.encode() not in raw
+        import time
+        for _ in range(50):
+            if "cmd" in captured:
+                break
+            time.sleep(0.05)
+        assert "--sandbox-backend" in captured["cmd"] and "contree" in captured["cmd"]
+        assert "NEBIUS_API_KEY" not in __import__("os").environ
+    finally:
+        session_key_clear()
+        server.shutdown()
+
+
+def test_both_given_but_contree_cannot_start_does_not_ask_for_them_again(accounts, monkeypatch):
+    import sys
+    _clear_contree_env(monkeypatch)
+    monkeypatch.setitem(sys.modules, "contree_sdk", None)   # import fails: SDK missing
+    import guardrails.sandbox as sb
+    monkeypatch.setattr(sb, "check", lambda *a, **k: (False, "bwrap down"))
+    monkeypatch.setattr(console_api.subprocess, "Popen", lambda *a, **k: (_ for _ in ()).throw(AssertionError("ran")))
+    server = _single_user_server(accounts, monkeypatch)
+    try:
+        status, raw = _post(server.server_address[1], "/api/checks", {
+            "pr_url": "https://github.com/me/demo/pull/8",
+            "nebius_api_key": "nebius-sdk-missing-key", "contree_project_id": "project-sdk-missing",
+        })
+        body = json.loads(raw)
+        assert status == 400 and body["refused"] is True
+        assert "are set" in body["error"] and "Contree software is not installed" in body["error"]
+        assert "add your" not in body["error"]
+        assert b"nebius-sdk-missing-key" not in raw and b"project-sdk-missing" not in raw
+    finally:
+        session_key_clear()
+        server.shutdown()

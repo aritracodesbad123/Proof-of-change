@@ -996,11 +996,16 @@ def viewer_account(token: str | None) -> dict[str, Any] | None:
 
 
 def request_session_token(token: str | None) -> str | None:
-    """Cookie token, or the in-memory local slot when this console skipped sign-in."""
-    if token:
-        return token
+    """The in-memory slot for this request's keys.
+
+    When this console skipped sign-in there is one user, so every request uses the
+    local slot. A leftover or changed cookie must not move the keys to a new slot,
+    or a page refresh would lose them. Otherwise the sign-in cookie is the slot.
+    """
     if sign_in_skip()[0]:
         return LOCAL_SESSION
+    if token:
+        return token
     return None
 
 

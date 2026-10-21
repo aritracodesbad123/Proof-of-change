@@ -200,7 +200,7 @@ def test_codespace_refuses_unsandboxed_pull_request_code(monkeypatch):
     assert plan.flags == []
     assert plan.refused is True
     assert plan.note and "will not run pull-request code" in plan.note
-    with pytest.raises(ValueError, match="will not run pull-request code"):
+    with pytest.raises(ValueError, match="No sandbox available"):
         console_api.start_check("https://github.com/me/demo/pull/8", model_provider="recorded")
     monkeypatch.setenv("POC_UNSAFE_NO_SANDBOX", "1")
     opted = console_api.console_run_flags()

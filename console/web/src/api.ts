@@ -1,3 +1,5 @@
+import type { StartBody } from './startForm'
+
 const BASE = import.meta.env.VITE_API_BASE ?? ''
 
 export class ApiError extends Error {
@@ -153,19 +155,17 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ pr_url, model_provider, approval }),
     }),
+  /** One request with the link, review choice and any keys typed into the start form. */
+  startWithFields: (body: StartBody) =>
+    json<Job>('/api/checks', { method: 'POST', body: JSON.stringify(body) }),
   sessionKey: () => json<{ nebius_key: boolean; tavily_key: boolean; contree_project?: boolean }>('/api/session/key'),
   setSessionKey: (nebius_api_key: string) =>
-    json<{ ok: boolean; nebius_key: boolean; tavily_key: boolean; contree_project?: boolean }>('/api/session/key', {
+    json<{ ok: boolean; nebius_key: boolean; tavily_key: boolean }>('/api/session/key', {
       method: 'POST',
       body: JSON.stringify({ nebius_api_key }),
     }),
-  setContreeProject: (contree_project_id: string) =>
-    json<{ ok: boolean; nebius_key: boolean; tavily_key: boolean; contree_project?: boolean }>('/api/session/key', {
-      method: 'POST',
-      body: JSON.stringify({ contree_project_id }),
-    }),
   setTavilyKey: (tavily_api_key: string) =>
-    json<{ ok: boolean; nebius_key: boolean; tavily_key: boolean; contree_project?: boolean }>('/api/session/key', {
+    json<{ ok: boolean; nebius_key: boolean; tavily_key: boolean }>('/api/session/key', {
       method: 'POST',
       body: JSON.stringify({ tavily_api_key }),
     }),
