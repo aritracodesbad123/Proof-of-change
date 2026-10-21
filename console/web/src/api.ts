@@ -87,12 +87,14 @@ export type HitlDraft = {
   rejected_claims?: unknown[]
 }
 
-export type HitlApprovalBody = {
-  approve: string[]
-  extra_scenarios: string[]
-  business_answers: Record<string, string>
-  skip_business_followup: boolean
-}
+export type HitlApprovalBody =
+  | {
+      approve: string[]
+      extra_scenarios: string[]
+      business_answers: Record<string, string>
+      skip_business_followup: boolean
+    }
+  | { cancel: true }
 
 export type Health = {
   ok: boolean

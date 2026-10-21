@@ -390,8 +390,11 @@ def deciding_ids(rec: dict) -> set:
 
 def generator_label(it: dict) -> str:
     g = (it.get("freeze") or {}).get("generator") or it.get("generator") or {}
+    tag = "human-requested, " if it.get("origin") == "human-requested" else ""
     if g.get("label"):
-        return g["label"]
+        return tag + g["label"]
+    if tag:
+        return tag + f"{it.get('source')} probe"
     return "fixed probe (no generator recorded; treated as post-hoc)" if it.get("source", "library") == "library" \
         else f"{it.get('source')} probe"
 
@@ -597,6 +600,7 @@ def build(rec: dict, prdir: Path, out_dir: Path, decision: dict | None = None) -
         R.h(3, related_reports.REPORT_LABEL)
         R.p(background_text)
 
+    rv.human_review_section(R, rec)
     R.h(2, "Claims vs reality", "claims")
     if rows:
         R.table(["#", "Claim (source)", "Status", "What we observed", "Log line"],

@@ -180,7 +180,7 @@ export function statesFromRecord(record: Record<string, unknown>): Record<NodeId
   if (has(record, 'per_run') || has(record, 'comparison')) set('existing-tests', 'done')
   if (has(record, 'behaviour_claims') || has(record, 'probe_plan') || has(record, 'probes')) {
     set('ai-write', 'done')
-    set('human-review', record.operator_approval === 'on' || has(record, 'hitl_approval') ? 'done' : 'skipped')
+    set('human-review', record.operator_approval === 'on' || has(record, 'human_review') || has(record, 'hitl_approval') ? 'done' : 'skipped')
   }
   const probes = record.probes as { items?: Array<{ observations?: unknown[] }> } | undefined
   if (probes?.items?.some((item) => (item.observations || []).length > 0)) set('before-after', 'done')

@@ -35,6 +35,7 @@ import {
 import './App.css'
 
 const MAX_SCENARIOS = 20
+const MAX_IDEA_CHARS = 500
 const SAMPLE_PR_URL = 'https://github.com/rasbt/mlxtend/pull/1229'
 const SAMPLE_PROVIDER = 'recorded'
 const VERDICT_FILTERS = ['all', 'verified', 'needs_attention', 'could_not_verify', 'no_code_change'] as const
@@ -708,13 +709,17 @@ function HitlPanel({
     setLocalErr(null)
     const extras = scenarios.map((row) => row.trim()).filter(Boolean)
     if (extras.length > MAX_SCENARIOS) {
-      setLocalErr(`At most ${MAX_SCENARIOS} scenarios`)
+      setLocalErr(`At most ${MAX_SCENARIOS} test ideas`)
+      return
+    }
+    if (extras.some((row) => row.length > MAX_IDEA_CHARS)) {
+      setLocalErr(`Keep each test idea to ${MAX_IDEA_CHARS} characters or fewer`)
       return
     }
     if (needsBiz) {
       const missing = questions.filter((question) => !String(answers[question.id] || '').trim())
       if (missing.length) {
-        setLocalErr('Answer the business questions, or skip the follow-up')
+        setLocalErr('Answer the follow-up questions, or skip them')
         return
       }
     }
@@ -735,10 +740,23 @@ function HitlPanel({
     }
   }
 
+  async function onCancel() {
+    setLocalErr(null)
+    setBusy(true)
+    try {
+      await api.submitScenarios(jobId, { cancel: true })
+      onSubmitted(await api.job(jobId))
+    } catch (error) {
+      setLocalErr(error instanceof Error ? error.message : String(error))
+    } finally {
+      setBusy(false)
+    }
+  }
+
   return (
     <section className="hitl panel" aria-label="Human review">
       <h2>Human review</h2>
-      <p className="hint">Approve or drop the drafted probes, add business scenarios, then continue.</p>
+      <p className="hint">Keep or drop each AI probe and add your own test ideas, then continue. Nothing runs until you do.</p>
       {(draft.claims || []).length > 0 ? (
         <div className="hitl-claims">
           <h3>Claims</h3>
@@ -754,7 +772,7 @@ function HitlPanel({
       <form onSubmit={(event) => void onContinue(event)} className="hitl-form">
         <h3>Draft probes</h3>
         {probeIds.length === 0 ? (
-          <p className="empty">No draft probes. Add scenarios below, or continue with none.</p>
+          <p className="empty">No AI probes were drafted. Add test ideas below, or continue with none.</p>
         ) : (
           <ul className="hitl-probes">
             {probeIds.map((id) => {
@@ -777,8 +795,8 @@ function HitlPanel({
             })}
           </ul>
         )}
-        <h3>Business scenarios</h3>
-        <p className="hint">One scenario per row, up to {MAX_SCENARIOS}.</p>
+        <h3>Your test ideas</h3>
+        <p className="hint">One test idea per row, up to {MAX_SCENARIOS}, each up to {MAX_IDEA_CHARS} characters.</p>
         <div className="scenario-list">
           {scenarios.map((value, index) => (
             <div key={index} className="scenario-row">
@@ -787,8 +805,9 @@ function HitlPanel({
                 onChange={(event) =>
                   setScenarios((rows) => rows.map((row, rowIndex) => (rowIndex === index ? event.target.value : row)))
                 }
-                placeholder={`Scenario ${index + 1}`}
-                aria-label={`Scenario ${index + 1}`}
+                placeholder={`Test idea ${index + 1}`}
+                maxLength={MAX_IDEA_CHARS}
+                aria-label={`Test idea ${index + 1}`}
               />
               <button
                 type="button"
@@ -811,10 +830,10 @@ function HitlPanel({
         </button>
         {draft.needs_business_followup ? (
           <div className="hitl-biz">
-            <h3>Business follow-up</h3>
+            <h3>Follow-up questions</h3>
             <label className="hitl-probe-row">
               <input type="checkbox" checked={skipBiz} onChange={(event) => setSkipBiz(event.target.checked)} />
-              <span>Skip business follow-up</span>
+              <span>Skip the follow-up questions</span>
             </label>
             {!skipBiz
               ? questions.map((question) => (
@@ -835,9 +854,14 @@ function HitlPanel({
             {localErr}
           </p>
         ) : null}
-        <button type="submit" disabled={busy}>
-          {busy ? 'Submitting…' : 'Continue check'}
-        </button>
+        <div className="row">
+          <button type="submit" disabled={busy}>
+            {busy ? 'Submitting…' : 'Continue check'}
+          </button>
+          <button type="button" className="ghost" disabled={busy} onClick={() => void onCancel()}>
+            Cancel check
+          </button>
+        </div>
       </form>
     </section>
   )

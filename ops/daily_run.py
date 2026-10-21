@@ -2793,7 +2793,10 @@ def plan_probes(repo: str, item: dict, rec: dict, base_root: Path, pr_roots: lis
             note["model_claims"] = res.get("claims", [])
             note["model_rejected_claims"] = res.get("rejected_claims", [])
             note["errors"] += res.get("errors", [])
-            plan += [{"path": x["path"], "source": "model", "freeze": x["freeze"]} for x in res.get("probes", [])]
+            plan += [{"path": x["path"], "source": "model", "freeze": x["freeze"],
+                      **({"origin": x["origin"]} if x.get("origin") else {})} for x in res.get("probes", [])]
+            if res.get("human_review"):
+                rec["human_review"] = res["human_review"]
             made = [c for c in getattr(provider, "calls", []) if c.get("ok")]
             if res.get("errors") and made and not res.get("probes"):
                 a.model_fallback = "the AI answered but no probe was usable, so only fixed probes ran"
@@ -2812,6 +2815,7 @@ def plan_probes(repo: str, item: dict, rec: dict, base_root: Path, pr_roots: lis
             note["errors"].append(f"differential probe: {e}")
     rec["probe_plan"] = note | {"frozen": [{"path": repo_relative(x["path"]) if x["source"] == "library"
                                            else str(Path(x["path"]).relative_to(prdir)), "source": x["source"],
+                                           **({"origin": x["origin"]} if x.get("origin") else {}),
                                            **x["freeze"]} for x in plan]}
     return plan
 
@@ -2849,6 +2853,8 @@ def run_probes(repo: str, pr: int, pythons: dict, prdir: Path, work: Path, a, pl
                                       guard=guard)
             it["path"] = repo_relative(path) if x["source"] == "library" else str(path.relative_to(prdir))
             it["generator"] = fz["generator"]
+            if x.get("origin"):
+                it["origin"] = x["origin"]
             it["freeze"] = fz | {"verified": True, "pr_started_at": pr_started}
             items.append(it)
         except freeze.FreezeError as e:
@@ -3710,10 +3716,22 @@ def test_source_pair(repo: str, cfg: dict, item: dict, prdir: Path, work: Path, 
     return gate(rec)
 
 
+def cap_for_review(rec: dict, v: str, reason: str) -> tuple[str, str]:
+    """After human review, a claim left with no probe cannot be verified. Cap verified at could_not_verify.
+    Only lowers a verified result; the verdict logic itself is unchanged."""
+    left = (rec.get("human_review") or {}).get("claims_without_probe") or []
+    if left and v == Verdict.VERIFIED.value:
+        shown = ", ".join(str(x) for x in left[:4]) + (f" (+{len(left) - 4} more)" if len(left) > 4 else "")
+        return (Verdict.COULD_NOT_VERIFY.value,
+                f"could not verify: after review no probe checks claim(s) {shown} ({reason})")
+    return v, reason
+
+
 def _store_verdict(rec: dict, cmp, cnv, ex) -> None:
     """Write the verdict. A docstring-only change marks each behaviour claim as holding by construction."""
     v, reason, _ = verdict_for(cmp, cnv, ex, rec.get("files"), rec.get("probes"), rec.get("behaviour_claims"),
                                rec.get("baseline"), docstring_only=bool(rec.get("docstring_only")))
+    v, reason = cap_for_review(rec, v, reason)
     rec["verdict"], rec["reason"] = v, reason
     if rec.get("docstring_only") and v == Verdict.VERIFIED.value:
         rec["behaviour_claims"] = mark_holds_by_construction(rec.get("behaviour_claims"))
@@ -4623,6 +4641,7 @@ def rejudge(rec: dict, prdir: Path) -> dict:
     pr_probes = rejudge_probes(rec.get("probes"))
     v, reason, _ = verdict_for(cmp, None, ex, rec.get("files"), pr_probes, rec.get("behaviour_claims"),
                                rec.get("baseline"))
+    v, reason = cap_for_review(rec, v, reason)
     out = {k: x for k, x in rec.items() if k not in ("verdict_before_coverage_gate", "reason_before_coverage_gate")}
     out.update(comparison=cmp, exit_check=ex, verdict=v, reason=reason)
     if pr_probes:

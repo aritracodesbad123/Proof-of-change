@@ -15,6 +15,16 @@ The review option on the start form is ticked by default, and the API treats a c
 
 The process chart and the timeline show **Human review** as its own step between the AI probes and running them. It shows as skipped when a check did not use it.
 
+## What the review records and how it affects the verdict
+
+- The record (`record.json`) now has a `human_review` section: which AI probes were kept and which were dropped, the test ideas the person added, the probes written from those ideas, and any claim left with no probe.
+- Probes written from a person's test ideas are labelled **human-requested** in the record and in both reports (the PR report and the reviewer report), which also gain a "Human review" section.
+- If the review leaves a claim with no probe, for example because the person dropped the only probe for it, a verified result is capped at could_not_verify. The cap only lowers a verified result and is applied after the normal verdict rules, which are otherwise unchanged. Without it, dropping the probe for a false claim could have produced verified.
+- Each test idea is limited to 500 characters and the whole review to 64 KB.
+- The review step has a **Cancel check** button. A cancelled check stops before any probe runs and says "review cancelled".
+- A check that waits too long for a review fails with "review not completed".
+- The console uses one term, "test ideas", for what the person adds.
+
 The fixed benchmark suite stays a CI job. It is not a step of each check.
 
 ## What stays automatic
