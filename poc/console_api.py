@@ -83,8 +83,13 @@ def child_environment(base: dict[str, str], provider: str, session_token: str | 
             secrets.append(server_value)
     if provider == "nebius" and pasted:
         env["NEBIUS_API_KEY"] = pasted
-    host_tavily = (env.get("TAVILY_API_KEY") or "").strip()
-    if len(host_tavily) >= 8:
+    from poc import console_auth
+    if console_auth.single_user_requested(base):
+        host_tavily = (env.get("TAVILY_API_KEY") or "").strip()
+    else:
+        # A hosted console never runs a user check on the server's Tavily account: only the typed key counts.
+        host_tavily = (env.pop("TAVILY_API_KEY", None) or "").strip()
+    if len(host_tavily) >= 8 and host_tavily not in secrets:
         secrets.append(host_tavily)
     pasted_tavily = session_key.get_tavily_key(session_token)
     if pasted_tavily and len(pasted_tavily) >= 8:
