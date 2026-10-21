@@ -2234,6 +2234,78 @@ def coverage_run(item: dict, venv: Path, main_root: Path, pr_root: Path, targets
     return res | {"seconds": secs, "exit": rc, "log": "coverage-pytest.log"}
 
 
+def _coverage_changed(item: dict, main_root: Path, pr_root: Path) -> tuple[dict, dict]:
+    """Changed lines for the coverage gate, or a status dict when there is nothing to measure."""
+    if not coverage_gate.python_sources(item["files"]):
+        return {}, {"status": "not needed", "why": "no changed non-test Python files"}
+    changed = {}
+    for rel in coverage_gate.python_sources(item["files"]):
+        new = pr_root / rel
+        if not new.is_file():
+            continue
+        old = main_root / rel
+        changed[rel] = coverage_gate.changed_lines(old.read_text(errors="replace") if old.is_file() else None,
+                                                   new.read_text(errors="replace"))
+    if not changed:
+        return {}, {"status": "failed", "why": "none of the changed Python files exist on the PR side"}
+    return changed, {}
+
+
+def contree_coverage_run(item: dict, main_root: Path, pr_root: Path, targets: list[str], prdir: Path, a) -> dict:
+    """Coverage gate measurement inside the Contree PR checkpoint.
+
+    pytest and coverage run remotely. The JSON report comes back in the command output and is fed to
+    coverage_gate.measure. No key is placed in the shell. A missing report stays 'not measured', so a product
+    check is still capped at could_not_verify."""
+    if getattr(a, "no_coverage", False) or _coverage_skipped_by_env():
+        return {"status": "skipped", "why": "--no-coverage"}
+    if not uses(getattr(a, "baseline", None), "coverage"):
+        return {"status": "skipped", "why": f"baseline {a.baseline} does not use the coverage gate"}
+    changed, early = _coverage_changed(item, main_root, pr_root)
+    if early:
+        return early
+    from poc import contree_sandboxes
+    sess = contree_sandboxes.session()
+    if sess is None or not getattr(sess, "pr_uuid", None):
+        return {"status": "not measured", "why": CONTREE_ONLY_COVERAGE_WHY}
+    sources = sorted({str(PurePosixPath("/work/src") / PurePosixPath(rel).parent) for rel in changed})
+    tg = " ".join(shlex.quote(t) for t in targets)
+    cov = " ".join(f"--cov={shlex.quote(s)}" for s in sources)
+    nflag = f"-n {shlex.quote(str(a.workers))} " if str(a.workers) != "0" else ""
+    shell = (
+        "set +e\ncd /work/src\n"
+        f"python -m pytest {tg} -p no:cacheprovider -q --timeout={int(a.test_timeout)} "
+        f"-o addopts= {nflag}{cov} --cov-report=json:/tmp/poc-cov.json "
+        ">/tmp/poc-cov-pytest.log 2>&1\n"
+        "ec=$?\n"
+        "printf '___POC_EXIT___%s\\n' \"$ec\"\n"
+        "printf '___POC_COV_START___\\n'\ncat /tmp/poc-cov.json 2>/dev/null\n"
+        "printf '\\n___POC_COV_END___\\n'\n"
+        "printf '___POC_LOG___\\n'\ncat /tmp/poc-cov-pytest.log 2>/dev/null\n"
+    )
+    t0 = time.time()
+    raw = sess.run_op("pr", shell, disposable=True, timeout=int(a.run_timeout))
+    secs = round(time.time() - t0, 1)
+    out = (raw.get("stdout") or "") + "\n" + (raw.get("stderr") or "")
+    log = out.split("___POC_LOG___\n", 1)[-1] if "___POC_LOG___" in out else out
+    (prdir / "coverage-pytest.log").write_text(f"$ contree coverage (pr)\n{log}")
+    blob = ""
+    if "___POC_COV_START___\n" in out:
+        blob = out.split("___POC_COV_START___\n", 1)[1].split("\n___POC_COV_END___", 1)[0]
+    try:
+        cov_files = json.loads(blob).get("files", {}) if blob.strip() else None
+    except json.JSONDecodeError:
+        cov_files = None
+    if cov_files is None:
+        return {"status": "not measured",
+                "why": "coverage run produced no data; see coverage-pytest.log", "seconds": secs}
+    (prdir / "coverage-pr.json").write_text(blob.strip() + "\n")
+    res = coverage_gate.measure(changed, cov_files or {})
+    exit_m = re.search(r"___POC_EXIT___(\S+)", out)
+    rc = int(exit_m.group(1)) if exit_m and exit_m.group(1).isdigit() else raw.get("exit_code")
+    return res | {"seconds": secs, "exit": rc, "log": "coverage-pytest.log", "where": "contree"}
+
+
 def gate(rec: dict) -> dict:
     """Apply the coverage gate (poc/coverage_gate.py) to a finished record; baselines without coverage skip it."""
     if not uses(rec.get("baseline"), "coverage"):
@@ -3330,10 +3402,11 @@ def _contree_only_pair(a, rec: dict, repo: str, cfg: dict, item: dict, sp: dict,
                        helper_on: bool) -> tuple:
     """Source-pair check where every step that runs pull-request or package code runs inside Contree.
 
-    Local checkouts are only read as files (test mapping, declared dependencies, probe planning). Installs, declared
-    test dependencies and optional backends go into the Contree checkpoints; tests and probes run there. Steps that
-    need a local side (local freeze, installed-commit guard, coverage, probe coverage, the optional-module retry) are
-    not run and are recorded as such."""
+    Local checkouts are only read as files (test mapping, declared dependencies, probe planning, which lines changed).
+    Installs, declared test dependencies and optional backends go into the Contree checkpoints; tests and probes run
+    there. A product check also runs pytest with coverage in the PR checkpoint and reads the report back. Steps that
+    need a local side (local freeze, installed-commit guard, probe coverage, the optional-module retry) are not run.
+    Study runs still leave coverage unmeasured."""
     from poc import demo_helper, run_progress
     vm, vp = work / "venv-main", work / "venv-pr"
     cm, cp = work / "side-main", work / "side-pr"
@@ -3355,10 +3428,13 @@ def _contree_only_pair(a, rec: dict, repo: str, cfg: dict, item: dict, sp: dict,
     decl = declared_test_deps(cm, list(dict.fromkeys(targets["main"] + targets["pr"])), cfg["dist"])
     optional = optional_backend_reqs(cm, cfg["dist"])
     base = demo_helper.contree_shell(setup_plan) if setup_plan else ""
+    measure_coverage = product_route(a)
+    not_local = ["local freeze", "installed-commit guard", "probe coverage", "optional-module retry"]
+    if not measure_coverage:
+        not_local.insert(2, "coverage")
     rec["contree_only"] = {"note": "bubblewrap cannot start here; installs, tests and probes ran in Contree",
                            "declared_test_deps": decl, "optional_backends": optional,
-                           "not_run_locally": ["local freeze", "installed-commit guard", "coverage",
-                                               "probe coverage", "optional-module retry"]}
+                           "not_run_locally": not_local}
     rec["coverage"] = {"status": "not measured", "why": CONTREE_ONLY_COVERAGE_WHY}
     run_progress.emit("install_main", detail="installing main and PR sides in Contree")
     cnv = _maybe_prepare_contree(a, repo, sp["main_sha"], sp["pr_sha"], rec, a.build_timeout,
@@ -3379,6 +3455,9 @@ def _contree_only_pair(a, rec: dict, repo: str, cfg: dict, item: dict, sp: dict,
         if cmp:
             ex = exit_check(rec.get("per_run", []), results, cmp)
             rec["exit_check"] = ex
+    if measure_coverage and targets["pr"] and not cnv:
+        run_progress.emit("pytest", "code", "coverage inside Contree")
+        rec["coverage"] = contree_coverage_run(item, cm, cp, targets["pr"], prdir, a)
     run_progress.emit("probes", "super", "running behaviour probes (Contree)")
     rec["probes"] = run_probes(repo, item["pr"], {"main": vm / "bin/python", "pr": vp / "bin/python"}, prdir,
                                work, a, plan, pr_started)

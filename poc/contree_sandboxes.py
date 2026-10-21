@@ -226,7 +226,7 @@ def install_shell_source(repo: str, sha: str, extra: str = "") -> str:
         "|| python -m pip install -q -e '.[test]' 2>/dev/null "
         "|| python -m pip install -q -e '.[tests]' 2>/dev/null "
         "|| python -m pip install -q -e .\n"
-        "python -m pip install -q pytest pytest-timeout pytest-xdist coverage\n"
+        "python -m pip install -q pytest pytest-timeout pytest-xdist coverage pytest-cov\n"
     )
     extra = (extra or "").strip()
     if not extra:
