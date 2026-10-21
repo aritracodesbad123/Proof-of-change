@@ -165,7 +165,8 @@ def test_logged_check_output_drops_the_key(tmp_path, monkeypatch):
     session_key.clear_key("sess-log")
 
 
-def test_live_check_without_a_key_uses_recorded_answers(monkeypatch):
+@pytest.mark.real_key_gate
+def test_live_check_without_a_key_is_refused(monkeypatch):
     monkeypatch.delenv("NEBIUS_API_KEY", raising=False)
     monkeypatch.delenv("CODESPACES", raising=False)
 
@@ -181,10 +182,9 @@ def test_live_check_without_a_key_uses_recorded_answers(monkeypatch):
         console_api, "console_run_flags",
         lambda *_a, **_k: console_api.ConsoleRunPlan([], None, False, None),
     )
-    job = console_api.start_check("https://github.com/me/demo/pull/4", model_provider="nebius")
-    assert job["model_provider"] == "recorded"
-    assert "recorded AI answers" in (job.get("run_note") or "")
-    assert SECRET not in json.dumps(job)
+    for provider in ("nebius", "recorded", "none"):
+        with pytest.raises(console_api.CheckRefused, match="Add your Nebius API key to run a live check."):
+            console_api.start_check("https://github.com/me/demo/pull/4", model_provider=provider)
 
 
 def test_codespace_refuses_unsandboxed_pull_request_code(monkeypatch):

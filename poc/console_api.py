@@ -654,6 +654,14 @@ def _read_child(proc: subprocess.Popen, logf, collected: list[str], deadline: fl
     return proc.wait(), False
 
 
+def _has_typed_key(session_token: str | None) -> bool:
+    """Whether this session has the user's own typed Nebius key. The server's key never counts."""
+    return session_key.has_key(session_token)
+
+
+NO_KEY_MESSAGE = "Add your Nebius API key to run a live check."
+
+
 class CheckRefused(ValueError):
     """The check was refused before any pull-request code ran."""
 
@@ -720,6 +728,10 @@ def start_check(pr_url: str, *, model_provider: str = "nebius", owner: str | Non
     blocked = spaces_host.block_reason(pr_url, model_provider)
     if blocked:
         raise ValueError(blocked)
+    sample = model_provider == "recorded" and spaces_host.is_vetted_sample(pr_url)
+    if not sample and not _has_typed_key(session_token):
+        # Only the saved sample may use the recorded AI answers. Any other check needs the user's own key.
+        raise CheckRefused(NO_KEY_MESSAGE)
     playback = spaces_host.playback_only(pr_url, model_provider)
     requested = model_provider
     model_provider, provider_note = resolve_console_provider(requested, session_token)

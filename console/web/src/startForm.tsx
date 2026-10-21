@@ -173,8 +173,8 @@ export function StartForm({
       <p className="hint">
         Keys are kept only in this browser tab and survive a page refresh; closing the tab clears them. They are
         sent with Run check, kept in the server's memory for the session, and never saved to disk, logs, or the
-        report. Pull-request code never sees them. Without a Nebius key, a live check uses
-        the recorded AI answers. Without a Tavily key, the lookup is skipped. Tavily keys are free at
+        report. Pull-request code never sees them. A check needs your own Nebius API key;
+        only the saved sample runs without one. Without a Tavily key, the lookup is skipped. Tavily keys are free at
         https://app.tavily.com/. A Nebius project ID lets the check run in a Nebius cloud sandbox, billed to your
         own Nebius account.
       </p>

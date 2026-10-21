@@ -67,7 +67,7 @@ A Codespace usually cannot start bubblewrap, the local safety sandbox. A live ch
 2. Wait until setup finishes and the terminal says the console is listening on port 8787 (setup log: `/tmp/poc-setup.log`, console log: `/tmp/poc-console.log`). If the page on port 8787 does not load, run `bash .devcontainer/start-console.sh` in the terminal. Open the forwarded port **8787**. Do not make port 8787 public. It stays private. If that port is public, the console does not start and tells you to set it back to private. Sign-in is not skipped while the port is public.
 3. Fill in the one start form. This Codespace does not ask you to sign in: it is your own machine, and email, Google, and GitHub sign-in are not set up here. Any other host still requires sign-in. The form has:
    - **Pull request URL** (required).
-   - **Nebius API key** (optional). Without it, a live check uses the recorded AI answers.
+   - **Nebius API key** (required for a live check). Without it the check is refused with "Add your Nebius API key to run a live check."; only the saved sample button runs without a key.
    - **Nebius project ID** (optional, the Contree project ID). With your key, the check runs in Contree sandboxes, billed to your own Nebius account.
    - **Tavily API key** (optional). The setup lookup needs it; without it the lookup is skipped. Tavily keys are free ([sign up](https://app.tavily.com/)). Codespaces also asks for it as the recommended secret `TAVILY_API_KEY`. Tavily can suggest package names, but one is installed only if its PyPI page links back to the same repo.
    - **Review the AI's probes** (ticked by default).

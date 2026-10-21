@@ -14,6 +14,20 @@ def _reset_operator_approval_mark():
     _hitl.reset_approval_ran()
 
 
+def pytest_configure(config):
+    config.addinivalue_line("markers", "real_key_gate: run with the console's real typed-key gate")
+
+
+@pytest.fixture(autouse=True)
+def _typed_key_gate(request, monkeypatch):
+    """Most console tests exercise later stages, so they pass the typed-key gate.
+    Tests marked real_key_gate check the gate itself."""
+    if request.node.get_closest_marker("real_key_gate") is None:
+        from poc import console_api
+        monkeypatch.setattr(console_api, "_has_typed_key", lambda _token: True)
+    yield
+
+
 FIX = Path(__file__).parent / "fixtures"
 REPO = Path(__file__).parent.parent
 

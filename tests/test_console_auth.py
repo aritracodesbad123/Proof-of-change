@@ -589,6 +589,7 @@ def _post(port, path, body, cookie=None):
     return resp.status, resp.read()
 
 
+@pytest.mark.real_key_gate
 def test_one_submit_starts_a_check_with_keys_and_keeps_them_in_memory_only(accounts, monkeypatch, tmp_path):
     from poc import session_key
     secret = "nebius-start-form-secret"
@@ -625,6 +626,7 @@ def test_one_submit_starts_a_check_with_keys_and_keeps_them_in_memory_only(accou
         server.shutdown()
 
 
+@pytest.mark.real_key_gate
 def test_refused_start_returns_a_plain_reason(accounts, monkeypatch):
     _clear_contree_env(monkeypatch)
     monkeypatch.delenv("POC_UNSAFE_NO_SANDBOX", raising=False)
@@ -657,6 +659,7 @@ def _clear_contree_env(monkeypatch):
         monkeypatch.delenv(name, raising=False)
 
 
+@pytest.mark.real_key_gate
 def test_form_key_and_project_turn_on_contree_only_mode(accounts, monkeypatch):
     """Both typed into the form: the check runs with --sandbox-backend contree, Contree mocked, bwrap down."""
     import sys
@@ -700,6 +703,7 @@ def test_form_key_and_project_turn_on_contree_only_mode(accounts, monkeypatch):
         server.shutdown()
 
 
+@pytest.mark.real_key_gate
 def test_both_given_but_contree_cannot_start_does_not_ask_for_them_again(accounts, monkeypatch):
     import sys
     _clear_contree_env(monkeypatch)
@@ -740,6 +744,7 @@ def test_sign_in_stays_on_when_port_visibility_cannot_be_read(monkeypatch):
     console_auth.reset_port_cache()
 
 
+@pytest.mark.real_key_gate
 def test_server_nebius_env_is_never_used_for_a_user_check(accounts, monkeypatch):
     """Server env has a key and project; the session has none: refused, asked for the key, nothing runs."""
     import sys
@@ -762,7 +767,7 @@ def test_server_nebius_env_is_never_used_for_a_user_check(accounts, monkeypatch)
         status, raw = _post(server.server_address[1], "/api/checks", {"pr_url": "https://github.com/me/demo/pull/9"})
         body = json.loads(raw)
         assert status == 400 and body["refused"] is True
-        assert "add your Nebius API key" in body["error"]
+        assert body["error"] == console_api.NO_KEY_MESSAGE
         assert "are set" not in body["error"]
         assert b"server-nebius-key" not in raw and b"server-project" not in raw
     finally:
@@ -791,3 +796,23 @@ def test_signed_in_accounts_keep_separate_keys_and_never_use_the_local_slot(monk
     finally:
         session_key.clear_key(tok_a)
         session_key.clear_key(tok_b)
+
+
+@pytest.mark.real_key_gate
+def test_unknown_pr_without_a_typed_key_is_refused_and_nothing_runs(accounts, monkeypatch):
+    _clear_contree_env(monkeypatch)
+    monkeypatch.setenv("NEBIUS_API_KEY", "server-key-does-not-count")
+    ran = []
+    monkeypatch.setattr(console_api.subprocess, "Popen", lambda *a, **k: ran.append(a) or (_ for _ in ()).throw(AssertionError("ran")))
+    server = _single_user_server(accounts, monkeypatch)
+    try:
+        for provider in ("nebius", "recorded", "none"):
+            status, raw = _post(server.server_address[1], "/api/checks",
+                                {"pr_url": "https://github.com/someone/unknown/pull/42", "model_provider": provider})
+            body = json.loads(raw)
+            assert status == 400 and body["refused"] is True
+            assert body["error"] == "Add your Nebius API key to run a live check."
+        assert ran == []
+    finally:
+        session_key_clear()
+        server.shutdown()
