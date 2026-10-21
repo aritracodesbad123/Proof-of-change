@@ -19,7 +19,7 @@ import {
   verdictPlain,
   verdictTone,
 } from './present'
-import { NebiusKeyField, TavilyKeyField } from './sessionKey'
+import { ContreeProjectField, NebiusKeyField, TavilyKeyField } from './sessionKey'
 import {
   CostTimePanel,
   DetailRail,
@@ -126,6 +126,7 @@ export default function App() {
   const approvalDefaultApplied = useRef(false)
   const [keyStored, setKeyStored] = useState(false)
   const [tavilyStored, setTavilyStored] = useState(false)
+  const [contreeStored, setContreeStored] = useState(false)
   const [busy, setBusy] = useState(false)
   const [detail, setDetail] = useState<{
     record: Record<string, unknown>
@@ -189,6 +190,7 @@ export default function App() {
     void api.sessionKey().then((status) => {
       setKeyStored(status.nebius_key)
       setTavilyStored(Boolean(status.tavily_key))
+      setContreeStored(Boolean(status.contree_project))
     }).catch(() => {
       setKeyStored(false)
       setTavilyStored(false)
@@ -465,6 +467,13 @@ export default function App() {
                     const saved = await api.setSessionKey(value)
                     setKeyStored(saved.nebius_key)
                     setTavilyStored(Boolean(saved.tavily_key))
+                  }}
+                />
+                <ContreeProjectField
+                  stored={contreeStored}
+                  onSave={async (value) => {
+                    const saved = await api.setContreeProject(value)
+                    setContreeStored(Boolean(saved.contree_project))
                   }}
                 />
                 <TavilyKeyField

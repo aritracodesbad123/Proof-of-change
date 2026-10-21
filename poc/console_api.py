@@ -65,7 +65,8 @@ def resolve_console_provider(requested: str, session_token: str | None = None) -
     )
 
 
-def child_environment(base: dict[str, str], provider: str, session_token: str | None) -> tuple[dict[str, str], list[str]]:
+def child_environment(base: dict[str, str], provider: str, session_token: str | None,
+                      contree: bool = False) -> tuple[dict[str, str], list[str]]:
     """Environment for one check. A pasted key is copied into this dict only, never into the parent process."""
     env = dict(base)
     secrets: list[str] = []
@@ -86,6 +87,17 @@ def child_environment(base: dict[str, str], provider: str, session_token: str | 
     if pasted_tavily and len(pasted_tavily) >= 8:
         secrets.append(pasted_tavily)
         env["TAVILY_API_KEY"] = pasted_tavily
+    if contree:
+        # The check process uses these only for its own Contree API calls. Pull-request code gets the allowlisted
+        # environment (guardrails.isolation.untrusted_env), which never carries them.
+        key, project = contree_credentials(session_token)
+        env["NEBIUS_API_KEY"], env["NEBIUS_PROJECT_ID"] = key, project
+        if len(key) >= 8 and key not in secrets:
+            secrets.append(key)
+    for name in ("NEBIUS_PROJECT_ID", "CONTREE_PROJECT_ID"):   # redact project IDs next to the Nebius key
+        project_id = (env.get(name) or "").strip()
+        if len(project_id) >= 8 and project_id not in secrets:
+            secrets.append(project_id)
     return env, secrets
 
 
@@ -103,9 +115,20 @@ class _ScrubWriter:
         self.raw.flush()
 
 
-def contree_usable() -> bool:
+def contree_credentials(session_token: str | None = None) -> tuple[str, str]:
+    """The judge's or operator's own Nebius key and Contree project ID: environment first, then the
+    in-memory console fields. CONTREE_PROJECT_ID is accepted as the Codespaces secret name for NEBIUS_PROJECT_ID."""
+    key = (os.environ.get("NEBIUS_API_KEY") or "").strip() or (session_key.get_key(session_token) or "").strip()
+    project = ((os.environ.get("NEBIUS_PROJECT_ID") or "").strip()
+               or (os.environ.get("CONTREE_PROJECT_ID") or "").strip()
+               or (session_key.get_contree_project(session_token) or "").strip())
+    return key, project
+
+
+def contree_usable(session_token: str | None = None) -> bool:
     """True only when Contree can actually start (creds + SDK). Env alone is not enough."""
-    if not (os.environ.get("NEBIUS_API_KEY") and os.environ.get("NEBIUS_PROJECT_ID")):
+    key, project = contree_credentials(session_token)
+    if not (key and project):
         return False
     try:
         import contree_sdk  # noqa: F401
@@ -182,7 +205,7 @@ class ConsoleRunPlan(NamedTuple):
     warning: str | None
 
 
-def console_run_flags() -> ConsoleRunPlan:
+def console_run_flags(session_token: str | None = None) -> ConsoleRunPlan:
     """Extra daily_run flags for the operator console.
 
     Prefer Contree when it can actually run. Otherwise bubblewrap is the sandbox.
@@ -190,7 +213,7 @@ def console_run_flags() -> ConsoleRunPlan:
     POC_UNSAFE_NO_SANDBOX=1, which adds --unsafe-no-sandbox and a visible warning.
     """
     force = _unsafe_opt_in()
-    if contree_usable():
+    if contree_usable(session_token):
         if force:
             return ConsoleRunPlan(
                 ["--sandbox-backend", "contree", "--unsafe-no-sandbox"],
@@ -216,6 +239,8 @@ def console_run_flags() -> ConsoleRunPlan:
             f"sandbox unavailable ({why}). "
             "Proof-of-Change will not run pull-request code without a sandbox. "
             "Install bubblewrap, or set up Contree (a Nebius key, a project id, and contree-sdk). "
+            "In a Codespace you can add your own Nebius key and Contree project ID, as the Codespaces secrets "
+            "NEBIUS_API_KEY and CONTREE_PROJECT_ID or in the hidden console fields, and the check then runs in Contree. "
             "Setting POC_UNSAFE_NO_SANDBOX=1 runs the code unsandboxed and shows a warning."
         ),
         True,
@@ -640,7 +665,7 @@ def start_check(pr_url: str, *, model_provider: str = "nebius", owner: str | Non
     playback = spaces_host.playback_only(pr_url, model_provider)
     requested = model_provider
     model_provider, provider_note = resolve_console_provider(requested, session_token)
-    plan = console_run_flags()
+    plan = console_run_flags(session_token)
     if playback:
         # Playback reads a saved sample. It does not clone or run pull-request code.
         flags, run_note, refused, warning = [], spaces_host.PLAYBACK_MESSAGE, False, None
@@ -770,7 +795,8 @@ def start_check(pr_url: str, *, model_provider: str = "nebius", owner: str | Non
         child_flags.extend(recorded_demo_flags(requested))
         if requested == "recorded":
             env["POC_SKIP_COVERAGE"] = "1"
-        env, secrets = child_environment(env, model_provider, session_token)
+        env, secrets = child_environment(env, model_provider, session_token,
+                                         contree="contree" in child_flags)
         argv = console_daily_run_argv(pr_url, model_provider, child_flags)
         try:
             # Live tee: write console.log while the check runs; polls read the last ~8KB.
@@ -980,7 +1006,7 @@ class Handler(BaseHTTPRequestHandler):
             return
 
         if path == "/api/health":
-            plan = console_run_flags()
+            plan = console_run_flags(self._session_token())
             flags, note, warning = list(plan.flags), plan.note, plan.warning
             refused = plan.refused
             from poc import spaces_host
@@ -1088,7 +1114,7 @@ class Handler(BaseHTTPRequestHandler):
         viewer = None if admin else account["id"]
         session_token = self._session_token()
         if path == "/api/session/key":
-            if "nebius_api_key" not in body and "tavily_api_key" not in body:
+            if not any(k in body for k in ("nebius_api_key", "tavily_api_key", "contree_project_id")):
                 return self._json(400, {"error": "Send the key as text."})
             try:
                 if "nebius_api_key" in body:
@@ -1101,6 +1127,11 @@ class Handler(BaseHTTPRequestHandler):
                     if not isinstance(raw_key, str):
                         return self._json(400, {"error": "Send the key as text."})
                     session_key.set_tavily_key(session_token, raw_key)
+                if "contree_project_id" in body:
+                    raw_key = body.get("contree_project_id", "")
+                    if not isinstance(raw_key, str):
+                        return self._json(400, {"error": "Send the project ID as text."})
+                    session_key.set_contree_project(session_token, raw_key)
             except ValueError as exc:
                 return self._json(400, {"error": str(exc)})
             return self._json(200, {"ok": True, **session_key.public_status(session_token)})

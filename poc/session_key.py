@@ -13,6 +13,7 @@ _MAX_LEN = 500
 _lock = threading.Lock()
 _keys: dict[str, str] = {}
 _tavily_keys: dict[str, str] = {}
+_contree_projects: dict[str, str] = {}
 _ASSIGNED = re.compile(
     r"(?i)\b(NEBIUS_API_KEY|TAVILY_API_KEY|GITHUB_TOKEN|GH_TOKEN|AUTHORIZATION)\b(\s*[:=]\s*|\s+)(\S+)"
 )
@@ -46,12 +47,25 @@ def set_tavily_key(token: str | None, key: str) -> None:
     _remember(_tavily_keys, token, key)
 
 
+def set_contree_project(token: str | None, project_id: str) -> None:
+    """Remember a Contree project ID for ``token``. Memory only, like the keys."""
+    _remember(_contree_projects, token, project_id)
+
+
+def get_contree_project(token: str | None) -> str | None:
+    if not token:
+        return None
+    with _lock:
+        return _contree_projects.get(token)
+
+
 def clear_key(token: str | None) -> None:
     if not token:
         return
     with _lock:
         _keys.pop(token, None)
         _tavily_keys.pop(token, None)
+        _contree_projects.pop(token, None)
 
 
 def get_key(token: str | None) -> str | None:
@@ -85,7 +99,8 @@ def known_secrets() -> list[str]:
 
 def public_status(token: str | None) -> dict[str, bool]:
     """What the API may return. Never the key."""
-    return {"nebius_key": has_key(token), "tavily_key": has_tavily_key(token)}
+    return {"nebius_key": has_key(token), "tavily_key": has_tavily_key(token),
+            "contree_project": bool(get_contree_project(token))}
 
 
 def scrub(text: str, secrets: list[str] | None = None) -> str:

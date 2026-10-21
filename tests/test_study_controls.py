@@ -377,7 +377,7 @@ def test_console_turns_swarm_and_approval_on_explicitly(monkeypatch, tmp_path):
 
     monkeypatch.setattr(console_api.subprocess, "Popen", fake_popen)
     monkeypatch.setattr(console_api.threading, "Thread", FakeThread)
-    monkeypatch.setattr(console_api, "console_run_flags", lambda: console_api.ConsoleRunPlan([], None, False, None))
+    monkeypatch.setattr(console_api, "console_run_flags", lambda *_a, **_k: console_api.ConsoleRunPlan([], None, False, None))
     job = console_api.start_check(
         "https://github.com/me/demo/pull/3", model_provider="none", approval=True,
     )
@@ -425,7 +425,7 @@ def test_console_human_review_is_on_by_default_and_can_be_skipped(monkeypatch, t
 
     monkeypatch.setattr(console_api.subprocess, "Popen", fake_popen)
     monkeypatch.setattr(console_api.threading, "Thread", FakeThread)
-    monkeypatch.setattr(console_api, "console_run_flags", lambda: console_api.ConsoleRunPlan([], None, False, None))
+    monkeypatch.setattr(console_api, "console_run_flags", lambda *_a, **_k: console_api.ConsoleRunPlan([], None, False, None))
     job = console_api.start_check("https://github.com/me/demo/pull/3", model_provider="none")
     assert job["approval"] is True
     holder["target"]()

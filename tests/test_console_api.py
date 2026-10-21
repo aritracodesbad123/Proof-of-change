@@ -65,7 +65,7 @@ def test_start_check_sets_hitl_env(tmp_path, monkeypatch):
             pass
 
     monkeypatch.setattr(console_api.threading, "Thread", FakeThread)
-    monkeypatch.setattr(console_api, "console_run_flags", lambda: console_api.ConsoleRunPlan([], None, False, None))
+    monkeypatch.setattr(console_api, "console_run_flags", lambda *_a, **_k: console_api.ConsoleRunPlan([], None, False, None))
     monkeypatch.setattr(console_api, "REPO_ROOT", tmp_path)
     (tmp_path / "ops" / "runs" / "_jobs").mkdir(parents=True)
     (tmp_path / "ops" / "daily_run.py").write_text("# stub\n")
@@ -167,7 +167,7 @@ def test_start_check_rejects_bad_url():
 
 def test_console_run_flags_prefers_contree(monkeypatch):
     monkeypatch.delenv("POC_UNSAFE_NO_SANDBOX", raising=False)
-    monkeypatch.setattr(console_api, "contree_usable", lambda: True)
+    monkeypatch.setattr(console_api, "contree_usable", lambda *_a, **_k: True)
     plan = console_api.console_run_flags()
     assert plan.flags == ["--sandbox-backend", "contree"]
     assert "--unsafe-no-sandbox" not in plan.flags
@@ -177,7 +177,7 @@ def test_console_run_flags_prefers_contree(monkeypatch):
 
 
 def test_console_run_flags_skips_contree_without_sdk(monkeypatch):
-    monkeypatch.setattr(console_api, "contree_usable", lambda: False)
+    monkeypatch.setattr(console_api, "contree_usable", lambda *_a, **_k: False)
     monkeypatch.delenv("POC_UNSAFE_NO_SANDBOX", raising=False)
     import guardrails.sandbox as sb
     monkeypatch.setattr(sb, "check", lambda: (False, "bwrap down"))
@@ -204,7 +204,7 @@ def test_console_run_flags_refuses_when_bwrap_down(monkeypatch):
 
 def test_explicit_unsafe_opt_in_warns(monkeypatch):
     monkeypatch.setenv("POC_UNSAFE_NO_SANDBOX", "1")
-    monkeypatch.setattr(console_api, "contree_usable", lambda: False)
+    monkeypatch.setattr(console_api, "contree_usable", lambda *_a, **_k: False)
     import guardrails.sandbox as sb
     monkeypatch.setattr(sb, "check", lambda: (False, "bwrap down"))
     plan = console_api.console_run_flags()
@@ -229,7 +229,7 @@ def test_explicit_unsafe_opt_in_warns(monkeypatch):
 
 def test_unsafe_opt_in_with_contree_warns(monkeypatch):
     monkeypatch.setenv("POC_UNSAFE_NO_SANDBOX", "1")
-    monkeypatch.setattr(console_api, "contree_usable", lambda: True)
+    monkeypatch.setattr(console_api, "contree_usable", lambda *_a, **_k: True)
     plan = console_api.console_run_flags()
     assert plan.flags == ["--sandbox-backend", "contree", "--unsafe-no-sandbox"]
     assert plan.refused is False
@@ -254,7 +254,7 @@ def test_unsafe_opt_in_with_contree_warns(monkeypatch):
 def test_start_check_refuses_unsandboxed_pr_code(monkeypatch):
     """Missing sandbox and no POC_UNSAFE_NO_SANDBOX=1: the child never starts."""
     monkeypatch.delenv("SPACE_ID", raising=False)
-    monkeypatch.setattr(console_api, "contree_usable", lambda: False)
+    monkeypatch.setattr(console_api, "contree_usable", lambda *_a, **_k: False)
     import guardrails.sandbox as sb
     monkeypatch.setattr(sb, "check", lambda: (False, "bwrap down"))
     started: list[str] = []
@@ -289,7 +289,7 @@ def test_start_check_queues_job(monkeypatch):
     monkeypatch.setattr(console_api.threading, "Thread", FakeThread)
     monkeypatch.setattr(
         console_api, "console_run_flags",
-        lambda: console_api.ConsoleRunPlan(
+        lambda *_a, **_k: console_api.ConsoleRunPlan(
             ["--unsafe-no-sandbox"],
             "sandbox unavailable (test); running with --unsafe-no-sandbox",
             False,

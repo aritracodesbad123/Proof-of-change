@@ -107,3 +107,57 @@ export function TavilyKeyField({
     </form>
   )
 }
+
+/** Hidden field for the judge's own Contree project ID. The value is not written to browser storage. */
+export function ContreeProjectField({
+  stored,
+  onSave,
+}: {
+  stored: boolean
+  onSave: (value: string) => Promise<void>
+}) {
+  const [value, setValue] = useState('')
+  const [busy, setBusy] = useState(false)
+  const [message, setMessage] = useState<string | null>(null)
+
+  async function submit(event: FormEvent) {
+    event.preventDefault()
+    setBusy(true)
+    setMessage(null)
+    try {
+      await onSave(value)
+      setValue('')
+      setMessage(value.trim() ? 'Saved for this session.' : 'Cleared for this session.')
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : String(error))
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  return (
+    <form className="key-form" onSubmit={(event) => void submit(event)}>
+      <label htmlFor="contree-project">Contree project ID</label>
+      <div className="url-row">
+        <input
+          id="contree-project"
+          type="password"
+          name="contree-session-project"
+          autoComplete="off"
+          value={value}
+          onChange={(event) => setValue(event.target.value)}
+          placeholder={stored ? 'A project ID is stored for this session' : 'Paste a project ID for this session only'}
+        />
+        <button type="submit" disabled={busy}>
+          {busy ? 'Saving…' : 'Save project ID'}
+        </button>
+      </div>
+      <p className="hint">
+        With your own Nebius key and Contree project ID, a check runs in Contree sandboxes. If they are missing, the
+        check uses bubblewrap on this machine. The value stays in the server's memory for this sign-in and is not saved
+        to disk, logs, or the report. A Codespace asks for the same value as the recommended secret CONTREE_PROJECT_ID.
+      </p>
+      {message ? <p className="hint">{message}</p> : null}
+    </form>
+  )
+}

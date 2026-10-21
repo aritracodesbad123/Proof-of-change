@@ -1394,6 +1394,53 @@ def _install_system_package(rec, name, run_side) -> bool:
 
 # ---------------------------------------------------------------- execution helpers
 HOST = None   # sbx=HOST: a trusted tool on our own files (git on our clones); everything else runs in a side's sandbox
+
+# Contree-only mode: a console check chose --sandbox-backend contree and bubblewrap cannot start here. Every step that
+# runs pull-request or package code must then go through the Contree session; a local side command is refused.
+_CONTREE_ONLY = False
+
+
+class Refusal(int):
+    """Return code of a step that was refused, not run. A non-zero int, so every rc != 0 check fails safely, and it
+    carries an explicit ``refused`` flag so callers never have to compare against a magic string."""
+    refused = True
+
+    def __new__(cls, code: int = 126):
+        return super().__new__(cls, code)
+
+
+def is_refused(rc) -> bool:
+    """True when a return code (or a CompletedProcess) is a Contree-only refusal."""
+    return bool(getattr(rc, "refused", False))
+
+
+LOCAL_REFUSED = Refusal(126)
+CONTREE_ONLY_NOTE = ("Contree-only: bubblewrap cannot start on this machine, so no pull-request or package code runs "
+                     "locally. This step needs a local side and was not run.")
+CONTREE_ONLY_COVERAGE_WHY = "Contree-only check: bubblewrap can't start here, so coverage wasn't run"
+NO_SANDBOX_FALLBACK = ("Contree could not prepare the main and PR sides ({why}), and bubblewrap cannot start on this "
+                       "machine, so Proof-of-Change will not run pull-request code. Check your Nebius key and Contree "
+                       "project ID and try again.")
+
+
+def set_contree_only(on: bool) -> None:
+    global _CONTREE_ONLY
+    _CONTREE_ONLY = bool(on)
+
+
+def contree_only() -> bool:
+    return _CONTREE_ONLY
+
+
+def contree_only_wanted(backend: str | None) -> bool:
+    """True when Contree was chosen and local PR code could not run inside bubblewrap: it cannot start here, or the
+    local sandbox was switched off. With Contree on, no pull-request code ever runs locally without a sandbox."""
+    if backend != "contree":
+        return False
+    if not sandbox.enabled():
+        return True
+    ok, _ = sandbox.check()
+    return not ok
 HEAVY_RAM_PER_BUILD_GB = 8
 HEAVY_RAM_PER_JOB_GB = 2
 OOM_PHRASE = "Killed signal terminated program"
@@ -1568,13 +1615,17 @@ def _wait_child(p: subprocess.Popen, timeout, t0: float):
             _heartbeat(int(time.time() - t0))
 
 
-def run(cmd, log_path: Path, cwd=None, env=None, timeout=None, sbx=HOST) -> tuple[int | str, float]:
+def run(cmd, log_path: Path, cwd=None, env=None, timeout=None, sbx=HOST) -> tuple[int, float]:
     """Run cmd with output to log_path. env is required: always an allowlisted base_env(...). sbx: the sandbox of a
     side (side_sandbox(...)); every command that may run PR or package code passes one."""
     if env is None:
         raise ValueError("run() needs an explicit allowlisted env (base_env)")
     t0 = time.time()
     shown = list(map(str, cmd))
+    if sbx is not None and _CONTREE_ONLY:
+        with open(log_path, "a") as fh:
+            fh.write(f"\n$ {' '.join(shown)}\n[daily_run] {CONTREE_ONLY_NOTE}\n")
+        return LOCAL_REFUSED, 0.0
     if sbx is not None:
         cmd, env, cwd = sandbox.wrap(cmd, env, sbx["rw"], sbx["ro"], sbx["network"], cwd)
     with open(log_path, "a") as fh:
@@ -1678,6 +1729,10 @@ def side_cwd(venv: Path) -> Path:
 def in_side(venv: Path, cmd: list, install: bool = False, network: bool = False, cwd=None, ro: tuple = (),
             timeout: int | None = 600) -> subprocess.CompletedProcess:
     """Captured run of cmd in the side's sandbox (venv Python and uv calls: freeze, version checks, imports)."""
+    if _CONTREE_ONLY:
+        cp = subprocess.CompletedProcess([str(c) for c in cmd], LOCAL_REFUSED, "", CONTREE_ONLY_NOTE)
+        cp.refused = True
+        return cp
     env = base_env(side_home(venv), install=install)
     argv, env, cwd2 = sandbox.wrap([str(c) for c in cmd], env, **{k: v for k, v in
                                    side_sandbox(venv, network=network, ro=ro).items()}, cwd=cwd or side_cwd(venv))
@@ -1971,14 +2026,15 @@ def _contree_ready() -> bool:
 
 
 def _maybe_prepare_contree(a, repo: str, main_sha: str, pr_sha: str, rec: dict, timeout: int,
-                           extra_shell: str = "") -> None:
-    """Build Contree main/PR checkpoints for source-pair; on failure fall back to local with an explicit note.
+                           extra_shell: str = "") -> str | None:
+    """Build Contree main/PR checkpoints for source-pair. On failure fall back to local bubblewrap only when it can
+    start here; otherwise return a refusal (no pull-request code runs). Returns None when the check may continue.
 
     extra_shell is the same text for both checkpoints. Empty keeps the default install.
     """
     from poc import contree_sandboxes
     if getattr(a, "sandbox_backend", None) != "contree":
-        return
+        return None
     contree_sandboxes.clear_session()
     try:
         sess = contree_sandboxes.prepare_source_pair(repo, main_sha, pr_sha, timeout=timeout, extra_shell=extra_shell)
@@ -1986,8 +2042,16 @@ def _maybe_prepare_contree(a, repo: str, main_sha: str, pr_sha: str, rec: dict, 
         rec["machine"] = "contree"
         rec["sandbox_backend"] = "contree"
         rec["sandbox_backend_note"] = contree_sandboxes.note()
+        return None
     except contree_sandboxes.ContreeError as e:
         contree_sandboxes.clear_session()
+        ok, _why = (False, "local sandbox off") if not sandbox.enabled() else sandbox.check()
+        if _CONTREE_ONLY or not ok:
+            refusal = NO_SANDBOX_FALLBACK.format(why=e)
+            rec["sandbox_backend"] = "contree"
+            rec["sandbox_backend_note"] = refusal
+            rec["contree"] = {"failed": str(e), "fallback": None}
+            return refusal
         note = f"contree checkpoint failed ({e}); using local bubblewrap"
         contree_sandboxes.select("local")  # keep module backend in sync with the fallback
         a.sandbox_backend = "local"
@@ -1996,6 +2060,19 @@ def _maybe_prepare_contree(a, repo: str, main_sha: str, pr_sha: str, rec: dict, 
         rec["sandbox_backend_note"] = note
         rec["machine"] = "local"
         rec["contree"] = {"fallback": note}
+        return None
+
+
+def contree_only_extra_shell(declared: list[str], optional: list[str], base: str = "") -> str:
+    """Shell for both Contree checkpoints in contree-only mode: the declared test dependencies (required) and each
+    optional test backend (best effort, a failure is skipped) are installed inside Contree, not locally."""
+    import shlex as _sh
+    lines = [base] if base.strip() else []
+    if declared:
+        lines.append("python -m pip install -q " + " ".join(_sh.quote(r) for r in declared))
+    for req in optional:
+        lines.append(f"python -m pip install -q {_sh.quote(req)} || echo 'optional backend skipped: {req}'")
+    return "\n".join(lines)
 
 
 def _contree_pytest_once(side: str, targets: list[str], test_timeout: int, run_timeout: int,
@@ -3249,6 +3326,81 @@ def sandbox_refusal(backend: str | None = None) -> str | None:
     return None if ok else why
 
 
+def _contree_only_pair(a, rec: dict, repo: str, cfg: dict, item: dict, sp: dict, work: Path, prdir: Path,
+                       helper_on: bool) -> tuple:
+    """Source-pair check where every step that runs pull-request or package code runs inside Contree.
+
+    Local checkouts are only read as files (test mapping, declared dependencies, probe planning). Installs, declared
+    test dependencies and optional backends go into the Contree checkpoints; tests and probes run there. Steps that
+    need a local side (local freeze, installed-commit guard, coverage, probe coverage, the optional-module retry) are
+    not run and are recorded as such."""
+    from poc import demo_helper, run_progress
+    vm, vp = work / "venv-main", work / "venv-pr"
+    cm, cp = work / "side-main", work / "side-pr"
+    for v in (vm, vp):
+        (v / "bin").mkdir(parents=True, exist_ok=True)
+    setup_plan = _product_plan(a, rec, repo, cfg, [cm, cp]) if helper_on else None
+    run_progress.emit("claims", "super", "planning behaviour claims / probes")
+    plan = plan_probes(repo, item, rec, cm, [cp, work / "src"], prdir, a)
+    rec["pr_side_started_at"] = pr_started = freeze.now()   # nothing below may create or change a probe
+    chosen_tg = chosen_test_targets(item.get("chosen"))
+    if chosen_tg:
+        targets = {"main": [t for t in chosen_tg if (cm / t).exists()],
+                   "pr": [t for t in chosen_tg if (cp / t).exists()]}
+    else:
+        targets = targets_for_sides(map_repo_tests(item["files"], cp), item["files"], cm, cp)
+    rec["test_targets"] = targets
+    rec["test_selection"] = ("chosen-PR subset: " if chosen_tg else "mapped from touched files: ") + ", ".join(
+        targets["pr"])
+    decl = declared_test_deps(cm, list(dict.fromkeys(targets["main"] + targets["pr"])), cfg["dist"])
+    optional = optional_backend_reqs(cm, cfg["dist"])
+    base = demo_helper.contree_shell(setup_plan) if setup_plan else ""
+    rec["contree_only"] = {"note": "bubblewrap cannot start here; installs, tests and probes ran in Contree",
+                           "declared_test_deps": decl, "optional_backends": optional,
+                           "not_run_locally": ["local freeze", "installed-commit guard", "coverage",
+                                               "probe coverage", "optional-module retry"]}
+    rec["coverage"] = {"status": "not measured", "why": CONTREE_ONLY_COVERAGE_WHY}
+    run_progress.emit("install_main", detail="installing main and PR sides in Contree")
+    cnv = _maybe_prepare_contree(a, repo, sp["main_sha"], sp["pr_sha"], rec, a.build_timeout,
+                                 extra_shell=contree_only_extra_shell(decl, optional, base))
+    cmp = ex = None
+    if cnv:
+        return cmp, cnv, ex, targets
+    if decl:
+        rec["declared_test_deps"] = {"requested": decl, "installed": True, "where": "contree"}
+        rec["test_extras"] = list(dict.fromkeys([*(rec.get("test_extras") or []), *decl]))
+    if not targets["pr"]:
+        cnv = "no tests could be mapped to the touched files"
+    else:
+        run_progress.emit("pytest", "code", "dual-run pytest on main and PR (Contree)")
+        per_run, results = run_tests({"main": vm, "pr": vp}, targets, prdir, work, a.runs, a.workers,
+                                     a.test_timeout, a.run_timeout, cwds={"main": cm, "pr": cp})
+        cmp, cnv, ex = finalize_tests(rec, per_run, results, a)
+        if cmp:
+            ex = exit_check(rec.get("per_run", []), results, cmp)
+            rec["exit_check"] = ex
+    run_progress.emit("probes", "super", "running behaviour probes (Contree)")
+    rec["probes"] = run_probes(repo, item["pr"], {"main": vm / "bin/python", "pr": vp / "bin/python"}, prdir,
+                               work, a, plan, pr_started)
+    from poc import probe_adequacy
+    for it in (rec["probes"] or {}).get("items") or []:
+        it["probe_changed_line_coverage"] = probe_adequacy.assess(
+            {"status": "not measured", "why": "Contree-only check: probe coverage needs a local side"})
+    rec["probe_changed_line_coverage"] = probe_adequacy.summary((rec["probes"] or {}).get("items") or [])
+    settle_probes(rec)
+    if change_is_docstring_only(rec.get("files"), cm, cp):
+        rec["docstring_only"] = True
+    return cmp, cnv, ex, targets
+
+
+def product_route(a) -> bool:
+    """True for a product check (console, request-a-check, Codespaces, GitHub App): a single pull request started with
+    the product flags. False for a study run and the daily study."""
+    from poc import related_reports
+    return related_reports.enabled(bool(getattr(a, "related_reports", False)), bench=bool(getattr(a, "bench", False)),
+                                   single_pr=bool(getattr(a, "pr", None)))
+
+
 def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, machine: dict) -> dict:
     from poc import run_progress
     t0 = time.time()
@@ -3260,11 +3412,14 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
     shutil.rmtree(work, ignore_errors=True); work.mkdir(parents=True)
     (prdir / "pr.diff").write_text(item["diff"])
     rec = new_record(repo, cfg, item, a, machine, rdir.name, run_date_for(rdir))
+    if product_route(a):
+        rec["product_check"] = True   # coverage gate: on a product check, verified needs measured coverage
     from poc import demo_helper
     if demo_helper.active(a):
         demo_helper.begin_check(a, rec, repo, cfg.get("dist") or cfg.get("pkg"), prdir)
     if mark_typing_only(rec, item.get("files")):
         return finish_typing_only(rec, prdir, work, t0, a)
+    set_contree_only(contree_only_wanted(getattr(a, "sandbox_backend", None)))
     refusal = sandbox_refusal(getattr(a, "sandbox_backend", None))
     if refusal:   # fail closed: no PR code runs without the sandbox (unless --unsafe-no-sandbox)
         rec["verdict"], rec["reason"], _ = verdict_for(None, refusal)
@@ -3594,6 +3749,10 @@ def test_source_pair(repo: str, cfg: dict, item: dict, prdir: Path, work: Path, 
     cnv, cmp, ex = None, None, None
     if not sp["ok"]:
         cnv = sp["why"]
+    elif _CONTREE_ONLY:
+        vm, vp = work / "venv-main", work / "venv-pr"
+        cm, cp = work / "side-main", work / "side-pr"
+        cmp, cnv, ex, targets = _contree_only_pair(a, rec, repo, cfg, item, sp, work, prdir, helper_on)
     else:
         vm, vp = work / "venv-main", work / "venv-pr"
         cm, cp = work / "side-main", work / "side-pr"
@@ -3665,9 +3824,10 @@ def test_source_pair(repo: str, cfg: dict, item: dict, prdir: Path, work: Path, 
             if not cnv:
                 if helper_on:
                     shell = demo_helper.contree_shell(setup_plan) if setup_plan else ""
-                    _maybe_prepare_contree(a, repo, sp["main_sha"], sp["pr_sha"], rec, a.build_timeout, extra_shell=shell)
+                    cnv = _maybe_prepare_contree(a, repo, sp["main_sha"], sp["pr_sha"], rec, a.build_timeout,
+                                                 extra_shell=shell)
                 else:
-                    _maybe_prepare_contree(a, repo, sp["main_sha"], sp["pr_sha"], rec, a.build_timeout)
+                    cnv = _maybe_prepare_contree(a, repo, sp["main_sha"], sp["pr_sha"], rec, a.build_timeout)
             if cnv:
                 pass
             elif not targets["pr"]:
