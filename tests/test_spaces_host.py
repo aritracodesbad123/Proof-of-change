@@ -1,5 +1,6 @@
 """Hugging Face Spaces: no unsandboxed pull-request code; the vetted sample still finishes."""
 import json
+import time
 
 import pytest
 
@@ -66,6 +67,42 @@ def test_a_space_without_a_sandbox_only_plays_the_vetted_sample(tmp_path, monkey
     saved = json.loads((tmp_path / "playback" / "mlxtend-1229" / "record.json").read_text())
     assert saved["playback"] is True
     assert "owner" not in saved
+
+
+def test_recorded_playback_finishes_on_any_host_without_a_sandbox(tmp_path, monkeypatch):
+    """The vetted sample plays back wherever the sandbox is closed. No child process starts."""
+    monkeypatch.delenv("SPACE_ID", raising=False)
+    monkeypatch.delenv("NEBIUS_API_KEY", raising=False)
+    monkeypatch.delenv("NEBIUS_PROJECT_ID", raising=False)
+    monkeypatch.delenv("POC_UNSAFE_NO_SANDBOX", raising=False)
+    import guardrails.sandbox as sb
+    monkeypatch.setattr(sb, "check", lambda: (False, "bwrap down"))
+    monkeypatch.setattr(console_api, "RUNS_ROOT", tmp_path)
+    monkeypatch.setattr(console_api, "REPO_ROOT", tmp_path)
+    monkeypatch.setattr(spaces_host.time, "sleep", lambda _s: None)
+    assert spaces_host.playback_only(spaces_host.VETTED_URL, "recorded") is True
+    assert spaces_host.playback_only("https://github.com/me/demo/pull/9", "recorded") is False
+
+    def refuse_process(*_args, **_kwargs):
+        raise AssertionError("pull-request code must not start without a sandbox")
+
+    monkeypatch.setattr(console_api.subprocess, "Popen", refuse_process)
+    with pytest.raises(ValueError, match="will not run pull-request code"):
+        console_api.start_check("https://github.com/me/demo/pull/9", model_provider="recorded")
+
+    job = console_api.start_check(spaces_host.VETTED_URL, model_provider="recorded")
+    assert job["run_flags"] == []
+    assert job["refused"] is False
+    deadline = time.time() + 5
+    while time.time() < deadline:
+        got = console_api.get_job(job["id"])
+        if got and got["status"] in {"done", "failed", "timed out"}:
+            break
+        time.sleep(0.02)
+    got = console_api.get_job(job["id"])
+    assert got["status"] == "done"
+    assert got["record"]["playback"] is True
+    assert "No pull-request code ran" in (got.get("log_tail") or "")
 
 
 def test_without_space_id_the_block_does_not_apply(monkeypatch):
