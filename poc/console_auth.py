@@ -33,6 +33,7 @@ import re
 import secrets
 import shutil
 import smtplib  # br-allow-external: console emails a one-time sign-in code
+import stat
 import subprocess
 import sys
 import threading
@@ -921,24 +922,59 @@ def access_code_path(env: dict[str, str] | os._Environ[str] | None = None) -> Pa
     return Path((env.get("POC_CONSOLE_CODE_FILE") or "").strip() or "/tmp/poc-console-code")
 
 
-def ensure_access_code(env: dict[str, str] | os._Environ[str] | None = None) -> None:
-    """Create the console code file (owner-only) when it does not exist. The code is never logged."""
-    path = access_code_path(env)
-    if path.exists():
-        return
+def _code_file_ok(path: Path) -> bool:
+    """True when the code file is a regular file we own with mode 0600, opened without following links."""
     try:
-        fd = os.open(str(path), os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+        fd = os.open(str(path), os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0))
+    except OSError:
+        return False
+    try:
+        st = os.fstat(fd)
+    finally:
+        os.close(fd)
+    return stat.S_ISREG(st.st_mode) and st.st_uid == os.getuid() and stat.S_IMODE(st.st_mode) == 0o600
+
+
+def ensure_access_code(env: dict[str, str] | os._Environ[str] | None = None) -> None:
+    """Create the console code file (owner-only, 0600). The code is never logged.
+
+    A symlink, or a file that is not ours with mode 0600, is removed and replaced.
+    """
+    path = access_code_path(env)
+    if os.path.lexists(path):
+        if not os.path.islink(path) and _code_file_ok(path):
+            return
+        try:
+            os.unlink(path)
+        except OSError:
+            return
+    try:
+        fd = os.open(str(path), os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, "O_NOFOLLOW", 0), 0o600)
     except OSError:
         return
     with os.fdopen(fd, "w") as fh:
+        os.fchmod(fh.fileno(), 0o600)
         fh.write(secrets.token_hex(16) + "\n")
 
 
 def _read_access_code(env: dict[str, str] | os._Environ[str] | None = None) -> str:
+    path = access_code_path(env)
     try:
-        return access_code_path(env).read_text().strip()
+        fd = os.open(str(path), os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0))
     except OSError:
         return ""
+    try:
+        st = os.fstat(fd)
+        if not (stat.S_ISREG(st.st_mode) and st.st_uid == os.getuid() and stat.S_IMODE(st.st_mode) == 0o600):
+            return ""
+        with os.fdopen(fd, "r") as fh:
+            fd = -1
+            return fh.read().strip()
+    except OSError:
+        return ""
+    finally:
+        if fd != -1:
+            os.close(fd)
 
 
 def redeem_access_code(code: str, env: dict[str, str] | os._Environ[str] | None = None) -> str:
@@ -953,6 +989,7 @@ def redeem_access_code(code: str, env: dict[str, str] | os._Environ[str] | None 
     if not single_user_requested(env):
         raise AuthError("Sign in first.", 401)
     if codespace_port_visibility() == "public":
+        _access_tokens.clear()
         raise AuthError(PORT_PUBLIC_MESSAGE, 401)
     if _access_failures >= _ACCESS_MAX_FAILURES:
         raise AuthError("Too many wrong console codes. Restart the console to try again.", 429)
@@ -972,7 +1009,11 @@ def _code_session(token: str | None, env: dict[str, str] | os._Environ[str] | No
         return False
     if _session_digest(token) not in _access_tokens:
         return False
-    return codespace_port_visibility() != "public"
+    if codespace_port_visibility() == "public":
+        # A public port ends every code session, not just this request.
+        _access_tokens.clear()
+        return False
+    return True
 
 
 def reset_port_cache() -> None:
@@ -992,9 +1033,10 @@ def _flag_on(env: dict[str, str] | os._Environ[str], name: str) -> bool:
 
 
 def single_user_requested(env: dict[str, str] | os._Environ[str] | None = None) -> bool:
-    """True only for a Codespace, or when the dev container set POC_SINGLE_USER."""
+    """True only inside a Codespace. POC_SINGLE_USER is honoured only when CODESPACES is also set,
+    so a hosted console can never skip sign-in or offer the console code."""
     env = os.environ if env is None else env
-    return _flag_on(env, "CODESPACES") or _flag_on(env, "POC_SINGLE_USER")
+    return _flag_on(env, "CODESPACES")
 
 
 def _port_visibility(raw: str | None, port: int = CONSOLE_PORT) -> str | None:
@@ -1077,6 +1119,7 @@ def sign_in_skip(env: dict[str, str] | os._Environ[str] | None = None) -> tuple[
         return False, None
     visibility = codespace_port_visibility()
     if visibility == "public":
+        _access_tokens.clear()
         return False, PORT_PUBLIC_MESSAGE
     if visibility is None:
         # gh missing or failing: we cannot prove the port is private, so sign-in stays on.
