@@ -218,8 +218,12 @@ def queue_order(issues: list[dict]) -> list[dict]:
 
 
 def default_check_argv(python: str, root: Path, pr_url: str) -> list[str]:
-    """The normal check: default flags, sandboxed. No unsandboxed switch."""
-    return [python, str(root / "ops" / "daily_run.py"), "--pr", pr_url]
+    """The normal check for a pull request a person submitted.
+
+    Sandboxed, with the advisory swarm on. No unsandboxed switch. A study run
+    and a benchmark run do not use this command, so their default stays off.
+    """
+    return [python, str(root / "ops" / "daily_run.py"), "--swarm", "--pr", pr_url]
 
 
 def already_said(comments: list[str], marker: str) -> bool:

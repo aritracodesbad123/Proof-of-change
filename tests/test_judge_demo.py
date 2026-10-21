@@ -218,6 +218,26 @@ def test_codespace_uses_contree_without_the_unsandboxed_flag(monkeypatch):
     assert plan.note and "Contree" in plan.note
 
 
+def test_worker_command_includes_the_swarm(tmp_path):
+    """A requested pull request is checked with the advisory swarm on."""
+    url = "https://github.com/me/demo/pull/3"
+    argv = request_worker.default_check_argv("python3", tmp_path, url)
+    assert "--swarm" in argv
+    assert argv[-2:] == ["--pr", url]
+    assert "--unsafe-no-sandbox" not in argv
+
+
+def test_codespace_start_turns_the_swarm_on():
+    """The Codespace one-command start sets POC_SWARM for the console, which also passes --swarm."""
+    root = Path(__file__).resolve().parents[1]
+    cfg = json.loads((root / ".devcontainer" / "devcontainer.json").read_text())
+    start = cfg["postStartCommand"]
+    assert "POC_SWARM=1" in start
+    assert "poc.console_api" in start
+    argv = console_api.console_daily_run_argv("https://github.com/me/demo/pull/3", "recorded")
+    assert "--swarm" in argv
+
+
 def test_quiet_window_cap_study_lock_and_offline():
     assert request_worker.in_quiet_window(_at(10, 39)) is False
     assert request_worker.in_quiet_window(_at(10, 40)) is True
@@ -321,6 +341,7 @@ def test_worker_runs_one_sandboxed_check_and_hides_the_token(tmp_path, capsys):
     )
     assert len(calls) == 1
     assert calls[0][-2:] == ["--pr", url]
+    assert "--swarm" in calls[0]
     assert "--unsafe-no-sandbox" not in calls[0]
     assert state["started"] == 1
     body = client.posted[-1][1]
