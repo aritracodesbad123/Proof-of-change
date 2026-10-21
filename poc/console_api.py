@@ -136,9 +136,10 @@ def console_daily_run_argv(pr_url: str, model_provider: str, extra_flags: list[s
     report_dir = (os.environ.get("POC_REPORT_DIR") or "").strip()
     if report_dir:
         extra.extend(["--report-dir", report_dir])
+    from poc import related_reports
     return [exe, str(REPO_ROOT / "ops" / "daily_run.py"),
             "--pr", pr_url.strip(), "--model-provider", model_provider,
-            "--swarm", "--console-job", *extra]
+            "--swarm", "--console-job", *related_reports.product_flags(), *extra]
 
 
 _UNSAFE_WARNING = (

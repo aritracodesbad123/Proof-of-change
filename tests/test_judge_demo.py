@@ -225,6 +225,7 @@ def test_worker_command_includes_the_swarm(tmp_path):
     url = "https://github.com/me/demo/pull/3"
     argv = request_worker.default_check_argv("python3", tmp_path, url)
     assert "--swarm" in argv
+    assert "--related-reports" in argv
     assert argv[-2:] == ["--pr", url]
     assert "--unsafe-no-sandbox" not in argv
 

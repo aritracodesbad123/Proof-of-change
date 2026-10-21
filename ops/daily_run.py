@@ -3410,6 +3410,31 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
     return finish(gate(rec), prdir, work, t0, a)
 
 
+def _attach_related_reports(rec: dict, runner) -> None:
+    """Store related bug reports when this product check asked and the swarm will run.
+
+    The text is background for the advisory AI. A study run, the daily study, and a check
+    whose swarm is off leave the record alone and do not call Tavily. A missing key or a
+    failed lookup is one log line. The exception text is not printed, because it can
+    contain the key. This never changes the verdict.
+    """
+    from poc import agents, related_reports
+    if not agents.swarm_enabled(bool(getattr(runner, "swarm", False))):
+        return
+    if runner is None or getattr(runner, "provider", None) is None or getattr(runner, "model_skipped", None):
+        return
+    if not related_reports.enabled(
+            bool(getattr(runner, "related_reports", False)),
+            bench=bool(getattr(runner, "bench", False)),
+            single_pr=bool(getattr(runner, "pr", None))):
+        return
+    try:
+        rec["related_reports"] = related_reports.collect(rec)
+    except Exception:  # noqa: BLE001 — do not print the message; it may contain the key
+        print(related_reports.FAIL_LOG, flush=True)
+        rec["related_reports"] = {"status": "error", "text": "", "items": [], "untrusted": True}
+
+
 def finish(rec: dict, prdir: Path, work: Path, t0: float, runner=None) -> dict:
     # Agent swarm (judge/helper/summary) after the code verdict; advisory only — never changes rec["verdict"].
     # Off unless the run asked (--swarm / POC_SWARM). Skip also when model_skipped is set
@@ -3422,6 +3447,9 @@ def finish(rec: dict, prdir: Path, work: Path, t0: float, runner=None) -> dict:
     ran_swarm = False
     if (swarm_requested and runner is not None and getattr(runner, "provider", None) is not None
             and not getattr(runner, "model_skipped", None)):
+        # Related bug reports are background for this advisory step only. The verdict above
+        # this function is already final. When the swarm is off, Tavily is not called.
+        _attach_related_reports(rec, runner)
         agents.run_swarm(runner.provider, rec)
         ran_swarm = True
     elif runner is not None and getattr(runner, "model_skipped", None) and "agents" not in rec:
@@ -4299,6 +4327,11 @@ def main(argv=None) -> int:
                          "plain-language summary). Off by default for command-line and benchmark runs, so "
                          "they make no swarm model calls. Also on when POC_SWARM is 1, true, yes, or on. "
                          "The operator console turns this on itself.")
+    ap.add_argument("--related-reports", action="store_true",
+                    help="on a product check, look up a few related public bug reports and pass them to the "
+                         "advisory AI as quoted background. Off for a study run and the daily study, even "
+                         "if this flag is set on a benchmark. Skipped when TAVILY_API_KEY is not set. "
+                         "Does not change the verdict and does not choose packages.")
     ap.add_argument("--console-job", action="store_true",
                     help="passed only by the operator console, on a single pull-request check. "
                          "With this flag that check may start while POC_HITL is set. "

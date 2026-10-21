@@ -62,6 +62,23 @@ def test_verdicts_and_summary_order(run, tmp_path):
     assert (tmp_path / "out" / "widget-2" / "REPORT.html").exists()
 
 
+def test_related_bug_reports_are_labelled_background(run, tmp_path):
+    label = "Background (related public bug reports, not used for the verdict)"
+    text = '"Window bug" https://github.com/acme/widgets/issues/9'
+    d = run / "widget-1"
+    rec = json.loads((d / "record.json").read_text())
+    rec["related_reports"] = {"status": "ok", "text": text, "items": [], "untrusted": True}
+    (d / "record.json").write_text(json.dumps(rec))
+    pr_report.render_run(run, tmp_path / "out", formats=("md",))
+    md = (tmp_path / "out" / "widget-1" / "REPORT.md").read_text()
+    assert f"### {label}" in md
+    assert md.index(label) < md.index(text)
+    bare = run / "widget-3"
+    other = (tmp_path / "out" / "widget-3" / "REPORT.md").read_text()
+    assert label not in other
+    assert "widget-3" in str(bare)
+
+
 def test_report_header_names_the_proof_of_change_commit(run, tmp_path):
     d = run / "widget-1"
     rec = json.loads((d / "record.json").read_text())
