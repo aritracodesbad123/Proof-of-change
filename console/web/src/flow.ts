@@ -8,6 +8,7 @@ export type NodeId =
   | 'install-head'
   | 'existing-tests'
   | 'ai-write'
+  | 'human-review'
   | 'before-after'
   | 'compare'
   | 'verifier'
@@ -35,6 +36,7 @@ export const FLOW_ORDER: NodeId[] = [
   'install-head',
   'existing-tests',
   'ai-write',
+  'human-review',
   'before-after',
   'compare',
   'verifier',
@@ -49,12 +51,18 @@ const COPY: Record<NodeId, { label: string; hint: string; x: number; y: number }
   'install-base': { label: 'Install original', hint: 'Install the original side.', x: 460, y: 48 },
   'install-head': { label: 'Install the change', hint: 'Install the change in a sandbox.', x: 460, y: 252 },
   'existing-tests': { label: 'Run existing tests', hint: 'The project’s own tests, on both sides.', x: 700, y: 48 },
-  'ai-write': { label: 'Write extra checks', hint: 'Extra checks written for this change.', x: 700, y: 252 },
-  'before-after': { label: 'Run them on both sides', hint: 'The extra checks run before and after the change.', x: 940, y: 252 },
-  compare: { label: 'Compare and drop noise', hint: 'Keep differences that are not noise.', x: 940, y: 48 },
-  verifier: { label: 'Reviewer / verifier', hint: 'Plain code checks the comparison.', x: 1160, y: 150 },
-  verdict: { label: 'Verdict and report', hint: 'The checker’s verdict and the report.', x: 1360, y: 150 },
-  advice: { label: 'Reviewer notes', hint: "Doesn't change the verdict.", x: 1560, y: 150 },
+  'ai-write': { label: 'AI writes probes', hint: 'Behaviour probes written for this change.', x: 700, y: 252 },
+  'human-review': {
+    label: 'Human review',
+    hint: 'You keep or drop each probe and add your own test ideas before anything runs.',
+    x: 900,
+    y: 252,
+  },
+  'before-after': { label: 'Run them on both sides', hint: 'The probes run before and after the change.', x: 1100, y: 252 },
+  compare: { label: 'Compare and drop noise', hint: 'Keep differences that are not noise.', x: 1100, y: 48 },
+  verifier: { label: 'Reviewer / verifier', hint: 'Plain code checks the comparison.', x: 1320, y: 150 },
+  verdict: { label: 'Verdict and report', hint: 'The checker’s verdict and the report.', x: 1520, y: 150 },
+  advice: { label: 'Reviewer notes', hint: "Doesn't change the verdict.", x: 1720, y: 150 },
 }
 
 export const FLOW_EDGES: [NodeId, NodeId][] = [
@@ -66,7 +74,8 @@ export const FLOW_EDGES: [NodeId, NodeId][] = [
   ['install-head', 'existing-tests'],
   ['install-base', 'ai-write'],
   ['checkout-head', 'ai-write'],
-  ['ai-write', 'before-after'],
+  ['ai-write', 'human-review'],
+  ['human-review', 'before-after'],
   ['install-base', 'before-after'],
   ['install-head', 'before-after'],
   ['existing-tests', 'compare'],
@@ -105,6 +114,7 @@ function failRest(marks: Record<NodeId, Mark>, id: NodeId, detail: string) {
 
 export function statesFromEvents(events: StageEvent[]): Record<NodeId, Mark> {
   const marks = blank()
+  const sawReview = events.some((event) => event.stage === 'await_human')
   for (const event of events) {
     const stage = event.stage || ''
     const detail = event.detail || ''
@@ -112,7 +122,11 @@ export function statesFromEvents(events: StageEvent[]): Record<NodeId, Mark> {
     else if (stage === 'install_main') doneThrough(marks, 'install-base', detail)
     else if (stage === 'install_pr') doneThrough(marks, 'install-head', detail)
     else if (stage === 'claims') doneThrough(marks, 'ai-write', detail)
-    else if (stage === 'probes') doneThrough(marks, 'before-after', detail)
+    else if (stage === 'await_human') doneThrough(marks, 'human-review', detail || 'Waiting for your review')
+    else if (stage === 'probes') {
+      if (!sawReview) marks['human-review'] = { state: 'skipped', detail: 'Review skipped for this check' }
+      doneThrough(marks, 'before-after', detail)
+    }
     else if (stage === 'pytest') {
       if (detail === 'before coverage') {
         marks['existing-tests'] = { state: 'done', detail }
@@ -157,14 +171,17 @@ export function statesFromRecord(record: Record<string, unknown>): Record<NodeId
   if (has(record, 'freeze') || has(record, 'main_side')) set('install-base', 'done')
   if (buildFailed) {
     set('install-head', 'failed', String(prSide.why))
-    for (const id of ['existing-tests', 'ai-write', 'before-after', 'compare', 'verifier', 'verdict', 'advice'] as NodeId[]) {
+    for (const id of ['existing-tests', 'ai-write', 'human-review', 'before-after', 'compare', 'verifier', 'verdict', 'advice'] as NodeId[]) {
       set(id, 'skipped')
     }
     return marks
   }
   if (has(record, 'pr_side') || has(record, 'freeze')) set('install-head', 'done')
   if (has(record, 'per_run') || has(record, 'comparison')) set('existing-tests', 'done')
-  if (has(record, 'behaviour_claims') || has(record, 'probe_plan') || has(record, 'probes')) set('ai-write', 'done')
+  if (has(record, 'behaviour_claims') || has(record, 'probe_plan') || has(record, 'probes')) {
+    set('ai-write', 'done')
+    set('human-review', record.operator_approval === 'on' || has(record, 'hitl_approval') ? 'done' : 'skipped')
+  }
   const probes = record.probes as { items?: Array<{ observations?: unknown[] }> } | undefined
   if (probes?.items?.some((item) => (item.observations || []).length > 0)) set('before-after', 'done')
   if (has(record, 'comparison')) set('compare', 'done')

@@ -121,7 +121,7 @@ export default function App() {
   const [contreeReady, setContreeReady] = useState<boolean | null>(null)
   const [prUrl, setPrUrl] = useState('')
   const [provider, setProvider] = useState('nebius')
-  const [approval, setApproval] = useState(false)
+  const [approval, setApproval] = useState(true)
   const approvalDefaultApplied = useRef(false)
   const [keyStored, setKeyStored] = useState(false)
   const [tavilyStored, setTavilyStored] = useState(false)
@@ -445,11 +445,12 @@ export default function App() {
                     checked={approval}
                     onChange={(event) => setApproval(event.target.checked)}
                   />
-                  Pause for approval before probes run
+                  Review the AI's probes before tests run (recommended)
                 </label>
                 <p className="hint">
-                  Off by default, so the check runs straight through. Tick it, or set POC_CONSOLE_APPROVAL=1, to pause
-                  and review probes. A study run still refuses that step.
+                  On by default. The AI drafts behaviour probes, you keep or drop each one and add your own test
+                  ideas, then the tests run. Untick it to skip the review for this check. Study and benchmark runs never
+                  pause.
                 </p>
                 <label htmlFor="provider">Model provider</label>
                 <select id="provider" value={provider} onChange={(event) => setProvider(event.target.value)}>

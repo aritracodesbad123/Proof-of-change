@@ -393,8 +393,8 @@ def test_console_turns_swarm_and_approval_on_explicitly(monkeypatch, tmp_path):
     assert job["approval"] is True
 
 
-def test_console_approval_is_off_unless_this_check_asks(monkeypatch, tmp_path):
-    """Default off, including when the parent process has POC_HITL. A study run is unchanged."""
+def test_console_human_review_is_on_by_default_and_can_be_skipped(monkeypatch, tmp_path):
+    """A console check pauses for human review by default. The person can skip it for that check."""
     _quiet_env(monkeypatch)
     monkeypatch.delenv("POC_CONSOLE_APPROVAL", raising=False)
     monkeypatch.setenv("POC_HITL", "1")
@@ -427,19 +427,83 @@ def test_console_approval_is_off_unless_this_check_asks(monkeypatch, tmp_path):
     monkeypatch.setattr(console_api.threading, "Thread", FakeThread)
     monkeypatch.setattr(console_api, "console_run_flags", lambda: console_api.ConsoleRunPlan([], None, False, None))
     job = console_api.start_check("https://github.com/me/demo/pull/3", model_provider="none")
-    assert job["approval"] is False
-    holder["target"]()
-    assert "POC_HITL" not in captured["env"]
-    assert "POC_HITL_DIR" not in captured["env"]
-    assert "--swarm" in captured["argv"] and "--console-job" in captured["argv"]
-
-    monkeypatch.setenv("POC_CONSOLE_APPROVAL", "1")
-    job = console_api.start_check("https://github.com/me/demo/pull/4", model_provider="none")
     assert job["approval"] is True
     holder["target"]()
     assert captured["env"]["POC_HITL"] == "1"
+    assert captured["env"].get("POC_HITL_DIR")
+    assert "--swarm" in captured["argv"] and "--console-job" in captured["argv"]
+
+    # The default is the console's own per-check setting, not a machine-wide variable.
+    monkeypatch.setenv("POC_CONSOLE_APPROVAL", "0")
+    job = console_api.start_check("https://github.com/me/demo/pull/4", model_provider="none")
+    assert job["approval"] is True
+    monkeypatch.delenv("POC_CONSOLE_APPROVAL", raising=False)
 
     job = console_api.start_check("https://github.com/me/demo/pull/5", model_provider="none", approval=False)
     assert job["approval"] is False
     holder["target"]()
     assert "POC_HITL" not in captured["env"]
+
+
+def test_human_review_default_is_console_only(monkeypatch):
+    """The default-on review belongs to the console. Automatic routes never pause for a person."""
+    from poc import hitl
+
+    monkeypatch.delenv("POC_CONSOLE_APPROVAL", raising=False)
+    assert console_api.console_approval_on(None) is True
+    assert console_api.console_approval_on(False) is False
+
+    # Outside a console job (study, daily study, benchmark, CLI, GitHub App, request-a-check)
+    # the review never turns on, and a requested one makes study and benchmark runs refuse.
+    monkeypatch.delenv("POC_HITL", raising=False)
+    monkeypatch.delenv("POC_CONSOLE", raising=False)
+    assert hitl.hitl_enabled() is False
+    assert hitl.study_operator_approval_stop(bench=False) is None
+    assert hitl.study_operator_approval_stop(bench=True) is None
+    monkeypatch.setenv("POC_HITL", "1")
+    assert hitl.hitl_enabled() is False
+    assert hitl.study_operator_approval_stop(bench=True)
+    assert hitl.study_operator_approval_stop(bench=True, console_job=True, single_pr=True)
+    assert hitl.study_operator_approval_stop(bench=False)
+
+
+def test_github_app_and_request_a_check_stay_automatic_when_console_review_is_on(monkeypatch, tmp_path):
+    """No person is present on these routes. They never pause, even when the console has review on."""
+    from ops import request_worker
+    from poc import github_app, hitl
+
+    monkeypatch.setenv("POC_CONSOLE_APPROVAL", "1")
+    monkeypatch.setenv("POC_HITL", "1")
+    monkeypatch.setenv("POC_HITL_DIR", str(tmp_path))
+    monkeypatch.setenv("POC_CONSOLE", "1")
+    assert console_api.console_approval_on(None) is True  # the console's own per-check default
+
+    # GitHub App: no --console-job, so the approval step can never start for its check.
+    app_argv = github_app.check_argv("https://github.com/me/demo/pull/7")
+    assert "--console-job" not in app_argv
+
+    # Request-a-check: no --console-job, and the child gets none of the review switches.
+    argv = request_worker.default_check_argv(sys.executable, tmp_path, "https://github.com/me/demo/pull/8")
+    assert "--console-job" not in argv
+    captured = {}
+
+    class Done:
+        returncode = 0
+        stdout = ""
+        stderr = ""
+
+    def fake_run(argv, **kw):
+        captured["env"] = kw.get("env") or {}
+        return Done()
+
+    monkeypatch.setattr(request_worker.subprocess, "run", fake_run)
+    try:
+        request_worker.run_check("https://github.com/me/demo/pull/8", request_worker.Settings(root=tmp_path), [])
+    except Exception:
+        pass  # only the child environment matters here
+    env = captured["env"]
+    for name in ("POC_HITL", "POC_HITL_DIR", "POC_CONSOLE", "POC_CONSOLE_APPROVAL"):
+        assert name not in env, name
+    monkeypatch.delenv("POC_CONSOLE", raising=False)
+    monkeypatch.delenv("POC_HITL", raising=False)
+    assert hitl.hitl_enabled() is False
