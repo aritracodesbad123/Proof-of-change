@@ -1,0 +1,21 @@
+{
+ "probe": null,
+ "runs": {
+  "add": [
+   "PPP",
+   "PPP"
+  ],
+  "clip_high": [
+   "---",
+   "PPP"
+  ],
+  "clip_low": [
+   "PPP",
+   "PPP"
+  ],
+  "mean": [
+   "PPP",
+   "PPP"
+  ]
+ }
+}

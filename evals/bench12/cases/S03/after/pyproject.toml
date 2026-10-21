@@ -1,0 +1,4 @@
+[project]
+name = "toypkg"
+version = "0.1"
+dependencies = ["toypkg-missing-dep==99.0"]

@@ -1,0 +1,51 @@
+{
+ "probe": {
+  "changed_lines_covered": 1,
+  "changed_lines_total": 1,
+  "claims": [
+   {
+    "covers": [
+     "add_zero"
+    ],
+    "expect": "same",
+    "id": "C1"
+   }
+  ],
+  "main": [
+   {
+    "add_zero": 4
+   },
+   {
+    "add_zero": 4
+   },
+   {
+    "add_zero": 4
+   }
+  ],
+  "pr": [
+   {
+    "add_zero": 5
+   },
+   {
+    "add_zero": 5
+   },
+   {
+    "add_zero": 5
+   }
+  ]
+ },
+ "runs": {
+  "add": [
+   "PPP",
+   "PPP"
+  ],
+  "clip_low": [
+   "PPP",
+   "PPP"
+  ],
+  "mean": [
+   "PPP",
+   "PPP"
+  ]
+ }
+}

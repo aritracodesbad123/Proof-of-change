@@ -1,0 +1,1 @@
+Fix clip's top bound and fix mean on an empty list.
