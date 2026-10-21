@@ -1,0 +1,745 @@
+{
+ "seed": 20261022,
+ "pool_size": 81,
+ "per_repo_cap": 3,
+ "draw_order_indices": [
+  45,
+  74,
+  36,
+  22,
+  6,
+  30,
+  29,
+  75,
+  0,
+  69,
+  16,
+  7,
+  25,
+  24,
+  39,
+  13,
+  67,
+  19,
+  32,
+  71,
+  65,
+  37,
+  28,
+  72,
+  59,
+  61,
+  23,
+  9,
+  56,
+  77,
+  73,
+  3,
+  49,
+  53,
+  47,
+  79,
+  4,
+  76,
+  78,
+  14,
+  62,
+  40,
+  21,
+  43,
+  11
+ ],
+ "skipped_same_repo_cap": [
+  19,
+  71,
+  65,
+  72,
+  59,
+  61,
+  23,
+  56,
+  73,
+  49,
+  53,
+  47,
+  78,
+  62,
+  21
+ ],
+ "drawn": [
+  {
+   "repo": "Second-Hand-Friends/kleinanzeigen-bot",
+   "number": 1361,
+   "url": "https://github.com/Second-Hand-Friends/kleinanzeigen-bot/pull/1361",
+   "title": "feat: add manual browser login command",
+   "author": "1cu",
+   "merged_at": "2026-10-17T19:42:14Z",
+   "base_sha": "594f623cf87ce7f8eefe76da02642af064c957eb",
+   "head_sha": "5258d75baff447f26f70c7ae4d5ed9a441dbcd95",
+   "merge_commit_sha": "7a3e364051c961b293412af4622bd91e2a460a35",
+   "additions": 222,
+   "deletions": 1,
+   "py_source_files": [
+    "src/kleinanzeigen_bot/app.py",
+    "src/kleinanzeigen_bot/cli.py",
+    "src/kleinanzeigen_bot/runtime_config.py",
+    "src/kleinanzeigen_bot/utils/web_scraping_mixin.py"
+   ],
+   "py_test_files": [
+    "tests/integration/test_web_scraping_mixin_integration.py",
+    "tests/unit/test_app.py",
+    "tests/unit/test_web_scraping_mixin.py"
+   ],
+   "stars": 434,
+   "pool_index": 45
+  },
+  {
+   "repo": "The-PR-Agent/pr-agent",
+   "number": 4189,
+   "url": "https://github.com/The-PR-Agent/pr-agent/pull/4189",
+   "title": "perf(similar_issue): batch embeddings before individual retries",
+   "author": "PeterDaveHello",
+   "merged_at": "2026-10-20T07:54:28Z",
+   "base_sha": "59638246e41d37caf1d95435e00718859e35b69b",
+   "head_sha": "c8a5bd91fcf5367590a8c050d3702ec51a826ba2",
+   "merge_commit_sha": "cbaa5f0d0bc2d1d940e5ae20a89247486251bf62",
+   "additions": 89,
+   "deletions": 10,
+   "py_source_files": [
+    "pr_agent/tools/pr_similar_issue.py"
+   ],
+   "py_test_files": [
+    "tests/unittest/test_similar_issue_embeddings.py"
+   ],
+   "stars": 13534,
+   "pool_index": 74
+  },
+  {
+   "repo": "optiland/optiland",
+   "number": 962,
+   "url": "https://github.com/optiland/optiland/pull/962",
+   "title": "Align dock and document tabs at the top",
+   "author": "BrunoChevalier",
+   "merged_at": "2026-10-20T15:06:20Z",
+   "base_sha": "1e0513902c68948a727394c6226f3580c7261c65",
+   "head_sha": "9fd0f199e62e97fc922135c4a1bb4ab890119576",
+   "merge_commit_sha": "a2575ed0b49443cd4a44597cbb25361bd46e1901",
+   "additions": 156,
+   "deletions": 1,
+   "py_source_files": [
+    "optiland_gui/config.py",
+    "optiland_gui/lens_editor.py",
+    "optiland_gui/main_window.py",
+    "optiland_gui/optimization_panel.py",
+    "optiland_gui/viewer_panel.py",
+    "optiland_gui/widgets/python_terminal.py"
+   ],
+   "py_test_files": [
+    "tests/gui/test_document_view_preferences.py",
+    "tests/gui/test_surface_properties_panels.py",
+    "tests/gui/test_tab_placement.py"
+   ],
+   "stars": 1022,
+   "pool_index": 36
+  },
+  {
+   "repo": "home-assistant/core",
+   "number": 187420,
+   "url": "https://github.com/home-assistant/core/pull/187420",
+   "title": "Follow UniFi site ID change in Network 11",
+   "author": "bas-slats",
+   "merged_at": "2026-10-20T16:16:49Z",
+   "base_sha": "9b4cd3839f905ef55ddafbfebf5202d033a96aa8",
+   "head_sha": "87bb89f442bb1ec341c55b2b05d2051a1308c49a",
+   "merge_commit_sha": "e6d7e1bf744e5337354e0614118c9642db3f114e",
+   "additions": 121,
+   "deletions": 3,
+   "py_source_files": [
+    "homeassistant/components/unifi/hub/hub.py"
+   ],
+   "py_test_files": [
+    "tests/components/unifi/test_hub.py"
+   ],
+   "stars": 91632,
+   "pool_index": 22
+  },
+  {
+   "repo": "caronc/apprise",
+   "number": 1783,
+   "url": "https://github.com/caronc/apprise/pull/1783",
+   "title": "tags= and tag= on urls not supported",
+   "author": "caronc",
+   "merged_at": "2026-10-11T21:14:36Z",
+   "base_sha": "c511e1d4bc61244d48ee1ec6d48c7149977d10d1",
+   "head_sha": "133d8b877e87121fb2c0a929f90c37bf88cb5de9",
+   "merge_commit_sha": "9b64369caf961c5651bd90893f8b7ed097dd925a",
+   "additions": 56,
+   "deletions": 23,
+   "py_source_files": [
+    "apprise/utils/yaml.py"
+   ],
+   "py_test_files": [
+    "tests/test_apprise_template.py",
+    "tests/test_apprise_template_placement.py",
+    "tests/test_utils_yaml.py"
+   ],
+   "stars": 17628,
+   "pool_index": 6
+  },
+  {
+   "repo": "mlflow/mlflow",
+   "number": 26542,
+   "url": "https://github.com/mlflow/mlflow/pull/26542",
+   "title": "Load latest Databricks scorers from the scheduled-scorers REST config so feedback records the scorer version",
+   "author": "joshuawong-db",
+   "merged_at": "2026-10-12T02:40:25Z",
+   "base_sha": "c35e8ae22d4f0825ac66737c2a84971ed791b0db",
+   "head_sha": "a8d0cee5738e7b703306d449180866dee7c236d3",
+   "merge_commit_sha": "2d181b1c9e4fac9ac1bb6493eb5bd761db683c9e",
+   "additions": 113,
+   "deletions": 132,
+   "py_source_files": [
+    "mlflow/genai/scorers/registry.py"
+   ],
+   "py_test_files": [
+    "tests/genai/scorers/test_scorer_CRUD.py",
+    "tests/genai/test_genai_import_without_agent_sdk.py"
+   ],
+   "stars": 28479,
+   "pool_index": 30
+  },
+  {
+   "repo": "macs3-project/MACS",
+   "number": 784,
+   "url": "https://github.com/macs3-project/MACS/pull/784",
+   "title": "Reject truncated BAM alignment records",
+   "author": "taoliu",
+   "merged_at": "2026-10-16T07:17:57Z",
+   "base_sha": "7d75df2c7a1b22376fe54ec581c84001232277a6",
+   "head_sha": "6a5f2dfd7617fef03b0cda965385d67cabd1e590",
+   "merge_commit_sha": "39cc7cb247e030c67669b07f8798a1922ca2ddab",
+   "additions": 269,
+   "deletions": 10,
+   "py_source_files": [
+    "MACS3/IO/Parser.py"
+   ],
+   "py_test_files": [
+    "test/test_Parser_bam_truncation.py"
+   ],
+   "stars": 787,
+   "pool_index": 29
+  },
+  {
+   "repo": "tornadoweb/tornado",
+   "number": 3787,
+   "url": "https://github.com/tornadoweb/tornado/pull/3787",
+   "title": "web: Bound the static version cache, update docs",
+   "author": "bdarnell",
+   "merged_at": "2026-10-10T21:27:46Z",
+   "base_sha": "f53b9b97c6f0c55b2be3d366de1f2f3daa808d0a",
+   "head_sha": "c3089e1d93e3e8b65a9c89a546409bd207a0de2f",
+   "merge_commit_sha": "9f94e12cc06dc807590aa51477e04ff0cca2296e",
+   "additions": 74,
+   "deletions": 9,
+   "py_source_files": [
+    "tornado/web.py"
+   ],
+   "py_test_files": [
+    "tornado/test/web_test.py"
+   ],
+   "stars": 22168,
+   "pool_index": 75
+  },
+  {
+   "repo": "agentscope-ai/ReMe",
+   "number": 627,
+   "url": "https://github.com/agentscope-ai/ReMe/pull/627",
+   "title": "refactor(stat): consolidate answer tests and shorten docs",
+   "author": "jinliyl",
+   "merged_at": "2026-10-15T13:04:27Z",
+   "base_sha": "29b83529ef7e62191e85d11ffafb03a37a641a25",
+   "head_sha": "e50baa006628ebdea9d24adb3bc7d42eebbebfbd",
+   "merge_commit_sha": "32e1f7faadfa35540e8da3205576a5572576f6b7",
+   "additions": 9,
+   "deletions": 37,
+   "py_source_files": [
+    "reme/steps/file_io/stat.py"
+   ],
+   "py_test_files": [
+    "tests/unit/test_crud_steps.py"
+   ],
+   "stars": 3665,
+   "pool_index": 0
+  },
+  {
+   "repo": "The-PR-Agent/pr-agent",
+   "number": 4183,
+   "url": "https://github.com/The-PR-Agent/pr-agent/pull/4183",
+   "title": "perf(gitlab): skip project lookup when fetching a merge request",
+   "author": "PeterDaveHello",
+   "merged_at": "2026-10-19T21:29:08Z",
+   "base_sha": "59638246e41d37caf1d95435e00718859e35b69b",
+   "head_sha": "e602c4aa85322d79c2bf25ae74df70d3efb67154",
+   "merge_commit_sha": "65dbbe531f2b0fcfbc2775e53cb6e99b9a698b94",
+   "additions": 16,
+   "deletions": 1,
+   "py_source_files": [
+    "pr_agent/git_providers/gitlab_provider.py"
+   ],
+   "py_test_files": [
+    "tests/unittest/test_gitlab_lazy_mr_lookup.py"
+   ],
+   "stars": 13534,
+   "pool_index": 69
+  },
+  {
+   "repo": "googlefonts/glyphsLib",
+   "number": 1208,
+   "url": "https://github.com/googlefonts/glyphsLib/pull/1208",
+   "title": "split comma-separated meta Table dlng/slng data",
+   "author": "anthrotype",
+   "merged_at": "2026-10-13T14:24:37Z",
+   "base_sha": "0d7b5ccdaab409bcc139649f5b0aef0f8f49f6b9",
+   "head_sha": "3783ef49b506628c370b63f445089968c559e7fd",
+   "merge_commit_sha": "1015b4165a71716de9e668fb23683be9cdf08dda",
+   "additions": 39,
+   "deletions": 7,
+   "py_source_files": [
+    "Lib/glyphsLib/builder/custom_params.py"
+   ],
+   "py_test_files": [
+    "tests/builder/custom_params_test.py"
+   ],
+   "stars": 203,
+   "pool_index": 16
+  },
+  {
+   "repo": "dapr/python-sdk",
+   "number": 1192,
+   "url": "https://github.com/dapr/python-sdk/pull/1192",
+   "title": "Fix convert_to_dapr_duration double-counting sub-second time",
+   "author": "amdadulbari",
+   "merged_at": "2026-10-12T21:25:52Z",
+   "base_sha": "da3d7421f66b51d752e75b4c436902e475c7ee84",
+   "head_sha": "df406e5f0e284bf773174aaf73b4664796d1e942",
+   "merge_commit_sha": "0943287160a2ea25f0b95b6c37b0c02f5f6d46d9",
+   "additions": 21,
+   "deletions": 1,
+   "py_source_files": [
+    "dapr/serializers/util.py"
+   ],
+   "py_test_files": [
+    "tests/serializers/test_util.py"
+   ],
+   "stars": 274,
+   "pool_index": 7
+  },
+  {
+   "repo": "home-assistant/core",
+   "number": 187588,
+   "url": "https://github.com/home-assistant/core/pull/187588",
+   "title": "Add pylint check that __init__ is the first method of a class",
+   "author": "joostlek",
+   "merged_at": "2026-10-20T17:50:34Z",
+   "base_sha": "00c6b6f5a7144fa7d609593b5baa4e09b4c3c878",
+   "head_sha": "9ad280c1b8a56231a27ff63e92d1eda568077b5c",
+   "merge_commit_sha": "7e953f8bc9ca2538ad64f3a7acd2d50d33978875",
+   "additions": 300,
+   "deletions": 0,
+   "py_source_files": [
+    "packages/pylint-home-assistant/pylint_home_assistant/checkers/init_first.py"
+   ],
+   "py_test_files": [
+    "tests/pylint/test_init_first.py"
+   ],
+   "stars": 91632,
+   "pool_index": 25
+  },
+  {
+   "repo": "home-assistant/core",
+   "number": 187475,
+   "url": "https://github.com/home-assistant/core/pull/187475",
+   "title": "Handle meter unit changes in energy cost sensor",
+   "author": "MindFreeze",
+   "merged_at": "2026-10-20T17:33:15Z",
+   "base_sha": "6597cc48125a6bf98e1ecd59520b58a06f38d024",
+   "head_sha": "7e21b875934ed3ff030df2e0d33c25de7f208ee7",
+   "merge_commit_sha": "9cefb3888f9266bcc54b66d3400669fd24ebc2aa",
+   "additions": 104,
+   "deletions": 9,
+   "py_source_files": [
+    "homeassistant/components/energy/sensor.py"
+   ],
+   "py_test_files": [
+    "tests/components/energy/test_sensor.py"
+   ],
+   "stars": 91632,
+   "pool_index": 24
+  },
+  {
+   "repo": "optuna/optuna",
+   "number": 6873,
+   "url": "https://github.com/optuna/optuna/pull/6873",
+   "title": "Avoid All-NaN RuntimeWarning in percentile pruner best-value lookup",
+   "author": "825pranav",
+   "merged_at": "2026-10-13T07:44:59Z",
+   "base_sha": "13a3ff1c78314b6a1117dcee9dbbe54ab66788f9",
+   "head_sha": "83a36def362a101198b89eb41b2d0b768ceaa4fc",
+   "merge_commit_sha": "988b115a8fc7e4897dc85b3e28b8cbb8be39fcd1",
+   "additions": 7,
+   "deletions": 5,
+   "py_source_files": [
+    "optuna/pruners/_percentile.py"
+   ],
+   "py_test_files": [
+    "tests/pruners_tests/test_percentile.py"
+   ],
+   "stars": 14946,
+   "pool_index": 39
+  },
+  {
+   "repo": "frappe/erpnext",
+   "number": 60004,
+   "url": "https://github.com/frappe/erpnext/pull/60004",
+   "title": "fix(balance-sheet): show profit or loss of unclosed earlier years",
+   "author": "nabinhait",
+   "merged_at": "2026-10-14T16:03:53Z",
+   "base_sha": "fbd2931178159774567b4a8b87adb0bb40828fe9",
+   "head_sha": "509e2f1581efb050f0d1f79c8b7f2bdafdd0681b",
+   "merge_commit_sha": "34d8f42f912ea9c08492e8ccfa42cb8af7bf418b",
+   "additions": 88,
+   "deletions": 40,
+   "py_source_files": [
+    "erpnext/accounts/report/balance_sheet/balance_sheet.py"
+   ],
+   "py_test_files": [
+    "erpnext/accounts/report/balance_sheet/test_balance_sheet.py"
+   ],
+   "stars": 40427,
+   "pool_index": 13
+  },
+  {
+   "repo": "The-PR-Agent/pr-agent",
+   "number": 4181,
+   "url": "https://github.com/The-PR-Agent/pr-agent/pull/4181",
+   "title": "perf(github-action): skip unused provider initialization",
+   "author": "PeterDaveHello",
+   "merged_at": "2026-10-19T21:31:18Z",
+   "base_sha": "59638246e41d37caf1d95435e00718859e35b69b",
+   "head_sha": "656635aa2363a75c0172784695c2138e628388d1",
+   "merge_commit_sha": "50c6055f914bd08b0d8de72d871cdf8d08da7749",
+   "additions": 7,
+   "deletions": 2,
+   "py_source_files": [
+    "pr_agent/servers/github_action_runner.py"
+   ],
+   "py_test_files": [
+    "tests/unittest/test_github_action_runner_core.py"
+   ],
+   "stars": 13534,
+   "pool_index": 67
+  },
+  {
+   "repo": "oceanbase/powercontext",
+   "number": 1908,
+   "url": "https://github.com/oceanbase/powercontext/pull/1908",
+   "title": "fix(dify): decouple generated contract from whole OpenAPI hash",
+   "author": "PsiACE",
+   "merged_at": "2026-10-09T11:23:13Z",
+   "base_sha": "2c987ea9dd4f1c2124393a6ef694abb9072292cd",
+   "head_sha": "cbbcddc6722f32411d36a8b3ac143402f324a392",
+   "merge_commit_sha": "de1f2b1843e7a6e3f0c67140139af6c4ea0ee006",
+   "additions": 113,
+   "deletions": 6,
+   "py_source_files": [
+    "integrations/dify/generate_contract.py"
+   ],
+   "py_test_files": [
+    "integrations/dify/tests/test_contract_generation.py"
+   ],
+   "stars": 1358,
+   "pool_index": 32
+  },
+  {
+   "repo": "optiland/optiland",
+   "number": 963,
+   "url": "https://github.com/optiland/optiland/pull/963",
+   "title": "Remove the duplicate separator beside navigation",
+   "author": "BrunoChevalier",
+   "merged_at": "2026-10-20T15:06:34Z",
+   "base_sha": "1e0513902c68948a727394c6226f3580c7261c65",
+   "head_sha": "9b8ce0cd1a8a9c9d6731e6ae29ea3dbebab3155a",
+   "merge_commit_sha": "23f9356d2a8af2f71d6b3997111dfd2cd08c4e53",
+   "additions": 168,
+   "deletions": 5,
+   "py_source_files": [
+    "optiland_gui/main_window.py"
+   ],
+   "py_test_files": [
+    "tests/gui/test_sidebar_separator.py"
+   ],
+   "stars": 1022,
+   "pool_index": 37
+  },
+  {
+   "repo": "macs3-project/MACS",
+   "number": 780,
+   "url": "https://github.com/macs3-project/MACS/pull/780",
+   "title": "Join started workers on startup failure",
+   "author": "taoliu",
+   "merged_at": "2026-10-15T04:26:51Z",
+   "base_sha": "6d42a58d3fd9aa4439aba8e82ab0cbdba316e831",
+   "head_sha": "d42766270b4033734ca228e4dd24b4dfabceb3be",
+   "merge_commit_sha": "d04eab637746b413b045f614cc40ca2f666c7da1",
+   "additions": 270,
+   "deletions": 30,
+   "py_source_files": [
+    "MACS3/Signal/CallPeakUnit.py",
+    "MACS3/Signal/PeakModel.py",
+    "MACS3/Utilities/Threads.py"
+   ],
+   "py_test_files": [
+    "test/test_thread_lifecycle.py"
+   ],
+   "stars": 787,
+   "pool_index": 28
+  },
+  {
+   "repo": "doobidoo/mcp-memory-service",
+   "number": 1531,
+   "url": "https://github.com/doobidoo/mcp-memory-service/pull/1531",
+   "title": "fix(maintenance): regenerate_embeddings writes vectors into their store partition",
+   "author": "filhocf",
+   "merged_at": "2026-10-14T18:30:53Z",
+   "base_sha": "47a8eff72c47092964734f094fca6a6ed841bbfd",
+   "head_sha": "86e5ab3f2f9f9be460d70b7576ab1450271c4728",
+   "merge_commit_sha": "35db2e9d3d93f12fb428600267bfb609bc182260",
+   "additions": 152,
+   "deletions": 8,
+   "py_source_files": [
+    "scripts/maintenance/regenerate_embeddings.py"
+   ],
+   "py_test_files": [
+    "tests/maintenance/test_regenerate_embeddings_store.py"
+   ],
+   "stars": 2029,
+   "pool_index": 9
+  },
+  {
+   "repo": "vllm-project/vllm",
+   "number": 59627,
+   "url": "https://github.com/vllm-project/vllm/pull/59627",
+   "title": "[Bugfix][Structured Output] Feed the token that implicitly ends reasoning to the grammar",
+   "author": "simon-veitner-redhat",
+   "merged_at": "2026-10-08T19:38:34Z",
+   "base_sha": "705e124c05cffe7c00dd19434922c94e0610d674",
+   "head_sha": "fb87b56a656eb3d517e20dcdc7c6f11d457ab53a",
+   "merge_commit_sha": "c23ca06b6d944579ad9d220297441236755b4744",
+   "additions": 151,
+   "deletions": 53,
+   "py_source_files": [
+    "vllm/parser/engine/adapters.py",
+    "vllm/parser/engine/parser_engine.py",
+    "vllm/v1/structured_output/__init__.py"
+   ],
+   "py_test_files": [
+    "tests/parser/engine/test_deepseek_v4.py",
+    "tests/parser/engine/test_parser_engine.py",
+    "tests/v1/spec_decode/test_mtp_structured_output.py",
+    "tests/v1/structured_output/test_structured_output_manager.py"
+   ],
+   "stars": 94788,
+   "pool_index": 77
+  },
+  {
+   "repo": "basetenlabs/truss",
+   "number": 2682,
+   "url": "https://github.com/basetenlabs/truss/pull/2682",
+   "title": "fix: return 503 for model not ready on draft/watch deployments",
+   "author": "devtyagi3909",
+   "merged_at": "2026-10-20T17:09:57Z",
+   "base_sha": "22bf0ef710abf95bd42bb3d4fdbe36ece8ce7123",
+   "head_sha": "cecc3606d9c76ef84183a2b3599c54a06b4dc84a",
+   "merge_commit_sha": "9b096f071d75f3ea6acf9529563caa6d3316d9f4",
+   "additions": 39,
+   "deletions": 3,
+   "py_source_files": [
+    "truss/templates/control/control/application.py"
+   ],
+   "py_test_files": [
+    "truss/tests/templates/control/control/test_sanitized_exception_middleware.py"
+   ],
+   "stars": 1223,
+   "pool_index": 3
+  },
+  {
+   "repo": "vllm-project/vllm",
+   "number": 60468,
+   "url": "https://github.com/vllm-project/vllm/pull/60468",
+   "title": "[Perf] Warm up DeepGEMM MegaMoE kernels before serving",
+   "author": "simon-veitner-redhat",
+   "merged_at": "2026-10-13T12:17:49Z",
+   "base_sha": "206e45d47009447001e9080d430e64c90fba21a6",
+   "head_sha": "71c61dc99458813c0af72a17eaed3138f1f5b2db",
+   "merge_commit_sha": "253e02b95e9c9deaebdc507f2eb26b29daf3fdf3",
+   "additions": 203,
+   "deletions": 1,
+   "py_source_files": [
+    "vllm/model_executor/warmup/deep_gemm_warmup.py",
+    "vllm/models/kimi_k3/nvidia/model.py"
+   ],
+   "py_test_files": [
+    "tests/model_executor/test_deep_gemm_warmup.py"
+   ],
+   "stars": 94788,
+   "pool_index": 79
+  },
+  {
+   "repo": "bopen/elevation",
+   "number": 89,
+   "url": "https://github.com/bopen/elevation/pull/89",
+   "title": "Cache missing tiles",
+   "author": "alexamici",
+   "merged_at": "2026-10-09T17:02:22Z",
+   "base_sha": "fd48ce75ebcdfe22b16a33c74ce276e87c47a22b",
+   "head_sha": "f94e513fa302c0dd96c94eeaf0a0ac76cacd39df",
+   "merge_commit_sha": "2c64f40ac1d4c675d55c6912b03ff17d3643dbae",
+   "additions": 124,
+   "deletions": 7,
+   "py_source_files": [
+    "elevation/cache.py",
+    "elevation/datasource.py",
+    "elevation/spatial.py"
+   ],
+   "py_test_files": [
+    "tests/integration_srtm1_ellip.py",
+    "tests/integration_srtm1_geoid.py",
+    "tests/integration_srtm3.py",
+    "tests/test_10_spatial.py",
+    "tests/test_20_datasource.py"
+   ],
+   "stars": 331,
+   "pool_index": 4
+  },
+  {
+   "repo": "vllm-project/vllm",
+   "number": 58715,
+   "url": "https://github.com/vllm-project/vllm/pull/58715",
+   "title": "[Metrics] Count finished requests by watermark status",
+   "author": "simon-veitner-redhat",
+   "merged_at": "2026-10-12T17:21:23Z",
+   "base_sha": "e0317b28ce3ba4c9bd2ff69d885e3f34688a6d71",
+   "head_sha": "9370bbd91c74e87ee90cb2fa575f7c93bfbc0e90",
+   "merge_commit_sha": "a7b7bc1fbe1f5c4e47c53b0f02a3ecfbcd8054b9",
+   "additions": 203,
+   "deletions": 1,
+   "py_source_files": [
+    "vllm/v1/engine/output_processor.py",
+    "vllm/v1/metrics/loggers.py",
+    "vllm/v1/metrics/stats.py"
+   ],
+   "py_test_files": [
+    "tests/v1/engine/test_output_processor.py",
+    "tests/v1/metrics/test_histogram_buckets.py",
+    "tests/watermarking/test_watermarking_e2e.py"
+   ],
+   "stars": 94788,
+   "pool_index": 76
+  },
+  {
+   "repo": "frappe/erpnext",
+   "number": 61257,
+   "url": "https://github.com/frappe/erpnext/pull/61257",
+   "title": "fix(accounts): validate payment mode accounts and enabled status",
+   "author": "Pandiyan5273",
+   "merged_at": "2026-10-18T13:06:59Z",
+   "base_sha": "e72d63c8f7cc581cbb5e60c209de447b1888df03",
+   "head_sha": "7feeb6fae1727a96a6529a8caee3bff5c19cf335",
+   "merge_commit_sha": "18f6a1ccb07338e07b67817ce6ba70664ab7e470",
+   "additions": 117,
+   "deletions": 7,
+   "py_source_files": [
+    "erpnext/accounts/doctype/mode_of_payment/mode_of_payment.py",
+    "erpnext/accounts/doctype/payment_entry/payment_entry.py",
+    "erpnext/accounts/doctype/payment_request/payment_request.py",
+    "erpnext/accounts/doctype/sales_invoice/services/pos.py"
+   ],
+   "py_test_files": [
+    "erpnext/accounts/doctype/mode_of_payment/test_mode_of_payment.py",
+    "erpnext/accounts/doctype/pos_invoice_merge_log/test_pos_invoice_merge_log.py"
+   ],
+   "stars": 40427,
+   "pool_index": 14
+  },
+  {
+   "repo": "oyvindwe/connectlife-ha",
+   "number": 742,
+   "url": "https://github.com/oyvindwe/connectlife-ha/pull/742",
+   "title": "Start WM26 G400 with program options, also from standby",
+   "author": "oyvindwe",
+   "merged_at": "2026-10-17T07:47:18Z",
+   "base_sha": "a1dbb9b9868e652f907cf9f841d5a79b5871a5e5",
+   "head_sha": "52bc2901d18f435ec71ddf4c9ee6f0cac4b0d466",
+   "merge_commit_sha": "4e11deb1c916c81762735482cba4802d7b9595bb",
+   "additions": 53,
+   "deletions": 8,
+   "py_source_files": [
+    "custom_components/connectlife/button.py",
+    "custom_components/connectlife/dictionaries.py"
+   ],
+   "py_test_files": [
+    "tests/test_dictionaries.py"
+   ],
+   "stars": 306,
+   "pool_index": 40
+  },
+  {
+   "repo": "pyrevitlabs/pyRevit",
+   "number": 3743,
+   "url": "https://github.com/pyrevitlabs/pyRevit/pull/3743",
+   "title": "Keep modeless output and logging in the originating command window",
+   "author": "Wurschdhaud",
+   "merged_at": "2026-10-10T08:20:04Z",
+   "base_sha": "2c1de2cfb10e2e8c58d31ae73225d5d293faf8f6",
+   "head_sha": "03cfc97499df32352b84f19cd4ca5d0f23d8fc5c",
+   "merge_commit_sha": "4aded6a54f069440ecb242b2bfba47e3ffd4917b",
+   "additions": 210,
+   "deletions": 58,
+   "py_source_files": [
+    "extensions/pyRevitDevTools.extension/pyRevitDev.tab/Developer Examples.panel/Modeless.pushbutton/script.py",
+    "pyrevitlib/pyrevit/coreutils/logger.py",
+    "pyrevitlib/pyrevit/script.py"
+   ],
+   "py_test_files": [
+    "pyrevitlib/pyrevit/unittests/test_script_module.py"
+   ],
+   "stars": 1965,
+   "pool_index": 43
+  },
+  {
+   "repo": "doobidoo/mcp-memory-service",
+   "number": 1603,
+   "url": "https://github.com/doobidoo/mcp-memory-service/pull/1603",
+   "title": "fix(mcp): propagate tool exceptions so failures reach the client as isError (#1601)",
+   "author": "filhocf",
+   "merged_at": "2026-10-19T20:21:20Z",
+   "base_sha": "476db1c80be7591b072657ae541aa03c24e9d959",
+   "head_sha": "f8760d36e773a9752fee44a21797d57075c95b92",
+   "merge_commit_sha": "5a8e90372f6f56771e33b38dd6de1be23d688e23",
+   "additions": 224,
+   "deletions": 65,
+   "py_source_files": [
+    "src/mcp_memory_service/server/handlers/memory.py",
+    "src/mcp_memory_service/server_impl.py",
+    "src/mcp_memory_service/web/api/mcp.py"
+   ],
+   "py_test_files": [
+    "tests/integration/test_server_handlers.py",
+    "tests/integration/test_store_error_envelope.py",
+    "tests/integration/test_unified_handlers.py"
+   ],
+   "stars": 2029,
+   "pool_index": 11
+  }
+ ]
+}
