@@ -16,6 +16,7 @@ import {
   observationsForClaim,
   probeItems,
   reasonPoints,
+  demoHelperLines,
   summaryText,
   testGlance,
   verdictLabel,
@@ -419,6 +420,22 @@ function observationLine(item: ObsRow) {
   )
 }
 
+export function HelperNotes({ notes }: { notes?: string[] | null }) {
+  const lines = (notes || []).filter((line) => line.trim())
+  if (lines.length === 0) return null
+  return (
+    <section className="panel" aria-label="Demo helper">
+      <h2>Demo helper</h2>
+      <p className="hint">Background only. These notes do not change the verdict.</p>
+      <ul>
+        {lines.map((line) => (
+          <li key={line}>{line}</li>
+        ))}
+      </ul>
+    </section>
+  )
+}
+
 export function RunAnalysis({ record }: { record: Record<string, unknown> }) {
   const map = behaviourMap(record)
   const probes = probeItems(record)
@@ -430,6 +447,7 @@ export function RunAnalysis({ record }: { record: Record<string, unknown> }) {
   const glance = testGlance(record)
   const summary = summaryText(record)
   const coverage = coveragePlain(record)
+  const helperLines = demoHelperLines(record)
 
   return (
     <div className="analysis">
@@ -437,6 +455,8 @@ export function RunAnalysis({ record }: { record: Record<string, unknown> }) {
         <h2>In plain English</h2>
         <pre className="summary-block">{summary}</pre>
       </section>
+
+      <HelperNotes notes={helperLines} />
 
       <section id="behaviour-map">
         <h2>Behaviour map</h2>

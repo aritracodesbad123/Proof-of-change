@@ -8,6 +8,8 @@ Endpoints:
   GET  /api/runs/<id>
   GET  /api/runs/<id>/report.pdf
   GET  /api/runs/<id>/report.html
+  GET  /api/session/key
+  POST /api/session/key   JSON {"nebius_api_key": "..."}  (memory only; never echoed)
   POST /api/checks   JSON {"pr_url": "https://github.com/o/r/pull/N"}
   GET  /api/jobs/<job_id>
   POST /api/jobs/<job_id>/scenarios   HITL approval (approve / extra_scenarios / business_answers)
@@ -30,6 +32,8 @@ from pathlib import Path
 from typing import Any, NamedTuple
 from urllib.parse import parse_qs, unquote, urlparse
 
+from poc import session_key
+
 REPO_ROOT = Path(__file__).resolve().parent.parent
 RUNS_ROOT = Path(os.environ.get("POC_OPS_RUNS", REPO_ROOT / "ops" / "runs"))
 HOSTED = REPO_ROOT / "reports" / "hosted"
@@ -47,6 +51,56 @@ _jobs_lock = threading.RLock()
 _recent_runs: dict[str, dict[str, Any]] = {}
 _RECENT_MAX = 30
 _RUN_LOG_RE = re.compile(r"run log:\s*(\S+/ops/runs/[^/\s]+)/REPORT\.md")
+
+
+def resolve_console_provider(requested: str, session_token: str | None = None) -> tuple[str, str | None]:
+    """Live checks need a key in this session or in the server environment. Otherwise use recorded answers."""
+    if requested != "nebius":
+        return requested, None
+    if session_key.has_key(session_token) or (os.environ.get("NEBIUS_API_KEY") or "").strip():
+        return "nebius", None
+    return "recorded", (
+        "No Nebius key for this session, so this check uses the recorded AI answers. "
+        "Those answers are a saved fixture, not a live model call."
+    )
+
+
+def child_environment(base: dict[str, str], provider: str, session_token: str | None) -> tuple[dict[str, str], list[str]]:
+    """Environment for one check. A pasted key is copied into this dict only, never into the parent process."""
+    env = dict(base)
+    secrets: list[str] = []
+    host = (env.get("NEBIUS_API_KEY") or "").strip()
+    if len(host) >= 8:
+        secrets.append(host)
+    pasted = session_key.get_key(session_token)
+    if pasted and len(pasted) >= 8:
+        secrets.append(pasted)
+    if provider != "nebius":
+        env.pop("NEBIUS_API_KEY", None)
+    elif pasted:
+        env["NEBIUS_API_KEY"] = pasted
+    host_tavily = (env.get("TAVILY_API_KEY") or "").strip()
+    if len(host_tavily) >= 8:
+        secrets.append(host_tavily)
+    pasted_tavily = session_key.get_tavily_key(session_token)
+    if pasted_tavily and len(pasted_tavily) >= 8:
+        secrets.append(pasted_tavily)
+        env["TAVILY_API_KEY"] = pasted_tavily
+    return env, secrets
+
+
+class _ScrubWriter:
+    """File wrapper that strips key values before they reach disk."""
+
+    def __init__(self, raw, secrets: list[str]):
+        self.raw = raw
+        self.secrets = secrets
+
+    def write(self, text):
+        self.raw.write(session_key.scrub(text, self.secrets))
+
+    def flush(self):
+        self.raw.flush()
 
 
 def contree_usable() -> bool:
@@ -92,10 +146,20 @@ _UNSAFE_WARNING = (
     "Pull-request code will run without a sandbox and can see this machine's files, keys, and network."
 )
 
-
 def _unsafe_opt_in() -> bool:
     """True only when the operator explicitly asked to run pull-request code unsandboxed."""
     return (os.environ.get("POC_UNSAFE_NO_SANDBOX") or "").strip().lower() in ("1", "true", "yes")
+
+
+def console_approval_on(explicit: bool | None = None) -> bool:
+    """Whether this console check pauses for a person to approve probes.
+
+    The environment variable POC_CONSOLE_APPROVAL defaults to off. A per-check choice,
+    when the caller passes one, wins over that default.
+    """
+    if explicit is not None:
+        return bool(explicit)
+    return (os.environ.get("POC_CONSOLE_APPROVAL") or "").strip().lower() in ("1", "true", "yes", "on")
 
 
 class ConsoleRunPlan(NamedTuple):
@@ -556,7 +620,8 @@ def _read_child(proc: subprocess.Popen, logf, collected: list[str], deadline: fl
     return proc.wait(), False
 
 
-def start_check(pr_url: str, *, model_provider: str = "nebius", owner: str | None = None) -> dict:
+def start_check(pr_url: str, *, model_provider: str = "nebius", owner: str | None = None,
+                session_token: str | None = None, approval: bool | None = None) -> dict:
     from poc import run_progress, spaces_host
 
     m = PR_RE.search(pr_url.strip())
@@ -566,6 +631,8 @@ def start_check(pr_url: str, *, model_provider: str = "nebius", owner: str | Non
     if blocked:
         raise ValueError(blocked)
     playback = spaces_host.playback_only(pr_url, model_provider)
+    requested = model_provider
+    model_provider, provider_note = resolve_console_provider(requested, session_token)
     plan = console_run_flags()
     if playback:
         # Playback reads a saved sample. It does not clone or run pull-request code.
@@ -574,6 +641,9 @@ def start_check(pr_url: str, *, model_provider: str = "nebius", owner: str | Non
         flags, run_note, refused, warning = plan.flags, plan.note, plan.refused, plan.warning
         if refused:
             raise ValueError(run_note or "Proof-of-Change will not run pull-request code without a sandbox.")
+    if provider_note and not playback:
+        run_note = f"{provider_note} {run_note}".strip() if run_note else provider_note
+    approval_on = console_approval_on(approval)
     job_id = uuid.uuid4().hex[:12]
     # Tests retarget REPO_ROOT. POC_OPS_RUNS (a Space home directory) wins when it is set.
     if (os.environ.get("POC_OPS_RUNS") or "").strip():
@@ -605,6 +675,7 @@ def start_check(pr_url: str, *, model_provider: str = "nebius", owner: str | Non
         "error": None,
         "warning": warning,
         "refused": refused,
+        "approval": approval_on,
         "run_id": None,
         "log_tail": "",
         "progress_path": str(progress_path),
@@ -634,10 +705,14 @@ def start_check(pr_url: str, *, model_provider: str = "nebius", owner: str | Non
 
         env = os.environ.copy()
         env["POC_PROGRESS_PATH"] = str(progress_path)
-        # The console asks for operator approval and turns the advisory swarm on itself.
         # --console-job is what lets this single pull-request check start. POC_CONSOLE does not.
-        env["POC_HITL"] = "1"
-        env["POC_HITL_DIR"] = str(hitl_dir)
+        # Operator approval is off unless this check, or POC_CONSOLE_APPROVAL, turned it on.
+        # A study run still refuses POC_HITL. This child is not a study run.
+        env.pop("POC_HITL", None)
+        env.pop("POC_HITL_DIR", None)
+        if approval_on:
+            env["POC_HITL"] = "1"
+            env["POC_HITL_DIR"] = str(hitl_dir)
         env["POC_CONSOLE"] = "1"
         env["POC_SWARM"] = "1"
         with _jobs_lock:
@@ -685,14 +760,16 @@ def start_check(pr_url: str, *, model_provider: str = "nebius", owner: str | Non
             rp.emit("failed", detail=message[:200])
             return
         child_flags = list(flags)
-        child_flags.extend(recorded_demo_flags(model_provider))
-        if model_provider == "recorded":
+        child_flags.extend(recorded_demo_flags(requested))
+        if requested == "recorded":
             env["POC_SKIP_COVERAGE"] = "1"
+        env, secrets = child_environment(env, model_provider, session_token)
         argv = console_daily_run_argv(pr_url, model_provider, child_flags)
         try:
             # Live tee: write console.log while the check runs; polls read the last ~8KB.
             collected: list[str] = []
-            with console_log.open("w", encoding="utf-8") as logf:
+            with console_log.open("w", encoding="utf-8") as raw_log:
+                logf = _ScrubWriter(raw_log, secrets)
                 proc = subprocess.Popen(
                     argv, cwd=str(REPO_ROOT), stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                     text=True, env=env, bufsize=1, start_new_session=True,
@@ -700,14 +777,17 @@ def start_check(pr_url: str, *, model_provider: str = "nebius", owner: str | Non
                 returncode, timed_out = _read_child(
                     proc, logf, collected, time.monotonic() + CONSOLE_JOB_TIMEOUT_S,
                 )
-            stdout_blob = "".join(collected)
+            stdout_blob = session_key.scrub("".join(collected), secrets)
             tail, fail_reason = job_log_and_error(stdout_blob, "", returncode)
+            tail = session_key.scrub(tail, secrets)
+            if fail_reason:
+                fail_reason = session_key.scrub(fail_reason, secrets)
             if timed_out:
                 fail_reason = "timed out"
             # Prefer file tail so the UI matches what was teed.
             file_tail = _tail_bytes(console_log, 8192)
             if file_tail:
-                tail = file_tail
+                tail = session_key.scrub(file_tail, secrets)
             os.environ["POC_PROGRESS_PATH"] = str(progress_path)
             found = find_record_for_pr(m.group(1), int(m.group(2)))
             # A written record means the check produced analysis — surface it even if exit!=0 (problems list).
@@ -753,11 +833,12 @@ def start_check(pr_url: str, *, model_provider: str = "nebius", owner: str | Non
 
 
 def _job_public(job: dict) -> dict:
-    from poc import hitl, run_progress
+    from poc import demo_helper, hitl, run_progress
 
     out = dict(job)
     prog = run_progress.job_progress(job.get("progress_path"))
     out.update(prog)
+    out["helper_notes"] = demo_helper.public_notes(prog.get("stages"), job.get("record"))
     # Live log: last ~8KB of the teed console.log on every poll.
     clog = job.get("console_log")
     if clog:
@@ -781,7 +862,23 @@ def _job_public(job: dict) -> dict:
     out.pop("console_log", None)
     out.pop("hitl_dir", None)
     out.pop("owner", None)
-    return out
+    return _scrub_public(out)
+
+
+def _scrub_public(obj: dict) -> dict:
+    """Strip any key value that is currently in memory or in the server environment."""
+    secrets = session_key.known_secrets()
+    host = (os.environ.get("NEBIUS_API_KEY") or "").strip()
+    if len(host) >= 8:
+        secrets.append(host)
+    host_tavily = (os.environ.get("TAVILY_API_KEY") or "").strip()
+    if len(host_tavily) >= 8:
+        secrets.append(host_tavily)
+    raw = session_key.scrub(json.dumps(obj, default=str), secrets)
+    try:
+        return json.loads(raw)
+    except json.JSONDecodeError:
+        return {"id": obj.get("id"), "status": obj.get("status"), "error": "The reply was withheld."}
 
 
 def get_job(job_id: str, owner: str | None = None, *, admin: bool = False) -> dict | None:
@@ -900,6 +997,7 @@ class Handler(BaseHTTPRequestHandler):
                 "run_note": note,
                 "warning": warning,
                 "refused": refused,
+                "approval_default": console_approval_on(None),
             })
         if path.startswith("/api"):
             account = self._viewer()
@@ -907,6 +1005,10 @@ class Handler(BaseHTTPRequestHandler):
                 return None
             admin = account.get("role") == "admin"
             viewer = None if admin else account["id"]
+            if path == "/api/session/key":
+                from poc import console_auth
+                token = console_auth.cookie_value(self.headers.get("Cookie"), console_auth.SESSION_COOKIE)
+                return self._json(200, session_key.public_status(token))
             if path == "/api/runs":
                 return self._json(200, {"runs": list_runs(owner=viewer, admin=admin)})
             rm = _REPORT_FILE_RE.match(path)
@@ -961,6 +1063,13 @@ class Handler(BaseHTTPRequestHandler):
             body = json.loads(raw.decode() or "{}")
         except json.JSONDecodeError:
             return self._json(400, {"error": "bad json"})
+        if not isinstance(body, dict):
+            return self._json(400, {"error": "bad json"})
+        if path == "/api/auth/logout":
+            from poc import console_auth
+            session_key.clear_key(
+                console_auth.cookie_value(self.headers.get("Cookie"), console_auth.SESSION_COOKIE),
+            )
         if self._auth("POST", body if isinstance(body, dict) else {}):
             return None
         account = self._viewer()
@@ -968,13 +1077,38 @@ class Handler(BaseHTTPRequestHandler):
             return None
         admin = account.get("role") == "admin"
         viewer = None if admin else account["id"]
+        from poc import console_auth
+        session_token = console_auth.cookie_value(self.headers.get("Cookie"), console_auth.SESSION_COOKIE)
+        if path == "/api/session/key":
+            if "nebius_api_key" not in body and "tavily_api_key" not in body:
+                return self._json(400, {"error": "Send the key as text."})
+            try:
+                if "nebius_api_key" in body:
+                    raw_key = body.get("nebius_api_key", "")
+                    if not isinstance(raw_key, str):
+                        return self._json(400, {"error": "Send the key as text."})
+                    session_key.set_key(session_token, raw_key)
+                if "tavily_api_key" in body:
+                    raw_key = body.get("tavily_api_key", "")
+                    if not isinstance(raw_key, str):
+                        return self._json(400, {"error": "Send the key as text."})
+                    session_key.set_tavily_key(session_token, raw_key)
+            except ValueError as exc:
+                return self._json(400, {"error": str(exc)})
+            return self._json(200, {"ok": True, **session_key.public_status(session_token)})
         if path == "/api/checks":
             pr_url = (body.get("pr_url") or "").strip()
             provider = (body.get("model_provider") or "nebius").strip() or "nebius"
+            approval = body.get("approval") if "approval" in body else None
+            if approval is not None:
+                approval = bool(approval)
             try:
-                job = start_check(pr_url, model_provider=provider, owner=account["id"])
+                job = start_check(
+                    pr_url, model_provider=provider, owner=account["id"],
+                    session_token=session_token, approval=approval,
+                )
             except ValueError as e:
-                return self._json(400, {"error": str(e)})
+                return self._json(400, {"error": session_key.scrub(str(e))})
             return self._json(202, job)
         if path.startswith("/api/jobs/") and path.endswith("/scenarios"):
             jid = path[len("/api/jobs/"):-len("/scenarios")].strip("/")

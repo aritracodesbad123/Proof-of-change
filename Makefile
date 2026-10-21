@@ -6,7 +6,7 @@ PY := $(VENV)/bin/python
 export PATH := $(CURDIR)/$(VENV)/bin:$(PATH)
 
 .DEFAULT_GOAL := help
-.PHONY: help setup check daily open decide test golden-reports console console-api console-web console-build console-host docker-console nebius-console
+.PHONY: help setup check daily open decide test golden-reports console console-api console-web console-build console-host docker-console nebius-console export-replay
 
 help:
 	@echo "Proof-of-Change commands:"
@@ -18,6 +18,7 @@ help:
 	@echo "  make console-api                        API only (http://127.0.0.1:8787)"
 	@echo "  make console-web                        Vite UI only (proxies /api to :8787)"
 	@echo "  make console-build                      build UI into console/web/dist (API can serve it)"
+	@echo "  make export-replay                      copy finished checks into replay/ for the results page"
 	@echo "  make console-host                       local: build + serve dist on 0.0.0.0:8787"
 	@echo "  make docker-console IMAGE=…             build+push console container image"
 	@echo "  make nebius-console IMAGE=… SUBNET_ID=… Nebius Endpoint (paid Compute)"
@@ -60,6 +61,9 @@ console-web:
 console-build:
 	@test -d console/web/node_modules || (cd console/web && npm install)
 	cd console/web && npm run build
+
+export-replay:
+	$(PYTHON) ops/export_replay.py
 
 # Long-lived console on this machine: SPA from dist + /api on 0.0.0.0
 console-host: console-build | $(PY)
