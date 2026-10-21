@@ -90,3 +90,65 @@ def test_coverage_is_not_run_locally_in_contree_only_mode(tmp_path):
     rc, _ = daily_run.run(["python", "-m", "coverage", "run", "-m", "pytest"], log, env={"PATH": "/usr/bin"},
                           sbx=daily_run.side_sandbox(tmp_path / "venv-pr"))
     assert daily_run.is_refused(rc)
+
+
+def _sides(tmp_path):
+    main = tmp_path / "side-main" / "widget"
+    pr = tmp_path / "side-pr" / "widget"
+    main.mkdir(parents=True)
+    pr.mkdir(parents=True)
+    (main / "core.py").write_text("def f():\n    return 1\n")
+    (pr / "core.py").write_text("def f():\n    return 2\n")
+    item = {"files": {"all": ["widget/core.py"]}}
+    a = SimpleNamespace(no_coverage=False, baseline="full", test_timeout=30, workers="0", run_timeout=60)
+    return main.parent, pr.parent, item, a
+
+
+def _gate(cov):
+    from poc import coverage_gate
+    rec = {"verdict": "verified", "reason": "1 new test(s) pass, 0 unchanged", "product_check": True,
+           "files": {"all": ["widget/core.py"]}, "coverage": cov}
+    return coverage_gate.apply(rec)
+
+
+def test_contree_only_measured_coverage_can_reach_verified(tmp_path, monkeypatch):
+    main_root, pr_root, item, a = _sides(tmp_path)
+    body = {"files": {"/work/src/widget/core.py": {"executed_lines": [1, 2], "missing_lines": []}}}
+    seen = {}
+
+    class Sess:
+        pr_uuid = "pr-1"
+
+        def run_op(self, side, shell, **k):
+            seen["side"] = side
+            seen["shell"] = shell
+            text = __import__("json").dumps(body)
+            return {"exit_code": 0, "stdout": f"___POC_EXIT___0\n___POC_COV_START___\n{text}\n___POC_COV_END___\n",
+                    "stderr": ""}
+
+    monkeypatch.setattr("poc.contree_sandboxes.session", lambda: Sess())
+    got = daily_run.contree_coverage_run(item, main_root, pr_root, ["tests/test_widget.py"], tmp_path, a)
+    assert got["status"] == "measured" and got["where"] == "contree"
+    assert got["changed_lines_covered"] >= 1
+    assert seen["side"] == "pr" and "--cov=/work/src/widget" in seen["shell"] and "pytest" in seen["shell"]
+    assert "NEBIUS" not in seen["shell"] and "API_KEY" not in seen["shell"]
+    assert _gate(got)["verdict"] == "verified"
+    assert (tmp_path / "coverage-pr.json").is_file()
+
+
+def test_contree_only_missing_coverage_file_still_caps(tmp_path, monkeypatch):
+    main_root, pr_root, item, a = _sides(tmp_path)
+
+    class Sess:
+        pr_uuid = "pr-1"
+
+        def run_op(self, side, shell, **k):
+            return {"exit_code": 1, "stdout": "___POC_EXIT___1\n___POC_LOG___\nno report\n", "stderr": ""}
+
+    monkeypatch.setattr("poc.contree_sandboxes.session", lambda: Sess())
+    got = daily_run.contree_coverage_run(item, main_root, pr_root, ["tests/test_widget.py"], tmp_path, a)
+    assert got["status"] == "not measured" and "no data" in got["why"]
+    assert not (tmp_path / "coverage-pr.json").exists()
+    gated = _gate(got)
+    assert gated["verdict"] == "could_not_verify"
+    assert gated["reason"].startswith("Coverage wasn't measured")
