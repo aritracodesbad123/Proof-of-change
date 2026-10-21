@@ -105,6 +105,50 @@ def test_recorded_playback_finishes_on_any_host_without_a_sandbox(tmp_path, monk
     assert "No pull-request code ran" in (got.get("log_tail") or "")
 
 
+def test_unsafe_opt_in_still_plays_back_the_vetted_sample(tmp_path, monkeypatch):
+    """With POC_UNSAFE_NO_SANDBOX=1 and no sandbox, the vetted sample still plays back.
+
+    A real check would run unsandboxed. This sample does not start a process.
+    """
+    monkeypatch.delenv("SPACE_ID", raising=False)
+    monkeypatch.delenv("NEBIUS_API_KEY", raising=False)
+    monkeypatch.delenv("NEBIUS_PROJECT_ID", raising=False)
+    monkeypatch.setenv("POC_UNSAFE_NO_SANDBOX", "1")
+    import guardrails.sandbox as sb
+    monkeypatch.setattr(sb, "check", lambda: (False, "bwrap down"))
+    monkeypatch.setattr(console_api, "RUNS_ROOT", tmp_path)
+    monkeypatch.setattr(console_api, "REPO_ROOT", tmp_path)
+    monkeypatch.setattr(spaces_host.time, "sleep", lambda _s: None)
+
+    plan = console_api.console_run_flags()
+    assert plan.refused is False
+    assert "--unsafe-no-sandbox" in plan.flags
+    assert spaces_host.playback_only(spaces_host.VETTED_URL, "recorded") is True
+
+    started: list[object] = []
+
+    def refuse_process(*args, **kwargs):
+        started.append((args, kwargs))
+        raise AssertionError("the vetted sample must play back and must not start a process")
+
+    monkeypatch.setattr(console_api.subprocess, "Popen", refuse_process)
+    job = console_api.start_check(spaces_host.VETTED_URL, model_provider="recorded")
+    assert job["playback"] is True
+    assert job["run_flags"] == []
+    assert job["refused"] is False
+    deadline = time.time() + 5
+    while time.time() < deadline:
+        got = console_api.get_job(job["id"])
+        if got and got["status"] in {"done", "failed", "timed out"}:
+            break
+        time.sleep(0.02)
+    got = console_api.get_job(job["id"])
+    assert got["status"] == "done"
+    assert got["record"]["playback"] is True
+    assert "No pull-request code ran" in (got.get("log_tail") or "")
+    assert started == []
+
+
 def test_without_space_id_the_block_does_not_apply(monkeypatch):
     monkeypatch.delenv("SPACE_ID", raising=False)
     assert spaces_host.block_reason("https://github.com/me/demo/pull/3", "nebius") is None
