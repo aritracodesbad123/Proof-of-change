@@ -497,7 +497,7 @@ def test_other_hosts_do_not_ask_about_the_codespace_port(accounts, monkeypatch):
 
 
 def test_codespace_and_single_user_skip_sign_in_when_the_port_is_not_public(accounts, monkeypatch):
-    for name, value in (("CODESPACES", "true"), ("POC_SINGLE_USER", "1"), ("POC_SINGLE_USER", "yes")):
+    for name, value in (("CODESPACES", "true"), ("CODESPACES", "1"), ("CODESPACES", "yes")):
         result = _me(monkeypatch, name, value, "private")
         assert result.status == 200
         assert result.body["id"] == "local"
@@ -525,6 +525,7 @@ def test_a_public_port_refuses_to_skip_sign_in(accounts, monkeypatch):
 
 
 def test_codespace_http_serves_without_a_session_and_still_hides_a_pasted_key(accounts, monkeypatch):
+    monkeypatch.setenv("CODESPACES", "true")
     monkeypatch.setenv("POC_SINGLE_USER", "1")
     monkeypatch.setattr(console_auth, "codespace_port_visibility", lambda: "private")
     server = console_api.ThreadingHTTPServer(("127.0.0.1", 0), console_api.Handler)
@@ -572,6 +573,7 @@ def test_http_sign_in_stays_required_when_the_port_is_public(accounts, monkeypat
 
 
 def _single_user_server(accounts, monkeypatch):
+    monkeypatch.setenv("CODESPACES", "true")
     monkeypatch.setenv("POC_SINGLE_USER", "1")
     monkeypatch.setattr(console_auth, "codespace_port_visibility", lambda: "private")
     server = console_api.ThreadingHTTPServer(("127.0.0.1", 0), console_api.Handler)
@@ -897,4 +899,114 @@ def test_console_code_fallback_is_fail_closed(accounts, monkeypatch, tmp_path):
                                       host="127.0.0.1", proto="http")
     assert off.status == 401
     assert console_auth.viewer_account(token) is None
+    console_auth.reset_access_codes()
+
+
+def _redeem(code):
+    return console_auth.handle_request("POST", "/api/auth/console-code", {}, {"code": code}, {},
+                                       host="127.0.0.1", proto="http")
+
+
+def test_console_code_file_is_0600(monkeypatch, tmp_path):
+    _code_env(monkeypatch, tmp_path, None)
+    console_auth.sign_in_skip()
+    path = tmp_path / "code"
+    assert path.is_file() and not path.is_symlink()
+    assert (path.stat().st_mode & 0o777) == 0o600
+    assert path.stat().st_uid == os.getuid()
+    console_auth.reset_access_codes()
+
+
+def test_symlinked_code_file_is_replaced_not_followed(monkeypatch, tmp_path):
+    _code_env(monkeypatch, tmp_path, None)
+    target = tmp_path / "planted"
+    target.write_text("attacker-chosen-code\n")
+    os.chmod(target, 0o600)
+    (tmp_path / "code").symlink_to(target)
+    assert console_auth._read_access_code() == ""          # O_NOFOLLOW refuses the link
+    console_auth.sign_in_skip()
+    path = tmp_path / "code"
+    assert not path.is_symlink() and (path.stat().st_mode & 0o777) == 0o600
+    assert target.read_text() == "attacker-chosen-code\n"    # the link target was not written
+    assert _redeem("attacker-chosen-code").status == 401
+    assert _redeem(path.read_text().strip()).status == 200
+    console_auth.reset_access_codes()
+
+
+def test_loose_mode_code_file_is_replaced(monkeypatch, tmp_path):
+    _code_env(monkeypatch, tmp_path, None)
+    path = tmp_path / "code"
+    path.write_text("world-readable-code\n")
+    os.chmod(path, 0o644)
+    assert console_auth._read_access_code() == ""
+    console_auth.sign_in_skip()
+    assert (path.stat().st_mode & 0o777) == 0o600
+    assert path.read_text().strip() != "world-readable-code"
+    assert _redeem("world-readable-code").status == 401
+    console_auth.reset_access_codes()
+
+
+def test_foreign_owned_code_file_is_replaced(monkeypatch, tmp_path):
+    _code_env(monkeypatch, tmp_path, None)
+    path = tmp_path / "code"
+    path.write_text("someone-elses-code\n")
+    os.chmod(path, 0o600)
+    real_getuid = os.getuid
+    monkeypatch.setattr(console_auth.os, "getuid", lambda: real_getuid() + 1)
+    assert console_auth._read_access_code() == ""
+    console_auth.sign_in_skip()
+    monkeypatch.setattr(console_auth.os, "getuid", real_getuid)
+    assert path.read_text().strip() != "someone-elses-code"
+    assert (path.stat().st_mode & 0o777) == 0o600
+    console_auth.reset_access_codes()
+
+
+def test_twenty_wrong_codes_then_429(monkeypatch, tmp_path):
+    _code_env(monkeypatch, tmp_path, None)
+    console_auth.sign_in_skip()
+    code = (tmp_path / "code").read_text().strip()
+    for _ in range(20):
+        assert _redeem("wrong-code").status == 401
+    locked = _redeem(code)
+    assert locked.status == 429 and not locked.cookies
+    assert code not in json.dumps(locked.body)
+    console_auth.reset_access_codes()
+
+
+def test_single_user_without_codespaces_never_enables_the_code(accounts, monkeypatch, tmp_path):
+    monkeypatch.delenv("CODESPACES", raising=False)
+    monkeypatch.setenv("POC_SINGLE_USER", "1")
+    monkeypatch.setenv("POC_CONSOLE_CODE_FILE", str(tmp_path / "code"))
+    monkeypatch.setattr(console_auth, "codespace_port_visibility", lambda: None)
+    console_auth.reset_port_cache()
+    console_auth.reset_access_codes()
+    assert console_auth.single_user_requested() is False
+    assert console_auth.sign_in_skip() == (False, None)
+    assert not (tmp_path / "code").exists()
+    me = console_auth.handle_request("GET", "/api/auth/me", {}, None, {}, host="127.0.0.1", proto="http")
+    assert me.status == 401 and not me.body.get("console_code")
+    (tmp_path / "code").write_text("abc\n")
+    os.chmod(tmp_path / "code", 0o600)
+    assert _redeem("abc").status == 401
+    monkeypatch.setattr(console_auth, "codespace_port_visibility", lambda: "private")
+    assert _me(monkeypatch, "POC_SINGLE_USER", "1", "private").status == 401
+    console_auth.reset_access_codes()
+
+
+def test_public_port_clears_every_code_session(monkeypatch, tmp_path):
+    _code_env(monkeypatch, tmp_path, None)
+    console_auth.sign_in_skip()
+    code = (tmp_path / "code").read_text().strip()
+    tokens = []
+    for _ in range(2):
+        ok = _redeem(code)
+        assert ok.status == 200
+        tokens.append(ok.cookies[0].split(";")[0].split("=", 1)[1])
+    assert len(console_auth._access_tokens) == 2
+    monkeypatch.setattr(console_auth, "codespace_port_visibility", lambda: "public")
+    assert console_auth.viewer_account(tokens[0]) is None
+    assert console_auth._access_tokens == set()
+    # Back to private: the old sessions stay gone.
+    monkeypatch.setattr(console_auth, "codespace_port_visibility", lambda: None)
+    assert all(console_auth.viewer_account(t) is None for t in tokens)
     console_auth.reset_access_codes()
