@@ -322,6 +322,140 @@ def _relevant_result(item: dict, needles: list[str]) -> bool:
     return _mentions_project(blob, needles)
 
 
+# Lint and type-check config. These are not install instructions.
+_LINT_FILES = frozenset({
+    "mypy.ini", ".mypy.ini", "ruff.toml", ".ruff.toml", ".flake8",
+    ".pylintrc", "pylintrc", "pyrightconfig.json", ".pyrightconfig.json", ".isort.cfg",
+})
+_SETUP_RANK = {"pyproject.toml": 0, "setup.cfg": 1, "setup.py": 2}
+_RANK_REQUIREMENTS = 3
+_RANK_INSTALL_DOC = 4
+_RANK_PYPI = 5
+_RANK_OTHER = 6
+_PYPI_HOSTS = frozenset({"pypi.org", "pypi.python.org"})
+_DOC_STEMS = frozenset({"readme", "install", "installation", "installing"})
+
+
+def _path_parts(url: str) -> list[str]:
+    path = urllib.parse.unquote(urllib.parse.urlsplit(url or "").path or "")
+    return [part for part in path.split("/") if part]
+
+
+def _title_tail(title: str) -> str:
+    return (title or "").strip().replace("\\", "/").split("/")[-1].strip().lower()
+
+
+def _names_a_lint_file(url: str, title: str) -> bool:
+    names = [part.lower() for part in _path_parts(url)]
+    tail = _title_tail(title)
+    if tail:
+        names.append(tail)
+    return any(name in _LINT_FILES for name in names)
+
+
+def _doc_stem(name: str) -> str:
+    low = (name or "").lower()
+    for suffix in (".markdown", ".html", ".rst", ".txt", ".md"):
+        if low.endswith(suffix):
+            return low[: -len(suffix)]
+    return low
+
+
+def _url_is_install_doc(url: str) -> bool:
+    parts = [part.lower() for part in _path_parts(url)]
+    base = parts[-1] if parts else ""
+    stem = _doc_stem(base)
+    if stem in _DOC_STEMS:
+        return True
+    docs = {"docs", "doc", "documentation"}
+    extra = _DOC_STEMS | {"setup", "getting-started", "quickstart"}
+    return any(part in docs for part in parts[:-1]) and stem in extra
+
+
+def _title_is_install_doc(title: str) -> bool:
+    low = (title or "").strip().lower()
+    return low in _DOC_STEMS or _doc_stem(_title_tail(title)) in _DOC_STEMS
+
+
+def _source_rank(url: str, title: str) -> int:
+    parts = [part.lower() for part in _path_parts(url)]
+    names = [parts[-1]] if parts else []
+    tail = _title_tail(title)
+    if tail and tail not in names:
+        names.append(tail)
+    for name in names:
+        if name in _SETUP_RANK:
+            return _SETUP_RANK[name]
+    if any(name.startswith("requirements") for name in names) or any(part.startswith("requirements") for part in parts):
+        return _RANK_REQUIREMENTS
+    if _url_is_install_doc(url):
+        return _RANK_INSTALL_DOC
+    host = (urllib.parse.urlsplit(url or "").hostname or "").lower()
+    if host.startswith("www."):
+        host = host[4:]
+    if host in _PYPI_HOSTS and len(parts) >= 2 and parts[0] == "project":
+        return _RANK_PYPI
+    if _title_is_install_doc(title):
+        return _RANK_INSTALL_DOC
+    return _RANK_OTHER
+
+
+def _canonical_url(url: str, project: str) -> tuple[str, bool]:
+    """One address per page. A versioned PyPI release page becomes /project/<name>/."""
+    raw = (url or "").strip()
+    if not raw:
+        return "", False
+    parsed = urllib.parse.urlsplit(raw)
+    host = (parsed.hostname or "").lower()
+    if host.startswith("www."):
+        host = host[4:]
+    path = re.sub(r"/{2,}", "/", urllib.parse.unquote(parsed.path or ""))
+    if host in _PYPI_HOSTS:
+        parts = [part for part in path.split("/") if part]
+        if len(parts) >= 2 and parts[0].lower() == "project":
+            dist = parts[1]
+            if project and dist.lower() == project.lower():
+                dist = project
+            else:
+                dist = dist.lower()
+            return f"https://pypi.org/project/{dist}/", len(parts) > 2
+    if len(path) > 1:
+        path = path.rstrip("/")
+    scheme = (parsed.scheme or "https").lower()
+    netloc = host
+    if parsed.port and parsed.port not in {80, 443}:
+        netloc = f"{host}:{parsed.port}"
+    return urllib.parse.urlunsplit((scheme, netloc, path, parsed.query, "")), False
+
+
+def polish_results(items: list, project: str = "") -> list[dict]:
+    """Drop lint config, fold old PyPI releases into the current page, and list setup sources once, first."""
+    ranked = []
+    for index, item in enumerate(items or []):
+        if not isinstance(item, dict):
+            continue
+        title = str(item.get("title") or "")
+        url = str(item.get("url") or "")
+        if _names_a_lint_file(url, title):
+            continue
+        canonical, rewritten = _canonical_url(url, project)
+        rank = _source_rank(canonical or url, title)
+        ranked.append((rank, int(rewritten), index, item, canonical))
+    ranked.sort(key=lambda row: (row[0], row[1], row[2]))
+    seen: set[str] = set()
+    out = []
+    for _rank, _rewritten, _index, item, canonical in ranked:
+        key = canonical.lower() if canonical else "title:" + str(item.get("title") or "").lower()
+        if key in seen:
+            continue
+        seen.add(key)
+        kept = dict(item)
+        if canonical:
+            kept["url"] = canonical
+        out.append(kept)
+    return out
+
+
 def scope_lookup(payload: dict, repo: str, project: str = "") -> dict:
     """Drop hits that never name this project. They are not shown, logged, or used."""
     if not isinstance(payload, dict):
@@ -329,7 +463,7 @@ def scope_lookup(payload: dict, repo: str, project: str = "") -> dict:
     needles = _project_needles(repo, project)
     kept = [item for item in (payload.get("results") or []) if isinstance(item, dict) and _relevant_result(item, needles)]
     out = dict(payload)
-    out["results"] = kept
+    out["results"] = polish_results(kept, _project_name(repo, project))
     answer = out.get("answer")
     if answer and not _mentions_project(str(answer), needles):
         out["answer"] = None
@@ -362,7 +496,7 @@ def lookup_project(repo: str, project: str, cache, env: dict | None = None, fetc
                 "results": [], "text": "", "errors": [],
                 "lines": ["Tavily lookup skipped: TAVILY_API_KEY is not set."]}
     fetch = fetch or live_fetch
-    results, texts, errors = [], [], []
+    gathered, answers, errors = [], [], []
     live = False
     cached_any = False
     fresh_any = False
@@ -388,16 +522,22 @@ def lookup_project(repo: str, project: str, cache, env: dict | None = None, fetc
             payload = stored
         payload = redact_obj(scope_lookup(payload, repo, project), env)
         if payload.get("answer"):
-            texts.append(str(payload["answer"]))
+            answers.append(str(payload["answer"]))
         for item in payload.get("results") or []:
             if not isinstance(item, dict):
                 continue
-            results.append({"title": item.get("title") or "", "url": item.get("url") or "", "query": query,
-                            "content": item.get("content") or ""})
-            if item.get("content"):
-                texts.append(str(item["content"]))
+            gathered.append({"title": item.get("title") or "", "url": item.get("url") or "", "query": query,
+                             "content": item.get("content") or ""})
         if payload.get("error"):
             errors.append(str(payload["error"]))
+    results = polish_results(gathered, _project_name(repo, project))
+    texts = []
+    for answer in answers:
+        if answer not in texts:
+            texts.append(answer)
+    for item in results:
+        if item.get("content"):
+            texts.append(str(item["content"]))
     lines = _result_lines(queries, results, errors, live)
     return {"ok": bool(results) and not errors, "skipped": False, "live_call": live,
             "cached": cached_any and not fresh_any, "queries": queries,

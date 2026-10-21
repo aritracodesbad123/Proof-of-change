@@ -330,7 +330,7 @@ def test_lookup_records_a_live_call_and_skips_cleanly(tmp_path):
 
     fresh = demo_helper.lookup_project(REPO, "widget", cache, env={"TAVILY_API_KEY": "present-but-not-logged"}, fetch=fetch)
     assert fresh["live_call"] is True and fresh["cached"] is False
-    assert fresh["lines"][0] == f"Looked up with Tavily: {len(demo_helper.lookup_queries(REPO, 'widget'))} results"
+    assert fresh["lines"][0] == "Looked up with Tavily: 1 results"
     assert any(line.startswith("Query: ") for line in fresh["lines"])
     assert any("site:github.com/acme/widget" in line for line in fresh["lines"])
     assert any("site:pypi.org" in line for line in fresh["lines"])
@@ -375,8 +375,8 @@ def test_lookup_queries_name_the_repo_and_drop_unrelated_hits():
                                     env={"TAVILY_API_KEY": "present-but-not-logged"}, fetch=fetch)
     blob = json.dumps(got)
     cached = json.dumps(cache._data)
-    assert got["lines"][0] == f"Looked up with Tavily: {len(queries)} results"
-    assert all(item["url"] == "https://github.com/jaraco/inflect" for item in got["results"])
+    assert got["lines"][0] == "Looked up with Tavily: 1 results"
+    assert [item["url"] for item in got["results"]] == ["https://github.com/jaraco/inflect"]
     for dropped in ("example.com/other", "unrelated product", "pip install inflection", "inflect-fork"):
         assert dropped not in blob
         assert dropped not in cached
@@ -406,6 +406,66 @@ def test_lookup_queries_name_the_repo_and_drop_unrelated_hits():
     assert calls == []
     assert "pip install inflection" not in json.dumps(gap)
     assert gap["reason"] == "could not verify: setup gap inflection"
+
+
+def test_lookup_counts_each_url_once_and_ranks_setup_sources():
+    repo = "https://github.com/jaraco/inflect"
+    hits = [
+        {"title": "Old release", "url": "https://pypi.org/project/inflect/0.2.4/", "content": "old inflect release"},
+        {"title": "mypy.ini", "url": f"{repo}/blob/main/mypy.ini", "content": "inflect type check config"},
+        {"title": "ruff.toml", "url": f"{repo}/blob/main/ruff.toml", "content": "inflect lint config"},
+        {"title": ".flake8", "url": f"{repo}/blob/main/.flake8", "content": "inflect flake8 config"},
+        {"title": "An issue", "url": f"{repo}/issues/1", "content": "inflect bug report"},
+        {"title": "README", "url": f"{repo}/blob/main/README.rst#readme", "content": "install inflect from the readme"},
+        {"title": "README again", "url": f"{repo}/blob/main/README.rst/", "content": "install inflect from the readme again"},
+        {"title": "requirements", "url": f"{repo}/blob/main/requirements.txt", "content": "inflect requirements"},
+        {"title": "setup.py", "url": f"{repo}/blob/main/setup.py", "content": "inflect setup.py"},
+        {"title": "setup.cfg", "url": f"{repo}/blob/main/setup.cfg", "content": "inflect setup.cfg"},
+        {"title": "pyproject", "url": f"{repo}/blob/main/pyproject.toml", "content": "inflect pyproject"},
+        {"title": "inflect", "url": "https://pypi.org/project/inflect/", "content": "current inflect page"},
+        {"title": "Old again", "url": "https://pypi.org/project/Inflect/7.0.0", "content": "another old inflect release"},
+        {"title": "pyrightconfig.json", "url": f"{repo}/blob/main/pyrightconfig.json", "content": "inflect pyright"},
+    ]
+
+    def fetch(_query, timeout=8, env=None):
+        return {"ok": True, "answer": "install inflect", "query": _query, "results": hits}
+
+    cache = demo_helper.MemoryCache()
+    got = demo_helper.lookup_project("jaraco/inflect", "inflect", cache,
+                                    env={"TAVILY_API_KEY": "present-but-not-logged"}, fetch=fetch)
+    urls = [item["url"] for item in got["results"]]
+    assert urls == [
+        f"{repo}/blob/main/pyproject.toml",
+        f"{repo}/blob/main/setup.cfg",
+        f"{repo}/blob/main/setup.py",
+        f"{repo}/blob/main/requirements.txt",
+        f"{repo}/blob/main/README.rst",
+        "https://pypi.org/project/inflect/",
+        f"{repo}/issues/1",
+    ]
+    assert got["lines"][0] == f"Looked up with Tavily: {len(urls)} results"
+    sources = [line.split(" — ", 1)[1] for line in got["lines"] if line.startswith("Source: ")]
+    assert sources == urls
+    assert urls.count("https://pypi.org/project/inflect/") == 1
+    blob = json.dumps(got)
+    cached = json.dumps(cache._data)
+    for dropped in ("0.2.4", "7.0.0", "mypy.ini", "ruff.toml", ".flake8", "pyrightconfig.json",
+                    "inflect type check config", "inflect lint config", "old inflect release"):
+        assert dropped not in blob
+        assert dropped not in cached
+    assert "current inflect page" in blob
+    assert blob.count("install inflect from the readme again") == 0
+    only_old = demo_helper.polish_results([
+        {"title": "inflect 0.2.4", "url": "https://pypi.org/project/inflect/0.2.4/#description", "content": "old"},
+        {"title": "inflect 7", "url": "https://www.pypi.org/project/Inflect/7.0.0", "content": "newer"},
+    ], "inflect")
+    assert [item["url"] for item in only_old] == ["https://pypi.org/project/inflect/"]
+    folded = demo_helper.polish_results([
+        {"title": "a", "url": f"{repo}/issues/1#comment", "content": "inflect"},
+        {"title": "b", "url": "https://GitHub.com/jaraco/inflect/issues/1/", "content": "inflect"},
+        {"title": ".pylintrc", "url": f"{repo}/blob/main/.pylintrc", "content": "inflect pylint"},
+    ], "inflect")
+    assert [item["url"] for item in folded] == [f"{repo}/issues/1"]
 
 
 def test_report_shows_helper_notes_and_does_not_count_a_setup_problem(tmp_path):
