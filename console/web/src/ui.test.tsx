@@ -1,7 +1,7 @@
 import { renderToStaticMarkup } from 'react-dom/server'
 import { expect, test } from 'vitest'
 import { illustrativeStates, timelineStates } from './present'
-import { SwarmTheater, Timeline, VerdictBadge } from './ui'
+import { HelperNotes, SwarmTheater, Timeline, VerdictBadge } from './ui'
 
 test('verdict badges render the four code labels', () => {
   const html = renderToStaticMarkup(
@@ -26,6 +26,17 @@ test('the swarm is labelled as advice that does not change the verdict', () => {
   expect(html).toContain('Advice only')
   expect(html).toContain('doesn’t change the verdict')
   expect(html).toContain('Ultra')
+})
+
+test('demo helper notes are shown and do not change the verdict', () => {
+  const html = renderToStaticMarkup(
+    <HelperNotes
+      notes={['Looked up with Tavily: 2 results', 'Setup plan: install pytest on main and pr']}
+    />,
+  )
+  expect(html).toContain('Looked up with Tavily')
+  expect(html).toContain('Setup plan')
+  expect(html).toContain('do not change the verdict')
 })
 
 test('a live timeline puts swarm stages on Advice, not Verdict', () => {

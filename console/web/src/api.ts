@@ -102,6 +102,7 @@ export type Health = {
   run_note?: string | null
   warning?: string | null
   refused?: boolean
+  approval_default?: boolean
   github_token?: boolean
   chrome?: boolean
 }
@@ -131,6 +132,7 @@ export type Job = {
   swarm?: SwarmStatus
   hitl_draft?: HitlDraft | null
   hitl_approval?: HitlApprovalBody | null
+  helper_notes?: string[]
 }
 
 export const api = {
@@ -144,10 +146,21 @@ export const api = {
       report_pdf?: string | null
       report_html?: string | null
     }>(`/api/runs/${encodeURIComponent(id)}`),
-  startCheck: (pr_url: string, model_provider = 'nebius') =>
+  startCheck: (pr_url: string, model_provider = 'nebius', approval = false) =>
     json<Job>('/api/checks', {
       method: 'POST',
-      body: JSON.stringify({ pr_url, model_provider }),
+      body: JSON.stringify({ pr_url, model_provider, approval }),
+    }),
+  sessionKey: () => json<{ nebius_key: boolean; tavily_key: boolean }>('/api/session/key'),
+  setSessionKey: (nebius_api_key: string) =>
+    json<{ ok: boolean; nebius_key: boolean; tavily_key: boolean }>('/api/session/key', {
+      method: 'POST',
+      body: JSON.stringify({ nebius_api_key }),
+    }),
+  setTavilyKey: (tavily_api_key: string) =>
+    json<{ ok: boolean; nebius_key: boolean; tavily_key: boolean }>('/api/session/key', {
+      method: 'POST',
+      body: JSON.stringify({ tavily_api_key }),
     }),
   job: (id: string) => json<Job>(`/api/jobs/${encodeURIComponent(id)}`),
   me: () => json<Account>('/api/auth/me'),

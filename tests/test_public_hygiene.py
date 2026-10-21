@@ -1,6 +1,7 @@
 """The repository is public: no file may name the people or bots behind it, internal schedules, internal tools, or
 machine-local paths. This guard fails CI if any of them reappear in a tracked file (PDF text included when
-pdftotext is available). Only the repository's own clone URL may contain the owner's handle."""
+pdftotext is available). The owner's handle may appear only in this repository's clone URL and its GitHub Pages
+address."""
 import os
 import re
 import shutil
@@ -13,6 +14,8 @@ ROOT = Path(__file__).resolve().parent.parent
 SELF = Path(__file__).resolve()
 ALLOWED = [
     re.compile(r"github\.com/aritracodesbad123/proof-of-change(\.git)?", re.I),
+    # GitHub Pages uses the owner handle as the site name. The name still fails in prose.
+    re.compile(r"aritracodesbad123\.github\.io/proof-of-change", re.I),
     # The licence file carries this copyright line on purpose. The name still fails anywhere else.
     re.compile(r"Copyright \(c\) 2026 Aritra Chakraborty"),
 ]
@@ -104,6 +107,7 @@ def test_guard_catches(text):
 
 
 @pytest.mark.parametrize("text", ["git clone https://github.com/aritracodesbad123/Proof-of-change.git",
+                                  "https://aritracodesbad123.github.io/Proof-of-change/",
                                   "*{box-sizing:border-box}", "a checkbox", "pick the tests", "cloud credits",
                                   "Nemotron robot-free", "Copyright (c) 2026 Aritra Chakraborty"])
 def test_guard_allows(text):

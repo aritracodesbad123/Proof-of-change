@@ -205,10 +205,14 @@ def clear_session() -> None:
     _state["session"] = None
 
 
-def install_shell_source(repo: str, sha: str) -> str:
-    """Clone a public GitHub SHA into /work/src and pip-install editable + pytest (source-pair style)."""
+def install_shell_source(repo: str, sha: str, extra: str = "") -> str:
+    """Clone a public GitHub SHA into /work/src and pip-install editable + pytest (source-pair style).
+
+    extra is the same shell on both sides (system packages and plan requirements). Empty leaves the
+    original install unchanged.
+    """
     # slim image needs git; network is available during checkpoint builds
-    return (
+    shell = (
         "export DEBIAN_FRONTEND=noninteractive\n"
         "(command -v git >/dev/null || (apt-get update -qq && apt-get install -y -qq git >/dev/null))\n"
         "python -m pip install -q --upgrade pip\n"
@@ -224,14 +228,22 @@ def install_shell_source(repo: str, sha: str) -> str:
         "|| python -m pip install -q -e .\n"
         "python -m pip install -q pytest pytest-timeout pytest-xdist coverage\n"
     )
+    extra = (extra or "").strip()
+    if not extra:
+        return shell
+    needle = "python -m pip install -q -e '.[dev]'"
+    return shell.replace(needle, extra + "\n" + needle, 1)
 
 
 def prepare_source_pair(repo: str, main_sha: str, pr_sha: str, *, timeout: int = 1800,
-                        runner: Callable | None = None) -> ContreeSession:
-    """Build main + PR Contree checkpoints for a source-pair style PR."""
+                        runner: Callable | None = None, extra_shell: str = "") -> ContreeSession:
+    """Build main + PR Contree checkpoints for a source-pair style PR.
+
+    extra_shell is applied to both SHAs. Empty keeps the default install shell.
+    """
     sess = new_session(runner=runner) if runner is not None else new_session()
-    sess.checkpoint_main(install_shell_source(repo, main_sha), timeout=timeout)
-    sess.fork_pr(install_shell_source(repo, pr_sha), timeout=timeout)
+    sess.checkpoint_main(install_shell_source(repo, main_sha, extra_shell), timeout=timeout)
+    sess.fork_pr(install_shell_source(repo, pr_sha, extra_shell), timeout=timeout)
     return sess
 
 

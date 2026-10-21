@@ -19,7 +19,7 @@ import re
 import sys
 from pathlib import Path
 
-from poc import coverage_gate
+from poc import coverage_gate, demo_helper
 from reports import reviewer as rv
 from reports.reviewer import Report, badge, link
 
@@ -564,6 +564,13 @@ def build(rec: dict, prdir: Path, out_dir: Path, decision: dict | None = None) -
             rows_a.append([role.get("role", "?"), role.get("model") or "-", role.get("status") or "-", note or "-"])
         R.table(["Role", "Model", "Status", "Notes"], rows_a)
         R.p(agents.get("note") or "judge/helper/summary are advisory; code owns the verdict", "meta")
+    helper = rec.get("demo_helper") if isinstance(rec.get("demo_helper"), dict) else None
+    helper_notes = (helper or {}).get("notes") if isinstance(helper, dict) else None
+    if helper_notes:
+        R.h(3, "Demo helper")
+        R.p("These notes are background from the console and the daily check. They do not change the verdict.")
+        R.p(demo_helper.RETRY_LIMITS)
+        R.bullets([str(note) for note in helper_notes])
 
     R.h(2, "Claims vs reality", "claims")
     if rows:

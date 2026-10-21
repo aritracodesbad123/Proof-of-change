@@ -100,10 +100,14 @@ def handle_event(event: str, payload: dict, env: dict | None = None) -> dict:
         claim = parse_prove(body)
         if claim is None:
             return {"action": "ignore", "why": "not a /prove comment"}
+        issue = payload.get("issue") or {}
+        # A comment on a plain issue is not a pull request. GitHub includes
+        # issue.pull_request only when the comment is on a pull request.
+        if not isinstance(issue.get("pull_request"), dict):
+            return {"action": "ignore", "why": "a /prove comment on an issue is ignored; comment on the pull request"}
         if not may_post(repo, env):
             return {"action": "refuse", "why": f"repo {repo} not in {DEMO_REPOS_ENV}"}
-        return {"action": "prove", "repo": repo, "claim": claim,
-                "pr": (payload.get("issue") or {}).get("number")}
+        return {"action": "prove", "repo": repo, "claim": claim, "pr": issue.get("number")}
     if event == "pull_request" and payload.get("action") in ("opened", "synchronize", "reopened"):
         if not may_post(repo, env):
             return {"action": "refuse", "why": f"repo {repo} not in {DEMO_REPOS_ENV}"}
