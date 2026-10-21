@@ -1,0 +1,124 @@
+"""Model-written probe for home-assistant-libs/pychromecast#1300 (model (nvidia/nemotron-3-super-120b-a12b, live)). Generated from the PR text and base-side code only;
+frozen before any PR-side execution. Untrusted: runs only in the sandbox without network."""
+PROBE = {'id': 'model-probe1', 'target': 'home-assistant-libs/pychromecast#1300', 'about': 'MultizoneController.playback_session attribute handling', 'claims': [{'id': 'C1', 'source': 'PR description', 'text': 'The PR parses playbackSession from MULTIZONE_STATUS (appAllowsGrouping, isVideoContent, streamTransferSupported) and exposes it as MultizoneController.playback_session, which is None when no session is attached and cleared on reset_members().', 'covers': ['c1.playback_session_initial_exists', 'c1.playback_session_initial_value', 'c1.playback_session_after_message_exists', 'c1.playback_session_after_message_value', 'c1.playback_session_after_reset_exists', 'c1.playback_session_after_reset_value'], 'expect': 'differs'}, {'id': 'C2', 'source': 'PR description', 'text': 'The PR parses PLAYBACK_SESSION_UPDATED messages into a PlaybackSessionUpdate object (name, changed_devices, failed_devices, optional session_endpoint) and passes it to listeners via a new MultiZoneControllerListener.multizone_playback_session_updated callback, which is not abstract so existing listener subclasses remain functional.', 'covers': ['c2.listener_called', 'c2.listener_argument_name', 'c2.listener_argument_changed_devices', 'c2.listener_argument_failed_devices', 'c2.listener_argument_session_endpoint'], 'expect': 'differs'}, {'id': 'C3', 'source': 'PR description', 'text': 'Device IDs are normalized to the dashed form used for members, accommodating devices that also report dashless IDs.', 'covers': ['c3.dashless_id_stored', 'c3.dashed_id_stored'], 'expect': 'differs'}], 'timeout_s': 60, 'generator': 'model (nvidia/nemotron-3-super-120b-a12b, live)'}
+
+import json  # added by the harness: the observations line is printed as JSON
+
+import uuid
+from pychromecast.controllers.multizone import MultizoneController, MultiZoneControllerListener
+
+class TestListener(MultiZoneControllerListener):
+    def __init__(self):
+        self.called = False
+        self.args = None
+    
+    def multizone_member_added(self, group_uuid: str) -> None:
+        pass
+    def multizone_member_removed(self, group_uuid: str) -> None:
+        pass
+    def multizone_status_received(self) -> None:
+        pass
+    def multizone_playback_session_updated(self, update) -> None:
+        self.called = True
+        self.args = update
+
+# Create controller
+controller = MultizoneController(uuid.UUID('12345678-1234-5678-1234-567812345678'))
+
+# Observations dictionary
+obs = {}
+
+# C1: playback_session attribute
+try:
+    val = controller.playback_session
+    obs['c1.playback_session_initial_exists'] = True
+    obs['c1.playback_session_initial_value'] = val
+except AttributeError as e:
+    obs['c1.playback_session_initial_exists'] = False
+    obs['c1.playback_session_initial_value'] = type(e).__name__
+
+# Simulate MULTIZONE_STATUS with playbackSession
+message_data = {
+    'type': 'MULTIZONE_STATUS',
+    'status': {
+        'devices': [{'deviceId': 'device1', 'name': 'Device 1'}],
+        'playbackSession': {
+            'appAllowsGrouping': True,
+            'isVideoContent': False,
+            'streamTransferSupported': True
+        }
+    }
+}
+controller.receive_message(None, message_data)
+
+try:
+    val = controller.playback_session
+    obs['c1.playback_session_after_message_exists'] = True
+    obs['c1.playback_session_after_message_value'] = val
+except AttributeError as e:
+    obs['c1.playback_session_after_message_exists'] = False
+    obs['c1.playback_session_after_message_value'] = type(e).__name__
+
+# Reset members
+controller.reset_members()
+
+try:
+    val = controller.playback_session
+    obs['c1.playback_session_after_reset_exists'] = True
+    obs['c1.playback_session_after_reset_value'] = val
+except AttributeError as e:
+    obs['c1.playback_session_after_reset_exists'] = False
+    obs['c1.playback_session_after_reset_value'] = type(e).__name__
+
+# C2: PLAYBACK_SESSION_UPDATED and listener
+listener = TestListener()
+controller.register_listener(listener)
+
+message_data2 = {
+    'type': 'PLAYBACK_SESSION_UPDATED',
+    'name': 'test-session',
+    'changed_devices': ['device1', 'device2'],
+    'failed_devices': [],
+    'session_endpoint': 'endpoint123'
+}
+controller.receive_message(None, message_data2)
+
+obs['c2.listener_called'] = listener.called
+if listener.called:
+    update = listener.args
+    obs['c2.listener_argument_name'] = update.name
+    obs['c2.listener_argument_changed_devices'] = update.changed_devices
+    obs['c2.listener_argument_failed_devices'] = update.failed_devices
+    obs['c2.listener_argument_session_endpoint'] = update.session_endpoint
+else:
+    obs['c2.listener_argument_name'] = None
+    obs['c2.listener_argument_changed_devices'] = None
+    obs['c2.listener_argument_failed_devices'] = None
+    obs['c2.listener_argument_session_endpoint'] = None
+
+# C3: Device ID normalization
+# Add dashless ID
+message_data3 = {
+    'type': 'DEVICE_ADDED',
+    'device': {
+        'deviceId': '123e4567e89b12d3a456426614174000',
+        'name': 'Dashless Device'
+    }
+}
+controller.receive_message(None, message_data3)
+
+# Add dashed ID
+message_data4 = {
+    'type': 'DEVICE_ADDED',
+    'device': {
+        'deviceId': '123e4567-e89b-12d3-a456-426614174000',
+        'name': 'Dashed Device'
+    }
+}
+controller.receive_message(None, message_data4)
+
+obs['c3.dashless_id_stored'] = '123e4567e89b12d3a456426614174000'
+obs['c3.dashed_id_stored'] = '123e4567-e89b-12d3-a456-426614174000'
+
+# Final observations
+print('{"observations": ' + str(obs).replace("'", '"') + '}')

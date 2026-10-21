@@ -1,0 +1,52 @@
+Setup check: GitHub token: present.
+Setup check: Nebius token: present.
+Setup check: free memory 5.7 GB (of 15.6 GB).
+Setup check: free disk 98.1 GB.
+Demo helper: git is installed.
+Demo helper: python3 is installed.
+Demo helper: uv is installed.
+[home-assistant-libs/pychromecast] priority 1: selected: [1300]
+  testing #1300 Expose multizone playback session info ...
+Setup check: GitHub token: present.
+Setup check: Nebius token: present.
+Setup check: free memory 5.7 GB (of 15.6 GB).
+Setup check: free disk 98.1 GB.
+Demo helper: git is installed.
+Demo helper: python3 is installed.
+Demo helper: uv is installed.
+Looked up with Tavily: 5 results
+Query: pychromecast python setup install instructions https://github.com/home-assistant-libs/pychromecast site:github.com/home-assistant-libs/pychromecast
+Query: pychromecast python documentation install https://github.com/home-assistant-libs/pychromecast site:github.com/home-assistant-libs/pychromecast
+Query: pychromecast python install requirements https://pypi.org/project/pychromecast/ https://github.com/home-assistant-libs/pychromecast site:pypi.org
+Source: PyChromecast · PyPI — https://pypi.org/project/pychromecast/
+Source: GitHub - home-assistant-libs/pychromecast: Library for Python 3 to communicate with the Google Chromecast. · GitHub — https://github.com/home-assistant-libs/pychromecast
+Source: Extra dependencies on raspbian Jessie (raspberry pi) · Issue #132 · home-assistant-libs/pychromecast · GitHub — https://github.com/home-assistant-libs/pychromecast/issues/132
+Source: pychromecast/pychromecast/socket_client.py at master · home-assistant-libs/pychromecast · GitHub — https://github.com/home-assistant-libs/pychromecast/blob/master/pychromecast/socket_client.py
+Source: "[WinError 10049] The requested address is not valid in its ... — https://github.com/home-assistant-libs/pychromecast/issues/483
+Setup plan: the same packages on main and pr.
+Setup plan: protobuf is noted, installed with the project.
+Setup plan: zeroconf is noted, installed with the project.
+Setup plan: casttube is noted, installed with the project.
+Setup plan: install beautifulsoup4==4.15.0 (listed in requirements-test.txt) on main and pr.
+Setup plan: install ruff==0.17.1 (listed in requirements-test.txt) on main and pr.
+Setup plan: install mypy==2.4.0 (listed in requirements-test.txt) on main and pr.
+Setup plan: install PlexAPI==4.17.2 (listed in requirements-test.txt) on main and pr.
+Setup plan: install pylint==4.1.3 (listed in requirements-test.txt) on main and pr.
+Setup plan: install pytest==9.1.1 (listed in requirements-test.txt) on main and pr.
+Setup plan: install rstcheck==6.3.0 (listed in requirements-test.txt) on main and pr.
+Setup plan: install types-beautifulsoup4==4.12.0.20250516 (listed in requirements-test.txt) on main and pr.
+Setup plan: install types-html5lib==1.1.11.20260518 (listed in requirements-test.txt) on main and pr.
+Setup plan: install types-protobuf==7.35.1.20260906 (listed in requirements-test.txt) on main and pr.
+Setup plan: install types-requests==2.33.0.20261006 (listed in requirements-test.txt) on main and pr.
+Setup plan: install yle-dl==20240927 (listed in requirements-test.txt) on main and pr.
+Setup plan: Python 3.12: Python 3.12 already meets >=3.11.0
+Related bug reports: 3 background item(s).
+    -> needs_attention: probe: 6 observation(s) need attention: c2old.multizone_status does not differ although the claim says it does (C2); c2old.playback_session_ (313.1s)
+Self-check: the report matches the run records.
+run log: <run-folder>/ops/runs/2026-10-21-check-1936/REPORT.md
+pychromecast-1300: NEEDS ATTENTION | Reject | confidence Medium | citations WARN
+summary: <run-folder>/report/SUMMARY.html
+
+DONE. Open this file to read the results:
+  <run-folder>/report/SUMMARY.html
+RUN_DONE exit=0 seconds=317

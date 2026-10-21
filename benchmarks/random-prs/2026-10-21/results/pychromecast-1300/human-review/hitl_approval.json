@@ -1,0 +1,15 @@
+{
+  "approve": [
+    "probe1"
+  ],
+  "extra_scenarios": [
+    "C1 field values: send controller.receive_message(None, MULTIZONE_STATUS whose status has devices [] and playbackSession {appAllowsGrouping: True, isVideoContent: False, streamTransferSupported: True}). Record playback_session.app_allows_grouping, .is_video_content, .stream_transfer_supported (snake_case dataclass fields; on main record the exception type name). Observations 'c1v.<field>', covers ['c1v.*'] for C1.",
+    "C2 old listeners keep working: register a MultiZoneControllerListener subclass written for the old API (defines only multizone_member_added, multizone_member_removed, multizone_status_received), then send a PLAYBACK_SESSION_UPDATED message and a MULTIZONE_STATUS. Record 'ok' or the exception type name for each as 'c2old.*'; covers ['c2old.*'] for C2.",
+    "C3 normalisation in session updates: send PLAYBACK_SESSION_UPDATED with name 'Group', changedDevices ['be209f090f6a4596ac1a16a77670692b'] (dashless), failedDevices ['2b514019-b9fa-43b5-a740-b4c3f8882918'], sessionEndpoint {deviceId dashless form of the first id, ipAddress '192.168.1.5', port 8009}. Record the listener's update.changed_devices, failed_devices and session_endpoint.device_id/host/port/session_id as 'c3n.*'; covers ['c3n.*'] for C3.",
+    "Unchanged behaviour (no claim; must match on both sides): send MULTIZONE_STATUS with devices Kitchen 'be209f09-0f6a-4596-ac1a-16a77670692b' and Back room '2b514019-b9fa-43b5-a740-b4c3f8882918' (dashed ids); record sorted controller.members and member names as 'same.members_after_status', then send DEVICE_REMOVED for Kitchen and record 'same.members_after_remove'."
+  ],
+  "business_answers": {},
+  "skip_business_followup": true,
+  "cancelled": false,
+  "written_at": 1792591652.7923563
+}

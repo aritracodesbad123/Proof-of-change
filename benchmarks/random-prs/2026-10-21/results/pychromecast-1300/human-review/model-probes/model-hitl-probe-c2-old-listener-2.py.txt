@@ -1,0 +1,52 @@
+"""Model-written probe for home-assistant-libs/pychromecast#1300 (model (nvidia/nemotron-3-super-120b-a12b, live)). Generated from the PR text and base-side code only;
+frozen before any PR-side execution. Untrusted: runs only in the sandbox without network."""
+PROBE = {'id': 'model-hitl-probe-c2-old-listener-2', 'target': 'home-assistant-libs/pychromecast#1300', 'about': 'Test that old MultiZoneControllerListener subclasses still work when PLAYBACK_SESSION_UPDATED and MULTIZONE_STATUS messages are received.', 'claims': [{'id': 'C2', 'source': 'PR description', 'text': 'The PR parses PLAYBACK_SESSION_UPDATED messages into a PlaybackSessionUpdate object (name, changed_devices, failed_devices, optional session_endpoint) and passes it to listeners via a new MultiZoneControllerListener.multizone_playback_session_updated callback, which is not abstract so existing listener subclasses remain functional.', 'covers': ['c2old.*'], 'expect': 'differs'}], 'timeout_s': 60, 'generator': 'model (nvidia/nemotron-3-super-120b-a12b, live)'}
+
+import json  # added by the harness: the observations line is printed as JSON
+import uuid
+from pychromecast.controllers.multizone import (
+    MultizoneController,
+    MultiZoneControllerListener,
+    MESSAGE_TYPE,
+    TYPE_SESSION_UPDATED,
+    TYPE_MULTIZONE_STATUS
+)
+
+class OldListener(MultiZoneControllerListener):
+    def multizone_member_added(self, group_uuid: str) -> None:
+        pass
+
+    def multizone_member_removed(self, group_uuid: str) -> None:
+        pass
+
+    def multizone_status_received(self) -> None:
+        pass
+
+# Create a controller and listener
+controller_uuid = uuid.uuid4()
+controller = MultizoneController(controller_uuid)
+listener = OldListener()
+controller.register_listener(listener)
+
+# Test PLAYBACK_SESSION_UPDATED
+data_session_updated = {MESSAGE_TYPE: TYPE_SESSION_UPDATED}
+try:
+    controller.receive_message(None, data_session_updated)
+    obs1 = 'ok'
+except Exception as e:
+    obs1 = type(e).__name__
+
+# Test MULTIZONE_STATUS with empty devices
+data_multizone_status = {
+    MESSAGE_TYPE: TYPE_MULTIZONE_STATUS,
+    'status': {
+        'devices': []
+    }
+}
+try:
+    controller.receive_message(None, data_multizone_status)
+    obs2 = 'ok'
+except Exception as e:
+    obs2 = type(e).__name__
+
+print('{"observations": {"c2old.playback_session_updated": "' + obs1 + '", "c2old.multizone_status": "' + obs2 + '"}}')

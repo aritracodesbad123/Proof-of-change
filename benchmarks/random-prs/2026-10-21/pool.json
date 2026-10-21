@@ -1,0 +1,1180 @@
+{
+ "filters": {
+  "search_query": "is:pr is:open draft:false language:python updated:>=2026-10-07 -author:app/dependabot -author:app/renovate -author:app/pre-commit-ci (sort=updated desc, first 1000 results = GitHub search cap)",
+  "repo": "primary language Python, stars>=200, pushed>=2026-09-21, has pyproject.toml/setup.py/setup.cfg on default branch",
+  "pr": "changes >=1 .py file, <=300 changed lines (diff +/- lines), not docs/CI-only (all files under docs/, .github/, or *.md/*.rst/*.txt), author not an automated account",
+  "collected_at": "2026-10-21 (Asia/Calcutta)"
+ },
+ "pool_size": 61,
+ "pool": [
+  {
+   "repo": "adbar/trafilatura",
+   "number": 995,
+   "url": "https://github.com/adbar/trafilatura/pull/995",
+   "title": "fix: keep a table footer below the table body",
+   "author": "L4XB",
+   "updated_at": "2026-10-21T08:56:31Z",
+   "stars": 7001,
+   "repo_pushed_at": "2026-10-06T19:31:29Z",
+   "files": [
+    "tests/unit_tests.py",
+    "trafilatura/htmlprocessing.py"
+   ],
+   "additions": 21,
+   "deletions": 0,
+   "changed_lines": 21,
+   "packaging": "pyproject.toml"
+  },
+  {
+   "repo": "adbar/trafilatura",
+   "number": 995,
+   "url": "https://github.com/adbar/trafilatura/pull/995",
+   "title": "fix: keep a table footer below the table body",
+   "author": "L4XB",
+   "updated_at": "2026-10-21T08:56:31Z",
+   "stars": 7001,
+   "repo_pushed_at": "2026-10-06T19:31:29Z",
+   "files": [
+    "tests/unit_tests.py",
+    "trafilatura/htmlprocessing.py"
+   ],
+   "additions": 21,
+   "deletions": 0,
+   "changed_lines": 21,
+   "packaging": "pyproject.toml"
+  },
+  {
+   "repo": "adbar/trafilatura",
+   "number": 995,
+   "url": "https://github.com/adbar/trafilatura/pull/995",
+   "title": "fix: keep a table footer below the table body",
+   "author": "L4XB",
+   "updated_at": "2026-10-21T08:56:31Z",
+   "stars": 7001,
+   "repo_pushed_at": "2026-10-06T19:31:29Z",
+   "files": [
+    "tests/unit_tests.py",
+    "trafilatura/htmlprocessing.py"
+   ],
+   "additions": 21,
+   "deletions": 0,
+   "changed_lines": 21,
+   "packaging": "pyproject.toml"
+  },
+  {
+   "repo": "AI-Hypercomputer/maxdiffusion",
+   "number": 515,
+   "url": "https://github.com/AI-Hypercomputer/maxdiffusion/pull/515",
+   "title": "chore: pyink-reformat two files failing the Linter workflow on main",
+   "author": "Perseus14",
+   "updated_at": "2026-10-21T08:56:12Z",
+   "stars": 392,
+   "repo_pushed_at": "2026-10-21T08:55:56Z",
+   "files": [
+    "src/maxdiffusion/configuration_utils.py",
+    "src/maxdiffusion/trainers/wan_trainer_2_2.py"
+   ],
+   "additions": 2,
+   "deletions": 3,
+   "changed_lines": 5,
+   "packaging": "pyproject.toml"
+  },
+  {
+   "repo": "AI-Hypercomputer/maxdiffusion",
+   "number": 515,
+   "url": "https://github.com/AI-Hypercomputer/maxdiffusion/pull/515",
+   "title": "chore: pyink-reformat two files failing the Linter workflow on main",
+   "author": "Perseus14",
+   "updated_at": "2026-10-21T08:56:12Z",
+   "stars": 392,
+   "repo_pushed_at": "2026-10-21T08:55:56Z",
+   "files": [
+    "src/maxdiffusion/configuration_utils.py",
+    "src/maxdiffusion/trainers/wan_trainer_2_2.py"
+   ],
+   "additions": 2,
+   "deletions": 3,
+   "changed_lines": 5,
+   "packaging": "pyproject.toml"
+  },
+  {
+   "repo": "alltheplaces/alltheplaces",
+   "number": 19898,
+   "url": "https://github.com/alltheplaces/alltheplaces/pull/19898",
+   "title": "[Goodyear US] Fix spider",
+   "author": "sharmaanurag95",
+   "updated_at": "2026-10-21T08:54:52Z",
+   "stars": 843,
+   "repo_pushed_at": "2026-10-21T08:45:10Z",
+   "files": [
+    "locations/spiders/goodyear_us.py"
+   ],
+   "additions": 6,
+   "deletions": 1,
+   "changed_lines": 7,
+   "packaging": "pyproject.toml"
+  },
+  {
+   "repo": "axolotl-ai-cloud/axolotl",
+   "number": 4189,
+   "url": "https://github.com/axolotl-ai-cloud/axolotl/pull/4189",
+   "title": "fix: use tanh GELU in the fused LoRA GEGLU kernel for gelu_pytorch_tanh",
+   "author": "NanoCode012",
+   "updated_at": "2026-10-21T08:56:11Z",
+   "stars": 12601,
+   "repo_pushed_at": "2026-10-21T08:28:36Z",
+   "files": [
+    "src/axolotl/kernels/geglu.py",
+    "src/axolotl/kernels/lora.py",
+    "tests/e2e/kernels/lora_patching/test_lora_kernel_patching.py",
+    "tests/e2e/kernels/test_geglu.py",
+    "tests/e2e/kernels/test_lora_mlp_geglu_moe_correctness.py",
+    "tests/kernels/test_geglu_kind.py"
+   ],
+   "additions": 131,
+   "deletions": 44,
+   "changed_lines": 175,
+   "packaging": "pyproject.toml"
+  },
+  {
+   "repo": "axolotl-ai-cloud/axolotl",
+   "number": 4189,
+   "url": "https://github.com/axolotl-ai-cloud/axolotl/pull/4189",
+   "title": "fix: use tanh GELU in the fused LoRA GEGLU kernel for gelu_pytorch_tanh",
+   "author": "NanoCode012",
+   "updated_at": "2026-10-21T08:56:11Z",
+   "stars": 12601,
+   "repo_pushed_at": "2026-10-21T08:28:36Z",
+   "files": [
+    "src/axolotl/kernels/geglu.py",
+    "src/axolotl/kernels/lora.py",
+    "tests/e2e/kernels/lora_patching/test_lora_kernel_patching.py",
+    "tests/e2e/kernels/test_geglu.py",
+    "tests/e2e/kernels/test_lora_mlp_geglu_moe_correctness.py",
+    "tests/kernels/test_geglu_kind.py"
+   ],
+   "additions": 131,
+   "deletions": 44,
+   "changed_lines": 175,
+   "packaging": "pyproject.toml"
+  },
+  {
+   "repo": "basicswap/basicswap",
+   "number": 806,
+   "url": "https://github.com/basicswap/basicswap/pull/806",
+   "title": "fix: keep seeds, passwords and rpc credentials out of the logs",
+   "author": "tecnovert",
+   "updated_at": "2026-10-21T08:54:56Z",
+   "stars": 326,
+   "repo_pushed_at": "2026-10-21T06:40:01Z",
+   "files": [
+    "basicswap/basicswap.py",
+    "basicswap/bin/prepare.py",
+    "basicswap/bin/run.py",
+    "basicswap/rpc.py",
+    "basicswap/rpc_pool.py",
+    "bin/install_certifi.py",
+    "doc/coins/dash.md",
+    "doc/install.md",
+    "doc/notes.md",
+    "docker/production/notes.md",
+    "tests/basicswap/test_other.py"
+   ],
+   "additions": 150,
+   "deletions": 29,
+   "changed_lines": 179,
+   "packaging": "pyproject.toml"
+  },
+  {
+   "repo": "celery/celery",
+   "number": 10907,
+   "url": "https://github.com/celery/celery/pull/10907",
+   "title": "Fix chord errbacks given as a single signature",
+   "author": "avanish-garg",
+   "updated_at": "2026-10-21T08:56:44Z",
+   "stars": 29028,
+   "repo_pushed_at": "2026-10-20T22:12:54Z",
+   "files": [
+    "celery/backends/base.py",
+    "t/unit/backends/test_base.py"
+   ],
+   "additions": 34,
+   "deletions": 3,
+   "changed_lines": 37,
+   "packaging": "pyproject.toml"
+  },
+  {
+   "repo": "celery/celery",
+   "number": 10907,
+   "url": "https://github.com/celery/celery/pull/10907",
+   "title": "Fix chord errbacks given as a single signature",
+   "author": "avanish-garg",
+   "updated_at": "2026-10-21T08:56:44Z",
+   "stars": 29028,
+   "repo_pushed_at": "2026-10-20T22:12:54Z",
+   "files": [
+    "celery/backends/base.py",
+    "t/unit/backends/test_base.py"
+   ],
+   "additions": 34,
+   "deletions": 3,
+   "changed_lines": 37,
+   "packaging": "pyproject.toml"
+  },
+  {
+   "repo": "celery/celery",
+   "number": 10907,
+   "url": "https://github.com/celery/celery/pull/10907",
+   "title": "Fix chord errbacks given as a single signature",
+   "author": "avanish-garg",
+   "updated_at": "2026-10-21T08:56:44Z",
+   "stars": 29028,
+   "repo_pushed_at": "2026-10-20T22:12:54Z",
+   "files": [
+    "celery/backends/base.py",
+    "t/unit/backends/test_base.py"
+   ],
+   "additions": 34,
+   "deletions": 3,
+   "changed_lines": 37,
+   "packaging": "pyproject.toml"
+  },
+  {
+   "repo": "demisto/content",
+   "number": 46286,
+   "url": "https://github.com/demisto/content/pull/46286",
+   "title": "CRTX-284098_validate_next_token",
+   "author": "masulin97",
+   "updated_at": "2026-10-21T08:55:07Z",
+   "stars": 1318,
+   "repo_pushed_at": "2026-10-21T08:50:41Z",
+   "files": [
+    "Packs/Azure/Integrations/Azure/Azure.py",
+    "Packs/Azure/Integrations/Azure/Azure_test.py",
+    "Packs/Azure/ReleaseNotes/1_20_0.md",
+    "Packs/Azure/pack_metadata.json"
+   ],
+   "additions": 105,
+   "deletions": 8,
+   "changed_lines": 113,
+   "packaging": "pyproject.toml"
+  },
+  {
+   "repo": "deshaw/pyflyby",
+   "number": 617,
+   "url": "https://github.com/deshaw/pyflyby/pull/617",
+   "title": "Fix: tidy-imports should handle malformed doctests on Python 3.14",
+   "author": "Carreau",
+   "updated_at": "2026-10-21T08:55:06Z",
+   "stars": 495,
+   "repo_pushed_at": "2026-10-20T11:50:50Z",
+   "files": [
+    "lib/python/pyflyby/_parse.py",
+    "tests/test_parse.py"
+   ],
+   "additions": 16,
+   "deletions": 2,
+   "changed_lines": 18,
+   "packaging": "pyproject.toml"
+  },
+  {
+   "repo": "fastapi/fastapi",
+   "number": 14490,
+   "url": "https://github.com/fastapi/fastapi/pull/14490",
+   "title": "\ud83d\udc1b Fix openapi for response model with nested computed field",
+   "author": "YuriiMotov",
+   "updated_at": "2026-10-21T08:56:24Z",
+   "stars": 103301,
+   "repo_pushed_at": "2026-10-21T09:00:10Z",
+   "files": [
+    "fastapi/_compat/v2.py",
+    "tests/test_openapi_separate_input_output_schemas.py"
+   ],
+   "additions": 78,
+   "deletions": 9,
+   "changed_lines": 87,
+   "packaging": "pyproject.toml"
+  },
+  {
+   "repo": "fastapi/fastapi",
+   "number": 14490,
+   "url": "https://github.com/fastapi/fastapi/pull/14490",
+   "title": "\ud83d\udc1b Fix openapi for response model with nested computed field",
+   "author": "YuriiMotov",
+   "updated_at": "2026-10-21T08:56:24Z",
+   "stars": 103301,
+   "repo_pushed_at": "2026-10-21T09:00:10Z",
+   "files": [
+    "fastapi/_compat/v2.py",
+    "tests/test_openapi_separate_input_output_schemas.py"
+   ],
+   "additions": 78,
+   "deletions": 9,
+   "changed_lines": 87,
+   "packaging": "pyproject.toml"
+  },
+  {
+   "repo": "fastapi/fastapi",
+   "number": 14490,
+   "url": "https://github.com/fastapi/fastapi/pull/14490",
+   "title": "\ud83d\udc1b Fix openapi for response model with nested computed field",
+   "author": "YuriiMotov",
+   "updated_at": "2026-10-21T08:56:24Z",
+   "stars": 103301,
+   "repo_pushed_at": "2026-10-21T09:00:10Z",
+   "files": [
+    "fastapi/_compat/v2.py",
+    "tests/test_openapi_separate_input_output_schemas.py"
+   ],
+   "additions": 78,
+   "deletions": 9,
+   "changed_lines": 87,
+   "packaging": "pyproject.toml"
+  },
+  {
+   "repo": "flagos-ai/FlagGems",
+   "number": 7212,
+   "url": "https://github.com/flagos-ai/FlagGems/pull/7212",
+   "title": "perf(kunlunxin): cache the 1D-tile geometry across pointwise launches",
+   "author": "llaboon",
+   "updated_at": "2026-10-21T08:55:20Z",
+   "stars": 1161,
+   "repo_pushed_at": "2026-10-21T08:55:20Z",
+   "files": [
+    "src/flag_gems/runtime/backend/_kunlunxin/utils/pointwise_dynamic.py"
+   ],
+   "additions": 40,
+   "deletions": 21,
+   "changed_lines": 61,
+   "packaging": "pyproject.toml"
+  },
+  {
+   "repo": "flagos-ai/FlagGems",
+   "number": 7293,
+   "url": "https://github.com/flagos-ai/FlagGems/pull/7293",
+   "title": "[KernelGen][Nvidia] Add _indices operator with Triton kernel",
+   "author": "Yukun-Cui",
+   "updated_at": "2026-10-21T08:56:10Z",
+   "stars": 1161,
+   "repo_pushed_at": "2026-10-21T08:55:20Z",
+   "files": [
+    "benchmark/test_indices.py",
+    "conf/operators.yaml",
+    "src/flag_gems/__init__.py",
+    "src/flag_gems/ops/__init__.py",
+    "src/flag_gems/ops/_indices.py",
+    "tests/test_indices.py"
+   ],
+   "additions": 259,
+   "deletions": 0,
+   "changed_lines": 259,
+   "packaging": "pyproject.toml"
+  },
+  {
+   "repo": "flagos-ai/FlagGems",
+   "number": 7293,
+   "url": "https://github.com/flagos-ai/FlagGems/pull/7293",
+   "title": "[KernelGen][Nvidia] Add _indices operator with Triton kernel",
+   "author": "Yukun-Cui",
+   "updated_at": "2026-10-21T08:56:10Z",
+   "stars": 1161,
+   "repo_pushed_at": "2026-10-21T08:55:20Z",
+   "files": [
+    "benchmark/test_indices.py",
+    "conf/operators.yaml",
+    "src/flag_gems/__init__.py",
+    "src/flag_gems/ops/__init__.py",
+    "src/flag_gems/ops/_indices.py",
+    "tests/test_indices.py"
+   ],
+   "additions": 259,
+   "deletions": 0,
+   "changed_lines": 259,
+   "packaging": "pyproject.toml"
+  },
+  {
+   "repo": "frappe/erpnext",
+   "number": 61682,
+   "url": "https://github.com/frappe/erpnext/pull/61682",
+   "title": "fix: SMS Center recipient and receiver-list bugs (v16)",
+   "author": "Shllokkk",
+   "updated_at": "2026-10-21T08:55:03Z",
+   "stars": 40415,
+   "repo_pushed_at": "2026-10-21T08:54:49Z",
+   "files": [
+    "erpnext/selling/doctype/sms_center/sms_center.py",
+    "erpnext/selling/doctype/sms_center/test_sms_center.py"
+   ],
+   "additions": 116,
+   "deletions": 7,
+   "changed_lines": 123,
+   "packaging": "pyproject.toml"
+  },
+  {
+   "repo": "frappe/erpnext",
+   "number": 61682,
+   "url": "https://github.com/frappe/erpnext/pull/61682",
+   "title": "fix: SMS Center recipient and receiver-list bugs (v16)",
+   "author": "Shllokkk",
+   "updated_at": "2026-10-21T08:55:03Z",
+   "stars": 40415,
+   "repo_pushed_at": "2026-10-21T08:54:49Z",
+   "files": [
+    "erpnext/selling/doctype/sms_center/sms_center.py",
+    "erpnext/selling/doctype/sms_center/test_sms_center.py"
+   ],
+   "additions": 116,
+   "deletions": 7,
+   "changed_lines": 123,
+   "packaging": "pyproject.toml"
+  },
+  {
+   "repo": "frappe/erpnext",
+   "number": 61683,
+   "url": "https://github.com/frappe/erpnext/pull/61683",
+   "title": "fix: SMS Center recipient and receiver-list bugs (v15)",
+   "author": "Shllokkk",
+   "updated_at": "2026-10-21T08:54:59Z",
+   "stars": 40415,
+   "repo_pushed_at": "2026-10-21T08:54:49Z",
+   "files": [
+    "erpnext/selling/doctype/sms_center/sms_center.py",
+    "erpnext/selling/doctype/sms_center/test_sms_center.py"
+   ],
+   "additions": 116,
+   "deletions": 7,
+   "changed_lines": 123,
+   "packaging": "pyproject.toml"
+  },
+  {
+   "repo": "hashgraph-online/hol-guard",
+   "number": 5467,
+   "url": "https://github.com/hashgraph-online/hol-guard/pull/5467",
+   "title": "refactor(options): retire the Python command-option shim",
+   "author": "zerocodefast",
+   "updated_at": "2026-10-21T08:55:11Z",
+   "stars": 959,
+   "repo_pushed_at": "2026-10-21T08:55:00Z",
+   "files": [
+    "docs/guard/contracts/python-capability-ownership.v1.json",
+    "docs/guard/contracts/runtime-retirement-ledger.v1.json",
+    "src/codex_plugin_scanner/guard/runtime/command_option_parsing.py",
+    "tests/test_native_command_options.py"
+   ],
+   "additions": 51,
+   "deletions": 214,
+   "changed_lines": 265,
+   "packaging": "pyproject.toml"
+  },
+  {
+   "repo": "home-assistant-libs/pychromecast",
+   "number": 1300,
+   "url": "https://github.com/home-assistant-libs/pychromecast/pull/1300",
+   "title": "Expose multizone playback session info",
+   "author": "elupus",
+   "updated_at": "2026-10-21T08:55:08Z",
+   "stars": 2703,
+   "repo_pushed_at": "2026-10-20T00:28:00Z",
+   "files": [
+    "pychromecast/controllers/multizone.py",
+    "tests/test_multizone.py"
+   ],
+   "additions": 245,
+   "deletions": 2,
+   "changed_lines": 247,
+   "packaging": "pyproject.toml"
+  },
+  {
+   "repo": "Mai-with-u/MaiBot",
+   "number": 2218,
+   "url": "https://github.com/Mai-with-u/MaiBot/pull/2218",
+   "title": "fix(query_memory): handle hybrid mode without time range instead of failing (fixes #2187)",
+   "author": "juliasadler",
+   "updated_at": "2026-10-21T08:56:22Z",
+   "stars": 6353,
+   "repo_pushed_at": "2026-10-20T20:04:08Z",
+   "files": [
+    "pytests/A_memorix_test/test_hybrid_without_time_range.py",
+    "src/A_memorix/core/utils/search_execution_service.py",
+    "src/maisaka/builtin_tool/query_memory.py"
+   ],
+   "additions": 265,
+   "deletions": 5,
+   "changed_lines": 270,
+   "packaging": "pyproject.toml"
+  },
+  {
+   "repo": "Mai-with-u/MaiBot",
+   "number": 2218,
+   "url": "https://github.com/Mai-with-u/MaiBot/pull/2218",
+   "title": "fix(query_memory): handle hybrid mode without time range instead of failing (fixes #2187)",
+   "author": "juliasadler",
+   "updated_at": "2026-10-21T08:56:22Z",
+   "stars": 6353,
+   "repo_pushed_at": "2026-10-20T20:04:08Z",
+   "files": [
+    "pytests/A_memorix_test/test_hybrid_without_time_range.py",
+    "src/A_memorix/core/utils/search_execution_service.py",
+    "src/maisaka/builtin_tool/query_memory.py"
+   ],
+   "additions": 265,
+   "deletions": 5,
+   "changed_lines": 270,
+   "packaging": "pyproject.toml"
+  },
+  {
+   "repo": "neuroinformatics-unit/movement",
+   "number": 1157,
+   "url": "https://github.com/neuroinformatics-unit/movement/pull/1157",
+   "title": "Fix NaN warning for single-track data in path metrics",
+   "author": "Sarthak-Shreshtha01",
+   "updated_at": "2026-10-21T08:56:47Z",
+   "stars": 337,
+   "repo_pushed_at": "2026-10-20T13:45:55Z",
+   "files": [
+    "movement/kinematics/path.py",
+    "tests/test_unit/test_kinematics/test_path.py"
+   ],
+   "additions": 21,
+   "deletions": 3,
+   "changed_lines": 24,
+   "packaging": "pyproject.toml"
+  },
+  {
+   "repo": "neuroinformatics-unit/movement",
+   "number": 1157,
+   "url": "https://github.com/neuroinformatics-unit/movement/pull/1157",
+   "title": "Fix NaN warning for single-track data in path metrics",
+   "author": "Sarthak-Shreshtha01",
+   "updated_at": "2026-10-21T08:56:47Z",
+   "stars": 337,
+   "repo_pushed_at": "2026-10-20T13:45:55Z",
+   "files": [
+    "movement/kinematics/path.py",
+    "tests/test_unit/test_kinematics/test_path.py"
+   ],
+   "additions": 21,
+   "deletions": 3,
+   "changed_lines": 24,
+   "packaging": "pyproject.toml"
+  },
+  {
+   "repo": "NVIDIA-NeMo/RL",
+   "number": 4769,
+   "url": "https://github.com/NVIDIA-NeMo/RL/pull/4769",
+   "title": "perf(data_plane): cheaper TransferQueue kv_retrieve_meta on the controller",
+   "author": "ZhiyuLi-Nvidia",
+   "updated_at": "2026-10-21T08:56:50Z",
+   "stars": 2076,
+   "repo_pushed_at": "2026-10-21T08:56:48Z",
+   "files": [
+    "nemo_rl/data_plane/adapters/tq_kv_meta_patch.py",
+    "nemo_rl/data_plane/adapters/transfer_queue.py",
+    "pyrefly.toml",
+    "tests/unit/data_plane/test_tq_kv_meta_patch.py"
+   ],
+   "additions": 167,
+   "deletions": 0,
+   "changed_lines": 167,
+   "packaging": "pyproject.toml"
+  },
+  {
+   "repo": "NVIDIA/structured-data-models",
+   "number": 1213,
+   "url": "https://github.com/NVIDIA/structured-data-models/pull/1213",
+   "title": "Expose immutable column groups for compiled table processing",
+   "author": "aw471",
+   "updated_at": "2026-10-21T08:56:30Z",
+   "stars": 375,
+   "repo_pushed_at": "2026-10-21T08:56:35Z",
+   "files": [
+    "docs/source/tensor.md",
+    "sdm/ensemble.py",
+    "sdm/processing/common/select.py",
+    "sdm/processing/common/stype.py",
+    "sdm/processing/numerical/constant.py",
+    "sdm/tensor/table.py",
+    "test/tensor/test_table.py"
+   ],
+   "additions": 42,
+   "deletions": 13,
+   "changed_lines": 55,
+   "packaging": "pyproject.toml"
+  },
+  {
+   "repo": "NVIDIA/structured-data-models",
+   "number": 1213,
+   "url": "https://github.com/NVIDIA/structured-data-models/pull/1213",
+   "title": "Expose immutable column groups for compiled table processing",
+   "author": "aw471",
+   "updated_at": "2026-10-21T08:56:30Z",
+   "stars": 375,
+   "repo_pushed_at": "2026-10-21T08:56:35Z",
+   "files": [
+    "docs/source/tensor.md",
+    "sdm/ensemble.py",
+    "sdm/processing/common/select.py",
+    "sdm/processing/common/stype.py",
+    "sdm/processing/numerical/constant.py",
+    "sdm/tensor/table.py",
+    "test/tensor/test_table.py"
+   ],
+   "additions": 42,
+   "deletions": 13,
+   "changed_lines": 55,
+   "packaging": "pyproject.toml"
+  },
+  {
+   "repo": "NVIDIA/structured-data-models",
+   "number": 1217,
+   "url": "https://github.com/NVIDIA/structured-data-models/pull/1217",
+   "title": "Fix table dispatch and context resumption during compilation",
+   "author": "aw471",
+   "updated_at": "2026-10-21T08:56:18Z",
+   "stars": 375,
+   "repo_pushed_at": "2026-10-21T08:56:35Z",
+   "files": [
+    "sdm/tensor/table.py"
+   ],
+   "additions": 12,
+   "deletions": 7,
+   "changed_lines": 19,
+   "packaging": "pyproject.toml"
+  },
+  {
+   "repo": "NVIDIA/structured-data-models",
+   "number": 1217,
+   "url": "https://github.com/NVIDIA/structured-data-models/pull/1217",
+   "title": "Fix table dispatch and context resumption during compilation",
+   "author": "aw471",
+   "updated_at": "2026-10-21T08:56:18Z",
+   "stars": 375,
+   "repo_pushed_at": "2026-10-21T08:56:35Z",
+   "files": [
+    "sdm/tensor/table.py"
+   ],
+   "additions": 12,
+   "deletions": 7,
+   "changed_lines": 19,
+   "packaging": "pyproject.toml"
+  },
+  {
+   "repo": "pahaz/sshtunnel",
+   "number": 304,
+   "url": "https://github.com/pahaz/sshtunnel/pull/304",
+   "title": "Migrate to PEP518",
+   "author": "nicolas-graves",
+   "updated_at": "2026-10-21T08:54:50Z",
+   "stars": 1304,
+   "repo_pushed_at": "2026-10-21T08:00:07Z",
+   "files": [
+    "pyproject.toml",
+    "setup.cfg",
+    "setup.py"
+   ],
+   "additions": 65,
+   "deletions": 153,
+   "changed_lines": 218,
+   "packaging": "pyproject.toml"
+  },
+  {
+   "repo": "pipecat-ai/pipecat",
+   "number": 6270,
+   "url": "https://github.com/pipecat-ai/pipecat/pull/6270",
+   "title": "Support Twilio API keys for auto hang-up",
+   "author": "ArmandinhoLeMonstre",
+   "updated_at": "2026-10-21T08:55:05Z",
+   "stars": 16680,
+   "repo_pushed_at": "2026-10-21T03:03:49Z",
+   "files": [
+    "changelog/6270.added.md",
+    "src/pipecat/serializers/twilio.py",
+    "tests/test_twilio_serializer.py"
+   ],
+   "additions": 172,
+   "deletions": 11,
+   "changed_lines": 183,
+   "packaging": "pyproject.toml"
+  },
+  {
+   "repo": "PostHog/posthog",
+   "number": 120512,
+   "url": "https://github.com/PostHog/posthog/pull/120512",
+   "title": "perf(tasks): move routine debug lines out of the run log",
+   "author": "jonathanlab",
+   "updated_at": "2026-10-21T08:55:03Z",
+   "stars": 40370,
+   "repo_pushed_at": "2026-10-21T08:55:15Z",
+   "files": [
+    "products/tasks/backend/temporal/process_task/activities/get_task_processing_context.py",
+    "products/tasks/backend/temporal/process_task/activities/materialize_context_layer.py",
+    "products/tasks/backend/temporal/process_task/activities/provision_sandbox.py",
+    "products/tasks/backend/temporal/process_task/activities/start_agent_server.py"
+   ],
+   "additions": 89,
+   "deletions": 117,
+   "changed_lines": 206,
+   "packaging": "pyproject.toml"
+  },
+  {
+   "repo": "PostHog/posthog",
+   "number": 120637,
+   "url": "https://github.com/PostHog/posthog/pull/120637",
+   "title": "fix(aio): warn only on slow thread waits in on_asyncify_pool",
+   "author": "bernatixer",
+   "updated_at": "2026-10-21T08:54:56Z",
+   "stars": 40370,
+   "repo_pushed_at": "2026-10-21T08:55:15Z",
+   "files": [
+    "posthog/temporal/common/utils.py",
+    "posthog/temporal/tests/test_asyncify.py"
+   ],
+   "additions": 41,
+   "deletions": 5,
+   "changed_lines": 46,
+   "packaging": "pyproject.toml"
+  },
+  {
+   "repo": "PostHog/posthog",
+   "number": 120919,
+   "url": "https://github.com/PostHog/posthog/pull/120919",
+   "title": "fix(google-search-console): suggest the domain property for a www hostname",
+   "author": "Gilbert09",
+   "updated_at": "2026-10-21T08:54:51Z",
+   "stars": 40370,
+   "repo_pushed_at": "2026-10-21T08:55:15Z",
+   "files": [
+    "products/warehouse_sources/backend/temporal/data_imports/sources/google_search_console/google_search_console.py",
+    "products/warehouse_sources/backend/temporal/data_imports/sources/google_search_console/tests/test_google_search_console.py"
+   ],
+   "additions": 12,
+   "deletions": 1,
+   "changed_lines": 13,
+   "packaging": "pyproject.toml"
+  },
+  {
+   "repo": "PostHog/posthog",
+   "number": 120919,
+   "url": "https://github.com/PostHog/posthog/pull/120919",
+   "title": "fix(google-search-console): suggest the domain property for a www hostname",
+   "author": "Gilbert09",
+   "updated_at": "2026-10-21T08:56:08Z",
+   "stars": 40370,
+   "repo_pushed_at": "2026-10-21T08:55:15Z",
+   "files": [
+    "products/warehouse_sources/backend/temporal/data_imports/sources/google_search_console/google_search_console.py",
+    "products/warehouse_sources/backend/temporal/data_imports/sources/google_search_console/tests/test_google_search_console.py"
+   ],
+   "additions": 12,
+   "deletions": 1,
+   "changed_lines": 13,
+   "packaging": "pyproject.toml"
+  },
+  {
+   "repo": "PostHog/posthog",
+   "number": 120919,
+   "url": "https://github.com/PostHog/posthog/pull/120919",
+   "title": "fix(google-search-console): suggest the domain property for a www hostname",
+   "author": "Gilbert09",
+   "updated_at": "2026-10-21T08:56:08Z",
+   "stars": 40370,
+   "repo_pushed_at": "2026-10-21T08:55:15Z",
+   "files": [
+    "products/warehouse_sources/backend/temporal/data_imports/sources/google_search_console/google_search_console.py",
+    "products/warehouse_sources/backend/temporal/data_imports/sources/google_search_console/tests/test_google_search_console.py"
+   ],
+   "additions": 12,
+   "deletions": 1,
+   "changed_lines": 13,
+   "packaging": "pyproject.toml"
+  },
+  {
+   "repo": "PrimeIntellect-ai/prime-rl",
+   "number": 4189,
+   "url": "https://github.com/PrimeIntellect-ai/prime-rl/pull/4189",
+   "title": "feat(perf): add perf/mfu_6dn (plain 6ND MFU)",
+   "author": "samsja",
+   "updated_at": "2026-10-21T08:56:32Z",
+   "stars": 2186,
+   "repo_pushed_at": "2026-10-21T08:59:45Z",
+   "files": [
+    "docs/training.md",
+    "src/prime_rl/trainer/perf.py",
+    "src/prime_rl/trainer/rl/train.py",
+    "src/prime_rl/trainer/sft/train.py"
+   ],
+   "additions": 14,
+   "deletions": 3,
+   "changed_lines": 17,
+   "packaging": "pyproject.toml"
+  },
+  {
+   "repo": "PrimeIntellect-ai/prime-rl",
+   "number": 4189,
+   "url": "https://github.com/PrimeIntellect-ai/prime-rl/pull/4189",
+   "title": "feat(perf): add perf/mfu_6dn (plain 6ND MFU)",
+   "author": "samsja",
+   "updated_at": "2026-10-21T08:56:32Z",
+   "stars": 2186,
+   "repo_pushed_at": "2026-10-21T08:59:45Z",
+   "files": [
+    "docs/training.md",
+    "src/prime_rl/trainer/perf.py",
+    "src/prime_rl/trainer/rl/train.py",
+    "src/prime_rl/trainer/sft/train.py"
+   ],
+   "additions": 14,
+   "deletions": 3,
+   "changed_lines": 17,
+   "packaging": "pyproject.toml"
+  },
+  {
+   "repo": "PrimeIntellect-ai/prime-rl",
+   "number": 4189,
+   "url": "https://github.com/PrimeIntellect-ai/prime-rl/pull/4189",
+   "title": "feat(perf): add perf/mfu_6dn (plain 6ND MFU)",
+   "author": "samsja",
+   "updated_at": "2026-10-21T08:56:32Z",
+   "stars": 2186,
+   "repo_pushed_at": "2026-10-21T08:59:45Z",
+   "files": [
+    "docs/training.md",
+    "src/prime_rl/trainer/perf.py",
+    "src/prime_rl/trainer/rl/train.py",
+    "src/prime_rl/trainer/sft/train.py"
+   ],
+   "additions": 14,
+   "deletions": 3,
+   "changed_lines": 17,
+   "packaging": "pyproject.toml"
+  },
+  {
+   "repo": "Project-MONAI/MONAI",
+   "number": 9160,
+   "url": "https://github.com/Project-MONAI/MONAI/pull/9160",
+   "title": " Add a torch.compile graph-break regression test for DiNTS",
+   "author": "nilapate",
+   "updated_at": "2026-10-21T08:56:09Z",
+   "stars": 8790,
+   "repo_pushed_at": "2026-10-20T14:45:10Z",
+   "files": [
+    "tests/networks/nets/test_dints_network.py"
+   ],
+   "additions": 30,
+   "deletions": 0,
+   "changed_lines": 30,
+   "packaging": "pyproject.toml"
+  },
+  {
+   "repo": "Project-MONAI/MONAI",
+   "number": 9160,
+   "url": "https://github.com/Project-MONAI/MONAI/pull/9160",
+   "title": " Add a torch.compile graph-break regression test for DiNTS",
+   "author": "nilapate",
+   "updated_at": "2026-10-21T08:56:09Z",
+   "stars": 8790,
+   "repo_pushed_at": "2026-10-20T14:45:10Z",
+   "files": [
+    "tests/networks/nets/test_dints_network.py"
+   ],
+   "additions": 30,
+   "deletions": 0,
+   "changed_lines": 30,
+   "packaging": "pyproject.toml"
+  },
+  {
+   "repo": "pytorch/pytorch",
+   "number": 200519,
+   "url": "https://github.com/pytorch/pytorch/pull/200519",
+   "title": "[module-level kernels] inductor: scan each subgraph for its own preamble uses",
+   "author": "bobrenjc93",
+   "updated_at": "2026-10-21T08:54:59Z",
+   "stars": 104943,
+   "repo_pushed_at": "2026-10-21T08:56:42Z",
+   "files": [
+    "test/inductor/test_wrapper_preamble.py",
+    "torch/_inductor/codegen/wrapper.py"
+   ],
+   "additions": 141,
+   "deletions": 21,
+   "changed_lines": 162,
+   "packaging": "pyproject.toml"
+  },
+  {
+   "repo": "pytorch/pytorch",
+   "number": 200520,
+   "url": "https://github.com/pytorch/pytorch/pull/200520",
+   "title": "[module-level kernels] inductor: drop async_compile from a module that compiles nothing",
+   "author": "bobrenjc93",
+   "updated_at": "2026-10-21T08:55:02Z",
+   "stars": 104943,
+   "repo_pushed_at": "2026-10-21T08:56:42Z",
+   "files": [
+    "test/inductor/test_wrapper_preamble.py",
+    "torch/_inductor/codegen/wrapper.py"
+   ],
+   "additions": 50,
+   "deletions": 15,
+   "changed_lines": 65,
+   "packaging": "pyproject.toml"
+  },
+  {
+   "repo": "ROCm/aiter",
+   "number": 6592,
+   "url": "https://github.com/ROCm/aiter/pull/6592",
+   "title": "[HIP] [Bugfix] Fix topk_sigmoid pybind conversion",
+   "author": "rjrock",
+   "updated_at": "2026-10-21T08:56:38Z",
+   "stars": 594,
+   "repo_pushed_at": "2026-10-21T08:31:28Z",
+   "files": [
+    "csrc/pybind/moe_topk_ck_pybind.cu",
+    "op_tests/test_topk_sigmoid.py"
+   ],
+   "additions": 21,
+   "deletions": 1,
+   "changed_lines": 22,
+   "packaging": "pyproject.toml"
+  },
+  {
+   "repo": "ROCm/aiter",
+   "number": 6592,
+   "url": "https://github.com/ROCm/aiter/pull/6592",
+   "title": "[HIP] [Bugfix] Fix topk_sigmoid pybind conversion",
+   "author": "rjrock",
+   "updated_at": "2026-10-21T08:56:38Z",
+   "stars": 594,
+   "repo_pushed_at": "2026-10-21T08:31:28Z",
+   "files": [
+    "csrc/pybind/moe_topk_ck_pybind.cu",
+    "op_tests/test_topk_sigmoid.py"
+   ],
+   "additions": 21,
+   "deletions": 1,
+   "changed_lines": 22,
+   "packaging": "pyproject.toml"
+  },
+  {
+   "repo": "ROCm/aiter",
+   "number": 6592,
+   "url": "https://github.com/ROCm/aiter/pull/6592",
+   "title": "[HIP] [Bugfix] Fix topk_sigmoid pybind conversion",
+   "author": "rjrock",
+   "updated_at": "2026-10-21T08:56:38Z",
+   "stars": 594,
+   "repo_pushed_at": "2026-10-21T08:31:28Z",
+   "files": [
+    "csrc/pybind/moe_topk_ck_pybind.cu",
+    "op_tests/test_topk_sigmoid.py"
+   ],
+   "additions": 21,
+   "deletions": 1,
+   "changed_lines": 22,
+   "packaging": "pyproject.toml"
+  },
+  {
+   "repo": "ROCm/aiter",
+   "number": 6762,
+   "url": "https://github.com/ROCm/aiter/pull/6762",
+   "title": "[FlyDSL] perf(flydsl): cache per-config host work on the GEMM launch path",
+   "author": "ZLkanyo009",
+   "updated_at": "2026-10-21T08:54:45Z",
+   "stars": 594,
+   "repo_pushed_at": "2026-10-21T08:31:28Z",
+   "files": [
+    "aiter/ops/flydsl/kernels/gemm_a16w16_gfx950.py",
+    "aiter/ops/flydsl/mxfp4_kname.py",
+    "aiter/ops/gemm_op_a8w8.py",
+    "aiter/tuned_gemm.py"
+   ],
+   "additions": 34,
+   "deletions": 4,
+   "changed_lines": 38,
+   "packaging": "pyproject.toml"
+  },
+  {
+   "repo": "spack/spack",
+   "number": 36762,
+   "url": "https://github.com/spack/spack/pull/36762",
+   "title": "spack install --overwrite: envs respect option",
+   "author": "becker33",
+   "updated_at": "2026-10-21T08:55:02Z",
+   "stars": 5144,
+   "repo_pushed_at": "2026-10-20T09:49:26Z",
+   "files": [
+    "lib/spack/spack/environment/environment.py",
+    "lib/spack/spack/test/cmd/env.py",
+    "lib/spack/spack/test/cmd/install.py"
+   ],
+   "additions": 14,
+   "deletions": 26,
+   "changed_lines": 40,
+   "packaging": "pyproject.toml"
+  },
+  {
+   "repo": "spack/spack",
+   "number": 36762,
+   "url": "https://github.com/spack/spack/pull/36762",
+   "title": "spack install --overwrite: envs respect option",
+   "author": "becker33",
+   "updated_at": "2026-10-21T08:55:02Z",
+   "stars": 5144,
+   "repo_pushed_at": "2026-10-20T09:49:26Z",
+   "files": [
+    "lib/spack/spack/environment/environment.py",
+    "lib/spack/spack/test/cmd/env.py",
+    "lib/spack/spack/test/cmd/install.py"
+   ],
+   "additions": 14,
+   "deletions": 26,
+   "changed_lines": 40,
+   "packaging": "pyproject.toml"
+  },
+  {
+   "repo": "tile-ai/tilelang",
+   "number": 3595,
+   "url": "https://github.com/tile-ai/tilelang/pull/3595",
+   "title": "[CUDA] Optimize vectorized BF16 to FP32 conversion",
+   "author": "LJC00118",
+   "updated_at": "2026-10-21T08:56:49Z",
+   "stars": 8711,
+   "repo_pushed_at": "2026-10-21T05:49:35Z",
+   "files": [
+    "src/cuda/codegen/codegen_cuda.cc",
+    "src/tl_templates/cuda/common.h",
+    "testing/python/language/test_tilelang_language_vectorized_cast.py",
+    "testing/python/transform/test_tilelang_transform_layout_inference.py"
+   ],
+   "additions": 19,
+   "deletions": 7,
+   "changed_lines": 26,
+   "packaging": "pyproject.toml"
+  },
+  {
+   "repo": "tile-ai/tilelang",
+   "number": 3595,
+   "url": "https://github.com/tile-ai/tilelang/pull/3595",
+   "title": "[CUDA] Optimize vectorized BF16 to FP32 conversion",
+   "author": "LJC00118",
+   "updated_at": "2026-10-21T08:56:49Z",
+   "stars": 8711,
+   "repo_pushed_at": "2026-10-21T05:49:35Z",
+   "files": [
+    "src/cuda/codegen/codegen_cuda.cc",
+    "src/tl_templates/cuda/common.h",
+    "testing/python/language/test_tilelang_language_vectorized_cast.py",
+    "testing/python/transform/test_tilelang_transform_layout_inference.py"
+   ],
+   "additions": 19,
+   "deletions": 7,
+   "changed_lines": 26,
+   "packaging": "pyproject.toml"
+  },
+  {
+   "repo": "vllm-project/humming",
+   "number": 158,
+   "url": "https://github.com/vllm-project/humming/pull/158",
+   "title": "fix(arith): preserve activation dtype for weight scales",
+   "author": "Alex-ai-future",
+   "updated_at": "2026-10-21T08:56:13Z",
+   "stars": 272,
+   "repo_pushed_at": "2026-10-21T05:54:07Z",
+   "files": [
+    "humming/include/humming/arith/mainloop_arith.cuh",
+    "humming/include/humming/datatype/base_conversion.cuh",
+    "tests/kernels/humming/test_shape.py",
+    "tests/kernels/humming/test_special_paths.py"
+   ],
+   "additions": 127,
+   "deletions": 23,
+   "changed_lines": 150,
+   "packaging": "pyproject.toml"
+  },
+  {
+   "repo": "vllm-project/humming",
+   "number": 158,
+   "url": "https://github.com/vllm-project/humming/pull/158",
+   "title": "fix(arith): preserve activation dtype for weight scales",
+   "author": "Alex-ai-future",
+   "updated_at": "2026-10-21T08:56:13Z",
+   "stars": 272,
+   "repo_pushed_at": "2026-10-21T05:54:07Z",
+   "files": [
+    "humming/include/humming/arith/mainloop_arith.cuh",
+    "humming/include/humming/datatype/base_conversion.cuh",
+    "tests/kernels/humming/test_shape.py",
+    "tests/kernels/humming/test_special_paths.py"
+   ],
+   "additions": 127,
+   "deletions": 23,
+   "changed_lines": 150,
+   "packaging": "pyproject.toml"
+  },
+  {
+   "repo": "vllm-project/vllm-ascend",
+   "number": 19366,
+   "url": "https://github.com/vllm-project/vllm-ascend/pull/19366",
+   "title": "[Performance][EPLB] Backport asynchronous map commits to v0.30.0",
+   "author": "freyfwt",
+   "updated_at": "2026-10-21T08:56:38Z",
+   "stars": 2998,
+   "repo_pushed_at": "2026-10-21T08:26:16Z",
+   "files": [
+    "tests/e2e/pull_request/one_card/test_eplb_update_npu.py",
+    "tests/e2e/pull_request/two_card/test_eplb_d2d_update.py",
+    "tests/ut/eplb/adaptor/test_vllm_adaptor.py",
+    "tests/ut/eplb/core/test_eplb_device_transfer_loader.py",
+    "vllm_ascend/eplb/adaptor/vllm_adaptor.py",
+    "vllm_ascend/eplb/core/eplb_device_transfer_loader.py"
+   ],
+   "additions": 235,
+   "deletions": 3,
+   "changed_lines": 238,
+   "packaging": "pyproject.toml"
+  },
+  {
+   "repo": "vllm-project/vllm-ascend",
+   "number": 19366,
+   "url": "https://github.com/vllm-project/vllm-ascend/pull/19366",
+   "title": "[Performance][EPLB] Backport asynchronous map commits to v0.30.0",
+   "author": "freyfwt",
+   "updated_at": "2026-10-21T08:56:38Z",
+   "stars": 2998,
+   "repo_pushed_at": "2026-10-21T08:26:16Z",
+   "files": [
+    "tests/e2e/pull_request/one_card/test_eplb_update_npu.py",
+    "tests/e2e/pull_request/two_card/test_eplb_d2d_update.py",
+    "tests/ut/eplb/adaptor/test_vllm_adaptor.py",
+    "tests/ut/eplb/core/test_eplb_device_transfer_loader.py",
+    "vllm_ascend/eplb/adaptor/vllm_adaptor.py",
+    "vllm_ascend/eplb/core/eplb_device_transfer_loader.py"
+   ],
+   "additions": 235,
+   "deletions": 3,
+   "changed_lines": 238,
+   "packaging": "pyproject.toml"
+  },
+  {
+   "repo": "vllm-project/vllm-ascend",
+   "number": 19366,
+   "url": "https://github.com/vllm-project/vllm-ascend/pull/19366",
+   "title": "[Performance][EPLB] Backport asynchronous map commits to v0.30.0",
+   "author": "freyfwt",
+   "updated_at": "2026-10-21T08:56:38Z",
+   "stars": 2998,
+   "repo_pushed_at": "2026-10-21T08:26:16Z",
+   "files": [
+    "tests/e2e/pull_request/one_card/test_eplb_update_npu.py",
+    "tests/e2e/pull_request/two_card/test_eplb_d2d_update.py",
+    "tests/ut/eplb/adaptor/test_vllm_adaptor.py",
+    "tests/ut/eplb/core/test_eplb_device_transfer_loader.py",
+    "vllm_ascend/eplb/adaptor/vllm_adaptor.py",
+    "vllm_ascend/eplb/core/eplb_device_transfer_loader.py"
+   ],
+   "additions": 235,
+   "deletions": 3,
+   "changed_lines": 238,
+   "packaging": "pyproject.toml"
+  }
+ ]
+}

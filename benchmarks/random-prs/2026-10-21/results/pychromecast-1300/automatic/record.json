@@ -1,0 +1,1270 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-home-assistant-libs-pychromecast-1300-e863b6dfeeb6-2026-10-21-check-1931",
+ "date_ist": "2026-10-21 19:31 IST",
+ "run_date": "2026-10-21",
+ "who": "ops/daily_run.py",
+ "repo": "home-assistant-libs/pychromecast",
+ "library": "pychromecast",
+ "pr": {
+  "repo": "home-assistant-libs/pychromecast",
+  "number": 1300,
+  "url": "https://github.com/home-assistant-libs/pychromecast/pull/1300",
+  "title": "Expose multizone playback session info",
+  "base_sha": "38d0941b5de4244498f2b81d78be9ac163a592ed",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "e863b6dfeeb6b3942da7b0a08448b87db3601026",
+  "merge_commit": "0f533d370d88e209d443c44fc4c2af48ef90a4b8",
+  "tested_main_sha": "38d0941b5de4244498f2b81d78be9ac163a592ed",
+  "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+ },
+ "author": "elupus",
+ "base_ref": "master",
+ "updated_at_utc": "2026-10-21T10:19:19Z",
+ "updated_at_ist": "2026-10-21 15:49 IST",
+ "ci_state": "not checked (single-PR check)",
+ "ci_detail": "checked on request with --pr",
+ "tested_at_ist": "2026-10-21 19:31 IST",
+ "files": {
+  "all": [
+   "pychromecast/controllers/multizone.py",
+   "tests/test_multizone.py"
+  ],
+  "package_py": [
+   "pychromecast/controllers/multizone.py"
+  ],
+  "compiled": [],
+  "other": [
+   "tests/test_multizone.py"
+  ]
+ },
+ "machine_type": {
+  "arch": "x86_64",
+  "os": "Linux",
+  "platform": "Linux-6.12.94+-x86_64-with-glibc2.41",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": "g++ (Debian 14.2.0-19) 14.2.0",
+  "cpu_model": "Intel(R) Xeon(R) Processor",
+  "ram_gb": 15.6
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 3,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.15",
+ "test_selection": "mapped from touched files: tests, tests/test_multizone.py",
+ "per_run": [
+  {
+   "side": "old",
+   "run": 1,
+   "passed": 1,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.2,
+   "pytest_summary": "1 passed in 0.76s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 1,
+   "passed": 6,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.2,
+   "pytest_summary": "6 passed in 0.77s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 2,
+   "passed": 1,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.2,
+   "pytest_summary": "1 passed in 0.75s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 2,
+   "passed": 6,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.2,
+   "pytest_summary": "6 passed in 0.74s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 3,
+   "passed": 1,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.2,
+   "pytest_summary": "1 passed in 0.74s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 3,
+   "passed": 6,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.2,
+   "pytest_summary": "6 passed in 0.75s",
+   "junit": true
+  }
+ ],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "local",
+ "sandbox_backend_note": "local bubblewrap",
+ "machine": "local",
+ "posted_upstream": false,
+ "logs": "pychromecast-1300/",
+ "freeze": {
+  "main": "freeze-main.txt",
+  "pr": "freeze-pr.txt"
+ },
+ "poc_commit": "5492834eef22efd122549356c73d26b3d0ae040a",
+ "route": "source-pair",
+ "current_head_sha": "e863b6dfeeb6b3942da7b0a08448b87db3601026",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "state": "open",
+ "mergeable": true,
+ "mergeable_state": "clean",
+ "product_check": true,
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": {
+   "ok": true,
+   "skipped": false,
+   "live_call": true,
+   "cached": false,
+   "queries": [
+    "pychromecast python setup install instructions https://github.com/home-assistant-libs/pychromecast site:github.com/home-assistant-libs/pychromecast",
+    "pychromecast python documentation install https://github.com/home-assistant-libs/pychromecast site:github.com/home-assistant-libs/pychromecast",
+    "pychromecast python install requirements https://pypi.org/project/pychromecast/ https://github.com/home-assistant-libs/pychromecast site:pypi.org"
+   ],
+   "results": [
+    {
+     "title": "PyChromecast \u00b7 PyPI",
+     "url": "https://pypi.org/project/pychromecast/",
+     "query": "pychromecast python install requirements https://pypi.org/project/pychromecast/ https://github.com/home-assistant-libs/pychromecast site:pypi.org"
+    },
+    {
+     "title": "GitHub - home-assistant-libs/pychromecast: Library for Python 3 to communicate with the Google Chromecast. \u00b7 GitHub",
+     "url": "https://github.com/home-assistant-libs/pychromecast",
+     "query": "pychromecast python setup install instructions https://github.com/home-assistant-libs/pychromecast site:github.com/home-assistant-libs/pychromecast"
+    },
+    {
+     "title": "pychromecast/pychromecast/socket_client.py at master \u00b7 home-assistant-libs/pychromecast \u00b7 GitHub",
+     "url": "https://github.com/home-assistant-libs/pychromecast/blob/master/pychromecast/socket_client.py",
+     "query": "pychromecast python setup install instructions https://github.com/home-assistant-libs/pychromecast site:github.com/home-assistant-libs/pychromecast"
+    },
+    {
+     "title": "pychromecast/examples/media_enqueue.py at master \u00b7 home-assistant-libs/pychromecast \u00b7 GitHub",
+     "url": "https://github.com/home-assistant-libs/pychromecast/blob/master/examples/media_enqueue.py",
+     "query": "pychromecast python setup install instructions https://github.com/home-assistant-libs/pychromecast site:github.com/home-assistant-libs/pychromecast"
+    },
+    {
+     "title": "\"[WinError 10049] The requested address is not valid in its ...",
+     "url": "https://github.com/home-assistant-libs/pychromecast/issues/483",
+     "query": "pychromecast python documentation install https://github.com/home-assistant-libs/pychromecast site:github.com/home-assistant-libs/pychromecast"
+    }
+   ],
+   "text": "To set up pychromecast, you need to install the Python packages requests, protobuf, and zeroconf. Install these dependencies by running `pip install -r requirements.txt`. The library can be used to discover and connect to Chromecast devices, as demonstrated in the examples provided in the repository. The socket connection parameters include host, port, cast type, retries, and timeout. The default port is 8009, but special devices may use different ports. The library also includes error handling for various connection issues.\nTo install the pychromecast library for Python 3 to communicate with Google Chromecast, you need to install the required dependencies using `pip install -r requirements.txt`. The library depends on the packages requests, protobuf, and zeroconf. The GitHub repository for pychromecast also includes a module for interacting with the Chromecast via protobuf-over-socket, which serves as a workaround for certain issues. The repository provides an example of discovering Chromecast devices using the library.\nTo install PyChromecast, you need Python 3.11+ as per the latest version on PyPI. The required dependencies are requests, protobuf, and zeroconf. You can download the source distribution from PyPI, for example, PyChromecast-0.8.2.tar.gz or PyChromecast-14.0.9.tar.gz. The sources indicate that PyChromecast relies on mDNS to discover cast devices and must be on the same subnet as the cast devices.\n# PyChromecast 14.0.9. Library for Python 3.11+ to communicate with the Google Chromecast. *Check out* Home Assistant *for a ready-made solution using PyChromecast for controlling and automating your Chromecast or Cast-enabled device like Google Home.*. >> import time >> import pychromecast >> import zeroconf >> # Create a browser which prints the friendly name of found chromecast devices >> zconf = zeroconf. stop_discovery(browser) >> # Discover and connect to chromecasts named Living Room >> c\nCheck out Home Assistant for a ready-made solution using PyChromecast for controlling and automating your Chromecast or Cast-enabled device like Google Home.\n\n## Dependencies\n\nPyChromecast depends on the Python packages requests, protobuf and zeroconf. Make sure you have these dependencies installed using `pip install -r requirements.txt`\n\n## How to use [...] | fabfile.py | fabfile.py |  |  |\n| mypy.ini | mypy.ini |  |  |\n| pylintrc | pylintrc |  |  |\n| pyproject.toml | pyproject.toml |  |  |\n| \n:param host: The host to connect to.\n\n:param port: The port to use when connecting to the device, set to None to\n\nuse the default of 8009. Special devices such as Cast Groups\n\nmay return a different port number so we need to use that.\n\n:param cast\\_type: The type of chromecast to connect to, see\n\ndial.CAST\\_TYPE\\_\\ for types.\n\n:param tries: Number of retries to perform if the connection fails.\n\nNone for infinite retries.\n\n:param timeout: A floating point number specifying the socket timeout in [\nconfigure\\_logging(args)\n\nchromecasts, browser = pychromecast.get\\_listed\\_chromecasts(\n\nfriendly\\_names=[args.cast], known\\_hosts=args.known\\_host\n\n)\n\nif not chromecasts:\n\nprint(f'No chromecast with name \"{args.cast}\" discovered')\n\nsys.exit(1)\n\ncast = chromecasts\n\n# Start socket client's worker thread and wait for initial status update\n\ncast.wait()\n\nprint(f'Found chromecast with name \"{args.cast}\"')\n\ncast.media\\_controller.play\\_media(MEDIA\\_URLS, \"audio/mp3\")\nThe only code I have written is import pychromecast services, browser = pychromecast.discovery.discover_chromecasts()",
+   "errors": [],
+   "lines": [
+    "Looked up with Tavily: 5 results",
+    "Query: pychromecast python setup install instructions https://github.com/home-assistant-libs/pychromecast site:github.com/home-assistant-libs/pychromecast",
+    "Query: pychromecast python documentation install https://github.com/home-assistant-libs/pychromecast site:github.com/home-assistant-libs/pychromecast",
+    "Query: pychromecast python install requirements https://pypi.org/project/pychromecast/ https://github.com/home-assistant-libs/pychromecast site:pypi.org",
+    "Source: PyChromecast \u00b7 PyPI \u2014 https://pypi.org/project/pychromecast/",
+    "Source: GitHub - home-assistant-libs/pychromecast: Library for Python 3 to communicate with the Google Chromecast. \u00b7 GitHub \u2014 https://github.com/home-assistant-libs/pychromecast",
+    "Source: pychromecast/pychromecast/socket_client.py at master \u00b7 home-assistant-libs/pychromecast \u00b7 GitHub \u2014 https://github.com/home-assistant-libs/pychromecast/blob/master/pychromecast/socket_client.py",
+    "Source: pychromecast/examples/media_enqueue.py at master \u00b7 home-assistant-libs/pychromecast \u00b7 GitHub \u2014 https://github.com/home-assistant-libs/pychromecast/blob/master/examples/media_enqueue.py",
+    "Source: \"[WinError 10049] The requested address is not valid in its ... \u2014 https://github.com/home-assistant-libs/pychromecast/issues/483"
+   ]
+  },
+  "notes": [
+   "Setup check: GitHub token: present.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory 5.8 GB (of 15.6 GB).",
+   "Setup check: free disk 98.1 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: 5 results",
+   "Query: pychromecast python setup install instructions https://github.com/home-assistant-libs/pychromecast site:github.com/home-assistant-libs/pychromecast",
+   "Query: pychromecast python documentation install https://github.com/home-assistant-libs/pychromecast site:github.com/home-assistant-libs/pychromecast",
+   "Query: pychromecast python install requirements https://pypi.org/project/pychromecast/ https://github.com/home-assistant-libs/pychromecast site:pypi.org",
+   "Source: PyChromecast \u00b7 PyPI \u2014 https://pypi.org/project/pychromecast/",
+   "Source: GitHub - home-assistant-libs/pychromecast: Library for Python 3 to communicate with the Google Chromecast. \u00b7 GitHub \u2014 https://github.com/home-assistant-libs/pychromecast",
+   "Source: pychromecast/pychromecast/socket_client.py at master \u00b7 home-assistant-libs/pychromecast \u00b7 GitHub \u2014 https://github.com/home-assistant-libs/pychromecast/blob/master/pychromecast/socket_client.py",
+   "Source: pychromecast/examples/media_enqueue.py at master \u00b7 home-assistant-libs/pychromecast \u00b7 GitHub \u2014 https://github.com/home-assistant-libs/pychromecast/blob/master/examples/media_enqueue.py",
+   "Source: \"[WinError 10049] The requested address is not valid in its ... \u2014 https://github.com/home-assistant-libs/pychromecast/issues/483",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: protobuf is noted, installed with the project.",
+   "Setup plan: zeroconf is noted, installed with the project.",
+   "Setup plan: casttube is noted, installed with the project.",
+   "Setup plan: install beautifulsoup4==4.15.0 (listed in requirements-test.txt) on main and pr.",
+   "Setup plan: install ruff==0.17.1 (listed in requirements-test.txt) on main and pr.",
+   "Setup plan: install mypy==2.4.0 (listed in requirements-test.txt) on main and pr.",
+   "Setup plan: install PlexAPI==4.17.2 (listed in requirements-test.txt) on main and pr.",
+   "Setup plan: install pylint==4.1.3 (listed in requirements-test.txt) on main and pr.",
+   "Setup plan: install pytest==9.1.1 (listed in requirements-test.txt) on main and pr.",
+   "Setup plan: install rstcheck==6.3.0 (listed in requirements-test.txt) on main and pr.",
+   "Setup plan: install types-beautifulsoup4==4.12.0.20250516 (listed in requirements-test.txt) on main and pr.",
+   "Setup plan: install types-html5lib==1.1.11.20260518 (listed in requirements-test.txt) on main and pr.",
+   "Setup plan: install types-protobuf==7.35.1.20260906 (listed in requirements-test.txt) on main and pr.",
+   "Setup plan: install types-requests==2.33.0.20261006 (listed in requirements-test.txt) on main and pr.",
+   "Setup plan: install yle-dl==20240927 (listed in requirements-test.txt) on main and pr.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >=3.11.0",
+   "Installed beautifulsoup4 4.15.0 from requirements-test.txt (listed in requirements-test.txt) on main and pr.",
+   "Installed ruff 0.17.1 from requirements-test.txt (listed in requirements-test.txt) on main and pr.",
+   "Installed mypy 2.4.0 from requirements-test.txt (listed in requirements-test.txt) on main and pr.",
+   "Installed PlexAPI 4.17.2 from requirements-test.txt (listed in requirements-test.txt) on main and pr.",
+   "Installed pylint 4.1.3 from requirements-test.txt (listed in requirements-test.txt) on main and pr.",
+   "Installed pytest 9.1.1 from requirements-test.txt (listed in requirements-test.txt) on main and pr.",
+   "Installed rstcheck 6.3.0 from requirements-test.txt (listed in requirements-test.txt) on main and pr.",
+   "Installed types-beautifulsoup4 4.12.0.20250516 from requirements-test.txt (listed in requirements-test.txt) on main and pr.",
+   "Installed types-html5lib 1.1.11.20260518 from requirements-test.txt (listed in requirements-test.txt) on main and pr.",
+   "Installed types-protobuf 7.35.1.20260906 from requirements-test.txt (listed in requirements-test.txt) on main and pr.",
+   "Installed types-requests 2.33.0.20261006 from requirements-test.txt (listed in requirements-test.txt) on main and pr.",
+   "Installed yle-dl 20240927 from requirements-test.txt (listed in requirements-test.txt) on main and pr."
+  ],
+  "setup_plan": {
+   "packages": [
+    {
+     "requirement": "protobuf>=4.25.1",
+     "name": "protobuf",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "zeroconf>=0.25.1",
+     "name": "zeroconf",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "casttube>=0.2.0",
+     "name": "casttube",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "beautifulsoup4==4.15.0",
+     "name": "beautifulsoup4",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements-test.txt",
+     "reason": "listed in requirements-test.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "ruff==0.17.1",
+     "name": "ruff",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements-test.txt",
+     "reason": "listed in requirements-test.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "mypy==2.4.0",
+     "name": "mypy",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements-test.txt",
+     "reason": "listed in requirements-test.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "PlexAPI==4.17.2",
+     "name": "PlexAPI",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements-test.txt",
+     "reason": "listed in requirements-test.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pylint==4.1.3",
+     "name": "pylint",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements-test.txt",
+     "reason": "listed in requirements-test.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest==9.1.1",
+     "name": "pytest",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements-test.txt",
+     "reason": "listed in requirements-test.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "rstcheck==6.3.0",
+     "name": "rstcheck",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements-test.txt",
+     "reason": "listed in requirements-test.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "types-beautifulsoup4==4.12.0.20250516",
+     "name": "types-beautifulsoup4",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements-test.txt",
+     "reason": "listed in requirements-test.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "types-html5lib==1.1.11.20260518",
+     "name": "types-html5lib",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements-test.txt",
+     "reason": "listed in requirements-test.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "types-protobuf==7.35.1.20260906",
+     "name": "types-protobuf",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements-test.txt",
+     "reason": "listed in requirements-test.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "types-requests==2.33.0.20261006",
+     "name": "types-requests",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements-test.txt",
+     "reason": "listed in requirements-test.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "yle-dl==20240927",
+     "name": "yle-dl",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements-test.txt",
+     "reason": "listed in requirements-test.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    }
+   ],
+   "extra_reqs": [
+    "beautifulsoup4==4.15.0",
+    "ruff==0.17.1",
+    "mypy==2.4.0",
+    "PlexAPI==4.17.2",
+    "pylint==4.1.3",
+    "pytest==9.1.1",
+    "rstcheck==6.3.0",
+    "types-beautifulsoup4==4.12.0.20250516",
+    "types-html5lib==1.1.11.20260518",
+    "types-protobuf==7.35.1.20260906",
+    "types-requests==2.33.0.20261006",
+    "yle-dl==20240927"
+   ],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >=3.11.0"
+   },
+   "system": [],
+   "refused": []
+  },
+  "installs": [
+   {
+    "package": "beautifulsoup4",
+    "requirement": "beautifulsoup4==4.15.0",
+    "version": "4.15.0",
+    "versions": {
+     "main": "4.15.0",
+     "pr": "4.15.0"
+    },
+    "source": "requirements-test.txt",
+    "reason": "listed in requirements-test.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "ruff",
+    "requirement": "ruff==0.17.1",
+    "version": "0.17.1",
+    "versions": {
+     "main": "0.17.1",
+     "pr": "0.17.1"
+    },
+    "source": "requirements-test.txt",
+    "reason": "listed in requirements-test.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "mypy",
+    "requirement": "mypy==2.4.0",
+    "version": "2.4.0",
+    "versions": {
+     "main": "2.4.0",
+     "pr": "2.4.0"
+    },
+    "source": "requirements-test.txt",
+    "reason": "listed in requirements-test.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "PlexAPI",
+    "requirement": "PlexAPI==4.17.2",
+    "version": "4.17.2",
+    "versions": {
+     "main": "4.17.2",
+     "pr": "4.17.2"
+    },
+    "source": "requirements-test.txt",
+    "reason": "listed in requirements-test.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "pylint",
+    "requirement": "pylint==4.1.3",
+    "version": "4.1.3",
+    "versions": {
+     "main": "4.1.3",
+     "pr": "4.1.3"
+    },
+    "source": "requirements-test.txt",
+    "reason": "listed in requirements-test.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "pytest",
+    "requirement": "pytest==9.1.1",
+    "version": "9.1.1",
+    "versions": {
+     "main": "9.1.1",
+     "pr": "9.1.1"
+    },
+    "source": "requirements-test.txt",
+    "reason": "listed in requirements-test.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "rstcheck",
+    "requirement": "rstcheck==6.3.0",
+    "version": "6.3.0",
+    "versions": {
+     "main": "6.3.0",
+     "pr": "6.3.0"
+    },
+    "source": "requirements-test.txt",
+    "reason": "listed in requirements-test.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "types-beautifulsoup4",
+    "requirement": "types-beautifulsoup4==4.12.0.20250516",
+    "version": "4.12.0.20250516",
+    "versions": {
+     "main": "4.12.0.20250516",
+     "pr": "4.12.0.20250516"
+    },
+    "source": "requirements-test.txt",
+    "reason": "listed in requirements-test.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "types-html5lib",
+    "requirement": "types-html5lib==1.1.11.20260518",
+    "version": "1.1.11.20260518",
+    "versions": {
+     "main": "1.1.11.20260518",
+     "pr": "1.1.11.20260518"
+    },
+    "source": "requirements-test.txt",
+    "reason": "listed in requirements-test.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "types-protobuf",
+    "requirement": "types-protobuf==7.35.1.20260906",
+    "version": "7.35.1.20260906",
+    "versions": {
+     "main": "7.35.1.20260906",
+     "pr": "7.35.1.20260906"
+    },
+    "source": "requirements-test.txt",
+    "reason": "listed in requirements-test.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "types-requests",
+    "requirement": "types-requests==2.33.0.20261006",
+    "version": "2.33.0.20261006",
+    "versions": {
+     "main": "2.33.0.20261006",
+     "pr": "2.33.0.20261006"
+    },
+    "source": "requirements-test.txt",
+    "reason": "listed in requirements-test.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "yle-dl",
+    "requirement": "yle-dl==20240927",
+    "version": "20240927",
+    "versions": {
+     "main": "20240927",
+     "pr": "20240927"
+    },
+    "source": "requirements-test.txt",
+    "reason": "listed in requirements-test.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   }
+  ]
+ },
+ "chosen": {
+  "pr": 1300,
+  "head_sha": null,
+  "install": null,
+  "test_cmd": null
+ },
+ "sides": {
+  "comparison_basis": "base tip vs GitHub test merge (refs/pull/N/merge)",
+  "main_sha": "38d0941b5de4244498f2b81d78be9ac163a592ed",
+  "pr_sha": "0f533d370d88e209d443c44fc4c2af48ef90a4b8",
+  "merge_commit": "0f533d370d88e209d443c44fc4c2af48ef90a4b8",
+  "merge_parents": [
+   "38d0941b5de4244498f2b81d78be9ac163a592ed",
+   "e863b6dfeeb6b3942da7b0a08448b87db3601026"
+  ],
+  "merge_head_matches_pinned_head": true
+ },
+ "tested": {
+  "main": "master @ 38d0941b5de4 (base tip = first parent of the merge commit)",
+  "pr": "GitHub test merge commit 0f533d370d88 (refs/pull/1300/merge) of head e863b6dfeeb6"
+ },
+ "probe_plan": {
+  "baseline": "full",
+  "model": "model provider: nebius (Token Factory, live)",
+  "errors": [],
+  "model_claims": [
+   {
+    "id": "C1",
+    "text": "The playbackSession fields (appAllowsGrouping, isVideoContent, streamTransferSupported) are parsed from MULTIZONE_STATUS and exposed as MultizoneController.playback_session.",
+    "source_quote": "- Parse `playbackSession` from `MULTIZONE_STATUS` (`appAllowsGrouping`, `isVideoContent`, `streamTransferSupported`) and expose it as `MultizoneController.playback_session`.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C2",
+    "text": "playback_session is None when no session is attached to the endpoint.",
+    "source_quote": "It's `None` when no session is attached to the endpoint",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C3",
+    "text": "playback_session is cleared on reset_members().",
+    "source_quote": "and it's cleared on `reset_members()`.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C4",
+    "text": "PLAYBACK_SESSION_UPDATED messages are parsed into a PlaybackSessionUpdate object containing name, changed_devices, failed_devices, and an optional session_endpoint.",
+    "source_quote": "- Parse `PLAYBACK_SESSION_UPDATED` (previously dropped) into a `PlaybackSessionUpdate` (`name`, `changed_devices`, `failed_devices`, optional `session_endpoint`).",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C5",
+    "text": "The parsed PlaybackSessionUpdate is delivered to listeners via the new MultiZoneControllerListener.multizone_playback_session_updated callback.",
+    "source_quote": "Pass it to listeners via a new `MultiZoneControllerListener.multizone_playback_session_updated` callback.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C6",
+    "text": "The multizone_playback_session_updated callback is not abstract, allowing existing listener subclasses to continue working without modification.",
+    "source_quote": "The callback is not abstract, so existing listener subclasses keep working.",
+    "testable": true,
+    "expect": "same"
+   },
+   {
+    "id": "C7",
+    "text": "Device IDs in multizone messages are normalized to the dashed form used for members, accommodating devices that report dashless IDs.",
+    "source_quote": "- Normalize device ids to the dashed form used for `members`, since devices also report dashless ids.",
+    "testable": true,
+    "expect": "differs"
+   }
+  ],
+  "model_rejected_claims": [],
+  "diff_targets": [],
+  "frozen": [
+   {
+    "path": "model-probes/model-p1.py",
+    "source": "model",
+    "sha256": "2d7fbf9a54bad7749d6a282c85cf5eabe4cb32fc0f7881bb9ff54839d15e9f4b",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-10-21T14:05:03.747739+00:00",
+    "inputs_sha256": "f4a0967abc770fc57569a1135b795fe161e80b552d1ce3c0d893318ae3dfa116",
+    "inputs": {
+     "title_chars": 38,
+     "body_chars": 1674,
+     "base_files": {
+      "pychromecast/controllers/multizone.py": "0ea23240ce530b427c0045d26fa7bd3f3c4d0c90c77dbef6c9d285fb0da632be"
+     }
+    }
+   }
+  ]
+ },
+ "test_extras": [],
+ "pr_side_started_at": "2026-10-21T14:05:03.876822+00:00",
+ "test_targets": {
+  "main": [
+   "tests"
+  ],
+  "pr": [
+   "tests",
+   "tests/test_multizone.py"
+  ]
+ },
+ "installed_commit": {
+  "main": {
+   "dist": "PyChromecast",
+   "expected": "38d0941b5de4244498f2b81d78be9ac163a592ed",
+   "installed": "38d0941b5de4244498f2b81d78be9ac163a592ed",
+   "ok": true
+  },
+  "pr": {
+   "dist": "PyChromecast",
+   "expected": "0f533d370d88e209d443c44fc4c2af48ef90a4b8",
+   "installed": "0f533d370d88e209d443c44fc4c2af48ef90a4b8",
+   "ok": true
+  }
+ },
+ "comparison": {
+  "same": 1,
+  "same_skipped_both": 0,
+  "regressions": [],
+  "fixed": [],
+  "new_tests_passing": 5,
+  "new_tests_failing": [],
+  "new_tests_skipped": [],
+  "removed_tests": [],
+  "reparametrized": [],
+  "skipped_missing_dependency": [],
+  "flaky": [],
+  "pr_unstable": [],
+  "pr_unstable_noisy": [],
+  "environment": [],
+  "other_changes": [],
+  "preexisting_failures": [],
+  "load_failed_both": [],
+  "load_failed_pr": [],
+  "load_failed_main": [],
+  "executed": {
+   "main": 1,
+   "pr": 6
+  },
+  "messages": {}
+ },
+ "exit_check": {
+  "explained": true,
+  "problems": [],
+  "detail": "all runs exited 0"
+ },
+ "coverage": {
+  "status": "measured",
+  "changed_lines_total": 43,
+  "changed_lines_covered": 41,
+  "files": [
+   {
+    "file": "pychromecast/controllers/multizone.py",
+    "changed_lines_total": 43,
+    "changed_lines_covered": 41
+   }
+  ],
+  "seconds": 1.9,
+  "exit": 0,
+  "log": "coverage-pytest.log"
+ },
+ "probes": {
+  "status": "error",
+  "items": [
+   {
+    "id": "model-p1",
+    "source": "model",
+    "path": "model-probes/model-p1.py",
+    "sha256": "2d7fbf9a54bad7749d6a282c85cf5eabe4cb32fc0f7881bb9ff54839d15e9f4b",
+    "target": "home-assistant-libs/pychromecast#1300",
+    "about": "model-written probe of the changed files (no description given)",
+    "claims": [
+     {
+      "id": "C1",
+      "source": "PR description",
+      "text": "The playbackSession fields (appAllowsGrouping, isVideoContent, streamTransferSupported) are parsed from MULTIZONE_STATUS and exposed as MultizoneController.playback_session.",
+      "covers": [
+       "obs_C1_playback_session_exists",
+       "obs_C1_playback_session_value"
+      ],
+      "expect": "differs"
+     },
+     {
+      "id": "C2",
+      "source": "PR description",
+      "text": "playback_session is None when no session is attached to the endpoint.",
+      "covers": [
+       "obs_C2_playback_session_none"
+      ],
+      "expect": "differs"
+     },
+     {
+      "id": "C3",
+      "source": "PR description",
+      "text": "playback_session is cleared on reset_members().",
+      "covers": [
+       "obs_C3_cleared_on_reset"
+      ],
+      "expect": "differs"
+     },
+     {
+      "id": "C4",
+      "source": "PR description",
+      "text": "PLAYBACK_SESSION_UPDATED messages are parsed into a PlaybackSessionUpdate object containing name, changed_devices, failed_devices, and an optional session_endpoint.",
+      "covers": [
+       "obs_C4_parsed_playback_session_updated"
+      ],
+      "expect": "differs"
+     },
+     {
+      "id": "C5",
+      "source": "PR description",
+      "text": "The parsed PlaybackSessionUpdate is delivered to listeners via the new MultiZoneControllerListener.multizone_playback_session_updated callback.",
+      "covers": [
+       "obs_C5_delivered_to_listeners"
+      ],
+      "expect": "differs"
+     },
+     {
+      "id": "C6",
+      "source": "PR description",
+      "text": "The multizone_playback_session_updated callback is not abstract, allowing existing listener subclasses to continue working without modification.",
+      "covers": [
+       "obs_C6_callback_not_abstract"
+      ],
+      "expect": "same"
+     },
+     {
+      "id": "C7",
+      "source": "PR description",
+      "text": "Device IDs in multizone messages are normalized to the dashed form used for members, accommodating devices that report dashless IDs.",
+      "covers": [
+       "obs_C7_device_ids_normalized"
+      ],
+      "expect": "differs"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.3,
+      "ok": false
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.3,
+      "ok": false
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.3,
+      "ok": false
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.3,
+      "ok": false
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.3,
+      "ok": false
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.3,
+      "ok": false
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-p1-main-1.jsonl",
+      "probe-model-p1-main-2.jsonl",
+      "probe-model-p1-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-p1-pr-1.jsonl",
+      "probe-model-p1-pr-2.jsonl",
+      "probe-model-p1-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      },
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      },
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      }
+     ],
+     "pr": [
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      },
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      },
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "probe.error",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "crash": "non-json output",
+       "exit_code": 1
+      },
+      "pr": {
+       "crash": "non-json output",
+       "exit_code": 1
+      },
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"probe.error\""
+       },
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"probe.error\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "2d7fbf9a54bad7749d6a282c85cf5eabe4cb32fc0f7881bb9ff54839d15e9f4b",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-10-21T14:05:03.747739+00:00",
+     "inputs_sha256": "f4a0967abc770fc57569a1135b795fe161e80b552d1ce3c0d893318ae3dfa116",
+     "inputs": {
+      "title_chars": 38,
+      "body_chars": 1674,
+      "base_files": {
+       "pychromecast/controllers/multizone.py": "0ea23240ce530b427c0045d26fa7bd3f3c4d0c90c77dbef6c9d285fb0da632be"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-10-21T14:05:03.876822+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 7,
+     "changed_lines_covered": 0,
+     "files": [
+      {
+       "file": "pychromecast/controllers/multizone.py",
+       "changed_lines_total": 7,
+       "changed_lines_covered": 6
+      }
+     ],
+     "adequacy": "not_adequate",
+     "note": "the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate",
+     "exit": 1,
+     "data": "probe-cov-model-p1.json",
+     "changed_lines_touched": 6
+    },
+    "status": "crashed",
+    "uninformative_reason": "the probe crashed or printed no parsed output on every main-side run"
+   }
+  ],
+  "summary": {
+   "labels": [],
+   "flagged": [],
+   "proven_claims": [],
+   "reason": "the probe crashed or printed no parsed output on every main-side run",
+   "ignored_noise": [],
+   "ignored_warning_only": [],
+   "pr_only_noisy": []
+  }
+ },
+ "probe_changed_line_coverage": {
+  "status": "measured",
+  "side": "main",
+  "probes": {
+   "model-p1": {
+    "status": "measured",
+    "changed_lines_covered": 0,
+    "changed_lines_total": 7,
+    "adequacy": "not_adequate"
+   }
+  },
+  "not_adequate": [
+   "model-p1"
+  ]
+ },
+ "verdict": "could_not_verify",
+ "reason": "could not verify: claim(s) C1, C2, C3, C4 (+2 more) expect a difference but no observation matches (1 test(s) ran on main, 6 on the PR; 5 new test(s) pass, 1 unchanged; probe model-p1 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count)",
+ "verdict_before_coverage_gate": "could_not_verify",
+ "reason_before_coverage_gate": "could not verify: claim(s) C1, C2, C3, C4 (+2 more) expect a difference but no observation matches (1 test(s) ran on main, 6 on the PR; 5 new test(s) pass, 1 unchanged; probe model-p1 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count)",
+ "changed_lines_total": 43,
+ "changed_lines_covered": 41,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "normal",
+  "note": "41 of 43 changed executable line(s) ran (95%)",
+  "measurement": "measured"
+ },
+ "related_reports": {
+  "status": "ok",
+  "text": "1. \"Issues \u00b7 home-assistant-libs/pychromecast \u00b7 GitHub\"\n   https://github.com/home-assistant-libs/pychromecast/issues\n   \"home-assistant-libs/pychromecast#1059 \u00b7 opened on Apr 28, 2025 ### Fields in `media.metadata` (artist, title etc) never get cleared in `MediaStatus` and can report wrong/stale info. home-assistant-libs/pychromecast#1018 \u00b7 opened on Feb 3, 2...\"\n2. \"GitHub - home-assistant-libs/pychromecast: Library for Python 3 to communicate with the Google Chromecast. \u00b7 GitHub\"\n   https://github.com/home-assistant-libs/pychromecast\n   \"namespaces ='urn:x-cast:com.google.cast.player.message''urn:x-cast:com.google.cast.media' session_id ='CCA39713-9A4F-34A6-A8BF-5D97BE7ECA5C' transport_id ='web-9' status_text = '' >> mc = cast media_controller >> mc play_media' >> mc block_...\"\n3. \"[solved] Pychromecast not connecting to devices (zeroconf issue) - cast - Home Assistant Community\"\n   h...",
+  "items": [
+   {
+    "title": "Issues \u00b7 home-assistant-libs/pychromecast \u00b7 GitHub",
+    "url": "https://github.com/home-assistant-libs/pychromecast/issues",
+    "content": "home-assistant-libs/pychromecast#1059 \u00b7 opened on Apr 28, 2025 ### Fields in `media.metadata` (artist, title etc) never get cleared in `MediaStatus` and can report wrong/stale info. home-assistant-libs/pychromecast#1018 \u00b7 opened on Feb 3, 2..."
+   },
+   {
+    "title": "GitHub - home-assistant-libs/pychromecast: Library for Python 3 to communicate with the Google Chromecast. \u00b7 GitHub",
+    "url": "https://github.com/home-assistant-libs/pychromecast",
+    "content": "namespaces ='urn:x-cast:com.google.cast.player.message''urn:x-cast:com.google.cast.media' session_id ='CCA39713-9A4F-34A6-A8BF-5D97BE7ECA5C' transport_id ='web-9' status_text = '' >> mc = cast media_controller >> mc play_media' >> mc block_..."
+   },
+   {
+    "title": "[solved] Pychromecast not connecting to devices (zeroconf issue) - cast - Home Assistant Community",
+    "url": "https://community.home-assistant.io/t/solved-pychromecast-not-connecting-to-devices-zeroconf-issue/617646",
+    "content": "2023-09-23 10:49:45.262 DEBUG (Thread-4) [pychromecast.socket_client] [Wohnzimmer(unknown):8009] Resolved service ServiceInfo(type='mdns', data='Google-Home-e6abf81fd4380f7992aeee28813cb6ce._googlecast._tcp.local.') to e6abf81f-d438-0f79-92..."
+   }
+  ],
+  "query": "home-assistant-libs/pychromecast Expose multizone playback session info bug report issue",
+  "untrusted": true
+ },
+ "explanation": {
+  "status": "wired",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "text": "The PR titled \"Expose multizone playback session info\" has a verdict of \"could_not_verify\". The reason given is \"could not verify: claim(s) C1, C2, C3, C4 (+2 more) expect a difference but no observation matches (1 test(s) ran on main, 6 on the PR; 5 new test(s) pass, 1 unchanged; probe model-p1 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count\". The baseline is \"full\" and the probe summary notes \"the probe crashed or printed no parsed output on every main-side run\".",
+  "quotes": [
+   "Expose multizone playback session info",
+   "could_not_verify",
+   "could not verify: claim(s) C1, C2, C3, C4 (+2 more) expect a difference but no observation matches (1 test(s) ran on main, 6 on the PR; 5 new test(s) pass, 1 unchanged; probe model-p1 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count",
+   "full",
+   "the probe crashed or printed no parsed output on every main-side run"
+  ],
+  "advisory": true
+ },
+ "agents": {
+  "status": "ran",
+  "advisory": true,
+  "note": "judge/helper/summary are advisory; code owns the verdict",
+  "roles": [
+   {
+    "role": "judge",
+    "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+    "status": "ok",
+    "note": null,
+    "labels": [
+     {
+      "id": "probe-model-p1",
+      "label": "needs_human",
+      "reason": "The probe has no description, so its purpose and findings cannot be assessed without human review."
+     }
+    ]
+   },
+   {
+    "role": "helper",
+    "model": "nvidia/Nemotron-3_5-Lightning",
+    "status": "ok",
+    "note": null,
+    "notes": [
+     "probe model-p1 crash: likely missing dependency or path issue; add to ignored_noise if reproducible",
+     "claims C1-C6 expect difference but no observation matches; mark as known-noise if stable across runs",
+     "5 new passing tests confirm positive signal; no action needed",
+     "1 unchanged test: expected; no regression indicated",
+     "verify probe model-p1 dependencies before runs to reduce not_adequate instances"
+    ]
+   },
+   {
+    "role": "summary",
+    "model": "nvidia/nemotron-3-super-120b-a12b",
+    "status": "ok",
+    "note": null
+   }
+  ],
+  "provider": {
+   "provider": "nebius",
+   "models": {
+    "claims": "nvidia/nemotron-3-super-120b-a12b",
+    "probes": "nvidia/nemotron-3-super-120b-a12b",
+    "judge": "nvidia/Nemotron-3-Ultra-550b-a55b",
+    "helper": "nvidia/Nemotron-3_5-Lightning",
+    "summary": "nvidia/nemotron-3-super-120b-a12b"
+   },
+   "blind": true
+  }
+ },
+ "swarm_requested": true,
+ "operator_approval_requested": false,
+ "swarm": "on",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [
+   "pychromecast/controllers/multizone.py"
+  ],
+  "compiled_files": [],
+  "other_files": [
+   "tests/test_multizone.py"
+  ]
+ },
+ "duration_s": {
+  "total_wall": 270.7,
+  "tests": 7.2
+ },
+ "cost": {
+  "ai_calls": 3,
+  "failed_ai_calls": 0,
+  "input_tokens": 9443,
+  "output_tokens": 20203,
+  "thinking_tokens": 18795,
+  "cost_usd": 0.021016,
+  "calls_without_usage": 0,
+  "ai_cost_usd": 0.021016,
+  "cost_complete": true,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 270.7,
+   "tests": 7.2
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.018047,
+  "total_cost_usd": 0.039063,
+  "swarm": {
+   "ai_calls": 3,
+   "failed_ai_calls": 0,
+   "input_tokens": 604,
+   "output_tokens": 1630,
+   "thinking_tokens": 1327,
+   "cost_usd": 0.001648,
+   "calls_without_usage": 2,
+   "ai_cost_usd": 0.001648,
+   "cost_complete": false,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ }
+}

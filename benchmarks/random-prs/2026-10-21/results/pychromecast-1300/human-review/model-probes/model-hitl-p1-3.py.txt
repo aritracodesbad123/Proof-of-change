@@ -1,0 +1,58 @@
+"""Model-written probe for home-assistant-libs/pychromecast#1300 (model (nvidia/nemotron-3-super-120b-a12b, live)). Generated from the PR text and base-side code only;
+frozen before any PR-side execution. Untrusted: runs only in the sandbox without network."""
+PROBE = {'id': 'model-hitl-p1-3', 'target': 'home-assistant-libs/pychromecast#1300', 'about': 'Tests normalization of device IDs in PLAYBACK_SESSION_UPDATED message handling in base code.', 'claims': [{'id': 'C3', 'source': 'PR description', 'text': 'Device IDs are normalized to the dashed form used for members, accommodating devices that also report dashless IDs.', 'covers': ['c3n.*'], 'expect': 'differs'}], 'timeout_s': 60, 'generator': 'model (nvidia/nemotron-3-super-120b-a12b, live)'}
+
+import json  # added by the harness: the observations line is printed as JSON
+import json
+import uuid
+try:
+    from pychromecast.controllers.multizone import MultizoneController, MultiZoneControllerListener
+except Exception as e:
+    print(json.dumps({"observations": {"c3n.import_error": type(e).__name__}}))
+    exit(0)
+
+class DummyListener(MultiZoneControllerListener):
+    def __init__(self):
+        self.count = 0
+
+    def multizone_member_added(self, group_uuid: str) -> None:
+        self.count += 1
+
+    def multizone_member_removed(self, group_uuid: str) -> None:
+        self.count += 1
+
+    def multizone_status_received(self) -> None:
+        self.count += 1
+
+# Use a fixed UUID for reproducibility
+test_uuid = uuid.UUID('12345678-1234-5678-1234-567812345678')
+controller = MultizoneController(test_uuid)
+listener = DummyListener()
+controller.register_listener(listener)
+
+members_before = controller.members
+
+# Build the data for PLAYBACK_SESSION_UPDATED message
+data = {
+    "type": "PLAYBACK_SESSION_UPDATED",
+    "name": "Group",
+    "changedDevices": ["be209f090f6a4596ac1a16a77670692b"],
+    "failedDevices": ["2b514019-b9fa-43b5-a740-b4c3f8882918"],
+    "sessionEndpoint": {
+        "deviceId": "be209f090f6a4596ac1a16a77670692b",
+        "ipAddress": "192.168.1.5",
+        "port": 8009
+    }
+}
+
+# Call receive_message with a dummy CastMessage (first arg) and the data (second arg)
+ret = controller.receive_message(None, data)
+members_after = controller.members
+
+observations = {
+    "c3n.receive_message_return": ret,
+    "c3n.members_before": members_before,
+    "c3n.members_after": members_after,
+    "c3n.listener_call_count": listener.count,
+}
+print(json.dumps({"observations": observations}))

@@ -1,0 +1,38 @@
+"""Model-written probe for home-assistant-libs/pychromecast#1300 (model (nvidia/nemotron-3-super-120b-a12b, live)). Generated from the PR text and base-side code only;
+frozen before any PR-side execution. Untrusted: runs only in the sandbox without network."""
+PROBE = {'id': 'model-p1', 'target': 'home-assistant-libs/pychromecast#1300', 'about': 'model-written probe of the changed files (no description given)', 'claims': [{'id': 'C1', 'source': 'PR description', 'text': 'The playbackSession fields (appAllowsGrouping, isVideoContent, streamTransferSupported) are parsed from MULTIZONE_STATUS and exposed as MultizoneController.playback_session.', 'covers': ['obs_C1_playback_session_exists', 'obs_C1_playback_session_value'], 'expect': 'differs'}, {'id': 'C2', 'source': 'PR description', 'text': 'playback_session is None when no session is attached to the endpoint.', 'covers': ['obs_C2_playback_session_none'], 'expect': 'differs'}, {'id': 'C3', 'source': 'PR description', 'text': 'playback_session is cleared on reset_members().', 'covers': ['obs_C3_cleared_on_reset'], 'expect': 'differs'}, {'id': 'C4', 'source': 'PR description', 'text': 'PLAYBACK_SESSION_UPDATED messages are parsed into a PlaybackSessionUpdate object containing name, changed_devices, failed_devices, and an optional session_endpoint.', 'covers': ['obs_C4_parsed_playback_session_updated'], 'expect': 'differs'}, {'id': 'C5', 'source': 'PR description', 'text': 'The parsed PlaybackSessionUpdate is delivered to listeners via the new MultiZoneControllerListener.multizone_playback_session_updated callback.', 'covers': ['obs_C5_delivered_to_listeners'], 'expect': 'differs'}, {'id': 'C6', 'source': 'PR description', 'text': 'The multizone_playback_session_updated callback is not abstract, allowing existing listener subclasses to continue working without modification.', 'covers': ['obs_C6_callback_not_abstract'], 'expect': 'same'}, {'id': 'C7', 'source': 'PR description', 'text': 'Device IDs in multizone messages are normalized to the dashed form used for members, accommodating devices that report dashless IDs.', 'covers': ['obs_C7_device_ids_normalized'], 'expect': 'differs'}], 'timeout_s': 60, 'generator': 'model (nvidia/nemotron-3-super-120b-a12b, live)'}
+
+import json  # added by the harness: the observations line is printed as JSON
+import inspect,json
+from pychromecast.controllers.multizone import MultizoneController,MultiZoneControllerListener,TYPE_SESSION_UPDATED
+from uuid import uuid4
+ctrl=MultizoneController(uuid4())
+has_ps=hasattr(ctrl,'playback_session')
+ps_val=getattr(ctrl,'playback_session',None)if has_ps else None
+val_before=getattr(ctrl,'playback_session',None)if hasattr(ctrl,'playback_session')else None
+ctrl.reset_members()
+val_after=getattr(ctrl,'playback_session',None)if hasattr(ctrl,'playback_session')else None
+cleared=val_after is None
+class L(MultiZoneControllerListener):
+    def __init__(self):
+        self.called=False
+        self.obj=None
+    def multizone_member_added(self,*a):pass
+    def multizone_member_removed(self,*a):pass
+    def multizone_status_received(self):pass
+    def multizone_playback_session_updated(self,name,changed_devices,failed_devices,session_endpoint=None):
+        self.called=True
+        self.obj=(name,changed_devices,failed_devices,session_endpoint)
+lst=L()
+ctrl.register_listener(lst)
+data={TYPE_SESSION_UPDATED:{'name':'s','changedDevices':['d1'],'failedDevices':[],'sessionEndpoint':'e'}}
+ctrl.receive_message(None,data)
+has_parsed=hasattr(ctrl,'_last_playback_session_update')
+parsed_obj=getattr(ctrl,'_last_playback_session_update',None)
+lst_called=lst.called
+method=getattr(MultiZoneControllerListener,'multizone_playback_session_updated',None)
+cb_not_abs=method is not None and not getattr(method,'__isabstractmethod__',False)
+ctrl._add_member('deviceID123','Test')
+norm=any('-' in k for k in ctrl._members.keys())
+obs={'obs_C1_playback_session_exists':has_ps,'obs_C1_playback_session_value':ps_val,'obs_C2_playback_session_none':ps_val is None,'obs_C3_cleared_on_reset':cleared,'obs_C4_parsed_playback_session_updated':has_parsed,'obs_C5_delivered_to_listeners':lst_called,'obs_C6_callback_not_abstract':cb_not_abs,'obs_C7_device_ids_normalized':norm}
+print(json.dumps({'observations':obs}))

@@ -1,0 +1,314 @@
+diff --git a/pychromecast/controllers/multizone.py b/pychromecast/controllers/multizone.py
+index 10caf154f..d2e54cf60 100644
+--- a/pychromecast/controllers/multizone.py
++++ b/pychromecast/controllers/multizone.py
+@@ -6,7 +6,8 @@
+ 
+ import abc
+ import logging
+-from typing import TYPE_CHECKING, TypedDict
++from dataclasses import dataclass
++from typing import TYPE_CHECKING, Any, TypedDict
+ from uuid import UUID
+ 
+ from . import BaseController
+@@ -40,6 +41,72 @@
+ TYPE_SESSION_UPDATED = "PLAYBACK_SESSION_UPDATED"
+ 
+ 
++@dataclass(frozen=True)
++class PlaybackSession:
++    """Capabilities of the playback session attached to a multizone endpoint."""
++
++    app_allows_grouping: bool | None
++    is_video_content: bool | None
++    stream_transfer_supported: bool | None
++
++
++@dataclass(frozen=True)
++class SessionEndpoint:
++    """Endpoint which currently owns a playback session."""
++
++    device_id: str
++    host: str
++    port: int
++    session_id: str | None
++
++
++@dataclass(frozen=True)
++class PlaybackSessionUpdate:
++    """Change of the set of devices playing a session.
++
++    changed_devices may be empty, it's always empty on copies sent to other
++    connections than the one which made the change.
++    """
++
++    name: str
++    changed_devices: list[str]
++    failed_devices: list[str]
++    session_endpoint: SessionEndpoint | None
++
++
++def _normalize_device_id(device_id: str) -> str:
++    """Return device id in dashed form, devices report both forms."""
++    try:
++        return str(UUID(device_id))
++    except ValueError:
++        return device_id
++
++
++def _parse_playback_session(data: dict[str, Any]) -> PlaybackSession:
++    return PlaybackSession(
++        data.get("appAllowsGrouping"),
++        data.get("isVideoContent"),
++        data.get("streamTransferSupported"),
++    )
++
++
++def _parse_session_update(data: dict[str, Any]) -> PlaybackSessionUpdate:
++    endpoint = None
++    if endpoint_data := data.get("sessionEndpoint"):
++        endpoint = SessionEndpoint(
++            _normalize_device_id(endpoint_data["deviceId"]),
++            endpoint_data["ipAddress"],
++            endpoint_data["port"],
++            endpoint_data.get("sessionId"),
++        )
++    return PlaybackSessionUpdate(
++        data.get("name", ""),
++        [_normalize_device_id(uuid) for uuid in data.get("changedDevices", [])],
++        [_normalize_device_id(uuid) for uuid in data.get("failedDevices", [])],
++        endpoint,
++    )
++
++
+ class GroupInfo(TypedDict):
+     """Chromecast connection and listener for a group."""
+ 
+@@ -69,6 +136,9 @@ def multizone_member_removed(self, group_uuid: str) -> None:
+     def multizone_status_received(self) -> None:
+         """Multizone status has been updated."""
+ 
++    def multizone_playback_session_updated(self, update: PlaybackSessionUpdate) -> None:
++        """The set of devices playing the session has changed."""
++
+ 
+ class MultiZoneManagerListener(abc.ABC):
+     """Listener for receiving audio group events for a cast device."""
+@@ -235,6 +305,7 @@ class MultizoneController(BaseController):
+ 
+     def __init__(self, uuid: UUID) -> None:
+         self._members: dict[str, str] = {}
++        self._playback_session: PlaybackSession | None = None
+         self._status_listeners: list[MultiZoneControllerListener] = []
+         self._uuid = str(uuid)
+         super().__init__(MULTIZONE_NAMESPACE, target_platform=True)
+@@ -269,6 +340,7 @@ def register_listener(self, listener: MultiZoneControllerListener) -> None:
+         listener.multizone_member_added(uuid)
+         listener.multizone_member_removed(uuid)
+         listener.multizone_status_received()
++        listener.multizone_playback_session_updated(update)
+         """
+         self._status_listeners.append(listener)
+ 
+@@ -277,8 +349,17 @@ def members(self) -> list[str]:
+         """Return a list of audio group members."""
+         return list(self._members.keys())
+ 
++    @property
++    def playback_session(self) -> PlaybackSession | None:
++        """Return the playback session reported in the last multizone status.
++
++        None if no session is attached to this endpoint.
++        """
++        return self._playback_session
++
+     def reset_members(self) -> None:
+         """Reset audio group members."""
++        self._playback_session = None
+         for uuid in list(self._members):
+             self._remove_member(uuid)
+ 
+@@ -328,13 +409,25 @@ def receive_message(  # pylint: disable=too-many-return-statements
+             for uuid in added_members:
+                 self._add_member(uuid, members[uuid])
+ 
++            playback_session = data["status"].get("playbackSession")
++            self._playback_session = (
++                _parse_playback_session(playback_session)
++                if playback_session is not None
++                else None
++            )
++
+             for listener in list(self._status_listeners):
+                 listener.multizone_status_received()
+ 
+             return True
+ 
+         if data[MESSAGE_TYPE] == TYPE_SESSION_UPDATED:
+-            # A temporary group has been formed
++            # The devices playing the session changed, the session may have
++            # moved to a new endpoint
++            update = _parse_session_update(data)
++            _LOGGER.debug("(%s) Playback session updated: %s", self._uuid, update)
++            for listener in list(self._status_listeners):
++                listener.multizone_playback_session_updated(update)
+             return True
+ 
+         if data[MESSAGE_TYPE] == TYPE_CASTING_GROUPS:
+diff --git a/tests/test_multizone.py b/tests/test_multizone.py
+new file mode 100644
+index 000000000..1171468c8
+--- /dev/null
++++ b/tests/test_multizone.py
+@@ -0,0 +1,150 @@
++"""Tests for the multizone controller."""
++
++from unittest.mock import MagicMock
++from uuid import UUID
++
++from pychromecast.controllers.multizone import (
++    MultizoneController,
++    MultiZoneControllerListener,
++    PlaybackSession,
++    PlaybackSessionUpdate,
++    SessionEndpoint,
++)
++
++GROUP_UUID = "9a4683f8-a265-4ec7-aab1-a70cb50f4ca7"
++KITCHEN_UUID = "be209f09-0f6a-4596-ac1a-16a77670692b"
++BACK_ROOM_UUID = "2b514019-b9fa-43b5-a740-b4c3f8882918"
++
++
++def _status(**extra: object) -> dict:
++    return {
++        "type": "MULTIZONE_STATUS",
++        "requestId": 1,
++        "status": {
++            "devices": [
++                {"deviceId": KITCHEN_UUID, "name": "Kitchen", "capabilities": 196612}
++            ],
++            "isMultichannel": False,
++            **extra,
++        },
++    }
++
++
++def _controller() -> tuple[MultizoneController, MagicMock]:
++    controller = MultizoneController(UUID(GROUP_UUID))
++    listener = MagicMock(spec=MultiZoneControllerListener)
++    controller.register_listener(listener)
++    return controller, listener
++
++
++def test_playback_session_from_status() -> None:
++    """Test playback session flags are read from multizone status."""
++    controller, listener = _controller()
++    assert controller.playback_session is None
++
++    controller.receive_message(
++        MagicMock(),
++        _status(
++            playbackSession={
++                "appAllowsGrouping": True,
++                "isVideoContent": False,
++                "streamTransferSupported": True,
++            }
++        ),
++    )
++    assert controller.members == [KITCHEN_UUID]
++    assert controller.playback_session == PlaybackSession(
++        app_allows_grouping=True,
++        is_video_content=False,
++        stream_transfer_supported=True,
++    )
++    listener.multizone_status_received.assert_called_once()
++
++    # No session attached any more
++    controller.receive_message(MagicMock(), _status())
++    assert controller.playback_session is None
++
++
++def test_playback_session_reset() -> None:
++    """Test playback session is cleared together with members."""
++    controller, _ = _controller()
++    controller.receive_message(
++        MagicMock(), _status(playbackSession={"appAllowsGrouping": False})
++    )
++    assert controller.playback_session == PlaybackSession(False, None, None)
++
++    controller.reset_members()
++    assert controller.playback_session is None
++    assert not controller.members
++
++
++def test_playback_session_updated() -> None:
++    """Test session updates are parsed and passed to listeners."""
++    controller, listener = _controller()
++    assert controller.receive_message(
++        MagicMock(),
++        {
++            "type": "PLAYBACK_SESSION_UPDATED",
++            "requestId": 5,
++            "name": "Kitchen + 1",
++            "changedDevices": [BACK_ROOM_UUID.replace("-", "")],
++            "failedDevices": [],
++            "sessionEndpoint": {
++                "deviceId": GROUP_UUID,
++                "ipAddress": "192.168.0.13",
++                "port": 32046,
++                "sessionId": "9e63447a-e514-4a79-a22c-2afa00eea9c1",
++            },
++        },
++    )
++    listener.multizone_playback_session_updated.assert_called_once_with(
++        PlaybackSessionUpdate(
++            name="Kitchen + 1",
++            changed_devices=[BACK_ROOM_UUID],
++            failed_devices=[],
++            session_endpoint=SessionEndpoint(
++                device_id=GROUP_UUID,
++                host="192.168.0.13",
++                port=32046,
++                session_id="9e63447a-e514-4a79-a22c-2afa00eea9c1",
++            ),
++        )
++    )
++
++
++def test_playback_session_updated_without_endpoint() -> None:
++    """Test session update where the endpoint did not move."""
++    controller, listener = _controller()
++    controller.receive_message(
++        MagicMock(),
++        {
++            "type": "PLAYBACK_SESSION_UPDATED",
++            "requestId": 0,
++            "changedDevices": [],
++        },
++    )
++    listener.multizone_playback_session_updated.assert_called_once_with(
++        PlaybackSessionUpdate(
++            name="", changed_devices=[], failed_devices=[], session_endpoint=None
++        )
++    )
++
++
++def test_listener_without_session_callback() -> None:
++    """Test listeners written before the session callback existed keep working."""
++
++    class OldListener(MultiZoneControllerListener):
++        def multizone_member_added(self, group_uuid: str) -> None:
++            pass
++
++        def multizone_member_removed(self, group_uuid: str) -> None:
++            pass
++
++        def multizone_status_received(self) -> None:
++            pass
++
++    controller = MultizoneController(UUID(GROUP_UUID))
++    controller.register_listener(OldListener())
++    assert controller.receive_message(
++        MagicMock(), {"type": "PLAYBACK_SESSION_UPDATED", "requestId": 0}
++    )
