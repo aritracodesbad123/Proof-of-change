@@ -1235,7 +1235,8 @@ def install_deps_only(venv: Path, checkout: Path, plan: dict, log: Path, python:
     cmds = [["uv", "venv", "-q", "-p", python, venv]]
     if plan.get("kind") == "uv-sync":
         # same result as `uv sync --no-install-project`: the lock (or pyproject) exported without the project itself
-        reqs = side_home(venv) / "poc-declared-deps.txt"
+        # inside the checkout, so local paths in the lock (workspace members) resolve as they do for uv sync
+        reqs = checkout / ".poc-declared-deps.txt"
         export = ["uv", "export", "-q", "--no-emit-project", "--no-hashes", "--directory", checkout,
                   "-p", venv / "bin/python", "-o", reqs]
         cmds.append(export + (["--frozen"] if plan.get("frozen") else []))
@@ -1253,7 +1254,9 @@ def install_deps_only(venv: Path, checkout: Path, plan: dict, log: Path, python:
         if rc == "oom":
             return False, _oom_reason()
         if rc != 0:
+            (checkout / ".poc-declared-deps.txt").unlink(missing_ok=True)
             return False, f"dependency-only install failed ({rc}); see {log.name}"
+    (checkout / ".poc-declared-deps.txt").unlink(missing_ok=True)
     for site in (venv / "lib").glob("python*/site-packages"):
         (site / "poc-project-path.pth").write_text(str(checkout) + "\n")
     return True, ""
