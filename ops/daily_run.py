@@ -54,7 +54,7 @@ from guardrails import sandbox  # noqa: E402
 from guardrails.isolation import untrusted_env  # noqa: E402
 from harness.machine import detect_machine_type  # noqa: E402
 from poc import agents, behaviour_claims, cost, coverage_gate, diff_probes, freeze, local_config, model_probes, model_provider, probes  # noqa: E402,E501
-from poc.diff import confirm  # noqa: E402
+from poc.diff import confirm, pr_runs_too_noisy  # noqa: E402
 from poc.pr_text import github_read_token  # noqa: E402
 from poc.verdict import Claim, FindingLabel, RunSummary, Verdict, pr_verdict  # noqa: E402
 
@@ -1206,6 +1206,8 @@ def install_side(venv: Path, checkout: Path, chosen: dict | None, log: Path, pyt
     for c in cmds:
         heavy = _compiles_checkout(c, checkout)
         rc, _ = (run_heavy if heavy else run)(c, log, env=env, timeout=timeout, sbx=sbx)
+        if rc == "timeout":
+            return False, f"install timed out after {timeout}s (whole process tree killed); see {log.name}"
         if rc == 0:
             continue
         if rc == "oom":
@@ -1213,6 +1215,8 @@ def install_side(venv: Path, checkout: Path, chosen: dict | None, log: Path, pyt
         bare = _without_test_extras(c, checkout) if heavy and optional_backend_reqs(checkout) else None
         if bare is not None:
             rc2, _ = run_heavy(bare, log, env=env, timeout=timeout, sbx=sbx)
+            if rc2 == "timeout":
+                return False, f"install timed out after {timeout}s (whole process tree killed); see {log.name}"
             if rc2 == 0:
                 return True, ""
             if rc2 == "oom":
@@ -1322,7 +1326,7 @@ def _log_plan_installs(rec, plan, venvs: dict) -> None:
     demo_helper.note_installs(rec, logs)
 
 
-def _retry_setup_gap(a, rec, repo, prdir, venvs: dict, rerun) -> None:
+def _retry_setup_gap(a, rec, repo, prdir, venvs: dict, rerun, recheck_coverage=None) -> None:
     """One setup-gap rerun on a console or daily check. A study run does not call this."""
     from poc import demo_helper, tavily_docs
     if not demo_helper.active(a):
@@ -1369,7 +1373,7 @@ def _retry_setup_gap(a, rec, repo, prdir, venvs: dict, rerun) -> None:
     demo_helper.retry_unverified(
         rec, rerun, install_one, declared, tavily.get("text") or "", demo_helper.fetch_pypi, repo,
         allow_system=getattr(a, "sandbox_backend", None) == "contree",
-        install_system=install_system, lookup=lookup)
+        install_system=install_system, lookup=lookup, recheck_coverage=recheck_coverage)
 
 
 def _install_system_package(rec, name, run_side) -> bool:
@@ -1581,9 +1585,49 @@ def run(cmd, log_path: Path, cwd=None, env=None, timeout=None, sbx=HOST) -> tupl
         try:
             rc = _wait_child(p, timeout, t0)
         except subprocess.TimeoutExpired:
-            os.killpg(p.pid, signal.SIGKILL); p.wait(); rc = "timeout"
+            _kill_tree(p.pid); p.wait(); rc = "timeout"
             fh.write(f"\n[daily_run] TIMEOUT after {timeout}s\n")
     return rc, round(time.time() - t0, 1)
+
+
+_PROC = "/proc"
+
+
+def _descendants(pid: int) -> list[int]:
+    """All descendants of pid by /proc parent links, including ones that left the process group via setsid."""
+    try:
+        entries = os.listdir(_PROC)
+    except FileNotFoundError:
+        return []
+    kids: dict[int, list[int]] = {}
+    for d in entries:
+        if d.isdigit():
+            try:
+                ppid = int(open(f"{_PROC}/{d}/stat").read().rsplit(")", 1)[1].split()[1])
+            except (OSError, IndexError, ValueError):
+                continue
+            kids.setdefault(ppid, []).append(int(d))
+    out, todo = [], [pid]
+    while todo:
+        for c in kids.get(todo.pop(), []):
+            out.append(c); todo.append(c)
+    return out
+
+
+def _kill_tree(pid: int) -> None:
+    """SIGSTOP the tree first so nothing forks or reparents while we collect it, then SIGKILL every member."""
+    procs = [pid] + _descendants(pid)
+    for sig in (signal.SIGSTOP, signal.SIGKILL):
+        for q in procs:
+            try:
+                os.kill(q, sig)
+            except ProcessLookupError:
+                pass
+        procs = [pid] + _descendants(pid) if sig == signal.SIGSTOP else procs
+    try:
+        os.killpg(pid, signal.SIGKILL)
+    except ProcessLookupError:
+        pass
 
 
 def site_packages(venv: Path) -> Path:
@@ -2291,7 +2335,8 @@ def compare_sides(results: dict) -> dict:
         ids |= set(r)
     out = {"same": 0, "same_skipped_both": 0, "regressions": [], "fixed": [], "new_tests_passing": 0,
            "new_tests_failing": [], "new_tests_skipped": [], "removed_tests": [], "reparametrized": [], "skipped_missing_dependency": [],
-           "flaky": [], "environment": [], "other_changes": [], "preexisting_failures": [], "load_failed_both": [],
+           "flaky": [], "pr_unstable": [], "pr_unstable_noisy": [], "environment": [], "other_changes": [],
+           "preexisting_failures": [], "load_failed_both": [],
            "load_failed_pr": [], "load_failed_main": []}
     msgs, removed, added = {}, [], []
     bad = ("failed", "error")
@@ -2336,6 +2381,15 @@ def compare_sides(results: dict) -> dict:
             continue
         if state == "flaky":
             out["flaky"].append(t); continue
+        if state == "pr_unstable":
+            # Base always passed and the PR sometimes fails, with a repeated PR result: call it.
+            # Every PR run different, or no failure to point at: too mixed to call.
+            kind = "noisy"
+            if (not pr_runs_too_noisy(p) and m[0]["o"] == "passed"
+                    and any(row["o"] in ("failed", "error") for row in p)):
+                kind = "regression"
+            out["pr_unstable" if kind == "regression" else "pr_unstable_noisy"].append(t)
+            continue
         mo, po = m[0]["o"], p[0]["o"]
         pmsg = next((r[t][1] for r in results["pr"] if t in r and r[t][1]), "")
         if po in bad and pmsg:
@@ -2392,6 +2446,7 @@ def exit_check(per_run: list[dict], results: dict, cmp: dict) -> dict:
     failing test, flaky, or blocked by a missing optional dependency). Any other exit code (interrupted, internal
     or usage error) is never explained."""
     flagged = (set(cmp["regressions"]) | set(cmp["new_tests_failing"]) | set(cmp["flaky"])
+               | set(cmp.get("pr_unstable") or []) | set(cmp.get("pr_unstable_noisy") or [])
                | {d["test"] for d in cmp.get("skipped_missing_dependency", [])}
                | {d["test"] for d in cmp.get("backend_same_error", [])}
                | {d["test"] for d in cmp.get("environment", [])})
@@ -2525,8 +2580,10 @@ def with_probes(cmp: dict | None, cnv_reason: str | None, exits: dict | None = N
                 probe_results: dict | None = None) -> tuple[str, str, list[str]]:
     """The PR verdict: the tests' verdict (tests_verdict), then the probes (poc/probes.py). An observation that needs
     attention (it differs and no claim covers it, or it contradicts a claim) makes the verdict
-    needs_attention, also when the tests alone could not verify the PR. Flaky observations and warning-only
-    differences are shown but never decide the verdict. Probes never upgrade a verdict: all-green
+    needs_attention, also when the tests alone could not verify the PR. Flaky observations are shown but never
+    decide the verdict, except one that is stable on the base and unstable only on the pull request: that needs
+    attention, or could not verify when every pull-request run differs. Warning-only differences never decide.
+    Probes never upgrade a verdict: all-green
     probes leave it as the tests decided. Without probes the verdict is exactly the tests' verdict."""
     from poc import probe_adequacy
     v, reason, fl = tests_verdict(cmp, cnv_reason, exits, files)
@@ -2537,6 +2594,11 @@ def with_probes(cmp: dict | None, cnv_reason: str | None, exits: dict | None = N
     s = probes.summarize(items)
     s["reason"] = "; ".join([s["reason"]] * bool(s["reason"]) + notes)
     fl = fl + s["labels"]
+    if s.get("pr_only_noisy") and v == Verdict.VERIFIED.value and not s["flagged"]:
+        names = ", ".join(s["pr_only_noisy"][:4])
+        return (Verdict.COULD_NOT_VERIFY.value,
+                f"could not verify: observation(s) {names} are stable on the base and unstable only on the PR, "
+                f"too mixed to call ({reason})", fl)
     if s["flagged"] and v != Verdict.NEEDS_ATTENTION.value:
         return Verdict.NEEDS_ATTENTION.value, f"{s['reason']}; tests: {reason}", fl
     return v, (f"{reason}; {s['reason']}" if s["reason"] else reason), fl
@@ -2548,17 +2610,18 @@ def tests_verdict(cmp: dict | None, cnv_reason: str | None, exits: dict | None =
 
     Order:
       1. could-not-verify reasons of the run itself;
-      2. real findings (regressions, new failing tests) -> needs attention (nothing below can hide them);
+      2. real findings (regressions, new failing tests, or a test that passes on every base run and fails on some
+         pull-request runs) -> needs attention (nothing below can hide them);
       3. no test actually ran on a side (all skipped, or every module failed to load) -> could not verify;
       4. a test module loads on one side only -> could not verify, naming the module;
       5. a test module of the changed code fails to load on both sides -> could not verify;
       6. unexplained pytest exit codes -> could not verify;
       7. new/changed tests skipped, or new tests that fail only because an optional dependency is missing
          -> could not verify (never needs attention);
-      8. flaky tests are listed but never decide the verdict (results that change between runs of one side are noise).
-         A test that passes and fails across the 3 runs of one side is listed. It is not a regression and
-         does not, on its own, produce needs attention. Flaky labels are not passed to pr_verdict, because
-         that rule treats every amber finding as needs attention (probes still use that rule);
+      8. a test that is stable on the base and unstable only on the pull request, but too mixed to call a
+         regression, is could not verify (never verified). A test that is flaky on both sides, or only on the
+         base, is listed and does not decide. Those flaky labels are not passed to pr_verdict, because that
+         rule treats every amber finding as needs attention;
       9. otherwise poc.verdict.pr_verdict."""
     if cnv_reason:
         return Verdict.COULD_NOT_VERIFY.value, cnv_reason, []
@@ -2570,6 +2633,7 @@ def tests_verdict(cmp: dict | None, cnv_reason: str | None, exits: dict | None =
     nothing_ran = ran_main == 0 or ran_pr == 0
     findings = []
     findings += [FindingLabel.UNMENTIONED_CHANGE] * (len(cmp["regressions"]) + len(cmp["new_tests_failing"]))
+    findings += [FindingLabel.UNMENTIONED_CHANGE] * len(cmp.get("pr_unstable") or [])
     findings += [FindingLabel.FLAKY] * len(cmp["flaky"])
     findings += [FindingLabel.NEEDS_HUMAN] * (len(cmp["removed_tests"]) + len(cmp["other_changes"]))
     findings += [FindingLabel.PROVEN] * len(cmp["fixed"])
@@ -2584,6 +2648,17 @@ def tests_verdict(cmp: dict | None, cnv_reason: str | None, exits: dict | None =
         shown = ", ".join(cmp["flaky"][:5])
         more = f" (+{len(cmp['flaky']) - 5})" if len(cmp["flaky"]) > 5 else ""
         bits.append(f"{len(cmp['flaky'])} flaky test(s): {shown}{more}")
+    pr_only = cmp.get("pr_unstable") or []
+    if pr_only:
+        shown = ", ".join(pr_only[:5])
+        more = f" (+{len(pr_only) - 5})" if len(pr_only) > 5 else ""
+        bits.append(f"{len(pr_only)} test(s) pass on every base run but fail on some pull-request runs: {shown}{more}")
+    pr_noisy = cmp.get("pr_unstable_noisy") or []
+    if pr_noisy:
+        shown = ", ".join(pr_noisy[:5])
+        more = f" (+{len(pr_noisy) - 5})" if len(pr_noisy) > 5 else ""
+        bits.append(f"{len(pr_noisy)} test(s) stable on the base and unstable only on the pull request, "
+                    f"too mixed to call a regression: {shown}{more}")
     if cmp["removed_tests"]:
         bits.append(f"{len(cmp['removed_tests'])} test(s) removed on the PR side")
     if cmp["other_changes"]:
@@ -2627,7 +2702,7 @@ def tests_verdict(cmp: dict | None, cnv_reason: str | None, exits: dict | None =
     # (comparison["flaky"] and the label above) but must not, on its own, produce that verdict.
     verdict_findings = [f for f in findings if f is not FindingLabel.FLAKY]
     cnv = Verdict.COULD_NOT_VERIFY.value
-    if cmp["regressions"] or cmp["new_tests_failing"]:
+    if cmp["regressions"] or cmp["new_tests_failing"] or pr_only:
         v = pr_verdict(RunSummary(build_ok=True, claims=[Claim("tests", testable=True, probed=True, proven=True)],
                                   findings=verdict_findings))
         return v.value, reason + (f"; {dep_note}" if dep_note else ""), fl
@@ -2650,6 +2725,8 @@ def tests_verdict(cmp: dict | None, cnv_reason: str | None, exits: dict | None =
                 + "; ".join(exits["problems"][:3]) + f" ({reason})", fl)
     if dep_note:
         return cnv, f"not fully verified: {dep_note} ({reason})", fl
+    if pr_noisy:
+        return cnv, f"not fully verified: {reason}", fl
     v = pr_verdict(RunSummary(build_ok=True, claims=[Claim("tests", testable=True, probed=True, proven=True)],
                               findings=verdict_findings))
     # Noise rule: a project test whose result changes between runs on the same side is shown in the reason but
@@ -3319,9 +3396,43 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
             settle_probes(rec)
             _store_verdict(rec, cmp, cnv, ex)
             return {"verdict": rec["verdict"], "reason": rec["reason"]}
+
+        def _recheck_nightly():
+            rec["probe_changed_line_coverage"] = probe_coverage(
+                item, rec.get("probes"), vm, site_packages(vm), site_packages(vp), prdir, a)
+            settle_probes(rec)
+            _store_verdict(rec, cmp, cnv, ex)
+            return {"verdict": rec.get("verdict"), "reason": rec.get("reason")}
+
         ready = bool(targets and targets.get("pr") and vp.exists())
-        _retry_setup_gap(a, rec, repo, prdir, {"main": vm, "pr": vp}, _rerun_nightly if ready else None)
+        _retry_setup_gap(a, rec, repo, prdir, {"main": vm, "pr": vp}, _rerun_nightly if ready else None,
+                         _recheck_nightly if ready else None)
     return finish(gate(rec), prdir, work, t0, a)
+
+
+def _attach_related_reports(rec: dict, runner) -> None:
+    """Store related bug reports when this product check asked and the swarm will run.
+
+    The text is background for the advisory AI. A study run, the daily study, and a check
+    whose swarm is off leave the record alone and do not call Tavily. A missing key or a
+    failed lookup is one log line. The exception text is not printed, because it can
+    contain the key. This never changes the verdict.
+    """
+    from poc import agents, related_reports
+    if not agents.swarm_enabled(bool(getattr(runner, "swarm", False))):
+        return
+    if runner is None or getattr(runner, "provider", None) is None or getattr(runner, "model_skipped", None):
+        return
+    if not related_reports.enabled(
+            bool(getattr(runner, "related_reports", False)),
+            bench=bool(getattr(runner, "bench", False)),
+            single_pr=bool(getattr(runner, "pr", None))):
+        return
+    try:
+        rec["related_reports"] = related_reports.collect(rec)
+    except Exception:  # noqa: BLE001 — do not print the message; it may contain the key
+        print(related_reports.FAIL_LOG, flush=True)
+        rec["related_reports"] = {"status": "error", "text": "", "items": [], "untrusted": True}
 
 
 def finish(rec: dict, prdir: Path, work: Path, t0: float, runner=None) -> dict:
@@ -3336,6 +3447,9 @@ def finish(rec: dict, prdir: Path, work: Path, t0: float, runner=None) -> dict:
     ran_swarm = False
     if (swarm_requested and runner is not None and getattr(runner, "provider", None) is not None
             and not getattr(runner, "model_skipped", None)):
+        # Related bug reports are background for this advisory step only. The verdict above
+        # this function is already final. When the swarm is off, Tavily is not called.
+        _attach_related_reports(rec, runner)
         agents.run_swarm(runner.provider, rec)
         ran_swarm = True
     elif runner is not None and getattr(runner, "model_skipped", None) and "agents" not in rec:
@@ -3583,8 +3697,16 @@ def test_source_pair(repo: str, cfg: dict, item: dict, prdir: Path, work: Path, 
             settle_probes(rec)
             _store_verdict(rec, cmp, cnv, ex)
             return {"verdict": rec["verdict"], "reason": rec["reason"]}
+
+        def _recheck_pair():
+            rec["probe_changed_line_coverage"] = probe_coverage(item, rec.get("probes"), vm, cm, cp, prdir, a)
+            settle_probes(rec)
+            _store_verdict(rec, cmp, cnv, ex)
+            return {"verdict": rec.get("verdict"), "reason": rec.get("reason")}
+
         ready = bool(vm and vp and targets and targets.get("pr"))
-        _retry_setup_gap(a, rec, repo, prdir, {"main": vm, "pr": vp} if vm and vp else {}, _rerun_pair if ready else None)
+        _retry_setup_gap(a, rec, repo, prdir, {"main": vm, "pr": vp} if vm and vp else {},
+                         _rerun_pair if ready else None, _recheck_pair if ready else None)
     return gate(rec)
 
 
@@ -4205,6 +4327,11 @@ def main(argv=None) -> int:
                          "plain-language summary). Off by default for command-line and benchmark runs, so "
                          "they make no swarm model calls. Also on when POC_SWARM is 1, true, yes, or on. "
                          "The operator console turns this on itself.")
+    ap.add_argument("--related-reports", action="store_true",
+                    help="on a product check, look up a few related public bug reports and pass them to the "
+                         "advisory AI as quoted background. Off for a study run and the daily study, even "
+                         "if this flag is set on a benchmark. Skipped when TAVILY_API_KEY is not set. "
+                         "Does not change the verdict and does not choose packages.")
     ap.add_argument("--console-job", action="store_true",
                     help="passed only by the operator console, on a single pull-request check. "
                          "With this flag that check may start while POC_HITL is set. "

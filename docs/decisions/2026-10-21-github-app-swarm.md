@@ -9,7 +9,7 @@ A check started by the GitHub App now passes `--swarm` to the runner. The adviso
 
 The operator console already turns that step on itself. A command-line run, a study run, and a benchmark run still leave it off unless the run asks with `--swarm` or with `POC_SWARM` set to `1`, `true`, `yes`, or `on`.
 
-This does not change the request-a-check daily cap. That cap stays 5.
+A requested check (request-a-check) already runs with `--swarm` on main, so every check started for a user pull request now has the swarm on. The request-a-check daily cap stays 5.
 
 ## Why
 
@@ -20,7 +20,8 @@ A check that a person starts from a pull request through the App should show the
 1. The GitHub App adds `--swarm` to the arguments of every check it starts.
 2. It does not set `POC_SWARM` in the process environment, so a later study or benchmark run in the same process is not turned on by accident.
 3. Study runs, benchmark runs, and command-line runs stay off unless they ask.
-4. The request-a-check daily cap stays 5. That path is a normal check and does not gain `--swarm` from this change.
+4. Request-a-check keeps its existing `--swarm` and its daily cap of 5.
+5. The App's arguments come from one helper, so the swarm switch and the related-reports flag are set in one place.
 
 ## Alternatives and tradeoffs
 
@@ -28,4 +29,4 @@ Setting `POC_SWARM` in the environment would also turn the swarm on, but it woul
 
 ## What it means for you
 
-A check the GitHub App runs includes the advisory labels and the plain-language summary when a model is available. A study run, a benchmark run, or a command you start yourself still skips that step until you ask for it. Request-a-check still stops after 5 checks in a day.
+A check the GitHub App runs includes the advisory labels and the plain-language summary when a model is available. A study run, a benchmark run, or a command you start yourself still skips that step until you ask for it. A requested check also includes them. Request-a-check still stops after 5 checks in a day.

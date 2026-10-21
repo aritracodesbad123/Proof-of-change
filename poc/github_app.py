@@ -100,10 +100,14 @@ def handle_event(event: str, payload: dict, env: dict | None = None) -> dict:
         claim = parse_prove(body)
         if claim is None:
             return {"action": "ignore", "why": "not a /prove comment"}
+        issue = payload.get("issue") or {}
+        # A comment on a plain issue is not a pull request. GitHub includes
+        # issue.pull_request only when the comment is on a pull request.
+        if not isinstance(issue.get("pull_request"), dict):
+            return {"action": "ignore", "why": "a /prove comment on an issue is ignored; comment on the pull request"}
         if not may_post(repo, env):
             return {"action": "refuse", "why": f"repo {repo} not in {DEMO_REPOS_ENV}"}
-        return {"action": "prove", "repo": repo, "claim": claim,
-                "pr": (payload.get("issue") or {}).get("number")}
+        return {"action": "prove", "repo": repo, "claim": claim, "pr": issue.get("number")}
     if event == "pull_request" and payload.get("action") in ("opened", "synchronize", "reopened"):
         if not may_post(repo, env):
             return {"action": "refuse", "why": f"repo {repo} not in {DEMO_REPOS_ENV}"}
@@ -230,6 +234,14 @@ def write_hosted_report(rec: dict, out_dir: Path | None = None) -> Path:
         f"<tr><td>{_esc(p.get('id'))}</td><td>{_esc(p.get('about'))}</td>"
         f"<td>{_esc(', '.join(p.get('labels') or []))}</td></tr>" for p in probes[:40])
     expl = (rec.get("explanation") or {}).get("text") or ""
+    from poc import related_reports
+    background = rec.get("related_reports") if isinstance(rec.get("related_reports"), dict) else None
+    background_text = str((background or {}).get("text") or "").strip()
+    background_html = ""
+    if background_text:
+        background_html = (
+            f"<h2>{_esc(related_reports.REPORT_LABEL)}</h2><p>{_esc(background_text)}</p>"
+        )
     html = f"""<!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Proof-of-Change {_esc(rid)}</title>
 <style>
@@ -251,6 +263,7 @@ sandbox {_esc(rec.get('sandbox_backend') or 'local')}</p>
 <h2>Summary</h2>
 <p>{_esc(expl) or '(no model summary)'}</p>
 <p class="meta">Agents: {_esc(json.dumps(agents.get('roles') or agents.get('status') or 'none'))}</p>
+{background_html}
 </body></html>"""
     path.write_text(html)
     return path
@@ -277,6 +290,19 @@ def _load_latest_record(repo: str, pr: int) -> dict | None:
         return None
     newest = max(candidates, key=lambda p: p.stat().st_mtime)
     return json.loads(newest.read_text())
+
+
+def check_argv(pr_url: str, env: dict | None = None) -> list[str]:
+    """Arguments for one product check started by the GitHub App.
+
+    ``--related-reports`` is quoted background for the advisory AI. ``--swarm`` turns the
+    advisory swarm on for every App check. A study run uses neither. The App does not set
+    ``POC_SWARM`` in the environment, so nothing else in the process is turned on.
+    """
+    env = os.environ if env is None else env
+    from poc import related_reports
+    provider = env.get("POC_MODEL_PROVIDER") or "nebius"
+    return ["--pr", pr_url, "--model-provider", provider, "--swarm", *related_reports.product_flags()]
 
 
 def apply(plan: dict, *, dry_run: bool | None = None, env: dict | None = None,
@@ -307,9 +333,7 @@ def apply(plan: dict, *, dry_run: bool | None = None, env: dict | None = None,
         note = None
 
     pr_url = f"https://github.com/{repo}/pull/{int(pr)}"
-    # The App turns the advisory swarm on for this check. A study run, a benchmark
-    # run, and the command line stay off unless they pass --swarm or POC_SWARM.
-    argv = ["--pr", pr_url, "--model-provider", env.get("POC_MODEL_PROVIDER") or "nebius", "--swarm"]
+    argv = check_argv(pr_url, env)
     if plan.get("claim"):
         # claim text is advisory for logs; daily_run reads claims from PR body
         pass

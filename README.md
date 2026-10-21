@@ -22,7 +22,7 @@ comment; it never posts to random upstream projects.
 | **What does the swarm do?** | After the code verdict: **Ultra** labels findings, **Lightning** suggests noise/install notes, **Super** writes a quote-checked summary. Those three roles are **advisory**. **Super** also extracts claims and writes probes earlier (that path *can* affect the verdict via executed probe diffs). |
 | **NVIDIA Nemotron?** | Super / Ultra / Lightning (Nano fallback) via configured model IDs in `poc/model_provider.py`. |
 | **Nebius at runtime?** | OpenAI-compatible chat completions at `https://api.tokenfactory.nebius.com/v1` using `NEBIUS_API_KEY` in the orchestrator only. Optional Contree sandboxes need `NEBIUS_PROJECT_ID`. |
-| **Try it?** | Local console: `make setup` then `make console-api` and `make console-web` → open http://127.0.0.1:5173. Use **Try sample (mlxtend#1229, prerecorded)** — no API key. Live Nebius needs `NEBIUS_API_KEY`. Hosted URL: pending deploy (see [`reports/SUBMISSION_CHECKLIST.md`](reports/SUBMISSION_CHECKLIST.md)). |
+| **Try it?** | Judges: see [For judges](#for-judges). The results page replays finished checks in the browser. A Codespace or a request issue can run a new check. Live checks need Linux. |
 | **Reproduce evaluation?** | See [`reports/AGENT_SWARM_EVALUATION.md`](reports/AGENT_SWARM_EVALUATION.md). Quick gate: `make test` (or `python -m evals.run_evals --observations evals/fixtures/golden_v1.jsonl --require-golden --require-v1`). |
 | **Demo video** | _TODO: public YouTube ≤3 min_ — script in [`reports/DEMO_SCRIPT_3MIN.md`](reports/DEMO_SCRIPT_3MIN.md). |
 
@@ -34,6 +34,39 @@ flowchart TD
   codeVerdict --> swarm[advisory_Ultra_Lightning_Super]
   swarm --> report[record_and_report]
 ```
+
+## For judges
+
+Judging runs 1–15 December. These three paths are free to use. Live checks need **Linux**. A Codespace is Linux. The results page is only a replay and works in a browser.
+
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/aritracodesbad123/Proof-of-change?quickstart=1)
+
+### Results page
+
+<https://aritracodesbad123.github.io/Proof-of-change/>
+
+This is the main link. It is the operator console in replay mode: light page, the flow chart, and the report for each finished check. The checks are real runs already stored in the repository (pull requests and the release comparisons). The page does not install a library and does not call an API. After this branch is merged, turn on Pages in the repository settings (source: GitHub Actions) so the link starts serving. The `pages` workflow publishes on every push to `main`.
+
+### Request a check
+
+1. Open a [Request a check](https://github.com/aritracodesbad123/Proof-of-change/issues/new?template=request-a-check.yml) issue.
+2. Paste one public GitHub pull request link. Python libraries only.
+3. Wait for a comment with the verdict and a report link. GitHub emails you.
+
+Do not paste an email address, a key, or any private information into the issue. The issue is public.
+
+The checker on the project machine takes one request at a time. It does not start between 10:40 and 12:30 IST. It stops after five checks per day unless that limit is changed on the machine. Each of those checks runs with the advisory swarm on. A study run and a benchmark run still leave that swarm off unless the run asks. The worker reads `TAVILY_API_KEY` from that machine. When the variable is missing it logs that the lookup was skipped and still runs the check. The key value is never printed. If a study run has the machine, your request stays in the queue. If the checker has not checked in recently, a short reply says it is offline and points back at the results page. The repository needs the labels `request-a-check`, `request-running`, and `request-done` (create them once under Issues → Labels). `request-running` is on the issue while a check is in progress.
+
+### Try it yourself in a Codespace
+
+1. Click the badge above, or use Code → Codespaces → Create.
+2. Wait until the console says it is listening. Open the forwarded port **8787**. Do not make port 8787 public. It stays private. If that port is public, the console does not start and tells you to set it back to private. Sign-in is not skipped while the port is public.
+3. Paste a pull request link and run a check. This Codespace does not ask you to sign in: it is your own machine, and email, Google, and GitHub sign-in are not set up here. Any other host still requires sign-in.
+4. Optional: paste your own Nebius API key into the password field. It stays in the server's memory for that sign-in. It is not written to disk, logs, reports, or the reply. Without a key, a live check uses the recorded AI answers.
+5. Your own Tavily API key. The lookup needs it, and you supply it the same way as the Nebius key: type it yourself into the hidden Codespaces secret field. This project does not ship or share a key. Tavily keys are free ([sign up](https://app.tavily.com/)). Codespaces asks for the recommended secret `TAVILY_API_KEY` (nothing is stored in this repository). You can also paste the same key into the hidden field next to the Nebius field. That value stays in the server's memory for the sign-in and is passed only as `TAVILY_API_KEY` for the check. It is not written to disk, logs, reports, or the reply. Without the key, the lookup is skipped and the check continues. Tavily does not choose which packages to install.
+6. Operator approval is off unless you tick **Pause for approval** on that check, or the Codespace has `POC_CONSOLE_APPROVAL=1`. A study run still refuses operator approval. The console that starts with the Codespace turns the advisory swarm on for a check you run there. A study run still leaves that swarm off unless you ask.
+
+If bubblewrap cannot start in the Codespace and Contree is not set up, the console refuses to run pull-request code. It does not fall back on its own. The only opt-in is `POC_UNSAFE_NO_SANDBOX=1`, and the page shows a warning. The vetted prerecorded sample still plays back, and that playback does not run pull-request code.
 
 **Untrusted code:** PR installs and tests run under bubblewrap when available (no orchestrator secrets in the sandbox env). The operator console refuses to run pull-request code when bubblewrap cannot start and Contree is not usable. The only opt-in is `POC_UNSAFE_NO_SANDBOX=1`, and the console shows a warning when that is set. Do not treat a prompt as a sandbox.
 
@@ -62,6 +95,8 @@ Several Nemotron models share the work (exact model names are in [Technical deta
 Plain code then runs the project's real tests, and those probes, on both *main* (today's code) and the PR — either on
 your machine or in a Nebius sandbox. **Comparing those runs is what decides the verdict.** The AI may explain and
 suggest labels; it never decides pass or fail.
+
+Tavily can suggest package names, but they're only installed if their PyPI page links back to the same repo. That check stops accidents, not a determined attacker.
 
 ## Proven results
 
@@ -557,6 +592,9 @@ run uses just the date. These folders stay on your computer only. They are never
   Default reports stay in the folder on the computer that ran the check.
 - **Never uses AI to decide the verdict.** Test comparison and verdicts are plain, testable code. AI may write a
   short summary and suggest labels; those are advice only.
+- **Never lets a web page decide the verdict.** On a product check, a few related public bug reports may be
+  passed to the advisory AI as quoted background. A study run does not look them up. They do not change the verdict
+  and they do not choose a package.
 - **Never sends your Nebius key or GitHub token into the sandbox where PR code runs.** Keys stay in the orchestrator
   process only.
 
@@ -571,6 +609,11 @@ run uses just the date. These folders stay on your computer only. They are never
   runs (`--sandbox-backend local|contree`; Nebius sandboxes also need `NEBIUS_PROJECT_ID` and
   `.venv/bin/pip install -e ".[contree]"`), the probe freeze rule, and the optional GitHub App
   (`POC_DEMO_REPOS`, webhook secret, installation token, `POC_REPORT_BASE_URL`, `python -m poc.github_app`).
+  On a product check, `--related-reports` (passed by the operator console, request-a-check, and the GitHub App)
+  looks up a few related public bug reports when `TAVILY_API_KEY` is set and the advisory swarm will run, and
+  passes them to that AI as quoted background. The report labels the text
+  "Background (related public bug reports, not used for the verdict)". A study run leaves this off. When the
+  swarm is off, the lookup is not called. Without the key, the check logs one line and continues. The key is never printed.
 - Model ids on Token Factory: `nvidia/nemotron-3-super-120b-a12b` (claims, probes, summary),
   `nvidia/Nemotron-3-Ultra-550b-a55b` (advisory labels), `nvidia/Nemotron-3_5-Lightning` with fallback
   `nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B` (advisory tips).

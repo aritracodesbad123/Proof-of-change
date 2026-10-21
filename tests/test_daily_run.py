@@ -536,24 +536,57 @@ def _flaky_sides(main_runs, pr_runs):
 
 
 def test_docs_only_flaky_test_does_not_decide_the_verdict():
-    """A documentation-only pull request with one test that passes and fails across the 3 runs: the flaky test is
-    shown, but a result that changes between runs of one side is noise and does not decide the verdict."""
+    """A test that disagrees with itself on the base, with a stable pull request, is noise. It is shown and does
+    not decide the verdict."""
     from poc import coverage_gate
     passed = {NPZ: ("passed", "")}
     failed = {NPZ: ("failed", "intermittent")}
-    cmp = _flaky_sides([passed] * 3, [passed, failed, passed])
-    assert cmp["flaky"] == [NPZ] and cmp["regressions"] == [] and cmp["new_tests_failing"] == []
-    v, reason, labels = dr.verdict_for(cmp, None, None, DOC_ONLY)
-    assert v == "verified"
-    assert NPZ in reason and "flaky" in reason and "do not decide the verdict" in reason
-    assert "flaky" in labels
-    gated = coverage_gate.apply({"verdict": v, "reason": reason, "files": DOC_ONLY, "comparison": cmp})
-    assert gated["verdict"] != "needs_attention"
-    # The same test disagreeing with itself on main is also flaky, not a regression.
     cmp_main = _flaky_sides([passed, failed, passed], [passed] * 3)
-    assert cmp_main["flaky"] == [NPZ]
-    v_main, reason_main, _ = dr.verdict_for(cmp_main, None, None, DOC_ONLY)
-    assert v_main == "verified" and NPZ in reason_main
+    assert cmp_main["flaky"] == [NPZ] and cmp_main["pr_unstable"] == [] and cmp_main["regressions"] == []
+    v_main, reason_main, labels = dr.verdict_for(cmp_main, None, None, DOC_ONLY)
+    assert v_main == "verified"
+    assert NPZ in reason_main and "flaky" in reason_main and "do not decide the verdict" in reason_main
+    assert "flaky" in labels
+    gated = coverage_gate.apply({"verdict": v_main, "reason": reason_main, "files": DOC_ONLY, "comparison": cmp_main})
+    assert gated["verdict"] != "needs_attention"
+
+
+def test_stable_base_one_of_three_on_the_pr_is_not_verified():
+    """3/3 pass on the base, 1/3 pass on the pull request. A possible regression, never verified."""
+    passed = {NPZ: ("passed", "")}
+    failed = {NPZ: ("failed", "intermittent")}
+    cmp = _flaky_sides([passed] * 3, [passed, failed, failed])
+    assert cmp["flaky"] == [] and cmp["pr_unstable"] == [NPZ] and cmp["pr_unstable_noisy"] == []
+    assert cmp["regressions"] == [] and cmp["new_tests_failing"] == []
+    v, reason, _ = dr.verdict_for(cmp, None, None, DOC_ONLY)
+    assert v == "needs_attention"
+    assert v != "verified"
+    assert NPZ in reason and "fail on some pull-request runs" in reason
+
+
+def test_every_pr_run_different_is_could_not_verify():
+    """Base always passes. The pull request passes, fails, then errors. Too mixed to call, so not verified."""
+    passed = {NPZ: ("passed", "")}
+    failed = {NPZ: ("failed", "intermittent")}
+    errored = {NPZ: ("error", "boom")}
+    cmp = _flaky_sides([passed] * 3, [passed, failed, errored])
+    assert cmp["pr_unstable_noisy"] == [NPZ]
+    assert cmp["pr_unstable"] == [] and cmp["flaky"] == []
+    v, reason, _ = dr.verdict_for(cmp, None, None, DOC_ONLY)
+    assert v == "could_not_verify"
+    assert v != "verified"
+    assert NPZ in reason and "too mixed to call" in reason
+
+
+def test_flaky_on_both_sides_does_not_decide_the_verdict():
+    """A test that passes and fails on both sides keeps today's handling: listed, and it does not decide."""
+    passed = {NPZ: ("passed", "")}
+    failed = {NPZ: ("failed", "intermittent")}
+    cmp = _flaky_sides([passed, failed, passed], [failed, passed, failed])
+    assert cmp["flaky"] == [NPZ] and cmp["pr_unstable"] == [] and cmp["pr_unstable_noisy"] == []
+    v, reason, _ = dr.verdict_for(cmp, None, None, DOC_ONLY)
+    assert v == "verified"
+    assert NPZ in reason and "do not decide the verdict" in reason
 
 
 def test_flaky_test_does_not_hide_a_real_regression():
@@ -563,7 +596,7 @@ def test_flaky_test_does_not_hide_a_real_regression():
           {NPZ: ("failed", "intermittent"), reg: ("failed", "boom")},
           {NPZ: ("passed", ""), reg: ("failed", "boom")}]
     cmp = _flaky_sides([main] * 3, pr)
-    assert cmp["regressions"] == [reg] and cmp["flaky"] == [NPZ]
+    assert cmp["regressions"] == [reg] and cmp["pr_unstable"] == [NPZ] and cmp["flaky"] == []
     v, reason, _ = dr.verdict_for(cmp, None, None, DOC_ONLY)
     assert v == "needs_attention" and "pass on main but fail on the PR" in reason and NPZ in reason
 
@@ -583,6 +616,22 @@ def test_report_lists_a_flaky_test_and_the_header_names_the_commit(tmp_path):
     header = md.split("##", 1)[0]
     assert f"Proof-of-Change commit: `{sha}`" in header
     assert NPZ in md and "**could_not_verify**" in md
+
+
+def test_report_lists_pr_only_unstable_tests_on_their_own_line():
+    from reports import pr_report
+    rec = _pr_record(verdict="could_not_verify", reason="not fully verified",
+                     comparison={"flaky": ["pkg/test_other.py::test_wobble"],
+                                 "pr_unstable_noisy": [NPZ], "pr_unstable": [],
+                                 "regressions": [], "new_tests_failing": [], "removed_tests": [],
+                                 "other_changes": []},
+                     files=DOC_ONLY, thread_env={"OMP_NUM_THREADS": "1", "PYTHONHASHSEED": "0"},
+                     machine_type={"label": "local"}, posted_upstream=False)
+    rows = {r[0]: r for r in pr_report.checks(rec)}
+    assert "Tests unstable only on the pull request" in rows
+    unstable = rows["Tests unstable only on the pull request"]
+    assert unstable[1] == "WARN" and NPZ in unstable[2]
+    assert NPZ not in rows["No flaky tests"][2]
 
 
 def test_record_check_fails_a_pr_run_without_poc_commit():

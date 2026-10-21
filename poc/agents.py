@@ -58,6 +58,7 @@ def swarm_enabled(flag: bool = False) -> bool:
     Command-line, study, and benchmark runs default to off. ``--swarm`` or ``POC_SWARM``
     (1, true, yes, or on) turns it on. The operator console and the GitHub App pass
     ``--swarm`` themselves.
+    A requested check and the Codespace console start do too. A study run does not.
     """
     if flag:
         return True
@@ -132,6 +133,15 @@ def run_swarm(provider: Provider | None, rec: dict, ctx: dict | None = None,
     return out
 
 
+def _with_background(rec: dict, body: str) -> str:
+    """Append quoted bug-report background when a product check stored it. Never an instruction."""
+    from poc import related_reports
+    block = related_reports.prompt_block(rec.get("related_reports"))
+    if not block:
+        return body
+    return body + "\n\n" + block
+
+
 def _run_swarm_roles(provider: Provider, rec: dict, ctx: dict, agents: list, out: dict,
                      run_judge: bool, run_helper: bool, run_summary: bool) -> None:
     from poc import run_progress
@@ -142,7 +152,7 @@ def _run_swarm_roles(provider: Provider, rec: dict, ctx: dict, agents: list, out
         role = _role(provider, "judge")
         agents.append(role)
         try:
-            user = "Findings:\n" + json.dumps(_findings_payload(rec), indent=1)[:8000]
+            user = _with_background(rec, "Findings:\n" + json.dumps(_findings_payload(rec), indent=1)[:8000])
             raw = _call(provider, "judge", JUDGE_PROMPT, user, JUDGE_SCHEMA, ctx)
             role["status"] = "ok"
             role["labels"] = raw.get("labels") or []
@@ -159,7 +169,7 @@ def _run_swarm_roles(provider: Provider, rec: dict, ctx: dict, agents: list, out
         role = _role(provider, "helper")
         agents.append(role)
         try:
-            user = "Record excerpt:\n" + _record_excerpt(rec)
+            user = _with_background(rec, "Record excerpt:\n" + _record_excerpt(rec))
             raw = _call(provider, "helper", HELPER_PROMPT, user, HELPER_SCHEMA, ctx)
             role["status"] = "ok"
             role["notes"] = raw.get("notes") or []
@@ -172,7 +182,7 @@ def _run_swarm_roles(provider: Provider, rec: dict, ctx: dict, agents: list, out
                 role["model"] = HELPER_FALLBACK
                 role["note"] = f"fell back to Nano after {type(e).__name__}"
                 try:
-                    user = "Record excerpt:\n" + _record_excerpt(rec)
+                    user = _with_background(rec, "Record excerpt:\n" + _record_excerpt(rec))
                     raw = _call(provider, "helper", HELPER_PROMPT, user, HELPER_SCHEMA, ctx)
                     role["status"] = "ok"
                     role["notes"] = raw.get("notes") or []
@@ -199,7 +209,7 @@ def _run_swarm_roles(provider: Provider, rec: dict, ctx: dict, agents: list, out
         role = _role(provider, "summary")
         agents.append(role)
         try:
-            user = "Record excerpt:\n" + _record_excerpt(rec)
+            user = _with_background(rec, "Record excerpt:\n" + _record_excerpt(rec))
             raw = _call(provider, "summary", SUMMARY_PROMPT, user, SUMMARY_SCHEMA, ctx)
             text = str(raw.get("text") or raw.get("summary") or "").strip()
             # Super sometimes double-encodes: {"text": "{\"summary\": \"...\"}"}

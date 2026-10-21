@@ -1,0 +1,84 @@
+{
+  "mode": "replay",
+  "note": "Finished checks stored in this folder. The results page does not install code and does not call an API.",
+  "checks": [
+    {
+      "id": "pr-rasbt-mlxtend-1229-296459ec1712-2026-10-10-probes",
+      "kind": "pull_request",
+      "repo": "rasbt/mlxtend",
+      "pr": 1229,
+      "url": "https://github.com/rasbt/mlxtend/pull/1229",
+      "title": "Fix feature_importance_permutation permuting the wrong columns for feature_groups",
+      "verdict": "needs_attention",
+      "reason": "probe: 2 observation(s) need attention: caller_x_after_call.changed_columns differs and no claim covers it; int_groups_after_multi_group.importances differs and no claim covers it; probe: claim(s) C1, C2 proven; probe: 1 other observation(s) identical on both sides; tests: 9 test(s) ran on main, 10 on the PR; 1 new test(s) pass, 9 unchanged",
+      "tested_at_ist": "2026-10-10 11:54 IST",
+      "record": "checks/pr-rasbt-mlxtend-1229-296459ec1712-2026-10-10-probes/record.json",
+      "report_html": null
+    },
+    {
+      "id": "pr-pandas-dev-pandas-70520-21633c2bcaf3-2026-10-10",
+      "kind": "pull_request",
+      "repo": "pandas-dev/pandas",
+      "pr": 70520,
+      "url": "https://github.com/pandas-dev/pandas/pull/70520",
+      "title": "DEPR: negative min_count in reductions (GH#50022)",
+      "verdict": "verified",
+      "reason": "1 test(s) re-parametrized (4 -> 4 ids); 49 new test(s) pass, 3274 unchanged",
+      "tested_at_ist": "2026-10-10 06:43 IST",
+      "record": "checks/pr-pandas-dev-pandas-70520-21633c2bcaf3-2026-10-10/record.json",
+      "report_html": null
+    },
+    {
+      "id": "numpy-numpy-32910",
+      "kind": "pull_request",
+      "repo": "numpy/numpy",
+      "pr": 32910,
+      "url": "https://github.com/numpy/numpy/pull/32910",
+      "title": "ENH: Release GIL in np.repeat when Python API is not needed",
+      "verdict": "could_not_verify",
+      "reason": "source build of PR head failed after 2.3s: ../meson.build:1:0: ERROR: Unknown compiler(s): [['c++'], ['g++'], ['clang++'], ['nvc++'], ['pgc++'], ['icpc'], ['icpx']] (build log: build-pr.log)",
+      "tested_at_ist": "2026-10-10 05:51 IST",
+      "record": "checks/numpy-numpy-32910/record.json",
+      "report_html": null
+    },
+    {
+      "id": "golden-sklearn160rc1-imblearn0124",
+      "kind": "release",
+      "repo": "scikit-learn",
+      "pr": null,
+      "url": null,
+      "title": "scikit-learn 1.5.2 to 1.6.0rc1 against imbalanced-learn 0.12.4",
+      "verdict": "needs_attention",
+      "reason": "imbalanced-learn 0.12.4 can no longer be imported with scikit-learn 1.6.0rc1: 46 test module(s) fail to load and 2243 test(s) that passed before cannot run. Same result in all 3 runs on each side.",
+      "tested_at_ist": "2026-10-10 05:36 IST",
+      "record": "checks/golden-sklearn160rc1-imblearn0124/record.json",
+      "report_html": "checks/golden-sklearn160rc1-imblearn0124/REPORT.html"
+    },
+    {
+      "id": "golden-pandas300rc0-upsetplot090",
+      "kind": "release",
+      "repo": "pandas",
+      "pr": null,
+      "url": null,
+      "title": "pandas 2.3.3 to 3.0.0rc0 against UpSetPlot 0.9.0",
+      "verdict": "needs_attention",
+      "reason": "67 test(s) of UpSetPlot that passed with pandas 2.3.3 fail with pandas 3.0.0rc0, in 5 distinct error type(s). Same result in all 3 runs on each side. 6 test(s) already failed before the change and are not counted.",
+      "tested_at_ist": "2026-10-10 05:36 IST",
+      "record": "checks/golden-pandas300rc0-upsetplot090/record.json",
+      "report_html": "checks/golden-pandas300rc0-upsetplot090/REPORT.html"
+    },
+    {
+      "id": "golden-clean-sklearn151to152-imblearn0124",
+      "kind": "release",
+      "repo": "scikit-learn",
+      "pr": null,
+      "url": null,
+      "title": "scikit-learn 1.5.1 to 1.5.2 against imbalanced-learn 0.12.4",
+      "verdict": "verified",
+      "reason": "No test of imbalanced-learn 0.12.4 changed result between scikit-learn 1.5.1 and 1.5.2 (2277 tests, 3 runs per side).",
+      "tested_at_ist": "2026-10-10 05:36 IST",
+      "record": "checks/golden-clean-sklearn151to152-imblearn0124/record.json",
+      "report_html": "checks/golden-clean-sklearn151to152-imblearn0124/REPORT.html"
+    }
+  ]
+}

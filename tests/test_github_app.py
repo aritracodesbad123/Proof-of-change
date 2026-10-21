@@ -21,9 +21,28 @@ def test_refuse_non_demo(monkeypatch):
     plan = github_app.handle_event(
         "issue_comment",
         {"action": "created", "comment": {"body": "/prove"}, "repository": {"full_name": "psf/requests"},
-         "issue": {"number": 1}},
+         "issue": {"number": 1, "pull_request": {}}},
         env={"POC_DEMO_REPOS": "me/demo"})
     assert plan["action"] == "refuse"
+
+
+def test_prove_on_a_plain_issue_is_ignored():
+    plan = github_app.handle_event(
+        "issue_comment",
+        {"action": "created", "comment": {"body": "/prove"}, "repository": {"full_name": "me/demo"},
+         "issue": {"number": 4}},
+        env={"POC_DEMO_REPOS": "me/demo"})
+    assert plan["action"] == "ignore"
+    assert "pull request" in plan["why"]
+
+
+def test_prove_on_a_pull_request_still_plans():
+    plan = github_app.handle_event(
+        "issue_comment",
+        {"action": "created", "comment": {"body": "/prove"}, "repository": {"full_name": "me/demo"},
+         "issue": {"number": 9, "pull_request": {}}},
+        env={"POC_DEMO_REPOS": "me/demo"})
+    assert plan == {"action": "prove", "repo": "me/demo", "claim": "", "pr": 9}
 
 
 def test_pull_request_plan():
@@ -127,3 +146,29 @@ def test_apply_runs_the_check_with_the_swarm_on(tmp_path, monkeypatch):
     assert "--swarm" in argv
     assert argv.count("--swarm") == 1
     assert "https://github.com/me/demo/pull/3" in argv
+
+
+def test_check_argv_has_the_swarm_on_once():
+    argv = github_app.check_argv("https://github.com/me/demo/pull/3", {})
+    assert argv.count("--swarm") == 1
+    assert argv[:4] == ["--pr", "https://github.com/me/demo/pull/3", "--model-provider", "nebius"]
+
+
+def test_app_check_leaves_study_runs_off(tmp_path, monkeypatch):
+    """After an App check, a study run in the same process still has the swarm off."""
+    import os
+
+    from ops import bench
+    from poc import agents
+    monkeypatch.delenv("POC_SWARM", raising=False)
+    monkeypatch.setattr(github_app, "_http_json",
+                        lambda *a, **k: {"id": 1, "html_url": "https://example.test/x"})
+    rec = {"id": "pr-me-demo-3", "verdict": "needs_attention", "reason": "diff", "repo": "me/demo",
+           "pr": {"number": 3, "head_sha": "abc"}, "behaviour_claims": [], "probes": {"items": []}}
+    github_app.apply({"action": "run", "repo": "me/demo", "pr": 3, "record": rec, "head_sha": "abc"},
+                     dry_run=False,
+                     env={"POC_DEMO_REPOS": "me/demo", "GITHUB_APP_INSTALLATION_TOKEN": "tok"},
+                     runner=lambda argv: 0, hosted_dir=tmp_path)
+    assert "POC_SWARM" not in os.environ
+    assert agents.swarm_enabled(False) is False
+    assert bench.labelled_study_out(tmp_path / "study", False) == tmp_path / "study"

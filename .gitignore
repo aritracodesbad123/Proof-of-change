@@ -29,3 +29,7 @@ ops/console-accounts.sqlite-wal
 ops/console-accounts.sqlite-shm
 ops/work/
 ops/seen_prs.json
+ops/request-worker-state.json
+ops/request-worker-state.lock
+ops/study.lock
+console/web/public/replay/

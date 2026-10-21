@@ -35,7 +35,7 @@ In scope (MVP, spec §7.1):
   with 4 planted PRs, **labelled as example data** everywhere it appears.
 
 Stretch (spec §7.2): MCP server (`prove_change`, `run_probe`) for Cursor/Claude, run-timeline screen, "copy as pytest",
-checkpoint cache per base SHA, Serverless AI eval job, Tavily doc lookup (Tavily bonus). Serverless AI eval job and Tavily doc lookup: **Planned, not yet built.**
+checkpoint cache per base SHA, Serverless AI eval job, Tavily doc lookup (Tavily bonus). Serverless AI eval job: **Planned, not yet built.** Tavily lookup is built. It runs only when `TAVILY_API_KEY` is set; otherwise the lookup is skipped and the check continues. Related public bug reports are optional quoted background for the advisory AI on a product check (the operator console, request-a-check, a Codespace that starts that console, and the GitHub App) when `TAVILY_API_KEY` is set and the advisory swarm will run. The report labels that text "Background (related public bug reports, not used for the verdict)". They do not decide a verdict and they do not choose a package.
 
 Out of scope (spec §7.3): non-Python languages; services needing DBs other than SQLite, queues or several services;
 private repos and secrets; GitLab/Bitbucket; blocking merges by default; **posting to any real upstream repository**
@@ -109,7 +109,7 @@ Model IDs must be confirmed at build time with `GET https://api.tokenfactory.neb
 | **Token Factory preloaded SWE environments** (SWE-bench Verified, SWE-rebench) | Ready-made environments to measure false alarms on known-good fixes. |
 
 ### Optional, not NVIDIA
-- **Tavily** web search: optional probe-time doc lookup via `poc/tavily_docs.py` when `TAVILY_API_KEY` is set (off by default in the daily path).
+- **Tavily** setup lookup: built (`poc/demo_helper.py` calls `poc/tavily_docs.py`). On a console or daily check, when `TAVILY_API_KEY` is set, the helper finds missing-package and setup sources from the project's own files and from PyPI. A package named in that lookup is installed only when its PyPI page links back to this GitHub repository. Tavily can suggest package names, but they're only installed if their PyPI page links back to the same repo. That check stops accidents, not a determined attacker. When `TAVILY_API_KEY` is not set, the lookup is skipped. A study run does not call it. Related public bug reports (`--related-reports`) are a separate quoted background for the advisory AI on a product check, and only when that swarm will run. A study run and the daily study leave that off. The report labels the text "Background (related public bug reports, not used for the verdict)". That text does not decide a verdict.
 
 ### Not needed for this project
 - NVIDIA Cosmos, GR00T, Sonic, Isaac and the Physical AI Workbench, and Jetson hardware. These are for the Physical AI track.
@@ -283,7 +283,7 @@ guardrails/              schema, isolation/timeouts, no-external scan
 reports/                 reviewer report generator (HTML/PDF/MD + daily summary), samples
 tests/                   pytest
 ```
-Checked against the code: claim extraction and probe generation run on main (Nemotron 3 Super on the Nebius Token Factory API). Advisory agent swarm (Ultra judge / Lightning helper / Super summary) runs after the code verdict via `poc/agents.py`. Operator console (React + API) shows live stages and swarm theater; Nebius host entry is `poc.serverless.console_http` / `orchestrate`. Local HTML reviewer reports and demo-repo hosted behavior maps are generated. Contree sandboxes and the GitHub App are wired (credentials optional; local/dry-run fallback). Still **Planned, not yet built:** managed Nebius schedule for `daily_job`, Contree MCP process hosting, and Tavily-by-default.
+Checked against the code: claim extraction and probe generation run on main (Nemotron 3 Super on the Nebius Token Factory API). Advisory agent swarm (Ultra judge / Lightning helper / Super summary) runs after the code verdict via `poc/agents.py`. Operator console (React + API) shows live stages and swarm theater; Nebius host entry is `poc.serverless.console_http` / `orchestrate`. Local HTML reviewer reports and demo-repo hosted behavior maps are generated. Contree sandboxes and the GitHub App are wired (credentials optional; local/dry-run fallback). The Tavily setup lookup is built and runs only when `TAVILY_API_KEY` is set; otherwise it is skipped. Product checks can attach related public bug reports as quoted background when `TAVILY_API_KEY` is set and the advisory swarm will run; the report labels that text "Background (related public bug reports, not used for the verdict)". That text does not decide a verdict. Still **Planned, not yet built:** managed Nebius schedule for `daily_job`, and Contree MCP process hosting.
 
 ## 14. Open questions
 
@@ -293,7 +293,7 @@ From spec §14:
 2. **Python only for the MVP?** Spec recommends yes. This draft assumes yes.
 3. **Second demo: a real repo or the constructed bookstore?** Spec recommends the constructed one, clearly labelled.
    Confirm.
-4. **Tavily for the $3k bonus?** Spec: only if a probe genuinely needs current third-party docs. **Planned, not yet built.**
+4. **Tavily for the $3k bonus?** Built. The helper finds missing-package and setup sources from the project's own files and from PyPI. A suggested package is installed only when its PyPI page links back to the GitHub repository. Tavily can suggest package names, but they're only installed if their PyPI page links back to the same repo. That check stops accidents, not a determined attacker. The lookup runs only when `TAVILY_API_KEY` is set; otherwise it is skipped. Related public bug reports are quoted background on product checks only, and only when the advisory swarm will run. The report labels them "Background (related public bug reports, not used for the verdict)". They are not an input to the verdict.
 5. Hosting: a Serverless AI endpoint, or a free host with Token Factory? Do the credits cover Compute? A Serverless AI endpoint is **Planned, not yet built.**
 6. License: Apache-2.0 or MIT? Resolved: MIT. See `docs/decisions/2026-10-15-mit-licence.md`.
 7. Credit budget for Ultra calls per run. Ultra advisory path is wired (`poc/agents.py` judge role); live cost caps are an ops question.

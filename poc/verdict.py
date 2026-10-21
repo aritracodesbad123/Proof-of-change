@@ -22,6 +22,7 @@ class FindingLabel(str, Enum):
     UNMENTIONED_CHANGE = "unmentioned"     # red: behaviour change on public surface that no claim covers
     NEEDS_HUMAN = "needs_human"            # amber: differs, related to a claim, model unsure it matches
     FLAKY = "flaky"                        # amber: a side disagreed with itself across reruns (never red)
+    UNSTABLE_ON_PR = "unstable_on_pr"      # grey: stable on the base, unstable only on the pull request
     NOT_TESTABLE = "not_testable"          # grey: always shown, never hidden
     NO_DIFFERENCE = "no_difference"        # same on both sides, no claim about it
 
@@ -30,7 +31,7 @@ COLOUR = {
     FindingLabel.PROVEN: "green", FindingLabel.NO_DIFFERENCE: "green",
     FindingLabel.FALSE_CLAIM: "red", FindingLabel.UNMENTIONED_CHANGE: "red",
     FindingLabel.NEEDS_HUMAN: "amber", FindingLabel.FLAKY: "amber",
-    FindingLabel.NOT_TESTABLE: "grey",
+    FindingLabel.UNSTABLE_ON_PR: "grey", FindingLabel.NOT_TESTABLE: "grey",
 }
 
 # Check-run conclusions: never "failure" (verdicts do not block merges).

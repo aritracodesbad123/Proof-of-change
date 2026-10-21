@@ -53,6 +53,8 @@ def test_confirm_reruns():
     assert confirm([a] * 3, [a] * 3) == "same"
     assert confirm([a] * 3, [b] * 3) == "differs"
     assert confirm([a, b, a], [b] * 3) == "flaky"
+    assert confirm([a] * 3, [a, b, b]) == "pr_unstable"
+    assert confirm([a, b, a], [a, b, a]) == "flaky"
     assert normalise({"pid": 1, "a": "0xdeadbeef00"}) == {"a": "<addr>"}
 
 

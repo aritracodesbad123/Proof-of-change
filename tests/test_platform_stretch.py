@@ -98,7 +98,7 @@ def test_github_app_g_ext_and_prove():
     plan = github_app.handle_event(
         "issue_comment",
         {"action": "created", "comment": {"body": "/prove"}, "repository": {"full_name": "me/demo"},
-         "issue": {"number": 3}},
+         "issue": {"number": 3, "pull_request": {}}},
         env={"POC_DEMO_REPOS": "me/demo"})
     assert plan["action"] == "prove" and plan["pr"] == 3
 
@@ -108,7 +108,23 @@ def test_hosted_report_writes_html(tmp_path):
         {"id": "t1", "verdict": "verified", "reason": "ok", "repo": "me/demo",
          "machine": "local", "behaviour_claims": [], "probes": {"items": []}},
         tmp_path)
-    assert path.is_file() and "Proof-of-Change" in path.read_text()
+    html = path.read_text()
+    assert path.is_file() and "Proof-of-Change" in html
+    assert "Background (related public bug reports, not used for the verdict)" not in html
+
+
+def test_hosted_report_labels_related_bug_reports(tmp_path):
+    label = "Background (related public bug reports, not used for the verdict)"
+    text = '"Window bug" <not a tag>'
+    path = github_app.write_hosted_report(
+        {"id": "t2", "verdict": "verified", "reason": "ok", "repo": "me/demo",
+         "machine": "local", "behaviour_claims": [], "probes": {"items": []},
+         "related_reports": {"status": "ok", "text": text, "items": [], "untrusted": True}},
+        tmp_path)
+    html = path.read_text()
+    assert f"<h2>{label}</h2>" in html
+    assert "&lt;not a tag&gt;" in html
+    assert "<not a tag>" not in html
 
 
 def test_serverless_orchestrate_dry_run():

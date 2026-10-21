@@ -43,7 +43,9 @@ Judging (``judge``): each observation is compared over 3 alternating runs per si
     flaky                           -> flaky             probe crashed on both sides    -> not_testable
 
 Any red or amber label (false_claim, unmentioned, needs_human) makes the PR verdict needs_attention. Flaky
-observations are ignored as noise, and differences that are only about warnings never count on their own.
+observations are ignored as noise when the base side is unstable or both sides are. An observation that is stable
+on the base and unstable only on the pull request is not that noise: it needs attention, or could not verify when
+every pull-request run differs. Differences that are only about warnings never count on their own.
 """
 from __future__ import annotations
 
@@ -57,7 +59,7 @@ import tempfile
 import time
 from pathlib import Path
 
-from poc.diff import compare, confirm, parse_probe_output
+from poc.diff import compare, confirm, parse_probe_output, pr_runs_too_noisy
 from poc.verdict import COLOUR, FindingLabel
 
 PROBES_DIR = Path(__file__).resolve().parent.parent / "probes"
@@ -229,9 +231,28 @@ def judge(spec: dict, runs: dict, files: dict | None = None) -> list[dict]:
         p = [{"v": o.get(name, ABSENT)} for o in runs["pr"]]
         state = confirm(m, p)
         claim = claim_for(spec, name)
-        res = {"name": name, "state": state, "label": label_for(state, claim, name, crashed_both),
+        pr_only = None
+        if state == "pr_unstable":
+            # Stored state stays "flaky" (the recorded vocabulary). The label is what the verdict reads.
+            if pr_runs_too_noisy(p):
+                pr_only, state = "noisy", "flaky"
+                # Not "flaky": that label is noise. This one stays visible to later checks.
+                label = FindingLabel.UNSTABLE_ON_PR.value
+            else:
+                pr_only, state = "regression", "flaky"
+                if claim is None:
+                    label = FindingLabel.UNMENTIONED_CHANGE.value
+                elif claim["expect"] == "same":
+                    label = FindingLabel.FALSE_CLAIM.value
+                else:
+                    label = FindingLabel.NEEDS_HUMAN.value
+        else:
+            label = label_for(state, claim, name, crashed_both)
+        res = {"name": name, "state": state, "label": label,
                "claim": claim["id"] if claim else None,
                "main": m[0]["v"], "pr": p[0]["v"]}
+        if pr_only:
+            res["pr_only"] = pr_only
         if state != "same":
             res["diffs"] = [dict(d, field=d["field"].split(".", 1)[1] if "." in d["field"] else "")
                             for d in compare({"v": m[0]["v"]}, {"v": p[0]["v"]})]
@@ -432,8 +453,11 @@ def summarize(items: list[dict]) -> dict:
     raw_flagged = [o for o in obs if COLOUR.get(FindingLabel(o["label"])) in ("red", "amber")]
     # Noise filter: an observation that changes between runs of the SAME side is noise, not a finding; it is listed
     # but never decides the verdict. A difference that is only about warnings never counts as a break on its own.
-    noisy = [o for o in raw_flagged if o["label"] == FindingLabel.FLAKY.value]
-    flagged = [o for o in raw_flagged if o["label"] != FindingLabel.FLAKY.value]
+    pr_only_noisy = [o for o in obs if o.get("pr_only") == "noisy"]
+    noisy = [o for o in raw_flagged if o["label"] == FindingLabel.FLAKY.value and o.get("pr_only") != "noisy"]
+    # Flaky on one side is noise. Unstable only on the pull request is not, even when it is too mixed to call.
+    flagged = [o for o in raw_flagged
+               if o["label"] != FindingLabel.FLAKY.value and o.get("pr_only") != "noisy"]
     warning_only = [o for o in flagged if is_warning_observation(o["name"])]
     if flagged and len(warning_only) == len(flagged):
         flagged = []
@@ -445,13 +469,17 @@ def summarize(items: list[dict]) -> dict:
         names = {FindingLabel.UNMENTIONED_CHANGE.value: "differs and no claim covers it",
                  FindingLabel.FALSE_CLAIM.value: "differs although the claim says it does not",
                  FindingLabel.NEEDS_HUMAN.value: "does not differ although the claim says it does",
-                 FindingLabel.FLAKY.value: "gives different results between runs of the same side"}
+                 FindingLabel.FLAKY.value: "gives different results between runs of the same side",
+                 FindingLabel.UNSTABLE_ON_PR.value: "is stable on the base and unstable only on the pull request"}
         bits.append(f"probe: {len(flagged)} observation(s) need attention: "
                     + "; ".join(f"{o['name']} {names[o['label']]}" + (f" ({o['claim']})" if o.get("claim") else "")
                                 for o in flagged[:4]))
     if noisy:
         bits.append(f"probe: {len(noisy)} observation(s) ignored as noise (they change between runs of the same "
                     "side)")
+    if pr_only_noisy:
+        bits.append(f"probe: {len(pr_only_noisy)} observation(s) stable on the base and unstable only on the PR, "
+                    "too mixed to call")
     if warning_only:
         bits.append(f"probe: {len(warning_only)} warning-only difference(s) not counted on their own")
     if proven:
@@ -465,4 +493,5 @@ def summarize(items: list[dict]) -> dict:
     return {"labels": [x.value for x in labels], "flagged": [{k: o[k] for k in ("probe", "name", "label", "claim")}
                                                              for o in flagged],
             "proven_claims": proven, "reason": "; ".join(bits),
-            "ignored_noise": [o["name"] for o in noisy], "ignored_warning_only": [o["name"] for o in warning_only]}
+            "ignored_noise": [o["name"] for o in noisy], "ignored_warning_only": [o["name"] for o in warning_only],
+            "pr_only_noisy": [o["name"] for o in pr_only_noisy]}

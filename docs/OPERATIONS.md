@@ -102,14 +102,17 @@ Verdict, in order:
 6. `could_not_verify` if an exit code is unexplained, or new/changed tests were skipped or failed only because
    an optional dependency is missing (a new test whose failure is `ModuleNotFoundError: No module named 'X'`,
    or another missing-dependency message the comparison already recognises, is blocked, not a pull-request break);
-7. `could_not_verify` if the only remaining difference is flaky tests. A test that passes and fails across the 3
-   runs of one side (main or the pull request) is listed in the record and the report, and the reason names it.
-   It is not a regression and does not, on its own, produce `needs_attention`. A real regression or a new failing
-   test still produces `needs_attention` when another test is flaky;
+7. A test that passes on every base run and fails on some pull-request runs is a possible regression:
+   `needs_attention` when a pull-request result repeats, `could_not_verify` when the pull-request runs are too
+   mixed to call. It is never `verified`. A test that is flaky on both sides, or only on the base, is listed
+   and does not, on its own, decide the verdict. A real regression or a new failing test still produces
+   `needs_attention` when another test is flaky;
 8. otherwise `needs_attention` for tests missing on the PR side or other outcome changes, `verified` if nothing differs.
 
 Then the coverage gate. The reason says how many tests ran on each side, how many were unchanged (and how many of
 those were skipped on both sides), flaky tests, and every module that failed to load.
+
+Limitation: after a setup rerun, probe line coverage is measured again only when the change is 200 lines or fewer. A larger change skips that measurement, and the rerun cannot raise the verdict to verified.
 
 ## Coverage gate (`poc/coverage_gate.py`)
 
@@ -500,6 +503,6 @@ may be nested, e.g. `<date>/<name>`; `run_date` is the folder's calendar date), 
 `--baseline tests|tests+diff|tests+probes|full` (what decides the verdict, default `full`; see "Baselines"),
 `--model-provider nebius|recorded|none` (default `nebius`; a missing or empty `NEBIUS_API_KEY` stops the run before it starts, including a benchmark or an eval that uses this default. `--model-provider none` runs with the AI off. The full baseline still refuses to test when no model is available, see docs/decisions/2026-10-14-require-model-for-ai-gate.md), `--claims-model ID`, `--probe-model ID`, `--recorded-dir DIR`,
 `--unsafe-no-sandbox` (run PR code without the sandbox; never used by the daily run), `--sandbox-backend local|contree` (default `local`; Contree needs `NEBIUS_API_KEY`, `NEBIUS_PROJECT_ID`, and `.[contree]`), `--no-coverage` (skip the coverage run; the gate then says "not measured"), `--no-probes` (do not run probe files;
-the record says `"probes": {"status": "none"}`).
+the record says `"probes": {"status": "none"}`). `--related-reports` looks up a few related public bug reports when `TAVILY_API_KEY` is set and the advisory swarm will run, and passes them to that AI as quoted background. The report labels the text "Background (related public bug reports, not used for the verdict)". The operator console, a Codespace that starts that console, the request-a-check worker, and the GitHub App pass the flag. When the swarm is off, Tavily is not called. A benchmark run and the daily study leave it off, and a benchmark stays off even if the flag is present. It does not change the verdict and does not choose a package. Without the key the check logs one line and continues. The key is never printed.
 
 A full daily run takes about 15-20 minutes (day 1: 15 PRs in 16.4 min wall time, before the coverage run existed).

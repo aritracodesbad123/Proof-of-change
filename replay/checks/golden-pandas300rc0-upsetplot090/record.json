@@ -1,0 +1,288 @@
+{
+  "schema_version": "1",
+  "schema_path": "/data/checkout/harness/schema/observation.schema.json",
+  "schema_sha256": "5a3c3d36b7730ce74d0f23b03c88ea862ea35cc327c7d79481fca8b972e8383e",
+  "harness_version": "1.0",
+  "id": "golden-pandas300rc0-upsetplot090",
+  "date_ist": "2026-10-10 05:36 IST",
+  "who": "runner",
+  "machine": "local",
+  "host": "runner-01",
+  "cpu_count": 8,
+  "platform": "Linux-6.12.94+-x86_64-with-glibc2.41",
+  "upstream": "pandas",
+  "old_version": "2.3.3",
+  "new_version": "3.0.0rc0",
+  "new_version_requested": "3.0.0rc0",
+  "new_direct_url": null,
+  "dependent": "UpSetPlot",
+  "dependent_version": "0.9.0",
+  "test_source": "repo tag 0.9.0 (https://github.com/jnothman/UpSetPlot, commit 7d889a9df7974509965a5ffd313e27764d43322a)",
+  "test_selection": "upsetplot/tests",
+  "subset_note": null,
+  "python": "3.13.5",
+  "runs_per_side": 3,
+  "workers": "4",
+  "import_mode": "importlib",
+  "cpus": "4-7",
+  "mem_cap_gb": 6.0,
+  "test_timeout_s": 300,
+  "run_timeout_s": 1500,
+  "pin_overridden": false,
+  "env_diff": [
+    "pandas==2.3.3",
+    "pandas==3.0.0rc0"
+  ],
+  "pip_check_new": "ok",
+  "pip_check_old": "ok",
+  "machine_type": {
+    "arch": "x86_64",
+    "os": "Linux",
+    "platform": "Linux-6.12.94+-x86_64-with-glibc2.41",
+    "cpu_count": 8,
+    "cpu_model": "Intel(R) Xeon(R) Processor",
+    "ram_gb": 15.6,
+    "ci": null,
+    "runner_name": null,
+    "runner_os": null,
+    "runner_arch": null,
+    "runner_environment": null,
+    "image": null,
+    "label": "local"
+  },
+  "thread_env": {
+    "OMP_NUM_THREADS": "1",
+    "OPENBLAS_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1",
+    "NUMEXPR_NUM_THREADS": "1",
+    "VECLIB_MAXIMUM_THREADS": "1",
+    "BLIS_NUM_THREADS": "1"
+  },
+  "dependent_import": {
+    "old": {
+      "upsetplot": "ok"
+    },
+    "new": {
+      "upsetplot": "ok"
+    }
+  },
+  "network": "install: allowed (uv from PyPI/nightly index, git clone of the tag); tests: no network (unshare -rn, private network namespace)",
+  "per_run": [
+    {
+      "side": "old",
+      "run": 1,
+      "exit": 1,
+      "seconds": 7.19,
+      "passed": 233,
+      "failed": 6,
+      "error": 0,
+      "collection_errors": 0,
+      "skipped": 12,
+      "junit": true,
+      "pytest_summary": "6 failed, 233 passed, 12 skipped, 414 warnings in 6.59s",
+      "summary_counts": {
+        "failed": 6,
+        "passed": 233,
+        "skipped": 12,
+        "warning": 414
+      }
+    },
+    {
+      "side": "new",
+      "run": 1,
+      "exit": 1,
+      "seconds": 11.4,
+      "passed": 166,
+      "failed": 73,
+      "error": 0,
+      "collection_errors": 0,
+      "skipped": 12,
+      "junit": true,
+      "pytest_summary": "73 failed, 166 passed, 12 skipped, 212 warnings in 10.62s",
+      "summary_counts": {
+        "failed": 73,
+        "passed": 166,
+        "skipped": 12,
+        "warning": 212
+      }
+    },
+    {
+      "side": "old",
+      "run": 2,
+      "exit": 1,
+      "seconds": 8.16,
+      "passed": 233,
+      "failed": 6,
+      "error": 0,
+      "collection_errors": 0,
+      "skipped": 12,
+      "junit": true,
+      "pytest_summary": "6 failed, 233 passed, 12 skipped, 414 warnings in 7.62s",
+      "summary_counts": {
+        "failed": 6,
+        "passed": 233,
+        "skipped": 12,
+        "warning": 414
+      }
+    },
+    {
+      "side": "new",
+      "run": 2,
+      "exit": 1,
+      "seconds": 8.75,
+      "passed": 166,
+      "failed": 73,
+      "error": 0,
+      "collection_errors": 0,
+      "skipped": 12,
+      "junit": true,
+      "pytest_summary": "73 failed, 166 passed, 12 skipped, 212 warnings in 8.20s",
+      "summary_counts": {
+        "failed": 73,
+        "passed": 166,
+        "skipped": 12,
+        "warning": 212
+      }
+    },
+    {
+      "side": "old",
+      "run": 3,
+      "exit": 1,
+      "seconds": 6.58,
+      "passed": 233,
+      "failed": 6,
+      "error": 0,
+      "collection_errors": 0,
+      "skipped": 12,
+      "junit": true,
+      "pytest_summary": "6 failed, 233 passed, 12 skipped, 414 warnings in 6.00s",
+      "summary_counts": {
+        "failed": 6,
+        "passed": 233,
+        "skipped": 12,
+        "warning": 414
+      }
+    },
+    {
+      "side": "new",
+      "run": 3,
+      "exit": 1,
+      "seconds": 9.16,
+      "passed": 166,
+      "failed": 73,
+      "error": 0,
+      "collection_errors": 0,
+      "skipped": 12,
+      "junit": true,
+      "pytest_summary": "73 failed, 166 passed, 12 skipped, 212 warnings in 8.55s",
+      "summary_counts": {
+        "failed": 73,
+        "passed": 166,
+        "skipped": 12,
+        "warning": 212
+      }
+    }
+  ],
+  "gates": {
+    "versions_verified": {
+      "pass": true,
+      "detail": "old pandas==2.3.3, new pandas==3.0.0rc0, UpSetPlot==0.9.0 on both sides (freeze + import probe)"
+    },
+    "env_identical_except_upstream": {
+      "pass": true,
+      "detail": "freeze diff: ['pandas==2.3.3', 'pandas==3.0.0rc0']"
+    },
+    "venv_isolated": {
+      "pass": true,
+      "detail": "both venvs created by uv without system site-packages (checked sys.prefix and sys.path)"
+    },
+    "threads_pinned": {
+      "pass": true,
+      "detail": "OMP_NUM_THREADS, OPENBLAS_NUM_THREADS, MKL_NUM_THREADS, NUMEXPR_NUM_THREADS, VECLIB_MAXIMUM_THREADS, BLIS_NUM_THREADS = 1 in both envs"
+    },
+    "runs_complete": {
+      "pass": true,
+      "detail": "3 runs per side requested (minimum 3); JUnit XML present and no suite timeout on every run"
+    },
+    "old_side_healthy": {
+      "pass": true,
+      "detail": "dependent imports on old: {'upsetplot': 'ok'}; old side passed [233, 233, 233] tests with collection errors [0, 0, 0]"
+    },
+    "stability": {
+      "pass": true,
+      "required": false,
+      "detail": "share of tests with the same outcome in every run: old 1.0, new 1.0 (advisory threshold 0.99)"
+    },
+    "no_secrets_in_logs": {
+      "pass": true,
+      "required": false,
+      "detail": "scrubbed env; no credential-like strings found in logs"
+    },
+    "schema_valid": {
+      "pass": true,
+      "detail": "record matches harness/schema/observation.schema.json"
+    }
+  },
+  "accepted": true,
+  "classification": {
+    "real_break": 67,
+    "already_broken": 6,
+    "flaky": 0,
+    "import_failure": 0,
+    "fixed_by_new": 0,
+    "lost_tests": 0
+  },
+  "stability": {
+    "tests": 251,
+    "old_stable_rate": 1.0,
+    "new_stable_rate": 1.0
+  },
+  "top_error_signatures_breaks": [
+    [
+      "ValueError: Invalid RGBA argument: nan",
+      36
+    ],
+    [
+      "AssertionError: DataFrame.index level [N] are different",
+      16
+    ],
+    [
+      "ValueError: Do not know how to convert N    NaN",
+      13
+    ],
+    [
+      "ValueError: 'c' argument must be a color, a sequence of colors, or a sequence of numbers, not N     #0000002e",
+      1
+    ],
+    [
+      "ValueError: 'c' argument must be a color, a sequence of colors, or a sequence of numbers, not N           NaN",
+      1
+    ]
+  ],
+  "top_error_signatures_already_broken": [
+    [
+      "TypeError: exceptions must be derived from Warning, not <class 'NoneType'>",
+      6
+    ]
+  ],
+  "duration_s": {
+    "total_wall": 56.5,
+    "tests_old_mean": 7.3,
+    "tests_new_mean": 9.8
+  },
+  "expected": "break: 67 real breaks from Copy-on-Write (Invalid RGBA argument: nan) and 6 already broken (pytest.warns(None))",
+  "expected_class": "break",
+  "matches_expected": "yes",
+  "explanation": {
+    "status": "not yet wired",
+    "groundedness": null
+  },
+  "hand_check": null,
+  "upstream_issue": null,
+  "notes": null,
+  "logs": "research/runs/golden-pandas300rc0-upsetplot090",
+  "report": "reports/golden-pandas300rc0-upsetplot090/REPORT.md",
+  "verdict": "needs_attention",
+  "reason": "67 test(s) of UpSetPlot that passed with pandas 2.3.3 fail with pandas 3.0.0rc0, in 5 distinct error type(s). Same result in all 3 runs on each side. 6 test(s) already failed before the change and are not counted.",
+  "repo": "pandas"
+}
