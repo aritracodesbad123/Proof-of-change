@@ -1322,14 +1322,16 @@ def _retry_setup_gap(a, rec, repo, prdir, venvs: dict, rerun) -> None:
         cache = demo_helper.FileCache(prdir / "tavily-cache.json")
 
         def lookup(query, _cache=cache):  # noqa: A001 — local lookup passed into the helper
+            project = str(rec.get("library") or "")
             hit = _cache.get(query)
-            if hit:
-                return hit
+            if isinstance(hit, dict):
+                return demo_helper.scope_lookup(hit, repo, project)
             got = demo_helper.live_fetch(query)
-            stored = demo_helper.redact_obj(got)
+            payload = got if isinstance(got, dict) else {"ok": False, "results": []}
+            stored = demo_helper.redact_obj(demo_helper.scope_lookup(payload, repo, project))
             stored["live_call"] = False
             _cache.put(query, stored)
-            return got
+            return stored
 
     demo_helper.retry_unverified(
         rec, rerun, install_one, declared, tavily.get("text") or "", demo_helper.fetch_pypi, repo,

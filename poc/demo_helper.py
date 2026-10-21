@@ -267,9 +267,73 @@ def _networkish(text: str) -> bool:
                                         "unreachable", "connection", "errno"))
 
 
+def _project_name(repo: str, project: str) -> str:
+    return (project or "").strip() or ((repo or "").split("/")[-1] or "project")
+
+
 def lookup_queries(repo: str, project: str) -> list[str]:
-    name = project or (repo.split("/")[-1] if repo else "project")
-    return [f"{name} python setup install instructions", f"{repo} python install bug report"]
+    """Name this distribution and this GitHub repository, and stay on their own sites.
+
+    An open search was returning forks and unrelated products. Each query includes the
+    PyPI distribution name and the repository URL, and is limited to that repository,
+    its docs on GitHub, or its page on pypi.org.
+    """
+    name = _project_name(repo, project)
+    parts = split_repo(repo or "")
+    if not parts:
+        return [f"{name} python setup install instructions"]
+    owner, repo_name = parts
+    github = f"https://github.com/{owner}/{repo_name}"
+    pypi = f"https://pypi.org/project/{name}/"
+    repo_site = f"site:github.com/{owner}/{repo_name}"
+    return [
+        f"{name} python setup install instructions {github} {repo_site}",
+        f"{name} python documentation install {github} {repo_site}",
+        f"{name} python install requirements {pypi} {github} site:pypi.org",
+    ]
+
+
+def _project_needles(repo: str, project: str) -> list[str]:
+    """Names a kept result must mention: the distribution, or owner/repo."""
+    needles = []
+    name = _project_name(repo, project)
+    if name and name != "project":
+        needles.append(name)
+    parts = split_repo(repo or "")
+    if parts:
+        owner, repo_name = parts
+        needles.append(f"{owner}/{repo_name}")
+        needles.append(f"github.com/{owner}/{repo_name}")
+    return needles
+
+
+def _mentions_project(text: str, needles: list[str]) -> bool:
+    """Whole-name match. A dot, hyphen, or underscore is part of the name, so inflect is not inflection or inflect-fork."""
+    if not text:
+        return False
+    for needle in needles:
+        if needle and re.search(rf"(?<![A-Za-z0-9._-]){re.escape(needle)}(?![A-Za-z0-9._-])", text, re.I):
+            return True
+    return False
+
+
+def _relevant_result(item: dict, needles: list[str]) -> bool:
+    blob = "\n".join(str(item.get(key) or "") for key in ("title", "url", "content"))
+    return _mentions_project(blob, needles)
+
+
+def scope_lookup(payload: dict, repo: str, project: str = "") -> dict:
+    """Drop hits that never name this project. They are not shown, logged, or used."""
+    if not isinstance(payload, dict):
+        return payload
+    needles = _project_needles(repo, project)
+    kept = [item for item in (payload.get("results") or []) if isinstance(item, dict) and _relevant_result(item, needles)]
+    out = dict(payload)
+    out["results"] = kept
+    answer = out.get("answer")
+    if answer and not _mentions_project(str(answer), needles):
+        out["answer"] = None
+    return out
 
 
 def _result_lines(queries: list[str], results: list[dict], errors: list[str], live: bool) -> list[str]:
@@ -317,12 +381,12 @@ def lookup_project(repo: str, project: str, cache, env: dict | None = None, fetc
                 payload = {"ok": False, "error": "lookup returned nothing", "query": query, "results": []}
             live = True
             fresh_any = True
-            stored = redact_obj(dict(payload), env)
+            stored = redact_obj(scope_lookup(dict(payload), repo, project), env)
             stored["live_call"] = False
             if cache is not None:
                 cache.put(query, stored)
             payload = stored
-        payload = redact_obj(payload, env)
+        payload = redact_obj(scope_lookup(payload, repo, project), env)
         if payload.get("answer"):
             texts.append(str(payload["answer"]))
         for item in payload.get("results") or []:
@@ -936,6 +1000,8 @@ def retry_unverified(rec: dict, rerun, install_one, declared, tavily_text: str, 
             extra = lookup(f"{repo} {name} python install")
         except Exception:  # noqa: BLE001 — keep going with the error text and the project files
             extra = None
+        if isinstance(extra, dict):
+            extra = scope_lookup(extra, repo, str(rec.get("library") or ""))
         tavily_text = (tavily_text or "") + "\n" + _lookup_text(extra)
     before = {"round": 1, "verdict": rec.get("verdict"), "reason": rec.get("reason")}
     parts = split_repo(repo or "")

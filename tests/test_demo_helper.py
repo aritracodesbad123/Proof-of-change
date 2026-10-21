@@ -324,14 +324,17 @@ def test_lookup_records_a_live_call_and_skips_cleanly(tmp_path):
 
     def fetch(query, timeout=8, env=None):
         assert timeout == demo_helper.TAVILY_TIMEOUT
-        return {"ok": True, "answer": "use pytest", "query": query,
-                "results": [{"title": "Install", "url": "https://example.com/install", "content": "pip install pytest"}]}
+        return {"ok": True, "answer": "install widget from the repository", "query": query,
+                "results": [{"title": "widget install", "url": "https://github.com/acme/widget",
+                             "content": "pip install widget"}]}
 
     fresh = demo_helper.lookup_project(REPO, "widget", cache, env={"TAVILY_API_KEY": "present-but-not-logged"}, fetch=fetch)
     assert fresh["live_call"] is True and fresh["cached"] is False
-    assert fresh["lines"][0] == "Looked up with Tavily: 2 results"
+    assert fresh["lines"][0] == f"Looked up with Tavily: {len(demo_helper.lookup_queries(REPO, 'widget'))} results"
     assert any(line.startswith("Query: ") for line in fresh["lines"])
-    assert any(line.startswith("Source: Install — ") for line in fresh["lines"])
+    assert any("site:github.com/acme/widget" in line for line in fresh["lines"])
+    assert any("site:pypi.org" in line for line in fresh["lines"])
+    assert any(line.startswith("Source: widget install — ") for line in fresh["lines"])
     again = demo_helper.lookup_project(REPO, "widget", cache, env={"TAVILY_API_KEY": "present-but-not-logged"}, fetch=fetch)
     assert again["live_call"] is False and again["cached"] is True
     assert "present-but-not-logged" not in (tmp_path / "cache.json").read_text()
@@ -346,6 +349,63 @@ def test_lookup_records_a_live_call_and_skips_cleanly(tmp_path):
                                        env={"TAVILY_API_KEY": "present-but-not-logged"}, fetch=offline)
     assert failed["live_call"] is True
     assert "no network" in failed["lines"][0]
+
+
+def test_lookup_queries_name_the_repo_and_drop_unrelated_hits():
+    queries = demo_helper.lookup_queries("jaraco/inflect", "inflect")
+    joined = "\n".join(queries)
+    assert "https://github.com/jaraco/inflect" in joined
+    assert "https://pypi.org/project/inflect/" in joined
+    assert any("site:github.com/jaraco/inflect" in query for query in queries)
+    assert any("site:pypi.org" in query for query in queries)
+    assert any("documentation" in query for query in queries)
+
+    def fetch(query, timeout=8, env=None):
+        return {"ok": True, "answer": "Try a fork of an unrelated product", "query": query, "results": [
+            {"title": "inflect setup", "url": "https://github.com/jaraco/inflect",
+             "content": "pip install inflect"},
+            {"title": "Inflection, a different library", "url": "https://github.com/example/inflection",
+             "content": "pip install inflection"},
+            {"title": "Some other product", "url": "https://example.com/other",
+             "content": "nothing to do with this repository"},
+        ]}
+
+    cache = demo_helper.MemoryCache()
+    got = demo_helper.lookup_project("jaraco/inflect", "inflect", cache,
+                                    env={"TAVILY_API_KEY": "present-but-not-logged"}, fetch=fetch)
+    blob = json.dumps(got)
+    cached = json.dumps(cache._data)
+    assert got["lines"][0] == f"Looked up with Tavily: {len(queries)} results"
+    assert all(item["url"] == "https://github.com/jaraco/inflect" for item in got["results"])
+    for dropped in ("example.com/other", "unrelated product", "pip install inflection", "inflect-fork"):
+        assert dropped not in blob
+        assert dropped not in cached
+    assert "inflect setup" in blob
+    # A hit is kept when only the body names the project. A fork name that merely starts with the project is not.
+    kept = demo_helper.scope_lookup(
+        {"answer": "unrelated essay", "results": [
+            {"title": "Notes", "url": "https://example.com/notes", "content": "jaraco/inflect needs pytest"},
+            {"title": "Fork", "url": "https://github.com/someone/inflect-fork", "content": "my copy"},
+            {"title": "Inflection", "url": "https://pypi.org/project/inflection/", "content": "a different library"},
+        ]},
+        "jaraco/inflect", "inflect")
+    assert [item["url"] for item in kept["results"]] == ["https://example.com/notes"]
+    assert kept["answer"] is None
+    # The same filter runs before a setup-gap lookup is used, so an unrelated install suggestion cannot be applied.
+    calls = []
+    gap = {"verdict": "could_not_verify", "reason": "ModuleNotFoundError: No module named 'inflection'",
+           "library": "inflect"}
+
+    def gap_lookup(_query):
+        return {"answer": "pip install inflection", "results": [
+            {"title": "Inflection", "url": "https://github.com/example/inflection", "content": "pip install inflection"}]}
+
+    demo_helper.retry_unverified(
+        gap, lambda: calls.append("rerun"), lambda *_a: calls.append("install"), [], "",
+        lambda _name: {"home_page": "https://github.com/jaraco/inflect"}, "jaraco/inflect", False, lookup=gap_lookup)
+    assert calls == []
+    assert "pip install inflection" not in json.dumps(gap)
+    assert gap["reason"] == "could not verify: setup gap inflection"
 
 
 def test_report_shows_helper_notes_and_does_not_count_a_setup_problem(tmp_path):
