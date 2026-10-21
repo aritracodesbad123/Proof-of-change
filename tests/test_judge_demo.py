@@ -600,3 +600,38 @@ def test_replay_export_and_committed_catalog_need_no_network(tmp_path, monkeypat
             html_path = Path(export_replay.ROOT) / "replay" / row["report_html"]
             assert html_path.is_file()
             assert "fonts.googleapis.com" not in html_path.read_text()
+
+
+def test_codespace_container_relaxes_only_seccomp_and_apparmor():
+    root = Path(__file__).resolve().parents[1]
+    cfg = json.loads((root / ".devcontainer" / "devcontainer.json").read_text())
+    assert cfg.get("privileged") is not True
+    assert cfg["runArgs"] == ["--security-opt", "seccomp=unconfined", "--security-opt", "apparmor=unconfined"]
+    assert not any("cap-add" in a or "privileged" in a for a in cfg["runArgs"])
+    assert "post-create.sh" in cfg["postCreateCommand"]
+    setup = (root / ".devcontainer" / "post-create.sh").read_text()
+    assert "set -Eeuo pipefail" in setup and "npm run build" in setup and "poc-setup.log" in setup
+    start = (root / ".devcontainer" / "start-console.sh").read_text()
+    assert "setsid" in start and "dist/index.html" in start and "listening" in start
+
+
+def test_sandbox_environment_never_holds_the_model_or_lookup_keys(tmp_path, monkeypatch):
+    """Host keys and keys a judge types into the console reach the check process, never untrusted code."""
+    from guardrails.isolation import untrusted_env
+    from poc import session_key
+    monkeypatch.setenv("NEBIUS_API_KEY", "host-nebius-key-123")
+    monkeypatch.setenv("TAVILY_API_KEY", "host-tavily-key-123")
+    token = "judge-session-token"
+    session_key.set_key(token, "typed-nebius-key-456")
+    session_key.set_tavily_key(token, "typed-tavily-key-456")
+    try:
+        for provider in ("nebius", "recorded"):
+            child, _ = console_api.child_environment(dict(os.environ), provider, token)
+            for install in (False, True):
+                env = untrusted_env(tmp_path / f"h-{provider}-{install}", install=install, base=child)
+                dumped = json.dumps(env)
+                assert "NEBIUS_API_KEY" not in env and "TAVILY_API_KEY" not in env
+                for v in ("host-nebius-key-123", "host-tavily-key-123", "typed-nebius-key-456", "typed-tavily-key-456"):
+                    assert v not in dumped
+    finally:
+        session_key.clear_key(token)

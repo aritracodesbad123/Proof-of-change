@@ -6,7 +6,15 @@
       "version": "22"
     }
   },
-  "forwardPorts": [8787],
+  "runArgs": [
+    "--security-opt",
+    "seccomp=unconfined",
+    "--security-opt",
+    "apparmor=unconfined"
+  ],
+  "forwardPorts": [
+    8787
+  ],
   "portsAttributes": {
     "8787": {
       "label": "Proof-of-Change console",
@@ -14,8 +22,8 @@
       "visibility": "private"
     }
   },
-  "postCreateCommand": "sudo apt-get update && sudo apt-get install -y bubblewrap && (sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0 || true) && python -m pip install -e '.[dev]' && cd console/web && npm ci && npm run build",
-  "postStartCommand": "bash .devcontainer/start-console.sh",
+  "postCreateCommand": "bash .devcontainer/post-create.sh",
+  "postStartCommand": "bash .devcontainer/start-console.sh || echo 'Console start failed; see /tmp/poc-console.log'",
   "secrets": {
     "TAVILY_API_KEY": {
       "description": "Your own Tavily API key. The setup lookup needs it. This project does not ship or share a key. Tavily keys are free. Without a key the lookup is skipped and the check continues. The value is not stored in the repository.",
