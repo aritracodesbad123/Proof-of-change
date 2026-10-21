@@ -76,10 +76,10 @@ for it in items:
     if not repos[full][0]:
         continue
     n = it["number"]
-    pr = get(f"https://api.github.com/repos/{full}/pulls/{n}")
+    pr = get(f"https://api.github.com/repos/{full}/pulls/{n}")  # br-allow-external: read-only GET of a PR
     if not pr or not pr.get("merged_at") or pr["additions"] + pr["deletions"] > 300:
         continue
-    files = get(f"https://api.github.com/repos/{full}/pulls/{n}/files?per_page=100") or []
+    files = get(f"https://api.github.com/repos/{full}/pulls/{n}/files?per_page=100") or []  # br-allow-external: read-only GET of PR files
     names = [f["filename"] for f in files]
     py = [x for x in names if x.endswith(".py")]
     tests = [x for x in py if TEST.search(x)]
