@@ -93,3 +93,37 @@ def test_installation_token_from_env(monkeypatch):
 def test_report_url_for():
     assert github_app.report_url_for(Path("x.html"), env={}) is None
     assert github_app.report_url_for(Path("x.html"), env={"POC_REPORT_BASE_URL": "https://h/t/"}) == "https://h/t/x.html"
+
+
+def test_apply_runs_the_check_with_the_swarm_on(tmp_path, monkeypatch):
+    """A GitHub App check passes --swarm even when POC_SWARM is unset.
+
+    A study or benchmark run still defaults to off: swarm_enabled(False) stays false.
+    """
+    monkeypatch.delenv("POC_SWARM", raising=False)
+    from poc import agents
+    assert agents.swarm_enabled(False) is False
+    seen: dict = {}
+
+    def runner(argv):
+        seen["argv"] = list(argv)
+        return 0
+
+    def fake_http(method, url, *, token, body=None, extra_headers=None):
+        if "check-runs" in url:
+            return {"id": 11, "html_url": "https://example.test/runs/11"}
+        return {"id": 22, "html_url": "https://example.test/comment/22"}
+
+    monkeypatch.setattr(github_app, "_http_json", fake_http)
+    rec = {"id": "pr-me-demo-3", "verdict": "needs_attention", "reason": "diff", "repo": "me/demo",
+           "pr": {"number": 3, "head_sha": "abc"}, "behaviour_claims": [], "probes": {"items": []}}
+    plan = {"action": "run", "repo": "me/demo", "pr": 3, "record": rec, "head_sha": "abc"}
+    out = github_app.apply(
+        plan, dry_run=False,
+        env={"POC_DEMO_REPOS": "me/demo", "GITHUB_APP_INSTALLATION_TOKEN": "tok"},
+        runner=runner, hosted_dir=tmp_path)
+    assert out["ok"] and not out["dry_run"]
+    argv = seen["argv"]
+    assert "--swarm" in argv
+    assert argv.count("--swarm") == 1
+    assert "https://github.com/me/demo/pull/3" in argv

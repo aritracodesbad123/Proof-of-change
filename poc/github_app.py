@@ -307,7 +307,9 @@ def apply(plan: dict, *, dry_run: bool | None = None, env: dict | None = None,
         note = None
 
     pr_url = f"https://github.com/{repo}/pull/{int(pr)}"
-    argv = ["--pr", pr_url, "--model-provider", env.get("POC_MODEL_PROVIDER") or "nebius"]
+    # The App turns the advisory swarm on for this check. A study run, a benchmark
+    # run, and the command line stay off unless they pass --swarm or POC_SWARM.
+    argv = ["--pr", pr_url, "--model-provider", env.get("POC_MODEL_PROVIDER") or "nebius", "--swarm"]
     if plan.get("claim"):
         # claim text is advisory for logs; daily_run reads claims from PR body
         pass

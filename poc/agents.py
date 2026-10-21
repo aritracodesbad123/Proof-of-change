@@ -55,8 +55,9 @@ Do not invent log lines. Answer with JSON only."""
 def swarm_enabled(flag: bool = False) -> bool:
     """True when this run should call the advisory swarm.
 
-    Command-line and benchmark runs default to off. ``--swarm`` or ``POC_SWARM``
-    (1, true, yes, or on) turns it on. The operator console passes ``--swarm`` itself.
+    Command-line, study, and benchmark runs default to off. ``--swarm`` or ``POC_SWARM``
+    (1, true, yes, or on) turns it on. The operator console and the GitHub App pass
+    ``--swarm`` themselves.
     """
     if flag:
         return True
