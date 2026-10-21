@@ -504,7 +504,7 @@ def test_codespace_and_single_user_skip_sign_in_when_the_port_is_not_public(acco
         assert result.body["role"] == "admin"
         assert console_auth.request_session_token(None) == console_auth.LOCAL_SESSION
     result = _me(monkeypatch, "CODESPACES", "true", None)
-    assert result.status == 200
+    assert result.status == 401 and result.body["error"] == console_auth.PORT_UNKNOWN_MESSAGE
     result = _me(monkeypatch, "CODESPACES", "true", "org")
     assert result.status == 200
 
@@ -721,3 +721,73 @@ def test_both_given_but_contree_cannot_start_does_not_ask_for_them_again(account
     finally:
         session_key_clear()
         server.shutdown()
+
+
+def test_sign_in_stays_on_when_port_visibility_cannot_be_read(monkeypatch):
+    monkeypatch.setenv("CODESPACES", "true")
+    console_auth.reset_port_cache()
+    monkeypatch.setattr(console_auth.shutil, "which", lambda _name: None)          # gh missing
+    assert console_auth.sign_in_skip() == (False, console_auth.PORT_UNKNOWN_MESSAGE)
+    assert console_auth.request_session_token(None) is None
+    console_auth.reset_port_cache()
+    monkeypatch.setattr(console_auth.shutil, "which", lambda _name: "/usr/bin/gh")
+
+    class Failed:
+        returncode, stdout = 1, ""
+
+    monkeypatch.setattr(console_auth.subprocess, "run", lambda *a, **k: Failed())  # gh failing
+    assert console_auth.sign_in_skip() == (False, console_auth.PORT_UNKNOWN_MESSAGE)
+    console_auth.reset_port_cache()
+
+
+def test_server_nebius_env_is_never_used_for_a_user_check(accounts, monkeypatch):
+    """Server env has a key and project; the session has none: refused, asked for the key, nothing runs."""
+    import sys
+    import types
+    _clear_contree_env(monkeypatch)
+    monkeypatch.setenv("NEBIUS_API_KEY", "server-nebius-key-should-not-be-used")
+    monkeypatch.setenv("NEBIUS_PROJECT_ID", "server-project-should-not-be-used")
+    monkeypatch.setenv("CONTREE_PROJECT_ID", "server-contree-project-unused")
+    monkeypatch.setitem(sys.modules, "contree_sdk", types.ModuleType("contree_sdk"))
+    import guardrails.sandbox as sb
+    monkeypatch.setattr(sb, "check", lambda *a, **k: (False, "bwrap down"))
+    monkeypatch.setattr(console_api.subprocess, "Popen", lambda *a, **k: (_ for _ in ()).throw(AssertionError("ran")))
+    assert console_api.contree_credentials(console_auth.LOCAL_SESSION) == ("", "")
+    assert console_api.resolve_console_provider("nebius", console_auth.LOCAL_SESSION)[0] == "recorded"
+    env, secrets = console_api.child_environment(dict(__import__("os").environ), "nebius", console_auth.LOCAL_SESSION)
+    assert "NEBIUS_API_KEY" not in env and "NEBIUS_PROJECT_ID" not in env and "CONTREE_PROJECT_ID" not in env
+    assert "server-nebius-key-should-not-be-used" in secrets
+    server = _single_user_server(accounts, monkeypatch)
+    try:
+        status, raw = _post(server.server_address[1], "/api/checks", {"pr_url": "https://github.com/me/demo/pull/9"})
+        body = json.loads(raw)
+        assert status == 400 and body["refused"] is True
+        assert "add your Nebius API key" in body["error"]
+        assert "are set" not in body["error"]
+        assert b"server-nebius-key" not in raw and b"server-project" not in raw
+    finally:
+        session_key_clear()
+        server.shutdown()
+
+
+def test_signed_in_accounts_keep_separate_keys_and_never_use_the_local_slot(monkeypatch):
+    from poc import session_key
+    for name in ("CODESPACES", "POC_SINGLE_USER"):
+        monkeypatch.delenv(name, raising=False)
+    assert console_auth.sign_in_skip()[0] is False
+    tok_a = console_auth.request_session_token("session-cookie-account-a")
+    tok_b = console_auth.request_session_token("session-cookie-account-b")
+    assert tok_a == "session-cookie-account-a" and tok_b == "session-cookie-account-b"
+    assert console_auth.LOCAL_SESSION not in (tok_a, tok_b)
+    assert console_auth.request_session_token(None) is None
+    try:
+        console_api.apply_start_fields(tok_a, {"nebius_api_key": "account-a-key-123", "contree_project_id": "proj-a-123"})
+        console_api.apply_start_fields(tok_b, {"nebius_api_key": "account-b-key-456"})
+        assert console_api.contree_credentials(tok_a) == ("account-a-key-123", "proj-a-123")
+        assert console_api.contree_credentials(tok_b) == ("account-b-key-456", "")
+        assert session_key.get_key(console_auth.LOCAL_SESSION) is None
+        with pytest.raises(ValueError):
+            console_api.apply_start_fields(console_auth.request_session_token(None), {"nebius_api_key": "no-session-key"})
+    finally:
+        session_key.clear_key(tok_a)
+        session_key.clear_key(tok_b)

@@ -899,6 +899,10 @@ PORT_PUBLIC_MESSAGE = (
     "Port 8787 is public. Set port 8787 back to private in the Ports panel, then start the console again. "
     "Sign-in stays required while that port is public."
 )
+PORT_UNKNOWN_MESSAGE = (
+    "Could not confirm that port 8787 is private (the gh command is missing or failed), so sign-in stays on. "
+    "Check the Ports panel shows 8787 as Private, then start the console again."
+)
 _PORT_CACHE_S = 15.0
 _port_seen: tuple[float, str | None] | None = None
 
@@ -983,8 +987,12 @@ def sign_in_skip(env: dict[str, str] | os._Environ[str] | None = None) -> tuple[
     env = os.environ if env is None else env
     if not single_user_requested(env):
         return False, None
-    if codespace_port_visibility() == "public":
+    visibility = codespace_port_visibility()
+    if visibility == "public":
         return False, PORT_PUBLIC_MESSAGE
+    if visibility is None:
+        # gh missing or failing: we cannot prove the port is private, so sign-in stays on.
+        return False, PORT_UNKNOWN_MESSAGE
     return True, None
 
 

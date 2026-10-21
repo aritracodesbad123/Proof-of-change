@@ -607,8 +607,9 @@ def test_codespace_container_is_not_loosened_and_setup_is_robust():
     cfg = json.loads((root / ".devcontainer" / "devcontainer.json").read_text())
     assert cfg.get("privileged") is not True and "runArgs" not in cfg and "capAdd" not in cfg
     assert "post-create.sh" in cfg["postCreateCommand"]
-    for name in ("NEBIUS_API_KEY", "CONTREE_PROJECT_ID"):
-        assert "Your own" in cfg["secrets"][name]["description"]
+    # Console checks use only keys typed into the form, so the Codespace does not ask for Nebius secrets.
+    for name in ("NEBIUS_API_KEY", "CONTREE_PROJECT_ID", "NEBIUS_PROJECT_ID"):
+        assert name not in cfg["secrets"]
     setup = (root / ".devcontainer" / "post-create.sh").read_text()
     assert "set -Eeuo pipefail" in setup and "npm run build" in setup and "poc-setup.log" in setup
     assert ".[dev,contree]" in setup
@@ -662,7 +663,8 @@ def test_sandbox_choice_uses_contree_with_the_judges_own_keys(monkeypatch):
         monkeypatch.delenv(k, raising=False)
     monkeypatch.setenv("NEBIUS_API_KEY", "secret-nebius-123")
     monkeypatch.setenv("CONTREE_PROJECT_ID", "proj-123")
-    assert _plan(monkeypatch, False).flags == ["--sandbox-backend", "contree"]
+    # Server environment values are never used for a user check.
+    assert _plan(monkeypatch, False).flags != ["--sandbox-backend", "contree"]
     monkeypatch.delenv("NEBIUS_API_KEY")
     monkeypatch.delenv("CONTREE_PROJECT_ID")
     token = "judge-contree"
@@ -684,7 +686,7 @@ def test_sandbox_choice_refuses_without_bubblewrap_or_keys(monkeypatch):
         monkeypatch.delenv(k, raising=False)
     plan = _plan(monkeypatch, False)
     assert plan.refused and plan.flags == []
-    assert "own Nebius key and Contree project ID" in plan.note
+    assert "own Nebius key and project ID into the start form" in plan.note
 
 
 def test_contree_keys_never_reach_pull_request_code(tmp_path, monkeypatch):

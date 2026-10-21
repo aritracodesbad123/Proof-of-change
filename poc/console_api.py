@@ -54,10 +54,10 @@ _RUN_LOG_RE = re.compile(r"run log:\s*(\S+/ops/runs/[^/\s]+)/REPORT\.md")
 
 
 def resolve_console_provider(requested: str, session_token: str | None = None) -> tuple[str, str | None]:
-    """Live checks need a key in this session or in the server environment. Otherwise use recorded answers."""
+    """Live checks need a key typed into this session. The server's key is never used. Otherwise recorded answers."""
     if requested != "nebius":
         return requested, None
-    if session_key.has_key(session_token) or (os.environ.get("NEBIUS_API_KEY") or "").strip():
+    if session_key.has_key(session_token):
         return "nebius", None
     return "recorded", (
         "No Nebius key for this session, so this check uses the recorded AI answers. "
@@ -76,9 +76,12 @@ def child_environment(base: dict[str, str], provider: str, session_token: str | 
     pasted = session_key.get_key(session_token)
     if pasted and len(pasted) >= 8:
         secrets.append(pasted)
-    if provider != "nebius":
-        env.pop("NEBIUS_API_KEY", None)
-    elif pasted:
+    # A user check never runs on the server's Nebius account: drop the server's values, keep them only for redaction.
+    for name in ("NEBIUS_API_KEY", "NEBIUS_PROJECT_ID", "CONTREE_PROJECT_ID"):
+        server_value = (env.pop(name, None) or "").strip()
+        if len(server_value) >= 8 and server_value not in secrets:
+            secrets.append(server_value)
+    if provider == "nebius" and pasted:
         env["NEBIUS_API_KEY"] = pasted
     host_tavily = (env.get("TAVILY_API_KEY") or "").strip()
     if len(host_tavily) >= 8:
@@ -91,7 +94,8 @@ def child_environment(base: dict[str, str], provider: str, session_token: str | 
         # The check process uses these only for its own Contree API calls. Pull-request code gets the allowlisted
         # environment (guardrails.isolation.untrusted_env), which never carries them.
         key, project = contree_credentials(session_token)
-        env["NEBIUS_API_KEY"], env["NEBIUS_PROJECT_ID"] = key, project
+        if key and project:
+            env["NEBIUS_API_KEY"], env["NEBIUS_PROJECT_ID"] = key, project
         if len(key) >= 8 and key not in secrets:
             secrets.append(key)
     for name in ("NEBIUS_PROJECT_ID", "CONTREE_PROJECT_ID"):   # redact project IDs next to the Nebius key
@@ -116,12 +120,11 @@ class _ScrubWriter:
 
 
 def contree_credentials(session_token: str | None = None) -> tuple[str, str]:
-    """The judge's or operator's own Nebius key and Contree project ID: environment first, then the
-    in-memory console fields. CONTREE_PROJECT_ID is accepted as the Codespaces secret name for NEBIUS_PROJECT_ID."""
-    key = (os.environ.get("NEBIUS_API_KEY") or "").strip() or (session_key.get_key(session_token) or "").strip()
-    project = ((os.environ.get("NEBIUS_PROJECT_ID") or "").strip()
-               or (os.environ.get("CONTREE_PROJECT_ID") or "").strip()
-               or (session_key.get_contree_project(session_token) or "").strip())
+    """The user's own Nebius key and Contree project ID for a console check: only the values typed into this
+    session. The server's NEBIUS_API_KEY / NEBIUS_PROJECT_ID / CONTREE_PROJECT_ID are never used for a user check,
+    so one person's check can never run on the server's Nebius account."""
+    key = (session_key.get_key(session_token) or "").strip()
+    project = (session_key.get_contree_project(session_token) or "").strip()
     return key, project
 
 
@@ -239,8 +242,7 @@ def console_run_flags(session_token: str | None = None) -> ConsoleRunPlan:
             f"sandbox unavailable ({why}). "
             "Proof-of-Change will not run pull-request code without a sandbox. "
             "Install bubblewrap, or set up Contree (a Nebius key, a project id, and contree-sdk). "
-            "In a Codespace you can add your own Nebius key and Contree project ID, as the Codespaces secrets "
-            "NEBIUS_API_KEY and CONTREE_PROJECT_ID or in the hidden console fields, and the check then runs in Contree. "
+            "Type your own Nebius key and project ID into the start form and the check then runs in Contree. "
             "Setting POC_UNSAFE_NO_SANDBOX=1 runs the code unsandboxed and shows a warning."
         ),
         True,
@@ -665,7 +667,9 @@ def _contree_sdk_installed() -> bool:
 
 
 def refusal_message(session_token: str | None = None) -> str:
-    """Plain words for a check refused because no sandbox can start. Never asks for a field already given."""
+    """Plain words for a check refused because no sandbox can start. Never asks for a field already given.
+
+    Only this session's typed values count; the server's environment is never described as "your key"."""
     key, project = contree_credentials(session_token)
     if key and project:
         if not _contree_sdk_installed():
@@ -1084,7 +1088,7 @@ class Handler(BaseHTTPRequestHandler):
                 "poc_commit_env": bool(
                     (os.environ.get("POC_COMMIT") or os.environ.get("RENDER_GIT_COMMIT") or "").strip()),
                 "chrome": bool(chrome),
-                "contree_ready": contree_usable(),
+                "contree_ready": contree_usable(self._session_token()),
                 "run_flags": flags,
                 "run_note": note,
                 "warning": warning,

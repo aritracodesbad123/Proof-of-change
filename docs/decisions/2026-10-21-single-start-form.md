@@ -15,6 +15,8 @@ When a check cannot start, the reply says why in plain words and the form shows 
 
 The Nebius key and project ID typed into the form are the same values the Contree routing reads. When both are given and Contree can start, the check runs in Contree only, even where bubblewrap cannot start. When both are given but Contree still cannot start, the reason says so and does not ask for them again.
 
+A console check uses only the Nebius key and project ID typed into that session. The server's own Nebius key and project ID, and Codespaces secrets with those names, are never used for a user check and are removed from the check's environment, so no one's check runs on another account. With sign-in on, each account's values are kept apart by its own sign-in, and the shared single-user slot is never used. If the console cannot read whether port 8787 is private, sign-in stays on.
+
 ## Why
 
 In a real Codespace test, a person saved the key with its own button, the page refreshed, and then Run check appeared to do nothing. Three buttons for three fields were confusing. Each key form was nested inside the start form, so a save also triggered the start handler. Start errors appeared only in a banner at the top of the page, so a refused start looked like silence.
