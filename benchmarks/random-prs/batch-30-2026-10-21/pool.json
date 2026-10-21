@@ -4,7 +4,7 @@
  "search_results": 3980,
  "filters": {
   "repo": "primary language Python, 200+ stars, pushed on/after 2026-09-21, not archived, pyproject.toml/setup.py/setup.cfg on default branch",
-  "pr": "merged, non-bot author, <=300 changed lines, changes >=1 non-test .py file AND >=1 test .py file (tests/, test_*.py, *_test.py, conftest.py)"
+  "pr": "merged, author not an automated account, <=300 changed lines, changes >=1 non-test .py file AND >=1 test .py file (tests/, test_*.py, *_test.py, conftest.py)"
  },
  "pool": [
   {
@@ -19,12 +19,8 @@
    "merge_commit_sha": "32e1f7faadfa35540e8da3205576a5572576f6b7",
    "additions": 9,
    "deletions": 37,
-   "py_source_files": [
-    "reme/steps/file_io/stat.py"
-   ],
-   "py_test_files": [
-    "tests/unit/test_crud_steps.py"
-   ],
+   "py_source_files": 1,
+   "py_test_files": 1,
    "stars": 3665
   },
   {
@@ -39,13 +35,8 @@
    "merge_commit_sha": "488a3c53b45fba895e16e952b9e42ed5f9cac325",
    "additions": 201,
    "deletions": 4,
-   "py_source_files": [
-    "superset/views/archived_assets.py",
-    "superset/views/base.py"
-   ],
-   "py_test_files": [
-    "tests/unit_tests/views/test_archived_assets.py"
-   ],
+   "py_source_files": 2,
+   "py_test_files": 1,
    "stars": 75244
   },
   {
@@ -60,14 +51,8 @@
    "merge_commit_sha": "832eb83a2d10ae3b1a1324a319b3312aad726f9c",
    "additions": 85,
    "deletions": 11,
-   "py_source_files": [
-    "awscli/customizations/configure/configure.py",
-    "awscli/customizations/login/login.py",
-    "awscli/customizations/utils.py"
-   ],
-   "py_test_files": [
-    "tests/unit/customizations/configure/test_configure.py"
-   ],
+   "py_source_files": 3,
+   "py_test_files": 1,
    "stars": 17317
   },
   {
@@ -82,12 +67,8 @@
    "merge_commit_sha": "9b096f071d75f3ea6acf9529563caa6d3316d9f4",
    "additions": 39,
    "deletions": 3,
-   "py_source_files": [
-    "truss/templates/control/control/application.py"
-   ],
-   "py_test_files": [
-    "truss/tests/templates/control/control/test_sanitized_exception_middleware.py"
-   ],
+   "py_source_files": 1,
+   "py_test_files": 1,
    "stars": 1223
   },
   {
@@ -102,18 +83,8 @@
    "merge_commit_sha": "2c64f40ac1d4c675d55c6912b03ff17d3643dbae",
    "additions": 124,
    "deletions": 7,
-   "py_source_files": [
-    "elevation/cache.py",
-    "elevation/datasource.py",
-    "elevation/spatial.py"
-   ],
-   "py_test_files": [
-    "tests/integration_srtm1_ellip.py",
-    "tests/integration_srtm1_geoid.py",
-    "tests/integration_srtm3.py",
-    "tests/test_10_spatial.py",
-    "tests/test_20_datasource.py"
-   ],
+   "py_source_files": 3,
+   "py_test_files": 5,
    "stars": 331
   },
   {
@@ -128,14 +99,8 @@
    "merge_commit_sha": "22f5ac982dd630b02c6daf0f826c2fb15c55fac6",
    "additions": 16,
    "deletions": 14,
-   "py_source_files": [
-    "elevation/datasource.py",
-    "elevation/spatial.py"
-   ],
-   "py_test_files": [
-    "tests/test_10_spatial.py",
-    "tests/test_20_datasource.py"
-   ],
+   "py_source_files": 2,
+   "py_test_files": 2,
    "stars": 331
   },
   {
@@ -150,14 +115,8 @@
    "merge_commit_sha": "9b64369caf961c5651bd90893f8b7ed097dd925a",
    "additions": 56,
    "deletions": 23,
-   "py_source_files": [
-    "apprise/utils/yaml.py"
-   ],
-   "py_test_files": [
-    "tests/test_apprise_template.py",
-    "tests/test_apprise_template_placement.py",
-    "tests/test_utils_yaml.py"
-   ],
+   "py_source_files": 1,
+   "py_test_files": 3,
    "stars": 17628
   },
   {
@@ -172,12 +131,8 @@
    "merge_commit_sha": "0943287160a2ea25f0b95b6c37b0c02f5f6d46d9",
    "additions": 21,
    "deletions": 1,
-   "py_source_files": [
-    "dapr/serializers/util.py"
-   ],
-   "py_test_files": [
-    "tests/serializers/test_util.py"
-   ],
+   "py_source_files": 1,
+   "py_test_files": 1,
    "stars": 274
   },
   {
@@ -192,12 +147,8 @@
    "merge_commit_sha": "18b2a122e783ab62ae6b4ec4b5ae1e57d9369fe9",
    "additions": 36,
    "deletions": 8,
-   "py_source_files": [
-    "postgres/datadog_checks/postgres/metadata.py"
-   ],
-   "py_test_files": [
-    "postgres/tests/test_metadata.py"
-   ],
+   "py_source_files": 1,
+   "py_test_files": 1,
    "stars": 1150
   },
   {
@@ -212,12 +163,8 @@
    "merge_commit_sha": "35db2e9d3d93f12fb428600267bfb609bc182260",
    "additions": 152,
    "deletions": 8,
-   "py_source_files": [
-    "scripts/maintenance/regenerate_embeddings.py"
-   ],
-   "py_test_files": [
-    "tests/maintenance/test_regenerate_embeddings_store.py"
-   ],
+   "py_source_files": 1,
+   "py_test_files": 1,
    "stars": 2029
   },
   {
@@ -232,12 +179,8 @@
    "merge_commit_sha": "5a1af63d452c7de9809f7d77cf5a3f15bfc3f47c",
    "additions": 48,
    "deletions": 4,
-   "py_source_files": [
-    "src/mcp_memory_service/consolidation/belief_service.py"
-   ],
-   "py_test_files": [
-    "tests/test_belief_noise_filter.py"
-   ],
+   "py_source_files": 1,
+   "py_test_files": 1,
    "stars": 2029
   },
   {
@@ -252,16 +195,8 @@
    "merge_commit_sha": "5a8e90372f6f56771e33b38dd6de1be23d688e23",
    "additions": 224,
    "deletions": 65,
-   "py_source_files": [
-    "src/mcp_memory_service/server/handlers/memory.py",
-    "src/mcp_memory_service/server_impl.py",
-    "src/mcp_memory_service/web/api/mcp.py"
-   ],
-   "py_test_files": [
-    "tests/integration/test_server_handlers.py",
-    "tests/integration/test_store_error_envelope.py",
-    "tests/integration/test_unified_handlers.py"
-   ],
+   "py_source_files": 3,
+   "py_test_files": 3,
    "stars": 2029
   },
   {
@@ -276,12 +211,8 @@
    "merge_commit_sha": "23c8743d7781d81b17a1f0b8f0ce1d25f4bf8a9b",
    "additions": 38,
    "deletions": 6,
-   "py_source_files": [
-    "builder/www/_builder.py"
-   ],
-   "py_test_files": [
-    "builder/builder/tests/test_editor_page.py"
-   ],
+   "py_source_files": 1,
+   "py_test_files": 1,
    "stars": 2445
   },
   {
@@ -296,12 +227,8 @@
    "merge_commit_sha": "34d8f42f912ea9c08492e8ccfa42cb8af7bf418b",
    "additions": 88,
    "deletions": 40,
-   "py_source_files": [
-    "erpnext/accounts/report/balance_sheet/balance_sheet.py"
-   ],
-   "py_test_files": [
-    "erpnext/accounts/report/balance_sheet/test_balance_sheet.py"
-   ],
+   "py_source_files": 1,
+   "py_test_files": 1,
    "stars": 40427
   },
   {
@@ -316,16 +243,8 @@
    "merge_commit_sha": "18f6a1ccb07338e07b67817ce6ba70664ab7e470",
    "additions": 117,
    "deletions": 7,
-   "py_source_files": [
-    "erpnext/accounts/doctype/mode_of_payment/mode_of_payment.py",
-    "erpnext/accounts/doctype/payment_entry/payment_entry.py",
-    "erpnext/accounts/doctype/payment_request/payment_request.py",
-    "erpnext/accounts/doctype/sales_invoice/services/pos.py"
-   ],
-   "py_test_files": [
-    "erpnext/accounts/doctype/mode_of_payment/test_mode_of_payment.py",
-    "erpnext/accounts/doctype/pos_invoice_merge_log/test_pos_invoice_merge_log.py"
-   ],
+   "py_source_files": 4,
+   "py_test_files": 2,
    "stars": 40427
   },
   {
@@ -340,18 +259,8 @@
    "merge_commit_sha": "a0f79d7e5f50c19b1be9c35cb7511d2500d184e2",
    "additions": 153,
    "deletions": 6,
-   "py_source_files": [
-    "hrms/api/roster.py",
-    "hrms/hr/doctype/attendance/attendance.py",
-    "hrms/hr/doctype/employee_attendance_tool/employee_attendance_tool.py",
-    "hrms/hr/doctype/leave_ledger_entry/leave_ledger_entry.py"
-   ],
-   "py_test_files": [
-    "hrms/hr/doctype/attendance/test_attendance.py",
-    "hrms/hr/doctype/employee_attendance_tool/test_employee_attendance_tool.py",
-    "hrms/hr/doctype/leave_ledger_entry/test_leave_ledger_entry.py",
-    "hrms/tests/test_roster.py"
-   ],
+   "py_source_files": 4,
+   "py_test_files": 4,
    "stars": 8948
   },
   {
@@ -366,12 +275,8 @@
    "merge_commit_sha": "1015b4165a71716de9e668fb23683be9cdf08dda",
    "additions": 39,
    "deletions": 7,
-   "py_source_files": [
-    "Lib/glyphsLib/builder/custom_params.py"
-   ],
-   "py_test_files": [
-    "tests/builder/custom_params_test.py"
-   ],
+   "py_source_files": 1,
+   "py_test_files": 1,
    "stars": 203
   },
   {
@@ -386,12 +291,8 @@
    "merge_commit_sha": "89e1598b9b63f8db522e5aab04ced46270fd042f",
    "additions": 94,
    "deletions": 2,
-   "py_source_files": [
-    "api/mixins.py"
-   ],
-   "py_test_files": [
-    "tests/test_cache.py"
-   ],
+   "py_source_files": 1,
+   "py_test_files": 1,
    "stars": 208
   },
   {
@@ -406,12 +307,8 @@
    "merge_commit_sha": "c3b7598c572c4272beef5571f95b0c60ff59e6fc",
    "additions": 166,
    "deletions": 2,
-   "py_source_files": [
-    "homeassistant/components/media_player/condition.py"
-   ],
-   "py_test_files": [
-    "tests/components/media_player/test_condition.py"
-   ],
+   "py_source_files": 1,
+   "py_test_files": 1,
    "stars": 91632
   },
   {
@@ -426,12 +323,8 @@
    "merge_commit_sha": "aa9365d30466624d51186f0bfe4e79ff039d3373",
    "additions": 26,
    "deletions": 0,
-   "py_source_files": [
-    "homeassistant/util/dt.py"
-   ],
-   "py_test_files": [
-    "tests/util/test_dt.py"
-   ],
+   "py_source_files": 1,
+   "py_test_files": 1,
    "stars": 91632
   },
   {
@@ -446,13 +339,8 @@
    "merge_commit_sha": "097224774908b2f05beb2955ec0e0913c30f77c7",
    "additions": 10,
    "deletions": 10,
-   "py_source_files": [
-    "homeassistant/components/smtp/__init__.py",
-    "homeassistant/components/smtp/config_flow.py"
-   ],
-   "py_test_files": [
-    "tests/components/smtp/conftest.py"
-   ],
+   "py_source_files": 2,
+   "py_test_files": 1,
    "stars": 91632
   },
   {
@@ -467,12 +355,8 @@
    "merge_commit_sha": "763faa2c5a81f3e2dcdddfb880e8d499267d5904",
    "additions": 24,
    "deletions": 9,
-   "py_source_files": [
-    "homeassistant/components/smhi/config_flow.py"
-   ],
-   "py_test_files": [
-    "tests/components/smhi/test_config_flow.py"
-   ],
+   "py_source_files": 1,
+   "py_test_files": 1,
    "stars": 91632
   },
   {
@@ -487,12 +371,8 @@
    "merge_commit_sha": "e6d7e1bf744e5337354e0614118c9642db3f114e",
    "additions": 121,
    "deletions": 3,
-   "py_source_files": [
-    "homeassistant/components/unifi/hub/hub.py"
-   ],
-   "py_test_files": [
-    "tests/components/unifi/test_hub.py"
-   ],
+   "py_source_files": 1,
+   "py_test_files": 1,
    "stars": 91632
   },
   {
@@ -507,13 +387,8 @@
    "merge_commit_sha": "5f4c354a9f745d37d3d36b20f7648d516da3c20c",
    "additions": 40,
    "deletions": 2,
-   "py_source_files": [
-    "homeassistant/components/elevenlabs/config_flow.py"
-   ],
-   "py_test_files": [
-    "tests/components/elevenlabs/conftest.py",
-    "tests/components/elevenlabs/test_config_flow.py"
-   ],
+   "py_source_files": 1,
+   "py_test_files": 2,
    "stars": 91632
   },
   {
@@ -528,12 +403,8 @@
    "merge_commit_sha": "9cefb3888f9266bcc54b66d3400669fd24ebc2aa",
    "additions": 104,
    "deletions": 9,
-   "py_source_files": [
-    "homeassistant/components/energy/sensor.py"
-   ],
-   "py_test_files": [
-    "tests/components/energy/test_sensor.py"
-   ],
+   "py_source_files": 1,
+   "py_test_files": 1,
    "stars": 91632
   },
   {
@@ -548,12 +419,8 @@
    "merge_commit_sha": "7e953f8bc9ca2538ad64f3a7acd2d50d33978875",
    "additions": 300,
    "deletions": 0,
-   "py_source_files": [
-    "packages/pylint-home-assistant/pylint_home_assistant/checkers/init_first.py"
-   ],
-   "py_test_files": [
-    "tests/pylint/test_init_first.py"
-   ],
+   "py_source_files": 1,
+   "py_test_files": 1,
    "stars": 91632
   },
   {
@@ -568,13 +435,8 @@
    "merge_commit_sha": "05d7f619ea6eb59518121015e74cf4150c0b469c",
    "additions": 94,
    "deletions": 3,
-   "py_source_files": [
-    "homeassistant/components/airgradient/const.py",
-    "homeassistant/components/airgradient/select.py"
-   ],
-   "py_test_files": [
-    "tests/components/airgradient/test_select.py"
-   ],
+   "py_source_files": 2,
+   "py_test_files": 1,
    "stars": 91632
   },
   {
@@ -589,12 +451,8 @@
    "merge_commit_sha": "941ac635b978773743d44af8fb59de4edcaac053",
    "additions": 112,
    "deletions": 8,
-   "py_source_files": [
-    "homeassistant/helpers/condition/entity_condition.py"
-   ],
-   "py_test_files": [
-    "tests/helpers/test_condition.py"
-   ],
+   "py_source_files": 1,
+   "py_test_files": 1,
    "stars": 91632
   },
   {
@@ -609,14 +467,8 @@
    "merge_commit_sha": "d04eab637746b413b045f614cc40ca2f666c7da1",
    "additions": 270,
    "deletions": 30,
-   "py_source_files": [
-    "MACS3/Signal/CallPeakUnit.py",
-    "MACS3/Signal/PeakModel.py",
-    "MACS3/Utilities/Threads.py"
-   ],
-   "py_test_files": [
-    "test/test_thread_lifecycle.py"
-   ],
+   "py_source_files": 3,
+   "py_test_files": 1,
    "stars": 787
   },
   {
@@ -631,12 +483,8 @@
    "merge_commit_sha": "39cc7cb247e030c67669b07f8798a1922ca2ddab",
    "additions": 269,
    "deletions": 10,
-   "py_source_files": [
-    "MACS3/IO/Parser.py"
-   ],
-   "py_test_files": [
-    "test/test_Parser_bam_truncation.py"
-   ],
+   "py_source_files": 1,
+   "py_test_files": 1,
    "stars": 787
   },
   {
@@ -651,13 +499,8 @@
    "merge_commit_sha": "2d181b1c9e4fac9ac1bb6493eb5bd761db683c9e",
    "additions": 113,
    "deletions": 132,
-   "py_source_files": [
-    "mlflow/genai/scorers/registry.py"
-   ],
-   "py_test_files": [
-    "tests/genai/scorers/test_scorer_CRUD.py",
-    "tests/genai/test_genai_import_without_agent_sdk.py"
-   ],
+   "py_source_files": 1,
+   "py_test_files": 2,
    "stars": 28479
   },
   {
@@ -672,12 +515,8 @@
    "merge_commit_sha": "cd70aa615b4a6018567daefdae2fc6d9ffa5e671",
    "additions": 34,
    "deletions": 4,
-   "py_source_files": [
-    "mlflow/tracing/otel/translation/genai_semconv.py"
-   ],
-   "py_test_files": [
-    "tests/tracing/otel/test_span_translation.py"
-   ],
+   "py_source_files": 1,
+   "py_test_files": 1,
    "stars": 28479
   },
   {
@@ -692,12 +531,8 @@
    "merge_commit_sha": "de1f2b1843e7a6e3f0c67140139af6c4ea0ee006",
    "additions": 113,
    "deletions": 6,
-   "py_source_files": [
-    "integrations/dify/generate_contract.py"
-   ],
-   "py_test_files": [
-    "integrations/dify/tests/test_contract_generation.py"
-   ],
+   "py_source_files": 1,
+   "py_test_files": 1,
    "stars": 1358
   },
   {
@@ -712,12 +547,8 @@
    "merge_commit_sha": "20913537ae2ffeceaf6364df2af1758aab7aad4a",
    "additions": 94,
    "deletions": 3,
-   "py_source_files": [
-    "optiland_gui/widgets/plot_navigation.py"
-   ],
-   "py_test_files": [
-    "tests/gui/test_plot_navigation.py"
-   ],
+   "py_source_files": 1,
+   "py_test_files": 1,
    "stars": 1022
   },
   {
@@ -732,13 +563,8 @@
    "merge_commit_sha": "1975c89047f0d880f844be65f86f5a9605a8b547",
    "additions": 174,
    "deletions": 2,
-   "py_source_files": [
-    "optiland/optic/optic_serializer.py",
-    "optiland/rays/polarization_state.py"
-   ],
-   "py_test_files": [
-    "tests/test_polarization_serialization.py"
-   ],
+   "py_source_files": 2,
+   "py_test_files": 1,
    "stars": 1022
   },
   {
@@ -753,12 +579,8 @@
    "merge_commit_sha": "8b4de6311747b6eba39cb22fafa389188b2200fa",
    "additions": 73,
    "deletions": 2,
-   "py_source_files": [
-    "optiland_gui/widgets/custom_title_bar.py"
-   ],
-   "py_test_files": [
-    "tests/gui/test_title_bar_contrast.py"
-   ],
+   "py_source_files": 1,
+   "py_test_files": 1,
    "stars": 1022
   },
   {
@@ -773,19 +595,8 @@
    "merge_commit_sha": "a2575ed0b49443cd4a44597cbb25361bd46e1901",
    "additions": 156,
    "deletions": 1,
-   "py_source_files": [
-    "optiland_gui/config.py",
-    "optiland_gui/lens_editor.py",
-    "optiland_gui/main_window.py",
-    "optiland_gui/optimization_panel.py",
-    "optiland_gui/viewer_panel.py",
-    "optiland_gui/widgets/python_terminal.py"
-   ],
-   "py_test_files": [
-    "tests/gui/test_document_view_preferences.py",
-    "tests/gui/test_surface_properties_panels.py",
-    "tests/gui/test_tab_placement.py"
-   ],
+   "py_source_files": 6,
+   "py_test_files": 3,
    "stars": 1022
   },
   {
@@ -800,12 +611,8 @@
    "merge_commit_sha": "23f9356d2a8af2f71d6b3997111dfd2cd08c4e53",
    "additions": 168,
    "deletions": 5,
-   "py_source_files": [
-    "optiland_gui/main_window.py"
-   ],
-   "py_test_files": [
-    "tests/gui/test_sidebar_separator.py"
-   ],
+   "py_source_files": 1,
+   "py_test_files": 1,
    "stars": 1022
   },
   {
@@ -820,12 +627,8 @@
    "merge_commit_sha": "b7ac11fe8eb2ade9f7e214ac78bca2c4d22de4dc",
    "additions": 184,
    "deletions": 2,
-   "py_source_files": [
-    "optiland_gui/widgets/python_terminal.py"
-   ],
-   "py_test_files": [
-    "tests/gui/test_script_tab_close.py"
-   ],
+   "py_source_files": 1,
+   "py_test_files": 1,
    "stars": 1022
   },
   {
@@ -840,12 +643,8 @@
    "merge_commit_sha": "988b115a8fc7e4897dc85b3e28b8cbb8be39fcd1",
    "additions": 7,
    "deletions": 5,
-   "py_source_files": [
-    "optuna/pruners/_percentile.py"
-   ],
-   "py_test_files": [
-    "tests/pruners_tests/test_percentile.py"
-   ],
+   "py_source_files": 1,
+   "py_test_files": 1,
    "stars": 14946
   },
   {
@@ -860,13 +659,8 @@
    "merge_commit_sha": "4e11deb1c916c81762735482cba4802d7b9595bb",
    "additions": 53,
    "deletions": 8,
-   "py_source_files": [
-    "custom_components/connectlife/button.py",
-    "custom_components/connectlife/dictionaries.py"
-   ],
-   "py_test_files": [
-    "tests/test_dictionaries.py"
-   ],
+   "py_source_files": 2,
+   "py_test_files": 1,
    "stars": 306
   },
   {
@@ -881,12 +675,8 @@
    "merge_commit_sha": "4bc667ada383aca4df00304cd171f327a9fae163",
    "additions": 161,
    "deletions": 8,
-   "py_source_files": [
-    "pydantic_settings/sources/providers/cli.py"
-   ],
-   "py_test_files": [
-    "tests/test_source_cli.py"
-   ],
+   "py_source_files": 1,
+   "py_test_files": 1,
    "stars": 1487
   },
   {
@@ -901,14 +691,8 @@
    "merge_commit_sha": "081d39f9c73f46e68bc2bef75a23f7d84ed0c377",
    "additions": 96,
    "deletions": 16,
-   "py_source_files": [
-    "pydantic_settings/sources/utils.py"
-   ],
-   "py_test_files": [
-    "tests/test_settings.py",
-    "tests/test_source_cli.py",
-    "tests/test_source_json.py"
-   ],
+   "py_source_files": 1,
+   "py_test_files": 3,
    "stars": 1487
   },
   {
@@ -923,14 +707,8 @@
    "merge_commit_sha": "4aded6a54f069440ecb242b2bfba47e3ffd4917b",
    "additions": 210,
    "deletions": 58,
-   "py_source_files": [
-    "extensions/pyRevitDevTools.extension/pyRevitDev.tab/Developer Examples.panel/Modeless.pushbutton/script.py",
-    "pyrevitlib/pyrevit/coreutils/logger.py",
-    "pyrevitlib/pyrevit/script.py"
-   ],
-   "py_test_files": [
-    "pyrevitlib/pyrevit/unittests/test_script_module.py"
-   ],
+   "py_source_files": 3,
+   "py_test_files": 1,
    "stars": 1965
   },
   {
@@ -945,17 +723,8 @@
    "merge_commit_sha": "7c671d5ca7652e2a5bf4d7330a0e291aecef86b9",
    "additions": 153,
    "deletions": 67,
-   "py_source_files": [
-    "src/kleinanzeigen_bot/publishing_form.py",
-    "src/kleinanzeigen_bot/utils/exceptions.py",
-    "src/kleinanzeigen_bot/utils/web_scraping_mixin.py"
-   ],
-   "py_test_files": [
-    "tests/integration/test_web_scraping_mixin_dom.py",
-    "tests/unit/test_publishing_form.py",
-    "tests/unit/test_publishing_workflow.py",
-    "tests/unit/test_web_scraping_mixin.py"
-   ],
+   "py_source_files": 3,
+   "py_test_files": 4,
    "stars": 434
   },
   {
@@ -970,17 +739,8 @@
    "merge_commit_sha": "7a3e364051c961b293412af4622bd91e2a460a35",
    "additions": 222,
    "deletions": 1,
-   "py_source_files": [
-    "src/kleinanzeigen_bot/app.py",
-    "src/kleinanzeigen_bot/cli.py",
-    "src/kleinanzeigen_bot/runtime_config.py",
-    "src/kleinanzeigen_bot/utils/web_scraping_mixin.py"
-   ],
-   "py_test_files": [
-    "tests/integration/test_web_scraping_mixin_integration.py",
-    "tests/unit/test_app.py",
-    "tests/unit/test_web_scraping_mixin.py"
-   ],
+   "py_source_files": 4,
+   "py_test_files": 3,
    "stars": 434
   },
   {
@@ -995,12 +755,8 @@
    "merge_commit_sha": "e233701867b0511397f519911af07effa3a72e1b",
    "additions": 98,
    "deletions": 4,
-   "py_source_files": [
-    "pr_agent/algo/pr_processing.py"
-   ],
-   "py_test_files": [
-    "tests/unittest/test_large_diff_no_progress.py"
-   ],
+   "py_source_files": 1,
+   "py_test_files": 1,
    "stars": 13534
   },
   {
@@ -1015,12 +771,8 @@
    "merge_commit_sha": "59798eafa723d5e34cc60a95c96dca4768668313",
    "additions": 109,
    "deletions": 4,
-   "py_source_files": [
-    "pr_agent/algo/model_routing.py"
-   ],
-   "py_test_files": [
-    "tests/unittest/test_model_routing.py"
-   ],
+   "py_source_files": 1,
+   "py_test_files": 1,
    "stars": 13534
   },
   {
@@ -1035,12 +787,8 @@
    "merge_commit_sha": "1a836558e1eda4a27b1b7aa1813399321a7fb3fb",
    "additions": 65,
    "deletions": 1,
-   "py_source_files": [
-    "pr_agent/algo/pr_processing.py"
-   ],
-   "py_test_files": [
-    "tests/unittest/test_diff_metadata_included_set.py"
-   ],
+   "py_source_files": 1,
+   "py_test_files": 1,
    "stars": 13534
   },
   {
@@ -1055,14 +803,8 @@
    "merge_commit_sha": "01f6a30748af82c908f4cc80c30a8a007c64403d",
    "additions": 58,
    "deletions": 6,
-   "py_source_files": [
-    "pr_agent/cli.py",
-    "pr_agent/git_providers/utils.py"
-   ],
-   "py_test_files": [
-    "tests/unittest/test_cli_exit_status.py",
-    "tests/unittest/test_extra_config_url.py"
-   ],
+   "py_source_files": 2,
+   "py_test_files": 2,
    "stars": 13534
   },
   {
@@ -1077,12 +819,8 @@
    "merge_commit_sha": "e7ed0975eb2870f10af953967cb13f22fd1ea4c1",
    "additions": 55,
    "deletions": 6,
-   "py_source_files": [
-    "pr_agent/algo/pr_processing.py"
-   ],
-   "py_test_files": [
-    "tests/unittest/test_pr_processing_core.py"
-   ],
+   "py_source_files": 1,
+   "py_test_files": 1,
    "stars": 13534
   },
   {
@@ -1097,14 +835,8 @@
    "merge_commit_sha": "83b791cd113dc5052379c4a9bcb60d273e0c3c6a",
    "additions": 221,
    "deletions": 20,
-   "py_source_files": [
-    "pr_agent/algo/pr_processing.py"
-   ],
-   "py_test_files": [
-    "tests/unittest/test_config_reference.py",
-    "tests/unittest/test_model_routing.py",
-    "tests/unittest/test_suggestion_chunk_recovery.py"
-   ],
+   "py_source_files": 1,
+   "py_test_files": 3,
    "stars": 13534
   },
   {
@@ -1119,12 +851,8 @@
    "merge_commit_sha": "aaca0136d7d3ab77faec1484b076a12b61237746",
    "additions": 36,
    "deletions": 12,
-   "py_source_files": [
-    "pr_agent/algo/utils.py"
-   ],
-   "py_test_files": [
-    "tests/unittest/test_try_fix_yaml.py"
-   ],
+   "py_source_files": 1,
+   "py_test_files": 1,
    "stars": 13534
   },
   {
@@ -1139,12 +867,8 @@
    "merge_commit_sha": "2c2e5578a82f9c2dc03d6949f941c186e9ec07a1",
    "additions": 123,
    "deletions": 14,
-   "py_source_files": [
-    "pr_agent/git_providers/github_provider.py"
-   ],
-   "py_test_files": [
-    "tests/unittest/test_github_provider_labels.py"
-   ],
+   "py_source_files": 1,
+   "py_test_files": 1,
    "stars": 13534
   },
   {
@@ -1159,12 +883,8 @@
    "merge_commit_sha": "2554e35857125710f4343b0110e6bb81c6f2cea4",
    "additions": 59,
    "deletions": 30,
-   "py_source_files": [
-    "pr_agent/servers/github_polling.py"
-   ],
-   "py_test_files": [
-    "tests/unittest/test_github_polling_settings.py"
-   ],
+   "py_source_files": 1,
+   "py_test_files": 1,
    "stars": 13534
   },
   {
@@ -1179,14 +899,8 @@
    "merge_commit_sha": "0c6e499018287e92b5350aa79789f37553d47177",
    "additions": 68,
    "deletions": 4,
-   "py_source_files": [
-    "pr_agent/git_providers/gitlab_provider.py",
-    "pr_agent/servers/gitlab_webhook.py"
-   ],
-   "py_test_files": [
-    "tests/unittest/test_gitlab_diffs_api.py",
-    "tests/unittest/test_pr_command_profiles.py"
-   ],
+   "py_source_files": 2,
+   "py_test_files": 2,
    "stars": 13534
   },
   {
@@ -1201,12 +915,8 @@
    "merge_commit_sha": "e72de8deb39f18773858bcf881d797c9d480656e",
    "additions": 25,
    "deletions": 1,
-   "py_source_files": [
-    "pr_agent/git_providers/github_provider.py"
-   ],
-   "py_test_files": [
-    "tests/unittest/test_github_provider_check_runs.py"
-   ],
+   "py_source_files": 1,
+   "py_test_files": 1,
    "stars": 13534
   },
   {
@@ -1221,13 +931,8 @@
    "merge_commit_sha": "56fee0351feca692e19a2ba6f9f0d0724882a795",
    "additions": 18,
    "deletions": 10,
-   "py_source_files": [
-    "pr_agent/git_providers/github_provider.py"
-   ],
-   "py_test_files": [
-    "tests/unittest/test_github_provider_comments.py",
-    "tests/unittest/test_github_review_dismissed_findings.py"
-   ],
+   "py_source_files": 1,
+   "py_test_files": 2,
    "stars": 13534
   },
   {
@@ -1242,15 +947,8 @@
    "merge_commit_sha": "1c4ab5d8e4be1d23ddb58e5c64871c947b8149ef",
    "additions": 66,
    "deletions": 64,
-   "py_source_files": [
-    "pr_agent/tools/pr_code_suggestions.py"
-   ],
-   "py_test_files": [
-    "tests/unittest/test_chunk_progress_reporting.py",
-    "tests/unittest/test_pr_code_suggestions_core.py",
-    "tests/unittest/test_self_reflect_fallback.py",
-    "tests/unittest/test_suggestion_chunk_recovery.py"
-   ],
+   "py_source_files": 1,
+   "py_test_files": 4,
    "stars": 13534
   },
   {
@@ -1265,12 +963,8 @@
    "merge_commit_sha": "e12e575c3d3638e487275d9e848b292a74edad6c",
    "additions": 9,
    "deletions": 6,
-   "py_source_files": [
-    "pr_agent/git_providers/gitlab_provider.py"
-   ],
-   "py_test_files": [
-    "tests/unittest/test_gitlab_provider.py"
-   ],
+   "py_source_files": 1,
+   "py_test_files": 1,
    "stars": 13534
   },
   {
@@ -1285,12 +979,8 @@
    "merge_commit_sha": "e14e68b0169b4d3b2455a72da255e0ac3e86ca00",
    "additions": 15,
    "deletions": 2,
-   "py_source_files": [
-    "pr_agent/git_providers/gitlab_provider.py"
-   ],
-   "py_test_files": [
-    "tests/unittest/test_gitlab_language_cache.py"
-   ],
+   "py_source_files": 1,
+   "py_test_files": 1,
    "stars": 13534
   },
   {
@@ -1305,12 +995,8 @@
    "merge_commit_sha": "b198840e9c609a506b4b0b1f5c1b97470add5182",
    "additions": 26,
    "deletions": 1,
-   "py_source_files": [
-    "pr_agent/git_providers/gitlab_provider.py"
-   ],
-   "py_test_files": [
-    "tests/unittest/test_gitlab_provider.py"
-   ],
+   "py_source_files": 1,
+   "py_test_files": 1,
    "stars": 13534
   },
   {
@@ -1325,12 +1011,8 @@
    "merge_commit_sha": "05c5186658ace5da2304a8910349815079e029ca",
    "additions": 52,
    "deletions": 1,
-   "py_source_files": [
-    "pr_agent/git_providers/github_provider.py"
-   ],
-   "py_test_files": [
-    "tests/unittest/test_github_provider_file_content.py"
-   ],
+   "py_source_files": 1,
+   "py_test_files": 1,
    "stars": 13534
   },
   {
@@ -1345,15 +1027,8 @@
    "merge_commit_sha": "d8a4f8a3f2dd3e083db15df866aa5dc247bee5fd",
    "additions": 104,
    "deletions": 34,
-   "py_source_files": [
-    "pr_agent/agent/pr_agent.py",
-    "pr_agent/git_providers/git_provider.py",
-    "pr_agent/tools/pr_reviewer.py"
-   ],
-   "py_test_files": [
-    "tests/unittest/test_pr_agent_routing.py",
-    "tests/unittest/test_pr_reviewer_core.py"
-   ],
+   "py_source_files": 3,
+   "py_test_files": 2,
    "stars": 13534
   },
   {
@@ -1368,15 +1043,8 @@
    "merge_commit_sha": "d24cd3e978011278c2cd3da284f10f321dd1967a",
    "additions": 40,
    "deletions": 5,
-   "py_source_files": [
-    "pr_agent/algo/ai_handlers/langchain_ai_handler.py",
-    "pr_agent/algo/ai_handlers/litellm_ai_handler.py",
-    "pr_agent/algo/ai_handlers/openai_ai_handler.py"
-   ],
-   "py_test_files": [
-    "tests/unittest/test_litellm_chat_completion_core.py",
-    "tests/unittest/test_openai_compat_handler_retry.py"
-   ],
+   "py_source_files": 3,
+   "py_test_files": 2,
    "stars": 13534
   },
   {
@@ -1391,12 +1059,8 @@
    "merge_commit_sha": "c657bb81d1de039d2f3c6787599dae865d0f5c1d",
    "additions": 17,
    "deletions": 2,
-   "py_source_files": [
-    "pr_agent/algo/utils.py"
-   ],
-   "py_test_files": [
-    "tests/unittest/test_extend_patch.py"
-   ],
+   "py_source_files": 1,
+   "py_test_files": 1,
    "stars": 13534
   },
   {
@@ -1411,12 +1075,8 @@
    "merge_commit_sha": "5c49c41f20f9d31a56a326d734512e5c452cac65",
    "additions": 53,
    "deletions": 16,
-   "py_source_files": [
-    "pr_agent/tools/pr_similar_issue.py"
-   ],
-   "py_test_files": [
-    "tests/unittest/test_similar_issue_qdrant_ingest.py"
-   ],
+   "py_source_files": 1,
+   "py_test_files": 1,
    "stars": 13534
   },
   {
@@ -1431,12 +1091,8 @@
    "merge_commit_sha": "50c6055f914bd08b0d8de72d871cdf8d08da7749",
    "additions": 7,
    "deletions": 2,
-   "py_source_files": [
-    "pr_agent/servers/github_action_runner.py"
-   ],
-   "py_test_files": [
-    "tests/unittest/test_github_action_runner_core.py"
-   ],
+   "py_source_files": 1,
+   "py_test_files": 1,
    "stars": 13534
   },
   {
@@ -1451,12 +1107,8 @@
    "merge_commit_sha": "d76c7eafe762f0997d604a5a8ca5b7909116e502",
    "additions": 35,
    "deletions": 5,
-   "py_source_files": [
-    "pr_agent/algo/review_merge.py"
-   ],
-   "py_test_files": [
-    "tests/unittest/test_review_chunk_merge.py"
-   ],
+   "py_source_files": 1,
+   "py_test_files": 1,
    "stars": 13534
   },
   {
@@ -1471,12 +1123,8 @@
    "merge_commit_sha": "65dbbe531f2b0fcfbc2775e53cb6e99b9a698b94",
    "additions": 16,
    "deletions": 1,
-   "py_source_files": [
-    "pr_agent/git_providers/gitlab_provider.py"
-   ],
-   "py_test_files": [
-    "tests/unittest/test_gitlab_lazy_mr_lookup.py"
-   ],
+   "py_source_files": 1,
+   "py_test_files": 1,
    "stars": 13534
   },
   {
@@ -1491,14 +1139,8 @@
    "merge_commit_sha": "2c6edf1033011bdffd7160660c9013496d089839",
    "additions": 79,
    "deletions": 2,
-   "py_source_files": [
-    "pr_agent/git_providers/github_provider.py"
-   ],
-   "py_test_files": [
-    "tests/unittest/test_github_app_auth.py",
-    "tests/unittest/test_github_provider_incremental.py",
-    "tests/unittest/test_github_provider_urls_and_diffs.py"
-   ],
+   "py_source_files": 1,
+   "py_test_files": 3,
    "stars": 13534
   },
   {
@@ -1513,12 +1155,8 @@
    "merge_commit_sha": "2eb8d5a045a32574de2e0c8c79160eed8ef25a46",
    "additions": 6,
    "deletions": 2,
-   "py_source_files": [
-    "pr_agent/tools/pr_update_changelog.py"
-   ],
-   "py_test_files": [
-    "tests/unittest/test_pr_update_changelog.py"
-   ],
+   "py_source_files": 1,
+   "py_test_files": 1,
    "stars": 13534
   },
   {
@@ -1533,12 +1171,8 @@
    "merge_commit_sha": "6b2f478a9c1f560efbd04f9d574df6dd8d97de0c",
    "additions": 45,
    "deletions": 13,
-   "py_source_files": [
-    "pr_agent/algo/language_handler.py"
-   ],
-   "py_test_files": [
-    "tests/unittest/test_bad_extension_case.py"
-   ],
+   "py_source_files": 1,
+   "py_test_files": 1,
    "stars": 13534
   },
   {
@@ -1553,12 +1187,8 @@
    "merge_commit_sha": "b4c3d11d2247dce6f716074c5352c3f97d6564df",
    "additions": 162,
    "deletions": 15,
-   "py_source_files": [
-    "pr_agent/tools/pr_help_docs.py"
-   ],
-   "py_test_files": [
-    "tests/unittest/test_pr_help_docs_prompt_fitting.py"
-   ],
+   "py_source_files": 1,
+   "py_test_files": 1,
    "stars": 13534
   },
   {
@@ -1573,12 +1203,8 @@
    "merge_commit_sha": "cbaa5f0d0bc2d1d940e5ae20a89247486251bf62",
    "additions": 89,
    "deletions": 10,
-   "py_source_files": [
-    "pr_agent/tools/pr_similar_issue.py"
-   ],
-   "py_test_files": [
-    "tests/unittest/test_similar_issue_embeddings.py"
-   ],
+   "py_source_files": 1,
+   "py_test_files": 1,
    "stars": 13534
   },
   {
@@ -1593,12 +1219,8 @@
    "merge_commit_sha": "9f94e12cc06dc807590aa51477e04ff0cca2296e",
    "additions": 74,
    "deletions": 9,
-   "py_source_files": [
-    "tornado/web.py"
-   ],
-   "py_test_files": [
-    "tornado/test/web_test.py"
-   ],
+   "py_source_files": 1,
+   "py_test_files": 1,
    "stars": 22168
   },
   {
@@ -1613,16 +1235,8 @@
    "merge_commit_sha": "a7b7bc1fbe1f5c4e47c53b0f02a3ecfbcd8054b9",
    "additions": 203,
    "deletions": 1,
-   "py_source_files": [
-    "vllm/v1/engine/output_processor.py",
-    "vllm/v1/metrics/loggers.py",
-    "vllm/v1/metrics/stats.py"
-   ],
-   "py_test_files": [
-    "tests/v1/engine/test_output_processor.py",
-    "tests/v1/metrics/test_histogram_buckets.py",
-    "tests/watermarking/test_watermarking_e2e.py"
-   ],
+   "py_source_files": 3,
+   "py_test_files": 3,
    "stars": 94788
   },
   {
@@ -1637,17 +1251,8 @@
    "merge_commit_sha": "c23ca06b6d944579ad9d220297441236755b4744",
    "additions": 151,
    "deletions": 53,
-   "py_source_files": [
-    "vllm/parser/engine/adapters.py",
-    "vllm/parser/engine/parser_engine.py",
-    "vllm/v1/structured_output/__init__.py"
-   ],
-   "py_test_files": [
-    "tests/parser/engine/test_deepseek_v4.py",
-    "tests/parser/engine/test_parser_engine.py",
-    "tests/v1/spec_decode/test_mtp_structured_output.py",
-    "tests/v1/structured_output/test_structured_output_manager.py"
-   ],
+   "py_source_files": 3,
+   "py_test_files": 4,
    "stars": 94788
   },
   {
@@ -1662,12 +1267,8 @@
    "merge_commit_sha": "e41d5d55439808e79326009599d5d83e157bf2d1",
    "additions": 4,
    "deletions": 3,
-   "py_source_files": [
-    "vllm/config/vllm.py"
-   ],
-   "py_test_files": [
-    "tests/watermarking/test_compatibility.py"
-   ],
+   "py_source_files": 1,
+   "py_test_files": 1,
    "stars": 94788
   },
   {
@@ -1682,13 +1283,8 @@
    "merge_commit_sha": "253e02b95e9c9deaebdc507f2eb26b29daf3fdf3",
    "additions": 203,
    "deletions": 1,
-   "py_source_files": [
-    "vllm/model_executor/warmup/deep_gemm_warmup.py",
-    "vllm/models/kimi_k3/nvidia/model.py"
-   ],
-   "py_test_files": [
-    "tests/model_executor/test_deep_gemm_warmup.py"
-   ],
+   "py_source_files": 2,
+   "py_test_files": 1,
    "stars": 94788
   },
   {
@@ -1703,22 +1299,8 @@
    "merge_commit_sha": "5b9bf0dd1f79a3c0874a9b0581d0564ba7843843",
    "additions": 61,
    "deletions": 43,
-   "py_source_files": [
-    "weave/trace_server/agents/constants.py",
-    "weave/trace_server/agents/semconv.py",
-    "weave/trace_server/agents/types.py",
-    "weave/trace_server/common_interface.py",
-    "weave/trace_server/http_service_interface.py",
-    "weave/trace_server/interface/feedback_types.py",
-    "weave/trace_server/interface/query.py",
-    "weave/trace_server/sensitive_data/policy.py",
-    "weave/trace_server/service_interface.py",
-    "weave/trace_server/trace_server_interface.py",
-    "weave/trace_server/validation.py"
-   ],
-   "py_test_files": [
-    "tests/shared/test_trace_server_paths.py"
-   ],
+   "py_source_files": 11,
+   "py_test_files": 1,
    "stars": 1142
   }
  ]

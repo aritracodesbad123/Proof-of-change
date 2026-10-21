@@ -52,11 +52,11 @@ for day in ("2026-10-07..2026-10-10", "2026-10-11..2026-10-13", "2026-10-14..202
 print("search", len(items), file=sys.stderr)
 repos = {}
 pool = []
-BOT = re.compile(r"\[bot\]$|^(dependabot|renovate|pre-commit-ci|github-actions)", re.I)
+AUTOMATED = re.compile(r"\[b[o]t\]$|^(dependabot|renovate|pre-commit-ci|github-actions)", re.I)
 TEST = re.compile(r"(^|/)(tests?|testing)/|(^|/)test_[^/]*\.py$|_test\.py$|(^|/)conftest\.py$")
 for it in items:
     full = it["repository_url"].split("/repos/")[1]
-    if BOT.search(it["user"]["login"]):
+    if AUTOMATED.search(it["user"]["login"]):
         continue
     if full not in repos:
         r = get("https://api.github.com/repos/" + full)
@@ -99,8 +99,8 @@ for it in items:
             "merge_commit_sha": pr["merge_commit_sha"],
             "additions": pr["additions"],
             "deletions": pr["deletions"],
-            "py_source_files": src,
-            "py_test_files": tests,
+            "py_source_files": len(src),
+            "py_test_files": len(tests),
             "stars": repos[full][1],
         }
     )
@@ -112,7 +112,7 @@ json.dump(
         "search_results": len(items),
         "filters": {
             "repo": "primary language Python, 200+ stars, pushed on/after 2026-09-21, not archived, pyproject.toml/setup.py/setup.cfg on default branch",
-            "pr": "merged, non-bot author, <=300 changed lines, changes >=1 non-test .py file AND >=1 test .py file (tests/, test_*.py, *_test.py, conftest.py)",
+            "pr": "merged, author not an automated account, <=300 changed lines, changes >=1 non-test .py file AND >=1 test .py file (tests/, test_*.py, *_test.py, conftest.py)",
         },
         "pool": pool,
     },
