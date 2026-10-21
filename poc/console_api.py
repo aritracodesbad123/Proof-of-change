@@ -938,13 +938,18 @@ class Handler(BaseHTTPRequestHandler):
 
     def _viewer(self) -> dict | None:
         from poc import console_auth
-        account = console_auth.service_from_env().account_for_session(
-            console_auth.cookie_value(self.headers.get("Cookie"), console_auth.SESSION_COOKIE),
-        )
+        token = console_auth.cookie_value(self.headers.get("Cookie"), console_auth.SESSION_COOKIE)
+        account = console_auth.viewer_account(token)
         if not account:
-            self._json(401, {"error": "Sign in first."})
+            _skipped, why = console_auth.sign_in_skip()
+            self._json(401, {"error": why or "Sign in first."})
             return None
         return account
+
+    def _session_token(self) -> str | None:
+        from poc import console_auth
+        token = console_auth.cookie_value(self.headers.get("Cookie"), console_auth.SESSION_COOKIE)
+        return console_auth.request_session_token(token)
 
     def _file(self, path: Path, content_type: str):
         data = path.read_bytes()
@@ -1006,9 +1011,7 @@ class Handler(BaseHTTPRequestHandler):
             admin = account.get("role") == "admin"
             viewer = None if admin else account["id"]
             if path == "/api/session/key":
-                from poc import console_auth
-                token = console_auth.cookie_value(self.headers.get("Cookie"), console_auth.SESSION_COOKIE)
-                return self._json(200, session_key.public_status(token))
+                return self._json(200, session_key.public_status(self._session_token()))
             if path == "/api/runs":
                 return self._json(200, {"runs": list_runs(owner=viewer, admin=admin)})
             rm = _REPORT_FILE_RE.match(path)
@@ -1067,9 +1070,8 @@ class Handler(BaseHTTPRequestHandler):
             return self._json(400, {"error": "bad json"})
         if path == "/api/auth/logout":
             from poc import console_auth
-            session_key.clear_key(
-                console_auth.cookie_value(self.headers.get("Cookie"), console_auth.SESSION_COOKIE),
-            )
+            session_key.clear_key(self._session_token())
+            session_key.clear_key(console_auth.LOCAL_SESSION)
         if self._auth("POST", body if isinstance(body, dict) else {}):
             return None
         account = self._viewer()
@@ -1077,8 +1079,7 @@ class Handler(BaseHTTPRequestHandler):
             return None
         admin = account.get("role") == "admin"
         viewer = None if admin else account["id"]
-        from poc import console_auth
-        session_token = console_auth.cookie_value(self.headers.get("Cookie"), console_auth.SESSION_COOKIE)
+        session_token = self._session_token()
         if path == "/api/session/key":
             if "nebius_api_key" not in body and "tavily_api_key" not in body:
                 return self._json(400, {"error": "Send the key as text."})

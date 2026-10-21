@@ -75,6 +75,7 @@ def accounts(tmp_path, monkeypatch):
         "RENDER", "RENDER_SERVICE_ID", "POC_OTP_TEST_SINK", "POC_SIGNUP_DISABLED", "POC_INVITE_CODE",
         "POC_SMTP_HOST", "POC_SMTP_PORT", "POC_SMTP_USER", "POC_SMTP_PASSWORD", "POC_SMTP_FROM",
         "GOOGLE_CLIENT_ID", "GOOGLE_CLIENT_SECRET", "GITHUB_CLIENT_ID", "GITHUB_CLIENT_SECRET", "POC_PUBLIC_URL",
+        "CODESPACES", "POC_SINGLE_USER",
     ):
         monkeypatch.delenv(key, raising=False)
     console_auth.reset_for_tests()
@@ -459,5 +460,112 @@ def test_password_login_http_sets_no_cookie_until_the_code_matches(accounts, mon
         verified = conn.getresponse()
         assert verified.status == 200
         assert any(item.startswith("poc_session=") for item in (verified.headers.get_all("Set-Cookie") or []))
+    finally:
+        server.shutdown()
+
+
+def _me(monkeypatch, env_name: str | None = None, env_value: str | None = None, visibility: str | None = "private"):
+    monkeypatch.delenv("CODESPACES", raising=False)
+    monkeypatch.delenv("POC_SINGLE_USER", raising=False)
+    if env_name:
+        monkeypatch.setenv(env_name, env_value or "")
+    monkeypatch.setattr(console_auth, "codespace_port_visibility", lambda: visibility)
+    console_auth.reset_port_cache()
+    return console_auth.handle_request("GET", "/api/auth/me", {}, None, {}, host="127.0.0.1", proto="http")
+
+
+def test_sign_in_stays_required_on_other_hosts(accounts, monkeypatch):
+    result = _me(monkeypatch)
+    assert result.status == 401
+    assert result.body["error"] == "Sign in first."
+    assert console_auth.viewer_account(None) is None
+    assert console_auth.request_session_token(None) is None
+    for value in ("", "0", "false", "no", "off"):
+        result = _me(monkeypatch, "CODESPACES", value)
+        assert result.status == 401
+        result = _me(monkeypatch, "POC_SINGLE_USER", value)
+        assert result.status == 401
+
+
+def test_other_hosts_do_not_ask_about_the_codespace_port(accounts, monkeypatch):
+    monkeypatch.delenv("CODESPACES", raising=False)
+    monkeypatch.delenv("POC_SINGLE_USER", raising=False)
+    calls = []
+    monkeypatch.setattr(console_auth.subprocess, "run", lambda *args, **kwargs: calls.append(args))
+    assert console_auth.sign_in_skip() == (False, None)
+    assert calls == []
+
+
+def test_codespace_and_single_user_skip_sign_in_when_the_port_is_not_public(accounts, monkeypatch):
+    for name, value in (("CODESPACES", "true"), ("POC_SINGLE_USER", "1"), ("POC_SINGLE_USER", "yes")):
+        result = _me(monkeypatch, name, value, "private")
+        assert result.status == 200
+        assert result.body["id"] == "local"
+        assert result.body["role"] == "admin"
+        assert console_auth.request_session_token(None) == console_auth.LOCAL_SESSION
+    result = _me(monkeypatch, "CODESPACES", "true", None)
+    assert result.status == 200
+    result = _me(monkeypatch, "CODESPACES", "true", "org")
+    assert result.status == 200
+
+
+def test_a_public_port_refuses_to_skip_sign_in(accounts, monkeypatch):
+    result = _me(monkeypatch, "CODESPACES", "true", "public")
+    assert result.status == 401
+    assert result.body["error"] == console_auth.PORT_PUBLIC_MESSAGE
+    assert "back to private" in result.body["error"]
+    assert console_auth.viewer_account(None) is None
+    result = _me(monkeypatch, "POC_SINGLE_USER", "1", "public")
+    assert result.status == 401
+    assert console_auth.port_refusal('[{"port": 8787, "visibility": "public"}]') == console_auth.PORT_PUBLIC_MESSAGE
+    assert console_auth.port_refusal('[{"port": 8787, "visibility": "private"}]') is None
+    assert console_auth.port_refusal('[{"port": 22, "visibility": "public"}]') is None
+    assert console_auth.port_refusal("") is None
+    assert console_auth.port_refusal("not json") is None
+
+
+def test_codespace_http_serves_without_a_session_and_still_hides_a_pasted_key(accounts, monkeypatch):
+    monkeypatch.setenv("POC_SINGLE_USER", "1")
+    monkeypatch.setattr(console_auth, "codespace_port_visibility", lambda: "private")
+    server = console_api.ThreadingHTTPServer(("127.0.0.1", 0), console_api.Handler)
+    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    secret = "nebius-session-secret-value"
+    try:
+        conn = http.client.HTTPConnection("127.0.0.1", server.server_address[1], timeout=5)
+        conn.request("GET", "/api/auth/me")
+        me = conn.getresponse()
+        me_body = json.loads(me.read().decode())
+        assert me.status == 200 and me_body["email"] == "local"
+        payload = json.dumps({"nebius_api_key": secret}).encode()
+        conn.request("POST", "/api/session/key", body=payload, headers={"Content-Type": "application/json"})
+        saved = conn.getresponse()
+        raw = saved.read()
+        assert saved.status == 200
+        assert secret.encode() not in raw
+        assert json.loads(raw)["nebius_key"] is True
+    finally:
+        session_key_clear()
+        server.shutdown()
+
+
+def session_key_clear():
+    from poc import session_key
+    session_key.clear_key(console_auth.LOCAL_SESSION)
+
+
+def test_http_sign_in_stays_required_when_the_port_is_public(accounts, monkeypatch):
+    monkeypatch.setenv("CODESPACES", "true")
+    monkeypatch.setattr(console_auth, "codespace_port_visibility", lambda: "public")
+    server = console_api.ThreadingHTTPServer(("127.0.0.1", 0), console_api.Handler)
+    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    try:
+        conn = http.client.HTTPConnection("127.0.0.1", server.server_address[1], timeout=5)
+        conn.request("GET", "/api/runs")
+        response = conn.getresponse()
+        body = json.loads(response.read().decode())
+        assert response.status == 401
+        assert body["error"] == console_auth.PORT_PUBLIC_MESSAGE
     finally:
         server.shutdown()

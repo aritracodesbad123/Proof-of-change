@@ -36,4 +36,4 @@ A always-on paid server would run checks the moment a judge asked. It costs mone
 
 ## What it means for you
 
-Use the results page to read finished checks. Open a "Request a check" issue for a new public Python pull request, and wait for the email. Or open a Codespace, use port 8787, and paste a key only if you want a live model call. Live checks need Linux. Turn on GitHub Pages from the Actions source so the results link is served, and create the two issue labels the template uses.
+Use the results page to read finished checks. Open a "Request a check" issue for a new public Python pull request, and wait for the email. Do not put an email address, a key, or other private information in that issue. Or open a Codespace, use port 8787, and paste a key only if you want a live model call. Leave that port private. Live checks need Linux. Turn on GitHub Pages from the Actions source so the results link is served, and create the labels `request-a-check`, `request-running`, and `request-done`.
