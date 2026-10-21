@@ -10,7 +10,7 @@ import json
 from types import SimpleNamespace
 
 from ops.daily_run import compare_sides, finish, verdict_for
-from poc import agents, console_api, github_app, model_provider, related_reports
+from poc import agents, console_api, github_app, model_provider, related_reports, tavily_docs
 
 SECRET = "tvly-SECRET-key-should-not-appear"
 EXPECTED = "EXPECTED-VERDICT-do-not-send"
@@ -141,6 +141,37 @@ def test_product_finish_stores_background_without_changing_verdict(tmp_path, mon
     assert kept["related_reports"]["text"] == '"a public bug report"'
     assert "packages" not in kept["related_reports"]
     assert any("UNTRUSTED BACKGROUND" in user for user in provider.users)
+
+
+def test_tavily_lookup_not_called_when_swarm_is_off(tmp_path, monkeypatch):
+    """--related-reports and a set Tavily key still do not call Tavily when the swarm is off."""
+    monkeypatch.delenv("POC_SWARM", raising=False)
+    monkeypatch.setenv("TAVILY_API_KEY", SECRET)
+    monkeypatch.setattr("ops.daily_run.check_record", lambda rec: [])
+    monkeypatch.setattr("ops.daily_run.stamp_model_use", lambda rec, runner: None)
+    calls = {"n": 0}
+
+    def lookup(*args, **kwargs):
+        calls["n"] += 1
+        raise AssertionError("Tavily lookup ran while the swarm was off")
+
+    monkeypatch.setattr(tavily_docs, "lookup", lookup)
+    assert tavily_docs.available() is True
+    rec = {"files": {"package_py": [], "compiled": [], "other": []}, "per_run": [],
+           "verdict": "verified", "reason": "ok", "repo": "acme/widgets",
+           "title": FAKE_TITLE, "pr": {"number": 4, "title": FAKE_TITLE, "repo": "acme/widgets"}}
+    prdir = tmp_path / "swarm-off"
+    prdir.mkdir()
+    finish(rec, prdir, tmp_path / "work", 0.0, SimpleNamespace(
+        related_reports=True, bench=None, pr=["https://github.com/acme/widgets/pull/4"],
+        swarm=False, provider=_Fixed(), model_skipped=None))
+    assert calls["n"] == 0
+    assert "related_reports" not in rec
+    assert rec["verdict"] == "verified"
+    assert rec["swarm"] == "off"
+    stored = (prdir / "record.json").read_text()
+    assert SECRET not in stored
+    assert "related_reports" not in stored
 
 
 def test_skipped_without_key(monkeypatch, capsys):
