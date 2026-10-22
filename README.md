@@ -109,86 +109,43 @@ Tavily can suggest package names, but they're only installed if their PyPI page 
 
 ## Scoring
 
-Current results: the 30-PR random batch on code version 0fa0016. Full table, records and reports: [benchmarks/batch30-0fa0016](benchmarks/batch30-0fa0016/README.md). Older runs: [benchmarks/replay-archive](benchmarks/replay-archive/README.md).
+Current results: the 30-PR random batch on code version 0fa0016. Full table, records and reports: [benchmarks/batch30-0fa0016](benchmarks/batch30-0fa0016/README.md). Older runs, including the earlier release comparisons: [benchmarks/replay-archive](benchmarks/replay-archive/README.md).
 
-30 merged pull requests from public Python projects, drawn at random with a fixed seed (20261022; list in `benchmarks/batch30-0fa0016/drawn.json`). Every check ran on Proof-of-Change at commit `0fa0016`, finishing on 22 Oct 2026 at 11:03 IST. All 30 runs completed; none crashed.
+30 merged pull requests from public Python projects, drawn at random with a fixed seed (20261022; list in `benchmarks/batch30-0fa0016/drawn.json`). Every check ran on Proof-of-Change at commit `0fa0016`, finishing on 22 Oct 2026 at 11:03 IST. All 30 runs completed; none crashed. Verdicts are the ones in each run's own `record.json`.
 
 ### Verdicts
 
 | Verdict | Count |
 |---|---|
 | Verified | 0 |
-| Needs attention | 6 |
-| Could not verify | 24 |
+| Needs attention | 8 |
+| Could not verify | 22 |
 
-Two more runs (oyvindwe/connectlife-ha #742, doobidoo/mcp-memory-service #1531) first found a difference, but the run failed its own trust checks, so the published verdict is "could not verify".
+The trust check in the report flags [oyvindwe/connectlife-ha #742](benchmarks/batch30-0fa0016/runs/connectlife-ha-742/REPORT.md), [doobidoo/mcp-memory-service #1531](benchmarks/batch30-0fa0016/runs/mcp-memory-service-1531/REPORT.md) as untrustworthy (the run failed its own checks), so treat those two needs-attention verdicts with caution.
 
 ### Why: breakdown of reasons
 
 | Reason | Runs |
 |---|---|
 | Setup failure: install failed | 12 |
-| Difference found between main and PR | 6 |
+| Difference found between main and PR | 8 |
 | Changed code not exercised (incl. docstring-only) | 4 |
 | Setup failure: setup gap | 3 |
 | Tests did not run or collect | 3 |
-| Run failed its own trust checks | 2 |
 
 Setup failures (install failed or setup gap) total 15 of 30. This is the biggest weakness the batch shows.
 
 ### Timing
 
-Median run: 2 min 43 s. Fastest: 17 s. Slowest: macs3-project/MACS #784 (341 min 49 s), optiland/optiland #963 (70 min 1 s), optuna/optuna #6873 (70 min 1 s). The 5 h 42 min MACS #784 run is the outlier.
+From each record's `duration_s.total_wall`. Median run: 2 min 39 s. Fastest: pyrevitlabs/pyRevit #3743 (14 s). Slowest: macs3-project/MACS #784 (341 min 45 s), optiland/optiland #963 (69 min 57 s), optuna/optuna #6873 (69 min 56 s). The MACS #784 run is the outlier.
 
 ### Accuracy: not measured for this batch
 
-Catches, misses and false alarms count only where there is outside proof of the right answer: a later revert, a follow-up bug report blaming the PR, or a maintainer's explicit confirmation. Passing maintainer CI and a closed linked issue do not count. We searched GitHub for reverts and follow-up fixes for all 30 PRs (`benchmarks/batch30-0fa0016/labels.json`) and found none, so **all 30 PRs are unlabelled** and no accuracy, false-alarm or miss rate is reported. No labels were invented.
-
-## Proven results
-
-Each result below was reproduced 3 times on each side, with the same outcome every time. These are replays run after
-the releases happened, to show the break was already visible at the release candidate. The records are in
-`evals/fixtures/golden_v1.jsonl` and the reports in `reports/samples/golden-v1/`. The full raw logs are too large for
-the repo; excerpts are in `evals/fixtures/runs/`.
-
-**A real scikit-learn break, visible 24 days before the release**
-scikit-learn 1.6.0rc1 (published 15 Nov 2024) no longer had a private helper, `_safe_tags`, that imbalanced-learn
-0.12.4 imported. It was removed in [scikit-learn#29677](https://github.com/scikit-learn/scikit-learn/pull/29677).
-
-| | scikit-learn 1.5.2 | scikit-learn 1.6.0rc1 |
-|---|---|---|
-| imbalanced-learn 0.12.4 tests | 2,238 passed | 0 passed, 525 errors (import fails: `_safe_tags`) |
-
-Verdict: NEEDS ATTENTION. The final 1.6.0 came out on 9 Dec 2024, 24 days after the release candidate (it brought
-`_safe_tags` back as a deprecated helper, [scikit-learn#30327](https://github.com/scikit-learn/scikit-learn/pull/30327)).
-
-**A real pandas 3.0 break, visible 49 days before the release**
-pandas 3.0.0rc0 (published 3 Dec 2025) makes Copy-on-Write the default
-([pandas#56633](https://github.com/pandas-dev/pandas/pull/56633)), which breaks UpSetPlot 0.9.0 plotting
-([UpSetPlot#303](https://github.com/jnothman/UpSetPlot/issues/303), opened 25 Jan 2026).
-
-| | pandas 2.3.3 | pandas 3.0.0rc0 |
-|---|---|---|
-| UpSetPlot 0.9.0 tests | 233 passed, 6 failed | 166 passed, 73 failed |
-
-Verdict: NEEDS ATTENTION. 67 new failures, 36 of them `Invalid RGBA argument: nan`. The 6 tests that failed on both
-sides were labelled as already broken, not blamed on the change. The final 3.0.0 came out on 21 Jan 2026, 49 days
-after the release candidate.
-
-**No false alarm on a safe upgrade**
-scikit-learn 1.5.1 to 1.5.2, tested against imbalanced-learn 0.12.4: 2,238 passed on both sides in every run.
-Verdict: VERIFIED.
-
-**Being honest about what tests can't see**
-In our first open-PR study, one PR ([mlxtend#1229](https://github.com/rasbt/mlxtend/pull/1229)) changed results for
-some inputs under a fixed random seed, and every existing test still passed, so the check said VERIFIED. An
-independent re-check found the change. Running the project's tests alone can miss that kind of change. When a Nebius
-API key is set, Proof-of-Change also runs *claim probes* (small scripts written from what the PR says it does) so
-those gaps are easier to catch. We still report misses like the early study openly.
+Catches, misses and false alarms count only where there is outside proof of the right answer: a later revert, a follow-up bug report blaming the PR, or a maintainer's explicit confirmation. Passing maintainer CI or closing a linked issue is not proof. We searched GitHub for reverts and follow-up fixes for all 30 PRs and found none, so **all 30 PRs are unlabelled** (`benchmarks/batch30-0fa0016/labels.json`) and no accuracy, false-alarm or miss rate is reported. No labels were invented.
 
 ---
 
-**Contents:** [Scoring](#scoring) · [Proven results](#proven-results) · [Setup](#1-one-time-setup-on-a-mac) · [Check one PR](#2-check-one-pr) ·
+**Contents:** [Scoring](#scoring) · [Setup](#1-one-time-setup-on-a-mac) · [Check one PR](#2-check-one-pr) ·
 [Operator console](#2b-operator-console-browse--start-checks) ·
 [How a report is made](#3-exactly-how-a-report-gets-generated) ·
 [Read a report](#4-how-to-read-a-report) · [Where files live](#5-where-files-live) ·

@@ -1,11 +1,12 @@
 # 30-PR random batch, code version 0fa0016
 
-Results of 30 random merged PRs checked on Proof-of-Change commit `0fa0016` (22 Oct 2026). Each run's record, report (Markdown and HTML) is in `runs/<repo>-<pr>/`.
+Results of 30 random merged PRs checked on Proof-of-Change commit `0fa0016` (22 Oct 2026). Each run's `record.json`, `REPORT.md` and `REPORT.html` are in `runs/<repo>-<pr>/`, as the tool wrote them; the only change is local machine paths replaced with placeholders by `publish.py`. `MANIFEST.json` lists the sha256 of each raw and published file.
 
 - [Scoring](SCORING.md)
 - [Needs-attention notes](NEEDS_ATTENTION_NOTES.md)
 - `drawn.json`: the seed and the PRs drawn
-- `labels.json`: what the GitHub search for outside proof found
+- `labels.json`: all 30 unlabelled, with what the GitHub search found
+- `publish.py`: rebuilds this folder from the batch run folder
 
 ## Results
 
@@ -15,7 +16,7 @@ Results of 30 random merged PRs checked on Proof-of-Change commit `0fa0016` (22 
 | 2 | macs3-project/MACS | [#784](https://github.com/macs3-project/MACS/pull/784) | Could not verify | Low | install failed (1); see setup-main.log | [report](runs/MACS-784/REPORT.md) |
 | 3 | agentscope-ai/ReMe | [#627](https://github.com/agentscope-ai/ReMe/pull/627) | Could not verify | Low | not verified: no AI-written probe ran any changed line, so the change itself was not exercised by a probe; docstring-only change (AST equal after blanking docst… | [report](runs/ReMe-627/REPORT.md) |
 | 4 | caronc/apprise | [#1783](https://github.com/caronc/apprise/pull/1783) | Needs attention | Medium | 10 test(s) removed on the PR side; 274 test(s) ran on main, 274 on the PR; 10 new test(s) pass, 264 unchanged; rejected: claim pattern(s) C1 match none of this … | [report](runs/apprise-1783/REPORT.md) |
-| 5 | oyvindwe/connectlife-ha | [#742](https://github.com/oyvindwe/connectlife-ha/pull/742) | Could not verify | Low | the run failed its own checks: 3 alternating runs per side | [report](runs/connectlife-ha-742/REPORT.md) |
+| 5 | oyvindwe/connectlife-ha | [#742](https://github.com/oyvindwe/connectlife-ha/pull/742) | Needs attention (report trust check failed) | Low | probe: 2 observation(s) need attention: C2.import_error does not differ although the claim says it does (C2); C3.import_error does not differ although the claim… | [report](runs/connectlife-ha-742/REPORT.md) |
 | 6 | home-assistant/core | [#187420](https://github.com/home-assistant/core/pull/187420) | Could not verify | Low | install failed (2); see setup-main.log | [report](runs/core-187420/REPORT.md) |
 | 7 | home-assistant/core | [#187475](https://github.com/home-assistant/core/pull/187475) | Could not verify | Low | install failed (2); see setup-main.log | [report](runs/core-187475/REPORT.md) |
 | 8 | home-assistant/core | [#187588](https://github.com/home-assistant/core/pull/187588) | Could not verify | Low | install failed (2); see setup-main.log | [report](runs/core-187588/REPORT.md) |
@@ -24,7 +25,7 @@ Results of 30 random merged PRs checked on Proof-of-Change commit `0fa0016` (22 
 | 11 | frappe/erpnext | [#61257](https://github.com/frappe/erpnext/pull/61257) | Could not verify | Low | install failed (2); see setup-main.log | [report](runs/erpnext-61257/REPORT.md) |
 | 12 | googlefonts/glyphsLib | [#1208](https://github.com/googlefonts/glyphsLib/pull/1208) | Could not verify | Low | could not verify: claim(s) C1 expect a difference but no observation matches (docstring-only change (AST equal after blanking docstrings); behaviour claims hold… | [report](runs/glyphsLib-1208/REPORT.md) |
 | 13 | Second-Hand-Friends/kleinanzeigen-bot | [#1361](https://github.com/Second-Hand-Friends/kleinanzeigen-bot/pull/1361) | Needs attention | Medium | 1 new test(s) fail on the PR; 322 test(s) ran on main, 335 on the PR; 12 new test(s) pass, 307 unchanged; 15 test failure(s) pre-existing and identical on both … | [report](runs/kleinanzeigen-bot-1361/REPORT.md) |
-| 14 | doobidoo/mcp-memory-service | [#1531](https://github.com/doobidoo/mcp-memory-service/pull/1531) | Could not verify | Low | the run failed its own checks: pytest exit codes explained | [report](runs/mcp-memory-service-1531/REPORT.md) |
+| 14 | doobidoo/mcp-memory-service | [#1531](https://github.com/doobidoo/mcp-memory-service/pull/1531) | Needs attention (report trust check failed) | Low | 194 test(s) pass on main but fail on the PR; 7 other outcome change(s); 200 test(s) fail on main and pass on the PR; 4517 test(s) ran on main, 4517 on the PR; 2… | [report](runs/mcp-memory-service-1531/REPORT.md) |
 | 15 | doobidoo/mcp-memory-service | [#1603](https://github.com/doobidoo/mcp-memory-service/pull/1603) | Needs attention | Medium | probe: 4 observation(s) need attention: refused.exception_raised differs and no claim covers it; refused.first_element_text differs and no claim covers it; refu… | [report](runs/mcp-memory-service-1603/REPORT.md) |
 | 16 | mlflow/mlflow | [#26542](https://github.com/mlflow/mlflow/pull/26542) | Needs attention | Medium | 3 test(s) removed on the PR side; 1 test(s) re-parametrized (2 -> 1 ids); 64 test(s) ran on main, 65 on the PR; 6 new test(s) pass, 59 unchanged; probe model-c1… | [report](runs/mlflow-26542/REPORT.md) |
 | 17 | optiland/optiland | [#962](https://github.com/optiland/optiland/pull/962) | Could not verify | Low | could not verify: setup gap setup | [report](runs/optiland-962/REPORT.md) |

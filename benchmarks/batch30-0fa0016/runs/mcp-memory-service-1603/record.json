@@ -4111,6 +4111,5 @@
  },
  "schema_errors": [
   "$.coverage.status: 'not measured' not in ['measured', 'failed', 'not needed', 'skipped']"
- ],
- "poc_code_version": "0fa0016"
+ ]
 }

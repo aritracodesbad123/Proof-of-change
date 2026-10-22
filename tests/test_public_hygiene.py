@@ -43,23 +43,30 @@ def _under_study_pairs(path: Path | None) -> bool:
 
 
 def _under_random_prs(path: Path | None) -> bool:
-    """True when path is a file inside benchmarks/random-prs/ (lists of upstream PRs)."""
+    """True inside benchmarks/random-prs/ or benchmarks/batch30-*/ (lists of upstream PRs): "bot" is allowed only inside an owner/name."""
     if path is None:
         return False
     parts = path.parts
-    return any(parts[i] == "benchmarks" and i + 1 < len(parts) and parts[i + 1] == "random-prs"
+    return any(parts[i] == "benchmarks" and i + 1 < len(parts)
+               and (parts[i + 1] == "random-prs" or parts[i + 1].startswith("batch30-"))
                for i in range(len(parts)))
 
 
 def _under_upstream_run(path: Path | None) -> bool:
-    """True for stored upstream check results (batch run folders and the results-page replay data)."""
+    """True only for stored upstream run output: the tool's own record and report files.
+
+    Our own write-ups (README, SCORING, notes) next to them are not covered.
+    """
     if path is None:
         return False
     parts = path.parts
     for i in range(len(parts) - 1):
-        if parts[i] == "benchmarks" and parts[i + 1].startswith("batch30-"):
+        if (parts[i] == "benchmarks" and parts[i + 1].startswith("batch30-") and "runs" in parts[i + 2:-1]
+                and path.name in {"record.json", "REPORT.md", "REPORT.html"}):
             return True
-        if parts[i] == "replay" and parts[i + 1] in {"checks", "catalog.json"}:
+        if parts[i] == "replay" and parts[i + 1] == "catalog.json":
+            return True  # generated only from the stored records by ops/export_replay.py
+        if parts[i] == "replay" and parts[i + 1] == "checks" and path.name in {"record.json", "REPORT.md", "REPORT.html"}:
             return True
     return False
 

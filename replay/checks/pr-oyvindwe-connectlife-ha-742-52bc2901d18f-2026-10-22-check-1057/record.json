@@ -808,8 +808,8 @@
     },
     "not_adequate": []
   },
-  "verdict": "could_not_verify",
-  "reason": "the run failed its own checks: 3 alternating runs per side",
+  "verdict": "needs_attention",
+  "reason": "probe: 2 observation(s) need attention: C2.import_error does not differ although the claim says it does (C2); C3.import_error does not differ although the claim says it does (C3); probe model-probe1 has no measured line coverage (coverage produced no data (exit 0); see probe-coverage.log); it does not count as covering the change; probe model-probe2 has no measured line coverage (coverage produced no data (exit 0); see probe-coverage.log); it does not count as covering the change; tests: tests produced no results on one side (collection failed; see pytest logs)",
   "verdict_before_coverage_gate": "needs_attention",
   "reason_before_coverage_gate": "probe: 2 observation(s) need attention: C2.import_error does not differ although the claim says it does (C2); C3.import_error does not differ although the claim says it does (C3); probe model-probe1 has no measured line coverage (coverage produced no data (exit 0); see probe-coverage.log); it does not count as covering the change; probe model-probe2 has no measured line coverage (coverage produced no data (exit 0); see probe-coverage.log); it does not count as covering the change; tests: tests produced no results on one side (collection failed; see pytest logs)",
   "changed_lines_total": null,
@@ -891,6 +891,5 @@
       "cost_complete": true,
       "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
     }
-  },
-  "poc_code_version": "0fa0016"
+  }
 }

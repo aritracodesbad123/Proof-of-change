@@ -2071,8 +2071,8 @@
   },
   "not_adequate": []
  },
- "verdict": "could_not_verify",
- "reason": "the run failed its own checks: pytest exit codes explained",
+ "verdict": "needs_attention",
+ "reason": "194 test(s) pass on main but fail on the PR; 7 other outcome change(s); 200 test(s) fail on main and pass on the PR; 4517 test(s) ran on main, 4517 on the PR; 2 new test(s) pass, 4072 unchanged (130 of them skipped on both sides); 176 test failure(s) pre-existing and identical on both sides; rejected: claim pattern(s) C1, C2 match none of this probe's observation names, so the probe is not counted; rejected: claim pattern(s) C2 match none of this probe's observation names, so the probe is not counted; rejected: claim pattern(s) C3 match none of this probe's observation names, so the probe is not counted; rejected: claim pattern(s) C4 match none of this probe's observation names, so the probe is not counted",
  "verdict_before_coverage_gate": "needs_attention",
  "reason_before_coverage_gate": "194 test(s) pass on main but fail on the PR; 7 other outcome change(s); 200 test(s) fail on main and pass on the PR; 4517 test(s) ran on main, 4517 on the PR; 2 new test(s) pass, 4072 unchanged (130 of them skipped on both sides); 176 test failure(s) pre-existing and identical on both sides; rejected: claim pattern(s) C1, C2 match none of this probe's observation names, so the probe is not counted; rejected: claim pattern(s) C2 match none of this probe's observation names, so the probe is not counted; rejected: claim pattern(s) C3 match none of this probe's observation names, so the probe is not counted; rejected: claim pattern(s) C4 match none of this probe's observation names, so the probe is not counted",
  "changed_lines_total": null,
@@ -2141,6 +2141,5 @@
    "cost_complete": true,
    "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
   }
- },
- "poc_code_version": "0fa0016"
+ }
 }
