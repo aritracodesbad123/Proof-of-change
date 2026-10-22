@@ -42,7 +42,8 @@ def test_mismatch_is_a_problem():
     sess, _ = _session({"img-main": "Python 3.12.7", "img-pr": "Python 3.14.0"})
     info = cs.side_pythons(sess, [">=3.14"])
     assert info["main"] == "3.12.7"
-    assert len(info["problems"]) == 1 and info["problems"][0].startswith("main:")
+    assert info["problems"][0].startswith("main:")
+    assert info["problems"][1] == "main ran 3.12.7, PR ran 3.14.0"
 
 
 def test_unreadable_version_is_a_problem():
@@ -85,3 +86,21 @@ def test_prepare_runs_the_check_on_product_route(monkeypatch, tmp_path):
     out = daily_run._maybe_prepare_contree(a, "o/r", "a" * 40, "b" * 40, rec, 60, main_dir=tmp_path)
     assert out and out.startswith("Contree Python check failed")
     assert rec["contree"]["python"]["problems"]
+
+
+def test_sides_differ_without_requires_python(tmp_path):
+    sess, _ = _session({"img-main": "Python 3.12.7", "img-pr": "Python 3.12.8"})
+    rec = {}
+    refusal = daily_run._check_contree_pythons(sess, rec, tmp_path)
+    assert refusal == "Contree Python check failed: main ran 3.12.7, PR ran 3.12.8"
+
+
+def test_sides_differ_with_requires_python():
+    sess, _ = _session({"img-main": "Python 3.14.0", "img-pr": "Python 3.14.1"})
+    info = cs.side_pythons(sess, [">=3.14"])
+    assert info["problems"] == ["main ran 3.14.0, PR ran 3.14.1"]
+
+
+def test_equal_sides_pass_without_requires_python(tmp_path):
+    sess, _ = _session({"img-main": "Python 3.13.2", "img-pr": "Python 3.13.2"})
+    assert daily_run._check_contree_pythons(sess, {}, tmp_path) is None

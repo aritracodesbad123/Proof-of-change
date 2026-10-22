@@ -309,7 +309,7 @@ def side_pythons(sess: "ContreeSession", specs: list[str], *, timeout: int = 120
 
     Runs `python --version` from the main and PR checkpoints (the same place the tests run). Each side whose
     version cannot be read, or does not satisfy requires-python, adds a problem. A non-empty `problems` list means
-    the check must not pass as a normal result."""
+    the check must not pass as a normal result. Both sides must also report the exact same full version."""
     from poc import demo_helper
     clauses = [c for text in specs or [] for c in demo_helper._py_clauses(text)]
     out: dict = {"requires_python": [s for s in specs or [] if s], "main": "", "pr": "", "problems": []}
@@ -327,6 +327,8 @@ def side_pythons(sess: "ContreeSession", specs: list[str], *, timeout: int = 120
         if clauses and (minor is None or not demo_helper._py_satisfies(minor, clauses)):
             out["problems"].append(f"{side}: Contree ran Python {version}, which does not satisfy requires-python "
                                    f"{', '.join(out['requires_python'])}")
+    if out["main"] and out["pr"] and out["main"] != out["pr"]:
+        out["problems"].append(f"main ran {out['main']}, PR ran {out['pr']}")
     return out
 
 
