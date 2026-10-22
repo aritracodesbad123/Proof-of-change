@@ -45,7 +45,7 @@ Judging runs 1–15 December. These three paths are free to use. Live checks nee
 
 <https://aritracodesbad123.github.io/Proof-of-change/>
 
-This is the main link. It is the operator console in replay mode: light page, the flow chart, and the report for each finished check. It shows only the 30-PR random batch on code version 0fa0016; older runs are kept in `benchmarks/replay-archive/`. The page does not install a library and does not call an API. After this branch is merged, turn on Pages in the repository settings (source: GitHub Actions) so the link starts serving. The `pages` workflow publishes on every push to `main`.
+This is the main link. It is the operator console in replay mode: light page, the flow chart, and the report for each finished check. It shows only the 30-PR random batch on code version 0fa0016; older runs are kept in `benchmarks/replay-archive/`. The page does not install a library and does not call an API. GitHub Pages is turned on in the repository settings (source: GitHub Actions), and the `pages` workflow publishes the page on every push to `main`.
 
 ### Request a check
 
