@@ -1190,11 +1190,35 @@ def pr_side_constraints(main_venv: Path, dist: str, dest: Path) -> Path:
     return dest
 
 
+def no_index_config_env(env: dict) -> dict:
+    """Product-check install env: index, find-links and trusted-host settings dropped (demo_helper.drop_index_env),
+    and no uv or pip config file read (UV_NO_CONFIG=1, PIP_CONFIG_FILE=/dev/null)."""
+    from poc import demo_helper
+    env = demo_helper.drop_index_env(env)
+    env["UV_NO_CONFIG"] = "1"
+    env["PIP_CONFIG_FILE"] = os.devnull
+    return env
+
+
+def no_config_cmd(cmd: list) -> list:
+    """A uv call that ignores config files; a `uv pip install` also ignores the project's [tool.uv.sources]."""
+    if not cmd or Path(str(cmd[0])).name != "uv" or "--no-config" in cmd:
+        return cmd
+    extra = ["--no-config"]
+    if [str(x) for x in cmd[1:3]] == ["pip", "install"]:
+        extra.append("--no-sources")
+    return [*cmd, *extra]
+
+
 def install_side(venv: Path, checkout: Path, chosen: dict | None, log: Path, python: str, timeout: int,
-                 constraints: Path | None, extra_reqs=None) -> tuple[bool, str]:
+                 constraints: Path | None, extra_reqs=None, isolated: bool = False) -> tuple[bool, str]:
+    """isolated (product checks): every uv call ignores config files and the project's [tool.uv.sources], and the
+    env has no index settings (no_index_config_env)."""
     env = base_env(side_home(venv), install=True)
     if subprocess.run(["git", "-C", checkout, "describe", "--tags"], capture_output=True, env=env).returncode != 0:
         env = base_env(side_home(venv), install=True, SETUPTOOLS_SCM_PRETEND_VERSION="9999.0.0")
+    if isolated:
+        env = no_index_config_env(env)
     proj, extra = side_install_args(chosen, checkout)
     proj = with_test_extras(proj, checkout)
     cmds = [[uv_bin(), "venv", "-q", "-p", python, venv],
@@ -1221,6 +1245,8 @@ def install_side(venv: Path, checkout: Path, chosen: dict | None, log: Path, pyt
         cmds[-1] += ["--override", ov]
     if extra_reqs:
         cmds[-1].extend(list(extra_reqs))
+    if isolated:
+        cmds = [no_config_cmd(c) for c in cmds]
     ro_files = tuple(x for x in (constraints, bc if bc and Path(bc).is_file() else None, ov) if x)
     sbx = side_sandbox(venv, network=True, ro=ro_files)
     sbx["rw"].append(checkout)
@@ -1255,8 +1281,7 @@ def install_deps_only(venv: Path, checkout: Path, plan: dict, log: Path, python:
     fallback passes main's checkout on both sides, so the PR's own dependency files never change what is installed.
     """
     from poc import demo_helper
-    env = demo_helper.drop_index_env(base_env(side_home(venv), install=True))   # no index from the environment
-    env["UV_NO_CONFIG"] = "1"   # no [tool.uv], [tool.uv.pip] or uv.toml settings (index, find-links) either
+    env = no_index_config_env(base_env(side_home(venv), install=True))   # no index from the env or config files
     src = Path(deps_root) if deps_root is not None else checkout
     cmds = [["uv", "venv", "-q", "-p", python, venv]]
     if plan.get("kind") == "uv-sync":
@@ -1585,7 +1610,8 @@ def _install_with_helper(a, rec, step, venv, checkout, chosen, log, timeout, con
             gpu = demo_helper.gpu_only_requirement(checkout)
             if gpu:
                 return False, demo_helper.gpu_reason(gpu)
-        ok, why = install_side(venv, checkout, chosen, log, state["py"], timeout, constraints, extra_reqs)
+        ok, why = install_side(venv, checkout, chosen, log, state["py"], timeout, constraints, extra_reqs,
+                                isolated=product_route(a))
         if ok:
             return ok, why
         text = _log_text()
@@ -1601,7 +1627,8 @@ def _install_with_helper(a, rec, step, venv, checkout, chosen, log, timeout, con
                          "was installed and the install was tried again.")
                 state["py"] = got
                 shutil.rmtree(venv, ignore_errors=True)
-                ok, why = install_side(venv, checkout, chosen, log, got, timeout, constraints, extra_reqs)
+                ok, why = install_side(venv, checkout, chosen, log, got, timeout, constraints, extra_reqs,
+                                             isolated=product_route(a))
                 if ok:
                     return ok, why
                 text = _log_text()
@@ -1728,8 +1755,8 @@ def _retry_setup_gap(a, rec, repo, prdir, venvs: dict, rerun, recheck_coverage=N
         venv = venvs.get(side)
         if venv is None:
             return False, ""
-        rc, _ = run([uv_bin(), "pip", "install", "-q", "-p", venv / "bin/python", requirement],
-                    prdir / "setup-gap.log", env=base_env(side_home(venv), install=True),
+        rc, _ = run(no_config_cmd([uv_bin(), "pip", "install", "-q", "-p", venv / "bin/python", requirement]),
+                    prdir / "setup-gap.log", env=no_index_config_env(base_env(side_home(venv), install=True)),
                     timeout=getattr(a, "build_timeout", 1800), sbx=side_sandbox(venv, network=True))
         return rc == 0, _dist_version(venv, requirement) if rc == 0 else ""
 

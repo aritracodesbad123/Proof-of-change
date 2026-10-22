@@ -307,8 +307,8 @@ DEPS_ONLY_SHELL = (
     " python -m pip install -q uv==0.13.1 2>/dev/null || true;"
     " PYX=\"$(python -c 'import sys; print(sys.executable)')\"; PFX=\"$(python -c 'import sys; print(sys.prefix)')\";"
     " if [ -f pyproject.toml ] && [ -f uv.lock ]; then UV_PROJECT_ENVIRONMENT=\"$PFX\" python -m uv sync -q"
-    " --no-install-project --frozen -p \"$PYX\";"
-    " elif [ -f pyproject.toml ]; then UV_PROJECT_ENVIRONMENT=\"$PFX\" python -m uv sync -q --no-install-project -p \"$PYX\";"
+    " --no-config --no-install-project --frozen -p \"$PYX\";"
+    " elif [ -f pyproject.toml ]; then UV_PROJECT_ENVIRONMENT=\"$PFX\" python -m uv sync -q --no-config --no-install-project -p \"$PYX\";"
     " else for f in requirements*.txt; do if [ -f \"$f\" ]; then python -m pip install -q -r \"$f\"; fi; done; fi"
     " && CHG=\"$(git status --porcelain --untracked-files=all --ignored=no | grep -v ' .poc-declared-deps.txt$' || true)\""
     " && if [ -n \"$CHG\" ]; then echo \"setup problem: the dependency install changed the checked-out code: $CHG\"; exit 1; fi"
@@ -317,15 +317,27 @@ DEPS_ONLY_SHELL = (
 )
 
 
+# Product checks: no index, find-links or trusted-host setting from the environment, and no pip or uv config file
+# (pip.conf, [tool.uv], [tool.uv.pip], uv.toml) can change where packages come from. Same rules as drop_index_env.
+NO_INDEX_CONFIG_SHELL = (
+    "for v in $(env | sed -n 's/^\\(\\(UV\\|PIP\\)_[A-Za-z0-9_]*\\)=.*/\\1/p'); do case \"$v\" in"
+    " UV_*INDEX*|UV_*FIND_LINKS*|UV_*INSECURE_HOST*|PIP_*INDEX*|PIP_*FIND_LINKS*|PIP_*TRUSTED_HOST*) unset \"$v\";;"
+    " esac; done\n"
+    "export UV_NO_CONFIG=1 PIP_CONFIG_FILE=/dev/null\n"
+)
+
+
 def install_shell_source(repo: str, sha: str, extra: str = "", deps_only_fallback: bool = False) -> str:
     """Clone a public GitHub SHA into /work/src and pip-install editable + pytest (source-pair style).
 
     extra is the same shell on both sides (system packages and plan requirements). Empty leaves the
-    original install unchanged.
+    original install unchanged. deps_only_fallback (product checks) also clears index settings from the environment
+    and turns off pip and uv config files for every install in the shell (NO_INDEX_CONFIG_SHELL).
     """
     # slim image needs git; network is available during checkpoint builds
     shell = (
-        "export DEBIAN_FRONTEND=noninteractive\n"
+        (NO_INDEX_CONFIG_SHELL if deps_only_fallback else "")
+        + "export DEBIAN_FRONTEND=noninteractive\n"
         "(command -v git >/dev/null || (apt-get update -qq && apt-get install -y -qq git >/dev/null))\n"
         "python -m pip install -q --upgrade pip\n"
         "rm -rf /work/src\n"
