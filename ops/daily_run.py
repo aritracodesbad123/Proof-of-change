@@ -2306,8 +2306,12 @@ def build_main_env(cfg: dict, venv: Path, log: Path, python: str, timeout: int, 
     steps = [[uv_bin(), "venv", "-q", "-p", python, venv],
              [uv_bin(), "pip", "install", "-q", "-p", py, cfg["dist"], *cfg["deps"], *BASE_TEST_DEPS, *cfg["test_deps"]]]
     sbx = side_sandbox(venv, network=True)
+
+    def iso(c):   # isolated (product checks): every uv call goes through isolated_install, as in install_side
+        return isolated_install(c, env, isolated)
     for c in steps:
-        rc, _ = run(c, log, env=env, timeout=timeout, sbx=sbx)
+        c2, e2 = iso(c)
+        rc, _ = run(c2, log, env=e2, timeout=timeout, sbx=sbx)
         if rc != 0:
             return {"ok": False, "why": f"main env setup failed ({rc}) at: {' '.join(map(str, c[:4]))}"}
     extras = test_extras(dist_extras(venv, cfg["dist"], env))
@@ -2315,7 +2319,8 @@ def build_main_env(cfg: dict, venv: Path, log: Path, python: str, timeout: int, 
     optional_backends = {"installed": [], "skipped": []}
     if extras or opt:
         spec = f"{cfg['dist']}[{','.join(extras)}]" if extras else cfg["dist"]
-        rc, _ = run([uv_bin(), "pip", "install", "-q", "-p", py, spec, *opt], log, env=env, timeout=timeout, sbx=sbx)
+        c2, e2 = iso([uv_bin(), "pip", "install", "-q", "-p", py, spec, *opt])
+        rc, _ = run(c2, log, env=e2, timeout=timeout, sbx=sbx)
         if rc != 0:
             reqs = list(dict.fromkeys(reqs_for_test_extras(metadata_requires(venv, cfg["dist"]), cfg["dist"]) + opt))
             if not reqs:
@@ -2330,13 +2335,14 @@ def build_main_env(cfg: dict, venv: Path, log: Path, python: str, timeout: int, 
             cfg["dist"], python), wheel_dir)
     except Exception as e:  # noqa: BLE001
         return {"ok": False, "why": f"could not fetch the nightly wheel: {e}"}
-    rc, _ = run([uv_bin(), "pip", "install", "-q", "-p", py, "--no-deps", "--reinstall", whl["path"]], log, env=env,
-                timeout=timeout, sbx=side_sandbox(venv, ro=(whl["path"],)))   # local file: no network needed
+    c2, e2 = iso([uv_bin(), "pip", "install", "-q", "-p", py, "--no-deps", "--reinstall", whl["path"]])
+    rc, _ = run(c2, log, env=e2, timeout=timeout, sbx=side_sandbox(venv, ro=(whl["path"],)))   # local file: no network needed
     if rc != 0:
         return {"ok": False, "why": f"installing the nightly wheel failed ({rc})"}
     ver = in_side(venv, [py, "-c", f"import {cfg['pkg']} as m;print(m.__version__)"]).stdout.strip()
     commit, how = nightly_commit(whl["version"], venv, cfg, env)
-    rc, _ = run([uv_bin(), "pip", "check", "-p", py], log, env=env, timeout=120, sbx=side_sandbox(venv))
+    c2, e2 = iso([uv_bin(), "pip", "check", "-p", py])
+    rc, _ = run(c2, log, env=e2, timeout=120, sbx=side_sandbox(venv))
     whl.pop("path")
     return {"ok": bool(ver), "version": ver, "pip_check": "ok" if rc == 0 else "conflicts (see setup log)",
             "build": whl | {"commit": commit, "commit_source": how},
@@ -2376,8 +2382,10 @@ def source_build(repo: str, item: dict, cfg: dict, venv: Path, workdir: Path, lo
              [uv_bin(), "venv", "-q", "-p", python, venv],
              [uv_bin(), "pip", "install", "-q", "-p", venv / "bin/python", *cfg["deps"], *BASE_TEST_DEPS, *cfg["test_deps"]]]
     for c in steps:   # git on our own fresh clone runs on the host; uv steps (package code) in the PR side's sandbox
-        sbx = side_sandbox(venv, network=True) if Path(str(c[0])).name == "uv" else HOST
-        rc, _ = run(c, log, env=env if Path(str(c[0])).name == "uv" else base_env(workdir / "home-git"), timeout=900, sbx=sbx)
+        is_uv = Path(str(c[0])).name == "uv"
+        sbx = side_sandbox(venv, network=True) if is_uv else HOST
+        c2, e2 = isolated_install(c, env, isolated) if is_uv else (c, base_env(workdir / "home-git"))
+        rc, _ = run(c2, log, env=e2, timeout=900, sbx=sbx)
         if rc != 0:
             return {"ok": False, "why": f"source checkout/setup failed ({rc}) at: {' '.join(map(str, c[:3]))}"}
     optional = [str(x) for x in list(cfg.get("optional_test_deps") or []) + list(main_extra_reqs)]
@@ -2385,8 +2393,8 @@ def source_build(repo: str, item: dict, cfg: dict, venv: Path, workdir: Path, lo
     backends = install_optional_backends({"pr": venv}, optional, log, timeout, isolated) if optional else {
         "installed": [], "skipped": []}
     t0 = time.time()
-    rc, secs = run_heavy([uv_bin(), "pip", "install", "-p", venv / "bin/python", "--no-cache", src], log, env=env,
-                         timeout=timeout, sbx=side_sandbox(venv, network=True))
+    c2, e2 = isolated_install([uv_bin(), "pip", "install", "-p", venv / "bin/python", "--no-cache", src], env, isolated)
+    rc, secs = run_heavy(c2, log, env=e2, timeout=timeout, sbx=side_sandbox(venv, network=True))
     if rc == "oom":
         return {"ok": False, "build_seconds": round(time.time() - t0, 1),
                 "infrastructure_failure": {"kind": "oom", "action": "retry"}, "why": _oom_reason()}
@@ -2708,8 +2716,9 @@ def coverage_run(item: dict, venv: Path, main_root: Path, pr_root: Path, targets
     if not changed:
         return {"status": "failed", "why": "none of the changed Python files exist on the PR side"}
     log = prdir / "coverage-pr.log"
-    rc, _ = run([uv_bin(), "pip", "install", "-q", "-p", venv / "bin/python", "coverage>=7", "pytest-cov>=5"], log,
-                env=base_env(side_home(venv), install=True), timeout=600, sbx=side_sandbox(venv, network=True))
+    c2, e2 = isolated_install([uv_bin(), "pip", "install", "-q", "-p", venv / "bin/python", "coverage>=7", "pytest-cov>=5"],
+                              base_env(side_home(venv), install=True), product_route(a))
+    rc, _ = run(c2, log, env=e2, timeout=600, sbx=side_sandbox(venv, network=True))
     if rc != 0:
         return {"status": "failed", "why": f"installing coverage failed ({rc}); see coverage-pr.log"}
     out = prdir / "coverage-pr.json"
@@ -3627,8 +3636,9 @@ def probe_coverage(item: dict, probe_results: dict | None, vm: Path, main_root: 
     log = prdir / "probe-coverage.log"
     py = vm / "bin" / "python"
     if in_side(vm, [py, "-c", "import coverage"]).returncode != 0:
-        rc, _ = run([uv_bin(), "pip", "install", "-q", "-p", py, "coverage>=7"], log,
-                    env=base_env(side_home(vm), install=True), timeout=600, sbx=side_sandbox(vm, network=True))
+        c2, e2 = isolated_install([uv_bin(), "pip", "install", "-q", "-p", py, "coverage>=7"],
+                                  base_env(side_home(vm), install=True), product_route(a))
+        rc, _ = run(c2, log, env=e2, timeout=600, sbx=side_sandbox(vm, network=True))
         if rc != 0:
             return unmeasured(f"installing coverage on the main side failed ({rc}); see probe-coverage.log")
     include = ",".join(str(Path(main_root) / rel) for rel, lines in changed.items() if (Path(main_root) / rel).is_file())

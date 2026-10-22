@@ -1,4 +1,5 @@
 """Product-path installs ignore uv/pip config files, the project's [tool.uv.sources] and index env settings."""
+import os
 import subprocess
 from pathlib import Path
 from types import SimpleNamespace
@@ -252,3 +253,105 @@ def test_nightly_and_source_build_backends_gated_on_product_route():
     assert tp.count("isolated=product_route(a)") == 4
     assert inspect.signature(daily_run.build_main_env).parameters["isolated"].default is False
     assert inspect.signature(daily_run.source_build).parameters["isolated"].default is False
+
+
+def _nightly_fakes(tmp_path, monkeypatch):
+    monkeypatch.setattr(daily_run, "base_env",
+                        lambda home, install=False, **kw: {"PATH": "/bin", "UV_EXTRA_INDEX_URL": "x",
+                                                           "PIP_INDEX_URL": "y", **kw})
+    monkeypatch.setattr(daily_run, "side_sandbox", lambda *a, **k: {"rw": []})
+    monkeypatch.setattr(daily_run, "optional_backend_reqs", lambda *a, **k: ["opt"])
+    monkeypatch.setattr(daily_run, "in_side", lambda *a, **k: SimpleNamespace(stdout="1.0\n", returncode=0))
+    return _capture(monkeypatch)
+
+
+def _source_build_calls(tmp_path, monkeypatch, **kw):
+    calls = _nightly_fakes(tmp_path, monkeypatch)
+    cfg = {"deps": ["d"], "test_deps": ["t"], "optional_test_deps": [], "dist": "p", "pkg": "p"}
+    out = daily_run.source_build("o/r", {"pr": 1}, cfg, tmp_path / "vp", tmp_path / "w", tmp_path / "l.log",
+                                 "3.12", 5, **kw)
+    assert out["ok"]
+    return [(c, e) for c, e in calls if Path(c[0]).name == "uv"]
+
+
+def test_source_build_product_hardens_every_uv_call_including_source_install(tmp_path, monkeypatch):
+    uv = _source_build_calls(tmp_path, monkeypatch, isolated=True)
+    assert len(uv) == 4   # venv, deps, optional backend, PR source tree
+    for c, e in uv:
+        assert "--no-config" in c and e["UV_NO_CONFIG"] == "1" and "PIP_INDEX_URL" not in e
+    src_install = [c for c, _ in uv if c[-3:-2] == [str(tmp_path / "w" / "src")] or str(tmp_path / "w" / "src") in c]
+    assert src_install and all("--no-sources" in c for c in src_install)
+
+
+def test_source_build_study_unchanged(tmp_path, monkeypatch):
+    default = _source_build_calls(tmp_path, monkeypatch)
+    study = _source_build_calls(tmp_path, monkeypatch, isolated=False)
+    assert default == study
+    for c, e in study:
+        assert "--no-config" not in c and "--no-sources" not in c and "UV_NO_CONFIG" not in e
+        assert e["PIP_INDEX_URL"] == "y"
+
+
+def _build_main_calls(tmp_path, monkeypatch, **kw):
+    calls = _nightly_fakes(tmp_path, monkeypatch)
+    monkeypatch.setattr(daily_run, "dist_extras", lambda *a: ["test"])
+    monkeypatch.setattr(daily_run, "test_extras", lambda x: x)
+    monkeypatch.setattr(daily_run, "metadata_requires", lambda *a: [])
+    monkeypatch.setattr(daily_run, "nightly_wheel", lambda *a: {})
+    monkeypatch.setattr(daily_run, "fetch_wheel", lambda *a: {"path": tmp_path / "x.whl", "version": "1"})
+    monkeypatch.setattr(daily_run, "nightly_commit", lambda *a: ("abc", "test"))
+    cfg = {"deps": ["d"], "test_deps": ["t"], "optional_test_deps": ["o"], "dist": "p", "pkg": "p"}
+    out = daily_run.build_main_env(cfg, tmp_path / "vm", tmp_path / "l.log", "3.12", 5, tmp_path / "wh", **kw)
+    assert out["ok"]
+    return [(c, e) for c, e in calls if Path(c[0]).name == "uv"]
+
+
+def test_build_main_env_product_hardens_every_uv_call(tmp_path, monkeypatch):
+    uv = _build_main_calls(tmp_path, monkeypatch, isolated=True)
+    assert len(uv) == 5   # venv, main install, test extras, nightly wheel, pip check
+    for c, e in uv:
+        assert "--no-config" in c and e["UV_NO_CONFIG"] == "1" and "UV_EXTRA_INDEX_URL" not in e
+        assert ("--no-sources" in c) == (c[1:3] == ["pip", "install"])
+
+
+def test_build_main_env_study_unchanged(tmp_path, monkeypatch):
+    default = _build_main_calls(tmp_path, monkeypatch)
+    study = _build_main_calls(tmp_path, monkeypatch, isolated=False)
+    assert default == study and len(study) == 5
+    for c, e in study:
+        assert "--no-config" not in c and "--no-sources" not in c and "UV_NO_CONFIG" not in e
+
+
+def test_coverage_installs_gated_on_product_route():
+    import inspect
+    for fn in (daily_run.coverage_run, daily_run.probe_coverage):
+        src = inspect.getsource(fn)
+        assert "isolated_install(" in src and "product_route(a)" in src
+
+
+@pytest.mark.skipif(not __import__("shutil").which("uv"), reason="uv not installed")
+def test_uv_sources_not_followed_on_product_checks(tmp_path):
+    """Behavioural, offline: a real `uv pip install` follows the project's [tool.uv.sources] path dependency on the
+    study route and ignores it once hardened by isolated_install (product checks)."""
+    import shutil
+    uv = shutil.which("uv")
+    dep = tmp_path / "dep"
+    (dep / "localonlydep").mkdir(parents=True)
+    (dep / "localonlydep" / "__init__.py").write_text("")
+    (dep / "pyproject.toml").write_text('[project]\nname = "localonlydep"\nversion = "0.1"\n')
+    proj = tmp_path / "proj"
+    proj.mkdir()
+    (proj / "pyproject.toml").write_text('[project]\nname = "proj"\nversion = "0"\ndependencies = ["localonlydep"]\n'
+                                         '[tool.uv.sources]\nlocalonlydep = { path = "../dep" }\n')
+    env = {"PATH": os.environ.get("PATH", ""), "HOME": str(tmp_path), "UV_CACHE_DIR": str(tmp_path / "cache")}
+    subprocess.run([uv, "venv", "-q", str(tmp_path / "v")], env=env, check=True, capture_output=True)
+    cmd = [uv, "pip", "install", "--dry-run", "--offline", "-p", str(tmp_path / "v" / "bin" / "python"),
+           "-r", "pyproject.toml"]
+    c_study, e_study = daily_run.isolated_install(cmd, env, False)
+    assert (c_study, e_study) == (cmd, env)
+    plain = subprocess.run(c_study, cwd=proj, env=e_study, capture_output=True, text=True)
+    assert plain.returncode == 0 and "localonlydep @ file" in plain.stdout + plain.stderr
+    c_prod, e_prod = daily_run.isolated_install(cmd, env, True)
+    assert "--no-sources" in c_prod
+    hardened = subprocess.run(c_prod, cwd=proj, env=e_prod, capture_output=True, text=True)
+    assert hardened.returncode != 0 and "localonlydep @ file" not in hardened.stdout + hardened.stderr
