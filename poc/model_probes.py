@@ -272,17 +272,38 @@ _FRAME_RE = re.compile(r'^\s*File "([^"]+)", line \d+', re.M)
 
 
 def _stdlib_file(f: str) -> bool:
-    """A frame in the Python standard library (not site-packages, not a checkout)."""
+    """A frame in the Python standard library (not site-packages, not a checkout). Frozen standard-library modules
+    such as ``<frozen runpy>`` count too."""
+    if re.fullmatch(r"<frozen [\w.]+>", f):
+        return True
     return bool(re.search(r"/lib/python3\.\d+/", f)) and "site-packages" not in f and "dist-packages" not in f
+
+
+# Python joins chained tracebacks with one of these lines; the last block is the error that ended the probe.
+_CHAIN_RE = re.compile(r"^(?:During handling of the above exception, another exception occurred:|"
+                       r"The above exception was the direct cause of the following exception:)\s*$", re.M)
+# A fake value list given to a mock ran out: StopIteration raised from unittest/mock.py.
+_MOCK_RAN_OUT_RE = re.compile(r'File "[^"]*/lib/python3\.\d+/unittest/mock\.py"[^\n]*\n(?:[^\n]*\n)?\s*StopIteration\b')
+
+
+def _frames_own(block: str, probe_name: str) -> bool:
+    frames = _FRAME_RE.findall(block or "")
+    return bool(frames) and all(Path(f).name == probe_name or _stdlib_file(f) for f in frames)
 
 
 def own_code_crash(log: str, probe_name: str) -> bool:
     """True when the log holds a traceback whose frames are only in the probe file itself or the standard library,
-    i.e. it never reached the project's code (or any installed package). No traceback: False (not provable)."""
-    frames = _FRAME_RE.findall(log or "")
-    if not frames:
-        return False
-    return all(Path(f).name == probe_name or _stdlib_file(f) for f in frames)
+    i.e. it never reached the project's code (or any installed package). No traceback: False (not provable).
+
+    One narrow exception for chained tracebacks: when the final block is a mock's fake value list running out
+    (StopIteration from unittest/mock.py) and that final block stays in the probe and the standard library, the
+    earlier blocks it was raised while handling are not counted. The probe's own fake broke the run either way.
+    Any other chain is judged on every block, as before."""
+    blocks = _CHAIN_RE.split(log or "")
+    last = blocks[-1]
+    if len(blocks) > 1 and _MOCK_RAN_OUT_RE.search(last) and _frames_own(last, probe_name):
+        return True
+    return _frames_own(log, probe_name)
 
 
 def probe_broke_itself(item: dict, logs: dict, probe_name: str) -> bool:

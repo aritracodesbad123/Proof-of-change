@@ -175,3 +175,36 @@ def test_rewrite_prompt_has_only_source_and_error(tmp_path):
     err = model_probes.error_summary({"main": [OWN], "pr": [OWN]})
     assert "observations" not in err and err.startswith("Traceback")
     assert json.dumps(_crashed()) not in err
+
+
+FROZEN = OWN.replace('  File "/x/model-probes/model-probe1.py"',
+                     '  File "<frozen runpy>", line 88, in _run_code\n    exec(code)\n'
+                     '  File "/x/model-probes/model-probe1.py"', 1)
+CHAIN_HEAD = PROJECT + "\nDuring handling of the above exception, another exception occurred:\n\n"
+
+
+def test_guard_counts_frozen_stdlib_frames_as_standard_library():
+    assert model_probes.own_code_crash(FROZEN, "model-probe1.py") is True
+    assert model_probes.own_code_crash(FROZEN.replace("<frozen runpy>", "<string>"), "model-probe1.py") is False
+
+
+def test_guard_ignores_earlier_blocks_when_a_mock_value_list_ran_out_last():
+    log = CHAIN_HEAD + OWN
+    assert model_probes.own_code_crash(log, "model-probe1.py") is True
+    cause = PROJECT + "\nThe above exception was the direct cause of the following exception:\n\n" + OWN
+    assert model_probes.own_code_crash(cause, "model-probe1.py") is True
+
+
+def test_guard_judges_every_block_when_the_last_error_is_not_a_mock_running_out():
+    last = OWN.replace("    result = next(effect)\nStopIteration", "    raise KeyError('k')\nKeyError: 'k'")
+    assert model_probes.own_code_crash(last, "model-probe1.py") is True   # unchained: unchanged
+    assert model_probes.own_code_crash(CHAIN_HEAD + last, "model-probe1.py") is False
+
+
+def test_guard_keeps_a_final_block_that_reaches_project_or_installed_code():
+    via_project = OWN.replace('  File "/opt/py/lib/python3.14/asyncio/base_events.py"',
+                              '  File "/work/src/pkg/mod.py", line 3, in g\n    loop.time()\n'
+                              '  File "/opt/py/lib/python3.14/asyncio/base_events.py"', 1)
+    assert model_probes.own_code_crash(CHAIN_HEAD + via_project, "model-probe1.py") is False
+    via_pkg = via_project.replace("/work/src/pkg/mod.py", "/v/lib/python3.14/site-packages/dep/x.py")
+    assert model_probes.own_code_crash(CHAIN_HEAD + via_pkg, "model-probe1.py") is False
