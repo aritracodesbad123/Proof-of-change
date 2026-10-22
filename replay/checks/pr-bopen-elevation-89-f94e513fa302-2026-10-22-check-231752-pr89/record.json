@@ -1,8 +1,8 @@
 {
   "schema_version": "1",
   "record_kind": "pr_run",
-  "id": "pr-bopen-elevation-89-f94e513fa302-2026-10-22-check-1041",
-  "date_ist": "2026-10-22 10:41 IST",
+  "id": "pr-bopen-elevation-89-f94e513fa302-2026-10-22-check-231752-pr89",
+  "date_ist": "2026-10-22 23:17 IST",
   "run_date": "2026-10-22",
   "who": "ops/daily_run.py",
   "repo": "bopen/elevation",
@@ -16,7 +16,7 @@
     "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
     "head_sha": "f94e513fa302c0dd96c94eeaf0a0ac76cacd39df",
     "merge_commit": null,
-    "tested_main_sha": "f94e513fa302c0dd96c94eeaf0a0ac76cacd39df",
+    "tested_main_sha": "fd48ce75ebcdfe22b16a33c74ce276e87c47a22b",
     "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
   },
   "author": "alexamici",
@@ -25,7 +25,7 @@
   "updated_at_ist": "2026-10-21 19:29 IST",
   "ci_state": "not checked (single-PR check)",
   "ci_detail": "checked on request with --pr",
-  "tested_at_ist": "2026-10-22 10:41 IST",
+  "tested_at_ist": "2026-10-22 23:17 IST",
   "files": {
     "all": [
       ".github/workflows/on-push.yml",
@@ -98,14 +98,14 @@
     {
       "side": "old",
       "run": 1,
-      "passed": 32,
-      "failed": 5,
+      "passed": 28,
+      "failed": 4,
       "error": 0,
       "skipped": 0,
       "collection_errors": 0,
       "exit": 1,
-      "seconds": 1.7,
-      "pytest_summary": "5 failed, 32 passed in 1.22s",
+      "seconds": 4.8,
+      "pytest_summary": "                if not part or len(errpipe_data) > 50000:",
       "junit": true
     },
     {
@@ -117,21 +117,21 @@
       "skipped": 0,
       "collection_errors": 0,
       "exit": 1,
-      "seconds": 1.7,
-      "pytest_summary": "5 failed, 32 passed in 1.26s",
+      "seconds": 4.4,
+      "pytest_summary": "                        close_fds, tuple(sorted(map(int, fds_to_keep",
       "junit": true
     },
     {
       "side": "old",
       "run": 2,
-      "passed": 32,
-      "failed": 5,
+      "passed": 28,
+      "failed": 4,
       "error": 0,
       "skipped": 0,
       "collection_errors": 0,
       "exit": 1,
-      "seconds": 1.6,
-      "pytest_summary": "5 failed, 32 passed in 1.21s",
+      "seconds": 5.1,
+      "pytest_summary": "                if not part or len(errpipe_data) > 50000:",
       "junit": true
     },
     {
@@ -143,21 +143,21 @@
       "skipped": 0,
       "collection_errors": 0,
       "exit": 1,
-      "seconds": 1.7,
-      "pytest_summary": "5 failed, 32 passed in 1.22s",
+      "seconds": 4.3,
+      "pytest_summary": "                        close_fds, tuple(sorted(map(int, fds_to_keep",
       "junit": true
     },
     {
       "side": "old",
       "run": 3,
-      "passed": 32,
-      "failed": 5,
+      "passed": 28,
+      "failed": 4,
       "error": 0,
       "skipped": 0,
       "collection_errors": 0,
       "exit": 1,
-      "seconds": 1.8,
-      "pytest_summary": "5 failed, 32 passed in 1.39s",
+      "seconds": 4.4,
+      "pytest_summary": "                if not part or len(errpipe_data) > 50000:",
       "junit": true
     },
     {
@@ -169,8 +169,8 @@
       "skipped": 0,
       "collection_errors": 0,
       "exit": 1,
-      "seconds": 1.8,
-      "pytest_summary": "5 failed, 32 passed in 1.39s",
+      "seconds": 5.1,
+      "pytest_summary": "                        close_fds, tuple(sorted(map(int, fds_to_keep",
       "junit": true
     }
   ],
@@ -184,16 +184,19 @@
     "note": "model provider: nebius (Token Factory, live)",
     "blind": false
   },
-  "sandbox_backend": "local",
-  "sandbox_backend_note": "local bubblewrap",
-  "machine": "local",
+  "sandbox_backend": "contree",
+  "sandbox_backend_note": "contree (Token Factory Sandboxes, sdk 0.3.6)",
+  "machine": "contree",
+  "tool_setup": {
+    "installed": [],
+    "tries": 0,
+    "note": "All required tools were already installed.",
+    "refused": []
+  },
   "posted_upstream": false,
   "logs": "elevation-89/",
-  "freeze": {
-    "main": "freeze-main.txt",
-    "pr": "freeze-pr.txt"
-  },
-  "poc_commit": "0fa0016ea51794edee0f4a085e41bf48dd813765",
+  "freeze": {},
+  "poc_commit": "25618580a18e939d170521d132214989299ecd9f",
   "route": "source-pair",
   "current_head_sha": "f94e513fa302c0dd96c94eeaf0a0ac76cacd39df",
   "tested_invocation": 1,
@@ -217,11 +220,6 @@
       ],
       "results": [
         {
-          "title": "README.rst - bopen/elevation",
-          "url": "https://github.com/bopen/elevation/blob/main/README.rst",
-          "query": "elevation python documentation install https://github.com/bopen/elevation site:github.com/bopen/elevation"
-        },
-        {
           "title": "elevation \u00b7 PyPI",
           "url": "https://pypi.org/project/elevation/",
           "query": "elevation python install requirements https://pypi.org/project/elevation/ https://github.com/bopen/elevation site:pypi.org"
@@ -237,30 +235,35 @@
           "query": "elevation python setup install instructions https://github.com/bopen/elevation site:github.com/bopen/elevation"
         },
         {
-          "title": "Issue #34 \u00b7 bopen/elevation - Windows support",
-          "url": "https://github.com/bopen/elevation/issues/34",
+          "title": "'reference' option not implemented in Python API \u00b7 Issue #50 \u00b7 bopen/elevation \u00b7 GitHub",
+          "url": "https://github.com/bopen/elevation/issues/50",
+          "query": "elevation python documentation install https://github.com/bopen/elevation site:github.com/bopen/elevation"
+        },
+        {
+          "title": "mkdir -p not working on windows \u00b7 Issue #40 \u00b7 bopen/elevation \u00b7 GitHub",
+          "url": "https://github.com/bopen/elevation/issues/40",
           "query": "elevation python documentation install https://github.com/bopen/elevation site:github.com/bopen/elevation"
         }
       ],
-      "text": "To install the Elevation Python package, use the command `pip install elevation`. Ensure that GDAL command line tools, including `gdal_translate`, `gdalbuildvrt`, `gdalinfo`, and `ogrinfo`, are installed and working. For installation details of GDAL command line tools, refer to the GDAL install documentation. Note that Elevation version 2.0 requires Python 3.11 or later. To check your system's readiness, run the command `eio selfcheck`.\nTo install the elevation Python package, use the command `pip install elevation`. Ensure that GDAL command line tools, including `gdal_translate`, `gdalbuildvrt`, `gdalinfo`, and `ogrinfo`, are installed and working. For Windows users, it is suggested to install the gdal suite at the system level to resolve installation issues. Elevation v2.0 requires Python 3.11 or later. For GDAL installation specifics, refer to the GDAL install documentation.\nTo install the elevation Python package, you can use pip to install the latest version, which officially supports Python 3. To install the latest version, run `pip install elevation`. For versions that support Python 2, use `pip install elevation==1.0.6`. The installation of GDAL command line tools varies across operating systems. For the lidar package, it is recommended to install from the conda-forge channel due to its GDAL dependency. To install lidar, run `mamba install -c conda-forge lidar`. For the latest version, use `mamba update -c conda-forge lidar`. For development, you can install directly from GitHub using `pip install git+https://github.com/opengeos/lidar`.\nPython script to download global terrain digital elevation models, SRTM 30m DEM and SRTM 90m DEM. - elevation/README.rst at main \u00b7 bopen/elevation.\nTitle: elevation \u00b7 PyPI\nPython script to download global terrain digital elevation models, SRTM 30m DEM and SRTM 90m DEM. Elevation provides easy download, cache and access of the global datasets. SRTM 90m Digital Elevation Database v4.1. Install the latest version of Elevation. The best way to install GDAL command line tools varies across operating systems. Note that starting from *elevation* v1.1 only Python 3 is officially supported. To get the last version sporting Python 2 support please us\nTitle: lidar \u00b7 PyPI\nA Python package for delineating nested surface depressions in digital elevation data. # Welcome to the lidar package. **lidar** is Python package for delineating the nested hierarchy of surface depressions in digital elevation models (DEMs). lidar: A Python package for delineating nested surface depressions from digital elevation data. **lidar** is a Python package for delineating the nested hierarchy of. surface depressions in digital elevation models (DEMs). The **lidar** \nNote that any download policies and attribution requirements of the respective providers apply.\n\nThis Open Source project is sponsored by B-Open - .\n\n## Installation\n\nInstall the latest version of Elevation from the Python Package Index:\n\n```\npip install elevation\n```\n\nThe following dependencies need to be installed and working:\n\n GDAL command line tools, i.e. `gdal_translate`, `gdalbuildvrt`, `gdalinfo` and `ogrinfo`\n\nThe following command runs some basic checks and reports common issues: [...]\nPython install gets called. Running and installing the gdal suite at the system level fixed my problems.",
+      "text": "To install the Elevation Python package, use the command `pip install elevation`. Ensure that GDAL command line tools, including `gdal_translate`, `gdalbuildvrt`, `gdalinfo`, and `ogrinfo`, are installed and working. For installation details of GDAL command line tools, refer to the GDAL install documentation. Note that Elevation version 2.0 requires Python 3.11 or later.\nTo install the elevation Python package, use the command `pip install elevation`. Ensure that GDAL command line tools are installed and working. For Windows users, the command `mkdir -p` may not work; instead, use `mkdir`. Note that elevation v2.0 requires Python 3.11 or later. The sources do not provide information on the 'reference' option in the Python API or the specific issue of 'mkdir -p' on Windows being replaced by 'mkdir'.\nTo install the elevation Python package, you can download the latest version from PyPI. The best way to install it is via pip: `pip install elevation`. Note that starting from version 1.1, only Python 3 is officially supported. For Python 2 support, use `pip install elevation==1.0.6`. Additionally, GDAL command line tools are required, and their installation method varies across operating systems. For GDAL installation details, refer to the GDAL documentation.\nTitle: elevation \u00b7 PyPI\nPython script to download global terrain digital elevation models, SRTM 30m DEM and SRTM 90m DEM. Elevation provides easy download, cache and access of the global datasets. SRTM 90m Digital Elevation Database v4.1. Install the latest version of Elevation. The best way to install GDAL command line tools varies across operating systems. Note that starting from *elevation* v1.1 only Python 3 is officially supported. To get the last version sporting Python 2 support please us\nTitle: lidar \u00b7 PyPI\nA Python package for delineating nested surface depressions in digital elevation data. # Welcome to the lidar package. **lidar** is Python package for delineating the nested hierarchy of surface depressions in digital elevation models (DEMs). lidar: A Python package for delineating nested surface depressions from digital elevation data. **lidar** is a Python package for delineating the nested hierarchy of. surface depressions in digital elevation models (DEMs). The **lidar** \nNote that any download policies and attribution requirements of the respective providers apply.\n\nThis Open Source project is sponsored by B-Open - .\n\n## Installation\n\nInstall the latest version of Elevation from the Python Package Index:\n\n```\npip install elevation\n```\n\nThe following dependencies need to be installed and working:\n\n GDAL command line tools, i.e. `gdal_translate`, `gdalbuildvrt`, `gdalinfo` and `ogrinfo`\n\nThe following command runs some basic checks and reports common issues: [...]\nTitle: 'reference' option not implemented in Python API \u00b7 Issue #50 \u00b7 bopen/elevation \u00b7 GitHub\n## Navigation Menu. # Search code, repositories, users, issues, pull requests... You signed in with another tab or window. Reload to refresh your session. You switched accounts on another tab or window. ### Uh oh! There was an error while loading. * Notifications  You must be signed in to change notification settings. # 'reference' option not implemented in Python API\u00a0#50. ## Description. opened on Sep\nTitle: mkdir -p not working on windows \u00b7 Issue #40 \u00b7 bopen/elevation \u00b7 GitHub\n## Navigation Menu. # Search code, repositories, users, issues, pull requests... # Provide feedback. We read every piece of feedback, and take your input very seriously. # Saved searches. ## Use saved searches to filter your results more quickly. To see all available qualifiers, see our documentation. # mkdir -p not working on windows\u00a0#40. ## Description. The elevation package can create problems on Windows machine bec",
       "errors": [],
       "lines": [
         "Looked up with Tavily: 5 results",
         "Query: elevation python setup install instructions https://github.com/bopen/elevation site:github.com/bopen/elevation",
         "Query: elevation python documentation install https://github.com/bopen/elevation site:github.com/bopen/elevation",
         "Query: elevation python install requirements https://pypi.org/project/elevation/ https://github.com/bopen/elevation site:pypi.org",
-        "Source: README.rst - bopen/elevation \u2014 https://github.com/bopen/elevation/blob/main/README.rst",
         "Source: elevation \u00b7 PyPI \u2014 https://pypi.org/project/elevation/",
         "Source: lidar \u00b7 PyPI \u2014 https://pypi.org/project/lidar/",
         "Source: GitHub - bopen/elevation: Download, cache and clip global terrain digital elevation models: Mapzen terrain tiles, SRTM 30m and 90m DEMs \u00b7 GitHub \u2014 https://github.com/bopen/elevation",
-        "Source: Issue #34 \u00b7 bopen/elevation - Windows support \u2014 https://github.com/bopen/elevation/issues/34"
+        "Source: 'reference' option not implemented in Python API \u00b7 Issue #50 \u00b7 bopen/elevation \u00b7 GitHub \u2014 https://github.com/bopen/elevation/issues/50",
+        "Source: mkdir -p not working on windows \u00b7 Issue #40 \u00b7 bopen/elevation \u00b7 GitHub \u2014 https://github.com/bopen/elevation/issues/40"
       ]
     },
     "notes": [
       "Setup check: GitHub token: present.",
       "Setup check: Nebius token: present.",
-      "Setup check: free memory 9.0 GB (of 15.6 GB).",
-      "Setup check: free disk 89.1 GB.",
+      "Setup check: free memory 6.7 GB (of 15.6 GB).",
+      "Setup check: free disk 40.9 GB.",
       "Demo helper: git is installed.",
       "Demo helper: python3 is installed.",
       "Demo helper: uv is installed.",
@@ -268,16 +271,41 @@
       "Query: elevation python setup install instructions https://github.com/bopen/elevation site:github.com/bopen/elevation",
       "Query: elevation python documentation install https://github.com/bopen/elevation site:github.com/bopen/elevation",
       "Query: elevation python install requirements https://pypi.org/project/elevation/ https://github.com/bopen/elevation site:pypi.org",
-      "Source: README.rst - bopen/elevation \u2014 https://github.com/bopen/elevation/blob/main/README.rst",
       "Source: elevation \u00b7 PyPI \u2014 https://pypi.org/project/elevation/",
       "Source: lidar \u00b7 PyPI \u2014 https://pypi.org/project/lidar/",
       "Source: GitHub - bopen/elevation: Download, cache and clip global terrain digital elevation models: Mapzen terrain tiles, SRTM 30m and 90m DEMs \u00b7 GitHub \u2014 https://github.com/bopen/elevation",
-      "Source: Issue #34 \u00b7 bopen/elevation - Windows support \u2014 https://github.com/bopen/elevation/issues/34",
+      "Source: 'reference' option not implemented in Python API \u00b7 Issue #50 \u00b7 bopen/elevation \u00b7 GitHub \u2014 https://github.com/bopen/elevation/issues/50",
+      "Source: mkdir -p not working on windows \u00b7 Issue #40 \u00b7 bopen/elevation \u00b7 GitHub \u2014 https://github.com/bopen/elevation/issues/40",
+      "Setup plan: the PR changes install docs (.github/workflows/on-push.yml); setup was read from main's copy and applied the same on both sides.",
       "Setup plan: the same packages on main and pr.",
       "Setup plan: appdirs is noted, installed with the project.",
       "Setup plan: fasteners is noted, installed with the project.",
       "Setup plan: typer is noted, installed with the project.",
-      "Setup plan: Python 3.12: Python 3.12 already meets >=3.11"
+      "Setup plan: install mypy>=1.15.0 (listed in a dependency group) on main and pr.",
+      "Setup plan: install myst-parser>=4.0.1 (listed in a dependency group) on main and pr.",
+      "Setup plan: install pre-commit>=4.3.0 (listed in a dependency group) on main and pr.",
+      "Setup plan: install pydata-sphinx-theme>=0.16.1 (listed in a dependency group) on main and pr.",
+      "Setup plan: install pytest>=9.1.1 (listed in a dependency group) on main and pr.",
+      "Setup plan: install pytest-cov>=5.0 (listed in a dependency group) on main and pr.",
+      "Setup plan: install pytest-mock>=3.16.0 (listed in a dependency group) on main and pr.",
+      "Setup plan: install pytest-xdist>=3.8.0 (listed in a dependency group) on main and pr.",
+      "Setup plan: install ruff>=0.15 (listed in a dependency group) on main and pr.",
+      "Setup plan: install sphinx>=7.2 (listed in a dependency group) on main and pr.",
+      "Setup plan: install sphinx-autoapi>=3.6.0 (listed in a dependency group) on main and pr.",
+      "Setup plan: Python 3.14: auto-fix: the project needs Python 3.14 and the sandbox image has 3.12, so Python 3.14 is installed in the sandbox during setup, the same on main and pr",
+      "Auto-fix: Python 3.14 is set up automatically for this check (no flag needed).",
+      "Setup plan: Python rule: one Python version is used on both sides: the lowest version that meets the requirements of both main and the pull request; if none meets both, the check stops as a setup problem and records both."
+    ],
+    "install_docs": [
+      "CONTRIBUTING.rst",
+      "Makefile",
+      "README.md",
+      "pyproject.toml",
+      ".github/workflows/on-push.yml"
+    ],
+    "install_docs_from": "main",
+    "install_docs_pr_changed": [
+      ".github/workflows/on-push.yml"
     ],
     "setup_plan": {
       "packages": [
@@ -316,18 +344,180 @@
             "main",
             "pr"
           ]
+        },
+        {
+          "requirement": "mypy>=1.15.0",
+          "name": "mypy",
+          "kind": "dependency-group",
+          "action": "install",
+          "source": "pyproject",
+          "reason": "listed in a dependency group",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "myst-parser>=4.0.1",
+          "name": "myst-parser",
+          "kind": "dependency-group",
+          "action": "install",
+          "source": "pyproject",
+          "reason": "listed in a dependency group",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "pre-commit>=4.3.0",
+          "name": "pre-commit",
+          "kind": "dependency-group",
+          "action": "install",
+          "source": "pyproject",
+          "reason": "listed in a dependency group",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "pydata-sphinx-theme>=0.16.1",
+          "name": "pydata-sphinx-theme",
+          "kind": "dependency-group",
+          "action": "install",
+          "source": "pyproject",
+          "reason": "listed in a dependency group",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "pytest>=9.1.1",
+          "name": "pytest",
+          "kind": "dependency-group",
+          "action": "install",
+          "source": "pyproject",
+          "reason": "listed in a dependency group",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "pytest-cov>=5.0",
+          "name": "pytest-cov",
+          "kind": "dependency-group",
+          "action": "install",
+          "source": "pyproject",
+          "reason": "listed in a dependency group",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "pytest-mock>=3.16.0",
+          "name": "pytest-mock",
+          "kind": "dependency-group",
+          "action": "install",
+          "source": "pyproject",
+          "reason": "listed in a dependency group",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "pytest-xdist>=3.8.0",
+          "name": "pytest-xdist",
+          "kind": "dependency-group",
+          "action": "install",
+          "source": "pyproject",
+          "reason": "listed in a dependency group",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "ruff>=0.15",
+          "name": "ruff",
+          "kind": "dependency-group",
+          "action": "install",
+          "source": "pyproject",
+          "reason": "listed in a dependency group",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "sphinx>=7.2",
+          "name": "sphinx",
+          "kind": "dependency-group",
+          "action": "install",
+          "source": "pyproject",
+          "reason": "listed in a dependency group",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "sphinx-autoapi>=3.6.0",
+          "name": "sphinx-autoapi",
+          "kind": "dependency-group",
+          "action": "install",
+          "source": "pyproject",
+          "reason": "listed in a dependency group",
+          "sides": [
+            "main",
+            "pr"
+          ]
         }
       ],
-      "extra_reqs": [],
+      "scope_blocked": "",
+      "component": null,
+      "aggregate_names": [],
+      "extra_reqs": [
+        "mypy>=1.15.0",
+        "myst-parser>=4.0.1",
+        "pre-commit>=4.3.0",
+        "pydata-sphinx-theme>=0.16.1",
+        "pytest>=9.1.1",
+        "pytest-cov>=5.0",
+        "pytest-mock>=3.16.0",
+        "pytest-xdist>=3.8.0",
+        "ruff>=0.15",
+        "sphinx>=7.2",
+        "sphinx-autoapi>=3.6.0"
+      ],
       "python": {
-        "requested": "3.12",
+        "requested": "3.14",
         "current": "3.12",
         "applied": true,
         "switch": null,
-        "reason": "Python 3.12 already meets >=3.11"
+        "provision": "3.14",
+        "auto_fix": true,
+        "reason": "auto-fix: the project needs Python 3.14 and the sandbox image has 3.12, so Python 3.14 is installed in the sandbox during setup, the same on main and pr",
+        "rule": "one Python version is used on both sides: the lowest version that meets the requirements of both main and the pull request; if none meets both, the check stops as a setup problem and records both",
+        "gate_failed": false
       },
       "system": [],
-      "refused": []
+      "refused": [],
+      "groups_blocked": ""
+    },
+    "steps": {
+      "setup_lookup": "Found 14 setup item(s) in the project's files and the web lookup.",
+      "setup_python": "Python 3.14: auto-fix: the project needs Python 3.14 and the sandbox image has 3.12, so Python 3.14 is installed in the sandbox during setup, the same on main and pr",
+      "install_deps": "Wrote requirements.txt and installed it on main and pr: mypy>=1.15.0, myst-parser>=4.0.1, pre-commit>=4.3.0, pydata-sphinx-theme>=0.16.1, pytest>=9.1.1, pytest-cov>=5.0, pytest-mock>=3.16.0, pytest-xdist>=3.8.0, ruff>=0.15, sphinx>=7.2, sphinx-autoapi>=3.6.0. 3 more come with the project install."
+    },
+    "run_files": {
+      "requirements": "requirements.txt",
+      "plan": "setup-plan.json",
+      "count": 11
     }
   },
   "chosen": {
@@ -337,12 +527,12 @@
     "test_cmd": null
   },
   "sides": {
-    "comparison_basis": "merge-base vs PR head (no merge ref available)",
-    "main_sha": "f94e513fa302c0dd96c94eeaf0a0ac76cacd39df",
+    "comparison_basis": "merge-base of PR base (GitHub base.sha) and PR head vs PR head (the first choice of main side was the PR code itself)",
+    "main_sha": "fd48ce75ebcdfe22b16a33c74ce276e87c47a22b",
     "pr_sha": "f94e513fa302c0dd96c94eeaf0a0ac76cacd39df"
   },
   "tested": {
-    "main": "main @ f94e513fa302 (merge-base with the PR head)",
+    "main": "main @ fd48ce75ebcd (merge-base with the PR head)",
     "pr": "PR head f94e513fa302"
   },
   "probe_plan": {
@@ -352,7 +542,7 @@
     "model_claims": [
       {
         "id": "C1",
-        "text": "After the change, missing tiles are cached.",
+        "text": "The system caches missing tiles.",
         "source_quote": "Cache missing tiles",
         "testable": true,
         "expect": "differs"
@@ -364,14 +554,13 @@
       "elevation.cache.ensure_tiles",
       "elevation.datasource.seed",
       "elevation.spatial.gdal_json",
-      "elevation.spatial.is_not_found",
       "elevation.spatial.call_gdal_translate"
     ],
     "frozen": [
       {
-        "path": "model-probes/model-probe1.py",
+        "path": "model-probes/model-p1.py",
         "source": "model",
-        "sha256": "d90b2da4df7c4616c8d63a24b3aae6200388101c0478faada845c7611cd8e7e0",
+        "sha256": "5b1fe5412fe632089dd8a415c793787b9b8f50336607592f3e27e7739fefb50f",
         "generator": {
           "kind": "model",
           "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
@@ -380,22 +569,94 @@
           "provenance": "live",
           "blind": true
         },
-        "frozen_at": "2026-10-22T05:14:10.918014+00:00",
-        "inputs_sha256": "359a68db28571c24ba9631dce443e5c5d8c10ea70e1a81496e80db186ec7fe07",
+        "frozen_at": "2026-10-22T17:49:08.848525+00:00",
+        "inputs_sha256": "06bc49622602fff27a21f88ecab9f18143896107cf103f3a066d95fe53544443",
         "inputs": {
           "title_chars": 19,
           "body_chars": 0,
           "base_files": {
-            "elevation/cache.py": "e18bfae913f423db41bdff3f0f1e055d87ee48fd290a73d61ae03c16ce46e028",
-            "elevation/datasource.py": "fe0cd0919b41f60428e69a0366d95fda80a18cf848700f8091acc96fbef3ee2e",
-            "elevation/spatial.py": "a56dd7a148555db038af9abdcb31a23ff1c7f2ade8167c2b8a50f0083d86ff8b"
+            "elevation/cache.py": "603a9478ce53b1a40c6ff18137a75ffbc8ea14d09992c53d7e79f62d57a5456a",
+            "elevation/datasource.py": "a3d7c073aa41685bc27e56c65e00f47d3fd5ebc752b07d6cfe3b399c5b16e9c8",
+            "elevation/spatial.py": "b137c2f47cc66d3f856e765e59c306465ba44dbcdd017506f3da8b504b5a9d70"
+          }
+        }
+      },
+      {
+        "path": "model-probes/model-p2.py",
+        "source": "model",
+        "sha256": "2a7378cef40b7348c22de44fcd20a8f4161ccfeee5d5eef1a77988b6d5a67f0e",
+        "generator": {
+          "kind": "model",
+          "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+          "model": "nvidia/nemotron-3-super-120b-a12b",
+          "provider": "nebius",
+          "provenance": "live",
+          "blind": true
+        },
+        "frozen_at": "2026-10-22T17:49:08.848633+00:00",
+        "inputs_sha256": "06bc49622602fff27a21f88ecab9f18143896107cf103f3a066d95fe53544443",
+        "inputs": {
+          "title_chars": 19,
+          "body_chars": 0,
+          "base_files": {
+            "elevation/cache.py": "603a9478ce53b1a40c6ff18137a75ffbc8ea14d09992c53d7e79f62d57a5456a",
+            "elevation/datasource.py": "a3d7c073aa41685bc27e56c65e00f47d3fd5ebc752b07d6cfe3b399c5b16e9c8",
+            "elevation/spatial.py": "b137c2f47cc66d3f856e765e59c306465ba44dbcdd017506f3da8b504b5a9d70"
+          }
+        }
+      },
+      {
+        "path": "model-probes/model-p3.py",
+        "source": "model",
+        "sha256": "456d1c8f7c8783e58f1f9586602ec345d875933b91ef63a78d6659d5ff4e3948",
+        "generator": {
+          "kind": "model",
+          "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+          "model": "nvidia/nemotron-3-super-120b-a12b",
+          "provider": "nebius",
+          "provenance": "live",
+          "blind": true
+        },
+        "frozen_at": "2026-10-22T17:49:08.848696+00:00",
+        "inputs_sha256": "06bc49622602fff27a21f88ecab9f18143896107cf103f3a066d95fe53544443",
+        "inputs": {
+          "title_chars": 19,
+          "body_chars": 0,
+          "base_files": {
+            "elevation/cache.py": "603a9478ce53b1a40c6ff18137a75ffbc8ea14d09992c53d7e79f62d57a5456a",
+            "elevation/datasource.py": "a3d7c073aa41685bc27e56c65e00f47d3fd5ebc752b07d6cfe3b399c5b16e9c8",
+            "elevation/spatial.py": "b137c2f47cc66d3f856e765e59c306465ba44dbcdd017506f3da8b504b5a9d70"
+          }
+        }
+      },
+      {
+        "path": "model-probes/model-p4.py",
+        "source": "model",
+        "sha256": "80a1b4f01b13bb64a49d008d2add9913b08af360b4161b9d8393754a0938fdaf",
+        "generator": {
+          "kind": "model",
+          "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+          "model": "nvidia/nemotron-3-super-120b-a12b",
+          "provider": "nebius",
+          "provenance": "live",
+          "blind": true
+        },
+        "frozen_at": "2026-10-22T17:49:08.848748+00:00",
+        "inputs_sha256": "06bc49622602fff27a21f88ecab9f18143896107cf103f3a066d95fe53544443",
+        "inputs": {
+          "title_chars": 19,
+          "body_chars": 0,
+          "base_files": {
+            "elevation/cache.py": "603a9478ce53b1a40c6ff18137a75ffbc8ea14d09992c53d7e79f62d57a5456a",
+            "elevation/datasource.py": "a3d7c073aa41685bc27e56c65e00f47d3fd5ebc752b07d6cfe3b399c5b16e9c8",
+            "elevation/spatial.py": "b137c2f47cc66d3f856e765e59c306465ba44dbcdd017506f3da8b504b5a9d70"
           }
         }
       },
       {
         "path": "diff-probes/diff-api.py",
         "source": "diff",
-        "sha256": "1a7190729261d71b7dd576b39021b139790a6d435d34c4203cb18f16a4bbe5b5",
+        "sha256": "a765b2f671654a34fa7d358cea5f2b65ea4d601c043644548097c5098fa09e72",
         "generator": {
           "kind": "diff",
           "label": "diff (auto-derived from base-side code, model-free)",
@@ -404,25 +665,21 @@
           "provenance": "auto-derived",
           "blind": false
         },
-        "frozen_at": "2026-10-22T05:14:10.934250+00:00",
-        "inputs_sha256": "a4e97b4f31455cbcadf5c236accb4b38645599f2e901d3386af45b57dcbf3603",
+        "frozen_at": "2026-10-22T17:49:08.854439+00:00",
+        "inputs_sha256": "465cf77089abc32fa64862ed4ed9d1b6ee47438aa5f5c8178f2b5955610cfc97",
         "inputs": {
           "title_chars": 0,
           "body_chars": 0,
           "base_files": {
-            "elevation/cache.py": "e18bfae913f423db41bdff3f0f1e055d87ee48fd290a73d61ae03c16ce46e028",
-            "elevation/datasource.py": "fe0cd0919b41f60428e69a0366d95fda80a18cf848700f8091acc96fbef3ee2e",
-            "elevation/spatial.py": "a56dd7a148555db038af9abdcb31a23ff1c7f2ade8167c2b8a50f0083d86ff8b"
+            "elevation/cache.py": "603a9478ce53b1a40c6ff18137a75ffbc8ea14d09992c53d7e79f62d57a5456a",
+            "elevation/datasource.py": "a3d7c073aa41685bc27e56c65e00f47d3fd5ebc752b07d6cfe3b399c5b16e9c8",
+            "elevation/spatial.py": "b137c2f47cc66d3f856e765e59c306465ba44dbcdd017506f3da8b504b5a9d70"
           }
         }
       }
     ]
   },
-  "test_extras": [
-    "pytest-mock>=3.16.0",
-    "pytest-xdist>=3.8.0"
-  ],
-  "pr_side_started_at": "2026-10-22T05:14:11.066831+00:00",
+  "pr_side_started_at": "2026-10-22T17:49:08.854655+00:00",
   "test_targets": {
     "main": [
       "tests/test_10_spatial.py",
@@ -433,18 +690,61 @@
       "tests/test_20_datasource.py"
     ]
   },
-  "installed_commit": {
-    "main": {
-      "dist": "elevation",
-      "expected": "f94e513fa302c0dd96c94eeaf0a0ac76cacd39df",
-      "installed": "f94e513fa302c0dd96c94eeaf0a0ac76cacd39df",
-      "ok": true
-    },
-    "pr": {
-      "dist": "elevation",
-      "expected": "f94e513fa302c0dd96c94eeaf0a0ac76cacd39df",
-      "installed": "f94e513fa302c0dd96c94eeaf0a0ac76cacd39df",
-      "ok": true
+  "contree_only": {
+    "note": "Contree mode: installs, tests and probes ran in Contree; nothing from the pull request ran locally",
+    "declared_test_deps": [
+      "pytest-mock>=3.16.0",
+      "pytest-xdist>=3.8.0"
+    ],
+    "optional_backends": [],
+    "not_run_locally": [
+      "local freeze",
+      "installed-commit guard",
+      "probe coverage",
+      "optional-module retry"
+    ]
+  },
+  "coverage": {
+    "status": "measured",
+    "changed_lines_total": 20,
+    "changed_lines_covered": 20,
+    "files": [
+      {
+        "file": "elevation/cache.py",
+        "changed_lines_total": 2,
+        "changed_lines_covered": 2
+      },
+      {
+        "file": "elevation/datasource.py",
+        "changed_lines_total": 0,
+        "changed_lines_covered": 0
+      },
+      {
+        "file": "elevation/spatial.py",
+        "changed_lines_total": 18,
+        "changed_lines_covered": 18
+      }
+    ],
+    "seconds": 6.6,
+    "exit": 1,
+    "log": "coverage-pytest.log",
+    "where": "contree"
+  },
+  "contree": {
+    "main_uuid": "2f41546e-18f8-4a5d-8ff0-af0f7c4bdcf9",
+    "pr_uuid": "aa2b354a-093d-4224-822d-be1bdfc5ed73",
+    "max_ops": 40,
+    "sdk": "0.3.6",
+    "base_image": "docker.io/library/python:3.12-slim-bookworm",
+    "python": {
+      "requires_python": [
+        ">=3.11",
+        "==3.14.*"
+      ],
+      "requires_python_found": true,
+      "main": "3.14.8",
+      "pr": "3.14.8",
+      "problems": []
     }
   },
   "declared_test_deps": {
@@ -452,15 +752,22 @@
       "pytest-mock>=3.16.0",
       "pytest-xdist>=3.8.0"
     ],
-    "installed": true
+    "installed": true,
+    "where": "contree"
   },
+  "test_extras": [
+    "pytest-mock>=3.16.0",
+    "pytest-xdist>=3.8.0"
+  ],
   "comparison": {
-    "same": 37,
+    "same": 32,
     "same_skipped_both": 0,
     "regressions": [],
     "fixed": [],
-    "new_tests_passing": 0,
-    "new_tests_failing": [],
+    "new_tests_passing": 4,
+    "new_tests_failing": [
+      "tests.test_10_spatial::test_call_gdal_translate_empty_on_notfound_local"
+    ],
     "new_tests_skipped": [],
     "removed_tests": [],
     "reparametrized": [],
@@ -472,7 +779,6 @@
     "other_changes": [],
     "preexisting_failures": [
       "tests.test_10_spatial::test_call_gdal_translate",
-      "tests.test_10_spatial::test_call_gdal_translate_empty_on_notfound_local",
       "tests.test_10_spatial::test_import_bounds_invalid",
       "tests.test_10_spatial::test_import_bounds_raster",
       "tests.test_10_spatial::test_import_bounds_vector"
@@ -481,235 +787,146 @@
     "load_failed_pr": [],
     "load_failed_main": [],
     "executed": {
-      "main": 37,
+      "main": 32,
       "pr": 37
     },
-    "messages": {}
+    "messages": {
+      "tests.test_10_spatial::test_call_gdal_translate_empty_on_notfound_local": "FileNotFoundError: [Errno 2] No such file or directory: 'gdal_translate'"
+    }
   },
   "exit_check": {
     "explained": true,
     "problems": [],
-    "detail": "pytest exit 1; 5 failure(s)/error(s) pre-existing and identical on both sides"
-  },
-  "coverage": {
-    "status": "measured",
-    "changed_lines_total": 0,
-    "changed_lines_covered": 0,
-    "files": [
-      {
-        "file": "elevation/cache.py",
-        "changed_lines_total": 0,
-        "changed_lines_covered": 0
-      },
-      {
-        "file": "elevation/datasource.py",
-        "changed_lines_total": 0,
-        "changed_lines_covered": 0
-      },
-      {
-        "file": "elevation/spatial.py",
-        "changed_lines_total": 0,
-        "changed_lines_covered": 0
-      }
-    ],
-    "seconds": 2.6,
-    "exit": 1,
-    "log": "coverage-pytest.log"
+    "detail": "pytest exit 1; 4 failure(s)/error(s) pre-existing and identical on both sides"
   },
   "probes": {
     "status": "ran",
     "items": [
       {
-        "id": "model-probe1",
+        "id": "model-p1",
         "source": "model",
-        "path": "model-probes/model-probe1.py",
-        "sha256": "d90b2da4df7c4616c8d63a24b3aae6200388101c0478faada845c7611cd8e7e0",
+        "path": "model-probes/model-p1.py",
+        "sha256": "5b1fe5412fe632089dd8a415c793787b9b8f50336607592f3e27e7739fefb50f",
         "target": "bopen/elevation#89",
-        "about": "Test caching behavior of missing tiles",
-        "claims": [
-          {
-            "id": "C1",
-            "source": "PR description",
-            "text": "After the change, missing tiles are cached.",
-            "covers": [
-              "tile_cached_after_*",
-              "spool_files_count",
-              "exception_type"
-            ],
-            "expect": "differs"
-          }
-        ],
+        "about": "Test is_cached returns False for missing tile",
+        "claims": [],
         "runs_per_side": 3,
         "per_run": [
           {
             "side": "main",
             "run": 1,
-            "seconds": 0.1,
-            "ok": true
+            "seconds": 1.9,
+            "ok": false
           },
           {
             "side": "pr",
             "run": 1,
-            "seconds": 0.1,
-            "ok": true
+            "seconds": 1.2,
+            "ok": false
           },
           {
             "side": "main",
             "run": 2,
-            "seconds": 0.1,
-            "ok": true
+            "seconds": 1.2,
+            "ok": false
           },
           {
             "side": "pr",
             "run": 2,
-            "seconds": 0.1,
-            "ok": true
+            "seconds": 1.5,
+            "ok": false
           },
           {
             "side": "main",
             "run": 3,
-            "seconds": 0.1,
-            "ok": true
+            "seconds": 1.2,
+            "ok": false
           },
           {
             "side": "pr",
             "run": 3,
-            "seconds": 0.1,
-            "ok": true
+            "seconds": 1.2,
+            "ok": false
           }
         ],
         "outputs": {
           "main": [
-            "probe-model-probe1-main-1.jsonl",
-            "probe-model-probe1-main-2.jsonl",
-            "probe-model-probe1-main-3.jsonl"
+            "probe-model-p1-main-1.jsonl",
+            "probe-model-p1-main-2.jsonl",
+            "probe-model-p1-main-3.jsonl"
           ],
           "pr": [
-            "probe-model-probe1-pr-1.jsonl",
-            "probe-model-probe1-pr-2.jsonl",
-            "probe-model-probe1-pr-3.jsonl"
+            "probe-model-p1-pr-1.jsonl",
+            "probe-model-p1-pr-2.jsonl",
+            "probe-model-p1-pr-3.jsonl"
           ]
         },
         "runs": {
           "main": [
             {
-              "tile_cached_after_ensure": false,
-              "tile_file_size": 0,
-              "spool_files_count": 0,
-              "exception_type": "FileNotFoundError"
+              "probe.error": {
+                "crash": "non-json output",
+                "exit_code": 1
+              }
             },
             {
-              "tile_cached_after_ensure": false,
-              "tile_file_size": 0,
-              "spool_files_count": 0,
-              "exception_type": "FileNotFoundError"
+              "probe.error": {
+                "crash": "non-json output",
+                "exit_code": 1
+              }
             },
             {
-              "tile_cached_after_ensure": false,
-              "tile_file_size": 0,
-              "spool_files_count": 0,
-              "exception_type": "FileNotFoundError"
+              "probe.error": {
+                "crash": "non-json output",
+                "exit_code": 1
+              }
             }
           ],
           "pr": [
             {
-              "tile_cached_after_ensure": false,
-              "tile_file_size": 0,
-              "spool_files_count": 0,
-              "exception_type": "FileNotFoundError"
+              "probe.error": {
+                "crash": "non-json output",
+                "exit_code": 1
+              }
             },
             {
-              "tile_cached_after_ensure": false,
-              "tile_file_size": 0,
-              "spool_files_count": 0,
-              "exception_type": "FileNotFoundError"
+              "probe.error": {
+                "crash": "non-json output",
+                "exit_code": 1
+              }
             },
             {
-              "tile_cached_after_ensure": false,
-              "tile_file_size": 0,
-              "spool_files_count": 0,
-              "exception_type": "FileNotFoundError"
+              "probe.error": {
+                "crash": "non-json output",
+                "exit_code": 1
+              }
             }
           ]
         },
         "observations": [
           {
-            "name": "exception_type",
+            "name": "probe.error",
             "state": "same",
-            "label": "needs_human",
-            "claim": "C1",
-            "main": "FileNotFoundError",
-            "pr": "FileNotFoundError",
-            "citations": {
-              "main": {
-                "file": "probe-model-probe1-main-1.jsonl",
-                "line": 1,
-                "quote": "\"observation\": \"exception_type\""
-              },
-              "pr": {
-                "file": "probe-model-probe1-pr-1.jsonl",
-                "line": 1,
-                "quote": "\"observation\": \"exception_type\""
-              }
-            }
-          },
-          {
-            "name": "spool_files_count",
-            "state": "same",
-            "label": "needs_human",
-            "claim": "C1",
-            "main": 0,
-            "pr": 0,
-            "citations": {
-              "main": {
-                "file": "probe-model-probe1-main-1.jsonl",
-                "line": 2,
-                "quote": "\"observation\": \"spool_files_count\""
-              },
-              "pr": {
-                "file": "probe-model-probe1-pr-1.jsonl",
-                "line": 2,
-                "quote": "\"observation\": \"spool_files_count\""
-              }
-            }
-          },
-          {
-            "name": "tile_cached_after_ensure",
-            "state": "same",
-            "label": "needs_human",
-            "claim": "C1",
-            "main": false,
-            "pr": false,
-            "citations": {
-              "main": {
-                "file": "probe-model-probe1-main-1.jsonl",
-                "line": 3,
-                "quote": "\"observation\": \"tile_cached_after_ensure\""
-              },
-              "pr": {
-                "file": "probe-model-probe1-pr-1.jsonl",
-                "line": 3,
-                "quote": "\"observation\": \"tile_cached_after_ensure\""
-              }
-            }
-          },
-          {
-            "name": "tile_file_size",
-            "state": "same",
-            "label": "no_difference",
+            "label": "not_testable",
             "claim": null,
-            "main": 0,
-            "pr": 0,
+            "main": {
+              "crash": "non-json output",
+              "exit_code": 1
+            },
+            "pr": {
+              "crash": "non-json output",
+              "exit_code": 1
+            },
             "citations": {
               "main": {
-                "file": "probe-model-probe1-main-1.jsonl",
-                "line": 4,
-                "quote": "\"observation\": \"tile_file_size\""
+                "file": "probe-model-p1-main-1.jsonl",
+                "line": 1,
+                "quote": "\"observation\": \"probe.error\""
               },
               "pr": {
-                "file": "probe-model-probe1-pr-1.jsonl",
-                "line": 4,
-                "quote": "\"observation\": \"tile_file_size\""
+                "file": "probe-model-p1-pr-1.jsonl",
+                "line": 1,
+                "quote": "\"observation\": \"probe.error\""
               }
             }
           }
@@ -723,7 +940,7 @@
           "blind": true
         },
         "freeze": {
-          "sha256": "d90b2da4df7c4616c8d63a24b3aae6200388101c0478faada845c7611cd8e7e0",
+          "sha256": "5b1fe5412fe632089dd8a415c793787b9b8f50336607592f3e27e7739fefb50f",
           "generator": {
             "kind": "model",
             "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
@@ -732,53 +949,544 @@
             "provenance": "live",
             "blind": true
           },
-          "frozen_at": "2026-10-22T05:14:10.918014+00:00",
-          "inputs_sha256": "359a68db28571c24ba9631dce443e5c5d8c10ea70e1a81496e80db186ec7fe07",
+          "frozen_at": "2026-10-22T17:49:08.848525+00:00",
+          "inputs_sha256": "06bc49622602fff27a21f88ecab9f18143896107cf103f3a066d95fe53544443",
           "inputs": {
             "title_chars": 19,
             "body_chars": 0,
             "base_files": {
-              "elevation/cache.py": "e18bfae913f423db41bdff3f0f1e055d87ee48fd290a73d61ae03c16ce46e028",
-              "elevation/datasource.py": "fe0cd0919b41f60428e69a0366d95fda80a18cf848700f8091acc96fbef3ee2e",
-              "elevation/spatial.py": "a56dd7a148555db038af9abdcb31a23ff1c7f2ade8167c2b8a50f0083d86ff8b"
+              "elevation/cache.py": "603a9478ce53b1a40c6ff18137a75ffbc8ea14d09992c53d7e79f62d57a5456a",
+              "elevation/datasource.py": "a3d7c073aa41685bc27e56c65e00f47d3fd5ebc752b07d6cfe3b399c5b16e9c8",
+              "elevation/spatial.py": "b137c2f47cc66d3f856e765e59c306465ba44dbcdd017506f3da8b504b5a9d70"
             }
           },
           "verified": true,
-          "pr_started_at": "2026-10-22T05:14:11.066831+00:00"
+          "pr_started_at": "2026-10-22T17:49:08.854655+00:00"
         },
         "probe_changed_line_coverage": {
-          "status": "measured",
-          "changed_lines_total": 0,
-          "changed_lines_covered": 0,
-          "files": [
+          "status": "not measured",
+          "why": "Contree-only check: probe coverage needs a local side",
+          "adequacy": "not_adequate",
+          "note": "the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate"
+        },
+        "status": "crashed",
+        "uninformative_reason": "the probe crashed or printed no parsed output on every main-side run"
+      },
+      {
+        "id": "model-p2",
+        "source": "model",
+        "path": "model-probes/model-p2.py",
+        "sha256": "2a7378cef40b7348c22de44fcd20a8f4161ccfeee5d5eef1a77988b6d5a67f0e",
+        "target": "bopen/elevation#89",
+        "about": "Test is_cached returns True after creating file",
+        "claims": [],
+        "runs_per_side": 3,
+        "per_run": [
+          {
+            "side": "main",
+            "run": 1,
+            "seconds": 1.4,
+            "ok": false
+          },
+          {
+            "side": "pr",
+            "run": 1,
+            "seconds": 1.7,
+            "ok": false
+          },
+          {
+            "side": "main",
+            "run": 2,
+            "seconds": 1.2,
+            "ok": false
+          },
+          {
+            "side": "pr",
+            "run": 2,
+            "seconds": 1.2,
+            "ok": false
+          },
+          {
+            "side": "main",
+            "run": 3,
+            "seconds": 1.2,
+            "ok": false
+          },
+          {
+            "side": "pr",
+            "run": 3,
+            "seconds": 1.2,
+            "ok": false
+          }
+        ],
+        "outputs": {
+          "main": [
+            "probe-model-p2-main-1.jsonl",
+            "probe-model-p2-main-2.jsonl",
+            "probe-model-p2-main-3.jsonl"
+          ],
+          "pr": [
+            "probe-model-p2-pr-1.jsonl",
+            "probe-model-p2-pr-2.jsonl",
+            "probe-model-p2-pr-3.jsonl"
+          ]
+        },
+        "runs": {
+          "main": [
             {
-              "file": "elevation/cache.py",
-              "changed_lines_total": 0,
-              "changed_lines_covered": 0
+              "probe.error": {
+                "crash": "non-json output",
+                "exit_code": 1
+              }
             },
             {
-              "file": "elevation/datasource.py",
-              "changed_lines_total": 0,
-              "changed_lines_covered": 0
+              "probe.error": {
+                "crash": "non-json output",
+                "exit_code": 1
+              }
             },
             {
-              "file": "elevation/spatial.py",
-              "changed_lines_total": 0,
-              "changed_lines_covered": 0
+              "probe.error": {
+                "crash": "non-json output",
+                "exit_code": 1
+              }
             }
           ],
-          "adequacy": "not_adequate",
-          "note": "no changed executable line exists on the main side (new files, comments or docstrings only), so the probe cannot be shown to reach the change",
-          "exit": 0,
-          "data": "probe-cov-model-probe1.json"
+          "pr": [
+            {
+              "probe.error": {
+                "crash": "non-json output",
+                "exit_code": 1
+              }
+            },
+            {
+              "probe.error": {
+                "crash": "non-json output",
+                "exit_code": 1
+              }
+            },
+            {
+              "probe.error": {
+                "crash": "non-json output",
+                "exit_code": 1
+              }
+            }
+          ]
         },
-        "status": "ran"
+        "observations": [
+          {
+            "name": "probe.error",
+            "state": "same",
+            "label": "not_testable",
+            "claim": null,
+            "main": {
+              "crash": "non-json output",
+              "exit_code": 1
+            },
+            "pr": {
+              "crash": "non-json output",
+              "exit_code": 1
+            },
+            "citations": {
+              "main": {
+                "file": "probe-model-p2-main-1.jsonl",
+                "line": 1,
+                "quote": "\"observation\": \"probe.error\""
+              },
+              "pr": {
+                "file": "probe-model-p2-pr-1.jsonl",
+                "line": 1,
+                "quote": "\"observation\": \"probe.error\""
+              }
+            }
+          }
+        ],
+        "generator": {
+          "kind": "model",
+          "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+          "model": "nvidia/nemotron-3-super-120b-a12b",
+          "provider": "nebius",
+          "provenance": "live",
+          "blind": true
+        },
+        "freeze": {
+          "sha256": "2a7378cef40b7348c22de44fcd20a8f4161ccfeee5d5eef1a77988b6d5a67f0e",
+          "generator": {
+            "kind": "model",
+            "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+            "model": "nvidia/nemotron-3-super-120b-a12b",
+            "provider": "nebius",
+            "provenance": "live",
+            "blind": true
+          },
+          "frozen_at": "2026-10-22T17:49:08.848633+00:00",
+          "inputs_sha256": "06bc49622602fff27a21f88ecab9f18143896107cf103f3a066d95fe53544443",
+          "inputs": {
+            "title_chars": 19,
+            "body_chars": 0,
+            "base_files": {
+              "elevation/cache.py": "603a9478ce53b1a40c6ff18137a75ffbc8ea14d09992c53d7e79f62d57a5456a",
+              "elevation/datasource.py": "a3d7c073aa41685bc27e56c65e00f47d3fd5ebc752b07d6cfe3b399c5b16e9c8",
+              "elevation/spatial.py": "b137c2f47cc66d3f856e765e59c306465ba44dbcdd017506f3da8b504b5a9d70"
+            }
+          },
+          "verified": true,
+          "pr_started_at": "2026-10-22T17:49:08.854655+00:00"
+        },
+        "probe_changed_line_coverage": {
+          "status": "not measured",
+          "why": "Contree-only check: probe coverage needs a local side",
+          "adequacy": "not_adequate",
+          "note": "the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate"
+        },
+        "status": "crashed",
+        "uninformative_reason": "the probe crashed or printed no parsed output on every main-side run"
+      },
+      {
+        "id": "model-p3",
+        "source": "model",
+        "path": "model-probes/model-p3.py",
+        "sha256": "456d1c8f7c8783e58f1f9586602ec345d875933b91ef63a78d6659d5ff4e3948",
+        "target": "bopen/elevation#89",
+        "about": "Test ensure_tiles raises exception when tile missing (GDAL not available)",
+        "claims": [],
+        "runs_per_side": 3,
+        "per_run": [
+          {
+            "side": "main",
+            "run": 1,
+            "seconds": 1.9,
+            "ok": false
+          },
+          {
+            "side": "pr",
+            "run": 1,
+            "seconds": 1.7,
+            "ok": false
+          },
+          {
+            "side": "main",
+            "run": 2,
+            "seconds": 1.2,
+            "ok": false
+          },
+          {
+            "side": "pr",
+            "run": 2,
+            "seconds": 1.2,
+            "ok": false
+          },
+          {
+            "side": "main",
+            "run": 3,
+            "seconds": 1.2,
+            "ok": false
+          },
+          {
+            "side": "pr",
+            "run": 3,
+            "seconds": 1.7,
+            "ok": false
+          }
+        ],
+        "outputs": {
+          "main": [
+            "probe-model-p3-main-1.jsonl",
+            "probe-model-p3-main-2.jsonl",
+            "probe-model-p3-main-3.jsonl"
+          ],
+          "pr": [
+            "probe-model-p3-pr-1.jsonl",
+            "probe-model-p3-pr-2.jsonl",
+            "probe-model-p3-pr-3.jsonl"
+          ]
+        },
+        "runs": {
+          "main": [
+            {
+              "probe.error": {
+                "crash": "non-json output",
+                "exit_code": 0
+              }
+            },
+            {
+              "probe.error": {
+                "crash": "non-json output",
+                "exit_code": 0
+              }
+            },
+            {
+              "probe.error": {
+                "crash": "non-json output",
+                "exit_code": 0
+              }
+            }
+          ],
+          "pr": [
+            {
+              "probe.error": {
+                "crash": "non-json output",
+                "exit_code": 0
+              }
+            },
+            {
+              "probe.error": {
+                "crash": "non-json output",
+                "exit_code": 0
+              }
+            },
+            {
+              "probe.error": {
+                "crash": "non-json output",
+                "exit_code": 0
+              }
+            }
+          ]
+        },
+        "observations": [
+          {
+            "name": "probe.error",
+            "state": "same",
+            "label": "not_testable",
+            "claim": null,
+            "main": {
+              "crash": "non-json output",
+              "exit_code": 0
+            },
+            "pr": {
+              "crash": "non-json output",
+              "exit_code": 0
+            },
+            "citations": {
+              "main": {
+                "file": "probe-model-p3-main-1.jsonl",
+                "line": 1,
+                "quote": "\"observation\": \"probe.error\""
+              },
+              "pr": {
+                "file": "probe-model-p3-pr-1.jsonl",
+                "line": 1,
+                "quote": "\"observation\": \"probe.error\""
+              }
+            }
+          }
+        ],
+        "generator": {
+          "kind": "model",
+          "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+          "model": "nvidia/nemotron-3-super-120b-a12b",
+          "provider": "nebius",
+          "provenance": "live",
+          "blind": true
+        },
+        "freeze": {
+          "sha256": "456d1c8f7c8783e58f1f9586602ec345d875933b91ef63a78d6659d5ff4e3948",
+          "generator": {
+            "kind": "model",
+            "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+            "model": "nvidia/nemotron-3-super-120b-a12b",
+            "provider": "nebius",
+            "provenance": "live",
+            "blind": true
+          },
+          "frozen_at": "2026-10-22T17:49:08.848696+00:00",
+          "inputs_sha256": "06bc49622602fff27a21f88ecab9f18143896107cf103f3a066d95fe53544443",
+          "inputs": {
+            "title_chars": 19,
+            "body_chars": 0,
+            "base_files": {
+              "elevation/cache.py": "603a9478ce53b1a40c6ff18137a75ffbc8ea14d09992c53d7e79f62d57a5456a",
+              "elevation/datasource.py": "a3d7c073aa41685bc27e56c65e00f47d3fd5ebc752b07d6cfe3b399c5b16e9c8",
+              "elevation/spatial.py": "b137c2f47cc66d3f856e765e59c306465ba44dbcdd017506f3da8b504b5a9d70"
+            }
+          },
+          "verified": true,
+          "pr_started_at": "2026-10-22T17:49:08.854655+00:00"
+        },
+        "probe_changed_line_coverage": {
+          "status": "not measured",
+          "why": "Contree-only check: probe coverage needs a local side",
+          "adequacy": "not_adequate",
+          "note": "the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate"
+        },
+        "status": "crashed",
+        "uninformative_reason": "the probe crashed or printed no parsed output on every main-side run"
+      },
+      {
+        "id": "model-p4",
+        "source": "model",
+        "path": "model-probes/model-p4.py",
+        "sha256": "80a1b4f01b13bb64a49d008d2add9913b08af360b4161b9d8393754a0938fdaf",
+        "target": "bopen/elevation#89",
+        "about": "Test ensure_tiles does not raise when tile already cached",
+        "claims": [],
+        "runs_per_side": 3,
+        "per_run": [
+          {
+            "side": "main",
+            "run": 1,
+            "seconds": 1.4,
+            "ok": false
+          },
+          {
+            "side": "pr",
+            "run": 1,
+            "seconds": 1.2,
+            "ok": false
+          },
+          {
+            "side": "main",
+            "run": 2,
+            "seconds": 1.2,
+            "ok": false
+          },
+          {
+            "side": "pr",
+            "run": 2,
+            "seconds": 1.7,
+            "ok": false
+          },
+          {
+            "side": "main",
+            "run": 3,
+            "seconds": 1.2,
+            "ok": false
+          },
+          {
+            "side": "pr",
+            "run": 3,
+            "seconds": 1.7,
+            "ok": false
+          }
+        ],
+        "outputs": {
+          "main": [
+            "probe-model-p4-main-1.jsonl",
+            "probe-model-p4-main-2.jsonl",
+            "probe-model-p4-main-3.jsonl"
+          ],
+          "pr": [
+            "probe-model-p4-pr-1.jsonl",
+            "probe-model-p4-pr-2.jsonl",
+            "probe-model-p4-pr-3.jsonl"
+          ]
+        },
+        "runs": {
+          "main": [
+            {
+              "probe.error": {
+                "crash": "non-json output",
+                "exit_code": 0
+              }
+            },
+            {
+              "probe.error": {
+                "crash": "non-json output",
+                "exit_code": 0
+              }
+            },
+            {
+              "probe.error": {
+                "crash": "non-json output",
+                "exit_code": 0
+              }
+            }
+          ],
+          "pr": [
+            {
+              "probe.error": {
+                "crash": "non-json output",
+                "exit_code": 0
+              }
+            },
+            {
+              "probe.error": {
+                "crash": "non-json output",
+                "exit_code": 0
+              }
+            },
+            {
+              "probe.error": {
+                "crash": "non-json output",
+                "exit_code": 0
+              }
+            }
+          ]
+        },
+        "observations": [
+          {
+            "name": "probe.error",
+            "state": "same",
+            "label": "not_testable",
+            "claim": null,
+            "main": {
+              "crash": "non-json output",
+              "exit_code": 0
+            },
+            "pr": {
+              "crash": "non-json output",
+              "exit_code": 0
+            },
+            "citations": {
+              "main": {
+                "file": "probe-model-p4-main-1.jsonl",
+                "line": 1,
+                "quote": "\"observation\": \"probe.error\""
+              },
+              "pr": {
+                "file": "probe-model-p4-pr-1.jsonl",
+                "line": 1,
+                "quote": "\"observation\": \"probe.error\""
+              }
+            }
+          }
+        ],
+        "generator": {
+          "kind": "model",
+          "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+          "model": "nvidia/nemotron-3-super-120b-a12b",
+          "provider": "nebius",
+          "provenance": "live",
+          "blind": true
+        },
+        "freeze": {
+          "sha256": "80a1b4f01b13bb64a49d008d2add9913b08af360b4161b9d8393754a0938fdaf",
+          "generator": {
+            "kind": "model",
+            "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+            "model": "nvidia/nemotron-3-super-120b-a12b",
+            "provider": "nebius",
+            "provenance": "live",
+            "blind": true
+          },
+          "frozen_at": "2026-10-22T17:49:08.848748+00:00",
+          "inputs_sha256": "06bc49622602fff27a21f88ecab9f18143896107cf103f3a066d95fe53544443",
+          "inputs": {
+            "title_chars": 19,
+            "body_chars": 0,
+            "base_files": {
+              "elevation/cache.py": "603a9478ce53b1a40c6ff18137a75ffbc8ea14d09992c53d7e79f62d57a5456a",
+              "elevation/datasource.py": "a3d7c073aa41685bc27e56c65e00f47d3fd5ebc752b07d6cfe3b399c5b16e9c8",
+              "elevation/spatial.py": "b137c2f47cc66d3f856e765e59c306465ba44dbcdd017506f3da8b504b5a9d70"
+            }
+          },
+          "verified": true,
+          "pr_started_at": "2026-10-22T17:49:08.854655+00:00"
+        },
+        "probe_changed_line_coverage": {
+          "status": "not measured",
+          "why": "Contree-only check: probe coverage needs a local side",
+          "adequacy": "not_adequate",
+          "note": "the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate"
+        },
+        "status": "crashed",
+        "uninformative_reason": "the probe crashed or printed no parsed output on every main-side run"
       },
       {
         "id": "diff-api",
         "source": "diff",
         "path": "diff-probes/diff-api.py",
-        "sha256": "1a7190729261d71b7dd576b39021b139790a6d435d34c4203cb18f16a4bbe5b5",
+        "sha256": "a765b2f671654a34fa7d358cea5f2b65ea4d601c043644548097c5098fa09e72",
         "target": "bopen/elevation#89",
         "about": "Public functions touched by the PR, called with type-appropriate inputs on both sides.",
         "claims": [],
@@ -787,37 +1495,37 @@
           {
             "side": "main",
             "run": 1,
-            "seconds": 0.1,
+            "seconds": 1.4,
             "ok": true
           },
           {
             "side": "pr",
             "run": 1,
-            "seconds": 0.1,
+            "seconds": 1.7,
             "ok": true
           },
           {
             "side": "main",
             "run": 2,
-            "seconds": 0.1,
+            "seconds": 1.2,
             "ok": true
           },
           {
             "side": "pr",
             "run": 2,
-            "seconds": 0.1,
+            "seconds": 1.7,
             "ok": true
           },
           {
             "side": "main",
             "run": 3,
-            "seconds": 0.1,
+            "seconds": 1.2,
             "ok": true
           },
           {
             "side": "pr",
             "run": 3,
-            "seconds": 0.1,
+            "seconds": 1.2,
             "ok": true
           }
         ],
@@ -976,42 +1684,6 @@
               },
               "elevation.spatial.gdal_json.input9": {
                 "raises": "PermissionError"
-              },
-              "elevation.spatial.is_not_found.input0": {
-                "raises": "ValueError"
-              },
-              "elevation.spatial.is_not_found.input1": {
-                "raises": "ValueError"
-              },
-              "elevation.spatial.is_not_found.input10": {
-                "raises": "ValueError"
-              },
-              "elevation.spatial.is_not_found.input11": {
-                "raises": "ValueError"
-              },
-              "elevation.spatial.is_not_found.input2": {
-                "raises": "ValueError"
-              },
-              "elevation.spatial.is_not_found.input3": {
-                "raises": "ValueError"
-              },
-              "elevation.spatial.is_not_found.input4": {
-                "raises": "ValueError"
-              },
-              "elevation.spatial.is_not_found.input5": {
-                "raises": "ValueError"
-              },
-              "elevation.spatial.is_not_found.input6": {
-                "raises": "ValueError"
-              },
-              "elevation.spatial.is_not_found.input7": {
-                "raises": "ValueError"
-              },
-              "elevation.spatial.is_not_found.input8": {
-                "raises": "ValueError"
-              },
-              "elevation.spatial.is_not_found.input9": {
-                "raises": "ValueError"
               }
             },
             {
@@ -1155,42 +1827,6 @@
               },
               "elevation.spatial.gdal_json.input9": {
                 "raises": "PermissionError"
-              },
-              "elevation.spatial.is_not_found.input0": {
-                "raises": "ValueError"
-              },
-              "elevation.spatial.is_not_found.input1": {
-                "raises": "ValueError"
-              },
-              "elevation.spatial.is_not_found.input10": {
-                "raises": "ValueError"
-              },
-              "elevation.spatial.is_not_found.input11": {
-                "raises": "ValueError"
-              },
-              "elevation.spatial.is_not_found.input2": {
-                "raises": "ValueError"
-              },
-              "elevation.spatial.is_not_found.input3": {
-                "raises": "ValueError"
-              },
-              "elevation.spatial.is_not_found.input4": {
-                "raises": "ValueError"
-              },
-              "elevation.spatial.is_not_found.input5": {
-                "raises": "ValueError"
-              },
-              "elevation.spatial.is_not_found.input6": {
-                "raises": "ValueError"
-              },
-              "elevation.spatial.is_not_found.input7": {
-                "raises": "ValueError"
-              },
-              "elevation.spatial.is_not_found.input8": {
-                "raises": "ValueError"
-              },
-              "elevation.spatial.is_not_found.input9": {
-                "raises": "ValueError"
               }
             },
             {
@@ -1334,42 +1970,6 @@
               },
               "elevation.spatial.gdal_json.input9": {
                 "raises": "PermissionError"
-              },
-              "elevation.spatial.is_not_found.input0": {
-                "raises": "ValueError"
-              },
-              "elevation.spatial.is_not_found.input1": {
-                "raises": "ValueError"
-              },
-              "elevation.spatial.is_not_found.input10": {
-                "raises": "ValueError"
-              },
-              "elevation.spatial.is_not_found.input11": {
-                "raises": "ValueError"
-              },
-              "elevation.spatial.is_not_found.input2": {
-                "raises": "ValueError"
-              },
-              "elevation.spatial.is_not_found.input3": {
-                "raises": "ValueError"
-              },
-              "elevation.spatial.is_not_found.input4": {
-                "raises": "ValueError"
-              },
-              "elevation.spatial.is_not_found.input5": {
-                "raises": "ValueError"
-              },
-              "elevation.spatial.is_not_found.input6": {
-                "raises": "ValueError"
-              },
-              "elevation.spatial.is_not_found.input7": {
-                "raises": "ValueError"
-              },
-              "elevation.spatial.is_not_found.input8": {
-                "raises": "ValueError"
-              },
-              "elevation.spatial.is_not_found.input9": {
-                "raises": "ValueError"
               }
             }
           ],
@@ -1515,42 +2115,6 @@
               },
               "elevation.spatial.gdal_json.input9": {
                 "raises": "PermissionError"
-              },
-              "elevation.spatial.is_not_found.input0": {
-                "raises": "ValueError"
-              },
-              "elevation.spatial.is_not_found.input1": {
-                "raises": "ValueError"
-              },
-              "elevation.spatial.is_not_found.input10": {
-                "raises": "ValueError"
-              },
-              "elevation.spatial.is_not_found.input11": {
-                "raises": "ValueError"
-              },
-              "elevation.spatial.is_not_found.input2": {
-                "raises": "ValueError"
-              },
-              "elevation.spatial.is_not_found.input3": {
-                "raises": "ValueError"
-              },
-              "elevation.spatial.is_not_found.input4": {
-                "raises": "ValueError"
-              },
-              "elevation.spatial.is_not_found.input5": {
-                "raises": "ValueError"
-              },
-              "elevation.spatial.is_not_found.input6": {
-                "raises": "ValueError"
-              },
-              "elevation.spatial.is_not_found.input7": {
-                "raises": "ValueError"
-              },
-              "elevation.spatial.is_not_found.input8": {
-                "raises": "ValueError"
-              },
-              "elevation.spatial.is_not_found.input9": {
-                "raises": "ValueError"
               }
             },
             {
@@ -1694,42 +2258,6 @@
               },
               "elevation.spatial.gdal_json.input9": {
                 "raises": "PermissionError"
-              },
-              "elevation.spatial.is_not_found.input0": {
-                "raises": "ValueError"
-              },
-              "elevation.spatial.is_not_found.input1": {
-                "raises": "ValueError"
-              },
-              "elevation.spatial.is_not_found.input10": {
-                "raises": "ValueError"
-              },
-              "elevation.spatial.is_not_found.input11": {
-                "raises": "ValueError"
-              },
-              "elevation.spatial.is_not_found.input2": {
-                "raises": "ValueError"
-              },
-              "elevation.spatial.is_not_found.input3": {
-                "raises": "ValueError"
-              },
-              "elevation.spatial.is_not_found.input4": {
-                "raises": "ValueError"
-              },
-              "elevation.spatial.is_not_found.input5": {
-                "raises": "ValueError"
-              },
-              "elevation.spatial.is_not_found.input6": {
-                "raises": "ValueError"
-              },
-              "elevation.spatial.is_not_found.input7": {
-                "raises": "ValueError"
-              },
-              "elevation.spatial.is_not_found.input8": {
-                "raises": "ValueError"
-              },
-              "elevation.spatial.is_not_found.input9": {
-                "raises": "ValueError"
               }
             },
             {
@@ -1873,42 +2401,6 @@
               },
               "elevation.spatial.gdal_json.input9": {
                 "raises": "PermissionError"
-              },
-              "elevation.spatial.is_not_found.input0": {
-                "raises": "ValueError"
-              },
-              "elevation.spatial.is_not_found.input1": {
-                "raises": "ValueError"
-              },
-              "elevation.spatial.is_not_found.input10": {
-                "raises": "ValueError"
-              },
-              "elevation.spatial.is_not_found.input11": {
-                "raises": "ValueError"
-              },
-              "elevation.spatial.is_not_found.input2": {
-                "raises": "ValueError"
-              },
-              "elevation.spatial.is_not_found.input3": {
-                "raises": "ValueError"
-              },
-              "elevation.spatial.is_not_found.input4": {
-                "raises": "ValueError"
-              },
-              "elevation.spatial.is_not_found.input5": {
-                "raises": "ValueError"
-              },
-              "elevation.spatial.is_not_found.input6": {
-                "raises": "ValueError"
-              },
-              "elevation.spatial.is_not_found.input7": {
-                "raises": "ValueError"
-              },
-              "elevation.spatial.is_not_found.input8": {
-                "raises": "ValueError"
-              },
-              "elevation.spatial.is_not_found.input9": {
-                "raises": "ValueError"
               }
             }
           ]
@@ -3077,294 +3569,6 @@
                 "quote": "\"observation\": \"elevation.spatial.gdal_json.input9\""
               }
             }
-          },
-          {
-            "name": "elevation.spatial.is_not_found.input0",
-            "state": "same",
-            "label": "no_difference",
-            "claim": null,
-            "main": {
-              "raises": "ValueError"
-            },
-            "pr": {
-              "raises": "ValueError"
-            },
-            "citations": {
-              "main": {
-                "file": "probe-diff-api-main-1.jsonl",
-                "line": 50,
-                "quote": "\"observation\": \"elevation.spatial.is_not_found.input0\""
-              },
-              "pr": {
-                "file": "probe-diff-api-pr-1.jsonl",
-                "line": 50,
-                "quote": "\"observation\": \"elevation.spatial.is_not_found.input0\""
-              }
-            }
-          },
-          {
-            "name": "elevation.spatial.is_not_found.input1",
-            "state": "same",
-            "label": "no_difference",
-            "claim": null,
-            "main": {
-              "raises": "ValueError"
-            },
-            "pr": {
-              "raises": "ValueError"
-            },
-            "citations": {
-              "main": {
-                "file": "probe-diff-api-main-1.jsonl",
-                "line": 51,
-                "quote": "\"observation\": \"elevation.spatial.is_not_found.input1\""
-              },
-              "pr": {
-                "file": "probe-diff-api-pr-1.jsonl",
-                "line": 51,
-                "quote": "\"observation\": \"elevation.spatial.is_not_found.input1\""
-              }
-            }
-          },
-          {
-            "name": "elevation.spatial.is_not_found.input10",
-            "state": "same",
-            "label": "no_difference",
-            "claim": null,
-            "main": {
-              "raises": "ValueError"
-            },
-            "pr": {
-              "raises": "ValueError"
-            },
-            "citations": {
-              "main": {
-                "file": "probe-diff-api-main-1.jsonl",
-                "line": 52,
-                "quote": "\"observation\": \"elevation.spatial.is_not_found.input10\""
-              },
-              "pr": {
-                "file": "probe-diff-api-pr-1.jsonl",
-                "line": 52,
-                "quote": "\"observation\": \"elevation.spatial.is_not_found.input10\""
-              }
-            }
-          },
-          {
-            "name": "elevation.spatial.is_not_found.input11",
-            "state": "same",
-            "label": "no_difference",
-            "claim": null,
-            "main": {
-              "raises": "ValueError"
-            },
-            "pr": {
-              "raises": "ValueError"
-            },
-            "citations": {
-              "main": {
-                "file": "probe-diff-api-main-1.jsonl",
-                "line": 53,
-                "quote": "\"observation\": \"elevation.spatial.is_not_found.input11\""
-              },
-              "pr": {
-                "file": "probe-diff-api-pr-1.jsonl",
-                "line": 53,
-                "quote": "\"observation\": \"elevation.spatial.is_not_found.input11\""
-              }
-            }
-          },
-          {
-            "name": "elevation.spatial.is_not_found.input2",
-            "state": "same",
-            "label": "no_difference",
-            "claim": null,
-            "main": {
-              "raises": "ValueError"
-            },
-            "pr": {
-              "raises": "ValueError"
-            },
-            "citations": {
-              "main": {
-                "file": "probe-diff-api-main-1.jsonl",
-                "line": 54,
-                "quote": "\"observation\": \"elevation.spatial.is_not_found.input2\""
-              },
-              "pr": {
-                "file": "probe-diff-api-pr-1.jsonl",
-                "line": 54,
-                "quote": "\"observation\": \"elevation.spatial.is_not_found.input2\""
-              }
-            }
-          },
-          {
-            "name": "elevation.spatial.is_not_found.input3",
-            "state": "same",
-            "label": "no_difference",
-            "claim": null,
-            "main": {
-              "raises": "ValueError"
-            },
-            "pr": {
-              "raises": "ValueError"
-            },
-            "citations": {
-              "main": {
-                "file": "probe-diff-api-main-1.jsonl",
-                "line": 55,
-                "quote": "\"observation\": \"elevation.spatial.is_not_found.input3\""
-              },
-              "pr": {
-                "file": "probe-diff-api-pr-1.jsonl",
-                "line": 55,
-                "quote": "\"observation\": \"elevation.spatial.is_not_found.input3\""
-              }
-            }
-          },
-          {
-            "name": "elevation.spatial.is_not_found.input4",
-            "state": "same",
-            "label": "no_difference",
-            "claim": null,
-            "main": {
-              "raises": "ValueError"
-            },
-            "pr": {
-              "raises": "ValueError"
-            },
-            "citations": {
-              "main": {
-                "file": "probe-diff-api-main-1.jsonl",
-                "line": 56,
-                "quote": "\"observation\": \"elevation.spatial.is_not_found.input4\""
-              },
-              "pr": {
-                "file": "probe-diff-api-pr-1.jsonl",
-                "line": 56,
-                "quote": "\"observation\": \"elevation.spatial.is_not_found.input4\""
-              }
-            }
-          },
-          {
-            "name": "elevation.spatial.is_not_found.input5",
-            "state": "same",
-            "label": "no_difference",
-            "claim": null,
-            "main": {
-              "raises": "ValueError"
-            },
-            "pr": {
-              "raises": "ValueError"
-            },
-            "citations": {
-              "main": {
-                "file": "probe-diff-api-main-1.jsonl",
-                "line": 57,
-                "quote": "\"observation\": \"elevation.spatial.is_not_found.input5\""
-              },
-              "pr": {
-                "file": "probe-diff-api-pr-1.jsonl",
-                "line": 57,
-                "quote": "\"observation\": \"elevation.spatial.is_not_found.input5\""
-              }
-            }
-          },
-          {
-            "name": "elevation.spatial.is_not_found.input6",
-            "state": "same",
-            "label": "no_difference",
-            "claim": null,
-            "main": {
-              "raises": "ValueError"
-            },
-            "pr": {
-              "raises": "ValueError"
-            },
-            "citations": {
-              "main": {
-                "file": "probe-diff-api-main-1.jsonl",
-                "line": 58,
-                "quote": "\"observation\": \"elevation.spatial.is_not_found.input6\""
-              },
-              "pr": {
-                "file": "probe-diff-api-pr-1.jsonl",
-                "line": 58,
-                "quote": "\"observation\": \"elevation.spatial.is_not_found.input6\""
-              }
-            }
-          },
-          {
-            "name": "elevation.spatial.is_not_found.input7",
-            "state": "same",
-            "label": "no_difference",
-            "claim": null,
-            "main": {
-              "raises": "ValueError"
-            },
-            "pr": {
-              "raises": "ValueError"
-            },
-            "citations": {
-              "main": {
-                "file": "probe-diff-api-main-1.jsonl",
-                "line": 59,
-                "quote": "\"observation\": \"elevation.spatial.is_not_found.input7\""
-              },
-              "pr": {
-                "file": "probe-diff-api-pr-1.jsonl",
-                "line": 59,
-                "quote": "\"observation\": \"elevation.spatial.is_not_found.input7\""
-              }
-            }
-          },
-          {
-            "name": "elevation.spatial.is_not_found.input8",
-            "state": "same",
-            "label": "no_difference",
-            "claim": null,
-            "main": {
-              "raises": "ValueError"
-            },
-            "pr": {
-              "raises": "ValueError"
-            },
-            "citations": {
-              "main": {
-                "file": "probe-diff-api-main-1.jsonl",
-                "line": 60,
-                "quote": "\"observation\": \"elevation.spatial.is_not_found.input8\""
-              },
-              "pr": {
-                "file": "probe-diff-api-pr-1.jsonl",
-                "line": 60,
-                "quote": "\"observation\": \"elevation.spatial.is_not_found.input8\""
-              }
-            }
-          },
-          {
-            "name": "elevation.spatial.is_not_found.input9",
-            "state": "same",
-            "label": "no_difference",
-            "claim": null,
-            "main": {
-              "raises": "ValueError"
-            },
-            "pr": {
-              "raises": "ValueError"
-            },
-            "citations": {
-              "main": {
-                "file": "probe-diff-api-main-1.jsonl",
-                "line": 61,
-                "quote": "\"observation\": \"elevation.spatial.is_not_found.input9\""
-              },
-              "pr": {
-                "file": "probe-diff-api-pr-1.jsonl",
-                "line": 61,
-                "quote": "\"observation\": \"elevation.spatial.is_not_found.input9\""
-              }
-            }
           }
         ],
         "generator": {
@@ -3376,7 +3580,7 @@
           "blind": false
         },
         "freeze": {
-          "sha256": "1a7190729261d71b7dd576b39021b139790a6d435d34c4203cb18f16a4bbe5b5",
+          "sha256": "a765b2f671654a34fa7d358cea5f2b65ea4d601c043644548097c5098fa09e72",
           "generator": {
             "kind": "diff",
             "label": "diff (auto-derived from base-side code, model-free)",
@@ -3385,67 +3589,31 @@
             "provenance": "auto-derived",
             "blind": false
           },
-          "frozen_at": "2026-10-22T05:14:10.934250+00:00",
-          "inputs_sha256": "a4e97b4f31455cbcadf5c236accb4b38645599f2e901d3386af45b57dcbf3603",
+          "frozen_at": "2026-10-22T17:49:08.854439+00:00",
+          "inputs_sha256": "465cf77089abc32fa64862ed4ed9d1b6ee47438aa5f5c8178f2b5955610cfc97",
           "inputs": {
             "title_chars": 0,
             "body_chars": 0,
             "base_files": {
-              "elevation/cache.py": "e18bfae913f423db41bdff3f0f1e055d87ee48fd290a73d61ae03c16ce46e028",
-              "elevation/datasource.py": "fe0cd0919b41f60428e69a0366d95fda80a18cf848700f8091acc96fbef3ee2e",
-              "elevation/spatial.py": "a56dd7a148555db038af9abdcb31a23ff1c7f2ade8167c2b8a50f0083d86ff8b"
+              "elevation/cache.py": "603a9478ce53b1a40c6ff18137a75ffbc8ea14d09992c53d7e79f62d57a5456a",
+              "elevation/datasource.py": "a3d7c073aa41685bc27e56c65e00f47d3fd5ebc752b07d6cfe3b399c5b16e9c8",
+              "elevation/spatial.py": "b137c2f47cc66d3f856e765e59c306465ba44dbcdd017506f3da8b504b5a9d70"
             }
           },
           "verified": true,
-          "pr_started_at": "2026-10-22T05:14:11.066831+00:00"
+          "pr_started_at": "2026-10-22T17:49:08.854655+00:00"
         },
         "probe_changed_line_coverage": {
-          "status": "measured",
-          "changed_lines_total": 0,
-          "changed_lines_covered": 0,
-          "files": [
-            {
-              "file": "elevation/cache.py",
-              "changed_lines_total": 0,
-              "changed_lines_covered": 0
-            },
-            {
-              "file": "elevation/datasource.py",
-              "changed_lines_total": 0,
-              "changed_lines_covered": 0
-            },
-            {
-              "file": "elevation/spatial.py",
-              "changed_lines_total": 0,
-              "changed_lines_covered": 0
-            }
-          ],
-          "adequacy": "not_adequate",
-          "note": "no changed executable line exists on the main side (new files, comments or docstrings only), so the probe cannot be shown to reach the change",
-          "exit": 0,
-          "data": "probe-cov-diff-api.json"
+          "status": "not measured",
+          "why": "Contree-only check: probe coverage needs a local side",
+          "adequacy": "unmeasured",
+          "note": "probe coverage not measured (Contree-only check: probe coverage needs a local side)"
         },
         "status": "ran"
       }
     ],
     "summary": {
       "labels": [
-        "needs_human",
-        "needs_human",
-        "needs_human",
-        "no_difference",
-        "no_difference",
-        "no_difference",
-        "no_difference",
-        "no_difference",
-        "no_difference",
-        "no_difference",
-        "no_difference",
-        "no_difference",
-        "no_difference",
-        "no_difference",
-        "no_difference",
-        "no_difference",
         "no_difference",
         "no_difference",
         "no_difference",
@@ -3496,67 +3664,75 @@
         "no_difference",
         "no_difference"
       ],
-      "flagged": [
-        {
-          "probe": "model-probe1",
-          "name": "exception_type",
-          "label": "needs_human",
-          "claim": "C1"
-        },
-        {
-          "probe": "model-probe1",
-          "name": "spool_files_count",
-          "label": "needs_human",
-          "claim": "C1"
-        },
-        {
-          "probe": "model-probe1",
-          "name": "tile_cached_after_ensure",
-          "label": "needs_human",
-          "claim": "C1"
-        }
-      ],
+      "flagged": [],
       "proven_claims": [],
-      "reason": "probe: 3 observation(s) need attention: exception_type does not differ although the claim says it does (C1); spool_files_count does not differ although the claim says it does (C1); tile_cached_after_ensure does not differ although the claim says it does (C1); probe: 62 other observation(s) identical on both sides",
+      "reason": "probe: 49 other observation(s) identical on both sides; the probe crashed or printed no parsed output on every main-side run; the probe crashed or printed no parsed output on every main-side run; the probe crashed or printed no parsed output on every main-side run; the probe crashed or printed no parsed output on every main-side run",
       "ignored_noise": [],
       "ignored_warning_only": [],
       "pr_only_noisy": []
+    },
+    "test_settings": {
+      "applied": true,
+      "read_from": "main checkout (same values on both sides)",
+      "source": [],
+      "variables": [],
+      "pythonpath": [],
+      "pr_changed": []
     }
   },
   "probe_changed_line_coverage": {
-    "status": "measured",
+    "status": "not measured",
     "side": "main",
     "probes": {
-      "model-probe1": {
-        "status": "measured",
-        "changed_lines_covered": 0,
-        "changed_lines_total": 0,
+      "model-p1": {
+        "status": "not measured",
+        "changed_lines_covered": null,
+        "changed_lines_total": null,
+        "adequacy": "not_adequate"
+      },
+      "model-p2": {
+        "status": "not measured",
+        "changed_lines_covered": null,
+        "changed_lines_total": null,
+        "adequacy": "not_adequate"
+      },
+      "model-p3": {
+        "status": "not measured",
+        "changed_lines_covered": null,
+        "changed_lines_total": null,
+        "adequacy": "not_adequate"
+      },
+      "model-p4": {
+        "status": "not measured",
+        "changed_lines_covered": null,
+        "changed_lines_total": null,
         "adequacy": "not_adequate"
       },
       "diff-api": {
-        "status": "measured",
-        "changed_lines_covered": 0,
-        "changed_lines_total": 0,
-        "adequacy": "not_adequate"
+        "status": "not measured",
+        "changed_lines_covered": null,
+        "changed_lines_total": null,
+        "adequacy": "unmeasured"
       }
     },
     "not_adequate": [
-      "diff-api",
-      "model-probe1"
+      "model-p1",
+      "model-p2",
+      "model-p3",
+      "model-p4"
     ]
   },
-  "docstring_only": true,
   "verdict": "needs_attention",
-  "reason": "probe: 3 observation(s) need attention: exception_type does not differ although the claim says it does (C1); spool_files_count does not differ although the claim says it does (C1); tile_cached_after_ensure does not differ although the claim says it does (C1); probe model-probe1 is not_adequate (no changed executable line exists on the main side (new files, comments or docstrings only), so the probe cannot be shown to reach the change); its matching results do not count; tests: 37 test(s) ran on main, 37 on the PR; 0 new test(s) pass, 32 unchanged; 5 test failure(s) pre-existing and identical on both sides",
+  "reason": "1 new test(s) fail on the PR; 32 test(s) ran on main, 37 on the PR; 4 new test(s) pass, 28 unchanged; 4 test failure(s) pre-existing and identical on both sides; probe model-p1 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count; probe model-p2 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count; probe model-p3 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count; probe model-p4 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count",
   "verdict_before_coverage_gate": "needs_attention",
-  "reason_before_coverage_gate": "probe: 3 observation(s) need attention: exception_type does not differ although the claim says it does (C1); spool_files_count does not differ although the claim says it does (C1); tile_cached_after_ensure does not differ although the claim says it does (C1); probe model-probe1 is not_adequate (no changed executable line exists on the main side (new files, comments or docstrings only), so the probe cannot be shown to reach the change); its matching results do not count; tests: 37 test(s) ran on main, 37 on the PR; 0 new test(s) pass, 32 unchanged; 5 test failure(s) pre-existing and identical on both sides",
-  "changed_lines_total": 0,
-  "changed_lines_covered": 0,
+  "reason_before_coverage_gate": "1 new test(s) fail on the PR; 32 test(s) ran on main, 37 on the PR; 4 new test(s) pass, 28 unchanged; 4 test failure(s) pre-existing and identical on both sides; probe model-p1 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count; probe model-p2 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count; probe model-p3 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count; probe model-p4 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count",
+  "changed_lines_total": 20,
+  "changed_lines_covered": 20,
   "coverage_gate": {
     "kind": "python",
     "changed": false,
     "confidence": "normal",
-    "note": "the changed Python lines are not executable (comments, docstrings, blank lines)",
+    "note": "20 of 20 changed executable line(s) ran (100%)",
     "measurement": "measured"
   },
   "agents": {
@@ -3593,28 +3769,28 @@
     ]
   },
   "duration_s": {
-    "total_wall": 149.0,
-    "tests": 10.3
+    "total_wall": 204.8,
+    "tests": 28.1
   },
   "cost": {
     "ai_calls": 3,
     "failed_ai_calls": 0,
-    "input_tokens": 16457,
-    "output_tokens": 17056,
-    "thinking_tokens": 16105,
-    "cost_usd": 0.020287,
+    "input_tokens": 15883,
+    "output_tokens": 8601,
+    "thinking_tokens": 7258,
+    "cost_usd": 0.012506,
     "calls_without_usage": 0,
-    "ai_cost_usd": 0.020287,
+    "ai_cost_usd": 0.012506,
     "cost_complete": true,
     "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
     "compute_seconds": {
-      "total_wall": 149.0,
-      "tests": 10.3
+      "total_wall": 204.8,
+      "tests": 28.1
     },
     "machine_usd_per_hour": 0.24,
     "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
-    "computer_cost_usd": 0.009933,
-    "total_cost_usd": 0.03022,
+    "computer_cost_usd": 0.013653,
+    "total_cost_usd": 0.026159,
     "swarm": {
       "ai_calls": 0,
       "failed_ai_calls": 0,
@@ -3627,7 +3803,5 @@
       "cost_complete": true,
       "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
     }
-  },
-  "head_at_report_sha": "f94e513fa302c0dd96c94eeaf0a0ac76cacd39df",
-  "head_moved_since_test": false
+  }
 }
