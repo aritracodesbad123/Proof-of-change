@@ -1247,29 +1247,32 @@ def install_side(venv: Path, checkout: Path, chosen: dict | None, log: Path, pyt
 
 
 def install_deps_only(venv: Path, checkout: Path, plan: dict, log: Path, python: str, timeout: int,
-                      extra_reqs=None) -> tuple[bool, str]:
+                      extra_reqs=None, deps_root: Path | None = None) -> tuple[bool, str]:
     """Install only the dependencies a project declares (product checks), never the project itself.
 
     Same commands on both sides. The checkout is added to the import path with a .pth file.
+    deps_root: read the dependency files from this folder (read-only) instead of the checkout. The flat-layout
+    fallback passes main's checkout on both sides, so the PR's own dependency files never change what is installed.
     """
     env = base_env(side_home(venv), install=True)
+    src = Path(deps_root) if deps_root is not None else checkout
     cmds = [["uv", "venv", "-q", "-p", python, venv]]
     if plan.get("kind") == "uv-sync":
         # same result as `uv sync --no-install-project`: the lock (or pyproject) exported without the project itself
-        # inside the checkout, so local paths in the lock (workspace members) resolve as they do for uv sync
-        reqs = checkout / ".poc-declared-deps.txt"
-        export = ["uv", "export", "-q", "--no-emit-project", "--no-hashes", "--directory", checkout,
+        # from the folder that declares it, so local paths in the lock (workspace members) resolve as for uv sync
+        reqs = (checkout if deps_root is None else side_out(venv)) / ".poc-declared-deps.txt"
+        export = ["uv", "export", "-q", "--no-emit-project", "--no-hashes", "--directory", src,
                   "-p", venv / "bin/python", "-o", reqs]
         cmds.append(export + (["--frozen"] if plan.get("frozen") else []))
         cmds.append(["uv", "pip", "install", "-q", "-p", venv / "bin/python", "-r", reqs])
     else:
         for name in plan.get("files") or []:
-            cmds.append(["uv", "pip", "install", "-q", "-p", venv / "bin/python", "-r", checkout / name])
+            cmds.append(["uv", "pip", "install", "-q", "-p", venv / "bin/python", "-r", src / name])
     cmds.append(["uv", "pip", "install", "-q", "-p", venv / "bin/python", *BASE_TEST_DEPS, *(extra_reqs or [])])
-    sbx = side_sandbox(venv, network=True)
+    sbx = side_sandbox(venv, network=True, ro=(() if deps_root is None or src == checkout else (src,)))
     sbx["rw"].append(checkout)
     for c in cmds:
-        rc, _ = run(c, log, cwd=checkout, env=env, timeout=timeout, sbx=sbx)   # lock paths are relative to it
+        rc, _ = run(c, log, cwd=src, env=env, timeout=timeout, sbx=sbx)   # lock paths are relative to it
         if rc == "timeout":
             return False, f"dependency install timed out after {timeout}s; see {log.name}"
         if rc == "oom":
@@ -1528,7 +1531,8 @@ def _install_with_helper(a, rec, step, venv, checkout, chosen, log, timeout, con
     def _unsupported(text: str) -> str | None:
         """A product-check install that should stop now, or None to keep going.
 
-        Study runs do not call this. A flat-layout project is not installed as a package.
+        Study runs do not call this. A flat-layout project is not installed as a package. On main it falls back to
+        the dependencies main declares (see _flat_plan); with nothing usable declared it stays unsupported.
         A disk-full install is not retried, and its temporary build files are removed.
         """
         if not product_route(a):
@@ -1536,10 +1540,25 @@ def _install_with_helper(a, rec, step, venv, checkout, chosen, log, timeout, con
         if demo_helper.disk_full(text):
             cleanup_install_temps(venv)
             return demo_helper.DISK_FULL_REASON
-        if demo_helper.flat_layout(text):
+        if demo_helper.flat_layout(text) and not _flat_plan():
             shutil.rmtree(venv, ignore_errors=True)
             return demo_helper.FLAT_LAYOUT_REASON
         return None
+
+    def _is_main() -> bool:
+        return str(step).lower().startswith("main")
+
+    def _flat_plan() -> dict | None:
+        """The deps-only plan for a flat layout, always from MAIN's files. Main: what main declares. PR side: main's
+        plan and main's folder, and only when main itself fell back, so a flat layout on the PR side alone stays
+        could not verify. The PR's own dependency files are never read."""
+        if _is_main():
+            return demo_helper.deps_only_plan(checkout)
+        helper = rec.get("demo_helper") or {}
+        return helper.get("deps_only") if helper.get("flat_deps_root") else None
+
+    def _flat_root() -> Path:
+        return checkout if _is_main() else Path(rec["demo_helper"]["flat_deps_root"])
 
     def once():
         if product_route(a):
@@ -1570,16 +1589,20 @@ def _install_with_helper(a, rec, step, venv, checkout, chosen, log, timeout, con
                 if blocked:
                     return False, blocked
         if product_route(a) and demo_helper.not_a_package(text):
-            plan = demo_helper.deps_only_plan(checkout)
+            flat = demo_helper.flat_layout(text)
+            plan = _flat_plan() if flat else demo_helper.deps_only_plan(checkout)
             if plan:
                 shutil.rmtree(venv, ignore_errors=True)
-                ok, why = install_deps_only(venv, checkout, plan, log, state["py"], timeout, extra_reqs)
+                ok, why = install_deps_only(venv, checkout, plan, log, state["py"], timeout, extra_reqs,
+                                            **({"deps_root": _flat_root()} if flat else {}))
                 if ok:
                     demo_helper.note_auto_fix(
                         rec, f"Auto-fix: the {step} could not build the project as a package, so only the "
                              f"dependencies it declares ({plan['source']}) were installed, the same way on both "
                              "sides, and the project's own folder was put on the import path.")
                     rec.setdefault("demo_helper", {})["deps_only"] = plan
+                    if flat and _is_main():
+                        rec["demo_helper"]["flat_deps_root"] = str(checkout)
                 else:
                     blocked = _unsupported(_log_text())
                     if blocked:
