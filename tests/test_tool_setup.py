@@ -46,3 +46,10 @@ def test_resolve_python_without_uv_does_not_crash(monkeypatch):
         raise tool_setup.ToolSetupError("no uv")
     monkeypatch.setattr(dr, "uv_bin", boom)
     assert dr.resolve_python("3.12") == "3.12"
+
+
+def test_uv_bin_installs_when_missing(monkeypatch):
+    seen = {"ensured": 0}
+    monkeypatch.setattr(tool_setup.shutil, "which", lambda t: "/x/uv" if seen["ensured"] else None)
+    monkeypatch.setattr(tool_setup, "ensure_tools", lambda: seen.__setitem__("ensured", 1))
+    assert tool_setup.uv_bin() == "uv" and seen["ensured"] == 1

@@ -149,10 +149,15 @@ def last_result() -> dict | None:
 
 def uv_bin() -> str:
     """The one place every uv call gets its path from. Installs it from the declared requirements if missing."""
+    # Prefer the bare name when it is on PATH: sandboxed commands resolve it inside the sandbox's own view.
+    if shutil.which("uv"):
+        return "uv"
     found = _which("uv")
     if found:
         return found
     ensure_tools()
+    if shutil.which("uv"):
+        return "uv"
     found = _which("uv")
     if not found:
         raise ToolSetupError("Proof-of-Change could not find uv even after installing it. "
