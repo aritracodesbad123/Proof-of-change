@@ -313,6 +313,35 @@ def test_install_docs_come_from_main_only_and_a_pr_change_is_flagged(tmp_path, m
     assert rows and rows[0][1] == "WARN" and "Dockerfile" in rows[0][2]
 
 
+def test_product_check_on_contree_does_not_produce_an_os_install(tmp_path, monkeypatch):
+    from types import SimpleNamespace
+
+    import ops.daily_run as dr
+    monkeypatch.delenv("POC_PROGRESS_PATH", raising=False)
+    main, pr = tmp_path / "side-main", tmp_path / "side-pr"
+    main.mkdir()
+    pr.mkdir()
+    (main / "pyproject.toml").write_text('[project]\nname = "widget"\ndependencies = []\n')
+    (main / "apt.txt").write_text("libxml2\n")
+    (pr / "apt.txt").write_text("libpr0\n")
+    a = SimpleNamespace(pr=["x"], product_check=True, python="3.12", sandbox_backend="contree", bench=None,
+                        batch_fix_system={f"{REPO}#5": ["zlib1g"]})
+    rec = {"pr": {"number": 5}, "files": {"all": []}}
+    plan = dr._product_plan(a, rec, REPO, {"dist": "widget"}, [main, pr], pypi=lambda name: None,
+                            python_available=lambda version: None)
+    shell = demo_helper.contree_shell(plan)
+    assert "apt-get" not in shell and "apt install" not in shell
+    names = {item["name"]: item["applied"] for item in plan["system"]}
+    assert names == {"libxml2": False, "zlib1g": False}
+    lim = rec["demo_helper"]["limitations"][0]
+    assert lim["needed"] == ["libxml2", "zlib1g"] and "could not verify" in lim["why"]
+    study = demo_helper.build_setup_plan(
+        REPO, [main], {"text": ""}, "3.12", "contree", "widget", apply_system=True,
+        python_available=lambda version: None, pypi=lambda name: None)
+    study_shell = demo_helper.contree_shell(study)
+    assert "apt-get install" in study_shell and "libxml2" in study_shell
+
+
 def test_pr_own_build_failure_is_labelled_and_never_retried_as_setup():
     from poc import batch_order
     rec = {"verdict": "could_not_verify", "reason": "build failed: x"}

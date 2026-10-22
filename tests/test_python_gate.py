@@ -67,6 +67,27 @@ def _not_a_python_project(venv, checkout, chosen, lg, py, *rest):
     return False, "install failed (1)"
 
 
+def test_flat_layout_on_the_pr_side_only_is_not_needs_attention(tmp_path, monkeypatch):
+    pr = tmp_path / "side-pr"
+    pr.mkdir()
+    (pr / "pyproject.toml").write_text('[project]\nname = "app"\n')
+    log = tmp_path / "setup-pr.log"
+    monkeypatch.setattr(daily_run, "install_side", _flat_layout)
+    a = SimpleNamespace(python="3.12", pr="https://github.com/acme/widget/pull/1", product_check=True, bench=None)
+    rec = {"files": {}, "probes": None}
+    ok, why = daily_run._install_with_helper(
+        a, rec, "PR install", tmp_path / "venv-pr", pr, None, log, 10, None, None,
+        max_retries=daily_run._pr_side_retries(a))
+    assert ok is False and why == demo_helper.FLAT_LAYOUT_REASON
+    # The blame rule uses two tries plus an "error:" line. Put that count back: the stop above is not stored
+    # as a setup failure, and a flat layout must still stay could not verify.
+    rec.setdefault("demo_helper", {}).setdefault("setup", {})["attempts"] = 2
+    why = daily_run._pr_own_failure(a, rec, "PR install", why, log, same_setup=True)
+    daily_run._store_verdict(rec, None, why, None)
+    assert rec["verdict"] == "could_not_verify" and why == demo_helper.FLAT_LAYOUT_REASON
+    assert "pr_build_failure" not in rec
+
+
 def test_not_a_python_project_still_installs_declared_dependencies(tmp_path, monkeypatch):
     (tmp_path / "pyproject.toml").write_text('[project]\nname = "app"\ndependencies = []\n')
     (tmp_path / "uv.lock").write_text("")
@@ -351,3 +372,55 @@ def test_gap_retry_reads_pytest_logs_and_checkout_extras(tmp_path, monkeypatch):
     daily_run._retry_setup_gap(a, {}, "acme/widget", tmp_path, {}, None, checkouts=[root])
     assert any(str(req).startswith("python-gitlab") for req in seen["declared"])
     assert seen["log_dir"] == tmp_path
+
+
+def _pyproject(path, deps):
+    path.mkdir(parents=True, exist_ok=True)
+    (path / "pyproject.toml").write_text(f'[project]\nname = "app"\ndependencies = {deps}\n')
+
+
+def test_a_dependency_added_only_by_the_pr_is_not_trusted_or_installed(tmp_path, monkeypatch):
+    from poc import tavily_docs
+    monkeypatch.setattr(tavily_docs, "available", lambda: False)
+    main = tmp_path / "side-main"
+    pr = tmp_path / "side-pr"
+    _pyproject(main, '["kept"]')
+    _pyproject(pr, '["kept", "added-by-pr"]')
+    work = tmp_path / "nightly"
+    packaging = work / "packaging"
+    src = work / "src"
+    _pyproject(packaging, '["kept"]')
+    _pyproject(src, '["kept", "added-by-pr"]')
+    assert daily_run.nightly_main_checkout(work) == packaging
+    assert daily_run.declared_checkouts(packaging, src) == [packaging]
+    assert daily_run.declared_checkouts(main, pr) == [main]
+    (tmp_path / "pytest-pr-1.log").write_text("E   ModuleNotFoundError: No module named 'added_by_pr'\n")
+    installed = []
+
+    def fake_run(cmd, *args, **kwargs):
+        installed.append([str(part) for part in cmd])
+        return 0, 0.0
+
+    monkeypatch.setattr(daily_run, "run", fake_run)
+    monkeypatch.setattr(daily_run, "uv_bin", lambda: "uv")
+    monkeypatch.setattr(daily_run, "side_home", lambda venv: tmp_path / "home")
+    monkeypatch.setattr(daily_run, "base_env", lambda *args, **kwargs: {})
+    monkeypatch.setattr(daily_run, "side_sandbox", lambda *args, **kwargs: {})
+    monkeypatch.setattr(daily_run, "_dist_version", lambda *args, **kwargs: "1")
+    rec = {"verdict": "could_not_verify", "reason": "could not verify: setup gap setup", "pr": {"number": 4},
+           "library": "app", "demo_helper": {"setup_plan": {"packages": []}, "tavily": {}}}
+    a = SimpleNamespace(bench=None, sandbox_backend="contree", pr="https://github.com/acme/widget/pull/4",
+                        product_check=True, build_timeout=30)
+    venvs = {"main": tmp_path / "venv-main", "pr": tmp_path / "venv-pr"}
+    for selection in (daily_run.declared_checkouts(main, pr),
+                      daily_run.declared_checkouts(daily_run.nightly_main_checkout(work), src)):
+        installed.clear()
+        rec = {"verdict": "could_not_verify", "reason": "could not verify: setup gap setup", "pr": {"number": 4},
+               "library": "app", "demo_helper": {"setup_plan": {"packages": []}, "tavily": {}}}
+        daily_run._retry_setup_gap(a, rec, "acme/widget", tmp_path, venvs, lambda: {"verdict": "verified",
+                                                                                   "reason": "ok"},
+                                   checkouts=selection)
+        blob = " ".join(" ".join(cmd) for cmd in installed)
+        assert "added-by-pr" not in blob and installed == []
+        notes = " ".join(rec["demo_helper"].get("notes") or [])
+        assert "added_by_pr" in notes and "refused" in notes

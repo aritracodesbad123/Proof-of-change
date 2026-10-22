@@ -1522,15 +1522,24 @@ def note_limitation(rec: dict, needed: list[str], error: str, why: str) -> dict:
     return item
 
 
-def _system_decision(names: list[str], sandbox: str) -> list[dict]:
+def _system_decision(names: list[str], sandbox: str, apply_system: bool = True) -> list[dict]:
+    """Whether each system package is installed in the sandbox.
+
+    A product check passes ``apply_system=False``. Those packages stay unapplied on every sandbox, including
+    Contree, so the shell never runs an OS install. A study plan keeps the earlier behaviour: Contree applies a
+    safe name, and the local sandbox does not.
+    """
     out = []
     for name in names:
         if not safe_apt_name(name):
             out.append({"name": name, "applied": False, "sides": ["main", "pr"],
                         "reason": "not applied: the name is not a safe system package name"})
-        elif sandbox == "contree":
+        elif apply_system and sandbox == "contree":
             out.append({"name": name, "applied": True, "sides": ["main", "pr"],
                         "reason": "applied in the Contree sandbox"})
+        elif not apply_system:
+            out.append({"name": name, "applied": False, "sides": ["main", "pr"],
+                        "reason": "not applied: this check does not install system packages"})
         else:
             out.append({"name": name, "applied": False, "sides": ["main", "pr"],
                         "reason": "not applied: the local sandbox cannot install system packages"})
@@ -1539,7 +1548,8 @@ def _system_decision(names: list[str], sandbox: str) -> list[dict]:
 
 def build_setup_plan(repo: str, checkouts, tavily, current_python: str, sandbox: str, self_dist: str = "",
                      python_available=None, pypi=None, allow_lookup_packages: bool = True,
-                     provision=None, auto_python: bool = True, docs_checkouts=None) -> dict:
+                     provision=None, auto_python: bool = True, docs_checkouts=None,
+                     apply_system: bool = True) -> dict:
     """One plan for both sides. Only project-listed packages and link-back suggestions are added.
 
     ``docs_checkouts`` (a product check passes main's checkout only) is where listed packages and system-package
@@ -1608,7 +1618,7 @@ def build_setup_plan(repo: str, checkouts, tavily, current_python: str, sandbox:
                              f"(would use {conflict['main']['version'] or 'none'}) and the pull request needs "
                              f"{conflict['pr']['requirement']} (would use {conflict['pr']['version'] or 'none'}); "
                              "no single version meets both, so nothing was tested")}
-    system = _system_decision(system_names, sandbox or "local")
+    system = _system_decision(system_names, sandbox or "local", apply_system=apply_system)
     extra = [item["requirement"] for item in packages if item["action"] == "install"]
     lines = ["Setup plan: the same packages on main and pr."]
     for item in packages:
@@ -1689,6 +1699,8 @@ def contree_shell(plan: dict | None) -> str:
     wanted = (plan.get("python") or {}).get("provision")
     if wanted and re.fullmatch(r"\d+\.\d+", str(wanted)) and (plan.get("python") or {}).get("switch") is None:
         lines.append(contree_python_shell(str(wanted)))
+    # Only an applied package is installed. A product check leaves every system package unapplied, so this
+    # writes no apt-get line on Contree either.
     apt = [item["name"] for item in plan.get("system") or [] if item.get("applied") and safe_apt_name(item["name"])]
     if apt:
         quoted = " ".join(shlex_quote(name) for name in apt)
@@ -2237,7 +2249,7 @@ def _emit_retry(detail: str) -> None:
 
 
 def retry_unverified_study(rec: dict, rerun, install_one, declared, tavily_text: str, pypi, repo: str,
-                     allow_system: bool, install_system=None, lookup=None, recheck_coverage=None) -> dict:
+                     allow_system: bool = False, install_system=None, lookup=None, recheck_coverage=None) -> dict:
     """Study and daily-study path, unchanged from before the product check flow.
 
     One rerun when a could-not-verify result is a setup gap. Tavily text alone never changes the verdict.
@@ -2245,7 +2257,11 @@ def retry_unverified_study(rec: dict, rerun, install_one, declared, tavily_text:
     This is the only step that can raise could_not_verify to verified. When the record has probes, that raise
     waits for a fresh probe line-coverage measurement. The measurement runs only when the change is small.
     A larger change skips it, and the verdict stays could_not_verify.
+
+    ``allow_system`` and ``install_system`` are unused. They stay so older callers still pass, and this step
+    does not install an OS package.
     """
+    _ = (allow_system, install_system)
     block = rec.setdefault("demo_helper", {})
     notes = list(block.get("notes") or [])
     setup = block.get("setup") or {}
@@ -2342,7 +2358,7 @@ def retry_unverified_study(rec: dict, rerun, install_one, declared, tavily_text:
 
 
 def retry_unverified(rec: dict, rerun, install_one, declared, tavily_text: str, pypi, repo: str,
-                     allow_system: bool, install_system=None, lookup=None, recheck_coverage=None,
+                     allow_system: bool = False, install_system=None, lookup=None, recheck_coverage=None,
                      max_tries: int = MAX_GAP_TRIES, declared_urls=(), apt_check=None,
                      project_text: str = "", log_dir=None) -> dict:
     """Up to ``max_tries`` reruns when a could-not-verify result is a setup or import gap.
@@ -2351,7 +2367,11 @@ def retry_unverified(rec: dict, rerun, install_one, declared, tavily_text: str, 
     Every try is logged in ``gap_retry.tries``. A needs-attention result (a PR-caused test failure) is never retried.
     Tavily text alone never changes the verdict. This is the only step that can raise could_not_verify to
     verified, and that raise still waits for a fresh probe line-coverage measurement when the record has probes.
+
+    ``allow_system`` and ``install_system`` are unused. A missing system library, header or build tool is a
+    could-not-verify limitation. This step does not install an OS package on any sandbox.
     """
+    _ = (allow_system, install_system)
     block = rec.setdefault("demo_helper", {})
     notes = list(block.get("notes") or [])
     setup = block.get("setup") or {}
@@ -2398,8 +2418,7 @@ def retry_unverified(rec: dict, rerun, install_one, declared, tavily_text: str, 
         tried.update(norm(req_name(spec["requirement"])) for spec in specs)
         entry = {"try": attempt, "problem": name, "lookup": query if looked else None, "sources": sources,
                  "planned": [spec["requirement"] for spec in specs], "installed": [], "rerun": False}
-        # A missing library, header or build tool stops here on every sandbox. Installing an OS package, including
-        # inside Contree, is not confirmed, so allow_system and install_system are not used for that.
+        # A missing library, header or build tool stops here on every sandbox, including Contree.
         if not specs and is_system_failure(text):
             pieces = missing_system_pieces(text)
             if not pieces:

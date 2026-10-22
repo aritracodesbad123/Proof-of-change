@@ -1371,6 +1371,31 @@ def _main_and_pr(folders: list) -> tuple:
     return main, pr
 
 
+def nightly_main_checkout(work: Path) -> Path | None:
+    """Main's tree on the nightly route.
+
+    A source build checks the pull-request head out at ``work/src``. That directory is not main. Main is
+    ``work/side-main`` when that checkout exists, otherwise the base-branch clone in ``work/packaging``.
+    """
+    for name in ("side-main", "packaging"):
+        path = Path(work) / name
+        if path.is_dir():
+            return path
+    return None
+
+
+def declared_checkouts(main, _pr=None) -> list[Path]:
+    """Checkouts a product gap retry may trust. Only main. The pull-request tree is ignored.
+
+    On the nightly route the ignored tree is ``work/src`` (the pull-request head). Pass main from
+    ``nightly_main_checkout`` instead.
+    """
+    if main is None:
+        return []
+    path = Path(main)
+    return [path] if path.is_dir() else []
+
+
 def _batch_key(repo: str, rec_or_item) -> str:
     pr = rec_or_item.get("pr") if isinstance(rec_or_item, dict) else None
     number = pr.get("number") if isinstance(pr, dict) else pr
@@ -1390,13 +1415,16 @@ def _product_plan(a, rec: dict, repo: str, cfg: dict, checkouts, pypi=None, pyth
     folders = [path for path in (checkouts or []) if path]
     main_dir, pr_dir = _main_and_pr(folders)
     product = product_route(a)
+    # A product check never installs an OS package, on Contree or anywhere else. A study plan still may.
+    apply_os = not product
     plan = demo_helper.build_setup_plan(
         repo, folders, tavily, getattr(a, "python", "") or "",
         getattr(a, "sandbox_backend", None) or "local",
         (cfg or {}).get("dist") or (cfg or {}).get("pkg") or "",
         python_available=python_available, pypi=pypi,
         allow_lookup_packages=bool(folders), auto_python=product,
-        docs_checkouts=([main_dir] if main_dir else []) if product else None)
+        docs_checkouts=([main_dir] if main_dir else []) if product else None,
+        apply_system=apply_os)
     for req in (getattr(a, "batch_fix_reqs", None) or {}).get(_batch_key(repo, rec), []):
         if req not in plan.setdefault("extra_reqs", []):
             plan["extra_reqs"].append(req)
@@ -1407,14 +1435,16 @@ def _product_plan(a, rec: dict, repo: str, cfg: dict, checkouts, pypi=None, pyth
             plan.setdefault("lines", []).append(f"Setup plan: install {req} (fix for an earlier setup failure) on main and pr.")
     staged_sys = [n for n in (getattr(a, "batch_fix_system", None) or {}).get(_batch_key(repo, rec), [])
                   if n not in {i["name"] for i in plan.get("system") or []}]
-    for item in demo_helper._system_decision(staged_sys, getattr(a, "sandbox_backend", None) or "local"):
+    for item in demo_helper._system_decision(staged_sys, getattr(a, "sandbox_backend", None) or "local",
+                                             apply_system=apply_os):
         plan.setdefault("system", []).append(item)
         plan.setdefault("lines", []).append(f"Setup plan: system package {item['name']} (fix for an earlier setup "
                                             f"failure): {item['reason']}")
     blocked = [i["name"] for i in plan.get("system") or [] if not i.get("applied")]
     if blocked:
-        demo_helper.note_limitation(rec, blocked, "the project's own files ask for these system packages",
-                                    "this sandbox (bubblewrap) cannot install OS packages")
+        why_os = ("this check does not install system packages, so the result stays could not verify" if product
+                  else "this sandbox (bubblewrap) cannot install OS packages")
+        demo_helper.note_limitation(rec, blocked, "the project's own files ask for these system packages", why_os)
     # Install docs come from main's checkout only, so a PR cannot add a package that then lands on main too.
     docs = demo_helper.project_install_docs([main_dir] if main_dir else [])
     block = rec.setdefault("demo_helper", {})
@@ -1599,6 +1629,10 @@ def _pr_own_failure(a, rec, step, why, log: Path | None = None, same_setup: bool
             text += "\n" + Path(log).read_text(errors="replace")[-20000:]
         except OSError as exc:
             print(f"WARNING: could not read {Path(log).name}: {type(exc).__name__}", file=sys.stderr, flush=True)
+    # A flat layout, a full disk, or a CUDA build is unsupported on a product check. The log's "error:" line
+    # must not turn that into needs attention, even when both sides install from source and both tries failed.
+    if demo_helper.flat_layout(text) or str(why).startswith("unsupported:"):
+        return demo_helper.FLAT_LAYOUT_REASON if demo_helper.flat_layout(text) else why
     if demo_helper.is_system_failure(text):
         line = demo_helper.failure_line(text)
         pieces = demo_helper.missing_system_pieces(text) or ([line[:120]] if line else [])
@@ -1653,16 +1687,6 @@ def _retry_setup_gap(a, rec, repo, prdir, venvs: dict, rerun, recheck_coverage=N
                     timeout=getattr(a, "build_timeout", 1800), sbx=side_sandbox(venv, network=True))
         return rc == 0, _dist_version(venv, requirement) if rc == 0 else ""
 
-    def install_system(name):
-        from poc import contree_sandboxes
-        sess = contree_sandboxes.session()
-
-        def run_side(side, shell, _sess=sess):
-            got = _sess.run_op(side, shell, disposable=False, timeout=300)
-            return int(got.get("exit_code") or 0) if isinstance(got, dict) else 1
-
-        return _install_system_package(rec, name, run_side if sess is not None else None)
-
     lookup = None
     if tavily_docs.available():
         cache = demo_helper.FileCache(prdir / "tavily-cache.json")
@@ -1680,21 +1704,21 @@ def _retry_setup_gap(a, rec, repo, prdir, venvs: dict, rerun, recheck_coverage=N
             return stored
 
     if product_route(a):
+        # ``checkouts`` is main's tree only. A dependency declared only on the pull request is not added.
         for checkout in checkouts or []:
             for req in demo_helper.declared_requirement_lines(checkout):
                 if req not in declared:
                     declared.append(req)
     if not product_route(a):
         # Study runs and the daily study keep the earlier single setup-gap rerun, unchanged.
+        # allow_system and install_system are unused and are not passed.
         demo_helper.retry_unverified_study(
             rec, rerun, install_one, declared, tavily.get("text") or "", demo_helper.fetch_pypi, repo,
-            allow_system=getattr(a, "sandbox_backend", None) == "contree",
-            install_system=install_system, lookup=lookup, recheck_coverage=recheck_coverage)
+            lookup=lookup, recheck_coverage=recheck_coverage)
         return
     demo_helper.retry_unverified(
         rec, rerun, install_one, declared, tavily.get("text") or "", demo_helper.fetch_pypi, repo,
-        allow_system=getattr(a, "sandbox_backend", None) == "contree",
-        install_system=install_system, lookup=lookup, recheck_coverage=recheck_coverage,
+        lookup=lookup, recheck_coverage=recheck_coverage,
         project_text=_INSTALL_DOCS.get(_batch_key(repo, rec), ""),
         declared_urls=_DECLARED_URLS.get(_batch_key(repo, rec), []), log_dir=prdir)
 
@@ -3995,7 +4019,7 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
         ready = bool(targets and targets.get("pr") and vp.exists())
         _retry_setup_gap(a, rec, repo, prdir, {"main": vm, "pr": vp}, _rerun_nightly if ready else None,
                          _recheck_nightly if ready else None,
-                         checkouts=[p for p in (work / "src",) if p.is_dir()])
+                         checkouts=declared_checkouts(nightly_main_checkout(work), work / "src"))
     return finish(gate(rec), prdir, work, t0, a)
 
 
@@ -4304,7 +4328,7 @@ def test_source_pair(repo: str, cfg: dict, item: dict, prdir: Path, work: Path, 
         ready = bool(vm and vp and targets and targets.get("pr"))
         _retry_setup_gap(a, rec, repo, prdir, {"main": vm, "pr": vp} if vm and vp else {},
                          _rerun_pair if ready else None, _recheck_pair if ready else None,
-                         checkouts=[p for p in (cm, cp) if p is not None and Path(p).is_dir()])
+                         checkouts=declared_checkouts(cm, cp))
     return gate(rec)
 
 
