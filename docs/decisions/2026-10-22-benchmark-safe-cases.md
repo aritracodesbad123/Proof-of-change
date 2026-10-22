@@ -13,8 +13,9 @@ purpose. For those, needs_attention is a fair answer, so they are reported but n
 is not counted as a false alarm.
 
 "Known-safe" here means no known regression, not proof of safety. Each rationale gives the head suite result
-it rests on. Failures listed as pre-existing come from the test environment, not the PR. For click that is 24
-test_echo_via_pager failures (8 tests x 3 pager variants), because the `less` pager is not installed there.
+it rests on. Listed failures are failures that look environmental (not confirmed on the base commit). For click that is
+24 test_echo_via_pager failures (8 tests × 3 pager variants), likely environmental; the cause (possibly a
+missing `less` pager) is not confirmed.
 
 isort #2737 was open when its commits were taken and was merged later the same evening. Its case says so.
 

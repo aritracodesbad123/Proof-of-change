@@ -7,7 +7,7 @@
   "head_sha": "d07ec9dc86eba68b993011761c13254de2a130e3",
   "category": "known_safe",
   "expected_verdict": "verified",
-  "rationale": "Upstream PR, merged 2026-10-22 23:28 IST, after these SHAs were taken (it was open then); no known regression; head suite result (Python 3.14.7, wheels only, no outside network): 2 failed, 713 passed, 1 skipped in 6.01s. Pre-existing environment failures, not caused by the PR: 2 (see notes).",
+  "rationale": "Upstream PR, merged 2026-10-22 23:28 IST, after these SHAs were taken (it was open then); no known regression; head suite result (Python 3.14.7, wheels only, no outside network): 2 failed, 713 passed, 1 skipped in 6.01s. Failures that look environmental (not confirmed on the base commit): 2 (see notes).",
   "source": "upstream PR PyCQA/isort#2737, SHAs from GitHub API 2026-10-22 ~22:40 IST",
   "notes": {
     "base_ref": "main",

@@ -7,7 +7,7 @@
   "head_sha": "3898a6bca948ef75595e646f1f8b4f23bf3ce145",
   "category": "known_safe",
   "expected_verdict": "verified",
-  "rationale": "Upstream open PR; no known regression; head suite result (Python 3.14.7, wheels only, no outside network): 33 failed, 2189 passed, 592 skipped, 2 xfailed, 60 warnings in 52.49s. Pre-existing environment failures, not caused by the PR: 33 (see notes).",
+  "rationale": "Upstream open PR; no known regression; head suite result (Python 3.14.7, wheels only, no outside network): 33 failed, 2189 passed, 592 skipped, 2 xfailed, 60 warnings in 52.49s. Failures that look environmental (not confirmed on the base commit): 33 (see notes).",
   "source": "upstream PR urllib3/urllib3#5328, SHAs from GitHub API 2026-10-22 ~22:40 IST",
   "notes": {
     "base_ref": "main",

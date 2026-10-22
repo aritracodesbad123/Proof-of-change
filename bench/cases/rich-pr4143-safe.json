@@ -7,7 +7,7 @@
   "head_sha": "e6a36f1dea906fe56880045644b5c8b6e8c34383",
   "category": "known_safe",
   "expected_verdict": "verified",
-  "rationale": "Upstream open PR; no known regression; head suite result (Python 3.14.7, wheels only, no outside network): 8 failed, 949 passed, 25 skipped, 1 warning in 3.85s. Pre-existing environment failures, not caused by the PR: 8 (see notes).",
+  "rationale": "Upstream open PR; no known regression; head suite result (Python 3.14.7, wheels only, no outside network): 8 failed, 949 passed, 25 skipped, 1 warning in 3.85s. Failures that look environmental (not confirmed on the base commit): 8 (see notes).",
   "source": "upstream PR Textualize/rich#4143, SHAs from GitHub API 2026-10-22 ~22:40 IST",
   "notes": {
     "base_ref": "main",

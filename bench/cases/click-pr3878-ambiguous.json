@@ -7,7 +7,7 @@
   "head_sha": "f8c5a8efc17d01a9fb10bba961def4c3215ce369",
   "category": "ambiguous",
   "expected_verdict": "needs_attention",
-  "rationale": "Upstream open PR; ambiguous: the PR changes CliRunner output on purpose, so needs_attention is a fair answer and is not scored as a false alarm. Head suite result (Python 3.14.7, wheels only, no outside network): 24 failed, 3222 passed, 24 skipped, 1 xfailed in 3.99s. Pre-existing environment failures, not caused by the PR: 24, all test_echo_via_pager (8 tests x 3 pager variants), because the `less` pager is not installed in the test environment (see notes).",
+  "rationale": "Upstream open PR; ambiguous: the PR changes CliRunner output on purpose, so needs_attention is a fair answer and is not scored as a false alarm. Head suite result (Python 3.14.7, wheels only, no outside network): 24 failed, 3222 passed, 24 skipped, 1 xfailed in 3.99s. Failures that look environmental (not confirmed on the base commit): 24 test_echo_via_pager failures (8 tests × 3 pager variants), likely environmental; the cause (possibly a missing `less` pager) is not confirmed (see notes).",
   "source": "upstream PR pallets/click#3878, SHAs from GitHub API 2026-10-22 ~22:40 IST",
   "notes": {
     "base_ref": "main",
