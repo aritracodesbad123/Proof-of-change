@@ -14,6 +14,7 @@ Cases where a check ends as could not verify. Setup limits are also written into
 - The daily picker's wheel check (a dry-run resolve that skips projects needing compiling) can still let a compile-needing project through. It does not inspect the project's own C extension or its build requirements; `-r`, URL or git lines in requirements files; optional or test requirements; or `setup.py` and `setup.cfg`. Such a project is picked and can still end as COULD NOT VERIFY at setup.
 - If the wheel check itself fails for a network or uv reason, every pull request of that project is skipped in that run.
 - The wheel check changes which pull requests the daily run picks, so daily results from before and after it are not drawn from the same pool.
+- Each product check that measures coverage inside Contree leaves one saved Contree image behind (the coverage run is kept so its report file can be read back in pieces), and that image is not deleted afterwards. Reading the report back has one overall time limit for all pieces together; if it runs out, coverage stays 'not measured' and the check stays COULD NOT VERIFY.
 
 ## OS packages in the local sandbox (bubblewrap)
 

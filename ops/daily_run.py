@@ -2924,6 +2924,74 @@ _COV_SHRINK = (
 )
 
 
+# Product route: the report never travels through the size-limited command output. Inside the PR checkpoint the
+# changed-files report is gzip-compressed, base64-encoded and written to a file; the run prints only its length and
+# SHA-256. The file is then fetched in fixed-size pieces from the saved result image and checked before use.
+_COV_PACK = (
+    "import base64,gzip,hashlib,json,os,sys\n"
+    "src=sys.argv[1];want=sys.argv[2:]\n"
+    "try:\n"
+    " d=json.load(open(src))\n"
+    " d['files']={k:v for k,v in d.get('files',{}).items() if any(k==w or k.endswith('/'+w) for w in want)}\n"
+    " raw=json.dumps(d,separators=(',',':')).encode()\n"
+    "except Exception:\n"
+    " raw=open(src,'rb').read() if os.path.exists(src) else b''\n"
+    "b=base64.b64encode(gzip.compress(raw)).decode()\n"
+    "os.makedirs('/work/poc-cov',exist_ok=True)\n"
+    "open('/work/poc-cov/cov.b64','w').write(b)\n"
+    "print('___POC_COV_FILE___%d %s'%(len(b),hashlib.sha256(b.encode()).hexdigest()))\n"
+)
+COV_CHUNK = 40000
+COV_MAX_CHUNKS = 200
+COV_FETCH_FAILED = "the coverage report could not be fetched from Contree"
+
+
+COV_MIN_PIECE_SECONDS = 5
+
+
+def _cov_clock() -> float:
+    return time.monotonic()
+
+
+def fetch_contree_coverage(sess, image: str, length: int, digest: str, timeout: int,
+                           clock=None) -> tuple[str | None, str]:
+    """(report JSON text, '') fetched piece by piece from the saved image, or (None, plain reason).
+
+    timeout is one overall deadline for the whole fetch, not per piece: each piece gets only the time left."""
+    import base64
+    import gzip
+    import hashlib
+    clock = clock or _cov_clock
+    deadline = clock() + max(0, int(timeout))
+    if not image:
+        return None, f"{COV_FETCH_FAILED} (the run returned no image id)"
+    if length <= 0 or length > COV_CHUNK * COV_MAX_CHUNKS:
+        return None, f"{COV_FETCH_FAILED} (unexpected size {length})"
+    parts = []
+    for start in range(1, length + 1, COV_CHUNK):
+        end = min(start + COV_CHUNK - 1, length)
+        left = int(deadline - clock())
+        if left < COV_MIN_PIECE_SECONDS:
+            return None, f"{COV_FETCH_FAILED} (ran out of time after {len(parts)} of {-(-length // COV_CHUNK)} pieces)"
+        try:
+            raw = sess.run_image(image, f"cut -c {start}-{end} /work/poc-cov/cov.b64", timeout=left)
+        except Exception as e:  # noqa: BLE001
+            return None, f"{COV_FETCH_FAILED} ({type(e).__name__})"
+        if not isinstance(raw, dict) or raw.get("exit_code") != 0:
+            return None, f"{COV_FETCH_FAILED} (a piece could not be read)"
+        piece = (raw.get("stdout") or "").strip()
+        if len(piece) != end - start + 1:
+            return None, f"{COV_FETCH_FAILED} (a piece came back the wrong size)"
+        parts.append(piece)
+    blob = "".join(parts)
+    if hashlib.sha256(blob.encode()).hexdigest() != digest:
+        return None, f"{COV_FETCH_FAILED} (checksum mismatch)"
+    try:
+        return gzip.decompress(base64.b64decode(blob)).decode("utf-8", "replace"), ""
+    except (ValueError, OSError, EOFError):
+        return None, f"{COV_FETCH_FAILED} (the report could not be decoded)"
+
+
 def contree_coverage_run(item: dict, main_root: Path, pr_root: Path, targets: list[str], prdir: Path, a) -> dict:
     """Coverage gate measurement inside the Contree PR checkpoint.
 
@@ -2958,9 +3026,16 @@ def contree_coverage_run(item: dict, main_root: Path, pr_root: Path, targets: li
         "printf '\\n___POC_COV_END___\\n'\n"
         "printf '___POC_LOG___\\n'\ncat /tmp/poc-cov-pytest.log 2>/dev/null\n"
     )
+    product = product_route(a)
+    if product:  # report goes to a file in the sandbox, not through the capped output
+        want = " ".join(shlex.quote(r) for r in sorted(changed))
+        shell = shell.split("printf '___POC_COV_START___", 1)[0] + (
+            f"python -c {shlex.quote(_COV_PACK)} /tmp/poc-cov.json {want} 2>/dev/null\n"
+            "printf '___POC_LOG___\\n'\ntail -c 20000 /tmp/poc-cov-pytest.log 2>/dev/null\n"
+        )
     t0 = time.time()
     try:
-        raw = sess.run_op("pr", shell, disposable=True, timeout=int(a.run_timeout))
+        raw = sess.run_op("pr", shell, disposable=not product, timeout=int(a.run_timeout))
     except Exception as e:  # Contree error or timeout: keep the cap instead of crashing the check
         return {"status": "not measured", "why": f"the Contree coverage run failed ({type(e).__name__})",
                 "seconds": round(time.time() - t0, 1), "where": "contree"}
@@ -2971,7 +3046,18 @@ def contree_coverage_run(item: dict, main_root: Path, pr_root: Path, targets: li
     log = out.split("___POC_LOG___\n", 1)[-1] if "___POC_LOG___" in out else out
     (prdir / "coverage-pytest.log").write_text(f"$ contree coverage (pr)\n{log}")
     blob = ""
-    if "___POC_COV_START___\n" in out:
+    if product:
+        m = re.search(r"___POC_COV_FILE___(\d+) ([0-9a-f]{64})", out)
+        if not m:
+            return {"status": "not measured", "seconds": secs, "where": "contree",
+                    "why": f"{COV_FETCH_FAILED} (no report file was written); see coverage-pytest.log"}
+        blob, why = fetch_contree_coverage(sess, raw.get("uuid") or "", int(m.group(1)), m.group(2),
+                                           int(a.run_timeout))
+        secs = round(time.time() - t0, 1)
+        if blob is None:
+            return {"status": "not measured", "seconds": secs, "where": "contree",
+                    "why": f"{why}; see coverage-pytest.log"}
+    elif "___POC_COV_START___\n" in out:
         blob = out.split("___POC_COV_START___\n", 1)[1].split("\n___POC_COV_END___", 1)[0]
         if "\n___POC_COV_END___" not in out:
             return {"status": "not measured", "seconds": secs, "where": "contree",
