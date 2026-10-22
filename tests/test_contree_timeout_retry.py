@@ -6,6 +6,8 @@ import pytest
 
 from poc import contree_sandboxes as cs
 
+_REAL_SDK_VERSION = cs._sdk_version
+
 
 class ApiTimeoutError(Exception):
     pass
@@ -63,6 +65,7 @@ def _sess(outcomes, retry=True):
 def no_sleep(monkeypatch):
     slept = []
     monkeypatch.setattr(cs, "_sleep", slept.append)
+    monkeypatch.setattr(cs, "_sdk_version", lambda: cs.SUPPORTED_SDK_VERSION)
     return slept
 
 
@@ -169,3 +172,34 @@ def test_no_create_hook_means_no_retry(no_sleep):
     with pytest.raises(cs.ContreeError):
         s.run_op("base", "true", disposable=False)
     assert len(seen) == 1 and no_sleep == []
+
+
+@pytest.mark.parametrize("ver", [None, "0.3.5", "0.3.7", "0.4.0", "0.3.6.post1"])
+def test_retries_only_on_the_checked_sdk_version(monkeypatch, no_sleep, ver):
+    """The start hook was checked only on contree-sdk 0.3.6; any other or missing version fails closed (no retry)."""
+    monkeypatch.setattr(cs, "_sdk_version", lambda: ver)
+    s, seen, _ = _sess([ApiTimeoutError(), _ok()])
+    with pytest.raises(cs.ContreeError):
+        s.run_op("base", "true", disposable=False)
+    assert len(seen) == 1 and no_sleep == []
+    assert not getattr(s._client, "_poc_tracks_starts", False)
+
+
+def test_checked_sdk_version_retries(no_sleep):
+    assert cs._sdk_version() == "0.3.6"
+    s, seen, _ = _sess([ApiTimeoutError(), _ok()])
+    assert s.run_op("base", "true", disposable=False)["exit_code"] == 0
+    assert len(seen) == 2
+
+
+def test_sdk_version_reads_installed_metadata(monkeypatch):
+    import importlib.metadata as md
+
+    monkeypatch.setattr(md, "version", lambda name: "9.9.9" if name == "contree-sdk" else "0")
+    assert _REAL_SDK_VERSION() == "9.9.9"
+
+    def missing(name):
+        raise md.PackageNotFoundError(name)
+
+    monkeypatch.setattr(md, "version", missing)
+    assert _REAL_SDK_VERSION() is None

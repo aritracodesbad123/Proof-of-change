@@ -208,8 +208,27 @@ def is_transient_error(exc: BaseException) -> bool:
 _STARTED: dict[int, bool] = {}
 
 
+# The start-tracking hook relies on an SDK internal (_start_operation, and that the request keeps the same command
+# string object). It was checked only against this exact version, so any other version gets no retries.
+SUPPORTED_SDK_VERSION = "0.3.6"
+
+
+def _sdk_version() -> str | None:
+    try:
+        from importlib.metadata import PackageNotFoundError, version
+    except ImportError:  # pragma: no cover
+        return None
+    try:
+        return version("contree-sdk")
+    except PackageNotFoundError:
+        return None
+
+
 def _track_starts(client) -> bool:
-    """Wrap client._start_operation once so we learn when a run is created. False if the SDK has no such call."""
+    """Wrap client._start_operation once so we learn when a run is created. False (no retries) if the installed
+    contree-sdk is not exactly SUPPORTED_SDK_VERSION, or the SDK has no such call."""
+    if _sdk_version() != SUPPORTED_SDK_VERSION:
+        return False
     if getattr(client, "_poc_tracks_starts", False):
         return True
     inner = getattr(client, "_start_operation", None)
