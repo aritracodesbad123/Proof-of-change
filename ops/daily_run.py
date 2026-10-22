@@ -1356,7 +1356,29 @@ def _project_file_dirs(repo: str, item: dict, work: Path, log: Path) -> list[Pat
     return [dest]
 
 
-def _product_plan(a, rec: dict, repo: str, cfg: dict, checkouts, pypi=None, python_available=None) -> dict | None:
+_INSTALL_DOCS: dict = {}   # this process only: install-doc text per PR, never written to disk or reused later
+_DECLARED: dict = {}       # this process only: Python packages main's checkout declares (deps and every extra), per PR
+_DECLARED_URLS: dict = {}  # this process only: homepage / docs links main's checkout declares, per PR
+
+
+def _main_and_pr(folders: list) -> tuple:
+    """Main's checkout and the PR's checkout among this run's folders (side-main / packaging and side-pr)."""
+    paths = [Path(f) for f in folders or []]
+    pr = next((f for f in paths if f.name == "side-pr"), None)
+    main = next((f for f in paths if f.name != "side-pr"), None)
+    if pr is None and len(paths) > 1 and main is paths[0]:
+        pr = paths[1]
+    return main, pr
+
+
+def _batch_key(repo: str, rec_or_item) -> str:
+    pr = rec_or_item.get("pr") if isinstance(rec_or_item, dict) else None
+    number = pr.get("number") if isinstance(pr, dict) else pr
+    return f"{repo}#{number}"
+
+
+def _product_plan(a, rec: dict, repo: str, cfg: dict, checkouts, pypi=None, python_available=None,
+                  out_dir=None) -> dict | None:
     """Setup plan for a console or daily check. None on a study run, which does not call this.
 
     Does not change the runner's Python. The caller passes ``_check_python`` into this check's installs.
@@ -1366,19 +1388,81 @@ def _product_plan(a, rec: dict, repo: str, cfg: dict, checkouts, pypi=None, pyth
         return None
     tavily = (rec.get("demo_helper") or {}).get("tavily") or {}
     folders = [path for path in (checkouts or []) if path]
+    main_dir, pr_dir = _main_and_pr(folders)
+    product = product_route(a)
     plan = demo_helper.build_setup_plan(
         repo, folders, tavily, getattr(a, "python", "") or "",
         getattr(a, "sandbox_backend", None) or "local",
         (cfg or {}).get("dist") or (cfg or {}).get("pkg") or "",
         python_available=python_available, pypi=pypi,
-        allow_lookup_packages=bool(folders), auto_python=product_route(a))
+        allow_lookup_packages=bool(folders), auto_python=product,
+        docs_checkouts=([main_dir] if main_dir else []) if product else None)
+    for req in (getattr(a, "batch_fix_reqs", None) or {}).get(_batch_key(repo, rec), []):
+        if req not in plan.setdefault("extra_reqs", []):
+            plan["extra_reqs"].append(req)
+            plan.setdefault("packages", []).append({
+                "requirement": req, "name": req, "kind": "tavily", "action": "install", "source": "tavily",
+                "reason": "diagnosed by the lookup after a setup failure; declared by the project as a dependency or extra",
+                "sides": ["main", "pr"]})
+            plan.setdefault("lines", []).append(f"Setup plan: install {req} (fix for an earlier setup failure) on main and pr.")
+    staged_sys = [n for n in (getattr(a, "batch_fix_system", None) or {}).get(_batch_key(repo, rec), [])
+                  if n not in {i["name"] for i in plan.get("system") or []}]
+    for item in demo_helper._system_decision(staged_sys, getattr(a, "sandbox_backend", None) or "local"):
+        plan.setdefault("system", []).append(item)
+        plan.setdefault("lines", []).append(f"Setup plan: system package {item['name']} (fix for an earlier setup "
+                                            f"failure): {item['reason']}")
+    blocked = [i["name"] for i in plan.get("system") or [] if not i.get("applied")]
+    if blocked:
+        demo_helper.note_limitation(rec, blocked, "the project's own files ask for these system packages",
+                                    "this sandbox (bubblewrap) cannot install OS packages")
+    # Install docs come from main's checkout only, so a PR cannot add a package that then lands on main too.
+    docs = demo_helper.project_install_docs([main_dir] if main_dir else [])
+    block = rec.setdefault("demo_helper", {})
+    block["install_docs"] = docs["sources"]
+    block["install_docs_from"] = "main"
+    _INSTALL_DOCS[_batch_key(repo, rec)] = docs["text"]
+    _DECLARED[_batch_key(repo, rec)] = sorted(demo_helper.declared_names(main_dir)) if main_dir else []
+    urls = demo_helper.declared_urls(main_dir) if main_dir else []
+    dist = (cfg or {}).get("dist") or (cfg or {}).get("pkg") or ""
+    parts = demo_helper.split_repo(repo or "")
+    if product and dist and parts:
+        try:
+            info = (pypi or demo_helper.fetch_pypi)(dist)
+        except Exception:  # noqa: BLE001 — no PyPI page means only the project's own files declare links
+            info = None
+        if demo_helper.pypi_links_back(info, *parts):   # the PyPI page is the project's own
+            urls.extend(u for u in demo_helper.pypi_declared_urls(info) if u not in urls)
+    _DECLARED_URLS[_batch_key(repo, rec)] = urls
+    changed = list(dict.fromkeys(
+        [f for f in ((rec.get("files") or {}).get("all") or []) if demo_helper.is_install_doc_path(f)]
+        + demo_helper.install_docs_changed(main_dir, pr_dir)))
+    if changed:
+        block["install_docs_pr_changed"] = changed
+        line = ("Setup plan: the PR changes install docs (" + ", ".join(changed[:5])
+                + "); setup was read from main's copy and applied the same on both sides.")
+        block["notes"] = demo_helper._unique([*(block.get("notes") or []), line])
+        demo_helper.announce([line])
     demo_helper.attach_plan(rec, plan)
     demo_helper.announce(plan.get("lines") or [])
+    from poc import run_progress
+    steps = demo_helper.plan_steps(plan)
+    rec.setdefault("demo_helper", {})["steps"] = steps
+    if out_dir is not None:
+        try:
+            files = demo_helper.write_run_files(plan, out_dir)
+            rec.setdefault("demo_helper", {})["run_files"] = files
+        except OSError as exc:
+            why = f"could not write this run's requirements.txt / setup-plan.json: {type(exc).__name__}: {exc}"
+            rec.setdefault("demo_helper", {})["run_files"] = {"error": why}
+            print(f"WARNING: {why}", file=sys.stderr, flush=True)
+    run_progress.emit("setup_lookup", detail=steps["setup_lookup"])
     py = plan.get("python") or {}
     if py.get("requested") and py.get("rule"):
-        from poc import run_progress
         run_progress.emit("setup_python", detail=("failed: " if py.get("gate_failed") else "")
                           + f"Python {py['requested']}: {py.get('reason')}")
+    else:
+        run_progress.emit("setup_python", detail=steps["setup_python"])
+    run_progress.emit("install_deps", detail=steps["install_deps"])
     return plan
 
 
@@ -1388,7 +1472,8 @@ def _check_python(a, plan) -> str:
     return switch or getattr(a, "python", "") or ""
 
 
-def _install_with_helper(a, rec, step, venv, checkout, chosen, log, timeout, constraints, extra_reqs, python=None):
+def _install_with_helper(a, rec, step, venv, checkout, chosen, log, timeout, constraints, extra_reqs, python=None,
+                         max_retries=None):
     """Retry one side's install. The caller uses the plain install_side call when the helper is off."""
     from poc import demo_helper
     py = a.python if python is None else python
@@ -1442,9 +1527,61 @@ def _install_with_helper(a, rec, step, venv, checkout, chosen, log, timeout, con
         return ok, why
 
     ok, why, _value, outcome = demo_helper.run_setup(
-        step, once, cleanup=lambda: shutil.rmtree(venv, ignore_errors=True))
+        step, once, cleanup=lambda: shutil.rmtree(venv, ignore_errors=True),
+        max_retries=demo_helper.MAX_SETUP_RETRIES if max_retries is None else max_retries)
     demo_helper.note_setup(rec, step, outcome)
     return ok, why
+
+
+def _pr_side_retries(a):
+    """Install retries for the PR side once main has installed fine. On a product run that is 1: one more try, then a
+    PR side that still will not build is the PR's own failure, not a setup problem. Other runs keep the earlier
+    retries."""
+    from poc import demo_helper
+    return 1 if product_route(a) else demo_helper.MAX_SETUP_RETRIES
+
+
+# Generic signs of an infrastructure failure (network, out of memory, timeout, disk, sandbox). No package names.
+# The word list is broad and may hide some real PR errors (they stay could not verify). That is safe for now.
+_INFRA_FAILURE = re.compile(
+    r"(out of memory|\boom\b|memoryerror|killed|no space left|disk quota|timed? ?out|timeout|connection (?:refused|"
+    r"reset|aborted)|temporary failure in name resolution|could not resolve host|name or service not known|network is "
+    r"unreachable|ssl(?:error|: )|http error 5\d\d|\b50[234]\b|bwrap|sandbox|infrastructure failure)", re.I)
+# A named error: an exception name or a compiler / build tool "error:" line.
+_NAMED_ERROR = re.compile(r"(?m)(?:^|\s)(?:[A-Za-z_][\w.]*(?:Error|Exception)\b|error(?:\[\w+\])?:\s*\S)")
+
+
+def _pr_own_failure(a, rec, step, why, log: Path | None = None, same_setup: bool = False) -> str:
+    """Label a PR-side build failure after a clean main install as the PR's own failure (product runs only).
+
+    When the error text shows a missing system library, header, pkg-config package or build tool (generic patterns,
+    no package names), it is a sandbox limitation instead: the result stays could not verify, with a limitation
+    naming what is missing."""
+    from poc import demo_helper
+    if not product_route(a) or str(why).startswith("infrastructure failure:"):
+        return why
+    # The try count defaults to 1 when no setup outcome is recorded (a patch failure, an unusual error), so the PR is
+    # never blamed in those cases. That is the safe direction.
+    tries = int(((rec.get("demo_helper") or {}).get("setup") or {}).get("attempts") or 1)
+    text = str(why)
+    if log is not None:
+        try:
+            text += "\n" + Path(log).read_text(errors="replace")[-20000:]
+        except OSError as exc:
+            print(f"WARNING: could not read {Path(log).name}: {type(exc).__name__}", file=sys.stderr, flush=True)
+    if demo_helper.is_system_failure(text):
+        missing = demo_helper.failure_line(text)
+        demo_helper.note_limitation(rec, [], missing, "the PR side needs a system library, header or build tool "
+                                                      "that this sandbox does not have")
+        return f"could not verify: the PR side needs a missing system library, header or build tool: {missing}"
+    if _INFRA_FAILURE.search(text):
+        return why   # network, memory, timeout, disk or sandbox trouble is never blamed on the PR
+    named = _NAMED_ERROR.search(text)
+    # Only when both sides install the same way from source (test_source_pair) and both PR-side tries failed.
+    # On the nightly route main is a ready-made wheel and the PR is built from source, so it is never blamed there.
+    blame = same_setup and bool(named) and tries >= 2
+    return demo_helper.note_pr_build_failure(rec, step, why, needs_attention=blame,
+                                             error=demo_helper.failure_line(text[named.start():]) if named else "")
 
 
 def _log_plan_installs(rec, plan, venvs: dict) -> None:
@@ -1510,10 +1647,19 @@ def _retry_setup_gap(a, rec, repo, prdir, venvs: dict, rerun, recheck_coverage=N
             _cache.put(query, stored)
             return stored
 
+    if not product_route(a):
+        # Study runs and the daily study keep the earlier single setup-gap rerun, unchanged.
+        demo_helper.retry_unverified_study(
+            rec, rerun, install_one, declared, tavily.get("text") or "", demo_helper.fetch_pypi, repo,
+            allow_system=getattr(a, "sandbox_backend", None) == "contree",
+            install_system=install_system, lookup=lookup, recheck_coverage=recheck_coverage)
+        return
     demo_helper.retry_unverified(
         rec, rerun, install_one, declared, tavily.get("text") or "", demo_helper.fetch_pypi, repo,
         allow_system=getattr(a, "sandbox_backend", None) == "contree",
-        install_system=install_system, lookup=lookup, recheck_coverage=recheck_coverage)
+        install_system=install_system, lookup=lookup, recheck_coverage=recheck_coverage,
+        project_text=_INSTALL_DOCS.get(_batch_key(repo, rec), ""),
+        declared_urls=_DECLARED_URLS.get(_batch_key(repo, rec), []))
 
 
 def _install_system_package(rec, name, run_side) -> bool:
@@ -3552,7 +3698,7 @@ def _contree_only_pair(a, rec: dict, repo: str, cfg: dict, item: dict, sp: dict,
     cm, cp = work / "side-main", work / "side-pr"
     for v in (vm, vp):
         (v / "bin").mkdir(parents=True, exist_ok=True)
-    setup_plan = _product_plan(a, rec, repo, cfg, [cm, cp]) if helper_on else None
+    setup_plan = _product_plan(a, rec, repo, cfg, [cm, cp], out_dir=prdir) if helper_on else None
     run_progress.emit("claims", "super", "planning behaviour claims / probes")
     plan = plan_probes(repo, item, rec, cm, [cp, work / "src"], prdir, a)
     rec["pr_side_started_at"] = pr_started = freeze.now()   # nothing below may create or change a probe
@@ -3654,7 +3800,7 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
     plan, pr_started = [], None
     helper_on = demo_helper.active(a)
     file_dirs = _project_file_dirs(repo, item, work, prdir / "packaging.log") if helper_on else []
-    setup_plan = _product_plan(a, rec, repo, cfg, file_dirs) if helper_on else None
+    setup_plan = _product_plan(a, rec, repo, cfg, file_dirs, out_dir=prdir) if helper_on else None
     py = _check_python(a, setup_plan)
     run_progress.emit("install_main", detail="installing main (nightly) side")
     if helper_on:
@@ -3690,7 +3836,8 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
                                          a.build_timeout, tuple(extra))
                     return bool(built.get("ok")), built.get("why") or "", built
                 _ok, _why, b, outcome = demo_helper.run_setup(
-                    "PR build", _build_pr, cleanup=lambda: shutil.rmtree(vp, ignore_errors=True))
+                    "PR build", _build_pr, cleanup=lambda: shutil.rmtree(vp, ignore_errors=True),
+                    max_retries=_pr_side_retries(a))
                 demo_helper.note_setup(rec, "PR build", outcome)
                 if not isinstance(b, dict):
                     b = {"ok": False, "why": _why}
@@ -3706,6 +3853,8 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
                     cnv = b["why"]
                 else:
                     cnv = b["why"] + " (build log: build-pr.log)"
+                    if helper_on:
+                        cnv = _pr_own_failure(a, rec, "PR build", cnv, prdir / "build-pr.log")
         else:
             rec["route"] = "nightly+patch"
             run_progress.emit("install_pr", detail="patching PR onto nightly")
@@ -3714,6 +3863,8 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
             rec["pr_side"] = {"source": "copy of main side + PR diff applied to the installed package", "patched": ok}
             if not ok:
                 cnv = why + " (see patch.log)"
+                if helper_on:
+                    cnv = _pr_own_failure(a, rec, "PR patch", cnv, prdir / "patch.log")
         if vp.exists():
             rec["freeze"]["pr"] = freeze_env(vp, prdir / "freeze-pr.txt")
     rec["tested"] = {"main": f"nightly {main.get('version', '?')} "
@@ -3978,7 +4129,7 @@ def test_source_pair(repo: str, cfg: dict, item: dict, prdir: Path, work: Path, 
     else:
         vm, vp = work / "venv-main", work / "venv-pr"
         cm, cp = work / "side-main", work / "side-pr"
-        setup_plan = _product_plan(a, rec, repo, cfg, [cm, cp]) if helper_on else None
+        setup_plan = _product_plan(a, rec, repo, cfg, [cm, cp], out_dir=prdir) if helper_on else None
         py = _check_python(a, setup_plan)
         extra = list(setup_plan["extra_reqs"]) if setup_plan and setup_plan.get("extra_reqs") else None
         run_progress.emit("install_main", detail="installing main side")
@@ -4000,7 +4151,10 @@ def test_source_pair(repo: str, cfg: dict, item: dict, prdir: Path, work: Path, 
             run_progress.emit("install_pr", detail="installing PR side")
             if helper_on:
                 ok, why = _install_with_helper(a, rec, "PR install", vp, cp, item.get("chosen"),
-                                               prdir / "setup-pr.log", a.build_timeout, cons, extra, python=py)
+                                               prdir / "setup-pr.log", a.build_timeout, cons, extra, python=py,
+                                               max_retries=_pr_side_retries(a))
+                if not ok:
+                    why = _pr_own_failure(a, rec, "PR install", why, prdir / "setup-pr.log", same_setup=True)
             else:
                 ok, why = install_side(vp, cp, item.get("chosen"), prdir / "setup-pr.log", a.python, a.build_timeout, cons)
             if ok:
@@ -4114,6 +4268,11 @@ def _store_verdict(rec: dict, cmp, cnv, ex) -> None:
     v, reason, _ = verdict_for(cmp, cnv, ex, rec.get("files"), rec.get("probes"), rec.get("behaviour_claims"),
                                rec.get("baseline"), docstring_only=bool(rec.get("docstring_only")))
     v, reason = cap_for_review(rec, v, reason)
+    own = rec.get("pr_build_failure") or {}
+    if own.get("needs_attention") and v == Verdict.COULD_NOT_VERIFY.value:
+        v = Verdict.NEEDS_ATTENTION.value
+        reason = (f"needs attention: main installed with the same setup, but the PR side failed to build on both "
+                  f"tries: {own.get('error') or own.get('why')}")[:400]
     rec["verdict"], rec["reason"] = v, reason
     if rec.get("docstring_only") and v == Verdict.VERIFIED.value:
         rec["behaviour_claims"] = mark_holds_by_construction(rec.get("behaviour_claims"))
@@ -4688,6 +4847,108 @@ def skip_unused_model(a) -> None:
         a.model_skipped = "AI calls skipped because --no-probes was set"
 
 
+def _batch_lookup(repo: str, cfg: dict) -> bool:
+    """The per-PR setup lookup gate. With no lookup key the gate is off and the PR goes straight to setup."""
+    from poc import demo_helper, tavily_docs
+    if not tavily_docs.available():
+        return True
+    query = demo_helper.lookup_queries(repo, cfg.get("dist") or cfg.get("pkg") or "")[0]
+    got = demo_helper.live_fetch(query)
+    return bool(got.get("ok"))
+
+
+def _batch_diagnose(a, item: tuple, why: str) -> None:
+    """Look a setup failure up on the project's own pages, read its install docs, and stage the fix for both
+    sides of the next try: Python packages the project declares (a dependency or any extra, read from main's
+    checkout), OS packages that exist in the distro archive."""
+    from poc import demo_helper
+    repo, cfg, c = item
+    key = f"{repo}#{c['pr']}"
+    got = demo_helper.live_fetch(f"{repo} install {demo_helper.failure_line(why)}"[:380])
+    trusted = demo_helper.trusted_lookup(demo_helper.scope_lookup(got, repo, cfg.get("dist") or ""), repo,
+                                         _DECLARED_URLS.get(key, [])) \
+        if got.get("ok") else {"results": [], "sources": []}
+    text = demo_helper._lookup_text(trusted)
+    print(f"Diagnosis sources (trusted only): {', '.join(trusted['sources']) or 'none'}", flush=True)
+    fixes = getattr(a, "batch_fix_reqs", None)
+    if fixes is None:
+        fixes = a.batch_fix_reqs = {}
+    staged = fixes.setdefault(key, [])
+    declared = set(_DECLARED.get(key, []))
+    for pkg in demo_helper.pip_suggestions(text):
+        if demo_helper.norm(pkg) not in declared:
+            print(f"Setup plan: refused {pkg}: not a declared dependency or extra of the project", flush=True)
+            continue
+        try:
+            info = demo_helper.fetch_pypi(pkg)
+        except Exception:  # noqa: BLE001
+            info = None
+        if info is None:
+            print(f"Setup plan: refused {pkg}: not found on PyPI", flush=True)
+        elif pkg not in staged:
+            staged.append(pkg)
+    fix = demo_helper.system_fix_for(why, text, _INSTALL_DOCS.get(key, ""), lookup_sources=trusted["sources"])
+    sys_staged = getattr(a, "batch_fix_system", None) or {}
+    a.batch_fix_system = sys_staged
+    names = sys_staged.setdefault(key, [])
+    names.extend(n for n in fix["install"] if n not in names)
+    print(f"Diagnosis for {key}: pip {staged or 'none'}, OS {names or 'none'} "
+          f"(from {', '.join(fix['sources']) or 'no source'})", flush=True)
+    for item_ in fix["refused"]:
+        print(f"Setup plan: refused system package {item_['name']}: {item_['reason']}", flush=True)
+    if not got.get("ok"):
+        raise RuntimeError("lookup failed")
+
+
+def batch_order_refusal(a) -> str | None:
+    """--batch-order and its diagnosed retries are for product runs only. A study run and the daily study refuse it,
+    so their results stay as they were."""
+    if getattr(a, "batch_order", False) and not product_route(a):
+        return ("--batch-order is for product runs only (--product-check with --pr); study runs and the daily "
+                "study do not use it")
+    return None
+
+
+def _run_batch_order(queue: list, rdir: Path, workroot: Path, a, machine: dict, seen: dict, problems: list) -> list:
+    from poc import batch_order
+
+    def key(item):
+        return f"{item[0]}#{item[2]['pr']}"
+
+    def run(item):
+        repo, cfg, c = item
+        print(f"  testing #{c['pr']} {c['title'][:60]} ...", flush=True)
+        try:
+            rec = gate(test_pr(repo, cfg, c, rdir, workroot, a, machine))
+        except model_provider.ProviderRejected:
+            raise
+        except Exception as e:  # noqa: BLE001
+            problems.append(f"{repo}#{c['pr']}: harness error: {type(e).__name__}: {e}")
+            return None
+        print(f"    -> {rec['verdict']}: {rec['reason'][:140]} ({rec['duration_s']['total_wall']}s)", flush=True)
+        return rec
+
+    def give_up(item, why):
+        repo, cfg, c = item
+        rec = new_record(repo, cfg, c, a, machine, rdir.name, run_date_for(rdir))
+        rec["verdict"], rec["reason"], _ = verdict_for(None, why)
+        return rec
+
+    if batch_order_refusal(a):
+        raise SystemExit(batch_order_refusal(a))
+    log = batch_order.OrderLog(rdir / "batch-order.jsonl")
+    out = batch_order.run_batch(queue, key, lambda item: _batch_lookup(item[0], item[1]), run,
+                                diagnose=lambda item, why: _batch_diagnose(a, item, why),
+                                give_up=give_up, log=log)
+    for rec in out:
+        repo, n = rec.get("repo"), prn(rec)
+        if repo and n is not None:
+            seen["prs"].setdefault(repo, {})[str(n)] = {"head_sha": (rec.get("pr") or {}).get("head_sha"),
+                                                       "tested_at_ist": rec.get("tested_at_ist"),
+                                                       "verdict": rec["verdict"], "run": rdir.name}
+    return out
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--libraries-file", default=None,
@@ -4773,6 +5034,9 @@ def main(argv=None) -> int:
                     help="independent verification jsonl, scored after verdicts (default: "
                          "<verification_dir>/<date>/verification.jsonl if it exists)")
     ap.add_argument("--select-only", action="store_true")
+    ap.add_argument("--batch-order", action="store_true",
+                    help="product batch order: setup lookup, then setup, then the run, per PR; a PR whose lookup or "
+                         "setup fails is logged and skipped, then retried at the end (diagnosis + fix, up to 3 tries)")
     ap.add_argument("--resume", action="store_true", help="reuse record.json of PRs already tested in this run folder "
                                                           "(same head SHA)")
     ap.add_argument("--reselect", action="store_true",
@@ -4795,6 +5059,9 @@ def main(argv=None) -> int:
     ap.add_argument("--ids", default=None, help="with --bench: comma-separated case IDs (default: all), e.g. B01,B14")
     ap.add_argument("--bench-out", default=None, help="with --bench: result folder (default: runs/bench-v0)")
     a = ap.parse_args(argv)
+    refused = batch_order_refusal(a)
+    if refused:
+        ap.error(refused)
     if a.max_heavy_builds is not None:
         os.environ["POC_MAX_HEAVY_BUILDS"] = str(max(1, a.max_heavy_builds))
     from poc import hitl
@@ -4897,6 +5164,7 @@ def main(argv=None) -> int:
     machine.setdefault("cpu_model", cpu_model())
     machine.setdefault("ram_gb", ram_gb())
     records, skipped, selection, reused = [], {}, {}, []
+    batch_queue: list = []
     inv_root = rdir / "invocations"
     a.invocation = (1 + len([p for p in inv_root.glob("invocation-*") if p.is_dir()])
                     if inv_root.is_dir() else 1)
@@ -4930,6 +5198,9 @@ def main(argv=None) -> int:
         if a.select_only:
             continue
         for c in chosen:
+            if getattr(a, "batch_order", False):
+                batch_queue.append((repo, cfg, c))
+                continue
             prev = rdir / f"{cfg['pkg']}-{c['pr']}" / "record.json"
             rec = None
             if a.resume and prev.exists():
@@ -4959,6 +5230,12 @@ def main(argv=None) -> int:
             seen.setdefault("prior_run_utc", {})[repo] = seen["last_run_utc"].get(repo)
         seen["last_run_utc"][repo] = started.astimezone(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
         seen.setdefault("last_run_date", {})[repo] = rdir.name
+    if batch_queue and not a.select_only:
+        try:
+            records.extend(_run_batch_order(batch_queue, rdir, workroot, a, machine, seen, problems))
+        except model_provider.ProviderRejected as e:
+            print(str(e), file=sys.stderr)
+            return 1
     (rdir / "selection.json").write_text(json.dumps({"selected": selection, "skipped": skipped}, indent=1))
     if a.select_only:
         print(json.dumps(selection, indent=1))

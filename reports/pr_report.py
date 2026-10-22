@@ -239,6 +239,12 @@ def checks(rec: dict) -> list[list]:
         else:
             out.append(["Probes ran on both sides", "PASS", f"{len(its)} probe(s), "
                         f"{its[0].get('runs_per_side', 3)} alternating runs per side, every run printed its observations", ""])
+    dh = rec.get("demo_helper") if isinstance(rec.get("demo_helper"), dict) else {}
+    if dh.get("install_docs_pr_changed"):
+        out.append(["Install docs unchanged by the PR", "WARN",
+                    "the PR changes " + ", ".join(dh["install_docs_pr_changed"][:5]),
+                    "Setup was read from main's install docs and applied the same on both sides; the PR's own install "
+                    "steps differ, so read the result with that in mind."])
     te = rec.get("thread_env") or {}
     # Thread-count variables must be 1. PYTHONHASHSEED is recorded in the same block (fixed hash seed) and must be 0;
     # it is not a thread count, so it is checked against its own value.
