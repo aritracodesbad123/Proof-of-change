@@ -1264,6 +1264,11 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--host", default=os.environ.get("POC_CONSOLE_HOST", "127.0.0.1"))
     ap.add_argument("--port", type=int, default=int(os.environ.get("POC_CONSOLE_PORT", "8787")))
     a = ap.parse_args(argv)
+    from poc.tool_setup import ToolSetupError, ensure_tools
+    try:
+        ensure_tools()
+    except ToolSetupError as e:  # checks still try again (and report) at their own start
+        print(f"Tool setup: {e}", flush=True)
     serve(a.host, a.port)
     return 0
 
