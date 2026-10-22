@@ -848,13 +848,21 @@ def declared_test_deps(checkout: Path, targets: list[str], self_dist: str) -> li
     return out
 
 
-def install_declared_test_deps(venvs: dict, reqs: list[str], log: Path, timeout: int) -> tuple[bool, str]:
-    """Install the same declared test requirements on both sides."""
+def isolated_install(cmd: list, env: dict, isolated: bool) -> tuple[list, dict]:
+    """isolated (product checks only): the uv call ignores config files and [tool.uv.sources], and the env drops
+    index settings and pip config (no_index_config_env). Not isolated: both are returned unchanged."""
+    return (no_config_cmd(cmd), no_index_config_env(env)) if isolated else (cmd, env)
+
+
+def install_declared_test_deps(venvs: dict, reqs: list[str], log: Path, timeout: int,
+                               isolated: bool = False) -> tuple[bool, str]:
+    """Install the same declared test requirements on both sides. isolated: see isolated_install."""
     if not reqs:
         return True, ""
     for side, venv in venvs.items():
-        rc, _ = run([uv_bin(), "pip", "install", "-q", "-p", venv / "bin/python", *reqs], log,
-                    env=base_env(side_home(venv), install=True), timeout=timeout, sbx=side_sandbox(venv, network=True))
+        cmd, env = isolated_install([uv_bin(), "pip", "install", "-q", "-p", venv / "bin/python", *reqs],
+                                    base_env(side_home(venv), install=True), isolated)
+        rc, _ = run(cmd, log, env=env, timeout=timeout, sbx=side_sandbox(venv, network=True))
         if rc != 0:
             return False, f"installing declared test requirements on the {side} side failed ({rc}); see {log.name}"
     return True, ""
@@ -912,8 +920,9 @@ def optional_backend_reqs(checkout: Path, self_dist: str | None = None) -> list[
     return reqs_for_test_extras(lines, name)
 
 
-def install_optional_backends(venvs: dict, reqs: list[str], log: Path, timeout: int) -> dict:
-    """Install each optional backend on each side. A failure is skipped; it does not stop the others."""
+def install_optional_backends(venvs: dict, reqs: list[str], log: Path, timeout: int, isolated: bool = False) -> dict:
+    """Install each optional backend on each side. A failure is skipped; it does not stop the others.
+    isolated: see isolated_install."""
     installed: list[str] = []
     skipped: list[dict] = []
     if not reqs:
@@ -921,9 +930,9 @@ def install_optional_backends(venvs: dict, reqs: list[str], log: Path, timeout: 
     for req in reqs:
         failed = False
         for side, venv in venvs.items():
-            rc, _ = run([uv_bin(), "pip", "install", "-q", "-p", venv / "bin/python", req], log,
-                        env=base_env(side_home(venv), install=True), timeout=timeout,
-                        sbx=side_sandbox(venv, network=True))
+            cmd, env = isolated_install([uv_bin(), "pip", "install", "-q", "-p", venv / "bin/python", req],
+                                        base_env(side_home(venv), install=True), isolated)
+            rc, _ = run(cmd, log, env=env, timeout=timeout, sbx=side_sandbox(venv, network=True))
             if rc != 0:
                 failed = True
                 skipped.append({"req": req, "side": side, "rc": rc if isinstance(rc, int) else str(rc)})
@@ -932,12 +941,13 @@ def install_optional_backends(venvs: dict, reqs: list[str], log: Path, timeout: 
     return {"installed": installed, "skipped": skipped}
 
 
-def attach_optional_backends(rec: dict, venvs: dict, checkout: Path, dist: str, log: Path, timeout: int) -> None:
+def attach_optional_backends(rec: dict, venvs: dict, checkout: Path, dist: str, log: Path, timeout: int,
+                             isolated: bool = False) -> None:
     """Best-effort install of test-extra backends. A skip is recorded and is not a verdict."""
     reqs = optional_backend_reqs(checkout, dist)
     if not reqs:
         return
-    rec["optional_backends"] = install_optional_backends(venvs, reqs, log, timeout)
+    rec["optional_backends"] = install_optional_backends(venvs, reqs, log, timeout, isolated)
 
 
 def _strip_test_extras(spec: str) -> str:
@@ -1190,11 +1200,35 @@ def pr_side_constraints(main_venv: Path, dist: str, dest: Path) -> Path:
     return dest
 
 
+def no_index_config_env(env: dict) -> dict:
+    """Product-check install env: index, find-links and trusted-host settings dropped (demo_helper.drop_index_env),
+    and no uv or pip config file read (UV_NO_CONFIG=1, PIP_CONFIG_FILE=/dev/null)."""
+    from poc import demo_helper
+    env = demo_helper.drop_index_env(env)
+    env["UV_NO_CONFIG"] = "1"
+    env["PIP_CONFIG_FILE"] = os.devnull
+    return env
+
+
+def no_config_cmd(cmd: list) -> list:
+    """A uv call that ignores config files; a `uv pip install` also ignores the project's [tool.uv.sources]."""
+    if not cmd or Path(str(cmd[0])).name != "uv" or "--no-config" in cmd:
+        return cmd
+    extra = ["--no-config"]
+    if [str(x) for x in cmd[1:3]] == ["pip", "install"]:
+        extra.append("--no-sources")
+    return [*cmd, *extra]
+
+
 def install_side(venv: Path, checkout: Path, chosen: dict | None, log: Path, python: str, timeout: int,
-                 constraints: Path | None, extra_reqs=None) -> tuple[bool, str]:
+                 constraints: Path | None, extra_reqs=None, isolated: bool = False) -> tuple[bool, str]:
+    """isolated (product checks): every uv call ignores config files and the project's [tool.uv.sources], and the
+    env has no index settings (no_index_config_env)."""
     env = base_env(side_home(venv), install=True)
     if subprocess.run(["git", "-C", checkout, "describe", "--tags"], capture_output=True, env=env).returncode != 0:
         env = base_env(side_home(venv), install=True, SETUPTOOLS_SCM_PRETEND_VERSION="9999.0.0")
+    if isolated:
+        env = no_index_config_env(env)
     proj, extra = side_install_args(chosen, checkout)
     proj = with_test_extras(proj, checkout)
     cmds = [[uv_bin(), "venv", "-q", "-p", python, venv],
@@ -1221,6 +1255,8 @@ def install_side(venv: Path, checkout: Path, chosen: dict | None, log: Path, pyt
         cmds[-1] += ["--override", ov]
     if extra_reqs:
         cmds[-1].extend(list(extra_reqs))
+    if isolated:
+        cmds = [no_config_cmd(c) for c in cmds]
     ro_files = tuple(x for x in (constraints, bc if bc and Path(bc).is_file() else None, ov) if x)
     sbx = side_sandbox(venv, network=True, ro=ro_files)
     sbx["rw"].append(checkout)
@@ -1255,8 +1291,7 @@ def install_deps_only(venv: Path, checkout: Path, plan: dict, log: Path, python:
     fallback passes main's checkout on both sides, so the PR's own dependency files never change what is installed.
     """
     from poc import demo_helper
-    env = demo_helper.drop_index_env(base_env(side_home(venv), install=True))   # no index from the environment
-    env["UV_NO_CONFIG"] = "1"   # no [tool.uv], [tool.uv.pip] or uv.toml settings (index, find-links) either
+    env = no_index_config_env(base_env(side_home(venv), install=True))   # no index from the env or config files
     src = Path(deps_root) if deps_root is not None else checkout
     cmds = [["uv", "venv", "-q", "-p", python, venv]]
     if plan.get("kind") == "uv-sync":
@@ -1572,6 +1607,10 @@ def _install_with_helper(a, rec, step, venv, checkout, chosen, log, timeout, con
         if demo_helper.flat_layout(text) and not _flat_plan():
             shutil.rmtree(venv, ignore_errors=True)
             return demo_helper.FLAT_LAYOUT_REASON
+        own = demo_helper.own_index_config(checkout)   # needs an index or sources product checks ignore
+        if own:
+            shutil.rmtree(venv, ignore_errors=True)
+            return demo_helper.own_index_reason(own)
         return None
 
     def _is_main() -> bool:
@@ -1595,7 +1634,8 @@ def _install_with_helper(a, rec, step, venv, checkout, chosen, log, timeout, con
             gpu = demo_helper.gpu_only_requirement(checkout)
             if gpu:
                 return False, demo_helper.gpu_reason(gpu)
-        ok, why = install_side(venv, checkout, chosen, log, state["py"], timeout, constraints, extra_reqs)
+        ok, why = install_side(venv, checkout, chosen, log, state["py"], timeout, constraints, extra_reqs,
+                                isolated=product_route(a))
         if ok:
             return ok, why
         text = _log_text()
@@ -1611,7 +1651,8 @@ def _install_with_helper(a, rec, step, venv, checkout, chosen, log, timeout, con
                          "was installed and the install was tried again.")
                 state["py"] = got
                 shutil.rmtree(venv, ignore_errors=True)
-                ok, why = install_side(venv, checkout, chosen, log, got, timeout, constraints, extra_reqs)
+                ok, why = install_side(venv, checkout, chosen, log, got, timeout, constraints, extra_reqs,
+                                             isolated=product_route(a))
                 if ok:
                     return ok, why
                 text = _log_text()
@@ -1738,8 +1779,8 @@ def _retry_setup_gap(a, rec, repo, prdir, venvs: dict, rerun, recheck_coverage=N
         venv = venvs.get(side)
         if venv is None:
             return False, ""
-        rc, _ = run([uv_bin(), "pip", "install", "-q", "-p", venv / "bin/python", requirement],
-                    prdir / "setup-gap.log", env=base_env(side_home(venv), install=True),
+        rc, _ = run(no_config_cmd([uv_bin(), "pip", "install", "-q", "-p", venv / "bin/python", requirement]),
+                    prdir / "setup-gap.log", env=no_index_config_env(base_env(side_home(venv), install=True)),
                     timeout=getattr(a, "build_timeout", 1800), sbx=side_sandbox(venv, network=True))
         return rc == 0, _dist_version(venv, requirement) if rc == 0 else ""
 
@@ -2265,7 +2306,8 @@ def freeze_env(venv: Path, out: Path) -> str:
     return out.name
 
 
-def build_main_env(cfg: dict, venv: Path, log: Path, python: str, timeout: int, wheel_dir: Path) -> dict:
+def build_main_env(cfg: dict, venv: Path, log: Path, python: str, timeout: int, wheel_dir: Path,
+                   isolated: bool = False) -> dict:
     """Stable release of the library with its test extra + test deps + optional test deps (so tests do not skip for
     missing optional modules), then the exact nightly wheel file, pinned by sha256, reinstalled without deps.
     UV_LINK_MODE=copy so patching the PR copy can never modify the shared uv cache."""
@@ -2274,8 +2316,12 @@ def build_main_env(cfg: dict, venv: Path, log: Path, python: str, timeout: int, 
     steps = [[uv_bin(), "venv", "-q", "-p", python, venv],
              [uv_bin(), "pip", "install", "-q", "-p", py, cfg["dist"], *cfg["deps"], *BASE_TEST_DEPS, *cfg["test_deps"]]]
     sbx = side_sandbox(venv, network=True)
+
+    def iso(c):   # isolated (product checks): every uv call goes through isolated_install, as in install_side
+        return isolated_install(c, env, isolated)
     for c in steps:
-        rc, _ = run(c, log, env=env, timeout=timeout, sbx=sbx)
+        c2, e2 = iso(c)
+        rc, _ = run(c2, log, env=e2, timeout=timeout, sbx=sbx)
         if rc != 0:
             return {"ok": False, "why": f"main env setup failed ({rc}) at: {' '.join(map(str, c[:4]))}"}
     extras = test_extras(dist_extras(venv, cfg["dist"], env))
@@ -2283,12 +2329,13 @@ def build_main_env(cfg: dict, venv: Path, log: Path, python: str, timeout: int, 
     optional_backends = {"installed": [], "skipped": []}
     if extras or opt:
         spec = f"{cfg['dist']}[{','.join(extras)}]" if extras else cfg["dist"]
-        rc, _ = run([uv_bin(), "pip", "install", "-q", "-p", py, spec, *opt], log, env=env, timeout=timeout, sbx=sbx)
+        c2, e2 = iso([uv_bin(), "pip", "install", "-q", "-p", py, spec, *opt])
+        rc, _ = run(c2, log, env=e2, timeout=timeout, sbx=sbx)
         if rc != 0:
             reqs = list(dict.fromkeys(reqs_for_test_extras(metadata_requires(venv, cfg["dist"]), cfg["dist"]) + opt))
             if not reqs:
                 return {"ok": False, "why": f"installing test extras/optional test deps failed ({rc}); see setup log"}
-            optional_backends = install_optional_backends({"main": venv}, reqs, log, timeout)
+            optional_backends = install_optional_backends({"main": venv}, reqs, log, timeout, isolated)
         else:
             bundled = reqs_for_test_extras(metadata_requires(venv, cfg["dist"]), cfg["dist"]) + opt
             optional_backends = {"installed": bundled, "skipped": []}
@@ -2298,13 +2345,14 @@ def build_main_env(cfg: dict, venv: Path, log: Path, python: str, timeout: int, 
             cfg["dist"], python), wheel_dir)
     except Exception as e:  # noqa: BLE001
         return {"ok": False, "why": f"could not fetch the nightly wheel: {e}"}
-    rc, _ = run([uv_bin(), "pip", "install", "-q", "-p", py, "--no-deps", "--reinstall", whl["path"]], log, env=env,
-                timeout=timeout, sbx=side_sandbox(venv, ro=(whl["path"],)))   # local file: no network needed
+    c2, e2 = iso([uv_bin(), "pip", "install", "-q", "-p", py, "--no-deps", "--reinstall", whl["path"]])
+    rc, _ = run(c2, log, env=e2, timeout=timeout, sbx=side_sandbox(venv, ro=(whl["path"],)))   # local file: no network needed
     if rc != 0:
         return {"ok": False, "why": f"installing the nightly wheel failed ({rc})"}
     ver = in_side(venv, [py, "-c", f"import {cfg['pkg']} as m;print(m.__version__)"]).stdout.strip()
     commit, how = nightly_commit(whl["version"], venv, cfg, env)
-    rc, _ = run([uv_bin(), "pip", "check", "-p", py], log, env=env, timeout=120, sbx=side_sandbox(venv))
+    c2, e2 = iso([uv_bin(), "pip", "check", "-p", py])
+    rc, _ = run(c2, log, env=e2, timeout=120, sbx=side_sandbox(venv))
     whl.pop("path")
     return {"ok": bool(ver), "version": ver, "pip_check": "ok" if rc == 0 else "conflicts (see setup log)",
             "build": whl | {"commit": commit, "commit_source": how},
@@ -2333,7 +2381,7 @@ def apply_patch(pdiff: str, site: Path, log: Path) -> tuple[bool, str]:
 
 
 def source_build(repo: str, item: dict, cfg: dict, venv: Path, workdir: Path, log: Path, python: str,
-                 timeout: int, main_extra_reqs: tuple = ()) -> dict:
+                 timeout: int, main_extra_reqs: tuple = (), isolated: bool = False) -> dict:
     env = base_env(side_home(venv), install=True)
     src = workdir / "src"
     steps = [["git", "init", "-q", src],
@@ -2344,17 +2392,19 @@ def source_build(repo: str, item: dict, cfg: dict, venv: Path, workdir: Path, lo
              [uv_bin(), "venv", "-q", "-p", python, venv],
              [uv_bin(), "pip", "install", "-q", "-p", venv / "bin/python", *cfg["deps"], *BASE_TEST_DEPS, *cfg["test_deps"]]]
     for c in steps:   # git on our own fresh clone runs on the host; uv steps (package code) in the PR side's sandbox
-        sbx = side_sandbox(venv, network=True) if Path(str(c[0])).name == "uv" else HOST
-        rc, _ = run(c, log, env=env if Path(str(c[0])).name == "uv" else base_env(workdir / "home-git"), timeout=900, sbx=sbx)
+        is_uv = Path(str(c[0])).name == "uv"
+        sbx = side_sandbox(venv, network=True) if is_uv else HOST
+        c2, e2 = isolated_install(c, env, isolated) if is_uv else (c, base_env(workdir / "home-git"))
+        rc, _ = run(c2, log, env=e2, timeout=900, sbx=sbx)
         if rc != 0:
             return {"ok": False, "why": f"source checkout/setup failed ({rc}) at: {' '.join(map(str, c[:3]))}"}
     optional = [str(x) for x in list(cfg.get("optional_test_deps") or []) + list(main_extra_reqs)]
     optional += [r for r in optional_backend_reqs(src, cfg["dist"]) if r not in optional]
-    backends = install_optional_backends({"pr": venv}, optional, log, timeout) if optional else {
+    backends = install_optional_backends({"pr": venv}, optional, log, timeout, isolated) if optional else {
         "installed": [], "skipped": []}
     t0 = time.time()
-    rc, secs = run_heavy([uv_bin(), "pip", "install", "-p", venv / "bin/python", "--no-cache", src], log, env=env,
-                         timeout=timeout, sbx=side_sandbox(venv, network=True))
+    c2, e2 = isolated_install([uv_bin(), "pip", "install", "-p", venv / "bin/python", "--no-cache", src], env, isolated)
+    rc, secs = run_heavy(c2, log, env=e2, timeout=timeout, sbx=side_sandbox(venv, network=True))
     if rc == "oom":
         return {"ok": False, "build_seconds": round(time.time() - t0, 1),
                 "infrastructure_failure": {"kind": "oom", "action": "retry"}, "why": _oom_reason()}
@@ -2473,7 +2523,7 @@ def _contree_ready() -> bool:
 
 
 def _maybe_prepare_contree(a, repo: str, main_sha: str, pr_sha: str, rec: dict, timeout: int,
-                           extra_shell: str = "") -> str | None:
+                           extra_shell: str = "", main_dir=None) -> str | None:
     """Build Contree main/PR checkpoints for source-pair. On failure return a refusal; there is no local bubblewrap
     fallback (no pull-request code runs). Returns None when the check may continue.
 
@@ -2490,6 +2540,8 @@ def _maybe_prepare_contree(a, repo: str, main_sha: str, pr_sha: str, rec: dict, 
         rec["machine"] = "contree"
         rec["sandbox_backend"] = "contree"
         rec["sandbox_backend_note"] = contree_sandboxes.note()
+        if product_route(a):
+            return _check_contree_pythons(sess, rec, main_dir)
         return None
     except contree_sandboxes.ContreeError as e:
         contree_sandboxes.clear_session()
@@ -2499,6 +2551,32 @@ def _maybe_prepare_contree(a, repo: str, main_sha: str, pr_sha: str, rec: dict, 
         rec["machine"] = "contree (not run)"
         rec["contree"] = entry
         return refusal
+
+
+def own_index_refusal(a, cnv: str | None, *checkouts) -> str | None:
+    """A Contree setup failure on a product check whose project needs its own index or uv sources: could not verify
+    with that limitation as the reason instead of the generic setup failure. Anything else is returned unchanged."""
+    from poc import demo_helper
+    if not cnv or not product_route(a) or cnv.startswith("infrastructure failure:"):
+        return cnv
+    found = [f for c in checkouts if c is not None for f in demo_helper.own_index_config(c)]
+    return demo_helper.own_index_reason(list(dict.fromkeys(found))) if found else cnv
+
+
+def _check_contree_pythons(sess, rec: dict, main_dir) -> str | None:
+    """Record the Python each Contree side ran and refuse the check when it is unreadable or outside requires-python.
+
+    requires-python comes from main's checkout only, so a PR cannot loosen it. A refusal caps the result at
+    could_not_verify; it never becomes a normal result."""
+    from poc import contree_sandboxes, demo_helper
+    specs: list[str] = []
+    if main_dir is not None and Path(main_dir).is_dir():
+        specs, _declared = demo_helper._python_from_checkout(Path(main_dir))
+    info = contree_sandboxes.side_pythons(sess, specs)
+    rec.setdefault("contree", {})["python"] = info
+    if info["problems"]:
+        return "Contree Python check failed: " + "; ".join(info["problems"])
+    return None
 
 
 def contree_only_extra_shell(declared: list[str], optional: list[str], base: str = "") -> str:
@@ -2648,8 +2726,9 @@ def coverage_run(item: dict, venv: Path, main_root: Path, pr_root: Path, targets
     if not changed:
         return {"status": "failed", "why": "none of the changed Python files exist on the PR side"}
     log = prdir / "coverage-pr.log"
-    rc, _ = run([uv_bin(), "pip", "install", "-q", "-p", venv / "bin/python", "coverage>=7", "pytest-cov>=5"], log,
-                env=base_env(side_home(venv), install=True), timeout=600, sbx=side_sandbox(venv, network=True))
+    c2, e2 = isolated_install([uv_bin(), "pip", "install", "-q", "-p", venv / "bin/python", "coverage>=7", "pytest-cov>=5"],
+                              base_env(side_home(venv), install=True), product_route(a))
+    rc, _ = run(c2, log, env=e2, timeout=600, sbx=side_sandbox(venv, network=True))
     if rc != 0:
         return {"status": "failed", "why": f"installing coverage failed ({rc}); see coverage-pr.log"}
     out = prdir / "coverage-pr.json"
@@ -3567,8 +3646,9 @@ def probe_coverage(item: dict, probe_results: dict | None, vm: Path, main_root: 
     log = prdir / "probe-coverage.log"
     py = vm / "bin" / "python"
     if in_side(vm, [py, "-c", "import coverage"]).returncode != 0:
-        rc, _ = run([uv_bin(), "pip", "install", "-q", "-p", py, "coverage>=7"], log,
-                    env=base_env(side_home(vm), install=True), timeout=600, sbx=side_sandbox(vm, network=True))
+        c2, e2 = isolated_install([uv_bin(), "pip", "install", "-q", "-p", py, "coverage>=7"],
+                                  base_env(side_home(vm), install=True), product_route(a))
+        rc, _ = run(c2, log, env=e2, timeout=600, sbx=side_sandbox(vm, network=True))
         if rc != 0:
             return unmeasured(f"installing coverage on the main side failed ({rc}); see probe-coverage.log")
     include = ",".join(str(Path(main_root) / rel) for rel, lines in changed.items() if (Path(main_root) / rel).is_file())
@@ -3761,8 +3841,9 @@ def settle_probes(rec: dict) -> None:
     rec["probe_changed_line_coverage"] = probe_adequacy.summary(rec["probes"]["items"])
 
 
-def install_optional_modules(venvs: dict, modules: list[str], log: Path, timeout: int) -> tuple[bool, str]:
-    """Install plain pip wheels for missing optional modules, on both sides."""
+def install_optional_modules(venvs: dict, modules: list[str], log: Path, timeout: int,
+                             isolated: bool = False) -> tuple[bool, str]:
+    """Install plain pip wheels for missing optional modules, on both sides. isolated: see isolated_install."""
     pkgs = []
     for name in modules:
         pkg = PIP_OPTIONAL.get(name)
@@ -3771,9 +3852,9 @@ def install_optional_modules(venvs: dict, modules: list[str], log: Path, timeout
     if not pkgs:
         return True, ""
     for side, venv in venvs.items():
-        rc, _ = run([uv_bin(), "pip", "install", "-q", "-p", venv / "bin/python", *pkgs], log,
-                    env=base_env(side_home(venv), install=True), timeout=timeout,
-                    sbx=side_sandbox(venv, network=True))
+        cmd, env = isolated_install([uv_bin(), "pip", "install", "-q", "-p", venv / "bin/python", *pkgs],
+                                    base_env(side_home(venv), install=True), isolated)
+        rc, _ = run(cmd, log, env=env, timeout=timeout, sbx=side_sandbox(venv, network=True))
         if rc != 0:
             return False, f"installing {', '.join(pkgs)} on the {side} side failed ({rc}); see {log.name}"
     return True, ""
@@ -3830,7 +3911,7 @@ def execute_tests(rec: dict, venvs: dict, targets: dict, prdir: Path, work: Path
     if not modules:
         return cmp, cnv, ex
     log = prdir / "setup-optional.log"
-    ok, why = install_optional_modules(venvs, modules, log, a.build_timeout)
+    ok, why = install_optional_modules(venvs, modules, log, a.build_timeout, product_route(a))
     wheels = [PIP_OPTIONAL[m] for m in modules if PIP_OPTIONAL.get(m)]
     if not ok:
         rec["optional_install_error"] = why
@@ -3921,7 +4002,8 @@ def _contree_only_pair(a, rec: dict, repo: str, cfg: dict, item: dict, sp: dict,
         rec["contree_only"]["note"] = "Contree mode: Contree did not run, so nothing from the pull request was run"
         return None, blocked, None, targets
     cnv = _maybe_prepare_contree(a, repo, sp["main_sha"], sp["pr_sha"], rec, a.build_timeout,
-                                 extra_shell=contree_only_extra_shell(decl, optional, base))
+                                 extra_shell=contree_only_extra_shell(decl, optional, base), main_dir=cm)
+    cnv = own_index_refusal(a, cnv, cm, cp)
     cmp = ex = None
     if cnv:
         rec["contree_only"]["note"] = "Contree mode: Contree did not run, so nothing from the pull request was run"
@@ -4007,7 +4089,7 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
     if helper_on:
         def _build_main():
             built = build_main_env(cfg, vm, prdir / "setup-main.log", py, a.build_timeout,
-                                   workroot / "wheels" / rdir.name)
+                                   workroot / "wheels" / rdir.name, isolated=product_route(a))
             return bool(built.get("ok")), built.get("why") or "", built
         _ok, _why, main, outcome = demo_helper.run_setup(
             "main install", _build_main, cleanup=lambda: shutil.rmtree(vm, ignore_errors=True))
@@ -4015,7 +4097,8 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
         if not isinstance(main, dict):
             main = {"ok": False, "why": _why}
     else:
-        main = build_main_env(cfg, vm, prdir / "setup-main.log", py, a.build_timeout, workroot / "wheels" / rdir.name)
+        main = build_main_env(cfg, vm, prdir / "setup-main.log", py, a.build_timeout, workroot / "wheels" / rdir.name,
+                              isolated=product_route(a))
     rec["main_side"] = {"source": "scientific-python nightly wheel (exact file, pinned by sha256)",
                         **{k: v for k, v in main.items() if k not in ("ok",)}}
     if main.get("build"):
@@ -4034,7 +4117,7 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
             if helper_on:
                 def _build_pr():
                     built = source_build(repo, item, cfg, vp, work, prdir / "build-pr.log", py,
-                                         a.build_timeout, tuple(extra))
+                                         a.build_timeout, tuple(extra), isolated=product_route(a))
                     return bool(built.get("ok")), built.get("why") or "", built
                 _ok, _why, b, outcome = demo_helper.run_setup(
                     "PR build", _build_pr, cleanup=lambda: shutil.rmtree(vp, ignore_errors=True),
@@ -4043,7 +4126,8 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
                 if not isinstance(b, dict):
                     b = {"ok": False, "why": _why}
             else:
-                b = source_build(repo, item, cfg, vp, work, prdir / "build-pr.log", py, a.build_timeout, tuple(extra))
+                b = source_build(repo, item, cfg, vp, work, prdir / "build-pr.log", py, a.build_timeout, tuple(extra),
+                                 isolated=product_route(a))
             rec["pr_side"] = {"source": f"source build of {item['head_sha'][:12]}",
                               **{k: v for k, v in b.items() if k != "ok"}}
             rec["notes"] = ("main = nightly wheel, PR = source build of the PR head; differences can include "
@@ -4080,9 +4164,10 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
         if reqs:
             def _plan_install(side, requirement, _vm=vm, _vp=vp):
                 venv = _vm if side == "main" else _vp
-                rc, _ = run([uv_bin(), "pip", "install", "-q", "-p", venv / "bin/python", requirement],
-                            prdir / "setup-plan.log", env=base_env(side_home(venv), install=True),
-                            timeout=a.build_timeout, sbx=side_sandbox(venv, network=True))
+                cmd, env = isolated_install([uv_bin(), "pip", "install", "-q", "-p", venv / "bin/python", requirement],
+                                            base_env(side_home(venv), install=True), product_route(a))
+                rc, _ = run(cmd, prdir / "setup-plan.log", env=env, timeout=a.build_timeout,
+                            sbx=side_sandbox(venv, network=True))
                 return rc == 0, _dist_version(venv, requirement) if rc == 0 else ""
             demo_helper.note_installs(rec, demo_helper.install_same(reqs, _plan_install))
     if not cnv:
@@ -4369,7 +4454,7 @@ def test_source_pair(repo: str, cfg: dict, item: dict, prdir: Path, work: Path, 
             if helper_on and setup_plan:
                 _log_plan_installs(rec, setup_plan, {"main": vm, "pr": vp})
             attach_optional_backends(rec, {"main": vm, "pr": vp}, cm, cfg["dist"],
-                                     prdir / "setup-optional.log", a.build_timeout)
+                                     prdir / "setup-optional.log", a.build_timeout, product_route(a))
             chosen_tg = chosen_test_targets(item.get("chosen"))
             if chosen_tg:
                 targets = {"main": [t for t in chosen_tg if (cm / t).exists()],
@@ -4390,7 +4475,7 @@ def test_source_pair(repo: str, cfg: dict, item: dict, prdir: Path, work: Path, 
                                                        cfg["dist"])
             if decl:
                 good, why2 = install_declared_test_deps({"main": vm, "pr": vp}, decl, prdir / "setup-declared.log",
-                                                        a.build_timeout)
+                                                        a.build_timeout, product_route(a))
                 rec["declared_test_deps"] = {"requested": decl, "installed": good}
                 if good:
                     rec["test_extras"] = list(dict.fromkeys([*(rec.get("test_extras") or []), *decl]))
@@ -4403,9 +4488,10 @@ def test_source_pair(repo: str, cfg: dict, item: dict, prdir: Path, work: Path, 
                 if helper_on:
                     shell = demo_helper.contree_shell(setup_plan) if setup_plan else ""
                     cnv = _maybe_prepare_contree(a, repo, sp["main_sha"], sp["pr_sha"], rec, a.build_timeout,
-                                                 extra_shell=shell)
+                                                 extra_shell=shell, main_dir=cm)
                 else:
-                    cnv = _maybe_prepare_contree(a, repo, sp["main_sha"], sp["pr_sha"], rec, a.build_timeout)
+                    cnv = _maybe_prepare_contree(a, repo, sp["main_sha"], sp["pr_sha"], rec, a.build_timeout, main_dir=cm)
+                cnv = own_index_refusal(a, cnv, cm, cp)
             if cnv:
                 pass
             elif not targets["pr"]:

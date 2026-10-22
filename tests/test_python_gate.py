@@ -21,7 +21,7 @@ def test_wrong_python_error_installs_it_and_retries_once(tmp_path, monkeypatch):
     log = tmp_path / "log"
     seen = []
 
-    def fake_install(venv, checkout, chosen, lg, py, *rest):
+    def fake_install(venv, checkout, chosen, lg, py, *rest, **_kw):
         seen.append(py)
         if py == "3.12":
             lg.write_text("error: the current Python does not satisfy requires-python >=3.14.7\n")
@@ -42,7 +42,7 @@ def test_wrong_python_error_installs_it_and_retries_once(tmp_path, monkeypatch):
     assert ok is False and set(seen) == {"3.12"}
 
 
-def _flat_layout(venv, checkout, chosen, lg, py, *rest):
+def _flat_layout(venv, checkout, chosen, lg, py, *rest, **_kw):
     lg.write_text("error: Multiple top-level packages discovered in a flat-layout: ['ee', 'posthog']\n")
     return False, "install failed (1)"
 
@@ -138,7 +138,7 @@ def test_flat_layout_on_the_pr_side_only_does_not_fall_back(tmp_path, monkeypatc
     assert ok is False and why == demo_helper.FLAT_LAYOUT_REASON and calls == ["install"]
 
 
-def _not_a_python_project(venv, checkout, chosen, lg, py, *rest):
+def _not_a_python_project(venv, checkout, chosen, lg, py, *rest, **_kw):
     lg.write_text("error: /src does not appear to be a Python project\n")
     return False, "install failed (1)"
 
@@ -335,7 +335,7 @@ def test_disk_full_stops_without_a_retry_and_removes_build_files(tmp_path, monke
     (home / "pip-unpack").mkdir()
     (home / "pip-unpack" / "x").write_text("x")
 
-    def fake_install(_venv, _checkout, _chosen, lg, py, *_rest):
+    def fake_install(_venv, _checkout, _chosen, lg, py, *_rest, **_kw):
         calls.append(py)
         lg.write_text("ERROR: Could not install wheels\nNo space left on device\n")
         return False, "install failed (1)"
@@ -359,7 +359,7 @@ def test_disk_full_on_a_study_run_keeps_the_old_retries(tmp_path, monkeypatch):
     kept.mkdir(parents=True)
     (kept / "part").write_text("keep")
 
-    def fake_install(_venv, _checkout, _chosen, lg, _py, *_rest):
+    def fake_install(_venv, _checkout, _chosen, lg, _py, *_rest, **_kw):
         calls.append(1)
         lg.write_text("No space left on device\n")
         return False, "install failed (1)"

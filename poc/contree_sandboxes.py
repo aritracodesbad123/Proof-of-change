@@ -8,6 +8,7 @@ Secrets never enter Contree shell env. Concurrent ops are capped at CONTREE_MAX_
 from __future__ import annotations
 
 import os
+import re
 import shlex
 import threading
 from pathlib import Path
@@ -288,6 +289,122 @@ class ContreeSession:
         return self.run_op(side, shell, disposable=True, timeout=timeout, files=files)
 
 
+_PY_VERSION_OUT = re.compile(r"^Python (\d+\.\d+(?:\.\d+)?)((?:a|b|rc)\d+)?(\+\S*)?\s*$")
+
+
+def parse_python_version(raw: dict | None) -> str:
+    """The full version from a `python --version` result, pre-release (a/b/rc) and local (+...) tags kept,
+    for example '3.13.0rc1' or '3.12.7+'. '' when the run failed or printed something else."""
+    if not isinstance(raw, dict) or raw.get("exit_code") != 0:
+        return ""
+    text = ((raw.get("stdout") or "") + "\n" + (raw.get("stderr") or "")).strip().splitlines()
+    for line in text:
+        m = _PY_VERSION_OUT.match(line.strip())
+        if m:
+            return "".join(g for g in m.groups() if g is not None)
+    return ""
+
+
+def split_python_version(version: str) -> tuple[tuple[int, ...], str, str] | None:
+    """(release numbers, pre-release tag, local tag) of a parsed version, or None when it is not one."""
+    m = re.fullmatch(r"(\d+\.\d+(?:\.\d+)?)((?:a|b|rc)\d+)?(\+\S*)?", version or "")
+    if not m:
+        return None
+    return tuple(int(x) for x in m.group(1).split(".")), m.group(2) or "", m.group(3) or ""
+
+
+_RP_CLAUSE = re.compile(r"^(~=|==|!=|>=|<=|>|<)\s*(\d+(?:\.\d+)*)(\.\*)?$")
+
+
+def parse_requires_python(text: str) -> list[tuple[str, tuple[int, ...], bool]] | None:
+    """Clauses of a requires-python string as (op, version, wildcard), all ANDed. None when any part is unreadable.
+
+    Stdlib only. Supports ==, !=, >=, <=, >, <, ~= and ==X.* / !=X.*. Nothing is dropped: one bad clause makes the
+    whole string unreadable."""
+    parts = [p.strip() for p in (text or "").split(",")]
+    if not parts or any(not p for p in parts):
+        return None
+    out = []
+    for part in parts:
+        m = _RP_CLAUSE.match(part)
+        if not m:
+            return None
+        op, ver, star = m.group(1), tuple(int(x) for x in m.group(2).split(".")), bool(m.group(3))
+        if star and op not in ("==", "!="):
+            return None
+        if op == "~=" and len(ver) < 2:
+            return None
+        out.append((op, ver, star))
+    return out
+
+
+def _pad(v: tuple[int, ...], n: int) -> tuple[int, ...]:
+    return v + (0,) * (n - len(v))
+
+
+def requires_python_ok(full: tuple[int, ...], clauses) -> bool:
+    """True when the full version (major, minor, micro) meets every clause."""
+    for op, ver, star in clauses:
+        if star:
+            hit = full[:len(ver)] == ver
+            if (op == "==") != hit:
+                return False
+            continue
+        n = max(len(full), len(ver))
+        a, b = _pad(full, n), _pad(ver, n)
+        if op == "~=":
+            ok = a >= b and full[:len(ver) - 1] == ver[:-1]
+        else:
+            ok = {"==": a == b, "!=": a != b, ">=": a >= b, "<=": a <= b, ">": a > b, "<": a < b}[op]
+        if not ok:
+            return False
+    return True
+
+
+def side_pythons(sess: "ContreeSession", specs: list[str], *, timeout: int = 120) -> dict:
+    """Which Python actually runs on each side's Contree checkpoint, checked against the project's requires-python.
+
+    Runs `python --version` from the main and PR checkpoints (the same place the tests run). Each side whose
+    version cannot be read, or does not satisfy requires-python, adds a problem. A non-empty `problems` list means
+    the check must not pass as a normal result. Both sides must also report the exact same full version."""
+    texts = [s.strip() for s in specs or [] if isinstance(s, str) and s.strip()]
+    out: dict = {"requires_python": texts, "requires_python_found": bool(texts), "main": "", "pr": "",
+                 "problems": []}
+    spec_sets = []
+    for text in texts:
+        clauses = parse_requires_python(text)  # every clause kept, e.g. '>=3.8,<4' keeps '<4'
+        if clauses is None:
+            out["problems"].append(f"requires-python could not be read: {text!r}")
+        else:
+            spec_sets.append(clauses)
+    spec_ok = len(spec_sets) == len(texts)
+    for side in ("main", "pr"):
+        try:
+            raw = sess.run_argv(side, ["python", "--version"], timeout=timeout, cwd="/work")
+        except ContreeError as e:
+            raw = {"exit_code": None, "stderr": f"{type(e).__name__}"}
+        version = parse_python_version(raw)
+        out[side] = version
+        if not version:
+            out["problems"].append(f"{side}: the Python version inside Contree could not be read")
+            continue
+        parts = split_python_version(version)
+        if parts is None:
+            out["problems"].append(f"{side}: the Python version inside Contree could not be read")
+            continue
+        if parts[1]:
+            out["problems"].append(f"{side}: Contree ran a pre-release Python ({version})")
+        if not spec_ok:
+            continue
+        full = parts[0]
+        if not all(requires_python_ok(full, clauses) for clauses in spec_sets):
+            out["problems"].append(f"{side}: Contree ran Python {version}, which does not satisfy requires-python "
+                                   f"{', '.join(texts)}")
+    if out["main"] and out["pr"] and out["main"] != out["pr"]:
+        out["problems"].append(f"main ran {out['main']}, PR ran {out['pr']}")
+    return out
+
+
 def new_session(**kw) -> ContreeSession:
     sess = ContreeSession(**kw)
     _state["session"] = sess
@@ -307,8 +424,8 @@ DEPS_ONLY_SHELL = (
     " python -m pip install -q uv==0.13.1 2>/dev/null || true;"
     " PYX=\"$(python -c 'import sys; print(sys.executable)')\"; PFX=\"$(python -c 'import sys; print(sys.prefix)')\";"
     " if [ -f pyproject.toml ] && [ -f uv.lock ]; then UV_PROJECT_ENVIRONMENT=\"$PFX\" python -m uv sync -q"
-    " --no-install-project --frozen -p \"$PYX\";"
-    " elif [ -f pyproject.toml ]; then UV_PROJECT_ENVIRONMENT=\"$PFX\" python -m uv sync -q --no-install-project -p \"$PYX\";"
+    " --no-config --no-install-project --frozen -p \"$PYX\";"
+    " elif [ -f pyproject.toml ]; then UV_PROJECT_ENVIRONMENT=\"$PFX\" python -m uv sync -q --no-config --no-install-project -p \"$PYX\";"
     " else for f in requirements*.txt; do if [ -f \"$f\" ]; then python -m pip install -q -r \"$f\"; fi; done; fi"
     " && CHG=\"$(git status --porcelain --untracked-files=all --ignored=no | grep -v ' .poc-declared-deps.txt$' || true)\""
     " && if [ -n \"$CHG\" ]; then echo \"setup problem: the dependency install changed the checked-out code: $CHG\"; exit 1; fi"
@@ -317,15 +434,40 @@ DEPS_ONLY_SHELL = (
 )
 
 
+# Product checks: no index, find-links or trusted-host setting from the environment, and no pip or uv config file
+# (pip.conf, [tool.uv], [tool.uv.pip], uv.toml) can change where packages come from. Same rules as drop_index_env.
+# Fixed list, plain POSIX: no sed, no eval. PIP_CONFIG_FILE and UV_NO_CONFIG are cleared too, then re-exported.
+INDEX_CONFIG_VARS = (
+    "UV_INDEX", "UV_INDEX_URL", "UV_EXTRA_INDEX_URL", "UV_DEFAULT_INDEX", "UV_FIND_LINKS", "UV_NO_INDEX",
+    "UV_INSECURE_HOST", "UV_INDEX_STRATEGY", "UV_KEYRING_PROVIDER", "UV_CONFIG_FILE", "UV_NO_CONFIG",
+    "PIP_INDEX", "PIP_INDEX_URL", "PIP_EXTRA_INDEX_URL", "PIP_FIND_LINKS", "PIP_NO_INDEX", "PIP_TRUSTED_HOST",
+    "PIP_KEYRING_PROVIDER", "PIP_CONFIG_FILE", "PIP_ISOLATED_MODE",
+)
+_KEEP_EXPORTED = ("UV_NO_CONFIG", "PIP_CONFIG_FILE")
+NO_INDEX_CONFIG_CHECK = (
+    "".join(f'[ -z "${{{v}+x}}" ] || {{ echo "setup problem: {v} is still set"; exit 1; }}\n'
+            for v in INDEX_CONFIG_VARS if v not in _KEEP_EXPORTED)
+    + '[ "${UV_NO_CONFIG-}" = 1 ] && [ "${PIP_CONFIG_FILE-}" = /dev/null ] '
+      '|| { echo "setup problem: the pip and uv config settings did not take"; exit 1; }\n'
+)
+NO_INDEX_CONFIG_SHELL = (
+    "unset " + " ".join(INDEX_CONFIG_VARS) + " || exit 1\n"
+    "export UV_NO_CONFIG=1 PIP_CONFIG_FILE=/dev/null || exit 1\n"
+    + NO_INDEX_CONFIG_CHECK
+)
+
+
 def install_shell_source(repo: str, sha: str, extra: str = "", deps_only_fallback: bool = False) -> str:
     """Clone a public GitHub SHA into /work/src and pip-install editable + pytest (source-pair style).
 
     extra is the same shell on both sides (system packages and plan requirements). Empty leaves the
-    original install unchanged.
+    original install unchanged. deps_only_fallback (product checks) also clears index settings from the environment
+    and turns off pip and uv config files for every install in the shell (NO_INDEX_CONFIG_SHELL).
     """
     # slim image needs git; network is available during checkpoint builds
     shell = (
-        "export DEBIAN_FRONTEND=noninteractive\n"
+        (NO_INDEX_CONFIG_SHELL if deps_only_fallback else "")
+        + "export DEBIAN_FRONTEND=noninteractive\n"
         "(command -v git >/dev/null || (apt-get update -qq && apt-get install -y -qq git >/dev/null))\n"
         "python -m pip install -q --upgrade pip\n"
         "rm -rf /work/src\n"

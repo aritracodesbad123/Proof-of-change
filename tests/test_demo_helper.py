@@ -177,7 +177,7 @@ def test_python_switch_applies_to_one_check_only(tmp_path, monkeypatch):
     assert daily_run._check_python(a, None) == "3.10"
     seen = {}
 
-    def fake_install(venv, checkout, chosen, log, python, timeout, constraints, extra_reqs=None):
+    def fake_install(venv, checkout, chosen, log, python, timeout, constraints, extra_reqs=None, **_kw):
         seen["python"] = python
         return True, ""
 

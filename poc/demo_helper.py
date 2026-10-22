@@ -1850,6 +1850,40 @@ def _requirement_lines(text: str):
             yield line
 
 
+_OWN_INDEX_KEYS = ("index", "index-url", "extra-index-url", "default-index", "find-links", "no-index", "sources",
+                   "trusted-host", "insecure-host")
+
+
+def own_index_config(root) -> list[str]:
+    """Settings in a project that ask for its own package index, find-links or uv sources: [tool.uv.sources],
+    [[tool.uv.index]], a uv workspace, index keys in [tool.uv] or [tool.uv.pip], and the same keys in uv.toml.
+    Product checks ignore all of these, so a project that needs them cannot be installed there."""
+    root = Path(root)
+    found = list(unsafe_uv_project(root))
+    uv = (_pyproject(root / "pyproject.toml").get("tool") or {}).get("uv") or {}
+    for label, table in (("pyproject.toml [tool.uv]", uv), ("pyproject.toml [tool.uv.pip]", (uv or {}).get("pip"))):
+        if isinstance(table, dict):
+            keys = [k for k in _OWN_INDEX_KEYS if k in table and not (label.endswith("[tool.uv]")
+                                                                     and k in ("index", "sources"))]
+            if keys:
+                found.append(f"{label}: " + ", ".join(keys))
+    uvtoml = _pyproject(root / "uv.toml")
+    for label, table in (("uv.toml", uvtoml), ("uv.toml [pip]", uvtoml.get("pip"))):
+        if isinstance(table, dict):
+            keys = [k for k in _OWN_INDEX_KEYS if k in table]
+            if keys:
+                found.append(f"{label}: " + ", ".join(keys))
+    return found
+
+
+def own_index_reason(found: list[str]) -> str:
+    """Could-not-verify reason for a product check whose project needs its own index or uv sources."""
+    shown = "; ".join(found[:3]) + (" and more" if len(found) > 3 else "")
+    return ("unsupported: the project needs its own package index or uv sources (" + shown + "). Product checks "
+            "install only from the official package index and ignore those settings, so the project could not be "
+            "installed and nothing was tested")
+
+
 def unsafe_uv_project(root) -> list[str]:
     """pyproject settings that make a uv-sync plan install from outside the official index: any
     ``[tool.uv.sources]`` entry (path, git, URL, workspace member) or any ``[[tool.uv.index]]`` entry."""
