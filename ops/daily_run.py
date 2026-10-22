@@ -1431,8 +1431,16 @@ def _product_plan(a, rec: dict, repo: str, cfg: dict, checkouts, pypi=None, pyth
     product = product_route(a)
     # A product check never installs an OS package, on Contree or anywhere else. A study plan still may.
     apply_os = not product
+    current = getattr(a, "python", "") or ""
+    if (getattr(a, "sandbox_backend", None) or "local") == "contree":
+        # Inside Contree the image's Python is what runs, and any version can be installed during setup, so the
+        # orchestrator machine's interpreters must not steer the choice.
+        from poc import contree_sandboxes
+        current = contree_sandboxes.image_python()
+        if python_available is None:
+            python_available = lambda version: True  # noqa: E731
     plan = demo_helper.build_setup_plan(
-        repo, folders, tavily, getattr(a, "python", "") or "",
+        repo, folders, tavily, current,
         getattr(a, "sandbox_backend", None) or "local",
         (cfg or {}).get("dist") or (cfg or {}).get("pkg") or "",
         python_available=python_available, pypi=pypi,
@@ -2674,6 +2682,17 @@ def _coverage_changed(item: dict, main_root: Path, pr_root: Path) -> tuple[dict,
     return changed, {}
 
 
+# Runs inside the Contree PR checkpoint after pytest: keeps only the changed files in the coverage report and
+# prints it compactly, so a large project's report fits in the command output (which Contree caps).
+_COV_SHRINK = (
+    "import json,sys\n"
+    "d=json.load(open(sys.argv[1]))\n"
+    "want=sys.argv[2:]\n"
+    "d['files']={k:v for k,v in d.get('files',{}).items() if any(k==w or k.endswith('/'+w) for w in want)}\n"
+    "print(json.dumps(d,separators=(',',':')))\n"
+)
+
+
 def contree_coverage_run(item: dict, main_root: Path, pr_root: Path, targets: list[str], prdir: Path, a) -> dict:
     """Coverage gate measurement inside the Contree PR checkpoint.
 
@@ -2702,7 +2721,9 @@ def contree_coverage_run(item: dict, main_root: Path, pr_root: Path, targets: li
         ">/tmp/poc-cov-pytest.log 2>&1\n"
         "ec=$?\n"
         "printf '___POC_EXIT___%s\\n' \"$ec\"\n"
-        "printf '___POC_COV_START___\\n'\ncat /tmp/poc-cov.json 2>/dev/null\n"
+        "printf '___POC_COV_START___\\n'\n"
+        f"python -c {shlex.quote(_COV_SHRINK)} /tmp/poc-cov.json {' '.join(shlex.quote(r) for r in sorted(changed))}"
+        " 2>/dev/null || cat /tmp/poc-cov.json 2>/dev/null\n"
         "printf '\\n___POC_COV_END___\\n'\n"
         "printf '___POC_LOG___\\n'\ncat /tmp/poc-cov-pytest.log 2>/dev/null\n"
     )
@@ -2721,6 +2742,9 @@ def contree_coverage_run(item: dict, main_root: Path, pr_root: Path, targets: li
     blob = ""
     if "___POC_COV_START___\n" in out:
         blob = out.split("___POC_COV_START___\n", 1)[1].split("\n___POC_COV_END___", 1)[0]
+        if "\n___POC_COV_END___" not in out:
+            return {"status": "not measured", "seconds": secs, "where": "contree",
+                    "why": "the coverage report was cut short by the Contree output limit; see coverage-pytest.log"}
     cov_files, why = coverage_gate.parse_report(blob)
     if cov_files is None:
         return {"status": "not measured", "why": f"{why}; see coverage-pytest.log", "seconds": secs,
