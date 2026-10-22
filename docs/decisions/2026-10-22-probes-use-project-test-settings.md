@@ -15,3 +15,7 @@ Nothing is specific to one repository. A project's config cannot set variables t
 ## Why
 
 On a Django app, every probe crashed on the main side because it loaded production settings. The app refused to start without its test flags, so the probe could not count, even though the project's tests ran fine with their pytest config.
+
+## Empty AI-written probes
+
+An AI-written probe whose code has no test statements (only imports, comments, a docstring or `pass`) is now rejected when it is written, as an "empty probe". The model is asked once more, with that reason. If the second answer is empty too, no probe file is written. Before, such a probe ran, printed nothing, and was counted as a crash on every run.
