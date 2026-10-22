@@ -1,0 +1,27 @@
+{
+  "schema": "poc-bench-case/1",
+  "id": "rich-pr4143-safe",
+  "repo": "Textualize/rich",
+  "pr_url": "https://github.com/Textualize/rich/pull/4143",
+  "base_sha": "46cebbb032f920eb096efbaf23cdc6fe9dd541f7",
+  "head_sha": "e6a36f1dea906fe56880045644b5c8b6e8c34383",
+  "category": "known_safe",
+  "expected_verdict": "verified",
+  "rationale": "Upstream open PR; no known regression; head suite result (Python 3.14.7, wheels only, no outside network): 8 failed, 949 passed, 25 skipped, 1 warning in 3.85s. Failures that look environmental (not confirmed on the base commit): 8 (see notes).",
+  "source": "upstream PR Textualize/rich#4143, SHAs from GitHub API 2026-10-22 ~22:40 IST",
+  "notes": {
+    "base_ref": "main",
+    "base_is_merge_base_as_of_2026-10-22_22:40_IST": true,
+    "refresh_before_run": "base_sha was the base-branch tip and the merge base as of 2026-10-22 22:40 IST. It is refreshed, and the head checked again, right before the pilot; if it has moved the runner reports not run.",
+    "clean_head_preexisting_failures": [
+      "tests/test_card.py::test_card_render",
+      "tests/test_markdown.py::test_inline_code_in_table_cells",
+      "tests/test_syntax.py::test_option_no_wrap",
+      "tests/test_syntax.py::test_python_render",
+      "tests/test_syntax.py::test_python_render_indent_guides",
+      "tests/test_syntax.py::test_python_render_simple",
+      "tests/test_syntax.py::test_python_render_simple_passing_lexer_instance",
+      "tests/test_syntax.py::test_syntax_highlight_ranges"
+    ]
+  }
+}
