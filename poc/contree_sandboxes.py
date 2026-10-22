@@ -368,6 +368,12 @@ class ContreeSession:
             raise ContreeError(f"no {side} checkpoint yet; call checkpoint_main / fork_pr first")
         return with_slot(lambda: self._run_on(uuid, shell, disposable=disposable, timeout=timeout, files=files))
 
+    def run_image(self, image_ref: str, shell: str, *, timeout: int = 600) -> dict:
+        """Run shell once, disposably, on an image id returned by an earlier non-disposable run."""
+        if not image_ref:
+            raise ContreeError("no image id to run on")
+        return with_slot(lambda: self._run_on(image_ref, shell, disposable=True, timeout=timeout))
+
     def checkpoint_main(self, install_shell: str, *, timeout: int = 1800) -> dict:
         """Build/save main checkpoint from BASE_IMAGE + install_shell (disposable=False)."""
         shell = f"set -euo pipefail\nmkdir -p /work\ncd /work\n{install_shell}"
