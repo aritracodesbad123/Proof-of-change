@@ -75,6 +75,20 @@ def _tidy_id(x):
     return re.sub(r"[^a-z0-9-]+", "-", x.lower()).strip("-")[:40] or x
 
 
+EMPTY_PROBE = "empty probe: the code has no test statements (only imports, comments or a docstring)"
+
+
+def has_test_code(tree: ast.AST) -> bool:
+    """True when the module does something beyond imports, docstrings, `pass` and `...`."""
+    for stmt in getattr(tree, "body", []):
+        if isinstance(stmt, (ast.Import, ast.ImportFrom, ast.Pass)):
+            continue
+        if isinstance(stmt, ast.Expr) and isinstance(stmt.value, ast.Constant):
+            continue
+        return True
+    return False
+
+
 def validate_probe(p: dict, claim_ids: set) -> str | None:
     """None if the model's probe is acceptable, else why not."""
     if not ID_RE.match(str(p.get("id", ""))):
@@ -86,6 +100,8 @@ def validate_probe(p: dict, claim_ids: set) -> str | None:
         tree = ast.parse(code)
     except SyntaxError as e:
         return f"code does not parse: {e.msg} (line {e.lineno})"
+    if not has_test_code(tree):
+        return EMPTY_PROBE
     for node in ast.walk(tree):
         if isinstance(node, ast.Assign) and any(isinstance(t, ast.Name) and t.id == "PROBE" for t in node.targets):
             return "code defines PROBE itself"

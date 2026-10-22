@@ -2080,6 +2080,29 @@ def side_out(venv: Path) -> Path:
     return d
 
 
+def side_checkout(venv: Path) -> Path | None:
+    """The side's own checkout next to its venv (work/venv-main -> work/side-main), or None (nightly routes)."""
+    d = venv.parent / f"side-{venv.name.removeprefix('venv-')}"
+    return d if d.is_dir() else None
+
+
+def probe_settings(a, venvs: dict) -> dict | None:
+    """Product checks only: the project's test settings read from MAIN's checkout (poc/test_settings.py), applied with
+    identical values to both sides. Study runs and the daily study get None, so their probes are unchanged."""
+    if not product_route(a):
+        return None
+    from poc import test_settings
+    main = side_checkout(venvs["main"]) if "main" in venvs else None
+    pr = side_checkout(venvs["pr"]) if "pr" in venvs else None
+    return test_settings.settings_from_main(main, pr) if main is not None else None
+
+
+def probe_env(venv: Path, settings: dict | None = None) -> dict:
+    """Environment for a behavioural probe: the allowlisted side env plus the given test settings (None: unchanged)."""
+    from poc import test_settings
+    return test_settings.apply_settings(base_env(side_home(venv)), settings, side_checkout(venv))
+
+
 def side_cwd(venv: Path) -> Path:
     d = venv.parent / f"cwd-{venv.name.removeprefix('venv-')}"
     d.mkdir(parents=True, exist_ok=True)
@@ -3253,16 +3276,21 @@ def probe_launcher(venv: Path, path: Path):
     return launch
 
 
+_CONTREE_CHECKOUTS: dict = {}   # "settings": the test settings for this PR's Contree probe runs (product checks)
+
+
 def _contree_probe_once(side: str, path: Path, timeout: int) -> tuple[dict, str, float]:
     """Run one probe file on a Contree checkpoint (upload probe, disposable run)."""
     from poc import contree_sandboxes
     sess = contree_sandboxes.session()
     assert sess is not None
     remote = f"/work/probes/{path.name}"
+    from poc import test_settings
+    exports = test_settings.shell_exports(_CONTREE_CHECKOUTS.get("settings"))
     t0 = time.time()
     raw = sess.run_op(
         side,
-        f"set -euo pipefail\ncd /work/src 2>/dev/null || cd /work\npython {shlex.quote(remote)}",
+        f"set -euo pipefail\ncd /work/src 2>/dev/null || cd /work\n{exports}python {shlex.quote(remote)}",
         disposable=True, timeout=timeout, files={remote: path})
     secs = round(time.time() - t0, 1)
     out, err = raw.get("stdout") or "", raw.get("stderr") or ""
@@ -3344,9 +3372,13 @@ def run_probes(repo: str, pr: int, pythons: dict, prdir: Path, work: Path, a, pl
         return {"status": "none", "items": []}
     items, errors, refused = [], [], []
     venvs = {side: Path(py).parent.parent for side, py in pythons.items()}   # <venv>/bin/python
-    envs = {side: base_env(side_home(v)) for side, v in venvs.items()}
+    settings = probe_settings(a, venvs)   # product checks: main's test settings, the same on both sides
+    envs = {side: probe_env(v, settings) for side, v in venvs.items()}
     cwds = {side: side_cwd(v) for side, v in venvs.items()}
     use_contree = _contree_ready()
+    if use_contree:
+        _CONTREE_CHECKOUTS.clear()
+        _CONTREE_CHECKOUTS["settings"] = settings
     for x in plan:
         path, fz = Path(x["path"]), x["freeze"]
         def guard(p, fz=fz):
@@ -3370,6 +3402,9 @@ def run_probes(repo: str, pr: int, pythons: dict, prdir: Path, work: Path, a, pl
         except probes.ProbeError as e:
             errors.append(str(e).replace(str(REPO_ROOT) + "/", ""))
     out = {"status": "ran" if items else "error", "items": items, "summary": probes.summarize(items)}
+    if settings is not None:
+        from poc import test_settings
+        out["test_settings"] = test_settings.summary(settings)
     if errors:
         out["errors"] = errors
     if refused:
@@ -3467,7 +3502,7 @@ def probe_coverage(item: dict, probe_results: dict | None, vm: Path, main_root: 
         out = side_out(vm)
         data, js = out / f".probe-cov-{it['id']}", out / f"probe-cov-{it['id']}.json"
         sbx = side_sandbox(vm, ro=(path,))
-        env = base_env(side_home(vm))
+        env = probe_env(vm, probe_settings(a, {"main": vm, "pr": vm.parent / "venv-pr"}))
         rc, _ = run([py, "-m", "coverage", "run", f"--data-file={data}", f"--include={include}", path], log,
                     cwd=side_cwd(vm), env=env, timeout=int(probes.read_spec(path).get("timeout_s", 120)), sbx=sbx)
         run([py, "-m", "coverage", "json", f"--data-file={data}", "-o", js, "-q"], log, cwd=side_cwd(vm), env=env,
