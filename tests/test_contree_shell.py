@@ -157,3 +157,14 @@ def test_redact_hides_plain_password_values():
     for v in (a, b, c):
         assert v not in out
     assert "&x=1" in out and "PASSWD=<redacted>" in out
+
+
+def test_redact_leaves_ordinary_basic_text_alone():
+    text = "Running basic tests\nbasic setup ok"
+    assert cs.redact(text, env={}) == text
+
+
+def test_redact_token_keeps_following_query_params():
+    val = "abc" + "Tok123"
+    out = cs.redact(f"GET /api?token={val}&page=2", env={})
+    assert val not in out and "&page=2" in out

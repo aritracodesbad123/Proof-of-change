@@ -54,15 +54,24 @@ def redact(text: str, env: dict | None = None) -> str:
         if v and str(v).strip():
             out = out.replace(str(v), f"<{k} redacted>")
     out = re.sub(r"(?i)(bearer\s+)\S+", r"\1<redacted>", out)
-    out = re.sub(r"(?i)(\bbasic\s+)[A-Za-z0-9+/=_\-]{4,}", r"\1<redacted>", out)
+    out = re.sub(r"(?i)(authorization:\s*basic\s+)\S+", r"\1<redacted>", out)
+    # Hide key=value secrets first, up to whitespace, & or a quote, and keep them out of demo_helper.redact's
+    # broader token= rule (which would also eat what follows the &) by parking them behind placeholders.
+    parked: list[str] = []
+
+    def _park(m):
+        parked.append(f"{m.group(1)}={m.group(2)}<redacted>")
+        return f"\x00{len(parked) - 1}\x00"
+
+    out = re.sub(r"(?i)\b(password|passwd|pwd|token)=(['\"]?)[^\s&'\"]+", _park, out)
     try:
         from poc import demo_helper
     except ImportError:  # pragma: no cover - script run from inside poc/
         import demo_helper  # type: ignore
     out = demo_helper.redact(out, env)
+    out = re.sub(r"\x00(\d+)\x00", lambda m: parked[int(m.group(1))], out)
     out = re.sub(r"\b(?:gh[pousr]_[A-Za-z0-9]{8,}|github_pat_[A-Za-z0-9_]{8,})", "<redacted>", out)
     out = re.sub(r"\bsk-[A-Za-z0-9_\-]{8,}", "<redacted>", out)
-    out = re.sub(r"(?i)\b(password|passwd|pwd|token)=(['\"]?)[^\s&'\"]+", r"\1=\2<redacted>", out)
     out = re.sub(r"(?i)\b([a-z][a-z0-9+.\-]*://[^\s:/@]+:)[^\s@/]+@", r"\1***@", out)
     return out
 
