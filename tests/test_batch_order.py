@@ -73,7 +73,8 @@ def test_runner_batch_order_logs_and_stages_fixes(tmp_path, monkeypatch):
     monkeypatch.setattr(dr, "_batch_diagnose", lambda a, item, why: staged.append(why))
     queue = [("o/r", {"pkg": "r"}, {"pr": n, "title": "t"}) for n in (1, 2)]
     seen = {"prs": {}}
-    out = dr._run_batch_order(queue, tmp_path, tmp_path, SimpleNamespace(), {}, seen, [])
+    out = dr._run_batch_order(queue, tmp_path, tmp_path, SimpleNamespace(pr=["x"], product_check=True), {}, seen,
+                              [])
     assert [r["pr"]["number"] for r in out] == [2, 1]
     assert staged and "install failed" in staged[0]
     assert "end pass" in (tmp_path / "batch-order.jsonl").read_text()
@@ -92,3 +93,50 @@ def test_diagnosis_is_staged_per_pr_and_from_trusted_pages_only(monkeypatch):
     a = SimpleNamespace()
     dr._batch_diagnose(a, ("o/r", {"dist": "r"}, {"pr": 7}), "ImportError: liba.so.1: cannot open shared object file")
     assert a.batch_fix_system == {"o/r#7": ["liba-dev"]}
+
+
+def test_batch_order_is_refused_outside_a_product_run(tmp_path):
+    from types import SimpleNamespace
+
+    import pytest
+
+    import ops.daily_run as dr
+    assert dr.batch_order_refusal(SimpleNamespace(batch_order=True, pr=["x"], product_check=True)) is None
+    for a in (SimpleNamespace(batch_order=True, pr=None, product_check=False),              # daily study
+              SimpleNamespace(batch_order=True, pr=["x"], product_check=False),           # study-style single PR
+              SimpleNamespace(batch_order=True, pr=["x"], product_check=True, bench="b.csv")):  # bench study
+        assert dr.batch_order_refusal(a)
+    with pytest.raises(SystemExit):
+        dr.main(["--batch-order", "--ops-dir", str(tmp_path)])
+    with pytest.raises(SystemExit):
+        dr._run_batch_order([], tmp_path, tmp_path, SimpleNamespace(batch_order=True), {}, {"prs": {}}, [])
+
+
+def test_study_runs_keep_the_earlier_single_setup_gap_rerun(tmp_path, monkeypatch):
+    """A study run and the daily study get exactly the old retry: one rerun, no OS-package diagnosis."""
+    from types import SimpleNamespace
+
+    import ops.daily_run as dr
+    from poc import demo_helper, tavily_docs
+    monkeypatch.setattr(tavily_docs, "available", lambda: False)
+    called = {}
+    monkeypatch.setattr(demo_helper, "retry_unverified_study", lambda *a, **k: called.setdefault("study", k))
+    monkeypatch.setattr(demo_helper, "retry_unverified", lambda *a, **k: called.setdefault("product", k))
+    rec = {"verdict": "could_not_verify", "reason": "No module named 'a'", "pr": {"number": 1}}
+    dr._retry_setup_gap(SimpleNamespace(pr=None, product_check=False), rec, "o/r", tmp_path, {}, None)
+    assert "study" in called and "product" not in called
+    assert "project_text" not in called["study"] and "max_tries" not in called["study"]
+    called.clear()
+    dr._retry_setup_gap(SimpleNamespace(pr=["x"], product_check=True), rec, "o/r", tmp_path, {}, None)
+    assert "product" in called and "study" not in called
+
+
+def test_study_retry_matches_the_old_one_rerun_behaviour():
+    from poc import demo_helper
+    reruns = []
+    rec = {"verdict": "could_not_verify", "reason": "ModuleNotFoundError: No module named 'a'"}
+    demo_helper.retry_unverified_study(
+        rec, lambda: reruns.append(1) or {"verdict": "could_not_verify", "reason": "No module named 'b'"},
+        lambda s, r: (True, "1"), ["a", "b"], "", None, "o/r", False)
+    gap = rec["demo_helper"]["gap_retry"]
+    assert reruns == [1] and len(gap["rounds"]) == 2 and "tries" not in gap

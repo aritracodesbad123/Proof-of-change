@@ -116,12 +116,60 @@ def test_no_package_is_proposed_without_a_system_failure_or_a_source():
     assert demo_helper.system_fix_for("fatal error: a.h: No such file or directory", "", "", YES)["install"] == []
 
 
+# Files this change touches; the test also adds every file git reports as changed against main, when it can.
+_FLOW_FILES = ("poc/demo_helper.py", "poc/batch_order.py", "ops/daily_run.py", "poc/run_progress.py",
+               "reports/pr_report.py", "console/web/src/flow.ts", "console/web/src/dag.tsx", ".env.example")
+_CODE_SUFFIXES = (".py", ".ts", ".tsx", ".js", ".sh", ".yml", ".yaml", ".toml", ".json", ".cfg", ".example")
+# Generic shapes of a hand-written OS package or error-to-package map. No real name is needed to catch one.
+_PACKAGE_SHAPES = (
+    r"""['"`]lib[a-z0-9][a-z0-9.+-]*-dev['"`]""",           # a -dev package literal
+    r"""['"`][a-z0-9][a-z0-9.+-]*-(?:essential|headers|devel)['"`]""",
+    r"""['"`][^'"`\n]*\.(?:so(?:\.\d+)*|h)['"`]\s*:\s*['"`\[(]""",   # "libX.so.1": ... / "x.h": ...
+    # an install command in code with a literal package name (a variable such as {quoted} is fine)
+    r"""\b(?:apt-get|apt|yum|dnf|apk|brew)\s+install\s+(?:-\S+\s+)*(?:lib[a-z0-9.+-]+|[a-z0-9.+]+-[a-z0-9.+-]+)\b""",
+)
+
+
+def _changed_files(root):
+    import subprocess
+    names = set(_FLOW_FILES)
+    for base in ("origin/main", "main"):
+        try:
+            got = subprocess.run(["git", "diff", "--name-only", f"{base}...HEAD"], cwd=root, capture_output=True,
+                                 text=True, timeout=30)
+        except (OSError, subprocess.SubprocessError):
+            continue
+        if got.returncode == 0:
+            names.update(line.strip() for line in got.stdout.splitlines() if line.strip())
+            break
+    return sorted(n for n in names if (root / n).is_file())
+
+
 def test_there_is_no_hand_written_package_list_or_error_map():
-    import inspect
-    src = inspect.getsource(demo_helper)
-    for gone in ("SYSTEM_ALLOWLIST", "_SO_PACKAGES", "_SYSTEM_MARKERS", "build-essential", "zlib1g", "libpq-dev",
-                 "libegl1"):
-        assert gone not in src
+    import re
+    from pathlib import Path
+    root = Path(__file__).resolve().parents[1]
+    files = _changed_files(root)
+    assert "console/web/src/flow.ts" in files and "poc/batch_order.py" in files
+    hits = []
+    for name in files:
+        if name.startswith("tests/") or not name.endswith(_CODE_SUFFIXES):
+            continue   # tests use made-up names (liba-dev); docs describe needs in plain words
+        text = (root / name).read_text(errors="replace")
+        for shape in _PACKAGE_SHAPES:
+            for m in re.finditer(shape, text):
+                line = text[:m.start()].count("\n") + 1
+                hits.append(f"{name}:{line}: {m.group(0)[:60]}")
+    for gone in ("SYSTEM_ALLOWLIST", "_SO_PACKAGES", "_SYSTEM_MARKERS"):
+        hits.extend(f"{name}: {gone}" for name in files if not name.startswith("tests/")
+                    and gone in (root / name).read_text(errors="replace"))
+    assert hits == [], "hand-written setup found:\n" + "\n".join(hits)
+
+
+def test_the_no_hardcoding_scan_catches_a_planted_map(tmp_path):
+    import re
+    planted = 'FIX = {"libfoo.so.1": "libfoo1", "x.h": ["libx-dev"]}\nrun("apt-get install -y libx-dev")\n'
+    assert sum(len(re.findall(shape, planted)) for shape in _PACKAGE_SHAPES) >= 3
 
 
 def test_system_gap_installs_proposed_packages_on_both_sides_and_reruns(monkeypatch):
@@ -151,7 +199,14 @@ def test_bubblewrap_records_a_limitation_with_packages_and_the_real_error(monkey
 
 def test_rule_a_only_the_projects_own_pages_are_trusted():
     assert demo_helper.trusted_url("https://github.com/acme/widget/blob/main/README.md", REPO)
-    assert demo_helper.trusted_url("https://github.com/acme/other-repo/wiki", REPO)  # same GitHub org
+    assert not demo_helper.trusted_url("https://github.com/acme/other-repo/wiki", REPO)  # same org, other repo
+    assert not demo_helper.trusted_url("https://acme.github.io/other-repo/install", REPO)
+    assert not demo_helper.trusted_url("https://github.com/acme", REPO)
+    # a declared GitHub link never widens trust to the organisation
+    assert not demo_helper.trusted_url("https://github.com/acme/other", REPO, ["https://github.com/acme"])
+    # the project's own docs site on a shared docs host: only its own path
+    assert demo_helper.trusted_url("https://widget.readthedocs.io/en/latest/install.html", REPO,
+                                   ["https://widget.readthedocs.io/en/latest/"])
     assert demo_helper.trusted_url("https://acme.github.io/widget/install", REPO)
     assert demo_helper.trusted_url("https://docs.widget.dev/setup", REPO, ["https://widget.dev"])
     assert not demo_helper.trusted_url("https://github.com/someone-else/widget", REPO)
@@ -208,3 +263,87 @@ def test_rule_d_same_setup_on_both_sides_with_sources_logged(monkeypatch):
     assert sides == ["main", "pr"]
     t = rec["demo_helper"]["gap_retry"]["tries"][0]
     assert t["installed"] == ["numpy 1"] and isinstance(t["sources"], list)
+
+
+def test_docs_site_declared_by_the_project_is_trusted(tmp_path):
+    (tmp_path / "pyproject.toml").write_text('[project]\nname = "widget"\n[project.urls]\n'
+                                             'Documentation = "https://widget.dev/docs"\n')
+    urls = demo_helper.declared_urls(tmp_path)
+    assert urls == ["https://widget.dev/docs"]
+    assert demo_helper.trusted_url("https://docs.widget.dev/install", REPO, urls)
+    info = {"info": {"home_page": "https://widget.dev", "project_urls": {"Docs": "https://w.example/d"}}}
+    assert "https://w.example/d" in demo_helper.pypi_declared_urls(info)
+
+
+def test_install_docs_come_from_main_only_and_a_pr_change_is_flagged(tmp_path, monkeypatch):
+    from types import SimpleNamespace
+
+    import ops.daily_run as dr
+    monkeypatch.delenv("POC_PROGRESS_PATH", raising=False)
+    main, pr = tmp_path / "side-main", tmp_path / "side-pr"
+    for side in (main, pr):
+        side.mkdir()
+        (side / "README.md").write_text("pip install widget\n")
+    (pr / "Dockerfile").write_text("RUN apt-get install -y libsneaky-dev\n")
+    (pr / "apt.txt").write_text("libsneaky2\n")
+    a = SimpleNamespace(pr=["x"], product_check=True, python="3.12", sandbox_backend="local")
+    rec = {"pr": {"number": 5}, "files": {"all": ["Dockerfile", "apt.txt", "widget/core.py"]}}
+    plan = dr._product_plan(a, rec, REPO, {"dist": "widget"}, [main, pr], pypi=lambda n: None,
+                            python_available=lambda v: None)
+    block = rec["demo_helper"]
+    assert block["install_docs"] == ["README.md"] and block["install_docs_from"] == "main"
+    assert "libsneaky-dev" not in dr._INSTALL_DOCS[f"{REPO}#5"]
+    assert [i["name"] for i in plan.get("system") or []] == []        # the PR's apt.txt is not used on either side
+    assert block["install_docs_pr_changed"][:2] == ["Dockerfile", "apt.txt"]
+    assert any("the PR changes install docs" in n for n in block["notes"])
+    from reports import pr_report
+    rows = [r for r in pr_report.checks(rec | {"verdict": "could_not_verify"}) if r[0].startswith("Install docs")]
+    assert rows and rows[0][1] == "WARN" and "Dockerfile" in rows[0][2]
+
+
+def test_pr_own_build_failure_is_labelled_and_never_retried_as_setup():
+    from poc import batch_order
+    rec = {"verdict": "could_not_verify", "reason": "build failed: x"}
+    reason = demo_helper.note_pr_build_failure(rec, "PR build", "build failed: x")
+    rec["reason"] = reason
+    assert reason.startswith("the PR's own build failed (main installed fine)")
+    assert rec["demo_helper"]["setup"]["label"] == demo_helper.PR_BUILD_LABEL
+    assert demo_helper.counts_as_verdict(rec)
+    assert not batch_order.is_setup_failure(rec)
+    calls = []
+    rec["reason"] = "ModuleNotFoundError: No module named 'a'"
+    demo_helper.retry_unverified(rec, lambda: calls.append("rerun"), lambda s, r: calls.append(r) or (True, "1"),
+                                 ["a"], "", None, REPO, False)
+    assert calls == [] and "gap_retry" not in rec["demo_helper"]
+
+
+def test_pr_side_gets_no_setup_retries_on_a_product_run_only():
+    from types import SimpleNamespace
+
+    import ops.daily_run as dr
+    assert dr._pr_side_retries(SimpleNamespace(pr=["x"], product_check=True)) == 0
+    assert dr._pr_side_retries(SimpleNamespace(pr=None, product_check=False)) == demo_helper.MAX_SETUP_RETRIES
+    rec = {}
+    assert dr._pr_own_failure(SimpleNamespace(pr=None), rec, "PR build", "boom") == "boom" and rec == {}
+
+
+def test_batch_diagnosis_only_stages_declared_python_packages(monkeypatch):
+    from types import SimpleNamespace
+
+    import ops.daily_run as dr
+    monkeypatch.setattr(demo_helper, "live_fetch", lambda q: {"ok": True, "results": [
+        {"url": "https://github.com/o/r/blob/main/INSTALL.md",
+         "content": "o r install:\npip install declared-extra linked-only"}]})
+    monkeypatch.setattr(demo_helper, "fetch_pypi", lambda name: {"info": {"project_urls": {
+        "Source": "https://github.com/o/r"}}})
+    dr._DECLARED["o/r#9"] = ["declared-extra"]
+    a = SimpleNamespace()
+    dr._batch_diagnose(a, ("o/r", {"dist": "r"}, {"pr": 9}), "ModuleNotFoundError: No module named 'x'")
+    assert a.batch_fix_reqs == {"o/r#9": ["declared-extra"]}
+
+
+def test_declared_names_cover_runtime_deps_and_every_extra(tmp_path):
+    (tmp_path / "pyproject.toml").write_text(
+        '[project]\nname = "w"\ndependencies = ["numpy>=1"]\n'
+        '[project.optional-dependencies]\nplot = ["Matplotlib"]\ntest = ["pytest"]\n')
+    assert {"numpy", "matplotlib", "pytest"} <= demo_helper.declared_names(tmp_path)

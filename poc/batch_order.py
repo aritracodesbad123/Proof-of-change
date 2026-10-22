@@ -20,6 +20,8 @@ def is_setup_failure(rec: dict | None) -> bool:
     from poc import demo_helper
     if not isinstance(rec, dict):
         return False
+    if rec.get("pr_build_failure"):
+        return False   # main installed fine and only the PR side failed: the PR's own failure, never retried as setup
     if not demo_helper.counts_as_verdict(rec):
         return True
     if rec.get("verdict") != "could_not_verify":
@@ -39,6 +41,7 @@ class OrderLog:
         self.rows.append(row)
         print(f"[order] {key}: {step}: {outcome}", flush=True)
         if self.path:
+            # A write error is not swallowed: the order log is part of the record, so the run stops loudly.
             self.path.parent.mkdir(parents=True, exist_ok=True)
             with self.path.open("a", encoding="utf-8") as fh:
                 fh.write(json.dumps(row, default=str) + "\n")

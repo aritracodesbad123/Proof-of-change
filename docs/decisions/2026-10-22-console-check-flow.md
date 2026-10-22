@@ -11,13 +11,13 @@
 - The console flowchart now shows 13 clickable steps: read the PR, setup lookup, set up Python, install dependencies, install main, install PR, benchmark suite, probes, review, tests, retries, swarm report and verdict.
 - A `.env.example` lists `NEBIUS_API_KEY`, `NEBIUS_PROJECT_ID` and `TAVILY_API_KEY`; `.env` is gitignored.
 
-- A new batch order for product runs (`--batch-order`): for each pull request, the setup lookup happens first, then setup, then the run. If the lookup or the setup fails, the pull request is logged and skipped, and the batch moves on. After all the others are done, each skipped pull request is tried again: the lookup diagnoses the failure, the fix (link-back PyPI packages only) is applied on both sides and setup is retried, up to 3 tries, before the verdict is "could not verify". The order, every skip and every try are written to `batch-order.jsonl` in the run folder.
-- A failure that needs an OS package (a missing header, shared library, tool or executable) is diagnosed for each run from that run's own sources: the project's install docs in its checkout (README, CONTRIBUTING, install pages, CI workflows, Dockerfile, pyproject and setup files) and lookup pages from the project's own sites, together with the failure text. The packages they name are proposed for that run. There is no hand-written package list and no error-to-package map in the code. Proposed packages go through the existing system-package install path, which installs on both sides or on neither, and the step is retried. Where the sandbox cannot install OS packages (bubblewrap), the check records a limitation in plain words with the packages it needed and the real error, and the result stays "could not verify". See docs/LIMITATIONS.md.
+- A new batch order for product runs (`--batch-order`): for each pull request, the setup lookup happens first, then setup, then the run. If the lookup or the setup fails, the pull request is logged and skipped, and the batch moves on. After all the others are done, each skipped pull request is tried again: the lookup diagnoses the failure, the fix (Python packages the project declares as a dependency or extra, read from main's copy) is applied on both sides and setup is retried, up to 3 tries, before the verdict is "could not verify". The order, every skip and every try are written to `batch-order.jsonl` in the run folder.
+- A failure that needs an OS package (a missing header, shared library, tool or executable) is diagnosed for each run from that run's own sources: the project's install docs in main's checkout only (README, CONTRIBUTING, install pages, CI workflows, Dockerfile, pyproject and setup files) and lookup pages from the project's own sites, together with the failure text. The packages they name are proposed for that run. There is no hand-written package list and no error-to-package map in the code. Proposed packages go through the existing system-package install path, which installs on both sides or on neither, and the step is retried. Where the sandbox cannot install OS packages (bubblewrap), the check records a limitation in plain words with the packages it needed and the real error, and the result stays "could not verify". See docs/LIMITATIONS.md.
 - Safety rules for every lookup-driven install:
-  - (a) Install steps are taken only from the project's own pages: its GitHub organisation, its GitHub Pages site, or a homepage or docs site the project declares. Other sites are ignored, and the lookup's free-text answer is not used.
-  - (b) A package must exist in the official source before it is installed: the distro archive for OS packages (checked with `apt-cache policy`), and PyPI for Python packages, where the package must be one the project declares or one whose PyPI page links back to the project.
+  - (a) Install steps are taken only from the project's own pages: its own GitHub repository (not other repositories in the same organisation), that repository's GitHub Pages site, or a homepage or docs site the project declares in its packaging files or on its PyPI page. On a docs host shared by many projects, only the project's own path is trusted. Other sites are ignored, and the lookup's free-text answer is not used.
+  - (b) A package must exist in the official source before it is installed: the distro archive for OS packages (checked with `apt-cache policy`), and PyPI for Python packages. A Python package from the batch diagnosis must be declared by the project (a runtime dependency or any extra) in main's copy; a PyPI link back alone is not enough. Packages from the first setup lookup still need a PyPI page that links back to the project.
   - (c) Only package names are taken from a page. Commands on a page are never run.
-  - (d) The same setup goes on both sides, inside that run's sandbox, and each try is logged with the pages it relied on.
+  - (d) The same setup goes on both sides, inside that run's sandbox, and each try is logged with the pages it relied on. Install docs, listed packages and system-package files are read from main's copy only, so a pull request cannot add a package that then lands on main too. When the pull request changes any of those files, the report shows a WARN line, "Install docs unchanged by the PR", and a note naming the files.
   - (e) Nothing carries over between runs: the install docs, lookup results and staged fixes belong to one run and one pull request.
 
 ## Why
@@ -32,12 +32,20 @@ Projects need different Python versions and libraries. A fixed list per reposito
 4. Up to 3 tries. If the gap remains, the verdict is "could not verify" with the missing name. The advisory swarm still writes its report and cannot change the verdict.
 
 5. In a batch, one pull request with a setup problem no longer holds up the others; it waits for the end pass.
+6. When main installs fine and only the pull request's side fails to build, that is the pull request's own failure. It is labelled "the PR's own build failure", is not retried as a setup problem (no install retries, no end-pass retries, no setup-gap retries) and the verdict stays "could not verify" with that reason.
+7. The batch order and the new setup-gap tries are for product runs only. A study run or the daily study that asks for `--batch-order` is refused, and those runs keep the earlier single setup-gap rerun, so their results are unchanged.
+8. A file the check cannot write (this run's requirements file, setup plan or lookup cache) is reported as a warning and noted in the record, not silently skipped.
+
+## The two retry limits
+
+- Install retries: if installing a side fails, the install is tried again up to 2 more times. On a product run the pull request's side gets none once main has installed fine (decision 6).
+- Setup-gap tries: if a test still cannot be verified because something is missing or fails to import, the cause is looked up, the fix is installed on both sides and the step is rerun, up to 3 tries. The batch end pass uses the same limit of 3 tries for a pull request whose setup failed.
 
 ## Alternatives and tradeoffs
 
 - A hand-kept list per repository would be faster to start but breaks on the next repository and goes stale.
 - More than 3 tries would rescue a few more checks but makes a stuck check slow for the person watching.
-- The study (benchmark) mode is unchanged and does not use the plan, so published study numbers are not affected.
+- The study (benchmark) mode and the daily study are unchanged: they refuse the batch order and keep the earlier single rerun, so published study numbers are not affected.
 
 ## What it means for you
 

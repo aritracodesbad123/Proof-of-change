@@ -11,6 +11,7 @@ import json
 import os
 import re
 import shutil
+import sys
 import urllib.parse
 import urllib.request
 from pathlib import Path
@@ -261,8 +262,10 @@ class FileCache:
         try:
             self.path.parent.mkdir(parents=True, exist_ok=True)
             self.path.write_text(json.dumps(self._data))
-        except OSError:
-            return
+        except OSError as exc:
+            # The cache is only a speed-up, so the check goes on, but the failed write is reported, not hidden.
+            print(f"WARNING: could not write the lookup cache {self.path.name}: {type(exc).__name__}: {exc}",
+                  file=sys.stderr, flush=True)
 
 
 def live_fetch(query: str, timeout: float = TAVILY_TIMEOUT, env: dict | None = None) -> dict:
@@ -1073,6 +1076,20 @@ INSTALL_DOC_NAMES = ("readme", "contributing", "install", "installation", "build
 _DOC_MAX = 400_000
 
 
+def is_install_doc_path(path) -> bool:
+    """True for a path the setup lookup reads as an install doc: top-level README, CONTRIBUTING, install pages,
+    Dockerfile and packaging files, the same names under docs/, doc/ or ci/, and CI workflow files."""
+    parts = [seg for seg in str(path or "").replace("\\", "/").split("/") if seg]
+    if not parts:
+        return False
+    low = parts[-1].lower()
+    if len(parts) == 3 and tuple(parts[:2]) == (".github", "workflows"):
+        return low.endswith((".yml", ".yaml"))
+    if len(parts) > 2 or (len(parts) == 2 and parts[0] not in ("docs", "doc", "ci", ".github")):
+        return False
+    return any(low == n or low.startswith(n + ".") or low.startswith(n + "-") for n in INSTALL_DOC_NAMES)
+
+
 def project_install_docs(checkouts) -> dict:
     """Read the project's own install docs from this run's checkout: README, CONTRIBUTING, install pages,
     CI workflows, Dockerfile and packaging files. Returns the text and the files it came from."""
@@ -1131,8 +1148,9 @@ def failure_line(text: str) -> str:
 
 
 def trusted_url(url: str, repo: str, declared_urls=()) -> bool:
-    """Rule (a): install steps come only from the project's own GitHub org, its GitHub Pages site, or a homepage or
-    docs host the project itself declares. Every other site is ignored."""
+    """Rule (a): install steps come only from the project's own GitHub repository (not its whole organisation),
+    its GitHub Pages site for that repository, or a homepage or docs site the project itself declares.
+    Every other site is ignored."""
     try:
         parsed = urllib.parse.urlparse(str(url or ""))
     except ValueError:
@@ -1141,20 +1159,132 @@ def trusted_url(url: str, repo: str, declared_urls=()) -> bool:
     if parsed.scheme not in ("https", "http") or not host:
         return False
     parts = split_repo(repo or "")
-    owner = parts[0].lower() if parts else ""
-    if owner and host in ("github.com", "raw.githubusercontent.com"):
-        segs = [seg for seg in parsed.path.split("/") if seg]
-        return bool(segs) and segs[0].lower() == owner
-    if owner and host == f"{owner}.github.io":
-        return True
+    owner, name = (parts[0].lower(), parts[1].lower()) if parts else ("", "")
+    segs = [seg.lower() for seg in parsed.path.split("/") if seg]
+    if owner and name and host in ("github.com", "raw.githubusercontent.com"):
+        return len(segs) >= 2 and segs[0] == owner and segs[1] in (name, name + ".git")
+    if owner and name and host == f"{owner}.github.io":
+        return name == host or (bool(segs) and segs[0] == name)
     for declared in declared_urls or ():
         try:
-            dhost = (urllib.parse.urlparse(str(declared)).hostname or "").lower()
+            dparsed = urllib.parse.urlparse(str(declared))
         except ValueError:
             continue
-        if dhost and dhost not in ("github.com", "pypi.org") and (host == dhost or host.endswith("." + dhost)):
+        dhost = (dparsed.hostname or "").lower()
+        if not dhost or dhost in ("pypi.org", "raw.githubusercontent.com"):
+            continue
+        if dhost == "github.com" or dhost.endswith(".github.io"):
+            continue   # GitHub links are covered by the repository rule above, never widened to the organisation
+        if dhost in _SHARED_DOC_HOSTS:
+            dsegs = [seg.lower() for seg in dparsed.path.split("/") if seg]
+            if host == dhost and dsegs and segs[:1] == dsegs[:1]:
+                return True
+            continue
+        if host == dhost or host.endswith("." + dhost):
             return True
     return False
+
+
+# Hosts shared by many projects: a declared link there trusts only that project's own path, never the whole host.
+_SHARED_DOC_HOSTS = ("readthedocs.org", "gitlab.com", "bitbucket.org", "sourceforge.net")
+
+
+def declared_urls(checkout) -> list[str]:
+    """Homepage and docs links the project itself declares in its packaging files (main's checkout)."""
+    found: list[str] = []
+    root = Path(checkout) if checkout else None
+    if root is None or not root.is_dir():
+        return found
+    data = _pyproject(root / "pyproject.toml")
+    project = data.get("project") if isinstance(data.get("project"), dict) else {}
+    urls = project.get("urls") if isinstance(project.get("urls"), dict) else {}
+    found.extend(str(v) for v in urls.values() if isinstance(v, str))
+    poetry = ((data.get("tool") or {}).get("poetry") or {}) if isinstance(data.get("tool"), dict) else {}
+    for key in ("homepage", "documentation", "repository"):
+        if isinstance(poetry.get(key), str):
+            found.append(poetry[key])
+    cfg = root / "setup.cfg"
+    if cfg.is_file():
+        import configparser
+        parser = configparser.ConfigParser()
+        try:
+            parser.read_string(_read(cfg))
+            if parser.has_option("metadata", "url"):
+                found.append(parser.get("metadata", "url").strip())
+            if parser.has_option("metadata", "project_urls"):
+                for line in parser.get("metadata", "project_urls").splitlines():
+                    if "=" in line:
+                        found.append(line.split("=", 1)[1].strip())
+        except (configparser.Error, OSError):
+            pass
+    return [u for u in dict.fromkeys(found) if u.startswith(("https://", "http://"))]
+
+
+def pypi_declared_urls(info) -> list[str]:
+    """Docs and homepage links on the project's own PyPI page (only used once that page links back)."""
+    data = (info or {}).get("info") if isinstance(info, dict) else None
+    if not isinstance(data, dict):
+        return []
+    urls = [data.get("home_page"), data.get("docs_url"), *((data.get("project_urls") or {}).values())]
+    return [str(u) for u in urls if isinstance(u, str) and u.startswith(("https://", "http://"))]
+
+
+def declared_names(checkout) -> set[str]:
+    """Every Python package the project declares: runtime deps, every extra, dependency groups and requirement files.
+    Names are normalised. Read from main's checkout only."""
+    root = Path(checkout) if checkout else None
+    names: set[str] = set()
+    if root is None or not root.is_dir():
+        return names
+
+    def add(req):
+        if isinstance(req, str):
+            name = req_name(req)
+            if _NAME.fullmatch(name or ""):
+                names.add(norm(name))
+
+    for item in declared_packages(root):
+        add(item.get("requirement") or item.get("name"))
+    data = _pyproject(root / "pyproject.toml")
+    project = data.get("project") if isinstance(data.get("project"), dict) else {}
+    for bucket in (project.get("optional-dependencies"), data.get("dependency-groups")):
+        if isinstance(bucket, dict):
+            for reqs in bucket.values():
+                for req in reqs if isinstance(reqs, list) else []:
+                    add(req)
+    cfg = root / "setup.cfg"
+    if cfg.is_file():
+        import configparser
+        parser = configparser.ConfigParser()
+        try:
+            parser.read_string(_read(cfg))
+            if parser.has_section("options.extras_require"):
+                for _extra, value in parser.items("options.extras_require"):
+                    for req in _req_lines(value):
+                        add(req)
+        except (configparser.Error, OSError):
+            pass
+    setup_py = _read(root / "setup.py")
+    for req in re.findall(r"""['\"]([^'\"]+)['\"]""", _section(setup_py, "extras_require")):
+        add(req)
+    return names
+
+
+def install_docs_changed(main_checkout, pr_checkout) -> list[str]:
+    """Install-doc files (the ones the setup lookup reads) whose content differs between main and the PR."""
+    if not main_checkout or not pr_checkout:
+        return []
+    main_root, pr_root = Path(main_checkout), Path(pr_checkout)
+    if not main_root.is_dir() or not pr_root.is_dir():
+        return []
+    labels = list(dict.fromkeys(project_install_docs([main_root])["sources"]
+                                + project_install_docs([pr_root])["sources"]))
+    changed = []
+    for label in labels:
+        a, b = main_root / label, pr_root / label
+        if a.is_file() != b.is_file() or (a.is_file() and _read(a) != _read(b)):
+            changed.append(label)
+    return changed
 
 
 def trusted_lookup(payload, repo: str, declared_urls=()) -> dict:
@@ -1235,15 +1365,19 @@ def _system_decision(names: list[str], sandbox: str) -> list[dict]:
 
 def build_setup_plan(repo: str, checkouts, tavily, current_python: str, sandbox: str, self_dist: str = "",
                      python_available=None, pypi=None, allow_lookup_packages: bool = True,
-                     provision=None, auto_python: bool = True) -> dict:
-    """One plan for both sides. Only project-listed packages and link-back suggestions are added."""
+                     provision=None, auto_python: bool = True, docs_checkouts=None) -> dict:
+    """One plan for both sides. Only project-listed packages and link-back suggestions are added.
+
+    ``docs_checkouts`` (a product check passes main's checkout only) is where listed packages and system-package
+    files are read from, so a PR cannot add a package that then lands on main too. None reads every checkout."""
+    docs_from = list(checkouts or []) if docs_checkouts is None else list(docs_checkouts)
     if python_available is not None and provision is None:
         provision = False   # an injected interpreter lookup (tests) never downloads anything
     python_available = find_python if python_available is None else python_available
     pypi = fetch_pypi if pypi is None else pypi
     packages: list[dict] = []
     seen: set = set()
-    for checkout in checkouts or []:
+    for checkout in docs_from:
         for item in declared_packages(checkout, self_dist):
             key = norm(item["name"])
             if key in seen:
@@ -1283,7 +1417,7 @@ def build_setup_plan(repo: str, checkouts, tavily, current_python: str, sandbox:
         conflict = sides
     requirement = ", ".join(dict.fromkeys(item.strip() for item in spec_texts if item and item.strip()))
     system_names = []
-    for checkout in checkouts or []:
+    for checkout in docs_from:
         for name in _apt_from_tree(Path(checkout)):
             if name not in system_names:
                 system_names.append(name)
@@ -1644,6 +1778,23 @@ def note_setup(rec: dict, step: str, outcome) -> None:
         announce([line])
 
 
+PR_BUILD_LABEL = "the PR's own build failure"
+
+
+def note_pr_build_failure(rec: dict, step: str, why: str) -> str:
+    """Main installed fine and only the PR side failed to build: the PR's own failure, not a setup problem.
+    It is labelled that way and never retried as setup. Returns the reason line for the record."""
+    reason = f"the PR's own build failed (main installed fine): {why}"
+    rec["pr_build_failure"] = {"step": step, "why": str(why)[:400]}
+    block = rec.setdefault("demo_helper", {})
+    block["setup"] = {"label": PR_BUILD_LABEL, "counts_as_verdict": True, "step": step, "pr_own_failure": True,
+                      "detail": str(why)[:400]}
+    line = f"{PR_BUILD_LABEL}: main installed fine, the {step} failed; not retried as a setup problem."
+    block["notes"] = _unique([*(block.get("notes") or []), line])
+    announce([line])
+    return reason
+
+
 def counts_as_verdict(rec: dict) -> bool:
     setup = (rec.get("demo_helper") or {}).get("setup") or {}
     return setup.get("counts_as_verdict") is not False
@@ -1837,6 +1988,111 @@ def _emit_retry(detail: str) -> None:
     run_progress.emit("retry", detail=detail[:400])
 
 
+def retry_unverified_study(rec: dict, rerun, install_one, declared, tavily_text: str, pypi, repo: str,
+                     allow_system: bool, install_system=None, lookup=None, recheck_coverage=None) -> dict:
+    """Study and daily-study path, unchanged from before the product check flow.
+
+    One rerun when a could-not-verify result is a setup gap. Tavily text alone never changes the verdict.
+
+    This is the only step that can raise could_not_verify to verified. When the record has probes, that raise
+    waits for a fresh probe line-coverage measurement. The measurement runs only when the change is small.
+    A larger change skips it, and the verdict stays could_not_verify.
+    """
+    block = rec.setdefault("demo_helper", {})
+    notes = list(block.get("notes") or [])
+    setup = block.get("setup") or {}
+    if setup.get("counts_as_verdict") is False:
+        notes.append("Demo helper: setup failure already labelled; the probe was not rerun.")
+        block["notes"] = _unique(notes)
+        return rec
+    text = gap_text(rec)
+    if not is_setup_gap(rec.get("verdict"), text):
+        block["notes"] = _unique(notes)
+        return rec
+    name = gap_name(text)
+    if lookup is not None:
+        try:
+            extra = lookup(f"{repo} {name} python install")
+        except Exception:  # noqa: BLE001 — keep going with the error text and the project files
+            extra = None
+        if isinstance(extra, dict):
+            extra = scope_lookup(extra, repo, str(rec.get("library") or ""))
+        tavily_text = (tavily_text or "") + "\n" + _lookup_text(extra)
+    before = {"round": 1, "verdict": rec.get("verdict"), "reason": rec.get("reason")}
+    parts = split_repo(repo or "")
+    owner, repo_name = parts if parts else ("", "")
+    suggested = set(pip_suggestions(tavily_text or ""))
+    specs = []
+    for module in _modules(text):
+        declared_req = _declared_req(module, declared)
+        if declared_req:
+            specs.append({"requirement": declared_req, "source": "project", "reason": "named by the error and listed in the project"})
+            continue
+        if module in suggested or norm(module) in {norm(item) for item in suggested}:
+            try:
+                info = pypi(module) if pypi else None
+            except Exception:  # noqa: BLE001
+                info = None
+            if pypi_links_back(info, owner, repo_name):
+                specs.append({"requirement": module, "source": "tavily",
+                              "reason": "named by the error and its PyPI page links to this GitHub repository"})
+            else:
+                notes.append(f"Setup plan: refused {module}: its PyPI page does not link to this GitHub repository")
+        else:
+            notes.append(f"Setup plan: refused {module}: not listed by the project and not a link-back suggestion")
+    # A system package comes from the project's own files, applied with the setup plan.
+    # Lookup text never adds one, even when the error names a missing library.
+    if not specs:
+        rec["verdict"] = "could_not_verify"
+        rec["reason"] = _gap_reason(name)
+        notes.append(f"Before rerun: {before['verdict']}: {before['reason']}")
+        notes.append(f"After rerun: not rerun. {rec['reason']}")
+        block["notes"] = _unique(notes)
+        block["gap_retry"] = {"reran": False, "rounds": [before], "installed": []}
+        return rec
+    if rerun is None:
+        rec["verdict"] = "could_not_verify"
+        rec["reason"] = _gap_reason(name)
+        notes.append(rec["reason"])
+        block["notes"] = _unique(notes)
+        block["gap_retry"] = {"reran": False, "rounds": [before], "installed": []}
+        return rec
+    logs = install_same(specs, install_one) if specs else []
+    note_installs(rec, logs)
+    notes = list(block.get("notes") or [])
+    installed = [row for row in logs if not str(row["versions"].get("main", "")).startswith("failed")
+                 and not str(row["versions"].get("pr", "")).startswith("failed")]
+    if not installed:
+        rec["verdict"] = "could_not_verify"
+        rec["reason"] = _gap_reason(name)
+        notes.append(f"Before rerun: {before['verdict']}: {before['reason']}")
+        notes.append(f"After rerun: not rerun. {rec['reason']}")
+        block["notes"] = _unique(notes)
+        block["gap_retry"] = {"reran": False, "rounds": [before], "installed": logs}
+        return rec
+    outcome = rerun() or {}
+    after_verdict = outcome.get("verdict", rec.get("verdict"))
+    after_reason = outcome.get("reason", rec.get("reason"))
+    after_text = f"{after_verdict}\n{after_reason}"
+    if is_setup_gap(after_verdict, after_text):
+        rec["verdict"] = "could_not_verify"
+        rec["reason"] = _gap_reason(gap_name(after_reason or text))
+    else:
+        held = _coverage_blocks_verified(rec, after_verdict, recheck_coverage)
+        if held:
+            rec["verdict"], rec["reason"] = held
+        else:
+            rec["verdict"] = after_verdict
+            rec["reason"] = after_reason
+    notes.append(f"Before rerun: {before['verdict']}: {before['reason']}")
+    notes.append(f"After rerun: {rec['verdict']}: {rec['reason']}")
+    block["notes"] = _unique(notes)
+    block["gap_retry"] = {"reran": True, "rounds": [before, {"round": 2, "verdict": rec["verdict"], "reason": rec["reason"]}],
+                          "installed": logs}
+    return rec
+
+
+
 def retry_unverified(rec: dict, rerun, install_one, declared, tavily_text: str, pypi, repo: str,
                      allow_system: bool, install_system=None, lookup=None, recheck_coverage=None,
                      max_tries: int = MAX_GAP_TRIES, declared_urls=(), apt_check=None,
@@ -1853,6 +2109,11 @@ def retry_unverified(rec: dict, rerun, install_one, declared, tavily_text: str, 
     setup = block.get("setup") or {}
     if setup.get("counts_as_verdict") is False:
         notes.append("Demo helper: setup failure already labelled; the probe was not rerun.")
+        block["notes"] = _unique(notes)
+        return rec
+    if rec.get("pr_build_failure"):
+        notes.append("Demo helper: main installed fine and only the PR side failed to build; that is the PR's own "
+                     "failure, so it was not retried as a setup problem.")
         block["notes"] = _unique(notes)
         return rec
     text = gap_text(rec)

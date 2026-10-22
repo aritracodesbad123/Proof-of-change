@@ -8,7 +8,8 @@ record (`demo_helper.limitations`) in plain words, with the packages it needed a
 The local sandbox gives each side its own filesystem and blocks the network outside installs. It cannot install
 operating-system packages. When a check needs one, the setup lookup still finds which packages the project's own
 docs name for the error, but the packages are not installed, and the result stays "could not verify". The same
-check run on Contree installs them on both sides and retries.
+check run on Contree should install them on both sides and retry; this has not yet been confirmed in a real
+Contree run.
 
 What you will see in the report: "This check needs the system package(s) ..., but this sandbox (bubblewrap)
 cannot install OS packages. The error was: ..."
