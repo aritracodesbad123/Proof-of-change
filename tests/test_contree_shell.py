@@ -168,3 +168,19 @@ def test_redact_token_keeps_following_query_params():
     val = "abc" + "Tok123"
     out = cs.redact(f"GET /api?token={val}&page=2", env={})
     assert val not in out and "&page=2" in out
+
+
+def test_redact_survives_nul_bytes_and_marker_like_text():
+    val = "nul" + "Secret99"
+    text = f"a\x000\x00 b \x0099\x00 token={val}&page=2 \x00deadbeef:5\x00 pwd=\x00{val}"
+    out = cs.redact(text, env={})
+    assert val not in out and "\x00" not in out and "&page=2" in out
+
+
+def test_redact_hides_whole_quoted_values_with_spaces():
+    a, b = "T7 " + "spaced", "my " + "pass word"
+    for key in ("token", "password", "passwd", "pwd"):
+        for q in ('"', "'"):
+            out = cs.redact(f"cfg {key}={q}{a}{q} {key.upper()}={q}{b}{q} end", env={})
+            assert a not in out and "spaced" not in out and "pass word" not in out, out
+            assert out.endswith(" end")
