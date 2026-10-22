@@ -294,7 +294,7 @@ def probe_broke_itself(item: dict, logs: dict, probe_name: str) -> bool:
         rs = runs.get(side) or []
         if not rs or not all(isinstance(o, dict) and PROBE_ERROR in o for o in rs):
             return False
-        if not logs.get(side) or not all(own_code_crash(l, probe_name) for l in logs[side]):
+        if not logs.get(side) or not all(own_code_crash(lg, probe_name) for lg in logs[side]):
             return False
     return True
 
@@ -309,7 +309,7 @@ def error_summary(logs: dict) -> str:
 def plain_reason(err: str) -> str:
     if "StopIteration" in err and ("mock" in err or "side_effect" in err or "next(" in err):
         return "a fake value list ran out"
-    last = [l for l in err.strip().splitlines() if l.strip()][-1:] or ["unknown error"]
+    last = [ln for ln in err.strip().splitlines() if ln.strip()][-1:] or ["unknown error"]
     return last[0].strip()[:120]
 
 

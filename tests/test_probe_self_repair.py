@@ -3,7 +3,6 @@
 No model is called: a stub provider answers. The study route must stay exactly as it was."""
 import hashlib
 import json
-from pathlib import Path
 from types import SimpleNamespace
 
 from ops import daily_run
