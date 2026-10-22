@@ -13,7 +13,7 @@ SDIST_OUT = ("error: No solution found when resolving dependencies\n"
              "that your requirements are unsatisfiable.\n\n"
              "hint: Wheels are required for `sdistpkg` because building from source is disabled for all packages\n")
 RESOLVE_OUT = ("error: No solution found when resolving dependencies\n"
-               "  cause: Because missingpkg was not found in the package registry and you require missingpkg, we "
+               "  cause: Because missingpkg was not found in the package index and you require missingpkg, we "
                "can conclude that your requirements are unsatisfiable.\n")
 
 
