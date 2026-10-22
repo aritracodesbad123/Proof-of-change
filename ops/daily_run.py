@@ -1254,7 +1254,8 @@ def install_deps_only(venv: Path, checkout: Path, plan: dict, log: Path, python:
     deps_root: read the dependency files from this folder (read-only) instead of the checkout. The flat-layout
     fallback passes main's checkout on both sides, so the PR's own dependency files never change what is installed.
     """
-    env = base_env(side_home(venv), install=True)
+    from poc import demo_helper
+    env = demo_helper.drop_index_env(base_env(side_home(venv), install=True))   # no index from the environment
     src = Path(deps_root) if deps_root is not None else checkout
     cmds = [["uv", "venv", "-q", "-p", python, venv]]
     if plan.get("kind") == "uv-sync":

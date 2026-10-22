@@ -1904,6 +1904,19 @@ def unsafe_requirement_lines(root, plan: dict | None, _seen=None, _top=None) -> 
     return bad
 
 
+def drop_index_env(env: dict) -> dict:
+    """The env without settings that point uv or pip at another index: UV_*INDEX*, UV_*FIND_LINKS*,
+    UV_*INSECURE_HOST*, PIP_*INDEX*, PIP_*FIND_LINKS*, PIP_*TRUSTED_HOST*."""
+    def off(key: str) -> bool:
+        k = key.upper()
+        if k.startswith("UV_"):
+            return any(w in k for w in ("INDEX", "FIND_LINKS", "INSECURE_HOST"))
+        if k.startswith("PIP_"):
+            return any(w in k for w in ("INDEX", "FIND_LINKS", "TRUSTED_HOST"))
+        return False
+    return {k: v for k, v in env.items() if not off(k)}
+
+
 def unsafe_requirements_reason(lines: list[str]) -> str:
     """The could-not-verify reason when the deps-only fallback refuses off-index requirement lines."""
     shown = "; ".join(lines[:3]) + (" and more" if len(lines) > 3 else "")

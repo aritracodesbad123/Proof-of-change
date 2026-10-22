@@ -670,3 +670,30 @@ def test_uv_sync_export_with_plain_lines_installs(tmp_path, monkeypatch):
     ok, why = daily_run.install_deps_only(tmp_path / "v", src, {"kind": "uv-sync", "frozen": True},
                                           tmp_path / "log", "3.14", 10)
     assert ok is True, why
+
+
+def test_deps_only_install_drops_index_env_vars(tmp_path, monkeypatch):
+    src = _git_checkout(tmp_path / "src")
+    for k in ("UV_EXTRA_INDEX_URL", "UV_INDEX", "UV_DEFAULT_INDEX", "UV_FIND_LINKS", "UV_NO_INDEX",
+              "UV_INSECURE_HOST", "PIP_INDEX_URL", "PIP_EXTRA_INDEX_URL", "PIP_FIND_LINKS", "PIP_NO_INDEX",
+              "PIP_TRUSTED_HOST"):
+        monkeypatch.setenv(k, "https://example.invalid/simple")
+    monkeypatch.setenv("UV_EXTRA_INDEX_URL", "https://example.invalid/simple")
+    envs = []
+    inner = _fake_install(tmp_path, lambda: None)
+
+    def fake_run(c, log, cwd=None, env=None, timeout=None, sbx=None):
+        envs.append(dict(env or {}))
+        return inner(c, log, cwd=cwd, env=env, timeout=timeout, sbx=sbx)
+    monkeypatch.setattr(daily_run, "run", fake_run)
+    ok, why = daily_run.install_deps_only(tmp_path / "v", src, {"kind": "uv-sync", "frozen": True},
+                                          tmp_path / "log", "3.14", 10)
+    assert ok is True, why
+    assert envs and all("UV_EXTRA_INDEX_URL" not in e for e in envs)
+    assert all(not any(k.startswith(("UV_", "PIP_")) and ("INDEX" in k or "FIND_LINKS" in k or "HOST" in k)
+                       for k in e) for e in envs)
+
+
+def test_drop_index_env_keeps_other_vars():
+    got = demo_helper.drop_index_env({"UV_CACHE_DIR": "c", "PATH": "p", "UV_INDEX_URL": "x", "PIP_TRUSTED_HOST": "h"})
+    assert got == {"UV_CACHE_DIR": "c", "PATH": "p"}
