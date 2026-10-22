@@ -1412,7 +1412,7 @@ def _install_with_helper(a, rec, step, venv, checkout, chosen, log, timeout, con
             text = ""
         wanted = demo_helper.wrong_python(text) if product_route(a) else None
         if wanted and wanted != state["py"] and not str(state["py"]).endswith(wanted):
-            got = demo_helper.find_python(wanted) or demo_helper.provision_python(wanted)
+            got = demo_helper.retry_python(wanted)
             if got:
                 demo_helper.note_auto_fix(
                     rec, f"Auto-fix: the {step} said it needs Python {wanted}, so Python {wanted} "
@@ -1533,7 +1533,7 @@ def _install_system_package(rec, name, run_side) -> bool:
 # ---------------------------------------------------------------- execution helpers
 HOST = None   # sbx=HOST: a trusted tool on our own files (git on our clones); everything else runs in a side's sandbox
 
-# Contree-only mode: a console check chose --sandbox-backend contree and bubblewrap cannot start here. Every step that
+# Contree-only mode: the check chose --sandbox-backend contree. Every step that
 # runs pull-request or package code must then go through the Contree session; a local side command is refused.
 _CONTREE_ONLY = False
 
@@ -1553,11 +1553,11 @@ def is_refused(rc) -> bool:
 
 
 LOCAL_REFUSED = Refusal(126)
-CONTREE_ONLY_NOTE = ("Contree-only: bubblewrap cannot start on this machine, so no pull-request or package code runs "
+CONTREE_ONLY_NOTE = ("Contree mode: no pull-request or package code runs "
                      "locally. This step needs a local side and was not run.")
-CONTREE_ONLY_COVERAGE_WHY = "Contree-only check: bubblewrap can't start here, so coverage wasn't run"
-NO_SANDBOX_FALLBACK = ("Contree could not prepare the main and PR sides ({why}), and bubblewrap cannot start on this "
-                       "machine, so Proof-of-Change will not run pull-request code. Check your Nebius key and Contree "
+CONTREE_ONLY_COVERAGE_WHY = "Contree mode: coverage runs only inside Contree, and it was not run there"
+NO_SANDBOX_FALLBACK = ("Contree could not prepare the main and PR sides ({why}). In Contree mode nothing from the pull "
+                       "request runs locally, so Proof-of-Change will not run pull-request code. Check your Nebius key and Contree "
                        "project ID and try again.")
 
 
@@ -1571,14 +1571,10 @@ def contree_only() -> bool:
 
 
 def contree_only_wanted(backend: str | None) -> bool:
-    """True when Contree was chosen and local PR code could not run inside bubblewrap: it cannot start here, or the
-    local sandbox was switched off. With Contree on, no pull-request code ever runs locally without a sandbox."""
-    if backend != "contree":
-        return False
-    if not sandbox.enabled():
-        return True
-    ok, _ = sandbox.check()
-    return not ok
+    """True whenever Contree was chosen. In Contree mode nothing from the pull request is installed or run locally,
+    not even first: both sides are built in Contree from the setup plan, and if Contree cannot run, the check is
+    refused (no bubblewrap fallback)."""
+    return backend == "contree"
 HEAVY_RAM_PER_BUILD_GB = 8
 HEAVY_RAM_PER_JOB_GB = 2
 OOM_PHRASE = "Killed signal terminated program"
@@ -2165,8 +2161,8 @@ def _contree_ready() -> bool:
 
 def _maybe_prepare_contree(a, repo: str, main_sha: str, pr_sha: str, rec: dict, timeout: int,
                            extra_shell: str = "") -> str | None:
-    """Build Contree main/PR checkpoints for source-pair. On failure fall back to local bubblewrap only when it can
-    start here; otherwise return a refusal (no pull-request code runs). Returns None when the check may continue.
+    """Build Contree main/PR checkpoints for source-pair. On failure return a refusal; there is no local bubblewrap
+    fallback (no pull-request code runs). Returns None when the check may continue.
 
     extra_shell is the same text for both checkpoints. Empty keeps the default install.
     """
@@ -2184,22 +2180,12 @@ def _maybe_prepare_contree(a, repo: str, main_sha: str, pr_sha: str, rec: dict, 
         return None
     except contree_sandboxes.ContreeError as e:
         contree_sandboxes.clear_session()
-        ok, _why = (False, "local sandbox off") if not sandbox.enabled() else sandbox.check()
-        if _CONTREE_ONLY or not ok:
-            refusal = NO_SANDBOX_FALLBACK.format(why=e)
-            rec["sandbox_backend"] = "contree"
-            rec["sandbox_backend_note"] = refusal
-            rec["contree"] = {"failed": str(e), "fallback": None}
-            return refusal
-        note = f"contree checkpoint failed ({e}); using local bubblewrap"
-        contree_sandboxes.select("local")  # keep module backend in sync with the fallback
-        a.sandbox_backend = "local"
-        a.sandbox_backend_note = note
-        rec["sandbox_backend"] = "local"
-        rec["sandbox_backend_note"] = note
-        rec["machine"] = "local"
-        rec["contree"] = {"fallback": note}
-        return None
+        refusal = NO_SANDBOX_FALLBACK.format(why=e)
+        rec["sandbox_backend"] = "contree"
+        rec["sandbox_backend_note"] = refusal
+        rec["machine"] = "contree (not run)"
+        rec["contree"] = {"failed": str(e), "fallback": None}
+        return refusal
 
 
 def contree_only_extra_shell(declared: list[str], optional: list[str], base: str = "") -> str:
@@ -3342,7 +3328,8 @@ def new_record(repo: str, cfg: dict, item: dict, a, machine: dict, run_date: str
                               "blind": bool(getattr(getattr(a, "provider", None), "blind", False))},
            "sandbox_backend": getattr(a, "sandbox_backend", None) or "local",
            "sandbox_backend_note": getattr(a, "sandbox_backend_note", None),
-           "machine": ("contree" if getattr(a, "sandbox_backend", None) == "contree" else "local"),
+           # "contree" only once both checkpoints were really built there (_maybe_prepare_contree sets it).
+           "machine": "local" if getattr(a, "sandbox_backend", None) != "contree" else "contree (not run)",
            "posted_upstream": False, "logs": f"{cfg['pkg']}-{item['pr']}/", "freeze": {}}
     sha = getattr(a, "poc_commit", None)
     if isinstance(sha, str) and _COMMIT.fullmatch(sha):
@@ -3579,7 +3566,7 @@ def _contree_only_pair(a, rec: dict, repo: str, cfg: dict, item: dict, sp: dict,
     not_local = ["local freeze", "installed-commit guard", "probe coverage", "optional-module retry"]
     if not measure_coverage:
         not_local.insert(2, "coverage")
-    rec["contree_only"] = {"note": "bubblewrap cannot start here; installs, tests and probes ran in Contree",
+    rec["contree_only"] = {"note": "Contree mode: installs, tests and probes ran in Contree; nothing from the pull request ran locally",
                            "declared_test_deps": decl, "optional_backends": optional,
                            "not_run_locally": not_local}
     rec["coverage"] = {"status": "not measured", "why": CONTREE_ONLY_COVERAGE_WHY}

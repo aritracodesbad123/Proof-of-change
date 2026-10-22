@@ -1001,6 +1001,20 @@ def _sandbox_can_see(path: str) -> bool:
     return real.startswith("/usr/") or not os.path.isabs(str(path))
 
 
+def retry_python(version: str, *, find=None, provision=None, can_see=None) -> str | None:
+    """Interpreter for the wrong-Python install retry: one the local sandbox can see, or one we provisioned.
+
+    A python{version} on PATH outside the sandbox mounts (a home folder, a venv link) is skipped, because the
+    sandboxed `uv venv -p` would fail with "No interpreter found"."""
+    find = find or find_python
+    provision = provision or provision_python
+    can_see = can_see or _sandbox_can_see
+    path = find(version)
+    if path and can_see(path):
+        return path
+    return provision(version)
+
+
 PYTHON_RULE = ("one Python version is used on both sides: the lowest version that meets the requirements of both "
                "main and the pull request; if none meets both, the check stops as a setup problem and records both")
 

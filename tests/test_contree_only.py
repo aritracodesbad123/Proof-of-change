@@ -20,7 +20,7 @@ def test_contree_only_needs_contree_and_a_broken_local_sandbox(monkeypatch):
     assert daily_run.contree_only_wanted("local") is False
     assert daily_run.contree_only_wanted(None) is False
     monkeypatch.setattr(daily_run.sandbox, "check", lambda: (True, ""))
-    assert daily_run.contree_only_wanted("contree") is False
+    assert daily_run.contree_only_wanted("contree") is True   # Contree mode never runs PR code locally
 
 
 def test_local_side_commands_are_refused_in_contree_only_mode(tmp_path, monkeypatch):
@@ -32,7 +32,7 @@ def test_local_side_commands_are_refused_in_contree_only_mode(tmp_path, monkeypa
     log = tmp_path / "log.txt"
     rc, _ = daily_run.run(["uv", "pip", "install", "x"], log, env={"PATH": "/usr/bin"},
                           sbx=daily_run.side_sandbox(venv, network=True))
-    assert daily_run.is_refused(rc) and "Contree-only" in log.read_text()
+    assert daily_run.is_refused(rc) and "Contree mode" in log.read_text()
     cp = daily_run.in_side(venv, ["python", "-c", "print(1)"])
     assert daily_run.is_refused(cp)
     # The installs behind install_optional_backends / install_declared_test_deps go through run(): refused too.
@@ -64,15 +64,15 @@ def test_failed_checkpoint_refuses_when_bubblewrap_cannot_start(monkeypatch):
     assert a.sandbox_backend == "contree" and rec["contree"]["fallback"] is None
 
 
-def test_failed_checkpoint_falls_back_only_when_bubblewrap_works(monkeypatch):
+def test_failed_checkpoint_refuses_even_when_bubblewrap_works(monkeypatch):
     from poc import contree_sandboxes
     monkeypatch.setattr(contree_sandboxes, "prepare_source_pair", _failing_prepare)
-    monkeypatch.setattr(contree_sandboxes, "select", lambda *a, **k: ("local", ""))
     monkeypatch.setattr(daily_run.sandbox, "enabled", lambda: True)
     monkeypatch.setattr(daily_run.sandbox, "check", lambda: (True, ""))
     a, rec = SimpleNamespace(sandbox_backend="contree"), {}
-    assert daily_run._maybe_prepare_contree(a, "o/r", "a" * 40, "b" * 40, rec, 10) is None
-    assert a.sandbox_backend == "local" and "using local bubblewrap" in rec["sandbox_backend_note"]
+    why = daily_run._maybe_prepare_contree(a, "o/r", "a" * 40, "b" * 40, rec, 10)
+    assert why and "will not run pull-request code" in why
+    assert a.sandbox_backend == "contree" and rec["contree"]["fallback"] is None
 
 
 def test_contree_never_falls_back_to_unsandboxed_local_code(monkeypatch):
@@ -152,3 +152,34 @@ def test_contree_only_missing_coverage_file_still_caps(tmp_path, monkeypatch):
     gated = _gate(got)
     assert gated["verdict"] == "could_not_verify"
     assert gated["reason"].startswith("Coverage wasn't measured")
+
+
+# --- Contree mode never installs or runs PR code locally (PR #87 follow-up) ---
+
+def test_contree_mode_is_always_contree_only_even_when_bubblewrap_works(monkeypatch):
+    monkeypatch.setattr(daily_run.sandbox, "enabled", lambda: True)
+    monkeypatch.setattr(daily_run.sandbox, "check", lambda: (True, ""))
+    assert daily_run.contree_only_wanted("contree") is True
+
+
+def test_machine_is_contree_only_when_the_checkpoints_were_built(monkeypatch):
+    from poc import contree_sandboxes
+
+    class _Sess:
+        def describe(self):
+            return {"main_uuid": "m-1", "pr_uuid": "p-1"}
+
+    monkeypatch.setattr(contree_sandboxes, "prepare_source_pair", lambda *a, **k: _Sess())
+    rec = {"machine": "contree (not run)"}
+    assert daily_run._maybe_prepare_contree(SimpleNamespace(sandbox_backend="contree"), "o/r", "a" * 40, "b" * 40,
+                                            rec, 10) is None
+    assert rec["machine"] == "contree" and rec["contree"]["pr_uuid"] == "p-1"
+
+
+def test_machine_is_not_contree_when_contree_never_ran(monkeypatch):
+    from poc import contree_sandboxes
+    monkeypatch.setattr(contree_sandboxes, "prepare_source_pair", _failing_prepare)
+    rec = {"machine": "contree (not run)"}
+    why = daily_run._maybe_prepare_contree(SimpleNamespace(sandbox_backend="contree"), "o/r", "a" * 40, "b" * 40,
+                                           rec, 10)
+    assert why and rec["machine"] != "contree" and rec["contree"]["fallback"] is None

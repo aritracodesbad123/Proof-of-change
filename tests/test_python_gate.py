@@ -177,3 +177,26 @@ def test_contree_deps_only_shell_checks_the_tree_and_writes_the_path_last():
     assert "git status --porcelain --untracked-files=all" in shell
     assert shell.index("git status --porcelain") < shell.index("poc-project-path.pth")
     assert 'rm -f "$SP/poc-project-path.pth"' in shell
+
+
+def test_retry_python_skips_an_interpreter_the_sandbox_cannot_see():
+    from poc import demo_helper
+    provisioned = []
+    got = demo_helper.retry_python("3.14", find=lambda v: "/home/someone/.local/bin/python3.14",
+                                   provision=lambda v: provisioned.append(v) or v,
+                                   can_see=lambda p: p.startswith("/usr/"))
+    assert got == "3.14" and provisioned == ["3.14"]
+
+
+def test_retry_python_uses_a_visible_interpreter_without_provisioning():
+    from poc import demo_helper
+    got = demo_helper.retry_python("3.14", find=lambda v: "/usr/bin/python3.14",
+                                   provision=lambda v: (_ for _ in ()).throw(AssertionError("no download")),
+                                   can_see=lambda p: p.startswith("/usr/"))
+    assert got == "/usr/bin/python3.14"
+
+
+def test_retry_python_gives_up_when_nothing_visible_and_provision_fails():
+    from poc import demo_helper
+    assert demo_helper.retry_python("3.14", find=lambda v: "/home/x/python3.14", provision=lambda v: None,
+                                    can_see=lambda p: False) is None
