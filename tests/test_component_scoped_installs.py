@@ -118,3 +118,115 @@ def test_product_plan_passes_changed_files_only_on_product(tmp_path, monkeypatch
         daily_run._product_plan(SimpleNamespace(python="3.12"), dict(rec), "acme/big-app", {}, [main],
                                 pypi=lambda n: None)
     assert seen == [["app/components/two/x.py"], None]
+
+
+# ---------------------------------------------------------------- review follow-ups
+def test_manifest_direct_url_line_stops_the_check(tmp_path):
+    bad = {**COMPONENTS, "two": ["evil @ https://x.invalid/e.whl"]}
+    main = _app(tmp_path / "main", manifests=bad)
+    plan = _plan(main, _app(tmp_path / "pr"), ["app/components/two/sensor.py"])
+    assert plan["scope_blocked"].startswith("unsupported:") and "x.invalid" in plan["scope_blocked"]
+    assert not any("x.invalid" in r for r in plan["extra_reqs"]) and plan["component"] is None
+
+
+def test_core_off_index_line_stops_the_check(tmp_path):
+    main = _app(tmp_path / "main")
+    (main / "requirements.txt").write_text("core-lib==1.0\ngit+https://x.invalid/r.git#egg=r\n")
+    plan = _plan(main, _app(tmp_path / "pr"), ["app/components/two/sensor.py"])
+    assert plan["scope_blocked"].startswith("unsupported:") and "requirements.txt" in plan["scope_blocked"]
+    (main / "requirements.txt").write_text("core-lib==1.0\n--extra-index-url https://x.invalid/simple\n")
+    assert _plan(main, main, ["app/components/two/x.py"])["scope_blocked"].startswith("unsupported:")
+
+
+def test_deps_only_plan_excludes_aggregate_files(tmp_path):
+    main = _app(tmp_path / "main")
+    plan = _plan(main, main, ["app/components/two/x.py"])
+    names = plan["aggregate_names"]
+    assert set(names) == {"requirements_all.txt", "requirements_test_all.txt"}
+    got = demo_helper.deps_only_plan(main, exclude=names)
+    assert got["files"] == ["requirements.txt", "requirements_test.txt"]
+    assert "requirements_all.txt" in demo_helper.deps_only_plan(main)["files"]   # default unchanged
+
+
+def test_daily_run_flat_and_contree_paths_get_aggregate_names(tmp_path, monkeypatch):
+    rec = {"demo_helper": {"setup_plan": {"aggregate_names": ["requirements_all.txt"]}}}
+    assert daily_run._aggregate_names(rec) == ["requirements_all.txt"]
+    assert daily_run._aggregate_names({}) == []
+    from poc import contree_sandboxes
+    shell = contree_sandboxes.install_shell_source("acme/big-app", "abc", deps_only_fallback=True,
+                                                   deps_exclude=["requirements_all.txt", "requirements_test_all.txt"])
+    assert 'case "$f" in requirements_all.txt|requirements_test_all.txt) continue;; esac;' in shell
+    assert contree_sandboxes.deps_only_shell() == contree_sandboxes.DEPS_ONLY_SHELL
+    assert "case" not in contree_sandboxes.DEPS_ONLY_SHELL
+    weird = contree_sandboxes.deps_only_shell(["requirements_$(x).txt"])
+    assert "'requirements_$(x).txt')" in weird
+
+
+def test_contree_fallback_shell_skips_aggregate_when_run(tmp_path):
+    import subprocess
+
+    from poc import contree_sandboxes
+    for name in ("requirements.txt", "requirements_all.txt"):
+        (tmp_path / name).write_text("")
+    body = contree_sandboxes.deps_only_shell(["requirements_all.txt"])
+    loop = body[body.index("for f in"):body.index("done;") + 5]
+    script = loop.replace("python -m pip install -q -r", "echo")
+    out = subprocess.run(["sh", "-c", script], cwd=tmp_path, capture_output=True, text=True).stdout.split()
+    assert out == ["requirements.txt"]
+
+
+def test_dotdot_path_is_refused(tmp_path):
+    comps = demo_helper.component_dirs(_app(tmp_path / "m"))
+    assert demo_helper.component_for_changes(["app/components/two/../one/x.py"], comps) is None
+    assert demo_helper.component_for_changes(["tests/components/two/../../../app/core.py"], comps) is None
+
+
+def test_same_named_folder_elsewhere_does_not_count(tmp_path):
+    comps = demo_helper.component_dirs(_app(tmp_path / "m"))
+    assert demo_helper.component_for_changes(["docs/two/page.md"], comps) is None
+    assert demo_helper.component_for_changes(["tests/two/test_x.py"], comps) == "app/components/two"
+    assert demo_helper.component_for_changes(["tests/components/two/test_x.py"], comps) == "app/components/two"
+
+
+def test_symlinked_manifest_is_not_a_component(tmp_path):
+    root = _app(tmp_path / "m")
+    other = tmp_path / "elsewhere.json"
+    other.write_text(json.dumps({"requirements": ["x==1"]}))
+    d = root / "app" / "components" / "four"
+    d.mkdir()
+    (d / "manifest.json").symlink_to(other)
+    assert "app/components/four" not in demo_helper.component_dirs(root)
+
+
+def test_small_plugin_project_is_not_flagged(tmp_path):
+    root = tmp_path / "small"
+    root.mkdir()
+    (root / "requirements.txt").write_text("lib-one==1.0\nlib-two==2.0\n")
+    for name, reqs in (("one", ["lib-one==1.0"]), ("two", ["lib-two==2.0"])):
+        d = root / "plugins" / name
+        d.mkdir(parents=True)
+        (d / "manifest.json").write_text(json.dumps({"requirements": reqs}))
+    comps = demo_helper.component_dirs(root)
+    assert demo_helper.aggregate_requirement_files(root, comps) == []        # only 2 components
+    (root / "plugins" / "three").mkdir()
+    (root / "plugins" / "three" / "manifest.json").write_text(json.dumps({"requirements": []}))
+    comps = demo_helper.component_dirs(root)
+    assert demo_helper.aggregate_requirement_files(root, comps) == []        # its only requirements file
+    plan = _plan(root, root, ["plugins/one/x.py"])
+    assert set(plan["extra_reqs"]) == {"lib-one==1.0", "lib-two==2.0"} and plan["scope_blocked"] == ""
+
+
+def test_lint_only_requirement_file_is_skipped_from_content(tmp_path):
+    main = _app(tmp_path / "main")
+    (main / ".pre-commit-config.yaml").write_text(
+        "repos:\n  - repo: https://github.com/example/lint-tool-pre-commit\n    hooks: [{id: lint-tool}]\n"
+        "  - repo: https://github.com/example/spell_checker\n")
+    (main / "requirements_lint_pins.txt").write_text("lint-tool==1.0\nspell-checker==2.0\n")
+    (main / "requirements_other.txt").write_text("lint-tool==1.0\nreal-lib==1.0\n")    # not lint-only
+    plan = _plan(main, main, ["app/components/two/x.py"])
+    assert "lint-tool==1.0" in plan["extra_reqs"]          # still pulled in by requirements_other.txt
+    assert "spell-checker==2.0" not in plan["extra_reqs"] and "real-lib==1.0" in plan["extra_reqs"]
+    names = [p.name for p in demo_helper.lint_only_requirement_files(main)]
+    assert names == ["requirements_lint_pins.txt"]
+    (main / ".pre-commit-config.yaml").unlink()
+    assert demo_helper.lint_only_requirement_files(main) == []
