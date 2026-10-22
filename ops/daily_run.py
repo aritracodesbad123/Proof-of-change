@@ -5458,6 +5458,12 @@ def _main(argv=None) -> int:
     started = now_ist()
     single = parse_pr_urls(a.pr)
     default_name = started.strftime("%Y-%m-%d") + (started.strftime("-check-%H%M") if single else "")
+    if single and product_route(a):
+        # Product checks get seconds and the first PR number, so two checks started in the same minute do not
+        # share a run folder (and its lock). Study and other runs keep the minute-only name.
+        first_pr = next((n for ns in single.values() for n in ns), None)
+        default_name = (started.strftime("%Y-%m-%d-check-%H%M%S")
+                        + (f"-pr{first_pr}" if first_pr is not None else ""))
     ops = Path(a.ops_dir).resolve(); rdir = ops / "runs" / (a.date or default_name)
     if single:  # one-off check: no library list, chosen-PRs or verification file apply
         a.libraries_file = str(rdir / "no-libraries.csv")
@@ -5468,11 +5474,12 @@ def _main(argv=None) -> int:
     if a.report_only:
         return report_only(rdir, a)
     rdir.mkdir(parents=True, exist_ok=True)
-    try:
-        a.run_lock = acquire_run_lock(rdir)
-    except RunLockHeld as e:
-        print(str(e), file=sys.stderr, flush=True)
-        return LOCK_HELD_EXIT
+    if product_route(a):   # study runs and the daily study are unchanged: no lock
+        try:
+            a.run_lock = acquire_run_lock(rdir)
+        except RunLockHeld as e:
+            print(str(e), file=sys.stderr, flush=True)
+            return LOCK_HELD_EXIT
     workroot = Path(a.work_dir or ops / "work").resolve()
     seen_path = ops / "seen_prs.json"
     seen = json.loads(seen_path.read_text()) if seen_path.exists() else {"last_run_utc": {}, "prs": {}}
@@ -5507,7 +5514,7 @@ def _main(argv=None) -> int:
         rows = [r for r in rows if r["library"] in want]
     chosen_path = chosen_prs_path(a, rdir)
     chosen_prs = parse_chosen(chosen_path)
-    gh = GitHub(None, fail_fast_auth=True)
+    gh = GitHub(None, fail_fast_auth=product_route(a))
     a.python_full = resolve_python(a.python)
     machine = dict(detect_machine_type())
     machine.setdefault("cpu_model", cpu_model())
