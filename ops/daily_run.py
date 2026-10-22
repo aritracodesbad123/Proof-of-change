@@ -110,14 +110,53 @@ def _rate_limit_max_wait_s() -> int:
         return 900
 
 
+AUTH_FAIL_EXIT = 3      # GitHub refused the login AUTH_FAIL_LIMIT times in a row for one request
+LOCK_HELD_EXIT = 4      # another run already holds this run folder's lock
+AUTH_FAIL_LIMIT = 3
+AUTH_FAIL_MESSAGE = ("auth problem: GitHub refused the login 3 times; "
+                     "the GitHub key in this run's environment is invalid or stale")
+RUN_LOCK_NAME = "run.lock"
+
+
+class GitHubAuthError(BaseException):
+    """GitHub answered 401 AUTH_FAIL_LIMIT times in a row for the same request.
+
+    A BaseException on purpose: per-repository ``except Exception`` handlers must not turn a bad key into
+    one "selection failed" line per library. The message never contains the token."""
+
+
+class RunLockHeld(RuntimeError):
+    """Another process holds the run folder's lock."""
+
+
+def acquire_run_lock(run_dir: Path):
+    """Take an exclusive, non-blocking flock on ``run_dir/run.lock``. Returns the open handle; keep it for the
+    life of the run (the kernel drops the lock when the process exits). Raises RunLockHeld when it is taken."""
+    run_dir.mkdir(parents=True, exist_ok=True)
+    path = run_dir / RUN_LOCK_NAME
+    handle = path.open("a+")
+    try:
+        fcntl.flock(handle.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except BlockingIOError:
+        handle.close()
+        raise RunLockHeld(f"another run holds the lock {path}; not starting a second copy") from None
+    handle.seek(0)
+    handle.truncate()
+    handle.write(f"{os.getpid()}\n")
+    handle.flush()
+    return handle
+
+
 class GitHub:
-    def __init__(self, log):
+    def __init__(self, log, fail_fast_auth: bool = False):
         # Authenticated = 5k/hour; anonymous = 60/hour (shared across Render IPs).
         # Host environment only. This value is never copied into an environment that runs pull-request code.
         self.token = github_read_token()
         self.calls = 0
         self.remaining = None
         self.log = log
+        # Product runs stop on a refused login instead of retrying it as a network error. Study runs leave it off.
+        self.fail_fast_auth = fail_fast_auth
 
     def _note(self, msg: str) -> None:
         print(msg, file=sys.stderr, flush=True)
@@ -166,6 +205,7 @@ class GitHub:
             req.add_header("Authorization", f"Bearer {self.token}")
         rate_retried = False
         attempt = 0
+        refused = 0
         while attempt < 3:
             try:
                 with urllib.request.urlopen(req, timeout=timeout) as r:
@@ -174,6 +214,13 @@ class GitHub:
                         self.remaining = int(r.headers.get("X-RateLimit-Remaining", "-1"))
                     return r.read()
             except urllib.error.HTTPError as e:
+                if e.code == 401 and api and self.fail_fast_auth:
+                    refused += 1
+                    if refused >= AUTH_FAIL_LIMIT:
+                        raise GitHubAuthError(AUTH_FAIL_MESSAGE) from None
+                    attempt += 1
+                    time.sleep(attempt)
+                    continue
                 if e.code in (403, 429) and api:
                     if not rate_retried and self._remaining_is_zero(e) and self._wait_for_reset(e, url):
                         rate_retried = True
@@ -5239,6 +5286,14 @@ def _run_batch_order(queue: list, rdir: Path, workroot: Path, a, machine: dict, 
 
 
 def main(argv=None) -> int:
+    try:
+        return _main(argv)
+    except GitHubAuthError:
+        print(AUTH_FAIL_MESSAGE, file=sys.stderr, flush=True)
+        return AUTH_FAIL_EXIT
+
+
+def _main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--libraries-file", default=None,
                     help="tracked-libraries CSV (default: $POC_LIBRARIES_FILE, else libraries_file in ops/local.json, "
@@ -5403,6 +5458,12 @@ def main(argv=None) -> int:
     started = now_ist()
     single = parse_pr_urls(a.pr)
     default_name = started.strftime("%Y-%m-%d") + (started.strftime("-check-%H%M") if single else "")
+    if single and product_route(a):
+        # Product checks get seconds and the first PR number, so two checks started in the same minute do not
+        # share a run folder (and its lock). Study and other runs keep the minute-only name.
+        first_pr = next((n for ns in single.values() for n in ns), None)
+        default_name = (started.strftime("%Y-%m-%d-check-%H%M%S")
+                        + (f"-pr{first_pr}" if first_pr is not None else ""))
     ops = Path(a.ops_dir).resolve(); rdir = ops / "runs" / (a.date or default_name)
     if single:  # one-off check: no library list, chosen-PRs or verification file apply
         a.libraries_file = str(rdir / "no-libraries.csv")
@@ -5413,6 +5474,12 @@ def main(argv=None) -> int:
     if a.report_only:
         return report_only(rdir, a)
     rdir.mkdir(parents=True, exist_ok=True)
+    if product_route(a):   # study runs and the daily study are unchanged: no lock
+        try:
+            a.run_lock = acquire_run_lock(rdir)
+        except RunLockHeld as e:
+            print(str(e), file=sys.stderr, flush=True)
+            return LOCK_HELD_EXIT
     workroot = Path(a.work_dir or ops / "work").resolve()
     seen_path = ops / "seen_prs.json"
     seen = json.loads(seen_path.read_text()) if seen_path.exists() else {"last_run_utc": {}, "prs": {}}
@@ -5447,7 +5514,7 @@ def main(argv=None) -> int:
         rows = [r for r in rows if r["library"] in want]
     chosen_path = chosen_prs_path(a, rdir)
     chosen_prs = parse_chosen(chosen_path)
-    gh = GitHub(None)
+    gh = GitHub(None, fail_fast_auth=product_route(a))
     a.python_full = resolve_python(a.python)
     machine = dict(detect_machine_type())
     machine.setdefault("cpu_model", cpu_model())
