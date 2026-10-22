@@ -483,5 +483,7 @@
    "cost_complete": true,
    "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
   }
- }
+ },
+ "head_at_report_sha": "d42766270b4033734ca228e4dd24b4dfabceb3be",
+ "head_moved_since_test": false
 }

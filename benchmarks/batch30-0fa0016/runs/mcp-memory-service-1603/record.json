@@ -4111,5 +4111,7 @@
  },
  "schema_errors": [
   "$.coverage.status: 'not measured' not in ['measured', 'failed', 'not needed', 'skipped']"
- ]
+ ],
+ "head_at_report_sha": "f8760d36e773a9752fee44a21797d57075c95b92",
+ "head_moved_since_test": false
 }

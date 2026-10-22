@@ -3,7 +3,8 @@
 
     python benchmarks/batch30-0fa0016/publish.py --src <batch run folder>
 
-For each run, copies record.json, REPORT.md and REPORT.html exactly as the tool wrote them.
+For each run, copies record.json, REPORT.md and REPORT.html exactly as the tool wrote them;
+record.json also keeps head_at_report_sha and head_moved_since_test from the run's records.jsonl.
 The only change is replacing local machine paths with placeholders (see PLACEHOLDERS);
 no verdict, reason or other field is touched. MANIFEST.json stores the sha256 of each raw
 file and of the published file so the copy can be checked against the originals.
@@ -28,6 +29,7 @@ PLACEHOLDERS = [
     (re.compile(r"/home/[^\s\"'<]*"), "<home>"),
     (re.compile(r"/" + r"workspace\b[^\s\"'<]*"), "<work>"),
 ]
+HEAD_FIELDS = ("head_at_report_sha", "head_moved_since_test")
 VLABEL = {"needs_attention": "Needs attention", "could_not_verify": "Could not verify", "verified": "Verified"}
 
 
@@ -57,12 +59,28 @@ def main() -> int:
         report_dir = Path(glob.glob(str(run / "report/*/"))[0])
         out = HERE / "runs" / run.name
         out.mkdir(parents=True, exist_ok=True)
-        for raw in (rec_path, report_dir / "REPORT.md", report_dir / "REPORT.html"):
+        # The run's final record is the single line of records.jsonl: record.json plus the two
+        # head-check fields added at report time. Publish it in record.json's own format, after
+        # checking that dropping exactly those fields gives back the raw record.json byte for byte.
+        jsonl_path = rec_path.parent.parent / "records.jsonl"
+        lines = [ln for ln in jsonl_path.read_text().splitlines() if ln.strip()]
+        assert len(lines) == 1, jsonl_path
+        final = json.loads(lines[0])
+        raw_rec = rec_path.read_bytes()
+        assert set(final) - set(json.loads(raw_rec)) <= set(HEAD_FIELDS), rec_path
+        assert all(f in final for f in HEAD_FIELDS), jsonl_path
+        base = {k: v for k, v in final.items() if k not in HEAD_FIELDS}
+        assert json.dumps(base, indent=1).encode() == raw_rec, rec_path
+        pub = placeholder(json.dumps(final, indent=1)).encode()
+        (out / "record.json").write_bytes(pub)
+        manifest[f"runs/{run.name}/record.json"] = {
+            "raw_sha256": sha(raw_rec), "raw_records_jsonl_sha256": sha(jsonl_path.read_bytes()), "published_sha256": sha(pub)}
+        for raw in (report_dir / "REPORT.md", report_dir / "REPORT.html"):
             data = raw.read_bytes()
             pub = placeholder(data.decode()).encode()
             (out / raw.name).write_bytes(pub)
             manifest[f"runs/{run.name}/{raw.name}"] = {"raw_sha256": sha(data), "published_sha256": sha(pub)}
-        rec = json.loads(rec_path.read_text())
+        rec = final
         summary = (run / "report" / "SUMMARY.md").read_text()
         conf = re.search(r"\((\w+) confidence\)", summary).group(1)
         report_verdict = re.search(r"\*\*(COULD NOT VERIFY|NEEDS ATTENTION|VERIFIED)\*\*", summary).group(1)
