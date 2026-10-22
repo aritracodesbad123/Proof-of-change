@@ -1528,7 +1528,8 @@ def _product_plan(a, rec: dict, repo: str, cfg: dict, checkouts, pypi=None, pyth
         python_available=python_available, pypi=pypi,
         allow_lookup_packages=bool(folders), auto_python=product,
         docs_checkouts=([main_dir] if main_dir else []) if product else None,
-        apply_system=apply_os)
+        apply_system=apply_os,
+        changed_files=list((rec.get("files") or {}).get("all") or []) if product else None)
     for req in (getattr(a, "batch_fix_reqs", None) or {}).get(_batch_key(repo, rec), []):
         if req not in plan.setdefault("extra_reqs", []):
             plan["extra_reqs"].append(req)
@@ -1609,7 +1610,10 @@ def _check_python(a, plan) -> str:
 def _groups_blocked(a, plan) -> str:
     """The could-not-verify reason when main's dependency groups can't be installed as written (refused lines or a
     table PEP 735 does not allow) on a product check, else "". Every install route stops on it before installing."""
-    return str((plan or {}).get("groups_blocked") or "") if product_route(a) else ""
+    if not product_route(a):
+        return ""
+    plan = plan or {}
+    return str(plan.get("groups_blocked") or plan.get("scope_blocked") or "")
 
 
 def _install_with_helper(a, rec, step, venv, checkout, chosen, log, timeout, constraints, extra_reqs, python=None,

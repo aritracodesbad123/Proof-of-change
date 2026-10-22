@@ -14,7 +14,7 @@ import shutil
 import sys
 import urllib.parse
 import urllib.request
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 
 from evals.label_study_pairs import split_repo
 
@@ -646,9 +646,12 @@ def _add_pkg(found: list[dict], seen: set, requirement: str, *, kind: str, actio
                   "reason": reason, "sides": ["main", "pr"]})
 
 
-def declared_packages(checkout, self_dist: str = "") -> list[dict]:
-    """Packages the checkout lists. Runtime deps are noted. Test extras and requirements are installed."""
+def declared_packages(checkout, self_dist: str = "", skip_files=()) -> list[dict]:
+    """Packages the checkout lists. Runtime deps are noted. Test extras and requirements are installed.
+
+    ``skip_files``: requirement files not to read (a product check passes the aggregate files of a component app)."""
     root = Path(checkout)
+    skip = {Path(f).resolve() for f in skip_files or ()}
     found: list[dict] = []
     seen: set = set()
     data = _pyproject(root / "pyproject.toml")
@@ -697,6 +700,8 @@ def declared_packages(checkout, self_dist: str = "") -> list[dict]:
             _add_pkg(found, seen, req, kind="test-extra", action="install", source="setup.py",
                      reason=f"listed in the {extra} extra", self_dist=self_dist)
     for path in _requirement_files(root):
+        if path.resolve() in skip:
+            continue
         for req in _req_lines(_read(path)):
             _add_pkg(found, seen, req, kind="requirements", action="install", source=path.name,
                      reason=f"listed in {path.name}", self_dist=self_dist)
@@ -831,6 +836,105 @@ def _requirement_files(root: Path) -> list[Path]:
             if name.startswith("requirements") and name.endswith(".txt"):
                 out.append(Path(dirpath) / name)
     return out
+
+
+# ---------------------------------------------------------------- component apps (product checks only)
+COMPONENT_MANIFEST = "manifest.json"
+_COMPONENT_DEPTH = 5
+
+
+def component_dirs(root) -> dict[str, list[str]]:
+    """Folders (relative, posix) that hold a JSON manifest declaring a ``requirements`` list, with that list.
+
+    This is the project's own per-component metadata; nothing here names a project or a package."""
+    root = Path(root)
+    out: dict[str, list[str]] = {}
+    if not root.is_dir():
+        return out
+    for dirpath, dirnames, filenames in os.walk(root):
+        rel = Path(dirpath).relative_to(root)
+        dirnames[:] = sorted(n for n in dirnames if n not in SKIP_DIRS and not n.startswith(".")
+                             and len(rel.parts) < _COMPONENT_DEPTH)
+        if COMPONENT_MANIFEST not in filenames or not rel.parts:
+            continue
+        try:
+            data = json.loads(_read(Path(dirpath) / COMPONENT_MANIFEST) or "null")
+        except ValueError:
+            continue
+        reqs = data.get("requirements") if isinstance(data, dict) else None
+        if isinstance(reqs, list) and all(isinstance(r, str) for r in reqs):
+            out[rel.as_posix()] = [r.strip() for r in reqs if r.strip()]
+    return out
+
+
+def aggregate_requirement_files(root, components: dict[str, list[str]]) -> list[Path]:
+    """Top-level requirements files that collect many components' requirements (requirements_all-style).
+
+    A file is an aggregate when lines from at least two different components' manifests appear in it and those
+    lines are at least half of the file. Decided from the content, never from the file name."""
+    root = Path(root)
+    owner: dict[str, set] = {}
+    for comp, reqs in components.items():
+        for req in reqs:
+            owner.setdefault(norm(req_name(req)), set()).add(comp)
+    out = []
+    for path in sorted(root.glob("requirements*.txt")) if root.is_dir() else []:
+        lines = _req_lines(_read(path))
+        if not lines:
+            continue
+        hit = [norm(req_name(line)) for line in lines if norm(req_name(line)) in owner]
+        comps = set().union(*(owner[h] for h in hit)) if hit else set()
+        if len(comps) >= 2 and 2 * len(hit) >= len(lines):
+            out.append(path)
+    return out
+
+
+def component_for_changes(changed, components: dict[str, list[str]], ignore=()) -> str | None:
+    """The single component every changed file belongs to, or None.
+
+    A file belongs to a component when it is inside that component's folder, or when one of its folder names is
+    that component's folder name (tests kept in a mirrored tree). Files in ``ignore`` (aggregate files that a
+    requirement bump regenerates) are not counted. Any other file, or two components, gives None."""
+    ignore = set(ignore)
+    by_name: dict[str, list[str]] = {}
+    for comp in components:
+        by_name.setdefault(PurePosixPath(comp).name, []).append(comp)
+    found = set()
+    counted = 0
+    for raw in changed or []:
+        path = PurePosixPath(str(raw).lstrip("/"))
+        if path.as_posix() in ignore:
+            continue
+        counted += 1
+        inside = [c for c in components if path.as_posix().startswith(c + "/")]
+        if inside:
+            found.add(max(inside, key=len))
+            continue
+        named = {c for part in path.parent.parts for c in by_name.get(part, [])}
+        if len(named) != 1:
+            return None
+        found |= named
+    return next(iter(found)) if counted and len(found) == 1 else None
+
+
+def component_scope(main_checkout, changed) -> dict | None:
+    """For a component app: which component the PR touches, its requirements (from MAIN's manifest), and the
+    aggregate files never to install. None when the project is not a component app (no aggregate file)."""
+    root = Path(main_checkout)
+    components = component_dirs(root)
+    if len(components) < 2:
+        return None
+    aggregates = aggregate_requirement_files(root, components)
+    if not aggregates:
+        return None
+    names = [p.relative_to(root).as_posix() for p in aggregates]
+    comp = component_for_changes(changed, components, ignore=names)
+    reason = "" if comp else (
+        "unsupported: this project keeps per-component requirements and an aggregate requirements file "
+        f"({', '.join(names)}), and the pull request's changed files do not belong to exactly one component, "
+        "so the aggregate file was not installed")
+    return {"component": comp, "requirements": list(components.get(comp, [])) if comp else [],
+            "aggregates": aggregates, "aggregate_names": names, "reason": reason}
 
 
 def _apt_from_tree(root: Path) -> list[str]:
@@ -1549,12 +1653,18 @@ def _system_decision(names: list[str], sandbox: str, apply_system: bool = True) 
 def build_setup_plan(repo: str, checkouts, tavily, current_python: str, sandbox: str, self_dist: str = "",
                      python_available=None, pypi=None, allow_lookup_packages: bool = True,
                      provision=None, auto_python: bool = True, docs_checkouts=None,
-                     apply_system: bool = True) -> dict:
+                     apply_system: bool = True, changed_files=None) -> dict:
     """One plan for both sides. Only project-listed packages and link-back suggestions are added.
 
     ``docs_checkouts`` (a product check passes main's checkout only) is where listed packages and system-package
     files are read from, so a PR cannot add a package that then lands on main too. None reads every checkout."""
     docs_from = list(checkouts or []) if docs_checkouts is None else list(docs_checkouts)
+    # changed_files (product checks only, with docs_checkouts): for a component app, install the core requirements
+    # plus the one touched component's manifest requirements, read from main, and never the aggregate file.
+    scope = None
+    if changed_files is not None and docs_checkouts is not None and docs_from:
+        scope = component_scope(docs_from[0], changed_files)
+    skip_files = scope["aggregates"] if scope else ()
     if python_available is not None and provision is None:
         provision = False   # an injected interpreter lookup (tests) never downloads anything
     python_available = find_python if python_available is None else python_available
@@ -1562,7 +1672,7 @@ def build_setup_plan(repo: str, checkouts, tavily, current_python: str, sandbox:
     packages: list[dict] = []
     seen: set = set()
     for checkout in docs_from:
-        for item in declared_packages(checkout, self_dist):
+        for item in declared_packages(checkout, self_dist, skip_files=skip_files):
             key = norm(item["name"])
             if key in seen:
                 continue
@@ -1583,6 +1693,15 @@ def build_setup_plan(repo: str, checkouts, tavily, current_python: str, sandbox:
             for req in group_lines:
                 _add_pkg(packages, seen, req, kind="dependency-group", action="install", source="pyproject",
                          reason="listed in a dependency group", self_dist=self_dist)
+    scope_blocked = ""
+    if scope:
+        if scope["component"]:
+            for req in scope["requirements"]:
+                _add_pkg(packages, seen, req, kind="component", action="install", source=COMPONENT_MANIFEST,
+                         reason=f"listed in the manifest of {scope['component']}, the component this PR changes",
+                         self_dist=self_dist)
+        else:
+            scope_blocked = scope["reason"]
     parts = split_repo(repo or "")
     owner, repo_name = parts if parts else ("", "")
     suggestions = pip_suggestions(text) if allow_lookup_packages else []
@@ -1653,7 +1772,14 @@ def build_setup_plan(repo: str, checkouts, tavily, current_python: str, sandbox:
         lines.append(f"Setup plan: refused {item['name']}: {item['reason']}")
     if groups_blocked:
         lines.append(f"Setup plan: stopped: {groups_blocked}")
-    return {"packages": packages, "extra_reqs": extra, "python": python, "system": system,
+    if scope:
+        lines.append("Setup plan: not installing the aggregate requirements file(s) "
+                     + ", ".join(scope["aggregate_names"]) + (f"; only the core requirements and {scope['component']}'s "
+                                                             "own requirements, read from main" if scope["component"] else ""))
+    if scope_blocked:
+        lines.append(f"Setup plan: stopped: {scope_blocked}")
+    return {"packages": packages, "scope_blocked": scope_blocked,
+            "component": (scope or {}).get("component"), "extra_reqs": extra, "python": python, "system": system,
             "refused": refused, "groups_blocked": groups_blocked, "lines": lines}
 
 
