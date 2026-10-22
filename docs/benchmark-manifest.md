@@ -48,11 +48,23 @@ check's record, the commits actually tested, the command and the exit code. Secr
 saved error output. `run_meta.json` holds the environment, with keys shown only as set or unset.
 
 A case counts as not run when the check left no record, when its tested base is not `base_sha`, when its
-tested PR head or PR side is not `head_sha`, or when the record does not show a Contree run (backend `contree`
-and both checkpoints built there). An open PR whose base branch has moved is therefore not run, never scored.
-So is a mergeable open PR that the check tests as GitHub's test merge commit, because that commit is not the
-head. Cases should use PRs the check compares as merge-base against PR head, such as a fork PR opened from a
-branch whose parent is `base_sha`.
+tested PR side does not match the case, or when the record does not show a Contree run (backend `contree` and
+both checkpoints built there). An open PR whose base branch has moved is therefore not run, never scored.
+
+The PR side matches in one of two ways, saved as `tested.pr_side`:
+
+- `head`: the check tested `head_sha` itself (it compared the merge-base with the PR head).
+- `merge_ref`: the check tested GitHub's test merge commit, and the record shows all of these: the PR side is
+  the recorded merge commit, its parents are exactly `[base_sha, head_sha]`, the tested base is `base_sha`,
+  and the merge commit's PR parent matches the pinned head.
+
+Any other PR side is not run. A mergeable open PR is normally tested as the merge commit, so its case only
+runs when the base branch still sits on `base_sha`. A PR on a fork does not avoid this: the check takes the
+merge ref the same way for a fork PR, so the same rules apply.
+
+The fork path is untested end to end. The case format accepts fork PRs, and the check clones the PR's own
+repository, but no fork PR has been run through `ops/daily_run.py` yet. Run one fork case and check its
+record before relying on fork cases.
 
 ## Summary
 

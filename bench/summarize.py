@@ -113,7 +113,11 @@ def _not_run(case: dict, arm: str) -> dict:
 
 def load(root: Path) -> dict[str, list[dict]]:
     """Results per arm. The case list and arms come from run_meta.json; a missing result counts as not run."""
-    meta = json.loads((root / "run_meta.json").read_text())
+    path = root / "run_meta.json"
+    if not path.is_file():
+        raise SystemExit(f"{path} is missing: summarize needs the run_meta.json that bench/run.py writes "
+                         "(it holds the case list that n is counted from)")
+    meta = json.loads(path.read_text())
     arms = {}
     for arm in meta["arms"]:
         d = root / arm.replace("+", "_")

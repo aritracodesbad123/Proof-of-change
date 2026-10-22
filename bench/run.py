@@ -131,6 +131,25 @@ def stages(rec: dict | None, exit_code: int | None) -> dict:
     return {"infra": "ok", "install": install, "tests": "ran" if ran else "not_run", "probes": probes}
 
 
+def pr_side(case: dict, sides: dict) -> tuple[str | None, list[str]]:
+    """How the PR side was tested: "head" (the PR head itself) or "merge_ref" (GitHub's test merge commit, accepted
+    only when it is exactly base_sha + head_sha). Returns (kind or None, problems)."""
+    if sides.get("pr_sha") == case["head_sha"]:
+        return "head", []
+    if "merge_commit" not in sides:
+        return None, [f"tested PR side {sides.get('pr_sha')} is not the manifest head_sha"]
+    p = []
+    if not sides.get("merge_commit") or sides.get("pr_sha") != sides.get("merge_commit"):
+        p.append("tested PR side is neither head_sha nor the recorded merge commit")
+    if sides.get("merge_parents") != [case["base_sha"], case["head_sha"]]:
+        p.append(f"merge commit parents {sides.get('merge_parents')} are not [base_sha, head_sha]")
+    if sides.get("main_sha") != case["base_sha"]:
+        p.append("merge-ref comparison base is not base_sha")
+    if sides.get("merge_head_matches_pinned_head") is not True:
+        p.append("merge commit's PR parent does not match the pinned head")
+    return (None, p) if p else ("merge_ref", [])
+
+
 def sha_check(case: dict, rec: dict | None) -> list[str]:
     """Problems with the commits the check actually tested versus the manifest."""
     if rec is None:
@@ -141,8 +160,7 @@ def sha_check(case: dict, rec: dict | None) -> list[str]:
     p = []
     if head != case["head_sha"]:
         p.append(f"tested PR head {head} is not the manifest head_sha")
-    if sides.get("pr_sha") != case["head_sha"]:
-        p.append(f"tested PR side {sides.get('pr_sha')} is not the manifest head_sha (e.g. a GitHub test merge commit)")
+    p += pr_side(case, sides)[1]
     if main_sha != case["base_sha"]:
         p.append(f"tested base {main_sha} is not the manifest base_sha")
     if main_sha and head and main_sha == head:
@@ -177,7 +195,8 @@ def result_for(case: dict, arm: str, cmd: list[str], rec: dict | None, exit_code
                   "cost_usd": cost.get("cost_usd"), "provider": (rec or {}).get("model_provider")},
         "tested": {"base_sha": ((rec or {}).get("sides") or {}).get("main_sha"),
                    "pr_sha": ((rec or {}).get("sides") or {}).get("pr_sha"),
-                   "head_sha": ((rec or {}).get("chosen") or {}).get("head_sha")},
+                   "head_sha": ((rec or {}).get("chosen") or {}).get("head_sha"),
+                   "pr_side": pr_side(case, (rec or {}).get("sides") or {})[0] if rec else None},
         "command": [Path(cmd[0]).name, *cmd[1:]], "exit_code": exit_code, "stderr_tail": stderr_tail[-2000:],
         "record_id": (rec or {}).get("id"), "poc_commit": (rec or {}).get("poc_commit"),
         "sandbox": {"backend": (rec or {}).get("sandbox_backend"), "machine": (rec or {}).get("machine")},

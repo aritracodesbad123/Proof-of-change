@@ -29,6 +29,10 @@ cases run with and without probes, with the misses counted honestly.
   side. Other cases are listed as excluded, with the reason.
 - The whole result object is cleaned of secret values before it is written.
 - A case may use a PR on a fork. The case still names the upstream project and the upstream base commit.
+  The fork path is untested end to end: no fork PR has been run through the check yet.
+- The PR side counts as matching when it is the head itself, or GitHub's test merge commit whose parents are
+  exactly the case's base and head, with the tested base equal to the case base and the merge's PR parent
+  equal to the pinned head. These fields already exist in the record; its format is unchanged.
 - The runner refuses fixture cases. The unit tests use three fixture cases that are marked as fixtures.
 - Verdict rules, the study path and the daily study are unchanged. The runner only reads the check's record.
   The stage states are derived from that record and are not new record fields.

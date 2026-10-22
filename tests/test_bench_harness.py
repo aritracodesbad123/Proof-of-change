@@ -242,3 +242,44 @@ def test_fork_pr_url():
     assert any("same repository name" in p for p in manifest.validate(
         dict(c, pr_url="https://github.com/someone/other/pull/7", fork="someone/other")))
     assert any("fork must be OWNER/REPO" in p for p in manifest.validate(dict(c, fork="bad")))
+
+
+def merge_sides(c, **kw):
+    sides = {"comparison_basis": "base tip vs GitHub test merge (refs/pull/N/merge)", "main_sha": c["base_sha"],
+             "pr_sha": "e" * 40, "merge_commit": "e" * 40, "merge_parents": [c["base_sha"], c["head_sha"]],
+             "merge_head_matches_pinned_head": True}
+    sides.update(kw)
+    return sides
+
+
+def test_matching_merge_ref_is_accepted(tmp_path):
+    c = cases()["fx-catch"]
+    rec = record(c, "needs_attention")
+    rec["sides"] = merge_sides(c)
+    r = run.run_one(c, "tests", tmp_path, fake_exec(rec))
+    assert r["outcome"] == "ran" and r["tested"]["pr_side"] == "merge_ref"
+    r2 = run.run_one(dict(c, id="fx-catch2"), "tests", tmp_path, fake_exec(record(c, "needs_attention")))
+    assert r2["tested"]["pr_side"] == "head"
+
+
+@pytest.mark.parametrize("change, problem", [
+    ({"merge_commit": "d" * 40}, "neither head_sha nor the recorded merge commit"),
+    ({"merge_parents": ["0" * 40, "4444" * 10]}, "are not [base_sha, head_sha]"),
+    ({"merge_parents": ["3333" * 10, "0" * 40]}, "are not [base_sha, head_sha]"),
+    ({"merge_parents": None}, "are not [base_sha, head_sha]"),
+    ({"main_sha": "0" * 40}, "merge-ref comparison base is not base_sha"),
+    ({"merge_head_matches_pinned_head": False}, "does not match the pinned head"),
+    ({"merge_head_matches_pinned_head": None}, "does not match the pinned head"),
+])
+def test_merge_ref_mismatch_is_not_run(tmp_path, change, problem):
+    c = cases()["fx-catch"]
+    rec = record(c, "needs_attention")
+    rec["sides"] = merge_sides(c, **change)
+    r = run.run_one(c, "tests", tmp_path, fake_exec(rec))
+    assert r["outcome"] == "not_run" and r["tested"]["pr_side"] is None
+    assert any(problem in p for p in r["not_run_why"]), r["not_run_why"]
+
+
+def test_summarize_without_run_meta_is_a_plain_error(tmp_path):
+    with pytest.raises(SystemExit, match="run_meta.json is missing"):
+        summarize.load(tmp_path)
