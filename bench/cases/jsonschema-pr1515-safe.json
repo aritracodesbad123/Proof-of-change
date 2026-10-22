@@ -1,0 +1,18 @@
+{
+  "schema": "poc-bench-case/1",
+  "id": "jsonschema-pr1515-safe",
+  "repo": "python-jsonschema/jsonschema",
+  "pr_url": "https://github.com/python-jsonschema/jsonschema/pull/1515",
+  "base_sha": "597e53f974260aba010716f7c9250f01a193969a",
+  "head_sha": "f5d429379c0fe08911d879978473c0d24c2a2860",
+  "category": "known_safe",
+  "expected_verdict": "verified",
+  "rationale": "Upstream open PR; intended behaviour change with its own targeted tests. Full suite on head (Python 3.14.7, wheels only, no outside network): 7810 passed, 703 skipped in 9.11s. No failures.",
+  "source": "upstream PR python-jsonschema/jsonschema#1515, SHAs from GitHub API 2026-10-22 ~22:40 IST",
+  "notes": {
+    "base_ref": "main",
+    "base_is_current_tip_and_merge_base": true,
+    "refresh_before_run": "base_sha is the base-branch tip as of 2026-10-22; if it moves the runner reports not run",
+    "clean_head_preexisting_failures": []
+  }
+}
