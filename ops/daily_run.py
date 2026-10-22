@@ -1600,10 +1600,12 @@ def _pr_own_failure(a, rec, step, why, log: Path | None = None, same_setup: bool
         except OSError as exc:
             print(f"WARNING: could not read {Path(log).name}: {type(exc).__name__}", file=sys.stderr, flush=True)
     if demo_helper.is_system_failure(text):
-        missing = demo_helper.failure_line(text)
-        demo_helper.note_limitation(rec, [], missing, "the PR side needs a system library, header or build tool "
-                                                      "that this sandbox does not have")
-        return f"could not verify: the PR side needs a missing system library, header or build tool: {missing}"
+        line = demo_helper.failure_line(text)
+        pieces = demo_helper.missing_system_pieces(text) or ([line[:120]] if line else [])
+        demo_helper.note_limitation(rec, pieces, line, "the PR side needs a system library, header or build tool "
+                                                       "that this check does not install")
+        named = ", ".join(pieces) if pieces else line
+        return f"could not verify: the PR side needs a missing system library, header or build tool: {named}"
     if _INFRA_FAILURE.search(text):
         return why   # network, memory, timeout, disk or sandbox trouble is never blamed on the PR
     named = _NAMED_ERROR.search(text)

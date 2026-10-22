@@ -288,6 +288,19 @@ def test_required_gpu_dependency_stops_before_install(tmp_path, monkeypatch):
     assert verdict == "could_not_verify" and reason == why
 
 
+def test_nvidia_name_without_a_cuda_build_does_not_stop_the_install(tmp_path, monkeypatch):
+    (tmp_path / "pyproject.toml").write_text(
+        '[project]\nname = "app"\ndependencies = ["nvidia-ml-py", "numpy"]\n')
+    calls = []
+    monkeypatch.setattr(daily_run, "install_side", lambda *a, **k: calls.append("install") or (True, ""))
+    a = SimpleNamespace(python="3.12", pr="https://github.com/a/b/pull/1", product_check=True, bench=None)
+    ok, why = daily_run._install_with_helper(a, {}, "main install", tmp_path / "v", tmp_path, None, tmp_path / "log",
+                                             10, None, None)
+    assert ok is True and calls == ["install"]
+    assert demo_helper.gpu_only_requirement(tmp_path) is None
+    assert not str(why).startswith("unsupported")
+
+
 def test_optional_cuda_extra_does_not_block_the_install(tmp_path, monkeypatch):
     (tmp_path / "pyproject.toml").write_text(
         '[project]\nname = "app"\ndependencies = ["numpy"]\n\n'

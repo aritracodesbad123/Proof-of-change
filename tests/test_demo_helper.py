@@ -996,6 +996,26 @@ def test_lookup_does_not_invent_an_import_to_package_mapping(tmp_path):
     assert "No module named 'gitlab'" in rec["reason"]
 
 
+def test_missing_library_stays_unverified_when_system_installs_are_on(tmp_path):
+    (tmp_path / "pytest-pr-1.log").write_text(
+        "E   ImportError: libEGL.so.1: cannot open shared object file: No such file or directory\n")
+    asked = []
+    rec = {"verdict": "could_not_verify",
+           "reason": "tests produced no results on one side (collection failed; see pytest logs)"}
+    demo_helper.retry_unverified(
+        rec, lambda: asked.append("rerun") or {"verdict": "verified", "reason": "ok"},
+        lambda *_a: asked.append("pip") or (True, "1"),
+        [], "", lambda _name: LINK, REPO, True,
+        install_system=lambda name: asked.append(("apt", name)) or True,
+        log_dir=tmp_path, project_text="apt-get install some-os-pkg", apt_check=lambda _name: True)
+    assert asked == []
+    assert rec["verdict"] == "could_not_verify"
+    lim = rec["demo_helper"]["limitations"][0]
+    assert "libEGL.so.1" in lim["needed"] and "libEGL.so.1" in lim["error"]
+    assert "some-os-pkg" not in json.dumps(lim)
+    assert rec["demo_helper"]["gap_retry"]["reran"] is False
+
+
 def test_missing_shared_library_is_named_in_the_reason(tmp_path):
     (tmp_path / "pytest-pr-1.log").write_text(
         "E   ImportError: libEGL.so.1: cannot open shared object file: No such file or directory\n")

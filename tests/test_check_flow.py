@@ -181,16 +181,19 @@ def test_the_no_hardcoding_scan_catches_a_planted_map(tmp_path):
     assert len(hits) >= 3 and all(h.startswith("poc/planted.py:") for h in hits)
 
 
-def test_system_gap_installs_proposed_packages_on_both_sides_and_reruns(monkeypatch):
+def test_system_gap_does_not_install_an_os_package_even_when_that_is_allowed(monkeypatch):
     monkeypatch.delenv("POC_PROGRESS_PATH", raising=False)
     asked = []
     rec = {"verdict": "could_not_verify", "reason": "ImportError: liba.so.1: cannot open shared object file"}
-    demo_helper.retry_unverified(rec, lambda: {"verdict": "verified", "reason": "ok"}, lambda s, r: (True, "1"),
+    demo_helper.retry_unverified(rec, lambda: asked.append("rerun") or {"verdict": "verified", "reason": "ok"},
+                                 lambda s, r: (True, "1"),
                                  [], "", None, REPO, True, install_system=lambda n: asked.append(n) or True,
                                  apt_check=YES, project_text="RUN apt-get update && apt-get install -y liba-dev")
-    assert asked == ["liba-dev"]
-    t = rec["demo_helper"]["gap_retry"]["tries"][0]
-    assert t["installed"] == ["system package liba-dev"] and t["sources"] == ["project install docs"]
+    assert asked == []
+    assert rec["verdict"] == "could_not_verify"
+    lim = rec["demo_helper"]["limitations"][0]
+    assert lim["needed"] == ["liba.so.1"] and "liba.so.1" in lim["error"]
+    assert rec["demo_helper"]["gap_retry"]["reran"] is False
 
 
 def test_bubblewrap_records_a_limitation_with_packages_and_the_real_error(monkeypatch):
@@ -199,8 +202,8 @@ def test_bubblewrap_records_a_limitation_with_packages_and_the_real_error(monkey
     demo_helper.retry_unverified(rec, lambda: {}, lambda s, r: (True, "1"), [], "", None, REPO, False,
                                  apt_check=YES, project_text="apt-get install liba-dev")
     lim = rec["demo_helper"]["limitations"][0]
-    assert lim["needed"] == ["liba-dev"] and "liba.so.1" in lim["error"]
-    assert "cannot install OS packages" in lim["plain"]
+    assert lim["needed"] == ["liba.so.1"] and "liba.so.1" in lim["error"]
+    assert "does not install system libraries" in lim["plain"]
     assert rec["verdict"] == "could_not_verify"
 
 
@@ -240,7 +243,7 @@ def test_rule_b_os_package_must_exist_in_the_distro_archive():
                                  [], "", None, REPO, True, install_system=lambda n: asked.append(n) or True,
                                  apt_check=lambda n: False, project_text="apt-get install liba-dev")
     assert asked == [] and rec["verdict"] == "could_not_verify"
-    assert any("not found in the distro archive" in n for n in rec["demo_helper"]["notes"])
+    assert rec["demo_helper"]["limitations"][0]["needed"] == ["liba.so.5"]
 
 
 def test_rule_b_python_package_must_link_back_on_pypi():

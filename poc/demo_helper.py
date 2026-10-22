@@ -96,7 +96,8 @@ _SETUP_MARKERS = (
 # Product-check stops. These are signals in an install log or a requirement line, not repository names.
 _DISK_FULL = re.compile(r"no space left on device|errno 28|disk quota exceeded", re.I)
 _FLAT_LAYOUT = re.compile(r"multiple top-level packages discovered in a flat-layout", re.I)
-_GPU_REQ = re.compile(r"(?i)(?:^|[^A-Za-z0-9])(?:nvidia|cuda)(?:[^A-Za-z0-9]|$)|\+cu\d+")
+# A CUDA build, not every name that contains "nvidia": nvidia-*-cu*, cuda-*, or a +cu wheel.
+_GPU_REQ = re.compile(r"(?i)(?:^|[^A-Za-z0-9])(?:nvidia-[a-z0-9._-]*-cu\d*|cuda-[a-z0-9._-]+)|\+cu\d+")
 _PYTEST_ERROR = re.compile(
     r"(?i)(?:module)?notfounderror:[^\n<]{0,180}|filenotfounderror:[^\n<]{0,180}|"
     r"no module named ['\"]?[\w.]+|importerror:[^\n<]{0,180}|"
@@ -787,9 +788,10 @@ def _iter_required_lines(checkout):
 
 
 def gpu_only_requirement(checkout) -> str | None:
-    """A required dependency that is a CUDA or GPU build, or None.
+    """A required dependency that is a CUDA build, or None.
 
-    The signal is the requirement name (nvidia-*, cuda-*, or a +cu wheel). Optional extras are ignored.
+    The signal is the requirement name: an nvidia-*-cu* package, a cuda-* package, or a +cu wheel.
+    A name that only contains "nvidia" is not a CUDA build. Optional extras are ignored.
     """
     for line in _iter_required_lines(checkout):
         if _GPU_REQ.search(line):
@@ -1265,6 +1267,42 @@ def os_packages_in(text: str) -> list[str]:
 
 def is_system_failure(text: str) -> bool:
     return bool(_SYSTEM_FAILURE.search(text or ""))
+
+
+def missing_system_pieces(text: str) -> list[str]:
+    """The library, header or tool an error says is missing.
+
+    Each name is taken from the error text. Nothing here is a distribution package, and nothing is chosen from a list.
+    """
+    found: list[str] = []
+
+    def add(name: str) -> None:
+        name = (name or "").strip().strip("'\"`,.;")
+        if not name or len(name) > 80 or name.lower() in {"error", "fatal", "command", "the"}:
+            return
+        if "/" in name:
+            name = name.rsplit("/", 1)[-1]
+        if name and name not in found:
+            found.append(name)
+
+    blob = text or ""
+    for match in re.finditer(r"lib[\w.+-]+\.so(?:\.\d+)*", blob):
+        add(match.group(0))
+    for match in re.finditer(r"(?i)fatal error:\s*([^\s:]+\.h)\b", blob):
+        add(match.group(1))
+    for match in re.finditer(r"(?i)cannot find -l([A-Za-z0-9_+.-]+)", blob):
+        add("-l" + match.group(1))
+    for match in re.finditer(r"(?i)package\s+([A-Za-z0-9_+.-]+)\s+was not found", blob):
+        add(match.group(1))
+    for match in re.finditer(r"(?i)([A-Za-z0-9_+./-]{1,60})\s+executable not found", blob):
+        add(match.group(1))
+    for match in re.finditer(r"(?i)command not found:\s*([A-Za-z0-9_+./-]+)", blob):
+        add(match.group(1))
+    for match in re.finditer(r"(?i)(?:^|[\s'\"])([A-Za-z0-9_+.-]{1,40}):\s*(?:command )?not found\b", blob):
+        add(match.group(1))
+    for match in re.finditer(r"(?i)command\s+'([^']+)'\s+failed", blob):
+        add(match.group(1))
+    return found[:8]
 
 
 def failure_line(text: str) -> str:
@@ -2360,36 +2398,20 @@ def retry_unverified(rec: dict, rerun, install_one, declared, tavily_text: str, 
         tried.update(norm(req_name(spec["requirement"])) for spec in specs)
         entry = {"try": attempt, "problem": name, "lookup": query if looked else None, "sources": sources,
                  "planned": [spec["requirement"] for spec in specs], "installed": [], "rerun": False}
-        sys_fix = system_fix_for(text, lookup_text, project_text, apt_check, sources)
-        for item in sys_fix["refused"]:
-            notes.append(f"Setup plan: refused system package {item['name']}: {item['reason']}")
-        sys_names = [n for n in sys_fix["install"] if n not in tried]
-        if not specs and is_system_failure(text) and not sys_names:
-            entry["result"] = "the project's docs and pages name no OS package for this error"
+        # A missing library, header or build tool stops here on every sandbox. Installing an OS package, including
+        # inside Contree, is not confirmed, so allow_system and install_system are not used for that.
+        if not specs and is_system_failure(text):
+            pieces = missing_system_pieces(text)
+            if not pieces:
+                line = failure_line(text)
+                pieces = [line[:120]] if line else []
+            entry["result"] = "needs a system library, header or build tool; this check does not install OS packages"
+            entry["planned"] = list(pieces)
+            note_limitation(rec, pieces, failure_line(text),
+                            "this check does not install system libraries, headers or build tools")
             tries.append(entry)
-            note_limitation(rec, [], failure_line(text), "no OS package for it was found in the project's own docs")
             _emit_retry(f"Try {attempt} of {max_tries}: {name}: {entry['result']}")
             break
-        if not specs and sys_names and rerun is not None:
-            tried.update(sys_names)
-            entry["planned"] = list(sys_names)
-            entry["sources"] = list(sys_fix["sources"])
-            if not (allow_system and install_system):
-                entry["result"] = "needs system package(s) " + ", ".join(sys_names) + "; this sandbox cannot install them"
-                note_limitation(rec, sys_names, failure_line(text),
-                                "this sandbox (bubblewrap) cannot install OS packages")
-                tries.append(entry)
-                _emit_retry(f"Try {attempt} of {max_tries}: {name}: {entry['result']}")
-                break
-            got = [n for n in sys_names if install_system(n)]
-            entry["installed"] = [f"system package {n}" for n in got]
-            if not got:
-                entry["result"] = "system package install failed on main or pr"
-                tries.append(entry)
-                _emit_retry(f"Try {attempt} of {max_tries}: {name}: {entry['result']}")
-                break
-            _emit_retry(f"Try {attempt} of {max_tries}: installed system package(s) {', '.join(got)} on main and pr; rerunning")
-            specs = None
         if specs is not None and (not specs or rerun is None):
             if not specs and repeat:
                 entry["result"] = "already installed on an earlier try and still missing"

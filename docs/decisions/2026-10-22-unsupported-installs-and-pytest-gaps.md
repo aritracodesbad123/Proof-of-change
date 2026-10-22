@@ -7,12 +7,12 @@
 
 A product check (a check started with `--product-check`) now stops before it spends retries on three kinds of install, and a could-not-verify result caused by a missing import or a missing library keeps the real pytest error.
 
-- If the project requires a CUDA or GPU package (a required dependency whose name contains `nvidia` or `cuda`, or a `+cu` wheel), the check does not install it. The reason is that the project needs a GPU / CUDA build, and it names the requirement. An optional extra that mentions CUDA does not stop the check.
+- If the project requires a CUDA build (a required dependency named `nvidia-*-cu*`, a `cuda-*` package, or a `+cu` wheel), the check does not install it. The reason says the project needs a GPU / CUDA build and names that requirement. A required package whose name only contains `nvidia`, and an optional extra that mentions CUDA, do not stop the check.
 - If the install log says the disk is full (`No space left on device`, and the same kind of message), the check does not retry. It deletes that install's virtualenv and the temporary build files next to it, then stops. The shared download cache is left as it is.
 - If the install log says setuptools found multiple top-level packages in a flat layout, the check does not try to install the project or only its dependencies. The reason is that the project is not installable as a Python package.
 - Other "this is not a Python package" failures, such as an application that is meant to be set up with `uv sync`, still install only the declared dependencies. That earlier behaviour is unchanged.
 - When a product check cannot verify because a test failed to import or collect, the gap step reads the pytest logs and the junit files, not only the short reason. The could-not-verify reason keeps that error text, so a missing module or a missing shared library is visible.
-- That same error text is what the existing per-run lookup diagnoses. The lookup query uses the pytest or collection line (a missing system library, header or tool still takes priority, because that path already handles OS packages). This change does not add another retry loop or another installer. A requirement is installed only when that existing step already would: the error names a module the project declares (including an extra), or a link-back suggestion. A missing system library is not installed by this change; its name stays in the reason.
+- That same error text is what the existing per-run lookup diagnoses. The lookup query uses the pytest or collection line. A missing system library, header or build tool still takes priority in that query. On a product check the result is could not verify, with a limitation that names the missing piece from the error text. This is the same on every sandbox, including Contree: the check does not try to install an OS package. This change does not add another retry loop or another installer. A Python requirement is installed only when that existing step already would: the error names a module the project declares (including an extra), or a link-back suggestion.
 
 A study run is unchanged. It does not use these stops, and it does not read pytest logs for a gap retry.
 
@@ -23,7 +23,8 @@ Some projects cannot be installed on this machine. A GPU stack downloads very la
 ## Decision
 
 - Detect these stops from the install log and from the project's required dependencies. Do not special-case a repository by name, and do not keep a table that maps an import name to a distribution name.
-- An optional extra that mentions CUDA does not by itself stop the check. Only a required dependency does.
+- An optional extra that mentions CUDA does not by itself stop the check. Only a required CUDA build does: `nvidia-*-cu*`, `cuda-*`, or a `+cu` wheel.
+- A missing system library, header or build tool is read from the error text. The check does not keep a list that turns that error into an OS package name, and it does not install one.
 - Disk-full cleanup removes the unfinished virtualenv, the side's temporary directory, a private uv cache for that side, and pip or uv build directories in that side's home. It does not wipe the shared cache.
 - The real pytest or collection error is part of the text the existing gap step already turns into a lookup query and a missing-name. The reason keeps that error next to the short name.
 - The verdict stays could_not_verify. These stops reach that verdict before retries, with a plain reason. They do not mark the check verified.
@@ -34,4 +35,4 @@ Retrying a disk-full install can fill the disk further and does not change the o
 
 ## What it means for you
 
-A product check of a GPU project, a flat-layout project, or an install that runs out of disk ends quickly with could_not_verify and a reason you can read. A disk-full install does not leave its temporary build files behind. A missing import shows the pytest error in the reason, and that error is what the per-run lookup diagnoses. A study run behaves as it did before.
+A product check of a CUDA project, a flat-layout project, or an install that runs out of disk ends quickly with could_not_verify and a reason you can read. A package whose name only contains nvidia is still installed. A disk-full install does not leave its temporary build files behind. A missing import shows the pytest error in the reason, and that error is what the per-run lookup diagnoses. A missing system library, header or build tool stays could not verify, and the limitation names what the error said was missing, on every sandbox. A study run behaves as it did before.
