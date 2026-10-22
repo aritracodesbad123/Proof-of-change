@@ -389,7 +389,8 @@ def select_prs(gh: GitHub, repo: str, cfg: dict, seen: dict, last_run_utc: str |
             skipped.append(base | {"why": skip}); continue
         item = {"pr": n, "title": p["title"], "body": p.get("body") or "", "url": p["html_url"],
                 "author": p["user"]["login"], "head_sha": sha,
-                "base_sha": p["base"]["sha"], "base_ref": p["base"]["ref"], "updated_at_utc": p["updated_at"],
+                "base_sha": p["base"]["sha"], "merge_commit_sha": p.get("merge_commit_sha"),
+                      "base_ref": p["base"]["ref"], "updated_at_utc": p["updated_at"],
                 "updated_at_ist": to_ist(p["updated_at"]), "files": fc, "diff": d,
                 "additions_hint": d.count("\n+") - d.count("\n+++")}
         (compiled if fc["compiled"] else pure).append(item)
@@ -531,7 +532,8 @@ def chosen_items(gh: GitHub, repo: str, cfg: dict, chosen: list[dict]) -> list[d
         items.append({"pr": p["number"], "title": p["title"], "body": p.get("body") or "", "url": p["html_url"],
                       "author": p["user"]["login"],
                       "head_sha": pk["head_sha"] or p["head"]["sha"], "current_head_sha": p["head"]["sha"],
-                      "base_sha": p["base"]["sha"], "base_ref": p["base"]["ref"], "updated_at_utc": p["updated_at"],
+                      "base_sha": p["base"]["sha"], "merge_commit_sha": p.get("merge_commit_sha"),
+                      "base_ref": p["base"]["ref"], "updated_at_utc": p["updated_at"],
                       "updated_at_ist": to_ist(p["updated_at"]), "files": classify_files(diff_files(d), cfg["pkg"]),
                       "diff": d, "mergeable": p.get("mergeable"), "mergeable_state": p.get("mergeable_state"),
                       "draft": p.get("draft"), "state": p.get("state"), "chosen": pk, "ci_state": "not checked (chosen PR)",
@@ -663,25 +665,40 @@ def _tree(src, env, sha: str) -> str:
                           text=True).stdout.strip()
 
 
+def _git_out(src, env, *args: str) -> str:
+    return subprocess.run(["git", "-C", src, *args], env=env, capture_output=True, text=True).stdout.strip()
+
+
 def distinct_base(src, env, log: Path, item: dict, res: dict) -> dict | None:
     """Product checks only. When the chosen main side is the PR head itself (a merged or closed PR: the merge-base
-    of head and base branch is the head) or has the same tree, use the PR's recorded base (GitHub base.sha), then the
-    first parent before the PR's commits. Returns an error dict ('unsupported: ...') when no distinct base exists."""
+    of head and base branch is the head) or has the same tree, pick the main side in this order:
+    1. merge-base of the PR's recorded base (GitHub base.sha) and the head, so every PR commit is compared and no
+       later base-branch commit is pulled in;
+    2. if that merge-base is the head itself, the first parent of the PR's merge commit (GitHub merge_commit_sha);
+    3. base.sha itself.
+    The first candidate whose tree differs from the PR side wins. Returns an error dict ('unsupported: ...') when no
+    distinct base exists."""
     main, pr = res.get("main_sha"), res.get("pr_sha")
     if not main or not pr or (main != pr and _tree(src, env, main) != _tree(src, env, pr)):
         return None
     head = item["head_sha"]
+    base_sha, merge_sha = item.get("base_sha"), item.get("merge_commit_sha")
     cands = []
-    if item.get("base_sha"):
-        run(["git", "-C", src, "fetch", "-q", "origin", item["base_sha"]], log, env=env, timeout=300)
-        cands.append((item["base_sha"], "PR base (GitHub base.sha) vs PR head"))
-    first = subprocess.run(["git", "-C", src, "rev-list", "--first-parent", "--max-count=1", f"{head}~1"], env=env,
-                           capture_output=True, text=True).stdout.strip()
-    if first:
-        cands.append((first, "first parent before the PR head vs PR head"))
+    if base_sha:
+        run(["git", "-C", src, "fetch", "-q", "origin", base_sha], log, env=env, timeout=300)
+        mb = _git_out(src, env, "merge-base", base_sha, head)
+        if mb and mb != head:
+            cands.append((mb, "merge-base of PR base (GitHub base.sha) and PR head vs PR head"))
+        elif mb == head and merge_sha:
+            run(["git", "-C", src, "fetch", "-q", "origin", merge_sha], log, env=env, timeout=300)
+            first = _git_out(src, env, "rev-parse", "--verify", "-q", f"{merge_sha}^1")
+            if first:
+                cands.append((first, "first parent of the PR merge commit vs PR head"))
+        cands.append((base_sha, "PR base (GitHub base.sha) vs PR head"))
+    pr_tree = _tree(src, env, pr)
     for sha, basis in cands:
         t = _tree(src, env, sha)
-        if t and t != _tree(src, env, pr):
+        if t and t != pr_tree:
             res |= {"main_sha": sha, "comparison_basis": basis + " (merge-base equals the PR head: PR already merged)"}
             return None
     return {"ok": False, "why": "unsupported: no base commit distinct from the PR head was found, so main and PR "
@@ -4755,7 +4772,8 @@ def frozen_items(gh: GitHub, repo: str, cfg: dict, frozen: dict) -> list[dict]:
         items.append({"pr": n, "title": p["title"], "body": p.get("body") or "", "url": p["html_url"],
                       "author": p["user"]["login"],
                       "head_sha": pinned, "current_head_sha": p["head"]["sha"], "head_moved": moved,
-                      "base_sha": p["base"]["sha"], "base_ref": p["base"]["ref"], "updated_at_utc": p["updated_at"],
+                      "base_sha": p["base"]["sha"], "merge_commit_sha": p.get("merge_commit_sha"),
+                      "base_ref": p["base"]["ref"], "updated_at_utc": p["updated_at"],
                       "updated_at_ist": to_ist(p["updated_at"]), "files": classify_files(diff_files(d), cfg["pkg"]),
                       "diff": d, "state": p.get("state"), "ci_state": state, "ci_detail": detail,
                       "frozen_from": it.get("first_attempt")})
