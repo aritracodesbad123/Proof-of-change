@@ -6,7 +6,7 @@ Each statement below is **Live** (it matches that commit, with a file and line) 
 
 ## 1. What it is
 
-Proof-of-Change reports each claim it can test as kept (the code word is proven), broken (the code word is false claim), or could not verify, and it keeps the log line behind the statement. A pull request that changes only docs, comments, or docstrings ends as could not verify, because there is no behaviour to test. It can read GitHub. A person makes the final call. It never approves a pull request and it never merges one. Live: `poc/verdict.py:20` (proven and false claim), `poc/verdict.py:3` (verdicts do not block a merge), and `README.md:10` (it only gives advice).
+Proof-of-Change reports each claim it can test as kept (the code word is proven), broken (the code word is false claim), or could not verify, and it keeps the log line behind the statement. Docs-only pull requests are skipped in the daily run. A single check in full mode ends as COULD NOT VERIFY because the AI-probe gate needs a probe that runs a changed line. Other modes can still mark a docstring-only change VERIFIED, with the reason 'holds by construction'. Live: `ops/daily_run.py:3300`, `ops/daily_run.py:3313`. It can read GitHub. A person makes the final call. It never approves a pull request and it never merges one. Live: `poc/verdict.py:20` (proven and false claim), `poc/verdict.py:3` (verdicts do not block a merge), and `README.md:10` (it only gives advice).
 
 ## 2. How a check works
 
@@ -37,7 +37,7 @@ These rules can only move a `verified` result downward. They do not raise a lowe
 
 The advisory reviewers (the swarm) do not change the verdict at all. They cannot raise it. Live: `poc/agents.py:108`.
 
-A pull request that changes only docs, comments, or docstrings ends as could not verify, because there is no behaviour to test. Live: `docs/decisions/2026-10-21-golden-check-ai-probe-gate-and-known-answer-benchmark.md:8`, `ops/daily_run.py:2931`. Draft pull request 56 is still open and is not part of this commit.
+Docs-only pull requests are skipped in the daily run. A single check in full mode ends as COULD NOT VERIFY because the AI-probe gate needs a probe that runs a changed line. Other modes can still mark a docstring-only change VERIFIED, with the reason 'holds by construction'. Live: `ops/daily_run.py:3300` (`verdict_for`), `ops/daily_run.py:3313`. Draft pull request 56 is still open and is not part of this commit.
 
 ## 4. Models
 
@@ -54,12 +54,12 @@ All four models run on NVIDIA Nemotron through Nebius Token Factory. Each call u
 
 Pull-request code is meant to run inside a sandbox.
 
-- **Contree** (Nebius cloud sandboxes) is the preferred design when a Nebius key and project ID are present and the Contree library is installed. The design bills the run to that account. Running with a judge's own Nebius account is not confirmed on the live Contree service. Contree is confirmed end-to-end only for the apprise pull request #1783 product check named in the README current limitations. Live: `poc/console_api.py:216`.
+- **Contree** (Nebius cloud sandboxes) is the preferred design when a Nebius key and project ID are present and the Contree library is installed. The design bills the run to that account. Running with a judge's own Nebius account is not confirmed on the live Contree service. Contree is confirmed end-to-end only for the apprise pull request #1783 product check (confirmed on commit cecf851) named in the README current limitations. Live: `poc/console_api.py:216`.
 - **Bubblewrap** is the Linux fallback when Contree cannot run. Live: `poc/console_api.py:216`.
-- **Contree-only mode.** The design runs installs, tests, and probes in Contree. A local step that would run pull-request code is refused. That full path is confirmed only for the apprise pull request #1783 check. Live: `ops/daily_run.py:1909`, `tests/test_contree_only.py:87`.
+- **Contree-only mode.** The design runs installs, tests, and probes in Contree. A local step that would run pull-request code is refused. That full path is confirmed only for the apprise pull request #1783 check (confirmed on commit cecf851). Live: `ops/daily_run.py:1909`, `tests/test_contree_only.py:87`.
 - There is no automatic unsandboxed fallback. The only opt-in is the host setting `POC_UNSAFE_NO_SANDBOX=1`. Live: `poc/console_api.py:177`, `docs/decisions/2026-10-21-console-refuses-unsandboxed.md:16`.
-- A product check is designed to run pytest with coverage inside the Contree pull-request checkpoint and read the report back. If that file is missing, the result stays could not verify. Measuring test coverage inside Contree is not confirmed on the live Contree service. Live: `ops/daily_run.py:2832`.
-- Contree-only mode does not measure which lines a probe ran. A full check still needs that measurement, so a full Contree-only check stays could not verify. Live: `ops/daily_run.py:4015`, `ops/daily_run.py:2931`.
+- A product check is designed to run pytest with coverage inside the Contree pull-request checkpoint and read the report back. If that file is missing, the result stays could not verify. Measuring test coverage inside Contree is not confirmed on the live Contree service. Live: `ops/daily_run.py:2843`.
+- Contree-only mode does not measure which lines a probe ran. A full check still needs that measurement, so a full Contree-only check stays could not verify. Live: `ops/daily_run.py:4015`, `ops/daily_run.py:2942`.
 
 ## 6. Keys and privacy
 
@@ -135,7 +135,7 @@ On every pull request, GitHub Actions runs, on Python 3.11 and 3.12: a decision-
 - A full Contree-only check cannot reach verified, because probe coverage is not measured there. In that design, a product check can stay verified when a coverage report comes back and the other caps allow it. Measuring test coverage inside Contree is not confirmed on the live Contree service. Live: `ops/daily_run.py:2843`, `docs/decisions/2026-10-21-contree-coverage.md:5`.
 - A coverage report written by the pull request's own code can still be forged. The gate accepts a report that lists every changed file and claims every line ran. Live: `docs/decisions/2026-10-21-coverage-report-checks.md:21`.
 - The PyPI link-back check is not attack-proof. The package author writes the link, so someone trying to get past it can write one too. Live: `docs/decisions/2026-10-21-pr-only-flaky-not-verified.md:35`.
-- Pull requests that change only docs, comments, or docstrings end as could not verify, because there is no behaviour to test. Draft pull request 56 is open and is not merged here. Live: `docs/decisions/2026-10-21-golden-check-ai-probe-gate-and-known-answer-benchmark.md:28`.
+- Docs-only pull requests are skipped in the daily run. A single check in full mode ends as COULD NOT VERIFY because the AI-probe gate needs a probe that runs a changed line. Other modes can still mark a docstring-only change VERIFIED, with the reason 'holds by construction'. Draft pull request 56 is open and is not merged here. Live: `ops/daily_run.py:3300` (`verdict_for`), `ops/daily_run.py:3313`.
 - A process that double-forks and is adopted by init can escape the install timeout. Live: `docs/decisions/2026-10-21-install-timeout-kills-process-tree.md:20`.
 - Codespace live checks are not confirmed. Live: `README.md:71`.
 - A managed schedule for the serverless daily job is not built. Live: `docs/REQUIREMENTS.md:286` ("Planned, not yet built" for that schedule).
