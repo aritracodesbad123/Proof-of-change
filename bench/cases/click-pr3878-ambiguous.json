@@ -1,12 +1,12 @@
 {
   "schema": "poc-bench-case/1",
-  "id": "click-pr3878-safe",
+  "id": "click-pr3878-ambiguous",
   "repo": "pallets/click",
   "pr_url": "https://github.com/pallets/click/pull/3878",
   "base_sha": "2247b35ea1c47c727d7a06e51fa280e12a863ff6",
   "head_sha": "f8c5a8efc17d01a9fb10bba961def4c3215ce369",
-  "category": "known_safe",
-  "expected_verdict": "verified",
+  "category": "ambiguous",
+  "expected_verdict": "needs_attention",
   "rationale": "Upstream open PR; intended behaviour change with its own targeted tests. Full suite on head (Python 3.14.7, wheels only, no outside network): 24 failed, 3222 passed, 24 skipped, 1 xfailed in 3.99s. Pre-existing environment failures, not caused by the PR: 16 (see notes).",
   "source": "upstream PR pallets/click#3878, SHAs from GitHub API 2026-10-22 ~22:40 IST",
   "notes": {
@@ -30,6 +30,7 @@
       "tests/test_utils/test_echo_via_pager.py::test_echo_via_pager[test8-less]",
       "tests/test_utils/test_echo_via_pager.py::test_echo_via_pager[test9-",
       "tests/test_utils/test_echo_via_pager.py::test_echo_via_pager[test9-less]"
-    ]
+    ],
+    "relabelled_ambiguous": "This PR changes output on purpose, so needs_attention is a fair answer and is not scored as a false alarm. Ambiguous cases are reported, not scored."
   }
 }
