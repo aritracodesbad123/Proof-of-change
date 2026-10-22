@@ -13,6 +13,15 @@ comment; it never posts to random upstream projects.
 
 > New words are explained the first time they appear. There is also a [glossary](#glossary) at the end.
 
+## Current limitations
+
+- Big applications with huge dependency lists (for example home-assistant, erpnext, or vllm-scale projects) usually end as COULD NOT VERIFY. Setup installs too much, and anything that needs a C or system build fails in Contree, because pull-request checks never install operating-system packages.
+- For apps built from many components, each listing its own requirements (like home-assistant integrations), a PR check installs only the touched component's packages plus the core requirements, read from main, and never the combined list of every component. This chooses the right packages; it is not confirmed that such a check finishes, and no such check has reached verified. If the changed files don't fall inside a single component (for example, changes to home-assistant's core files), the check ends as COULD NOT VERIFY. Confirmed on a real check: home-assistant #187420 scoped to the one integration, then setup failed building a core package that needs a C++ compiler.
+- Big applications whose own core requirements need a C or C++ build, with no ready-made packages (wheels) for the Python version the project requires, end as COULD NOT VERIFY. For example, home-assistant requires Python 3.14, and two of its core packages, pymicro-vad and pyspeex-noise (home-assistant requirements.txt lines 45 and 48), have no ready-made packages for 3.14 and need a C++ compiler, which the sandbox does not have. PR checks never install operating-system packages such as compilers, and they never switch to a Python version the project does not allow.
+- Docs-only pull requests are skipped in the daily run. A single check in full mode ends as COULD NOT VERIFY because the AI-probe gate needs a probe that runs a changed line. Other modes can still mark a docstring-only change VERIFIED, with the reason 'holds by construction'.
+- Contree is confirmed end-to-end only for a real product check (apprise pull request #1783, confirmed on commit cecf851) run from main in Contree-only mode (`POC_REQUIRE_CONTREE=1`), where the verdict matched the local run and nothing ran outside Contree. Not confirmed on the live Contree service: test coverage measured inside Contree, which shell runs setup, hiding of failure text, and running with a judge's own Nebius account.
+- Projects that need their own package index or uv sources, or that run on a pre-release (test) build of Python, end as COULD NOT VERIFY by design. Main and the pull request must run the exact same Python version, or the result is COULD NOT VERIFY.
+
 ## For hackathon judges (quick answers)
 
 | Question | Answer |
@@ -61,14 +70,14 @@ The checker on the project machine takes one request at a time. It does not star
 
 Live checks in a Codespace have not been confirmed to work yet. For a result you can rely on, use the results page or [Request a check](#request-a-check). The steps below are for trying it anyway.
 
-A Codespace usually cannot start bubblewrap, the local safety sandbox. A live check there therefore runs in Contree sandboxes, and that needs your own Nebius API key and Contree project ID. Contree runs are billed to your own Nebius account. Type them into the console's start form, where they stay in this tab's session storage and the server's memory for that session. A console check uses only the values typed into the form: it never uses `NEBIUS_API_KEY` or a project ID from the server's environment or Codespaces secrets. This project does not ship a key. The keys are used only for the check's own Contree and model calls and are never passed to pull-request code. With Contree, installs, tests and behaviour probes all run inside Contree. A product check also measures test coverage inside Contree. If that coverage file is missing, the result stays could not verify. A full check still needs an AI probe that ran a changed line. Contree-only mode does not measure probe coverage, so that full check stays could not verify. If neither sandbox can start, the console refuses to run pull-request code and says which keys to add.
+A Codespace usually cannot start bubblewrap, the local safety sandbox. A live check there therefore runs in Contree sandboxes, and that needs your own Nebius API key and Contree project ID. The design bills a Contree run to the Nebius account whose key you type. Running with a judge's own Nebius account is not confirmed on the live Contree service. Type them into the console's start form, where they stay in this tab's session storage and the server's memory for that session. A console check uses only the values typed into the form: it never uses `NEBIUS_API_KEY` or a project ID from the server's environment or Codespaces secrets. This project does not ship a key. The keys are used only for the check's own Contree and model calls and are never passed to pull-request code. With Contree, the design is that installs, tests and behaviour probes all run inside Contree. A product check is designed to measure test coverage inside Contree; this is not confirmed on the live Contree service. If that coverage file is missing, the result stays could not verify. A full check still needs an AI probe that ran a changed line. Contree-only mode does not measure probe coverage, so that full check stays could not verify. If neither sandbox can start, the console refuses to run pull-request code and says which keys to add.
 
 1. Click the badge above, or use Code → Codespaces → Create.
 2. Wait until setup finishes and the terminal says the console is listening on port 8787 (setup log: `/tmp/poc-setup.log`, console log: `/tmp/poc-console.log`). If the page on port 8787 does not load, run `bash .devcontainer/start-console.sh` in the terminal. Open the forwarded port **8787**. Do not make port 8787 public. It stays private. If that port is public, the console does not start and tells you to set it back to private. Sign-in is not skipped while the port is public.
 3. Fill in the one start form. This Codespace does not ask you to sign in: it is your own machine, and email, Google, and GitHub sign-in are not set up here. Any other host still requires sign-in. The form has:
    - **Pull request URL** (required).
    - **Nebius API key** (required for a live check). Without it the check is refused with "Add your Nebius API key to run a live check."; only the saved sample button runs without a key.
-   - **Nebius project ID** (optional, the Contree project ID). With your key, the check runs in Contree sandboxes, billed to your own Nebius account.
+   - **Nebius project ID** (optional, the Contree project ID). With your key, the design runs the check in Contree sandboxes and bills that account. Running with a judge's own Nebius account is not confirmed on the live Contree service.
    - **Tavily API key** (optional). The setup lookup needs it; without it the lookup is skipped. Tavily keys are free ([sign up](https://app.tavily.com/)). Codespaces also asks for it as the recommended secret `TAVILY_API_KEY`. Tavily can suggest package names, but one is installed only if its PyPI page links back to the same repo.
    - **Review the AI's probes** (ticked by default).
 4. Click **Run check** once. Everything is sent together; there are no separate save buttons. Keys you typed are kept only in this browser tab's session storage, so they survive a page refresh and clear when the tab closes. They are never put in local storage or cookies. On the server they stay in memory for the session and are never written to disk, logs, reports, or the reply, and pull-request code never sees them. Leave a field blank to keep the value already sent this session.
@@ -145,7 +154,7 @@ Catches, misses and false alarms count only where there is outside proof of the 
 
 ---
 
-**Contents:** [Scoring](#scoring) · [Setup](#1-one-time-setup-on-a-mac) · [Check one PR](#2-check-one-pr) ·
+**Contents:** [Current limitations](#current-limitations) · [Scoring](#scoring) · [Setup](#1-one-time-setup-on-a-mac) · [Check one PR](#2-check-one-pr) ·
 [Operator console](#2b-operator-console-browse--start-checks) ·
 [How a report is made](#3-exactly-how-a-report-gets-generated) ·
 [Read a report](#4-how-to-read-a-report) · [Where files live](#5-where-files-live) ·
@@ -322,7 +331,8 @@ make check PR=https://github.com/numpy/numpy/pull/32940
 
 > **App-style repositories can be slow.** Some projects are applications rather than installable packages (for example
 > PostHog). The check then sets up the Python version the project asks for and installs every dependency it declares,
-> which can take much longer. A check of a PostHog pull request took about 22 minutes.
+> which can take much longer. A check of a PostHog pull request took about 22 minutes. Big applications with huge
+> dependency lists usually end as COULD NOT VERIFY. See [Current limitations](#current-limitations).
 
 - **What you should see** (the first time takes a few minutes because test environments are downloaded; later about
   1 to 4 minutes per PR):
@@ -380,8 +390,9 @@ make console-build && make console-api
 
 `make check` still works the same; the console calls that same path.
 
-Works best for **numpy, pandas and scikit-learn** (the default libraries). Other pure-Python libraries on GitHub
-usually work too. They are downloaded and built from their source code, which takes longer.
+The default libraries are **numpy, pandas and scikit-learn**. Other libraries are downloaded and built from their
+source code, which takes longer. A check can end as COULD NOT VERIFY for the reasons in
+[Current limitations](#current-limitations).
 
 ### Check every tracked library at once
 
@@ -441,8 +452,9 @@ flowchart TD
    PR's new or changed tests were skipped because an optional module is missing, the verdict is COULD NOT VERIFY,
    never VERIFIED: the change was not tested.
    **6b. Coverage gate.** The PR side's tests run once more, untimed, under coverage.py, to measure how many of the
-   PR's changed code lines actually ran. On a Contree-only product check that extra run happens inside Contree and the
-   report is read back. VERIFIED only stays VERIFIED if the changed code was exercised (section 4). A product check
+   PR's changed code lines actually ran. On a Contree-only product check the design runs that extra coverage pass
+   inside Contree and reads the report back. Measuring test coverage inside Contree is not confirmed on the live
+   Contree service. VERIFIED only stays VERIFIED if the changed code was exercised (section 4). A product check
    whose coverage file is missing stays COULD NOT VERIFY.
 7. **Save the evidence:** `record.json` (what was done and found) and every raw test log.
 8. **Write the report.** For each PR it builds the claims table, finds the exact log line behind every claim, re-reads

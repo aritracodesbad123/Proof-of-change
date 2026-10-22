@@ -2,7 +2,7 @@
 
 ## What changed
 
-A product check that can only run inside Contree now runs pytest with coverage in the pull-request checkpoint and reads the JSON report back. That report goes through the existing coverage gate. If the report is missing, coverage stays "not measured" and a product check that would have been verified is still capped at could not verify.
+A product check that can only run inside Contree now runs pytest with coverage in the pull-request checkpoint and reads the JSON report back. That report goes through the existing coverage gate. If the report is missing, coverage stays "not measured" and a product check that would have been verified is still capped at could not verify. Measuring test coverage inside Contree is not confirmed on the live Contree service. See docs/LIMITATIONS.md.
 
 Study runs are unchanged: they still record coverage as not measured on this path. Probe coverage is still not measured in Contree-only mode. The Contree install also includes pytest-cov so the coverage run does not need a second install.
 

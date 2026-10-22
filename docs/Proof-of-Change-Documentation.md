@@ -6,7 +6,7 @@ Each statement below is **Live** (it matches that commit, with a file and line) 
 
 ## 1. What it is
 
-Proof-of-Change checks whether a pull request does what it claims. It reports each claim as kept (the code word is proven), broken (the code word is false claim), or could not verify, and it keeps the log line behind the statement. It can read GitHub. A person makes the final call. It never approves a pull request and it never merges one. Live: `poc/verdict.py:20` (proven and false claim), `poc/verdict.py:3` (verdicts do not block a merge), and `README.md:10` (it only gives advice).
+Proof-of-Change reports each claim it can test as kept (the code word is proven), broken (the code word is false claim), or could not verify, and it keeps the log line behind the statement. Docs-only pull requests are skipped in the daily run. A single check in full mode ends as COULD NOT VERIFY because the AI-probe gate needs a probe that runs a changed line. Other modes can still mark a docstring-only change VERIFIED, with the reason 'holds by construction'. Live: `ops/daily_run.py:3300`, `ops/daily_run.py:3313`. It can read GitHub. A person makes the final call. It never approves a pull request and it never merges one. Live: `poc/verdict.py:20` (proven and false claim), `poc/verdict.py:3` (verdicts do not block a merge), and `README.md:10` (it only gives advice).
 
 ## 2. How a check works
 
@@ -37,7 +37,7 @@ These rules can only move a `verified` result downward. They do not raise a lowe
 
 The advisory reviewers (the swarm) do not change the verdict at all. They cannot raise it. Live: `poc/agents.py:108`.
 
-A docstring-only change is marked verified on this commit when it is not already needs attention, with the reason that behaviour claims hold by construction. Live: `ops/daily_run.py:2722`. Draft pull request 56 is still open and is not part of this commit.
+Docs-only pull requests are skipped in the daily run. A single check in full mode ends as COULD NOT VERIFY because the AI-probe gate needs a probe that runs a changed line. Other modes can still mark a docstring-only change VERIFIED, with the reason 'holds by construction'. Live: `ops/daily_run.py:3300` (`verdict_for`), `ops/daily_run.py:3313`. Draft pull request 56 is still open and is not part of this commit.
 
 ## 4. Models
 
@@ -54,12 +54,12 @@ All four models run on NVIDIA Nemotron through Nebius Token Factory. Each call u
 
 Pull-request code is meant to run inside a sandbox.
 
-- **Contree** (Nebius cloud sandboxes) is preferred when the person's own Nebius key and project ID are present and the Contree library is installed. The run is billed to that account. Live: `poc/console_api.py:214`, `README.md:64`.
-- **Bubblewrap** is the Linux fallback when Contree cannot run. Live: `poc/console_api.py:214`.
-- **Contree-only mode.** Installs, tests, and probes run in Contree. A local step that would run pull-request code is refused. Live: `ops/daily_run.py:3409`, `tests/test_contree_only.py:87`.
+- **Contree** (Nebius cloud sandboxes) is the preferred design when a Nebius key and project ID are present and the Contree library is installed. The design bills the run to that account. Running with a judge's own Nebius account is not confirmed on the live Contree service. Contree is confirmed end-to-end only for the apprise pull request #1783 product check (confirmed on commit cecf851) named in the README current limitations. Live: `poc/console_api.py:216`.
+- **Bubblewrap** is the Linux fallback when Contree cannot run. Live: `poc/console_api.py:216`.
+- **Contree-only mode.** The design runs installs, tests, and probes in Contree. A local step that would run pull-request code is refused. That full path is confirmed only for the apprise pull request #1783 check (confirmed on commit cecf851). Live: `ops/daily_run.py:1909`, `tests/test_contree_only.py:87`.
 - There is no automatic unsandboxed fallback. The only opt-in is the host setting `POC_UNSAFE_NO_SANDBOX=1`. Live: `poc/console_api.py:177`, `docs/decisions/2026-10-21-console-refuses-unsandboxed.md:16`.
-- A product check in Contree runs pytest with coverage inside the pull-request checkpoint and reads the report back. If that file is missing, the result stays could not verify. Live: `ops/daily_run.py:2257`, `ops/daily_run.py:3468`.
-- Contree-only mode does not measure which lines a probe ran. A full check still needs that measurement, so a full Contree-only check stays could not verify. Live: `ops/daily_run.py:3474`, `ops/daily_run.py:2351`.
+- A product check is designed to run pytest with coverage inside the Contree pull-request checkpoint and read the report back. If that file is missing, the result stays could not verify. Measuring test coverage inside Contree is not confirmed on the live Contree service. Live: `ops/daily_run.py:2843`.
+- Contree-only mode does not measure which lines a probe ran. A full check still needs that measurement, so a full Contree-only check stays could not verify. Live: `ops/daily_run.py:4015`, `ops/daily_run.py:2942`.
 
 ## 6. Keys and privacy
 
@@ -74,7 +74,7 @@ Pull-request code is meant to run inside a sandbox.
 
 ## 7. Tavily
 
-Tavily can suggest package names. A suggestion is installed only when that package's PyPI page links back to the same GitHub repository, and the link must be http or https. Live: `poc/demo_helper.py:6`, `poc/demo_helper.py:930`, `poc/demo_helper.py:956`. The package author writes that link. It stops an accident. It does not stop someone who is trying to get a bad package installed. Live: `docs/decisions/2026-10-21-pr-only-flaky-not-verified.md:11`, `README.md:108`.
+Tavily can suggest package names. A suggestion is installed only when that package's PyPI page links back to the same GitHub repository, and the link must be http or https. Live: `poc/demo_helper.py:6`, `poc/demo_helper.py:930`, `poc/demo_helper.py:956`. The package author writes that link. It stops an accident. It does not stop someone who is trying to get a bad package installed. Live: `docs/decisions/2026-10-21-pr-only-flaky-not-verified.md:11`, `README.md:117`.
 
 The retry rule, in the program's own words: "If setup fails, the helper retries the install up to 2 times. If a test still can't be verified because something is missing, it installs what's missing and reruns that test once." Live: `poc/demo_helper.py:24`.
 
@@ -84,10 +84,10 @@ Related bug reports are background. The report labels them as not used for the v
 
 - **Command line.** `ops/daily_run.py` with a `--pr` link. Live: `poc/console_api.py:166` (the console builds that same command).
 - **Web console.** React pages in `console/web`, API in `poc/console_api.py`.
-- **Request a check.** A public GitHub issue. The default cap is five checks a day (`POC_DAILY_CAP`). Live: `ops/request_worker.py:63`, `README.md:58`.
+- **Request a check.** A public GitHub issue. The default cap is five checks a day (`POC_DAILY_CAP`). Live: `ops/request_worker.py:63`, `README.md:67`.
 - **GitHub App.** Swarm is always on for an App check. Live: `poc/github_app.py:298`. It posts a check and a comment only on allowlisted demo repositories when a token is set. Live: `README.md:11`.
 - **Results page.** https://aritracodesbad123.github.io/Proof-of-change/
-- **Codespaces.** Live checks in a Codespace have not been confirmed to work yet. Live: `README.md:62`. The steps under that heading are for trying it anyway. A live check there needs the person's own Nebius key and project ID. If the console cannot read whether port 8787 is public, it asks for a code that sits in the Codespace at `/tmp/poc-console-code`. Sign-in is skipped only when that port list is read and the port is not public. Live: `poc/console_auth.py:904`, `poc/console_auth.py:1043`.
+- **Codespaces.** Live checks in a Codespace are not confirmed. Live: `README.md:71`. The steps under that heading describe the design. A live check there is designed to use a Nebius key and project ID typed into the form. Running with a judge's own Nebius account is not confirmed on the live Contree service. If the console cannot read whether port 8787 is public, it asks for a code that sits in the Codespace at `/tmp/poc-console-code`. Sign-in is skipped only when that port list is read and the port is not public. Live: `poc/console_auth.py:904`, `poc/console_auth.py:1043`.
 
 ## 9. Security table
 
@@ -104,7 +104,7 @@ Related bug reports are background. The report labels them as not used for the v
 | Serverless start has no session | Live | `poc/serverless.py:54` |
 | Keys scrubbed from helper text | Live | `poc/demo_helper.py:35` (secret names), `poc/related_reports.py:69` |
 | Bubblewrap sandbox | Live | `guardrails/sandbox.py`, used from `ops/daily_run.py` |
-| Contree billed to the typed account | Live | `README.md:64` |
+| Contree billed to the typed account | Design. Running with a judge's own Nebius account is not confirmed on the live Contree service | `poc/console_api.py:216` |
 | No unsandboxed fallback except `POC_UNSAFE_NO_SANDBOX=1` | Live | `poc/console_api.py:177` |
 | PyPI link-back before install | Live | `poc/demo_helper.py:956` |
 | Related reports are not a verdict input | Live | `poc/related_reports.py:22` |
@@ -130,13 +130,14 @@ On every pull request, GitHub Actions runs, on Python 3.11 and 3.12: a decision-
 
 ## 12. Known limitations
 
-- The runner installs and tests Python projects (`pyproject.toml`, pytest). It is not a checker for other languages. Live: `pyproject.toml:6`, `README.md:7`.
-- A full Contree-only check cannot reach verified, because probe coverage is not measured there. A product check can reach verified when the coverage report comes back and the other caps allow it. Live: `ops/daily_run.py:3474`, `docs/decisions/2026-10-21-contree-coverage.md:5`.
+- The runner is for Python projects that use the normal package index (`pyproject.toml`, pytest). It is not a checker for other languages. Big applications, a project's own package index or uv sources, and a pre-release (test) build of Python end as could not verify. Main and the pull request must run the exact same Python version, or the result is could not verify. Live: `pyproject.toml:6`, `README.md:16`.
+- For apps built from many components, each listing its own requirements (like home-assistant integrations), a product check installs only the touched component's packages plus the core requirements, read from main, and never the combined list of every component. If the changed files don't fall inside a single component (for example, changes to home-assistant's core files), the check ends as could not verify. Live: `poc/demo_helper.py:1003`. This chooses the right packages; it is not confirmed that such a check finishes, and no such check has reached verified.
+- A full Contree-only check cannot reach verified, because probe coverage is not measured there. In that design, a product check can stay verified when a coverage report comes back and the other caps allow it. Measuring test coverage inside Contree is not confirmed on the live Contree service. Live: `ops/daily_run.py:2843`, `docs/decisions/2026-10-21-contree-coverage.md:5`.
 - A coverage report written by the pull request's own code can still be forged. The gate accepts a report that lists every changed file and claims every line ran. Live: `docs/decisions/2026-10-21-coverage-report-checks.md:21`.
 - The PyPI link-back check is not attack-proof. The package author writes the link, so someone trying to get past it can write one too. Live: `docs/decisions/2026-10-21-pr-only-flaky-not-verified.md:35`.
-- Docstring-only changes are marked verified on this commit when they are not already needs attention. Draft pull request 56 is open and is not merged here. Live: `ops/daily_run.py:2722`.
+- Docs-only pull requests are skipped in the daily run. A single check in full mode ends as COULD NOT VERIFY because the AI-probe gate needs a probe that runs a changed line. Other modes can still mark a docstring-only change VERIFIED, with the reason 'holds by construction'. Draft pull request 56 is open and is not merged here. Live: `ops/daily_run.py:3300` (`verdict_for`), `ops/daily_run.py:3313`.
 - A process that double-forks and is adopted by init can escape the install timeout. Live: `docs/decisions/2026-10-21-install-timeout-kills-process-tree.md:20`.
-- Codespace live checks are not confirmed. Live: `README.md:62`.
+- Codespace live checks are not confirmed. Live: `README.md:71`.
 - A managed schedule for the serverless daily job is not built. Live: `docs/REQUIREMENTS.md:286` ("Planned, not yet built" for that schedule).
 
 ## 13. Tech stack and licence
