@@ -1,0 +1,1487 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-caronc-apprise-1783-133d8b877e87-2026-10-22-check-0152",
+ "date_ist": "2026-10-22 01:52 IST",
+ "run_date": "2026-10-22",
+ "who": "ops/daily_run.py",
+ "repo": "caronc/apprise",
+ "library": "apprise",
+ "pr": {
+  "repo": "caronc/apprise",
+  "number": 1783,
+  "url": "https://github.com/caronc/apprise/pull/1783",
+  "title": "tags= and tag= on urls not supported",
+  "base_sha": "c511e1d4bc61244d48ee1ec6d48c7149977d10d1",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "133d8b877e87121fb2c0a929f90c37bf88cb5de9",
+  "merge_commit": null,
+  "tested_main_sha": "c511e1d4bc61244d48ee1ec6d48c7149977d10d1",
+  "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+ },
+ "author": "caronc",
+ "base_ref": "master",
+ "updated_at_utc": "2026-10-21T00:15:48Z",
+ "updated_at_ist": "2026-10-21 05:45 IST",
+ "ci_state": "not checked (single-PR check)",
+ "ci_detail": "checked on request with --pr",
+ "tested_at_ist": "2026-10-22 01:52 IST",
+ "files": {
+  "all": [
+   "apprise/utils/yaml.py",
+   "tests/test_apprise_template.py",
+   "tests/test_apprise_template_placement.py",
+   "tests/test_utils_yaml.py"
+  ],
+  "package_py": [
+   "apprise/utils/yaml.py"
+  ],
+  "compiled": [],
+  "other": [
+   "tests/test_apprise_template.py",
+   "tests/test_apprise_template_placement.py",
+   "tests/test_utils_yaml.py"
+  ]
+ },
+ "machine_type": {
+  "arch": "x86_64",
+  "os": "Linux",
+  "platform": "Linux-6.12.94+-x86_64-with-glibc2.41",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": "g++ (Debian 14.2.0-19) 14.2.0",
+  "cpu_model": "Intel(R) Xeon(R) Processor",
+  "ram_gb": 15.6
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 3,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.15",
+ "test_selection": "mapped from touched files: tests/test_apprise_template.py, tests/test_apprise_template_placement.py, tests/test_utils_yaml.py",
+ "per_run": [
+  {
+   "side": "old",
+   "run": 1,
+   "passed": 274,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 3.4,
+   "pytest_summary": "274 passed, 4 warnings in 2.83s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 1,
+   "passed": 274,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 3.4,
+   "pytest_summary": "274 passed, 4 warnings in 2.79s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 2,
+   "passed": 274,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 3.4,
+   "pytest_summary": "274 passed, 4 warnings in 2.79s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 2,
+   "passed": 274,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 3.4,
+   "pytest_summary": "274 passed, 4 warnings in 2.82s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 3,
+   "passed": 274,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 3.4,
+   "pytest_summary": "274 passed, 4 warnings in 2.84s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 3,
+   "passed": 274,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 3.4,
+   "pytest_summary": "274 passed, 4 warnings in 2.85s",
+   "junit": true
+  }
+ ],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "local",
+ "sandbox_backend_note": "local bubblewrap",
+ "machine": "local",
+ "posted_upstream": false,
+ "logs": "apprise-1783/",
+ "freeze": {
+  "main": "freeze-main.txt",
+  "pr": "freeze-pr.txt"
+ },
+ "poc_commit": "0fa0016ea51794edee0f4a085e41bf48dd813765",
+ "route": "source-pair",
+ "current_head_sha": "133d8b877e87121fb2c0a929f90c37bf88cb5de9",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "state": "closed",
+ "mergeable_state": "unknown",
+ "product_check": true,
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": {
+   "ok": true,
+   "skipped": false,
+   "live_call": true,
+   "cached": false,
+   "queries": [
+    "apprise python setup install instructions https://github.com/caronc/apprise site:github.com/caronc/apprise",
+    "apprise python documentation install https://github.com/caronc/apprise site:github.com/caronc/apprise",
+    "apprise python install requirements https://pypi.org/project/apprise/ https://github.com/caronc/apprise site:pypi.org"
+   ],
+   "results": [
+    {
+     "title": "mka142-apprise \u00b7 PyPI",
+     "url": "https://pypi.org/project/mka142-apprise/",
+     "query": "apprise python install requirements https://pypi.org/project/apprise/ https://github.com/caronc/apprise site:pypi.org"
+    },
+    {
+     "title": "apprise \u00b7 PyPI",
+     "url": "https://pypi.org/project/apprise/",
+     "query": "apprise python install requirements https://pypi.org/project/apprise/ https://github.com/caronc/apprise site:pypi.org"
+    },
+    {
+     "title": "Matrix notifications could be end-to-end encrypted \u00b7 Issue #305 \u00b7 caronc/apprise \u00b7 GitHub",
+     "url": "https://github.com/caronc/apprise/issues/305",
+     "query": "apprise python setup install instructions https://github.com/caronc/apprise site:github.com/caronc/apprise"
+    },
+    {
+     "title": "GitHub - caronc/apprise: Apprise - Push Notifications that work with just about every platform! \u00b7 GitHub",
+     "url": "https://github.com/caronc/apprise",
+     "query": "apprise python setup install instructions https://github.com/caronc/apprise site:github.com/caronc/apprise"
+    },
+    {
+     "title": "apprise/CONTRIBUTING.md at master \u00b7 caronc/apprise \u00b7 GitHub",
+     "url": "https://github.com/caronc/apprise/blob/master/CONTRIBUTING.md",
+     "query": "apprise python setup install instructions https://github.com/caronc/apprise site:github.com/caronc/apprise"
+    },
+    {
+     "title": "Releases \u00b7 caronc/apprise \u00b7 GitHub",
+     "url": "https://github.com/caronc/apprise/releases",
+     "query": "apprise python documentation install https://github.com/caronc/apprise site:github.com/caronc/apprise"
+    },
+    {
+     "title": "GitHub - caronc/apprise-docs: Apprise Documentation \u00b7 GitHub",
+     "url": "https://github.com/caronc/apprise-docs",
+     "query": "apprise python documentation install https://github.com/caronc/apprise site:github.com/caronc/apprise"
+    },
+    {
+     "title": "PyPI \u00b7 The Python Package Index",
+     "url": "https://pypi.org",
+     "query": "apprise python install requirements https://pypi.org/project/apprise/ https://github.com/caronc/apprise site:pypi.org"
+    }
+   ],
+   "text": "To install Apprise from PyPI, the easiest method is to use pip. The GitHub repository for Apprise mentions that you can install it directly from PyPI. Additionally, the CONTRIBUTING.md file provides guidance for local development setup, indicating that Python >= 3.9, pip, and git are required. For development, it suggests using VS Code with the Python extension, but no `.venv` is required unless you choose to use one.\nTo install Apprise, you can use pip from PyPI. The sources indicate that the installation command is: `# Install Apprise from PyPI`. The latest versions available for installation are v1.11.0 and v1.9.7. The sources do not provide a definitive answer on the most current version available.\nTo install Apprise, you can use pip with the command `pip install apprise`. The Apprise project on PyPI allows you to send notifications to popular services like Telegram, Discord, Slack, and Amazon SNS. The latest release mentioned in the sources is version 2.4.0 for the package `apache-airflow-providers-apprise`. For more details on supported settings and capabilities, you can run `target-apprise --about` on GitHub. The sources do not provide a definitive answer for specific installation requirements beyond the basic pip command.\nApprise allows you to send a notification to almost all of the most popular notification services available to us today such as: Telegram, Discord, Slack, Amazon SNS,... Sep 18, 2021 \u00b7 Apprise Transactions aims to enable push Notifications for just about every payment platform with just about every notification service notification services available to... pip install apache-airflow-providers- apprise Copy PIP instructions Description Release files Release history Package apache-airflow-provider\nNov 26, 2017 \u00b7 Apprise looks for each value in this order and stops at the first answer: a value passed with --template-var (-tv) the default written in the template: section the... The Python Package Index ( PyPI ) is a repository of software for the Python programming language. PyPI helps you find and install software developed and shared by the ... Apprise allows you to send a notification to almost all of the most popular notification services available to us today such as: Telegram, Discord\n-> python - olm2.20 Installing collected packages python - olm Running setup py install for python - olm error ERROR Complete output from command/ home/ l2g/ Development/ home - assistant core/ bin/ python3 - u - c'import setuptools, tokenize;__file__=' \"'\"'/tmp/pip-install-n3e2d485/python-olm/setup.py' \"'\"';f=getattr(tokenize, ' \"'\" 'open' \"'\"', open)(__file__);code=f.read().replace(' \"'\" '\\r\\n' \\r \\n \"'\"', ' \"'\" '\\n' \\n \"'\"');f.close();exec(compile(code, __file__, ' \"'\" 'exec' \"'\"'))' install \n# Installation\n\nThe easiest way is to install Apprise from PyPI:\n\nApprise is also packaged as an RPM and available through EPEL supporting CentOS, Redhat, Rocky, Oracle Linux, etc.\n\nYou can also check out the Graphical version of Apprise to centralize your configuration and notifications through a manageable webpage.\n\n# Command Line Usage\n1. Open the repo: `code .`\n2. Press `Ctrl+Shift+P -> Python: Select Interpreter`\n3. Choose the same interpreter you used for `pip install .[dev]`\n4. Press `Ctrl+Shift+P -> Python: Discover Tests`\n\n`.vscode/settings.json` is pre-configured with:\n\n pytest as the test runner\n ruff for linting\n PYTHONPATH set to project root\n\nNo `.venv` is required unless you choose to use one.\n\n## \ud83d\udccc How to Contribute [...] 1. Fork the repository and create a new branch.\n2. Make your changes.\n3. Run the checks liste\n### \u2764\ufe0f Life-Cycle Support\n\n \ud83d\udd25 Adapt appriseit.com as new documentation source in #1486\n Improved documentation surrounding tagging in #1489\n improved on notification manger customization in #1490\n \ud83d\ude80 100% test coverage in #1491\n\n## New Contributors\n\n @github-actions[bot] made their first contribution in #1495\n @erik434 made their first contribution in #1496\n\n## Installation\n\nApprise is available on PyPI through pip:\n\n```\n# Install Apprise v1.9.7 from PyPI #\n```\n\nFull Changelog: v1.9.6...v1.9.7 [.\nGetting Started (`getting-started/`) Introductory material for new users\n Troubleshooting (`qa/`) Troubleshooting, diagnostics, and FAQs\n Apprise API (`api/`) Documentation for the web-based API (Sidecar) wrapper for Apprise\n Apprise CLI (`cli/`) Command-line interface documentation\n Apprise (Python) Library (`library/`) Developer-focused documentation and internals\n Guides (`guides/`) How-to articles, workflows, best practices, and troubleshooting patterns [...] | LICENSE | LICENSE |  |  |\n| RE\nThe Python Package Index ( PyPI ) is a repository of software for the Python programming language. PyPI helps you find and install software developed and shared by the ... Apprise allows you to send a notification to almost all of the most popular notification services available to us today such as: Telegram, Discord, Slack, Amazon SNS,... Sep 18, 2021 \u00b7 Apprise Transactions aims to enable push Notifications for just about every payment platform with just about every notification service notific",
+   "errors": [],
+   "lines": [
+    "Looked up with Tavily: 8 results",
+    "Query: apprise python setup install instructions https://github.com/caronc/apprise site:github.com/caronc/apprise",
+    "Query: apprise python documentation install https://github.com/caronc/apprise site:github.com/caronc/apprise",
+    "Query: apprise python install requirements https://pypi.org/project/apprise/ https://github.com/caronc/apprise site:pypi.org",
+    "Source: mka142-apprise \u00b7 PyPI \u2014 https://pypi.org/project/mka142-apprise/",
+    "Source: apprise \u00b7 PyPI \u2014 https://pypi.org/project/apprise/",
+    "Source: Matrix notifications could be end-to-end encrypted \u00b7 Issue #305 \u00b7 caronc/apprise \u00b7 GitHub \u2014 https://github.com/caronc/apprise/issues/305",
+    "Source: GitHub - caronc/apprise: Apprise - Push Notifications that work with just about every platform! \u00b7 GitHub \u2014 https://github.com/caronc/apprise",
+    "Source: apprise/CONTRIBUTING.md at master \u00b7 caronc/apprise \u00b7 GitHub \u2014 https://github.com/caronc/apprise/blob/master/CONTRIBUTING.md",
+    "Source: Releases \u00b7 caronc/apprise \u00b7 GitHub \u2014 https://github.com/caronc/apprise/releases",
+    "Source: GitHub - caronc/apprise-docs: Apprise Documentation \u00b7 GitHub \u2014 https://github.com/caronc/apprise-docs",
+    "Source: PyPI \u00b7 The Python Package Index \u2014 https://pypi.org"
+   ]
+  },
+  "notes": [
+   "Setup check: GitHub token: present.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory 5.8 GB (of 15.6 GB).",
+   "Setup check: free disk 92.7 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: 8 results",
+   "Query: apprise python setup install instructions https://github.com/caronc/apprise site:github.com/caronc/apprise",
+   "Query: apprise python documentation install https://github.com/caronc/apprise site:github.com/caronc/apprise",
+   "Query: apprise python install requirements https://pypi.org/project/apprise/ https://github.com/caronc/apprise site:pypi.org",
+   "Source: mka142-apprise \u00b7 PyPI \u2014 https://pypi.org/project/mka142-apprise/",
+   "Source: apprise \u00b7 PyPI \u2014 https://pypi.org/project/apprise/",
+   "Source: Matrix notifications could be end-to-end encrypted \u00b7 Issue #305 \u00b7 caronc/apprise \u00b7 GitHub \u2014 https://github.com/caronc/apprise/issues/305",
+   "Source: GitHub - caronc/apprise: Apprise - Push Notifications that work with just about every platform! \u00b7 GitHub \u2014 https://github.com/caronc/apprise",
+   "Source: apprise/CONTRIBUTING.md at master \u00b7 caronc/apprise \u00b7 GitHub \u2014 https://github.com/caronc/apprise/blob/master/CONTRIBUTING.md",
+   "Source: Releases \u00b7 caronc/apprise \u00b7 GitHub \u2014 https://github.com/caronc/apprise/releases",
+   "Source: GitHub - caronc/apprise-docs: Apprise Documentation \u00b7 GitHub \u2014 https://github.com/caronc/apprise-docs",
+   "Source: PyPI \u00b7 The Python Package Index \u2014 https://pypi.org",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: requests is noted, installed with the project.",
+   "Setup plan: urllib3 is noted, installed with the project.",
+   "Setup plan: requests-oauthlib is noted, installed with the project.",
+   "Setup plan: click is noted, installed with the project.",
+   "Setup plan: markdown is noted, installed with the project.",
+   "Setup plan: PyYAML is noted, installed with the project.",
+   "Setup plan: certifi is noted, installed with the project.",
+   "Setup plan: tzdata is noted, installed with the project.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >=3.9"
+  ],
+  "setup_plan": {
+   "packages": [
+    {
+     "requirement": "requests",
+     "name": "requests",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "urllib3",
+     "name": "urllib3",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "requests-oauthlib",
+     "name": "requests-oauthlib",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "click>=5.0",
+     "name": "click",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "markdown",
+     "name": "markdown",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "PyYAML",
+     "name": "PyYAML",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "certifi",
+     "name": "certifi",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "tzdata; platform_system == 'Windows'",
+     "name": "tzdata",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    }
+   ],
+   "extra_reqs": [],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >=3.9"
+   },
+   "system": [],
+   "refused": []
+  }
+ },
+ "chosen": {
+  "pr": 1783,
+  "head_sha": null,
+  "install": null,
+  "test_cmd": null
+ },
+ "sides": {
+  "comparison_basis": "merge-base vs PR head (no merge ref available)",
+  "main_sha": "c511e1d4bc61244d48ee1ec6d48c7149977d10d1",
+  "pr_sha": "133d8b877e87121fb2c0a929f90c37bf88cb5de9"
+ },
+ "tested": {
+  "main": "master @ c511e1d4bc61 (merge-base with the PR head)",
+  "pr": "PR head 133d8b877e87"
+ },
+ "probe_plan": {
+  "baseline": "full",
+  "model": "model provider: nebius (Token Factory, live)",
+  "errors": [],
+  "model_claims": [
+   {
+    "id": "C1",
+    "text": "The query parameters ?tag= and ?tags= are handled exactly like ?asset=.",
+    "source_quote": "` ?tag=` and `?tags=` are handled exactly like `?asset=`.",
+    "testable": true,
+    "expect": "same"
+   }
+  ],
+  "model_rejected_claims": [],
+  "diff_targets": [
+   "apprise.utils.yaml.templated_tag"
+  ],
+  "frozen": [
+   {
+    "path": "model-probes/model-p1.py",
+    "source": "model",
+    "sha256": "2d652cbfd0de811fba327021d66852748264d5b8e1a340098b979b0c3d74837c",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-10-21T20:22:57.818147+00:00",
+    "inputs_sha256": "b71a5b9a91056eebea6b1f626dcfc2beb49be0f843d3121f652553aaa29e9d1a",
+    "inputs": {
+     "title_chars": 36,
+     "body_chars": 939,
+     "base_files": {
+      "apprise/utils/yaml.py": "5b32162a2706b1480a84114f8cb38d2c9c88276b9d27f075ceb72d9d50a8a234"
+     }
+    }
+   },
+   {
+    "path": "diff-probes/diff-api.py",
+    "source": "diff",
+    "sha256": "a2444305993dafc5057b6f80b74b1a08259cf3613914058e9b275721aec33c39",
+    "generator": {
+     "kind": "diff",
+     "label": "diff (auto-derived from base-side code, model-free)",
+     "model": null,
+     "provider": null,
+     "provenance": "auto-derived",
+     "blind": false
+    },
+    "frozen_at": "2026-10-21T20:22:57.819529+00:00",
+    "inputs_sha256": "09effdf725e503fb42e253403384d76feeb621e9f62759d75128aec055608834",
+    "inputs": {
+     "title_chars": 0,
+     "body_chars": 0,
+     "base_files": {
+      "apprise/utils/yaml.py": "5b32162a2706b1480a84114f8cb38d2c9c88276b9d27f075ceb72d9d50a8a234"
+     }
+    }
+   }
+  ]
+ },
+ "test_extras": [
+  "pytest-mock",
+  "pytest-xdist"
+ ],
+ "pr_side_started_at": "2026-10-21T20:22:57.948020+00:00",
+ "test_targets": {
+  "main": [
+   "tests/test_apprise_template.py",
+   "tests/test_apprise_template_placement.py",
+   "tests/test_utils_yaml.py"
+  ],
+  "pr": [
+   "tests/test_apprise_template.py",
+   "tests/test_apprise_template_placement.py",
+   "tests/test_utils_yaml.py"
+  ]
+ },
+ "installed_commit": {
+  "main": {
+   "dist": "apprise",
+   "expected": "c511e1d4bc61244d48ee1ec6d48c7149977d10d1",
+   "installed": "c511e1d4bc61244d48ee1ec6d48c7149977d10d1",
+   "ok": true
+  },
+  "pr": {
+   "dist": "apprise",
+   "expected": "133d8b877e87121fb2c0a929f90c37bf88cb5de9",
+   "installed": "133d8b877e87121fb2c0a929f90c37bf88cb5de9",
+   "ok": true
+  }
+ },
+ "declared_test_deps": {
+  "requested": [
+   "pytest-mock",
+   "pytest-xdist"
+  ],
+  "installed": true
+ },
+ "comparison": {
+  "same": 264,
+  "same_skipped_both": 0,
+  "regressions": [],
+  "fixed": [],
+  "new_tests_passing": 10,
+  "new_tests_failing": [],
+  "new_tests_skipped": [],
+  "removed_tests": [
+   "tests.test_apprise_template::test_apprise_template_rejects_tag_variable[json://localhost/?+tag=${T}]",
+   "tests.test_apprise_template::test_apprise_template_rejects_tag_variable[json://localhost/?-tag=${T}]",
+   "tests.test_apprise_template::test_apprise_template_rejects_tag_variable[json://localhost/?:tag=${T}]",
+   "tests.test_apprise_template::test_apprise_template_rejects_tag_variable[json://localhost/?tag=${T}]",
+   "tests.test_apprise_template::test_apprise_template_rejects_tag_variable[json://localhost/?tags=${T}]",
+   "tests.test_apprise_template_placement::test_disallowed_variable_positions[json://localhost/?tag=${V}]",
+   "tests.test_utils_yaml::test_yaml_templated_tag_checks_every_query_bucket[qsd+]",
+   "tests.test_utils_yaml::test_yaml_templated_tag_checks_every_query_bucket[qsd-]",
+   "tests.test_utils_yaml::test_yaml_templated_tag_checks_every_query_bucket[qsd:]",
+   "tests.test_utils_yaml::test_yaml_templated_tag_checks_every_query_bucket[qsd]"
+  ],
+  "reparametrized": [],
+  "skipped_missing_dependency": [],
+  "flaky": [],
+  "pr_unstable": [],
+  "pr_unstable_noisy": [],
+  "environment": [],
+  "other_changes": [],
+  "preexisting_failures": [],
+  "load_failed_both": [],
+  "load_failed_pr": [],
+  "load_failed_main": [],
+  "executed": {
+   "main": 274,
+   "pr": 274
+  },
+  "messages": {}
+ },
+ "exit_check": {
+  "explained": true,
+  "problems": [],
+  "detail": "all runs exited 0"
+ },
+ "coverage": {
+  "status": "measured",
+  "changed_lines_total": 0,
+  "changed_lines_covered": 0,
+  "files": [
+   {
+    "file": "apprise/utils/yaml.py",
+    "changed_lines_total": 0,
+    "changed_lines_covered": 0
+   }
+  ],
+  "seconds": 5.4,
+  "exit": 0,
+  "log": "coverage-pytest.log"
+ },
+ "probes": {
+  "status": "ran",
+  "items": [
+   {
+    "id": "model-p1",
+    "source": "model",
+    "path": "model-probes/model-p1.py",
+    "sha256": "2d652cbfd0de811fba327021d66852748264d5b8e1a340098b979b0c3d74837c",
+    "target": "caronc/apprise#1783",
+    "about": "Check the YAML_REAPPLY_SKIP set for tag, tags, and asset",
+    "claims": [
+     {
+      "id": "C1",
+      "source": "PR description",
+      "text": "The query parameters ?tag= and ?tags= are handled exactly like ?asset=.",
+      "covers": [
+       "C1"
+      ],
+      "expect": "same"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.2,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-p1-main-1.jsonl",
+      "probe-model-p1-main-2.jsonl",
+      "probe-model-p1-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-p1-pr-1.jsonl",
+      "probe-model-p1-pr-2.jsonl",
+      "probe-model-p1-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "yaml_reapply_skip_import_exception": null,
+       "yaml_reapply_skip_type": "<class 'frozenset'>",
+       "yaml_reapply_skip_contents": [
+        "asset",
+        "tag",
+        "tags"
+       ],
+       "yaml_reapply_skip_has_tag": true,
+       "yaml_reapply_skip_has_tags": true,
+       "yaml_reapply_skip_has_asset": true,
+       "yaml_reapply_skip_length": 3
+      },
+      {
+       "yaml_reapply_skip_import_exception": null,
+       "yaml_reapply_skip_type": "<class 'frozenset'>",
+       "yaml_reapply_skip_contents": [
+        "asset",
+        "tag",
+        "tags"
+       ],
+       "yaml_reapply_skip_has_tag": true,
+       "yaml_reapply_skip_has_tags": true,
+       "yaml_reapply_skip_has_asset": true,
+       "yaml_reapply_skip_length": 3
+      },
+      {
+       "yaml_reapply_skip_import_exception": null,
+       "yaml_reapply_skip_type": "<class 'frozenset'>",
+       "yaml_reapply_skip_contents": [
+        "asset",
+        "tag",
+        "tags"
+       ],
+       "yaml_reapply_skip_has_tag": true,
+       "yaml_reapply_skip_has_tags": true,
+       "yaml_reapply_skip_has_asset": true,
+       "yaml_reapply_skip_length": 3
+      }
+     ],
+     "pr": [
+      {
+       "yaml_reapply_skip_import_exception": null,
+       "yaml_reapply_skip_type": "<class 'frozenset'>",
+       "yaml_reapply_skip_contents": [
+        "asset",
+        "tag",
+        "tags"
+       ],
+       "yaml_reapply_skip_has_tag": true,
+       "yaml_reapply_skip_has_tags": true,
+       "yaml_reapply_skip_has_asset": true,
+       "yaml_reapply_skip_length": 3
+      },
+      {
+       "yaml_reapply_skip_import_exception": null,
+       "yaml_reapply_skip_type": "<class 'frozenset'>",
+       "yaml_reapply_skip_contents": [
+        "asset",
+        "tag",
+        "tags"
+       ],
+       "yaml_reapply_skip_has_tag": true,
+       "yaml_reapply_skip_has_tags": true,
+       "yaml_reapply_skip_has_asset": true,
+       "yaml_reapply_skip_length": 3
+      },
+      {
+       "yaml_reapply_skip_import_exception": null,
+       "yaml_reapply_skip_type": "<class 'frozenset'>",
+       "yaml_reapply_skip_contents": [
+        "asset",
+        "tag",
+        "tags"
+       ],
+       "yaml_reapply_skip_has_tag": true,
+       "yaml_reapply_skip_has_tags": true,
+       "yaml_reapply_skip_has_asset": true,
+       "yaml_reapply_skip_length": 3
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "yaml_reapply_skip_contents",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": [
+       "asset",
+       "tag",
+       "tags"
+      ],
+      "pr": [
+       "asset",
+       "tag",
+       "tags"
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"yaml_reapply_skip_contents\""
+       },
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"yaml_reapply_skip_contents\""
+       }
+      }
+     },
+     {
+      "name": "yaml_reapply_skip_has_asset",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": true,
+      "pr": true,
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"yaml_reapply_skip_has_asset\""
+       },
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"yaml_reapply_skip_has_asset\""
+       }
+      }
+     },
+     {
+      "name": "yaml_reapply_skip_has_tag",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": true,
+      "pr": true,
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"yaml_reapply_skip_has_tag\""
+       },
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"yaml_reapply_skip_has_tag\""
+       }
+      }
+     },
+     {
+      "name": "yaml_reapply_skip_has_tags",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": true,
+      "pr": true,
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"yaml_reapply_skip_has_tags\""
+       },
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"yaml_reapply_skip_has_tags\""
+       }
+      }
+     },
+     {
+      "name": "yaml_reapply_skip_import_exception",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": null,
+      "pr": null,
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"yaml_reapply_skip_import_exception\""
+       },
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"yaml_reapply_skip_import_exception\""
+       }
+      }
+     },
+     {
+      "name": "yaml_reapply_skip_length",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": 3,
+      "pr": 3,
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"yaml_reapply_skip_length\""
+       },
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"yaml_reapply_skip_length\""
+       }
+      }
+     },
+     {
+      "name": "yaml_reapply_skip_type",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": "<class 'frozenset'>",
+      "pr": "<class 'frozenset'>",
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 7,
+        "quote": "\"observation\": \"yaml_reapply_skip_type\""
+       },
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 7,
+        "quote": "\"observation\": \"yaml_reapply_skip_type\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "2d652cbfd0de811fba327021d66852748264d5b8e1a340098b979b0c3d74837c",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-10-21T20:22:57.818147+00:00",
+     "inputs_sha256": "b71a5b9a91056eebea6b1f626dcfc2beb49be0f843d3121f652553aaa29e9d1a",
+     "inputs": {
+      "title_chars": 36,
+      "body_chars": 939,
+      "base_files": {
+       "apprise/utils/yaml.py": "5b32162a2706b1480a84114f8cb38d2c9c88276b9d27f075ceb72d9d50a8a234"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-10-21T20:22:57.948020+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 5,
+     "changed_lines_covered": 1,
+     "files": [
+      {
+       "file": "apprise/utils/yaml.py",
+       "changed_lines_total": 5,
+       "changed_lines_covered": 1
+      }
+     ],
+     "adequacy": "adequate",
+     "note": "ran 1 of 5 changed line(s) on the main side",
+     "exit": 0,
+     "data": "probe-cov-model-p1.json"
+    },
+    "status": "rejected",
+    "rejected_reason": "rejected: claim pattern(s) C1 match none of this probe's observation names, so the probe is not counted"
+   },
+   {
+    "id": "diff-api",
+    "source": "diff",
+    "path": "diff-probes/diff-api.py",
+    "sha256": "a2444305993dafc5057b6f80b74b1a08259cf3613914058e9b275721aec33c39",
+    "target": "caronc/apprise#1783",
+    "about": "Public functions touched by the PR, called with type-appropriate inputs on both sides.",
+    "claims": [],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.3,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.2,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-diff-api-main-1.jsonl",
+      "probe-diff-api-main-2.jsonl",
+      "probe-diff-api-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-diff-api-pr-1.jsonl",
+      "probe-diff-api-pr-2.jsonl",
+      "probe-diff-api-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "apprise.utils.yaml.templated_tag.input0": false,
+       "apprise.utils.yaml.templated_tag.input1": false,
+       "apprise.utils.yaml.templated_tag.input10": false,
+       "apprise.utils.yaml.templated_tag.input11": false,
+       "apprise.utils.yaml.templated_tag.input2": false,
+       "apprise.utils.yaml.templated_tag.input3": false,
+       "apprise.utils.yaml.templated_tag.input4": false,
+       "apprise.utils.yaml.templated_tag.input5": false,
+       "apprise.utils.yaml.templated_tag.input6": false,
+       "apprise.utils.yaml.templated_tag.input7": false,
+       "apprise.utils.yaml.templated_tag.input8": false,
+       "apprise.utils.yaml.templated_tag.input9": false
+      },
+      {
+       "apprise.utils.yaml.templated_tag.input0": false,
+       "apprise.utils.yaml.templated_tag.input1": false,
+       "apprise.utils.yaml.templated_tag.input10": false,
+       "apprise.utils.yaml.templated_tag.input11": false,
+       "apprise.utils.yaml.templated_tag.input2": false,
+       "apprise.utils.yaml.templated_tag.input3": false,
+       "apprise.utils.yaml.templated_tag.input4": false,
+       "apprise.utils.yaml.templated_tag.input5": false,
+       "apprise.utils.yaml.templated_tag.input6": false,
+       "apprise.utils.yaml.templated_tag.input7": false,
+       "apprise.utils.yaml.templated_tag.input8": false,
+       "apprise.utils.yaml.templated_tag.input9": false
+      },
+      {
+       "apprise.utils.yaml.templated_tag.input0": false,
+       "apprise.utils.yaml.templated_tag.input1": false,
+       "apprise.utils.yaml.templated_tag.input10": false,
+       "apprise.utils.yaml.templated_tag.input11": false,
+       "apprise.utils.yaml.templated_tag.input2": false,
+       "apprise.utils.yaml.templated_tag.input3": false,
+       "apprise.utils.yaml.templated_tag.input4": false,
+       "apprise.utils.yaml.templated_tag.input5": false,
+       "apprise.utils.yaml.templated_tag.input6": false,
+       "apprise.utils.yaml.templated_tag.input7": false,
+       "apprise.utils.yaml.templated_tag.input8": false,
+       "apprise.utils.yaml.templated_tag.input9": false
+      }
+     ],
+     "pr": [
+      {
+       "apprise.utils.yaml.templated_tag.input0": false,
+       "apprise.utils.yaml.templated_tag.input1": false,
+       "apprise.utils.yaml.templated_tag.input10": false,
+       "apprise.utils.yaml.templated_tag.input11": false,
+       "apprise.utils.yaml.templated_tag.input2": false,
+       "apprise.utils.yaml.templated_tag.input3": false,
+       "apprise.utils.yaml.templated_tag.input4": false,
+       "apprise.utils.yaml.templated_tag.input5": false,
+       "apprise.utils.yaml.templated_tag.input6": false,
+       "apprise.utils.yaml.templated_tag.input7": false,
+       "apprise.utils.yaml.templated_tag.input8": false,
+       "apprise.utils.yaml.templated_tag.input9": false
+      },
+      {
+       "apprise.utils.yaml.templated_tag.input0": false,
+       "apprise.utils.yaml.templated_tag.input1": false,
+       "apprise.utils.yaml.templated_tag.input10": false,
+       "apprise.utils.yaml.templated_tag.input11": false,
+       "apprise.utils.yaml.templated_tag.input2": false,
+       "apprise.utils.yaml.templated_tag.input3": false,
+       "apprise.utils.yaml.templated_tag.input4": false,
+       "apprise.utils.yaml.templated_tag.input5": false,
+       "apprise.utils.yaml.templated_tag.input6": false,
+       "apprise.utils.yaml.templated_tag.input7": false,
+       "apprise.utils.yaml.templated_tag.input8": false,
+       "apprise.utils.yaml.templated_tag.input9": false
+      },
+      {
+       "apprise.utils.yaml.templated_tag.input0": false,
+       "apprise.utils.yaml.templated_tag.input1": false,
+       "apprise.utils.yaml.templated_tag.input10": false,
+       "apprise.utils.yaml.templated_tag.input11": false,
+       "apprise.utils.yaml.templated_tag.input2": false,
+       "apprise.utils.yaml.templated_tag.input3": false,
+       "apprise.utils.yaml.templated_tag.input4": false,
+       "apprise.utils.yaml.templated_tag.input5": false,
+       "apprise.utils.yaml.templated_tag.input6": false,
+       "apprise.utils.yaml.templated_tag.input7": false,
+       "apprise.utils.yaml.templated_tag.input8": false,
+       "apprise.utils.yaml.templated_tag.input9": false
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "apprise.utils.yaml.templated_tag.input0",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": false,
+      "pr": false,
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"apprise.utils.yaml.templated_tag.input0\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"apprise.utils.yaml.templated_tag.input0\""
+       }
+      }
+     },
+     {
+      "name": "apprise.utils.yaml.templated_tag.input1",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": false,
+      "pr": false,
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"apprise.utils.yaml.templated_tag.input1\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"apprise.utils.yaml.templated_tag.input1\""
+       }
+      }
+     },
+     {
+      "name": "apprise.utils.yaml.templated_tag.input10",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": false,
+      "pr": false,
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"apprise.utils.yaml.templated_tag.input10\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"apprise.utils.yaml.templated_tag.input10\""
+       }
+      }
+     },
+     {
+      "name": "apprise.utils.yaml.templated_tag.input11",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": false,
+      "pr": false,
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"apprise.utils.yaml.templated_tag.input11\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"apprise.utils.yaml.templated_tag.input11\""
+       }
+      }
+     },
+     {
+      "name": "apprise.utils.yaml.templated_tag.input2",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": false,
+      "pr": false,
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"apprise.utils.yaml.templated_tag.input2\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"apprise.utils.yaml.templated_tag.input2\""
+       }
+      }
+     },
+     {
+      "name": "apprise.utils.yaml.templated_tag.input3",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": false,
+      "pr": false,
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"apprise.utils.yaml.templated_tag.input3\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"apprise.utils.yaml.templated_tag.input3\""
+       }
+      }
+     },
+     {
+      "name": "apprise.utils.yaml.templated_tag.input4",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": false,
+      "pr": false,
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 7,
+        "quote": "\"observation\": \"apprise.utils.yaml.templated_tag.input4\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 7,
+        "quote": "\"observation\": \"apprise.utils.yaml.templated_tag.input4\""
+       }
+      }
+     },
+     {
+      "name": "apprise.utils.yaml.templated_tag.input5",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": false,
+      "pr": false,
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 8,
+        "quote": "\"observation\": \"apprise.utils.yaml.templated_tag.input5\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 8,
+        "quote": "\"observation\": \"apprise.utils.yaml.templated_tag.input5\""
+       }
+      }
+     },
+     {
+      "name": "apprise.utils.yaml.templated_tag.input6",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": false,
+      "pr": false,
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 9,
+        "quote": "\"observation\": \"apprise.utils.yaml.templated_tag.input6\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 9,
+        "quote": "\"observation\": \"apprise.utils.yaml.templated_tag.input6\""
+       }
+      }
+     },
+     {
+      "name": "apprise.utils.yaml.templated_tag.input7",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": false,
+      "pr": false,
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 10,
+        "quote": "\"observation\": \"apprise.utils.yaml.templated_tag.input7\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 10,
+        "quote": "\"observation\": \"apprise.utils.yaml.templated_tag.input7\""
+       }
+      }
+     },
+     {
+      "name": "apprise.utils.yaml.templated_tag.input8",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": false,
+      "pr": false,
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 11,
+        "quote": "\"observation\": \"apprise.utils.yaml.templated_tag.input8\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 11,
+        "quote": "\"observation\": \"apprise.utils.yaml.templated_tag.input8\""
+       }
+      }
+     },
+     {
+      "name": "apprise.utils.yaml.templated_tag.input9",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": false,
+      "pr": false,
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 12,
+        "quote": "\"observation\": \"apprise.utils.yaml.templated_tag.input9\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 12,
+        "quote": "\"observation\": \"apprise.utils.yaml.templated_tag.input9\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "diff",
+     "label": "diff (auto-derived from base-side code, model-free)",
+     "model": null,
+     "provider": null,
+     "provenance": "auto-derived",
+     "blind": false
+    },
+    "freeze": {
+     "sha256": "a2444305993dafc5057b6f80b74b1a08259cf3613914058e9b275721aec33c39",
+     "generator": {
+      "kind": "diff",
+      "label": "diff (auto-derived from base-side code, model-free)",
+      "model": null,
+      "provider": null,
+      "provenance": "auto-derived",
+      "blind": false
+     },
+     "frozen_at": "2026-10-21T20:22:57.819529+00:00",
+     "inputs_sha256": "09effdf725e503fb42e253403384d76feeb621e9f62759d75128aec055608834",
+     "inputs": {
+      "title_chars": 0,
+      "body_chars": 0,
+      "base_files": {
+       "apprise/utils/yaml.py": "5b32162a2706b1480a84114f8cb38d2c9c88276b9d27f075ceb72d9d50a8a234"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-10-21T20:22:57.948020+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 5,
+     "changed_lines_covered": 1,
+     "files": [
+      {
+       "file": "apprise/utils/yaml.py",
+       "changed_lines_total": 5,
+       "changed_lines_covered": 1
+      }
+     ],
+     "adequacy": "adequate",
+     "note": "ran 1 of 5 changed line(s) on the main side",
+     "exit": 0,
+     "data": "probe-cov-diff-api.json"
+    },
+    "status": "ran"
+   }
+  ],
+  "summary": {
+   "labels": [
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference"
+   ],
+   "flagged": [],
+   "proven_claims": [],
+   "reason": "probe: 12 other observation(s) identical on both sides; rejected: claim pattern(s) C1 match none of this probe's observation names, so the probe is not counted",
+   "ignored_noise": [],
+   "ignored_warning_only": [],
+   "pr_only_noisy": []
+  }
+ },
+ "probe_changed_line_coverage": {
+  "status": "measured",
+  "side": "main",
+  "probes": {
+   "model-p1": {
+    "status": "measured",
+    "changed_lines_covered": 1,
+    "changed_lines_total": 5,
+    "adequacy": "adequate"
+   },
+   "diff-api": {
+    "status": "measured",
+    "changed_lines_covered": 1,
+    "changed_lines_total": 5,
+    "adequacy": "adequate"
+   }
+  },
+  "not_adequate": []
+ },
+ "verdict": "needs_attention",
+ "reason": "10 test(s) removed on the PR side; 274 test(s) ran on main, 274 on the PR; 10 new test(s) pass, 264 unchanged; rejected: claim pattern(s) C1 match none of this probe's observation names, so the probe is not counted",
+ "verdict_before_coverage_gate": "needs_attention",
+ "reason_before_coverage_gate": "10 test(s) removed on the PR side; 274 test(s) ran on main, 274 on the PR; 10 new test(s) pass, 264 unchanged; rejected: claim pattern(s) C1 match none of this probe's observation names, so the probe is not counted",
+ "changed_lines_total": 0,
+ "changed_lines_covered": 0,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "normal",
+  "note": "the changed Python lines are not executable (comments, docstrings, blank lines)",
+  "measurement": "measured"
+ },
+ "agents": {
+  "status": "skipped",
+  "note": "advisory swarm is off",
+  "roles": []
+ },
+ "explanation": {
+  "status": "not yet wired",
+  "why": "advisory swarm is off"
+ },
+ "swarm_requested": false,
+ "operator_approval_requested": false,
+ "swarm": "off",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [
+   "apprise/utils/yaml.py"
+  ],
+  "compiled_files": [],
+  "other_files": [
+   "tests/test_apprise_template.py",
+   "tests/test_apprise_template_placement.py",
+   "tests/test_utils_yaml.py"
+  ]
+ },
+ "duration_s": {
+  "total_wall": 82.3,
+  "tests": 20.4
+ },
+ "cost": {
+  "ai_calls": 2,
+  "failed_ai_calls": 0,
+  "input_tokens": 2842,
+  "output_tokens": 4475,
+  "thinking_tokens": 4033,
+  "cost_usd": 0.00488,
+  "calls_without_usage": 0,
+  "ai_cost_usd": 0.00488,
+  "cost_complete": true,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 82.3,
+   "tests": 20.4
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.005487,
+  "total_cost_usd": 0.010367,
+  "swarm": {
+   "ai_calls": 0,
+   "failed_ai_calls": 0,
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "thinking_tokens": 0,
+   "cost_usd": 0.0,
+   "calls_without_usage": 0,
+   "ai_cost_usd": 0.0,
+   "cost_complete": true,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ },
+ "head_at_report_sha": "133d8b877e87121fb2c0a929f90c37bf88cb5de9",
+ "head_moved_since_test": false
+}

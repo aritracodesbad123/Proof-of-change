@@ -1,0 +1,3633 @@
+{
+  "schema_version": "1",
+  "record_kind": "pr_run",
+  "id": "pr-bopen-elevation-89-f94e513fa302-2026-10-22-check-1041",
+  "date_ist": "2026-10-22 10:41 IST",
+  "run_date": "2026-10-22",
+  "who": "ops/daily_run.py",
+  "repo": "bopen/elevation",
+  "library": "elevation",
+  "pr": {
+    "repo": "bopen/elevation",
+    "number": 89,
+    "url": "https://github.com/bopen/elevation/pull/89",
+    "title": "Cache missing tiles",
+    "base_sha": "fd48ce75ebcdfe22b16a33c74ce276e87c47a22b",
+    "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+    "head_sha": "f94e513fa302c0dd96c94eeaf0a0ac76cacd39df",
+    "merge_commit": null,
+    "tested_main_sha": "f94e513fa302c0dd96c94eeaf0a0ac76cacd39df",
+    "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+  },
+  "author": "alexamici",
+  "base_ref": "main",
+  "updated_at_utc": "2026-10-21T13:59:26Z",
+  "updated_at_ist": "2026-10-21 19:29 IST",
+  "ci_state": "not checked (single-PR check)",
+  "ci_detail": "checked on request with --pr",
+  "tested_at_ist": "2026-10-22 10:41 IST",
+  "files": {
+    "all": [
+      ".github/workflows/on-push.yml",
+      "CHANGELOG.rst",
+      "elevation/cache.py",
+      "elevation/datasource.py",
+      "elevation/spatial.py",
+      "tests/data/SRTM1_ELLIP/se_tasman_sea.tif",
+      "tests/data/SRTM1_GEOID/se_tasman_sea.tif",
+      "tests/data/SRTM3/nw_pacific.tif",
+      "tests/integration_srtm1_ellip.py",
+      "tests/integration_srtm1_geoid.py",
+      "tests/integration_srtm3.py",
+      "tests/test_10_spatial.py",
+      "tests/test_20_datasource.py"
+    ],
+    "package_py": [
+      "elevation/cache.py",
+      "elevation/datasource.py",
+      "elevation/spatial.py"
+    ],
+    "compiled": [],
+    "other": [
+      ".github/workflows/on-push.yml",
+      "CHANGELOG.rst",
+      "tests/data/SRTM1_ELLIP/se_tasman_sea.tif",
+      "tests/data/SRTM1_GEOID/se_tasman_sea.tif",
+      "tests/data/SRTM3/nw_pacific.tif",
+      "tests/integration_srtm1_ellip.py",
+      "tests/integration_srtm1_geoid.py",
+      "tests/integration_srtm3.py",
+      "tests/test_10_spatial.py",
+      "tests/test_20_datasource.py"
+    ]
+  },
+  "machine_type": {
+    "arch": "x86_64",
+    "os": "Linux",
+    "platform": "Linux-6.12.94+-x86_64-with-glibc2.41",
+    "cpu_count": 8,
+    "ci": null,
+    "runner_name": null,
+    "runner_os": null,
+    "runner_arch": null,
+    "runner_environment": null,
+    "image": null,
+    "label": "local",
+    "gxx": "g++ (Debian 14.2.0-19) 14.2.0",
+    "cpu_model": "Intel(R) Xeon(R) Processor",
+    "ram_gb": 15.6
+  },
+  "thread_env": {
+    "OMP_NUM_THREADS": "1",
+    "OPENBLAS_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1",
+    "NUMEXPR_NUM_THREADS": "1",
+    "VECLIB_MAXIMUM_THREADS": "1",
+    "BLIS_NUM_THREADS": "1",
+    "PYTHONHASHSEED": "0"
+  },
+  "runs_per_side": 3,
+  "runs_per_side_planned": 3,
+  "workers": "4",
+  "test_timeout_s": 120,
+  "run_timeout_s": 900,
+  "build_timeout_s": 1800,
+  "python": "3.12.15",
+  "test_selection": "mapped from touched files: tests/test_10_spatial.py, tests/test_20_datasource.py",
+  "per_run": [
+    {
+      "side": "old",
+      "run": 1,
+      "passed": 32,
+      "failed": 5,
+      "error": 0,
+      "skipped": 0,
+      "collection_errors": 0,
+      "exit": 1,
+      "seconds": 1.7,
+      "pytest_summary": "5 failed, 32 passed in 1.22s",
+      "junit": true
+    },
+    {
+      "side": "new",
+      "run": 1,
+      "passed": 32,
+      "failed": 5,
+      "error": 0,
+      "skipped": 0,
+      "collection_errors": 0,
+      "exit": 1,
+      "seconds": 1.7,
+      "pytest_summary": "5 failed, 32 passed in 1.26s",
+      "junit": true
+    },
+    {
+      "side": "old",
+      "run": 2,
+      "passed": 32,
+      "failed": 5,
+      "error": 0,
+      "skipped": 0,
+      "collection_errors": 0,
+      "exit": 1,
+      "seconds": 1.6,
+      "pytest_summary": "5 failed, 32 passed in 1.21s",
+      "junit": true
+    },
+    {
+      "side": "new",
+      "run": 2,
+      "passed": 32,
+      "failed": 5,
+      "error": 0,
+      "skipped": 0,
+      "collection_errors": 0,
+      "exit": 1,
+      "seconds": 1.7,
+      "pytest_summary": "5 failed, 32 passed in 1.22s",
+      "junit": true
+    },
+    {
+      "side": "old",
+      "run": 3,
+      "passed": 32,
+      "failed": 5,
+      "error": 0,
+      "skipped": 0,
+      "collection_errors": 0,
+      "exit": 1,
+      "seconds": 1.8,
+      "pytest_summary": "5 failed, 32 passed in 1.39s",
+      "junit": true
+    },
+    {
+      "side": "new",
+      "run": 3,
+      "passed": 32,
+      "failed": 5,
+      "error": 0,
+      "skipped": 0,
+      "collection_errors": 0,
+      "exit": 1,
+      "seconds": 1.8,
+      "pytest_summary": "5 failed, 32 passed in 1.39s",
+      "junit": true
+    }
+  ],
+  "notes": null,
+  "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+  "behaviour_claims": [],
+  "baseline": "full",
+  "model_provider": {
+    "requested": "nebius",
+    "used": "nebius",
+    "note": "model provider: nebius (Token Factory, live)",
+    "blind": false
+  },
+  "sandbox_backend": "local",
+  "sandbox_backend_note": "local bubblewrap",
+  "machine": "local",
+  "posted_upstream": false,
+  "logs": "elevation-89/",
+  "freeze": {
+    "main": "freeze-main.txt",
+    "pr": "freeze-pr.txt"
+  },
+  "poc_commit": "0fa0016ea51794edee0f4a085e41bf48dd813765",
+  "route": "source-pair",
+  "current_head_sha": "f94e513fa302c0dd96c94eeaf0a0ac76cacd39df",
+  "tested_invocation": 1,
+  "model_provider_used": "nebius",
+  "state": "closed",
+  "mergeable_state": "unknown",
+  "product_check": true,
+  "demo_helper": {
+    "preflight": {
+      "ok": true
+    },
+    "tavily": {
+      "ok": true,
+      "skipped": false,
+      "live_call": true,
+      "cached": false,
+      "queries": [
+        "elevation python setup install instructions https://github.com/bopen/elevation site:github.com/bopen/elevation",
+        "elevation python documentation install https://github.com/bopen/elevation site:github.com/bopen/elevation",
+        "elevation python install requirements https://pypi.org/project/elevation/ https://github.com/bopen/elevation site:pypi.org"
+      ],
+      "results": [
+        {
+          "title": "README.rst - bopen/elevation",
+          "url": "https://github.com/bopen/elevation/blob/main/README.rst",
+          "query": "elevation python documentation install https://github.com/bopen/elevation site:github.com/bopen/elevation"
+        },
+        {
+          "title": "elevation \u00b7 PyPI",
+          "url": "https://pypi.org/project/elevation/",
+          "query": "elevation python install requirements https://pypi.org/project/elevation/ https://github.com/bopen/elevation site:pypi.org"
+        },
+        {
+          "title": "lidar \u00b7 PyPI",
+          "url": "https://pypi.org/project/lidar/",
+          "query": "elevation python install requirements https://pypi.org/project/elevation/ https://github.com/bopen/elevation site:pypi.org"
+        },
+        {
+          "title": "GitHub - bopen/elevation: Download, cache and clip global terrain digital elevation models: Mapzen terrain tiles, SRTM 30m and 90m DEMs \u00b7 GitHub",
+          "url": "https://github.com/bopen/elevation",
+          "query": "elevation python setup install instructions https://github.com/bopen/elevation site:github.com/bopen/elevation"
+        },
+        {
+          "title": "Issue #34 \u00b7 bopen/elevation - Windows support",
+          "url": "https://github.com/bopen/elevation/issues/34",
+          "query": "elevation python documentation install https://github.com/bopen/elevation site:github.com/bopen/elevation"
+        }
+      ],
+      "text": "To install the Elevation Python package, use the command `pip install elevation`. Ensure that GDAL command line tools, including `gdal_translate`, `gdalbuildvrt`, `gdalinfo`, and `ogrinfo`, are installed and working. For installation details of GDAL command line tools, refer to the GDAL install documentation. Note that Elevation version 2.0 requires Python 3.11 or later. To check your system's readiness, run the command `eio selfcheck`.\nTo install the elevation Python package, use the command `pip install elevation`. Ensure that GDAL command line tools, including `gdal_translate`, `gdalbuildvrt`, `gdalinfo`, and `ogrinfo`, are installed and working. For Windows users, it is suggested to install the gdal suite at the system level to resolve installation issues. Elevation v2.0 requires Python 3.11 or later. For GDAL installation specifics, refer to the GDAL install documentation.\nTo install the elevation Python package, you can use pip to install the latest version, which officially supports Python 3. To install the latest version, run `pip install elevation`. For versions that support Python 2, use `pip install elevation==1.0.6`. The installation of GDAL command line tools varies across operating systems. For the lidar package, it is recommended to install from the conda-forge channel due to its GDAL dependency. To install lidar, run `mamba install -c conda-forge lidar`. For the latest version, use `mamba update -c conda-forge lidar`. For development, you can install directly from GitHub using `pip install git+https://github.com/opengeos/lidar`.\nPython script to download global terrain digital elevation models, SRTM 30m DEM and SRTM 90m DEM. - elevation/README.rst at main \u00b7 bopen/elevation.\nTitle: elevation \u00b7 PyPI\nPython script to download global terrain digital elevation models, SRTM 30m DEM and SRTM 90m DEM. Elevation provides easy download, cache and access of the global datasets. SRTM 90m Digital Elevation Database v4.1. Install the latest version of Elevation. The best way to install GDAL command line tools varies across operating systems. Note that starting from *elevation* v1.1 only Python 3 is officially supported. To get the last version sporting Python 2 support please us\nTitle: lidar \u00b7 PyPI\nA Python package for delineating nested surface depressions in digital elevation data. # Welcome to the lidar package. **lidar** is Python package for delineating the nested hierarchy of surface depressions in digital elevation models (DEMs). lidar: A Python package for delineating nested surface depressions from digital elevation data. **lidar** is a Python package for delineating the nested hierarchy of. surface depressions in digital elevation models (DEMs). The **lidar** \nNote that any download policies and attribution requirements of the respective providers apply.\n\nThis Open Source project is sponsored by B-Open - .\n\n## Installation\n\nInstall the latest version of Elevation from the Python Package Index:\n\n```\npip install elevation\n```\n\nThe following dependencies need to be installed and working:\n\n GDAL command line tools, i.e. `gdal_translate`, `gdalbuildvrt`, `gdalinfo` and `ogrinfo`\n\nThe following command runs some basic checks and reports common issues: [...]\nPython install gets called. Running and installing the gdal suite at the system level fixed my problems.",
+      "errors": [],
+      "lines": [
+        "Looked up with Tavily: 5 results",
+        "Query: elevation python setup install instructions https://github.com/bopen/elevation site:github.com/bopen/elevation",
+        "Query: elevation python documentation install https://github.com/bopen/elevation site:github.com/bopen/elevation",
+        "Query: elevation python install requirements https://pypi.org/project/elevation/ https://github.com/bopen/elevation site:pypi.org",
+        "Source: README.rst - bopen/elevation \u2014 https://github.com/bopen/elevation/blob/main/README.rst",
+        "Source: elevation \u00b7 PyPI \u2014 https://pypi.org/project/elevation/",
+        "Source: lidar \u00b7 PyPI \u2014 https://pypi.org/project/lidar/",
+        "Source: GitHub - bopen/elevation: Download, cache and clip global terrain digital elevation models: Mapzen terrain tiles, SRTM 30m and 90m DEMs \u00b7 GitHub \u2014 https://github.com/bopen/elevation",
+        "Source: Issue #34 \u00b7 bopen/elevation - Windows support \u2014 https://github.com/bopen/elevation/issues/34"
+      ]
+    },
+    "notes": [
+      "Setup check: GitHub token: present.",
+      "Setup check: Nebius token: present.",
+      "Setup check: free memory 9.0 GB (of 15.6 GB).",
+      "Setup check: free disk 89.1 GB.",
+      "Demo helper: git is installed.",
+      "Demo helper: python3 is installed.",
+      "Demo helper: uv is installed.",
+      "Looked up with Tavily: 5 results",
+      "Query: elevation python setup install instructions https://github.com/bopen/elevation site:github.com/bopen/elevation",
+      "Query: elevation python documentation install https://github.com/bopen/elevation site:github.com/bopen/elevation",
+      "Query: elevation python install requirements https://pypi.org/project/elevation/ https://github.com/bopen/elevation site:pypi.org",
+      "Source: README.rst - bopen/elevation \u2014 https://github.com/bopen/elevation/blob/main/README.rst",
+      "Source: elevation \u00b7 PyPI \u2014 https://pypi.org/project/elevation/",
+      "Source: lidar \u00b7 PyPI \u2014 https://pypi.org/project/lidar/",
+      "Source: GitHub - bopen/elevation: Download, cache and clip global terrain digital elevation models: Mapzen terrain tiles, SRTM 30m and 90m DEMs \u00b7 GitHub \u2014 https://github.com/bopen/elevation",
+      "Source: Issue #34 \u00b7 bopen/elevation - Windows support \u2014 https://github.com/bopen/elevation/issues/34",
+      "Setup plan: the same packages on main and pr.",
+      "Setup plan: appdirs is noted, installed with the project.",
+      "Setup plan: fasteners is noted, installed with the project.",
+      "Setup plan: typer is noted, installed with the project.",
+      "Setup plan: Python 3.12: Python 3.12 already meets >=3.11"
+    ],
+    "setup_plan": {
+      "packages": [
+        {
+          "requirement": "appdirs>=1.4.4",
+          "name": "appdirs",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "fasteners>=0.18",
+          "name": "fasteners",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "typer>=0.26.7",
+          "name": "typer",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        }
+      ],
+      "extra_reqs": [],
+      "python": {
+        "requested": "3.12",
+        "current": "3.12",
+        "applied": true,
+        "switch": null,
+        "reason": "Python 3.12 already meets >=3.11"
+      },
+      "system": [],
+      "refused": []
+    }
+  },
+  "chosen": {
+    "pr": 89,
+    "head_sha": null,
+    "install": null,
+    "test_cmd": null
+  },
+  "sides": {
+    "comparison_basis": "merge-base vs PR head (no merge ref available)",
+    "main_sha": "f94e513fa302c0dd96c94eeaf0a0ac76cacd39df",
+    "pr_sha": "f94e513fa302c0dd96c94eeaf0a0ac76cacd39df"
+  },
+  "tested": {
+    "main": "main @ f94e513fa302 (merge-base with the PR head)",
+    "pr": "PR head f94e513fa302"
+  },
+  "probe_plan": {
+    "baseline": "full",
+    "model": "model provider: nebius (Token Factory, live)",
+    "errors": [],
+    "model_claims": [
+      {
+        "id": "C1",
+        "text": "After the change, missing tiles are cached.",
+        "source_quote": "Cache missing tiles",
+        "testable": true,
+        "expect": "differs"
+      }
+    ],
+    "model_rejected_claims": [],
+    "diff_targets": [
+      "elevation.cache.is_cached",
+      "elevation.cache.ensure_tiles",
+      "elevation.datasource.seed",
+      "elevation.spatial.gdal_json",
+      "elevation.spatial.is_not_found",
+      "elevation.spatial.call_gdal_translate"
+    ],
+    "frozen": [
+      {
+        "path": "model-probes/model-probe1.py",
+        "source": "model",
+        "sha256": "d90b2da4df7c4616c8d63a24b3aae6200388101c0478faada845c7611cd8e7e0",
+        "generator": {
+          "kind": "model",
+          "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+          "model": "nvidia/nemotron-3-super-120b-a12b",
+          "provider": "nebius",
+          "provenance": "live",
+          "blind": true
+        },
+        "frozen_at": "2026-10-22T05:14:10.918014+00:00",
+        "inputs_sha256": "359a68db28571c24ba9631dce443e5c5d8c10ea70e1a81496e80db186ec7fe07",
+        "inputs": {
+          "title_chars": 19,
+          "body_chars": 0,
+          "base_files": {
+            "elevation/cache.py": "e18bfae913f423db41bdff3f0f1e055d87ee48fd290a73d61ae03c16ce46e028",
+            "elevation/datasource.py": "fe0cd0919b41f60428e69a0366d95fda80a18cf848700f8091acc96fbef3ee2e",
+            "elevation/spatial.py": "a56dd7a148555db038af9abdcb31a23ff1c7f2ade8167c2b8a50f0083d86ff8b"
+          }
+        }
+      },
+      {
+        "path": "diff-probes/diff-api.py",
+        "source": "diff",
+        "sha256": "1a7190729261d71b7dd576b39021b139790a6d435d34c4203cb18f16a4bbe5b5",
+        "generator": {
+          "kind": "diff",
+          "label": "diff (auto-derived from base-side code, model-free)",
+          "model": null,
+          "provider": null,
+          "provenance": "auto-derived",
+          "blind": false
+        },
+        "frozen_at": "2026-10-22T05:14:10.934250+00:00",
+        "inputs_sha256": "a4e97b4f31455cbcadf5c236accb4b38645599f2e901d3386af45b57dcbf3603",
+        "inputs": {
+          "title_chars": 0,
+          "body_chars": 0,
+          "base_files": {
+            "elevation/cache.py": "e18bfae913f423db41bdff3f0f1e055d87ee48fd290a73d61ae03c16ce46e028",
+            "elevation/datasource.py": "fe0cd0919b41f60428e69a0366d95fda80a18cf848700f8091acc96fbef3ee2e",
+            "elevation/spatial.py": "a56dd7a148555db038af9abdcb31a23ff1c7f2ade8167c2b8a50f0083d86ff8b"
+          }
+        }
+      }
+    ]
+  },
+  "test_extras": [
+    "pytest-mock>=3.16.0",
+    "pytest-xdist>=3.8.0"
+  ],
+  "pr_side_started_at": "2026-10-22T05:14:11.066831+00:00",
+  "test_targets": {
+    "main": [
+      "tests/test_10_spatial.py",
+      "tests/test_20_datasource.py"
+    ],
+    "pr": [
+      "tests/test_10_spatial.py",
+      "tests/test_20_datasource.py"
+    ]
+  },
+  "installed_commit": {
+    "main": {
+      "dist": "elevation",
+      "expected": "f94e513fa302c0dd96c94eeaf0a0ac76cacd39df",
+      "installed": "f94e513fa302c0dd96c94eeaf0a0ac76cacd39df",
+      "ok": true
+    },
+    "pr": {
+      "dist": "elevation",
+      "expected": "f94e513fa302c0dd96c94eeaf0a0ac76cacd39df",
+      "installed": "f94e513fa302c0dd96c94eeaf0a0ac76cacd39df",
+      "ok": true
+    }
+  },
+  "declared_test_deps": {
+    "requested": [
+      "pytest-mock>=3.16.0",
+      "pytest-xdist>=3.8.0"
+    ],
+    "installed": true
+  },
+  "comparison": {
+    "same": 37,
+    "same_skipped_both": 0,
+    "regressions": [],
+    "fixed": [],
+    "new_tests_passing": 0,
+    "new_tests_failing": [],
+    "new_tests_skipped": [],
+    "removed_tests": [],
+    "reparametrized": [],
+    "skipped_missing_dependency": [],
+    "flaky": [],
+    "pr_unstable": [],
+    "pr_unstable_noisy": [],
+    "environment": [],
+    "other_changes": [],
+    "preexisting_failures": [
+      "tests.test_10_spatial::test_call_gdal_translate",
+      "tests.test_10_spatial::test_call_gdal_translate_empty_on_notfound_local",
+      "tests.test_10_spatial::test_import_bounds_invalid",
+      "tests.test_10_spatial::test_import_bounds_raster",
+      "tests.test_10_spatial::test_import_bounds_vector"
+    ],
+    "load_failed_both": [],
+    "load_failed_pr": [],
+    "load_failed_main": [],
+    "executed": {
+      "main": 37,
+      "pr": 37
+    },
+    "messages": {}
+  },
+  "exit_check": {
+    "explained": true,
+    "problems": [],
+    "detail": "pytest exit 1; 5 failure(s)/error(s) pre-existing and identical on both sides"
+  },
+  "coverage": {
+    "status": "measured",
+    "changed_lines_total": 0,
+    "changed_lines_covered": 0,
+    "files": [
+      {
+        "file": "elevation/cache.py",
+        "changed_lines_total": 0,
+        "changed_lines_covered": 0
+      },
+      {
+        "file": "elevation/datasource.py",
+        "changed_lines_total": 0,
+        "changed_lines_covered": 0
+      },
+      {
+        "file": "elevation/spatial.py",
+        "changed_lines_total": 0,
+        "changed_lines_covered": 0
+      }
+    ],
+    "seconds": 2.6,
+    "exit": 1,
+    "log": "coverage-pytest.log"
+  },
+  "probes": {
+    "status": "ran",
+    "items": [
+      {
+        "id": "model-probe1",
+        "source": "model",
+        "path": "model-probes/model-probe1.py",
+        "sha256": "d90b2da4df7c4616c8d63a24b3aae6200388101c0478faada845c7611cd8e7e0",
+        "target": "bopen/elevation#89",
+        "about": "Test caching behavior of missing tiles",
+        "claims": [
+          {
+            "id": "C1",
+            "source": "PR description",
+            "text": "After the change, missing tiles are cached.",
+            "covers": [
+              "tile_cached_after_*",
+              "spool_files_count",
+              "exception_type"
+            ],
+            "expect": "differs"
+          }
+        ],
+        "runs_per_side": 3,
+        "per_run": [
+          {
+            "side": "main",
+            "run": 1,
+            "seconds": 0.1,
+            "ok": true
+          },
+          {
+            "side": "pr",
+            "run": 1,
+            "seconds": 0.1,
+            "ok": true
+          },
+          {
+            "side": "main",
+            "run": 2,
+            "seconds": 0.1,
+            "ok": true
+          },
+          {
+            "side": "pr",
+            "run": 2,
+            "seconds": 0.1,
+            "ok": true
+          },
+          {
+            "side": "main",
+            "run": 3,
+            "seconds": 0.1,
+            "ok": true
+          },
+          {
+            "side": "pr",
+            "run": 3,
+            "seconds": 0.1,
+            "ok": true
+          }
+        ],
+        "outputs": {
+          "main": [
+            "probe-model-probe1-main-1.jsonl",
+            "probe-model-probe1-main-2.jsonl",
+            "probe-model-probe1-main-3.jsonl"
+          ],
+          "pr": [
+            "probe-model-probe1-pr-1.jsonl",
+            "probe-model-probe1-pr-2.jsonl",
+            "probe-model-probe1-pr-3.jsonl"
+          ]
+        },
+        "runs": {
+          "main": [
+            {
+              "tile_cached_after_ensure": false,
+              "tile_file_size": 0,
+              "spool_files_count": 0,
+              "exception_type": "FileNotFoundError"
+            },
+            {
+              "tile_cached_after_ensure": false,
+              "tile_file_size": 0,
+              "spool_files_count": 0,
+              "exception_type": "FileNotFoundError"
+            },
+            {
+              "tile_cached_after_ensure": false,
+              "tile_file_size": 0,
+              "spool_files_count": 0,
+              "exception_type": "FileNotFoundError"
+            }
+          ],
+          "pr": [
+            {
+              "tile_cached_after_ensure": false,
+              "tile_file_size": 0,
+              "spool_files_count": 0,
+              "exception_type": "FileNotFoundError"
+            },
+            {
+              "tile_cached_after_ensure": false,
+              "tile_file_size": 0,
+              "spool_files_count": 0,
+              "exception_type": "FileNotFoundError"
+            },
+            {
+              "tile_cached_after_ensure": false,
+              "tile_file_size": 0,
+              "spool_files_count": 0,
+              "exception_type": "FileNotFoundError"
+            }
+          ]
+        },
+        "observations": [
+          {
+            "name": "exception_type",
+            "state": "same",
+            "label": "needs_human",
+            "claim": "C1",
+            "main": "FileNotFoundError",
+            "pr": "FileNotFoundError",
+            "citations": {
+              "main": {
+                "file": "probe-model-probe1-main-1.jsonl",
+                "line": 1,
+                "quote": "\"observation\": \"exception_type\""
+              },
+              "pr": {
+                "file": "probe-model-probe1-pr-1.jsonl",
+                "line": 1,
+                "quote": "\"observation\": \"exception_type\""
+              }
+            }
+          },
+          {
+            "name": "spool_files_count",
+            "state": "same",
+            "label": "needs_human",
+            "claim": "C1",
+            "main": 0,
+            "pr": 0,
+            "citations": {
+              "main": {
+                "file": "probe-model-probe1-main-1.jsonl",
+                "line": 2,
+                "quote": "\"observation\": \"spool_files_count\""
+              },
+              "pr": {
+                "file": "probe-model-probe1-pr-1.jsonl",
+                "line": 2,
+                "quote": "\"observation\": \"spool_files_count\""
+              }
+            }
+          },
+          {
+            "name": "tile_cached_after_ensure",
+            "state": "same",
+            "label": "needs_human",
+            "claim": "C1",
+            "main": false,
+            "pr": false,
+            "citations": {
+              "main": {
+                "file": "probe-model-probe1-main-1.jsonl",
+                "line": 3,
+                "quote": "\"observation\": \"tile_cached_after_ensure\""
+              },
+              "pr": {
+                "file": "probe-model-probe1-pr-1.jsonl",
+                "line": 3,
+                "quote": "\"observation\": \"tile_cached_after_ensure\""
+              }
+            }
+          },
+          {
+            "name": "tile_file_size",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": 0,
+            "pr": 0,
+            "citations": {
+              "main": {
+                "file": "probe-model-probe1-main-1.jsonl",
+                "line": 4,
+                "quote": "\"observation\": \"tile_file_size\""
+              },
+              "pr": {
+                "file": "probe-model-probe1-pr-1.jsonl",
+                "line": 4,
+                "quote": "\"observation\": \"tile_file_size\""
+              }
+            }
+          }
+        ],
+        "generator": {
+          "kind": "model",
+          "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+          "model": "nvidia/nemotron-3-super-120b-a12b",
+          "provider": "nebius",
+          "provenance": "live",
+          "blind": true
+        },
+        "freeze": {
+          "sha256": "d90b2da4df7c4616c8d63a24b3aae6200388101c0478faada845c7611cd8e7e0",
+          "generator": {
+            "kind": "model",
+            "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+            "model": "nvidia/nemotron-3-super-120b-a12b",
+            "provider": "nebius",
+            "provenance": "live",
+            "blind": true
+          },
+          "frozen_at": "2026-10-22T05:14:10.918014+00:00",
+          "inputs_sha256": "359a68db28571c24ba9631dce443e5c5d8c10ea70e1a81496e80db186ec7fe07",
+          "inputs": {
+            "title_chars": 19,
+            "body_chars": 0,
+            "base_files": {
+              "elevation/cache.py": "e18bfae913f423db41bdff3f0f1e055d87ee48fd290a73d61ae03c16ce46e028",
+              "elevation/datasource.py": "fe0cd0919b41f60428e69a0366d95fda80a18cf848700f8091acc96fbef3ee2e",
+              "elevation/spatial.py": "a56dd7a148555db038af9abdcb31a23ff1c7f2ade8167c2b8a50f0083d86ff8b"
+            }
+          },
+          "verified": true,
+          "pr_started_at": "2026-10-22T05:14:11.066831+00:00"
+        },
+        "probe_changed_line_coverage": {
+          "status": "measured",
+          "changed_lines_total": 0,
+          "changed_lines_covered": 0,
+          "files": [
+            {
+              "file": "elevation/cache.py",
+              "changed_lines_total": 0,
+              "changed_lines_covered": 0
+            },
+            {
+              "file": "elevation/datasource.py",
+              "changed_lines_total": 0,
+              "changed_lines_covered": 0
+            },
+            {
+              "file": "elevation/spatial.py",
+              "changed_lines_total": 0,
+              "changed_lines_covered": 0
+            }
+          ],
+          "adequacy": "not_adequate",
+          "note": "no changed executable line exists on the main side (new files, comments or docstrings only), so the probe cannot be shown to reach the change",
+          "exit": 0,
+          "data": "probe-cov-model-probe1.json"
+        },
+        "status": "ran"
+      },
+      {
+        "id": "diff-api",
+        "source": "diff",
+        "path": "diff-probes/diff-api.py",
+        "sha256": "1a7190729261d71b7dd576b39021b139790a6d435d34c4203cb18f16a4bbe5b5",
+        "target": "bopen/elevation#89",
+        "about": "Public functions touched by the PR, called with type-appropriate inputs on both sides.",
+        "claims": [],
+        "runs_per_side": 3,
+        "per_run": [
+          {
+            "side": "main",
+            "run": 1,
+            "seconds": 0.1,
+            "ok": true
+          },
+          {
+            "side": "pr",
+            "run": 1,
+            "seconds": 0.1,
+            "ok": true
+          },
+          {
+            "side": "main",
+            "run": 2,
+            "seconds": 0.1,
+            "ok": true
+          },
+          {
+            "side": "pr",
+            "run": 2,
+            "seconds": 0.1,
+            "ok": true
+          },
+          {
+            "side": "main",
+            "run": 3,
+            "seconds": 0.1,
+            "ok": true
+          },
+          {
+            "side": "pr",
+            "run": 3,
+            "seconds": 0.1,
+            "ok": true
+          }
+        ],
+        "outputs": {
+          "main": [
+            "probe-diff-api-main-1.jsonl",
+            "probe-diff-api-main-2.jsonl",
+            "probe-diff-api-main-3.jsonl"
+          ],
+          "pr": [
+            "probe-diff-api-pr-1.jsonl",
+            "probe-diff-api-pr-2.jsonl",
+            "probe-diff-api-pr-3.jsonl"
+          ]
+        },
+        "runs": {
+          "main": [
+            {
+              "elevation.cache.ensure_tiles.input0": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.ensure_tiles.input1": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.ensure_tiles.input10": null,
+              "elevation.cache.ensure_tiles.input11": null,
+              "elevation.cache.ensure_tiles.input2": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.ensure_tiles.input3": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.ensure_tiles.input4": {
+                "raises": "ValueError"
+              },
+              "elevation.cache.ensure_tiles.input5": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.ensure_tiles.input6": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.ensure_tiles.input7": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.ensure_tiles.input8": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.ensure_tiles.input9": null,
+              "elevation.cache.is_cached.input0": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.is_cached.input1": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.is_cached.input10": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.is_cached.input11": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.is_cached.input2": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.is_cached.input3": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.is_cached.input4": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.is_cached.input5": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.is_cached.input6": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.is_cached.input7": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.is_cached.input8": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.is_cached.input9": {
+                "raises": "TypeError"
+              },
+              "elevation.datasource.seed.input0": {
+                "raises": "TypeError"
+              },
+              "elevation.spatial.call_gdal_translate.input0": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.call_gdal_translate.input1": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.call_gdal_translate.input10": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.call_gdal_translate.input11": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.call_gdal_translate.input2": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.call_gdal_translate.input3": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.call_gdal_translate.input4": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.call_gdal_translate.input5": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.call_gdal_translate.input6": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.call_gdal_translate.input7": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.call_gdal_translate.input8": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.call_gdal_translate.input9": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.gdal_json.input0": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.gdal_json.input1": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.gdal_json.input10": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.gdal_json.input11": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.gdal_json.input2": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.gdal_json.input3": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.gdal_json.input4": {
+                "raises": "FileNotFoundError"
+              },
+              "elevation.spatial.gdal_json.input5": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.gdal_json.input6": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.gdal_json.input7": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.gdal_json.input8": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.gdal_json.input9": {
+                "raises": "PermissionError"
+              },
+              "elevation.spatial.is_not_found.input0": {
+                "raises": "ValueError"
+              },
+              "elevation.spatial.is_not_found.input1": {
+                "raises": "ValueError"
+              },
+              "elevation.spatial.is_not_found.input10": {
+                "raises": "ValueError"
+              },
+              "elevation.spatial.is_not_found.input11": {
+                "raises": "ValueError"
+              },
+              "elevation.spatial.is_not_found.input2": {
+                "raises": "ValueError"
+              },
+              "elevation.spatial.is_not_found.input3": {
+                "raises": "ValueError"
+              },
+              "elevation.spatial.is_not_found.input4": {
+                "raises": "ValueError"
+              },
+              "elevation.spatial.is_not_found.input5": {
+                "raises": "ValueError"
+              },
+              "elevation.spatial.is_not_found.input6": {
+                "raises": "ValueError"
+              },
+              "elevation.spatial.is_not_found.input7": {
+                "raises": "ValueError"
+              },
+              "elevation.spatial.is_not_found.input8": {
+                "raises": "ValueError"
+              },
+              "elevation.spatial.is_not_found.input9": {
+                "raises": "ValueError"
+              }
+            },
+            {
+              "elevation.cache.ensure_tiles.input0": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.ensure_tiles.input1": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.ensure_tiles.input10": null,
+              "elevation.cache.ensure_tiles.input11": null,
+              "elevation.cache.ensure_tiles.input2": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.ensure_tiles.input3": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.ensure_tiles.input4": {
+                "raises": "ValueError"
+              },
+              "elevation.cache.ensure_tiles.input5": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.ensure_tiles.input6": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.ensure_tiles.input7": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.ensure_tiles.input8": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.ensure_tiles.input9": null,
+              "elevation.cache.is_cached.input0": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.is_cached.input1": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.is_cached.input10": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.is_cached.input11": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.is_cached.input2": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.is_cached.input3": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.is_cached.input4": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.is_cached.input5": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.is_cached.input6": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.is_cached.input7": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.is_cached.input8": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.is_cached.input9": {
+                "raises": "TypeError"
+              },
+              "elevation.datasource.seed.input0": {
+                "raises": "TypeError"
+              },
+              "elevation.spatial.call_gdal_translate.input0": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.call_gdal_translate.input1": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.call_gdal_translate.input10": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.call_gdal_translate.input11": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.call_gdal_translate.input2": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.call_gdal_translate.input3": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.call_gdal_translate.input4": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.call_gdal_translate.input5": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.call_gdal_translate.input6": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.call_gdal_translate.input7": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.call_gdal_translate.input8": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.call_gdal_translate.input9": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.gdal_json.input0": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.gdal_json.input1": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.gdal_json.input10": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.gdal_json.input11": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.gdal_json.input2": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.gdal_json.input3": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.gdal_json.input4": {
+                "raises": "FileNotFoundError"
+              },
+              "elevation.spatial.gdal_json.input5": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.gdal_json.input6": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.gdal_json.input7": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.gdal_json.input8": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.gdal_json.input9": {
+                "raises": "PermissionError"
+              },
+              "elevation.spatial.is_not_found.input0": {
+                "raises": "ValueError"
+              },
+              "elevation.spatial.is_not_found.input1": {
+                "raises": "ValueError"
+              },
+              "elevation.spatial.is_not_found.input10": {
+                "raises": "ValueError"
+              },
+              "elevation.spatial.is_not_found.input11": {
+                "raises": "ValueError"
+              },
+              "elevation.spatial.is_not_found.input2": {
+                "raises": "ValueError"
+              },
+              "elevation.spatial.is_not_found.input3": {
+                "raises": "ValueError"
+              },
+              "elevation.spatial.is_not_found.input4": {
+                "raises": "ValueError"
+              },
+              "elevation.spatial.is_not_found.input5": {
+                "raises": "ValueError"
+              },
+              "elevation.spatial.is_not_found.input6": {
+                "raises": "ValueError"
+              },
+              "elevation.spatial.is_not_found.input7": {
+                "raises": "ValueError"
+              },
+              "elevation.spatial.is_not_found.input8": {
+                "raises": "ValueError"
+              },
+              "elevation.spatial.is_not_found.input9": {
+                "raises": "ValueError"
+              }
+            },
+            {
+              "elevation.cache.ensure_tiles.input0": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.ensure_tiles.input1": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.ensure_tiles.input10": null,
+              "elevation.cache.ensure_tiles.input11": null,
+              "elevation.cache.ensure_tiles.input2": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.ensure_tiles.input3": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.ensure_tiles.input4": {
+                "raises": "ValueError"
+              },
+              "elevation.cache.ensure_tiles.input5": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.ensure_tiles.input6": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.ensure_tiles.input7": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.ensure_tiles.input8": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.ensure_tiles.input9": null,
+              "elevation.cache.is_cached.input0": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.is_cached.input1": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.is_cached.input10": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.is_cached.input11": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.is_cached.input2": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.is_cached.input3": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.is_cached.input4": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.is_cached.input5": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.is_cached.input6": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.is_cached.input7": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.is_cached.input8": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.is_cached.input9": {
+                "raises": "TypeError"
+              },
+              "elevation.datasource.seed.input0": {
+                "raises": "TypeError"
+              },
+              "elevation.spatial.call_gdal_translate.input0": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.call_gdal_translate.input1": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.call_gdal_translate.input10": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.call_gdal_translate.input11": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.call_gdal_translate.input2": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.call_gdal_translate.input3": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.call_gdal_translate.input4": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.call_gdal_translate.input5": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.call_gdal_translate.input6": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.call_gdal_translate.input7": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.call_gdal_translate.input8": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.call_gdal_translate.input9": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.gdal_json.input0": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.gdal_json.input1": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.gdal_json.input10": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.gdal_json.input11": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.gdal_json.input2": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.gdal_json.input3": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.gdal_json.input4": {
+                "raises": "FileNotFoundError"
+              },
+              "elevation.spatial.gdal_json.input5": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.gdal_json.input6": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.gdal_json.input7": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.gdal_json.input8": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.gdal_json.input9": {
+                "raises": "PermissionError"
+              },
+              "elevation.spatial.is_not_found.input0": {
+                "raises": "ValueError"
+              },
+              "elevation.spatial.is_not_found.input1": {
+                "raises": "ValueError"
+              },
+              "elevation.spatial.is_not_found.input10": {
+                "raises": "ValueError"
+              },
+              "elevation.spatial.is_not_found.input11": {
+                "raises": "ValueError"
+              },
+              "elevation.spatial.is_not_found.input2": {
+                "raises": "ValueError"
+              },
+              "elevation.spatial.is_not_found.input3": {
+                "raises": "ValueError"
+              },
+              "elevation.spatial.is_not_found.input4": {
+                "raises": "ValueError"
+              },
+              "elevation.spatial.is_not_found.input5": {
+                "raises": "ValueError"
+              },
+              "elevation.spatial.is_not_found.input6": {
+                "raises": "ValueError"
+              },
+              "elevation.spatial.is_not_found.input7": {
+                "raises": "ValueError"
+              },
+              "elevation.spatial.is_not_found.input8": {
+                "raises": "ValueError"
+              },
+              "elevation.spatial.is_not_found.input9": {
+                "raises": "ValueError"
+              }
+            }
+          ],
+          "pr": [
+            {
+              "elevation.cache.ensure_tiles.input0": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.ensure_tiles.input1": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.ensure_tiles.input10": null,
+              "elevation.cache.ensure_tiles.input11": null,
+              "elevation.cache.ensure_tiles.input2": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.ensure_tiles.input3": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.ensure_tiles.input4": {
+                "raises": "ValueError"
+              },
+              "elevation.cache.ensure_tiles.input5": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.ensure_tiles.input6": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.ensure_tiles.input7": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.ensure_tiles.input8": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.ensure_tiles.input9": null,
+              "elevation.cache.is_cached.input0": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.is_cached.input1": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.is_cached.input10": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.is_cached.input11": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.is_cached.input2": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.is_cached.input3": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.is_cached.input4": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.is_cached.input5": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.is_cached.input6": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.is_cached.input7": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.is_cached.input8": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.is_cached.input9": {
+                "raises": "TypeError"
+              },
+              "elevation.datasource.seed.input0": {
+                "raises": "TypeError"
+              },
+              "elevation.spatial.call_gdal_translate.input0": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.call_gdal_translate.input1": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.call_gdal_translate.input10": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.call_gdal_translate.input11": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.call_gdal_translate.input2": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.call_gdal_translate.input3": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.call_gdal_translate.input4": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.call_gdal_translate.input5": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.call_gdal_translate.input6": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.call_gdal_translate.input7": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.call_gdal_translate.input8": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.call_gdal_translate.input9": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.gdal_json.input0": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.gdal_json.input1": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.gdal_json.input10": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.gdal_json.input11": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.gdal_json.input2": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.gdal_json.input3": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.gdal_json.input4": {
+                "raises": "FileNotFoundError"
+              },
+              "elevation.spatial.gdal_json.input5": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.gdal_json.input6": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.gdal_json.input7": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.gdal_json.input8": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.gdal_json.input9": {
+                "raises": "PermissionError"
+              },
+              "elevation.spatial.is_not_found.input0": {
+                "raises": "ValueError"
+              },
+              "elevation.spatial.is_not_found.input1": {
+                "raises": "ValueError"
+              },
+              "elevation.spatial.is_not_found.input10": {
+                "raises": "ValueError"
+              },
+              "elevation.spatial.is_not_found.input11": {
+                "raises": "ValueError"
+              },
+              "elevation.spatial.is_not_found.input2": {
+                "raises": "ValueError"
+              },
+              "elevation.spatial.is_not_found.input3": {
+                "raises": "ValueError"
+              },
+              "elevation.spatial.is_not_found.input4": {
+                "raises": "ValueError"
+              },
+              "elevation.spatial.is_not_found.input5": {
+                "raises": "ValueError"
+              },
+              "elevation.spatial.is_not_found.input6": {
+                "raises": "ValueError"
+              },
+              "elevation.spatial.is_not_found.input7": {
+                "raises": "ValueError"
+              },
+              "elevation.spatial.is_not_found.input8": {
+                "raises": "ValueError"
+              },
+              "elevation.spatial.is_not_found.input9": {
+                "raises": "ValueError"
+              }
+            },
+            {
+              "elevation.cache.ensure_tiles.input0": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.ensure_tiles.input1": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.ensure_tiles.input10": null,
+              "elevation.cache.ensure_tiles.input11": null,
+              "elevation.cache.ensure_tiles.input2": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.ensure_tiles.input3": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.ensure_tiles.input4": {
+                "raises": "ValueError"
+              },
+              "elevation.cache.ensure_tiles.input5": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.ensure_tiles.input6": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.ensure_tiles.input7": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.ensure_tiles.input8": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.ensure_tiles.input9": null,
+              "elevation.cache.is_cached.input0": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.is_cached.input1": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.is_cached.input10": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.is_cached.input11": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.is_cached.input2": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.is_cached.input3": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.is_cached.input4": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.is_cached.input5": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.is_cached.input6": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.is_cached.input7": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.is_cached.input8": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.is_cached.input9": {
+                "raises": "TypeError"
+              },
+              "elevation.datasource.seed.input0": {
+                "raises": "TypeError"
+              },
+              "elevation.spatial.call_gdal_translate.input0": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.call_gdal_translate.input1": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.call_gdal_translate.input10": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.call_gdal_translate.input11": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.call_gdal_translate.input2": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.call_gdal_translate.input3": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.call_gdal_translate.input4": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.call_gdal_translate.input5": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.call_gdal_translate.input6": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.call_gdal_translate.input7": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.call_gdal_translate.input8": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.call_gdal_translate.input9": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.gdal_json.input0": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.gdal_json.input1": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.gdal_json.input10": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.gdal_json.input11": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.gdal_json.input2": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.gdal_json.input3": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.gdal_json.input4": {
+                "raises": "FileNotFoundError"
+              },
+              "elevation.spatial.gdal_json.input5": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.gdal_json.input6": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.gdal_json.input7": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.gdal_json.input8": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.gdal_json.input9": {
+                "raises": "PermissionError"
+              },
+              "elevation.spatial.is_not_found.input0": {
+                "raises": "ValueError"
+              },
+              "elevation.spatial.is_not_found.input1": {
+                "raises": "ValueError"
+              },
+              "elevation.spatial.is_not_found.input10": {
+                "raises": "ValueError"
+              },
+              "elevation.spatial.is_not_found.input11": {
+                "raises": "ValueError"
+              },
+              "elevation.spatial.is_not_found.input2": {
+                "raises": "ValueError"
+              },
+              "elevation.spatial.is_not_found.input3": {
+                "raises": "ValueError"
+              },
+              "elevation.spatial.is_not_found.input4": {
+                "raises": "ValueError"
+              },
+              "elevation.spatial.is_not_found.input5": {
+                "raises": "ValueError"
+              },
+              "elevation.spatial.is_not_found.input6": {
+                "raises": "ValueError"
+              },
+              "elevation.spatial.is_not_found.input7": {
+                "raises": "ValueError"
+              },
+              "elevation.spatial.is_not_found.input8": {
+                "raises": "ValueError"
+              },
+              "elevation.spatial.is_not_found.input9": {
+                "raises": "ValueError"
+              }
+            },
+            {
+              "elevation.cache.ensure_tiles.input0": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.ensure_tiles.input1": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.ensure_tiles.input10": null,
+              "elevation.cache.ensure_tiles.input11": null,
+              "elevation.cache.ensure_tiles.input2": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.ensure_tiles.input3": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.ensure_tiles.input4": {
+                "raises": "ValueError"
+              },
+              "elevation.cache.ensure_tiles.input5": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.ensure_tiles.input6": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.ensure_tiles.input7": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.ensure_tiles.input8": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.ensure_tiles.input9": null,
+              "elevation.cache.is_cached.input0": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.is_cached.input1": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.is_cached.input10": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.is_cached.input11": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.is_cached.input2": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.is_cached.input3": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.is_cached.input4": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.is_cached.input5": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.is_cached.input6": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.is_cached.input7": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.is_cached.input8": {
+                "raises": "TypeError"
+              },
+              "elevation.cache.is_cached.input9": {
+                "raises": "TypeError"
+              },
+              "elevation.datasource.seed.input0": {
+                "raises": "TypeError"
+              },
+              "elevation.spatial.call_gdal_translate.input0": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.call_gdal_translate.input1": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.call_gdal_translate.input10": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.call_gdal_translate.input11": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.call_gdal_translate.input2": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.call_gdal_translate.input3": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.call_gdal_translate.input4": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.call_gdal_translate.input5": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.call_gdal_translate.input6": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.call_gdal_translate.input7": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.call_gdal_translate.input8": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.call_gdal_translate.input9": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.gdal_json.input0": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.gdal_json.input1": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.gdal_json.input10": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.gdal_json.input11": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.gdal_json.input2": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.gdal_json.input3": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.gdal_json.input4": {
+                "raises": "FileNotFoundError"
+              },
+              "elevation.spatial.gdal_json.input5": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.gdal_json.input6": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.gdal_json.input7": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.gdal_json.input8": {
+                "raises": "AttributeError"
+              },
+              "elevation.spatial.gdal_json.input9": {
+                "raises": "PermissionError"
+              },
+              "elevation.spatial.is_not_found.input0": {
+                "raises": "ValueError"
+              },
+              "elevation.spatial.is_not_found.input1": {
+                "raises": "ValueError"
+              },
+              "elevation.spatial.is_not_found.input10": {
+                "raises": "ValueError"
+              },
+              "elevation.spatial.is_not_found.input11": {
+                "raises": "ValueError"
+              },
+              "elevation.spatial.is_not_found.input2": {
+                "raises": "ValueError"
+              },
+              "elevation.spatial.is_not_found.input3": {
+                "raises": "ValueError"
+              },
+              "elevation.spatial.is_not_found.input4": {
+                "raises": "ValueError"
+              },
+              "elevation.spatial.is_not_found.input5": {
+                "raises": "ValueError"
+              },
+              "elevation.spatial.is_not_found.input6": {
+                "raises": "ValueError"
+              },
+              "elevation.spatial.is_not_found.input7": {
+                "raises": "ValueError"
+              },
+              "elevation.spatial.is_not_found.input8": {
+                "raises": "ValueError"
+              },
+              "elevation.spatial.is_not_found.input9": {
+                "raises": "ValueError"
+              }
+            }
+          ]
+        },
+        "observations": [
+          {
+            "name": "elevation.cache.ensure_tiles.input0",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "raises": "TypeError"
+            },
+            "pr": {
+              "raises": "TypeError"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 1,
+                "quote": "\"observation\": \"elevation.cache.ensure_tiles.input0\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 1,
+                "quote": "\"observation\": \"elevation.cache.ensure_tiles.input0\""
+              }
+            }
+          },
+          {
+            "name": "elevation.cache.ensure_tiles.input1",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "raises": "TypeError"
+            },
+            "pr": {
+              "raises": "TypeError"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 2,
+                "quote": "\"observation\": \"elevation.cache.ensure_tiles.input1\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 2,
+                "quote": "\"observation\": \"elevation.cache.ensure_tiles.input1\""
+              }
+            }
+          },
+          {
+            "name": "elevation.cache.ensure_tiles.input10",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": null,
+            "pr": null,
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 3,
+                "quote": "\"observation\": \"elevation.cache.ensure_tiles.input10\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 3,
+                "quote": "\"observation\": \"elevation.cache.ensure_tiles.input10\""
+              }
+            }
+          },
+          {
+            "name": "elevation.cache.ensure_tiles.input11",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": null,
+            "pr": null,
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 4,
+                "quote": "\"observation\": \"elevation.cache.ensure_tiles.input11\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 4,
+                "quote": "\"observation\": \"elevation.cache.ensure_tiles.input11\""
+              }
+            }
+          },
+          {
+            "name": "elevation.cache.ensure_tiles.input2",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "raises": "TypeError"
+            },
+            "pr": {
+              "raises": "TypeError"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 5,
+                "quote": "\"observation\": \"elevation.cache.ensure_tiles.input2\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 5,
+                "quote": "\"observation\": \"elevation.cache.ensure_tiles.input2\""
+              }
+            }
+          },
+          {
+            "name": "elevation.cache.ensure_tiles.input3",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "raises": "TypeError"
+            },
+            "pr": {
+              "raises": "TypeError"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 6,
+                "quote": "\"observation\": \"elevation.cache.ensure_tiles.input3\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 6,
+                "quote": "\"observation\": \"elevation.cache.ensure_tiles.input3\""
+              }
+            }
+          },
+          {
+            "name": "elevation.cache.ensure_tiles.input4",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "raises": "ValueError"
+            },
+            "pr": {
+              "raises": "ValueError"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 7,
+                "quote": "\"observation\": \"elevation.cache.ensure_tiles.input4\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 7,
+                "quote": "\"observation\": \"elevation.cache.ensure_tiles.input4\""
+              }
+            }
+          },
+          {
+            "name": "elevation.cache.ensure_tiles.input5",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "raises": "TypeError"
+            },
+            "pr": {
+              "raises": "TypeError"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 8,
+                "quote": "\"observation\": \"elevation.cache.ensure_tiles.input5\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 8,
+                "quote": "\"observation\": \"elevation.cache.ensure_tiles.input5\""
+              }
+            }
+          },
+          {
+            "name": "elevation.cache.ensure_tiles.input6",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "raises": "TypeError"
+            },
+            "pr": {
+              "raises": "TypeError"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 9,
+                "quote": "\"observation\": \"elevation.cache.ensure_tiles.input6\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 9,
+                "quote": "\"observation\": \"elevation.cache.ensure_tiles.input6\""
+              }
+            }
+          },
+          {
+            "name": "elevation.cache.ensure_tiles.input7",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "raises": "TypeError"
+            },
+            "pr": {
+              "raises": "TypeError"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 10,
+                "quote": "\"observation\": \"elevation.cache.ensure_tiles.input7\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 10,
+                "quote": "\"observation\": \"elevation.cache.ensure_tiles.input7\""
+              }
+            }
+          },
+          {
+            "name": "elevation.cache.ensure_tiles.input8",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "raises": "TypeError"
+            },
+            "pr": {
+              "raises": "TypeError"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 11,
+                "quote": "\"observation\": \"elevation.cache.ensure_tiles.input8\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 11,
+                "quote": "\"observation\": \"elevation.cache.ensure_tiles.input8\""
+              }
+            }
+          },
+          {
+            "name": "elevation.cache.ensure_tiles.input9",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": null,
+            "pr": null,
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 12,
+                "quote": "\"observation\": \"elevation.cache.ensure_tiles.input9\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 12,
+                "quote": "\"observation\": \"elevation.cache.ensure_tiles.input9\""
+              }
+            }
+          },
+          {
+            "name": "elevation.cache.is_cached.input0",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "raises": "TypeError"
+            },
+            "pr": {
+              "raises": "TypeError"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 13,
+                "quote": "\"observation\": \"elevation.cache.is_cached.input0\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 13,
+                "quote": "\"observation\": \"elevation.cache.is_cached.input0\""
+              }
+            }
+          },
+          {
+            "name": "elevation.cache.is_cached.input1",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "raises": "TypeError"
+            },
+            "pr": {
+              "raises": "TypeError"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 14,
+                "quote": "\"observation\": \"elevation.cache.is_cached.input1\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 14,
+                "quote": "\"observation\": \"elevation.cache.is_cached.input1\""
+              }
+            }
+          },
+          {
+            "name": "elevation.cache.is_cached.input10",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "raises": "TypeError"
+            },
+            "pr": {
+              "raises": "TypeError"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 15,
+                "quote": "\"observation\": \"elevation.cache.is_cached.input10\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 15,
+                "quote": "\"observation\": \"elevation.cache.is_cached.input10\""
+              }
+            }
+          },
+          {
+            "name": "elevation.cache.is_cached.input11",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "raises": "TypeError"
+            },
+            "pr": {
+              "raises": "TypeError"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 16,
+                "quote": "\"observation\": \"elevation.cache.is_cached.input11\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 16,
+                "quote": "\"observation\": \"elevation.cache.is_cached.input11\""
+              }
+            }
+          },
+          {
+            "name": "elevation.cache.is_cached.input2",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "raises": "TypeError"
+            },
+            "pr": {
+              "raises": "TypeError"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 17,
+                "quote": "\"observation\": \"elevation.cache.is_cached.input2\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 17,
+                "quote": "\"observation\": \"elevation.cache.is_cached.input2\""
+              }
+            }
+          },
+          {
+            "name": "elevation.cache.is_cached.input3",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "raises": "TypeError"
+            },
+            "pr": {
+              "raises": "TypeError"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 18,
+                "quote": "\"observation\": \"elevation.cache.is_cached.input3\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 18,
+                "quote": "\"observation\": \"elevation.cache.is_cached.input3\""
+              }
+            }
+          },
+          {
+            "name": "elevation.cache.is_cached.input4",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "raises": "TypeError"
+            },
+            "pr": {
+              "raises": "TypeError"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 19,
+                "quote": "\"observation\": \"elevation.cache.is_cached.input4\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 19,
+                "quote": "\"observation\": \"elevation.cache.is_cached.input4\""
+              }
+            }
+          },
+          {
+            "name": "elevation.cache.is_cached.input5",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "raises": "TypeError"
+            },
+            "pr": {
+              "raises": "TypeError"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 20,
+                "quote": "\"observation\": \"elevation.cache.is_cached.input5\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 20,
+                "quote": "\"observation\": \"elevation.cache.is_cached.input5\""
+              }
+            }
+          },
+          {
+            "name": "elevation.cache.is_cached.input6",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "raises": "TypeError"
+            },
+            "pr": {
+              "raises": "TypeError"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 21,
+                "quote": "\"observation\": \"elevation.cache.is_cached.input6\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 21,
+                "quote": "\"observation\": \"elevation.cache.is_cached.input6\""
+              }
+            }
+          },
+          {
+            "name": "elevation.cache.is_cached.input7",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "raises": "TypeError"
+            },
+            "pr": {
+              "raises": "TypeError"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 22,
+                "quote": "\"observation\": \"elevation.cache.is_cached.input7\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 22,
+                "quote": "\"observation\": \"elevation.cache.is_cached.input7\""
+              }
+            }
+          },
+          {
+            "name": "elevation.cache.is_cached.input8",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "raises": "TypeError"
+            },
+            "pr": {
+              "raises": "TypeError"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 23,
+                "quote": "\"observation\": \"elevation.cache.is_cached.input8\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 23,
+                "quote": "\"observation\": \"elevation.cache.is_cached.input8\""
+              }
+            }
+          },
+          {
+            "name": "elevation.cache.is_cached.input9",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "raises": "TypeError"
+            },
+            "pr": {
+              "raises": "TypeError"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 24,
+                "quote": "\"observation\": \"elevation.cache.is_cached.input9\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 24,
+                "quote": "\"observation\": \"elevation.cache.is_cached.input9\""
+              }
+            }
+          },
+          {
+            "name": "elevation.datasource.seed.input0",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "raises": "TypeError"
+            },
+            "pr": {
+              "raises": "TypeError"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 25,
+                "quote": "\"observation\": \"elevation.datasource.seed.input0\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 25,
+                "quote": "\"observation\": \"elevation.datasource.seed.input0\""
+              }
+            }
+          },
+          {
+            "name": "elevation.spatial.call_gdal_translate.input0",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "raises": "AttributeError"
+            },
+            "pr": {
+              "raises": "AttributeError"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 26,
+                "quote": "\"observation\": \"elevation.spatial.call_gdal_translate.input0\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 26,
+                "quote": "\"observation\": \"elevation.spatial.call_gdal_translate.input0\""
+              }
+            }
+          },
+          {
+            "name": "elevation.spatial.call_gdal_translate.input1",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "raises": "AttributeError"
+            },
+            "pr": {
+              "raises": "AttributeError"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 27,
+                "quote": "\"observation\": \"elevation.spatial.call_gdal_translate.input1\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 27,
+                "quote": "\"observation\": \"elevation.spatial.call_gdal_translate.input1\""
+              }
+            }
+          },
+          {
+            "name": "elevation.spatial.call_gdal_translate.input10",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "raises": "AttributeError"
+            },
+            "pr": {
+              "raises": "AttributeError"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 28,
+                "quote": "\"observation\": \"elevation.spatial.call_gdal_translate.input10\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 28,
+                "quote": "\"observation\": \"elevation.spatial.call_gdal_translate.input10\""
+              }
+            }
+          },
+          {
+            "name": "elevation.spatial.call_gdal_translate.input11",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "raises": "AttributeError"
+            },
+            "pr": {
+              "raises": "AttributeError"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 29,
+                "quote": "\"observation\": \"elevation.spatial.call_gdal_translate.input11\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 29,
+                "quote": "\"observation\": \"elevation.spatial.call_gdal_translate.input11\""
+              }
+            }
+          },
+          {
+            "name": "elevation.spatial.call_gdal_translate.input2",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "raises": "AttributeError"
+            },
+            "pr": {
+              "raises": "AttributeError"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 30,
+                "quote": "\"observation\": \"elevation.spatial.call_gdal_translate.input2\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 30,
+                "quote": "\"observation\": \"elevation.spatial.call_gdal_translate.input2\""
+              }
+            }
+          },
+          {
+            "name": "elevation.spatial.call_gdal_translate.input3",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "raises": "AttributeError"
+            },
+            "pr": {
+              "raises": "AttributeError"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 31,
+                "quote": "\"observation\": \"elevation.spatial.call_gdal_translate.input3\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 31,
+                "quote": "\"observation\": \"elevation.spatial.call_gdal_translate.input3\""
+              }
+            }
+          },
+          {
+            "name": "elevation.spatial.call_gdal_translate.input4",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "raises": "AttributeError"
+            },
+            "pr": {
+              "raises": "AttributeError"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 32,
+                "quote": "\"observation\": \"elevation.spatial.call_gdal_translate.input4\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 32,
+                "quote": "\"observation\": \"elevation.spatial.call_gdal_translate.input4\""
+              }
+            }
+          },
+          {
+            "name": "elevation.spatial.call_gdal_translate.input5",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "raises": "AttributeError"
+            },
+            "pr": {
+              "raises": "AttributeError"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 33,
+                "quote": "\"observation\": \"elevation.spatial.call_gdal_translate.input5\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 33,
+                "quote": "\"observation\": \"elevation.spatial.call_gdal_translate.input5\""
+              }
+            }
+          },
+          {
+            "name": "elevation.spatial.call_gdal_translate.input6",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "raises": "AttributeError"
+            },
+            "pr": {
+              "raises": "AttributeError"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 34,
+                "quote": "\"observation\": \"elevation.spatial.call_gdal_translate.input6\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 34,
+                "quote": "\"observation\": \"elevation.spatial.call_gdal_translate.input6\""
+              }
+            }
+          },
+          {
+            "name": "elevation.spatial.call_gdal_translate.input7",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "raises": "AttributeError"
+            },
+            "pr": {
+              "raises": "AttributeError"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 35,
+                "quote": "\"observation\": \"elevation.spatial.call_gdal_translate.input7\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 35,
+                "quote": "\"observation\": \"elevation.spatial.call_gdal_translate.input7\""
+              }
+            }
+          },
+          {
+            "name": "elevation.spatial.call_gdal_translate.input8",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "raises": "AttributeError"
+            },
+            "pr": {
+              "raises": "AttributeError"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 36,
+                "quote": "\"observation\": \"elevation.spatial.call_gdal_translate.input8\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 36,
+                "quote": "\"observation\": \"elevation.spatial.call_gdal_translate.input8\""
+              }
+            }
+          },
+          {
+            "name": "elevation.spatial.call_gdal_translate.input9",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "raises": "AttributeError"
+            },
+            "pr": {
+              "raises": "AttributeError"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 37,
+                "quote": "\"observation\": \"elevation.spatial.call_gdal_translate.input9\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 37,
+                "quote": "\"observation\": \"elevation.spatial.call_gdal_translate.input9\""
+              }
+            }
+          },
+          {
+            "name": "elevation.spatial.gdal_json.input0",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "raises": "AttributeError"
+            },
+            "pr": {
+              "raises": "AttributeError"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 38,
+                "quote": "\"observation\": \"elevation.spatial.gdal_json.input0\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 38,
+                "quote": "\"observation\": \"elevation.spatial.gdal_json.input0\""
+              }
+            }
+          },
+          {
+            "name": "elevation.spatial.gdal_json.input1",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "raises": "AttributeError"
+            },
+            "pr": {
+              "raises": "AttributeError"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 39,
+                "quote": "\"observation\": \"elevation.spatial.gdal_json.input1\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 39,
+                "quote": "\"observation\": \"elevation.spatial.gdal_json.input1\""
+              }
+            }
+          },
+          {
+            "name": "elevation.spatial.gdal_json.input10",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "raises": "AttributeError"
+            },
+            "pr": {
+              "raises": "AttributeError"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 40,
+                "quote": "\"observation\": \"elevation.spatial.gdal_json.input10\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 40,
+                "quote": "\"observation\": \"elevation.spatial.gdal_json.input10\""
+              }
+            }
+          },
+          {
+            "name": "elevation.spatial.gdal_json.input11",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "raises": "AttributeError"
+            },
+            "pr": {
+              "raises": "AttributeError"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 41,
+                "quote": "\"observation\": \"elevation.spatial.gdal_json.input11\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 41,
+                "quote": "\"observation\": \"elevation.spatial.gdal_json.input11\""
+              }
+            }
+          },
+          {
+            "name": "elevation.spatial.gdal_json.input2",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "raises": "AttributeError"
+            },
+            "pr": {
+              "raises": "AttributeError"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 42,
+                "quote": "\"observation\": \"elevation.spatial.gdal_json.input2\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 42,
+                "quote": "\"observation\": \"elevation.spatial.gdal_json.input2\""
+              }
+            }
+          },
+          {
+            "name": "elevation.spatial.gdal_json.input3",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "raises": "AttributeError"
+            },
+            "pr": {
+              "raises": "AttributeError"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 43,
+                "quote": "\"observation\": \"elevation.spatial.gdal_json.input3\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 43,
+                "quote": "\"observation\": \"elevation.spatial.gdal_json.input3\""
+              }
+            }
+          },
+          {
+            "name": "elevation.spatial.gdal_json.input4",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "raises": "FileNotFoundError"
+            },
+            "pr": {
+              "raises": "FileNotFoundError"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 44,
+                "quote": "\"observation\": \"elevation.spatial.gdal_json.input4\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 44,
+                "quote": "\"observation\": \"elevation.spatial.gdal_json.input4\""
+              }
+            }
+          },
+          {
+            "name": "elevation.spatial.gdal_json.input5",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "raises": "AttributeError"
+            },
+            "pr": {
+              "raises": "AttributeError"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 45,
+                "quote": "\"observation\": \"elevation.spatial.gdal_json.input5\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 45,
+                "quote": "\"observation\": \"elevation.spatial.gdal_json.input5\""
+              }
+            }
+          },
+          {
+            "name": "elevation.spatial.gdal_json.input6",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "raises": "AttributeError"
+            },
+            "pr": {
+              "raises": "AttributeError"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 46,
+                "quote": "\"observation\": \"elevation.spatial.gdal_json.input6\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 46,
+                "quote": "\"observation\": \"elevation.spatial.gdal_json.input6\""
+              }
+            }
+          },
+          {
+            "name": "elevation.spatial.gdal_json.input7",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "raises": "AttributeError"
+            },
+            "pr": {
+              "raises": "AttributeError"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 47,
+                "quote": "\"observation\": \"elevation.spatial.gdal_json.input7\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 47,
+                "quote": "\"observation\": \"elevation.spatial.gdal_json.input7\""
+              }
+            }
+          },
+          {
+            "name": "elevation.spatial.gdal_json.input8",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "raises": "AttributeError"
+            },
+            "pr": {
+              "raises": "AttributeError"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 48,
+                "quote": "\"observation\": \"elevation.spatial.gdal_json.input8\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 48,
+                "quote": "\"observation\": \"elevation.spatial.gdal_json.input8\""
+              }
+            }
+          },
+          {
+            "name": "elevation.spatial.gdal_json.input9",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "raises": "PermissionError"
+            },
+            "pr": {
+              "raises": "PermissionError"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 49,
+                "quote": "\"observation\": \"elevation.spatial.gdal_json.input9\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 49,
+                "quote": "\"observation\": \"elevation.spatial.gdal_json.input9\""
+              }
+            }
+          },
+          {
+            "name": "elevation.spatial.is_not_found.input0",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "raises": "ValueError"
+            },
+            "pr": {
+              "raises": "ValueError"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 50,
+                "quote": "\"observation\": \"elevation.spatial.is_not_found.input0\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 50,
+                "quote": "\"observation\": \"elevation.spatial.is_not_found.input0\""
+              }
+            }
+          },
+          {
+            "name": "elevation.spatial.is_not_found.input1",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "raises": "ValueError"
+            },
+            "pr": {
+              "raises": "ValueError"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 51,
+                "quote": "\"observation\": \"elevation.spatial.is_not_found.input1\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 51,
+                "quote": "\"observation\": \"elevation.spatial.is_not_found.input1\""
+              }
+            }
+          },
+          {
+            "name": "elevation.spatial.is_not_found.input10",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "raises": "ValueError"
+            },
+            "pr": {
+              "raises": "ValueError"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 52,
+                "quote": "\"observation\": \"elevation.spatial.is_not_found.input10\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 52,
+                "quote": "\"observation\": \"elevation.spatial.is_not_found.input10\""
+              }
+            }
+          },
+          {
+            "name": "elevation.spatial.is_not_found.input11",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "raises": "ValueError"
+            },
+            "pr": {
+              "raises": "ValueError"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 53,
+                "quote": "\"observation\": \"elevation.spatial.is_not_found.input11\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 53,
+                "quote": "\"observation\": \"elevation.spatial.is_not_found.input11\""
+              }
+            }
+          },
+          {
+            "name": "elevation.spatial.is_not_found.input2",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "raises": "ValueError"
+            },
+            "pr": {
+              "raises": "ValueError"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 54,
+                "quote": "\"observation\": \"elevation.spatial.is_not_found.input2\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 54,
+                "quote": "\"observation\": \"elevation.spatial.is_not_found.input2\""
+              }
+            }
+          },
+          {
+            "name": "elevation.spatial.is_not_found.input3",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "raises": "ValueError"
+            },
+            "pr": {
+              "raises": "ValueError"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 55,
+                "quote": "\"observation\": \"elevation.spatial.is_not_found.input3\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 55,
+                "quote": "\"observation\": \"elevation.spatial.is_not_found.input3\""
+              }
+            }
+          },
+          {
+            "name": "elevation.spatial.is_not_found.input4",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "raises": "ValueError"
+            },
+            "pr": {
+              "raises": "ValueError"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 56,
+                "quote": "\"observation\": \"elevation.spatial.is_not_found.input4\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 56,
+                "quote": "\"observation\": \"elevation.spatial.is_not_found.input4\""
+              }
+            }
+          },
+          {
+            "name": "elevation.spatial.is_not_found.input5",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "raises": "ValueError"
+            },
+            "pr": {
+              "raises": "ValueError"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 57,
+                "quote": "\"observation\": \"elevation.spatial.is_not_found.input5\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 57,
+                "quote": "\"observation\": \"elevation.spatial.is_not_found.input5\""
+              }
+            }
+          },
+          {
+            "name": "elevation.spatial.is_not_found.input6",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "raises": "ValueError"
+            },
+            "pr": {
+              "raises": "ValueError"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 58,
+                "quote": "\"observation\": \"elevation.spatial.is_not_found.input6\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 58,
+                "quote": "\"observation\": \"elevation.spatial.is_not_found.input6\""
+              }
+            }
+          },
+          {
+            "name": "elevation.spatial.is_not_found.input7",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "raises": "ValueError"
+            },
+            "pr": {
+              "raises": "ValueError"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 59,
+                "quote": "\"observation\": \"elevation.spatial.is_not_found.input7\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 59,
+                "quote": "\"observation\": \"elevation.spatial.is_not_found.input7\""
+              }
+            }
+          },
+          {
+            "name": "elevation.spatial.is_not_found.input8",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "raises": "ValueError"
+            },
+            "pr": {
+              "raises": "ValueError"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 60,
+                "quote": "\"observation\": \"elevation.spatial.is_not_found.input8\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 60,
+                "quote": "\"observation\": \"elevation.spatial.is_not_found.input8\""
+              }
+            }
+          },
+          {
+            "name": "elevation.spatial.is_not_found.input9",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "raises": "ValueError"
+            },
+            "pr": {
+              "raises": "ValueError"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 61,
+                "quote": "\"observation\": \"elevation.spatial.is_not_found.input9\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 61,
+                "quote": "\"observation\": \"elevation.spatial.is_not_found.input9\""
+              }
+            }
+          }
+        ],
+        "generator": {
+          "kind": "diff",
+          "label": "diff (auto-derived from base-side code, model-free)",
+          "model": null,
+          "provider": null,
+          "provenance": "auto-derived",
+          "blind": false
+        },
+        "freeze": {
+          "sha256": "1a7190729261d71b7dd576b39021b139790a6d435d34c4203cb18f16a4bbe5b5",
+          "generator": {
+            "kind": "diff",
+            "label": "diff (auto-derived from base-side code, model-free)",
+            "model": null,
+            "provider": null,
+            "provenance": "auto-derived",
+            "blind": false
+          },
+          "frozen_at": "2026-10-22T05:14:10.934250+00:00",
+          "inputs_sha256": "a4e97b4f31455cbcadf5c236accb4b38645599f2e901d3386af45b57dcbf3603",
+          "inputs": {
+            "title_chars": 0,
+            "body_chars": 0,
+            "base_files": {
+              "elevation/cache.py": "e18bfae913f423db41bdff3f0f1e055d87ee48fd290a73d61ae03c16ce46e028",
+              "elevation/datasource.py": "fe0cd0919b41f60428e69a0366d95fda80a18cf848700f8091acc96fbef3ee2e",
+              "elevation/spatial.py": "a56dd7a148555db038af9abdcb31a23ff1c7f2ade8167c2b8a50f0083d86ff8b"
+            }
+          },
+          "verified": true,
+          "pr_started_at": "2026-10-22T05:14:11.066831+00:00"
+        },
+        "probe_changed_line_coverage": {
+          "status": "measured",
+          "changed_lines_total": 0,
+          "changed_lines_covered": 0,
+          "files": [
+            {
+              "file": "elevation/cache.py",
+              "changed_lines_total": 0,
+              "changed_lines_covered": 0
+            },
+            {
+              "file": "elevation/datasource.py",
+              "changed_lines_total": 0,
+              "changed_lines_covered": 0
+            },
+            {
+              "file": "elevation/spatial.py",
+              "changed_lines_total": 0,
+              "changed_lines_covered": 0
+            }
+          ],
+          "adequacy": "not_adequate",
+          "note": "no changed executable line exists on the main side (new files, comments or docstrings only), so the probe cannot be shown to reach the change",
+          "exit": 0,
+          "data": "probe-cov-diff-api.json"
+        },
+        "status": "ran"
+      }
+    ],
+    "summary": {
+      "labels": [
+        "needs_human",
+        "needs_human",
+        "needs_human",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference"
+      ],
+      "flagged": [
+        {
+          "probe": "model-probe1",
+          "name": "exception_type",
+          "label": "needs_human",
+          "claim": "C1"
+        },
+        {
+          "probe": "model-probe1",
+          "name": "spool_files_count",
+          "label": "needs_human",
+          "claim": "C1"
+        },
+        {
+          "probe": "model-probe1",
+          "name": "tile_cached_after_ensure",
+          "label": "needs_human",
+          "claim": "C1"
+        }
+      ],
+      "proven_claims": [],
+      "reason": "probe: 3 observation(s) need attention: exception_type does not differ although the claim says it does (C1); spool_files_count does not differ although the claim says it does (C1); tile_cached_after_ensure does not differ although the claim says it does (C1); probe: 62 other observation(s) identical on both sides",
+      "ignored_noise": [],
+      "ignored_warning_only": [],
+      "pr_only_noisy": []
+    }
+  },
+  "probe_changed_line_coverage": {
+    "status": "measured",
+    "side": "main",
+    "probes": {
+      "model-probe1": {
+        "status": "measured",
+        "changed_lines_covered": 0,
+        "changed_lines_total": 0,
+        "adequacy": "not_adequate"
+      },
+      "diff-api": {
+        "status": "measured",
+        "changed_lines_covered": 0,
+        "changed_lines_total": 0,
+        "adequacy": "not_adequate"
+      }
+    },
+    "not_adequate": [
+      "diff-api",
+      "model-probe1"
+    ]
+  },
+  "docstring_only": true,
+  "verdict": "needs_attention",
+  "reason": "probe: 3 observation(s) need attention: exception_type does not differ although the claim says it does (C1); spool_files_count does not differ although the claim says it does (C1); tile_cached_after_ensure does not differ although the claim says it does (C1); probe model-probe1 is not_adequate (no changed executable line exists on the main side (new files, comments or docstrings only), so the probe cannot be shown to reach the change); its matching results do not count; tests: 37 test(s) ran on main, 37 on the PR; 0 new test(s) pass, 32 unchanged; 5 test failure(s) pre-existing and identical on both sides",
+  "verdict_before_coverage_gate": "needs_attention",
+  "reason_before_coverage_gate": "probe: 3 observation(s) need attention: exception_type does not differ although the claim says it does (C1); spool_files_count does not differ although the claim says it does (C1); tile_cached_after_ensure does not differ although the claim says it does (C1); probe model-probe1 is not_adequate (no changed executable line exists on the main side (new files, comments or docstrings only), so the probe cannot be shown to reach the change); its matching results do not count; tests: 37 test(s) ran on main, 37 on the PR; 0 new test(s) pass, 32 unchanged; 5 test failure(s) pre-existing and identical on both sides",
+  "changed_lines_total": 0,
+  "changed_lines_covered": 0,
+  "coverage_gate": {
+    "kind": "python",
+    "changed": false,
+    "confidence": "normal",
+    "note": "the changed Python lines are not executable (comments, docstrings, blank lines)",
+    "measurement": "measured"
+  },
+  "agents": {
+    "status": "skipped",
+    "note": "advisory swarm is off",
+    "roles": []
+  },
+  "explanation": {
+    "status": "not yet wired",
+    "why": "advisory swarm is off"
+  },
+  "swarm_requested": false,
+  "operator_approval_requested": false,
+  "swarm": "off",
+  "operator_approval": "off",
+  "what_changed": {
+    "package_python_files": [
+      "elevation/cache.py",
+      "elevation/datasource.py",
+      "elevation/spatial.py"
+    ],
+    "compiled_files": [],
+    "other_files": [
+      ".github/workflows/on-push.yml",
+      "CHANGELOG.rst",
+      "tests/data/SRTM1_ELLIP/se_tasman_sea.tif",
+      "tests/data/SRTM1_GEOID/se_tasman_sea.tif",
+      "tests/data/SRTM3/nw_pacific.tif",
+      "tests/integration_srtm1_ellip.py",
+      "tests/integration_srtm1_geoid.py",
+      "tests/integration_srtm3.py",
+      "tests/test_10_spatial.py",
+      "tests/test_20_datasource.py"
+    ]
+  },
+  "duration_s": {
+    "total_wall": 149.0,
+    "tests": 10.3
+  },
+  "cost": {
+    "ai_calls": 3,
+    "failed_ai_calls": 0,
+    "input_tokens": 16457,
+    "output_tokens": 17056,
+    "thinking_tokens": 16105,
+    "cost_usd": 0.020287,
+    "calls_without_usage": 0,
+    "ai_cost_usd": 0.020287,
+    "cost_complete": true,
+    "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+    "compute_seconds": {
+      "total_wall": 149.0,
+      "tests": 10.3
+    },
+    "machine_usd_per_hour": 0.24,
+    "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+    "computer_cost_usd": 0.009933,
+    "total_cost_usd": 0.03022,
+    "swarm": {
+      "ai_calls": 0,
+      "failed_ai_calls": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "thinking_tokens": 0,
+      "cost_usd": 0.0,
+      "calls_without_usage": 0,
+      "ai_cost_usd": 0.0,
+      "cost_complete": true,
+      "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+    }
+  },
+  "head_at_report_sha": "f94e513fa302c0dd96c94eeaf0a0ac76cacd39df",
+  "head_moved_since_test": false
+}

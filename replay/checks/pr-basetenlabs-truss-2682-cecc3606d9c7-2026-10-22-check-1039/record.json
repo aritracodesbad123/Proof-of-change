@@ -1,0 +1,1012 @@
+{
+  "schema_version": "1",
+  "record_kind": "pr_run",
+  "id": "pr-basetenlabs-truss-2682-cecc3606d9c7-2026-10-22-check-1039",
+  "date_ist": "2026-10-22 10:39 IST",
+  "run_date": "2026-10-22",
+  "who": "ops/daily_run.py",
+  "repo": "basetenlabs/truss",
+  "library": "truss",
+  "pr": {
+    "repo": "basetenlabs/truss",
+    "number": 2682,
+    "url": "https://github.com/basetenlabs/truss/pull/2682",
+    "title": "fix: return 503 for model not ready on draft/watch deployments",
+    "base_sha": "22bf0ef710abf95bd42bb3d4fdbe36ece8ce7123",
+    "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+    "head_sha": "cecc3606d9c76ef84183a2b3599c54a06b4dc84a",
+    "merge_commit": null,
+    "tested_main_sha": "22bf0ef710abf95bd42bb3d4fdbe36ece8ce7123",
+    "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+  },
+  "author": "devtyagi3909",
+  "base_ref": "main",
+  "updated_at_utc": "2026-10-21T18:46:46Z",
+  "updated_at_ist": "2026-10-22 00:16 IST",
+  "ci_state": "not checked (single-PR check)",
+  "ci_detail": "checked on request with --pr",
+  "tested_at_ist": "2026-10-22 10:39 IST",
+  "files": {
+    "all": [
+      "truss/templates/control/control/application.py",
+      "truss/tests/templates/control/control/test_sanitized_exception_middleware.py"
+    ],
+    "package_py": [
+      "truss/templates/control/control/application.py",
+      "truss/tests/templates/control/control/test_sanitized_exception_middleware.py"
+    ],
+    "compiled": [],
+    "other": []
+  },
+  "machine_type": {
+    "arch": "x86_64",
+    "os": "Linux",
+    "platform": "Linux-6.12.94+-x86_64-with-glibc2.41",
+    "cpu_count": 8,
+    "ci": null,
+    "runner_name": null,
+    "runner_os": null,
+    "runner_arch": null,
+    "runner_environment": null,
+    "image": null,
+    "label": "local",
+    "gxx": "g++ (Debian 14.2.0-19) 14.2.0",
+    "cpu_model": "Intel(R) Xeon(R) Processor",
+    "ram_gb": 15.6
+  },
+  "thread_env": {
+    "OMP_NUM_THREADS": "1",
+    "OPENBLAS_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1",
+    "NUMEXPR_NUM_THREADS": "1",
+    "VECLIB_MAXIMUM_THREADS": "1",
+    "BLIS_NUM_THREADS": "1",
+    "PYTHONHASHSEED": "0"
+  },
+  "runs_per_side": 0,
+  "runs_per_side_planned": 3,
+  "workers": "4",
+  "test_timeout_s": 120,
+  "run_timeout_s": 900,
+  "build_timeout_s": 1800,
+  "python": "3.12.15",
+  "test_selection": "mapped from touched files: truss/tests/templates/control/control/test_sanitized_exception_middleware.py",
+  "per_run": [
+    {
+      "side": "old",
+      "run": 1,
+      "passed": 0,
+      "failed": 0,
+      "error": 0,
+      "skipped": 0,
+      "collection_errors": 0,
+      "exit": 4,
+      "seconds": 2.3,
+      "pytest_summary": "E   ModuleNotFoundError: No module named 'requests_mock'",
+      "junit": false
+    },
+    {
+      "side": "new",
+      "run": 1,
+      "passed": 0,
+      "failed": 0,
+      "error": 0,
+      "skipped": 0,
+      "collection_errors": 0,
+      "exit": 4,
+      "seconds": 2.3,
+      "pytest_summary": "E   ModuleNotFoundError: No module named 'requests_mock'",
+      "junit": false
+    },
+    {
+      "side": "old",
+      "run": 2,
+      "passed": 0,
+      "failed": 0,
+      "error": 0,
+      "skipped": 0,
+      "collection_errors": 0,
+      "exit": 4,
+      "seconds": 2.3,
+      "pytest_summary": "E   ModuleNotFoundError: No module named 'requests_mock'",
+      "junit": false
+    },
+    {
+      "side": "new",
+      "run": 2,
+      "passed": 0,
+      "failed": 0,
+      "error": 0,
+      "skipped": 0,
+      "collection_errors": 0,
+      "exit": 4,
+      "seconds": 2.3,
+      "pytest_summary": "E   ModuleNotFoundError: No module named 'requests_mock'",
+      "junit": false
+    },
+    {
+      "side": "old",
+      "run": 3,
+      "passed": 0,
+      "failed": 0,
+      "error": 0,
+      "skipped": 0,
+      "collection_errors": 0,
+      "exit": 4,
+      "seconds": 2.3,
+      "pytest_summary": "E   ModuleNotFoundError: No module named 'requests_mock'",
+      "junit": false
+    },
+    {
+      "side": "new",
+      "run": 3,
+      "passed": 0,
+      "failed": 0,
+      "error": 0,
+      "skipped": 0,
+      "collection_errors": 0,
+      "exit": 4,
+      "seconds": 2.5,
+      "pytest_summary": "E   ModuleNotFoundError: No module named 'requests_mock'",
+      "junit": false
+    }
+  ],
+  "notes": null,
+  "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+  "behaviour_claims": [],
+  "baseline": "full",
+  "model_provider": {
+    "requested": "nebius",
+    "used": "nebius",
+    "note": "model provider: nebius (Token Factory, live)",
+    "blind": false
+  },
+  "sandbox_backend": "local",
+  "sandbox_backend_note": "local bubblewrap",
+  "machine": "local",
+  "posted_upstream": false,
+  "logs": "truss-2682/",
+  "freeze": {
+    "main": "freeze-main.txt",
+    "pr": "freeze-pr.txt"
+  },
+  "poc_commit": "0fa0016ea51794edee0f4a085e41bf48dd813765",
+  "route": "source-pair",
+  "current_head_sha": "cecc3606d9c76ef84183a2b3599c54a06b4dc84a",
+  "tested_invocation": 1,
+  "model_provider_used": "nebius",
+  "state": "closed",
+  "mergeable_state": "unknown",
+  "product_check": true,
+  "demo_helper": {
+    "preflight": {
+      "ok": true
+    },
+    "tavily": {
+      "ok": true,
+      "skipped": false,
+      "live_call": true,
+      "cached": false,
+      "queries": [
+        "truss python setup install instructions https://github.com/basetenlabs/truss site:github.com/basetenlabs/truss",
+        "truss python documentation install https://github.com/basetenlabs/truss site:github.com/basetenlabs/truss",
+        "truss python install requirements https://pypi.org/project/truss/ https://github.com/basetenlabs/truss site:pypi.org"
+      ],
+      "results": [
+        {
+          "title": "truss-examples/comfyui-truss/README.md at main \u00b7 basetenlabs/truss-examples \u00b7 GitHub",
+          "url": "https://github.com/basetenlabs/truss-examples/blob/main/comfyui-truss/README.md",
+          "query": "truss python documentation install https://github.com/basetenlabs/truss site:github.com/basetenlabs/truss"
+        },
+        {
+          "title": "truss-transfer \u00b7 PyPI",
+          "url": "https://pypi.org/project/truss-transfer/",
+          "query": "truss python install requirements https://pypi.org/project/truss/ https://github.com/basetenlabs/truss site:pypi.org"
+        },
+        {
+          "title": "truss \u00b7 PyPI",
+          "url": "https://pypi.org/project/truss/",
+          "query": "truss python install requirements https://pypi.org/project/truss/ https://github.com/basetenlabs/truss site:pypi.org"
+        },
+        {
+          "title": "pip install --upgrade truss not working \u00b7 Issue #856",
+          "url": "https://github.com/basetenlabs/truss/issues/856",
+          "query": "truss python setup install instructions https://github.com/basetenlabs/truss site:github.com/basetenlabs/truss"
+        },
+        {
+          "title": "GitHub - basetenlabs/truss: The simplest way to serve AI/ML models in production \u00b7 GitHub",
+          "url": "https://github.com/basetenlabs/truss",
+          "query": "truss python documentation install https://github.com/basetenlabs/truss site:github.com/basetenlabs/truss"
+        },
+        {
+          "title": "GitHub - basetenlabs/truss-examples: Examples of models deployable with Truss \u00b7 GitHub",
+          "url": "https://github.com/basetenlabs/truss-examples",
+          "query": "truss python documentation install https://github.com/basetenlabs/truss site:github.com/basetenlabs/truss"
+        }
+      ],
+      "text": "When trying to run `pip install --upgrade truss`, the process fails with an error indicating that `uvloop` does not support Windows at the moment. This issue is documented in the GitHub issue #856. The sources do not provide further details on how to resolve this issue or alternative installation methods for Windows users.\nTo install Truss, use the command `pip install --upgrade truss`. This is supported by both the main Truss GitHub repository and the truss-examples repository. The truss-examples repository also provides a detailed guide on deploying specific models, including setting up the environment and authenticating with Baseten. The sources do not provide specific details on the Python versions or CI status directly, but they emphasize the use of `pip install --upgrade truss` for installation.\nTo install Truss, you can use the command `pip install truss`. The truss package on PyPI supports deploying and serving ML models on Baseten, handling containerization, dependency management, and GPU configuration for various frameworks. The latest version available is 0.15.2, which can be downloaded as `truss-0.15.2.tar.gz` or `truss-0.15.2-py3-none-any.whl`. The sources do not provide a definitive answer for the most recent version beyond this information.\nEach command in `build_commands` is independent of the previous command. So you need to execute this part `cd ComfyUI/custom_nodes` each time you want to install a new custom node.\n\nOnce you have both the `data/comfy_ui_workflow.json` and `config.yaml` set up correctly we can begin deployment.\n\n## Deployment\n\nBefore deployment:\n\n1. Make sure you have a Baseten account and API key.\n2. Install the latest version of Truss: `pip install --upgrade truss` [...] build_commandsgit clone  ComfyUI && git \nTitle: truss-transfer \u00b7 PyPI\n# Truss-Transfer. # pip install <work> result_dir = truss_transfer.lazy_data_resolve(\"/custom/download/path\"). print(f\"download using {truss_transfer.__version__}\"). resolved_dir = truss_transfer.lazy_data_resolve(str(download_dir)). ./target/x86_64-unknown-linux-musl/release/truss_transfer_cli /tmp/download_dir. python -m truss_transfer /tmp\nTitle: truss \u00b7 PyPI\n# Truss. Truss is the CLI for deploying and serving ML models on Baseten. Package your model's serving logic in Python, launch training jobs, and deploy to production\u2014Truss handles containerization, dependency management, and GPU configuration. Deploy models from any framework: `transformers`, `diffusers`, PyTorch, TensorFlow, vLLM, SGLang, TensorRT-LLM, and more:. ## Why Truss? * **Write once, run anywhere:** Package model code, weights, and dependencies with a model server \nwhen trying to run pip install --upgrade truss, subprocess exits with error: uvloop does not support Windows at the moment.\n# Installation\n\nInstall Truss with:\n\n```\npip install --upgrade truss \n```\n\n# Quickstart\n\nDeploying a model to Baseten via Truss turns a Hugging Face model into a production-ready API endpoint. You write a `config.yaml` that specifies the model, the hardware, and the engine, then `uvx truss push` builds a TensorRT-optimized container and deploys it. No Python code, no Dockerfile, no container management. [...] This guide walks through deploying Qwen 2.5 3B Instruct, a small but capable LLM, from \n## Repository files navigation\n\n# Truss Examples\n\nTruss Examples CI\n\nTruss Examples CI\n\nTruss is the simplest way to serve AI/ML models in production.\n\nTo get you started with Truss, this repository has dozens of example models, each ready to deploy as-is or adapt to your needs.\n\n## Installation\n\nGet the repository with:\n\n`git clone \n\nInstall Truss with:\n\n`pip install --upgrade truss`\n\n## Deployment\n\nPick a model to deploy by passing a path to that model. [...] | baseten-inference-stack-v2-templ",
+      "errors": [],
+      "lines": [
+        "Looked up with Tavily: 6 results",
+        "Query: truss python setup install instructions https://github.com/basetenlabs/truss site:github.com/basetenlabs/truss",
+        "Query: truss python documentation install https://github.com/basetenlabs/truss site:github.com/basetenlabs/truss",
+        "Query: truss python install requirements https://pypi.org/project/truss/ https://github.com/basetenlabs/truss site:pypi.org",
+        "Source: truss-examples/comfyui-truss/README.md at main \u00b7 basetenlabs/truss-examples \u00b7 GitHub \u2014 https://github.com/basetenlabs/truss-examples/blob/main/comfyui-truss/README.md",
+        "Source: truss-transfer \u00b7 PyPI \u2014 https://pypi.org/project/truss-transfer/",
+        "Source: truss \u00b7 PyPI \u2014 https://pypi.org/project/truss/",
+        "Source: pip install --upgrade truss not working \u00b7 Issue #856 \u2014 https://github.com/basetenlabs/truss/issues/856",
+        "Source: GitHub - basetenlabs/truss: The simplest way to serve AI/ML models in production \u00b7 GitHub \u2014 https://github.com/basetenlabs/truss",
+        "Source: GitHub - basetenlabs/truss-examples: Examples of models deployable with Truss \u00b7 GitHub \u2014 https://github.com/basetenlabs/truss-examples"
+      ]
+    },
+    "notes": [
+      "Setup check: GitHub token: present.",
+      "Setup check: Nebius token: present.",
+      "Setup check: free memory 8.3 GB (of 15.6 GB).",
+      "Setup check: free disk 89.3 GB.",
+      "Demo helper: git is installed.",
+      "Demo helper: python3 is installed.",
+      "Demo helper: uv is installed.",
+      "Looked up with Tavily: 6 results",
+      "Query: truss python setup install instructions https://github.com/basetenlabs/truss site:github.com/basetenlabs/truss",
+      "Query: truss python documentation install https://github.com/basetenlabs/truss site:github.com/basetenlabs/truss",
+      "Query: truss python install requirements https://pypi.org/project/truss/ https://github.com/basetenlabs/truss site:pypi.org",
+      "Source: truss-examples/comfyui-truss/README.md at main \u00b7 basetenlabs/truss-examples \u00b7 GitHub \u2014 https://github.com/basetenlabs/truss-examples/blob/main/comfyui-truss/README.md",
+      "Source: truss-transfer \u00b7 PyPI \u2014 https://pypi.org/project/truss-transfer/",
+      "Source: truss \u00b7 PyPI \u2014 https://pypi.org/project/truss/",
+      "Source: pip install --upgrade truss not working \u00b7 Issue #856 \u2014 https://github.com/basetenlabs/truss/issues/856",
+      "Source: GitHub - basetenlabs/truss: The simplest way to serve AI/ML models in production \u00b7 GitHub \u2014 https://github.com/basetenlabs/truss",
+      "Source: GitHub - basetenlabs/truss-examples: Examples of models deployable with Truss \u00b7 GitHub \u2014 https://github.com/basetenlabs/truss-examples",
+      "Setup plan: the same packages on main and pr.",
+      "Setup plan: huggingface_hub is noted, installed with the project.",
+      "Setup plan: pydantic is noted, installed with the project.",
+      "Setup plan: PyYAML is noted, installed with the project.",
+      "Setup plan: tomlkit is noted, installed with the project.",
+      "Setup plan: Jinja2 is noted, installed with the project.",
+      "Setup plan: aiofiles is noted, installed with the project.",
+      "Setup plan: blake3 is noted, installed with the project.",
+      "Setup plan: boto3 is noted, installed with the project.",
+      "Setup plan: click is noted, installed with the project.",
+      "Setup plan: google-cloud-storage is noted, installed with the project.",
+      "Setup plan: httpx is noted, installed with the project.",
+      "Setup plan: httpx-ws is noted, installed with the project.",
+      "Setup plan: inquirerpy is noted, installed with the project.",
+      "Setup plan: keyring is noted, installed with the project.",
+      "Setup plan: libcst is noted, installed with the project.",
+      "Setup plan: loguru is noted, installed with the project.",
+      "Setup plan: packaging is noted, installed with the project.",
+      "Setup plan: pathspec is noted, installed with the project.",
+      "Setup plan: psutil is noted, installed with the project.",
+      "Setup plan: python-json-logger is noted, installed with the project.",
+      "Setup plan: python-on-whales is noted, installed with the project.",
+      "Setup plan: requests is noted, installed with the project.",
+      "Setup plan: rich is noted, installed with the project.",
+      "Setup plan: rich-click is noted, installed with the project.",
+      "Setup plan: ruff is noted, installed with the project.",
+      "Setup plan: tenacity is noted, installed with the project.",
+      "Setup plan: watchfiles is noted, installed with the project.",
+      "Setup plan: truss-transfer is noted, installed with the project.",
+      "Setup plan: Python 3.12: Python 3.12 already meets >=3.9,<3.15, <3.15,>=3.9"
+    ],
+    "setup_plan": {
+      "packages": [
+        {
+          "requirement": "huggingface_hub>=0.25.0",
+          "name": "huggingface_hub",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "pydantic>=2.10.0",
+          "name": "pydantic",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "PyYAML>=6.0",
+          "name": "PyYAML",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "tomlkit>=0.13.2",
+          "name": "tomlkit",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "Jinja2>=3.1.2,<4",
+          "name": "Jinja2",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "aiofiles>=24.1.0,<25",
+          "name": "aiofiles",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "blake3>=1.0.4,<2",
+          "name": "blake3",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "boto3>=1.34.85,<2",
+          "name": "boto3",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "click>=8.0.3,<9",
+          "name": "click",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "google-cloud-storage>=2.10.0",
+          "name": "google-cloud-storage",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "httpx>=0.24.1",
+          "name": "httpx",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "httpx-ws>=0.7.1,<0.8",
+          "name": "httpx-ws",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "inquirerpy>=0.3.4,<0.4",
+          "name": "inquirerpy",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "keyring>=25,<26",
+          "name": "keyring",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "libcst>=1.1.2",
+          "name": "libcst",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "loguru>=0.7.2",
+          "name": "loguru",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "packaging>=20.9",
+          "name": "packaging",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "pathspec>=0.9.0",
+          "name": "pathspec",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "psutil>=5.9.4",
+          "name": "psutil",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "python-json-logger>=2.0.2",
+          "name": "python-json-logger",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "python-on-whales>=0.68.0",
+          "name": "python-on-whales",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "requests>=2.31",
+          "name": "requests",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "rich>=13.4.2,<14",
+          "name": "rich",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "rich-click>=1.8.9,<2",
+          "name": "rich-click",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "ruff>=0.4.8",
+          "name": "ruff",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "tenacity>=8.0.1",
+          "name": "tenacity",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "watchfiles>=0.19.0,<0.20",
+          "name": "watchfiles",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "truss-transfer>=0.0.42,<0.0.44",
+          "name": "truss-transfer",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        }
+      ],
+      "extra_reqs": [],
+      "python": {
+        "requested": "3.12",
+        "current": "3.12",
+        "applied": true,
+        "switch": null,
+        "reason": "Python 3.12 already meets >=3.9,<3.15, <3.15,>=3.9"
+      },
+      "system": [],
+      "refused": []
+    }
+  },
+  "chosen": {
+    "pr": 2682,
+    "head_sha": null,
+    "install": null,
+    "test_cmd": null
+  },
+  "sides": {
+    "comparison_basis": "merge-base vs PR head (no merge ref available)",
+    "main_sha": "22bf0ef710abf95bd42bb3d4fdbe36ece8ce7123",
+    "pr_sha": "cecc3606d9c76ef84183a2b3599c54a06b4dc84a"
+  },
+  "tested": {
+    "main": "main @ 22bf0ef710ab (merge-base with the PR head)",
+    "pr": "PR head cecc3606d9c7"
+  },
+  "probe_plan": {
+    "baseline": "full",
+    "model": "model provider: nebius (Token Factory, live)",
+    "errors": [],
+    "model_claims": [
+      {
+        "id": "C1",
+        "text": "When a ModelNotReady exception is raised, the API returns a 503 Service Unavailable response with a JSON body instead of a 500 Internal Server Error.",
+        "source_quote": "return 503 for model not ready",
+        "testable": true,
+        "expect": "differs"
+      }
+    ],
+    "model_rejected_claims": [],
+    "diff_targets": [],
+    "frozen": [
+      {
+        "path": "model-probes/model-p1.py",
+        "source": "model",
+        "sha256": "293dd760f055e20ce42f2a441ab6b16c0df91fd47ff2ccbc216c1c00055acfa7",
+        "generator": {
+          "kind": "model",
+          "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+          "model": "nvidia/nemotron-3-super-120b-a12b",
+          "provider": "nebius",
+          "provenance": "live",
+          "blind": true
+        },
+        "frozen_at": "2026-10-22T05:10:59.878261+00:00",
+        "inputs_sha256": "70ec974b78e39a4593bccd942e57f8ad4e5c0c6a691d11c49f2043d577c0e7c1",
+        "inputs": {
+          "title_chars": 62,
+          "body_chars": 208,
+          "base_files": {
+            "truss/templates/control/control/application.py": "5cfa58ba6418be2e39c089fec0b399583c4ea2ba1cbcf202aacece0a2271ef4c"
+          }
+        }
+      }
+    ]
+  },
+  "test_extras": [
+    "pytest-asyncio>=0.23.6,<0.24",
+    "pytest-check>=2.4.1,<3",
+    "pytest-split>=0.10.0"
+  ],
+  "pr_side_started_at": "2026-10-22T05:11:00.002877+00:00",
+  "test_targets": {
+    "main": [
+      "truss/tests/templates/control/control/test_sanitized_exception_middleware.py"
+    ],
+    "pr": [
+      "truss/tests/templates/control/control/test_sanitized_exception_middleware.py"
+    ]
+  },
+  "installed_commit": {
+    "main": {
+      "dist": "truss",
+      "expected": "22bf0ef710abf95bd42bb3d4fdbe36ece8ce7123",
+      "installed": "22bf0ef710abf95bd42bb3d4fdbe36ece8ce7123",
+      "ok": true
+    },
+    "pr": {
+      "dist": "truss",
+      "expected": "cecc3606d9c76ef84183a2b3599c54a06b4dc84a",
+      "installed": "cecc3606d9c76ef84183a2b3599c54a06b4dc84a",
+      "ok": true
+    }
+  },
+  "declared_test_deps": {
+    "requested": [
+      "pytest-asyncio>=0.23.6,<0.24",
+      "pytest-check>=2.4.1,<3",
+      "pytest-split>=0.10.0"
+    ],
+    "installed": true
+  },
+  "probes": {
+    "status": "error",
+    "items": [
+      {
+        "id": "model-p1",
+        "source": "model",
+        "path": "model-probes/model-p1.py",
+        "sha256": "293dd760f055e20ce42f2a441ab6b16c0df91fd47ff2ccbc216c1c00055acfa7",
+        "target": "basetenlabs/truss#2682",
+        "about": "Test the behavior of SanitizedExceptionMiddleware when encountering ModelNotReady vs. other exceptions.",
+        "claims": [
+          {
+            "id": "C1",
+            "source": "PR description",
+            "text": "When a ModelNotReady exception is raised, the API returns a 503 Service Unavailable response with a JSON body instead of a 500 Internal Server Error.",
+            "covers": [
+              "*"
+            ],
+            "expect": "differs"
+          }
+        ],
+        "runs_per_side": 3,
+        "per_run": [
+          {
+            "side": "main",
+            "run": 1,
+            "seconds": 0.0,
+            "ok": false
+          },
+          {
+            "side": "pr",
+            "run": 1,
+            "seconds": 0.0,
+            "ok": false
+          },
+          {
+            "side": "main",
+            "run": 2,
+            "seconds": 0.0,
+            "ok": false
+          },
+          {
+            "side": "pr",
+            "run": 2,
+            "seconds": 0.0,
+            "ok": false
+          },
+          {
+            "side": "main",
+            "run": 3,
+            "seconds": 0.0,
+            "ok": false
+          },
+          {
+            "side": "pr",
+            "run": 3,
+            "seconds": 0.0,
+            "ok": false
+          }
+        ],
+        "outputs": {
+          "main": [
+            "probe-model-p1-main-1.jsonl",
+            "probe-model-p1-main-2.jsonl",
+            "probe-model-p1-main-3.jsonl"
+          ],
+          "pr": [
+            "probe-model-p1-pr-1.jsonl",
+            "probe-model-p1-pr-2.jsonl",
+            "probe-model-p1-pr-3.jsonl"
+          ]
+        },
+        "runs": {
+          "main": [
+            {
+              "probe.error": {
+                "crash": "non-json output",
+                "exit_code": 1
+              }
+            },
+            {
+              "probe.error": {
+                "crash": "non-json output",
+                "exit_code": 1
+              }
+            },
+            {
+              "probe.error": {
+                "crash": "non-json output",
+                "exit_code": 1
+              }
+            }
+          ],
+          "pr": [
+            {
+              "probe.error": {
+                "crash": "non-json output",
+                "exit_code": 1
+              }
+            },
+            {
+              "probe.error": {
+                "crash": "non-json output",
+                "exit_code": 1
+              }
+            },
+            {
+              "probe.error": {
+                "crash": "non-json output",
+                "exit_code": 1
+              }
+            }
+          ]
+        },
+        "observations": [
+          {
+            "name": "probe.error",
+            "state": "same",
+            "label": "not_testable",
+            "claim": "C1",
+            "main": {
+              "crash": "non-json output",
+              "exit_code": 1
+            },
+            "pr": {
+              "crash": "non-json output",
+              "exit_code": 1
+            },
+            "citations": {
+              "main": {
+                "file": "probe-model-p1-main-1.jsonl",
+                "line": 1,
+                "quote": "\"observation\": \"probe.error\""
+              },
+              "pr": {
+                "file": "probe-model-p1-pr-1.jsonl",
+                "line": 1,
+                "quote": "\"observation\": \"probe.error\""
+              }
+            }
+          }
+        ],
+        "generator": {
+          "kind": "model",
+          "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+          "model": "nvidia/nemotron-3-super-120b-a12b",
+          "provider": "nebius",
+          "provenance": "live",
+          "blind": true
+        },
+        "freeze": {
+          "sha256": "293dd760f055e20ce42f2a441ab6b16c0df91fd47ff2ccbc216c1c00055acfa7",
+          "generator": {
+            "kind": "model",
+            "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+            "model": "nvidia/nemotron-3-super-120b-a12b",
+            "provider": "nebius",
+            "provenance": "live",
+            "blind": true
+          },
+          "frozen_at": "2026-10-22T05:10:59.878261+00:00",
+          "inputs_sha256": "70ec974b78e39a4593bccd942e57f8ad4e5c0c6a691d11c49f2043d577c0e7c1",
+          "inputs": {
+            "title_chars": 62,
+            "body_chars": 208,
+            "base_files": {
+              "truss/templates/control/control/application.py": "5cfa58ba6418be2e39c089fec0b399583c4ea2ba1cbcf202aacece0a2271ef4c"
+            }
+          },
+          "verified": true,
+          "pr_started_at": "2026-10-22T05:11:00.002877+00:00"
+        },
+        "probe_changed_line_coverage": {
+          "status": "not measured",
+          "why": "coverage produced no data (exit 1); see probe-coverage.log",
+          "adequacy": "not_adequate",
+          "note": "the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate"
+        },
+        "status": "crashed",
+        "uninformative_reason": "the probe crashed or printed no parsed output on every main-side run"
+      }
+    ],
+    "summary": {
+      "labels": [],
+      "flagged": [],
+      "proven_claims": [],
+      "reason": "the probe crashed or printed no parsed output on every main-side run",
+      "ignored_noise": [],
+      "ignored_warning_only": [],
+      "pr_only_noisy": []
+    }
+  },
+  "probe_changed_line_coverage": {
+    "status": "not measured",
+    "side": "main",
+    "probes": {
+      "model-p1": {
+        "status": "not measured",
+        "changed_lines_covered": null,
+        "changed_lines_total": null,
+        "adequacy": "not_adequate"
+      }
+    },
+    "not_adequate": [
+      "model-p1"
+    ]
+  },
+  "verdict": "could_not_verify",
+  "reason": "tests produced no results on one side (collection failed; see pytest logs); probe model-p1 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count",
+  "verdict_before_coverage_gate": "could_not_verify",
+  "reason_before_coverage_gate": "tests produced no results on one side (collection failed; see pytest logs); probe model-p1 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count",
+  "changed_lines_total": null,
+  "changed_lines_covered": null,
+  "coverage_gate": {
+    "kind": "python",
+    "changed": false,
+    "confidence": "lower",
+    "note": "coverage of the changed Python lines was NOT MEASURED (record predates the coverage gate: no coverage run exists for it, so this is not a measurement result)",
+    "measurement": "not measured: predates gate"
+  },
+  "agents": {
+    "status": "skipped",
+    "note": "advisory swarm is off",
+    "roles": []
+  },
+  "explanation": {
+    "status": "not yet wired",
+    "why": "advisory swarm is off"
+  },
+  "swarm_requested": false,
+  "operator_approval_requested": false,
+  "swarm": "off",
+  "operator_approval": "off",
+  "what_changed": {
+    "package_python_files": [
+      "truss/templates/control/control/application.py",
+      "truss/tests/templates/control/control/test_sanitized_exception_middleware.py"
+    ],
+    "compiled_files": [],
+    "other_files": []
+  },
+  "duration_s": {
+    "total_wall": 113.3,
+    "tests": 14.0
+  },
+  "cost": {
+    "ai_calls": 3,
+    "failed_ai_calls": 0,
+    "input_tokens": 4712,
+    "output_tokens": 17005,
+    "thinking_tokens": 15597,
+    "cost_usd": 0.016718,
+    "calls_without_usage": 0,
+    "ai_cost_usd": 0.016718,
+    "cost_complete": true,
+    "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+    "compute_seconds": {
+      "total_wall": 113.3,
+      "tests": 14.0
+    },
+    "machine_usd_per_hour": 0.24,
+    "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+    "computer_cost_usd": 0.007553,
+    "total_cost_usd": 0.024271,
+    "swarm": {
+      "ai_calls": 0,
+      "failed_ai_calls": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "thinking_tokens": 0,
+      "cost_usd": 0.0,
+      "calls_without_usage": 0,
+      "ai_cost_usd": 0.0,
+      "cost_complete": true,
+      "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+    }
+  },
+  "head_at_report_sha": "cecc3606d9c76ef84183a2b3599c54a06b4dc84a",
+  "head_moved_since_test": false
+}

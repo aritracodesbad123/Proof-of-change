@@ -1,0 +1,1396 @@
+# Reviewer report: home-assistant/core#187588: Add pylint check that __init__ is the first method of a class
+
+Run `core-187588`, tested 2026-10-22 07:53 IST by ops/daily_run.py (route source-pair). Proof-of-Change commit `0fa0016ea51794edee0f4a085e41bf48dd813765`. Report generated 2026-10-22 07:54 IST by reports/pr_report.py.
+
+Baseline: **full** (test comparison + claim probes + coverage gate + claim flagging (differential probes shown, informational)).
+
+> ## ⚪ COULD NOT VERIFY
+>
+> **Recommended action:** Re-run  
+> **Confidence:** Low. The run did not produce a usable comparison, so there is no conclusion about the PR. The run did not finish cleanly, so it says nothing about the PR.
+>
+> Advice only: Proof-of-Change never blocks a merge and never posts on GitHub.
+
+## Summary in plain English
+
+- **What it says it does:** Add pylint check that __init__ is the first method of a class ([home-assistant/core#187588](https://github.com/home-assistant/core/pull/187588)).
+- **What we observed:** install failed (2); see setup-main.log.
+- **What you should do:** Do not decide yet. Fix the problem under 'How to fix' and run the check again.
+
+### Demo helper
+
+These notes are background from the console and the daily check. They do not change the verdict.
+
+If setup fails, the helper retries the install up to 2 times. If a test still can't be verified because something is missing, it installs what's missing and reruns that test once.
+
+- Setup check: GitHub token: present.
+- Setup check: Nebius token: present.
+- Setup check: free memory 6.3 GB (of 15.6 GB).
+- Setup check: free disk 91.7 GB.
+- Demo helper: git is installed.
+- Demo helper: python3 is installed.
+- Demo helper: uv is installed.
+- Looked up with Tavily: 6 results
+- Query: core python setup install instructions https://github.com/home-assistant/core site:github.com/home-assistant/core
+- Query: core python documentation install https://github.com/home-assistant/core site:github.com/home-assistant/core
+- Query: core python install requirements https://pypi.org/project/core/ https://github.com/home-assistant/core site:pypi.org
+- Source: core/pyproject.toml at d09b344c4d66145dc92865d76e8469571b07660a · home-assistant/core · GitHub — https://github.com/home-assistant/core/blob/d09b344c4d66145dc92865d76e8469571b07660a/pyproject.toml
+- Source: core/pyproject.toml at dev · home-assistant/core · GitHub — https://github.com/home-assistant/core/blob/dev/pyproject.toml
+- Source: shepherd-core — https://pypi.org/project/shepherd-core/
+- Source: msgraph-core · PyPI — https://pypi.org/project/msgraph-core/
+- Source: Home Assistant Core 0.111 does not complete a clean install using python virtualenv · Issue #36651 · home-assistant/core · GitHub — https://github.com/home-assistant/core/issues/36651
+- Source: core/.github/workflows/builder.yml at dev · home-assistant/core · GitHub — https://github.com/home-assistant/core/blob/dev/.github/workflows/builder.yml
+- Setup plan: the same packages on main and pr.
+- Setup plan: aiodns is noted, installed with the project.
+- Setup plan: aiogithubapi is noted, installed with the project.
+- Setup plan: aiohttp is noted, installed with the project.
+- Setup plan: aiohttp_cors is noted, installed with the project.
+- Setup plan: aiohttp-fast-zlib is noted, installed with the project.
+- Setup plan: aiohttp-asyncmdnsresolver is noted, installed with the project.
+- Setup plan: aiozoneinfo is noted, installed with the project.
+- Setup plan: annotatedyaml is noted, installed with the project.
+- Setup plan: astral is noted, installed with the project.
+- Setup plan: async-interrupt is noted, installed with the project.
+- Setup plan: attrs is noted, installed with the project.
+- Setup plan: atomicwrites-homeassistant is noted, installed with the project.
+- Setup plan: audioop-lts is noted, installed with the project.
+- Setup plan: awesomeversion is noted, installed with the project.
+- Setup plan: bcrypt is noted, installed with the project.
+- Setup plan: certifi is noted, installed with the project.
+- Setup plan: ciso8601 is noted, installed with the project.
+- Setup plan: cronsim is noted, installed with the project.
+- Setup plan: fnv-hash-fast is noted, installed with the project.
+- Setup plan: hass-nabucasa is noted, installed with the project.
+- Setup plan: httpx2 is noted, installed with the project.
+- Setup plan: home-assistant-bluetooth is noted, installed with the project.
+- Setup plan: ifaddr is noted, installed with the project.
+- Setup plan: Jinja2 is noted, installed with the project.
+- Setup plan: lru-dict is noted, installed with the project.
+- Setup plan: PyJWT is noted, installed with the project.
+- Setup plan: cryptography is noted, installed with the project.
+- Setup plan: Pillow is noted, installed with the project.
+- Setup plan: propcache is noted, installed with the project.
+- Setup plan: pyopenssl is noted, installed with the project.
+- Setup plan: pyserial is noted, installed with the project.
+- Setup plan: orjson is noted, installed with the project.
+- Setup plan: packaging is noted, installed with the project.
+- Setup plan: psutil-home-assistant is noted, installed with the project.
+- Setup plan: python-slugify is noted, installed with the project.
+- Setup plan: PyYAML is noted, installed with the project.
+- Setup plan: requests is noted, installed with the project.
+- Setup plan: securetar is noted, installed with the project.
+- Setup plan: SQLAlchemy is noted, installed with the project.
+- Setup plan: standard-aifc is noted, installed with the project.
+- Setup plan: standard-telnetlib is noted, installed with the project.
+- Setup plan: truststore is noted, installed with the project.
+- Setup plan: typing-extensions is noted, installed with the project.
+- Setup plan: ulid-transform is noted, installed with the project.
+- Setup plan: urllib3 is noted, installed with the project.
+- Setup plan: uv is noted, installed with the project.
+- Setup plan: probatio is noted, installed with the project.
+- Setup plan: yarl is noted, installed with the project.
+- Setup plan: webrtc-models is noted, installed with the project.
+- Setup plan: zeroconf is noted, installed with the project.
+- Setup plan: install gazetteer-matcher==1.1.0 (listed in requirements.txt) on main and pr.
+- Setup plan: install ha-ffmpeg==3.2.2 (listed in requirements.txt) on main and pr.
+- Setup plan: install hassil==3.12.1 (listed in requirements.txt) on main and pr.
+- Setup plan: install home-assistant-intents==2026.10.6 (listed in requirements.txt) on main and pr.
+- Setup plan: install infrared-protocols==10.3.0 (listed in requirements.txt) on main and pr.
+- Setup plan: install mutagen==1.48.1 (listed in requirements.txt) on main and pr.
+- Setup plan: install pymicro-vad==1.0.1 (listed in requirements.txt) on main and pr.
+- Setup plan: install pyspeex-noise==1.0.2 (listed in requirements.txt) on main and pr.
+- Setup plan: install PyTurboJPEG==1.8.3 (listed in requirements.txt) on main and pr.
+- Setup plan: install rf-protocols==4.3.0 (listed in requirements.txt) on main and pr.
+- Setup plan: install AEMET-OpenData==0.6.4 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install AIOSomecomfort==0.0.38 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install Adax-local==0.3.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install DoorBirdPy==3.0.12 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install HAP-python==5.0.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install HATasmota==0.10.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install HueBLE==2.2.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install Mastodon.py==2.3.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install Netio==2.0.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install PSNAWP==3.0.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install PlexAPI==4.18.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install ProgettiHWSW==0.1.4 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install PyChromecast==14.0.10 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install PyFlume==0.6.5 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install PyFronius==0.8.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install PyLoadAPI==2.1.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install PyMetEireann==2024.11.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install PyMetno==0.13.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install PyMicroBot==0.0.23 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install PyNaCl==1.6.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install PyQRCode==1.2.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install PyRMVtransport==0.3.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install PySrDaliGateway==0.21.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install PySwitchbot==3.1.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install PySwitchmate==0.5.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install PySyncThru==0.8.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install PyTransportNSW==0.1.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install PyViCare==2.63.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install PyXiaomiGateway==0.14.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install RachioPy==1.1.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install RestrictedPython==8.5 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install Tami4EdgeAPI==3.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install TwitterAPI==2.7.12 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install WSDiscovery==2.1.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install accuweather==5.1.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install actron-neo-api==0.5.16 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install adax==0.4.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install adb-shell[async]==0.4.4 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install adext==0.4.7 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install adguardhome==1.0.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install advantage-air==0.4.4 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install afsapi==1.0.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install agent-py==0.0.24 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aio-geojson-generic-client==0.5 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aio-geojson-geonetnz-quakes==0.16 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aio-geojson-geonetnz-volcano==0.9 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aio-geojson-nsw-rfs-incidents==0.7 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aio-geojson-usgs-earthquakes==0.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aio-georss-gdacs==0.10 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aio-ownet==0.1.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aio-wattwaechter==1.2.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aioacaia==0.2.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aioairq==0.4.8 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aioairzone-cloud==0.7.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aioairzone==1.0.5 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aioamazondevices==16.8.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aioambient==2024.08.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aioanylist==1.0.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aioapcaccess==1.0.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aioaquacell==1.0.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aioaquarite==0.13.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aioaseko==1.0.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aioasuswrt==1.5.4 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aioautomower==3.1.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aioaxlevpp==0.2.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aioazuredevops==2.2.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aiobafi6==0.9.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aiobotocore==3.7.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aiocentriconnect==0.2.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aiocomelit==3.0.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aiodhcpwatcher==1.2.7 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aiodiscover==3.3.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aioeafm==0.1.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aioeagle==1.1.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aioecosmart==0.1.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aioecowitt==2026.6.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aioelectricitymaps==1.1.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aioemonitor==1.0.5 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aioengiebelgium==0.8.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aioesphomeapi==46.12.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aiofiles==25.1.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aioflo==2026.9.4 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aioftp==0.21.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aioghost==0.4.16 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aioguardian==2026.01.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aioharmanluxury==0.2.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aioharmony==1.0.10 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aiohasupervisor==0.7.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aiohomeconnect==0.39.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aiohomekit==4.0.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aiohortos==0.3.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aiohpprinter==2.0.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aiohttp_sse==2.2.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aiohue==4.9.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aioimaplib==2.0.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aioimmich==0.18.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aioindiallsky==0.1.6 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aioipp==0.20.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aiokafka==0.10.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aiokarakeep==0.3.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aiokef==0.2.16 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aiokem==1.0.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aiolibrenms==0.0.4 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aiolichess==1.3.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aiolookin==1.0.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aiolyric==2.2.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aiomealie==2.1.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aiomelcloudhome==0.3.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aiomodernforms==0.3.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aiomusiccast==0.15.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aionanoleaf2==1.2.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aionatureremo==0.4.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aionotion==2024.03.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aiontfy==0.8.5 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aionut==4.3.4 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aioonkyo==0.4.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aioopenexchangerates==0.6.8 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aiooui==0.1.9 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aiopegelonline==0.1.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aiopnsense==1.0.10 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aiopowerwall==0.6.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aioptdevices==2026.03.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aiopulse==0.4.7 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aiopurpleair==2025.08.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aiopvapi==3.4.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aiopyarr==23.4.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aioqsw==0.4.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aioraven==0.7.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aiorecollect==2023.09.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aioridwell==2025.09.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aiortm==0.20.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aioruckus==0.46.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aiorussound==5.0.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aioruuvigateway==0.1.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aioshelly==13.35.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aioskybell==23.12.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aioslimproto==3.0.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aiosmtplib==5.1.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aiosolaredge==1.0.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aiosteamist==1.0.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aiostreammagic==2.13.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aioswitcher==6.1.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aiosyncthing==0.7.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aiotankerkoenig==0.5.5 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aiotedee==0.3.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aiothreema==0.2.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aiotractive==1.3.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aiounifi==97 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aiousbwatcher==1.1.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aiovitesy==1.4.4 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aiovlc==0.5.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aiovodafone==3.3.5 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aiowaqi==3.1.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aiowatttime==2024.6.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aiowebdav2==0.6.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aiowebostv==0.10.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aiowithings==3.1.6 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aioymaps==1.2.5 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install airgradient==0.11.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install airly==1.1.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install airos==0.6.13 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install airpatrol==0.1.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install airthings-ble==1.3.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install airthings-cloud==0.2.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install airtouch4pyapi==1.0.5 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install airtouch5py==0.4.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install alpha-vantage==2.3.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install altruistclient==0.1.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install amberelectric==2.0.12 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install amcrest==1.9.9 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install androidtv[async]==0.0.75 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install androidtvremote2==0.3.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install anel-pwrctrl-homeassistant==0.0.1.dev2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install anova-wifi==1.0.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install anthemav==1.4.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install anthropic==1.15.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install anyio==4.15.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install apple_weatherkit==1.1.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install apprise==1.11.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aprslib==0.7.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install apsystems-ez1==2.7.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aqualogic==2.6 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aranet4==2.6.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install arcam-fmj==3.0.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install arris-tg2492lg==2.2.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install arwn-client==0.2.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install asusrouter==1.21.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install async-upnp-client==0.49.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install asyncarve==0.1.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install asyncinotify==4.4.4 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install asyncpysupla==0.0.5 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install asyncsleepiq==1.7.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install asyncssh==2.24.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install auroranoaa==0.0.5 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install aurorapy==0.2.7 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install autarco==3.2.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install automower-ble==0.2.9 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install autoskope_client==1.4.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install av==19.0.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install avea==1.8.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install axis==74 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install ayla-iot-unofficial==1.5.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install azure-eventhub==5.11.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install azure-kusto-data[aio]==4.5.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install azure-kusto-ingest==4.5.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install azure-servicebus==7.15.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install azure-storage-blob==12.24.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install b2sdk==2.10.4 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install babel==2.18.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install baidu-aip==1.6.6 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install base36==0.1.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install batinfo==0.4.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install beautifulsoup4==4.13.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install besen==0.6.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install bitvis-protobuf==2.0.4 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install bizkaibus==0.1.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install bleak-esphome==4.0.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install bleak-retry-connector==4.7.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install bleak-smlight==1.1.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install bleak==3.0.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install blebox-uniapi==2.5.9 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install blinkpy==0.25.9 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install blockchain==1.4.4 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install bluecurrent-api==1.3.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install bluemaestro-ble==0.4.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install bluetooth-adapters==2.4.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install bluetooth-auto-recovery==1.6.4 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install bluetooth-data-tools==1.29.24 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install bond-async==0.2.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install bosch-alarm-mode2==0.4.11 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install boschshcpy==0.6.20 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install boto3==1.42.97 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install bring-api==1.1.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install broadlink-async==1.1.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install brother==6.2.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install brottsplatskartan==1.0.5 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install brunt==1.2.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install bthome-ble==3.23.4 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install bthomehub5-devicelist==0.1.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install btsmarthub-devicelist==0.2.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install buienradar==1.0.9 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install cached-ipaddress==1.1.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install caldav==3.5.0a0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install chefiq-ble==1.0.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install chess-com-api==1.1.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install cielo-connect-api==1.0.6 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install ciscomobilityexpress==0.3.9 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install clearpasspy==1.0.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install clx-sdk-xms==1.0.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install coinbase-advanced-py==1.2.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install colorlog==6.10.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install colorthief==0.2.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install compit-inext-api==0.9.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install concord232==0.15.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install connect-box==0.3.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install construct==2.10.68 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install cookidoo-api==0.18.4 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install crownstone-cloud==1.4.11 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install crownstone-sse==2.0.5 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install crownstone-uart==2.1.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install data-grand-lyon-ha==0.9.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install datadog==0.52.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install datapoint==0.12.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install dbus-fast==5.0.22 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install debugpy==1.8.22 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install decora-wifi==1.4 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install deebot-client==18.7.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install defusedxml==0.7.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install deluge-client==1.10.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install demetriek==2.1.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install denon-rs232==4.3.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install denonavr==1.3.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install devialet==1.5.7 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install devolo-home-control-api==0.19.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install devolo-plc-api==1.6.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install dio-chacon-wifi-api==1.3.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install directv==0.4.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install discogs-client==2.3.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install discovery30303==0.3.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install dremel3dpy==2.1.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install dropmqttapi==1.0.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install dsmr-parser==1.11.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install dwdwfsapi==1.1.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install dynalite-devices==0.1.47 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install dynalite-panel==0.0.4 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install eagle100==0.1.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install earn-e-p1==0.3.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install easyenergy==3.0.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install ebusdpy==0.0.17 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install ecoaliface==0.4.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install egauge-async==0.4.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install eheimdigital==1.7.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install ekey-bionyxpy==1.0.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install electrickiwi-api==0.9.14 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install elevenlabs==2.51.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install elgato==6.1.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install elkm1-lib==2.2.15 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install elkoep-aio-mqtt==0.1.0b4 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install elmax-api==0.0.6.4rc0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install elvia==0.1.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install emoji==2.8.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install emulated-roku==0.3.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install energieleser==0.1.7 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install energyflip-api-client==0.3.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install energyid-webhooks==0.0.16 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install energyzero==5.1.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install enocean-async==0.4.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install enturclient==0.2.4 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install env-canada==0.20.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install ephem==4.1.6 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install epicstore-api==0.1.9 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install epion==0.0.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install epson-projector==0.6.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install eq3btsmart==2.3.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install esios_api==4.4.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install esphome-dashboard-api==1.4.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install essent-dynamic-pricing==0.3.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install eternalegypt==0.0.18 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install eufylife-ble-client==0.1.10 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install eurotronic-cometblue-ha==2.0.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install evohome-async==3.1.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install evolutionhttp==0.0.19 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install faadelays==2023.9.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install fastdotcom==0.0.6 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install feedparser==6.0.12 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install file-read-backwards==2.0.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install fing_agent_api==1.1.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install fints==3.1.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install fish-audio-sdk==1.1.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install fitbit-web-api==2.13.5 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install fitbit==0.3.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install fivem-api==0.1.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install fixerio==1.0.0a0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install fjaraskupan==2.3.4 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install flexit-modbus==0.1.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install flexit_bacnet==2.2.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install flipr-api==1.6.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install flow-it-api==0.0.1.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install fluss-api==0.2.5 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install flux-led==1.2.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install foobot_async==1.0.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install forecast-solar==5.0.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install fortiosapi==1.0.5 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install freebox-api==1.3.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install freesms==0.2.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install fressnapftracker==0.3.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install fritzconnection[qr]==1.15.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install fronius-modbus==0.2.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install fumis==0.4.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install fyta_cli==0.7.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install gTTS==2.5.4 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install gardena-bluetooth==2.10.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install gassist-text==0.1.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install gatus-api==1.2.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install gcal-sync==9.2.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install genie-partner-sdk==1.0.11 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install geniushub-client==0.7.4 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install geocachingapi==0.3.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install geopy==2.5.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install georss-generic-client==0.8 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install georss-ign-sismologia-client==0.8 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install georss-qld-bushfire-alert-client==0.8 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install getmac==0.9.5 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install gios==7.1.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install glances-api==0.10.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install go2rtc-client==0.4.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install goalzero==0.2.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install goodwe==0.4.10 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install google-api-python-client==2.71.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install google-cloud-pubsub==2.39.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install google-cloud-speech==2.40.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install google-cloud-texttospeech==2.37.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install google-genai==2.25.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install google-health-api==0.9.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install google-maps-routing==0.11.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install google-nest-sdm==9.2.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install google-photos-library-api==0.12.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install google_air_quality_api==3.0.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install googlewifiapi==0.1.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install goslide-api==0.7.4 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install gotailwind==0.4.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install govee-ble==1.4.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install govee-local-api==3.1.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install gpiozero==1.6.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install gps3==0.33.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install grandstream-home-api==0.1.7 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install greeclimate==3.5.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install greencell_client==1.0.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install greeneye_monitor==3.0.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install greenplanet-energy-api==0.1.10 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install gridnet==5.0.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install growattServer==2.2.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install gspread==6.2.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install guntamatic==1.12.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install guppy3==3.1.7 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install h2==4.4.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install ha-iotawattpy==0.3.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install ha-philipsjs==3.3.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install ha-silabs-firmware-client==0.3.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install ha-xthings-cloud==1.0.5 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install habiticalib==0.4.7 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install habluetooth==7.1.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install hanna-cloud==0.0.7 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install harbor-python==1.5.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install hass-splunk==0.1.4 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install haveniaq==0.1.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install hdate[astral]==1.2.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install hdfury==1.6.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install heatmiserV3==2.0.6 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install hegel-ip-client==0.1.4 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install here-routing==1.2.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install here-transit==1.2.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install hikvision==0.4 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install hkavr==0.0.5 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install hko==0.3.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install hlk-sw16==0.0.9 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install hole==0.9.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install holidays==0.106 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install home-assistant-frontend==20260930.4 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install homekit-audio-proxy==1.2.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install homelink-integration-api==0.1.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install homematicip==2.19.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install homevolt==0.7.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install horimote==0.4.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install huawei-lte-api==1.11.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install huum==0.8.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install hydropeak-opendata==0.2.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install hyperion-py==0.7.6 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install hyponcloud==1.0.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install iammeter==0.2.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install iaqualink==0.7.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install ibeacon-ble==1.2.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install ical==14.3.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install icalendar==6.3.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install icmplib==3.0.4 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install idasen-ha==3.0.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install idrive-e2-client==0.1.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install iglo==1.2.7 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install igloohome-api==0.1.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install ihcsdk==2.8.12 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install imeon_inverter_api==0.4.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install imgw_pib==2.5.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install incomfort-client==0.7.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install indevolt-api==1.8.8 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install influxdb-client==1.50.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install influxdb==5.3.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install inkbird-ble==1.7.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install insteon-frontend-home-assistant==0.7.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install intellifire4py==4.5.6 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install iometer==1.0.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install iottycloud==0.3.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install iperf3==0.1.11 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install irm-kmi-api==1.1.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install isal==1.8.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install iseo-argo-ble==0.9.10 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install ismartgate==5.0.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install israel-rail-api==0.1.5 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install jaraco.abode==6.4.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install jellyfin-apiclient-python==1.19.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install jsonpath-python==1.1.6 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install justnimbus==0.7.4 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install kaco-modbus==1.1.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install kaco-serial==1.0.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install kaiterra-async-client==1.1.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install keba-kecontact==1.3.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install kegtron-ble==1.0.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install kiosker-python-api==1.2.9 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install kiwiki-client==0.1.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install knocki==0.4.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install knx-frontend==2026.10.5.160528 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install knx-telegram-store[sqlite,postgres]==0.15.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install krakenex==2.2.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install lacrosse-view==1.1.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install lakeside==0.13 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install laundrify-aio==1.2.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install lcn-frontend==0.2.9 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install ld2410-ble==0.1.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install leaone-ble==0.3.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install led-ble==1.1.11 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install lektricowifi==0.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install letpot==0.7.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install lg-rs232-tv==1.3.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install libpyfoscamcgi==0.0.9 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install libpyvivotek==0.6.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install librehardwaremonitor-api==1.12.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install librouteros==4.2.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install libsoundtouch==0.8 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install lifx-async==7.10.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install lighthouse-ble==0.2.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install lightify==1.0.7.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install lightwave==0.24 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install limitlessled==1.1.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install livisi==1.0.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install locationsharinglib==5.0.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install lojack-api==0.7.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install london-tube-status==0.7 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install loqedAPI==2.1.16 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install lorawan-connection==1.2.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install luftdaten==0.7.4 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install lunatone-rest-api-client==0.11.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install lupupy==0.3.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install lw12==0.9.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install lxml==6.1.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install lyngdorf==2.2.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install marantz-rs232==2.1.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install matrix-nio==0.26.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install matter-ble-proxy==0.7.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install matter-python-client==1.4.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install maxcube-api==0.4.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install mbddns==0.1.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install mcp==2.3.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install mcstatus==14.2.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install meater-python==0.0.8 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install medcom-ble==0.1.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install melnor-bluetooth==0.0.25 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install messagebird==1.2.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install meteo-lt-pkg==0.7.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install meteoalertapi==0.3.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install meteofrance-api==1.5.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install mficlient==0.5.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install micloud==0.5 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install microBeesPy==0.3.5 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install midea-local==13.0.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install mill-local==0.5.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install millheater==0.14.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install minio==7.1.12 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install mitsubishi-comfort==0.6.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install moat-ble==0.1.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install modbus-connection[tmodbus]==4.12.4 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install moehlenhoff-alpha2==1.4.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install momonga==0.7.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install monarchmoneycommunity==1.6.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install monzopy==1.8.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install mopeka-iot-ble==0.8.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install motionblinds==0.6.30 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install motionblindsble==0.1.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install motioneye-client==0.4.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install mozart-api==6.2.0.44.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install mullvad-api==1.0.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install music-assistant-client==1.6.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install mutesync==0.0.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install mvg==1.6.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install my-pv==0.0.14 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install myuplink==0.7.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install nad-receiver==0.4.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install ndms2-client==0.1.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install neopool-modbus==4.13.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install nessclient==1.3.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install netdata==1.3.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install netmap==0.7.0.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install nettigo-air-monitor==5.1.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install neurio==0.3.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install nexblue-api==0.1.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install nexia==2.13.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install nextcloudmonitor==1.5.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install nextcord==3.1.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install nextdns==5.2.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install nhc==0.8.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install nibe==2.25.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install nice-go==1.0.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install niluclient==0.1.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install noaa-coops==0.4.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install notifications-android-tv==0.1.5 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install notify-events==1.0.4 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install nrgkick-api==1.8.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install nsapi==3.1.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install nsw-fuel-api-client==1.1.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install nuheat==1.0.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install numato-gpio==0.13.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install numpy==2.3.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install nyt_games==1.0.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install oasatelematics==0.4 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install oauth2client==4.1.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install objgraph==3.5.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install odp-amsterdam==6.1.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install oemthermostat==1.1.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install ohme==1.9.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install okokscale==0.0.4 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install ollama==0.6.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install omnilogic==0.4.9 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install ondilo==0.5.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install onedrive-personal-sdk==0.2.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install onvif-zeep-async==4.3.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install onvif_parsers==2.5.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install open-garage==0.3.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install open-meteo==1.0.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install openai==3.26.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install openerz-api==0.3.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install openhomedevice==2.5 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install openrgb-python==0.3.8 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install opensensemap-api==0.4.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install openwebifpy==4.3.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install openwrt-luci-rpc==1.1.17 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install openwrt-ubus-rpc==0.0.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install opower==0.22.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install oralb-ble==1.1.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install orvibo==1.1.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install ouman-eh-800-api==1.1.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install ourgroceries==1.6.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install ovoenergy==3.0.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install p1monitor==3.2.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install paho-mqtt==2.1.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pajgps-api==0.4.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install panacotta==0.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install panasonic-viera==0.4.6 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pdunehd==1.3.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install peblar==2.1.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install peco==0.1.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pencompy==0.0.4 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pescea==1.0.12 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pexpect==4.9.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install phone-modem==0.1.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pigpio==1.78 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install plexauth==0.0.6 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install plexwebsocket==0.0.14 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install plugwise==1.14.7 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pmsensor==0.4 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install poolsense==0.1.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install powerfox==2.1.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install prana-api-client==0.12.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install praw==7.5.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install prayer-times-calculator-offline==1.0.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install proliphix==0.4.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install prometheus-client==0.21.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install prowlpy==1.1.5 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install proxmoxer==2.3.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install psutil==7.2.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pulsectl==23.5.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pushbullet.py==0.11.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pushover_complete==1.2.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pvo==4.0.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install py-aosmith==1.0.18 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install py-canary==0.5.4 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install py-cpuinfo==9.0.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install py-dactyl==2.1.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install py-dormakaba-dkey==1.0.6 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install py-improv-ble-client==2.0.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install py-madvr2==1.9.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install py-melissa-climate==3.0.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install py-nextbusnext==2.3.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install py-nightscout==1.2.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install py-nymta==0.4.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install py-opendisplay==7.18.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install py-schluter==0.1.7 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install py-sucks==0.9.11 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install py-synologydsm-api==2.11.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install py-unifi-access==1.6.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyAtome==0.1.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyCEC==0.5.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyControl4==2.0.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyDuotecno==2024.10.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyElectra==1.2.8 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyEmby==1.10 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyHik==0.4.8 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyHomee==1.4.6 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyRFXtrx==0.34.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pySDCP==1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyTibber==0.37.6 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyW215==0.8.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyW800rf32==0.4 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install py_ccm15==1.1.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install py_vapid==1.9.4 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyads==3.4.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyaehw4a1==0.3.9 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyaftership==21.11.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyairnow==1.4.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyairobotrest==0.4.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyairvisual==2023.08.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyanglianwater==3.3.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyaprilaire==0.9.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyaqvify==0.0.12 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyatag==0.3.7.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyatmo==9.9.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyatv==0.18.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyaussiebb==0.1.5 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyaxencoapi==1.0.7 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pybalboa==1.1.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pybbox==0.0.5-alpha (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyblackbird==0.10 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyblu==2.2.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pybotvac==0.0.29 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pybraendstofpriser==2.2.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pybravia==0.5.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pycarwings2==2.14 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pycasperglow==1.2.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pycfdns==3.0.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pychannels==1.2.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pycketcasts==1.0.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pycmus==0.1.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pycomfoconnect==0.5.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pycoolmasternet-async==0.2.6 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pycsspeechtts==1.0.8 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pycync==0.6.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pydaikin==2.20.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pydanfossair==1.0.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pydeako==0.6.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pydeconz==120 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pydelijn==1.1.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pydexcom==0.5.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pydiscovergy==3.0.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pydoods==1.0.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pydrawise==2026.10.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pydroid-ipcam==3.0.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pydroplet==2.5.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyebox==1.1.4 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyecoforest==0.4.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyeconet==0.3.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyecotrend-ista==3.4.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyedimax==0.2.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyefergy==22.5.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyegps==0.2.5 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyemoncms==0.1.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyenphase==4.0.6 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyenvertechevt800==0.2.4 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyenvisalink==4.9 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyephember2==0.4.12 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyeverlights==0.1.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyevilgenius==2.0.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyezvizapi==1.0.5.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyfibaro==0.8.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyfido==2.1.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyfirefly==0.1.12 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyfireservicerota==0.0.49 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyflic==2.0.4 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyfnip==0.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyforked-daapd==0.1.14 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyfreedompro==1.1.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyfreshr==1.2.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyfritzhome==0.6.21 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyfttt==0.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pygatt[GATTTOOL]==4.0.5 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pygeosphere-warnings==0.1.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pygtfs==0.1.11 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pygti==1.1.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyhaseiq==0.2.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyhaversion==22.8.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyhelty==0.2.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyheltycloud==0.2.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyheos==1.0.6 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyhive-integration==1.0.9 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyhomematic==0.1.78 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyhomeworks==1.1.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyialarm==2.2.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyicloud==2026.10.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyimouapi==1.4.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyinsteon==1.7.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyintelliclima==0.5.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyintesishome==2.5.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyipma==3.0.10 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyiqvia==2022.04.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyirishrail==0.0.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyiskra==0.1.29 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyiss==1.0.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyisy==3.8.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyitachip2ir2==0.0.8 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyituran==0.1.6 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyjvcprojector==2.1.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pykaleidescape==1.2.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pykira==0.1.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pykmtronic==0.3.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pykodi==0.2.7 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pykoplenti==1.5.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pykrakenapi==0.1.9 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pykulersky==0.5.8 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pykwb==0.0.8 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pylacrosse==0.4 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pylamarzocco==2.5.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pylast==5.1.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pylaunches==2.0.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pylgnetcast==0.3.9 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pylibrespot-java==0.1.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyliebherrhomeapi==0.5.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pylitejet==0.6.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pylitterbot==2025.7.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pylutron-caseta==0.29.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pylutron==0.4.4 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pymailgunner==1.4 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pymata-express==1.19 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pymediaroom==0.6.5.4 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pymeteoclimatic==0.1.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pymiele==0.6.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pymitv==1.4.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pymochad==0.2.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pymodbus==3.13.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pymonoprice==0.6.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pymysensors==0.26.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pynecil==4.2.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pynetgear==0.10.10 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pynetio==0.1.9.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pynina==1.0.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pynintendoauth==1.0.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pynintendoparental==2.6.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pynobo==1.9.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pynordpool==0.4.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pynuki==1.6.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pynws[retry]==1.8.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pynx584==0.8.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pynzbgetapi==0.2.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyobihai==1.4.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyoctoprintapi==0.1.14 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyombi==0.1.10 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyomie==1.1.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyopenuv==2023.02.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyopenweathermap==0.2.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyoppleio-legacy==1.0.8 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyosoenergyapi==1.2.4 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyotgw==2.2.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyotp==2.10.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyoverkiz[nexity]==2.2.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pypalazzetti==0.1.20 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pypaperless==5.2.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pypca==0.0.7 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pypck==0.9.13 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pypglab==0.0.5 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pypjlink2==1.2.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyplaato==0.0.19 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pypoint==3.0.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyportainer==1.0.49 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyprobeplus==2.1.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyprof2calltree==1.4.5 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyprosegur==0.0.14 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyprusalink==3.0.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyps4-2ndscreen==1.3.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyqvrpro==0.52 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyqwikswitch==0.93 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyrail==0.4.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyrainbird==6.6.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyrate-limiter==4.5.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyrecswitch==1.0.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyrejseplan==1.0.9 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyrepetierng==0.1.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyrisco==0.8.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyroute2==0.9.6 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyrympro==0.0.9 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pysabnzbd==1.1.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pysaj==0.0.16 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pysaunum==0.7.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyschlage==2026.9.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyscorpiontrack==0.1.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pysensibo==1.2.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pysenz==1.1.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pysesame2==1.0.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyseventeentrack==1.2.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pysiaalarm==3.2.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pysignalclirestapi==0.3.25 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pysillaprism==0.2.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyskyqhub==0.1.4 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pysma==1.1.9 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pysmappee==0.2.29 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pysmarlaapi==1.0.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pysmartthings==4.0.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pysmarty2==0.10.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pysmartyplants==0.2.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pysmhi==2.0.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pysml==0.1.8 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pysmlight==0.5.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pysnmp==7.1.27 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pysnooz==0.10.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pysoma==0.0.12 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pysomfymylink==1.0.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyspcwebgw==0.7.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pysqueezebox==0.14.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pystiebeleltron==0.9.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pysuezV2==2.0.8 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyswitchbee==1.8.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pytautulli==23.1.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyteleinfo==0.4.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pythinkingcleaner==0.0.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install python-MotionMount==2.3.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install python-aidot==0.3.59 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install python-awair==0.2.5 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install python-blockchain-api==0.0.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install python-bsblan==6.1.10 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install python-citybikes==0.3.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install python-digitalocean==1.13.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install python-dropbox-api==0.1.6 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install python-duco-connectivity==0.18.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install python-ecobee-api==0.4.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install python-family-hub-local==0.0.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install python-fullykiosk==0.0.15 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install python-gc100==1.0.3a0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install python-gitlab==1.6.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install python-google-drive-api==0.2.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install python-google-weather-api==0.0.8 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install python-homeassistant-analytics==0.9.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install python-homewizard-energy==10.2.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install python-hotspring==3.1.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install python-hpilo==4.4.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install python-izone==1.3.11 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install python-join-api==0.1.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install python-kasa[speedups]==0.11.0.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install python-linkplay==0.2.14 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install python-melcloud==0.1.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install python-miio==0.5.12 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install python-mpd2==3.1.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install python-mystrom==2.5.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install python-open-router==0.4.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install python-opendata-transport==0.5.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install python-openevse-http==1.8.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install python-opensky==1.0.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install python-otbr-api==3.1.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install python-overseerr==0.9.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install python-picnic-api2==2.0.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install python-pooldose==0.9.10 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install python-qube-heatpump==1.17.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install python-rabbitair==0.0.8 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install python-ripple-api==0.0.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install python-roborock==7.12.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install python-smarttub==0.0.47 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install python-sn2==0.4.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install python-snoo==0.8.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install python-songpal==0.16.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install python-swisscom-internet-box==0.2.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install python-tado==0.18.16 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install python-technove==2.1.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install python-telegram-bot[socks]==22.7 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install python-xbox==0.4.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pythonegardia==1.0.52 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pythonkuma==0.5.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pytile==2024.12.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pytomorrowio==0.3.6 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pytouchline_extended==0.4.5 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pytouchlinesl==0.6.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pytraccar==3.0.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pytradfri[async]==14.0.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pytrafikverket==2.0.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pytrydan==1.0.5 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyuptimerobot==25.0.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyvera==0.3.16 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyversasense==0.0.6 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyvesync==3.4.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyvlx==0.2.36 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyvolumio==0.1.5 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pywaze==1.2.4 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyweatherflowudp==1.7.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pywebpush==2.3.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pywemo==1.4.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pywilight==0.0.74 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pywillow==0.1.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pywizlight==0.6.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pywmspro==0.4.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyws66i==1.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyxeoma==1.4.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyyardian==1.4.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyzbar==0.1.9 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyzerproc==0.4.8 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install pyzonneplan==0.3.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install qbittorrent-api==2026.5.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install qbusmqttapi==1.5.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install qingping-ble==1.1.6 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install qnapstats==0.6.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install quantum-gateway==0.0.8 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install radios==2.0.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install radiotherm==2.1.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install rapt-ble==2.0.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install raspyrfm-client==1.2.9 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install redgtech-api==0.1.38 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install refoss-ha==1.2.6 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install regenmaschine==2024.03.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install renault-api==0.6.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install renson-endura-delta==1.7.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install reolink-aio==0.21.18 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install rfk101py==0.0.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install rflink==0.0.68 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install ring-doorbell==0.9.14 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install ritassist==0.9.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install ritualsgenie==0.1.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install rocketchat-API==0.6.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install rokuecp==0.19.5 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install romy==0.0.10 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install roombapy==2.0.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install roonapi==0.1.6 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install rova==0.4.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install rpi-bad-power==0.1.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install ruuvitag-ble==0.4.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install rxv==0.7.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install samsung-exlink==1.2.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install samsungctl[websocket]==0.7.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install samsungtvws[async,encrypted]==3.0.6 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install sanix==1.0.6 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install satel-integra==1.6.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install screenlogicpy==0.10.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install sendgrid==6.8.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install sense-energy==0.15.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install sensecap-lorawan==1.0.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install sensirion-ble==0.1.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install sensorpro-ble==0.7.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install sensorpush-api==2.1.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install sensorpush-ble==1.9.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install sensorpush-ha==1.3.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install sensoterra==2.0.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install sentence-stream==1.3.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install sentry-sdk==2.48.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install serialx==1.14.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install sfrbox-api==0.2.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install sharkiq==1.5.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install sharp_aquos_rc==0.3.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install shodan==1.28.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install simplefin4py==0.0.18 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install simplehound==0.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install simplepush[legacy]==3.8.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install simplisafe-python==2026.06.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install sisyphus-control==3.1.4 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install skoda-public-api==1.3.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install skyboxremote==0.0.6 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install slack_sdk==3.33.4 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install slixmpp==1.17.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install smart-meter-texas==0.5.6 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install snapcast==2.3.8 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install soco==0.31.5 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install sofar-modbus==0.25.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install solaredge-web==0.5.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install solaredged==0.5.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install solarlog_cli==0.7.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install solarman-opendata==0.0.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install solax==3.2.4 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install sonos-websocket==0.2.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install speak2mary==1.4.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install specialized-turbo[cloud]==0.8.4 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install speedtest-cli==2.1.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install spinev-ble[bleak]==0.5.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install spotifyaio==2.0.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install sqlparse==0.6.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install srpenergy==1.3.8 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install starline==0.1.5 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install starlingbank==3.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install starlink-grpc-core==1.2.5 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install statsd==3.2.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install steamloop==1.2.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install steamodd==5.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install stookwijzer==1.6.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install streamlabswater==1.0.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install subarulink==0.7.21 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install sunsynk-api-client==1.4.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install surepy==0.10.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install swisshydrodata==0.1.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install switchbot-api==2.13.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install synology-srm==0.2.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install systembridgeconnector==5.12.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install tailscale==1.0.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install tank-utility==1.5.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install tapsaff==0.2.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install tellcore-net==0.4 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install tellcore-py==1.1.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install tellduslive==0.10.12 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install teltasync==0.4.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install temescal==0.5 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install temperusb==1.6.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install tesla-fleet-api==1.18.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install tesla-powerwall==0.5.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install tesla-wall-connector==1.2.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install teslemetry-stream==1.3.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install tessie-api==0.1.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install theben-conexa-smgw==0.4.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install thermobeacon-ble==0.10.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install thermopro-ble==1.1.4 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install thingspeak==1.0.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install thinqconnect==1.0.14 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install tilt-ble==1.0.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install tilt-pi==0.2.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install tmb==0.0.4 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install tmodbus==0.6.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install todoist-api-python==3.1.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install togrill-bluetooth==0.9.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install tololib==1.2.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install tonewinner-rs232==1.3.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install toonapi==0.3.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install total-connect-client==2026.9 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install tplink-omada-client==1.5.13 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install transmission-rpc==7.0.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install triggercmd==0.0.36 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install trmnl==0.1.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install ttls==1.11.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install ttn_client==1.3.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install tuya-device-handlers==0.0.31 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install tuya-device-sharing-sdk==0.2.15 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install twentemilieu==3.0.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install twilio==6.32.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install twitchAPI==4.2.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install uasiren==0.0.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install uhooapi==1.2.8 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install uiprotect==23.9.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install ultraheat-api==0.6.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install unifi-discovery==1.5.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install unifi_ap==0.0.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install universal-silabs-flasher==1.1.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install upb-lib==0.7.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install upcloud-api==2.9.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install url-normalize==3.0.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install uvcclient==0.12.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install vacuum-map-parser-roborock==0.1.5 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install vallox-websocket-api==6.1.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install vegehub==0.1.26 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install vehicle==3.0.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install velbus-aio==2026.9.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install venstarcolortouch==0.22 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install viaggiatreno_ha==0.2.4 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install victron-ble-ha-parser==0.8.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install victron-mqtt==2026.9.5 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install victron-vrm==0.1.13 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install vilfo-api-client==0.5.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install visionpluspython==1.1.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install vizaio==0.7.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install vobject==0.9.9 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install voip-utils==0.5.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install volkszaehler==0.4.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install volvocarsapi==0.4.4 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install vsure==2.10.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install vtjp==0.2.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install wakeonlan==3.3.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install wallbox==0.9.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install watchdog==6.0.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install waterfurnace==1.10.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install watergate-local-api==2026.2.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install weatherflow4py==1.5.12 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install webexpythonsdk==2.0.6 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install webio-api==0.1.12 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install webmin-xmlrpc==0.0.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install weheat==2026.9.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install whirlpool-sixth-sense==2.1.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install whoisdomain==2.20260806.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install wiffi==1.1.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install wiim==0.3.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install wirelesstagpy==0.8.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install wled==1.1.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install wolf-comm==0.0.52 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install wsdot==0.0.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install wyoming==1.10.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install xiaomi-ble==1.21.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install xiaomi-weather==0.1.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install xknx==4.0.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install xknxproject==3.10.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install xmltodict==1.0.4 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install xs1-api-client==3.0.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install yalesmartalarmclient==0.4.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install yalexs-ble==4.1.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install yalexs==9.2.13 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install yeelight==0.7.16 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install yeelightsunflower==0.0.10 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install yolink-api==0.6.5 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install yoto-api==4.5.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install youless-api==2.2.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install youtubeaio==2.1.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install yt-dlp[default]==2026.07.04 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install zabbix-utils==2.0.4 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install zamg==0.4.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install zcc-helper==3.8 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install zeversolar==0.3.2 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install zha-quirks==2.3.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install zha==2.3.1 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install zhong-hong-hvac==1.0.21 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install ziggo-mediabox-xl==1.1.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install zinvolt==1.1.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install zm-py==0.5.4 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install zwave-js-server-python==0.74.0 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install zwave-me-ws==0.4.3 (listed in requirements_all.txt) on main and pr.
+- Setup plan: install ast-serialize==0.12.1 (listed in requirements_test.txt) on main and pr.
+- Setup plan: install astroid==4.3.4 (listed in requirements_test.txt) on main and pr.
+- Setup plan: install coverage==7.16.2 (listed in requirements_test.txt) on main and pr.
+- Setup plan: install freezegun==1.5.5 (listed in requirements_test.txt) on main and pr.
+- Setup plan: install librt==0.16.0 (listed in requirements_test.txt) on main and pr.
+- Setup plan: install license-expression==30.4.4 (listed in requirements_test.txt) on main and pr.
+- Setup plan: install mock-open==1.4.0 (listed in requirements_test.txt) on main and pr.
+- Setup plan: install mypy==2.4.0 (listed in requirements_test.txt) on main and pr.
+- Setup plan: install prek==0.5.5 (listed in requirements_test.txt) on main and pr.
+- Setup plan: install pydantic==2.14.1 (listed in requirements_test.txt) on main and pr.
+- Setup plan: install PyGithub==2.10.0 (listed in requirements_test.txt) on main and pr.
+- Setup plan: install pylint==4.1.3 (listed in requirements_test.txt) on main and pr.
+- Setup plan: install pylint-per-file-ignores==4.0.0 (listed in requirements_test.txt) on main and pr.
+- Setup plan: install pipdeptree==4.2.7 (listed in requirements_test.txt) on main and pr.
+- Setup plan: install pytest-asyncio==1.4.0 (listed in requirements_test.txt) on main and pr.
+- Setup plan: install pytest-aiohttp==1.1.1 (listed in requirements_test.txt) on main and pr.
+- Setup plan: install pytest-codspeed==5.0.3 (listed in requirements_test.txt) on main and pr.
+- Setup plan: install pytest-cov==7.1.0 (listed in requirements_test.txt) on main and pr.
+- Setup plan: install pytest-freezer==0.4.9 (listed in requirements_test.txt) on main and pr.
+- Setup plan: install pytest-github-actions-annotate-failures==0.4.2 (listed in requirements_test.txt) on main and pr.
+- Setup plan: install pytest-socket==0.8.1 (listed in requirements_test.txt) on main and pr.
+- Setup plan: install pytest-sugar==1.1.1 (listed in requirements_test.txt) on main and pr.
+- Setup plan: install pytest-timeout==2.4.0 (listed in requirements_test.txt) on main and pr.
+- Setup plan: install pytest-unordered==0.8.0 (listed in requirements_test.txt) on main and pr.
+- Setup plan: install pytest-picked==0.5.1 (listed in requirements_test.txt) on main and pr.
+- Setup plan: install pytest-xdist==3.8.0 (listed in requirements_test.txt) on main and pr.
+- Setup plan: install pytest==9.0.3 (listed in requirements_test.txt) on main and pr.
+- Setup plan: install requests-mock==1.12.1 (listed in requirements_test.txt) on main and pr.
+- Setup plan: install respx==0.23.1 (listed in requirements_test.txt) on main and pr.
+- Setup plan: install syrupy==6.1.1 (listed in requirements_test.txt) on main and pr.
+- Setup plan: install tqdm==4.70.1 (listed in requirements_test.txt) on main and pr.
+- Setup plan: install types-aiofiles==25.1.0.20260518 (listed in requirements_test.txt) on main and pr.
+- Setup plan: install types-atomicwrites==1.4.5.1 (listed in requirements_test.txt) on main and pr.
+- Setup plan: install types-croniter==6.2.4.20261006 (listed in requirements_test.txt) on main and pr.
+- Setup plan: install types-chardet==0.1.5 (listed in requirements_test.txt) on main and pr.
+- Setup plan: install types-decorator==5.2.0.20260712 (listed in requirements_test.txt) on main and pr.
+- Setup plan: install types-pexpect==4.9.0.20260518 (listed in requirements_test.txt) on main and pr.
+- Setup plan: install types-protobuf==7.35.1.20260906 (listed in requirements_test.txt) on main and pr.
+- Setup plan: install types-psutil==7.2.2.20260906 (listed in requirements_test.txt) on main and pr.
+- Setup plan: install types-pyserial==3.5.0.20260712 (listed in requirements_test.txt) on main and pr.
+- Setup plan: install types-python-dateutil==2.9.0.20260807 (listed in requirements_test.txt) on main and pr.
+- Setup plan: install types-python-slugify==8.0.2.20240310 (listed in requirements_test.txt) on main and pr.
+- Setup plan: install types-pytz==2026.3.1.20260727 (listed in requirements_test.txt) on main and pr.
+- Setup plan: install types-PyYAML==6.0.12.20260906 (listed in requirements_test.txt) on main and pr.
+- Setup plan: install types-requests==2.33.0.20261006 (listed in requirements_test.txt) on main and pr.
+- Setup plan: install types-xmltodict==1.0.1.20260518 (listed in requirements_test.txt) on main and pr.
+- Setup plan: install unidiff==1.0.1 (listed in requirements_test.txt) on main and pr.
+- Setup plan: install codespell==2.4.3 (listed in requirements_test_pre_commit.txt) on main and pr.
+- Setup plan: install ruff==0.17.0 (listed in requirements_test_pre_commit.txt) on main and pr.
+- Setup plan: install yamllint==1.38.0 (listed in requirements_test_pre_commit.txt) on main and pr.
+- Setup plan: install zizmor==1.30.1 (listed in requirements_test_pre_commit.txt) on main and pr.
+- Setup plan: Python 3.14: switched the local sandbox to <home>
+- rerun, setup problem: main install failed after 3 tries.
+- Demo helper: setup failure already labelled; the probe was not rerun.
+
+## Claims vs reality
+
+No tests ran, so no claim could be checked.
+
+## What changed in behavior
+
+Not measured: install failed (2); see setup-main.log.
+
+## Probes
+
+Model-written probes: model provider: nebius (Token Factory, live).
+
+No probes ran: this record predates probes.
+
+## Was the changed code exercised?
+
+**Coverage: NOT MEASURED, record predates the coverage gate.** No coverage run exists for this record; nothing below is a measurement.
+
+Coverage gate (python, confidence lower): coverage of the changed Python lines was NOT MEASURED (record predates the coverage gate: no coverage run exists for it, so this is not a measurement result).
+
+How this is measured: one extra, untimed run of the PR side's tests under coverage.py. Changed lines come from comparing the tested main and PR files. Compiled code (C, C++, Cython) is invisible to coverage.py; such a change only counts as verified when the PR adds or changes a test for that module.
+
+## What went right
+
+- Tested `9ad280c1b8a5` of the PR against main (source-pair route).
+- Single-thread environment: OMP_NUM_THREADS=1, OPENBLAS_NUM_THREADS=1, MKL_NUM_THREADS=1, NUMEXPR_NUM_THREADS=1, VECLIB_MAXIMUM_THREADS=1, BLIS_NUM_THREADS=1, PYTHONHASHSEED=0.
+- Machine type recorded: local x86_64 8 cpus.
+- Nothing posted upstream: GitHub was only read.
+
+## What went wrong and how to fix it
+
+| Issue | Status | Detail | How to fix |
+|---|---|---|---|
+| Run did not finish | ⚪ **COULD NOT VERIFY** | install failed (2); see setup-main.log | Read the setup/build log under Evidence links; build failures usually need a compiler or a newer nightly. |
+| Changed code was exercised (coverage gate) | 🟠 **WARN** | coverage of the changed Python lines was NOT MEASURED (record predates the coverage gate: no coverage run exists for it, so this is not a measurement result) | Not a measurement: this record is older than the coverage gate. Re-run the PR with the current ops/daily_run.py to measure it. |
+
+## Evals and guardrails
+
+| Check | Result | Detail |
+|---|---|---|
+| Changed code was exercised (coverage gate) | 🟠 **WARN** | coverage of the changed Python lines was NOT MEASURED (record predates the coverage gate: no coverage run exists for it, so this is not a measurement result) |
+| Single-thread environment | 🟢 **PASS** | OMP_NUM_THREADS=1, OPENBLAS_NUM_THREADS=1, MKL_NUM_THREADS=1, NUMEXPR_NUM_THREADS=1, VECLIB_MAXIMUM_THREADS=1, BLIS_NUM_THREADS=1, PYTHONHASHSEED=0 |
+| Machine type recorded | 🟢 **PASS** | local x86_64 8 cpus |
+| Nothing posted upstream | 🟢 **PASS** | GitHub was only read |
+| Known-answer replay (fresh re-run) | ⚪ **SKIP** | not replayed yet |
+| Every claim cites a real log line | ⚪ **SKIP** | no log lines to cite (no tests ran) |
+
+## Checklist
+
+- [ ] I read the verdict and the plain-English summary.
+- [ ] Every 'false' or 'unmentioned change' row has a log line I can open.
+- [ ] Nothing under 'What went wrong' is a run problem (those mean Re-run, not Reject).
+- [ ] I recorded my decision (see below).
+
+**Decision recorded:** none yet. To record one, run `make decide REPORT=<run>/report/core-187588 DECISION=approve` (or `reject`, `approve_with_notes`, `re_run`).
+
+## Rerun command
+
+```
+make check PR=https://github.com/home-assistant/core/pull/187588
+```
+
+## Evidence links
+
+- [Pull request home-assistant/core#187588](https://github.com/home-assistant/core/pull/187588)
+- [record.json](../../ops/runs/2026-10-22-check-0753/core-187588/record.json)
+- [pr.diff](../../ops/runs/2026-10-22-check-0753/core-187588/pr.diff)
+- [setup-main.log](../../ops/runs/2026-10-22-check-0753/core-187588/setup-main.log)
+- [git.log](../../ops/runs/2026-10-22-check-0753/core-187588/git.log)
+
+## Glossary
+
+| Term | Meaning |
+|---|---|
+| main | The library as it is today, without the PR. |
+| PR | Pull request: a proposed change to the library. |
+| run | One full pass of the selected tests. We do 3 per side, alternating main and PR. |
+| flaky | A test that gives different results when nothing changed; it is ignored as evidence. |
+| log line | A line in a pytest-*.log file: the raw output the verdict is based on. |
+| route | How the two sides were built: nightly+patch, source-build or source-pair (see docs/OPERATIONS.md). |
+| changed lines covered | How many of the PR's changed, executable Python lines ran during the PR side's tests. |
+| re-parametrized | A test whose parameter ids changed (renamed cases); the new ids are judged on their own. |

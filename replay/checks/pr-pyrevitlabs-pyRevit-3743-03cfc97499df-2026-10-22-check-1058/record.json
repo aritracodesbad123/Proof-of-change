@@ -1,0 +1,295 @@
+{
+  "schema_version": "1",
+  "record_kind": "pr_run",
+  "id": "pr-pyrevitlabs-pyRevit-3743-03cfc97499df-2026-10-22-check-1058",
+  "date_ist": "2026-10-22 10:58 IST",
+  "run_date": "2026-10-22",
+  "who": "ops/daily_run.py",
+  "repo": "pyrevitlabs/pyRevit",
+  "library": "pyRevit",
+  "pr": {
+    "repo": "pyrevitlabs/pyRevit",
+    "number": 3743,
+    "url": "https://github.com/pyrevitlabs/pyRevit/pull/3743",
+    "title": "Keep modeless output and logging in the originating command window",
+    "base_sha": "2c1de2cfb10e2e8c58d31ae73225d5d293faf8f6",
+    "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+    "head_sha": "03cfc97499df32352b84f19cd4ca5d0f23d8fc5c",
+    "merge_commit": null,
+    "tested_main_sha": "03cfc97499df32352b84f19cd4ca5d0f23d8fc5c",
+    "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+  },
+  "author": "Wurschdhaud",
+  "base_ref": "develop",
+  "updated_at_utc": "2026-10-21T06:30:21Z",
+  "updated_at_ist": "2026-10-21 12:00 IST",
+  "ci_state": "not checked (single-PR check)",
+  "ci_detail": "checked on request with --pr",
+  "tested_at_ist": "2026-10-22 10:58 IST",
+  "files": {
+    "all": [
+      "dev/pyRevitLabs.PyRevit.Runtime/ScriptIO.cs",
+      "dev/pyRevitLabs.PyRevit.Runtime/ScriptLoggerService.cs",
+      "dev/pyRevitLabs.PyRevit.Runtime/ScriptOutput.cs",
+      "dev/pyRevitLabs.PyRevit.Runtime/scriptruntime.cs",
+      "dev/pyRevitLoader/pyRevitExtensionParserTester/ScriptLoggerServiceTests.cs",
+      "pyrevitlib/pyrevit/coreutils/logger.py",
+      "pyrevitlib/pyrevit/script.py",
+      "pyrevitlib/pyrevit/unittests/test_script_module.py"
+    ],
+    "package_py": [],
+    "compiled": [],
+    "other": [
+      "dev/pyRevitLabs.PyRevit.Runtime/ScriptIO.cs",
+      "dev/pyRevitLabs.PyRevit.Runtime/ScriptLoggerService.cs",
+      "dev/pyRevitLabs.PyRevit.Runtime/ScriptOutput.cs",
+      "dev/pyRevitLabs.PyRevit.Runtime/scriptruntime.cs",
+      "dev/pyRevitLoader/pyRevitExtensionParserTester/ScriptLoggerServiceTests.cs",
+      "pyrevitlib/pyrevit/coreutils/logger.py",
+      "pyrevitlib/pyrevit/script.py",
+      "pyrevitlib/pyrevit/unittests/test_script_module.py"
+    ]
+  },
+  "machine_type": {
+    "arch": "x86_64",
+    "os": "Linux",
+    "platform": "Linux-6.12.94+-x86_64-with-glibc2.41",
+    "cpu_count": 8,
+    "ci": null,
+    "runner_name": null,
+    "runner_os": null,
+    "runner_arch": null,
+    "runner_environment": null,
+    "image": null,
+    "label": "local",
+    "gxx": "g++ (Debian 14.2.0-19) 14.2.0",
+    "cpu_model": "Intel(R) Xeon(R) Processor",
+    "ram_gb": 15.6
+  },
+  "thread_env": {
+    "OMP_NUM_THREADS": "1",
+    "OPENBLAS_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1",
+    "NUMEXPR_NUM_THREADS": "1",
+    "VECLIB_MAXIMUM_THREADS": "1",
+    "BLIS_NUM_THREADS": "1",
+    "PYTHONHASHSEED": "0"
+  },
+  "runs_per_side": 0,
+  "runs_per_side_planned": 3,
+  "workers": "4",
+  "test_timeout_s": 120,
+  "run_timeout_s": 900,
+  "build_timeout_s": 1800,
+  "python": "3.12.15",
+  "test_selection": "",
+  "per_run": [],
+  "notes": null,
+  "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+  "behaviour_claims": [],
+  "baseline": "full",
+  "model_provider": {
+    "requested": "nebius",
+    "used": null,
+    "note": "model provider: nebius (Token Factory, live)",
+    "blind": false
+  },
+  "sandbox_backend": "local",
+  "sandbox_backend_note": "local bubblewrap",
+  "machine": "local",
+  "posted_upstream": false,
+  "logs": "pyrevit-3743/",
+  "freeze": {},
+  "poc_commit": "0fa0016ea51794edee0f4a085e41bf48dd813765",
+  "route": "source-pair",
+  "current_head_sha": "03cfc97499df32352b84f19cd4ca5d0f23d8fc5c",
+  "tested_invocation": 1,
+  "model_provider_used": "none",
+  "model_provider_fallback": "no AI call ran (asked for nebius)",
+  "state": "closed",
+  "mergeable_state": "unknown",
+  "product_check": true,
+  "demo_helper": {
+    "preflight": {
+      "ok": true
+    },
+    "tavily": {
+      "ok": true,
+      "skipped": false,
+      "live_call": true,
+      "cached": false,
+      "queries": [
+        "pyRevit python setup install instructions https://github.com/pyrevitlabs/pyRevit site:github.com/pyrevitlabs/pyRevit",
+        "pyRevit python documentation install https://github.com/pyrevitlabs/pyRevit site:github.com/pyrevitlabs/pyRevit",
+        "pyRevit python install requirements https://pypi.org/project/pyRevit/ https://github.com/pyrevitlabs/pyRevit site:pypi.org"
+      ],
+      "results": [
+        {
+          "title": "pyrevit-stubs-24 \u00b7 PyPI",
+          "url": "https://pypi.org/project/pyrevit-stubs-24/",
+          "query": "pyRevit python install requirements https://pypi.org/project/pyRevit/ https://github.com/pyrevitlabs/pyRevit site:pypi.org"
+        },
+        {
+          "title": "Releases \u00b7 pyrevitlabs/pyRevit \u00b7 GitHub",
+          "url": "https://github.com/pyrevitlabs/pyRevit/releases",
+          "query": "pyRevit python setup install instructions https://github.com/pyrevitlabs/pyRevit site:github.com/pyrevitlabs/pyRevit"
+        },
+        {
+          "title": "GitHub - pyrevitlabs/pyRevit: Rapid Application Development (RAD) Environment for Autodesk Revit\u00ae \u00b7 GitHub",
+          "url": "https://github.com/pyrevitlabs/pyRevit",
+          "query": "pyRevit python setup install instructions https://github.com/pyrevitlabs/pyRevit site:github.com/pyrevitlabs/pyRevit"
+        },
+        {
+          "title": "Can't Install/Uninstall \u00b7 Issue #1172 \u00b7 pyrevitlabs/pyRevit \u00b7 GitHub",
+          "url": "https://github.com/pyrevitlabs/pyRevit/issues/1172",
+          "query": "pyRevit python setup install instructions https://github.com/pyrevitlabs/pyRevit site:github.com/pyrevitlabs/pyRevit"
+        }
+      ],
+      "text": "To install pyRevit, download the installer from the releases page on GitHub. The latest installers available are pyRevit 6.5.5.26237 for Admin/All Users/%PROGRAMDATA% and pyRevit CLI 6.5.5.26237 for Admin/System %PATH%. For installation issues, users have suggested commands like \"pyrevit clones add master\" and \"pyrevit attach master 277 --installed\" in the command prompt. However, if these commands do not resolve installation issues, further assistance may be required.\nTo install pyRevit, download the installer from the GitHub releases page. The latest versions available are pyRevit 6.5.5.26237 Installer - Admin / All Users / %PROGRAMDATA% and pyRevit CLI 6.5.5.26237 Installer - Admin / System %PATH%. For per-user installations, use pyRevit 6.5.2.26175 Installer \u2014 Per-user / %LOCALAPPDATA%. The installation process can be guided by the pyRevit environment command `pyrevit env` if issues arise.\nTo install pyRevit, you can use pip to install the pyrevit-stubs-24 package. The installation command is `pip install pyrevit-stubs-26`. After installation, give your IDE some time to index all new files for autocomplete suggestions. Note that only one version of pyrevit-stubs should be installed at a time, and the code will be executed by pyRevit's engine, not your IDE. The package provides unofficial type stubs for Autodesk Revit API and pyRevit modules, and is independently created and not affiliated with or endorsed by Autodesk.\nTitle: pyrevit-stubs-24 \u00b7 PyPI\nAutocomplete stubs for Revit API and pyRevit modules. ### Navigation. ### Verified details. *These details have been verified by PyPI*. ###### Maintainers. ### Unverified details. *These details have **not** been verified by PyPI*. ###### Meta. ## Project description. # pyrevit-stubs-26. *Typing & Autocomplete stubs for **RevitAPI 2024** and pyRevit modules.*. Prepared by Erik Frits from www.LearnRevitAPI.com. ## Installation. Install like any other python package:\n<li>\ud83d\udce6 pyRevit 6.5.0.26173 Installer - Admin / All Users / %PROGRAMDATA%</li> </ul>\n  <h3>pyRevit CLI (Command line utility)</h3>\n  <ul>\n  <li>\ud83d\udce6 pyRevit CLI 6.5.0.26173 Installer - Admin / System %PATH%</li> </ul></div> </div>\n  <div>\n  <div>\n  <h3>Contributors</h3>\n  <ul>\n  <li> <img alt=\"@Tam\" src=\"  </li>\n  <li> <img alt=\"@dosymep\" src=\"  </li>\n  <li> <img alt=\"@jmcouffin\" src=\"  </li>\n  <li> <img alt=\"@Seed-43\" src=\"  </li>\n  <li> <img alt=\"@permpong13\" src=\"  </li> [...] <li>\ud83d\udce6 pyRevit 6.5.5.\n### pyRevit can help you\n\n Add a powerful set of free tools to your Revit workflows.\n Sketch out your automation ideas quickly in python\n Write your own Revit addons for Revit using python (IronPython or CPython), C#, VB.Net\n Distribute your tools (pyRevit, Dynamo, or Grasshopper) easily to your teams using a unified interface\n Share your tools with the community\n\n# Getting Started\n\n## Get Started Using pyRevit\n\nInstall pyRevit\n\nCreate Custom Patterns\n\nManage Keynotes\n\nConfigure pyRevit [...] py\non Feb 25, 2021\n\n   More actions\n\n   oh, i just found the solution for my old laptop from this website  \n    #1075\n\n   try go to cmd and type  \n    pyrevit clones add master \"C:\\Users\\Jose De Jesus\\AppData\\Roaming\\pyRevit-Master\"  \n    then  \n    pyrevit attach master 277 --installed\n\n   Reacted by Ehsan Iran-Nejad\n6. ### eirannejadcommentedon Feb 28, 2021\n\n   @eirannejad\n\n   eirannejad\n\n   on Feb 28, 2021\n\n   Collaborator\n\n   More actions [...] Rick\n\n pyRevit Environment: Open a command prompt ",
+      "errors": [],
+      "lines": [
+        "Looked up with Tavily: 4 results",
+        "Query: pyRevit python setup install instructions https://github.com/pyrevitlabs/pyRevit site:github.com/pyrevitlabs/pyRevit",
+        "Query: pyRevit python documentation install https://github.com/pyrevitlabs/pyRevit site:github.com/pyrevitlabs/pyRevit",
+        "Query: pyRevit python install requirements https://pypi.org/project/pyRevit/ https://github.com/pyrevitlabs/pyRevit site:pypi.org",
+        "Source: pyrevit-stubs-24 \u00b7 PyPI \u2014 https://pypi.org/project/pyrevit-stubs-24/",
+        "Source: Releases \u00b7 pyrevitlabs/pyRevit \u00b7 GitHub \u2014 https://github.com/pyrevitlabs/pyRevit/releases",
+        "Source: GitHub - pyrevitlabs/pyRevit: Rapid Application Development (RAD) Environment for Autodesk Revit\u00ae \u00b7 GitHub \u2014 https://github.com/pyrevitlabs/pyRevit",
+        "Source: Can't Install/Uninstall \u00b7 Issue #1172 \u00b7 pyrevitlabs/pyRevit \u00b7 GitHub \u2014 https://github.com/pyrevitlabs/pyRevit/issues/1172"
+      ]
+    },
+    "notes": [
+      "Setup check: GitHub token: present.",
+      "Setup check: Nebius token: present.",
+      "Setup check: free memory 8.0 GB (of 15.6 GB).",
+      "Setup check: free disk 88.0 GB.",
+      "Demo helper: git is installed.",
+      "Demo helper: python3 is installed.",
+      "Demo helper: uv is installed.",
+      "Looked up with Tavily: 4 results",
+      "Query: pyRevit python setup install instructions https://github.com/pyrevitlabs/pyRevit site:github.com/pyrevitlabs/pyRevit",
+      "Query: pyRevit python documentation install https://github.com/pyrevitlabs/pyRevit site:github.com/pyrevitlabs/pyRevit",
+      "Query: pyRevit python install requirements https://pypi.org/project/pyRevit/ https://github.com/pyrevitlabs/pyRevit site:pypi.org",
+      "Source: pyrevit-stubs-24 \u00b7 PyPI \u2014 https://pypi.org/project/pyrevit-stubs-24/",
+      "Source: Releases \u00b7 pyrevitlabs/pyRevit \u00b7 GitHub \u2014 https://github.com/pyrevitlabs/pyRevit/releases",
+      "Source: GitHub - pyrevitlabs/pyRevit: Rapid Application Development (RAD) Environment for Autodesk Revit\u00ae \u00b7 GitHub \u2014 https://github.com/pyrevitlabs/pyRevit",
+      "Source: Can't Install/Uninstall \u00b7 Issue #1172 \u00b7 pyrevitlabs/pyRevit \u00b7 GitHub \u2014 https://github.com/pyrevitlabs/pyRevit/issues/1172",
+      "Setup plan: the same packages on main and pr.",
+      "rerun, setup problem: main install failed after 3 tries.",
+      "Demo helper: setup failure already labelled; the probe was not rerun."
+    ],
+    "setup_plan": {
+      "packages": [],
+      "extra_reqs": [],
+      "python": {
+        "requested": null,
+        "current": "3.12",
+        "applied": false,
+        "switch": null,
+        "reason": "no Python version was requested"
+      },
+      "system": [],
+      "refused": []
+    },
+    "setup": {
+      "label": "rerun, setup problem",
+      "counts_as_verdict": false,
+      "step": "main install",
+      "attempts": 3,
+      "detail": "install failed (1); see setup-main.log"
+    }
+  },
+  "chosen": {
+    "pr": 3743,
+    "head_sha": null,
+    "install": null,
+    "test_cmd": null
+  },
+  "sides": {
+    "comparison_basis": "merge-base vs PR head (no merge ref available)",
+    "main_sha": "03cfc97499df32352b84f19cd4ca5d0f23d8fc5c",
+    "pr_sha": "03cfc97499df32352b84f19cd4ca5d0f23d8fc5c"
+  },
+  "tested": {
+    "main": "develop @ 03cfc97499df (merge-base with the PR head)",
+    "pr": "PR head 03cfc97499df"
+  },
+  "verdict": "could_not_verify",
+  "reason": "install failed (1); see setup-main.log",
+  "verdict_before_coverage_gate": "could_not_verify",
+  "reason_before_coverage_gate": "install failed (1); see setup-main.log",
+  "changed_lines_total": null,
+  "changed_lines_covered": null,
+  "coverage_gate": {
+    "kind": "python",
+    "changed": false,
+    "confidence": "lower",
+    "note": "coverage of the changed Python lines was NOT MEASURED (record predates the coverage gate: no coverage run exists for it, so this is not a measurement result)",
+    "measurement": "not measured: predates gate"
+  },
+  "agents": {
+    "status": "skipped",
+    "note": "advisory swarm is off",
+    "roles": []
+  },
+  "explanation": {
+    "status": "not yet wired",
+    "why": "advisory swarm is off"
+  },
+  "swarm_requested": false,
+  "operator_approval_requested": false,
+  "swarm": "off",
+  "operator_approval": "off",
+  "what_changed": {
+    "package_python_files": [],
+    "compiled_files": [],
+    "other_files": [
+      "dev/pyRevitLabs.PyRevit.Runtime/ScriptIO.cs",
+      "dev/pyRevitLabs.PyRevit.Runtime/ScriptLoggerService.cs",
+      "dev/pyRevitLabs.PyRevit.Runtime/ScriptOutput.cs",
+      "dev/pyRevitLabs.PyRevit.Runtime/scriptruntime.cs",
+      "dev/pyRevitLoader/pyRevitExtensionParserTester/ScriptLoggerServiceTests.cs",
+      "pyrevitlib/pyrevit/coreutils/logger.py",
+      "pyrevitlib/pyrevit/script.py",
+      "pyrevitlib/pyrevit/unittests/test_script_module.py"
+    ]
+  },
+  "duration_s": {
+    "total_wall": 14.2,
+    "tests": 0
+  },
+  "cost": {
+    "ai_calls": 0,
+    "failed_ai_calls": 0,
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "thinking_tokens": 0,
+    "cost_usd": 0.0,
+    "calls_without_usage": 0,
+    "ai_cost_usd": 0.0,
+    "cost_complete": true,
+    "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+    "compute_seconds": {
+      "total_wall": 14.2,
+      "tests": 0
+    },
+    "machine_usd_per_hour": 0.24,
+    "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+    "computer_cost_usd": 0.000947,
+    "total_cost_usd": 0.000947,
+    "swarm": {
+      "ai_calls": 0,
+      "failed_ai_calls": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "thinking_tokens": 0,
+      "cost_usd": 0.0,
+      "calls_without_usage": 0,
+      "ai_cost_usd": 0.0,
+      "cost_complete": true,
+      "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+    }
+  },
+  "head_at_report_sha": "03cfc97499df32352b84f19cd4ca5d0f23d8fc5c",
+  "head_moved_since_test": false
+}

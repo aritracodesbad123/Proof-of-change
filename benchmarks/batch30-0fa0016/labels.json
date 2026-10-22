@@ -1,0 +1,313 @@
+[
+ {
+  "url": "https://github.com/Second-Hand-Friends/kleinanzeigen-bot/pull/1361",
+  "sources": [
+   "maintainer CI all passed on head 5258d75 (26 checks)"
+  ],
+  "checked_ist": "2026-10-22 01:36 IST",
+  "search_result": "ok",
+  "label": "unlabelled",
+  "why_unlabelled": "no revert, follow-up bug report or maintainer confirmation found; passing CI is not proof"
+ },
+ {
+  "url": "https://github.com/The-PR-Agent/pr-agent/pull/4189",
+  "sources": [
+   "maintainer CI all passed on head c8a5bd9 (13 checks)"
+  ],
+  "checked_ist": "2026-10-22 01:37 IST",
+  "search_result": "ok",
+  "label": "unlabelled",
+  "why_unlabelled": "no revert, follow-up bug report or maintainer confirmation found; passing CI is not proof"
+ },
+ {
+  "url": "https://github.com/optiland/optiland/pull/962",
+  "sources": [
+   "maintainer CI all passed on head 9fd0f19 (16 checks)"
+  ],
+  "checked_ist": "2026-10-22 01:37 IST",
+  "search_result": "ok",
+  "label": "unlabelled",
+  "why_unlabelled": "no revert, follow-up bug report or maintainer confirmation found; passing CI is not proof"
+ },
+ {
+  "url": "https://github.com/home-assistant/core/pull/187420",
+  "sources": [
+   "closes issue https://github.com/home-assistant/core/issues/184129",
+   "maintainer CI all_passed on head 87bb89f"
+  ],
+  "checked_ist": "2026-10-22 01:38 IST",
+  "search_result": "ok",
+  "label": "unlabelled",
+  "why_unlabelled": "no revert, follow-up bug report or maintainer confirmation found; passing CI is not proof"
+ },
+ {
+  "url": "https://github.com/caronc/apprise/pull/1783",
+  "sources": [
+   "maintainer CI all passed on head 133d8b8 (21 checks)"
+  ],
+  "checked_ist": "2026-10-22 01:38 IST",
+  "search_result": "ok",
+  "label": "unlabelled",
+  "why_unlabelled": "no revert, follow-up bug report or maintainer confirmation found; passing CI is not proof"
+ },
+ {
+  "url": "https://github.com/mlflow/mlflow/pull/26542",
+  "sources": [
+   "maintainer CI all passed on head a8d0cee (90 checks)"
+  ],
+  "checked_ist": "2026-10-22 01:38 IST",
+  "search_result": "ok",
+  "label": "unlabelled",
+  "why_unlabelled": "no revert, follow-up bug report or maintainer confirmation found; passing CI is not proof"
+ },
+ {
+  "url": "https://github.com/macs3-project/MACS/pull/784",
+  "sources": [
+   "closes issue https://github.com/macs3-project/MACS/issues/766",
+   "maintainer CI all_passed on head 6a5f2df"
+  ],
+  "checked_ist": "2026-10-22 01:39 IST",
+  "search_result": "ok",
+  "label": "unlabelled",
+  "why_unlabelled": "no revert, follow-up bug report or maintainer confirmation found; passing CI is not proof"
+ },
+ {
+  "url": "https://github.com/tornadoweb/tornado/pull/3787",
+  "sources": [
+   "maintainer CI all passed on head c3089e1 (16 checks)"
+  ],
+  "checked_ist": "2026-10-22 01:39 IST",
+  "search_result": "ok",
+  "label": "unlabelled",
+  "why_unlabelled": "no revert, follow-up bug report or maintainer confirmation found; passing CI is not proof"
+ },
+ {
+  "url": "https://github.com/agentscope-ai/ReMe/pull/627",
+  "sources": [
+   "maintainer CI all passed on head e50baa0 (15 checks)"
+  ],
+  "checked_ist": "2026-10-22 01:39 IST",
+  "search_result": "ok",
+  "label": "unlabelled",
+  "why_unlabelled": "no revert, follow-up bug report or maintainer confirmation found; passing CI is not proof"
+ },
+ {
+  "url": "https://github.com/The-PR-Agent/pr-agent/pull/4183",
+  "sources": [
+   "maintainer CI all passed on head e602c4a (13 checks)"
+  ],
+  "checked_ist": "2026-10-22 01:40 IST",
+  "search_result": "ok",
+  "label": "unlabelled",
+  "why_unlabelled": "no revert, follow-up bug report or maintainer confirmation found; passing CI is not proof"
+ },
+ {
+  "url": "https://github.com/googlefonts/glyphsLib/pull/1208",
+  "sources": [
+   "closes issue https://github.com/googlefonts/glyphsLib/issues/1207",
+   "maintainer CI all_passed on head 3783ef4"
+  ],
+  "checked_ist": "2026-10-22 01:40 IST",
+  "search_result": "ok",
+  "label": "unlabelled",
+  "why_unlabelled": "no revert, follow-up bug report or maintainer confirmation found; passing CI is not proof"
+ },
+ {
+  "url": "https://github.com/dapr/python-sdk/pull/1192",
+  "sources": [
+   "no revert, follow-up fix or linked issue found; maintainer CI some_failed"
+  ],
+  "checked_ist": "2026-10-22 01:41 IST",
+  "search_result": "unlabelled",
+  "label": "unlabelled",
+  "why_unlabelled": "no revert, follow-up bug report or maintainer confirmation found; passing CI is not proof"
+ },
+ {
+  "url": "https://github.com/home-assistant/core/pull/187588",
+  "sources": [
+   "maintainer CI all passed on head 9ad280c (53 checks)"
+  ],
+  "checked_ist": "2026-10-22 01:41 IST",
+  "search_result": "ok",
+  "label": "unlabelled",
+  "why_unlabelled": "no revert, follow-up bug report or maintainer confirmation found; passing CI is not proof"
+ },
+ {
+  "url": "https://github.com/home-assistant/core/pull/187475",
+  "sources": [
+   "maintainer CI all passed on head 7e21b87 (54 checks)"
+  ],
+  "checked_ist": "2026-10-22 01:41 IST",
+  "search_result": "ok",
+  "label": "unlabelled",
+  "why_unlabelled": "no revert, follow-up bug report or maintainer confirmation found; passing CI is not proof"
+ },
+ {
+  "url": "https://github.com/optuna/optuna/pull/6873",
+  "sources": [
+   "closes issue https://github.com/optuna/optuna/issues/6872",
+   "maintainer CI all_passed on head 83a36de"
+  ],
+  "checked_ist": "2026-10-22 01:42 IST",
+  "search_result": "ok",
+  "label": "unlabelled",
+  "why_unlabelled": "no revert, follow-up bug report or maintainer confirmation found; passing CI is not proof"
+ },
+ {
+  "url": "https://github.com/frappe/erpnext/pull/60004",
+  "sources": [
+   "maintainer CI all passed on head 509e2f1 (18 checks)"
+  ],
+  "checked_ist": "2026-10-22 01:42 IST",
+  "search_result": "ok",
+  "label": "unlabelled",
+  "why_unlabelled": "no revert, follow-up bug report or maintainer confirmation found; passing CI is not proof"
+ },
+ {
+  "url": "https://github.com/The-PR-Agent/pr-agent/pull/4181",
+  "sources": [
+   "maintainer CI all passed on head 656635a (13 checks)"
+  ],
+  "checked_ist": "2026-10-22 01:42 IST",
+  "search_result": "ok",
+  "label": "unlabelled",
+  "why_unlabelled": "no revert, follow-up bug report or maintainer confirmation found; passing CI is not proof"
+ },
+ {
+  "url": "https://github.com/oceanbase/powercontext/pull/1908",
+  "sources": [
+   "closes issue https://github.com/oceanbase/powercontext/issues/1904",
+   "maintainer CI some_failed on head cbbcddc"
+  ],
+  "checked_ist": "2026-10-22 01:43 IST",
+  "search_result": "ok",
+  "label": "unlabelled",
+  "why_unlabelled": "no revert, follow-up bug report or maintainer confirmation found; passing CI is not proof"
+ },
+ {
+  "url": "https://github.com/optiland/optiland/pull/963",
+  "sources": [
+   "maintainer CI all passed on head 9b8ce0c (16 checks)"
+  ],
+  "checked_ist": "2026-10-22 01:46 IST",
+  "search_result": "ok",
+  "label": "unlabelled",
+  "why_unlabelled": "no revert, follow-up bug report or maintainer confirmation found; passing CI is not proof"
+ },
+ {
+  "url": "https://github.com/macs3-project/MACS/pull/780",
+  "sources": [
+   "closes issue https://github.com/macs3-project/MACS/issues/762",
+   "maintainer CI all_passed on head d427662"
+  ],
+  "checked_ist": "2026-10-22 01:46 IST",
+  "search_result": "ok",
+  "label": "unlabelled",
+  "why_unlabelled": "no revert, follow-up bug report or maintainer confirmation found; passing CI is not proof"
+ },
+ {
+  "url": "https://github.com/doobidoo/mcp-memory-service/pull/1531",
+  "sources": [
+   "closes issue https://github.com/doobidoo/mcp-memory-service/issues/1521",
+   "maintainer CI all_passed on head 86e5ab3"
+  ],
+  "checked_ist": "2026-10-22 01:50 IST",
+  "search_result": "ok",
+  "label": "unlabelled",
+  "why_unlabelled": "no revert, follow-up bug report or maintainer confirmation found; passing CI is not proof"
+ },
+ {
+  "url": "https://github.com/vllm-project/vllm/pull/59627",
+  "sources": [
+   "closes issue https://github.com/vllm-project/vllm/issues/59608",
+   "maintainer CI all_passed on head fb87b56"
+  ],
+  "checked_ist": "2026-10-22 01:50 IST",
+  "search_result": "ok",
+  "label": "unlabelled",
+  "why_unlabelled": "no revert, follow-up bug report or maintainer confirmation found; passing CI is not proof"
+ },
+ {
+  "url": "https://github.com/basetenlabs/truss/pull/2682",
+  "sources": [
+   "no revert, follow-up fix or linked issue found; maintainer CI some_failed"
+  ],
+  "checked_ist": "2026-10-22 01:50 IST",
+  "search_result": "unlabelled",
+  "label": "unlabelled",
+  "why_unlabelled": "no revert, follow-up bug report or maintainer confirmation found; passing CI is not proof"
+ },
+ {
+  "url": "https://github.com/vllm-project/vllm/pull/60468",
+  "sources": [
+   "maintainer CI all passed on head 71c61dc (6 checks)"
+  ],
+  "checked_ist": "2026-10-22 01:51 IST",
+  "search_result": "ok",
+  "label": "unlabelled",
+  "why_unlabelled": "no revert, follow-up bug report or maintainer confirmation found; passing CI is not proof"
+ },
+ {
+  "url": "https://github.com/bopen/elevation/pull/89",
+  "sources": [
+   "maintainer CI all passed on head f94e513 (11 checks)"
+  ],
+  "checked_ist": "2026-10-22 01:51 IST",
+  "search_result": "ok",
+  "label": "unlabelled",
+  "why_unlabelled": "no revert, follow-up bug report or maintainer confirmation found; passing CI is not proof"
+ },
+ {
+  "url": "https://github.com/vllm-project/vllm/pull/58715",
+  "sources": [
+   "maintainer CI all passed on head 9370bbd (6 checks)"
+  ],
+  "checked_ist": "2026-10-22 01:52 IST",
+  "search_result": "ok",
+  "label": "unlabelled",
+  "why_unlabelled": "no revert, follow-up bug report or maintainer confirmation found; passing CI is not proof"
+ },
+ {
+  "url": "https://github.com/frappe/erpnext/pull/61257",
+  "sources": [
+   "maintainer CI all passed on head 7feeb6f (23 checks)"
+  ],
+  "checked_ist": "2026-10-22 01:52 IST",
+  "search_result": "ok",
+  "label": "unlabelled",
+  "why_unlabelled": "no revert, follow-up bug report or maintainer confirmation found; passing CI is not proof"
+ },
+ {
+  "url": "https://github.com/oyvindwe/connectlife-ha/pull/742",
+  "sources": [
+   "closes issue https://github.com/oyvindwe/connectlife-ha/issues/655",
+   "maintainer CI all_passed on head 52bc290"
+  ],
+  "checked_ist": "2026-10-22 01:52 IST",
+  "search_result": "ok",
+  "label": "unlabelled",
+  "why_unlabelled": "no revert, follow-up bug report or maintainer confirmation found; passing CI is not proof"
+ },
+ {
+  "url": "https://github.com/pyrevitlabs/pyRevit/pull/3743",
+  "sources": [
+   "closes issue https://github.com/pyrevitlabs/pyRevit/issues/3735",
+   "maintainer CI all_passed on head 03cfc97"
+  ],
+  "checked_ist": "2026-10-22 01:53 IST",
+  "search_result": "ok",
+  "label": "unlabelled",
+  "why_unlabelled": "no revert, follow-up bug report or maintainer confirmation found; passing CI is not proof"
+ },
+ {
+  "url": "https://github.com/doobidoo/mcp-memory-service/pull/1603",
+  "sources": [
+   "closes issue https://github.com/doobidoo/mcp-memory-service/issues/1601",
+   "maintainer CI all_passed on head f8760d3"
+  ],
+  "checked_ist": "2026-10-22 01:53 IST",
+  "search_result": "ok",
+  "label": "unlabelled",
+  "why_unlabelled": "no revert, follow-up bug report or maintainer confirmation found; passing CI is not proof"
+ }
+]
