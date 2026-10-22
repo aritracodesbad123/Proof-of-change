@@ -1,7 +1,7 @@
 # The dependencies-only fallback reads main's files for every not-a-package error and refuses off-index lines
 
 **Date:** 2026-10-22
-**Status:** proposed
+**Status:** accepted
 
 ## What changed
 
