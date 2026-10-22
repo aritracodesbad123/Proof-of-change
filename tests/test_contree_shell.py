@@ -123,8 +123,10 @@ def test_stderr_tail_hides_github_token_sk_token_and_url_password(monkeypatch):
     ghp = "ghp_" + "A1b2C3d4E5f6G7h8I9j0K1l2M3n4O5p6Q7r8"
     sk = "sk-" + "fakeKey1234567890abcdef"
     pw = "hunter2Secret"
+    tok = "plain" + "TokenValue987"
     stderr = (f"fatal: auth with {ghp} failed\n"
-              f"pip: index token={sk} rejected\n"
+              f"auth with {sk} rejected\n"
+              f"pip: index token={tok} rejected\n"
               f"Looking in https://deploy:{pw}@pypi.example.com/simple\n")
 
     def runner(shell, disposable, image_ref, timeout, files):
@@ -134,7 +136,24 @@ def test_stderr_tail_hides_github_token_sk_token_and_url_password(monkeypatch):
         cs.ContreeSession(runner=runner).checkpoint_main("echo installed", timeout=5)
     _, entry = daily_run.contree_refusal(ei.value)
     rec = {"contree": entry}
-    for leaked in (ghp, sk, pw):
+    for leaked in (ghp, sk, pw, tok):
         assert leaked not in rec["contree"]["stderr_tail"]
         assert leaked not in rec["contree"]["failed"]
     assert "https://deploy:***@pypi.example.com" in rec["contree"]["stderr_tail"]
+
+
+def test_redact_hides_basic_auth_header():
+    import base64
+    cred = base64.b64encode(("deploy" + ":" + "s3cr" + "etPw").encode()).decode()
+    for hdr in (f"Authorization: Basic {cred}", f"authorization: basic {cred}"):
+        out = cs.redact(f"curl: {hdr}\n", env={})
+        assert cred not in out and "<redacted>" in out
+
+
+def test_redact_hides_plain_password_values():
+    a, b, c = ("pa" + "ssVal42", "pw" + "dVal43", "pd" + "Val44")
+    text = f"url?password={a}&x=1 PASSWD={b} cfg Pwd='{c}'"
+    out = cs.redact(text, env={})
+    for v in (a, b, c):
+        assert v not in out
+    assert "&x=1" in out and "PASSWD=<redacted>" in out
