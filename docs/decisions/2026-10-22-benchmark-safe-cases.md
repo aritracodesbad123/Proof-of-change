@@ -1,16 +1,18 @@
-# Benchmark: the 12 known-safe cases go in first
+# Benchmark: 10 known-safe and 2 ambiguous cases go in first
 
 **Status:** proposed
 
 ## What changed
 
-`bench/cases/` gets 12 case files, one known-safe open pull request each from attrs, boltons, click, isort,
-jsonschema, markupsafe, prettytable, requests, rich, sqlparse, toolz and urllib3. All 12 pass the case file
-checker (`python -m bench.manifest bench/cases`). No code changed.
+`bench/cases/` gets 12 case files, one open pull request each from attrs, boltons, click, isort, jsonschema,
+markupsafe, prettytable, requests, rich, sqlparse, toolz and urllib3. 10 are known safe. 2 are ambiguous: attrs
+#1647 and click #3878 change output on purpose (astuple output and CliRunner output), so needs_attention is a
+fair answer for them and is not scored as a false alarm. Ambiguous cases are reported, not scored. All 12 pass
+the case file checker (`python -m bench.manifest bench/cases`). No code changed.
 
 ## What is not included
 
-Only the known-safe cases are included. The planted-regression cases, their patches and any bundles are left
+Only the known-safe cases, two of them relabelled ambiguous, are included. The planted-regression cases, their patches and any bundles are left
 out. They wait for the fork trial, which has to show that a PR on a fork resolves its sides correctly through
 the check before any fork case is trusted.
 
