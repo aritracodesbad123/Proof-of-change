@@ -1528,7 +1528,8 @@ def _product_plan(a, rec: dict, repo: str, cfg: dict, checkouts, pypi=None, pyth
         python_available=python_available, pypi=pypi,
         allow_lookup_packages=bool(folders), auto_python=product,
         docs_checkouts=([main_dir] if main_dir else []) if product else None,
-        apply_system=apply_os)
+        apply_system=apply_os,
+        changed_files=list((rec.get("files") or {}).get("all") or []) if product else None)
     for req in (getattr(a, "batch_fix_reqs", None) or {}).get(_batch_key(repo, rec), []):
         if req not in plan.setdefault("extra_reqs", []):
             plan["extra_reqs"].append(req)
@@ -1609,7 +1610,10 @@ def _check_python(a, plan) -> str:
 def _groups_blocked(a, plan) -> str:
     """The could-not-verify reason when main's dependency groups can't be installed as written (refused lines or a
     table PEP 735 does not allow) on a product check, else "". Every install route stops on it before installing."""
-    return str((plan or {}).get("groups_blocked") or "") if product_route(a) else ""
+    if not product_route(a):
+        return ""
+    plan = plan or {}
+    return str(plan.get("groups_blocked") or plan.get("scope_blocked") or "")
 
 
 def _install_with_helper(a, rec, step, venv, checkout, chosen, log, timeout, constraints, extra_reqs, python=None,
@@ -1669,7 +1673,7 @@ def _install_with_helper(a, rec, step, venv, checkout, chosen, log, timeout, con
         plan and main's folder, and only when main itself fell back, so a flat layout on the PR side alone stays
         could not verify. The PR's own dependency files are never read."""
         if _is_main():
-            return demo_helper.deps_only_plan(checkout)
+            return demo_helper.deps_only_plan(checkout, exclude=_aggregate_names(rec) if product_route(a) else ())
         helper = rec.get("demo_helper") or {}
         return helper.get("deps_only") if helper.get("flat_deps_root") else None
 
@@ -2562,6 +2566,12 @@ def missing_dependency(skip_msg: str) -> str | None:
     return next(g for g in m.groups() if g).split(".")[0]
 
 
+def _aggregate_names(rec: dict) -> list[str]:
+    """Aggregate requirements files of a component app (from the product setup plan) that no install path reads."""
+    plan = (rec.get("demo_helper") or {}).get("setup_plan") or {}
+    return [str(n) for n in plan.get("aggregate_names") or []]
+
+
 def _contree_ready() -> bool:
     from poc import contree_sandboxes
     sess = contree_sandboxes.session()
@@ -2582,7 +2592,8 @@ def _maybe_prepare_contree(a, repo: str, main_sha: str, pr_sha: str, rec: dict, 
     contree_sandboxes.clear_session()
     try:
         sess = contree_sandboxes.prepare_source_pair(repo, main_sha, pr_sha, timeout=timeout, extra_shell=extra_shell,
-                                                     **({"deps_only_fallback": True} if product_route(a) else {}))
+                                                     **({"deps_only_fallback": True, "deps_exclude": _aggregate_names(rec)}
+                                                        if product_route(a) else {}))
         rec["contree"] = sess.describe()
         rec["machine"] = "contree"
         rec["sandbox_backend"] = "contree"

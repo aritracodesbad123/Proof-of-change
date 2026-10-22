@@ -419,19 +419,31 @@ def clear_session() -> None:
     _state["session"] = None
 
 
-DEPS_ONLY_SHELL = (
+DEPS_ONLY_SHELL_TEMPLATE = (
     "{ echo 'Auto-fix: the project could not be built as a package, so only the dependencies it declares are installed';"
     " python -m pip install -q uv==0.13.1 2>/dev/null || true;"
     " PYX=\"$(python -c 'import sys; print(sys.executable)')\"; PFX=\"$(python -c 'import sys; print(sys.prefix)')\";"
     " if [ -f pyproject.toml ] && [ -f uv.lock ]; then UV_PROJECT_ENVIRONMENT=\"$PFX\" python -m uv sync -q"
     " --no-config --no-install-project --frozen -p \"$PYX\";"
     " elif [ -f pyproject.toml ]; then UV_PROJECT_ENVIRONMENT=\"$PFX\" python -m uv sync -q --no-config --no-install-project -p \"$PYX\";"
-    " else for f in requirements*.txt; do if [ -f \"$f\" ]; then python -m pip install -q -r \"$f\"; fi; done; fi"
+    " else for f in requirements*.txt; do {skip}if [ -f \"$f\" ]; then python -m pip install -q -r \"$f\"; fi; done; fi"
     " && CHG=\"$(git status --porcelain --untracked-files=all --ignored=no | grep -v ' .poc-declared-deps.txt$' || true)\""
     " && if [ -n \"$CHG\" ]; then echo \"setup problem: the dependency install changed the checked-out code: $CHG\"; exit 1; fi"
     " && SP=\"$(python -c 'import sysconfig; print(sysconfig.get_paths()[\"purelib\"])')\""
     " && rm -f \"$SP/poc-project-path.pth\" && echo /work/src > \"$SP/poc-project-path.pth\"; }"
 )
+
+
+def deps_only_shell(exclude=()) -> str:
+    """DEPS_ONLY_SHELL, skipping the requirements files named in ``exclude`` (aggregate files of a component app).
+    Names are matched literally with a quoted case pattern; an empty list gives the same text as before."""
+    import shlex
+    names = [n for n in dict.fromkeys(str(x).rsplit("/", 1)[-1] for x in exclude or ()) if n]
+    skip = ("case \"$f\" in " + "|".join(shlex.quote(n) for n in names) + ") continue;; esac; ") if names else ""
+    return DEPS_ONLY_SHELL_TEMPLATE.replace("{skip}", skip)
+
+
+DEPS_ONLY_SHELL = deps_only_shell()
 
 
 # Product checks: no index, find-links or trusted-host setting from the environment, and no pip or uv config file
@@ -457,12 +469,14 @@ NO_INDEX_CONFIG_SHELL = (
 )
 
 
-def install_shell_source(repo: str, sha: str, extra: str = "", deps_only_fallback: bool = False) -> str:
+def install_shell_source(repo: str, sha: str, extra: str = "", deps_only_fallback: bool = False,
+                         deps_exclude=()) -> str:
     """Clone a public GitHub SHA into /work/src and pip-install editable + pytest (source-pair style).
 
     extra is the same shell on both sides (system packages and plan requirements). Empty leaves the
     original install unchanged. deps_only_fallback (product checks) also clears index settings from the environment
-    and turns off pip and uv config files for every install in the shell (NO_INDEX_CONFIG_SHELL).
+    and turns off pip and uv config files for every install in the shell (NO_INDEX_CONFIG_SHELL). deps_exclude:
+    requirements file names the deps-only fallback never installs (aggregate files of a component app).
     """
     # slim image needs git; network is available during checkpoint builds
     shell = (
@@ -479,7 +493,7 @@ def install_shell_source(repo: str, sha: str, extra: str = "", deps_only_fallbac
         "python -m pip install -q -e '.[dev]' 2>/dev/null "
         "|| python -m pip install -q -e '.[test]' 2>/dev/null "
         "|| python -m pip install -q -e '.[tests]' 2>/dev/null "
-        "|| python -m pip install -q -e ." + (" \\\n|| " + DEPS_ONLY_SHELL if deps_only_fallback else "") + "\n"
+        "|| python -m pip install -q -e ." + (" \\\n|| " + deps_only_shell(deps_exclude) if deps_only_fallback else "") + "\n"
         "python -m pip install -q pytest pytest-timeout pytest-xdist coverage pytest-cov\n"
     )
     extra = (extra or "").strip()
@@ -491,14 +505,14 @@ def install_shell_source(repo: str, sha: str, extra: str = "", deps_only_fallbac
 
 def prepare_source_pair(repo: str, main_sha: str, pr_sha: str, *, timeout: int = 1800,
                         runner: Callable | None = None, extra_shell: str = "",
-                        deps_only_fallback: bool = False) -> ContreeSession:
+                        deps_only_fallback: bool = False, deps_exclude=()) -> ContreeSession:
     """Build main + PR Contree checkpoints for a source-pair style PR.
 
     extra_shell is applied to both SHAs. Empty keeps the default install shell.
     """
     sess = new_session(runner=runner) if runner is not None else new_session()
-    sess.checkpoint_main(install_shell_source(repo, main_sha, extra_shell, deps_only_fallback), timeout=timeout)
-    sess.fork_pr(install_shell_source(repo, pr_sha, extra_shell, deps_only_fallback), timeout=timeout)
+    sess.checkpoint_main(install_shell_source(repo, main_sha, extra_shell, deps_only_fallback, deps_exclude), timeout=timeout)
+    sess.fork_pr(install_shell_source(repo, pr_sha, extra_shell, deps_only_fallback, deps_exclude), timeout=timeout)
     return sess
 
 
