@@ -56,6 +56,8 @@ from harness.machine import detect_machine_type  # noqa: E402
 from poc import agents, behaviour_claims, cost, coverage_gate, diff_probes, freeze, local_config, model_probes, model_provider, probes  # noqa: E402,E501
 from poc.diff import confirm, pr_runs_too_noisy  # noqa: E402
 from poc.pr_text import github_read_token  # noqa: E402
+from poc.tool_setup import ToolSetupError, ensure_tools, uv_bin  # noqa: E402
+from poc.tool_setup import last_result as tool_setup_result  # noqa: E402
 from poc.verdict import Claim, FindingLabel, RunSummary, Verdict, pr_verdict  # noqa: E402
 
 IST = dt.timezone(dt.timedelta(hours=5, minutes=30))
@@ -851,7 +853,7 @@ def install_declared_test_deps(venvs: dict, reqs: list[str], log: Path, timeout:
     if not reqs:
         return True, ""
     for side, venv in venvs.items():
-        rc, _ = run(["uv", "pip", "install", "-q", "-p", venv / "bin/python", *reqs], log,
+        rc, _ = run([uv_bin(), "pip", "install", "-q", "-p", venv / "bin/python", *reqs], log,
                     env=base_env(side_home(venv), install=True), timeout=timeout, sbx=side_sandbox(venv, network=True))
         if rc != 0:
             return False, f"installing declared test requirements on the {side} side failed ({rc}); see {log.name}"
@@ -919,7 +921,7 @@ def install_optional_backends(venvs: dict, reqs: list[str], log: Path, timeout: 
     for req in reqs:
         failed = False
         for side, venv in venvs.items():
-            rc, _ = run(["uv", "pip", "install", "-q", "-p", venv / "bin/python", req], log,
+            rc, _ = run([uv_bin(), "pip", "install", "-q", "-p", venv / "bin/python", req], log,
                         env=base_env(side_home(venv), install=True), timeout=timeout,
                         sbx=side_sandbox(venv, network=True))
             if rc != 0:
@@ -1162,7 +1164,7 @@ def pr_side_constraints(main_venv: Path, dist: str, dest: Path) -> Path:
 
     Editable lines and comments are dropped. `dist` is the label the run already uses for this exclusion; it is
     not the commit guard's lookup. The file is written to `dest`."""
-    frz = in_side(main_venv, ["uv", "pip", "freeze", "-p", main_venv / "bin/python"], install=True).stdout
+    frz = in_side(main_venv, [uv_bin(), "pip", "freeze", "-p", main_venv / "bin/python"], install=True).stdout
     pkgname = dist.lower().replace("_", "-")
     dest.write_text("\n".join(ln for ln in frz.splitlines() if ln and not ln.startswith(("-e", "#"))
                                and ln.split("==")[0].lower().replace("_", "-") != pkgname) + "\n")
@@ -1176,8 +1178,8 @@ def install_side(venv: Path, checkout: Path, chosen: dict | None, log: Path, pyt
         env = base_env(side_home(venv), install=True, SETUPTOOLS_SCM_PRETEND_VERSION="9999.0.0")
     proj, extra = side_install_args(chosen, checkout)
     proj = with_test_extras(proj, checkout)
-    cmds = [["uv", "venv", "-q", "-p", python, venv],
-            ["uv", "pip", "install", "-q", "-p", venv / "bin/python", *proj, *extra, *BASE_TEST_DEPS,
+    cmds = [[uv_bin(), "venv", "-q", "-p", python, venv],
+            [uv_bin(), "pip", "install", "-q", "-p", venv / "bin/python", *proj, *extra, *BASE_TEST_DEPS,
              *pyproject_test_groups(checkout)]
             + (["-c", constraints] if constraints else [])]
     # Optional build constraints (POC_BUILD_CONSTRAINTS, read here in the orchestrator): pins for the isolated build
@@ -1190,7 +1192,7 @@ def install_side(venv: Path, checkout: Path, chosen: dict | None, log: Path, pyt
         # meson-python editable installs rebuild on import with the build tools (ninja, meson, cython); with build
         # isolation those live in a temporary dir that is gone by test time. Install them into the venv instead.
         pins = (["-c", bc] if bc and Path(bc).is_file() else []) + (["-c", constraints] if constraints else [])
-        cmds.insert(1, ["uv", "pip", "install", "-q", "-p", venv / "bin/python", *breq, "ninja", *pins])
+        cmds.insert(1, [uv_bin(), "pip", "install", "-q", "-p", venv / "bin/python", *breq, "ninja", *pins])
         cmds[-1].insert(cmds[-1].index("-p"), "--no-build-isolation")
     # Optional overrides (POC_INSTALL_OVERRIDES): e.g. drop an optional test extra that cannot build on this machine
     # ("scikit-umfpack; python_version < '0'"). Same file for both sides and every tool.
@@ -1339,7 +1341,7 @@ def _retry_setup_gap(a, rec, repo, prdir, venvs: dict, rerun, recheck_coverage=N
         venv = venvs.get(side)
         if venv is None:
             return False, ""
-        rc, _ = run(["uv", "pip", "install", "-q", "-p", venv / "bin/python", requirement],
+        rc, _ = run([uv_bin(), "pip", "install", "-q", "-p", venv / "bin/python", requirement],
                     prdir / "setup-gap.log", env=base_env(side_home(venv), install=True),
                     timeout=getattr(a, "build_timeout", 1800), sbx=side_sandbox(venv, network=True))
         return rc == 0, _dist_version(venv, requirement) if rc == 0 else ""
@@ -1813,7 +1815,7 @@ def dist_extras(venv: Path, dist: str, env: dict) -> list[str]:
 
 
 def freeze_env(venv: Path, out: Path) -> str:
-    txt = in_side(venv, ["uv", "pip", "freeze", "-p", venv / "bin/python"], install=True).stdout
+    txt = in_side(venv, [uv_bin(), "pip", "freeze", "-p", venv / "bin/python"], install=True).stdout
     out.write_text(txt)
     return out.name
 
@@ -1824,8 +1826,8 @@ def build_main_env(cfg: dict, venv: Path, log: Path, python: str, timeout: int, 
     UV_LINK_MODE=copy so patching the PR copy can never modify the shared uv cache."""
     env = base_env(side_home(venv), install=True)
     py = venv / "bin/python"
-    steps = [["uv", "venv", "-q", "-p", python, venv],
-             ["uv", "pip", "install", "-q", "-p", py, cfg["dist"], *cfg["deps"], *BASE_TEST_DEPS, *cfg["test_deps"]]]
+    steps = [[uv_bin(), "venv", "-q", "-p", python, venv],
+             [uv_bin(), "pip", "install", "-q", "-p", py, cfg["dist"], *cfg["deps"], *BASE_TEST_DEPS, *cfg["test_deps"]]]
     sbx = side_sandbox(venv, network=True)
     for c in steps:
         rc, _ = run(c, log, env=env, timeout=timeout, sbx=sbx)
@@ -1836,7 +1838,7 @@ def build_main_env(cfg: dict, venv: Path, log: Path, python: str, timeout: int, 
     optional_backends = {"installed": [], "skipped": []}
     if extras or opt:
         spec = f"{cfg['dist']}[{','.join(extras)}]" if extras else cfg["dist"]
-        rc, _ = run(["uv", "pip", "install", "-q", "-p", py, spec, *opt], log, env=env, timeout=timeout, sbx=sbx)
+        rc, _ = run([uv_bin(), "pip", "install", "-q", "-p", py, spec, *opt], log, env=env, timeout=timeout, sbx=sbx)
         if rc != 0:
             reqs = list(dict.fromkeys(reqs_for_test_extras(metadata_requires(venv, cfg["dist"]), cfg["dist"]) + opt))
             if not reqs:
@@ -1851,13 +1853,13 @@ def build_main_env(cfg: dict, venv: Path, log: Path, python: str, timeout: int, 
             cfg["dist"], python), wheel_dir)
     except Exception as e:  # noqa: BLE001
         return {"ok": False, "why": f"could not fetch the nightly wheel: {e}"}
-    rc, _ = run(["uv", "pip", "install", "-q", "-p", py, "--no-deps", "--reinstall", whl["path"]], log, env=env,
+    rc, _ = run([uv_bin(), "pip", "install", "-q", "-p", py, "--no-deps", "--reinstall", whl["path"]], log, env=env,
                 timeout=timeout, sbx=side_sandbox(venv, ro=(whl["path"],)))   # local file: no network needed
     if rc != 0:
         return {"ok": False, "why": f"installing the nightly wheel failed ({rc})"}
     ver = in_side(venv, [py, "-c", f"import {cfg['pkg']} as m;print(m.__version__)"]).stdout.strip()
     commit, how = nightly_commit(whl["version"], venv, cfg, env)
-    rc, _ = run(["uv", "pip", "check", "-p", py], log, env=env, timeout=120, sbx=side_sandbox(venv))
+    rc, _ = run([uv_bin(), "pip", "check", "-p", py], log, env=env, timeout=120, sbx=side_sandbox(venv))
     whl.pop("path")
     return {"ok": bool(ver), "version": ver, "pip_check": "ok" if rc == 0 else "conflicts (see setup log)",
             "build": whl | {"commit": commit, "commit_source": how},
@@ -1894,11 +1896,11 @@ def source_build(repo: str, item: dict, cfg: dict, venv: Path, workdir: Path, lo
               f"pull/{item['pr']}/head"],
              ["git", "-C", src, "checkout", "-q", "FETCH_HEAD"],
              ["git", "-C", src, "submodule", "update", "-q", "--init", "--depth", "1", "--recursive"],
-             ["uv", "venv", "-q", "-p", python, venv],
-             ["uv", "pip", "install", "-q", "-p", venv / "bin/python", *cfg["deps"], *BASE_TEST_DEPS, *cfg["test_deps"]]]
+             [uv_bin(), "venv", "-q", "-p", python, venv],
+             [uv_bin(), "pip", "install", "-q", "-p", venv / "bin/python", *cfg["deps"], *BASE_TEST_DEPS, *cfg["test_deps"]]]
     for c in steps:   # git on our own fresh clone runs on the host; uv steps (package code) in the PR side's sandbox
-        sbx = side_sandbox(venv, network=True) if c[0] == "uv" else HOST
-        rc, _ = run(c, log, env=env if c[0] == "uv" else base_env(workdir / "home-git"), timeout=900, sbx=sbx)
+        sbx = side_sandbox(venv, network=True) if Path(str(c[0])).name == "uv" else HOST
+        rc, _ = run(c, log, env=env if Path(str(c[0])).name == "uv" else base_env(workdir / "home-git"), timeout=900, sbx=sbx)
         if rc != 0:
             return {"ok": False, "why": f"source checkout/setup failed ({rc}) at: {' '.join(map(str, c[:3]))}"}
     optional = [str(x) for x in list(cfg.get("optional_test_deps") or []) + list(main_extra_reqs)]
@@ -1906,7 +1908,7 @@ def source_build(repo: str, item: dict, cfg: dict, venv: Path, workdir: Path, lo
     backends = install_optional_backends({"pr": venv}, optional, log, timeout) if optional else {
         "installed": [], "skipped": []}
     t0 = time.time()
-    rc, secs = run_heavy(["uv", "pip", "install", "-p", venv / "bin/python", "--no-cache", src], log, env=env,
+    rc, secs = run_heavy([uv_bin(), "pip", "install", "-p", venv / "bin/python", "--no-cache", src], log, env=env,
                          timeout=timeout, sbx=side_sandbox(venv, network=True))
     if rc == "oom":
         return {"ok": False, "build_seconds": round(time.time() - t0, 1),
@@ -2210,7 +2212,7 @@ def coverage_run(item: dict, venv: Path, main_root: Path, pr_root: Path, targets
     if not changed:
         return {"status": "failed", "why": "none of the changed Python files exist on the PR side"}
     log = prdir / "coverage-pr.log"
-    rc, _ = run(["uv", "pip", "install", "-q", "-p", venv / "bin/python", "coverage>=7", "pytest-cov>=5"], log,
+    rc, _ = run([uv_bin(), "pip", "install", "-q", "-p", venv / "bin/python", "coverage>=7", "pytest-cov>=5"], log,
                 env=base_env(side_home(venv), install=True), timeout=600, sbx=side_sandbox(venv, network=True))
     if rc != 0:
         return {"status": "failed", "why": f"installing coverage failed ({rc}); see coverage-pr.log"}
@@ -3101,7 +3103,7 @@ def probe_coverage(item: dict, probe_results: dict | None, vm: Path, main_root: 
     log = prdir / "probe-coverage.log"
     py = vm / "bin" / "python"
     if in_side(vm, [py, "-c", "import coverage"]).returncode != 0:
-        rc, _ = run(["uv", "pip", "install", "-q", "-p", py, "coverage>=7"], log,
+        rc, _ = run([uv_bin(), "pip", "install", "-q", "-p", py, "coverage>=7"], log,
                     env=base_env(side_home(vm), install=True), timeout=600, sbx=side_sandbox(vm, network=True))
         if rc != 0:
             return unmeasured(f"installing coverage on the main side failed ({rc}); see probe-coverage.log")
@@ -3204,10 +3206,14 @@ def new_record(repo: str, cfg: dict, item: dict, a, machine: dict, run_date: str
            "sandbox_backend": getattr(a, "sandbox_backend", None) or "local",
            "sandbox_backend_note": getattr(a, "sandbox_backend_note", None),
            "machine": ("contree" if getattr(a, "sandbox_backend", None) == "contree" else "local"),
+           "tool_setup": getattr(a, "tool_setup", None) or tool_setup_result(),
            "posted_upstream": False, "logs": f"{cfg['pkg']}-{item['pr']}/", "freeze": {}}
     sha = getattr(a, "poc_commit", None)
     if isinstance(sha, str) and _COMMIT.fullmatch(sha):
         rec["poc_commit"] = sha
+    ts = rec.get("tool_setup") or {}
+    if ts.get("installed"):  # plain words in the report's setup notes: what was fixed before the check started
+        rec.setdefault("demo_helper", {}).setdefault("notes", []).append(f"Set up Python: {ts['note']}")
     rec["route"] = ("source-pair" if not cfg.get("nightly") else
                     "source-build" if item["files"]["compiled"] else "nightly+patch")
     rec["current_head_sha"] = item.get("current_head_sha") or item["head_sha"]
@@ -3300,7 +3306,7 @@ def install_optional_modules(venvs: dict, modules: list[str], log: Path, timeout
     if not pkgs:
         return True, ""
     for side, venv in venvs.items():
-        rc, _ = run(["uv", "pip", "install", "-q", "-p", venv / "bin/python", *pkgs], log,
+        rc, _ = run([uv_bin(), "pip", "install", "-q", "-p", venv / "bin/python", *pkgs], log,
                     env=base_env(side_home(venv), install=True), timeout=timeout,
                     sbx=side_sandbox(venv, network=True))
         if rc != 0:
@@ -3593,7 +3599,7 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
         if reqs:
             def _plan_install(side, requirement, _vm=vm, _vp=vp):
                 venv = _vm if side == "main" else _vp
-                rc, _ = run(["uv", "pip", "install", "-q", "-p", venv / "bin/python", requirement],
+                rc, _ = run([uv_bin(), "pip", "install", "-q", "-p", venv / "bin/python", requirement],
                             prdir / "setup-plan.log", env=base_env(side_home(venv), install=True),
                             timeout=a.build_timeout, sbx=side_sandbox(venv, network=True))
                 return rc == 0, _dist_version(venv, requirement) if rc == 0 else ""
@@ -4731,6 +4737,12 @@ def main(argv=None) -> int:
         print(f"Stopped: only {free_gb:.0f} GB of free disk space; a run needs at least {a.min_free_gb:.0f} GB "
               f"(test environments are large). Free some space, or delete the {ops / 'work'} folder.", file=sys.stderr)
         return 2
+    # Set up Python step: install any declared tool that is missing (uv etc.) before anything shells out to it.
+    try:
+        a.tool_setup = ensure_tools()
+    except ToolSetupError as e:
+        print(f"Cannot start the check: {e}", file=sys.stderr, flush=True)
+        return 2
     if not a.select_only:
         from poc import demo_helper
         if demo_helper.active(a):
@@ -5070,7 +5082,10 @@ def report_only(rdir: Path, a) -> int:
 
 def resolve_python(spec: str) -> str:
     """'3.12' -> '3.12.15' (the interpreter uv will use for the venvs)."""
-    exe = subprocess.run(["uv", "python", "find", spec], capture_output=True, text=True).stdout.strip()
+    try:
+        exe = subprocess.run([uv_bin(), "python", "find", spec], capture_output=True, text=True).stdout.strip()
+    except (ToolSetupError, OSError):
+        exe = ""
     if exe:
         v = subprocess.run([exe, "-c", "import platform;print(platform.python_version())"], capture_output=True,
                            text=True).stdout.strip()
