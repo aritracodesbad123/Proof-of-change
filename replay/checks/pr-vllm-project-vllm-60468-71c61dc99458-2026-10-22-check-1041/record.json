@@ -1,0 +1,425 @@
+{
+  "schema_version": "1",
+  "record_kind": "pr_run",
+  "id": "pr-vllm-project-vllm-60468-71c61dc99458-2026-10-22-check-1041",
+  "date_ist": "2026-10-22 10:41 IST",
+  "run_date": "2026-10-22",
+  "who": "ops/daily_run.py",
+  "repo": "vllm-project/vllm",
+  "library": "vllm",
+  "pr": {
+    "repo": "vllm-project/vllm",
+    "number": 60468,
+    "url": "https://github.com/vllm-project/vllm/pull/60468",
+    "title": "[Perf] Warm up DeepGEMM MegaMoE kernels before serving",
+    "base_sha": "206e45d47009447001e9080d430e64c90fba21a6",
+    "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+    "head_sha": "71c61dc99458813c0af72a17eaed3138f1f5b2db",
+    "merge_commit": null,
+    "tested_main_sha": "206e45d47009447001e9080d430e64c90fba21a6",
+    "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+  },
+  "author": "simon-veitner-redhat",
+  "base_ref": "main",
+  "updated_at_utc": "2026-10-21T09:29:34Z",
+  "updated_at_ist": "2026-10-21 14:59 IST",
+  "ci_state": "not checked (single-PR check)",
+  "ci_detail": "checked on request with --pr",
+  "tested_at_ist": "2026-10-22 10:41 IST",
+  "files": {
+    "all": [
+      "tests/model_executor/test_deep_gemm_warmup.py",
+      "vllm/model_executor/warmup/deep_gemm_warmup.py",
+      "vllm/models/kimi_k3/nvidia/model.py"
+    ],
+    "package_py": [
+      "vllm/model_executor/warmup/deep_gemm_warmup.py",
+      "vllm/models/kimi_k3/nvidia/model.py"
+    ],
+    "compiled": [],
+    "other": [
+      "tests/model_executor/test_deep_gemm_warmup.py"
+    ]
+  },
+  "machine_type": {
+    "arch": "x86_64",
+    "os": "Linux",
+    "platform": "Linux-6.12.94+-x86_64-with-glibc2.41",
+    "cpu_count": 8,
+    "ci": null,
+    "runner_name": null,
+    "runner_os": null,
+    "runner_arch": null,
+    "runner_environment": null,
+    "image": null,
+    "label": "local",
+    "gxx": "g++ (Debian 14.2.0-19) 14.2.0",
+    "cpu_model": "Intel(R) Xeon(R) Processor",
+    "ram_gb": 15.6
+  },
+  "thread_env": {
+    "OMP_NUM_THREADS": "1",
+    "OPENBLAS_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1",
+    "NUMEXPR_NUM_THREADS": "1",
+    "VECLIB_MAXIMUM_THREADS": "1",
+    "BLIS_NUM_THREADS": "1",
+    "PYTHONHASHSEED": "0"
+  },
+  "runs_per_side": 0,
+  "runs_per_side_planned": 3,
+  "workers": "4",
+  "test_timeout_s": 120,
+  "run_timeout_s": 900,
+  "build_timeout_s": 1800,
+  "python": "3.12.15",
+  "test_selection": "",
+  "per_run": [],
+  "notes": null,
+  "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+  "behaviour_claims": [],
+  "baseline": "full",
+  "model_provider": {
+    "requested": "nebius",
+    "used": null,
+    "note": "model provider: nebius (Token Factory, live)",
+    "blind": false
+  },
+  "sandbox_backend": "local",
+  "sandbox_backend_note": "local bubblewrap",
+  "machine": "local",
+  "posted_upstream": false,
+  "logs": "vllm-60468/",
+  "freeze": {},
+  "poc_commit": "0fa0016ea51794edee0f4a085e41bf48dd813765",
+  "route": "source-pair",
+  "current_head_sha": "71c61dc99458813c0af72a17eaed3138f1f5b2db",
+  "tested_invocation": 1,
+  "model_provider_used": "none",
+  "model_provider_fallback": "no AI call ran (asked for nebius)",
+  "state": "closed",
+  "mergeable_state": "unknown",
+  "product_check": true,
+  "demo_helper": {
+    "preflight": {
+      "ok": true
+    },
+    "tavily": {
+      "ok": true,
+      "skipped": false,
+      "live_call": true,
+      "cached": false,
+      "queries": [
+        "vllm python setup install instructions https://github.com/vllm-project/vllm site:github.com/vllm-project/vllm",
+        "vllm python documentation install https://github.com/vllm-project/vllm site:github.com/vllm-project/vllm",
+        "vllm python install requirements https://pypi.org/project/vllm/ https://github.com/vllm-project/vllm site:pypi.org"
+      ],
+      "results": [
+        {
+          "title": "vllm \u00b7 PyPI",
+          "url": "https://pypi.org/project/vllm/",
+          "query": "vllm python install requirements https://pypi.org/project/vllm/ https://github.com/vllm-project/vllm site:pypi.org"
+        },
+        {
+          "title": "vllm-ascend \u00b7 PyPI",
+          "url": "https://pypi.org/project/vllm-ascend/",
+          "query": "vllm python install requirements https://pypi.org/project/vllm/ https://github.com/vllm-project/vllm site:pypi.org"
+        },
+        {
+          "title": "vllm/docs/getting_started/installation/gpu.cuda.inc.md at main \u00b7 vllm-project/vllm \u00b7 GitHub",
+          "url": "https://github.com/vllm-project/vllm/blob/main/docs/getting_started/installation/gpu.cuda.inc.md",
+          "query": "vllm python setup install instructions https://github.com/vllm-project/vllm site:github.com/vllm-project/vllm"
+        },
+        {
+          "title": "[Installation]: pip install -e failed \u00b7 Issue #5674 \u00b7 vllm-project/vllm \u00b7 GitHub",
+          "url": "https://github.com/vllm-project/vllm/issues/5674",
+          "query": "vllm python setup install instructions https://github.com/vllm-project/vllm site:github.com/vllm-project/vllm"
+        },
+        {
+          "title": "Releases \u00b7 vllm-project/vllm \u00b7 GitHub",
+          "url": "https://github.com/vllm-project/vllm/releases",
+          "query": "vllm python setup install instructions https://github.com/vllm-project/vllm site:github.com/vllm-project/vllm"
+        },
+        {
+          "title": "[Installation]: how to install v0.8.0 \u00b7 Issue #15081 \u00b7 vllm-project/vllm \u00b7 GitHub",
+          "url": "https://github.com/vllm-project/vllm/issues/15081",
+          "query": "vllm python documentation install https://github.com/vllm-project/vllm site:github.com/vllm-project/vllm"
+        },
+        {
+          "title": "vllm/.gitignore at main \u00b7 vllm-project/vllm \u00b7 GitHub",
+          "url": "https://github.com/vllm-project/vllm/blob/main/.gitignore",
+          "query": "vllm python documentation install https://github.com/vllm-project/vllm site:github.com/vllm-project/vllm"
+        },
+        {
+          "title": "[Bug]: vllm ignores existing pytorch installation \u00b7 Issue #21745 \u00b7 vllm-project/vllm \u00b7 GitHub",
+          "url": "https://github.com/vllm-project/vllm/issues/21745",
+          "query": "vllm python documentation install https://github.com/vllm-project/vllm site:github.com/vllm-project/vllm"
+        }
+      ],
+      "text": "To install vLLM, you can use `uv pip` with the `--editable` flag for changes in Python code without compilation: `uv pip install vllm --torch-backend=auto vllm download-kernels`. For building from source, clone the repository and run `pip install -e .`. If you need to use a local version of cutlass, set the environment variable `VLLM_CUTLASS_SRC_DIR`. For CUDA 13.0, use `pip install vllm`. For ROCm, use `pip install vllm --extra-index-url`. For XPU, use `uv pip install vllm --extra-index-url --extra-index-url --index-strategy unsafe-best-match`.\nTo install vllm version 0.8.0, you can use the following pip commands to install the required dependencies: `pip3 install onnxruntime==1.20.1 pynvml==11.5.0 pyzmq==25.1.2 sentence-transformers==3.3.1 torch==2.5.1 torchaudio==2.5.1 torchvision==0.20.1 transformers==4.50.0.dev0 triton==3.1.0 vllm-nccl-cu12==2.18.1.0.1.0`. For conda dependencies, install `numpy 1.26.4`, `nvidia-cublas-cu12 12.4.5.8`, `nvidia-cuda-cupti-cu12 12.4.127`, `nvidia-cuda-nvrtc-cu12 12.4.127`, `pyzmq 25.1.2`, `sentence-transformers 3.3.1`, `torch 2.5.1`, `torchaudio 2.5.1\nTo install vllm, you can use the command `pip install vllm==0.23.0`. For the Ascend backend, you can use `pip install vllm vllm-ascend` once support is available. For now, you can clone the vllm and vllm-ascend repositories from GitHub and build the wheel from source. The sources do not provide a definitive answer for the current date's requirements beyond these instructions.\nTitle: vllm\n# vllm \u00b7 PyPI. Skip to main contentSwitch to mobile version. # vllm 0.23.0. pip install vllm==0.23.0 Copy PIP instructions. A high-throughput and memory-efficient inference and serving engine for LLMs. JetBrains is a Contributing sponsor of the Python Software Foundation. ### Easy, fast, and cheap LLM serving for everyone. \ud83d\udd25 We have built a vLLM website to help you get started with vLLM. Please visit vllm.ai to learn more. For events, please visit vllm.ai/events to join us. vLLM is a\nTitle: vllm-ascend \u00b7 PyPI\n### vLLM Ascend Plugin. * [2024/12] We are working with the vLLM community to support [[RFC]: Hardware pluggable](https://github.com/vllm-project/vllm/issues/11162). vLLM Ascend plugin (`vllm-ascend`) is a backend plugin for running vLLM on the Ascend NPU. This plugin is the recommended approach for supporting the Ascend backend within the vLLM community. It adheres to the principles outlined in the [[RFC]: Hardware pluggable](https://github.com/vllm-project/vllm/issues\nIf you only need to change Python code, you can build and install vLLM without compilation. Using `uv pip`'s `--editable` flag, changes you make to the code will be reflected when you run vLLM:\n\n```\ncd.\n```\n\nThe install command will do the following:\n\n1. Look for the current branch in your vLLM clone.\n2. Identify the corresponding base commit in the main branch.\n3. Download the pre-built wheel of the base commit.\n4. Use its compiled libraries and `vllm-rs` binary in the installation. [...] There\nSay, you are already inside rocm-vllm container (which you mentioned earlier), you make some changes in /vllm-workspace, you can run `python setup.py install`, which will do build vllm from source. Alternatively for easy experiments, you can change python code directly in vllm installation directory by showing where it is installed using command like \"pip show vllm\" without needing to run `python setup.py install`.\n13. ### AndyZZtcommentedon Aug 13, 2024\n\n    @AndyZZt\n\n    AndyZZt [...] ### How \n## Release Artifacts\n\n### Python Wheels\n\n| Platform | Install |\n --- |\n| PyPI (CUDA 13.0) | `pip install vllm` |\n| PyPI (CUDA 13.0, uv) | `uv pip install vllm --torch-backend=auto` |\n| ROCm | `pip install vllm --extra-index-url  |\n\n### Docker Images [...] ### Python Wheels\n\n| Platform | Install |\n --- |\n| PyPI (CUDA 13.0) | `pip install vllm` |\n| PyPI (CUDA 13.0, uv) | `uv pip install vllm --torch-backend=auto` |\n| ROCm | `pip install vllm --extra-index-url  |\n| XPU | `uv pip install vllm --extr\n[pip3] onnxruntime==1.20.1 [pip3] pynvml==11.5.0 [pip3] pyzmq==25.1.2 [pip3] sentence-transformers==3.3.1 [pip3] torch==2.5.1 [pip3] torchaudio==2.5.1 [pip3] torchvision==0.20.1 [pip3] transformers==4.50.0.dev0 [pip3] triton==3.1.0 [pip3] vllm-nccl-cu12==2.18.1.0.1.0 [conda] numpy 1.26.4 pypi_0 pypi [conda] nvidia-cublas-cu12 12.4.5.8 pypi_0 pypi [conda] nvidia-cuda-cupti-cu12 12.4.127 pypi_0 pypi [conda] nvidia-cuda-nvrtc-cu12 12.4.127 pypi_0 pypi [conda] nvidia-cuda-runtime-cu12 12.4.127 [...]\n\\.egg-info/\n\n.installed.cfg\n\n\\.egg\n\nMANIFEST\n\n/.deps/\n\n# PyInstaller\n\n# Usually these files are written by a python script from a template\n\n# before PyInstaller builds the exe, so as to inject date/other infos into it.\n\n\\.manifest\n\n\\.spec\n\n# Installer logs\n\npip-log.txt\n\npip-delete-this-directory.txt\n\n# Unit test / coverage reports\n\nhtmlcov/\n\n.tox/\n\n.nox/\n\n.coverage\n\n.coverage.\\\n\n.cache\n\nnosetests.xml\n\ncoverage.xml\n\n\\.cover\n\n\\.py,cover\n\n.hypothesis/\n\n.pytest\\_cache/\n\ncover/\n\n# Translations [...] \n### Before submitting a new issue...\n\n Make sure you already searched for relevant issues, and asked the chatbot living at the bottom right corner of the documentation page, which can answer lots of frequently asked questions.\n\nReactions are currently unavailable\n\n## Activity\n\nSign up for free to join this conversation on GitHub. Already have an account? Sign in to comment\n\n## Metadata\n\n## Metadata\n\nNo one assigned\n\n### Labels\n\nbugSomething isn't workingSomething isn't working\n\nNo type [...] ```",
+      "errors": [],
+      "lines": [
+        "Looked up with Tavily: 8 results",
+        "Query: vllm python setup install instructions https://github.com/vllm-project/vllm site:github.com/vllm-project/vllm",
+        "Query: vllm python documentation install https://github.com/vllm-project/vllm site:github.com/vllm-project/vllm",
+        "Query: vllm python install requirements https://pypi.org/project/vllm/ https://github.com/vllm-project/vllm site:pypi.org",
+        "Source: vllm \u00b7 PyPI \u2014 https://pypi.org/project/vllm/",
+        "Source: vllm-ascend \u00b7 PyPI \u2014 https://pypi.org/project/vllm-ascend/",
+        "Source: vllm/docs/getting_started/installation/gpu.cuda.inc.md at main \u00b7 vllm-project/vllm \u00b7 GitHub \u2014 https://github.com/vllm-project/vllm/blob/main/docs/getting_started/installation/gpu.cuda.inc.md",
+        "Source: [Installation]: pip install -e failed \u00b7 Issue #5674 \u00b7 vllm-project/vllm \u00b7 GitHub \u2014 https://github.com/vllm-project/vllm/issues/5674",
+        "Source: Releases \u00b7 vllm-project/vllm \u00b7 GitHub \u2014 https://github.com/vllm-project/vllm/releases",
+        "Source: [Installation]: how to install v0.8.0 \u00b7 Issue #15081 \u00b7 vllm-project/vllm \u00b7 GitHub \u2014 https://github.com/vllm-project/vllm/issues/15081",
+        "Source: vllm/.gitignore at main \u00b7 vllm-project/vllm \u00b7 GitHub \u2014 https://github.com/vllm-project/vllm/blob/main/.gitignore",
+        "Source: [Bug]: vllm ignores existing pytorch installation \u00b7 Issue #21745 \u00b7 vllm-project/vllm \u00b7 GitHub \u2014 https://github.com/vllm-project/vllm/issues/21745"
+      ]
+    },
+    "notes": [
+      "Setup check: GitHub token: present.",
+      "Setup check: Nebius token: present.",
+      "Setup check: free memory 9.0 GB (of 15.6 GB).",
+      "Setup check: free disk 89.2 GB.",
+      "Demo helper: git is installed.",
+      "Demo helper: python3 is installed.",
+      "Demo helper: uv is installed.",
+      "Looked up with Tavily: 8 results",
+      "Query: vllm python setup install instructions https://github.com/vllm-project/vllm site:github.com/vllm-project/vllm",
+      "Query: vllm python documentation install https://github.com/vllm-project/vllm site:github.com/vllm-project/vllm",
+      "Query: vllm python install requirements https://pypi.org/project/vllm/ https://github.com/vllm-project/vllm site:pypi.org",
+      "Source: vllm \u00b7 PyPI \u2014 https://pypi.org/project/vllm/",
+      "Source: vllm-ascend \u00b7 PyPI \u2014 https://pypi.org/project/vllm-ascend/",
+      "Source: vllm/docs/getting_started/installation/gpu.cuda.inc.md at main \u00b7 vllm-project/vllm \u00b7 GitHub \u2014 https://github.com/vllm-project/vllm/blob/main/docs/getting_started/installation/gpu.cuda.inc.md",
+      "Source: [Installation]: pip install -e failed \u00b7 Issue #5674 \u00b7 vllm-project/vllm \u00b7 GitHub \u2014 https://github.com/vllm-project/vllm/issues/5674",
+      "Source: Releases \u00b7 vllm-project/vllm \u00b7 GitHub \u2014 https://github.com/vllm-project/vllm/releases",
+      "Source: [Installation]: how to install v0.8.0 \u00b7 Issue #15081 \u00b7 vllm-project/vllm \u00b7 GitHub \u2014 https://github.com/vllm-project/vllm/issues/15081",
+      "Source: vllm/.gitignore at main \u00b7 vllm-project/vllm \u00b7 GitHub \u2014 https://github.com/vllm-project/vllm/blob/main/.gitignore",
+      "Source: [Bug]: vllm ignores existing pytorch installation \u00b7 Issue #21745 \u00b7 vllm-project/vllm \u00b7 GitHub \u2014 https://github.com/vllm-project/vllm/issues/21745",
+      "Setup plan: the same packages on main and pr.",
+      "Setup plan: install pandas (listed in requirements.txt) on main and pr.",
+      "Setup plan: install numpy>=1.24 (listed in requirements.txt) on main and pr.",
+      "Setup plan: install aiohttp>=3.10 (listed in requirements.txt) on main and pr.",
+      "Setup plan: install transformers>=4.46 (listed in requirements.txt) on main and pr.",
+      "Setup plan: install xlsxwriter>=3.2.1 (listed in requirements.txt) on main and pr.",
+      "Setup plan: install tqdm>=4.66 (listed in requirements.txt) on main and pr.",
+      "Setup plan: install matplotlib (listed in requirements.txt) on main and pr.",
+      "Setup plan: install seaborn (listed in requirements.txt) on main and pr.",
+      "Setup plan: Python 3.12: Python 3.12 already meets >=3.11,<3.15, <3.15,>=3.11",
+      "rerun, setup problem: main install failed after 3 tries.",
+      "Demo helper: setup failure already labelled; the probe was not rerun."
+    ],
+    "setup_plan": {
+      "packages": [
+        {
+          "requirement": "pandas",
+          "name": "pandas",
+          "kind": "requirements",
+          "action": "install",
+          "source": "requirements.txt",
+          "reason": "listed in requirements.txt",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "numpy>=1.24",
+          "name": "numpy",
+          "kind": "requirements",
+          "action": "install",
+          "source": "requirements.txt",
+          "reason": "listed in requirements.txt",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "aiohttp>=3.10",
+          "name": "aiohttp",
+          "kind": "requirements",
+          "action": "install",
+          "source": "requirements.txt",
+          "reason": "listed in requirements.txt",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "transformers>=4.46",
+          "name": "transformers",
+          "kind": "requirements",
+          "action": "install",
+          "source": "requirements.txt",
+          "reason": "listed in requirements.txt",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "xlsxwriter>=3.2.1",
+          "name": "xlsxwriter",
+          "kind": "requirements",
+          "action": "install",
+          "source": "requirements.txt",
+          "reason": "listed in requirements.txt",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "tqdm>=4.66",
+          "name": "tqdm",
+          "kind": "requirements",
+          "action": "install",
+          "source": "requirements.txt",
+          "reason": "listed in requirements.txt",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "matplotlib",
+          "name": "matplotlib",
+          "kind": "requirements",
+          "action": "install",
+          "source": "requirements.txt",
+          "reason": "listed in requirements.txt",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "seaborn",
+          "name": "seaborn",
+          "kind": "requirements",
+          "action": "install",
+          "source": "requirements.txt",
+          "reason": "listed in requirements.txt",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        }
+      ],
+      "extra_reqs": [
+        "pandas",
+        "numpy>=1.24",
+        "aiohttp>=3.10",
+        "transformers>=4.46",
+        "xlsxwriter>=3.2.1",
+        "tqdm>=4.66",
+        "matplotlib",
+        "seaborn"
+      ],
+      "python": {
+        "requested": "3.12",
+        "current": "3.12",
+        "applied": true,
+        "switch": null,
+        "reason": "Python 3.12 already meets >=3.11,<3.15, <3.15,>=3.11"
+      },
+      "system": [],
+      "refused": []
+    },
+    "setup": {
+      "label": "rerun, setup problem",
+      "counts_as_verdict": false,
+      "step": "main install",
+      "attempts": 3,
+      "detail": "install failed (2); see setup-main.log"
+    }
+  },
+  "chosen": {
+    "pr": 60468,
+    "head_sha": null,
+    "install": null,
+    "test_cmd": null
+  },
+  "sides": {
+    "comparison_basis": "merge-base vs PR head (no merge ref available)",
+    "main_sha": "206e45d47009447001e9080d430e64c90fba21a6",
+    "pr_sha": "71c61dc99458813c0af72a17eaed3138f1f5b2db"
+  },
+  "tested": {
+    "main": "main @ 206e45d47009 (merge-base with the PR head)",
+    "pr": "PR head 71c61dc99458"
+  },
+  "verdict": "could_not_verify",
+  "reason": "install failed (2); see setup-main.log",
+  "verdict_before_coverage_gate": "could_not_verify",
+  "reason_before_coverage_gate": "install failed (2); see setup-main.log",
+  "changed_lines_total": null,
+  "changed_lines_covered": null,
+  "coverage_gate": {
+    "kind": "python",
+    "changed": false,
+    "confidence": "lower",
+    "note": "coverage of the changed Python lines was NOT MEASURED (record predates the coverage gate: no coverage run exists for it, so this is not a measurement result)",
+    "measurement": "not measured: predates gate"
+  },
+  "agents": {
+    "status": "skipped",
+    "note": "advisory swarm is off",
+    "roles": []
+  },
+  "explanation": {
+    "status": "not yet wired",
+    "why": "advisory swarm is off"
+  },
+  "swarm_requested": false,
+  "operator_approval_requested": false,
+  "swarm": "off",
+  "operator_approval": "off",
+  "what_changed": {
+    "package_python_files": [
+      "vllm/model_executor/warmup/deep_gemm_warmup.py",
+      "vllm/models/kimi_k3/nvidia/model.py"
+    ],
+    "compiled_files": [],
+    "other_files": [
+      "tests/model_executor/test_deep_gemm_warmup.py"
+    ]
+  },
+  "duration_s": {
+    "total_wall": 36.1,
+    "tests": 0
+  },
+  "cost": {
+    "ai_calls": 0,
+    "failed_ai_calls": 0,
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "thinking_tokens": 0,
+    "cost_usd": 0.0,
+    "calls_without_usage": 0,
+    "ai_cost_usd": 0.0,
+    "cost_complete": true,
+    "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+    "compute_seconds": {
+      "total_wall": 36.1,
+      "tests": 0
+    },
+    "machine_usd_per_hour": 0.24,
+    "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+    "computer_cost_usd": 0.002407,
+    "total_cost_usd": 0.002407,
+    "swarm": {
+      "ai_calls": 0,
+      "failed_ai_calls": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "thinking_tokens": 0,
+      "cost_usd": 0.0,
+      "calls_without_usage": 0,
+      "ai_cost_usd": 0.0,
+      "cost_complete": true,
+      "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+    }
+  },
+  "head_at_report_sha": "71c61dc99458813c0af72a17eaed3138f1f5b2db",
+  "head_moved_since_test": false
+}

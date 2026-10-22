@@ -1,0 +1,1234 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-optiland-optiland-962-9fd0f199e62e-2026-10-22-check-0122",
+ "date_ist": "2026-10-22 01:22 IST",
+ "run_date": "2026-10-22",
+ "who": "ops/daily_run.py",
+ "repo": "optiland/optiland",
+ "library": "optiland",
+ "pr": {
+  "repo": "optiland/optiland",
+  "number": 962,
+  "url": "https://github.com/optiland/optiland/pull/962",
+  "title": "Align dock and document tabs at the top",
+  "base_sha": "1e0513902c68948a727394c6226f3580c7261c65",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "9fd0f199e62e97fc922135c4a1bb4ab890119576",
+  "merge_commit": null,
+  "tested_main_sha": "1e0513902c68948a727394c6226f3580c7261c65",
+  "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+ },
+ "author": "BrunoChevalier",
+ "base_ref": "master",
+ "updated_at_utc": "2026-10-21T17:31:17Z",
+ "updated_at_ist": "2026-10-21 23:01 IST",
+ "ci_state": "not checked (single-PR check)",
+ "ci_detail": "checked on request with --pr",
+ "tested_at_ist": "2026-10-22 01:22 IST",
+ "files": {
+  "all": [
+   "docs/developers_guide/gui.rst",
+   "optiland_gui/config.py",
+   "optiland_gui/lens_editor.py",
+   "optiland_gui/main_window.py",
+   "optiland_gui/optimization_panel.py",
+   "optiland_gui/viewer_panel.py",
+   "optiland_gui/widgets/python_terminal.py",
+   "tests/gui/test_document_view_preferences.py",
+   "tests/gui/test_surface_properties_panels.py",
+   "tests/gui/test_tab_placement.py"
+  ],
+  "package_py": [],
+  "compiled": [],
+  "other": [
+   "docs/developers_guide/gui.rst",
+   "optiland_gui/config.py",
+   "optiland_gui/lens_editor.py",
+   "optiland_gui/main_window.py",
+   "optiland_gui/optimization_panel.py",
+   "optiland_gui/viewer_panel.py",
+   "optiland_gui/widgets/python_terminal.py",
+   "tests/gui/test_document_view_preferences.py",
+   "tests/gui/test_surface_properties_panels.py",
+   "tests/gui/test_tab_placement.py"
+  ]
+ },
+ "machine_type": {
+  "arch": "x86_64",
+  "os": "Linux",
+  "platform": "Linux-6.12.94+-x86_64-with-glibc2.41",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": "g++ (Debian 14.2.0-19) 14.2.0",
+  "cpu_model": "Intel(R) Xeon(R) Processor",
+  "ram_gb": 15.6
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 3,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.15",
+ "test_selection": "mapped from touched files: tests/gui/test_document_view_preferences.py, tests/gui/test_surface_properties_panels.py, tests/gui/test_tab_placement.py",
+ "per_run": [
+  {
+   "side": "old",
+   "run": 1,
+   "passed": 0,
+   "failed": 0,
+   "error": 4,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 13.9,
+   "pytest_summary": "4 errors in 6.05s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 1,
+   "passed": 0,
+   "failed": 0,
+   "error": 3,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 12.2,
+   "pytest_summary": "3 errors in 5.62s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 2,
+   "passed": 0,
+   "failed": 0,
+   "error": 4,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 11.6,
+   "pytest_summary": "4 errors in 6.07s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 2,
+   "passed": 0,
+   "failed": 0,
+   "error": 3,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 11.9,
+   "pytest_summary": "3 errors in 6.38s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 3,
+   "passed": 0,
+   "failed": 0,
+   "error": 4,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 12.0,
+   "pytest_summary": "4 errors in 6.31s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 3,
+   "passed": 0,
+   "failed": 0,
+   "error": 3,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 11.6,
+   "pytest_summary": "3 errors in 6.07s",
+   "junit": true
+  }
+ ],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "local",
+ "sandbox_backend_note": "local bubblewrap",
+ "machine": "local",
+ "posted_upstream": false,
+ "logs": "optiland-962/",
+ "freeze": {
+  "main": "freeze-main.txt",
+  "pr": "freeze-pr.txt"
+ },
+ "poc_commit": "0fa0016ea51794edee0f4a085e41bf48dd813765",
+ "route": "source-pair",
+ "current_head_sha": "9fd0f199e62e97fc922135c4a1bb4ab890119576",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "state": "closed",
+ "mergeable_state": "unknown",
+ "product_check": true,
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": {
+   "ok": true,
+   "skipped": false,
+   "live_call": true,
+   "cached": false,
+   "queries": [
+    "optiland python setup install instructions https://github.com/optiland/optiland site:github.com/optiland/optiland",
+    "optiland python documentation install https://github.com/optiland/optiland site:github.com/optiland/optiland",
+    "optiland python install requirements https://pypi.org/project/optiland/ https://github.com/optiland/optiland site:pypi.org"
+   ],
+   "results": [
+    {
+     "title": "optiland/pyproject.toml at master",
+     "url": "https://github.com/optiland/optiland/blob/master/pyproject.toml",
+     "query": "optiland python documentation install https://github.com/optiland/optiland site:github.com/optiland/optiland"
+    },
+    {
+     "title": "GitHub - optiland/optiland: Comprehensive optical design, optimization, and analysis in Python, including GPU-accelerated and differentiable ray tracing via PyTorch. \u00b7 GitHub",
+     "url": "https://github.com/optiland/optiland",
+     "query": "optiland python documentation install https://github.com/optiland/optiland site:github.com/optiland/optiland"
+    },
+    {
+     "title": "Raytracing / Simulating LED in enclosed compartments \u00b7 optiland/optiland \u00b7 Discussion #96 \u00b7 GitHub",
+     "url": "https://github.com/optiland/optiland/discussions/96",
+     "query": "optiland python documentation install https://github.com/optiland/optiland site:github.com/optiland/optiland"
+    }
+   ],
+   "text": "To install Optiland, use the command `pip install optiland` for the core package or `pip install optiland[gui]` for the core package with the GUI. Under the hood, Optiland uses NumPy for fast CPU calculations and PyTorch for GPU acceleration and automatic differentiation. The sources do not provide a definitive answer to specific installation details beyond these commands.\nComprehensive optical design, optimization, and analysis in Python, including GPU-accelerated and differentiable ray tracing via PyTorch.\nA singlet drawn by Optiland\n\nStuck? `from optiland.diagnostics import check_system; print(check_system(lens))` reports what is missing or inconsistent about a system, each finding with a runnable fix.\n\n\u2192 Start Here \u00b7 Conventions \u00b7 How do I \u2026? \u00b7 5-minute quickstart \u00b7 Example Gallery \u00b7 Full Learning Guide\n\n## Installation\n\n Core only\n\n  ```\n  pip install optiland\n  ```\n Core + GUI\n\n  ```\n  pip install optiland[gui]\n  ```\n With CPU\u2011only PyTorch [...] Under the hood, Optiland uses NumPy for fast CPU\nis_stop=True, material='mirror', rx=np.pi/4) File optics_VENV/lib/python3.11/site-packages/optiland/optic/optic.py:149, in Optic.add_surface(self, new_surface, surface_type, comment, index, is_stop, material, kwargs) 119 def add_surface( 120 self, 121 new_surface=None, (...) 127 kwargs, 128 ): 129 \"\"\"Adds a new surface to the optic. 130 131 Args: (...) 147 148 \"\"\" --> 149 self.surface_group.add_surface( 150 new_surface=new_surface, 151 surface_type=surface_type, 152 comment=comment, 153 [...] ms",
+   "errors": [],
+   "lines": [
+    "Looked up with Tavily: 3 results",
+    "Query: optiland python setup install instructions https://github.com/optiland/optiland site:github.com/optiland/optiland",
+    "Query: optiland python documentation install https://github.com/optiland/optiland site:github.com/optiland/optiland",
+    "Query: optiland python install requirements https://pypi.org/project/optiland/ https://github.com/optiland/optiland site:pypi.org",
+    "Source: optiland/pyproject.toml at master \u2014 https://github.com/optiland/optiland/blob/master/pyproject.toml",
+    "Source: GitHub - optiland/optiland: Comprehensive optical design, optimization, and analysis in Python, including GPU-accelerated and differentiable ray tracing via PyTorch. \u00b7 GitHub \u2014 https://github.com/optiland/optiland",
+    "Source: Raytracing / Simulating LED in enclosed compartments \u00b7 optiland/optiland \u00b7 Discussion #96 \u00b7 GitHub \u2014 https://github.com/optiland/optiland/discussions/96"
+   ]
+  },
+  "notes": [
+   "Setup check: GitHub token: present.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory 4.5 GB (of 15.6 GB).",
+   "Setup check: free disk 92.8 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: 3 results",
+   "Query: optiland python setup install instructions https://github.com/optiland/optiland site:github.com/optiland/optiland",
+   "Query: optiland python documentation install https://github.com/optiland/optiland site:github.com/optiland/optiland",
+   "Query: optiland python install requirements https://pypi.org/project/optiland/ https://github.com/optiland/optiland site:pypi.org",
+   "Source: optiland/pyproject.toml at master \u2014 https://github.com/optiland/optiland/blob/master/pyproject.toml",
+   "Source: GitHub - optiland/optiland: Comprehensive optical design, optimization, and analysis in Python, including GPU-accelerated and differentiable ray tracing via PyTorch. \u00b7 GitHub \u2014 https://github.com/optiland/optiland",
+   "Source: Raytracing / Simulating LED in enclosed compartments \u00b7 optiland/optiland \u00b7 Discussion #96 \u00b7 GitHub \u2014 https://github.com/optiland/optiland/discussions/96",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: numpy is noted, installed with the project.",
+   "Setup plan: scipy is noted, installed with the project.",
+   "Setup plan: pandas is noted, installed with the project.",
+   "Setup plan: pyyaml is noted, installed with the project.",
+   "Setup plan: matplotlib is noted, installed with the project.",
+   "Setup plan: vtk is noted, installed with the project.",
+   "Setup plan: tabulate is noted, installed with the project.",
+   "Setup plan: numba is noted, installed with the project.",
+   "Setup plan: requests is noted, installed with the project.",
+   "Setup plan: seaborn is noted, installed with the project.",
+   "Setup plan: typing-extensions is noted, installed with the project.",
+   "Setup plan: install sphinx==8.2.3 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install docutils==0.21.2 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install pydata-sphinx-theme==0.21.0 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install sphinx-design==0.7.0 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install sphinx-copybutton==0.5.2 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install sphinx-sitemap==2.9.0 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install sphinx-notfound-page==1.1.0 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install Pygments==2.21.0 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install nbsphinx==0.9.8 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install ipython==9.17.0 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install jupyterlite-sphinx==0.23.0 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install jupyterlite-xeus==5.0.0 (listed in requirements.txt) on main and pr.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >=3.11",
+   "Installed sphinx 8.2.3 from requirements.txt (listed in requirements.txt) on main and pr.",
+   "Installed docutils 0.21.2 from requirements.txt (listed in requirements.txt) on main and pr.",
+   "Installed pydata-sphinx-theme 0.21.0 from requirements.txt (listed in requirements.txt) on main and pr.",
+   "Installed sphinx-design 0.7.0 from requirements.txt (listed in requirements.txt) on main and pr.",
+   "Installed sphinx-copybutton 0.5.2 from requirements.txt (listed in requirements.txt) on main and pr.",
+   "Installed sphinx-sitemap 2.9.0 from requirements.txt (listed in requirements.txt) on main and pr.",
+   "Installed sphinx-notfound-page 1.1.0 from requirements.txt (listed in requirements.txt) on main and pr.",
+   "Installed Pygments 2.21.0 from requirements.txt (listed in requirements.txt) on main and pr.",
+   "Installed nbsphinx 0.9.8 from requirements.txt (listed in requirements.txt) on main and pr.",
+   "Installed ipython 9.17.0 from requirements.txt (listed in requirements.txt) on main and pr.",
+   "Installed jupyterlite-sphinx 0.23.0 from requirements.txt (listed in requirements.txt) on main and pr.",
+   "Installed jupyterlite-xeus 5.0.0 from requirements.txt (listed in requirements.txt) on main and pr.",
+   "Before rerun: could_not_verify: no test actually ran on the PR side: 3 test(s) ran on main, 0 on the PR; 0 new test(s) pass, 0 unchanged; 1 test module(s) fail to load on both sides (tests.gui.test_surface_properties_panels), so their tests did not run; test module tests.gui.test_document_view_preferences fails to load on the PR side (3 test(s) no longer run); test module tests.gui.test_tab_placement fails to load on the PR side (0 test(s) no longer run); probe model-p1 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count",
+   "After rerun: not rerun. could not verify: setup gap setup"
+  ],
+  "setup_plan": {
+   "packages": [
+    {
+     "requirement": "numpy",
+     "name": "numpy",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "scipy",
+     "name": "scipy",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pandas",
+     "name": "pandas",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pyyaml",
+     "name": "pyyaml",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "matplotlib",
+     "name": "matplotlib",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "vtk",
+     "name": "vtk",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "tabulate",
+     "name": "tabulate",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "numba>=0.60.0",
+     "name": "numba",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "requests",
+     "name": "requests",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "seaborn",
+     "name": "seaborn",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "typing-extensions>=4.1.0",
+     "name": "typing-extensions",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "sphinx==8.2.3",
+     "name": "sphinx",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "docutils==0.21.2",
+     "name": "docutils",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pydata-sphinx-theme==0.21.0",
+     "name": "pydata-sphinx-theme",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "sphinx-design==0.7.0",
+     "name": "sphinx-design",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "sphinx-copybutton==0.5.2",
+     "name": "sphinx-copybutton",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "sphinx-sitemap==2.9.0",
+     "name": "sphinx-sitemap",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "sphinx-notfound-page==1.1.0",
+     "name": "sphinx-notfound-page",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "Pygments==2.21.0",
+     "name": "Pygments",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "nbsphinx==0.9.8",
+     "name": "nbsphinx",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "ipython==9.17.0",
+     "name": "ipython",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "jupyterlite-sphinx==0.23.0",
+     "name": "jupyterlite-sphinx",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "jupyterlite-xeus==5.0.0",
+     "name": "jupyterlite-xeus",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    }
+   ],
+   "extra_reqs": [
+    "sphinx==8.2.3",
+    "docutils==0.21.2",
+    "pydata-sphinx-theme==0.21.0",
+    "sphinx-design==0.7.0",
+    "sphinx-copybutton==0.5.2",
+    "sphinx-sitemap==2.9.0",
+    "sphinx-notfound-page==1.1.0",
+    "Pygments==2.21.0",
+    "nbsphinx==0.9.8",
+    "ipython==9.17.0",
+    "jupyterlite-sphinx==0.23.0",
+    "jupyterlite-xeus==5.0.0"
+   ],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >=3.11"
+   },
+   "system": [],
+   "refused": []
+  },
+  "installs": [
+   {
+    "package": "sphinx",
+    "requirement": "sphinx==8.2.3",
+    "version": "8.2.3",
+    "versions": {
+     "main": "8.2.3",
+     "pr": "8.2.3"
+    },
+    "source": "requirements.txt",
+    "reason": "listed in requirements.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "docutils",
+    "requirement": "docutils==0.21.2",
+    "version": "0.21.2",
+    "versions": {
+     "main": "0.21.2",
+     "pr": "0.21.2"
+    },
+    "source": "requirements.txt",
+    "reason": "listed in requirements.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "pydata-sphinx-theme",
+    "requirement": "pydata-sphinx-theme==0.21.0",
+    "version": "0.21.0",
+    "versions": {
+     "main": "0.21.0",
+     "pr": "0.21.0"
+    },
+    "source": "requirements.txt",
+    "reason": "listed in requirements.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "sphinx-design",
+    "requirement": "sphinx-design==0.7.0",
+    "version": "0.7.0",
+    "versions": {
+     "main": "0.7.0",
+     "pr": "0.7.0"
+    },
+    "source": "requirements.txt",
+    "reason": "listed in requirements.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "sphinx-copybutton",
+    "requirement": "sphinx-copybutton==0.5.2",
+    "version": "0.5.2",
+    "versions": {
+     "main": "0.5.2",
+     "pr": "0.5.2"
+    },
+    "source": "requirements.txt",
+    "reason": "listed in requirements.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "sphinx-sitemap",
+    "requirement": "sphinx-sitemap==2.9.0",
+    "version": "2.9.0",
+    "versions": {
+     "main": "2.9.0",
+     "pr": "2.9.0"
+    },
+    "source": "requirements.txt",
+    "reason": "listed in requirements.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "sphinx-notfound-page",
+    "requirement": "sphinx-notfound-page==1.1.0",
+    "version": "1.1.0",
+    "versions": {
+     "main": "1.1.0",
+     "pr": "1.1.0"
+    },
+    "source": "requirements.txt",
+    "reason": "listed in requirements.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "Pygments",
+    "requirement": "Pygments==2.21.0",
+    "version": "2.21.0",
+    "versions": {
+     "main": "2.21.0",
+     "pr": "2.21.0"
+    },
+    "source": "requirements.txt",
+    "reason": "listed in requirements.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "nbsphinx",
+    "requirement": "nbsphinx==0.9.8",
+    "version": "0.9.8",
+    "versions": {
+     "main": "0.9.8",
+     "pr": "0.9.8"
+    },
+    "source": "requirements.txt",
+    "reason": "listed in requirements.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "ipython",
+    "requirement": "ipython==9.17.0",
+    "version": "9.17.0",
+    "versions": {
+     "main": "9.17.0",
+     "pr": "9.17.0"
+    },
+    "source": "requirements.txt",
+    "reason": "listed in requirements.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "jupyterlite-sphinx",
+    "requirement": "jupyterlite-sphinx==0.23.0",
+    "version": "0.23.0",
+    "versions": {
+     "main": "0.23.0",
+     "pr": "0.23.0"
+    },
+    "source": "requirements.txt",
+    "reason": "listed in requirements.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "jupyterlite-xeus",
+    "requirement": "jupyterlite-xeus==5.0.0",
+    "version": "5.0.0",
+    "versions": {
+     "main": "5.0.0",
+     "pr": "5.0.0"
+    },
+    "source": "requirements.txt",
+    "reason": "listed in requirements.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   }
+  ],
+  "gap_retry": {
+   "reran": false,
+   "rounds": [
+    {
+     "round": 1,
+     "verdict": "could_not_verify",
+     "reason": "no test actually ran on the PR side: 3 test(s) ran on main, 0 on the PR; 0 new test(s) pass, 0 unchanged; 1 test module(s) fail to load on both sides (tests.gui.test_surface_properties_panels), so their tests did not run; test module tests.gui.test_document_view_preferences fails to load on the PR side (3 test(s) no longer run); test module tests.gui.test_tab_placement fails to load on the PR side (0 test(s) no longer run); probe model-p1 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count"
+    }
+   ],
+   "installed": []
+  }
+ },
+ "chosen": {
+  "pr": 962,
+  "head_sha": null,
+  "install": null,
+  "test_cmd": null
+ },
+ "sides": {
+  "comparison_basis": "merge-base vs PR head (no merge ref available)",
+  "main_sha": "1e0513902c68948a727394c6226f3580c7261c65",
+  "pr_sha": "9fd0f199e62e97fc922135c4a1bb4ab890119576"
+ },
+ "tested": {
+  "main": "master @ 1e0513902c68 (merge-base with the PR head)",
+  "pr": "PR head 9fd0f199e62e"
+ },
+ "probe_plan": {
+  "baseline": "full",
+  "model": "model provider: nebius (Token Factory, live)",
+  "errors": [],
+  "model_claims": [
+   {
+    "id": "C1",
+    "text": "After the change, outer docks, nested script docks, viewer, script, optimization, and surface-property tab widgets will have their tabs placed at the top (North) consistently.",
+    "source_quote": "Apply one shared North default to outer docks, nested script docks and the viewer, script, optimization and surface-property tab widgets.",
+    "testable": true,
+    "expect": "differs"
+   }
+  ],
+  "model_rejected_claims": [],
+  "diff_targets": [],
+  "frozen": [
+   {
+    "path": "model-probes/model-p1.py",
+    "source": "model",
+    "sha256": "f6837713af422eb9549cf115ba687971b4a6fcbcb9337399f720c8d2076c4ced",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-10-21T19:56:50.058441+00:00",
+    "inputs_sha256": "6ef7d7dbede82ff52e046a554691dac4f37e36ebb2596f6073874ceaa1827f7a",
+    "inputs": {
+     "title_chars": 39,
+     "body_chars": 1258,
+     "base_files": {
+      "optiland_gui/config.py": "1b6311c863bce35c89da01cdbcad9146282e97b240eb0db77c3cb0df49115ee1",
+      "optiland_gui/lens_editor.py": "86b3501190111fd99c14fd7b0c7726673e1f68e7c12d0e7f8b1a64d980303584",
+      "optiland_gui/main_window.py": "0dab94226c4d4017d8e6d1149ceaaf5f0f3f6d1ab4648286678ebf612f865086",
+      "optiland_gui/optimization_panel.py": "80cab176f8b8db97e1b80d9bf7378b2bd65acb94b25e59ab0001603a1f91fe45",
+      "optiland_gui/viewer_panel.py": "dc0829e9483f24c83c84fbdfe7ef4281afe52e6ac62303bf87e7a60c901070b8",
+      "optiland_gui/widgets/python_terminal.py": "4d4eee0db53207a0f2d83934d3d44288d7fcd2b46f78afa6840af021d41d55eb"
+     }
+    }
+   }
+  ]
+ },
+ "test_extras": [
+  "pytest-xdist>=3.6",
+  "PySide6",
+  "qtconsole"
+ ],
+ "pr_side_started_at": "2026-10-21T19:56:50.295828+00:00",
+ "test_targets": {
+  "main": [
+   "tests/gui/test_document_view_preferences.py",
+   "tests/gui/test_surface_properties_panels.py"
+  ],
+  "pr": [
+   "tests/gui/test_document_view_preferences.py",
+   "tests/gui/test_surface_properties_panels.py",
+   "tests/gui/test_tab_placement.py"
+  ]
+ },
+ "installed_commit": {
+  "main": {
+   "dist": "optiland",
+   "expected": "1e0513902c68948a727394c6226f3580c7261c65",
+   "installed": "1e0513902c68948a727394c6226f3580c7261c65",
+   "ok": true
+  },
+  "pr": {
+   "dist": "optiland",
+   "expected": "9fd0f199e62e97fc922135c4a1bb4ab890119576",
+   "installed": "9fd0f199e62e97fc922135c4a1bb4ab890119576",
+   "ok": true
+  }
+ },
+ "declared_test_deps": {
+  "requested": [
+   "pytest-xdist>=3.6",
+   "PySide6",
+   "qtconsole"
+  ],
+  "installed": true
+ },
+ "comparison": {
+  "same": 0,
+  "same_skipped_both": 0,
+  "regressions": [],
+  "fixed": [],
+  "new_tests_passing": 0,
+  "new_tests_failing": [],
+  "new_tests_skipped": [],
+  "removed_tests": [],
+  "reparametrized": [],
+  "skipped_missing_dependency": [],
+  "flaky": [],
+  "pr_unstable": [],
+  "pr_unstable_noisy": [],
+  "environment": [],
+  "other_changes": [],
+  "preexisting_failures": [],
+  "load_failed_both": [
+   "tests.gui.test_surface_properties_panels"
+  ],
+  "load_failed_pr": [
+   {
+    "module": "tests.gui.test_document_view_preferences",
+    "tests_affected": 3
+   },
+   {
+    "module": "tests.gui.test_tab_placement",
+    "tests_affected": 0
+   }
+  ],
+  "load_failed_main": [],
+  "executed": {
+   "main": 3,
+   "pr": 0
+  },
+  "messages": {}
+ },
+ "exit_check": {
+  "explained": false,
+  "problems": [
+   "PR run 1: 2 failure(s) not seen on main",
+   "PR run 2: 2 failure(s) not seen on main",
+   "PR run 3: 2 failure(s) not seen on main"
+  ],
+  "detail": "pytest exit 1; no identical pre-existing failures"
+ },
+ "coverage": {
+  "status": "failed",
+  "why": "coverage run produced no data (exit 1); see coverage-pytest.log",
+  "seconds": 14.8
+ },
+ "probes": {
+  "status": "error",
+  "items": [
+   {
+    "id": "model-p1",
+    "source": "model",
+    "path": "model-probes/model-p1.py",
+    "sha256": "f6837713af422eb9549cf115ba687971b4a6fcbcb9337399f720c8d2076c4ced",
+    "target": "optiland/optiland#962",
+    "about": "Check tab positions of tab widgets in docks and lens editor surface properties",
+    "claims": [
+     {
+      "id": "C1",
+      "source": "PR description",
+      "text": "After the change, outer docks, nested script docks, viewer, script, optimization, and surface-property tab widgets will have their tabs placed at the top (North) consistently.",
+      "covers": [
+       "*"
+      ],
+      "expect": "differs"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": false
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": false
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": false
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": false
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": false
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": false
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-p1-main-1.jsonl",
+      "probe-model-p1-main-2.jsonl",
+      "probe-model-p1-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-p1-pr-1.jsonl",
+      "probe-model-p1-pr-2.jsonl",
+      "probe-model-p1-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      },
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      },
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      }
+     ],
+     "pr": [
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      },
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      },
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "probe.error",
+      "state": "same",
+      "label": "not_testable",
+      "claim": "C1",
+      "main": {
+       "crash": "non-json output",
+       "exit_code": 1
+      },
+      "pr": {
+       "crash": "non-json output",
+       "exit_code": 1
+      },
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"probe.error\""
+       },
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"probe.error\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "f6837713af422eb9549cf115ba687971b4a6fcbcb9337399f720c8d2076c4ced",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-10-21T19:56:50.058441+00:00",
+     "inputs_sha256": "6ef7d7dbede82ff52e046a554691dac4f37e36ebb2596f6073874ceaa1827f7a",
+     "inputs": {
+      "title_chars": 39,
+      "body_chars": 1258,
+      "base_files": {
+       "optiland_gui/config.py": "1b6311c863bce35c89da01cdbcad9146282e97b240eb0db77c3cb0df49115ee1",
+       "optiland_gui/lens_editor.py": "86b3501190111fd99c14fd7b0c7726673e1f68e7c12d0e7f8b1a64d980303584",
+       "optiland_gui/main_window.py": "0dab94226c4d4017d8e6d1149ceaaf5f0f3f6d1ab4648286678ebf612f865086",
+       "optiland_gui/optimization_panel.py": "80cab176f8b8db97e1b80d9bf7378b2bd65acb94b25e59ab0001603a1f91fe45",
+       "optiland_gui/viewer_panel.py": "dc0829e9483f24c83c84fbdfe7ef4281afe52e6ac62303bf87e7a60c901070b8",
+       "optiland_gui/widgets/python_terminal.py": "4d4eee0db53207a0f2d83934d3d44288d7fcd2b46f78afa6840af021d41d55eb"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-10-21T19:56:50.295828+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "not measured",
+     "why": "coverage produced no data (exit 1); see probe-coverage.log",
+     "adequacy": "not_adequate",
+     "note": "the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate"
+    },
+    "status": "crashed",
+    "uninformative_reason": "the probe crashed or printed no parsed output on every main-side run"
+   }
+  ],
+  "summary": {
+   "labels": [],
+   "flagged": [],
+   "proven_claims": [],
+   "reason": "the probe crashed or printed no parsed output on every main-side run",
+   "ignored_noise": [],
+   "ignored_warning_only": [],
+   "pr_only_noisy": []
+  }
+ },
+ "probe_changed_line_coverage": {
+  "status": "not measured",
+  "side": "main",
+  "probes": {
+   "model-p1": {
+    "status": "not measured",
+    "changed_lines_covered": null,
+    "changed_lines_total": null,
+    "adequacy": "not_adequate"
+   }
+  },
+  "not_adequate": [
+   "model-p1"
+  ]
+ },
+ "verdict": "could_not_verify",
+ "reason": "could not verify: setup gap setup",
+ "verdict_before_coverage_gate": "could_not_verify",
+ "reason_before_coverage_gate": "could not verify: setup gap setup",
+ "changed_lines_total": null,
+ "changed_lines_covered": null,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "lower",
+  "note": "coverage of the changed Python lines was NOT MEASURED (coverage run produced no data (exit 1); see coverage-pytest.log)",
+  "measurement": "not measured"
+ },
+ "agents": {
+  "status": "skipped",
+  "note": "advisory swarm is off",
+  "roles": []
+ },
+ "explanation": {
+  "status": "not yet wired",
+  "why": "advisory swarm is off"
+ },
+ "swarm_requested": false,
+ "operator_approval_requested": false,
+ "swarm": "off",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [],
+  "compiled_files": [],
+  "other_files": [
+   "docs/developers_guide/gui.rst",
+   "optiland_gui/config.py",
+   "optiland_gui/lens_editor.py",
+   "optiland_gui/main_window.py",
+   "optiland_gui/optimization_panel.py",
+   "optiland_gui/viewer_panel.py",
+   "optiland_gui/widgets/python_terminal.py",
+   "tests/gui/test_document_view_preferences.py",
+   "tests/gui/test_surface_properties_panels.py",
+   "tests/gui/test_tab_placement.py"
+  ]
+ },
+ "duration_s": {
+  "total_wall": 353.0,
+  "tests": 73.2
+ },
+ "cost": {
+  "ai_calls": 3,
+  "failed_ai_calls": 0,
+  "input_tokens": 27999,
+  "output_tokens": 18487,
+  "thinking_tokens": 17311,
+  "cost_usd": 0.025038,
+  "calls_without_usage": 0,
+  "ai_cost_usd": 0.025038,
+  "cost_complete": true,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 353.0,
+   "tests": 73.2
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.023533,
+  "total_cost_usd": 0.048571,
+  "swarm": {
+   "ai_calls": 0,
+   "failed_ai_calls": 0,
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "thinking_tokens": 0,
+   "cost_usd": 0.0,
+   "calls_without_usage": 0,
+   "ai_cost_usd": 0.0,
+   "cost_complete": true,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ },
+ "head_at_report_sha": "9fd0f199e62e97fc922135c4a1bb4ab890119576",
+ "head_moved_since_test": false
+}
