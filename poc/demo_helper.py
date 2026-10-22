@@ -1068,7 +1068,9 @@ _SYSTEM_FAILURE = re.compile(
     r"(cannot open shared object file|error while loading shared libraries|library not loaded|"
     r"fatal error: [^\s:]+\.h|executable not found|command not found|: not found|"
     r"no such file or directory: '[^'/]+'|unable to execute|c compiler cannot create executables|"
-    r"could not find [^\n]*(?:library|headers?)|package [^\n]* was not found in the pkg-config)", re.I)
+    r"could not find [^\n]*(?:library|headers?)|package [^\n]* was not found in the pkg-config|"
+    r"cannot find -l\S+|ld: library not found|error: command '[^']+' failed: no such file or directory|"
+    r"\b(?:cc|gcc|g\+\+|clang|make|cmake|gfortran|rustc|cargo)\b[^\n]{0,40}(?:not found|no such file))", re.I)
 _APT_INSTALL = re.compile(r"\bapt(?:-get)?\s+(?:-\S+\s+)*install\s+((?:(?:-\S+|[A-Za-z0-9][A-Za-z0-9.+:-]*)[ \t]*)+)")
 INSTALL_DOC_NAMES = ("readme", "contributing", "install", "installation", "building", "development",
                      "dockerfile", "pyproject.toml", "setup.cfg", "setup.py", "tox.ini", "environment.yml",

@@ -347,3 +347,26 @@ def test_declared_names_cover_runtime_deps_and_every_extra(tmp_path):
         '[project]\nname = "w"\ndependencies = ["numpy>=1"]\n'
         '[project.optional-dependencies]\nplot = ["Matplotlib"]\ntest = ["pytest"]\n')
     assert {"numpy", "matplotlib", "pytest"} <= demo_helper.declared_names(tmp_path)
+
+
+def test_pr_side_missing_system_piece_is_a_limitation_not_the_prs_fault(tmp_path):
+    from types import SimpleNamespace
+
+    import ops.daily_run as dr
+    a = SimpleNamespace(pr=["x"], product_check=True)
+    for err in ("src/x.c:1:10: fatal error: zlib.h: No such file or directory",
+                "/usr/bin/ld: cannot find -lfoo",
+                "Package bar was not found in the pkg-config search path",
+                "Error: pg_config executable not found.",
+                "/bin/sh: 1: make: not found",
+                "error: command 'gcc' failed: No such file or directory"):
+        log = tmp_path / "build-pr.log"
+        log.write_text("building...\n" + err + "\n")
+        rec = {}
+        reason = dr._pr_own_failure(a, rec, "PR build", "build failed (1); see build-pr.log", log)
+        assert "pr_build_failure" not in rec, err
+        assert reason.startswith("could not verify") and rec["demo_helper"]["limitations"], err
+    rec = {}
+    log.write_text("SyntaxError: invalid syntax in widget/core.py\n")
+    reason = dr._pr_own_failure(a, rec, "PR build", "build failed (1)", log)
+    assert rec["pr_build_failure"] and reason.startswith("the PR's own build failed")

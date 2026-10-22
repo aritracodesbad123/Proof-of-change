@@ -1530,11 +1530,26 @@ def _pr_side_retries(a):
     return 0 if product_route(a) else demo_helper.MAX_SETUP_RETRIES
 
 
-def _pr_own_failure(a, rec, step, why) -> str:
-    """Label a PR-side build failure after a clean main install as the PR's own failure (product runs only)."""
+def _pr_own_failure(a, rec, step, why, log: Path | None = None) -> str:
+    """Label a PR-side build failure after a clean main install as the PR's own failure (product runs only).
+
+    When the error text shows a missing system library, header, pkg-config package or build tool (generic patterns,
+    no package names), it is a sandbox limitation instead: the result stays could not verify, with a limitation
+    naming what is missing."""
     from poc import demo_helper
     if not product_route(a) or str(why).startswith("infrastructure failure:"):
         return why
+    text = str(why)
+    if log is not None:
+        try:
+            text += "\n" + Path(log).read_text(errors="replace")[-20000:]
+        except OSError as exc:
+            print(f"WARNING: could not read {Path(log).name}: {type(exc).__name__}", file=sys.stderr, flush=True)
+    if demo_helper.is_system_failure(text):
+        missing = demo_helper.failure_line(text)
+        demo_helper.note_limitation(rec, [], missing, "the PR side needs a system library, header or build tool "
+                                                      "that this sandbox does not have")
+        return f"could not verify: the PR side needs a missing system library, header or build tool: {missing}"
     return demo_helper.note_pr_build_failure(rec, step, why)
 
 
@@ -3808,7 +3823,7 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
                 else:
                     cnv = b["why"] + " (build log: build-pr.log)"
                     if helper_on:
-                        cnv = _pr_own_failure(a, rec, "PR build", cnv)
+                        cnv = _pr_own_failure(a, rec, "PR build", cnv, prdir / "build-pr.log")
         else:
             rec["route"] = "nightly+patch"
             run_progress.emit("install_pr", detail="patching PR onto nightly")
@@ -3818,7 +3833,7 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
             if not ok:
                 cnv = why + " (see patch.log)"
                 if helper_on:
-                    cnv = _pr_own_failure(a, rec, "PR patch", cnv)
+                    cnv = _pr_own_failure(a, rec, "PR patch", cnv, prdir / "patch.log")
         if vp.exists():
             rec["freeze"]["pr"] = freeze_env(vp, prdir / "freeze-pr.txt")
     rec["tested"] = {"main": f"nightly {main.get('version', '?')} "
@@ -4108,7 +4123,7 @@ def test_source_pair(repo: str, cfg: dict, item: dict, prdir: Path, work: Path, 
                                                prdir / "setup-pr.log", a.build_timeout, cons, extra, python=py,
                                                max_retries=_pr_side_retries(a))
                 if not ok:
-                    why = _pr_own_failure(a, rec, "PR install", why)
+                    why = _pr_own_failure(a, rec, "PR install", why, prdir / "setup-pr.log")
             else:
                 ok, why = install_side(vp, cp, item.get("chosen"), prdir / "setup-pr.log", a.python, a.build_timeout, cons)
             if ok:
