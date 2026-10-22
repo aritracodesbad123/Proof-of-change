@@ -2676,7 +2676,8 @@ def _maybe_prepare_contree(a, repo: str, main_sha: str, pr_sha: str, rec: dict, 
     contree_sandboxes.clear_session()
     try:
         sess = contree_sandboxes.prepare_source_pair(repo, main_sha, pr_sha, timeout=timeout, extra_shell=extra_shell,
-                                                     **({"deps_only_fallback": True, "deps_exclude": _aggregate_names(rec)}
+                                                     **({"deps_only_fallback": True, "deps_exclude": _aggregate_names(rec),
+                                                        "retry_transient": True}
                                                         if product_route(a) else {}))
         rec["contree"] = sess.describe()
         rec["machine"] = "contree"

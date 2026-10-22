@@ -177,6 +177,87 @@ def note() -> str:
     return _state["note"]
 
 
+MAX_TRIES = 3
+RETRY_DELAYS = (5.0, 15.0)
+# Overall deadline per step: the step's own timeout plus this much for start-up retries and backoff.
+RETRY_GRACE = 120.0
+
+
+def _sleep(seconds: float) -> None:
+    import time
+    time.sleep(seconds)
+
+
+def _now() -> float:
+    import time
+    return time.monotonic()
+
+
+def is_transient_error(exc: BaseException) -> bool:
+    """True for a Contree API timeout (ApiTimeoutError, TimeoutError, ...) or an HTTP 5xx; never for an auth refusal."""
+    if is_auth_error(exc):
+        return False
+    if isinstance(exc, TimeoutError) or "timeout" in type(exc).__name__.lower():
+        return True
+    status = getattr(exc, "status_code", None) or getattr(exc, "status", None)
+    return isinstance(status, int) and 500 <= status <= 599
+
+
+# id(command string) -> True once Contree has created the run for it. The command string object is held alive for
+# the whole try, so its id is unique while it is registered; this keeps concurrent runs on one client apart.
+_STARTED: dict[int, bool] = {}
+
+
+# The start-tracking hook relies on an SDK internal (_start_operation, and that the request keeps the same command
+# string object). It was checked only against this exact version, so any other version gets no retries.
+SUPPORTED_SDK_VERSION = "0.3.6"
+
+
+def _sdk_version() -> str | None:
+    try:
+        from importlib.metadata import PackageNotFoundError, version
+    except ImportError:  # pragma: no cover
+        return None
+    try:
+        return version("contree-sdk")
+    except PackageNotFoundError:
+        return None
+
+
+def _track_starts(client) -> bool:
+    """Wrap client._start_operation once so we learn when a run is created. False (no retries) if the installed
+    contree-sdk is not exactly SUPPORTED_SDK_VERSION, or the SDK has no such call."""
+    if _sdk_version() != SUPPORTED_SDK_VERSION:
+        return False
+    if getattr(client, "_poc_tracks_starts", False):
+        return True
+    inner = getattr(client, "_start_operation", None)
+    if not callable(inner):
+        return False
+
+    def mark(request):
+        key = id(getattr(request, "command", None))
+        if key in _STARTED:
+            _STARTED[key] = True
+
+    def tracked(request, *a, **k):
+        res = inner(request, *a, **k)
+        if hasattr(res, "__await__"):
+            async def done():
+                uid = await res
+                mark(request)
+                return uid
+            return done()
+        mark(request)
+        return res
+    try:
+        client._start_operation = tracked
+        client._poc_tracks_starts = True
+    except (AttributeError, TypeError):
+        return False
+    return True
+
+
 def with_slot(fn: Callable[[], Any]) -> Any:
     with _sem:
         return fn()
@@ -193,8 +274,11 @@ def _text(val) -> str:
 class ContreeSession:
     """One PR's Contree checkpoints (main + PR) and disposable runs."""
 
-    def __init__(self, *, base_image: str = BASE_IMAGE, runner: Callable | None = None):
+    def __init__(self, *, base_image: str = BASE_IMAGE, runner: Callable | None = None,
+                 retry_transient: bool = False):
         self.base_image = base_image
+        # Product checks only: retry a Contree API timeout or 5xx (at most MAX_TRIES tries in all).
+        self.retry_transient = retry_transient
         self.main_uuid: str | None = None
         self.pr_uuid: str | None = None
         # runner(shell, disposable, image_ref|None, timeout, files) -> {exit_code,stdout,stderr,uuid}
@@ -218,16 +302,13 @@ class ContreeSession:
     def _run_on(self, image_ref: str | None, shell: str, *, disposable: bool, timeout: int,
                 files: dict | None = None) -> dict:
         if self._runner is not None:
+            # A test runner starts and waits in one call, so we cannot tell whether a run began: never retried.
             return self._runner(shell, disposable, image_ref, timeout, files)
 
         client = self._client_sync()
+        deadline = _now() + float(timeout) + RETRY_GRACE
         try:
-            if image_ref:
-                img = client.images.use(image_ref, strict=True)
-            else:
-                img = client.images.oci(self.base_image)
-            result = img.run(shell=bash_wrapped(shell), disposable=disposable, timeout=timeout,
-                             files=files or None).wait()
+            result = self._start_and_wait(client, image_ref, shell, disposable, timeout, files, deadline)
         except ContreeError:
             raise
         except Exception as e:  # noqa: BLE001 — never leak tokens from SDK messages
@@ -242,6 +323,40 @@ class ContreeSession:
             "stderr": _text(getattr(result, "stderr", None)),
             "uuid": str(uuid) if uuid is not None else None,
         }
+
+    def _start_and_wait(self, client, image_ref, shell, disposable, timeout, files, deadline):
+        """Start one run and wait for it. Only the start is ever retried.
+
+        The SDK's wait() both creates the run (client._start_operation) and polls it, and cancels the run on any
+        error while polling, so the same run cannot be polled again. We therefore record when the run was created:
+        a failure before that (images.use/oci, or the create call itself) may be retried on a transient error; a
+        failure after it is raised unchanged, so PR code never runs twice. If the SDK does not expose the create
+        call, every failure counts as "may have started" and nothing is retried."""
+        tries = MAX_TRIES if self.retry_transient else 1
+        can_track = tries > 1 and _track_starts(client)
+        for n in range(tries):
+            cmd = bash_wrapped(shell)
+            key = id(cmd)
+            if can_track:
+                _STARTED[key] = False
+            try:
+                if image_ref:
+                    img = client.images.use(image_ref, strict=True)
+                else:
+                    img = client.images.oci(self.base_image)
+                return img.run(shell=cmd, disposable=disposable, timeout=timeout, files=files or None).wait()
+            except ContreeError:
+                raise
+            except Exception as e:  # noqa: BLE001
+                started = _STARTED.get(key, True) if can_track else True
+                if n + 1 >= tries or not is_transient_error(e) or started:
+                    raise
+                delay = RETRY_DELAYS[min(n, len(RETRY_DELAYS) - 1)]
+                if deadline - _now() - delay < float(timeout):
+                    raise  # not enough time left for a whole step: keep the original reason
+                _sleep(delay)
+            finally:
+                _STARTED.pop(key, None)
 
     def run_op(self, side: str, shell: str, *, disposable: bool = True, timeout: int = 600,
                files: dict | None = None) -> dict:
@@ -511,12 +626,14 @@ def install_shell_source(repo: str, sha: str, extra: str = "", deps_only_fallbac
 
 def prepare_source_pair(repo: str, main_sha: str, pr_sha: str, *, timeout: int = 1800,
                         runner: Callable | None = None, extra_shell: str = "",
-                        deps_only_fallback: bool = False, deps_exclude=()) -> ContreeSession:
+                        deps_only_fallback: bool = False, deps_exclude=(),
+                        retry_transient: bool = False) -> ContreeSession:
     """Build main + PR Contree checkpoints for a source-pair style PR.
 
     extra_shell is applied to both SHAs. Empty keeps the default install shell.
     """
-    sess = new_session(runner=runner) if runner is not None else new_session()
+    kw = {"retry_transient": True} if retry_transient else {}
+    sess = new_session(runner=runner, **kw) if runner is not None else new_session(**kw)
     sess.checkpoint_main(install_shell_source(repo, main_sha, extra_shell, deps_only_fallback, deps_exclude), timeout=timeout)
     sess.fork_pr(install_shell_source(repo, pr_sha, extra_shell, deps_only_fallback, deps_exclude), timeout=timeout)
     return sess
