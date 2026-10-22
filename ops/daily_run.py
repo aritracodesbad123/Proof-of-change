@@ -658,7 +658,43 @@ def targets_for_sides(mapped: list[str], files: dict | None, main_root: Path, pr
     return {"main": [nearest], "pr": list(dict.fromkeys([nearest, *pr_ok]))}
 
 
-def source_pair(repo: str, item: dict, work: Path, log: Path, python: str, timeout: int) -> dict:
+def _tree(src, env, sha: str) -> str:
+    return subprocess.run(["git", "-C", src, "rev-parse", f"{sha}^{{tree}}"], env=env, capture_output=True,
+                          text=True).stdout.strip()
+
+
+def distinct_base(src, env, log: Path, item: dict, res: dict) -> dict | None:
+    """Product checks only. When the chosen main side is the PR head itself (a merged or closed PR: the merge-base
+    of head and base branch is the head) or has the same tree, use the PR's recorded base (GitHub base.sha), then the
+    first parent before the PR's commits. Returns an error dict ('unsupported: ...') when no distinct base exists."""
+    main, pr = res.get("main_sha"), res.get("pr_sha")
+    if not main or not pr or (main != pr and _tree(src, env, main) != _tree(src, env, pr)):
+        return None
+    head = item["head_sha"]
+    cands = []
+    if item.get("base_sha"):
+        run(["git", "-C", src, "fetch", "-q", "origin", item["base_sha"]], log, env=env, timeout=300)
+        cands.append((item["base_sha"], "PR base (GitHub base.sha) vs PR head"))
+    first = subprocess.run(["git", "-C", src, "rev-list", "--first-parent", "--max-count=1", f"{head}~1"], env=env,
+                           capture_output=True, text=True).stdout.strip()
+    if first:
+        cands.append((first, "first parent before the PR head vs PR head"))
+    for sha, basis in cands:
+        t = _tree(src, env, sha)
+        if t and t != _tree(src, env, pr):
+            res |= {"main_sha": sha, "comparison_basis": basis + " (merge-base equals the PR head: PR already merged)"}
+            return None
+    return {"ok": False, "why": "unsupported: no base commit distinct from the PR head was found, so main and PR "
+                                "would be the same code; the check stops instead of comparing identical commits"}
+
+
+def sides_identical(rec: dict) -> bool:
+    """True when the recorded main and PR sides are the same commit."""
+    s = rec.get("sides") or {}
+    return bool(s.get("main_sha")) and s.get("main_sha") == s.get("pr_sha")
+
+
+def source_pair(repo: str, item: dict, work: Path, log: Path, python: str, timeout: int, product: bool = False) -> dict:
     """Pure-Python library without nightly wheels: build both sides from git.
     Conflicting PR (mergeable false / state dirty): main = merge-base(PR head, base branch), PR = PR head.
     Mergeable PR: main = current base-branch tip, PR = GitHub's test merge commit (refs/pull/N/merge).
@@ -699,6 +735,10 @@ def source_pair(repo: str, item: dict, work: Path, log: Path, python: str, timeo
             res |= {"comparison_basis": "base tip vs GitHub test merge (refs/pull/N/merge)", "main_sha": parent1,
                     "pr_sha": merge, "merge_commit": merge, "merge_parents": [parent1, parent2],
                     "merge_head_matches_pinned_head": parent2 == head}
+    if product:
+        bad = distinct_base(src, env, log, item, res)
+        if bad:
+            return bad
     for side in ("main", "pr"):
         # git -C resolves relative worktree paths against src/, not cwd.
         rc, _ = run(["git", "-C", src, "worktree", "add", "-q", "--detach",
@@ -3292,7 +3332,8 @@ def probe_items(probe_results: dict | None, baseline: str | None) -> dict | None
 
 def verdict_for(cmp: dict | None, cnv_reason: str | None, exits: dict | None = None, files: dict | None = None,
                 probe_results: dict | None = None, claims: list | None = None,
-                baseline: str | None = None, docstring_only: bool = False) -> tuple[str, str, list[str]]:
+                baseline: str | None = None, docstring_only: bool = False,
+                same_sides: bool = False) -> tuple[str, str, list[str]]:
     """tests, then probes (with_probes), then behaviour-preservation claims (poc/behaviour_claims.py): a 'verified'
     PR whose title or description claims results stay the same, with no probe checking that, becomes
     could_not_verify ('unverified behaviour claim: "<quote>"; needs a probe'). With a probe, the probe decides.
@@ -3301,6 +3342,10 @@ def verdict_for(cmp: dict | None, cnv_reason: str | None, exits: dict | None = N
     unless the tests already need attention.
     A probe claim that expects a difference but matches no observation on that probe can only lower a verified
     result to could_not_verify. It never raises a verdict."""
+    if same_sides:
+        return (Verdict.COULD_NOT_VERIFY.value,
+                "unsupported: main and PR sides are the same commit, so nothing was compared; "
+                "a docstring-only result cannot be claimed", ["identical_sides"])
     probe_results = probe_items(probe_results, baseline)
     v, reason, fl = with_probes(cmp, cnv_reason, exits, files, probe_results)
     if uses(baseline, "claim_flags") and claims and v == Verdict.VERIFIED.value and not behaviour_claims.probe_covers(
@@ -4436,7 +4481,8 @@ def test_source_pair(repo: str, cfg: dict, item: dict, prdir: Path, work: Path, 
     run_progress.emit("fetch_pr", detail="checking out main / PR sides")
     if helper_on:
         def _checkout():
-            got = source_pair(repo, item, work, prdir / "git.log", a.python, a.build_timeout)
+            got = source_pair(repo, item, work, prdir / "git.log", a.python, a.build_timeout,
+                              product=product_route(a))
             return bool(got.get("ok")), str(got.get("why") or ""), got
 
         def _clean_checkout():
@@ -4449,7 +4495,8 @@ def test_source_pair(repo: str, cfg: dict, item: dict, prdir: Path, work: Path, 
         if not isinstance(sp, dict):
             sp = {"ok": False, "why": _detail or "source checkout failed"}
     else:
-        sp = source_pair(repo, item, work, prdir / "git.log", a.python, a.build_timeout)
+        sp = source_pair(repo, item, work, prdir / "git.log", a.python, a.build_timeout,
+                              product=product_route(a))
     rec["sides"] = {k: v for k, v in sp.items() if k != "ok"}
     if sp.get("merge_commit"):
         rec["pr"]["merge_commit"] = sp["merge_commit"]
@@ -4612,8 +4659,11 @@ def cap_for_review(rec: dict, v: str, reason: str) -> tuple[str, str]:
 
 def _store_verdict(rec: dict, cmp, cnv, ex) -> None:
     """Write the verdict. A docstring-only change marks each behaviour claim as holding by construction."""
+    same = bool(rec.get("product_check")) and sides_identical(rec)
+    if same:
+        rec["docstring_only"] = False
     v, reason, _ = verdict_for(cmp, cnv, ex, rec.get("files"), rec.get("probes"), rec.get("behaviour_claims"),
-                               rec.get("baseline"), docstring_only=bool(rec.get("docstring_only")))
+                               rec.get("baseline"), docstring_only=bool(rec.get("docstring_only")), same_sides=same)
     v, reason = cap_for_review(rec, v, reason)
     own = rec.get("pr_build_failure") or {}
     if own.get("needs_attention") and v == Verdict.COULD_NOT_VERIFY.value:
