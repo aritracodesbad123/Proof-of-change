@@ -848,13 +848,21 @@ def declared_test_deps(checkout: Path, targets: list[str], self_dist: str) -> li
     return out
 
 
-def install_declared_test_deps(venvs: dict, reqs: list[str], log: Path, timeout: int) -> tuple[bool, str]:
-    """Install the same declared test requirements on both sides."""
+def isolated_install(cmd: list, env: dict, isolated: bool) -> tuple[list, dict]:
+    """isolated (product checks only): the uv call ignores config files and [tool.uv.sources], and the env drops
+    index settings and pip config (no_index_config_env). Not isolated: both are returned unchanged."""
+    return (no_config_cmd(cmd), no_index_config_env(env)) if isolated else (cmd, env)
+
+
+def install_declared_test_deps(venvs: dict, reqs: list[str], log: Path, timeout: int,
+                               isolated: bool = False) -> tuple[bool, str]:
+    """Install the same declared test requirements on both sides. isolated: see isolated_install."""
     if not reqs:
         return True, ""
     for side, venv in venvs.items():
-        rc, _ = run([uv_bin(), "pip", "install", "-q", "-p", venv / "bin/python", *reqs], log,
-                    env=base_env(side_home(venv), install=True), timeout=timeout, sbx=side_sandbox(venv, network=True))
+        cmd, env = isolated_install([uv_bin(), "pip", "install", "-q", "-p", venv / "bin/python", *reqs],
+                                    base_env(side_home(venv), install=True), isolated)
+        rc, _ = run(cmd, log, env=env, timeout=timeout, sbx=side_sandbox(venv, network=True))
         if rc != 0:
             return False, f"installing declared test requirements on the {side} side failed ({rc}); see {log.name}"
     return True, ""
@@ -912,8 +920,9 @@ def optional_backend_reqs(checkout: Path, self_dist: str | None = None) -> list[
     return reqs_for_test_extras(lines, name)
 
 
-def install_optional_backends(venvs: dict, reqs: list[str], log: Path, timeout: int) -> dict:
-    """Install each optional backend on each side. A failure is skipped; it does not stop the others."""
+def install_optional_backends(venvs: dict, reqs: list[str], log: Path, timeout: int, isolated: bool = False) -> dict:
+    """Install each optional backend on each side. A failure is skipped; it does not stop the others.
+    isolated: see isolated_install."""
     installed: list[str] = []
     skipped: list[dict] = []
     if not reqs:
@@ -921,9 +930,9 @@ def install_optional_backends(venvs: dict, reqs: list[str], log: Path, timeout: 
     for req in reqs:
         failed = False
         for side, venv in venvs.items():
-            rc, _ = run([uv_bin(), "pip", "install", "-q", "-p", venv / "bin/python", req], log,
-                        env=base_env(side_home(venv), install=True), timeout=timeout,
-                        sbx=side_sandbox(venv, network=True))
+            cmd, env = isolated_install([uv_bin(), "pip", "install", "-q", "-p", venv / "bin/python", req],
+                                        base_env(side_home(venv), install=True), isolated)
+            rc, _ = run(cmd, log, env=env, timeout=timeout, sbx=side_sandbox(venv, network=True))
             if rc != 0:
                 failed = True
                 skipped.append({"req": req, "side": side, "rc": rc if isinstance(rc, int) else str(rc)})
@@ -932,12 +941,13 @@ def install_optional_backends(venvs: dict, reqs: list[str], log: Path, timeout: 
     return {"installed": installed, "skipped": skipped}
 
 
-def attach_optional_backends(rec: dict, venvs: dict, checkout: Path, dist: str, log: Path, timeout: int) -> None:
+def attach_optional_backends(rec: dict, venvs: dict, checkout: Path, dist: str, log: Path, timeout: int,
+                             isolated: bool = False) -> None:
     """Best-effort install of test-extra backends. A skip is recorded and is not a verdict."""
     reqs = optional_backend_reqs(checkout, dist)
     if not reqs:
         return
-    rec["optional_backends"] = install_optional_backends(venvs, reqs, log, timeout)
+    rec["optional_backends"] = install_optional_backends(venvs, reqs, log, timeout, isolated)
 
 
 def _strip_test_extras(spec: str) -> str:
@@ -2526,7 +2536,7 @@ def own_index_refusal(a, cnv: str | None, *checkouts) -> str | None:
     """A Contree setup failure on a product check whose project needs its own index or uv sources: could not verify
     with that limitation as the reason instead of the generic setup failure. Anything else is returned unchanged."""
     from poc import demo_helper
-    if not cnv or not product_route(a):
+    if not cnv or not product_route(a) or cnv.startswith("infrastructure failure:"):
         return cnv
     found = [f for c in checkouts if c is not None for f in demo_helper.own_index_config(c)]
     return demo_helper.own_index_reason(list(dict.fromkeys(found))) if found else cnv
@@ -3792,8 +3802,9 @@ def settle_probes(rec: dict) -> None:
     rec["probe_changed_line_coverage"] = probe_adequacy.summary(rec["probes"]["items"])
 
 
-def install_optional_modules(venvs: dict, modules: list[str], log: Path, timeout: int) -> tuple[bool, str]:
-    """Install plain pip wheels for missing optional modules, on both sides."""
+def install_optional_modules(venvs: dict, modules: list[str], log: Path, timeout: int,
+                             isolated: bool = False) -> tuple[bool, str]:
+    """Install plain pip wheels for missing optional modules, on both sides. isolated: see isolated_install."""
     pkgs = []
     for name in modules:
         pkg = PIP_OPTIONAL.get(name)
@@ -3802,9 +3813,9 @@ def install_optional_modules(venvs: dict, modules: list[str], log: Path, timeout
     if not pkgs:
         return True, ""
     for side, venv in venvs.items():
-        rc, _ = run([uv_bin(), "pip", "install", "-q", "-p", venv / "bin/python", *pkgs], log,
-                    env=base_env(side_home(venv), install=True), timeout=timeout,
-                    sbx=side_sandbox(venv, network=True))
+        cmd, env = isolated_install([uv_bin(), "pip", "install", "-q", "-p", venv / "bin/python", *pkgs],
+                                    base_env(side_home(venv), install=True), isolated)
+        rc, _ = run(cmd, log, env=env, timeout=timeout, sbx=side_sandbox(venv, network=True))
         if rc != 0:
             return False, f"installing {', '.join(pkgs)} on the {side} side failed ({rc}); see {log.name}"
     return True, ""
@@ -3861,7 +3872,7 @@ def execute_tests(rec: dict, venvs: dict, targets: dict, prdir: Path, work: Path
     if not modules:
         return cmp, cnv, ex
     log = prdir / "setup-optional.log"
-    ok, why = install_optional_modules(venvs, modules, log, a.build_timeout)
+    ok, why = install_optional_modules(venvs, modules, log, a.build_timeout, product_route(a))
     wheels = [PIP_OPTIONAL[m] for m in modules if PIP_OPTIONAL.get(m)]
     if not ok:
         rec["optional_install_error"] = why
@@ -4104,9 +4115,10 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
         if reqs:
             def _plan_install(side, requirement, _vm=vm, _vp=vp):
                 venv = _vm if side == "main" else _vp
-                rc, _ = run([uv_bin(), "pip", "install", "-q", "-p", venv / "bin/python", requirement],
-                            prdir / "setup-plan.log", env=base_env(side_home(venv), install=True),
-                            timeout=a.build_timeout, sbx=side_sandbox(venv, network=True))
+                cmd, env = isolated_install([uv_bin(), "pip", "install", "-q", "-p", venv / "bin/python", requirement],
+                                            base_env(side_home(venv), install=True), product_route(a))
+                rc, _ = run(cmd, prdir / "setup-plan.log", env=env, timeout=a.build_timeout,
+                            sbx=side_sandbox(venv, network=True))
                 return rc == 0, _dist_version(venv, requirement) if rc == 0 else ""
             demo_helper.note_installs(rec, demo_helper.install_same(reqs, _plan_install))
     if not cnv:
@@ -4393,7 +4405,7 @@ def test_source_pair(repo: str, cfg: dict, item: dict, prdir: Path, work: Path, 
             if helper_on and setup_plan:
                 _log_plan_installs(rec, setup_plan, {"main": vm, "pr": vp})
             attach_optional_backends(rec, {"main": vm, "pr": vp}, cm, cfg["dist"],
-                                     prdir / "setup-optional.log", a.build_timeout)
+                                     prdir / "setup-optional.log", a.build_timeout, product_route(a))
             chosen_tg = chosen_test_targets(item.get("chosen"))
             if chosen_tg:
                 targets = {"main": [t for t in chosen_tg if (cm / t).exists()],
@@ -4414,7 +4426,7 @@ def test_source_pair(repo: str, cfg: dict, item: dict, prdir: Path, work: Path, 
                                                        cfg["dist"])
             if decl:
                 good, why2 = install_declared_test_deps({"main": vm, "pr": vp}, decl, prdir / "setup-declared.log",
-                                                        a.build_timeout)
+                                                        a.build_timeout, product_route(a))
                 rec["declared_test_deps"] = {"requested": decl, "installed": good}
                 if good:
                     rec["test_extras"] = list(dict.fromkeys([*(rec.get("test_extras") or []), *decl]))

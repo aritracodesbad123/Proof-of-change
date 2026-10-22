@@ -187,3 +187,55 @@ def test_contree_failure_with_own_index_becomes_the_limitation_reason(tmp_path):
     plain = tmp_path / "plain"
     plain.mkdir()
     assert daily_run.own_index_refusal(a, "Contree setup failed", plain) == "Contree setup failed"
+
+
+def _helper_calls(monkeypatch, tmp_path, isolated):
+    monkeypatch.setattr(daily_run, "base_env",
+                        lambda home, install=False, **kw: {"PATH": "/bin", "UV_EXTRA_INDEX_URL": "x",
+                                                           "PIP_INDEX_URL": "y", **kw})
+    monkeypatch.setattr(daily_run, "side_sandbox", lambda *a, **k: {"rw": []})
+    monkeypatch.setattr(daily_run, "PIP_OPTIONAL", {"mod": "wheelpkg"})
+    calls = _capture(monkeypatch)
+    venvs = {"main": tmp_path / "vm", "pr": tmp_path / "vp"}
+    log = tmp_path / "l.log"
+    kw = {} if isolated is None else {"isolated": isolated}
+    daily_run.install_declared_test_deps(venvs, ["a"], log, 5, **kw)
+    daily_run.install_optional_backends(venvs, ["b"], log, 5, **kw)
+    daily_run.install_optional_modules(venvs, ["mod"], log, 5, **kw)
+    return calls
+
+
+def test_helpers_hardened_on_product_checks(tmp_path, monkeypatch):
+    calls = _helper_calls(monkeypatch, tmp_path, True)
+    assert len(calls) == 6
+    for c, e in calls:
+        assert c[-2:] == ["--no-config", "--no-sources"]
+        assert e["UV_NO_CONFIG"] == "1" and e["PIP_CONFIG_FILE"] == daily_run.os.devnull
+        assert "UV_EXTRA_INDEX_URL" not in e and "PIP_INDEX_URL" not in e
+
+
+def test_helpers_unchanged_on_study_route(tmp_path, monkeypatch):
+    default = _helper_calls(monkeypatch, tmp_path, None)
+    study = _helper_calls(monkeypatch, tmp_path, False)
+    assert default == study and len(study) == 6
+    for c, e in study:
+        assert "--no-config" not in c and "--no-sources" not in c
+        assert e == {"PATH": "/bin", "UV_EXTRA_INDEX_URL": "x", "PIP_INDEX_URL": "y", "install": True} or \
+            e == {"PATH": "/bin", "UV_EXTRA_INDEX_URL": "x", "PIP_INDEX_URL": "y"}
+
+
+def test_install_call_sites_gate_on_product_route():
+    import inspect
+    src = inspect.getsource(daily_run)
+    assert 'decl, prdir / "setup-declared.log",\n' in src
+    assert src.count("a.build_timeout, product_route(a))") >= 3   # declared, optional backends, optional modules
+    plan = src[src.index("def _plan_install"):][:800]
+    assert "isolated_install(" in plan and "product_route(a)" in plan
+
+
+def test_own_index_refusal_keeps_infrastructure_failure(tmp_path, monkeypatch):
+    co = _checkout(tmp_path / "co")
+    a = SimpleNamespace(pr=1, bench=None, product_check=True)
+    why = "infrastructure failure: contree session lost"
+    assert daily_run.own_index_refusal(a, why, co) == why
+    assert daily_run.own_index_refusal(a, "install failed (1)", co).startswith("unsupported:")
