@@ -2,7 +2,7 @@
 
 **Date:** 2026-10-22
 **Status:** accepted
-Merged as 0886b27, approved by George and Jonathan.
+Merged as 0886b27, approved by both reviewers.
 
 ## What changed
 
