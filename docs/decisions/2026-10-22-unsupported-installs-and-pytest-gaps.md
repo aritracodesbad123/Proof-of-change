@@ -1,0 +1,37 @@
+# Product checks stop early on installs they cannot finish, and a missing import keeps its real error
+
+**Date:** 2026-10-22
+**Status:** proposed (awaiting review)
+
+## What changed
+
+A product check (a check started with `--product-check`) now stops before it spends retries on three kinds of install, and a could-not-verify result caused by a missing import or a missing library keeps the real pytest error.
+
+- If the project requires a CUDA or GPU package (a required dependency whose name contains `nvidia` or `cuda`, or a `+cu` wheel), the check does not install it. The reason is that the project needs a GPU / CUDA build, and it names the requirement. An optional extra that mentions CUDA does not stop the check.
+- If the install log says the disk is full (`No space left on device`, and the same kind of message), the check does not retry. It deletes that install's virtualenv and the temporary build files next to it, then stops. The shared download cache is left as it is.
+- If the install log says setuptools found multiple top-level packages in a flat layout, the check does not try to install the project or only its dependencies. The reason is that the project is not installable as a Python package.
+- Other "this is not a Python package" failures, such as an application that is meant to be set up with `uv sync`, still install only the declared dependencies. That earlier behaviour is unchanged.
+- When a product check cannot verify because a test failed to import or collect, the gap step reads the pytest logs and the junit files, not only the short reason. The could-not-verify reason keeps that error text, so a missing module or a missing shared library is visible.
+- That same error text is what the existing per-run lookup diagnoses. The lookup query uses the pytest or collection line (a missing system library, header or tool still takes priority, because that path already handles OS packages). This change does not add another retry loop or another installer. A requirement is installed only when that existing step already would: the error names a module the project declares (including an extra), or a link-back suggestion. A missing system library is not installed by this change; its name stays in the reason.
+
+A study run is unchanged. It does not use these stops, and it does not read pytest logs for a gap retry.
+
+## Why
+
+Some projects cannot be installed on this machine. A GPU stack downloads very large wheels until the disk is full, then the same download is tried again. A flat-layout tree is not one Python package, so another install attempt does not help. Separately, a could-not-verify result often said only "setup gap setup", because the real `No module named ...` line lived in the pytest log and the gap step never read it. The lookup then diagnosed the generic sentence instead of the error, so nothing useful was installed and the missing name was lost.
+
+## Decision
+
+- Detect these stops from the install log and from the project's required dependencies. Do not special-case a repository by name, and do not keep a table that maps an import name to a distribution name.
+- An optional extra that mentions CUDA does not by itself stop the check. Only a required dependency does.
+- Disk-full cleanup removes the unfinished virtualenv, the side's temporary directory, a private uv cache for that side, and pip or uv build directories in that side's home. It does not wipe the shared cache.
+- The real pytest or collection error is part of the text the existing gap step already turns into a lookup query and a missing-name. The reason keeps that error next to the short name.
+- The verdict stays could_not_verify. These stops reach that verdict before retries, with a plain reason. They do not mark the check verified.
+
+## Alternatives and tradeoffs
+
+Retrying a disk-full install can fill the disk further and does not change the outcome. Treating every "not a package" error as unsupported would also stop applications that install cleanly from their declared dependencies, so only the flat-layout error takes the new stop. Leaving the short "setup gap setup" reason would keep the report from saying what was missing. A second installer, or a fixed import-to-package table, would overlap the lookup step that already decides what to install for each run.
+
+## What it means for you
+
+A product check of a GPU project, a flat-layout project, or an install that runs out of disk ends quickly with could_not_verify and a reason you can read. A disk-full install does not leave its temporary build files behind. A missing import shows the pytest error in the reason, and that error is what the per-run lookup diagnoses. A study run behaves as it did before.

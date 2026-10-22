@@ -1489,14 +1489,40 @@ def _install_with_helper(a, rec, step, venv, checkout, chosen, log, timeout, con
 
     state = {"py": py}
 
+    def _log_text() -> str:
+        try:
+            return log.read_text(errors="replace")[-20000:]
+        except OSError:
+            return ""
+
+    def _unsupported(text: str) -> str | None:
+        """A product-check install that should stop now, or None to keep going.
+
+        Study runs do not call this. A flat-layout project is not installed as a package.
+        A disk-full install is not retried, and its temporary build files are removed.
+        """
+        if not product_route(a):
+            return None
+        if demo_helper.disk_full(text):
+            cleanup_install_temps(venv)
+            return demo_helper.DISK_FULL_REASON
+        if demo_helper.flat_layout(text):
+            shutil.rmtree(venv, ignore_errors=True)
+            return demo_helper.FLAT_LAYOUT_REASON
+        return None
+
     def once():
+        if product_route(a):
+            gpu = demo_helper.gpu_only_requirement(checkout)
+            if gpu:
+                return False, demo_helper.gpu_reason(gpu)
         ok, why = install_side(venv, checkout, chosen, log, state["py"], timeout, constraints, extra_reqs)
         if ok:
             return ok, why
-        try:
-            text = log.read_text(errors="replace")[-20000:]
-        except OSError:
-            text = ""
+        text = _log_text()
+        blocked = _unsupported(text)
+        if blocked:
+            return False, blocked
         wanted = demo_helper.wrong_python(text) if product_route(a) else None
         if wanted and wanted != state["py"] and not str(state["py"]).endswith(wanted):
             got = demo_helper.retry_python(wanted)
@@ -1509,10 +1535,10 @@ def _install_with_helper(a, rec, step, venv, checkout, chosen, log, timeout, con
                 ok, why = install_side(venv, checkout, chosen, log, got, timeout, constraints, extra_reqs)
                 if ok:
                     return ok, why
-                try:
-                    text = log.read_text(errors="replace")[-20000:]
-                except OSError:
-                    text = ""
+                text = _log_text()
+                blocked = _unsupported(text)
+                if blocked:
+                    return False, blocked
         if product_route(a) and demo_helper.not_a_package(text):
             plan = demo_helper.deps_only_plan(checkout)
             if plan:
@@ -1524,6 +1550,10 @@ def _install_with_helper(a, rec, step, venv, checkout, chosen, log, timeout, con
                              f"dependencies it declares ({plan['source']}) were installed, the same way on both "
                              "sides, and the project's own folder was put on the import path.")
                     rec.setdefault("demo_helper", {})["deps_only"] = plan
+                else:
+                    blocked = _unsupported(_log_text())
+                    if blocked:
+                        return False, blocked
         return ok, why
 
     ok, why, _value, outcome = demo_helper.run_setup(
@@ -1603,7 +1633,7 @@ def _log_plan_installs(rec, plan, venvs: dict) -> None:
     demo_helper.note_installs(rec, logs)
 
 
-def _retry_setup_gap(a, rec, repo, prdir, venvs: dict, rerun, recheck_coverage=None) -> None:
+def _retry_setup_gap(a, rec, repo, prdir, venvs: dict, rerun, recheck_coverage=None, checkouts=None) -> None:
     """One setup-gap rerun on a console or daily check. A study run does not call this."""
     from poc import demo_helper, tavily_docs
     if not demo_helper.active(a):
@@ -1647,6 +1677,11 @@ def _retry_setup_gap(a, rec, repo, prdir, venvs: dict, rerun, recheck_coverage=N
             _cache.put(query, stored)
             return stored
 
+    if product_route(a):
+        for checkout in checkouts or []:
+            for req in demo_helper.declared_requirement_lines(checkout):
+                if req not in declared:
+                    declared.append(req)
     if not product_route(a):
         # Study runs and the daily study keep the earlier single setup-gap rerun, unchanged.
         demo_helper.retry_unverified_study(
@@ -1659,7 +1694,7 @@ def _retry_setup_gap(a, rec, repo, prdir, venvs: dict, rerun, recheck_coverage=N
         allow_system=getattr(a, "sandbox_backend", None) == "contree",
         install_system=install_system, lookup=lookup, recheck_coverage=recheck_coverage,
         project_text=_INSTALL_DOCS.get(_batch_key(repo, rec), ""),
-        declared_urls=_DECLARED_URLS.get(_batch_key(repo, rec), []))
+        declared_urls=_DECLARED_URLS.get(_batch_key(repo, rec), []), log_dir=prdir)
 
 
 def _install_system_package(rec, name, run_side) -> bool:
@@ -1977,6 +2012,23 @@ def base_env(home: Path, install: bool = False, **extra) -> dict:
 def side_home(venv: Path) -> Path:
     """Per-environment temporary HOME, next to the venv: work/venv-main -> work/home-main."""
     return venv.parent / f"home-{venv.name.removeprefix('venv-')}"
+
+
+def cleanup_install_temps(venv: Path) -> None:
+    """Remove an unfinished install and the temporary build files it left on disk.
+
+    The virtualenv holds the wheels that were unpacked. The side home holds pip and uv build
+    directories. The shared download cache is left in place.
+    """
+    home = side_home(venv)
+    shutil.rmtree(venv, ignore_errors=True)
+    for path in (home / ".tmp", home / ".uv-cache"):
+        shutil.rmtree(path, ignore_errors=True)
+    if not home.is_dir():
+        return
+    for child in list(home.iterdir()):
+        if child.is_dir() and (child.name.startswith(("pip-", "tmp", "uv-")) or child.name in {"build", "temp"}):
+            shutil.rmtree(child, ignore_errors=True)
 
 
 def side_sandbox(venv: Path, network: bool = False, ro: tuple = (), rw: tuple = ()) -> dict:
@@ -3940,7 +3992,8 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
 
         ready = bool(targets and targets.get("pr") and vp.exists())
         _retry_setup_gap(a, rec, repo, prdir, {"main": vm, "pr": vp}, _rerun_nightly if ready else None,
-                         _recheck_nightly if ready else None)
+                         _recheck_nightly if ready else None,
+                         checkouts=[p for p in (work / "src",) if p.is_dir()])
     return finish(gate(rec), prdir, work, t0, a)
 
 
@@ -4248,7 +4301,8 @@ def test_source_pair(repo: str, cfg: dict, item: dict, prdir: Path, work: Path, 
 
         ready = bool(vm and vp and targets and targets.get("pr"))
         _retry_setup_gap(a, rec, repo, prdir, {"main": vm, "pr": vp} if vm and vp else {},
-                         _rerun_pair if ready else None, _recheck_pair if ready else None)
+                         _rerun_pair if ready else None, _recheck_pair if ready else None,
+                         checkouts=[p for p in (cm, cp) if p is not None and Path(p).is_dir()])
     return gate(rec)
 
 

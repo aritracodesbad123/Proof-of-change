@@ -46,10 +46,31 @@ def _flat_layout(venv, checkout, chosen, lg, py, *rest):
     return False, "install failed (1)"
 
 
-def test_flat_layout_installs_declared_dependencies_only(tmp_path, monkeypatch):
+def test_flat_layout_on_a_product_check_is_unsupported(tmp_path, monkeypatch):
     (tmp_path / "pyproject.toml").write_text('[project]\nname = "app"\ndependencies = []\n')
     (tmp_path / "uv.lock").write_text("")
-    monkeypatch.setattr(daily_run, "install_side", _flat_layout)
+    calls = []
+    monkeypatch.setattr(daily_run, "install_side", lambda *a, **k: calls.append("install") or _flat_layout(*a, **k))
+    monkeypatch.setattr(daily_run, "install_deps_only", lambda *a, **k: calls.append("deps") or (True, ""))
+    rec = {}
+    a = SimpleNamespace(python="3.14", pr="https://github.com/a/b/pull/1", product_check=True, bench=None)
+    ok, why = daily_run._install_with_helper(a, rec, "main install", tmp_path / "v", tmp_path, None, tmp_path / "log",
+                                             10, None, None)
+    assert ok is False and why == demo_helper.FLAT_LAYOUT_REASON
+    assert calls == ["install"]
+    verdict, reason, _flags = daily_run.tests_verdict(None, why, None, None)
+    assert verdict == "could_not_verify" and reason == why
+
+
+def _not_a_python_project(venv, checkout, chosen, lg, py, *rest):
+    lg.write_text("error: /src does not appear to be a Python project\n")
+    return False, "install failed (1)"
+
+
+def test_not_a_python_project_still_installs_declared_dependencies(tmp_path, monkeypatch):
+    (tmp_path / "pyproject.toml").write_text('[project]\nname = "app"\ndependencies = []\n')
+    (tmp_path / "uv.lock").write_text("")
+    monkeypatch.setattr(daily_run, "install_side", _not_a_python_project)
     got = []
     monkeypatch.setattr(daily_run, "install_deps_only", lambda *a, **k: got.append(a[2]) or (True, ""))
     rec = {}
@@ -200,3 +221,120 @@ def test_retry_python_gives_up_when_nothing_visible_and_provision_fails():
     from poc import demo_helper
     assert demo_helper.retry_python("3.14", find=lambda v: "/home/x/python3.14", provision=lambda v: None,
                                     can_see=lambda p: False) is None
+
+
+def test_disk_full_stops_without_a_retry_and_removes_build_files(tmp_path, monkeypatch):
+    calls = []
+    venv = tmp_path / "venv-main"
+    (venv / "site").mkdir(parents=True)
+    (venv / "site" / "wheel").write_text("wheel")
+    home = tmp_path / "home-main"
+    (home / ".tmp" / "pip-build").mkdir(parents=True)
+    (home / ".tmp" / "pip-build" / "part").write_text("temp")
+    (home / ".uv-cache").mkdir()
+    (home / ".uv-cache" / "wheel").write_text("cache")
+    (home / "pip-unpack").mkdir()
+    (home / "pip-unpack" / "x").write_text("x")
+
+    def fake_install(_venv, _checkout, _chosen, lg, py, *_rest):
+        calls.append(py)
+        lg.write_text("ERROR: Could not install wheels\nNo space left on device\n")
+        return False, "install failed (1)"
+
+    monkeypatch.setattr(daily_run, "install_side", fake_install)
+    a = SimpleNamespace(python="3.12", pr="https://github.com/a/b/pull/1", product_check=True, bench=None)
+    ok, why = daily_run._install_with_helper(a, {}, "main install", venv, tmp_path, None, tmp_path / "log",
+                                             10, None, None)
+    assert ok is False and why == demo_helper.DISK_FULL_REASON
+    assert calls == ["3.12"]
+    assert not venv.exists()
+    assert not (home / ".tmp").exists() and not (home / ".uv-cache").exists()
+    assert not (home / "pip-unpack").exists()
+    verdict, reason, _flags = daily_run.tests_verdict(None, why, None, None)
+    assert verdict == "could_not_verify" and reason == why
+
+
+def test_disk_full_on_a_study_run_keeps_the_old_retries(tmp_path, monkeypatch):
+    calls = []
+    kept = tmp_path / "home-main" / ".tmp"
+    kept.mkdir(parents=True)
+    (kept / "part").write_text("keep")
+
+    def fake_install(_venv, _checkout, _chosen, lg, _py, *_rest):
+        calls.append(1)
+        lg.write_text("No space left on device\n")
+        return False, "install failed (1)"
+
+    monkeypatch.setattr(daily_run, "install_side", fake_install)
+    a = SimpleNamespace(python="3.12", pr="https://github.com/a/b/pull/1", product_check=False, bench=None)
+    ok, why = daily_run._install_with_helper(a, {}, "main install", tmp_path / "venv-main", tmp_path, None,
+                                             tmp_path / "log", 10, None, None)
+    assert ok is False and why.startswith("install failed")
+    assert len(calls) == demo_helper.MAX_SETUP_RETRIES + 1
+    assert (kept / "part").is_file()
+
+
+def test_required_gpu_dependency_stops_before_install(tmp_path, monkeypatch):
+    (tmp_path / "pyproject.toml").write_text(
+        '[project]\nname = "app"\ndependencies = ["nvidia-cublas-cu12", "numpy"]\n')
+    calls = []
+    monkeypatch.setattr(daily_run, "install_side", lambda *a, **k: calls.append("install") or (True, ""))
+    a = SimpleNamespace(python="3.12", pr="https://github.com/a/b/pull/1", product_check=True, bench=None)
+    ok, why = daily_run._install_with_helper(a, {}, "main install", tmp_path / "v", tmp_path, None, tmp_path / "log",
+                                             10, None, None)
+    assert ok is False and calls == []
+    assert "GPU / CUDA" in why and "nvidia-cublas-cu12" in why
+    verdict, reason, _flags = daily_run.tests_verdict(None, why, None, None)
+    assert verdict == "could_not_verify" and reason == why
+
+
+def test_optional_cuda_extra_does_not_block_the_install(tmp_path, monkeypatch):
+    (tmp_path / "pyproject.toml").write_text(
+        '[project]\nname = "app"\ndependencies = ["numpy"]\n\n'
+        '[project.optional-dependencies]\ncuda = ["nvidia-cublas-cu12"]\n')
+    (tmp_path / "requirements-dev.txt").write_text("cuda-python\n")
+    calls = []
+    monkeypatch.setattr(daily_run, "install_side", lambda *a, **k: calls.append("install") or (True, ""))
+    a = SimpleNamespace(python="3.12", pr="https://github.com/a/b/pull/1", product_check=True, bench=None)
+    ok, _why = daily_run._install_with_helper(a, {}, "main install", tmp_path / "v", tmp_path, None, tmp_path / "log",
+                                              10, None, None)
+    assert ok is True and calls == ["install"]
+
+
+def test_cuda_wheel_marker_is_a_required_gpu_signal(tmp_path):
+    (tmp_path / "requirements.txt").write_text("scuda\n")
+    assert demo_helper.gpu_only_requirement(tmp_path) is None
+    (tmp_path / "requirements.txt").write_text("torch+cu121\n")
+    assert demo_helper.gpu_only_requirement(tmp_path) == "torch+cu121"
+
+
+def test_study_run_still_installs_when_a_gpu_package_is_required(tmp_path, monkeypatch):
+    (tmp_path / "pyproject.toml").write_text('[project]\nname = "app"\ndependencies = ["cuda-python"]\n')
+    calls = []
+    monkeypatch.setattr(daily_run, "install_side", lambda *a, **k: calls.append("install") or (True, ""))
+    a = SimpleNamespace(python="3.12", pr="https://github.com/a/b/pull/1", product_check=False, bench=None)
+    ok, why = daily_run._install_with_helper(a, {}, "main install", tmp_path / "v", tmp_path, None, tmp_path / "log",
+                                             10, None, None)
+    assert ok is True and calls == ["install"] and not str(why).startswith("unsupported")
+
+
+def test_gap_retry_reads_pytest_logs_and_checkout_extras(tmp_path, monkeypatch):
+    root = tmp_path / "src"
+    root.mkdir()
+    (root / "pyproject.toml").write_text(
+        '[project]\nname = "app"\ndependencies = ["requests"]\n\n'
+        '[project.optional-dependencies]\nci = ["python-gitlab>=4"]\n')
+    (tmp_path / "pytest-pr-1.log").write_text("E   ModuleNotFoundError: No module named 'gitlab'\n")
+    seen = {}
+
+    def fake_retry(rec, rerun, install_one, declared, *args, **kwargs):
+        seen["declared"] = list(declared)
+        seen["log_dir"] = kwargs.get("log_dir")
+        return rec
+
+    monkeypatch.setattr("poc.demo_helper.retry_unverified", fake_retry)
+    a = SimpleNamespace(bench=None, sandbox_backend="local", pr="https://github.com/acme/widget/pull/1",
+                        product_check=True)
+    daily_run._retry_setup_gap(a, {}, "acme/widget", tmp_path, {}, None, checkouts=[root])
+    assert any(str(req).startswith("python-gitlab") for req in seen["declared"])
+    assert seen["log_dir"] == tmp_path

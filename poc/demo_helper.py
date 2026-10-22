@@ -93,6 +93,22 @@ _SETUP_MARKERS = (
     "too much memory",
     "infrastructure failure",
 )
+# Product-check stops. These are signals in an install log or a requirement line, not repository names.
+_DISK_FULL = re.compile(r"no space left on device|errno 28|disk quota exceeded", re.I)
+_FLAT_LAYOUT = re.compile(r"multiple top-level packages discovered in a flat-layout", re.I)
+_GPU_REQ = re.compile(r"(?i)(?:^|[^A-Za-z0-9])(?:nvidia|cuda)(?:[^A-Za-z0-9]|$)|\+cu\d+")
+_PYTEST_ERROR = re.compile(
+    r"(?i)(?:module)?notfounderror:[^\n<]{0,180}|filenotfounderror:[^\n<]{0,180}|"
+    r"no module named ['\"]?[\w.]+|importerror:[^\n<]{0,180}|"
+    r"cannot open shared object file[^\n<]{0,120}|error while loading shared libraries:[^\n<]{0,120}|"
+    r"library not loaded:[^\n<]{0,120}|error collecting [^\n<]{0,160}|"
+    r"no such file or directory:[^\n<]{0,160}|resolutionimpossible:[^\n<]{0,160}|"
+    r"version conflict[^\n<]{0,80}"
+)
+DISK_FULL_REASON = ("unsupported: the install ran out of disk space, so its temporary build files were removed "
+                    "and nothing was tested")
+FLAT_LAYOUT_REASON = ("unsupported: this project isn't installable as a Python package "
+                      "(multiple top-level packages in a flat layout)")
 
 
 def active(runner) -> bool:
@@ -686,6 +702,115 @@ def declared_packages(checkout, self_dist: str = "") -> list[dict]:
     return found
 
 
+def _collect_reqs(found: list[str], seen: set, lines) -> None:
+    for line in lines or []:
+        if not isinstance(line, str):
+            continue
+        name = req_name(line)
+        key = norm(name)
+        if _NAME.fullmatch(name) and key not in seen:
+            seen.add(key)
+            found.append(line.strip())
+
+
+def declared_requirement_lines(checkout) -> list[str]:
+    """Every requirement the project declares, extras included.
+
+    The gap step uses this to recognise a name the error already produced. It does not install them.
+    """
+    root = Path(checkout)
+    found: list[str] = []
+    seen: set = set()
+    data = _pyproject(root / "pyproject.toml")
+    project = data.get("project") if isinstance(data.get("project"), dict) else {}
+    _collect_reqs(found, seen, project.get("dependencies"))
+    for bucket in (project.get("optional-dependencies"), data.get("dependency-groups")):
+        if not isinstance(bucket, dict):
+            continue
+        for reqs in bucket.values():
+            if isinstance(reqs, list):
+                _collect_reqs(found, seen, reqs)
+    cfg = root / "setup.cfg"
+    if cfg.is_file():
+        import configparser
+        parser = configparser.ConfigParser()
+        try:
+            parser.read_string(_read(cfg))
+        except (configparser.Error, OSError):
+            parser = None
+        if parser is not None:
+            if parser.has_option("options", "install_requires"):
+                _collect_reqs(found, seen, _req_lines(parser.get("options", "install_requires")))
+            if parser.has_section("options.extras_require"):
+                for _extra, value in parser.items("options.extras_require"):
+                    _collect_reqs(found, seen, _req_lines(value))
+    setup_py = _read(root / "setup.py")
+    _collect_reqs(found, seen, re.findall(r"""['\"]([^'\"]+)['\"]""", _section(setup_py, "install_requires")))
+    extras_blob = _section(setup_py, "extras_require")
+    for match in re.finditer(r"""['\"][^'\"]+['\"]\s*:\s*\[([^\]]*)\]""", extras_blob):
+        _collect_reqs(found, seen, re.findall(r"""['\"]([^'\"]+)['\"]""", match.group(1)))
+    for path in _requirement_files(root):
+        _collect_reqs(found, seen, _req_lines(_read(path)))
+    return found
+
+
+def _plain_req_lines(text: str):
+    for raw in (text or "").splitlines():
+        line = raw.split("#", 1)[0].strip()
+        if line and not line.startswith(("-", ".", "--")):
+            yield line
+
+
+def _iter_required_lines(checkout):
+    """Required dependency lines, including local version markers such as +cu. Extras are not included."""
+    root = Path(checkout)
+    data = _pyproject(root / "pyproject.toml")
+    project = data.get("project") if isinstance(data.get("project"), dict) else {}
+    for line in project.get("dependencies") or []:
+        if isinstance(line, str):
+            yield line
+    cfg = root / "setup.cfg"
+    if cfg.is_file():
+        import configparser
+        parser = configparser.ConfigParser()
+        try:
+            parser.read_string(_read(cfg))
+        except (configparser.Error, OSError):
+            parser = None
+        if parser is not None and parser.has_option("options", "install_requires"):
+            yield from _plain_req_lines(parser.get("options", "install_requires"))
+    setup_py = _read(root / "setup.py")
+    yield from re.findall(r"""['\"]([^'\"]+)['\"]""", _section(setup_py, "install_requires"))
+    base = root / "requirements.txt"
+    if base.is_file():
+        yield from _plain_req_lines(_read(base))
+
+
+def gpu_only_requirement(checkout) -> str | None:
+    """A required dependency that is a CUDA or GPU build, or None.
+
+    The signal is the requirement name (nvidia-*, cuda-*, or a +cu wheel). Optional extras are ignored.
+    """
+    for line in _iter_required_lines(checkout):
+        if _GPU_REQ.search(line):
+            name = req_name(line)
+            return name or line.strip()
+    return None
+
+
+def gpu_reason(name: str) -> str:
+    return (f"unsupported: this project needs a GPU / CUDA build (it requires {name}), "
+            "so it was not installed")
+
+
+def disk_full(text: str) -> bool:
+    return bool(_DISK_FULL.search(text or ""))
+
+
+def flat_layout(text: str) -> bool:
+    return bool(_FLAT_LAYOUT.search(text or ""))
+
+
 def _section(text: str, name: str) -> str:
     match = re.search(rf"{re.escape(name)}\s*=\s*(\[[^\]]*\]|\{{[^\}}]*\}})", text or "", re.S)
     return match.group(1) if match else ""
@@ -1143,10 +1268,19 @@ def is_system_failure(text: str) -> bool:
 
 
 def failure_line(text: str) -> str:
-    for line in (text or "").splitlines():
+    """The line the per-run lookup diagnoses.
+
+    A missing OS library, header or tool still wins, because that is what the system-package step reads.
+    Otherwise a pytest or collection error is used, so a generic first line does not hide it.
+    """
+    lines = [line.strip() for line in (text or "").splitlines() if line.strip()]
+    for line in lines:
         if _SYSTEM_FAILURE.search(line):
-            return line.strip()[:300]
-    return (text or "").strip().splitlines()[0][:300] if (text or "").strip() else ""
+            return line[:300]
+    for line in lines:
+        if _PYTEST_ERROR.search(line):
+            return line[:300]
+    return lines[0][:300] if lines else ""
 
 
 def trusted_url(url: str, repo: str, declared_urls=()) -> bool:
@@ -1816,7 +1950,49 @@ def is_setup_gap(verdict, text: str) -> bool:
     return any(marker in low for marker in _GAP_MARKERS)
 
 
-def gap_text(rec: dict) -> str:
+def _keep_bit(bits: list[str], bit: str, limit: int) -> None:
+    """Keep the longer of two overlapping error lines, and stop at `limit` lines."""
+    if not bit or len(bits) >= limit and all(earlier not in bit for earlier in bits):
+        return
+    for i, earlier in enumerate(bits):
+        if bit in earlier:
+            return
+        if earlier in bit:
+            bits[i] = bit
+            return
+    if len(bits) < limit:
+        bits.append(bit)
+
+
+def pytest_error_text(log_dir=None, record: dict | None = None, limit: int = 4000) -> str:
+    """Import and collection errors from pytest logs, junit files, and per-run summaries.
+
+    Secrets are removed before the text is returned.
+    """
+    blobs: list[str] = []
+    if isinstance(record, dict):
+        for entry in record.get("per_run") or []:
+            if isinstance(entry, dict) and entry.get("pytest_summary"):
+                blobs.append(str(entry["pytest_summary"]))
+    root = Path(log_dir) if log_dir else None
+    if root is not None and root.is_dir():
+        files = sorted(root.glob("pytest-*.log")) + sorted(root.glob("junit-*.xml"))
+        for path in files[:12]:
+            try:
+                blobs.append(path.read_text(errors="replace"))
+            except OSError:
+                continue
+    bits: list[str] = []
+    for blob in blobs:
+        for match in _PYTEST_ERROR.finditer(blob):
+            _keep_bit(bits, " ".join(match.group(0).split()), 8)
+        if len(bits) >= 8:
+            break
+    return redact("\n".join(bits))[:limit]
+
+
+def gap_text(rec: dict, log_dir=None) -> str:
+    """Reason, probe errors, comparison messages, and the pytest or collection error."""
     parts = [str(rec.get("reason") or "")]
     probes = rec.get("probes") or {}
     items = probes.get("items") if isinstance(probes, dict) else probes
@@ -1829,7 +2005,13 @@ def gap_text(rec: dict) -> str:
         messages = comparison.get("messages") or {}
         if isinstance(messages, dict):
             parts.extend(str(value) for value in messages.values())
-    return "\n".join(parts)
+    # Log files are read only when a caller passes a directory. The study path calls this with no directory,
+    # so its gap text stays the reason, the probes and the comparison messages.
+    if log_dir is not None:
+        logged = pytest_error_text(log_dir, rec)
+        if logged:
+            parts.append(logged)
+    return "\n".join(part for part in parts if part)
 
 
 def _modules(text: str) -> list[str]:
@@ -1883,8 +2065,33 @@ def _declared_req(module: str, declared) -> str | None:
     return None
 
 
-def _gap_reason(name: str) -> str:
-    return f"could not verify: setup gap {name}"
+def error_excerpt(text: str, limit: int = 240) -> str:
+    """The real error lines, shortened and with secrets removed."""
+    found: list[str] = []
+    for match in _PYTEST_ERROR.finditer(text or ""):
+        _keep_bit(found, " ".join(match.group(0).split()), 3)
+        if len(found) >= 3:
+            break
+    if not found:
+        for raw in (text or "").splitlines():
+            line = raw.strip()
+            low = line.lower()
+            if any(marker in low for marker in ("no such file", "version conflict", "resolutionimpossible",
+                                                "conflicting dependencies")):
+                if line not in found:
+                    found.append(line)
+            if len(found) >= 3:
+                break
+    return redact(" | ".join(found))[:limit]
+
+
+def _gap_reason(name: str, detail: str = "") -> str:
+    """could_not_verify reason that keeps the real error next to the short name."""
+    base = f"could not verify: setup gap {name}"
+    excerpt = error_excerpt(detail)
+    if excerpt and excerpt not in base:
+        return f"{base}: {excerpt}"
+    return base
 
 
 def _lookup_text(extra) -> str:
@@ -2099,7 +2306,7 @@ def retry_unverified_study(rec: dict, rerun, install_one, declared, tavily_text:
 def retry_unverified(rec: dict, rerun, install_one, declared, tavily_text: str, pypi, repo: str,
                      allow_system: bool, install_system=None, lookup=None, recheck_coverage=None,
                      max_tries: int = MAX_GAP_TRIES, declared_urls=(), apt_check=None,
-                     project_text: str = "") -> dict:
+                     project_text: str = "", log_dir=None) -> dict:
     """Up to ``max_tries`` reruns when a could-not-verify result is a setup or import gap.
 
     Each try: look the error up (Tavily, when a lookup is given), install the fix on main and pr, rerun the step.
@@ -2119,7 +2326,7 @@ def retry_unverified(rec: dict, rerun, install_one, declared, tavily_text: str, 
                      "failure, so it was not retried as a setup problem.")
         block["notes"] = _unique(notes)
         return rec
-    text = gap_text(rec)
+    text = gap_text(rec, log_dir=log_dir)
     if not is_setup_gap(rec.get("verdict"), text):
         block["notes"] = _unique(notes)
         return rec
@@ -2212,10 +2419,13 @@ def retry_unverified(rec: dict, rerun, install_one, declared, tavily_text: str, 
         after_reason = outcome.get("reason", rec.get("reason"))
         after_text = f"{after_verdict}\n{after_reason}"
         if is_setup_gap(after_verdict, after_text):
+            kept = text
+            named = gap_name(after_reason or kept)
             rec["verdict"] = "could_not_verify"
-            rec["reason"] = _gap_reason(gap_name(after_reason or text))
-            entry["result"] = f"still a setup gap: {gap_name(after_reason or text)}"
-            text = after_text
+            rec["reason"] = _gap_reason(named, after_reason or kept)
+            entry["result"] = f"still a setup gap: {named}"
+            # A rerun that only repeats a generic reason must not drop the pytest error the lookup diagnoses.
+            text = after_text if error_excerpt(after_reason or "") else f"{after_text}\n{kept}"
         else:
             held = _coverage_blocks_verified(rec, after_verdict, recheck_coverage)
             if held:
@@ -2229,7 +2439,7 @@ def retry_unverified(rec: dict, rerun, install_one, declared, tavily_text: str, 
             break
     if not reran or is_setup_gap(rec.get("verdict"), f"{rec.get('verdict')}\n{rec.get('reason')}"):
         rec["verdict"] = "could_not_verify"
-        rec["reason"] = _gap_reason(gap_name(text))
+        rec["reason"] = _gap_reason(gap_name(text), text)
     notes.append(f"Before rerun: {rounds[0]['verdict']}: {rounds[0]['reason']}")
     if reran:
         notes.append(f"After rerun: ({len(tries)} of {max_tries} tries) {rec['verdict']}: {rec['reason']}")
