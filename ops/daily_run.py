@@ -1559,6 +1559,12 @@ def _check_python(a, plan) -> str:
     return switch or getattr(a, "python", "") or ""
 
 
+def _groups_blocked(a, plan) -> str:
+    """The could-not-verify reason when main's dependency groups can't be installed as written (refused lines or a
+    table PEP 735 does not allow) on a product check, else "". Every install route stops on it before installing."""
+    return str((plan or {}).get("groups_blocked") or "") if product_route(a) else ""
+
+
 def _install_with_helper(a, rec, step, venv, checkout, chosen, log, timeout, constraints, extra_reqs, python=None,
                          max_retries=None):
     """Retry one side's install. The caller uses the plain install_side call when the helper is off."""
@@ -1571,6 +1577,10 @@ def _install_with_helper(a, rec, step, venv, checkout, chosen, log, timeout, con
         demo_helper.note_setup(rec, step, {"ok": False, "label": demo_helper.SETUP_LABEL, "counts_as_verdict": False,
                                            "attempts": 1, "detail": why, "retried": False, "step": step})
         return False, why
+    blocked_groups = _groups_blocked(a, (rec.get("demo_helper") or {}).get("setup_plan"))
+    if blocked_groups:
+        # same as a refused requirement line in the deps-only fallback: stop before installing anything
+        return False, blocked_groups
     from poc import run_progress
     run_progress.emit("install_deps", detail=f"{step}: installing the project's declared dependencies")
 
@@ -3987,6 +3997,10 @@ def _contree_only_pair(a, rec: dict, repo: str, cfg: dict, item: dict, sp: dict,
                            "not_run_locally": not_local}
     rec["coverage"] = {"status": "not measured", "why": CONTREE_ONLY_COVERAGE_WHY}
     run_progress.emit("install_main", detail="installing main and PR sides in Contree")
+    blocked = _groups_blocked(a, setup_plan)
+    if blocked:
+        rec["contree_only"]["note"] = "Contree mode: Contree did not run, so nothing from the pull request was run"
+        return None, blocked, None, targets
     cnv = _maybe_prepare_contree(a, repo, sp["main_sha"], sp["pr_sha"], rec, a.build_timeout,
                                  extra_shell=contree_only_extra_shell(decl, optional, base), main_dir=cm)
     cnv = own_index_refusal(a, cnv, cm, cp)
@@ -4066,6 +4080,10 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
     helper_on = demo_helper.active(a)
     file_dirs = _project_file_dirs(repo, item, work, prdir / "packaging.log") if helper_on else []
     setup_plan = _product_plan(a, rec, repo, cfg, file_dirs, out_dir=prdir) if helper_on else None
+    blocked = _groups_blocked(a, setup_plan)
+    if blocked:   # fail closed before any install
+        rec["verdict"], rec["reason"], _ = verdict_for(None, blocked)
+        return finish(rec, prdir, work, t0, a)
     py = _check_python(a, setup_plan)
     run_progress.emit("install_main", detail="installing main (nightly) side")
     if helper_on:
