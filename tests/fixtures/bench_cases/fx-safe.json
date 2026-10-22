@@ -1,0 +1,13 @@
+{
+ "schema": "poc-bench-case/1",
+ "id": "fx-safe",
+ "fixture": true,
+ "repo": "pytoolz/toolz",
+ "pr_url": "https://github.com/pytoolz/toolz/pull/1",
+ "base_sha": "1111111111111111111111111111111111111111",
+ "head_sha": "2222222222222222222222222222222222222222",
+ "category": "known_safe",
+ "expected_verdict": "verified",
+ "rationale": "FIXTURE for unit tests only; not a real case.",
+ "source": "unit-test fixture"
+}
