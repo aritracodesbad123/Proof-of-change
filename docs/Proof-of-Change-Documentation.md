@@ -74,7 +74,7 @@ Pull-request code is meant to run inside a sandbox.
 
 ## 7. Tavily
 
-Tavily can suggest package names. A suggestion is installed only when that package's PyPI page links back to the same GitHub repository, and the link must be http or https. Live: `poc/demo_helper.py:6`, `poc/demo_helper.py:930`, `poc/demo_helper.py:956`. The package author writes that link. It stops an accident. It does not stop someone who is trying to get a bad package installed. Live: `docs/decisions/2026-10-21-pr-only-flaky-not-verified.md:11`, `README.md:115`.
+Tavily can suggest package names. A suggestion is installed only when that package's PyPI page links back to the same GitHub repository, and the link must be http or https. Live: `poc/demo_helper.py:6`, `poc/demo_helper.py:930`, `poc/demo_helper.py:956`. The package author writes that link. It stops an accident. It does not stop someone who is trying to get a bad package installed. Live: `docs/decisions/2026-10-21-pr-only-flaky-not-verified.md:11`, `README.md:117`.
 
 The retry rule, in the program's own words: "If setup fails, the helper retries the install up to 2 times. If a test still can't be verified because something is missing, it installs what's missing and reruns that test once." Live: `poc/demo_helper.py:24`.
 
@@ -84,10 +84,10 @@ Related bug reports are background. The report labels them as not used for the v
 
 - **Command line.** `ops/daily_run.py` with a `--pr` link. Live: `poc/console_api.py:166` (the console builds that same command).
 - **Web console.** React pages in `console/web`, API in `poc/console_api.py`.
-- **Request a check.** A public GitHub issue. The default cap is five checks a day (`POC_DAILY_CAP`). Live: `ops/request_worker.py:63`, `README.md:65`.
+- **Request a check.** A public GitHub issue. The default cap is five checks a day (`POC_DAILY_CAP`). Live: `ops/request_worker.py:63`, `README.md:67`.
 - **GitHub App.** Swarm is always on for an App check. Live: `poc/github_app.py:298`. It posts a check and a comment only on allowlisted demo repositories when a token is set. Live: `README.md:11`.
 - **Results page.** https://aritracodesbad123.github.io/Proof-of-change/
-- **Codespaces.** Live checks in a Codespace are not confirmed. Live: `README.md:69`. The steps under that heading describe the design. A live check there is designed to use a Nebius key and project ID typed into the form. Running with a judge's own Nebius account is not confirmed on the live Contree service. If the console cannot read whether port 8787 is public, it asks for a code that sits in the Codespace at `/tmp/poc-console-code`. Sign-in is skipped only when that port list is read and the port is not public. Live: `poc/console_auth.py:904`, `poc/console_auth.py:1043`.
+- **Codespaces.** Live checks in a Codespace are not confirmed. Live: `README.md:71`. The steps under that heading describe the design. A live check there is designed to use a Nebius key and project ID typed into the form. Running with a judge's own Nebius account is not confirmed on the live Contree service. If the console cannot read whether port 8787 is public, it asks for a code that sits in the Codespace at `/tmp/poc-console-code`. Sign-in is skipped only when that port list is read and the port is not public. Live: `poc/console_auth.py:904`, `poc/console_auth.py:1043`.
 
 ## 9. Security table
 
@@ -131,12 +131,13 @@ On every pull request, GitHub Actions runs, on Python 3.11 and 3.12: a decision-
 ## 12. Known limitations
 
 - The runner is for Python projects that use the normal package index (`pyproject.toml`, pytest). It is not a checker for other languages. Big applications, a project's own package index or uv sources, and a pre-release (test) build of Python end as could not verify. Main and the pull request must run the exact same Python version, or the result is could not verify. Live: `pyproject.toml:6`, `README.md:16`.
-- A full Contree-only check cannot reach verified, because probe coverage is not measured there. In that design, a product check can stay verified when a coverage report comes back and the other caps allow it. Measuring test coverage inside Contree is not confirmed on the live Contree service. Live: `ops/daily_run.py:2832`, `docs/decisions/2026-10-21-contree-coverage.md:5`.
+- For apps built from many components, each listing its own requirements (like home-assistant integrations), a product check installs only the touched component's packages plus the core requirements, read from main, and never the combined list of every component. If the changed files don't fall inside a single component (for example, changes to home-assistant's core files), the check ends as could not verify. Live: `poc/demo_helper.py:1003`. This chooses the right packages; it is not confirmed that such a check finishes, and no such check has reached verified.
+- A full Contree-only check cannot reach verified, because probe coverage is not measured there. In that design, a product check can stay verified when a coverage report comes back and the other caps allow it. Measuring test coverage inside Contree is not confirmed on the live Contree service. Live: `ops/daily_run.py:2843`, `docs/decisions/2026-10-21-contree-coverage.md:5`.
 - A coverage report written by the pull request's own code can still be forged. The gate accepts a report that lists every changed file and claims every line ran. Live: `docs/decisions/2026-10-21-coverage-report-checks.md:21`.
 - The PyPI link-back check is not attack-proof. The package author writes the link, so someone trying to get past it can write one too. Live: `docs/decisions/2026-10-21-pr-only-flaky-not-verified.md:35`.
 - Pull requests that change only docs, comments, or docstrings end as could not verify, because there is no behaviour to test. Draft pull request 56 is open and is not merged here. Live: `docs/decisions/2026-10-21-golden-check-ai-probe-gate-and-known-answer-benchmark.md:28`.
 - A process that double-forks and is adopted by init can escape the install timeout. Live: `docs/decisions/2026-10-21-install-timeout-kills-process-tree.md:20`.
-- Codespace live checks are not confirmed. Live: `README.md:69`.
+- Codespace live checks are not confirmed. Live: `README.md:71`.
 - A managed schedule for the serverless daily job is not built. Live: `docs/REQUIREMENTS.md:286` ("Planned, not yet built" for that schedule).
 
 ## 13. Tech stack and licence
