@@ -1,7 +1,8 @@
 # Product checks stop early on installs they cannot finish, and a missing import keeps its real error
 
 **Date:** 2026-10-22
-**Status:** proposed (awaiting review)
+**Status:** accepted
+Merged as 0886b27, approved by both reviewers.
 
 ## What changed
 
