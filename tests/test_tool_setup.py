@@ -9,6 +9,11 @@ def _cp(rc=0, err=""):
     return subprocess.CompletedProcess([], rc, "", err)
 
 
+@pytest.fixture(autouse=True)
+def _allow(monkeypatch):
+    monkeypatch.setattr(tool_setup, "declared_requirements", lambda: ["uv==9.9.9", "other==1"])
+
+
 def test_missing_tool_is_installed_from_declared_list_and_continues(monkeypatch):
     state = {"installed": False}
     monkeypatch.setattr(tool_setup, "_satisfied", lambda r: state["installed"])
@@ -34,7 +39,18 @@ def test_retries_then_plain_error(monkeypatch):
     assert "could not install it after 3 tries" in msg and "Traceback" not in msg
 
 
-def test_declared_requirements_come_from_pyproject():
+def test_tool_not_on_allowlist_is_refused(monkeypatch):
+    monkeypatch.setattr(tool_setup, "_satisfied", lambda r: False)
+    calls, logs = [], []
+    with pytest.raises(tool_setup.ToolSetupError):
+        tool_setup.ensure_tools(["evil==1.0", "uv==9.9.9"], installer=lambda r: calls.append(list(r)) or _cp(1),
+                                sleep=lambda s: None, log=logs.append)
+    assert calls and all("evil==1.0" not in c for c in calls)
+    assert any("refused evil==1.0" in m for m in logs)
+
+
+def test_declared_requirements_come_from_pyproject(monkeypatch):
+    monkeypatch.undo()
     reqs = tool_setup.declared_requirements()
     assert any(tool_setup._name(r) == "uv" for r in reqs)
 

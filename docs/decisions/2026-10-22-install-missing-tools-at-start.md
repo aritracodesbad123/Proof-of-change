@@ -20,4 +20,5 @@ Setup scripts can be skipped or fail, so the code makes sure of its own tools in
 
 1. Tools are declared once, in `pyproject.toml`.
 2. `ensure_tools()` installs whatever is missing, with 3 tries, then a plain error.
-3. `git` is checked but not installed; a missing `git` gives a plain error.
+3. Only our own tools, exactly pinned in `pyproject.toml`, are ever installed. A requirement from a checked repo or pull request is refused and logged, never installed.
+4. `git` is checked but not installed; a missing `git` gives a plain error.

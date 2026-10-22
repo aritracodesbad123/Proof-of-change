@@ -35,6 +35,11 @@ def declared_requirements(pyproject: Path = ROOT / "pyproject.toml") -> list[str
         return []
 
 
+def allowlist() -> list[str]:
+    """Our own tools, exactly pinned (name==version), from our own pyproject. Nothing else is ever installed."""
+    return [r.strip() for r in declared_requirements() if re.fullmatch(r"[A-Za-z0-9_.-]+==[^\s;,]+", r.strip())]
+
+
 def _name(req: str) -> str:
     return re.split(r"[\s<>=!~;\[]", req.strip(), maxsplit=1)[0]
 
@@ -102,7 +107,12 @@ def ensure_tools(requirements: list[str] | None = None, retries: int = RETRIES, 
     """Install every missing declared requirement in one pip call (up to `retries` tries). Returns
     {"installed": [...], "tries": n, "note": plain words}. Raises ToolSetupError in plain words on failure."""
     global _last
-    reqs = declared_requirements() if requirements is None else list(requirements)
+    allow = allowlist()
+    reqs = list(allow) if requirements is None else list(requirements)
+    refused = [r for r in reqs if r.strip() not in allow]
+    if refused:  # never install anything a checked repo or PR asks for: only our own pinned tools
+        log(f"Tool setup: refused {', '.join(refused)}: not one of Proof-of-Change's own pinned tools")
+        reqs = [r for r in reqs if r.strip() in allow]
     installer = installer or _pip_install
     _add_script_dirs()
     missing = [r for r in reqs if not _satisfied(r)]
@@ -132,7 +142,7 @@ def ensure_tools(requirements: list[str] | None = None, retries: int = RETRIES, 
     installed = [r for r in missing]
     note = (f"Installed missing tools before starting: {', '.join(installed)}." if installed
             else "All required tools were already installed.")
-    _last = {"installed": installed, "tries": tries, "note": note}
+    _last = {"installed": installed, "tries": tries, "note": note, "refused": refused}
     if installed:
         log(f"Tool setup: {note}")
     return dict(_last)
