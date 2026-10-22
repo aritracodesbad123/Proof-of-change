@@ -1559,8 +1559,16 @@ CONTREE_ONLY_NOTE = ("Contree mode: no pull-request or package code runs "
                      "locally. This step needs a local side and was not run.")
 CONTREE_ONLY_COVERAGE_WHY = "Contree mode: coverage runs only inside Contree, and it was not run there"
 NO_SANDBOX_FALLBACK = ("Contree could not prepare the main and PR sides ({why}). In Contree mode nothing from the pull "
-                       "request runs locally, so Proof-of-Change will not run pull-request code. Check your Nebius key and Contree "
-                       "project ID and try again.")
+                       "request runs locally, so Proof-of-Change will not run pull-request code.")
+CONTREE_AUTH_HINT = " Check your Nebius key and Contree project ID and try again."
+
+
+def contree_refusal(e) -> tuple[str, dict]:
+    """Refusal text and record entry for a Contree setup failure. Blames credentials only on an API auth error."""
+    refusal = NO_SANDBOX_FALLBACK.format(why=e) + (CONTREE_AUTH_HINT if getattr(e, "auth", False) else "")
+    entry = {"failed": str(e), "fallback": None, "exit_code": getattr(e, "exit_code", None),
+             "stderr_tail": getattr(e, "stderr_tail", "") or "", "auth_error": bool(getattr(e, "auth", False))}
+    return refusal, entry
 
 
 def set_contree_only(on: bool) -> None:
@@ -2182,11 +2190,11 @@ def _maybe_prepare_contree(a, repo: str, main_sha: str, pr_sha: str, rec: dict, 
         return None
     except contree_sandboxes.ContreeError as e:
         contree_sandboxes.clear_session()
-        refusal = NO_SANDBOX_FALLBACK.format(why=e)
+        refusal, entry = contree_refusal(e)
         rec["sandbox_backend"] = "contree"
         rec["sandbox_backend_note"] = refusal
         rec["machine"] = "contree (not run)"
-        rec["contree"] = {"failed": str(e), "fallback": None}
+        rec["contree"] = entry
         return refusal
 
 

@@ -26,7 +26,63 @@ _state: dict[str, Any] = {"backend": "local", "note": "local bubblewrap", "sessi
 
 
 class ContreeError(RuntimeError):
-    """Contree failed; message must never contain API keys."""
+    """Contree failed; message must never contain API keys.
+
+    exit_code and stderr_tail (redacted) describe a failed sandbox command; auth is True only when the
+    Contree API itself refused the credentials."""
+
+    def __init__(self, msg: str, *, exit_code=None, stderr_tail: str = "", auth: bool = False):
+        super().__init__(msg)
+        self.exit_code = exit_code
+        self.stderr_tail = stderr_tail
+        self.auth = auth
+
+
+AUTH_ERROR_NAMES = ("forbidden", "unauthorized", "unauthorised", "authentication", "permissiondenied")
+TAIL_CHARS = 1500
+
+
+def redact(text: str, env: dict | None = None) -> str:
+    """Remove the Nebius key and project id (and bearer tokens) from text."""
+    import re
+    env = os.environ if env is None else env
+    out = text or ""
+    for k in (KEY_ENV, PROJECT_ENV):
+        v = env.get(k)
+        if v and str(v).strip():
+            out = out.replace(str(v), f"<{k} redacted>")
+    return re.sub(r"(?i)(bearer\s+)\S+", r"\1<redacted>", out)
+
+
+def tail(text: str, n: int = TAIL_CHARS) -> str:
+    text = redact(text or "").strip()
+    return text if len(text) <= n else "..." + text[-n:]
+
+
+def is_auth_error(exc: BaseException) -> bool:
+    """True only for an API auth refusal (by exception class name or HTTP 401/403 status)."""
+    name = type(exc).__name__.lower()
+    if any(w in name for w in AUTH_ERROR_NAMES):
+        return True
+    status = getattr(exc, "status_code", None) or getattr(exc, "status", None)
+    return status in (401, 403)
+
+
+def bash_wrapped(shell: str) -> str:
+    """POSIX sh script that runs shell under bash when present (so set -o pipefail works), else under sh with
+    pipefail removed. Contree runs commands with /bin/sh, which is dash on Debian images."""
+    fallback = shell.replace("set -euo pipefail", "set -eu").replace("set -o pipefail", ":")
+    return (f"if command -v bash >/dev/null 2>&1; then\n  exec bash -c {shlex.quote(shell)}\nfi\n"
+            f"{fallback}")
+
+
+def setup_failure(what: str, raw: dict) -> ContreeError:
+    code = raw.get("exit_code")
+    err = tail(raw.get("stderr") or "") or tail(raw.get("stdout") or "")
+    msg = f"{what} failed (exit {code})"
+    if err:
+        msg += f"; last error output: {err[-300:]}"
+    return ContreeError(msg, exit_code=code, stderr_tail=err)
 
 
 def select(name: str, env: dict | None = None) -> tuple[str, str]:
@@ -130,11 +186,13 @@ class ContreeSession:
                 img = client.images.use(image_ref, strict=True)
             else:
                 img = client.images.oci(self.base_image)
-            result = img.run(shell=shell, disposable=disposable, timeout=timeout,
+            result = img.run(shell=bash_wrapped(shell), disposable=disposable, timeout=timeout,
                              files=files or None).wait()
         except ContreeError:
             raise
         except Exception as e:  # noqa: BLE001 — never leak tokens from SDK messages
+            if is_auth_error(e):
+                raise ContreeError(f"Contree API refused access ({type(e).__name__})", auth=True) from None
             raise ContreeError(f"contree request failed: {type(e).__name__}") from None
 
         uuid = getattr(result, "uuid", None)
@@ -160,7 +218,7 @@ class ContreeSession:
         shell = f"set -euo pipefail\nmkdir -p /work\ncd /work\n{install_shell}"
         raw = self.run_op("base", shell, disposable=False, timeout=timeout)
         if raw.get("exit_code") != 0:
-            raise ContreeError(f"main checkpoint install failed (exit {raw.get('exit_code')})")
+            raise setup_failure("main checkpoint install", raw)
         uuid = raw.get("uuid")
         if not uuid:
             raise ContreeError("main checkpoint returned no reusable image id")
@@ -174,7 +232,7 @@ class ContreeSession:
         shell = f"set -euo pipefail\ncd /work 2>/dev/null || {{ mkdir -p /work && cd /work; }}\n{install_shell}"
         raw = self.run_op("main", shell, disposable=False, timeout=timeout)
         if raw.get("exit_code") != 0:
-            raise ContreeError(f"PR checkpoint install failed (exit {raw.get('exit_code')})")
+            raise setup_failure("PR checkpoint install", raw)
         uuid = raw.get("uuid")
         if not uuid:
             # filesystem may be unchanged; reuse main as starting point only if install was a no-op — refuse
