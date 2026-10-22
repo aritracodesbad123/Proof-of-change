@@ -13,9 +13,9 @@ Product checks never install operating-system packages, on any sandbox, includin
 system library, header file or build tool ends as "could not verify", and the report names the missing piece from
 the error text. Contree support itself is built, not confirmed on the live Contree service.
 
-What you will see in the report: "This check needs the system package(s) ..., but this check does not install
-system libraries, headers or build tools. The error was: ..." Study runs show the bubblewrap wording instead:
-"this sandbox (bubblewrap) cannot install OS packages".
+What you will see in the report: "This check needs the system package(s) ..., but
+this check does not install system libraries, headers or build tools. The error was: ..."
+Study runs show the bubblewrap wording instead: "this sandbox (bubblewrap) cannot install OS packages".
 
 Known cases from the 22 October batch (on the local sandbox):
 
