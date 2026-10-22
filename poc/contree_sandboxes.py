@@ -319,11 +319,24 @@ DEPS_ONLY_SHELL = (
 
 # Product checks: no index, find-links or trusted-host setting from the environment, and no pip or uv config file
 # (pip.conf, [tool.uv], [tool.uv.pip], uv.toml) can change where packages come from. Same rules as drop_index_env.
+# Fixed list, plain POSIX: no sed, no eval. PIP_CONFIG_FILE and UV_NO_CONFIG are cleared too, then re-exported.
+INDEX_CONFIG_VARS = (
+    "UV_INDEX", "UV_INDEX_URL", "UV_EXTRA_INDEX_URL", "UV_DEFAULT_INDEX", "UV_FIND_LINKS", "UV_NO_INDEX",
+    "UV_INSECURE_HOST", "UV_INDEX_STRATEGY", "UV_KEYRING_PROVIDER", "UV_CONFIG_FILE", "UV_NO_CONFIG",
+    "PIP_INDEX", "PIP_INDEX_URL", "PIP_EXTRA_INDEX_URL", "PIP_FIND_LINKS", "PIP_NO_INDEX", "PIP_TRUSTED_HOST",
+    "PIP_KEYRING_PROVIDER", "PIP_CONFIG_FILE", "PIP_ISOLATED_MODE",
+)
+_KEEP_EXPORTED = ("UV_NO_CONFIG", "PIP_CONFIG_FILE")
+NO_INDEX_CONFIG_CHECK = (
+    "".join(f'[ -z "${{{v}+x}}" ] || {{ echo "setup problem: {v} is still set"; exit 1; }}\n'
+            for v in INDEX_CONFIG_VARS if v not in _KEEP_EXPORTED)
+    + '[ "${UV_NO_CONFIG-}" = 1 ] && [ "${PIP_CONFIG_FILE-}" = /dev/null ] '
+      '|| { echo "setup problem: the pip and uv config settings did not take"; exit 1; }\n'
+)
 NO_INDEX_CONFIG_SHELL = (
-    "for v in $(env | sed -n 's/^\\(\\(UV\\|PIP\\)_[A-Za-z0-9_]*\\)=.*/\\1/p'); do case \"$v\" in"
-    " UV_*INDEX*|UV_*FIND_LINKS*|UV_*INSECURE_HOST*|PIP_*INDEX*|PIP_*FIND_LINKS*|PIP_*TRUSTED_HOST*) unset \"$v\";;"
-    " esac; done\n"
-    "export UV_NO_CONFIG=1 PIP_CONFIG_FILE=/dev/null\n"
+    "unset " + " ".join(INDEX_CONFIG_VARS) + " || exit 1\n"
+    "export UV_NO_CONFIG=1 PIP_CONFIG_FILE=/dev/null || exit 1\n"
+    + NO_INDEX_CONFIG_CHECK
 )
 
 

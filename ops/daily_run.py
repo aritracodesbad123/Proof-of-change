@@ -1587,6 +1587,10 @@ def _install_with_helper(a, rec, step, venv, checkout, chosen, log, timeout, con
         if demo_helper.flat_layout(text) and not _flat_plan():
             shutil.rmtree(venv, ignore_errors=True)
             return demo_helper.FLAT_LAYOUT_REASON
+        own = demo_helper.own_index_config(checkout)   # needs an index or sources product checks ignore
+        if own:
+            shutil.rmtree(venv, ignore_errors=True)
+            return demo_helper.own_index_reason(own)
         return None
 
     def _is_main() -> bool:
@@ -2516,6 +2520,16 @@ def _maybe_prepare_contree(a, repo: str, main_sha: str, pr_sha: str, rec: dict, 
         rec["machine"] = "contree (not run)"
         rec["contree"] = entry
         return refusal
+
+
+def own_index_refusal(a, cnv: str | None, *checkouts) -> str | None:
+    """A Contree setup failure on a product check whose project needs its own index or uv sources: could not verify
+    with that limitation as the reason instead of the generic setup failure. Anything else is returned unchanged."""
+    from poc import demo_helper
+    if not cnv or not product_route(a):
+        return cnv
+    found = [f for c in checkouts if c is not None for f in demo_helper.own_index_config(c)]
+    return demo_helper.own_index_reason(list(dict.fromkeys(found))) if found else cnv
 
 
 def contree_only_extra_shell(declared: list[str], optional: list[str], base: str = "") -> str:
@@ -3935,6 +3949,7 @@ def _contree_only_pair(a, rec: dict, repo: str, cfg: dict, item: dict, sp: dict,
     run_progress.emit("install_main", detail="installing main and PR sides in Contree")
     cnv = _maybe_prepare_contree(a, repo, sp["main_sha"], sp["pr_sha"], rec, a.build_timeout,
                                  extra_shell=contree_only_extra_shell(decl, optional, base))
+    cnv = own_index_refusal(a, cnv, cm, cp)
     cmp = ex = None
     if cnv:
         rec["contree_only"]["note"] = "Contree mode: Contree did not run, so nothing from the pull request was run"
@@ -4415,6 +4430,7 @@ def test_source_pair(repo: str, cfg: dict, item: dict, prdir: Path, work: Path, 
                                                  extra_shell=shell)
                 else:
                     cnv = _maybe_prepare_contree(a, repo, sp["main_sha"], sp["pr_sha"], rec, a.build_timeout)
+                cnv = own_index_refusal(a, cnv, cm, cp)
             if cnv:
                 pass
             elif not targets["pr"]:
