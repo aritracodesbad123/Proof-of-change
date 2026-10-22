@@ -1570,6 +1570,14 @@ def build_setup_plan(repo: str, checkouts, tavily, current_python: str, sandbox:
             packages.append(item)
     text = _tavily_text(tavily)
     refused = []
+    if docs_checkouts is not None:
+        # Product check: every dependency group in main's files, through the deps-only refusal rules.
+        for checkout in docs_from:
+            group_lines, group_refused = dependency_group_reqs(checkout, self_dist)
+            refused += group_refused
+            for req in group_lines:
+                _add_pkg(packages, seen, req, kind="dependency-group", action="install", source="pyproject",
+                         reason="listed in a dependency group", self_dist=self_dist)
     parts = split_repo(repo or "")
     owner, repo_name = parts if parts else ("", "")
     suggestions = pip_suggestions(text) if allow_lookup_packages else []
@@ -1902,6 +1910,76 @@ def unsafe_requirement_lines(root, plan: dict | None, _seen=None, _top=None) -> 
             if _refused_line(line):
                 bad.append(f"{name}: {line[:120]}")
     return bad
+
+
+def dependency_group_reqs(checkout, self_dist: str = "") -> tuple[list[str], list[dict]]:
+    """Every PEP 735 [dependency-groups] line in this checkout's pyproject, as (installable lines, refused).
+
+    No group name is special: all groups are read. ``{include-group = "x"}`` entries are followed; a group that
+    includes itself, directly or in a loop, is read once. A line naming the project itself (for example
+    ``proj[all]``) is replaced by the lines of those extras from [project.optional-dependencies], followed the same
+    way, so the project itself is never installed from the index. Every resulting line goes through the deps-only
+    refusal rules (index options, URLs, git, editable, local paths); refused lines are returned, not installed."""
+    data = _pyproject(Path(checkout) / "pyproject.toml")
+    groups = data.get("dependency-groups")
+    if not isinstance(groups, dict) or not groups:
+        return [], []
+    project = data.get("project") if isinstance(data.get("project"), dict) else {}
+    extras = project.get("optional-dependencies") if isinstance(project.get("optional-dependencies"), dict) else {}
+    selves = {norm(n) for n in (self_dist, project.get("name") or "") if n}
+    out: list[str] = []
+    refused: list[dict] = []
+    seen_groups: set = set()
+    seen_extras: set = set()
+
+    def add_line(req: str, where: str) -> None:
+        line = req.strip()
+        if not line:
+            return
+        if _refused_line(line) or line.startswith("-"):
+            refused.append({"name": line[:120], "reason": f"dependency group {where}: points outside the official "
+                                                          "package index, so it was not installed"})
+            return
+        name = req_name(line)
+        if name and norm(name) in selves:
+            for extra in extra_names(line):
+                add_extra(extra)
+            return
+        if line not in out:
+            out.append(line)
+
+    def add_extra(extra: str) -> None:
+        key = norm(extra)
+        if key in seen_extras:
+            return
+        seen_extras.add(key)
+        for name, reqs in extras.items():
+            if norm(str(name)) == key and isinstance(reqs, list):
+                for req in reqs:
+                    if isinstance(req, str):
+                        add_line(req, f"extra {name}")
+
+    def add_group(name: str) -> None:
+        key = norm(name)
+        if key in seen_groups:
+            return
+        seen_groups.add(key)
+        match = [g for g in groups if norm(str(g)) == key]
+        for entry in groups.get(match[0], []) if match and isinstance(groups.get(match[0]), list) else []:
+            if isinstance(entry, str):
+                add_line(entry, str(match[0]))
+            elif isinstance(entry, dict) and isinstance(entry.get("include-group"), str):
+                add_group(entry["include-group"])
+
+    for g in groups:
+        add_group(str(g))
+    return out, refused
+
+
+def extra_names(req: str) -> list[str]:
+    """'pkg[a, b]; marker' -> ['a', 'b']."""
+    m = re.match(r"^[A-Za-z0-9._-]+\s*\[([^\]]*)\]", req.strip())
+    return [x.strip() for x in m.group(1).split(",") if x.strip()] if m else []
 
 
 def drop_index_env(env: dict) -> dict:
