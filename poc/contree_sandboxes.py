@@ -177,6 +177,25 @@ def note() -> str:
     return _state["note"]
 
 
+MAX_TRIES = 3
+RETRY_DELAYS = (5.0, 15.0)
+
+
+def _sleep(seconds: float) -> None:
+    import time
+    time.sleep(seconds)
+
+
+def is_transient_error(exc: BaseException) -> bool:
+    """True for a Contree API timeout (ApiTimeoutError, TimeoutError, ...) or an HTTP 5xx; never for an auth refusal."""
+    if is_auth_error(exc):
+        return False
+    if isinstance(exc, TimeoutError) or "timeout" in type(exc).__name__.lower():
+        return True
+    status = getattr(exc, "status_code", None) or getattr(exc, "status", None)
+    return isinstance(status, int) and 500 <= status <= 599
+
+
 def with_slot(fn: Callable[[], Any]) -> Any:
     with _sem:
         return fn()
@@ -193,8 +212,11 @@ def _text(val) -> str:
 class ContreeSession:
     """One PR's Contree checkpoints (main + PR) and disposable runs."""
 
-    def __init__(self, *, base_image: str = BASE_IMAGE, runner: Callable | None = None):
+    def __init__(self, *, base_image: str = BASE_IMAGE, runner: Callable | None = None,
+                 retry_transient: bool = False):
         self.base_image = base_image
+        # Product checks only: retry a Contree API timeout or 5xx (at most MAX_TRIES tries in all).
+        self.retry_transient = retry_transient
         self.main_uuid: str | None = None
         self.pr_uuid: str | None = None
         # runner(shell, disposable, image_ref|None, timeout, files) -> {exit_code,stdout,stderr,uuid}
@@ -218,16 +240,19 @@ class ContreeSession:
     def _run_on(self, image_ref: str | None, shell: str, *, disposable: bool, timeout: int,
                 files: dict | None = None) -> dict:
         if self._runner is not None:
-            return self._runner(shell, disposable, image_ref, timeout, files)
+            return self._retrying(lambda: self._runner(shell, disposable, image_ref, timeout, files))
 
         client = self._client_sync()
-        try:
+
+        def once():
             if image_ref:
                 img = client.images.use(image_ref, strict=True)
             else:
                 img = client.images.oci(self.base_image)
-            result = img.run(shell=bash_wrapped(shell), disposable=disposable, timeout=timeout,
-                             files=files or None).wait()
+            return img.run(shell=bash_wrapped(shell), disposable=disposable, timeout=timeout,
+                           files=files or None).wait()
+        try:
+            result = self._retrying(once)
         except ContreeError:
             raise
         except Exception as e:  # noqa: BLE001 — never leak tokens from SDK messages
@@ -242,6 +267,21 @@ class ContreeSession:
             "stderr": _text(getattr(result, "stderr", None)),
             "uuid": str(uuid) if uuid is not None else None,
         }
+
+    def _retrying(self, fn: Callable[[], Any]) -> Any:
+        """fn(), retried with backoff on a transient Contree API error when retry_transient is set.
+
+        Never runs anything locally. The last error is re-raised unchanged, so the caller's reason stays the same."""
+        tries = MAX_TRIES if self.retry_transient else 1
+        for n in range(tries):
+            try:
+                return fn()
+            except ContreeError:
+                raise
+            except Exception as e:  # noqa: BLE001
+                if n + 1 >= tries or not is_transient_error(e):
+                    raise
+                _sleep(RETRY_DELAYS[min(n, len(RETRY_DELAYS) - 1)])
 
     def run_op(self, side: str, shell: str, *, disposable: bool = True, timeout: int = 600,
                files: dict | None = None) -> dict:
@@ -505,12 +545,14 @@ def install_shell_source(repo: str, sha: str, extra: str = "", deps_only_fallbac
 
 def prepare_source_pair(repo: str, main_sha: str, pr_sha: str, *, timeout: int = 1800,
                         runner: Callable | None = None, extra_shell: str = "",
-                        deps_only_fallback: bool = False, deps_exclude=()) -> ContreeSession:
+                        deps_only_fallback: bool = False, deps_exclude=(),
+                        retry_transient: bool = False) -> ContreeSession:
     """Build main + PR Contree checkpoints for a source-pair style PR.
 
     extra_shell is applied to both SHAs. Empty keeps the default install shell.
     """
-    sess = new_session(runner=runner) if runner is not None else new_session()
+    kw = {"retry_transient": True} if retry_transient else {}
+    sess = new_session(runner=runner, **kw) if runner is not None else new_session(**kw)
     sess.checkpoint_main(install_shell_source(repo, main_sha, extra_shell, deps_only_fallback, deps_exclude), timeout=timeout)
     sess.fork_pr(install_shell_source(repo, pr_sha, extra_shell, deps_only_fallback, deps_exclude), timeout=timeout)
     return sess
