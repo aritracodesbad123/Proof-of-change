@@ -1528,7 +1528,8 @@ def _install_with_helper(a, rec, step, venv, checkout, chosen, log, timeout, con
     def _unsupported(text: str) -> str | None:
         """A product-check install that should stop now, or None to keep going.
 
-        Study runs do not call this. A flat-layout project is not installed as a package.
+        Study runs do not call this. A flat-layout project is not installed as a package. On main it falls back to
+        the dependencies main declares (see _flat_plan); with nothing usable declared it stays unsupported.
         A disk-full install is not retried, and its temporary build files are removed.
         """
         if not product_route(a):
@@ -1536,10 +1537,17 @@ def _install_with_helper(a, rec, step, venv, checkout, chosen, log, timeout, con
         if demo_helper.disk_full(text):
             cleanup_install_temps(venv)
             return demo_helper.DISK_FULL_REASON
-        if demo_helper.flat_layout(text):
+        if demo_helper.flat_layout(text) and not _flat_plan():
             shutil.rmtree(venv, ignore_errors=True)
             return demo_helper.FLAT_LAYOUT_REASON
         return None
+
+    def _flat_plan() -> dict | None:
+        """The deps-only plan for a flat layout. Main: what main declares. PR side: main's plan, and only when main
+        itself fell back, so a flat layout on the PR side alone stays could not verify."""
+        if str(step).lower().startswith("main"):
+            return demo_helper.deps_only_plan(checkout)
+        return (rec.get("demo_helper") or {}).get("deps_only")
 
     def once():
         if product_route(a):
@@ -1570,7 +1578,7 @@ def _install_with_helper(a, rec, step, venv, checkout, chosen, log, timeout, con
                 if blocked:
                     return False, blocked
         if product_route(a) and demo_helper.not_a_package(text):
-            plan = demo_helper.deps_only_plan(checkout)
+            plan = _flat_plan() if demo_helper.flat_layout(text) else demo_helper.deps_only_plan(checkout)
             if plan:
                 shutil.rmtree(venv, ignore_errors=True)
                 ok, why = install_deps_only(venv, checkout, plan, log, state["py"], timeout, extra_reqs)

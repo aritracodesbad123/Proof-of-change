@@ -46,20 +46,53 @@ def _flat_layout(venv, checkout, chosen, lg, py, *rest):
     return False, "install failed (1)"
 
 
-def test_flat_layout_on_a_product_check_is_unsupported(tmp_path, monkeypatch):
+def _flat_product(tmp_path, monkeypatch, rec, step, checkout, calls):
+    monkeypatch.setattr(daily_run, "install_side", lambda *a, **k: calls.append("install") or _flat_layout(*a, **k))
+    monkeypatch.setattr(daily_run, "install_deps_only", lambda *a, **k: calls.append(("deps", a[1], a[2])) or (True, ""))
+    a = SimpleNamespace(python="3.14", pr="https://github.com/a/b/pull/1", product_check=True, bench=None)
+    return daily_run._install_with_helper(a, rec, step, tmp_path / ("v-" + step.split()[0]), checkout, None,
+                                          tmp_path / "log", 10, None, None, max_retries=1)
+
+
+def test_flat_layout_on_main_falls_back_to_declared_dependencies(tmp_path, monkeypatch):
     (tmp_path / "pyproject.toml").write_text('[project]\nname = "app"\ndependencies = []\n')
     (tmp_path / "uv.lock").write_text("")
-    calls = []
-    monkeypatch.setattr(daily_run, "install_side", lambda *a, **k: calls.append("install") or _flat_layout(*a, **k))
-    monkeypatch.setattr(daily_run, "install_deps_only", lambda *a, **k: calls.append("deps") or (True, ""))
-    rec = {}
-    a = SimpleNamespace(python="3.14", pr="https://github.com/a/b/pull/1", product_check=True, bench=None)
-    ok, why = daily_run._install_with_helper(a, rec, "main install", tmp_path / "v", tmp_path, None, tmp_path / "log",
-                                             10, None, None)
+    calls, rec = [], {}
+    ok, _ = _flat_product(tmp_path, monkeypatch, rec, "main install", tmp_path, calls)
+    plan = {"kind": "uv-sync", "frozen": True, "source": "uv.lock"}
+    assert ok is True and calls == ["install", ("deps", tmp_path, plan)]
+    assert rec["demo_helper"]["deps_only"] == plan
+    assert any("project's own folder was put on the import path" in n for n in rec["demo_helper"]["auto_fixes"])
+
+
+def test_flat_layout_on_main_with_nothing_declared_stays_unsupported(tmp_path, monkeypatch):
+    calls, rec = [], {}
+    ok, why = _flat_product(tmp_path, monkeypatch, rec, "main install", tmp_path, calls)
     assert ok is False and why == demo_helper.FLAT_LAYOUT_REASON
-    assert calls == ["install"]
+    assert calls == ["install"] and "deps_only" not in rec.get("demo_helper", {})
     verdict, reason, _flags = daily_run.tests_verdict(None, why, None, None)
     assert verdict == "could_not_verify" and reason == why
+
+
+def test_flat_layout_on_both_sides_gets_the_same_setup(tmp_path, monkeypatch):
+    main, pr = tmp_path / "main", tmp_path / "pr"
+    for side in (main, pr):
+        side.mkdir()
+    (main / "requirements.txt").write_text("")
+    (pr / "pyproject.toml").write_text('[project]\nname = "app"\n')
+    calls, rec = [], {}
+    assert _flat_product(tmp_path, monkeypatch, rec, "main install", main, calls)[0] is True
+    assert _flat_product(tmp_path, monkeypatch, rec, "PR install", pr, calls)[0] is True
+    deps = [c for c in calls if c != "install"]
+    plan = {"kind": "requirements", "files": ["requirements.txt"], "source": "requirements.txt"}
+    assert deps == [("deps", main, plan), ("deps", pr, plan)]
+
+
+def test_flat_layout_on_the_pr_side_only_does_not_fall_back(tmp_path, monkeypatch):
+    (tmp_path / "pyproject.toml").write_text('[project]\nname = "app"\n')
+    calls, rec = [], {}
+    ok, why = _flat_product(tmp_path, monkeypatch, rec, "PR install", tmp_path, calls)
+    assert ok is False and why == demo_helper.FLAT_LAYOUT_REASON and calls == ["install"]
 
 
 def _not_a_python_project(venv, checkout, chosen, lg, py, *rest):
