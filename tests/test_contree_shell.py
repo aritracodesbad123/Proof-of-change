@@ -117,3 +117,24 @@ def test_record_keeps_error_output(monkeypatch):
     rec = {}
     refusal = daily_run._maybe_prepare_contree(a, "o/r", "a", "b", rec, 5)
     assert refusal and rec["contree"]["stderr_tail"] == "sh: bad" and rec["contree"]["exit_code"] == 2
+
+
+def test_stderr_tail_hides_github_token_sk_token_and_url_password(monkeypatch):
+    ghp = "ghp_" + "A1b2C3d4E5f6G7h8I9j0K1l2M3n4O5p6Q7r8"
+    sk = "sk-" + "fakeKey1234567890abcdef"
+    pw = "hunter2Secret"
+    stderr = (f"fatal: auth with {ghp} failed\n"
+              f"pip: index token={sk} rejected\n"
+              f"Looking in https://deploy:{pw}@pypi.example.com/simple\n")
+
+    def runner(shell, disposable, image_ref, timeout, files):
+        return {"exit_code": 1, "stdout": "", "stderr": stderr, "uuid": "u1"}
+
+    with pytest.raises(cs.ContreeError) as ei:
+        cs.ContreeSession(runner=runner).checkpoint_main("echo installed", timeout=5)
+    _, entry = daily_run.contree_refusal(ei.value)
+    rec = {"contree": entry}
+    for leaked in (ghp, sk, pw):
+        assert leaked not in rec["contree"]["stderr_tail"]
+        assert leaked not in rec["contree"]["failed"]
+    assert "https://deploy:***@pypi.example.com" in rec["contree"]["stderr_tail"]

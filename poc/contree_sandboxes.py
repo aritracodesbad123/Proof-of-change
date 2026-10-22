@@ -43,7 +43,8 @@ TAIL_CHARS = 1500
 
 
 def redact(text: str, env: dict | None = None) -> str:
-    """Remove the Nebius key and project id (and bearer tokens) from text."""
+    """Remove the Nebius key and project id, bearer tokens, every secret demo_helper.redact knows, GitHub tokens
+    (ghp_/gho_/ghu_/ghs_/ghr_/github_pat_), sk- style keys and passwords in URLs (scheme://user:pw@host)."""
     import re
     env = os.environ if env is None else env
     out = text or ""
@@ -51,7 +52,16 @@ def redact(text: str, env: dict | None = None) -> str:
         v = env.get(k)
         if v and str(v).strip():
             out = out.replace(str(v), f"<{k} redacted>")
-    return re.sub(r"(?i)(bearer\s+)\S+", r"\1<redacted>", out)
+    out = re.sub(r"(?i)(bearer\s+)\S+", r"\1<redacted>", out)
+    try:
+        from poc import demo_helper
+    except ImportError:  # pragma: no cover - script run from inside poc/
+        import demo_helper  # type: ignore
+    out = demo_helper.redact(out, env)
+    out = re.sub(r"\b(?:gh[pousr]_[A-Za-z0-9]{8,}|github_pat_[A-Za-z0-9_]{8,})", "<redacted>", out)
+    out = re.sub(r"\bsk-[A-Za-z0-9_\-]{8,}", "<redacted>", out)
+    out = re.sub(r"(?i)\b([a-z][a-z0-9+.\-]*://[^\s:/@]+:)[^\s@/]+@", r"\1***@", out)
+    return out
 
 
 def tail(text: str, n: int = TAIL_CHARS) -> str:
