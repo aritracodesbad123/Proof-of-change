@@ -382,8 +382,8 @@ def run_case(row: dict, a, fp: Fingerprints, key: str, out: Path, machine: dict)
         env = dr.base_env(dr.side_home(venv), install=True)
         sbx = dr.side_sandbox(venv, network=True)
         ok, why = True, ""
-        for c in (["uv", "venv", "-q", "-p", a.python_full, venv],
-                  ["uv", "pip", "install", "-q", "-p", venv / "bin/python", wheels[rid]]):
+        for c in ([dr.uv_bin(), "venv", "-q", "-p", a.python_full, venv],
+                  [dr.uv_bin(), "pip", "install", "-q", "-p", venv / "bin/python", wheels[rid]]):
             rc, _ = dr.run(c, logd / "setup-main.log", env=env, timeout=a.build_timeout, sbx=sbx)
             if rc != 0:
                 ok, why = False, f"wheel install failed ({rc})"
