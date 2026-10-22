@@ -1420,8 +1420,16 @@ def _product_plan(a, rec: dict, repo: str, cfg: dict, checkouts, pypi=None, pyth
     product = product_route(a)
     # A product check never installs an OS package, on Contree or anywhere else. A study plan still may.
     apply_os = not product
+    current = getattr(a, "python", "") or ""
+    if (getattr(a, "sandbox_backend", None) or "local") == "contree":
+        # Inside Contree the image's Python is what runs, and any version can be installed during setup, so the
+        # orchestrator machine's interpreters must not steer the choice.
+        from poc import contree_sandboxes
+        current = contree_sandboxes.image_python()
+        if python_available is None:
+            python_available = lambda version: True  # noqa: E731
     plan = demo_helper.build_setup_plan(
-        repo, folders, tavily, getattr(a, "python", "") or "",
+        repo, folders, tavily, current,
         getattr(a, "sandbox_backend", None) or "local",
         (cfg or {}).get("dist") or (cfg or {}).get("pkg") or "",
         python_available=python_available, pypi=pypi,
