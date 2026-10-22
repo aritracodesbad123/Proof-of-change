@@ -1,7 +1,7 @@
 # Product checks retry a Contree API timeout a few times
 
 **Date:** 2026-10-22
-**Status:** proposed
+**Status:** accepted
 
 ## What changed
 
