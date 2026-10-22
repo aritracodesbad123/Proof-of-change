@@ -1,0 +1,13 @@
+{
+ "schema": "poc-bench-case/1",
+ "id": "fx-miss",
+ "fixture": true,
+ "repo": "pytoolz/toolz",
+ "pr_url": "https://github.com/pytoolz/toolz/pull/1",
+ "base_sha": "5555555555555555555555555555555555555555",
+ "head_sha": "6666666666666666666666666666666666666666",
+ "category": "known_regression_tests_miss",
+ "expected_verdict": "needs_attention",
+ "rationale": "FIXTURE for unit tests only; not a real case.",
+ "source": "unit-test fixture"
+}

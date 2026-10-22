@@ -1,0 +1,13 @@
+{
+ "schema": "poc-bench-case/1",
+ "id": "fx-catch",
+ "fixture": true,
+ "repo": "pytoolz/toolz",
+ "pr_url": "https://github.com/pytoolz/toolz/pull/1",
+ "base_sha": "3333333333333333333333333333333333333333",
+ "head_sha": "4444444444444444444444444444444444444444",
+ "category": "known_regression_tests_catch",
+ "expected_verdict": "needs_attention",
+ "rationale": "FIXTURE for unit tests only; not a real case.",
+ "source": "unit-test fixture"
+}
