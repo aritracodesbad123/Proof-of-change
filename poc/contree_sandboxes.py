@@ -179,11 +179,18 @@ def note() -> str:
 
 MAX_TRIES = 3
 RETRY_DELAYS = (5.0, 15.0)
+# Overall deadline per step: the step's own timeout plus this much for start-up retries and backoff.
+RETRY_GRACE = 120.0
 
 
 def _sleep(seconds: float) -> None:
     import time
     time.sleep(seconds)
+
+
+def _now() -> float:
+    import time
+    return time.monotonic()
 
 
 def is_transient_error(exc: BaseException) -> bool:
@@ -194,6 +201,42 @@ def is_transient_error(exc: BaseException) -> bool:
         return True
     status = getattr(exc, "status_code", None) or getattr(exc, "status", None)
     return isinstance(status, int) and 500 <= status <= 599
+
+
+# id(command string) -> True once Contree has created the run for it. The command string object is held alive for
+# the whole try, so its id is unique while it is registered; this keeps concurrent runs on one client apart.
+_STARTED: dict[int, bool] = {}
+
+
+def _track_starts(client) -> bool:
+    """Wrap client._start_operation once so we learn when a run is created. False if the SDK has no such call."""
+    if getattr(client, "_poc_tracks_starts", False):
+        return True
+    inner = getattr(client, "_start_operation", None)
+    if not callable(inner):
+        return False
+
+    def mark(request):
+        key = id(getattr(request, "command", None))
+        if key in _STARTED:
+            _STARTED[key] = True
+
+    def tracked(request, *a, **k):
+        res = inner(request, *a, **k)
+        if hasattr(res, "__await__"):
+            async def done():
+                uid = await res
+                mark(request)
+                return uid
+            return done()
+        mark(request)
+        return res
+    try:
+        client._start_operation = tracked
+        client._poc_tracks_starts = True
+    except (AttributeError, TypeError):
+        return False
+    return True
 
 
 def with_slot(fn: Callable[[], Any]) -> Any:
@@ -240,19 +283,13 @@ class ContreeSession:
     def _run_on(self, image_ref: str | None, shell: str, *, disposable: bool, timeout: int,
                 files: dict | None = None) -> dict:
         if self._runner is not None:
-            return self._retrying(lambda: self._runner(shell, disposable, image_ref, timeout, files))
+            # A test runner starts and waits in one call, so we cannot tell whether a run began: never retried.
+            return self._runner(shell, disposable, image_ref, timeout, files)
 
         client = self._client_sync()
-
-        def once():
-            if image_ref:
-                img = client.images.use(image_ref, strict=True)
-            else:
-                img = client.images.oci(self.base_image)
-            return img.run(shell=bash_wrapped(shell), disposable=disposable, timeout=timeout,
-                           files=files or None).wait()
+        deadline = _now() + float(timeout) + RETRY_GRACE
         try:
-            result = self._retrying(once)
+            result = self._start_and_wait(client, image_ref, shell, disposable, timeout, files, deadline)
         except ContreeError:
             raise
         except Exception as e:  # noqa: BLE001 — never leak tokens from SDK messages
@@ -268,20 +305,39 @@ class ContreeSession:
             "uuid": str(uuid) if uuid is not None else None,
         }
 
-    def _retrying(self, fn: Callable[[], Any]) -> Any:
-        """fn(), retried with backoff on a transient Contree API error when retry_transient is set.
+    def _start_and_wait(self, client, image_ref, shell, disposable, timeout, files, deadline):
+        """Start one run and wait for it. Only the start is ever retried.
 
-        Never runs anything locally. The last error is re-raised unchanged, so the caller's reason stays the same."""
+        The SDK's wait() both creates the run (client._start_operation) and polls it, and cancels the run on any
+        error while polling, so the same run cannot be polled again. We therefore record when the run was created:
+        a failure before that (images.use/oci, or the create call itself) may be retried on a transient error; a
+        failure after it is raised unchanged, so PR code never runs twice. If the SDK does not expose the create
+        call, every failure counts as "may have started" and nothing is retried."""
         tries = MAX_TRIES if self.retry_transient else 1
+        can_track = tries > 1 and _track_starts(client)
         for n in range(tries):
+            cmd = bash_wrapped(shell)
+            key = id(cmd)
+            if can_track:
+                _STARTED[key] = False
             try:
-                return fn()
+                if image_ref:
+                    img = client.images.use(image_ref, strict=True)
+                else:
+                    img = client.images.oci(self.base_image)
+                return img.run(shell=cmd, disposable=disposable, timeout=timeout, files=files or None).wait()
             except ContreeError:
                 raise
             except Exception as e:  # noqa: BLE001
-                if n + 1 >= tries or not is_transient_error(e):
+                started = _STARTED.get(key, True) if can_track else True
+                if n + 1 >= tries or not is_transient_error(e) or started:
                     raise
-                _sleep(RETRY_DELAYS[min(n, len(RETRY_DELAYS) - 1)])
+                delay = RETRY_DELAYS[min(n, len(RETRY_DELAYS) - 1)]
+                if deadline - _now() - delay < float(timeout):
+                    raise  # not enough time left for a whole step: keep the original reason
+                _sleep(delay)
+            finally:
+                _STARTED.pop(key, None)
 
     def run_op(self, side: str, shell: str, *, disposable: bool = True, timeout: int = 600,
                files: dict | None = None) -> dict:
