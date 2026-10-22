@@ -62,7 +62,7 @@ def redact(text: str, env: dict | None = None) -> str:
     out = demo_helper.redact(out, env)
     out = re.sub(r"\b(?:gh[pousr]_[A-Za-z0-9]{8,}|github_pat_[A-Za-z0-9_]{8,})", "<redacted>", out)
     out = re.sub(r"\bsk-[A-Za-z0-9_\-]{8,}", "<redacted>", out)
-    out = re.sub(r"(?i)\b(password|passwd|pwd|token)=[^\s&'\"]+", r"\1=<redacted>", out)
+    out = re.sub(r"(?i)\b(password|passwd|pwd|token)=(['\"]?)[^\s&'\"]+", r"\1=\2<redacted>", out)
     out = re.sub(r"(?i)\b([a-z][a-z0-9+.\-]*://[^\s:/@]+:)[^\s@/]+@", r"\1***@", out)
     return out
 
