@@ -16,7 +16,7 @@ def _rec(**extra):
 def test_contree_only_record_reports_why_coverage_was_not_run():
     rec = _rec(coverage={"status": "not measured", "why": daily_run.CONTREE_ONLY_COVERAGE_WHY})
     note = cg.apply(rec)["coverage_gate"]["note"]
-    assert "Contree-only check: bubblewrap can't start here, so coverage wasn't run" in note
+    assert daily_run.CONTREE_ONLY_COVERAGE_WHY in note
     assert "predates the coverage gate" not in note
 
 

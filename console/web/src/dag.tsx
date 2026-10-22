@@ -27,7 +27,7 @@ export function ProcessDag({
     <section className="panel dag" aria-label="Check process">
       <h2>How this check moves</h2>
       <p className="hint">Each shape is one step. Reviewer notes come after the verdict and do not change it.</p>
-      <svg className="dag-svg" viewBox="0 0 1890 340" role="img">
+      <svg className="dag-svg" viewBox="0 0 2010 340" role="img">
         <title>Directed graph of the check</title>
         {FLOW_EDGES.map(([from, to]) => {
           const a = byId[from]
