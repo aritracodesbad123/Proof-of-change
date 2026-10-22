@@ -7,12 +7,12 @@
   "head_sha": "b4c338e49e285f8ebfed29bc8e72bcf78501561b",
   "category": "known_safe",
   "expected_verdict": "verified",
-  "rationale": "Upstream open PR; intended behaviour change with its own targeted tests. Full suite on head (Python 3.14.7, wheels only, no outside network): 526 passed, 5 warnings, 12 subtests passed in 1.85s. No failures.",
+  "rationale": "Upstream open PR; no known regression; head suite result (Python 3.14.7, wheels only, no outside network): 526 passed, 5 warnings, 12 subtests passed in 1.85s. No failures.",
   "source": "upstream PR mahmoud/boltons#586, SHAs from GitHub API 2026-10-22 ~22:40 IST",
   "notes": {
     "base_ref": "master",
-    "base_is_current_tip_and_merge_base": true,
-    "refresh_before_run": "base_sha is the base-branch tip as of 2026-10-22; if it moves the runner reports not run",
+    "base_is_merge_base_as_of_2026-10-22_22:40_IST": true,
+    "refresh_before_run": "base_sha was the base-branch tip and the merge base as of 2026-10-22 22:40 IST. It is refreshed, and the head checked again, right before the pilot; if it has moved the runner reports not run.",
     "clean_head_preexisting_failures": []
   }
 }
