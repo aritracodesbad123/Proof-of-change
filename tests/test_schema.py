@@ -151,8 +151,9 @@ def test_rev4_coverage_fields_optional_and_typed():
 
 
 def test_coverage_status_not_measured_is_valid():
-    from ops.schema_check import validate
     import json
+
+    from ops.schema_check import validate
     schema = json.loads(SCHEMA_PATH.read_text())
     node = schema["properties"]["coverage"]["properties"]["status"]
     assert "not measured" in node["enum"]
