@@ -981,7 +981,7 @@
   },
   "coverage": {
    "type": "object",
-   "description": "OPTIONAL (rev 4, coverage gate). Raw result of the coverage run: status (measured|failed|not needed|skipped), why, seconds, log, changed_lines_total, changed_lines_covered, files[{file, changed_lines_total, changed_lines_covered, note}].",
+   "description": "OPTIONAL (rev 4, coverage gate). Raw result of the coverage run: status (measured|failed|not needed|skipped|not measured), why, seconds, log, changed_lines_total, changed_lines_covered, files[{file, changed_lines_total, changed_lines_covered, note}].",
    "properties": {
     "status": {
      "type": "string",
@@ -989,7 +989,8 @@
       "measured",
       "failed",
       "not needed",
-      "skipped"
+      "skipped",
+      "not measured"
      ]
     }
    }
@@ -2020,6 +2021,11 @@
    "rev": 15,
    "date": "2026-10-21",
    "change": "observation label and summary labels may be unstable_on_pr (stable on the base, unstable only on the pull request). Nothing becomes required, so rev 1-14 records stay valid."
+  },
+  {
+   "rev": 16,
+   "date": "2026-10-22",
+   "change": "coverage.status may be 'not measured' (the product writes it when a coverage report is missing or unusable). Nothing becomes required, so rev 1-15 records stay valid."
   }
  ],
  "if": {
