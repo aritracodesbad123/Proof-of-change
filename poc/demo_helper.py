@@ -1880,6 +1880,9 @@ def unsafe_requirement_lines(root, plan: dict | None, _seen=None, _top=None) -> 
     bad: list[str] = []
     for name in plan.get("files") or []:
         path = (root / name).resolve()
+        if not path.is_relative_to(top):   # e.g. a top-level requirements file that is a symlink out of the project
+            bad.append(f"{name}: (leads outside the project)")
+            continue
         if path in seen:
             continue
         seen.add(path)

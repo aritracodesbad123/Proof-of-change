@@ -1256,6 +1256,7 @@ def install_deps_only(venv: Path, checkout: Path, plan: dict, log: Path, python:
     """
     from poc import demo_helper
     env = demo_helper.drop_index_env(base_env(side_home(venv), install=True))   # no index from the environment
+    env["UV_NO_CONFIG"] = "1"   # no [tool.uv], [tool.uv.pip] or uv.toml settings (index, find-links) either
     src = Path(deps_root) if deps_root is not None else checkout
     cmds = [["uv", "venv", "-q", "-p", python, venv]]
     if plan.get("kind") == "uv-sync":
@@ -1271,13 +1272,14 @@ def install_deps_only(venv: Path, checkout: Path, plan: dict, log: Path, python:
         for name in plan.get("files") or []:
             cmds.append(["uv", "pip", "install", "-q", "-p", venv / "bin/python", "-r", src / name])
     cmds.append(["uv", "pip", "install", "-q", "-p", venv / "bin/python", *BASE_TEST_DEPS, *(extra_reqs or [])])
+    cmds = [c if isinstance(c, tuple) else [*c, "--no-config"] for c in cmds]   # every uv call ignores config files
     sbx = side_sandbox(venv, network=True, ro=(() if deps_root is None or src == checkout else (src,)))
     sbx["rw"].append(checkout)
     for c in cmds:
         if isinstance(c, tuple) and c[0] == "check-export":
-            from poc import demo_helper
             refused = demo_helper.unsafe_exported_lines(c[1])
             if refused:
+                Path(c[1]).unlink(missing_ok=True)
                 (checkout / ".poc-declared-deps.txt").unlink(missing_ok=True)
                 return False, demo_helper.unsafe_requirements_reason(refused)
             continue
