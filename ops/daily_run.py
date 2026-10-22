@@ -1542,6 +1542,7 @@ def _pr_side_retries(a):
 
 
 # Generic signs of an infrastructure failure (network, out of memory, timeout, disk, sandbox). No package names.
+# The word list is broad and may hide some real PR errors (they stay could not verify). That is safe for now.
 _INFRA_FAILURE = re.compile(
     r"(out of memory|\boom\b|memoryerror|killed|no space left|disk quota|timed? ?out|timeout|connection (?:refused|"
     r"reset|aborted)|temporary failure in name resolution|could not resolve host|name or service not known|network is "
@@ -1550,7 +1551,7 @@ _INFRA_FAILURE = re.compile(
 _NAMED_ERROR = re.compile(r"(?m)(?:^|\s)(?:[A-Za-z_][\w.]*(?:Error|Exception)\b|error(?:\[\w+\])?:\s*\S)")
 
 
-def _pr_own_failure(a, rec, step, why, log: Path | None = None) -> str:
+def _pr_own_failure(a, rec, step, why, log: Path | None = None, same_setup: bool = False) -> str:
     """Label a PR-side build failure after a clean main install as the PR's own failure (product runs only).
 
     When the error text shows a missing system library, header, pkg-config package or build tool (generic patterns,
@@ -1559,6 +1560,8 @@ def _pr_own_failure(a, rec, step, why, log: Path | None = None) -> str:
     from poc import demo_helper
     if not product_route(a) or str(why).startswith("infrastructure failure:"):
         return why
+    # The try count defaults to 1 when no setup outcome is recorded (a patch failure, an unusual error), so the PR is
+    # never blamed in those cases. That is the safe direction.
     tries = int(((rec.get("demo_helper") or {}).get("setup") or {}).get("attempts") or 1)
     text = str(why)
     if log is not None:
@@ -1574,7 +1577,9 @@ def _pr_own_failure(a, rec, step, why, log: Path | None = None) -> str:
     if _INFRA_FAILURE.search(text):
         return why   # network, memory, timeout, disk or sandbox trouble is never blamed on the PR
     named = _NAMED_ERROR.search(text)
-    blame = bool(named) and tries >= 2   # main installed with the same setup; both PR-side tries failed
+    # Only when both sides install the same way from source (test_source_pair) and both PR-side tries failed.
+    # On the nightly route main is a ready-made wheel and the PR is built from source, so it is never blamed there.
+    blame = same_setup and bool(named) and tries >= 2
     return demo_helper.note_pr_build_failure(rec, step, why, needs_attention=blame,
                                              error=demo_helper.failure_line(text[named.start():]) if named else "")
 
@@ -4149,7 +4154,7 @@ def test_source_pair(repo: str, cfg: dict, item: dict, prdir: Path, work: Path, 
                                                prdir / "setup-pr.log", a.build_timeout, cons, extra, python=py,
                                                max_retries=_pr_side_retries(a))
                 if not ok:
-                    why = _pr_own_failure(a, rec, "PR install", why, prdir / "setup-pr.log")
+                    why = _pr_own_failure(a, rec, "PR install", why, prdir / "setup-pr.log", same_setup=True)
             else:
                 ok, why = install_side(vp, cp, item.get("chosen"), prdir / "setup-pr.log", a.python, a.build_timeout, cons)
             if ok:

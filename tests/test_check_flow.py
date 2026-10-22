@@ -381,7 +381,7 @@ def test_pr_side_missing_system_piece_is_a_limitation_not_the_prs_fault(tmp_path
     assert rec["pr_build_failure"] and reason.startswith("the PR's own build failed")
 
 
-def _pr_fail(tmp_path, log_text, tries):
+def _pr_fail(tmp_path, log_text, tries, same_setup=True):
     from types import SimpleNamespace
 
     import ops.daily_run as dr
@@ -389,7 +389,7 @@ def _pr_fail(tmp_path, log_text, tries):
     log.write_text(log_text)
     rec = {"demo_helper": {"setup": {"attempts": tries, "counts_as_verdict": False}}}
     reason = dr._pr_own_failure(SimpleNamespace(pr=["x"], product_check=True), rec, "PR install",
-                                "install failed (1); see setup-pr.log", log)
+                                "install failed (1); see setup-pr.log", log, same_setup=same_setup)
     return rec, reason
 
 
@@ -440,3 +440,12 @@ def test_docs_site_on_the_projects_own_pypi_page_is_trusted_in_the_real_flow(tmp
         urls = dr._DECLARED_URLS[f"{REPO}#11"]
         assert ("https://widget.dev/" in urls) is expect
         assert "https://evil.example/" not in urls
+
+
+def test_nightly_route_pr_build_failure_is_recorded_but_never_needs_attention(tmp_path):
+    import ops.daily_run as dr
+    rec, reason = _pr_fail(tmp_path, "SyntaxError: invalid syntax (core.py, line 3)\n", 2, same_setup=False)
+    assert rec["pr_build_failure"] and rec["pr_build_failure"]["needs_attention"] is False
+    rec |= {"files": {}, "probes": None}
+    dr._store_verdict(rec, None, reason, None)
+    assert rec["verdict"] == "could_not_verify"
