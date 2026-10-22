@@ -1,7 +1,7 @@
 # Record which Python ran on each Contree side
 
 **Date:** 2026-10-22
-**Status:** proposed
+**Status:** accepted
 
 ## What changed
 
