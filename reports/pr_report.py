@@ -239,6 +239,12 @@ def checks(rec: dict) -> list[list]:
         else:
             out.append(["Probes ran on both sides", "PASS", f"{len(its)} probe(s), "
                         f"{its[0].get('runs_per_side', 3)} alternating runs per side, every run printed its observations", ""])
+    ts = (p or {}).get("test_settings") if p else None
+    if ts and ts.get("pr_changed"):
+        out.append(["Probe test settings unchanged by the PR", "WARN",
+                    "the PR changes " + ", ".join(ts["pr_changed"][:5]),
+                    "Probes used main's test settings on both sides; the PR's own test config or Django settings "
+                    "differ, so read the probe results with that in mind."])
     te = rec.get("thread_env") or {}
     # Thread-count variables must be 1. PYTHONHASHSEED is recorded in the same block (fixed hash seed) and must be 0;
     # it is not a thread count, so it is checked against its own value.
@@ -480,6 +486,15 @@ def probes_section(R, rec: dict, rel) -> list[dict]:
                                  else "this record predates probes."))
         return []
     items = probe_items(rec)
+    ts = p.get("test_settings") or {}
+    if ts.get("applied"):
+        R.p("Probe test settings: read from main's checkout ("
+            + (", ".join(ts.get("source") or []) or "no config found") + "), the same on both sides. Variables: "
+            + (", ".join(f"`{v}`" for v in ts.get("variables") or []) or "none")
+            + (". Python path entries: " + ", ".join(f"`{x}`" for x in ts["pythonpath"]) if ts.get("pythonpath") else "")
+            + "." + (" **The PR changes " + ", ".join(f"`{f}`" for f in ts["pr_changed"])
+                     + ", so its own test settings differ from the ones the probes used.**"
+                     if ts.get("pr_changed") else ""), "meta")
     for x in p.get("refused") or []:
         R.p(f"**Refused ({x.get('source', 'probe')}): `{x['path']}`**: {x['why']}. It was not run on the PR side.")
     if not items:

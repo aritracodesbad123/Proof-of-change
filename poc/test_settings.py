@@ -28,8 +28,14 @@ except ModuleNotFoundError:  # pragma: no cover
 _KEY = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
 _VAR = re.compile(r"\$\{([A-Za-z_][A-Za-z0-9_]*)\}|\$([A-Za-z_][A-Za-z0-9_]*)")
 # Never let a project's test config steer how our runner or the sandbox behaves.
-_BLOCKED = {"PATH", "HOME", "PYTHONHOME", "PYTHONSTARTUP", "LD_PRELOAD", "LD_LIBRARY_PATH", "PYTHONPATH",
-            "TMPDIR", "SHELL", "USER"}
+_BLOCKED = {"PATH", "HOME", "TMPDIR", "SHELL", "USER"}
+_BLOCKED_PREFIXES = ("PYTHON", "LD_", "COVERAGE_", "PYTEST_")
+
+
+def blocked(key: str) -> bool:
+    """Variables a project's test config may not set: they steer the runner, the interpreter or the sandbox."""
+    up = key.upper()
+    return up in _BLOCKED or up.startswith(_BLOCKED_PREFIXES)
 
 
 def _lines(value) -> list[str]:
@@ -159,7 +165,7 @@ def project_test_env(checkout: Path | None, base: dict | None = None) -> dict:
 
     base is the environment the probe would get anyway; D: entries do not override a key already in it.
     """
-    out: dict = {"env": {}, "pythonpath": [], "source": []}
+    out: dict = {"env": {}, "pythonpath": [], "source": []}   # pythonpath: entries relative to the checkout
     if checkout is None or not Path(checkout).is_dir():
         return out
     root = Path(checkout)
@@ -167,7 +173,7 @@ def project_test_env(checkout: Path | None, base: dict | None = None) -> dict:
     name, opts = pytest_config(root)
     if name:
         for key, value, default_only, raw in _env_entries(opts):
-            if key in _BLOCKED or (default_only and key in seen):
+            if blocked(key) or (default_only and key in seen):
                 continue
             value = value if raw else _expand(value, seen)
             out["env"][key] = seen[key] = value
@@ -179,26 +185,84 @@ def project_test_env(checkout: Path | None, base: dict | None = None) -> dict:
         for e in entries:
             p = (root / str(e)).resolve()
             if p.is_dir() and (p == root.resolve() or root.resolve() in p.parents):
-                out["pythonpath"].append(str(p))
+                out["pythonpath"].append(os.path.relpath(p, root.resolve()))
         out["source"].append(name)
-    from_conftest = {k: v for k, v in conftest_env(root).items() if k not in _BLOCKED and k not in out["env"]}
+    from_conftest = {k: v for k, v in conftest_env(root).items() if not blocked(k) and k not in out["env"]}
     if from_conftest:
         out["env"].update(from_conftest)
         out["source"].append("conftest.py")
     return out
 
 
-def apply(env: dict, checkout: Path | None) -> dict:
-    """A copy of env with the project's test settings added (PYTHONPATH gets the config's pythonpath entries)."""
-    got = project_test_env(checkout, env)
+def django_settings_paths(checkout: Path, module: str | None) -> list[str]:
+    """Checkout-relative files of a Django settings module (module.py, or every file of a settings package)."""
+    if not module or not re.fullmatch(r"[A-Za-z_][\w.]*", module):
+        return []
+    root = Path(checkout)
+    rel = Path(*module.split("."))
+    got = []
+    if (root / rel).with_suffix(".py").is_file():
+        got.append(str(rel.with_suffix(".py")))
+    if (root / rel).is_dir():
+        got += sorted(str(p.relative_to(root)) for p in (root / rel).rglob("*") if p.is_file())
+    return got
+
+
+CONFIG_FILES = ("pytest.ini", "pyproject.toml", "tox.ini", "setup.cfg", "conftest.py")
+
+
+def settings_from_main(main: Path | None, pr: Path | None = None) -> dict:
+    """The test settings read from MAIN's checkout only (applied identically to both sides), plus the config and
+    Django settings files the pull request changed (so the report can flag them)."""
+    got = project_test_env(main)
+    changed = []
+    if main is not None and pr is not None:
+        files = list(CONFIG_FILES) + django_settings_paths(main, got["env"].get("DJANGO_SETTINGS_MODULE")) \
+            + django_settings_paths(pr, got["env"].get("DJANGO_SETTINGS_MODULE"))
+        for f in dict.fromkeys(files):
+            a, b = Path(main) / f, Path(pr) / f
+            ra = a.read_bytes() if a.is_file() else None
+            rb = b.read_bytes() if b.is_file() else None
+            if ra != rb:
+                changed.append(f)
+    return got | {"pr_changed": changed}
+
+
+def summary(settings: dict | None) -> dict:
+    """What a record keeps: the source file(s) and variable names, never values."""
+    if not settings:
+        return {"applied": False}
+    return {"applied": True, "read_from": "main checkout (same values on both sides)",
+            "source": list(settings.get("source") or []), "variables": sorted(settings.get("env") or {}),
+            "pythonpath": list(settings.get("pythonpath") or []), "pr_changed": list(settings.get("pr_changed") or [])}
+
+
+def apply_settings(env: dict, settings: dict | None, checkout: Path | None) -> dict:
+    """A copy of env with the given settings; pythonpath entries are joined to THIS side's checkout."""
     new = dict(env)
-    new.update(got["env"])
-    if got["pythonpath"]:
-        new["PYTHONPATH"] = os.pathsep.join(got["pythonpath"] + ([env["PYTHONPATH"]] if env.get("PYTHONPATH") else []))
+    if not settings:
+        return new
+    for k, v in (settings.get("env") or {}).items():
+        if not (k in env and k in (settings.get("default_only") or ())):
+            new[k] = v
+    if settings.get("pythonpath") and checkout is not None:
+        paths = [str((Path(checkout) / r).resolve()) for r in settings["pythonpath"]]
+        new["PYTHONPATH"] = os.pathsep.join(paths + ([env["PYTHONPATH"]] if env.get("PYTHONPATH") else []))
     return new
 
 
-def shell_exports(checkout: Path | None) -> str:
-    """`export K=V` lines (for a remote run where the checkout lives at the same relative layout)."""
-    got = project_test_env(checkout)
-    return "".join(f"export {k}={shlex.quote(v)}\n" for k, v in got["env"].items())
+def apply(env: dict, checkout: Path | None) -> dict:
+    """apply_settings with settings read from the same checkout."""
+    return apply_settings(env, project_test_env(checkout, env), checkout)
+
+
+def shell_exports(settings: dict | None, remote_root: str = "/work/src") -> str:
+    """`export K=V` lines for a remote (Contree) probe run, including the pythonpath under remote_root."""
+    if not settings:
+        return ""
+    lines = [f"export {k}={shlex.quote(v)}\n" for k, v in (settings.get("env") or {}).items()]
+    if settings.get("pythonpath"):
+        root = remote_root.rstrip("/")
+        paths = [root if r in (".", "") else f"{root}/{r}" for r in settings["pythonpath"]]
+        lines.append("export PYTHONPATH=" + shlex.quote(os.pathsep.join(paths)) + '"${PYTHONPATH:+:$PYTHONPATH}"\n')
+    return "".join(lines)
