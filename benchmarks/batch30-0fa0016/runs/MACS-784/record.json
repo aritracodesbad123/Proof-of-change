@@ -1,0 +1,443 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-macs3-project-MACS-784-6a5f2dfd7617-2026-10-22-check-0201",
+ "date_ist": "2026-10-22 02:01 IST",
+ "run_date": "2026-10-22",
+ "who": "ops/daily_run.py",
+ "repo": "macs3-project/MACS",
+ "library": "MACS",
+ "pr": {
+  "repo": "macs3-project/MACS",
+  "number": 784,
+  "url": "https://github.com/macs3-project/MACS/pull/784",
+  "title": "Reject truncated BAM alignment records",
+  "base_sha": "7d75df2c7a1b22376fe54ec581c84001232277a6",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "6a5f2dfd7617fef03b0cda965385d67cabd1e590",
+  "merge_commit": null,
+  "tested_main_sha": "6a5f2dfd7617fef03b0cda965385d67cabd1e590",
+  "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+ },
+ "author": "taoliu",
+ "base_ref": "main",
+ "updated_at_utc": "2026-10-21T16:45:19Z",
+ "updated_at_ist": "2026-10-21 22:15 IST",
+ "ci_state": "not checked (single-PR check)",
+ "ci_detail": "checked on request with --pr",
+ "tested_at_ist": "2026-10-22 02:01 IST",
+ "files": {
+  "all": [
+   "MACS3/IO/Parser.py",
+   "docs/source/docs/SAMBAMBAMPE.md",
+   "test/test_Parser_bam_truncation.py"
+  ],
+  "package_py": [],
+  "compiled": [],
+  "other": [
+   "MACS3/IO/Parser.py",
+   "docs/source/docs/SAMBAMBAMPE.md",
+   "test/test_Parser_bam_truncation.py"
+  ]
+ },
+ "machine_type": {
+  "arch": "x86_64",
+  "os": "Linux",
+  "platform": "Linux-6.12.94+-x86_64-with-glibc2.41",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": "g++ (Debian 14.2.0-19) 14.2.0",
+  "cpu_model": "Intel(R) Xeon(R) Processor",
+  "ram_gb": 15.6
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 0,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.15",
+ "test_selection": "",
+ "per_run": [],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [
+  {
+   "source": "PR description",
+   "quote": "Existing skips and BAMPE empty-input behavior are unchanged.",
+   "pattern": "unchanged"
+  }
+ ],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": null,
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "local",
+ "sandbox_backend_note": "local bubblewrap",
+ "machine": "local",
+ "posted_upstream": false,
+ "logs": "macs-784/",
+ "freeze": {},
+ "poc_commit": "0fa0016ea51794edee0f4a085e41bf48dd813765",
+ "route": "source-pair",
+ "current_head_sha": "6a5f2dfd7617fef03b0cda965385d67cabd1e590",
+ "tested_invocation": 1,
+ "model_provider_used": "none",
+ "model_provider_fallback": "no AI call ran (asked for nebius)",
+ "state": "closed",
+ "mergeable_state": "unknown",
+ "product_check": true,
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": {
+   "ok": true,
+   "skipped": false,
+   "live_call": true,
+   "cached": false,
+   "queries": [
+    "MACS python setup install instructions https://github.com/macs3-project/MACS site:github.com/macs3-project/MACS",
+    "MACS python documentation install https://github.com/macs3-project/MACS site:github.com/macs3-project/MACS",
+    "MACS python install requirements https://pypi.org/project/MACS/ https://github.com/macs3-project/MACS site:pypi.org"
+   ],
+   "results": [
+    {
+     "title": "MACS \u00b7 PyPI",
+     "url": "https://pypi.org/project/MACS/",
+     "query": "MACS python install requirements https://pypi.org/project/MACS/ https://github.com/macs3-project/MACS site:pypi.org"
+    },
+    {
+     "title": "MACS2 \u00b7 PyPI",
+     "url": "https://pypi.org/project/macs2/",
+     "query": "MACS python install requirements https://pypi.org/project/MACS/ https://github.com/macs3-project/MACS site:pypi.org"
+    },
+    {
+     "title": "MACS3 \u00b7 PyPI",
+     "url": "https://pypi.org/project/macs3/",
+     "query": "MACS python install requirements https://pypi.org/project/MACS/ https://github.com/macs3-project/MACS site:pypi.org"
+    },
+    {
+     "title": "ERROR: Could not build wheels for MACS2, which is required to install pyproject.toml-based projects \u00b7 macs3-project/MACS \u00b7 Discussion #568 \u00b7 GitHub",
+     "url": "https://github.com/macs3-project/MACS/discussions/568",
+     "query": "MACS python setup install instructions https://github.com/macs3-project/MACS site:github.com/macs3-project/MACS"
+    },
+    {
+     "title": "Install macs2 \u00b7 macs3-project/MACS Wiki",
+     "url": "https://github.com/macs3-project/MACS/wiki/Install-macs2",
+     "query": "MACS python setup install instructions https://github.com/macs3-project/MACS site:github.com/macs3-project/MACS"
+    },
+    {
+     "title": "GitHub - macs3-project/MACS: MACS -- Model-based Analysis of ChIP-Seq \u00b7 GitHub",
+     "url": "https://github.com/macs3-project/MACS",
+     "query": "MACS python setup install instructions https://github.com/macs3-project/MACS site:github.com/macs3-project/MACS"
+    },
+    {
+     "title": "Releases \u00b7 macs3-project/MACS - GitHub",
+     "url": "https://github.com/macs3-project/MACS/releases?after=v2.2.7",
+     "query": "MACS python documentation install https://github.com/macs3-project/MACS site:github.com/macs3-project/MACS"
+    }
+   ],
+   "text": "To install MACS, clone the repository with submodules, checkout the desired branch, change to the MACS directory, and run `pip install .` as per the GitHub discussion. The MACS Wiki suggests downloading the source code package from PyPI and running `python setup.py install`. The GitHub repository indicates that MACS3 now requires Python 3.12 or later, and mentions dependencies like `pandas` and `anndata`. The sources do not provide a definitive answer for the current setup instructions.\nTo install the MACS Python documentation, you should use the `setup.py` file available in the repository. The latest version of MACS requires Python 3.12 or later. The `requirements.txt` file lists dependencies including `pandas` and `anndata`. For the most recent release, visit the releases page after v2.2.7 to find version 3.0.5 which improves performance and adds a Python API for single-cell fragment analysis. The GitHub repository also includes a wiki page for installing MACS2.\nThe provided sources do not contain specific information about the install requirements for the MACS Python package. They mention the MACS Discussions forum for questions and community interactions but do not detail any specific installation requirements or dependencies for MACS. The sources focus more on the general functionality and community aspects of MACS rather than its technical installation details.\nDec 16, 2013 \u00b7 MACS will save the raw tag count every 10 bps. Usable only with '--wig' option. --call-subpeaks If set, MACS will invoke Mali Salmon's PeakSplitter soft through system... Dec 8, 2020 \u00b7 If you have any questions, suggestion/ideas, or just want to have conversions with developers and other users in the community, we recommend using the MACS Discussions... The Python Package Index ( PyPI ) is a repository of software for the Python programming language. PyPI helps you find and instal\nJul 3, 2012 \u00b7 MACS captures the influence of genome complexity to evaluate the significance of enriched ChIP regions and MACS improves the spatial resolution of binding sites through... Dec 16, 2013 \u00b7 MACS will save the raw tag count every 10 bps. Usable only with '--wig' option. --call-subpeaks If set, MACS will invoke Mali Salmon's PeakSplitter soft through system... Dec 8, 2020 \u00b7 If you have any questions, suggestion/ideas, or just want to have conversions with developers and other users in t\nDec 8, 2020 \u00b7 If you have any questions, suggestion/ideas, or just want to have conversions with developers and other users in the community, we recommend using the MACS Discussions... The Python Package Index ( PyPI ) is a repository of software for the Python programming language. PyPI helps you find and install software developed and shared by the ... GitHub page Development documentation Development IRC Code of Conduct Everyone interacting in the pip project \u2019s codebases, issue trackers, cha\ncode.  Here's a step-by-step via command line:  change directory into folder where you want to install files: `cd my_place_for_storing_macs3`  install source code with submodules: `git clone --recurse-submodules   checkout dev branch: `git checkout hmmratac_add_training_command`  change directories to MACS folder: `cd MACS`  install dependencies and MACS3: `pip install .`  Let us know if you run into issues! | [...] File \"/private/var/folders/q4/6g8136zx63771ym8xtkyccg00000gq/T/pip-build-env-iu0\nDownload source code package from MACS2 page on PyPI then type $ python setup.py install; If you don't have Numpy, install Numpy first either\n| MANIFEST.in | MANIFEST.in |  |  |\n| README.md | README.md |  |  |\n| pyproject.toml | pyproject.toml |  |  |\n| requirements.txt | requirements.txt |  |  |\n| setup.py | setup.py |  |  |\n|  | [...] MACS3 now requires Python 3.12 or later. The `cykhash` dependency was removed, while `pandas` and `anndata` were added for AnnData export. [...] ```\ngit branch -m master main git fetch origin git branch -u origin/main main git remote set-head origin -a \n```\n\n## About\n\nMACS -- Model-based Analysis of Ch\nMACS3 3.0.5 improves peak-calling performance, adds a Python API for single-cell fragment analysis, and fixes several peak-calling edge cases.",
+   "errors": [],
+   "lines": [
+    "Looked up with Tavily: 7 results",
+    "Query: MACS python setup install instructions https://github.com/macs3-project/MACS site:github.com/macs3-project/MACS",
+    "Query: MACS python documentation install https://github.com/macs3-project/MACS site:github.com/macs3-project/MACS",
+    "Query: MACS python install requirements https://pypi.org/project/MACS/ https://github.com/macs3-project/MACS site:pypi.org",
+    "Source: MACS \u00b7 PyPI \u2014 https://pypi.org/project/MACS/",
+    "Source: MACS2 \u00b7 PyPI \u2014 https://pypi.org/project/macs2/",
+    "Source: MACS3 \u00b7 PyPI \u2014 https://pypi.org/project/macs3/",
+    "Source: ERROR: Could not build wheels for MACS2, which is required to install pyproject.toml-based projects \u00b7 macs3-project/MACS \u00b7 Discussion #568 \u00b7 GitHub \u2014 https://github.com/macs3-project/MACS/discussions/568",
+    "Source: Install macs2 \u00b7 macs3-project/MACS Wiki \u2014 https://github.com/macs3-project/MACS/wiki/Install-macs2",
+    "Source: GitHub - macs3-project/MACS: MACS -- Model-based Analysis of ChIP-Seq \u00b7 GitHub \u2014 https://github.com/macs3-project/MACS",
+    "Source: Releases \u00b7 macs3-project/MACS - GitHub \u2014 https://github.com/macs3-project/MACS/releases?after=v2.2.7"
+   ]
+  },
+  "notes": [
+   "Setup check: GitHub token: present.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory 6.2 GB (of 15.6 GB).",
+   "Setup check: free disk 92.4 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: 7 results",
+   "Query: MACS python setup install instructions https://github.com/macs3-project/MACS site:github.com/macs3-project/MACS",
+   "Query: MACS python documentation install https://github.com/macs3-project/MACS site:github.com/macs3-project/MACS",
+   "Query: MACS python install requirements https://pypi.org/project/MACS/ https://github.com/macs3-project/MACS site:pypi.org",
+   "Source: MACS \u00b7 PyPI \u2014 https://pypi.org/project/MACS/",
+   "Source: MACS2 \u00b7 PyPI \u2014 https://pypi.org/project/macs2/",
+   "Source: MACS3 \u00b7 PyPI \u2014 https://pypi.org/project/macs3/",
+   "Source: ERROR: Could not build wheels for MACS2, which is required to install pyproject.toml-based projects \u00b7 macs3-project/MACS \u00b7 Discussion #568 \u00b7 GitHub \u2014 https://github.com/macs3-project/MACS/discussions/568",
+   "Source: Install macs2 \u00b7 macs3-project/MACS Wiki \u2014 https://github.com/macs3-project/MACS/wiki/Install-macs2",
+   "Source: GitHub - macs3-project/MACS: MACS -- Model-based Analysis of ChIP-Seq \u00b7 GitHub \u2014 https://github.com/macs3-project/MACS",
+   "Source: Releases \u00b7 macs3-project/MACS - GitHub \u2014 https://github.com/macs3-project/MACS/releases?after=v2.2.7",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: numpy is noted, installed with the project.",
+   "Setup plan: scipy is noted, installed with the project.",
+   "Setup plan: pandas is noted, installed with the project.",
+   "Setup plan: anndata is noted, installed with the project.",
+   "Setup plan: hmmlearn is noted, installed with the project.",
+   "Setup plan: scikit-learn is noted, installed with the project.",
+   "Setup plan: install Cython>=3.0,<3.1 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install pytest>=7.0 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install setuptools>=68.0 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install ncls (listed in requirements.txt) on main and pr.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >=3.12",
+   "rerun, setup problem: main install failed after 3 tries.",
+   "Demo helper: setup failure already labelled; the probe was not rerun."
+  ],
+  "setup_plan": {
+   "packages": [
+    {
+     "requirement": "numpy>=1.25",
+     "name": "numpy",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "scipy>=1.12",
+     "name": "scipy",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pandas>=2.0",
+     "name": "pandas",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "anndata>=0.10",
+     "name": "anndata",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "hmmlearn>=0.3.2",
+     "name": "hmmlearn",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "scikit-learn>=1.3",
+     "name": "scikit-learn",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "Cython>=3.0,<3.1",
+     "name": "Cython",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest>=7.0",
+     "name": "pytest",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "setuptools>=68.0",
+     "name": "setuptools",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "ncls",
+     "name": "ncls",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    }
+   ],
+   "extra_reqs": [
+    "Cython>=3.0,<3.1",
+    "pytest>=7.0",
+    "setuptools>=68.0",
+    "ncls"
+   ],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >=3.12"
+   },
+   "system": [],
+   "refused": []
+  },
+  "setup": {
+   "label": "rerun, setup problem",
+   "counts_as_verdict": false,
+   "step": "main install",
+   "attempts": 3,
+   "detail": "install failed (1); see setup-main.log"
+  }
+ },
+ "chosen": {
+  "pr": 784,
+  "head_sha": null,
+  "install": null,
+  "test_cmd": null
+ },
+ "sides": {
+  "comparison_basis": "merge-base vs PR head (no merge ref available)",
+  "main_sha": "6a5f2dfd7617fef03b0cda965385d67cabd1e590",
+  "pr_sha": "6a5f2dfd7617fef03b0cda965385d67cabd1e590"
+ },
+ "tested": {
+  "main": "main @ 6a5f2dfd7617 (merge-base with the PR head)",
+  "pr": "PR head 6a5f2dfd7617"
+ },
+ "verdict": "could_not_verify",
+ "reason": "install failed (1); see setup-main.log",
+ "verdict_before_coverage_gate": "could_not_verify",
+ "reason_before_coverage_gate": "install failed (1); see setup-main.log",
+ "changed_lines_total": null,
+ "changed_lines_covered": null,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "lower",
+  "note": "coverage of the changed Python lines was NOT MEASURED (record predates the coverage gate: no coverage run exists for it, so this is not a measurement result)",
+  "measurement": "not measured: predates gate"
+ },
+ "agents": {
+  "status": "skipped",
+  "note": "advisory swarm is off",
+  "roles": []
+ },
+ "explanation": {
+  "status": "not yet wired",
+  "why": "advisory swarm is off"
+ },
+ "swarm_requested": false,
+ "operator_approval_requested": false,
+ "swarm": "off",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [],
+  "compiled_files": [],
+  "other_files": [
+   "MACS3/IO/Parser.py",
+   "docs/source/docs/SAMBAMBAMPE.md",
+   "test/test_Parser_bam_truncation.py"
+  ]
+ },
+ "duration_s": {
+  "total_wall": 20505.1,
+  "tests": 0
+ },
+ "cost": {
+  "ai_calls": 0,
+  "failed_ai_calls": 0,
+  "input_tokens": 0,
+  "output_tokens": 0,
+  "thinking_tokens": 0,
+  "cost_usd": 0.0,
+  "calls_without_usage": 0,
+  "ai_cost_usd": 0.0,
+  "cost_complete": true,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 20505.1,
+   "tests": 0
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 1.367007,
+  "total_cost_usd": 1.367007,
+  "swarm": {
+   "ai_calls": 0,
+   "failed_ai_calls": 0,
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "thinking_tokens": 0,
+   "cost_usd": 0.0,
+   "calls_without_usage": 0,
+   "ai_cost_usd": 0.0,
+   "cost_complete": true,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ },
+ "poc_code_version": "0fa0016"
+}

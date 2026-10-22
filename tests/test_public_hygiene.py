@@ -51,6 +51,19 @@ def _under_random_prs(path: Path | None) -> bool:
                for i in range(len(parts)))
 
 
+def _under_upstream_run(path: Path | None) -> bool:
+    """True for stored upstream check results (batch run folders and the results-page replay data)."""
+    if path is None:
+        return False
+    parts = path.parts
+    for i in range(len(parts) - 1):
+        if parts[i] == "benchmarks" and parts[i + 1].startswith("batch30-"):
+            return True
+        if parts[i] == "replay" and parts[i + 1] in {"checks", "catalog.json"}:
+            return True
+    return False
+
+
 def _inside_upstream_repo(line: str, match: re.Match) -> bool:
     """True when the match sits inside an upstream repository name on this line."""
     return any(repo.start() <= match.start() and match.end() <= repo.end() for repo in UPSTREAM_REPO.finditer(line))
@@ -88,6 +101,9 @@ def findings(text: str, path: Path | None = None) -> list[str]:
     for i, line in enumerate(text.splitlines(), 1):
         for kind, pat in PATTERNS.items():
             matches = list(pat.finditer(line))
+            if kind in {"bot", "internal library registry / picks"} and _under_upstream_run(path):
+                # Upstream package, test and repository names in stored run output. Machine paths still fail.
+                matches = []
             if kind == "bot" and study_pairs:
                 # Repository names under the study-pair files may contain this word. Prose still fails.
                 matches = [m for m in matches if not _inside_upstream_repo(line, m)]

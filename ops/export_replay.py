@@ -209,7 +209,7 @@ def _golden_record(root: Path, item: dict) -> tuple[dict, list[Path]]:
     return record, reports
 
 
-def collect(root: Path, runs: Path | None, reports: Path | None) -> list[tuple[dict, list[Path]]]:
+def collect(root: Path, runs: Path | None, reports: Path | None, curated: bool = True) -> list[tuple[dict, list[Path]]]:
     """Curated repo examples, then any finished records under the run folders."""
     items: list[tuple[dict, list[Path]]] = []
     seen: set[str] = set()
@@ -223,7 +223,7 @@ def collect(root: Path, runs: Path | None, reports: Path | None) -> list[tuple[d
         seen.add(rid)
         items.append((record, report_files))
 
-    for item in CURATED:
+    for item in (CURATED if curated else ()):
         kind = item["kind"]
         if kind == "json":
             path = root / item["path"]
@@ -263,13 +263,13 @@ def collect(root: Path, runs: Path | None, reports: Path | None) -> list[tuple[d
     return items
 
 
-def export(root: Path, out: Path, runs: Path | None = None, reports: Path | None = None) -> dict:
+def export(root: Path, out: Path, runs: Path | None = None, reports: Path | None = None, curated: bool = True) -> dict:
     """Write ``out/catalog.json`` and one folder per check. Local files only."""
-    checks = [_write_check(out, record, files) for record, files in collect(root, runs, reports)]
+    checks = [_write_check(out, record, files) for record, files in collect(root, runs, reports, curated)]
     catalog = {
         "mode": "replay",
         "note": (
-            "Finished checks stored in this folder. "
+            "30-PR random batch on code version 0fa0016. Older runs are kept in benchmarks/replay-archive/. "
             "The results page does not install code and does not call an API."
         ),
         "checks": checks,
@@ -285,8 +285,9 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--out", default=str(ROOT / "replay"), help="folder to write (default: replay/)")
     ap.add_argument("--runs", default=str(ROOT / "ops" / "runs"), help="finished run folders (record.json)")
     ap.add_argument("--reports", default=str(ROOT / "reports" / "daily"), help="daily report folders")
+    ap.add_argument("--no-curated", action="store_true", help="leave out the curated older examples (the page then shows only --runs)")
     args = ap.parse_args(argv)
-    catalog = export(Path(args.root), Path(args.out), Path(args.runs), Path(args.reports))
+    catalog = export(Path(args.root), Path(args.out), Path(args.runs), Path(args.reports), not args.no_curated)
     print(f"exported {len(catalog['checks'])} checks to {args.out}")
     return 0
 

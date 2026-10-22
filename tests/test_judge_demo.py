@@ -589,7 +589,7 @@ def test_replay_export_and_committed_catalog_need_no_network(tmp_path, monkeypat
     repo_catalog = json.loads((Path(export_replay.ROOT) / "replay" / "catalog.json").read_text())
     assert repo_catalog["mode"] == "replay"
     verdicts = {row["verdict"] for row in repo_catalog["checks"]}
-    assert {"needs_attention", "verified", "could_not_verify"} <= verdicts
+    assert verdicts and verdicts <= {"needs_attention", "verified", "could_not_verify", "no_code_change"}
     for row in repo_catalog["checks"]:
         record_path = Path(export_replay.ROOT) / "replay" / row["record"]
         text = record_path.read_text()

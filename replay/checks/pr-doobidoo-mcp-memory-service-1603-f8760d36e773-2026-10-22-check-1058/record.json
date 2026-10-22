@@ -1,0 +1,4116 @@
+{
+  "schema_version": "1",
+  "record_kind": "pr_run",
+  "id": "pr-doobidoo-mcp-memory-service-1603-f8760d36e773-2026-10-22-check-1058",
+  "date_ist": "2026-10-22 10:58 IST",
+  "run_date": "2026-10-22",
+  "who": "ops/daily_run.py",
+  "repo": "doobidoo/mcp-memory-service",
+  "library": "mcp-memory-service",
+  "pr": {
+    "repo": "doobidoo/mcp-memory-service",
+    "number": 1603,
+    "url": "https://github.com/doobidoo/mcp-memory-service/pull/1603",
+    "title": "fix(mcp): propagate tool exceptions so failures reach the client as isError (#1601)",
+    "base_sha": "476db1c80be7591b072657ae541aa03c24e9d959",
+    "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+    "head_sha": "f8760d36e773a9752fee44a21797d57075c95b92",
+    "merge_commit": null,
+    "tested_main_sha": "476db1c80be7591b072657ae541aa03c24e9d959",
+    "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+  },
+  "author": "filhocf",
+  "base_ref": "main",
+  "updated_at_utc": "2026-10-21T17:23:30Z",
+  "updated_at_ist": "2026-10-21 22:53 IST",
+  "ci_state": "not checked (single-PR check)",
+  "ci_detail": "checked on request with --pr",
+  "tested_at_ist": "2026-10-22 10:58 IST",
+  "files": {
+    "all": [
+      "changelog.d/1601.fixed.md",
+      "src/mcp_memory_service/server/handlers/memory.py",
+      "src/mcp_memory_service/server_impl.py",
+      "src/mcp_memory_service/web/api/mcp.py",
+      "tests/integration/test_server_handlers.py",
+      "tests/integration/test_store_error_envelope.py",
+      "tests/integration/test_unified_handlers.py"
+    ],
+    "package_py": [
+      "src/mcp_memory_service/server/handlers/memory.py",
+      "src/mcp_memory_service/server_impl.py",
+      "src/mcp_memory_service/web/api/mcp.py"
+    ],
+    "compiled": [],
+    "other": [
+      "changelog.d/1601.fixed.md",
+      "tests/integration/test_server_handlers.py",
+      "tests/integration/test_store_error_envelope.py",
+      "tests/integration/test_unified_handlers.py"
+    ]
+  },
+  "machine_type": {
+    "arch": "x86_64",
+    "os": "Linux",
+    "platform": "Linux-6.12.94+-x86_64-with-glibc2.41",
+    "cpu_count": 8,
+    "ci": null,
+    "runner_name": null,
+    "runner_os": null,
+    "runner_arch": null,
+    "runner_environment": null,
+    "image": null,
+    "label": "local",
+    "gxx": "g++ (Debian 14.2.0-19) 14.2.0",
+    "cpu_model": "Intel(R) Xeon(R) Processor",
+    "ram_gb": 15.6
+  },
+  "thread_env": {
+    "OMP_NUM_THREADS": "1",
+    "OPENBLAS_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1",
+    "NUMEXPR_NUM_THREADS": "1",
+    "VECLIB_MAXIMUM_THREADS": "1",
+    "BLIS_NUM_THREADS": "1",
+    "PYTHONHASHSEED": "0"
+  },
+  "runs_per_side": 3,
+  "runs_per_side_planned": 3,
+  "workers": "4",
+  "test_timeout_s": 120,
+  "run_timeout_s": 900,
+  "build_timeout_s": 1800,
+  "python": "3.12.15",
+  "test_selection": "mapped from touched files: tests/integration/test_server_handlers.py, tests/integration/test_store_error_envelope.py, tests/integration/test_unified_handlers.py",
+  "per_run": [
+    {
+      "side": "old",
+      "run": 1,
+      "passed": 29,
+      "failed": 0,
+      "error": 0,
+      "skipped": 1,
+      "collection_errors": 0,
+      "exit": 0,
+      "seconds": 4.9,
+      "pytest_summary": "[Test Cleanup] Removed test database directory: <run>/ops/work/mcp_memory_service-1603/home-main/.tmp/mcp-test-db-dhw3slpe",
+      "junit": true
+    },
+    {
+      "side": "new",
+      "run": 1,
+      "passed": 35,
+      "failed": 0,
+      "error": 0,
+      "skipped": 1,
+      "collection_errors": 0,
+      "exit": 0,
+      "seconds": 9.6,
+      "pytest_summary": "[Test Cleanup] Removed test database directory: <run>/ops/work/mcp_memory_service-1603/home-pr/.tmp/mcp-test-db-ap6mewrv",
+      "junit": true
+    },
+    {
+      "side": "old",
+      "run": 2,
+      "passed": 29,
+      "failed": 0,
+      "error": 0,
+      "skipped": 1,
+      "collection_errors": 0,
+      "exit": 0,
+      "seconds": 5.0,
+      "pytest_summary": "[Test Cleanup] Removed test database directory: <run>/ops/work/mcp_memory_service-1603/home-main/.tmp/mcp-test-db-8q019m95",
+      "junit": true
+    },
+    {
+      "side": "new",
+      "run": 2,
+      "passed": 35,
+      "failed": 0,
+      "error": 0,
+      "skipped": 1,
+      "collection_errors": 0,
+      "exit": 0,
+      "seconds": 9.8,
+      "pytest_summary": "[Test Cleanup] Removed test database directory: <run>/ops/work/mcp_memory_service-1603/home-pr/.tmp/mcp-test-db-1o0hbc4e",
+      "junit": true
+    },
+    {
+      "side": "old",
+      "run": 3,
+      "passed": 29,
+      "failed": 0,
+      "error": 0,
+      "skipped": 1,
+      "collection_errors": 0,
+      "exit": 0,
+      "seconds": 5.3,
+      "pytest_summary": "[Test Cleanup] Removed test database directory: <run>/ops/work/mcp_memory_service-1603/home-main/.tmp/mcp-test-db-6lr8dvlq",
+      "junit": true
+    },
+    {
+      "side": "new",
+      "run": 3,
+      "passed": 35,
+      "failed": 0,
+      "error": 0,
+      "skipped": 1,
+      "collection_errors": 0,
+      "exit": 0,
+      "seconds": 10.4,
+      "pytest_summary": "[Test Cleanup] Removed test database directory: <run>/ops/work/mcp_memory_service-1603/home-pr/.tmp/mcp-test-db-qkovppwa",
+      "junit": true
+    }
+  ],
+  "notes": null,
+  "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+  "behaviour_claims": [],
+  "baseline": "full",
+  "model_provider": {
+    "requested": "nebius",
+    "used": "nebius",
+    "note": "model provider: nebius (Token Factory, live)",
+    "blind": false
+  },
+  "sandbox_backend": "local",
+  "sandbox_backend_note": "local bubblewrap",
+  "machine": "local",
+  "posted_upstream": false,
+  "logs": "mcp_memory_service-1603/",
+  "freeze": {
+    "main": "freeze-main.txt",
+    "pr": "freeze-pr.txt"
+  },
+  "poc_commit": "0fa0016ea51794edee0f4a085e41bf48dd813765",
+  "route": "source-pair",
+  "current_head_sha": "f8760d36e773a9752fee44a21797d57075c95b92",
+  "tested_invocation": 1,
+  "model_provider_used": "nebius",
+  "state": "closed",
+  "mergeable_state": "unknown",
+  "product_check": true,
+  "demo_helper": {
+    "preflight": {
+      "ok": true
+    },
+    "tavily": {
+      "ok": true,
+      "skipped": false,
+      "live_call": true,
+      "cached": false,
+      "queries": [
+        "mcp-memory-service python setup install instructions https://github.com/doobidoo/mcp-memory-service site:github.com/doobidoo/mcp-memory-service",
+        "mcp-memory-service python documentation install https://github.com/doobidoo/mcp-memory-service site:github.com/doobidoo/mcp-memory-service",
+        "mcp-memory-service python install requirements https://pypi.org/project/mcp-memory-service/ https://github.com/doobidoo/mcp-memory-service site:pypi.org"
+      ],
+      "results": [
+        {
+          "title": "mcp-memory-service \u00b7 PyPI",
+          "url": "https://pypi.org/project/mcp-memory-service/",
+          "query": "mcp-memory-service python install requirements https://pypi.org/project/mcp-memory-service/ https://github.com/doobidoo/mcp-memory-service site:pypi.org"
+        },
+        {
+          "title": "mcp-memory-service/docs/setup-guide.md at main \u00b7 doobidoo/mcp-memory-service \u00b7 GitHub",
+          "url": "https://github.com/doobidoo/mcp-memory-service/blob/main/docs/setup-guide.md",
+          "query": "mcp-memory-service python setup install instructions https://github.com/doobidoo/mcp-memory-service site:github.com/doobidoo/mcp-memory-service"
+        },
+        {
+          "title": "GitHub - doobidoo/mcp-memory-service: Open-source persistent memory for AI agent pipelines (LangGraph, CrewAI, AutoGen) and Claude. REST API + knowledge graph + autonomous consolidation. \u00b7 GitHub",
+          "url": "https://github.com/doobidoo/mcp-memory-service",
+          "query": "mcp-memory-service python setup install instructions https://github.com/doobidoo/mcp-memory-service site:github.com/doobidoo/mcp-memory-service"
+        },
+        {
+          "title": "01 Installation Guide \u00b7 doobidoo/mcp-memory-service Wiki \u00b7 GitHub",
+          "url": "https://github.com/doobidoo/mcp-memory-service/wiki/01-Installation-Guide",
+          "query": "mcp-memory-service python setup install instructions https://github.com/doobidoo/mcp-memory-service site:github.com/doobidoo/mcp-memory-service"
+        },
+        {
+          "title": "Presume I know nothing about the underlying technology and please explain how to start using this project \u00b7 doobidoo/mcp-memory-service \u00b7 Discussion #525 \u00b7 GitHub",
+          "url": "https://github.com/doobidoo/mcp-memory-service/discussions/525",
+          "query": "mcp-memory-service python documentation install https://github.com/doobidoo/mcp-memory-service site:github.com/doobidoo/mcp-memory-service"
+        }
+      ],
+      "text": "To set up the mcp-memory-service, first install it using `pip install mcp-memory-service`. Then start the HTTP API with `MCP_ALLOW_ANONYMOUS_ACCESS=true memory server --http`. For Claude Desktop, edit the config file and install hooks with `python3 codex/install_hooks.py`. For optimal performance, use the recommended system requirements: Python 3.11 or newer, 4GB RAM minimum, 2GB free storage, and compatible OS. For legacy hardware, use `python install.py --legacy-hardware` for SQLite-vec backend and CPU-only optimization. For modern hardware, use `python install.py` for GPU acceleration and full features.\nTo install the mcp-memory-service Python package, use `pip install mcp-memory-service`. After installation, configure your AI client by editing the appropriate config file: macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`, Windows: `%APPDATA%\\\\Claude\\\\claude_desktop_config.json`, Linux: `~/.config/Claude/claude_desktop_config.json`. For Codex (automatic memory hooks), start the Memory Service HTTP API and run `python3 codex/install_hooks.py`. The sources do not provide specific details on the installation script reference.\nTo install the `mcp-memory-service` Python package, you can use the command `pip install mcp-memory-service`. The package supports Remote MCP for native claude.ai integration and provides a framework-agnostic REST API with 15 endpoints. It also supports SSE events for real-time notifications and runs embeddings locally via ONNX. The latest version available on PyPI is 10.40.2, which includes features like a knowledge graph, smart retrieval, and multi-client support. For the most up-to-date version, visit https://pypi.org/project/mcp-memory-service/.\nTitle: mcp-memory-service \u00b7 PyPI\n# mcp-memory-service. ## Persistent Shared Memory for AI Agent Pipelines. Unlike desktop-only MCP servers, **mcp-memory-service supports Remote MCP** for native claude.ai integration. | Without mcp-memory-service | With mcp-memory-service |. * **Framework-agnostic REST API** \u2014 15 endpoints, no MCP client library needed. * **`X-Agent-ID` header** \u2014 auto-tag memories by agent identity for scoped retrieval. * **SSE events** \u2014 real-time notifications when any agent s\nDuration: ~5 min for the memory plugin; the sidebar is optional.\n\n### 1. Install\n\n```\npip install mcp-memory-service\n```\n\n### 2. Start the HTTP API\n\n```\nMCP_ALLOW_ANONYMOUS_ACCESS=true memory server --http\n```\n\nKeep this server running in a separate terminal, or use an existing HTTP deployment. Check that it is reachable before starting OpenCode:\n\n```\ncurl --fail \n```\n\nThe response must report `\"status\": \"healthy\"`. [...] Each path builds on the previous one where noted. OpenCode users can start\n## \ud83d\ude80 Get Started in 60 Seconds\n\n> Not sure which setup fits? The Setup Guide walks you to the right path in under a minute.\n\n1. Install:\n\n```\npip install mcp-memory-service\n```\n\n2. Configure your AI client:\n\n Claude Desktop\n\nAdd to your config file:\n\n macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`\n Windows: `%APPDATA%\\Claude\\claude_desktop_config.json`\n Linux: `~/.config/Claude/claude_desktop_config.json` [...] The plugin ships as repository files for the local plugin d\nWhat this does:\n\n \u2705 Detects your operating system and hardware\n \u2705 Installs optimal dependencies for your system\n \u2705 Configures the best storage backend (SQLite-vec recommended)\n \u2705 Sets up environment variables\n \u2705 Generates secure API key\n \u2705 Optionally installs as system service\n\n## \ud83d\udccb Prerequisites\n\n### System Requirements\n\n Python: 3.10 or newer (3.11+ recommended)\n Memory: 4GB RAM minimum (8GB+ recommended)\n Storage: 2GB free space\n OS: Windows 10+, macOS 10.15+, or Linux (Ubuntu 18.04+) [...] F\nuser | `pip install mcp-memory-service` then edit `claude_desktop_config.json` then restart | | Claude Code user | `pip install mcp-memory-service` then edit `~/.claude/config.json` then restart | | Agent/developer | `pip install mcp-memory-service` then `memory server --http` then use REST API |   Hope that clears things up! We will update the README to fix the broken install script reference. |",
+      "errors": [],
+      "lines": [
+        "Looked up with Tavily: 5 results",
+        "Query: mcp-memory-service python setup install instructions https://github.com/doobidoo/mcp-memory-service site:github.com/doobidoo/mcp-memory-service",
+        "Query: mcp-memory-service python documentation install https://github.com/doobidoo/mcp-memory-service site:github.com/doobidoo/mcp-memory-service",
+        "Query: mcp-memory-service python install requirements https://pypi.org/project/mcp-memory-service/ https://github.com/doobidoo/mcp-memory-service site:pypi.org",
+        "Source: mcp-memory-service \u00b7 PyPI \u2014 https://pypi.org/project/mcp-memory-service/",
+        "Source: mcp-memory-service/docs/setup-guide.md at main \u00b7 doobidoo/mcp-memory-service \u00b7 GitHub \u2014 https://github.com/doobidoo/mcp-memory-service/blob/main/docs/setup-guide.md",
+        "Source: GitHub - doobidoo/mcp-memory-service: Open-source persistent memory for AI agent pipelines (LangGraph, CrewAI, AutoGen) and Claude. REST API + knowledge graph + autonomous consolidation. \u00b7 GitHub \u2014 https://github.com/doobidoo/mcp-memory-service",
+        "Source: 01 Installation Guide \u00b7 doobidoo/mcp-memory-service Wiki \u00b7 GitHub \u2014 https://github.com/doobidoo/mcp-memory-service/wiki/01-Installation-Guide",
+        "Source: Presume I know nothing about the underlying technology and please explain how to start using this project \u00b7 doobidoo/mcp-memory-service \u00b7 Discussion #525 \u00b7 GitHub \u2014 https://github.com/doobidoo/mcp-memory-service/discussions/525"
+      ]
+    },
+    "notes": [
+      "Setup check: GitHub token: present.",
+      "Setup check: Nebius token: present.",
+      "Setup check: free memory 8.0 GB (of 15.6 GB).",
+      "Setup check: free disk 87.9 GB.",
+      "Demo helper: git is installed.",
+      "Demo helper: python3 is installed.",
+      "Demo helper: uv is installed.",
+      "Looked up with Tavily: 5 results",
+      "Query: mcp-memory-service python setup install instructions https://github.com/doobidoo/mcp-memory-service site:github.com/doobidoo/mcp-memory-service",
+      "Query: mcp-memory-service python documentation install https://github.com/doobidoo/mcp-memory-service site:github.com/doobidoo/mcp-memory-service",
+      "Query: mcp-memory-service python install requirements https://pypi.org/project/mcp-memory-service/ https://github.com/doobidoo/mcp-memory-service site:pypi.org",
+      "Source: mcp-memory-service \u00b7 PyPI \u2014 https://pypi.org/project/mcp-memory-service/",
+      "Source: mcp-memory-service/docs/setup-guide.md at main \u00b7 doobidoo/mcp-memory-service \u00b7 GitHub \u2014 https://github.com/doobidoo/mcp-memory-service/blob/main/docs/setup-guide.md",
+      "Source: GitHub - doobidoo/mcp-memory-service: Open-source persistent memory for AI agent pipelines (LangGraph, CrewAI, AutoGen) and Claude. REST API + knowledge graph + autonomous consolidation. \u00b7 GitHub \u2014 https://github.com/doobidoo/mcp-memory-service",
+      "Source: 01 Installation Guide \u00b7 doobidoo/mcp-memory-service Wiki \u00b7 GitHub \u2014 https://github.com/doobidoo/mcp-memory-service/wiki/01-Installation-Guide",
+      "Source: Presume I know nothing about the underlying technology and please explain how to start using this project \u00b7 doobidoo/mcp-memory-service \u00b7 Discussion #525 \u00b7 GitHub \u2014 https://github.com/doobidoo/mcp-memory-service/discussions/525",
+      "Setup plan: the same packages on main and pr.",
+      "Setup plan: aiofiles is noted, installed with the project.",
+      "Setup plan: aiohttp is noted, installed with the project.",
+      "Setup plan: aiosqlite is noted, installed with the project.",
+      "Setup plan: apscheduler is noted, installed with the project.",
+      "Setup plan: authlib is noted, installed with the project.",
+      "Setup plan: build is noted, installed with the project.",
+      "Setup plan: chardet is noted, installed with the project.",
+      "Setup plan: click is noted, installed with the project.",
+      "Setup plan: cryptography is noted, installed with the project.",
+      "Setup plan: fastapi is noted, installed with the project.",
+      "Setup plan: httpx is noted, installed with the project.",
+      "Setup plan: mcp is noted, installed with the project.",
+      "Setup plan: numpy is noted, installed with the project.",
+      "Setup plan: psutil is noted, installed with the project.",
+      "Setup plan: PyJWT is noted, installed with the project.",
+      "Setup plan: pypdf is noted, installed with the project.",
+      "Setup plan: PyYAML is noted, installed with the project.",
+      "Setup plan: python-dotenv is noted, installed with the project.",
+      "Setup plan: python-multipart is noted, installed with the project.",
+      "Setup plan: requests is noted, installed with the project.",
+      "Setup plan: sqlite-vec is noted, installed with the project.",
+      "Setup plan: sse-starlette is noted, installed with the project.",
+      "Setup plan: typing-extensions is noted, installed with the project.",
+      "Setup plan: uvicorn is noted, installed with the project.",
+      "Setup plan: zeroconf is noted, installed with the project.",
+      "Setup plan: Python 3.12: Python 3.12 already meets >=3.10"
+    ],
+    "setup_plan": {
+      "packages": [
+        {
+          "requirement": "aiofiles>=23.2.1",
+          "name": "aiofiles",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "aiohttp>=3.13.3",
+          "name": "aiohttp",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "aiosqlite>=0.20.0",
+          "name": "aiosqlite",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "apscheduler>=3.11.0",
+          "name": "apscheduler",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "authlib>=1.6.9",
+          "name": "authlib",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "build>=0.10.0",
+          "name": "build",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "chardet>=5.0.0",
+          "name": "chardet",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "click>=8.0.0",
+          "name": "click",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "cryptography>=46.0.6",
+          "name": "cryptography",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "fastapi>=0.115.5",
+          "name": "fastapi",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "httpx>=0.24.0",
+          "name": "httpx",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "mcp>=1.9.2,<2.0.0",
+          "name": "mcp",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "numpy>=1.24.0",
+          "name": "numpy",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "psutil>=5.9.0",
+          "name": "psutil",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "PyJWT[crypto]>=2.12.0",
+          "name": "PyJWT",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "pypdf>=6.9.1",
+          "name": "pypdf",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "PyYAML>=6.0",
+          "name": "PyYAML",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "python-dotenv>=1.0.0",
+          "name": "python-dotenv",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "python-multipart>=0.0.22",
+          "name": "python-multipart",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "requests>=2.32.4",
+          "name": "requests",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "sqlite-vec>=0.1.6",
+          "name": "sqlite-vec",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "sse-starlette>=2.1.0",
+          "name": "sse-starlette",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "typing-extensions>=4.0.0; python_version < '3.11'",
+          "name": "typing-extensions",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "uvicorn>=0.30.0",
+          "name": "uvicorn",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "zeroconf>=0.130.0",
+          "name": "zeroconf",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        }
+      ],
+      "extra_reqs": [],
+      "python": {
+        "requested": "3.12",
+        "current": "3.12",
+        "applied": true,
+        "switch": null,
+        "reason": "Python 3.12 already meets >=3.10"
+      },
+      "system": [],
+      "refused": []
+    }
+  },
+  "chosen": {
+    "pr": 1603,
+    "head_sha": null,
+    "install": null,
+    "test_cmd": null
+  },
+  "sides": {
+    "comparison_basis": "merge-base vs PR head (no merge ref available)",
+    "main_sha": "476db1c80be7591b072657ae541aa03c24e9d959",
+    "pr_sha": "f8760d36e773a9752fee44a21797d57075c95b92"
+  },
+  "tested": {
+    "main": "main @ 476db1c80be7 (merge-base with the PR head)",
+    "pr": "PR head f8760d36e773"
+  },
+  "probe_plan": {
+    "baseline": "full",
+    "model": "model provider: nebius (Token Factory, live)",
+    "errors": [],
+    "model_claims": [
+      {
+        "id": "C1",
+        "text": "A tool call that fails now answers with `isError: true`.",
+        "source_quote": "A tool call that fails now answers with `isError: true`.",
+        "testable": true,
+        "expect": "differs"
+      },
+      {
+        "id": "C2",
+        "text": "Before, the envelope said `isError: false` and carried the error text as ordinary content",
+        "source_quote": "Before, the envelope said `isError: false` and carried the error text as ordinary content",
+        "testable": true,
+        "expect": "same"
+      },
+      {
+        "id": "C3",
+        "text": "New integration test on the real streamable-http transport: a refused write yields `isError: true`, an accepted write yields `false`.",
+        "source_quote": "New integration test on the real streamable-http transport: a refused write yields `isError: true`, an accepted write yields `false`.",
+        "testable": true,
+        "expect": "differs"
+      }
+    ],
+    "model_rejected_claims": [],
+    "diff_targets": [
+      "mcp_memory_service.server.handlers.memory.handle_store_memory",
+      "mcp_memory_service.server.handlers.memory.handle_memory_observe",
+      "mcp_memory_service.server.handlers.memory.handle_store_session",
+      "mcp_memory_service.web.api.mcp.mcp_endpoint"
+    ],
+    "frozen": [
+      {
+        "path": "model-probes/model-p1.py",
+        "source": "model",
+        "sha256": "ea8cd8e61b5d14cf09dfc61b5de05786baf728174e594d944146b8bf10fbc80a",
+        "generator": {
+          "kind": "model",
+          "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+          "model": "nvidia/nemotron-3-super-120b-a12b",
+          "provider": "nebius",
+          "provenance": "live",
+          "blind": true
+        },
+        "frozen_at": "2026-10-22T05:31:27.779695+00:00",
+        "inputs_sha256": "0be32288fd03f3b16a66f21f004428297ce12e28a9c488b6d5f9b831d99c8a14",
+        "inputs": {
+          "title_chars": 83,
+          "body_chars": 4137,
+          "base_files": {
+            "src/mcp_memory_service/server/handlers/memory.py": "8c627907bcc679e359c48dde8fb39d7e5a76b52a3dc0102f8a6a1af510a5c2ce",
+            "src/mcp_memory_service/server_impl.py": "b36957bff711e99cde98f852d7c707938a85ab2111409eaef926e75798c7d68f",
+            "src/mcp_memory_service/web/api/mcp.py": "9c0a7304b161d1ce1bee6b6bfab2731a8d397bad91834469809a628e84e319e2"
+          }
+        }
+      },
+      {
+        "path": "diff-probes/diff-api.py",
+        "source": "diff",
+        "sha256": "bbd984c322885d0b645bb8dae59173bf6bc5a7dac869945aad43d6c529dc0919",
+        "generator": {
+          "kind": "diff",
+          "label": "diff (auto-derived from base-side code, model-free)",
+          "model": null,
+          "provider": null,
+          "provenance": "auto-derived",
+          "blind": false
+        },
+        "frozen_at": "2026-10-22T05:31:27.814767+00:00",
+        "inputs_sha256": "bee6d9f00fa4ccb1ce866b71ef09488e873aea1e3ca366a48dfb8c677ccaf80f",
+        "inputs": {
+          "title_chars": 0,
+          "body_chars": 0,
+          "base_files": {
+            "src/mcp_memory_service/server/handlers/memory.py": "8c627907bcc679e359c48dde8fb39d7e5a76b52a3dc0102f8a6a1af510a5c2ce",
+            "src/mcp_memory_service/server_impl.py": "b36957bff711e99cde98f852d7c707938a85ab2111409eaef926e75798c7d68f",
+            "src/mcp_memory_service/web/api/mcp.py": "9c0a7304b161d1ce1bee6b6bfab2731a8d397bad91834469809a628e84e319e2"
+          }
+        }
+      }
+    ]
+  },
+  "test_extras": [
+    "pytest-asyncio>=0.23.0",
+    "pytest-timeout>=2.0.0",
+    "pytest-subtests>=0.10.0",
+    "pytest-asyncio>=1.4.0"
+  ],
+  "pr_side_started_at": "2026-10-22T05:31:27.959206+00:00",
+  "test_targets": {
+    "main": [
+      "tests/integration/test_server_handlers.py",
+      "tests/integration/test_unified_handlers.py"
+    ],
+    "pr": [
+      "tests/integration/test_server_handlers.py",
+      "tests/integration/test_store_error_envelope.py",
+      "tests/integration/test_unified_handlers.py"
+    ]
+  },
+  "installed_commit": {
+    "main": {
+      "dist": "mcp-memory-service",
+      "expected": "476db1c80be7591b072657ae541aa03c24e9d959",
+      "installed": "476db1c80be7591b072657ae541aa03c24e9d959",
+      "ok": true
+    },
+    "pr": {
+      "dist": "mcp-memory-service",
+      "expected": "f8760d36e773a9752fee44a21797d57075c95b92",
+      "installed": "f8760d36e773a9752fee44a21797d57075c95b92",
+      "ok": true
+    }
+  },
+  "declared_test_deps": {
+    "requested": [
+      "pytest-asyncio>=0.23.0",
+      "pytest-timeout>=2.0.0",
+      "pytest-subtests>=0.10.0",
+      "pytest-asyncio>=1.4.0"
+    ],
+    "installed": true
+  },
+  "comparison": {
+    "same": 30,
+    "same_skipped_both": 1,
+    "regressions": [],
+    "fixed": [],
+    "new_tests_passing": 6,
+    "new_tests_failing": [],
+    "new_tests_skipped": [],
+    "removed_tests": [],
+    "reparametrized": [],
+    "skipped_missing_dependency": [],
+    "flaky": [],
+    "pr_unstable": [],
+    "pr_unstable_noisy": [],
+    "environment": [],
+    "other_changes": [],
+    "preexisting_failures": [],
+    "load_failed_both": [],
+    "load_failed_pr": [],
+    "load_failed_main": [],
+    "executed": {
+      "main": 29,
+      "pr": 35
+    },
+    "messages": {}
+  },
+  "exit_check": {
+    "explained": true,
+    "problems": [],
+    "detail": "all runs exited 0"
+  },
+  "coverage": {
+    "status": "not measured",
+    "why": "the coverage report leaves out changed file(s): src/mcp_memory_service/web/api/mcp.py",
+    "changed_lines_total": null,
+    "changed_lines_covered": null,
+    "files": [
+      {
+        "file": "src/mcp_memory_service/server/handlers/memory.py",
+        "changed_lines_total": 10,
+        "changed_lines_covered": 5
+      },
+      {
+        "file": "src/mcp_memory_service/server_impl.py",
+        "changed_lines_total": 1,
+        "changed_lines_covered": 0
+      },
+      {
+        "file": "src/mcp_memory_service/web/api/mcp.py",
+        "changed_lines_total": null,
+        "changed_lines_covered": null,
+        "note": "file not measured by coverage"
+      }
+    ],
+    "seconds": 14.4,
+    "exit": 0,
+    "log": "coverage-pytest.log"
+  },
+  "probes": {
+    "status": "ran",
+    "items": [
+      {
+        "id": "model-p1",
+        "source": "model",
+        "path": "model-probes/model-p1.py",
+        "sha256": "ea8cd8e61b5d14cf09dfc61b5de05786baf728174e594d944146b8bf10fbc80a",
+        "target": "doobidoo/mcp-memory-service#1603",
+        "about": "handler.handle_store_memory",
+        "claims": [
+          {
+            "id": "C1",
+            "source": "PR description",
+            "text": "A tool call that fails now answers with `isError: true`.",
+            "covers": [
+              "C1"
+            ],
+            "expect": "differs"
+          },
+          {
+            "id": "C2",
+            "source": "PR description",
+            "text": "Before, the envelope said `isError: false` and carried the error text as ordinary content",
+            "covers": [
+              "C2"
+            ],
+            "expect": "same"
+          },
+          {
+            "id": "C3",
+            "source": "PR description",
+            "text": "New integration test on the real streamable-http transport: a refused write yields `isError: true`, an accepted write yields `false`.",
+            "covers": [
+              "C3"
+            ],
+            "expect": "differs"
+          }
+        ],
+        "runs_per_side": 3,
+        "per_run": [
+          {
+            "side": "main",
+            "run": 1,
+            "seconds": 2.0,
+            "ok": true
+          },
+          {
+            "side": "pr",
+            "run": 1,
+            "seconds": 1.9,
+            "ok": true
+          },
+          {
+            "side": "main",
+            "run": 2,
+            "seconds": 2.0,
+            "ok": true
+          },
+          {
+            "side": "pr",
+            "run": 2,
+            "seconds": 2.1,
+            "ok": true
+          },
+          {
+            "side": "main",
+            "run": 3,
+            "seconds": 2.0,
+            "ok": true
+          },
+          {
+            "side": "pr",
+            "run": 3,
+            "seconds": 2.0,
+            "ok": true
+          }
+        ],
+        "outputs": {
+          "main": [
+            "probe-model-p1-main-1.jsonl",
+            "probe-model-p1-main-2.jsonl",
+            "probe-model-p1-main-3.jsonl"
+          ],
+          "pr": [
+            "probe-model-p1-pr-1.jsonl",
+            "probe-model-p1-pr-2.jsonl",
+            "probe-model-p1-pr-3.jsonl"
+          ]
+        },
+        "runs": {
+          "main": [
+            {
+              "refused.exception_raised": null,
+              "refused.return_type": "list",
+              "refused.first_element_type": "types.TextContent",
+              "refused.first_element_text": "Error storing memory: Duplicate content detected (semantically similar to a5d7...)",
+              "accepted.exception_raised": null,
+              "accepted.return_type": "list",
+              "accepted.first_element_type": "types.TextContent",
+              "accepted.first_element_text": "Memory stored successfully (hash: abc123)"
+            },
+            {
+              "refused.exception_raised": null,
+              "refused.return_type": "list",
+              "refused.first_element_type": "types.TextContent",
+              "refused.first_element_text": "Error storing memory: Duplicate content detected (semantically similar to a5d7...)",
+              "accepted.exception_raised": null,
+              "accepted.return_type": "list",
+              "accepted.first_element_type": "types.TextContent",
+              "accepted.first_element_text": "Memory stored successfully (hash: abc123)"
+            },
+            {
+              "refused.exception_raised": null,
+              "refused.return_type": "list",
+              "refused.first_element_type": "types.TextContent",
+              "refused.first_element_text": "Error storing memory: Duplicate content detected (semantically similar to a5d7...)",
+              "accepted.exception_raised": null,
+              "accepted.return_type": "list",
+              "accepted.first_element_type": "types.TextContent",
+              "accepted.first_element_text": "Memory stored successfully (hash: abc123)"
+            }
+          ],
+          "pr": [
+            {
+              "refused.exception_raised": "RuntimeError",
+              "refused.return_type": null,
+              "refused.first_element_type": null,
+              "refused.first_element_text": null,
+              "accepted.exception_raised": null,
+              "accepted.return_type": "list",
+              "accepted.first_element_type": "types.TextContent",
+              "accepted.first_element_text": "Memory stored successfully (hash: abc123)"
+            },
+            {
+              "refused.exception_raised": "RuntimeError",
+              "refused.return_type": null,
+              "refused.first_element_type": null,
+              "refused.first_element_text": null,
+              "accepted.exception_raised": null,
+              "accepted.return_type": "list",
+              "accepted.first_element_type": "types.TextContent",
+              "accepted.first_element_text": "Memory stored successfully (hash: abc123)"
+            },
+            {
+              "refused.exception_raised": "RuntimeError",
+              "refused.return_type": null,
+              "refused.first_element_type": null,
+              "refused.first_element_text": null,
+              "accepted.exception_raised": null,
+              "accepted.return_type": "list",
+              "accepted.first_element_type": "types.TextContent",
+              "accepted.first_element_text": "Memory stored successfully (hash: abc123)"
+            }
+          ]
+        },
+        "observations": [
+          {
+            "name": "accepted.exception_raised",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": null,
+            "pr": null,
+            "citations": {
+              "main": {
+                "file": "probe-model-p1-main-1.jsonl",
+                "line": 1,
+                "quote": "\"observation\": \"accepted.exception_raised\""
+              },
+              "pr": {
+                "file": "probe-model-p1-pr-1.jsonl",
+                "line": 1,
+                "quote": "\"observation\": \"accepted.exception_raised\""
+              }
+            }
+          },
+          {
+            "name": "accepted.first_element_text",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": "Memory stored successfully (hash: abc123)",
+            "pr": "Memory stored successfully (hash: abc123)",
+            "citations": {
+              "main": {
+                "file": "probe-model-p1-main-1.jsonl",
+                "line": 2,
+                "quote": "\"observation\": \"accepted.first_element_text\""
+              },
+              "pr": {
+                "file": "probe-model-p1-pr-1.jsonl",
+                "line": 2,
+                "quote": "\"observation\": \"accepted.first_element_text\""
+              }
+            }
+          },
+          {
+            "name": "accepted.first_element_type",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": "types.TextContent",
+            "pr": "types.TextContent",
+            "citations": {
+              "main": {
+                "file": "probe-model-p1-main-1.jsonl",
+                "line": 3,
+                "quote": "\"observation\": \"accepted.first_element_type\""
+              },
+              "pr": {
+                "file": "probe-model-p1-pr-1.jsonl",
+                "line": 3,
+                "quote": "\"observation\": \"accepted.first_element_type\""
+              }
+            }
+          },
+          {
+            "name": "accepted.return_type",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": "list",
+            "pr": "list",
+            "citations": {
+              "main": {
+                "file": "probe-model-p1-main-1.jsonl",
+                "line": 4,
+                "quote": "\"observation\": \"accepted.return_type\""
+              },
+              "pr": {
+                "file": "probe-model-p1-pr-1.jsonl",
+                "line": 4,
+                "quote": "\"observation\": \"accepted.return_type\""
+              }
+            }
+          },
+          {
+            "name": "refused.exception_raised",
+            "state": "differs",
+            "label": "unmentioned",
+            "claim": null,
+            "main": null,
+            "pr": "RuntimeError",
+            "diffs": [
+              {
+                "field": "",
+                "main": null,
+                "pr": "RuntimeError"
+              }
+            ],
+            "citations": {
+              "main": {
+                "file": "probe-model-p1-main-1.jsonl",
+                "line": 5,
+                "quote": "\"observation\": \"refused.exception_raised\""
+              },
+              "pr": {
+                "file": "probe-model-p1-pr-1.jsonl",
+                "line": 5,
+                "quote": "\"observation\": \"refused.exception_raised\""
+              }
+            }
+          },
+          {
+            "name": "refused.first_element_text",
+            "state": "differs",
+            "label": "unmentioned",
+            "claim": null,
+            "main": "Error storing memory: Duplicate content detected (semantically similar to a5d7...)",
+            "pr": null,
+            "diffs": [
+              {
+                "field": "",
+                "main": "Error storing memory: Duplicate content detected (semantically similar to a5d7...)",
+                "pr": null
+              }
+            ],
+            "citations": {
+              "main": {
+                "file": "probe-model-p1-main-1.jsonl",
+                "line": 6,
+                "quote": "\"observation\": \"refused.first_element_text\""
+              },
+              "pr": {
+                "file": "probe-model-p1-pr-1.jsonl",
+                "line": 6,
+                "quote": "\"observation\": \"refused.first_element_text\""
+              }
+            }
+          },
+          {
+            "name": "refused.first_element_type",
+            "state": "differs",
+            "label": "unmentioned",
+            "claim": null,
+            "main": "types.TextContent",
+            "pr": null,
+            "diffs": [
+              {
+                "field": "",
+                "main": "types.TextContent",
+                "pr": null
+              }
+            ],
+            "citations": {
+              "main": {
+                "file": "probe-model-p1-main-1.jsonl",
+                "line": 7,
+                "quote": "\"observation\": \"refused.first_element_type\""
+              },
+              "pr": {
+                "file": "probe-model-p1-pr-1.jsonl",
+                "line": 7,
+                "quote": "\"observation\": \"refused.first_element_type\""
+              }
+            }
+          },
+          {
+            "name": "refused.return_type",
+            "state": "differs",
+            "label": "unmentioned",
+            "claim": null,
+            "main": "list",
+            "pr": null,
+            "diffs": [
+              {
+                "field": "",
+                "main": "list",
+                "pr": null
+              }
+            ],
+            "citations": {
+              "main": {
+                "file": "probe-model-p1-main-1.jsonl",
+                "line": 8,
+                "quote": "\"observation\": \"refused.return_type\""
+              },
+              "pr": {
+                "file": "probe-model-p1-pr-1.jsonl",
+                "line": 8,
+                "quote": "\"observation\": \"refused.return_type\""
+              }
+            }
+          }
+        ],
+        "generator": {
+          "kind": "model",
+          "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+          "model": "nvidia/nemotron-3-super-120b-a12b",
+          "provider": "nebius",
+          "provenance": "live",
+          "blind": true
+        },
+        "freeze": {
+          "sha256": "ea8cd8e61b5d14cf09dfc61b5de05786baf728174e594d944146b8bf10fbc80a",
+          "generator": {
+            "kind": "model",
+            "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+            "model": "nvidia/nemotron-3-super-120b-a12b",
+            "provider": "nebius",
+            "provenance": "live",
+            "blind": true
+          },
+          "frozen_at": "2026-10-22T05:31:27.779695+00:00",
+          "inputs_sha256": "0be32288fd03f3b16a66f21f004428297ce12e28a9c488b6d5f9b831d99c8a14",
+          "inputs": {
+            "title_chars": 83,
+            "body_chars": 4137,
+            "base_files": {
+              "src/mcp_memory_service/server/handlers/memory.py": "8c627907bcc679e359c48dde8fb39d7e5a76b52a3dc0102f8a6a1af510a5c2ce",
+              "src/mcp_memory_service/server_impl.py": "b36957bff711e99cde98f852d7c707938a85ab2111409eaef926e75798c7d68f",
+              "src/mcp_memory_service/web/api/mcp.py": "9c0a7304b161d1ce1bee6b6bfab2731a8d397bad91834469809a628e84e319e2"
+            }
+          },
+          "verified": true,
+          "pr_started_at": "2026-10-22T05:31:27.959206+00:00"
+        },
+        "probe_changed_line_coverage": {
+          "status": "measured",
+          "changed_lines_total": 9,
+          "changed_lines_covered": 1,
+          "files": [
+            {
+              "file": "src/mcp_memory_service/server/handlers/memory.py",
+              "changed_lines_total": 7,
+              "changed_lines_covered": 1
+            },
+            {
+              "file": "src/mcp_memory_service/server_impl.py",
+              "changed_lines_total": 2,
+              "changed_lines_covered": 0
+            },
+            {
+              "file": "src/mcp_memory_service/web/api/mcp.py",
+              "changed_lines_total": null,
+              "changed_lines_covered": null,
+              "note": "file not measured by coverage"
+            }
+          ],
+          "adequacy": "adequate",
+          "note": "ran 1 of 9 changed line(s) on the main side",
+          "exit": 0,
+          "data": "probe-cov-model-p1.json"
+        },
+        "status": "rejected",
+        "rejected_reason": "rejected: claim pattern(s) C1, C2, C3 match none of this probe's observation names, so the probe is not counted"
+      },
+      {
+        "id": "diff-api",
+        "source": "diff",
+        "path": "diff-probes/diff-api.py",
+        "sha256": "bbd984c322885d0b645bb8dae59173bf6bc5a7dac869945aad43d6c529dc0919",
+        "target": "doobidoo/mcp-memory-service#1603",
+        "about": "Public functions touched by the PR, called with type-appropriate inputs on both sides.",
+        "claims": [],
+        "runs_per_side": 3,
+        "per_run": [
+          {
+            "side": "main",
+            "run": 1,
+            "seconds": 2.2,
+            "ok": true
+          },
+          {
+            "side": "pr",
+            "run": 1,
+            "seconds": 2.2,
+            "ok": true
+          },
+          {
+            "side": "main",
+            "run": 2,
+            "seconds": 2.2,
+            "ok": true
+          },
+          {
+            "side": "pr",
+            "run": 2,
+            "seconds": 2.0,
+            "ok": true
+          },
+          {
+            "side": "main",
+            "run": 3,
+            "seconds": 2.0,
+            "ok": true
+          },
+          {
+            "side": "pr",
+            "run": 3,
+            "seconds": 2.0,
+            "ok": true
+          }
+        ],
+        "outputs": {
+          "main": [
+            "probe-diff-api-main-1.jsonl",
+            "probe-diff-api-main-2.jsonl",
+            "probe-diff-api-main-3.jsonl"
+          ],
+          "pr": [
+            "probe-diff-api-pr-1.jsonl",
+            "probe-diff-api-pr-2.jsonl",
+            "probe-diff-api-pr-3.jsonl"
+          ]
+        },
+        "runs": {
+          "main": [
+            {
+              "mcp_memory_service.server.handlers.memory.handle_memory_observe.input0": {
+                "repr": "<coroutine object handle_memory_observe>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_memory_observe.input1": {
+                "repr": "<coroutine object handle_memory_observe>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_memory_observe.input10": {
+                "repr": "<coroutine object handle_memory_observe>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_memory_observe.input11": {
+                "repr": "<coroutine object handle_memory_observe>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_memory_observe.input12": {
+                "repr": "<coroutine object handle_memory_observe>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_memory_observe.input2": {
+                "repr": "<coroutine object handle_memory_observe>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_memory_observe.input3": {
+                "repr": "<coroutine object handle_memory_observe>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_memory_observe.input4": {
+                "repr": "<coroutine object handle_memory_observe>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_memory_observe.input5": {
+                "repr": "<coroutine object handle_memory_observe>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_memory_observe.input6": {
+                "repr": "<coroutine object handle_memory_observe>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_memory_observe.input7": {
+                "repr": "<coroutine object handle_memory_observe>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_memory_observe.input8": {
+                "repr": "<coroutine object handle_memory_observe>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_memory_observe.input9": {
+                "repr": "<coroutine object handle_memory_observe>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_memory.input0": {
+                "repr": "<coroutine object handle_store_memory>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_memory.input1": {
+                "repr": "<coroutine object handle_store_memory>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_memory.input10": {
+                "repr": "<coroutine object handle_store_memory>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_memory.input11": {
+                "repr": "<coroutine object handle_store_memory>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_memory.input12": {
+                "repr": "<coroutine object handle_store_memory>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_memory.input2": {
+                "repr": "<coroutine object handle_store_memory>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_memory.input3": {
+                "repr": "<coroutine object handle_store_memory>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_memory.input4": {
+                "repr": "<coroutine object handle_store_memory>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_memory.input5": {
+                "repr": "<coroutine object handle_store_memory>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_memory.input6": {
+                "repr": "<coroutine object handle_store_memory>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_memory.input7": {
+                "repr": "<coroutine object handle_store_memory>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_memory.input8": {
+                "repr": "<coroutine object handle_store_memory>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_memory.input9": {
+                "repr": "<coroutine object handle_store_memory>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_session.input0": {
+                "repr": "<coroutine object handle_store_session>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_session.input1": {
+                "repr": "<coroutine object handle_store_session>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_session.input10": {
+                "repr": "<coroutine object handle_store_session>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_session.input11": {
+                "repr": "<coroutine object handle_store_session>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_session.input12": {
+                "repr": "<coroutine object handle_store_session>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_session.input2": {
+                "repr": "<coroutine object handle_store_session>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_session.input3": {
+                "repr": "<coroutine object handle_store_session>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_session.input4": {
+                "repr": "<coroutine object handle_store_session>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_session.input5": {
+                "repr": "<coroutine object handle_store_session>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_session.input6": {
+                "repr": "<coroutine object handle_store_session>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_session.input7": {
+                "repr": "<coroutine object handle_store_session>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_session.input8": {
+                "repr": "<coroutine object handle_store_session>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_session.input9": {
+                "repr": "<coroutine object handle_store_session>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.web.api.mcp.mcp_endpoint.input0": {
+                "repr": "<coroutine object mcp_endpoint>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.web.api.mcp.mcp_endpoint.input1": {
+                "repr": "<coroutine object mcp_endpoint>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.web.api.mcp.mcp_endpoint.input10": {
+                "repr": "<coroutine object mcp_endpoint>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.web.api.mcp.mcp_endpoint.input11": {
+                "repr": "<coroutine object mcp_endpoint>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.web.api.mcp.mcp_endpoint.input12": {
+                "repr": "<coroutine object mcp_endpoint>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.web.api.mcp.mcp_endpoint.input2": {
+                "repr": "<coroutine object mcp_endpoint>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.web.api.mcp.mcp_endpoint.input3": {
+                "repr": "<coroutine object mcp_endpoint>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.web.api.mcp.mcp_endpoint.input4": {
+                "repr": "<coroutine object mcp_endpoint>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.web.api.mcp.mcp_endpoint.input5": {
+                "repr": "<coroutine object mcp_endpoint>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.web.api.mcp.mcp_endpoint.input6": {
+                "repr": "<coroutine object mcp_endpoint>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.web.api.mcp.mcp_endpoint.input7": {
+                "repr": "<coroutine object mcp_endpoint>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.web.api.mcp.mcp_endpoint.input8": {
+                "repr": "<coroutine object mcp_endpoint>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.web.api.mcp.mcp_endpoint.input9": {
+                "repr": "<coroutine object mcp_endpoint>",
+                "type": "coroutine"
+              }
+            },
+            {
+              "mcp_memory_service.server.handlers.memory.handle_memory_observe.input0": {
+                "repr": "<coroutine object handle_memory_observe>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_memory_observe.input1": {
+                "repr": "<coroutine object handle_memory_observe>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_memory_observe.input10": {
+                "repr": "<coroutine object handle_memory_observe>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_memory_observe.input11": {
+                "repr": "<coroutine object handle_memory_observe>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_memory_observe.input12": {
+                "repr": "<coroutine object handle_memory_observe>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_memory_observe.input2": {
+                "repr": "<coroutine object handle_memory_observe>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_memory_observe.input3": {
+                "repr": "<coroutine object handle_memory_observe>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_memory_observe.input4": {
+                "repr": "<coroutine object handle_memory_observe>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_memory_observe.input5": {
+                "repr": "<coroutine object handle_memory_observe>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_memory_observe.input6": {
+                "repr": "<coroutine object handle_memory_observe>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_memory_observe.input7": {
+                "repr": "<coroutine object handle_memory_observe>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_memory_observe.input8": {
+                "repr": "<coroutine object handle_memory_observe>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_memory_observe.input9": {
+                "repr": "<coroutine object handle_memory_observe>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_memory.input0": {
+                "repr": "<coroutine object handle_store_memory>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_memory.input1": {
+                "repr": "<coroutine object handle_store_memory>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_memory.input10": {
+                "repr": "<coroutine object handle_store_memory>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_memory.input11": {
+                "repr": "<coroutine object handle_store_memory>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_memory.input12": {
+                "repr": "<coroutine object handle_store_memory>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_memory.input2": {
+                "repr": "<coroutine object handle_store_memory>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_memory.input3": {
+                "repr": "<coroutine object handle_store_memory>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_memory.input4": {
+                "repr": "<coroutine object handle_store_memory>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_memory.input5": {
+                "repr": "<coroutine object handle_store_memory>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_memory.input6": {
+                "repr": "<coroutine object handle_store_memory>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_memory.input7": {
+                "repr": "<coroutine object handle_store_memory>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_memory.input8": {
+                "repr": "<coroutine object handle_store_memory>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_memory.input9": {
+                "repr": "<coroutine object handle_store_memory>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_session.input0": {
+                "repr": "<coroutine object handle_store_session>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_session.input1": {
+                "repr": "<coroutine object handle_store_session>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_session.input10": {
+                "repr": "<coroutine object handle_store_session>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_session.input11": {
+                "repr": "<coroutine object handle_store_session>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_session.input12": {
+                "repr": "<coroutine object handle_store_session>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_session.input2": {
+                "repr": "<coroutine object handle_store_session>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_session.input3": {
+                "repr": "<coroutine object handle_store_session>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_session.input4": {
+                "repr": "<coroutine object handle_store_session>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_session.input5": {
+                "repr": "<coroutine object handle_store_session>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_session.input6": {
+                "repr": "<coroutine object handle_store_session>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_session.input7": {
+                "repr": "<coroutine object handle_store_session>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_session.input8": {
+                "repr": "<coroutine object handle_store_session>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_session.input9": {
+                "repr": "<coroutine object handle_store_session>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.web.api.mcp.mcp_endpoint.input0": {
+                "repr": "<coroutine object mcp_endpoint>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.web.api.mcp.mcp_endpoint.input1": {
+                "repr": "<coroutine object mcp_endpoint>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.web.api.mcp.mcp_endpoint.input10": {
+                "repr": "<coroutine object mcp_endpoint>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.web.api.mcp.mcp_endpoint.input11": {
+                "repr": "<coroutine object mcp_endpoint>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.web.api.mcp.mcp_endpoint.input12": {
+                "repr": "<coroutine object mcp_endpoint>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.web.api.mcp.mcp_endpoint.input2": {
+                "repr": "<coroutine object mcp_endpoint>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.web.api.mcp.mcp_endpoint.input3": {
+                "repr": "<coroutine object mcp_endpoint>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.web.api.mcp.mcp_endpoint.input4": {
+                "repr": "<coroutine object mcp_endpoint>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.web.api.mcp.mcp_endpoint.input5": {
+                "repr": "<coroutine object mcp_endpoint>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.web.api.mcp.mcp_endpoint.input6": {
+                "repr": "<coroutine object mcp_endpoint>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.web.api.mcp.mcp_endpoint.input7": {
+                "repr": "<coroutine object mcp_endpoint>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.web.api.mcp.mcp_endpoint.input8": {
+                "repr": "<coroutine object mcp_endpoint>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.web.api.mcp.mcp_endpoint.input9": {
+                "repr": "<coroutine object mcp_endpoint>",
+                "type": "coroutine"
+              }
+            },
+            {
+              "mcp_memory_service.server.handlers.memory.handle_memory_observe.input0": {
+                "repr": "<coroutine object handle_memory_observe>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_memory_observe.input1": {
+                "repr": "<coroutine object handle_memory_observe>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_memory_observe.input10": {
+                "repr": "<coroutine object handle_memory_observe>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_memory_observe.input11": {
+                "repr": "<coroutine object handle_memory_observe>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_memory_observe.input12": {
+                "repr": "<coroutine object handle_memory_observe>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_memory_observe.input2": {
+                "repr": "<coroutine object handle_memory_observe>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_memory_observe.input3": {
+                "repr": "<coroutine object handle_memory_observe>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_memory_observe.input4": {
+                "repr": "<coroutine object handle_memory_observe>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_memory_observe.input5": {
+                "repr": "<coroutine object handle_memory_observe>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_memory_observe.input6": {
+                "repr": "<coroutine object handle_memory_observe>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_memory_observe.input7": {
+                "repr": "<coroutine object handle_memory_observe>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_memory_observe.input8": {
+                "repr": "<coroutine object handle_memory_observe>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_memory_observe.input9": {
+                "repr": "<coroutine object handle_memory_observe>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_memory.input0": {
+                "repr": "<coroutine object handle_store_memory>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_memory.input1": {
+                "repr": "<coroutine object handle_store_memory>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_memory.input10": {
+                "repr": "<coroutine object handle_store_memory>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_memory.input11": {
+                "repr": "<coroutine object handle_store_memory>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_memory.input12": {
+                "repr": "<coroutine object handle_store_memory>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_memory.input2": {
+                "repr": "<coroutine object handle_store_memory>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_memory.input3": {
+                "repr": "<coroutine object handle_store_memory>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_memory.input4": {
+                "repr": "<coroutine object handle_store_memory>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_memory.input5": {
+                "repr": "<coroutine object handle_store_memory>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_memory.input6": {
+                "repr": "<coroutine object handle_store_memory>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_memory.input7": {
+                "repr": "<coroutine object handle_store_memory>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_memory.input8": {
+                "repr": "<coroutine object handle_store_memory>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_memory.input9": {
+                "repr": "<coroutine object handle_store_memory>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_session.input0": {
+                "repr": "<coroutine object handle_store_session>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_session.input1": {
+                "repr": "<coroutine object handle_store_session>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_session.input10": {
+                "repr": "<coroutine object handle_store_session>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_session.input11": {
+                "repr": "<coroutine object handle_store_session>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_session.input12": {
+                "repr": "<coroutine object handle_store_session>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_session.input2": {
+                "repr": "<coroutine object handle_store_session>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_session.input3": {
+                "repr": "<coroutine object handle_store_session>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_session.input4": {
+                "repr": "<coroutine object handle_store_session>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_session.input5": {
+                "repr": "<coroutine object handle_store_session>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_session.input6": {
+                "repr": "<coroutine object handle_store_session>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_session.input7": {
+                "repr": "<coroutine object handle_store_session>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_session.input8": {
+                "repr": "<coroutine object handle_store_session>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_session.input9": {
+                "repr": "<coroutine object handle_store_session>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.web.api.mcp.mcp_endpoint.input0": {
+                "repr": "<coroutine object mcp_endpoint>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.web.api.mcp.mcp_endpoint.input1": {
+                "repr": "<coroutine object mcp_endpoint>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.web.api.mcp.mcp_endpoint.input10": {
+                "repr": "<coroutine object mcp_endpoint>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.web.api.mcp.mcp_endpoint.input11": {
+                "repr": "<coroutine object mcp_endpoint>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.web.api.mcp.mcp_endpoint.input12": {
+                "repr": "<coroutine object mcp_endpoint>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.web.api.mcp.mcp_endpoint.input2": {
+                "repr": "<coroutine object mcp_endpoint>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.web.api.mcp.mcp_endpoint.input3": {
+                "repr": "<coroutine object mcp_endpoint>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.web.api.mcp.mcp_endpoint.input4": {
+                "repr": "<coroutine object mcp_endpoint>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.web.api.mcp.mcp_endpoint.input5": {
+                "repr": "<coroutine object mcp_endpoint>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.web.api.mcp.mcp_endpoint.input6": {
+                "repr": "<coroutine object mcp_endpoint>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.web.api.mcp.mcp_endpoint.input7": {
+                "repr": "<coroutine object mcp_endpoint>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.web.api.mcp.mcp_endpoint.input8": {
+                "repr": "<coroutine object mcp_endpoint>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.web.api.mcp.mcp_endpoint.input9": {
+                "repr": "<coroutine object mcp_endpoint>",
+                "type": "coroutine"
+              }
+            }
+          ],
+          "pr": [
+            {
+              "mcp_memory_service.server.handlers.memory.handle_memory_observe.input0": {
+                "repr": "<coroutine object handle_memory_observe>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_memory_observe.input1": {
+                "repr": "<coroutine object handle_memory_observe>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_memory_observe.input10": {
+                "repr": "<coroutine object handle_memory_observe>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_memory_observe.input11": {
+                "repr": "<coroutine object handle_memory_observe>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_memory_observe.input12": {
+                "repr": "<coroutine object handle_memory_observe>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_memory_observe.input2": {
+                "repr": "<coroutine object handle_memory_observe>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_memory_observe.input3": {
+                "repr": "<coroutine object handle_memory_observe>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_memory_observe.input4": {
+                "repr": "<coroutine object handle_memory_observe>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_memory_observe.input5": {
+                "repr": "<coroutine object handle_memory_observe>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_memory_observe.input6": {
+                "repr": "<coroutine object handle_memory_observe>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_memory_observe.input7": {
+                "repr": "<coroutine object handle_memory_observe>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_memory_observe.input8": {
+                "repr": "<coroutine object handle_memory_observe>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_memory_observe.input9": {
+                "repr": "<coroutine object handle_memory_observe>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_memory.input0": {
+                "repr": "<coroutine object handle_store_memory>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_memory.input1": {
+                "repr": "<coroutine object handle_store_memory>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_memory.input10": {
+                "repr": "<coroutine object handle_store_memory>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_memory.input11": {
+                "repr": "<coroutine object handle_store_memory>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_memory.input12": {
+                "repr": "<coroutine object handle_store_memory>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_memory.input2": {
+                "repr": "<coroutine object handle_store_memory>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_memory.input3": {
+                "repr": "<coroutine object handle_store_memory>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_memory.input4": {
+                "repr": "<coroutine object handle_store_memory>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_memory.input5": {
+                "repr": "<coroutine object handle_store_memory>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_memory.input6": {
+                "repr": "<coroutine object handle_store_memory>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_memory.input7": {
+                "repr": "<coroutine object handle_store_memory>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_memory.input8": {
+                "repr": "<coroutine object handle_store_memory>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_memory.input9": {
+                "repr": "<coroutine object handle_store_memory>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_session.input0": {
+                "repr": "<coroutine object handle_store_session>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_session.input1": {
+                "repr": "<coroutine object handle_store_session>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_session.input10": {
+                "repr": "<coroutine object handle_store_session>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_session.input11": {
+                "repr": "<coroutine object handle_store_session>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_session.input12": {
+                "repr": "<coroutine object handle_store_session>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_session.input2": {
+                "repr": "<coroutine object handle_store_session>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_session.input3": {
+                "repr": "<coroutine object handle_store_session>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_session.input4": {
+                "repr": "<coroutine object handle_store_session>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_session.input5": {
+                "repr": "<coroutine object handle_store_session>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_session.input6": {
+                "repr": "<coroutine object handle_store_session>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_session.input7": {
+                "repr": "<coroutine object handle_store_session>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_session.input8": {
+                "repr": "<coroutine object handle_store_session>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_session.input9": {
+                "repr": "<coroutine object handle_store_session>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.web.api.mcp.mcp_endpoint.input0": {
+                "repr": "<coroutine object mcp_endpoint>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.web.api.mcp.mcp_endpoint.input1": {
+                "repr": "<coroutine object mcp_endpoint>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.web.api.mcp.mcp_endpoint.input10": {
+                "repr": "<coroutine object mcp_endpoint>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.web.api.mcp.mcp_endpoint.input11": {
+                "repr": "<coroutine object mcp_endpoint>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.web.api.mcp.mcp_endpoint.input12": {
+                "repr": "<coroutine object mcp_endpoint>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.web.api.mcp.mcp_endpoint.input2": {
+                "repr": "<coroutine object mcp_endpoint>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.web.api.mcp.mcp_endpoint.input3": {
+                "repr": "<coroutine object mcp_endpoint>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.web.api.mcp.mcp_endpoint.input4": {
+                "repr": "<coroutine object mcp_endpoint>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.web.api.mcp.mcp_endpoint.input5": {
+                "repr": "<coroutine object mcp_endpoint>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.web.api.mcp.mcp_endpoint.input6": {
+                "repr": "<coroutine object mcp_endpoint>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.web.api.mcp.mcp_endpoint.input7": {
+                "repr": "<coroutine object mcp_endpoint>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.web.api.mcp.mcp_endpoint.input8": {
+                "repr": "<coroutine object mcp_endpoint>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.web.api.mcp.mcp_endpoint.input9": {
+                "repr": "<coroutine object mcp_endpoint>",
+                "type": "coroutine"
+              }
+            },
+            {
+              "mcp_memory_service.server.handlers.memory.handle_memory_observe.input0": {
+                "repr": "<coroutine object handle_memory_observe>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_memory_observe.input1": {
+                "repr": "<coroutine object handle_memory_observe>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_memory_observe.input10": {
+                "repr": "<coroutine object handle_memory_observe>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_memory_observe.input11": {
+                "repr": "<coroutine object handle_memory_observe>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_memory_observe.input12": {
+                "repr": "<coroutine object handle_memory_observe>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_memory_observe.input2": {
+                "repr": "<coroutine object handle_memory_observe>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_memory_observe.input3": {
+                "repr": "<coroutine object handle_memory_observe>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_memory_observe.input4": {
+                "repr": "<coroutine object handle_memory_observe>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_memory_observe.input5": {
+                "repr": "<coroutine object handle_memory_observe>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_memory_observe.input6": {
+                "repr": "<coroutine object handle_memory_observe>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_memory_observe.input7": {
+                "repr": "<coroutine object handle_memory_observe>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_memory_observe.input8": {
+                "repr": "<coroutine object handle_memory_observe>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_memory_observe.input9": {
+                "repr": "<coroutine object handle_memory_observe>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_memory.input0": {
+                "repr": "<coroutine object handle_store_memory>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_memory.input1": {
+                "repr": "<coroutine object handle_store_memory>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_memory.input10": {
+                "repr": "<coroutine object handle_store_memory>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_memory.input11": {
+                "repr": "<coroutine object handle_store_memory>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_memory.input12": {
+                "repr": "<coroutine object handle_store_memory>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_memory.input2": {
+                "repr": "<coroutine object handle_store_memory>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_memory.input3": {
+                "repr": "<coroutine object handle_store_memory>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_memory.input4": {
+                "repr": "<coroutine object handle_store_memory>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_memory.input5": {
+                "repr": "<coroutine object handle_store_memory>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_memory.input6": {
+                "repr": "<coroutine object handle_store_memory>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_memory.input7": {
+                "repr": "<coroutine object handle_store_memory>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_memory.input8": {
+                "repr": "<coroutine object handle_store_memory>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_memory.input9": {
+                "repr": "<coroutine object handle_store_memory>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_session.input0": {
+                "repr": "<coroutine object handle_store_session>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_session.input1": {
+                "repr": "<coroutine object handle_store_session>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_session.input10": {
+                "repr": "<coroutine object handle_store_session>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_session.input11": {
+                "repr": "<coroutine object handle_store_session>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_session.input12": {
+                "repr": "<coroutine object handle_store_session>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_session.input2": {
+                "repr": "<coroutine object handle_store_session>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_session.input3": {
+                "repr": "<coroutine object handle_store_session>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_session.input4": {
+                "repr": "<coroutine object handle_store_session>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_session.input5": {
+                "repr": "<coroutine object handle_store_session>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_session.input6": {
+                "repr": "<coroutine object handle_store_session>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_session.input7": {
+                "repr": "<coroutine object handle_store_session>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_session.input8": {
+                "repr": "<coroutine object handle_store_session>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_session.input9": {
+                "repr": "<coroutine object handle_store_session>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.web.api.mcp.mcp_endpoint.input0": {
+                "repr": "<coroutine object mcp_endpoint>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.web.api.mcp.mcp_endpoint.input1": {
+                "repr": "<coroutine object mcp_endpoint>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.web.api.mcp.mcp_endpoint.input10": {
+                "repr": "<coroutine object mcp_endpoint>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.web.api.mcp.mcp_endpoint.input11": {
+                "repr": "<coroutine object mcp_endpoint>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.web.api.mcp.mcp_endpoint.input12": {
+                "repr": "<coroutine object mcp_endpoint>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.web.api.mcp.mcp_endpoint.input2": {
+                "repr": "<coroutine object mcp_endpoint>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.web.api.mcp.mcp_endpoint.input3": {
+                "repr": "<coroutine object mcp_endpoint>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.web.api.mcp.mcp_endpoint.input4": {
+                "repr": "<coroutine object mcp_endpoint>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.web.api.mcp.mcp_endpoint.input5": {
+                "repr": "<coroutine object mcp_endpoint>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.web.api.mcp.mcp_endpoint.input6": {
+                "repr": "<coroutine object mcp_endpoint>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.web.api.mcp.mcp_endpoint.input7": {
+                "repr": "<coroutine object mcp_endpoint>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.web.api.mcp.mcp_endpoint.input8": {
+                "repr": "<coroutine object mcp_endpoint>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.web.api.mcp.mcp_endpoint.input9": {
+                "repr": "<coroutine object mcp_endpoint>",
+                "type": "coroutine"
+              }
+            },
+            {
+              "mcp_memory_service.server.handlers.memory.handle_memory_observe.input0": {
+                "repr": "<coroutine object handle_memory_observe>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_memory_observe.input1": {
+                "repr": "<coroutine object handle_memory_observe>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_memory_observe.input10": {
+                "repr": "<coroutine object handle_memory_observe>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_memory_observe.input11": {
+                "repr": "<coroutine object handle_memory_observe>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_memory_observe.input12": {
+                "repr": "<coroutine object handle_memory_observe>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_memory_observe.input2": {
+                "repr": "<coroutine object handle_memory_observe>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_memory_observe.input3": {
+                "repr": "<coroutine object handle_memory_observe>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_memory_observe.input4": {
+                "repr": "<coroutine object handle_memory_observe>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_memory_observe.input5": {
+                "repr": "<coroutine object handle_memory_observe>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_memory_observe.input6": {
+                "repr": "<coroutine object handle_memory_observe>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_memory_observe.input7": {
+                "repr": "<coroutine object handle_memory_observe>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_memory_observe.input8": {
+                "repr": "<coroutine object handle_memory_observe>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_memory_observe.input9": {
+                "repr": "<coroutine object handle_memory_observe>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_memory.input0": {
+                "repr": "<coroutine object handle_store_memory>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_memory.input1": {
+                "repr": "<coroutine object handle_store_memory>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_memory.input10": {
+                "repr": "<coroutine object handle_store_memory>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_memory.input11": {
+                "repr": "<coroutine object handle_store_memory>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_memory.input12": {
+                "repr": "<coroutine object handle_store_memory>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_memory.input2": {
+                "repr": "<coroutine object handle_store_memory>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_memory.input3": {
+                "repr": "<coroutine object handle_store_memory>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_memory.input4": {
+                "repr": "<coroutine object handle_store_memory>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_memory.input5": {
+                "repr": "<coroutine object handle_store_memory>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_memory.input6": {
+                "repr": "<coroutine object handle_store_memory>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_memory.input7": {
+                "repr": "<coroutine object handle_store_memory>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_memory.input8": {
+                "repr": "<coroutine object handle_store_memory>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_memory.input9": {
+                "repr": "<coroutine object handle_store_memory>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_session.input0": {
+                "repr": "<coroutine object handle_store_session>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_session.input1": {
+                "repr": "<coroutine object handle_store_session>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_session.input10": {
+                "repr": "<coroutine object handle_store_session>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_session.input11": {
+                "repr": "<coroutine object handle_store_session>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_session.input12": {
+                "repr": "<coroutine object handle_store_session>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_session.input2": {
+                "repr": "<coroutine object handle_store_session>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_session.input3": {
+                "repr": "<coroutine object handle_store_session>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_session.input4": {
+                "repr": "<coroutine object handle_store_session>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_session.input5": {
+                "repr": "<coroutine object handle_store_session>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_session.input6": {
+                "repr": "<coroutine object handle_store_session>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_session.input7": {
+                "repr": "<coroutine object handle_store_session>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_session.input8": {
+                "repr": "<coroutine object handle_store_session>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.server.handlers.memory.handle_store_session.input9": {
+                "repr": "<coroutine object handle_store_session>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.web.api.mcp.mcp_endpoint.input0": {
+                "repr": "<coroutine object mcp_endpoint>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.web.api.mcp.mcp_endpoint.input1": {
+                "repr": "<coroutine object mcp_endpoint>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.web.api.mcp.mcp_endpoint.input10": {
+                "repr": "<coroutine object mcp_endpoint>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.web.api.mcp.mcp_endpoint.input11": {
+                "repr": "<coroutine object mcp_endpoint>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.web.api.mcp.mcp_endpoint.input12": {
+                "repr": "<coroutine object mcp_endpoint>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.web.api.mcp.mcp_endpoint.input2": {
+                "repr": "<coroutine object mcp_endpoint>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.web.api.mcp.mcp_endpoint.input3": {
+                "repr": "<coroutine object mcp_endpoint>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.web.api.mcp.mcp_endpoint.input4": {
+                "repr": "<coroutine object mcp_endpoint>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.web.api.mcp.mcp_endpoint.input5": {
+                "repr": "<coroutine object mcp_endpoint>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.web.api.mcp.mcp_endpoint.input6": {
+                "repr": "<coroutine object mcp_endpoint>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.web.api.mcp.mcp_endpoint.input7": {
+                "repr": "<coroutine object mcp_endpoint>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.web.api.mcp.mcp_endpoint.input8": {
+                "repr": "<coroutine object mcp_endpoint>",
+                "type": "coroutine"
+              },
+              "mcp_memory_service.web.api.mcp.mcp_endpoint.input9": {
+                "repr": "<coroutine object mcp_endpoint>",
+                "type": "coroutine"
+              }
+            }
+          ]
+        },
+        "observations": [
+          {
+            "name": "mcp_memory_service.server.handlers.memory.handle_memory_observe.input0",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "repr": "<coroutine object handle_memory_observe>",
+              "type": "coroutine"
+            },
+            "pr": {
+              "repr": "<coroutine object handle_memory_observe>",
+              "type": "coroutine"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 1,
+                "quote": "\"observation\": \"mcp_memory_service.server.handlers.memory.handle_memory_observe.input0\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 1,
+                "quote": "\"observation\": \"mcp_memory_service.server.handlers.memory.handle_memory_observe.input0\""
+              }
+            }
+          },
+          {
+            "name": "mcp_memory_service.server.handlers.memory.handle_memory_observe.input1",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "repr": "<coroutine object handle_memory_observe>",
+              "type": "coroutine"
+            },
+            "pr": {
+              "repr": "<coroutine object handle_memory_observe>",
+              "type": "coroutine"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 2,
+                "quote": "\"observation\": \"mcp_memory_service.server.handlers.memory.handle_memory_observe.input1\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 2,
+                "quote": "\"observation\": \"mcp_memory_service.server.handlers.memory.handle_memory_observe.input1\""
+              }
+            }
+          },
+          {
+            "name": "mcp_memory_service.server.handlers.memory.handle_memory_observe.input10",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "repr": "<coroutine object handle_memory_observe>",
+              "type": "coroutine"
+            },
+            "pr": {
+              "repr": "<coroutine object handle_memory_observe>",
+              "type": "coroutine"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 3,
+                "quote": "\"observation\": \"mcp_memory_service.server.handlers.memory.handle_memory_observe.input10\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 3,
+                "quote": "\"observation\": \"mcp_memory_service.server.handlers.memory.handle_memory_observe.input10\""
+              }
+            }
+          },
+          {
+            "name": "mcp_memory_service.server.handlers.memory.handle_memory_observe.input11",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "repr": "<coroutine object handle_memory_observe>",
+              "type": "coroutine"
+            },
+            "pr": {
+              "repr": "<coroutine object handle_memory_observe>",
+              "type": "coroutine"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 4,
+                "quote": "\"observation\": \"mcp_memory_service.server.handlers.memory.handle_memory_observe.input11\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 4,
+                "quote": "\"observation\": \"mcp_memory_service.server.handlers.memory.handle_memory_observe.input11\""
+              }
+            }
+          },
+          {
+            "name": "mcp_memory_service.server.handlers.memory.handle_memory_observe.input12",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "repr": "<coroutine object handle_memory_observe>",
+              "type": "coroutine"
+            },
+            "pr": {
+              "repr": "<coroutine object handle_memory_observe>",
+              "type": "coroutine"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 5,
+                "quote": "\"observation\": \"mcp_memory_service.server.handlers.memory.handle_memory_observe.input12\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 5,
+                "quote": "\"observation\": \"mcp_memory_service.server.handlers.memory.handle_memory_observe.input12\""
+              }
+            }
+          },
+          {
+            "name": "mcp_memory_service.server.handlers.memory.handle_memory_observe.input2",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "repr": "<coroutine object handle_memory_observe>",
+              "type": "coroutine"
+            },
+            "pr": {
+              "repr": "<coroutine object handle_memory_observe>",
+              "type": "coroutine"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 6,
+                "quote": "\"observation\": \"mcp_memory_service.server.handlers.memory.handle_memory_observe.input2\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 6,
+                "quote": "\"observation\": \"mcp_memory_service.server.handlers.memory.handle_memory_observe.input2\""
+              }
+            }
+          },
+          {
+            "name": "mcp_memory_service.server.handlers.memory.handle_memory_observe.input3",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "repr": "<coroutine object handle_memory_observe>",
+              "type": "coroutine"
+            },
+            "pr": {
+              "repr": "<coroutine object handle_memory_observe>",
+              "type": "coroutine"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 7,
+                "quote": "\"observation\": \"mcp_memory_service.server.handlers.memory.handle_memory_observe.input3\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 7,
+                "quote": "\"observation\": \"mcp_memory_service.server.handlers.memory.handle_memory_observe.input3\""
+              }
+            }
+          },
+          {
+            "name": "mcp_memory_service.server.handlers.memory.handle_memory_observe.input4",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "repr": "<coroutine object handle_memory_observe>",
+              "type": "coroutine"
+            },
+            "pr": {
+              "repr": "<coroutine object handle_memory_observe>",
+              "type": "coroutine"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 8,
+                "quote": "\"observation\": \"mcp_memory_service.server.handlers.memory.handle_memory_observe.input4\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 8,
+                "quote": "\"observation\": \"mcp_memory_service.server.handlers.memory.handle_memory_observe.input4\""
+              }
+            }
+          },
+          {
+            "name": "mcp_memory_service.server.handlers.memory.handle_memory_observe.input5",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "repr": "<coroutine object handle_memory_observe>",
+              "type": "coroutine"
+            },
+            "pr": {
+              "repr": "<coroutine object handle_memory_observe>",
+              "type": "coroutine"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 9,
+                "quote": "\"observation\": \"mcp_memory_service.server.handlers.memory.handle_memory_observe.input5\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 9,
+                "quote": "\"observation\": \"mcp_memory_service.server.handlers.memory.handle_memory_observe.input5\""
+              }
+            }
+          },
+          {
+            "name": "mcp_memory_service.server.handlers.memory.handle_memory_observe.input6",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "repr": "<coroutine object handle_memory_observe>",
+              "type": "coroutine"
+            },
+            "pr": {
+              "repr": "<coroutine object handle_memory_observe>",
+              "type": "coroutine"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 10,
+                "quote": "\"observation\": \"mcp_memory_service.server.handlers.memory.handle_memory_observe.input6\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 10,
+                "quote": "\"observation\": \"mcp_memory_service.server.handlers.memory.handle_memory_observe.input6\""
+              }
+            }
+          },
+          {
+            "name": "mcp_memory_service.server.handlers.memory.handle_memory_observe.input7",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "repr": "<coroutine object handle_memory_observe>",
+              "type": "coroutine"
+            },
+            "pr": {
+              "repr": "<coroutine object handle_memory_observe>",
+              "type": "coroutine"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 11,
+                "quote": "\"observation\": \"mcp_memory_service.server.handlers.memory.handle_memory_observe.input7\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 11,
+                "quote": "\"observation\": \"mcp_memory_service.server.handlers.memory.handle_memory_observe.input7\""
+              }
+            }
+          },
+          {
+            "name": "mcp_memory_service.server.handlers.memory.handle_memory_observe.input8",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "repr": "<coroutine object handle_memory_observe>",
+              "type": "coroutine"
+            },
+            "pr": {
+              "repr": "<coroutine object handle_memory_observe>",
+              "type": "coroutine"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 12,
+                "quote": "\"observation\": \"mcp_memory_service.server.handlers.memory.handle_memory_observe.input8\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 12,
+                "quote": "\"observation\": \"mcp_memory_service.server.handlers.memory.handle_memory_observe.input8\""
+              }
+            }
+          },
+          {
+            "name": "mcp_memory_service.server.handlers.memory.handle_memory_observe.input9",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "repr": "<coroutine object handle_memory_observe>",
+              "type": "coroutine"
+            },
+            "pr": {
+              "repr": "<coroutine object handle_memory_observe>",
+              "type": "coroutine"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 13,
+                "quote": "\"observation\": \"mcp_memory_service.server.handlers.memory.handle_memory_observe.input9\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 13,
+                "quote": "\"observation\": \"mcp_memory_service.server.handlers.memory.handle_memory_observe.input9\""
+              }
+            }
+          },
+          {
+            "name": "mcp_memory_service.server.handlers.memory.handle_store_memory.input0",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "repr": "<coroutine object handle_store_memory>",
+              "type": "coroutine"
+            },
+            "pr": {
+              "repr": "<coroutine object handle_store_memory>",
+              "type": "coroutine"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 14,
+                "quote": "\"observation\": \"mcp_memory_service.server.handlers.memory.handle_store_memory.input0\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 14,
+                "quote": "\"observation\": \"mcp_memory_service.server.handlers.memory.handle_store_memory.input0\""
+              }
+            }
+          },
+          {
+            "name": "mcp_memory_service.server.handlers.memory.handle_store_memory.input1",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "repr": "<coroutine object handle_store_memory>",
+              "type": "coroutine"
+            },
+            "pr": {
+              "repr": "<coroutine object handle_store_memory>",
+              "type": "coroutine"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 15,
+                "quote": "\"observation\": \"mcp_memory_service.server.handlers.memory.handle_store_memory.input1\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 15,
+                "quote": "\"observation\": \"mcp_memory_service.server.handlers.memory.handle_store_memory.input1\""
+              }
+            }
+          },
+          {
+            "name": "mcp_memory_service.server.handlers.memory.handle_store_memory.input10",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "repr": "<coroutine object handle_store_memory>",
+              "type": "coroutine"
+            },
+            "pr": {
+              "repr": "<coroutine object handle_store_memory>",
+              "type": "coroutine"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 16,
+                "quote": "\"observation\": \"mcp_memory_service.server.handlers.memory.handle_store_memory.input10\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 16,
+                "quote": "\"observation\": \"mcp_memory_service.server.handlers.memory.handle_store_memory.input10\""
+              }
+            }
+          },
+          {
+            "name": "mcp_memory_service.server.handlers.memory.handle_store_memory.input11",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "repr": "<coroutine object handle_store_memory>",
+              "type": "coroutine"
+            },
+            "pr": {
+              "repr": "<coroutine object handle_store_memory>",
+              "type": "coroutine"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 17,
+                "quote": "\"observation\": \"mcp_memory_service.server.handlers.memory.handle_store_memory.input11\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 17,
+                "quote": "\"observation\": \"mcp_memory_service.server.handlers.memory.handle_store_memory.input11\""
+              }
+            }
+          },
+          {
+            "name": "mcp_memory_service.server.handlers.memory.handle_store_memory.input12",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "repr": "<coroutine object handle_store_memory>",
+              "type": "coroutine"
+            },
+            "pr": {
+              "repr": "<coroutine object handle_store_memory>",
+              "type": "coroutine"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 18,
+                "quote": "\"observation\": \"mcp_memory_service.server.handlers.memory.handle_store_memory.input12\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 18,
+                "quote": "\"observation\": \"mcp_memory_service.server.handlers.memory.handle_store_memory.input12\""
+              }
+            }
+          },
+          {
+            "name": "mcp_memory_service.server.handlers.memory.handle_store_memory.input2",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "repr": "<coroutine object handle_store_memory>",
+              "type": "coroutine"
+            },
+            "pr": {
+              "repr": "<coroutine object handle_store_memory>",
+              "type": "coroutine"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 19,
+                "quote": "\"observation\": \"mcp_memory_service.server.handlers.memory.handle_store_memory.input2\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 19,
+                "quote": "\"observation\": \"mcp_memory_service.server.handlers.memory.handle_store_memory.input2\""
+              }
+            }
+          },
+          {
+            "name": "mcp_memory_service.server.handlers.memory.handle_store_memory.input3",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "repr": "<coroutine object handle_store_memory>",
+              "type": "coroutine"
+            },
+            "pr": {
+              "repr": "<coroutine object handle_store_memory>",
+              "type": "coroutine"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 20,
+                "quote": "\"observation\": \"mcp_memory_service.server.handlers.memory.handle_store_memory.input3\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 20,
+                "quote": "\"observation\": \"mcp_memory_service.server.handlers.memory.handle_store_memory.input3\""
+              }
+            }
+          },
+          {
+            "name": "mcp_memory_service.server.handlers.memory.handle_store_memory.input4",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "repr": "<coroutine object handle_store_memory>",
+              "type": "coroutine"
+            },
+            "pr": {
+              "repr": "<coroutine object handle_store_memory>",
+              "type": "coroutine"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 21,
+                "quote": "\"observation\": \"mcp_memory_service.server.handlers.memory.handle_store_memory.input4\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 21,
+                "quote": "\"observation\": \"mcp_memory_service.server.handlers.memory.handle_store_memory.input4\""
+              }
+            }
+          },
+          {
+            "name": "mcp_memory_service.server.handlers.memory.handle_store_memory.input5",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "repr": "<coroutine object handle_store_memory>",
+              "type": "coroutine"
+            },
+            "pr": {
+              "repr": "<coroutine object handle_store_memory>",
+              "type": "coroutine"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 22,
+                "quote": "\"observation\": \"mcp_memory_service.server.handlers.memory.handle_store_memory.input5\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 22,
+                "quote": "\"observation\": \"mcp_memory_service.server.handlers.memory.handle_store_memory.input5\""
+              }
+            }
+          },
+          {
+            "name": "mcp_memory_service.server.handlers.memory.handle_store_memory.input6",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "repr": "<coroutine object handle_store_memory>",
+              "type": "coroutine"
+            },
+            "pr": {
+              "repr": "<coroutine object handle_store_memory>",
+              "type": "coroutine"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 23,
+                "quote": "\"observation\": \"mcp_memory_service.server.handlers.memory.handle_store_memory.input6\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 23,
+                "quote": "\"observation\": \"mcp_memory_service.server.handlers.memory.handle_store_memory.input6\""
+              }
+            }
+          },
+          {
+            "name": "mcp_memory_service.server.handlers.memory.handle_store_memory.input7",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "repr": "<coroutine object handle_store_memory>",
+              "type": "coroutine"
+            },
+            "pr": {
+              "repr": "<coroutine object handle_store_memory>",
+              "type": "coroutine"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 24,
+                "quote": "\"observation\": \"mcp_memory_service.server.handlers.memory.handle_store_memory.input7\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 24,
+                "quote": "\"observation\": \"mcp_memory_service.server.handlers.memory.handle_store_memory.input7\""
+              }
+            }
+          },
+          {
+            "name": "mcp_memory_service.server.handlers.memory.handle_store_memory.input8",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "repr": "<coroutine object handle_store_memory>",
+              "type": "coroutine"
+            },
+            "pr": {
+              "repr": "<coroutine object handle_store_memory>",
+              "type": "coroutine"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 25,
+                "quote": "\"observation\": \"mcp_memory_service.server.handlers.memory.handle_store_memory.input8\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 25,
+                "quote": "\"observation\": \"mcp_memory_service.server.handlers.memory.handle_store_memory.input8\""
+              }
+            }
+          },
+          {
+            "name": "mcp_memory_service.server.handlers.memory.handle_store_memory.input9",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "repr": "<coroutine object handle_store_memory>",
+              "type": "coroutine"
+            },
+            "pr": {
+              "repr": "<coroutine object handle_store_memory>",
+              "type": "coroutine"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 26,
+                "quote": "\"observation\": \"mcp_memory_service.server.handlers.memory.handle_store_memory.input9\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 26,
+                "quote": "\"observation\": \"mcp_memory_service.server.handlers.memory.handle_store_memory.input9\""
+              }
+            }
+          },
+          {
+            "name": "mcp_memory_service.server.handlers.memory.handle_store_session.input0",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "repr": "<coroutine object handle_store_session>",
+              "type": "coroutine"
+            },
+            "pr": {
+              "repr": "<coroutine object handle_store_session>",
+              "type": "coroutine"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 27,
+                "quote": "\"observation\": \"mcp_memory_service.server.handlers.memory.handle_store_session.input0\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 27,
+                "quote": "\"observation\": \"mcp_memory_service.server.handlers.memory.handle_store_session.input0\""
+              }
+            }
+          },
+          {
+            "name": "mcp_memory_service.server.handlers.memory.handle_store_session.input1",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "repr": "<coroutine object handle_store_session>",
+              "type": "coroutine"
+            },
+            "pr": {
+              "repr": "<coroutine object handle_store_session>",
+              "type": "coroutine"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 28,
+                "quote": "\"observation\": \"mcp_memory_service.server.handlers.memory.handle_store_session.input1\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 28,
+                "quote": "\"observation\": \"mcp_memory_service.server.handlers.memory.handle_store_session.input1\""
+              }
+            }
+          },
+          {
+            "name": "mcp_memory_service.server.handlers.memory.handle_store_session.input10",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "repr": "<coroutine object handle_store_session>",
+              "type": "coroutine"
+            },
+            "pr": {
+              "repr": "<coroutine object handle_store_session>",
+              "type": "coroutine"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 29,
+                "quote": "\"observation\": \"mcp_memory_service.server.handlers.memory.handle_store_session.input10\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 29,
+                "quote": "\"observation\": \"mcp_memory_service.server.handlers.memory.handle_store_session.input10\""
+              }
+            }
+          },
+          {
+            "name": "mcp_memory_service.server.handlers.memory.handle_store_session.input11",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "repr": "<coroutine object handle_store_session>",
+              "type": "coroutine"
+            },
+            "pr": {
+              "repr": "<coroutine object handle_store_session>",
+              "type": "coroutine"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 30,
+                "quote": "\"observation\": \"mcp_memory_service.server.handlers.memory.handle_store_session.input11\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 30,
+                "quote": "\"observation\": \"mcp_memory_service.server.handlers.memory.handle_store_session.input11\""
+              }
+            }
+          },
+          {
+            "name": "mcp_memory_service.server.handlers.memory.handle_store_session.input12",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "repr": "<coroutine object handle_store_session>",
+              "type": "coroutine"
+            },
+            "pr": {
+              "repr": "<coroutine object handle_store_session>",
+              "type": "coroutine"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 31,
+                "quote": "\"observation\": \"mcp_memory_service.server.handlers.memory.handle_store_session.input12\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 31,
+                "quote": "\"observation\": \"mcp_memory_service.server.handlers.memory.handle_store_session.input12\""
+              }
+            }
+          },
+          {
+            "name": "mcp_memory_service.server.handlers.memory.handle_store_session.input2",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "repr": "<coroutine object handle_store_session>",
+              "type": "coroutine"
+            },
+            "pr": {
+              "repr": "<coroutine object handle_store_session>",
+              "type": "coroutine"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 32,
+                "quote": "\"observation\": \"mcp_memory_service.server.handlers.memory.handle_store_session.input2\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 32,
+                "quote": "\"observation\": \"mcp_memory_service.server.handlers.memory.handle_store_session.input2\""
+              }
+            }
+          },
+          {
+            "name": "mcp_memory_service.server.handlers.memory.handle_store_session.input3",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "repr": "<coroutine object handle_store_session>",
+              "type": "coroutine"
+            },
+            "pr": {
+              "repr": "<coroutine object handle_store_session>",
+              "type": "coroutine"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 33,
+                "quote": "\"observation\": \"mcp_memory_service.server.handlers.memory.handle_store_session.input3\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 33,
+                "quote": "\"observation\": \"mcp_memory_service.server.handlers.memory.handle_store_session.input3\""
+              }
+            }
+          },
+          {
+            "name": "mcp_memory_service.server.handlers.memory.handle_store_session.input4",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "repr": "<coroutine object handle_store_session>",
+              "type": "coroutine"
+            },
+            "pr": {
+              "repr": "<coroutine object handle_store_session>",
+              "type": "coroutine"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 34,
+                "quote": "\"observation\": \"mcp_memory_service.server.handlers.memory.handle_store_session.input4\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 34,
+                "quote": "\"observation\": \"mcp_memory_service.server.handlers.memory.handle_store_session.input4\""
+              }
+            }
+          },
+          {
+            "name": "mcp_memory_service.server.handlers.memory.handle_store_session.input5",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "repr": "<coroutine object handle_store_session>",
+              "type": "coroutine"
+            },
+            "pr": {
+              "repr": "<coroutine object handle_store_session>",
+              "type": "coroutine"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 35,
+                "quote": "\"observation\": \"mcp_memory_service.server.handlers.memory.handle_store_session.input5\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 35,
+                "quote": "\"observation\": \"mcp_memory_service.server.handlers.memory.handle_store_session.input5\""
+              }
+            }
+          },
+          {
+            "name": "mcp_memory_service.server.handlers.memory.handle_store_session.input6",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "repr": "<coroutine object handle_store_session>",
+              "type": "coroutine"
+            },
+            "pr": {
+              "repr": "<coroutine object handle_store_session>",
+              "type": "coroutine"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 36,
+                "quote": "\"observation\": \"mcp_memory_service.server.handlers.memory.handle_store_session.input6\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 36,
+                "quote": "\"observation\": \"mcp_memory_service.server.handlers.memory.handle_store_session.input6\""
+              }
+            }
+          },
+          {
+            "name": "mcp_memory_service.server.handlers.memory.handle_store_session.input7",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "repr": "<coroutine object handle_store_session>",
+              "type": "coroutine"
+            },
+            "pr": {
+              "repr": "<coroutine object handle_store_session>",
+              "type": "coroutine"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 37,
+                "quote": "\"observation\": \"mcp_memory_service.server.handlers.memory.handle_store_session.input7\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 37,
+                "quote": "\"observation\": \"mcp_memory_service.server.handlers.memory.handle_store_session.input7\""
+              }
+            }
+          },
+          {
+            "name": "mcp_memory_service.server.handlers.memory.handle_store_session.input8",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "repr": "<coroutine object handle_store_session>",
+              "type": "coroutine"
+            },
+            "pr": {
+              "repr": "<coroutine object handle_store_session>",
+              "type": "coroutine"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 38,
+                "quote": "\"observation\": \"mcp_memory_service.server.handlers.memory.handle_store_session.input8\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 38,
+                "quote": "\"observation\": \"mcp_memory_service.server.handlers.memory.handle_store_session.input8\""
+              }
+            }
+          },
+          {
+            "name": "mcp_memory_service.server.handlers.memory.handle_store_session.input9",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "repr": "<coroutine object handle_store_session>",
+              "type": "coroutine"
+            },
+            "pr": {
+              "repr": "<coroutine object handle_store_session>",
+              "type": "coroutine"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 39,
+                "quote": "\"observation\": \"mcp_memory_service.server.handlers.memory.handle_store_session.input9\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 39,
+                "quote": "\"observation\": \"mcp_memory_service.server.handlers.memory.handle_store_session.input9\""
+              }
+            }
+          },
+          {
+            "name": "mcp_memory_service.web.api.mcp.mcp_endpoint.input0",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "repr": "<coroutine object mcp_endpoint>",
+              "type": "coroutine"
+            },
+            "pr": {
+              "repr": "<coroutine object mcp_endpoint>",
+              "type": "coroutine"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 40,
+                "quote": "\"observation\": \"mcp_memory_service.web.api.mcp.mcp_endpoint.input0\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 40,
+                "quote": "\"observation\": \"mcp_memory_service.web.api.mcp.mcp_endpoint.input0\""
+              }
+            }
+          },
+          {
+            "name": "mcp_memory_service.web.api.mcp.mcp_endpoint.input1",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "repr": "<coroutine object mcp_endpoint>",
+              "type": "coroutine"
+            },
+            "pr": {
+              "repr": "<coroutine object mcp_endpoint>",
+              "type": "coroutine"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 41,
+                "quote": "\"observation\": \"mcp_memory_service.web.api.mcp.mcp_endpoint.input1\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 41,
+                "quote": "\"observation\": \"mcp_memory_service.web.api.mcp.mcp_endpoint.input1\""
+              }
+            }
+          },
+          {
+            "name": "mcp_memory_service.web.api.mcp.mcp_endpoint.input10",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "repr": "<coroutine object mcp_endpoint>",
+              "type": "coroutine"
+            },
+            "pr": {
+              "repr": "<coroutine object mcp_endpoint>",
+              "type": "coroutine"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 42,
+                "quote": "\"observation\": \"mcp_memory_service.web.api.mcp.mcp_endpoint.input10\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 42,
+                "quote": "\"observation\": \"mcp_memory_service.web.api.mcp.mcp_endpoint.input10\""
+              }
+            }
+          },
+          {
+            "name": "mcp_memory_service.web.api.mcp.mcp_endpoint.input11",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "repr": "<coroutine object mcp_endpoint>",
+              "type": "coroutine"
+            },
+            "pr": {
+              "repr": "<coroutine object mcp_endpoint>",
+              "type": "coroutine"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 43,
+                "quote": "\"observation\": \"mcp_memory_service.web.api.mcp.mcp_endpoint.input11\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 43,
+                "quote": "\"observation\": \"mcp_memory_service.web.api.mcp.mcp_endpoint.input11\""
+              }
+            }
+          },
+          {
+            "name": "mcp_memory_service.web.api.mcp.mcp_endpoint.input12",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "repr": "<coroutine object mcp_endpoint>",
+              "type": "coroutine"
+            },
+            "pr": {
+              "repr": "<coroutine object mcp_endpoint>",
+              "type": "coroutine"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 44,
+                "quote": "\"observation\": \"mcp_memory_service.web.api.mcp.mcp_endpoint.input12\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 44,
+                "quote": "\"observation\": \"mcp_memory_service.web.api.mcp.mcp_endpoint.input12\""
+              }
+            }
+          },
+          {
+            "name": "mcp_memory_service.web.api.mcp.mcp_endpoint.input2",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "repr": "<coroutine object mcp_endpoint>",
+              "type": "coroutine"
+            },
+            "pr": {
+              "repr": "<coroutine object mcp_endpoint>",
+              "type": "coroutine"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 45,
+                "quote": "\"observation\": \"mcp_memory_service.web.api.mcp.mcp_endpoint.input2\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 45,
+                "quote": "\"observation\": \"mcp_memory_service.web.api.mcp.mcp_endpoint.input2\""
+              }
+            }
+          },
+          {
+            "name": "mcp_memory_service.web.api.mcp.mcp_endpoint.input3",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "repr": "<coroutine object mcp_endpoint>",
+              "type": "coroutine"
+            },
+            "pr": {
+              "repr": "<coroutine object mcp_endpoint>",
+              "type": "coroutine"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 46,
+                "quote": "\"observation\": \"mcp_memory_service.web.api.mcp.mcp_endpoint.input3\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 46,
+                "quote": "\"observation\": \"mcp_memory_service.web.api.mcp.mcp_endpoint.input3\""
+              }
+            }
+          },
+          {
+            "name": "mcp_memory_service.web.api.mcp.mcp_endpoint.input4",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "repr": "<coroutine object mcp_endpoint>",
+              "type": "coroutine"
+            },
+            "pr": {
+              "repr": "<coroutine object mcp_endpoint>",
+              "type": "coroutine"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 47,
+                "quote": "\"observation\": \"mcp_memory_service.web.api.mcp.mcp_endpoint.input4\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 47,
+                "quote": "\"observation\": \"mcp_memory_service.web.api.mcp.mcp_endpoint.input4\""
+              }
+            }
+          },
+          {
+            "name": "mcp_memory_service.web.api.mcp.mcp_endpoint.input5",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "repr": "<coroutine object mcp_endpoint>",
+              "type": "coroutine"
+            },
+            "pr": {
+              "repr": "<coroutine object mcp_endpoint>",
+              "type": "coroutine"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 48,
+                "quote": "\"observation\": \"mcp_memory_service.web.api.mcp.mcp_endpoint.input5\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 48,
+                "quote": "\"observation\": \"mcp_memory_service.web.api.mcp.mcp_endpoint.input5\""
+              }
+            }
+          },
+          {
+            "name": "mcp_memory_service.web.api.mcp.mcp_endpoint.input6",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "repr": "<coroutine object mcp_endpoint>",
+              "type": "coroutine"
+            },
+            "pr": {
+              "repr": "<coroutine object mcp_endpoint>",
+              "type": "coroutine"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 49,
+                "quote": "\"observation\": \"mcp_memory_service.web.api.mcp.mcp_endpoint.input6\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 49,
+                "quote": "\"observation\": \"mcp_memory_service.web.api.mcp.mcp_endpoint.input6\""
+              }
+            }
+          },
+          {
+            "name": "mcp_memory_service.web.api.mcp.mcp_endpoint.input7",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "repr": "<coroutine object mcp_endpoint>",
+              "type": "coroutine"
+            },
+            "pr": {
+              "repr": "<coroutine object mcp_endpoint>",
+              "type": "coroutine"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 50,
+                "quote": "\"observation\": \"mcp_memory_service.web.api.mcp.mcp_endpoint.input7\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 50,
+                "quote": "\"observation\": \"mcp_memory_service.web.api.mcp.mcp_endpoint.input7\""
+              }
+            }
+          },
+          {
+            "name": "mcp_memory_service.web.api.mcp.mcp_endpoint.input8",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "repr": "<coroutine object mcp_endpoint>",
+              "type": "coroutine"
+            },
+            "pr": {
+              "repr": "<coroutine object mcp_endpoint>",
+              "type": "coroutine"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 51,
+                "quote": "\"observation\": \"mcp_memory_service.web.api.mcp.mcp_endpoint.input8\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 51,
+                "quote": "\"observation\": \"mcp_memory_service.web.api.mcp.mcp_endpoint.input8\""
+              }
+            }
+          },
+          {
+            "name": "mcp_memory_service.web.api.mcp.mcp_endpoint.input9",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "repr": "<coroutine object mcp_endpoint>",
+              "type": "coroutine"
+            },
+            "pr": {
+              "repr": "<coroutine object mcp_endpoint>",
+              "type": "coroutine"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 52,
+                "quote": "\"observation\": \"mcp_memory_service.web.api.mcp.mcp_endpoint.input9\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 52,
+                "quote": "\"observation\": \"mcp_memory_service.web.api.mcp.mcp_endpoint.input9\""
+              }
+            }
+          }
+        ],
+        "generator": {
+          "kind": "diff",
+          "label": "diff (auto-derived from base-side code, model-free)",
+          "model": null,
+          "provider": null,
+          "provenance": "auto-derived",
+          "blind": false
+        },
+        "freeze": {
+          "sha256": "bbd984c322885d0b645bb8dae59173bf6bc5a7dac869945aad43d6c529dc0919",
+          "generator": {
+            "kind": "diff",
+            "label": "diff (auto-derived from base-side code, model-free)",
+            "model": null,
+            "provider": null,
+            "provenance": "auto-derived",
+            "blind": false
+          },
+          "frozen_at": "2026-10-22T05:31:27.814767+00:00",
+          "inputs_sha256": "bee6d9f00fa4ccb1ce866b71ef09488e873aea1e3ca366a48dfb8c677ccaf80f",
+          "inputs": {
+            "title_chars": 0,
+            "body_chars": 0,
+            "base_files": {
+              "src/mcp_memory_service/server/handlers/memory.py": "8c627907bcc679e359c48dde8fb39d7e5a76b52a3dc0102f8a6a1af510a5c2ce",
+              "src/mcp_memory_service/server_impl.py": "b36957bff711e99cde98f852d7c707938a85ab2111409eaef926e75798c7d68f",
+              "src/mcp_memory_service/web/api/mcp.py": "9c0a7304b161d1ce1bee6b6bfab2731a8d397bad91834469809a628e84e319e2"
+            }
+          },
+          "verified": true,
+          "pr_started_at": "2026-10-22T05:31:27.959206+00:00"
+        },
+        "probe_changed_line_coverage": {
+          "status": "measured",
+          "changed_lines_total": 14,
+          "changed_lines_covered": 3,
+          "files": [
+            {
+              "file": "src/mcp_memory_service/server/handlers/memory.py",
+              "changed_lines_total": 7,
+              "changed_lines_covered": 0
+            },
+            {
+              "file": "src/mcp_memory_service/server_impl.py",
+              "changed_lines_total": 2,
+              "changed_lines_covered": 0
+            },
+            {
+              "file": "src/mcp_memory_service/web/api/mcp.py",
+              "changed_lines_total": 5,
+              "changed_lines_covered": 3
+            }
+          ],
+          "adequacy": "adequate",
+          "note": "ran 3 of 14 changed line(s) on the main side",
+          "exit": 0,
+          "data": "probe-cov-diff-api.json"
+        },
+        "status": "ran"
+      }
+    ],
+    "summary": {
+      "labels": [
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference",
+        "no_difference"
+      ],
+      "flagged": [],
+      "proven_claims": [],
+      "reason": "probe: 52 other observation(s) identical on both sides; rejected: claim pattern(s) C1, C2, C3 match none of this probe's observation names, so the probe is not counted",
+      "ignored_noise": [],
+      "ignored_warning_only": [],
+      "pr_only_noisy": []
+    }
+  },
+  "probe_changed_line_coverage": {
+    "status": "measured",
+    "side": "main",
+    "probes": {
+      "model-p1": {
+        "status": "measured",
+        "changed_lines_covered": 1,
+        "changed_lines_total": 9,
+        "adequacy": "adequate"
+      },
+      "diff-api": {
+        "status": "measured",
+        "changed_lines_covered": 3,
+        "changed_lines_total": 14,
+        "adequacy": "adequate"
+      }
+    },
+    "not_adequate": []
+  },
+  "verdict": "needs_attention",
+  "reason": "probe: 4 observation(s) need attention: refused.exception_raised differs and no claim covers it; refused.first_element_text differs and no claim covers it; refused.first_element_type differs and no claim covers it; refused.return_type differs and no claim covers it; rejected: claim pattern(s) C1, C2, C3 match none of this probe's observation names, so the probe is not counted; tests: 29 test(s) ran on main, 35 on the PR; 6 new test(s) pass, 30 unchanged (1 of them skipped on both sides)",
+  "verdict_before_coverage_gate": "needs_attention",
+  "reason_before_coverage_gate": "probe: 4 observation(s) need attention: refused.exception_raised differs and no claim covers it; refused.first_element_text differs and no claim covers it; refused.first_element_type differs and no claim covers it; refused.return_type differs and no claim covers it; rejected: claim pattern(s) C1, C2, C3 match none of this probe's observation names, so the probe is not counted; tests: 29 test(s) ran on main, 35 on the PR; 6 new test(s) pass, 30 unchanged (1 of them skipped on both sides)",
+  "changed_lines_total": null,
+  "changed_lines_covered": null,
+  "coverage_gate": {
+    "kind": "python",
+    "changed": false,
+    "confidence": "lower",
+    "note": "coverage of the changed Python lines was NOT MEASURED (the coverage report leaves out changed file(s): src/mcp_memory_service/web/api/mcp.py)",
+    "measurement": "not measured"
+  },
+  "agents": {
+    "status": "skipped",
+    "note": "advisory swarm is off",
+    "roles": []
+  },
+  "explanation": {
+    "status": "not yet wired",
+    "why": "advisory swarm is off"
+  },
+  "swarm_requested": false,
+  "operator_approval_requested": false,
+  "swarm": "off",
+  "operator_approval": "off",
+  "what_changed": {
+    "package_python_files": [
+      "src/mcp_memory_service/server/handlers/memory.py",
+      "src/mcp_memory_service/server_impl.py",
+      "src/mcp_memory_service/web/api/mcp.py"
+    ],
+    "compiled_files": [],
+    "other_files": [
+      "changelog.d/1601.fixed.md",
+      "tests/integration/test_server_handlers.py",
+      "tests/integration/test_store_error_envelope.py",
+      "tests/integration/test_unified_handlers.py"
+    ]
+  },
+  "duration_s": {
+    "total_wall": 270.3,
+    "tests": 45.0
+  },
+  "cost": {
+    "ai_calls": 3,
+    "failed_ai_calls": 0,
+    "input_tokens": 31710,
+    "output_tokens": 28434,
+    "thinking_tokens": 15513,
+    "cost_usd": 0.035104,
+    "calls_without_usage": 0,
+    "ai_cost_usd": 0.035104,
+    "cost_complete": true,
+    "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+    "compute_seconds": {
+      "total_wall": 270.3,
+      "tests": 45.0
+    },
+    "machine_usd_per_hour": 0.24,
+    "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+    "computer_cost_usd": 0.01802,
+    "total_cost_usd": 0.053124,
+    "swarm": {
+      "ai_calls": 0,
+      "failed_ai_calls": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "thinking_tokens": 0,
+      "cost_usd": 0.0,
+      "calls_without_usage": 0,
+      "ai_cost_usd": 0.0,
+      "cost_complete": true,
+      "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+    }
+  },
+  "schema_errors": [
+    "$.coverage.status: 'not measured' not in ['measured', 'failed', 'not needed', 'skipped']"
+  ],
+  "poc_code_version": "0fa0016"
+}

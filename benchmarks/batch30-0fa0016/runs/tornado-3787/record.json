@@ -1,0 +1,1103 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-tornadoweb-tornado-3787-c3089e1d93e3-2026-10-22-check-0743",
+ "date_ist": "2026-10-22 07:43 IST",
+ "run_date": "2026-10-22",
+ "who": "ops/daily_run.py",
+ "repo": "tornadoweb/tornado",
+ "library": "tornado",
+ "pr": {
+  "repo": "tornadoweb/tornado",
+  "number": 3787,
+  "url": "https://github.com/tornadoweb/tornado/pull/3787",
+  "title": "web: Bound the static version cache, update docs",
+  "base_sha": "f53b9b97c6f0c55b2be3d366de1f2f3daa808d0a",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "c3089e1d93e3e8b65a9c89a546409bd207a0de2f",
+  "merge_commit": null,
+  "tested_main_sha": "c3089e1d93e3e8b65a9c89a546409bd207a0de2f",
+  "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+ },
+ "author": "bdarnell",
+ "base_ref": "master",
+ "updated_at_utc": "2026-10-21T15:15:59Z",
+ "updated_at_ist": "2026-10-21 20:45 IST",
+ "ci_state": "not checked (single-PR check)",
+ "ci_detail": "checked on request with --pr",
+ "tested_at_ist": "2026-10-22 07:43 IST",
+ "files": {
+  "all": [
+   "docs/releases/v6.6.0.rst",
+   "tornado/test/web_test.py",
+   "tornado/web.py"
+  ],
+  "package_py": [
+   "tornado/test/web_test.py",
+   "tornado/web.py"
+  ],
+  "compiled": [],
+  "other": [
+   "docs/releases/v6.6.0.rst"
+  ]
+ },
+ "machine_type": {
+  "arch": "x86_64",
+  "os": "Linux",
+  "platform": "Linux-6.12.94+-x86_64-with-glibc2.41",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": "g++ (Debian 14.2.0-19) 14.2.0",
+  "cpu_model": "Intel(R) Xeon(R) Processor",
+  "ram_gb": 15.6
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 0,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.15",
+ "test_selection": "",
+ "per_run": [],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": null,
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "local",
+ "sandbox_backend_note": "local bubblewrap",
+ "machine": "local",
+ "posted_upstream": false,
+ "logs": "tornado-3787/",
+ "freeze": {},
+ "poc_commit": "0fa0016ea51794edee0f4a085e41bf48dd813765",
+ "route": "source-pair",
+ "current_head_sha": "c3089e1d93e3e8b65a9c89a546409bd207a0de2f",
+ "tested_invocation": 1,
+ "model_provider_used": "none",
+ "model_provider_fallback": "no AI call ran (asked for nebius)",
+ "state": "closed",
+ "mergeable_state": "unknown",
+ "product_check": true,
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": {
+   "ok": true,
+   "skipped": false,
+   "live_call": true,
+   "cached": false,
+   "queries": [
+    "tornado python setup install instructions https://github.com/tornadoweb/tornado site:github.com/tornadoweb/tornado",
+    "tornado python documentation install https://github.com/tornadoweb/tornado site:github.com/tornadoweb/tornado",
+    "tornado python install requirements https://pypi.org/project/tornado/ https://github.com/tornadoweb/tornado site:pypi.org"
+   ],
+   "results": [
+    {
+     "title": "tornado \u00b7 PyPI",
+     "url": "https://pypi.org/project/tornado/",
+     "query": "tornado python install requirements https://pypi.org/project/tornado/ https://github.com/tornadoweb/tornado site:pypi.org"
+    },
+    {
+     "title": "tornado/maint/vm/windows/bootstrap.py at master",
+     "url": "https://github.com/tornadoweb/tornado/blob/master/maint/vm/windows/bootstrap.py",
+     "query": "tornado python setup install instructions https://github.com/tornadoweb/tornado site:github.com/tornadoweb/tornado"
+    },
+    {
+     "title": "Support for free-threaded CPython \u00b7 Issue #3501 \u00b7 tornadoweb/tornado \u00b7 GitHub",
+     "url": "https://github.com/tornadoweb/tornado/issues/3501",
+     "query": "tornado python setup install instructions https://github.com/tornadoweb/tornado site:github.com/tornadoweb/tornado"
+    },
+    {
+     "title": "Performance issues when use websocket upload binary files \u00b7 Issue #3007 \u00b7 tornadoweb/tornado \u00b7 GitHub",
+     "url": "https://github.com/tornadoweb/tornado/issues/3007",
+     "query": "tornado python setup install instructions https://github.com/tornadoweb/tornado site:github.com/tornadoweb/tornado"
+    },
+    {
+     "title": "GitHub - tornadoweb/tornado: Tornado is a Python web framework and asynchronous networking library, originally developed at FriendFeed. \u00b7 GitHub",
+     "url": "https://github.com/tornadoweb/tornado",
+     "query": "tornado python documentation install https://github.com/tornadoweb/tornado site:github.com/tornadoweb/tornado"
+    },
+    {
+     "title": "tornado/.github/workflows/build.yml at 657d5939cccbc1fcedb75c92cd1b427e9fd974b3 \u00b7 tornadoweb/tornado \u00b7 GitHub",
+     "url": "https://github.com/tornadoweb/tornado/blob/HEAD/.github/workflows/build.yml",
+     "query": "tornado python documentation install https://github.com/tornadoweb/tornado site:github.com/tornadoweb/tornado"
+    },
+    {
+     "title": "tornado/.github/workflows/build.yml at 7d6465056ceb7a054b3f64cf1c18271753b10482 \u00b7 tornadoweb/tornado \u00b7 GitHub",
+     "url": "https://github.com/tornadoweb/tornado/blob/7d6465056ceb7a054b3f64cf1c18271753b10482/.github/workflows/build.yml",
+     "query": "tornado python documentation install https://github.com/tornadoweb/tornado site:github.com/tornadoweb/tornado"
+    }
+   ],
+   "text": "The sources indicate that to install Tornado, you may need to install the `python3-dev` package and ensure that the Python development package is available in your package repository. For Windows, the sources mention setting up a shared folder and installing VirtualBox guest additions. However, there is no direct instruction on how to install Tornado itself from the provided sources. The sources also discuss issues related to Tornado's C extension module and performance concerns when using WebSocket for binary file uploads.\nTo install Tornado, you can use the provided setup.py file in the repository. The GitHub repository includes a build workflow that automates the installation process by building wheels and uploading them to PyPI. To install Tornado, you can run the command `pip install tornado` in your terminal. The repository also includes a README file with additional documentation and resources.\nTo install Tornado, you can use pip from PyPI. The latest version available on PyPI is Tornado 6.0a1, which can be installed with `pip install tornado==6.0a1`. For older versions, Tornado 4.4.3 is also available, which can be installed with `pip install tornado==4.4.3`. Tornado runs on Python 2.5, 2.6, 2.7, and 3.2, with dependencies varying by Python version. For Python 2.5, PycURL, simplejson, and Python development headers are required. For Python 3.2, the distribute package is needed. The source code is also available on GitHub at https://github.com/facebook/tornado.\nTitle: tornado \u00b7 PyPI\nTornado is an open source version of the scalable, non-blocking web server and and tools that power FriendFeed. ## Project description. Tornado is an open source version of the scalable, non-blocking web server. and and tools that power FriendFeed. available at http://www.tornadoweb.org/. Tornado is licensed under the Apache Licence, Version 2.0. (http://www.apache.org/licenses/LICENSE-2.0.html). Tornado is listed in PyPI and can be installed with pip or. Note that the sour\n1) Install virtualbox guest additions (from the device menu in virtualbox) \u00b7 2) Set up a shared folder to the root of your tornado repo. It must be a \u00b7 3) Install\nTraceback (most recent call last): File \"C:\\Users\\runneradmin\\AppData\\Local\\Temp\\cibw-run-peuew8qd\\cp313t-win32\\venv-test\\Lib\\site-packages\\tornado\\httpclient.py\", line 113, in __del__ File \"C:\\Users\\runneradmin\\AppData\\Local\\Temp\\cibw-run-peuew8qd\\cp313t-win32\\venv-test\\Lib\\site-packages\\tornado\\httpclient.py\", line 118, in close File \"C:\\Users\\runneradmin\\AppData\\Local\\Temp\\cibw-run-peuew8qd\\cp313t-win32\\venv-test\\Lib\\site-packages\\tornado\\simple_httpclient.py\", line 157, in close File [...] 1\nmore systems), or installing the `python3-dev` package and reinstalling your virtualenv. (If the environment variable `TORNADO_EXTENSION=1` is set at install time, the installation will fail instead of falling back to the slower python mask function) [...] There's one more issue in your profile: it's calling `_websocket_mask_python`, which indicates that Tornado's C extension module is not installed properly. That means that at the time you installed Tornado, you were unable to use a pre-built w\n| MANIFEST.in | | MANIFEST.in |  |  |\n| README.rst | | README.rst |  |  |\n| SECURITY.md | | SECURITY.md |  |  |\n| codecov.yml | | codecov.yml |  |  |\n| pyproject.toml | | pyproject.toml |  |  |\n| requirements.in | | requirements.in |  |  |\n| requirements.txt | | requirements.txt |  |  |\n| runtests.sh | | runtests.sh |  |  |\n| setup.cfg | | setup.cfg |  |  |\n| setup.py | | setup.py |  |  |\n| tox.ini | | tox.ini |  |  |\n| View all files | | | [...] This example does not use any of Tornado's asynch\nTitle: tornado/.github/workflows/build.yml at 657d5939cccbc1fcedb75c92cd1b427e9fd974b3 \u00b7 tornadoweb/tornado \u00b7 GitHub\n# Search code, repositories, users, issues, pull requests... You signed in with another tab or window. You signed out in another tab or window. You switched accounts on another tab or window. * Notifications  You must be signed in to change notification settings. ## Expand file tree. # build.yml. # build.yml. ## File metadata and controls. # The \"build\" workflow produces wheels (a\nTitle: tornado/.github/workflows/build.yml at 7d6465056ceb7a054b3f64cf1c18271753b10482 \u00b7 tornadoweb/tornado \u00b7 GitHub\n## Navigation Menu. # Search code, repositories, users, issues, pull requests... You signed in with another tab or window. Reload to refresh your session. You signed out in another tab or window. Reload to refresh your session. You switched accounts on another tab or window. Reload to refresh your session. * Notifications  You must be signed in to change notification settings. ## ",
+   "errors": [],
+   "lines": [
+    "Looked up with Tavily: 7 results",
+    "Query: tornado python setup install instructions https://github.com/tornadoweb/tornado site:github.com/tornadoweb/tornado",
+    "Query: tornado python documentation install https://github.com/tornadoweb/tornado site:github.com/tornadoweb/tornado",
+    "Query: tornado python install requirements https://pypi.org/project/tornado/ https://github.com/tornadoweb/tornado site:pypi.org",
+    "Source: tornado \u00b7 PyPI \u2014 https://pypi.org/project/tornado/",
+    "Source: tornado/maint/vm/windows/bootstrap.py at master \u2014 https://github.com/tornadoweb/tornado/blob/master/maint/vm/windows/bootstrap.py",
+    "Source: Support for free-threaded CPython \u00b7 Issue #3501 \u00b7 tornadoweb/tornado \u00b7 GitHub \u2014 https://github.com/tornadoweb/tornado/issues/3501",
+    "Source: Performance issues when use websocket upload binary files \u00b7 Issue #3007 \u00b7 tornadoweb/tornado \u00b7 GitHub \u2014 https://github.com/tornadoweb/tornado/issues/3007",
+    "Source: GitHub - tornadoweb/tornado: Tornado is a Python web framework and asynchronous networking library, originally developed at FriendFeed. \u00b7 GitHub \u2014 https://github.com/tornadoweb/tornado",
+    "Source: tornado/.github/workflows/build.yml at 657d5939cccbc1fcedb75c92cd1b427e9fd974b3 \u00b7 tornadoweb/tornado \u00b7 GitHub \u2014 https://github.com/tornadoweb/tornado/blob/HEAD/.github/workflows/build.yml",
+    "Source: tornado/.github/workflows/build.yml at 7d6465056ceb7a054b3f64cf1c18271753b10482 \u00b7 tornadoweb/tornado \u00b7 GitHub \u2014 https://github.com/tornadoweb/tornado/blob/7d6465056ceb7a054b3f64cf1c18271753b10482/.github/workflows/build.yml"
+   ]
+  },
+  "notes": [
+   "Setup check: GitHub token: present.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory 6.3 GB (of 15.6 GB).",
+   "Setup check: free disk 92.3 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: 7 results",
+   "Query: tornado python setup install instructions https://github.com/tornadoweb/tornado site:github.com/tornadoweb/tornado",
+   "Query: tornado python documentation install https://github.com/tornadoweb/tornado site:github.com/tornadoweb/tornado",
+   "Query: tornado python install requirements https://pypi.org/project/tornado/ https://github.com/tornadoweb/tornado site:pypi.org",
+   "Source: tornado \u00b7 PyPI \u2014 https://pypi.org/project/tornado/",
+   "Source: tornado/maint/vm/windows/bootstrap.py at master \u2014 https://github.com/tornadoweb/tornado/blob/master/maint/vm/windows/bootstrap.py",
+   "Source: Support for free-threaded CPython \u00b7 Issue #3501 \u00b7 tornadoweb/tornado \u00b7 GitHub \u2014 https://github.com/tornadoweb/tornado/issues/3501",
+   "Source: Performance issues when use websocket upload binary files \u00b7 Issue #3007 \u00b7 tornadoweb/tornado \u00b7 GitHub \u2014 https://github.com/tornadoweb/tornado/issues/3007",
+   "Source: GitHub - tornadoweb/tornado: Tornado is a Python web framework and asynchronous networking library, originally developed at FriendFeed. \u00b7 GitHub \u2014 https://github.com/tornadoweb/tornado",
+   "Source: tornado/.github/workflows/build.yml at 657d5939cccbc1fcedb75c92cd1b427e9fd974b3 \u00b7 tornadoweb/tornado \u00b7 GitHub \u2014 https://github.com/tornadoweb/tornado/blob/HEAD/.github/workflows/build.yml",
+   "Source: tornado/.github/workflows/build.yml at 7d6465056ceb7a054b3f64cf1c18271753b10482 \u00b7 tornadoweb/tornado \u00b7 GitHub \u2014 https://github.com/tornadoweb/tornado/blob/7d6465056ceb7a054b3f64cf1c18271753b10482/.github/workflows/build.yml",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: install alabaster==1.0.0 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install ast-serialize==0.11.2 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install babel==2.18.0 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install black==26.5.1 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install build==1.6.1 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install cachetools==7.1.8 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install certifi==2026.7.22 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install charset-normalizer==3.5.1 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install click==8.5.0 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install colorama==0.4.6 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install distlib==0.4.3 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install docutils==0.22.4 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install filelock==3.32.7 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install flake8==7.3.0 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install idna==3.19 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install imagesize==2.0.1 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install jinja2==3.1.6 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install librt==0.15.0 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install markupsafe==3.0.3 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install mccabe==0.7.0 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install mypy==2.3.1 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install mypy-extensions==1.1.0 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install packaging==26.3 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install pathspec==1.1.1 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install pip-tools==7.6.1 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install platformdirs==4.11.9 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install pluggy==1.6.0 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install pycodestyle==2.14.0 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install pyflakes==3.4.0 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install pygments==2.21.0 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install pyproject-api==1.11.1 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install pyproject-hooks==1.3.3 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install python-discovery==1.6.0 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install pytokens==0.4.1 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install requests==2.34.2 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install roman-numerals==4.1.0 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install snowballstemmer==3.1.1 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install sphinx==9.0.4 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install sphinx-rtd-theme==3.1.0 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install sphinxcontrib-applehelp==2.0.0 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install sphinxcontrib-devhelp==2.0.0 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install sphinxcontrib-htmlhelp==2.1.0 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install sphinxcontrib-jquery==4.1 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install sphinxcontrib-jsmath==1.0.1 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install sphinxcontrib-qthelp==2.0.0 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install sphinxcontrib-serializinghtml==2.0.0 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install tomli-w==1.2.0 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install tox==4.61.4 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install types-pycurl==7.47.0.20260703 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install typing-extensions==4.16.0 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install urllib3==2.8.0 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install virtualenv==21.7.13 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install wheel==0.48.0 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install aiopg (listed in requirements.txt) on main and pr.",
+   "Setup plan: install bcrypt (listed in requirements.txt) on main and pr.",
+   "Setup plan: install markdown (listed in requirements.txt) on main and pr.",
+   "Setup plan: install psycopg2 (listed in requirements.txt) on main and pr.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >= 3.11, >=3.11",
+   "rerun, setup problem: main install failed after 3 tries.",
+   "Demo helper: setup failure already labelled; the probe was not rerun."
+  ],
+  "setup_plan": {
+   "packages": [
+    {
+     "requirement": "alabaster==1.0.0",
+     "name": "alabaster",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "ast-serialize==0.11.2",
+     "name": "ast-serialize",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "babel==2.18.0",
+     "name": "babel",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "black==26.5.1",
+     "name": "black",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "build==1.6.1",
+     "name": "build",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "cachetools==7.1.8",
+     "name": "cachetools",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "certifi==2026.7.22",
+     "name": "certifi",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "charset-normalizer==3.5.1",
+     "name": "charset-normalizer",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "click==8.5.0",
+     "name": "click",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "colorama==0.4.6",
+     "name": "colorama",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "distlib==0.4.3",
+     "name": "distlib",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "docutils==0.22.4",
+     "name": "docutils",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "filelock==3.32.7",
+     "name": "filelock",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "flake8==7.3.0",
+     "name": "flake8",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "idna==3.19",
+     "name": "idna",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "imagesize==2.0.1",
+     "name": "imagesize",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "jinja2==3.1.6",
+     "name": "jinja2",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "librt==0.15.0",
+     "name": "librt",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "markupsafe==3.0.3",
+     "name": "markupsafe",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "mccabe==0.7.0",
+     "name": "mccabe",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "mypy==2.3.1",
+     "name": "mypy",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "mypy-extensions==1.1.0",
+     "name": "mypy-extensions",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "packaging==26.3",
+     "name": "packaging",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pathspec==1.1.1",
+     "name": "pathspec",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pip-tools==7.6.1",
+     "name": "pip-tools",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "platformdirs==4.11.9",
+     "name": "platformdirs",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pluggy==1.6.0",
+     "name": "pluggy",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pycodestyle==2.14.0",
+     "name": "pycodestyle",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pyflakes==3.4.0",
+     "name": "pyflakes",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pygments==2.21.0",
+     "name": "pygments",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pyproject-api==1.11.1",
+     "name": "pyproject-api",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pyproject-hooks==1.3.3",
+     "name": "pyproject-hooks",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "python-discovery==1.6.0",
+     "name": "python-discovery",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytokens==0.4.1",
+     "name": "pytokens",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "requests==2.34.2",
+     "name": "requests",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "roman-numerals==4.1.0",
+     "name": "roman-numerals",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "snowballstemmer==3.1.1",
+     "name": "snowballstemmer",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "sphinx==9.0.4",
+     "name": "sphinx",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "sphinx-rtd-theme==3.1.0",
+     "name": "sphinx-rtd-theme",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "sphinxcontrib-applehelp==2.0.0",
+     "name": "sphinxcontrib-applehelp",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "sphinxcontrib-devhelp==2.0.0",
+     "name": "sphinxcontrib-devhelp",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "sphinxcontrib-htmlhelp==2.1.0",
+     "name": "sphinxcontrib-htmlhelp",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "sphinxcontrib-jquery==4.1",
+     "name": "sphinxcontrib-jquery",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "sphinxcontrib-jsmath==1.0.1",
+     "name": "sphinxcontrib-jsmath",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "sphinxcontrib-qthelp==2.0.0",
+     "name": "sphinxcontrib-qthelp",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "sphinxcontrib-serializinghtml==2.0.0",
+     "name": "sphinxcontrib-serializinghtml",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "tomli-w==1.2.0",
+     "name": "tomli-w",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "tox==4.61.4",
+     "name": "tox",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "types-pycurl==7.47.0.20260703",
+     "name": "types-pycurl",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "typing-extensions==4.16.0",
+     "name": "typing-extensions",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "urllib3==2.8.0",
+     "name": "urllib3",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "virtualenv==21.7.13",
+     "name": "virtualenv",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "wheel==0.48.0",
+     "name": "wheel",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "aiopg",
+     "name": "aiopg",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "bcrypt",
+     "name": "bcrypt",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "markdown",
+     "name": "markdown",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "psycopg2",
+     "name": "psycopg2",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    }
+   ],
+   "extra_reqs": [
+    "alabaster==1.0.0",
+    "ast-serialize==0.11.2",
+    "babel==2.18.0",
+    "black==26.5.1",
+    "build==1.6.1",
+    "cachetools==7.1.8",
+    "certifi==2026.7.22",
+    "charset-normalizer==3.5.1",
+    "click==8.5.0",
+    "colorama==0.4.6",
+    "distlib==0.4.3",
+    "docutils==0.22.4",
+    "filelock==3.32.7",
+    "flake8==7.3.0",
+    "idna==3.19",
+    "imagesize==2.0.1",
+    "jinja2==3.1.6",
+    "librt==0.15.0",
+    "markupsafe==3.0.3",
+    "mccabe==0.7.0",
+    "mypy==2.3.1",
+    "mypy-extensions==1.1.0",
+    "packaging==26.3",
+    "pathspec==1.1.1",
+    "pip-tools==7.6.1",
+    "platformdirs==4.11.9",
+    "pluggy==1.6.0",
+    "pycodestyle==2.14.0",
+    "pyflakes==3.4.0",
+    "pygments==2.21.0",
+    "pyproject-api==1.11.1",
+    "pyproject-hooks==1.3.3",
+    "python-discovery==1.6.0",
+    "pytokens==0.4.1",
+    "requests==2.34.2",
+    "roman-numerals==4.1.0",
+    "snowballstemmer==3.1.1",
+    "sphinx==9.0.4",
+    "sphinx-rtd-theme==3.1.0",
+    "sphinxcontrib-applehelp==2.0.0",
+    "sphinxcontrib-devhelp==2.0.0",
+    "sphinxcontrib-htmlhelp==2.1.0",
+    "sphinxcontrib-jquery==4.1",
+    "sphinxcontrib-jsmath==1.0.1",
+    "sphinxcontrib-qthelp==2.0.0",
+    "sphinxcontrib-serializinghtml==2.0.0",
+    "tomli-w==1.2.0",
+    "tox==4.61.4",
+    "types-pycurl==7.47.0.20260703",
+    "typing-extensions==4.16.0",
+    "urllib3==2.8.0",
+    "virtualenv==21.7.13",
+    "wheel==0.48.0",
+    "aiopg",
+    "bcrypt",
+    "markdown",
+    "psycopg2"
+   ],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >= 3.11, >=3.11"
+   },
+   "system": [],
+   "refused": []
+  },
+  "setup": {
+   "label": "rerun, setup problem",
+   "counts_as_verdict": false,
+   "step": "main install",
+   "attempts": 3,
+   "detail": "install failed (1); see setup-main.log"
+  }
+ },
+ "chosen": {
+  "pr": 3787,
+  "head_sha": null,
+  "install": null,
+  "test_cmd": null
+ },
+ "sides": {
+  "comparison_basis": "merge-base vs PR head (no merge ref available)",
+  "main_sha": "c3089e1d93e3e8b65a9c89a546409bd207a0de2f",
+  "pr_sha": "c3089e1d93e3e8b65a9c89a546409bd207a0de2f"
+ },
+ "tested": {
+  "main": "master @ c3089e1d93e3 (merge-base with the PR head)",
+  "pr": "PR head c3089e1d93e3"
+ },
+ "verdict": "could_not_verify",
+ "reason": "install failed (1); see setup-main.log",
+ "verdict_before_coverage_gate": "could_not_verify",
+ "reason_before_coverage_gate": "install failed (1); see setup-main.log",
+ "changed_lines_total": null,
+ "changed_lines_covered": null,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "lower",
+  "note": "coverage of the changed Python lines was NOT MEASURED (record predates the coverage gate: no coverage run exists for it, so this is not a measurement result)",
+  "measurement": "not measured: predates gate"
+ },
+ "agents": {
+  "status": "skipped",
+  "note": "advisory swarm is off",
+  "roles": []
+ },
+ "explanation": {
+  "status": "not yet wired",
+  "why": "advisory swarm is off"
+ },
+ "swarm_requested": false,
+ "operator_approval_requested": false,
+ "swarm": "off",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [
+   "tornado/test/web_test.py",
+   "tornado/web.py"
+  ],
+  "compiled_files": [],
+  "other_files": [
+   "docs/releases/v6.6.0.rst"
+  ]
+ },
+ "duration_s": {
+  "total_wall": 16.7,
+  "tests": 0
+ },
+ "cost": {
+  "ai_calls": 0,
+  "failed_ai_calls": 0,
+  "input_tokens": 0,
+  "output_tokens": 0,
+  "thinking_tokens": 0,
+  "cost_usd": 0.0,
+  "calls_without_usage": 0,
+  "ai_cost_usd": 0.0,
+  "cost_complete": true,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 16.7,
+   "tests": 0
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.001113,
+  "total_cost_usd": 0.001113,
+  "swarm": {
+   "ai_calls": 0,
+   "failed_ai_calls": 0,
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "thinking_tokens": 0,
+   "cost_usd": 0.0,
+   "calls_without_usage": 0,
+   "ai_cost_usd": 0.0,
+   "cost_complete": true,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ },
+ "poc_code_version": "0fa0016"
+}

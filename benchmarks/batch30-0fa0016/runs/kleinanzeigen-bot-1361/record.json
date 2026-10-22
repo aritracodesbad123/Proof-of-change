@@ -1,0 +1,1405 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-Second-Hand-Friends-kleinanzeigen-bot-1361-5258d75baff4-2026-10-22-check-0115",
+ "date_ist": "2026-10-22 01:15 IST",
+ "run_date": "2026-10-22",
+ "who": "ops/daily_run.py",
+ "repo": "Second-Hand-Friends/kleinanzeigen-bot",
+ "library": "kleinanzeigen-bot",
+ "pr": {
+  "repo": "Second-Hand-Friends/kleinanzeigen-bot",
+  "number": 1361,
+  "url": "https://github.com/Second-Hand-Friends/kleinanzeigen-bot/pull/1361",
+  "title": "feat: add manual browser login command",
+  "base_sha": "594f623cf87ce7f8eefe76da02642af064c957eb",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "5258d75baff447f26f70c7ae4d5ed9a441dbcd95",
+  "merge_commit": null,
+  "tested_main_sha": "594f623cf87ce7f8eefe76da02642af064c957eb",
+  "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+ },
+ "author": "1cu",
+ "base_ref": "main",
+ "updated_at_utc": "2026-10-21T18:11:02Z",
+ "updated_at_ist": "2026-10-21 23:41 IST",
+ "ci_state": "not checked (single-PR check)",
+ "ci_detail": "checked on request with --pr",
+ "tested_at_ist": "2026-10-22 01:15 IST",
+ "files": {
+  "all": [
+   "README.md",
+   "docs/BROWSER_TROUBLESHOOTING.md",
+   "src/kleinanzeigen_bot/app.py",
+   "src/kleinanzeigen_bot/cli.py",
+   "src/kleinanzeigen_bot/resources/translations.de.yaml",
+   "src/kleinanzeigen_bot/runtime_config.py",
+   "src/kleinanzeigen_bot/utils/web_scraping_mixin.py",
+   "tests/integration/test_web_scraping_mixin_integration.py",
+   "tests/unit/test_app.py",
+   "tests/unit/test_web_scraping_mixin.py"
+  ],
+  "package_py": [
+   "src/kleinanzeigen_bot/app.py",
+   "src/kleinanzeigen_bot/cli.py",
+   "src/kleinanzeigen_bot/runtime_config.py",
+   "src/kleinanzeigen_bot/utils/web_scraping_mixin.py"
+  ],
+  "compiled": [],
+  "other": [
+   "README.md",
+   "docs/BROWSER_TROUBLESHOOTING.md",
+   "src/kleinanzeigen_bot/resources/translations.de.yaml",
+   "tests/integration/test_web_scraping_mixin_integration.py",
+   "tests/unit/test_app.py",
+   "tests/unit/test_web_scraping_mixin.py"
+  ]
+ },
+ "machine_type": {
+  "arch": "x86_64",
+  "os": "Linux",
+  "platform": "Linux-6.12.94+-x86_64-with-glibc2.41",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": "g++ (Debian 14.2.0-19) 14.2.0",
+  "cpu_model": "Intel(R) Xeon(R) Processor",
+  "ram_gb": 15.6
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 3,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.15",
+ "test_selection": "mapped from touched files: tests/integration/test_web_scraping_mixin_integration.py, tests/unit/test_app.py, tests/unit/test_web_scraping_mixin.py, tests/unit/test_cli.py, tests/unit/test_runtime_config.py",
+ "per_run": [
+  {
+   "side": "old",
+   "run": 1,
+   "passed": 307,
+   "failed": 3,
+   "error": 12,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 7.4,
+   "pytest_summary": "3 failed, 307 passed, 5 warnings, 12 errors in 5.67s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 1,
+   "passed": 319,
+   "failed": 4,
+   "error": 12,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 7.3,
+   "pytest_summary": "4 failed, 319 passed, 5 warnings, 12 errors in 5.76s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 2,
+   "passed": 307,
+   "failed": 3,
+   "error": 12,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 7.2,
+   "pytest_summary": "3 failed, 307 passed, 5 warnings, 12 errors in 5.66s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 2,
+   "passed": 319,
+   "failed": 4,
+   "error": 12,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 7.2,
+   "pytest_summary": "4 failed, 319 passed, 5 warnings, 12 errors in 5.71s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 3,
+   "passed": 307,
+   "failed": 3,
+   "error": 12,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 7.3,
+   "pytest_summary": "3 failed, 307 passed, 5 warnings, 12 errors in 5.69s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 3,
+   "passed": 319,
+   "failed": 4,
+   "error": 12,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 7.3,
+   "pytest_summary": "4 failed, 319 passed, 5 warnings, 12 errors in 5.70s",
+   "junit": true
+  }
+ ],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "local",
+ "sandbox_backend_note": "local bubblewrap",
+ "machine": "local",
+ "posted_upstream": false,
+ "logs": "kleinanzeigen_bot-1361/",
+ "freeze": {
+  "main": "freeze-main.txt",
+  "pr": "freeze-pr.txt"
+ },
+ "poc_commit": "0fa0016ea51794edee0f4a085e41bf48dd813765",
+ "route": "source-pair",
+ "current_head_sha": "5258d75baff447f26f70c7ae4d5ed9a441dbcd95",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "state": "closed",
+ "mergeable_state": "unknown",
+ "product_check": true,
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": {
+   "ok": false,
+   "skipped": false,
+   "live_call": true,
+   "cached": false,
+   "queries": [
+    "kleinanzeigen-bot python setup install instructions https://github.com/Second-Hand-Friends/kleinanzeigen-bot site:github.com/Second-Hand-Friends/kleinanzeigen-bot",
+    "kleinanzeigen-bot python documentation install https://github.com/Second-Hand-Friends/kleinanzeigen-bot site:github.com/Second-Hand-Friends/kleinanzeigen-bot",
+    "kleinanzeigen-bot python install requirements https://pypi.org/project/kleinanzeigen-bot/ https://github.com/Second-Hand-Friends/kleinanzeigen-bot site:pypi.org"
+   ],
+   "results": [],
+   "text": "",
+   "errors": [],
+   "lines": [
+    "Looked up with Tavily: 0 results",
+    "Query: kleinanzeigen-bot python setup install instructions https://github.com/Second-Hand-Friends/kleinanzeigen-bot site:github.com/Second-Hand-Friends/kleinanzeigen-bot",
+    "Query: kleinanzeigen-bot python documentation install https://github.com/Second-Hand-Friends/kleinanzeigen-bot site:github.com/Second-Hand-Friends/kleinanzeigen-bot",
+    "Query: kleinanzeigen-bot python install requirements https://pypi.org/project/kleinanzeigen-bot/ https://github.com/Second-Hand-Friends/kleinanzeigen-bot site:pypi.org"
+   ]
+  },
+  "notes": [
+   "Setup check: GitHub token: present.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory 6.6 GB (of 15.6 GB).",
+   "Setup check: free disk 93.1 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: 0 results",
+   "Query: kleinanzeigen-bot python setup install instructions https://github.com/Second-Hand-Friends/kleinanzeigen-bot site:github.com/Second-Hand-Friends/kleinanzeigen-bot",
+   "Query: kleinanzeigen-bot python documentation install https://github.com/Second-Hand-Friends/kleinanzeigen-bot site:github.com/Second-Hand-Friends/kleinanzeigen-bot",
+   "Query: kleinanzeigen-bot python install requirements https://pypi.org/project/kleinanzeigen-bot/ https://github.com/Second-Hand-Friends/kleinanzeigen-bot site:pypi.org",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: certifi is noted, installed with the project.",
+   "Setup plan: colorama is noted, installed with the project.",
+   "Setup plan: jaraco.text is noted, installed with the project.",
+   "Setup plan: nodriver is noted, installed with the project.",
+   "Setup plan: platformdirs is noted, installed with the project.",
+   "Setup plan: pydantic is noted, installed with the project.",
+   "Setup plan: ruamel.yaml is noted, installed with the project.",
+   "Setup plan: psutil is noted, installed with the project.",
+   "Setup plan: wcmatch is noted, installed with the project.",
+   "Setup plan: sanitize-filename is noted, installed with the project.",
+   "Setup plan: requests is noted, installed with the project.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >=3.12,<3.16"
+  ],
+  "setup_plan": {
+   "packages": [
+    {
+     "requirement": "certifi",
+     "name": "certifi",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "colorama",
+     "name": "colorama",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "jaraco.text",
+     "name": "jaraco.text",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "nodriver==0.50.6",
+     "name": "nodriver",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "platformdirs>=2.1.0",
+     "name": "platformdirs",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pydantic>=2.11.0",
+     "name": "pydantic",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "ruamel.yaml",
+     "name": "ruamel.yaml",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "psutil",
+     "name": "psutil",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "wcmatch",
+     "name": "wcmatch",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "sanitize-filename>=1.2.0",
+     "name": "sanitize-filename",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "requests>=2.34.2",
+     "name": "requests",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    }
+   ],
+   "extra_reqs": [],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >=3.12,<3.16"
+   },
+   "system": [],
+   "refused": []
+  }
+ },
+ "chosen": {
+  "pr": 1361,
+  "head_sha": null,
+  "install": null,
+  "test_cmd": null
+ },
+ "sides": {
+  "comparison_basis": "merge-base vs PR head (no merge ref available)",
+  "main_sha": "594f623cf87ce7f8eefe76da02642af064c957eb",
+  "pr_sha": "5258d75baff447f26f70c7ae4d5ed9a441dbcd95"
+ },
+ "tested": {
+  "main": "main @ 594f623cf87c (merge-base with the PR head)",
+  "pr": "PR head 5258d75baff4"
+ },
+ "probe_plan": {
+  "baseline": "full",
+  "model": "model provider: nebius (Token Factory, live)",
+  "errors": [],
+  "model_claims": [
+   {
+    "id": "C1",
+    "text": "Add `login`, which opens the configured browser profile visibly, lets the user authenticate, then verifies the configured account after ENTER and closes the managed browser.",
+    "source_quote": "Add `login`, which opens the configured browser profile visibly, lets the user authenticate, then verifies the configured account after ENTER and closes the managed browser.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C2",
+    "text": "In Docker it works with the browser desktop of the standard image (#1357).",
+    "source_quote": "In Docker it works with the browser desktop of the standard image (#1357).",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C3",
+    "text": "Force a persistent visible session for this command only (no private/guest/headless arguments), without changing config files or submitting credentials/SMS requests.",
+    "source_quote": "Force a persistent visible session for this command only (no private/guest/headless arguments), without changing config files or submitting credentials/SMS requests.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C4",
+    "text": "Reject noninteractive input, verify the configured account, and close browser resources on success/failure.",
+    "source_quote": "Reject noninteractive input, verify the configured account, and close browser resources on success/failure.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C5",
+    "text": "Warn when private/guest mode in the normal config would prevent later session reuse.",
+    "source_quote": "Warn when private/guest mode in the normal config would prevent later session reuse.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C6",
+    "text": "Document native, Docker and Portainer usage in docs/BROWSER_TROUBLESHOOTING.md and link it from the README.",
+    "source_quote": "Document native, Docker and Portainer usage in `docs/BROWSER_TROUBLESHOOTING.md` and link it from the README.",
+    "testable": false,
+    "expect": "same"
+   },
+   {
+    "id": "C7",
+    "text": "No new dependencies, config defaults, or schema changes.",
+    "source_quote": "No new dependencies, config defaults, or schema changes.",
+    "testable": false,
+    "expect": "same"
+   }
+  ],
+  "model_rejected_claims": [],
+  "diff_targets": [
+   "kleinanzeigen_bot.cli.help_text"
+  ],
+  "frozen": [
+   {
+    "path": "model-probes/model-probe1.py",
+    "source": "model",
+    "sha256": "82b30287eedd2712f4a2cfbd64a05bc1fefab492f46238e5bd248cf44f2aaa87",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-10-21T19:47:31.180236+00:00",
+    "inputs_sha256": "a32369b7767fc8e7a0d03ac9bbc237f33c4b722a7d8980cd896d5baaec9d05c3",
+    "inputs": {
+     "title_chars": 38,
+     "body_chars": 2633,
+     "base_files": {
+      "src/kleinanzeigen_bot/app.py": "71e14a1b062889dd37530ef7c80c67eac0fd32be8e212adf8e3cdb2b0d290ff1",
+      "src/kleinanzeigen_bot/cli.py": "266b55cce5cfc4a65fe9cd8d58acd889476446d598d6ef00883c97bf8b34839c",
+      "src/kleinanzeigen_bot/runtime_config.py": "82f832f1ef2d4d7be3ae83d42a58cf71dada87ffd0f9577944015e965dfceb97",
+      "src/kleinanzeigen_bot/utils/web_scraping_mixin.py": "5856ae66b8632073bf8b09b176e5a29b540612f559746355493484cb269182ac"
+     }
+    }
+   },
+   {
+    "path": "model-probes/model-probe2.py",
+    "source": "model",
+    "sha256": "92d626db0e988f6c40232b2399d5633e9a187714411c47ba6b13c914807a9b24",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-10-21T19:47:31.180399+00:00",
+    "inputs_sha256": "a32369b7767fc8e7a0d03ac9bbc237f33c4b722a7d8980cd896d5baaec9d05c3",
+    "inputs": {
+     "title_chars": 38,
+     "body_chars": 2633,
+     "base_files": {
+      "src/kleinanzeigen_bot/app.py": "71e14a1b062889dd37530ef7c80c67eac0fd32be8e212adf8e3cdb2b0d290ff1",
+      "src/kleinanzeigen_bot/cli.py": "266b55cce5cfc4a65fe9cd8d58acd889476446d598d6ef00883c97bf8b34839c",
+      "src/kleinanzeigen_bot/runtime_config.py": "82f832f1ef2d4d7be3ae83d42a58cf71dada87ffd0f9577944015e965dfceb97",
+      "src/kleinanzeigen_bot/utils/web_scraping_mixin.py": "5856ae66b8632073bf8b09b176e5a29b540612f559746355493484cb269182ac"
+     }
+    }
+   },
+   {
+    "path": "diff-probes/diff-api.py",
+    "source": "diff",
+    "sha256": "763b4ca5a87d4435c6ed2202fc951b628584d9a8d0a9e56b5ba29421d1fd0561",
+    "generator": {
+     "kind": "diff",
+     "label": "diff (auto-derived from base-side code, model-free)",
+     "model": null,
+     "provider": null,
+     "provenance": "auto-derived",
+     "blind": false
+    },
+    "frozen_at": "2026-10-21T19:47:31.201394+00:00",
+    "inputs_sha256": "a5cb63b78d3017bcefaef62d63e70848a7b751a07432c66ae797553aac7aa943",
+    "inputs": {
+     "title_chars": 0,
+     "body_chars": 0,
+     "base_files": {
+      "src/kleinanzeigen_bot/app.py": "71e14a1b062889dd37530ef7c80c67eac0fd32be8e212adf8e3cdb2b0d290ff1",
+      "src/kleinanzeigen_bot/cli.py": "266b55cce5cfc4a65fe9cd8d58acd889476446d598d6ef00883c97bf8b34839c",
+      "src/kleinanzeigen_bot/runtime_config.py": "82f832f1ef2d4d7be3ae83d42a58cf71dada87ffd0f9577944015e965dfceb97",
+      "src/kleinanzeigen_bot/utils/web_scraping_mixin.py": "5856ae66b8632073bf8b09b176e5a29b540612f559746355493484cb269182ac"
+     }
+    }
+   }
+  ]
+ },
+ "test_extras": [
+  "pytest-asyncio>=0.25.3",
+  "pytest-xdist>=3.6.1",
+  "pytest-rerunfailures",
+  "pytest-mock>=3.14.0"
+ ],
+ "pr_side_started_at": "2026-10-21T19:47:31.325458+00:00",
+ "test_targets": {
+  "main": [
+   "tests/integration/test_web_scraping_mixin_integration.py",
+   "tests/unit/test_app.py",
+   "tests/unit/test_web_scraping_mixin.py",
+   "tests/unit/test_cli.py",
+   "tests/unit/test_runtime_config.py"
+  ],
+  "pr": [
+   "tests/integration/test_web_scraping_mixin_integration.py",
+   "tests/unit/test_app.py",
+   "tests/unit/test_web_scraping_mixin.py",
+   "tests/unit/test_cli.py",
+   "tests/unit/test_runtime_config.py"
+  ]
+ },
+ "installed_commit": {
+  "main": {
+   "dist": "kleinanzeigen-bot",
+   "expected": "594f623cf87ce7f8eefe76da02642af064c957eb",
+   "installed": "594f623cf87ce7f8eefe76da02642af064c957eb",
+   "ok": true
+  },
+  "pr": {
+   "dist": "kleinanzeigen-bot",
+   "expected": "5258d75baff447f26f70c7ae4d5ed9a441dbcd95",
+   "installed": "5258d75baff447f26f70c7ae4d5ed9a441dbcd95",
+   "ok": true
+  }
+ },
+ "declared_test_deps": {
+  "requested": [
+   "pytest-asyncio>=0.25.3",
+   "pytest-xdist>=3.6.1",
+   "pytest-rerunfailures",
+   "pytest-mock>=3.14.0"
+  ],
+  "installed": true
+ },
+ "comparison": {
+  "same": 322,
+  "same_skipped_both": 0,
+  "regressions": [],
+  "fixed": [],
+  "new_tests_passing": 12,
+  "new_tests_failing": [
+   "tests.integration.test_web_scraping_mixin_integration::test_closing_a_session_persists_cookies_for_the_next_start"
+  ],
+  "new_tests_skipped": [],
+  "removed_tests": [],
+  "reparametrized": [],
+  "skipped_missing_dependency": [],
+  "flaky": [],
+  "pr_unstable": [],
+  "pr_unstable_noisy": [],
+  "environment": [],
+  "other_changes": [],
+  "preexisting_failures": [
+   "tests.integration.test_web_scraping_mixin_integration::test_init",
+   "tests.integration.test_web_scraping_mixin_integration::test_logged_in_marker_is_detected_on_redesigned_start_page_at_any_viewport_width[1024-True]",
+   "tests.integration.test_web_scraping_mixin_integration::test_logged_in_marker_is_detected_on_redesigned_start_page_at_any_viewport_width[390-False]",
+   "tests.integration.test_web_scraping_mixin_integration::test_sms_verification_prompts_at_request_and_entry_stages[<p>Ger\\xe4t best\\xe4tigen<br>Wir senden dir einen Code.</p><button>Code senden</button>-True]",
+   "tests.integration.test_web_scraping_mixin_integration::test_sms_verification_prompts_at_request_and_entry_stages[<p>Willkommen</p>-False]",
+   "tests.integration.test_web_scraping_mixin_integration::test_sms_verification_prompts_at_request_and_entry_stages[<p>Wir haben dir gerade einen 6-stelligen Code f\\xfcr die Telefonnummer +49 *** geschickt.</p>-True]",
+   "tests.integration.test_web_scraping_mixin_integration::test_sms_verification_prompts_at_request_and_entry_stages[<p>Wir haben dir gerade einen <strong>6-stelligen Code</strong> f\\xfcr die Telefonnummer +49 *** geschickt.</p>-True]",
+   "tests.integration.test_web_scraping_mixin_integration::test_sms_verification_prompts_at_request_and_entry_stages[<p>Wir senden dir einen 6-stelligen Code f\\xfcr die Telefonnummer +49 ***.</p><button>Code senden</button>-True]",
+   "tests.integration.test_web_scraping_mixin_integration::test_sms_verification_prompts_at_request_and_entry_stages[<p>Wir senden dir einen <strong>6-stelligen Code</strong> f\\xfcr die Telefonnummer.</p><button>Code senden</button>-True]",
+   "tests.integration.test_web_scraping_mixin_integration::test_sms_verification_prompts_at_request_and_entry_stages[<p>Wir senden dir unsere Angebote per E-Mail.</p>-False]",
+   "tests.integration.test_web_scraping_mixin_integration::test_sms_verification_prompts_at_request_and_entry_stages[<script>const t = 'Wir senden dir einen 6-stelligen Code';</script><p>Willkommen</p>-False]",
+   "tests.integration.test_web_scraping_mixin_integration::test_viewport_resize_applies_window_bounds",
+   "tests.unit.test_web_scraping_mixin.TestWebScrapingBrowserConfiguration::test_browser_profile_configuration",
+   "tests.unit.test_web_scraping_mixin.TestWebScrapingBrowserConfiguration::test_session_creation_error_cleanup",
+   "tests.unit.test_web_scraping_mixin.TestWebScrapingBrowserConfiguration::test_session_state_persistence"
+  ],
+  "load_failed_both": [],
+  "load_failed_pr": [],
+  "load_failed_main": [],
+  "executed": {
+   "main": 322,
+   "pr": 335
+  },
+  "messages": {
+   "tests.integration.test_web_scraping_mixin_integration::test_closing_a_session_persists_cookies_for_the_next_start": "AssertionError: Installed browser could not be detected"
+  }
+ },
+ "exit_check": {
+  "explained": true,
+  "problems": [],
+  "detail": "pytest exit 1; 15 failure(s)/error(s) pre-existing and identical on both sides"
+ },
+ "coverage": {
+  "status": "measured",
+  "changed_lines_total": 27,
+  "changed_lines_covered": 27,
+  "files": [
+   {
+    "file": "src/kleinanzeigen_bot/app.py",
+    "changed_lines_total": 18,
+    "changed_lines_covered": 18
+   },
+   {
+    "file": "src/kleinanzeigen_bot/cli.py",
+    "changed_lines_total": 0,
+    "changed_lines_covered": 0
+   },
+   {
+    "file": "src/kleinanzeigen_bot/runtime_config.py",
+    "changed_lines_total": 0,
+    "changed_lines_covered": 0
+   },
+   {
+    "file": "src/kleinanzeigen_bot/utils/web_scraping_mixin.py",
+    "changed_lines_total": 9,
+    "changed_lines_covered": 9
+   }
+  ],
+  "seconds": 10.1,
+  "exit": 1,
+  "log": "coverage-pytest.log"
+ },
+ "probes": {
+  "status": "ran",
+  "items": [
+   {
+    "id": "model-probe1",
+    "source": "model",
+    "path": "model-probes/model-probe1.py",
+    "sha256": "82b30287eedd2712f4a2cfbd64a05bc1fefab492f46238e5bd248cf44f2aaa87",
+    "target": "Second-Hand-Friends/kleinanzeigen-bot#1361",
+    "about": "Test login command recognition and non-interactive rejection",
+    "claims": [
+     {
+      "id": "C1",
+      "source": "PR description",
+      "text": "Add `login`, which opens the configured browser profile visibly, lets the user authenticate, then verifies the configured account after ENTER and closes the managed browser.",
+      "covers": [
+       "exists",
+       "rejects noninteractive input"
+      ],
+      "expect": "differs"
+     },
+     {
+      "id": "C4",
+      "source": "PR description",
+      "text": "Reject noninteractive input, verify the configured account, and close browser resources on success/failure.",
+      "covers": [
+       "rejects noninteractive input"
+      ],
+      "expect": "differs"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 1.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 1.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 1.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 1.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 1.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 1.1,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-probe1-main-1.jsonl",
+      "probe-model-probe1-main-2.jsonl",
+      "probe-model-probe1-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-probe1-pr-1.jsonl",
+      "probe-model-probe1-pr-2.jsonl",
+      "probe-model-probe1-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "probe1.exit_code": 2,
+       "probe1.stderr": "\u001b[33m[WARNING]\u001b[0m \u001b[33mnodriver CDP re-attach patch not found: installed nodriver may miss the flat-mode fix. Plain pip installs skip the PDM post_install hook; run `pdm install` from a source checko",
+       "probe1.stdout": " _    _      _                           _                       _           _\n| | _| | ___(_)_ __   __ _ _ __  _______(_) __ _  ___ _ __      | |__   ___ | |_\n| |/ / |/ _ \\ | '_ \\ / _` | '_ \\|_  / _ "
+      },
+      {
+       "probe1.exit_code": 2,
+       "probe1.stderr": "\u001b[33m[WARNING]\u001b[0m \u001b[33mnodriver CDP re-attach patch not found: installed nodriver may miss the flat-mode fix. Plain pip installs skip the PDM post_install hook; run `pdm install` from a source checko",
+       "probe1.stdout": " _    _      _                           _                       _           _\n| | _| | ___(_)_ __   __ _ _ __  _______(_) __ _  ___ _ __      | |__   ___ | |_\n| |/ / |/ _ \\ | '_ \\ / _` | '_ \\|_  / _ "
+      },
+      {
+       "probe1.exit_code": 2,
+       "probe1.stderr": "\u001b[33m[WARNING]\u001b[0m \u001b[33mnodriver CDP re-attach patch not found: installed nodriver may miss the flat-mode fix. Plain pip installs skip the PDM post_install hook; run `pdm install` from a source checko",
+       "probe1.stdout": " _    _      _                           _                       _           _\n| | _| | ___(_)_ __   __ _ _ __  _______(_) __ _  ___ _ __      | |__   ___ | |_\n| |/ / |/ _ \\ | '_ \\ / _` | '_ \\|_  / _ "
+      }
+     ],
+     "pr": [
+      {
+       "probe1.exit_code": 1,
+       "probe1.stderr": "\u001b[33m[WARNING]\u001b[0m \u001b[33mnodriver CDP re-attach patch not found: installed nodriver may miss the flat-mode fix. Plain pip installs skip the PDM post_install hook; run `pdm install` from a source checko",
+       "probe1.stdout": " _    _      _                           _                       _           _\n| | _| | ___(_)_ __   __ _ _ __  _______(_) __ _  ___ _ __      | |__   ___ | |_\n| |/ / |/ _ \\ | '_ \\ / _` | '_ \\|_  / _ "
+      },
+      {
+       "probe1.exit_code": 1,
+       "probe1.stderr": "\u001b[33m[WARNING]\u001b[0m \u001b[33mnodriver CDP re-attach patch not found: installed nodriver may miss the flat-mode fix. Plain pip installs skip the PDM post_install hook; run `pdm install` from a source checko",
+       "probe1.stdout": " _    _      _                           _                       _           _\n| | _| | ___(_)_ __   __ _ _ __  _______(_) __ _  ___ _ __      | |__   ___ | |_\n| |/ / |/ _ \\ | '_ \\ / _` | '_ \\|_  / _ "
+      },
+      {
+       "probe1.exit_code": 1,
+       "probe1.stderr": "\u001b[33m[WARNING]\u001b[0m \u001b[33mnodriver CDP re-attach patch not found: installed nodriver may miss the flat-mode fix. Plain pip installs skip the PDM post_install hook; run `pdm install` from a source checko",
+       "probe1.stdout": " _    _      _                           _                       _           _\n| | _| | ___(_)_ __   __ _ _ __  _______(_) __ _  ___ _ __      | |__   ___ | |_\n| |/ / |/ _ \\ | '_ \\ / _` | '_ \\|_  / _ "
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "probe1.exit_code",
+      "state": "differs",
+      "label": "unmentioned",
+      "claim": null,
+      "main": 2,
+      "pr": 1,
+      "diffs": [
+       {
+        "field": "",
+        "main": 2,
+        "pr": 1
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"probe1.exit_code\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"probe1.exit_code\""
+       }
+      }
+     },
+     {
+      "name": "probe1.stderr",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": "\u001b[33m[WARNING]\u001b[0m \u001b[33mnodriver CDP re-attach patch not found: installed nodriver may miss the flat-mode fix. Plain pip installs skip the PDM post_install hook; run `pdm install` from a source checko",
+      "pr": "\u001b[33m[WARNING]\u001b[0m \u001b[33mnodriver CDP re-attach patch not found: installed nodriver may miss the flat-mode fix. Plain pip installs skip the PDM post_install hook; run `pdm install` from a source checko",
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"probe1.stderr\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"probe1.stderr\""
+       }
+      }
+     },
+     {
+      "name": "probe1.stdout",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": " _    _      _                           _                       _           _\n| | _| | ___(_)_ __   __ _ _ __  _______(_) __ _  ___ _ __      | |__   ___ | |_\n| |/ / |/ _ \\ | '_ \\ / _` | '_ \\|_  / _ ",
+      "pr": " _    _      _                           _                       _           _\n| | _| | ___(_)_ __   __ _ _ __  _______(_) __ _  ___ _ __      | |__   ___ | |_\n| |/ / |/ _ \\ | '_ \\ / _` | '_ \\|_  / _ ",
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-main-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"probe1.stdout\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"probe1.stdout\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "82b30287eedd2712f4a2cfbd64a05bc1fefab492f46238e5bd248cf44f2aaa87",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-10-21T19:47:31.180236+00:00",
+     "inputs_sha256": "a32369b7767fc8e7a0d03ac9bbc237f33c4b722a7d8980cd896d5baaec9d05c3",
+     "inputs": {
+      "title_chars": 38,
+      "body_chars": 2633,
+      "base_files": {
+       "src/kleinanzeigen_bot/app.py": "71e14a1b062889dd37530ef7c80c67eac0fd32be8e212adf8e3cdb2b0d290ff1",
+       "src/kleinanzeigen_bot/cli.py": "266b55cce5cfc4a65fe9cd8d58acd889476446d598d6ef00883c97bf8b34839c",
+       "src/kleinanzeigen_bot/runtime_config.py": "82f832f1ef2d4d7be3ae83d42a58cf71dada87ffd0f9577944015e965dfceb97",
+       "src/kleinanzeigen_bot/utils/web_scraping_mixin.py": "5856ae66b8632073bf8b09b176e5a29b540612f559746355493484cb269182ac"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-10-21T19:47:31.325458+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "not measured",
+     "why": "coverage produced no data (exit 0); see probe-coverage.log",
+     "adequacy": "unmeasured",
+     "note": "probe coverage not measured (coverage produced no data (exit 0); see probe-coverage.log)"
+    },
+    "status": "rejected",
+    "rejected_reason": "rejected: claim pattern(s) C1, C4 match none of this probe's observation names, so the probe is not counted"
+   },
+   {
+    "id": "model-probe2",
+    "source": "model",
+    "path": "model-probes/model-probe2.py",
+    "sha256": "92d626db0e988f6c40232b2399d5633e9a187714411c47ba6b13c914807a9b24",
+    "target": "Second-Hand-Friends/kleinanzeigen-bot#1361",
+    "about": "Test config file unchanged and private mode warning",
+    "claims": [
+     {
+      "id": "C2",
+      "source": "PR description",
+      "text": "In Docker it works with the browser desktop of the standard image (#1357).",
+      "covers": [
+       "works in Docker standard image"
+      ],
+      "expect": "differs"
+     },
+     {
+      "id": "C3",
+      "source": "PR description",
+      "text": "Force a persistent visible session for this command only (no private/guest/headless arguments), without changing config files or submitting credentials/SMS requests.",
+      "covers": [
+       "does not change config files",
+       "forces persistent visible session (no private/guest/headless)"
+      ],
+      "expect": "differs"
+     },
+     {
+      "id": "C4",
+      "source": "PR description",
+      "text": "Reject noninteractive input, verify the configured account, and close browser resources on success/failure.",
+      "covers": [
+       "closes browser resources on success/failure"
+      ],
+      "expect": "differs"
+     },
+     {
+      "id": "C5",
+      "source": "PR description",
+      "text": "Warn when private/guest mode in the normal config would prevent later session reuse.",
+      "covers": [
+       "warns when private/guest mode prevents session reuse"
+      ],
+      "expect": "differs"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 1.0,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 1.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 1.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 1.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 1.0,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 1.0,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-probe2-main-1.jsonl",
+      "probe-model-probe2-main-2.jsonl",
+      "probe-model-probe2-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-probe2-pr-1.jsonl",
+      "probe-model-probe2-pr-2.jsonl",
+      "probe-model-probe2-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "probe2.config_unchanged": true,
+       "probe2.warning_found": false
+      },
+      {
+       "probe2.config_unchanged": true,
+       "probe2.warning_found": false
+      },
+      {
+       "probe2.config_unchanged": true,
+       "probe2.warning_found": false
+      }
+     ],
+     "pr": [
+      {
+       "probe2.config_unchanged": true,
+       "probe2.warning_found": false
+      },
+      {
+       "probe2.config_unchanged": true,
+       "probe2.warning_found": false
+      },
+      {
+       "probe2.config_unchanged": true,
+       "probe2.warning_found": false
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "probe2.config_unchanged",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": true,
+      "pr": true,
+      "citations": {
+       "main": {
+        "file": "probe-model-probe2-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"probe2.config_unchanged\""
+       },
+       "pr": {
+        "file": "probe-model-probe2-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"probe2.config_unchanged\""
+       }
+      }
+     },
+     {
+      "name": "probe2.warning_found",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": false,
+      "pr": false,
+      "citations": {
+       "main": {
+        "file": "probe-model-probe2-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"probe2.warning_found\""
+       },
+       "pr": {
+        "file": "probe-model-probe2-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"probe2.warning_found\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "92d626db0e988f6c40232b2399d5633e9a187714411c47ba6b13c914807a9b24",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-10-21T19:47:31.180399+00:00",
+     "inputs_sha256": "a32369b7767fc8e7a0d03ac9bbc237f33c4b722a7d8980cd896d5baaec9d05c3",
+     "inputs": {
+      "title_chars": 38,
+      "body_chars": 2633,
+      "base_files": {
+       "src/kleinanzeigen_bot/app.py": "71e14a1b062889dd37530ef7c80c67eac0fd32be8e212adf8e3cdb2b0d290ff1",
+       "src/kleinanzeigen_bot/cli.py": "266b55cce5cfc4a65fe9cd8d58acd889476446d598d6ef00883c97bf8b34839c",
+       "src/kleinanzeigen_bot/runtime_config.py": "82f832f1ef2d4d7be3ae83d42a58cf71dada87ffd0f9577944015e965dfceb97",
+       "src/kleinanzeigen_bot/utils/web_scraping_mixin.py": "5856ae66b8632073bf8b09b176e5a29b540612f559746355493484cb269182ac"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-10-21T19:47:31.325458+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "not measured",
+     "why": "coverage produced no data (exit 0); see probe-coverage.log",
+     "adequacy": "unmeasured",
+     "note": "probe coverage not measured (coverage produced no data (exit 0); see probe-coverage.log)"
+    },
+    "status": "rejected",
+    "rejected_reason": "rejected: claim pattern(s) C2, C3, C4, C5 match none of this probe's observation names, so the probe is not counted"
+   },
+   {
+    "id": "diff-api",
+    "source": "diff",
+    "path": "diff-probes/diff-api.py",
+    "sha256": "763b4ca5a87d4435c6ed2202fc951b628584d9a8d0a9e56b5ba29421d1fd0561",
+    "target": "Second-Hand-Friends/kleinanzeigen-bot#1361",
+    "about": "Public functions touched by the PR, called with type-appropriate inputs on both sides.",
+    "claims": [],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 1.0,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 1.0,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 1.0,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 1.0,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 1.0,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 1.0,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-diff-api-main-1.jsonl",
+      "probe-diff-api-main-2.jsonl",
+      "probe-diff-api-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-diff-api-pr-1.jsonl",
+      "probe-diff-api-pr-2.jsonl",
+      "probe-diff-api-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "kleinanzeigen_bot.cli.help_text.input0": "Usage: \u001b[95mpython -m kleinanzeigen_bot COMMAND [OPTIONS]\u001b[0m\n\nCommands:\n  publish  - (re-)publishes ads\n  verify   - verifies the configuration files and ad integrity\n  delete   - deletes ads\n  updat"
+      },
+      {
+       "kleinanzeigen_bot.cli.help_text.input0": "Usage: \u001b[95mpython -m kleinanzeigen_bot COMMAND [OPTIONS]\u001b[0m\n\nCommands:\n  publish  - (re-)publishes ads\n  verify   - verifies the configuration files and ad integrity\n  delete   - deletes ads\n  updat"
+      },
+      {
+       "kleinanzeigen_bot.cli.help_text.input0": "Usage: \u001b[95mpython -m kleinanzeigen_bot COMMAND [OPTIONS]\u001b[0m\n\nCommands:\n  publish  - (re-)publishes ads\n  verify   - verifies the configuration files and ad integrity\n  delete   - deletes ads\n  updat"
+      }
+     ],
+     "pr": [
+      {
+       "kleinanzeigen_bot.cli.help_text.input0": "Usage: \u001b[95mpython -m kleinanzeigen_bot COMMAND [OPTIONS]\u001b[0m\n\nCommands:\n  publish  - (re-)publishes ads\n  verify   - verifies the configuration files and ad integrity\n  delete   - deletes ads\n  updat"
+      },
+      {
+       "kleinanzeigen_bot.cli.help_text.input0": "Usage: \u001b[95mpython -m kleinanzeigen_bot COMMAND [OPTIONS]\u001b[0m\n\nCommands:\n  publish  - (re-)publishes ads\n  verify   - verifies the configuration files and ad integrity\n  delete   - deletes ads\n  updat"
+      },
+      {
+       "kleinanzeigen_bot.cli.help_text.input0": "Usage: \u001b[95mpython -m kleinanzeigen_bot COMMAND [OPTIONS]\u001b[0m\n\nCommands:\n  publish  - (re-)publishes ads\n  verify   - verifies the configuration files and ad integrity\n  delete   - deletes ads\n  updat"
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "kleinanzeigen_bot.cli.help_text.input0",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": "Usage: \u001b[95mpython -m kleinanzeigen_bot COMMAND [OPTIONS]\u001b[0m\n\nCommands:\n  publish  - (re-)publishes ads\n  verify   - verifies the configuration files and ad integrity\n  delete   - deletes ads\n  updat",
+      "pr": "Usage: \u001b[95mpython -m kleinanzeigen_bot COMMAND [OPTIONS]\u001b[0m\n\nCommands:\n  publish  - (re-)publishes ads\n  verify   - verifies the configuration files and ad integrity\n  delete   - deletes ads\n  updat",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"kleinanzeigen_bot.cli.help_text.input0\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"kleinanzeigen_bot.cli.help_text.input0\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "diff",
+     "label": "diff (auto-derived from base-side code, model-free)",
+     "model": null,
+     "provider": null,
+     "provenance": "auto-derived",
+     "blind": false
+    },
+    "freeze": {
+     "sha256": "763b4ca5a87d4435c6ed2202fc951b628584d9a8d0a9e56b5ba29421d1fd0561",
+     "generator": {
+      "kind": "diff",
+      "label": "diff (auto-derived from base-side code, model-free)",
+      "model": null,
+      "provider": null,
+      "provenance": "auto-derived",
+      "blind": false
+     },
+     "frozen_at": "2026-10-21T19:47:31.201394+00:00",
+     "inputs_sha256": "a5cb63b78d3017bcefaef62d63e70848a7b751a07432c66ae797553aac7aa943",
+     "inputs": {
+      "title_chars": 0,
+      "body_chars": 0,
+      "base_files": {
+       "src/kleinanzeigen_bot/app.py": "71e14a1b062889dd37530ef7c80c67eac0fd32be8e212adf8e3cdb2b0d290ff1",
+       "src/kleinanzeigen_bot/cli.py": "266b55cce5cfc4a65fe9cd8d58acd889476446d598d6ef00883c97bf8b34839c",
+       "src/kleinanzeigen_bot/runtime_config.py": "82f832f1ef2d4d7be3ae83d42a58cf71dada87ffd0f9577944015e965dfceb97",
+       "src/kleinanzeigen_bot/utils/web_scraping_mixin.py": "5856ae66b8632073bf8b09b176e5a29b540612f559746355493484cb269182ac"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-10-21T19:47:31.325458+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 6,
+     "changed_lines_covered": 0,
+     "files": [
+      {
+       "file": "src/kleinanzeigen_bot/app.py",
+       "changed_lines_total": 3,
+       "changed_lines_covered": 0
+      },
+      {
+       "file": "src/kleinanzeigen_bot/cli.py",
+       "changed_lines_total": 0,
+       "changed_lines_covered": 0
+      },
+      {
+       "file": "src/kleinanzeigen_bot/runtime_config.py",
+       "changed_lines_total": 0,
+       "changed_lines_covered": 0
+      },
+      {
+       "file": "src/kleinanzeigen_bot/utils/web_scraping_mixin.py",
+       "changed_lines_total": 3,
+       "changed_lines_covered": 0
+      }
+     ],
+     "adequacy": "not_adequate",
+     "note": "ran none of the 6 changed line(s) on the main side",
+     "exit": 0,
+     "data": "probe-cov-diff-api.json"
+    },
+    "status": "ran"
+   }
+  ],
+  "summary": {
+   "labels": [
+    "no_difference"
+   ],
+   "flagged": [],
+   "proven_claims": [],
+   "reason": "probe: 1 other observation(s) identical on both sides; rejected: claim pattern(s) C1, C4 match none of this probe's observation names, so the probe is not counted; rejected: claim pattern(s) C2, C3, C4, C5 match none of this probe's observation names, so the probe is not counted",
+   "ignored_noise": [],
+   "ignored_warning_only": [],
+   "pr_only_noisy": []
+  }
+ },
+ "probe_changed_line_coverage": {
+  "status": "partly measured",
+  "side": "main",
+  "probes": {
+   "model-probe1": {
+    "status": "not measured",
+    "changed_lines_covered": null,
+    "changed_lines_total": null,
+    "adequacy": "unmeasured"
+   },
+   "model-probe2": {
+    "status": "not measured",
+    "changed_lines_covered": null,
+    "changed_lines_total": null,
+    "adequacy": "unmeasured"
+   },
+   "diff-api": {
+    "status": "measured",
+    "changed_lines_covered": 0,
+    "changed_lines_total": 6,
+    "adequacy": "not_adequate"
+   }
+  },
+  "not_adequate": [
+   "diff-api"
+  ]
+ },
+ "verdict": "needs_attention",
+ "reason": "1 new test(s) fail on the PR; 322 test(s) ran on main, 335 on the PR; 12 new test(s) pass, 307 unchanged; 15 test failure(s) pre-existing and identical on both sides; probe: 1 observation(s) need attention: probe1.exit_code differs and no claim covers it; rejected: claim pattern(s) C1, C4 match none of this probe's observation names, so the probe is not counted; rejected: claim pattern(s) C2, C3, C4, C5 match none of this probe's observation names, so the probe is not counted",
+ "verdict_before_coverage_gate": "needs_attention",
+ "reason_before_coverage_gate": "1 new test(s) fail on the PR; 322 test(s) ran on main, 335 on the PR; 12 new test(s) pass, 307 unchanged; 15 test failure(s) pre-existing and identical on both sides; probe: 1 observation(s) need attention: probe1.exit_code differs and no claim covers it; rejected: claim pattern(s) C1, C4 match none of this probe's observation names, so the probe is not counted; rejected: claim pattern(s) C2, C3, C4, C5 match none of this probe's observation names, so the probe is not counted",
+ "changed_lines_total": 27,
+ "changed_lines_covered": 27,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "normal",
+  "note": "27 of 27 changed executable line(s) ran (100%)",
+  "measurement": "measured"
+ },
+ "agents": {
+  "status": "skipped",
+  "note": "advisory swarm is off",
+  "roles": []
+ },
+ "explanation": {
+  "status": "not yet wired",
+  "why": "advisory swarm is off"
+ },
+ "swarm_requested": false,
+ "operator_approval_requested": false,
+ "swarm": "off",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [
+   "src/kleinanzeigen_bot/app.py",
+   "src/kleinanzeigen_bot/cli.py",
+   "src/kleinanzeigen_bot/runtime_config.py",
+   "src/kleinanzeigen_bot/utils/web_scraping_mixin.py"
+  ],
+  "compiled_files": [],
+  "other_files": [
+   "README.md",
+   "docs/BROWSER_TROUBLESHOOTING.md",
+   "src/kleinanzeigen_bot/resources/translations.de.yaml",
+   "tests/integration/test_web_scraping_mixin_integration.py",
+   "tests/unit/test_app.py",
+   "tests/unit/test_web_scraping_mixin.py"
+  ]
+ },
+ "duration_s": {
+  "total_wall": 179.6,
+  "tests": 43.7
+ },
+ "cost": {
+  "ai_calls": 2,
+  "failed_ai_calls": 0,
+  "input_tokens": 16195,
+  "output_tokens": 13688,
+  "thinking_tokens": 12147,
+  "cost_usd": 0.017178,
+  "calls_without_usage": 0,
+  "ai_cost_usd": 0.017178,
+  "cost_complete": true,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 179.6,
+   "tests": 43.7
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.011973,
+  "total_cost_usd": 0.029151,
+  "swarm": {
+   "ai_calls": 0,
+   "failed_ai_calls": 0,
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "thinking_tokens": 0,
+   "cost_usd": 0.0,
+   "calls_without_usage": 0,
+   "ai_cost_usd": 0.0,
+   "cost_complete": true,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ },
+ "poc_code_version": "0fa0016"
+}

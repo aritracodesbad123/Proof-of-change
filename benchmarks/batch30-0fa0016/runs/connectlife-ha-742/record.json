@@ -1,0 +1,896 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-oyvindwe-connectlife-ha-742-52bc2901d18f-2026-10-22-check-1057",
+ "date_ist": "2026-10-22 10:57 IST",
+ "run_date": "2026-10-22",
+ "who": "ops/daily_run.py",
+ "repo": "oyvindwe/connectlife-ha",
+ "library": "connectlife-ha",
+ "pr": {
+  "repo": "oyvindwe/connectlife-ha",
+  "number": 742,
+  "url": "https://github.com/oyvindwe/connectlife-ha/pull/742",
+  "title": "Start WM26 G400 with program options, also from standby",
+  "base_sha": "a1dbb9b9868e652f907cf9f841d5a79b5871a5e5",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "52bc2901d18f435ec71ddf4c9ee6f0cac4b0d466",
+  "merge_commit": null,
+  "tested_main_sha": "a1dbb9b9868e652f907cf9f841d5a79b5871a5e5",
+  "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+ },
+ "author": "oyvindwe",
+ "base_ref": "main",
+ "updated_at_utc": "2026-10-21T16:43:03Z",
+ "updated_at_ist": "2026-10-21 22:13 IST",
+ "ci_state": "not checked (single-PR check)",
+ "ci_detail": "checked on request with --pr",
+ "tested_at_ist": "2026-10-22 10:57 IST",
+ "files": {
+  "all": [
+   "custom_components/connectlife/button.py",
+   "custom_components/connectlife/data_dictionaries/027-washing-machine-wm26-g400.yaml",
+   "custom_components/connectlife/data_dictionaries/README.md",
+   "custom_components/connectlife/data_dictionaries/properties-schema.json",
+   "custom_components/connectlife/dictionaries.py",
+   "custom_components/connectlife/strings.json",
+   "custom_components/connectlife/translations/cs.json",
+   "custom_components/connectlife/translations/de.json",
+   "custom_components/connectlife/translations/en.json",
+   "custom_components/connectlife/translations/es.json",
+   "custom_components/connectlife/translations/fr.json",
+   "custom_components/connectlife/translations/it.json",
+   "custom_components/connectlife/translations/nl.json",
+   "custom_components/connectlife/translations/no.json",
+   "custom_components/connectlife/translations/sr-Latn.json",
+   "tests/test_dictionaries.py"
+  ],
+  "package_py": [],
+  "compiled": [],
+  "other": [
+   "custom_components/connectlife/button.py",
+   "custom_components/connectlife/data_dictionaries/027-washing-machine-wm26-g400.yaml",
+   "custom_components/connectlife/data_dictionaries/README.md",
+   "custom_components/connectlife/data_dictionaries/properties-schema.json",
+   "custom_components/connectlife/dictionaries.py",
+   "custom_components/connectlife/strings.json",
+   "custom_components/connectlife/translations/cs.json",
+   "custom_components/connectlife/translations/de.json",
+   "custom_components/connectlife/translations/en.json",
+   "custom_components/connectlife/translations/es.json",
+   "custom_components/connectlife/translations/fr.json",
+   "custom_components/connectlife/translations/it.json",
+   "custom_components/connectlife/translations/nl.json",
+   "custom_components/connectlife/translations/no.json",
+   "custom_components/connectlife/translations/sr-Latn.json",
+   "tests/test_dictionaries.py"
+  ]
+ },
+ "machine_type": {
+  "arch": "x86_64",
+  "os": "Linux",
+  "platform": "Linux-6.12.94+-x86_64-with-glibc2.41",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": "g++ (Debian 14.2.0-19) 14.2.0",
+  "cpu_model": "Intel(R) Xeon(R) Processor",
+  "ram_gb": 15.6
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 0,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.13.5",
+ "test_selection": "mapped from touched files: tests/test_dictionaries.py",
+ "per_run": [
+  {
+   "side": "old",
+   "run": 1,
+   "passed": 0,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 4,
+   "seconds": 0.4,
+   "pytest_summary": "E   ModuleNotFoundError: No module named 'homeassistant'",
+   "junit": false
+  },
+  {
+   "side": "new",
+   "run": 1,
+   "passed": 0,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 4,
+   "seconds": 0.4,
+   "pytest_summary": "E   ModuleNotFoundError: No module named 'homeassistant'",
+   "junit": false
+  },
+  {
+   "side": "old",
+   "run": 2,
+   "passed": 0,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 4,
+   "seconds": 0.4,
+   "pytest_summary": "E   ModuleNotFoundError: No module named 'homeassistant'",
+   "junit": false
+  },
+  {
+   "side": "new",
+   "run": 2,
+   "passed": 0,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 4,
+   "seconds": 0.4,
+   "pytest_summary": "E   ModuleNotFoundError: No module named 'homeassistant'",
+   "junit": false
+  },
+  {
+   "side": "old",
+   "run": 3,
+   "passed": 0,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 4,
+   "seconds": 0.4,
+   "pytest_summary": "E   ModuleNotFoundError: No module named 'homeassistant'",
+   "junit": false
+  },
+  {
+   "side": "new",
+   "run": 3,
+   "passed": 0,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 4,
+   "seconds": 0.4,
+   "pytest_summary": "E   ModuleNotFoundError: No module named 'homeassistant'",
+   "junit": false
+  }
+ ],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "local",
+ "sandbox_backend_note": "local bubblewrap",
+ "machine": "local",
+ "posted_upstream": false,
+ "logs": "connectlife_ha-742/",
+ "freeze": {
+  "main": "freeze-main.txt",
+  "pr": "freeze-pr.txt"
+ },
+ "poc_commit": "0fa0016ea51794edee0f4a085e41bf48dd813765",
+ "route": "source-pair",
+ "current_head_sha": "52bc2901d18f435ec71ddf4c9ee6f0cac4b0d466",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "state": "closed",
+ "mergeable_state": "unknown",
+ "product_check": true,
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": {
+   "ok": true,
+   "skipped": false,
+   "live_call": true,
+   "cached": false,
+   "queries": [
+    "connectlife-ha python setup install instructions https://github.com/oyvindwe/connectlife-ha site:github.com/oyvindwe/connectlife-ha",
+    "connectlife-ha python documentation install https://github.com/oyvindwe/connectlife-ha site:github.com/oyvindwe/connectlife-ha",
+    "connectlife-ha python install requirements https://pypi.org/project/connectlife-ha/ https://github.com/oyvindwe/connectlife-ha site:pypi.org"
+   ],
+   "results": [
+    {
+     "title": "README.md - oyvindwe/connectlife-ha",
+     "url": "https://github.com/oyvindwe/connectlife-ha/blob/main/custom_components/connectlife/data_dictionaries/README.md",
+     "query": "connectlife-ha python setup install instructions https://github.com/oyvindwe/connectlife-ha site:github.com/oyvindwe/connectlife-ha"
+    },
+    {
+     "title": "Add data dictionary for Dehumidifier 007-499 (Hisense ...",
+     "url": "https://github.com/oyvindwe/connectlife-ha/issues/546",
+     "query": "connectlife-ha python setup install instructions https://github.com/oyvindwe/connectlife-ha site:github.com/oyvindwe/connectlife-ha"
+    },
+    {
+     "title": "AC light behavior \u00b7 Issue #340 \u00b7 oyvindwe/connectlife-ha \u00b7 GitHub",
+     "url": "https://github.com/oyvindwe/connectlife-ha/issues/340",
+     "query": "connectlife-ha python setup install instructions https://github.com/oyvindwe/connectlife-ha site:github.com/oyvindwe/connectlife-ha"
+    },
+    {
+     "title": "GitHub - oyvindwe/connectlife-ha: ConnectLife integration for Home Assistant \u00b7 GitHub",
+     "url": "https://github.com/oyvindwe/connectlife-ha",
+     "query": "connectlife-ha python documentation install https://github.com/oyvindwe/connectlife-ha site:github.com/oyvindwe/connectlife-ha"
+    },
+    {
+     "title": "ConnectLife integration stopped working \u00b7 Issue #352 \u00b7 oyvindwe/connectlife-ha \u00b7 GitHub",
+     "url": "https://github.com/oyvindwe/connectlife-ha/issues/352",
+     "query": "connectlife-ha python documentation install https://github.com/oyvindwe/connectlife-ha site:github.com/oyvindwe/connectlife-ha"
+    }
+   ],
+   "text": "To install the connectlife-ha package, you need to use pip to install the connectlife package and then generate a skeleton file using the command `python -m connectlife.dump --username <username> --password <password>`. The sources also mention that you can run it locally if you have a Python installation and that a fully restart of Home Assistant is required after creating a device dump. The sources do not provide specific details on the version of Python required or any additional dependencies beyond the connectlife package.\nTo install the connectlife-ha Python documentation from the GitHub repository, you can either use HACS or download the connectlife directory and place it in your `/custom_components/` directory. After installation, restart Home Assistant. To finalize the setup, open the ConnectLife mobile app, change the app language to English, force close the app, reopen it, accept the Terms & Conditions, and reload the ConnectLife integration in Home Assistant. The app language can be changed back afterward.\nThe sources do not provide information about the installation requirements for \"connectlife-ha\" Python package. The provided sources focus on Hyundai vehicle details, including MSRP and financing options, and do not mention anything related to \"connectlife-ha\" or its installation requirements.\nGenerate a skeleton file using the connectlife package: pip install connectlife python -m connectlife.dump --username <username> --password <password>\noyvindwe/connectlife-ha \u30fb pip install connectlife python \u30fb you can run it locally if you have a Python installation. Settings \u2192 Integrations\nMore actions\n\n   ```\n   Device info 104\u51b7\u6696\u8282\u80fd\u65e0\u529f\u7387 Hardware: 009-104``` \n   ```\n3. ### oyvindwecommentedon May 9, 2026\n\n   @oyvindwe\n\n   oyvindwe\n\n   on May 9, 2026\n\n   Owner\n\n   More actions\n\n   Sorry for late follow up - do you see a sensor for `t dimmer` listed in Home Assistant?\n\n   Are you able to create a device dump?\n\n   ```\n   pip install connectlife python -m connectlife.dump --username  --password  \n   ```\n4. ### gmarconicommentedon May 11, 2026\n\n   @gmarconi\n\n   gmarconi [...] Then fully \n| DEVICES.md | DEVICES.md |  |  |\n| LICENSE | LICENSE |  |  |\n| README.md | README.md |  |  |\n| hacs.json | hacs.json |  |  |\n| img.png | img.png |  |  |\n| img\\_1.png | img\\_1.png |  |  |\n| pyproject.toml | pyproject.toml |  |  |\n| uv.lock | uv.lock |  |  |\n|  | [...] ## Repository files navigation\n\n# ConnectLife\n\nConnectLife integration for Home Assistant\n\n## Installation\n\nYou can install using HACS or download.\n\n### HACS\n\nIf you have HACS installed use the button below:\n\n### Download\n\nDownload\nFile \"/config/custom_components/connectlife/__init__.py\", line 58, in async_setup_entry await coordinator.async_config_entry_first_refresh() File \"/usr/src/homeassistant/homeassistant/helpers/update_coordinator.py\", line 319, in async_config_entry_first_refresh await self._async_config_entry_first_refresh() File \"/usr/src/homeassistant/homeassistant/helpers/update_coordinator.py\", line 342, in _async_config_entry_first_refresh await self._async_refresh( ...<3 lines>... ) File [...] File \"/config",
+   "errors": [],
+   "lines": [
+    "Looked up with Tavily: 5 results",
+    "Query: connectlife-ha python setup install instructions https://github.com/oyvindwe/connectlife-ha site:github.com/oyvindwe/connectlife-ha",
+    "Query: connectlife-ha python documentation install https://github.com/oyvindwe/connectlife-ha site:github.com/oyvindwe/connectlife-ha",
+    "Query: connectlife-ha python install requirements https://pypi.org/project/connectlife-ha/ https://github.com/oyvindwe/connectlife-ha site:pypi.org",
+    "Source: README.md - oyvindwe/connectlife-ha \u2014 https://github.com/oyvindwe/connectlife-ha/blob/main/custom_components/connectlife/data_dictionaries/README.md",
+    "Source: Add data dictionary for Dehumidifier 007-499 (Hisense ... \u2014 https://github.com/oyvindwe/connectlife-ha/issues/546",
+    "Source: AC light behavior \u00b7 Issue #340 \u00b7 oyvindwe/connectlife-ha \u00b7 GitHub \u2014 https://github.com/oyvindwe/connectlife-ha/issues/340",
+    "Source: GitHub - oyvindwe/connectlife-ha: ConnectLife integration for Home Assistant \u00b7 GitHub \u2014 https://github.com/oyvindwe/connectlife-ha",
+    "Source: ConnectLife integration stopped working \u00b7 Issue #352 \u00b7 oyvindwe/connectlife-ha \u00b7 GitHub \u2014 https://github.com/oyvindwe/connectlife-ha/issues/352"
+   ]
+  },
+  "notes": [
+   "Setup check: GitHub token: present.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory 8.1 GB (of 15.6 GB).",
+   "Setup check: free disk 88.1 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: 5 results",
+   "Query: connectlife-ha python setup install instructions https://github.com/oyvindwe/connectlife-ha site:github.com/oyvindwe/connectlife-ha",
+   "Query: connectlife-ha python documentation install https://github.com/oyvindwe/connectlife-ha site:github.com/oyvindwe/connectlife-ha",
+   "Query: connectlife-ha python install requirements https://pypi.org/project/connectlife-ha/ https://github.com/oyvindwe/connectlife-ha site:pypi.org",
+   "Source: README.md - oyvindwe/connectlife-ha \u2014 https://github.com/oyvindwe/connectlife-ha/blob/main/custom_components/connectlife/data_dictionaries/README.md",
+   "Source: Add data dictionary for Dehumidifier 007-499 (Hisense ... \u2014 https://github.com/oyvindwe/connectlife-ha/issues/546",
+   "Source: AC light behavior \u00b7 Issue #340 \u00b7 oyvindwe/connectlife-ha \u00b7 GitHub \u2014 https://github.com/oyvindwe/connectlife-ha/issues/340",
+   "Source: GitHub - oyvindwe/connectlife-ha: ConnectLife integration for Home Assistant \u00b7 GitHub \u2014 https://github.com/oyvindwe/connectlife-ha",
+   "Source: ConnectLife integration stopped working \u00b7 Issue #352 \u00b7 oyvindwe/connectlife-ha \u00b7 GitHub \u2014 https://github.com/oyvindwe/connectlife-ha/issues/352",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: connectlife is noted, installed with the project.",
+   "Setup plan: Python 3.13: switched the local sandbox to /usr/bin/python3.13",
+   "Setup plan: refused python: no network or the package was not found",
+   "Setup plan: refused connectlife.dump: no network or the package was not found"
+  ],
+  "setup_plan": {
+   "packages": [
+    {
+     "requirement": "connectlife==0.13.0",
+     "name": "connectlife",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    }
+   ],
+   "extra_reqs": [],
+   "python": {
+    "requested": "3.13",
+    "current": "3.12",
+    "applied": true,
+    "switch": "/usr/bin/python3.13",
+    "reason": "switched the local sandbox to /usr/bin/python3.13"
+   },
+   "system": [],
+   "refused": [
+    {
+     "name": "python",
+     "reason": "no network or the package was not found"
+    },
+    {
+     "name": "connectlife.dump",
+     "reason": "no network or the package was not found"
+    }
+   ]
+  }
+ },
+ "chosen": {
+  "pr": 742,
+  "head_sha": null,
+  "install": null,
+  "test_cmd": null
+ },
+ "sides": {
+  "comparison_basis": "merge-base vs PR head (no merge ref available)",
+  "main_sha": "a1dbb9b9868e652f907cf9f841d5a79b5871a5e5",
+  "pr_sha": "52bc2901d18f435ec71ddf4c9ee6f0cac4b0d466"
+ },
+ "tested": {
+  "main": "main @ a1dbb9b9868e (merge-base with the PR head)",
+  "pr": "PR head 52bc2901d18f"
+ },
+ "probe_plan": {
+  "baseline": "full",
+  "model": "model provider: nebius (Token Factory, live)",
+  "errors": [],
+  "model_claims": [
+   {
+    "id": "C1",
+    "text": "The machine only uses the program options when they are sent with the start command.",
+    "source_quote": "the machine only uses the program options when they are sent with the start command.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C2",
+    "text": "Start is available in standby as well as program select, and starting from standby with the full command works.",
+    "source_quote": "Start is available in standby as well as program select. Starting from standby with the full command was verified in #655.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C3",
+    "text": "`available_when` now accepts a list of allowed values per property.",
+    "source_quote": "`available_when` accepts a list of allowed values per property.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C4",
+    "text": "Program 8 is Normal wash (was No program selected) and program 45 Easy care is added.",
+    "source_quote": "Program 8 is Normal wash (was No program selected), and program 45 Easy care is added.",
+    "testable": true,
+    "expect": "differs"
+   }
+  ],
+  "model_rejected_claims": [],
+  "diff_targets": [],
+  "frozen": [
+   {
+    "path": "model-probes/model-probe1.py",
+    "source": "model",
+    "sha256": "2afa1f2e49b78b32071df0a4fd935f085b026756ff91560bbecfb149cf2223a7",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-10-22T05:28:00.714376+00:00",
+    "inputs_sha256": "17db489e9619aea222da5095b18a16a9104850ea10d158f45cae55cb945d5549",
+    "inputs": {
+     "title_chars": 55,
+     "body_chars": 921,
+     "base_files": {
+      "custom_components/connectlife/button.py": "d8951773b6eb514bd2d7b3801cf57a0d973c6e13fac46db1ba0c6b9133e704f8",
+      "custom_components/connectlife/dictionaries.py": "391252f1ae034bbf7d44b2f8ceeb69544e774c4c57ca0792253adaef6b2da061"
+     }
+    }
+   },
+   {
+    "path": "model-probes/model-probe2.py",
+    "source": "model",
+    "sha256": "c88bec690bd3fc8fabda956b6d3bede6a4806f8fb306da701e38257c290d9e39",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-10-22T05:28:00.714539+00:00",
+    "inputs_sha256": "17db489e9619aea222da5095b18a16a9104850ea10d158f45cae55cb945d5549",
+    "inputs": {
+     "title_chars": 55,
+     "body_chars": 921,
+     "base_files": {
+      "custom_components/connectlife/button.py": "d8951773b6eb514bd2d7b3801cf57a0d973c6e13fac46db1ba0c6b9133e704f8",
+      "custom_components/connectlife/dictionaries.py": "391252f1ae034bbf7d44b2f8ceeb69544e774c4c57ca0792253adaef6b2da061"
+     }
+    }
+   }
+  ]
+ },
+ "test_extras": [],
+ "pr_side_started_at": "2026-10-22T05:28:00.857284+00:00",
+ "test_targets": {
+  "main": [
+   "tests/test_dictionaries.py"
+  ],
+  "pr": [
+   "tests/test_dictionaries.py"
+  ]
+ },
+ "installed_commit": {
+  "main": {
+   "dist": "connectlife-ha",
+   "expected": "a1dbb9b9868e652f907cf9f841d5a79b5871a5e5",
+   "installed": "a1dbb9b9868e652f907cf9f841d5a79b5871a5e5",
+   "ok": true
+  },
+  "pr": {
+   "dist": "connectlife-ha",
+   "expected": "52bc2901d18f435ec71ddf4c9ee6f0cac4b0d466",
+   "installed": "52bc2901d18f435ec71ddf4c9ee6f0cac4b0d466",
+   "ok": true
+  }
+ },
+ "declared_test_deps": {
+  "requested": [
+   "pytest-homeassistant-custom-component==0.13.297"
+  ],
+  "installed": false
+ },
+ "optional_install_error": "installing declared test requirements on the main side failed (1); see setup-declared.log",
+ "probes": {
+  "status": "ran",
+  "items": [
+   {
+    "id": "model-probe1",
+    "source": "model",
+    "path": "model-probes/model-probe1.py",
+    "sha256": "2afa1f2e49b78b32071df0a4fd935f085b026756ff91560bbecfb149cf2223a7",
+    "target": "oyvindwe/connectlife-ha#742",
+    "about": "Tests the availability mechanism for buttons (claim C2)",
+    "claims": [
+     {
+      "id": "C2",
+      "source": "PR description",
+      "text": "Start is available in standby as well as program select, and starting from standby with the full command works.",
+      "covers": [
+       "C2.*"
+      ],
+      "expect": "differs"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-probe1-main-1.jsonl",
+      "probe-model-probe1-main-2.jsonl",
+      "probe-model-probe1-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-probe1-pr-1.jsonl",
+      "probe-model-probe1-pr-2.jsonl",
+      "probe-model-probe1-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "C2.import_error": "ModuleNotFoundError"
+      },
+      {
+       "C2.import_error": "ModuleNotFoundError"
+      },
+      {
+       "C2.import_error": "ModuleNotFoundError"
+      }
+     ],
+     "pr": [
+      {
+       "C2.import_error": "ModuleNotFoundError"
+      },
+      {
+       "C2.import_error": "ModuleNotFoundError"
+      },
+      {
+       "C2.import_error": "ModuleNotFoundError"
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "C2.import_error",
+      "state": "same",
+      "label": "needs_human",
+      "claim": "C2",
+      "main": "ModuleNotFoundError",
+      "pr": "ModuleNotFoundError",
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"C2.import_error\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"C2.import_error\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "2afa1f2e49b78b32071df0a4fd935f085b026756ff91560bbecfb149cf2223a7",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-10-22T05:28:00.714376+00:00",
+     "inputs_sha256": "17db489e9619aea222da5095b18a16a9104850ea10d158f45cae55cb945d5549",
+     "inputs": {
+      "title_chars": 55,
+      "body_chars": 921,
+      "base_files": {
+       "custom_components/connectlife/button.py": "d8951773b6eb514bd2d7b3801cf57a0d973c6e13fac46db1ba0c6b9133e704f8",
+       "custom_components/connectlife/dictionaries.py": "391252f1ae034bbf7d44b2f8ceeb69544e774c4c57ca0792253adaef6b2da061"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-10-22T05:28:00.857284+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "not measured",
+     "why": "coverage produced no data (exit 0); see probe-coverage.log",
+     "adequacy": "unmeasured",
+     "note": "probe coverage not measured (coverage produced no data (exit 0); see probe-coverage.log)"
+    },
+    "status": "ran"
+   },
+   {
+    "id": "model-probe2",
+    "source": "model",
+    "path": "model-probes/model-probe2.py",
+    "sha256": "c88bec690bd3fc8fabda956b6d3bede6a4806f8fb306da701e38257c290d9e39",
+    "target": "oyvindwe/connectlife-ha#742",
+    "about": "Tests the available_when structure change (claim C3)",
+    "claims": [
+     {
+      "id": "C3",
+      "source": "PR description",
+      "text": "`available_when` now accepts a list of allowed values per property.",
+      "covers": [
+       "C3.*"
+      ],
+      "expect": "differs"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-probe2-main-1.jsonl",
+      "probe-model-probe2-main-2.jsonl",
+      "probe-model-probe2-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-probe2-pr-1.jsonl",
+      "probe-model-probe2-pr-2.jsonl",
+      "probe-model-probe2-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "C3.import_error": "ModuleNotFoundError"
+      },
+      {
+       "C3.import_error": "ModuleNotFoundError"
+      },
+      {
+       "C3.import_error": "ModuleNotFoundError"
+      }
+     ],
+     "pr": [
+      {
+       "C3.import_error": "ModuleNotFoundError"
+      },
+      {
+       "C3.import_error": "ModuleNotFoundError"
+      },
+      {
+       "C3.import_error": "ModuleNotFoundError"
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "C3.import_error",
+      "state": "same",
+      "label": "needs_human",
+      "claim": "C3",
+      "main": "ModuleNotFoundError",
+      "pr": "ModuleNotFoundError",
+      "citations": {
+       "main": {
+        "file": "probe-model-probe2-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"C3.import_error\""
+       },
+       "pr": {
+        "file": "probe-model-probe2-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"C3.import_error\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "c88bec690bd3fc8fabda956b6d3bede6a4806f8fb306da701e38257c290d9e39",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-10-22T05:28:00.714539+00:00",
+     "inputs_sha256": "17db489e9619aea222da5095b18a16a9104850ea10d158f45cae55cb945d5549",
+     "inputs": {
+      "title_chars": 55,
+      "body_chars": 921,
+      "base_files": {
+       "custom_components/connectlife/button.py": "d8951773b6eb514bd2d7b3801cf57a0d973c6e13fac46db1ba0c6b9133e704f8",
+       "custom_components/connectlife/dictionaries.py": "391252f1ae034bbf7d44b2f8ceeb69544e774c4c57ca0792253adaef6b2da061"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-10-22T05:28:00.857284+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "not measured",
+     "why": "coverage produced no data (exit 0); see probe-coverage.log",
+     "adequacy": "unmeasured",
+     "note": "probe coverage not measured (coverage produced no data (exit 0); see probe-coverage.log)"
+    },
+    "status": "ran"
+   }
+  ],
+  "summary": {
+   "labels": [
+    "needs_human",
+    "needs_human"
+   ],
+   "flagged": [
+    {
+     "probe": "model-probe1",
+     "name": "C2.import_error",
+     "label": "needs_human",
+     "claim": "C2"
+    },
+    {
+     "probe": "model-probe2",
+     "name": "C3.import_error",
+     "label": "needs_human",
+     "claim": "C3"
+    }
+   ],
+   "proven_claims": [],
+   "reason": "probe: 2 observation(s) need attention: C2.import_error does not differ although the claim says it does (C2); C3.import_error does not differ although the claim says it does (C3)",
+   "ignored_noise": [],
+   "ignored_warning_only": [],
+   "pr_only_noisy": []
+  }
+ },
+ "probe_changed_line_coverage": {
+  "status": "not measured",
+  "side": "main",
+  "probes": {
+   "model-probe1": {
+    "status": "not measured",
+    "changed_lines_covered": null,
+    "changed_lines_total": null,
+    "adequacy": "unmeasured"
+   },
+   "model-probe2": {
+    "status": "not measured",
+    "changed_lines_covered": null,
+    "changed_lines_total": null,
+    "adequacy": "unmeasured"
+   }
+  },
+  "not_adequate": []
+ },
+ "verdict": "could_not_verify",
+ "reason": "the run failed its own checks: 3 alternating runs per side",
+ "verdict_before_coverage_gate": "needs_attention",
+ "reason_before_coverage_gate": "probe: 2 observation(s) need attention: C2.import_error does not differ although the claim says it does (C2); C3.import_error does not differ although the claim says it does (C3); probe model-probe1 has no measured line coverage (coverage produced no data (exit 0); see probe-coverage.log); it does not count as covering the change; probe model-probe2 has no measured line coverage (coverage produced no data (exit 0); see probe-coverage.log); it does not count as covering the change; tests: tests produced no results on one side (collection failed; see pytest logs)",
+ "changed_lines_total": null,
+ "changed_lines_covered": null,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "lower",
+  "note": "coverage of the changed Python lines was NOT MEASURED (record predates the coverage gate: no coverage run exists for it, so this is not a measurement result)",
+  "measurement": "not measured: predates gate"
+ },
+ "agents": {
+  "status": "skipped",
+  "note": "advisory swarm is off",
+  "roles": []
+ },
+ "explanation": {
+  "status": "not yet wired",
+  "why": "advisory swarm is off"
+ },
+ "swarm_requested": false,
+ "operator_approval_requested": false,
+ "swarm": "off",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [],
+  "compiled_files": [],
+  "other_files": [
+   "custom_components/connectlife/button.py",
+   "custom_components/connectlife/data_dictionaries/027-washing-machine-wm26-g400.yaml",
+   "custom_components/connectlife/data_dictionaries/README.md",
+   "custom_components/connectlife/data_dictionaries/properties-schema.json",
+   "custom_components/connectlife/dictionaries.py",
+   "custom_components/connectlife/strings.json",
+   "custom_components/connectlife/translations/cs.json",
+   "custom_components/connectlife/translations/de.json",
+   "custom_components/connectlife/translations/en.json",
+   "custom_components/connectlife/translations/es.json",
+   "custom_components/connectlife/translations/fr.json",
+   "custom_components/connectlife/translations/it.json",
+   "custom_components/connectlife/translations/nl.json",
+   "custom_components/connectlife/translations/no.json",
+   "custom_components/connectlife/translations/sr-Latn.json",
+   "tests/test_dictionaries.py"
+  ]
+ },
+ "duration_s": {
+  "total_wall": 67.4,
+  "tests": 2.4
+ },
+ "cost": {
+  "ai_calls": 2,
+  "failed_ai_calls": 0,
+  "input_tokens": 8411,
+  "output_tokens": 9119,
+  "thinking_tokens": 7955,
+  "cost_usd": 0.01073,
+  "calls_without_usage": 0,
+  "ai_cost_usd": 0.01073,
+  "cost_complete": true,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 67.4,
+   "tests": 2.4
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.004493,
+  "total_cost_usd": 0.015223,
+  "swarm": {
+   "ai_calls": 0,
+   "failed_ai_calls": 0,
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "thinking_tokens": 0,
+   "cost_usd": 0.0,
+   "calls_without_usage": 0,
+   "ai_cost_usd": 0.0,
+   "cost_complete": true,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ },
+ "poc_code_version": "0fa0016"
+}

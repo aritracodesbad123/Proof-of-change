@@ -45,7 +45,7 @@ Judging runs 1–15 December. These three paths are free to use. Live checks nee
 
 <https://aritracodesbad123.github.io/Proof-of-change/>
 
-This is the main link. It is the operator console in replay mode: light page, the flow chart, and the report for each finished check. The checks are real runs already stored in the repository (pull requests and the release comparisons). The page does not install a library and does not call an API. After this branch is merged, turn on Pages in the repository settings (source: GitHub Actions) so the link starts serving. The `pages` workflow publishes on every push to `main`.
+This is the main link. It is the operator console in replay mode: light page, the flow chart, and the report for each finished check. It shows only the 30-PR random batch on code version 0fa0016; older runs are kept in `benchmarks/replay-archive/`. The page does not install a library and does not call an API. After this branch is merged, turn on Pages in the repository settings (source: GitHub Actions) so the link starts serving. The `pages` workflow publishes on every push to `main`.
 
 ### Request a check
 
@@ -107,6 +107,43 @@ suggest labels; it never decides pass or fail.
 
 Tavily can suggest package names, but they're only installed if their PyPI page links back to the same repo. That check stops accidents, not a determined attacker.
 
+## Scoring
+
+Current results: the 30-PR random batch on code version 0fa0016. Full table, records and reports: [benchmarks/batch30-0fa0016](benchmarks/batch30-0fa0016/README.md). Older runs: [benchmarks/replay-archive](benchmarks/replay-archive/README.md).
+
+30 merged pull requests from public Python projects, drawn at random with a fixed seed (20261022; list in `benchmarks/batch30-0fa0016/drawn.json`). Every check ran on Proof-of-Change at commit `0fa0016`, finishing on 22 Oct 2026 at 11:03 IST. All 30 runs completed; none crashed.
+
+### Verdicts
+
+| Verdict | Count |
+|---|---|
+| Verified | 0 |
+| Needs attention | 6 |
+| Could not verify | 24 |
+
+Two more runs (oyvindwe/connectlife-ha #742, doobidoo/mcp-memory-service #1531) first found a difference, but the run failed its own trust checks, so the published verdict is "could not verify".
+
+### Why: breakdown of reasons
+
+| Reason | Runs |
+|---|---|
+| Setup failure: install failed | 12 |
+| Difference found between main and PR | 6 |
+| Changed code not exercised (incl. docstring-only) | 4 |
+| Setup failure: setup gap | 3 |
+| Tests did not run or collect | 3 |
+| Run failed its own trust checks | 2 |
+
+Setup failures (install failed or setup gap) total 15 of 30. This is the biggest weakness the batch shows.
+
+### Timing
+
+Median run: 2 min 43 s. Fastest: 17 s. Slowest: macs3-project/MACS #784 (341 min 49 s), optiland/optiland #963 (70 min 1 s), optuna/optuna #6873 (70 min 1 s). The 5 h 42 min MACS #784 run is the outlier.
+
+### Accuracy: not measured for this batch
+
+Catches, misses and false alarms count only where there is outside proof of the right answer: a later revert, a follow-up bug report blaming the PR, or a maintainer's explicit confirmation. Passing maintainer CI and a closed linked issue do not count. We searched GitHub for reverts and follow-up fixes for all 30 PRs (`benchmarks/batch30-0fa0016/labels.json`) and found none, so **all 30 PRs are unlabelled** and no accuracy, false-alarm or miss rate is reported. No labels were invented.
+
 ## Proven results
 
 Each result below was reproduced 3 times on each side, with the same outcome every time. These are replays run after
@@ -151,7 +188,7 @@ those gaps are easier to catch. We still report misses like the early study open
 
 ---
 
-**Contents:** [Proven results](#proven-results) · [Setup](#1-one-time-setup-on-a-mac) · [Check one PR](#2-check-one-pr) ·
+**Contents:** [Scoring](#scoring) · [Proven results](#proven-results) · [Setup](#1-one-time-setup-on-a-mac) · [Check one PR](#2-check-one-pr) ·
 [Operator console](#2b-operator-console-browse--start-checks) ·
 [How a report is made](#3-exactly-how-a-report-gets-generated) ·
 [Read a report](#4-how-to-read-a-report) · [Where files live](#5-where-files-live) ·
