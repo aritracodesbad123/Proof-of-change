@@ -48,7 +48,8 @@ def _flat_layout(venv, checkout, chosen, lg, py, *rest):
 
 def _flat_product(tmp_path, monkeypatch, rec, step, checkout, calls):
     monkeypatch.setattr(daily_run, "install_side", lambda *a, **k: calls.append("install") or _flat_layout(*a, **k))
-    monkeypatch.setattr(daily_run, "install_deps_only", lambda *a, **k: calls.append(("deps", a[1], a[2])) or (True, ""))
+    monkeypatch.setattr(daily_run, "install_deps_only",
+                        lambda *a, **k: calls.append(("deps", a[1], a[2], k.get("deps_root"))) or (True, ""))
     a = SimpleNamespace(python="3.14", pr="https://github.com/a/b/pull/1", product_check=True, bench=None)
     return daily_run._install_with_helper(a, rec, step, tmp_path / ("v-" + step.split()[0]), checkout, None,
                                           tmp_path / "log", 10, None, None, max_retries=1)
@@ -60,7 +61,7 @@ def test_flat_layout_on_main_falls_back_to_declared_dependencies(tmp_path, monke
     calls, rec = [], {}
     ok, _ = _flat_product(tmp_path, monkeypatch, rec, "main install", tmp_path, calls)
     plan = {"kind": "uv-sync", "frozen": True, "source": "uv.lock"}
-    assert ok is True and calls == ["install", ("deps", tmp_path, plan)]
+    assert ok is True and calls == ["install", ("deps", tmp_path, plan, tmp_path)]
     assert rec["demo_helper"]["deps_only"] == plan
     assert any("project's own folder was put on the import path" in n for n in rec["demo_helper"]["auto_fixes"])
 
@@ -85,7 +86,48 @@ def test_flat_layout_on_both_sides_gets_the_same_setup(tmp_path, monkeypatch):
     assert _flat_product(tmp_path, monkeypatch, rec, "PR install", pr, calls)[0] is True
     deps = [c for c in calls if c != "install"]
     plan = {"kind": "requirements", "files": ["requirements.txt"], "source": "requirements.txt"}
-    assert deps == [("deps", main, plan), ("deps", pr, plan)]
+    assert deps == [("deps", main, plan, main), ("deps", pr, plan, main)]
+
+
+def test_flat_layout_pr_added_dependency_is_refused(tmp_path, monkeypatch):
+    """The PR adds a dependency on a flat layout: main's files alone decide what is installed on both sides."""
+    main, pr = tmp_path / "main", tmp_path / "pr"
+    for side in (main, pr):
+        side.mkdir()
+    (main / "requirements.txt").write_text("")
+    (pr / "requirements.txt").write_text("pr-added-dependency\n")
+    (pr / "requirements-extra.txt").write_text("another-pr-dependency\n")
+    calls, rec = [], {}
+    assert _flat_product(tmp_path, monkeypatch, rec, "main install", main, calls)[0] is True
+    ok, why = _flat_product(tmp_path, monkeypatch, rec, "PR install", pr, calls)
+    plan = {"kind": "requirements", "files": ["requirements.txt"], "source": "requirements.txt"}
+    assert [c for c in calls if c != "install"] == [("deps", main, plan, main), ("deps", pr, plan, main)]
+    assert ok is True and why == ""
+
+    # the real command list: only main's file is read, never the PR's
+    monkeypatch.undo()
+    cmds = []
+    monkeypatch.setattr(daily_run, "run", lambda c, *a, **k: cmds.append([str(x) for x in c]) or (0, 0.0))
+    monkeypatch.setattr(daily_run, "checkout_changes", lambda co: [])
+    monkeypatch.setattr(daily_run, "write_project_path", lambda v, co: None)
+    work = tmp_path / "work"
+    work.mkdir()
+    ok, why = daily_run.install_deps_only(work / "venv-pr", pr, plan, tmp_path / "log", "3.14", 10, deps_root=main)
+    flat = " ".join(" ".join(c) for c in cmds)
+    assert ok is True and str(main / "requirements.txt") in flat
+    assert str(pr / "requirements.txt") not in flat and "requirements-extra" not in flat
+    assert "pr-added-dependency" not in flat and "another-pr-dependency" not in flat
+    # a refused PR dependency is not a regression finding: the setup itself never fails into needs attention
+    verdict, _reason, _flags = daily_run.tests_verdict(None, demo_helper.FLAT_LAYOUT_REASON, None, None)
+    assert verdict == "could_not_verify"
+
+
+def test_flat_layout_pr_side_without_main_folder_does_not_fall_back(tmp_path, monkeypatch):
+    (tmp_path / "requirements.txt").write_text("pr-added-dependency\n")
+    calls, rec = [], {"demo_helper": {"deps_only": {"kind": "requirements", "files": ["requirements.txt"],
+                                                    "source": "requirements.txt"}}}
+    ok, why = _flat_product(tmp_path, monkeypatch, rec, "PR install", tmp_path, calls)
+    assert ok is False and why == demo_helper.FLAT_LAYOUT_REASON and calls == ["install"]
 
 
 def test_flat_layout_on_the_pr_side_only_does_not_fall_back(tmp_path, monkeypatch):
