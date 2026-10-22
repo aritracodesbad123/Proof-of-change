@@ -1,7 +1,7 @@
 # Product checks install the project's dependency groups
 
 **Date:** 2026-10-22
-**Status:** proposed
+**Status:** accepted
 
 ## What changed
 
