@@ -104,3 +104,36 @@ def test_sides_differ_with_requires_python():
 def test_equal_sides_pass_without_requires_python(tmp_path):
     sess, _ = _session({"img-main": "Python 3.13.2", "img-pr": "Python 3.13.2"})
     assert daily_run._check_contree_pythons(sess, {}, tmp_path) is None
+
+
+def test_patch_level_spec_is_enforced():
+    sess, _ = _session({"img-main": "Python 3.12.1", "img-pr": "Python 3.12.1"})
+    info = cs.side_pythons(sess, [">=3.12.4"])
+    assert len(info["problems"]) == 2 and all("does not satisfy" in p for p in info["problems"])
+    sess, _ = _session({"img-main": "Python 3.12.4", "img-pr": "Python 3.12.4"})
+    assert cs.side_pythons(sess, [">=3.12.4"])["problems"] == []
+
+
+def test_malformed_spec_cannot_pass(tmp_path):
+    sess, _ = _session({"img-main": "Python 3.12.7", "img-pr": "Python 3.12.7"})
+    info = cs.side_pythons(sess, [">=3.1o"])
+    assert info["problems"] == ["requires-python could not be read: '>=3.1o'"]
+    (tmp_path / "pyproject.toml").write_text('[project]\nname = "x"\nrequires-python = ">=3.1o"\n')
+    refusal = daily_run._check_contree_pythons(sess, {}, tmp_path)
+    assert refusal and "requires-python could not be read" in refusal
+
+
+def test_upper_bound_clause_is_kept():
+    sess, _ = _session({"img-main": "Python 3.12.7", "img-pr": "Python 3.12.7"})
+    assert cs.side_pythons(sess, [">=3.8,<4"])["problems"] == []
+    sess, _ = _session({"img-main": "Python 4.0.0", "img-pr": "Python 4.0.0"})
+    info = cs.side_pythons(sess, [">=3.8,<4"])
+    assert len(info["problems"]) == 2
+
+
+def test_missing_requires_python_is_recorded(tmp_path):
+    sess, _ = _session({"img-main": "Python 3.12.7", "img-pr": "Python 3.12.7"})
+    rec = {}
+    assert daily_run._check_contree_pythons(sess, rec, tmp_path) is None
+    assert rec["contree"]["python"]["requires_python_found"] is False
+    assert rec["contree"]["python"]["requires_python"] == []
