@@ -1356,6 +1356,15 @@ def _project_file_dirs(repo: str, item: dict, work: Path, log: Path) -> list[Pat
     return [dest]
 
 
+_INSTALL_DOCS: dict = {}   # this process only: install-doc text per PR, never written to disk or reused later
+
+
+def _batch_key(repo: str, rec_or_item) -> str:
+    pr = rec_or_item.get("pr") if isinstance(rec_or_item, dict) else None
+    number = pr.get("number") if isinstance(pr, dict) else pr
+    return f"{repo}#{number}"
+
+
 def _product_plan(a, rec: dict, repo: str, cfg: dict, checkouts, pypi=None, python_available=None,
                   out_dir=None) -> dict | None:
     """Setup plan for a console or daily check. None on a study run, which does not call this.
@@ -1373,7 +1382,7 @@ def _product_plan(a, rec: dict, repo: str, cfg: dict, checkouts, pypi=None, pyth
         (cfg or {}).get("dist") or (cfg or {}).get("pkg") or "",
         python_available=python_available, pypi=pypi,
         allow_lookup_packages=bool(folders), auto_python=product_route(a))
-    for req in (getattr(a, "batch_fix_reqs", None) or {}).get(repo, []):
+    for req in (getattr(a, "batch_fix_reqs", None) or {}).get(_batch_key(repo, rec), []):
         if req not in plan.setdefault("extra_reqs", []):
             plan["extra_reqs"].append(req)
             plan.setdefault("packages", []).append({
@@ -1381,12 +1390,19 @@ def _product_plan(a, rec: dict, repo: str, cfg: dict, checkouts, pypi=None, pyth
                 "reason": "diagnosed by the lookup after a setup failure; PyPI page links to this GitHub repository",
                 "sides": ["main", "pr"]})
             plan.setdefault("lines", []).append(f"Setup plan: install {req} (fix for an earlier setup failure) on main and pr.")
-    staged_sys = [n for n in (getattr(a, "batch_fix_system", None) or {}).get(repo, [])
-                  if n in demo_helper.SYSTEM_ALLOWLIST and n not in {i["name"] for i in plan.get("system") or []}]
+    staged_sys = [n for n in (getattr(a, "batch_fix_system", None) or {}).get(_batch_key(repo, rec), [])
+                  if n not in {i["name"] for i in plan.get("system") or []}]
     for item in demo_helper._system_decision(staged_sys, getattr(a, "sandbox_backend", None) or "local"):
         plan.setdefault("system", []).append(item)
         plan.setdefault("lines", []).append(f"Setup plan: system package {item['name']} (fix for an earlier setup "
                                             f"failure): {item['reason']}")
+    blocked = [i["name"] for i in plan.get("system") or [] if not i.get("applied")]
+    if blocked:
+        demo_helper.note_limitation(rec, blocked, "the project's own files ask for these system packages",
+                                    "this sandbox (bubblewrap) cannot install OS packages")
+    docs = demo_helper.project_install_docs(folders)
+    rec.setdefault("demo_helper", {})["install_docs"] = docs["sources"]
+    _INSTALL_DOCS[_batch_key(repo, rec)] = docs["text"]
     demo_helper.attach_plan(rec, plan)
     demo_helper.announce(plan.get("lines") or [])
     from poc import run_progress
@@ -1540,7 +1556,8 @@ def _retry_setup_gap(a, rec, repo, prdir, venvs: dict, rerun, recheck_coverage=N
     demo_helper.retry_unverified(
         rec, rerun, install_one, declared, tavily.get("text") or "", demo_helper.fetch_pypi, repo,
         allow_system=getattr(a, "sandbox_backend", None) == "contree",
-        install_system=install_system, lookup=lookup, recheck_coverage=recheck_coverage)
+        install_system=install_system, lookup=lookup, recheck_coverage=recheck_coverage,
+        project_text=_INSTALL_DOCS.get(_batch_key(repo, rec), ""))
 
 
 def _install_system_package(rec, name, run_side) -> bool:
@@ -4725,12 +4742,14 @@ def _batch_lookup(repo: str, cfg: dict) -> bool:
     return bool(got.get("ok"))
 
 
-def _batch_diagnose(a, repo: str, cfg: dict, why: str) -> None:
-    """Look up a setup failure and stage the fix (link-back PyPI packages only) for both sides of the next try."""
+def _batch_diagnose(a, item: tuple, why: str) -> None:
+    """Look a setup failure up on the project's own pages, read its install docs, and stage the fix for both
+    sides of the next try: PyPI packages that link back, OS packages that exist in the distro archive."""
     from evals.label_study_pairs import split_repo
     from poc import demo_helper
-    name = demo_helper.gap_name(why)
-    got = demo_helper.live_fetch(f"{repo} {name} python install setup error {why[:120]}")
+    repo, cfg, c = item
+    key = f"{repo}#{c['pr']}"
+    got = demo_helper.live_fetch(f"{repo} install {demo_helper.failure_line(why)}"[:380])
     trusted = demo_helper.trusted_lookup(demo_helper.scope_lookup(got, repo, cfg.get("dist") or ""), repo) \
         if got.get("ok") else {"results": [], "sources": []}
     text = demo_helper._lookup_text(trusted)
@@ -4739,7 +4758,7 @@ def _batch_diagnose(a, repo: str, cfg: dict, why: str) -> None:
     fixes = getattr(a, "batch_fix_reqs", None)
     if fixes is None:
         fixes = a.batch_fix_reqs = {}
-    staged = fixes.setdefault(repo, [])
+    staged = fixes.setdefault(key, [])
     for pkg in demo_helper.pip_suggestions(text):
         try:
             info = demo_helper.fetch_pypi(pkg)
@@ -4747,13 +4766,15 @@ def _batch_diagnose(a, repo: str, cfg: dict, why: str) -> None:
             info = None
         if demo_helper.pypi_links_back(info, *parts) and pkg not in staged:
             staged.append(pkg)
-    fix = demo_helper.system_fix_for(why, text)
-    sys_staged = (getattr(a, "batch_fix_system", None) or {})
+    fix = demo_helper.system_fix_for(why, text, _INSTALL_DOCS.get(key, ""), lookup_sources=trusted["sources"])
+    sys_staged = getattr(a, "batch_fix_system", None) or {}
     a.batch_fix_system = sys_staged
-    names = sys_staged.setdefault(repo, [])
-    names.extend(n for n in fix["install"] if n not in names and demo_helper.apt_available(n))
-    for item in fix["refused"]:
-        print(f"Setup plan: refused system package {item['name']}: {item['reason']}", flush=True)
+    names = sys_staged.setdefault(key, [])
+    names.extend(n for n in fix["install"] if n not in names)
+    print(f"Diagnosis for {key}: pip {staged or 'none'}, OS {names or 'none'} "
+          f"(from {', '.join(fix['sources']) or 'no source'})", flush=True)
+    for item_ in fix["refused"]:
+        print(f"Setup plan: refused system package {item_['name']}: {item_['reason']}", flush=True)
     if not got.get("ok"):
         raise RuntimeError("lookup failed")
 
@@ -4785,7 +4806,7 @@ def _run_batch_order(queue: list, rdir: Path, workroot: Path, a, machine: dict, 
 
     log = batch_order.OrderLog(rdir / "batch-order.jsonl")
     out = batch_order.run_batch(queue, key, lambda item: _batch_lookup(item[0], item[1]), run,
-                                diagnose=lambda item, why: _batch_diagnose(a, item[0], item[1], why),
+                                diagnose=lambda item, why: _batch_diagnose(a, item, why),
                                 give_up=give_up, log=log)
     for rec in out:
         repo, n = rec.get("repo"), prn(rec)

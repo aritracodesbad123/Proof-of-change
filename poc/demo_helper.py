@@ -1059,34 +1059,75 @@ def _python_decision(requested: str | None, current: str, sandbox: str, python_a
             "reason": f"not applied: python{requested} is not available to the local sandbox"}
 
 
-# The only OS packages a diagnosis may install. Fixed here; a lookup can never add a name to it.
-SYSTEM_ALLOWLIST = ("build-essential", "pkg-config", "zlib1g-dev", "libpq-dev", "libffi-dev", "libssl-dev",
-                    "libegl1", "libgl1", "libxkbcommon0")
-# A missing shared library (.so) named in an error, mapped to the allowlisted packages that provide it.
-_SO_PACKAGES = (
-    ("libegl.so", ("libegl1", "libgl1", "libxkbcommon0")),   # headless GUI tests (Qt) need all three
-    ("libgl.so", ("libgl1",)),
-    ("libxkbcommon.so", ("libxkbcommon0",)),
-    ("libz.so", ("zlib1g-dev",)),
-    ("libpq.so", ("libpq-dev",)),
-    ("libffi.so", ("libffi-dev",)),
-    ("libssl.so", ("libssl-dev",)),
-    ("libcrypto.so", ("libssl-dev",)),
-)
-_SYSTEM_MARKERS = (
-    (("zlib.h", "zlib headers", "zlib not found", "libz.so", "-lz"), "zlib1g-dev"),
-    (("pg_config", "libpq-fe.h"), "libpq-dev"),
-    (("ffi.h",), "libffi-dev"),
-    (("openssl/", "ssl.h", "openssl not found"), "libssl-dev"),
-    (("pkg-config", "pkgconfig"), "pkg-config"),
-    (("python.h", "command 'gcc' failed", "gcc: not found", "cc: not found", "unable to execute 'gcc'",
-      "no such file or directory: 'gcc'", "c compiler cannot create executables", "error: command 'cc'",
-      "no such file or directory: 'make'", "no such file or directory: 'cc'", "no such file or directory: 'g++'",
-      "make: not found", "make: command not found", "gcc: command not found", "cc: command not found",
-      "g++: command not found", "c++: command not found", "unable to execute 'cc'", "command 'g++' failed"),
-     "build-essential"),
-)
-_APT_INSTALL = re.compile(r"apt(?:-get)?\s+install\s+(?:-y\s+)?((?:[a-z0-9][a-z0-9.+-]+\s*)+)")
+# Generic signs that a failure needs an OS package (a missing header, shared library, tool or executable).
+# These name no package and no project; the package names always come from the project's own files or pages.
+_SYSTEM_FAILURE = re.compile(
+    r"(cannot open shared object file|error while loading shared libraries|library not loaded|"
+    r"fatal error: [^\s:]+\.h|executable not found|command not found|: not found|"
+    r"no such file or directory: '[^'/]+'|unable to execute|c compiler cannot create executables|"
+    r"could not find [^\n]*(?:library|headers?)|package [^\n]* was not found in the pkg-config)", re.I)
+_APT_INSTALL = re.compile(r"\bapt(?:-get)?\s+(?:-\S+\s+)*install\s+((?:(?:-\S+|[A-Za-z0-9][A-Za-z0-9.+:-]*)[ \t]*)+)")
+INSTALL_DOC_NAMES = ("readme", "contributing", "install", "installation", "building", "development",
+                     "dockerfile", "pyproject.toml", "setup.cfg", "setup.py", "tox.ini", "environment.yml",
+                     "environment.yaml", "noxfile.py", "makefile") + tuple(APT_FILES)
+_DOC_MAX = 400_000
+
+
+def project_install_docs(checkouts) -> dict:
+    """Read the project's own install docs from this run's checkout: README, CONTRIBUTING, install pages,
+    CI workflows, Dockerfile and packaging files. Returns the text and the files it came from."""
+    parts, sources, size = [], [], 0
+    for checkout in checkouts or []:
+        root = Path(checkout)
+        if not root.is_dir():
+            continue
+        for dirpath, dirnames, filenames in os.walk(root):
+            rel = Path(dirpath).relative_to(root)
+            in_ci = rel.parts[:2] == (".github", "workflows")
+            dirnames[:] = [d for d in dirnames if d not in SKIP_DIRS and (len(rel.parts) < 2 or in_ci)
+                           and (d in (".github", "workflows", "docs", "doc", "ci") or len(rel.parts) == 0)]
+            for name in filenames:
+                low = name.lower()
+                wanted = in_ci and low.endswith((".yml", ".yaml"))
+                wanted = wanted or any(low == n or low.startswith(n + ".") or low.startswith(n + "-")
+                                       for n in INSTALL_DOC_NAMES)
+                if not wanted:
+                    continue
+                path = Path(dirpath) / name
+                label = str(path.relative_to(root))
+                if label in sources:
+                    continue
+                text = _read(path)[:50_000]
+                if size + len(text) > _DOC_MAX:
+                    break
+                size += len(text)
+                parts.append(text)
+                sources.append(label)
+    return {"text": "\n".join(parts), "sources": sources}
+
+
+def os_packages_in(text: str) -> list[str]:
+    """Package names from apt install lines in a text. Only names are taken; the command is never run."""
+    found: list[str] = []
+    for match in _APT_INSTALL.finditer(text or ""):
+        for word in match.group(1).split():
+            word = word.strip().strip("\\").split("=", 1)[0].lower()
+            if word.startswith("-") or word in ("install", "sudo") or not safe_apt_name(word):
+                continue
+            if word not in found:
+                found.append(word)
+    return found
+
+
+def is_system_failure(text: str) -> bool:
+    return bool(_SYSTEM_FAILURE.search(text or ""))
+
+
+def failure_line(text: str) -> str:
+    for line in (text or "").splitlines():
+        if _SYSTEM_FAILURE.search(line):
+            return line.strip()[:300]
+    return (text or "").strip().splitlines()[0][:300] if (text or "").strip() else ""
 
 
 def trusted_url(url: str, repo: str, declared_urls=()) -> bool:
@@ -1140,30 +1181,41 @@ def apt_available(name: str, run=None) -> bool:
     return bool(m and m.group(1) != "(none)")
 
 
-def system_fix_for(error_text: str, lookup_text: str = "") -> dict:
-    """Map a missing system library to OS packages. Only names on SYSTEM_ALLOWLIST pass; others are refused."""
-    low = (error_text or "").lower()
-    allowed: list[str] = []
-    refused: list[dict] = []
-    for so, names in _SO_PACKAGES:
-        if so in low:
-            allowed.extend(n for n in names if n not in allowed)
-    for markers, name in _SYSTEM_MARKERS:
-        if any(m in low for m in markers) and name not in allowed:
-            allowed.append(name)
-    for lib in re.findall(r"(lib[\w.+-]+\.so)", low):
-        if not any(lib.startswith(so) for so, _ in _SO_PACKAGES) and not any(r["name"] == lib for r in refused):
-            refused.append({"name": lib, "reason": "no allowlisted system package provides it"})
-    if allowed or any(m in low for m in _GAP_MARKERS + ("fatal error", "not found", "error:")):
-        for match in _APT_INSTALL.finditer((lookup_text or "").lower()):
-            for name in match.group(1).split():
-                if name in allowed or name in {r["name"] for r in refused}:
-                    continue
-                if name in SYSTEM_ALLOWLIST:
-                    allowed.append(name)
-                elif safe_apt_name(name):
-                    refused.append({"name": name, "reason": "not on the fixed system package allowlist"})
-    return {"install": allowed, "refused": refused}
+def system_fix_for(error_text: str, lookup_text: str = "", project_text: str = "", apt_check=None,
+                   lookup_sources=()) -> dict:
+    """OS packages for a failure that needs one, proposed by this run's own sources.
+
+    Candidates come from the project's install docs (``project_text``) and from trusted lookup pages
+    (``lookup_text``). A name is kept only when it exists in the distro archive. Nothing is mapped by hand.
+    """
+    if not is_system_failure(error_text):
+        return {"install": [], "refused": [], "sources": []}
+    apt_check = apt_check or apt_available
+    install, refused, sources = [], [], []
+    for text, source in ((project_text, "project install docs"), (lookup_text, "trusted lookup pages")):
+        for name in os_packages_in(text):
+            if name in install or any(r["name"] == name for r in refused):
+                continue
+            if apt_check(name):
+                install.append(name)
+                if source not in sources:
+                    sources.append(source)
+            else:
+                refused.append({"name": name, "reason": "not found in the distro archive"})
+    return {"install": install, "refused": refused,
+            "sources": sources + [u for u in lookup_sources or () if u not in sources]}
+
+
+def note_limitation(rec: dict, needed: list[str], error: str, why: str) -> dict:
+    """Record what this sandbox could not do, in plain words, with the packages and the real error."""
+    block = rec.setdefault("demo_helper", {})
+    item = {"kind": "OS packages", "needed": list(needed), "error": (error or "")[:300], "why": why,
+            "plain": (f"This check needs the system package(s) {', '.join(needed)}, but {why}. "
+                      f"The error was: {(error or '').strip()[:200]}")}
+    lims = block.setdefault("limitations", [])
+    if item not in lims:
+        lims.append(item)
+    return item
 
 
 def _system_decision(names: list[str], sandbox: str) -> list[dict]:
@@ -1787,7 +1839,8 @@ def _emit_retry(detail: str) -> None:
 
 def retry_unverified(rec: dict, rerun, install_one, declared, tavily_text: str, pypi, repo: str,
                      allow_system: bool, install_system=None, lookup=None, recheck_coverage=None,
-                     max_tries: int = MAX_GAP_TRIES, declared_urls=(), apt_check=None) -> dict:
+                     max_tries: int = MAX_GAP_TRIES, declared_urls=(), apt_check=None,
+                     project_text: str = "") -> dict:
     """Up to ``max_tries`` reruns when a could-not-verify result is a setup or import gap.
 
     Each try: look the error up (Tavily, when a lookup is given), install the fix on main and pr, rerun the step.
@@ -1817,7 +1870,7 @@ def retry_unverified(rec: dict, rerun, install_one, declared, tavily_text: str, 
     tried: set[str] = set()
     for attempt in range(1, max(0, max_tries) + 1):
         name = gap_name(text)
-        query = f"{repo} {name} python install"
+        query = f"{repo} {name} install {failure_line(text)}"[:380]
         looked = False
         sources: list[str] = []
         if lookup is not None:
@@ -1836,22 +1889,28 @@ def retry_unverified(rec: dict, rerun, install_one, declared, tavily_text: str, 
         tried.update(norm(req_name(spec["requirement"])) for spec in specs)
         entry = {"try": attempt, "problem": name, "lookup": query if looked else None, "sources": sources,
                  "planned": [spec["requirement"] for spec in specs], "installed": [], "rerun": False}
-        sys_fix = system_fix_for(text, lookup_text)
+        sys_fix = system_fix_for(text, lookup_text, project_text, apt_check, sources)
         for item in sys_fix["refused"]:
             notes.append(f"Setup plan: refused system package {item['name']}: {item['reason']}")
         sys_names = [n for n in sys_fix["install"] if n not in tried]
+        if not specs and is_system_failure(text) and not sys_names:
+            entry["result"] = "the project's docs and pages name no OS package for this error"
+            tries.append(entry)
+            note_limitation(rec, [], failure_line(text), "no OS package for it was found in the project's own docs")
+            _emit_retry(f"Try {attempt} of {max_tries}: {name}: {entry['result']}")
+            break
         if not specs and sys_names and rerun is not None:
             tried.update(sys_names)
             entry["planned"] = list(sys_names)
+            entry["sources"] = list(sys_fix["sources"])
             if not (allow_system and install_system):
                 entry["result"] = "needs system package(s) " + ", ".join(sys_names) + "; this sandbox cannot install them"
+                note_limitation(rec, sys_names, failure_line(text),
+                                "this sandbox (bubblewrap) cannot install OS packages")
                 tries.append(entry)
                 _emit_retry(f"Try {attempt} of {max_tries}: {name}: {entry['result']}")
                 break
-            missing = [n for n in sys_names if not apt_check(n)]
-            for n in missing:
-                notes.append(f"Setup plan: refused system package {n}: not found in the distro archive")
-            got = [n for n in sys_names if n not in missing and install_system(n)]
+            got = [n for n in sys_names if install_system(n)]
             entry["installed"] = [f"system package {n}" for n in got]
             if not got:
                 entry["result"] = "system package install failed on main or pr"
