@@ -589,7 +589,9 @@ def test_replay_export_and_committed_catalog_need_no_network(tmp_path, monkeypat
     repo_catalog = json.loads((Path(export_replay.ROOT) / "replay" / "catalog.json").read_text())
     assert repo_catalog["mode"] == "replay"
     verdicts = {row["verdict"] for row in repo_catalog["checks"]}
-    assert {"needs_attention", "verified", "could_not_verify"} <= verdicts
+    counts = {v: sum(1 for row in repo_catalog["checks"] if row["verdict"] == v) for v in verdicts}
+    # The page shows only the 30-PR batch on code version 0fa0016.
+    assert counts == {"needs_attention": 8, "could_not_verify": 22}
     for row in repo_catalog["checks"]:
         record_path = Path(export_replay.ROOT) / "replay" / row["record"]
         text = record_path.read_text()

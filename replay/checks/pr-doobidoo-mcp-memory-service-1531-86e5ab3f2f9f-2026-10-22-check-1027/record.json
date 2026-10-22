@@ -1,0 +1,2147 @@
+{
+  "schema_version": "1",
+  "record_kind": "pr_run",
+  "id": "pr-doobidoo-mcp-memory-service-1531-86e5ab3f2f9f-2026-10-22-check-1027",
+  "date_ist": "2026-10-22 10:27 IST",
+  "run_date": "2026-10-22",
+  "who": "ops/daily_run.py",
+  "repo": "doobidoo/mcp-memory-service",
+  "library": "mcp-memory-service",
+  "pr": {
+    "repo": "doobidoo/mcp-memory-service",
+    "number": 1531,
+    "url": "https://github.com/doobidoo/mcp-memory-service/pull/1531",
+    "title": "fix(maintenance): regenerate_embeddings writes vectors into their store partition",
+    "base_sha": "47a8eff72c47092964734f094fca6a6ed841bbfd",
+    "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+    "head_sha": "86e5ab3f2f9f9be460d70b7576ab1450271c4728",
+    "merge_commit": null,
+    "tested_main_sha": "47a8eff72c47092964734f094fca6a6ed841bbfd",
+    "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+  },
+  "author": "filhocf",
+  "base_ref": "main",
+  "updated_at_utc": "2026-10-21T17:23:31Z",
+  "updated_at_ist": "2026-10-21 22:53 IST",
+  "ci_state": "not checked (single-PR check)",
+  "ci_detail": "checked on request with --pr",
+  "tested_at_ist": "2026-10-22 10:27 IST",
+  "files": {
+    "all": [
+      "changelog.d/1521-regenerate-embeddings-store.fixed.md",
+      "scripts/maintenance/regenerate_embeddings.py",
+      "tests/maintenance/test_regenerate_embeddings_store.py"
+    ],
+    "package_py": [],
+    "compiled": [],
+    "other": [
+      "changelog.d/1521-regenerate-embeddings-store.fixed.md",
+      "scripts/maintenance/regenerate_embeddings.py",
+      "tests/maintenance/test_regenerate_embeddings_store.py"
+    ]
+  },
+  "machine_type": {
+    "arch": "x86_64",
+    "os": "Linux",
+    "platform": "Linux-6.12.94+-x86_64-with-glibc2.41",
+    "cpu_count": 8,
+    "ci": null,
+    "runner_name": null,
+    "runner_os": null,
+    "runner_arch": null,
+    "runner_environment": null,
+    "image": null,
+    "label": "local",
+    "gxx": "g++ (Debian 14.2.0-19) 14.2.0",
+    "cpu_model": "Intel(R) Xeon(R) Processor",
+    "ram_gb": 15.6
+  },
+  "thread_env": {
+    "OMP_NUM_THREADS": "1",
+    "OPENBLAS_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1",
+    "NUMEXPR_NUM_THREADS": "1",
+    "VECLIB_MAXIMUM_THREADS": "1",
+    "BLIS_NUM_THREADS": "1",
+    "PYTHONHASHSEED": "0"
+  },
+  "runs_per_side": 3,
+  "runs_per_side_planned": 3,
+  "workers": "4",
+  "test_timeout_s": 120,
+  "run_timeout_s": 900,
+  "build_timeout_s": 1800,
+  "python": "3.12.15",
+  "test_selection": "mapped from touched files: tests, tests/maintenance/test_regenerate_embeddings_store.py",
+  "per_run": [
+    {
+      "side": "old",
+      "run": 1,
+      "passed": 4136,
+      "failed": 14,
+      "error": 367,
+      "skipped": 132,
+      "collection_errors": 0,
+      "exit": 1,
+      "seconds": 72.2,
+      "pytest_summary": "[Test Cleanup] Removed test database directory: <run>/ops/work/mcp_memory_service-1531/home-main/.tmp/mcp-test-db-mqptrdxc",
+      "junit": true
+    },
+    {
+      "side": "new",
+      "run": 1,
+      "passed": 4144,
+      "failed": 13,
+      "error": 360,
+      "skipped": 134,
+      "collection_errors": 0,
+      "exit": 1,
+      "seconds": 70.4,
+      "pytest_summary": "[Test Cleanup] Removed test database directory: <run>/ops/work/mcp_memory_service-1531/home-pr/.tmp/mcp-test-db-wi_sl2_p",
+      "junit": true
+    },
+    {
+      "side": "old",
+      "run": 2,
+      "passed": 4136,
+      "failed": 14,
+      "error": 367,
+      "skipped": 132,
+      "collection_errors": 0,
+      "exit": 1,
+      "seconds": 72.1,
+      "pytest_summary": "[Test Cleanup] Removed test database directory: <run>/ops/work/mcp_memory_service-1531/home-main/.tmp/mcp-test-db-_e07jv49",
+      "junit": true
+    },
+    {
+      "side": "new",
+      "run": 2,
+      "passed": 4144,
+      "failed": 13,
+      "error": 360,
+      "skipped": 134,
+      "collection_errors": 0,
+      "exit": 1,
+      "seconds": 72.1,
+      "pytest_summary": "[Test Cleanup] Removed test database directory: <run>/ops/work/mcp_memory_service-1531/home-pr/.tmp/mcp-test-db-_32xfzh9",
+      "junit": true
+    },
+    {
+      "side": "old",
+      "run": 3,
+      "passed": 4136,
+      "failed": 14,
+      "error": 367,
+      "skipped": 132,
+      "collection_errors": 0,
+      "exit": 1,
+      "seconds": 72.4,
+      "pytest_summary": "[Test Cleanup] Removed test database directory: <run>/ops/work/mcp_memory_service-1531/home-main/.tmp/mcp-test-db-0twthses",
+      "junit": true
+    },
+    {
+      "side": "new",
+      "run": 3,
+      "passed": 4144,
+      "failed": 13,
+      "error": 360,
+      "skipped": 134,
+      "collection_errors": 0,
+      "exit": 1,
+      "seconds": 71.2,
+      "pytest_summary": "[Test Cleanup] Removed test database directory: <run>/ops/work/mcp_memory_service-1531/home-pr/.tmp/mcp-test-db-b6lr5nv4",
+      "junit": true
+    }
+  ],
+  "notes": null,
+  "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+  "behaviour_claims": [],
+  "baseline": "full",
+  "model_provider": {
+    "requested": "nebius",
+    "used": "nebius",
+    "note": "model provider: nebius (Token Factory, live)",
+    "blind": false
+  },
+  "sandbox_backend": "local",
+  "sandbox_backend_note": "local bubblewrap",
+  "machine": "local",
+  "posted_upstream": false,
+  "logs": "mcp_memory_service-1531/",
+  "freeze": {
+    "main": "freeze-main.txt",
+    "pr": "freeze-pr.txt"
+  },
+  "poc_commit": "0fa0016ea51794edee0f4a085e41bf48dd813765",
+  "route": "source-pair",
+  "current_head_sha": "86e5ab3f2f9f9be460d70b7576ab1450271c4728",
+  "tested_invocation": 1,
+  "model_provider_used": "nebius",
+  "state": "closed",
+  "mergeable_state": "unknown",
+  "product_check": true,
+  "demo_helper": {
+    "preflight": {
+      "ok": true
+    },
+    "tavily": {
+      "ok": true,
+      "skipped": false,
+      "live_call": true,
+      "cached": false,
+      "queries": [
+        "mcp-memory-service python setup install instructions https://github.com/doobidoo/mcp-memory-service site:github.com/doobidoo/mcp-memory-service",
+        "mcp-memory-service python documentation install https://github.com/doobidoo/mcp-memory-service site:github.com/doobidoo/mcp-memory-service",
+        "mcp-memory-service python install requirements https://pypi.org/project/mcp-memory-service/ https://github.com/doobidoo/mcp-memory-service site:pypi.org"
+      ],
+      "results": [
+        {
+          "title": "mcp-memory-service \u00b7 PyPI",
+          "url": "https://pypi.org/project/mcp-memory-service/",
+          "query": "mcp-memory-service python install requirements https://pypi.org/project/mcp-memory-service/ https://github.com/doobidoo/mcp-memory-service site:pypi.org"
+        },
+        {
+          "title": "GitHub - doobidoo/mcp-memory-service: Open-source persistent memory for AI agent pipelines (LangGraph, CrewAI, AutoGen) and Claude. REST API + knowledge graph + autonomous consolidation. \u00b7 GitHub",
+          "url": "https://github.com/doobidoo/mcp-memory-service",
+          "query": "mcp-memory-service python setup install instructions https://github.com/doobidoo/mcp-memory-service site:github.com/doobidoo/mcp-memory-service"
+        },
+        {
+          "title": "01 Installation Guide \u00b7 doobidoo/mcp-memory-service Wiki \u00b7 GitHub",
+          "url": "https://github.com/doobidoo/mcp-memory-service/wiki/01-Installation-Guide",
+          "query": "mcp-memory-service python setup install instructions https://github.com/doobidoo/mcp-memory-service site:github.com/doobidoo/mcp-memory-service"
+        },
+        {
+          "title": "[Feature]: Support for Python 3.14 by bumping supported tokenizers version to 0.22.2 \u00b7 Issue #376 \u00b7 doobidoo/mcp-memory-service \u00b7 GitHub",
+          "url": "https://github.com/doobidoo/mcp-memory-service/issues/376",
+          "query": "mcp-memory-service python setup install instructions https://github.com/doobidoo/mcp-memory-service site:github.com/doobidoo/mcp-memory-service"
+        },
+        {
+          "title": "mcp-memory-service/docs/ide-compatability.md at main \u00b7 doobidoo/mcp-memory-service \u00b7 GitHub",
+          "url": "https://github.com/doobidoo/mcp-memory-service/blob/main/docs/ide-compatability.md",
+          "query": "mcp-memory-service python documentation install https://github.com/doobidoo/mcp-memory-service site:github.com/doobidoo/mcp-memory-service"
+        }
+      ],
+      "text": "To install the mcp-memory-service, use the command `pip install mcp-memory-service`. For specific configurations, such as integrating with Claude Desktop, add the appropriate configuration to your config file based on your operating system. For legacy hardware, use `python install.py --legacy-hardware` and for modern hardware, use `python install.py`. Note that Python 3.10 or newer is required, with 3.11+ recommended. The sources also mention that Python 3.14 support was added in version 10.1.0, but installation may fail due to compatibility issues with certain libraries.\nTo install the mcp-memory-service Python documentation, you can use the PyPI installation method by running `pip install mcp-memory-service`. For local installation, clone the repository from GitHub and run `python install.py`. The installation guide also provides options for legacy and modern hardware optimizations. For verifying the installation, run `python scripts/test_installation.py`. The sources do not provide a definitive answer for some specific installation details beyond what is mentioned.\nTo install the `mcp-memory-service` Python package, you can use the command `pip install mcp-memory-service`. The package supports Remote MCP for native claude.ai integration and provides a framework-agnostic REST API with 15 endpoints. It also supports SSE events for real-time notifications and runs embeddings locally via ONNX. The latest version available on PyPI is 10.40.2, which includes features like a knowledge graph, smart retrieval, and multi-client support. For the most up-to-date version, visit https://pypi.org/project/mcp-memory-service/.\nTitle: mcp-memory-service \u00b7 PyPI\n# mcp-memory-service. ## Persistent Shared Memory for AI Agent Pipelines. Unlike desktop-only MCP servers, **mcp-memory-service supports Remote MCP** for native claude.ai integration. | Without mcp-memory-service | With mcp-memory-service |. * **Framework-agnostic REST API** \u2014 15 endpoints, no MCP client library needed. * **`X-Agent-ID` header** \u2014 auto-tag memories by agent identity for scoped retrieval. * **SSE events** \u2014 real-time notifications when any agent s\n## \ud83d\ude80 Get Started in 60 Seconds\n\n> Not sure which setup fits? The Setup Guide walks you to the right path in under a minute.\n\n1. Install:\n\n```\npip install mcp-memory-service\n```\n\n2. Configure your AI client:\n\n Claude Desktop\n\nAdd to your config file:\n\n macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`\n Windows: `%APPDATA%\\Claude\\claude_desktop_config.json`\n Linux: `~/.config/Claude/claude_desktop_config.json` [...] The plugin ships as repository files for the local plugin d\nWhat this does:\n\n \u2705 Detects your operating system and hardware\n \u2705 Installs optimal dependencies for your system\n \u2705 Configures the best storage backend (SQLite-vec recommended)\n \u2705 Sets up environment variables\n \u2705 Generates secure API key\n \u2705 Optionally installs as system service\n\n## \ud83d\udccb Prerequisites\n\n### System Requirements\n\n Python: 3.10 or newer (3.11+ recommended)\n Memory: 4GB RAM minimum (8GB+ recommended)\n Storage: 2GB free space\n OS: Windows 10+, macOS 10.15+, or Linux (Ubuntu 18.04+) [...] F\nWhat Changed:\n\n    \u2705 Python 3.14 support added (3.10-3.14 now supported)\n    \u2705 Tokenizers upgraded from ==0.20.3 to >=0.22.2\n    \u2705 Resolves PyO3 compatibility issues preventing installation\n    \u2705 Zero breaking changes - full backward compatibility maintained\n    \u2705 All 1005 tests passing across Python 3.10-3.14\n\n   Installation:\n\n   ```\n   pip install mcp-memory-service==10.1.0\n   ``` [...] Tried to clone, bump version, setup venv, uv pip install, and run install script on my local setup (Windows\n1. Verify Installation: Run `python scripts/test_installation.py`\n2. Check Logs: Most IDEs show MCP server logs in their output panels\n3. Test Standalone: Try running the server directly: `uv run memory`\n4. Path Issues: Use absolute paths in your configuration\n5. Python Environment: Ensure the IDE can access your Python environment\n\n### IDE-Specific Tips\n\nCursor: If using multiple MCP servers, be aware of Cursor's server limit. Prioritize based on your needs. [...] ```\n\"mcpServers\" \"memory\" \"com",
+      "errors": [],
+      "lines": [
+        "Looked up with Tavily: 5 results",
+        "Query: mcp-memory-service python setup install instructions https://github.com/doobidoo/mcp-memory-service site:github.com/doobidoo/mcp-memory-service",
+        "Query: mcp-memory-service python documentation install https://github.com/doobidoo/mcp-memory-service site:github.com/doobidoo/mcp-memory-service",
+        "Query: mcp-memory-service python install requirements https://pypi.org/project/mcp-memory-service/ https://github.com/doobidoo/mcp-memory-service site:pypi.org",
+        "Source: mcp-memory-service \u00b7 PyPI \u2014 https://pypi.org/project/mcp-memory-service/",
+        "Source: GitHub - doobidoo/mcp-memory-service: Open-source persistent memory for AI agent pipelines (LangGraph, CrewAI, AutoGen) and Claude. REST API + knowledge graph + autonomous consolidation. \u00b7 GitHub \u2014 https://github.com/doobidoo/mcp-memory-service",
+        "Source: 01 Installation Guide \u00b7 doobidoo/mcp-memory-service Wiki \u00b7 GitHub \u2014 https://github.com/doobidoo/mcp-memory-service/wiki/01-Installation-Guide",
+        "Source: [Feature]: Support for Python 3.14 by bumping supported tokenizers version to 0.22.2 \u00b7 Issue #376 \u00b7 doobidoo/mcp-memory-service \u00b7 GitHub \u2014 https://github.com/doobidoo/mcp-memory-service/issues/376",
+        "Source: mcp-memory-service/docs/ide-compatability.md at main \u00b7 doobidoo/mcp-memory-service \u00b7 GitHub \u2014 https://github.com/doobidoo/mcp-memory-service/blob/main/docs/ide-compatability.md"
+      ]
+    },
+    "notes": [
+      "Setup check: GitHub token: present.",
+      "Setup check: Nebius token: present.",
+      "Setup check: free memory 8.3 GB (of 15.6 GB).",
+      "Setup check: free disk 89.2 GB.",
+      "Demo helper: git is installed.",
+      "Demo helper: python3 is installed.",
+      "Demo helper: uv is installed.",
+      "Looked up with Tavily: 5 results",
+      "Query: mcp-memory-service python setup install instructions https://github.com/doobidoo/mcp-memory-service site:github.com/doobidoo/mcp-memory-service",
+      "Query: mcp-memory-service python documentation install https://github.com/doobidoo/mcp-memory-service site:github.com/doobidoo/mcp-memory-service",
+      "Query: mcp-memory-service python install requirements https://pypi.org/project/mcp-memory-service/ https://github.com/doobidoo/mcp-memory-service site:pypi.org",
+      "Source: mcp-memory-service \u00b7 PyPI \u2014 https://pypi.org/project/mcp-memory-service/",
+      "Source: GitHub - doobidoo/mcp-memory-service: Open-source persistent memory for AI agent pipelines (LangGraph, CrewAI, AutoGen) and Claude. REST API + knowledge graph + autonomous consolidation. \u00b7 GitHub \u2014 https://github.com/doobidoo/mcp-memory-service",
+      "Source: 01 Installation Guide \u00b7 doobidoo/mcp-memory-service Wiki \u00b7 GitHub \u2014 https://github.com/doobidoo/mcp-memory-service/wiki/01-Installation-Guide",
+      "Source: [Feature]: Support for Python 3.14 by bumping supported tokenizers version to 0.22.2 \u00b7 Issue #376 \u00b7 doobidoo/mcp-memory-service \u00b7 GitHub \u2014 https://github.com/doobidoo/mcp-memory-service/issues/376",
+      "Source: mcp-memory-service/docs/ide-compatability.md at main \u00b7 doobidoo/mcp-memory-service \u00b7 GitHub \u2014 https://github.com/doobidoo/mcp-memory-service/blob/main/docs/ide-compatability.md",
+      "Setup plan: the same packages on main and pr.",
+      "Setup plan: aiofiles is noted, installed with the project.",
+      "Setup plan: aiohttp is noted, installed with the project.",
+      "Setup plan: aiosqlite is noted, installed with the project.",
+      "Setup plan: apscheduler is noted, installed with the project.",
+      "Setup plan: authlib is noted, installed with the project.",
+      "Setup plan: build is noted, installed with the project.",
+      "Setup plan: chardet is noted, installed with the project.",
+      "Setup plan: click is noted, installed with the project.",
+      "Setup plan: cryptography is noted, installed with the project.",
+      "Setup plan: fastapi is noted, installed with the project.",
+      "Setup plan: httpx is noted, installed with the project.",
+      "Setup plan: mcp is noted, installed with the project.",
+      "Setup plan: numpy is noted, installed with the project.",
+      "Setup plan: psutil is noted, installed with the project.",
+      "Setup plan: PyJWT is noted, installed with the project.",
+      "Setup plan: pypdf is noted, installed with the project.",
+      "Setup plan: PyYAML is noted, installed with the project.",
+      "Setup plan: python-dotenv is noted, installed with the project.",
+      "Setup plan: python-multipart is noted, installed with the project.",
+      "Setup plan: requests is noted, installed with the project.",
+      "Setup plan: sqlite-vec is noted, installed with the project.",
+      "Setup plan: sse-starlette is noted, installed with the project.",
+      "Setup plan: typing-extensions is noted, installed with the project.",
+      "Setup plan: uvicorn is noted, installed with the project.",
+      "Setup plan: zeroconf is noted, installed with the project.",
+      "Setup plan: Python 3.12: Python 3.12 already meets >=3.10"
+    ],
+    "setup_plan": {
+      "packages": [
+        {
+          "requirement": "aiofiles>=23.2.1",
+          "name": "aiofiles",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "aiohttp>=3.13.3",
+          "name": "aiohttp",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "aiosqlite>=0.20.0",
+          "name": "aiosqlite",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "apscheduler>=3.11.0",
+          "name": "apscheduler",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "authlib>=1.6.9",
+          "name": "authlib",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "build>=0.10.0",
+          "name": "build",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "chardet>=5.0.0",
+          "name": "chardet",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "click>=8.0.0",
+          "name": "click",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "cryptography>=46.0.6",
+          "name": "cryptography",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "fastapi>=0.115.5",
+          "name": "fastapi",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "httpx>=0.24.0",
+          "name": "httpx",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "mcp>=1.8.0,<2.0.0",
+          "name": "mcp",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "numpy>=1.24.0",
+          "name": "numpy",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "psutil>=5.9.0",
+          "name": "psutil",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "PyJWT[crypto]>=2.12.0",
+          "name": "PyJWT",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "pypdf>=6.9.1",
+          "name": "pypdf",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "PyYAML>=6.0",
+          "name": "PyYAML",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "python-dotenv>=1.0.0",
+          "name": "python-dotenv",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "python-multipart>=0.0.22",
+          "name": "python-multipart",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "requests>=2.32.4",
+          "name": "requests",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "sqlite-vec>=0.1.6",
+          "name": "sqlite-vec",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "sse-starlette>=2.1.0",
+          "name": "sse-starlette",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "typing-extensions>=4.0.0; python_version < '3.11'",
+          "name": "typing-extensions",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "uvicorn>=0.30.0",
+          "name": "uvicorn",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "zeroconf>=0.130.0",
+          "name": "zeroconf",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        }
+      ],
+      "extra_reqs": [],
+      "python": {
+        "requested": "3.12",
+        "current": "3.12",
+        "applied": true,
+        "switch": null,
+        "reason": "Python 3.12 already meets >=3.10"
+      },
+      "system": [],
+      "refused": []
+    }
+  },
+  "chosen": {
+    "pr": 1531,
+    "head_sha": null,
+    "install": null,
+    "test_cmd": null
+  },
+  "sides": {
+    "comparison_basis": "merge-base vs PR head (no merge ref available)",
+    "main_sha": "47a8eff72c47092964734f094fca6a6ed841bbfd",
+    "pr_sha": "86e5ab3f2f9f9be460d70b7576ab1450271c4728"
+  },
+  "tested": {
+    "main": "main @ 47a8eff72c47 (merge-base with the PR head)",
+    "pr": "PR head 86e5ab3f2f9f"
+  },
+  "probe_plan": {
+    "baseline": "full",
+    "model": "model provider: nebius (Token Factory, live)",
+    "errors": [],
+    "model_claims": [
+      {
+        "id": "C1",
+        "text": "regenerate_embeddings writes vectors into their store partition",
+        "source_quote": "regenerate_embeddings writes vectors into their store partition",
+        "testable": true,
+        "expect": "differs"
+      },
+      {
+        "id": "C2",
+        "text": "regenerate_embeddings now reads each memory's store and writes the vector into that partition",
+        "source_quote": "It now reads each memory's `store` (`COALESCE(store, 'default')`) and writes the vector into that partition.",
+        "testable": true,
+        "expect": "differs"
+      },
+      {
+        "id": "C3",
+        "text": "The import of serialize_float32 is corrected to come from the sqlite_vec package",
+        "source_quote": "Also fixes a broken import that prevented the script from running at all: `serialize_float32` comes from the `sqlite_vec` package, not from `mcp_memory_service.storage.sqlite_vec`.",
+        "testable": true,
+        "expect": "differs"
+      },
+      {
+        "id": "C4",
+        "text": "After the fix, a store-scoped retrieve finds the regenerated vector",
+        "source_quote": "Test: `tests/maintenance/test_regenerate_embeddings_store.py` stores a memory in a named store, drops its vector, runs the real regeneration core, and asserts the vector returns to its own partition and a store-scoped retrieve finds it \u2014 RED without the `store` write, GREEN with it.",
+        "testable": true,
+        "expect": "differs"
+      }
+    ],
+    "model_rejected_claims": [],
+    "diff_targets": [],
+    "frozen": [
+      {
+        "path": "model-probes/model-probe1.py",
+        "source": "model",
+        "sha256": "d899e2206799e84976c9371f8dd5d0917bd767b298b78f4c7eb889bcc8f61a3d",
+        "generator": {
+          "kind": "model",
+          "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+          "model": "nvidia/nemotron-3-super-120b-a12b",
+          "provider": "nebius",
+          "provenance": "live",
+          "blind": true
+        },
+        "frozen_at": "2026-10-22T04:57:54.684729+00:00",
+        "inputs_sha256": "94d656784d5e9901a0df0b9df9e5ec1a6c932fea50d27dbb315192bcd86361e0",
+        "inputs": {
+          "title_chars": 81,
+          "body_chars": 2323,
+          "base_files": {}
+        }
+      },
+      {
+        "path": "model-probes/model-probe2.py",
+        "source": "model",
+        "sha256": "6c1a8d11bbfcbe7143de0b651a1d68dfcda123294f61d84b8feb200f5f75c238",
+        "generator": {
+          "kind": "model",
+          "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+          "model": "nvidia/nemotron-3-super-120b-a12b",
+          "provider": "nebius",
+          "provenance": "live",
+          "blind": true
+        },
+        "frozen_at": "2026-10-22T04:57:54.684870+00:00",
+        "inputs_sha256": "94d656784d5e9901a0df0b9df9e5ec1a6c932fea50d27dbb315192bcd86361e0",
+        "inputs": {
+          "title_chars": 81,
+          "body_chars": 2323,
+          "base_files": {}
+        }
+      },
+      {
+        "path": "model-probes/model-probe3.py",
+        "source": "model",
+        "sha256": "046eabb20deaa11cfe8dfbbde3474cb151983bf80bcaa1406e315fb20adf72c5",
+        "generator": {
+          "kind": "model",
+          "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+          "model": "nvidia/nemotron-3-super-120b-a12b",
+          "provider": "nebius",
+          "provenance": "live",
+          "blind": true
+        },
+        "frozen_at": "2026-10-22T04:57:54.684938+00:00",
+        "inputs_sha256": "94d656784d5e9901a0df0b9df9e5ec1a6c932fea50d27dbb315192bcd86361e0",
+        "inputs": {
+          "title_chars": 81,
+          "body_chars": 2323,
+          "base_files": {}
+        }
+      },
+      {
+        "path": "model-probes/model-probe4.py",
+        "source": "model",
+        "sha256": "733d191e3521b7b1018f5fc458341b742f74e1c089e8f57a21ace8185c2c5a9b",
+        "generator": {
+          "kind": "model",
+          "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+          "model": "nvidia/nemotron-3-super-120b-a12b",
+          "provider": "nebius",
+          "provenance": "live",
+          "blind": true
+        },
+        "frozen_at": "2026-10-22T04:57:54.685006+00:00",
+        "inputs_sha256": "94d656784d5e9901a0df0b9df9e5ec1a6c932fea50d27dbb315192bcd86361e0",
+        "inputs": {
+          "title_chars": 81,
+          "body_chars": 2323,
+          "base_files": {}
+        }
+      }
+    ]
+  },
+  "test_extras": [
+    "pytest-asyncio>=0.23.0",
+    "pytest-timeout>=2.0.0",
+    "pytest-subtests>=0.10.0",
+    "pytest-asyncio>=1.4.0"
+  ],
+  "pr_side_started_at": "2026-10-22T04:57:54.803243+00:00",
+  "test_targets": {
+    "main": [
+      "tests"
+    ],
+    "pr": [
+      "tests",
+      "tests/maintenance/test_regenerate_embeddings_store.py"
+    ]
+  },
+  "installed_commit": {
+    "main": {
+      "dist": "mcp-memory-service",
+      "expected": "47a8eff72c47092964734f094fca6a6ed841bbfd",
+      "installed": "47a8eff72c47092964734f094fca6a6ed841bbfd",
+      "ok": true
+    },
+    "pr": {
+      "dist": "mcp-memory-service",
+      "expected": "86e5ab3f2f9f9be460d70b7576ab1450271c4728",
+      "installed": "86e5ab3f2f9f9be460d70b7576ab1450271c4728",
+      "ok": true
+    }
+  },
+  "declared_test_deps": {
+    "requested": [
+      "pytest-asyncio>=0.23.0",
+      "pytest-timeout>=2.0.0",
+      "pytest-subtests>=0.10.0",
+      "pytest-asyncio>=1.4.0"
+    ],
+    "installed": true
+  },
+  "comparison": {
+    "same": 4248,
+    "same_skipped_both": 130,
+    "regressions": [
+      "tests.integration.test_cloudflare_connection::test_cloudflare_config",
+      "tests.integration.test_cloudflare_connection::test_storage_backend_import",
+      "tests.integration.test_concurrent_clients.TestConcurrentClients::test_multiple_readers_one_writer",
+      "tests.integration.test_concurrent_clients.TestConcurrentClients::test_reader_writer_concurrent",
+      "tests.integration.test_concurrent_clients.TestConcurrentClients::test_two_clients_concurrent_write",
+      "tests.storage.test_graph_distribution::test_graph_visualization_connection_count_accuracy",
+      "tests.storage.test_graph_distribution::test_graph_visualization_performance_with_large_graph",
+      "tests.storage.test_graph_storage.TestGraphStorage::test_connection_types_json_array",
+      "tests.storage.test_graph_storage.TestGraphStorage::test_delete_association",
+      "tests.storage.test_graph_storage.TestGraphStorage::test_duplicate_association_handling",
+      "tests.storage.test_graph_storage.TestGraphStorage::test_empty_hash_validation",
+      "tests.storage.test_graph_storage.TestGraphStorage::test_find_connected_basic",
+      "tests.storage.test_graph_storage.TestGraphStorage::test_find_connected_empty_hash",
+      "tests.storage.test_graph_storage.TestGraphStorage::test_find_connected_multi_hop",
+      "tests.storage.test_graph_storage.TestGraphStorage::test_find_connected_with_cycles",
+      "tests.storage.test_graph_storage.TestGraphStorage::test_get_association_count",
+      "tests.storage.test_graph_storage.TestGraphStorage::test_get_subgraph",
+      "tests.storage.test_graph_storage.TestGraphStorage::test_get_subgraph_empty_hash",
+      "tests.storage.test_graph_storage.TestGraphStorage::test_metadata_null_handling",
+      "tests.storage.test_graph_storage.TestGraphStorage::test_metadata_storage",
+      "tests.storage.test_graph_storage.TestGraphStorage::test_query_performance_benchmark",
+      "tests.storage.test_graph_storage.TestGraphStorage::test_self_loop_prevention",
+      "tests.storage.test_graph_storage.TestGraphStorage::test_shortest_path_direct",
+      "tests.storage.test_graph_storage.TestGraphStorage::test_shortest_path_empty_hash",
+      "tests.storage.test_graph_storage.TestGraphStorage::test_shortest_path_multi_hop",
+      "tests.storage.test_graph_storage.TestGraphStorage::test_shortest_path_no_path",
+      "tests.storage.test_graph_storage.TestGraphStorage::test_shortest_path_self",
+      "tests.storage.test_graph_storage.TestGraphStorage::test_similarity_scores",
+      "tests.storage.test_graph_storage.TestGraphStorage::test_store_association_basic",
+      "tests.storage.test_graph_storage.TestGraphStorage::test_store_bidirectional_symmetric",
+      "tests.storage.test_graph_storage.TestGraphStorage::test_store_directed_asymmetric",
+      "tests.storage.test_graph_storage.TestGraphStorage::test_subgraph_multi_hop",
+      "tests.storage.test_graph_viz_entity_edges::test_entity_links_do_not_inflate_the_connection_count",
+      "tests.storage.test_graph_viz_entity_edges::test_entity_only_memory_is_not_selected_as_a_node",
+      "tests.storage.test_graph_viz_entity_edges::test_memory_to_memory_links_still_select_nodes",
+      "tests.storage.test_health_check_lock::test_collect_sqlite_stats_handles_missing_tables",
+      "tests.storage.test_health_check_lock::test_collect_sqlite_stats_synchronous_helper",
+      "tests.storage.test_health_check_lock::test_hybrid_health_checker_waits_for_connection_lock",
+      "tests.storage.test_health_check_lock::test_sqlite_health_checker_uses_run_in_thread",
+      "tests.storage.test_health_check_lock::test_sqlite_health_checker_waits_for_connection_lock",
+      "tests.storage.test_hybrid_graph_methods::test_hybrid_delegates_graph_visualization_data",
+      "tests.storage.test_hybrid_graph_methods::test_hybrid_delegates_relationship_type_distribution",
+      "tests.storage.test_hybrid_graph_methods::test_hybrid_does_not_query_cloudflare_for_graph_data",
+      "tests.storage.test_hybrid_graph_methods::test_hybrid_graph_methods_consistency_across_calls",
+      "tests.storage.test_hybrid_graph_methods::test_hybrid_graph_methods_error_handling",
+      "tests.storage.test_hybrid_graph_methods::test_hybrid_graph_methods_match_primary_directly",
+      "tests.storage.test_hybrid_graph_methods::test_hybrid_graph_visualization_empty_graph",
+      "tests.storage.test_hybrid_graph_methods::test_hybrid_graph_visualization_limit_parameter_delegation",
+      "tests.storage.test_hybrid_graph_methods::test_hybrid_graph_visualization_min_connections_delegation",
+      "tests.storage.test_hybrid_graph_methods::test_hybrid_graph_visualization_returns_primary_data",
+      "tests.storage.test_hybrid_graph_methods::test_hybrid_relationship_distribution_empty_graph",
+      "tests.storage.test_hybrid_graph_methods::test_hybrid_relationship_distribution_returns_primary_data",
+      "tests.storage.test_hybrid_graph_methods::test_hybrid_relationship_distribution_with_mock_primary",
+      "tests.storage.test_hybrid_mark_superseded::test_mark_superseded_batch_hides_loser_in_primary",
+      "tests.storage.test_hybrid_search::test_bm25_excludes_superseded_by_default",
+      "tests.storage.test_hybrid_search::test_bm25_matches_query_terms_that_are_not_adjacent",
+      "tests.storage.test_hybrid_search::test_bm25_mixed_short_and_long_words_matches_on_long_word",
+      "tests.storage.test_hybrid_search::test_bm25_short_word_query_falls_back_to_phrase",
+      "tests.storage.test_hybrid_search::test_bm25_treats_operator_words_as_terms",
+      "tests.storage.test_hybrid_search::test_fuse_scores_custom_weights",
+      "tests.storage.test_hybrid_search::test_fuse_scores_default_weights",
+      "tests.storage.test_hybrid_search::test_hybrid_mode_via_search_memories",
+      "tests.storage.test_hybrid_search::test_hybrid_search_debug_info",
+      "tests.storage.test_hybrid_search::test_hybrid_search_empty_query",
+      "tests.storage.test_hybrid_search::test_hybrid_search_exact_match",
+      "tests.storage.test_hybrid_search::test_hybrid_search_keyword_boost",
+      "tests.storage.test_hybrid_search::test_hybrid_search_latency_benchmark",
+      "tests.storage.test_hybrid_search::test_hybrid_search_special_characters",
+      "tests.storage.test_hybrid_search::test_hybrid_vs_semantic_scoring",
+      "tests.storage.test_hybrid_search::test_normalize_bm25_score",
+      "tests.storage.test_hybrid_search::test_semantic_mode_unchanged",
+      "tests.storage.test_issue_551_external_embedding_fallback.TestExternalEmbeddingFallbackBehavior::test_connection_error_raises_with_dim_info_when_db_exists",
+      "tests.storage.test_issue_551_external_embedding_fallback.TestExternalEmbeddingFallbackBehavior::test_connection_error_raises_without_dim_info_when_no_db",
+      "tests.storage.test_issue_551_external_embedding_fallback.TestExternalEmbeddingFallbackBehavior::test_import_error_also_raises",
+      "tests.storage.test_issue_551_external_embedding_fallback.TestExternalEmbeddingFallbackBehavior::test_no_external_url_does_not_raise",
+      "tests.storage.test_issue_551_external_embedding_fallback.TestExternalEmbeddingFallbackBehavior::test_runtime_error_also_raises",
+      "tests.storage.test_issue_551_external_embedding_fallback.TestGetExistingDbEmbeddingDimension::test_regex_parses_384_dimension_from_schema_string",
+      "tests.storage.test_issue_551_external_embedding_fallback.TestGetExistingDbEmbeddingDimension::test_regex_parses_768_dimension_from_schema_string",
+      "tests.storage.test_issue_551_external_embedding_fallback.TestGetExistingDbEmbeddingDimension::test_returns_none_when_conn_is_none",
+      "tests.storage.test_issue_551_external_embedding_fallback.TestGetExistingDbEmbeddingDimension::test_returns_none_when_no_float_pattern",
+      "tests.storage.test_issue_551_external_embedding_fallback.TestGetExistingDbEmbeddingDimension::test_returns_none_when_table_missing",
+      "tests.storage.test_kiro_cli_v4_parser.TestKiroCliV4Parser::test_coverage_report_populated_for_all_types",
+      "tests.storage.test_kiro_cli_v4_parser.TestKiroCliV4Parser::test_detects_kiro_cli_v4_format",
+      "tests.storage.test_kiro_cli_v4_parser.TestKiroCliV4Parser::test_empty_and_system_content_filtering",
+      "tests.storage.test_kiro_cli_v4_parser.TestKiroCliV4Parser::test_extracts_user_and_assistant_messages",
+      "tests.storage.test_kiro_cli_v4_parser.TestKiroCliV4Parser::test_long_tool_result_is_kept_not_dropped",
+      "tests.storage.test_kiro_cli_v4_parser.TestKiroCliV4Parser::test_malformed_payload_does_not_abort_run",
+      "tests.storage.test_kiro_cli_v4_parser.TestKiroCliV4Parser::test_old_claude_format_still_works",
+      "tests.storage.test_kiro_cli_v4_parser.TestKiroCliV4Parser::test_old_kiro_format_still_works",
+      "tests.storage.test_kiro_cli_v4_parser.TestKiroCliV4Parser::test_tool_call_and_metadata_dropped_but_counted_in_coverage",
+      "tests.storage.test_kiro_cli_v4_parser.TestKiroCliV4Parser::test_tool_result_applies_system_content_filter",
+      "tests.storage.test_kiro_cli_v4_parser.TestKiroCliV4Parser::test_tool_result_captured_as_assistant",
+      "tests.storage.test_memory_evolution.TestEffectiveConfidence::test_custom_decay_window_env",
+      "tests.storage.test_memory_evolution.TestEffectiveConfidence::test_decay_disabled_returns_confidence_unchanged",
+      "tests.storage.test_memory_evolution.TestEffectiveConfidence::test_fresh_memory_full_confidence",
+      "tests.storage.test_memory_evolution.TestEffectiveConfidence::test_half_confidence_with_decay",
+      "tests.storage.test_memory_evolution.TestEffectiveConfidence::test_none_confidence_defaults_to_one",
+      "tests.storage.test_memory_evolution.TestEffectiveConfidence::test_none_last_accessed_falls_back_to_created_at",
+      "tests.storage.test_memory_evolution.TestEffectiveConfidence::test_stale_memory_decays",
+      "tests.storage.test_memory_evolution.TestEffectiveConfidence::test_very_old_memory_floors_at_zero",
+      "tests.storage.test_memory_evolution.TestGetMemoryHistory::test_history_from_middle_version",
+      "tests.storage.test_memory_evolution.TestGetMemoryHistory::test_history_nonexistent_hash",
+      "tests.storage.test_memory_evolution.TestGetMemoryHistory::test_history_version_numbers",
+      "tests.storage.test_memory_evolution.TestGetMemoryHistory::test_single_memory_no_history",
+      "tests.storage.test_memory_evolution.TestGetMemoryHistory::test_two_version_lineage",
+      "tests.storage.test_memory_evolution.TestRetrieveConfidenceFiltering::test_retrieve_with_staleness_returns_fresh_results",
+      "tests.storage.test_memory_evolution.TestRetrieveConfidenceFiltering::test_retrieve_without_confidence_returns_requested_count",
+      "tests.storage.test_memory_evolution.TestUpdateMemoryVersioned::test_atomicity_embedding_exists",
+      "tests.storage.test_memory_evolution.TestUpdateMemoryVersioned::test_basic_versioned_update",
+      "tests.storage.test_memory_evolution.TestUpdateMemoryVersioned::test_multi_version_chain",
+      "tests.storage.test_memory_evolution.TestUpdateMemoryVersioned::test_versioned_update_inherits_custom_metadata",
+      "tests.storage.test_memory_evolution.TestUpdateMemoryVersioned::test_versioned_update_nonexistent_hash",
+      "tests.storage.test_memory_evolution.TestUpdateMemoryVersioned::test_versioned_update_preserves_tags",
+      "tests.storage.test_memory_evolution.TestUpdateMemoryVersioned::test_versioned_update_sets_parent_id",
+      "tests.storage.test_memory_evolution.TestUpdateMemoryVersioned::test_versioned_update_sets_superseded_by",
+      "tests.storage.test_metadata_timestamp_parity::test_cloudflare_missing_record_uses_returned_rows[False-cloudflare]",
+      "tests.storage.test_metadata_timestamp_parity::test_cloudflare_missing_record_uses_returned_rows[True-cloudflare]",
+      "tests.storage.test_metadata_timestamp_parity::test_cloudflare_reports_failed_metadata_update",
+      "tests.storage.test_metadata_timestamp_parity::test_concurrent_structural_change_advances_time[memory_type-cloudflare]",
+      "tests.storage.test_metadata_timestamp_parity::test_concurrent_structural_change_advances_time[tags-cloudflare]",
+      "tests.storage.test_metadata_timestamp_parity::test_deleted_memory_is_not_updated[cloudflare]",
+      "tests.storage.test_metadata_timestamp_parity::test_deleted_memory_is_not_updated[sqlite_vec]",
+      "tests.storage.test_metadata_timestamp_parity::test_explicit_sync_timestamps[cloudflare-False]",
+      "tests.storage.test_metadata_timestamp_parity::test_explicit_sync_timestamps[cloudflare-True]",
+      "tests.storage.test_metadata_timestamp_parity::test_explicit_sync_timestamps[sqlite_vec-False]",
+      "tests.storage.test_metadata_timestamp_parity::test_explicit_sync_timestamps[sqlite_vec-True]",
+      "tests.storage.test_metadata_timestamp_parity::test_hybrid_batch_sync_timestamp_preservation[change0-False-False-False-cloudflare]",
+      "tests.storage.test_metadata_timestamp_parity::test_hybrid_batch_sync_timestamp_preservation[change0-False-False-True-cloudflare]",
+      "tests.storage.test_metadata_timestamp_parity::test_hybrid_batch_sync_timestamp_preservation[change1-False-True-False-cloudflare]",
+      "tests.storage.test_metadata_timestamp_parity::test_hybrid_batch_sync_timestamp_preservation[change1-False-True-True-cloudflare]",
+      "tests.storage.test_metadata_timestamp_parity::test_hybrid_batch_sync_timestamp_preservation[change2-False-True-False-cloudflare]",
+      "tests.storage.test_metadata_timestamp_parity::test_hybrid_batch_sync_timestamp_preservation[change2-False-True-True-cloudflare]",
+      "tests.storage.test_metadata_timestamp_parity::test_hybrid_batch_sync_timestamp_preservation[change3-True-False-False-cloudflare]",
+      "tests.storage.test_metadata_timestamp_parity::test_hybrid_batch_sync_timestamp_preservation[change3-True-False-True-cloudflare]",
+      "tests.storage.test_metadata_timestamp_parity::test_hybrid_batch_sync_timestamp_preservation[change4-False-False-False-cloudflare]",
+      "tests.storage.test_metadata_timestamp_parity::test_hybrid_batch_sync_timestamp_preservation[change4-False-False-True-cloudflare]",
+      "tests.storage.test_metadata_timestamp_parity::test_metadata_only_preserves_timestamps[cloudflare-False]",
+      "tests.storage.test_metadata_timestamp_parity::test_metadata_only_preserves_timestamps[cloudflare-True]",
+      "tests.storage.test_metadata_timestamp_parity::test_metadata_only_preserves_timestamps[sqlite_vec-False]",
+      "tests.storage.test_metadata_timestamp_parity::test_metadata_only_preserves_timestamps[sqlite_vec-True]",
+      "tests.storage.test_metadata_timestamp_parity::test_metadata_without_preservation_advances_time[cloudflare]",
+      "tests.storage.test_metadata_timestamp_parity::test_metadata_without_preservation_advances_time[sqlite_vec]",
+      "tests.storage.test_metadata_timestamp_parity::test_structural_updates_advance_updated_at[cloudflare-updates0]",
+      "tests.storage.test_metadata_timestamp_parity::test_structural_updates_advance_updated_at[cloudflare-updates1]",
+      "tests.storage.test_metadata_timestamp_parity::test_structural_updates_advance_updated_at[cloudflare-updates2]",
+      "tests.storage.test_metadata_timestamp_parity::test_structural_updates_advance_updated_at[cloudflare-updates3]",
+      "tests.storage.test_metadata_timestamp_parity::test_structural_updates_advance_updated_at[sqlite_vec-updates0]",
+      "tests.storage.test_metadata_timestamp_parity::test_structural_updates_advance_updated_at[sqlite_vec-updates1]",
+      "tests.storage.test_metadata_timestamp_parity::test_structural_updates_advance_updated_at[sqlite_vec-updates2]",
+      "tests.storage.test_metadata_timestamp_parity::test_structural_updates_advance_updated_at[sqlite_vec-updates3]",
+      "tests.storage.test_metadata_timestamp_parity::test_unchanged_structural_fields_preserve_timestamps[cloudflare-stored_tags0-updates0]",
+      "tests.storage.test_metadata_timestamp_parity::test_unchanged_structural_fields_preserve_timestamps[cloudflare-stored_tags1-updates1]",
+      "tests.storage.test_metadata_timestamp_parity::test_unchanged_structural_fields_preserve_timestamps[cloudflare-stored_tags2-updates2]",
+      "tests.storage.test_metadata_timestamp_parity::test_unchanged_structural_fields_preserve_timestamps[cloudflare-stored_tags3-updates3]",
+      "tests.storage.test_metadata_timestamp_parity::test_unchanged_structural_fields_preserve_timestamps[cloudflare-stored_tags4-updates4]",
+      "tests.storage.test_metadata_timestamp_parity::test_unchanged_structural_fields_preserve_timestamps[sqlite_vec-stored_tags0-updates0]",
+      "tests.storage.test_metadata_timestamp_parity::test_unchanged_structural_fields_preserve_timestamps[sqlite_vec-stored_tags1-updates1]",
+      "tests.storage.test_metadata_timestamp_parity::test_unchanged_structural_fields_preserve_timestamps[sqlite_vec-stored_tags2-updates2]",
+      "tests.storage.test_metadata_timestamp_parity::test_unchanged_structural_fields_preserve_timestamps[sqlite_vec-stored_tags3-updates3]",
+      "tests.storage.test_metadata_timestamp_parity::test_unchanged_structural_fields_preserve_timestamps[sqlite_vec-stored_tags4-updates4]",
+      "tests.storage.test_migration_runner::test_migration_runner_sync_executes_sql_files",
+      "tests.storage.test_migration_runner::test_migration_runner_sync_idempotent",
+      "tests.storage.test_migration_runner::test_migration_runner_sync_invalid_sql",
+      "tests.storage.test_migration_runner::test_migration_runner_sync_multiple_files",
+      "tests.storage.test_migration_runner::test_stamp_baseline_recovers_v16_after_partial_rollback",
+      "tests.storage.test_milvus_expr_escaping.TestEscapeExprValue::test_backslash_before_quote",
+      "tests.storage.test_milvus_expr_escaping.TestEscapeExprValue::test_backslash_is_escaped",
+      "tests.storage.test_milvus_expr_escaping.TestEscapeExprValue::test_order_is_backslash_then_quote",
+      "tests.storage.test_milvus_expr_escaping.TestEscapeExprValue::test_plain_value_untouched",
+      "tests.storage.test_milvus_expr_escaping.TestEscapeExprValue::test_quote_is_escaped",
+      "tests.storage.test_milvus_expr_escaping.TestEscapeExprValue::test_trailing_backslash_cannot_escape_the_closing_quote",
+      "tests.storage.test_milvus_expr_escaping.TestEscapeExprValue::test_windows_path",
+      "tests.storage.test_milvus_expr_escaping::test_query_edges_escapes_relationship_types",
+      "tests.storage.test_milvus_expr_escaping::test_query_edges_escapes_trailing_backslash",
+      "tests.storage.test_milvus_parity_methods.TestGetTypeCounts::test_groups_by_memory_type",
+      "tests.storage.test_milvus_parity_methods.TestGetTypeCounts::test_missing_type_is_untyped",
+      "tests.storage.test_milvus_parity_methods.TestGetTypeCounts::test_soft_deleted_rows_are_not_counted",
+      "tests.storage.test_milvus_parity_methods.TestGraphVisualizationData::test_bounded_graph_loads_only_selected_source_records",
+      "tests.storage.test_milvus_parity_methods.TestGraphVisualizationData::test_builds_nodes_and_edges",
+      "tests.storage.test_milvus_parity_methods.TestGraphVisualizationData::test_connection_count_uses_distinct_targets",
+      "tests.storage.test_milvus_parity_methods.TestGraphVisualizationData::test_deleted_targets_do_not_consume_node_limit",
+      "tests.storage.test_milvus_parity_methods.TestGraphVisualizationData::test_edges_to_unrendered_nodes_dropped",
+      "tests.storage.test_milvus_parity_methods.TestGraphVisualizationData::test_entity_edges_do_not_count_as_connections",
+      "tests.storage.test_milvus_parity_methods.TestGraphVisualizationData::test_min_connections_filters_nodes",
+      "tests.storage.test_milvus_parity_methods.TestGraphVisualizationData::test_quality_score_read_from_metadata",
+      "tests.storage.test_milvus_parity_methods.TestGraphVisualizationData::test_returns_meta_key_when_empty",
+      "tests.storage.test_milvus_parity_methods.TestRelationshipTypeDistribution::test_counts_by_type_descending",
+      "tests.storage.test_milvus_parity_methods.TestRelationshipTypeDistribution::test_missing_type_counted_as_untyped",
+      "tests.storage.test_milvus_parity_methods.TestRelationshipTypeDistribution::test_no_graph_collection_returns_empty",
+      "tests.storage.test_milvus_parity_methods.TestUntaggedMemories::test_count_excludes_soft_deleted_rows",
+      "tests.storage.test_milvus_parity_methods.TestUntaggedMemories::test_count_returns_zero_on_error",
+      "tests.storage.test_milvus_parity_methods.TestUntaggedMemories::test_count_uses_server_side_filter",
+      "tests.storage.test_milvus_parity_methods.TestUntaggedMemories::test_delete_chunks_large_result_sets",
+      "tests.storage.test_milvus_parity_methods.TestUntaggedMemories::test_delete_matches_same_predicate"
+    ],
+    "fixed": [
+      "tests.services.test_mistake_notes::test_mistake_note_delete",
+      "tests.services.test_mistake_notes::test_mistake_note_delete_nonexistent",
+      "tests.services.test_mistake_notes::test_mistake_note_delete_wrong_type",
+      "tests.services.test_mistake_notes::test_mistake_note_update_nonexistent",
+      "tests.services.test_mistake_notes::test_mistake_note_update_rejects_blanking_correct_action[   ]",
+      "tests.services.test_mistake_notes::test_mistake_note_update_rejects_blanking_correct_action[\\n\\t ]",
+      "tests.services.test_mistake_notes::test_mistake_note_update_wrong_type",
+      "tests.services.test_search_by_tag_matching::test_any_matching_preserves_creation_order",
+      "tests.services.test_search_by_tag_matching::test_empty_tags_match_nothing[False]",
+      "tests.services.test_search_by_tag_matching::test_empty_tags_match_nothing[True]",
+      "tests.services.test_search_by_tag_matching::test_missing_required_tag_matches_nothing",
+      "tests.services.test_search_by_tag_matching::test_single_tag_is_exact_in_both_modes[False]",
+      "tests.services.test_search_by_tag_matching::test_single_tag_is_exact_in_both_modes[True]",
+      "tests.services.test_search_by_tag_matching::test_tag_matching_modes[False-expected1-[\"alpha\",\"beta\"]]",
+      "tests.services.test_search_by_tag_matching::test_tag_matching_modes[False-expected1-alpha,beta]",
+      "tests.services.test_search_by_tag_matching::test_tag_matching_modes[False-expected1-tags0]",
+      "tests.services.test_search_by_tag_matching::test_tag_matching_modes[True-expected0-[\"alpha\",\"beta\"]]",
+      "tests.services.test_search_by_tag_matching::test_tag_matching_modes[True-expected0-alpha,beta]",
+      "tests.services.test_search_by_tag_matching::test_tag_matching_modes[True-expected0-tags0]",
+      "tests.smithery.test_smithery::test_smithery_config",
+      "tests.storage.test_1352_supersession_unset::test_empty_string_clears_superseded_by",
+      "tests.storage.test_1352_supersession_unset::test_list_superseded_orphans_excludes_live_winner",
+      "tests.storage.test_1352_supersession_unset::test_list_superseded_orphans_finds_deleted_winner",
+      "tests.storage.test_1352_supersession_unset::test_list_superseded_orphans_finds_missing_winner",
+      "tests.storage.test_1352_supersession_unset::test_set_superseded_by_via_api",
+      "tests.storage.test_1352_supersession_unset::test_unrelated_update_preserves_superseded_by",
+      "tests.storage.test_1352_supersession_unset::test_update_memory_metadata_cannot_unset_superseded_by",
+      "tests.storage.test_access_patterns_candidate_scope::test_consolidator_falls_back_for_backends_without_the_parameter",
+      "tests.storage.test_access_patterns_candidate_scope::test_consolidator_passes_the_candidate_window_down",
+      "tests.storage.test_access_patterns_candidate_scope::test_consolidator_passes_the_window_in_the_form_the_signature_accepts[args-forwarder]",
+      "tests.storage.test_access_patterns_candidate_scope::test_consolidator_passes_the_window_in_the_form_the_signature_accepts[keyword-only]",
+      "tests.storage.test_access_patterns_candidate_scope::test_consolidator_passes_the_window_in_the_form_the_signature_accepts[kwargs-forwarder]",
+      "tests.storage.test_access_patterns_candidate_scope::test_consolidator_passes_the_window_in_the_form_the_signature_accepts[positional-only]",
+      "tests.storage.test_access_patterns_candidate_scope::test_empty_window_returns_nothing_rather_than_everything",
+      "tests.storage.test_access_patterns_candidate_scope::test_none_keeps_the_unbounded_contract",
+      "tests.storage.test_access_patterns_candidate_scope::test_scoped_query_returns_only_the_candidate_window",
+      "tests.storage.test_access_patterns_candidate_scope::test_scoped_query_still_hides_soft_deleted_rows",
+      "tests.storage.test_access_patterns_candidate_scope::test_window_larger_than_the_sqlite_parameter_cap_is_chunked",
+      "tests.storage.test_access_patterns_last_accessed::test_get_access_patterns_handles_missing_last_accessed_gracefully",
+      "tests.storage.test_access_patterns_last_accessed::test_get_access_patterns_no_limit_cutoff",
+      "tests.storage.test_access_patterns_last_accessed::test_get_access_patterns_reads_last_accessed_not_updated_at",
+      "tests.storage.test_async_threading.TestExecuteWithRetryThreading::test_execute_with_retry_does_not_block_loop",
+      "tests.storage.test_async_threading.TestExecuteWithRetryThreading::test_execute_with_retry_retries_on_locked",
+      "tests.storage.test_async_threading.TestExecuteWithRetryThreading::test_execute_with_retry_returns_result",
+      "tests.storage.test_backend_store_signature_conformance::test_all_backends_accept_store_kwarg[count_all_memories]",
+      "tests.storage.test_backend_store_signature_conformance::test_all_backends_accept_store_kwarg[delete_memories]",
+      "tests.storage.test_backend_store_signature_conformance::test_all_backends_accept_store_kwarg[get_all_memories]",
+      "tests.storage.test_backend_store_signature_conformance::test_all_backends_accept_store_kwarg[get_all_tags_with_counts]",
+      "tests.storage.test_backend_store_signature_conformance::test_all_backends_accept_store_kwarg[get_by_hash]",
+      "tests.storage.test_backend_store_signature_conformance::test_all_backends_accept_store_kwarg[get_graph_visualization_data]",
+      "tests.storage.test_backend_store_signature_conformance::test_all_backends_accept_store_kwarg[get_memory_timestamps]",
+      "tests.storage.test_backend_store_signature_conformance::test_all_backends_accept_store_kwarg[recall]",
+      "tests.storage.test_backend_store_signature_conformance::test_all_backends_accept_store_kwarg[retrieve]",
+      "tests.storage.test_backend_store_signature_conformance::test_all_backends_accept_store_kwarg[search_memories]",
+      "tests.storage.test_backend_store_signature_conformance::test_all_backends_accept_store_kwarg[store]",
+      "tests.storage.test_backend_store_signature_conformance::test_all_backends_implement_web_api_methods[count_all_memories]",
+      "tests.storage.test_backend_store_signature_conformance::test_all_backends_implement_web_api_methods[delete]",
+      "tests.storage.test_backend_store_signature_conformance::test_all_backends_implement_web_api_methods[delete_by_tags]",
+      "tests.storage.test_backend_store_signature_conformance::test_all_backends_implement_web_api_methods[get_all_memories]",
+      "tests.storage.test_backend_store_signature_conformance::test_all_backends_implement_web_api_methods[get_all_tags_with_counts]",
+      "tests.storage.test_backend_store_signature_conformance::test_all_backends_implement_web_api_methods[get_by_hash]",
+      "tests.storage.test_backend_store_signature_conformance::test_all_backends_implement_web_api_methods[get_largest_memories]",
+      "tests.storage.test_backend_store_signature_conformance::test_all_backends_implement_web_api_methods[get_memories_by_time_range]",
+      "tests.storage.test_backend_store_signature_conformance::test_all_backends_implement_web_api_methods[get_memory_timestamps]",
+      "tests.storage.test_backend_store_signature_conformance::test_all_backends_implement_web_api_methods[get_recent_memories]",
+      "tests.storage.test_backend_store_signature_conformance::test_all_backends_implement_web_api_methods[get_stats]",
+      "tests.storage.test_backend_store_signature_conformance::test_all_backends_implement_web_api_methods[recall]",
+      "tests.storage.test_backend_store_signature_conformance::test_all_backends_implement_web_api_methods[retrieve]",
+      "tests.storage.test_backend_store_signature_conformance::test_all_backends_implement_web_api_methods[search_by_tag]",
+      "tests.storage.test_backend_store_signature_conformance::test_all_backends_implement_web_api_methods[search_by_tags]",
+      "tests.storage.test_backend_store_signature_conformance::test_all_backends_implement_web_api_methods[store]",
+      "tests.storage.test_backend_store_signature_conformance::test_all_backends_implement_web_api_methods[update_memory_metadata]",
+      "tests.storage.test_backend_store_signature_conformance::test_backend_modules_all_importable",
+      "tests.storage.test_backend_store_signature_conformance::test_base_interface_declares_store_kwarg[count_all_memories]",
+      "tests.storage.test_backend_store_signature_conformance::test_base_interface_declares_store_kwarg[delete_memories]",
+      "tests.storage.test_backend_store_signature_conformance::test_base_interface_declares_store_kwarg[get_all_memories]",
+      "tests.storage.test_backend_store_signature_conformance::test_base_interface_declares_store_kwarg[get_all_tags_with_counts]",
+      "tests.storage.test_backend_store_signature_conformance::test_base_interface_declares_store_kwarg[get_by_hash]",
+      "tests.storage.test_backend_store_signature_conformance::test_base_interface_declares_store_kwarg[get_graph_visualization_data]",
+      "tests.storage.test_backend_store_signature_conformance::test_base_interface_declares_store_kwarg[get_memory_timestamps]",
+      "tests.storage.test_backend_store_signature_conformance::test_base_interface_declares_store_kwarg[recall]",
+      "tests.storage.test_backend_store_signature_conformance::test_base_interface_declares_store_kwarg[retrieve]",
+      "tests.storage.test_backend_store_signature_conformance::test_base_interface_declares_store_kwarg[search_memories]",
+      "tests.storage.test_backend_store_signature_conformance::test_base_interface_declares_store_kwarg[store]",
+      "tests.storage.test_backend_store_signature_conformance::test_base_interface_declares_web_api_methods[count_all_memories]",
+      "tests.storage.test_backend_store_signature_conformance::test_base_interface_declares_web_api_methods[delete]",
+      "tests.storage.test_backend_store_signature_conformance::test_base_interface_declares_web_api_methods[delete_by_tags]",
+      "tests.storage.test_backend_store_signature_conformance::test_base_interface_declares_web_api_methods[get_all_memories]",
+      "tests.storage.test_backend_store_signature_conformance::test_base_interface_declares_web_api_methods[get_all_tags_with_counts]",
+      "tests.storage.test_backend_store_signature_conformance::test_base_interface_declares_web_api_methods[get_by_hash]",
+      "tests.storage.test_backend_store_signature_conformance::test_base_interface_declares_web_api_methods[get_conflicts]",
+      "tests.storage.test_backend_store_signature_conformance::test_base_interface_declares_web_api_methods[get_graph_visualization_data]",
+      "tests.storage.test_backend_store_signature_conformance::test_base_interface_declares_web_api_methods[get_largest_memories]",
+      "tests.storage.test_backend_store_signature_conformance::test_base_interface_declares_web_api_methods[get_memories_by_time_range]",
+      "tests.storage.test_backend_store_signature_conformance::test_base_interface_declares_web_api_methods[get_memory_timestamps]",
+      "tests.storage.test_backend_store_signature_conformance::test_base_interface_declares_web_api_methods[get_recent_memories]",
+      "tests.storage.test_backend_store_signature_conformance::test_base_interface_declares_web_api_methods[get_relationship_type_distribution]",
+      "tests.storage.test_backend_store_signature_conformance::test_base_interface_declares_web_api_methods[get_stats]",
+      "tests.storage.test_backend_store_signature_conformance::test_base_interface_declares_web_api_methods[recall]",
+      "tests.storage.test_backend_store_signature_conformance::test_base_interface_declares_web_api_methods[resolve_conflict]",
+      "tests.storage.test_backend_store_signature_conformance::test_base_interface_declares_web_api_methods[retrieve]",
+      "tests.storage.test_backend_store_signature_conformance::test_base_interface_declares_web_api_methods[search_by_tag]",
+      "tests.storage.test_backend_store_signature_conformance::test_base_interface_declares_web_api_methods[search_by_tags]",
+      "tests.storage.test_backend_store_signature_conformance::test_base_interface_declares_web_api_methods[store]",
+      "tests.storage.test_backend_store_signature_conformance::test_base_interface_declares_web_api_methods[update_memory_metadata]",
+      "tests.storage.test_backend_store_signature_conformance::test_milvus_graph_storage_matches_graph_storage_signature[common_neighbors]",
+      "tests.storage.test_backend_store_signature_conformance::test_milvus_graph_storage_matches_graph_storage_signature[find_memories_by_entity]",
+      "tests.storage.test_backend_store_signature_conformance::test_milvus_graph_storage_matches_graph_storage_signature[get_entities_for_memory]",
+      "tests.storage.test_backend_store_signature_conformance::test_milvus_graph_storage_matches_graph_storage_signature[get_entity_profile]",
+      "tests.storage.test_backend_store_signature_conformance::test_milvus_graph_storage_matches_graph_storage_signature[list_entities]",
+      "tests.storage.test_backend_store_signature_conformance::test_milvus_graph_storage_matches_graph_storage_signature[store_entity_link]",
+      "tests.storage.test_backend_store_signature_conformance::test_milvus_graph_storage_matches_graph_storage_signature[transitive_closure]",
+      "tests.storage.test_backend_store_signature_conformance::test_milvus_parity_methods_accept_web_api_call_shapes[count_untagged_memories]",
+      "tests.storage.test_backend_store_signature_conformance::test_milvus_parity_methods_accept_web_api_call_shapes[delete_untagged_memories]",
+      "tests.storage.test_backend_store_signature_conformance::test_milvus_parity_methods_accept_web_api_call_shapes[get_graph_visualization_data]",
+      "tests.storage.test_backend_store_signature_conformance::test_milvus_parity_methods_accept_web_api_call_shapes[get_relationship_type_distribution]",
+      "tests.storage.test_backend_store_signature_conformance::test_milvus_parity_methods_accept_web_api_call_shapes[get_type_counts]",
+      "tests.storage.test_backend_store_signature_conformance::test_milvus_parity_methods_accept_web_api_call_shapes[update_memory_versioned]",
+      "tests.storage.test_cloudflare_retrieve::test_load_memory_from_match_loads_by_vector_id_without_match_metadata",
+      "tests.storage.test_cloudflare_retrieve::test_load_memory_from_match_sql_excludes_soft_deleted_rows",
+      "tests.storage.test_cloudflare_retrieve::test_recall_clamps_topk_to_vectorize_limit",
+      "tests.storage.test_cloudflare_retrieve::test_retrieve_clamps_topk_to_vectorize_limit",
+      "tests.storage.test_cloudflare_retrieve::test_retrieve_full_page_boundary_at_exactly_n_results",
+      "tests.storage.test_cloudflare_retrieve::test_retrieve_full_page_with_enough_tag_matches_is_complete",
+      "tests.storage.test_cloudflare_retrieve::test_retrieve_reports_complete_recall_when_page_is_not_full",
+      "tests.storage.test_cloudflare_retrieve::test_retrieve_surfaces_recall_ceiling_when_tag_filter_page_is_full",
+      "tests.storage.test_cloudflare_retrieve::test_retrieve_tag_filter_overfetches_vectorize_matches",
+      "tests.storage.test_cloudflare_retrieve::test_retrieve_untagged_clamps_topk_to_vectorize_limit",
+      "tests.storage.test_cloudflare_retrieve::test_retrieve_untagged_exact_page_is_complete_but_clamped_is_not",
+      "tests.storage.test_cloudflare_retrieve::test_retrieve_warns_when_tag_filter_starves_to_zero_at_the_ceiling",
+      "tests.storage.test_cloudflare_retrieve::test_vectorize_queries_request_no_metadata_and_keep_topk_at_100",
+      "tests.storage.test_conflict_detection.TestConflictIntegration::test_store_detect_resolve_lifecycle",
+      "tests.storage.test_conflict_detection.TestDetectConflicts::test_conflicting_memories_detected",
+      "tests.storage.test_conflict_detection.TestDetectConflicts::test_similar_content_no_conflict",
+      "tests.storage.test_conflict_detection.TestDetectConflicts::test_superseded_memory_excluded",
+      "tests.storage.test_conflict_detection.TestGetConflicts::test_get_conflicts_returns_pairs",
+      "tests.storage.test_conflict_detection.TestResolveConflict::test_resolve_boosts_winner_confidence",
+      "tests.storage.test_conflict_detection.TestResolveConflict::test_resolve_marks_loser_superseded",
+      "tests.storage.test_conflict_detection.TestResolveConflict::test_resolve_nonexistent_hash_fails",
+      "tests.storage.test_conflict_detection.TestResolveConflict::test_resolve_removes_conflict_tag",
+      "tests.storage.test_d1_read_amplification.TestCloudflareHealthProbe::test_probe_asks_for_no_rows",
+      "tests.storage.test_d1_read_amplification.TestCloudflareHealthProbe::test_probe_reports_failure",
+      "tests.storage.test_d1_read_amplification.TestCloudflarePurgeDeleted::test_gives_up_on_a_failed_lookup",
+      "tests.storage.test_d1_read_amplification.TestCloudflarePurgeDeleted::test_honours_the_retention_window",
+      "tests.storage.test_d1_read_amplification.TestCloudflarePurgeDeleted::test_leaves_memories_alone_if_the_tag_delete_fails",
+      "tests.storage.test_d1_read_amplification.TestCloudflarePurgeDeleted::test_purges_join_rows_before_memories",
+      "tests.storage.test_d1_read_amplification.TestCloudflarePurgeDeleted::test_stops_when_nothing_is_due",
+      "tests.storage.test_d1_read_amplification.TestCloudflareStatsQuery::test_counts_come_from_one_scan",
+      "tests.storage.test_d1_read_amplification.TestPeriodicSyncCost::test_capacity_check_runs_on_the_first_cycle",
+      "tests.storage.test_d1_read_amplification.TestPeriodicSyncCost::test_capacity_check_waits_for_its_interval",
+      "tests.storage.test_d1_read_amplification.TestPeriodicSyncCost::test_falls_back_to_stats_without_a_probe",
+      "tests.storage.test_d1_read_amplification.TestPeriodicSyncCost::test_health_check_uses_the_probe",
+      "tests.storage.test_d1_read_amplification.TestTombstonePurgeReachesBothBackends::test_a_failing_backend_does_not_stop_the_other",
+      "tests.storage.test_d1_read_amplification.TestTombstonePurgeReachesBothBackends::test_both_backends_are_purged",
+      "tests.storage.test_delete_mixin_logging::test_error_logs_do_not_carry_newlines[<lambda>-Error deleting before date: disk gone]",
+      "tests.storage.test_delete_mixin_logging::test_error_logs_do_not_carry_newlines[<lambda>-Error deleting by timeframe: disk gone]",
+      "tests.storage.test_delete_mixin_logging::test_error_logs_do_not_carry_newlines[<lambda>-Failed to check if memory is deleted: disk gone]",
+      "tests.storage.test_delete_mixin_logging::test_error_logs_do_not_carry_newlines[<lambda>-Failed to cleanup duplicates: disk gone]",
+      "tests.storage.test_delete_mixin_logging::test_error_logs_do_not_carry_newlines[<lambda>-Failed to delete by tag: disk gone]",
+      "tests.storage.test_delete_mixin_logging::test_error_logs_do_not_carry_newlines[<lambda>-Failed to delete by tags: disk gone]",
+      "tests.storage.test_delete_mixin_logging::test_error_logs_do_not_carry_newlines[<lambda>-Failed to delete memory: disk gone]",
+      "tests.storage.test_delete_mixin_logging::test_error_logs_do_not_carry_newlines[<lambda>-Failed to purge deleted memories: disk gone]",
+      "tests.storage.test_delete_mixin_logging::test_success_and_embedding_fallback_logs_do_not_carry_newlines",
+      "tests.storage.test_embedding_cache_sqlite_vec.TestEmbeddingCacheSqliteVec::test_bounded_lru_eviction_regression_should_pass",
+      "tests.storage.test_embedding_cache_sqlite_vec.TestEmbeddingCacheSqliteVec::test_cache_hit_avoids_double_encoding_regression_should_pass",
+      "tests.storage.test_embedding_cache_sqlite_vec.TestEmbeddingCacheSqliteVec::test_cache_key_segregated_by_model_name_fails_with_hash_collision",
+      "tests.storage.test_embedding_cache_sqlite_vec.TestEmbeddingCacheSqliteVec::test_embedding_validations_preserved_regression_should_pass",
+      "tests.storage.test_embedding_cache_sqlite_vec.TestEmbeddingCacheSqliteVec::test_enable_cache_false_disables_caching_regression_should_pass",
+      "tests.storage.test_embedding_cache_sqlite_vec.TestEmbeddingCacheSqliteVec::test_external_provider_cache_segregation_fails_with_colliding_keys",
+      "tests.storage.test_embedding_cache_sqlite_vec.TestEmbeddingCacheSqliteVec::test_hash_fallback_dimension_isolation_fails_with_model_name_key",
+      "tests.storage.test_embedding_cache_sqlite_vec.TestEmbeddingCacheSqliteVec::test_lru_recency_behavior_regression_should_pass",
+      "tests.storage.test_embedding_cache_sqlite_vec.TestEmbeddingCacheSqliteVec::test_model_name_segregation_explicit_fails_with_text_only_key",
+      "tests.storage.test_embedding_invariants::test_consolidation_health_flags_hybrid_primary_missing_embeddings",
+      "tests.storage.test_embedding_invariants::test_consolidation_health_flags_missing_embeddings",
+      "tests.storage.test_embedding_invariants::test_consolidation_health_unverified_integrity_degrades_status",
+      "tests.storage.test_embedding_invariants::test_db_health_check_fails_on_store_error",
+      "tests.storage.test_embedding_invariants::test_detailed_health_flags_hybrid_primary_missing_embeddings",
+      "tests.storage.test_embedding_invariants::test_detailed_health_flags_missing_embeddings",
+      "tests.storage.test_embedding_invariants::test_detailed_health_unverified_integrity_degrades_status",
+      "tests.storage.test_embedding_invariants::test_embedding_integrity_detection",
+      "tests.storage.test_embedding_invariants::test_health_endpoints_use_run_in_thread",
+      "tests.storage.test_exact_search_like_wildcards::test_cloudflare_exact_search_treats_wildcards_literally",
+      "tests.storage.test_exact_search_like_wildcards::test_sqlite_vec_exact_search_treats_wildcards_literally",
+      "tests.storage.test_graph_distribution::test_graph_visualization_data_basic_structure",
+      "tests.storage.test_graph_distribution::test_graph_visualization_data_empty_graph",
+      "tests.storage.test_graph_distribution::test_graph_visualization_edge_format",
+      "tests.storage.test_graph_distribution::test_graph_visualization_edges_between_included_nodes_only",
+      "tests.storage.test_graph_distribution::test_graph_visualization_handles_null_memory_type",
+      "tests.storage.test_graph_distribution::test_graph_visualization_limit_parameter",
+      "tests.storage.test_graph_distribution::test_graph_visualization_memory_type_preservation",
+      "tests.storage.test_graph_distribution::test_graph_visualization_meta_information",
+      "tests.storage.test_graph_distribution::test_graph_visualization_min_connections_filter",
+      "tests.storage.test_graph_distribution::test_graph_visualization_node_format",
+      "tests.storage.test_graph_distribution::test_relationship_type_distribution_all_six_types",
+      "tests.storage.test_graph_distribution::test_relationship_type_distribution_counts_accuracy",
+      "tests.storage.test_graph_distribution::test_relationship_type_distribution_empty_graph",
+      "tests.storage.test_graph_distribution::test_relationship_type_distribution_mixed_typed_untyped",
+      "tests.storage.test_graph_distribution::test_relationship_type_distribution_ordering",
+      "tests.storage.test_graph_distribution::test_relationship_type_distribution_with_empty_string",
+      "tests.storage.test_graph_distribution::test_relationship_type_distribution_with_untyped_null"
+    ],
+    "new_tests_passing": 2,
+    "new_tests_failing": [],
+    "new_tests_skipped": [],
+    "removed_tests": [],
+    "reparametrized": [],
+    "skipped_missing_dependency": [],
+    "flaky": [],
+    "pr_unstable": [],
+    "pr_unstable_noisy": [],
+    "environment": [],
+    "other_changes": [
+      "tests.integration.test_cli_interfaces.TestCLIPerformance::test_memory_version_performance: failed -> error",
+      "tests.storage.test_backend_store_signature_conformance::test_all_backends_implement_web_api_methods[get_conflicts]: error -> skipped",
+      "tests.storage.test_backend_store_signature_conformance::test_all_backends_implement_web_api_methods[get_graph_visualization_data]: error -> skipped",
+      "tests.storage.test_backend_store_signature_conformance::test_all_backends_implement_web_api_methods[get_relationship_type_distribution]: error -> skipped",
+      "tests.storage.test_backend_store_signature_conformance::test_all_backends_implement_web_api_methods[resolve_conflict]: error -> skipped",
+      "tests.storage.test_graph_distribution::test_graph_visualization_relationship_type_in_edges: skipped -> error",
+      "tests.storage.test_hybrid_graph_methods::test_hybrid_graph_visualization_with_mock_primary: skipped -> error"
+    ],
+    "preexisting_failures": [
+      "tests.benchmarks.test_benchmark_devbench.TestIngestAndRetrieve::test_retrieve_exact_query_finds_something",
+      "tests.integration.test_cli_interfaces.TestCLIFunctionality::test_memory_status_command",
+      "tests.integration.test_cli_interfaces.TestCLIInterfaces::test_argument_compatibility",
+      "tests.integration.test_cli_interfaces.TestCLIInterfaces::test_memory_command_exists",
+      "tests.integration.test_cli_interfaces.TestCLIInterfaces::test_memory_server_command_exists",
+      "tests.integration.test_cli_interfaces.TestCLIInterfaces::test_memory_server_version_flag",
+      "tests.integration.test_cli_interfaces.TestCLIInterfaces::test_memory_server_vs_memory_server_subcommand",
+      "tests.integration.test_cli_interfaces.TestCLIPerformance::test_cli_startup_time",
+      "tests.integration.test_cli_interfaces.TestCLIRobustness::test_environment_variable_passing",
+      "tests.integration.test_cli_interfaces.TestCLIRobustness::test_memory_server_argument_parity",
+      "tests.integration.test_concurrent_clients.TestConcurrentClients::test_database_consistency",
+      "tests.integration.test_concurrent_clients.TestConcurrentClients::test_rapid_concurrent_access",
+      "tests.integration.test_http_server_startup::test_all_api_routes_registered",
+      "tests.integration.test_http_server_startup::test_backup_scheduler_integrates_with_lifespan",
+      "tests.integration.test_http_server_startup::test_cors_middleware_configured",
+      "tests.integration.test_http_server_startup::test_health_endpoint_responds",
+      "tests.integration.test_http_server_startup::test_http_server_starts",
+      "tests.integration.test_http_server_startup::test_server_handles_404",
+      "tests.integration.test_http_server_startup::test_server_handles_invalid_json",
+      "tests.integration.test_http_server_startup::test_server_modules_importable",
+      "tests.integration.test_http_server_startup::test_static_files_mounted",
+      "tests.integration.test_hybrid_http_pull.TestBug2HybridBackendSelection::test_bug2_http_backend_without_url_raises_error",
+      "tests.integration.test_hybrid_http_pull.TestHybridHTTPPullBug::test_cloudflare_regression_uses_d1_path_not_list_hashes",
+      "tests.integration.test_hybrid_http_pull.TestHybridHTTPPullBug::test_http_pull_syncs_zero_memories_bug_p0a",
+      "tests.integration.test_hybrid_http_pull.TestHybridHTTPPullBug::test_http_secondary_get_stats_returns_zero_bug_p0b",
+      "tests.integration.test_hybrid_http_pull.TestHybridHTTPPullBug::test_list_content_hashes_page_contract_bug_p1",
+      "tests.integration.test_hybrid_http_pull.TestHybridHTTPPullBug::test_primary_contains_pulled_hashes_bug_p0a",
+      "tests.integration.test_hybrid_http_pull.TestHybridHTTPPullBug::test_pull_idempotency_second_run_syncs_zero",
+      "tests.integration.test_hybrid_http_pull.TestHybridHTTPPullBug::test_pulled_memory_content_preservation_bug_p0a",
+      "tests.integration.test_hybrid_http_pull::test_minimal_setup_verification",
+      "tests.integration.test_mdns_integration.TestDiscoveryClientIntegration::test_discovery_client_real_network",
+      "tests.integration.test_mdns_integration.TestDiscoveryClientIntegration::test_health_check_real_service",
+      "tests.integration.test_mdns_integration.TestMDNSConfiguration::test_custom_service_type",
+      "tests.integration.test_mdns_integration.TestMDNSConfiguration::test_https_service_advertisement",
+      "tests.integration.test_mdns_integration.TestMDNSErrorHandling::test_discovery_timeout_handling",
+      "tests.integration.test_mdns_integration.TestMDNSErrorHandling::test_port_conflict_handling",
+      "tests.integration.test_mdns_integration.TestMDNSNetworkIntegration::test_advertiser_discovery_roundtrip",
+      "tests.integration.test_mdns_integration.TestMDNSNetworkIntegration::test_service_advertiser_real_network",
+      "tests.integration.test_mdns_integration.TestMDNSNetworkIntegration::test_service_discovery_real_network",
+      "tests.integration.test_memory_search_summarization::test_cancellation_propagates_through_handler",
+      "tests.integration.test_memory_search_summarization::test_default_and_false_keep_raw_results[arguments0]",
+      "tests.integration.test_memory_search_summarization::test_default_and_false_keep_raw_results[arguments1]",
+      "tests.integration.test_memory_search_summarization::test_default_and_false_keep_raw_results[arguments2]",
+      "tests.integration.test_memory_search_summarization::test_disabled_empty_search_warns_without_initializing_provider[False-0]",
+      "tests.integration.test_memory_search_summarization::test_disabled_empty_search_warns_without_initializing_provider[False-100]",
+      "tests.integration.test_memory_search_summarization::test_disabled_empty_search_warns_without_initializing_provider[False-1]",
+      "tests.integration.test_memory_search_summarization::test_disabled_empty_search_warns_without_initializing_provider[False-500]",
+      "tests.integration.test_memory_search_summarization::test_disabled_empty_search_warns_without_initializing_provider[True-0]",
+      "tests.integration.test_memory_search_summarization::test_disabled_empty_search_warns_without_initializing_provider[True-100]",
+      "tests.integration.test_memory_search_summarization::test_disabled_empty_search_warns_without_initializing_provider[True-1]",
+      "tests.integration.test_memory_search_summarization::test_disabled_empty_search_warns_without_initializing_provider[True-500]",
+      "tests.integration.test_memory_search_summarization::test_disabled_policy_preserves_raw_results_without_calling_provider[chain-None]",
+      "tests.integration.test_memory_search_summarization::test_disabled_policy_preserves_raw_results_without_calling_provider[chain-false]",
+      "tests.integration.test_memory_search_summarization::test_disabled_policy_preserves_raw_results_without_calling_provider[chain-invalid]",
+      "tests.integration.test_memory_search_summarization::test_disabled_policy_preserves_raw_results_without_calling_provider[legacy-None]",
+      "tests.integration.test_memory_search_summarization::test_disabled_policy_preserves_raw_results_without_calling_provider[legacy-false]",
+      "tests.integration.test_memory_search_summarization::test_disabled_policy_preserves_raw_results_without_calling_provider[legacy-invalid]",
+      "tests.integration.test_memory_search_summarization::test_disabled_policy_respects_response_limit[100]",
+      "tests.integration.test_memory_search_summarization::test_disabled_policy_respects_response_limit[1]",
+      "tests.integration.test_memory_search_summarization::test_disabled_policy_respects_response_limit[2500]",
+      "tests.integration.test_memory_search_summarization::test_failure_is_visible_and_preserves_raw_results[empty]",
+      "tests.integration.test_memory_search_summarization::test_failure_is_visible_and_preserves_raw_results[invalid-citation]",
+      "tests.integration.test_memory_search_summarization::test_failure_is_visible_and_preserves_raw_results[provider-error]",
+      "tests.integration.test_memory_search_summarization::test_failure_is_visible_and_preserves_raw_results[unconfigured]",
+      "tests.integration.test_memory_search_summarization::test_http_mcp_round_trip_with_read_scope[nonexistent content-False-Invented source [999].]",
+      "tests.integration.test_memory_search_summarization::test_http_mcp_round_trip_with_read_scope[nonexistent content-False-Ordering matters [1].]",
+      "tests.integration.test_memory_search_summarization::test_http_mcp_round_trip_with_read_scope[nonexistent content-True-Invented source [999].]",
+      "tests.integration.test_memory_search_summarization::test_http_mcp_round_trip_with_read_scope[nonexistent content-True-Ordering matters [1].]",
+      "tests.integration.test_memory_search_summarization::test_http_mcp_round_trip_with_read_scope[replication ordering-False-Invented source [999].]",
+      "tests.integration.test_memory_search_summarization::test_http_mcp_round_trip_with_read_scope[replication ordering-False-Ordering matters [1].]",
+      "tests.integration.test_memory_search_summarization::test_http_mcp_round_trip_with_read_scope[replication ordering-True-Invented source [999].]",
+      "tests.integration.test_memory_search_summarization::test_http_mcp_round_trip_with_read_scope[replication ordering-True-Ordering matters [1].]",
+      "tests.integration.test_memory_search_summarization::test_large_beliefs_do_not_crowd_out_raw_fallback[provider-error-2500]",
+      "tests.integration.test_memory_search_summarization::test_large_beliefs_do_not_crowd_out_raw_fallback[provider-error-5000]",
+      "tests.integration.test_memory_search_summarization::test_large_beliefs_do_not_crowd_out_raw_fallback[summary-budget-2500]",
+      "tests.integration.test_memory_search_summarization::test_large_beliefs_do_not_crowd_out_raw_fallback[summary-budget-5000]",
+      "tests.integration.test_memory_search_summarization::test_oversized_provider_response_falls_back_to_raw",
+      "tests.integration.test_memory_search_summarization::test_requested_beliefs_preserved_in_valid_json",
+      "tests.integration.test_memory_search_summarization::test_retrieval_error_does_not_call_llm",
+      "tests.integration.test_memory_search_summarization::test_stored_access_queries_never_leave_the_summary_path",
+      "tests.integration.test_memory_search_summarization::test_summary_fallback_enforces_the_complete_response_budget[invalid-citation-100]",
+      "tests.integration.test_memory_search_summarization::test_summary_fallback_enforces_the_complete_response_budget[invalid-citation-1]",
+      "tests.integration.test_memory_search_summarization::test_summary_fallback_enforces_the_complete_response_budget[invalid-citation-2500]",
+      "tests.integration.test_memory_search_summarization::test_summary_fallback_enforces_the_complete_response_budget[invalid-citation-25]",
+      "tests.integration.test_memory_search_summarization::test_summary_fallback_enforces_the_complete_response_budget[invalid-citation-5000]",
+      "tests.integration.test_memory_search_summarization::test_summary_fallback_enforces_the_complete_response_budget[invalid-citation-512]",
+      "tests.integration.test_memory_search_summarization::test_summary_fallback_enforces_the_complete_response_budget[provider-error-100]",
+      "tests.integration.test_memory_search_summarization::test_summary_fallback_enforces_the_complete_response_budget[provider-error-1]",
+      "tests.integration.test_memory_search_summarization::test_summary_fallback_enforces_the_complete_response_budget[provider-error-2500]",
+      "tests.integration.test_memory_search_summarization::test_summary_fallback_enforces_the_complete_response_budget[provider-error-25]",
+      "tests.integration.test_memory_search_summarization::test_summary_fallback_enforces_the_complete_response_budget[provider-error-5000]",
+      "tests.integration.test_memory_search_summarization::test_summary_fallback_enforces_the_complete_response_budget[provider-error-512]",
+      "tests.integration.test_memory_search_summarization::test_summary_fallback_enforces_the_complete_response_budget[unconfigured-100]",
+      "tests.integration.test_memory_search_summarization::test_summary_fallback_enforces_the_complete_response_budget[unconfigured-1]",
+      "tests.integration.test_memory_search_summarization::test_summary_fallback_enforces_the_complete_response_budget[unconfigured-2500]",
+      "tests.integration.test_memory_search_summarization::test_summary_fallback_enforces_the_complete_response_budget[unconfigured-25]",
+      "tests.integration.test_memory_search_summarization::test_summary_fallback_enforces_the_complete_response_budget[unconfigured-5000]",
+      "tests.integration.test_memory_search_summarization::test_summary_fallback_enforces_the_complete_response_budget[unconfigured-512]",
+      "tests.integration.test_memory_search_summarization::test_summary_honors_response_limit_without_losing_metadata",
+      "tests.integration.test_memory_search_summarization::test_summary_keeps_sources_and_originals_queryable",
+      "tests.integration.test_memory_search_summarization::test_summary_runs_after_tag_filter",
+      "tests.integration.test_memory_search_summarization::test_summary_uses_final_plugin_results",
+      "tests.integration.test_memory_search_summarization::test_summary_works_with_other_search_modes[hybrid]",
+      "tests.integration.test_memory_search_summarization::test_summary_works_with_other_search_modes[ranked]",
+      "tests.integration.test_memory_search_summarization::test_summary_works_with_other_search_modes[semantic]",
+      "tests.integration.test_memory_search_summarization::test_time_only_and_empty_search_do_not_summarize",
+      "tests.integration.test_oauth_basic_auth::test_oauth_basic_auth",
+      "tests.integration.test_oauth_flow::test_oauth_endpoints",
+      "tests.integration.test_prompt_handlers.TestLearningSessionPlaceholderGuard::test_placeholder_predicate[ $1 -True]",
+      "tests.integration.test_prompt_handlers.TestLearningSessionPlaceholderGuard::test_placeholder_predicate[$1 real-False]",
+      "tests.integration.test_prompt_handlers.TestLearningSessionPlaceholderGuard::test_placeholder_predicate[$1-True]",
+      "tests.integration.test_prompt_handlers.TestLearningSessionPlaceholderGuard::test_placeholder_predicate[$10-True]",
+      "tests.integration.test_prompt_handlers.TestLearningSessionPlaceholderGuard::test_placeholder_predicate[$2-True]",
+      "tests.integration.test_prompt_handlers.TestLearningSessionPlaceholderGuard::test_placeholder_predicate[$abc-False]",
+      "tests.integration.test_prompt_handlers.TestLearningSessionPlaceholderGuard::test_placeholder_predicate[-False]",
+      "tests.integration.test_prompt_handlers.TestLearningSessionPlaceholderGuard::test_placeholder_predicate[General-False]",
+      "tests.integration.test_prompt_handlers.TestLearningSessionPlaceholderGuard::test_placeholder_predicate[None-False]",
+      "tests.integration.test_prompt_handlers.TestLearningSessionPlaceholderGuard::test_placeholder_predicate[real value-False]",
+      "tests.integration.test_prompt_handlers.TestPromptHandlersExist::test_prompt_handlers_smoke_test",
+      "tests.integration.test_prompt_handlers.TestPromptHandlersExist::test_server_has_prompts_registered",
+      "tests.integration.test_response_limit_tags.TestSearchByTagResponseLimit::test_empty_tags_still_return_handler_error",
+      "tests.integration.test_response_limit_tags.TestSearchByTagResponseLimit::test_limit_counts_tags_before_including_later_memory",
+      "tests.integration.test_response_limit_tags.TestSearchByTagResponseLimit::test_no_limit_preserves_memories_with_many_valid_tags",
+      "tests.integration.test_server_handlers.TestGetCacheStats::test_get_cache_stats_backend_info_structure",
+      "tests.integration.test_server_handlers.TestHandleRetrieveMemory::test_retrieve_memory_missing_query",
+      "tests.integration.test_server_handlers.TestHandleRetrieveMemory::test_retrieve_memory_success",
+      "tests.integration.test_server_handlers.TestHandleSearchByTag::test_search_by_tag_missing_tags",
+      "tests.integration.test_server_handlers.TestHandleSearchByTag::test_search_by_tag_success",
+      "tests.integration.test_server_handlers.TestHandleStoreMemory::test_store_memory_chunked",
+      "tests.integration.test_server_handlers.TestHandleStoreMemory::test_store_memory_default_type",
+      "tests.integration.test_server_handlers.TestHandleStoreMemory::test_store_memory_empty_content",
+      "tests.integration.test_server_handlers.TestHandleStoreMemory::test_store_memory_missing_content",
+      "tests.integration.test_server_handlers.TestHandleStoreMemory::test_store_memory_success",
+      "tests.integration.test_server_handlers.TestHandleStoreMemory::test_store_memory_with_conversation_id",
+      "tests.integration.test_server_handlers.TestHandleStoreMemory::test_store_memory_with_tags_string",
+      "tests.integration.test_server_handlers.TestIssue198Regression::test_error_handling_without_keyerror",
+      "tests.integration.test_server_handlers.TestIssue198Regression::test_no_keyerror_on_store_success",
+      "tests.integration.test_unified_handlers.TestBackwardsCompatibility::test_old_delete_by_tag_still_works",
+      "tests.integration.test_unified_handlers.TestBackwardsCompatibility::test_old_retrieve_memory_still_works",
+      "tests.integration.test_unified_handlers.TestBackwardsCompatibility::test_old_search_by_tag_still_works",
+      "tests.integration.test_unified_handlers.TestHandleMemoryDelete::test_delete_by_content_hash",
+      "tests.integration.test_unified_handlers.TestHandleMemoryDelete::test_delete_by_tags_all_match",
+      "tests.integration.test_unified_handlers.TestHandleMemoryDelete::test_delete_by_tags_any_match",
+      "tests.integration.test_unified_handlers.TestHandleMemoryDelete::test_delete_by_timeframe",
+      "tests.integration.test_unified_handlers.TestHandleMemoryDelete::test_delete_dry_run_mode",
+      "tests.integration.test_unified_handlers.TestHandleMemoryList::test_list_filtered_by_tags",
+      "tests.integration.test_unified_handlers.TestHandleMemoryList::test_list_with_pagination",
+      "tests.integration.test_unified_handlers.TestHandleMemorySearch::test_date_range_filter",
+      "tests.integration.test_unified_handlers.TestHandleMemorySearch::test_exact_search_mode",
+      "tests.integration.test_unified_handlers.TestHandleMemorySearch::test_hybrid_search_with_quality_boost",
+      "tests.integration.test_unified_handlers.TestHandleMemorySearch::test_semantic_search_default",
+      "tests.integration.test_unified_handlers.TestHandleMemorySearch::test_tag_filter",
+      "tests.integration.test_unified_handlers.TestHandleMemorySearch::test_time_expression_filter",
+      "tests.maintenance.test_changelog_housekeeping::test_update_archive_header_boundary_handles_prerelease",
+      "tests.maintenance.test_changelog_housekeeping::test_update_archive_header_boundary_inserts_when_missing",
+      "tests.maintenance.test_changelog_housekeeping::test_update_archive_header_boundary_leaves_unrelated_text",
+      "tests.maintenance.test_changelog_housekeeping::test_update_archive_header_boundary_no_double_version_when_unknown_format",
+      "tests.maintenance.test_changelog_housekeeping::test_update_archive_header_boundary_no_match_is_noop",
+      "tests.maintenance.test_changelog_housekeeping::test_update_archive_header_boundary_rewrites_prose_version",
+      "tests.maintenance.test_changelog_housekeeping::test_update_header_range_still_works_after_refactor",
+      "tests.maintenance.test_github_triage_digest::test_digest_issue_is_excluded_everywhere",
+      "tests.maintenance.test_github_triage_digest::test_digest_neither_mentions_nor_cross_references",
+      "tests.maintenance.test_github_triage_digest::test_issue_urls_in_titles_are_not_linked",
+      "tests.maintenance.test_github_triage_digest::test_line_cap_keeps_the_footer_and_the_cap_warning",
+      "tests.maintenance.test_github_triage_digest::test_lookup_cap_is_reported_not_silent",
+      "tests.maintenance.test_github_triage_digest::test_no_section_header_is_left_without_items",
+      "tests.maintenance.test_github_triage_digest::test_pagination_cap_is_reported_and_survives_the_line_cap",
+      "tests.maintenance.test_github_triage_digest::test_pull_requests_are_not_counted_as_issues",
+      "tests.maintenance.test_github_triage_digest::test_stale_uses_the_last_commenter_not_the_author",
+      "tests.maintenance.test_github_triage_digest::test_titles_cannot_ping_or_cross_reference",
+      "tests.maintenance.test_github_triage_digest::test_uncommented_issue_counts_the_author_as_last_speaker",
+      "tests.storage.test_graph_distribution::test_graph_visualization_excludes_deleted_memories",
+      "tests.test_quality_system.TestQualitySystemPerformance::test_implicit_signals_performance",
+      "tests.unit.test_cli_lifecycle::test_stop_force_kills_foreign_listener",
+      "tests.unit.test_cli_lifecycle::test_stop_kills_untracked_memory_server_listener",
+      "tests.unit.test_cli_lifecycle::test_stop_refuses_to_kill_foreign_listener_without_force"
+    ],
+    "load_failed_both": [],
+    "load_failed_pr": [],
+    "load_failed_main": [],
+    "executed": {
+      "main": 4517,
+      "pr": 4517
+    },
+    "messages": {
+      "tests.integration.test_cloudflare_connection::test_cloudflare_config": "failed on setup with \"ValueError: I/O operation on closed file\"",
+      "tests.integration.test_cloudflare_connection::test_storage_backend_import": "failed on setup with \"ValueError: I/O operation on closed file\"",
+      "tests.integration.test_concurrent_clients.TestConcurrentClients::test_multiple_readers_one_writer": "failed on setup with \"ValueError: I/O operation on closed file\"",
+      "tests.integration.test_concurrent_clients.TestConcurrentClients::test_reader_writer_concurrent": "failed on setup with \"ValueError: I/O operation on closed file\"",
+      "tests.integration.test_concurrent_clients.TestConcurrentClients::test_two_clients_concurrent_write": "failed on setup with \"ValueError: I/O operation on closed file\"",
+      "tests.storage.test_graph_distribution::test_graph_visualization_connection_count_accuracy": "failed on setup with \"ValueError: I/O operation on closed file\"",
+      "tests.storage.test_graph_distribution::test_graph_visualization_performance_with_large_graph": "failed on setup with \"ValueError: I/O operation on closed file\"",
+      "tests.storage.test_graph_storage.TestGraphStorage::test_connection_types_json_array": "failed on setup with \"ValueError: I/O operation on closed file\"",
+      "tests.storage.test_graph_storage.TestGraphStorage::test_delete_association": "failed on setup with \"ValueError: I/O operation on closed file\"",
+      "tests.storage.test_graph_storage.TestGraphStorage::test_duplicate_association_handling": "failed on setup with \"ValueError: I/O operation on closed file\"",
+      "tests.storage.test_graph_storage.TestGraphStorage::test_empty_hash_validation": "failed on setup with \"ValueError: I/O operation on closed file\"",
+      "tests.storage.test_graph_storage.TestGraphStorage::test_find_connected_basic": "failed on setup with \"ValueError: I/O operation on closed file\"",
+      "tests.storage.test_graph_storage.TestGraphStorage::test_find_connected_empty_hash": "failed on setup with \"ValueError: I/O operation on closed file\"",
+      "tests.storage.test_graph_storage.TestGraphStorage::test_find_connected_multi_hop": "failed on setup with \"ValueError: I/O operation on closed file\"",
+      "tests.storage.test_graph_storage.TestGraphStorage::test_find_connected_with_cycles": "failed on setup with \"ValueError: I/O operation on closed file\"",
+      "tests.storage.test_graph_storage.TestGraphStorage::test_get_association_count": "failed on setup with \"ValueError: I/O operation on closed file\"",
+      "tests.storage.test_graph_storage.TestGraphStorage::test_get_subgraph": "failed on setup with \"ValueError: I/O operation on closed file\"",
+      "tests.storage.test_graph_storage.TestGraphStorage::test_get_subgraph_empty_hash": "failed on setup with \"ValueError: I/O operation on closed file\"",
+      "tests.storage.test_graph_storage.TestGraphStorage::test_metadata_null_handling": "failed on setup with \"ValueError: I/O operation on closed file\"",
+      "tests.storage.test_graph_storage.TestGraphStorage::test_metadata_storage": "failed on setup with \"ValueError: I/O operation on closed file\""
+    }
+  },
+  "exit_check": {
+    "explained": false,
+    "problems": [
+      "PR run 1: 2 failure(s) not seen on main",
+      "PR run 2: 2 failure(s) not seen on main",
+      "PR run 3: 2 failure(s) not seen on main"
+    ],
+    "detail": "pytest exit 1; 176 failure(s)/error(s) pre-existing and identical on both sides"
+  },
+  "coverage": {
+    "status": "not needed",
+    "why": "no changed non-test Python files"
+  },
+  "probes": {
+    "status": "rejected",
+    "items": [
+      {
+        "id": "model-probe1",
+        "source": "model",
+        "path": "model-probes/model-probe1.py",
+        "sha256": "d899e2206799e84976c9371f8dd5d0917bd767b298b78f4c7eb889bcc8f61a3d",
+        "target": "doobidoo/mcp-memory-service#1531",
+        "about": "Check that regenerate_embeddings writes vectors into store partition",
+        "claims": [
+          {
+            "id": "C1",
+            "source": "PR description",
+            "text": "regenerate_embeddings writes vectors into their store partition",
+            "covers": [
+              "vector_insert_uses_store"
+            ],
+            "expect": "differs"
+          },
+          {
+            "id": "C2",
+            "source": "PR description",
+            "text": "regenerate_embeddings now reads each memory's store and writes the vector into that partition",
+            "covers": [
+              "vector_insert_uses_store"
+            ],
+            "expect": "differs"
+          }
+        ],
+        "runs_per_side": 3,
+        "per_run": [
+          {
+            "side": "main",
+            "run": 1,
+            "seconds": 0.1,
+            "ok": true
+          },
+          {
+            "side": "pr",
+            "run": 1,
+            "seconds": 0.1,
+            "ok": true
+          },
+          {
+            "side": "main",
+            "run": 2,
+            "seconds": 0.1,
+            "ok": true
+          },
+          {
+            "side": "pr",
+            "run": 2,
+            "seconds": 0.1,
+            "ok": true
+          },
+          {
+            "side": "main",
+            "run": 3,
+            "seconds": 0.1,
+            "ok": true
+          },
+          {
+            "side": "pr",
+            "run": 3,
+            "seconds": 0.1,
+            "ok": true
+          }
+        ],
+        "outputs": {
+          "main": [
+            "probe-model-probe1-main-1.jsonl",
+            "probe-model-probe1-main-2.jsonl",
+            "probe-model-probe1-main-3.jsonl"
+          ],
+          "pr": [
+            "probe-model-probe1-pr-1.jsonl",
+            "probe-model-probe1-pr-2.jsonl",
+            "probe-model-probe1-pr-3.jsonl"
+          ]
+        },
+        "runs": {
+          "main": [
+            {
+              "error": "ModuleNotFoundError"
+            },
+            {
+              "error": "ModuleNotFoundError"
+            },
+            {
+              "error": "ModuleNotFoundError"
+            }
+          ],
+          "pr": [
+            {
+              "error": "ModuleNotFoundError"
+            },
+            {
+              "error": "ModuleNotFoundError"
+            },
+            {
+              "error": "ModuleNotFoundError"
+            }
+          ]
+        },
+        "observations": [
+          {
+            "name": "error",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": "ModuleNotFoundError",
+            "pr": "ModuleNotFoundError",
+            "citations": {
+              "main": {
+                "file": "probe-model-probe1-main-1.jsonl",
+                "line": 1,
+                "quote": "\"observation\": \"error\""
+              },
+              "pr": {
+                "file": "probe-model-probe1-pr-1.jsonl",
+                "line": 1,
+                "quote": "\"observation\": \"error\""
+              }
+            }
+          }
+        ],
+        "generator": {
+          "kind": "model",
+          "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+          "model": "nvidia/nemotron-3-super-120b-a12b",
+          "provider": "nebius",
+          "provenance": "live",
+          "blind": true
+        },
+        "freeze": {
+          "sha256": "d899e2206799e84976c9371f8dd5d0917bd767b298b78f4c7eb889bcc8f61a3d",
+          "generator": {
+            "kind": "model",
+            "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+            "model": "nvidia/nemotron-3-super-120b-a12b",
+            "provider": "nebius",
+            "provenance": "live",
+            "blind": true
+          },
+          "frozen_at": "2026-10-22T04:57:54.684729+00:00",
+          "inputs_sha256": "94d656784d5e9901a0df0b9df9e5ec1a6c932fea50d27dbb315192bcd86361e0",
+          "inputs": {
+            "title_chars": 81,
+            "body_chars": 2323,
+            "base_files": {}
+          },
+          "verified": true,
+          "pr_started_at": "2026-10-22T04:57:54.803243+00:00"
+        },
+        "probe_changed_line_coverage": {
+          "status": "not measured",
+          "why": "no changed non-test Python files",
+          "adequacy": "unmeasured",
+          "note": "probe coverage not measured (no changed non-test Python files)"
+        },
+        "status": "rejected",
+        "rejected_reason": "rejected: claim pattern(s) C1, C2 match none of this probe's observation names, so the probe is not counted"
+      },
+      {
+        "id": "model-probe2",
+        "source": "model",
+        "path": "model-probes/model-probe2.py",
+        "sha256": "6c1a8d11bbfcbe7143de0b651a1d68dfcda123294f61d84b8feb200f5f75c238",
+        "target": "doobidoo/mcp-memory-service#1531",
+        "about": "Check that regenerate_embeddings reads each memory's store and writes vector into that partition",
+        "claims": [
+          {
+            "id": "C2",
+            "source": "PR description",
+            "text": "regenerate_embeddings now reads each memory's store and writes the vector into that partition",
+            "covers": [
+              "reads_store_via_coalesce"
+            ],
+            "expect": "differs"
+          }
+        ],
+        "runs_per_side": 3,
+        "per_run": [
+          {
+            "side": "main",
+            "run": 1,
+            "seconds": 0.1,
+            "ok": true
+          },
+          {
+            "side": "pr",
+            "run": 1,
+            "seconds": 0.1,
+            "ok": true
+          },
+          {
+            "side": "main",
+            "run": 2,
+            "seconds": 0.1,
+            "ok": true
+          },
+          {
+            "side": "pr",
+            "run": 2,
+            "seconds": 0.1,
+            "ok": true
+          },
+          {
+            "side": "main",
+            "run": 3,
+            "seconds": 0.1,
+            "ok": true
+          },
+          {
+            "side": "pr",
+            "run": 3,
+            "seconds": 0.1,
+            "ok": true
+          }
+        ],
+        "outputs": {
+          "main": [
+            "probe-model-probe2-main-1.jsonl",
+            "probe-model-probe2-main-2.jsonl",
+            "probe-model-probe2-main-3.jsonl"
+          ],
+          "pr": [
+            "probe-model-probe2-pr-1.jsonl",
+            "probe-model-probe2-pr-2.jsonl",
+            "probe-model-probe2-pr-3.jsonl"
+          ]
+        },
+        "runs": {
+          "main": [
+            {
+              "error": "ModuleNotFoundError"
+            },
+            {
+              "error": "ModuleNotFoundError"
+            },
+            {
+              "error": "ModuleNotFoundError"
+            }
+          ],
+          "pr": [
+            {
+              "error": "ModuleNotFoundError"
+            },
+            {
+              "error": "ModuleNotFoundError"
+            },
+            {
+              "error": "ModuleNotFoundError"
+            }
+          ]
+        },
+        "observations": [
+          {
+            "name": "error",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": "ModuleNotFoundError",
+            "pr": "ModuleNotFoundError",
+            "citations": {
+              "main": {
+                "file": "probe-model-probe2-main-1.jsonl",
+                "line": 1,
+                "quote": "\"observation\": \"error\""
+              },
+              "pr": {
+                "file": "probe-model-probe2-pr-1.jsonl",
+                "line": 1,
+                "quote": "\"observation\": \"error\""
+              }
+            }
+          }
+        ],
+        "generator": {
+          "kind": "model",
+          "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+          "model": "nvidia/nemotron-3-super-120b-a12b",
+          "provider": "nebius",
+          "provenance": "live",
+          "blind": true
+        },
+        "freeze": {
+          "sha256": "6c1a8d11bbfcbe7143de0b651a1d68dfcda123294f61d84b8feb200f5f75c238",
+          "generator": {
+            "kind": "model",
+            "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+            "model": "nvidia/nemotron-3-super-120b-a12b",
+            "provider": "nebius",
+            "provenance": "live",
+            "blind": true
+          },
+          "frozen_at": "2026-10-22T04:57:54.684870+00:00",
+          "inputs_sha256": "94d656784d5e9901a0df0b9df9e5ec1a6c932fea50d27dbb315192bcd86361e0",
+          "inputs": {
+            "title_chars": 81,
+            "body_chars": 2323,
+            "base_files": {}
+          },
+          "verified": true,
+          "pr_started_at": "2026-10-22T04:57:54.803243+00:00"
+        },
+        "probe_changed_line_coverage": {
+          "status": "not measured",
+          "why": "no changed non-test Python files",
+          "adequacy": "unmeasured",
+          "note": "probe coverage not measured (no changed non-test Python files)"
+        },
+        "status": "rejected",
+        "rejected_reason": "rejected: claim pattern(s) C2 match none of this probe's observation names, so the probe is not counted"
+      },
+      {
+        "id": "model-probe3",
+        "source": "model",
+        "path": "model-probes/model-probe3.py",
+        "sha256": "046eabb20deaa11cfe8dfbbde3474cb151983bf80bcaa1406e315fb20adf72c5",
+        "target": "doobidoo/mcp-memory-service#1531",
+        "about": "Check that import of serialize_float32 is corrected to come from sqlite_vec package",
+        "claims": [
+          {
+            "id": "C3",
+            "source": "PR description",
+            "text": "The import of serialize_float32 is corrected to come from the sqlite_vec package",
+            "covers": [
+              "serialize_float32_from_sqlite_vec"
+            ],
+            "expect": "differs"
+          }
+        ],
+        "runs_per_side": 3,
+        "per_run": [
+          {
+            "side": "main",
+            "run": 1,
+            "seconds": 0.1,
+            "ok": true
+          },
+          {
+            "side": "pr",
+            "run": 1,
+            "seconds": 0.1,
+            "ok": true
+          },
+          {
+            "side": "main",
+            "run": 2,
+            "seconds": 0.1,
+            "ok": true
+          },
+          {
+            "side": "pr",
+            "run": 2,
+            "seconds": 0.1,
+            "ok": true
+          },
+          {
+            "side": "main",
+            "run": 3,
+            "seconds": 0.1,
+            "ok": true
+          },
+          {
+            "side": "pr",
+            "run": 3,
+            "seconds": 0.1,
+            "ok": true
+          }
+        ],
+        "outputs": {
+          "main": [
+            "probe-model-probe3-main-1.jsonl",
+            "probe-model-probe3-main-2.jsonl",
+            "probe-model-probe3-main-3.jsonl"
+          ],
+          "pr": [
+            "probe-model-probe3-pr-1.jsonl",
+            "probe-model-probe3-pr-2.jsonl",
+            "probe-model-probe3-pr-3.jsonl"
+          ]
+        },
+        "runs": {
+          "main": [
+            {
+              "error": "ModuleNotFoundError"
+            },
+            {
+              "error": "ModuleNotFoundError"
+            },
+            {
+              "error": "ModuleNotFoundError"
+            }
+          ],
+          "pr": [
+            {
+              "error": "ModuleNotFoundError"
+            },
+            {
+              "error": "ModuleNotFoundError"
+            },
+            {
+              "error": "ModuleNotFoundError"
+            }
+          ]
+        },
+        "observations": [
+          {
+            "name": "error",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": "ModuleNotFoundError",
+            "pr": "ModuleNotFoundError",
+            "citations": {
+              "main": {
+                "file": "probe-model-probe3-main-1.jsonl",
+                "line": 1,
+                "quote": "\"observation\": \"error\""
+              },
+              "pr": {
+                "file": "probe-model-probe3-pr-1.jsonl",
+                "line": 1,
+                "quote": "\"observation\": \"error\""
+              }
+            }
+          }
+        ],
+        "generator": {
+          "kind": "model",
+          "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+          "model": "nvidia/nemotron-3-super-120b-a12b",
+          "provider": "nebius",
+          "provenance": "live",
+          "blind": true
+        },
+        "freeze": {
+          "sha256": "046eabb20deaa11cfe8dfbbde3474cb151983bf80bcaa1406e315fb20adf72c5",
+          "generator": {
+            "kind": "model",
+            "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+            "model": "nvidia/nemotron-3-super-120b-a12b",
+            "provider": "nebius",
+            "provenance": "live",
+            "blind": true
+          },
+          "frozen_at": "2026-10-22T04:57:54.684938+00:00",
+          "inputs_sha256": "94d656784d5e9901a0df0b9df9e5ec1a6c932fea50d27dbb315192bcd86361e0",
+          "inputs": {
+            "title_chars": 81,
+            "body_chars": 2323,
+            "base_files": {}
+          },
+          "verified": true,
+          "pr_started_at": "2026-10-22T04:57:54.803243+00:00"
+        },
+        "probe_changed_line_coverage": {
+          "status": "not measured",
+          "why": "no changed non-test Python files",
+          "adequacy": "unmeasured",
+          "note": "probe coverage not measured (no changed non-test Python files)"
+        },
+        "status": "rejected",
+        "rejected_reason": "rejected: claim pattern(s) C3 match none of this probe's observation names, so the probe is not counted"
+      },
+      {
+        "id": "model-probe4",
+        "source": "model",
+        "path": "model-probes/model-probe4.py",
+        "sha256": "733d191e3521b7b1018f5fc458341b742f74e1c089e8f57a21ace8185c2c5a9b",
+        "target": "doobidoo/mcp-memory-service#1531",
+        "about": "Check that after fix, a store-scoped retrieve finds the regenerated vector",
+        "claims": [
+          {
+            "id": "C4",
+            "source": "PR description",
+            "text": "After the fix, a store-scoped retrieve finds the regenerated vector",
+            "covers": [
+              "retrieve_query_includes_store"
+            ],
+            "expect": "differs"
+          }
+        ],
+        "runs_per_side": 3,
+        "per_run": [
+          {
+            "side": "main",
+            "run": 1,
+            "seconds": 0.1,
+            "ok": true
+          },
+          {
+            "side": "pr",
+            "run": 1,
+            "seconds": 0.1,
+            "ok": true
+          },
+          {
+            "side": "main",
+            "run": 2,
+            "seconds": 0.1,
+            "ok": true
+          },
+          {
+            "side": "pr",
+            "run": 2,
+            "seconds": 0.1,
+            "ok": true
+          },
+          {
+            "side": "main",
+            "run": 3,
+            "seconds": 0.1,
+            "ok": true
+          },
+          {
+            "side": "pr",
+            "run": 3,
+            "seconds": 0.1,
+            "ok": true
+          }
+        ],
+        "outputs": {
+          "main": [
+            "probe-model-probe4-main-1.jsonl",
+            "probe-model-probe4-main-2.jsonl",
+            "probe-model-probe4-main-3.jsonl"
+          ],
+          "pr": [
+            "probe-model-probe4-pr-1.jsonl",
+            "probe-model-probe4-pr-2.jsonl",
+            "probe-model-probe4-pr-3.jsonl"
+          ]
+        },
+        "runs": {
+          "main": [
+            {
+              "error": "ModuleNotFoundError"
+            },
+            {
+              "error": "ModuleNotFoundError"
+            },
+            {
+              "error": "ModuleNotFoundError"
+            }
+          ],
+          "pr": [
+            {
+              "error": "ModuleNotFoundError"
+            },
+            {
+              "error": "ModuleNotFoundError"
+            },
+            {
+              "error": "ModuleNotFoundError"
+            }
+          ]
+        },
+        "observations": [
+          {
+            "name": "error",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": "ModuleNotFoundError",
+            "pr": "ModuleNotFoundError",
+            "citations": {
+              "main": {
+                "file": "probe-model-probe4-main-1.jsonl",
+                "line": 1,
+                "quote": "\"observation\": \"error\""
+              },
+              "pr": {
+                "file": "probe-model-probe4-pr-1.jsonl",
+                "line": 1,
+                "quote": "\"observation\": \"error\""
+              }
+            }
+          }
+        ],
+        "generator": {
+          "kind": "model",
+          "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+          "model": "nvidia/nemotron-3-super-120b-a12b",
+          "provider": "nebius",
+          "provenance": "live",
+          "blind": true
+        },
+        "freeze": {
+          "sha256": "733d191e3521b7b1018f5fc458341b742f74e1c089e8f57a21ace8185c2c5a9b",
+          "generator": {
+            "kind": "model",
+            "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+            "model": "nvidia/nemotron-3-super-120b-a12b",
+            "provider": "nebius",
+            "provenance": "live",
+            "blind": true
+          },
+          "frozen_at": "2026-10-22T04:57:54.685006+00:00",
+          "inputs_sha256": "94d656784d5e9901a0df0b9df9e5ec1a6c932fea50d27dbb315192bcd86361e0",
+          "inputs": {
+            "title_chars": 81,
+            "body_chars": 2323,
+            "base_files": {}
+          },
+          "verified": true,
+          "pr_started_at": "2026-10-22T04:57:54.803243+00:00"
+        },
+        "probe_changed_line_coverage": {
+          "status": "not measured",
+          "why": "no changed non-test Python files",
+          "adequacy": "unmeasured",
+          "note": "probe coverage not measured (no changed non-test Python files)"
+        },
+        "status": "rejected",
+        "rejected_reason": "rejected: claim pattern(s) C4 match none of this probe's observation names, so the probe is not counted"
+      }
+    ],
+    "summary": {
+      "labels": [],
+      "flagged": [],
+      "proven_claims": [],
+      "reason": "rejected: claim pattern(s) C1, C2 match none of this probe's observation names, so the probe is not counted; rejected: claim pattern(s) C2 match none of this probe's observation names, so the probe is not counted; rejected: claim pattern(s) C3 match none of this probe's observation names, so the probe is not counted; rejected: claim pattern(s) C4 match none of this probe's observation names, so the probe is not counted",
+      "ignored_noise": [],
+      "ignored_warning_only": [],
+      "pr_only_noisy": []
+    }
+  },
+  "probe_changed_line_coverage": {
+    "status": "not measured",
+    "side": "main",
+    "probes": {
+      "model-probe1": {
+        "status": "not measured",
+        "changed_lines_covered": null,
+        "changed_lines_total": null,
+        "adequacy": "unmeasured"
+      },
+      "model-probe2": {
+        "status": "not measured",
+        "changed_lines_covered": null,
+        "changed_lines_total": null,
+        "adequacy": "unmeasured"
+      },
+      "model-probe3": {
+        "status": "not measured",
+        "changed_lines_covered": null,
+        "changed_lines_total": null,
+        "adequacy": "unmeasured"
+      },
+      "model-probe4": {
+        "status": "not measured",
+        "changed_lines_covered": null,
+        "changed_lines_total": null,
+        "adequacy": "unmeasured"
+      }
+    },
+    "not_adequate": []
+  },
+  "verdict": "needs_attention",
+  "reason": "194 test(s) pass on main but fail on the PR; 7 other outcome change(s); 200 test(s) fail on main and pass on the PR; 4517 test(s) ran on main, 4517 on the PR; 2 new test(s) pass, 4072 unchanged (130 of them skipped on both sides); 176 test failure(s) pre-existing and identical on both sides; rejected: claim pattern(s) C1, C2 match none of this probe's observation names, so the probe is not counted; rejected: claim pattern(s) C2 match none of this probe's observation names, so the probe is not counted; rejected: claim pattern(s) C3 match none of this probe's observation names, so the probe is not counted; rejected: claim pattern(s) C4 match none of this probe's observation names, so the probe is not counted",
+  "verdict_before_coverage_gate": "needs_attention",
+  "reason_before_coverage_gate": "194 test(s) pass on main but fail on the PR; 7 other outcome change(s); 200 test(s) fail on main and pass on the PR; 4517 test(s) ran on main, 4517 on the PR; 2 new test(s) pass, 4072 unchanged (130 of them skipped on both sides); 176 test failure(s) pre-existing and identical on both sides; rejected: claim pattern(s) C1, C2 match none of this probe's observation names, so the probe is not counted; rejected: claim pattern(s) C2 match none of this probe's observation names, so the probe is not counted; rejected: claim pattern(s) C3 match none of this probe's observation names, so the probe is not counted; rejected: claim pattern(s) C4 match none of this probe's observation names, so the probe is not counted",
+  "changed_lines_total": null,
+  "changed_lines_covered": null,
+  "coverage_gate": {
+    "kind": "no-executable-change",
+    "changed": false,
+    "confidence": "normal",
+    "note": "no executable code changed (docs, tests or config only), so there was nothing to cover",
+    "measurement": "not needed"
+  },
+  "agents": {
+    "status": "skipped",
+    "note": "advisory swarm is off",
+    "roles": []
+  },
+  "explanation": {
+    "status": "not yet wired",
+    "why": "advisory swarm is off"
+  },
+  "swarm_requested": false,
+  "operator_approval_requested": false,
+  "swarm": "off",
+  "operator_approval": "off",
+  "what_changed": {
+    "package_python_files": [],
+    "compiled_files": [],
+    "other_files": [
+      "changelog.d/1521-regenerate-embeddings-store.fixed.md",
+      "scripts/maintenance/regenerate_embeddings.py",
+      "tests/maintenance/test_regenerate_embeddings_store.py"
+    ]
+  },
+  "duration_s": {
+    "total_wall": 469.4,
+    "tests": 430.4
+  },
+  "cost": {
+    "ai_calls": 3,
+    "failed_ai_calls": 0,
+    "input_tokens": 3595,
+    "output_tokens": 4099,
+    "thinking_tokens": 2744,
+    "cost_usd": 0.004768,
+    "calls_without_usage": 0,
+    "ai_cost_usd": 0.004768,
+    "cost_complete": true,
+    "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+    "compute_seconds": {
+      "total_wall": 469.4,
+      "tests": 430.4
+    },
+    "machine_usd_per_hour": 0.24,
+    "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+    "computer_cost_usd": 0.031293,
+    "total_cost_usd": 0.036061,
+    "swarm": {
+      "ai_calls": 0,
+      "failed_ai_calls": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "thinking_tokens": 0,
+      "cost_usd": 0.0,
+      "calls_without_usage": 0,
+      "ai_cost_usd": 0.0,
+      "cost_complete": true,
+      "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+    }
+  },
+  "head_at_report_sha": "86e5ab3f2f9f9be460d70b7576ab1450271c4728",
+  "head_moved_since_test": false
+}

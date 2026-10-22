@@ -1,0 +1,461 @@
+{
+  "schema_version": "1",
+  "record_kind": "pr_run",
+  "id": "pr-frappe-erpnext-61257-7feeb6fae172-2026-10-22-check-1056",
+  "date_ist": "2026-10-22 10:56 IST",
+  "run_date": "2026-10-22",
+  "who": "ops/daily_run.py",
+  "repo": "frappe/erpnext",
+  "library": "erpnext",
+  "pr": {
+    "repo": "frappe/erpnext",
+    "number": 61257,
+    "url": "https://github.com/frappe/erpnext/pull/61257",
+    "title": "fix(accounts): validate payment mode accounts and enabled status",
+    "base_sha": "e72d63c8f7cc581cbb5e60c209de447b1888df03",
+    "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+    "head_sha": "7feeb6fae1727a96a6529a8caee3bff5c19cf335",
+    "merge_commit": null,
+    "tested_main_sha": "7feeb6fae1727a96a6529a8caee3bff5c19cf335",
+    "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+  },
+  "author": "Pandiyan5273",
+  "base_ref": "develop",
+  "updated_at_utc": "2026-10-21T18:24:22Z",
+  "updated_at_ist": "2026-10-21 23:54 IST",
+  "ci_state": "not checked (single-PR check)",
+  "ci_detail": "checked on request with --pr",
+  "tested_at_ist": "2026-10-22 10:56 IST",
+  "files": {
+    "all": [
+      "erpnext/accounts/doctype/mode_of_payment/mode_of_payment.js",
+      "erpnext/accounts/doctype/mode_of_payment/mode_of_payment.py",
+      "erpnext/accounts/doctype/mode_of_payment/test_mode_of_payment.py",
+      "erpnext/accounts/doctype/payment_entry/payment_entry.py",
+      "erpnext/accounts/doctype/payment_request/payment_request.py",
+      "erpnext/accounts/doctype/pos_invoice_merge_log/test_pos_invoice_merge_log.py",
+      "erpnext/accounts/doctype/sales_invoice/services/pos.py"
+    ],
+    "package_py": [
+      "erpnext/accounts/doctype/mode_of_payment/mode_of_payment.py",
+      "erpnext/accounts/doctype/mode_of_payment/test_mode_of_payment.py",
+      "erpnext/accounts/doctype/payment_entry/payment_entry.py",
+      "erpnext/accounts/doctype/payment_request/payment_request.py",
+      "erpnext/accounts/doctype/pos_invoice_merge_log/test_pos_invoice_merge_log.py",
+      "erpnext/accounts/doctype/sales_invoice/services/pos.py"
+    ],
+    "compiled": [],
+    "other": [
+      "erpnext/accounts/doctype/mode_of_payment/mode_of_payment.js"
+    ]
+  },
+  "machine_type": {
+    "arch": "x86_64",
+    "os": "Linux",
+    "platform": "Linux-6.12.94+-x86_64-with-glibc2.41",
+    "cpu_count": 8,
+    "ci": null,
+    "runner_name": null,
+    "runner_os": null,
+    "runner_arch": null,
+    "runner_environment": null,
+    "image": null,
+    "label": "local",
+    "gxx": "g++ (Debian 14.2.0-19) 14.2.0",
+    "cpu_model": "Intel(R) Xeon(R) Processor",
+    "ram_gb": 15.6
+  },
+  "thread_env": {
+    "OMP_NUM_THREADS": "1",
+    "OPENBLAS_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1",
+    "NUMEXPR_NUM_THREADS": "1",
+    "VECLIB_MAXIMUM_THREADS": "1",
+    "BLIS_NUM_THREADS": "1",
+    "PYTHONHASHSEED": "0"
+  },
+  "runs_per_side": 0,
+  "runs_per_side_planned": 3,
+  "workers": "4",
+  "test_timeout_s": 120,
+  "run_timeout_s": 900,
+  "build_timeout_s": 1800,
+  "python": "3.12.15",
+  "test_selection": "",
+  "per_run": [],
+  "notes": null,
+  "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+  "behaviour_claims": [],
+  "baseline": "full",
+  "model_provider": {
+    "requested": "nebius",
+    "used": null,
+    "note": "model provider: nebius (Token Factory, live)",
+    "blind": false
+  },
+  "sandbox_backend": "local",
+  "sandbox_backend_note": "local bubblewrap",
+  "machine": "local",
+  "posted_upstream": false,
+  "logs": "erpnext-61257/",
+  "freeze": {},
+  "poc_commit": "0fa0016ea51794edee0f4a085e41bf48dd813765",
+  "route": "source-pair",
+  "current_head_sha": "7feeb6fae1727a96a6529a8caee3bff5c19cf335",
+  "tested_invocation": 1,
+  "model_provider_used": "none",
+  "model_provider_fallback": "no AI call ran (asked for nebius)",
+  "state": "closed",
+  "mergeable_state": "unknown",
+  "product_check": true,
+  "demo_helper": {
+    "preflight": {
+      "ok": true
+    },
+    "tavily": {
+      "ok": true,
+      "skipped": false,
+      "live_call": true,
+      "cached": false,
+      "queries": [
+        "erpnext python setup install instructions https://github.com/frappe/erpnext site:github.com/frappe/erpnext",
+        "erpnext python documentation install https://github.com/frappe/erpnext site:github.com/frappe/erpnext",
+        "erpnext python install requirements https://pypi.org/project/erpnext/ https://github.com/frappe/erpnext site:pypi.org"
+      ],
+      "results": [
+        {
+          "title": "erpnext/README.md at develop \u00b7 frappe/erpnext \u00b7 GitHub",
+          "url": "https://github.com/frappe/erpnext/blob/develop/README.md",
+          "query": "erpnext python documentation install https://github.com/frappe/erpnext site:github.com/frappe/erpnext"
+        },
+        {
+          "title": "frappe-bench \u00b7 PyPI",
+          "url": "https://pypi.org/project/frappe-bench/",
+          "query": "erpnext python install requirements https://pypi.org/project/erpnext/ https://github.com/frappe/erpnext site:pypi.org"
+        },
+        {
+          "title": "caffeinated-whale-cli \u00b7 PyPI",
+          "url": "https://pypi.org/project/caffeinated-whale-cli/",
+          "query": "erpnext python install requirements https://pypi.org/project/erpnext/ https://github.com/frappe/erpnext site:pypi.org"
+        },
+        {
+          "title": "ws-frappe-cli \u00b7 PyPI",
+          "url": "https://pypi.org/project/ws-frappe-cli/",
+          "query": "erpnext python install requirements https://pypi.org/project/erpnext/ https://github.com/frappe/erpnext site:pypi.org"
+        },
+        {
+          "title": "GitHub - frappe/erpnext: Free and Open Source Enterprise Resource Planning (ERP) \u00b7 GitHub",
+          "url": "https://github.com/frappe/erpnext",
+          "query": "erpnext python setup install instructions https://github.com/frappe/erpnext site:github.com/frappe/erpnext"
+        },
+        {
+          "title": "Easy install setup guide for Ubuntu 20.04 LTS  \u00b7 Issue #22125 \u00b7 frappe/erpnext \u00b7 GitHub",
+          "url": "https://github.com/frappe/erpnext/issues/22125",
+          "query": "erpnext python setup install instructions https://github.com/frappe/erpnext site:github.com/frappe/erpnext"
+        },
+        {
+          "title": "GitHub - frappe/erpnext-14: Free and Open Source Enterprise Resource Planning (ERP) \u00b7 GitHub",
+          "url": "https://github.com/frappe/erpnext-14",
+          "query": "erpnext python setup install instructions https://github.com/frappe/erpnext site:github.com/frappe/erpnext"
+        },
+        {
+          "title": "GitHub - frappe/erpnext: Free and Open Source Enterprise ...",
+          "url": "https://github.com/frappe/erpnext/tree/develop",
+          "query": "erpnext python documentation install https://github.com/frappe/erpnext site:github.com/frappe/erpnext"
+        },
+        {
+          "title": "Releases \u00b7 frappe/erpnext \u00b7 GitHub",
+          "url": "https://github.com/frappe/erpnext/releases",
+          "query": "erpnext python documentation install https://github.com/frappe/erpnext site:github.com/frappe/erpnext"
+        }
+      ],
+      "text": "To set up ERPNext, first, follow the installation steps to start the server with `bench start`. Then, create a new site using `bench new-site erpnext.localhost`. To install the ERPNext app, use `bench get-app` followed by `bench --site erpnext.localhost install-app erpnext`. For a manual install on Ubuntu 20.04 LTS, use `sudo python3 install.py --production --user Your_USERNAME --mariadb-version 10.5 --verbose`. Ensure to create a user with sudo rights and modify the install.py script if necessary. For Docker-based setups, refer to the Frappe Docker documentation for ARM-based setups.\nTo install ERPNext, follow the steps outlined in the README.md file on the GitHub repository. First, set up bench by following the installation steps and start the server with \"bench start\". Then, create a new site using \"bench new-site erpnext.localhost\". Next, get the ERPNext app with \"bench get-app\" and install it with \"bench --site erpnext.localhost install-app erpnext\". Finally, open the URL in your browser to see the app running. For more details, refer to the official documentation and Frappe School.\nTo install ERPNext, you can use the `frappe-bench` package from PyPI with `pip install frappe-bench`. This package is a command-line utility for installing, updating, and managing multiple sites for Frappe applications. It also fetches the required containers and sets up a default ERPNext instance. Alternatively, you can use `ws-frappe-cli` which is a command-line tool for setting up, configuring, and managing Frappe/ERPNext development environments. It provides an intuitive interface for common development tasks such as creating a new Frappe development environment, site creation, and app management. To install it, use `pip install ws-frappe-cli`.\n1. Setup bench by following the Installation Steps and start the server\n\n   ```\n   bench start \n   ```\n2. In a separate terminal window, run the following commands:\n\n   ```\n   # Create a new site bench new-site erpnext.localhost \n   ```\n3. Get the ERPNext app and install it\n\n   ```\n   # Get the ERPNext app bench get-app  # Install the app bench --site erpnext.localhost install-app erpnext \n   ```\n4. Open the URL ` in your browser, you should see the app running\n\n## Learning and Community [...] M\n# frappe-bench 5.27.0. Bench is a command-line utility that helps you to install, update, and manage multiple sites for Frappe applications on \\*nix systems for development and production. This script will install docker on your system and will fetch the required containers, setup bench and a default ERPNext instance. usage: easy-install.py build [-h] [-n PROJECT] [-i IMAGE] [-q] [-m HTTP_PORT] [-v VERSION] [-a APPS] [-s SITES] [-e EMAIL] [-p] [-r FRAPPE_PATH] [-b FRAPPE_BRANCH] [-j APPS_JSON] [\n# Initialize a new Frappe project (downloads compose, starts containers, creates bench & site). cwcli init my-project --port 10000 --install-erpnext. cwcli update my-project --app erpnext --build. cwcli init my-project --install-erpnext. Inspects a project to find all bench instances, sites, and apps within it. cwcli inspect frappe-one --update. cwcli inspect frappe-one --show-apps. # Open project with interactive prompt (uses cached bench path). cwcli open frappe-one --app erpnext --code-inside\nTitle: ws-frappe-cli \u00b7 PyPI\n# WS Frappe CLI. A command-line tool for ### 1. Create a new Frappe development environment:. ws setup my-erp-project. * Create a new project directory wi### `ws setup`. * `--force`: Force setup even if directory exists. ### `ws create-site`. * Create a Python virtual environment. * Initialize a new bench with Frappext development environment management. WS Frappe CLI simplifies the setup, configuration, and management of Frappe/ERPNext development environments. It pr\n1. Setup bench by following the Installation Steps and start the server\n\n   ```\n   bench start \n   ```\n2. In a separate terminal window, run the following commands:\n\n   ```\n   # Create a new site bench new-site erpnext.localhost \n   ```\n3. Get the ERPNext app and install it\n\n   ```\n   # Get the ERPNext app bench get-app  # Install the app bench --site erpnext.localhost install-app erpnext \n   ```\n4. Open the URL ` in your browser, you should see the app running\n\n## Learning and Community [...] M\n`sudo python3 install.py --production --user Your_USERNAME --mariadb-version 10.5 --verbose`\n\n`sudo python3 install.py --production --user Your_USERNAME --mariadb-version 10.5 --verbose`\n\nNote mariadb version 10.5 was used since default 10.2 is not supported by ubuntu 20.04\n\nLot of people is having this error but nobody was able to knows where does this error come from. Thanks to --verbose it will help troubleshooting.\n\nIn my case i had to tweak the following files to make it through. [...] Line\n## Repository files navigation\n\n\n\n### Containerized Installation\n\nUse docker to deploy ERPNext in production or for development of Frappe apps. See  for more details.\n\n### Manual Install\n\nThe Easy Way: our install script for bench will install all dependencies (e.g. MariaDB). See  for more details.\n\nNew passwords will be created for the ERPNext \"Administrator\" user, the MariaDB root user, and the frappe user (the script displays the passwords and saves them to ~/frappe\\_passwords.txt).\nFrappe School - Learn Frappe Framework and ERPNext from the various courses by the maintainers or from the community. Official documentation - Extensive documentation for... ERPNext is an open source ERP written on Python and has MySQL at the back-end and includes Financial Accounting, Inventory Management, CRM, Project Management, Human... Free and Open Source Enterprise Resource Planning (ERP) - frappe / erpnext Free and Open Source Enterprise Resource Planning (ERP) - erpnext / erpnext at dev\nAllows users to submit a Period Closing Voucher when the stock account balance and stock value differ by up to 1%, after reviewing and confirming the difference; larger differences still block submission. (#60193)\n Updates ERPNext\u2019s module dock with soft, single-color icons that adapt to light and dark themes and hover or active states, and gives CRM, Support, and Portal their own icons. (#60325) [...] ## Bug Fixes [...] ## Bug Fixes",
+      "errors": [],
+      "lines": [
+        "Looked up with Tavily: 9 results",
+        "Query: erpnext python setup install instructions https://github.com/frappe/erpnext site:github.com/frappe/erpnext",
+        "Query: erpnext python documentation install https://github.com/frappe/erpnext site:github.com/frappe/erpnext",
+        "Query: erpnext python install requirements https://pypi.org/project/erpnext/ https://github.com/frappe/erpnext site:pypi.org",
+        "Source: erpnext/README.md at develop \u00b7 frappe/erpnext \u00b7 GitHub \u2014 https://github.com/frappe/erpnext/blob/develop/README.md",
+        "Source: frappe-bench \u00b7 PyPI \u2014 https://pypi.org/project/frappe-bench/",
+        "Source: caffeinated-whale-cli \u00b7 PyPI \u2014 https://pypi.org/project/caffeinated-whale-cli/",
+        "Source: ws-frappe-cli \u00b7 PyPI \u2014 https://pypi.org/project/ws-frappe-cli/",
+        "Source: GitHub - frappe/erpnext: Free and Open Source Enterprise Resource Planning (ERP) \u00b7 GitHub \u2014 https://github.com/frappe/erpnext",
+        "Source: Easy install setup guide for Ubuntu 20.04 LTS  \u00b7 Issue #22125 \u00b7 frappe/erpnext \u00b7 GitHub \u2014 https://github.com/frappe/erpnext/issues/22125",
+        "Source: GitHub - frappe/erpnext-14: Free and Open Source Enterprise Resource Planning (ERP) \u00b7 GitHub \u2014 https://github.com/frappe/erpnext-14",
+        "Source: GitHub - frappe/erpnext: Free and Open Source Enterprise ... \u2014 https://github.com/frappe/erpnext/tree/develop",
+        "Source: Releases \u00b7 frappe/erpnext \u00b7 GitHub \u2014 https://github.com/frappe/erpnext/releases"
+      ]
+    },
+    "notes": [
+      "Setup check: GitHub token: present.",
+      "Setup check: Nebius token: present.",
+      "Setup check: free memory 8.1 GB (of 15.6 GB).",
+      "Setup check: free disk 88.2 GB.",
+      "Demo helper: git is installed.",
+      "Demo helper: python3 is installed.",
+      "Demo helper: uv is installed.",
+      "Looked up with Tavily: 9 results",
+      "Query: erpnext python setup install instructions https://github.com/frappe/erpnext site:github.com/frappe/erpnext",
+      "Query: erpnext python documentation install https://github.com/frappe/erpnext site:github.com/frappe/erpnext",
+      "Query: erpnext python install requirements https://pypi.org/project/erpnext/ https://github.com/frappe/erpnext site:pypi.org",
+      "Source: erpnext/README.md at develop \u00b7 frappe/erpnext \u00b7 GitHub \u2014 https://github.com/frappe/erpnext/blob/develop/README.md",
+      "Source: frappe-bench \u00b7 PyPI \u2014 https://pypi.org/project/frappe-bench/",
+      "Source: caffeinated-whale-cli \u00b7 PyPI \u2014 https://pypi.org/project/caffeinated-whale-cli/",
+      "Source: ws-frappe-cli \u00b7 PyPI \u2014 https://pypi.org/project/ws-frappe-cli/",
+      "Source: GitHub - frappe/erpnext: Free and Open Source Enterprise Resource Planning (ERP) \u00b7 GitHub \u2014 https://github.com/frappe/erpnext",
+      "Source: Easy install setup guide for Ubuntu 20.04 LTS  \u00b7 Issue #22125 \u00b7 frappe/erpnext \u00b7 GitHub \u2014 https://github.com/frappe/erpnext/issues/22125",
+      "Source: GitHub - frappe/erpnext-14: Free and Open Source Enterprise Resource Planning (ERP) \u00b7 GitHub \u2014 https://github.com/frappe/erpnext-14",
+      "Source: GitHub - frappe/erpnext: Free and Open Source Enterprise ... \u2014 https://github.com/frappe/erpnext/tree/develop",
+      "Source: Releases \u00b7 frappe/erpnext \u00b7 GitHub \u2014 https://github.com/frappe/erpnext/releases",
+      "Setup plan: the same packages on main and pr.",
+      "Setup plan: Unidecode is noted, installed with the project.",
+      "Setup plan: barcodenumber is noted, installed with the project.",
+      "Setup plan: rapidfuzz is noted, installed with the project.",
+      "Setup plan: holidays is noted, installed with the project.",
+      "Setup plan: googlemaps is noted, installed with the project.",
+      "Setup plan: plaid-python is noted, installed with the project.",
+      "Setup plan: python-youtube is noted, installed with the project.",
+      "Setup plan: pypng is noted, installed with the project.",
+      "Setup plan: mt-940 is noted, installed with the project.",
+      "Setup plan: pdfplumber is noted, installed with the project.",
+      "Setup plan: Python 3.14: switched the local sandbox to <home>",
+      "rerun, setup problem: main install failed after 3 tries.",
+      "Demo helper: setup failure already labelled; the probe was not rerun."
+    ],
+    "setup_plan": {
+      "packages": [
+        {
+          "requirement": "Unidecode~=1.4.0",
+          "name": "Unidecode",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "barcodenumber~=0.5.0",
+          "name": "barcodenumber",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "rapidfuzz~=3.14.3",
+          "name": "rapidfuzz",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "holidays~=0.87",
+          "name": "holidays",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "googlemaps~=4.10.0",
+          "name": "googlemaps",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "plaid-python~=7.2.1",
+          "name": "plaid-python",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "python-youtube~=0.9.9",
+          "name": "python-youtube",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "pypng~=0.20220715.0",
+          "name": "pypng",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "mt-940>=4.26.0",
+          "name": "mt-940",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "pdfplumber>=0.11.0",
+          "name": "pdfplumber",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        }
+      ],
+      "extra_reqs": [],
+      "python": {
+        "requested": "3.14",
+        "current": "3.12",
+        "applied": true,
+        "switch": "<home>",
+        "reason": "switched the local sandbox to <home>"
+      },
+      "system": [],
+      "refused": []
+    },
+    "setup": {
+      "label": "rerun, setup problem",
+      "counts_as_verdict": false,
+      "step": "main install",
+      "attempts": 3,
+      "detail": "install failed (2); see setup-main.log"
+    }
+  },
+  "chosen": {
+    "pr": 61257,
+    "head_sha": null,
+    "install": null,
+    "test_cmd": null
+  },
+  "sides": {
+    "comparison_basis": "merge-base vs PR head (no merge ref available)",
+    "main_sha": "7feeb6fae1727a96a6529a8caee3bff5c19cf335",
+    "pr_sha": "7feeb6fae1727a96a6529a8caee3bff5c19cf335"
+  },
+  "tested": {
+    "main": "develop @ 7feeb6fae172 (merge-base with the PR head)",
+    "pr": "PR head 7feeb6fae172"
+  },
+  "verdict": "could_not_verify",
+  "reason": "install failed (2); see setup-main.log",
+  "verdict_before_coverage_gate": "could_not_verify",
+  "reason_before_coverage_gate": "install failed (2); see setup-main.log",
+  "changed_lines_total": null,
+  "changed_lines_covered": null,
+  "coverage_gate": {
+    "kind": "python",
+    "changed": false,
+    "confidence": "lower",
+    "note": "coverage of the changed Python lines was NOT MEASURED (record predates the coverage gate: no coverage run exists for it, so this is not a measurement result)",
+    "measurement": "not measured: predates gate"
+  },
+  "agents": {
+    "status": "skipped",
+    "note": "advisory swarm is off",
+    "roles": []
+  },
+  "explanation": {
+    "status": "not yet wired",
+    "why": "advisory swarm is off"
+  },
+  "swarm_requested": false,
+  "operator_approval_requested": false,
+  "swarm": "off",
+  "operator_approval": "off",
+  "what_changed": {
+    "package_python_files": [
+      "erpnext/accounts/doctype/mode_of_payment/mode_of_payment.py",
+      "erpnext/accounts/doctype/mode_of_payment/test_mode_of_payment.py",
+      "erpnext/accounts/doctype/payment_entry/payment_entry.py",
+      "erpnext/accounts/doctype/payment_request/payment_request.py",
+      "erpnext/accounts/doctype/pos_invoice_merge_log/test_pos_invoice_merge_log.py",
+      "erpnext/accounts/doctype/sales_invoice/services/pos.py"
+    ],
+    "compiled_files": [],
+    "other_files": [
+      "erpnext/accounts/doctype/mode_of_payment/mode_of_payment.js"
+    ]
+  },
+  "duration_s": {
+    "total_wall": 18.3,
+    "tests": 0
+  },
+  "cost": {
+    "ai_calls": 0,
+    "failed_ai_calls": 0,
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "thinking_tokens": 0,
+    "cost_usd": 0.0,
+    "calls_without_usage": 0,
+    "ai_cost_usd": 0.0,
+    "cost_complete": true,
+    "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+    "compute_seconds": {
+      "total_wall": 18.3,
+      "tests": 0
+    },
+    "machine_usd_per_hour": 0.24,
+    "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+    "computer_cost_usd": 0.00122,
+    "total_cost_usd": 0.00122,
+    "swarm": {
+      "ai_calls": 0,
+      "failed_ai_calls": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "thinking_tokens": 0,
+      "cost_usd": 0.0,
+      "calls_without_usage": 0,
+      "ai_cost_usd": 0.0,
+      "cost_complete": true,
+      "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+    }
+  },
+  "head_at_report_sha": "7feeb6fae1727a96a6529a8caee3bff5c19cf335",
+  "head_moved_since_test": false
+}
