@@ -117,3 +117,63 @@ test('a failed PR install skips later steps; a stored record fills in the steps'
   expect(marks['setup-lookup'].detail).toBe('Found 2')
   expect(marks.retries.detail).toContain('installed foo 1.0')
 })
+
+test('python setup and dependency install are their own steps before the tests', () => {
+  const nodes = flowNodes(
+    [
+      { at: 1, stage: 'fetch_pr', detail: '' },
+      { at: 2, stage: 'setup_python', detail: 'Python 3.14: auto-fix: installed in the sandbox' },
+      { at: 3, stage: 'install_deps', detail: 'main install: installing the project' },
+      { at: 4, stage: 'install_main', detail: 'installing main side' },
+    ],
+    null,
+  )
+  const ids = nodes.map((node) => node.id)
+  expect(ids.indexOf('setup-python')).toBeLessThan(ids.indexOf('install-deps'))
+  expect(ids.indexOf('install-deps')).toBeLessThan(ids.indexOf('benchmark'))
+  const py = nodes.find((node) => node.id === 'setup-python')
+  expect(py?.label).toBe('Set up Python 3.14')
+  expect(py?.state).toBe('done')
+  expect(nodes.find((node) => node.id === 'install-deps')?.state).toBe('running')
+})
+
+test('a failed python setup stops everything after it', () => {
+  const marks = statesFromEvents([
+    { at: 1, stage: 'fetch_pr', detail: '' },
+    { at: 2, stage: 'setup_python', detail: 'failed: Python 3.14: not applied' },
+  ])
+  expect(marks['setup-python'].state).toBe('failed')
+  expect(marks['install-deps'].state).toBe('skipped')
+  expect(marks.benchmark.state).toBe('skipped')
+  const rec = statesFromRecord({
+    repo: 'a/b', pr: { number: 1 }, tested: { main: 'a', pr: 'b' },
+    demo_helper: { setup_plan: { python: { requested: '3.14', gate_failed: true, reason: 'not applied' } } },
+  })
+  expect(rec['setup-python'].state).toBe('failed')
+  expect(rec.verdict.state).toBe('skipped')
+})
+
+test('the dependency step lists what was installed and fixed', () => {
+  const marks = statesFromRecord({
+    repo: 'a/b', pr: { number: 1 }, tested: { main: 'a', pr: 'b' }, main_side: {}, pr_side: {}, freeze: {},
+    demo_helper: {
+      setup_plan: { python: { requested: '3.14', applied: true, reason: 'auto-fix: installed' }, extra_reqs: ['pytest>=7'] },
+      installs: [{ package: 'pytest', version: '8.3.0' }],
+      auto_fixes: ['Auto-fix: Python 3.14 was missing'],
+    },
+  })
+  expect(marks['setup-python'].state).toBe('done')
+  expect(marks['setup-python'].detail).toContain('Auto-fix')
+  expect(marks['install-deps'].state).toBe('done')
+  expect(marks['install-deps'].detail).toContain('pytest 8.3.0')
+})
+
+test('a setup problem fails the dependency step and skips the tests', () => {
+  const marks = statesFromRecord({
+    repo: 'a/b', pr: { number: 1 }, tested: { main: 'a', pr: 'b' }, main_side: {},
+    demo_helper: { setup: { counts_as_verdict: false, step: 'main install', detail: 'install failed' } },
+  })
+  expect(marks['install-deps'].state).toBe('failed')
+  expect(marks['install-deps'].detail).toContain('setup problem')
+  expect(marks.benchmark.state).toBe('skipped')
+})

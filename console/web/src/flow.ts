@@ -106,7 +106,9 @@ function blank(): Record<NodeId, Mark> {
 // closes whatever was running instead of everything to its left.
 function start(marks: Record<NodeId, Mark>, id: NodeId, detail = '') {
   for (const node of FLOW_ORDER) {
-    if (node !== id && marks[node].state === 'running') marks[node].state = 'done'
+    // Dependencies install as part of each side's install, so that step stays open until both sides are in.
+    const keepDeps = node === 'install-deps' && (id === 'install-base' || id === 'install-head' || id === 'probes')
+    if (node !== id && !keepDeps && marks[node].state === 'running') marks[node].state = 'done'
   }
   const keep = marks[id].detail
   const text = id === 'retries' && keep && detail ? `${keep}\n${detail}` : detail || keep
@@ -147,6 +149,17 @@ export function statesFromEvents(events: StageEvent[]): Record<NodeId, Mark> {
     else if (stage === 'retry') id = 'retries'
     else if (stage.startsWith('agent_')) id = 'swarm'
     else if (stage === 'verdict' || stage === 'report') id = 'verdict'
+    if (id === 'setup-python' && detail.startsWith('failed')) {
+      start(marks, id, '')
+      failRest(marks, id, detail.replace(/^failed:\s*/, ''))
+      last = id
+      continue
+    }
+    if (id === 'install-deps' && marks['install-deps'].state !== 'pending') {
+      const keep = marks['install-deps'].detail
+      marks['install-deps'].detail = keep && detail && !keep.includes(detail) ? `${keep}\n${detail}` : detail || keep
+      continue
+    }
     if (id) {
       if (id === 'tests' && marks['human-review'].state === 'pending') {
         marks['human-review'] = { state: 'skipped', detail: SKIP_TEXT['human-review'] || '' }
@@ -189,18 +202,47 @@ export function statesFromRecord(record: Record<string, unknown>): Record<NodeId
     marks[id] = { state, detail }
   }
   if (has(record, 'repo') || has(record, 'pr')) set('intake', 'done')
+  const plan = obj(helper.setup_plan)
+  const python = obj(plan.python)
+  const fixes = Array.isArray(helper.auto_fixes) ? (helper.auto_fixes as string[]) : []
   if (has(helper, 'setup_plan') || has(helper, 'tavily')) {
     set('setup-lookup', 'done', String(steps.setup_lookup || 'Looked up the project setup'))
-    set('setup-python', 'done', String(steps.setup_python || (record.python ? `Python ${record.python}` : '')))
-    set('install-deps', 'done', String(steps.install_deps || ''))
-  } else if (has(record, 'main_side') || has(record, 'freeze')) {
+  } else if (has(record, 'main_side') || has(record, 'freeze') || has(record, 'tested')) {
     set('setup-lookup', 'skipped', 'No setup lookup on this run')
-    set('setup-python', 'done', record.python ? `Python ${record.python}` : '')
-    set('install-deps', 'skipped', 'Installed with the project only')
+  }
+  const pyWhy = [String(steps.setup_python || python.reason || ''), ...fixes.filter((line) => /python/i.test(line))]
+    .filter(Boolean)
+    .join(' ')
+  if (python.requested) {
+    if (python.gate_failed) {
+      set('setup-python', 'failed', pyWhy)
+      for (const id of FLOW_ORDER.slice(FLOW_ORDER.indexOf('install-deps'))) set(id, 'skipped')
+      return marks
+    }
+    set('setup-python', python.applied ? 'done' : 'skipped', pyWhy)
+  } else if (has(record, 'tested') || has(record, 'sides') || has(record, 'main_side')) {
+    set('setup-python', 'done', pyWhy || 'The sandbox Python already meets the project')
+  }
+  const setup = obj(helper.setup)
+  if (setup.counts_as_verdict === false) {
+    set('install-deps', 'failed', `setup problem: ${String(setup.detail || setup.step || 'install failed')}`)
+    for (const id of FLOW_ORDER.slice(FLOW_ORDER.indexOf('benchmark'))) set(id, 'skipped')
+    return marks
+  }
+  if (has(record, 'main_side') || has(record, 'freeze') || has(record, 'pr_side')) {
+    const installs = Array.isArray(helper.installs) ? (helper.installs as Array<Record<string, unknown>>) : []
+    const reqs = Array.isArray(plan.extra_reqs) ? (plan.extra_reqs as string[]) : []
+    const listed = installs.length ? installs.map((row) => `${row.package} ${row.version}`).join(', ') : reqs.join(', ')
+    const other = fixes.filter((line) => !/python/i.test(line))
+    const text = listed
+      ? `Installed on both sides: ${listed}`
+      : String(steps.install_deps || 'Installed the project and its declared dependencies on both sides')
+    set('install-deps', 'done', [text, ...other].join(' '))
   }
   if (has(record, 'freeze') || has(record, 'main_side')) set('install-base', 'done')
   if (buildFailed) {
     set('install-head', 'failed', String(prSide.why))
+    set('install-deps', 'failed', String(prSide.why))
     for (const id of FLOW_ORDER.slice(FLOW_ORDER.indexOf('benchmark'))) set(id, 'skipped')
     if (typeof record.verdict === 'string' && record.verdict) set('verdict', 'done', record.verdict)
     return marks
@@ -260,13 +302,28 @@ export function flowNodes(
     }
   }
   const durations = durationText(record)
+  const version = pythonVersion(events, record)
   return FLOW_ORDER.map((id) => ({
     id,
     ...COPY[id],
+    label: id === 'setup-python' && version ? `Set up Python ${version}` : COPY[id].label,
     state: marks[id].state,
     detail: marks[id].detail,
     duration: durations[id] || '',
   }))
+}
+
+export function pythonVersion(
+  events: StageEvent[] | null | undefined,
+  record: Record<string, unknown> | null | undefined,
+): string {
+  const python = obj(obj(obj(record?.demo_helper).setup_plan).python)
+  if (typeof python.requested === 'string' && /^\d+\.\d+$/.test(python.requested)) return python.requested
+  for (const event of events || []) {
+    const match = event.stage === 'setup_python' ? /Python (\d+\.\d+)/.exec(event.detail || '') : null
+    if (match) return match[1]
+  }
+  return ''
 }
 
 export function edgeActive(from: NodeState, to: NodeState) {

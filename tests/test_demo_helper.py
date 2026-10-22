@@ -106,14 +106,15 @@ def test_python_and_system_hints_follow_the_sandbox(tmp_path):
     contree = demo_helper.build_setup_plan(
         REPO, [root], {"text": "apt-get install libhdf5-dev\n"}, "3.10", "contree", "widget",
         python_available=lambda version: "/usr/bin/python3.11", pypi=_pypi)
-    assert contree["python"]["switch"] is None and contree["python"]["applied"] is False
-    assert "Contree" in contree["python"]["reason"]
+    assert contree["python"]["switch"] is None and contree["python"]["applied"] is True
+    assert contree["python"]["provision"] == "3.11" and "auto-fix" in contree["python"]["reason"]
     applied = {item["name"]: item["applied"] for item in contree["system"]}
     assert applied == {"libxml2": True}
     assert "libhdf5-dev" not in json.dumps(contree)
     shell = demo_helper.contree_shell(contree)
     assert "apt-get install -y -qq libxml2" in shell
     assert "libhdf5-dev" not in shell and "pytest>=7" in shell
+    assert "uv python install -q 3.11" in shell and shell.index("uv python install") < shell.index("pytest>=7")
 
 
 def test_setup_plan_ignores_python_and_system_hints_from_tavily(tmp_path):
@@ -775,3 +776,141 @@ def test_live_tavily_call_is_recorded_without_the_key():
     assert got["live_call"] is True
     if not got["results"]:
         pytest.fail("live Tavily call returned no results")
+
+
+def test_missing_python_is_provisioned_automatically_on_the_local_sandbox(tmp_path):
+    root = _checkout(tmp_path, python=">=3.14")
+    asked = []
+    plan = demo_helper.build_setup_plan(
+        REPO, [root], {"text": ""}, "3.12", "local", "widget",
+        python_available=lambda _v: None, pypi=_pypi, provision=lambda v: asked.append(v) or v)
+    assert asked == ["3.14"]
+    assert plan["python"]["applied"] is True and plan["python"]["switch"] == "3.14"
+    assert any(line.startswith("Auto-fix: Python 3.14") for line in plan["lines"])
+    failed = demo_helper.build_setup_plan(
+        REPO, [root], {"text": ""}, "3.12", "local", "widget",
+        python_available=lambda _v: None, pypi=_pypi, provision=lambda v: None)
+    assert failed["python"]["applied"] is False and "not applied" in failed["python"]["reason"]
+
+
+def test_injected_lookup_never_downloads(tmp_path, monkeypatch):
+    root = _checkout(tmp_path, python=">=3.14")
+    monkeypatch.setattr(demo_helper, "provision_python", lambda v: (_ for _ in ()).throw(AssertionError("download")))
+    plan = demo_helper.build_setup_plan(REPO, [root], {"text": ""}, "3.12", "local", "widget",
+                                        python_available=lambda _v: None, pypi=_pypi)
+    assert plan["python"]["applied"] is False
+
+
+def test_python_version_file_and_ci_config_are_read(tmp_path):
+    root = tmp_path / "proj"
+    (root / ".github" / "workflows").mkdir(parents=True)
+    (root / ".python-version").write_text("3.14.7\n")
+    (root / ".github" / "workflows" / "ci.yml").write_text("with:\n  python-version: '3.13'\n")
+    (root / "tox.ini").write_text("[tox]\nenvlist = py311, py312\n")
+    specs, declared = demo_helper._python_from_checkout(root)
+    assert "==3.14.*" in specs
+    assert {"3.13", "3.11", "3.12"} <= set(declared)
+    assert demo_helper.choose_python(specs, declared, "3.12", lambda _v: None) == "3.14"
+
+
+def test_contree_python_shell_is_same_for_both_sides_and_rejects_bad_versions():
+    shell = demo_helper.contree_python_shell("3.14")
+    assert "sys.version_info[:2] == (3, 14)" in shell and "/usr/local/bin/python" in shell
+    assert "Auto-fix:" in shell
+    import pytest
+    for bad in ("3.14; rm -rf /", "latest", ""):
+        with pytest.raises(ValueError):
+            demo_helper.contree_python_shell(bad)
+
+
+def test_provision_python_strips_keys_and_validates(monkeypatch):
+    monkeypatch.setenv("NEBIUS_API_KEY", "x")
+    monkeypatch.setenv("GITHUB_POC_TOKEN", "y")
+    seen = {}
+
+    def runner(argv, env):
+        seen["argv"], seen["env"] = argv, env
+        return 0
+    got = demo_helper.provision_python("3.14", which=lambda _n: "/usr/bin/uv", runner=runner, install_dir="/x")
+    assert got == "3.14" and seen["argv"] == ["/usr/bin/uv", "python", "install", "-q", "3.14"]
+    assert "NEBIUS_API_KEY" not in seen["env"] and "GITHUB_POC_TOKEN" not in seen["env"]
+    assert seen["env"]["UV_PYTHON_INSTALL_DIR"] == "/x"
+    assert demo_helper.provision_python("3.14;id", which=lambda _n: "/usr/bin/uv", runner=runner) is None
+    assert demo_helper.provision_python("3.14", which=lambda _n: None, runner=runner) is None
+    assert demo_helper.provision_python("3.14", which=lambda _n: "/usr/bin/uv", runner=lambda a, e: 1,
+                                        install_dir="/x") is None
+
+
+def test_wrong_python_reads_install_errors():
+    assert demo_helper.wrong_python("error: the requested interpreter does not satisfy requires-python >=3.14.7") == "3.14"
+    assert demo_helper.wrong_python("No interpreter found for Python 3.13 in managed installations") == "3.13"
+    assert demo_helper.wrong_python("error: could not build wheels for lxml") is None
+
+
+def test_study_runs_keep_the_old_python_behaviour(tmp_path):
+    root = _checkout(tmp_path, python=">=3.14")
+    called = []
+    plan = demo_helper.build_setup_plan(REPO, [root], {"text": ""}, "3.12", "contree", "widget",
+                                        python_available=lambda _v: None, pypi=_pypi,
+                                        provision=lambda v: called.append(v) or v, auto_python=False)
+    assert called == [] and plan["python"]["applied"] is False and "rule" not in plan["python"]
+    assert "uv python install" not in demo_helper.contree_shell(plan)
+
+
+def test_missing_python_is_a_hard_gate_with_the_rule_recorded(tmp_path):
+    root = _checkout(tmp_path, python=">=3.14")
+    plan = demo_helper.build_setup_plan(REPO, [root], {"text": ""}, "3.12", "local", "widget",
+                                        python_available=lambda _v: None, pypi=_pypi, provision=lambda v: None)
+    assert plan["python"]["gate_failed"] is True
+    assert any("Python rule:" in line and "stops as a setup problem" in line for line in plan["lines"])
+
+
+def test_provision_ignores_mirrors(monkeypatch):
+    monkeypatch.setenv("UV_PYTHON_INSTALL_MIRROR", "https://evil.example/")
+    monkeypatch.setenv("UV_PYTHON_DOWNLOADS_JSON_URL", "https://evil.example/x.json")
+    seen = {}
+    demo_helper.provision_python("3.14", which=lambda _n: "/usr/bin/uv",
+                                 runner=lambda a, e: seen.update(e) or 0, install_dir="/x")
+    assert "UV_PYTHON_INSTALL_MIRROR" not in seen and "UV_PYTHON_DOWNLOADS_JSON_URL" not in seen
+    shell = demo_helper.contree_python_shell("3.14")
+    assert "unset UV_PYTHON_INSTALL_MIRROR" in shell and demo_helper.UV_PIN in shell
+
+
+def test_interpreter_the_sandbox_cannot_see_is_replaced_by_a_managed_one(tmp_path, monkeypatch):
+    root = _checkout(tmp_path, python=">=3.14")
+    monkeypatch.setattr(demo_helper, "_sandbox_can_see", lambda p: str(p).startswith("/usr/"))
+    plan = demo_helper.build_setup_plan(REPO, [root], {"text": ""}, "3.12", "local", "widget",
+                                        python_available=lambda _v: "/home/u/.local/bin/python3.14", pypi=_pypi,
+                                        provision=lambda v: v)
+    assert plan["python"]["switch"] == "3.14" and plan["python"]["auto_fix"] is True
+
+
+def test_sides_with_no_shared_python_stop_as_a_setup_problem(tmp_path):
+    main = _checkout(tmp_path / "m", python="<3.12")
+    pr = _checkout(tmp_path / "p", python=">=3.13")
+    plan = demo_helper.build_setup_plan(REPO, [main, pr], {"text": ""}, "3.12", "contree", "widget",
+                                        python_available=lambda _v: None, pypi=None, provision=False)
+    py = plan["python"]
+    assert py["gate_failed"] is True and py["requested"] is None
+    assert py["versions"]["main"]["requirement"] == "<3.12" and py["versions"]["pr"]["requirement"] == ">=3.13"
+    assert "setup problem" in py["reason"] and "<3.12" in py["reason"] and ">=3.13" in py["reason"]
+    assert "uv python install" not in demo_helper.contree_shell(plan)
+
+
+def test_not_a_package_and_deps_only_plan(tmp_path):
+    assert demo_helper.not_a_package("error: Multiple top-level packages discovered in a flat-layout: ['ee']")
+    assert not demo_helper.not_a_package("error: could not resolve numpy")
+    app = tmp_path / "app"
+    app.mkdir()
+    (app / "pyproject.toml").write_text('[project]\nname = "app"\ndependencies = ["django"]\n')
+    assert demo_helper.deps_only_plan(app) == {"kind": "uv-sync", "frozen": False, "source": "pyproject.toml"}
+    (app / "uv.lock").write_text("")
+    assert demo_helper.deps_only_plan(app)["frozen"] is True
+    reqs = tmp_path / "reqs"
+    reqs.mkdir()
+    (reqs / "requirements.txt").write_text("django\n")
+    (reqs / "requirements-dev.txt").write_text("pytest\n")
+    assert demo_helper.deps_only_plan(reqs)["files"] == ["requirements-dev.txt", "requirements.txt"]
+    empty = tmp_path / "empty"
+    empty.mkdir()
+    assert demo_helper.deps_only_plan(empty) is None

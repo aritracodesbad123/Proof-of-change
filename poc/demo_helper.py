@@ -800,11 +800,32 @@ def _python_from_checkout(root: Path) -> tuple[list[str], list[str]]:
             specs.append(parser.get("options", "python_requires"))
         if parser is not None and parser.has_option("metadata", "classifiers"):
             declared.extend(_classifier_versions(parser.get("metadata", "classifiers")))
+    pinned = _read(root / ".python-version").strip().splitlines()
+    if pinned and re.fullmatch(r"\d+\.\d+(\.\d+)?", pinned[0].strip()):
+        minor = _minor(pinned[0].strip())
+        if minor:
+            specs.append(f"=={minor[0]}.{minor[1]}.*")
+    for name in ("tox.ini", "noxfile.py"):
+        declared.extend(_ci_versions(_read(root / name)))
+    workflows = root / ".github" / "workflows"
+    if workflows.is_dir():
+        for wf in sorted(workflows.glob("*.y*ml"))[:20]:
+            declared.extend(_ci_versions(_read(wf)))
     setup_py = _read(root / "setup.py")
     for match in re.finditer(r"""python_requires\s*=\s*['\"]([^'\"]+)['\"]""", setup_py):
         specs.append(match.group(1))
     declared.extend(_classifier_versions(setup_py))
     return specs, declared
+
+
+def _ci_versions(text: str) -> list[str]:
+    """Python versions a test or CI config names (python-version: "3.14", py314, python3.14)."""
+    found: list[str] = []
+    for match in re.finditer(r"(?:python-version\W+|python|\bpy)(3)\.?(1\d|[6-9])\b", text or ""):
+        version = f"{match.group(1)}.{match.group(2)}"
+        if version not in found:
+            found.append(version)
+    return found
 
 
 def _python_from_pypi(info) -> tuple[list[str], list[str]]:
@@ -972,7 +993,38 @@ def pypi_links_back(info, owner: str, repo: str) -> bool:
     return any(github_repo_url(value, owner, repo) for value in values)
 
 
-def _python_decision(requested: str | None, current: str, sandbox: str, python_available, requirement: str = "") -> dict:
+def _sandbox_can_see(path: str) -> bool:
+    """True when the local sandbox mounts this interpreter (/usr is mounted read-only; home folders are not)."""
+    try:
+        from guardrails import sandbox
+        if not sandbox.enabled():
+            return True
+    except Exception:  # noqa: BLE001
+        pass
+    real = os.path.realpath(str(path))
+    return real.startswith("/usr/") or not os.path.isabs(str(path))
+
+
+def retry_python(version: str, *, find=None, provision=None, can_see=None) -> str | None:
+    """Interpreter for the wrong-Python install retry: one the local sandbox can see, or one we provisioned.
+
+    A python{version} on PATH outside the sandbox mounts (a home folder, a venv link) is skipped, because the
+    sandboxed `uv venv -p` would fail with "No interpreter found"."""
+    find = find or find_python
+    provision = provision or provision_python
+    can_see = can_see or _sandbox_can_see
+    path = find(version)
+    if path and can_see(path):
+        return path
+    return provision(version)
+
+
+PYTHON_RULE = ("one Python version is used on both sides: the lowest version that meets the requirements of both "
+               "main and the pull request; if none meets both, the check stops as a setup problem and records both")
+
+
+def _python_decision(requested: str | None, current: str, sandbox: str, python_available, requirement: str = "",
+                     provision=None, auto_python: bool = True) -> dict:
     if not requested:
         return {"requested": None, "current": current, "applied": False, "switch": None,
                 "reason": "no Python version was requested"}
@@ -982,13 +1034,27 @@ def _python_decision(requested: str | None, current: str, sandbox: str, python_a
         met = requirement or requested
         return {"requested": requested, "current": current, "applied": True, "switch": None,
                 "reason": f"Python {current} already meets {met}"}
-    if sandbox == "contree":
+    if sandbox == "contree" and not auto_python:
         return {"requested": requested, "current": current, "applied": False, "switch": None,
                 "reason": "not applied: the Contree image keeps its Python"}
+    if sandbox == "contree":
+        return {"requested": requested, "current": current, "applied": True, "switch": None,
+                "provision": requested, "auto_fix": True,
+                "reason": (f"auto-fix: the project needs Python {requested} and the sandbox image has "
+                           f"{current or 'another version'}, so Python {requested} is installed in the sandbox "
+                           "during setup, the same on main and pr")}
     path = python_available(requested) if python_available else None
+    if path and auto_python and not _sandbox_can_see(path):
+        path = None   # an interpreter outside /usr is not mounted in the sandbox; use a managed one instead
     if path:
         return {"requested": requested, "current": current, "applied": True, "switch": path,
                 "reason": f"switched the local sandbox to {path}"}
+    got = provision(requested) if provision else None
+    if got:
+        return {"requested": requested, "current": current, "applied": True, "switch": got,
+                "provision": requested, "auto_fix": True,
+                "reason": (f"auto-fix: Python {requested} was missing, so it was downloaded and installed "
+                           "for this check, the same on main and pr")}
     return {"requested": requested, "current": current, "applied": False, "switch": None,
             "reason": f"not applied: python{requested} is not available to the local sandbox"}
 
@@ -1009,8 +1075,11 @@ def _system_decision(names: list[str], sandbox: str) -> list[dict]:
 
 
 def build_setup_plan(repo: str, checkouts, tavily, current_python: str, sandbox: str, self_dist: str = "",
-                     python_available=None, pypi=None, allow_lookup_packages: bool = True) -> dict:
+                     python_available=None, pypi=None, allow_lookup_packages: bool = True,
+                     provision=None, auto_python: bool = True) -> dict:
     """One plan for both sides. Only project-listed packages and link-back suggestions are added."""
+    if python_available is not None and provision is None:
+        provision = False   # an injected interpreter lookup (tests) never downloads anything
     python_available = find_python if python_available is None else python_available
     pypi = fetch_pypi if pypi is None else pypi
     packages: list[dict] = []
@@ -1045,13 +1114,33 @@ def build_setup_plan(repo: str, checkouts, tavily, current_python: str, sandbox:
             refused.append({"name": name, "reason": "its PyPI page does not link to this GitHub repository"})
     spec_texts, declared_versions = _python_requirement(checkouts, repo, self_dist, pypi)
     requested = choose_python(spec_texts, declared_versions, current_python or "", python_available)
+    conflict = None
+    if auto_python and requested is None and spec_texts and len(list(checkouts or [])) > 1:
+        sides = {}
+        for side, checkout in zip(SIDES, list(checkouts)[:2]):
+            side_specs, side_declared = _python_requirement([checkout], repo, self_dist, None)
+            sides[side] = {"requirement": ", ".join(side_specs) or "none",
+                           "version": choose_python(side_specs, side_declared, current_python or "", None)}
+        conflict = sides
     requirement = ", ".join(dict.fromkeys(item.strip() for item in spec_texts if item and item.strip()))
     system_names = []
     for checkout in checkouts or []:
         for name in _apt_from_tree(Path(checkout)):
             if name not in system_names:
                 system_names.append(name)
-    python = _python_decision(requested, current_python or "", sandbox or "local", python_available, requirement)
+    python = _python_decision(requested, current_python or "", sandbox or "local", python_available, requirement,
+                              provision=(provision_python if provision is None else (provision or None))
+                              if auto_python else None, auto_python=auto_python)
+    if auto_python and requested:
+        python["rule"] = PYTHON_RULE
+        python["gate_failed"] = not python.get("applied")
+    if conflict:
+        python = {"requested": None, "current": current_python or "", "applied": False, "switch": None,
+                  "rule": PYTHON_RULE, "gate_failed": True, "versions": conflict,
+                  "reason": (f"setup problem: main needs Python {conflict['main']['requirement']} "
+                             f"(would use {conflict['main']['version'] or 'none'}) and the pull request needs "
+                             f"{conflict['pr']['requirement']} (would use {conflict['pr']['version'] or 'none'}); "
+                             "no single version meets both, so nothing was tested")}
     system = _system_decision(system_names, sandbox or "local")
     extra = [item["requirement"] for item in packages if item["action"] == "install"]
     lines = ["Setup plan: the same packages on main and pr."]
@@ -1062,6 +1151,12 @@ def build_setup_plan(repo: str, checkouts, tavily, current_python: str, sandbox:
             lines.append(f"Setup plan: {item['name']} is noted, installed with the project.")
     if requested:
         lines.append(f"Setup plan: Python {requested}: {python['reason']}")
+    if conflict:
+        lines.append(f"Setup plan: Python: {python['reason']}")
+    if python.get("auto_fix"):
+        lines.append(f"Auto-fix: Python {requested} is set up automatically for this check (no flag needed).")
+    if python.get("rule"):
+        lines.append(f"Setup plan: Python rule: {python['rule']}.")
     for item in system:
         lines.append(f"Setup plan: system package {item['name']}: {item['reason']}")
     for item in refused:
@@ -1124,6 +1219,9 @@ def contree_shell(plan: dict | None) -> str:
     if not plan:
         return ""
     lines = []
+    wanted = (plan.get("python") or {}).get("provision")
+    if wanted and re.fullmatch(r"\d+\.\d+", str(wanted)) and (plan.get("python") or {}).get("switch") is None:
+        lines.append(contree_python_shell(str(wanted)))
     apt = [item["name"] for item in plan.get("system") or [] if item.get("applied") and safe_apt_name(item["name"])]
     if apt:
         quoted = " ".join(shlex_quote(name) for name in apt)
@@ -1132,6 +1230,116 @@ def contree_shell(plan: dict | None) -> str:
     if reqs:
         lines.append("python -m pip install -q " + " ".join(shlex_quote(req) for req in reqs))
     return "\n".join(lines)
+
+
+# uv verifies each managed CPython download against the SHA-256 in its own built-in manifest.
+UV_PIN = "uv==0.13.1"
+_MIRROR_VARS = ("UV_PYTHON_INSTALL_MIRROR", "UV_PYTHON_DOWNLOADS_JSON_URL", "UV_PYPY_INSTALL_MIRROR")
+
+
+def contree_python_shell(version: str) -> str:
+    """Setup shell (network on, before tests) that makes `python` the wanted version in a Contree checkpoint.
+
+    uv downloads a standalone CPython into /opt/poc-python. A small wrapper puts it first on PATH as
+    `python`, so every later step (pip installs, pytest, probes) uses it. The PR checkpoint is forked
+    from main, so both sides use the same interpreter. No-op when `python` already is that version.
+    """
+    if not re.fullmatch(r"\d+\.\d+", version or ""):
+        raise ValueError(f"not a Python version: {version!r}")
+    major, minor = version.split(".")
+    return (
+        f"if ! python -c 'import sys; sys.exit(0 if sys.version_info[:2] == ({major}, {minor}) else 1)'; then\n"
+        f"  echo 'Auto-fix: installing Python {version} for this check (the project needs it)'\n"
+        "  unset UV_PYTHON_INSTALL_MIRROR UV_PYTHON_DOWNLOADS_JSON_URL UV_PYPY_INSTALL_MIRROR\n"
+        f"  python -m pip install -q {UV_PIN}\n"
+        f"  UV_PYTHON_INSTALL_DIR=/opt/poc-python/install python -m uv python install -q {version}\n"
+        f"  UV_PYTHON_INSTALL_DIR=/opt/poc-python/install python -m uv venv -q --seed -p {version} /opt/poc-python/venv\n"
+        "  printf '#!/bin/sh\\nexec /opt/poc-python/venv/bin/python \"$@\"\\n' > /usr/local/bin/python\n"
+        "  chmod 0755 /usr/local/bin/python\n"
+        "  hash -r\n"
+        f"  python -c 'import sys; assert sys.version_info[:2] == ({major}, {minor}), sys.version'\n"
+        "fi"
+    )
+
+
+def provision_python(version: str, *, which=None, runner=None, install_dir: str | None = None) -> str | None:
+    """Install a uv-managed CPython for the local sandbox. Runs in the orchestrator before any project code.
+
+    Returns the version string for `uv venv -p` (the managed install directory is mounted read-only in
+    the sandbox), or None when it cannot be installed. Only the interpreter is downloaded; project
+    packages still come from the project's own files.
+    """
+    if not re.fullmatch(r"\d+\.\d+", version or ""):
+        return None
+    which = which or shutil.which
+    uv = which("uv")
+    if not uv:
+        return None
+    if runner is None:
+        import subprocess
+
+        def runner(argv, env):
+            try:
+                return subprocess.run(argv, env=env, capture_output=True, text=True, timeout=900).returncode
+            except (OSError, subprocess.SubprocessError):
+                return 1
+    env = dict(os.environ)
+    if install_dir is None:
+        try:
+            from guardrails.sandbox import python_install_dir
+            install_dir = python_install_dir()
+        except Exception:  # noqa: BLE001
+            install_dir = None
+    if install_dir:
+        env["UV_PYTHON_INSTALL_DIR"] = install_dir
+    for key in _MIRROR_VARS:   # only uv's own managed builds, never a mirror or a list a caller supplies
+        env.pop(key, None)
+    for key in list(env):   # no keys reach the download
+        if any(word in key.upper() for word in ("TOKEN", "KEY", "SECRET", "PASSWORD")):
+            env.pop(key)
+    if runner([uv, "python", "install", "-q", version], env) != 0:
+        return None
+    return version
+
+
+_NOT_A_PACKAGE = re.compile(
+    r"multiple top-level packages discovered in a flat-layout|failed to build `|does not appear to be a python project|"
+    r"neither 'setup\.py' nor 'pyproject\.toml' found|no `project` table found|package-mode = false", re.I)
+
+
+def not_a_package(log_text: str) -> bool:
+    """True when an install failed because the project itself cannot be built as a package."""
+    return bool(_NOT_A_PACKAGE.search(log_text or ""))
+
+
+def deps_only_plan(checkout) -> dict | None:
+    """How to install only what the project declares, without building the project itself.
+
+    uv.lock (with pyproject): ``uv sync --no-install-project --frozen``. pyproject with [project]
+    dependencies: ``uv sync --no-install-project``. Otherwise requirements*.txt files. None when the
+    project declares nothing usable.
+    """
+    root = Path(checkout)
+    pyproject = _pyproject(root / "pyproject.toml")
+    if (root / "pyproject.toml").is_file() and isinstance(pyproject.get("project"), dict):
+        frozen = (root / "uv.lock").is_file()
+        return {"kind": "uv-sync", "frozen": frozen,
+                "source": "uv.lock" if frozen else "pyproject.toml"}
+    reqs = sorted(p.name for p in root.glob("requirements*.txt") if p.is_file())
+    if reqs:
+        return {"kind": "requirements", "files": reqs, "source": ", ".join(reqs)}
+    return None
+
+
+_WRONG_PYTHON = re.compile(
+    r"(?:requires-python|requires a different python|no interpreter found|python_requires|"
+    r"does not satisfy|not compatible with python|requires python)[^\n]*?(3\.(?:1\d|[6-9]))", re.I)
+
+
+def wrong_python(log_text: str) -> str | None:
+    """The Python minor version an install error says it needs, or None when the error is something else."""
+    match = _WRONG_PYTHON.search(log_text or "")
+    return match.group(1) if match else None
 
 
 def install_system_both(run_side, name: str) -> dict:
@@ -1207,6 +1415,14 @@ def note_installs(rec: dict, logs: list[dict]) -> None:
     for row in logs:
         notes.append(f"Installed {row['package']} {row['version']} from {row['source']} ({row['reason']}) on main and pr.")
     block["notes"] = _unique(notes)
+
+
+def note_auto_fix(rec: dict, line: str) -> None:
+    """Record one automatic setup fix in plain words; it shows in the report notes."""
+    block = rec.setdefault("demo_helper", {})
+    block.setdefault("auto_fixes", []).append(line)
+    block["notes"] = _unique([*(block.get("notes") or []), line])
+    announce([line])
 
 
 def is_setup_failure(detail: str) -> bool:
