@@ -1,6 +1,6 @@
 # Benchmark runner with a tests-only arm and a tests+probes arm
 
-**Status:** proposed
+**Status:** accepted
 
 ## What changed
 
