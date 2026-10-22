@@ -759,7 +759,7 @@ def distinct_base(src, env, log: Path, item: dict, res: dict) -> dict | None:
     1. merge-base of the PR's recorded base (GitHub base.sha) and the head, so every PR commit is compared and no
        later base-branch commit is pulled in;
     2. if that merge-base is the head itself, the first parent of the PR's merge commit (GitHub merge_commit_sha);
-    3. base.sha itself.
+    3. base.sha itself, only when the PR head is not already an ancestor of base.sha.
     The first candidate whose tree differs from the PR side wins. Returns an error dict ('unsupported: ...') when no
     distinct base exists."""
     main, pr = res.get("main_sha"), res.get("pr_sha")
@@ -772,18 +772,25 @@ def distinct_base(src, env, log: Path, item: dict, res: dict) -> dict | None:
         run(["git", "-C", src, "fetch", "-q", "origin", base_sha], log, env=env, timeout=300)
         mb = _git_out(src, env, "merge-base", base_sha, head)
         if mb and mb != head:
-            cands.append((mb, "merge-base of PR base (GitHub base.sha) and PR head vs PR head"))
+            cands.append((mb, "merge-base of PR base (GitHub base.sha) and PR head vs PR head "
+                              "(the first choice of main side was the PR code itself)"))
         elif mb == head and merge_sha:
             run(["git", "-C", src, "fetch", "-q", "origin", merge_sha], log, env=env, timeout=300)
             first = _git_out(src, env, "rev-parse", "--verify", "-q", f"{merge_sha}^1")
             if first:
-                cands.append((first, "first parent of the PR merge commit vs PR head"))
-        cands.append((base_sha, "PR base (GitHub base.sha) vs PR head"))
+                cands.append((first, "first parent of the PR merge commit vs PR head "
+                                     "(the PR head is already in its recorded base: PR merged)"))
+        # base.sha as-is only when the head is not already inside it; otherwise it would bring in base-branch
+        # commits that are not part of the PR (for example a closed, unmerged PR whose base moved on).
+        inside = subprocess.run(["git", "-C", src, "merge-base", "--is-ancestor", head, base_sha], env=env,
+                                capture_output=True, text=True).returncode == 0
+        if not inside:
+            cands.append((base_sha, "PR base (GitHub base.sha) vs PR head (no merge-base with the PR head was found)"))
     pr_tree = _tree(src, env, pr)
     for sha, basis in cands:
         t = _tree(src, env, sha)
         if t and t != pr_tree:
-            res |= {"main_sha": sha, "comparison_basis": basis + " (merge-base equals the PR head: PR already merged)"}
+            res |= {"main_sha": sha, "comparison_basis": basis}
             return None
     return {"ok": False, "why": "unsupported: no base commit distinct from the PR head was found, so main and PR "
                                 "would be the same code; the check stops instead of comparing identical commits"}

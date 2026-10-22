@@ -15,6 +15,7 @@ Cases where a check ends as could not verify. Setup limits are also written into
 - If the wheel check itself fails for a network or uv reason, every pull request of that project is skipped in that run.
 - The wheel check changes which pull requests the daily run selects, so daily results from before and after it are not drawn from the same pool.
 - Each product check that measures coverage inside Contree leaves one saved Contree image behind (the coverage run is kept so its report file can be read back in pieces), and that image is not deleted afterwards. Reading the report back has one overall time limit for all pieces together; if it runs out, coverage stays 'not measured' and the check stays COULD NOT VERIFY.
+- A pull request that was merged by rebase, and whose recorded base already contains its head, is compared from the parent of GitHub's merge commit, which is its last rebased commit. Only that last commit is compared, not the earlier commits of the pull request. A closed pull request whose head is already inside its recorded base and that has no readable merge commit ends as COULD NOT VERIFY.
 
 ## OS packages in the local sandbox (bubblewrap)
 

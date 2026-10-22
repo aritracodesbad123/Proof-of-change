@@ -97,6 +97,34 @@ def test_merge_base_equal_to_head_uses_merge_commit_first_parent(tmp_path):
     assert "first parent of the PR merge commit" in res["comparison_basis"]
 
 
+def test_head_inside_base_sha_without_merge_commit_is_unsupported(tmp_path):
+    """Closed PR, no merge commit: base.sha (L after a fast-forward to the head) already contains the head, so using
+    it would compare later base commits that are not part of the PR. Stop instead."""
+    repo, s = _two_commit_repo(tmp_path)
+    _git(repo, "checkout", "-q", "-b", "ff", s["C2"])
+    (repo / "after.py").write_text("after = 1\n")
+    _git(repo, "add", ".")
+    _git(repo, "commit", "-q", "-m", "later base commit after the head")
+    ahead = _git(repo, "rev-parse", "HEAD")
+    res = {"main_sha": s["C2"], "pr_sha": s["C2"], "comparison_basis": "x"}
+    for merge in (None, "f" * 40):  # no merge commit, or a merge commit that cannot be fetched
+        item = {"head_sha": s["C2"], "base_sha": ahead, "merge_commit_sha": merge}
+        bad = dr.distinct_base(repo, dr.base_env(tmp_path / "h"), tmp_path / "g.log", item, res)
+        assert bad and bad["why"].startswith("unsupported:") and res["main_sha"] == s["C2"]
+
+
+def test_basis_names_the_reason(tmp_path):
+    repo, s = _two_commit_repo(tmp_path)
+    res = {"main_sha": s["C2"], "pr_sha": s["C2"], "comparison_basis": "x"}
+    dr.distinct_base(repo, dr.base_env(tmp_path / "h"), tmp_path / "g.log",
+                     {"head_sha": s["C2"], "base_sha": s["L"]}, res)
+    assert "PR merged" not in res["comparison_basis"] and "merge-base" in res["comparison_basis"]
+    res = {"main_sha": s["C2"], "pr_sha": s["C2"], "comparison_basis": "x"}
+    dr.distinct_base(repo, dr.base_env(tmp_path / "h"), tmp_path / "g.log",
+                     {"head_sha": s["C2"], "base_sha": s["M"], "merge_commit_sha": s["M"]}, res)
+    assert "PR merged" in res["comparison_basis"]
+
+
 def test_no_head_parent_fallback(tmp_path):
     repo, s = _two_commit_repo(tmp_path)
     res = {"main_sha": s["C2"], "pr_sha": s["C2"], "comparison_basis": "x"}
