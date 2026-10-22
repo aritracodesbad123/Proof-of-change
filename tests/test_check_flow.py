@@ -181,16 +181,19 @@ def test_the_no_hardcoding_scan_catches_a_planted_map(tmp_path):
     assert len(hits) >= 3 and all(h.startswith("poc/planted.py:") for h in hits)
 
 
-def test_system_gap_installs_proposed_packages_on_both_sides_and_reruns(monkeypatch):
+def test_system_gap_does_not_install_an_os_package_even_when_that_is_allowed(monkeypatch):
     monkeypatch.delenv("POC_PROGRESS_PATH", raising=False)
     asked = []
     rec = {"verdict": "could_not_verify", "reason": "ImportError: liba.so.1: cannot open shared object file"}
-    demo_helper.retry_unverified(rec, lambda: {"verdict": "verified", "reason": "ok"}, lambda s, r: (True, "1"),
+    demo_helper.retry_unverified(rec, lambda: asked.append("rerun") or {"verdict": "verified", "reason": "ok"},
+                                 lambda s, r: (True, "1"),
                                  [], "", None, REPO, True, install_system=lambda n: asked.append(n) or True,
                                  apt_check=YES, project_text="RUN apt-get update && apt-get install -y liba-dev")
-    assert asked == ["liba-dev"]
-    t = rec["demo_helper"]["gap_retry"]["tries"][0]
-    assert t["installed"] == ["system package liba-dev"] and t["sources"] == ["project install docs"]
+    assert asked == []
+    assert rec["verdict"] == "could_not_verify"
+    lim = rec["demo_helper"]["limitations"][0]
+    assert lim["needed"] == ["liba.so.1"] and "liba.so.1" in lim["error"]
+    assert rec["demo_helper"]["gap_retry"]["reran"] is False
 
 
 def test_bubblewrap_records_a_limitation_with_packages_and_the_real_error(monkeypatch):
@@ -199,8 +202,8 @@ def test_bubblewrap_records_a_limitation_with_packages_and_the_real_error(monkey
     demo_helper.retry_unverified(rec, lambda: {}, lambda s, r: (True, "1"), [], "", None, REPO, False,
                                  apt_check=YES, project_text="apt-get install liba-dev")
     lim = rec["demo_helper"]["limitations"][0]
-    assert lim["needed"] == ["liba-dev"] and "liba.so.1" in lim["error"]
-    assert "cannot install OS packages" in lim["plain"]
+    assert lim["needed"] == ["liba.so.1"] and "liba.so.1" in lim["error"]
+    assert "does not install system libraries" in lim["plain"]
     assert rec["verdict"] == "could_not_verify"
 
 
@@ -240,7 +243,7 @@ def test_rule_b_os_package_must_exist_in_the_distro_archive():
                                  [], "", None, REPO, True, install_system=lambda n: asked.append(n) or True,
                                  apt_check=lambda n: False, project_text="apt-get install liba-dev")
     assert asked == [] and rec["verdict"] == "could_not_verify"
-    assert any("not found in the distro archive" in n for n in rec["demo_helper"]["notes"])
+    assert rec["demo_helper"]["limitations"][0]["needed"] == ["liba.so.5"]
 
 
 def test_rule_b_python_package_must_link_back_on_pypi():
@@ -308,6 +311,35 @@ def test_install_docs_come_from_main_only_and_a_pr_change_is_flagged(tmp_path, m
     from reports import pr_report
     rows = [r for r in pr_report.checks(rec | {"verdict": "could_not_verify"}) if r[0].startswith("Install docs")]
     assert rows and rows[0][1] == "WARN" and "Dockerfile" in rows[0][2]
+
+
+def test_product_check_on_contree_does_not_produce_an_os_install(tmp_path, monkeypatch):
+    from types import SimpleNamespace
+
+    import ops.daily_run as dr
+    monkeypatch.delenv("POC_PROGRESS_PATH", raising=False)
+    main, pr = tmp_path / "side-main", tmp_path / "side-pr"
+    main.mkdir()
+    pr.mkdir()
+    (main / "pyproject.toml").write_text('[project]\nname = "widget"\ndependencies = []\n')
+    (main / "apt.txt").write_text("libxml2\n")
+    (pr / "apt.txt").write_text("libpr0\n")
+    a = SimpleNamespace(pr=["x"], product_check=True, python="3.12", sandbox_backend="contree", bench=None,
+                        batch_fix_system={f"{REPO}#5": ["zlib1g"]})
+    rec = {"pr": {"number": 5}, "files": {"all": []}}
+    plan = dr._product_plan(a, rec, REPO, {"dist": "widget"}, [main, pr], pypi=lambda name: None,
+                            python_available=lambda version: None)
+    shell = demo_helper.contree_shell(plan)
+    assert "apt-get" not in shell and "apt install" not in shell
+    names = {item["name"]: item["applied"] for item in plan["system"]}
+    assert names == {"libxml2": False, "zlib1g": False}
+    lim = rec["demo_helper"]["limitations"][0]
+    assert lim["needed"] == ["libxml2", "zlib1g"] and "could not verify" in lim["why"]
+    study = demo_helper.build_setup_plan(
+        REPO, [main], {"text": ""}, "3.12", "contree", "widget", apply_system=True,
+        python_available=lambda version: None, pypi=lambda name: None)
+    study_shell = demo_helper.contree_shell(study)
+    assert "apt-get install" in study_shell and "libxml2" in study_shell
 
 
 def test_pr_own_build_failure_is_labelled_and_never_retried_as_setup():

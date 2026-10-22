@@ -453,7 +453,8 @@ def test_unverified_setup_gap_installs_on_both_sides_and_reruns_once():
                                  lambda name: LINK if name == "numpy" else None, REPO, False)
     assert calls.count("rerun") == 1
     assert again["verdict"] == "could_not_verify"
-    assert again["reason"] == "could not verify: setup gap numpy"
+    assert again["reason"].startswith("could not verify: setup gap numpy:")
+    assert "No module named 'numpy'" in again["reason"]
 
     calls.clear()
     blocked = {"verdict": "could_not_verify", "reason": "ModuleNotFoundError: No module named 'numpy'"}
@@ -461,7 +462,8 @@ def test_unverified_setup_gap_installs_on_both_sides_and_reruns_once():
                                  [], "verified. pip install unrelated-pkg", lambda _name: OTHER, REPO, False)
     assert calls == []
     assert blocked["verdict"] == "could_not_verify"
-    assert blocked["reason"] == "could not verify: setup gap numpy"
+    assert blocked["reason"].startswith("could not verify: setup gap numpy:")
+    assert "No module named 'numpy'" in blocked["reason"]
 
 
 def _probe_record(lines, covered):
@@ -567,11 +569,13 @@ def test_gap_retry_stops_when_lookup_fails_or_nothing_can_be_installed():
     demo_helper.retry_unverified(missing, lambda: calls.append("rerun"), lambda *_a: (True, "1"),
                                  [], "verified", lambda _name: LINK, REPO, False)
     assert calls.count("rerun") == 1
-    assert missing["reason"] == "could not verify: setup gap missing fixture sample.csv"
+    assert missing["reason"].startswith("could not verify: setup gap missing fixture sample.csv")
+    assert "sample.csv" in missing["reason"] and "No such file" in missing["reason"]
     conflict = {"verdict": "could_not_verify", "reason": "ResolutionImpossible: version conflict"}
     demo_helper.retry_unverified(conflict, lambda: calls.append("rerun"), lambda *_a: (True, "1"),
                                  ["numpy"], "pip install numpy", lambda _name: LINK, REPO, False)
-    assert conflict["reason"] == "could not verify: setup gap version conflict"
+    assert conflict["reason"].startswith("could not verify: setup gap version conflict")
+    assert "ResolutionImpossible" in conflict["reason"]
     labelled = {"verdict": "could_not_verify", "reason": "ModuleNotFoundError: No module named 'numpy'",
                 "demo_helper": {"setup": {"counts_as_verdict": False}}}
     before = labelled["reason"]
@@ -666,7 +670,8 @@ def test_lookup_queries_name_the_repo_and_drop_unrelated_hits():
         lambda _name: {"home_page": "https://github.com/jaraco/inflect"}, "jaraco/inflect", False, lookup=gap_lookup)
     assert calls == []
     assert "pip install inflection" not in json.dumps(gap)
-    assert gap["reason"] == "could not verify: setup gap inflection"
+    assert gap["reason"].startswith("could not verify: setup gap inflection")
+    assert "No module named 'inflection'" in gap["reason"]
 
 
 def test_lookup_counts_each_url_once_and_ranks_setup_sources():
@@ -914,3 +919,137 @@ def test_not_a_package_and_deps_only_plan(tmp_path):
     empty = tmp_path / "empty"
     empty.mkdir()
     assert demo_helper.deps_only_plan(empty) is None
+
+
+def test_gap_text_reads_the_pytest_collection_error(tmp_path):
+    rec = {"verdict": "could_not_verify",
+           "reason": "tests produced no results on one side (collection failed; see pytest logs)"}
+    assert demo_helper.gap_name(demo_helper.gap_text(rec)) == "setup"
+    (tmp_path / "pytest-pr-1.log").write_text("E   ModuleNotFoundError: No module named 'gitlab'\n")
+    (tmp_path / "junit-pr-1.xml").write_text(
+        "<testsuite><testcase><failure>ModuleNotFoundError: No module named 'gitlab'</failure></testcase></testsuite>")
+    text = demo_helper.gap_text(rec, log_dir=tmp_path)
+    assert "No module named 'gitlab'" in text
+    assert demo_helper.gap_name(text) == "gitlab"
+    assert "No module named 'gitlab'" in demo_helper.failure_line(text)
+    summary = {"verdict": "could_not_verify", "reason": "collection failed; see pytest logs",
+               "per_run": [{"pytest_summary": "E   ModuleNotFoundError: No module named 'requests'\n"}]}
+    assert demo_helper.gap_name(demo_helper.gap_text(summary)) == "setup"
+    assert demo_helper.gap_name(demo_helper.gap_text(summary, log_dir=tmp_path)) == "requests"
+
+
+def test_failure_line_keeps_a_system_failure_ahead_of_an_import_error():
+    generic = ("tests produced no results on one side (collection failed; see pytest logs)\n"
+               "ModuleNotFoundError: No module named 'gitlab'")
+    assert "No module named 'gitlab'" in demo_helper.failure_line(generic)
+    system = generic + "\nImportError: libEGL.so.1: cannot open shared object file: No such file or directory"
+    line = demo_helper.failure_line(system)
+    assert "libEGL.so.1" in line and "cannot open shared object" in line
+
+
+def test_pytest_error_feeds_the_existing_lookup_and_installs_a_declared_module(tmp_path):
+    (tmp_path / "pytest-main-1.log").write_text("E   ModuleNotFoundError: No module named 'numpy'\n")
+    queries, calls = [], []
+    bare = {"verdict": "could_not_verify",
+            "reason": "tests produced no results on one side (collection failed; see pytest logs)"}
+    demo_helper.retry_unverified(
+        bare, lambda: (_ for _ in ()).throw(AssertionError("rerun")),
+        lambda *_a: (_ for _ in ()).throw(AssertionError("install")),
+        ["numpy>=1.24"], "", None, REPO, False)
+    assert bare["reason"].startswith("tests produced no results")
+
+    def lookup(query):
+        queries.append(query)
+        return {"results": []}
+
+    rec = {"verdict": "could_not_verify",
+           "reason": "tests produced no results on one side (collection failed; see pytest logs)"}
+    demo_helper.retry_unverified(
+        rec, lambda: {"verdict": "verified", "reason": "the tests passed"},
+        lambda side, requirement: calls.append((side, requirement)) or (True, "1.26"),
+        ["numpy>=1.24"], "", lambda _name: None, REPO, False, lookup=lookup, log_dir=tmp_path)
+    assert queries and "No module named 'numpy'" in queries[0]
+    assert calls == [("main", "numpy>=1.24"), ("pr", "numpy>=1.24")]
+    assert rec["verdict"] == "verified"
+
+
+def test_lookup_does_not_invent_an_import_to_package_mapping(tmp_path):
+    (tmp_path / "pytest-pr-1.log").write_text("E   ModuleNotFoundError: No module named 'gitlab'\n")
+    queries, calls = [], []
+
+    def lookup(query):
+        queries.append(query)
+        return {"results": [{"url": "https://github.com/acme/widget",
+                             "content": "acme/widget\npip install python-gitlab\n"}]}
+
+    rec = {"verdict": "could_not_verify",
+           "reason": "tests produced no results on one side (collection failed; see pytest logs)",
+           "library": "widget"}
+    demo_helper.retry_unverified(
+        rec, lambda: calls.append("rerun") or {"verdict": "could_not_verify", "reason": "still"},
+        lambda side, requirement: calls.append((side, requirement)) or (True, "1"),
+        ["python-gitlab>=4"], "", lambda _name: LINK, REPO, False, lookup=lookup, log_dir=tmp_path)
+    assert queries and "No module named 'gitlab'" in queries[0]
+    assert calls == []
+    assert "python-gitlab" not in json.dumps(rec["demo_helper"].get("gap_retry"))
+    assert rec["reason"].startswith("could not verify: setup gap gitlab")
+    assert "No module named 'gitlab'" in rec["reason"]
+
+
+def test_missing_library_stays_unverified_when_system_installs_are_on(tmp_path):
+    (tmp_path / "pytest-pr-1.log").write_text(
+        "E   ImportError: libEGL.so.1: cannot open shared object file: No such file or directory\n")
+    asked = []
+    rec = {"verdict": "could_not_verify",
+           "reason": "tests produced no results on one side (collection failed; see pytest logs)"}
+    demo_helper.retry_unverified(
+        rec, lambda: asked.append("rerun") or {"verdict": "verified", "reason": "ok"},
+        lambda *_a: asked.append("pip") or (True, "1"),
+        [], "", lambda _name: LINK, REPO, True,
+        install_system=lambda name: asked.append(("apt", name)) or True,
+        log_dir=tmp_path, project_text="apt-get install some-os-pkg", apt_check=lambda _name: True)
+    assert asked == []
+    assert rec["verdict"] == "could_not_verify"
+    lim = rec["demo_helper"]["limitations"][0]
+    assert "libEGL.so.1" in lim["needed"] and "libEGL.so.1" in lim["error"]
+    assert "some-os-pkg" not in json.dumps(lim)
+    assert rec["demo_helper"]["gap_retry"]["reran"] is False
+
+
+def test_missing_shared_library_is_named_in_the_reason(tmp_path):
+    (tmp_path / "pytest-pr-1.log").write_text(
+        "E   ImportError: libEGL.so.1: cannot open shared object file: No such file or directory\n")
+    systems = []
+    rec = {"verdict": "could_not_verify",
+           "reason": "tests produced no results on one side (collection failed; see pytest logs)"}
+    demo_helper.retry_unverified(
+        rec, lambda: systems.append("rerun"), lambda *_a: systems.append("pip"),
+        [], "", lambda _name: LINK, REPO, False,
+        install_system=lambda name: systems.append(("apt", name)) or False,
+        log_dir=tmp_path, project_text="", apt_check=lambda _name: False)
+    assert systems == []
+    assert "libEGL.so.1" in rec["reason"]
+    assert "cannot open shared object" in rec["reason"]
+
+
+def test_pytest_log_secrets_stay_out_of_the_reason(tmp_path, monkeypatch):
+    secret = "tvly-test-secret-value"
+    monkeypatch.setenv("TAVILY_API_KEY", secret)
+    (tmp_path / "pytest-pr-1.log").write_text(
+        f"E   ModuleNotFoundError: No module named 'numpy' token={secret}\n")
+    rec = {"verdict": "could_not_verify",
+           "reason": "tests produced no results on one side (collection failed; see pytest logs)"}
+    demo_helper.retry_unverified(rec, None, lambda *_a: (True, "1"), [], "", None, REPO, False, log_dir=tmp_path)
+    assert secret not in json.dumps(rec)
+    assert "[redacted]" in rec["reason"]
+    assert "No module named 'numpy'" in rec["reason"]
+
+
+def test_declared_requirements_include_extras(tmp_path):
+    (tmp_path / "pyproject.toml").write_text(
+        '[project]\nname = "app"\ndependencies = ["requests"]\n\n'
+        '[project.optional-dependencies]\nci = ["python-gitlab>=4"]\ntest = ["pytest>=7"]\n')
+    lines = demo_helper.declared_requirement_lines(tmp_path)
+    assert "requests" in lines
+    assert any(line.startswith("python-gitlab") for line in lines)
+    assert any(line.startswith("pytest") for line in lines)

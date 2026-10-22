@@ -93,6 +93,23 @@ _SETUP_MARKERS = (
     "too much memory",
     "infrastructure failure",
 )
+# Product-check stops. These are signals in an install log or a requirement line, not repository names.
+_DISK_FULL = re.compile(r"no space left on device|errno 28|disk quota exceeded", re.I)
+_FLAT_LAYOUT = re.compile(r"multiple top-level packages discovered in a flat-layout", re.I)
+# A CUDA build, not every name that contains "nvidia": nvidia-*-cu*, cuda-*, or a +cu wheel.
+_GPU_REQ = re.compile(r"(?i)(?:^|[^A-Za-z0-9])(?:nvidia-[a-z0-9._-]*-cu\d*|cuda-[a-z0-9._-]+)|\+cu\d+")
+_PYTEST_ERROR = re.compile(
+    r"(?i)(?:module)?notfounderror:[^\n<]{0,180}|filenotfounderror:[^\n<]{0,180}|"
+    r"no module named ['\"]?[\w.]+|importerror:[^\n<]{0,180}|"
+    r"cannot open shared object file[^\n<]{0,120}|error while loading shared libraries:[^\n<]{0,120}|"
+    r"library not loaded:[^\n<]{0,120}|error collecting [^\n<]{0,160}|"
+    r"no such file or directory:[^\n<]{0,160}|resolutionimpossible:[^\n<]{0,160}|"
+    r"version conflict[^\n<]{0,80}"
+)
+DISK_FULL_REASON = ("unsupported: the install ran out of disk space, so its temporary build files were removed "
+                    "and nothing was tested")
+FLAT_LAYOUT_REASON = ("unsupported: this project isn't installable as a Python package "
+                      "(multiple top-level packages in a flat layout)")
 
 
 def active(runner) -> bool:
@@ -686,6 +703,116 @@ def declared_packages(checkout, self_dist: str = "") -> list[dict]:
     return found
 
 
+def _collect_reqs(found: list[str], seen: set, lines) -> None:
+    for line in lines or []:
+        if not isinstance(line, str):
+            continue
+        name = req_name(line)
+        key = norm(name)
+        if _NAME.fullmatch(name) and key not in seen:
+            seen.add(key)
+            found.append(line.strip())
+
+
+def declared_requirement_lines(checkout) -> list[str]:
+    """Every requirement the project declares, extras included.
+
+    The gap step uses this to recognise a name the error already produced. It does not install them.
+    """
+    root = Path(checkout)
+    found: list[str] = []
+    seen: set = set()
+    data = _pyproject(root / "pyproject.toml")
+    project = data.get("project") if isinstance(data.get("project"), dict) else {}
+    _collect_reqs(found, seen, project.get("dependencies"))
+    for bucket in (project.get("optional-dependencies"), data.get("dependency-groups")):
+        if not isinstance(bucket, dict):
+            continue
+        for reqs in bucket.values():
+            if isinstance(reqs, list):
+                _collect_reqs(found, seen, reqs)
+    cfg = root / "setup.cfg"
+    if cfg.is_file():
+        import configparser
+        parser = configparser.ConfigParser()
+        try:
+            parser.read_string(_read(cfg))
+        except (configparser.Error, OSError):
+            parser = None
+        if parser is not None:
+            if parser.has_option("options", "install_requires"):
+                _collect_reqs(found, seen, _req_lines(parser.get("options", "install_requires")))
+            if parser.has_section("options.extras_require"):
+                for _extra, value in parser.items("options.extras_require"):
+                    _collect_reqs(found, seen, _req_lines(value))
+    setup_py = _read(root / "setup.py")
+    _collect_reqs(found, seen, re.findall(r"""['\"]([^'\"]+)['\"]""", _section(setup_py, "install_requires")))
+    extras_blob = _section(setup_py, "extras_require")
+    for match in re.finditer(r"""['\"][^'\"]+['\"]\s*:\s*\[([^\]]*)\]""", extras_blob):
+        _collect_reqs(found, seen, re.findall(r"""['\"]([^'\"]+)['\"]""", match.group(1)))
+    for path in _requirement_files(root):
+        _collect_reqs(found, seen, _req_lines(_read(path)))
+    return found
+
+
+def _plain_req_lines(text: str):
+    for raw in (text or "").splitlines():
+        line = raw.split("#", 1)[0].strip()
+        if line and not line.startswith(("-", ".", "--")):
+            yield line
+
+
+def _iter_required_lines(checkout):
+    """Required dependency lines, including local version markers such as +cu. Extras are not included."""
+    root = Path(checkout)
+    data = _pyproject(root / "pyproject.toml")
+    project = data.get("project") if isinstance(data.get("project"), dict) else {}
+    for line in project.get("dependencies") or []:
+        if isinstance(line, str):
+            yield line
+    cfg = root / "setup.cfg"
+    if cfg.is_file():
+        import configparser
+        parser = configparser.ConfigParser()
+        try:
+            parser.read_string(_read(cfg))
+        except (configparser.Error, OSError):
+            parser = None
+        if parser is not None and parser.has_option("options", "install_requires"):
+            yield from _plain_req_lines(parser.get("options", "install_requires"))
+    setup_py = _read(root / "setup.py")
+    yield from re.findall(r"""['\"]([^'\"]+)['\"]""", _section(setup_py, "install_requires"))
+    base = root / "requirements.txt"
+    if base.is_file():
+        yield from _plain_req_lines(_read(base))
+
+
+def gpu_only_requirement(checkout) -> str | None:
+    """A required dependency that is a CUDA build, or None.
+
+    The signal is the requirement name: an nvidia-*-cu* package, a cuda-* package, or a +cu wheel.
+    A name that only contains "nvidia" is not a CUDA build. Optional extras are ignored.
+    """
+    for line in _iter_required_lines(checkout):
+        if _GPU_REQ.search(line):
+            name = req_name(line)
+            return name or line.strip()
+    return None
+
+
+def gpu_reason(name: str) -> str:
+    return (f"unsupported: this project needs a GPU / CUDA build (it requires {name}), "
+            "so it was not installed")
+
+
+def disk_full(text: str) -> bool:
+    return bool(_DISK_FULL.search(text or ""))
+
+
+def flat_layout(text: str) -> bool:
+    return bool(_FLAT_LAYOUT.search(text or ""))
+
+
 def _section(text: str, name: str) -> str:
     match = re.search(rf"{re.escape(name)}\s*=\s*(\[[^\]]*\]|\{{[^\}}]*\}})", text or "", re.S)
     return match.group(1) if match else ""
@@ -1142,11 +1269,56 @@ def is_system_failure(text: str) -> bool:
     return bool(_SYSTEM_FAILURE.search(text or ""))
 
 
+def missing_system_pieces(text: str) -> list[str]:
+    """The library, header or tool an error says is missing.
+
+    Each name is taken from the error text. Nothing here is a distribution package, and nothing is chosen from a list.
+    """
+    found: list[str] = []
+
+    def add(name: str) -> None:
+        name = (name or "").strip().strip("'\"`,.;")
+        if not name or len(name) > 80 or name.lower() in {"error", "fatal", "command", "the"}:
+            return
+        if "/" in name:
+            name = name.rsplit("/", 1)[-1]
+        if name and name not in found:
+            found.append(name)
+
+    blob = text or ""
+    for match in re.finditer(r"lib[\w.+-]+\.so(?:\.\d+)*", blob):
+        add(match.group(0))
+    for match in re.finditer(r"(?i)fatal error:\s*([^\s:]+\.h)\b", blob):
+        add(match.group(1))
+    for match in re.finditer(r"(?i)cannot find -l([A-Za-z0-9_+.-]+)", blob):
+        add("-l" + match.group(1))
+    for match in re.finditer(r"(?i)package\s+([A-Za-z0-9_+.-]+)\s+was not found", blob):
+        add(match.group(1))
+    for match in re.finditer(r"(?i)([A-Za-z0-9_+./-]{1,60})\s+executable not found", blob):
+        add(match.group(1))
+    for match in re.finditer(r"(?i)command not found:\s*([A-Za-z0-9_+./-]+)", blob):
+        add(match.group(1))
+    for match in re.finditer(r"(?i)(?:^|[\s'\"])([A-Za-z0-9_+.-]{1,40}):\s*(?:command )?not found\b", blob):
+        add(match.group(1))
+    for match in re.finditer(r"(?i)command\s+'([^']+)'\s+failed", blob):
+        add(match.group(1))
+    return found[:8]
+
+
 def failure_line(text: str) -> str:
-    for line in (text or "").splitlines():
+    """The line the per-run lookup diagnoses.
+
+    A missing OS library, header or tool still wins, because that is what the system-package step reads.
+    Otherwise a pytest or collection error is used, so a generic first line does not hide it.
+    """
+    lines = [line.strip() for line in (text or "").splitlines() if line.strip()]
+    for line in lines:
         if _SYSTEM_FAILURE.search(line):
-            return line.strip()[:300]
-    return (text or "").strip().splitlines()[0][:300] if (text or "").strip() else ""
+            return line[:300]
+    for line in lines:
+        if _PYTEST_ERROR.search(line):
+            return line[:300]
+    return lines[0][:300] if lines else ""
 
 
 def trusted_url(url: str, repo: str, declared_urls=()) -> bool:
@@ -1350,15 +1522,24 @@ def note_limitation(rec: dict, needed: list[str], error: str, why: str) -> dict:
     return item
 
 
-def _system_decision(names: list[str], sandbox: str) -> list[dict]:
+def _system_decision(names: list[str], sandbox: str, apply_system: bool = True) -> list[dict]:
+    """Whether each system package is installed in the sandbox.
+
+    A product check passes ``apply_system=False``. Those packages stay unapplied on every sandbox, including
+    Contree, so the shell never runs an OS install. A study plan keeps the earlier behaviour: Contree applies a
+    safe name, and the local sandbox does not.
+    """
     out = []
     for name in names:
         if not safe_apt_name(name):
             out.append({"name": name, "applied": False, "sides": ["main", "pr"],
                         "reason": "not applied: the name is not a safe system package name"})
-        elif sandbox == "contree":
+        elif apply_system and sandbox == "contree":
             out.append({"name": name, "applied": True, "sides": ["main", "pr"],
                         "reason": "applied in the Contree sandbox"})
+        elif not apply_system:
+            out.append({"name": name, "applied": False, "sides": ["main", "pr"],
+                        "reason": "not applied: this check does not install system packages"})
         else:
             out.append({"name": name, "applied": False, "sides": ["main", "pr"],
                         "reason": "not applied: the local sandbox cannot install system packages"})
@@ -1367,7 +1548,8 @@ def _system_decision(names: list[str], sandbox: str) -> list[dict]:
 
 def build_setup_plan(repo: str, checkouts, tavily, current_python: str, sandbox: str, self_dist: str = "",
                      python_available=None, pypi=None, allow_lookup_packages: bool = True,
-                     provision=None, auto_python: bool = True, docs_checkouts=None) -> dict:
+                     provision=None, auto_python: bool = True, docs_checkouts=None,
+                     apply_system: bool = True) -> dict:
     """One plan for both sides. Only project-listed packages and link-back suggestions are added.
 
     ``docs_checkouts`` (a product check passes main's checkout only) is where listed packages and system-package
@@ -1436,7 +1618,7 @@ def build_setup_plan(repo: str, checkouts, tavily, current_python: str, sandbox:
                              f"(would use {conflict['main']['version'] or 'none'}) and the pull request needs "
                              f"{conflict['pr']['requirement']} (would use {conflict['pr']['version'] or 'none'}); "
                              "no single version meets both, so nothing was tested")}
-    system = _system_decision(system_names, sandbox or "local")
+    system = _system_decision(system_names, sandbox or "local", apply_system=apply_system)
     extra = [item["requirement"] for item in packages if item["action"] == "install"]
     lines = ["Setup plan: the same packages on main and pr."]
     for item in packages:
@@ -1517,6 +1699,8 @@ def contree_shell(plan: dict | None) -> str:
     wanted = (plan.get("python") or {}).get("provision")
     if wanted and re.fullmatch(r"\d+\.\d+", str(wanted)) and (plan.get("python") or {}).get("switch") is None:
         lines.append(contree_python_shell(str(wanted)))
+    # Only an applied package is installed. A product check leaves every system package unapplied, so this
+    # writes no apt-get line on Contree either.
     apt = [item["name"] for item in plan.get("system") or [] if item.get("applied") and safe_apt_name(item["name"])]
     if apt:
         quoted = " ".join(shlex_quote(name) for name in apt)
@@ -1816,7 +2000,49 @@ def is_setup_gap(verdict, text: str) -> bool:
     return any(marker in low for marker in _GAP_MARKERS)
 
 
-def gap_text(rec: dict) -> str:
+def _keep_bit(bits: list[str], bit: str, limit: int) -> None:
+    """Keep the longer of two overlapping error lines, and stop at `limit` lines."""
+    if not bit or len(bits) >= limit and all(earlier not in bit for earlier in bits):
+        return
+    for i, earlier in enumerate(bits):
+        if bit in earlier:
+            return
+        if earlier in bit:
+            bits[i] = bit
+            return
+    if len(bits) < limit:
+        bits.append(bit)
+
+
+def pytest_error_text(log_dir=None, record: dict | None = None, limit: int = 4000) -> str:
+    """Import and collection errors from pytest logs, junit files, and per-run summaries.
+
+    Secrets are removed before the text is returned.
+    """
+    blobs: list[str] = []
+    if isinstance(record, dict):
+        for entry in record.get("per_run") or []:
+            if isinstance(entry, dict) and entry.get("pytest_summary"):
+                blobs.append(str(entry["pytest_summary"]))
+    root = Path(log_dir) if log_dir else None
+    if root is not None and root.is_dir():
+        files = sorted(root.glob("pytest-*.log")) + sorted(root.glob("junit-*.xml"))
+        for path in files[:12]:
+            try:
+                blobs.append(path.read_text(errors="replace"))
+            except OSError:
+                continue
+    bits: list[str] = []
+    for blob in blobs:
+        for match in _PYTEST_ERROR.finditer(blob):
+            _keep_bit(bits, " ".join(match.group(0).split()), 8)
+        if len(bits) >= 8:
+            break
+    return redact("\n".join(bits))[:limit]
+
+
+def gap_text(rec: dict, log_dir=None) -> str:
+    """Reason, probe errors, comparison messages, and the pytest or collection error."""
     parts = [str(rec.get("reason") or "")]
     probes = rec.get("probes") or {}
     items = probes.get("items") if isinstance(probes, dict) else probes
@@ -1829,7 +2055,13 @@ def gap_text(rec: dict) -> str:
         messages = comparison.get("messages") or {}
         if isinstance(messages, dict):
             parts.extend(str(value) for value in messages.values())
-    return "\n".join(parts)
+    # Log files are read only when a caller passes a directory. The study path calls this with no directory,
+    # so its gap text stays the reason, the probes and the comparison messages.
+    if log_dir is not None:
+        logged = pytest_error_text(log_dir, rec)
+        if logged:
+            parts.append(logged)
+    return "\n".join(part for part in parts if part)
 
 
 def _modules(text: str) -> list[str]:
@@ -1883,8 +2115,33 @@ def _declared_req(module: str, declared) -> str | None:
     return None
 
 
-def _gap_reason(name: str) -> str:
-    return f"could not verify: setup gap {name}"
+def error_excerpt(text: str, limit: int = 240) -> str:
+    """The real error lines, shortened and with secrets removed."""
+    found: list[str] = []
+    for match in _PYTEST_ERROR.finditer(text or ""):
+        _keep_bit(found, " ".join(match.group(0).split()), 3)
+        if len(found) >= 3:
+            break
+    if not found:
+        for raw in (text or "").splitlines():
+            line = raw.strip()
+            low = line.lower()
+            if any(marker in low for marker in ("no such file", "version conflict", "resolutionimpossible",
+                                                "conflicting dependencies")):
+                if line not in found:
+                    found.append(line)
+            if len(found) >= 3:
+                break
+    return redact(" | ".join(found))[:limit]
+
+
+def _gap_reason(name: str, detail: str = "") -> str:
+    """could_not_verify reason that keeps the real error next to the short name."""
+    base = f"could not verify: setup gap {name}"
+    excerpt = error_excerpt(detail)
+    if excerpt and excerpt not in base:
+        return f"{base}: {excerpt}"
+    return base
 
 
 def _lookup_text(extra) -> str:
@@ -1992,7 +2249,7 @@ def _emit_retry(detail: str) -> None:
 
 
 def retry_unverified_study(rec: dict, rerun, install_one, declared, tavily_text: str, pypi, repo: str,
-                     allow_system: bool, install_system=None, lookup=None, recheck_coverage=None) -> dict:
+                     allow_system: bool = False, install_system=None, lookup=None, recheck_coverage=None) -> dict:
     """Study and daily-study path, unchanged from before the product check flow.
 
     One rerun when a could-not-verify result is a setup gap. Tavily text alone never changes the verdict.
@@ -2000,7 +2257,11 @@ def retry_unverified_study(rec: dict, rerun, install_one, declared, tavily_text:
     This is the only step that can raise could_not_verify to verified. When the record has probes, that raise
     waits for a fresh probe line-coverage measurement. The measurement runs only when the change is small.
     A larger change skips it, and the verdict stays could_not_verify.
+
+    ``allow_system`` and ``install_system`` are unused. They stay so older callers still pass, and this step
+    does not install an OS package.
     """
+    _ = (allow_system, install_system)
     block = rec.setdefault("demo_helper", {})
     notes = list(block.get("notes") or [])
     setup = block.get("setup") or {}
@@ -2097,16 +2358,20 @@ def retry_unverified_study(rec: dict, rerun, install_one, declared, tavily_text:
 
 
 def retry_unverified(rec: dict, rerun, install_one, declared, tavily_text: str, pypi, repo: str,
-                     allow_system: bool, install_system=None, lookup=None, recheck_coverage=None,
+                     allow_system: bool = False, install_system=None, lookup=None, recheck_coverage=None,
                      max_tries: int = MAX_GAP_TRIES, declared_urls=(), apt_check=None,
-                     project_text: str = "") -> dict:
+                     project_text: str = "", log_dir=None) -> dict:
     """Up to ``max_tries`` reruns when a could-not-verify result is a setup or import gap.
 
     Each try: look the error up (Tavily, when a lookup is given), install the fix on main and pr, rerun the step.
     Every try is logged in ``gap_retry.tries``. A needs-attention result (a PR-caused test failure) is never retried.
     Tavily text alone never changes the verdict. This is the only step that can raise could_not_verify to
     verified, and that raise still waits for a fresh probe line-coverage measurement when the record has probes.
+
+    ``allow_system`` and ``install_system`` are unused. A missing system library, header or build tool is a
+    could-not-verify limitation. This step does not install an OS package on any sandbox.
     """
+    _ = (allow_system, install_system)
     block = rec.setdefault("demo_helper", {})
     notes = list(block.get("notes") or [])
     setup = block.get("setup") or {}
@@ -2119,7 +2384,7 @@ def retry_unverified(rec: dict, rerun, install_one, declared, tavily_text: str, 
                      "failure, so it was not retried as a setup problem.")
         block["notes"] = _unique(notes)
         return rec
-    text = gap_text(rec)
+    text = gap_text(rec, log_dir=log_dir)
     if not is_setup_gap(rec.get("verdict"), text):
         block["notes"] = _unique(notes)
         return rec
@@ -2153,36 +2418,19 @@ def retry_unverified(rec: dict, rerun, install_one, declared, tavily_text: str, 
         tried.update(norm(req_name(spec["requirement"])) for spec in specs)
         entry = {"try": attempt, "problem": name, "lookup": query if looked else None, "sources": sources,
                  "planned": [spec["requirement"] for spec in specs], "installed": [], "rerun": False}
-        sys_fix = system_fix_for(text, lookup_text, project_text, apt_check, sources)
-        for item in sys_fix["refused"]:
-            notes.append(f"Setup plan: refused system package {item['name']}: {item['reason']}")
-        sys_names = [n for n in sys_fix["install"] if n not in tried]
-        if not specs and is_system_failure(text) and not sys_names:
-            entry["result"] = "the project's docs and pages name no OS package for this error"
+        # A missing library, header or build tool stops here on every sandbox, including Contree.
+        if not specs and is_system_failure(text):
+            pieces = missing_system_pieces(text)
+            if not pieces:
+                line = failure_line(text)
+                pieces = [line[:120]] if line else []
+            entry["result"] = "needs a system library, header or build tool; this check does not install OS packages"
+            entry["planned"] = list(pieces)
+            note_limitation(rec, pieces, failure_line(text),
+                            "this check does not install system libraries, headers or build tools")
             tries.append(entry)
-            note_limitation(rec, [], failure_line(text), "no OS package for it was found in the project's own docs")
             _emit_retry(f"Try {attempt} of {max_tries}: {name}: {entry['result']}")
             break
-        if not specs and sys_names and rerun is not None:
-            tried.update(sys_names)
-            entry["planned"] = list(sys_names)
-            entry["sources"] = list(sys_fix["sources"])
-            if not (allow_system and install_system):
-                entry["result"] = "needs system package(s) " + ", ".join(sys_names) + "; this sandbox cannot install them"
-                note_limitation(rec, sys_names, failure_line(text),
-                                "this sandbox (bubblewrap) cannot install OS packages")
-                tries.append(entry)
-                _emit_retry(f"Try {attempt} of {max_tries}: {name}: {entry['result']}")
-                break
-            got = [n for n in sys_names if install_system(n)]
-            entry["installed"] = [f"system package {n}" for n in got]
-            if not got:
-                entry["result"] = "system package install failed on main or pr"
-                tries.append(entry)
-                _emit_retry(f"Try {attempt} of {max_tries}: {name}: {entry['result']}")
-                break
-            _emit_retry(f"Try {attempt} of {max_tries}: installed system package(s) {', '.join(got)} on main and pr; rerunning")
-            specs = None
         if specs is not None and (not specs or rerun is None):
             if not specs and repeat:
                 entry["result"] = "already installed on an earlier try and still missing"
@@ -2212,10 +2460,13 @@ def retry_unverified(rec: dict, rerun, install_one, declared, tavily_text: str, 
         after_reason = outcome.get("reason", rec.get("reason"))
         after_text = f"{after_verdict}\n{after_reason}"
         if is_setup_gap(after_verdict, after_text):
+            kept = text
+            named = gap_name(after_reason or kept)
             rec["verdict"] = "could_not_verify"
-            rec["reason"] = _gap_reason(gap_name(after_reason or text))
-            entry["result"] = f"still a setup gap: {gap_name(after_reason or text)}"
-            text = after_text
+            rec["reason"] = _gap_reason(named, after_reason or kept)
+            entry["result"] = f"still a setup gap: {named}"
+            # A rerun that only repeats a generic reason must not drop the pytest error the lookup diagnoses.
+            text = after_text if error_excerpt(after_reason or "") else f"{after_text}\n{kept}"
         else:
             held = _coverage_blocks_verified(rec, after_verdict, recheck_coverage)
             if held:
@@ -2229,7 +2480,7 @@ def retry_unverified(rec: dict, rerun, install_one, declared, tavily_text: str, 
             break
     if not reran or is_setup_gap(rec.get("verdict"), f"{rec.get('verdict')}\n{rec.get('reason')}"):
         rec["verdict"] = "could_not_verify"
-        rec["reason"] = _gap_reason(gap_name(text))
+        rec["reason"] = _gap_reason(gap_name(text), text)
     notes.append(f"Before rerun: {rounds[0]['verdict']}: {rounds[0]['reason']}")
     if reran:
         notes.append(f"After rerun: ({len(tries)} of {max_tries} tries) {rec['verdict']}: {rec['reason']}")
