@@ -1,7 +1,7 @@
 # Console check flow: setup lookup, per-run requirements and 3 retry tries
 
 **Date:** 2026-10-22
-**Status:** proposed (awaiting review)
+**Status:** accepted (merged in #94 as e46e491)
 
 ## What changed
 
@@ -13,6 +13,7 @@
 
 - A new batch order for product runs (`--batch-order`): for each pull request, the setup lookup happens first, then setup, then the run. If the lookup or the setup fails, the pull request is logged and skipped, and the batch moves on. After all the others are done, each skipped pull request is tried again: the lookup diagnoses the failure, the fix (Python packages the project declares as a dependency or extra, read from main's copy) is applied on both sides and setup is retried, up to 3 tries, before the verdict is "could not verify". The order, every skip and every try are written to `batch-order.jsonl` in the run folder.
 - A failure that needs an OS package (a missing header, shared library, tool or executable) is diagnosed for each run from that run's own sources: the project's install docs in main's checkout only (README, CONTRIBUTING, install pages, CI workflows, Dockerfile, pyproject and setup files) and lookup pages from the project's own sites, together with the failure text. The packages they name are proposed for that run. There is no hand-written package list and no error-to-package map in the code. Proposed packages go through the existing system-package install path, which installs on both sides or on neither, and the step is retried. Where the sandbox cannot install OS packages (bubblewrap), the check records a limitation in plain words with the packages it needed and the real error, and the result stays "could not verify". See docs/LIMITATIONS.md.
+- #95 overrides this OS-package install path for product checks: they never install OS packages on any sandbox, including Contree. A missing system package is recorded as a "could not verify" limitation instead.
 - Safety rules for every lookup-driven install:
   - (a) Install steps are taken only from the project's own pages: its own GitHub repository (not other repositories in the same organisation), that repository's GitHub Pages site, or a homepage or docs site the project declares in its packaging files or on its PyPI page. On a docs host shared by many projects, only the project's own path is trusted. Other sites are ignored, and the lookup's free-text answer is not used.
   - (b) A package must exist in the official source before it is installed: the distro archive for OS packages (checked with `apt-cache policy`), and PyPI for Python packages. A Python package from the batch diagnosis must be declared by the project (a runtime dependency or any extra) in main's copy; a PyPI link back alone is not enough. Packages from the first setup lookup still need a PyPI page that links back to the project.
