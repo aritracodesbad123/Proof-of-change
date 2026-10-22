@@ -26,8 +26,8 @@ export function ProcessDag({
   return (
     <section className="panel dag" aria-label="Check process">
       <h2>How this check moves</h2>
-      <p className="hint">Each shape is one step. Reviewer notes come after the verdict and do not change it.</p>
-      <svg className="dag-svg" viewBox="0 0 2010 340" role="img">
+      <p className="hint">Each shape is one step. Click one to see what was installed or done. The swarm report does not change the verdict.</p>
+      <svg className="dag-svg" viewBox="0 0 1220 290" role="img">
         <title>Directed graph of the check</title>
         {FLOW_EDGES.map(([from, to]) => {
           const a = byId[from]
@@ -74,8 +74,8 @@ export function ProcessDag({
         <p className="kicker">{STATE_LABEL[current.state]}{current.duration ? ` · ${current.duration}` : ''}</p>
         <h3>{current.label}</h3>
         <p>{current.hint}</p>
-        {current.detail ? <p className="meta-line">{current.detail}</p> : null}
-        {current.id === 'advice' ? <p className="hint">Doesn't change the verdict.</p> : null}
+        {current.detail ? <p className="meta-line" style={{ whiteSpace: 'pre-line' }}>{current.detail}</p> : null}
+        {current.id === 'swarm' ? <p className="hint">Doesn't change the verdict.</p> : null}
         {log && (current.state === 'running' || current.state === 'failed') ? (
           <pre className="log dag-log">{log.slice(-1200)}</pre>
         ) : null}
