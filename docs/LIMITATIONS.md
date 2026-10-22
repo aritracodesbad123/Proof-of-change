@@ -11,6 +11,9 @@ Cases where a check ends as could not verify. Setup limits are also written into
 - Docs-only pull requests are skipped in the daily run. A single check in full mode ends as COULD NOT VERIFY because the AI-probe gate needs a probe that runs a changed line. Other modes can still mark a docstring-only change VERIFIED, with the reason 'holds by construction'.
 - Contree is confirmed end-to-end only for a real product check (apprise pull request #1783, confirmed on commit cecf851) run from main in Contree-only mode (`POC_REQUIRE_CONTREE=1`), where the verdict matched the local run and nothing ran outside Contree. Not confirmed on the live Contree service: test coverage measured inside Contree, which shell runs setup, hiding of failure text, and running with a judge's own Nebius account.
 - Projects that need their own package index or uv sources, or that run on a pre-release (test) build of Python, end as COULD NOT VERIFY by design. Main and the pull request must run the exact same Python version, or the result is COULD NOT VERIFY.
+- The daily picker's wheel check (a dry-run resolve that skips projects needing compiling) can still let a compile-needing project through. It does not inspect the project's own C extension or its build requirements; `-r`, URL or git lines in requirements files; optional or test requirements; or `setup.py` and `setup.cfg`. Such a project is picked and can still end as COULD NOT VERIFY at setup.
+- If the wheel check itself fails for a network or uv reason, every pull request of that project is skipped in that run.
+- The wheel check changes which pull requests the daily run picks, so daily results from before and after it are not drawn from the same pool.
 
 ## OS packages in the local sandbox (bubblewrap)
 
