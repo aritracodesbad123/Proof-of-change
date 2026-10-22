@@ -1,0 +1,1319 @@
+{
+  "schema_version": "1",
+  "record_kind": "pr_run",
+  "id": "pr-optuna-optuna-6873-83a36def362a-2026-10-22-check-232846-pr6873",
+  "date_ist": "2026-10-22 23:28 IST",
+  "run_date": "2026-10-22",
+  "who": "ops/daily_run.py",
+  "repo": "optuna/optuna",
+  "library": "optuna",
+  "pr": {
+    "repo": "optuna/optuna",
+    "number": 6873,
+    "url": "https://github.com/optuna/optuna/pull/6873",
+    "title": "Avoid All-NaN RuntimeWarning in percentile pruner best-value lookup",
+    "base_sha": "13a3ff1c78314b6a1117dcee9dbbe54ab66788f9",
+    "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+    "head_sha": "83a36def362a101198b89eb41b2d0b768ceaa4fc",
+    "merge_commit": null,
+    "tested_main_sha": "0d05a967362d22414d759b3e3f382f2d883d948b",
+    "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+  },
+  "author": "825pranav",
+  "base_ref": "master",
+  "updated_at_utc": "2026-10-21T10:02:36Z",
+  "updated_at_ist": "2026-10-21 15:32 IST",
+  "ci_state": "not checked (single-PR check)",
+  "ci_detail": "checked on request with --pr",
+  "tested_at_ist": "2026-10-22 23:28 IST",
+  "files": {
+    "all": [
+      "optuna/pruners/_percentile.py",
+      "tests/pruners_tests/test_percentile.py"
+    ],
+    "package_py": [
+      "optuna/pruners/_percentile.py"
+    ],
+    "compiled": [],
+    "other": [
+      "tests/pruners_tests/test_percentile.py"
+    ]
+  },
+  "machine_type": {
+    "arch": "x86_64",
+    "os": "Linux",
+    "platform": "Linux-6.12.94+-x86_64-with-glibc2.41",
+    "cpu_count": 8,
+    "ci": null,
+    "runner_name": null,
+    "runner_os": null,
+    "runner_arch": null,
+    "runner_environment": null,
+    "image": null,
+    "label": "local",
+    "gxx": "g++ (Debian 14.2.0-19) 14.2.0",
+    "cpu_model": "Intel(R) Xeon(R) Processor",
+    "ram_gb": 15.6
+  },
+  "thread_env": {
+    "OMP_NUM_THREADS": "1",
+    "OPENBLAS_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1",
+    "NUMEXPR_NUM_THREADS": "1",
+    "VECLIB_MAXIMUM_THREADS": "1",
+    "BLIS_NUM_THREADS": "1",
+    "PYTHONHASHSEED": "0"
+  },
+  "runs_per_side": 3,
+  "runs_per_side_planned": 3,
+  "workers": "4",
+  "test_timeout_s": 120,
+  "run_timeout_s": 900,
+  "build_timeout_s": 1800,
+  "python": "3.12.15",
+  "test_selection": "mapped from touched files: tests/pruners_tests/test_percentile.py",
+  "per_run": [
+    {
+      "side": "old",
+      "run": 1,
+      "passed": 11,
+      "failed": 0,
+      "error": 0,
+      "skipped": 0,
+      "collection_errors": 0,
+      "exit": 0,
+      "seconds": 2.9,
+      "pytest_summary": "11 passed in 0.86s",
+      "junit": true
+    },
+    {
+      "side": "new",
+      "run": 1,
+      "passed": 11,
+      "failed": 0,
+      "error": 0,
+      "skipped": 0,
+      "collection_errors": 0,
+      "exit": 0,
+      "seconds": 2.9,
+      "pytest_summary": "11 passed in 0.90s",
+      "junit": true
+    },
+    {
+      "side": "old",
+      "run": 2,
+      "passed": 11,
+      "failed": 0,
+      "error": 0,
+      "skipped": 0,
+      "collection_errors": 0,
+      "exit": 0,
+      "seconds": 2.9,
+      "pytest_summary": "11 passed in 0.81s",
+      "junit": true
+    },
+    {
+      "side": "new",
+      "run": 2,
+      "passed": 11,
+      "failed": 0,
+      "error": 0,
+      "skipped": 0,
+      "collection_errors": 0,
+      "exit": 0,
+      "seconds": 3.6,
+      "pytest_summary": "11 passed in 0.87s",
+      "junit": true
+    },
+    {
+      "side": "old",
+      "run": 3,
+      "passed": 11,
+      "failed": 0,
+      "error": 0,
+      "skipped": 0,
+      "collection_errors": 0,
+      "exit": 0,
+      "seconds": 2.9,
+      "pytest_summary": "11 passed in 0.83s",
+      "junit": true
+    },
+    {
+      "side": "new",
+      "run": 3,
+      "passed": 11,
+      "failed": 0,
+      "error": 0,
+      "skipped": 0,
+      "collection_errors": 0,
+      "exit": 0,
+      "seconds": 2.9,
+      "pytest_summary": "11 passed in 0.80s",
+      "junit": true
+    }
+  ],
+  "notes": null,
+  "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+  "behaviour_claims": [
+    {
+      "source": "PR description",
+      "quote": "The returned value is identical to before (NaN), so pruning behavior is unchanged.",
+      "pattern": "unchanged"
+    },
+    {
+      "source": "PR description",
+      "quote": "The empty case is untouched and still raises `ValueError` (covered by the existing test).",
+      "pattern": "untouched"
+    }
+  ],
+  "baseline": "full",
+  "model_provider": {
+    "requested": "nebius",
+    "used": "nebius",
+    "note": "model provider: nebius (Token Factory, live)",
+    "blind": false
+  },
+  "sandbox_backend": "contree",
+  "sandbox_backend_note": "contree (Token Factory Sandboxes, sdk 0.3.6)",
+  "machine": "contree",
+  "tool_setup": {
+    "installed": [],
+    "tries": 0,
+    "note": "All required tools were already installed.",
+    "refused": []
+  },
+  "posted_upstream": false,
+  "logs": "optuna-6873/",
+  "freeze": {},
+  "poc_commit": "527dff7b74cbdb43d4c87c94ca5fc45de85ae08d",
+  "route": "source-pair",
+  "current_head_sha": "83a36def362a101198b89eb41b2d0b768ceaa4fc",
+  "tested_invocation": 1,
+  "model_provider_used": "nebius",
+  "state": "closed",
+  "mergeable_state": "unknown",
+  "product_check": true,
+  "demo_helper": {
+    "preflight": {
+      "ok": true
+    },
+    "tavily": {
+      "ok": true,
+      "skipped": false,
+      "live_call": true,
+      "cached": false,
+      "queries": [
+        "optuna python setup install instructions https://github.com/optuna/optuna site:github.com/optuna/optuna",
+        "optuna python documentation install https://github.com/optuna/optuna site:github.com/optuna/optuna",
+        "optuna python install requirements https://pypi.org/project/optuna/ https://github.com/optuna/optuna site:pypi.org"
+      ],
+      "results": [
+        {
+          "title": "optuna",
+          "url": "https://pypi.org/project/optuna/",
+          "query": "optuna python install requirements https://pypi.org/project/optuna/ https://github.com/optuna/optuna site:pypi.org"
+        },
+        {
+          "title": "optuna-integration",
+          "url": "https://pypi.org/project/optuna-integration/",
+          "query": "optuna python install requirements https://pypi.org/project/optuna/ https://github.com/optuna/optuna site:pypi.org"
+        },
+        {
+          "title": "optuna/CONTRIBUTING.md at master \u00b7 optuna/optuna \u00b7 GitHub",
+          "url": "https://github.com/optuna/optuna/blob/master/CONTRIBUTING.md",
+          "query": "optuna python setup install instructions https://github.com/optuna/optuna site:github.com/optuna/optuna"
+        },
+        {
+          "title": "v4.0.0 \u00b7 optuna/optuna \u00b7 Discussion #5656 \u00b7 GitHub",
+          "url": "https://github.com/optuna/optuna/discussions/5656",
+          "query": "optuna python setup install instructions https://github.com/optuna/optuna site:github.com/optuna/optuna"
+        },
+        {
+          "title": "RuntimeError: The runtime optuna version 2.8.0 is no longer compatible with the table schema (set up by optuna 2.8.0). Please try updating optuna to the latest version by `$ pip install -U optuna`. \u00b7 Issue #2812 \u00b7 optuna/optuna \u00b7 GitHub",
+          "url": "https://github.com/optuna/optuna/issues/2812",
+          "query": "optuna python setup install instructions https://github.com/optuna/optuna site:github.com/optuna/optuna"
+        },
+        {
+          "title": "GitHub - optuna/optuna-integration: Extended functionalities for Optuna in combination with third-party libraries. \u00b7 GitHub",
+          "url": "https://github.com/optuna/optuna-integration",
+          "query": "optuna python documentation install https://github.com/optuna/optuna site:github.com/optuna/optuna"
+        },
+        {
+          "title": "GitHub - optuna/optuna at dagshub.com \u00b7 GitHub",
+          "url": "https://github.com/optuna/optuna?ref=dagshub.com",
+          "query": "optuna python documentation install https://github.com/optuna/optuna site:github.com/optuna/optuna"
+        },
+        {
+          "title": "GitHub - optuna/optuna: A hyperparameter optimization framework \u00b7 GitHub",
+          "url": "https://github.com/optuna/optuna",
+          "query": "optuna python documentation install https://github.com/optuna/optuna site:github.com/optuna/optuna"
+        }
+      ],
+      "text": "To set up Optuna, first fork the repository on GitHub. After forking, create a virtual environment and install Optuna in editable mode using the command `python -m venv .venv && source.venv/bin/activate && pip install -e.`. For additional setup, check the format, coding style, and type hints using `ruff` and `mypy`. The sources do not provide specific instructions for installing dependencies like `tensorflow-cpu` or `numpy<2.0.0`.\nTo install Optuna, you can use either pip or conda. The sources indicate that you can install Optuna via pip with the command `$ pip install optuna` and on Anaconda Cloud with `$ conda install -c conda-forge optuna`. The sources also mention that Optuna supports Python 3.10 or newer and that `optuna-dashboard` can be installed via pip with `$ pip install optuna-dashboard`.\nTo install Optuna, use pip with the command `pip install optunahub`. Optuna supports Python 3.9 or newer. The sources do not provide information about installing optuna-dashboard or optuna-integration directly, but they mention that optuna-dashboard can be installed via PyPI or Anaconda Cloud and does not require any additional dependencies beyond the SQLite3 file. The sources do not provide a definitive answer regarding specific installation requirements for optuna-integration.\nInstallation Optuna is available at the Python Package Index and on Anaconda Cloud. Optuna supports Python 3.9 or newer. pip install optunahub\nThis package is an integration module of Optuna, an automatic Hyperparameter optimization software framework. The modules in this package provide users with\nAfter forking, download and install Optuna on your computer.\n\n```\ncd\n```\n\nThis command creates `.venv` and installs Optuna in editable mode.\n\n### Checking the Format, Coding Style, and Type Hints\n\nCode is formatted with ruff and additional conventions are described in the Wiki. Type hints, PEP484, are checked with mypy.\n\nYou can check the format, coding style, and type hints by running the following commands:\n\n```\n...\n``` [...] PRs from first-time contributors that appear to be primarily generat\nInstall `tensorflow-cpu` in CIs (Install `tensorflow-cpu` in CIs optuna-examples#260)  Add python 3.12 and run terminator search cv (Add python 3.12 and run terminator search cv optuna-examples#264)  Enhance `README.md` (Enhance `README.md` optuna-examples#265)  Organize the directory structure (Organize the directory structure optuna-examples#266)  Fix CI with version constraints of packages (Fix CI with version constraints of packages optuna-examples#267)  Install `numpy<2.0.0` for\nOptuna version: 2.8.0\n Python version: 3.8.10\n OS: Ubuntu 20.04.2 LTS\n (Optional) Other libraries and their versions:  \n   alembic==1.4.1  \n   attrs==21.2.0  \n   certifi==2021.5.30  \n   charset-normalizer==2.0.2  \n   click==8.0.1  \n   cliff==3.8.0  \n   cloudpickle==1.6.0  \n   cmaes==0.8.2  \n   cmd2==2.1.2  \n   colorama==0.4.4  \n   colorlog==5.0.1  \n   databricks-cli==0.14.3  \n   docker==5.0.0  \n   entrypoints==0.3  \n   Flask==2.0.1  \n   gitdb==4.0.7  \n   GitPython==3.1.18 [...] File \"/home/dev00\n## Repository files navigation\n\n# Optuna-Integration\n\nPython pypi conda GitHub license Read the Docs\n\nThis package is an integration module of Optuna, an automatic Hyperparameter optimization software framework. The modules in this package provide users with extended functionalities for Optuna in combination with third-party libraries such as PyTorch, sklearn, and TensorFlow.\n\nNote\n\nYou can find more information in our official documentations and API reference.\n\n## Installation [...] | README.md\nstudy = optuna.create_study()  # Create a new study.\nstudy.optimize(objective, n_trials=100)  # Invoke optimization of the objective function.\n```\n\nNote\n\nMore examples can be found in optuna/optuna-examples.\n\nThe examples cover diverse problem setups such as multi-objective optimization, constrained optimization, pruning, and distributed optimization.\n\n## Installation\n\nOptuna is available at the Python Package Index and on Anaconda Cloud.\n\n```\n# PyPI\n$ pip install optuna\n``` [...] ```\n# Anaconda\nNote\n\nMore examples can be found in optuna/optuna-examples.\n\nThe examples cover diverse problem setups such as multi-objective optimization, constrained optimization, pruning, and distributed optimization.\n\n## Installation\n\nOptuna is available at the Python Package Index and on Anaconda Cloud.\n\n```\n# PyPI #\n```\n\n```\n# Anaconda Cloud #\n```\n\nImportant\n\nOptuna supports Python 3.9 or newer.\n\n## Rustuna [...] ## Web Dashboard\n\nOptuna Dashboard is a real-time web dashboard for Optuna. You can check th",
+      "errors": [],
+      "lines": [
+        "Looked up with Tavily: 8 results",
+        "Query: optuna python setup install instructions https://github.com/optuna/optuna site:github.com/optuna/optuna",
+        "Query: optuna python documentation install https://github.com/optuna/optuna site:github.com/optuna/optuna",
+        "Query: optuna python install requirements https://pypi.org/project/optuna/ https://github.com/optuna/optuna site:pypi.org",
+        "Source: optuna \u2014 https://pypi.org/project/optuna/",
+        "Source: optuna-integration \u2014 https://pypi.org/project/optuna-integration/",
+        "Source: optuna/CONTRIBUTING.md at master \u00b7 optuna/optuna \u00b7 GitHub \u2014 https://github.com/optuna/optuna/blob/master/CONTRIBUTING.md",
+        "Source: v4.0.0 \u00b7 optuna/optuna \u00b7 Discussion #5656 \u00b7 GitHub \u2014 https://github.com/optuna/optuna/discussions/5656",
+        "Source: RuntimeError: The runtime optuna version 2.8.0 is no longer compatible with the table schema (set up by optuna 2.8.0). Please try updating optuna to the latest version by `$ pip install -U optuna`. \u00b7 Issue #2812 \u00b7 optuna/optuna \u00b7 GitHub \u2014 https://github.com/optuna/optuna/issues/2812",
+        "Source: GitHub - optuna/optuna-integration: Extended functionalities for Optuna in combination with third-party libraries. \u00b7 GitHub \u2014 https://github.com/optuna/optuna-integration",
+        "Source: GitHub - optuna/optuna at dagshub.com \u00b7 GitHub \u2014 https://github.com/optuna/optuna?ref=dagshub.com",
+        "Source: GitHub - optuna/optuna: A hyperparameter optimization framework \u00b7 GitHub \u2014 https://github.com/optuna/optuna"
+      ]
+    },
+    "notes": [
+      "Setup check: GitHub token: present.",
+      "Setup check: Nebius token: present.",
+      "Setup check: free memory 7.3 GB (of 15.6 GB).",
+      "Setup check: free disk 40.1 GB.",
+      "Demo helper: git is installed.",
+      "Demo helper: python3 is installed.",
+      "Demo helper: uv is installed.",
+      "Looked up with Tavily: 8 results",
+      "Query: optuna python setup install instructions https://github.com/optuna/optuna site:github.com/optuna/optuna",
+      "Query: optuna python documentation install https://github.com/optuna/optuna site:github.com/optuna/optuna",
+      "Query: optuna python install requirements https://pypi.org/project/optuna/ https://github.com/optuna/optuna site:pypi.org",
+      "Source: optuna \u2014 https://pypi.org/project/optuna/",
+      "Source: optuna-integration \u2014 https://pypi.org/project/optuna-integration/",
+      "Source: optuna/CONTRIBUTING.md at master \u00b7 optuna/optuna \u00b7 GitHub \u2014 https://github.com/optuna/optuna/blob/master/CONTRIBUTING.md",
+      "Source: v4.0.0 \u00b7 optuna/optuna \u00b7 Discussion #5656 \u00b7 GitHub \u2014 https://github.com/optuna/optuna/discussions/5656",
+      "Source: RuntimeError: The runtime optuna version 2.8.0 is no longer compatible with the table schema (set up by optuna 2.8.0). Please try updating optuna to the latest version by `$ pip install -U optuna`. \u00b7 Issue #2812 \u00b7 optuna/optuna \u00b7 GitHub \u2014 https://github.com/optuna/optuna/issues/2812",
+      "Source: GitHub - optuna/optuna-integration: Extended functionalities for Optuna in combination with third-party libraries. \u00b7 GitHub \u2014 https://github.com/optuna/optuna-integration",
+      "Source: GitHub - optuna/optuna at dagshub.com \u00b7 GitHub \u2014 https://github.com/optuna/optuna?ref=dagshub.com",
+      "Source: GitHub - optuna/optuna: A hyperparameter optimization framework \u00b7 GitHub \u2014 https://github.com/optuna/optuna",
+      "Setup plan: the same packages on main and pr.",
+      "Setup plan: alembic is noted, installed with the project.",
+      "Setup plan: colorlog is noted, installed with the project.",
+      "Setup plan: numpy is noted, installed with the project.",
+      "Setup plan: packaging is noted, installed with the project.",
+      "Setup plan: sqlalchemy is noted, installed with the project.",
+      "Setup plan: tqdm is noted, installed with the project.",
+      "Setup plan: PyYAML is noted, installed with the project.",
+      "Setup plan: install fakeredis[lua] (listed in the test extra) on main and pr.",
+      "Setup plan: install moto (listed in the test extra) on main and pr.",
+      "Setup plan: install plotly (listed in the test extra) on main and pr.",
+      "Setup plan: install pytest (listed in the test extra) on main and pr.",
+      "Setup plan: install pytest-xdist (listed in the test extra) on main and pr.",
+      "Setup plan: install scipy>=1.9.2 (listed in the test extra) on main and pr.",
+      "Setup plan: install torch (listed in the test extra) on main and pr.",
+      "Setup plan: install greenlet (listed in the test extra) on main and pr.",
+      "Setup plan: install grpcio (listed in the test extra) on main and pr.",
+      "Setup plan: install protobuf>=5.28.1 (listed in the test extra) on main and pr.",
+      "Setup plan: install mypy (listed in a dependency group) on main and pr.",
+      "Setup plan: install mypy_boto3_s3 (listed in a dependency group) on main and pr.",
+      "Setup plan: install ruff (listed in a dependency group) on main and pr.",
+      "Setup plan: install scipy-stubs; python_version>='3.10' (listed in a dependency group) on main and pr.",
+      "Setup plan: install types-PyYAML (listed in a dependency group) on main and pr.",
+      "Setup plan: install types-redis (listed in a dependency group) on main and pr.",
+      "Setup plan: install types-setuptools (listed in a dependency group) on main and pr.",
+      "Setup plan: install types-tqdm (listed in a dependency group) on main and pr.",
+      "Setup plan: install typing_extensions>=3.10.0.0 (listed in a dependency group) on main and pr.",
+      "Setup plan: Python 3.12: Python 3.12 already meets >=3.9",
+      "Setup plan: Python rule: one Python version is used on both sides: the lowest version that meets the requirements of both main and the pull request; if none meets both, the check stops as a setup problem and records both."
+    ],
+    "install_docs": [
+      "CONTRIBUTING.md",
+      "README.md",
+      "pyproject.toml",
+      ".github/workflows/checks-optional.yaml",
+      ".github/workflows/checks.yml",
+      ".github/workflows/mac-tests.yml",
+      ".github/workflows/matplotlib-tests.yml",
+      ".github/workflows/pypi-publish.yml",
+      ".github/workflows/reviewdog.yml",
+      ".github/workflows/sphinx-build.yml",
+      ".github/workflows/stale.yml",
+      ".github/workflows/tests-storage.yml",
+      ".github/workflows/tests-with-minimum-versions.yml",
+      ".github/workflows/tests.yml",
+      ".github/workflows/windows-tests.yml",
+      "docs/Makefile",
+      "tutorial/README.rst"
+    ],
+    "install_docs_from": "main",
+    "setup_plan": {
+      "packages": [
+        {
+          "requirement": "alembic>=1.5.0",
+          "name": "alembic",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "colorlog",
+          "name": "colorlog",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "numpy",
+          "name": "numpy",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "packaging>=20.0",
+          "name": "packaging",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "sqlalchemy>=1.4.2",
+          "name": "sqlalchemy",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "tqdm",
+          "name": "tqdm",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "PyYAML",
+          "name": "PyYAML",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "fakeredis[lua]",
+          "name": "fakeredis",
+          "kind": "test-extra",
+          "action": "install",
+          "source": "pyproject",
+          "reason": "listed in the test extra",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "moto",
+          "name": "moto",
+          "kind": "test-extra",
+          "action": "install",
+          "source": "pyproject",
+          "reason": "listed in the test extra",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "plotly",
+          "name": "plotly",
+          "kind": "test-extra",
+          "action": "install",
+          "source": "pyproject",
+          "reason": "listed in the test extra",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "pytest",
+          "name": "pytest",
+          "kind": "test-extra",
+          "action": "install",
+          "source": "pyproject",
+          "reason": "listed in the test extra",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "pytest-xdist",
+          "name": "pytest-xdist",
+          "kind": "test-extra",
+          "action": "install",
+          "source": "pyproject",
+          "reason": "listed in the test extra",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "scipy>=1.9.2",
+          "name": "scipy",
+          "kind": "test-extra",
+          "action": "install",
+          "source": "pyproject",
+          "reason": "listed in the test extra",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "torch",
+          "name": "torch",
+          "kind": "test-extra",
+          "action": "install",
+          "source": "pyproject",
+          "reason": "listed in the test extra",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "greenlet",
+          "name": "greenlet",
+          "kind": "test-extra",
+          "action": "install",
+          "source": "pyproject",
+          "reason": "listed in the test extra",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "grpcio",
+          "name": "grpcio",
+          "kind": "test-extra",
+          "action": "install",
+          "source": "pyproject",
+          "reason": "listed in the test extra",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "protobuf>=5.28.1",
+          "name": "protobuf",
+          "kind": "test-extra",
+          "action": "install",
+          "source": "pyproject",
+          "reason": "listed in the test extra",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "mypy",
+          "name": "mypy",
+          "kind": "dependency-group",
+          "action": "install",
+          "source": "pyproject",
+          "reason": "listed in a dependency group",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "mypy_boto3_s3",
+          "name": "mypy_boto3_s3",
+          "kind": "dependency-group",
+          "action": "install",
+          "source": "pyproject",
+          "reason": "listed in a dependency group",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "ruff",
+          "name": "ruff",
+          "kind": "dependency-group",
+          "action": "install",
+          "source": "pyproject",
+          "reason": "listed in a dependency group",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "scipy-stubs; python_version>='3.10'",
+          "name": "scipy-stubs",
+          "kind": "dependency-group",
+          "action": "install",
+          "source": "pyproject",
+          "reason": "listed in a dependency group",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "types-PyYAML",
+          "name": "types-PyYAML",
+          "kind": "dependency-group",
+          "action": "install",
+          "source": "pyproject",
+          "reason": "listed in a dependency group",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "types-redis",
+          "name": "types-redis",
+          "kind": "dependency-group",
+          "action": "install",
+          "source": "pyproject",
+          "reason": "listed in a dependency group",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "types-setuptools",
+          "name": "types-setuptools",
+          "kind": "dependency-group",
+          "action": "install",
+          "source": "pyproject",
+          "reason": "listed in a dependency group",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "types-tqdm",
+          "name": "types-tqdm",
+          "kind": "dependency-group",
+          "action": "install",
+          "source": "pyproject",
+          "reason": "listed in a dependency group",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "typing_extensions>=3.10.0.0",
+          "name": "typing_extensions",
+          "kind": "dependency-group",
+          "action": "install",
+          "source": "pyproject",
+          "reason": "listed in a dependency group",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        }
+      ],
+      "scope_blocked": "",
+      "component": null,
+      "aggregate_names": [],
+      "extra_reqs": [
+        "fakeredis[lua]",
+        "moto",
+        "plotly",
+        "pytest",
+        "pytest-xdist",
+        "scipy>=1.9.2",
+        "torch",
+        "greenlet",
+        "grpcio",
+        "protobuf>=5.28.1",
+        "mypy",
+        "mypy_boto3_s3",
+        "ruff",
+        "scipy-stubs; python_version>='3.10'",
+        "types-PyYAML",
+        "types-redis",
+        "types-setuptools",
+        "types-tqdm",
+        "typing_extensions>=3.10.0.0"
+      ],
+      "python": {
+        "requested": "3.12",
+        "current": "3.12",
+        "applied": true,
+        "switch": null,
+        "reason": "Python 3.12 already meets >=3.9",
+        "rule": "one Python version is used on both sides: the lowest version that meets the requirements of both main and the pull request; if none meets both, the check stops as a setup problem and records both",
+        "gate_failed": false
+      },
+      "system": [],
+      "refused": [],
+      "groups_blocked": ""
+    },
+    "steps": {
+      "setup_lookup": "Found 26 setup item(s) in the project's files and the web lookup.",
+      "setup_python": "Python 3.12: Python 3.12 already meets >=3.9",
+      "install_deps": "Wrote requirements.txt and installed it on main and pr: fakeredis[lua], moto, plotly, pytest, pytest-xdist, scipy>=1.9.2, torch, greenlet, grpcio, protobuf>=5.28.1, mypy, mypy_boto3_s3. 7 more come with the project install."
+    },
+    "run_files": {
+      "requirements": "requirements.txt",
+      "plan": "setup-plan.json",
+      "count": 19
+    }
+  },
+  "chosen": {
+    "pr": 6873,
+    "head_sha": null,
+    "install": null,
+    "test_cmd": null
+  },
+  "sides": {
+    "comparison_basis": "merge-base of PR base (GitHub base.sha) and PR head vs PR head (the first choice of main side was the PR code itself)",
+    "main_sha": "0d05a967362d22414d759b3e3f382f2d883d948b",
+    "pr_sha": "83a36def362a101198b89eb41b2d0b768ceaa4fc"
+  },
+  "tested": {
+    "main": "master @ 0d05a967362d (merge-base with the PR head)",
+    "pr": "PR head 83a36def362a"
+  },
+  "probe_plan": {
+    "baseline": "full",
+    "model": "model provider: nebius (Token Factory, live)",
+    "errors": [],
+    "model_claims": [
+      {
+        "id": "C2",
+        "text": "For an all-NaN input array, _get_best_intermediate_result_over_steps returns NaN, preserving the previous return value and thus leaving pruning behavior unchanged.",
+        "source_quote": "The returned value is identical to before (NaN), so pruning behavior is unchanged.",
+        "testable": true,
+        "expect": "same"
+      },
+      {
+        "id": "C3",
+        "text": "For an empty input array, _get_best_intermediate_result_over_steps still raises a ValueError, as before.",
+        "source_quote": "The empty case is untouched and still raises `ValueError` (covered by the existing test).",
+        "testable": true,
+        "expect": "same"
+      }
+    ],
+    "model_rejected_claims": [
+      {
+        "id": "C1",
+        "text": "When a trial reports only NaN intermediate values, the function _get_best_intermediate_result_over_steps no longer emits a numpy RuntimeWarning about All-NaN slice.",
+        "source_quote": "_get_best_intermediate_result_over_steps lets numpy's `RuntimeWarning: All-NaN slice encountered` (from `np.nanmin`/`np.nanmax`) escape to the user.",
+        "testable": true,
+        "expect": "differs",
+        "rejected": "source_quote not found in the PR text"
+      }
+    ],
+    "diff_targets": [],
+    "frozen": [
+      {
+        "path": "model-probes/model-probe-c2.py",
+        "source": "model",
+        "sha256": "82fd98e135fd9febe56cb6e5322050f11e0142d8e1b53f384bba2ebae8ac05f8",
+        "generator": {
+          "kind": "model",
+          "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+          "model": "nvidia/nemotron-3-super-120b-a12b",
+          "provider": "nebius",
+          "provenance": "live",
+          "blind": true
+        },
+        "frozen_at": "2026-10-22T18:00:03.624077+00:00",
+        "inputs_sha256": "5d14fafaea8077614bedc11dd97a2e77365f84231d6d95a4e54d37c20c89ce0c",
+        "inputs": {
+          "title_chars": 67,
+          "body_chars": 1677,
+          "base_files": {
+            "optuna/pruners/_percentile.py": "ccdbfe5649fcf3b43acb76cf67ae842639bf7c371d9ed7fb7757fdde21314f3f"
+          }
+        }
+      },
+      {
+        "path": "model-probes/model-probe-c3.py",
+        "source": "model",
+        "sha256": "3d96536387ca224ecee15f6e9be4bf67d3de726df5bf2d8438b0e6b6137ccb82",
+        "generator": {
+          "kind": "model",
+          "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+          "model": "nvidia/nemotron-3-super-120b-a12b",
+          "provider": "nebius",
+          "provenance": "live",
+          "blind": true
+        },
+        "frozen_at": "2026-10-22T18:00:03.624212+00:00",
+        "inputs_sha256": "5d14fafaea8077614bedc11dd97a2e77365f84231d6d95a4e54d37c20c89ce0c",
+        "inputs": {
+          "title_chars": 67,
+          "body_chars": 1677,
+          "base_files": {
+            "optuna/pruners/_percentile.py": "ccdbfe5649fcf3b43acb76cf67ae842639bf7c371d9ed7fb7757fdde21314f3f"
+          }
+        }
+      }
+    ]
+  },
+  "pr_side_started_at": "2026-10-22T18:00:03.624730+00:00",
+  "test_targets": {
+    "main": [
+      "tests/pruners_tests/test_percentile.py"
+    ],
+    "pr": [
+      "tests/pruners_tests/test_percentile.py"
+    ]
+  },
+  "contree_only": {
+    "note": "Contree mode: installs, tests and probes ran in Contree; nothing from the pull request ran locally",
+    "declared_test_deps": [
+      "pytest-xdist"
+    ],
+    "optional_backends": [],
+    "not_run_locally": [
+      "local freeze",
+      "installed-commit guard",
+      "probe coverage",
+      "optional-module retry"
+    ]
+  },
+  "coverage": {
+    "status": "measured",
+    "changed_lines_total": 2,
+    "changed_lines_covered": 2,
+    "files": [
+      {
+        "file": "optuna/pruners/_percentile.py",
+        "changed_lines_total": 2,
+        "changed_lines_covered": 2
+      }
+    ],
+    "seconds": 4.8,
+    "exit": 0,
+    "log": "coverage-pytest.log",
+    "where": "contree"
+  },
+  "contree": {
+    "main_uuid": "796a0bad-39c2-4573-af1e-31c58140a8bc",
+    "pr_uuid": "eea7bb5f-0414-4ca4-9acf-9c234191d4ad",
+    "max_ops": 40,
+    "sdk": "0.3.6",
+    "base_image": "docker.io/library/python:3.12-slim-bookworm",
+    "python": {
+      "requires_python": [
+        ">=3.9"
+      ],
+      "requires_python_found": true,
+      "main": "3.12.15",
+      "pr": "3.12.15",
+      "problems": []
+    }
+  },
+  "declared_test_deps": {
+    "requested": [
+      "pytest-xdist"
+    ],
+    "installed": true,
+    "where": "contree"
+  },
+  "test_extras": [
+    "pytest-xdist"
+  ],
+  "comparison": {
+    "same": 11,
+    "same_skipped_both": 0,
+    "regressions": [],
+    "fixed": [],
+    "new_tests_passing": 0,
+    "new_tests_failing": [],
+    "new_tests_skipped": [],
+    "removed_tests": [],
+    "reparametrized": [],
+    "skipped_missing_dependency": [],
+    "flaky": [],
+    "pr_unstable": [],
+    "pr_unstable_noisy": [],
+    "environment": [],
+    "other_changes": [],
+    "preexisting_failures": [],
+    "load_failed_both": [],
+    "load_failed_pr": [],
+    "load_failed_main": [],
+    "executed": {
+      "main": 11,
+      "pr": 11
+    },
+    "messages": {}
+  },
+  "exit_check": {
+    "explained": true,
+    "problems": [],
+    "detail": "all runs exited 0"
+  },
+  "probes": {
+    "status": "ran",
+    "items": [
+      {
+        "id": "model-probe-c2",
+        "source": "model",
+        "path": "model-probes/model-probe-c2.py",
+        "sha256": "82fd98e135fd9febe56cb6e5322050f11e0142d8e1b53f384bba2ebae8ac05f8",
+        "target": "optuna/optuna#6873",
+        "about": "Probe for claim C2: all-NaN input returns NaN",
+        "claims": [],
+        "runs_per_side": 3,
+        "per_run": [
+          {
+            "side": "main",
+            "run": 1,
+            "seconds": 2.6,
+            "ok": false
+          },
+          {
+            "side": "pr",
+            "run": 1,
+            "seconds": 2.4,
+            "ok": false
+          },
+          {
+            "side": "main",
+            "run": 2,
+            "seconds": 2.4,
+            "ok": false
+          },
+          {
+            "side": "pr",
+            "run": 2,
+            "seconds": 2.5,
+            "ok": false
+          },
+          {
+            "side": "main",
+            "run": 3,
+            "seconds": 2.4,
+            "ok": false
+          },
+          {
+            "side": "pr",
+            "run": 3,
+            "seconds": 2.5,
+            "ok": false
+          }
+        ],
+        "outputs": {
+          "main": [
+            "probe-model-probe-c2-main-1.jsonl",
+            "probe-model-probe-c2-main-2.jsonl",
+            "probe-model-probe-c2-main-3.jsonl"
+          ],
+          "pr": [
+            "probe-model-probe-c2-pr-1.jsonl",
+            "probe-model-probe-c2-pr-2.jsonl",
+            "probe-model-probe-c2-pr-3.jsonl"
+          ]
+        },
+        "runs": {
+          "main": [
+            {
+              "probe.error": {
+                "crash": "non-json output",
+                "exit_code": 1
+              }
+            },
+            {
+              "probe.error": {
+                "crash": "non-json output",
+                "exit_code": 1
+              }
+            },
+            {
+              "probe.error": {
+                "crash": "non-json output",
+                "exit_code": 1
+              }
+            }
+          ],
+          "pr": [
+            {
+              "probe.error": {
+                "crash": "non-json output",
+                "exit_code": 1
+              }
+            },
+            {
+              "probe.error": {
+                "crash": "non-json output",
+                "exit_code": 1
+              }
+            },
+            {
+              "probe.error": {
+                "crash": "non-json output",
+                "exit_code": 1
+              }
+            }
+          ]
+        },
+        "observations": [
+          {
+            "name": "probe.error",
+            "state": "same",
+            "label": "not_testable",
+            "claim": null,
+            "main": {
+              "crash": "non-json output",
+              "exit_code": 1
+            },
+            "pr": {
+              "crash": "non-json output",
+              "exit_code": 1
+            },
+            "citations": {
+              "main": {
+                "file": "probe-model-probe-c2-main-1.jsonl",
+                "line": 1,
+                "quote": "\"observation\": \"probe.error\""
+              },
+              "pr": {
+                "file": "probe-model-probe-c2-pr-1.jsonl",
+                "line": 1,
+                "quote": "\"observation\": \"probe.error\""
+              }
+            }
+          }
+        ],
+        "generator": {
+          "kind": "model",
+          "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+          "model": "nvidia/nemotron-3-super-120b-a12b",
+          "provider": "nebius",
+          "provenance": "live",
+          "blind": true
+        },
+        "freeze": {
+          "sha256": "82fd98e135fd9febe56cb6e5322050f11e0142d8e1b53f384bba2ebae8ac05f8",
+          "generator": {
+            "kind": "model",
+            "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+            "model": "nvidia/nemotron-3-super-120b-a12b",
+            "provider": "nebius",
+            "provenance": "live",
+            "blind": true
+          },
+          "frozen_at": "2026-10-22T18:00:03.624077+00:00",
+          "inputs_sha256": "5d14fafaea8077614bedc11dd97a2e77365f84231d6d95a4e54d37c20c89ce0c",
+          "inputs": {
+            "title_chars": 67,
+            "body_chars": 1677,
+            "base_files": {
+              "optuna/pruners/_percentile.py": "ccdbfe5649fcf3b43acb76cf67ae842639bf7c371d9ed7fb7757fdde21314f3f"
+            }
+          },
+          "verified": true,
+          "pr_started_at": "2026-10-22T18:00:03.624730+00:00"
+        },
+        "probe_changed_line_coverage": {
+          "status": "not measured",
+          "why": "Contree-only check: probe coverage needs a local side",
+          "adequacy": "not_adequate",
+          "note": "the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate"
+        },
+        "status": "crashed",
+        "uninformative_reason": "the probe crashed or printed no parsed output on every main-side run"
+      },
+      {
+        "id": "model-probe-c3",
+        "source": "model",
+        "path": "model-probes/model-probe-c3.py",
+        "sha256": "3d96536387ca224ecee15f6e9be4bf67d3de726df5bf2d8438b0e6b6137ccb82",
+        "target": "optuna/optuna#6873",
+        "about": "Probe for claim C3: empty input raises ValueError",
+        "claims": [],
+        "runs_per_side": 3,
+        "per_run": [
+          {
+            "side": "main",
+            "run": 1,
+            "seconds": 2.5,
+            "ok": true
+          },
+          {
+            "side": "pr",
+            "run": 1,
+            "seconds": 2.4,
+            "ok": true
+          },
+          {
+            "side": "main",
+            "run": 2,
+            "seconds": 2.5,
+            "ok": true
+          },
+          {
+            "side": "pr",
+            "run": 2,
+            "seconds": 2.4,
+            "ok": true
+          },
+          {
+            "side": "main",
+            "run": 3,
+            "seconds": 2.4,
+            "ok": true
+          },
+          {
+            "side": "pr",
+            "run": 3,
+            "seconds": 2.4,
+            "ok": true
+          }
+        ],
+        "outputs": {
+          "main": [
+            "probe-model-probe-c3-main-1.jsonl",
+            "probe-model-probe-c3-main-2.jsonl",
+            "probe-model-probe-c3-main-3.jsonl"
+          ],
+          "pr": [
+            "probe-model-probe-c3-pr-1.jsonl",
+            "probe-model-probe-c3-pr-2.jsonl",
+            "probe-model-probe-c3-pr-3.jsonl"
+          ]
+        },
+        "runs": {
+          "main": [
+            {
+              "exception": "ValueError"
+            },
+            {
+              "exception": "ValueError"
+            },
+            {
+              "exception": "ValueError"
+            }
+          ],
+          "pr": [
+            {
+              "exception": "ValueError"
+            },
+            {
+              "exception": "ValueError"
+            },
+            {
+              "exception": "ValueError"
+            }
+          ]
+        },
+        "observations": [
+          {
+            "name": "exception",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": "ValueError",
+            "pr": "ValueError",
+            "citations": {
+              "main": {
+                "file": "probe-model-probe-c3-main-1.jsonl",
+                "line": 1,
+                "quote": "\"observation\": \"exception\""
+              },
+              "pr": {
+                "file": "probe-model-probe-c3-pr-1.jsonl",
+                "line": 1,
+                "quote": "\"observation\": \"exception\""
+              }
+            }
+          }
+        ],
+        "generator": {
+          "kind": "model",
+          "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+          "model": "nvidia/nemotron-3-super-120b-a12b",
+          "provider": "nebius",
+          "provenance": "live",
+          "blind": true
+        },
+        "freeze": {
+          "sha256": "3d96536387ca224ecee15f6e9be4bf67d3de726df5bf2d8438b0e6b6137ccb82",
+          "generator": {
+            "kind": "model",
+            "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+            "model": "nvidia/nemotron-3-super-120b-a12b",
+            "provider": "nebius",
+            "provenance": "live",
+            "blind": true
+          },
+          "frozen_at": "2026-10-22T18:00:03.624212+00:00",
+          "inputs_sha256": "5d14fafaea8077614bedc11dd97a2e77365f84231d6d95a4e54d37c20c89ce0c",
+          "inputs": {
+            "title_chars": 67,
+            "body_chars": 1677,
+            "base_files": {
+              "optuna/pruners/_percentile.py": "ccdbfe5649fcf3b43acb76cf67ae842639bf7c371d9ed7fb7757fdde21314f3f"
+            }
+          },
+          "verified": true,
+          "pr_started_at": "2026-10-22T18:00:03.624730+00:00"
+        },
+        "probe_changed_line_coverage": {
+          "status": "not measured",
+          "why": "Contree-only check: probe coverage needs a local side",
+          "adequacy": "unmeasured",
+          "note": "probe coverage not measured (Contree-only check: probe coverage needs a local side)"
+        },
+        "status": "ran"
+      }
+    ],
+    "summary": {
+      "labels": [
+        "no_difference"
+      ],
+      "flagged": [],
+      "proven_claims": [],
+      "reason": "probe: 1 other observation(s) identical on both sides; the probe crashed or printed no parsed output on every main-side run",
+      "ignored_noise": [],
+      "ignored_warning_only": [],
+      "pr_only_noisy": []
+    },
+    "test_settings": {
+      "applied": true,
+      "read_from": "main checkout (same values on both sides)",
+      "source": [
+        "pyproject.toml"
+      ],
+      "variables": [],
+      "pythonpath": [],
+      "pr_changed": []
+    }
+  },
+  "probe_changed_line_coverage": {
+    "status": "not measured",
+    "side": "main",
+    "probes": {
+      "model-probe-c2": {
+        "status": "not measured",
+        "changed_lines_covered": null,
+        "changed_lines_total": null,
+        "adequacy": "not_adequate"
+      },
+      "model-probe-c3": {
+        "status": "not measured",
+        "changed_lines_covered": null,
+        "changed_lines_total": null,
+        "adequacy": "unmeasured"
+      }
+    },
+    "not_adequate": [
+      "model-probe-c2"
+    ]
+  },
+  "verdict": "could_not_verify",
+  "reason": "unverified behaviour claim: \"The returned value is identical to before (NaN), so pruning behavior is unchanged.\" (+1 more); needs a probe (11 test(s) ran on main, 11 on the PR; 0 new test(s) pass, 11 unchanged; probe model-probe-c2 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count; probe model-probe-c3 has no measured line coverage (Contree-only check: probe coverage needs a local side); it does not count as covering the change)",
+  "verdict_before_coverage_gate": "could_not_verify",
+  "reason_before_coverage_gate": "unverified behaviour claim: \"The returned value is identical to before (NaN), so pruning behavior is unchanged.\" (+1 more); needs a probe (11 test(s) ran on main, 11 on the PR; 0 new test(s) pass, 11 unchanged; probe model-probe-c2 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count; probe model-probe-c3 has no measured line coverage (Contree-only check: probe coverage needs a local side); it does not count as covering the change)",
+  "changed_lines_total": 2,
+  "changed_lines_covered": 2,
+  "coverage_gate": {
+    "kind": "python",
+    "changed": false,
+    "confidence": "normal",
+    "note": "2 of 2 changed executable line(s) ran (100%)",
+    "measurement": "measured"
+  },
+  "agents": {
+    "status": "skipped",
+    "note": "advisory swarm is off",
+    "roles": []
+  },
+  "explanation": {
+    "status": "not yet wired",
+    "why": "advisory swarm is off"
+  },
+  "swarm_requested": false,
+  "operator_approval_requested": false,
+  "swarm": "off",
+  "operator_approval": "off",
+  "what_changed": {
+    "package_python_files": [
+      "optuna/pruners/_percentile.py"
+    ],
+    "compiled_files": [],
+    "other_files": [
+      "tests/pruners_tests/test_percentile.py"
+    ]
+  },
+  "duration_s": {
+    "total_wall": 303.8,
+    "tests": 18.1
+  },
+  "cost": {
+    "ai_calls": 3,
+    "failed_ai_calls": 0,
+    "input_tokens": 6089,
+    "output_tokens": 9211,
+    "thinking_tokens": 8420,
+    "cost_usd": 0.010117,
+    "calls_without_usage": 0,
+    "ai_cost_usd": 0.010117,
+    "cost_complete": true,
+    "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+    "compute_seconds": {
+      "total_wall": 303.8,
+      "tests": 18.1
+    },
+    "machine_usd_per_hour": 0.24,
+    "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+    "computer_cost_usd": 0.020253,
+    "total_cost_usd": 0.03037,
+    "swarm": {
+      "ai_calls": 0,
+      "failed_ai_calls": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "thinking_tokens": 0,
+      "cost_usd": 0.0,
+      "calls_without_usage": 0,
+      "ai_cost_usd": 0.0,
+      "cost_complete": true,
+      "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+    }
+  }
+}
