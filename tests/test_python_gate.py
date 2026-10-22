@@ -1,3 +1,4 @@
+from pathlib import Path
 from types import SimpleNamespace
 
 from ops import daily_run
@@ -205,6 +206,8 @@ def test_deps_only_install_runs_uv_sync_in_the_sandbox_and_adds_the_path(tmp_pat
         cmds.append([str(x) for x in c])
         if c[1] == "venv":
             (tmp_path / "v" / "lib" / "python3.14" / "site-packages").mkdir(parents=True)
+        if c[1] == "export":
+            (tmp_path / "src" / ".poc-declared-deps.txt").write_text("django==5.0\n")
         assert sbx is not None
         return 0, 0.0
     monkeypatch.setattr(daily_run, "run", fake_run)
@@ -499,3 +502,250 @@ def test_a_dependency_added_only_by_the_pr_is_not_trusted_or_installed(tmp_path,
         assert "added-by-pr" not in blob and installed == []
         notes = " ".join(rec["demo_helper"].get("notes") or [])
         assert "added_by_pr" in notes and "refused" in notes
+
+
+def _other_not_a_package(tmp_path, monkeypatch, rec, step, checkout, calls):
+    monkeypatch.setattr(daily_run, "install_side",
+                        lambda *a, **k: calls.append("install") or _not_a_python_project(*a, **k))
+    monkeypatch.setattr(daily_run, "install_deps_only",
+                        lambda *a, **k: calls.append(("deps", a[1], a[2], k.get("deps_root"))) or (True, ""))
+    a = SimpleNamespace(python="3.14", pr="https://github.com/a/b/pull/1", product_check=True, bench=None)
+    return daily_run._install_with_helper(a, rec, step, tmp_path / ("v-" + step.split()[0]), checkout, None,
+                                          tmp_path / "log", 10, None, None, max_retries=1)
+
+
+def test_other_not_a_package_pr_side_reads_mains_files(tmp_path, monkeypatch):
+    """A not-a-package error that is not a flat layout: the PR side installs from main's files, never its own."""
+    main, pr = tmp_path / "main", tmp_path / "pr"
+    for side in (main, pr):
+        side.mkdir()
+    (main / "requirements.txt").write_text("")
+    (pr / "requirements.txt").write_text("pr-added-dependency\n")
+    calls, rec = [], {}
+    assert _other_not_a_package(tmp_path, monkeypatch, rec, "main install", main, calls)[0] is True
+    assert _other_not_a_package(tmp_path, monkeypatch, rec, "PR install", pr, calls)[0] is True
+    plan = {"kind": "requirements", "files": ["requirements.txt"], "source": "requirements.txt"}
+    assert [c for c in calls if c != "install"] == [("deps", main, plan, main), ("deps", pr, plan, main)]
+
+
+def test_other_not_a_package_on_the_pr_side_only_does_not_fall_back(tmp_path, monkeypatch):
+    (tmp_path / "requirements.txt").write_text("pr-added-dependency\n")
+    calls, rec = [], {}
+    ok, _ = _other_not_a_package(tmp_path, monkeypatch, rec, "PR install", tmp_path, calls)
+    assert ok is False and calls and set(calls) == {"install"}
+
+
+import pytest  # noqa: E402
+
+_REFUSED = ["--index-url https://example.invalid/simple", "--extra-index-url https://example.invalid/simple",
+            "-i https://example.invalid/simple", "-f https://example.invalid/wheels",
+            "--find-links ./wheels", "git+https://example.invalid/x.git", "https://example.invalid/x.tar.gz",
+            "name @ https://example.invalid/x.whl", "-e .", "--editable ./sub", ".", "./sub", "../other",
+            "/abs/path", "local.whl"]
+
+
+@pytest.mark.parametrize("line", _REFUSED)
+def test_deps_only_refuses_off_index_lines(tmp_path, monkeypatch, line):
+    (tmp_path / "requirements.txt").write_text(f"okpkg>=1\n{line}\n")
+    calls, rec = [], {}
+    ok, why = _flat_product(tmp_path, monkeypatch, rec, "main install", tmp_path, calls)
+    assert ok is False and calls == ["install"] and why.startswith("unsupported:")
+    assert "outside the official package index" in why and line.split()[0] in why
+    verdict, reason, _flags = daily_run.tests_verdict(None, why, None, None)
+    assert verdict == "could_not_verify" and reason == why
+
+
+def test_deps_only_refuses_off_index_lines_in_included_files(tmp_path):
+    (tmp_path / "requirements.txt").write_text("-r requirements-base.txt\n")
+    (tmp_path / "requirements-base.txt").write_text("-e .\n")
+    plan = demo_helper.deps_only_plan(tmp_path)
+    assert demo_helper.unsafe_requirement_lines(tmp_path, plan) == ["requirements-base.txt: -e ."]
+
+
+def test_deps_only_allows_plain_index_requirements(tmp_path):
+    (tmp_path / "requirements.txt").write_text("# c\nokpkg>=1  # note\nother[extra]==2; python_version>'3.8'\n"
+                                               "-r requirements-dev.txt\n-c constraints.txt\n")
+    (tmp_path / "requirements-dev.txt").write_text("devpkg\n")
+    (tmp_path / "constraints.txt").write_text("okpkg<3\n")
+    assert demo_helper.unsafe_requirement_lines(tmp_path, demo_helper.deps_only_plan(tmp_path)) == []
+
+
+def test_deps_only_include_without_a_space_is_followed(tmp_path):
+    (tmp_path / "requirements.txt").write_text("-rx.txt\n")
+    (tmp_path / "x.txt").write_text("git+https://example.invalid/pkg.git\n")
+    plan = demo_helper.deps_only_plan(tmp_path)
+    assert demo_helper.unsafe_requirement_lines(tmp_path, plan) == ["x.txt: git+https://example.invalid/pkg.git"]
+    (tmp_path / "requirements.txt").write_text("-cx.txt\n--requirement=y.txt\n")
+    (tmp_path / "y.txt").write_text("-e .\n")
+    assert len(demo_helper.unsafe_requirement_lines(tmp_path, plan)) == 2
+
+
+def test_deps_only_include_loops_end(tmp_path):
+    (tmp_path / "requirements.txt").write_text("okpkg\n-r requirements-a.txt\n")
+    (tmp_path / "requirements-a.txt").write_text("-rrequirements.txt\nother\n")
+    assert demo_helper.unsafe_requirement_lines(tmp_path, demo_helper.deps_only_plan(tmp_path)) == []
+    (tmp_path / "requirements-a.txt").write_text("-r requirements-a.txt\n-r requirements.txt\n.\n")
+    assert demo_helper.unsafe_requirement_lines(tmp_path, demo_helper.deps_only_plan(tmp_path)) == \
+        ["requirements-a.txt: ."]
+
+
+@pytest.mark.parametrize("include", ["-r ../outside.txt", "-r=../outside.txt", "-rsub/../../outside.txt",
+                                     "-r /etc/outside.txt", "-c/etc/outside.txt", "-r ~/outside.txt",
+                                     "-r https://example.invalid/r.txt"])
+def test_deps_only_refuses_includes_outside_the_project(tmp_path, include):
+    proj = tmp_path / "proj"
+    proj.mkdir()
+    (tmp_path / "outside.txt").write_text("okpkg\n")
+    (proj / "requirements.txt").write_text(include + "\n")
+    assert demo_helper.unsafe_requirement_lines(proj, demo_helper.deps_only_plan(proj)) == \
+        ["requirements.txt: " + include]
+
+
+def test_deps_only_refuses_an_include_symlinked_outside_the_project(tmp_path):
+    proj = tmp_path / "proj"
+    proj.mkdir()
+    (tmp_path / "outside.txt").write_text("okpkg\n")
+    (proj / "inc.txt").symlink_to(tmp_path / "outside.txt")
+    (proj / "requirements.txt").write_text("-r inc.txt\n")
+    assert demo_helper.unsafe_requirement_lines(proj, demo_helper.deps_only_plan(proj)) == ["requirements.txt: -r inc.txt"]
+
+
+@pytest.mark.parametrize("line", ["--trusted-host example.invalid", "--no-index"])
+def test_deps_only_refuses_trusted_host_and_no_index(tmp_path, line):
+    (tmp_path / "requirements.txt").write_text(f"okpkg\n{line}\n")
+    assert demo_helper.unsafe_requirement_lines(tmp_path, demo_helper.deps_only_plan(tmp_path)) == \
+        [f"requirements.txt: {line}"]
+
+
+_UV_PROJECT = '[project]\nname = "p"\nversion = "0"\ndependencies = ["okpkg>=1"]\n'
+
+
+@pytest.mark.parametrize("extra,needle", [
+    ('[tool.uv.sources]\nokpkg = { path = "../okpkg" }\n', "[tool.uv.sources]"),
+    ('[tool.uv.sources]\nokpkg = { git = "https://example.invalid/okpkg" }\n', "[tool.uv.sources]"),
+    ('[[tool.uv.index]]\nname = "x"\nurl = "https://example.invalid/simple"\n', "[[tool.uv.index]]"),
+    ('[tool.uv.workspace]\nmembers = ["libs/*"]\n', "[tool.uv.workspace]"),
+])
+def test_uv_sync_plan_refuses_sources_index_and_workspace(tmp_path, extra, needle):
+    (tmp_path / "pyproject.toml").write_text(_UV_PROJECT + extra)
+    plan = demo_helper.deps_only_plan(tmp_path)
+    assert plan["kind"] == "uv-sync"
+    bad = demo_helper.unsafe_requirement_lines(tmp_path, plan)
+    assert len(bad) == 1 and needle in bad[0]
+    assert demo_helper.unsafe_requirements_reason(bad).startswith("unsupported:")
+
+
+def test_uv_sync_plan_with_plain_deps_passes(tmp_path):
+    (tmp_path / "pyproject.toml").write_text(_UV_PROJECT + '[tool.uv]\ndev-dependencies = ["devpkg"]\n')
+    assert demo_helper.unsafe_requirement_lines(tmp_path, demo_helper.deps_only_plan(tmp_path)) == []
+
+
+@pytest.mark.parametrize("line", ["-e ./libs/member", "./libs/member", "okpkg @ file:///x/okpkg",
+                                  "okpkg @ git+https://example.invalid/okpkg@abc", "okpkg @ https://example.invalid/o.whl",
+                                  "--index-url https://example.invalid/simple"])
+def test_uv_sync_export_off_index_lines_stop_the_install(tmp_path, monkeypatch, line):
+    src = _git_checkout(tmp_path / "src")
+    cmds = []
+
+    def fake_run(c, log, cwd=None, env=None, timeout=None, sbx=None):
+        cmds.append([str(x) for x in c])
+        if c[1] == "venv":
+            (tmp_path / "v" / "lib" / "python3.14" / "site-packages").mkdir(parents=True, exist_ok=True)
+        if c[1] == "export":
+            (src / ".poc-declared-deps.txt").write_text(f"# generated\nokpkg==1.0 ; python_version >= '3.9'\n"
+                                                        f"    # via p\n{line}\n")
+        return 0, 0.0
+    monkeypatch.setattr(daily_run, "run", fake_run)
+    ok, why = daily_run.install_deps_only(tmp_path / "v", src, {"kind": "uv-sync", "frozen": True},
+                                          tmp_path / "log", "3.14", 10)
+    assert ok is False and why.startswith("unsupported:") and "outside the official package index" in why
+    assert not any(c[:3] == ["uv", "pip", "install"] for c in cmds)
+    assert not (src / ".poc-declared-deps.txt").exists()
+    verdict, _reason, _flags = daily_run.tests_verdict(None, why, None, None)
+    assert verdict == "could_not_verify"
+
+
+def test_uv_sync_export_with_plain_lines_installs(tmp_path, monkeypatch):
+    src = _git_checkout(tmp_path / "src")
+    monkeypatch.setattr(daily_run, "run", _fake_install(tmp_path, lambda: None))
+    ok, why = daily_run.install_deps_only(tmp_path / "v", src, {"kind": "uv-sync", "frozen": True},
+                                          tmp_path / "log", "3.14", 10)
+    assert ok is True, why
+
+
+def test_deps_only_install_drops_index_env_vars(tmp_path, monkeypatch):
+    src = _git_checkout(tmp_path / "src")
+    for k in ("UV_EXTRA_INDEX_URL", "UV_INDEX", "UV_DEFAULT_INDEX", "UV_FIND_LINKS", "UV_NO_INDEX",
+              "UV_INSECURE_HOST", "PIP_INDEX_URL", "PIP_EXTRA_INDEX_URL", "PIP_FIND_LINKS", "PIP_NO_INDEX",
+              "PIP_TRUSTED_HOST"):
+        monkeypatch.setenv(k, "https://example.invalid/simple")
+    monkeypatch.setenv("UV_EXTRA_INDEX_URL", "https://example.invalid/simple")
+    envs = []
+    inner = _fake_install(tmp_path, lambda: None)
+
+    def fake_run(c, log, cwd=None, env=None, timeout=None, sbx=None):
+        envs.append(dict(env or {}))
+        return inner(c, log, cwd=cwd, env=env, timeout=timeout, sbx=sbx)
+    monkeypatch.setattr(daily_run, "run", fake_run)
+    ok, why = daily_run.install_deps_only(tmp_path / "v", src, {"kind": "uv-sync", "frozen": True},
+                                          tmp_path / "log", "3.14", 10)
+    assert ok is True, why
+    assert envs and all("UV_EXTRA_INDEX_URL" not in e for e in envs)
+    assert all(not any(k.startswith(("UV_", "PIP_")) and ("INDEX" in k or "FIND_LINKS" in k or "HOST" in k)
+                       for k in e) for e in envs)
+
+
+def test_drop_index_env_keeps_other_vars():
+    got = demo_helper.drop_index_env({"UV_CACHE_DIR": "c", "PATH": "p", "UV_INDEX_URL": "x", "PIP_TRUSTED_HOST": "h"})
+    assert got == {"UV_CACHE_DIR": "c", "PATH": "p"}
+
+
+@pytest.mark.parametrize("config", ["pyproject", "uv.toml"])
+def test_deps_only_uv_calls_ignore_uv_config(tmp_path, monkeypatch, config):
+    src = _git_checkout(tmp_path / "src")
+    if config == "pyproject":
+        (src / "pyproject.toml").write_text(_UV_PROJECT + '[tool.uv]\nextra-index-url = ["https://example.invalid/s"]\n'
+                                            '[tool.uv.pip]\nfind-links = ["https://example.invalid/f"]\n')
+    else:
+        (src / "uv.toml").write_text('index-url = "https://example.invalid/s"\nno-index = true\n')
+    calls = []
+    inner = _fake_install(tmp_path, lambda: None)
+
+    def fake_run(c, log, cwd=None, env=None, timeout=None, sbx=None):
+        calls.append(([str(x) for x in c], dict(env or {})))
+        return inner(c, log, cwd=cwd, env=env, timeout=timeout, sbx=sbx)
+    monkeypatch.setattr(daily_run, "run", fake_run)
+    daily_run.install_deps_only(tmp_path / "v", src, {"kind": "uv-sync", "frozen": True}, tmp_path / "log", "3.14", 10)
+    daily_run.install_deps_only(tmp_path / "v2", src, {"kind": "requirements", "files": ["requirements.txt"]},
+                                tmp_path / "log", "3.14", 10)
+    uv_calls = [(c, e) for c, e in calls if c and c[0] == "uv"]
+    assert uv_calls and all("--no-config" in c and e.get("UV_NO_CONFIG") == "1" for c, e in uv_calls)
+
+
+def test_deps_only_refuses_a_top_level_requirements_symlink_outside(tmp_path):
+    proj = tmp_path / "proj"
+    proj.mkdir()
+    (tmp_path / "outside.txt").write_text("okpkg\n")
+    (proj / "requirements.txt").symlink_to(tmp_path / "outside.txt")
+    assert demo_helper.unsafe_requirement_lines(proj, demo_helper.deps_only_plan(proj)) == \
+        ["requirements.txt: (leads outside the project)"]
+
+
+def test_refused_export_file_is_deleted_from_the_output_folder(tmp_path, monkeypatch):
+    src, main = _git_checkout(tmp_path / "src"), _git_checkout(tmp_path / "main")
+    written = []
+
+    def fake_run(c, log, cwd=None, env=None, timeout=None, sbx=None):
+        if c[1] == "venv":
+            (tmp_path / "v" / "lib" / "python3.14" / "site-packages").mkdir(parents=True, exist_ok=True)
+        if c[1] == "export":
+            out = Path(c[c.index("-o") + 1])
+            out.parent.mkdir(parents=True, exist_ok=True)
+            out.write_text("-e ./member\n")
+            written.append(out)
+        return 0, 0.0
+    monkeypatch.setattr(daily_run, "run", fake_run)
+    ok, why = daily_run.install_deps_only(tmp_path / "v", src, {"kind": "uv-sync", "frozen": True},
+                                          tmp_path / "log", "3.14", 10, deps_root=main)
+    assert ok is False and why.startswith("unsupported:")
+    assert written and not any(p.exists() for p in written)
