@@ -14,7 +14,7 @@ import shutil
 import sys
 import urllib.parse
 import urllib.request
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 
 from evals.label_study_pairs import split_repo
 
@@ -646,9 +646,12 @@ def _add_pkg(found: list[dict], seen: set, requirement: str, *, kind: str, actio
                   "reason": reason, "sides": ["main", "pr"]})
 
 
-def declared_packages(checkout, self_dist: str = "") -> list[dict]:
-    """Packages the checkout lists. Runtime deps are noted. Test extras and requirements are installed."""
+def declared_packages(checkout, self_dist: str = "", skip_files=()) -> list[dict]:
+    """Packages the checkout lists. Runtime deps are noted. Test extras and requirements are installed.
+
+    ``skip_files``: requirement files not to read (a product check passes the aggregate files of a component app)."""
     root = Path(checkout)
+    skip = {Path(f).resolve() for f in skip_files or ()}
     found: list[dict] = []
     seen: set = set()
     data = _pyproject(root / "pyproject.toml")
@@ -697,6 +700,8 @@ def declared_packages(checkout, self_dist: str = "") -> list[dict]:
             _add_pkg(found, seen, req, kind="test-extra", action="install", source="setup.py",
                      reason=f"listed in the {extra} extra", self_dist=self_dist)
     for path in _requirement_files(root):
+        if path.resolve() in skip:
+            continue
         for req in _req_lines(_read(path)):
             _add_pkg(found, seen, req, kind="requirements", action="install", source=path.name,
                      reason=f"listed in {path.name}", self_dist=self_dist)
@@ -831,6 +836,199 @@ def _requirement_files(root: Path) -> list[Path]:
             if name.startswith("requirements") and name.endswith(".txt"):
                 out.append(Path(dirpath) / name)
     return out
+
+
+# ---------------------------------------------------------------- component apps (product checks only)
+COMPONENT_MANIFEST = "manifest.json"
+_COMPONENT_DEPTH = 5
+
+
+def component_dirs(root) -> dict[str, list[str]]:
+    """Folders (relative, posix) that hold a JSON manifest declaring a ``requirements`` list, with that list.
+
+    This is the project's own per-component metadata; nothing here names a project or a package."""
+    root = Path(root)
+    out: dict[str, list[str]] = {}
+    if not root.is_dir():
+        return out
+    for dirpath, dirnames, filenames in os.walk(root):
+        rel = Path(dirpath).relative_to(root)
+        dirnames[:] = sorted(n for n in dirnames if n not in SKIP_DIRS and not n.startswith(".")
+                             and len(rel.parts) < _COMPONENT_DEPTH)
+        if COMPONENT_MANIFEST not in filenames or not rel.parts:
+            continue
+        if (Path(dirpath) / COMPONENT_MANIFEST).is_symlink():
+            continue   # a manifest that points elsewhere is not the component's own metadata
+        try:
+            data = json.loads(_read(Path(dirpath) / COMPONENT_MANIFEST) or "null")
+        except ValueError:
+            continue
+        reqs = data.get("requirements") if isinstance(data, dict) else None
+        if isinstance(reqs, list) and all(isinstance(r, str) for r in reqs):
+            out[rel.as_posix()] = [r.strip() for r in reqs if r.strip()]
+    return out
+
+
+def aggregate_requirement_files(root, components: dict[str, list[str]]) -> list[Path]:
+    """Top-level requirements files that collect many components' requirements (requirements_all-style).
+
+    A file is an aggregate when lines from at least two different components' manifests appear in it and those
+    lines are at least half of the file. Decided from the content, never from the file name. A project with fewer
+    than three components, or whose only requirements file this is, has no aggregate (that file is its core)."""
+    root = Path(root)
+    if len(components) < 3:
+        return []
+    candidates = sorted(root.glob("requirements*.txt")) if root.is_dir() else []
+    if len([p for p in candidates if p.is_file()]) < 2:
+        return []
+    owner: dict[str, set] = {}
+    for comp, reqs in components.items():
+        for req in reqs:
+            owner.setdefault(norm(req_name(req)), set()).add(comp)
+    out = []
+    for path in candidates:
+        lines = _req_lines(_read(path))
+        if not lines:
+            continue
+        hit = [norm(req_name(line)) for line in lines if norm(req_name(line)) in owner]
+        comps = set().union(*(owner[h] for h in hit)) if hit else set()
+        if len(comps) >= 2 and 2 * len(hit) >= len(lines):
+            out.append(path)
+    return out
+
+
+def component_for_changes(changed, components: dict[str, list[str]], ignore=()) -> str | None:
+    """The single component every changed file belongs to, or None.
+
+    A file belongs to a component when it is inside that component's folder, or inside ``tests/<path>`` or
+    ``tests/<name>`` for that component (tests kept in a mirrored tree, at the top level or under the component's
+    parent package). A folder elsewhere that merely shares the name does not count. Files in ``ignore`` (aggregate
+    files that a requirement bump regenerates) are not counted. A path with a ``..`` part, any other file, or two
+    components gives None."""
+    ignore = set(ignore)
+    found = set()
+    counted = 0
+    for raw in changed or []:
+        path = PurePosixPath(str(raw).lstrip("/"))
+        if ".." in path.parts:
+            return None
+        if path.as_posix() in ignore:
+            continue
+        counted += 1
+        text = path.as_posix()
+        inside = [c for c in components if text.startswith(c + "/")]
+        if inside:
+            found.add(max(inside, key=len))
+            continue
+        depth = {c: max((len(t) for t in _test_roots(c) if text.startswith(t + "/")), default=0) for c in components}
+        best = max(depth.values(), default=0)
+        tied = [c for c, d in depth.items() if d and d == best]
+        if len(tied) != 1:
+            return None
+        found.add(tied[0])
+    return next(iter(found)) if counted and len(found) == 1 else None
+
+
+def _test_roots(comp: str) -> list[str]:
+    """Mirrored test folders for a component: tests/<path>, tests/<path below the top package>, tests/<name>."""
+    parts = PurePosixPath(comp).parts
+    return list(dict.fromkeys("tests/" + "/".join(parts[i:]) for i in range(len(parts))))
+
+
+def lint_only_requirement_files(root, ignore=()) -> list[Path]:
+    """Top-level requirements files that only pin the project's lint hooks (pre-commit style), decided from content:
+    every requirement in the file is named in the project's own .pre-commit-config.yaml. No file or package names."""
+    root = Path(root)
+    config = root / ".pre-commit-config.yaml"
+    if not config.is_file() or config.is_symlink():
+        return []
+    hooks = re.sub(r"[-_.]+", "-", _read(config).lower())
+    skip = {Path(p).name for p in ignore}
+    out = []
+    for path in sorted(root.glob("requirements*.txt")):
+        if path.name in skip or not path.is_file():
+            continue
+        raw = list(_requirement_lines(_read(path)))
+        lines = _req_lines(_read(path))
+        if lines and len(lines) == len(raw) and all(
+                re.search(rf"(?<![a-z0-9]){re.escape(norm(req_name(line)))}(?![a-z0-9])", hooks) for line in lines):
+            out.append(path)
+    return out
+
+
+def _scope_refused(root: Path, comp: str | None, reqs, skip) -> list[str]:
+    """Lines that would install from outside the official index: the component's manifest lines, every line of the
+    core requirements files that are still installed, and every line of each file they include with -r/-c,
+    followed recursively (cycles stop), even when an included file is on a skip list. An include with a ``..``
+    part, or one that resolves outside the project (symlinks included), or that is missing, is itself refused."""
+    bad = [f"{comp}/{COMPONENT_MANIFEST}: {line[:120]}" for line in reqs if _refused_line(line)] if comp else []
+    root = Path(root).resolve()
+    skip = {Path(p).resolve() for p in skip}
+    done: set = set()
+
+    def label(path: Path) -> str:
+        return path.relative_to(root).as_posix()
+
+    def walk(path: Path) -> None:
+        if path in done:
+            return
+        done.add(path)
+        for line in _requirement_lines(_read(path)):
+            inc = _INCLUDE.match(line)
+            if not inc:
+                if _refused_line(line):
+                    bad.append(f"{label(path)}: {line[:120]}")
+                continue
+            target = inc.group(1)
+            if ".." in PurePosixPath(target).parts or target.startswith(("/", "~")) or "://" in target:
+                bad.append(f"{label(path)}: {line[:120]} (include outside the project)")
+                continue
+            full = (path.parent / target).resolve()
+            if not full.is_relative_to(root) or not full.is_file():
+                bad.append(f"{label(path)}: {line[:120]} (include outside the project or missing)")
+                continue
+            walk(full)
+
+    for path in _requirement_files(root):
+        full = path.resolve()
+        if full in skip:
+            continue
+        if not full.is_relative_to(root):
+            bad.append(f"{path.name}: resolves outside the project")
+            continue
+        walk(full)
+    return bad
+
+
+def component_scope(main_checkout, changed) -> dict | None:
+    """For a component app: which component the PR touches, its requirements (from MAIN's manifest), and the
+    aggregate files never to install. None when the project is not a component app (no aggregate file).
+
+    Any manifest or core line that installs from outside the official index (direct URL, VCS, local path or an
+    index option) stops the check with an ``unsupported:`` reason; nothing is installed."""
+    root = Path(main_checkout)
+    components = component_dirs(root)
+    if len(components) < 3:
+        return None
+    aggregates = aggregate_requirement_files(root, components)
+    if not aggregates:
+        return None
+    names = [p.relative_to(root).as_posix() for p in aggregates]
+    lint = lint_only_requirement_files(root, ignore=names)
+    comp = component_for_changes(changed, components, ignore=names)
+    reqs = list(components.get(comp, [])) if comp else []
+    reason = "" if comp else (
+        "unsupported: this project keeps per-component requirements and an aggregate requirements file "
+        f"({', '.join(names)}), and the pull request's changed files do not belong to exactly one component, "
+        "so the aggregate file was not installed")
+    if comp:
+        bad = _scope_refused(root, comp, reqs, [*aggregates, *lint])
+        if bad:
+            reason = ("unsupported: these requirement lines install from outside the official package index, "
+                      "which product checks do not allow, so nothing was installed: " + "; ".join(bad[:5]))
+    return {"component": comp if not reason else None, "touched": comp, "requirements": reqs if not reason else [],
+            "aggregates": aggregates, "aggregate_names": names, "lint_only": lint,
+            "lint_only_names": [p.relative_to(root).as_posix() for p in lint], "reason": reason}
 
 
 def _apt_from_tree(root: Path) -> list[str]:
@@ -1549,12 +1747,18 @@ def _system_decision(names: list[str], sandbox: str, apply_system: bool = True) 
 def build_setup_plan(repo: str, checkouts, tavily, current_python: str, sandbox: str, self_dist: str = "",
                      python_available=None, pypi=None, allow_lookup_packages: bool = True,
                      provision=None, auto_python: bool = True, docs_checkouts=None,
-                     apply_system: bool = True) -> dict:
+                     apply_system: bool = True, changed_files=None) -> dict:
     """One plan for both sides. Only project-listed packages and link-back suggestions are added.
 
     ``docs_checkouts`` (a product check passes main's checkout only) is where listed packages and system-package
     files are read from, so a PR cannot add a package that then lands on main too. None reads every checkout."""
     docs_from = list(checkouts or []) if docs_checkouts is None else list(docs_checkouts)
+    # changed_files (product checks only, with docs_checkouts): for a component app, install the core requirements
+    # plus the one touched component's manifest requirements, read from main, and never the aggregate file.
+    scope = None
+    if changed_files is not None and docs_checkouts is not None and docs_from:
+        scope = component_scope(docs_from[0], changed_files)
+    skip_files = [*scope["aggregates"], *scope["lint_only"]] if scope else ()
     if python_available is not None and provision is None:
         provision = False   # an injected interpreter lookup (tests) never downloads anything
     python_available = find_python if python_available is None else python_available
@@ -1562,7 +1766,7 @@ def build_setup_plan(repo: str, checkouts, tavily, current_python: str, sandbox:
     packages: list[dict] = []
     seen: set = set()
     for checkout in docs_from:
-        for item in declared_packages(checkout, self_dist):
+        for item in declared_packages(checkout, self_dist, skip_files=skip_files):
             key = norm(item["name"])
             if key in seen:
                 continue
@@ -1583,6 +1787,15 @@ def build_setup_plan(repo: str, checkouts, tavily, current_python: str, sandbox:
             for req in group_lines:
                 _add_pkg(packages, seen, req, kind="dependency-group", action="install", source="pyproject",
                          reason="listed in a dependency group", self_dist=self_dist)
+    scope_blocked = ""
+    if scope:
+        if scope["component"]:
+            for req in scope["requirements"]:
+                _add_pkg(packages, seen, req, kind="component", action="install", source=COMPONENT_MANIFEST,
+                         reason=f"listed in the manifest of {scope['component']}, the component this PR changes",
+                         self_dist=self_dist)
+        else:
+            scope_blocked = scope["reason"]
     parts = split_repo(repo or "")
     owner, repo_name = parts if parts else ("", "")
     suggestions = pip_suggestions(text) if allow_lookup_packages else []
@@ -1653,7 +1866,17 @@ def build_setup_plan(repo: str, checkouts, tavily, current_python: str, sandbox:
         lines.append(f"Setup plan: refused {item['name']}: {item['reason']}")
     if groups_blocked:
         lines.append(f"Setup plan: stopped: {groups_blocked}")
-    return {"packages": packages, "extra_reqs": extra, "python": python, "system": system,
+    if scope:
+        lines.append("Setup plan: not installing the aggregate requirements file(s) "
+                     + ", ".join(scope["aggregate_names"]) + (f"; only the core requirements and {scope['component']}'s "
+                                                             "own requirements, read from main" if scope["component"] else ""))
+    if scope and scope["lint_only_names"]:
+        lines.append("Setup plan: not installing lint-only requirements file(s) " + ", ".join(scope["lint_only_names"]))
+    if scope_blocked:
+        lines.append(f"Setup plan: stopped: {scope_blocked}")
+    return {"packages": packages, "scope_blocked": scope_blocked,
+            "component": (scope or {}).get("component"),
+            "aggregate_names": list((scope or {}).get("aggregate_names") or []), "extra_reqs": extra, "python": python, "system": system,
             "refused": refused, "groups_blocked": groups_blocked, "lines": lines}
 
 
@@ -1806,20 +2029,22 @@ def not_a_package(log_text: str) -> bool:
     return bool(_NOT_A_PACKAGE.search(log_text or ""))
 
 
-def deps_only_plan(checkout) -> dict | None:
+def deps_only_plan(checkout, exclude=()) -> dict | None:
     """How to install only what the project declares, without building the project itself.
 
     uv.lock (with pyproject): ``uv sync --no-install-project --frozen``. pyproject with [project]
     dependencies: ``uv sync --no-install-project``. Otherwise requirements*.txt files. None when the
-    project declares nothing usable.
+    project declares nothing usable. ``exclude``: requirements file names never to install (a product check on a
+    component app passes its aggregate files).
     """
     root = Path(checkout)
+    skip = {PurePosixPath(str(n)).name for n in exclude or ()}
     pyproject = _pyproject(root / "pyproject.toml")
     if (root / "pyproject.toml").is_file() and isinstance(pyproject.get("project"), dict):
         frozen = (root / "uv.lock").is_file()
         return {"kind": "uv-sync", "frozen": frozen,
                 "source": "uv.lock" if frozen else "pyproject.toml"}
-    reqs = sorted(p.name for p in root.glob("requirements*.txt") if p.is_file())
+    reqs = sorted(p.name for p in root.glob("requirements*.txt") if p.is_file() and p.name not in skip)
     if reqs:
         return {"kind": "requirements", "files": reqs, "source": ", ".join(reqs)}
     return None
