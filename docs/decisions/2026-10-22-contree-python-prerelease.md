@@ -1,7 +1,7 @@
 # Keep pre-release and local tags in the Contree Python version
 
 **Date:** 2026-10-22
-**Status:** proposed
+**Status:** accepted
 
 ## What changed
 
