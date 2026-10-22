@@ -11,6 +11,9 @@
 - The console flowchart now shows 13 clickable steps: read the PR, setup lookup, set up Python, install dependencies, install main, install PR, benchmark suite, probes, review, tests, retries, swarm report and verdict.
 - A `.env.example` lists `NEBIUS_API_KEY`, `NEBIUS_PROJECT_ID` and `TAVILY_API_KEY`; `.env` is gitignored.
 
+- A new batch order for product runs (`--batch-order`): for each pull request, the setup lookup happens first, then setup, then the run. If the lookup or the setup fails, the pull request is logged and skipped, and the batch moves on. After all the others are done, each skipped pull request is tried again: the lookup diagnoses the failure, the fix (link-back PyPI packages only) is applied on both sides and setup is retried, up to 3 tries, before the verdict is "could not verify". The order, every skip and every try are written to `batch-order.jsonl` in the run folder.
+- A missing system library (for example zlib headers, or `pg_config` for libpq) is mapped to OS packages from a fixed allowlist only: `build-essential`, `pkg-config`, `zlib1g-dev`, `libpq-dev`, `libffi-dev`, `libssl-dev`. They are installed on both sides in a sandbox that can install system packages, and the step is retried. Any other name, even one the lookup suggests, is refused and logged. A sandbox that cannot install system packages logs what is needed and the result stays "could not verify".
+
 ## Why
 
 Projects need different Python versions and libraries. A fixed list per repository hides that work and does not carry over to the next repository. Some setup problems only show up mid-run, and one rerun was often not enough when a fix uncovered the next missing piece.
@@ -21,6 +24,8 @@ Projects need different Python versions and libraries. A fixed list per reposito
 2. Only packages the project lists, or whose PyPI page links back to the project's GitHub repository, are installed. Anything else is refused and logged.
 3. Retries cover setup and import gaps only. A "needs attention" result, which is a test the PR breaks, is never retried.
 4. Up to 3 tries. If the gap remains, the verdict is "could not verify" with the missing name. The advisory swarm still writes its report and cannot change the verdict.
+
+5. In a batch, one pull request with a setup problem no longer holds up the others; it waits for the end pass.
 
 ## Alternatives and tradeoffs
 

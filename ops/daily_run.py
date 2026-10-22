@@ -1373,6 +1373,20 @@ def _product_plan(a, rec: dict, repo: str, cfg: dict, checkouts, pypi=None, pyth
         (cfg or {}).get("dist") or (cfg or {}).get("pkg") or "",
         python_available=python_available, pypi=pypi,
         allow_lookup_packages=bool(folders), auto_python=product_route(a))
+    for req in (getattr(a, "batch_fix_reqs", None) or {}).get(repo, []):
+        if req not in plan.setdefault("extra_reqs", []):
+            plan["extra_reqs"].append(req)
+            plan.setdefault("packages", []).append({
+                "requirement": req, "name": req, "kind": "tavily", "action": "install", "source": "tavily",
+                "reason": "diagnosed by the lookup after a setup failure; PyPI page links to this GitHub repository",
+                "sides": ["main", "pr"]})
+            plan.setdefault("lines", []).append(f"Setup plan: install {req} (fix for an earlier setup failure) on main and pr.")
+    staged_sys = [n for n in (getattr(a, "batch_fix_system", None) or {}).get(repo, [])
+                  if n in demo_helper.SYSTEM_ALLOWLIST and n not in {i["name"] for i in plan.get("system") or []}]
+    for item in demo_helper._system_decision(staged_sys, getattr(a, "sandbox_backend", None) or "local"):
+        plan.setdefault("system", []).append(item)
+        plan.setdefault("lines", []).append(f"Setup plan: system package {item['name']} (fix for an earlier setup "
+                                            f"failure): {item['reason']}")
     demo_helper.attach_plan(rec, plan)
     demo_helper.announce(plan.get("lines") or [])
     from poc import run_progress
@@ -4701,6 +4715,84 @@ def skip_unused_model(a) -> None:
         a.model_skipped = "AI calls skipped because --no-probes was set"
 
 
+def _batch_lookup(repo: str, cfg: dict) -> bool:
+    """The per-PR setup lookup gate. With no lookup key the gate is off and the PR goes straight to setup."""
+    from poc import demo_helper, tavily_docs
+    if not tavily_docs.available():
+        return True
+    query = demo_helper.lookup_queries(repo, cfg.get("dist") or cfg.get("pkg") or "")[0]
+    got = demo_helper.live_fetch(query)
+    return bool(got.get("ok"))
+
+
+def _batch_diagnose(a, repo: str, cfg: dict, why: str) -> None:
+    """Look up a setup failure and stage the fix (link-back PyPI packages only) for both sides of the next try."""
+    from evals.label_study_pairs import split_repo
+    from poc import demo_helper
+    name = demo_helper.gap_name(why)
+    got = demo_helper.live_fetch(f"{repo} {name} python install setup error {why[:120]}")
+    text = demo_helper._lookup_text(demo_helper.scope_lookup(got, repo, cfg.get("dist") or "")) if got.get("ok") else ""
+    parts = split_repo(repo) or ("", "")
+    fixes = getattr(a, "batch_fix_reqs", None)
+    if fixes is None:
+        fixes = a.batch_fix_reqs = {}
+    staged = fixes.setdefault(repo, [])
+    for pkg in demo_helper.pip_suggestions(text):
+        try:
+            info = demo_helper.fetch_pypi(pkg)
+        except Exception:  # noqa: BLE001
+            info = None
+        if demo_helper.pypi_links_back(info, *parts) and pkg not in staged:
+            staged.append(pkg)
+    fix = demo_helper.system_fix_for(why, text)
+    sys_staged = (getattr(a, "batch_fix_system", None) or {})
+    a.batch_fix_system = sys_staged
+    names = sys_staged.setdefault(repo, [])
+    names.extend(n for n in fix["install"] if n not in names)
+    for item in fix["refused"]:
+        print(f"Setup plan: refused system package {item['name']}: {item['reason']}", flush=True)
+    if not got.get("ok"):
+        raise RuntimeError("lookup failed")
+
+
+def _run_batch_order(queue: list, rdir: Path, workroot: Path, a, machine: dict, seen: dict, problems: list) -> list:
+    from poc import batch_order
+
+    def key(item):
+        return f"{item[0]}#{item[2]['pr']}"
+
+    def run(item):
+        repo, cfg, c = item
+        print(f"  testing #{c['pr']} {c['title'][:60]} ...", flush=True)
+        try:
+            rec = gate(test_pr(repo, cfg, c, rdir, workroot, a, machine))
+        except model_provider.ProviderRejected:
+            raise
+        except Exception as e:  # noqa: BLE001
+            problems.append(f"{repo}#{c['pr']}: harness error: {type(e).__name__}: {e}")
+            return None
+        print(f"    -> {rec['verdict']}: {rec['reason'][:140]} ({rec['duration_s']['total_wall']}s)", flush=True)
+        return rec
+
+    def give_up(item, why):
+        repo, cfg, c = item
+        rec = new_record(repo, cfg, c, a, machine, rdir.name, run_date_for(rdir))
+        rec["verdict"], rec["reason"], _ = verdict_for(None, why)
+        return rec
+
+    log = batch_order.OrderLog(rdir / "batch-order.jsonl")
+    out = batch_order.run_batch(queue, key, lambda item: _batch_lookup(item[0], item[1]), run,
+                                diagnose=lambda item, why: _batch_diagnose(a, item[0], item[1], why),
+                                give_up=give_up, log=log)
+    for rec in out:
+        repo, n = rec.get("repo"), prn(rec)
+        if repo and n is not None:
+            seen["prs"].setdefault(repo, {})[str(n)] = {"head_sha": (rec.get("pr") or {}).get("head_sha"),
+                                                       "tested_at_ist": rec.get("tested_at_ist"),
+                                                       "verdict": rec["verdict"], "run": rdir.name}
+    return out
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--libraries-file", default=None,
@@ -4786,6 +4878,9 @@ def main(argv=None) -> int:
                     help="independent verification jsonl, scored after verdicts (default: "
                          "<verification_dir>/<date>/verification.jsonl if it exists)")
     ap.add_argument("--select-only", action="store_true")
+    ap.add_argument("--batch-order", action="store_true",
+                    help="product batch order: setup lookup, then setup, then the run, per PR; a PR whose lookup or "
+                         "setup fails is logged and skipped, then retried at the end (diagnosis + fix, up to 3 tries)")
     ap.add_argument("--resume", action="store_true", help="reuse record.json of PRs already tested in this run folder "
                                                           "(same head SHA)")
     ap.add_argument("--reselect", action="store_true",
@@ -4910,6 +5005,7 @@ def main(argv=None) -> int:
     machine.setdefault("cpu_model", cpu_model())
     machine.setdefault("ram_gb", ram_gb())
     records, skipped, selection, reused = [], {}, {}, []
+    batch_queue: list = []
     inv_root = rdir / "invocations"
     a.invocation = (1 + len([p for p in inv_root.glob("invocation-*") if p.is_dir()])
                     if inv_root.is_dir() else 1)
@@ -4943,6 +5039,9 @@ def main(argv=None) -> int:
         if a.select_only:
             continue
         for c in chosen:
+            if getattr(a, "batch_order", False):
+                batch_queue.append((repo, cfg, c))
+                continue
             prev = rdir / f"{cfg['pkg']}-{c['pr']}" / "record.json"
             rec = None
             if a.resume and prev.exists():
@@ -4972,6 +5071,12 @@ def main(argv=None) -> int:
             seen.setdefault("prior_run_utc", {})[repo] = seen["last_run_utc"].get(repo)
         seen["last_run_utc"][repo] = started.astimezone(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
         seen.setdefault("last_run_date", {})[repo] = rdir.name
+    if batch_queue and not a.select_only:
+        try:
+            records.extend(_run_batch_order(batch_queue, rdir, workroot, a, machine, seen, problems))
+        except model_provider.ProviderRejected as e:
+            print(str(e), file=sys.stderr)
+            return 1
     (rdir / "selection.json").write_text(json.dumps({"selected": selection, "skipped": skipped}, indent=1))
     if a.select_only:
         print(json.dumps(selection, indent=1))

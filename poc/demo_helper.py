@@ -1059,6 +1059,41 @@ def _python_decision(requested: str | None, current: str, sandbox: str, python_a
             "reason": f"not applied: python{requested} is not available to the local sandbox"}
 
 
+# The only OS packages a diagnosis may install. Fixed here; a lookup can never add a name to it.
+SYSTEM_ALLOWLIST = ("build-essential", "pkg-config", "zlib1g-dev", "libpq-dev", "libffi-dev", "libssl-dev")
+_SYSTEM_MARKERS = (
+    (("zlib.h", "zlib headers", "zlib not found", "libz.so", "-lz"), "zlib1g-dev"),
+    (("pg_config", "libpq", "libpq-fe.h"), "libpq-dev"),
+    (("ffi.h", "libffi"), "libffi-dev"),
+    (("openssl/", "ssl.h", "libssl", "openssl not found"), "libssl-dev"),
+    (("pkg-config", "pkgconfig"), "pkg-config"),
+    (("python.h", "command 'gcc' failed", "gcc: not found", "cc: not found", "unable to execute 'gcc'",
+      "no such file or directory: 'gcc'", "c compiler cannot create executables", "error: command 'cc'"),
+     "build-essential"),
+)
+_APT_INSTALL = re.compile(r"apt(?:-get)?\s+install\s+(?:-y\s+)?((?:[a-z0-9][a-z0-9.+-]+\s*)+)")
+
+
+def system_fix_for(error_text: str, lookup_text: str = "") -> dict:
+    """Map a missing system library to OS packages. Only names on SYSTEM_ALLOWLIST pass; others are refused."""
+    low = (error_text or "").lower()
+    allowed: list[str] = []
+    refused: list[dict] = []
+    for markers, name in _SYSTEM_MARKERS:
+        if any(m in low for m in markers) and name not in allowed:
+            allowed.append(name)
+    if allowed or any(m in low for m in _GAP_MARKERS + ("fatal error", "not found", "error:")):
+        for match in _APT_INSTALL.finditer((lookup_text or "").lower()):
+            for name in match.group(1).split():
+                if name in allowed or name in {r["name"] for r in refused}:
+                    continue
+                if name in SYSTEM_ALLOWLIST:
+                    allowed.append(name)
+                elif safe_apt_name(name):
+                    refused.append({"name": name, "reason": "not on the fixed system package allowlist"})
+    return {"install": allowed, "refused": refused}
+
+
 def _system_decision(names: list[str], sandbox: str) -> list[dict]:
     out = []
     for name in names:
@@ -1726,7 +1761,28 @@ def retry_unverified(rec: dict, rerun, install_one, declared, tavily_text: str, 
         tried.update(norm(req_name(spec["requirement"])) for spec in specs)
         entry = {"try": attempt, "problem": name, "lookup": query if looked else None,
                  "planned": [spec["requirement"] for spec in specs], "installed": [], "rerun": False}
-        if not specs or rerun is None:
+        sys_fix = system_fix_for(text, lookup_text)
+        for item in sys_fix["refused"]:
+            notes.append(f"Setup plan: refused system package {item['name']}: {item['reason']}")
+        sys_names = [n for n in sys_fix["install"] if n not in tried]
+        if not specs and sys_names and rerun is not None:
+            tried.update(sys_names)
+            entry["planned"] = list(sys_names)
+            if not (allow_system and install_system):
+                entry["result"] = "needs system package(s) " + ", ".join(sys_names) + "; this sandbox cannot install them"
+                tries.append(entry)
+                _emit_retry(f"Try {attempt} of {max_tries}: {name}: {entry['result']}")
+                break
+            got = [n for n in sys_names if install_system(n)]
+            entry["installed"] = [f"system package {n}" for n in got]
+            if not got:
+                entry["result"] = "system package install failed on main or pr"
+                tries.append(entry)
+                _emit_retry(f"Try {attempt} of {max_tries}: {name}: {entry['result']}")
+                break
+            _emit_retry(f"Try {attempt} of {max_tries}: installed system package(s) {', '.join(got)} on main and pr; rerunning")
+            specs = None
+        if specs is not None and (not specs or rerun is None):
             if not specs and repeat:
                 entry["result"] = "already installed on an earlier try and still missing"
             else:
@@ -1734,19 +1790,20 @@ def retry_unverified(rec: dict, rerun, install_one, declared, tavily_text: str, 
             tries.append(entry)
             _emit_retry(f"Try {attempt} of {max_tries}: {name}: {entry['result']}")
             break
-        logs = install_same(specs, install_one)
-        note_installs(rec, logs)
-        notes = list(block.get("notes") or [])
-        all_logs.extend(logs)
-        good = [row for row in logs if not str(row["versions"].get("main", "")).startswith("failed")
-                and not str(row["versions"].get("pr", "")).startswith("failed")]
-        entry["installed"] = [f"{row['package']} {row['version']}" for row in good]
-        if not good:
-            entry["result"] = "install failed on main or pr"
-            tries.append(entry)
-            _emit_retry(f"Try {attempt} of {max_tries}: {name}: {entry['result']}")
-            break
-        _emit_retry(f"Try {attempt} of {max_tries}: installed {', '.join(entry['installed'])} on main and pr; rerunning")
+        if specs is not None:
+            logs = install_same(specs, install_one)
+            note_installs(rec, logs)
+            notes = list(block.get("notes") or [])
+            all_logs.extend(logs)
+            good = [row for row in logs if not str(row["versions"].get("main", "")).startswith("failed")
+                    and not str(row["versions"].get("pr", "")).startswith("failed")]
+            entry["installed"] = [f"{row['package']} {row['version']}" for row in good]
+            if not good:
+                entry["result"] = "install failed on main or pr"
+                tries.append(entry)
+                _emit_retry(f"Try {attempt} of {max_tries}: {name}: {entry['result']}")
+                break
+            _emit_retry(f"Try {attempt} of {max_tries}: installed {', '.join(entry['installed'])} on main and pr; rerunning")
         outcome = rerun() or {}
         reran = True
         entry["rerun"] = True

@@ -94,3 +94,29 @@ def test_install_retry_is_shown_as_a_retry_step(tmp_path, monkeypatch):
 def test_new_steps_are_in_the_progress_vocabulary():
     for stage in ("setup_lookup", "setup_python", "install_deps", "retry"):
         assert stage in run_progress.STAGES
+
+
+def test_missing_system_library_maps_only_to_the_allowlist():
+    fix = demo_helper.system_fix_for("fatal error: zlib.h: No such file or directory\nError: pg_config executable not found",
+                                     "Run sudo apt-get install -y zlib1g-dev libpq-dev evil-pkg")
+    assert fix["install"] == ["zlib1g-dev", "libpq-dev"]
+    assert fix["refused"] == [{"name": "evil-pkg", "reason": "not on the fixed system package allowlist"}]
+    assert set(demo_helper.SYSTEM_ALLOWLIST) >= {"build-essential", "pkg-config", "libffi-dev", "libssl-dev"}
+
+
+def test_system_library_gap_installs_on_both_sides_and_reruns(monkeypatch):
+    monkeypatch.delenv("POC_PROGRESS_PATH", raising=False)
+    installed = []
+    rec = {"verdict": "could_not_verify", "reason": "ImportError: libpq.so.5: cannot open shared object file"}
+    demo_helper.retry_unverified(rec, lambda: {"verdict": "verified", "reason": "ok"}, lambda s, r: (True, "1"),
+                                 [], "", None, REPO, True, install_system=lambda n: installed.append(n) or True)
+    assert installed == ["libpq-dev"]
+    assert rec["demo_helper"]["gap_retry"]["tries"][0]["installed"] == ["system package libpq-dev"]
+
+
+def test_local_sandbox_logs_the_system_need_without_installing(monkeypatch):
+    monkeypatch.delenv("POC_PROGRESS_PATH", raising=False)
+    rec = {"verdict": "could_not_verify", "reason": "ImportError: libffi.so.8: cannot open shared object file"}
+    demo_helper.retry_unverified(rec, lambda: {}, lambda s, r: (True, "1"), [], "", None, REPO, False)
+    assert "libffi-dev" in rec["demo_helper"]["gap_retry"]["tries"][0]["result"]
+    assert rec["verdict"] == "could_not_verify"
