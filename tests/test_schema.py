@@ -51,10 +51,10 @@ def test_gxx_version_is_optional(upset):
 def test_schema_is_the_shared_file():
     from guardrails.schema import COMPATIBLE_SCHEMA_SHA256, SCHEMA_REVISION
     assert SCHEMA_PATH.parts[-3:] == ("harness", "schema", "observation.schema.json")
-    assert SCHEMA_SHA256 == "bf01b426e15b75b466aa14fa2fde396a3485e4f4bec6a89f4abc1445ab1b1fb2"  # rev 15
-    assert SCHEMA_REVISION == 15
+    assert SCHEMA_SHA256 == "234e58e340929ef11d76c264cd2cdf7b34d614654d732e0ac90f85c74f5c599c"  # rev 16
+    assert SCHEMA_REVISION == 16
     got = sorted(COMPATIBLE_SCHEMA_SHA256.values(), key=lambda s: int(s.split()[-1]))
-    assert got == [f"rev {n}" for n in range(1, 16)]
+    assert got == [f"rev {n}" for n in range(1, 17)]
     assert COMPATIBLE_SCHEMA_SHA256["5a3c3d36b7730ce74d0f23b03c88ea862ea35cc327c7d79481fca8b972e8383e"] == "rev 1"
     readme = (SCHEMA_PATH.parent / "README.md").read_text()
     assert all(sha in readme for sha in COMPATIBLE_SCHEMA_SHA256)  # documented
@@ -65,7 +65,7 @@ def test_rev1_records_still_valid_under_current_rev(golden_v1_records):
     for r in golden_v1_records:
         assert r["schema_sha256"].startswith("5a3c3d36")  # the golden records were written against rev 1
         assert validate_record(r, require_v1=True) == []
-        assert "valid under current rev 15" in schema_reference_note(r)
+        assert "valid under current rev 16" in schema_reference_note(r)
 
 
 def test_rev2_optional_fields(golden_v1_records):
@@ -148,3 +148,16 @@ def test_rev4_coverage_fields_optional_and_typed():
     bad = copy.deepcopy(gated)
     bad["changed_lines_total"] = -1
     assert validate_record(bad)
+
+
+def test_coverage_status_not_measured_is_valid():
+    import json
+
+    from ops.schema_check import validate
+    schema = json.loads(SCHEMA_PATH.read_text())
+    node = schema["properties"]["coverage"]["properties"]["status"]
+    assert "not measured" in node["enum"]
+    rec = {"coverage": {"status": "not measured"}}
+    assert not [e for e in validate(rec, schema) if "coverage.status" in e]
+    rec["coverage"]["status"] = "bogus"
+    assert [e for e in validate(rec, schema) if "coverage.status" in e]
