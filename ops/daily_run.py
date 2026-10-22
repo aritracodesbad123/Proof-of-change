@@ -1254,7 +1254,9 @@ def install_deps_only(venv: Path, checkout: Path, plan: dict, log: Path, python:
     deps_root: read the dependency files from this folder (read-only) instead of the checkout. The flat-layout
     fallback passes main's checkout on both sides, so the PR's own dependency files never change what is installed.
     """
-    env = base_env(side_home(venv), install=True)
+    from poc import demo_helper
+    env = demo_helper.drop_index_env(base_env(side_home(venv), install=True))   # no index from the environment
+    env["UV_NO_CONFIG"] = "1"   # no [tool.uv], [tool.uv.pip] or uv.toml settings (index, find-links) either
     src = Path(deps_root) if deps_root is not None else checkout
     cmds = [["uv", "venv", "-q", "-p", python, venv]]
     if plan.get("kind") == "uv-sync":
@@ -1264,14 +1266,23 @@ def install_deps_only(venv: Path, checkout: Path, plan: dict, log: Path, python:
         export = ["uv", "export", "-q", "--no-emit-project", "--no-hashes", "--directory", src,
                   "-p", venv / "bin/python", "-o", reqs]
         cmds.append(export + (["--frozen"] if plan.get("frozen") else []))
+        cmds.append(("check-export", reqs))   # same off-index line rules as requirement files, before installing
         cmds.append(["uv", "pip", "install", "-q", "-p", venv / "bin/python", "-r", reqs])
     else:
         for name in plan.get("files") or []:
             cmds.append(["uv", "pip", "install", "-q", "-p", venv / "bin/python", "-r", src / name])
     cmds.append(["uv", "pip", "install", "-q", "-p", venv / "bin/python", *BASE_TEST_DEPS, *(extra_reqs or [])])
+    cmds = [c if isinstance(c, tuple) else [*c, "--no-config"] for c in cmds]   # every uv call ignores config files
     sbx = side_sandbox(venv, network=True, ro=(() if deps_root is None or src == checkout else (src,)))
     sbx["rw"].append(checkout)
     for c in cmds:
+        if isinstance(c, tuple) and c[0] == "check-export":
+            refused = demo_helper.unsafe_exported_lines(c[1])
+            if refused:
+                Path(c[1]).unlink(missing_ok=True)
+                (checkout / ".poc-declared-deps.txt").unlink(missing_ok=True)
+                return False, demo_helper.unsafe_requirements_reason(refused)
+            continue
         rc, _ = run(c, log, cwd=src, env=env, timeout=timeout, sbx=sbx)   # lock paths are relative to it
         if rc == "timeout":
             return False, f"dependency install timed out after {timeout}s; see {log.name}"
@@ -1420,8 +1431,16 @@ def _product_plan(a, rec: dict, repo: str, cfg: dict, checkouts, pypi=None, pyth
     product = product_route(a)
     # A product check never installs an OS package, on Contree or anywhere else. A study plan still may.
     apply_os = not product
+    current = getattr(a, "python", "") or ""
+    if (getattr(a, "sandbox_backend", None) or "local") == "contree":
+        # Inside Contree the image's Python is what runs, and any version can be installed during setup, so the
+        # orchestrator machine's interpreters must not steer the choice.
+        from poc import contree_sandboxes
+        current = contree_sandboxes.image_python()
+        if python_available is None:
+            python_available = lambda version: True  # noqa: E731
     plan = demo_helper.build_setup_plan(
-        repo, folders, tavily, getattr(a, "python", "") or "",
+        repo, folders, tavily, current,
         getattr(a, "sandbox_backend", None) or "local",
         (cfg or {}).get("dist") or (cfg or {}).get("pkg") or "",
         python_available=python_available, pypi=pypi,
@@ -1549,7 +1568,8 @@ def _install_with_helper(a, rec, step, venv, checkout, chosen, log, timeout, con
         return str(step).lower().startswith("main")
 
     def _flat_plan() -> dict | None:
-        """The deps-only plan for a flat layout, always from MAIN's files. Main: what main declares. PR side: main's
+        """The deps-only plan for any not-a-package error (flat layout or other), always from MAIN's files.
+        Main: what main declares. PR side: main's
         plan and main's folder, and only when main itself fell back, so a flat layout on the PR side alone stays
         could not verify. The PR's own dependency files are never read."""
         if _is_main():
@@ -1589,19 +1609,22 @@ def _install_with_helper(a, rec, step, venv, checkout, chosen, log, timeout, con
                 if blocked:
                     return False, blocked
         if product_route(a) and demo_helper.not_a_package(text):
-            flat = demo_helper.flat_layout(text)
-            plan = _flat_plan() if flat else demo_helper.deps_only_plan(checkout)
+            plan = _flat_plan()
+            refused = demo_helper.unsafe_requirement_lines(_flat_root(), plan) if plan else []
+            if refused:
+                shutil.rmtree(venv, ignore_errors=True)
+                return False, demo_helper.unsafe_requirements_reason(refused)
             if plan:
                 shutil.rmtree(venv, ignore_errors=True)
                 ok, why = install_deps_only(venv, checkout, plan, log, state["py"], timeout, extra_reqs,
-                                            **({"deps_root": _flat_root()} if flat else {}))
+                                            deps_root=_flat_root())
                 if ok:
                     demo_helper.note_auto_fix(
                         rec, f"Auto-fix: the {step} could not build the project as a package, so only the "
                              f"dependencies it declares ({plan['source']}) were installed, the same way on both "
                              "sides, and the project's own folder was put on the import path.")
                     rec.setdefault("demo_helper", {})["deps_only"] = plan
-                    if flat and _is_main():
+                    if _is_main():
                         rec["demo_helper"]["flat_deps_root"] = str(checkout)
                 else:
                     blocked = _unsupported(_log_text())
@@ -2659,6 +2682,17 @@ def _coverage_changed(item: dict, main_root: Path, pr_root: Path) -> tuple[dict,
     return changed, {}
 
 
+# Runs inside the Contree PR checkpoint after pytest: keeps only the changed files in the coverage report and
+# prints it compactly, so a large project's report fits in the command output (which Contree caps).
+_COV_SHRINK = (
+    "import json,sys\n"
+    "d=json.load(open(sys.argv[1]))\n"
+    "want=sys.argv[2:]\n"
+    "d['files']={k:v for k,v in d.get('files',{}).items() if any(k==w or k.endswith('/'+w) for w in want)}\n"
+    "print(json.dumps(d,separators=(',',':')))\n"
+)
+
+
 def contree_coverage_run(item: dict, main_root: Path, pr_root: Path, targets: list[str], prdir: Path, a) -> dict:
     """Coverage gate measurement inside the Contree PR checkpoint.
 
@@ -2687,7 +2721,9 @@ def contree_coverage_run(item: dict, main_root: Path, pr_root: Path, targets: li
         ">/tmp/poc-cov-pytest.log 2>&1\n"
         "ec=$?\n"
         "printf '___POC_EXIT___%s\\n' \"$ec\"\n"
-        "printf '___POC_COV_START___\\n'\ncat /tmp/poc-cov.json 2>/dev/null\n"
+        "printf '___POC_COV_START___\\n'\n"
+        f"python -c {shlex.quote(_COV_SHRINK)} /tmp/poc-cov.json {' '.join(shlex.quote(r) for r in sorted(changed))}"
+        " 2>/dev/null || cat /tmp/poc-cov.json 2>/dev/null\n"
         "printf '\\n___POC_COV_END___\\n'\n"
         "printf '___POC_LOG___\\n'\ncat /tmp/poc-cov-pytest.log 2>/dev/null\n"
     )
@@ -2706,6 +2742,9 @@ def contree_coverage_run(item: dict, main_root: Path, pr_root: Path, targets: li
     blob = ""
     if "___POC_COV_START___\n" in out:
         blob = out.split("___POC_COV_START___\n", 1)[1].split("\n___POC_COV_END___", 1)[0]
+        if "\n___POC_COV_END___" not in out:
+            return {"status": "not measured", "seconds": secs, "where": "contree",
+                    "why": "the coverage report was cut short by the Contree output limit; see coverage-pytest.log"}
     cov_files, why = coverage_gate.parse_report(blob)
     if cov_files is None:
         return {"status": "not measured", "why": f"{why}; see coverage-pytest.log", "seconds": secs,

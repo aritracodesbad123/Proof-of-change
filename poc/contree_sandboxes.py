@@ -21,6 +21,18 @@ BACKENDS = ("local", "contree")
 BASE_IMAGE = os.environ.get("POC_CONTREE_BASE_IMAGE", "docker.io/library/python:3.12-slim-bookworm")
 SDK_VERSION = "0.3.6"
 
+
+def image_python(image: str | None = None) -> str:
+    """'X.Y' read from the Contree base image tag (for example python:3.12-slim), or '' when the tag names none.
+
+    Version selection for a Contree check uses this, not the Pythons on the machine that runs the orchestrator."""
+    import re
+    tag = (image or BASE_IMAGE).rsplit("/", 1)[-1]
+    if not tag.startswith("python:"):
+        return ""
+    m = re.search(r":(\d+)\.(\d+)(?:[.-]|$)", tag)
+    return f"{m.group(1)}.{m.group(2)}" if m else ""
+
 _sem = threading.Semaphore(MAX_OPS)
 _state: dict[str, Any] = {"backend": "local", "note": "local bubblewrap", "session": None}
 

@@ -1810,6 +1810,123 @@ def deps_only_plan(checkout) -> dict | None:
     return None
 
 
+_OFF_INDEX_OPTION = re.compile(
+    r"^(?:--index-url|--extra-index-url|-i|-f|--find-links|-e|--editable|--trusted-host|--no-index)(?:[\s=]|$)")
+_URL_LINE = re.compile(r"(?:^|[\s@])(?:git\+|hg\+|svn\+|bzr\+)?[a-z][a-z0-9+.-]*://", re.I)
+_INCLUDE = re.compile(r"^(?:-r|--requirement|-c|--constraint)(?:\s+|=)?(\S+)")
+
+
+def _local_path_line(line: str) -> bool:
+    """A requirement line that names a local folder or file (``.``, ``./x``, ``../x``, ``/x``, ``~/x``, ``x.whl``)."""
+    head = line.split(";")[0].split()[0] if line.split() else ""
+    return (head in (".", "..") or head.startswith(("./", "../", "/", "~", "file:"))
+            or head.endswith((".whl", ".tar.gz", ".zip")) or "/" in head.split("[")[0])
+
+
+def _refused_line(line: str) -> bool:
+    """One requirement line installs from outside the official index (option, URL, git, editable or local path)."""
+    return bool(_OFF_INDEX_OPTION.match(line) or _URL_LINE.search(line) or _local_path_line(line))
+
+
+def _requirement_lines(text: str):
+    for raw in text.splitlines():
+        line = raw.split(" #")[0].strip()
+        if line and not line.startswith("#"):
+            yield line
+
+
+def unsafe_uv_project(root) -> list[str]:
+    """pyproject settings that make a uv-sync plan install from outside the official index: any
+    ``[tool.uv.sources]`` entry (path, git, URL, workspace member) or any ``[[tool.uv.index]]`` entry."""
+    uv = (_pyproject(Path(root) / "pyproject.toml").get("tool") or {}).get("uv") or {}
+    bad = []
+    if isinstance(uv, dict):
+        if uv.get("sources"):
+            bad.append("pyproject.toml: [tool.uv.sources] " + ", ".join(sorted(map(str, uv["sources"])))[:120])
+        if uv.get("index"):
+            bad.append("pyproject.toml: [[tool.uv.index]]")
+        if uv.get("workspace"):
+            bad.append("pyproject.toml: [tool.uv.workspace]")
+    return bad
+
+
+def unsafe_exported_lines(path, label: str = "uv export") -> list[str]:
+    """The same line rules applied to a ``uv export`` output file. A workspace member comes out as ``-e ./x``, so
+    main's members can never be installed into the PR side to hide the PR's change."""
+    try:
+        text = Path(path).read_text(errors="replace")
+    except OSError:
+        return [f"{label}: (export output missing)"]
+    return [f"{label}: {line[:120]}" for line in _requirement_lines(text) if _refused_line(line)]
+
+
+def unsafe_requirement_lines(root, plan: dict | None, _seen=None, _top=None) -> list[str]:
+    """Requirement lines in a deps-only plan's files that install from outside the official index.
+
+    Refused: --index-url, --extra-index-url, -i, -f/--find-links, -e/--editable, --trusted-host, --no-index, git+ or
+    any URL, and local paths (``.`` included). Files pulled in with -r/-c (``-r x``, ``-r=x``, ``-rx``) are checked
+    too; an include that is a URL, absolute, uses ``..`` or resolves outside the project is itself refused. A uv-sync
+    plan is refused here when pyproject has [tool.uv.sources], [[tool.uv.index]] or a workspace; its exported lines
+    are checked after ``uv export`` (``unsafe_exported_lines``). Empty list: nothing refused."""
+    if not plan:
+        return []
+    if plan.get("kind") == "uv-sync":
+        return unsafe_uv_project(root)
+    if plan.get("kind") != "requirements":
+        return []
+    root = Path(root)
+    top = root.resolve() if _top is None else _top
+    seen = set() if _seen is None else _seen
+    bad: list[str] = []
+    for name in plan.get("files") or []:
+        path = (root / name).resolve()
+        if not path.is_relative_to(top):   # e.g. a top-level requirements file that is a symlink out of the project
+            bad.append(f"{name}: (leads outside the project)")
+            continue
+        if path in seen:
+            continue
+        seen.add(path)
+        try:
+            text = path.read_text(errors="replace")
+        except OSError:
+            continue
+        for line in _requirement_lines(text):
+            inc = _INCLUDE.match(line)
+            if inc:
+                target = inc.group(1)
+                dest = (path.parent / target).resolve()
+                if (_URL_LINE.search(target) or Path(target).is_absolute() or ".." in Path(target).parts
+                        or target.startswith("~") or not dest.is_relative_to(top)):
+                    bad.append(f"{name}: {line[:120]}")
+                else:
+                    bad += unsafe_requirement_lines(path.parent, {"kind": "requirements", "files": [target]},
+                                                    seen, top)
+                continue
+            if _refused_line(line):
+                bad.append(f"{name}: {line[:120]}")
+    return bad
+
+
+def drop_index_env(env: dict) -> dict:
+    """The env without settings that point uv or pip at another index: UV_*INDEX*, UV_*FIND_LINKS*,
+    UV_*INSECURE_HOST*, PIP_*INDEX*, PIP_*FIND_LINKS*, PIP_*TRUSTED_HOST*."""
+    def off(key: str) -> bool:
+        k = key.upper()
+        if k.startswith("UV_"):
+            return any(w in k for w in ("INDEX", "FIND_LINKS", "INSECURE_HOST"))
+        if k.startswith("PIP_"):
+            return any(w in k for w in ("INDEX", "FIND_LINKS", "TRUSTED_HOST"))
+        return False
+    return {k: v for k, v in env.items() if not off(k)}
+
+
+def unsafe_requirements_reason(lines: list[str]) -> str:
+    """The could-not-verify reason when the deps-only fallback refuses off-index requirement lines."""
+    shown = "; ".join(lines[:3]) + (" and more" if len(lines) > 3 else "")
+    return ("unsupported: the project's declared dependencies point outside the official package index "
+            f"({shown}), so they were not installed and nothing was tested")
+
+
 _WRONG_PYTHON = re.compile(
     r"(?:requires-python|requires a different python|no interpreter found|python_requires|"
     r"does not satisfy|not compatible with python|requires python)[^\n]*?(3\.(?:1\d|[6-9]))", re.I)

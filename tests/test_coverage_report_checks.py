@@ -126,3 +126,38 @@ def test_partial_report_never_ran_uses_total_rule(product):
         assert out["verdict"] == "could_not_verify" and out["reason"].startswith(coverage_gate.PRODUCT_NOT_MEASURED)
     else:
         assert out["verdict"] == "verified"
+
+
+def test_report_cut_short_by_contree_output_limit_is_not_measured(tmp_path, monkeypatch):
+    big = json.dumps({"files": {f"/work/src/m{i}.py": {"executed_lines": list(range(500)), "missing_lines": []}
+                                for i in range(50)}})
+    out = "___POC_EXIT___0\n___POC_COV_START___\n" + big[:65000]   # end marker lost to the output cap
+    got = _run(tmp_path, monkeypatch, lambda *a, **k: {"stdout": out, "stderr": "", "exit_code": 0})
+    assert got["status"] == "not measured" and "cut short" in got["why"]
+    assert _gate(got)["verdict"] == "could_not_verify"
+
+
+def test_shrink_keeps_only_changed_files_and_is_compact(tmp_path):
+    import subprocess
+    import sys
+    rep = {"meta": {"format": 3}, "files": {
+        "widget/core.py": {"executed_lines": [1, 2], "missing_lines": []},
+        "/work/src/widget/util.py": {"executed_lines": [3], "missing_lines": []},
+        **{f"other/m{i}.py": {"executed_lines": list(range(300)), "missing_lines": []} for i in range(40)}}}
+    f = tmp_path / "cov.json"
+    f.write_text(json.dumps(rep, indent=2))
+    out = subprocess.run([sys.executable, "-c", daily_run._COV_SHRINK, str(f), "widget/core.py", "widget/util.py"],
+                         capture_output=True, text=True, check=True).stdout
+    files, why = coverage_gate.parse_report(out)
+    assert why == "" and set(files) == {"widget/core.py", "/work/src/widget/util.py"}
+    assert len(out) < 300
+
+
+def test_coverage_shell_shrinks_to_changed_files(tmp_path, monkeypatch):
+    seen = {}
+
+    def run_op(side, shell, **k):
+        seen["shell"] = shell
+        return {"stdout": "", "stderr": "", "exit_code": 0}
+    _run(tmp_path, monkeypatch, run_op)
+    assert "python -c" in seen["shell"] and "/tmp/poc-cov.json" in seen["shell"]

@@ -1053,3 +1053,38 @@ def test_declared_requirements_include_extras(tmp_path):
     assert "requests" in lines
     assert any(line.startswith("python-gitlab") for line in lines)
     assert any(line.startswith("pytest") for line in lines)
+
+
+def test_contree_python_choice_ignores_host_pythons(tmp_path, monkeypatch):
+    """A >=3.14 project gets 3.14 installed in Contree even when the host has 3.14 and the image has 3.12,
+    and a 3.12 image is not mistaken for the host's 3.14."""
+    from ops import daily_run
+    from poc import contree_sandboxes
+    monkeypatch.setattr(contree_sandboxes, "BASE_IMAGE", "docker.io/library/python:3.12-slim-bookworm")
+    monkeypatch.setattr(demo_helper, "find_python", lambda version, which=None: None)
+    a = SimpleNamespace(python="3.14", bench=None, sandbox_backend="contree", pr=["x"], product_check=True)
+    root = _checkout(tmp_path, python=">=3.14")
+    plan = daily_run._product_plan(a, {}, "acme/widget", {"dist": "widget"}, [root], pypi=_pypi)
+    assert plan["python"]["requested"] == "3.14" and plan["python"]["current"] == "3.12"
+    assert plan["python"]["provision"] == "3.14"
+    assert "uv python install -q 3.14" in demo_helper.contree_shell(plan)
+
+
+def test_contree_lowest_matching_version_not_host_choice(tmp_path, monkeypatch):
+    from ops import daily_run
+    from poc import contree_sandboxes
+    monkeypatch.setattr(contree_sandboxes, "BASE_IMAGE", "docker.io/library/python:3.10-slim")
+    monkeypatch.setattr(demo_helper, "find_python",
+                        lambda version, which=None: "/usr/bin/python3.13" if version == "3.13" else None)
+    a = SimpleNamespace(python="3.13", bench=None, sandbox_backend="contree", pr=["x"], product_check=True)
+    root = _checkout(tmp_path, python=">=3.11")
+    plan = daily_run._product_plan(a, {}, "acme/widget", {"dist": "widget"}, [root], pypi=_pypi)
+    assert plan["python"]["requested"] == "3.11" and plan["python"]["provision"] == "3.11"
+
+
+@pytest.mark.parametrize("image,want", [("docker.io/library/python:3.12-slim-bookworm", "3.12"),
+                                        ("python:3.14", "3.14"), ("python:3.13.2-slim", "3.13"),
+                                        ("example.org/team/base:latest", ""), ("ubuntu:24.04", "")])
+def test_image_python_reads_tag(image, want):
+    from poc import contree_sandboxes
+    assert contree_sandboxes.image_python(image) == want
