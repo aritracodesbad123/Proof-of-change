@@ -43,12 +43,32 @@ def _under_study_pairs(path: Path | None) -> bool:
 
 
 def _under_random_prs(path: Path | None) -> bool:
-    """True when path is a file inside benchmarks/random-prs/ (lists of upstream PRs)."""
+    """True inside benchmarks/random-prs/ or benchmarks/batch30-*/ (lists of upstream PRs): "bot" is allowed only inside an owner/name."""
     if path is None:
         return False
     parts = path.parts
-    return any(parts[i] == "benchmarks" and i + 1 < len(parts) and parts[i + 1] == "random-prs"
+    return any(parts[i] == "benchmarks" and i + 1 < len(parts)
+               and (parts[i + 1] == "random-prs" or parts[i + 1].startswith("batch30-"))
                for i in range(len(parts)))
+
+
+def _under_upstream_run(path: Path | None) -> bool:
+    """True only for stored upstream run output: the tool's own record and report files.
+
+    Our own write-ups (README, SCORING, notes) next to them are not covered.
+    """
+    if path is None:
+        return False
+    parts = path.parts
+    for i in range(len(parts) - 1):
+        if (parts[i] == "benchmarks" and parts[i + 1].startswith("batch30-") and "runs" in parts[i + 2:-1]
+                and path.name in {"record.json", "REPORT.md", "REPORT.html"}):
+            return True
+        if parts[i] == "replay" and parts[i + 1] == "catalog.json":
+            return True  # generated only from the stored records by ops/export_replay.py
+        if parts[i] == "replay" and parts[i + 1] == "checks" and path.name in {"record.json", "REPORT.md", "REPORT.html"}:
+            return True
+    return False
 
 
 def _inside_upstream_repo(line: str, match: re.Match) -> bool:
@@ -88,6 +108,9 @@ def findings(text: str, path: Path | None = None) -> list[str]:
     for i, line in enumerate(text.splitlines(), 1):
         for kind, pat in PATTERNS.items():
             matches = list(pat.finditer(line))
+            if kind in {"bot", "internal library registry / picks"} and _under_upstream_run(path):
+                # Upstream package, test and repository names in stored run output. Machine paths still fail.
+                matches = []
             if kind == "bot" and study_pairs:
                 # Repository names under the study-pair files may contain this word. Prose still fails.
                 matches = [m for m in matches if not _inside_upstream_repo(line, m)]

@@ -1,0 +1,1365 @@
+{
+  "schema_version": "1",
+  "record_kind": "pr_run",
+  "id": "pr-The-PR-Agent-pr-agent-4183-e602c4aa8532-2026-10-22-check-0745",
+  "date_ist": "2026-10-22 07:45 IST",
+  "run_date": "2026-10-22",
+  "who": "ops/daily_run.py",
+  "repo": "The-PR-Agent/pr-agent",
+  "library": "pr-agent",
+  "pr": {
+    "repo": "The-PR-Agent/pr-agent",
+    "number": 4183,
+    "url": "https://github.com/The-PR-Agent/pr-agent/pull/4183",
+    "title": "perf(gitlab): skip project lookup when fetching a merge request",
+    "base_sha": "59638246e41d37caf1d95435e00718859e35b69b",
+    "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+    "head_sha": "e602c4aa85322d79c2bf25ae74df70d3efb67154",
+    "merge_commit": null,
+    "tested_main_sha": "59638246e41d37caf1d95435e00718859e35b69b",
+    "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+  },
+  "author": "PeterDaveHello",
+  "base_ref": "main",
+  "updated_at_utc": "2026-10-21T18:11:45Z",
+  "updated_at_ist": "2026-10-21 23:41 IST",
+  "ci_state": "not checked (single-PR check)",
+  "ci_detail": "checked on request with --pr",
+  "tested_at_ist": "2026-10-22 07:45 IST",
+  "files": {
+    "all": [
+      "pr_agent/git_providers/gitlab_provider.py",
+      "tests/unittest/test_gitlab_lazy_mr_lookup.py"
+    ],
+    "package_py": [
+      "pr_agent/git_providers/gitlab_provider.py"
+    ],
+    "compiled": [],
+    "other": [
+      "tests/unittest/test_gitlab_lazy_mr_lookup.py"
+    ]
+  },
+  "machine_type": {
+    "arch": "x86_64",
+    "os": "Linux",
+    "platform": "Linux-6.12.94+-x86_64-with-glibc2.41",
+    "cpu_count": 8,
+    "ci": null,
+    "runner_name": null,
+    "runner_os": null,
+    "runner_arch": null,
+    "runner_environment": null,
+    "image": null,
+    "label": "local",
+    "gxx": "g++ (Debian 14.2.0-19) 14.2.0",
+    "cpu_model": "Intel(R) Xeon(R) Processor",
+    "ram_gb": 15.6
+  },
+  "thread_env": {
+    "OMP_NUM_THREADS": "1",
+    "OPENBLAS_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1",
+    "NUMEXPR_NUM_THREADS": "1",
+    "VECLIB_MAXIMUM_THREADS": "1",
+    "BLIS_NUM_THREADS": "1",
+    "PYTHONHASHSEED": "0"
+  },
+  "runs_per_side": 3,
+  "runs_per_side_planned": 3,
+  "workers": "4",
+  "test_timeout_s": 120,
+  "run_timeout_s": 900,
+  "build_timeout_s": 1800,
+  "python": "3.12.15",
+  "test_selection": "mapped from touched files: tests/unittest/test_gitlab_lazy_mr_lookup.py, tests/unittest/test_gitlab_provider.py",
+  "per_run": [
+    {
+      "side": "old",
+      "run": 1,
+      "passed": 0,
+      "failed": 0,
+      "error": 1,
+      "skipped": 0,
+      "collection_errors": 0,
+      "exit": 1,
+      "seconds": 1.5,
+      "pytest_summary": "1 error in 0.91s",
+      "junit": true
+    },
+    {
+      "side": "new",
+      "run": 1,
+      "passed": 0,
+      "failed": 0,
+      "error": 2,
+      "skipped": 0,
+      "collection_errors": 0,
+      "exit": 1,
+      "seconds": 2.2,
+      "pytest_summary": "2 errors in 1.60s",
+      "junit": true
+    },
+    {
+      "side": "old",
+      "run": 2,
+      "passed": 0,
+      "failed": 0,
+      "error": 1,
+      "skipped": 0,
+      "collection_errors": 0,
+      "exit": 1,
+      "seconds": 1.6,
+      "pytest_summary": "1 error in 0.91s",
+      "junit": true
+    },
+    {
+      "side": "new",
+      "run": 2,
+      "passed": 0,
+      "failed": 0,
+      "error": 2,
+      "skipped": 0,
+      "collection_errors": 0,
+      "exit": 1,
+      "seconds": 2.1,
+      "pytest_summary": "2 errors in 1.54s",
+      "junit": true
+    },
+    {
+      "side": "old",
+      "run": 3,
+      "passed": 0,
+      "failed": 0,
+      "error": 1,
+      "skipped": 0,
+      "collection_errors": 0,
+      "exit": 1,
+      "seconds": 1.6,
+      "pytest_summary": "1 error in 0.95s",
+      "junit": true
+    },
+    {
+      "side": "new",
+      "run": 3,
+      "passed": 0,
+      "failed": 0,
+      "error": 2,
+      "skipped": 0,
+      "collection_errors": 0,
+      "exit": 1,
+      "seconds": 2.2,
+      "pytest_summary": "2 errors in 1.64s",
+      "junit": true
+    }
+  ],
+  "notes": null,
+  "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+  "behaviour_claims": [],
+  "baseline": "full",
+  "model_provider": {
+    "requested": "nebius",
+    "used": "nebius",
+    "note": "model provider: nebius (Token Factory, live)",
+    "blind": false
+  },
+  "sandbox_backend": "local",
+  "sandbox_backend_note": "local bubblewrap",
+  "machine": "local",
+  "posted_upstream": false,
+  "logs": "pr_agent-4183/",
+  "freeze": {
+    "main": "freeze-main.txt",
+    "pr": "freeze-pr.txt"
+  },
+  "poc_commit": "0fa0016ea51794edee0f4a085e41bf48dd813765",
+  "route": "source-pair",
+  "current_head_sha": "e602c4aa85322d79c2bf25ae74df70d3efb67154",
+  "tested_invocation": 1,
+  "model_provider_used": "nebius",
+  "state": "closed",
+  "mergeable_state": "unknown",
+  "product_check": true,
+  "demo_helper": {
+    "preflight": {
+      "ok": true
+    },
+    "tavily": {
+      "ok": true,
+      "skipped": false,
+      "live_call": true,
+      "cached": false,
+      "queries": [
+        "pr-agent python setup install instructions https://github.com/The-PR-Agent/pr-agent site:github.com/The-PR-Agent/pr-agent",
+        "pr-agent python documentation install https://github.com/The-PR-Agent/pr-agent site:github.com/The-PR-Agent/pr-agent",
+        "pr-agent python install requirements https://pypi.org/project/pr-agent/ https://github.com/The-PR-Agent/pr-agent site:pypi.org"
+      ],
+      "results": [
+        {
+          "title": "pr-agent \u00b7 PyPI",
+          "url": "https://pypi.org/project/pr-agent/",
+          "query": "pr-agent python install requirements https://pypi.org/project/pr-agent/ https://github.com/The-PR-Agent/pr-agent site:pypi.org"
+        },
+        {
+          "title": "pr-agent/docs/docs/installation/github.md at main \u00b7 The-PR-Agent/pr-agent \u00b7 GitHub",
+          "url": "https://github.com/The-PR-Agent/pr-agent/blob/main/docs/docs/installation/github.md",
+          "query": "pr-agent python setup install instructions https://github.com/The-PR-Agent/pr-agent site:github.com/The-PR-Agent/pr-agent"
+        },
+        {
+          "title": "pr-agent/AGENTS.md at main \u00b7 The-PR-Agent/pr-agent \u00b7 GitHub",
+          "url": "https://github.com/The-PR-Agent/pr-agent/blob/main/AGENTS.md",
+          "query": "pr-agent python setup install instructions https://github.com/The-PR-Agent/pr-agent site:github.com/The-PR-Agent/pr-agent"
+        },
+        {
+          "title": "PR Agent invocation fails due to OpenAI Inference error \u00b7 Issue #2055 \u00b7 The-PR-Agent/pr-agent \u00b7 GitHub",
+          "url": "https://github.com/The-PR-Agent/pr-agent/issues/2055",
+          "query": "pr-agent python setup install instructions https://github.com/The-PR-Agent/pr-agent site:github.com/The-PR-Agent/pr-agent"
+        },
+        {
+          "title": "GitHub - The-PR-Agent/pr-agent: \ud83d\ude80 PR Agent: The Original Open-Source PR Reviewer. This project is not the Qodo free tier. \u00b7 GitHub",
+          "url": "https://github.com/The-PR-Agent/pr-agent",
+          "query": "pr-agent python documentation install https://github.com/The-PR-Agent/pr-agent site:github.com/The-PR-Agent/pr-agent"
+        }
+      ],
+      "text": "To set up the PR Agent Python project, first, acquire the App private key and App ID from your app's settings page. Clone the repository using `git clone`. Then, copy the secrets template file and fill in the required information. Set the `PYTHONPATH` to include your `pr-agent` project directory using either Option A by adding `PYTHONPATH=\"/PATH/TO/PROJECTS/pr-agent` to your `.env` file or Option B by setting `PYTHONPATH` and running the CLI in one command. Install dependencies using `uv sync` from `uv.lock` and run tests with `PYTHONPATH=.` set. Secrets should be supplied through environment variables, not persisted in code or configuration files. Adjust runtime behavior by overriding keys in `.pr_agent.toml` or by supplying repository-specific Dynaconf files.\nTo install the PR Agent Python documentation, first, acquire the necessary information from your app's settings page, including the App private key, App ID. Clone the repository using `git clone`. Then, copy the secrets template file and fill in the required details. Set the `PYTHONPATH` to include your `pr-agent` project directory using either Option A by adding `PYTHONPATH=\"/PATH/TO/PROJECTS/pr-agent` to your `.env` file or Option B by setting `PYTHONPATH` and running the CLI in one command. Install dependencies with `uv sync` and run tests with `PYTHONPATH=.` set to keep imports functional. Adjust configuration through `.pr_agent.toml` or files under `pr_agent/settings/` instead of hard-coding values.\nTo install the pr-agent Python package, you can use pip to download version 0.2.7 from PyPI. The installation command is `pip install pr-agent==0.2.7`. The pr-agent package aims to help efficiently review and handle pull requests by providing AI feedbacks and suggestions. It includes tools like `/improve` for code suggestions, `/analyze` for identifying changed code components, and `/custom_prompt` for generating custom suggestions based on specific guidelines. The package also supports adjusting the response language and has been updated to address community-identified vulnerabilities.\nTitle: pr-agent \u00b7 PyPI\nCodiumAI PR-Agent aims to help efficiently review and handle pull requests, by providing AI feedbacks and suggestions. PR-Agent is now available for easy installation via pip. * A new knowledge-base website for PR-Agent is now available. * You can now use the repo's wiki page to set configurations for PR-Agent \ud83d\udc8e. CodiumAI PR-Agent aims to help efficiently review and handle pull requests, by providing AI feedbacks and suggestions. * See the Usage Guide for instructions on r\n```\n$(python -c \"import secrets; print(secrets.token_hex(10))\")$(\"import secrets; print(secrets.token_hex(10))\" \" \")\n```\n\n1. Acquire the following pieces of information from your app's settings page:\n\n    App private key (click \"Generate a private key\" and save the file)\n    App ID\n2. Clone this repository:\n\n```\ngit clone \n```\n\n1. Copy the secrets template file and fill in the following:\n\n```\n# Edit .secrets.toml file #\n``` [...] 6. Set the `PYTHONPATH` to include your `pr-agent` project directo\nDo match the interpreter requirement declared in `pyproject.toml` (Python \u2265 3.12) and install dependencies with `uv sync` (runtime + dev, from `uv.lock`) before running tools.\n Do run tests with `PYTHONPATH=.` set to keep imports functional (for example `PYTHONPATH=. uv run pytest tests/unittest/test_output_models.py -q`).\n Do adjust configuration through `.pr_agent.toml` or files under `pr_agent/settings/` instead of hard-coding values. [...] Install dependencies (runtime + dev) into a project \n- script: | echo \"Running PR Agent action step\" # Construct PR_URL PR_URL=\"${SYSTEM_COLLECTIONURI}${SYSTEM_TEAMPROJECT}/_git/${BUILD_REPOSITORY_NAME}/pullrequest/${SYSTEM_PULLREQUEST_PULLREQUESTID}\" echo \"PR_URL=$PR_URL\" # Extract organization URL from System.CollectionUri ORG_URL=$(echo \"$(System.CollectionUri)\" | sed 's/\\/$//') # Remove trailing slash if present echo \"Organization URL: $ORG_URL\" export azure_devops__org=\"$ORG_URL\" export config__git_provider=\"azure\" pip install pr-agent [...] \n| .python-version | | .python-version |  |  |\n| AGENTS.md | | AGENTS.md |  |  |\n| CHANGELOG.md | | CHANGELOG.md |  |  |\n| CLAUDE.md | | CLAUDE.md |  |  |\n| CODE\\_OF\\_CONDUCT.md | | CODE\\_OF\\_CONDUCT.md |  |  |\n| CONTRIBUTING.md | | CONTRIBUTING.md |  |  |\n| Dockerfile.github\\_action\\_dockerhub | | Dockerfile.github\\_action\\_dockerhub |  |  |\n| LICENSE | | LICENSE |  |  |\n| MANIFEST.in | | MANIFEST.in |  |  |\n| README.md | | README.md |  |  |\n| RELEASE\\_NOTES.md | | RELEASE\\_NOTES.md |  |  |",
+      "errors": [],
+      "lines": [
+        "Looked up with Tavily: 5 results",
+        "Query: pr-agent python setup install instructions https://github.com/The-PR-Agent/pr-agent site:github.com/The-PR-Agent/pr-agent",
+        "Query: pr-agent python documentation install https://github.com/The-PR-Agent/pr-agent site:github.com/The-PR-Agent/pr-agent",
+        "Query: pr-agent python install requirements https://pypi.org/project/pr-agent/ https://github.com/The-PR-Agent/pr-agent site:pypi.org",
+        "Source: pr-agent \u00b7 PyPI \u2014 https://pypi.org/project/pr-agent/",
+        "Source: pr-agent/docs/docs/installation/github.md at main \u00b7 The-PR-Agent/pr-agent \u00b7 GitHub \u2014 https://github.com/The-PR-Agent/pr-agent/blob/main/docs/docs/installation/github.md",
+        "Source: pr-agent/AGENTS.md at main \u00b7 The-PR-Agent/pr-agent \u00b7 GitHub \u2014 https://github.com/The-PR-Agent/pr-agent/blob/main/AGENTS.md",
+        "Source: PR Agent invocation fails due to OpenAI Inference error \u00b7 Issue #2055 \u00b7 The-PR-Agent/pr-agent \u00b7 GitHub \u2014 https://github.com/The-PR-Agent/pr-agent/issues/2055",
+        "Source: GitHub - The-PR-Agent/pr-agent: \ud83d\ude80 PR Agent: The Original Open-Source PR Reviewer. This project is not the Qodo free tier. \u00b7 GitHub \u2014 https://github.com/The-PR-Agent/pr-agent"
+      ]
+    },
+    "notes": [
+      "Setup check: GitHub token: present.",
+      "Setup check: Nebius token: present.",
+      "Setup check: free memory 6.9 GB (of 15.6 GB).",
+      "Setup check: free disk 92.1 GB.",
+      "Demo helper: git is installed.",
+      "Demo helper: python3 is installed.",
+      "Demo helper: uv is installed.",
+      "Looked up with Tavily: 5 results",
+      "Query: pr-agent python setup install instructions https://github.com/The-PR-Agent/pr-agent site:github.com/The-PR-Agent/pr-agent",
+      "Query: pr-agent python documentation install https://github.com/The-PR-Agent/pr-agent site:github.com/The-PR-Agent/pr-agent",
+      "Query: pr-agent python install requirements https://pypi.org/project/pr-agent/ https://github.com/The-PR-Agent/pr-agent site:pypi.org",
+      "Source: pr-agent \u00b7 PyPI \u2014 https://pypi.org/project/pr-agent/",
+      "Source: pr-agent/docs/docs/installation/github.md at main \u00b7 The-PR-Agent/pr-agent \u00b7 GitHub \u2014 https://github.com/The-PR-Agent/pr-agent/blob/main/docs/docs/installation/github.md",
+      "Source: pr-agent/AGENTS.md at main \u00b7 The-PR-Agent/pr-agent \u00b7 GitHub \u2014 https://github.com/The-PR-Agent/pr-agent/blob/main/AGENTS.md",
+      "Source: PR Agent invocation fails due to OpenAI Inference error \u00b7 Issue #2055 \u00b7 The-PR-Agent/pr-agent \u00b7 GitHub \u2014 https://github.com/The-PR-Agent/pr-agent/issues/2055",
+      "Source: GitHub - The-PR-Agent/pr-agent: \ud83d\ude80 PR Agent: The Original Open-Source PR Reviewer. This project is not the Qodo free tier. \u00b7 GitHub \u2014 https://github.com/The-PR-Agent/pr-agent",
+      "Setup plan: the same packages on main and pr.",
+      "Setup plan: aiohttp is noted, installed with the project.",
+      "Setup plan: anthropic is noted, installed with the project.",
+      "Setup plan: certifi is noted, installed with the project.",
+      "Setup plan: dynaconf is noted, installed with the project.",
+      "Setup plan: fastapi is noted, installed with the project.",
+      "Setup plan: GitPython is noted, installed with the project.",
+      "Setup plan: starlette is noted, installed with the project.",
+      "Setup plan: Jinja2 is noted, installed with the project.",
+      "Setup plan: litellm is noted, installed with the project.",
+      "Setup plan: loguru is noted, installed with the project.",
+      "Setup plan: openai is noted, installed with the project.",
+      "Setup plan: PyJWT is noted, installed with the project.",
+      "Setup plan: PyYAML is noted, installed with the project.",
+      "Setup plan: retry is noted, installed with the project.",
+      "Setup plan: starlette-context is noted, installed with the project.",
+      "Setup plan: tiktoken is noted, installed with the project.",
+      "Setup plan: ujson is noted, installed with the project.",
+      "Setup plan: unidiff is noted, installed with the project.",
+      "Setup plan: urllib3 is noted, installed with the project.",
+      "Setup plan: uvicorn is noted, installed with the project.",
+      "Setup plan: tenacity is noted, installed with the project.",
+      "Setup plan: langfuse is noted, installed with the project.",
+      "Setup plan: gunicorn is noted, installed with the project.",
+      "Setup plan: pydantic is noted, installed with the project.",
+      "Setup plan: pydantic-settings is noted, installed with the project.",
+      "Setup plan: html2text is noted, installed with the project.",
+      "Setup plan: opentelemetry-api is noted, installed with the project.",
+      "Setup plan: opentelemetry-sdk is noted, installed with the project.",
+      "Setup plan: opentelemetry-exporter-otlp-proto-http is noted, installed with the project.",
+      "Setup plan: prometheus-client is noted, installed with the project.",
+      "Setup plan: Python 3.12: Python 3.12 already meets >=3.12",
+      "Before rerun: could_not_verify: no test actually ran on either side: 0 tests ran; 0 new test(s) pass, 0 unchanged; 1 test module(s) fail to load on both sides (tests.unittest.test_gitlab_provider), so their tests did not run; test module tests.unittest.test_gitlab_lazy_mr_lookup fails to load on the PR side (0 test(s) no longer run); probe model-p1 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count; probe model-p2 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count",
+      "After rerun: not rerun. could not verify: setup gap setup"
+    ],
+    "setup_plan": {
+      "packages": [
+        {
+          "requirement": "aiohttp>=3.14.3,<4",
+          "name": "aiohttp",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "anthropic>=0.69.0",
+          "name": "anthropic",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "certifi>=2026.7.22",
+          "name": "certifi",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "dynaconf>=3.3.5,<4",
+          "name": "dynaconf",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "fastapi>=0.141.1,<1",
+          "name": "fastapi",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "GitPython>=3.1.62,<4",
+          "name": "GitPython",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "starlette>=1.6.0,<2",
+          "name": "starlette",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "Jinja2==3.1.6",
+          "name": "Jinja2",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "litellm==1.105.1",
+          "name": "litellm",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "loguru==0.7.3",
+          "name": "loguru",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "openai>=1.55.3",
+          "name": "openai",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "PyJWT>=2.15.1,<3",
+          "name": "PyJWT",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "PyYAML==6.0.3",
+          "name": "PyYAML",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "retry==0.9.2",
+          "name": "retry",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "starlette-context==0.5.1",
+          "name": "starlette-context",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "tiktoken==0.14.0",
+          "name": "tiktoken",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "ujson>=5.13.0,<7",
+          "name": "ujson",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "unidiff==1.0.1",
+          "name": "unidiff",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "urllib3>=2.8.0,<3",
+          "name": "urllib3",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "uvicorn>=0.31.1,<1",
+          "name": "uvicorn",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "tenacity==8.2.3",
+          "name": "tenacity",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "langfuse==3.14.5",
+          "name": "langfuse",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "gunicorn==26.2.0",
+          "name": "gunicorn",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "pydantic==2.14.0",
+          "name": "pydantic",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "pydantic-settings==2.15.0",
+          "name": "pydantic-settings",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "html2text==2025.4.15",
+          "name": "html2text",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "opentelemetry-api==1.43.0",
+          "name": "opentelemetry-api",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "opentelemetry-sdk==1.43.0",
+          "name": "opentelemetry-sdk",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "opentelemetry-exporter-otlp-proto-http==1.43.0",
+          "name": "opentelemetry-exporter-otlp-proto-http",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "prometheus-client==0.26.0",
+          "name": "prometheus-client",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        }
+      ],
+      "extra_reqs": [],
+      "python": {
+        "requested": "3.12",
+        "current": "3.12",
+        "applied": true,
+        "switch": null,
+        "reason": "Python 3.12 already meets >=3.12"
+      },
+      "system": [],
+      "refused": []
+    },
+    "gap_retry": {
+      "reran": false,
+      "rounds": [
+        {
+          "round": 1,
+          "verdict": "could_not_verify",
+          "reason": "no test actually ran on either side: 0 tests ran; 0 new test(s) pass, 0 unchanged; 1 test module(s) fail to load on both sides (tests.unittest.test_gitlab_provider), so their tests did not run; test module tests.unittest.test_gitlab_lazy_mr_lookup fails to load on the PR side (0 test(s) no longer run); probe model-p1 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count; probe model-p2 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count"
+        }
+      ],
+      "installed": []
+    }
+  },
+  "chosen": {
+    "pr": 4183,
+    "head_sha": null,
+    "install": null,
+    "test_cmd": null
+  },
+  "sides": {
+    "comparison_basis": "merge-base vs PR head (no merge ref available)",
+    "main_sha": "59638246e41d37caf1d95435e00718859e35b69b",
+    "pr_sha": "e602c4aa85322d79c2bf25ae74df70d3efb67154"
+  },
+  "tested": {
+    "main": "main @ 59638246e41d (merge-base with the PR head)",
+    "pr": "PR head e602c4aa8532"
+  },
+  "probe_plan": {
+    "baseline": "full",
+    "model": "model provider: nebius (Token Factory, live)",
+    "errors": [],
+    "model_claims": [
+      {
+        "id": "C2",
+        "text": "Avoid fetching GitLab project metadata when a project identifier is already available.",
+        "source_quote": "Avoid fetching GitLab project metadata when a project identifier is already available.",
+        "testable": true,
+        "expect": "differs"
+      },
+      {
+        "id": "C4",
+        "text": "Eliminates one GitLab API request per merge-request lookup.",
+        "source_quote": "Eliminates one GitLab API request per merge-request lookup without changing the returned MR or its error handling.",
+        "testable": true,
+        "expect": "differs"
+      },
+      {
+        "id": "C5",
+        "text": "The returned merge request object is unchanged.",
+        "source_quote": "Eliminates one GitLab API request per merge-request lookup without changing the returned MR or its error handling.",
+        "testable": true,
+        "expect": "same"
+      },
+      {
+        "id": "C6",
+        "text": "Error handling for merge request lookup is unchanged.",
+        "source_quote": "Eliminates one GitLab API request per merge-request lookup without changing the returned MR or its error handling.",
+        "testable": true,
+        "expect": "same"
+      }
+    ],
+    "model_rejected_claims": [
+      {
+        "id": "C1",
+        "text": "The change skips project lookup when fetching a merge request.",
+        "source_quote": "perf(gitlab): skip project request when fetching a merge request",
+        "testable": true,
+        "expect": "differs",
+        "rejected": "source_quote not found in the PR text"
+      },
+      {
+        "id": "C3",
+        "text": "Using projects.get(self.id_project, lazy=True) while leaving the subsequent merge-request lookup unchanged.",
+        "source_quote": "Use projects.get(self.id_project, lazy=True) while leaving the subsequent merge-request lookup unchanged.",
+        "testable": true,
+        "expect": "same",
+        "rejected": "source_quote not found in the PR text"
+      }
+    ],
+    "diff_targets": [],
+    "frozen": [
+      {
+        "path": "model-probes/model-p1.py",
+        "source": "model",
+        "sha256": "6b626f5353f4f28637dde5210cbc30aaf189d0266a2277f8904587fbdda3254a",
+        "generator": {
+          "kind": "model",
+          "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+          "model": "nvidia/nemotron-3-super-120b-a12b",
+          "provider": "nebius",
+          "provenance": "live",
+          "blind": true
+        },
+        "frozen_at": "2026-10-22T02:18:07.997525+00:00",
+        "inputs_sha256": "de9505691f44d8bb9e0001340d5095d476ccb1a571fa452faa21e3962b3af0b3",
+        "inputs": {
+          "title_chars": 63,
+          "body_chars": 2787,
+          "base_files": {
+            "pr_agent/git_providers/gitlab_provider.py": "82f71205e7ba294432eee8390e2ffaa353d89a8d3d99f7234db370bcbdac1555"
+          }
+        }
+      },
+      {
+        "path": "model-probes/model-p2.py",
+        "source": "model",
+        "sha256": "4393ccca6af92bd16236124050391010444cb535f40fe113c36a46b89b6e8b7c",
+        "generator": {
+          "kind": "model",
+          "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+          "model": "nvidia/nemotron-3-super-120b-a12b",
+          "provider": "nebius",
+          "provenance": "live",
+          "blind": true
+        },
+        "frozen_at": "2026-10-22T02:18:07.997692+00:00",
+        "inputs_sha256": "de9505691f44d8bb9e0001340d5095d476ccb1a571fa452faa21e3962b3af0b3",
+        "inputs": {
+          "title_chars": 63,
+          "body_chars": 2787,
+          "base_files": {
+            "pr_agent/git_providers/gitlab_provider.py": "82f71205e7ba294432eee8390e2ffaa353d89a8d3d99f7234db370bcbdac1555"
+          }
+        }
+      }
+    ]
+  },
+  "test_extras": [
+    "pytest-asyncio>=1.4.0"
+  ],
+  "pr_side_started_at": "2026-10-22T02:18:08.149245+00:00",
+  "test_targets": {
+    "main": [
+      "tests/unittest/test_gitlab_provider.py"
+    ],
+    "pr": [
+      "tests/unittest/test_gitlab_lazy_mr_lookup.py",
+      "tests/unittest/test_gitlab_provider.py"
+    ]
+  },
+  "installed_commit": {
+    "main": {
+      "dist": "pr-agent",
+      "expected": "59638246e41d37caf1d95435e00718859e35b69b",
+      "installed": "59638246e41d37caf1d95435e00718859e35b69b",
+      "ok": true
+    },
+    "pr": {
+      "dist": "pr-agent",
+      "expected": "e602c4aa85322d79c2bf25ae74df70d3efb67154",
+      "installed": "e602c4aa85322d79c2bf25ae74df70d3efb67154",
+      "ok": true
+    }
+  },
+  "declared_test_deps": {
+    "requested": [
+      "pytest-asyncio>=1.4.0"
+    ],
+    "installed": true
+  },
+  "comparison": {
+    "same": 0,
+    "same_skipped_both": 0,
+    "regressions": [],
+    "fixed": [],
+    "new_tests_passing": 0,
+    "new_tests_failing": [],
+    "new_tests_skipped": [],
+    "removed_tests": [],
+    "reparametrized": [],
+    "skipped_missing_dependency": [],
+    "flaky": [],
+    "pr_unstable": [],
+    "pr_unstable_noisy": [],
+    "environment": [],
+    "other_changes": [],
+    "preexisting_failures": [],
+    "load_failed_both": [
+      "tests.unittest.test_gitlab_provider"
+    ],
+    "load_failed_pr": [
+      {
+        "module": "tests.unittest.test_gitlab_lazy_mr_lookup",
+        "tests_affected": 0
+      }
+    ],
+    "load_failed_main": [],
+    "executed": {
+      "main": 0,
+      "pr": 0
+    },
+    "messages": {}
+  },
+  "exit_check": {
+    "explained": false,
+    "problems": [
+      "PR run 1: 1 failure(s) not seen on main",
+      "PR run 2: 1 failure(s) not seen on main",
+      "PR run 3: 1 failure(s) not seen on main"
+    ],
+    "detail": "pytest exit 1; no identical pre-existing failures"
+  },
+  "coverage": {
+    "status": "measured",
+    "changed_lines_total": 1,
+    "changed_lines_covered": 0,
+    "files": [
+      {
+        "file": "pr_agent/git_providers/gitlab_provider.py",
+        "changed_lines_total": 1,
+        "changed_lines_covered": 0
+      }
+    ],
+    "seconds": 3.7,
+    "exit": 1,
+    "log": "coverage-pytest.log"
+  },
+  "probes": {
+    "status": "error",
+    "items": [
+      {
+        "id": "model-p1",
+        "source": "model",
+        "path": "model-probes/model-p1.py",
+        "sha256": "6b626f5353f4f28637dde5210cbc30aaf189d0266a2277f8904587fbdda3254a",
+        "target": "The-PR-Agent/pr-agent#4183",
+        "about": "Normal case: check project and MR calls, and MR object",
+        "claims": [
+          {
+            "id": "C2",
+            "source": "PR description",
+            "text": "Avoid fetching GitLab project metadata when a project identifier is already available.",
+            "covers": [
+              "normal.project_calls"
+            ],
+            "expect": "differs"
+          },
+          {
+            "id": "C4",
+            "source": "PR description",
+            "text": "Eliminates one GitLab API request per merge-request lookup.",
+            "covers": [
+              "normal.total_calls"
+            ],
+            "expect": "differs"
+          },
+          {
+            "id": "C5",
+            "source": "PR description",
+            "text": "The returned merge request object is unchanged.",
+            "covers": [
+              "normal.mr_id",
+              "normal.mr_title"
+            ],
+            "expect": "same"
+          }
+        ],
+        "runs_per_side": 3,
+        "per_run": [
+          {
+            "side": "main",
+            "run": 1,
+            "seconds": 0.1,
+            "ok": false
+          },
+          {
+            "side": "pr",
+            "run": 1,
+            "seconds": 0.0,
+            "ok": false
+          },
+          {
+            "side": "main",
+            "run": 2,
+            "seconds": 0.0,
+            "ok": false
+          },
+          {
+            "side": "pr",
+            "run": 2,
+            "seconds": 0.0,
+            "ok": false
+          },
+          {
+            "side": "main",
+            "run": 3,
+            "seconds": 0.0,
+            "ok": false
+          },
+          {
+            "side": "pr",
+            "run": 3,
+            "seconds": 0.0,
+            "ok": false
+          }
+        ],
+        "outputs": {
+          "main": [
+            "probe-model-p1-main-1.jsonl",
+            "probe-model-p1-main-2.jsonl",
+            "probe-model-p1-main-3.jsonl"
+          ],
+          "pr": [
+            "probe-model-p1-pr-1.jsonl",
+            "probe-model-p1-pr-2.jsonl",
+            "probe-model-p1-pr-3.jsonl"
+          ]
+        },
+        "runs": {
+          "main": [
+            {
+              "probe.error": {
+                "crash": "non-json output",
+                "exit_code": 1
+              }
+            },
+            {
+              "probe.error": {
+                "crash": "non-json output",
+                "exit_code": 1
+              }
+            },
+            {
+              "probe.error": {
+                "crash": "non-json output",
+                "exit_code": 1
+              }
+            }
+          ],
+          "pr": [
+            {
+              "probe.error": {
+                "crash": "non-json output",
+                "exit_code": 1
+              }
+            },
+            {
+              "probe.error": {
+                "crash": "non-json output",
+                "exit_code": 1
+              }
+            },
+            {
+              "probe.error": {
+                "crash": "non-json output",
+                "exit_code": 1
+              }
+            }
+          ]
+        },
+        "observations": [
+          {
+            "name": "probe.error",
+            "state": "same",
+            "label": "not_testable",
+            "claim": null,
+            "main": {
+              "crash": "non-json output",
+              "exit_code": 1
+            },
+            "pr": {
+              "crash": "non-json output",
+              "exit_code": 1
+            },
+            "citations": {
+              "main": {
+                "file": "probe-model-p1-main-1.jsonl",
+                "line": 1,
+                "quote": "\"observation\": \"probe.error\""
+              },
+              "pr": {
+                "file": "probe-model-p1-pr-1.jsonl",
+                "line": 1,
+                "quote": "\"observation\": \"probe.error\""
+              }
+            }
+          }
+        ],
+        "generator": {
+          "kind": "model",
+          "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+          "model": "nvidia/nemotron-3-super-120b-a12b",
+          "provider": "nebius",
+          "provenance": "live",
+          "blind": true
+        },
+        "freeze": {
+          "sha256": "6b626f5353f4f28637dde5210cbc30aaf189d0266a2277f8904587fbdda3254a",
+          "generator": {
+            "kind": "model",
+            "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+            "model": "nvidia/nemotron-3-super-120b-a12b",
+            "provider": "nebius",
+            "provenance": "live",
+            "blind": true
+          },
+          "frozen_at": "2026-10-22T02:18:07.997525+00:00",
+          "inputs_sha256": "de9505691f44d8bb9e0001340d5095d476ccb1a571fa452faa21e3962b3af0b3",
+          "inputs": {
+            "title_chars": 63,
+            "body_chars": 2787,
+            "base_files": {
+              "pr_agent/git_providers/gitlab_provider.py": "82f71205e7ba294432eee8390e2ffaa353d89a8d3d99f7234db370bcbdac1555"
+            }
+          },
+          "verified": true,
+          "pr_started_at": "2026-10-22T02:18:08.149245+00:00"
+        },
+        "probe_changed_line_coverage": {
+          "status": "not measured",
+          "why": "coverage produced no data (exit 1); see probe-coverage.log",
+          "adequacy": "not_adequate",
+          "note": "the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate"
+        },
+        "status": "crashed",
+        "uninformative_reason": "the probe crashed or printed no parsed output on every main-side run"
+      },
+      {
+        "id": "model-p2",
+        "source": "model",
+        "path": "model-probes/model-p2.py",
+        "sha256": "4393ccca6af92bd16236124050391010444cb535f40fe113c36a46b89b6e8b7c",
+        "target": "The-PR-Agent/pr-agent#4183",
+        "about": "Error cases: check exception types for project not found and MR not found",
+        "claims": [
+          {
+            "id": "C6",
+            "source": "PR description",
+            "text": "Error handling for merge request lookup is unchanged.",
+            "covers": [
+              "error_project_not_found.exception",
+              "error_mr_not_found.exception"
+            ],
+            "expect": "same"
+          }
+        ],
+        "runs_per_side": 3,
+        "per_run": [
+          {
+            "side": "main",
+            "run": 1,
+            "seconds": 0.0,
+            "ok": false
+          },
+          {
+            "side": "pr",
+            "run": 1,
+            "seconds": 0.0,
+            "ok": false
+          },
+          {
+            "side": "main",
+            "run": 2,
+            "seconds": 0.0,
+            "ok": false
+          },
+          {
+            "side": "pr",
+            "run": 2,
+            "seconds": 0.0,
+            "ok": false
+          },
+          {
+            "side": "main",
+            "run": 3,
+            "seconds": 0.0,
+            "ok": false
+          },
+          {
+            "side": "pr",
+            "run": 3,
+            "seconds": 0.0,
+            "ok": false
+          }
+        ],
+        "outputs": {
+          "main": [
+            "probe-model-p2-main-1.jsonl",
+            "probe-model-p2-main-2.jsonl",
+            "probe-model-p2-main-3.jsonl"
+          ],
+          "pr": [
+            "probe-model-p2-pr-1.jsonl",
+            "probe-model-p2-pr-2.jsonl",
+            "probe-model-p2-pr-3.jsonl"
+          ]
+        },
+        "runs": {
+          "main": [
+            {
+              "probe.error": {
+                "crash": "non-json output",
+                "exit_code": 1
+              }
+            },
+            {
+              "probe.error": {
+                "crash": "non-json output",
+                "exit_code": 1
+              }
+            },
+            {
+              "probe.error": {
+                "crash": "non-json output",
+                "exit_code": 1
+              }
+            }
+          ],
+          "pr": [
+            {
+              "probe.error": {
+                "crash": "non-json output",
+                "exit_code": 1
+              }
+            },
+            {
+              "probe.error": {
+                "crash": "non-json output",
+                "exit_code": 1
+              }
+            },
+            {
+              "probe.error": {
+                "crash": "non-json output",
+                "exit_code": 1
+              }
+            }
+          ]
+        },
+        "observations": [
+          {
+            "name": "probe.error",
+            "state": "same",
+            "label": "not_testable",
+            "claim": null,
+            "main": {
+              "crash": "non-json output",
+              "exit_code": 1
+            },
+            "pr": {
+              "crash": "non-json output",
+              "exit_code": 1
+            },
+            "citations": {
+              "main": {
+                "file": "probe-model-p2-main-1.jsonl",
+                "line": 1,
+                "quote": "\"observation\": \"probe.error\""
+              },
+              "pr": {
+                "file": "probe-model-p2-pr-1.jsonl",
+                "line": 1,
+                "quote": "\"observation\": \"probe.error\""
+              }
+            }
+          }
+        ],
+        "generator": {
+          "kind": "model",
+          "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+          "model": "nvidia/nemotron-3-super-120b-a12b",
+          "provider": "nebius",
+          "provenance": "live",
+          "blind": true
+        },
+        "freeze": {
+          "sha256": "4393ccca6af92bd16236124050391010444cb535f40fe113c36a46b89b6e8b7c",
+          "generator": {
+            "kind": "model",
+            "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+            "model": "nvidia/nemotron-3-super-120b-a12b",
+            "provider": "nebius",
+            "provenance": "live",
+            "blind": true
+          },
+          "frozen_at": "2026-10-22T02:18:07.997692+00:00",
+          "inputs_sha256": "de9505691f44d8bb9e0001340d5095d476ccb1a571fa452faa21e3962b3af0b3",
+          "inputs": {
+            "title_chars": 63,
+            "body_chars": 2787,
+            "base_files": {
+              "pr_agent/git_providers/gitlab_provider.py": "82f71205e7ba294432eee8390e2ffaa353d89a8d3d99f7234db370bcbdac1555"
+            }
+          },
+          "verified": true,
+          "pr_started_at": "2026-10-22T02:18:08.149245+00:00"
+        },
+        "probe_changed_line_coverage": {
+          "status": "not measured",
+          "why": "coverage produced no data (exit 1); see probe-coverage.log",
+          "adequacy": "not_adequate",
+          "note": "the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate"
+        },
+        "status": "crashed",
+        "uninformative_reason": "the probe crashed or printed no parsed output on every main-side run"
+      }
+    ],
+    "summary": {
+      "labels": [],
+      "flagged": [],
+      "proven_claims": [],
+      "reason": "the probe crashed or printed no parsed output on every main-side run; the probe crashed or printed no parsed output on every main-side run",
+      "ignored_noise": [],
+      "ignored_warning_only": [],
+      "pr_only_noisy": []
+    }
+  },
+  "probe_changed_line_coverage": {
+    "status": "not measured",
+    "side": "main",
+    "probes": {
+      "model-p1": {
+        "status": "not measured",
+        "changed_lines_covered": null,
+        "changed_lines_total": null,
+        "adequacy": "not_adequate"
+      },
+      "model-p2": {
+        "status": "not measured",
+        "changed_lines_covered": null,
+        "changed_lines_total": null,
+        "adequacy": "not_adequate"
+      }
+    },
+    "not_adequate": [
+      "model-p1",
+      "model-p2"
+    ]
+  },
+  "verdict": "could_not_verify",
+  "reason": "could not verify: setup gap setup",
+  "verdict_before_coverage_gate": "could_not_verify",
+  "reason_before_coverage_gate": "could not verify: setup gap setup",
+  "changed_lines_total": 1,
+  "changed_lines_covered": 0,
+  "coverage_gate": {
+    "kind": "python",
+    "changed": false,
+    "confidence": "normal",
+    "note": "0 of 1 changed executable line(s) ran (0%)",
+    "measurement": "measured"
+  },
+  "agents": {
+    "status": "skipped",
+    "note": "advisory swarm is off",
+    "roles": []
+  },
+  "explanation": {
+    "status": "not yet wired",
+    "why": "advisory swarm is off"
+  },
+  "swarm_requested": false,
+  "operator_approval_requested": false,
+  "swarm": "off",
+  "operator_approval": "off",
+  "what_changed": {
+    "package_python_files": [
+      "pr_agent/git_providers/gitlab_provider.py"
+    ],
+    "compiled_files": [],
+    "other_files": [
+      "tests/unittest/test_gitlab_lazy_mr_lookup.py"
+    ]
+  },
+  "duration_s": {
+    "total_wall": 190.7,
+    "tests": 11.2
+  },
+  "cost": {
+    "ai_calls": 3,
+    "failed_ai_calls": 0,
+    "input_tokens": 31076,
+    "output_tokens": 23164,
+    "thinking_tokens": 21741,
+    "cost_usd": 0.03017,
+    "calls_without_usage": 0,
+    "ai_cost_usd": 0.03017,
+    "cost_complete": true,
+    "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+    "compute_seconds": {
+      "total_wall": 190.7,
+      "tests": 11.2
+    },
+    "machine_usd_per_hour": 0.24,
+    "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+    "computer_cost_usd": 0.012713,
+    "total_cost_usd": 0.042883,
+    "swarm": {
+      "ai_calls": 0,
+      "failed_ai_calls": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "thinking_tokens": 0,
+      "cost_usd": 0.0,
+      "calls_without_usage": 0,
+      "ai_cost_usd": 0.0,
+      "cost_complete": true,
+      "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+    }
+  },
+  "head_at_report_sha": "e602c4aa85322d79c2bf25ae74df70d3efb67154",
+  "head_moved_since_test": false
+}

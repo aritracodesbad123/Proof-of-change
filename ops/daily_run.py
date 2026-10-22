@@ -1094,6 +1094,16 @@ def check_installed_commit_by_name(venv: Path, dist: str, expected_sha: str, che
     return False, info
 
 
+def _deps_only_path(venv: Path) -> Path | None:
+    """The folder a dependency-only install put on the import path, or None."""
+    for site in Path(venv).glob("lib/python*/site-packages"):
+        f = site / "poc-project-path.pth"
+        if f.is_file():
+            lines = [ln.strip() for ln in f.read_text(errors="replace").splitlines() if ln.strip()]
+            return Path(lines[0]) if len(lines) == 1 else None
+    return None
+
+
 def check_installed_commit(venv: Path, dist: str, expected_sha: str, checkout: Path | None = None) -> tuple[bool, dict]:
     """Does the environment contain the checkout of `expected_sha`? Fails closed.
 
@@ -1125,6 +1135,15 @@ def check_installed_commit(venv: Path, dist: str, expected_sha: str, checkout: P
         else:
             elsewhere.append((name, url if isinstance(url, str) else ""))
     if not matches:
+        pth = _deps_only_path(venv)
+        if pth is not None and _same_folder(pth, checkout):
+            # dependency-only install (the project could not be built): the import path names this checkout
+            head = _checkout_head(checkout)
+            info.update({"dist": "(project folder on the import path)", "installed": head, "deps_only": True})
+            ok = _sha_same(expected_sha, head)
+            if not ok:
+                info["why"] = f"the checkout on the import path is at {head[:12] or 'unknown'}, not {expected_sha[:12]}"
+            return ok, info
         if len(elsewhere) == 1:
             name, url = elsewhere[0]
             info["dist"] = name
@@ -1227,6 +1246,76 @@ def install_side(venv: Path, checkout: Path, chosen: dict | None, log: Path, pyt
     return True, ""
 
 
+def install_deps_only(venv: Path, checkout: Path, plan: dict, log: Path, python: str, timeout: int,
+                      extra_reqs=None) -> tuple[bool, str]:
+    """Install only the dependencies a project declares (product checks), never the project itself.
+
+    Same commands on both sides. The checkout is added to the import path with a .pth file.
+    """
+    env = base_env(side_home(venv), install=True)
+    cmds = [["uv", "venv", "-q", "-p", python, venv]]
+    if plan.get("kind") == "uv-sync":
+        # same result as `uv sync --no-install-project`: the lock (or pyproject) exported without the project itself
+        # inside the checkout, so local paths in the lock (workspace members) resolve as they do for uv sync
+        reqs = checkout / ".poc-declared-deps.txt"
+        export = ["uv", "export", "-q", "--no-emit-project", "--no-hashes", "--directory", checkout,
+                  "-p", venv / "bin/python", "-o", reqs]
+        cmds.append(export + (["--frozen"] if plan.get("frozen") else []))
+        cmds.append(["uv", "pip", "install", "-q", "-p", venv / "bin/python", "-r", reqs])
+    else:
+        for name in plan.get("files") or []:
+            cmds.append(["uv", "pip", "install", "-q", "-p", venv / "bin/python", "-r", checkout / name])
+    cmds.append(["uv", "pip", "install", "-q", "-p", venv / "bin/python", *BASE_TEST_DEPS, *(extra_reqs or [])])
+    sbx = side_sandbox(venv, network=True)
+    sbx["rw"].append(checkout)
+    for c in cmds:
+        rc, _ = run(c, log, cwd=checkout, env=env, timeout=timeout, sbx=sbx)   # lock paths are relative to it
+        if rc == "timeout":
+            return False, f"dependency install timed out after {timeout}s; see {log.name}"
+        if rc == "oom":
+            return False, _oom_reason()
+        if rc != 0:
+            (checkout / ".poc-declared-deps.txt").unlink(missing_ok=True)
+            return False, f"dependency-only install failed ({rc}); see {log.name}"
+    (checkout / ".poc-declared-deps.txt").unlink(missing_ok=True)
+    changed = checkout_changes(checkout)
+    if changed:
+        return False, ("setup problem: the dependency install changed the checked-out code ("
+                       + ", ".join(changed[:5]) + (" and more" if len(changed) > 5 else "") + "), so nothing was tested")
+    write_project_path(venv, checkout)
+    return True, ""
+
+
+DEPS_FILE = ".poc-declared-deps.txt"
+
+
+def checkout_changes(checkout: Path) -> list[str]:
+    """Paths that differ from the checked-out commit, untracked files included. Only our own deps file is ignored.
+
+    A git error counts as a change, so this fails closed."""
+    got = subprocess.run(["git", "-C", str(checkout), "status", "--porcelain", "--untracked-files=all",
+                          "--ignored=no"], capture_output=True, text=True)
+    if got.returncode != 0:
+        return ["(git status failed)"]
+    out = []
+    for line in got.stdout.splitlines():
+        path = line[3:].strip()
+        if path and path != DEPS_FILE:
+            out.append(path)
+    return out
+
+
+def write_project_path(venv: Path, checkout: Path) -> None:
+    """Write our import-path entry after the install has finished, replacing whatever is there.
+
+    Nothing an install does can plant or change it: any existing file of that name is removed first."""
+    for site in (venv / "lib").glob("python*/site-packages"):
+        f = site / "poc-project-path.pth"
+        if f.is_symlink() or f.exists():
+            f.unlink()
+        f.write_text(str(checkout) + "\n")
+
+
 def _dist_version(venv: Path, requirement: str) -> str:
     """Installed version of one requirement, or "" when it is not there. The name is checked before it is used."""
     name = _req_name(requirement)
@@ -1282,9 +1371,14 @@ def _product_plan(a, rec: dict, repo: str, cfg: dict, checkouts, pypi=None, pyth
         getattr(a, "sandbox_backend", None) or "local",
         (cfg or {}).get("dist") or (cfg or {}).get("pkg") or "",
         python_available=python_available, pypi=pypi,
-        allow_lookup_packages=bool(folders))
+        allow_lookup_packages=bool(folders), auto_python=product_route(a))
     demo_helper.attach_plan(rec, plan)
     demo_helper.announce(plan.get("lines") or [])
+    py = plan.get("python") or {}
+    if py.get("requested") and py.get("rule"):
+        from poc import run_progress
+        run_progress.emit("setup_python", detail=("failed: " if py.get("gate_failed") else "")
+                          + f"Python {py['requested']}: {py.get('reason')}")
     return plan
 
 
@@ -1298,9 +1392,53 @@ def _install_with_helper(a, rec, step, venv, checkout, chosen, log, timeout, con
     """Retry one side's install. The caller uses the plain install_side call when the helper is off."""
     from poc import demo_helper
     py = a.python if python is None else python
+    gate = ((rec.get("demo_helper") or {}).get("setup_plan") or {}).get("python") or {}
+    if gate.get("gate_failed"):
+        why = (f"setup problem: Python {gate.get('requested')} could not be installed for this check "
+               f"({gate.get('reason')}); nothing was tested") if gate.get("requested") else str(gate.get("reason"))
+        demo_helper.note_setup(rec, step, {"ok": False, "label": demo_helper.SETUP_LABEL, "counts_as_verdict": False,
+                                           "attempts": 1, "detail": why, "retried": False, "step": step})
+        return False, why
+    from poc import run_progress
+    run_progress.emit("install_deps", detail=f"{step}: installing the project's declared dependencies")
+
+    state = {"py": py}
 
     def once():
-        ok, why = install_side(venv, checkout, chosen, log, py, timeout, constraints, extra_reqs)
+        ok, why = install_side(venv, checkout, chosen, log, state["py"], timeout, constraints, extra_reqs)
+        if ok:
+            return ok, why
+        try:
+            text = log.read_text(errors="replace")[-20000:]
+        except OSError:
+            text = ""
+        wanted = demo_helper.wrong_python(text) if product_route(a) else None
+        if wanted and wanted != state["py"] and not str(state["py"]).endswith(wanted):
+            got = demo_helper.retry_python(wanted)
+            if got:
+                demo_helper.note_auto_fix(
+                    rec, f"Auto-fix: the {step} said it needs Python {wanted}, so Python {wanted} "
+                         "was installed and the install was tried again.")
+                state["py"] = got
+                shutil.rmtree(venv, ignore_errors=True)
+                ok, why = install_side(venv, checkout, chosen, log, got, timeout, constraints, extra_reqs)
+                if ok:
+                    return ok, why
+                try:
+                    text = log.read_text(errors="replace")[-20000:]
+                except OSError:
+                    text = ""
+        if product_route(a) and demo_helper.not_a_package(text):
+            plan = demo_helper.deps_only_plan(checkout)
+            if plan:
+                shutil.rmtree(venv, ignore_errors=True)
+                ok, why = install_deps_only(venv, checkout, plan, log, state["py"], timeout, extra_reqs)
+                if ok:
+                    demo_helper.note_auto_fix(
+                        rec, f"Auto-fix: the {step} could not build the project as a package, so only the "
+                             f"dependencies it declares ({plan['source']}) were installed, the same way on both "
+                             "sides, and the project's own folder was put on the import path.")
+                    rec.setdefault("demo_helper", {})["deps_only"] = plan
         return ok, why
 
     ok, why, _value, outcome = demo_helper.run_setup(
@@ -1397,7 +1535,7 @@ def _install_system_package(rec, name, run_side) -> bool:
 # ---------------------------------------------------------------- execution helpers
 HOST = None   # sbx=HOST: a trusted tool on our own files (git on our clones); everything else runs in a side's sandbox
 
-# Contree-only mode: a console check chose --sandbox-backend contree and bubblewrap cannot start here. Every step that
+# Contree-only mode: the check chose --sandbox-backend contree. Every step that
 # runs pull-request or package code must then go through the Contree session; a local side command is refused.
 _CONTREE_ONLY = False
 
@@ -1417,11 +1555,11 @@ def is_refused(rc) -> bool:
 
 
 LOCAL_REFUSED = Refusal(126)
-CONTREE_ONLY_NOTE = ("Contree-only: bubblewrap cannot start on this machine, so no pull-request or package code runs "
+CONTREE_ONLY_NOTE = ("Contree mode: no pull-request or package code runs "
                      "locally. This step needs a local side and was not run.")
-CONTREE_ONLY_COVERAGE_WHY = "Contree-only check: bubblewrap can't start here, so coverage wasn't run"
-NO_SANDBOX_FALLBACK = ("Contree could not prepare the main and PR sides ({why}), and bubblewrap cannot start on this "
-                       "machine, so Proof-of-Change will not run pull-request code. Check your Nebius key and Contree "
+CONTREE_ONLY_COVERAGE_WHY = "Contree mode: coverage runs only inside Contree, and it was not run there"
+NO_SANDBOX_FALLBACK = ("Contree could not prepare the main and PR sides ({why}). In Contree mode nothing from the pull "
+                       "request runs locally, so Proof-of-Change will not run pull-request code. Check your Nebius key and Contree "
                        "project ID and try again.")
 
 
@@ -1435,14 +1573,10 @@ def contree_only() -> bool:
 
 
 def contree_only_wanted(backend: str | None) -> bool:
-    """True when Contree was chosen and local PR code could not run inside bubblewrap: it cannot start here, or the
-    local sandbox was switched off. With Contree on, no pull-request code ever runs locally without a sandbox."""
-    if backend != "contree":
-        return False
-    if not sandbox.enabled():
-        return True
-    ok, _ = sandbox.check()
-    return not ok
+    """True whenever Contree was chosen. In Contree mode nothing from the pull request is installed or run locally,
+    not even first: both sides are built in Contree from the setup plan, and if Contree cannot run, the check is
+    refused (no bubblewrap fallback)."""
+    return backend == "contree"
 HEAVY_RAM_PER_BUILD_GB = 8
 HEAVY_RAM_PER_JOB_GB = 2
 OOM_PHRASE = "Killed signal terminated program"
@@ -2052,8 +2186,8 @@ def _contree_ready() -> bool:
 
 def _maybe_prepare_contree(a, repo: str, main_sha: str, pr_sha: str, rec: dict, timeout: int,
                            extra_shell: str = "") -> str | None:
-    """Build Contree main/PR checkpoints for source-pair. On failure fall back to local bubblewrap only when it can
-    start here; otherwise return a refusal (no pull-request code runs). Returns None when the check may continue.
+    """Build Contree main/PR checkpoints for source-pair. On failure return a refusal; there is no local bubblewrap
+    fallback (no pull-request code runs). Returns None when the check may continue.
 
     extra_shell is the same text for both checkpoints. Empty keeps the default install.
     """
@@ -2062,7 +2196,8 @@ def _maybe_prepare_contree(a, repo: str, main_sha: str, pr_sha: str, rec: dict, 
         return None
     contree_sandboxes.clear_session()
     try:
-        sess = contree_sandboxes.prepare_source_pair(repo, main_sha, pr_sha, timeout=timeout, extra_shell=extra_shell)
+        sess = contree_sandboxes.prepare_source_pair(repo, main_sha, pr_sha, timeout=timeout, extra_shell=extra_shell,
+                                                     **({"deps_only_fallback": True} if product_route(a) else {}))
         rec["contree"] = sess.describe()
         rec["machine"] = "contree"
         rec["sandbox_backend"] = "contree"
@@ -2070,22 +2205,12 @@ def _maybe_prepare_contree(a, repo: str, main_sha: str, pr_sha: str, rec: dict, 
         return None
     except contree_sandboxes.ContreeError as e:
         contree_sandboxes.clear_session()
-        ok, _why = (False, "local sandbox off") if not sandbox.enabled() else sandbox.check()
-        if _CONTREE_ONLY or not ok:
-            refusal = NO_SANDBOX_FALLBACK.format(why=e)
-            rec["sandbox_backend"] = "contree"
-            rec["sandbox_backend_note"] = refusal
-            rec["contree"] = {"failed": str(e), "fallback": None}
-            return refusal
-        note = f"contree checkpoint failed ({e}); using local bubblewrap"
-        contree_sandboxes.select("local")  # keep module backend in sync with the fallback
-        a.sandbox_backend = "local"
-        a.sandbox_backend_note = note
-        rec["sandbox_backend"] = "local"
-        rec["sandbox_backend_note"] = note
-        rec["machine"] = "local"
-        rec["contree"] = {"fallback": note}
-        return None
+        refusal = NO_SANDBOX_FALLBACK.format(why=e)
+        rec["sandbox_backend"] = "contree"
+        rec["sandbox_backend_note"] = refusal
+        rec["machine"] = "contree (not run)"
+        rec["contree"] = {"failed": str(e), "fallback": None}
+        return refusal
 
 
 def contree_only_extra_shell(declared: list[str], optional: list[str], base: str = "") -> str:
@@ -3240,8 +3365,9 @@ def new_record(repo: str, cfg: dict, item: dict, a, machine: dict, run_date: str
                               "blind": bool(getattr(getattr(a, "provider", None), "blind", False))},
            "sandbox_backend": getattr(a, "sandbox_backend", None) or "local",
            "sandbox_backend_note": getattr(a, "sandbox_backend_note", None),
-           "machine": ("contree" if getattr(a, "sandbox_backend", None) == "contree" else "local"),
-           "tool_setup": getattr(a, "tool_setup", None) or tool_setup_result(),
+            # "contree" only once both checkpoints were really built there (_maybe_prepare_contree sets it).
+            "machine": "local" if getattr(a, "sandbox_backend", None) != "contree" else "contree (not run)",
+            "tool_setup": getattr(a, "tool_setup", None) or tool_setup_result(),
            "posted_upstream": False, "logs": f"{cfg['pkg']}-{item['pr']}/", "freeze": {}}
     sha = getattr(a, "poc_commit", None)
     if isinstance(sha, str) and _COMMIT.fullmatch(sha):
@@ -3481,7 +3607,7 @@ def _contree_only_pair(a, rec: dict, repo: str, cfg: dict, item: dict, sp: dict,
     not_local = ["local freeze", "installed-commit guard", "probe coverage", "optional-module retry"]
     if not measure_coverage:
         not_local.insert(2, "coverage")
-    rec["contree_only"] = {"note": "bubblewrap cannot start here; installs, tests and probes ran in Contree",
+    rec["contree_only"] = {"note": "Contree mode: Contree has not run yet; nothing from the pull request ran locally",
                            "declared_test_deps": decl, "optional_backends": optional,
                            "not_run_locally": not_local}
     rec["coverage"] = {"status": "not measured", "why": CONTREE_ONLY_COVERAGE_WHY}
@@ -3490,7 +3616,10 @@ def _contree_only_pair(a, rec: dict, repo: str, cfg: dict, item: dict, sp: dict,
                                  extra_shell=contree_only_extra_shell(decl, optional, base))
     cmp = ex = None
     if cnv:
+        rec["contree_only"]["note"] = "Contree mode: Contree did not run, so nothing from the pull request was run"
         return cmp, cnv, ex, targets
+    rec["contree_only"]["note"] = ("Contree mode: installs, tests and probes ran in Contree; nothing from the pull "
+                                   "request ran locally")
     if decl:
         rec["declared_test_deps"] = {"requested": decl, "installed": True, "where": "contree"}
         rec["test_extras"] = list(dict.fromkeys([*(rec.get("test_extras") or []), *decl]))

@@ -1,0 +1,3036 @@
+{
+  "schema_version": "1",
+  "record_kind": "pr_run",
+  "id": "pr-googlefonts-glyphsLib-1208-3783ef49b506-2026-10-22-check-0748",
+  "date_ist": "2026-10-22 07:48 IST",
+  "run_date": "2026-10-22",
+  "who": "ops/daily_run.py",
+  "repo": "googlefonts/glyphsLib",
+  "library": "glyphsLib",
+  "pr": {
+    "repo": "googlefonts/glyphsLib",
+    "number": 1208,
+    "url": "https://github.com/googlefonts/glyphsLib/pull/1208",
+    "title": "split comma-separated meta Table dlng/slng data",
+    "base_sha": "0d7b5ccdaab409bcc139649f5b0aef0f8f49f6b9",
+    "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+    "head_sha": "3783ef49b506628c370b63f445089968c559e7fd",
+    "merge_commit": null,
+    "tested_main_sha": "3783ef49b506628c370b63f445089968c559e7fd",
+    "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+  },
+  "author": "anthrotype",
+  "base_ref": "main",
+  "updated_at_utc": "2026-10-21T13:13:12Z",
+  "updated_at_ist": "2026-10-21 18:43 IST",
+  "ci_state": "not checked (single-PR check)",
+  "ci_detail": "checked on request with --pr",
+  "tested_at_ist": "2026-10-22 07:48 IST",
+  "files": {
+    "all": [
+      "Lib/glyphsLib/builder/custom_params.py",
+      "tests/builder/custom_params_test.py"
+    ],
+    "package_py": [],
+    "compiled": [],
+    "other": [
+      "Lib/glyphsLib/builder/custom_params.py",
+      "tests/builder/custom_params_test.py"
+    ]
+  },
+  "machine_type": {
+    "arch": "x86_64",
+    "os": "Linux",
+    "platform": "Linux-6.12.94+-x86_64-with-glibc2.41",
+    "cpu_count": 8,
+    "ci": null,
+    "runner_name": null,
+    "runner_os": null,
+    "runner_arch": null,
+    "runner_environment": null,
+    "image": null,
+    "label": "local",
+    "gxx": "g++ (Debian 14.2.0-19) 14.2.0",
+    "cpu_model": "Intel(R) Xeon(R) Processor",
+    "ram_gb": 15.6
+  },
+  "thread_env": {
+    "OMP_NUM_THREADS": "1",
+    "OPENBLAS_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1",
+    "NUMEXPR_NUM_THREADS": "1",
+    "VECLIB_MAXIMUM_THREADS": "1",
+    "BLIS_NUM_THREADS": "1",
+    "PYTHONHASHSEED": "0"
+  },
+  "runs_per_side": 3,
+  "runs_per_side_planned": 3,
+  "workers": "4",
+  "test_timeout_s": 120,
+  "run_timeout_s": 900,
+  "build_timeout_s": 1800,
+  "python": "3.12.15",
+  "test_selection": "mapped from touched files: tests/builder/custom_params_test.py",
+  "per_run": [
+    {
+      "side": "old",
+      "run": 1,
+      "passed": 75,
+      "failed": 0,
+      "error": 0,
+      "skipped": 0,
+      "collection_errors": 0,
+      "exit": 0,
+      "seconds": 1.9,
+      "pytest_summary": "75 passed in 1.46s",
+      "junit": true
+    },
+    {
+      "side": "new",
+      "run": 1,
+      "passed": 75,
+      "failed": 0,
+      "error": 0,
+      "skipped": 0,
+      "collection_errors": 0,
+      "exit": 0,
+      "seconds": 1.9,
+      "pytest_summary": "75 passed in 1.45s",
+      "junit": true
+    },
+    {
+      "side": "old",
+      "run": 2,
+      "passed": 75,
+      "failed": 0,
+      "error": 0,
+      "skipped": 0,
+      "collection_errors": 0,
+      "exit": 0,
+      "seconds": 1.9,
+      "pytest_summary": "75 passed in 1.47s",
+      "junit": true
+    },
+    {
+      "side": "new",
+      "run": 2,
+      "passed": 75,
+      "failed": 0,
+      "error": 0,
+      "skipped": 0,
+      "collection_errors": 0,
+      "exit": 0,
+      "seconds": 1.9,
+      "pytest_summary": "75 passed in 1.44s",
+      "junit": true
+    },
+    {
+      "side": "old",
+      "run": 3,
+      "passed": 75,
+      "failed": 0,
+      "error": 0,
+      "skipped": 0,
+      "collection_errors": 0,
+      "exit": 0,
+      "seconds": 1.8,
+      "pytest_summary": "75 passed in 1.33s",
+      "junit": true
+    },
+    {
+      "side": "new",
+      "run": 3,
+      "passed": 75,
+      "failed": 0,
+      "error": 0,
+      "skipped": 0,
+      "collection_errors": 0,
+      "exit": 0,
+      "seconds": 1.7,
+      "pytest_summary": "75 passed in 1.32s",
+      "junit": true
+    }
+  ],
+  "notes": null,
+  "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+  "behaviour_claims": [],
+  "baseline": "full",
+  "model_provider": {
+    "requested": "nebius",
+    "used": "nebius",
+    "note": "model provider: nebius (Token Factory, live)",
+    "blind": false
+  },
+  "sandbox_backend": "local",
+  "sandbox_backend_note": "local bubblewrap",
+  "machine": "local",
+  "posted_upstream": false,
+  "logs": "glyphslib-1208/",
+  "freeze": {
+    "main": "freeze-main.txt",
+    "pr": "freeze-pr.txt"
+  },
+  "poc_commit": "0fa0016ea51794edee0f4a085e41bf48dd813765",
+  "route": "source-pair",
+  "current_head_sha": "3783ef49b506628c370b63f445089968c559e7fd",
+  "tested_invocation": 1,
+  "model_provider_used": "nebius",
+  "state": "closed",
+  "mergeable_state": "unknown",
+  "product_check": true,
+  "demo_helper": {
+    "preflight": {
+      "ok": true
+    },
+    "tavily": {
+      "ok": false,
+      "skipped": false,
+      "live_call": true,
+      "cached": false,
+      "queries": [
+        "glyphsLib python setup install instructions https://github.com/googlefonts/glyphsLib site:github.com/googlefonts/glyphsLib",
+        "glyphsLib python documentation install https://github.com/googlefonts/glyphsLib site:github.com/googlefonts/glyphsLib",
+        "glyphsLib python install requirements https://pypi.org/project/glyphsLib/ https://github.com/googlefonts/glyphsLib site:pypi.org"
+      ],
+      "results": [
+        {
+          "title": "glyphsLib",
+          "url": "https://pypi.org/project/glyphsLib/",
+          "query": "glyphsLib python install requirements https://pypi.org/project/glyphsLib/ https://github.com/googlefonts/glyphsLib site:pypi.org"
+        },
+        {
+          "title": "GitHub - googlefonts/glyphsLib: A bridge from Glyphs source files (.glyphs) to UFOs \u00b7 GitHub",
+          "url": "https://github.com/googlefonts/glyphsLib",
+          "query": "glyphsLib python documentation install https://github.com/googlefonts/glyphsLib site:github.com/googlefonts/glyphsLib"
+        },
+        {
+          "title": "Handle smart components \u00b7 Issue #91 \u00b7 googlefonts/glyphsLib \u00b7 GitHub",
+          "url": "https://github.com/googlefonts/glyphsLib/issues/91",
+          "query": "glyphsLib python documentation install https://github.com/googlefonts/glyphsLib site:github.com/googlefonts/glyphsLib"
+        }
+      ],
+      "text": "To install the glyphsLib Python library, you can use the provided requirements file. The repository contains a `requirements.txt` file that lists the necessary dependencies for development and production. To install, clone the repository and run `pip install -r requirements.txt` in the repository's root directory. The library provides a bridge from Glyphs source files (.glyphs) to UFOs and Designspace files via defcon and designspaceLib, with main conversion methods found in `__init__.py`. For building fonts, consider using fontmake which leverages glyphsLib.\nThe sources indicate that glyphsLib is a Python library that provides a bridge from Glyphs source files (.glyphs) to UFOs and Designspace files via defcon and designspaceLib. To install glyphsLib, you can use pip, the Python package installer. The latest version available on PyPI is 6.13.1, which can be installed with the command `pip install glyphsLib`. The sources do not provide specific system requirements or additional dependencies beyond Python 3, which is implied as a necessary prerequisite for installing and running glyphsLib.\nTitle: glyphsLib\n# glyphsLib \u00b7 PyPI. # glyphsLib 6.13.1. A bridge from Glyphs source files (.glyphs) to UFOs. Image 5: Sponsored: Python Software Foundation. Anaconda, Inc is a Maintaining sponsor of the Python Software Foundation. Image 6: CI Build StatusImage 7: PyPI VersionImage 8: CodecovImage 9: Join the chat at https://gitter.im/fonttools-dev/glyphsLib. ## glyphsLib. This Python library provides a bridge from Glyphs source files (.glyphs) to UFOs and Designspace files via defcon and design\n| README.builder.md | README.builder.md |  |  |\n| README.rst | README.rst |  |  |\n| pyproject.toml | pyproject.toml |  |  |\n| requirements-dev.in | requirements-dev.in |  |  |\n| requirements-dev.txt | requirements-dev.txt |  |  |\n| requirements.txt | requirements.txt |  |  |\n| setup.cfg | setup.cfg |  |  |\n| tox.ini | tox.ini |  |  |\n|  | [...] ## Repository files navigation\n\nCI Build Status  PyPI Version  Codecov  Join the chat at \n\n## glyphsLib\n\nThis Python library provides a bridge from Glyph\nSee also  and, I guess the handbook (I don't have it at hand). [...] More actions\n\n    @jpt you can set up a build script to remote control glyphs and export, if you want to use Python to build the font. Here\u2019s an example:  \n     \n\n    Reacted by Jeremy Tribby and Sovichet Tep\n\n    Reacted by Jeremy Tribby\n25. ### jptcommentedon Feb 11, 2021\n\n    @jpt\n\n    jpt\n\n    on Feb 11, 2021\n\n    More actions [...] @moyogo\n\n   moyogo\n\n   on Dec 20, 2017\n\n   Collaborator\n\n   More actions",
+      "errors": [
+        "TimeoutError: The read operation timed out"
+      ],
+      "lines": [
+        "Looked up with Tavily: 3 results",
+        "Query: glyphsLib python setup install instructions https://github.com/googlefonts/glyphsLib site:github.com/googlefonts/glyphsLib",
+        "Query: glyphsLib python documentation install https://github.com/googlefonts/glyphsLib site:github.com/googlefonts/glyphsLib",
+        "Query: glyphsLib python install requirements https://pypi.org/project/glyphsLib/ https://github.com/googlefonts/glyphsLib site:pypi.org",
+        "Source: glyphsLib \u2014 https://pypi.org/project/glyphsLib/",
+        "Source: GitHub - googlefonts/glyphsLib: A bridge from Glyphs source files (.glyphs) to UFOs \u00b7 GitHub \u2014 https://github.com/googlefonts/glyphsLib",
+        "Source: Handle smart components \u00b7 Issue #91 \u00b7 googlefonts/glyphsLib \u00b7 GitHub \u2014 https://github.com/googlefonts/glyphsLib/issues/91"
+      ]
+    },
+    "notes": [
+      "Setup check: GitHub token: present.",
+      "Setup check: Nebius token: present.",
+      "Setup check: free memory 6.9 GB (of 15.6 GB).",
+      "Setup check: free disk 92.0 GB.",
+      "Demo helper: git is installed.",
+      "Demo helper: python3 is installed.",
+      "Demo helper: uv is installed.",
+      "Looked up with Tavily: 3 results",
+      "Query: glyphsLib python setup install instructions https://github.com/googlefonts/glyphsLib site:github.com/googlefonts/glyphsLib",
+      "Query: glyphsLib python documentation install https://github.com/googlefonts/glyphsLib site:github.com/googlefonts/glyphsLib",
+      "Query: glyphsLib python install requirements https://pypi.org/project/glyphsLib/ https://github.com/googlefonts/glyphsLib site:pypi.org",
+      "Source: glyphsLib \u2014 https://pypi.org/project/glyphsLib/",
+      "Source: GitHub - googlefonts/glyphsLib: A bridge from Glyphs source files (.glyphs) to UFOs \u00b7 GitHub \u2014 https://github.com/googlefonts/glyphsLib",
+      "Source: Handle smart components \u00b7 Issue #91 \u00b7 googlefonts/glyphsLib \u00b7 GitHub \u2014 https://github.com/googlefonts/glyphsLib/issues/91",
+      "Setup plan: the same packages on main and pr.",
+      "Setup plan: ufoLib2 is noted, installed with the project.",
+      "Setup plan: fonttools is noted, installed with the project.",
+      "Setup plan: openstep-plist is noted, installed with the project.",
+      "Setup plan: install attrs==26.1.0 (listed in requirements-dev.txt) on main and pr.",
+      "Setup plan: install black==26.5.1 (listed in requirements-dev.txt) on main and pr.",
+      "Setup plan: install booleanoperations==0.10.0 (listed in requirements-dev.txt) on main and pr.",
+      "Setup plan: install cffsubr==0.4.0 (listed in requirements-dev.txt) on main and pr.",
+      "Setup plan: install click==8.4.2 (listed in requirements-dev.txt) on main and pr.",
+      "Setup plan: install coverage==7.15.2 (listed in requirements-dev.txt) on main and pr.",
+      "Setup plan: install defcon==0.12.2 (listed in requirements-dev.txt) on main and pr.",
+      "Setup plan: install execnet==2.1.2 (listed in requirements-dev.txt) on main and pr.",
+      "Setup plan: install flake8==7.3.0 (listed in requirements-dev.txt) on main and pr.",
+      "Setup plan: install flake8-bugbear==25.11.29 (listed in requirements-dev.txt) on main and pr.",
+      "Setup plan: install fontmath==0.10.0 (listed in requirements-dev.txt) on main and pr.",
+      "Setup plan: install iniconfig==2.3.0 (listed in requirements-dev.txt) on main and pr.",
+      "Setup plan: install lxml==6.1.1 (listed in requirements-dev.txt) on main and pr.",
+      "Setup plan: install mccabe==0.7.0 (listed in requirements-dev.txt) on main and pr.",
+      "Setup plan: install mypy-extensions==1.1.0 (listed in requirements-dev.txt) on main and pr.",
+      "Setup plan: install packaging==26.2 (listed in requirements-dev.txt) on main and pr.",
+      "Setup plan: install pathspec==1.1.1 (listed in requirements-dev.txt) on main and pr.",
+      "Setup plan: install platformdirs==4.11.0 (listed in requirements-dev.txt) on main and pr.",
+      "Setup plan: install pluggy==1.6.0 (listed in requirements-dev.txt) on main and pr.",
+      "Setup plan: install pyclipper==1.4.0 (listed in requirements-dev.txt) on main and pr.",
+      "Setup plan: install pycodestyle==2.14.0 (listed in requirements-dev.txt) on main and pr.",
+      "Setup plan: install pyflakes==3.4.0 (listed in requirements-dev.txt) on main and pr.",
+      "Setup plan: install pygments==2.20.0 (listed in requirements-dev.txt) on main and pr.",
+      "Setup plan: install pytest==9.1.1 (listed in requirements-dev.txt) on main and pr.",
+      "Setup plan: install pytest-randomly==4.1.0 (listed in requirements-dev.txt) on main and pr.",
+      "Setup plan: install pytest-xdist==3.8.0 (listed in requirements-dev.txt) on main and pr.",
+      "Setup plan: install pytokens==0.4.1 (listed in requirements-dev.txt) on main and pr.",
+      "Setup plan: install skia-pathops==0.9.2 (listed in requirements-dev.txt) on main and pr.",
+      "Setup plan: install ufo2ft==3.9.0 (listed in requirements-dev.txt) on main and pr.",
+      "Setup plan: install ufonormalizer==0.6.3 (listed in requirements-dev.txt) on main and pr.",
+      "Setup plan: install unicodedata2==17.0.1 (listed in requirements-dev.txt) on main and pr.",
+      "Setup plan: install xmldiff==3.0 (listed in requirements-dev.txt) on main and pr.",
+      "Setup plan: Python 3.12: Python 3.12 already meets >=3.10",
+      "Installed attrs 26.1.0 from requirements-dev.txt (listed in requirements-dev.txt) on main and pr.",
+      "Installed black 26.5.1 from requirements-dev.txt (listed in requirements-dev.txt) on main and pr.",
+      "Installed booleanoperations 0.10.0 from requirements-dev.txt (listed in requirements-dev.txt) on main and pr.",
+      "Installed cffsubr 0.4.0 from requirements-dev.txt (listed in requirements-dev.txt) on main and pr.",
+      "Installed click 8.4.2 from requirements-dev.txt (listed in requirements-dev.txt) on main and pr.",
+      "Installed coverage 7.15.2 from requirements-dev.txt (listed in requirements-dev.txt) on main and pr.",
+      "Installed defcon 0.12.2 from requirements-dev.txt (listed in requirements-dev.txt) on main and pr.",
+      "Installed execnet 2.1.2 from requirements-dev.txt (listed in requirements-dev.txt) on main and pr.",
+      "Installed flake8 7.3.0 from requirements-dev.txt (listed in requirements-dev.txt) on main and pr.",
+      "Installed flake8-bugbear 25.11.29 from requirements-dev.txt (listed in requirements-dev.txt) on main and pr.",
+      "Installed fontmath 0.10.0 from requirements-dev.txt (listed in requirements-dev.txt) on main and pr.",
+      "Installed iniconfig 2.3.0 from requirements-dev.txt (listed in requirements-dev.txt) on main and pr.",
+      "Installed lxml 6.1.1 from requirements-dev.txt (listed in requirements-dev.txt) on main and pr.",
+      "Installed mccabe 0.7.0 from requirements-dev.txt (listed in requirements-dev.txt) on main and pr.",
+      "Installed mypy-extensions 1.1.0 from requirements-dev.txt (listed in requirements-dev.txt) on main and pr.",
+      "Installed packaging 26.2 from requirements-dev.txt (listed in requirements-dev.txt) on main and pr.",
+      "Installed pathspec 1.1.1 from requirements-dev.txt (listed in requirements-dev.txt) on main and pr.",
+      "Installed platformdirs 4.11.0 from requirements-dev.txt (listed in requirements-dev.txt) on main and pr.",
+      "Installed pluggy 1.6.0 from requirements-dev.txt (listed in requirements-dev.txt) on main and pr.",
+      "Installed pyclipper 1.4.0 from requirements-dev.txt (listed in requirements-dev.txt) on main and pr.",
+      "Installed pycodestyle 2.14.0 from requirements-dev.txt (listed in requirements-dev.txt) on main and pr.",
+      "Installed pyflakes 3.4.0 from requirements-dev.txt (listed in requirements-dev.txt) on main and pr.",
+      "Installed pygments 2.20.0 from requirements-dev.txt (listed in requirements-dev.txt) on main and pr.",
+      "Installed pytest 9.1.1 from requirements-dev.txt (listed in requirements-dev.txt) on main and pr.",
+      "Installed pytest-randomly 4.1.0 from requirements-dev.txt (listed in requirements-dev.txt) on main and pr.",
+      "Installed pytest-xdist 3.8.0 from requirements-dev.txt (listed in requirements-dev.txt) on main and pr.",
+      "Installed pytokens 0.4.1 from requirements-dev.txt (listed in requirements-dev.txt) on main and pr.",
+      "Installed skia-pathops 0.9.2 from requirements-dev.txt (listed in requirements-dev.txt) on main and pr.",
+      "Installed ufo2ft 3.9.0 from requirements-dev.txt (listed in requirements-dev.txt) on main and pr.",
+      "Installed ufonormalizer 0.6.3 from requirements-dev.txt (listed in requirements-dev.txt) on main and pr.",
+      "Installed unicodedata2 17.0.1 from requirements-dev.txt (listed in requirements-dev.txt) on main and pr.",
+      "Installed xmldiff 3.0 from requirements-dev.txt (listed in requirements-dev.txt) on main and pr."
+    ],
+    "setup_plan": {
+      "packages": [
+        {
+          "requirement": "ufoLib2 >= 0.6.2",
+          "name": "ufoLib2",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "setup.cfg",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "fonttools[ufo,unicode] >= 4.38.0",
+          "name": "fonttools",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "setup.cfg",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "openstep-plist >= 0.3.0",
+          "name": "openstep-plist",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "setup.cfg",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "attrs==26.1.0",
+          "name": "attrs",
+          "kind": "requirements",
+          "action": "install",
+          "source": "requirements-dev.txt",
+          "reason": "listed in requirements-dev.txt",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "black==26.5.1",
+          "name": "black",
+          "kind": "requirements",
+          "action": "install",
+          "source": "requirements-dev.txt",
+          "reason": "listed in requirements-dev.txt",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "booleanoperations==0.10.0",
+          "name": "booleanoperations",
+          "kind": "requirements",
+          "action": "install",
+          "source": "requirements-dev.txt",
+          "reason": "listed in requirements-dev.txt",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "cffsubr==0.4.0",
+          "name": "cffsubr",
+          "kind": "requirements",
+          "action": "install",
+          "source": "requirements-dev.txt",
+          "reason": "listed in requirements-dev.txt",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "click==8.4.2",
+          "name": "click",
+          "kind": "requirements",
+          "action": "install",
+          "source": "requirements-dev.txt",
+          "reason": "listed in requirements-dev.txt",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "coverage==7.15.2",
+          "name": "coverage",
+          "kind": "requirements",
+          "action": "install",
+          "source": "requirements-dev.txt",
+          "reason": "listed in requirements-dev.txt",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "defcon==0.12.2",
+          "name": "defcon",
+          "kind": "requirements",
+          "action": "install",
+          "source": "requirements-dev.txt",
+          "reason": "listed in requirements-dev.txt",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "execnet==2.1.2",
+          "name": "execnet",
+          "kind": "requirements",
+          "action": "install",
+          "source": "requirements-dev.txt",
+          "reason": "listed in requirements-dev.txt",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "flake8==7.3.0",
+          "name": "flake8",
+          "kind": "requirements",
+          "action": "install",
+          "source": "requirements-dev.txt",
+          "reason": "listed in requirements-dev.txt",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "flake8-bugbear==25.11.29",
+          "name": "flake8-bugbear",
+          "kind": "requirements",
+          "action": "install",
+          "source": "requirements-dev.txt",
+          "reason": "listed in requirements-dev.txt",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "fontmath==0.10.0",
+          "name": "fontmath",
+          "kind": "requirements",
+          "action": "install",
+          "source": "requirements-dev.txt",
+          "reason": "listed in requirements-dev.txt",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "iniconfig==2.3.0",
+          "name": "iniconfig",
+          "kind": "requirements",
+          "action": "install",
+          "source": "requirements-dev.txt",
+          "reason": "listed in requirements-dev.txt",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "lxml==6.1.1",
+          "name": "lxml",
+          "kind": "requirements",
+          "action": "install",
+          "source": "requirements-dev.txt",
+          "reason": "listed in requirements-dev.txt",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "mccabe==0.7.0",
+          "name": "mccabe",
+          "kind": "requirements",
+          "action": "install",
+          "source": "requirements-dev.txt",
+          "reason": "listed in requirements-dev.txt",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "mypy-extensions==1.1.0",
+          "name": "mypy-extensions",
+          "kind": "requirements",
+          "action": "install",
+          "source": "requirements-dev.txt",
+          "reason": "listed in requirements-dev.txt",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "packaging==26.2",
+          "name": "packaging",
+          "kind": "requirements",
+          "action": "install",
+          "source": "requirements-dev.txt",
+          "reason": "listed in requirements-dev.txt",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "pathspec==1.1.1",
+          "name": "pathspec",
+          "kind": "requirements",
+          "action": "install",
+          "source": "requirements-dev.txt",
+          "reason": "listed in requirements-dev.txt",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "platformdirs==4.11.0",
+          "name": "platformdirs",
+          "kind": "requirements",
+          "action": "install",
+          "source": "requirements-dev.txt",
+          "reason": "listed in requirements-dev.txt",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "pluggy==1.6.0",
+          "name": "pluggy",
+          "kind": "requirements",
+          "action": "install",
+          "source": "requirements-dev.txt",
+          "reason": "listed in requirements-dev.txt",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "pyclipper==1.4.0",
+          "name": "pyclipper",
+          "kind": "requirements",
+          "action": "install",
+          "source": "requirements-dev.txt",
+          "reason": "listed in requirements-dev.txt",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "pycodestyle==2.14.0",
+          "name": "pycodestyle",
+          "kind": "requirements",
+          "action": "install",
+          "source": "requirements-dev.txt",
+          "reason": "listed in requirements-dev.txt",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "pyflakes==3.4.0",
+          "name": "pyflakes",
+          "kind": "requirements",
+          "action": "install",
+          "source": "requirements-dev.txt",
+          "reason": "listed in requirements-dev.txt",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "pygments==2.20.0",
+          "name": "pygments",
+          "kind": "requirements",
+          "action": "install",
+          "source": "requirements-dev.txt",
+          "reason": "listed in requirements-dev.txt",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "pytest==9.1.1",
+          "name": "pytest",
+          "kind": "requirements",
+          "action": "install",
+          "source": "requirements-dev.txt",
+          "reason": "listed in requirements-dev.txt",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "pytest-randomly==4.1.0",
+          "name": "pytest-randomly",
+          "kind": "requirements",
+          "action": "install",
+          "source": "requirements-dev.txt",
+          "reason": "listed in requirements-dev.txt",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "pytest-xdist==3.8.0",
+          "name": "pytest-xdist",
+          "kind": "requirements",
+          "action": "install",
+          "source": "requirements-dev.txt",
+          "reason": "listed in requirements-dev.txt",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "pytokens==0.4.1",
+          "name": "pytokens",
+          "kind": "requirements",
+          "action": "install",
+          "source": "requirements-dev.txt",
+          "reason": "listed in requirements-dev.txt",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "skia-pathops==0.9.2",
+          "name": "skia-pathops",
+          "kind": "requirements",
+          "action": "install",
+          "source": "requirements-dev.txt",
+          "reason": "listed in requirements-dev.txt",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "ufo2ft==3.9.0",
+          "name": "ufo2ft",
+          "kind": "requirements",
+          "action": "install",
+          "source": "requirements-dev.txt",
+          "reason": "listed in requirements-dev.txt",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "ufonormalizer==0.6.3",
+          "name": "ufonormalizer",
+          "kind": "requirements",
+          "action": "install",
+          "source": "requirements-dev.txt",
+          "reason": "listed in requirements-dev.txt",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "unicodedata2==17.0.1",
+          "name": "unicodedata2",
+          "kind": "requirements",
+          "action": "install",
+          "source": "requirements-dev.txt",
+          "reason": "listed in requirements-dev.txt",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "xmldiff==3.0",
+          "name": "xmldiff",
+          "kind": "requirements",
+          "action": "install",
+          "source": "requirements-dev.txt",
+          "reason": "listed in requirements-dev.txt",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        }
+      ],
+      "extra_reqs": [
+        "attrs==26.1.0",
+        "black==26.5.1",
+        "booleanoperations==0.10.0",
+        "cffsubr==0.4.0",
+        "click==8.4.2",
+        "coverage==7.15.2",
+        "defcon==0.12.2",
+        "execnet==2.1.2",
+        "flake8==7.3.0",
+        "flake8-bugbear==25.11.29",
+        "fontmath==0.10.0",
+        "iniconfig==2.3.0",
+        "lxml==6.1.1",
+        "mccabe==0.7.0",
+        "mypy-extensions==1.1.0",
+        "packaging==26.2",
+        "pathspec==1.1.1",
+        "platformdirs==4.11.0",
+        "pluggy==1.6.0",
+        "pyclipper==1.4.0",
+        "pycodestyle==2.14.0",
+        "pyflakes==3.4.0",
+        "pygments==2.20.0",
+        "pytest==9.1.1",
+        "pytest-randomly==4.1.0",
+        "pytest-xdist==3.8.0",
+        "pytokens==0.4.1",
+        "skia-pathops==0.9.2",
+        "ufo2ft==3.9.0",
+        "ufonormalizer==0.6.3",
+        "unicodedata2==17.0.1",
+        "xmldiff==3.0"
+      ],
+      "python": {
+        "requested": "3.12",
+        "current": "3.12",
+        "applied": true,
+        "switch": null,
+        "reason": "Python 3.12 already meets >=3.10"
+      },
+      "system": [],
+      "refused": []
+    },
+    "installs": [
+      {
+        "package": "attrs",
+        "requirement": "attrs==26.1.0",
+        "version": "26.1.0",
+        "versions": {
+          "main": "26.1.0",
+          "pr": "26.1.0"
+        },
+        "source": "requirements-dev.txt",
+        "reason": "listed in requirements-dev.txt",
+        "sides": [
+          "main",
+          "pr"
+        ]
+      },
+      {
+        "package": "black",
+        "requirement": "black==26.5.1",
+        "version": "26.5.1",
+        "versions": {
+          "main": "26.5.1",
+          "pr": "26.5.1"
+        },
+        "source": "requirements-dev.txt",
+        "reason": "listed in requirements-dev.txt",
+        "sides": [
+          "main",
+          "pr"
+        ]
+      },
+      {
+        "package": "booleanoperations",
+        "requirement": "booleanoperations==0.10.0",
+        "version": "0.10.0",
+        "versions": {
+          "main": "0.10.0",
+          "pr": "0.10.0"
+        },
+        "source": "requirements-dev.txt",
+        "reason": "listed in requirements-dev.txt",
+        "sides": [
+          "main",
+          "pr"
+        ]
+      },
+      {
+        "package": "cffsubr",
+        "requirement": "cffsubr==0.4.0",
+        "version": "0.4.0",
+        "versions": {
+          "main": "0.4.0",
+          "pr": "0.4.0"
+        },
+        "source": "requirements-dev.txt",
+        "reason": "listed in requirements-dev.txt",
+        "sides": [
+          "main",
+          "pr"
+        ]
+      },
+      {
+        "package": "click",
+        "requirement": "click==8.4.2",
+        "version": "8.4.2",
+        "versions": {
+          "main": "8.4.2",
+          "pr": "8.4.2"
+        },
+        "source": "requirements-dev.txt",
+        "reason": "listed in requirements-dev.txt",
+        "sides": [
+          "main",
+          "pr"
+        ]
+      },
+      {
+        "package": "coverage",
+        "requirement": "coverage==7.15.2",
+        "version": "7.15.2",
+        "versions": {
+          "main": "7.15.2",
+          "pr": "7.15.2"
+        },
+        "source": "requirements-dev.txt",
+        "reason": "listed in requirements-dev.txt",
+        "sides": [
+          "main",
+          "pr"
+        ]
+      },
+      {
+        "package": "defcon",
+        "requirement": "defcon==0.12.2",
+        "version": "0.12.2",
+        "versions": {
+          "main": "0.12.2",
+          "pr": "0.12.2"
+        },
+        "source": "requirements-dev.txt",
+        "reason": "listed in requirements-dev.txt",
+        "sides": [
+          "main",
+          "pr"
+        ]
+      },
+      {
+        "package": "execnet",
+        "requirement": "execnet==2.1.2",
+        "version": "2.1.2",
+        "versions": {
+          "main": "2.1.2",
+          "pr": "2.1.2"
+        },
+        "source": "requirements-dev.txt",
+        "reason": "listed in requirements-dev.txt",
+        "sides": [
+          "main",
+          "pr"
+        ]
+      },
+      {
+        "package": "flake8",
+        "requirement": "flake8==7.3.0",
+        "version": "7.3.0",
+        "versions": {
+          "main": "7.3.0",
+          "pr": "7.3.0"
+        },
+        "source": "requirements-dev.txt",
+        "reason": "listed in requirements-dev.txt",
+        "sides": [
+          "main",
+          "pr"
+        ]
+      },
+      {
+        "package": "flake8-bugbear",
+        "requirement": "flake8-bugbear==25.11.29",
+        "version": "25.11.29",
+        "versions": {
+          "main": "25.11.29",
+          "pr": "25.11.29"
+        },
+        "source": "requirements-dev.txt",
+        "reason": "listed in requirements-dev.txt",
+        "sides": [
+          "main",
+          "pr"
+        ]
+      },
+      {
+        "package": "fontmath",
+        "requirement": "fontmath==0.10.0",
+        "version": "0.10.0",
+        "versions": {
+          "main": "0.10.0",
+          "pr": "0.10.0"
+        },
+        "source": "requirements-dev.txt",
+        "reason": "listed in requirements-dev.txt",
+        "sides": [
+          "main",
+          "pr"
+        ]
+      },
+      {
+        "package": "iniconfig",
+        "requirement": "iniconfig==2.3.0",
+        "version": "2.3.0",
+        "versions": {
+          "main": "2.3.0",
+          "pr": "2.3.0"
+        },
+        "source": "requirements-dev.txt",
+        "reason": "listed in requirements-dev.txt",
+        "sides": [
+          "main",
+          "pr"
+        ]
+      },
+      {
+        "package": "lxml",
+        "requirement": "lxml==6.1.1",
+        "version": "6.1.1",
+        "versions": {
+          "main": "6.1.1",
+          "pr": "6.1.1"
+        },
+        "source": "requirements-dev.txt",
+        "reason": "listed in requirements-dev.txt",
+        "sides": [
+          "main",
+          "pr"
+        ]
+      },
+      {
+        "package": "mccabe",
+        "requirement": "mccabe==0.7.0",
+        "version": "0.7.0",
+        "versions": {
+          "main": "0.7.0",
+          "pr": "0.7.0"
+        },
+        "source": "requirements-dev.txt",
+        "reason": "listed in requirements-dev.txt",
+        "sides": [
+          "main",
+          "pr"
+        ]
+      },
+      {
+        "package": "mypy-extensions",
+        "requirement": "mypy-extensions==1.1.0",
+        "version": "1.1.0",
+        "versions": {
+          "main": "1.1.0",
+          "pr": "1.1.0"
+        },
+        "source": "requirements-dev.txt",
+        "reason": "listed in requirements-dev.txt",
+        "sides": [
+          "main",
+          "pr"
+        ]
+      },
+      {
+        "package": "packaging",
+        "requirement": "packaging==26.2",
+        "version": "26.2",
+        "versions": {
+          "main": "26.2",
+          "pr": "26.2"
+        },
+        "source": "requirements-dev.txt",
+        "reason": "listed in requirements-dev.txt",
+        "sides": [
+          "main",
+          "pr"
+        ]
+      },
+      {
+        "package": "pathspec",
+        "requirement": "pathspec==1.1.1",
+        "version": "1.1.1",
+        "versions": {
+          "main": "1.1.1",
+          "pr": "1.1.1"
+        },
+        "source": "requirements-dev.txt",
+        "reason": "listed in requirements-dev.txt",
+        "sides": [
+          "main",
+          "pr"
+        ]
+      },
+      {
+        "package": "platformdirs",
+        "requirement": "platformdirs==4.11.0",
+        "version": "4.11.0",
+        "versions": {
+          "main": "4.11.0",
+          "pr": "4.11.0"
+        },
+        "source": "requirements-dev.txt",
+        "reason": "listed in requirements-dev.txt",
+        "sides": [
+          "main",
+          "pr"
+        ]
+      },
+      {
+        "package": "pluggy",
+        "requirement": "pluggy==1.6.0",
+        "version": "1.6.0",
+        "versions": {
+          "main": "1.6.0",
+          "pr": "1.6.0"
+        },
+        "source": "requirements-dev.txt",
+        "reason": "listed in requirements-dev.txt",
+        "sides": [
+          "main",
+          "pr"
+        ]
+      },
+      {
+        "package": "pyclipper",
+        "requirement": "pyclipper==1.4.0",
+        "version": "1.4.0",
+        "versions": {
+          "main": "1.4.0",
+          "pr": "1.4.0"
+        },
+        "source": "requirements-dev.txt",
+        "reason": "listed in requirements-dev.txt",
+        "sides": [
+          "main",
+          "pr"
+        ]
+      },
+      {
+        "package": "pycodestyle",
+        "requirement": "pycodestyle==2.14.0",
+        "version": "2.14.0",
+        "versions": {
+          "main": "2.14.0",
+          "pr": "2.14.0"
+        },
+        "source": "requirements-dev.txt",
+        "reason": "listed in requirements-dev.txt",
+        "sides": [
+          "main",
+          "pr"
+        ]
+      },
+      {
+        "package": "pyflakes",
+        "requirement": "pyflakes==3.4.0",
+        "version": "3.4.0",
+        "versions": {
+          "main": "3.4.0",
+          "pr": "3.4.0"
+        },
+        "source": "requirements-dev.txt",
+        "reason": "listed in requirements-dev.txt",
+        "sides": [
+          "main",
+          "pr"
+        ]
+      },
+      {
+        "package": "pygments",
+        "requirement": "pygments==2.20.0",
+        "version": "2.20.0",
+        "versions": {
+          "main": "2.20.0",
+          "pr": "2.20.0"
+        },
+        "source": "requirements-dev.txt",
+        "reason": "listed in requirements-dev.txt",
+        "sides": [
+          "main",
+          "pr"
+        ]
+      },
+      {
+        "package": "pytest",
+        "requirement": "pytest==9.1.1",
+        "version": "9.1.1",
+        "versions": {
+          "main": "9.1.1",
+          "pr": "9.1.1"
+        },
+        "source": "requirements-dev.txt",
+        "reason": "listed in requirements-dev.txt",
+        "sides": [
+          "main",
+          "pr"
+        ]
+      },
+      {
+        "package": "pytest-randomly",
+        "requirement": "pytest-randomly==4.1.0",
+        "version": "4.1.0",
+        "versions": {
+          "main": "4.1.0",
+          "pr": "4.1.0"
+        },
+        "source": "requirements-dev.txt",
+        "reason": "listed in requirements-dev.txt",
+        "sides": [
+          "main",
+          "pr"
+        ]
+      },
+      {
+        "package": "pytest-xdist",
+        "requirement": "pytest-xdist==3.8.0",
+        "version": "3.8.0",
+        "versions": {
+          "main": "3.8.0",
+          "pr": "3.8.0"
+        },
+        "source": "requirements-dev.txt",
+        "reason": "listed in requirements-dev.txt",
+        "sides": [
+          "main",
+          "pr"
+        ]
+      },
+      {
+        "package": "pytokens",
+        "requirement": "pytokens==0.4.1",
+        "version": "0.4.1",
+        "versions": {
+          "main": "0.4.1",
+          "pr": "0.4.1"
+        },
+        "source": "requirements-dev.txt",
+        "reason": "listed in requirements-dev.txt",
+        "sides": [
+          "main",
+          "pr"
+        ]
+      },
+      {
+        "package": "skia-pathops",
+        "requirement": "skia-pathops==0.9.2",
+        "version": "0.9.2",
+        "versions": {
+          "main": "0.9.2",
+          "pr": "0.9.2"
+        },
+        "source": "requirements-dev.txt",
+        "reason": "listed in requirements-dev.txt",
+        "sides": [
+          "main",
+          "pr"
+        ]
+      },
+      {
+        "package": "ufo2ft",
+        "requirement": "ufo2ft==3.9.0",
+        "version": "3.9.0",
+        "versions": {
+          "main": "3.9.0",
+          "pr": "3.9.0"
+        },
+        "source": "requirements-dev.txt",
+        "reason": "listed in requirements-dev.txt",
+        "sides": [
+          "main",
+          "pr"
+        ]
+      },
+      {
+        "package": "ufonormalizer",
+        "requirement": "ufonormalizer==0.6.3",
+        "version": "0.6.3",
+        "versions": {
+          "main": "0.6.3",
+          "pr": "0.6.3"
+        },
+        "source": "requirements-dev.txt",
+        "reason": "listed in requirements-dev.txt",
+        "sides": [
+          "main",
+          "pr"
+        ]
+      },
+      {
+        "package": "unicodedata2",
+        "requirement": "unicodedata2==17.0.1",
+        "version": "17.0.1",
+        "versions": {
+          "main": "17.0.1",
+          "pr": "17.0.1"
+        },
+        "source": "requirements-dev.txt",
+        "reason": "listed in requirements-dev.txt",
+        "sides": [
+          "main",
+          "pr"
+        ]
+      },
+      {
+        "package": "xmldiff",
+        "requirement": "xmldiff==3.0",
+        "version": "3.0",
+        "versions": {
+          "main": "3.0",
+          "pr": "3.0"
+        },
+        "source": "requirements-dev.txt",
+        "reason": "listed in requirements-dev.txt",
+        "sides": [
+          "main",
+          "pr"
+        ]
+      }
+    ]
+  },
+  "chosen": {
+    "pr": 1208,
+    "head_sha": null,
+    "install": null,
+    "test_cmd": null
+  },
+  "sides": {
+    "comparison_basis": "merge-base vs PR head (no merge ref available)",
+    "main_sha": "3783ef49b506628c370b63f445089968c559e7fd",
+    "pr_sha": "3783ef49b506628c370b63f445089968c559e7fd"
+  },
+  "tested": {
+    "main": "main @ 3783ef49b506 (merge-base with the PR head)",
+    "pr": "PR head 3783ef49b506"
+  },
+  "probe_plan": {
+    "baseline": "full",
+    "model": "model provider: nebius (Token Factory, live)",
+    "errors": [],
+    "model_claims": [
+      {
+        "id": "C1",
+        "text": "The PR splits comma-separated values in dlng/slng metadata.",
+        "source_quote": "split comma-separated meta Table dlng/slng data",
+        "testable": true,
+        "expect": "differs"
+      },
+      {
+        "id": "C2",
+        "text": "The PR splits the data on commas, stripping whitespace and dropping empty items.",
+        "source_quote": "splits the data on commas, stripping whitespace and dropping empty items",
+        "testable": true,
+        "expect": "differs"
+      },
+      {
+        "id": "C3",
+        "text": "The PR joins a list back into one entry on the way out, not one per tag.",
+        "source_quote": "joins a list back into one entry on the way out, not one per tag",
+        "testable": true,
+        "expect": "differs"
+      },
+      {
+        "id": "C4",
+        "text": "The duplicate-tag warning now only fires for appl and bild, which keep just the last entry.",
+        "source_quote": "The duplicate-tag warning now only fires for `appl` and `bild`, which keep just the last entry.",
+        "testable": true,
+        "expect": "differs"
+      },
+      {
+        "id": "C5",
+        "text": "Repeated dlng and slng entries are all kept, so there's nothing to warn about.",
+        "source_quote": "Repeated `dlng` and `slng` entries are all kept, so there's nothing to warn about.",
+        "testable": true,
+        "expect": "differs"
+      },
+      {
+        "id": "C6",
+        "text": "ufo2ft joins the list with ',' so the compiled string loses its spaces.",
+        "source_quote": "ufo2ft joins the list with `,`, so the compiled string loses its spaces",
+        "testable": true,
+        "expect": "differs"
+      }
+    ],
+    "model_rejected_claims": [],
+    "diff_targets": [
+      "Lib.glyphsLib.builder.custom_params.to_ufo_meta_table",
+      "Lib.glyphsLib.builder.custom_params.to_glyphs_meta_table"
+    ],
+    "frozen": [
+      {
+        "path": "model-probes/model-probe1.py",
+        "source": "model",
+        "sha256": "e00a736d2f09c4f29136198707ee74d69004697acc2d4f086b5c0f988fa8fff5",
+        "generator": {
+          "kind": "model",
+          "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+          "model": "nvidia/nemotron-3-super-120b-a12b",
+          "provider": "nebius",
+          "provenance": "live",
+          "blind": true
+        },
+        "frozen_at": "2026-10-22T02:20:49.282235+00:00",
+        "inputs_sha256": "9fd511b4a898958fd3177e84af9e81391fe5da17e6487b11c7e5796027fbdeb3",
+        "inputs": {
+          "title_chars": 47,
+          "body_chars": 784,
+          "base_files": {
+            "Lib/glyphsLib/builder/custom_params.py": "457b4a8dda978c5d8fd9212ad6f45a3bd31a667cf45c9e350863f4cf1477d362"
+          }
+        }
+      },
+      {
+        "path": "diff-probes/diff-api.py",
+        "source": "diff",
+        "sha256": "78e024ecadae1bad8e17ab9ebfe5c49b149aa63ac1b36f562f71a9ba3950b765",
+        "generator": {
+          "kind": "diff",
+          "label": "diff (auto-derived from base-side code, model-free)",
+          "model": null,
+          "provider": null,
+          "provenance": "auto-derived",
+          "blind": false
+        },
+        "frozen_at": "2026-10-22T02:20:49.289862+00:00",
+        "inputs_sha256": "6a7561d2e5193491ccf43cb3c76cfedcd5a5923300ed83962041aa03538dff1f",
+        "inputs": {
+          "title_chars": 0,
+          "body_chars": 0,
+          "base_files": {
+            "Lib/glyphsLib/builder/custom_params.py": "457b4a8dda978c5d8fd9212ad6f45a3bd31a667cf45c9e350863f4cf1477d362"
+          }
+        }
+      }
+    ]
+  },
+  "test_extras": [],
+  "pr_side_started_at": "2026-10-22T02:20:49.457977+00:00",
+  "test_targets": {
+    "main": [
+      "tests/builder/custom_params_test.py"
+    ],
+    "pr": [
+      "tests/builder/custom_params_test.py"
+    ]
+  },
+  "installed_commit": {
+    "main": {
+      "dist": "glyphsLib",
+      "expected": "3783ef49b506628c370b63f445089968c559e7fd",
+      "installed": "3783ef49b506628c370b63f445089968c559e7fd",
+      "ok": true
+    },
+    "pr": {
+      "dist": "glyphsLib",
+      "expected": "3783ef49b506628c370b63f445089968c559e7fd",
+      "installed": "3783ef49b506628c370b63f445089968c559e7fd",
+      "ok": true
+    }
+  },
+  "comparison": {
+    "same": 75,
+    "same_skipped_both": 0,
+    "regressions": [],
+    "fixed": [],
+    "new_tests_passing": 0,
+    "new_tests_failing": [],
+    "new_tests_skipped": [],
+    "removed_tests": [],
+    "reparametrized": [],
+    "skipped_missing_dependency": [],
+    "flaky": [],
+    "pr_unstable": [],
+    "pr_unstable_noisy": [],
+    "environment": [],
+    "other_changes": [],
+    "preexisting_failures": [],
+    "load_failed_both": [],
+    "load_failed_pr": [],
+    "load_failed_main": [],
+    "executed": {
+      "main": 75,
+      "pr": 75
+    },
+    "messages": {}
+  },
+  "exit_check": {
+    "explained": true,
+    "problems": [],
+    "detail": "all runs exited 0"
+  },
+  "coverage": {
+    "status": "measured",
+    "changed_lines_total": 0,
+    "changed_lines_covered": 0,
+    "files": [
+      {
+        "file": "Lib/glyphsLib/builder/custom_params.py",
+        "changed_lines_total": 0,
+        "changed_lines_covered": 0
+      }
+    ],
+    "seconds": 3.4,
+    "exit": 0,
+    "log": "coverage-pytest.log"
+  },
+  "probes": {
+    "status": "ran",
+    "items": [
+      {
+        "id": "model-probe1",
+        "source": "model",
+        "path": "model-probes/model-probe1.py",
+        "sha256": "e00a736d2f09c4f29136198707ee74d69004697acc2d4f086b5c0f988fa8fff5",
+        "target": "googlefonts/glyphsLib#1208",
+        "about": "Testing meta table handling for dlng/slng splitting and joining",
+        "claims": [
+          {
+            "id": "C1",
+            "source": "PR description",
+            "text": "The PR splits comma-separated values in dlng/slng metadata.",
+            "covers": [
+              "C1",
+              "C2",
+              "C3",
+              "C4",
+              "C5",
+              "C6"
+            ],
+            "expect": "differs"
+          }
+        ],
+        "runs_per_side": 3,
+        "per_run": [
+          {
+            "side": "main",
+            "run": 1,
+            "seconds": 0.5,
+            "ok": true
+          },
+          {
+            "side": "pr",
+            "run": 1,
+            "seconds": 0.4,
+            "ok": true
+          },
+          {
+            "side": "main",
+            "run": 2,
+            "seconds": 0.4,
+            "ok": true
+          },
+          {
+            "side": "pr",
+            "run": 2,
+            "seconds": 0.5,
+            "ok": true
+          },
+          {
+            "side": "main",
+            "run": 3,
+            "seconds": 0.4,
+            "ok": true
+          },
+          {
+            "side": "pr",
+            "run": 3,
+            "seconds": 0.4,
+            "ok": true
+          }
+        ],
+        "outputs": {
+          "main": [
+            "probe-model-probe1-main-1.jsonl",
+            "probe-model-probe1-main-2.jsonl",
+            "probe-model-probe1-main-3.jsonl"
+          ],
+          "pr": [
+            "probe-model-probe1-pr-1.jsonl",
+            "probe-model-probe1-pr-2.jsonl",
+            "probe-model-probe1-pr-3.jsonl"
+          ]
+        },
+        "runs": {
+          "main": [
+            {
+              "testA.input": [
+                {
+                  "tag": "dlng",
+                  "data": " Latn , , Am , "
+                }
+              ],
+              "testA.output": {
+                "dlng": [
+                  "Latn",
+                  "Am"
+                ]
+              },
+              "testB.input": [
+                {
+                  "tag": "appl",
+                  "data": "first"
+                },
+                {
+                  "tag": "appl",
+                  "data": "second"
+                }
+              ],
+              "testB.output": {
+                "appl": "second"
+              },
+              "testC.input": [
+                {
+                  "tag": "bild",
+                  "data": "first"
+                },
+                {
+                  "tag": "bild",
+                  "data": "second"
+                }
+              ],
+              "testC.output": {
+                "bild": "second"
+              },
+              "testD.input": [
+                {
+                  "tag": "dlng",
+                  "data": "A"
+                },
+                {
+                  "tag": "dlng",
+                  "data": "B"
+                }
+              ],
+              "testD.output": {
+                "dlng": [
+                  "A",
+                  "B"
+                ]
+              },
+              "testE.input": [
+                {
+                  "tag": "slng",
+                  "data": "X"
+                },
+                {
+                  "tag": "slng",
+                  "data": "Y"
+                }
+              ],
+              "testE.output": {
+                "slng": [
+                  "X",
+                  "Y"
+                ]
+              },
+              "testF.input": {
+                "dlng": [
+                  "Latn",
+                  "Am"
+                ]
+              },
+              "testF.output": [
+                {
+                  "tag": "dlng",
+                  "data": "Latn, Am"
+                }
+              ],
+              "testG.input": {
+                "appl": "some data"
+              },
+              "testG.output": [
+                {
+                  "tag": "appl",
+                  "data": "some data"
+                }
+              ],
+              "testH.all_stripped": true,
+              "testH.non_empty": true,
+              "testI.warning_appl_logged": true,
+              "testI.warning_bild_logged": true,
+              "testI.warning_dlng_logged": false,
+              "testI.warning_slng_logged": false
+            },
+            {
+              "testA.input": [
+                {
+                  "tag": "dlng",
+                  "data": " Latn , , Am , "
+                }
+              ],
+              "testA.output": {
+                "dlng": [
+                  "Latn",
+                  "Am"
+                ]
+              },
+              "testB.input": [
+                {
+                  "tag": "appl",
+                  "data": "first"
+                },
+                {
+                  "tag": "appl",
+                  "data": "second"
+                }
+              ],
+              "testB.output": {
+                "appl": "second"
+              },
+              "testC.input": [
+                {
+                  "tag": "bild",
+                  "data": "first"
+                },
+                {
+                  "tag": "bild",
+                  "data": "second"
+                }
+              ],
+              "testC.output": {
+                "bild": "second"
+              },
+              "testD.input": [
+                {
+                  "tag": "dlng",
+                  "data": "A"
+                },
+                {
+                  "tag": "dlng",
+                  "data": "B"
+                }
+              ],
+              "testD.output": {
+                "dlng": [
+                  "A",
+                  "B"
+                ]
+              },
+              "testE.input": [
+                {
+                  "tag": "slng",
+                  "data": "X"
+                },
+                {
+                  "tag": "slng",
+                  "data": "Y"
+                }
+              ],
+              "testE.output": {
+                "slng": [
+                  "X",
+                  "Y"
+                ]
+              },
+              "testF.input": {
+                "dlng": [
+                  "Latn",
+                  "Am"
+                ]
+              },
+              "testF.output": [
+                {
+                  "tag": "dlng",
+                  "data": "Latn, Am"
+                }
+              ],
+              "testG.input": {
+                "appl": "some data"
+              },
+              "testG.output": [
+                {
+                  "tag": "appl",
+                  "data": "some data"
+                }
+              ],
+              "testH.all_stripped": true,
+              "testH.non_empty": true,
+              "testI.warning_appl_logged": true,
+              "testI.warning_bild_logged": true,
+              "testI.warning_dlng_logged": false,
+              "testI.warning_slng_logged": false
+            },
+            {
+              "testA.input": [
+                {
+                  "tag": "dlng",
+                  "data": " Latn , , Am , "
+                }
+              ],
+              "testA.output": {
+                "dlng": [
+                  "Latn",
+                  "Am"
+                ]
+              },
+              "testB.input": [
+                {
+                  "tag": "appl",
+                  "data": "first"
+                },
+                {
+                  "tag": "appl",
+                  "data": "second"
+                }
+              ],
+              "testB.output": {
+                "appl": "second"
+              },
+              "testC.input": [
+                {
+                  "tag": "bild",
+                  "data": "first"
+                },
+                {
+                  "tag": "bild",
+                  "data": "second"
+                }
+              ],
+              "testC.output": {
+                "bild": "second"
+              },
+              "testD.input": [
+                {
+                  "tag": "dlng",
+                  "data": "A"
+                },
+                {
+                  "tag": "dlng",
+                  "data": "B"
+                }
+              ],
+              "testD.output": {
+                "dlng": [
+                  "A",
+                  "B"
+                ]
+              },
+              "testE.input": [
+                {
+                  "tag": "slng",
+                  "data": "X"
+                },
+                {
+                  "tag": "slng",
+                  "data": "Y"
+                }
+              ],
+              "testE.output": {
+                "slng": [
+                  "X",
+                  "Y"
+                ]
+              },
+              "testF.input": {
+                "dlng": [
+                  "Latn",
+                  "Am"
+                ]
+              },
+              "testF.output": [
+                {
+                  "tag": "dlng",
+                  "data": "Latn, Am"
+                }
+              ],
+              "testG.input": {
+                "appl": "some data"
+              },
+              "testG.output": [
+                {
+                  "tag": "appl",
+                  "data": "some data"
+                }
+              ],
+              "testH.all_stripped": true,
+              "testH.non_empty": true,
+              "testI.warning_appl_logged": true,
+              "testI.warning_bild_logged": true,
+              "testI.warning_dlng_logged": false,
+              "testI.warning_slng_logged": false
+            }
+          ],
+          "pr": [
+            {
+              "testA.input": [
+                {
+                  "tag": "dlng",
+                  "data": " Latn , , Am , "
+                }
+              ],
+              "testA.output": {
+                "dlng": [
+                  "Latn",
+                  "Am"
+                ]
+              },
+              "testB.input": [
+                {
+                  "tag": "appl",
+                  "data": "first"
+                },
+                {
+                  "tag": "appl",
+                  "data": "second"
+                }
+              ],
+              "testB.output": {
+                "appl": "second"
+              },
+              "testC.input": [
+                {
+                  "tag": "bild",
+                  "data": "first"
+                },
+                {
+                  "tag": "bild",
+                  "data": "second"
+                }
+              ],
+              "testC.output": {
+                "bild": "second"
+              },
+              "testD.input": [
+                {
+                  "tag": "dlng",
+                  "data": "A"
+                },
+                {
+                  "tag": "dlng",
+                  "data": "B"
+                }
+              ],
+              "testD.output": {
+                "dlng": [
+                  "A",
+                  "B"
+                ]
+              },
+              "testE.input": [
+                {
+                  "tag": "slng",
+                  "data": "X"
+                },
+                {
+                  "tag": "slng",
+                  "data": "Y"
+                }
+              ],
+              "testE.output": {
+                "slng": [
+                  "X",
+                  "Y"
+                ]
+              },
+              "testF.input": {
+                "dlng": [
+                  "Latn",
+                  "Am"
+                ]
+              },
+              "testF.output": [
+                {
+                  "tag": "dlng",
+                  "data": "Latn, Am"
+                }
+              ],
+              "testG.input": {
+                "appl": "some data"
+              },
+              "testG.output": [
+                {
+                  "tag": "appl",
+                  "data": "some data"
+                }
+              ],
+              "testH.all_stripped": true,
+              "testH.non_empty": true,
+              "testI.warning_appl_logged": true,
+              "testI.warning_bild_logged": true,
+              "testI.warning_dlng_logged": false,
+              "testI.warning_slng_logged": false
+            },
+            {
+              "testA.input": [
+                {
+                  "tag": "dlng",
+                  "data": " Latn , , Am , "
+                }
+              ],
+              "testA.output": {
+                "dlng": [
+                  "Latn",
+                  "Am"
+                ]
+              },
+              "testB.input": [
+                {
+                  "tag": "appl",
+                  "data": "first"
+                },
+                {
+                  "tag": "appl",
+                  "data": "second"
+                }
+              ],
+              "testB.output": {
+                "appl": "second"
+              },
+              "testC.input": [
+                {
+                  "tag": "bild",
+                  "data": "first"
+                },
+                {
+                  "tag": "bild",
+                  "data": "second"
+                }
+              ],
+              "testC.output": {
+                "bild": "second"
+              },
+              "testD.input": [
+                {
+                  "tag": "dlng",
+                  "data": "A"
+                },
+                {
+                  "tag": "dlng",
+                  "data": "B"
+                }
+              ],
+              "testD.output": {
+                "dlng": [
+                  "A",
+                  "B"
+                ]
+              },
+              "testE.input": [
+                {
+                  "tag": "slng",
+                  "data": "X"
+                },
+                {
+                  "tag": "slng",
+                  "data": "Y"
+                }
+              ],
+              "testE.output": {
+                "slng": [
+                  "X",
+                  "Y"
+                ]
+              },
+              "testF.input": {
+                "dlng": [
+                  "Latn",
+                  "Am"
+                ]
+              },
+              "testF.output": [
+                {
+                  "tag": "dlng",
+                  "data": "Latn, Am"
+                }
+              ],
+              "testG.input": {
+                "appl": "some data"
+              },
+              "testG.output": [
+                {
+                  "tag": "appl",
+                  "data": "some data"
+                }
+              ],
+              "testH.all_stripped": true,
+              "testH.non_empty": true,
+              "testI.warning_appl_logged": true,
+              "testI.warning_bild_logged": true,
+              "testI.warning_dlng_logged": false,
+              "testI.warning_slng_logged": false
+            },
+            {
+              "testA.input": [
+                {
+                  "tag": "dlng",
+                  "data": " Latn , , Am , "
+                }
+              ],
+              "testA.output": {
+                "dlng": [
+                  "Latn",
+                  "Am"
+                ]
+              },
+              "testB.input": [
+                {
+                  "tag": "appl",
+                  "data": "first"
+                },
+                {
+                  "tag": "appl",
+                  "data": "second"
+                }
+              ],
+              "testB.output": {
+                "appl": "second"
+              },
+              "testC.input": [
+                {
+                  "tag": "bild",
+                  "data": "first"
+                },
+                {
+                  "tag": "bild",
+                  "data": "second"
+                }
+              ],
+              "testC.output": {
+                "bild": "second"
+              },
+              "testD.input": [
+                {
+                  "tag": "dlng",
+                  "data": "A"
+                },
+                {
+                  "tag": "dlng",
+                  "data": "B"
+                }
+              ],
+              "testD.output": {
+                "dlng": [
+                  "A",
+                  "B"
+                ]
+              },
+              "testE.input": [
+                {
+                  "tag": "slng",
+                  "data": "X"
+                },
+                {
+                  "tag": "slng",
+                  "data": "Y"
+                }
+              ],
+              "testE.output": {
+                "slng": [
+                  "X",
+                  "Y"
+                ]
+              },
+              "testF.input": {
+                "dlng": [
+                  "Latn",
+                  "Am"
+                ]
+              },
+              "testF.output": [
+                {
+                  "tag": "dlng",
+                  "data": "Latn, Am"
+                }
+              ],
+              "testG.input": {
+                "appl": "some data"
+              },
+              "testG.output": [
+                {
+                  "tag": "appl",
+                  "data": "some data"
+                }
+              ],
+              "testH.all_stripped": true,
+              "testH.non_empty": true,
+              "testI.warning_appl_logged": true,
+              "testI.warning_bild_logged": true,
+              "testI.warning_dlng_logged": false,
+              "testI.warning_slng_logged": false
+            }
+          ]
+        },
+        "observations": [
+          {
+            "name": "testA.input",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": [
+              {
+                "tag": "dlng",
+                "data": " Latn , , Am , "
+              }
+            ],
+            "pr": [
+              {
+                "tag": "dlng",
+                "data": " Latn , , Am , "
+              }
+            ],
+            "citations": {
+              "main": {
+                "file": "probe-model-probe1-main-1.jsonl",
+                "line": 1,
+                "quote": "\"observation\": \"testA.input\""
+              },
+              "pr": {
+                "file": "probe-model-probe1-pr-1.jsonl",
+                "line": 1,
+                "quote": "\"observation\": \"testA.input\""
+              }
+            }
+          },
+          {
+            "name": "testA.output",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "dlng": [
+                "Latn",
+                "Am"
+              ]
+            },
+            "pr": {
+              "dlng": [
+                "Latn",
+                "Am"
+              ]
+            },
+            "citations": {
+              "main": {
+                "file": "probe-model-probe1-main-1.jsonl",
+                "line": 2,
+                "quote": "\"observation\": \"testA.output\""
+              },
+              "pr": {
+                "file": "probe-model-probe1-pr-1.jsonl",
+                "line": 2,
+                "quote": "\"observation\": \"testA.output\""
+              }
+            }
+          },
+          {
+            "name": "testB.input",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": [
+              {
+                "tag": "appl",
+                "data": "first"
+              },
+              {
+                "tag": "appl",
+                "data": "second"
+              }
+            ],
+            "pr": [
+              {
+                "tag": "appl",
+                "data": "first"
+              },
+              {
+                "tag": "appl",
+                "data": "second"
+              }
+            ],
+            "citations": {
+              "main": {
+                "file": "probe-model-probe1-main-1.jsonl",
+                "line": 3,
+                "quote": "\"observation\": \"testB.input\""
+              },
+              "pr": {
+                "file": "probe-model-probe1-pr-1.jsonl",
+                "line": 3,
+                "quote": "\"observation\": \"testB.input\""
+              }
+            }
+          },
+          {
+            "name": "testB.output",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "appl": "second"
+            },
+            "pr": {
+              "appl": "second"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-model-probe1-main-1.jsonl",
+                "line": 4,
+                "quote": "\"observation\": \"testB.output\""
+              },
+              "pr": {
+                "file": "probe-model-probe1-pr-1.jsonl",
+                "line": 4,
+                "quote": "\"observation\": \"testB.output\""
+              }
+            }
+          },
+          {
+            "name": "testC.input",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": [
+              {
+                "tag": "bild",
+                "data": "first"
+              },
+              {
+                "tag": "bild",
+                "data": "second"
+              }
+            ],
+            "pr": [
+              {
+                "tag": "bild",
+                "data": "first"
+              },
+              {
+                "tag": "bild",
+                "data": "second"
+              }
+            ],
+            "citations": {
+              "main": {
+                "file": "probe-model-probe1-main-1.jsonl",
+                "line": 5,
+                "quote": "\"observation\": \"testC.input\""
+              },
+              "pr": {
+                "file": "probe-model-probe1-pr-1.jsonl",
+                "line": 5,
+                "quote": "\"observation\": \"testC.input\""
+              }
+            }
+          },
+          {
+            "name": "testC.output",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "bild": "second"
+            },
+            "pr": {
+              "bild": "second"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-model-probe1-main-1.jsonl",
+                "line": 6,
+                "quote": "\"observation\": \"testC.output\""
+              },
+              "pr": {
+                "file": "probe-model-probe1-pr-1.jsonl",
+                "line": 6,
+                "quote": "\"observation\": \"testC.output\""
+              }
+            }
+          },
+          {
+            "name": "testD.input",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": [
+              {
+                "tag": "dlng",
+                "data": "A"
+              },
+              {
+                "tag": "dlng",
+                "data": "B"
+              }
+            ],
+            "pr": [
+              {
+                "tag": "dlng",
+                "data": "A"
+              },
+              {
+                "tag": "dlng",
+                "data": "B"
+              }
+            ],
+            "citations": {
+              "main": {
+                "file": "probe-model-probe1-main-1.jsonl",
+                "line": 7,
+                "quote": "\"observation\": \"testD.input\""
+              },
+              "pr": {
+                "file": "probe-model-probe1-pr-1.jsonl",
+                "line": 7,
+                "quote": "\"observation\": \"testD.input\""
+              }
+            }
+          },
+          {
+            "name": "testD.output",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "dlng": [
+                "A",
+                "B"
+              ]
+            },
+            "pr": {
+              "dlng": [
+                "A",
+                "B"
+              ]
+            },
+            "citations": {
+              "main": {
+                "file": "probe-model-probe1-main-1.jsonl",
+                "line": 8,
+                "quote": "\"observation\": \"testD.output\""
+              },
+              "pr": {
+                "file": "probe-model-probe1-pr-1.jsonl",
+                "line": 8,
+                "quote": "\"observation\": \"testD.output\""
+              }
+            }
+          },
+          {
+            "name": "testE.input",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": [
+              {
+                "tag": "slng",
+                "data": "X"
+              },
+              {
+                "tag": "slng",
+                "data": "Y"
+              }
+            ],
+            "pr": [
+              {
+                "tag": "slng",
+                "data": "X"
+              },
+              {
+                "tag": "slng",
+                "data": "Y"
+              }
+            ],
+            "citations": {
+              "main": {
+                "file": "probe-model-probe1-main-1.jsonl",
+                "line": 9,
+                "quote": "\"observation\": \"testE.input\""
+              },
+              "pr": {
+                "file": "probe-model-probe1-pr-1.jsonl",
+                "line": 9,
+                "quote": "\"observation\": \"testE.input\""
+              }
+            }
+          },
+          {
+            "name": "testE.output",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "slng": [
+                "X",
+                "Y"
+              ]
+            },
+            "pr": {
+              "slng": [
+                "X",
+                "Y"
+              ]
+            },
+            "citations": {
+              "main": {
+                "file": "probe-model-probe1-main-1.jsonl",
+                "line": 10,
+                "quote": "\"observation\": \"testE.output\""
+              },
+              "pr": {
+                "file": "probe-model-probe1-pr-1.jsonl",
+                "line": 10,
+                "quote": "\"observation\": \"testE.output\""
+              }
+            }
+          },
+          {
+            "name": "testF.input",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "dlng": [
+                "Latn",
+                "Am"
+              ]
+            },
+            "pr": {
+              "dlng": [
+                "Latn",
+                "Am"
+              ]
+            },
+            "citations": {
+              "main": {
+                "file": "probe-model-probe1-main-1.jsonl",
+                "line": 11,
+                "quote": "\"observation\": \"testF.input\""
+              },
+              "pr": {
+                "file": "probe-model-probe1-pr-1.jsonl",
+                "line": 11,
+                "quote": "\"observation\": \"testF.input\""
+              }
+            }
+          },
+          {
+            "name": "testF.output",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": [
+              {
+                "tag": "dlng",
+                "data": "Latn, Am"
+              }
+            ],
+            "pr": [
+              {
+                "tag": "dlng",
+                "data": "Latn, Am"
+              }
+            ],
+            "citations": {
+              "main": {
+                "file": "probe-model-probe1-main-1.jsonl",
+                "line": 12,
+                "quote": "\"observation\": \"testF.output\""
+              },
+              "pr": {
+                "file": "probe-model-probe1-pr-1.jsonl",
+                "line": 12,
+                "quote": "\"observation\": \"testF.output\""
+              }
+            }
+          },
+          {
+            "name": "testG.input",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "appl": "some data"
+            },
+            "pr": {
+              "appl": "some data"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-model-probe1-main-1.jsonl",
+                "line": 13,
+                "quote": "\"observation\": \"testG.input\""
+              },
+              "pr": {
+                "file": "probe-model-probe1-pr-1.jsonl",
+                "line": 13,
+                "quote": "\"observation\": \"testG.input\""
+              }
+            }
+          },
+          {
+            "name": "testG.output",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": [
+              {
+                "tag": "appl",
+                "data": "some data"
+              }
+            ],
+            "pr": [
+              {
+                "tag": "appl",
+                "data": "some data"
+              }
+            ],
+            "citations": {
+              "main": {
+                "file": "probe-model-probe1-main-1.jsonl",
+                "line": 14,
+                "quote": "\"observation\": \"testG.output\""
+              },
+              "pr": {
+                "file": "probe-model-probe1-pr-1.jsonl",
+                "line": 14,
+                "quote": "\"observation\": \"testG.output\""
+              }
+            }
+          },
+          {
+            "name": "testH.all_stripped",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": true,
+            "pr": true,
+            "citations": {
+              "main": {
+                "file": "probe-model-probe1-main-1.jsonl",
+                "line": 15,
+                "quote": "\"observation\": \"testH.all_stripped\""
+              },
+              "pr": {
+                "file": "probe-model-probe1-pr-1.jsonl",
+                "line": 15,
+                "quote": "\"observation\": \"testH.all_stripped\""
+              }
+            }
+          },
+          {
+            "name": "testH.non_empty",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": true,
+            "pr": true,
+            "citations": {
+              "main": {
+                "file": "probe-model-probe1-main-1.jsonl",
+                "line": 16,
+                "quote": "\"observation\": \"testH.non_empty\""
+              },
+              "pr": {
+                "file": "probe-model-probe1-pr-1.jsonl",
+                "line": 16,
+                "quote": "\"observation\": \"testH.non_empty\""
+              }
+            }
+          },
+          {
+            "name": "testI.warning_appl_logged",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": true,
+            "pr": true,
+            "citations": {
+              "main": {
+                "file": "probe-model-probe1-main-1.jsonl",
+                "line": 17,
+                "quote": "\"observation\": \"testI.warning_appl_logged\""
+              },
+              "pr": {
+                "file": "probe-model-probe1-pr-1.jsonl",
+                "line": 17,
+                "quote": "\"observation\": \"testI.warning_appl_logged\""
+              }
+            }
+          },
+          {
+            "name": "testI.warning_bild_logged",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": true,
+            "pr": true,
+            "citations": {
+              "main": {
+                "file": "probe-model-probe1-main-1.jsonl",
+                "line": 18,
+                "quote": "\"observation\": \"testI.warning_bild_logged\""
+              },
+              "pr": {
+                "file": "probe-model-probe1-pr-1.jsonl",
+                "line": 18,
+                "quote": "\"observation\": \"testI.warning_bild_logged\""
+              }
+            }
+          },
+          {
+            "name": "testI.warning_dlng_logged",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": false,
+            "pr": false,
+            "citations": {
+              "main": {
+                "file": "probe-model-probe1-main-1.jsonl",
+                "line": 19,
+                "quote": "\"observation\": \"testI.warning_dlng_logged\""
+              },
+              "pr": {
+                "file": "probe-model-probe1-pr-1.jsonl",
+                "line": 19,
+                "quote": "\"observation\": \"testI.warning_dlng_logged\""
+              }
+            }
+          },
+          {
+            "name": "testI.warning_slng_logged",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": false,
+            "pr": false,
+            "citations": {
+              "main": {
+                "file": "probe-model-probe1-main-1.jsonl",
+                "line": 20,
+                "quote": "\"observation\": \"testI.warning_slng_logged\""
+              },
+              "pr": {
+                "file": "probe-model-probe1-pr-1.jsonl",
+                "line": 20,
+                "quote": "\"observation\": \"testI.warning_slng_logged\""
+              }
+            }
+          }
+        ],
+        "generator": {
+          "kind": "model",
+          "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+          "model": "nvidia/nemotron-3-super-120b-a12b",
+          "provider": "nebius",
+          "provenance": "live",
+          "blind": true
+        },
+        "freeze": {
+          "sha256": "e00a736d2f09c4f29136198707ee74d69004697acc2d4f086b5c0f988fa8fff5",
+          "generator": {
+            "kind": "model",
+            "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+            "model": "nvidia/nemotron-3-super-120b-a12b",
+            "provider": "nebius",
+            "provenance": "live",
+            "blind": true
+          },
+          "frozen_at": "2026-10-22T02:20:49.282235+00:00",
+          "inputs_sha256": "9fd511b4a898958fd3177e84af9e81391fe5da17e6487b11c7e5796027fbdeb3",
+          "inputs": {
+            "title_chars": 47,
+            "body_chars": 784,
+            "base_files": {
+              "Lib/glyphsLib/builder/custom_params.py": "457b4a8dda978c5d8fd9212ad6f45a3bd31a667cf45c9e350863f4cf1477d362"
+            }
+          },
+          "verified": true,
+          "pr_started_at": "2026-10-22T02:20:49.457977+00:00"
+        },
+        "probe_changed_line_coverage": {
+          "status": "measured",
+          "changed_lines_total": 0,
+          "changed_lines_covered": 0,
+          "files": [
+            {
+              "file": "Lib/glyphsLib/builder/custom_params.py",
+              "changed_lines_total": 0,
+              "changed_lines_covered": 0
+            }
+          ],
+          "adequacy": "not_adequate",
+          "note": "no changed executable line exists on the main side (new files, comments or docstrings only), so the probe cannot be shown to reach the change",
+          "exit": 0,
+          "data": "probe-cov-model-probe1.json"
+        },
+        "status": "rejected",
+        "rejected_reason": "rejected: claim pattern(s) C1 match none of this probe's observation names, so the probe is not counted"
+      },
+      {
+        "id": "diff-api",
+        "source": "diff",
+        "path": "diff-probes/diff-api.py",
+        "sha256": "78e024ecadae1bad8e17ab9ebfe5c49b149aa63ac1b36f562f71a9ba3950b765",
+        "target": "googlefonts/glyphsLib#1208",
+        "about": "Public functions touched by the PR, called with type-appropriate inputs on both sides.",
+        "claims": [],
+        "runs_per_side": 3,
+        "per_run": [
+          {
+            "side": "main",
+            "run": 1,
+            "seconds": 0.0,
+            "ok": true
+          },
+          {
+            "side": "pr",
+            "run": 1,
+            "seconds": 0.0,
+            "ok": true
+          },
+          {
+            "side": "main",
+            "run": 2,
+            "seconds": 0.0,
+            "ok": true
+          },
+          {
+            "side": "pr",
+            "run": 2,
+            "seconds": 0.0,
+            "ok": true
+          },
+          {
+            "side": "main",
+            "run": 3,
+            "seconds": 0.0,
+            "ok": true
+          },
+          {
+            "side": "pr",
+            "run": 3,
+            "seconds": 0.0,
+            "ok": true
+          }
+        ],
+        "outputs": {
+          "main": [
+            "probe-diff-api-main-1.jsonl",
+            "probe-diff-api-main-2.jsonl",
+            "probe-diff-api-main-3.jsonl"
+          ],
+          "pr": [
+            "probe-diff-api-pr-1.jsonl",
+            "probe-diff-api-pr-2.jsonl",
+            "probe-diff-api-pr-3.jsonl"
+          ]
+        },
+        "runs": {
+          "main": [
+            {
+              "Lib.glyphsLib.builder.custom_params.to_glyphs_meta_table.import": {
+                "raises": "ModuleNotFoundError"
+              },
+              "Lib.glyphsLib.builder.custom_params.to_ufo_meta_table.import": {
+                "raises": "ModuleNotFoundError"
+              }
+            },
+            {
+              "Lib.glyphsLib.builder.custom_params.to_glyphs_meta_table.import": {
+                "raises": "ModuleNotFoundError"
+              },
+              "Lib.glyphsLib.builder.custom_params.to_ufo_meta_table.import": {
+                "raises": "ModuleNotFoundError"
+              }
+            },
+            {
+              "Lib.glyphsLib.builder.custom_params.to_glyphs_meta_table.import": {
+                "raises": "ModuleNotFoundError"
+              },
+              "Lib.glyphsLib.builder.custom_params.to_ufo_meta_table.import": {
+                "raises": "ModuleNotFoundError"
+              }
+            }
+          ],
+          "pr": [
+            {
+              "Lib.glyphsLib.builder.custom_params.to_glyphs_meta_table.import": {
+                "raises": "ModuleNotFoundError"
+              },
+              "Lib.glyphsLib.builder.custom_params.to_ufo_meta_table.import": {
+                "raises": "ModuleNotFoundError"
+              }
+            },
+            {
+              "Lib.glyphsLib.builder.custom_params.to_glyphs_meta_table.import": {
+                "raises": "ModuleNotFoundError"
+              },
+              "Lib.glyphsLib.builder.custom_params.to_ufo_meta_table.import": {
+                "raises": "ModuleNotFoundError"
+              }
+            },
+            {
+              "Lib.glyphsLib.builder.custom_params.to_glyphs_meta_table.import": {
+                "raises": "ModuleNotFoundError"
+              },
+              "Lib.glyphsLib.builder.custom_params.to_ufo_meta_table.import": {
+                "raises": "ModuleNotFoundError"
+              }
+            }
+          ]
+        },
+        "observations": [
+          {
+            "name": "Lib.glyphsLib.builder.custom_params.to_glyphs_meta_table.import",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "raises": "ModuleNotFoundError"
+            },
+            "pr": {
+              "raises": "ModuleNotFoundError"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 1,
+                "quote": "\"observation\": \"Lib.glyphsLib.builder.custom_params.to_glyphs_meta_table.import\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 1,
+                "quote": "\"observation\": \"Lib.glyphsLib.builder.custom_params.to_glyphs_meta_table.import\""
+              }
+            }
+          },
+          {
+            "name": "Lib.glyphsLib.builder.custom_params.to_ufo_meta_table.import",
+            "state": "same",
+            "label": "no_difference",
+            "claim": null,
+            "main": {
+              "raises": "ModuleNotFoundError"
+            },
+            "pr": {
+              "raises": "ModuleNotFoundError"
+            },
+            "citations": {
+              "main": {
+                "file": "probe-diff-api-main-1.jsonl",
+                "line": 2,
+                "quote": "\"observation\": \"Lib.glyphsLib.builder.custom_params.to_ufo_meta_table.import\""
+              },
+              "pr": {
+                "file": "probe-diff-api-pr-1.jsonl",
+                "line": 2,
+                "quote": "\"observation\": \"Lib.glyphsLib.builder.custom_params.to_ufo_meta_table.import\""
+              }
+            }
+          }
+        ],
+        "generator": {
+          "kind": "diff",
+          "label": "diff (auto-derived from base-side code, model-free)",
+          "model": null,
+          "provider": null,
+          "provenance": "auto-derived",
+          "blind": false
+        },
+        "freeze": {
+          "sha256": "78e024ecadae1bad8e17ab9ebfe5c49b149aa63ac1b36f562f71a9ba3950b765",
+          "generator": {
+            "kind": "diff",
+            "label": "diff (auto-derived from base-side code, model-free)",
+            "model": null,
+            "provider": null,
+            "provenance": "auto-derived",
+            "blind": false
+          },
+          "frozen_at": "2026-10-22T02:20:49.289862+00:00",
+          "inputs_sha256": "6a7561d2e5193491ccf43cb3c76cfedcd5a5923300ed83962041aa03538dff1f",
+          "inputs": {
+            "title_chars": 0,
+            "body_chars": 0,
+            "base_files": {
+              "Lib/glyphsLib/builder/custom_params.py": "457b4a8dda978c5d8fd9212ad6f45a3bd31a667cf45c9e350863f4cf1477d362"
+            }
+          },
+          "verified": true,
+          "pr_started_at": "2026-10-22T02:20:49.457977+00:00"
+        },
+        "probe_changed_line_coverage": {
+          "status": "not measured",
+          "why": "coverage produced no data (exit 0); see probe-coverage.log",
+          "adequacy": "not_adequate",
+          "note": "uninformative: every input raised ModuleNotFoundError on both sides; not counted as ran or adequate"
+        },
+        "status": "uninformative",
+        "uninformative_reason": "uninformative: every input raised ModuleNotFoundError on both sides"
+      }
+    ],
+    "summary": {
+      "labels": [],
+      "flagged": [],
+      "proven_claims": [],
+      "reason": "uninformative: every input raised ModuleNotFoundError on both sides; rejected: claim pattern(s) C1 match none of this probe's observation names, so the probe is not counted",
+      "ignored_noise": [],
+      "ignored_warning_only": [],
+      "pr_only_noisy": []
+    }
+  },
+  "probe_changed_line_coverage": {
+    "status": "partly measured",
+    "side": "main",
+    "probes": {
+      "model-probe1": {
+        "status": "measured",
+        "changed_lines_covered": 0,
+        "changed_lines_total": 0,
+        "adequacy": "not_adequate"
+      },
+      "diff-api": {
+        "status": "not measured",
+        "changed_lines_covered": null,
+        "changed_lines_total": null,
+        "adequacy": "not_adequate"
+      }
+    },
+    "not_adequate": [
+      "diff-api",
+      "model-probe1"
+    ]
+  },
+  "docstring_only": true,
+  "verdict": "could_not_verify",
+  "reason": "could not verify: claim(s) C1 expect a difference but no observation matches (docstring-only change (AST equal after blanking docstrings); behaviour claims hold by construction)",
+  "verdict_before_coverage_gate": "could_not_verify",
+  "reason_before_coverage_gate": "could not verify: claim(s) C1 expect a difference but no observation matches (docstring-only change (AST equal after blanking docstrings); behaviour claims hold by construction)",
+  "changed_lines_total": 0,
+  "changed_lines_covered": 0,
+  "coverage_gate": {
+    "kind": "python",
+    "changed": false,
+    "confidence": "normal",
+    "note": "the changed Python lines are not executable (comments, docstrings, blank lines)",
+    "measurement": "measured"
+  },
+  "agents": {
+    "status": "skipped",
+    "note": "advisory swarm is off",
+    "roles": []
+  },
+  "explanation": {
+    "status": "not yet wired",
+    "why": "advisory swarm is off"
+  },
+  "swarm_requested": false,
+  "operator_approval_requested": false,
+  "swarm": "off",
+  "operator_approval": "off",
+  "what_changed": {
+    "package_python_files": [],
+    "compiled_files": [],
+    "other_files": [
+      "Lib/glyphsLib/builder/custom_params.py",
+      "tests/builder/custom_params_test.py"
+    ]
+  },
+  "duration_s": {
+    "total_wall": 169.8,
+    "tests": 11.1
+  },
+  "cost": {
+    "ai_calls": 2,
+    "failed_ai_calls": 0,
+    "input_tokens": 12965,
+    "output_tokens": 13073,
+    "thinking_tokens": 11449,
+    "cost_usd": 0.015655,
+    "calls_without_usage": 0,
+    "ai_cost_usd": 0.015655,
+    "cost_complete": true,
+    "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+    "compute_seconds": {
+      "total_wall": 169.8,
+      "tests": 11.1
+    },
+    "machine_usd_per_hour": 0.24,
+    "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+    "computer_cost_usd": 0.01132,
+    "total_cost_usd": 0.026975,
+    "swarm": {
+      "ai_calls": 0,
+      "failed_ai_calls": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "thinking_tokens": 0,
+      "cost_usd": 0.0,
+      "calls_without_usage": 0,
+      "ai_cost_usd": 0.0,
+      "cost_complete": true,
+      "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+    }
+  },
+  "head_at_report_sha": "3783ef49b506628c370b63f445089968c559e7fd",
+  "head_moved_since_test": false
+}

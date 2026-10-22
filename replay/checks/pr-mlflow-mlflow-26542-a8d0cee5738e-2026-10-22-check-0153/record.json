@@ -1,0 +1,2145 @@
+{
+  "schema_version": "1",
+  "record_kind": "pr_run",
+  "id": "pr-mlflow-mlflow-26542-a8d0cee5738e-2026-10-22-check-0153",
+  "date_ist": "2026-10-22 01:53 IST",
+  "run_date": "2026-10-22",
+  "who": "ops/daily_run.py",
+  "repo": "mlflow/mlflow",
+  "library": "mlflow",
+  "pr": {
+    "repo": "mlflow/mlflow",
+    "number": 26542,
+    "url": "https://github.com/mlflow/mlflow/pull/26542",
+    "title": "Load latest Databricks scorers from the scheduled-scorers REST config so feedback records the scorer version",
+    "base_sha": "c35e8ae22d4f0825ac66737c2a84971ed791b0db",
+    "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+    "head_sha": "a8d0cee5738e7b703306d449180866dee7c236d3",
+    "merge_commit": null,
+    "tested_main_sha": "94cc0f1b58de0b89041c0307e8db7e7c7671e8a6",
+    "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+  },
+  "author": "joshuawong-db",
+  "base_ref": "master",
+  "updated_at_utc": "2026-10-21T03:51:36Z",
+  "updated_at_ist": "2026-10-21 09:21 IST",
+  "ci_state": "not checked (single-PR check)",
+  "ci_detail": "checked on request with --pr",
+  "tested_at_ist": "2026-10-22 01:53 IST",
+  "files": {
+    "all": [
+      "mlflow/genai/scorers/registry.py",
+      "tests/genai/scorers/test_scorer_CRUD.py",
+      "tests/genai/test_genai_import_without_agent_sdk.py"
+    ],
+    "package_py": [
+      "mlflow/genai/scorers/registry.py"
+    ],
+    "compiled": [],
+    "other": [
+      "tests/genai/scorers/test_scorer_CRUD.py",
+      "tests/genai/test_genai_import_without_agent_sdk.py"
+    ]
+  },
+  "machine_type": {
+    "arch": "x86_64",
+    "os": "Linux",
+    "platform": "Linux-6.12.94+-x86_64-with-glibc2.41",
+    "cpu_count": 8,
+    "ci": null,
+    "runner_name": null,
+    "runner_os": null,
+    "runner_arch": null,
+    "runner_environment": null,
+    "image": null,
+    "label": "local",
+    "gxx": "g++ (Debian 14.2.0-19) 14.2.0",
+    "cpu_model": "Intel(R) Xeon(R) Processor",
+    "ram_gb": 15.6
+  },
+  "thread_env": {
+    "OMP_NUM_THREADS": "1",
+    "OPENBLAS_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1",
+    "NUMEXPR_NUM_THREADS": "1",
+    "VECLIB_MAXIMUM_THREADS": "1",
+    "BLIS_NUM_THREADS": "1",
+    "PYTHONHASHSEED": "0"
+  },
+  "runs_per_side": 3,
+  "runs_per_side_planned": 3,
+  "workers": "4",
+  "test_timeout_s": 120,
+  "run_timeout_s": 900,
+  "build_timeout_s": 1800,
+  "python": "3.12.15",
+  "test_selection": "mapped from touched files: tests/genai/scorers/test_scorer_CRUD.py, tests/genai/test_genai_import_without_agent_sdk.py, tests/demo/test_registry.py, tests/genai/scorers/deepeval/test_registry.py",
+  "per_run": [
+    {
+      "side": "old",
+      "run": 1,
+      "passed": 64,
+      "failed": 0,
+      "error": 0,
+      "skipped": 0,
+      "collection_errors": 0,
+      "exit": 0,
+      "seconds": 23.1,
+      "pytest_summary": "64 passed, 4 warnings in 15.40s",
+      "junit": true
+    },
+    {
+      "side": "new",
+      "run": 1,
+      "passed": 65,
+      "failed": 0,
+      "error": 0,
+      "skipped": 0,
+      "collection_errors": 0,
+      "exit": 0,
+      "seconds": 22.1,
+      "pytest_summary": "65 passed, 4 warnings in 14.77s",
+      "junit": true
+    },
+    {
+      "side": "old",
+      "run": 2,
+      "passed": 64,
+      "failed": 0,
+      "error": 0,
+      "skipped": 0,
+      "collection_errors": 0,
+      "exit": 0,
+      "seconds": 21.8,
+      "pytest_summary": "64 passed, 4 warnings in 14.74s",
+      "junit": true
+    },
+    {
+      "side": "new",
+      "run": 2,
+      "passed": 65,
+      "failed": 0,
+      "error": 0,
+      "skipped": 0,
+      "collection_errors": 0,
+      "exit": 0,
+      "seconds": 61.7,
+      "pytest_summary": "65 passed, 4 warnings in 55.00s",
+      "junit": true
+    },
+    {
+      "side": "old",
+      "run": 3,
+      "passed": 64,
+      "failed": 0,
+      "error": 0,
+      "skipped": 0,
+      "collection_errors": 0,
+      "exit": 0,
+      "seconds": 21.7,
+      "pytest_summary": "64 passed, 4 warnings in 15.16s",
+      "junit": true
+    },
+    {
+      "side": "new",
+      "run": 3,
+      "passed": 65,
+      "failed": 0,
+      "error": 0,
+      "skipped": 0,
+      "collection_errors": 0,
+      "exit": 0,
+      "seconds": 22.3,
+      "pytest_summary": "65 passed, 4 warnings in 15.52s",
+      "junit": true
+    }
+  ],
+  "notes": null,
+  "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+  "behaviour_claims": [],
+  "baseline": "full",
+  "model_provider": {
+    "requested": "nebius",
+    "used": "nebius",
+    "note": "model provider: nebius (Token Factory, live)",
+    "blind": false
+  },
+  "sandbox_backend": "local",
+  "sandbox_backend_note": "local bubblewrap",
+  "machine": "local",
+  "posted_upstream": false,
+  "logs": "mlflow-26542/",
+  "freeze": {
+    "main": "freeze-main.txt",
+    "pr": "freeze-pr.txt"
+  },
+  "poc_commit": "0fa0016ea51794edee0f4a085e41bf48dd813765",
+  "route": "source-pair",
+  "current_head_sha": "a8d0cee5738e7b703306d449180866dee7c236d3",
+  "tested_invocation": 1,
+  "model_provider_used": "nebius",
+  "state": "closed",
+  "mergeable_state": "unknown",
+  "product_check": true,
+  "demo_helper": {
+    "preflight": {
+      "ok": true
+    },
+    "tavily": {
+      "ok": true,
+      "skipped": false,
+      "live_call": true,
+      "cached": false,
+      "queries": [
+        "mlflow python setup install instructions https://github.com/mlflow/mlflow site:github.com/mlflow/mlflow",
+        "mlflow python documentation install https://github.com/mlflow/mlflow site:github.com/mlflow/mlflow",
+        "mlflow python install requirements https://pypi.org/project/mlflow/ https://github.com/mlflow/mlflow site:pypi.org"
+      ],
+      "results": [
+        {
+          "title": "mlflow-tracing",
+          "url": "https://pypi.org/project/mlflow-tracing/",
+          "query": "mlflow python install requirements https://pypi.org/project/mlflow/ https://github.com/mlflow/mlflow site:pypi.org"
+        },
+        {
+          "title": "mlflow",
+          "url": "https://pypi.org/project/mlflow/",
+          "query": "mlflow python install requirements https://pypi.org/project/mlflow/ https://github.com/mlflow/mlflow site:pypi.org"
+        },
+        {
+          "title": "mlflow-skinny 2.3.1",
+          "url": "https://pypi.org/project/mlflow-skinny/",
+          "query": "mlflow python install requirements https://pypi.org/project/mlflow/ https://github.com/mlflow/mlflow site:pypi.org"
+        },
+        {
+          "title": "mlflow/CONTRIBUTING.md at master \u00b7 mlflow/mlflow \u00b7 GitHub",
+          "url": "https://github.com/mlflow/mlflow/blob/master/CONTRIBUTING.md",
+          "query": "mlflow python setup install instructions https://github.com/mlflow/mlflow site:github.com/mlflow/mlflow"
+        },
+        {
+          "title": "GitHub - mlflow/mlflow-export-import \u00b7 GitHub",
+          "url": "https://github.com/mlflow/mlflow-export-import",
+          "query": "mlflow python setup install instructions https://github.com/mlflow/mlflow site:github.com/mlflow/mlflow"
+        },
+        {
+          "title": "[SETUP-BUG] I am facing one Issue while deploying MLFLOW to Azure Web App \u00b7 Issue #20148 \u00b7 mlflow/mlflow \u00b7 GitHub",
+          "url": "https://github.com/mlflow/mlflow/issues/20148",
+          "query": "mlflow python setup install instructions https://github.com/mlflow/mlflow site:github.com/mlflow/mlflow"
+        },
+        {
+          "title": "mlflow/CHANGELOG.md at master \u00b7 mlflow/mlflow \u00b7 GitHub",
+          "url": "https://github.com/mlflow/mlflow/blob/master/CHANGELOG.md",
+          "query": "mlflow python documentation install https://github.com/mlflow/mlflow site:github.com/mlflow/mlflow"
+        },
+        {
+          "title": "CLAUDE.md \u00b7 mlflow/mlflow Wiki \u00b7 GitHub",
+          "url": "https://github.com/mlflow/mlflow/wiki/CLAUDE.md",
+          "query": "mlflow python documentation install https://github.com/mlflow/mlflow site:github.com/mlflow/mlflow"
+        }
+      ],
+      "text": "To install the Python MLflow package from source, it is recommended to install MLflow in its own conda environment by running the command from your checkout of MLflow. For development and testing, additional installations are required. For a development environment setup, the automated script `dev-env-setup.sh` can be used. For deployment, MLflow can be installed via pip from GitHub, a specific commit, or a clone, though installation from PyPI is deprecated. For Databricks notebook setup, a virtual environment is created first, and MLflow can be installed using `%pip install mlflow-export-import`. For Azure Web App deployment, MLflow is installed via a Dockerfile.\nTo install the Python MLflow package from source, it is recommended to install MLflow in its own conda environment by running the command from your checkout of MLflow. For development and testing, you will also need to install additional packages into the conda environment. To try out a specific release candidate, run `pip install mlflow==3.11.0rc0`. The sources also mention installing MLflow in an editable mode using `uv pip install -e.` and installing test dependencies with `uv pip install -r requirements/test-requirements.txt`.\nTo install the MLflow Python package, the sources suggest running the command \"pip install mlflow\". However, one source mentions that MLflow requires conda to be on the PATH for the projects feature. Another source specifies \"pip install mlflow-tracing\" for a different package. The sources do not provide a definitive answer for the specific version or additional dependencies beyond what is mentioned.\nTo install the MLflow Python package, run the following command: pip install mlflow-tracing To install from the source code, run the following command: pip\nMLflow provides everything you need to build, debug, evaluate, and deploy production-quality LLM applications and AI agents. Supports Python, TypeScript/\nInstall MLflow from PyPI via pip install mlflow MLflow requires conda to be on the PATH for the projects feature. Nightly snapshots of MLflow\nThen, install the Python MLflow package from source - this is required for developing & testing changes across all languages and APIs. We recommend installing MLflow in its own conda environment by running the following from your checkout of MLflow:\n\n```\n'.[extras]' ' ' # installs mlflow from current checkout with some useful extra utilities #\n```\n\nIf you plan on doing development and testing, you will also need to install the following into the conda environment: [...] The automated development\n#### 1. Install from github\n\nRecommended.\n\n```\npip install git+ \n```\n\n#### 3. Install from a specific commit\n\n```\npip install git+ \n```\n\n#### 4. Install from github clone\n\n```\ngit clone  cd mlflow-export-import pip install -e . \n```\n\n#### 5. Install from PyPI\n\nLegacy. Due to the quick turnaround time for bug ad feature fixes, this is deprecated.\n\n### Databricks notebook setup\n\nMake sure your cluster has the latest MLflow and Databricks Runtime ML version installed. [...] ```\nexport MLFLOW_TRACKI\nOS Platform and Distribution (e.g., Linux Ubuntu 16.04): Azure Web App Linux Based Container\n MLflow installed from (source or binary): Installed via MLFLOW library using Docker File\n MLflow version (run `mlflow --version`): mlflow, version 3.8.1\n Python version: 3.12.3 version\n\n### Code to reproduce issue\n\nDocker file Deployed :  \n FROM python:3.10-slim\n\nENV PYTHONUNBUFFERED=1\n\nRUN pip install --no-cache-dir mlflow mlflow-oidc-auth[full]\n\nEXPOSE 8080 [...] OS Platform and Distribution (e.g., Li\nTo try out this release candidate, please run:\n\n`pip install mlflow==3.11.0rc0`\n\n`pip install mlflow==3.11.0rc0`\n\n## 3.10.1 (2026-03-05)\n\nMLflow 3.10.1 is a patch release that contains some minor feature enhancements, bug fixes, and documentation updates.\n\nFeatures:\n\nBug fixes:\n\n`default_permission=NO_PERMISSIONS`\n`HttpArtifactRepository`\n`logged_model`\n`experiment_id`\n\nDocumentation updates:\n\nSmall bug fixes and documentation updates: [...] Documentation updates:\n\n`Pre-LLM`\n`Post-LLM`\n`guardrai\nalready created) uv venv --python 3.10 source .venv/bin/activate # Install the package in editable mode uv pip install -e . # Install test dependencies uv pip install -r requirements/test-requirements.txt # Install lint dependencies uv pip install -r requirements/lint-requirements.txt `` This setup install the minimum dependencies to run MLflow and tests for core functionality. You may also want to install extra dependencies such as machine learning frameworks, if you face missing dependencies [",
+      "errors": [],
+      "lines": [
+        "Looked up with Tavily: 8 results",
+        "Query: mlflow python setup install instructions https://github.com/mlflow/mlflow site:github.com/mlflow/mlflow",
+        "Query: mlflow python documentation install https://github.com/mlflow/mlflow site:github.com/mlflow/mlflow",
+        "Query: mlflow python install requirements https://pypi.org/project/mlflow/ https://github.com/mlflow/mlflow site:pypi.org",
+        "Source: mlflow-tracing \u2014 https://pypi.org/project/mlflow-tracing/",
+        "Source: mlflow \u2014 https://pypi.org/project/mlflow/",
+        "Source: mlflow-skinny 2.3.1 \u2014 https://pypi.org/project/mlflow-skinny/",
+        "Source: mlflow/CONTRIBUTING.md at master \u00b7 mlflow/mlflow \u00b7 GitHub \u2014 https://github.com/mlflow/mlflow/blob/master/CONTRIBUTING.md",
+        "Source: GitHub - mlflow/mlflow-export-import \u00b7 GitHub \u2014 https://github.com/mlflow/mlflow-export-import",
+        "Source: [SETUP-BUG] I am facing one Issue while deploying MLFLOW to Azure Web App \u00b7 Issue #20148 \u00b7 mlflow/mlflow \u00b7 GitHub \u2014 https://github.com/mlflow/mlflow/issues/20148",
+        "Source: mlflow/CHANGELOG.md at master \u00b7 mlflow/mlflow \u00b7 GitHub \u2014 https://github.com/mlflow/mlflow/blob/master/CHANGELOG.md",
+        "Source: CLAUDE.md \u00b7 mlflow/mlflow Wiki \u00b7 GitHub \u2014 https://github.com/mlflow/mlflow/wiki/CLAUDE.md"
+      ]
+    },
+    "notes": [
+      "Setup check: GitHub token: present.",
+      "Setup check: Nebius token: present.",
+      "Setup check: free memory 6.0 GB (of 15.6 GB).",
+      "Setup check: free disk 92.5 GB.",
+      "Demo helper: git is installed.",
+      "Demo helper: python3 is installed.",
+      "Demo helper: uv is installed.",
+      "Looked up with Tavily: 8 results",
+      "Query: mlflow python setup install instructions https://github.com/mlflow/mlflow site:github.com/mlflow/mlflow",
+      "Query: mlflow python documentation install https://github.com/mlflow/mlflow site:github.com/mlflow/mlflow",
+      "Query: mlflow python install requirements https://pypi.org/project/mlflow/ https://github.com/mlflow/mlflow site:pypi.org",
+      "Source: mlflow-tracing \u2014 https://pypi.org/project/mlflow-tracing/",
+      "Source: mlflow \u2014 https://pypi.org/project/mlflow/",
+      "Source: mlflow-skinny 2.3.1 \u2014 https://pypi.org/project/mlflow-skinny/",
+      "Source: mlflow/CONTRIBUTING.md at master \u00b7 mlflow/mlflow \u00b7 GitHub \u2014 https://github.com/mlflow/mlflow/blob/master/CONTRIBUTING.md",
+      "Source: GitHub - mlflow/mlflow-export-import \u00b7 GitHub \u2014 https://github.com/mlflow/mlflow-export-import",
+      "Source: [SETUP-BUG] I am facing one Issue while deploying MLFLOW to Azure Web App \u00b7 Issue #20148 \u00b7 mlflow/mlflow \u00b7 GitHub \u2014 https://github.com/mlflow/mlflow/issues/20148",
+      "Source: mlflow/CHANGELOG.md at master \u00b7 mlflow/mlflow \u00b7 GitHub \u2014 https://github.com/mlflow/mlflow/blob/master/CHANGELOG.md",
+      "Source: CLAUDE.md \u00b7 mlflow/mlflow Wiki \u00b7 GitHub \u2014 https://github.com/mlflow/mlflow/wiki/CLAUDE.md",
+      "Setup plan: the same packages on main and pr.",
+      "Setup plan: Flask-CORS is noted, installed with the project.",
+      "Setup plan: Flask is noted, installed with the project.",
+      "Setup plan: aiohttp is noted, installed with the project.",
+      "Setup plan: alembic is noted, installed with the project.",
+      "Setup plan: anyio is noted, installed with the project.",
+      "Setup plan: cachetools is noted, installed with the project.",
+      "Setup plan: click is noted, installed with the project.",
+      "Setup plan: cloudpickle is noted, installed with the project.",
+      "Setup plan: cryptography is noted, installed with the project.",
+      "Setup plan: databricks-sdk is noted, installed with the project.",
+      "Setup plan: docker is noted, installed with the project.",
+      "Setup plan: fastapi is noted, installed with the project.",
+      "Setup plan: gitpython is noted, installed with the project.",
+      "Setup plan: graphene is noted, installed with the project.",
+      "Setup plan: gunicorn is noted, installed with the project.",
+      "Setup plan: huey is noted, installed with the project.",
+      "Setup plan: importlib_metadata is noted, installed with the project.",
+      "Setup plan: matplotlib is noted, installed with the project.",
+      "Setup plan: numpy is noted, installed with the project.",
+      "Setup plan: opentelemetry-api is noted, installed with the project.",
+      "Setup plan: opentelemetry-proto is noted, installed with the project.",
+      "Setup plan: opentelemetry-sdk is noted, installed with the project.",
+      "Setup plan: packaging is noted, installed with the project.",
+      "Setup plan: pandas is noted, installed with the project.",
+      "Setup plan: protobuf is noted, installed with the project.",
+      "Setup plan: pyarrow is noted, installed with the project.",
+      "Setup plan: pydantic is noted, installed with the project.",
+      "Setup plan: python-dotenv is noted, installed with the project.",
+      "Setup plan: pyyaml is noted, installed with the project.",
+      "Setup plan: requests is noted, installed with the project.",
+      "Setup plan: scikit-learn is noted, installed with the project.",
+      "Setup plan: scipy is noted, installed with the project.",
+      "Setup plan: skops is noted, installed with the project.",
+      "Setup plan: sqlalchemy is noted, installed with the project.",
+      "Setup plan: sqlparse is noted, installed with the project.",
+      "Setup plan: starlette is noted, installed with the project.",
+      "Setup plan: typing-extensions is noted, installed with the project.",
+      "Setup plan: uvicorn is noted, installed with the project.",
+      "Setup plan: waitress is noted, installed with the project.",
+      "Setup plan: install psutil (listed in the test extra) on main and pr.",
+      "Setup plan: install pyspark (listed in the test extra) on main and pr.",
+      "Setup plan: install texttable (listed in the test extra) on main and pr.",
+      "Setup plan: install opentelemetry-exporter-otlp-proto-grpc (listed in the test extra) on main and pr.",
+      "Setup plan: install opentelemetry-exporter-otlp-proto-http (listed in the test extra) on main and pr.",
+      "Setup plan: install toml (listed in requirements.txt) on main and pr.",
+      "Setup plan: Python 3.12: Python 3.12 already meets >=3.10",
+      "Installed psutil 7.2.2 from pyproject (listed in the test extra) on main and pr.",
+      "Installed pyspark 4.2.0 from pyproject (listed in the test extra) on main and pr.",
+      "Installed texttable 1.7.2 from pyproject (listed in the test extra) on main and pr.",
+      "Installed opentelemetry-exporter-otlp-proto-grpc 1.45.1 from pyproject (listed in the test extra) on main and pr.",
+      "Installed opentelemetry-exporter-otlp-proto-http 1.45.1 from pyproject (listed in the test extra) on main and pr.",
+      "Installed toml 0.10.2 from requirements.txt (listed in requirements.txt) on main and pr."
+    ],
+    "setup_plan": {
+      "packages": [
+        {
+          "requirement": "Flask-CORS<7",
+          "name": "Flask-CORS",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "Flask<4",
+          "name": "Flask",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "aiohttp<4,>=3.7.0",
+          "name": "aiohttp",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "alembic<2,!=1.10.0",
+          "name": "alembic",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "anyio<5,>=3.6.2,!=4.15.0",
+          "name": "anyio",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "cachetools<8,>=5.0.0",
+          "name": "cachetools",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "click<9,>=7.0",
+          "name": "click",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "cloudpickle<4",
+          "name": "cloudpickle",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "cryptography<51,>=43.0.0",
+          "name": "cryptography",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "databricks-sdk<1,>=0.20.0",
+          "name": "databricks-sdk",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "docker<8,>=4.0.0",
+          "name": "docker",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "fastapi<1",
+          "name": "fastapi",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "gitpython<4,>=3.1.9",
+          "name": "gitpython",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "graphene<4",
+          "name": "graphene",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "gunicorn<27; platform_system != 'Windows'",
+          "name": "gunicorn",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "huey<4,>=2.5.4",
+          "name": "huey",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "importlib_metadata<10,>=3.7.0,!=4.7.0",
+          "name": "importlib_metadata",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "matplotlib<4",
+          "name": "matplotlib",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "numpy<3",
+          "name": "numpy",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "opentelemetry-api<3,>=1.9.0",
+          "name": "opentelemetry-api",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "opentelemetry-proto<3,>=1.9.0",
+          "name": "opentelemetry-proto",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "opentelemetry-sdk<3,>=1.9.0",
+          "name": "opentelemetry-sdk",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "packaging<27",
+          "name": "packaging",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "pandas<4",
+          "name": "pandas",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "protobuf<8,>=3.12.0",
+          "name": "protobuf",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "pyarrow<26,>=4.0.0",
+          "name": "pyarrow",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "pydantic<3,>=2.0.0",
+          "name": "pydantic",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "python-dotenv<2,>=0.19.0",
+          "name": "python-dotenv",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "pyyaml<7,>=5.1",
+          "name": "pyyaml",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "requests<3,>=2.17.3",
+          "name": "requests",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "scikit-learn<2",
+          "name": "scikit-learn",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "scipy<2",
+          "name": "scipy",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "skops<1",
+          "name": "skops",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "sqlalchemy<3,>=1.4.0",
+          "name": "sqlalchemy",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "sqlparse<1,>=0.4.0",
+          "name": "sqlparse",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "starlette<2",
+          "name": "starlette",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "typing-extensions<5,>=4.0.0",
+          "name": "typing-extensions",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "uvicorn<1",
+          "name": "uvicorn",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "waitress<4; platform_system == 'Windows'",
+          "name": "waitress",
+          "kind": "runtime",
+          "action": "noted",
+          "source": "pyproject",
+          "reason": "runtime dependency, installed with the project",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "psutil",
+          "name": "psutil",
+          "kind": "test-extra",
+          "action": "install",
+          "source": "pyproject",
+          "reason": "listed in the test extra",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "pyspark",
+          "name": "pyspark",
+          "kind": "test-extra",
+          "action": "install",
+          "source": "pyproject",
+          "reason": "listed in the test extra",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "texttable",
+          "name": "texttable",
+          "kind": "test-extra",
+          "action": "install",
+          "source": "pyproject",
+          "reason": "listed in the test extra",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "opentelemetry-exporter-otlp-proto-grpc",
+          "name": "opentelemetry-exporter-otlp-proto-grpc",
+          "kind": "test-extra",
+          "action": "install",
+          "source": "pyproject",
+          "reason": "listed in the test extra",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "opentelemetry-exporter-otlp-proto-http",
+          "name": "opentelemetry-exporter-otlp-proto-http",
+          "kind": "test-extra",
+          "action": "install",
+          "source": "pyproject",
+          "reason": "listed in the test extra",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        },
+        {
+          "requirement": "toml",
+          "name": "toml",
+          "kind": "requirements",
+          "action": "install",
+          "source": "requirements.txt",
+          "reason": "listed in requirements.txt",
+          "sides": [
+            "main",
+            "pr"
+          ]
+        }
+      ],
+      "extra_reqs": [
+        "psutil",
+        "pyspark",
+        "texttable",
+        "opentelemetry-exporter-otlp-proto-grpc",
+        "opentelemetry-exporter-otlp-proto-http",
+        "toml"
+      ],
+      "python": {
+        "requested": "3.12",
+        "current": "3.12",
+        "applied": true,
+        "switch": null,
+        "reason": "Python 3.12 already meets >=3.10"
+      },
+      "system": [],
+      "refused": []
+    },
+    "installs": [
+      {
+        "package": "psutil",
+        "requirement": "psutil",
+        "version": "7.2.2",
+        "versions": {
+          "main": "7.2.2",
+          "pr": "7.2.2"
+        },
+        "source": "pyproject",
+        "reason": "listed in the test extra",
+        "sides": [
+          "main",
+          "pr"
+        ]
+      },
+      {
+        "package": "pyspark",
+        "requirement": "pyspark",
+        "version": "4.2.0",
+        "versions": {
+          "main": "4.2.0",
+          "pr": "4.2.0"
+        },
+        "source": "pyproject",
+        "reason": "listed in the test extra",
+        "sides": [
+          "main",
+          "pr"
+        ]
+      },
+      {
+        "package": "texttable",
+        "requirement": "texttable",
+        "version": "1.7.2",
+        "versions": {
+          "main": "1.7.2",
+          "pr": "1.7.2"
+        },
+        "source": "pyproject",
+        "reason": "listed in the test extra",
+        "sides": [
+          "main",
+          "pr"
+        ]
+      },
+      {
+        "package": "opentelemetry-exporter-otlp-proto-grpc",
+        "requirement": "opentelemetry-exporter-otlp-proto-grpc",
+        "version": "1.45.1",
+        "versions": {
+          "main": "1.45.1",
+          "pr": "1.45.1"
+        },
+        "source": "pyproject",
+        "reason": "listed in the test extra",
+        "sides": [
+          "main",
+          "pr"
+        ]
+      },
+      {
+        "package": "opentelemetry-exporter-otlp-proto-http",
+        "requirement": "opentelemetry-exporter-otlp-proto-http",
+        "version": "1.45.1",
+        "versions": {
+          "main": "1.45.1",
+          "pr": "1.45.1"
+        },
+        "source": "pyproject",
+        "reason": "listed in the test extra",
+        "sides": [
+          "main",
+          "pr"
+        ]
+      },
+      {
+        "package": "toml",
+        "requirement": "toml",
+        "version": "0.10.2",
+        "versions": {
+          "main": "0.10.2",
+          "pr": "0.10.2"
+        },
+        "source": "requirements.txt",
+        "reason": "listed in requirements.txt",
+        "sides": [
+          "main",
+          "pr"
+        ]
+      }
+    ]
+  },
+  "chosen": {
+    "pr": 26542,
+    "head_sha": null,
+    "install": null,
+    "test_cmd": null
+  },
+  "sides": {
+    "comparison_basis": "merge-base vs PR head (no merge ref available)",
+    "main_sha": "94cc0f1b58de0b89041c0307e8db7e7c7671e8a6",
+    "pr_sha": "a8d0cee5738e7b703306d449180866dee7c236d3"
+  },
+  "tested": {
+    "main": "master @ 94cc0f1b58de (merge-base with the PR head)",
+    "pr": "PR head a8d0cee5738e"
+  },
+  "probe_plan": {
+    "baseline": "full",
+    "model": "model provider: nebius (Token Factory, live)",
+    "errors": [],
+    "model_claims": [
+      {
+        "id": "C1",
+        "text": "After this PR, get_scorer(name) returns scorer objects that include scorer_version, canonical_resource_name, and canonical_resource_name_type populated from the scheduled-scorers REST config.",
+        "source_quote": "This PR builds these scorers from the managed-evals scheduled-scorers REST config (`GET /api/2.0/managed-evals/scheduled-scorers/{experiment_id}`). One config holds both the current definition and its `scorer_version`.",
+        "testable": true,
+        "expect": "differs"
+      },
+      {
+        "id": "C2",
+        "text": "When the server omits sample_rate, the scorer reports STOPPED (rather than defaulting to 1.0), matching the server's treatment of a missing sample_rate as 0 for active scorer counting.",
+        "source_quote": "**`sample_rate` when the server omits it:** `databricks-agents` turned a missing `sample_rate` into `1.0`. The REST config keeps `None`, so the scorer reports `STOPPED`. This is correct, not a regression: the server treats a missing sample rate as `0` (not sampling) when it counts and validates active scorers. The versioned path already behaves this way.",
+        "testable": true,
+        "expect": "same"
+      },
+      {
+        "id": "C3",
+        "text": "If the server omits scorer_version (scorer versioning disabled), the returned scorer\u2019s version and resource-name fields remain None, just as before, and no error is raised.",
+        "source_quote": "**When the server omits `scorer_version`** (scorer versioning disabled for the workspace): the version and resource-name fields stay `None`, the same as before, and nothing raises.",
+        "testable": true,
+        "expect": "same"
+      },
+      {
+        "id": "C4a",
+        "text": "get_scorer(name) no longer fails when another scorer in the same experiment cannot be deserialized.",
+        "source_quote": "**Undeserializable scorers:** `get_scorer(name)` no longer fails because a *different* scorer in the experiment can't be deserialized.",
+        "testable": true,
+        "expect": "differs"
+      },
+      {
+        "id": "C4b",
+        "text": "list_scorers() continues to raise an error when encountering a badly serialized scorer, as it did before the PR.",
+        "source_quote": "`list_scorers()` still raises on a bad scorer, as before.",
+        "testable": true,
+        "expect": "same"
+      },
+      {
+        "id": "C5a",
+        "text": "Requesting a non\u2011existent scorer still raises RESOURCE_DOES_NOT_EXIST with the same error message.",
+        "source_quote": "**Errors:** a missing scorer still raises `RESOURCE_DOES_NOT_EXIST` with the same message.",
+        "testable": true,
+        "expect": "same"
+      },
+      {
+        "id": "C5b",
+        "text": "The active\u2011experiment check performed by list_scorers() remains unchanged.",
+        "source_quote": "The active-experiment check in `list_scorers` is unchanged.",
+        "testable": true,
+        "expect": "same"
+      }
+    ],
+    "model_rejected_claims": [],
+    "diff_targets": [],
+    "frozen": [
+      {
+        "path": "model-probes/model-c1.py",
+        "source": "model",
+        "sha256": "9de22f9f7e1e5e3275ec2277fd1a1e94a34c5ca5bfe066ce8a9aafe8ccf725bf",
+        "generator": {
+          "kind": "model",
+          "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+          "model": "nvidia/nemotron-3-super-120b-a12b",
+          "provider": "nebius",
+          "provenance": "live",
+          "blind": true
+        },
+        "frozen_at": "2026-10-21T20:25:56.277493+00:00",
+        "inputs_sha256": "db4bddf45ad1cba0d9d901717e738330cdbfbddd780c8d58e4d71dea49509ce0",
+        "inputs": {
+          "title_chars": 108,
+          "body_chars": 5181,
+          "base_files": {
+            "mlflow/genai/scorers/registry.py": "40ea88c587a14067f5a0fa08f670013dc187cfd90a5c6b604d0c2ed4fca3f306"
+          }
+        }
+      },
+      {
+        "path": "model-probes/model-c2.py",
+        "source": "model",
+        "sha256": "8be2ef10f5bd353e5c866ff9fcc1b1ac56b12204549c2f16a1a18ad4549e90ec",
+        "generator": {
+          "kind": "model",
+          "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+          "model": "nvidia/nemotron-3-super-120b-a12b",
+          "provider": "nebius",
+          "provenance": "live",
+          "blind": true
+        },
+        "frozen_at": "2026-10-21T20:25:56.277722+00:00",
+        "inputs_sha256": "db4bddf45ad1cba0d9d901717e738330cdbfbddd780c8d58e4d71dea49509ce0",
+        "inputs": {
+          "title_chars": 108,
+          "body_chars": 5181,
+          "base_files": {
+            "mlflow/genai/scorers/registry.py": "40ea88c587a14067f5a0fa08f670013dc187cfd90a5c6b604d0c2ed4fca3f306"
+          }
+        }
+      },
+      {
+        "path": "model-probes/model-c3.py",
+        "source": "model",
+        "sha256": "4b16d7670c221d3704ec34d20d255916d4459d331564d3f4aebb75442364afa1",
+        "generator": {
+          "kind": "model",
+          "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+          "model": "nvidia/nemotron-3-super-120b-a12b",
+          "provider": "nebius",
+          "provenance": "live",
+          "blind": true
+        },
+        "frozen_at": "2026-10-21T20:25:56.277836+00:00",
+        "inputs_sha256": "db4bddf45ad1cba0d9d901717e738330cdbfbddd780c8d58e4d71dea49509ce0",
+        "inputs": {
+          "title_chars": 108,
+          "body_chars": 5181,
+          "base_files": {
+            "mlflow/genai/scorers/registry.py": "40ea88c587a14067f5a0fa08f670013dc187cfd90a5c6b604d0c2ed4fca3f306"
+          }
+        }
+      },
+      {
+        "path": "model-probes/model-c4a.py",
+        "source": "model",
+        "sha256": "3dac11617159409f0ef0cac24eeff3ddb23950e281fddccdb3291a27689bb16a",
+        "generator": {
+          "kind": "model",
+          "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+          "model": "nvidia/nemotron-3-super-120b-a12b",
+          "provider": "nebius",
+          "provenance": "live",
+          "blind": true
+        },
+        "frozen_at": "2026-10-21T20:25:56.277915+00:00",
+        "inputs_sha256": "db4bddf45ad1cba0d9d901717e738330cdbfbddd780c8d58e4d71dea49509ce0",
+        "inputs": {
+          "title_chars": 108,
+          "body_chars": 5181,
+          "base_files": {
+            "mlflow/genai/scorers/registry.py": "40ea88c587a14067f5a0fa08f670013dc187cfd90a5c6b604d0c2ed4fca3f306"
+          }
+        }
+      }
+    ]
+  },
+  "test_extras": [
+    "pytest-asyncio",
+    "pytest-repeat",
+    "pytest-timeout",
+    "boto3<2,>=1.28.56",
+    "fastapi<1",
+    "slowapi<1,>=0.1.9",
+    "tiktoken<1",
+    "uvicorn[standard]<1",
+    "watchfiles<2",
+    "deepeval"
+  ],
+  "pr_side_started_at": "2026-10-21T20:25:56.432324+00:00",
+  "test_targets": {
+    "main": [
+      "tests/genai/scorers/test_scorer_CRUD.py",
+      "tests/genai/test_genai_import_without_agent_sdk.py",
+      "tests/demo/test_registry.py",
+      "tests/genai/scorers/deepeval/test_registry.py"
+    ],
+    "pr": [
+      "tests/genai/scorers/test_scorer_CRUD.py",
+      "tests/genai/test_genai_import_without_agent_sdk.py",
+      "tests/demo/test_registry.py",
+      "tests/genai/scorers/deepeval/test_registry.py"
+    ]
+  },
+  "installed_commit": {
+    "main": {
+      "dist": "mlflow",
+      "expected": "94cc0f1b58de0b89041c0307e8db7e7c7671e8a6",
+      "installed": "94cc0f1b58de0b89041c0307e8db7e7c7671e8a6",
+      "ok": true
+    },
+    "pr": {
+      "dist": "mlflow",
+      "expected": "a8d0cee5738e7b703306d449180866dee7c236d3",
+      "installed": "a8d0cee5738e7b703306d449180866dee7c236d3",
+      "ok": true
+    }
+  },
+  "declared_test_deps": {
+    "requested": [
+      "pytest-asyncio",
+      "pytest-repeat",
+      "pytest-timeout",
+      "boto3<2,>=1.28.56",
+      "fastapi<1",
+      "slowapi<1,>=0.1.9",
+      "tiktoken<1",
+      "uvicorn[standard]<1",
+      "watchfiles<2",
+      "deepeval"
+    ],
+    "installed": true
+  },
+  "comparison": {
+    "same": 59,
+    "same_skipped_both": 0,
+    "regressions": [],
+    "fixed": [],
+    "new_tests_passing": 6,
+    "new_tests_failing": [],
+    "new_tests_skipped": [],
+    "removed_tests": [
+      "tests.genai.scorers.test_scorer_CRUD::test_databricks_backend_list_and_get_use_databricks_agents",
+      "tests.genai.test_genai_import_without_agent_sdk::test_get_scorer_raises_when_agents_not_installed",
+      "tests.genai.test_genai_import_without_agent_sdk::test_list_scorers_raises_when_agents_not_installed"
+    ],
+    "reparametrized": [
+      {
+        "test": "tests.genai.scorers.test_scorer_CRUD::test_databricks_backend_agents_missing_scorer_uses_oss_error",
+        "removed_ids": [
+          "tests.genai.scorers.test_scorer_CRUD::test_databricks_backend_agents_missing_scorer_uses_oss_error[delete_scorer-kwargs1-delete_scheduled_scorer]",
+          "tests.genai.scorers.test_scorer_CRUD::test_databricks_backend_agents_missing_scorer_uses_oss_error[get_scorer-kwargs0-get_scheduled_scorer]"
+        ],
+        "added_ids": [
+          "tests.genai.scorers.test_scorer_CRUD::test_databricks_backend_agents_missing_scorer_uses_oss_error"
+        ]
+      }
+    ],
+    "skipped_missing_dependency": [],
+    "flaky": [],
+    "pr_unstable": [],
+    "pr_unstable_noisy": [],
+    "environment": [],
+    "other_changes": [],
+    "preexisting_failures": [],
+    "load_failed_both": [],
+    "load_failed_pr": [],
+    "load_failed_main": [],
+    "executed": {
+      "main": 64,
+      "pr": 65
+    },
+    "messages": {}
+  },
+  "exit_check": {
+    "explained": true,
+    "problems": [],
+    "detail": "all runs exited 0"
+  },
+  "coverage": {
+    "status": "measured",
+    "changed_lines_total": 6,
+    "changed_lines_covered": 6,
+    "files": [
+      {
+        "file": "mlflow/genai/scorers/registry.py",
+        "changed_lines_total": 6,
+        "changed_lines_covered": 6
+      }
+    ],
+    "seconds": 25.0,
+    "exit": 0,
+    "log": "coverage-pytest.log"
+  },
+  "probes": {
+    "status": "error",
+    "items": [
+      {
+        "id": "model-c1",
+        "source": "model",
+        "path": "model-probes/model-c1.py",
+        "sha256": "9de22f9f7e1e5e3275ec2277fd1a1e94a34c5ca5bfe066ce8a9aafe8ccf725bf",
+        "target": "mlflow/mlflow#26542",
+        "about": "get_scorer(name)",
+        "claims": [
+          {
+            "id": "C1",
+            "source": "PR description",
+            "text": "After this PR, get_scorer(name) returns scorer objects that include scorer_version, canonical_resource_name, and canonical_resource_name_type populated from the scheduled-scorers REST config.",
+            "covers": [
+              "C1"
+            ],
+            "expect": "differs"
+          }
+        ],
+        "runs_per_side": 3,
+        "per_run": [
+          {
+            "side": "main",
+            "run": 1,
+            "seconds": 5.0,
+            "ok": false
+          },
+          {
+            "side": "pr",
+            "run": 1,
+            "seconds": 5.0,
+            "ok": false
+          },
+          {
+            "side": "main",
+            "run": 2,
+            "seconds": 4.4,
+            "ok": false
+          },
+          {
+            "side": "pr",
+            "run": 2,
+            "seconds": 4.8,
+            "ok": false
+          },
+          {
+            "side": "main",
+            "run": 3,
+            "seconds": 4.7,
+            "ok": false
+          },
+          {
+            "side": "pr",
+            "run": 3,
+            "seconds": 4.5,
+            "ok": false
+          }
+        ],
+        "outputs": {
+          "main": [
+            "probe-model-c1-main-1.jsonl",
+            "probe-model-c1-main-2.jsonl",
+            "probe-model-c1-main-3.jsonl"
+          ],
+          "pr": [
+            "probe-model-c1-pr-1.jsonl",
+            "probe-model-c1-pr-2.jsonl",
+            "probe-model-c1-pr-3.jsonl"
+          ]
+        },
+        "runs": {
+          "main": [
+            {
+              "probe.error": {
+                "crash": "non-json output",
+                "exit_code": 1
+              }
+            },
+            {
+              "probe.error": {
+                "crash": "non-json output",
+                "exit_code": 1
+              }
+            },
+            {
+              "probe.error": {
+                "crash": "non-json output",
+                "exit_code": 1
+              }
+            }
+          ],
+          "pr": [
+            {
+              "probe.error": {
+                "crash": "non-json output",
+                "exit_code": 1
+              }
+            },
+            {
+              "probe.error": {
+                "crash": "non-json output",
+                "exit_code": 1
+              }
+            },
+            {
+              "probe.error": {
+                "crash": "non-json output",
+                "exit_code": 1
+              }
+            }
+          ]
+        },
+        "observations": [
+          {
+            "name": "probe.error",
+            "state": "same",
+            "label": "not_testable",
+            "claim": null,
+            "main": {
+              "crash": "non-json output",
+              "exit_code": 1
+            },
+            "pr": {
+              "crash": "non-json output",
+              "exit_code": 1
+            },
+            "citations": {
+              "main": {
+                "file": "probe-model-c1-main-1.jsonl",
+                "line": 1,
+                "quote": "\"observation\": \"probe.error\""
+              },
+              "pr": {
+                "file": "probe-model-c1-pr-1.jsonl",
+                "line": 1,
+                "quote": "\"observation\": \"probe.error\""
+              }
+            }
+          }
+        ],
+        "generator": {
+          "kind": "model",
+          "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+          "model": "nvidia/nemotron-3-super-120b-a12b",
+          "provider": "nebius",
+          "provenance": "live",
+          "blind": true
+        },
+        "freeze": {
+          "sha256": "9de22f9f7e1e5e3275ec2277fd1a1e94a34c5ca5bfe066ce8a9aafe8ccf725bf",
+          "generator": {
+            "kind": "model",
+            "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+            "model": "nvidia/nemotron-3-super-120b-a12b",
+            "provider": "nebius",
+            "provenance": "live",
+            "blind": true
+          },
+          "frozen_at": "2026-10-21T20:25:56.277493+00:00",
+          "inputs_sha256": "db4bddf45ad1cba0d9d901717e738330cdbfbddd780c8d58e4d71dea49509ce0",
+          "inputs": {
+            "title_chars": 108,
+            "body_chars": 5181,
+            "base_files": {
+              "mlflow/genai/scorers/registry.py": "40ea88c587a14067f5a0fa08f670013dc187cfd90a5c6b604d0c2ed4fca3f306"
+            }
+          },
+          "verified": true,
+          "pr_started_at": "2026-10-21T20:25:56.432324+00:00"
+        },
+        "probe_changed_line_coverage": {
+          "status": "measured",
+          "changed_lines_total": 25,
+          "changed_lines_covered": 0,
+          "files": [
+            {
+              "file": "mlflow/genai/scorers/registry.py",
+              "changed_lines_total": 25,
+              "changed_lines_covered": 5
+            }
+          ],
+          "adequacy": "not_adequate",
+          "note": "the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate",
+          "exit": 1,
+          "data": "probe-cov-model-c1.json",
+          "changed_lines_touched": 5
+        },
+        "status": "crashed",
+        "uninformative_reason": "the probe crashed or printed no parsed output on every main-side run"
+      },
+      {
+        "id": "model-c2",
+        "source": "model",
+        "path": "model-probes/model-c2.py",
+        "sha256": "8be2ef10f5bd353e5c866ff9fcc1b1ac56b12204549c2f16a1a18ad4549e90ec",
+        "target": "mlflow/mlflow#26542",
+        "about": "list_scorers()",
+        "claims": [
+          {
+            "id": "C2",
+            "source": "PR description",
+            "text": "When the server omits sample_rate, the scorer reports STOPPED (rather than defaulting to 1.0), matching the server's treatment of a missing sample_rate as 0 for active scorer counting.",
+            "covers": [
+              "C2"
+            ],
+            "expect": "same"
+          }
+        ],
+        "runs_per_side": 3,
+        "per_run": [
+          {
+            "side": "main",
+            "run": 1,
+            "seconds": 4.3,
+            "ok": false
+          },
+          {
+            "side": "pr",
+            "run": 1,
+            "seconds": 4.2,
+            "ok": false
+          },
+          {
+            "side": "main",
+            "run": 2,
+            "seconds": 4.3,
+            "ok": false
+          },
+          {
+            "side": "pr",
+            "run": 2,
+            "seconds": 4.3,
+            "ok": false
+          },
+          {
+            "side": "main",
+            "run": 3,
+            "seconds": 4.3,
+            "ok": false
+          },
+          {
+            "side": "pr",
+            "run": 3,
+            "seconds": 4.2,
+            "ok": false
+          }
+        ],
+        "outputs": {
+          "main": [
+            "probe-model-c2-main-1.jsonl",
+            "probe-model-c2-main-2.jsonl",
+            "probe-model-c2-main-3.jsonl"
+          ],
+          "pr": [
+            "probe-model-c2-pr-1.jsonl",
+            "probe-model-c2-pr-2.jsonl",
+            "probe-model-c2-pr-3.jsonl"
+          ]
+        },
+        "runs": {
+          "main": [
+            {
+              "probe.error": {
+                "crash": "non-json output",
+                "exit_code": 0
+              }
+            },
+            {
+              "probe.error": {
+                "crash": "non-json output",
+                "exit_code": 0
+              }
+            },
+            {
+              "probe.error": {
+                "crash": "non-json output",
+                "exit_code": 0
+              }
+            }
+          ],
+          "pr": [
+            {
+              "probe.error": {
+                "crash": "non-json output",
+                "exit_code": 0
+              }
+            },
+            {
+              "probe.error": {
+                "crash": "non-json output",
+                "exit_code": 0
+              }
+            },
+            {
+              "probe.error": {
+                "crash": "non-json output",
+                "exit_code": 0
+              }
+            }
+          ]
+        },
+        "observations": [
+          {
+            "name": "probe.error",
+            "state": "same",
+            "label": "not_testable",
+            "claim": null,
+            "main": {
+              "crash": "non-json output",
+              "exit_code": 0
+            },
+            "pr": {
+              "crash": "non-json output",
+              "exit_code": 0
+            },
+            "citations": {
+              "main": {
+                "file": "probe-model-c2-main-1.jsonl",
+                "line": 1,
+                "quote": "\"observation\": \"probe.error\""
+              },
+              "pr": {
+                "file": "probe-model-c2-pr-1.jsonl",
+                "line": 1,
+                "quote": "\"observation\": \"probe.error\""
+              }
+            }
+          }
+        ],
+        "generator": {
+          "kind": "model",
+          "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+          "model": "nvidia/nemotron-3-super-120b-a12b",
+          "provider": "nebius",
+          "provenance": "live",
+          "blind": true
+        },
+        "freeze": {
+          "sha256": "8be2ef10f5bd353e5c866ff9fcc1b1ac56b12204549c2f16a1a18ad4549e90ec",
+          "generator": {
+            "kind": "model",
+            "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+            "model": "nvidia/nemotron-3-super-120b-a12b",
+            "provider": "nebius",
+            "provenance": "live",
+            "blind": true
+          },
+          "frozen_at": "2026-10-21T20:25:56.277722+00:00",
+          "inputs_sha256": "db4bddf45ad1cba0d9d901717e738330cdbfbddd780c8d58e4d71dea49509ce0",
+          "inputs": {
+            "title_chars": 108,
+            "body_chars": 5181,
+            "base_files": {
+              "mlflow/genai/scorers/registry.py": "40ea88c587a14067f5a0fa08f670013dc187cfd90a5c6b604d0c2ed4fca3f306"
+            }
+          },
+          "verified": true,
+          "pr_started_at": "2026-10-21T20:25:56.432324+00:00"
+        },
+        "probe_changed_line_coverage": {
+          "status": "measured",
+          "changed_lines_total": 25,
+          "changed_lines_covered": 0,
+          "files": [
+            {
+              "file": "mlflow/genai/scorers/registry.py",
+              "changed_lines_total": 25,
+              "changed_lines_covered": 5
+            }
+          ],
+          "adequacy": "not_adequate",
+          "note": "the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate",
+          "exit": 0,
+          "data": "probe-cov-model-c2.json",
+          "changed_lines_touched": 5
+        },
+        "status": "crashed",
+        "uninformative_reason": "the probe crashed or printed no parsed output on every main-side run"
+      },
+      {
+        "id": "model-c3",
+        "source": "model",
+        "path": "model-probes/model-c3.py",
+        "sha256": "4b16d7670c221d3704ec34d20d255916d4459d331564d3f4aebb75442364afa1",
+        "target": "mlflow/mlflow#26542",
+        "about": "get_scorer(name)",
+        "claims": [
+          {
+            "id": "C3",
+            "source": "PR description",
+            "text": "If the server omits scorer_version (scorer versioning disabled), the returned scorer\u2019s version and resource-name fields remain None, just as before, and no error is raised.",
+            "covers": [
+              "C3"
+            ],
+            "expect": "same"
+          }
+        ],
+        "runs_per_side": 3,
+        "per_run": [
+          {
+            "side": "main",
+            "run": 1,
+            "seconds": 4.3,
+            "ok": false
+          },
+          {
+            "side": "pr",
+            "run": 1,
+            "seconds": 4.2,
+            "ok": false
+          },
+          {
+            "side": "main",
+            "run": 2,
+            "seconds": 4.2,
+            "ok": false
+          },
+          {
+            "side": "pr",
+            "run": 2,
+            "seconds": 4.5,
+            "ok": false
+          },
+          {
+            "side": "main",
+            "run": 3,
+            "seconds": 4.5,
+            "ok": false
+          },
+          {
+            "side": "pr",
+            "run": 3,
+            "seconds": 4.7,
+            "ok": false
+          }
+        ],
+        "outputs": {
+          "main": [
+            "probe-model-c3-main-1.jsonl",
+            "probe-model-c3-main-2.jsonl",
+            "probe-model-c3-main-3.jsonl"
+          ],
+          "pr": [
+            "probe-model-c3-pr-1.jsonl",
+            "probe-model-c3-pr-2.jsonl",
+            "probe-model-c3-pr-3.jsonl"
+          ]
+        },
+        "runs": {
+          "main": [
+            {
+              "probe.error": {
+                "crash": "non-json output",
+                "exit_code": 1
+              }
+            },
+            {
+              "probe.error": {
+                "crash": "non-json output",
+                "exit_code": 1
+              }
+            },
+            {
+              "probe.error": {
+                "crash": "non-json output",
+                "exit_code": 1
+              }
+            }
+          ],
+          "pr": [
+            {
+              "probe.error": {
+                "crash": "non-json output",
+                "exit_code": 1
+              }
+            },
+            {
+              "probe.error": {
+                "crash": "non-json output",
+                "exit_code": 1
+              }
+            },
+            {
+              "probe.error": {
+                "crash": "non-json output",
+                "exit_code": 1
+              }
+            }
+          ]
+        },
+        "observations": [
+          {
+            "name": "probe.error",
+            "state": "same",
+            "label": "not_testable",
+            "claim": null,
+            "main": {
+              "crash": "non-json output",
+              "exit_code": 1
+            },
+            "pr": {
+              "crash": "non-json output",
+              "exit_code": 1
+            },
+            "citations": {
+              "main": {
+                "file": "probe-model-c3-main-1.jsonl",
+                "line": 1,
+                "quote": "\"observation\": \"probe.error\""
+              },
+              "pr": {
+                "file": "probe-model-c3-pr-1.jsonl",
+                "line": 1,
+                "quote": "\"observation\": \"probe.error\""
+              }
+            }
+          }
+        ],
+        "generator": {
+          "kind": "model",
+          "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+          "model": "nvidia/nemotron-3-super-120b-a12b",
+          "provider": "nebius",
+          "provenance": "live",
+          "blind": true
+        },
+        "freeze": {
+          "sha256": "4b16d7670c221d3704ec34d20d255916d4459d331564d3f4aebb75442364afa1",
+          "generator": {
+            "kind": "model",
+            "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+            "model": "nvidia/nemotron-3-super-120b-a12b",
+            "provider": "nebius",
+            "provenance": "live",
+            "blind": true
+          },
+          "frozen_at": "2026-10-21T20:25:56.277836+00:00",
+          "inputs_sha256": "db4bddf45ad1cba0d9d901717e738330cdbfbddd780c8d58e4d71dea49509ce0",
+          "inputs": {
+            "title_chars": 108,
+            "body_chars": 5181,
+            "base_files": {
+              "mlflow/genai/scorers/registry.py": "40ea88c587a14067f5a0fa08f670013dc187cfd90a5c6b604d0c2ed4fca3f306"
+            }
+          },
+          "verified": true,
+          "pr_started_at": "2026-10-21T20:25:56.432324+00:00"
+        },
+        "probe_changed_line_coverage": {
+          "status": "measured",
+          "changed_lines_total": 25,
+          "changed_lines_covered": 0,
+          "files": [
+            {
+              "file": "mlflow/genai/scorers/registry.py",
+              "changed_lines_total": 25,
+              "changed_lines_covered": 5
+            }
+          ],
+          "adequacy": "not_adequate",
+          "note": "the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate",
+          "exit": 1,
+          "data": "probe-cov-model-c3.json",
+          "changed_lines_touched": 5
+        },
+        "status": "crashed",
+        "uninformative_reason": "the probe crashed or printed no parsed output on every main-side run"
+      },
+      {
+        "id": "model-c4a",
+        "source": "model",
+        "path": "model-probes/model-c4a.py",
+        "sha256": "3dac11617159409f0ef0cac24eeff3ddb23950e281fddccdb3291a27689bb16a",
+        "target": "mlflow/mlflow#26542",
+        "about": "get_scorer(name)",
+        "claims": [
+          {
+            "id": "C4a",
+            "source": "PR description",
+            "text": "get_scorer(name) no longer fails when another scorer in the same experiment cannot be deserialized.",
+            "covers": [
+              "C4a"
+            ],
+            "expect": "differs"
+          }
+        ],
+        "runs_per_side": 3,
+        "per_run": [
+          {
+            "side": "main",
+            "run": 1,
+            "seconds": 4.4,
+            "ok": false
+          },
+          {
+            "side": "pr",
+            "run": 1,
+            "seconds": 4.2,
+            "ok": false
+          },
+          {
+            "side": "main",
+            "run": 2,
+            "seconds": 4.2,
+            "ok": false
+          },
+          {
+            "side": "pr",
+            "run": 2,
+            "seconds": 4.3,
+            "ok": false
+          },
+          {
+            "side": "main",
+            "run": 3,
+            "seconds": 4.3,
+            "ok": false
+          },
+          {
+            "side": "pr",
+            "run": 3,
+            "seconds": 4.4,
+            "ok": false
+          }
+        ],
+        "outputs": {
+          "main": [
+            "probe-model-c4a-main-1.jsonl",
+            "probe-model-c4a-main-2.jsonl",
+            "probe-model-c4a-main-3.jsonl"
+          ],
+          "pr": [
+            "probe-model-c4a-pr-1.jsonl",
+            "probe-model-c4a-pr-2.jsonl",
+            "probe-model-c4a-pr-3.jsonl"
+          ]
+        },
+        "runs": {
+          "main": [
+            {
+              "probe.error": {
+                "crash": "non-json output",
+                "exit_code": 1
+              }
+            },
+            {
+              "probe.error": {
+                "crash": "non-json output",
+                "exit_code": 1
+              }
+            },
+            {
+              "probe.error": {
+                "crash": "non-json output",
+                "exit_code": 1
+              }
+            }
+          ],
+          "pr": [
+            {
+              "probe.error": {
+                "crash": "non-json output",
+                "exit_code": 1
+              }
+            },
+            {
+              "probe.error": {
+                "crash": "non-json output",
+                "exit_code": 1
+              }
+            },
+            {
+              "probe.error": {
+                "crash": "non-json output",
+                "exit_code": 1
+              }
+            }
+          ]
+        },
+        "observations": [
+          {
+            "name": "probe.error",
+            "state": "same",
+            "label": "not_testable",
+            "claim": null,
+            "main": {
+              "crash": "non-json output",
+              "exit_code": 1
+            },
+            "pr": {
+              "crash": "non-json output",
+              "exit_code": 1
+            },
+            "citations": {
+              "main": {
+                "file": "probe-model-c4a-main-1.jsonl",
+                "line": 1,
+                "quote": "\"observation\": \"probe.error\""
+              },
+              "pr": {
+                "file": "probe-model-c4a-pr-1.jsonl",
+                "line": 1,
+                "quote": "\"observation\": \"probe.error\""
+              }
+            }
+          }
+        ],
+        "generator": {
+          "kind": "model",
+          "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+          "model": "nvidia/nemotron-3-super-120b-a12b",
+          "provider": "nebius",
+          "provenance": "live",
+          "blind": true
+        },
+        "freeze": {
+          "sha256": "3dac11617159409f0ef0cac24eeff3ddb23950e281fddccdb3291a27689bb16a",
+          "generator": {
+            "kind": "model",
+            "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+            "model": "nvidia/nemotron-3-super-120b-a12b",
+            "provider": "nebius",
+            "provenance": "live",
+            "blind": true
+          },
+          "frozen_at": "2026-10-21T20:25:56.277915+00:00",
+          "inputs_sha256": "db4bddf45ad1cba0d9d901717e738330cdbfbddd780c8d58e4d71dea49509ce0",
+          "inputs": {
+            "title_chars": 108,
+            "body_chars": 5181,
+            "base_files": {
+              "mlflow/genai/scorers/registry.py": "40ea88c587a14067f5a0fa08f670013dc187cfd90a5c6b604d0c2ed4fca3f306"
+            }
+          },
+          "verified": true,
+          "pr_started_at": "2026-10-21T20:25:56.432324+00:00"
+        },
+        "probe_changed_line_coverage": {
+          "status": "measured",
+          "changed_lines_total": 25,
+          "changed_lines_covered": 0,
+          "files": [
+            {
+              "file": "mlflow/genai/scorers/registry.py",
+              "changed_lines_total": 25,
+              "changed_lines_covered": 5
+            }
+          ],
+          "adequacy": "not_adequate",
+          "note": "the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate",
+          "exit": 1,
+          "data": "probe-cov-model-c4a.json",
+          "changed_lines_touched": 5
+        },
+        "status": "crashed",
+        "uninformative_reason": "the probe crashed or printed no parsed output on every main-side run"
+      }
+    ],
+    "summary": {
+      "labels": [],
+      "flagged": [],
+      "proven_claims": [],
+      "reason": "the probe crashed or printed no parsed output on every main-side run; the probe crashed or printed no parsed output on every main-side run; the probe crashed or printed no parsed output on every main-side run; the probe crashed or printed no parsed output on every main-side run",
+      "ignored_noise": [],
+      "ignored_warning_only": [],
+      "pr_only_noisy": []
+    }
+  },
+  "probe_changed_line_coverage": {
+    "status": "measured",
+    "side": "main",
+    "probes": {
+      "model-c1": {
+        "status": "measured",
+        "changed_lines_covered": 0,
+        "changed_lines_total": 25,
+        "adequacy": "not_adequate"
+      },
+      "model-c2": {
+        "status": "measured",
+        "changed_lines_covered": 0,
+        "changed_lines_total": 25,
+        "adequacy": "not_adequate"
+      },
+      "model-c3": {
+        "status": "measured",
+        "changed_lines_covered": 0,
+        "changed_lines_total": 25,
+        "adequacy": "not_adequate"
+      },
+      "model-c4a": {
+        "status": "measured",
+        "changed_lines_covered": 0,
+        "changed_lines_total": 25,
+        "adequacy": "not_adequate"
+      }
+    },
+    "not_adequate": [
+      "model-c1",
+      "model-c2",
+      "model-c3",
+      "model-c4a"
+    ]
+  },
+  "verdict": "needs_attention",
+  "reason": "3 test(s) removed on the PR side; 1 test(s) re-parametrized (2 -> 1 ids); 64 test(s) ran on main, 65 on the PR; 6 new test(s) pass, 59 unchanged; probe model-c1 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count; probe model-c2 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count; probe model-c3 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count; probe model-c4a is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count",
+  "verdict_before_coverage_gate": "needs_attention",
+  "reason_before_coverage_gate": "3 test(s) removed on the PR side; 1 test(s) re-parametrized (2 -> 1 ids); 64 test(s) ran on main, 65 on the PR; 6 new test(s) pass, 59 unchanged; probe model-c1 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count; probe model-c2 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count; probe model-c3 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count; probe model-c4a is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count",
+  "changed_lines_total": 6,
+  "changed_lines_covered": 6,
+  "coverage_gate": {
+    "kind": "python",
+    "changed": false,
+    "confidence": "normal",
+    "note": "6 of 6 changed executable line(s) ran (100%)",
+    "measurement": "measured"
+  },
+  "agents": {
+    "status": "skipped",
+    "note": "advisory swarm is off",
+    "roles": []
+  },
+  "explanation": {
+    "status": "not yet wired",
+    "why": "advisory swarm is off"
+  },
+  "swarm_requested": false,
+  "operator_approval_requested": false,
+  "swarm": "off",
+  "operator_approval": "off",
+  "what_changed": {
+    "package_python_files": [
+      "mlflow/genai/scorers/registry.py"
+    ],
+    "compiled_files": [],
+    "other_files": [
+      "tests/genai/scorers/test_scorer_CRUD.py",
+      "tests/genai/test_genai_import_without_agent_sdk.py"
+    ]
+  },
+  "duration_s": {
+    "total_wall": 494.1,
+    "tests": 172.7
+  },
+  "cost": {
+    "ai_calls": 2,
+    "failed_ai_calls": 0,
+    "input_tokens": 14584,
+    "output_tokens": 14254,
+    "thinking_tokens": 11167,
+    "cost_usd": 0.017204,
+    "calls_without_usage": 0,
+    "ai_cost_usd": 0.017204,
+    "cost_complete": true,
+    "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+    "compute_seconds": {
+      "total_wall": 494.1,
+      "tests": 172.7
+    },
+    "machine_usd_per_hour": 0.24,
+    "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+    "computer_cost_usd": 0.03294,
+    "total_cost_usd": 0.050144,
+    "swarm": {
+      "ai_calls": 0,
+      "failed_ai_calls": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "thinking_tokens": 0,
+      "cost_usd": 0.0,
+      "calls_without_usage": 0,
+      "ai_cost_usd": 0.0,
+      "cost_complete": true,
+      "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+    }
+  },
+  "head_at_report_sha": "a8d0cee5738e7b703306d449180866dee7c236d3",
+  "head_moved_since_test": false
+}
