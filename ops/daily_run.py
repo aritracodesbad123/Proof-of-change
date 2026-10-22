@@ -1549,7 +1549,8 @@ def _install_with_helper(a, rec, step, venv, checkout, chosen, log, timeout, con
         return str(step).lower().startswith("main")
 
     def _flat_plan() -> dict | None:
-        """The deps-only plan for a flat layout, always from MAIN's files. Main: what main declares. PR side: main's
+        """The deps-only plan for any not-a-package error (flat layout or other), always from MAIN's files.
+        Main: what main declares. PR side: main's
         plan and main's folder, and only when main itself fell back, so a flat layout on the PR side alone stays
         could not verify. The PR's own dependency files are never read."""
         if _is_main():
@@ -1589,19 +1590,22 @@ def _install_with_helper(a, rec, step, venv, checkout, chosen, log, timeout, con
                 if blocked:
                     return False, blocked
         if product_route(a) and demo_helper.not_a_package(text):
-            flat = demo_helper.flat_layout(text)
-            plan = _flat_plan() if flat else demo_helper.deps_only_plan(checkout)
+            plan = _flat_plan()
+            refused = demo_helper.unsafe_requirement_lines(_flat_root(), plan) if plan else []
+            if refused:
+                shutil.rmtree(venv, ignore_errors=True)
+                return False, demo_helper.unsafe_requirements_reason(refused)
             if plan:
                 shutil.rmtree(venv, ignore_errors=True)
                 ok, why = install_deps_only(venv, checkout, plan, log, state["py"], timeout, extra_reqs,
-                                            **({"deps_root": _flat_root()} if flat else {}))
+                                            deps_root=_flat_root())
                 if ok:
                     demo_helper.note_auto_fix(
                         rec, f"Auto-fix: the {step} could not build the project as a package, so only the "
                              f"dependencies it declares ({plan['source']}) were installed, the same way on both "
                              "sides, and the project's own folder was put on the import path.")
                     rec.setdefault("demo_helper", {})["deps_only"] = plan
-                    if flat and _is_main():
+                    if _is_main():
                         rec["demo_helper"]["flat_deps_root"] = str(checkout)
                 else:
                     blocked = _unsupported(_log_text())

@@ -499,3 +499,69 @@ def test_a_dependency_added_only_by_the_pr_is_not_trusted_or_installed(tmp_path,
         assert "added-by-pr" not in blob and installed == []
         notes = " ".join(rec["demo_helper"].get("notes") or [])
         assert "added_by_pr" in notes and "refused" in notes
+
+
+def _other_not_a_package(tmp_path, monkeypatch, rec, step, checkout, calls):
+    monkeypatch.setattr(daily_run, "install_side",
+                        lambda *a, **k: calls.append("install") or _not_a_python_project(*a, **k))
+    monkeypatch.setattr(daily_run, "install_deps_only",
+                        lambda *a, **k: calls.append(("deps", a[1], a[2], k.get("deps_root"))) or (True, ""))
+    a = SimpleNamespace(python="3.14", pr="https://github.com/a/b/pull/1", product_check=True, bench=None)
+    return daily_run._install_with_helper(a, rec, step, tmp_path / ("v-" + step.split()[0]), checkout, None,
+                                          tmp_path / "log", 10, None, None, max_retries=1)
+
+
+def test_other_not_a_package_pr_side_reads_mains_files(tmp_path, monkeypatch):
+    """A not-a-package error that is not a flat layout: the PR side installs from main's files, never its own."""
+    main, pr = tmp_path / "main", tmp_path / "pr"
+    for side in (main, pr):
+        side.mkdir()
+    (main / "requirements.txt").write_text("")
+    (pr / "requirements.txt").write_text("pr-added-dependency\n")
+    calls, rec = [], {}
+    assert _other_not_a_package(tmp_path, monkeypatch, rec, "main install", main, calls)[0] is True
+    assert _other_not_a_package(tmp_path, monkeypatch, rec, "PR install", pr, calls)[0] is True
+    plan = {"kind": "requirements", "files": ["requirements.txt"], "source": "requirements.txt"}
+    assert [c for c in calls if c != "install"] == [("deps", main, plan, main), ("deps", pr, plan, main)]
+
+
+def test_other_not_a_package_on_the_pr_side_only_does_not_fall_back(tmp_path, monkeypatch):
+    (tmp_path / "requirements.txt").write_text("pr-added-dependency\n")
+    calls, rec = [], {}
+    ok, _ = _other_not_a_package(tmp_path, monkeypatch, rec, "PR install", tmp_path, calls)
+    assert ok is False and calls and set(calls) == {"install"}
+
+
+import pytest  # noqa: E402
+
+_REFUSED = ["--index-url https://example.invalid/simple", "--extra-index-url https://example.invalid/simple",
+            "-i https://example.invalid/simple", "-f https://example.invalid/wheels",
+            "--find-links ./wheels", "git+https://example.invalid/x.git", "https://example.invalid/x.tar.gz",
+            "name @ https://example.invalid/x.whl", "-e .", "--editable ./sub", ".", "./sub", "../other",
+            "/abs/path", "local.whl"]
+
+
+@pytest.mark.parametrize("line", _REFUSED)
+def test_deps_only_refuses_off_index_lines(tmp_path, monkeypatch, line):
+    (tmp_path / "requirements.txt").write_text(f"okpkg>=1\n{line}\n")
+    calls, rec = [], {}
+    ok, why = _flat_product(tmp_path, monkeypatch, rec, "main install", tmp_path, calls)
+    assert ok is False and calls == ["install"] and why.startswith("unsupported:")
+    assert "outside the official package index" in why and line.split()[0] in why
+    verdict, reason, _flags = daily_run.tests_verdict(None, why, None, None)
+    assert verdict == "could_not_verify" and reason == why
+
+
+def test_deps_only_refuses_off_index_lines_in_included_files(tmp_path):
+    (tmp_path / "requirements.txt").write_text("-r requirements-base.txt\n")
+    (tmp_path / "requirements-base.txt").write_text("-e .\n")
+    plan = demo_helper.deps_only_plan(tmp_path)
+    assert demo_helper.unsafe_requirement_lines(tmp_path, plan) == ["requirements-base.txt: -e ."]
+
+
+def test_deps_only_allows_plain_index_requirements(tmp_path):
+    (tmp_path / "requirements.txt").write_text("# c\nokpkg>=1  # note\nother[extra]==2; python_version>'3.8'\n"
+                                               "-r requirements-dev.txt\n-c constraints.txt\n")
+    (tmp_path / "requirements-dev.txt").write_text("devpkg\n")
+    (tmp_path / "constraints.txt").write_text("okpkg<3\n")
+    assert demo_helper.unsafe_requirement_lines(tmp_path, demo_helper.deps_only_plan(tmp_path)) == []

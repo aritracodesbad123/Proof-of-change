@@ -1810,6 +1810,62 @@ def deps_only_plan(checkout) -> dict | None:
     return None
 
 
+_OFF_INDEX_OPTION = re.compile(r"^(?:--index-url|--extra-index-url|-i|-f|--find-links|-e|--editable)(?:[\s=]|$)")
+_URL_LINE = re.compile(r"(?:^|[\s@])(?:git\+|hg\+|svn\+|bzr\+)?[a-z][a-z0-9+.-]*://", re.I)
+_INCLUDE = re.compile(r"^(?:-r|--requirement|-c|--constraint)(?:\s+|=)(\S+)")
+
+
+def _local_path_line(line: str) -> bool:
+    """A requirement line that names a local folder or file (``.``, ``./x``, ``../x``, ``/x``, ``~/x``, ``x.whl``)."""
+    head = line.split(";")[0].split()[0] if line.split() else ""
+    return (head in (".", "..") or head.startswith(("./", "../", "/", "~", "file:"))
+            or head.endswith((".whl", ".tar.gz", ".zip")) or "/" in head.split("[")[0])
+
+
+def unsafe_requirement_lines(root, plan: dict | None, _seen=None) -> list[str]:
+    """Requirement lines in a deps-only plan's files that install from outside the official index.
+
+    Refused: --index-url, --extra-index-url, -i, -f/--find-links, -e/--editable, git+ or any URL, and local paths
+    (``.`` included). Files pulled in with -r/-c are checked too. A ``-e .`` from main would install main's own code
+    into the PR side and hide the PR's change, so any of these ends the fallback. Empty list: nothing refused."""
+    if not plan or plan.get("kind") != "requirements":
+        return []
+    root = Path(root)
+    seen = set() if _seen is None else _seen
+    bad: list[str] = []
+    for name in plan.get("files") or []:
+        path = (root / name).resolve()
+        if path in seen:
+            continue
+        seen.add(path)
+        try:
+            text = path.read_text(errors="replace")
+        except OSError:
+            continue
+        for raw in text.splitlines():
+            line = raw.split(" #")[0].strip()
+            if not line or line.startswith("#"):
+                continue
+            inc = _INCLUDE.match(line)
+            if inc:
+                target = inc.group(1)
+                if _URL_LINE.search(target) or Path(target).is_absolute() or ".." in Path(target).parts:
+                    bad.append(f"{name}: {line[:120]}")
+                else:
+                    bad += unsafe_requirement_lines(path.parent, {"kind": "requirements", "files": [target]}, seen)
+                continue
+            if _OFF_INDEX_OPTION.match(line) or _URL_LINE.search(line) or _local_path_line(line):
+                bad.append(f"{name}: {line[:120]}")
+    return bad
+
+
+def unsafe_requirements_reason(lines: list[str]) -> str:
+    """The could-not-verify reason when the deps-only fallback refuses off-index requirement lines."""
+    shown = "; ".join(lines[:3]) + (" and more" if len(lines) > 3 else "")
+    return ("unsupported: the project's declared dependencies point outside the official package index "
+            f"({shown}), so they were not installed and nothing was tested")
+
+
 _WRONG_PYTHON = re.compile(
     r"(?:requires-python|requires a different python|no interpreter found|python_requires|"
     r"does not satisfy|not compatible with python|requires python)[^\n]*?(3\.(?:1\d|[6-9]))", re.I)
