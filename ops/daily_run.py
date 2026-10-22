@@ -4731,7 +4731,10 @@ def _batch_diagnose(a, repo: str, cfg: dict, why: str) -> None:
     from poc import demo_helper
     name = demo_helper.gap_name(why)
     got = demo_helper.live_fetch(f"{repo} {name} python install setup error {why[:120]}")
-    text = demo_helper._lookup_text(demo_helper.scope_lookup(got, repo, cfg.get("dist") or "")) if got.get("ok") else ""
+    trusted = demo_helper.trusted_lookup(demo_helper.scope_lookup(got, repo, cfg.get("dist") or ""), repo) \
+        if got.get("ok") else {"results": [], "sources": []}
+    text = demo_helper._lookup_text(trusted)
+    print(f"Diagnosis sources (trusted only): {', '.join(trusted['sources']) or 'none'}", flush=True)
     parts = split_repo(repo) or ("", "")
     fixes = getattr(a, "batch_fix_reqs", None)
     if fixes is None:
@@ -4748,7 +4751,7 @@ def _batch_diagnose(a, repo: str, cfg: dict, why: str) -> None:
     sys_staged = (getattr(a, "batch_fix_system", None) or {})
     a.batch_fix_system = sys_staged
     names = sys_staged.setdefault(repo, [])
-    names.extend(n for n in fix["install"] if n not in names)
+    names.extend(n for n in fix["install"] if n not in names and demo_helper.apt_available(n))
     for item in fix["refused"]:
         print(f"Setup plan: refused system package {item['name']}: {item['reason']}", flush=True)
     if not got.get("ok"):

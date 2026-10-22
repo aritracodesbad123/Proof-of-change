@@ -1089,6 +1089,57 @@ _SYSTEM_MARKERS = (
 _APT_INSTALL = re.compile(r"apt(?:-get)?\s+install\s+(?:-y\s+)?((?:[a-z0-9][a-z0-9.+-]+\s*)+)")
 
 
+def trusted_url(url: str, repo: str, declared_urls=()) -> bool:
+    """Rule (a): install steps come only from the project's own GitHub org, its GitHub Pages site, or a homepage or
+    docs host the project itself declares. Every other site is ignored."""
+    try:
+        parsed = urllib.parse.urlparse(str(url or ""))
+    except ValueError:
+        return False
+    host = (parsed.hostname or "").lower()
+    if parsed.scheme not in ("https", "http") or not host:
+        return False
+    parts = split_repo(repo or "")
+    owner = parts[0].lower() if parts else ""
+    if owner and host in ("github.com", "raw.githubusercontent.com"):
+        segs = [seg for seg in parsed.path.split("/") if seg]
+        return bool(segs) and segs[0].lower() == owner
+    if owner and host == f"{owner}.github.io":
+        return True
+    for declared in declared_urls or ():
+        try:
+            dhost = (urllib.parse.urlparse(str(declared)).hostname or "").lower()
+        except ValueError:
+            continue
+        if dhost and dhost not in ("github.com", "pypi.org") and (host == dhost or host.endswith("." + dhost)):
+            return True
+    return False
+
+
+def trusted_lookup(payload, repo: str, declared_urls=()) -> dict:
+    """Keep only results from trusted pages; drop the free-text answer, which has no source page."""
+    if not isinstance(payload, dict):
+        return {"results": [], "sources": []}
+    kept = [item for item in payload.get("results") or []
+            if isinstance(item, dict) and trusted_url(item.get("url"), repo, declared_urls)]
+    return {"results": kept, "answer": None, "sources": [item.get("url") for item in kept]}
+
+
+def apt_available(name: str, run=None) -> bool:
+    """Rule (b): an OS package must exist in the distro archive (apt-cache policy shows a candidate)."""
+    import subprocess
+    if not safe_apt_name(name):
+        return False
+    run = run or (lambda cmd: subprocess.run(cmd, capture_output=True, text=True, timeout=30))
+    try:
+        out = run(["apt-cache", "policy", name])
+    except Exception:  # noqa: BLE001 — no apt means the package cannot be confirmed
+        return False
+    text = getattr(out, "stdout", "") or ""
+    m = re.search(r"Candidate:\s*(\S+)", text)
+    return bool(m and m.group(1) != "(none)")
+
+
 def system_fix_for(error_text: str, lookup_text: str = "") -> dict:
     """Map a missing system library to OS packages. Only names on SYSTEM_ALLOWLIST pass; others are refused."""
     low = (error_text or "").lower()
@@ -1736,7 +1787,7 @@ def _emit_retry(detail: str) -> None:
 
 def retry_unverified(rec: dict, rerun, install_one, declared, tavily_text: str, pypi, repo: str,
                      allow_system: bool, install_system=None, lookup=None, recheck_coverage=None,
-                     max_tries: int = MAX_GAP_TRIES) -> dict:
+                     max_tries: int = MAX_GAP_TRIES, declared_urls=(), apt_check=None) -> dict:
     """Up to ``max_tries`` reruns when a could-not-verify result is a setup or import gap.
 
     Each try: look the error up (Tavily, when a lookup is given), install the fix on main and pr, rerun the step.
@@ -1757,6 +1808,7 @@ def retry_unverified(rec: dict, rerun, install_one, declared, tavily_text: str, 
         return rec
     parts = split_repo(repo or "")
     owner, repo_name = parts if parts else ("", "")
+    apt_check = apt_check or apt_available
     rounds = [{"round": 1, "verdict": rec.get("verdict"), "reason": rec.get("reason")}]
     tries: list[dict] = []
     all_logs: list[dict] = []
@@ -1767,20 +1819,22 @@ def retry_unverified(rec: dict, rerun, install_one, declared, tavily_text: str, 
         name = gap_name(text)
         query = f"{repo} {name} python install"
         looked = False
+        sources: list[str] = []
         if lookup is not None:
             try:
                 extra = lookup(query)
             except Exception:  # noqa: BLE001 — keep going with the error text and the project files
                 extra = None
             if isinstance(extra, dict):
-                extra = scope_lookup(extra, repo, str(rec.get("library") or ""))
+                extra = trusted_lookup(scope_lookup(extra, repo, str(rec.get("library") or "")), repo, declared_urls)
                 looked = True
+                sources = list(extra.get("sources") or [])
             lookup_text = lookup_text + "\n" + _lookup_text(extra)
         specs = _gap_specs(text, declared, lookup_text, pypi, owner, repo_name, notes)
         repeat = [spec for spec in specs if norm(req_name(spec["requirement"])) in tried]
         specs = [spec for spec in specs if norm(req_name(spec["requirement"])) not in tried]
         tried.update(norm(req_name(spec["requirement"])) for spec in specs)
-        entry = {"try": attempt, "problem": name, "lookup": query if looked else None,
+        entry = {"try": attempt, "problem": name, "lookup": query if looked else None, "sources": sources,
                  "planned": [spec["requirement"] for spec in specs], "installed": [], "rerun": False}
         sys_fix = system_fix_for(text, lookup_text)
         for item in sys_fix["refused"]:
@@ -1794,7 +1848,10 @@ def retry_unverified(rec: dict, rerun, install_one, declared, tavily_text: str, 
                 tries.append(entry)
                 _emit_retry(f"Try {attempt} of {max_tries}: {name}: {entry['result']}")
                 break
-            got = [n for n in sys_names if install_system(n)]
+            missing = [n for n in sys_names if not apt_check(n)]
+            for n in missing:
+                notes.append(f"Setup plan: refused system package {n}: not found in the distro archive")
+            got = [n for n in sys_names if n not in missing and install_system(n)]
             entry["installed"] = [f"system package {n}" for n in got]
             if not got:
                 entry["result"] = "system package install failed on main or pr"
