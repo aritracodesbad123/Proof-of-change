@@ -1,7 +1,7 @@
 # Records may say coverage was not measured
 
 **Date:** 2026-10-22
-**Status:** proposed
+**Status:** accepted
 
 ## What changed
 
