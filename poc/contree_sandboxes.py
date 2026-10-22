@@ -8,6 +8,7 @@ Secrets never enter Contree shell env. Concurrent ops are capped at CONTREE_MAX_
 from __future__ import annotations
 
 import os
+import re
 import shlex
 import threading
 from pathlib import Path
@@ -286,6 +287,47 @@ class ContreeSession:
         cmd = " ".join(shlex.quote(str(a)) for a in argv)
         shell = f"set -euo pipefail\ncd {shlex.quote(cwd)}\n{cmd}"
         return self.run_op(side, shell, disposable=True, timeout=timeout, files=files)
+
+
+_PY_VERSION_OUT = re.compile(r"^Python (\d+)\.(\d+)(?:\.(\d+))?\S*\s*$")
+
+
+def parse_python_version(raw: dict | None) -> str:
+    """'X.Y.Z' from a `python --version` result, or '' when the run failed or printed something else."""
+    if not isinstance(raw, dict) or raw.get("exit_code") != 0:
+        return ""
+    text = ((raw.get("stdout") or "") + "\n" + (raw.get("stderr") or "")).strip().splitlines()
+    for line in text:
+        m = _PY_VERSION_OUT.match(line.strip())
+        if m:
+            return ".".join(g for g in m.groups() if g is not None)
+    return ""
+
+
+def side_pythons(sess: "ContreeSession", specs: list[str], *, timeout: int = 120) -> dict:
+    """Which Python actually runs on each side's Contree checkpoint, checked against the project's requires-python.
+
+    Runs `python --version` from the main and PR checkpoints (the same place the tests run). Each side whose
+    version cannot be read, or does not satisfy requires-python, adds a problem. A non-empty `problems` list means
+    the check must not pass as a normal result."""
+    from poc import demo_helper
+    clauses = [c for text in specs or [] for c in demo_helper._py_clauses(text)]
+    out: dict = {"requires_python": [s for s in specs or [] if s], "main": "", "pr": "", "problems": []}
+    for side in ("main", "pr"):
+        try:
+            raw = sess.run_argv(side, ["python", "--version"], timeout=timeout, cwd="/work")
+        except ContreeError as e:
+            raw = {"exit_code": None, "stderr": f"{type(e).__name__}"}
+        version = parse_python_version(raw)
+        out[side] = version
+        if not version:
+            out["problems"].append(f"{side}: the Python version inside Contree could not be read")
+            continue
+        minor = demo_helper._minor(version)
+        if clauses and (minor is None or not demo_helper._py_satisfies(minor, clauses)):
+            out["problems"].append(f"{side}: Contree ran Python {version}, which does not satisfy requires-python "
+                                   f"{', '.join(out['requires_python'])}")
+    return out
 
 
 def new_session(**kw) -> ContreeSession:

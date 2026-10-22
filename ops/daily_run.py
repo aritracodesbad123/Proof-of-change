@@ -2448,7 +2448,7 @@ def _contree_ready() -> bool:
 
 
 def _maybe_prepare_contree(a, repo: str, main_sha: str, pr_sha: str, rec: dict, timeout: int,
-                           extra_shell: str = "") -> str | None:
+                           extra_shell: str = "", main_dir=None) -> str | None:
     """Build Contree main/PR checkpoints for source-pair. On failure return a refusal; there is no local bubblewrap
     fallback (no pull-request code runs). Returns None when the check may continue.
 
@@ -2465,6 +2465,8 @@ def _maybe_prepare_contree(a, repo: str, main_sha: str, pr_sha: str, rec: dict, 
         rec["machine"] = "contree"
         rec["sandbox_backend"] = "contree"
         rec["sandbox_backend_note"] = contree_sandboxes.note()
+        if product_route(a):
+            return _check_contree_pythons(sess, rec, main_dir)
         return None
     except contree_sandboxes.ContreeError as e:
         contree_sandboxes.clear_session()
@@ -2474,6 +2476,22 @@ def _maybe_prepare_contree(a, repo: str, main_sha: str, pr_sha: str, rec: dict, 
         rec["machine"] = "contree (not run)"
         rec["contree"] = entry
         return refusal
+
+
+def _check_contree_pythons(sess, rec: dict, main_dir) -> str | None:
+    """Record the Python each Contree side ran and refuse the check when it is unreadable or outside requires-python.
+
+    requires-python comes from main's checkout only, so a PR cannot loosen it. A refusal caps the result at
+    could_not_verify; it never becomes a normal result."""
+    from poc import contree_sandboxes, demo_helper
+    specs: list[str] = []
+    if main_dir is not None and Path(main_dir).is_dir():
+        specs, _declared = demo_helper._python_from_checkout(Path(main_dir))
+    info = contree_sandboxes.side_pythons(sess, specs)
+    rec.setdefault("contree", {})["python"] = info
+    if info["problems"]:
+        return "Contree Python check failed: " + "; ".join(info["problems"])
+    return None
 
 
 def contree_only_extra_shell(declared: list[str], optional: list[str], base: str = "") -> str:
@@ -3892,7 +3910,7 @@ def _contree_only_pair(a, rec: dict, repo: str, cfg: dict, item: dict, sp: dict,
     rec["coverage"] = {"status": "not measured", "why": CONTREE_ONLY_COVERAGE_WHY}
     run_progress.emit("install_main", detail="installing main and PR sides in Contree")
     cnv = _maybe_prepare_contree(a, repo, sp["main_sha"], sp["pr_sha"], rec, a.build_timeout,
-                                 extra_shell=contree_only_extra_shell(decl, optional, base))
+                                 extra_shell=contree_only_extra_shell(decl, optional, base), main_dir=cm)
     cmp = ex = None
     if cnv:
         rec["contree_only"]["note"] = "Contree mode: Contree did not run, so nothing from the pull request was run"
@@ -4370,9 +4388,9 @@ def test_source_pair(repo: str, cfg: dict, item: dict, prdir: Path, work: Path, 
                 if helper_on:
                     shell = demo_helper.contree_shell(setup_plan) if setup_plan else ""
                     cnv = _maybe_prepare_contree(a, repo, sp["main_sha"], sp["pr_sha"], rec, a.build_timeout,
-                                                 extra_shell=shell)
+                                                 extra_shell=shell, main_dir=cm)
                 else:
-                    cnv = _maybe_prepare_contree(a, repo, sp["main_sha"], sp["pr_sha"], rec, a.build_timeout)
+                    cnv = _maybe_prepare_contree(a, repo, sp["main_sha"], sp["pr_sha"], rec, a.build_timeout, main_dir=cm)
             if cnv:
                 pass
             elif not targets["pr"]:
