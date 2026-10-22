@@ -1,5 +1,4 @@
 """Behavioural probes get the project's own test settings, read generically from its pytest config and conftest."""
-from pathlib import Path
 
 from ops import daily_run
 from poc import test_settings
@@ -73,7 +72,8 @@ def test_contree_probe_gets_the_same_settings_as_exports(tmp_path):
 
 def test_run_probes_passes_the_project_env_to_each_side(tmp_path, monkeypatch):
     from types import SimpleNamespace
-    from poc import probes, freeze
+
+    from poc import freeze, probes
     for side in ("main", "pr"):
         (tmp_path / f"venv-{side}" / "bin").mkdir(parents=True)
         (tmp_path / f"side-{side}").mkdir()
