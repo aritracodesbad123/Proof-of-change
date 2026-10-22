@@ -545,10 +545,13 @@ def _case_view(root: Path, meta_case: dict, names: list[str], by_arm: dict[str, 
 
 
 def build(root: Path) -> dict:
-    """Report data from one results folder. Summaries are bench.summarize's own objects."""
+    """Report data from one results folder. Summaries are bench.summarize's own objects.
+
+    load() runs first, so a missing run_meta.json raises the same SystemExit summarize raises.
+    """
     root = Path(root)
-    meta = json.loads((root / "run_meta.json").read_text())
     arms = load(root)
+    meta = json.loads((root / "run_meta.json").read_text())
     summary = summarize(arms)
     names = _arm_order(meta, arms)
     index = {arm: {row["case_id"]: row for row in rows} for arm, rows in arms.items()}
@@ -575,8 +578,29 @@ def build(root: Path) -> dict:
     }
 
 
+def _one_line(value) -> str:
+    """Collapse line breaks so a table cell or heading cannot gain a new Markdown line."""
+    return str(value).replace("\r\n", " ").replace("\r", " ").replace("\n", " ").replace("\u2028", " ").replace("\u2029", " ")
+
+
 def _md_cell(value) -> str:
-    return str(value).replace("\\", "\\\\").replace("|", "\\|").replace("\n", " ")
+    return _one_line(value).replace("\\", "\\\\").replace("|", "\\|")
+
+
+def _quoted_block(text: str) -> str:
+    """Fence record and model text. The fence is longer than any backtick run inside, so the text cannot close it."""
+    body = str(text).replace("\r\n", "\n").replace("\r", "\n").replace("\u2028", "\n").replace("\u2029", "\n")
+    if not body.endswith("\n"):
+        body += "\n"
+    longest = run = 0
+    for ch in body:
+        if ch == "`":
+            run += 1
+            longest = max(longest, run)
+        else:
+            run = 0
+    fence = "`" * max(3, longest + 1)
+    return f"{fence}\n{body}{fence}"
 
 
 def _md_table(headers: list[str], rows: list[list]) -> list[str]:
@@ -587,11 +611,12 @@ def _md_table(headers: list[str], rows: list[list]) -> list[str]:
 
 
 def _md_arm_blocks(blocks: list[tuple[str, list[str]]]) -> list[str]:
+    """Arm names stay labels. Every quoted line from a record or the model is inside one fence."""
     lines = []
     for name, body in blocks:
-        lines.append(f"**{name}**")
+        lines.append(f"**{_one_line(name)}**")
         lines.append("")
-        lines.extend(body)
+        lines.append(_quoted_block("\n".join(body) if body else MISSING))
         lines.append("")
     return lines
 
@@ -648,7 +673,7 @@ def render_markdown(doc: dict) -> str:
     lines.extend(_md_table(["Field", "Recorded"], doc.get("environment") or []))
     lines.append("")
     for case in doc.get("cases") or []:
-        lines.extend([f"## Case {case['id']}", ""])
+        lines.extend([f"## Case {_one_line(case['id'])}", ""])
         if case.get("sample"):
             lines.extend(["SAMPLE", ""])
         lines.extend([case["decision"], ""])

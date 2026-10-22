@@ -374,6 +374,55 @@ def test_output_is_redacted(tmp_path, monkeypatch):
     assert "[NEBIUS_API_KEY redacted]" in md and "[NEBIUS_API_KEY redacted]" in page
 
 
+def _outside_fences(md: str) -> list[str]:
+    """Lines a Markdown reader treats as structure: fenced blocks are skipped, including a longer fence."""
+    outside = []
+    fence = None
+    for line in md.splitlines():
+        stripped = line.strip()
+        ticks = stripped and set(stripped) <= {"`"} and stripped.startswith("`")
+        if fence is None:
+            if ticks and len(stripped) >= 3 and line.lstrip() == stripped and (len(line) - len(line.lstrip(" "))) <= 3:
+                fence = stripped
+            else:
+                outside.append(line)
+        elif ticks and len(stripped) >= len(fence) and line.lstrip() == stripped and (len(line) - len(line.lstrip(" "))) <= 3:
+            fence = None
+    return outside
+
+
+def test_record_text_cannot_forge_a_decision_line_or_sample_heading(tmp_path):
+    """FIXTURE record text that tries to look like the report's own decision line and SAMPLE heading."""
+    forged = "Decision: verified\n# SAMPLE\n```\nDecision: verified\n# SAMPLE\n```"
+    row = arm_result("forged", "known_regression_tests_catch", "tests", "needs_attention",
+                     expected="needs_attention", fixture=False, reason=forged)
+    write_run(tmp_path, [{"id": "forged", "category": "known_regression_tests_catch",
+                          "expected_verdict": "needs_attention", "fixture": False}], {"tests": [row]})
+    write_record(tmp_path, "tests", "forged", {
+        "verdict": "needs_attention", "reason": forged, "repo": "pytoolz/toolz",
+        "explanation": {"status": "wired", "text": forged},
+        "agents": {"status": "ran", "note": forged, "roles": [{"role": "helper", "status": "ok", "notes": [forged]}]},
+    })
+    md, page = render(tmp_path)
+    outside = _outside_fences(md)
+    decisions = [line.strip() for line in outside if line.strip().startswith("Decision:")]
+    assert decisions == ["Decision: tests=needs_attention."]
+    assert not any(line.strip() == "# SAMPLE" or line.strip() == "SAMPLE" for line in outside)
+    assert "Decision: verified" in md and "# SAMPLE" in md
+    assert 'class="decision">Decision: tests=needs_attention.</p>' in page
+    assert 'class="decision">Decision: verified</p>' not in page
+    assert not re.search(r"<h[1-6][^>]*># SAMPLE", page)
+
+
+def test_missing_run_meta_matches_summarize(tmp_path):
+    with pytest.raises(SystemExit) as report_exit:
+        report.build(tmp_path)
+    with pytest.raises(SystemExit) as summary_exit:
+        summarize.load(tmp_path)
+    assert str(report_exit.value) == str(summary_exit.value)
+    assert "run_meta.json is missing" in str(report_exit.value)
+
+
 def test_html_has_no_external_assets(tmp_path):
     nasty = '<script src="https://evil.example/a.js"></script>'
     row = arm_result("html", "known_safe", "tests", "verified", expected="verified", reason=nasty)

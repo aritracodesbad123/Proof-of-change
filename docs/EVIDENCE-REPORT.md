@@ -70,6 +70,10 @@ Under the decision, each arm shows:
 | Runtime | `wall_seconds` and `check_duration_s` |
 | Model calls and cost | `model.ai_calls`, token counts, `provider`, `model.cost_usd` |
 
+Record text and model text are written inside a fenced code block. The fence is longer than any
+backtick run in that text, so a line inside it cannot become a heading or a `Decision:` line.
+Table cells are kept on one line.
+
 The strongest supporting evidence is quoted next, per arm, and only from executed results: a probe
 finding that held on all 3 runs of each side (the same condition `bench.run.probe_held` uses), then
 failing test names from `comparison.regressions`, `comparison.new_tests_failing`, and
