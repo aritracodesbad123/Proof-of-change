@@ -53,10 +53,11 @@ sys.path.insert(0, str(REPO_ROOT))
 from guardrails import sandbox  # noqa: E402
 from guardrails.isolation import untrusted_env  # noqa: E402
 from harness.machine import detect_machine_type  # noqa: E402
-from poc.tool_setup import ToolSetupError, ensure_tools, last_result as tool_setup_result, uv_bin  # noqa: E402
 from poc import agents, behaviour_claims, cost, coverage_gate, diff_probes, freeze, local_config, model_probes, model_provider, probes  # noqa: E402,E501
 from poc.diff import confirm, pr_runs_too_noisy  # noqa: E402
 from poc.pr_text import github_read_token  # noqa: E402
+from poc.tool_setup import ToolSetupError, ensure_tools, uv_bin  # noqa: E402
+from poc.tool_setup import last_result as tool_setup_result  # noqa: E402
 from poc.verdict import Claim, FindingLabel, RunSummary, Verdict, pr_verdict  # noqa: E402
 
 IST = dt.timezone(dt.timedelta(hours=5, minutes=30))
