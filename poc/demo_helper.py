@@ -957,18 +957,46 @@ def lint_only_requirement_files(root, ignore=()) -> list[Path]:
 
 
 def _scope_refused(root: Path, comp: str | None, reqs, skip) -> list[str]:
-    """Lines that would install from outside the official index: the component's manifest lines and every line of
-    the core requirements files that are still installed."""
+    """Lines that would install from outside the official index: the component's manifest lines, every line of the
+    core requirements files that are still installed, and every line of each file they include with -r/-c,
+    followed recursively (cycles stop), even when an included file is on a skip list. An include with a ``..``
+    part, or one that resolves outside the project (symlinks included), or that is missing, is itself refused."""
     bad = [f"{comp}/{COMPONENT_MANIFEST}: {line[:120]}" for line in reqs if _refused_line(line)] if comp else []
+    root = Path(root).resolve()
     skip = {Path(p).resolve() for p in skip}
-    for path in _requirement_files(root):
-        if path.resolve() in skip:
-            continue
+    done: set = set()
+
+    def label(path: Path) -> str:
+        return path.relative_to(root).as_posix()
+
+    def walk(path: Path) -> None:
+        if path in done:
+            return
+        done.add(path)
         for line in _requirement_lines(_read(path)):
-            if _INCLUDE.match(line):
-                continue   # -r/-c of another file: that file is checked on its own
-            if _refused_line(line):
-                bad.append(f"{path.relative_to(root).as_posix()}: {line[:120]}")
+            inc = _INCLUDE.match(line)
+            if not inc:
+                if _refused_line(line):
+                    bad.append(f"{label(path)}: {line[:120]}")
+                continue
+            target = inc.group(1)
+            if ".." in PurePosixPath(target).parts or target.startswith(("/", "~")) or "://" in target:
+                bad.append(f"{label(path)}: {line[:120]} (include outside the project)")
+                continue
+            full = (path.parent / target).resolve()
+            if not full.is_relative_to(root) or not full.is_file():
+                bad.append(f"{label(path)}: {line[:120]} (include outside the project or missing)")
+                continue
+            walk(full)
+
+    for path in _requirement_files(root):
+        full = path.resolve()
+        if full in skip:
+            continue
+        if not full.is_relative_to(root):
+            bad.append(f"{path.name}: resolves outside the project")
+            continue
+        walk(full)
     return bad
 
 

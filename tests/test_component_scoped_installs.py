@@ -230,3 +230,42 @@ def test_lint_only_requirement_file_is_skipped_from_content(tmp_path):
     assert names == ["requirements_lint_pins.txt"]
     (main / ".pre-commit-config.yaml").unlink()
     assert demo_helper.lint_only_requirement_files(main) == []
+
+
+def test_constraint_file_not_named_requirements_is_checked(tmp_path):
+    main = _app(tmp_path / "main")
+    (main / "app" / "constraints.txt").write_text("pinned==1.0\nevil @ https://x.invalid/e.whl\n")
+    (main / "requirements.txt").write_text("-c app/constraints.txt\ncore-lib==1.0\n")
+    plan = _plan(main, main, ["app/components/two/x.py"])
+    assert plan["scope_blocked"].startswith("unsupported:") and "app/constraints.txt" in plan["scope_blocked"]
+    assert plan["component"] is None and "lib-two==2.0" not in plan["extra_reqs"]
+
+
+def test_included_lint_only_file_is_still_checked(tmp_path):
+    main = _app(tmp_path / "main")
+    (main / ".pre-commit-config.yaml").write_text("repos:\n  - repo: https://github.com/example/lint-tool\n")
+    (main / "requirements_lint_pins.txt").write_text("lint-tool==1.0\n")
+    assert [p.name for p in demo_helper.lint_only_requirement_files(main)] == ["requirements_lint_pins.txt"]
+    assert _plan(main, main, ["app/components/two/x.py"])["scope_blocked"] == ""
+    (main / "requirements_lint_pins.txt").write_text("lint-tool @ https://x.invalid/lint.whl\n")
+    assert [p.name for p in demo_helper.lint_only_requirement_files(main)] == ["requirements_lint_pins.txt"]
+    (main / "requirements_test.txt").write_text("-r requirements.txt\n-r requirements_lint_pins.txt\ntest-lib==1.0\n")
+    plan = _plan(main, main, ["app/components/two/x.py"])
+    assert plan["scope_blocked"].startswith("unsupported:") and "requirements_lint_pins.txt" in plan["scope_blocked"]
+
+
+def test_include_outside_the_project_is_refused(tmp_path):
+    outside = tmp_path / "outside.txt"
+    outside.write_text("fine==1.0\n")
+    for include in ("-r ../outside.txt", "-c sub/../requirements.txt", "-r link.txt"):
+        main = _app(tmp_path / f"m{abs(hash(include))}")
+        (main / "link.txt").symlink_to(outside)
+        (main / "requirements.txt").write_text(f"{include}\ncore-lib==1.0\n")
+        plan = _plan(main, main, ["app/components/two/x.py"])
+        assert plan["scope_blocked"].startswith("unsupported:"), include
+
+
+def test_include_cycle_terminates(tmp_path):
+    main = _app(tmp_path / "main")
+    (main / "requirements.txt").write_text("-r requirements_test.txt\ncore-lib==1.0\n")
+    assert _plan(main, main, ["app/components/two/x.py"])["scope_blocked"] == ""
