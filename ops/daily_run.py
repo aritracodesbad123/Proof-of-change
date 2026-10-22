@@ -5332,11 +5332,11 @@ def given_commit(root: Path | None, expected: str) -> str:
 def resolve_poc_commit(root: Path | None = None) -> str:
     """Stamp every run with a known Proof-of-Change commit.
 
-    Local checkout: fast-forward to origin/main. Docker/Render images ship without .git
+    Local checkout (.git folder, or .git file in a worktree): fast-forward to origin/main. Docker/Render images ship without .git
     (.dockerignore); use POC_COMMIT or Render's RENDER_GIT_COMMIT instead.
     """
     root = root or REPO_ROOT
-    if (root / ".git").is_dir():
+    if (root / ".git").exists():  # a folder, or a file in a git worktree
         return sync_to_origin_main(root)
     for key in ("POC_COMMIT", "RENDER_GIT_COMMIT"):
         sha = (os.environ.get(key) or "").strip().lower()
