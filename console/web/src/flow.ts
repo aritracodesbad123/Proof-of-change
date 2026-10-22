@@ -4,8 +4,10 @@ export type NodeId =
   | 'intake'
   | 'checkout-base'
   | 'checkout-head'
+  | 'setup-python'
   | 'install-base'
   | 'install-head'
+  | 'install-deps'
   | 'existing-tests'
   | 'ai-write'
   | 'human-review'
@@ -32,8 +34,10 @@ export const FLOW_ORDER: NodeId[] = [
   'intake',
   'checkout-base',
   'checkout-head',
+  'setup-python',
   'install-base',
   'install-head',
+  'install-deps',
   'existing-tests',
   'ai-write',
   'human-review',
@@ -45,39 +49,53 @@ export const FLOW_ORDER: NodeId[] = [
 ]
 
 const COPY: Record<NodeId, { label: string; hint: string; x: number; y: number }> = {
-  intake: { label: 'PR intake', hint: 'Read the pull request.', x: 70, y: 150 },
-  'checkout-base': { label: 'Checkout original', hint: 'The code before the change.', x: 250, y: 48 },
-  'checkout-head': { label: 'Checkout the change', hint: 'The code the pull request adds.', x: 250, y: 252 },
-  'install-base': { label: 'Install original', hint: 'Install the original side.', x: 460, y: 48 },
-  'install-head': { label: 'Install the change', hint: 'Install the change in a sandbox.', x: 460, y: 252 },
-  'existing-tests': { label: 'Run existing tests', hint: 'The project’s own tests, on both sides.', x: 700, y: 48 },
-  'ai-write': { label: 'AI writes probes', hint: 'Behaviour probes written for this change.', x: 700, y: 252 },
+  intake: { label: 'PR intake', hint: 'Read the pull request.', x: 40, y: 150 },
+  'checkout-base': { label: 'Checkout original', hint: 'The code before the change.', x: 220, y: 48 },
+  'checkout-head': { label: 'Checkout the change', hint: 'The code the pull request adds.', x: 220, y: 252 },
+  'setup-python': {
+    label: 'Set up Python',
+    hint: 'The Python version the project asks for, installed in the sandbox and the same on both sides.',
+    x: 400,
+    y: 150,
+  },
+  'install-base': { label: 'Install original', hint: 'Install the original side.', x: 580, y: 48 },
+  'install-head': { label: 'Install the change', hint: 'Install the change in a sandbox.', x: 580, y: 252 },
+  'install-deps': {
+    label: 'Install dependencies',
+    hint: 'Every library the project lists, the same on both sides. Tests start only after this succeeds.',
+    x: 760,
+    y: 150,
+  },
+  'existing-tests': { label: 'Run existing tests', hint: 'The project’s own tests, on both sides.', x: 940, y: 48 },
+  'ai-write': { label: 'AI writes probes', hint: 'Behaviour probes written for this change.', x: 940, y: 252 },
   'human-review': {
     label: 'Human review',
     hint: 'You keep or drop each probe and add your own test ideas before anything runs.',
-    x: 900,
+    x: 1120,
     y: 252,
   },
-  'before-after': { label: 'Run them on both sides', hint: 'The probes run before and after the change.', x: 1100, y: 252 },
-  compare: { label: 'Compare and drop noise', hint: 'Keep differences that are not noise.', x: 1100, y: 48 },
-  verifier: { label: 'Reviewer / verifier', hint: 'Plain code checks the comparison.', x: 1320, y: 150 },
-  verdict: { label: 'Verdict and report', hint: 'The checker’s verdict and the report.', x: 1520, y: 150 },
-  advice: { label: 'Reviewer notes', hint: "Doesn't change the verdict.", x: 1720, y: 150 },
+  'before-after': { label: 'Run them on both sides', hint: 'The probes run before and after the change.', x: 1300, y: 252 },
+  compare: { label: 'Compare and drop noise', hint: 'Keep differences that are not noise.', x: 1300, y: 48 },
+  verifier: { label: 'Reviewer / verifier', hint: 'Plain code checks the comparison.', x: 1480, y: 150 },
+  verdict: { label: 'Verdict and report', hint: 'The checker’s verdict and the report.', x: 1660, y: 150 },
+  advice: { label: 'Reviewer notes', hint: "Doesn't change the verdict.", x: 1840, y: 150 },
 }
 
 export const FLOW_EDGES: [NodeId, NodeId][] = [
   ['intake', 'checkout-base'],
   ['intake', 'checkout-head'],
-  ['checkout-base', 'install-base'],
-  ['checkout-head', 'install-head'],
-  ['install-base', 'existing-tests'],
-  ['install-head', 'existing-tests'],
-  ['install-base', 'ai-write'],
+  ['checkout-base', 'setup-python'],
+  ['checkout-head', 'setup-python'],
+  ['setup-python', 'install-base'],
+  ['setup-python', 'install-head'],
+  ['install-base', 'install-deps'],
+  ['install-head', 'install-deps'],
+  ['install-deps', 'existing-tests'],
+  ['install-deps', 'ai-write'],
   ['checkout-head', 'ai-write'],
   ['ai-write', 'human-review'],
   ['human-review', 'before-after'],
-  ['install-base', 'before-after'],
-  ['install-head', 'before-after'],
+  ['install-deps', 'before-after'],
   ['existing-tests', 'compare'],
   ['before-after', 'compare'],
   ['compare', 'verifier'],
@@ -119,6 +137,13 @@ export function statesFromEvents(events: StageEvent[]): Record<NodeId, Mark> {
     const stage = event.stage || ''
     const detail = event.detail || ''
     if (stage === 'queued' || stage === 'fetch_pr') doneThrough(marks, 'intake', detail)
+    else if (stage === 'setup_python') {
+      if (detail.startsWith('failed')) failRest(marks, 'setup-python', detail.replace(/^failed:\s*/, ''))
+      else doneThrough(marks, 'setup-python', detail)
+    } else if (stage === 'install_deps') {
+      if (marks['install-deps'].state === 'pending') marks['install-deps'] = { state: 'running', detail }
+      else marks['install-deps'].detail = detail
+    }
     else if (stage === 'install_main') doneThrough(marks, 'install-base', detail)
     else if (stage === 'install_pr') doneThrough(marks, 'install-head', detail)
     else if (stage === 'claims') doneThrough(marks, 'ai-write', detail)
@@ -168,15 +193,46 @@ export function statesFromRecord(record: Record<string, unknown>): Record<NodeId
     set('checkout-base', 'done')
     set('checkout-head', 'done')
   }
+  const helper = (record.demo_helper && typeof record.demo_helper === 'object' ? record.demo_helper : {}) as Record<string, unknown>
+  const plan = (helper.setup_plan && typeof helper.setup_plan === 'object' ? helper.setup_plan : {}) as Record<string, unknown>
+  const python = (plan.python && typeof plan.python === 'object' ? plan.python : {}) as Record<string, unknown>
+  const fixes = Array.isArray(helper.auto_fixes) ? (helper.auto_fixes as string[]) : []
+  if (python.requested) {
+    const why = [String(python.reason || ''), ...fixes.filter((line) => /python/i.test(line))].filter(Boolean).join(' ')
+    if (python.gate_failed) {
+      set('setup-python', 'failed', why)
+      for (const id of FLOW_ORDER.slice(FLOW_ORDER.indexOf('install-base'))) set(id, 'skipped')
+      return marks
+    }
+    set('setup-python', python.applied ? 'done' : 'skipped', why)
+  } else if (has(record, 'tested') || has(record, 'sides')) {
+    set('setup-python', 'done', 'The sandbox Python already meets the project')
+  }
   if (has(record, 'freeze') || has(record, 'main_side')) set('install-base', 'done')
+  const setup = (helper.setup && typeof helper.setup === 'object' ? helper.setup : {}) as Record<string, unknown>
+  if (setup.counts_as_verdict === false) {
+    set('install-deps', 'failed', `setup problem: ${String(setup.detail || setup.step || 'install failed')}`)
+    for (const id of FLOW_ORDER.slice(FLOW_ORDER.indexOf('existing-tests'))) set(id, 'skipped')
+    return marks
+  }
   if (buildFailed) {
     set('install-head', 'failed', String(prSide.why))
+    set('install-deps', 'failed', String(prSide.why))
     for (const id of ['existing-tests', 'ai-write', 'human-review', 'before-after', 'compare', 'verifier', 'verdict', 'advice'] as NodeId[]) {
       set(id, 'skipped')
     }
     return marks
   }
-  if (has(record, 'pr_side') || has(record, 'freeze')) set('install-head', 'done')
+  if (has(record, 'pr_side') || has(record, 'freeze')) {
+    set('install-head', 'done')
+    const installs = Array.isArray(helper.installs) ? (helper.installs as Array<Record<string, unknown>>) : []
+    const reqs = Array.isArray(plan.extra_reqs) ? (plan.extra_reqs as string[]) : []
+    const listed = installs.length
+      ? installs.map((row) => `${row.package} ${row.version}`).join(', ')
+      : reqs.join(', ')
+    const other = fixes.filter((line) => !/python/i.test(line))
+    set('install-deps', 'done', [listed ? `Installed on both sides: ${listed}` : 'Installed the project and its declared dependencies on both sides', ...other].join(' '))
+  }
   if (has(record, 'per_run') || has(record, 'comparison')) set('existing-tests', 'done')
   if (has(record, 'behaviour_claims') || has(record, 'probe_plan') || has(record, 'probes')) {
     set('ai-write', 'done')
@@ -226,13 +282,30 @@ export function flowNodes(
     }
   }
   const durations = durationText(record)
+  const version = pythonVersion(events, record)
   return FLOW_ORDER.map((id) => ({
     id,
     ...COPY[id],
+    label: id === 'setup-python' && version ? `Set up Python ${version}` : COPY[id].label,
     state: marks[id].state,
     detail: marks[id].detail,
     duration: durations[id] || '',
   }))
+}
+
+export function pythonVersion(
+  events: StageEvent[] | null | undefined,
+  record: Record<string, unknown> | null | undefined,
+): string {
+  const helper = (record?.demo_helper && typeof record.demo_helper === 'object' ? record.demo_helper : {}) as Record<string, unknown>
+  const plan = (helper.setup_plan && typeof helper.setup_plan === 'object' ? helper.setup_plan : {}) as Record<string, unknown>
+  const python = (plan.python && typeof plan.python === 'object' ? plan.python : {}) as Record<string, unknown>
+  if (typeof python.requested === 'string' && /^\d+\.\d+$/.test(python.requested)) return python.requested
+  for (const event of events || []) {
+    const match = event.stage === 'setup_python' ? /Python (\d+\.\d+)/.exec(event.detail || '') : null
+    if (match) return match[1]
+  }
+  return ''
 }
 
 export function edgeActive(from: NodeState, to: NodeState) {

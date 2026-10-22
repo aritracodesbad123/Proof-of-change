@@ -320,6 +320,10 @@ make test
 make check PR=https://github.com/numpy/numpy/pull/32940
 ```
 
+> **App-style repositories can be slow.** Some projects are applications rather than installable packages (for example
+> PostHog). The check then sets up the Python version the project asks for and installs every dependency it declares,
+> which can take much longer. A check of a PostHog pull request took about 22 minutes.
+
 - **What you should see** (the first time takes a few minutes because test environments are downloaded; later about
   1 to 4 minutes per PR):
 
