@@ -120,3 +120,23 @@ def test_local_sandbox_logs_the_system_need_without_installing(monkeypatch):
     demo_helper.retry_unverified(rec, lambda: {}, lambda s, r: (True, "1"), [], "", None, REPO, False)
     assert "libffi-dev" in rec["demo_helper"]["gap_retry"]["tries"][0]["result"]
     assert rec["verdict"] == "could_not_verify"
+
+
+def test_missing_so_files_map_to_allowlisted_packages():
+    gui = demo_helper.system_fix_for("ImportError: libEGL.so.1: cannot open shared object file: No such file")
+    assert gui["install"] == ["libegl1", "libgl1", "libxkbcommon0"]
+    assert demo_helper.system_fix_for("Error: pg_config executable not found.")["install"] == ["libpq-dev"]
+    assert demo_helper.system_fix_for("fatal error: zlib.h: No such file or directory")["install"] == ["zlib1g-dev"]
+    odd = demo_helper.system_fix_for("ImportError: libcuda.so.1: cannot open shared object file")
+    assert odd["install"] == [] and odd["refused"][0]["name"] == "libcuda.so"
+
+
+def test_gui_library_gap_goes_through_install_system_on_both_sides(monkeypatch):
+    monkeypatch.delenv("POC_PROGRESS_PATH", raising=False)
+    asked = []
+    rec = {"verdict": "could_not_verify", "reason": "ImportError: libEGL.so.1: cannot open shared object file"}
+    demo_helper.retry_unverified(rec, lambda: {"verdict": "needs_attention", "reason": "a GUI test differs"},
+                                 lambda s, r: (True, "1"), [], "", None, REPO, True,
+                                 install_system=lambda n: asked.append(n) or True)
+    assert asked == ["libegl1", "libgl1", "libxkbcommon0"]
+    assert rec["verdict"] == "needs_attention"

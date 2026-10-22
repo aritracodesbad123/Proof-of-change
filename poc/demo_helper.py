@@ -1060,12 +1060,24 @@ def _python_decision(requested: str | None, current: str, sandbox: str, python_a
 
 
 # The only OS packages a diagnosis may install. Fixed here; a lookup can never add a name to it.
-SYSTEM_ALLOWLIST = ("build-essential", "pkg-config", "zlib1g-dev", "libpq-dev", "libffi-dev", "libssl-dev")
+SYSTEM_ALLOWLIST = ("build-essential", "pkg-config", "zlib1g-dev", "libpq-dev", "libffi-dev", "libssl-dev",
+                    "libegl1", "libgl1", "libxkbcommon0")
+# A missing shared library (.so) named in an error, mapped to the allowlisted packages that provide it.
+_SO_PACKAGES = (
+    ("libegl.so", ("libegl1", "libgl1", "libxkbcommon0")),   # headless GUI tests (Qt) need all three
+    ("libgl.so", ("libgl1",)),
+    ("libxkbcommon.so", ("libxkbcommon0",)),
+    ("libz.so", ("zlib1g-dev",)),
+    ("libpq.so", ("libpq-dev",)),
+    ("libffi.so", ("libffi-dev",)),
+    ("libssl.so", ("libssl-dev",)),
+    ("libcrypto.so", ("libssl-dev",)),
+)
 _SYSTEM_MARKERS = (
     (("zlib.h", "zlib headers", "zlib not found", "libz.so", "-lz"), "zlib1g-dev"),
-    (("pg_config", "libpq", "libpq-fe.h"), "libpq-dev"),
-    (("ffi.h", "libffi"), "libffi-dev"),
-    (("openssl/", "ssl.h", "libssl", "openssl not found"), "libssl-dev"),
+    (("pg_config", "libpq-fe.h"), "libpq-dev"),
+    (("ffi.h",), "libffi-dev"),
+    (("openssl/", "ssl.h", "openssl not found"), "libssl-dev"),
     (("pkg-config", "pkgconfig"), "pkg-config"),
     (("python.h", "command 'gcc' failed", "gcc: not found", "cc: not found", "unable to execute 'gcc'",
       "no such file or directory: 'gcc'", "c compiler cannot create executables", "error: command 'cc'"),
@@ -1079,9 +1091,15 @@ def system_fix_for(error_text: str, lookup_text: str = "") -> dict:
     low = (error_text or "").lower()
     allowed: list[str] = []
     refused: list[dict] = []
+    for so, names in _SO_PACKAGES:
+        if so in low:
+            allowed.extend(n for n in names if n not in allowed)
     for markers, name in _SYSTEM_MARKERS:
         if any(m in low for m in markers) and name not in allowed:
             allowed.append(name)
+    for lib in re.findall(r"(lib[\w.+-]+\.so)", low):
+        if not any(lib.startswith(so) for so, _ in _SO_PACKAGES) and not any(r["name"] == lib for r in refused):
+            refused.append({"name": lib, "reason": "no allowlisted system package provides it"})
     if allowed or any(m in low for m in _GAP_MARKERS + ("fatal error", "not found", "error:")):
         for match in _APT_INSTALL.finditer((lookup_text or "").lower()):
             for name in match.group(1).split():
