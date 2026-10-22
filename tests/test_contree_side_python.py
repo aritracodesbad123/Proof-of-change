@@ -23,7 +23,7 @@ def _session(versions):
 def test_parse_python_version():
     assert cs.parse_python_version({"exit_code": 0, "stdout": "Python 3.14.0\n"}) == "3.14.0"
     assert cs.parse_python_version({"exit_code": 0, "stdout": "", "stderr": "Python 3.12.7"}) == "3.12.7"
-    assert cs.parse_python_version({"exit_code": 0, "stdout": "Python 3.14.0rc1"}) == "3.14.0"
+    assert cs.parse_python_version({"exit_code": 0, "stdout": "Python 3.14.0rc1"}) == "3.14.0rc1"
     assert cs.parse_python_version({"exit_code": 0, "stdout": "garbage"}) == ""
     assert cs.parse_python_version({"exit_code": 1, "stdout": "Python 3.12.7"}) == ""
     assert cs.parse_python_version(None) == ""
@@ -164,3 +164,43 @@ def test_each_operator(spec, version, ok):
 @pytest.mark.parametrize("spec", [">=3.1o", ">=3.8,", "3.12", "~=3", ">=3.*", "===3.12", ">=3.8,<4,junk", "^3.12"])
 def test_unreadable_specs(spec):
     assert cs.parse_requires_python(spec) is None
+
+
+@pytest.mark.parametrize("out,want", [
+    ("Python 3.13.0rc1", "3.13.0rc1"), ("Python 3.14.0a3", "3.14.0a3"), ("Python 3.14.0b2", "3.14.0b2"),
+    ("Python 3.12.7+", "3.12.7+"), ("Python 3.13.0rc1+local.1", "3.13.0rc1+local.1"), ("Python 3.12.7", "3.12.7"),
+])
+def test_version_keeps_prerelease_and_local_tags(out, want):
+    assert cs.parse_python_version({"exit_code": 0, "stdout": out}) == want
+
+
+@pytest.mark.parametrize("out", ["Python 3.13.0dev", "Python 3.13.0rc", "Python 3.13.0 junk"])
+def test_odd_version_text_is_unreadable(out):
+    assert cs.parse_python_version({"exit_code": 0, "stdout": out}) == ""
+
+
+def test_prerelease_on_one_side_is_a_problem_and_a_mismatch(tmp_path):
+    sess, _ = _session({"img-main": "Python 3.13.0", "img-pr": "Python 3.13.0rc1"})
+    rec = {}
+    refusal = daily_run._check_contree_pythons(sess, rec, tmp_path)
+    assert refusal and "pr: Contree ran a pre-release Python (3.13.0rc1)" in refusal
+    assert "main ran 3.13.0, PR ran 3.13.0rc1" in refusal
+    assert rec["contree"]["python"]["pr"] == "3.13.0rc1"
+
+
+def test_prerelease_on_both_sides_is_a_problem(tmp_path):
+    sess, _ = _session({"img-main": "Python 3.14.0b2", "img-pr": "Python 3.14.0b2"})
+    info = cs.side_pythons(sess, [">=3.14"])
+    assert info["problems"] == ["main: Contree ran a pre-release Python (3.14.0b2)",
+                                "pr: Contree ran a pre-release Python (3.14.0b2)"]
+
+
+def test_prerelease_flagged_even_with_unreadable_spec():
+    sess, _ = _session({"img-main": "Python 3.14.0rc1", "img-pr": "Python 3.14.0rc1"})
+    info = cs.side_pythons(sess, [">=3.1o"])
+    assert any("pre-release" in p for p in info["problems"])
+
+
+def test_local_tag_alone_is_not_a_problem():
+    sess, _ = _session({"img-main": "Python 3.12.7+", "img-pr": "Python 3.12.7+"})
+    assert cs.side_pythons(sess, [">=3.12"])["problems"] == []
