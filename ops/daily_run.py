@@ -3323,14 +3323,16 @@ def plan_probes(repo: str, item: dict, rec: dict, base_root: Path, pr_roots: lis
                           if (Path(base_root) / rel).is_file()}
             try:
                 res = model_probes.generate(provider, repo, item["pr"], item["title"], item.get("body"), base_files,
-                                            base_root, pr_roots, prdir / "model-probes")
+                                            base_root, pr_roots, prdir / "model-probes",
+                                            **({"product": True} if product_route(a) else {}))
             except freeze.FreezeError as e:
                 res = {"errors": [str(e)], "probes": [], "claims": [], "rejected_claims": []}
             note["model_claims"] = res.get("claims", [])
             note["model_rejected_claims"] = res.get("rejected_claims", [])
             note["errors"] += res.get("errors", [])
             plan += [{"path": x["path"], "source": "model", "freeze": x["freeze"],
-                      **({"origin": x["origin"]} if x.get("origin") else {})} for x in res.get("probes", [])]
+                      **({"origin": x["origin"]} if x.get("origin") else {}),
+                      **({"repair": x["repair"]} if x.get("repair") else {})} for x in res.get("probes", [])]
             if res.get("human_review"):
                 rec["human_review"] = res["human_review"]
             made = [c for c in getattr(provider, "calls", []) if c.get("ok")]
@@ -3391,6 +3393,11 @@ def run_probes(repo: str, pr: int, pythons: dict, prdir: Path, work: Path, a, pl
                 it = probes.run_probe(path, pythons, prdir, cwds, envs, runs=a.runs, source=x["source"],
                                       launchers={side: probe_launcher(v, path) for side, v in venvs.items()},
                                       guard=guard)
+            if x.get("repair") and product_route(a) and getattr(a, "provider", None) is not None:
+                it, path, fz, pr_started = _repair_probe(it, path, fz, pr_started, x["repair"], prdir, a,
+                                                         lambda p, f, ps: _run_one_probe(p, f, ps, prdir, a, x,
+                                                                                         pythons, cwds, envs, venvs,
+                                                                                         use_contree))
             it["path"] = repo_relative(path) if x["source"] == "library" else str(path.relative_to(prdir))
             it["generator"] = fz["generator"]
             if x.get("origin"):
@@ -3410,6 +3417,71 @@ def run_probes(repo: str, pr: int, pythons: dict, prdir: Path, work: Path, a, pl
     if refused:
         out["refused"] = refused
     return out
+
+
+def _run_one_probe(path: Path, fz: dict, pr_started: str, prdir: Path, a, x: dict, pythons: dict, cwds: dict,
+                   envs: dict, venvs: dict, use_contree: bool) -> dict:
+    """One frozen probe on both sides, exactly like the first run (used by the product-check probe repair)."""
+    def guard(p, fz=fz):
+        freeze.verify(p, fz, pr_started)
+    guard(path)
+    if use_contree:
+        return _contree_run_probe(path, prdir, a.runs, x["source"], guard)
+    return probes.run_probe(path, pythons, prdir, cwds, envs, runs=a.runs, source=x["source"],
+                            launchers={side: probe_launcher(v, path) for side, v in venvs.items()}, guard=guard)
+
+
+def _probe_logs(prdir: Path, spec_id: str, runs: int) -> dict:
+    return {side: [(prdir / f"probe-{spec_id}-{side}-{i}.log").read_text(errors="replace")
+                   if (prdir / f"probe-{spec_id}-{side}-{i}.log").is_file() else "" for i in range(1, runs + 1)]
+            for side in ("main", "pr")}
+
+
+def _repair_probe(it: dict, path: Path, fz: dict, pr_started: str, repair: dict, prdir: Path, a, rerun) -> tuple:
+    """Product checks only. If a model probe broke itself (crashed on BOTH sides, traceback only in its own code or
+    the standard library), give the model ONLY the probe's source and its own error text and rerun the rewrite on both
+    sides: first attempt plus up to MAX_PROBE_REWRITES rewrites. Every crash is logged. If it still fails, the probe
+    stays crashed and the result stays could not verify. A crash on one side only, or in project code, is evidence
+    and is left alone."""
+    total = 1 + model_probes.MAX_PROBE_REWRITES
+    attempts, lines, attempt = [], [], 1
+    n = int(re.sub(r"\D", "", path.stem.rsplit("probe", 1)[-1]) or 0) or path.stem
+    while True:
+        spec_id = it.get("id") or f"model-{repair['draft']['id']}"
+        logs = _probe_logs(prdir, spec_id, len((it.get("runs") or {}).get("main") or []))
+        broke = model_probes.probe_broke_itself(it, logs, path.name)
+        if not broke:
+            if attempt > 1:
+                attempts.append({"attempt": attempt, "outcome": "ran"})
+                lines.append(f"Probe {n} ran after the rewrite (attempt {attempt} of {total}).")
+            break
+        err = model_probes.error_summary(logs)
+        why = model_probes.plain_reason(err)
+        keep = prdir / "probe-repair" / f"attempt{attempt}"
+        keep.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(path, keep / path.name)
+        for f in prdir.glob(f"probe-{spec_id}-*"):
+            shutil.copy2(f, keep / f.name)
+        attempts.append({"attempt": attempt, "outcome": "crashed in its own code", "why": why,
+                         "sha256": fz.get("sha256")})
+        if attempt >= total:
+            lines.append(f"Probe {n} crashed in its own code ({why}) on attempt {attempt} of {total}; no rewrites "
+                         "left, so it gives no evidence and the result stays could not verify.")
+            break
+        new = model_probes.rewrite_probe(a.provider, repair, path.read_text(), err)
+        if new is None:
+            lines.append(f"Probe {n} crashed in its own code ({why}) on attempt {attempt} of {total}; the rewrite "
+                         "was unusable, so it gives no evidence.")
+            break
+        attempt += 1
+        lines.append(f"Probe {n} crashed in its own code ({why}); rewritten and rerun, attempt {attempt} of {total}.")
+        path.write_text(model_probes.probe_file(new, repair["target"], repair["claims_by_id"], repair["gen"]["label"]))
+        fz = freeze.freeze(path, repair["gen"], repair["inputs"]) | {"rewrite_of_attempt": attempt - 1}
+        pr_started = freeze.now()
+        it = rerun(path, fz, pr_started)
+    if attempts:
+        it["repair"] = {"attempts": attempts, "lines": lines, "max_attempts": total}
+    return it, path, fz, pr_started
 
 
 def _contree_run_probe(path: Path, outdir: Path, runs: int, source: str, guard) -> dict:

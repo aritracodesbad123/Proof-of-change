@@ -31,6 +31,24 @@ ID_RE = re.compile(r"^[a-z0-9][a-z0-9-]{0,39}$")
 # sometimes call json.dumps without importing it, and then the probe fails the same way on both sides and tests
 # nothing. The harness adds the import itself; it changes no behaviour of the code under test.
 JSON_IMPORT = "import json  # added by the harness: the observations line is printed as JSON\n"
+# Product checks only (the study route keeps PROBES_PROMPT exactly as it is). Generic rules, no project names.
+PROBE_SAFETY_RULES = """
+Extra rules for every probe:
+- Never monkeypatch, mock or replace standard-library or runtime core functions (time and clock functions, asyncio
+  event-loop internals, random, os, sys) with finite fakes, lists or iterators; they run out and crash the probe.
+- Never build hand-made fake objects: no mocks, stubs, MagicMock or stand-in classes in place of the project's own
+  objects. Call the project's real code with real inputs.
+- Prefer calling the real public API with small, real inputs.
+- If a value really must be controlled, use a deterministic function with no limit (for example a counter that keeps
+  counting), never a fixed list of values.
+- Keep each probe simple and always print the parsed observations line, even when a call fails."""
+PRODUCT_PROBES_PROMPT = PROBES_PROMPT + "\n" + PROBE_SAFETY_RULES
+# A probe rewrite sees only the probe's own source and its own error text: never either side's observations.
+REPAIR_PROMPT = PRODUCT_PROBES_PROMPT + """
+You are now repairing ONE probe that crashed in its own code on both sides, before reaching the code under test. You
+get only its source and its error text. Return the same probe (same id, about and claims) with corrected code that
+follows every rule above. Answer with JSON only."""
+MAX_PROBE_REWRITES = 2   # first attempt plus up to 2 rewrites: 3 attempts in total
 UNLINKED_REASON = ("no probe listed the claim ids it checks, so its results could not be tied to any claim; in each "
                    "probe, \"claims\" must name the claim ids it checks and the observation names that cover them")
 
@@ -145,8 +163,10 @@ def _usable(resp, claim_ids: set) -> list:
 
 
 def generate(provider: Provider, repo: str, pr: int, title: str, body: str | None, base_files: dict,
-             base_root: Path, pr_roots: list, outdir: Path) -> dict:
+             base_root: Path, pr_roots: list, outdir: Path, product: bool = False) -> dict:
+    """product=True (product checks only) adds PROBE_SAFETY_RULES; the study route passes nothing and is unchanged."""
     from poc import run_progress
+    PROBES_PROMPT = PRODUCT_PROBES_PROMPT if product else globals()["PROBES_PROMPT"]
 
     inputs = freeze.base_inputs(title, body, base_files, base_root, pr_roots)   # raises on PR-side input paths
     ctx = {"repo": repo, "pr": pr}
@@ -240,5 +260,73 @@ def generate(provider: Provider, repo: str, pr: int, title: str, body: str | Non
     for p in draft_probes:
         path = outdir / f"model-{p['id']}.py"
         path.write_text(probe_file(p, f"{repo}#{pr}", by_id, gen["label"]))
-        out["probes"].append({"path": path, "freeze": freeze.freeze(path, gen, inputs)})
+        entry = {"path": path, "freeze": freeze.freeze(path, gen, inputs)}
+        if product:
+            entry["repair"] = {"draft": p, "target": f"{repo}#{pr}", "claims_by_id": by_id, "gen": gen,
+                               "inputs": inputs, "ctx": ctx}
+        out["probes"].append(entry)
     return out
+
+
+_FRAME_RE = re.compile(r'^\s*File "([^"]+)", line \d+', re.M)
+
+
+def _stdlib_file(f: str) -> bool:
+    """A frame in the Python standard library (not site-packages, not a checkout)."""
+    return bool(re.search(r"/lib/python3\.\d+/", f)) and "site-packages" not in f and "dist-packages" not in f
+
+
+def own_code_crash(log: str, probe_name: str) -> bool:
+    """True when the log holds a traceback whose frames are only in the probe file itself or the standard library,
+    i.e. it never reached the project's code (or any installed package). No traceback: False (not provable)."""
+    frames = _FRAME_RE.findall(log or "")
+    if not frames:
+        return False
+    return all(Path(f).name == probe_name or _stdlib_file(f) for f in frames)
+
+
+def probe_broke_itself(item: dict, logs: dict, probe_name: str) -> bool:
+    """A probe broke itself only if EVERY run crashed (no parsed output) on BOTH sides AND no traceback reaches the
+    project's code. A crash on the PR side only, or one inside project code, is evidence and is never repaired."""
+    from poc.probes import PROBE_ERROR
+    runs = item.get("runs") or {}
+    for side in ("main", "pr"):
+        rs = runs.get(side) or []
+        if not rs or not all(isinstance(o, dict) and PROBE_ERROR in o for o in rs):
+            return False
+        if not logs.get(side) or not all(own_code_crash(l, probe_name) for l in logs[side]):
+            return False
+    return True
+
+
+def error_summary(logs: dict) -> str:
+    """The probe's own error text (last traceback of the first main-side run), capped. No observations."""
+    log = next(iter(logs.get("main") or []), "") or ""
+    i = log.rfind("Traceback (most recent call last)")
+    return (log[i:] if i >= 0 else log)[-3000:]
+
+
+def plain_reason(err: str) -> str:
+    if "StopIteration" in err and ("mock" in err or "side_effect" in err or "next(" in err):
+        return "a fake value list ran out"
+    last = [l for l in err.strip().splitlines() if l.strip()][-1:] or ["unknown error"]
+    return last[0].strip()[:120]
+
+
+def rewrite_probe(provider: Provider, repair: dict, source: str, err: str) -> dict | None:
+    """Ask the model to rewrite one probe from its own source and its own error text only. Returns the new draft
+    (validated) or None."""
+    user = ("Probe source:\n" + source + "\n\nIts error text:\n" + err)
+    try:
+        resp = provider.complete_json("probes", REPAIR_PROMPT, user, PROBES_SCHEMA, repair["ctx"])
+    except ProviderError:
+        return None
+    old = repair["draft"]
+    for p in (resp or {}).get("probes", [])[:1]:
+        if not isinstance(p, dict):
+            continue
+        new = dict(old, code=_unescape_code(p.get("code")))
+        if new["code"] == old.get("code") or validate_probe(new, set(repair["claims_by_id"])):
+            return None
+        return new
+    return None

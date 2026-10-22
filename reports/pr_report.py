@@ -522,6 +522,8 @@ def probes_section(R, rec: dict, rel) -> list[dict]:
             + (f", `{it['path']}`" if it.get("path") else "")
             + (f", frozen `{fz['sha256'][:12]}` at {fz.get('frozen_at', '?')}" if fz.get("sha256") else "")
             + f"): {it.get('about', '')}")
+        for line in (it.get("repair") or {}).get("lines", []):
+            R.p(line)
         if it.get("claims"):
             R.bullets([f"P-{c['id']} ({c.get('source', 'claim')}): {c['text']} Expects the covered observations to "
                        f"{'differ' if c['expect'] == 'differs' else 'stay the same'}." for c in it["claims"]])
