@@ -17,3 +17,5 @@ Some projects written in Python depend on packages that must be compiled from C 
 ## Not changed
 
 Single pull-request checks (`--pr`), chosen PRs and frozen selections do not run this check, and the study pair-gathering scripts are not changed. No operating-system package is installed. Test-only and optional requirements are not part of the dry run, so a project can still fail setup later on one of those.
+
+The daily picker's output never feeds into study runs: `select_prs` is called only from the daily selection loop in `ops/daily_run.py`, study (bench) runs return through `bench.run` before that loop is reached, and the study pair-gathering script `evals/gather_study_pairs.py` reads only its own `--candidates` file, not the picker's selection.
