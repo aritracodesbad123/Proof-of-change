@@ -304,23 +304,70 @@ def parse_python_version(raw: dict | None) -> str:
     return ""
 
 
+_RP_CLAUSE = re.compile(r"^(~=|==|!=|>=|<=|>|<)\s*(\d+(?:\.\d+)*)(\.\*)?$")
+
+
+def parse_requires_python(text: str) -> list[tuple[str, tuple[int, ...], bool]] | None:
+    """Clauses of a requires-python string as (op, version, wildcard), all ANDed. None when any part is unreadable.
+
+    Stdlib only. Supports ==, !=, >=, <=, >, <, ~= and ==X.* / !=X.*. Nothing is dropped: one bad clause makes the
+    whole string unreadable."""
+    parts = [p.strip() for p in (text or "").split(",")]
+    if not parts or any(not p for p in parts):
+        return None
+    out = []
+    for part in parts:
+        m = _RP_CLAUSE.match(part)
+        if not m:
+            return None
+        op, ver, star = m.group(1), tuple(int(x) for x in m.group(2).split(".")), bool(m.group(3))
+        if star and op not in ("==", "!="):
+            return None
+        if op == "~=" and len(ver) < 2:
+            return None
+        out.append((op, ver, star))
+    return out
+
+
+def _pad(v: tuple[int, ...], n: int) -> tuple[int, ...]:
+    return v + (0,) * (n - len(v))
+
+
+def requires_python_ok(full: tuple[int, ...], clauses) -> bool:
+    """True when the full version (major, minor, micro) meets every clause."""
+    for op, ver, star in clauses:
+        if star:
+            hit = full[:len(ver)] == ver
+            if (op == "==") != hit:
+                return False
+            continue
+        n = max(len(full), len(ver))
+        a, b = _pad(full, n), _pad(ver, n)
+        if op == "~=":
+            ok = a >= b and full[:len(ver) - 1] == ver[:-1]
+        else:
+            ok = {"==": a == b, "!=": a != b, ">=": a >= b, "<=": a <= b, ">": a > b, "<": a < b}[op]
+        if not ok:
+            return False
+    return True
+
+
 def side_pythons(sess: "ContreeSession", specs: list[str], *, timeout: int = 120) -> dict:
     """Which Python actually runs on each side's Contree checkpoint, checked against the project's requires-python.
 
     Runs `python --version` from the main and PR checkpoints (the same place the tests run). Each side whose
     version cannot be read, or does not satisfy requires-python, adds a problem. A non-empty `problems` list means
     the check must not pass as a normal result. Both sides must also report the exact same full version."""
-    from packaging.specifiers import InvalidSpecifier, SpecifierSet
-    from packaging.version import InvalidVersion, Version
     texts = [s.strip() for s in specs or [] if isinstance(s, str) and s.strip()]
     out: dict = {"requires_python": texts, "requires_python_found": bool(texts), "main": "", "pr": "",
                  "problems": []}
     spec_sets = []
     for text in texts:
-        try:
-            spec_sets.append(SpecifierSet(text))  # every clause kept, e.g. '>=3.8,<4' keeps '<4'
-        except InvalidSpecifier:
+        clauses = parse_requires_python(text)  # every clause kept, e.g. '>=3.8,<4' keeps '<4'
+        if clauses is None:
             out["problems"].append(f"requires-python could not be read: {text!r}")
+        else:
+            spec_sets.append(clauses)
     spec_ok = len(spec_sets) == len(texts)
     for side in ("main", "pr"):
         try:
@@ -334,12 +381,8 @@ def side_pythons(sess: "ContreeSession", specs: list[str], *, timeout: int = 120
             continue
         if not spec_ok:
             continue
-        try:
-            full = Version(version)
-        except InvalidVersion:
-            out["problems"].append(f"{side}: the Python version inside Contree could not be read")
-            continue
-        if not all(ss.contains(full, prereleases=True) for ss in spec_sets):
+        full = tuple(int(x) for x in version.split("."))
+        if not all(requires_python_ok(full, clauses) for clauses in spec_sets):
             out["problems"].append(f"{side}: Contree ran Python {version}, which does not satisfy requires-python "
                                    f"{', '.join(texts)}")
     if out["main"] and out["pr"] and out["main"] != out["pr"]:

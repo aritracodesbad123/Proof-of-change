@@ -9,7 +9,7 @@
 - The run record keeps the result under `contree.python`: the main version, the PR version, the requires-python taken from main's files, and any problems.
 - If a side's version cannot be read, or does not satisfy requires-python, the check stops with "Contree Python check failed: ..." and the result is capped at could not verify.
 - Main and PR must also report exactly the same full version (for example 3.12.7 on both). If they differ, the check stops with "Contree Python check failed: main ran X, PR ran Y", even when the project declares no requires-python.
-- requires-python is checked against the full reported version with the standard Python version-specifier rules (pre-releases allowed), so a patch-level bound such as `>=3.12.4` fails on 3.12.1 and every clause is kept (`>=3.8,<4` keeps `<4`).
+- requires-python is checked against the full reported version with a small built-in checker (the product core stays standard-library only, so no `packaging` dependency is added). It handles `==`, `!=`, `>=`, `<=`, `>`, `<`, `~=`, `==X.*` and `!=X.*`, compares the full major.minor.micro, and ANDs all clauses, so a patch-level bound such as `>=3.12.4` fails on 3.12.1 and every clause is kept (`>=3.8,<4` keeps `<4`).
 - A requires-python that cannot be parsed (for example `>=3.1o`) stops the check with "requires-python could not be read"; no clause is ever dropped to make it fit.
 - When no requires-python is found, the record says so explicitly (`requires_python_found: false`).
 

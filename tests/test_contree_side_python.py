@@ -137,3 +137,30 @@ def test_missing_requires_python_is_recorded(tmp_path):
     assert daily_run._check_contree_pythons(sess, rec, tmp_path) is None
     assert rec["contree"]["python"]["requires_python_found"] is False
     assert rec["contree"]["python"]["requires_python"] == []
+
+
+import pytest  # noqa: E402
+
+
+@pytest.mark.parametrize("spec,version,ok", [
+    ("==3.12.7", (3, 12, 7), True), ("==3.12.7", (3, 12, 8), False), ("==3.12", (3, 12, 0), True),
+    ("!=3.12.7", (3, 12, 7), False), ("!=3.12.7", (3, 12, 8), True),
+    (">=3.12.4", (3, 12, 4), True), (">=3.12.4", (3, 12, 1), False),
+    ("<=3.12", (3, 12, 0), True), ("<=3.12", (3, 12, 1), False),
+    (">3.12", (3, 12, 1), True), (">3.12", (3, 12, 0), False),
+    ("<3.13", (3, 12, 9), True), ("<3.13", (3, 13, 0), False),
+    ("~=3.12", (3, 14, 0), True), ("~=3.12", (4, 0, 0), False), ("~=3.12", (3, 11, 9), False),
+    ("~=3.12.4", (3, 12, 9), True), ("~=3.12.4", (3, 13, 0), False), ("~=3.12.4", (3, 12, 3), False),
+    ("==3.12.*", (3, 12, 5), True), ("==3.12.*", (3, 13, 0), False),
+    ("!=3.12.*", (3, 12, 5), False), ("!=3.12.*", (3, 13, 0), True),
+    (">=3.8,<4", (3, 12, 7), True), (">=3.8,<4", (4, 0, 0), False), (">=3.8, <4, !=3.9.*", (3, 9, 1), False),
+])
+def test_each_operator(spec, version, ok):
+    clauses = cs.parse_requires_python(spec)
+    assert clauses is not None
+    assert cs.requires_python_ok(version, clauses) is ok
+
+
+@pytest.mark.parametrize("spec", [">=3.1o", ">=3.8,", "3.12", "~=3", ">=3.*", "===3.12", ">=3.8,<4,junk", "^3.12"])
+def test_unreadable_specs(spec):
+    assert cs.parse_requires_python(spec) is None

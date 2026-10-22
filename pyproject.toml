@@ -3,7 +3,7 @@ name = "blast-radius"
 version = "0.1.0"
 description = "Proof-of-Change: prove what a PR claims by running it on main and on the PR. Plus the downstream-test harness, evals, guardrails and approver reports."
 requires-python = ">=3.11"
-dependencies = ["uv==0.13.1", "packaging>=23"]  # the runner shells out to uv (and git); poc/tool_setup.py installs any missing one at start-up
+dependencies = ["uv==0.13.1"]  # the runner shells out to uv (and git); poc/tool_setup.py installs any missing one at start-up
 
 [project.optional-dependencies]
 dev = ["pytest>=8", "pytest-timeout>=2", "ruff>=0.6", "jsonschema>=4", "coverage>=7"]  # jsonschema: cross-checks the stdlib validators in tests
