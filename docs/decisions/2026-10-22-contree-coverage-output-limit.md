@@ -1,7 +1,7 @@
 # Contree coverage reports are trimmed to the changed files
 
 **Date:** 2026-10-22
-**Status:** proposed
+**Status:** accepted
 
 ## What changed
 
