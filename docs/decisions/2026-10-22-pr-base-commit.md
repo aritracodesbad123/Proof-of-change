@@ -1,6 +1,6 @@
 # Compare a merged pull request with its real base
 
-Status: proposed
+Status: accepted
 
 ## What changed
 
