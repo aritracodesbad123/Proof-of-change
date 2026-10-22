@@ -1722,6 +1722,19 @@ def side_out(venv: Path) -> Path:
     return d
 
 
+def side_checkout(venv: Path) -> Path | None:
+    """The side's own checkout next to its venv (work/venv-main -> work/side-main), or None (nightly routes)."""
+    d = venv.parent / f"side-{venv.name.removeprefix('venv-')}"
+    return d if d.is_dir() else None
+
+
+def probe_env(venv: Path, checkout: Path | None = None) -> dict:
+    """Environment for a behavioural probe: the allowlisted side env plus the project's own test settings
+    (pytest config env entries, DJANGO_SETTINGS_MODULE, pythonpath, literal conftest env), as its pytest runs get."""
+    from poc import test_settings
+    return test_settings.apply(base_env(side_home(venv)), checkout if checkout is not None else side_checkout(venv))
+
+
 def side_cwd(venv: Path) -> Path:
     d = venv.parent / f"cwd-{venv.name.removeprefix('venv-')}"
     d.mkdir(parents=True, exist_ok=True)
@@ -2904,16 +2917,21 @@ def probe_launcher(venv: Path, path: Path):
     return launch
 
 
+_CONTREE_CHECKOUTS: dict = {}   # side -> local checkout read for the project's test settings (files only)
+
+
 def _contree_probe_once(side: str, path: Path, timeout: int) -> tuple[dict, str, float]:
     """Run one probe file on a Contree checkpoint (upload probe, disposable run)."""
     from poc import contree_sandboxes
     sess = contree_sandboxes.session()
     assert sess is not None
     remote = f"/work/probes/{path.name}"
+    from poc import test_settings
+    exports = test_settings.shell_exports(_CONTREE_CHECKOUTS.get(side))
     t0 = time.time()
     raw = sess.run_op(
         side,
-        f"set -euo pipefail\ncd /work/src 2>/dev/null || cd /work\npython {shlex.quote(remote)}",
+        f"set -euo pipefail\ncd /work/src 2>/dev/null || cd /work\n{exports}python {shlex.quote(remote)}",
         disposable=True, timeout=timeout, files={remote: path})
     secs = round(time.time() - t0, 1)
     out, err = raw.get("stdout") or "", raw.get("stderr") or ""
@@ -2995,9 +3013,12 @@ def run_probes(repo: str, pr: int, pythons: dict, prdir: Path, work: Path, a, pl
         return {"status": "none", "items": []}
     items, errors, refused = [], [], []
     venvs = {side: Path(py).parent.parent for side, py in pythons.items()}   # <venv>/bin/python
-    envs = {side: base_env(side_home(v)) for side, v in venvs.items()}
+    envs = {side: probe_env(v) for side, v in venvs.items()}   # the project's test settings, as pytest gets them
     cwds = {side: side_cwd(v) for side, v in venvs.items()}
     use_contree = _contree_ready()
+    if use_contree:
+        _CONTREE_CHECKOUTS.clear()
+        _CONTREE_CHECKOUTS.update({side: side_checkout(v) for side, v in venvs.items()})
     for x in plan:
         path, fz = Path(x["path"]), x["freeze"]
         def guard(p, fz=fz):
@@ -3118,7 +3139,7 @@ def probe_coverage(item: dict, probe_results: dict | None, vm: Path, main_root: 
         out = side_out(vm)
         data, js = out / f".probe-cov-{it['id']}", out / f"probe-cov-{it['id']}.json"
         sbx = side_sandbox(vm, ro=(path,))
-        env = base_env(side_home(vm))
+        env = probe_env(vm)
         rc, _ = run([py, "-m", "coverage", "run", f"--data-file={data}", f"--include={include}", path], log,
                     cwd=side_cwd(vm), env=env, timeout=int(probes.read_spec(path).get("timeout_s", 120)), sbx=sbx)
         run([py, "-m", "coverage", "json", f"--data-file={data}", "-o", js, "-q"], log, cwd=side_cwd(vm), env=env,
