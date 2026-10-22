@@ -47,9 +47,11 @@ class Sess:
         return {"exit_code": 0, "stdout": self.b64[s - 1:e][:CAP] + "\n", "stderr": ""}
 
 
-def _product_run(tmp_path, monkeypatch, sess):
+def _product_run(tmp_path, monkeypatch, sess, run_timeout=None):
     main_root, pr_root, item, a = _sides(tmp_path)
     a.product_check, a.pr, a.bench = True, 1, None
+    if run_timeout is not None:
+        a.run_timeout = run_timeout
     monkeypatch.setattr("poc.contree_sandboxes.session", lambda: sess)
     return daily_run.contree_coverage_run(item, main_root, pr_root, ["tests/test_widget.py"], tmp_path, a)
 
@@ -128,3 +130,41 @@ def test_study_route_unchanged(tmp_path, monkeypatch):
     monkeypatch.setattr("poc.contree_sandboxes.session", lambda: SimpleNamespace(pr_uuid="pr-1", run_op=op))
     got = daily_run.contree_coverage_run(item, main_root, pr_root, ["t.py"], tmp_path, a)
     assert got["status"] == "measured" and seen["disposable"] is True
+
+
+def _clocked(monkeypatch, sess, per_piece):
+    """Fake clock: every fetched piece takes per_piece seconds. Records the timeout given to each piece."""
+    now = [0.0]
+    monkeypatch.setattr(daily_run, "_cov_clock", lambda: now[0])
+    real, given = sess.run_image, []
+
+    def run_image(image, shell, timeout=600):
+        given.append(timeout)
+        now[0] += per_piece
+        return real(image, shell, timeout)
+    sess.run_image = run_image
+    return given
+
+
+def test_pieces_share_one_overall_deadline(tmp_path, monkeypatch):
+    monkeypatch.setattr(daily_run, "COV_CHUNK", 997)
+    sess = Sess(_big_report())
+    given = _clocked(monkeypatch, sess, per_piece=1)
+    budget = 3600
+    got = _product_run(tmp_path, monkeypatch, sess, run_timeout=budget)
+    assert got["status"] == "measured", got
+    assert len(given) > 3 and given[0] <= budget
+    assert given == sorted(given, reverse=True) and given[-1] < given[0]
+    assert all(t == budget - i for i, t in enumerate(given))
+
+
+def test_running_out_of_time_stays_not_measured(tmp_path, monkeypatch):
+    monkeypatch.setattr(daily_run, "COV_CHUNK", 997)
+    sess = Sess(_big_report())
+    given = _clocked(monkeypatch, sess, per_piece=1000)  # far slower than the budget allows
+    got = _product_run(tmp_path, monkeypatch, sess, run_timeout=3600)
+    assert got["status"] == "not measured"
+    assert "could not be fetched from Contree" in got["why"] and "ran out of time" in got["why"]
+    assert given == [3600, 2600, 1600, 600]  # each piece gets only the time left; no piece starts past the deadline
+    assert len(given) < -(-len(sess.b64) // 997)
+    assert _gate(got)["verdict"] == "could_not_verify"

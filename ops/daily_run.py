@@ -2862,11 +2862,23 @@ COV_MAX_CHUNKS = 200
 COV_FETCH_FAILED = "the coverage report could not be fetched from Contree"
 
 
-def fetch_contree_coverage(sess, image: str, length: int, digest: str, timeout: int) -> tuple[str | None, str]:
-    """(report JSON text, '') fetched piece by piece from the saved image, or (None, plain reason)."""
+COV_MIN_PIECE_SECONDS = 5
+
+
+def _cov_clock() -> float:
+    return time.monotonic()
+
+
+def fetch_contree_coverage(sess, image: str, length: int, digest: str, timeout: int,
+                           clock=None) -> tuple[str | None, str]:
+    """(report JSON text, '') fetched piece by piece from the saved image, or (None, plain reason).
+
+    timeout is one overall deadline for the whole fetch, not per piece: each piece gets only the time left."""
     import base64
     import gzip
     import hashlib
+    clock = clock or _cov_clock
+    deadline = clock() + max(0, int(timeout))
     if not image:
         return None, f"{COV_FETCH_FAILED} (the run returned no image id)"
     if length <= 0 or length > COV_CHUNK * COV_MAX_CHUNKS:
@@ -2874,8 +2886,11 @@ def fetch_contree_coverage(sess, image: str, length: int, digest: str, timeout: 
     parts = []
     for start in range(1, length + 1, COV_CHUNK):
         end = min(start + COV_CHUNK - 1, length)
+        left = int(deadline - clock())
+        if left < COV_MIN_PIECE_SECONDS:
+            return None, f"{COV_FETCH_FAILED} (ran out of time after {len(parts)} of {-(-length // COV_CHUNK)} pieces)"
         try:
-            raw = sess.run_image(image, f"cut -c {start}-{end} /work/poc-cov/cov.b64", timeout=timeout)
+            raw = sess.run_image(image, f"cut -c {start}-{end} /work/poc-cov/cov.b64", timeout=left)
         except Exception as e:  # noqa: BLE001
             return None, f"{COV_FETCH_FAILED} ({type(e).__name__})"
         if not isinstance(raw, dict) or raw.get("exit_code") != 0:
