@@ -289,19 +289,28 @@ class ContreeSession:
         return self.run_op(side, shell, disposable=True, timeout=timeout, files=files)
 
 
-_PY_VERSION_OUT = re.compile(r"^Python (\d+)\.(\d+)(?:\.(\d+))?\S*\s*$")
+_PY_VERSION_OUT = re.compile(r"^Python (\d+\.\d+(?:\.\d+)?)((?:a|b|rc)\d+)?(\+\S*)?\s*$")
 
 
 def parse_python_version(raw: dict | None) -> str:
-    """'X.Y.Z' from a `python --version` result, or '' when the run failed or printed something else."""
+    """The full version from a `python --version` result, pre-release (a/b/rc) and local (+...) tags kept,
+    for example '3.13.0rc1' or '3.12.7+'. '' when the run failed or printed something else."""
     if not isinstance(raw, dict) or raw.get("exit_code") != 0:
         return ""
     text = ((raw.get("stdout") or "") + "\n" + (raw.get("stderr") or "")).strip().splitlines()
     for line in text:
         m = _PY_VERSION_OUT.match(line.strip())
         if m:
-            return ".".join(g for g in m.groups() if g is not None)
+            return "".join(g for g in m.groups() if g is not None)
     return ""
+
+
+def split_python_version(version: str) -> tuple[tuple[int, ...], str, str] | None:
+    """(release numbers, pre-release tag, local tag) of a parsed version, or None when it is not one."""
+    m = re.fullmatch(r"(\d+\.\d+(?:\.\d+)?)((?:a|b|rc)\d+)?(\+\S*)?", version or "")
+    if not m:
+        return None
+    return tuple(int(x) for x in m.group(1).split(".")), m.group(2) or "", m.group(3) or ""
 
 
 _RP_CLAUSE = re.compile(r"^(~=|==|!=|>=|<=|>|<)\s*(\d+(?:\.\d+)*)(\.\*)?$")
@@ -379,9 +388,15 @@ def side_pythons(sess: "ContreeSession", specs: list[str], *, timeout: int = 120
         if not version:
             out["problems"].append(f"{side}: the Python version inside Contree could not be read")
             continue
+        parts = split_python_version(version)
+        if parts is None:
+            out["problems"].append(f"{side}: the Python version inside Contree could not be read")
+            continue
+        if parts[1]:
+            out["problems"].append(f"{side}: Contree ran a pre-release Python ({version})")
         if not spec_ok:
             continue
-        full = tuple(int(x) for x in version.split("."))
+        full = parts[0]
         if not all(requires_python_ok(full, clauses) for clauses in spec_sets):
             out["problems"].append(f"{side}: Contree ran Python {version}, which does not satisfy requires-python "
                                    f"{', '.join(texts)}")
