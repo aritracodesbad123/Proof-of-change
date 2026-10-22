@@ -2296,7 +2296,8 @@ def freeze_env(venv: Path, out: Path) -> str:
     return out.name
 
 
-def build_main_env(cfg: dict, venv: Path, log: Path, python: str, timeout: int, wheel_dir: Path) -> dict:
+def build_main_env(cfg: dict, venv: Path, log: Path, python: str, timeout: int, wheel_dir: Path,
+                   isolated: bool = False) -> dict:
     """Stable release of the library with its test extra + test deps + optional test deps (so tests do not skip for
     missing optional modules), then the exact nightly wheel file, pinned by sha256, reinstalled without deps.
     UV_LINK_MODE=copy so patching the PR copy can never modify the shared uv cache."""
@@ -2319,7 +2320,7 @@ def build_main_env(cfg: dict, venv: Path, log: Path, python: str, timeout: int, 
             reqs = list(dict.fromkeys(reqs_for_test_extras(metadata_requires(venv, cfg["dist"]), cfg["dist"]) + opt))
             if not reqs:
                 return {"ok": False, "why": f"installing test extras/optional test deps failed ({rc}); see setup log"}
-            optional_backends = install_optional_backends({"main": venv}, reqs, log, timeout)
+            optional_backends = install_optional_backends({"main": venv}, reqs, log, timeout, isolated)
         else:
             bundled = reqs_for_test_extras(metadata_requires(venv, cfg["dist"]), cfg["dist"]) + opt
             optional_backends = {"installed": bundled, "skipped": []}
@@ -2364,7 +2365,7 @@ def apply_patch(pdiff: str, site: Path, log: Path) -> tuple[bool, str]:
 
 
 def source_build(repo: str, item: dict, cfg: dict, venv: Path, workdir: Path, log: Path, python: str,
-                 timeout: int, main_extra_reqs: tuple = ()) -> dict:
+                 timeout: int, main_extra_reqs: tuple = (), isolated: bool = False) -> dict:
     env = base_env(side_home(venv), install=True)
     src = workdir / "src"
     steps = [["git", "init", "-q", src],
@@ -2381,7 +2382,7 @@ def source_build(repo: str, item: dict, cfg: dict, venv: Path, workdir: Path, lo
             return {"ok": False, "why": f"source checkout/setup failed ({rc}) at: {' '.join(map(str, c[:3]))}"}
     optional = [str(x) for x in list(cfg.get("optional_test_deps") or []) + list(main_extra_reqs)]
     optional += [r for r in optional_backend_reqs(src, cfg["dist"]) if r not in optional]
-    backends = install_optional_backends({"pr": venv}, optional, log, timeout) if optional else {
+    backends = install_optional_backends({"pr": venv}, optional, log, timeout, isolated) if optional else {
         "installed": [], "skipped": []}
     t0 = time.time()
     rc, secs = run_heavy([uv_bin(), "pip", "install", "-p", venv / "bin/python", "--no-cache", src], log, env=env,
@@ -4060,7 +4061,7 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
     if helper_on:
         def _build_main():
             built = build_main_env(cfg, vm, prdir / "setup-main.log", py, a.build_timeout,
-                                   workroot / "wheels" / rdir.name)
+                                   workroot / "wheels" / rdir.name, isolated=product_route(a))
             return bool(built.get("ok")), built.get("why") or "", built
         _ok, _why, main, outcome = demo_helper.run_setup(
             "main install", _build_main, cleanup=lambda: shutil.rmtree(vm, ignore_errors=True))
@@ -4068,7 +4069,8 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
         if not isinstance(main, dict):
             main = {"ok": False, "why": _why}
     else:
-        main = build_main_env(cfg, vm, prdir / "setup-main.log", py, a.build_timeout, workroot / "wheels" / rdir.name)
+        main = build_main_env(cfg, vm, prdir / "setup-main.log", py, a.build_timeout, workroot / "wheels" / rdir.name,
+                              isolated=product_route(a))
     rec["main_side"] = {"source": "scientific-python nightly wheel (exact file, pinned by sha256)",
                         **{k: v for k, v in main.items() if k not in ("ok",)}}
     if main.get("build"):
@@ -4087,7 +4089,7 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
             if helper_on:
                 def _build_pr():
                     built = source_build(repo, item, cfg, vp, work, prdir / "build-pr.log", py,
-                                         a.build_timeout, tuple(extra))
+                                         a.build_timeout, tuple(extra), isolated=product_route(a))
                     return bool(built.get("ok")), built.get("why") or "", built
                 _ok, _why, b, outcome = demo_helper.run_setup(
                     "PR build", _build_pr, cleanup=lambda: shutil.rmtree(vp, ignore_errors=True),
@@ -4096,7 +4098,8 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
                 if not isinstance(b, dict):
                     b = {"ok": False, "why": _why}
             else:
-                b = source_build(repo, item, cfg, vp, work, prdir / "build-pr.log", py, a.build_timeout, tuple(extra))
+                b = source_build(repo, item, cfg, vp, work, prdir / "build-pr.log", py, a.build_timeout, tuple(extra),
+                                 isolated=product_route(a))
             rec["pr_side"] = {"source": f"source build of {item['head_sha'][:12]}",
                               **{k: v for k, v in b.items() if k != "ok"}}
             rec["notes"] = ("main = nightly wheel, PR = source build of the PR head; differences can include "

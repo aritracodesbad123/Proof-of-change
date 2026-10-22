@@ -136,7 +136,8 @@ def test_contree_only_declared_installs_run_after_the_isolation_lines():
 
 def test_product_route_passes_isolated_to_install_side(tmp_path, monkeypatch):
     src = Path(daily_run.__file__).read_text()
-    assert src.count("isolated=product_route(a))") == 2
+    import re
+    assert len(re.findall(r"install_side\([^)]*\)?[^\n]*\n?[^\n]*isolated=product_route\(a\)\)", src)) == 2
 
 
 def _own_index_product(tmp_path, monkeypatch, project_text, uv_toml=None, step="main install"):
@@ -239,3 +240,15 @@ def test_own_index_refusal_keeps_infrastructure_failure(tmp_path, monkeypatch):
     why = "infrastructure failure: contree session lost"
     assert daily_run.own_index_refusal(a, why, co) == why
     assert daily_run.own_index_refusal(a, "install failed (1)", co).startswith("unsupported:")
+
+
+def test_nightly_and_source_build_backends_gated_on_product_route():
+    import inspect
+    bm = inspect.getsource(daily_run.build_main_env)
+    sb = inspect.getsource(daily_run.source_build)
+    assert "isolated: bool = False" in bm and "reqs, log, timeout, isolated)" in bm
+    assert "isolated: bool = False" in sb and "optional, log, timeout, isolated)" in sb
+    tp = inspect.getsource(daily_run.test_pr)
+    assert tp.count("isolated=product_route(a)") == 4
+    assert inspect.signature(daily_run.build_main_env).parameters["isolated"].default is False
+    assert inspect.signature(daily_run.source_build).parameters["isolated"].default is False
