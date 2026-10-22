@@ -1,7 +1,7 @@
 # Product checks fetch the Contree coverage report from a file
 
 **Date:** 2026-10-22
-**Status:** proposed
+**Status:** accepted
 
 ## What changed
 
