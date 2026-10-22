@@ -1,7 +1,7 @@
 # Accept a git worktree when stamping the Proof-of-Change commit
 
 **Date:** 2026-10-22
-**Status:** proposed
+**Status:** accepted
 
 ## What changed
 
