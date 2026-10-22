@@ -3566,7 +3566,7 @@ def _contree_only_pair(a, rec: dict, repo: str, cfg: dict, item: dict, sp: dict,
     not_local = ["local freeze", "installed-commit guard", "probe coverage", "optional-module retry"]
     if not measure_coverage:
         not_local.insert(2, "coverage")
-    rec["contree_only"] = {"note": "Contree mode: installs, tests and probes ran in Contree; nothing from the pull request ran locally",
+    rec["contree_only"] = {"note": "Contree mode: Contree has not run yet; nothing from the pull request ran locally",
                            "declared_test_deps": decl, "optional_backends": optional,
                            "not_run_locally": not_local}
     rec["coverage"] = {"status": "not measured", "why": CONTREE_ONLY_COVERAGE_WHY}
@@ -3575,7 +3575,10 @@ def _contree_only_pair(a, rec: dict, repo: str, cfg: dict, item: dict, sp: dict,
                                  extra_shell=contree_only_extra_shell(decl, optional, base))
     cmp = ex = None
     if cnv:
+        rec["contree_only"]["note"] = "Contree mode: Contree did not run, so nothing from the pull request was run"
         return cmp, cnv, ex, targets
+    rec["contree_only"]["note"] = ("Contree mode: installs, tests and probes ran in Contree; nothing from the pull "
+                                   "request ran locally")
     if decl:
         rec["declared_test_deps"] = {"requested": decl, "installed": True, "where": "contree"}
         rec["test_extras"] = list(dict.fromkeys([*(rec.get("test_extras") or []), *decl]))
