@@ -145,12 +145,8 @@ def _changed_files(root):
     return sorted(n for n in names if (root / n).is_file())
 
 
-def test_there_is_no_hand_written_package_list_or_error_map():
+def _scan(root, files):
     import re
-    from pathlib import Path
-    root = Path(__file__).resolve().parents[1]
-    files = _changed_files(root)
-    assert "console/web/src/flow.ts" in files and "poc/batch_order.py" in files
     hits = []
     for name in files:
         if name.startswith("tests/") or not name.endswith(_CODE_SUFFIXES):
@@ -160,6 +156,15 @@ def test_there_is_no_hand_written_package_list_or_error_map():
             for m in re.finditer(shape, text):
                 line = text[:m.start()].count("\n") + 1
                 hits.append(f"{name}:{line}: {m.group(0)[:60]}")
+    return hits
+
+
+def test_there_is_no_hand_written_package_list_or_error_map():
+    from pathlib import Path
+    root = Path(__file__).resolve().parents[1]
+    files = _changed_files(root)
+    assert "console/web/src/flow.ts" in files and "poc/batch_order.py" in files
+    hits = _scan(root, files)
     for gone in ("SYSTEM_ALLOWLIST", "_SO_PACKAGES", "_SYSTEM_MARKERS"):
         hits.extend(f"{name}: {gone}" for name in files if not name.startswith("tests/")
                     and gone in (root / name).read_text(errors="replace"))
@@ -167,9 +172,13 @@ def test_there_is_no_hand_written_package_list_or_error_map():
 
 
 def test_the_no_hardcoding_scan_catches_a_planted_map(tmp_path):
-    import re
-    planted = 'FIX = {"libfoo.so.1": "libfoo1", "x.h": ["libx-dev"]}\nrun("apt-get install -y libx-dev")\n'
-    assert sum(len(re.findall(shape, planted)) for shape in _PACKAGE_SHAPES) >= 3
+    (tmp_path / "poc").mkdir()
+    (tmp_path / "poc" / "planted.py").write_text(
+        'FIX = {"libfoo.so.1": "libfoo1", "x.h": ["libx-dev"]}\nrun("apt-get install -y libx-dev")\n')
+    (tmp_path / "tests").mkdir()
+    (tmp_path / "tests" / "fixture.py").write_text('X = "liba-dev"\n')   # tests are not scanned
+    hits = _scan(tmp_path, ["poc/planted.py", "tests/fixture.py"])
+    assert len(hits) >= 3 and all(h.startswith("poc/planted.py:") for h in hits)
 
 
 def test_system_gap_installs_proposed_packages_on_both_sides_and_reruns(monkeypatch):
@@ -321,7 +330,7 @@ def test_pr_side_gets_no_setup_retries_on_a_product_run_only():
     from types import SimpleNamespace
 
     import ops.daily_run as dr
-    assert dr._pr_side_retries(SimpleNamespace(pr=["x"], product_check=True)) == 0
+    assert dr._pr_side_retries(SimpleNamespace(pr=["x"], product_check=True)) == 1
     assert dr._pr_side_retries(SimpleNamespace(pr=None, product_check=False)) == demo_helper.MAX_SETUP_RETRIES
     rec = {}
     assert dr._pr_own_failure(SimpleNamespace(pr=None), rec, "PR build", "boom") == "boom" and rec == {}
@@ -370,3 +379,64 @@ def test_pr_side_missing_system_piece_is_a_limitation_not_the_prs_fault(tmp_path
     log.write_text("SyntaxError: invalid syntax in widget/core.py\n")
     reason = dr._pr_own_failure(a, rec, "PR build", "build failed (1)", log)
     assert rec["pr_build_failure"] and reason.startswith("the PR's own build failed")
+
+
+def _pr_fail(tmp_path, log_text, tries):
+    from types import SimpleNamespace
+
+    import ops.daily_run as dr
+    log = tmp_path / "setup-pr.log"
+    log.write_text(log_text)
+    rec = {"demo_helper": {"setup": {"attempts": tries, "counts_as_verdict": False}}}
+    reason = dr._pr_own_failure(SimpleNamespace(pr=["x"], product_check=True), rec, "PR install",
+                                "install failed (1); see setup-pr.log", log)
+    return rec, reason
+
+
+def test_pr_side_fails_both_tries_with_a_named_error_needs_attention(tmp_path):
+    import ops.daily_run as dr
+    rec, _reason = _pr_fail(tmp_path, "Traceback...\nSyntaxError: invalid syntax (core.py, line 3)\n", 2)
+    assert rec["pr_build_failure"]["needs_attention"] and "SyntaxError" in rec["pr_build_failure"]["error"]
+    rec |= {"files": {}, "probes": None}
+    dr._store_verdict(rec, None, _reason, None)
+    assert rec["verdict"] == "needs_attention" and "both tries" in rec["reason"]
+
+
+def test_pr_side_one_failed_try_or_no_named_error_is_not_blamed(tmp_path):
+    rec, _ = _pr_fail(tmp_path, "SyntaxError: invalid syntax\n", 1)
+    assert rec["pr_build_failure"]["needs_attention"] is False
+    rec, _ = _pr_fail(tmp_path, "something went wrong\n", 2)
+    assert rec["pr_build_failure"]["needs_attention"] is False
+
+
+def test_pr_side_infrastructure_failures_are_never_blamed_on_the_pr(tmp_path):
+    for err in ("RuntimeError: Connection reset by peer", "MemoryError: out of memory", "OSError: No space left on device",
+                "TimeoutError: timed out after 1800s", "error: Could not resolve host: pypi.org",
+                "bwrap: Creating new namespace failed"):
+        rec, reason = _pr_fail(tmp_path, err + "\n", 2)
+        assert "pr_build_failure" not in rec and reason.startswith("install failed"), err
+
+
+def test_pr_side_missing_system_piece_after_two_tries_stays_could_not_verify(tmp_path):
+    rec, reason = _pr_fail(tmp_path, "error: fatal error: foo.h: No such file or directory\n", 2)
+    assert "pr_build_failure" not in rec and reason.startswith("could not verify")
+    assert rec["demo_helper"]["limitations"]
+
+
+def test_docs_site_on_the_projects_own_pypi_page_is_trusted_in_the_real_flow(tmp_path, monkeypatch):
+    from types import SimpleNamespace
+
+    import ops.daily_run as dr
+    monkeypatch.delenv("POC_PROGRESS_PATH", raising=False)
+    main = tmp_path / "side-main"
+    main.mkdir()
+    own = {"info": {"project_urls": {"Source": "https://github.com/acme/widget", "Docs": "https://widget.dev/"}}}
+    other = {"info": {"project_urls": {"Source": "https://github.com/x/y", "Docs": "https://evil.example/"}}}
+    a = SimpleNamespace(pr=["x"], product_check=True, python="3.12", sandbox_backend="local")
+    for info, expect in ((own, True), (other, False)):
+        rec = {"pr": {"number": 11}, "files": {"all": []}}
+        dr._product_plan(a, rec, REPO, {"dist": "widget"}, [main], pypi=lambda n, _i=info: _i,
+                         python_available=lambda v: None)
+        urls = dr._DECLARED_URLS[f"{REPO}#11"]
+        assert ("https://widget.dev/" in urls) is expect
+        assert "https://evil.example/" not in urls

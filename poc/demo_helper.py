@@ -1783,11 +1783,12 @@ def note_setup(rec: dict, step: str, outcome) -> None:
 PR_BUILD_LABEL = "the PR's own build failure"
 
 
-def note_pr_build_failure(rec: dict, step: str, why: str) -> str:
+def note_pr_build_failure(rec: dict, step: str, why: str, needs_attention: bool = False, error: str = "") -> str:
     """Main installed fine and only the PR side failed to build: the PR's own failure, not a setup problem.
     It is labelled that way and never retried as setup. Returns the reason line for the record."""
     reason = f"the PR's own build failed (main installed fine): {why}"
-    rec["pr_build_failure"] = {"step": step, "why": str(why)[:400]}
+    rec["pr_build_failure"] = {"step": step, "why": str(why)[:400], "needs_attention": bool(needs_attention),
+                               "error": (error or "")[:300]}
     block = rec.setdefault("demo_helper", {})
     block["setup"] = {"label": PR_BUILD_LABEL, "counts_as_verdict": True, "step": step, "pr_own_failure": True,
                       "detail": str(why)[:400]}

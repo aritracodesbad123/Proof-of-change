@@ -1422,7 +1422,17 @@ def _product_plan(a, rec: dict, repo: str, cfg: dict, checkouts, pypi=None, pyth
     block["install_docs_from"] = "main"
     _INSTALL_DOCS[_batch_key(repo, rec)] = docs["text"]
     _DECLARED[_batch_key(repo, rec)] = sorted(demo_helper.declared_names(main_dir)) if main_dir else []
-    _DECLARED_URLS[_batch_key(repo, rec)] = demo_helper.declared_urls(main_dir) if main_dir else []
+    urls = demo_helper.declared_urls(main_dir) if main_dir else []
+    dist = (cfg or {}).get("dist") or (cfg or {}).get("pkg") or ""
+    parts = demo_helper.split_repo(repo or "")
+    if product and dist and parts:
+        try:
+            info = (pypi or demo_helper.fetch_pypi)(dist)
+        except Exception:  # noqa: BLE001 — no PyPI page means only the project's own files declare links
+            info = None
+        if demo_helper.pypi_links_back(info, *parts):   # the PyPI page is the project's own
+            urls.extend(u for u in demo_helper.pypi_declared_urls(info) if u not in urls)
+    _DECLARED_URLS[_batch_key(repo, rec)] = urls
     changed = list(dict.fromkeys(
         [f for f in ((rec.get("files") or {}).get("all") or []) if demo_helper.is_install_doc_path(f)]
         + demo_helper.install_docs_changed(main_dir, pr_dir)))
@@ -1524,10 +1534,20 @@ def _install_with_helper(a, rec, step, venv, checkout, chosen, log, timeout, con
 
 
 def _pr_side_retries(a):
-    """Install retries for the PR side once main has installed fine. On a product run that is 0: a PR side that will
-    not build is the PR's own failure, not a setup problem to retry. Other runs keep the earlier retries."""
+    """Install retries for the PR side once main has installed fine. On a product run that is 1: one more try, then a
+    PR side that still will not build is the PR's own failure, not a setup problem. Other runs keep the earlier
+    retries."""
     from poc import demo_helper
-    return 0 if product_route(a) else demo_helper.MAX_SETUP_RETRIES
+    return 1 if product_route(a) else demo_helper.MAX_SETUP_RETRIES
+
+
+# Generic signs of an infrastructure failure (network, out of memory, timeout, disk, sandbox). No package names.
+_INFRA_FAILURE = re.compile(
+    r"(out of memory|\boom\b|memoryerror|killed|no space left|disk quota|timed? ?out|timeout|connection (?:refused|"
+    r"reset|aborted)|temporary failure in name resolution|could not resolve host|name or service not known|network is "
+    r"unreachable|ssl(?:error|: )|http error 5\d\d|\b50[234]\b|bwrap|sandbox|infrastructure failure)", re.I)
+# A named error: an exception name or a compiler / build tool "error:" line.
+_NAMED_ERROR = re.compile(r"(?m)(?:^|\s)(?:[A-Za-z_][\w.]*(?:Error|Exception)\b|error(?:\[\w+\])?:\s*\S)")
 
 
 def _pr_own_failure(a, rec, step, why, log: Path | None = None) -> str:
@@ -1539,6 +1559,7 @@ def _pr_own_failure(a, rec, step, why, log: Path | None = None) -> str:
     from poc import demo_helper
     if not product_route(a) or str(why).startswith("infrastructure failure:"):
         return why
+    tries = int(((rec.get("demo_helper") or {}).get("setup") or {}).get("attempts") or 1)
     text = str(why)
     if log is not None:
         try:
@@ -1550,7 +1571,12 @@ def _pr_own_failure(a, rec, step, why, log: Path | None = None) -> str:
         demo_helper.note_limitation(rec, [], missing, "the PR side needs a system library, header or build tool "
                                                       "that this sandbox does not have")
         return f"could not verify: the PR side needs a missing system library, header or build tool: {missing}"
-    return demo_helper.note_pr_build_failure(rec, step, why)
+    if _INFRA_FAILURE.search(text):
+        return why   # network, memory, timeout, disk or sandbox trouble is never blamed on the PR
+    named = _NAMED_ERROR.search(text)
+    blame = bool(named) and tries >= 2   # main installed with the same setup; both PR-side tries failed
+    return demo_helper.note_pr_build_failure(rec, step, why, needs_attention=blame,
+                                             error=demo_helper.failure_line(text[named.start():]) if named else "")
 
 
 def _log_plan_installs(rec, plan, venvs: dict) -> None:
@@ -4237,6 +4263,11 @@ def _store_verdict(rec: dict, cmp, cnv, ex) -> None:
     v, reason, _ = verdict_for(cmp, cnv, ex, rec.get("files"), rec.get("probes"), rec.get("behaviour_claims"),
                                rec.get("baseline"), docstring_only=bool(rec.get("docstring_only")))
     v, reason = cap_for_review(rec, v, reason)
+    own = rec.get("pr_build_failure") or {}
+    if own.get("needs_attention") and v == Verdict.COULD_NOT_VERIFY.value:
+        v = Verdict.NEEDS_ATTENTION.value
+        reason = (f"needs attention: main installed with the same setup, but the PR side failed to build on both "
+                  f"tries: {own.get('error') or own.get('why')}")[:400]
     rec["verdict"], rec["reason"] = v, reason
     if rec.get("docstring_only") and v == Verdict.VERIFIED.value:
         rec["behaviour_claims"] = mark_holds_by_construction(rec.get("behaviour_claims"))

@@ -32,13 +32,13 @@ Projects need different Python versions and libraries. A fixed list per reposito
 4. Up to 3 tries. If the gap remains, the verdict is "could not verify" with the missing name. The advisory swarm still writes its report and cannot change the verdict.
 
 5. In a batch, one pull request with a setup problem no longer holds up the others; it waits for the end pass.
-6. When main installs fine and only the pull request's side fails to build, that is the pull request's own failure. It is labelled "the PR's own build failure", is not retried as a setup problem (no install retries, no end-pass retries, no setup-gap retries) and the verdict stays "could not verify" with that reason. Exception: when the error text shows a missing system library, header file, pkg-config package or build tool (matched by generic error patterns, never a list of package names), it is not the pull request's fault. It stays "could not verify" with a limitation naming what is missing.
+6. When main installs fine and only the pull request's side fails to build, that is the pull request's own failure. It is labelled "the PR's own build failure" and is not retried as a setup problem (no end-pass retries, no setup-gap retries). On a product run the pull request's side gets one more install try. If both tries fail with a named error (an exception name or a build tool "error:" line), the verdict is "needs attention". Otherwise it stays "could not verify" with that reason. Infrastructure trouble (network, out of memory, timeout, disk, sandbox) is never blamed on the pull request. Exception: when the error text shows a missing system library, header file, pkg-config package or build tool (matched by generic error patterns, never a list of package names), it is not the pull request's fault. It stays "could not verify" with a limitation naming what is missing.
 7. The batch order and the new setup-gap tries are for product runs only. A study run or the daily study that asks for `--batch-order` is refused, and those runs keep the earlier single setup-gap rerun, so their results are unchanged.
 8. A file the check cannot write (this run's requirements file, setup plan or lookup cache) is reported as a warning and noted in the record, not silently skipped.
 
 ## The two retry limits
 
-- Install retries: if installing a side fails, the install is tried again up to 2 more times. On a product run the pull request's side gets none once main has installed fine (decision 6).
+- Install retries: if installing a side fails, the install is tried again up to 2 more times. On a product run the pull request's side gets 1 more try once main has installed fine (decision 6).
 - Setup-gap tries: if a test still cannot be verified because something is missing or fails to import, the cause is looked up, the fix is installed on both sides and the step is rerun, up to 3 tries. The batch end pass uses the same limit of 3 tries for a pull request whose setup failed.
 
 ## Alternatives and tradeoffs
