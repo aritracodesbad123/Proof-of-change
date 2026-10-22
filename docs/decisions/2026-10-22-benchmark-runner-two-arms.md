@@ -21,8 +21,14 @@ cases run with and without probes, with the misses counted honestly.
 
 - Runs go only through `--product-check --sandbox-backend contree` with `POC_REQUIRE_CONTREE=1`. There is no
   local fallback, and nothing is posted anywhere.
-- A case with no record, or one that tested commits other than the case file's, is not run. Not run and
-  could_not_verify count as misses, never as catches or wins.
+- A case is not run when it has no record, when the tested base, PR head or PR side differs from the case
+  file's commits, or when the record does not show a Contree run. Not run and could_not_verify count as misses,
+  never as catches or wins. n comes from the case list in the run's metadata, so a missing result is not run.
+- Probe uplift counts a case only when both arms ran on the same commits, both installs succeeded, tests-only
+  reached a decided verdict, and the probes flag comes from a finding with the same values on all 3 runs of each
+  side. Other cases are listed as excluded, with the reason.
+- The whole result object is cleaned of secret values before it is written.
+- A case may use a PR on a fork. The case still names the upstream project and the upstream base commit.
 - The runner refuses fixture cases. The unit tests use three fixture cases that are marked as fixtures.
 - Verdict rules, the study path and the daily study are unchanged. The runner only reads the check's record.
   The stage states are derived from that record and are not new record fields.

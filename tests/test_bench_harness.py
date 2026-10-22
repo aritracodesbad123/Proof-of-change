@@ -58,11 +58,19 @@ def test_schema_missing_field_and_duplicate_id(tmp_path):
     assert len(cs) == 1 and any("duplicate id" in p for ps in problems.values() for p in ps)
 
 
-def record(case, verdict, base=None, head=None, install_ok=True, ai_calls=0, usd=0.0):
-    return {"id": "r", "verdict": verdict, "reason": "x", "sides": {"main_sha": base or case["base_sha"], "pr_sha": "f" * 40},
+def probe_item(main_vals=(1, 1, 1), pr_vals=(2, 2, 2), label="unmentioned", state="differs"):
+    return {"runs_per_side": 3, "per_run": [{"ok": True}] * 6,
+            "runs": {"main": [{"o": v} for v in main_vals], "pr": [{"o": v} for v in pr_vals]},
+            "observations": [{"name": "o", "state": state, "label": label}]}
+
+
+def record(case, verdict, base=None, head=None, install_ok=True, ai_calls=0, usd=0.0, pr_sha=None, backend="contree",
+           machine="contree", items=None, reason="x"):
+    return {"id": "r", "verdict": verdict, "reason": reason,
+            "sides": {"main_sha": base or case["base_sha"], "pr_sha": pr_sha or head or case["head_sha"]},
             "chosen": {"head_sha": head or case["head_sha"]}, "installed_commit": {"main": {"ok": install_ok}, "pr": {"ok": True}},
-            "per_run": [{"passed": 3, "failed": 0}], "probes": {"status": "ran"},
-            "cost": {"ai_calls": ai_calls, "cost_usd": usd}}
+            "per_run": [{"passed": 3, "failed": 0}], "probes": {"status": "ran", "items": items or [probe_item()]},
+            "cost": {"ai_calls": ai_calls, "cost_usd": usd}, "sandbox_backend": backend, "machine": machine}
 
 
 def fake_exec(rec, code=0, stderr=""):
@@ -94,7 +102,10 @@ def test_runner_records_a_run(tmp_path):
     assert json.loads((tmp_path / "tests_probes" / "fx-catch.json").read_text())["case_id"] == "fx-catch"
 
 
-@pytest.mark.parametrize("rec_kw, code", [({"head": "9" * 40}, 0), ({"base": "9" * 40}, 0), (None, 3)])
+@pytest.mark.parametrize("rec_kw, code", [({"head": "9" * 40}, 0), ({"base": "9" * 40}, 0), (None, 3),
+                                          ({"pr_sha": "9" * 40}, 0),                       # e.g. GitHub test merge commit
+                                          ({"backend": "local", "machine": "local"}, 0),   # not Contree
+                                          ({"machine": "contree (not run)"}, 0)])          # Contree refused
 def test_wrong_commits_or_no_record_is_not_run(tmp_path, rec_kw, code):
     c = cases()["fx-safe"]
     rec = None if rec_kw is None else record(c, "verified", **rec_kw)
@@ -104,12 +115,36 @@ def test_wrong_commits_or_no_record_is_not_run(tmp_path, rec_kw, code):
         assert r["stages"]["infra"] == "failed"
 
 
-def test_install_failure_stage_and_secret_redaction(tmp_path, monkeypatch):
-    monkeypatch.setenv("NEBIUS_API_KEY", "sekrit-value-123")
+def test_install_failure_stage(tmp_path):
     c = cases()["fx-safe"]
-    r = run.run_one(c, "tests", tmp_path, fake_exec(record(c, "could_not_verify", install_ok=False), 0, "boom sekrit-value-123"))
+    r = run.run_one(c, "tests", tmp_path, fake_exec(record(c, "could_not_verify", install_ok=False)))
     assert r["stages"]["install"] == "failed"
-    assert "sekrit" not in json.dumps(r)
+
+
+@pytest.mark.parametrize("name", ["NEBIUS_API_KEY", "GH_TOKEN", "GITHUB_TOKEN", "NEBIUS_PROJECT_ID", "TAVILY_API_KEY"])
+def test_whole_result_is_redacted(tmp_path, monkeypatch, name):
+    from poc import contree_sandboxes
+    assert {contree_sandboxes.KEY_ENV, contree_sandboxes.PROJECT_ENV, "GH_TOKEN", "GITHUB_TOKEN"} <= set(run.SECRET_NAMES)
+    monkeypatch.setenv(name, "sekrit-value-123")
+    c = cases()["fx-safe"]
+    rec = record(c, "verified", reason="leak sekrit-value-123 in reason", items=[probe_item()])
+    r = run.run_one(c, "tests", tmp_path, fake_exec(rec, 0, "boom sekrit-value-123"))
+    saved = (tmp_path / "tests" / "fx-safe.json").read_text()
+    assert "sekrit" not in json.dumps(r) and "sekrit" not in saved and f"[{name} redacted]" in saved
+    assert run.redact_all({"a": ["x sekrit-value-123", {"sekrit-value-123": 1}]}) == {
+        "a": [f"x [{name} redacted]", {f"[{name} redacted]": 1}]}
+
+
+@pytest.mark.parametrize("items, want", [
+    ([probe_item()], True),
+    ([probe_item(main_vals=(1, 1, 3))], False),            # main side changed between runs
+    ([probe_item(pr_vals=(2, 2))], False),                  # fewer than 3 runs
+    ([probe_item(label="proven")], False),                  # not a finding
+    ([{"id": "p"}], None),                                  # record does not expose per-run values
+    ([], None),
+])
+def test_probe_held(items, want):
+    assert run.probe_held({"probes": {"items": items}}) is want
 
 
 def test_runner_refuses_fixtures(tmp_path):
@@ -147,18 +182,63 @@ def test_empty_denominators_have_no_rate():
     assert m["bugs_caught"] == {"count": 0, "n": 0, "rate": None}
 
 
-def test_uplift_and_summary_files(tmp_path):
-    t = [res("m1", "known_regression_tests_miss", "tests", "verified"),
-         res("c1", "known_regression_tests_catch", "tests", "needs_attention")]
-    p = [res("m1", "known_regression_tests_miss", "tests+probes", "needs_attention"),
-         res("c1", "known_regression_tests_catch", "tests+probes", "could_not_verify")]
-    for arm, rs in (("tests", t), ("tests_probes", p)):
-        (tmp_path / arm).mkdir()
+def _write(root, arms, cases_meta):
+    (root / "run_meta.json").write_text(json.dumps({"arms": {a: [] for a in arms}, "cases": cases_meta}))
+    for arm, rs in arms.items():
+        d = root / arm.replace("+", "_")
+        d.mkdir()
         for r in rs:
-            (tmp_path / arm / f"{r['case_id']}.json").write_text(json.dumps(r))
+            (d / f"{r['case_id']}.json").write_text(json.dumps(r))
+
+
+def full(cid, cat, arm, verdict, held=True, tested="A", install="ok", outcome="ran"):
+    r = res(cid, cat, arm, verdict, outcome=outcome, install=install)
+    r.update(tested={"base_sha": tested}, probe_held_all_runs=held)
+    return r
+
+
+MISS, CATCH = "known_regression_tests_miss", "known_regression_tests_catch"
+
+
+def test_uplift_counts_only_comparable_held_cases(tmp_path):
+    t = [full("m1", MISS, "tests", "verified"), full("m2", MISS, "tests", "verified"),
+         full("m3", MISS, "tests", "verified", tested="B"), full("m4", MISS, "tests", "verified", install="failed"),
+         full("m5", MISS, "tests", "could_not_verify"), full("m6", MISS, "tests", "verified"),
+         full("c1", CATCH, "tests", "needs_attention")]
+    p = [full("m1", MISS, "tests+probes", "needs_attention"),
+         full("m2", MISS, "tests+probes", "needs_attention", held=None),
+         full("m3", MISS, "tests+probes", "needs_attention"), full("m4", MISS, "tests+probes", "needs_attention"),
+         full("m5", MISS, "tests+probes", "needs_attention"), full("m6", MISS, "tests+probes", "needs_attention", held=False),
+         full("c1", CATCH, "tests+probes", "verified")]
+    u = summarize.uplift(t, p)
+    assert u["caught_by_probes_not_tests"] == ["m1"] and u["caught_by_tests_not_probes"] == ["c1"]
+    assert u["regression_cases_compared"] == 2
+    assert u["excluded"] == {"m2": "record does not expose whether the probe result held on all runs",
+                             "m3": "the two arms tested different commits",
+                             "m4": "install did not succeed in both arms",
+                             "m5": "tests-only arm did not reach a decided verdict (could_not_verify)",
+                             "m6": "no probe finding held on all runs"}
+
+
+def test_missing_result_counts_as_not_run_and_summary_files(tmp_path):
+    meta = [{"id": i, "category": MISS, "expected_verdict": "needs_attention", "fixture": True} for i in ("m1", "m2")]
+    _write(tmp_path, {"tests": [full("m1", MISS, "tests", "verified")],
+                      "tests+probes": [full("m1", MISS, "tests+probes", "needs_attention")]}, meta)
     assert summarize.main([str(tmp_path)]) == 0
     s = json.loads((tmp_path / "summary.json").read_text())
-    assert s["probe_uplift"] == {"caught_by_probes_not_tests": ["m1"], "caught_by_tests_not_probes": ["c1"],
-                                 "regression_cases_in_both_arms": 2}
+    for arm in ("tests", "tests+probes"):
+        assert s["arms"][arm]["n_cases"] == 2 and s["arms"][arm]["not_run"] == 1
+    assert s["arms"]["tests+probes"]["bugs_caught"] == {"count": 1, "n": 2, "rate": 0.5}
+    assert s["probe_uplift"]["caught_by_probes_not_tests"] == ["m1"]
+    assert s["probe_uplift"]["excluded"] == {"m2": "did not run in both arms"}
     md = (tmp_path / "summary.md").read_text()
-    assert "FIXTURE DATA" in md and "1 planted regression(s) caught by tests+probes but not by tests-only (m1)" in md
+    assert "FIXTURE DATA" in md and "excluded m2: did not run in both arms" in md
+
+
+def test_fork_pr_url():
+    c = dict(cases()["fx-safe"], pr_url="https://github.com/someone/toolz/pull/7")
+    assert any("needs \"fork\"" in p for p in manifest.validate(c))
+    assert manifest.validate(dict(c, fork="someone/toolz")) == []
+    assert any("same repository name" in p for p in manifest.validate(
+        dict(c, pr_url="https://github.com/someone/other/pull/7", fork="someone/other")))
+    assert any("fork must be OWNER/REPO" in p for p in manifest.validate(dict(c, fork="bad")))

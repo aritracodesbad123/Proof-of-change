@@ -11,7 +11,10 @@ Per arm, over the cases that arm was asked to run (n shown with every rate; smal
   could not verify     could_not_verify or not run, over all cases (both counts also shown apart)
   setup failures       install stage failed, over all cases
   runtime, model calls and cost   sums over the runs that reported them (missing values are counted, not guessed)
-Probe uplift = regression cases caught by tests+probes but not by tests-only (and the reverse, shown too).
+Probe uplift = regression cases caught by tests+probes but not by tests-only (and the reverse, shown too), counted
+only when both arms ran on the same commits, both installs succeeded, tests-only reached a decided verdict, and the
+tests+probes flag comes from a probe finding that held on all 3 runs. Every other case is listed as excluded, with why.
+n comes from the case list in run_meta.json: a case with no result file counts as not run.
 No significance testing is done or claimed.
 """
 from __future__ import annotations
@@ -59,22 +62,67 @@ def arm_metrics(results: list[dict]) -> dict:
     }
 
 
+def _excluded_why(t: dict | None, p: dict | None) -> str | None:
+    """Why a regression case cannot count toward probe uplift (None: it can)."""
+    if t is None or p is None or t.get("outcome") != "ran" or p.get("outcome") != "ran":
+        return "did not run in both arms"
+    if t.get("tested") != p.get("tested"):
+        return "the two arms tested different commits"
+    if (t.get("stages") or {}).get("install") != "ok" or (p.get("stages") or {}).get("install") != "ok":
+        return "install did not succeed in both arms"
+    if t.get("verdict") not in DECIDED:
+        return f"tests-only arm did not reach a decided verdict ({t.get('verdict')})"
+    if p.get("verdict") != "needs_attention" or t.get("verdict") == "needs_attention":
+        return None
+    held = p.get("probe_held_all_runs")
+    if held is None:
+        return "record does not expose whether the probe result held on all runs"
+    if held is not True:
+        return "no probe finding held on all runs"
+    return None
+
+
 def uplift(tests: list[dict], probes: list[dict]) -> dict:
-    caught = lambda rs: {r["case_id"] for r in rs  # noqa: E731
-                         if r["category"] in REGRESSION and r.get("outcome") == "ran" and r["verdict"] == "needs_attention"}
-    t, p = caught(tests), caught(probes)
-    both = {r["case_id"] for r in tests} & {r["case_id"] for r in probes if r["category"] in REGRESSION}
-    return {"caught_by_probes_not_tests": sorted((p - t) & both), "caught_by_tests_not_probes": sorted((t - p) & both),
-            "regression_cases_in_both_arms": len(both)}
+    """Planted regressions caught by tests+probes (a probe finding that held on every run) but not by tests-only,
+    counted only where both arms ran on the same commits, both installs succeeded and tests-only decided."""
+    t_by = {r["case_id"]: r for r in tests}
+    p_by = {r["case_id"]: r for r in probes}
+    ids = sorted({cid for cid, r in {**t_by, **p_by}.items() if r["category"] in REGRESSION})
+    gained, lost, excluded, eligible = [], [], {}, 0
+    for cid in ids:
+        t, p = t_by.get(cid), p_by.get(cid)
+        why = _excluded_why(t, p)
+        if why:
+            excluded[cid] = why
+            continue
+        eligible += 1
+        t_hit, p_hit = t["verdict"] == "needs_attention", p["verdict"] == "needs_attention"
+        if p_hit and not t_hit:
+            gained.append(cid)
+        elif t_hit and not p_hit:
+            lost.append(cid)
+    return {"caught_by_probes_not_tests": gained, "caught_by_tests_not_probes": lost,
+            "regression_cases_compared": eligible, "excluded": excluded}
+
+
+def _not_run(case: dict, arm: str) -> dict:
+    return {"schema": "poc-bench-result/1", "case_id": case["id"], "arm": arm, "fixture": bool(case.get("fixture")),
+            "category": case["category"], "expected_verdict": case["expected_verdict"], "outcome": "not_run",
+            "verdict": None, "not_run_why": ["no result file"], "stages": {}, "wall_seconds": None, "model": {}}
 
 
 def load(root: Path) -> dict[str, list[dict]]:
+    """Results per arm. The case list and arms come from run_meta.json; a missing result counts as not run."""
+    meta = json.loads((root / "run_meta.json").read_text())
     arms = {}
-    for d in sorted(x for x in root.iterdir() if x.is_dir() and x.name != "ops"):
-        rs = [json.loads(f.read_text()) for f in sorted(d.glob("*.json"))]
-        rs = [r for r in rs if r.get("schema") == "poc-bench-result/1"]
-        if rs:
-            arms[rs[0]["arm"]] = rs
+    for arm in meta["arms"]:
+        d = root / arm.replace("+", "_")
+        got = {}
+        for f in sorted(d.glob("*.json")) if d.is_dir() else []:
+            r = json.loads(f.read_text())
+            if r.get("schema") == "poc-bench-result/1" and r.get("arm") == arm:
+                got[r["case_id"]] = r
+        arms[arm] = [got.get(c["id"]) or _not_run(c, arm) for c in meta["cases"]]
     return arms
 
 
@@ -107,8 +155,9 @@ def markdown(s: dict) -> str:
         u = s["probe_uplift"]
         tail = (f"\nProbe uplift: {len(u['caught_by_probes_not_tests'])} planted regression(s) caught by tests+probes but "
                 f"not by tests-only ({', '.join(u['caught_by_probes_not_tests']) or 'none'}); "
-                f"{len(u['caught_by_tests_not_probes'])} the other way; over {u['regression_cases_in_both_arms']} "
-                "regression case(s) run in both arms.\n")
+                f"{len(u['caught_by_tests_not_probes'])} the other way; over {u['regression_cases_compared']} "
+                "comparable regression case(s).\n")
+        tail += "".join(f"- excluded {cid}: {why}\n" for cid, why in u["excluded"].items())
     note = ("\nA case that did not run or ended could_not_verify counts as a miss, never a catch. Counts, not "
             "significance: no statistical test is claimed.\n")
     return head + "\n".join(rows) + "\n" + tail + note

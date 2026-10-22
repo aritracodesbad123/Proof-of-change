@@ -42,7 +42,11 @@ def validate(case: dict) -> list[str]:
     if not m:
         p.append("pr_url must be https://github.com/OWNER/REPO/pull/N")
     elif m.group(1).lower() != str(case["repo"]).lower():
-        p.append("pr_url is not in repo")
+        fork = case.get("fork")
+        if not isinstance(fork, str) or fork.lower() != m.group(1).lower():
+            p.append("pr_url is not in repo; a PR on a fork needs \"fork\": \"OWNER/REPO\" naming the pr_url's repository")
+        elif fork.split("/")[-1].lower() != str(case["repo"]).split("/")[-1].lower():
+            p.append("fork must have the same repository name as repo")
     for k in ("base_sha", "head_sha"):
         if not isinstance(case[k], str) or not SHA.match(case[k]):
             p.append(f"{k} must be a full 40-character lowercase commit id")
@@ -61,6 +65,8 @@ def validate(case: dict) -> list[str]:
             p.append(f"{k} must be a non-empty string")
     if "fixture" in case and not isinstance(case["fixture"], bool):
         p.append("fixture must be true or false")
+    if "fork" in case and not (isinstance(case["fork"], str) and re.match(r"^[^/\s]+/[^/\s]+$", case["fork"])):
+        p.append("fork must be OWNER/REPO")
     if "patch" in case and not (isinstance(case["patch"], str) and case["patch"].endswith((".patch", ".diff"))):
         p.append("patch must be a path to a .patch or .diff file")
     return p

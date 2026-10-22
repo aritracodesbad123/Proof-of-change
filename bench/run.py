@@ -26,6 +26,8 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from bench.manifest import load_cases
+from poc.contree_sandboxes import KEY_ENV as CONTREE_KEY_ENV
+from poc.contree_sandboxes import PROJECT_ENV as CONTREE_PROJECT_ENV
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 IST = timezone(timedelta(hours=5, minutes=30))
@@ -35,7 +37,10 @@ ARMS = {
     "tests+probes+swarm": ["--baseline", "tests+probes", "--model-provider", "nebius", "--swarm"],
 }
 KEY_NAMES = ("NEBIUS_API_KEY", "NEBIUS_PROJECT_ID", "GITHUB_POC_TOKEN")  # reported only as set/unset
-SECRET_NAMES = KEY_NAMES + ("TAVILY_API_KEY", "POC_SMTP_PASSWORD")
+SECRET_NAMES = tuple(dict.fromkeys(KEY_NAMES + ("TAVILY_API_KEY", "POC_SMTP_PASSWORD", "GH_TOKEN", "GITHUB_TOKEN",
+                                                 CONTREE_KEY_ENV, CONTREE_PROJECT_ENV)))
+RED_LABELS = ("false_claim", "unmentioned")  # probe findings that make a verdict needs_attention
+PROBE_RUNS = 3
 
 
 def redact(text: str, env=None) -> str:
@@ -46,6 +51,45 @@ def redact(text: str, env=None) -> str:
         if v and len(v) >= 4:
             text = text.replace(v, f"[{k} redacted]")
     return text
+
+
+def redact_all(obj, env=None):
+    """redact() applied to every string in a JSON-like object, keys included."""
+    if isinstance(obj, str):
+        return redact(obj, env)
+    if isinstance(obj, dict):
+        return {redact_all(k, env): redact_all(v, env) for k, v in obj.items()}
+    if isinstance(obj, (list, tuple)):
+        return [redact_all(v, env) for v in obj]
+    return obj
+
+
+def probe_held(rec: dict | None) -> bool | None:
+    """True when a probe finding (false claim or unmentioned change) showed the same main and PR values on all
+    PROBE_RUNS runs of each side; False when the record shows probe runs but no such finding; None when the record
+    does not expose per-run probe values."""
+    items = ((rec or {}).get("probes") or {}).get("items")
+    if not isinstance(items, list) or not items:
+        return None
+    exposed = False
+    for it in items:
+        runs = it.get("runs") if isinstance(it, dict) else None
+        if not isinstance(runs, dict) or not isinstance(it.get("observations"), list):
+            continue
+        exposed = True
+        sides = {k: runs.get(k) for k in ("main", "pr")}
+        if not all(isinstance(v, list) and len(v) == PROBE_RUNS for v in sides.values()):
+            continue
+        if not all(r.get("ok") for r in it.get("per_run") or [{}]):
+            continue
+        for o in it["observations"]:
+            name = o.get("name")
+            if o.get("state") != "differs" or o.get("label") not in RED_LABELS:
+                continue
+            vals = {k: [r.get(name, "<missing>") if isinstance(r, dict) else "<missing>" for r in v] for k, v in sides.items()}
+            if all(len({json.dumps(x, sort_keys=True) for x in v}) == 1 for v in vals.values()) and vals["main"][0] != vals["pr"][0]:
+                return True
+    return False if exposed else None
 
 
 def arm_dir_name(arm: str) -> str:
@@ -97,6 +141,8 @@ def sha_check(case: dict, rec: dict | None) -> list[str]:
     p = []
     if head != case["head_sha"]:
         p.append(f"tested PR head {head} is not the manifest head_sha")
+    if sides.get("pr_sha") != case["head_sha"]:
+        p.append(f"tested PR side {sides.get('pr_sha')} is not the manifest head_sha (e.g. a GitHub test merge commit)")
     if main_sha != case["base_sha"]:
         p.append(f"tested base {main_sha} is not the manifest base_sha")
     if main_sha and head and main_sha == head:
@@ -104,9 +150,19 @@ def sha_check(case: dict, rec: dict | None) -> list[str]:
     return p
 
 
+def contree_check(rec: dict | None) -> list[str]:
+    """The record must show the check really ran in Contree (backend contree and both checkpoints built there)."""
+    if rec is None:
+        return []
+    if rec.get("sandbox_backend") != "contree" or rec.get("machine") != "contree":
+        return [f"record does not show a Contree run (sandbox_backend={rec.get('sandbox_backend')!r}, "
+                f"machine={rec.get('machine')!r})"]
+    return []
+
+
 def result_for(case: dict, arm: str, cmd: list[str], rec: dict | None, exit_code: int | None, seconds: float,
                stderr_tail: str = "") -> dict:
-    problems = sha_check(case, rec)
+    problems = sha_check(case, rec) + contree_check(rec)
     ran = rec is not None and not problems and rec.get("verdict") is not None
     cost = (rec or {}).get("cost") or {}
     return {
@@ -122,8 +178,10 @@ def result_for(case: dict, arm: str, cmd: list[str], rec: dict | None, exit_code
         "tested": {"base_sha": ((rec or {}).get("sides") or {}).get("main_sha"),
                    "pr_sha": ((rec or {}).get("sides") or {}).get("pr_sha"),
                    "head_sha": ((rec or {}).get("chosen") or {}).get("head_sha")},
-        "command": [Path(cmd[0]).name, *cmd[1:]], "exit_code": exit_code, "stderr_tail": redact(stderr_tail[-2000:]),
+        "command": [Path(cmd[0]).name, *cmd[1:]], "exit_code": exit_code, "stderr_tail": stderr_tail[-2000:],
         "record_id": (rec or {}).get("id"), "poc_commit": (rec or {}).get("poc_commit"),
+        "sandbox": {"backend": (rec or {}).get("sandbox_backend"), "machine": (rec or {}).get("machine")},
+        "probe_held_all_runs": probe_held(rec),
     }
 
 
@@ -149,7 +207,7 @@ def run_one(case: dict, arm: str, out: Path, execute=subprocess.run) -> dict:
         code, err = p.returncode, p.stderr or ""
     except OSError as e:
         code, err = None, f"could not start: {e}"
-    res = result_for(case, arm, cmd, find_record(ops_dir, run_name), code, time.time() - t0, err)
+    res = redact_all(result_for(case, arm, cmd, find_record(ops_dir, run_name), code, time.time() - t0, err))
     d = out / arm_dir_name(arm)
     d.mkdir(parents=True, exist_ok=True)
     (d / f"{case['id']}.json").write_text(json.dumps(res, indent=1))
@@ -178,8 +236,10 @@ def main(argv=None) -> int:
     out = Path(a.out or REPO_ROOT / "bench" / "results" / datetime.now(IST).strftime("%Y-%m-%d"))
     out.mkdir(parents=True, exist_ok=True)
     arms = ["tests", "tests+probes"] + (["tests+probes+swarm"] if a.swarm_arm else [])
-    (out / "run_meta.json").write_text(json.dumps({"environment": environment(), "arms": {k: ARMS[k] for k in arms},
-                                                   "cases": [c["id"] for c in cases]}, indent=1))
+    meta = {"environment": environment(), "arms": {k: ARMS[k] for k in arms},
+            "cases": [{"id": c["id"], "category": c["category"], "expected_verdict": c["expected_verdict"],
+                       "fixture": bool(c.get("fixture"))} for c in cases]}
+    (out / "run_meta.json").write_text(json.dumps(redact_all(meta), indent=1))
     for c in cases:
         for arm in arms:
             r = run_one(c, arm, out)
