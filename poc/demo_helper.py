@@ -19,10 +19,12 @@ from evals.label_study_pairs import split_repo
 
 SETUP_LABEL = "rerun, setup problem"
 MAX_SETUP_RETRIES = 2  # further install attempts after the first failure
-MAX_GAP_ROUNDS = 2  # the first run plus one setup-gap rerun of that test
+MAX_GAP_TRIES = 3  # setup-gap fix-and-rerun tries after the first run; a PR-caused test failure is never retried
+MAX_GAP_ROUNDS = MAX_GAP_TRIES + 1  # the first run plus up to 3 setup-gap reruns
 RETRY_LIMITS = (
     "If setup fails, the helper retries the install up to 2 times. "
-    "If a test still can't be verified because something is missing, it installs what's missing and reruns that test once."
+    "If a test still can't be verified because something is missing or fails to import, it looks up the cause, "
+    "installs the fix on both sides and reruns that step, up to 3 tries."
 )
 TAVILY_TIMEOUT = 8
 PYPI_TIMEOUT = 8
@@ -563,6 +565,8 @@ def begin_check(runner, rec: dict, repo: str, project: str, cache_dir, env: dict
             return rec["demo_helper"]
         info = preflight(cache_dir or ".", env=env, model_token=getattr(runner, "model_provider", None))
         cache = FileCache(Path(cache_dir) / "tavily-cache.json") if cache_dir else MemoryCache()
+        from poc import run_progress
+        run_progress.emit("setup_lookup", detail="Looking up how this project is set up (Python, config, libraries)")
         looked = lookup_project(repo, project, cache, env=env, fetch=fetch)
         block = rec.setdefault("demo_helper", {})
         block["preflight"] = {"ok": info["ok"]}
@@ -1072,6 +1076,49 @@ def attach_plan(rec: dict, plan: dict) -> None:
     block["notes"] = _unique([*(block.get("notes") or []), *plan.get("lines", [])])
 
 
+def write_run_files(plan: dict, out_dir) -> dict:
+    """Write this run's requirements.txt and setup-plan.json. Nothing in them is written per repository by hand:
+    every line comes from the project's own files or from a link-back lookup suggestion in ``plan``."""
+    out = Path(out_dir)
+    out.mkdir(parents=True, exist_ok=True)
+    reqs = [str(req).strip() for req in plan.get("extra_reqs") or [] if str(req).strip()]
+    head = ["# Written for this run by the setup lookup. Installed together on main and pr."]
+    for item in plan.get("packages") or []:
+        if item.get("action") == "install":
+            head.append(f"# {item['requirement']}: {item.get('reason') or 'setup plan'}")
+    req_path = out / "requirements.txt"
+    req_path.write_text("\n".join(head + reqs) + "\n", encoding="utf-8")
+    plan_path = out / "setup-plan.json"
+    plan_path.write_text(json.dumps(redact_obj({k: v for k, v in plan.items()}), indent=2, default=str),
+                         encoding="utf-8")
+    return {"requirements": str(req_path.name), "plan": str(plan_path.name), "count": len(reqs)}
+
+
+def plan_steps(plan: dict) -> dict[str, str]:
+    """Plain-words lines for the three setup steps in the console flowchart."""
+    packages = [item for item in plan.get("packages") or [] if item.get("action") == "install"]
+    noted = [item for item in plan.get("packages") or [] if item.get("action") != "install"]
+    found = len(plan.get("packages") or [])
+    lookup = f"Found {found} setup item(s) in the project's files and the web lookup."
+    if plan.get("refused"):
+        lookup += " Refused: " + ", ".join(f"{r['name']} ({r['reason']})" for r in plan["refused"][:5]) + "."
+    py = plan.get("python") or {}
+    if py.get("switch"):
+        python = f"Using Python {py['switch']}: {py.get('reason') or 'the project asks for it'}."
+    elif py.get("requested"):
+        python = f"Python {py['requested']}: {py.get('reason') or ''}".strip()
+    else:
+        python = "Kept the default Python; the project does not ask for another one."
+    if packages:
+        deps = "Wrote requirements.txt and installed it on main and pr: " + ", ".join(
+            item["requirement"] for item in packages[:12]) + "."
+    else:
+        deps = "Nothing extra to install; the project's own install covers it."
+    if noted:
+        deps += f" {len(noted)} more come with the project install."
+    return {"setup_lookup": lookup, "setup_python": python, "install_deps": deps}
+
+
 def contree_shell(plan: dict | None) -> str:
     """Extra shell for both Contree checkpoints. Empty when the plan adds nothing the sandbox may apply."""
     if not plan:
@@ -1186,6 +1233,9 @@ def run_setup(step: str, fn, *, active: bool = True, cleanup=None, max_retries: 
     for attempt in range(tries):
         if attempt and cleanup:
             cleanup()
+        if attempt:
+            from poc import run_progress
+            run_progress.emit("retry", detail=f"{step}: try {attempt + 1} of {tries} after a setup problem: {redact(detail, env)[:200]}")
         try:
             ok, detail, value = _unpack(fn())
         except Exception as exc:  # noqa: BLE001
@@ -1384,37 +1434,7 @@ def _coverage_blocks_verified(rec: dict, after_verdict: str, recheck_coverage) -
     return None
 
 
-def retry_unverified(rec: dict, rerun, install_one, declared, tavily_text: str, pypi, repo: str,
-                     allow_system: bool, install_system=None, lookup=None, recheck_coverage=None) -> dict:
-    """One rerun when a could-not-verify result is a setup gap. Tavily text alone never changes the verdict.
-
-    This is the only step that can raise could_not_verify to verified. When the record has probes, that raise
-    waits for a fresh probe line-coverage measurement. The measurement runs only when the change is small.
-    A larger change skips it, and the verdict stays could_not_verify.
-    """
-    block = rec.setdefault("demo_helper", {})
-    notes = list(block.get("notes") or [])
-    setup = block.get("setup") or {}
-    if setup.get("counts_as_verdict") is False:
-        notes.append("Demo helper: setup failure already labelled; the probe was not rerun.")
-        block["notes"] = _unique(notes)
-        return rec
-    text = gap_text(rec)
-    if not is_setup_gap(rec.get("verdict"), text):
-        block["notes"] = _unique(notes)
-        return rec
-    name = gap_name(text)
-    if lookup is not None:
-        try:
-            extra = lookup(f"{repo} {name} python install")
-        except Exception:  # noqa: BLE001 — keep going with the error text and the project files
-            extra = None
-        if isinstance(extra, dict):
-            extra = scope_lookup(extra, repo, str(rec.get("library") or ""))
-        tavily_text = (tavily_text or "") + "\n" + _lookup_text(extra)
-    before = {"round": 1, "verdict": rec.get("verdict"), "reason": rec.get("reason")}
-    parts = split_repo(repo or "")
-    owner, repo_name = parts if parts else ("", "")
+def _gap_specs(text: str, declared, tavily_text: str, pypi, owner: str, repo_name: str, notes: list) -> list[dict]:
     suggested = set(pip_suggestions(tavily_text or ""))
     specs = []
     for module in _modules(text):
@@ -1434,55 +1454,116 @@ def retry_unverified(rec: dict, rerun, install_one, declared, tavily_text: str, 
                 notes.append(f"Setup plan: refused {module}: its PyPI page does not link to this GitHub repository")
         else:
             notes.append(f"Setup plan: refused {module}: not listed by the project and not a link-back suggestion")
-    # A system package comes from the project's own files, applied with the setup plan.
-    # Lookup text never adds one, even when the error names a missing library.
-    if not specs:
-        rec["verdict"] = "could_not_verify"
-        rec["reason"] = _gap_reason(name)
-        notes.append(f"Before rerun: {before['verdict']}: {before['reason']}")
-        notes.append(f"After rerun: not rerun. {rec['reason']}")
-        block["notes"] = _unique(notes)
-        block["gap_retry"] = {"reran": False, "rounds": [before], "installed": []}
-        return rec
-    if rerun is None:
-        rec["verdict"] = "could_not_verify"
-        rec["reason"] = _gap_reason(name)
-        notes.append(rec["reason"])
-        block["notes"] = _unique(notes)
-        block["gap_retry"] = {"reran": False, "rounds": [before], "installed": []}
-        return rec
-    logs = install_same(specs, install_one) if specs else []
-    note_installs(rec, logs)
+    return specs
+
+
+def _emit_retry(detail: str) -> None:
+    from poc import run_progress
+    run_progress.emit("retry", detail=detail[:400])
+
+
+def retry_unverified(rec: dict, rerun, install_one, declared, tavily_text: str, pypi, repo: str,
+                     allow_system: bool, install_system=None, lookup=None, recheck_coverage=None,
+                     max_tries: int = MAX_GAP_TRIES) -> dict:
+    """Up to ``max_tries`` reruns when a could-not-verify result is a setup or import gap.
+
+    Each try: look the error up (Tavily, when a lookup is given), install the fix on main and pr, rerun the step.
+    Every try is logged in ``gap_retry.tries``. A needs-attention result (a PR-caused test failure) is never retried.
+    Tavily text alone never changes the verdict. This is the only step that can raise could_not_verify to
+    verified, and that raise still waits for a fresh probe line-coverage measurement when the record has probes.
+    """
+    block = rec.setdefault("demo_helper", {})
     notes = list(block.get("notes") or [])
-    installed = [row for row in logs if not str(row["versions"].get("main", "")).startswith("failed")
-                 and not str(row["versions"].get("pr", "")).startswith("failed")]
-    if not installed:
-        rec["verdict"] = "could_not_verify"
-        rec["reason"] = _gap_reason(name)
-        notes.append(f"Before rerun: {before['verdict']}: {before['reason']}")
-        notes.append(f"After rerun: not rerun. {rec['reason']}")
+    setup = block.get("setup") or {}
+    if setup.get("counts_as_verdict") is False:
+        notes.append("Demo helper: setup failure already labelled; the probe was not rerun.")
         block["notes"] = _unique(notes)
-        block["gap_retry"] = {"reran": False, "rounds": [before], "installed": logs}
         return rec
-    outcome = rerun() or {}
-    after_verdict = outcome.get("verdict", rec.get("verdict"))
-    after_reason = outcome.get("reason", rec.get("reason"))
-    after_text = f"{after_verdict}\n{after_reason}"
-    if is_setup_gap(after_verdict, after_text):
-        rec["verdict"] = "could_not_verify"
-        rec["reason"] = _gap_reason(gap_name(after_reason or text))
-    else:
-        held = _coverage_blocks_verified(rec, after_verdict, recheck_coverage)
-        if held:
-            rec["verdict"], rec["reason"] = held
+    text = gap_text(rec)
+    if not is_setup_gap(rec.get("verdict"), text):
+        block["notes"] = _unique(notes)
+        return rec
+    parts = split_repo(repo or "")
+    owner, repo_name = parts if parts else ("", "")
+    rounds = [{"round": 1, "verdict": rec.get("verdict"), "reason": rec.get("reason")}]
+    tries: list[dict] = []
+    all_logs: list[dict] = []
+    reran = False
+    lookup_text = tavily_text or ""
+    tried: set[str] = set()
+    for attempt in range(1, max(0, max_tries) + 1):
+        name = gap_name(text)
+        query = f"{repo} {name} python install"
+        looked = False
+        if lookup is not None:
+            try:
+                extra = lookup(query)
+            except Exception:  # noqa: BLE001 — keep going with the error text and the project files
+                extra = None
+            if isinstance(extra, dict):
+                extra = scope_lookup(extra, repo, str(rec.get("library") or ""))
+                looked = True
+            lookup_text = lookup_text + "\n" + _lookup_text(extra)
+        specs = _gap_specs(text, declared, lookup_text, pypi, owner, repo_name, notes)
+        repeat = [spec for spec in specs if norm(req_name(spec["requirement"])) in tried]
+        specs = [spec for spec in specs if norm(req_name(spec["requirement"])) not in tried]
+        tried.update(norm(req_name(spec["requirement"])) for spec in specs)
+        entry = {"try": attempt, "problem": name, "lookup": query if looked else None,
+                 "planned": [spec["requirement"] for spec in specs], "installed": [], "rerun": False}
+        if not specs or rerun is None:
+            if not specs and repeat:
+                entry["result"] = "already installed on an earlier try and still missing"
+            else:
+                entry["result"] = "nothing safe to install" if not specs else "no rerun available"
+            tries.append(entry)
+            _emit_retry(f"Try {attempt} of {max_tries}: {name}: {entry['result']}")
+            break
+        logs = install_same(specs, install_one)
+        note_installs(rec, logs)
+        notes = list(block.get("notes") or [])
+        all_logs.extend(logs)
+        good = [row for row in logs if not str(row["versions"].get("main", "")).startswith("failed")
+                and not str(row["versions"].get("pr", "")).startswith("failed")]
+        entry["installed"] = [f"{row['package']} {row['version']}" for row in good]
+        if not good:
+            entry["result"] = "install failed on main or pr"
+            tries.append(entry)
+            _emit_retry(f"Try {attempt} of {max_tries}: {name}: {entry['result']}")
+            break
+        _emit_retry(f"Try {attempt} of {max_tries}: installed {', '.join(entry['installed'])} on main and pr; rerunning")
+        outcome = rerun() or {}
+        reran = True
+        entry["rerun"] = True
+        after_verdict = outcome.get("verdict", rec.get("verdict"))
+        after_reason = outcome.get("reason", rec.get("reason"))
+        after_text = f"{after_verdict}\n{after_reason}"
+        if is_setup_gap(after_verdict, after_text):
+            rec["verdict"] = "could_not_verify"
+            rec["reason"] = _gap_reason(gap_name(after_reason or text))
+            entry["result"] = f"still a setup gap: {gap_name(after_reason or text)}"
+            text = after_text
         else:
-            rec["verdict"] = after_verdict
-            rec["reason"] = after_reason
-    notes.append(f"Before rerun: {before['verdict']}: {before['reason']}")
-    notes.append(f"After rerun: {rec['verdict']}: {rec['reason']}")
+            held = _coverage_blocks_verified(rec, after_verdict, recheck_coverage)
+            if held:
+                rec["verdict"], rec["reason"] = held
+            else:
+                rec["verdict"], rec["reason"] = after_verdict, after_reason
+            entry["result"] = f"fixed: {rec['verdict']}"
+        rounds.append({"round": attempt + 1, "verdict": rec["verdict"], "reason": rec["reason"]})
+        tries.append(entry)
+        if not entry["result"].startswith("still"):
+            break
+    if not reran or is_setup_gap(rec.get("verdict"), f"{rec.get('verdict')}\n{rec.get('reason')}"):
+        rec["verdict"] = "could_not_verify"
+        rec["reason"] = _gap_reason(gap_name(text))
+    notes.append(f"Before rerun: {rounds[0]['verdict']}: {rounds[0]['reason']}")
+    if reran:
+        notes.append(f"After rerun: ({len(tries)} of {max_tries} tries) {rec['verdict']}: {rec['reason']}")
+    else:
+        notes.append(f"After rerun: not rerun. {rec['reason']}")
     block["notes"] = _unique(notes)
-    block["gap_retry"] = {"reran": True, "rounds": [before, {"round": 2, "verdict": rec["verdict"], "reason": rec["reason"]}],
-                          "installed": logs}
+    block["gap_retry"] = {"reran": reran, "rounds": rounds, "installed": all_logs, "tries": tries,
+                          "max_tries": max_tries}
     return rec
 
 

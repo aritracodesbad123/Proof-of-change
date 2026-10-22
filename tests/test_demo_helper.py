@@ -254,14 +254,14 @@ def test_nightly_plan_reads_project_files_and_skips_lookup_packages_without_them
 
 def test_report_states_the_retry_limits():
     sentence = ("If setup fails, the helper retries the install up to 2 times. "
-                "If a test still can't be verified because something is missing, it installs what's missing "
-                "and reruns that test once.")
+                "If a test still can't be verified because something is missing or fails to import, it looks up "
+                "the cause, installs the fix on both sides and reruns that step, up to 3 tries.")
     assert demo_helper.RETRY_LIMITS == sentence
-    assert demo_helper.MAX_SETUP_RETRIES == 2 and demo_helper.MAX_GAP_ROUNDS == 2
+    assert demo_helper.MAX_SETUP_RETRIES == 2 and demo_helper.MAX_GAP_TRIES == 3
     text = demo_helper.markdown_for({"demo_helper": {"notes": ["Setup plan: ok"]}})
     assert text.count(sentence) == 1
     import reports.pr_report as pr_report
-    assert sentence in Path("docs/decisions/2026-10-21-demo-helper.md").read_text()
+    assert sentence in Path("docs/decisions/2026-10-22-console-check-flow.md").read_text()
     assert pr_report.demo_helper.RETRY_LIMITS == sentence
 
 

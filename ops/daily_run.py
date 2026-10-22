@@ -1267,7 +1267,8 @@ def _project_file_dirs(repo: str, item: dict, work: Path, log: Path) -> list[Pat
     return [dest]
 
 
-def _product_plan(a, rec: dict, repo: str, cfg: dict, checkouts, pypi=None, python_available=None) -> dict | None:
+def _product_plan(a, rec: dict, repo: str, cfg: dict, checkouts, pypi=None, python_available=None,
+                  out_dir=None) -> dict | None:
     """Setup plan for a console or daily check. None on a study run, which does not call this.
 
     Does not change the runner's Python. The caller passes ``_check_python`` into this check's installs.
@@ -1285,6 +1286,18 @@ def _product_plan(a, rec: dict, repo: str, cfg: dict, checkouts, pypi=None, pyth
         allow_lookup_packages=bool(folders))
     demo_helper.attach_plan(rec, plan)
     demo_helper.announce(plan.get("lines") or [])
+    from poc import run_progress
+    steps = demo_helper.plan_steps(plan)
+    rec.setdefault("demo_helper", {})["steps"] = steps
+    if out_dir is not None:
+        try:
+            files = demo_helper.write_run_files(plan, out_dir)
+            rec.setdefault("demo_helper", {})["run_files"] = files
+        except OSError:
+            pass
+    run_progress.emit("setup_lookup", detail=steps["setup_lookup"])
+    run_progress.emit("setup_python", detail=steps["setup_python"])
+    run_progress.emit("install_deps", detail=steps["install_deps"])
     return plan
 
 
@@ -3426,7 +3439,7 @@ def _contree_only_pair(a, rec: dict, repo: str, cfg: dict, item: dict, sp: dict,
     cm, cp = work / "side-main", work / "side-pr"
     for v in (vm, vp):
         (v / "bin").mkdir(parents=True, exist_ok=True)
-    setup_plan = _product_plan(a, rec, repo, cfg, [cm, cp]) if helper_on else None
+    setup_plan = _product_plan(a, rec, repo, cfg, [cm, cp], out_dir=prdir) if helper_on else None
     run_progress.emit("claims", "super", "planning behaviour claims / probes")
     plan = plan_probes(repo, item, rec, cm, [cp, work / "src"], prdir, a)
     rec["pr_side_started_at"] = pr_started = freeze.now()   # nothing below may create or change a probe
@@ -3525,7 +3538,7 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
     plan, pr_started = [], None
     helper_on = demo_helper.active(a)
     file_dirs = _project_file_dirs(repo, item, work, prdir / "packaging.log") if helper_on else []
-    setup_plan = _product_plan(a, rec, repo, cfg, file_dirs) if helper_on else None
+    setup_plan = _product_plan(a, rec, repo, cfg, file_dirs, out_dir=prdir) if helper_on else None
     py = _check_python(a, setup_plan)
     run_progress.emit("install_main", detail="installing main (nightly) side")
     if helper_on:
@@ -3849,7 +3862,7 @@ def test_source_pair(repo: str, cfg: dict, item: dict, prdir: Path, work: Path, 
     else:
         vm, vp = work / "venv-main", work / "venv-pr"
         cm, cp = work / "side-main", work / "side-pr"
-        setup_plan = _product_plan(a, rec, repo, cfg, [cm, cp]) if helper_on else None
+        setup_plan = _product_plan(a, rec, repo, cfg, [cm, cp], out_dir=prdir) if helper_on else None
         py = _check_python(a, setup_plan)
         extra = list(setup_plan["extra_reqs"]) if setup_plan and setup_plan.get("extra_reqs") else None
         run_progress.emit("install_main", detail="installing main side")
