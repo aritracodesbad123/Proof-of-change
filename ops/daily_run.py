@@ -1254,7 +1254,9 @@ def install_deps_only(venv: Path, checkout: Path, plan: dict, log: Path, python:
     deps_root: read the dependency files from this folder (read-only) instead of the checkout. The flat-layout
     fallback passes main's checkout on both sides, so the PR's own dependency files never change what is installed.
     """
-    env = base_env(side_home(venv), install=True)
+    from poc import demo_helper
+    env = demo_helper.drop_index_env(base_env(side_home(venv), install=True))   # no index from the environment
+    env["UV_NO_CONFIG"] = "1"   # no [tool.uv], [tool.uv.pip] or uv.toml settings (index, find-links) either
     src = Path(deps_root) if deps_root is not None else checkout
     cmds = [["uv", "venv", "-q", "-p", python, venv]]
     if plan.get("kind") == "uv-sync":
@@ -1264,14 +1266,23 @@ def install_deps_only(venv: Path, checkout: Path, plan: dict, log: Path, python:
         export = ["uv", "export", "-q", "--no-emit-project", "--no-hashes", "--directory", src,
                   "-p", venv / "bin/python", "-o", reqs]
         cmds.append(export + (["--frozen"] if plan.get("frozen") else []))
+        cmds.append(("check-export", reqs))   # same off-index line rules as requirement files, before installing
         cmds.append(["uv", "pip", "install", "-q", "-p", venv / "bin/python", "-r", reqs])
     else:
         for name in plan.get("files") or []:
             cmds.append(["uv", "pip", "install", "-q", "-p", venv / "bin/python", "-r", src / name])
     cmds.append(["uv", "pip", "install", "-q", "-p", venv / "bin/python", *BASE_TEST_DEPS, *(extra_reqs or [])])
+    cmds = [c if isinstance(c, tuple) else [*c, "--no-config"] for c in cmds]   # every uv call ignores config files
     sbx = side_sandbox(venv, network=True, ro=(() if deps_root is None or src == checkout else (src,)))
     sbx["rw"].append(checkout)
     for c in cmds:
+        if isinstance(c, tuple) and c[0] == "check-export":
+            refused = demo_helper.unsafe_exported_lines(c[1])
+            if refused:
+                Path(c[1]).unlink(missing_ok=True)
+                (checkout / ".poc-declared-deps.txt").unlink(missing_ok=True)
+                return False, demo_helper.unsafe_requirements_reason(refused)
+            continue
         rc, _ = run(c, log, cwd=src, env=env, timeout=timeout, sbx=sbx)   # lock paths are relative to it
         if rc == "timeout":
             return False, f"dependency install timed out after {timeout}s; see {log.name}"
@@ -1557,7 +1568,8 @@ def _install_with_helper(a, rec, step, venv, checkout, chosen, log, timeout, con
         return str(step).lower().startswith("main")
 
     def _flat_plan() -> dict | None:
-        """The deps-only plan for a flat layout, always from MAIN's files. Main: what main declares. PR side: main's
+        """The deps-only plan for any not-a-package error (flat layout or other), always from MAIN's files.
+        Main: what main declares. PR side: main's
         plan and main's folder, and only when main itself fell back, so a flat layout on the PR side alone stays
         could not verify. The PR's own dependency files are never read."""
         if _is_main():
@@ -1597,19 +1609,22 @@ def _install_with_helper(a, rec, step, venv, checkout, chosen, log, timeout, con
                 if blocked:
                     return False, blocked
         if product_route(a) and demo_helper.not_a_package(text):
-            flat = demo_helper.flat_layout(text)
-            plan = _flat_plan() if flat else demo_helper.deps_only_plan(checkout)
+            plan = _flat_plan()
+            refused = demo_helper.unsafe_requirement_lines(_flat_root(), plan) if plan else []
+            if refused:
+                shutil.rmtree(venv, ignore_errors=True)
+                return False, demo_helper.unsafe_requirements_reason(refused)
             if plan:
                 shutil.rmtree(venv, ignore_errors=True)
                 ok, why = install_deps_only(venv, checkout, plan, log, state["py"], timeout, extra_reqs,
-                                            **({"deps_root": _flat_root()} if flat else {}))
+                                            deps_root=_flat_root())
                 if ok:
                     demo_helper.note_auto_fix(
                         rec, f"Auto-fix: the {step} could not build the project as a package, so only the "
                              f"dependencies it declares ({plan['source']}) were installed, the same way on both "
                              "sides, and the project's own folder was put on the import path.")
                     rec.setdefault("demo_helper", {})["deps_only"] = plan
-                    if flat and _is_main():
+                    if _is_main():
                         rec["demo_helper"]["flat_deps_root"] = str(checkout)
                 else:
                     blocked = _unsupported(_log_text())
