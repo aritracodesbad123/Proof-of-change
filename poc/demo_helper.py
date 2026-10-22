@@ -1080,7 +1080,10 @@ _SYSTEM_MARKERS = (
     (("openssl/", "ssl.h", "openssl not found"), "libssl-dev"),
     (("pkg-config", "pkgconfig"), "pkg-config"),
     (("python.h", "command 'gcc' failed", "gcc: not found", "cc: not found", "unable to execute 'gcc'",
-      "no such file or directory: 'gcc'", "c compiler cannot create executables", "error: command 'cc'"),
+      "no such file or directory: 'gcc'", "c compiler cannot create executables", "error: command 'cc'",
+      "no such file or directory: 'make'", "no such file or directory: 'cc'", "no such file or directory: 'g++'",
+      "make: not found", "make: command not found", "gcc: command not found", "cc: command not found",
+      "g++: command not found", "c++: command not found", "unable to execute 'cc'", "command 'g++' failed"),
      "build-essential"),
 )
 _APT_INSTALL = re.compile(r"apt(?:-get)?\s+install\s+(?:-y\s+)?((?:[a-z0-9][a-z0-9.+-]+\s*)+)")

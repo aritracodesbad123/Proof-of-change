@@ -140,3 +140,16 @@ def test_gui_library_gap_goes_through_install_system_on_both_sides(monkeypatch):
                                  install_system=lambda n: asked.append(n) or True)
     assert asked == ["libegl1", "libgl1", "libxkbcommon0"]
     assert rec["verdict"] == "needs_attention"
+
+
+def test_missing_build_tools_map_to_build_essential():
+    for err in ("FileNotFoundError: [Errno 2] No such file or directory: 'make'",
+                "/bin/sh: 1: gcc: command not found", "error: command 'g++' failed: No such file or directory",
+                "bash: cc: command not found"):
+        assert demo_helper.system_fix_for(err)["install"] == ["build-essential"], err
+    asked = []
+    rec = {"verdict": "could_not_verify",
+           "reason": "pyads==3.4.0 build: FileNotFoundError: No such file or directory: 'make'; ImportError"}
+    demo_helper.retry_unverified(rec, lambda: {"verdict": "verified", "reason": "ok"}, lambda s, r: (True, "1"),
+                                 [], "", None, REPO, True, install_system=lambda n: asked.append(n) or True)
+    assert asked == ["build-essential"]
