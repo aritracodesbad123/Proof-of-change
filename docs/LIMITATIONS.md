@@ -11,6 +11,7 @@ Cases where a check ends as could not verify. Setup limits are also written into
 - Docs-only pull requests are skipped in the daily run. A single check in full mode ends as COULD NOT VERIFY because the AI-probe gate needs a probe that runs a changed line. Other modes can still mark a docstring-only change VERIFIED, with the reason 'holds by construction'.
 - Contree is confirmed end-to-end only for a real product check (apprise pull request #1783, confirmed on commit cecf851) run from main in Contree-only mode (`POC_REQUIRE_CONTREE=1`), where the verdict matched the local run and nothing ran outside Contree. Not confirmed on the live Contree service: test coverage measured inside Contree, which shell runs setup, hiding of failure text, and running with a judge's own Nebius account.
 - Projects that need their own package index or uv sources, or that run on a pre-release (test) build of Python, end as COULD NOT VERIFY by design. Main and the pull request must run the exact same Python version, or the result is COULD NOT VERIFY.
+- Each product check that measures coverage inside Contree leaves one saved Contree image behind (the coverage run is kept so its report file can be read back in pieces), and that image is not deleted afterwards. Reading the report back has one overall time limit for all pieces together; if it runs out, coverage stays 'not measured' and the check stays COULD NOT VERIFY.
 
 ## OS packages in the local sandbox (bubblewrap)
 
