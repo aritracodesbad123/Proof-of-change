@@ -1570,11 +1570,16 @@ def build_setup_plan(repo: str, checkouts, tavily, current_python: str, sandbox:
             packages.append(item)
     text = _tavily_text(tavily)
     refused = []
+    groups_blocked = ""
     if docs_checkouts is not None:
         # Product check: every dependency group in main's files, through the deps-only refusal rules.
         for checkout in docs_from:
-            group_lines, group_refused = dependency_group_reqs(checkout, self_dist)
+            group_lines, group_refused, group_problems = dependency_group_reqs(checkout, self_dist)
             refused += group_refused
+            if group_refused or group_problems:
+                # fail closed: nothing from the groups is installed and the check stops as could not verify
+                groups_blocked = dependency_groups_reason(group_refused, group_problems)
+                continue
             for req in group_lines:
                 _add_pkg(packages, seen, req, kind="dependency-group", action="install", source="pyproject",
                          reason="listed in a dependency group", self_dist=self_dist)
@@ -1646,8 +1651,10 @@ def build_setup_plan(repo: str, checkouts, tavily, current_python: str, sandbox:
         lines.append(f"Setup plan: system package {item['name']}: {item['reason']}")
     for item in refused:
         lines.append(f"Setup plan: refused {item['name']}: {item['reason']}")
+    if groups_blocked:
+        lines.append(f"Setup plan: stopped: {groups_blocked}")
     return {"packages": packages, "extra_reqs": extra, "python": python, "system": system,
-            "refused": refused, "lines": lines}
+            "refused": refused, "groups_blocked": groups_blocked, "lines": lines}
 
 
 def attach_plan(rec: dict, plan: dict) -> None:
@@ -1915,23 +1922,38 @@ def unsafe_requirement_lines(root, plan: dict | None, _seen=None, _top=None) -> 
     return bad
 
 
-def dependency_group_reqs(checkout, self_dist: str = "") -> tuple[list[str], list[dict]]:
-    """Every PEP 735 [dependency-groups] line in this checkout's pyproject, as (installable lines, refused).
+def dependency_group_reqs(checkout, self_dist: str = "") -> tuple[list[str], list[dict], list[str]]:
+    """Every PEP 735 [dependency-groups] line in this checkout's pyproject, as (lines, refused, problems).
 
     No group name is special: all groups are read. ``{include-group = "x"}`` entries are followed; a group that
     includes itself, directly or in a loop, is read once. A line naming the project itself (for example
     ``proj[all]``) is replaced by the lines of those extras from [project.optional-dependencies], followed the same
     way, so the project itself is never installed from the index. Every resulting line goes through the deps-only
-    refusal rules (index options, URLs, git, editable, local paths); refused lines are returned, not installed."""
+    refusal rules (index options, URLs, git, editable, local paths). ``refused`` holds refused lines and
+    ``problems`` holds tables that PEP 735 does not allow (a missing included group, names that clash after
+    normalization, entries that are neither a string nor an include-group table). A product check that gets
+    either back stops as could not verify (see dependency_groups_reason); nothing from the groups is installed."""
     data = _pyproject(Path(checkout) / "pyproject.toml")
     groups = data.get("dependency-groups")
-    if not isinstance(groups, dict) or not groups:
-        return [], []
+    if groups is None:
+        return [], [], []
+    if not isinstance(groups, dict):
+        return [], [], ["[dependency-groups] is not a table"]
+    if not groups:
+        return [], [], []
     project = data.get("project") if isinstance(data.get("project"), dict) else {}
     extras = project.get("optional-dependencies") if isinstance(project.get("optional-dependencies"), dict) else {}
     selves = {norm(n) for n in (self_dist, project.get("name") or "") if n}
     out: list[str] = []
     refused: list[dict] = []
+    problems: list[str] = []
+    by_key: dict = {}
+    for g in groups:
+        key = norm(str(g))
+        if key in by_key:
+            problems.append(f'group names "{by_key[key]}" and "{g}" are the same after normalization')
+        else:
+            by_key[key] = str(g)
     seen_groups: set = set()
     seen_extras: set = set()
 
@@ -1962,21 +1984,43 @@ def dependency_group_reqs(checkout, self_dist: str = "") -> tuple[list[str], lis
                     if isinstance(req, str):
                         add_line(req, f"extra {name}")
 
-    def add_group(name: str) -> None:
+    def add_group(name: str, via: str = "") -> None:
         key = norm(name)
+        if key not in by_key:
+            problems.append(f'include-group "{name}" in group "{via}" names a group that does not exist')
+            return
         if key in seen_groups:
             return
         seen_groups.add(key)
-        match = [g for g in groups if norm(str(g)) == key]
-        for entry in groups.get(match[0], []) if match and isinstance(groups.get(match[0]), list) else []:
+        real = by_key[key]
+        entries = groups.get(real)
+        if not isinstance(entries, list):
+            problems.append(f'group "{real}" is not a list')
+            return
+        for entry in entries:
             if isinstance(entry, str):
-                add_line(entry, str(match[0]))
-            elif isinstance(entry, dict) and isinstance(entry.get("include-group"), str):
-                add_group(entry["include-group"])
+                add_line(entry, real)
+            elif isinstance(entry, dict) and set(entry) == {"include-group"} and isinstance(entry["include-group"], str):
+                add_group(entry["include-group"], real)
+            else:
+                problems.append(f'group "{real}" has an entry that is neither a requirement nor an include-group '
+                                f"({str(entry)[:60]})")
 
-    for g in groups:
-        add_group(str(g))
-    return out, refused
+    for g in list(by_key.values()):
+        add_group(g)
+    return out, refused, list(dict.fromkeys(problems))
+
+
+def dependency_groups_reason(refused: list[dict], problems: list[str]) -> str:
+    """The could-not-verify reason when a product check's dependency groups can't be installed as written."""
+    if refused:
+        names = [r["name"] for r in refused]
+        shown = "; ".join(names[:3]) + (" and more" if len(names) > 3 else "")
+        return ("unsupported: the project's dependency groups list lines that point outside the official package "
+                f"index ({shown}), so nothing was installed and nothing was tested")
+    shown = "; ".join(problems[:3]) + (" and more" if len(problems) > 3 else "")
+    return ("unsupported: the project's dependency groups can't be read as PEP 735 describes "
+            f"({shown}), so nothing was installed and nothing was tested")
 
 
 def extra_names(req: str) -> list[str]:
