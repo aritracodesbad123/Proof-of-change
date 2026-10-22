@@ -208,3 +208,27 @@ def test_guard_keeps_a_final_block_that_reaches_project_or_installed_code():
     assert model_probes.own_code_crash(CHAIN_HEAD + via_project, "model-probe1.py") is False
     via_pkg = via_project.replace("/work/src/pkg/mod.py", "/v/lib/python3.14/site-packages/dep/x.py")
     assert model_probes.own_code_crash(CHAIN_HEAD + via_pkg, "model-probe1.py") is False
+
+
+def _chain(log):
+    return CHAIN_HEAD + log
+
+
+def test_loosened_rewrite_needs_the_same_crash_on_both_sides():
+    item = {"runs": _crashed()}
+    same = _chain(OWN)
+    assert model_probes.probe_broke_itself(item, {"main": [same] * 3, "pr": [same] * 3}, "model-probe1.py") is True
+    other_line = _chain(OWN.replace("line 68, in <module>", "line 70, in <module>"))
+    assert model_probes.crash_signature(same, "model-probe1.py") == ("StopIteration", "68")
+    assert model_probes.probe_broke_itself(item, {"main": [same] * 3, "pr": [other_line] * 3},
+                                           "model-probe1.py") is False
+    # a different final error type on the PR side: the sides differ, so no rewrite
+    pr = [_chain(OWN.replace("StopIteration\n", "StopIteration\nRuntimeError: other\n"))] * 3
+    assert model_probes.crash_signature(pr[0], "model-probe1.py") == ("RuntimeError", "68")
+    assert model_probes.probe_broke_itself(item, {"main": [same] * 3, "pr": pr}, "model-probe1.py") is False
+
+
+def test_unchained_own_crashes_are_unchanged_by_the_same_crash_rule():
+    item = {"runs": _crashed()}
+    moved = OWN.replace("line 68, in <module>", "line 70, in <module>")
+    assert model_probes.probe_broke_itself(item, {"main": [OWN] * 3, "pr": [moved] * 3}, "model-probe1.py") is True

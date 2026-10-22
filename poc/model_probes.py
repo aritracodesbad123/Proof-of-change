@@ -291,6 +291,31 @@ def _frames_own(block: str, probe_name: str) -> bool:
     return bool(frames) and all(Path(f).name == probe_name or _stdlib_file(f) for f in frames)
 
 
+def _loosened(log: str, probe_name: str) -> bool:
+    """True when own_code_crash holds only through the chained mock-ran-out exception, not on every block."""
+    blocks = _CHAIN_RE.split(log or "")
+    last = blocks[-1]
+    return (len(blocks) > 1 and bool(_MOCK_RAN_OUT_RE.search(last)) and _frames_own(last, probe_name)
+            and not _frames_own(log, probe_name))
+
+
+_LINE_RE = re.compile(r'^\s*File "([^"]+)", line (\d+)', re.M)
+_EXC_RE = re.compile(r"^([A-Za-z_][\w.]*)(?::|$)", re.M)
+
+
+def crash_signature(log: str, probe_name: str) -> tuple[str, str] | None:
+    """The crash that ended the probe: (error type, probe line), from the final traceback block. The probe line is
+    the last frame in the probe file itself. None when either part cannot be read."""
+    last = _CHAIN_RE.split(log or "")[-1]
+    lines = [n for f, n in _LINE_RE.findall(last) if Path(f).name == probe_name]
+    i = last.rfind("Traceback (most recent call last)")
+    tail = last[i:] if i >= 0 else last
+    excs = [m for m in _EXC_RE.findall(tail) if m != "Traceback"]
+    if not lines or not excs:
+        return None
+    return excs[-1], lines[-1]
+
+
 def own_code_crash(log: str, probe_name: str) -> bool:
     """True when the log holds a traceback whose frames are only in the probe file itself or the standard library,
     i.e. it never reached the project's code (or any installed package). No traceback: False (not provable).
@@ -308,7 +333,9 @@ def own_code_crash(log: str, probe_name: str) -> bool:
 
 def probe_broke_itself(item: dict, logs: dict, probe_name: str) -> bool:
     """A probe broke itself only if EVERY run crashed (no parsed output) on BOTH sides AND no traceback reaches the
-    project's code. A crash on the PR side only, or one inside project code, is evidence and is never repaired."""
+    project's code. A crash on the PR side only, or one inside project code, is evidence and is never repaired.
+    When any run passes only through the loosened chained-mock rule, every run on both sides must end in the same
+    crash (same error type at the same probe line); if the sides differ, there is no rewrite."""
     from poc.probes import PROBE_ERROR
     runs = item.get("runs") or {}
     for side in ("main", "pr"):
@@ -316,6 +343,12 @@ def probe_broke_itself(item: dict, logs: dict, probe_name: str) -> bool:
         if not rs or not all(isinstance(o, dict) and PROBE_ERROR in o for o in rs):
             return False
         if not logs.get(side) or not all(own_code_crash(lg, probe_name) for lg in logs[side]):
+            return False
+    every = [lg for side in ("main", "pr") for lg in logs[side]]
+    if any(_loosened(lg, probe_name) for lg in every):
+        # the loosened rule needs the same crash on both sides: same error type at the same probe line
+        sigs = {crash_signature(lg, probe_name) for lg in every}
+        if len(sigs) != 1 or None in sigs:
             return False
     return True
 
