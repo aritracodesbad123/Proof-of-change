@@ -357,12 +357,91 @@ def baseline_for(seen: dict, repo: str, run_date: str) -> tuple[dict, str | None
         since = seen.get("last_run_utc", {}).get(repo)
     return prs, since
 
+# ---------------------------------------------------------------- wheel-only picker check
+WHEEL_CHECK_PLATFORM = "x86_64-manylinux_2_28"   # the Linux machines checks run on
+WHEEL_CHECK_TIMEOUT = 180
+_NO_WHEEL_RE = re.compile(r"Wheels are required for `([^`]+)`|Because ([A-Za-z0-9][A-Za-z0-9._-]*)\S* has no usable wheels"
+                          r"|([A-Za-z0-9][A-Za-z0-9._-]*)\S* has no usable wheels")
+
+
+def _main_file(gh, repo: str, ref: str, path: str) -> str | None:
+    """Text of one file on the default branch, or None when it is missing or unreadable."""
+    try:
+        raw = gh.get(f"https://api.github.com/repos/{repo}/contents/{path}?ref={urllib.parse.quote(ref)}",
+                     accept="application/vnd.github.raw")
+    except Exception:  # noqa: BLE001
+        return None
+    return raw.decode("utf-8", errors="replace") if isinstance(raw, bytes) else str(raw)
+
+
+def _plain_req(line: str) -> str | None:
+    """A requirement string fit for a dry run: options (-r, -e, --index-url, ...), URLs, direct references and local
+    paths are dropped, so nothing read from the project can change where packages come from."""
+    line = line.split(" #", 1)[0].strip()
+    if not line or line.startswith(("#", "-", ".", "/", "~")) or "://" in line or " @ " in line or "@" in line.split(";")[0]:
+        return None
+    return line
+
+
+def main_requirements(gh, repo: str, ref: str) -> list[str]:
+    """Runtime requirements declared on the default branch: [project].dependencies in pyproject.toml and the plain
+    lines of a top-level requirements.txt."""
+    import tomllib
+    reqs: list[str] = []
+    pp = _main_file(gh, repo, ref, "pyproject.toml")
+    if pp:
+        try:
+            deps = tomllib.loads(pp).get("project", {}).get("dependencies", [])
+        except Exception:  # noqa: BLE001
+            deps = []
+        reqs += [r for r in (_plain_req(d) for d in deps if isinstance(d, str)) if r]
+    rt = _main_file(gh, repo, ref, "requirements.txt")
+    if rt:
+        reqs += [r for r in (_plain_req(x) for x in rt.splitlines()) if r]
+    return list(dict.fromkeys(reqs))
+
+
+def wheel_only_dry_run(reqs: list[str], python: str, runner=None) -> tuple[int, str]:
+    """Resolve reqs for `python` allowing only ready-built wheels (--only-binary :all:); nothing is installed or built.
+    The uv call and its env go through isolated_install, as on a product install."""
+    cmd = [uv_bin(), "pip", "compile", "-", "--only-binary", ":all:", "--python-version", python,
+           "--python-platform", WHEEL_CHECK_PLATFORM, "--no-header", "-q"]
+    env = {k: v for k, v in os.environ.items() if not k.endswith(("TOKEN", "KEY", "SECRET", "PASSWORD"))}
+    cmd, env = isolated_install(cmd, env, True)
+    if runner is None:
+        def runner(c, e, text):
+            r = subprocess.run([str(x) for x in c], input=text, capture_output=True, text=True, env=e,
+                               timeout=WHEEL_CHECK_TIMEOUT)
+            return r.returncode, (r.stdout or "") + (r.stderr or "")
+    try:
+        return runner(cmd, env, "\n".join(reqs) + "\n")
+    except subprocess.TimeoutExpired:
+        return 1, "dry run timed out"
+
+
+def wheel_only_skip(reqs: list[str], python: str, runner=None) -> str | None:
+    """None when every requirement resolves to ready-built wheels for `python`; otherwise the plain skip reason."""
+    if not reqs:
+        return None
+    rc, out = wheel_only_dry_run(reqs, python, runner)
+    if rc == 0:
+        return None
+    m = _NO_WHEEL_RE.search(out)
+    if m:
+        return f"skipped: needs compiling ({next(g for g in m.groups() if g)})"
+    first = next((ln.strip() for ln in out.splitlines() if ln.strip()), "no output")
+    return f"skipped: requirements do not resolve to ready-built wheels ({first[:200]})"
+
+
 def select_prs(gh: GitHub, repo: str, cfg: dict, seen: dict, last_run_utc: str | None, max_n: int,
-               scan_limit: int, log) -> tuple[list[dict], list[dict]]:
+               scan_limit: int, log, python: str | None = None, wheel_runner=None) -> tuple[list[dict], list[dict]]:
     """Return (selected, skipped). Day 1 (no last run): the max_n most recently updated eligible PRs.
     Later: eligible PRs updated since the last run whose head SHA was not tested yet (capped at max_n).
     Eligible = non-draft, upstream CI not failing (if visible), changes Python code in the package.
-    Pure-Python PRs are preferred; compiled ones fill remaining slots."""
+    Pure-Python PRs are preferred; compiled ones fill remaining slots.
+    python set: before a PR is selected, the default branch's requirements must resolve to ready-built wheels for that
+    Python (wheel_only_skip, checked once per library); otherwise the PR is skipped with that reason."""
+    wheel_skip: list = []   # [reason or None] once computed
     pulls = gh.json(f"/repos/{repo}/pulls?state=open&sort=updated&direction=desc&per_page=50")
     seen_repo = seen.get(repo, {})
     pure, compiled, skipped = [], [], []
@@ -387,6 +466,11 @@ def select_prs(gh: GitHub, repo: str, cfg: dict, seen: dict, last_run_utc: str |
         skip = selection_skip_for_files(fc, cfg["pkg"])
         if skip:
             skipped.append(base | {"why": skip}); continue
+        if python:
+            if not wheel_skip:
+                wheel_skip.append(wheel_only_skip(main_requirements(gh, repo, p["base"]["ref"]), python, wheel_runner))
+            if wheel_skip[0]:
+                skipped.append(base | {"why": wheel_skip[0]}); continue
         item = {"pr": n, "title": p["title"], "body": p.get("body") or "", "url": p["html_url"],
                 "author": p["user"]["login"], "head_sha": sha,
                 "base_sha": p["base"]["sha"], "base_ref": p["base"]["ref"], "updated_at_utc": p["updated_at"],
@@ -2592,7 +2676,8 @@ def _maybe_prepare_contree(a, repo: str, main_sha: str, pr_sha: str, rec: dict, 
     contree_sandboxes.clear_session()
     try:
         sess = contree_sandboxes.prepare_source_pair(repo, main_sha, pr_sha, timeout=timeout, extra_shell=extra_shell,
-                                                     **({"deps_only_fallback": True, "deps_exclude": _aggregate_names(rec)}
+                                                     **({"deps_only_fallback": True, "deps_exclude": _aggregate_names(rec),
+                                                        "retry_transient": True}
                                                         if product_route(a) else {}))
         rec["contree"] = sess.describe()
         rec["machine"] = "contree"
@@ -2840,6 +2925,74 @@ _COV_SHRINK = (
 )
 
 
+# Product route: the report never travels through the size-limited command output. Inside the PR checkpoint the
+# changed-files report is gzip-compressed, base64-encoded and written to a file; the run prints only its length and
+# SHA-256. The file is then fetched in fixed-size pieces from the saved result image and checked before use.
+_COV_PACK = (
+    "import base64,gzip,hashlib,json,os,sys\n"
+    "src=sys.argv[1];want=sys.argv[2:]\n"
+    "try:\n"
+    " d=json.load(open(src))\n"
+    " d['files']={k:v for k,v in d.get('files',{}).items() if any(k==w or k.endswith('/'+w) for w in want)}\n"
+    " raw=json.dumps(d,separators=(',',':')).encode()\n"
+    "except Exception:\n"
+    " raw=open(src,'rb').read() if os.path.exists(src) else b''\n"
+    "b=base64.b64encode(gzip.compress(raw)).decode()\n"
+    "os.makedirs('/work/poc-cov',exist_ok=True)\n"
+    "open('/work/poc-cov/cov.b64','w').write(b)\n"
+    "print('___POC_COV_FILE___%d %s'%(len(b),hashlib.sha256(b.encode()).hexdigest()))\n"
+)
+COV_CHUNK = 40000
+COV_MAX_CHUNKS = 200
+COV_FETCH_FAILED = "the coverage report could not be fetched from Contree"
+
+
+COV_MIN_PIECE_SECONDS = 5
+
+
+def _cov_clock() -> float:
+    return time.monotonic()
+
+
+def fetch_contree_coverage(sess, image: str, length: int, digest: str, timeout: int,
+                           clock=None) -> tuple[str | None, str]:
+    """(report JSON text, '') fetched piece by piece from the saved image, or (None, plain reason).
+
+    timeout is one overall deadline for the whole fetch, not per piece: each piece gets only the time left."""
+    import base64
+    import gzip
+    import hashlib
+    clock = clock or _cov_clock
+    deadline = clock() + max(0, int(timeout))
+    if not image:
+        return None, f"{COV_FETCH_FAILED} (the run returned no image id)"
+    if length <= 0 or length > COV_CHUNK * COV_MAX_CHUNKS:
+        return None, f"{COV_FETCH_FAILED} (unexpected size {length})"
+    parts = []
+    for start in range(1, length + 1, COV_CHUNK):
+        end = min(start + COV_CHUNK - 1, length)
+        left = int(deadline - clock())
+        if left < COV_MIN_PIECE_SECONDS:
+            return None, f"{COV_FETCH_FAILED} (ran out of time after {len(parts)} of {-(-length // COV_CHUNK)} pieces)"
+        try:
+            raw = sess.run_image(image, f"cut -c {start}-{end} /work/poc-cov/cov.b64", timeout=left)
+        except Exception as e:  # noqa: BLE001
+            return None, f"{COV_FETCH_FAILED} ({type(e).__name__})"
+        if not isinstance(raw, dict) or raw.get("exit_code") != 0:
+            return None, f"{COV_FETCH_FAILED} (a piece could not be read)"
+        piece = (raw.get("stdout") or "").strip()
+        if len(piece) != end - start + 1:
+            return None, f"{COV_FETCH_FAILED} (a piece came back the wrong size)"
+        parts.append(piece)
+    blob = "".join(parts)
+    if hashlib.sha256(blob.encode()).hexdigest() != digest:
+        return None, f"{COV_FETCH_FAILED} (checksum mismatch)"
+    try:
+        return gzip.decompress(base64.b64decode(blob)).decode("utf-8", "replace"), ""
+    except (ValueError, OSError, EOFError):
+        return None, f"{COV_FETCH_FAILED} (the report could not be decoded)"
+
+
 def contree_coverage_run(item: dict, main_root: Path, pr_root: Path, targets: list[str], prdir: Path, a) -> dict:
     """Coverage gate measurement inside the Contree PR checkpoint.
 
@@ -2874,9 +3027,16 @@ def contree_coverage_run(item: dict, main_root: Path, pr_root: Path, targets: li
         "printf '\\n___POC_COV_END___\\n'\n"
         "printf '___POC_LOG___\\n'\ncat /tmp/poc-cov-pytest.log 2>/dev/null\n"
     )
+    product = product_route(a)
+    if product:  # report goes to a file in the sandbox, not through the capped output
+        want = " ".join(shlex.quote(r) for r in sorted(changed))
+        shell = shell.split("printf '___POC_COV_START___", 1)[0] + (
+            f"python -c {shlex.quote(_COV_PACK)} /tmp/poc-cov.json {want} 2>/dev/null\n"
+            "printf '___POC_LOG___\\n'\ntail -c 20000 /tmp/poc-cov-pytest.log 2>/dev/null\n"
+        )
     t0 = time.time()
     try:
-        raw = sess.run_op("pr", shell, disposable=True, timeout=int(a.run_timeout))
+        raw = sess.run_op("pr", shell, disposable=not product, timeout=int(a.run_timeout))
     except Exception as e:  # Contree error or timeout: keep the cap instead of crashing the check
         return {"status": "not measured", "why": f"the Contree coverage run failed ({type(e).__name__})",
                 "seconds": round(time.time() - t0, 1), "where": "contree"}
@@ -2887,7 +3047,18 @@ def contree_coverage_run(item: dict, main_root: Path, pr_root: Path, targets: li
     log = out.split("___POC_LOG___\n", 1)[-1] if "___POC_LOG___" in out else out
     (prdir / "coverage-pytest.log").write_text(f"$ contree coverage (pr)\n{log}")
     blob = ""
-    if "___POC_COV_START___\n" in out:
+    if product:
+        m = re.search(r"___POC_COV_FILE___(\d+) ([0-9a-f]{64})", out)
+        if not m:
+            return {"status": "not measured", "seconds": secs, "where": "contree",
+                    "why": f"{COV_FETCH_FAILED} (no report file was written); see coverage-pytest.log"}
+        blob, why = fetch_contree_coverage(sess, raw.get("uuid") or "", int(m.group(1)), m.group(2),
+                                           int(a.run_timeout))
+        secs = round(time.time() - t0, 1)
+        if blob is None:
+            return {"status": "not measured", "seconds": secs, "where": "contree",
+                    "why": f"{why}; see coverage-pytest.log"}
+    elif "___POC_COV_START___\n" in out:
         blob = out.split("___POC_COV_START___\n", 1)[1].split("\n___POC_COV_END___", 1)[0]
         if "\n___POC_COV_END___" not in out:
             return {"status": "not measured", "seconds": secs, "where": "contree",
@@ -5374,6 +5545,8 @@ def _main(argv=None) -> int:
     ap.add_argument("--runs", type=int, default=3)
     ap.add_argument("--workers", default="4")
     ap.add_argument("--python", default="3.12")
+    ap.add_argument("--no-wheel-check", action="store_true",
+                    help="picker: do not require the default branch's requirements to resolve to ready-built wheels")
     ap.add_argument("--test-timeout", type=int, default=120)
     ap.add_argument("--run-timeout", type=int, default=900)
     ap.add_argument("--build-timeout", type=int, default=1800)
@@ -5551,7 +5724,8 @@ def _main(argv=None) -> int:
                 chosen, sk = frozen_items(gh, repo, cfg, frozen[repo]), []
             else:
                 sel_seen, sel_since = baseline_for(seen, repo, rdir.name)
-                chosen, sk = select_prs(gh, repo, cfg, sel_seen, sel_since, a.max_per_library, a.scan_limit, None)
+                chosen, sk = select_prs(gh, repo, cfg, sel_seen, sel_since, a.max_per_library, a.scan_limit, None,
+                                      python=None if getattr(a, "no_wheel_check", False) else a.python)
         except Exception as e:  # noqa: BLE001
             problems.append(f"{repo}: PR selection failed: {e}")
             continue
