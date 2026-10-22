@@ -1264,6 +1264,7 @@ def install_deps_only(venv: Path, checkout: Path, plan: dict, log: Path, python:
         export = ["uv", "export", "-q", "--no-emit-project", "--no-hashes", "--directory", src,
                   "-p", venv / "bin/python", "-o", reqs]
         cmds.append(export + (["--frozen"] if plan.get("frozen") else []))
+        cmds.append(("check-export", reqs))   # same off-index line rules as requirement files, before installing
         cmds.append(["uv", "pip", "install", "-q", "-p", venv / "bin/python", "-r", reqs])
     else:
         for name in plan.get("files") or []:
@@ -1272,6 +1273,13 @@ def install_deps_only(venv: Path, checkout: Path, plan: dict, log: Path, python:
     sbx = side_sandbox(venv, network=True, ro=(() if deps_root is None or src == checkout else (src,)))
     sbx["rw"].append(checkout)
     for c in cmds:
+        if isinstance(c, tuple) and c[0] == "check-export":
+            from poc import demo_helper
+            refused = demo_helper.unsafe_exported_lines(c[1])
+            if refused:
+                (checkout / ".poc-declared-deps.txt").unlink(missing_ok=True)
+                return False, demo_helper.unsafe_requirements_reason(refused)
+            continue
         rc, _ = run(c, log, cwd=src, env=env, timeout=timeout, sbx=sbx)   # lock paths are relative to it
         if rc == "timeout":
             return False, f"dependency install timed out after {timeout}s; see {log.name}"
