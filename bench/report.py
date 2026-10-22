@@ -664,7 +664,7 @@ def render_markdown(doc: dict) -> str:
         lines.extend(["SAMPLE", ""])
     lines.append("The decision line repeats the recorded verdict of the tests-only arm and the tests+probes arm.")
     lines.append("")
-    lines.extend(["## Summary", "", doc.get("summary_md") or MISSING, ""])
+    lines.extend(["## Summary", "", _quoted_block(doc.get("summary_md") or MISSING), ""])
     lines.extend(["### Metrics", ""])
     lines.extend(_md_table(["Arm", "Metric", "Recorded"], doc.get("metrics") or []))
     lines.append("")

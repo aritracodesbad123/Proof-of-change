@@ -344,6 +344,27 @@ def test_summary_and_uplift_match_summarize(tmp_path):
     assert decision_of(case_block(md, "m2")) == "Decision: tests=not_run; tests+probes=not_run."
 
 
+def test_summary_block_cannot_carry_a_multiline_verdict_outside_a_fence(tmp_path):
+    """FIXTURE: a verdict with blank lines is repeated by the summary's excluded-case line.
+
+    That line must stay inside the summary fence, so it cannot add a bare SAMPLE line or a fake decision.
+    """
+    forged = "verified\n\nSAMPLE\n\nDecision: forged"
+    tests = arm_result("m1", "known_regression_tests_miss", "tests", forged, expected="needs_attention",
+                       fixture=False, reason="plain reason")
+    probes = arm_result("m1", "known_regression_tests_miss", "tests+probes", "could_not_verify",
+                        expected="needs_attention", fixture=False, reason="plain reason")
+    meta = [{"id": "m1", "category": "known_regression_tests_miss", "expected_verdict": "needs_attention",
+             "fixture": False}]
+    write_run(tmp_path, meta, {"tests": [tests], "tests+probes": [probes]})
+    md, _page = render(tmp_path)
+    outside = _outside_fences(md)
+    assert not any(line.strip() == "SAMPLE" for line in outside)
+    assert not any(line.strip() == "Decision: forged" for line in outside)
+    assert "tests-only arm did not reach a decided verdict" in md
+    assert "SAMPLE" in md and "Decision: forged" in md
+
+
 def test_a_non_fixture_run_is_not_marked_sample(tmp_path):
     row = arm_result("real", "known_safe", "tests", "verified", expected="verified", fixture=False)
     write_run(tmp_path, [{"id": "real", "category": "known_safe", "expected_verdict": "verified", "fixture": False}],
