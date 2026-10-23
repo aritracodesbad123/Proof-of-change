@@ -5493,6 +5493,30 @@ def _batch_diagnose(a, item: tuple, why: str) -> None:
         raise RuntimeError("lookup failed")
 
 
+def record_contree_failure(repo, cfg, item, rdir: Path, workroot: Path, a, machine: dict, exc):
+    """A Contree error that escaped the check.
+
+    On a product check, write the same could-not-verify refusal as a prepare failure and return that record.
+    A study run, the daily study, and any other error return None so the caller keeps its harness error.
+    """
+    from poc import contree_sandboxes
+    if not product_route(a) or not isinstance(exc, contree_sandboxes.ContreeError):
+        return None
+    tag = f"{cfg['pkg']}-{item['pr']}"
+    prdir = rdir / tag
+    prdir.mkdir(parents=True, exist_ok=True)
+    work = workroot / tag
+    rec = new_record(repo, cfg, item, a, machine, rdir.name, run_date_for(rdir))
+    rec["product_check"] = True
+    why, entry = contree_refusal(exc)
+    rec["verdict"], rec["reason"], _ = verdict_for(None, why)
+    rec["sandbox_backend"] = "contree"
+    rec["sandbox_backend_note"] = why
+    rec["machine"] = "contree (not run)"
+    rec["contree"] = entry
+    return finish(rec, prdir, work, time.time(), a)
+
+
 def batch_order_refusal(a) -> str | None:
     """--batch-order and its diagnosed retries are for product runs only. A study run and the daily study refuse it,
     so their results stay as they were."""
@@ -5516,6 +5540,11 @@ def _run_batch_order(queue: list, rdir: Path, workroot: Path, a, machine: dict, 
         except model_provider.ProviderRejected:
             raise
         except Exception as e:  # noqa: BLE001
+            stopped = record_contree_failure(repo, cfg, c, rdir, workroot, a, machine, e)
+            if stopped is not None:
+                print(f"    -> {stopped['verdict']}: {stopped['reason'][:140]} "
+                      f"({stopped['duration_s']['total_wall']}s)", flush=True)
+                return stopped
             problems.append(f"{repo}#{c['pr']}: harness error: {type(e).__name__}: {e}")
             return None
         print(f"    -> {rec['verdict']}: {rec['reason'][:140]} ({rec['duration_s']['total_wall']}s)", flush=True)
@@ -5836,8 +5865,11 @@ def _main(argv=None) -> int:
                 print(str(e), file=sys.stderr)
                 return 1
             except Exception as e:  # noqa: BLE001
-                problems.append(f"{repo}#{c['pr']}: harness error: {type(e).__name__}: {e}")
-                continue
+                stopped = record_contree_failure(repo, cfg, c, rdir, workroot, a, machine, e)
+                if stopped is None:
+                    problems.append(f"{repo}#{c['pr']}: harness error: {type(e).__name__}: {e}")
+                    continue
+                rec = stopped
             records.append(rec)
             print(f"    -> {rec['verdict']}: {rec['reason'][:140]} ({rec['duration_s']['total_wall']}s)", flush=True)
             seen["prs"].setdefault(repo, {})[str(c["pr"])] = {"head_sha": c["head_sha"], "tested_at_ist": rec["tested_at_ist"],
