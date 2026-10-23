@@ -1,5 +1,6 @@
 """Product checks retry a transient Contree API timeout or 5xx, at most 3 tries, and never run locally."""
 import asyncio
+from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
@@ -18,6 +19,10 @@ class ServerError(Exception):
 
 
 class Forbidden(Exception):
+    pass
+
+
+class ContreeTransportError(Exception):
     pass
 
 
@@ -190,6 +195,82 @@ def test_checked_sdk_version_retries(no_sleep):
     s, seen, _ = _sess([ApiTimeoutError(), _ok()])
     assert s.run_op("base", "true", disposable=False)["exit_code"] == 0
     assert len(seen) == 2
+
+
+def test_transport_error_before_start_is_retried(no_sleep):
+    s, seen, _ = _sess([ContreeTransportError(), _ok()])
+    got = s.checkpoint_main("true", timeout=60)
+    assert got["uuid"] == "img-1" and len(seen) == 2
+    assert no_sleep == [cs.RETRY_DELAYS[0]]
+
+
+def test_transport_error_after_start_is_not_retried(no_sleep):
+    s, seen, _ = _sess([("wait", ContreeTransportError()), _ok()])
+    with pytest.raises(cs.ContreeError, match="ContreeTransportError"):
+        s.checkpoint_main("true", timeout=60)
+    assert len(s._client.created) == 1 and no_sleep == []
+
+
+def test_client_uses_a_long_http_timeout(monkeypatch):
+    from dataclasses import fields
+
+    from contree_sdk.auth import IAMAuth
+
+    captured = {}
+
+    class FakeSync:
+        def __init__(self, config=None, **kwargs):
+            captured["config"] = config
+            captured["kwargs"] = kwargs
+
+    import contree_sdk
+    monkeypatch.setattr(contree_sdk, "ContreeSync", FakeSync)
+    client = cs.ContreeSession()._client_sync()
+    cfg = captured["config"]
+    token_default = next(f for f in fields(IAMAuth) if f.name == "token").default
+    assert client is not None and captured["kwargs"] == {}
+    assert cfg.transport_timeout == cs.HTTP_TIMEOUT >= 60
+    assert isinstance(cfg.auth, IAMAuth) and cfg.auth.token == token_default
+
+
+def _stop_item():
+    return {
+        "pr": 43, "url": "https://example/43", "title": "t", "body": "", "diff": "",
+        "head_sha": "b" * 40, "base_sha": "c" * 40, "author": "a", "base_ref": "main",
+        "updated_at_utc": "2026-01-01T00:00:00Z", "updated_at_ist": "2026-01-01 05:30 IST",
+        "ci_state": "none", "ci_detail": "",
+        "files": {"all": [], "package_py": [], "compiled": [], "other": []},
+    }
+
+
+def _stop_args(product):
+    return SimpleNamespace(
+        product_check=product, pr="https://example/43" if product else None, bench=None,
+        runs=1, workers=1, test_timeout=60, run_timeout=60, build_timeout=60,
+        python="3.12", python_full=None, baseline="full", sandbox_backend="contree",
+        sandbox_backend_note=None, swarm=False, provider=None, model_provider=None,
+        model_note=None, model_skipped=None, model_fallback=None, poc_commit="a" * 40,
+        invocation=None, tool_setup={"note": "test"})
+
+
+def test_product_contree_failure_is_could_not_verify(monkeypatch, tmp_path):
+    from ops import daily_run
+    monkeypatch.setattr(daily_run, "finish", lambda rec, prdir, work, t0, runner=None: rec)
+    rec = daily_run.record_contree_failure(
+        "mahmoud/boltons", {"pkg": "boltons", "dist": "boltons"}, _stop_item(),
+        tmp_path, tmp_path, _stop_args(True), {}, cs.ContreeError("contree request failed: ApiTimeoutError"))
+    assert rec["verdict"] == "could_not_verify"
+    assert "ApiTimeoutError" in rec["reason"]
+    assert rec["product_check"] is True and rec["contree"]["fallback"] is None
+
+
+def test_study_contree_failure_stays_a_harness_error():
+    from ops import daily_run
+    got = daily_run.record_contree_failure(
+        "mahmoud/boltons", {"pkg": "boltons", "dist": "boltons"}, _stop_item(),
+        Path("unused"), Path("unused"), _stop_args(False), {},
+        cs.ContreeError("contree request failed: ApiTimeoutError"))
+    assert got is None
 
 
 def test_sdk_version_reads_installed_metadata(monkeypatch):

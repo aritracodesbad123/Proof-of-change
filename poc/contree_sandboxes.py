@@ -181,6 +181,10 @@ MAX_TRIES = 3
 RETRY_DELAYS = (5.0, 15.0)
 # Overall deadline per step: the step's own timeout plus this much for start-up retries and backoff.
 RETRY_GRACE = 120.0
+# One HTTP call (a poll or an upload). The SDK default is 10s, which cancels a running sandbox when that
+# one call is slow. This is not the step timeout. ponytail: one number for every call; if the SDK grows a
+# separate upload timeout, use that for uploads and keep polls short.
+HTTP_TIMEOUT = 120.0
 
 
 def _sleep(seconds: float) -> None:
@@ -194,10 +198,11 @@ def _now() -> float:
 
 
 def is_transient_error(exc: BaseException) -> bool:
-    """True for a Contree API timeout (ApiTimeoutError, TimeoutError, ...) or an HTTP 5xx; never for an auth refusal."""
+    """True for a Contree API timeout, a dropped HTTP connection, or an HTTP 5xx; never for an auth refusal."""
     if is_auth_error(exc):
         return False
-    if isinstance(exc, TimeoutError) or "timeout" in type(exc).__name__.lower():
+    name = type(exc).__name__.lower()
+    if isinstance(exc, TimeoutError) or "timeout" in name or "transport" in name:
         return True
     status = getattr(exc, "status_code", None) or getattr(exc, "status", None)
     return isinstance(status, int) and 500 <= status <= 599
@@ -294,9 +299,11 @@ class ContreeSession:
             return self._client
         try:
             from contree_sdk import ContreeSync
+            from contree_sdk.config import ContreeConfig
         except ImportError as e:
             raise ContreeError("contree-sdk is not installed; pip install -e '.[contree]'") from e
-        self._client = ContreeSync()
+        # Auth stays the SDK default: it reads NEBIUS_API_KEY from the environment. The key is not passed in.
+        self._client = ContreeSync(config=ContreeConfig(transport_timeout=HTTP_TIMEOUT))
         return self._client
 
     def _run_on(self, image_ref: str | None, shell: str, *, disposable: bool, timeout: int,
