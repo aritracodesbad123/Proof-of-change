@@ -1,0 +1,772 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-pallets-markupsafe-512-4ec455858376-markupsafe-512",
+ "date_ist": "2026-10-24 07:19 IST",
+ "run_date": "2026-10-24",
+ "who": "ops/daily_run.py",
+ "repo": "pallets/markupsafe",
+ "library": "markupsafe",
+ "pr": {
+  "repo": "pallets/markupsafe",
+  "number": 512,
+  "url": "https://github.com/pallets/markupsafe/pull/512",
+  "title": "Add support for t-strings",
+  "base_sha": "b2e4d9c7687be25695fffbe93a37622302b24fb1",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "4ec455858376338b448ad4317aa36735ce04b879",
+  "merge_commit": "0f6e377f1b8909fcb044811d6ce407661d0fd501",
+  "tested_main_sha": "4e111271b1494995708a9e878a10829b5e10c7ba",
+  "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+ },
+ "author": "xmo-odoo",
+ "base_ref": "main",
+ "updated_at_utc": "2026-03-04T14:06:09Z",
+ "updated_at_ist": "2026-03-04 19:36 IST",
+ "ci_state": "not checked (single-PR check)",
+ "ci_detail": "checked on request with --pr",
+ "tested_at_ist": "2026-10-24 07:19 IST",
+ "files": {
+  "all": [
+   "CHANGES.rst",
+   "docs/formatting.rst",
+   "src/markupsafe/__init__.py",
+   "tests/test_markupsafe.py"
+  ],
+  "package_py": [
+   "src/markupsafe/__init__.py"
+  ],
+  "compiled": [],
+  "other": [
+   "CHANGES.rst",
+   "docs/formatting.rst",
+   "tests/test_markupsafe.py"
+  ]
+ },
+ "machine_type": {
+  "arch": "arm64",
+  "os": "Darwin",
+  "platform": "macOS-15.5-arm64-arm-64bit-Mach-O",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": "Apple clang version 14.0.3 (clang-1403.0.22.14.1)",
+  "cpu_model": null,
+  "ram_gb": null
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 0,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.14",
+ "test_selection": "mapped from touched files: tests/test_markupsafe.py",
+ "per_run": [],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "contree",
+ "sandbox_backend_note": "Contree could not prepare the main and PR sides (contree request failed: ApiTimeoutError). In Contree mode nothing from the pull request runs locally, so Proof-of-Change will not run pull-request code.",
+ "machine": "contree (not run)",
+ "tool_setup": {
+  "installed": [],
+  "tries": 0,
+  "note": "All required tools were already installed.",
+  "refused": []
+ },
+ "posted_upstream": false,
+ "logs": "markupsafe-512/",
+ "freeze": {},
+ "poc_commit": "863751e9580b866fe64247737975cb2e04e97215",
+ "route": "source-pair",
+ "current_head_sha": "4ec455858376338b448ad4317aa36735ce04b879",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "state": "open",
+ "mergeable": true,
+ "mergeable_state": "clean",
+ "product_check": true,
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": {
+   "ok": true,
+   "skipped": false,
+   "live_call": true,
+   "cached": false,
+   "queries": [
+    "markupsafe python setup install instructions https://github.com/pallets/markupsafe site:github.com/pallets/markupsafe",
+    "markupsafe python documentation install https://github.com/pallets/markupsafe site:github.com/pallets/markupsafe",
+    "markupsafe python install requirements https://pypi.org/project/markupsafe/ https://github.com/pallets/markupsafe site:pypi.org"
+   ],
+   "results": [
+    {
+     "title": "markupsafe/pyproject.toml at main \u00b7 pallets/markupsafe \u00b7 GitHub",
+     "url": "https://github.com/pallets/markupsafe/blob/main/pyproject.toml",
+     "query": "markupsafe python documentation install https://github.com/pallets/markupsafe site:github.com/pallets/markupsafe"
+    },
+    {
+     "title": "MarkupSafe \u00b7 PyPI",
+     "url": "https://pypi.org/project/markupsafe/",
+     "query": "markupsafe python install requirements https://pypi.org/project/markupsafe/ https://github.com/pallets/markupsafe site:pypi.org"
+    },
+    {
+     "title": "Fail to install MarkupSafe \u00b7 Issue #167 \u00b7 pallets/markupsafe \u00b7 GitHub",
+     "url": "https://github.com/pallets/markupsafe/issues/167",
+     "query": "markupsafe python setup install instructions https://github.com/pallets/markupsafe site:github.com/pallets/markupsafe"
+    },
+    {
+     "title": "Won't install on Windows \u00b7 Issue #67 \u00b7 pallets/markupsafe \u00b7 GitHub",
+     "url": "https://github.com/pallets/markupsafe/issues/67",
+     "query": "markupsafe python setup install instructions https://github.com/pallets/markupsafe site:github.com/pallets/markupsafe"
+    },
+    {
+     "title": "Unable to install markupsafe in amazon ec2 redhat virtual env \u00b7 Issue #85 \u00b7 pallets/markupsafe \u00b7 GitHub",
+     "url": "https://github.com/pallets/markupsafe/issues/85",
+     "query": "markupsafe python setup install instructions https://github.com/pallets/markupsafe site:github.com/pallets/markupsafe"
+    },
+    {
+     "title": "\"No module named 'markupsafe'\" when installing MarkupSafe \u00b7 Issue #285 \u00b7 pallets/markupsafe \u00b7 GitHub",
+     "url": "https://github.com/pallets/markupsafe/issues/285",
+     "query": "markupsafe python documentation install https://github.com/pallets/markupsafe site:github.com/pallets/markupsafe"
+    },
+    {
+     "title": "No module named 'markupsafe' when installing MarkupSafe >= 2.1.0 \u00b7 Issue #289 \u00b7 pallets/markupsafe \u00b7 GitHub",
+     "url": "https://github.com/pallets/markupsafe/issues/289",
+     "query": "markupsafe python documentation install https://github.com/pallets/markupsafe site:github.com/pallets/markupsafe"
+    }
+   ],
+   "text": "To install MarkupSafe, you can use pip. However, if you encounter issues, you may need to download the tar ball and use 'python setup install'. For verbose output during installation, use `pip -v install markupsafe`. If you face installation problems on specific systems like macOS with Python 3.9 or Windows, the issues might involve missing modules or incorrect PYTHONPATH settings. For more details, refer to the GitHub issues linked in the sources.\nThe sources indicate that MarkupSafe is a Python library for safely adding untrusted strings to HTML/XML markup, with its latest version as of the provided source being \"3.1.0.dev\". The GitHub repository for MarkupSafe also includes issues related to installation errors, such as \"No module named'markupsafe'\" when installing MarkupSafe, but does not provide a direct installation command or method. The sources do not provide a definitive answer to the specific question of how to install MarkupSafe from the provided GitHub repository.\nTo install MarkupSafe, you can use pip with the command `pip install MarkupSafe`. The latest version available on PyPI as of today is 3.0.3, but there is also a pre-release version 2.0.0a1 available. For the pre-release, you can specify the version with `pip install MarkupSafe==2.0.0a1`. The sources do not provide a definitive answer on which version to choose, so you should consider the stability and compatibility with your project requirements.\n162\n\n163\n\n164\n\n165\n\n166\n\n167\n\n168\n\n169\n\n170\n\n171\n\n172\n\n173\n\n174\n\n175\n\n176\n\n177\n\n178\n\n179\n\n180\n\n181\n\n182\n\n183\n\n184\n\n185\n\n186\n\n187\n\n188\n\n189\n\n190\n\n191\n\n192\n\n193\n\n194\n\n195\n\n196\n\n197\n\n198\n\n199\n\n200\n\n201\n\n202\n\n203\n\n204\n\n205\n\n206\n\n207\n\n208\n\n209\n\n210\n\n211\n\n212\n\n213\n\n214\n\n215\n\n216\n\n217\n\n218\n\n219\n\n220\n\n221\n\n222\n\n223\n\n224\n\n225\n\n226\n\n[project]\n\nname = \"MarkupSafe\"\n\nversion = \"3.1.0.dev\"\n\ndescription = \"Safely add untrusted strings to HTML/XML markup.\"\n\nreadme = \"README.md\"\n\nlicense = \"BSD-3-Clause\"\nTitle: MarkupSafe \u00b7 PyPI\nJoin the official Python Developers Survey 2026 and have a chance to win a prize. Implements a XML/HTML/XHTML Markup safe string for Python. ## Project description. Implements a unicode subclass that supports HTML strings:. >>> from markupsafe import Markup, escape. >>> escape(\"<script>alert(document.cookie);</script>\"). Markup(u'&lt;script&gt;alert(document.cookie);&lt;/script&gt;'). >>> tmpl = Markup(\"<em>%s</em>\"). Markup(u'<em>Peter &gt; Lustig</em>'). If you want to\ncommand: /usr/local/opt/python@3.9/bin/python3.9 -u -c 'import sys, setuptools, tokenize; sys.argv = '\"'\"'/private/var/folders/hy/8zks4s092j50pqjncl362krh0000gn/T/pip-install-fpk7mejk/markupsafe\\_4b9b24980c0b43868aff97ba9d840847/setup.py'\"'\"'; file='\"'\"'/private/var/folders/hy/8zks4s092j50pqjncl362krh0000gn/T/pip-install-fpk7mejk/markupsafe\\_4b9b24980c0b43868aff97ba9d840847/setup.py'\"'\"';f=getattr(tokenize, '\"'\"'open'\"'\"', open)(file);code=f.read().replace('\"'\"'\\r\\n'\"'\"', [...] File \"/private/va\nline 14, in  from markupsafe._compat import text_type, string_types, int_types, \\ ModuleNotFoundError: No module named 'markupsafe._compat' (myvenv) d:\\work\\Python\\2018\\hook\\app>chcp 65001 Active code page: 65001 (myvenv) d:\\work\\Python\\2018\\hook\\app>pip install markupsafe Requirement already satisfied: markupsafe in d:\\work\\python\\2018\\hook\\myvenv\\lib\\site-packages (myvenv) d:\\work\\Python\\2018\\hook\\app>main.py Traceback (most recent call last): File \"D:\\work\\Python\\2018\\hook\\app\\main.py\", line \nOK, Here is my case.  \n    pip install fail somehow , i give it up.  \n    Then I download the tar ball, use 'python setup install'.  \n    Got prompt to set PYTHONPATH. The package can only install under lib64/python2.7/dist-packages, so I export PYTHONPATH=blabla/lib64/.../dist-packages  \n    After that, I can see MarkupSafe in pip list and able to import in python shell.  \n    But my flask app (base on wsgi) still report unable import markupsafe error. [...] (trysmautoenv) [pcdeuser@ip-172-31-8\nline 121, in setup dist.parse_config_files() File \"/usr/lib/python3.7/site-packages/setuptools/dist.py\", line 442, in parse_config_files ignore_option_errors=ignore_option_errors) File \"/usr/lib/python3.7/site-packages/setuptools/config.py\", line 106, in parse_configuration meta.parse() File \"/usr/lib/python3.7/site-packages/setuptools/config.py\", line 382, in parse section_parser_method(section_options) File \"/usr/lib/python3.7/site-packages/setuptools/config.py\", line 355, in parse_section [..\nline 382, in parse section_parser_method(section_options) File \\\"/usr/lib/python3.8/site-packages/setuptools/config.py\\\", line 355, in parse_section self[name] = value File \\\"/usr/lib/python3.8/site-packages/setuptools/config.py\\\", line 173, in __setitem__ value = parser(value) File \\\"/usr/lib/python3.8/site-packages/setuptools/config.py\\\", line 430, in _parse_version version = self._parse_attr(value) File \\\"/usr/lib/python3.8/site-packages/setuptools/config.py\\\", line 305, in _parse_attr [...] ",
+   "errors": [],
+   "lines": [
+    "Looked up with Tavily: 7 results",
+    "Query: markupsafe python setup install instructions https://github.com/pallets/markupsafe site:github.com/pallets/markupsafe",
+    "Query: markupsafe python documentation install https://github.com/pallets/markupsafe site:github.com/pallets/markupsafe",
+    "Query: markupsafe python install requirements https://pypi.org/project/markupsafe/ https://github.com/pallets/markupsafe site:pypi.org",
+    "Source: markupsafe/pyproject.toml at main \u00b7 pallets/markupsafe \u00b7 GitHub \u2014 https://github.com/pallets/markupsafe/blob/main/pyproject.toml",
+    "Source: MarkupSafe \u00b7 PyPI \u2014 https://pypi.org/project/markupsafe/",
+    "Source: Fail to install MarkupSafe \u00b7 Issue #167 \u00b7 pallets/markupsafe \u00b7 GitHub \u2014 https://github.com/pallets/markupsafe/issues/167",
+    "Source: Won't install on Windows \u00b7 Issue #67 \u00b7 pallets/markupsafe \u00b7 GitHub \u2014 https://github.com/pallets/markupsafe/issues/67",
+    "Source: Unable to install markupsafe in amazon ec2 redhat virtual env \u00b7 Issue #85 \u00b7 pallets/markupsafe \u00b7 GitHub \u2014 https://github.com/pallets/markupsafe/issues/85",
+    "Source: \"No module named 'markupsafe'\" when installing MarkupSafe \u00b7 Issue #285 \u00b7 pallets/markupsafe \u00b7 GitHub \u2014 https://github.com/pallets/markupsafe/issues/285",
+    "Source: No module named 'markupsafe' when installing MarkupSafe >= 2.1.0 \u00b7 Issue #289 \u00b7 pallets/markupsafe \u00b7 GitHub \u2014 https://github.com/pallets/markupsafe/issues/289"
+   ]
+  },
+  "notes": [
+   "Setup check: GitHub token: missing.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory could not be read.",
+   "Setup check: free disk 38.2 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: 7 results",
+   "Query: markupsafe python setup install instructions https://github.com/pallets/markupsafe site:github.com/pallets/markupsafe",
+   "Query: markupsafe python documentation install https://github.com/pallets/markupsafe site:github.com/pallets/markupsafe",
+   "Query: markupsafe python install requirements https://pypi.org/project/markupsafe/ https://github.com/pallets/markupsafe site:pypi.org",
+   "Source: markupsafe/pyproject.toml at main \u00b7 pallets/markupsafe \u00b7 GitHub \u2014 https://github.com/pallets/markupsafe/blob/main/pyproject.toml",
+   "Source: MarkupSafe \u00b7 PyPI \u2014 https://pypi.org/project/markupsafe/",
+   "Source: Fail to install MarkupSafe \u00b7 Issue #167 \u00b7 pallets/markupsafe \u00b7 GitHub \u2014 https://github.com/pallets/markupsafe/issues/167",
+   "Source: Won't install on Windows \u00b7 Issue #67 \u00b7 pallets/markupsafe \u00b7 GitHub \u2014 https://github.com/pallets/markupsafe/issues/67",
+   "Source: Unable to install markupsafe in amazon ec2 redhat virtual env \u00b7 Issue #85 \u00b7 pallets/markupsafe \u00b7 GitHub \u2014 https://github.com/pallets/markupsafe/issues/85",
+   "Source: \"No module named 'markupsafe'\" when installing MarkupSafe \u00b7 Issue #285 \u00b7 pallets/markupsafe \u00b7 GitHub \u2014 https://github.com/pallets/markupsafe/issues/285",
+   "Source: No module named 'markupsafe' when installing MarkupSafe >= 2.1.0 \u00b7 Issue #289 \u00b7 pallets/markupsafe \u00b7 GitHub \u2014 https://github.com/pallets/markupsafe/issues/289",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: install pytest (listed in the tests extra) on main and pr.",
+   "Setup plan: install pytest-run-parallel; python_full_version >= '3.13' (listed in the tests extra) on main and pr.",
+   "Setup plan: install ruff (listed in a dependency group) on main and pr.",
+   "Setup plan: install tox (listed in a dependency group) on main and pr.",
+   "Setup plan: install tox-uv (listed in a dependency group) on main and pr.",
+   "Setup plan: install pallets-sphinx-themes (listed in a dependency group) on main and pr.",
+   "Setup plan: install sphinx (listed in a dependency group) on main and pr.",
+   "Setup plan: install sphinxcontrib-log-cabinet (listed in a dependency group) on main and pr.",
+   "Setup plan: install sphinx-autobuild (listed in a dependency group) on main and pr.",
+   "Setup plan: install gha-update ; python_full_version >= '3.12' (listed in a dependency group) on main and pr.",
+   "Setup plan: install pre-commit (listed in a dependency group) on main and pr.",
+   "Setup plan: install pre-commit-uv (listed in a dependency group) on main and pr.",
+   "Setup plan: install mypy (listed in a dependency group) on main and pr.",
+   "Setup plan: install pyright (listed in a dependency group) on main and pr.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >=3.11, >=3.9",
+   "Setup plan: Python rule: one Python version is used on both sides: the lowest version that meets the requirements of both main and the pull request; if none meets both, the check stops as a setup problem and records both.",
+   "Setup plan: refused fail: its PyPI page does not link to this GitHub repository",
+   "Setup plan: refused somehow: no network or the package was not found",
+   "Setup plan: refused i: its PyPI page does not link to this GitHub repository",
+   "Setup plan: refused give: no network or the package was not found",
+   "Setup plan: refused it: its PyPI page does not link to this GitHub repository",
+   "Setup plan: refused up.: no network or the package was not found"
+  ],
+  "install_docs": [
+   "pyproject.toml",
+   "README.md",
+   "setup.py",
+   "docs/Makefile",
+   ".github/workflows/lock.yaml",
+   ".github/workflows/tests.yaml",
+   ".github/workflows/pre-commit.yaml",
+   ".github/workflows/zizmor.yaml",
+   ".github/workflows/publish.yaml"
+  ],
+  "install_docs_from": "main",
+  "setup_plan": {
+   "packages": [
+    {
+     "requirement": "pytest",
+     "name": "pytest",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the tests extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest-run-parallel; python_full_version >= '3.13'",
+     "name": "pytest-run-parallel",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the tests extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "ruff",
+     "name": "ruff",
+     "kind": "dependency-group",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in a dependency group",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "tox",
+     "name": "tox",
+     "kind": "dependency-group",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in a dependency group",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "tox-uv",
+     "name": "tox-uv",
+     "kind": "dependency-group",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in a dependency group",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pallets-sphinx-themes",
+     "name": "pallets-sphinx-themes",
+     "kind": "dependency-group",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in a dependency group",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "sphinx",
+     "name": "sphinx",
+     "kind": "dependency-group",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in a dependency group",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "sphinxcontrib-log-cabinet",
+     "name": "sphinxcontrib-log-cabinet",
+     "kind": "dependency-group",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in a dependency group",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "sphinx-autobuild",
+     "name": "sphinx-autobuild",
+     "kind": "dependency-group",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in a dependency group",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "gha-update ; python_full_version >= '3.12'",
+     "name": "gha-update",
+     "kind": "dependency-group",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in a dependency group",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pre-commit",
+     "name": "pre-commit",
+     "kind": "dependency-group",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in a dependency group",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pre-commit-uv",
+     "name": "pre-commit-uv",
+     "kind": "dependency-group",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in a dependency group",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "mypy",
+     "name": "mypy",
+     "kind": "dependency-group",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in a dependency group",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pyright",
+     "name": "pyright",
+     "kind": "dependency-group",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in a dependency group",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    }
+   ],
+   "scope_blocked": "",
+   "component": null,
+   "aggregate_names": [],
+   "extra_reqs": [
+    "pytest",
+    "pytest-run-parallel; python_full_version >= '3.13'",
+    "ruff",
+    "tox",
+    "tox-uv",
+    "pallets-sphinx-themes",
+    "sphinx",
+    "sphinxcontrib-log-cabinet",
+    "sphinx-autobuild",
+    "gha-update ; python_full_version >= '3.12'",
+    "pre-commit",
+    "pre-commit-uv",
+    "mypy",
+    "pyright"
+   ],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >=3.11, >=3.9",
+    "rule": "one Python version is used on both sides: the lowest version that meets the requirements of both main and the pull request; if none meets both, the check stops as a setup problem and records both",
+    "gate_failed": false
+   },
+   "system": [],
+   "refused": [
+    {
+     "name": "fail",
+     "reason": "its PyPI page does not link to this GitHub repository"
+    },
+    {
+     "name": "somehow",
+     "reason": "no network or the package was not found"
+    },
+    {
+     "name": "i",
+     "reason": "its PyPI page does not link to this GitHub repository"
+    },
+    {
+     "name": "give",
+     "reason": "no network or the package was not found"
+    },
+    {
+     "name": "it",
+     "reason": "its PyPI page does not link to this GitHub repository"
+    },
+    {
+     "name": "up.",
+     "reason": "no network or the package was not found"
+    }
+   ],
+   "groups_blocked": ""
+  },
+  "steps": {
+   "setup_lookup": "Found 14 setup item(s) in the project's files and the web lookup. Refused: fail (its PyPI page does not link to this GitHub repository), somehow (no network or the package was not found), i (its PyPI page does not link to this GitHub repository), give (no network or the package was not found), it (its PyPI page does not link to this GitHub repository).",
+   "setup_python": "Python 3.12: Python 3.12 already meets >=3.11, >=3.9",
+   "install_deps": "Wrote requirements.txt and installed it on main and pr: pytest, pytest-run-parallel; python_full_version >= '3.13', ruff, tox, tox-uv, pallets-sphinx-themes, sphinx, sphinxcontrib-log-cabinet, sphinx-autobuild, gha-update ; python_full_version >= '3.12', pre-commit, pre-commit-uv."
+  },
+  "run_files": {
+   "requirements": "requirements.txt",
+   "plan": "setup-plan.json",
+   "count": 14
+  }
+ },
+ "chosen": {
+  "pr": 512,
+  "head_sha": null,
+  "install": null,
+  "test_cmd": null
+ },
+ "sides": {
+  "comparison_basis": "base tip vs GitHub test merge (refs/pull/N/merge)",
+  "main_sha": "4e111271b1494995708a9e878a10829b5e10c7ba",
+  "pr_sha": "0f6e377f1b8909fcb044811d6ce407661d0fd501",
+  "merge_commit": "0f6e377f1b8909fcb044811d6ce407661d0fd501",
+  "merge_parents": [
+   "4e111271b1494995708a9e878a10829b5e10c7ba",
+   "4ec455858376338b448ad4317aa36735ce04b879"
+  ],
+  "merge_head_matches_pinned_head": true
+ },
+ "tested": {
+  "main": "main @ 4e111271b149 (base tip = first parent of the merge commit)",
+  "pr": "GitHub test merge commit 0f6e377f1b89 (refs/pull/512/merge) of head 4ec455858376"
+ },
+ "probe_plan": {
+  "baseline": "full",
+  "model": "model provider: nebius (Token Factory, live)",
+  "errors": [],
+  "model_claims": [
+   {
+    "id": "C1",
+    "text": "The PR adds support for t-string Template objects to the Markup and escape functions.",
+    "source_quote": "This commit adds support for t-strings to both `Markup` and `escape`, essentially matching the handling of `__html__`.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C3",
+    "text": "The PR does not add support for t-strings to Markup.__add__ or Markup.__radd__.",
+    "source_quote": "- `Markup.__add__` / `Markup.__radd__`",
+    "testable": true,
+    "expect": "same"
+   },
+   {
+    "id": "C4",
+    "text": "The PR does not add support for t-strings to EscapeFormatter.",
+    "source_quote": "- `EscapeFormatter` as I'm not entirely sure whether / how a template object should interact with format specs.",
+    "testable": true,
+    "expect": "same"
+   }
+  ],
+  "model_rejected_claims": [
+   {
+    "id": "C2",
+    "text": "For markupsafe, the literal parts of a t-string are treated as safe (marked as Markup) while the interpolations are treated as unsafe (HTML\u2011escaped).",
+    "source_quote": "So for markupsafe the literal parts of the template are considered \"safe\" and the interpolations are considered unsafe. So for markupsafe the literal parts are `Markup`-ed while the interpolations are `escape`-ed.",
+    "testable": true,
+    "expect": "differs",
+    "rejected": "source_quote not found in the PR text"
+   }
+  ],
+  "diff_targets": [
+   "markupsafe.escape"
+  ],
+  "frozen": [
+   {
+    "path": "model-probes/model-c1.py",
+    "source": "model",
+    "sha256": "c049ee1d04f9be08b18246eaf92defca7105566620a3093055dc8c4ba135bc07",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-10-24T01:50:57.062170+00:00",
+    "inputs_sha256": "e9d7c013e14cbca50677f2c5126cdee824c45a1d2bf3144deb132dd6729c8be5",
+    "inputs": {
+     "title_chars": 25,
+     "body_chars": 908,
+     "base_files": {
+      "src/markupsafe/__init__.py": "310afadaabdd94a53d5b57c84cbd56b1ebe1877454be8ba986237d142e533df0"
+     }
+    }
+   },
+   {
+    "path": "model-probes/model-c3.py",
+    "source": "model",
+    "sha256": "e74a3c425b336a51efb2ec2e36987b514d95beda0f21cd8fa0bc66aaec0ecb21",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-10-24T01:50:57.062984+00:00",
+    "inputs_sha256": "e9d7c013e14cbca50677f2c5126cdee824c45a1d2bf3144deb132dd6729c8be5",
+    "inputs": {
+     "title_chars": 25,
+     "body_chars": 908,
+     "base_files": {
+      "src/markupsafe/__init__.py": "310afadaabdd94a53d5b57c84cbd56b1ebe1877454be8ba986237d142e533df0"
+     }
+    }
+   },
+   {
+    "path": "model-probes/model-c4.py",
+    "source": "model",
+    "sha256": "a09716033df81d86060889fc2919121f4af7db7e5e3c7555ef08e0bf53d8d133",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-10-24T01:50:57.063442+00:00",
+    "inputs_sha256": "e9d7c013e14cbca50677f2c5126cdee824c45a1d2bf3144deb132dd6729c8be5",
+    "inputs": {
+     "title_chars": 25,
+     "body_chars": 908,
+     "base_files": {
+      "src/markupsafe/__init__.py": "310afadaabdd94a53d5b57c84cbd56b1ebe1877454be8ba986237d142e533df0"
+     }
+    }
+   },
+   {
+    "path": "diff-probes/diff-api.py",
+    "source": "diff",
+    "sha256": "549d75f7ce2d6206b9396b2c4575758042d5530591e5fb0ef18b6cfb9c4c3121",
+    "generator": {
+     "kind": "diff",
+     "label": "diff (auto-derived from base-side code, model-free)",
+     "model": null,
+     "provider": null,
+     "provenance": "auto-derived",
+     "blind": false
+    },
+    "frozen_at": "2026-10-24T01:50:57.071235+00:00",
+    "inputs_sha256": "bdb217f172607db3b5bb4dc538c032adde171cebc53bf9e305a974b08755eaf3",
+    "inputs": {
+     "title_chars": 0,
+     "body_chars": 0,
+     "base_files": {
+      "src/markupsafe/__init__.py": "310afadaabdd94a53d5b57c84cbd56b1ebe1877454be8ba986237d142e533df0"
+     }
+    }
+   }
+  ]
+ },
+ "pr_side_started_at": "2026-10-24T01:50:57.071429+00:00",
+ "test_targets": {
+  "main": [
+   "tests/test_markupsafe.py"
+  ],
+  "pr": [
+   "tests/test_markupsafe.py"
+  ]
+ },
+ "contree_only": {
+  "note": "Contree mode: Contree did not run, so nothing from the pull request was run",
+  "declared_test_deps": [
+   "pytest-run-parallel; python_full_version >= '3.13'"
+  ],
+  "optional_backends": [],
+  "not_run_locally": [
+   "local freeze",
+   "installed-commit guard",
+   "probe coverage",
+   "optional-module retry"
+  ]
+ },
+ "coverage": {
+  "status": "not measured",
+  "why": "Contree mode: coverage runs only inside Contree, and it was not run there"
+ },
+ "contree": {
+  "failed": "contree request failed: ApiTimeoutError",
+  "fallback": null,
+  "exit_code": null,
+  "stderr_tail": "",
+  "auth_error": false
+ },
+ "verdict": "could_not_verify",
+ "reason": "Contree could not prepare the main and PR sides (contree request failed: ApiTimeoutError). In Contree mode nothing from the pull request runs locally, so Proof-of-Change will not run pull-request code.",
+ "verdict_before_coverage_gate": "could_not_verify",
+ "reason_before_coverage_gate": "Contree could not prepare the main and PR sides (contree request failed: ApiTimeoutError). In Contree mode nothing from the pull request runs locally, so Proof-of-Change will not run pull-request code.",
+ "changed_lines_total": null,
+ "changed_lines_covered": null,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "lower",
+  "note": "coverage of the changed Python lines was NOT MEASURED (Contree mode: coverage runs only inside Contree, and it was not run there)",
+  "measurement": "not measured"
+ },
+ "explanation": {
+  "status": "wired",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "text": "Verdict: could_not_verify. Contree could not prepare the main and PR sides (contree request failed: ApiTimeoutError). In Contree mode nothing from the pull request runs locally, so Proof-of-Change will not run pull-request code.",
+  "quotes": [],
+  "advisory": true
+ },
+ "agents": {
+  "status": "ran",
+  "advisory": true,
+  "note": "judge/helper/summary are advisory; code owns the verdict",
+  "roles": [
+   {
+    "role": "judge",
+    "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+    "status": "ok",
+    "note": null,
+    "labels": []
+   },
+   {
+    "role": "helper",
+    "model": "nvidia/Nemotron-3_5-Lightning",
+    "status": "ok",
+    "note": null,
+    "notes": [
+     "contree ApiTimeoutError may retry on network recovery",
+     "proof-of-change skipped PR code execution, verify contree local setup",
+     "baseline full can increase diff time, consider incremental baseline for stability",
+     "noise: contree timeout entries in CI logs can be safely ignored",
+     "install hint: confirm contree API endpoint and authentication credentials"
+    ]
+   },
+   {
+    "role": "summary",
+    "model": "nvidia/nemotron-3-super-120b-a12b",
+    "status": "ok",
+    "note": "model returned empty text; filled from code verdict/reason"
+   }
+  ],
+  "provider": {
+   "provider": "nebius",
+   "models": {
+    "claims": "nvidia/nemotron-3-super-120b-a12b",
+    "probes": "nvidia/nemotron-3-super-120b-a12b",
+    "judge": "nvidia/Nemotron-3-Ultra-550b-a55b",
+    "helper": "nvidia/Nemotron-3_5-Lightning",
+    "summary": "nvidia/nemotron-3-super-120b-a12b"
+   },
+   "blind": true
+  }
+ },
+ "swarm_requested": true,
+ "operator_approval_requested": false,
+ "swarm": "on",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [
+   "src/markupsafe/__init__.py"
+  ],
+  "compiled_files": [],
+  "other_files": [
+   "CHANGES.rst",
+   "docs/formatting.rst",
+   "tests/test_markupsafe.py"
+  ]
+ },
+ "duration_s": {
+  "total_wall": 1027.5,
+  "tests": 0
+ },
+ "cost": {
+  "ai_calls": 2,
+  "failed_ai_calls": 0,
+  "input_tokens": 4698,
+  "output_tokens": 11997,
+  "thinking_tokens": 10104,
+  "cost_usd": 0.012207,
+  "calls_without_usage": 0,
+  "ai_cost_usd": 0.012207,
+  "cost_complete": true,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 1027.5,
+   "tests": 0
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.0685,
+  "total_cost_usd": 0.080707,
+  "swarm": {
+   "ai_calls": 3,
+   "failed_ai_calls": 0,
+   "input_tokens": 147,
+   "output_tokens": 738,
+   "thinking_tokens": 725,
+   "cost_usd": 0.000708,
+   "calls_without_usage": 2,
+   "ai_cost_usd": 0.000708,
+   "cost_complete": false,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ }
+}

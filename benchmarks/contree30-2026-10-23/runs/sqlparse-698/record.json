@@ -1,0 +1,525 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-andialbrecht-sqlparse-698-c6ca23981037-sqlparse-698",
+ "date_ist": "2026-10-24 09:34 IST",
+ "run_date": "2026-10-24",
+ "who": "ops/daily_run.py",
+ "repo": "andialbrecht/sqlparse",
+ "library": "sqlparse",
+ "pr": {
+  "repo": "andialbrecht/sqlparse",
+  "number": 698,
+  "url": "https://github.com/andialbrecht/sqlparse/pull/698",
+  "title": "feat(databricks): add initial databricks syntax",
+  "base_sha": "907fb496f90f2719095a1f01fe24db1e5c0e15a8",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "c6ca239810373429ea72834132d1ca614f3fd76e",
+  "merge_commit": null,
+  "tested_main_sha": "907fb496f90f2719095a1f01fe24db1e5c0e15a8",
+  "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+ },
+ "author": "sjrusso8",
+ "base_ref": "master",
+ "updated_at_utc": "2023-01-02T15:59:36Z",
+ "updated_at_ist": "2023-01-02 21:29 IST",
+ "ci_state": "not checked (single-PR check)",
+ "ci_detail": "checked on request with --pr",
+ "tested_at_ist": "2026-10-24 09:34 IST",
+ "files": {
+  "all": [
+   "sqlparse/filters/aligned_indent.py",
+   "sqlparse/keywords.py",
+   "sqlparse/lexer.py",
+   "sqlparse/sql.py",
+   "tests/test_parse.py",
+   "tests/test_tokenize.py"
+  ],
+  "package_py": [
+   "sqlparse/filters/aligned_indent.py",
+   "sqlparse/keywords.py",
+   "sqlparse/lexer.py",
+   "sqlparse/sql.py"
+  ],
+  "compiled": [],
+  "other": [
+   "tests/test_parse.py",
+   "tests/test_tokenize.py"
+  ]
+ },
+ "machine_type": {
+  "arch": "arm64",
+  "os": "Darwin",
+  "platform": "macOS-15.5-arm64-arm-64bit-Mach-O",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": "Apple clang version 14.0.3 (clang-1403.0.22.14.1)",
+  "cpu_model": null,
+  "ram_gb": null
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 0,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.14",
+ "test_selection": "mapped from touched files: tests/test_parse.py, tests/test_tokenize.py, tests/test_keywords.py",
+ "per_run": [],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "contree",
+ "sandbox_backend_note": "Contree could not prepare the main and PR sides (contree request failed: ApiTimeoutError). In Contree mode nothing from the pull request runs locally, so Proof-of-Change will not run pull-request code.",
+ "machine": "contree (not run)",
+ "tool_setup": {
+  "installed": [],
+  "tries": 0,
+  "note": "All required tools were already installed.",
+  "refused": []
+ },
+ "posted_upstream": false,
+ "logs": "sqlparse-698/",
+ "freeze": {},
+ "poc_commit": "863751e9580b866fe64247737975cb2e04e97215",
+ "route": "source-pair",
+ "current_head_sha": "c6ca239810373429ea72834132d1ca614f3fd76e",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "model_provider_fallback": "AI call fell back or failed (probes); the AI answered but no probe was usable, so only fixed probes ran",
+ "state": "open",
+ "mergeable": false,
+ "mergeable_state": "dirty",
+ "product_check": true,
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": {
+   "ok": true,
+   "skipped": false,
+   "live_call": true,
+   "cached": false,
+   "queries": [
+    "sqlparse python setup install instructions https://github.com/andialbrecht/sqlparse site:github.com/andialbrecht/sqlparse",
+    "sqlparse python documentation install https://github.com/andialbrecht/sqlparse site:github.com/andialbrecht/sqlparse",
+    "sqlparse python install requirements https://pypi.org/project/sqlparse/ https://github.com/andialbrecht/sqlparse site:pypi.org"
+   ],
+   "results": [
+    {
+     "title": "sqlparse \u00b7 PyPI",
+     "url": "https://pypi.org/project/sqlparse/",
+     "query": "sqlparse python install requirements https://pypi.org/project/sqlparse/ https://github.com/andialbrecht/sqlparse site:pypi.org"
+    },
+    {
+     "title": "GitHub - andialbrecht/sqlparse: A non-validating SQL parser module for Python \u00b7 GitHub",
+     "url": "https://github.com/andialbrecht/sqlparse",
+     "query": "sqlparse python setup install instructions https://github.com/andialbrecht/sqlparse site:github.com/andialbrecht/sqlparse"
+    },
+    {
+     "title": "sqlparse/.github/workflows/python-app.yml at master \u00b7 andialbrecht/sqlparse \u00b7 GitHub",
+     "url": "https://github.com/andialbrecht/sqlparse/blob/master/.github/workflows/python-app.yml",
+     "query": "sqlparse python setup install instructions https://github.com/andialbrecht/sqlparse site:github.com/andialbrecht/sqlparse"
+    },
+    {
+     "title": "sqlparse/Makefile at master \u00b7 andialbrecht/sqlparse \u00b7 GitHub",
+     "url": "https://github.com/andialbrecht/sqlparse/blob/master/Makefile",
+     "query": "sqlparse python setup install instructions https://github.com/andialbrecht/sqlparse site:github.com/andialbrecht/sqlparse"
+    },
+    {
+     "title": "sqlparse/CHANGELOG at master \u00b7 andialbrecht/sqlparse \u00b7 GitHub",
+     "url": "https://github.com/andialbrecht/sqlparse/blob/master/CHANGELOG",
+     "query": "sqlparse python documentation install https://github.com/andialbrecht/sqlparse site:github.com/andialbrecht/sqlparse"
+    },
+    {
+     "title": "sqlparse/.readthedocs.yaml at master \u00b7 andialbrecht/sqlparse \u00b7 GitHub",
+     "url": "https://github.com/andialbrecht/sqlparse/blob/master/.readthedocs.yaml",
+     "query": "sqlparse python documentation install https://github.com/andialbrecht/sqlparse site:github.com/andialbrecht/sqlparse"
+    }
+   ],
+   "text": "To install sqlparse, use the command `pip install sqlparse`. The GitHub repository also provides the `sqlformat` command for formatting SQL files, which can be used with options like `--reindent` and `--keywords upper`. The repository uses `uv` for dependency management and testing, as indicated in the `Makefile` and the GitHub Actions workflow.\nTo install sqlparse, use the command `pip install sqlparse`. The latest release, 0.5.5, was on December 19, 2025, and it includes bug fixes such as DoS protection and splitting of BEGIN TRANSACTION statements. The documentation is available on GitHub and is built using Sphinx. The project is licensed under the New BSD license.\nTo install sqlparse using Python, you need Python version 2.7 or higher, but not 3.0 through 3.3. The latest version available on PyPI as of today is 0.3.1, and it can be installed via pip with the command `pip install sqlparse==0.3.1`. The sources indicate that sqlparse supports both Python 2 and Python 3, and it can be downloaded as either a source distribution (`sqlparse-0.3.1.tar.gz`) or a built distribution (`sqlparse-0.3.1-py2.py3-none-any.whl`).\nTitle: sqlparse \u00b7 PyPI\nJoin us in Long Beach, CA starting May 13, 2026. Grab your ticket and discounted hotel today before they\u2019re gone! ## Project description. sqlparse is a non-validating SQL parser module. It provides support for parsing, splitting and formatting SQL statements. Visit the project page for. >>> sqlparse.split('select * from foo; select * from bar;'). [u'select * from foo; ', u'select * from bar;']. >>> sql = 'select * from foo where id in (select id from bar);'. >>> print(sqlp\nsqlparse tokenizes SQL text and groups the parts it recognizes into a tree of statements, clauses, identifiers and expressions. It accepts any input without validating it, and makes no assumptions about a particular SQL dialect, so vendor extensions and templated SQL parse too. It is a building block for formatters, linters, editors and query analysis tools.\n\nLicensed under the New BSD license.\n\n## Install\n\n```\npip install sqlparse\n```\n\n## Usage [...] ## Command line\n\nInstalling sqlparse also pr\nos: ubuntu-latest\n\n- python-version: \"3.12\"\n\nos: ubuntu-latest\n\n- python-version: \"3.13\"\n\nos: ubuntu-latest\n\n- python-version: \"3.14\"\n\nos: ubuntu-latest\n\n# Test on additional platforms for Python 3.11\n\n- python-version: \"3.11\"\n\nos: macos-latest\n\n- python-version: \"3.11\"\n\nos: windows-latest\n\nsteps:\n\n- uses: actions/checkout@v4\n\n- name: Setup uv\n\nuses: astral-sh/setup-uv@v5\n\nwith:\n\nenable-cache: true\n\npython-version: ${{ matrix.python-version }}\n\n- name: Install dependencies and run tests [...] 56\nbenchmark:\n\n@for bench in benchmarks/bench\\_\\.py; do \\\n\nuv run --group dev python $$bench || exit 1; \\\n\necho; \\\n\ncoverage:\n\nuv run --group dev coverage run -m pytest tests/\n\nuv run --group dev coverage combine\n\nuv run --group dev coverage report\n\ncoverage-xml:\n\nuv run --group dev coverage run -m pytest tests/\n\nuv run --group dev coverage combine\n\nuv run --group dev coverage xml\n\nclean:\n\n$(PYTHON) setup.py clean\n\nfind . -name '\\.pyc' -delete\n\nfind . -name '\\~' -delete\n\nrelease:\n\n@rm -rf dist/ [..\nparsing errors or invalid SQL statements. When re-indenting such\n\nstatements the formatter flips back to column 0 before going crazy.\n\nOther\n\n\\ Documentation updates.\n\nRelease 0.1.6 (Jan 01, 2013)\n\nsqlparse is now compatible with Python 3 without any patches. The\n\nPython 3 version is generated during install by 2to3. You'll need\n\ndistribute to install sqlparse for Python 3.\n\nBug Fixes\n\n\\ Fix parsing error with dollar-quoted procedure bodies (issue83).\n\nOther\n\n\\ Documentation updates. [...] \\ The\n# Fail on all warnings to avoid broken references\n\n# fail\\_on\\_warning: true\n\n# Optionally build your docs in additional formats such as PDF and ePub\n\n# formats:\n\n# - pdf\n\n# - epub\n\n# Install the package itself (autodoc imports it) together with the\n\n# documentation dependencies declared in pyproject.toml.\n\npython:\n\ninstall:\n\n- method: pip\n\npath: .\n\nextra\\_requirements:\n\n- doc\n\nYou can\u2019t perform that action at this time. [...] # See  for details\n\n# Required\n\nversion: 2\n\n# Set the OS, Python vers",
+   "errors": [],
+   "lines": [
+    "Looked up with Tavily: 6 results",
+    "Query: sqlparse python setup install instructions https://github.com/andialbrecht/sqlparse site:github.com/andialbrecht/sqlparse",
+    "Query: sqlparse python documentation install https://github.com/andialbrecht/sqlparse site:github.com/andialbrecht/sqlparse",
+    "Query: sqlparse python install requirements https://pypi.org/project/sqlparse/ https://github.com/andialbrecht/sqlparse site:pypi.org",
+    "Source: sqlparse \u00b7 PyPI \u2014 https://pypi.org/project/sqlparse/",
+    "Source: GitHub - andialbrecht/sqlparse: A non-validating SQL parser module for Python \u00b7 GitHub \u2014 https://github.com/andialbrecht/sqlparse",
+    "Source: sqlparse/.github/workflows/python-app.yml at master \u00b7 andialbrecht/sqlparse \u00b7 GitHub \u2014 https://github.com/andialbrecht/sqlparse/blob/master/.github/workflows/python-app.yml",
+    "Source: sqlparse/Makefile at master \u00b7 andialbrecht/sqlparse \u00b7 GitHub \u2014 https://github.com/andialbrecht/sqlparse/blob/master/Makefile",
+    "Source: sqlparse/CHANGELOG at master \u00b7 andialbrecht/sqlparse \u00b7 GitHub \u2014 https://github.com/andialbrecht/sqlparse/blob/master/CHANGELOG",
+    "Source: sqlparse/.readthedocs.yaml at master \u00b7 andialbrecht/sqlparse \u00b7 GitHub \u2014 https://github.com/andialbrecht/sqlparse/blob/master/.readthedocs.yaml"
+   ]
+  },
+  "notes": [
+   "Setup check: GitHub token: missing.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory could not be read.",
+   "Setup check: free disk 38.2 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: 6 results",
+   "Query: sqlparse python setup install instructions https://github.com/andialbrecht/sqlparse site:github.com/andialbrecht/sqlparse",
+   "Query: sqlparse python documentation install https://github.com/andialbrecht/sqlparse site:github.com/andialbrecht/sqlparse",
+   "Query: sqlparse python install requirements https://pypi.org/project/sqlparse/ https://github.com/andialbrecht/sqlparse site:pypi.org",
+   "Source: sqlparse \u00b7 PyPI \u2014 https://pypi.org/project/sqlparse/",
+   "Source: GitHub - andialbrecht/sqlparse: A non-validating SQL parser module for Python \u00b7 GitHub \u2014 https://github.com/andialbrecht/sqlparse",
+   "Source: sqlparse/.github/workflows/python-app.yml at master \u00b7 andialbrecht/sqlparse \u00b7 GitHub \u2014 https://github.com/andialbrecht/sqlparse/blob/master/.github/workflows/python-app.yml",
+   "Source: sqlparse/Makefile at master \u00b7 andialbrecht/sqlparse \u00b7 GitHub \u2014 https://github.com/andialbrecht/sqlparse/blob/master/Makefile",
+   "Source: sqlparse/CHANGELOG at master \u00b7 andialbrecht/sqlparse \u00b7 GitHub \u2014 https://github.com/andialbrecht/sqlparse/blob/master/CHANGELOG",
+   "Source: sqlparse/.readthedocs.yaml at master \u00b7 andialbrecht/sqlparse \u00b7 GitHub \u2014 https://github.com/andialbrecht/sqlparse/blob/master/.readthedocs.yaml",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: install pytest (listed in the test extra) on main and pr.",
+   "Setup plan: install pytest-cov (listed in the test extra) on main and pr.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >=3.5, >=3.10",
+   "Setup plan: Python rule: one Python version is used on both sides: the lowest version that meets the requirements of both main and the pull request; if none meets both, the check stops as a setup problem and records both."
+  ],
+  "install_docs": [
+   "Makefile",
+   "pyproject.toml",
+   "tox.ini",
+   "README.rst",
+   "docs/Makefile",
+   ".github/workflows/codeql-analysis.yml",
+   ".github/workflows/python-app.yml"
+  ],
+  "install_docs_from": "main",
+  "setup_plan": {
+   "packages": [
+    {
+     "requirement": "pytest",
+     "name": "pytest",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the test extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest-cov",
+     "name": "pytest-cov",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the test extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    }
+   ],
+   "scope_blocked": "",
+   "component": null,
+   "aggregate_names": [],
+   "extra_reqs": [
+    "pytest",
+    "pytest-cov"
+   ],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >=3.5, >=3.10",
+    "rule": "one Python version is used on both sides: the lowest version that meets the requirements of both main and the pull request; if none meets both, the check stops as a setup problem and records both",
+    "gate_failed": false
+   },
+   "system": [],
+   "refused": [],
+   "groups_blocked": ""
+  },
+  "steps": {
+   "setup_lookup": "Found 2 setup item(s) in the project's files and the web lookup.",
+   "setup_python": "Python 3.12: Python 3.12 already meets >=3.5, >=3.10",
+   "install_deps": "Wrote requirements.txt and installed it on main and pr: pytest, pytest-cov."
+  },
+  "run_files": {
+   "requirements": "requirements.txt",
+   "plan": "setup-plan.json",
+   "count": 2
+  }
+ },
+ "chosen": {
+  "pr": 698,
+  "head_sha": null,
+  "install": null,
+  "test_cmd": null
+ },
+ "sides": {
+  "comparison_basis": "merge-base vs PR head (PR conflicts with base)",
+  "main_sha": "907fb496f90f2719095a1f01fe24db1e5c0e15a8",
+  "pr_sha": "c6ca239810373429ea72834132d1ca614f3fd76e"
+ },
+ "tested": {
+  "main": "master @ 907fb496f90f (merge-base with the PR head)",
+  "pr": "PR head c6ca23981037"
+ },
+ "probe_plan": {
+  "baseline": "full",
+  "model": "model provider: nebius (Token Factory, live)",
+  "errors": [
+   "nebius probes request failed: TimeoutError"
+  ],
+  "model_claims": [
+   {
+    "id": "C1",
+    "text": "Parsing the CREATE TABLE IF NOT EXISTS ... USING delta ... statement yields the keyword list ['CREATE', 'TABLE', 'IF', 'NOT', 'EXISTS', 'USING', 'LOCATION', 'PARTITIONED BY', 'COMMENT', 'TBLPROPERTIES'].",
+    "source_quote": ">>> ['CREATE', 'TABLE', 'IF', 'NOT', 'EXISTS', 'USING', 'LOCATION', 'PARTITIONED BY', 'COMMENT', 'TBLPROPERTIES']",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C2",
+    "text": "Parsing the OPTIMIZE ... ZORDER BY statement yields the keyword list ['OPTIMIZE', 'ZORDER BY'].",
+    "source_quote": ">>> ['OPTIMIZE', 'ZORDER BY']",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C3",
+    "text": "Parsing the VACUUM statement yields the keyword list ['VACUUM'].",
+    "source_quote": ">>> ['VACUUM']",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C4",
+    "text": "Parsing the CREATE BLOOMFILTER INDEX statement yields the keyword list ['CREATE', 'BLOOMFILTER INDEX', 'ON', 'TABLE', 'FOR'].",
+    "source_quote": ">>> ['CREATE', 'BLOOMFILTER INDEX', 'ON', 'TABLE', 'FOR']",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C5",
+    "text": "Parsing the CREATE TABLE ... SHALLOW CLONE statement yields the keyword list ['CREATE', 'TABLE', 'SHALLOW CLONE'].",
+    "source_quote": ">>> ['CREATE', 'TABLE', 'SHALLOW CLONE']",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C6",
+    "text": "Parsing the DESCRIBE HISTORY statement yields the keyword list ['DESCRIBE', 'HISTORY'].",
+    "source_quote": ">>> ['DESCRIBE', 'HISTORY']",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C7",
+    "text": "Parsing the DESCRIBE TABLE EXTENDED statement yields the keyword list ['DESCRIBE', 'TABLE', 'EXTENDED'].",
+    "source_quote": ">>> ['DESCRIBE', 'TABLE', 'EXTENDED']",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C8",
+    "text": "Parsing the SHOW DETAIL statement yields the keyword list ['SHOW', 'DETAIL'].",
+    "source_quote": ">>> ['SHOW', 'DETAIL']",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C9",
+    "text": "Parsing the MSCK REPAIR TABLE ... SYNC METADATA statement yields the keyword list ['MSCK REPAIR', 'TABLE', 'SYNC', 'METADATA'].",
+    "source_quote": ">>> ['MSCK REPAIR', 'TABLE', 'SYNC', 'METADATA']",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C10",
+    "text": "Parsing the REFRESH TABLE statement yields the keyword list ['REFRESH', 'TABLE'].",
+    "source_quote": ">>> ['REFRESH', 'TABLE']",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C11",
+    "text": "This PR adds initial Databricks syntax support.",
+    "source_quote": "feat(databricks): add initial databricks syntax",
+    "testable": true,
+    "expect": "differs"
+   }
+  ],
+  "model_rejected_claims": [],
+  "diff_targets": [],
+  "frozen": []
+ },
+ "pr_side_started_at": "2026-10-24T05:21:56.995725+00:00",
+ "test_targets": {
+  "main": [
+   "tests/test_parse.py",
+   "tests/test_tokenize.py",
+   "tests/test_keywords.py"
+  ],
+  "pr": [
+   "tests/test_parse.py",
+   "tests/test_tokenize.py",
+   "tests/test_keywords.py"
+  ]
+ },
+ "contree_only": {
+  "note": "Contree mode: Contree did not run, so nothing from the pull request was run",
+  "declared_test_deps": [],
+  "optional_backends": [],
+  "not_run_locally": [
+   "local freeze",
+   "installed-commit guard",
+   "probe coverage",
+   "optional-module retry"
+  ]
+ },
+ "coverage": {
+  "status": "not measured",
+  "why": "Contree mode: coverage runs only inside Contree, and it was not run there"
+ },
+ "contree": {
+  "failed": "contree request failed: ApiTimeoutError",
+  "fallback": null,
+  "exit_code": null,
+  "stderr_tail": "",
+  "auth_error": false
+ },
+ "verdict": "could_not_verify",
+ "reason": "Contree could not prepare the main and PR sides (contree request failed: ApiTimeoutError). In Contree mode nothing from the pull request runs locally, so Proof-of-Change will not run pull-request code.",
+ "verdict_before_coverage_gate": "could_not_verify",
+ "reason_before_coverage_gate": "Contree could not prepare the main and PR sides (contree request failed: ApiTimeoutError). In Contree mode nothing from the pull request runs locally, so Proof-of-Change will not run pull-request code.",
+ "changed_lines_total": null,
+ "changed_lines_covered": null,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "lower",
+  "note": "coverage of the changed Python lines was NOT MEASURED (Contree mode: coverage runs only inside Contree, and it was not run there)",
+  "measurement": "not measured"
+ },
+ "explanation": {
+  "status": "wired",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "text": "Verdict: could_not_verify. Contree could not prepare the main and PR sides (contree request failed: ApiTimeoutError). In Contree mode nothing from the pull request runs locally, so Proof-of-Change will not run pull-request code.",
+  "quotes": [],
+  "advisory": true
+ },
+ "agents": {
+  "status": "ran",
+  "advisory": true,
+  "note": "judge/helper/summary are advisory; code owns the verdict",
+  "roles": [
+   {
+    "role": "judge",
+    "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+    "status": "ok",
+    "note": null,
+    "labels": []
+   },
+   {
+    "role": "helper",
+    "model": "nvidia/Nemotron-3_5-Lightning",
+    "status": "ok",
+    "note": null,
+    "notes": [
+     "contree ApiTimeoutError: retry with backoff for future diffs",
+     "ensure stable API access before running contree comparisons",
+     "databricks syntax change: test locally if contree times out",
+     "ignore contree timeout noise in diff logs when latency > 30s",
+     "update contree CLI to latest version for API stability"
+    ]
+   },
+   {
+    "role": "summary",
+    "model": "nvidia/nemotron-3-super-120b-a12b",
+    "status": "ok",
+    "note": "model returned empty text; filled from code verdict/reason"
+   }
+  ],
+  "provider": {
+   "provider": "nebius",
+   "models": {
+    "claims": "nvidia/nemotron-3-super-120b-a12b",
+    "probes": "nvidia/nemotron-3-super-120b-a12b",
+    "judge": "nvidia/Nemotron-3-Ultra-550b-a55b",
+    "helper": "nvidia/Nemotron-3_5-Lightning",
+    "summary": "nvidia/nemotron-3-super-120b-a12b"
+   },
+   "blind": true
+  }
+ },
+ "swarm_requested": true,
+ "operator_approval_requested": false,
+ "swarm": "on",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [
+   "sqlparse/filters/aligned_indent.py",
+   "sqlparse/keywords.py",
+   "sqlparse/lexer.py",
+   "sqlparse/sql.py"
+  ],
+  "compiled_files": [],
+  "other_files": [
+   "tests/test_parse.py",
+   "tests/test_tokenize.py"
+  ]
+ },
+ "duration_s": {
+  "total_wall": 5556.9,
+  "tests": 0
+ },
+ "cost": {
+  "ai_calls": 2,
+  "failed_ai_calls": 1,
+  "input_tokens": 788,
+  "output_tokens": 1525,
+  "thinking_tokens": 685,
+  "cost_usd": 0.001609,
+  "calls_without_usage": 1,
+  "ai_cost_usd": 0.001609,
+  "cost_complete": false,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 5556.9,
+   "tests": 0
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.37046,
+  "total_cost_usd": 0.372069,
+  "swarm": {
+   "ai_calls": 3,
+   "failed_ai_calls": 0,
+   "input_tokens": 153,
+   "output_tokens": 430,
+   "thinking_tokens": 417,
+   "cost_usd": 0.000433,
+   "calls_without_usage": 2,
+   "ai_cost_usd": 0.000433,
+   "cost_complete": false,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ }
+}

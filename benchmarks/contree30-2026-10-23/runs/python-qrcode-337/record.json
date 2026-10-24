@@ -1,0 +1,462 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-lincolnloop-python-qrcode-337-768d2ed4b660-python-qrcode-337",
+ "date_ist": "2026-10-23 14:24 IST",
+ "run_date": "2026-10-23",
+ "who": "ops/daily_run.py",
+ "repo": "lincolnloop/python-qrcode",
+ "library": "python-qrcode",
+ "pr": {
+  "repo": "lincolnloop/python-qrcode",
+  "number": 337,
+  "url": "https://github.com/lincolnloop/python-qrcode/pull/337",
+  "title": "Allow embedded image location to be erased before placing image",
+  "base_sha": "ac2dda2ddef6d6bd98b291f2b4a7b69f2c5ad3a9",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "768d2ed4b6608dd8571c23bcabcf3fbfc814a7a4",
+  "merge_commit": null,
+  "tested_main_sha": "b80fea6ee7e75f3024b9ed7adf891a143e0b14e3",
+  "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+ },
+ "author": "shanko07",
+ "base_ref": "main",
+ "updated_at_utc": "2025-07-23T11:38:46Z",
+ "updated_at_ist": "2025-07-23 17:08 IST",
+ "ci_state": "not checked (single-PR check)",
+ "ci_detail": "checked on request with --pr",
+ "tested_at_ist": "2026-10-23 14:24 IST",
+ "files": {
+  "all": [
+   "qrcode/image/styledpil.py"
+  ],
+  "package_py": [],
+  "compiled": [],
+  "other": [
+   "qrcode/image/styledpil.py"
+  ]
+ },
+ "machine_type": {
+  "arch": "arm64",
+  "os": "Darwin",
+  "platform": "macOS-15.5-arm64-arm-64bit-Mach-O",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": "Apple clang version 14.0.3 (clang-1403.0.22.14.1)",
+  "cpu_model": null,
+  "ram_gb": null
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 0,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.14",
+ "test_selection": "mapped from touched files: ",
+ "per_run": [],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "contree",
+ "sandbox_backend_note": "contree (Token Factory Sandboxes, sdk 0.3.6)",
+ "machine": "contree",
+ "tool_setup": {
+  "installed": [],
+  "tries": 0,
+  "note": "All required tools were already installed.",
+  "refused": []
+ },
+ "posted_upstream": false,
+ "logs": "python_qrcode-337/",
+ "freeze": {},
+ "poc_commit": "863751e9580b866fe64247737975cb2e04e97215",
+ "route": "source-pair",
+ "current_head_sha": "768d2ed4b6608dd8571c23bcabcf3fbfc814a7a4",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "model_provider_fallback": "AI call fell back or failed (claims)",
+ "state": "open",
+ "mergeable": false,
+ "mergeable_state": "dirty",
+ "product_check": true,
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": {
+   "ok": false,
+   "skipped": false,
+   "live_call": true,
+   "cached": false,
+   "queries": [
+    "python-qrcode python setup install instructions https://github.com/lincolnloop/python-qrcode site:github.com/lincolnloop/python-qrcode",
+    "python-qrcode python documentation install https://github.com/lincolnloop/python-qrcode site:github.com/lincolnloop/python-qrcode",
+    "python-qrcode python install requirements https://pypi.org/project/python-qrcode/ https://github.com/lincolnloop/python-qrcode site:pypi.org"
+   ],
+   "results": [
+    {
+     "title": "ImportError: No module named qrcode \u00b7 Issue #103",
+     "url": "https://github.com/lincolnloop/python-qrcode/issues/103",
+     "query": "python-qrcode python setup install instructions https://github.com/lincolnloop/python-qrcode site:github.com/lincolnloop/python-qrcode"
+    },
+    {
+     "title": "Need to pip install colorama on Windows #131",
+     "url": "https://github.com/lincolnloop/python-qrcode/issues/131",
+     "query": "python-qrcode python setup install instructions https://github.com/lincolnloop/python-qrcode site:github.com/lincolnloop/python-qrcode"
+    },
+    {
+     "title": "import Image error \u00b7 Issue #129 \u00b7 lincolnloop/python-qrcode",
+     "url": "https://github.com/lincolnloop/python-qrcode/issues/129",
+     "query": "python-qrcode python setup install instructions https://github.com/lincolnloop/python-qrcode site:github.com/lincolnloop/python-qrcode"
+    }
+   ],
+   "text": "To install the `python-qrcode` package, it is suggested to use `pip install qrcode[pil]` as a solution to an ImportError. For Windows users, it is noted that `pip install colorama` should be done if using the source distribution due to a dependency in the `setup.py` file. The default QR code generator uses PIL, but it is not an enforced requirement.\nlincolnloop/python-qrcode \u2026 installing 5.1 over the 5.3 install solved my issue. try using pip install qrcode[pil] It worked for me after a lot\nIf using the source dist, colorama should be installed due to https://github.com/lincolnloop/python-qrcode/blob/master/setup.py#L23. But the\nThe default qr generator uses PIL (as the readme clearly states), but since you can also use other generators it is not an enforced requirement.",
+   "errors": [
+    "TimeoutError: The read operation timed out"
+   ],
+   "lines": [
+    "Looked up with Tavily: 3 results",
+    "Query: python-qrcode python setup install instructions https://github.com/lincolnloop/python-qrcode site:github.com/lincolnloop/python-qrcode",
+    "Query: python-qrcode python documentation install https://github.com/lincolnloop/python-qrcode site:github.com/lincolnloop/python-qrcode",
+    "Query: python-qrcode python install requirements https://pypi.org/project/python-qrcode/ https://github.com/lincolnloop/python-qrcode site:pypi.org",
+    "Source: ImportError: No module named qrcode \u00b7 Issue #103 \u2014 https://github.com/lincolnloop/python-qrcode/issues/103",
+    "Source: Need to pip install colorama on Windows #131 \u2014 https://github.com/lincolnloop/python-qrcode/issues/131",
+    "Source: import Image error \u00b7 Issue #129 \u00b7 lincolnloop/python-qrcode \u2014 https://github.com/lincolnloop/python-qrcode/issues/129"
+   ]
+  },
+  "notes": [
+   "Setup check: GitHub token: missing.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory could not be read.",
+   "Setup check: free disk 37.3 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: 3 results",
+   "Query: python-qrcode python setup install instructions https://github.com/lincolnloop/python-qrcode site:github.com/lincolnloop/python-qrcode",
+   "Query: python-qrcode python documentation install https://github.com/lincolnloop/python-qrcode site:github.com/lincolnloop/python-qrcode",
+   "Query: python-qrcode python install requirements https://pypi.org/project/python-qrcode/ https://github.com/lincolnloop/python-qrcode site:pypi.org",
+   "Source: ImportError: No module named qrcode \u00b7 Issue #103 \u2014 https://github.com/lincolnloop/python-qrcode/issues/103",
+   "Source: Need to pip install colorama on Windows #131 \u2014 https://github.com/lincolnloop/python-qrcode/issues/131",
+   "Source: import Image error \u00b7 Issue #129 \u00b7 lincolnloop/python-qrcode \u2014 https://github.com/lincolnloop/python-qrcode/issues/129",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: colorama is noted, installed with the project.",
+   "Setup plan: typing_extensions is noted, installed with the project.",
+   "Setup plan: pypng is noted, installed with the project.",
+   "Setup plan: install coverage (listed in the test extra) on main and pr.",
+   "Setup plan: install pytest (listed in the test extra) on main and pr.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >= 3.7",
+   "Setup plan: Python rule: one Python version is used on both sides: the lowest version that meets the requirements of both main and the pull request; if none meets both, the check stops as a setup problem and records both."
+  ],
+  "install_docs": [
+   "pyproject.toml",
+   "setup.py",
+   "tox.ini",
+   "setup.cfg",
+   "README.rst",
+   ".github/workflows/python-app.yml"
+  ],
+  "install_docs_from": "main",
+  "setup_plan": {
+   "packages": [
+    {
+     "requirement": "colorama;platform_system==\"Windows\"",
+     "name": "colorama",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "setup.cfg",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "typing_extensions",
+     "name": "typing_extensions",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "setup.cfg",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pypng",
+     "name": "pypng",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "setup.cfg",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "coverage",
+     "name": "coverage",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "setup.cfg",
+     "reason": "listed in the test extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest",
+     "name": "pytest",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "setup.cfg",
+     "reason": "listed in the test extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    }
+   ],
+   "scope_blocked": "",
+   "component": null,
+   "aggregate_names": [],
+   "extra_reqs": [
+    "coverage",
+    "pytest"
+   ],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >= 3.7",
+    "rule": "one Python version is used on both sides: the lowest version that meets the requirements of both main and the pull request; if none meets both, the check stops as a setup problem and records both",
+    "gate_failed": false
+   },
+   "system": [],
+   "refused": [],
+   "groups_blocked": ""
+  },
+  "steps": {
+   "setup_lookup": "Found 5 setup item(s) in the project's files and the web lookup.",
+   "setup_python": "Python 3.12: Python 3.12 already meets >= 3.7",
+   "install_deps": "Wrote requirements.txt and installed it on main and pr: coverage, pytest. 3 more come with the project install."
+  },
+  "run_files": {
+   "requirements": "requirements.txt",
+   "plan": "setup-plan.json",
+   "count": 2
+  }
+ },
+ "chosen": {
+  "pr": 337,
+  "head_sha": null,
+  "install": null,
+  "test_cmd": null
+ },
+ "sides": {
+  "comparison_basis": "merge-base vs PR head (PR conflicts with base)",
+  "main_sha": "b80fea6ee7e75f3024b9ed7adf891a143e0b14e3",
+  "pr_sha": "768d2ed4b6608dd8571c23bcabcf3fbfc814a7a4"
+ },
+ "tested": {
+  "main": "main @ b80fea6ee7e7 (merge-base with the PR head)",
+  "pr": "PR head 768d2ed4b660"
+ },
+ "probe_plan": {
+  "baseline": "full",
+  "model": "model provider: nebius (Token Factory, live)",
+  "errors": [
+   "nebius claims request failed: TimeoutError"
+  ],
+  "model_claims": [],
+  "model_rejected_claims": [],
+  "diff_targets": [],
+  "frozen": []
+ },
+ "pr_side_started_at": "2026-10-23T09:40:01.451119+00:00",
+ "test_targets": {
+  "main": [],
+  "pr": []
+ },
+ "contree_only": {
+  "note": "Contree mode: installs, tests and probes ran in Contree; nothing from the pull request ran locally",
+  "declared_test_deps": [],
+  "optional_backends": [],
+  "not_run_locally": [
+   "local freeze",
+   "installed-commit guard",
+   "probe coverage",
+   "optional-module retry"
+  ]
+ },
+ "coverage": {
+  "status": "not measured",
+  "why": "Contree mode: coverage runs only inside Contree, and it was not run there"
+ },
+ "contree": {
+  "main_uuid": "adb383f2-8d11-45ef-add6-740ae6dd9490",
+  "pr_uuid": "8ec66989-410e-45c6-8e0b-f7b61d00fdf6",
+  "max_ops": 40,
+  "sdk": "0.3.6",
+  "base_image": "docker.io/library/python:3.12-slim-bookworm",
+  "python": {
+   "requires_python": [
+    ">= 3.7"
+   ],
+   "requires_python_found": true,
+   "main": "3.12.15",
+   "pr": "3.12.15",
+   "problems": []
+  }
+ },
+ "probes": {
+  "status": "none",
+  "items": []
+ },
+ "probe_changed_line_coverage": {
+  "status": "no probes",
+  "probes": {}
+ },
+ "verdict": "could_not_verify",
+ "reason": "no tests could be mapped to the touched files",
+ "verdict_before_coverage_gate": "could_not_verify",
+ "reason_before_coverage_gate": "no tests could be mapped to the touched files",
+ "changed_lines_total": null,
+ "changed_lines_covered": null,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "lower",
+  "note": "coverage of the changed Python lines was NOT MEASURED (Contree mode: coverage runs only inside Contree, and it was not run there)",
+  "measurement": "not measured"
+ },
+ "explanation": {
+  "status": "wired",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "text": "The PR titled \"Allow embedded image location to be erased before placing image\" resulted in a verdict of \"could_not_verify\" because \"no tests could be mapped to the touched files\".",
+  "quotes": [
+   "Allow embedded image location to be erased before placing image",
+   "could_not_verify",
+   "no tests could be mapped to the touched files"
+  ],
+  "advisory": true
+ },
+ "agents": {
+  "status": "ran",
+  "advisory": true,
+  "note": "judge/helper/summary are advisory; code owns the verdict",
+  "roles": [
+   {
+    "role": "judge",
+    "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+    "status": "ok",
+    "note": null,
+    "labels": []
+   },
+   {
+    "role": "helper",
+    "model": "nvidia/Nemotron-3_5-Lightning",
+    "status": "ok",
+    "note": null,
+    "notes": [
+     "Ignore whitespace changes in image path normalization",
+     "Map untouched baseline files to existing test coverage",
+     "Add install hint: ensure test suite includes image logic",
+     "Suppress noise from generated image metadata in diffs",
+     "Link touched files to baseline expectations for test mapping"
+    ]
+   },
+   {
+    "role": "summary",
+    "model": "nvidia/nemotron-3-super-120b-a12b",
+    "status": "ok",
+    "note": null
+   }
+  ],
+  "provider": {
+   "provider": "nebius",
+   "models": {
+    "claims": "nvidia/nemotron-3-super-120b-a12b",
+    "probes": "nvidia/nemotron-3-super-120b-a12b",
+    "judge": "nvidia/Nemotron-3-Ultra-550b-a55b",
+    "helper": "nvidia/Nemotron-3_5-Lightning",
+    "summary": "nvidia/nemotron-3-super-120b-a12b"
+   },
+   "blind": true
+  }
+ },
+ "swarm_requested": true,
+ "operator_approval_requested": false,
+ "swarm": "on",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [],
+  "compiled_files": [],
+  "other_files": [
+   "qrcode/image/styledpil.py"
+  ]
+ },
+ "duration_s": {
+  "total_wall": 2805.0,
+  "tests": 0
+ },
+ "cost": {
+  "ai_calls": 1,
+  "failed_ai_calls": 1,
+  "input_tokens": 0,
+  "output_tokens": 0,
+  "thinking_tokens": 0,
+  "cost_usd": 0.0,
+  "calls_without_usage": 1,
+  "ai_cost_usd": 0.0,
+  "cost_complete": false,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 2805.0,
+   "tests": 0
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.187,
+  "total_cost_usd": 0.187,
+  "swarm": {
+   "ai_calls": 3,
+   "failed_ai_calls": 0,
+   "input_tokens": 117,
+   "output_tokens": 441,
+   "thinking_tokens": 350,
+   "cost_usd": 0.000432,
+   "calls_without_usage": 2,
+   "ai_cost_usd": 0.000432,
+   "cost_complete": false,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ }
+}

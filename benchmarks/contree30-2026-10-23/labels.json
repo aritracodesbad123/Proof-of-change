@@ -1,0 +1,235 @@
+[
+ {
+  "url": "https://github.com/pallets/itsdangerous/pull/428",
+  "title": "require padding when decoding base64 on Python 3.15+",
+  "label": "unlabelled",
+  "named_by_pr": [
+   "#420"
+  ],
+  "why_unlabelled": "the pull request text names an issue; that is not proof of a bug in the change. No revert, follow-up bug report, or maintainer confirmation was recorded."
+ },
+ {
+  "url": "https://github.com/andialbrecht/sqlparse/pull/669",
+  "title": "Strip last statement when it only contains comment",
+  "label": "unlabelled",
+  "named_by_pr": [],
+  "why_unlabelled": "the pull request text names an issue; that is not proof of a bug in the change. No revert, follow-up bug report, or maintainer confirmation was recorded."
+ },
+ {
+  "url": "https://github.com/pytoolz/toolz/pull/56",
+  "title": "Purity edits",
+  "label": "unlabelled",
+  "named_by_pr": [],
+  "why_unlabelled": "the pull request text names an issue; that is not proof of a bug in the change. No revert, follow-up bug report, or maintainer confirmation was recorded."
+ },
+ {
+  "url": "https://github.com/mahmoud/boltons/pull/43",
+  "title": "join function for iterutils",
+  "label": "unlabelled",
+  "named_by_pr": [],
+  "why_unlabelled": "the pull request text names an issue; that is not proof of a bug in the change. No revert, follow-up bug report, or maintainer confirmation was recorded."
+ },
+ {
+  "url": "https://github.com/WhyNotHugo/python-barcode/pull/162",
+  "title": "Add FNC4 to encode high (160\u2013255) characters",
+  "label": "unlabelled",
+  "named_by_pr": [],
+  "why_unlabelled": "the pull request text names an issue; that is not proof of a bug in the change. No revert, follow-up bug report, or maintainer confirmation was recorded."
+ },
+ {
+  "url": "https://github.com/lincolnloop/python-qrcode/pull/337",
+  "title": "Allow embedded image location to be erased before placing image",
+  "label": "unlabelled",
+  "named_by_pr": [],
+  "why_unlabelled": "the pull request text names an issue; that is not proof of a bug in the change. No revert, follow-up bug report, or maintainer confirmation was recorded."
+ },
+ {
+  "url": "https://github.com/PyCQA/isort/pull/2682",
+  "title": "Fix split directives on complete multiline imports",
+  "label": "unlabelled",
+  "named_by_pr": [
+   "#2680"
+  ],
+  "why_unlabelled": "the pull request text names an issue; that is not proof of a bug in the change. No revert, follow-up bug report, or maintainer confirmation was recorded."
+ },
+ {
+  "url": "https://github.com/python-jsonschema/jsonschema/pull/1459",
+  "title": "Fix multipleOf with integer-valued float for large integers",
+  "label": "unlabelled",
+  "named_by_pr": [
+   "#1159"
+  ],
+  "why_unlabelled": "the pull request text names an issue; that is not proof of a bug in the change. No revert, follow-up bug report, or maintainer confirmation was recorded."
+ },
+ {
+  "url": "https://github.com/pallets/click/pull/2784",
+  "title": "Allow adding dynamic parameters to every Context",
+  "label": "unlabelled",
+  "named_by_pr": [
+   "#2783"
+  ],
+  "why_unlabelled": "the pull request text names an issue; that is not proof of a bug in the change. No revert, follow-up bug report, or maintainer confirmation was recorded."
+ },
+ {
+  "url": "https://github.com/psf/requests/pull/5922",
+  "title": "Always use value of session.verify when set, fixes #5921",
+  "label": "unlabelled",
+  "named_by_pr": [
+   "https://github.com/psf/requests/issues/5921"
+  ],
+  "why_unlabelled": "the pull request text names an issue; that is not proof of a bug in the change. No revert, follow-up bug report, or maintainer confirmation was recorded."
+ },
+ {
+  "url": "https://github.com/Textualize/rich/pull/2556",
+  "title": "feat(terminal_theme): add more themes",
+  "label": "unlabelled",
+  "named_by_pr": [],
+  "why_unlabelled": "the pull request text names an issue; that is not proof of a bug in the change. No revert, follow-up bug report, or maintainer confirmation was recorded."
+ },
+ {
+  "url": "https://github.com/encode/httpx/pull/2997",
+  "title": "Fixing missed arguments for pools when init transports",
+  "label": "unlabelled",
+  "named_by_pr": [],
+  "why_unlabelled": "the pull request text names an issue; that is not proof of a bug in the change. No revert, follow-up bug report, or maintainer confirmation was recorded."
+ },
+ {
+  "url": "https://github.com/urllib3/urllib3/pull/2888",
+  "title": "Keep hostname's trailing dot",
+  "label": "unlabelled",
+  "named_by_pr": [],
+  "why_unlabelled": "the pull request text names an issue; that is not proof of a bug in the change. No revert, follow-up bug report, or maintainer confirmation was recorded."
+ },
+ {
+  "url": "https://github.com/Delgan/loguru/pull/86",
+  "title": "[RFC] Allow to configure exception formatter",
+  "label": "unlabelled",
+  "named_by_pr": [
+   "https://github.com/Delgan/loguru/issues/59"
+  ],
+  "why_unlabelled": "the pull request text names an issue; that is not proof of a bug in the change. No revert, follow-up bug report, or maintainer confirmation was recorded."
+ },
+ {
+  "url": "https://github.com/prettytable/prettytable/pull/223",
+  "title": "Refactor old %-formatting to use format() builtin",
+  "label": "unlabelled",
+  "named_by_pr": [],
+  "why_unlabelled": "the pull request text names an issue; that is not proof of a bug in the change. No revert, follow-up bug report, or maintainer confirmation was recorded."
+ },
+ {
+  "url": "https://github.com/pyinvoke/invoke/pull/957",
+  "title": "Default run.shell to /bin/sh",
+  "label": "unlabelled",
+  "named_by_pr": [],
+  "why_unlabelled": "the pull request text names an issue; that is not proof of a bug in the change. No revert, follow-up bug report, or maintainer confirmation was recorded."
+ },
+ {
+  "url": "https://github.com/pyutils/line_profiler/pull/322",
+  "title": "feat: Add reset_stats method to LineProfiler for resetting accumulated profiling data",
+  "label": "unlabelled",
+  "named_by_pr": [],
+  "why_unlabelled": "the pull request text names an issue; that is not proof of a bug in the change. No revert, follow-up bug report, or maintainer confirmation was recorded."
+ },
+ {
+  "url": "https://github.com/pallets/markupsafe/pull/512",
+  "title": "Add support for t-strings",
+  "label": "unlabelled",
+  "named_by_pr": [
+   "#511"
+  ],
+  "why_unlabelled": "the pull request text names an issue; that is not proof of a bug in the change. No revert, follow-up bug report, or maintainer confirmation was recorded."
+ },
+ {
+  "url": "https://github.com/python-attrs/attrs/pull/1357",
+  "title": "WIP: cached properties implementation using descriptor rather than ge\u2026",
+  "label": "unlabelled",
+  "named_by_pr": [],
+  "why_unlabelled": "the pull request text names an issue; that is not proof of a bug in the change. No revert, follow-up bug report, or maintainer confirmation was recorded."
+ },
+ {
+  "url": "https://github.com/andialbrecht/sqlparse/pull/698",
+  "title": "feat(databricks): add initial databricks syntax",
+  "label": "unlabelled",
+  "named_by_pr": [],
+  "why_unlabelled": "the pull request text names an issue; that is not proof of a bug in the change. No revert, follow-up bug report, or maintainer confirmation was recorded."
+ },
+ {
+  "url": "https://github.com/pytoolz/toolz/pull/210",
+  "title": "Consume",
+  "label": "unlabelled",
+  "named_by_pr": [],
+  "why_unlabelled": "the pull request text names an issue; that is not proof of a bug in the change. No revert, follow-up bug report, or maintainer confirmation was recorded."
+ },
+ {
+  "url": "https://github.com/lincolnloop/python-qrcode/pull/418",
+  "title": "Replace exception with warning for low error correction with embedded image",
+  "label": "unlabelled",
+  "named_by_pr": [],
+  "why_unlabelled": "the pull request text names an issue; that is not proof of a bug in the change. No revert, follow-up bug report, or maintainer confirmation was recorded."
+ },
+ {
+  "url": "https://github.com/PyCQA/isort/pull/2588",
+  "title": "fix: keep comment-only lines inside from-import groups",
+  "label": "unlabelled",
+  "named_by_pr": [
+   "#1852"
+  ],
+  "why_unlabelled": "the pull request text names an issue; that is not proof of a bug in the change. No revert, follow-up bug report, or maintainer confirmation was recorded."
+ },
+ {
+  "url": "https://github.com/python-jsonschema/jsonschema/pull/1534",
+  "title": "Support Draft 2020-12 relative JSON Pointer index manipulation",
+  "label": "unlabelled",
+  "named_by_pr": [
+   "#1533"
+  ],
+  "why_unlabelled": "the pull request text names an issue; that is not proof of a bug in the change. No revert, follow-up bug report, or maintainer confirmation was recorded."
+ },
+ {
+  "url": "https://github.com/psf/requests/pull/4920",
+  "title": "iter_content() checks for < 1 chunk_size",
+  "label": "unlabelled",
+  "named_by_pr": [],
+  "why_unlabelled": "the pull request text names an issue; that is not proof of a bug in the change. No revert, follow-up bug report, or maintainer confirmation was recorded."
+ },
+ {
+  "url": "https://github.com/Textualize/rich/pull/2697",
+  "title": "added a new parameter for method capture(echo)",
+  "label": "unlabelled",
+  "named_by_pr": [
+   "https://github.com/Textualize/rich/issues/2338"
+  ],
+  "why_unlabelled": "the pull request text names an issue; that is not proof of a bug in the change. No revert, follow-up bug report, or maintainer confirmation was recorded."
+ },
+ {
+  "url": "https://github.com/encode/httpx/pull/3079",
+  "title": "Types: Fix type annotation for default_encoding parameter",
+  "label": "unlabelled",
+  "named_by_pr": [],
+  "why_unlabelled": "the pull request text names an issue; that is not proof of a bug in the change. No revert, follow-up bug report, or maintainer confirmation was recorded."
+ },
+ {
+  "url": "https://github.com/urllib3/urllib3/pull/3224",
+  "title": "PoolManager: Fix incorrect retry configuration in case of redirection",
+  "label": "unlabelled",
+  "named_by_pr": [],
+  "why_unlabelled": "the pull request text names an issue; that is not proof of a bug in the change. No revert, follow-up bug report, or maintainer confirmation was recorded."
+ },
+ {
+  "url": "https://github.com/pyinvoke/invoke/pull/991",
+  "title": "Add '!join' tag to config parser",
+  "label": "unlabelled",
+  "named_by_pr": [],
+  "why_unlabelled": "the pull request text names an issue; that is not proof of a bug in the change. No revert, follow-up bug report, or maintainer confirmation was recorded."
+ },
+ {
+  "url": "https://github.com/pytest-dev/pytest/pull/14709",
+  "title": "Fix importlib mode shadowing an installed package with a namespace package (#13257)",
+  "label": "unlabelled",
+  "named_by_pr": [
+   "#12592",
+   "#13257"
+  ],
+  "why_unlabelled": "the pull request text names an issue; that is not proof of a bug in the change. No revert, follow-up bug report, or maintainer confirmation was recorded."
+ }
+]

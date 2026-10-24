@@ -1,0 +1,2722 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-mahmoud-boltons-43-750b91072192-boltons-43",
+ "date_ist": "2026-10-23 15:19 IST",
+ "run_date": "2026-10-23",
+ "who": "ops/daily_run.py",
+ "repo": "mahmoud/boltons",
+ "library": "boltons",
+ "pr": {
+  "repo": "mahmoud/boltons",
+  "number": 43,
+  "url": "https://github.com/mahmoud/boltons/pull/43",
+  "title": "join function for iterutils",
+  "base_sha": "4140386d1fb1eee177298bfe7f5335d4ce2aab47",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "750b9107219262e27524935cd4339bde04ceac7f",
+  "merge_commit": null,
+  "tested_main_sha": "5b78fecfb976e44988ec455fd852f0a48482729f",
+  "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+ },
+ "author": "fivetentaylor",
+ "base_ref": "master",
+ "updated_at_utc": "2016-08-03T09:11:14Z",
+ "updated_at_ist": "2016-08-03 14:41 IST",
+ "ci_state": "not checked (single-PR check)",
+ "ci_detail": "checked on request with --pr",
+ "tested_at_ist": "2026-10-23 15:19 IST",
+ "files": {
+  "all": [
+   "boltons/iterutils.py",
+   "tests/test_iterutils.py"
+  ],
+  "package_py": [
+   "boltons/iterutils.py"
+  ],
+  "compiled": [],
+  "other": [
+   "tests/test_iterutils.py"
+  ]
+ },
+ "machine_type": {
+  "arch": "arm64",
+  "os": "Darwin",
+  "platform": "macOS-15.5-arm64-arm-64bit-Mach-O",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": "Apple clang version 14.0.3 (clang-1403.0.22.14.1)",
+  "cpu_model": null,
+  "ram_gb": null
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 0,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.14",
+ "test_selection": "mapped from touched files: tests, tests/test_iterutils.py",
+ "per_run": [
+  {
+   "side": "old",
+   "run": 1,
+   "passed": 0,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 1.4,
+   "pytest_summary": "AttributeError: __spec__",
+   "junit": false
+  },
+  {
+   "side": "new",
+   "run": 1,
+   "passed": 0,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 1.4,
+   "pytest_summary": "AttributeError: __spec__",
+   "junit": false
+  },
+  {
+   "side": "old",
+   "run": 2,
+   "passed": 0,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 1.4,
+   "pytest_summary": "AttributeError: __spec__",
+   "junit": false
+  },
+  {
+   "side": "new",
+   "run": 2,
+   "passed": 0,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 1.4,
+   "pytest_summary": "AttributeError: __spec__",
+   "junit": false
+  },
+  {
+   "side": "old",
+   "run": 3,
+   "passed": 0,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 1.4,
+   "pytest_summary": "AttributeError: __spec__",
+   "junit": false
+  },
+  {
+   "side": "new",
+   "run": 3,
+   "passed": 0,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 1.4,
+   "pytest_summary": "AttributeError: __spec__",
+   "junit": false
+  }
+ ],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "contree",
+ "sandbox_backend_note": "contree (Token Factory Sandboxes, sdk 0.3.6)",
+ "machine": "contree",
+ "tool_setup": {
+  "installed": [],
+  "tries": 0,
+  "note": "All required tools were already installed.",
+  "refused": []
+ },
+ "posted_upstream": false,
+ "logs": "boltons-43/",
+ "freeze": {},
+ "poc_commit": "863751e9580b866fe64247737975cb2e04e97215",
+ "route": "source-pair",
+ "current_head_sha": "750b9107219262e27524935cd4339bde04ceac7f",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "state": "open",
+ "mergeable": false,
+ "mergeable_state": "dirty",
+ "product_check": true,
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": {
+   "ok": true,
+   "skipped": false,
+   "live_call": true,
+   "cached": false,
+   "queries": [
+    "boltons python setup install instructions https://github.com/mahmoud/boltons site:github.com/mahmoud/boltons",
+    "boltons python documentation install https://github.com/mahmoud/boltons site:github.com/mahmoud/boltons",
+    "boltons python install requirements https://pypi.org/project/boltons/ https://github.com/mahmoud/boltons site:pypi.org"
+   ],
+   "results": [
+    {
+     "title": "boltons \u00b7 PyPI",
+     "url": "https://pypi.org/project/boltons/",
+     "query": "boltons python install requirements https://pypi.org/project/boltons/ https://github.com/mahmoud/boltons site:pypi.org"
+    },
+    {
+     "title": "types-boltons \u00b7 PyPI",
+     "url": "https://pypi.org/project/types-boltons/",
+     "query": "boltons python install requirements https://pypi.org/project/boltons/ https://github.com/mahmoud/boltons site:pypi.org"
+    },
+    {
+     "title": "Improve Test Suite Documentation \u00b7 Issue #390 \u00b7 mahmoud/boltons \u00b7 GitHub",
+     "url": "https://github.com/mahmoud/boltons/issues/390",
+     "query": "boltons python setup install instructions https://github.com/mahmoud/boltons site:github.com/mahmoud/boltons"
+    },
+    {
+     "title": "boltons/.readthedocs.yaml at master \u00b7 mahmoud/boltons \u00b7 GitHub",
+     "url": "https://github.com/mahmoud/boltons/blob/master/.readthedocs.yaml",
+     "query": "boltons python documentation install https://github.com/mahmoud/boltons site:github.com/mahmoud/boltons"
+    },
+    {
+     "title": "boltons/docs/index.rst at master \u00b7 mahmoud/boltons \u00b7 GitHub",
+     "url": "https://github.com/mahmoud/boltons/blob/master/docs/index.rst",
+     "query": "boltons python documentation install https://github.com/mahmoud/boltons site:github.com/mahmoud/boltons"
+    },
+    {
+     "title": "boltons/boltons/tbutils.py at master \u00b7 mahmoud/boltons",
+     "url": "https://github.com/mahmoud/boltons/blob/master/boltons/tbutils.py",
+     "query": "boltons python documentation install https://github.com/mahmoud/boltons site:github.com/mahmoud/boltons"
+    }
+   ],
+   "text": "The sources do not provide direct instructions for setting up and installing the boltons Python package. However, they do mention how to run tests using `pytest`, including running all tests with `pytest` or `python -m pytest`, specific test files with `pytest tests/test_cacheutils.py`, and specific test functions with `pytest tests/test_cacheutils.py::test_lru_add`. The sources also list various test files and their contents but do not specify installation steps for the boltons package.\nTo install the boltons Python library from the GitHub repository, use the command `pip install boltons`. The repository specifies that it is built with Python 3.10 on Ubuntu 22.04 and documentation is built with Sphinx. The library includes various utilities such as file saving, ordered dictionaries, priority queues, and more. The sources do not provide a definitive answer to the current date or version count.\nTo install the \"boltons\" package, you can use pip, the Python package installer. The PyPI page for \"boltons\" indicates that it is a set of over 230 BSD-licensed, pure-Python utilities. To install it, you can use the command `pip install boltons`. Additionally, there is a typing stub package available for \"boltons\" named \"types-boltons\" which can be installed with `pip install types-boltons`. This typing stub package aims to provide accurate annotations for \"boltons\" version 26.1.* and is part of the typeshed project.\nMar 1, 2013 \u00b7 Boltons boltons should be builtins. Boltons is a set of over 230 BSD-licensed, pure-Python utilities in the same spirit as \u2014 and yet conspicuously missing from \u2014 the standard library, including: Atomic file saving, bolted on with fileutils A highly-optimized OrderedMultiDict, in dictutils Two types of PriorityQueue, in queueutils\nSep 6, 2026 \u00b7 Typing stubs for boltons This is a type stub package for the boltons package. It can be used by type checkers to check code that uses boltons. This version of types-boltons aims to provide accurate annotations for boltons==26.1.*. This package is part of the typeshed project. All fixes for types and metadata should be contributed there.\nPriority files:\n\n test\\_cacheutils.py (12 KB, many complex tests)\n test\\_dictutils.py (12 KB, complex OMD tests)\n test\\_iterutils.py (17 KB, many utility tests)\n test\\_ioutils.py (19 KB, file operation tests)\n test\\_socketutils.py (12 KB, network tests)\n test\\_urlutils.py (16 KB, URL parsing tests)\n\n### 4. Add Inline Comments\n\nFor complex test logic, add inline comments explaining:\n\n Non-obvious assertions\n Complex setup/teardown\n Edge case rationale\n Magic numbers or values [...] Overview of te\nversion: 2\n\n# Set the version of Python and other tools you might need\n\nbuild:\n\nos: ubuntu-22.04\n\ntools:\n\npython: \"3.10\"\n\n# Build documentation in the docs/ directory with Sphinx\n\nsphinx:\n\nconfiguration: docs/conf.py\n\n# If using Sphinx, optionally build your docs in additional formats such as PDF\n\n# formats:\n\n# - pdf\n\n# Optionally declare the Python requirements required to build your docs\n\npython:\n\ninstall:\n\n- requirements: docs/requirements-rtd.txt\n\n- method: pip\n\npath: .\nAnd that's just a small selection. As of |today|, `boltons` is |b\\_type\\_count| types and |b\\_func\\_count| functions, spread across |b\\_mod\\_count| modules. See them all in the :ref:`genindex`, and see what's new by checking the CHANGELOG.\n\n## Installation and Integration\n\nBoltons can be added to a project in a few ways. There's the obvious one:\n\n```\npip install boltons \n```\n\nOn macOS, it can also be installed via MacPorts:\n\n```\nsudo port install py-boltons \n``` [...] More file actions\n\n## Lates\ndocs  \n         misc  \n         tests  \n       .gitignore  \n       .readthedocs.yaml  \n       CHANGELOG.md  \n       LICENSE  \n       README.md  \n       TODO.rst  \n       pyproject.toml  \n       setup.cfg  \n       tox.ini  \n\n## Breadcrumbs\n\n1.   boltons\n2.   /boltons\n\n/\n# tbutils.py\n\nCopy path\n\nBlame More file actions\n\nBlame More file actions\n\n## Latest commit\n\nImage 1: mahmoudmahmoud\n\ntbutils: round-trip traceback anchor lines in ParsedException (#333)\n\nJul 18, 2026 [...] .github  \n         .omp",
+   "errors": [],
+   "lines": [
+    "Looked up with Tavily: 6 results",
+    "Query: boltons python setup install instructions https://github.com/mahmoud/boltons site:github.com/mahmoud/boltons",
+    "Query: boltons python documentation install https://github.com/mahmoud/boltons site:github.com/mahmoud/boltons",
+    "Query: boltons python install requirements https://pypi.org/project/boltons/ https://github.com/mahmoud/boltons site:pypi.org",
+    "Source: boltons \u00b7 PyPI \u2014 https://pypi.org/project/boltons/",
+    "Source: types-boltons \u00b7 PyPI \u2014 https://pypi.org/project/types-boltons/",
+    "Source: Improve Test Suite Documentation \u00b7 Issue #390 \u00b7 mahmoud/boltons \u00b7 GitHub \u2014 https://github.com/mahmoud/boltons/issues/390",
+    "Source: boltons/.readthedocs.yaml at master \u00b7 mahmoud/boltons \u00b7 GitHub \u2014 https://github.com/mahmoud/boltons/blob/master/.readthedocs.yaml",
+    "Source: boltons/docs/index.rst at master \u00b7 mahmoud/boltons \u00b7 GitHub \u2014 https://github.com/mahmoud/boltons/blob/master/docs/index.rst",
+    "Source: boltons/boltons/tbutils.py at master \u00b7 mahmoud/boltons \u2014 https://github.com/mahmoud/boltons/blob/master/boltons/tbutils.py"
+   ]
+  },
+  "notes": [
+   "Setup check: GitHub token: missing.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory could not be read.",
+   "Setup check: free disk 37.3 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: 6 results",
+   "Query: boltons python setup install instructions https://github.com/mahmoud/boltons site:github.com/mahmoud/boltons",
+   "Query: boltons python documentation install https://github.com/mahmoud/boltons site:github.com/mahmoud/boltons",
+   "Query: boltons python install requirements https://pypi.org/project/boltons/ https://github.com/mahmoud/boltons site:pypi.org",
+   "Source: boltons \u00b7 PyPI \u2014 https://pypi.org/project/boltons/",
+   "Source: types-boltons \u00b7 PyPI \u2014 https://pypi.org/project/types-boltons/",
+   "Source: Improve Test Suite Documentation \u00b7 Issue #390 \u00b7 mahmoud/boltons \u00b7 GitHub \u2014 https://github.com/mahmoud/boltons/issues/390",
+   "Source: boltons/.readthedocs.yaml at master \u00b7 mahmoud/boltons \u00b7 GitHub \u2014 https://github.com/mahmoud/boltons/blob/master/.readthedocs.yaml",
+   "Source: boltons/docs/index.rst at master \u00b7 mahmoud/boltons \u00b7 GitHub \u2014 https://github.com/mahmoud/boltons/blob/master/docs/index.rst",
+   "Source: boltons/boltons/tbutils.py at master \u00b7 mahmoud/boltons \u2014 https://github.com/mahmoud/boltons/blob/master/boltons/tbutils.py",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: install sphinxcontrib-napoleon (listed in requirements-rtd.txt) on main and pr.",
+   "Setup plan: install py==1.4.26 (listed in requirements-test.txt) on main and pr.",
+   "Setup plan: install pytest==2.7.0 (listed in requirements-test.txt) on main and pr.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >=3.7",
+   "Setup plan: Python rule: one Python version is used on both sides: the lowest version that meets the requirements of both main and the pull request; if none meets both, the check stops as a setup problem and records both."
+  ],
+  "install_docs": [
+   "README.md",
+   "setup.py",
+   "tox.ini",
+   "docs/Makefile"
+  ],
+  "install_docs_from": "main",
+  "setup_plan": {
+   "packages": [
+    {
+     "requirement": "sphinxcontrib-napoleon",
+     "name": "sphinxcontrib-napoleon",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements-rtd.txt",
+     "reason": "listed in requirements-rtd.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "py==1.4.26",
+     "name": "py",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements-test.txt",
+     "reason": "listed in requirements-test.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest==2.7.0",
+     "name": "pytest",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements-test.txt",
+     "reason": "listed in requirements-test.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    }
+   ],
+   "scope_blocked": "",
+   "component": null,
+   "aggregate_names": [],
+   "extra_reqs": [
+    "sphinxcontrib-napoleon",
+    "py==1.4.26",
+    "pytest==2.7.0"
+   ],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >=3.7",
+    "rule": "one Python version is used on both sides: the lowest version that meets the requirements of both main and the pull request; if none meets both, the check stops as a setup problem and records both",
+    "gate_failed": false
+   },
+   "system": [],
+   "refused": [],
+   "groups_blocked": ""
+  },
+  "steps": {
+   "setup_lookup": "Found 3 setup item(s) in the project's files and the web lookup.",
+   "setup_python": "Python 3.12: Python 3.12 already meets >=3.7",
+   "install_deps": "Wrote requirements.txt and installed it on main and pr: sphinxcontrib-napoleon, py==1.4.26, pytest==2.7.0."
+  },
+  "run_files": {
+   "requirements": "requirements.txt",
+   "plan": "setup-plan.json",
+   "count": 3
+  }
+ },
+ "chosen": {
+  "pr": 43,
+  "head_sha": null,
+  "install": null,
+  "test_cmd": null
+ },
+ "sides": {
+  "comparison_basis": "merge-base vs PR head (PR conflicts with base)",
+  "main_sha": "5b78fecfb976e44988ec455fd852f0a48482729f",
+  "pr_sha": "750b9107219262e27524935cd4339bde04ceac7f"
+ },
+ "tested": {
+  "main": "master @ 5b78fecfb976 (merge-base with the PR head)",
+  "pr": "PR head 750b91072192"
+ },
+ "probe_plan": {
+  "baseline": "full",
+  "model": "model provider: nebius (Token Factory, live)",
+  "errors": [],
+  "model_claims": [],
+  "model_rejected_claims": [],
+  "diff_targets": [
+   "boltons.iterutils.one"
+  ],
+  "frozen": [
+   {
+    "path": "model-probes/model-probe1.py",
+    "source": "model",
+    "sha256": "4115af1681f8e03d425b6a2124893a8c1661ecdc1481b8d490f5ded66bf96d5f",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-10-23T09:49:58.716929+00:00",
+    "inputs_sha256": "88c9eeab971de8479aaa4e3103f92a1d88db21bca38981afaf1bdd07046cb7b9",
+    "inputs": {
+     "title_chars": 27,
+     "body_chars": 258,
+     "base_files": {
+      "boltons/iterutils.py": "3d2a644955010327354be57835d7d3e86c4cc35eddce5d3730cca927c6ffb9b6"
+     }
+    }
+   },
+   {
+    "path": "diff-probes/diff-api.py",
+    "source": "diff",
+    "sha256": "fc4fddfa524754a70646f08db264745d6349ea2c73445d8e9bb6bd36977d357a",
+    "generator": {
+     "kind": "diff",
+     "label": "diff (auto-derived from base-side code, model-free)",
+     "model": null,
+     "provider": null,
+     "provenance": "auto-derived",
+     "blind": false
+    },
+    "frozen_at": "2026-10-23T09:49:58.725285+00:00",
+    "inputs_sha256": "6dc049852dd0e1d2dfbb229a89a82022af4d6a7779c590178e81183bc945638a",
+    "inputs": {
+     "title_chars": 0,
+     "body_chars": 0,
+     "base_files": {
+      "boltons/iterutils.py": "3d2a644955010327354be57835d7d3e86c4cc35eddce5d3730cca927c6ffb9b6"
+     }
+    }
+   }
+  ]
+ },
+ "pr_side_started_at": "2026-10-23T09:49:58.725405+00:00",
+ "test_targets": {
+  "main": [
+   "tests"
+  ],
+  "pr": [
+   "tests",
+   "tests/test_iterutils.py"
+  ]
+ },
+ "contree_only": {
+  "note": "Contree mode: installs, tests and probes ran in Contree; nothing from the pull request ran locally",
+  "declared_test_deps": [],
+  "optional_backends": [],
+  "not_run_locally": [
+   "local freeze",
+   "installed-commit guard",
+   "probe coverage",
+   "optional-module retry"
+  ]
+ },
+ "coverage": {
+  "status": "not measured",
+  "why": "Contree mode: coverage runs only inside Contree, and it was not run there"
+ },
+ "contree": {
+  "main_uuid": "97c59e5b-5928-4558-a5cc-7212edaf4a6d",
+  "pr_uuid": "de2cc717-5b23-43b4-8431-6733fbe1719c",
+  "max_ops": 40,
+  "sdk": "0.3.6",
+  "base_image": "docker.io/library/python:3.12-slim-bookworm",
+  "python": {
+   "requires_python": [],
+   "requires_python_found": false,
+   "main": "3.12.15",
+   "pr": "3.12.15",
+   "problems": []
+  }
+ },
+ "probes": {
+  "status": "ran",
+  "items": [
+   {
+    "id": "model-probe1",
+    "source": "model",
+    "path": "model-probes/model-probe1.py",
+    "sha256": "4115af1681f8e03d425b6a2124893a8c1661ecdc1481b8d490f5ded66bf96d5f",
+    "target": "mahmoud/boltons#43",
+    "about": "model-written probe of the changed files (no description given)",
+    "claims": [],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 2.0,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 1.7,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 1.7,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 1.7,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 1.3,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 1.7,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-probe1-main-1.jsonl",
+      "probe-model-probe1-main-2.jsonl",
+      "probe-model-probe1-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-probe1-pr-1.jsonl",
+      "probe-model-probe1-pr-2.jsonl",
+      "probe-model-probe1-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "split_iter.basic": [
+        [
+         "hi",
+         "hello"
+        ],
+        [
+         "sup"
+        ],
+        [
+         "soap"
+        ]
+       ],
+       "split_iter.sep_none_groups": [
+        [
+         "hi",
+         "hello"
+        ],
+        [
+         "sup"
+        ]
+       ],
+       "split_iter.sep_list": [
+        [
+         "hi",
+         "hello"
+        ],
+        [],
+        [
+         "sup"
+        ],
+        []
+       ],
+       "split_iter.callable": [
+        [
+         "hi",
+         "hello"
+        ],
+        [],
+        [
+         "sup"
+        ],
+        []
+       ],
+       "chunked_iter.basic": [
+        [
+         0,
+         1,
+         2
+        ],
+        [
+         3,
+         4,
+         5
+        ],
+        [
+         6,
+         7,
+         8
+        ],
+        [
+         9
+        ]
+       ],
+       "chunked_iter.fill": [
+        [
+         0,
+         1,
+         2
+        ],
+        [
+         3,
+         4,
+         5
+        ],
+        [
+         6,
+         7,
+         8
+        ],
+        [
+         9,
+         0,
+         0
+        ]
+       ],
+       "chunked_iter.count": "ValueError: got unexpected keyword arguments: dict_keys(['count'])",
+       "windowed_iter.basic": [
+        [
+         0,
+         1,
+         2
+        ],
+        [
+         1,
+         2,
+         3
+        ],
+        [
+         2,
+         3,
+         4
+        ],
+        [
+         3,
+         4,
+         5
+        ],
+        [
+         4,
+         5,
+         6
+        ]
+       ],
+       "windowed_iter.tooshort": [],
+       "unique_iter.basic": [
+        1,
+        2,
+        3
+       ],
+       "unique_iter.key_len": [
+        "hi",
+        "hello",
+        "bye"
+       ],
+       "one.basic_true": true,
+       "one.basic_false_multi": false,
+       "one.basic_value": "a",
+       "one.cmp": 42,
+       "is_iterable.list": true,
+       "is_iterable.object": false,
+       "is_scalar.string": true,
+       "is_scalar.range": false
+      },
+      {
+       "split_iter.basic": [
+        [
+         "hi",
+         "hello"
+        ],
+        [
+         "sup"
+        ],
+        [
+         "soap"
+        ]
+       ],
+       "split_iter.sep_none_groups": [
+        [
+         "hi",
+         "hello"
+        ],
+        [
+         "sup"
+        ]
+       ],
+       "split_iter.sep_list": [
+        [
+         "hi",
+         "hello"
+        ],
+        [],
+        [
+         "sup"
+        ],
+        []
+       ],
+       "split_iter.callable": [
+        [
+         "hi",
+         "hello"
+        ],
+        [],
+        [
+         "sup"
+        ],
+        []
+       ],
+       "chunked_iter.basic": [
+        [
+         0,
+         1,
+         2
+        ],
+        [
+         3,
+         4,
+         5
+        ],
+        [
+         6,
+         7,
+         8
+        ],
+        [
+         9
+        ]
+       ],
+       "chunked_iter.fill": [
+        [
+         0,
+         1,
+         2
+        ],
+        [
+         3,
+         4,
+         5
+        ],
+        [
+         6,
+         7,
+         8
+        ],
+        [
+         9,
+         0,
+         0
+        ]
+       ],
+       "chunked_iter.count": "ValueError: got unexpected keyword arguments: dict_keys(['count'])",
+       "windowed_iter.basic": [
+        [
+         0,
+         1,
+         2
+        ],
+        [
+         1,
+         2,
+         3
+        ],
+        [
+         2,
+         3,
+         4
+        ],
+        [
+         3,
+         4,
+         5
+        ],
+        [
+         4,
+         5,
+         6
+        ]
+       ],
+       "windowed_iter.tooshort": [],
+       "unique_iter.basic": [
+        1,
+        2,
+        3
+       ],
+       "unique_iter.key_len": [
+        "hi",
+        "hello",
+        "bye"
+       ],
+       "one.basic_true": true,
+       "one.basic_false_multi": false,
+       "one.basic_value": "a",
+       "one.cmp": 42,
+       "is_iterable.list": true,
+       "is_iterable.object": false,
+       "is_scalar.string": true,
+       "is_scalar.range": false
+      },
+      {
+       "split_iter.basic": [
+        [
+         "hi",
+         "hello"
+        ],
+        [
+         "sup"
+        ],
+        [
+         "soap"
+        ]
+       ],
+       "split_iter.sep_none_groups": [
+        [
+         "hi",
+         "hello"
+        ],
+        [
+         "sup"
+        ]
+       ],
+       "split_iter.sep_list": [
+        [
+         "hi",
+         "hello"
+        ],
+        [],
+        [
+         "sup"
+        ],
+        []
+       ],
+       "split_iter.callable": [
+        [
+         "hi",
+         "hello"
+        ],
+        [],
+        [
+         "sup"
+        ],
+        []
+       ],
+       "chunked_iter.basic": [
+        [
+         0,
+         1,
+         2
+        ],
+        [
+         3,
+         4,
+         5
+        ],
+        [
+         6,
+         7,
+         8
+        ],
+        [
+         9
+        ]
+       ],
+       "chunked_iter.fill": [
+        [
+         0,
+         1,
+         2
+        ],
+        [
+         3,
+         4,
+         5
+        ],
+        [
+         6,
+         7,
+         8
+        ],
+        [
+         9,
+         0,
+         0
+        ]
+       ],
+       "chunked_iter.count": "ValueError: got unexpected keyword arguments: dict_keys(['count'])",
+       "windowed_iter.basic": [
+        [
+         0,
+         1,
+         2
+        ],
+        [
+         1,
+         2,
+         3
+        ],
+        [
+         2,
+         3,
+         4
+        ],
+        [
+         3,
+         4,
+         5
+        ],
+        [
+         4,
+         5,
+         6
+        ]
+       ],
+       "windowed_iter.tooshort": [],
+       "unique_iter.basic": [
+        1,
+        2,
+        3
+       ],
+       "unique_iter.key_len": [
+        "hi",
+        "hello",
+        "bye"
+       ],
+       "one.basic_true": true,
+       "one.basic_false_multi": false,
+       "one.basic_value": "a",
+       "one.cmp": 42,
+       "is_iterable.list": true,
+       "is_iterable.object": false,
+       "is_scalar.string": true,
+       "is_scalar.range": false
+      }
+     ],
+     "pr": [
+      {
+       "split_iter.basic": [
+        [
+         "hi",
+         "hello"
+        ],
+        [
+         "sup"
+        ],
+        [
+         "soap"
+        ]
+       ],
+       "split_iter.sep_none_groups": [
+        [
+         "hi",
+         "hello"
+        ],
+        [
+         "sup"
+        ]
+       ],
+       "split_iter.sep_list": [
+        [
+         "hi",
+         "hello"
+        ],
+        [],
+        [
+         "sup"
+        ],
+        []
+       ],
+       "split_iter.callable": [
+        [
+         "hi",
+         "hello"
+        ],
+        [],
+        [
+         "sup"
+        ],
+        []
+       ],
+       "chunked_iter.basic": [
+        [
+         0,
+         1,
+         2
+        ],
+        [
+         3,
+         4,
+         5
+        ],
+        [
+         6,
+         7,
+         8
+        ],
+        [
+         9
+        ]
+       ],
+       "chunked_iter.fill": [
+        [
+         0,
+         1,
+         2
+        ],
+        [
+         3,
+         4,
+         5
+        ],
+        [
+         6,
+         7,
+         8
+        ],
+        [
+         9,
+         0,
+         0
+        ]
+       ],
+       "chunked_iter.count": "ValueError: got unexpected keyword arguments: dict_keys(['count'])",
+       "windowed_iter.basic": [
+        [
+         0,
+         1,
+         2
+        ],
+        [
+         1,
+         2,
+         3
+        ],
+        [
+         2,
+         3,
+         4
+        ],
+        [
+         3,
+         4,
+         5
+        ],
+        [
+         4,
+         5,
+         6
+        ]
+       ],
+       "windowed_iter.tooshort": [],
+       "unique_iter.basic": [
+        1,
+        2,
+        3
+       ],
+       "unique_iter.key_len": [
+        "hi",
+        "hello",
+        "bye"
+       ],
+       "one.basic_true": true,
+       "one.basic_false_multi": false,
+       "one.basic_value": "a",
+       "one.cmp": 42,
+       "is_iterable.list": true,
+       "is_iterable.object": false,
+       "is_scalar.string": true,
+       "is_scalar.range": false
+      },
+      {
+       "split_iter.basic": [
+        [
+         "hi",
+         "hello"
+        ],
+        [
+         "sup"
+        ],
+        [
+         "soap"
+        ]
+       ],
+       "split_iter.sep_none_groups": [
+        [
+         "hi",
+         "hello"
+        ],
+        [
+         "sup"
+        ]
+       ],
+       "split_iter.sep_list": [
+        [
+         "hi",
+         "hello"
+        ],
+        [],
+        [
+         "sup"
+        ],
+        []
+       ],
+       "split_iter.callable": [
+        [
+         "hi",
+         "hello"
+        ],
+        [],
+        [
+         "sup"
+        ],
+        []
+       ],
+       "chunked_iter.basic": [
+        [
+         0,
+         1,
+         2
+        ],
+        [
+         3,
+         4,
+         5
+        ],
+        [
+         6,
+         7,
+         8
+        ],
+        [
+         9
+        ]
+       ],
+       "chunked_iter.fill": [
+        [
+         0,
+         1,
+         2
+        ],
+        [
+         3,
+         4,
+         5
+        ],
+        [
+         6,
+         7,
+         8
+        ],
+        [
+         9,
+         0,
+         0
+        ]
+       ],
+       "chunked_iter.count": "ValueError: got unexpected keyword arguments: dict_keys(['count'])",
+       "windowed_iter.basic": [
+        [
+         0,
+         1,
+         2
+        ],
+        [
+         1,
+         2,
+         3
+        ],
+        [
+         2,
+         3,
+         4
+        ],
+        [
+         3,
+         4,
+         5
+        ],
+        [
+         4,
+         5,
+         6
+        ]
+       ],
+       "windowed_iter.tooshort": [],
+       "unique_iter.basic": [
+        1,
+        2,
+        3
+       ],
+       "unique_iter.key_len": [
+        "hi",
+        "hello",
+        "bye"
+       ],
+       "one.basic_true": true,
+       "one.basic_false_multi": false,
+       "one.basic_value": "a",
+       "one.cmp": 42,
+       "is_iterable.list": true,
+       "is_iterable.object": false,
+       "is_scalar.string": true,
+       "is_scalar.range": false
+      },
+      {
+       "split_iter.basic": [
+        [
+         "hi",
+         "hello"
+        ],
+        [
+         "sup"
+        ],
+        [
+         "soap"
+        ]
+       ],
+       "split_iter.sep_none_groups": [
+        [
+         "hi",
+         "hello"
+        ],
+        [
+         "sup"
+        ]
+       ],
+       "split_iter.sep_list": [
+        [
+         "hi",
+         "hello"
+        ],
+        [],
+        [
+         "sup"
+        ],
+        []
+       ],
+       "split_iter.callable": [
+        [
+         "hi",
+         "hello"
+        ],
+        [],
+        [
+         "sup"
+        ],
+        []
+       ],
+       "chunked_iter.basic": [
+        [
+         0,
+         1,
+         2
+        ],
+        [
+         3,
+         4,
+         5
+        ],
+        [
+         6,
+         7,
+         8
+        ],
+        [
+         9
+        ]
+       ],
+       "chunked_iter.fill": [
+        [
+         0,
+         1,
+         2
+        ],
+        [
+         3,
+         4,
+         5
+        ],
+        [
+         6,
+         7,
+         8
+        ],
+        [
+         9,
+         0,
+         0
+        ]
+       ],
+       "chunked_iter.count": "ValueError: got unexpected keyword arguments: dict_keys(['count'])",
+       "windowed_iter.basic": [
+        [
+         0,
+         1,
+         2
+        ],
+        [
+         1,
+         2,
+         3
+        ],
+        [
+         2,
+         3,
+         4
+        ],
+        [
+         3,
+         4,
+         5
+        ],
+        [
+         4,
+         5,
+         6
+        ]
+       ],
+       "windowed_iter.tooshort": [],
+       "unique_iter.basic": [
+        1,
+        2,
+        3
+       ],
+       "unique_iter.key_len": [
+        "hi",
+        "hello",
+        "bye"
+       ],
+       "one.basic_true": true,
+       "one.basic_false_multi": false,
+       "one.basic_value": "a",
+       "one.cmp": 42,
+       "is_iterable.list": true,
+       "is_iterable.object": false,
+       "is_scalar.string": true,
+       "is_scalar.range": false
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "chunked_iter.basic",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": [
+       [
+        0,
+        1,
+        2
+       ],
+       [
+        3,
+        4,
+        5
+       ],
+       [
+        6,
+        7,
+        8
+       ],
+       [
+        9
+       ]
+      ],
+      "pr": [
+       [
+        0,
+        1,
+        2
+       ],
+       [
+        3,
+        4,
+        5
+       ],
+       [
+        6,
+        7,
+        8
+       ],
+       [
+        9
+       ]
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"chunked_iter.basic\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"chunked_iter.basic\""
+       }
+      }
+     },
+     {
+      "name": "chunked_iter.count",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": "ValueError: got unexpected keyword arguments: dict_keys(['count'])",
+      "pr": "ValueError: got unexpected keyword arguments: dict_keys(['count'])",
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"chunked_iter.count\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"chunked_iter.count\""
+       }
+      }
+     },
+     {
+      "name": "chunked_iter.fill",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": [
+       [
+        0,
+        1,
+        2
+       ],
+       [
+        3,
+        4,
+        5
+       ],
+       [
+        6,
+        7,
+        8
+       ],
+       [
+        9,
+        0,
+        0
+       ]
+      ],
+      "pr": [
+       [
+        0,
+        1,
+        2
+       ],
+       [
+        3,
+        4,
+        5
+       ],
+       [
+        6,
+        7,
+        8
+       ],
+       [
+        9,
+        0,
+        0
+       ]
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-main-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"chunked_iter.fill\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"chunked_iter.fill\""
+       }
+      }
+     },
+     {
+      "name": "is_iterable.list",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": true,
+      "pr": true,
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-main-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"is_iterable.list\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"is_iterable.list\""
+       }
+      }
+     },
+     {
+      "name": "is_iterable.object",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": false,
+      "pr": false,
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-main-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"is_iterable.object\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"is_iterable.object\""
+       }
+      }
+     },
+     {
+      "name": "is_scalar.range",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": false,
+      "pr": false,
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-main-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"is_scalar.range\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"is_scalar.range\""
+       }
+      }
+     },
+     {
+      "name": "is_scalar.string",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": true,
+      "pr": true,
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-main-1.jsonl",
+        "line": 7,
+        "quote": "\"observation\": \"is_scalar.string\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 7,
+        "quote": "\"observation\": \"is_scalar.string\""
+       }
+      }
+     },
+     {
+      "name": "one.basic_false_multi",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": false,
+      "pr": false,
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-main-1.jsonl",
+        "line": 8,
+        "quote": "\"observation\": \"one.basic_false_multi\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 8,
+        "quote": "\"observation\": \"one.basic_false_multi\""
+       }
+      }
+     },
+     {
+      "name": "one.basic_true",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": true,
+      "pr": true,
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-main-1.jsonl",
+        "line": 9,
+        "quote": "\"observation\": \"one.basic_true\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 9,
+        "quote": "\"observation\": \"one.basic_true\""
+       }
+      }
+     },
+     {
+      "name": "one.basic_value",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": "a",
+      "pr": "a",
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-main-1.jsonl",
+        "line": 10,
+        "quote": "\"observation\": \"one.basic_value\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 10,
+        "quote": "\"observation\": \"one.basic_value\""
+       }
+      }
+     },
+     {
+      "name": "one.cmp",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": 42,
+      "pr": 42,
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-main-1.jsonl",
+        "line": 11,
+        "quote": "\"observation\": \"one.cmp\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 11,
+        "quote": "\"observation\": \"one.cmp\""
+       }
+      }
+     },
+     {
+      "name": "split_iter.basic",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": [
+       [
+        "hi",
+        "hello"
+       ],
+       [
+        "sup"
+       ],
+       [
+        "soap"
+       ]
+      ],
+      "pr": [
+       [
+        "hi",
+        "hello"
+       ],
+       [
+        "sup"
+       ],
+       [
+        "soap"
+       ]
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-main-1.jsonl",
+        "line": 12,
+        "quote": "\"observation\": \"split_iter.basic\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 12,
+        "quote": "\"observation\": \"split_iter.basic\""
+       }
+      }
+     },
+     {
+      "name": "split_iter.callable",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": [
+       [
+        "hi",
+        "hello"
+       ],
+       [],
+       [
+        "sup"
+       ],
+       []
+      ],
+      "pr": [
+       [
+        "hi",
+        "hello"
+       ],
+       [],
+       [
+        "sup"
+       ],
+       []
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-main-1.jsonl",
+        "line": 13,
+        "quote": "\"observation\": \"split_iter.callable\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 13,
+        "quote": "\"observation\": \"split_iter.callable\""
+       }
+      }
+     },
+     {
+      "name": "split_iter.sep_list",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": [
+       [
+        "hi",
+        "hello"
+       ],
+       [],
+       [
+        "sup"
+       ],
+       []
+      ],
+      "pr": [
+       [
+        "hi",
+        "hello"
+       ],
+       [],
+       [
+        "sup"
+       ],
+       []
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-main-1.jsonl",
+        "line": 14,
+        "quote": "\"observation\": \"split_iter.sep_list\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 14,
+        "quote": "\"observation\": \"split_iter.sep_list\""
+       }
+      }
+     },
+     {
+      "name": "split_iter.sep_none_groups",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": [
+       [
+        "hi",
+        "hello"
+       ],
+       [
+        "sup"
+       ]
+      ],
+      "pr": [
+       [
+        "hi",
+        "hello"
+       ],
+       [
+        "sup"
+       ]
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-main-1.jsonl",
+        "line": 15,
+        "quote": "\"observation\": \"split_iter.sep_none_groups\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 15,
+        "quote": "\"observation\": \"split_iter.sep_none_groups\""
+       }
+      }
+     },
+     {
+      "name": "unique_iter.basic",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": [
+       1,
+       2,
+       3
+      ],
+      "pr": [
+       1,
+       2,
+       3
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-main-1.jsonl",
+        "line": 16,
+        "quote": "\"observation\": \"unique_iter.basic\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 16,
+        "quote": "\"observation\": \"unique_iter.basic\""
+       }
+      }
+     },
+     {
+      "name": "unique_iter.key_len",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": [
+       "hi",
+       "hello",
+       "bye"
+      ],
+      "pr": [
+       "hi",
+       "hello",
+       "bye"
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-main-1.jsonl",
+        "line": 17,
+        "quote": "\"observation\": \"unique_iter.key_len\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 17,
+        "quote": "\"observation\": \"unique_iter.key_len\""
+       }
+      }
+     },
+     {
+      "name": "windowed_iter.basic",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": [
+       [
+        0,
+        1,
+        2
+       ],
+       [
+        1,
+        2,
+        3
+       ],
+       [
+        2,
+        3,
+        4
+       ],
+       [
+        3,
+        4,
+        5
+       ],
+       [
+        4,
+        5,
+        6
+       ]
+      ],
+      "pr": [
+       [
+        0,
+        1,
+        2
+       ],
+       [
+        1,
+        2,
+        3
+       ],
+       [
+        2,
+        3,
+        4
+       ],
+       [
+        3,
+        4,
+        5
+       ],
+       [
+        4,
+        5,
+        6
+       ]
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-main-1.jsonl",
+        "line": 18,
+        "quote": "\"observation\": \"windowed_iter.basic\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 18,
+        "quote": "\"observation\": \"windowed_iter.basic\""
+       }
+      }
+     },
+     {
+      "name": "windowed_iter.tooshort",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": [],
+      "pr": [],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-main-1.jsonl",
+        "line": 19,
+        "quote": "\"observation\": \"windowed_iter.tooshort\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 19,
+        "quote": "\"observation\": \"windowed_iter.tooshort\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "4115af1681f8e03d425b6a2124893a8c1661ecdc1481b8d490f5ded66bf96d5f",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-10-23T09:49:58.716929+00:00",
+     "inputs_sha256": "88c9eeab971de8479aaa4e3103f92a1d88db21bca38981afaf1bdd07046cb7b9",
+     "inputs": {
+      "title_chars": 27,
+      "body_chars": 258,
+      "base_files": {
+       "boltons/iterutils.py": "3d2a644955010327354be57835d7d3e86c4cc35eddce5d3730cca927c6ffb9b6"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-10-23T09:49:58.725405+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "not measured",
+     "why": "Contree-only check: probe coverage needs a local side",
+     "adequacy": "unmeasured",
+     "note": "probe coverage not measured (Contree-only check: probe coverage needs a local side)"
+    },
+    "status": "ran"
+   },
+   {
+    "id": "diff-api",
+    "source": "diff",
+    "path": "diff-probes/diff-api.py",
+    "sha256": "fc4fddfa524754a70646f08db264745d6349ea2c73445d8e9bb6bd36977d357a",
+    "target": "mahmoud/boltons#43",
+    "about": "Public functions touched by the PR, called with type-appropriate inputs on both sides.",
+    "claims": [],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 2.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 1.8,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 1.8,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 1.7,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 1.7,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 1.7,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-diff-api-main-1.jsonl",
+      "probe-diff-api-main-2.jsonl",
+      "probe-diff-api-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-diff-api-pr-1.jsonl",
+      "probe-diff-api-pr-2.jsonl",
+      "probe-diff-api-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "boltons.iterutils.one.input0": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.one.input1": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.one.input10": false,
+       "boltons.iterutils.one.input11": false,
+       "boltons.iterutils.one.input2": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.one.input3": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.one.input4": false,
+       "boltons.iterutils.one.input5": false,
+       "boltons.iterutils.one.input6": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.one.input7": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.one.input8": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.one.input9": false
+      },
+      {
+       "boltons.iterutils.one.input0": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.one.input1": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.one.input10": false,
+       "boltons.iterutils.one.input11": false,
+       "boltons.iterutils.one.input2": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.one.input3": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.one.input4": false,
+       "boltons.iterutils.one.input5": false,
+       "boltons.iterutils.one.input6": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.one.input7": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.one.input8": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.one.input9": false
+      },
+      {
+       "boltons.iterutils.one.input0": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.one.input1": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.one.input10": false,
+       "boltons.iterutils.one.input11": false,
+       "boltons.iterutils.one.input2": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.one.input3": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.one.input4": false,
+       "boltons.iterutils.one.input5": false,
+       "boltons.iterutils.one.input6": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.one.input7": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.one.input8": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.one.input9": false
+      }
+     ],
+     "pr": [
+      {
+       "boltons.iterutils.one.input0": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.one.input1": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.one.input10": false,
+       "boltons.iterutils.one.input11": false,
+       "boltons.iterutils.one.input2": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.one.input3": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.one.input4": false,
+       "boltons.iterutils.one.input5": false,
+       "boltons.iterutils.one.input6": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.one.input7": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.one.input8": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.one.input9": false
+      },
+      {
+       "boltons.iterutils.one.input0": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.one.input1": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.one.input10": false,
+       "boltons.iterutils.one.input11": false,
+       "boltons.iterutils.one.input2": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.one.input3": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.one.input4": false,
+       "boltons.iterutils.one.input5": false,
+       "boltons.iterutils.one.input6": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.one.input7": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.one.input8": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.one.input9": false
+      },
+      {
+       "boltons.iterutils.one.input0": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.one.input1": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.one.input10": false,
+       "boltons.iterutils.one.input11": false,
+       "boltons.iterutils.one.input2": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.one.input3": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.one.input4": false,
+       "boltons.iterutils.one.input5": false,
+       "boltons.iterutils.one.input6": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.one.input7": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.one.input8": {
+        "raises": "TypeError"
+       },
+       "boltons.iterutils.one.input9": false
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "boltons.iterutils.one.input0",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"boltons.iterutils.one.input0\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"boltons.iterutils.one.input0\""
+       }
+      }
+     },
+     {
+      "name": "boltons.iterutils.one.input1",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"boltons.iterutils.one.input1\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"boltons.iterutils.one.input1\""
+       }
+      }
+     },
+     {
+      "name": "boltons.iterutils.one.input10",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": false,
+      "pr": false,
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"boltons.iterutils.one.input10\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"boltons.iterutils.one.input10\""
+       }
+      }
+     },
+     {
+      "name": "boltons.iterutils.one.input11",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": false,
+      "pr": false,
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"boltons.iterutils.one.input11\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"boltons.iterutils.one.input11\""
+       }
+      }
+     },
+     {
+      "name": "boltons.iterutils.one.input2",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"boltons.iterutils.one.input2\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"boltons.iterutils.one.input2\""
+       }
+      }
+     },
+     {
+      "name": "boltons.iterutils.one.input3",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"boltons.iterutils.one.input3\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"boltons.iterutils.one.input3\""
+       }
+      }
+     },
+     {
+      "name": "boltons.iterutils.one.input4",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": false,
+      "pr": false,
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 7,
+        "quote": "\"observation\": \"boltons.iterutils.one.input4\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 7,
+        "quote": "\"observation\": \"boltons.iterutils.one.input4\""
+       }
+      }
+     },
+     {
+      "name": "boltons.iterutils.one.input5",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": false,
+      "pr": false,
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 8,
+        "quote": "\"observation\": \"boltons.iterutils.one.input5\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 8,
+        "quote": "\"observation\": \"boltons.iterutils.one.input5\""
+       }
+      }
+     },
+     {
+      "name": "boltons.iterutils.one.input6",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 9,
+        "quote": "\"observation\": \"boltons.iterutils.one.input6\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 9,
+        "quote": "\"observation\": \"boltons.iterutils.one.input6\""
+       }
+      }
+     },
+     {
+      "name": "boltons.iterutils.one.input7",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 10,
+        "quote": "\"observation\": \"boltons.iterutils.one.input7\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 10,
+        "quote": "\"observation\": \"boltons.iterutils.one.input7\""
+       }
+      }
+     },
+     {
+      "name": "boltons.iterutils.one.input8",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 11,
+        "quote": "\"observation\": \"boltons.iterutils.one.input8\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 11,
+        "quote": "\"observation\": \"boltons.iterutils.one.input8\""
+       }
+      }
+     },
+     {
+      "name": "boltons.iterutils.one.input9",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": false,
+      "pr": false,
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 12,
+        "quote": "\"observation\": \"boltons.iterutils.one.input9\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 12,
+        "quote": "\"observation\": \"boltons.iterutils.one.input9\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "diff",
+     "label": "diff (auto-derived from base-side code, model-free)",
+     "model": null,
+     "provider": null,
+     "provenance": "auto-derived",
+     "blind": false
+    },
+    "freeze": {
+     "sha256": "fc4fddfa524754a70646f08db264745d6349ea2c73445d8e9bb6bd36977d357a",
+     "generator": {
+      "kind": "diff",
+      "label": "diff (auto-derived from base-side code, model-free)",
+      "model": null,
+      "provider": null,
+      "provenance": "auto-derived",
+      "blind": false
+     },
+     "frozen_at": "2026-10-23T09:49:58.725285+00:00",
+     "inputs_sha256": "6dc049852dd0e1d2dfbb229a89a82022af4d6a7779c590178e81183bc945638a",
+     "inputs": {
+      "title_chars": 0,
+      "body_chars": 0,
+      "base_files": {
+       "boltons/iterutils.py": "3d2a644955010327354be57835d7d3e86c4cc35eddce5d3730cca927c6ffb9b6"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-10-23T09:49:58.725405+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "not measured",
+     "why": "Contree-only check: probe coverage needs a local side",
+     "adequacy": "unmeasured",
+     "note": "probe coverage not measured (Contree-only check: probe coverage needs a local side)"
+    },
+    "status": "ran"
+   }
+  ],
+  "summary": {
+   "labels": [
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference"
+   ],
+   "flagged": [],
+   "proven_claims": [],
+   "reason": "probe: 31 other observation(s) identical on both sides",
+   "ignored_noise": [],
+   "ignored_warning_only": [],
+   "pr_only_noisy": []
+  },
+  "test_settings": {
+   "applied": true,
+   "read_from": "main checkout (same values on both sides)",
+   "source": [],
+   "variables": [],
+   "pythonpath": [],
+   "pr_changed": []
+  }
+ },
+ "probe_changed_line_coverage": {
+  "status": "not measured",
+  "side": "main",
+  "probes": {
+   "model-probe1": {
+    "status": "not measured",
+    "changed_lines_covered": null,
+    "changed_lines_total": null,
+    "adequacy": "unmeasured"
+   },
+   "diff-api": {
+    "status": "not measured",
+    "changed_lines_covered": null,
+    "changed_lines_total": null,
+    "adequacy": "unmeasured"
+   }
+  },
+  "not_adequate": []
+ },
+ "verdict": "could_not_verify",
+ "reason": "tests produced no results on one side (collection failed; see pytest logs); probe model-probe1 has no measured line coverage (Contree-only check: probe coverage needs a local side); it does not count as covering the change",
+ "verdict_before_coverage_gate": "could_not_verify",
+ "reason_before_coverage_gate": "tests produced no results on one side (collection failed; see pytest logs); probe model-probe1 has no measured line coverage (Contree-only check: probe coverage needs a local side); it does not count as covering the change",
+ "changed_lines_total": null,
+ "changed_lines_covered": null,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "lower",
+  "note": "coverage of the changed Python lines was NOT MEASURED (Contree mode: coverage runs only inside Contree, and it was not run there)",
+  "measurement": "not measured"
+ },
+ "explanation": {
+  "status": "wired",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "text": "\"join function for iterutils\" \"could_not_verify\" \"tests produced no results on one side (collection failed; see pytest logs)\" \"probe model-probe1 has no measured line coverage (Contree-only check: probe coverage needs a local side)\" \"it does not count as covering the change\" \"full\" \"no_difference\" \"probe: 31 other observation(s) identical on both sides\"",
+  "quotes": [
+   "join function for iterutils",
+   "could_not_verify",
+   "tests produced no results on one side (collection failed; see pytest logs)",
+   "probe model-probe1 has no measured line coverage (Contree-only check: probe coverage needs a local side)",
+   "it does not count as covering the change",
+   "full",
+   "no_difference",
+   "probe: 31 other observation(s) identical on both sides"
+  ],
+  "advisory": true
+ },
+ "agents": {
+  "status": "ran",
+  "advisory": true,
+  "note": "judge/helper/summary are advisory; code owns the verdict",
+  "roles": [
+   {
+    "role": "judge",
+    "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+    "status": "ok",
+    "note": null,
+    "labels": [
+     {
+      "id": "probe-model-probe1",
+      "label": "unmentioned",
+      "reason": "The probe ran but no description of its outcome was provided, so no verdict can be inferred."
+     },
+     {
+      "id": "probe-diff-api",
+      "label": "proven",
+      "reason": "Public functions touched by the PR were exercised with type-appropriate inputs on both sides, indicating the probe completed successfully."
+     }
+    ]
+   },
+   {
+    "role": "helper",
+    "model": "nvidia/Nemotron-3_5-Lightning",
+    "status": "ok",
+    "note": null,
+    "notes": [
+     "Contree: probe coverage requires measured line coverage on local side.",
+     "pytest: test collection failed on one side; re-run both sides for comparison.",
+     "probe model-probe1: no measured coverage; align reporting config across environments.",
+     "diff ignore: suppress no_difference flags when coverage is absent on one side.",
+     "install hint: add test extras `pip install -e .[test]` to enable full probe coverage."
+    ]
+   },
+   {
+    "role": "summary",
+    "model": "nvidia/nemotron-3-super-120b-a12b",
+    "status": "ok",
+    "note": null
+   }
+  ],
+  "provider": {
+   "provider": "nebius",
+   "models": {
+    "claims": "nvidia/nemotron-3-super-120b-a12b",
+    "probes": "nvidia/nemotron-3-super-120b-a12b",
+    "judge": "nvidia/Nemotron-3-Ultra-550b-a55b",
+    "helper": "nvidia/Nemotron-3_5-Lightning",
+    "summary": "nvidia/nemotron-3-super-120b-a12b"
+   },
+   "blind": true
+  }
+ },
+ "swarm_requested": true,
+ "operator_approval_requested": false,
+ "swarm": "on",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [
+   "boltons/iterutils.py"
+  ],
+  "compiled_files": [],
+  "other_files": [
+   "tests/test_iterutils.py"
+  ]
+ },
+ "duration_s": {
+  "total_wall": 119.3,
+  "tests": 8.4
+ },
+ "cost": {
+  "ai_calls": 2,
+  "failed_ai_calls": 0,
+  "input_tokens": 4175,
+  "output_tokens": 3219,
+  "thinking_tokens": 2007,
+  "cost_usd": 0.00415,
+  "calls_without_usage": 0,
+  "ai_cost_usd": 0.00415,
+  "cost_complete": true,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 119.3,
+   "tests": 8.4
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.007953,
+  "total_cost_usd": 0.012103,
+  "swarm": {
+   "ai_calls": 3,
+   "failed_ai_calls": 0,
+   "input_tokens": 402,
+   "output_tokens": 1622,
+   "thinking_tokens": 1411,
+   "cost_usd": 0.00158,
+   "calls_without_usage": 2,
+   "ai_cost_usd": 0.00158,
+   "cost_complete": false,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ }
+}
