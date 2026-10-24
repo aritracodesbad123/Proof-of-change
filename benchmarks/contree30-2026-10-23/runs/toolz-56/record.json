@@ -1,0 +1,387 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-pytoolz-toolz-56-8d918fca4f9b-toolz-56",
+ "date_ist": "2026-10-23 12:20 IST",
+ "run_date": "2026-10-23",
+ "who": "ops/daily_run.py",
+ "repo": "pytoolz/toolz",
+ "library": "toolz",
+ "pr": {
+  "repo": "pytoolz/toolz",
+  "number": 56,
+  "url": "https://github.com/pytoolz/toolz/pull/56",
+  "title": "Purity edits",
+  "base_sha": "7959ef3916eda92c2640d0c1d3c37c8a65a09ab6",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "8d918fca4f9be05d7cd085f4f578de2d8180f180",
+  "merge_commit": null,
+  "tested_main_sha": "a7daeeb36b69af1def1da87447f814b493e18341",
+  "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+ },
+ "author": "mrocklin",
+ "base_ref": "master",
+ "updated_at_utc": "2014-07-01T09:44:18Z",
+ "updated_at_ist": "2014-07-01 15:14 IST",
+ "ci_state": "not checked (single-PR check)",
+ "ci_detail": "checked on request with --pr",
+ "tested_at_ist": "2026-10-23 12:20 IST",
+ "files": {
+  "all": [
+   "doc/source/purity.rst",
+   "examples/fib.py"
+  ],
+  "package_py": [],
+  "compiled": [],
+  "other": [
+   "doc/source/purity.rst",
+   "examples/fib.py"
+  ]
+ },
+ "machine_type": {
+  "arch": "arm64",
+  "os": "Darwin",
+  "platform": "macOS-15.5-arm64-arm-64bit-Mach-O",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": "Apple clang version 14.0.3 (clang-1403.0.22.14.1)",
+  "cpu_model": null,
+  "ram_gb": null
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 0,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.14",
+ "test_selection": "mapped from touched files: ",
+ "per_run": [],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "contree",
+ "sandbox_backend_note": "contree (Token Factory Sandboxes, sdk 0.3.6)",
+ "machine": "contree",
+ "tool_setup": {
+  "installed": [],
+  "tries": 0,
+  "note": "All required tools were already installed.",
+  "refused": []
+ },
+ "posted_upstream": false,
+ "logs": "toolz-56/",
+ "freeze": {},
+ "poc_commit": "863751e9580b866fe64247737975cb2e04e97215",
+ "route": "source-pair",
+ "current_head_sha": "8d918fca4f9be05d7cd085f4f578de2d8180f180",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "state": "open",
+ "mergeable": false,
+ "mergeable_state": "dirty",
+ "product_check": true,
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": {
+   "ok": true,
+   "skipped": false,
+   "live_call": true,
+   "cached": false,
+   "queries": [
+    "toolz python setup install instructions https://github.com/pytoolz/toolz site:github.com/pytoolz/toolz",
+    "toolz python documentation install https://github.com/pytoolz/toolz site:github.com/pytoolz/toolz",
+    "toolz python install requirements https://pypi.org/project/toolz/ https://github.com/pytoolz/toolz site:pypi.org"
+   ],
+   "results": [
+    {
+     "title": "toolz",
+     "url": "https://pypi.org/project/toolz/",
+     "query": "toolz python install requirements https://pypi.org/project/toolz/ https://github.com/pytoolz/toolz site:pypi.org"
+    },
+    {
+     "title": "GitHub - pytoolz/toolz: A functional standard library for Python. \u00b7 GitHub",
+     "url": "https://github.com/pytoolz/toolz",
+     "query": "toolz python documentation install https://github.com/pytoolz/toolz site:github.com/pytoolz/toolz"
+    },
+    {
+     "title": "optional static typing for toolz \u00b7 Issue #496 \u00b7 pytoolz/toolz - GitHub",
+     "url": "https://github.com/pytoolz/toolz/issues/496",
+     "query": "toolz python documentation install https://github.com/pytoolz/toolz site:github.com/pytoolz/toolz"
+    }
+   ],
+   "text": "The provided sources do not contain specific instructions for setting up and installing the toolz Python package from its GitHub repository. The sources focus on Microsoft account verification, Windows Insider Program, and Microsoft Community Hub discussions, none of which provide relevant information on installing toolz. Therefore, no definitive answer on the installation instructions for toolz can be provided based on the given sources.\nTo install `toolz`, you can use the Python Package Index (PyPI). The GitHub repository for `toolz` states: \"`toolz` is on the Python Package Index (PyPI):\". To install it, you can use the command `pip install toolz`. The repository also mentions that `toolz` supports Python 3.9+ and is implemented in pure Python, requiring no dependencies beyond the standard library.\nTo install toolz, it is available on the Python Package Index (PyPI) and supports Python 3.9+ with a common codebase. It is pure Python and requires no dependencies beyond those provided by the standard library. For version 0.2.1, toolz supports Python 2.6+ and Python 3.2+ with a common codebase, also requiring no dependencies beyond the standard library. For version 0.12.0, toolz supports Python 3.5+ with a common codebase, also requiring no dependencies beyond the standard library.\nInstall toolz is on the Python Package Index (PyPI): toolz supports Python 3.9+ with a common codebase. It is pure Python and requires no dependencies beyond\n## Repository files navigation\n\n# Toolz\n\nBuild Status Coverage Status Version Status\n\nBuild Status\nCoverage Status\nVersion Status\n\nA set of utility functions for iterators, functions, and dictionaries.\n\nSee the PyToolz documentation at \n\n## LICENSE\n\nNew BSD. See License File.\n\n## Install\n\n`toolz` is on the Python Package Index (PyPI):\n\n`toolz`\n\n## Structure and Heritage\n\n`toolz` is implemented in three parts:\n\n`toolz` [...] These functions come from the legacy of functional languages for list\npr\nThe type hints described in PEP-484 provide a convenient way to reason about code, and make it possible for static type checkers like mypy",
+   "errors": [],
+   "lines": [
+    "Looked up with Tavily: 3 results",
+    "Query: toolz python setup install instructions https://github.com/pytoolz/toolz site:github.com/pytoolz/toolz",
+    "Query: toolz python documentation install https://github.com/pytoolz/toolz site:github.com/pytoolz/toolz",
+    "Query: toolz python install requirements https://pypi.org/project/toolz/ https://github.com/pytoolz/toolz site:pypi.org",
+    "Source: toolz \u2014 https://pypi.org/project/toolz/",
+    "Source: GitHub - pytoolz/toolz: A functional standard library for Python. \u00b7 GitHub \u2014 https://github.com/pytoolz/toolz",
+    "Source: optional static typing for toolz \u00b7 Issue #496 \u00b7 pytoolz/toolz - GitHub \u2014 https://github.com/pytoolz/toolz/issues/496"
+   ]
+  },
+  "notes": [
+   "Setup check: GitHub token: missing.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory could not be read.",
+   "Setup check: free disk 37.3 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: 3 results",
+   "Query: toolz python setup install instructions https://github.com/pytoolz/toolz site:github.com/pytoolz/toolz",
+   "Query: toolz python documentation install https://github.com/pytoolz/toolz site:github.com/pytoolz/toolz",
+   "Query: toolz python install requirements https://pypi.org/project/toolz/ https://github.com/pytoolz/toolz site:pypi.org",
+   "Source: toolz \u2014 https://pypi.org/project/toolz/",
+   "Source: GitHub - pytoolz/toolz: A functional standard library for Python. \u00b7 GitHub \u2014 https://github.com/pytoolz/toolz",
+   "Source: optional static typing for toolz \u00b7 Issue #496 \u00b7 pytoolz/toolz - GitHub \u2014 https://github.com/pytoolz/toolz/issues/496",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >=3.9",
+   "Setup plan: Python rule: one Python version is used on both sides: the lowest version that meets the requirements of both main and the pull request; if none meets both, the check stops as a setup problem and records both."
+  ],
+  "install_docs": [
+   "README.md",
+   "setup.py",
+   "doc/Makefile"
+  ],
+  "install_docs_from": "main",
+  "setup_plan": {
+   "packages": [],
+   "scope_blocked": "",
+   "component": null,
+   "aggregate_names": [],
+   "extra_reqs": [],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >=3.9",
+    "rule": "one Python version is used on both sides: the lowest version that meets the requirements of both main and the pull request; if none meets both, the check stops as a setup problem and records both",
+    "gate_failed": false
+   },
+   "system": [],
+   "refused": [],
+   "groups_blocked": ""
+  },
+  "steps": {
+   "setup_lookup": "Found 0 setup item(s) in the project's files and the web lookup.",
+   "setup_python": "Python 3.12: Python 3.12 already meets >=3.9",
+   "install_deps": "Nothing extra to install; the project's own install covers it."
+  },
+  "run_files": {
+   "requirements": "requirements.txt",
+   "plan": "setup-plan.json",
+   "count": 0
+  }
+ },
+ "chosen": {
+  "pr": 56,
+  "head_sha": null,
+  "install": null,
+  "test_cmd": null
+ },
+ "sides": {
+  "comparison_basis": "merge-base vs PR head (PR conflicts with base)",
+  "main_sha": "a7daeeb36b69af1def1da87447f814b493e18341",
+  "pr_sha": "8d918fca4f9be05d7cd085f4f578de2d8180f180"
+ },
+ "tested": {
+  "main": "master @ a7daeeb36b69 (merge-base with the PR head)",
+  "pr": "PR head 8d918fca4f9b"
+ },
+ "probe_plan": {
+  "baseline": "full",
+  "model": "model provider: nebius (Token Factory, live)",
+  "errors": [],
+  "model_claims": [],
+  "model_rejected_claims": [],
+  "diff_targets": [],
+  "frozen": []
+ },
+ "pr_side_started_at": "2026-10-23T06:50:30.223313+00:00",
+ "test_targets": {
+  "main": [],
+  "pr": []
+ },
+ "contree_only": {
+  "note": "Contree mode: installs, tests and probes ran in Contree; nothing from the pull request ran locally",
+  "declared_test_deps": [],
+  "optional_backends": [],
+  "not_run_locally": [
+   "local freeze",
+   "installed-commit guard",
+   "probe coverage",
+   "optional-module retry"
+  ]
+ },
+ "coverage": {
+  "status": "not measured",
+  "why": "Contree mode: coverage runs only inside Contree, and it was not run there"
+ },
+ "contree": {
+  "main_uuid": "6ab18c83-129a-4cb2-8cbb-c7046ee88c68",
+  "pr_uuid": "b12609ce-786a-4c44-92a8-033c33246e57",
+  "max_ops": 40,
+  "sdk": "0.3.6",
+  "base_image": "docker.io/library/python:3.12-slim-bookworm",
+  "python": {
+   "requires_python": [],
+   "requires_python_found": false,
+   "main": "3.12.15",
+   "pr": "3.12.15",
+   "problems": []
+  }
+ },
+ "probes": {
+  "status": "none",
+  "items": []
+ },
+ "probe_changed_line_coverage": {
+  "status": "no probes",
+  "probes": {}
+ },
+ "verdict": "could_not_verify",
+ "reason": "no tests could be mapped to the touched files",
+ "verdict_before_coverage_gate": "could_not_verify",
+ "reason_before_coverage_gate": "no tests could be mapped to the touched files",
+ "changed_lines_total": null,
+ "changed_lines_covered": null,
+ "coverage_gate": {
+  "kind": "no-executable-change",
+  "changed": false,
+  "confidence": "normal",
+  "note": "no executable code changed (docs, tests or config only), so there was nothing to cover",
+  "measurement": "not needed"
+ },
+ "explanation": {
+  "status": "wired",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "text": "The \"Purity edits\" check returned a verdict of \"could_not_verify\" because \"no tests could be mapped to the touched files\". The baseline used was \"full\"",
+  "quotes": [
+   "Purity edits",
+   "could_not_verify",
+   "no tests could be mapped to the touched files",
+   "full"
+  ],
+  "advisory": true
+ },
+ "agents": {
+  "status": "ran",
+  "advisory": true,
+  "note": "judge/helper/summary are advisory; code owns the verdict",
+  "roles": [
+   {
+    "role": "judge",
+    "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+    "status": "ok",
+    "note": null,
+    "labels": []
+   },
+   {
+    "role": "helper",
+    "model": "nvidia/Nemotron-3_5-Lightning",
+    "status": "ok",
+    "note": null,
+    "notes": [
+     "No tests mapped to changed files; ignore for verification",
+     "Mark diffs as unverified when test mapping is absent",
+     "Include test files in changes to enable baseline comparison",
+     "Noise: test absence \u2260 code issue; skip verification flag",
+     "Hint: configure CI to map test targets for future runs"
+    ]
+   },
+   {
+    "role": "summary",
+    "model": "nvidia/nemotron-3-super-120b-a12b",
+    "status": "ok",
+    "note": null
+   }
+  ],
+  "provider": {
+   "provider": "nebius",
+   "models": {
+    "claims": "nvidia/nemotron-3-super-120b-a12b",
+    "probes": "nvidia/nemotron-3-super-120b-a12b",
+    "judge": "nvidia/Nemotron-3-Ultra-550b-a55b",
+    "helper": "nvidia/Nemotron-3_5-Lightning",
+    "summary": "nvidia/nemotron-3-super-120b-a12b"
+   },
+   "blind": true
+  }
+ },
+ "swarm_requested": true,
+ "operator_approval_requested": false,
+ "swarm": "on",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [],
+  "compiled_files": [],
+  "other_files": [
+   "doc/source/purity.rst",
+   "examples/fib.py"
+  ]
+ },
+ "duration_s": {
+  "total_wall": 61.3,
+  "tests": 0
+ },
+ "cost": {
+  "ai_calls": 1,
+  "failed_ai_calls": 0,
+  "input_tokens": 124,
+  "output_tokens": 191,
+  "thinking_tokens": 183,
+  "cost_usd": 0.000209,
+  "calls_without_usage": 0,
+  "ai_cost_usd": 0.000209,
+  "cost_complete": true,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 61.3,
+   "tests": 0
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.004087,
+  "total_cost_usd": 0.004296,
+  "swarm": {
+   "ai_calls": 3,
+   "failed_ai_calls": 0,
+   "input_tokens": 110,
+   "output_tokens": 359,
+   "thinking_tokens": 272,
+   "cost_usd": 0.000356,
+   "calls_without_usage": 2,
+   "ai_cost_usd": 0.000356,
+   "cost_complete": false,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ }
+}

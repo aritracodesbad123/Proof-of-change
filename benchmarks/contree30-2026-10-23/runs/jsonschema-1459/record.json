@@ -1,0 +1,767 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-python-jsonschema-jsonschema-1459-08a8c22576d5-jsonschema-1459",
+ "date_ist": "2026-10-23 15:28 IST",
+ "run_date": "2026-10-23",
+ "who": "ops/daily_run.py",
+ "repo": "python-jsonschema/jsonschema",
+ "library": "jsonschema",
+ "pr": {
+  "repo": "python-jsonschema/jsonschema",
+  "number": 1459,
+  "url": "https://github.com/python-jsonschema/jsonschema/pull/1459",
+  "title": "Fix multipleOf with integer-valued float for large integers",
+  "base_sha": "5a5fa97c7d5409b9f1f1280e51a3e63334b105ae",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "08a8c22576d5686a183462c2fe86a0913c1d9b91",
+  "merge_commit": "7317cdc9976d85c21b887b73fdc787df496922f4",
+  "tested_main_sha": "c497561ea0a95f5aac09cd63d15eb1420eb7bbec",
+  "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+ },
+ "author": "worksbyfriday",
+ "base_ref": "main",
+ "updated_at_utc": "2026-08-01T17:41:39Z",
+ "updated_at_ist": "2026-08-01 23:11 IST",
+ "ci_state": "not checked (single-PR check)",
+ "ci_detail": "checked on request with --pr",
+ "tested_at_ist": "2026-10-23 15:28 IST",
+ "files": {
+  "all": [
+   "jsonschema/_keywords.py",
+   "jsonschema/tests/test_validators.py"
+  ],
+  "package_py": [
+   "jsonschema/_keywords.py",
+   "jsonschema/tests/test_validators.py"
+  ],
+  "compiled": [],
+  "other": []
+ },
+ "machine_type": {
+  "arch": "arm64",
+  "os": "Darwin",
+  "platform": "macOS-15.5-arm64-arm-64bit-Mach-O",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": "Apple clang version 14.0.3 (clang-1403.0.22.14.1)",
+  "cpu_model": null,
+  "ram_gb": null
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 3,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.14",
+ "test_selection": "mapped from touched files: jsonschema/tests/test_validators.py",
+ "per_run": [
+  {
+   "side": "old",
+   "run": 1,
+   "passed": 304,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 2.8,
+   "pytest_summary": "304 passed in 0.82s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 1,
+   "passed": 305,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 2.8,
+   "pytest_summary": "305 passed in 0.89s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 2,
+   "passed": 304,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 2.9,
+   "pytest_summary": "304 passed in 0.85s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 2,
+   "passed": 305,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 2.9,
+   "pytest_summary": "305 passed in 0.90s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 3,
+   "passed": 304,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 2.9,
+   "pytest_summary": "304 passed in 0.85s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 3,
+   "passed": 305,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 2.8,
+   "pytest_summary": "305 passed in 0.84s",
+   "junit": true
+  }
+ ],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "contree",
+ "sandbox_backend_note": "contree (Token Factory Sandboxes, sdk 0.3.6)",
+ "machine": "contree",
+ "tool_setup": {
+  "installed": [],
+  "tries": 0,
+  "note": "All required tools were already installed.",
+  "refused": []
+ },
+ "posted_upstream": false,
+ "logs": "jsonschema-1459/",
+ "freeze": {},
+ "poc_commit": "863751e9580b866fe64247737975cb2e04e97215",
+ "route": "source-pair",
+ "current_head_sha": "08a8c22576d5686a183462c2fe86a0913c1d9b91",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "model_provider_fallback": "the AI answered but no probe was usable, so only fixed probes ran",
+ "state": "open",
+ "mergeable": true,
+ "mergeable_state": "clean",
+ "product_check": true,
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": {
+   "ok": true,
+   "skipped": false,
+   "live_call": true,
+   "cached": false,
+   "queries": [
+    "jsonschema python setup install instructions https://github.com/python-jsonschema/jsonschema site:github.com/python-jsonschema/jsonschema",
+    "jsonschema python documentation install https://github.com/python-jsonschema/jsonschema site:github.com/python-jsonschema/jsonschema",
+    "jsonschema python install requirements https://pypi.org/project/jsonschema/ https://github.com/python-jsonschema/jsonschema site:pypi.org"
+   ],
+   "results": [
+    {
+     "title": "GitHub - python-jsonschema/jsonschema: An implementation of the JSON Schema specification for Python \u00b7 GitHub",
+     "url": "https://github.com/python-jsonschema/jsonschema",
+     "query": "jsonschema python documentation install https://github.com/python-jsonschema/jsonschema site:github.com/python-jsonschema/jsonschema"
+    },
+    {
+     "title": "Relative URI $refs returning \"unknown url type\" \u00b7 Issue #313 \u00b7 python-jsonschema/jsonschema \u00b7 GitHub",
+     "url": "https://github.com/python-jsonschema/jsonschema/issues/313",
+     "query": "jsonschema python documentation install https://github.com/python-jsonschema/jsonschema site:github.com/python-jsonschema/jsonschema"
+    },
+    {
+     "title": "incorrect anyOf validation error \u00b7 Issue #598 \u00b7 python-jsonschema/jsonschema \u00b7 GitHub",
+     "url": "https://github.com/python-jsonschema/jsonschema/issues/598",
+     "query": "jsonschema python documentation install https://github.com/python-jsonschema/jsonschema site:github.com/python-jsonschema/jsonschema"
+    }
+   ],
+   "text": "The sources provided do not contain any information about the installation instructions for the jsonschema Python package from its GitHub repository. The sources focus on Saint Adalard of Corbie, his historical context, and Catholic resources, none of which relate to the installation of Python packages. Therefore, no relevant information about jsonschema Python setup install instructions can be derived from the given sources.\nTo install the `jsonschema` package for Python, you can use pip with the command `pip install jsonschema`. The package is available on PyPI and supports multiple JSON Schema drafts. Additionally, two extras are available for format validation: `format` and `format-nongpl`. These extras can be included during installation but do not activate format checks by default. The installation process is demonstrated in GitHub issue #598 with the command `env/bin/pip install jsonschema==3.0.2`.\nThe provided sources do not contain information about the installation requirements for the Python package jsonschema. They discuss various topics related to Microsoft Community Hub, including Windows Insider Program and Microsoft Security, but none of these sources mention jsonschema or its installation requirements. Therefore, no specific details about installing jsonschema can be provided based on the given sources.\nIt can also be used from the command line by installing check-jsonschema.\n\n## Features\n\n Full support for Draft 2020-12, Draft 2019-09, Draft 7, Draft 6, Draft 4 and Draft 3\n Lazy validation that can iteratively report all validation errors.\n Programmatic querying of which properties or items failed validation.\n\n## Installation\n\n`jsonschema` is available on PyPI. You can install using pip:\n\n```\n$ pip install jsonschema\n```\n\n### Extras [...] ### Extras\n\nTwo extras are available when installing th\nThe project is documented here:  \n       \n     The files are found here piecemeal:  \n       \n     The entire project can be downloaded and unzipped from:  \n     \n\n    The command I used today (in place of the commands found in the `val/` subdirectory) from the `json/` subdirectory is:\n\n    ```\n    ~/u/cd/artefacts/UBL-2.1-JSON-v1.0-cnd02/json $ jsonschema -i UBL-Invoice-2.1-Example.json ../json-schema/maindoc/UBL-Invoice-2.1.json \n    ```\n24. Julian\npkg_resources, pip, wheel...done. $ env/bin/pip install jsonschema==3.0.2 Collecting jsonschema==3.0.2 Using cached  Collecting attrs>=17.4.0 (from jsonschema==3.0.2) Using cached  Collecting six>=1.11.0 (from jsonschema==3.0.2) Using cached  Collecting pyrsistent>=0.14.0 (from jsonschema==3.0.2) Requirement already satisfied: setuptools in ./env/lib/python3.7/site-packages (from jsonschema==3.0.2) (41.2.0) Installing collected packages: attrs, six, pyrsistent, jsonschema Successfully installed ",
+   "errors": [],
+   "lines": [
+    "Looked up with Tavily: 3 results",
+    "Query: jsonschema python setup install instructions https://github.com/python-jsonschema/jsonschema site:github.com/python-jsonschema/jsonschema",
+    "Query: jsonschema python documentation install https://github.com/python-jsonschema/jsonschema site:github.com/python-jsonschema/jsonschema",
+    "Query: jsonschema python install requirements https://pypi.org/project/jsonschema/ https://github.com/python-jsonschema/jsonschema site:pypi.org",
+    "Source: GitHub - python-jsonschema/jsonschema: An implementation of the JSON Schema specification for Python \u00b7 GitHub \u2014 https://github.com/python-jsonschema/jsonschema",
+    "Source: Relative URI $refs returning \"unknown url type\" \u00b7 Issue #313 \u00b7 python-jsonschema/jsonschema \u00b7 GitHub \u2014 https://github.com/python-jsonschema/jsonschema/issues/313",
+    "Source: incorrect anyOf validation error \u00b7 Issue #598 \u00b7 python-jsonschema/jsonschema \u00b7 GitHub \u2014 https://github.com/python-jsonschema/jsonschema/issues/598"
+   ]
+  },
+  "notes": [
+   "Setup check: GitHub token: missing.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory could not be read.",
+   "Setup check: free disk 37.3 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: 3 results",
+   "Query: jsonschema python setup install instructions https://github.com/python-jsonschema/jsonschema site:github.com/python-jsonschema/jsonschema",
+   "Query: jsonschema python documentation install https://github.com/python-jsonschema/jsonschema site:github.com/python-jsonschema/jsonschema",
+   "Query: jsonschema python install requirements https://pypi.org/project/jsonschema/ https://github.com/python-jsonschema/jsonschema site:pypi.org",
+   "Source: GitHub - python-jsonschema/jsonschema: An implementation of the JSON Schema specification for Python \u00b7 GitHub \u2014 https://github.com/python-jsonschema/jsonschema",
+   "Source: Relative URI $refs returning \"unknown url type\" \u00b7 Issue #313 \u00b7 python-jsonschema/jsonschema \u00b7 GitHub \u2014 https://github.com/python-jsonschema/jsonschema/issues/313",
+   "Source: incorrect anyOf validation error \u00b7 Issue #598 \u00b7 python-jsonschema/jsonschema \u00b7 GitHub \u2014 https://github.com/python-jsonschema/jsonschema/issues/598",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: attrs is noted, installed with the project.",
+   "Setup plan: jsonschema-specifications is noted, installed with the project.",
+   "Setup plan: referencing is noted, installed with the project.",
+   "Setup plan: rpds-py is noted, installed with the project.",
+   "Setup plan: install virtue (listed in the test extra) on main and pr.",
+   "Setup plan: install jsonpath-ng (listed in the test extra) on main and pr.",
+   "Setup plan: install pyperf (listed in a dependency group) on main and pr.",
+   "Setup plan: install furo (listed in a dependency group) on main and pr.",
+   "Setup plan: install lxml (listed in a dependency group) on main and pr.",
+   "Setup plan: install sphinx<9 (listed in a dependency group) on main and pr.",
+   "Setup plan: install sphinx-autoapi (listed in a dependency group) on main and pr.",
+   "Setup plan: install sphinx-autodoc-typehints (listed in a dependency group) on main and pr.",
+   "Setup plan: install sphinx-copybutton (listed in a dependency group) on main and pr.",
+   "Setup plan: install sphinx-json-schema-spec (listed in a dependency group) on main and pr.",
+   "Setup plan: install sphinxcontrib-spelling>5 (listed in a dependency group) on main and pr.",
+   "Setup plan: install sphinxext-opengraph (listed in a dependency group) on main and pr.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >=3.12, >=3.10",
+   "Setup plan: Python rule: one Python version is used on both sides: the lowest version that meets the requirements of both main and the pull request; if none meets both, the check stops as a setup problem and records both."
+  ],
+  "install_docs": [
+   "CONTRIBUTING.rst",
+   "pyproject.toml",
+   "README.rst",
+   "noxfile.py",
+   "docs/Makefile",
+   "json/README.md",
+   "json/CONTRIBUTING.md",
+   "json/tox.ini",
+   ".github/workflows/zizmor.yml",
+   ".github/workflows/ci.yml"
+  ],
+  "install_docs_from": "main",
+  "setup_plan": {
+   "packages": [
+    {
+     "requirement": "attrs>=22.2.0",
+     "name": "attrs",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "jsonschema-specifications>=2023.03.6",
+     "name": "jsonschema-specifications",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "referencing>=0.28.4",
+     "name": "referencing",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "rpds-py>=0.25.0",
+     "name": "rpds-py",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "virtue",
+     "name": "virtue",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the test extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "jsonpath-ng",
+     "name": "jsonpath-ng",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the test extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pyperf",
+     "name": "pyperf",
+     "kind": "dependency-group",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in a dependency group",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "furo",
+     "name": "furo",
+     "kind": "dependency-group",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in a dependency group",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "lxml",
+     "name": "lxml",
+     "kind": "dependency-group",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in a dependency group",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "sphinx<9",
+     "name": "sphinx",
+     "kind": "dependency-group",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in a dependency group",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "sphinx-autoapi",
+     "name": "sphinx-autoapi",
+     "kind": "dependency-group",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in a dependency group",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "sphinx-autodoc-typehints",
+     "name": "sphinx-autodoc-typehints",
+     "kind": "dependency-group",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in a dependency group",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "sphinx-copybutton",
+     "name": "sphinx-copybutton",
+     "kind": "dependency-group",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in a dependency group",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "sphinx-json-schema-spec",
+     "name": "sphinx-json-schema-spec",
+     "kind": "dependency-group",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in a dependency group",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "sphinxcontrib-spelling>5",
+     "name": "sphinxcontrib-spelling",
+     "kind": "dependency-group",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in a dependency group",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "sphinxext-opengraph",
+     "name": "sphinxext-opengraph",
+     "kind": "dependency-group",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in a dependency group",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    }
+   ],
+   "scope_blocked": "",
+   "component": null,
+   "aggregate_names": [],
+   "extra_reqs": [
+    "virtue",
+    "jsonpath-ng",
+    "pyperf",
+    "furo",
+    "lxml",
+    "sphinx<9",
+    "sphinx-autoapi",
+    "sphinx-autodoc-typehints",
+    "sphinx-copybutton",
+    "sphinx-json-schema-spec",
+    "sphinxcontrib-spelling>5",
+    "sphinxext-opengraph"
+   ],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >=3.12, >=3.10",
+    "rule": "one Python version is used on both sides: the lowest version that meets the requirements of both main and the pull request; if none meets both, the check stops as a setup problem and records both",
+    "gate_failed": false
+   },
+   "system": [],
+   "refused": [],
+   "groups_blocked": ""
+  },
+  "steps": {
+   "setup_lookup": "Found 16 setup item(s) in the project's files and the web lookup.",
+   "setup_python": "Python 3.12: Python 3.12 already meets >=3.12, >=3.10",
+   "install_deps": "Wrote requirements.txt and installed it on main and pr: virtue, jsonpath-ng, pyperf, furo, lxml, sphinx<9, sphinx-autoapi, sphinx-autodoc-typehints, sphinx-copybutton, sphinx-json-schema-spec, sphinxcontrib-spelling>5, sphinxext-opengraph. 4 more come with the project install."
+  },
+  "run_files": {
+   "requirements": "requirements.txt",
+   "plan": "setup-plan.json",
+   "count": 12
+  }
+ },
+ "chosen": {
+  "pr": 1459,
+  "head_sha": null,
+  "install": null,
+  "test_cmd": null
+ },
+ "sides": {
+  "comparison_basis": "base tip vs GitHub test merge (refs/pull/N/merge)",
+  "main_sha": "c497561ea0a95f5aac09cd63d15eb1420eb7bbec",
+  "pr_sha": "7317cdc9976d85c21b887b73fdc787df496922f4",
+  "merge_commit": "7317cdc9976d85c21b887b73fdc787df496922f4",
+  "merge_parents": [
+   "c497561ea0a95f5aac09cd63d15eb1420eb7bbec",
+   "08a8c22576d5686a183462c2fe86a0913c1d9b91"
+  ],
+  "merge_head_matches_pinned_head": true
+ },
+ "tested": {
+  "main": "main @ c497561ea0a9 (base tip = first parent of the merge commit)",
+  "pr": "GitHub test merge commit 7317cdc9976d (refs/pull/1459/merge) of head 08a8c22576d5"
+ },
+ "probe_plan": {
+  "baseline": "full",
+  "model": "model provider: nebius (Token Factory, live)",
+  "errors": [
+   "probe 'p1' rejected: code does not parse: unmatched '}' (line 13)"
+  ],
+  "model_claims": [
+   {
+    "id": "C1",
+    "text": "When multipleOf is an integer-valued float (e.g. 11.0), the validator uses float division, which loses precision for instances beyond 2**53.",
+    "source_quote": "When `multipleOf` is an integer-valued float (e.g. `11.0`), the validator uses float division, which loses precision for instances beyond `2**53`.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C2",
+    "text": "The value 9007199254740995 is a multiple of 11, but dividing it by 11.0 loses precision and causes the validation to fail.",
+    "source_quote": "This causes false negatives: `9007199254740995` is a multiple of `11`, but `9007199254740995 / 11.0` loses precision and the check fails.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C3",
+    "text": "Converting integer-valued floats to int before the divisibility check makes multipleOf: 11.0 behave identically to multipleOf: 11, as required by the JSON Schema spec for numbers with zero fractional parts.",
+    "source_quote": "The fix converts integer-valued floats to `int` before performing the divisibility check, using `float.is_integer()`. This ensures that `multipleOf: 11.0` behaves identically to `multipleOf: 11`, per the JSON Schema spec which states that numbers with zero fractional parts are integers.",
+    "testable": true,
+    "expect": "same"
+   },
+   {
+    "id": "C4",
+    "text": "Non-integer floats (e.g. 0.5) are unaffected by the change; the isinstance(dB, float) branch continues to handle them.",
+    "source_quote": "Non-integer floats (e.g. `0.5`) are unaffected \u2014 the `isinstance(dB, float)` branch still handles them.",
+    "testable": true,
+    "expect": "same"
+   }
+  ],
+  "model_rejected_claims": [],
+  "diff_targets": [],
+  "frozen": []
+ },
+ "pr_side_started_at": "2026-10-23T10:00:30.451413+00:00",
+ "test_targets": {
+  "main": [
+   "jsonschema/tests/test_validators.py"
+  ],
+  "pr": [
+   "jsonschema/tests/test_validators.py"
+  ]
+ },
+ "contree_only": {
+  "note": "Contree mode: installs, tests and probes ran in Contree; nothing from the pull request ran locally",
+  "declared_test_deps": [],
+  "optional_backends": [],
+  "not_run_locally": [
+   "local freeze",
+   "installed-commit guard",
+   "probe coverage",
+   "optional-module retry"
+  ]
+ },
+ "coverage": {
+  "status": "not measured",
+  "why": "coverage run produced no data; see coverage-pytest.log",
+  "seconds": 3.4,
+  "where": "contree"
+ },
+ "contree": {
+  "main_uuid": "7cddfacb-9e84-4305-a964-2b6987a7642c",
+  "pr_uuid": "8d5ca09f-5f85-4c6e-8455-864a3bc4f62d",
+  "max_ops": 40,
+  "sdk": "0.3.6",
+  "base_image": "docker.io/library/python:3.12-slim-bookworm",
+  "python": {
+   "requires_python": [
+    ">=3.12"
+   ],
+   "requires_python_found": true,
+   "main": "3.12.15",
+   "pr": "3.12.15",
+   "problems": []
+  }
+ },
+ "comparison": {
+  "same": 304,
+  "same_skipped_both": 0,
+  "regressions": [],
+  "fixed": [],
+  "new_tests_passing": 1,
+  "new_tests_failing": [],
+  "new_tests_skipped": [],
+  "removed_tests": [],
+  "reparametrized": [],
+  "skipped_missing_dependency": [],
+  "flaky": [],
+  "pr_unstable": [],
+  "pr_unstable_noisy": [],
+  "environment": [],
+  "other_changes": [],
+  "preexisting_failures": [],
+  "load_failed_both": [],
+  "load_failed_pr": [],
+  "load_failed_main": [],
+  "executed": {
+   "main": 304,
+   "pr": 305
+  },
+  "messages": {}
+ },
+ "exit_check": {
+  "explained": true,
+  "problems": [],
+  "detail": "all runs exited 0"
+ },
+ "probes": {
+  "status": "none",
+  "items": []
+ },
+ "probe_changed_line_coverage": {
+  "status": "no probes",
+  "probes": {}
+ },
+ "verdict": "could_not_verify",
+ "reason": "Coverage wasn't measured, so this can't be marked verified (coverage run produced no data; see coverage-pytest.log) (tests: 304 test(s) ran on main, 305 on the PR; 1 new test(s) pass, 304 unchanged)",
+ "verdict_before_coverage_gate": "verified",
+ "reason_before_coverage_gate": "304 test(s) ran on main, 305 on the PR; 1 new test(s) pass, 304 unchanged",
+ "changed_lines_total": null,
+ "changed_lines_covered": null,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": true,
+  "confidence": "none",
+  "note": "coverage of the changed Python lines was NOT MEASURED (coverage run produced no data; see coverage-pytest.log)",
+  "measurement": "not measured"
+ },
+ "explanation": {
+  "status": "wired",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "text": "Verdict: could_not_verify. Coverage wasn't measured, so this can't be marked verified (coverage run produced no data; see coverage-pytest.log) (tests: 304 test(s) ran on main, 305 on the PR; 1 new test(s) pass, 304 unchanged)",
+  "quotes": [],
+  "advisory": true
+ },
+ "agents": {
+  "status": "ran",
+  "advisory": true,
+  "note": "judge/helper/summary are advisory; code owns the verdict",
+  "roles": [
+   {
+    "role": "judge",
+    "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+    "status": "ok",
+    "note": null,
+    "labels": []
+   },
+   {
+    "role": "helper",
+    "model": "nvidia/Nemotron-3_5-Lightning",
+    "status": "ok",
+    "note": null,
+    "notes": [
+     "Run `pytest --cov` to generate coverage data before merging.",
+     "Ignore coverage-missing noise: verdict depends on coverage log presence.",
+     "Install hint: `pip install coverage pytest-cov` if coverage tooling is absent.",
+     "Noise pattern: `coverage-pytest.log` absent \u2192 verdict defaults to could_not_verify.",
+     "Ensure CI matrix includes coverage step to avoid false unverified states."
+    ]
+   },
+   {
+    "role": "summary",
+    "model": "nvidia/nemotron-3-super-120b-a12b",
+    "status": "ok",
+    "note": "model returned empty text; filled from code verdict/reason"
+   }
+  ],
+  "provider": {
+   "provider": "nebius",
+   "models": {
+    "claims": "nvidia/nemotron-3-super-120b-a12b",
+    "probes": "nvidia/nemotron-3-super-120b-a12b",
+    "judge": "nvidia/Nemotron-3-Ultra-550b-a55b",
+    "helper": "nvidia/Nemotron-3_5-Lightning",
+    "summary": "nvidia/nemotron-3-super-120b-a12b"
+   },
+   "blind": true
+  }
+ },
+ "swarm_requested": true,
+ "operator_approval_requested": false,
+ "swarm": "on",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [
+   "jsonschema/_keywords.py",
+   "jsonschema/tests/test_validators.py"
+  ],
+  "compiled_files": [],
+  "other_files": []
+ },
+ "duration_s": {
+  "total_wall": 259.7,
+  "tests": 17.1
+ },
+ "cost": {
+  "ai_calls": 3,
+  "failed_ai_calls": 0,
+  "input_tokens": 9259,
+  "output_tokens": 11420,
+  "thinking_tokens": 10675,
+  "cost_usd": 0.013056,
+  "calls_without_usage": 0,
+  "ai_cost_usd": 0.013056,
+  "cost_complete": true,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 259.7,
+   "tests": 17.1
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.017313,
+  "total_cost_usd": 0.030369,
+  "swarm": {
+   "ai_calls": 3,
+   "failed_ai_calls": 0,
+   "input_tokens": 169,
+   "output_tokens": 856,
+   "thinking_tokens": 843,
+   "cost_usd": 0.000821,
+   "calls_without_usage": 2,
+   "ai_cost_usd": 0.000821,
+   "cost_complete": false,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ }
+}
