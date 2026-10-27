@@ -1,0 +1,180 @@
+{
+ "baseline": "full",
+ "behaviour_claims": [],
+ "comparison": {
+  "environment": [],
+  "executed": {
+   "main": 66,
+   "pr": 67
+  },
+  "fixed": [],
+  "flaky": [],
+  "load_failed_both": [],
+  "load_failed_main": [],
+  "load_failed_pr": [],
+  "messages": {},
+  "new_tests_failing": [],
+  "new_tests_passing": 1,
+  "new_tests_skipped": [],
+  "other_changes": [],
+  "pr_unstable": [],
+  "pr_unstable_noisy": [],
+  "preexisting_failures": [],
+  "regressions": [],
+  "removed_tests": [],
+  "reparametrized": [],
+  "same": 66,
+  "same_skipped_both": 0,
+  "skipped_missing_dependency": []
+ },
+ "exit_check": {
+  "detail": "all runs exited 0",
+  "explained": true,
+  "problems": []
+ },
+ "files": {
+  "all": [
+   "changelog/5328.bugfix.rst",
+   "src/urllib3/util/retry.py",
+   "test/test_retry.py"
+  ],
+  "compiled": [],
+  "other": [
+   "changelog/5328.bugfix.rst",
+   "test/test_retry.py"
+  ],
+  "package_py": [
+   "src/urllib3/util/retry.py"
+  ]
+ },
+ "model_rejected_claims": [],
+ "pr": 5328,
+ "probes": {
+  "items": [
+   {
+    "about": "Test the behavior of zero Retry-After and backoff interaction.",
+    "claims": [],
+    "id": "model-p1",
+    "observations": [
+     {
+      "claim": null,
+      "label": "no_difference",
+      "main": 2.0,
+      "name": "missing_header.sleep_time",
+      "pr": 2.0,
+      "state": "same"
+     },
+     {
+      "claim": null,
+      "label": "no_difference",
+      "main": 1,
+      "name": "non_zero_retry_after.sleep_time",
+      "pr": 1,
+      "state": "same"
+     },
+     {
+      "claim": null,
+      "label": "no_difference",
+      "main": 0,
+      "name": "parse_retry_after.zero_from_past_date",
+      "pr": 0,
+      "state": "same"
+     },
+     {
+      "claim": null,
+      "label": "no_difference",
+      "main": 0,
+      "name": "parse_retry_after.zero_from_string",
+      "pr": 0,
+      "state": "same"
+     },
+     {
+      "claim": null,
+      "diffs": [
+       {
+        "field": "",
+        "main": 2.0,
+        "pr": 0
+       }
+      ],
+      "label": "unmentioned",
+      "main": 2.0,
+      "name": "zero_retry_after.sleep_time",
+      "pr": 0,
+      "state": "differs"
+     }
+    ],
+    "probe_changed_line_coverage": {
+     "adequacy": "adequate",
+     "changed_lines_covered": 3,
+     "changed_lines_total": 3,
+     "data": "probe-cov-model-p1.json",
+     "exit": 0,
+     "files": [
+      {
+       "changed_lines_covered": 3,
+       "changed_lines_total": 3,
+       "file": "src/urllib3/util/retry.py"
+      }
+     ],
+     "note": "ran 3 of 3 changed line(s) on the main side",
+     "status": "measured",
+     "where": "contree"
+    },
+    "runs": {
+     "main": [
+      {
+       "missing_header.sleep_time": 2.0,
+       "non_zero_retry_after.sleep_time": 1,
+       "parse_retry_after.zero_from_past_date": 0,
+       "parse_retry_after.zero_from_string": 0,
+       "zero_retry_after.sleep_time": 2.0
+      },
+      {
+       "missing_header.sleep_time": 2.0,
+       "non_zero_retry_after.sleep_time": 1,
+       "parse_retry_after.zero_from_past_date": 0,
+       "parse_retry_after.zero_from_string": 0,
+       "zero_retry_after.sleep_time": 2.0
+      },
+      {
+       "missing_header.sleep_time": 2.0,
+       "non_zero_retry_after.sleep_time": 1,
+       "parse_retry_after.zero_from_past_date": 0,
+       "parse_retry_after.zero_from_string": 0,
+       "zero_retry_after.sleep_time": 2.0
+      }
+     ],
+     "pr": [
+      {
+       "missing_header.sleep_time": 2.0,
+       "non_zero_retry_after.sleep_time": 1,
+       "parse_retry_after.zero_from_past_date": 0,
+       "parse_retry_after.zero_from_string": 0,
+       "zero_retry_after.sleep_time": 0
+      },
+      {
+       "missing_header.sleep_time": 2.0,
+       "non_zero_retry_after.sleep_time": 1,
+       "parse_retry_after.zero_from_past_date": 0,
+       "parse_retry_after.zero_from_string": 0,
+       "zero_retry_after.sleep_time": 0
+      },
+      {
+       "missing_header.sleep_time": 2.0,
+       "non_zero_retry_after.sleep_time": 1,
+       "parse_retry_after.zero_from_past_date": 0,
+       "parse_retry_after.zero_from_string": 0,
+       "zero_retry_after.sleep_time": 0
+      }
+     ]
+    },
+    "source": "model",
+    "status": "ran",
+    "target": "urllib3/urllib3#5328"
+   }
+  ]
+ },
+ "repo": "urllib3/urllib3",
+ "verdict_at_fcc3c08": "needs_attention"
+}

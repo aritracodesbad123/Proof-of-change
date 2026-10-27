@@ -1,0 +1,656 @@
+{
+ "baseline": "full",
+ "behaviour_claims": [],
+ "comparison": {
+  "environment": [],
+  "executed": {
+   "main": 273,
+   "pr": 275
+  },
+  "fixed": [],
+  "flaky": [],
+  "load_failed_both": [],
+  "load_failed_main": [],
+  "load_failed_pr": [],
+  "messages": {},
+  "new_tests_failing": [],
+  "new_tests_passing": 2,
+  "new_tests_skipped": [],
+  "other_changes": [],
+  "pr_unstable": [],
+  "pr_unstable_noisy": [],
+  "preexisting_failures": [],
+  "regressions": [],
+  "removed_tests": [],
+  "reparametrized": [],
+  "same": 274,
+  "same_skipped_both": 1,
+  "skipped_missing_dependency": []
+ },
+ "exit_check": {
+  "detail": "all runs exited 0",
+  "explained": true,
+  "problems": []
+ },
+ "files": {
+  "all": [
+   "isort/literal.py",
+   "tests/unit/test_isort.py",
+   "tests/unit/test_literal.py"
+  ],
+  "compiled": [],
+  "other": [
+   "tests/unit/test_isort.py",
+   "tests/unit/test_literal.py"
+  ],
+  "package_py": [
+   "isort/literal.py"
+  ]
+ },
+ "model_rejected_claims": [],
+ "pr": 2737,
+ "probes": {
+  "items": [
+   {
+    "about": "Test C1 and C2: augmented assignment __all__ += ... with sort_reexports",
+    "claims": [
+     {
+      "covers": [
+       "C1"
+      ],
+      "expect": "differs",
+      "id": "C1",
+      "source": "PR description",
+      "text": "With --sort-reexports, an augmented assignment to __all__ is rewritten into invalid Python: '__all__ += [\"b\", \"a\"]' becomes '__all__ + = [\"a\", \"b\"]'."
+     },
+     {
+      "covers": [
+       "C2"
+      ],
+      "expect": "differs",
+      "id": "C2",
+      "source": "PR description",
+      "text": "After the fix, the same input yields valid code: '__all__ += [\"b\", \"a\"]' becomes '__all__ += [\"a\", \"b\"]'."
+     }
+    ],
+    "id": "model-p1",
+    "observations": [
+     {
+      "claim": null,
+      "diffs": [
+       {
+        "field": "",
+        "main": "__all__ + = [\"a\", \"b\"]\n",
+        "pr": "__all__ += [\"a\", \"b\"]\n"
+       }
+      ],
+      "label": "unmentioned",
+      "main": "__all__ + = [\"a\", \"b\"]\n",
+      "name": "C1.output",
+      "pr": "__all__ += [\"a\", \"b\"]\n",
+      "state": "differs"
+     },
+     {
+      "claim": null,
+      "diffs": [
+       {
+        "field": "",
+        "main": "__all__ + = [\"a\", \"b\"]\n",
+        "pr": "__all__ += [\"a\", \"b\"]\n"
+       }
+      ],
+      "label": "unmentioned",
+      "main": "__all__ + = [\"a\", \"b\"]\n",
+      "name": "C2.output",
+      "pr": "__all__ += [\"a\", \"b\"]\n",
+      "state": "differs"
+     },
+     {
+      "claim": null,
+      "label": "no_difference",
+      "main": "x += [\"b\", \"a\"]  # isort: list\n",
+      "name": "C3a.output",
+      "pr": "x += [\"b\", \"a\"]  # isort: list\n",
+      "state": "same"
+     },
+     {
+      "claim": null,
+      "label": "no_difference",
+      "main": "x |= {\"b\", \"a\"}  # isort: set\n",
+      "name": "C3b.output",
+      "pr": "x |= {\"b\", \"a\"}  # isort: set\n",
+      "state": "same"
+     }
+    ],
+    "probe_changed_line_coverage": {
+     "adequacy": "adequate",
+     "changed_lines_covered": 4,
+     "changed_lines_total": 4,
+     "data": "probe-cov-model-p1.json",
+     "exit": 0,
+     "files": [
+      {
+       "changed_lines_covered": 4,
+       "changed_lines_total": 4,
+       "file": "isort/literal.py"
+      }
+     ],
+     "note": "ran 4 of 4 changed line(s) on the main side",
+     "status": "measured",
+     "where": "contree"
+    },
+    "runs": {
+     "main": [
+      {
+       "C1.output": "__all__ + = [\"a\", \"b\"]\n",
+       "C2.output": "__all__ + = [\"a\", \"b\"]\n",
+       "C3a.output": "x += [\"b\", \"a\"]  # isort: list\n",
+       "C3b.output": "x |= {\"b\", \"a\"}  # isort: set\n"
+      },
+      {
+       "C1.output": "__all__ + = [\"a\", \"b\"]\n",
+       "C2.output": "__all__ + = [\"a\", \"b\"]\n",
+       "C3a.output": "x += [\"b\", \"a\"]  # isort: list\n",
+       "C3b.output": "x |= {\"b\", \"a\"}  # isort: set\n"
+      },
+      {
+       "C1.output": "__all__ + = [\"a\", \"b\"]\n",
+       "C2.output": "__all__ + = [\"a\", \"b\"]\n",
+       "C3a.output": "x += [\"b\", \"a\"]  # isort: list\n",
+       "C3b.output": "x |= {\"b\", \"a\"}  # isort: set\n"
+      }
+     ],
+     "pr": [
+      {
+       "C1.output": "__all__ += [\"a\", \"b\"]\n",
+       "C2.output": "__all__ += [\"a\", \"b\"]\n",
+       "C3a.output": "x += [\"b\", \"a\"]  # isort: list\n",
+       "C3b.output": "x |= {\"b\", \"a\"}  # isort: set\n"
+      },
+      {
+       "C1.output": "__all__ += [\"a\", \"b\"]\n",
+       "C2.output": "__all__ += [\"a\", \"b\"]\n",
+       "C3a.output": "x += [\"b\", \"a\"]  # isort: list\n",
+       "C3b.output": "x |= {\"b\", \"a\"}  # isort: set\n"
+      },
+      {
+       "C1.output": "__all__ += [\"a\", \"b\"]\n",
+       "C2.output": "__all__ += [\"a\", \"b\"]\n",
+       "C3a.output": "x += [\"b\", \"a\"]  # isort: list\n",
+       "C3b.output": "x |= {\"b\", \"a\"}  # isort: set\n"
+      }
+     ]
+    },
+    "source": "model",
+    "status": "rejected",
+    "target": "PyCQA/isort#2737"
+   },
+   {
+    "about": "Test that normal assignment works (sanity check)",
+    "claims": [],
+    "id": "model-p2",
+    "observations": [
+     {
+      "claim": null,
+      "label": "no_difference",
+      "main": "__all__ = [\"a\", \"b\"]\n",
+      "name": "normal.assign.output",
+      "pr": "__all__ = [\"a\", \"b\"]\n",
+      "state": "same"
+     }
+    ],
+    "probe_changed_line_coverage": {
+     "adequacy": "adequate",
+     "changed_lines_covered": 4,
+     "changed_lines_total": 4,
+     "data": "probe-cov-model-p2.json",
+     "exit": 0,
+     "files": [
+      {
+       "changed_lines_covered": 4,
+       "changed_lines_total": 4,
+       "file": "isort/literal.py"
+      }
+     ],
+     "note": "ran 4 of 4 changed line(s) on the main side",
+     "status": "measured",
+     "where": "contree"
+    },
+    "runs": {
+     "main": [
+      {
+       "normal.assign.output": "__all__ = [\"a\", \"b\"]\n"
+      },
+      {
+       "normal.assign.output": "__all__ = [\"a\", \"b\"]\n"
+      },
+      {
+       "normal.assign.output": "__all__ = [\"a\", \"b\"]\n"
+      }
+     ],
+     "pr": [
+      {
+       "normal.assign.output": "__all__ = [\"a\", \"b\"]\n"
+      },
+      {
+       "normal.assign.output": "__all__ = [\"a\", \"b\"]\n"
+      },
+      {
+       "normal.assign.output": "__all__ = [\"a\", \"b\"]\n"
+      }
+     ]
+    },
+    "source": "model",
+    "status": "ran",
+    "target": "PyCQA/isort#2737"
+   },
+   {
+    "about": "Public functions touched by the PR, called with type-appropriate inputs on both sides.",
+    "claims": [],
+    "id": "diff-api",
+    "observations": [
+     {
+      "claim": null,
+      "label": "no_difference",
+      "main": {
+       "raises": "ValueError"
+      },
+      "name": "isort.literal.assignment.input0",
+      "pr": {
+       "raises": "ValueError"
+      },
+      "state": "same"
+     },
+     {
+      "claim": null,
+      "label": "no_difference",
+      "main": {
+       "raises": "ValueError"
+      },
+      "name": "isort.literal.assignment.input1",
+      "pr": {
+       "raises": "ValueError"
+      },
+      "state": "same"
+     },
+     {
+      "claim": null,
+      "label": "no_difference",
+      "main": {
+       "raises": "TypeError"
+      },
+      "name": "isort.literal.assignment.input10",
+      "pr": {
+       "raises": "TypeError"
+      },
+      "state": "same"
+     },
+     {
+      "claim": null,
+      "label": "no_difference",
+      "main": {
+       "raises": "TypeError"
+      },
+      "name": "isort.literal.assignment.input11",
+      "pr": {
+       "raises": "TypeError"
+      },
+      "state": "same"
+     },
+     {
+      "claim": null,
+      "label": "no_difference",
+      "main": {
+       "raises": "ValueError"
+      },
+      "name": "isort.literal.assignment.input2",
+      "pr": {
+       "raises": "ValueError"
+      },
+      "state": "same"
+     },
+     {
+      "claim": null,
+      "label": "no_difference",
+      "main": {
+       "raises": "ValueError"
+      },
+      "name": "isort.literal.assignment.input3",
+      "pr": {
+       "raises": "ValueError"
+      },
+      "state": "same"
+     },
+     {
+      "claim": null,
+      "label": "no_difference",
+      "main": {
+       "raises": "ValueError"
+      },
+      "name": "isort.literal.assignment.input4",
+      "pr": {
+       "raises": "ValueError"
+      },
+      "state": "same"
+     },
+     {
+      "claim": null,
+      "label": "no_difference",
+      "main": {
+       "raises": "TypeError"
+      },
+      "name": "isort.literal.assignment.input5",
+      "pr": {
+       "raises": "TypeError"
+      },
+      "state": "same"
+     },
+     {
+      "claim": null,
+      "label": "no_difference",
+      "main": {
+       "raises": "ValueError"
+      },
+      "name": "isort.literal.assignment.input6",
+      "pr": {
+       "raises": "ValueError"
+      },
+      "state": "same"
+     },
+     {
+      "claim": null,
+      "label": "no_difference",
+      "main": {
+       "raises": "ValueError"
+      },
+      "name": "isort.literal.assignment.input7",
+      "pr": {
+       "raises": "ValueError"
+      },
+      "state": "same"
+     },
+     {
+      "claim": null,
+      "label": "no_difference",
+      "main": {
+       "raises": "ValueError"
+      },
+      "name": "isort.literal.assignment.input8",
+      "pr": {
+       "raises": "ValueError"
+      },
+      "state": "same"
+     },
+     {
+      "claim": null,
+      "label": "no_difference",
+      "main": {
+       "raises": "ValueError"
+      },
+      "name": "isort.literal.assignment.input9",
+      "pr": {
+       "raises": "ValueError"
+      },
+      "state": "same"
+     }
+    ],
+    "probe_changed_line_coverage": {
+     "adequacy": "not_adequate",
+     "changed_lines_covered": 0,
+     "changed_lines_total": 4,
+     "data": "probe-cov-diff-api.json",
+     "exit": 0,
+     "files": [
+      {
+       "changed_lines_covered": 0,
+       "changed_lines_total": 4,
+       "file": "isort/literal.py"
+      }
+     ],
+     "note": "ran none of the 4 changed line(s) on the main side",
+     "status": "measured",
+     "where": "contree"
+    },
+    "runs": {
+     "main": [
+      {
+       "isort.literal.assignment.input0": {
+        "raises": "ValueError"
+       },
+       "isort.literal.assignment.input1": {
+        "raises": "ValueError"
+       },
+       "isort.literal.assignment.input10": {
+        "raises": "TypeError"
+       },
+       "isort.literal.assignment.input11": {
+        "raises": "TypeError"
+       },
+       "isort.literal.assignment.input2": {
+        "raises": "ValueError"
+       },
+       "isort.literal.assignment.input3": {
+        "raises": "ValueError"
+       },
+       "isort.literal.assignment.input4": {
+        "raises": "ValueError"
+       },
+       "isort.literal.assignment.input5": {
+        "raises": "TypeError"
+       },
+       "isort.literal.assignment.input6": {
+        "raises": "ValueError"
+       },
+       "isort.literal.assignment.input7": {
+        "raises": "ValueError"
+       },
+       "isort.literal.assignment.input8": {
+        "raises": "ValueError"
+       },
+       "isort.literal.assignment.input9": {
+        "raises": "ValueError"
+       }
+      },
+      {
+       "isort.literal.assignment.input0": {
+        "raises": "ValueError"
+       },
+       "isort.literal.assignment.input1": {
+        "raises": "ValueError"
+       },
+       "isort.literal.assignment.input10": {
+        "raises": "TypeError"
+       },
+       "isort.literal.assignment.input11": {
+        "raises": "TypeError"
+       },
+       "isort.literal.assignment.input2": {
+        "raises": "ValueError"
+       },
+       "isort.literal.assignment.input3": {
+        "raises": "ValueError"
+       },
+       "isort.literal.assignment.input4": {
+        "raises": "ValueError"
+       },
+       "isort.literal.assignment.input5": {
+        "raises": "TypeError"
+       },
+       "isort.literal.assignment.input6": {
+        "raises": "ValueError"
+       },
+       "isort.literal.assignment.input7": {
+        "raises": "ValueError"
+       },
+       "isort.literal.assignment.input8": {
+        "raises": "ValueError"
+       },
+       "isort.literal.assignment.input9": {
+        "raises": "ValueError"
+       }
+      },
+      {
+       "isort.literal.assignment.input0": {
+        "raises": "ValueError"
+       },
+       "isort.literal.assignment.input1": {
+        "raises": "ValueError"
+       },
+       "isort.literal.assignment.input10": {
+        "raises": "TypeError"
+       },
+       "isort.literal.assignment.input11": {
+        "raises": "TypeError"
+       },
+       "isort.literal.assignment.input2": {
+        "raises": "ValueError"
+       },
+       "isort.literal.assignment.input3": {
+        "raises": "ValueError"
+       },
+       "isort.literal.assignment.input4": {
+        "raises": "ValueError"
+       },
+       "isort.literal.assignment.input5": {
+        "raises": "TypeError"
+       },
+       "isort.literal.assignment.input6": {
+        "raises": "ValueError"
+       },
+       "isort.literal.assignment.input7": {
+        "raises": "ValueError"
+       },
+       "isort.literal.assignment.input8": {
+        "raises": "ValueError"
+       },
+       "isort.literal.assignment.input9": {
+        "raises": "ValueError"
+       }
+      }
+     ],
+     "pr": [
+      {
+       "isort.literal.assignment.input0": {
+        "raises": "ValueError"
+       },
+       "isort.literal.assignment.input1": {
+        "raises": "ValueError"
+       },
+       "isort.literal.assignment.input10": {
+        "raises": "TypeError"
+       },
+       "isort.literal.assignment.input11": {
+        "raises": "TypeError"
+       },
+       "isort.literal.assignment.input2": {
+        "raises": "ValueError"
+       },
+       "isort.literal.assignment.input3": {
+        "raises": "ValueError"
+       },
+       "isort.literal.assignment.input4": {
+        "raises": "ValueError"
+       },
+       "isort.literal.assignment.input5": {
+        "raises": "TypeError"
+       },
+       "isort.literal.assignment.input6": {
+        "raises": "ValueError"
+       },
+       "isort.literal.assignment.input7": {
+        "raises": "ValueError"
+       },
+       "isort.literal.assignment.input8": {
+        "raises": "ValueError"
+       },
+       "isort.literal.assignment.input9": {
+        "raises": "ValueError"
+       }
+      },
+      {
+       "isort.literal.assignment.input0": {
+        "raises": "ValueError"
+       },
+       "isort.literal.assignment.input1": {
+        "raises": "ValueError"
+       },
+       "isort.literal.assignment.input10": {
+        "raises": "TypeError"
+       },
+       "isort.literal.assignment.input11": {
+        "raises": "TypeError"
+       },
+       "isort.literal.assignment.input2": {
+        "raises": "ValueError"
+       },
+       "isort.literal.assignment.input3": {
+        "raises": "ValueError"
+       },
+       "isort.literal.assignment.input4": {
+        "raises": "ValueError"
+       },
+       "isort.literal.assignment.input5": {
+        "raises": "TypeError"
+       },
+       "isort.literal.assignment.input6": {
+        "raises": "ValueError"
+       },
+       "isort.literal.assignment.input7": {
+        "raises": "ValueError"
+       },
+       "isort.literal.assignment.input8": {
+        "raises": "ValueError"
+       },
+       "isort.literal.assignment.input9": {
+        "raises": "ValueError"
+       }
+      },
+      {
+       "isort.literal.assignment.input0": {
+        "raises": "ValueError"
+       },
+       "isort.literal.assignment.input1": {
+        "raises": "ValueError"
+       },
+       "isort.literal.assignment.input10": {
+        "raises": "TypeError"
+       },
+       "isort.literal.assignment.input11": {
+        "raises": "TypeError"
+       },
+       "isort.literal.assignment.input2": {
+        "raises": "ValueError"
+       },
+       "isort.literal.assignment.input3": {
+        "raises": "ValueError"
+       },
+       "isort.literal.assignment.input4": {
+        "raises": "ValueError"
+       },
+       "isort.literal.assignment.input5": {
+        "raises": "TypeError"
+       },
+       "isort.literal.assignment.input6": {
+        "raises": "ValueError"
+       },
+       "isort.literal.assignment.input7": {
+        "raises": "ValueError"
+       },
+       "isort.literal.assignment.input8": {
+        "raises": "ValueError"
+       },
+       "isort.literal.assignment.input9": {
+        "raises": "ValueError"
+       }
+      }
+     ]
+    },
+    "source": "diff",
+    "status": "ran",
+    "target": "PyCQA/isort#2737"
+   }
+  ]
+ },
+ "repo": "PyCQA/isort",
+ "verdict_at_fcc3c08": "needs_attention"
+}

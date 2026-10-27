@@ -1,0 +1,97 @@
+{
+ "baseline": "full",
+ "behaviour_claims": [],
+ "comparison": null,
+ "exit_check": null,
+ "files": {
+  "all": [
+   "AUTHORS",
+   "changelog/14998.bugfix.rst",
+   "src/_pytest/tmpdir.py",
+   "testing/test_tmpdir.py"
+  ],
+  "compiled": [],
+  "other": [
+   "AUTHORS",
+   "changelog/14998.bugfix.rst",
+   "src/_pytest/tmpdir.py",
+   "testing/test_tmpdir.py"
+  ],
+  "package_py": []
+ },
+ "model_rejected_claims": [],
+ "pr": 15265,
+ "probes": {
+  "items": [
+   {
+    "about": "tmp_path fixture teardown behavior when policy='failed' and teardown fails in a dependent fixture",
+    "claims": [
+     {
+      "covers": [
+       "C1*"
+      ],
+      "expect": "differs",
+      "id": "C1",
+      "source": "PR description",
+      "text": "With tmp_path_retention_policy='failed', temporary directories are not removed when fixture setup or teardown fails."
+     },
+     {
+      "covers": [
+       "C2*"
+      ],
+      "expect": "differs",
+      "id": "C2",
+      "source": "PR description",
+      "text": "Cleanup of temporary directories is deferred until the teardown report is available, so pytest considers failures during setup, call, and teardown when deciding retention."
+     }
+    ],
+    "id": "model-p1",
+    "observations": [
+     {
+      "claim": null,
+      "label": "no_difference",
+      "main": false,
+      "name": "tmp_path.retained.when_teardown_fails.policy_failed",
+      "pr": false,
+      "state": "same"
+     }
+    ],
+    "probe_changed_line_coverage": {
+     "adequacy": "unmeasured",
+     "note": "probe coverage not measured (coverage run produced no data; see probe-coverage.log)",
+     "status": "not measured",
+     "why": "coverage run produced no data; see probe-coverage.log"
+    },
+    "runs": {
+     "main": [
+      {
+       "tmp_path.retained.when_teardown_fails.policy_failed": false
+      },
+      {
+       "tmp_path.retained.when_teardown_fails.policy_failed": false
+      },
+      {
+       "tmp_path.retained.when_teardown_fails.policy_failed": false
+      }
+     ],
+     "pr": [
+      {
+       "tmp_path.retained.when_teardown_fails.policy_failed": false
+      },
+      {
+       "tmp_path.retained.when_teardown_fails.policy_failed": false
+      },
+      {
+       "tmp_path.retained.when_teardown_fails.policy_failed": false
+      }
+     ]
+    },
+    "source": "model",
+    "status": "rejected",
+    "target": "pytest-dev/pytest#15265"
+   }
+  ]
+ },
+ "repo": "pytest-dev/pytest",
+ "verdict_at_fcc3c08": "could_not_verify"
+}

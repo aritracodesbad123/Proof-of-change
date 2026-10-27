@@ -46,13 +46,38 @@ def _norm(s: str) -> str:
     return re.sub(r"\s+", " ", s or "").strip()
 
 
-def grounded_claims(raw: dict, title: str, body: str | None) -> tuple[list, list]:
-    """(kept, rejected): a claim is kept only if its source_quote is found in the title or description."""
+# Product checks only: a quote may lose its Markdown when the model copies it ("`a=b`" quoted as "a=b"). These
+# characters are compared loosely. Study runs keep the exact match.
+_LOOSE_DROP = re.compile(r"[`*_]")
+_LOOSE_MAP = str.maketrans({"\u2010": "-", "\u2011": "-", "\u2012": "-", "\u2013": "-", "\u2014": "-",
+                            "\u2015": "-", "\u2212": "-", "\u2018": "'", "\u2019": "'", "\u201a": "'",
+                            "\u201b": "'", "\u2032": "'", "\u201c": '"', "\u201d": '"', "\u201e": '"',
+                            "\u201f": '"', "\u2033": '"', "\u2192": "->", "\u27f6": "->", "\u21d2": "=>",
+                            "\u27f9": "=>"})
+
+
+def loose_norm(s: str) -> str:
+    """Whitespace collapsed, Markdown marks (backticks, *, _) removed, dashes, arrows and quotes unified."""
+    return _norm(_LOOSE_DROP.sub("", (s or "").translate(_LOOSE_MAP)))
+
+
+def grounded_claims(raw: dict, title: str, body: str | None, loose: bool = False) -> tuple[list, list]:
+    """(kept, rejected): a claim is kept only if its source_quote is found in the title or description.
+
+    loose (product checks only): a quote that is not found as written is compared again after loose_norm on both
+    sides. A claim kept that way carries quote_match "loose", so the record shows every such match."""
     text = _norm(title) + " \n " + _norm(body)
+    loose_text = (loose_norm(title) + " \n " + loose_norm(body)) if loose else ""
     kept, rejected = [], []
     for c in (raw or {}).get("claims", [])[:20]:
         q = _norm(c.get("source_quote", ""))
-        ok = bool(q) and q in text and c.get("expect") in ("same", "differs") and c.get("id")
+        valid = c.get("expect") in ("same", "differs") and c.get("id")
+        ok = bool(q) and q in text and valid
+        if not ok and loose and valid:
+            lq = loose_norm(c.get("source_quote", ""))
+            if lq and lq in loose_text:
+                kept.append(c | {"quote_match": "loose"})
+                continue
         (kept if ok else rejected).append(c | ({} if ok else {"rejected": "source_quote not found in the PR text"}))
     return kept, rejected
 
@@ -254,8 +279,11 @@ def generate(provider: Provider, repo: str, pr: int, title: str, body: str | Non
     except ProviderError as e:
         out["errors"].append(str(e))
         return out
-    kept, rejected = grounded_claims(raw, title, body)
+    kept, rejected = grounded_claims(raw, title, body, loose=product)
     out["claims"], out["rejected_claims"] = kept, rejected
+    loose = [{"claim": c.get("id"), "source_quote": c.get("source_quote")} for c in kept if c.get("quote_match") == "loose"]
+    if loose:
+        out["loose_quote_matches"] = loose
     testable = [c for c in kept if c.get("testable")]
     if not testable and not base_files:
         return out
