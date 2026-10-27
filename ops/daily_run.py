@@ -2720,6 +2720,12 @@ def _aggregate_names(rec: dict) -> list[str]:
     return [str(n) for n in plan.get("aggregate_names") or []]
 
 
+def parallel_on(a) -> bool:
+    """POC_PARALLEL=1 (off by default): product checks only build both Contree checkpoints at once, prepare them
+    while probes are written, and run each main/PR pair of timed runs at the same time. Study runs never use it."""
+    return product_route(a) and (os.environ.get("POC_PARALLEL") or "").strip().lower() in {"1", "true", "yes", "on"}
+
+
 def _contree_ready() -> bool:
     from poc import contree_sandboxes
     sess = contree_sandboxes.session()
@@ -2741,7 +2747,8 @@ def _maybe_prepare_contree(a, repo: str, main_sha: str, pr_sha: str, rec: dict, 
     try:
         sess = contree_sandboxes.prepare_source_pair(repo, main_sha, pr_sha, timeout=timeout, extra_shell=extra_shell,
                                                      **({"deps_only_fallback": True, "deps_exclude": _aggregate_names(rec),
-                                                        "retry_transient": True}
+                                                        "retry_transient": True,
+                                                        **({"parallel": True} if parallel_on(a) else {})}
                                                         if product_route(a) else {}))
         rec["contree"] = sess.describe()
         rec["machine"] = "contree"
@@ -2854,14 +2861,17 @@ def _contree_pytest_once(side: str, targets: list[str], test_timeout: int, run_t
 
 def run_tests(side_venvs: dict, targets_by_side: dict, rdir: Path, workdir: Path, runs: int, workers: str,
               test_timeout: int, run_timeout: int, cwds: dict | None = None,
-              keep_addopts: bool = False) -> tuple[list[dict], dict]:
-    """targets are relative to site-packages (nightly routes) or to the side's checkout (cwds given).
+              keep_addopts: bool = False, parallel: bool = False) -> tuple[list[dict], dict]:
+    """parallel (POC_PARALLEL, Contree only): run i's main and PR pytest start together in their own sandboxes;
+    results are recorded in the same order as the serial schedule.
+    targets are relative to site-packages (nightly routes) or to the side's checkout (cwds given).
     per_run entries use the shared schema shape (side old/new, all counts present).
     When a Contree session with main/PR checkpoints is active, pytest runs remotely (source-pair)."""
     from poc import run_progress
     use_contree = _contree_ready() and cwds is not None
     envs = ({side: base_env(side_home(v)) for side, v in side_venvs.items()} if not use_contree else {})
     per_run, results = [], {"main": [], "pr": []}
+    pending_pr = None
     for i in range(1, runs + 1):
         for side in ("main", "pr"):
             run_progress.emit("pytest", "code", f"before run {i}/{runs}")
@@ -2882,7 +2892,19 @@ def run_tests(side_venvs: dict, targets_by_side: dict, rdir: Path, workdir: Path
                 run_progress.emit("pytest", "code", f"after run {i}/{runs}")
                 continue
             if use_contree:
-                rc, secs = _contree_pytest_once(side, tg, test_timeout, run_timeout, workers, jx, lg, keep_addopts)
+                if parallel and side == "main" and all(targets_by_side[s] for s in ("main", "pr")):
+                    from concurrent.futures import ThreadPoolExecutor
+                    with ThreadPoolExecutor(max_workers=2) as ex:
+                        futs = {s: ex.submit(_contree_pytest_once, s, list(targets_by_side[s]), test_timeout,
+                                             run_timeout, workers, rdir / f"junit-{s}-{i}.xml",
+                                             rdir / f"pytest-{s}-{i}.log", keep_addopts) for s in ("main", "pr")}
+                        pending_pr = futs["pr"]
+                    rc, secs = futs["main"].result()
+                elif parallel and side == "pr" and pending_pr is not None:
+                    rc, secs = pending_pr.result()
+                    pending_pr = None
+                else:
+                    rc, secs = _contree_pytest_once(side, tg, test_timeout, run_timeout, workers, jx, lg, keep_addopts)
             else:
                 cmd = [venv / "bin/python", "-m", "pytest", *tg, "-p", "no:cacheprovider", "-q", "-rfE",
                        f"--timeout={test_timeout}", *repo_addopts_args(keep_addopts), "-o", "junit_family=xunit2",
@@ -4426,6 +4448,8 @@ def _contree_only_pair(a, rec: dict, repo: str, cfg: dict, item: dict, sp: dict,
     for v in (vm, vp):
         (v / "bin").mkdir(parents=True, exist_ok=True)
     setup_plan = _product_plan(a, rec, repo, cfg, [cm, cp], out_dir=prdir) if helper_on else None
+    if parallel_on(a):
+        return _contree_only_pair_parallel(a, rec, repo, cfg, item, sp, work, prdir, setup_plan)
     run_progress.emit("claims", "super", "planning behaviour claims / probes")
     plan = plan_probes(repo, item, rec, cm, [cp, work / "src"], prdir, a)
     rec["pr_side_started_at"] = pr_started = freeze.now()   # nothing below may create or change a probe
@@ -4473,6 +4497,93 @@ def _contree_only_pair(a, rec: dict, repo: str, cfg: dict, item: dict, sp: dict,
         per_run, results = run_tests({"main": vm, "pr": vp}, targets, prdir, work, a.runs, a.workers,
                                      a.test_timeout, a.run_timeout, cwds={"main": cm, "pr": cp},
                                      keep_addopts=product_route(a))
+        cmp, cnv, ex = finalize_tests(rec, per_run, results, a)
+        if cmp:
+            ex = exit_check(rec.get("per_run", []), results, cmp)
+            rec["exit_check"] = ex
+    if measure_coverage and targets["pr"] and not cnv:
+        run_progress.emit("pytest", "code", "coverage inside Contree")
+        rec["coverage"] = contree_coverage_run(item, cm, cp, targets["pr"], prdir, a)
+    run_progress.emit("probes", "super", "running behaviour probes (Contree)")
+    rec["probes"] = run_probes(repo, item["pr"], {"main": vm / "bin/python", "pr": vp / "bin/python"}, prdir,
+                               work, a, plan, pr_started)
+    from poc import probe_adequacy
+    if measure_coverage:  # product route: each probe runs once more on the main checkpoint under coverage
+        run_progress.emit("probes", "super", "probe coverage inside Contree")
+        rec["probe_changed_line_coverage"] = contree_probe_coverage(item, rec["probes"], cm, cp, prdir, a)
+    else:
+        for it in (rec["probes"] or {}).get("items") or []:
+            it["probe_changed_line_coverage"] = probe_adequacy.assess(
+                {"status": "not measured", "why": "Contree-only check: probe coverage needs a local side"})
+        rec["probe_changed_line_coverage"] = probe_adequacy.summary((rec["probes"] or {}).get("items") or [])
+    settle_probes(rec)
+    if change_is_docstring_only(rec.get("files"), cm, cp):
+        rec["docstring_only"] = True
+    return cmp, cnv, ex, targets
+
+
+
+def _contree_only_pair_parallel(a, rec: dict, repo: str, cfg: dict, item: dict, sp: dict, work: Path, prdir: Path,
+                                setup_plan) -> tuple:
+    """POC_PARALLEL=1 version of _contree_only_pair: the same steps and verdict inputs, but the Contree checkpoints
+    are prepared while the probes are written (probe planning reads only local files and the model), and each pair of
+    timed runs starts main and PR together. Probes are still frozen before any pull-request code runs: the PR
+    checkpoint install runs only the project's install, never a probe, and pr_side_started_at is set after both."""
+    from concurrent.futures import ThreadPoolExecutor
+    from poc import demo_helper, run_progress
+    vm, vp = work / "venv-main", work / "venv-pr"
+    cm, cp = work / "side-main", work / "side-pr"
+    chosen_tg = chosen_test_targets(item.get("chosen"))
+    if chosen_tg:
+        targets = {"main": [t for t in chosen_tg if (cm / t).exists()],
+                   "pr": [t for t in chosen_tg if (cp / t).exists()]}
+    else:
+        targets = targets_for_sides(map_repo_tests(item["files"], cp), item["files"], cm, cp)
+    rec["test_targets"] = targets
+    rec["test_selection"] = ("chosen-PR subset: " if chosen_tg else "mapped from touched files: ") + ", ".join(
+        targets["pr"])
+    decl = declared_test_deps(cm, list(dict.fromkeys(targets["main"] + targets["pr"])), cfg["dist"])
+    optional = optional_backend_reqs(cm, cfg["dist"])
+    base = demo_helper.contree_shell(setup_plan) if setup_plan else ""
+    measure_coverage = product_route(a)
+    not_local = ["local freeze", "installed-commit guard", "probe coverage", "optional-module retry"]
+    if not measure_coverage:
+        not_local.insert(2, "coverage")
+    rec["contree_only"] = {"note": "Contree mode: Contree has not run yet; nothing from the pull request ran locally",
+                           "declared_test_deps": decl, "optional_backends": optional,
+                           "not_run_locally": not_local}
+    rec["coverage"] = {"status": "not measured", "why": CONTREE_ONLY_COVERAGE_WHY}
+    run_progress.emit("install_main", detail="installing main and PR sides in Contree")
+    blocked = _groups_blocked(a, setup_plan)
+    if blocked:
+        rec["contree_only"]["note"] = "Contree mode: Contree did not run, so nothing from the pull request was run"
+        return None, blocked, None, targets
+    with ThreadPoolExecutor(max_workers=1) as pool:
+        prep = pool.submit(_maybe_prepare_contree, a, repo, sp["main_sha"], sp["pr_sha"], rec, a.build_timeout,
+                         extra_shell=contree_only_extra_shell(decl, optional, base), main_dir=cm)
+        run_progress.emit("claims", "super", "planning behaviour claims / probes")
+        try:
+            plan = plan_probes(repo, item, rec, cm, [cp, work / "src"], prdir, a)
+        finally:
+            cnv = prep.result()
+    rec["pr_side_started_at"] = pr_started = freeze.now()   # nothing below may create or change a probe
+    cnv = own_index_refusal(a, cnv, cm, cp)
+    cmp = ex = None
+    if cnv:
+        rec["contree_only"]["note"] = "Contree mode: Contree did not run, so nothing from the pull request was run"
+        return cmp, cnv, ex, targets
+    rec["contree_only"]["note"] = ("Contree mode: installs, tests and probes ran in Contree; nothing from the pull "
+                                   "request ran locally")
+    if decl:
+        rec["declared_test_deps"] = {"requested": decl, "installed": True, "where": "contree"}
+        rec["test_extras"] = list(dict.fromkeys([*(rec.get("test_extras") or []), *decl]))
+    if not targets["pr"]:
+        cnv = "no tests could be mapped to the touched files"
+    else:
+        run_progress.emit("pytest", "code", "dual-run pytest on main and PR (Contree)")
+        per_run, results = run_tests({"main": vm, "pr": vp}, targets, prdir, work, a.runs, a.workers,
+                                     a.test_timeout, a.run_timeout, cwds={"main": cm, "pr": cp},
+                                     keep_addopts=product_route(a), parallel=True)
         cmp, cnv, ex = finalize_tests(rec, per_run, results, a)
         if cmp:
             ex = exit_check(rec.get("per_run", []), results, cmp)

@@ -402,6 +402,19 @@ class ContreeSession:
         return {"backend": "contree", "kind": "pr", "uuid": self.pr_uuid, "from": self.main_uuid,
                 "disposable": False}
 
+    def build_pr_from_base(self, install_shell: str, *, timeout: int = 1800) -> dict:
+        """Parallel mode only: build the PR checkpoint in its own sandbox from the base image, not forked from main,
+        so it can be built at the same time as main. Same install shell as fork_pr."""
+        shell = f"set -euo pipefail\nmkdir -p /work\ncd /work\n{install_shell}"
+        raw = self.run_op("base", shell, disposable=False, timeout=timeout)
+        if raw.get("exit_code") != 0:
+            raise setup_failure("PR checkpoint install", raw)
+        uuid = raw.get("uuid")
+        if not uuid:
+            raise ContreeError("PR checkpoint returned no reusable image id")
+        self.pr_uuid = str(uuid)
+        return {"backend": "contree", "kind": "pr", "uuid": self.pr_uuid, "from": "base", "disposable": False}
+
     def run_argv(self, side: str, argv: list, *, timeout: int = 600, cwd: str = "/work/src",
                  files: dict | None = None) -> dict:
         """Run argv on a side checkpoint; returns exit_code/stdout/stderr like a local subprocess."""
@@ -627,13 +640,25 @@ def install_shell_source(repo: str, sha: str, extra: str = "", deps_only_fallbac
 def prepare_source_pair(repo: str, main_sha: str, pr_sha: str, *, timeout: int = 1800,
                         runner: Callable | None = None, extra_shell: str = "",
                         deps_only_fallback: bool = False, deps_exclude=(),
-                        retry_transient: bool = False) -> ContreeSession:
+                        retry_transient: bool = False, parallel: bool = False) -> ContreeSession:
     """Build main + PR Contree checkpoints for a source-pair style PR.
 
-    extra_shell is applied to both SHAs. Empty keeps the default install shell.
+    extra_shell is applied to both SHAs. Empty keeps the default install shell. parallel (POC_PARALLEL, product
+    checks only) builds both checkpoints at once in separate sandboxes from the base image; off keeps the fork.
     """
     kw = {"retry_transient": True} if retry_transient else {}
     sess = new_session(runner=runner, **kw) if runner is not None else new_session(**kw)
+    if parallel:
+        from concurrent.futures import ThreadPoolExecutor
+        with ThreadPoolExecutor(max_workers=2) as ex:
+            fm = ex.submit(sess.checkpoint_main, install_shell_source(repo, main_sha, extra_shell, deps_only_fallback,
+                                                                      deps_exclude), timeout=timeout)
+            fp = ex.submit(sess.build_pr_from_base, install_shell_source(repo, pr_sha, extra_shell,
+                                                                         deps_only_fallback, deps_exclude),
+                           timeout=timeout)
+            fm.result()   # main's failure is reported first, as in the serial order
+            fp.result()
+        return sess
     sess.checkpoint_main(install_shell_source(repo, main_sha, extra_shell, deps_only_fallback, deps_exclude), timeout=timeout)
     sess.fork_pr(install_shell_source(repo, pr_sha, extra_shell, deps_only_fallback, deps_exclude), timeout=timeout)
     return sess
