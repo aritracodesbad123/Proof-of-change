@@ -8,6 +8,8 @@ import sys
 from pathlib import Path
 from types import SimpleNamespace
 
+import pytest
+
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "ops"))
@@ -115,3 +117,28 @@ def test_daily_run_refuses_both_flags_before_any_work():
                           cwd=str(ROOT), env=env, capture_output=True, text=True, timeout=120)
     assert proc.returncode != 0
     assert "cannot be used together" in proc.stderr
+
+
+def test_hosted_typed_key_is_neither_stored_nor_used(monkeypatch):
+    _hosted(monkeypatch)
+    console_api.apply_start_fields("tok-g", {"nebius_api_key": TYPED_KEY, "tavily_api_key": TYPED_KEY,
+                                             "contree_project_id": TYPED_PROJECT})
+    assert not session_key.get_key("tok-g")
+    assert not session_key.get_tavily_key("tok-g")
+    assert not session_key.get_contree_project("tok-g")
+    # Even a key already in the session is not used on hosted.
+    session_key.set_key("tok-g", TYPED_KEY)
+    base = {"PATH": "/usr/bin", "POC_HOSTED": "1", "NEBIUS_API_KEY": SERVER_KEY,
+            "NEBIUS_PROJECT_ID": SERVER_PROJECT}
+    for contree in (False, True):
+        env, _ = console_api.child_environment(base, "nebius", "tok-g", contree=contree)
+        assert env["NEBIUS_API_KEY"] == SERVER_KEY
+        assert TYPED_KEY not in env.values()
+    assert console_api.resolve_console_provider("nebius", "tok-g") == ("nebius", None)
+
+
+@pytest.mark.real_key_gate
+def test_hosted_without_server_key_has_no_key(monkeypatch):
+    _hosted(monkeypatch, key=None, project=None)
+    session_key.set_key("tok-h", TYPED_KEY)
+    assert console_api._has_typed_key("tok-h") is False

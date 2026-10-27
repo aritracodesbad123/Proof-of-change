@@ -58,7 +58,11 @@ def resolve_console_provider(requested: str, session_token: str | None = None) -
     """Live checks need a key typed into this session. The server's key is never used. Otherwise recorded answers."""
     if requested != "nebius":
         return requested, None
-    if session_key.has_key(session_token):
+    if hosted_console():
+        # A hosted console's model calls use only the server's key (a decision; see the decision log).
+        if (os.environ.get("NEBIUS_API_KEY") or "").strip():
+            return "nebius", None
+    elif session_key.has_key(session_token):
         return "nebius", None
     return "recorded", (
         "No Nebius key for this session, so this check uses the recorded AI answers. "
@@ -77,11 +81,16 @@ def child_environment(base: dict[str, str], provider: str, session_token: str | 
     pasted = session_key.get_key(session_token)
     if pasted and len(pasted) >= 8:
         secrets.append(pasted)
-    # A user check never runs on the server's Nebius account: drop the server's values, keep them only for redaction.
+    # Drop the server's values (kept only for redaction). A local check never runs on the server's Nebius account;
+    # a hosted check gets the server key back below.
     for name in ("NEBIUS_API_KEY", "NEBIUS_PROJECT_ID", "CONTREE_PROJECT_ID"):
         server_value = (env.pop(name, None) or "").strip()
         if len(server_value) >= 8 and server_value not in secrets:
             secrets.append(server_value)
+    if hosted_console(base):
+        pasted = None   # a hosted console never uses a typed key
+        if provider == "nebius" and len(host) >= 8:
+            env["NEBIUS_API_KEY"] = host   # hosted model calls use the server's key
     if provider == "nebius" and pasted:
         env["NEBIUS_API_KEY"] = pasted
     from poc import console_auth
@@ -673,7 +682,10 @@ def _read_child(proc: subprocess.Popen, logf, collected: list[str], deadline: fl
 
 
 def _has_typed_key(session_token: str | None) -> bool:
-    """Whether this session has the user's own typed Nebius key. The server's key never counts."""
+    """Whether this check has a Nebius key it may use. Locally: the user's own typed key; the server's never
+    counts. Hosted: only the server setting counts; a typed key is never stored or used."""
+    if hosted_console():
+        return bool((os.environ.get("NEBIUS_API_KEY") or "").strip())
     return session_key.has_key(session_token)
 
 
@@ -804,10 +816,11 @@ def apply_start_fields(session_token: str | None, body: dict) -> None:
     Raises ValueError with a plain message. Values are never echoed, logged, or written to disk.
     """
     from poc import console_auth
+    # A hosted console stores no typed key or project ID at all: the server settings are the only ones.
+    if hosted_console():
+        return
     setters = [("nebius_api_key", session_key.set_key)]
-    # A hosted console reads the Contree project ID only from the server setting. A typed value is not read.
-    if not hosted_console():
-        setters.extend((name, session_key.set_contree_project) for name in _PROJECT_FIELDS)
+    setters.extend((name, session_key.set_contree_project) for name in _PROJECT_FIELDS)
     # A hosted console never reads a typed Tavily key. The server setting is the only one.
     if console_auth.single_user_requested():
         setters.insert(1, ("tavily_api_key", session_key.set_tavily_key))
