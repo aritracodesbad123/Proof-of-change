@@ -6,7 +6,7 @@ A test that passes on every run of the current code, and passes on some runs of 
 
 A test that is flaky on both sides is still only listed. It does not decide the verdict. The same split applies to a probe observation.
 
-The setup rerun is the only step that can raise could not verify to verified. Before it does, probe line coverage is measured again, but only when the change is small (200 changed lines or fewer). A larger change skips that measurement, and the rerun then cannot raise the verdict to verified.
+A setup repair only lets the check run again. The verdict comes from the same rules as any other run. Probe line coverage is measured again only when the change is small (200 changed lines or fewer). A larger change skips that measurement, and the verdict stays could not verify.
 
 A web search can suggest package names. Those names are installed only when the package's page on the Python package index links back to the same repository. The package author writes that link. It stops an accident. It does not stop someone who is trying to get a bad package installed.
 
@@ -22,7 +22,7 @@ Ignoring a failure that shows up only on the pull request treats a possible brea
 
 - Count a result that is stable on the base and unstable only on the pull request as a possible regression. Needs attention when it can be called. Could not verify when it is too mixed to call. Never verified.
 - Keep today's handling when a result is flaky on both sides.
-- Recompute probe line coverage after a setup rerun, and only then allow could not verify to become verified. Skip that measurement when the change is larger than 200 lines, and do not raise the verdict in that case.
+- Recompute probe line coverage after a setup rerun, and only for a change of 200 lines or fewer. Skip that measurement when the change is larger, and leave the verdict could not verify in that case.
 - Say plainly that a suggested package is installed only when its package-index page links back to the same repository, and that this stops accidents, not a determined attacker.
 - Label a probe result that is stable on the base and too mixed to call on the pull request as unstable on the pull request, not as flaky.
 - Treat a measurement with no changed lines as not adequate, so a setup rerun cannot become verified from it.
