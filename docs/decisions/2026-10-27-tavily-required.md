@@ -5,32 +5,45 @@
 A product check now refuses to start when `TAVILY_API_KEY` is missing or blank. The message is one line. It
 names the variable and says a check cannot run without the setup lookup. It never prints the key.
 
-A product check is a single pull request started from the operator console, the request-a-check worker, the
-daily product check, a Codespace, or the GitHub App. If the lookup fails while that check is running (the
-service returns an error, the call times out, or the response is empty or not usable), the check stops. The
-result is could not verify, and the record stores the reason in plain words. The record also stores the
-queries, how many results came back, and each source title and URL, so the report can show them.
+A product check is one pull request started with `--product-check`: the operator console, the
+request-a-check worker, a Codespace check, or the GitHub App. The daily study is not a product check.
+It is the library sweep with no single pull request. A study run (a benchmark) does not call the lookup.
+The daily study still skips it when the key is not set, and a failed lookup does not stop that run.
 
-A study run and the daily study are unchanged. A study run does not call the lookup. The daily study still
-skips it when the key is not set, and a failed lookup does not stop that run.
+If the setup lookup fails while a product check is running, before a verdict exists, the check stops.
+The result is could not verify, and the record stores the reason in plain words. The record also stores
+the queries, how many results came back, and each source title and URL, so the report can show them.
+
+Related public bug reports are quoted background for the advisory write-up. If that later lookup fails,
+the reason is recorded and the reports are left out of the write-up. The verdict stays as the check
+already decided.
+
+On a hosted console the Tavily key is a private server setting, `TAVILY_API_KEY`. The start form does
+not ask for one, and a typed value is not read. If the server key is missing, the check refuses with
+one line that says the operator needs to set it. A Codespace or other local run still refuses when its
+own key is missing.
 
 ## Why
 
 The lookup used to be optional. A missing key wrote a skip line and the check continued. A person reading
-the result could not tell that the setup sources had never been looked up. The same thing happened when the
-call failed: the check kept going and the result looked finished.
+the result could not tell that the setup sources had never been looked up. The same thing happened when
+the setup call failed: the check kept going and the result looked finished.
+
+A hosted console must not ask a visitor to type a Tavily key. That key belongs on the server.
 
 ## Decision
 
 - Stop before a product check starts when `TAVILY_API_KEY` is missing or blank. Do not continue.
-- Stop a product check that is already running when the lookup fails. Record could not verify and the reason.
-  A valid response with zero hits is a finished lookup, not a failure.
+- Stop a product check that is already running when the setup lookup fails, before a verdict exists.
+  Record could not verify and the reason. A valid response with zero hits is a finished lookup, not a failure.
 - Store the queries, the result count, and the source titles and URLs on the result record.
-- On the hosted console, only a key typed into the session counts. The server's key is not used for a
-  visitor's check. With no typed key, the check is refused. A Codespace still accepts the `TAVILY_API_KEY`
-  secret from the environment, because that secret belongs to the person running the Codespace.
+- If the related-reports lookup fails after the verdict, record the redacted reason and leave that
+  background out of the advisory write-up. Do not change the verdict.
+- On a hosted console, use only the server's `TAVILY_API_KEY`. Do not show a Tavily field and do not
+  read a typed value. Refuse with one line when the server key is missing.
+- On a Codespace or other local run, keep the rule that a missing key refuses the check.
 - Playing back the saved sample does not run a check, so it does not need the key.
-- Leave study runs and the daily study as they are.
+- Leave study runs and the daily study as they are. The daily study is not a product check.
 
 ## Alternatives and tradeoffs
 
@@ -40,12 +53,14 @@ call failed: the check kept going and the result looked finished.
 - Require the key for a study run and the daily study as well. Those runs are compared with earlier runs
   that did not depend on the lookup. Changing them would mix a setup failure into results that are meant to
   stay comparable.
-- Commit one shared key in the repository. That would expose the key. Each person sets their own. Tavily
-  keys are free.
+- Ask each hosted visitor to type a key. That puts a server setting into the form. The hosted key stays
+  on the server.
+- Commit one shared key in the repository. That would expose the key. The operator sets it on the server.
+  A person running a Codespace sets their own. Tavily keys are free.
 
 ## What it means for you
 
-Set `TAVILY_API_KEY` before a product check. In the console, type your own key into the start form. In a
-Codespace, set the recommended secret or type the key into the form. Keys are free at
-https://app.tavily.com/. Do not commit a key. A study run and the daily study do not need the key for this
-lookup.
+Set `TAVILY_API_KEY` before a product check. On a hosted console the operator sets it on the server. The
+form does not ask for it. In a Codespace, set the recommended secret or type the key into the form. Keys
+are free at https://app.tavily.com/. Do not commit a key. A study run and the daily study do not need
+the key for this lookup.

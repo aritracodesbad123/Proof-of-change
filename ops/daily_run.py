@@ -4535,23 +4535,21 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
 
 
 def _record_related_failure(rec: dict, payload: dict) -> None:
-    """A refused or failed related-reports lookup stops the check as could not verify."""
+    """Store the related-reports lookup. A failure does not change the verdict.
+
+    The reports only feed the advisory write-up. When the lookup fails, that step is
+    skipped: the reason is already on the payload, and the verdict stays as it was.
+    """
     rec["related_reports"] = payload
-    if not isinstance(payload, dict) or payload.get("status") not in ("refused", "error"):
-        return
-    from poc import related_reports
-    reason = str(payload.get("reason") or related_reports.FAIL_LOG)
-    rec["verdict"] = "could_not_verify"
-    rec["reason"] = reason
 
 
 def _attach_related_reports(rec: dict, runner) -> None:
     """Store related bug reports when this product check asked and the swarm will run.
 
     The text is background for the advisory AI. A study run, the daily study, and a check
-    whose swarm is off leave the record alone and do not call Tavily. A missing key refuses.
-    A failed lookup stops the check as could not verify. The exception text is not printed
-    raw, because it can contain the key.
+    whose swarm is off leave the record alone and do not call Tavily. A missing key is
+    recorded as a refusal. A failed lookup is recorded and left out of the write-up. Neither
+    changes the verdict. The exception text is not printed raw, because it can contain the key.
     """
     from poc import agents, related_reports
     if not agents.swarm_enabled(bool(getattr(runner, "swarm", False))):
@@ -4593,16 +4591,11 @@ def finish(rec: dict, prdir: Path, work: Path, t0: float, runner=None) -> dict:
     elif (swarm_requested and runner is not None and getattr(runner, "provider", None) is not None
             and not getattr(runner, "model_skipped", None)):
         # Related bug reports are background for this advisory step only. A failed lookup
-        # stops the check as could not verify. When the swarm is off, Tavily is not called.
+        # is recorded and left out of the write-up. It does not change the verdict.
+        # When the swarm is off, Tavily is not called.
         _attach_related_reports(rec, runner)
-        related = rec.get("related_reports") if isinstance(rec.get("related_reports"), dict) else {}
-        if related.get("status") in ("refused", "error"):
-            note = "the check stopped because the Tavily lookup failed"
-            rec["agents"] = {"status": "skipped", "note": note, "roles": []}
-            rec.setdefault("explanation", {"status": "not yet wired", "why": note})
-        else:
-            agents.run_swarm(runner.provider, rec)
-            ran_swarm = True
+        agents.run_swarm(runner.provider, rec)
+        ran_swarm = True
     elif runner is not None and getattr(runner, "model_skipped", None) and "agents" not in rec:
         rec["agents"] = {"status": "skipped", "note": runner.model_skipped, "roles": []}
         rec.setdefault("explanation", {"status": "not yet wired", "why": runner.model_skipped})
@@ -5652,8 +5645,8 @@ def _main(argv=None) -> int:
                     help="on a product check, look up a few related public bug reports and pass them to the "
                          "advisory AI as quoted background. Off for a study run and the daily study, even "
                          "if this flag is set on a benchmark. A product check does not start without "
-                         "TAVILY_API_KEY. If this lookup fails, the check stops as could not verify. "
-                         "It does not choose packages.")
+                         "TAVILY_API_KEY. If this lookup fails, the reason is recorded and the reports are "
+                         "left out of the write-up. The verdict is left as it was. It does not choose packages.")
     ap.add_argument("--product-check", action="store_true",
                     help="set only by product routes (console, request-a-check, Codespaces, GitHub App) on a single "
                          "pull-request check: 'verified' then needs measured coverage. Ignored on a benchmark or "

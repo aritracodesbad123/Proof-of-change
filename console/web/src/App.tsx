@@ -125,6 +125,7 @@ export default function App() {
   const [keyStored, setKeyStored] = useState(false)
   const [tavilyStored, setTavilyStored] = useState(false)
   const [projectStored, setProjectStored] = useState(false)
+  const [askTavilyKey, setAskTavilyKey] = useState(false)
   const [detail, setDetail] = useState<{
     record: Record<string, unknown>
     folder: string
@@ -158,6 +159,7 @@ export default function App() {
     try {
       const health = await api.health()
       setApiOk(health.ok)
+      setAskTavilyKey(Boolean(health.tavily_key_field))
       setContreeReady(Boolean(health.contree_ready))
       setHealthNote(health.warning || health.run_note || null)
       if (!approvalDefaultApplied.current && typeof health.approval_default === 'boolean') {
@@ -169,6 +171,7 @@ export default function App() {
       setErr(null)
     } catch (error) {
       setApiOk(false)
+      setAskTavilyKey(false)
       setHealthNote(null)
       setContreeReady(null)
       setRuns((prev) => (prev.length ? prev : mergeRunLists([], loadLocalRuns(account?.id || null))))
@@ -421,6 +424,7 @@ export default function App() {
                 change it.
               </p>
               <StartForm
+                askTavilyKey={askTavilyKey}
                 stored={{ nebius_key: keyStored, tavily_key: tavilyStored, contree_project: projectStored }}
                 onStart={async (fields) => {
                   const result = await submitStart(fields, api.startWithFields)

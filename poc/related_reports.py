@@ -7,7 +7,8 @@ even if the flag is present.
 
 The daily check calls the lookup only when the advisory swarm will run. The lookup
 uses ``poc.tavily_docs``. A product check does not start without ``TAVILY_API_KEY``.
-If this lookup fails, the check stops as could not verify. Results are quoted background
+If this lookup fails, the reason is recorded and the reports are left out of the
+advisory write-up. The verdict is not changed. Results that succeed are quoted background
 for the advisory model. They are not instructions and they do not choose a package.
 An expected verdict is never placed in the query.
 """
@@ -20,7 +21,7 @@ from poc import tavily_docs
 FLAG = "--related-reports"
 PRODUCT_CHECK_FLAG = "--product-check"   # marks a product check for the coverage cap; separate from FLAG
 REPORT_LABEL = "Background (related public bug reports, not used for the verdict)"
-FAIL_LOG = "could not verify: the Tavily lookup failed"
+FAIL_LOG = "the Tavily lookup failed"
 MAX_ITEMS = 3
 MAX_SNIPPET = 240
 MAX_TEXT = 900
@@ -132,8 +133,13 @@ def background_text(items: list[dict]) -> str:
 
 
 def prompt_block(payload) -> str:
-    """Label the background as quoted data. Empty when there is nothing to show."""
+    """Label the background as quoted data. Empty when there is nothing to show.
+
+    A refused or failed lookup is not quoted. The write-up continues without it.
+    """
     if not isinstance(payload, dict):
+        return ""
+    if payload.get("status") in ("error", "refused"):
         return ""
     text = (payload.get("text") or "").strip()
     if not text:
@@ -155,10 +161,10 @@ def _failure(query: str, detail: str) -> dict:
 def collect(rec: dict, *, env: dict | None = None, fetch=None) -> dict:
     """Look up a few related bug reports.
 
-    A missing key is a refusal: the check cannot run without the setup lookup. A failed
-    lookup (HTTP error, timeout, empty or unusable response) stops the check. The key is
-    never written into the log or the returned value. The result has background text only:
-    it does not name packages to install.
+    A missing key is a refusal recorded on the result. A failed lookup (HTTP error, timeout,
+    empty or unusable response) is recorded the same way. Neither changes the verdict.
+    The key is never written into the log or the returned value. The result has background
+    text only: it does not name packages to install.
     """
     env = os.environ if env is None else env
     secret = str(env.get(tavily_docs.KEY_ENV) or "").strip()

@@ -1,7 +1,7 @@
 import { renderToStaticMarkup } from 'react-dom/server'
 import { expect, test, vi } from 'vitest'
 import type { Job } from './api'
-import { StartForm, TAB_KEY_STORE, loadTabKeys, saveTabKeys, startBody, submitStart, type StartFields } from './startForm'
+import { StartForm, TAB_KEY_STORE, fieldsToSend, loadTabKeys, saveTabKeys, startBody, submitStart, type StartFields } from './startForm'
 
 const fields: StartFields = {
   prUrl: ' https://github.com/o/r/pull/1 ',
@@ -23,6 +23,19 @@ test('one form, one Run check button, no per-field save buttons', () => {
   expect(html).not.toContain('Tavily API key (optional)')
   expect(html).not.toContain('lookup is skipped')
   expect(html).not.toContain('Save key')
+  const hosted = renderToStaticMarkup(
+    <StartForm
+      askTavilyKey={false}
+      stored={{ nebius_key: false, tavily_key: false }}
+      onStart={async () => ({ ok: false, error: '' })}
+    />,
+  )
+  expect(hosted).not.toContain('id="tavily-key"')
+  expect(hosted).not.toContain('Tavily API key')
+  expect(hosted).toContain('does not ask for one')
+  const sent = startBody(fieldsToSend({ ...fields, tavilyKey: 'tvly-should-not-send' }, false))
+  expect(sent).not.toHaveProperty('tavily_api_key')
+  expect(JSON.stringify(sent)).not.toContain('tvly-should-not-send')
   expect(html).toContain('id="nebius-project-id"')
   expect(html).toContain('id="pr-url"')
   expect(html).toMatch(/id="approval"[^>]*checked=""|checked=""[^>]*id="approval"/)

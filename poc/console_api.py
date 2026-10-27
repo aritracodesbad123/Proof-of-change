@@ -84,17 +84,16 @@ def child_environment(base: dict[str, str], provider: str, session_token: str | 
     if provider == "nebius" and pasted:
         env["NEBIUS_API_KEY"] = pasted
     from poc import console_auth
-    if console_auth.single_user_requested(base):
-        host_tavily = (env.get("TAVILY_API_KEY") or "").strip()
-    else:
-        # A hosted console never runs a user check on the server's Tavily account: only the typed key counts.
-        host_tavily = (env.pop("TAVILY_API_KEY", None) or "").strip()
+    # A hosted console uses only the server's Tavily key. A typed value is ignored there.
+    # A Codespace may use the key typed into the form, and otherwise the environment secret.
+    host_tavily = (env.get("TAVILY_API_KEY") or "").strip()
     if len(host_tavily) >= 8 and host_tavily not in secrets:
         secrets.append(host_tavily)
     pasted_tavily = session_key.get_tavily_key(session_token)
     if pasted_tavily and len(pasted_tavily) >= 8:
         secrets.append(pasted_tavily)
-        env["TAVILY_API_KEY"] = pasted_tavily
+        if console_auth.single_user_requested(base):
+            env["TAVILY_API_KEY"] = pasted_tavily
     if contree:
         # The check process uses these only for its own Contree API calls. Pull-request code gets the allowlisted
         # environment (guardrails.isolation.untrusted_env), which never carries them.
@@ -667,20 +666,23 @@ def _has_typed_key(session_token: str | None) -> bool:
 def _has_tavily_key(session_token: str | None, base: dict | None = None) -> bool:
     """Whether this check has a Tavily key it is allowed to use. The value is never returned.
 
-    A hosted console counts only the key typed into the session. A Codespace also counts
-    ``TAVILY_API_KEY`` from the environment, because that secret belongs to the person running it.
+    A hosted console counts only ``TAVILY_API_KEY`` on the server. A Codespace counts a key
+    typed into the form, and otherwise the environment secret.
     """
-    pasted = (session_key.get_tavily_key(session_token) or "").strip()
-    if pasted:
-        return True
     base = os.environ if base is None else base
     from poc import console_auth
     if console_auth.single_user_requested(base):
-        return bool((base.get("TAVILY_API_KEY") or "").strip())
-    return False
+        pasted = (session_key.get_tavily_key(session_token) or "").strip()
+        if pasted:
+            return True
+    return bool((base.get("TAVILY_API_KEY") or "").strip())
 
 
 NO_KEY_MESSAGE = "Add your Nebius API key to run a live check."
+HOSTED_TAVILY_MISSING = (
+    "This server has no Tavily key set, so checks can't run. "
+    "The operator needs to set TAVILY_API_KEY."
+)
 
 
 class CheckRefused(ValueError):
@@ -724,11 +726,14 @@ def apply_start_fields(session_token: str | None, body: dict) -> None:
 
     Raises ValueError with a plain message. Values are never echoed, logged, or written to disk.
     """
+    from poc import console_auth
     setters = [
         ("nebius_api_key", session_key.set_key),
-        ("tavily_api_key", session_key.set_tavily_key),
         *[(name, session_key.set_contree_project) for name in _PROJECT_FIELDS],
     ]
+    # A hosted console never reads a typed Tavily key. The server setting is the only one.
+    if console_auth.single_user_requested():
+        setters.insert(1, ("tavily_api_key", session_key.set_tavily_key))
     for field, setter in setters:
         raw = body.get(field)
         if raw is None:
@@ -756,8 +761,10 @@ def start_check(pr_url: str, *, model_provider: str = "nebius", owner: str | Non
     playback = spaces_host.playback_only(pr_url, model_provider)
     if not playback and not _has_tavily_key(session_token):
         # Playing the saved sample does not run a check. Every other check needs the setup lookup.
-        from poc import tavily_docs
-        raise CheckRefused(tavily_docs.MISSING_KEY)
+        from poc import console_auth, tavily_docs
+        if console_auth.single_user_requested():
+            raise CheckRefused(tavily_docs.MISSING_KEY)
+        raise CheckRefused(HOSTED_TAVILY_MISSING)
     requested = model_provider
     model_provider, provider_note = resolve_console_provider(requested, session_token)
     plan = console_run_flags(session_token)
@@ -1116,6 +1123,7 @@ class Handler(BaseHTTPRequestHandler):
                 chrome = find_chrome()
             except Exception:  # noqa: BLE001
                 chrome = None
+            from poc import console_auth
             return self._json(200, {
                 "ok": True,
                 "service": "proof-of-change-console",
@@ -1131,6 +1139,7 @@ class Handler(BaseHTTPRequestHandler):
                 "warning": warning,
                 "refused": refused,
                 "approval_default": console_approval_on(None),
+                "tavily_key_field": console_auth.single_user_requested(),
             })
         if path.startswith("/api"):
             account = self._viewer()
@@ -1218,10 +1227,13 @@ class Handler(BaseHTTPRequestHandler):
                         return self._json(400, {"error": "Send the key as text."})
                     session_key.set_key(session_token, raw_key)
                 if "tavily_api_key" in body:
-                    raw_key = body.get("tavily_api_key", "")
-                    if not isinstance(raw_key, str):
-                        return self._json(400, {"error": "Send the key as text."})
-                    session_key.set_tavily_key(session_token, raw_key)
+                    from poc import console_auth
+                    # Hosted checks use the server setting. A typed value is not stored.
+                    if console_auth.single_user_requested():
+                        raw_key = body.get("tavily_api_key", "")
+                        if not isinstance(raw_key, str):
+                            return self._json(400, {"error": "Send the key as text."})
+                        session_key.set_tavily_key(session_token, raw_key)
                 if "contree_project_id" in body:
                     raw_key = body.get("contree_project_id", "")
                     if not isinstance(raw_key, str):

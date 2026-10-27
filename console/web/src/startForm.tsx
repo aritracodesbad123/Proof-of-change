@@ -36,6 +36,11 @@ export function startBody(fields: StartFields): StartBody {
 
 export type StartResult = { ok: true; job: Job } | { ok: false; error: string }
 
+/** A hosted form never sends a typed Tavily key, even if this tab still has one stored. */
+export function fieldsToSend(fields: StartFields, askTavilyKey: boolean): StartFields {
+  return askTavilyKey ? fields : { ...fields, tavilyKey: '' }
+}
+
 /** Submit the whole form once. Never throws: a failure always comes back as a message to show. */
 export async function submitStart(
   fields: StartFields,
@@ -95,11 +100,14 @@ export function StartForm({
   onStart,
   onSample,
   initialUrl = '',
+  askTavilyKey = true,
 }: {
   stored: StoredStatus
   onStart: (fields: StartFields) => Promise<StartResult>
   onSample?: () => void
   initialUrl?: string
+  /** False on a hosted console. That form does not ask for a Tavily key. */
+  askTavilyKey?: boolean
 }) {
   const [fields, setFields] = useState<StartFields>(() => ({
     prUrl: initialUrl,
@@ -120,7 +128,7 @@ export function StartForm({
     event.preventDefault()
     setBusy(true)
     setError(null)
-    const result = await onStart(fields)
+    const result = await onStart(fieldsToSend(fields, askTavilyKey))
     setBusy(false)
     if (!result.ok) {
       setError(result.error)
@@ -160,24 +168,29 @@ export function StartForm({
         onChange={(event) => set('nebiusProjectId', event.target.value)}
         placeholder={keyHint(stored.contree_project)}
       />
-      <label htmlFor="tavily-key">Tavily API key (required)</label>
-      <input
-        id="tavily-key"
-        type="password"
-        name="tavily-session-key"
-        autoComplete="new-password"
-        value={fields.tavilyKey}
-        onChange={(event) => set('tavilyKey', event.target.value)}
-        placeholder={keyHint(stored.tavily_key)}
-      />
+      {askTavilyKey ? (
+        <>
+          <label htmlFor="tavily-key">Tavily API key (required)</label>
+          <input
+            id="tavily-key"
+            type="password"
+            name="tavily-session-key"
+            autoComplete="new-password"
+            value={fields.tavilyKey}
+            onChange={(event) => set('tavilyKey', event.target.value)}
+            placeholder={keyHint(stored.tavily_key)}
+          />
+        </>
+      ) : null}
       <p className="hint">
         Keys are kept only in this browser tab and survive a page refresh; closing the tab clears them. They are
         sent with Run check, kept in the server's memory for the session, and never saved to disk, logs, or the
         report. Pull-request code never sees them. A check needs your own Nebius API key;
-        only the saved sample runs without one. A check needs a Tavily API key for the setup lookup and does not
-        start without one. The saved sample still plays back without it. Tavily keys are free at
-        https://app.tavily.com/. A Nebius project ID lets the check run in a Nebius cloud sandbox, billed to your
-        own Nebius account.
+        only the saved sample runs without one.{' '}
+        {askTavilyKey
+          ? 'A check needs a Tavily API key for the setup lookup and does not start without one. The saved sample still plays back without it. Tavily keys are free at https://app.tavily.com/.'
+          : 'This server uses its own Tavily key for the setup lookup. This form does not ask for one. A check does not start when that server key is missing.'}{' '}
+        A Nebius project ID lets the check run in a Nebius cloud sandbox, billed to your own Nebius account.
       </p>
       <label htmlFor="provider">Model provider</label>
       <select id="provider" value={fields.provider} onChange={(event) => set('provider', event.target.value)}>

@@ -260,38 +260,50 @@ def test_github_app_refuses_without_calling_the_runner(capsys):
 
 
 @pytest.mark.real_tavily_gate
-def test_hosted_console_refuses_without_a_typed_key(monkeypatch):
+def test_hosted_console_uses_the_server_key_and_refuses_when_it_is_missing(monkeypatch):
     monkeypatch.delenv("CODESPACES", raising=False)
-    monkeypatch.setenv("TAVILY_API_KEY", "server-tavily-secret-not-used")
-    monkeypatch.setattr(console_api.threading, "Thread", _QuietThread)
-    with pytest.raises(console_api.CheckRefused, match="Tavily key missing"):
-        console_api.start_check(PR, model_provider="recorded", session_token="sess-hosted")
-
-
-@pytest.mark.real_tavily_gate
-def test_codespace_secret_and_a_typed_key_can_start(monkeypatch):
     monkeypatch.setattr(console_api.threading, "Thread", _QuietThread)
     monkeypatch.setattr(
         console_api, "console_run_flags",
         lambda *_a, **_k: console_api.ConsoleRunPlan(["--unsafe-no-sandbox"], "test", False, None),
     )
-    secret = "codespace-tavily-secret"
+    secret = "server-tavily-secret-value"
+    monkeypatch.setenv("TAVILY_API_KEY", secret)
+    session_key.set_tavily_key("sess-hosted", "typed-tavily-secret-xyz")
+    try:
+        job = console_api.start_check(PR, model_provider="recorded", session_token="sess-hosted")
+    finally:
+        session_key.clear_key("sess-hosted")
+    assert job["status"] == "queued"
+    blob = json.dumps(job)
+    assert secret not in blob
+    assert "typed-tavily-secret-xyz" not in blob
+
+    monkeypatch.delenv("TAVILY_API_KEY", raising=False)
+    session_key.set_tavily_key("sess-hosted", "typed-tavily-secret-xyz")
+    try:
+        with pytest.raises(console_api.CheckRefused, match="This server has no Tavily key set"):
+            console_api.start_check(PR, model_provider="recorded", session_token="sess-hosted")
+    finally:
+        session_key.clear_key("sess-hosted")
+
+
+@pytest.mark.real_tavily_gate
+def test_codespace_still_refuses_without_a_key_and_starts_with_one(monkeypatch):
+    monkeypatch.setattr(console_api.threading, "Thread", _QuietThread)
+    monkeypatch.setattr(
+        console_api, "console_run_flags",
+        lambda *_a, **_k: console_api.ConsoleRunPlan(["--unsafe-no-sandbox"], "test", False, None),
+    )
     monkeypatch.setenv("CODESPACES", "true")
+    monkeypatch.delenv("TAVILY_API_KEY", raising=False)
+    with pytest.raises(console_api.CheckRefused, match="Tavily key missing"):
+        console_api.start_check(PR, model_provider="recorded")
+    secret = "codespace-tavily-secret"
     monkeypatch.setenv("TAVILY_API_KEY", secret)
     job = console_api.start_check(PR, model_provider="recorded")
     assert job["status"] == "queued"
     assert secret not in json.dumps(job)
-
-    monkeypatch.delenv("CODESPACES", raising=False)
-    monkeypatch.delenv("TAVILY_API_KEY", raising=False)
-    typed = "typed-tavily-secret-xyz"
-    session_key.set_tavily_key("sess-typed", typed)
-    try:
-        typed_job = console_api.start_check(PR, model_provider="recorded", session_token="sess-typed")
-    finally:
-        session_key.set_tavily_key("sess-typed", "")
-    assert typed_job["status"] == "queued"
-    assert typed not in json.dumps(typed_job)
 
 
 @pytest.mark.real_tavily_gate
@@ -360,13 +372,22 @@ def test_findings_are_stored_on_the_record(tmp_path, monkeypatch):
     assert SECRET not in json.dumps(block)
 
 
-def test_related_lookup_failure_stops_the_check(tmp_path, monkeypatch):
+def test_related_lookup_failure_leaves_the_verdict(tmp_path, monkeypatch, capsys):
     monkeypatch.setenv("TAVILY_API_KEY", SECRET)
     monkeypatch.setattr(daily_run, "check_record", lambda rec: [])
     monkeypatch.setattr(daily_run, "stamp_model_use", lambda rec, runner: None)
+    ran = {"n": 0}
+
+    def run_swarm(_provider, rec):
+        ran["n"] += 1
+        assert rec["verdict"] == "verified"
+        block = rec.get("related_reports") or {}
+        assert block.get("text", "") == ""
+
+    monkeypatch.setattr(daily_run.agents, "run_swarm", run_swarm)
 
     def lookup(*_args, **_kwargs):
-        return {"ok": False, "error": f"HTTP 500 {SECRET}", "results": []}
+        raise RuntimeError(f"HTTP 500 {SECRET}")
 
     monkeypatch.setattr(tavily_docs, "lookup", lookup)
     rec = {
@@ -382,8 +403,28 @@ def test_related_lookup_failure_stops_the_check(tmp_path, monkeypatch):
     daily_run.finish(rec, prdir, tmp_path / "work", 0.0, SimpleNamespace(
         related_reports=True, bench=None, pr=[PR], swarm=True, provider=object(), model_skipped=None,
     ))
-    assert rec["verdict"] == "could_not_verify"
-    assert rec["reason"].startswith("could not verify: the Tavily lookup failed")
-    assert rec["agents"]["status"] == "skipped"
-    assert SECRET not in json.dumps(rec)
+    logged = capsys.readouterr()
+    assert ran["n"] == 1
+    assert rec["verdict"] == "verified"
+    assert rec["reason"] == "ok"
+    assert rec["related_reports"]["status"] == "error"
+    assert "the Tavily lookup failed" in rec["related_reports"]["reason"]
+    blob = json.dumps(rec) + logged.out + logged.err
+    assert SECRET not in blob
     assert SECRET not in (prdir / "record.json").read_text()
+
+
+def test_setup_lookup_exception_is_redacted_from_the_record_and_the_console(tmp_path, monkeypatch, capsys):
+    monkeypatch.setenv("TAVILY_API_KEY", SECRET)
+
+    def fetch(_query, timeout=None, env=None):
+        raise RuntimeError(f"timed out while using {SECRET}")
+
+    rec = {}
+    block = demo_helper.begin_check(_runner(), rec, "acme/widgets", "widgets", tmp_path, fetch=fetch)
+    logged = capsys.readouterr()
+    blob = json.dumps(rec) + logged.out + logged.err
+    assert SECRET not in blob
+    assert block["tavily"]["stop"] is True
+    assert "could not verify: the setup lookup failed" in block["tavily"]["stop_reason"]
+    assert "[redacted]" in block["tavily"]["stop_reason"]

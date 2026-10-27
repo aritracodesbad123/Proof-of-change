@@ -308,7 +308,7 @@ def test_request_form_warns_and_names_the_running_label():
     assert "Do not make port 8787 public" in readme
 
 
-def test_tavily_session_key_reaches_the_check_and_is_not_echoed(monkeypatch):
+def test_tavily_session_key_reaches_a_codespace_check_and_is_not_echoed(monkeypatch):
     secret = "tavily-session-secret-value"
     monkeypatch.delenv("TAVILY_API_KEY", raising=False)
     session_key.clear_key("sess-t")
@@ -317,7 +317,11 @@ def test_tavily_session_key_reaches_the_check_and_is_not_echoed(monkeypatch):
     assert status["tavily_key"] is True
     assert status["nebius_key"] is False
     assert secret not in json.dumps(status)
-    env, secrets = console_api.child_environment({"PATH": "/usr/bin"}, "recorded", "sess-t")
+    hosted, hosted_secrets = console_api.child_environment(
+        {"PATH": "/usr/bin", "TAVILY_API_KEY": "server-tavily-key-999"}, "recorded", "sess-t")
+    assert hosted["TAVILY_API_KEY"] == "server-tavily-key-999"
+    assert secret in hosted_secrets
+    env, secrets = console_api.child_environment({"PATH": "/usr/bin", "CODESPACES": "true"}, "recorded", "sess-t")
     assert env["TAVILY_API_KEY"] == secret
     assert secret in secrets
     assert secret not in os.environ.get("TAVILY_API_KEY", "")
