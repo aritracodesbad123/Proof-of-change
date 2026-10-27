@@ -12,8 +12,16 @@ A product check run with `POC_PARALLEL=1` saves wall time in three places. The f
 ## Boundaries
 - Only product checks use it (`product_route`). The study route and its output are unchanged, and so are the verdict rules.
 - Pull-request code still runs only in Contree.
-- If main's checkpoint fails, that failure is reported first, the same as in serial order.
+- If main's checkpoint fails, that failure is reported first, the same as in serial order, and the check does not wait for the PR build. The PR build is marked abandoned in the record (`contree.pr_build`); it ends on Contree's own time limit and its image is never used.
+- A probe-planning error is raised as itself. The background checkpoint build is still waited for, but its result never replaces the planning error.
+- One code path: the serial and parallel checks share `_contree_only_pair`; only the prep step and the timed-run schedule differ.
 - If one side has no test targets, the other side runs alone, the same as in serial order.
 
+## Installed versions per side
+Because the PR side is no longer forked from main, a dependency with an unpinned range could resolve to a different version on each side. In parallel mode the installed packages on both checkpoints are recorded (`contree.packages`, from `pip list`, editable installs of the project left out). If any version differs, or a side cannot be read, the check is refused and capped at could not verify, so a version change is never blamed on the pull request. A pull request that changes its own dependencies therefore comes out could not verify in parallel mode; serial mode is unchanged.
+
+## Timings
+Running the pairs at the same time means the two sides compete for the same service at once. Per-side seconds from parallel mode are recorded for completeness only and must not be used in any speed claim. Only whole-check wall time, measured with the flag on and off on the same cases, may be compared.
+
 ## Risk
-Because the PR side is no longer forked from main, a dependency with an unpinned range could resolve to a different version on each side. Running the pairs at the same time also means the two sides compete for the same service at once. Per-side seconds are still measured per run. The flag stays off until the 3-case comparison shows matching verdicts.
+The flag stays off until the on/off comparison shows matching verdicts.
