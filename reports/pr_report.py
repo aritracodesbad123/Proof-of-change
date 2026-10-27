@@ -714,6 +714,11 @@ def build(rec: dict, prdir: Path, out_dir: Path, decision: dict | None = None) -
         R.p(f"**Decision recorded:** none yet. To record one, run `make decide REPORT={out_dir} DECISION=approve` "
             "(or `reject`, `approve_with_notes`, `re_run`).")
 
+    tm = rec.get("timings")
+    if isinstance(tm, dict) and tm:
+        R.h(2, "How long each step took", "timings")
+        R.table(["Step", "Seconds"], [[str(k), str(v)] for k, v in tm.items()])
+
     R.h(2, "Rerun command", "rerun")
     R.code(f"make check PR={rec.get('url', '<PR URL>')}")
 
