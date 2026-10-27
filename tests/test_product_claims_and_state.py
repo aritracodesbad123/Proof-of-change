@@ -110,11 +110,27 @@ def test_37_claimless_model_probe_does_not_flag_requests_7520():
     assert _verdict(before)[0] == "needs_attention"            # study route: unchanged
     after = probes.apply_status(claim_hygiene.apply(r["probes"]))
     assert after["claim_hygiene"]["advisory_probes"] == ["model-probe1"]
-    v, reason, _ = _verdict(after)
-    assert v == "verified"
-    assert "advisory" in reason
+    v, reason, fl = _verdict(after)
+    assert v == "could_not_verify"            # an unclaimed difference is never verified
+    assert "no claims attached" in reason and "advisory_unclaimed_difference" in fl
     obs = [o for it in after["items"] for o in it["observations"] if o.get("advisory")]
     assert len(obs) == 3 and all(o["label"] == "unmentioned" for o in obs)   # still shown, still labelled
+
+
+def test_37_advisory_difference_can_never_be_verified():
+    from poc.verdict import FindingLabel
+    spec = {"id": "m", "target": "o/r#1", "about": "x", "claims": []}
+    item = probes.entry(spec, {"main": [{"a": 1}] * 3, "pr": [{"a": 2}] * 3}, None, [], "model", None)
+    pr = probes.apply_status(claim_hygiene.apply({"status": "ran", "items": [item]}))
+    assert pr["items"][0]["observations"][0]["label"] == FindingLabel.UNMENTIONED_CHANGE.value
+    assert pr["items"][0]["observations"][0]["advisory"] is True
+    for docstring_only in (False, True):
+        v = dr.verdict_for(_cmp_verified(), None, probe_results=pr, docstring_only=docstring_only)[0]
+        assert v != "verified"
+    # without a difference the claim-less probe changes nothing
+    same = probes.entry(spec, {"main": [{"a": 1}] * 3, "pr": [{"a": 1}] * 3}, None, [], "model", None)
+    pr2 = probes.apply_status(claim_hygiene.apply({"status": "ran", "items": [same]}))
+    assert _verdict(pr2)[0] == "verified"
 
 
 def test_37_claimless_probe_never_hides_test_findings():
@@ -249,3 +265,35 @@ def test_40_test_pr_refuses_before_any_run(tmp_path, monkeypatch):
     dr.test_pr("o/r", {"pkg": "r"}, item, tmp_path / "r", tmp_path / "w", a, {})
     assert finished["verdict"] == "could_not_verify"
     assert finished["reason"].startswith("refused:") and finished["pr_state_refusal"]
+
+
+def test_40_known_answer_case_runs_merged_and_closed_prs(tmp_path, monkeypatch):
+    class Reached(Exception):
+        pass
+
+    def reached(*a, **k):
+        raise Reached
+
+    monkeypatch.setattr(dr, "finish", lambda rec, *a: (_ for _ in ()).throw(AssertionError(rec.get("reason"))))
+    monkeypatch.setattr(dr, "new_record", lambda *a, **k: {})
+    monkeypatch.setattr(dr, "begin_pr", lambda a: None)
+    from poc import demo_helper
+    monkeypatch.setattr(demo_helper, "begin_check", reached)
+    monkeypatch.setattr(demo_helper, "active", lambda a: True)
+    a = SimpleNamespace(pr="https://github.com/o/r/pull/1", product_check=True, bench=None, known_answer_case=True)
+    for state in ("closed", "merged"):
+        import pytest
+        with pytest.raises(Reached):   # went past the state check into the check itself
+            dr.test_pr("o/r", {"pkg": "r"}, {"pr": 1, "diff": "", "state": state}, tmp_path / state, tmp_path / "w",
+                       a, {})
+
+
+def test_40_benchmark_runner_marks_its_cases_known_answer(tmp_path):
+    from bench import run
+    case = {"pr_url": "https://github.com/o/r/pull/1"}
+    for arm in run.ARMS:
+        cmd = run.command(case, arm, tmp_path, "n")
+        assert "--known-answer-case" in cmd and "--product-check" in cmd
+    ns = dr.build_parser().parse_args(["--pr", "x", "--product-check"]) if hasattr(dr, "build_parser") else None
+    if ns is not None:
+        assert ns.known_answer_case is False

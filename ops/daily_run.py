@@ -3574,6 +3574,14 @@ def verdict_for(cmp: dict | None, cnv_reason: str | None, exits: dict | None = N
         return (Verdict.COULD_NOT_VERIFY.value,
                 f"could not verify: claim(s) {shown}{extra} expect a difference but no observation matches ({reason})",
                 fl + ["unmatched_differs_claim"])
+    advisory = sorted({str(it.get("id")) for it in (probe_results or {}).get("items") or []
+                       for o in it.get("observations") or [] if o.get("advisory")})
+    if advisory and v == Verdict.VERIFIED.value:
+        # A claim-less probe saw a difference nobody claimed. It does not raise needs attention, but it is
+        # unexplained, so the PR cannot be verified either.
+        return (Verdict.COULD_NOT_VERIFY.value,
+                f"could not verify: probe(s) {', '.join(advisory)} have no claims attached and saw a difference no "
+                f"claim covers, so the change is not confirmed ({reason})", fl + ["advisory_unclaimed_difference"])
     if hygiene and hygiene.get("dropped_flagged") and v == Verdict.VERIFIED.value:
         from poc import claim_hygiene
         return (Verdict.COULD_NOT_VERIFY.value, f"could not verify: {claim_hygiene.note_text(hygiene)} ({reason})",
@@ -4517,7 +4525,12 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
         rec["product_check"] = True   # coverage gate: on a product check, verified needs measured coverage
     if product_route(a):
         closed = closed_pr_reason(item)
-        if closed:   # refuse before any lookup, install or run
+        if closed and getattr(a, "known_answer_case", False):
+            # A benchmark or known-answer case tests fixed commits on purpose, merged or closed included: label only.
+            rec["pr_state_note"] = ("known-answer case: this pull request is "
+                                    f"{item.get('state')}; its fixed commits were tested on purpose")
+            closed = None
+        if closed:   # a user-requested product check: refuse before any lookup, install or run
             rec["pr_state_refusal"] = closed
             rec["verdict"], rec["reason"], _ = verdict_for(None, closed)
             return finish(rec, prdir, work, t0, a)
@@ -5809,6 +5822,9 @@ def _main(argv=None) -> int:
                          "if this flag is set on a benchmark. A product check does not start without "
                          "TAVILY_API_KEY. If this lookup fails, the reason is recorded and the reports are "
                          "left out of the write-up. The verdict is left as it was. It does not choose packages.")
+    ap.add_argument("--known-answer-case", action="store_true",
+                    help="set by benchmark and known-answer runners: the pull request's fixed commits are tested "
+                         "even when it is closed or merged (the state is labelled in the record, not refused)")
     ap.add_argument("--product-check", action="store_true",
                     help="set only by product routes (console, request-a-check, Codespaces, GitHub App) on a single "
                          "pull-request check: 'verified' then needs measured coverage. Ignored on a benchmark or "

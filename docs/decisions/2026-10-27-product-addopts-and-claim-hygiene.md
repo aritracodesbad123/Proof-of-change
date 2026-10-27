@@ -25,8 +25,8 @@ generic causes:
    route still blanks addopts, as before.
 2. **Claim-less model probes are advisory.** A model probe with an empty claims list cannot tell which differences
    the pull request intended. Its "differs and no claim covers it" observations stay in the record with their label,
-   are marked `advisory`, and are listed in the reason, but they do not decide the verdict. The tests and the other
-   probes still decide. A probe that has claims still flags any unclaimed difference.
+   are marked `advisory`, and do not raise needs attention. They are still unexplained, so a pull request with
+   one can never be verified: it is held at could not verify. A probe that has claims still flags any unclaimed difference.
 3. **"Stays the same" claims expect same.** A claim whose text says behaviour is kept ("unchanged", "preserved",
    "still", "continues to", "as before", "will not", "does not") is typed `same`, unless it also says the old
    behaviour stops ("no longer", "anymore", "now", "instead"). The probe is judged again with the corrected type, so
@@ -38,6 +38,9 @@ generic causes:
 5. **Closed or merged pull requests are refused.** Before any lookup, install or run, a product check of a pull
    request whose state is not open stops with could not verify and the plain reason "refused: this pull request is
    closed or merged, not open, so it was not tested". The reason is also kept in `pr_state_refusal`.
+   Benchmark and known-answer runs test fixed commits of merged or closed pull requests on purpose. Their runner
+   passes `--known-answer-case`, which records the state in `pr_state_note` instead of refusing. Only a
+   user-requested product check (without that flag) is refused. There is no per-project list.
 
 Each clean-up is written to the record (`probes.claim_hygiene` and `claim_hygiene_note`), so a reader can see what
 was changed and why.
@@ -47,5 +50,5 @@ was changed and why.
 - Projects whose tests depend on their own addopts can now be measured. A project whose addopts add something the
   check cannot satisfy may now fail differently; that shows up in its test log as a setup problem.
 - None of the claim rules can turn a run into verified on its own: tests still decide, and dropped or retyped claims
-  can only remove a false flag or add a stricter one.
+  can only remove a false flag or add a stricter one. An advisory difference holds the run at could not verify.
 - The phrase lists are deliberately small and may miss wording. A missed phrase leaves today's behaviour in place.
