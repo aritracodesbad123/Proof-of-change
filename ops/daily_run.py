@@ -3617,6 +3617,7 @@ def verdict_for(cmp: dict | None, cnv_reason: str | None, exits: dict | None = N
                 "unsupported: main and PR sides are the same commit, so nothing was compared; "
                 "a docstring-only result cannot be claimed", ["identical_sides"])
     hygiene = (probe_results or {}).get("claim_hygiene") if isinstance(probe_results, dict) else None
+    broad = (probe_results or {}).get("broad_claims") if isinstance(probe_results, dict) else None
     probe_results = probe_items(probe_results, baseline)
     v, reason, fl = with_probes(cmp, cnv_reason, exits, files, probe_results)
     if uses(baseline, "claim_flags") and claims and v == Verdict.VERIFIED.value and not behaviour_claims.probe_covers(
@@ -3653,6 +3654,10 @@ def verdict_for(cmp: dict | None, cnv_reason: str | None, exits: dict | None = N
         from poc import claim_hygiene
         return (Verdict.COULD_NOT_VERIFY.value, f"could not verify: {claim_hygiene.note_text(hygiene)} ({reason})",
                 fl + ["dropped_flagged_probe"])
+    if broad and broad.get("held_back") and v == Verdict.VERIFIED.value:
+        from poc import broad_claims
+        return (Verdict.COULD_NOT_VERIFY.value, f"could not verify: {broad_claims.note_text(broad)} ({reason})",
+                fl + ["broad_claim_few_inputs"])
     return v, reason, fl
 
 
@@ -4353,6 +4358,11 @@ def settle_probes(rec: dict) -> None:
         note = claim_hygiene.note_text(pr.get("claim_hygiene"))
         if note:
             rec["claim_hygiene_note"] = note
+        from poc import broad_claims
+        pr = broad_claims.apply(pr)
+        bnote = broad_claims.note_text((pr or {}).get("broad_claims"))
+        if bnote:
+            rec["broad_claims_note"] = bnote
     rec["probes"] = probes.apply_status(pr)
     rec["probe_changed_line_coverage"] = probe_adequacy.summary(rec["probes"]["items"])
 
