@@ -1,0 +1,391 @@
+{
+ "baseline": "full",
+ "behaviour_claims": [
+  {
+   "pattern": "untouched",
+   "quote": "inside a list used as a mapping value was left untouched as well.",
+   "source": "PR description"
+  },
+  {
+   "pattern": "untouched",
+   "quote": "previously-untouched nested containers from turning into new `TypeError`s or into",
+   "source": "PR description"
+  },
+  {
+   "pattern": "passed through",
+   "quote": "non-atomic objects nested in collections are still passed through unchanged.)",
+   "source": "PR description"
+  },
+  {
+   "pattern": "untouched",
+   "quote": "`python -m pytest tests -q` on the untouched `main` commit shows exactly the same",
+   "source": "PR description"
+  }
+ ],
+ "comparison": {
+  "environment": [],
+  "executed": {
+   "main": 53,
+   "pr": 62
+  },
+  "fixed": [],
+  "flaky": [],
+  "load_failed_both": [],
+  "load_failed_main": [],
+  "load_failed_pr": [],
+  "messages": {},
+  "new_tests_failing": [],
+  "new_tests_passing": 9,
+  "new_tests_skipped": [],
+  "other_changes": [],
+  "pr_unstable": [],
+  "pr_unstable_noisy": [],
+  "preexisting_failures": [],
+  "regressions": [],
+  "removed_tests": [],
+  "reparametrized": [],
+  "same": 53,
+  "same_skipped_both": 0,
+  "skipped_missing_dependency": []
+ },
+ "exit_check": {
+  "detail": "all runs exited 0",
+  "explained": true,
+  "problems": []
+ },
+ "files": {
+  "all": [
+   "changelog.d/1647.change.md",
+   "src/attr/_funcs.py",
+   "tests/test_funcs.py"
+  ],
+  "compiled": [],
+  "other": [
+   "changelog.d/1647.change.md",
+   "src/attr/_funcs.py",
+   "tests/test_funcs.py"
+  ],
+  "package_py": []
+ },
+ "model_rejected_claims": [
+  {
+   "expect": "differs",
+   "id": "C7",
+   "rejected": "source_quote not found in the PR text",
+   "source_quote": "* Mappings that cannot be built from a mapping object (e.g. `defaultdict`) become plain `dict`s \u2014 the same thing `asdict()` does \u2014 rather than crashing.",
+   "testable": true,
+   "text": "Mappings that cannot be built from a mapping object (e.g., defaultdict) become plain dicts instead of crashing."
+  }
+ ],
+ "pr": 1647,
+ "probes": {
+  "items": [
+   {
+    "about": "Tests claim C1: astuple() with recurse=True only converts attrs instances nested at most one collection deep; deeper nested attrs instances remain as live attrs objects.",
+    "claims": [
+     {
+      "covers": [
+       "C1"
+      ],
+      "expect": "differs",
+      "id": "C1",
+      "source": "PR description",
+      "text": "astuple() with recurse=True only converts attrs instances nested at most one collection deep; deeper nested attrs instances remain as live attrs objects."
+     }
+    ],
+    "id": "model-p1",
+    "observations": [
+     {
+      "claim": null,
+      "diffs": [
+       {
+        "field": "",
+        "main": 4,
+        "pr": 0
+       }
+      ],
+      "label": "unmentioned",
+      "main": 4,
+      "name": "C1.leftover_count",
+      "pr": 0,
+      "state": "differs"
+     }
+    ],
+    "probe_changed_line_coverage": {
+     "adequacy": "adequate",
+     "changed_lines_covered": 3,
+     "changed_lines_total": 3,
+     "data": "probe-cov-model-p1.json",
+     "exit": 0,
+     "files": [
+      {
+       "changed_lines_covered": 3,
+       "changed_lines_total": 3,
+       "file": "src/attr/_funcs.py"
+      }
+     ],
+     "note": "ran 3 of 3 changed line(s) on the main side",
+     "status": "measured",
+     "where": "contree"
+    },
+    "runs": {
+     "main": [
+      {
+       "C1.leftover_count": 4
+      },
+      {
+       "C1.leftover_count": 4
+      },
+      {
+       "C1.leftover_count": 4
+      }
+     ],
+     "pr": [
+      {
+       "C1.leftover_count": 0
+      },
+      {
+       "C1.leftover_count": 0
+      },
+      {
+       "C1.leftover_count": 0
+      }
+     ]
+    },
+    "source": "model",
+    "status": "rejected",
+    "target": "python-attrs/attrs#1647"
+   },
+   {
+    "about": "Tests claim C2: asdict() converts all nested attrs instances regardless of depth.",
+    "claims": [
+     {
+      "covers": [
+       "C2"
+      ],
+      "expect": "same",
+      "id": "C2",
+      "source": "PR description",
+      "text": "asdict() converts all nested attrs instances regardless of depth."
+     }
+    ],
+    "id": "model-p2",
+    "observations": [
+     {
+      "claim": null,
+      "label": "no_difference",
+      "main": 0,
+      "name": "C2.asdict_leftover_count",
+      "pr": 0,
+      "state": "same"
+     }
+    ],
+    "probe_changed_line_coverage": {
+     "adequacy": "not_adequate",
+     "changed_lines_covered": 0,
+     "changed_lines_total": 3,
+     "data": "probe-cov-model-p2.json",
+     "exit": 0,
+     "files": [
+      {
+       "changed_lines_covered": 0,
+       "changed_lines_total": 3,
+       "file": "src/attr/_funcs.py"
+      }
+     ],
+     "note": "ran none of the 3 changed line(s) on the main side",
+     "status": "measured",
+     "where": "contree"
+    },
+    "runs": {
+     "main": [
+      {
+       "C2.asdict_leftover_count": 0
+      },
+      {
+       "C2.asdict_leftover_count": 0
+      },
+      {
+       "C2.asdict_leftover_count": 0
+      }
+     ],
+     "pr": [
+      {
+       "C2.asdict_leftover_count": 0
+      },
+      {
+       "C2.asdict_leftover_count": 0
+      },
+      {
+       "C2.asdict_leftover_count": 0
+      }
+     ]
+    },
+    "source": "model",
+    "status": "rejected",
+    "target": "python-attrs/attrs#1647"
+   },
+   {
+    "about": "Tests claim C3: The repro script shows 4 leftover attrs instances unconverted by astuple().",
+    "claims": [
+     {
+      "covers": [
+       "C3"
+      ],
+      "expect": "differs",
+      "id": "C3",
+      "source": "PR description",
+      "text": "The repro script shows 4 leftover attrs instances unconverted by astuple()."
+     }
+    ],
+    "id": "model-p3",
+    "observations": [
+     {
+      "claim": null,
+      "diffs": [
+       {
+        "field": "",
+        "main": 4,
+        "pr": 0
+       }
+      ],
+      "label": "unmentioned",
+      "main": 4,
+      "name": "C3.inner_string_count",
+      "pr": 0,
+      "state": "differs"
+     }
+    ],
+    "probe_changed_line_coverage": {
+     "adequacy": "adequate",
+     "changed_lines_covered": 3,
+     "changed_lines_total": 3,
+     "data": "probe-cov-model-p3.json",
+     "exit": 0,
+     "files": [
+      {
+       "changed_lines_covered": 3,
+       "changed_lines_total": 3,
+       "file": "src/attr/_funcs.py"
+      }
+     ],
+     "note": "ran 3 of 3 changed line(s) on the main side",
+     "status": "measured",
+     "where": "contree"
+    },
+    "runs": {
+     "main": [
+      {
+       "C3.inner_string_count": 4
+      },
+      {
+       "C3.inner_string_count": 4
+      },
+      {
+       "C3.inner_string_count": 4
+      }
+     ],
+     "pr": [
+      {
+       "C3.inner_string_count": 0
+      },
+      {
+       "C3.inner_string_count": 0
+      },
+      {
+       "C3.inner_string_count": 0
+      }
+     ]
+    },
+    "source": "model",
+    "status": "rejected",
+    "target": "python-attrs/attrs#1647"
+   },
+   {
+    "about": "Tests claim C4: After the fix, astuple() returns the same structure as asdict() with dicts replaced by tuples.",
+    "claims": [
+     {
+      "covers": [
+       "C4"
+      ],
+      "expect": "differs",
+      "id": "C4",
+      "source": "PR description",
+      "text": "After the fix, astuple() returns the same structure as asdict() with dicts replaced by tuples."
+     }
+    ],
+    "id": "model-p4",
+    "observations": [
+     {
+      "claim": null,
+      "label": "no_difference",
+      "main": true,
+      "name": "C4.nested_astuple_eq_expected",
+      "pr": true,
+      "state": "same"
+     },
+     {
+      "claim": null,
+      "label": "no_difference",
+      "main": true,
+      "name": "C4.simple_astuple_eq_asdict_values",
+      "pr": true,
+      "state": "same"
+     }
+    ],
+    "probe_changed_line_coverage": {
+     "adequacy": "adequate",
+     "changed_lines_covered": 1,
+     "changed_lines_total": 3,
+     "data": "probe-cov-model-p4.json",
+     "exit": 0,
+     "files": [
+      {
+       "changed_lines_covered": 1,
+       "changed_lines_total": 3,
+       "file": "src/attr/_funcs.py"
+      }
+     ],
+     "note": "ran 1 of 3 changed line(s) on the main side",
+     "status": "measured",
+     "where": "contree"
+    },
+    "runs": {
+     "main": [
+      {
+       "C4.nested_astuple_eq_expected": true,
+       "C4.simple_astuple_eq_asdict_values": true
+      },
+      {
+       "C4.nested_astuple_eq_expected": true,
+       "C4.simple_astuple_eq_asdict_values": true
+      },
+      {
+       "C4.nested_astuple_eq_expected": true,
+       "C4.simple_astuple_eq_asdict_values": true
+      }
+     ],
+     "pr": [
+      {
+       "C4.nested_astuple_eq_expected": true,
+       "C4.simple_astuple_eq_asdict_values": true
+      },
+      {
+       "C4.nested_astuple_eq_expected": true,
+       "C4.simple_astuple_eq_asdict_values": true
+      },
+      {
+       "C4.nested_astuple_eq_expected": true,
+       "C4.simple_astuple_eq_asdict_values": true
+      }
+     ]
+    },
+    "source": "model",
+    "status": "rejected",
+    "target": "python-attrs/attrs#1647"
+   }
+  ]
+ },
+ "repo": "python-attrs/attrs",
+ "verdict_at_fcc3c08": "needs_attention"
+}
