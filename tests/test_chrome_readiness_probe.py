@@ -51,3 +51,24 @@ def test_working_chrome_is_used_after_probe(tmp_path, monkeypatch):
     assert reviewer.to_pdf(str(_html(tmp_path)), str(tmp_path / "r.pdf")) is None
     assert (tmp_path / "r.pdf").read_bytes() == b"%PDF-1.4 chrome" and not calls
     assert reviewer._CHROME_READY == {str(tmp_path / "chrome"): None}
+
+
+def test_real_page_timeout_is_cached_after_probe_passed(tmp_path, monkeypatch):
+    log = tmp_path / "calls.log"
+    # passes the readiness probe (probe.html), hangs on any real report page
+    _fake_chrome(tmp_path, monkeypatch,
+                 f'#!/bin/sh\necho "$@" >> {log}\ncase "$*" in *probe.html*) '
+                 'for a; do case "$a" in --print-to-pdf=*) printf "%%PDF-1.4 probe" > "${a#*=}";; esac; done;; '
+                 '*) sleep 120;; esac\n')
+    monkeypatch.setattr(reviewer, "PDF_TIMEOUT_S", 1)
+    t0 = time.monotonic()
+    assert reviewer.to_pdf(str(_html(tmp_path)), str(tmp_path / "r.pdf")) is None
+    assert time.monotonic() - t0 < 8
+    assert (tmp_path / "r.pdf").read_bytes().startswith(b"%PDF")
+    assert "timed out" in reviewer._CHROME_READY[str(tmp_path / "chrome")]
+    calls = len(log.read_text().splitlines())
+    assert calls == 2  # probe + real page
+    t1 = time.monotonic()
+    assert reviewer.to_pdf(str(_html(tmp_path, "s.html")), str(tmp_path / "s.pdf")) is None
+    assert time.monotonic() - t1 < 3
+    assert len(log.read_text().splitlines()) == calls, "second PDF must not start Chrome"

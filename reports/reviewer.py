@@ -1165,6 +1165,11 @@ def to_pdf(html_path: str, pdf_path: str) -> str | None:
         chrome_err = _chrome_pdf(html_path, pdf_path)
         if chrome_err is None:
             return None
+        if "timed out" in chrome_err:
+            # probe passed but the real page hung: remember it so later PDFs in this process skip Chrome
+            chrome = find_chrome()
+            if chrome:
+                _CHROME_READY[chrome] = chrome_err
     try:
         _fallback_pdf(html_path, pdf_path)
     except Exception as e:  # noqa: BLE001
