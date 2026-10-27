@@ -4791,7 +4791,15 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
             rec["pr_state_refusal"] = closed
             rec["verdict"], rec["reason"], _ = verdict_for(None, closed)
             return finish(rec, prdir, work, t0, a)
-    from poc import demo_helper
+    from poc import demo_helper, tavily_budget
+    if product_route(a):
+        rec["_tavily_meter"] = tavily_budget.begin(f"{repo}#{item['pr']}")   # this check's Tavily calls
+        capped = tavily_budget.refusal()
+        if capped:   # refuse up front, before any Tavily call, rather than fail halfway
+            print(capped, flush=True)
+            rec["tavily_credit_refusal"] = capped
+            rec["verdict"], rec["reason"], _ = verdict_for(None, capped)
+            return finish(rec, prdir, work, t0, a)
     if demo_helper.active(a):
         demo_helper.begin_check(a, rec, repo, cfg.get("dist") or cfg.get("pkg"), prdir)
     if product_route(a):
@@ -5051,6 +5059,11 @@ def finish(rec: dict, prdir: Path, work: Path, t0: float, runner=None) -> dict:
     rec["cost"] = cost.take(rec["duration_s"])
     if rec.get("product_check"):  # timing only; study records stay byte-identical
         rec["timings"] = step_timings(rec)
+        from poc import tavily_budget
+        credits = tavily_budget.take(rec.pop("_tavily_meter", None))
+        if credits is not None:
+            rec["tavily_credits"] = credits
+            print(tavily_budget.log_line(credits), flush=True)
     mark_bench_model_invalid(rec, runner)
     errs = check_record(rec)
     if errs:
