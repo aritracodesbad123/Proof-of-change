@@ -2872,9 +2872,13 @@ def _maybe_prepare_contree(a, repo: str, main_sha: str, pr_sha: str, rec: dict, 
         sess = contree_sandboxes.prepare_source_pair(repo, main_sha, pr_sha, timeout=timeout, extra_shell=extra_shell,
                                                      **({"deps_only_fallback": True, "deps_exclude": _aggregate_names(rec),
                                                         "retry_transient": True,
-                                                        **({"parallel": True} if parallel_on(a) else {})}
+                                                        **({"parallel": True, "deps_touched":
+                                                            contree_sandboxes.touches_dependency_files(rec.get("files"))}
+                                                           if parallel_on(a) else {})}
                                                         if product_route(a) else {}))
         rec["contree"] = sess.describe()
+        if getattr(sess, "parallel_fallback", None):
+            rec["contree"]["parallel_fallback"] = sess.parallel_fallback
         rec["machine"] = "contree"
         rec["sandbox_backend"] = "contree"
         rec["sandbox_backend_note"] = contree_sandboxes.note()
@@ -2993,17 +2997,6 @@ def _check_contree_pythons(sess, rec: dict, main_dir) -> str | None:
     rec.setdefault("contree", {})["python"] = info
     if info["problems"]:
         return "Contree Python check failed: " + "; ".join(info["problems"])
-    return None
-
-
-def _check_contree_packages(sess, rec: dict) -> str | None:
-    """Parallel mode only: the PR side is built from the base image, not forked from main, so record the installed
-    versions on each side and refuse (capped at could_not_verify) when they differ or cannot be read."""
-    from poc import contree_sandboxes
-    info = contree_sandboxes.side_packages(sess)
-    rec.setdefault("contree", {})["packages"] = info
-    if info["problems"]:
-        return "Contree package check failed: " + "; ".join(info["problems"])
     return None
 
 
@@ -4690,18 +4683,22 @@ def _contree_only_pair(a, rec: dict, repo: str, cfg: dict, item: dict, sp: dict,
     run_progress.emit("install_main", detail="installing main and PR sides in Contree")
     blocked = _groups_blocked(a, setup_plan)
     if blocked:
+        if par:   # same record as flag-off: probes are planned and frozen before the blocked return
+            run_progress.emit("claims", "super", "planning behaviour claims / probes")
+            plan_probes(repo, item, rec, cm, [cp, work / "src"], prdir, a)
+            rec["pr_side_started_at"] = freeze.now()
         rec["contree_only"]["note"] = "Contree mode: Contree did not run, so nothing from the pull request was run"
         return None, blocked, None, targets
     extra = contree_only_extra_shell(decl, optional, base)
+    module = cfg.get("pkg") or ""
     if par:
         # Probe planning reads only local files and the model; the PR checkpoint runs only the project's install.
         # pr_side_started_at is set after both, so probes are still frozen before any pull-request code runs.
-        cnv, plan = _prepare_while_planning(a, repo, item, rec, sp, cm, cp, work, prdir, extra,
-                                            cfg.get("pkg") or "")
+        cnv, plan = _prepare_while_planning(a, repo, item, rec, sp, cm, cp, work, prdir, extra, module)
         rec["pr_side_started_at"] = pr_started = freeze.now()   # nothing below may create or change a probe
     else:
         cnv = _maybe_prepare_contree(a, repo, sp["main_sha"], sp["pr_sha"], rec, a.build_timeout,
-                                     extra_shell=extra, main_dir=cm, module=cfg.get("pkg") or "")
+                                     extra_shell=extra, main_dir=cm, module=module)
     cnv = own_index_refusal(a, cnv, cm, cp)
     cmp = ex = None
     if cnv:
@@ -4760,7 +4757,9 @@ def _prepare_while_planning(a, repo: str, item: dict, rec: dict, sp: dict, cm: P
         run_progress.emit("claims", "super", "planning behaviour claims / probes")
         try:
             plan = plan_probes(repo, item, rec, cm, [cp, work / "src"], prdir, a)
-        except BaseException:
+        except BaseException as err:
+            run_progress.emit("claims", "super", f"probe planning failed ({type(err).__name__}); waiting for the "
+                                                 "Contree setup to finish before reporting it")
             try:
                 prep.result()
             except Exception:  # noqa: BLE001, S110 - the planning error is the one reported

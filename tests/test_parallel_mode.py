@@ -23,7 +23,7 @@ def _runner(log, delay=0.2):
         with lock:
             live["n"] -= 1
         uid = "img-pr" if "deadbeefpr" in shell else "img-main"
-        return {"exit_code": 0, "stdout": "", "stderr": "", "uuid": uid}
+        return {"exit_code": 0, "stdout": "[]" if "pip list" in shell else "", "stderr": "", "uuid": uid}
     return run, live
 
 
@@ -54,10 +54,11 @@ def test_parallel_prepare_builds_both_from_base_at_once():
     run, live = _runner(log)
     t0 = time.time()
     sess = cs.prepare_source_pair("o/r", "deadbeefmain", "deadbeefpr", runner=run, parallel=True)
-    assert time.time() - t0 < 0.39
+    assert time.time() - t0 < 0.39 + 0.45   # builds overlap (0.2 s), then two 0.2 s version reads
     assert live["max"] == 2
-    assert sess.main_uuid == "img-main" and sess.pr_uuid == "img-pr"
-    assert all(img is None and not disp for _, disp, img in log)   # separate sandboxes from the base image
+    assert sess.main_uuid == "img-main" and sess.pr_uuid == "img-pr" and sess.parallel_fallback is None
+    builds = [(disp, img) for _, disp, img in log if not disp]
+    assert builds == [(False, None), (False, None)]   # separate sandboxes from the base image
 
 
 def test_parallel_prepare_main_failure_raises():
@@ -119,45 +120,69 @@ class _ArgvSess:
         return {"exit_code": 0, "stdout": json.dumps([{"name": k, "version": x} for k, x in v.items()])}
 
 
-def test_side_packages_same_versions_pass():
-    info = cs.side_packages(_ArgvSess({"attrs": "24.1"}, {"Attrs": "24.1"}))
-    assert info["problems"] == [] and info["differs"] == []
+def test_package_drift_none_when_same():
+    assert cs.package_drift(_ArgvSess({"attrs": "24.1"}, {"Attrs": "24.1"})) is None
 
 
-def test_side_packages_differ_caps_check(monkeypatch):
-    sess = _ArgvSess({"attrs": "24.1", "six": "1.16"}, {"attrs": "24.2"})
-    rec = {}
-    why = dr._check_contree_packages(sess, rec)
-    assert why and "attrs: main 24.1, PR 24.2" in why and "six: main 1.16, PR not installed" in why
-    assert rec["contree"]["packages"]["main"]["attrs"] == "24.1"
-    v, _, _ = dr.verdict_for(None, why)
-    assert v == "could_not_verify"
+def test_package_drift_reasons():
+    why = cs.package_drift(_ArgvSess({"attrs": "24.1", "six": "1.16"}, {"attrs": "24.2"}))
+    assert "attrs: main 24.1, PR 24.2" in why and "six: main 1.16, PR not installed" in why
+    assert "could not be read" in cs.package_drift(_ArgvSess({"a": "1"}, None))
 
 
-def test_side_packages_unreadable_is_a_problem():
-    assert cs.side_packages(_ArgvSess({"a": "1"}, None))["problems"]
+def test_no_could_not_verify_on_drift_code_left():
+    assert not hasattr(dr, "_check_contree_packages") and not hasattr(cs, "side_packages")
+
+
+@pytest.mark.parametrize("files,hit", [(["requirements-dev.txt"], True), (["pyproject.toml"], True),
+                                       ({"all": ["sub/setup.cfg"]}, True), (["constraints.txt"], True),
+                                       (["src/x.py", "docs/requirements.md"], False)])
+def test_touches_dependency_files(files, hit):
+    assert cs.touches_dependency_files(files) is hit
 
 
 def test_client_sync_creates_one_client_under_threads(monkeypatch):
     import sys
-    made = []
+    made, inside, peak = [], {"n": 0}, {"n": 0}
+    gate = threading.Barrier(2)
 
     class Slow:
         def __init__(self):
-            time.sleep(0.05)
+            inside["n"] += 1
+            peak["n"] = max(peak["n"], inside["n"])
+            time.sleep(0.1)
             made.append(self)
+            inside["n"] -= 1
     monkeypatch.setitem(sys.modules, "contree_sdk", SimpleNamespace(ContreeSync=Slow))
     sess = cs.ContreeSession()
-    ts = [threading.Thread(target=sess._client_sync) for _ in range(8)]
+    got = []
+
+    def go():
+        gate.wait()   # both threads call _client_sync at the same moment
+        got.append(sess._client_sync())
+    ts = [threading.Thread(target=go) for _ in range(2)]
     for t in ts:
         t.start()
     for t in ts:
         t.join()
-    assert len(made) == 1
+    assert len(got) == 2 and got[0] is got[1] and len(made) == 1 and peak["n"] == 1
 
 
-def test_started_map_is_lock_guarded():
-    assert isinstance(cs._STATE_LOCK, type(threading.Lock()))
+def test_started_map_two_threads_never_lose_entries():
+    keys = list(range(2000))
+
+    def put(off):
+        for k in keys[off::2]:
+            with cs._STATE_LOCK:
+                cs._STARTED[-1 - k] = False
+    ts = [threading.Thread(target=put, args=(o,)) for o in (0, 1)]
+    for t in ts:
+        t.start()
+    for t in ts:
+        t.join()
+    with cs._STATE_LOCK:
+        n = sum(1 for k in keys if cs._STARTED.pop(-1 - k, None) is False)
+    assert n == len(keys)
 
 
 def test_parallel_main_failure_does_not_wait_for_pr_build():
@@ -199,10 +224,14 @@ def test_planning_error_not_hidden_by_prep_error(monkeypatch):
     def plan(*a, **k):
         raise ValueError("planning")
     monkeypatch.setattr(dr, "plan_probes", plan)
+    seen = []
+    from poc import run_progress
+    monkeypatch.setattr(run_progress, "emit", lambda *a, **k: seen.append(" ".join(map(str, a))))
     a = SimpleNamespace(build_timeout=60)
     with pytest.raises(ValueError, match="planning"):
         dr._prepare_while_planning(a, "o/r", {}, {}, {"main_sha": "m", "pr_sha": "p"}, None, None,
                                    __import__("pathlib").Path("."), None, "")
+    assert any("probe planning failed (ValueError); waiting" in m for m in seen)
 
 
 JUNIT = ('<?xml version="1.0"?><testsuites><testsuite name="s" tests="2">'
@@ -222,22 +251,59 @@ def _junit_pytest(fail_pr=False, die_pr=False):
     return once
 
 
-def _pair(monkeypatch, tmp_path, parallel, **kw):
-    """Run the whole Contree-only pair with every Contree/model step stubbed; return (record, result, verdict)."""
-    (tmp_path / "side-main").mkdir(exist_ok=True)
-    (tmp_path / "side-pr").mkdir(exist_ok=True)
+def _contree_runner(drift=False, outside=False):
+    """Fake Contree API under a real session: installs, python --version, pip list and the own-checkout import."""
+    import json
+
+    def run(shell, disposable, image_ref, timeout, files):
+        r = {"exit_code": 0, "stdout": "", "stderr": "", "uuid": None}
+        if "python --version" in shell:
+            r["stdout"] = "Python 3.12.1\n"
+        elif "pip list" in shell:
+            pr_base = image_ref == "img-pr-base"
+            r["stdout"] = json.dumps([{"name": "attrs", "version": "24.2" if drift and pr_base else "24.1"}])
+        elif "importlib" in shell:
+            f = "/usr/lib/python3/site-packages/x/__init__.py" if outside else "/work/src/x/__init__.py"
+            r["stdout"] = json.dumps({"root": "/work/src", "file": f, "namespace": False, "paths": []})
+        elif not disposable:   # checkpoint builds
+            if "origin m\n" in shell:
+                r["uuid"] = "img-main"
+            elif image_ref == "img-main":
+                r["uuid"] = "img-pr"            # forked on main, as flag-off does
+            else:
+                r["uuid"] = "img-pr-base"       # parallel build from the base image
+        return r
+    return run
+
+
+def _pair(monkeypatch, tmp_path, parallel, real_prep=False, blocked="", files=("src/x.py",), drift=False,
+          outside=False, **kw):
+    """Run the whole Contree-only pair with model/test steps stubbed; return (record, result, verdict).
+    real_prep keeps _maybe_prepare_contree and prepare_source_pair real over a fake Contree API."""
+    import shutil
+    for d in ("side-main", "side-pr", "venv-main", "venv-pr"):
+        shutil.rmtree(tmp_path / d, ignore_errors=True)
+    (tmp_path / "side-main").mkdir()
+    (tmp_path / "side-pr").mkdir()
     if parallel:
         monkeypatch.setenv("POC_PARALLEL", "1")
     else:
         monkeypatch.delenv("POC_PARALLEL", raising=False)
     stub = {"chosen_test_targets": lambda c: ["t.py"], "declared_test_deps": lambda *a: [],
-            "optional_backend_reqs": lambda *a: [], "_groups_blocked": lambda *a: None,
-            "_maybe_prepare_contree": lambda *a, **k: None, "own_index_refusal": lambda a, cnv, *x: cnv,
+            "optional_backend_reqs": lambda *a: [], "own_index_refusal": lambda a, cnv, *x: cnv,
             "plan_probes": lambda *a, **k: {"probes": []}, "_contree_ready": lambda: True,
             "_contree_pytest_once": _junit_pytest(**kw),
             "contree_coverage_run": lambda *a, **k: {"status": "stub"},
             "run_probes": lambda *a, **k: {"items": []}, "contree_probe_coverage": lambda *a, **k: {"status": "stub"},
-            "settle_probes": lambda rec: None, "change_is_docstring_only": lambda *a: False}
+            "settle_probes": lambda rec: None, "change_is_docstring_only": lambda *a: False,
+            "_product_plan": lambda *a, **k: ({"groups_blocked": blocked} if blocked else {})}
+    if real_prep:
+        run = _contree_runner(drift=drift, outside=outside)
+        real_new = cs.new_session
+        monkeypatch.setattr(cs, "new_session", lambda **k: real_new(runner=run, **{x: v for x, v in k.items()
+                                                                                    if x != "runner"}))
+    else:
+        stub["_maybe_prepare_contree"] = lambda *a, **k: None
     for k, v in stub.items():
         monkeypatch.setattr(dr, k, v)
     monkeypatch.setattr(dr.freeze, "now", lambda: "T")
@@ -247,15 +313,73 @@ def _pair(monkeypatch, tmp_path, parallel, **kw):
                         test_timeout=60, run_timeout=600, build_timeout=60, sandbox_backend="contree")
     prdir = tmp_path / ("on" if parallel else "off")
     prdir.mkdir(exist_ok=True)
-    rec = {"files": ["src/x.py"]}
-    item = {"files": ["src/x.py"], "pr": 1, "chosen": None}
-    out = dr._contree_only_pair(a, rec, "o/r", {"dist": "x"}, item, {"main_sha": "m", "pr_sha": "p"}, tmp_path,
-                                prdir, False)
+    rec = {"files": {"all": list(files)}}
+    item = {"files": {"all": list(files)}, "pr": 1, "chosen": None}
+    out = dr._contree_only_pair(a, rec, "o/r", {"dist": "x", "pkg": "x"}, item, {"main_sha": "m", "pr_sha": "p"},
+                                tmp_path, prdir, True)
+    cs.clear_session()
     cmp, cnv, ex, _ = out
     v = dr.verdict_for(cmp, cnv, ex)
     for r in rec.get("per_run", []):
         r.pop("seconds", None)
     return rec, out, v
+
+
+def _same(off, on):
+    fb = (on[0].get("contree") or {}).pop("parallel_fallback", None)
+    assert on[0] == off[0]
+    assert on[1] == off[1]
+    assert on[2] == off[2]
+    return fb
+
+
+def test_on_off_same_when_pr_changes_dependencies(monkeypatch, tmp_path):
+    files = ("src/x.py", "requirements.txt")
+    off = _pair(monkeypatch, tmp_path, False, real_prep=True, files=files)
+    on = _pair(monkeypatch, tmp_path, True, real_prep=True, files=files)
+    assert _same(off, on) == "the pull request changes a dependency file"
+    assert on[0]["contree"]["pr_uuid"] == "img-pr"   # built on main's image
+
+
+def test_on_off_same_with_version_drift(monkeypatch, tmp_path):
+    off = _pair(monkeypatch, tmp_path, False, real_prep=True, drift=True)
+    on = _pair(monkeypatch, tmp_path, True, real_prep=True, drift=True)
+    fb = _same(off, on)
+    assert fb.startswith("main and PR installed different package versions: attrs: main 24.1, PR 24.2")
+    assert on[2][0] == off[2][0] != "could_not_verify"
+
+
+def test_parallel_without_drift_keeps_base_build(monkeypatch, tmp_path):
+    on = _pair(monkeypatch, tmp_path, True, real_prep=True)
+    assert on[0]["contree"]["pr_uuid"] == "img-pr-base" and "parallel_fallback" not in on[0]["contree"]
+    assert on[0]["contree"]["own_checkout"]["status"] == "ok" and on[0]["contree"]["python"]["problems"] == []
+
+
+@pytest.mark.parametrize("drift", [False, True])
+def test_own_checkout_check_fires_on_and_off(monkeypatch, tmp_path, drift):
+    off = _pair(monkeypatch, tmp_path, False, real_prep=True, outside=True, drift=drift)
+    on = _pair(monkeypatch, tmp_path, True, real_prep=True, outside=True, drift=drift)
+    for r in (off, on):
+        assert r[0]["contree"]["own_checkout"]["status"] == "outside the checkout"
+        assert "separately installed copy" in r[1][1] and r[2][0] == "could_not_verify"
+    assert on[0]["contree"]["own_checkout"] == off[0]["contree"]["own_checkout"]
+    assert on[2] == off[2]
+
+
+def test_on_off_same_when_blocked(monkeypatch, tmp_path):
+    off = _pair(monkeypatch, tmp_path, False, real_prep=True, blocked="dependency groups refused")
+    on = _pair(monkeypatch, tmp_path, True, real_prep=True, blocked="dependency groups refused")
+    assert on[0].get("pr_side_started_at") == off[0].get("pr_side_started_at") == "T"
+    assert _same(off, on) is None
+    assert on[1][1] == "dependency groups refused"
+
+
+def test_plan_probes_never_writes_contree_record():
+    import ast
+    import inspect
+    src = inspect.getsource(dr.plan_probes)
+    names = {n.value for n in ast.walk(ast.parse(src)) if isinstance(n, ast.Constant) and n.value == "contree"}
+    assert not names, "plan_probes must not touch rec['contree'] (it runs while the checkpoints are built)"
 
 
 @pytest.mark.parametrize("kw", [{}, {"fail_pr": True}, {"die_pr": True}])

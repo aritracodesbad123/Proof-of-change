@@ -290,6 +290,8 @@ class ContreeSession:
         self._client = None
         # Parallel mode: set when main's checkpoint fails, so a PR build still running is never used.
         self._pr_abandoned = False
+        # Parallel mode: why the PR side was rebuilt on top of main's image as flag-off does (None: not rebuilt).
+        self.parallel_fallback: str | None = None
 
     def describe(self) -> dict:
         return {"main_uuid": self.main_uuid, "pr_uuid": self.pr_uuid, "max_ops": MAX_OPS,
@@ -425,9 +427,10 @@ class ContreeSession:
         uuid = raw.get("uuid")
         if not uuid:
             raise ContreeError("PR checkpoint returned no reusable image id")
-        if self._pr_abandoned:   # main failed first: this image is never used for the check
-            return {"backend": "contree", "kind": "pr", "uuid": None, "from": "base", "abandoned": True}
-        self.pr_uuid = str(uuid)
+        with _STATE_LOCK:   # checked and set together with _prepare_parallel's abandon
+            if self._pr_abandoned:   # main failed first: this image is never used for the check
+                return {"backend": "contree", "kind": "pr", "uuid": None, "from": "base", "abandoned": True}
+            self.pr_uuid = str(uuid)
         return {"backend": "contree", "kind": "pr", "uuid": self.pr_uuid, "from": "base", "disposable": False}
 
     def run_argv(self, side: str, argv: list, *, timeout: int = 600, cwd: str = "/work/src",
@@ -676,8 +679,9 @@ def _prepare_parallel(sess: "ContreeSession", main_shell: str, pr_shell: str, ti
     try:
         sess.checkpoint_main(main_shell, timeout=timeout)
     except BaseException as e:
-        sess._pr_abandoned = True
-        sess.pr_uuid = None
+        with _STATE_LOCK:
+            sess._pr_abandoned = True
+            sess.pr_uuid = None
         try:
             e.pr_build = ("failed too: " + type(res["err"]).__name__) if "err" in res else (
                 PR_BUILD_ABANDONED if t.is_alive() else "finished, not used")
@@ -689,44 +693,50 @@ def _prepare_parallel(sess: "ContreeSession", main_shell: str, pr_shell: str, ti
         raise res["err"]
 
 
-def side_packages(sess: "ContreeSession", *, timeout: int = 120) -> dict:
-    """Installed distributions on each side's checkpoint (`pip list`, editable installs of the project left out).
+DEPENDENCY_FILE_NAMES = {"pyproject.toml", "setup.py", "setup.cfg", "uv.lock", "poetry.lock", "pdm.lock",
+                         "Pipfile", "Pipfile.lock", "environment.yml", "environment.yaml"}
 
-    Parallel mode builds the PR side from the base image instead of forking main, so an unpinned dependency can
-    resolve differently. Any difference, or a side that cannot be read, adds a problem: the check is then capped at
-    could_not_verify rather than blaming a version change on the pull request."""
-    out: dict = {"main": {}, "pr": {}, "differs": [], "problems": []}
+
+def touches_dependency_files(files) -> bool:
+    """True when the changed files include a dependency file (pyproject, setup, requirements, constraints, locks).
+    files is a list of paths or a classify_files dict (its "all" list)."""
+    paths = files.get("all") or [] if isinstance(files, dict) else list(files or [])
+    for f in paths:
+        name = str(f).rsplit("/", 1)[-1]
+        if name in DEPENDENCY_FILE_NAMES or (name.endswith((".txt", ".in"))
+                                             and name.startswith(("requirements", "constraints"))):
+            return True
+    return False
+
+
+def package_drift(sess: "ContreeSession", *, timeout: int = 120) -> str | None:
+    """Parallel mode: compare the installed distributions on both checkpoints (`pip list`, editable installs of the
+    project left out). Returns why the PR side must be rebuilt on main's image (a version differs, or a side cannot
+    be read), else None. This never changes a verdict: the caller falls back to the flag-off build."""
+    found: dict = {}
     for side in ("main", "pr"):
         try:
             raw = sess.run_argv(side, ["python", "-m", "pip", "list", "--format=json", "--exclude-editable",
                                        "--disable-pip-version-check"], timeout=timeout, cwd="/work")
         except ContreeError as e:
             raw = {"exit_code": None, "stdout": "", "stderr": type(e).__name__}
-        pk = None
-        if raw.get("exit_code") == 0:
-            try:
-                pk = {str(d["name"]).lower().replace("_", "-"): str(d["version"])
-                      for d in json.loads(raw.get("stdout") or "")}
-            except (ValueError, TypeError, KeyError):
-                pk = None
-        if pk is None:
-            out["problems"].append(f"{side}: installed package versions inside Contree could not be read")
-            continue
-        out[side] = pk
-    if not out["problems"]:
-        for name in sorted(set(out["main"]) | set(out["pr"])):
-            a, b = out["main"].get(name), out["pr"].get(name)
-            if a != b:
-                out["differs"].append(f"{name}: main {a or 'not installed'}, PR {b or 'not installed'}")
-        if out["differs"]:
-            out["problems"].append("main and PR installed different package versions: " + "; ".join(out["differs"]))
-    return out
+        try:
+            if raw.get("exit_code") != 0:
+                raise ValueError
+            found[side] = {str(d["name"]).lower().replace("_", "-"): str(d["version"])
+                           for d in json.loads(raw.get("stdout") or "")}
+        except (ValueError, TypeError, KeyError):
+            return f"installed package versions on the {side} side could not be read"
+    differs = [f"{n}: main {found['main'].get(n) or 'not installed'}, PR {found['pr'].get(n) or 'not installed'}"
+               for n in sorted(set(found["main"]) | set(found["pr"])) if found["main"].get(n) != found["pr"].get(n)]
+    return ("main and PR installed different package versions: " + "; ".join(differs)) if differs else None
 
 
 def prepare_source_pair(repo: str, main_sha: str, pr_sha: str, *, timeout: int = 1800,
                         runner: Callable | None = None, extra_shell: str = "",
                         deps_only_fallback: bool = False, deps_exclude=(),
-                        retry_transient: bool = False, parallel: bool = False) -> ContreeSession:
+                        retry_transient: bool = False, parallel: bool = False,
+                        deps_touched: bool = False) -> ContreeSession:
     """Build main + PR Contree checkpoints for a source-pair style PR.
 
     extra_shell is applied to both SHAs. Empty keeps the default install shell. parallel (POC_PARALLEL, product
@@ -734,13 +744,24 @@ def prepare_source_pair(repo: str, main_sha: str, pr_sha: str, *, timeout: int =
     """
     kw = {"retry_transient": True} if retry_transient else {}
     sess = new_session(runner=runner, **kw) if runner is not None else new_session(**kw)
-    if parallel:
-        _prepare_parallel(sess, install_shell_source(repo, main_sha, extra_shell, deps_only_fallback, deps_exclude),
-                          install_shell_source(repo, pr_sha, extra_shell, deps_only_fallback, deps_exclude), timeout)
+    main_shell = install_shell_source(repo, main_sha, extra_shell, deps_only_fallback, deps_exclude)
+    pr_shell = install_shell_source(repo, pr_sha, extra_shell, deps_only_fallback, deps_exclude)
+    if parallel and not deps_touched:
+        _prepare_parallel(sess, main_shell, pr_shell, timeout)
+        why = package_drift(sess)
+        if why is None:
+            return sess
+        # Fall back to exactly the flag-off build: the PR side on top of main's image. Never changes a verdict.
+        sess.pr_uuid = None
+        sess.fork_pr(pr_shell, timeout=timeout)
+        sess.parallel_fallback = why
         return sess
-    sess.checkpoint_main(install_shell_source(repo, main_sha, extra_shell, deps_only_fallback, deps_exclude), timeout=timeout)
-    sess.fork_pr(install_shell_source(repo, pr_sha, extra_shell, deps_only_fallback, deps_exclude), timeout=timeout)
+    if parallel:
+        sess.parallel_fallback = "the pull request changes a dependency file"
+    sess.checkpoint_main(main_shell, timeout=timeout)
+    sess.fork_pr(pr_shell, timeout=timeout)
     return sess
+
 
 
 def smoke(env: dict | None = None) -> dict:

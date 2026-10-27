@@ -14,11 +14,18 @@ A product check run with `POC_PARALLEL=1` saves wall time in three places. The f
 - Pull-request code still runs only in Contree.
 - If main's checkpoint fails, that failure is reported first, the same as in serial order, and the check does not wait for the PR build. The PR build is marked abandoned in the record (`contree.pr_build`); it ends on Contree's own time limit and its image is never used.
 - A probe-planning error is raised as itself. The background checkpoint build is still waited for, but its result never replaces the planning error.
+- Probe planning never writes `rec['contree']`, which the background build owns.
 - One code path: the serial and parallel checks share `_contree_only_pair`; only the prep step and the timed-run schedule differ.
 - If one side has no test targets, the other side runs alone, the same as in serial order.
 
-## Installed versions per side
-Because the PR side is no longer forked from main, a dependency with an unpinned range could resolve to a different version on each side. In parallel mode the installed packages on both checkpoints are recorded (`contree.packages`, from `pip list`, editable installs of the project left out). If any version differs, or a side cannot be read, the check is refused and capped at could not verify, so a version change is never blamed on the pull request. A pull request that changes its own dependencies therefore comes out could not verify in parallel mode; serial mode is unchanged.
+## Fallback to the flag-off build
+The flag never changes a verdict. Because the PR side is normally built from the base image instead of on main's image, a dependency with an unpinned range could resolve differently. So after both builds the installed packages on each side are compared (`pip list`, editable installs of the project left out). The PR side is rebuilt on top of main's image, exactly as with the flag off, when:
+- any installed version differs between the sides, or
+- a side's package list cannot be read.
+
+When the pull request changes a dependency file (pyproject, setup, requirements, constraints or a lock file), the parallel build is skipped and both sides are built exactly as with the flag off. Each fallback is recorded as `contree.parallel_fallback` with its reason. Main's Python check and the PR-own-code check run after every build path, parallel or fallback.
+
+Blocked checks plan and freeze the probes before returning, so their records match the flag-off records.
 
 ## Timings
 Running the pairs at the same time means the two sides compete for the same service at once. Per-side seconds from parallel mode are recorded for completeness only and must not be used in any speed claim. Only whole-check wall time, measured with the flag on and off on the same cases, may be compared.
