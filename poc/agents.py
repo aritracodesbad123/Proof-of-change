@@ -83,7 +83,7 @@ SUMMARY_PROMPT = (
     "\n"
     + UNTRUSTED_RULES
     + "\n\n"
-    "Abstain by setting text to \"could not verify from the record excerpt\" and quotes to an empty list "
+    "Abstain by setting text to \"No summary: the record excerpt did not support one.\" and quotes to an empty list "
     "when the excerpt does not support a summary.\n"
     "\n"
     "The text may only state what the record excerpt states. "

@@ -75,7 +75,7 @@ CLAIMS_PROMPT = (
     "For each claim use exactly these fields:\n"
     "- id: C1, C2, and so on\n"
     "- text: one sentence\n"
-    "- source_quote: a copy of the words from the title or description, unchanged\n"
+    "- source_quote: copied exactly, character for character, from the pull request text\n"
     "- testable: false when the claim cannot be checked by running code, otherwise true\n"
     "- expect: \"differs\" when the claim says behaviour changes between the base and the pull request, "
     "\"same\" when the claim says behaviour stays the same\n"
