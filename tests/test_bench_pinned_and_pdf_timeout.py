@@ -163,7 +163,9 @@ def test_report_failure_never_changes_exit_or_records(tmp_path, monkeypatch, cap
 def test_step_timings_recorded_and_shown(monkeypatch):
     from poc import run_progress
     clock = iter([100.0, 103.0, 110.0, 111.5])
-    monkeypatch.setattr(run_progress.time, "time", lambda: next(clock))
+    # Fake only run_progress's clock: patching time.time itself would also feed any other thread in the process.
+    monkeypatch.setattr(run_progress, "time", types.SimpleNamespace(time=lambda: next(clock)))
+    monkeypatch.delenv("POC_PROGRESS_PATH", raising=False)   # the clock list assumes no progress file is written
     run_progress.reset_timings()
     run_progress.emit("fetch_pr")
     run_progress.emit("setup_lookup")

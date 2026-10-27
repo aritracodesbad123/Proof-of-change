@@ -69,9 +69,23 @@ def listener():
     srv = socket.socket()
     srv.bind(("127.0.0.1", 0))
     srv.listen(5)
-    threading.Thread(target=lambda: [c.close() for c in iter(lambda: srv.accept()[0], None)], daemon=True).start()
+    def serve():
+        while True:
+            try:
+                conn, _ = srv.accept()
+            except OSError:   # the socket was shut down at teardown: stop quietly
+                return
+            conn.close()
+    t = threading.Thread(target=serve, daemon=True)
+    t.start()
     yield srv.getsockname()[1]
+    try:
+        srv.shutdown(socket.SHUT_RDWR)   # wakes the blocked accept() before the socket is closed
+    except OSError:
+        pass
     srv.close()
+    t.join(5)
+    assert not t.is_alive(), "listener thread did not stop"
 
 
 EVIL_BACKEND = r'''
