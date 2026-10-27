@@ -1,6 +1,6 @@
 # Benchmark cases test their pinned commits; a slow PDF never stops a check
 
-Status: proposed
+Status: accepted
 
 ## What happened
 
