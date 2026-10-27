@@ -7,6 +7,7 @@ Secrets never enter Contree shell env. Concurrent ops are capped at CONTREE_MAX_
 """
 from __future__ import annotations
 
+import json
 import os
 import re
 import shlex
@@ -206,6 +207,8 @@ def is_transient_error(exc: BaseException) -> bool:
 # id(command string) -> True once Contree has created the run for it. The command string object is held alive for
 # the whole try, so its id is unique while it is registered; this keeps concurrent runs on one client apart.
 _STARTED: dict[int, bool] = {}
+# Guards _STARTED and each session's lazy client: parallel mode starts two runs at once on one session.
+_STATE_LOCK = threading.Lock()
 
 
 # The start-tracking hook relies on an SDK internal (_start_operation, and that the request keeps the same command
@@ -237,8 +240,9 @@ def _track_starts(client) -> bool:
 
     def mark(request):
         key = id(getattr(request, "command", None))
-        if key in _STARTED:
-            _STARTED[key] = True
+        with _STATE_LOCK:
+            if key in _STARTED:
+                _STARTED[key] = True
 
     def tracked(request, *a, **k):
         res = inner(request, *a, **k)
@@ -284,20 +288,25 @@ class ContreeSession:
         # runner(shell, disposable, image_ref|None, timeout, files) -> {exit_code,stdout,stderr,uuid}
         self._runner = runner
         self._client = None
+        # Parallel mode: set when main's checkpoint fails, so a PR build still running is never used.
+        self._pr_abandoned = False
+        # Parallel mode: why the PR side was rebuilt on top of main's image as flag-off does (None: not rebuilt).
+        self.parallel_fallback: str | None = None
 
     def describe(self) -> dict:
         return {"main_uuid": self.main_uuid, "pr_uuid": self.pr_uuid, "max_ops": MAX_OPS,
                 "sdk": SDK_VERSION, "base_image": self.base_image}
 
     def _client_sync(self):
-        if self._client is not None:
+        with _STATE_LOCK:
+            if self._client is not None:
+                return self._client
+            try:
+                from contree_sdk import ContreeSync
+            except ImportError as e:
+                raise ContreeError("contree-sdk is not installed; pip install -e '.[contree]'") from e
+            self._client = ContreeSync()
             return self._client
-        try:
-            from contree_sdk import ContreeSync
-        except ImportError as e:
-            raise ContreeError("contree-sdk is not installed; pip install -e '.[contree]'") from e
-        self._client = ContreeSync()
-        return self._client
 
     def _run_on(self, image_ref: str | None, shell: str, *, disposable: bool, timeout: int,
                 files: dict | None = None) -> dict:
@@ -338,7 +347,8 @@ class ContreeSession:
             cmd = bash_wrapped(shell)
             key = id(cmd)
             if can_track:
-                _STARTED[key] = False
+                with _STATE_LOCK:
+                    _STARTED[key] = False
             try:
                 if image_ref:
                     img = client.images.use(image_ref, strict=True)
@@ -348,7 +358,11 @@ class ContreeSession:
             except ContreeError:
                 raise
             except Exception as e:  # noqa: BLE001
-                started = _STARTED.get(key, True) if can_track else True
+                if can_track:
+                    with _STATE_LOCK:
+                        started = _STARTED.get(key, True)
+                else:
+                    started = True
                 if n + 1 >= tries or not is_transient_error(e) or started:
                     raise
                 delay = RETRY_DELAYS[min(n, len(RETRY_DELAYS) - 1)]
@@ -356,7 +370,8 @@ class ContreeSession:
                     raise  # not enough time left for a whole step: keep the original reason
                 _sleep(delay)
             finally:
-                _STARTED.pop(key, None)
+                with _STATE_LOCK:
+                    _STARTED.pop(key, None)
 
     def run_op(self, side: str, shell: str, *, disposable: bool = True, timeout: int = 600,
                files: dict | None = None) -> dict:
@@ -401,6 +416,22 @@ class ContreeSession:
         self.pr_uuid = str(uuid)
         return {"backend": "contree", "kind": "pr", "uuid": self.pr_uuid, "from": self.main_uuid,
                 "disposable": False}
+
+    def build_pr_from_base(self, install_shell: str, *, timeout: int = 1800) -> dict:
+        """Parallel mode only: build the PR checkpoint in its own sandbox from the base image, not forked from main,
+        so it can be built at the same time as main. Same install shell as fork_pr."""
+        shell = f"set -euo pipefail\nmkdir -p /work\ncd /work\n{install_shell}"
+        raw = self.run_op("base", shell, disposable=False, timeout=timeout)
+        if raw.get("exit_code") != 0:
+            raise setup_failure("PR checkpoint install", raw)
+        uuid = raw.get("uuid")
+        if not uuid:
+            raise ContreeError("PR checkpoint returned no reusable image id")
+        with _STATE_LOCK:   # checked and set together with _prepare_parallel's abandon
+            if self._pr_abandoned:   # main failed first: this image is never used for the check
+                return {"backend": "contree", "kind": "pr", "uuid": None, "from": "base", "abandoned": True}
+            self.pr_uuid = str(uuid)
+        return {"backend": "contree", "kind": "pr", "uuid": self.pr_uuid, "from": "base", "disposable": False}
 
     def run_argv(self, side: str, argv: list, *, timeout: int = 600, cwd: str = "/work/src",
                  files: dict | None = None) -> dict:
@@ -675,19 +706,109 @@ def install_shell_source(repo: str, sha: str, extra: str = "", deps_only_fallbac
     return shell.replace(needle, extra + "\n" + needle, 1)
 
 
+PR_BUILD_ABANDONED = ("abandoned: main's checkpoint failed first, so the PR build was not waited for; it ends on "
+                      "Contree's own time limit and its image is never used")
+
+
+def _prepare_parallel(sess: "ContreeSession", main_shell: str, pr_shell: str, timeout: int) -> None:
+    """Build main and PR at once. The PR build runs in a daemon thread so a main failure returns at once instead of
+    waiting up to `timeout` for the PR build: the session is marked abandoned (its PR image is never used) and the
+    error carries pr_build for the record. Main's failure is reported first, as in the serial order."""
+    res: dict = {}
+
+    def build_pr():
+        try:
+            res["ok"] = sess.build_pr_from_base(pr_shell, timeout=timeout)
+        except BaseException as e:  # noqa: BLE001 - re-raised in the caller's thread
+            res["err"] = e
+    t = threading.Thread(target=build_pr, name="poc-pr-checkpoint", daemon=True)
+    t.start()
+    try:
+        sess.checkpoint_main(main_shell, timeout=timeout)
+    except BaseException as e:
+        with _STATE_LOCK:
+            sess._pr_abandoned = True
+            sess.pr_uuid = None
+        try:
+            e.pr_build = ("failed too: " + type(res["err"]).__name__) if "err" in res else (
+                PR_BUILD_ABANDONED if t.is_alive() else "finished, not used")
+        except (AttributeError, TypeError):
+            pass
+        raise
+    t.join()
+    if "err" in res:
+        raise res["err"]
+
+
+DEPENDENCY_FILE_NAMES = {"pyproject.toml", "setup.py", "setup.cfg", "uv.lock", "poetry.lock", "pdm.lock",
+                         "Pipfile", "Pipfile.lock", "environment.yml", "environment.yaml"}
+
+
+def touches_dependency_files(files) -> bool:
+    """True when the changed files include a dependency file (pyproject, setup, requirements, constraints, locks).
+    files is a list of paths or a classify_files dict (its "all" list)."""
+    paths = files.get("all") or [] if isinstance(files, dict) else list(files or [])
+    for f in paths:
+        name = str(f).rsplit("/", 1)[-1]
+        if name in DEPENDENCY_FILE_NAMES or (name.endswith((".txt", ".in"))
+                                             and name.startswith(("requirements", "constraints"))):
+            return True
+    return False
+
+
+def package_drift(sess: "ContreeSession", *, timeout: int = 120) -> str | None:
+    """Parallel mode: compare the installed distributions on both checkpoints (`pip list`, editable installs of the
+    project left out). Returns why the PR side must be rebuilt on main's image (a version differs, or a side cannot
+    be read), else None. This never changes a verdict: the caller falls back to the flag-off build."""
+    found: dict = {}
+    for side in ("main", "pr"):
+        try:
+            raw = sess.run_argv(side, ["python", "-m", "pip", "list", "--format=json", "--exclude-editable",
+                                       "--disable-pip-version-check"], timeout=timeout, cwd="/work")
+        except Exception as e:  # noqa: BLE001 - any SDK error means "could not be read": fall back to flag-off
+            raw = {"exit_code": None, "stdout": "", "stderr": type(e).__name__}
+        try:
+            if raw.get("exit_code") != 0:
+                raise ValueError
+            found[side] = {str(d["name"]).lower().replace("_", "-"): str(d["version"])
+                           for d in json.loads(raw.get("stdout") or "")}
+        except (ValueError, TypeError, KeyError):
+            return f"installed package versions on the {side} side could not be read"
+    differs = [f"{n}: main {found['main'].get(n) or 'not installed'}, PR {found['pr'].get(n) or 'not installed'}"
+               for n in sorted(set(found["main"]) | set(found["pr"])) if found["main"].get(n) != found["pr"].get(n)]
+    return ("main and PR installed different package versions: " + "; ".join(differs)) if differs else None
+
+
 def prepare_source_pair(repo: str, main_sha: str, pr_sha: str, *, timeout: int = 1800,
                         runner: Callable | None = None, extra_shell: str = "",
                         deps_only_fallback: bool = False, deps_exclude=(),
-                        retry_transient: bool = False) -> ContreeSession:
+                        retry_transient: bool = False, parallel: bool = False,
+                        deps_touched: bool = False) -> ContreeSession:
     """Build main + PR Contree checkpoints for a source-pair style PR.
 
-    extra_shell is applied to both SHAs. Empty keeps the default install shell.
+    extra_shell is applied to both SHAs. Empty keeps the default install shell. parallel (POC_PARALLEL, product
+    checks only) builds both checkpoints at once in separate sandboxes from the base image; off keeps the fork.
     """
     kw = {"retry_transient": True} if retry_transient else {}
     sess = new_session(runner=runner, **kw) if runner is not None else new_session(**kw)
-    sess.checkpoint_main(install_shell_source(repo, main_sha, extra_shell, deps_only_fallback, deps_exclude), timeout=timeout)
-    sess.fork_pr(install_shell_source(repo, pr_sha, extra_shell, deps_only_fallback, deps_exclude), timeout=timeout)
+    main_shell = install_shell_source(repo, main_sha, extra_shell, deps_only_fallback, deps_exclude)
+    pr_shell = install_shell_source(repo, pr_sha, extra_shell, deps_only_fallback, deps_exclude)
+    if parallel and not deps_touched:
+        _prepare_parallel(sess, main_shell, pr_shell, timeout)
+        why = package_drift(sess)
+        if why is None:
+            return sess
+        # Fall back to exactly the flag-off build: the PR side on top of main's image. Never changes a verdict.
+        sess.pr_uuid = None
+        sess.fork_pr(pr_shell, timeout=timeout)
+        sess.parallel_fallback = why
+        return sess
+    if parallel:
+        sess.parallel_fallback = "the pull request changes a dependency file"
+    sess.checkpoint_main(main_shell, timeout=timeout)
+    sess.fork_pr(pr_shell, timeout=timeout)
     return sess
+
 
 
 def smoke(env: dict | None = None) -> dict:
