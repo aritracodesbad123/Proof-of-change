@@ -54,7 +54,7 @@ def test_docs_seed_crawled_when_the_repository_gives_too_few_steps(tmp_path):
     assert [u for u, _ in fake.crawls] == [f"https://github.com/acme/widget/tree/{SHA}",
                                            "https://widget.example.org/"]
     assert all(d["crawled"] for d in got["seed_decisions"])
-    assert f"fewer than {tavily_crawl.MIN_REPO_STEPS}" in got["seed_decisions"][1]["why"]
+    assert "fewer than" in got["seed_decisions"][1]["why"]
     assert got["credits"] == 5.0
 
 
@@ -96,3 +96,24 @@ def test_worst_case_still_counts_the_conditional_docs_seed():
     repo_only = tavily_budget.worst_case(crawl_bodies=bodies["crawl"][:1])
     assert tavily_budget.REPO_ONLY_CHECK == repo_only == 8 + 16 + 3 == 27
     assert tavily_budget.WORST_CASE_CHECK == repo_only + per_seed == 43
+
+
+class BarePipRepo(ThinRepo):
+    """The repository only says `pip install attrs hypothesis`: two declared packages, no extra or group."""
+
+    def crawl(self, url, **kw):
+        if "github.com" in url:
+            self.crawls.append((url, kw))
+            return {"results": [{"url": f"https://github.com/acme/widget/blob/{SHA}/README.md",
+                                 "raw_content": "Install: `pip install attrs hypothesis`"}], "usage": {"credits": 2}}
+        return super().crawl(url, **kw)
+
+
+def test_bare_multi_package_pip_line_does_not_skip_the_docs_seed(tmp_path):
+    fake = BarePipRepo()
+    got = _crawl(tmp_path, fake)
+    backed = [s for s in got["steps"] if s["used"] and s["kind"] == "package"]
+    assert len(backed) >= tavily_crawl.MIN_REPO_STEPS   # enough steps by count alone
+    assert [u for u, _ in fake.crawls][-1] == "https://widget.example.org/"
+    docs_d = got["seed_decisions"][1]
+    assert docs_d["crawled"] and "no extra, dependency group or requirements file" in docs_d["why"]

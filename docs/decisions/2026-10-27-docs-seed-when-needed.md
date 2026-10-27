@@ -4,12 +4,15 @@
 
 A product check's repository crawl always crawls the repository seed (the pull request's repository at its
 base commit) and extracts its key pages. It crawls the project's docs site, when the packaging metadata
-labels one, only if those pages give fewer than `MIN_REPO_STEPS` (2) setup steps that the project's own files
-back. The threshold is the same for every project. No project has its own flag.
+labels one, unless those pages give at least `MIN_REPO_STEPS` (2) setup steps that the project's own files
+back **and** at least one of them is an extra, a dependency group or a requirements file. Bare package names
+alone, such as a README's `pip install requests attrs`, never skip the docs site: they list packages but do not
+describe a test setup. The rule is the same for every project. No project has its own flag.
 
 Each record's `repo_crawl` block now has `seed_decisions`: for every seed, its URL, whether it was crawled, and
 why. Examples are "the repository seed is always crawled", "skipped: the repository gave 3 setup step(s), at
-least 2" and "the repository gave 0 setup step(s), fewer than 2". A check that reads a saved crawl records the
+least 2, including 1 extra, group or requirements file", "the repository gave 0 setup step(s), fewer than 2"
+and "the repository gave 2 setup step(s) but no extra, dependency group or requirements file". A check that reads a saved crawl records the
 seeds that crawl used.
 
 ## Saved crawls stay valid
@@ -42,7 +45,8 @@ the backstop. Tests tie both numbers to the request bodies the code sends.
 
 ## Trade-offs
 
-A project whose repository gives two or more setup steps no longer has its docs site read. If those steps are
+A project whose repository gives two or more backed setup steps, one of them structured, no longer has its
+docs site read. If those steps are
 incomplete, the setup-gap repair loop and its lookups still run as before. The docs pages are no longer sent to
 Extract, since extract runs before the decision. When the docs seed is crawled, its raw page text still feeds
 the setup steps.

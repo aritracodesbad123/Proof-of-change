@@ -518,14 +518,31 @@ def _from_cache(block: dict, hit: dict, docs: str, now: float, checkout) -> dict
     return _finish(block, dict(hit.get("pages") or {}), dict(hit.get("full") or {}), checkout)
 
 
-def _steps_used(pages: dict, full: dict, checkout) -> int:
+def _steps_used(pages: dict, full: dict, checkout) -> list[dict]:
     """How many setup steps the project's own files back, from the pages read so far."""
     steps: list[dict] = []
     for url, text in list(full.items()) + [(u, t) for u, t in pages.items() if u not in full]:
         for step in parse_steps(text, url):
             if not any(s["kind"] == step["kind"] and s["value"] == step["value"] for s in steps):
                 steps.append(step)
-    return sum(1 for row in merge_steps(steps, checkout) if row.get("used"))
+    return [row for row in merge_steps(steps, checkout) if row.get("used")]
+
+
+STRUCTURED_KINDS = ("extra", "group", "requirements_file")   # a test setup, not just a list of package names
+
+
+def _repo_enough(used: list[dict]) -> tuple[bool, str]:
+    """The docs site may be skipped only when the repository gives at least MIN_REPO_STEPS backed steps and at
+    least one of them is an extra, a dependency group or a requirements file. Bare package names alone, such as
+    a README's `pip install a b`, never skip it."""
+    structured = sum(1 for row in used if row.get("kind") in STRUCTURED_KINDS)
+    if len(used) >= MIN_REPO_STEPS and structured:
+        return True, (f"skipped: the repository gave {len(used)} setup step(s), at least {MIN_REPO_STEPS}, "
+                      f"including {structured} extra, group or requirements file")
+    if len(used) < MIN_REPO_STEPS:
+        return False, f"the repository gave {len(used)} setup step(s), fewer than {MIN_REPO_STEPS}"
+    return False, (f"the repository gave {len(used)} setup step(s) but no extra, dependency group or "
+                   "requirements file")
 
 
 def _crawl_seed(block: dict, seed: dict, crawl_fn, pages: dict, repo: str, base_sha: str, docs: str) -> bool:
@@ -546,8 +563,8 @@ def _crawl_seed(block: dict, seed: dict, crawl_fn, pages: dict, repo: str, base_
 
 def _crawl_and_store(block: dict, repo: str, base_sha: str, checkout, docs: str, cpath: Path, now: float, env,
                      crawl_fn, extract_fn) -> dict:
-    """Crawl the repository seed and extract its key pages. The docs-site seed is crawled only when the
-    repository gives fewer than MIN_REPO_STEPS setup steps the project's own files back. Each seed's decision
+    """Crawl the repository seed and extract its key pages. The docs-site seed is skipped only when the
+    repository gives at least MIN_REPO_STEPS backed setup steps, one of them an extra, group or requirements file. Each seed's decision
     is recorded in ``seed_decisions``. The cache key and CRAWL_VERSION are unchanged, so saved crawls stay valid;
     a new entry only adds the optional ``seed_decisions`` field, which older readers ignore."""
     crawl_fn = crawl_fn or (lambda url, **kw: crawl(url, env=env, **kw))
@@ -578,16 +595,14 @@ def _crawl_and_store(block: dict, repo: str, base_sha: str, checkout, docs: str,
                 url = str((item or {}).get("url") or "")
                 if in_scope(url, repo, base_sha, docs):
                     full[url] = str(item.get("raw_content") or "")
-    found = _steps_used(pages, full, checkout)
+    enough, why = _repo_enough(_steps_used(pages, full, checkout))
     for seed in docs_seeds:
-        if found >= MIN_REPO_STEPS:
-            decisions.append({"url": seed["url"], "crawled": False,
-                              "why": f"skipped: the repository gave {found} setup step(s), at least {MIN_REPO_STEPS}"})
+        if enough:
+            decisions.append({"url": seed["url"], "crawled": False, "why": why})
             continue
         ok = _crawl_seed(block, seed, crawl_fn, pages, repo, base_sha, docs)
         any_ok = any_ok or ok
-        decisions.append({"url": seed["url"], "crawled": True,
-                          "why": f"the repository gave {found} setup step(s), fewer than {MIN_REPO_STEPS}"})
+        decisions.append({"url": seed["url"], "crawled": True, "why": why})
     block["pages_crawled"] = list(pages)
     block["pages_extracted"] = list(full)
     if not any_ok:
