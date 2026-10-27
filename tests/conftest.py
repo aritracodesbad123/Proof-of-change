@@ -110,3 +110,17 @@ def _reset_contree_bridge():
     yield
     contree_sandboxes.select("local")
     contree_sandboxes.clear_session()
+
+
+@pytest.fixture(autouse=True)
+def _isolate_progress_and_run_memory(monkeypatch):
+    """Process-wide state that tests must not inherit or leave behind.
+
+    POC_PROGRESS_PATH: a console job's worker thread sets it in os.environ for the whole process, so a later test's
+    run_progress.emit would also write a progress event (an extra clock read). monkeypatch puts back the value from
+    before the test when it ends, even if a worker thread changed it meanwhile.
+    console_api._recent_runs: the in-memory list of remembered runs; each test starts with an empty one."""
+    monkeypatch.delenv("POC_PROGRESS_PATH", raising=False)
+    from poc import console_api
+    monkeypatch.setattr(console_api, "_recent_runs", {})
+    yield

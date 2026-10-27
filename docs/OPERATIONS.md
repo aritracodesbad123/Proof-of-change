@@ -112,7 +112,7 @@ Verdict, in order:
 Then the coverage gate. The reason says how many tests ran on each side, how many were unchanged (and how many of
 those were skipped on both sides), flaky tests, and every module that failed to load.
 
-Limitation: after a setup rerun, probe line coverage is measured again only when the change is 200 lines or fewer. A larger change skips that measurement, and the rerun cannot raise the verdict to verified.
+Limitation: after a setup rerun, probe line coverage is measured again only when the change is 200 lines or fewer. A larger change skips that measurement, and the verdict stays could not verify.
 
 ## Coverage gate (`poc/coverage_gate.py`)
 
