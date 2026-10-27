@@ -12,8 +12,8 @@ The shorter copy is in the README.
 
 A check is for a Python project. A project in another language is not supported. A request for a
 check is accepted when the repository's language is Python, or when the project root contains a
-Python project file. The tested set is these small Python libraries: pytest, requests, rich, attrs,
-click, isort, jsonschema, boltons, line_profiler, python-barcode, httpx, urllib3, python-qrcode,
+Python project file. The tested set is these 19 small Python libraries: pytest, requests, rich,
+attrs, click, isort, jsonschema, boltons, python-barcode, httpx, urllib3, python-qrcode,
 itsdangerous, markupsafe, prettytable, loguru, sqlparse, toolz and invoke.
 
 ### Projects that need compiling
@@ -58,9 +58,9 @@ cannot be tested.
 
 ### What a verdict means
 
-Kept means the behaviour the change described still holds. Broken, also called needs attention,
-means the check found a difference a person should look at. Could not verify means the check cannot
-say whether the change is fine.
+Verified means the behaviour the change described still holds. Needs attention means the check
+found a difference a person should look at. Could not verify means the check cannot say whether
+the change is fine.
 
 Passing probes never raise the verdict. The tool never approves a pull request and never merges
 one. A person decides.

@@ -26,7 +26,7 @@ comment; it never posts to random upstream projects.
 
 A longer version of this section is in [docs/LIMITATIONS.md](docs/LIMITATIONS.md#what-we-can-and-cant-test).
 
-Proof-of-Change checks Python projects. A project in another language is not supported. The tested set is these small Python libraries: pytest, requests, rich, attrs, click, isort, jsonschema, boltons, line_profiler, python-barcode, httpx, urllib3, python-qrcode, itsdangerous, markupsafe, prettytable, loguru, sqlparse, toolz and invoke.
+Proof-of-Change checks Python projects. A project in another language is not supported. The tested set is these 19 small Python libraries: pytest, requests, rich, attrs, click, isort, jsonschema, boltons, python-barcode, httpx, urllib3, python-qrcode, itsdangerous, markupsafe, prettytable, loguru, sqlparse, toolz and invoke.
 
 A project that needs compiling is not supported. That includes code written in C, C++ or Rust. The daily run enforces this for dependencies before it selects pull requests. It resolves the project's runtime requirements and allows only ready-built packages, so that step compiles nothing and installs nothing. If a requirement has no ready-built package, that project's pull requests are left out of the run. The check reads the dependencies in the project file and the plain lines of a top-level requirements file. It does not open the project's own compiled code, and it does not read optional or test requirements, so a project can still reach setup and fail there. A check of one named pull request does not run this test. When a check needs a compiler, the check does not install one. Setup fails, and the result is could not verify.
 
@@ -34,7 +34,7 @@ Not built: in a Contree-only run the tool does not measure which changed lines a
 
 Tests and probes in the local sandbox have no internet. The network is on only while packages are installed. Secret keys are not given to that sandbox, and they are not placed in a Contree shell. A behaviour that needs a network service, a password or a key cannot be tested.
 
-Kept means the behaviour the change described still holds. Broken, also called needs attention, means the check found a difference a person should look at. Could not verify means the check cannot say whether the change is fine. Passing probes never raise the verdict. The tool never approves a pull request and never merges one. A person decides.
+Verified means the behaviour the change described still holds. Needs attention means the check found a difference a person should look at. Could not verify means the check cannot say whether the change is fine. Passing probes never raise the verdict. The tool never approves a pull request and never merges one. A person decides.
 
 Not built: the same-commit guard on a study run. A product check stops when main and the pull request are the same commit. A study run does not apply that guard.
 
