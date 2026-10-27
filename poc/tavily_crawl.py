@@ -26,6 +26,7 @@ EXTRACT_API = "https://api.tavily.com/extract"
 UNAVAILABLE = "Tavily unavailable"
 CRAWL_LIMIT = 40
 EXTRACT_MAX = 12
+MIN_REPO_STEPS = 2      # crawl the docs-site seed only when the repository gives fewer setup steps than this
 TIMEOUT = 150
 CACHE_ENV = "POC_TAVILY_CRAWL_CACHE"
 CRAWL_VERSION = "2"     # bump when crawl or step-parsing code changes, so old cached crawls are not reused
@@ -509,33 +510,72 @@ def crawl_repo(repo: str, base_sha: str, checkout, env: dict | None = None, craw
 def _from_cache(block: dict, hit: dict, docs: str, now: float, checkout) -> dict:
     # Same project version: the same pages give the same steps, with no Tavily call and no credits.
     block.update(docs_domain=docs, seeds=list(hit.get("seeds") or []))
+    block["seed_decisions"] = list(hit.get("seed_decisions") or []) or [
+        {"url": u, "crawled": True, "why": "read from a crawl saved for this repository and base commit"}
+        for u in block["seeds"]]
     block["cache"]["hit"] = True
     block["cache"]["age_seconds"] = int(now - float(hit.get("saved_at") or now))
     return _finish(block, dict(hit.get("pages") or {}), dict(hit.get("full") or {}), checkout)
 
 
+def _steps_used(pages: dict, full: dict, checkout) -> list[dict]:
+    """How many setup steps the project's own files back, from the pages read so far."""
+    steps: list[dict] = []
+    for url, text in list(full.items()) + [(u, t) for u, t in pages.items() if u not in full]:
+        for step in parse_steps(text, url):
+            if not any(s["kind"] == step["kind"] and s["value"] == step["value"] for s in steps):
+                steps.append(step)
+    return [row for row in merge_steps(steps, checkout) if row.get("used")]
+
+
+STRUCTURED_KINDS = ("extra", "group", "requirements_file")   # a test setup, not just a list of package names
+
+
+def _repo_enough(used: list[dict]) -> tuple[bool, str]:
+    """The docs site may be skipped only when the repository gives at least MIN_REPO_STEPS backed steps and at
+    least one of them is an extra, a dependency group or a requirements file. Bare package names alone, such as
+    a README's `pip install a b`, never skip it."""
+    structured = sum(1 for row in used if row.get("kind") in STRUCTURED_KINDS)
+    if len(used) >= MIN_REPO_STEPS and structured:
+        return True, (f"skipped: the repository gave {len(used)} setup step(s), at least {MIN_REPO_STEPS}, "
+                      f"including {structured} extra, group or requirements file")
+    if len(used) < MIN_REPO_STEPS:
+        return False, f"the repository gave {len(used)} setup step(s), fewer than {MIN_REPO_STEPS}"
+    return False, (f"the repository gave {len(used)} setup step(s) but no extra, dependency group or "
+                   "requirements file")
+
+
+def _crawl_seed(block: dict, seed: dict, crawl_fn, pages: dict, repo: str, base_sha: str, docs: str) -> bool:
+    block["seeds"].append(seed["url"])
+    got = crawl_fn(seed["url"], select_domains=seed["select_domains"], select_paths=seed["select_paths"])
+    block["calls"] += 1
+    got = got if isinstance(got, dict) else {"ok": False, "error": "no response"}
+    block["credits"] += _credits(got)
+    if got.get("ok") is False or got.get("error"):
+        block["errors"].append(f"crawl {seed['url']}: {got.get('error') or 'failed'}")
+        return False
+    for item in got.get("results") or []:
+        url = str((item or {}).get("url") or "")
+        if in_scope(url, repo, base_sha, docs) and url not in pages:
+            pages[url] = str(item.get("raw_content") or "")
+    return True
+
+
 def _crawl_and_store(block: dict, repo: str, base_sha: str, checkout, docs: str, cpath: Path, now: float, env,
                      crawl_fn, extract_fn) -> dict:
+    """Crawl the repository seed and extract its key pages. The docs-site seed is skipped only when the
+    repository gives at least MIN_REPO_STEPS backed setup steps, one of them an extra, group or requirements file. Each seed's decision
+    is recorded in ``seed_decisions``. The cache key and CRAWL_VERSION are unchanged, so saved crawls stay valid;
+    a new entry only adds the optional ``seed_decisions`` field, which older readers ignore."""
     crawl_fn = crawl_fn or (lambda url, **kw: crawl(url, env=env, **kw))
     extract_fn = extract_fn or (lambda urls: extract(urls, env=env))
     block["docs_domain"] = docs
+    decisions = block.setdefault("seed_decisions", [])
     pages: dict[str, str] = {}
-    any_ok = False
-    for seed in seeds(repo, base_sha, docs):
-        block["seeds"].append(seed["url"])
-        got = crawl_fn(seed["url"], select_domains=seed["select_domains"], select_paths=seed["select_paths"])
-        block["calls"] += 1
-        got = got if isinstance(got, dict) else {"ok": False, "error": "no response"}
-        block["credits"] += _credits(got)
-        if got.get("ok") is False or got.get("error"):
-            block["errors"].append(f"crawl {seed['url']}: {got.get('error') or 'failed'}")
-            continue
-        any_ok = True
-        for item in got.get("results") or []:
-            url = str((item or {}).get("url") or "")
-            if in_scope(url, repo, base_sha, docs) and url not in pages:
-                pages[url] = str(item.get("raw_content") or "")
-    block["pages_crawled"] = list(pages)
+    all_seeds = seeds(repo, base_sha, docs)
+    repo_seed, docs_seeds = all_seeds[0], all_seeds[1:]
+    any_ok = _crawl_seed(block, repo_seed, crawl_fn, pages, repo, base_sha, docs)
+    decisions.append({"url": repo_seed["url"], "crawled": True, "why": "the repository seed is always crawled"})
     key = [u for u in pages if _KEY_PAGE.search(urlparse(u).path)]
     for u in local_key_urls(repo, base_sha, checkout):
         if u not in key:
@@ -555,13 +595,23 @@ def _crawl_and_store(block: dict, repo: str, base_sha: str, checkout, docs: str,
                 url = str((item or {}).get("url") or "")
                 if in_scope(url, repo, base_sha, docs):
                     full[url] = str(item.get("raw_content") or "")
+    enough, why = _repo_enough(_steps_used(pages, full, checkout))
+    for seed in docs_seeds:
+        if enough:
+            decisions.append({"url": seed["url"], "crawled": False, "why": why})
+            continue
+        ok = _crawl_seed(block, seed, crawl_fn, pages, repo, base_sha, docs)
+        any_ok = any_ok or ok
+        decisions.append({"url": seed["url"], "crawled": True, "why": why})
+    block["pages_crawled"] = list(pages)
     block["pages_extracted"] = list(full)
     if not any_ok:
         why = block["errors"][0] if block["errors"] else "no call succeeded"
         block.update(stop=True, stop_reason=f"{UNAVAILABLE}: {why}")
         return block
     block["cache"]["saved"] = _cache_write(cpath, {"saved_at": now, "repo": repo, "base_sha": base_sha,
-                                                   "seeds": block["seeds"], "pages": pages, "full": full})
+                                                   "seeds": block["seeds"], "pages": pages, "full": full,
+                                                   "seed_decisions": decisions})
     return _finish(block, pages, full, checkout)
 
 
