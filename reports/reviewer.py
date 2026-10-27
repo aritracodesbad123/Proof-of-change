@@ -1206,11 +1206,39 @@ def _chrome_pdf(html_path: str, pdf_path: str) -> str | None:
             _, err = p.communicate(timeout=PDF_TIMEOUT_S)
         except subprocess.TimeoutExpired:
             _kill_group(p)
+            _kill_profile_users(prof)
             if os.path.exists(pdf_path):
                 os.remove(pdf_path)
             return f"PDF timed out after {PDF_TIMEOUT_S} s"
         _kill_group(p)  # helpers Chrome left behind
+        _kill_profile_users(prof)
     return None if _pdf_ok(pdf_path) else f"chrome failed: {(err or '')[-300:]}"
+
+
+def _kill_profile_users(prof: str) -> int:
+    """SIGKILL any process still using the temporary Chrome profile folder (one that escaped the process group).
+    Returns how many were signalled. Linux /proc only; a no-op elsewhere."""
+    import signal
+    n, me = 0, os.getpid()
+    try:
+        pids = [d for d in os.listdir("/proc") if d.isdigit()]
+    except OSError:
+        return 0
+    for pid in pids:
+        if int(pid) == me:
+            continue
+        try:
+            with open(f"/proc/{pid}/cmdline", "rb") as f:
+                cmd = f.read().decode(errors="replace")
+        except OSError:
+            continue
+        if f"--user-data-dir={prof}" in cmd:
+            try:
+                os.kill(int(pid), signal.SIGKILL)
+                n += 1
+            except OSError:
+                pass
+    return n
 
 
 def _kill_group(p: subprocess.Popen) -> None:

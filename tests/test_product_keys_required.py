@@ -16,7 +16,7 @@ def product_args(**kw):
 
 
 def test_all_present_starts():
-    assert daily_run.tavily_start_refusal(product_args(), env=dict(VALUES)) is None
+    assert daily_run.product_keys_start_refusal(product_args(), env=dict(VALUES)) is None
 
 
 @pytest.mark.parametrize("gone", list(VALUES))
@@ -27,7 +27,7 @@ def test_each_missing_key_refuses_by_name_without_values(gone, how):
         env.pop(gone)
     else:
         env[gone] = "   "
-    line = daily_run.tavily_start_refusal(product_args(), env=env)
+    line = daily_run.product_keys_start_refusal(product_args(), env=env)
     assert line and gone in line.split("missing:")[1]
     assert not any(v in line for v in VALUES.values())
     others = [k for k in VALUES if k != gone]
@@ -35,14 +35,14 @@ def test_each_missing_key_refuses_by_name_without_values(gone, how):
 
 
 def test_all_missing_lists_all():
-    line = daily_run.tavily_start_refusal(product_args(), env={})
+    line = daily_run.product_keys_start_refusal(product_args(), env={})
     tail = line.split("missing:")[1]
     assert all(k in tail for k in VALUES)
 
 
 def test_study_and_benchmark_runs_unchanged():
     study = types.SimpleNamespace(pr=[], product_check=False, bench=False, select_only=False, report_only=False)
-    assert daily_run.tavily_start_refusal(study, env={}) is None
+    assert daily_run.product_keys_start_refusal(study, env={}) is None
     bench = product_args()
     bench.bench = True
-    assert daily_run.tavily_start_refusal(bench, env={}) is None
+    assert daily_run.product_keys_start_refusal(bench, env={}) is None

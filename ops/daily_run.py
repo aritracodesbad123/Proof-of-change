@@ -860,18 +860,56 @@ def source_pair(repo: str, item: dict, work: Path, log: Path, python: str, timeo
     return res
 
 
+def pinned_clone(repo: str, pinned: dict, work: Path, log: Path) -> str | None:
+    """Blobless clone of the repo into work/src with both pinned commits fetched. None on success, else why."""
+    env = base_env(work / "home-git")
+    src = work / "src"
+    if (src / ".git").exists():
+        return None
+    steps = [["git", "clone", "-q", "--filter=blob:none", "--no-checkout", f"https://github.com/{repo}.git", src],
+             ["git", "-C", src, "fetch", "-q", "origin", pinned["main"], pinned["pr"]]]
+    for c in steps:
+        rc, _ = run(c, log, env=env, timeout=900)
+        if rc != 0:
+            return f"git step failed ({rc}): {' '.join(map(str, c[:4]))}"
+    return None
+
+
+def apply_pinned_diff(repo: str, item: dict, pkg: str, work: Path, log: Path) -> str | None:
+    """When a check is pinned (--base-sha/--head-sha), replace the PR diff and changed-file list taken from GitHub's
+    current PR view with `git diff base_sha head_sha` from the pinned clone, so pr.diff, claims, file mapping and line
+    coverage all describe the commits actually tested. Records head_moved when the live PR head differs from the
+    pinned head. Returns None on success, else why."""
+    pinned = item["pinned_sides"]
+    why = pinned_clone(repo, pinned, work, log)
+    if why:
+        return why
+    try:
+        d = subprocess.run(["git", "-C", str(work / "src"), "diff", "--no-color", "--no-ext-diff",
+                            pinned["main"], pinned["pr"]], capture_output=True, text=True, timeout=600,
+                           env=base_env(work / "home-git"))
+    except (OSError, subprocess.TimeoutExpired) as e:
+        return f"git diff of pinned commits failed: {e}"
+    if d.returncode != 0:
+        return f"git diff of pinned commits failed ({d.returncode})"
+    item["github_diff_ignored"] = True
+    item["diff"] = d.stdout
+    item["files"] = classify_files(diff_files(d.stdout), pkg)
+    item["diff_source"] = "git diff base_sha head_sha (pinned commits)"
+    live = item.get("current_head_sha")
+    item["head_moved"] = bool(live) and live != pinned["pr"]
+    return None
+
+
 def pinned_source_pair(repo: str, pinned: dict, work: Path, log: Path) -> dict:
     """Both sides at the exact commits a benchmark case file pins (--base-sha / --head-sha): main = base_sha,
     PR = head_sha. No base-branch tip, merge ref or merge-base is looked up, so a case keeps testing the commits it
     was written for after upstream moves on."""
     env = base_env(work / "home-git")
     src = work / "src"
-    steps = [["git", "clone", "-q", "--filter=blob:none", "--no-checkout", f"https://github.com/{repo}.git", src],
-             ["git", "-C", src, "fetch", "-q", "origin", pinned["main"], pinned["pr"]]]
-    for c in steps:
-        rc, _ = run(c, log, env=env, timeout=900)
-        if rc != 0:
-            return {"ok": False, "why": f"git step failed ({rc}): {' '.join(map(str, c[:4]))}"}
+    why = pinned_clone(repo, pinned, work, log)
+    if why:
+        return {"ok": False, "why": why}
     res = {"comparison_basis": "pinned base vs pinned PR head (benchmark case file)",
            "main_sha": pinned["main"], "pr_sha": pinned["pr"], "pinned": True}
     for side in ("main", "pr"):
@@ -4237,7 +4275,7 @@ def new_record(repo: str, cfg: dict, item: dict, a, machine: dict, run_date: str
     if getattr(a, "invocation", None):
         rec["tested_invocation"] = a.invocation
     stamp_model_use(rec, a)
-    for k in ("head_moved", "current_head_sha", "frozen_from", "state", "mergeable", "mergeable_state"):
+    for k in ("head_moved", "current_head_sha", "diff_source", "frozen_from", "state", "mergeable", "mergeable_state"):
         if item.get(k) is not None:
             rec[k] = item[k]
     return rec
@@ -4599,8 +4637,13 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
     prdir = rdir / tag; prdir.mkdir(parents=True, exist_ok=True)
     work = workroot / tag
     shutil.rmtree(work, ignore_errors=True); work.mkdir(parents=True)
+    pin_why = (apply_pinned_diff(repo, item, cfg["pkg"], work, prdir / "git.log")
+               if item.get("pinned_sides") else None)
     (prdir / "pr.diff").write_text(item["diff"])
     rec = new_record(repo, cfg, item, a, machine, rdir.name, run_date_for(rdir))
+    if pin_why:   # pinned commits could not be diffed: never fall back to GitHub's current PR diff
+        rec["verdict"], rec["reason"], _ = verdict_for(None, f"pinned commits unavailable: {pin_why}")
+        return finish(rec, prdir, work, t0, a)
     if product_route(a):
         rec["product_check"] = True   # coverage gate: on a product check, verified needs measured coverage
     if product_route(a) and getattr(a, "live_check", False):
@@ -5722,8 +5765,9 @@ def skip_unused_model(a) -> None:
         a.model_skipped = "AI calls skipped because --no-probes was set"
 
 
-def tavily_start_refusal(a, env=None) -> str | None:
-    """One line when a product check has no Tavily key. None for a study run and the daily study.
+def product_keys_start_refusal(a, env=None) -> str | None:
+    """One line when a product check is missing any of NEBIUS_API_KEY, TAVILY_API_KEY or NEBIUS_PROJECT_ID.
+    None for a study run and the daily study. Benchmark runs always pass --product-check, so they need all three.
 
     Report rebuilds and selection-only runs do not call the lookup, so they are not refused here.
     The line never contains the key.
@@ -5997,7 +6041,7 @@ def _main(argv=None) -> int:
         print(stop, file=sys.stderr)
         raise SystemExit(1)
     a.swarm = agents.swarm_enabled(bool(a.swarm))
-    stop = tavily_start_refusal(a)  # product checks: all three keys, before any work
+    stop = product_keys_start_refusal(a)  # product checks: all three keys, before any work
     if stop:
         print(stop, file=sys.stderr)
         raise SystemExit(1)

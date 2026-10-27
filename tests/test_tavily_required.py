@@ -223,13 +223,13 @@ def test_study_paths_are_not_refused(monkeypatch, capsys, tmp_path):
     select = SimpleNamespace(pr=[PR], product_check=True, bench=None, select_only=True, report_only=False)
     report = SimpleNamespace(pr=[PR], product_check=True, bench=None, select_only=False, report_only=True)
     for args in (study, bench, plain, select, report):
-        assert daily_run.tavily_start_refusal(args) is None
+        assert daily_run.product_keys_start_refusal(args) is None
     product = SimpleNamespace(pr=[PR], product_check=True, bench=None, select_only=False, report_only=False)
     monkeypatch.setenv("NEBIUS_API_KEY", "n-key")
     monkeypatch.setenv("NEBIUS_PROJECT_ID", "n-proj")
-    assert daily_run.tavily_start_refusal(product).endswith(tavily_docs.MISSING_KEY)
+    assert daily_run.product_keys_start_refusal(product).endswith(tavily_docs.MISSING_KEY)
     monkeypatch.setenv("TAVILY_API_KEY", SECRET)
-    assert daily_run.tavily_start_refusal(product) is None
+    assert daily_run.product_keys_start_refusal(product) is None
 
     def reached(*_args, **_kwargs):
         raise SystemExit("reached-commit")

@@ -176,3 +176,58 @@ def test_step_timings_recorded_and_shown(monkeypatch):
     assert st["sandbox prep (checkout)"] == 3.0 and st["Tavily setup lookup"] == 17.0
     assert st["tests (main side)"] == 3.0 and st["tests (PR side)"] == 3.0 and st["model call 1 (claims)"] == 4.2
     assert rec["verdict"] == "verified" and "timings" not in rec
+
+
+def _git(cwd, *args):
+    env = {"GIT_AUTHOR_NAME": "t", "GIT_AUTHOR_EMAIL": "t@t", "GIT_COMMITTER_NAME": "t", "GIT_COMMITTER_EMAIL": "t@t",
+           "HOME": str(cwd), "PATH": "/usr/bin:/bin:/usr/local/bin"}
+    return subprocess.run(["git", "-C", str(cwd), *args], check=True, capture_output=True, text=True,
+                          env=env).stdout.strip()
+
+
+def test_moved_pr_head_does_not_change_pr_diff(tmp_path):
+    work = tmp_path / "w"
+    src = work / "src"
+    src.mkdir(parents=True)
+    _git(src, "init", "-q")
+    (src / "pkg").mkdir()
+    (src / "pkg" / "a.py").write_text("x = 1\n")
+    _git(src, "add", "."); _git(src, "commit", "-qm", "base")
+    base = _git(src, "rev-parse", "HEAD")
+    (src / "pkg" / "a.py").write_text("x = 2\n")
+    _git(src, "commit", "-qam", "pinned head")
+    head = _git(src, "rev-parse", "HEAD")
+    (src / "pkg" / "b.py").write_text("y = 3\n")
+    _git(src, "add", "."); _git(src, "commit", "-qm", "moved head")
+    moved = _git(src, "rev-parse", "HEAD")
+    live_diff = _git(src, "diff", base, moved)   # what GitHub's current PR view would show
+    item = {"diff": live_diff, "files": daily_run.classify_files(daily_run.diff_files(live_diff), "pkg"),
+            "head_sha": head, "current_head_sha": moved, "pinned_sides": {"main": base, "pr": head}}
+    assert daily_run.apply_pinned_diff("o/r", item, "pkg", work, tmp_path / "git.log") is None
+    assert item["diff"].strip() == _git(src, "diff", base, head)
+    assert "pkg/b.py" not in item["diff"] and daily_run.diff_files(item["diff"]) == ["pkg/a.py"]
+    assert item["head_moved"] is True
+    item2 = dict(item, current_head_sha=head, diff=live_diff)
+    daily_run.apply_pinned_diff("o/r", item2, "pkg", work, tmp_path / "git.log")
+    assert item2["diff"] == item["diff"] and item2["head_moved"] is False
+
+
+def test_moved_head_is_reported_not_run(tmp_path):
+    c = cases()["fx-safe"]
+    rec = record(c, "verified")
+    assert not [p for p in run.sha_check(c, rec) if "moved" in p]
+    rec["head_moved"], rec["current_head_sha"] = True, "f" * 40
+    assert any("moved" in p for p in run.sha_check(c, rec))
+    r = run.result_for(c, "tests", ["x"], rec, 0, 1.0)
+    assert r["outcome"] == "not_run" and r["verdict"] is None
+
+
+def test_leftover_chrome_on_temp_profile_is_killed(tmp_path):
+    prof = str(tmp_path / "prof")
+    p = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(60)", f"--user-data-dir={prof}"])
+    try:
+        assert reviewer._kill_profile_users(prof) == 1
+        assert p.wait(timeout=10) != 0
+    finally:
+        if p.poll() is None:
+            p.kill()
