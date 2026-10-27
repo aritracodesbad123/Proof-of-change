@@ -2901,6 +2901,14 @@ def _maybe_prepare_contree(a, repo: str, main_sha: str, pr_sha: str, rec: dict, 
 CONTREE_UNAVAILABLE = "Contree unavailable"
 
 
+def both_sandbox_flags_refusal(a) -> str | None:
+    """--require-contree with --unsafe-no-sandbox is refused outright, before any work."""
+    if getattr(a, "require_contree", False) and getattr(a, "unsafe_no_sandbox", False):
+        return ("STOPPED: --require-contree and --unsafe-no-sandbox cannot be used together. "
+                "Result: could not verify.")
+    return None
+
+
 def contree_required_refusal(a, env: dict | None = None) -> str | None:
     """For --require-contree: select Contree with no local fallback. Returns a plain could-not-verify note
     ('STOPPED: Contree unavailable: ...') when Contree cannot start, else None. No pull-request code runs then."""
@@ -6296,6 +6304,9 @@ def _main(argv=None) -> int:
     ap.add_argument("--ids", default=None, help="with --bench: comma-separated case IDs (default: all), e.g. B01,B14")
     ap.add_argument("--bench-out", default=None, help="with --bench: result folder (default: runs/bench-v0)")
     a = ap.parse_args(argv)
+    if both_sandbox_flags_refusal(a):
+        print(both_sandbox_flags_refusal(a), file=sys.stderr)
+        raise SystemExit(1)
     refused = batch_order_refusal(a)
     if refused:
         ap.error(refused)
