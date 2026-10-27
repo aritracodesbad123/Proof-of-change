@@ -1,6 +1,6 @@
 # Benchmark: 10 known-safe and 2 ambiguous cases go in first
 
-**Status:** proposed
+**Status:** accepted
 
 ## What changed
 
