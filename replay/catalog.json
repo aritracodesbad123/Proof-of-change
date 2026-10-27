@@ -107,17 +107,17 @@
       "report_html": "checks/pr-home-assistant-core-187588-9ad280c1b8a5-2026-10-22-check-0753/REPORT.html"
     },
     {
-      "id": "pr-bopen-elevation-89-f94e513fa302-2026-10-22-check-1041",
+      "id": "pr-bopen-elevation-89-f94e513fa302-2026-10-22-check-231752-pr89",
       "kind": "pull_request",
       "repo": "bopen/elevation",
       "pr": 89,
       "url": "https://github.com/bopen/elevation/pull/89",
       "title": "Cache missing tiles",
       "verdict": "needs_attention",
-      "reason": "probe: 3 observation(s) need attention: exception_type does not differ although the claim says it does (C1); spool_files_count does not differ although the claim says it does (C1); tile_cached_after_ensure does not differ although the claim says it does (C1); probe model-probe1 is not_adequate (no changed executable line exists on the main side (new files, comments or docstrings only), so the probe cannot be shown to reach the change); its matching results do not count; tests: 37 test(s) ran on ",
-      "tested_at_ist": "2026-10-22 10:41 IST",
-      "record": "checks/pr-bopen-elevation-89-f94e513fa302-2026-10-22-check-1041/record.json",
-      "report_html": "checks/pr-bopen-elevation-89-f94e513fa302-2026-10-22-check-1041/REPORT.html"
+      "reason": "1 new test(s) fail on the PR; 32 test(s) ran on main, 37 on the PR; 4 new test(s) pass, 28 unchanged; 4 test failure(s) pre-existing and identical on both sides; probe model-p1 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count; probe model-p2 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count",
+      "tested_at_ist": "2026-10-22 23:17 IST",
+      "record": "checks/pr-bopen-elevation-89-f94e513fa302-2026-10-22-check-231752-pr89/record.json",
+      "report_html": "checks/pr-bopen-elevation-89-f94e513fa302-2026-10-22-check-231752-pr89/REPORT.html"
     },
     {
       "id": "pr-frappe-erpnext-60004-509e2f1581ef-2026-10-22-check-0904",
@@ -146,17 +146,17 @@
       "report_html": "checks/pr-frappe-erpnext-61257-7feeb6fae172-2026-10-22-check-1056/REPORT.html"
     },
     {
-      "id": "pr-googlefonts-glyphsLib-1208-3783ef49b506-2026-10-22-check-0748",
+      "id": "pr-googlefonts-glyphsLib-1208-3783ef49b506-2026-10-22-check-232431-pr1208",
       "kind": "pull_request",
       "repo": "googlefonts/glyphsLib",
       "pr": 1208,
       "url": "https://github.com/googlefonts/glyphsLib/pull/1208",
       "title": "split comma-separated meta Table dlng/slng data",
       "verdict": "could_not_verify",
-      "reason": "could not verify: claim(s) C1 expect a difference but no observation matches (docstring-only change (AST equal after blanking docstrings); behaviour claims hold by construction)",
-      "tested_at_ist": "2026-10-22 07:48 IST",
-      "record": "checks/pr-googlefonts-glyphsLib-1208-3783ef49b506-2026-10-22-check-0748/record.json",
-      "report_html": "checks/pr-googlefonts-glyphsLib-1208-3783ef49b506-2026-10-22-check-0748/REPORT.html"
+      "reason": "could not verify: claim(s) C1, C2, C3, C4 expect a difference but no observation matches (73 test(s) ran on main, 75 on the PR; 2 new test(s) pass, 73 unchanged; rejected: claim pattern(s) C1 match none of this probe's observation names, so the probe is not counted; rejected: claim pattern(s) C2 match none of this probe's observation names, so the probe is not counted; rejected: claim pattern(s) C3 match none of this probe's observation names, so the probe is not counted; rejected: claim pattern",
+      "tested_at_ist": "2026-10-22 23:24 IST",
+      "record": "checks/pr-googlefonts-glyphsLib-1208-3783ef49b506-2026-10-22-check-232431-pr1208/record.json",
+      "report_html": "checks/pr-googlefonts-glyphsLib-1208-3783ef49b506-2026-10-22-check-232431-pr1208/REPORT.html"
     },
     {
       "id": "pr-Second-Hand-Friends-kleinanzeigen-bot-1361-5258d75baff4-2026-10-22-check-0115",
@@ -237,17 +237,17 @@
       "report_html": "checks/pr-optiland-optiland-963-9b8ce0cd1a8a-2026-10-22-check-0911/REPORT.html"
     },
     {
-      "id": "pr-optuna-optuna-6873-83a36def362a-2026-10-22-check-0754",
+      "id": "pr-optuna-optuna-6873-83a36def362a-2026-10-22-check-232846-pr6873",
       "kind": "pull_request",
       "repo": "optuna/optuna",
       "pr": 6873,
       "url": "https://github.com/optuna/optuna/pull/6873",
       "title": "Avoid All-NaN RuntimeWarning in percentile pruner best-value lookup",
       "verdict": "could_not_verify",
-      "reason": "not verified: no AI-written probe ran any changed line, so the change itself was not exercised by a probe; docstring-only change (AST equal after blanking docstrings); behaviour claims hold by construction",
-      "tested_at_ist": "2026-10-22 07:54 IST",
-      "record": "checks/pr-optuna-optuna-6873-83a36def362a-2026-10-22-check-0754/record.json",
-      "report_html": "checks/pr-optuna-optuna-6873-83a36def362a-2026-10-22-check-0754/REPORT.html"
+      "reason": "unverified behaviour claim: \"The returned value is identical to before (NaN), so pruning behavior is unchanged.\" (+1 more); needs a probe (11 test(s) ran on main, 11 on the PR; 0 new test(s) pass, 11 unchanged; probe model-probe-c2 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count; probe model-probe-c3 has no measured line coverage (Contree-only check: probe coverage needs a local side); it do",
+      "tested_at_ist": "2026-10-22 23:28 IST",
+      "record": "checks/pr-optuna-optuna-6873-83a36def362a-2026-10-22-check-232846-pr6873/record.json",
+      "report_html": "checks/pr-optuna-optuna-6873-83a36def362a-2026-10-22-check-232846-pr6873/REPORT.html"
     },
     {
       "id": "pr-oceanbase-powercontext-1908-cbbcddc6722f-2026-10-22-check-0909",
