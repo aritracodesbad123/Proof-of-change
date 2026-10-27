@@ -132,6 +132,7 @@ def test_both_makers_failing_is_logged_error_not_verdict(tmp_path, monkeypatch, 
 
 def test_pr_report_with_hanging_chrome_keeps_verdict(tmp_path, monkeypatch):
     import shutil as sh
+
     from reports.generate import main as pr_main
     _hanging_chrome(tmp_path, monkeypatch)
     src = Path(__file__).resolve().parents[1] / "evals" / "fixtures" / "record_rev2_example.json"
