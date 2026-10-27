@@ -275,7 +275,8 @@ def update_posts_for_pdf(report_dir: str | Path, state: str, env: dict | None = 
     'PDF preparing…' becomes the PDF link, or 'PDF could not be generated.' Nothing happens without a saved
     id, after a previous edit (idempotent), or without a token. Only the saved items on the saved demo-repo
     PR are touched; nothing new is posted. A failed edit (GitHub, network or token error) is retried with a
-    short bounded backoff; 'done' is saved only after every edit succeeded, so a later resume tries again.
+    short bounded backoff; 'done' is saved only after every edit succeeded, so a later resume or the
+    background sweep (PendingEditSweeper) tries again.
     Progress of each edit is saved, so a retry never edits the same item twice.
     """
     from reports import pdf_status
@@ -336,6 +337,95 @@ def posts_pending(report_dir: str | Path) -> bool:
     except (OSError, ValueError):
         return False
     return isinstance(info, dict) and not info.get("done") and bool(info.get("comment_id") or info.get("check_run_id"))
+
+
+# Background sweep: a long-running App retries pending edits (done is null) on a timer, so a comment
+# never waits for a restart after the short backoff above gave up. It gives up after a set limit.
+EDIT_SWEEP_INTERVAL_S = 300          # every 5 minutes
+EDIT_SWEEP_MAX_ATTEMPTS = 12         # about an hour of sweeps
+EDIT_SWEEP_MAX_AGE_S = 6 * 3600      # or 6 hours after the first sweep saw it pending
+GAVE_UP = "gave_up"
+
+
+def _sweep_roots(roots=None) -> list[Path]:
+    if roots is not None:
+        return [Path(r) for r in roots]
+    return [Path(os.environ.get("POC_REPORT_DIR") or (REPO_ROOT / "reports" / "daily"))]
+
+
+def sweep_pending_posts(roots=None, *, env: dict | None = None, now: float | None = None,
+                        update: Callable[..., bool] | None = None,
+                        max_attempts: int = EDIT_SWEEP_MAX_ATTEMPTS,
+                        max_age_s: float = EDIT_SWEEP_MAX_AGE_S) -> dict:
+    """One sweep: retry each pending edit once (no in-sweep waits); give up past the limit. Never raises."""
+    from reports import pdf_status
+    now = time.time() if now is None else now
+    update = update_posts_for_pdf if update is None else update
+    out = {"done": [], "retrying": [], "gave_up": []}
+    try:
+        for root in _sweep_roots(roots):
+            if not root.is_dir():
+                continue
+            for cp in root.rglob(COMMENT_FILE):
+                d = cp.parent
+                try:
+                    if not posts_pending(d):
+                        continue
+                    state = pdf_status.read_state(d)
+                    if state not in (pdf_status.READY, pdf_status.ERROR):
+                        continue  # PDF still preparing: its own retry will edit
+                    info = json.loads(cp.read_text())
+                    first = info.get("sweep_first_at")
+                    first = float(now if first is None else first)
+                    attempts = int(info.get("sweep_attempts") or 0)
+                    if attempts >= max_attempts or now - first > max_age_s:
+                        info.update(done=GAVE_UP, final_error=(
+                            f"comment/check-run edit gave up after {attempts} sweep attempts"
+                            f" over {int(now - first)}s"))
+                        cp.write_text(json.dumps(info))
+                        _log_error("Gave up editing the App comment/check run for report %s after %d sweep "
+                                   "attempts; it still says '%s'", d.name, attempts, PREPARING_TEXT)
+                        out["gave_up"].append(d.name)
+                        continue
+                    info.update(sweep_first_at=first, sweep_attempts=attempts + 1)
+                    cp.write_text(json.dumps(info))
+                    if update(d, state, env=env, delays=()):
+                        out["done"].append(d.name)
+                    else:
+                        out["retrying"].append(d.name)
+                except Exception as e:  # noqa: BLE001 - a sweep must never raise
+                    _log_error("PDF edit sweep failed for %s: %s", d.name, type(e).__name__)
+    except Exception as e:  # noqa: BLE001
+        _log_error("PDF edit sweep failed: %s", type(e).__name__)
+    return out
+
+
+class PendingEditSweeper:
+    """Daemon thread running sweep_pending_posts every interval; stop() ends it cleanly."""
+
+    def __init__(self, interval_s: float = EDIT_SWEEP_INTERVAL_S, sweep: Callable[[], Any] | None = None,
+                 stop_event=None):
+        import threading
+        self.interval_s = interval_s
+        self.sweep = sweep or sweep_pending_posts
+        self.stop_event = stop_event or threading.Event()
+        self.thread = threading.Thread(target=self.run, name="poc-pdf-edit-sweep", daemon=True)
+
+    def run(self) -> None:
+        while not self.stop_event.wait(self.interval_s):
+            try:
+                self.sweep()
+            except Exception as e:  # noqa: BLE001
+                _log_error("PDF edit sweep failed: %s", type(e).__name__)
+
+    def start(self) -> "PendingEditSweeper":
+        self.thread.start()
+        return self
+
+    def stop(self, timeout: float = 5) -> None:
+        self.stop_event.set()
+        if self.thread.is_alive():
+            self.thread.join(timeout)
 
 
 PDF_PREPARING_MARK = "<!--pdf-preparing:{name}-->"
@@ -692,8 +782,13 @@ def serve(host: str = "0.0.0.0", port: int = 8080, env: dict | None = None) -> N
     H.env = env
     H.apply_fn = apply
     httpd = HTTPServer((host, port), H)
+    sweeper = PendingEditSweeper().start()
     print(f"proof-of-change github app listening on http://{host}:{port}  POST /webhook  GET /health", flush=True)
-    httpd.serve_forever()
+    try:
+        httpd.serve_forever()
+    finally:
+        sweeper.stop()
+        httpd.server_close()
 
 
 def main(argv: list[str] | None = None) -> int:

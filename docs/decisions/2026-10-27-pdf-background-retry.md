@@ -35,6 +35,11 @@ simply missing and nothing told anyone.
 - On startup (App and console) any folder still `preparing` gets its retry restarted, or is marked
   `error` once it is older than the retry window plus 5 minutes.
 - Reports no longer skip the PDF when Chrome is missing: the built-in PDF maker makes it right away.
+- While the App runs, a background sweep (`PendingEditSweeper`, every `EDIT_SWEEP_INTERVAL_S` = 5 minutes)
+  retries any comment/check-run edit still pending (`done` null) once its PDF is ready or failed, with no
+  waits inside the sweep. After `EDIT_SWEEP_MAX_ATTEMPTS` (12) sweeps or `EDIT_SWEEP_MAX_AGE_S` (6 hours)
+  it gives up: `done` becomes `gave_up`, `final_error` is saved in `github_comment.json`, and a plain error
+  is logged. The sweep never raises or blocks webhook handling, and stops cleanly on shutdown.
 - The record, the verdict and the HTML/Markdown reports are never changed by any of this.
 
 ## Consequences
