@@ -762,6 +762,8 @@ def render_run(run_dir: str | Path, out: str | Path, formats=("md", "html", "pdf
         recs.append((normalize(json.loads(p.read_text()), p.parent.name), p.parent))
     if not recs:
         raise SystemExit(f"no */record.json under {run_dir}: is this an ops/runs/<date> folder?")
+    from reports import pdf_status
+    want_pdf = "pdf" in formats
     if "pdf" in formats and not rv.find_chrome():
         print("note: no Chrome/Chromium found, so no PDFs; HTML and Markdown are written", file=sys.stderr)
         formats = tuple(f for f in formats if f != "pdf")
@@ -777,6 +779,9 @@ def render_run(run_dir: str | Path, out: str | Path, formats=("md", "html", "pdf
         (od / "REPORT.html").write_text(rv.to_html(R, f"Reviewer report {run_id(rec)}"))
         if "pdf" in formats:
             s["pdf_error"] = rv.to_pdf(str(od / "REPORT.html"), str(od / "REPORT.pdf"))
+        if want_pdf:
+            # Missing PDF: mark it 'preparing' and keep regenerating it in the background. Never touches the record.
+            s["pdf_state"] = pdf_status.after_first_attempt(od, s.get("pdf_error") if "pdf" in formats else "no Chrome")
         rows.append(s)
         print(f"{s['id']}: {s['verdict']} | {s['action']} | confidence {s['confidence']} | citations {s['citations']}")
     gated = [(r, s) for (r, _), s in zip(recs, rows) if (r.get("coverage_gate") or {}).get("changed")]

@@ -488,6 +488,13 @@ export function behaviourMap(record: Record<string, unknown>): BehaviourMap {
   }
 }
 
+/** True while the PDF is missing but a background retry is still regenerating it ("PDF preparing…"). */
+export function pdfPreparing(pdf?: string | null, status?: string | null): boolean {
+  return !pdf && status === 'preparing'
+}
+
+export const PDF_PREPARING_LABEL = 'PDF preparing…'
+
 export function evidenceLinks(
   record: Record<string, unknown>,
   extras: { pdf?: string | null; html?: string | null },

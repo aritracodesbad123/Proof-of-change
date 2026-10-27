@@ -52,6 +52,7 @@ export type RunRow = {
   folder?: string
   source?: string
   report_pdf?: string | null
+  report_pdf_status?: string | null
   report_html?: string | null
 }
 
@@ -130,6 +131,7 @@ export type Job = {
   folder?: string
   record?: Record<string, unknown>
   report_pdf?: string | null
+  report_pdf_status?: string | null
   report_html?: string | null
   stages?: StageEvent[]
   current_stage?: string | null
@@ -150,6 +152,7 @@ export const api = {
       folder: string
       hosted_report: string | null
       report_pdf?: string | null
+  report_pdf_status?: string | null
       report_html?: string | null
     }>(`/api/runs/${encodeURIComponent(id)}`),
   startCheck: (pr_url: string, model_provider = 'nebius', approval = true) =>

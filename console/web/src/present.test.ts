@@ -1,8 +1,10 @@
 import { readFileSync } from 'node:fs'
 import { describe, expect, test } from 'vitest'
 import {
+  PDF_PREPARING_LABEL,
   behaviourMap,
   costTime,
+  pdfPreparing,
   coveragePlain,
   filterRuns,
   illustrativeStates,
@@ -194,4 +196,14 @@ test('the timeline shows human review as a step of its own', () => {
   expect(waiting.find((s) => s.id === 'probes')?.state).toBe('done')
   const skipped = timelineStates([{ stage: 'claims' }, { stage: 'probes' }, { stage: 'verdict' }])
   expect(skipped.find((s) => s.id === 'review')?.state).toBe('skipped')
+})
+
+describe('PDF preparing', () => {
+  test('shows "PDF preparing…" only while the PDF is missing and a retry is running', () => {
+    expect(pdfPreparing(null, 'preparing')).toBe(true)
+    expect(pdfPreparing('/api/runs/x/report.pdf', 'preparing')).toBe(false)
+    expect(pdfPreparing('/api/runs/x/report.pdf', 'ready')).toBe(false)
+    expect(pdfPreparing(null, null)).toBe(false)
+    expect(PDF_PREPARING_LABEL).toBe('PDF preparing…')
+  })
 })

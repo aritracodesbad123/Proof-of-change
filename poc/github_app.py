@@ -84,10 +84,15 @@ def check_run_payload(repo: str, head_sha: str, verdict: str, summary: str, repo
     return body
 
 
-def summary_comment(verdict: str, reason: str, report_url: str | None = None) -> str:
+def summary_comment(verdict: str, reason: str, report_url: str | None = None, *,
+                    pdf_url: str | None = None, pdf_preparing: bool = False) -> str:
     lines = [f"**Proof-of-Change:** `{verdict}`", "", reason or "(no reason)", ""]
     if report_url:
         lines.append(f"[Full report]({report_url})")
+    if pdf_url:
+        lines.append(f"[PDF report]({pdf_url})")
+    elif pdf_preparing:
+        lines.append("PDF preparing…")
     lines.append("_Advice only — this never blocks a merge._")
     return "\n".join(lines)
 
@@ -219,12 +224,64 @@ def report_url_for(path: Path, env: dict | None = None) -> str | None:
     return f"{base}/{path.name}"
 
 
-def write_hosted_report(rec: dict, out_dir: Path | None = None) -> Path:
+PDF_PREPARING_MARK = "<!--pdf-preparing:{name}-->"
+
+
+def reviewer_report_dir(rec: dict) -> Path | None:
+    """Folder holding this record's REPORT.html / REPORT.pdf / pdf_status.json, if one was written."""
+    try:
+        from poc import console_api
+        html = console_api.find_reviewer_report_file(str(rec.get("id") or ""), "html", rec=rec)
+    except Exception:  # noqa: BLE001 - a missing report folder only means no PDF line
+        return None
+    return html.parent if html else None
+
+
+def _pdf_block(rid: str, report_dir: Path | None, out_dir: Path) -> tuple[str, str | None]:
+    """(HTML snippet, PDF state). Copies a ready PDF next to the hosted page; else shows 'PDF preparing…'."""
+    if report_dir is None:
+        return "", None
+    from reports import pdf_status
+    state = pdf_status.read_state(report_dir)
+    if state == pdf_status.READY:
+        import shutil
+        shutil.copyfile(report_dir / pdf_status.PDF_FILE, out_dir / f"{rid}.pdf")
+        return f'<p><a href="{_esc(rid)}.pdf">PDF report</a></p>', state
+    if state in (pdf_status.PREPARING, pdf_status.ERROR):
+        mark = PDF_PREPARING_MARK.format(name=_esc(report_dir.name))
+        return f'<p class="pdf-preparing">PDF preparing…</p>{mark}', pdf_status.PREPARING
+    return "", None
+
+
+def publish_ready_pdf(report_dir: str | Path, hosted_dir: str | Path | None = None) -> int:
+    """Called when a background retry finishes: swap 'PDF preparing…' for the real link on hosted pages."""
+    from reports import pdf_status
+    report_dir = Path(report_dir)
+    hosted_dir = Path(hosted_dir) if hosted_dir is not None else DEFAULT_HOSTED
+    pdf = report_dir / pdf_status.PDF_FILE
+    if not hosted_dir.is_dir() or not (pdf.is_file() and pdf.stat().st_size > 0):
+        return 0
+    mark = PDF_PREPARING_MARK.format(name=_esc(report_dir.name))
+    n = 0
+    for page in hosted_dir.glob("*.html"):
+        text = page.read_text(encoding="utf-8", errors="replace")
+        if mark not in text:
+            continue
+        import shutil
+        shutil.copyfile(pdf, hosted_dir / f"{page.stem}.pdf")
+        page.write_text(text.replace(f'<p class="pdf-preparing">PDF preparing…</p>{mark}',
+                                     f'<p><a href="{_esc(page.stem)}.pdf">PDF report</a></p>'))
+        n += 1
+    return n
+
+
+def write_hosted_report(rec: dict, out_dir: Path | None = None, report_dir: Path | None = None) -> Path:
     """Static behavior-map HTML for one PR record (hosted or opened locally)."""
     out_dir = Path(out_dir) if out_dir is not None else DEFAULT_HOSTED
     out_dir.mkdir(parents=True, exist_ok=True)
     rid = rec.get("id") or "run"
     path = out_dir / f"{rid}.html"
+    pdf_html, _ = _pdf_block(str(rid), report_dir, out_dir)
     claims = rec.get("behaviour_claims") or []
     probes = ((rec.get("probes") or {}).get("items") or [])
     agents = rec.get("agents") or {}
@@ -253,6 +310,7 @@ table{{border-collapse:collapse;width:100%}} th,td{{border:1px solid #ccc;paddin
 </style></head><body>
 <h1>Proof-of-Change</h1>
 <div class="banner"><strong>{_esc(rec.get('verdict'))}</strong> — {_esc(rec.get('reason'))}</div>
+{pdf_html}
 <p class="meta">Repo {_esc(rec.get('repo'))} · machine {_esc(rec.get('machine') or 'local')} ·
 sandbox {_esc(rec.get('sandbox_backend') or 'local')}</p>
 <h2>Behavior map</h2>
@@ -362,12 +420,19 @@ def apply(plan: dict, *, dry_run: bool | None = None, env: dict | None = None,
                "note": note or "no record.json found after run"}
         return out
 
-    report_path = write_hosted_report(rec, hosted_dir or DEFAULT_HOSTED)
+    rdir = reviewer_report_dir(rec)
+    report_path = write_hosted_report(rec, hosted_dir or DEFAULT_HOSTED, report_dir=rdir)
     url = report_url_for(report_path, env)
+    hosted_pdf = report_path.with_suffix(".pdf")
+    pdf_url = report_url_for(hosted_pdf, env) if hosted_pdf.is_file() else None
+    from reports import pdf_status
+    pdf_preparing = rdir is not None and not hosted_pdf.is_file() and pdf_status.read_state(rdir) in (
+        pdf_status.PREPARING, pdf_status.ERROR)
     verdict = str(rec.get("verdict") or "could_not_verify")
     reason = str(rec.get("reason") or "")
     head = plan.get("head_sha") or (rec.get("pr") or {}).get("head_sha") or ""
-    gh_meta: dict[str, Any] = {"report_path": str(report_path), "report_url": url, "dry_run": force_dry}
+    gh_meta: dict[str, Any] = {"report_path": str(report_path), "report_url": url, "dry_run": force_dry,
+                               "pdf_url": pdf_url, "pdf_preparing": pdf_preparing}
 
     if force_dry or not token:
         gh_meta["note"] = note or "dry_run: check run and comment not posted"
@@ -379,7 +444,8 @@ def apply(plan: dict, *, dry_run: bool | None = None, env: dict | None = None,
     try:
         payload = check_run_payload(str(repo), str(head), verdict, reason, url, env=env)
         check = post_check_run(str(repo), payload, token, env=env)
-        comment = post_pr_comment(str(repo), int(pr), summary_comment(verdict, reason, url), token, env=env)
+        comment = post_pr_comment(str(repo), int(pr), summary_comment(verdict, reason, url, pdf_url=pdf_url,
+                                                                        pdf_preparing=pdf_preparing), token, env=env)
     except (GitHubAppError, PermissionError) as e:
         gh_meta["error"] = str(e)
         return {"ok": False, "action": action, "repo": repo, "pr": pr, "github_app": gh_meta,
