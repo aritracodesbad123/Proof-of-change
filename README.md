@@ -30,7 +30,7 @@ Proof-of-Change checks Python projects. A project in another language is not sup
 
 A project that needs compiling is not supported. That includes code written in C, C++ or Rust. The daily run enforces this for dependencies before it selects pull requests. It resolves the project's runtime requirements and allows only ready-built packages, so that step compiles nothing and installs nothing. If a requirement has no ready-built package, that project's pull requests are left out of the run. The check reads the dependencies in the project file and the plain lines of a top-level requirements file. It does not open the project's own compiled code, and it does not read optional or test requirements, so a project can still reach setup and fail there. A check of one named pull request does not run this test. When a check needs a compiler, the check does not install one. Setup fails, and the result is could not verify.
 
-Not built: in a Contree-only run the tool does not measure which changed lines a probe ran. A probe without that measurement is dropped and does not count. That alone keeps a Contree-only result from verified.
+In a Contree run, each probe is measured on the main side inside Contree. If that measurement fails for any reason, the probe is left unmeasured and cannot count toward verified.
 
 Line coverage of a probe is measured only on the main side, in main's line numbers. A line the pull request adds is judged by the main lines next to it, so a check can pass without ever running a newly added branch of the code. A pull request that only adds new files cannot be verified.
 
