@@ -887,11 +887,8 @@ def start_check(pr_url: str, *, model_provider: str = "nebius", owner: str | Non
         run_note = f"{provider_note} {run_note}".strip() if run_note else provider_note
     approval_on = console_approval_on(approval)
     job_id = uuid.uuid4().hex[:12]
-    # Tests retarget REPO_ROOT. POC_OPS_RUNS (a Space home directory) wins when it is set.
-    if (os.environ.get("POC_OPS_RUNS") or "").strip():
-        jobs_dir = RUNS_ROOT / "_jobs" / job_id
-    else:
-        jobs_dir = REPO_ROOT / "ops" / "runs" / "_jobs" / job_id
+    # Job folders live under the run folders: POC_OPS_RUNS when set, else ops/runs (RUNS_ROOT).
+    jobs_dir = RUNS_ROOT / "_jobs" / job_id
     jobs_dir.mkdir(parents=True, exist_ok=True)
     progress_path = jobs_dir / "progress.jsonl"
     console_log = jobs_dir / "console.log"

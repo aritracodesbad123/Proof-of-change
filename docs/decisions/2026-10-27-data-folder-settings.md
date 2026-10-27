@@ -9,6 +9,7 @@ when the setting is unset, the old path is used, so local runs behave as before.
 | Write | Setting | Default (unchanged) | On the VM |
 | --- | --- | --- | --- |
 | Hosted HTML reports, written by `poc/github_app.py` and read by `poc/console_api.py` | `POC_HOSTED_REPORTS_DIR` (new) | `reports/hosted` | `/var/lib/proof-of-change/reports/hosted` |
+| Console job folders (`_jobs/<id>`: progress, console log, operator approval) | `POC_OPS_RUNS` via `RUNS_ROOT`; the old fallback to `REPO_ROOT/ops/runs/_jobs` is gone | `ops/runs/_jobs` | `/var/lib/proof-of-change/runs/_jobs` |
 | Run folders the App looks in for a finished record | `POC_OPS_RUNS` (already used by the console) | `ops/runs` | `/var/lib/proof-of-change/runs` |
 | An App check's run folder, `seen_prs.json` and work folder (`daily_run --ops-dir`) | `POC_OPS_DIR` (already used by the console) | `ops` | `/var/lib/proof-of-change` |
 | An App check's reviewer reports (`daily_run --report-dir`) | `POC_REPORT_DIR` (already used by the console) | `reports/daily/<run>` | `/var/lib/proof-of-change/reports/daily` |
@@ -24,6 +25,13 @@ Run folders reuse the existing `POC_OPS_RUNS` rather than adding a second name f
 - **Setup and health check.** `setup.sh` creates every one of these folders, owned by the service user.
   `healthcheck.sh` writes and then removes a small file in each one, as that user.
 - **No links.** No links into the code folder are used.
+
+Other `REPO_ROOT` paths were checked and are not the same kind of write:
+- **Read-only lookups:** the schema, the tracked-libraries list, `ops/local.json`, the web page files and `.git`.
+- **Writes that already have a setting:** the accounts file (`POC_ACCOUNTS_FILE`), heavy builds (`POC_HEAVY_BUILD_DIR`), and `daily_run`'s `--ops-dir`/`--report-dir` defaults, which both the console and the App now pass.
+- **Git sync:** used only by daily study runs on a git checkout; the VM's copy has no `.git`.
+
+Tests that point `console_api.REPO_ROOT` at a temporary folder now also point `RUNS_ROOT` there, so they never write job folders into the real checkout.
 
 ## Tests
 

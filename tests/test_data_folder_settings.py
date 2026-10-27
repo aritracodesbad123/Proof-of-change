@@ -60,3 +60,25 @@ def test_healthcheck_probes_each_data_folder_as_the_service_user():
     assert "runuser -u proof-of-change" in hc and "rm -f" in hc
     for d in ("runs", "reports/daily", "reports/hosted", "work/heavy-builds", "github-app"):
         assert f"/var/lib/proof-of-change/{d}" in hc
+
+
+def test_console_job_folders_follow_the_run_folders(tmp_path, monkeypatch):
+    class FakeThread:
+        def __init__(self, target=None, daemon=None):
+            pass
+
+        def start(self):
+            pass
+
+    code_root, runs = tmp_path / "code", tmp_path / "data" / "runs"
+    (code_root / "ops").mkdir(parents=True)
+    (code_root / "ops" / "daily_run.py").write_text("# stub\n")
+    monkeypatch.setattr(console_api.threading, "Thread", FakeThread)
+    monkeypatch.setattr(console_api, "console_run_flags",
+                        lambda *_a, **_k: console_api.ConsoleRunPlan([], None, False, None))
+    monkeypatch.setattr(console_api, "REPO_ROOT", code_root)
+    monkeypatch.setattr(console_api, "RUNS_ROOT", runs)
+    job = console_api.start_check("https://github.com/me/demo/pull/3", model_provider="none")
+    assert (runs / "_jobs" / job["id"]).is_dir()
+    assert not (code_root / "ops" / "runs").exists()  # nothing written into the code folder
+    assert 'REPO_ROOT / "ops" / "runs" / "_jobs"' not in (ROOT / "poc" / "console_api.py").read_text()
