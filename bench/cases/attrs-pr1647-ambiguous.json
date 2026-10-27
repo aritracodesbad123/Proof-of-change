@@ -1,0 +1,19 @@
+{
+  "schema": "poc-bench-case/1",
+  "id": "attrs-pr1647-ambiguous",
+  "repo": "python-attrs/attrs",
+  "pr_url": "https://github.com/python-attrs/attrs/pull/1647",
+  "base_sha": "ee66e7274852438cc23d4240a1a9cd632fda8b52",
+  "head_sha": "9961295ab2d96438c3ede4ddd9e4ca211913f145",
+  "category": "ambiguous",
+  "expected_verdict": "needs_attention",
+  "rationale": "Upstream open PR; ambiguous: the PR changes astuple output on purpose, so needs_attention is a fair answer and is not scored as a false alarm. Head suite result (Python 3.14.7, wheels only, no outside network): 1416 passed, 4 skipped, 2 xfailed in 10.27s. No failures.",
+  "source": "upstream PR python-attrs/attrs#1647, SHAs from GitHub API 2026-10-22 ~22:40 IST",
+  "notes": {
+    "base_ref": "main",
+    "base_is_merge_base_as_of_2026-10-22_22:40_IST": true,
+    "refresh_before_run": "base_sha was the base-branch tip and the merge base as of 2026-10-22 22:40 IST. It is refreshed, and the head checked again, right before the pilot; if it has moved the runner reports not run.",
+    "clean_head_preexisting_failures": [],
+    "relabelled_ambiguous": "This PR changes output on purpose, so needs_attention is a fair answer and is not scored as a false alarm. Ambiguous cases are reported, not scored."
+  }
+}
