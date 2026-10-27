@@ -130,6 +130,26 @@ def test_package_drift_reasons():
     assert "could not be read" in cs.package_drift(_ArgvSess({"a": "1"}, None))
 
 
+def test_package_drift_raw_sdk_error_counts_as_unreadable():
+    class Raw:
+        def run_argv(self, side, argv, timeout=120, cwd="/work"):
+            raise RuntimeError("sdk transport broke")   # not a ContreeError
+    assert "could not be read" in cs.package_drift(Raw())
+
+
+def test_raw_sdk_error_in_drift_falls_back_to_flag_off_build():
+    log = []
+    run, _ = _runner(log, 0)
+
+    def flaky(shell, disposable, image_ref, timeout, files):
+        if "pip list" in shell:
+            raise RuntimeError("sdk transport broke")
+        return run(shell, disposable, image_ref, timeout, files)
+    sess = cs.prepare_source_pair("o/r", "deadbeefmain", "deadbeefpr", runner=flaky, parallel=True)
+    assert "could not be read" in sess.parallel_fallback
+    assert log[-1][2] == "img-main" and sess.pr_uuid == "img-pr"   # PR rebuilt on main's image
+
+
 def test_no_could_not_verify_on_drift_code_left():
     assert not hasattr(dr, "_check_contree_packages") and not hasattr(cs, "side_packages")
 
@@ -155,16 +175,20 @@ def test_client_sync_creates_one_client_under_threads(monkeypatch):
             inside["n"] -= 1
     monkeypatch.setitem(sys.modules, "contree_sdk", SimpleNamespace(ContreeSync=Slow))
     sess = cs.ContreeSession()
-    got = []
+    got, errors = [], []
 
     def go():
-        gate.wait()   # both threads call _client_sync at the same moment
-        got.append(sess._client_sync())
+        try:
+            gate.wait(timeout=5)   # both threads call _client_sync at the same moment
+            got.append(sess._client_sync())
+        except BaseException as e:  # noqa: BLE001 - asserted after join, never left unhandled in the thread
+            errors.append(e)
     ts = [threading.Thread(target=go) for _ in range(2)]
     for t in ts:
         t.start()
     for t in ts:
-        t.join()
+        t.join(timeout=10)
+    assert not errors and not any(t.is_alive() for t in ts)
     assert len(got) == 2 and got[0] is got[1] and len(made) == 1 and peak["n"] == 1
 
 
@@ -200,8 +224,10 @@ def test_parallel_main_failure_does_not_wait_for_pr_build():
     assert time.time() - t0 < 0.4
     assert ei.value.pr_build == cs.PR_BUILD_ABANDONED
     sess = cs.session()
-    done.wait(2)
-    time.sleep(0.05)
+    for t in [t for t in threading.enumerate() if t.name == "poc-pr-checkpoint"]:
+        t.join(timeout=5)   # never leave the PR-build thread running past the test
+        assert not t.is_alive()
+    assert done.is_set()
     assert sess.pr_uuid is None   # the late PR image is never used
 
 

@@ -718,7 +718,7 @@ def package_drift(sess: "ContreeSession", *, timeout: int = 120) -> str | None:
         try:
             raw = sess.run_argv(side, ["python", "-m", "pip", "list", "--format=json", "--exclude-editable",
                                        "--disable-pip-version-check"], timeout=timeout, cwd="/work")
-        except ContreeError as e:
+        except Exception as e:  # noqa: BLE001 - any SDK error means "could not be read": fall back to flag-off
             raw = {"exit_code": None, "stdout": "", "stderr": type(e).__name__}
         try:
             if raw.get("exit_code") != 0:
