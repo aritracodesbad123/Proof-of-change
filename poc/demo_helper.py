@@ -31,7 +31,7 @@ TAVILY_TIMEOUT = 8
 PYPI_TIMEOUT = 8
 MAX_SUGGESTIONS = 8
 # Probe line coverage is measured again after a setup rerun only when the change is this small.
-# A larger change skips that measurement, and the rerun cannot raise could_not_verify to verified.
+# A larger change skips that measurement, and the verdict stays could_not_verify.
 SMALL_CHANGED_LINES = 200
 SIDES = ("main", "pr")
 TEST_EXTRAS = ("test", "tests", "testing")
@@ -2850,10 +2850,9 @@ def retry_unverified_study(rec: dict, rerun, install_one, declared, tavily_text:
     """Study and daily-study path, unchanged from before the product check flow.
 
     One rerun when a could-not-verify result is a setup gap. Tavily text alone never changes the verdict.
-
-    This is the only step that can raise could_not_verify to verified. When the record has probes, that raise
-    waits for a fresh probe line-coverage measurement. The measurement runs only when the change is small.
-    A larger change skips it, and the verdict stays could_not_verify.
+    A repair only lets the check run; the verdict comes from the same rules as any other run.
+    When the record has probes, a fresh probe line-coverage measurement runs only when the change is small.
+    A larger change skips that measurement, and the verdict stays could_not_verify.
 
     ``allow_system`` and ``install_system`` are unused. They stay so older callers still pass, and this step
     does not install an OS package.
@@ -2961,10 +2960,12 @@ def retry_unverified(rec: dict, rerun, install_one, declared, tavily_text: str, 
                      product_repair: bool = False) -> dict:
     """Up to ``max_tries`` reruns when a could-not-verify result is a setup or import gap.
 
-    Each try: look the error up (Tavily, when a lookup is given), install the fix on main and pr, rerun the step.
-    Every try is logged in ``gap_retry.tries``. A needs-attention result (a PR-caused test failure) is never retried.
-    Tavily text alone never changes the verdict. This is the only step that can raise could_not_verify to
-    verified, and that raise still waits for a fresh probe line-coverage measurement when the record has probes.
+    Each try looks up the real error (Tavily, when a lookup is given), installs the same fix on main and pr,
+    and runs the check again. Every try is logged in ``gap_retry.tries``. A repair only lets the check run;
+    the verdict comes from the same rules as any other run. A needs-attention result (a failure the pull
+    request caused) is never retried. Tavily text alone never changes the verdict. When the record has probes,
+    a fresh probe line-coverage measurement runs only when the change is small. A larger change skips that
+    measurement, and the verdict stays could_not_verify.
 
     ``allow_system`` and ``install_system`` are unused. A missing system library, header or build tool is a
     could-not-verify limitation. This step does not install an OS package on any sandbox.
