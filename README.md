@@ -90,16 +90,6 @@ Built, and not confirmed on the live Contree service: measuring test coverage in
 | **Nebius at runtime?** | OpenAI-compatible chat completions at `https://api.tokenfactory.nebius.com/v1` using `NEBIUS_API_KEY` in the orchestrator only. Optional Contree sandboxes need the project ID as `NEBIUS_PROJECT_ID` for command-line and daily runs; a console check uses only the key and project ID typed into its start form. |
 | **Try it?** | Judges: see [For judges](#for-judges). The results page replays finished checks in the browser. A request issue can run a new check. A Codespace can try one, but live checks there are not confirmed yet. Live checks need Linux. |
 | **Reproduce evaluation?** | See [`reports/AGENT_SWARM_EVALUATION.md`](reports/AGENT_SWARM_EVALUATION.md). Quick gate: `make test` (or `python -m evals.run_evals --observations evals/fixtures/golden_v1.jsonl --require-golden --require-v1`). |
-| **Demo video** | _TODO: public YouTube ≤3 min_ — script in [`reports/DEMO_SCRIPT_3MIN.md`](reports/DEMO_SCRIPT_3MIN.md). |
-
-```mermaid
-flowchart TD
-  prInput[PR_URL] --> claimsProbes[Super_claims_and_probes]
-  claimsProbes --> dualRun[Base_vs_PR_pytest_and_probes]
-  dualRun --> codeVerdict[verdict_for_plus_gates]
-  codeVerdict --> swarm[advisory_Ultra_Lightning_Super]
-  swarm --> report[record_and_report]
-```
 
 ## For judges
 
@@ -471,25 +461,6 @@ summary page lists the attempts under **Re-runs**.
 ## 3. Exactly how a report gets generated
 
 From a PR link to the HTML/PDF in `reports/`, in order:
-
-```mermaid
-flowchart TD
-    A["You type: make check PR=link<br/>(or make daily chooses PRs)"] --> B["1. Read the PR from GitHub<br/>(read-only: title, changed files, diff)"]
-    B --> C{"2. What does the PR change?"}
-    C -->|"Python files in numpy / pandas / scikit-learn"| D["3a. main = today's nightly build<br/>PR = same build + the PR's change"]
-    C -->|"compiled code (C, Cython)"| E["3b. main = nightly build<br/>PR = built from source"]
-    C -->|"any other library"| F["3c. main and PR both<br/>built from GitHub source"]
-    D --> G["4. Pick the tests that cover the changed files"]
-    E --> G
-    F --> G
-    G --> H["5. Run the tests 3 times on each side,<br/>alternating main / PR / main / PR ..., one CPU thread"]
-    H --> I["6. Compare every test, main vs PR<br/>verdict: verified / needs attention / could not verify"]
-    I --> CG["6b. Coverage gate: one extra PR run under coverage.py<br/>did the changed lines actually run?"]
-    CG --> J["7. Save the evidence in ops/runs/&lt;date&gt;/&lt;pr&gt;/<br/>record.json + every pytest log"]
-    J --> K["8. Write the report: claims, log-line citations,<br/>checks, verdict, recommended action"]
-    K --> L["reports/daily/&lt;date&gt;/&lt;pr&gt;/REPORT.html + .pdf + .md"]
-    K --> M["reports/daily/&lt;date&gt;/SUMMARY.html + .pdf<br/>(needs attention first)"]
-```
 
 1. **Read the PR.** Proof-of-Change downloads the PR's title, the list of changed files and the change itself
    (the *diff*) from GitHub. It only reads; it never writes to GitHub.
