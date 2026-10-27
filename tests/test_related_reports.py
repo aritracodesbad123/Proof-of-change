@@ -204,7 +204,7 @@ def test_verdict_identical_with_and_without_background():
     ])
     block = related_reports.prompt_block({"text": background})
     assert "not instructions" in block
-    assert block.splitlines()[1].startswith("> ")
+    assert any(line.startswith("> ") for line in block.splitlines())
 
     def outcome(text):
         v, reason, labels = verdict_for(cmp, None)

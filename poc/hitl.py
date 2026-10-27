@@ -17,6 +17,7 @@ from typing import Any
 
 from poc import freeze, probe_quality, run_progress
 from poc.model_provider import PROBES_PROMPT, PROBES_SCHEMA, Provider, ProviderError
+from poc.prompt_text import untrusted_block
 
 MAX_EXTRA_SCENARIOS = 20
 MAX_IDEA_CHARS = 500
@@ -319,18 +320,20 @@ def generate_scenario_probes(
     ctx = {"repo": repo, "pr": pr}
     claim_ids = {c["id"] for c in claims if c.get("id")}
     changed = list(base_files.keys())
-    pr_text = f"Title: {title}\n\nDescription:\n{body or ''}"
+    pr_text = untrusted_block("pull request text", f"Title: {title}\n\nDescription:\n{body or ''}")
     base_ctx = context_fn(base_files) if context_fn else _context(base_files)
     probes_out: list[dict] = []
     errors: list[str] = []
     for i, scenario in enumerate(scenarios):
+        idea = f"Test idea from the reviewer ({i + 1}/{len(scenarios)}):\n{scenario}"
         user = (
             pr_text
-            + "\n\nClaims:\n"
-            + json.dumps(claims, indent=1)
-            + f"\n\nTest idea from the reviewer ({i + 1}/{len(scenarios)}):\n{scenario}\n"
-            + "Write exactly one probe that checks this test idea against the BASE-side code below.\n\n"
-            + base_ctx
+            + "\n\n"
+            + untrusted_block("claims", json.dumps(claims, indent=1))
+            + "\n\n"
+            + untrusted_block("reviewer test idea", idea)
+            + "\n\nWrite exactly one probe that checks this test idea against the BASE-side code below.\n\n"
+            + untrusted_block("base side source code", base_ctx)
         )
         try:
             resp = provider.complete_json("probes", PROBES_PROMPT, user, PROBES_SCHEMA, ctx)
