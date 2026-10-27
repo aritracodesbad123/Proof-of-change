@@ -125,9 +125,16 @@ class _ScrubWriter:
 
 
 def contree_credentials(session_token: str | None = None) -> tuple[str, str]:
-    """The user's own Nebius key and Contree project ID for a console check: only the values typed into this
-    session. The server's NEBIUS_API_KEY / NEBIUS_PROJECT_ID / CONTREE_PROJECT_ID are never used for a user check,
-    so one person's check can never run on the server's Nebius account."""
+    """The Nebius key and project ID Contree uses for a console check.
+
+    A hosted console (POC_HOSTED=1, Render or a Space) reads them only from the private server settings
+    NEBIUS_API_KEY and NEBIUS_PROJECT_ID; anything typed into a session is ignored. Every hosted check is then
+    charged to the daily cap and POC_TAVILY_CREDIT_CAP (hosted_budget_refusal). A local console uses only the
+    values typed into this session, so a local user's check never runs on the server's Nebius account.
+    The values are never shown, logged or echoed."""
+    if hosted_console():
+        return ((os.environ.get("NEBIUS_API_KEY") or "").strip(),
+                (os.environ.get("NEBIUS_PROJECT_ID") or "").strip())
     key = (session_key.get_key(session_token) or "").strip()
     project = (session_key.get_contree_project(session_token) or "").strip()
     return key, project
@@ -719,6 +726,48 @@ def hosted_console(env=None) -> bool:
     return flag or console_auth.on_render(env) or spaces_host.on_spaces(env)
 
 
+DAILY_CAP_REACHED = "Daily check limit reached"
+CREDIT_CAP_MISSING = ("This hosted console has no Tavily credit cap set (POC_TAVILY_CREDIT_CAP), so it does not "
+                      "start checks. The operator needs to set it.")
+_daily_lock = threading.Lock()
+
+
+def _ist_day(now: float | None = None) -> str:
+    return time.strftime("%Y-%m-%d", time.gmtime((time.time() if now is None else now) + 5.5 * 3600))
+
+
+def daily_cap(env=None) -> int:
+    env = os.environ if env is None else env
+    try:
+        return max(0, int((env.get("POC_DAILY_CAP") or "").strip() or 5))
+    except ValueError:
+        return 5
+
+
+def hosted_budget_refusal(env=None, *, path: Path | None = None, now: float | None = None) -> str | None:
+    """On a hosted console, charge this check to the daily cap and require POC_TAVILY_CREDIT_CAP.
+
+    Returns a refusal (one plain line, no values) or None after counting the check for today (IST).
+    The Tavily credit cap itself is enforced inside the check, before its first Tavily call."""
+    env = os.environ if env is None else env
+    if not str(env.get("POC_TAVILY_CREDIT_CAP") or "").strip():
+        return CREDIT_CAP_MISSING
+    cap = daily_cap(env)
+    path = path or (RUNS_ROOT / "_console_daily.json")
+    day = _ist_day(now)
+    with _daily_lock:
+        try:
+            data = json.loads(path.read_text())
+        except (OSError, ValueError):
+            data = {}
+        used = int(data.get(day) or 0) if isinstance(data, dict) else 0
+        if used >= cap:
+            return f"{DAILY_CAP_REACHED} ({cap} checks per day on this console). Try again tomorrow."
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps({day: used + 1}))
+    return None
+
+
 def refusal_message(session_token: str | None = None) -> str:
     """Plain words for a check refused because no sandbox can start. Never asks for a field already given.
 
@@ -727,13 +776,9 @@ def refusal_message(session_token: str | None = None) -> str:
     if hosted_console():
         prefix = f"{CONTREE_UNAVAILABLE} (could not verify; no pull-request code was run): "
         if key and project:
-            return prefix + ("your Nebius key and project ID are set, but Contree could not start. "
-                             "Try again in a moment.")
-        if project and not key:
-            return prefix + "add your Nebius API key so the Contree sandbox can start."
-        if key and not project:
-            return prefix + "add your Nebius project ID."
-        return prefix + "add your Nebius API key and Nebius project ID so the check can run in Contree."
+            return prefix + "Contree could not start on this server. Try again in a moment."
+        return prefix + ("the operator has not set up Contree on this server "
+                         "(NEBIUS_API_KEY and NEBIUS_PROJECT_ID are private server settings).")
     if key and project:
         if not _contree_sdk_installed():
             return ("No sandbox available: your Nebius key and project ID are set, but the Contree software is not "
@@ -759,10 +804,10 @@ def apply_start_fields(session_token: str | None, body: dict) -> None:
     Raises ValueError with a plain message. Values are never echoed, logged, or written to disk.
     """
     from poc import console_auth
-    setters = [
-        ("nebius_api_key", session_key.set_key),
-        *[(name, session_key.set_contree_project) for name in _PROJECT_FIELDS],
-    ]
+    setters = [("nebius_api_key", session_key.set_key)]
+    # A hosted console reads the Contree project ID only from the server setting. A typed value is not read.
+    if not hosted_console():
+        setters.extend((name, session_key.set_contree_project) for name in _PROJECT_FIELDS)
     # A hosted console never reads a typed Tavily key. The server setting is the only one.
     if console_auth.single_user_requested():
         setters.insert(1, ("tavily_api_key", session_key.set_tavily_key))
@@ -807,6 +852,10 @@ def start_check(pr_url: str, *, model_provider: str = "nebius", owner: str | Non
         flags, run_note, refused, warning = plan.flags, plan.note, plan.refused, plan.warning
         if refused:
             raise CheckRefused(refusal_message(session_token))
+        if hosted_console():
+            over = hosted_budget_refusal()
+            if over:
+                raise CheckRefused(over)
     if provider_note and not playback:
         run_note = f"{provider_note} {run_note}".strip() if run_note else provider_note
     approval_on = console_approval_on(approval)
