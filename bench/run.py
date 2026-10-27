@@ -173,6 +173,9 @@ def sha_check(case: dict, rec: dict | None) -> list[str]:
     p = []
     if head != case["head_sha"]:
         p.append(f"tested PR head {head} is not the manifest head_sha")
+    live = rec.get("current_head_sha")
+    if rec.get("head_moved") or (live and live != case["head_sha"]):
+        p.append(f"PR head moved: live head {live} is not the pinned head_sha (case file: report not run)")
     p += pr_side(case, sides)[1]
     if main_sha != case["base_sha"]:
         p.append(f"tested base {main_sha} is not the manifest base_sha")
