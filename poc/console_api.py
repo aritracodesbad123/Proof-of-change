@@ -317,8 +317,9 @@ def report_links(run_id: str, *, folder: str | None = None, rec: dict | None = N
     return {
         "report_pdf": f"/api/runs/{q}/report.pdf" if pdf else None,
         "report_html": f"/api/runs/{q}/report.html" if html else None,
-        # 'preparing' while a background retry regenerates a missing PDF (an 'error' is shown the same way).
-        "report_pdf_status": "ready" if pdf else ("preparing" if pdf_state in ("preparing", "error") else None),
+        # 'preparing' while a background retry regenerates a missing PDF; 'failed' once every try has failed.
+        "report_pdf_status": "ready" if pdf else (
+            "preparing" if pdf_state == "preparing" else ("failed" if pdf_state == "error" else None)),
     }
 
 
@@ -1300,6 +1301,11 @@ class Handler(BaseHTTPRequestHandler):
 
 
 def serve(host: str = "127.0.0.1", port: int = 8787) -> None:
+    try:  # resume PDFs left 'preparing' by a restart; mark failed those past their time limit
+        from reports import pdf_status
+        pdf_status.resume_pending([REPORTS_DAILY])
+    except Exception:  # noqa: BLE001 - never blocks the console from starting
+        pass
     httpd = ThreadingHTTPServer((host, port), Handler)
     print(f"Proof-of-Change console API http://{host}:{port}  (UI: Vite :5173 or {WEB_DIST})", flush=True)
     httpd.serve_forever()

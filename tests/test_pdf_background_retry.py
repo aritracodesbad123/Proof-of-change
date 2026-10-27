@@ -33,7 +33,7 @@ def test_status_file_states(tmp_path):
     assert ps.read_state(d) is None
     ps.write_status(d, ps.PREPARING, 1)
     assert ps.read_state(d) == ps.PREPARING
-    assert set(json.loads((d / ps.STATUS_FILE).read_text())) == {"state", "attempts", "updated_at"}
+    assert set(json.loads((d / ps.STATUS_FILE).read_text())) == {"state", "attempts", "updated_at", "started_at"}
     (d / "REPORT.pdf").write_bytes(b"%PDF")
     assert ps.read_state(d) == ps.READY
     with pytest.raises(ValueError):
@@ -68,7 +68,7 @@ def test_final_failure_logs_error_for_maintainers(tmp_path, caplog):
     assert st["state"] == "error" and st["attempts"] == 6
     assert "chrome" not in (d / ps.STATUS_FILE).read_text().lower()
     assert any("PDF still missing" in r.message for r in caplog.records)
-    assert ps.user_label(ps.read_state(d)) == "PDF preparing…"
+    assert ps.user_label(ps.read_state(d)) == "PDF could not be generated."
 
 
 def test_first_attempt_ok_marks_ready_without_worker(tmp_path, monkeypatch):
@@ -132,7 +132,7 @@ def test_console_links_show_preparing_then_real_link(tmp_path, monkeypatch):
     links = console_api.report_links("run-1", folder="run-1")
     assert links["report_pdf"] is None and links["report_pdf_status"] == "preparing"
     ps.write_status(d, ps.ERROR, 6)
-    assert console_api.report_links("run-1", folder="run-1")["report_pdf_status"] == "preparing"
+    assert console_api.report_links("run-1", folder="run-1")["report_pdf_status"] == "failed"
     (d / "REPORT.pdf").write_bytes(b"%PDF")
     links = console_api.report_links("run-1", folder="run-1")
     assert links["report_pdf"].endswith("/report.pdf") and links["report_pdf_status"] == "ready"

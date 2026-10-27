@@ -7,8 +7,12 @@ Every report folder that should have a REPORT.pdf gets a small ``pdf_status.json
 * ``ready``      REPORT.pdf exists and is non-empty.
 * ``preparing``  the first attempt (Chrome, then the built-in PDF maker) failed; a detached background
                  worker keeps regenerating the PDF from the saved REPORT.html with backoff.
-* ``error``      every background try failed. An error is logged for maintainers. Users still only see
-                 "PDF preparing…" (no workaround is offered to them).
+* ``error``      every background try failed, or the folder stayed 'preparing' past TIME_LIMIT_S. An error is
+                 logged for maintainers and users see "PDF could not be generated." (console, hosted page,
+                 and the App's own PR comment and check run, edited in place).
+
+One worker per folder: a lock file (``.pdf.lock``) stops two workers writing the same PDF. On startup
+``resume_pending`` restarts the retry for any folder still 'preparing', or marks it failed when too old.
 
 The record, its verdict and the HTML/Markdown reports are never touched here: this module only reads
 REPORT.html and writes REPORT.pdf and pdf_status.json. Error text is never written to the status file,
@@ -33,6 +37,10 @@ PREPARING, READY, ERROR = "preparing", "ready", "error"
 # 5 tries over roughly ten minutes: waits before each try, in seconds.
 RETRY_DELAYS_S = (15, 45, 90, 180, 270)
 NO_RETRY_ENV = "POC_PDF_NO_BACKGROUND_RETRY"
+LOCK_FILE = ".pdf.lock"
+# A folder still 'preparing' this long after its first attempt is marked failed on startup.
+TIME_LIMIT_S = sum(RETRY_DELAYS_S) + 5 * 60
+FAILED_LABEL = "PDF could not be generated."
 
 log = logging.getLogger("proof_of_change.pdf")
 
@@ -52,7 +60,14 @@ def write_status(report_dir: str | Path, state: str, attempts: int = 0) -> Path:
     d.mkdir(parents=True, exist_ok=True)
     p = d / STATUS_FILE
     tmp = d / (STATUS_FILE + ".tmp")
-    tmp.write_text(json.dumps({"state": state, "attempts": int(attempts), "updated_at": round(time.time(), 1)}))
+    started = None
+    try:
+        started = json.loads(p.read_text()).get("started_at")
+    except (OSError, ValueError, AttributeError):
+        pass
+    now = round(time.time(), 1)
+    tmp.write_text(json.dumps({"state": state, "attempts": int(attempts), "updated_at": now,
+                               "started_at": started if isinstance(started, (int, float)) else now}))
     os.replace(tmp, p)
     return p
 
@@ -72,8 +87,10 @@ def read_state(report_dir: str | Path) -> str | None:
 
 
 def user_label(state: str | None) -> str | None:
-    """What a user sees while the PDF is missing. Same text for preparing and error: no workaround is shown."""
-    return "PDF preparing…" if state in (PREPARING, ERROR) else None
+    """What a user sees while the PDF is missing: 'PDF preparing…', or the failure line after every try failed."""
+    if state == ERROR:
+        return FAILED_LABEL
+    return "PDF preparing…" if state == PREPARING else None
 
 
 def start_background_retry(report_dir: str | Path) -> bool:
@@ -109,9 +126,52 @@ def after_first_attempt(report_dir: str | Path, error: str | None) -> str:
     return PREPARING
 
 
+class _FolderLock:
+    """Non-blocking exclusive lock on <report folder>/.pdf.lock; ``held`` is False when another worker has it."""
+
+    def __init__(self, d: Path):
+        self.path, self.fh, self.held = d / LOCK_FILE, None, False
+
+    def __enter__(self):
+        import fcntl
+        self.fh = open(self.path, "a+")  # noqa: SIM115
+        try:
+            fcntl.flock(self.fh.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+            self.held = True
+        except OSError:
+            self.held = False
+        return self
+
+    def __exit__(self, *exc):
+        import fcntl
+        if self.fh:
+            if self.held:
+                fcntl.flock(self.fh.fileno(), fcntl.LOCK_UN)
+            self.fh.close()
+        return False
+
+
+def _notify(d: Path, state: str) -> None:
+    """Update hosted App pages and the App's own PR comment and check run. Never raises."""
+    try:
+        from poc import github_app
+        github_app.publish_pdf_outcome(d, state)
+    except Exception as e:  # noqa: BLE001 - the PDF state is already saved; the console reads it on its own
+        log.error("PDF %s for report %s but the App outputs were not updated: %s", state, d.name, type(e).__name__)
+
+
 def retry_until_ready(report_dir: str | Path, delays=RETRY_DELAYS_S, sleep=time.sleep, to_pdf=None) -> str:
-    """Regenerate REPORT.pdf from the saved REPORT.html with backoff until it exists. Returns the final state."""
+    """Regenerate REPORT.pdf from the saved REPORT.html with backoff until it exists. Returns the final state.
+
+    Holds the folder lock for the whole loop; a second worker returns the current state right away."""
     d = Path(report_dir)
+    with _FolderLock(d) as lock:
+        if not lock.held:
+            return read_state(d) or PREPARING
+        return _retry_locked(d, delays, sleep, to_pdf)
+
+
+def _retry_locked(d: Path, delays, sleep, to_pdf) -> str:
     pdf, html_p = d / PDF_FILE, d / HTML_FILE
     if to_pdf is None:
         from reports import reviewer as rv
@@ -132,17 +192,56 @@ def retry_until_ready(report_dir: str | Path, delays=RETRY_DELAYS_S, sleep=time.
         write_status(d, PREPARING, attempts)
     if _pdf_ok(pdf):
         write_status(d, READY, attempts)
-        try:  # swap "PDF preparing…" for the real link on any hosted GitHub App page
-            from poc import github_app
-            github_app.publish_ready_pdf(d)
-        except Exception:  # noqa: BLE001 - the PDF exists; the console finds it on its own
-            pass
+        _notify(d, READY)
         return READY
     write_status(d, ERROR, attempts)
-    log.error("PDF still missing after %d attempts for report %s; HTML and Markdown reports are unchanged",
+    _notify(d, ERROR)
+    log.error("PDF still missing after %d attempts for report %s; HTML and Markdown reports are unchanged; "
+              "users now see 'PDF could not be generated.'",
               attempts, d.name)
     print(f"ERROR: PDF still missing after {attempts} attempts for report {d.name}", file=sys.stderr, flush=True)
     return ERROR
+
+
+def resume_pending(roots=None, *, now: float | None = None, start=None, time_limit: float = TIME_LIMIT_S) -> dict:
+    """On startup: restart the retry for folders still 'preparing'; mark failed those past the time limit."""
+    if roots is None:
+        repo_root = Path(__file__).resolve().parent.parent
+        roots = [Path(os.environ.get("POC_REPORT_DIR") or (repo_root / "reports" / "daily"))]
+    now = time.time() if now is None else now
+    start = start_background_retry if start is None else start
+    out = {"resumed": [], "failed": []}
+    for root in roots:
+        root = Path(root)
+        if not root.is_dir():
+            continue
+        for sp in root.rglob(STATUS_FILE):
+            d = sp.parent
+            if read_state(d) != PREPARING:
+                if _pdf_ok(d / PDF_FILE):  # finished while nobody was watching: sync the saved state once
+                    try:
+                        if json.loads(sp.read_text()).get("state") != READY:
+                            write_status(d, READY, 0)
+                            _notify(d, READY)
+                    except (OSError, ValueError):
+                        pass
+                continue
+            try:
+                info = json.loads(sp.read_text())
+            except (OSError, ValueError):
+                continue
+            started = info.get("started_at") or info.get("updated_at") or 0
+            if now - float(started) > time_limit:
+                with _FolderLock(d) as lock:
+                    if not lock.held:
+                        continue
+                    write_status(d, ERROR, int(info.get("attempts") or 0))
+                log.error("PDF for report %s was still preparing past its time limit; marked failed", d.name)
+                _notify(d, ERROR)
+                out["failed"].append(d.name)
+            elif start(d):
+                out["resumed"].append(d.name)
+    return out
 
 
 def main(argv: list[str] | None = None) -> int:

@@ -1,9 +1,11 @@
 import { readFileSync } from 'node:fs'
 import { describe, expect, test } from 'vitest'
 import {
+  PDF_FAILED_LABEL,
   PDF_PREPARING_LABEL,
   behaviourMap,
   costTime,
+  pdfFailed,
   pdfPreparing,
   coveragePlain,
   filterRuns,
@@ -205,5 +207,12 @@ describe('PDF preparing', () => {
     expect(pdfPreparing('/api/runs/x/report.pdf', 'ready')).toBe(false)
     expect(pdfPreparing(null, null)).toBe(false)
     expect(PDF_PREPARING_LABEL).toBe('PDF preparing…')
+    expect(pdfPreparing(null, 'failed')).toBe(false)
+  })
+  test('shows a clear failure line once every retry failed', () => {
+    expect(pdfFailed(null, 'failed')).toBe(true)
+    expect(pdfFailed('/api/runs/x/report.pdf', 'failed')).toBe(false)
+    expect(pdfFailed(null, 'preparing')).toBe(false)
+    expect(PDF_FAILED_LABEL).toBe('PDF could not be generated.')
   })
 })

@@ -85,14 +85,16 @@ def check_run_payload(repo: str, head_sha: str, verdict: str, summary: str, repo
 
 
 def summary_comment(verdict: str, reason: str, report_url: str | None = None, *,
-                    pdf_url: str | None = None, pdf_preparing: bool = False) -> str:
+                    pdf_url: str | None = None, pdf_preparing: bool = False, pdf_failed: bool = False) -> str:
     lines = [f"**Proof-of-Change:** `{verdict}`", "", reason or "(no reason)", ""]
     if report_url:
         lines.append(f"[Full report]({report_url})")
     if pdf_url:
         lines.append(f"[PDF report]({pdf_url})")
+    elif pdf_failed:
+        lines.append(FAILED_TEXT)
     elif pdf_preparing:
-        lines.append("PDF preparing…")
+        lines.append(PREPARING_TEXT)
     lines.append("_Advice only — this never blocks a merge._")
     return "\n".join(lines)
 
@@ -216,12 +218,96 @@ def post_pr_comment(repo: str, pr: int, body: str, token: str, env: dict | None 
                       body={"body": body})
 
 
+COMMENT_FILE = "github_comment.json"
+PREPARING_TEXT = "PDF preparing…"
+FAILED_TEXT = "PDF could not be generated."
+
+
 def report_url_for(path: Path, env: dict | None = None) -> str | None:
     env = os.environ if env is None else env
     base = (env.get(REPORT_BASE_ENV) or "").rstrip("/")
     if not base:
         return None
     return f"{base}/{path.name}"
+
+
+def patch_pr_comment(repo: str, comment_id: int, body: str, token: str, env: dict | None = None) -> dict:
+    if not may_post(repo, env):
+        raise PermissionError(f"refusing to edit comment on non-demo repo {repo!r}")
+    # br-allow-external: G-ext edit of the App's own demo-repo PR comment only (may_post); never upstream
+    return _http_json("PATCH", f"{API}/repos/{repo}/issues/comments/{int(comment_id)}", token=token,
+                      body={"body": body})
+
+
+def patch_check_run(repo: str, check_run_id: int, payload: dict, token: str, env: dict | None = None) -> dict:
+    if not may_post(repo, env):
+        raise PermissionError(f"refusing to edit check run on non-demo repo {repo!r}")
+    # br-allow-external: G-ext edit of the App's own demo-repo check run only (may_post); never upstream
+    return _http_json("PATCH", f"{API}/repos/{repo}/check-runs/{int(check_run_id)}", token=token, body=payload)
+
+
+def remember_posts(report_dir: Path, *, repo: str, pr: int, comment_id, comment_body: str, check_run_id,
+                   check_title: str, check_summary: str, pdf_url: str | None) -> Path | None:
+    """Save the App's own comment and check run that say 'PDF preparing…', for an in-place edit later."""
+    if not pdf_url or not (comment_id or check_run_id):
+        return None
+    p = Path(report_dir) / COMMENT_FILE
+    p.write_text(json.dumps({"repo": repo, "pr": int(pr), "comment_id": comment_id, "comment_body": comment_body,
+                             "check_run_id": check_run_id, "check_title": check_title,
+                             "check_summary": check_summary, "pdf_url": pdf_url, "done": None}))
+    return p
+
+
+def _log_error(msg: str, *args) -> None:
+    import logging
+    logging.getLogger("proof_of_change.github_app").error(msg, *args)
+
+
+def update_posts_for_pdf(report_dir: str | Path, state: str, env: dict | None = None,
+                         patch_comment: Callable[..., dict] | None = None,
+                         patch_check: Callable[..., dict] | None = None) -> bool:
+    """When the PDF is ready (or has finally failed), edit the App's saved comment and check run in place.
+
+    'PDF preparing…' becomes the PDF link, or 'PDF could not be generated.' Nothing happens without a saved
+    id, after a previous edit (idempotent), or without a token. Only the saved items on the saved demo-repo
+    PR are touched; nothing new is posted.
+    """
+    from reports import pdf_status
+    if state not in (pdf_status.READY, pdf_status.ERROR):
+        return False
+    env = os.environ if env is None else env
+    p = Path(report_dir) / COMMENT_FILE
+    try:
+        info = json.loads(p.read_text())
+    except (OSError, ValueError):
+        return False
+    if not isinstance(info, dict) or info.get("done") or not (info.get("comment_id") or info.get("check_run_id")):
+        return False
+    repo, url = str(info.get("repo") or ""), str(info.get("pdf_url") or "")
+    if not repo or not url:
+        return False
+    new_text = f"[PDF report]({url})" if state == pdf_status.READY else FAILED_TEXT
+    try:
+        token = installation_token(env)
+        if not token:
+            _log_error("PDF %s but no App token to edit the PR comment/check run", state)
+            return False
+        if info.get("comment_id") and PREPARING_TEXT in str(info.get("comment_body") or ""):
+            body = str(info["comment_body"]).replace(PREPARING_TEXT, new_text, 1)
+            (patch_comment or patch_pr_comment)(repo, int(info["comment_id"]), body, token, env=env)
+            info["comment_body"] = body
+        if info.get("check_run_id"):
+            line = f"PDF: {url}" if state == pdf_status.READY else FAILED_TEXT
+            summary = (str(info.get("check_summary") or "") + "\n\n" + line)[:65000]
+            (patch_check or patch_check_run)(repo, int(info["check_run_id"]), {
+                "output": {"title": str(info.get("check_title") or "Proof-of-Change"), "summary": summary}},
+                token, env=env)
+    except (GitHubAppError, PermissionError, ValueError) as e:
+        _log_error("PDF %s but the App comment/check run could not be edited: %s", state, type(e).__name__)
+        return False
+    info["done"] = state
+    p.write_text(json.dumps(info))
+    return True
 
 
 PDF_PREPARING_MARK = "<!--pdf-preparing:{name}-->"
@@ -247,10 +333,41 @@ def _pdf_block(rid: str, report_dir: Path | None, out_dir: Path) -> tuple[str, s
         import shutil
         shutil.copyfile(report_dir / pdf_status.PDF_FILE, out_dir / f"{rid}.pdf")
         return f'<p><a href="{_esc(rid)}.pdf">PDF report</a></p>', state
-    if state in (pdf_status.PREPARING, pdf_status.ERROR):
+    if state == pdf_status.ERROR:
+        return f'<p class="pdf-failed">{FAILED_TEXT}</p>', state
+    if state == pdf_status.PREPARING:
         mark = PDF_PREPARING_MARK.format(name=_esc(report_dir.name))
         return f'<p class="pdf-preparing">PDF preparing…</p>{mark}', pdf_status.PREPARING
     return "", None
+
+
+def publish_failed_pdf(report_dir: str | Path, hosted_dir: str | Path | None = None) -> int:
+    """All retries failed: swap 'PDF preparing…' for a clear failure line on hosted pages."""
+    report_dir = Path(report_dir)
+    hosted_dir = Path(hosted_dir) if hosted_dir is not None else DEFAULT_HOSTED
+    if not hosted_dir.is_dir():
+        return 0
+    mark = PDF_PREPARING_MARK.format(name=_esc(report_dir.name))
+    n = 0
+    for page in hosted_dir.glob("*.html"):
+        text = page.read_text(encoding="utf-8", errors="replace")
+        if mark not in text:
+            continue
+        page.write_text(text.replace(f'<p class="pdf-preparing">PDF preparing…</p>{mark}',
+                                     f'<p class="pdf-failed">{FAILED_TEXT}</p>'))
+        n += 1
+    return n
+
+
+def publish_pdf_outcome(report_dir: str | Path, state: str, hosted_dir: str | Path | None = None,
+                        env: dict | None = None) -> None:
+    """Background retry finished: update hosted pages, then the App's own comment and check run."""
+    from reports import pdf_status
+    if state == pdf_status.READY:
+        publish_ready_pdf(report_dir, hosted_dir)
+    elif state == pdf_status.ERROR:
+        publish_failed_pdf(report_dir, hosted_dir)
+    update_posts_for_pdf(report_dir, state, env)
 
 
 def publish_ready_pdf(report_dir: str | Path, hosted_dir: str | Path | None = None) -> int:
@@ -428,6 +545,9 @@ def apply(plan: dict, *, dry_run: bool | None = None, env: dict | None = None,
     from reports import pdf_status
     pdf_preparing = rdir is not None and not hosted_pdf.is_file() and pdf_status.read_state(rdir) in (
         pdf_status.PREPARING, pdf_status.ERROR)
+    pdf_failed = rdir is not None and not hosted_pdf.is_file() and pdf_status.read_state(rdir) == pdf_status.ERROR
+    pdf_preparing = pdf_preparing and not pdf_failed
+    later_pdf_url = report_url_for(hosted_pdf, env) if pdf_preparing else None
     verdict = str(rec.get("verdict") or "could_not_verify")
     reason = str(rec.get("reason") or "")
     head = plan.get("head_sha") or (rec.get("pr") or {}).get("head_sha") or ""
@@ -444,8 +564,9 @@ def apply(plan: dict, *, dry_run: bool | None = None, env: dict | None = None,
     try:
         payload = check_run_payload(str(repo), str(head), verdict, reason, url, env=env)
         check = post_check_run(str(repo), payload, token, env=env)
-        comment = post_pr_comment(str(repo), int(pr), summary_comment(verdict, reason, url, pdf_url=pdf_url,
-                                                                        pdf_preparing=pdf_preparing), token, env=env)
+        comment_body = summary_comment(verdict, reason, url, pdf_url=pdf_url, pdf_preparing=pdf_preparing,
+                                       pdf_failed=pdf_failed)
+        comment = post_pr_comment(str(repo), int(pr), comment_body, token, env=env)
     except (GitHubAppError, PermissionError) as e:
         gh_meta["error"] = str(e)
         return {"ok": False, "action": action, "repo": repo, "pr": pr, "github_app": gh_meta,
@@ -455,6 +576,14 @@ def apply(plan: dict, *, dry_run: bool | None = None, env: dict | None = None,
     gh_meta["check_run_url"] = check.get("html_url")
     gh_meta["comment_id"] = comment.get("id")
     gh_meta["comment_url"] = comment.get("html_url")
+    if pdf_preparing and rdir is not None:
+        out = payload.get("output") or {}
+        remember_posts(rdir, repo=str(repo), pr=int(pr), comment_id=comment.get("id"), comment_body=comment_body,
+                       check_run_id=check.get("id"), check_title=str(out.get("title") or ""),
+                       check_summary=str(out.get("summary") or ""), pdf_url=later_pdf_url)
+        late = pdf_status.read_state(rdir)
+        if late in (pdf_status.READY, pdf_status.ERROR):  # the retry finished while we were posting
+            publish_pdf_outcome(rdir, late, hosted_dir or DEFAULT_HOSTED, env)
     rec["github_app"] = gh_meta
     rec["posted_upstream"] = True
     return {"ok": True, "action": action, "repo": repo, "pr": pr, "dry_run": False,
@@ -514,8 +643,20 @@ class _WebhookHandler(BaseHTTPRequestHandler):
         self.wfile.write(body)
 
 
+def require_report_base(env: dict | None = None) -> str:
+    """Hosted App mode needs a public report address, or PR comments would carry no working links."""
+    env = os.environ if env is None else env
+    base = (env.get(REPORT_BASE_ENV) or "").strip()
+    if not base:
+        raise SystemExit(f"refusing to start: {REPORT_BASE_ENV} is not set (public address of the hosted reports)")
+    return base
+
+
 def serve(host: str = "0.0.0.0", port: int = 8080, env: dict | None = None) -> None:
     env = os.environ if env is None else env
+    require_report_base(env)
+    from reports import pdf_status
+    pdf_status.resume_pending()  # folders still 'preparing' from before a restart
 
     class H(_WebhookHandler):
         pass

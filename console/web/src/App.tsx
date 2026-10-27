@@ -10,11 +10,13 @@ import {
 } from './api'
 import { ProcessDag } from './dag'
 import {
+  PDF_FAILED_LABEL,
   PDF_PREPARING_LABEL,
   TIMELINE_SPEC,
   costTime,
   filterRuns,
   illustrativeStates,
+  pdfFailed,
   pdfPreparing,
   prNumber,
   timelineStates,
@@ -539,6 +541,8 @@ export default function App() {
                           </a>
                         ) : pdfPreparing(run.report_pdf, run.report_pdf_status) ? (
                           <span className="pdf-link pdf-preparing">{PDF_PREPARING_LABEL}</span>
+                        ) : pdfFailed(run.report_pdf, run.report_pdf_status) ? (
+                          <span className="pdf-link pdf-failed">{PDF_FAILED_LABEL}</span>
                         ) : null}
                       </article>
                     </li>
