@@ -3,6 +3,89 @@
 Cases where a check ends as could not verify. Setup limits are also written into that check's record
 (`demo_helper.limitations`) in plain words, with the packages it needed and the real error.
 
+## What we can and can't test
+
+This section is for a reader who is not a programmer. It names limits the program already enforces.
+The shorter copy is in the README.
+
+### Python projects
+
+A check is for a Python project. A project in another language is not supported. A request for a
+check is accepted when the repository's language is Python, or when the project root contains a
+Python project file. The tested set is these small Python libraries: pytest, requests, rich, attrs,
+click, isort, jsonschema, boltons, line_profiler, python-barcode, httpx, urllib3, python-qrcode,
+itsdangerous, markupsafe, prettytable, loguru, sqlparse, toolz and invoke.
+
+### Projects that need compiling
+
+Not supported. A project that needs a compiler, including code written in C, C++ or Rust, is not
+something these checks can build.
+
+The daily run enforces this for dependencies before it selects pull requests. It reads the runtime
+requirements on the default branch: the dependencies in the project file, and the plain lines of a
+top-level requirements file. It resolves them for the Python version the checks use, and it allows
+only ready-built packages. A ready-built package is already compiled, so this step compiles nothing
+and installs nothing. Secret keys are not given to that step. If a requirement has no ready-built
+package, every pull request of that project is left out of that run, and the reason says it needs
+compiling. If the requirements cannot be resolved, the pull requests are left out for that reason
+too. The check runs once per project in a run. Starting that run with `--no-wheel-check` turns the
+check off.
+
+The check does not open the project's own compiled source. It does not read optional or test
+requirements, and it does not read setup.py or setup.cfg. A project can therefore still be
+selected and then fail at setup. A check of one named pull request does not run this test. A study
+run does not run it. When a check does reach setup and the project still needs a compiler, the
+check does not install a compiler or any other operating-system package. Setup fails, and the
+result is could not verify.
+
+### Line coverage in a Contree-only run
+
+Not built: in a Contree-only run the tool does not measure which changed lines a probe ran. Each
+probe is recorded with no line measurement. A probe with no measurement is dropped and does not
+count toward a verified result. That limit alone keeps a Contree-only result from verified. A
+difference the probe did see can still be reported as needs attention.
+
+Measuring how much of the project's own tests ran the changed lines, inside Contree, is a separate
+step. That step is built, and it is not confirmed on the live Contree service. When the report from
+that step is missing, a product check stays could not verify.
+
+### Network and keys
+
+Tests and probes in the local sandbox have no internet. The network is turned on only while
+packages are installed. Secret keys are not given to the local sandbox. They are not placed in the
+shell that runs inside Contree. A behaviour that needs a network service, a password or a key
+cannot be tested.
+
+### What a verdict means
+
+Kept means the behaviour the change described still holds. Broken, also called needs attention,
+means the check found a difference a person should look at. Could not verify means the check cannot
+say whether the change is fine.
+
+Passing probes never raise the verdict. The tool never approves a pull request and never merges
+one. A person decides.
+
+### Study runs
+
+Not built: the same-commit guard on a study run. A product check stops when main and the pull
+request are the same commit, because there is nothing to compare. A study run does not apply that
+guard.
+
+### Contree on the live service
+
+Built, and not confirmed on the live Contree service: measuring test coverage inside Contree,
+which shell runs setup, hiding of failure text, and running with a person's own Nebius account.
+
+### What 12 checks showed
+
+Of 12 pull requests from the tested libraries, 0 were verified, 4 need attention (isort,
+jsonschema, rich, prettytable) and 8 could not be verified (requests, attrs, click, urllib3,
+sqlparse, toolz, markupsafe, boltons). In every record, main differed from the pull request.
+
+The missing probe measurement in a Contree-only run, described above, alone keeps any of these
+from verified. The probes crashed on main for requests, sqlparse and toolz. markupsafe had a setup
+failure. click, urllib3 and boltons had no probe that ran a changed line.
+
 ## Current limitations
 
 - Big applications with huge dependency lists (for example home-assistant, erpnext, or vllm-scale projects) usually end as COULD NOT VERIFY. Setup installs too much, and anything that needs a C or system build fails in Contree, because pull-request checks never install operating-system packages. The operating-system package cases below are the same limit, with the error text a report shows.
