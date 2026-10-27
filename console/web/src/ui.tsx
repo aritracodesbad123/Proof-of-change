@@ -21,6 +21,8 @@ import {
   testGlance,
   verdictLabel,
   verdictTone,
+  PDF_PREPARING_LABEL,
+  pdfPreparing,
 } from './present'
 
 const AGENTS: { key: keyof SwarmStatus; name: string; role: string }[] = [
@@ -247,14 +249,21 @@ export function EvidenceLinks({
   record,
   pdf,
   html,
+  pdfStatus,
 }: {
   record: Record<string, unknown>
   pdf?: string | null
   html?: string | null
+  pdfStatus?: string | null
 }) {
   const links = evidenceLinks(record, { pdf, html })
   return (
     <ul className="evidence">
+      {pdfPreparing(pdf, pdfStatus) ? (
+        <li className="pdf-preparing" aria-live="polite">
+          {PDF_PREPARING_LABEL}
+        </li>
+      ) : null}
       {links.map((link) => (
         <li key={link.href + link.label}>
           <a href={link.href} {...(link.external ? { target: '_blank', rel: 'noreferrer' } : {})}>

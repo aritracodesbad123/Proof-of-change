@@ -110,3 +110,9 @@ def _reset_contree_bridge():
     yield
     contree_sandboxes.select("local")
     contree_sandboxes.clear_session()
+
+
+@pytest.fixture(autouse=True)
+def _no_background_pdf_retry(monkeypatch):
+    """Never start a detached PDF retry worker from a test; tests that need it patch it explicitly."""
+    monkeypatch.setenv("POC_PDF_NO_BACKGROUND_RETRY", "1")

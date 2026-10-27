@@ -310,9 +310,16 @@ def report_links(run_id: str, *, folder: str | None = None, rec: dict | None = N
     q = quote(run_id, safe="")
     pdf = find_reviewer_report_file(run_id, "pdf", folder=folder, rec=rec)
     html = find_reviewer_report_file(run_id, "html", folder=folder, rec=rec)
+    pdf_state = None
+    if not pdf and html:
+        from reports import pdf_status
+        pdf_state = pdf_status.read_state(html.parent)
     return {
         "report_pdf": f"/api/runs/{q}/report.pdf" if pdf else None,
         "report_html": f"/api/runs/{q}/report.html" if html else None,
+        # 'preparing' while a background retry regenerates a missing PDF; 'failed' once every try has failed.
+        "report_pdf_status": "ready" if pdf else (
+            "preparing" if pdf_state == "preparing" else ("failed" if pdf_state == "error" else None)),
     }
 
 
@@ -374,6 +381,7 @@ def _row_from_record(rec: dict, path: Path | None = None) -> dict:
         "source": "disk" if path else "memory",
         "report_pdf": links["report_pdf"],
         "report_html": links["report_html"],
+        "report_pdf_status": links.get("report_pdf_status"),
     }
 
 
@@ -394,6 +402,7 @@ def remember_run(rec: dict, path: Path | None = None, *, owner: str | None = Non
         "hosted_report": _display_path(hosted) if hosted.is_file() else None,
         "report_pdf": links.get("report_pdf"),
         "report_html": links.get("report_html"),
+        "report_pdf_status": links.get("report_pdf_status"),
         "saved_at": time.time(),
     }
     with _jobs_lock:
@@ -519,6 +528,7 @@ def get_run(run_id: str, owner: str | None = None, *, admin: bool = False) -> di
             "hosted_report": snap.get("hosted_report"),
             "report_pdf": links.get("report_pdf") or snap.get("report_pdf"),
             "report_html": links.get("report_html") or snap.get("report_html"),
+            "report_pdf_status": links.get("report_pdf_status") or snap.get("report_pdf_status"),
             "source": "memory",
         }
     return None
@@ -1023,6 +1033,12 @@ def get_job(job_id: str, owner: str | None = None, *, admin: bool = False) -> di
             return None
         if not _visible(j.get("owner"), viewer=owner, admin=admin):
             return None
+        if j.get("report_pdf_status") == "preparing" and j.get("run_id"):
+            # A background retry may have produced the PDF since the check finished: swap in the real link.
+            try:
+                j.update(report_links(str(j["run_id"]), folder=j.get("folder"), rec=j.get("record")))
+            except Exception:  # noqa: BLE001 - a link refresh never fails the job view
+                pass
         return _job_public(j)
 
 
@@ -1285,6 +1301,11 @@ class Handler(BaseHTTPRequestHandler):
 
 
 def serve(host: str = "127.0.0.1", port: int = 8787) -> None:
+    try:  # resume PDFs left 'preparing' by a restart; mark failed those past their time limit
+        from reports import pdf_status
+        pdf_status.resume_pending([REPORTS_DAILY])
+    except Exception:  # noqa: BLE001 - never blocks the console from starting
+        pass
     httpd = ThreadingHTTPServer((host, port), Handler)
     print(f"Proof-of-Change console API http://{host}:{port}  (UI: Vite :5173 or {WEB_DIST})", flush=True)
     httpd.serve_forever()

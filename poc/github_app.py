@@ -84,10 +84,17 @@ def check_run_payload(repo: str, head_sha: str, verdict: str, summary: str, repo
     return body
 
 
-def summary_comment(verdict: str, reason: str, report_url: str | None = None) -> str:
+def summary_comment(verdict: str, reason: str, report_url: str | None = None, *,
+                    pdf_url: str | None = None, pdf_preparing: bool = False, pdf_failed: bool = False) -> str:
     lines = [f"**Proof-of-Change:** `{verdict}`", "", reason or "(no reason)", ""]
     if report_url:
         lines.append(f"[Full report]({report_url})")
+    if pdf_url:
+        lines.append(f"[PDF report]({pdf_url})")
+    elif pdf_failed:
+        lines.append(FAILED_TEXT)
+    elif pdf_preparing:
+        lines.append(PREPARING_TEXT)
     lines.append("_Advice only — this never blocks a merge._")
     return "\n".join(lines)
 
@@ -211,6 +218,11 @@ def post_pr_comment(repo: str, pr: int, body: str, token: str, env: dict | None 
                       body={"body": body})
 
 
+COMMENT_FILE = "github_comment.json"
+PREPARING_TEXT = "PDF preparing…"
+FAILED_TEXT = "PDF could not be generated."
+
+
 def report_url_for(path: Path, env: dict | None = None) -> str | None:
     env = os.environ if env is None else env
     base = (env.get(REPORT_BASE_ENV) or "").rstrip("/")
@@ -219,12 +231,304 @@ def report_url_for(path: Path, env: dict | None = None) -> str | None:
     return f"{base}/{path.name}"
 
 
-def write_hosted_report(rec: dict, out_dir: Path | None = None) -> Path:
+def patch_pr_comment(repo: str, comment_id: int, body: str, token: str, env: dict | None = None) -> dict:
+    if not may_post(repo, env):
+        raise PermissionError(f"refusing to edit comment on non-demo repo {repo!r}")
+    # br-allow-external: G-ext edit of the App's own demo-repo PR comment only (may_post); never upstream
+    return _http_json("PATCH", f"{API}/repos/{repo}/issues/comments/{int(comment_id)}", token=token,
+                      body={"body": body})
+
+
+def patch_check_run(repo: str, check_run_id: int, payload: dict, token: str, env: dict | None = None) -> dict:
+    if not may_post(repo, env):
+        raise PermissionError(f"refusing to edit check run on non-demo repo {repo!r}")
+    # br-allow-external: G-ext edit of the App's own demo-repo check run only (may_post); never upstream
+    return _http_json("PATCH", f"{API}/repos/{repo}/check-runs/{int(check_run_id)}", token=token, body=payload)
+
+
+def remember_posts(report_dir: Path, *, repo: str, pr: int, comment_id, comment_body: str, check_run_id,
+                   check_title: str, check_summary: str, pdf_url: str | None) -> Path | None:
+    """Save the App's own comment and check run that say 'PDF preparing…', for an in-place edit later."""
+    if not pdf_url or not (comment_id or check_run_id):
+        return None
+    p = Path(report_dir) / COMMENT_FILE
+    p.write_text(json.dumps({"repo": repo, "pr": int(pr), "comment_id": comment_id, "comment_body": comment_body,
+                             "check_run_id": check_run_id, "check_title": check_title,
+                             "check_summary": check_summary, "pdf_url": pdf_url, "done": None}))
+    return p
+
+
+def _log_error(msg: str, *args) -> None:
+    import logging
+    logging.getLogger("proof_of_change.github_app").error(msg, *args)
+
+
+EDIT_RETRY_DELAYS_S = (2, 5, 15)
+
+
+def update_posts_for_pdf(report_dir: str | Path, state: str, env: dict | None = None,
+                         patch_comment: Callable[..., dict] | None = None,
+                         patch_check: Callable[..., dict] | None = None,
+                         delays=EDIT_RETRY_DELAYS_S, sleep: Callable[[float], Any] = time.sleep) -> bool:
+    """When the PDF is ready (or has finally failed), edit the App's saved comment and check run in place.
+
+    'PDF preparing…' becomes the PDF link, or 'PDF could not be generated.' Nothing happens without a saved
+    id, after a previous edit (idempotent), or without a token. Only the saved items on the saved demo-repo
+    PR are touched; nothing new is posted. A failed edit (GitHub, network or token error) is retried with a
+    short bounded backoff; 'done' is saved only after every edit succeeded, so a later resume or the
+    background sweep (PendingEditSweeper) tries again.
+    Progress of each edit is saved, so a retry never edits the same item twice.
+    """
+    from reports import pdf_status
+    if state not in (pdf_status.READY, pdf_status.ERROR):
+        return False
+    env = os.environ if env is None else env
+    p = Path(report_dir) / COMMENT_FILE
+    try:
+        info = json.loads(p.read_text())
+    except (OSError, ValueError):
+        return False
+    if not isinstance(info, dict) or info.get("done") or not (info.get("comment_id") or info.get("check_run_id")):
+        return False
+    repo, url = str(info.get("repo") or ""), str(info.get("pdf_url") or "")
+    if not repo or not url:
+        return False
+    new_text = f"[PDF report]({url})" if state == pdf_status.READY else FAILED_TEXT
+    waits = list(delays or ())
+    attempt = 0
+    while True:
+        attempt += 1
+        try:
+            token = installation_token(env)
+            if not token:
+                raise GitHubAppError("no App token")
+            if info.get("comment_id") and PREPARING_TEXT in str(info.get("comment_body") or ""):
+                body = str(info["comment_body"]).replace(PREPARING_TEXT, new_text, 1)
+                (patch_comment or patch_pr_comment)(repo, int(info["comment_id"]), body, token, env=env)
+                info["comment_body"] = body
+                p.write_text(json.dumps(info))
+            if info.get("check_run_id") and not info.get("check_done"):
+                line = f"PDF: {url}" if state == pdf_status.READY else FAILED_TEXT
+                summary = (str(info.get("check_summary") or "") + "\n\n" + line)[:65000]
+                (patch_check or patch_check_run)(repo, int(info["check_run_id"]), {
+                    "output": {"title": str(info.get("check_title") or "Proof-of-Change"), "summary": summary}},
+                    token, env=env)
+                info["check_done"] = True
+                p.write_text(json.dumps(info))
+            break
+        except PermissionError as e:  # not a demo repo: retrying cannot help
+            _log_error("PDF %s but the App comment/check run may not be edited: %s", state, type(e).__name__)
+            return False
+        except (GitHubAppError, OSError, ValueError) as e:
+            if not waits:
+                _log_error("PDF %s but the App comment/check run could not be edited after %d tries: %s; "
+                           "will retry on next resume", state, attempt, type(e).__name__)
+                return False
+            sleep(waits.pop(0))
+    info["done"] = state
+    p.write_text(json.dumps(info))
+    return True
+
+
+def posts_pending(report_dir: str | Path) -> bool:
+    """True while the App's saved comment/check run still waits for its PDF edit (done is null)."""
+    try:
+        info = json.loads((Path(report_dir) / COMMENT_FILE).read_text())
+    except (OSError, ValueError):
+        return False
+    return isinstance(info, dict) and not info.get("done") and bool(info.get("comment_id") or info.get("check_run_id"))
+
+
+# Background sweep: a long-running App retries pending edits (done is null) on a timer, so a comment
+# never waits for a restart after the short backoff above gave up. It gives up after a set limit.
+EDIT_SWEEP_INTERVAL_S = 300          # every 5 minutes
+EDIT_SWEEP_MAX_ATTEMPTS = 12         # about an hour of sweeps
+EDIT_SWEEP_MAX_AGE_S = 6 * 3600      # or 6 hours after the first sweep saw it pending
+GAVE_UP = "gave_up"
+
+
+def _sweep_roots(roots=None) -> list[Path]:
+    if roots is not None:
+        return [Path(r) for r in roots]
+    return [Path(os.environ.get("POC_REPORT_DIR") or (REPO_ROOT / "reports" / "daily"))]
+
+
+def sweep_pending_posts(roots=None, *, env: dict | None = None, now: float | None = None,
+                        update: Callable[..., bool] | None = None,
+                        max_attempts: int = EDIT_SWEEP_MAX_ATTEMPTS,
+                        max_age_s: float = EDIT_SWEEP_MAX_AGE_S) -> dict:
+    """One sweep: retry each pending edit once (no in-sweep waits); give up past the limit. Never raises."""
+    from reports import pdf_status
+    now = time.time() if now is None else now
+    update = update_posts_for_pdf if update is None else update
+    out = {"done": [], "retrying": [], "gave_up": []}
+    try:
+        for root in _sweep_roots(roots):
+            if not root.is_dir():
+                continue
+            for cp in root.rglob(COMMENT_FILE):
+                d = cp.parent
+                try:
+                    if not posts_pending(d):
+                        continue
+                    state = pdf_status.read_state(d)
+                    if state not in (pdf_status.READY, pdf_status.ERROR):
+                        continue  # PDF still preparing: its own retry will edit
+                    info = json.loads(cp.read_text())
+                    first = info.get("sweep_first_at")
+                    first = float(now if first is None else first)
+                    attempts = int(info.get("sweep_attempts") or 0)
+                    if attempts >= max_attempts or now - first > max_age_s:
+                        # One last edit that swaps "PDF preparing…" for the plain failure text, so the
+                        # PR comment and check run don't stay on "preparing". Never raises.
+                        try:
+                            final_ok = bool(update(d, pdf_status.ERROR, env=env, delays=()))
+                        except Exception as e:  # noqa: BLE001
+                            _log_error("Final PDF edit failed for %s: %s", d.name, type(e).__name__)
+                            final_ok = False
+                        try:
+                            info = json.loads(cp.read_text())  # keep progress the final edit saved
+                        except (OSError, ValueError):
+                            pass
+                        info.update(done=GAVE_UP, final_edit_ok=final_ok, final_error=(
+                            f"comment/check-run edit gave up after {attempts} sweep attempts"
+                            f" over {int(now - first)}s"))
+                        cp.write_text(json.dumps(info))
+                        _log_error("Gave up editing the App comment/check run for report %s after %d sweep "
+                                   "attempts; final failure-text edit %s", d.name, attempts,
+                                   "succeeded" if final_ok else f"failed, it still says '{PREPARING_TEXT}'")
+                        out["gave_up"].append(d.name)
+                        continue
+                    info.update(sweep_first_at=first, sweep_attempts=attempts + 1)
+                    cp.write_text(json.dumps(info))
+                    if update(d, state, env=env, delays=()):
+                        out["done"].append(d.name)
+                    else:
+                        out["retrying"].append(d.name)
+                except Exception as e:  # noqa: BLE001 - a sweep must never raise
+                    _log_error("PDF edit sweep failed for %s: %s", d.name, type(e).__name__)
+    except Exception as e:  # noqa: BLE001
+        _log_error("PDF edit sweep failed: %s", type(e).__name__)
+    return out
+
+
+class PendingEditSweeper:
+    """Daemon thread running sweep_pending_posts every interval; stop() ends it cleanly."""
+
+    def __init__(self, interval_s: float = EDIT_SWEEP_INTERVAL_S, sweep: Callable[[], Any] | None = None,
+                 stop_event=None):
+        import threading
+        self.interval_s = interval_s
+        self.sweep = sweep or sweep_pending_posts
+        self.stop_event = stop_event or threading.Event()
+        self.thread = threading.Thread(target=self.run, name="poc-pdf-edit-sweep", daemon=True)
+
+    def run(self) -> None:
+        while not self.stop_event.wait(self.interval_s):
+            try:
+                self.sweep()
+            except Exception as e:  # noqa: BLE001
+                _log_error("PDF edit sweep failed: %s", type(e).__name__)
+
+    def start(self) -> "PendingEditSweeper":
+        self.thread.start()
+        return self
+
+    def stop(self, timeout: float = 5) -> None:
+        self.stop_event.set()
+        if self.thread.is_alive():
+            self.thread.join(timeout)
+
+
+PDF_PREPARING_MARK = "<!--pdf-preparing:{name}-->"
+
+
+def reviewer_report_dir(rec: dict) -> Path | None:
+    """Folder holding this record's REPORT.html / REPORT.pdf / pdf_status.json, if one was written."""
+    try:
+        from poc import console_api
+        html = console_api.find_reviewer_report_file(str(rec.get("id") or ""), "html", rec=rec)
+    except Exception:  # noqa: BLE001 - a missing report folder only means no PDF line
+        return None
+    return html.parent if html else None
+
+
+def _pdf_block(rid: str, report_dir: Path | None, out_dir: Path) -> tuple[str, str | None]:
+    """(HTML snippet, PDF state). Copies a ready PDF next to the hosted page; else shows 'PDF preparing…'."""
+    if report_dir is None:
+        return "", None
+    from reports import pdf_status
+    state = pdf_status.read_state(report_dir)
+    if state == pdf_status.READY:
+        import shutil
+        shutil.copyfile(report_dir / pdf_status.PDF_FILE, out_dir / f"{rid}.pdf")
+        return f'<p><a href="{_esc(rid)}.pdf">PDF report</a></p>', state
+    if state == pdf_status.ERROR:
+        return f'<p class="pdf-failed">{FAILED_TEXT}</p>', state
+    if state == pdf_status.PREPARING:
+        mark = PDF_PREPARING_MARK.format(name=_esc(report_dir.name))
+        return f'<p class="pdf-preparing">PDF preparing…</p>{mark}', pdf_status.PREPARING
+    return "", None
+
+
+def publish_failed_pdf(report_dir: str | Path, hosted_dir: str | Path | None = None) -> int:
+    """All retries failed: swap 'PDF preparing…' for a clear failure line on hosted pages."""
+    report_dir = Path(report_dir)
+    hosted_dir = Path(hosted_dir) if hosted_dir is not None else DEFAULT_HOSTED
+    if not hosted_dir.is_dir():
+        return 0
+    mark = PDF_PREPARING_MARK.format(name=_esc(report_dir.name))
+    n = 0
+    for page in hosted_dir.glob("*.html"):
+        text = page.read_text(encoding="utf-8", errors="replace")
+        if mark not in text:
+            continue
+        page.write_text(text.replace(f'<p class="pdf-preparing">PDF preparing…</p>{mark}',
+                                     f'<p class="pdf-failed">{FAILED_TEXT}</p>'))
+        n += 1
+    return n
+
+
+def publish_pdf_outcome(report_dir: str | Path, state: str, hosted_dir: str | Path | None = None,
+                        env: dict | None = None) -> None:
+    """Background retry finished: update hosted pages, then the App's own comment and check run."""
+    from reports import pdf_status
+    if state == pdf_status.READY:
+        publish_ready_pdf(report_dir, hosted_dir)
+    elif state == pdf_status.ERROR:
+        publish_failed_pdf(report_dir, hosted_dir)
+    update_posts_for_pdf(report_dir, state, env)
+
+
+def publish_ready_pdf(report_dir: str | Path, hosted_dir: str | Path | None = None) -> int:
+    """Called when a background retry finishes: swap 'PDF preparing…' for the real link on hosted pages."""
+    from reports import pdf_status
+    report_dir = Path(report_dir)
+    hosted_dir = Path(hosted_dir) if hosted_dir is not None else DEFAULT_HOSTED
+    pdf = report_dir / pdf_status.PDF_FILE
+    if not hosted_dir.is_dir() or not (pdf.is_file() and pdf.stat().st_size > 0):
+        return 0
+    mark = PDF_PREPARING_MARK.format(name=_esc(report_dir.name))
+    n = 0
+    for page in hosted_dir.glob("*.html"):
+        text = page.read_text(encoding="utf-8", errors="replace")
+        if mark not in text:
+            continue
+        import shutil
+        shutil.copyfile(pdf, hosted_dir / f"{page.stem}.pdf")
+        page.write_text(text.replace(f'<p class="pdf-preparing">PDF preparing…</p>{mark}',
+                                     f'<p><a href="{_esc(page.stem)}.pdf">PDF report</a></p>'))
+        n += 1
+    return n
+
+
+def write_hosted_report(rec: dict, out_dir: Path | None = None, report_dir: Path | None = None) -> Path:
     """Static behavior-map HTML for one PR record (hosted or opened locally)."""
     out_dir = Path(out_dir) if out_dir is not None else DEFAULT_HOSTED
     out_dir.mkdir(parents=True, exist_ok=True)
     rid = rec.get("id") or "run"
     path = out_dir / f"{rid}.html"
+    pdf_html, _ = _pdf_block(str(rid), report_dir, out_dir)
     claims = rec.get("behaviour_claims") or []
     probes = ((rec.get("probes") or {}).get("items") or [])
     agents = rec.get("agents") or {}
@@ -253,6 +557,7 @@ table{{border-collapse:collapse;width:100%}} th,td{{border:1px solid #ccc;paddin
 </style></head><body>
 <h1>Proof-of-Change</h1>
 <div class="banner"><strong>{_esc(rec.get('verdict'))}</strong> — {_esc(rec.get('reason'))}</div>
+{pdf_html}
 <p class="meta">Repo {_esc(rec.get('repo'))} · machine {_esc(rec.get('machine') or 'local')} ·
 sandbox {_esc(rec.get('sandbox_backend') or 'local')}</p>
 <h2>Behavior map</h2>
@@ -362,12 +667,22 @@ def apply(plan: dict, *, dry_run: bool | None = None, env: dict | None = None,
                "note": note or "no record.json found after run"}
         return out
 
-    report_path = write_hosted_report(rec, hosted_dir or DEFAULT_HOSTED)
+    rdir = reviewer_report_dir(rec)
+    report_path = write_hosted_report(rec, hosted_dir or DEFAULT_HOSTED, report_dir=rdir)
     url = report_url_for(report_path, env)
+    hosted_pdf = report_path.with_suffix(".pdf")
+    pdf_url = report_url_for(hosted_pdf, env) if hosted_pdf.is_file() else None
+    from reports import pdf_status
+    pdf_preparing = rdir is not None and not hosted_pdf.is_file() and pdf_status.read_state(rdir) in (
+        pdf_status.PREPARING, pdf_status.ERROR)
+    pdf_failed = rdir is not None and not hosted_pdf.is_file() and pdf_status.read_state(rdir) == pdf_status.ERROR
+    pdf_preparing = pdf_preparing and not pdf_failed
+    later_pdf_url = report_url_for(hosted_pdf, env) if pdf_preparing else None
     verdict = str(rec.get("verdict") or "could_not_verify")
     reason = str(rec.get("reason") or "")
     head = plan.get("head_sha") or (rec.get("pr") or {}).get("head_sha") or ""
-    gh_meta: dict[str, Any] = {"report_path": str(report_path), "report_url": url, "dry_run": force_dry}
+    gh_meta: dict[str, Any] = {"report_path": str(report_path), "report_url": url, "dry_run": force_dry,
+                               "pdf_url": pdf_url, "pdf_preparing": pdf_preparing}
 
     if force_dry or not token:
         gh_meta["note"] = note or "dry_run: check run and comment not posted"
@@ -379,7 +694,9 @@ def apply(plan: dict, *, dry_run: bool | None = None, env: dict | None = None,
     try:
         payload = check_run_payload(str(repo), str(head), verdict, reason, url, env=env)
         check = post_check_run(str(repo), payload, token, env=env)
-        comment = post_pr_comment(str(repo), int(pr), summary_comment(verdict, reason, url), token, env=env)
+        comment_body = summary_comment(verdict, reason, url, pdf_url=pdf_url, pdf_preparing=pdf_preparing,
+                                       pdf_failed=pdf_failed)
+        comment = post_pr_comment(str(repo), int(pr), comment_body, token, env=env)
     except (GitHubAppError, PermissionError) as e:
         gh_meta["error"] = str(e)
         return {"ok": False, "action": action, "repo": repo, "pr": pr, "github_app": gh_meta,
@@ -389,6 +706,14 @@ def apply(plan: dict, *, dry_run: bool | None = None, env: dict | None = None,
     gh_meta["check_run_url"] = check.get("html_url")
     gh_meta["comment_id"] = comment.get("id")
     gh_meta["comment_url"] = comment.get("html_url")
+    if pdf_preparing and rdir is not None:
+        out = payload.get("output") or {}
+        remember_posts(rdir, repo=str(repo), pr=int(pr), comment_id=comment.get("id"), comment_body=comment_body,
+                       check_run_id=check.get("id"), check_title=str(out.get("title") or ""),
+                       check_summary=str(out.get("summary") or ""), pdf_url=later_pdf_url)
+        late = pdf_status.read_state(rdir)
+        if late in (pdf_status.READY, pdf_status.ERROR):  # the retry finished while we were posting
+            publish_pdf_outcome(rdir, late, hosted_dir or DEFAULT_HOSTED, env)
     rec["github_app"] = gh_meta
     rec["posted_upstream"] = True
     return {"ok": True, "action": action, "repo": repo, "pr": pr, "dry_run": False,
@@ -448,8 +773,20 @@ class _WebhookHandler(BaseHTTPRequestHandler):
         self.wfile.write(body)
 
 
+def require_report_base(env: dict | None = None) -> str:
+    """Hosted App mode needs a public report address, or PR comments would carry no working links."""
+    env = os.environ if env is None else env
+    base = (env.get(REPORT_BASE_ENV) or "").strip()
+    if not base:
+        raise SystemExit(f"refusing to start: {REPORT_BASE_ENV} is not set (public address of the hosted reports)")
+    return base
+
+
 def serve(host: str = "0.0.0.0", port: int = 8080, env: dict | None = None) -> None:
     env = os.environ if env is None else env
+    require_report_base(env)
+    from reports import pdf_status
+    pdf_status.resume_pending()  # folders still 'preparing' from before a restart
 
     class H(_WebhookHandler):
         pass
@@ -457,8 +794,13 @@ def serve(host: str = "0.0.0.0", port: int = 8080, env: dict | None = None) -> N
     H.env = env
     H.apply_fn = apply
     httpd = HTTPServer((host, port), H)
+    sweeper = PendingEditSweeper().start()
     print(f"proof-of-change github app listening on http://{host}:{port}  POST /webhook  GET /health", flush=True)
-    httpd.serve_forever()
+    try:
+        httpd.serve_forever()
+    finally:
+        sweeper.stop()
+        httpd.server_close()
 
 
 def main(argv: list[str] | None = None) -> int:

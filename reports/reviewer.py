@@ -1155,6 +1155,28 @@ def find_chrome() -> str | None:
 
 
 def to_pdf(html_path: str, pdf_path: str) -> str | None:
+    """Write the PDF to <pdf>.tmp, check it starts with %PDF, then rename it into place atomically.
+
+    Readers never see a half-written REPORT.pdf. Returns None on success, else an error string."""
+    tmp = pdf_path + ".tmp"
+    if os.path.exists(tmp):
+        os.remove(tmp)
+    err = _to_pdf_direct(html_path, tmp)
+    try:
+        if err is None:
+            with open(tmp, "rb") as fh:
+                if fh.read(4) != b"%PDF":
+                    err = "ERROR: PDF not generated: output is not a PDF file"
+                    print(err, file=sys.stderr, flush=True)
+        if err is None:
+            os.replace(tmp, pdf_path)
+    finally:
+        if os.path.exists(tmp):
+            os.remove(tmp)
+    return err
+
+
+def _to_pdf_direct(html_path: str, pdf_path: str) -> str | None:
     """Print HTML to an A4 PDF. Returns None when a non-empty PDF exists, else an error string.
 
     First a fresh headless Chrome/Chromium (own temp profile, own process group, hard time limit, whole group

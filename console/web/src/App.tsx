@@ -10,10 +10,14 @@ import {
 } from './api'
 import { ProcessDag } from './dag'
 import {
+  PDF_FAILED_LABEL,
+  PDF_PREPARING_LABEL,
   TIMELINE_SPEC,
   costTime,
   filterRuns,
   illustrativeStates,
+  pdfFailed,
+  pdfPreparing,
   prNumber,
   timelineStates,
   verdictPlain,
@@ -132,6 +136,7 @@ export default function App() {
     hosted_report: string | null
     report_pdf?: string | null
     report_html?: string | null
+    report_pdf_status?: string | null
   } | null>(null)
   const [job, setJob] = useState<Job | null>(null)
   const [refreshing, setRefreshing] = useState(false)
@@ -219,6 +224,7 @@ export default function App() {
           hosted_report: payload.hosted_report,
           report_pdf: payload.report_pdf,
           report_html: payload.report_html,
+          report_pdf_status: payload.report_pdf_status,
         })
         if (payload.record && payload.record.id) {
           const pr = payload.record.pr as { number?: number; url?: string; title?: string } | undefined
@@ -261,6 +267,25 @@ export default function App() {
       })
   }, [view, account?.id])
 
+  // While a PDF is being regenerated in the background, re-check every 20 s and swap in the real link.
+  const pdfWaiting = view.name === 'run' && !!detail && pdfPreparing(detail.report_pdf, detail.report_pdf_status)
+  useEffect(() => {
+    if (!pdfWaiting || view.name !== 'run') return
+    const id = window.setInterval(() => {
+      void api
+        .run(view.id)
+        .then((payload) =>
+          setDetail((current) =>
+            current
+              ? { ...current, report_pdf: payload.report_pdf, report_pdf_status: payload.report_pdf_status }
+              : current,
+          ),
+        )
+        .catch(() => undefined)
+    }, 20000)
+    return () => window.clearInterval(id)
+  }, [pdfWaiting, view])
+
   useEffect(() => {
     if (view.name !== 'job') return
     setJob(null)
@@ -291,6 +316,7 @@ export default function App() {
                 folder: next.folder || '',
                 report_pdf: next.report_pdf,
                 report_html: next.report_html,
+                report_pdf_status: next.report_pdf_status,
               },
               record: next.record,
               folder: next.folder || '',
@@ -307,6 +333,7 @@ export default function App() {
                 hosted_report: null,
                 report_pdf: next.report_pdf,
                 report_html: next.report_html,
+                report_pdf_status: next.report_pdf_status,
               })
             }
           }
@@ -512,6 +539,10 @@ export default function App() {
                           <a className="pdf-link" href={run.report_pdf} download>
                             Download PDF
                           </a>
+                        ) : pdfPreparing(run.report_pdf, run.report_pdf_status) ? (
+                          <span className="pdf-link pdf-preparing">{PDF_PREPARING_LABEL}</span>
+                        ) : pdfFailed(run.report_pdf, run.report_pdf_status) ? (
+                          <span className="pdf-link pdf-failed">{PDF_FAILED_LABEL}</span>
                         ) : null}
                       </article>
                     </li>
@@ -571,6 +602,8 @@ export default function App() {
                   <a className="btn-report" href={job.report_pdf}>
                     Download PDF
                   </a>
+                ) : pdfPreparing(job.report_pdf, job.report_pdf_status) ? (
+                  <span className="btn-report ghost pdf-preparing">{PDF_PREPARING_LABEL}</span>
                 ) : null}
                 {job.report_html ? (
                   <a className="btn-report ghost" href={job.report_html} target="_blank" rel="noreferrer">
@@ -621,7 +654,12 @@ export default function App() {
             <h2>Cost and time</h2>
             <CostTimePanel cost={costTime(detail.record)} />
             <h2>Evidence</h2>
-            <EvidenceLinks record={detail.record} pdf={detail.report_pdf} html={detail.report_html} />
+            <EvidenceLinks
+              record={detail.record}
+              pdf={detail.report_pdf}
+              html={detail.report_html}
+              pdfStatus={detail.report_pdf_status}
+            />
             <RunAnalysis record={detail.record} />
             {detail.hosted_report ? (
               <p className="meta-line">
