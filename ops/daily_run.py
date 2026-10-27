@@ -4530,6 +4530,7 @@ def _contree_only_pair_parallel(a, rec: dict, repo: str, cfg: dict, item: dict, 
     timed runs starts main and PR together. Probes are still frozen before any pull-request code runs: the PR
     checkpoint install runs only the project's install, never a probe, and pr_side_started_at is set after both."""
     from concurrent.futures import ThreadPoolExecutor
+
     from poc import demo_helper, run_progress
     vm, vp = work / "venv-main", work / "venv-pr"
     cm, cp = work / "side-main", work / "side-pr"
