@@ -75,6 +75,8 @@ def _post(api: str, body: dict, env: dict, timeout: float) -> dict:
     if not isinstance(data, dict):
         return {"ok": False, "error": "the response was not valid", "results": []}
     data["ok"] = True
+    from poc import tavily_budget
+    tavily_budget.record("crawl" if api == CRAWL_API else "extract", payload=data)
     return data
 
 
@@ -411,7 +413,7 @@ def _cache_read(path: Path, now: float, ttl: float):
 def _cache_write(path: Path, data: dict) -> bool:
     try:
         path.parent.mkdir(parents=True, exist_ok=True)
-        tmp = path.with_suffix(".tmp")
+        tmp = path.with_suffix(f".{os.getpid()}.tmp")   # unique per process, so parallel runs never clash
         tmp.write_text(json.dumps(data))
         tmp.replace(path)
         return True
