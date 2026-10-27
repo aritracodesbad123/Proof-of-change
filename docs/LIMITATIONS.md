@@ -83,8 +83,10 @@ jsonschema, rich, prettytable) and 8 could not be verified (requests, attrs, cli
 sqlparse, toolz, markupsafe, boltons). In every record, main differed from the pull request.
 
 The missing probe measurement in a Contree-only run, described above, alone keeps any of these
-from verified. The probes crashed on main for requests, sqlparse and toolz. markupsafe had a setup
-failure. click, urllib3 and boltons had no probe that ran a changed line.
+from verified. The probes crashed on main for requests, sqlparse, toolz and attrs. For attrs, the
+new tests passed, but the check written for the pull request's claim crashed on main, so the claim
+itself was never tested. markupsafe had a setup failure. click, urllib3 and boltons had no probe
+that ran a changed line.
 
 ## Current limitations
 

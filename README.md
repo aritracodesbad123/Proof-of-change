@@ -40,7 +40,7 @@ Not built: the same-commit guard on a study run. A product check stops when main
 
 Built, and not confirmed on the live Contree service: measuring test coverage inside Contree, which shell runs setup, hiding of failure text, and running with a person's own Nebius account.
 
-Of 12 pull requests from the tested libraries, 0 were verified, 4 need attention (isort, jsonschema, rich, prettytable) and 8 could not be verified (requests, attrs, click, urllib3, sqlparse, toolz, markupsafe, boltons). In every record, main differed from the pull request. The missing probe measurement above is what keeps any of them from verified. The probes crashed on main for requests, sqlparse and toolz. markupsafe had a setup failure. click, urllib3 and boltons had no probe that ran a changed line.
+Of 12 pull requests from the tested libraries, 0 were verified, 4 need attention (isort, jsonschema, rich, prettytable) and 8 could not be verified (requests, attrs, click, urllib3, sqlparse, toolz, markupsafe, boltons). In every record, main differed from the pull request. The missing probe measurement above is what keeps any of them from verified. The probes crashed on main for requests, sqlparse, toolz and attrs. For attrs, the new tests passed, but the check written for the pull request's claim crashed on main, so the claim itself was never tested. markupsafe had a setup failure. click, urllib3 and boltons had no probe that ran a changed line.
 
 ## For hackathon judges (quick answers)
 
