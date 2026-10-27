@@ -112,7 +112,7 @@ def test_37_claimless_model_probe_does_not_flag_requests_7520():
     assert after["claim_hygiene"]["advisory_probes"] == ["model-probe1"]
     v, reason, fl = _verdict(after)
     assert v == "could_not_verify"            # an unclaimed difference is never verified
-    assert "no claims attached" in reason and "advisory_unclaimed_difference" in fl
+    assert "no linked claims" in reason and "advisory_unclaimed_difference" in fl
     obs = [o for it in after["items"] for o in it["observations"] if o.get("advisory")]
     assert len(obs) == 3 and all(o["label"] == "unmentioned" for o in obs)   # still shown, still labelled
 

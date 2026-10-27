@@ -3589,7 +3589,7 @@ def verdict_for(cmp: dict | None, cnv_reason: str | None, exits: dict | None = N
         # A claim-less probe saw a difference nobody claimed. It does not raise needs attention, but it is
         # unexplained, so the PR cannot be verified either.
         return (Verdict.COULD_NOT_VERIFY.value,
-                f"could not verify: probe(s) {', '.join(advisory)} have no claims attached and saw a difference no "
+                f"could not verify: probe(s) {', '.join(advisory)} have no linked claims and saw a difference no "
                 f"claim covers, so the change is not confirmed ({reason})", fl + ["advisory_unclaimed_difference"])
     if hygiene and hygiene.get("held_back") and v == Verdict.VERIFIED.value:
         return (Verdict.COULD_NOT_VERIFY.value,
@@ -3825,6 +3825,8 @@ def plan_probes(repo: str, item: dict, rec: dict, base_root: Path, pr_roots: lis
             note["model_claims"] = res.get("claims", [])
             note["model_rejected_claims"] = res.get("rejected_claims", [])
             note["errors"] += res.get("errors", [])
+            if res.get("loose_quote_matches"):   # product checks: quotes matched after removing Markdown marks
+                note["model_loose_quote_matches"] = res["loose_quote_matches"]
             if res.get("rewritten_imports"):   # product checks: src/ layout imports rewritten to the installed name
                 note["rewritten_imports"] = res["rewritten_imports"]
             plan += [{"path": x["path"], "source": "model", "freeze": x["freeze"],
