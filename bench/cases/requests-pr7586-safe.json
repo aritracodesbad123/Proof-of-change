@@ -1,0 +1,23 @@
+{
+  "schema": "poc-bench-case/1",
+  "id": "requests-pr7586-safe",
+  "repo": "psf/requests",
+  "pr_url": "https://github.com/psf/requests/pull/7586",
+  "base_sha": "f361ead047be5cb873174218582f7d8b9fcd9f49",
+  "head_sha": "9820a0c297d4c3e3f7359b617b5082f24c63c79e",
+  "category": "known_safe",
+  "expected_verdict": "verified",
+  "rationale": "Upstream open PR; no known regression; head suite result (Python 3.14.7, wheels only, no outside network): 4 failed, 617 passed, 15 skipped, 1 xpassed, 18 warnings in 77.43s (0:01:17). Failures that look environmental (not confirmed on the base commit): 4 (see notes).",
+  "source": "upstream PR psf/requests#7586, SHAs from GitHub API 2026-10-22 ~22:40 IST",
+  "notes": {
+    "base_ref": "main",
+    "base_is_merge_base_as_of_2026-10-22_22:40_IST": true,
+    "refresh_before_run": "base_sha was the base-branch tip and the merge base as of 2026-10-22 22:40 IST. It is refreshed, and the head checked again, right before the pilot; if it has moved the runner reports not run.",
+    "clean_head_preexisting_failures": [
+      "tests/test_requests.py::TestTimeout::test_connect_timeout[timeout0]",
+      "tests/test_requests.py::TestTimeout::test_connect_timeout[timeout1]",
+      "tests/test_requests.py::TestTimeout::test_total_timeout_connect[timeout0]",
+      "tests/test_requests.py::TestTimeout::test_total_timeout_connect[timeout1]"
+    ]
+  }
+}

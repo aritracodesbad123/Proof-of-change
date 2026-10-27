@@ -1,0 +1,18 @@
+{
+  "schema": "poc-bench-case/1",
+  "id": "prettytable-pr524-safe",
+  "repo": "prettytable/prettytable",
+  "pr_url": "https://github.com/prettytable/prettytable/pull/524",
+  "base_sha": "5fec60c0fd85530e5299d8c6e39dc030bfd7ce9f",
+  "head_sha": "812094ef1dae28c9ed74ea1a5b192c0e62c35906",
+  "category": "known_safe",
+  "expected_verdict": "verified",
+  "rationale": "Upstream open PR; no known regression; head suite result (Python 3.14.7, wheels only, no outside network): 343 passed in 0.78s. No failures.",
+  "source": "upstream PR prettytable/prettytable#524, SHAs from GitHub API 2026-10-22 ~22:40 IST",
+  "notes": {
+    "base_ref": "main",
+    "base_is_merge_base_as_of_2026-10-22_22:40_IST": true,
+    "refresh_before_run": "base_sha was the base-branch tip and the merge base as of 2026-10-22 22:40 IST. It is refreshed, and the head checked again, right before the pilot; if it has moved the runner reports not run.",
+    "clean_head_preexisting_failures": []
+  }
+}

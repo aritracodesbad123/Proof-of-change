@@ -1,0 +1,18 @@
+{
+  "schema": "poc-bench-case/1",
+  "id": "sqlparse-pr928-safe",
+  "repo": "andialbrecht/sqlparse",
+  "pr_url": "https://github.com/andialbrecht/sqlparse/pull/928",
+  "base_sha": "60cdc649726bf1bc4f1b336050560b336da715ec",
+  "head_sha": "21c3f014ccce592ccdbca5cd3a1932cea06b40ef",
+  "category": "known_safe",
+  "expected_verdict": "verified",
+  "rationale": "Upstream open PR; no known regression; head suite result (Python 3.14.7, wheels only, no outside network): 547 passed, 2 xfailed, 1 xpassed in 2.30s. No failures.",
+  "source": "upstream PR andialbrecht/sqlparse#928, SHAs from GitHub API 2026-10-22 ~22:40 IST",
+  "notes": {
+    "base_ref": "master",
+    "base_is_merge_base_as_of_2026-10-22_22:40_IST": true,
+    "refresh_before_run": "base_sha was the base-branch tip and the merge base as of 2026-10-22 22:40 IST. It is refreshed, and the head checked again, right before the pilot; if it has moved the runner reports not run.",
+    "clean_head_preexisting_failures": []
+  }
+}
