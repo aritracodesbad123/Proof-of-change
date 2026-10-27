@@ -4029,6 +4029,11 @@ def contree_probe_coverage(item: dict, probe_results: dict | None, main_root: Pa
             timeout = int(probes.read_spec(path).get("timeout_s", 120))
         except probes.ProbeError:
             timeout = 120
+        except Exception as e:  # noqa: BLE001 - keep the cap instead of crashing the check
+            log_parts.append(f"$ contree probe coverage (main) {it.get('id')}\nreading the probe spec failed: "
+                             f"{type(e).__name__}: {e}")
+            unmeasured(it, f"reading the probe spec failed ({type(e).__name__}); see probe-coverage.log")
+            continue
         remote = f"/work/probes/{path.name}"
         shell = (
             "set +e\ncd /work/src 2>/dev/null || cd /work\n" + exports +
@@ -4065,12 +4070,22 @@ def contree_probe_coverage(item: dict, probe_results: dict | None, main_root: Pa
             unmeasured(it, f"{why}; see probe-coverage.log")
             continue
         dest = prdir / f"probe-cov-{it['id']}.json"
-        dest.write_text(blob.strip() + "\n")
+        try:
+            dest.write_text(blob.strip() + "\n")
+        except Exception as e:  # noqa: BLE001 - keep the cap instead of crashing the check
+            log_parts.append(f"saving the coverage report for {it.get('id')} failed: {type(e).__name__}: {e}")
+            unmeasured(it, f"saving the coverage report failed ({type(e).__name__}); see probe-coverage.log")
+            continue
         exit_m = re.search(r"___POC_EXIT___(\S+)", out)
         rc = int(exit_m.group(1)) if exit_m and exit_m.group(1).isdigit() else raw.get("exit_code")
         it["probe_changed_line_coverage"] = probe_adequacy.measure(changed, cov_files) | {
             "exit": rc, "data": dest.name, "where": "contree"}
-    (prdir / "probe-coverage.log").write_text(contree_sandboxes.redact("\n".join(log_parts)))
+    try:
+        (prdir / "probe-coverage.log").write_text(contree_sandboxes.redact("\n".join(log_parts)))
+    except Exception as e:  # noqa: BLE001 - fail closed: without the log, no probe's coverage is trusted
+        why = contree_sandboxes.redact(f"writing probe-coverage.log failed ({type(e).__name__}: {e})")
+        print(f"  {why}", flush=True)
+        return all_unmeasured(why)
     return probe_adequacy.summary(items)
 
 

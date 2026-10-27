@@ -41,8 +41,11 @@ class Sess:
         return {"exit_code": 0, "stdout": (piece[:-1] if self.short else piece) + "\n", "stderr": ""}
 
 
-def _run(tmp_path, monkeypatch, sess):
+def _run(tmp_path, monkeypatch, sess, texts=None):
     main_root, pr_root, item, a = _sides(tmp_path)
+    if texts:
+        (main_root / "widget" / "core.py").write_text(texts[0])
+        (pr_root / "widget" / "core.py").write_text(texts[1])
     probe = tmp_path / "p1.py"
     probe.write_text("print('x')\n")
     items = [{"id": "p1", "path": str(probe), "observations": []}]
@@ -112,3 +115,69 @@ def test_study_route_does_not_call_probe_coverage():
     src = open(daily_run.__file__).read()
     block = src.split("if measure_coverage:  # product route: each probe runs", 1)[1].split("settle_probes(rec)", 1)[0]
     assert "Contree-only check: probe coverage needs a local side" in block  # non-product branch unchanged
+
+
+SECRET = "ghp_" + "A" * 36
+
+
+def test_read_spec_any_error_keeps_cap_and_logs_redacted(tmp_path, monkeypatch):
+    main_root, pr_root, item, a = _sides(tmp_path)
+    probe = tmp_path / "p1.py"
+    probe.write_text("print('x')\n")
+    items = [{"id": "p1", "path": str(probe), "observations": []}]
+    sess = Sess(_pack(REPORT))
+    monkeypatch.setattr("poc.contree_sandboxes.session", lambda: sess)
+
+    def boom(p):
+        raise ValueError(f"bad spec token={SECRET}")
+    monkeypatch.setattr(daily_run.probes, "read_spec", boom)
+    daily_run.contree_probe_coverage(item, {"items": items}, main_root, pr_root, tmp_path, a)
+    _assert_capped(items[0]["probe_changed_line_coverage"])
+    assert sess.ops == []                                   # nothing ran for that probe
+    log = (tmp_path / "probe-coverage.log").read_text()
+    assert "ValueError" in log and SECRET not in log
+
+
+def test_report_write_error_keeps_cap_and_logs_redacted(tmp_path, monkeypatch):
+    real = daily_run.Path.write_text
+
+    def flaky(self, data, *k, **kw):
+        if self.name == "probe-cov-p1.json":
+            raise OSError(f"disk full token={SECRET}")
+        return real(self, data, *k, **kw)
+    monkeypatch.setattr(daily_run.Path, "write_text", flaky)
+    cov, _ = _run(tmp_path, monkeypatch, Sess(_pack(REPORT)))
+    _assert_capped(cov)
+    log = (tmp_path / "probe-coverage.log").read_text()
+    assert "OSError" in log and SECRET not in log
+
+
+def test_log_write_error_keeps_cap_and_does_not_crash(tmp_path, monkeypatch, capsys):
+    real = daily_run.Path.write_text
+
+    def flaky(self, data, *k, **kw):
+        if self.name == "probe-coverage.log":
+            raise OSError(f"read-only token={SECRET}")
+        return real(self, data, *k, **kw)
+    monkeypatch.setattr(daily_run.Path, "write_text", flaky)
+    cov, summary = _run(tmp_path, monkeypatch, Sess(_pack(REPORT)))
+    _assert_capped(cov)
+    assert SECRET not in capsys.readouterr().out and SECRET not in json.dumps(cov)
+
+
+MAIN_SRC = "def f():\n    a = 1\n    return a\ndef g():\n    return 1\n"
+PR_SRC = "def f():\n    a = 1\n    b = 2\n    c = 3\n    return a\ndef g():\n    return 2\n"
+
+
+def test_changed_lines_use_main_side_numbering(tmp_path, monkeypatch):
+    # The PR inserts two lines in f() and replaces g()'s return, so that line is 5 on main but 7 on the PR.
+    assert probe_adequacy.main_side_lines(MAIN_SRC, PR_SRC) == {2, 3, 5}
+    f = "/work/src/widget/core.py"
+    (tmp_path / "a").mkdir(), (tmp_path / "b").mkdir()
+    main_hit = {"meta": {}, "files": {f: {"executed_lines": [4, 5], "missing_lines": [1, 2, 3]}}}
+    cov, _ = _run(tmp_path / "a", monkeypatch, Sess(_pack(main_hit)), (MAIN_SRC, PR_SRC))
+    assert cov["changed_lines_total"] == 3 and cov["changed_lines_covered"] == 1   # main line 5 counted
+    # a report that only has the PR-side number (7) for g()'s return must not count as covering the change
+    pr_numbered = {"meta": {}, "files": {f: {"executed_lines": [6, 7], "missing_lines": [1, 2, 3, 4, 5]}}}
+    cov, _ = _run(tmp_path / "b", monkeypatch, Sess(_pack(pr_numbered)), (MAIN_SRC, PR_SRC))
+    assert cov["changed_lines_covered"] == 0 and cov["adequacy"] == probe_adequacy.NOT_ADEQUATE
