@@ -28,6 +28,7 @@ CRAWL_LIMIT = 40
 EXTRACT_MAX = 12
 TIMEOUT = 150
 CACHE_ENV = "POC_TAVILY_CRAWL_CACHE"
+CRAWL_VERSION = "2"     # bump when crawl or step-parsing code changes, so old cached crawls are not reused
 CACHE_TTL = 7 * 24 * 3600   # seconds; the base commit pins the content, the TTL only bounds staleness of docs pages
 
 INSTRUCTIONS = (
@@ -157,10 +158,9 @@ def in_scope(url: str, repo: str, base_sha: str, docs: str = "") -> bool:
         prefix = f"/{owner}/{name}".lower()
         if not (path == prefix or path.startswith(prefix + "/")):
             return False
-        if "/tree/" in path or "/blob/" in path:
-            return bool(base_sha) and re.match(rf"{re.escape(prefix)}/(tree|blob)/{re.escape(base_sha.lower())}(/|$)",
-                                               path) is not None
-        return True
+        # Only code at the pinned base commit: issues, PRs, discussions, wikis are open to anyone's text.
+        return bool(base_sha) and re.match(rf"{re.escape(prefix)}/(tree|blob)/{re.escape(base_sha.lower())}(/|$)",
+                                           path) is not None
     return bool(docs) and host == docs
 
 
@@ -242,7 +242,7 @@ def _balanced(s: str) -> bool:
 
 def _checkout_facts(checkout) -> dict:
     root = Path(checkout) if checkout else None
-    facts = {"extras": set(), "groups": set(), "files": set(), "declared": set(), "self": ""}
+    facts = {"extras": set(), "groups": set(), "files": set(), "declared": set(), "pins": set(), "self": ""}
     if root is None or not root.is_dir():
         return facts
     py = root / "pyproject.toml"
@@ -258,11 +258,11 @@ def _checkout_facts(checkout) -> dict:
         groups = data.get("dependency-groups") if isinstance(data.get("dependency-groups"), dict) else {}
         facts["groups"].update(groups)
         for req in proj.get("dependencies") or []:
-            facts["declared"].add(_req_name(req))
+            _declare(facts, req)
         for reqs in (proj.get("optional-dependencies") or {}).values():
-            facts["declared"].update(_req_name(r) for r in reqs or [] if isinstance(r, str))
+            [_declare(facts, r) for r in reqs or [] if isinstance(r, str)]
         for reqs in groups.values():
-            facts["declared"].update(_req_name(r) for r in reqs or [] if isinstance(r, str))
+            [_declare(facts, r) for r in reqs or [] if isinstance(r, str)]
     cfg = root / "setup.cfg"
     if cfg.is_file():
         import configparser
@@ -272,8 +272,8 @@ def _checkout_facts(checkout) -> dict:
             if parser.has_section("options.extras_require"):
                 for key in parser.options("options.extras_require"):
                     facts["extras"].add(_norm(key))
-                    facts["declared"].update(_req_name(line) for line in
-                                             parser.get("options.extras_require", key).splitlines() if line.strip())
+                    [_declare(facts, line) for line in
+                                     parser.get("options.extras_require", key).splitlines() if line.strip()]
             if parser.has_option("metadata", "name"):
                 facts["self"] = facts["self"] or _norm(parser.get("metadata", "name"))
         except (configparser.Error, OSError):
@@ -286,11 +286,25 @@ def _checkout_facts(checkout) -> dict:
             for line in path.read_text(encoding="utf-8", errors="replace").splitlines():
                 line = line.split("#", 1)[0].strip()
                 if line and not line.startswith("-"):
-                    facts["declared"].add(_req_name(line))
+                    _declare(facts, line)
         except OSError:
             pass
     facts["declared"].discard("")
     return facts
+
+
+def _pin(req: str) -> str:
+    """``name<spec>`` with spaces, extras and markers removed; empty when the requirement has no version."""
+    body = re.sub(r"\[[^\]]*\]", "", (req or "").split(";", 1)[0]).replace(" ", "")
+    m = re.match(r"([A-Za-z0-9][A-Za-z0-9_.\-]*)(.+)?$", body)
+    return f"{_norm(m.group(1))}{m.group(2)}" if m and m.group(2) else ""
+
+
+def _declare(facts: dict, req: str) -> None:
+    facts["declared"].add(_req_name(req))
+    pin = _pin(req)
+    if pin:
+        facts["pins"].add(pin)
 
 
 def _norm(name: str) -> str:
@@ -330,6 +344,11 @@ def merge_steps(steps: list[dict], checkout) -> list[dict]:
                 ok = bool(name) and name in facts["declared"]
                 row["used"], row["why"] = ok, ("package the project itself declares" if ok
                                               else "not declared in the project's own files, so not installed")
+                pin = _pin(value)
+                if ok and pin and pin not in facts["pins"]:
+                    # A version taken from a web page is not trusted; only the project's own exact pin is kept.
+                    row["value"] = re.sub(r"[<>=!~].*$", "", value).strip()
+                    row["why"] = "package the project declares; crawled version pin dropped (not in the project's files)"
         else:
             row["used"], row["why"] = False, "recorded for the setup plan; not an install step"
         out.append(row)
@@ -375,7 +394,7 @@ def cache_dir(env: dict | None = None) -> Path:
 
 def _cache_path(root: Path, repo: str, base_sha: str, docs: str) -> Path:
     import hashlib
-    key = f"{repo.lower()}@{base_sha.lower()}|{docs}"
+    key = f"v{CRAWL_VERSION}|{repo.lower()}@{base_sha.lower()}|{docs}"
     return Path(root) / (hashlib.sha256(key.encode()).hexdigest()[:32] + ".json")
 
 
@@ -419,7 +438,7 @@ def crawl_repo(repo: str, base_sha: str, checkout, env: dict | None = None, craw
     docs = docs_host(checkout)
     root = cache_dir(env) if cache_root is None else Path(cache_root)
     cpath = _cache_path(root, repo, base_sha, docs)
-    block["cache"]["key"] = f"{repo}@{base_sha}"
+    block["cache"]["key"] = f"v{CRAWL_VERSION}|{repo}@{base_sha}"
     hit = _cache_read(cpath, now, ttl)
     if hit is not None:
         # Same project version: the same pages give the same steps, with no Tavily call and no credits.

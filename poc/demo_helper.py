@@ -3004,7 +3004,7 @@ def retry_unverified(rec: dict, rerun, install_one, declared, tavily_text: str, 
             err = real_error_line(text) or name
             angle = ("install" if attempt == 1 else "development setup test dependencies" if attempt == 2
                      else "contributing guide run tests")
-            query = f"{repo} {err} {angle}"[:380]
+            query = redact(f"{repo} {err} {angle}")[:380]  # no secrets in the web search
         else:
             query = f"{repo} {name} install {failure_line(text)}"[:380]
         looked = False

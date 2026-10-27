@@ -50,3 +50,13 @@ what gets tested.
 
 A crawled step is only as good as the project's own pages. A step the project's files do not back is recorded
 and not used. Setup will not always succeed. When it fails after three repair tries, the result says so.
+
+## Review fixes
+
+- A Tavily stop on the product route ends the check through the normal exit (`gate()`, then the caller's `finish()`), so record.json, the PDF and cleanup still happen. The record says could not verify with the "Tavily unavailable" reason.
+- On GitHub only `/<owner>/<repo>/(tree|blob)/<base commit>/…` is in scope. Issues, pull requests, discussions, wikis and other branches are out, since anyone can write text there.
+- The repair search is redacted before it is sent to Tavily.
+- The import-origin check resolves the checkout path inside the sandbox (realpath), so a symlinked checkout still matches. A namespace package (no `__file__`) is reported as its own status and counts as in the checkout only when one of its paths is.
+- The crawl cache key carries `CRAWL_VERSION`, so a code change does not reuse old crawls.
+- A version pin taken from a crawled page is dropped (the package is kept) unless the project's own files list that exact pin.
+- The crawl reads the main commit that is tested. The record keeps both `crawl_base_sha` and `checkout_sha`; if they differ, the crawled steps are not applied and the check stops at could not verify.

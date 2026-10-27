@@ -1814,12 +1814,30 @@ def _product_plan(a, rec: dict, repo: str, cfg: dict, checkouts, pypi=None, pyth
     return plan
 
 
+def _checkout_commit(path) -> str:
+    """The commit a local checkout is at, or "" when it can't be read."""
+    if path is None or not Path(path).is_dir():
+        return ""
+    try:
+        got = subprocess.run(["git", "-C", str(path), "rev-parse", "--show-toplevel", "HEAD"], capture_output=True,
+                             text=True, timeout=30)
+    except (OSError, subprocess.SubprocessError):
+        return ""
+    lines = got.stdout.split()
+    if got.returncode != 0 or len(lines) != 2 or Path(lines[0]).resolve() != Path(path).resolve():
+        return ""   # not its own checkout (for example a plain copy inside another repository)
+    sha = lines[1]
+    return sha if got.returncode == 0 and re.fullmatch(r"[0-9a-f]{40}", sha) else ""
+
+
 def _repo_crawl(rec: dict, repo: str, plan: dict, main_dir, crawl_fn=None, extract_fn=None) -> dict:
     """Product checks only: crawl the PR's own repository (at the base commit) and its docs site with Tavily before
     any install. Kept steps go first into the sandbox install. Tavily unavailable stops the check."""
     from poc import demo_helper, run_progress, tavily_crawl
     run_progress.emit("setup_lookup", detail="Crawling this repository's own setup, contributing and CI pages")
-    base = str((rec.get("pr") or {}).get("base_sha") or "")
+    pr = rec.get("pr") or {}
+    # Crawl the exact main commit that is tested (the base tip, or the merge-base when that is what's tested).
+    base = str(pr.get("tested_main_sha") or pr.get("base_sha") or "")
     try:
         got = tavily_crawl.crawl_repo(repo, base, main_dir, crawl_fn=crawl_fn, extract_fn=extract_fn)
     except Exception as exc:  # noqa: BLE001 — the message is redacted below; the check stops, it never crashes
@@ -1830,6 +1848,15 @@ def _repo_crawl(rec: dict, repo: str, plan: dict, main_dir, crawl_fn=None, extra
     stored = {k: v for k, v in got.items() if k != "context"}
     stored["applied_in_sandbox"] = bool(got.get("shell")) and not got.get("stop")
     stored["used_steps"] = [s for s in got.get("steps") or [] if s.get("used")]
+    checkout_sha = _checkout_commit(main_dir) or str(pr.get("tested_main_sha") or "")
+    stored["crawl_base_sha"], stored["checkout_sha"] = base, checkout_sha
+    stored["commits_match"] = bool(base) and bool(checkout_sha) and checkout_sha.lower().startswith(base.lower())
+    if not got.get("stop") and checkout_sha and not stored["commits_match"]:
+        got["stop"] = True
+        got["stop_reason"] = (f"setup lookup read the base commit {base[:12]}, but main's checkout is at "
+                              f"{checkout_sha[:12]}, so its steps may not fit what was tested")
+        stored["stop"], stored["stop_reason"] = True, got["stop_reason"]
+        stored["applied_in_sandbox"] = False
     rec.setdefault("demo_helper", {})["repo_crawl"] = stored
     plan["crawl_context"] = got.get("context") or ""
     if got.get("stop"):
@@ -2870,20 +2897,32 @@ def own_index_refusal(a, cnv: str | None, *checkouts) -> str | None:
 OWN_CHECKOUT_ROOT = "/work/src"
 
 
-def own_checkout_problem(side: str, module: str, path: str) -> str:
-    """The plain could-not-verify reason when a side imports the package from outside its own checkout, else ""."""
+def own_checkout_problem(side: str, module: str, path: str, root: str = OWN_CHECKOUT_ROOT) -> str:
+    """The plain could-not-verify reason when a side imports the package from outside its own checkout, else "".
+
+    ``root`` is the checkout path as resolved inside the sandbox (realpath), so a symlinked checkout still matches."""
     path = (path or "").strip()
     if not path:
         return ""
-    if path == OWN_CHECKOUT_ROOT or path.startswith(OWN_CHECKOUT_ROOT + "/"):
-        return ""
+    for r in {str(root or OWN_CHECKOUT_ROOT).rstrip("/") or "/", OWN_CHECKOUT_ROOT}:
+        if path == r or path.startswith(r + "/"):
+            return ""
     return (f"could not verify: on the {side} side the tests imported {module} from a separately installed copy "
             f"({path}), not from the pull request's own checkout, so the change was not what was tested")
 
 
+_ORIGIN_CODE = (
+    "import importlib,json,os;r=os.path.realpath({root!r});m=importlib.import_module({module!r});"
+    "f=getattr(m,'__file__',None);p=[os.path.realpath(x) for x in (getattr(m,'__path__',None) or [])];"
+    "print(json.dumps({{'root':r,'file':os.path.realpath(f) if f else '','namespace':not f,'paths':p}}))")
+
+
 def _check_own_checkout(sess, rec: dict, module: str) -> str | None:
     """Product checks: from the directory the tests run in, import the package on each side and read its __file__.
-    A copy outside the checkout caps the check at could not verify. A module that does not import is recorded only."""
+
+    The checkout path is resolved inside the sandbox, so a symlink does not cap the check. A copy outside the
+    checkout caps the check at could not verify. A namespace package (no __file__) gets its own status: it is
+    in the checkout only when one of its paths is. A module that does not import is recorded only."""
     from poc import contree_sandboxes
     module = str(module or "").strip()
     out: dict = {"module": module, "checkout": OWN_CHECKOUT_ROOT}
@@ -2891,20 +2930,44 @@ def _check_own_checkout(sess, rec: dict, module: str) -> str | None:
     if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_.]*", module):
         out["status"] = "not checked: no importable package name"
         return None
-    code = f"import importlib,os;m=importlib.import_module({module!r});print(os.path.realpath(m.__file__ or ''))"
-    problems = []
+    code = _ORIGIN_CODE.format(root=OWN_CHECKOUT_ROOT, module=module)
+    problems, namespace = [], []
     for side in ("main", "pr"):
         try:
             raw = sess.run_argv(side, ["python", "-c", code], timeout=120, cwd=OWN_CHECKOUT_ROOT)
         except contree_sandboxes.ContreeError as e:
             raw = {"exit_code": None, "stderr": type(e).__name__}
         lines = [x.strip() for x in str(raw.get("stdout") or "").splitlines() if x.strip()]
-        path = lines[-1] if raw.get("exit_code") == 0 and lines else ""
+        info = {}
+        if raw.get("exit_code") == 0 and lines:
+            try:
+                info = json.loads(lines[-1])
+            except ValueError:
+                info = {}
+        if not isinstance(info, dict) or not info:
+            out[side] = "not importable"
+            continue
+        root = str(info.get("root") or OWN_CHECKOUT_ROOT)
+        out[f"{side}_checkout_real"] = root
+        if info.get("namespace"):
+            paths = [str(x) for x in info.get("paths") or []]
+            out[side] = "namespace package: " + (", ".join(paths) or "no paths")
+            inside = [x for x in paths if not own_checkout_problem(side, module, x, root)]
+            namespace.append(side)
+            if not inside:
+                problems.append(own_checkout_problem(side, module, paths[0] if paths else "(no path)", root))
+            continue
+        path = str(info.get("file") or "")
         out[side] = path or "not importable"
-        why = own_checkout_problem(side, module, path)
+        why = own_checkout_problem(side, module, path, root)
         if why:
             problems.append(why)
-    out["status"] = "outside the checkout" if problems else "ok"
+    if problems:
+        out["status"] = "outside the checkout"
+    elif namespace:
+        out["status"] = "namespace package (" + ", ".join(namespace) + "): a path is in the checkout"
+    else:
+        out["status"] = "ok"
     return problems[0] if problems else None
 
 
@@ -5120,7 +5183,9 @@ def test_source_pair(repo: str, cfg: dict, item: dict, prdir: Path, work: Path, 
         setup_plan = _product_plan(a, rec, repo, cfg, [cm, cp], out_dir=prdir) if helper_on else None
         if _groups_blocked(a, setup_plan) and (setup_plan or {}).get("crawl_stop"):
             rec["verdict"], rec["reason"], _ = verdict_for(None, str(setup_plan["crawl_stop"]))
-            return rec
+            # Same exit as the end of this function: gate() here, then the caller's finish() writes record.json,
+            # the PDF and cleans up (the check is only ever reached through finish(test_source_pair(...))).
+            return gate(rec)
         py = _check_python(a, setup_plan)
         extra = list(setup_plan["extra_reqs"]) if setup_plan and setup_plan.get("extra_reqs") else None
         run_progress.emit("install_main", detail="installing main side")

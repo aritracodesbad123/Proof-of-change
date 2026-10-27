@@ -1,4 +1,5 @@
 """Repository crawl before installs (product checks only). Tavily is always mocked; no key is real."""
+import json
 from types import SimpleNamespace
 
 import pytest
@@ -101,7 +102,7 @@ def test_steps_kept_only_when_project_files_back_them(tmp_path):
 
 def test_cache_hit_same_steps_no_calls(tmp_path):
     first, _ = _run(tmp_path, now=1000.0)
-    assert first["cache"] == {"hit": False, "key": f"{REPO}@{SHA}", "saved": True}
+    assert first["cache"] == {"hit": False, "key": f"v{tavily_crawl.CRAWL_VERSION}|{REPO}@{SHA}", "saved": True}
     again, fake = _run(tmp_path, now=2000.0)
     assert again["cache"]["hit"] is True and fake.crawls == [] and fake.extracts == []
     assert again["calls"] == 0 and again["credits"] == 0
@@ -153,7 +154,8 @@ def test_own_checkout_import_check():
     class Sess:
         def run_argv(self, side, argv, **kw):
             path = "/work/src/widget/__init__.py" if side == "main" else "/usr/lib/site-packages/widget/__init__.py"
-            return {"exit_code": 0, "stdout": path + "\n"}
+            info = {"root": "/work/src", "file": path, "namespace": False, "paths": []}
+            return {"exit_code": 0, "stdout": json.dumps(info) + "\n"}
     rec = {}
     assert "pr side" in daily_run._check_own_checkout(Sess(), rec, "widget")
     assert rec["contree"]["own_checkout"]["status"] == "outside the checkout"
