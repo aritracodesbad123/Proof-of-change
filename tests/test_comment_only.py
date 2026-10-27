@@ -169,3 +169,33 @@ def test_doc_test_shell_has_outer_time_limit():
 def test_performance_claims_count():
     for t in ("Improve parsing", "Speed up import", "Faster load", "Optimise loop", "optimize cache"):
         assert co.claimed_behaviour_change(t, "") is not None, t
+
+
+def _pinned(monkeypatch, files, github_diff, pinned_all, ignored=True):
+    """A pinned item: item["diff"]/item["files"] come from the pinned commits; GitHub's diff is elsewhere."""
+    item = {"diff": _diff(files), "files": {"all": pinned_all}, "pinned_sides": {"main": "b" * 40, "pr": "h" * 40},
+            "github_diff": github_diff, "title": "Tidy", "body": "", "head_sha": "h" * 40, "base_sha": "b" * 40}
+    if ignored:
+        item["github_diff_ignored"] = True
+    reader = lambda side, path: files[path][0 if side == "base" else 1]  # noqa: E731
+    reader.name_status = lambda: [("M", p) for p in files]
+    monkeypatch.setattr(dr, "finish", lambda rec, *a, **k: rec)
+    return dr.comment_only_fast_path("o/r", item, {}, None, None, 0.0, argparse.Namespace(), reader=reader,
+                                     doc_tests=lambda *x: (True, "doc tests passed"))
+
+
+def test_pinned_check_reads_pinned_diff_not_github(monkeypatch):
+    head = "def f(x):\n    # add one to x\n    return x + 1\n\n\ny = 2\n"
+    moved = _diff({"pkg/m.py": (BASE, "def f(x):\n    return x + 2\n\n\ny = 2\n")})
+    rec = _pinned(monkeypatch, {"pkg/m.py": (BASE, head)}, moved, ["pkg/m.py"])
+    assert rec["verdict"] == "verified" and "pkg/m.py lines 2" in rec["reason"]
+
+
+def test_pinned_files_disagreeing_with_name_status_takes_normal_path(monkeypatch):
+    head = "def f(x):\n    # add one to x\n    return x + 1\n\n\ny = 2\n"
+    assert _pinned(monkeypatch, {"pkg/m.py": (BASE, head)}, "", ["pkg/m.py", "pkg/other.py"]) is None
+
+
+def test_pinned_without_pinned_diff_takes_normal_path(monkeypatch):
+    head = "def f(x):\n    # add one to x\n    return x + 1\n\n\ny = 2\n"
+    assert _pinned(monkeypatch, {"pkg/m.py": (BASE, head)}, "", ["pkg/m.py"], ignored=False) is None

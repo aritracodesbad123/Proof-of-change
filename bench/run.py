@@ -19,6 +19,7 @@ import argparse
 import json
 import os
 import platform
+import shutil
 import subprocess
 import sys
 import time
@@ -98,7 +99,19 @@ def arm_dir_name(arm: str) -> str:
 
 def command(case: dict, arm: str, ops_dir: Path, run_name: str) -> list[str]:
     return [sys.executable, str(REPO_ROOT / "ops" / "daily_run.py"), "--pr", case["pr_url"], "--product-check",
-            "--sandbox-backend", "contree", *ARMS[arm], "--ops-dir", str(ops_dir), "--date", run_name, "--no-report"]
+            "--sandbox-backend", "contree", *ARMS[arm], "--ops-dir", str(ops_dir), "--date", run_name, "--no-report",
+            *(["--base-sha", case["base_sha"], "--head-sha", case["head_sha"]]
+              if case.get("base_sha") and case.get("head_sha") else [])]
+
+
+TRANSPORT_ERROR = "ContreeTransportError"
+
+
+def transport_failed(rec: dict | None) -> bool:
+    """True only when Contree itself could not be reached (a network/transport error before any test ran).
+    A test failure, a setup gap or any verdict from tests that did run is never a reason to retry."""
+    failed = ((rec or {}).get("contree") or {}).get("failed") or ""
+    return TRANSPORT_ERROR in str(failed)
 
 
 def find_record(ops_dir: Path, run_name: str) -> dict | None:
@@ -160,6 +173,9 @@ def sha_check(case: dict, rec: dict | None) -> list[str]:
     p = []
     if head != case["head_sha"]:
         p.append(f"tested PR head {head} is not the manifest head_sha")
+    live = rec.get("current_head_sha")
+    if rec.get("head_moved") or (live and live != case["head_sha"]):
+        p.append(f"PR head moved: live head {live} is not the pinned head_sha (case file: report not run)")
     p += pr_side(case, sides)[1]
     if main_sha != case["base_sha"]:
         p.append(f"tested base {main_sha} is not the manifest base_sha")
@@ -221,12 +237,21 @@ def run_one(case: dict, arm: str, out: Path, execute=subprocess.run) -> dict:
     cmd = command(case, arm, ops_dir, run_name)
     env = dict(os.environ, POC_REQUIRE_CONTREE="1")
     t0 = time.time()
-    try:
-        p = execute(cmd, env=env, capture_output=True, text=True, check=False)
-        code, err = p.returncode, p.stderr or ""
-    except OSError as e:
-        code, err = None, f"could not start: {e}"
-    res = redact_all(result_for(case, arm, cmd, find_record(ops_dir, run_name), code, time.time() - t0, err))
+    retried = False
+    for attempt in (1, 2):
+        try:
+            p = execute(cmd, env=env, capture_output=True, text=True, check=False)
+            code, err = p.returncode, p.stderr or ""
+        except OSError as e:
+            code, err = None, f"could not start: {e}"
+        rec = find_record(ops_dir, run_name)
+        if attempt == 1 and transport_failed(rec):
+            retried = True
+            shutil.rmtree(ops_dir / "runs" / run_name, ignore_errors=True)  # the retry writes a fresh record
+            continue
+        break
+    res = redact_all(result_for(case, arm, cmd, rec, code, time.time() - t0, err))
+    res["retried_after_contree_transport_error"] = retried
     d = out / arm_dir_name(arm)
     d.mkdir(parents=True, exist_ok=True)
     (d / f"{case['id']}.json").write_text(json.dumps(res, indent=1))
