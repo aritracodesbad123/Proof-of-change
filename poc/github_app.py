@@ -379,12 +379,24 @@ def sweep_pending_posts(roots=None, *, env: dict | None = None, now: float | Non
                     first = float(now if first is None else first)
                     attempts = int(info.get("sweep_attempts") or 0)
                     if attempts >= max_attempts or now - first > max_age_s:
-                        info.update(done=GAVE_UP, final_error=(
+                        # One last edit that swaps "PDF preparing…" for the plain failure text, so the
+                        # PR comment and check run don't stay on "preparing". Never raises.
+                        try:
+                            final_ok = bool(update(d, pdf_status.ERROR, env=env, delays=()))
+                        except Exception as e:  # noqa: BLE001
+                            _log_error("Final PDF edit failed for %s: %s", d.name, type(e).__name__)
+                            final_ok = False
+                        try:
+                            info = json.loads(cp.read_text())  # keep progress the final edit saved
+                        except (OSError, ValueError):
+                            pass
+                        info.update(done=GAVE_UP, final_edit_ok=final_ok, final_error=(
                             f"comment/check-run edit gave up after {attempts} sweep attempts"
                             f" over {int(now - first)}s"))
                         cp.write_text(json.dumps(info))
                         _log_error("Gave up editing the App comment/check run for report %s after %d sweep "
-                                   "attempts; it still says '%s'", d.name, attempts, PREPARING_TEXT)
+                                   "attempts; final failure-text edit %s", d.name, attempts,
+                                   "succeeded" if final_ok else f"failed, it still says '{PREPARING_TEXT}'")
                         out["gave_up"].append(d.name)
                         continue
                     info.update(sweep_first_at=first, sweep_attempts=attempts + 1)

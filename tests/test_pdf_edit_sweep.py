@@ -91,3 +91,43 @@ def test_sweeper_thread_runs_and_stops_cleanly():
     assert ran.wait(2)
     s.stop()
     assert not s.thread.is_alive()
+
+
+def test_give_up_final_edit_swaps_in_failure_text(tmp_path):
+    d = _pending(tmp_path)
+    bodies, checks = [], []
+
+    def pc(repo, cid, body, tok, env=None):
+        bodies.append(body)
+        return {}
+
+    def update(rd, state, env=None, delays=()):
+        if state != ps.ERROR:
+            return False  # normal sweeps keep failing
+        return ga.update_posts_for_pdf(rd, state, ENV, pc, lambda *a, **k: checks.append(a) or {}, delays=())
+
+    for i in range(2):
+        ga.sweep_pending_posts([tmp_path], now=1000 + i, update=update, max_attempts=2)
+    out = ga.sweep_pending_posts([tmp_path], now=1010, update=update, max_attempts=2)
+    assert out["gave_up"] == ["run-1"]
+    info = _info(d)
+    assert info["done"] == ga.GAVE_UP and info["final_edit_ok"] is True
+    assert ga.FAILED_TEXT in bodies[-1] and ga.PREPARING_TEXT not in bodies[-1]
+    assert ga.FAILED_TEXT in info["comment_body"] and info["check_done"] is True
+    assert ga.FAILED_TEXT in checks[-1][2]["output"]["summary"]
+
+
+def test_give_up_final_edit_failing_still_gives_up(tmp_path):
+    d = _pending(tmp_path)
+
+    def update(rd, state, env=None, delays=()):
+        if state == ps.ERROR:
+            raise RuntimeError("github down")
+        return False
+
+    ga.sweep_pending_posts([tmp_path], now=1000, update=update, max_attempts=1)
+    out = ga.sweep_pending_posts([tmp_path], now=1001, update=update, max_attempts=1)
+    assert out["gave_up"] == ["run-1"]
+    info = _info(d)
+    assert info["done"] == ga.GAVE_UP and info["final_edit_ok"] is False
+    assert not ga.posts_pending(d)

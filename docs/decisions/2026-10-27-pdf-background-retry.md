@@ -41,6 +41,9 @@ simply missing and nothing told anyone.
   it gives up: `done` becomes `gave_up`, `final_error` is saved in `github_comment.json`, and a plain error
   is logged. The sweep never raises or blocks webhook handling, and stops cleanly on shutdown.
 - The record, the verdict and the HTML/Markdown reports are never changed by any of this.
+- On give-up, the sweep makes one final edit that replaces "PDF preparing…" with the plain PDF failure
+  text in the PR comment and check run. It never raises; `done` is `gave_up` either way, and
+  `final_edit_ok` records whether that last edit succeeded.
 
 ## Consequences
 
