@@ -40,14 +40,39 @@ result is could not verify.
 
 ### Line coverage in a Contree-only run
 
-Not built: in a Contree-only run the tool does not measure which changed lines a probe ran. Each
-probe is recorded with no line measurement. A probe with no measurement is dropped and does not
-count toward a verified result. That limit alone keeps a Contree-only result from verified. A
-difference the probe did see can still be reported as needs attention.
+In a Contree run, each probe is measured on the main side inside Contree. If that measurement
+fails for any reason, the probe is left unmeasured and cannot count toward verified.
 
 Measuring how much of the project's own tests ran the changed lines, inside Contree, is a separate
 step. That step is built, and it is not confirmed on the live Contree service. When the report from
 that step is missing, a product check stays could not verify.
+
+### Line coverage on the main side
+
+Line coverage of a probe is measured only on the main side, in main's line numbers. A line the
+pull request adds is judged by the main lines next to it, so a check can pass without ever
+running a newly added branch of the code. A pull request that only adds new files cannot be
+verified.
+
+A probe counts as measured when only some of the changed files show up in its coverage.
+
+### Multi-line lambdas
+
+Not supported: a changed line on a later line of a multi-line lambda is judged by the line
+where the lambda is assigned. That line runs when the module is imported, so the change can be
+counted as reached even if the lambda never ran.
+
+### Plugin flags
+
+Not supported: a project whose own test suite needs a plugin flag passed to the test run, for
+example pytest's own repository needing `-p pytester`. The tool does not add per-project flags,
+so these end as could not verify.
+
+### Fresh claims and checks
+
+The AI writes the claims and the checks fresh on every run. The same pull request on the same
+code can get a different verdict on another run. An earlier run of one pull request came out
+needs attention, and a later run came out verified.
 
 ### Network and keys
 
@@ -55,6 +80,11 @@ Tests and probes in the local sandbox have no internet. The network is turned on
 packages are installed. Secret keys are not given to the local sandbox. They are not placed in the
 shell that runs inside Contree. A behaviour that needs a network service, a password or a key
 cannot be tested.
+
+### Setup lookup
+
+A product check needs `TAVILY_API_KEY` and refuses to start without it. A study run and the daily
+study do not need it.
 
 ### What a verdict means
 
