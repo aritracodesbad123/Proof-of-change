@@ -95,8 +95,9 @@ def ast_equal_ignoring_docstrings(old_text: str, new_text: str) -> bool:
     return ast.dump(old) == ast.dump(new)
 
 
-def changed_lines(old_text: str | None, new_text: str) -> set[int]:
-    """1-based line numbers of new_text that are added or changed relative to old_text (whole file if new)."""
+def changed_lines(old_text: str | None, new_text: str, statement_start: bool = False) -> set[int]:
+    """1-based line numbers of new_text that are added or changed relative to old_text (whole file if new).
+    statement_start (product checks): map each line to the first line of its statement (statement_starts)."""
     new = new_text.splitlines()
     if old_text is None:
         return set(range(1, len(new) + 1))
@@ -104,6 +105,69 @@ def changed_lines(old_text: str | None, new_text: str) -> set[int]:
     for tag, _i1, _i2, j1, j2 in difflib.SequenceMatcher(None, old_text.splitlines(), new, autojunk=False).get_opcodes():
         if tag in ("replace", "insert"):
             out.update(range(j1 + 1, j2 + 1))
+    return statement_starts(new_text, out) if statement_start else out
+
+
+_HEADER_FIELDS = ("test", "target", "iter", "items", "subject", "args", "returns", "bases", "keywords",
+                  "type_params")
+
+
+def _own_spans(tree: ast.AST) -> list[tuple[int, int]]:
+    """(first line, last line) of the part of each statement that coverage.py reports at its first line.
+
+    A simple statement owns all its lines. A compound statement (def, class, if, for, while, with, try, match)
+    owns only its header: from its first line to the last line of its header expressions (a multi-line signature
+    or condition). Its body, else, except, finally and case clauses are not part of it."""
+    out = []
+    for n in ast.walk(tree):
+        if not isinstance(n, ast.stmt) or not isinstance(getattr(n, "end_lineno", None), int):
+            continue
+        if not any(isinstance(getattr(n, f, None), list) and getattr(n, f) and isinstance(getattr(n, f)[0], ast.stmt)
+                   for f in ("body", "orelse", "finalbody", "handlers")) and not isinstance(n, ast.Match):
+            out.append((n.lineno, n.end_lineno))
+            continue
+        end = n.lineno
+        for f in _HEADER_FIELDS:
+            v = getattr(n, f, None)
+            for x in (v if isinstance(v, list) else [v]):
+                if isinstance(x, ast.AST):
+                    for sub in ast.walk(x):
+                        e = getattr(sub, "end_lineno", None)
+                        if isinstance(e, int):
+                            end = max(end, e)
+        out.append((n.lineno, end))
+    return out
+
+
+def statement_starts(text: str | None, lines: set[int]) -> set[int]:
+    """Each changed line that coverage.py cannot see, mapped to the first line of the statement it belongs to.
+
+    coverage.py reports a statement that spans several lines (a long list, dict, call or string) only at its first
+    line, so a change on a later line of that statement would otherwise look non-executable. Only such a line is
+    remapped: one strictly inside a multi-line simple statement, or inside the multi-line header of a def, class
+    or compound statement. A line that is the first line of any statement is kept, and so are blank lines,
+    comment lines, decorators and else, except, finally and case lines; a body line is never mapped onto its def,
+    class or block header.
+
+    Fails closed: when the text cannot be parsed, the lines are returned unchanged."""
+    lines = set(lines)
+    if not text or not lines:
+        return lines
+    try:
+        tree = ast.parse(text)
+    except (SyntaxError, ValueError, RecursionError, MemoryError):
+        return lines
+    src = text.splitlines()
+    spans = _own_spans(tree)
+    firsts = {a for a, _b in spans}
+    out = set()
+    for ln in lines:
+        body = src[ln - 1].strip() if 1 <= ln <= len(src) else ""
+        if ln in firsts or not body or body.startswith("#"):
+            out.add(ln)
+            continue
+        owner = [a for a, b in spans if a < ln <= b]
+        out.add(max(owner) if owner else ln)
     return out
 
 

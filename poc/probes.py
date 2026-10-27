@@ -107,11 +107,61 @@ def find_probes(repo: str, pr: int, root: Path = PROBES_DIR) -> list[Path]:
     return sorted([p for p in d.glob(f"{pr}.py")] + [p for p in d.glob(f"{pr}-*.py")])
 
 
-def observations_of(stdout: str, exit_code) -> dict:
-    """{name: value} from one probe run. A run without usable observations becomes one PROBE_ERROR observation."""
+_JSON_SCALARS = (str, int, float, bool, type(None))
+
+
+def _json_shaped(v, depth: int = 0) -> bool:
+    """True when v holds only what JSON itself can say: dicts with string keys, lists, strings, finite numbers,
+    true, false and null. Tuples, sets, bytes, complex numbers, NaN and infinity are not: they would change on
+    the way to JSON, so they make the output ambiguous."""
+    if depth > 32:
+        return False
+    if isinstance(v, float):
+        return v == v and v not in (float("inf"), float("-inf"))
+    if isinstance(v, _JSON_SCALARS):
+        return True
+    if type(v) is list:
+        return all(_json_shaped(x, depth + 1) for x in v)
+    if type(v) is dict:
+        return all(isinstance(k, str) and _json_shaped(x, depth + 1) for k, x in v.items())
+    return False
+
+
+def literal_observations(stdout: str):
+    """Product checks only. The observations object when the probe's last line is a Python literal of exactly
+    {'observations': {...}} (what print(dict) shows) holding only JSON-shaped values; else None.
+
+    Fails closed: any other shape, any extra key, a value JSON cannot hold as is, or a line that is not a plain
+    literal stays unparsed. The line is read with ast.literal_eval, never run."""
+    lines = [ln for ln in (stdout or "").strip().splitlines() if ln.strip()]
+    if not lines:
+        return None
+    last = lines[-1].strip()
+    if not (last.startswith("{") and last.endswith("}")):
+        return None
+    try:
+        obj = ast.literal_eval(last)
+    except (ValueError, SyntaxError, TypeError, MemoryError, RecursionError):
+        return None
+    if type(obj) is not dict or set(obj) != {"observations"} or type(obj["observations"]) is not dict:
+        return None
+    if not _json_shaped(obj):
+        return None
+    return obj
+
+
+def observations_of(stdout: str, exit_code, literal_output: bool = False) -> dict:
+    """{name: value} from one probe run. A run without usable observations becomes one PROBE_ERROR observation.
+
+    literal_output (product checks only): when the last line is not JSON, also accept a Python literal of the same
+    {"observations": {...}} object (see literal_observations). Study runs leave it off, so their parsing is unchanged."""
     if len(stdout.encode(errors="replace")) > MAX_OUTPUT_BYTES:
         return {PROBE_ERROR: {"contract": f"output larger than {MAX_OUTPUT_BYTES} bytes", "exit_code": exit_code}}
     obj = parse_probe_output(stdout, exit_code)
+    if literal_output and obj.get("crash") == "non-json output":
+        lit = literal_observations(stdout)
+        if lit is not None:
+            obj = lit if exit_code in (0, "0") else dict(lit, exit_code=exit_code)
     obs = obj.get("observations") if isinstance(obj, dict) else None
     if not isinstance(obs, dict) or "crash" in obj or "timeout" in obj:
         return {PROBE_ERROR: {k: v for k, v in obj.items() if k != "observations"} or {"crash": "no observations"}}
@@ -263,7 +313,8 @@ def judge(spec: dict, runs: dict, files: dict | None = None) -> list[dict]:
     return out
 
 
-def run_once(path: Path, python: Path, cwd: Path, env: dict, timeout: int, launch=None) -> tuple[dict, str, float]:
+def run_once(path: Path, python: Path, cwd: Path, env: dict, timeout: int, launch=None,
+             literal_output: bool = False) -> tuple[dict, str, float]:
     """launch(argv, env, cwd) -> (argv, env, cwd) wraps the command, e.g. into the sandbox (guardrails/sandbox.py)."""
     t0 = time.time()
     argv = [str(python), str(path)]
@@ -280,7 +331,7 @@ def run_once(path: Path, python: Path, cwd: Path, env: dict, timeout: int, launc
     if code == "timeout":
         return observations_of("", code), f"timed out after {timeout}s", round(time.time() - t0, 1)
     log = out[-4000:] + ("\n--- stderr ---\n" + err[-4000:] if err else "")
-    return observations_of(out, code), log, round(time.time() - t0, 1)
+    return observations_of(out, code, literal_output), log, round(time.time() - t0, 1)
 
 
 FILE_LIMIT_BYTES = 64_000_000   # RLIMIT_FSIZE of a probe: caps its stdout/stderr files and anything it writes
@@ -296,7 +347,7 @@ def _head(f, n: int) -> str:
 
 
 def run_probe(path: Path, pythons: dict, outdir: Path, cwd: Path | dict, envs: dict, runs: int = 3,
-              source: str = "library", launchers: dict | None = None, guard=None) -> dict:
+              source: str = "library", launchers: dict | None = None, guard=None, literal_output: bool = False) -> dict:
     """Run one probe file `runs` times per side, alternating main/PR; save outputs; judge. Returns the record entry.
     envs: {"main": env, "pr": env}, each side's own allowlisted environment (guardrails.isolation.untrusted_env).
     guard(path) is called before every PR-side run and raises (poc.freeze.FreezeError) to stop it."""
@@ -312,7 +363,7 @@ def run_probe(path: Path, pythons: dict, outdir: Path, cwd: Path | dict, envs: d
             if side == "pr" and guard:
                 guard(path)
             obs, log, secs = run_once(path, pythons[side], cwds[side], envs[side], int(spec["timeout_s"]),
-                                         (launchers or {}).get(side))
+                                         (launchers or {}).get(side), literal_output)
             fname = f"probe-{spec['id']}-{side}-{i}.jsonl"
             write_output(outdir / fname, obs)
             (outdir / f"probe-{spec['id']}-{side}-{i}.log").write_text(log)
