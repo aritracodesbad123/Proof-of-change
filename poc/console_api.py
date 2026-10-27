@@ -18,6 +18,7 @@ Serves console/web/dist when built. CORS open for local Vite (5173).
 """
 from __future__ import annotations
 
+import fcntl
 import json
 import os
 import re
@@ -767,16 +768,24 @@ def hosted_budget_refusal(env=None, *, path: Path | None = None, now: float | No
     cap = daily_cap(env)
     path = path or (RUNS_ROOT / "_console_daily.json")
     day = _ist_day(now)
-    with _daily_lock:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    # The console and the GitHub App listener are separate processes sharing this counter, so the read and the
+    # write happen under an exclusive fcntl lock on a side file (the thread lock covers threads in one process).
+    with _daily_lock, open(str(path) + ".lock", "a") as lock_fh:
+        fcntl.flock(lock_fh, fcntl.LOCK_EX)
         try:
-            data = json.loads(path.read_text())
-        except (OSError, ValueError):
-            data = {}
-        used = int(data.get(day) or 0) if isinstance(data, dict) else 0
-        if used >= cap:
-            return f"{DAILY_CAP_REACHED} ({cap} checks per day on this console). Try again tomorrow."
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(json.dumps({day: used + 1}))
+            try:
+                data = json.loads(path.read_text())
+            except (OSError, ValueError):
+                data = {}
+            used = int(data.get(day) or 0) if isinstance(data, dict) else 0
+            if used >= cap:
+                return f"{DAILY_CAP_REACHED} ({cap} checks per day on this console). Try again tomorrow."
+            tmp = path.with_name(path.name + f".{os.getpid()}.tmp")
+            tmp.write_text(json.dumps({day: used + 1}))
+            os.replace(tmp, path)
+        finally:
+            fcntl.flock(lock_fh, fcntl.LOCK_UN)
     return None
 
 
