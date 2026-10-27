@@ -36,3 +36,32 @@ def test_not_product_or_no_report_not_refused():
 def test_reportlab_is_a_declared_dependency():
     deps = tomllib.loads((Path(__file__).resolve().parents[1] / "pyproject.toml").read_text())["project"]["dependencies"]
     assert any(d.split("=")[0].split(">")[0].strip().lower() == "reportlab" for d in deps)
+
+
+def _no_reportlab(monkeypatch):
+    from poc import pdf_maker
+    real = pdf_maker.importlib.import_module
+    monkeypatch.setattr(pdf_maker.importlib, "import_module",
+                        lambda n: missing(n) if n == "reportlab" else real(n))
+
+
+def test_console_refuses_to_start_without_reportlab(monkeypatch, capsys):
+    from poc import console_api
+    _no_reportlab(monkeypatch)
+    monkeypatch.setattr(console_api, "serve", lambda *a, **k: (_ for _ in ()).throw(AssertionError("served")))
+    assert console_api.main(["--port", "0"]) == 1
+    assert "reportlab" in capsys.readouterr().err
+
+
+def test_github_app_refuses_to_start_without_reportlab(monkeypatch, capsys):
+    from poc import github_app
+    _no_reportlab(monkeypatch)
+    monkeypatch.setattr(github_app, "serve", lambda *a, **k: (_ for _ in ()).throw(AssertionError("served")))
+    assert github_app.main(["--port", "0"]) == 1
+    assert "reportlab" in capsys.readouterr().err
+
+
+def test_one_shared_refusal_line():
+    from poc import pdf_maker
+    assert daily_run.pdf_maker_start_refusal(args(), importer=missing) == pdf_maker.REFUSAL
+    assert pdf_maker.missing_refusal(lambda n: object()) is None

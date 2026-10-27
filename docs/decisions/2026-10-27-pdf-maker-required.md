@@ -1,10 +1,10 @@
 # A product check needs the built-in PDF maker
 
-Status: proposed
+Status: accepted
 
 ## What changed
 
-A product check now refuses to start when the `reportlab` package cannot be imported. The message is one
+A product check now refuses to start when the `reportlab` package cannot be imported. The hosted console and the GitHub App refuse to start the server the same way, through one shared helper (`poc/pdf_maker.py`). The message is one
 plain line that says the built-in PDF maker is missing and to install the project's dependencies.
 A study run, a selection-only run and a run with `--no-report` are not affected.
 

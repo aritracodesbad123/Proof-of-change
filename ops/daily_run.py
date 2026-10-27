@@ -5798,13 +5798,8 @@ def pdf_maker_start_refusal(a, importer=None) -> str | None:
         return None
     if getattr(a, "select_only", False) or getattr(a, "no_report", False):
         return None
-    import importlib
-    try:
-        (importer or importlib.import_module)("reportlab")
-    except Exception:  # noqa: BLE001
-        return ("refusing: a product check needs the built-in PDF maker (the reportlab package, listed in "
-                "pyproject.toml) so the PDF never fails; install the project's dependencies and start again.")
-    return None
+    from poc import pdf_maker
+    return pdf_maker.missing_refusal(importer)
 
 
 PRODUCT_KEYS = ("NEBIUS_API_KEY", "TAVILY_API_KEY", "NEBIUS_PROJECT_ID")

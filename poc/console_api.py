@@ -24,6 +24,7 @@ import re
 import select
 import signal
 import subprocess
+import sys
 import threading
 import time
 import uuid
@@ -1296,6 +1297,11 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--host", default=os.environ.get("POC_CONSOLE_HOST", "127.0.0.1"))
     ap.add_argument("--port", type=int, default=int(os.environ.get("POC_CONSOLE_PORT", "8787")))
     a = ap.parse_args(argv)
+    from poc import pdf_maker
+    stop = pdf_maker.missing_refusal()  # every check here is a product check: no PDF maker, no start
+    if stop:
+        print(stop, file=sys.stderr, flush=True)
+        return 1
     from poc.tool_setup import ToolSetupError, ensure_tools
     try:
         ensure_tools()
