@@ -467,6 +467,11 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--host", default=os.environ.get("POC_WEBHOOK_HOST", "0.0.0.0"))
     ap.add_argument("--port", type=int, default=int(os.environ.get("POC_WEBHOOK_PORT", "8080")))
     a = ap.parse_args(argv)
+    from poc import pdf_maker
+    stop = pdf_maker.missing_refusal()  # every check here is a product check: no PDF maker, no start
+    if stop:
+        print(stop, file=sys.stderr, flush=True)
+        return 1
     serve(a.host, a.port)
     return 0
 

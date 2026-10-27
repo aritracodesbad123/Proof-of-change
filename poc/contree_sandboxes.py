@@ -645,6 +645,10 @@ def install_shell_source(repo: str, sha: str, extra: str = "", deps_only_fallbac
         "|| python -m pip install -q -e ." + (" \\\n|| " + deps_only_shell(deps_exclude) if deps_only_fallback else "") + "\n"
         "python -m pip install -q pytest pytest-timeout pytest-xdist coverage pytest-cov\n"
     )
+    if deps_only_fallback:
+        # Product checks: reinstall the checkout itself last, without dependencies, so a test tool installed above
+        # cannot replace the pull request's own code with a separately installed copy.
+        shell += "python -m pip install -q --no-deps -e . 2>/dev/null || true\n"
     extra = (extra or "").strip()
     if not extra:
         return shell
