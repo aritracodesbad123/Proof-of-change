@@ -30,8 +30,9 @@ Tavily stays required. With no key, or when every Tavily call fails, the check s
 unavailable" before any install. Each record stores the pages crawled, the pages read in full, every step with
 the URL it came from and whether it was used, the number of Tavily calls and the credits they used.
 
-Results are cached on disk by repository and base commit, for seven days. A rerun of the same project version
-reads the cache, makes no Tavily call and gets the same steps. The record says whether the cache was hit. The
+Results are cached on disk by the exact repository and base commit, for seven days. A rerun at the same
+repository and base commit reads the cache, makes no crawl or extract call and gets the same steps. Every new
+base commit, even a newer tip of the same branch, pays for a full crawl. The record says whether the cache was hit. The
 cache never changes a verdict.
 
 Only product checks do this. A study run and the daily study are unchanged, and their install commands stay
