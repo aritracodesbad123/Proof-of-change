@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 
 from ops import daily_run as dr
-from poc import broad_claims, model_probes, probes
+from poc import broad_claims, model_probes
 from poc.model_provider import PROBES_PROMPT
 
 FX = Path(__file__).resolve().parent / "fixtures/product_claims_2026_10_27"
