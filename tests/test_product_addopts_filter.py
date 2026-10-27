@@ -1,7 +1,6 @@
 """Product checks keep the project's pytest addopts but strip, by flag name, only the flags our command sets."""
 import subprocess
 import sys
-from pathlib import Path
 
 from ops import daily_run as dr
 from poc import pytest_addopts as pa

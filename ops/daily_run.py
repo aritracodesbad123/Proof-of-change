@@ -2893,7 +2893,8 @@ def run_tests(side_venvs: dict, targets_by_side: dict, rdir: Path, workdir: Path
                                                  root=(cwds[side] if cwds else None))
             else:
                 cmd = [venv / "bin/python", "-m", "pytest", *tg, "-p", "no:cacheprovider", "-q", "-rfE",
-                       f"--timeout={test_timeout}", *repo_addopts_args(keep_addopts, cwds[side] if cwds else None), "-o", "junit_family=xunit2",
+                       f"--timeout={test_timeout}", *repo_addopts_args(keep_addopts, cwds[side] if cwds else None),
+                       "-o", "junit_family=xunit2",
                        f"--junitxml={jin}"]
                 if workers != "0":
                     cmd += ["-n", workers]
