@@ -103,6 +103,27 @@ def test_41_c1_never_links_c10():
     assert got["C1.x"] == ("C1", FindingLabel.NEEDS_HUMAN.value)
 
 
+
+def test_41_c1_star_alone_never_takes_c10():
+    """A C1 claim on a probe whose only observation is C10.x: the old matcher linked "C1*" to it."""
+    for covers in (["C1*"], ["c1"], ["C1"]):
+        item = {"id": "model-p", "source": "model", "target": "t", "about": "a",
+                "claims": [{"id": "C1", "covers": covers, "expect": "differs", "text": "one"}],
+                "runs": {"main": [{"C10.x": 1}] * 3, "pr": [{"C10.x": 2}] * 3}}
+        pr = probes.apply_status(claim_hygiene.apply({"items": [probes.rejudge_entry(item)]}))
+        obs = pr["items"][0]["observations"]
+        assert all(o["label"] != FindingLabel.PROVEN.value and o.get("claim") is None for o in obs), covers
+        assert dr.verdict_for(_cmp(), None, probe_results=pr)[0] != VER, covers
+        # the study route still uses the old matcher, unchanged
+        assert probes._covers_name(["C1*"], "C10.x") is True
+
+
+def test_41_separators():
+    claim = {"id": "C1", "covers": ["C1"], "expect": "differs", "text": "x"}
+    names = ["C1.a", "C1_a", "c1-a", "C1", "C10", "C10_a", "C1a", "C1 a"]
+    assert claim_hygiene.linked_names(claim, names) == ["C1.a", "C1_a", "c1-a", "C1"]
+
+
 def test_41_relinked_claim_must_still_hold():
     """Linking only says which claim an observation belongs to: an unmet claim still needs attention."""
     pr = _product("attrs-1647")
@@ -171,6 +192,22 @@ def test_43_markdown_quotes_grounded_requests_7520():
     assert {c["id"] for c in kept} == {"C1", "C2"}
     assert all(c["quote_match"] == "loose" for c in kept)
     assert [c["id"] for c in rejected] == ["C3"]        # reworded, not only unformatted: still rejected
+
+
+def test_43_only_paired_marks_and_min_length():
+    n = model_probes.loose_norm
+    assert n("a_b_c and snake_case_name") == "a_b_c and snake_case_name"     # underscores inside words kept
+    raw = {"claims": [{"id": "C1", "expect": "differs", "source_quote": "abc now keeps every value intact"}]}
+    kept, _ = model_probes.grounded_claims(raw, "t", "a_b_c now keeps every value intact", loose=True)
+    assert kept == []
+    assert n("__bold__ and _it_ and *it* and **b** and `c`") == "bold and it and it and b and c"
+    assert n("x * y * z") == "x * y * z"                                     # lone stars are not a pair
+    for q in ("__x__", "`x`", "x"):
+        raw = {"claims": [{"id": "C1", "expect": "differs", "source_quote": q}]}
+        assert model_probes.grounded_claims(raw, "t", "x", loose=True)[0] == [] or q == "x"
+    assert model_probes.loose_quote_ok("__x__") is None
+    assert model_probes.loose_quote_ok(" ".join(["`ab`"] * 10)) is None   # mostly marks
+    assert model_probes.loose_quote_ok("`parse` keeps every following parameter") is not None
 
 
 def test_43_loose_rules():

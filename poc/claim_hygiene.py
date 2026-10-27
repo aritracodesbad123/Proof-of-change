@@ -7,8 +7,9 @@ First, claim links are repaired in code (rule 0). Then three rules, each fail cl
 into verified on its own):
 
 0. A model often writes a claim's covers as the claim id ("C1", "C1*", any case) instead of observation-name
-   patterns. Such a cover links the claim to the observation named exactly that id or starting with "<id>.",
-   ignoring case, and never to a longer id ("C1" never links "C10.x"). Other patterns are matched ignoring case.
+   patterns. Such a cover links the claim to the observation named exactly that id or starting with the id and
+   ".", "_" or "-", ignoring case, and never to a longer id ("C1" or "C1*" never links "C10.x"). A claim with
+   such a cover is always matched this way, even when that leaves it linking nothing. Other patterns are matched ignoring case.
    The covers as written are kept on the claim (covers_as_written) and each repaired link is listed in
    ``relinked``. A link only says which claim an observation belongs to; the claim still has to hold.
 
@@ -67,6 +68,16 @@ def says_stays_same(text: str) -> bool:
     return bool(_STAYS_SAME.search(t)) and not _SAYS_CHANGE.search(t)
 
 
+# What may follow the claim id in an observation name: "C1.a", "C1_a", "C1-a". A digit or letter never does, so "C1"
+# never links "C10" or "C1a".
+ID_SEPARATORS = "._-"
+
+
+def _has_id_cover(claim: dict) -> bool:
+    cid = str(claim.get("id") or "")
+    return any(isinstance(p, str) and _is_id_cover(p, cid) for p in claim.get("covers") or [])
+
+
 def _is_id_cover(pat: str, cid: str) -> bool:
     p = pat.strip()
     if p.endswith("*"):
@@ -80,7 +91,7 @@ def _escape(name: str) -> str:
 
 def linked_names(claim: dict, names: list[str]) -> list[str]:
     """Observation names a claim covers (rule 0): a cover equal to the claim id (optionally ending in *) means the
-    name equal to the id or starting with "<id>."; any other cover is an fnmatch pattern, compared ignoring case."""
+    name equal to the id or starting with the id and ".", "_" or "-"; any other cover is an fnmatch pattern, compared ignoring case."""
     cid = str(claim.get("id") or "")
     out = []
     for n in names:
@@ -89,7 +100,8 @@ def linked_names(claim: dict, names: list[str]) -> list[str]:
             if not isinstance(pat, str):
                 continue
             if _is_id_cover(pat, cid):
-                hit = low == cid.lower() or low.startswith(cid.lower() + ".")
+                c = cid.lower()
+                hit = low == c or (low.startswith(c) and low[len(c)] in ID_SEPARATORS)
             else:
                 hit = fnmatch.fnmatchcase(low, pat.lower())
             if hit:
@@ -110,7 +122,9 @@ def relink(item: dict) -> tuple[dict, list]:
             continue
         want = linked_names(c, names)
         had = [n for n in names if probes._covers_name(c.get("covers"), n)]
-        if want and sorted(want) != sorted(had):
+        # A claim with an id cover always uses the new matcher, even when it then links nothing: the old matcher
+        # would link "C1*" to "C10.x".
+        if (want or _has_id_cover(c)) and sorted(want) != sorted(had):
             fixed.append({"probe": item.get("id"), "claim": c.get("id"), "covers_as_written": c.get("covers"),
                           "linked": sorted(want)})
             c = dict(c, covers=[_escape(n) for n in sorted(want)], covers_as_written=c.get("covers"))

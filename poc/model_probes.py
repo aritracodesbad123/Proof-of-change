@@ -46,19 +46,38 @@ def _norm(s: str) -> str:
     return re.sub(r"\s+", " ", s or "").strip()
 
 
-# Product checks only: a quote may lose its Markdown when the model copies it ("`a=b`" quoted as "a=b"). These
-# characters are compared loosely. Study runs keep the exact match.
-_LOOSE_DROP = re.compile(r"[`*_]")
+# Product checks only: a quote may lose its Markdown when the model copies it ("`a=b`" quoted as "a=b"). Only
+# PAIRED marks around a span are removed (`code`, **b**, __b__, *i*, _i_ at word boundaries); an underscore inside a
+# word is kept, so "abc" never matches "a_b_c". Dashes, arrows and quotes are unified. Study runs keep the exact match.
+_PAIRED = [re.compile(r"`([^`\n]+)`"),
+           re.compile(r"\*\*(?=\S)([^*\n]+?)(?<=\S)\*\*"),
+           re.compile(r"(?<![\w_])__(?=\S)([^_\n]+?)(?<=\S)__(?![\w_])"),
+           re.compile(r"(?<![\w*])\*(?=[^\s*])([^*\n]+?)(?<=[^\s*])\*(?![\w*])"),
+           re.compile(r"(?<![\w_])_(?=[^\s_])([^_\n]+?)(?<=[^\s_])_(?![\w_])")]
 _LOOSE_MAP = str.maketrans({"\u2010": "-", "\u2011": "-", "\u2012": "-", "\u2013": "-", "\u2014": "-",
                             "\u2015": "-", "\u2212": "-", "\u2018": "'", "\u2019": "'", "\u201a": "'",
                             "\u201b": "'", "\u2032": "'", "\u201c": '"', "\u201d": '"', "\u201e": '"',
                             "\u201f": '"', "\u2033": '"', "\u2192": "->", "\u27f6": "->", "\u21d2": "=>",
                             "\u27f9": "=>"})
+LOOSE_MIN_CHARS = 20      # a shorter quote must match exactly
+LOOSE_MIN_KEPT = 0.8      # a quote that loses more than a fifth of its characters to normalising is not matched
 
 
 def loose_norm(s: str) -> str:
-    """Whitespace collapsed, Markdown marks (backticks, *, _) removed, dashes, arrows and quotes unified."""
-    return _norm(_LOOSE_DROP.sub("", (s or "").translate(_LOOSE_MAP)))
+    """Whitespace collapsed, paired Markdown marks removed, dashes, arrows and quotes unified."""
+    t = _norm((s or "").translate(_LOOSE_MAP))
+    for rx in _PAIRED:
+        t = rx.sub(r"\1", t)
+    return _norm(t)
+
+
+def loose_quote_ok(quote: str) -> str | None:
+    """The normalised quote if it may be matched loosely, else None (too short, or mostly lost to normalising)."""
+    raw = _norm(quote)
+    lq = loose_norm(quote)
+    if len(lq) < LOOSE_MIN_CHARS or not raw or len(lq) < LOOSE_MIN_KEPT * len(raw):
+        return None
+    return lq
 
 
 def grounded_claims(raw: dict, title: str, body: str | None, loose: bool = False) -> tuple[list, list]:
@@ -74,7 +93,7 @@ def grounded_claims(raw: dict, title: str, body: str | None, loose: bool = False
         valid = c.get("expect") in ("same", "differs") and c.get("id")
         ok = bool(q) and q in text and valid
         if not ok and loose and valid:
-            lq = loose_norm(c.get("source_quote", ""))
+            lq = loose_quote_ok(c.get("source_quote", ""))
             if lq and lq in loose_text:
                 kept.append(c | {"quote_match": "loose"})
                 continue
