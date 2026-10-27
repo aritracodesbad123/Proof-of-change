@@ -221,6 +221,12 @@ def console_run_flags(session_token: str | None = None) -> ConsoleRunPlan:
     POC_UNSAFE_NO_SANDBOX=1, which adds --unsafe-no-sandbox and a visible warning.
     """
     force = _unsafe_opt_in()
+    if hosted_console():
+        # A hosted console runs pull-request code only in Contree. No local bubblewrap, no unsandboxed opt-in.
+        if contree_usable(session_token):
+            return ConsoleRunPlan(["--sandbox-backend", "contree", "--require-contree"],
+                                  "using Contree sandboxes", False, None)
+        return ConsoleRunPlan([], refusal_message(session_token), True, None)
     if contree_usable(session_token):
         if force:
             return ConsoleRunPlan(
@@ -698,11 +704,36 @@ def _contree_sdk_installed() -> bool:
     return True
 
 
+CONTREE_UNAVAILABLE = "Contree unavailable"
+
+
+def hosted_console(env=None) -> bool:
+    """True for a hosted console: POC_HOSTED=1 (set as a server setting on a hosted deploy), Render, or a Space,
+    and never a single-user Codespace. There, pull-request code runs only in Contree and a check refuses with
+    'Contree unavailable' when Contree cannot start. A local console keeps its bubblewrap default."""
+    from poc import console_auth, spaces_host
+    env = os.environ if env is None else env
+    if console_auth.single_user_requested(env):
+        return False
+    flag = str(env.get("POC_HOSTED") or "").strip().lower() in ("1", "true", "yes")
+    return flag or console_auth.on_render(env) or spaces_host.on_spaces(env)
+
+
 def refusal_message(session_token: str | None = None) -> str:
     """Plain words for a check refused because no sandbox can start. Never asks for a field already given.
 
     Only this session's typed values count; the server's environment is never described as "your key"."""
     key, project = contree_credentials(session_token)
+    if hosted_console():
+        prefix = f"{CONTREE_UNAVAILABLE} (could not verify; no pull-request code was run): "
+        if key and project:
+            return prefix + ("your Nebius key and project ID are set, but Contree could not start. "
+                             "Try again in a moment.")
+        if project and not key:
+            return prefix + "add your Nebius API key so the Contree sandbox can start."
+        if key and not project:
+            return prefix + "add your Nebius project ID."
+        return prefix + "add your Nebius API key and Nebius project ID so the check can run in Contree."
     if key and project:
         if not _contree_sdk_installed():
             return ("No sandbox available: your Nebius key and project ID are set, but the Contree software is not "

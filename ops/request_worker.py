@@ -224,12 +224,14 @@ def default_check_argv(python: str, root: Path, pr_url: str) -> list[str]:
     """The normal check for a pull request a person submitted.
 
     Sandboxed, with the advisory swarm on, and with related public bug reports
-    as quoted background. No unsandboxed switch. A study run and a benchmark run
-    do not use this command, so their default stays off.
+    as quoted background. No unsandboxed switch. Pull-request code runs only in Contree;
+    if Contree cannot start the check stops with 'Contree unavailable' (could not verify).
+    A study run and a benchmark run do not use this command, so their default stays off.
     """
     from poc import related_reports
+    from poc.github_app import CONTREE_FLAGS
     return [python, str(root / "ops" / "daily_run.py"), "--swarm",
-            *related_reports.product_flags(), "--pr", pr_url]
+            *related_reports.product_flags(), *CONTREE_FLAGS, "--pr", pr_url]
 
 
 def already_said(comments: list[str], marker: str) -> bool:
