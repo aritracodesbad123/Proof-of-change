@@ -1725,6 +1725,8 @@ def _product_plan(a, rec: dict, repo: str, cfg: dict, checkouts, pypi=None, pyth
                 + "); setup was read from main's copy and applied the same on both sides.")
         block["notes"] = demo_helper._unique([*(block.get("notes") or []), line])
         demo_helper.announce([line])
+    if product:
+        _repo_crawl(rec, repo, plan, main_dir)
     demo_helper.attach_plan(rec, plan)
     demo_helper.announce(plan.get("lines") or [])
     from poc import run_progress
@@ -1749,6 +1751,37 @@ def _product_plan(a, rec: dict, repo: str, cfg: dict, checkouts, pypi=None, pyth
     return plan
 
 
+def _repo_crawl(rec: dict, repo: str, plan: dict, main_dir, crawl_fn=None, extract_fn=None) -> dict:
+    """Product checks only: crawl the PR's own repository (at the base commit) and its docs site with Tavily before
+    any install. Kept steps go first into the sandbox install. Tavily unavailable stops the check."""
+    from poc import demo_helper, run_progress, tavily_crawl
+    run_progress.emit("setup_lookup", detail="Crawling this repository's own setup, contributing and CI pages")
+    base = str((rec.get("pr") or {}).get("base_sha") or "")
+    try:
+        got = tavily_crawl.crawl_repo(repo, base, main_dir, crawl_fn=crawl_fn, extract_fn=extract_fn)
+    except Exception as exc:  # noqa: BLE001 — the message is redacted below; the check stops, it never crashes
+        got = {"ok": False, "stop": True, "steps": [], "shell": "", "calls": 0, "credits": 0.0,
+               "pages_crawled": [], "pages_extracted": [], "errors": [],
+               "stop_reason": f"{tavily_crawl.UNAVAILABLE}: {type(exc).__name__}"}
+    got = demo_helper.redact_obj(got)
+    stored = {k: v for k, v in got.items() if k != "context"}
+    stored["applied_in_sandbox"] = bool(got.get("shell")) and not got.get("stop")
+    stored["used_steps"] = [s for s in got.get("steps") or [] if s.get("used")]
+    rec.setdefault("demo_helper", {})["repo_crawl"] = stored
+    plan["crawl_context"] = got.get("context") or ""
+    if got.get("stop"):
+        plan["crawl_stop"] = got.get("stop_reason") or tavily_crawl.UNAVAILABLE
+        plan.setdefault("lines", []).append(f"Setup plan: stopped: {plan['crawl_stop']}")
+        return stored
+    plan["crawl_shell"] = got.get("shell") or ""
+    used = stored["used_steps"]
+    plan.setdefault("lines", []).append(
+        f"Repository crawl: {len(got.get('pages_crawled') or [])} page(s) crawled, "
+        f"{len(got.get('pages_extracted') or [])} read in full, {len(used)} setup step(s) used first in the sandbox "
+        f"({got.get('calls', 0)} Tavily call(s), {got.get('credits', 0)} credit(s)).")
+    return stored
+
+
 def _check_python(a, plan) -> str:
     """Python for this check only. A switch is not written back onto the runner."""
     switch = ((plan or {}).get("python") or {}).get("switch")
@@ -1761,7 +1794,7 @@ def _groups_blocked(a, plan) -> str:
     if not product_route(a):
         return ""
     plan = plan or {}
-    return str(plan.get("groups_blocked") or plan.get("scope_blocked") or "")
+    return str(plan.get("crawl_stop") or plan.get("groups_blocked") or plan.get("scope_blocked") or "")
 
 
 def _install_with_helper(a, rec, step, venv, checkout, chosen, log, timeout, constraints, extra_reqs, python=None,
@@ -2016,7 +2049,8 @@ def _retry_setup_gap(a, rec, repo, prdir, venvs: dict, rerun, recheck_coverage=N
         rec, rerun, install_one, declared, tavily.get("text") or "", demo_helper.fetch_pypi, repo,
         lookup=lookup, recheck_coverage=recheck_coverage,
         project_text=_INSTALL_DOCS.get(_batch_key(repo, rec), ""),
-        declared_urls=_DECLARED_URLS.get(_batch_key(repo, rec), []), log_dir=prdir)
+        declared_urls=_DECLARED_URLS.get(_batch_key(repo, rec), []), log_dir=prdir,
+        crawl_context=str(plan.get("crawl_context") or ""), product_repair=True)
 
 
 def _install_system_package(rec, name, run_side) -> bool:
@@ -2728,7 +2762,7 @@ def _contree_ready() -> bool:
 
 
 def _maybe_prepare_contree(a, repo: str, main_sha: str, pr_sha: str, rec: dict, timeout: int,
-                           extra_shell: str = "", main_dir=None) -> str | None:
+                           extra_shell: str = "", main_dir=None, module: str = "") -> str | None:
     """Build Contree main/PR checkpoints for source-pair. On failure return a refusal; there is no local bubblewrap
     fallback (no pull-request code runs). Returns None when the check may continue.
 
@@ -2748,7 +2782,7 @@ def _maybe_prepare_contree(a, repo: str, main_sha: str, pr_sha: str, rec: dict, 
         rec["sandbox_backend"] = "contree"
         rec["sandbox_backend_note"] = contree_sandboxes.note()
         if product_route(a):
-            return _check_contree_pythons(sess, rec, main_dir)
+            return _check_contree_pythons(sess, rec, main_dir) or _check_own_checkout(sess, rec, module)
         return None
     except contree_sandboxes.ContreeError as e:
         contree_sandboxes.clear_session()
@@ -2768,6 +2802,47 @@ def own_index_refusal(a, cnv: str | None, *checkouts) -> str | None:
         return cnv
     found = [f for c in checkouts if c is not None for f in demo_helper.own_index_config(c)]
     return demo_helper.own_index_reason(list(dict.fromkeys(found))) if found else cnv
+
+
+OWN_CHECKOUT_ROOT = "/work/src"
+
+
+def own_checkout_problem(side: str, module: str, path: str) -> str:
+    """The plain could-not-verify reason when a side imports the package from outside its own checkout, else ""."""
+    path = (path or "").strip()
+    if not path:
+        return ""
+    if path == OWN_CHECKOUT_ROOT or path.startswith(OWN_CHECKOUT_ROOT + "/"):
+        return ""
+    return (f"could not verify: on the {side} side the tests imported {module} from a separately installed copy "
+            f"({path}), not from the pull request's own checkout, so the change was not what was tested")
+
+
+def _check_own_checkout(sess, rec: dict, module: str) -> str | None:
+    """Product checks: from the directory the tests run in, import the package on each side and read its __file__.
+    A copy outside the checkout caps the check at could not verify. A module that does not import is recorded only."""
+    from poc import contree_sandboxes
+    module = str(module or "").strip()
+    out: dict = {"module": module, "checkout": OWN_CHECKOUT_ROOT}
+    rec.setdefault("contree", {})["own_checkout"] = out
+    if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_.]*", module):
+        out["status"] = "not checked: no importable package name"
+        return None
+    code = f"import importlib,os;m=importlib.import_module({module!r});print(os.path.realpath(m.__file__ or ''))"
+    problems = []
+    for side in ("main", "pr"):
+        try:
+            raw = sess.run_argv(side, ["python", "-c", code], timeout=120, cwd=OWN_CHECKOUT_ROOT)
+        except contree_sandboxes.ContreeError as e:
+            raw = {"exit_code": None, "stderr": type(e).__name__}
+        lines = [x.strip() for x in str(raw.get("stdout") or "").splitlines() if x.strip()]
+        path = lines[-1] if raw.get("exit_code") == 0 and lines else ""
+        out[side] = path or "not importable"
+        why = own_checkout_problem(side, module, path)
+        if why:
+            problems.append(why)
+    out["status"] = "outside the checkout" if problems else "ok"
+    return problems[0] if problems else None
 
 
 def _check_contree_pythons(sess, rec: dict, main_dir) -> str | None:
@@ -4455,7 +4530,8 @@ def _contree_only_pair(a, rec: dict, repo: str, cfg: dict, item: dict, sp: dict,
         rec["contree_only"]["note"] = "Contree mode: Contree did not run, so nothing from the pull request was run"
         return None, blocked, None, targets
     cnv = _maybe_prepare_contree(a, repo, sp["main_sha"], sp["pr_sha"], rec, a.build_timeout,
-                                 extra_shell=contree_only_extra_shell(decl, optional, base), main_dir=cm)
+                                 extra_shell=contree_only_extra_shell(decl, optional, base), main_dir=cm,
+                                 module=cfg.get("pkg") or "")
     cnv = own_index_refusal(a, cnv, cm, cp)
     cmp = ex = None
     if cnv:
@@ -4948,6 +5024,9 @@ def test_source_pair(repo: str, cfg: dict, item: dict, prdir: Path, work: Path, 
         vm, vp = work / "venv-main", work / "venv-pr"
         cm, cp = work / "side-main", work / "side-pr"
         setup_plan = _product_plan(a, rec, repo, cfg, [cm, cp], out_dir=prdir) if helper_on else None
+        if _groups_blocked(a, setup_plan) and (setup_plan or {}).get("crawl_stop"):
+            rec["verdict"], rec["reason"], _ = verdict_for(None, str(setup_plan["crawl_stop"]))
+            return rec
         py = _check_python(a, setup_plan)
         extra = list(setup_plan["extra_reqs"]) if setup_plan and setup_plan.get("extra_reqs") else None
         run_progress.emit("install_main", detail="installing main side")
@@ -5019,9 +5098,10 @@ def test_source_pair(repo: str, cfg: dict, item: dict, prdir: Path, work: Path, 
                 if helper_on:
                     shell = demo_helper.contree_shell(setup_plan) if setup_plan else ""
                     cnv = _maybe_prepare_contree(a, repo, sp["main_sha"], sp["pr_sha"], rec, a.build_timeout,
-                                                 extra_shell=shell, main_dir=cm)
+                                                 extra_shell=shell, main_dir=cm, module=cfg.get("pkg") or "")
                 else:
-                    cnv = _maybe_prepare_contree(a, repo, sp["main_sha"], sp["pr_sha"], rec, a.build_timeout, main_dir=cm)
+                    cnv = _maybe_prepare_contree(a, repo, sp["main_sha"], sp["pr_sha"], rec, a.build_timeout, main_dir=cm,
+                                                 module=cfg.get("pkg") or "")
                 cnv = own_index_refusal(a, cnv, cm, cp)
             if cnv:
                 pass

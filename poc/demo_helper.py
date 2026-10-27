@@ -1587,6 +1587,34 @@ def failure_line(text: str) -> str:
     return lines[0][:300] if lines else ""
 
 
+_BANNER = re.compile(r"^(?:[=_\-*!#~ ]{3,}.*|.*[=_\-]{5,}\s*$|(?:short test summary info|errors?|"
+                     r"interrupted:.*|collected \d+ items?.*|ImportError while loading conftest.*|"
+                     r"ImportError while importing test module.*|Hint: make sure.*|Traceback \(most recent call last\):)"
+                     r")$", re.IGNORECASE)
+_ERROR_LINE = re.compile(r"(?:^E\s+|^)(?:[\w.]+(?:Error|Exception|Conflict)\b|error:|ERROR: (?!collecting)|"
+                         r"No matching distribution|Could not find a version)", re.IGNORECASE)
+
+
+def real_error_line(text: str) -> str:
+    """The specific error line behind a setup or collection failure, never a pytest or pip banner.
+
+    Prefers an ``E   SomeError: ...`` line, then any line naming an error type or a pip error, then the per-run
+    lookup line. Banner lines (``==== ERRORS ====``, "ImportError while loading conftest", a bare "Traceback") are
+    skipped. Product checks send this line to the repair lookup."""
+    lines = [line.rstrip() for line in (text or "").splitlines() if line.strip()]
+    plain = [line.strip() for line in lines]
+    for raw, line in zip(lines, plain):
+        if raw.lstrip().startswith("E ") and _ERROR_LINE.search(line[1:].strip()) and not _BANNER.match(line[1:].strip()):
+            return line[1:].strip()[:300]
+    for line in plain:
+        if _BANNER.match(line):
+            continue
+        if _ERROR_LINE.search(line):
+            return line[:300]
+    picked = failure_line(text)
+    return "" if _BANNER.match(picked or "") else picked
+
+
 def trusted_url(url: str, repo: str, declared_urls=()) -> bool:
     """Rule (a): install steps come only from the project's own GitHub repository (not its whole organisation),
     its GitHub Pages site for that repository, or a homepage or docs site the project itself declares.
@@ -2002,6 +2030,9 @@ def contree_shell(plan: dict | None) -> str:
     if not plan:
         return ""
     lines = []
+    crawled = str(plan.get("crawl_shell") or "").strip()
+    if crawled:   # product checks only: the repository's own crawled steps run first
+        lines.append(crawled)
     wanted = (plan.get("python") or {}).get("provision")
     if wanted and re.fullmatch(r"\d+\.\d+", str(wanted)) and (plan.get("python") or {}).get("switch") is None:
         lines.append(contree_python_shell(str(wanted)))
@@ -2926,7 +2957,8 @@ def retry_unverified_study(rec: dict, rerun, install_one, declared, tavily_text:
 def retry_unverified(rec: dict, rerun, install_one, declared, tavily_text: str, pypi, repo: str,
                      allow_system: bool = False, install_system=None, lookup=None, recheck_coverage=None,
                      max_tries: int = MAX_GAP_TRIES, declared_urls=(), apt_check=None,
-                     project_text: str = "", log_dir=None) -> dict:
+                     project_text: str = "", log_dir=None, crawl_context: str = "",
+                     product_repair: bool = False) -> dict:
     """Up to ``max_tries`` reruns when a could-not-verify result is a setup or import gap.
 
     Each try: look the error up (Tavily, when a lookup is given), install the fix on main and pr, rerun the step.
@@ -2963,9 +2995,18 @@ def retry_unverified(rec: dict, rerun, install_one, declared, tavily_text: str, 
     reran = False
     lookup_text = tavily_text or ""
     tried: set[str] = set()
+    if product_repair and crawl_context:
+        lookup_text = lookup_text + "\n" + crawl_context
     for attempt in range(1, max(0, max_tries) + 1):
         name = gap_name(text)
-        query = f"{repo} {name} install {failure_line(text)}"[:380]
+        if product_repair:
+            # The real error line, never a banner, and a different angle on each try so all tries are used.
+            err = real_error_line(text) or name
+            angle = ("install" if attempt == 1 else "development setup test dependencies" if attempt == 2
+                     else "contributing guide run tests")
+            query = f"{repo} {err} {angle}"[:380]
+        else:
+            query = f"{repo} {name} install {failure_line(text)}"[:380]
         looked = False
         sources: list[str] = []
         if lookup is not None:
@@ -2983,6 +3024,7 @@ def retry_unverified(rec: dict, rerun, install_one, declared, tavily_text: str, 
         specs = [spec for spec in specs if norm(req_name(spec["requirement"])) not in tried]
         tried.update(norm(req_name(spec["requirement"])) for spec in specs)
         entry = {"try": attempt, "problem": name, "lookup": query if looked else None, "sources": sources,
+                 **({"error_line": real_error_line(text)} if product_repair else {}),
                  "planned": [spec["requirement"] for spec in specs], "installed": [], "rerun": False}
         # A missing library, header or build tool stops here on every sandbox, including Contree.
         if not specs and is_system_failure(text):
@@ -3004,6 +3046,8 @@ def retry_unverified(rec: dict, rerun, install_one, declared, tavily_text: str, 
                 entry["result"] = "nothing safe to install" if not specs else "no rerun available"
             tries.append(entry)
             _emit_retry(f"Try {attempt} of {max_tries}: {name}: {entry['result']}")
+            if product_repair and not specs and rerun is not None and attempt < max_tries:
+                continue   # product checks: ask again from another angle; every try is used
             break
         if specs is not None:
             logs = install_same(specs, install_one)
