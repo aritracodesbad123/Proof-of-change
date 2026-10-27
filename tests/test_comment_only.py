@@ -18,6 +18,7 @@ def _diff(files):
 def _run(files, title="Tidy", body="", doc_tests=None, monkeypatch=None):
     item = {"diff": _diff(files), "title": title, "body": body, "head_sha": "h" * 40, "base_sha": "b" * 40}
     reader = lambda side, path: files[path][0 if side == "base" else 1]  # noqa: E731
+    reader.name_status = lambda: [("M", p) for p in files]
     monkeypatch.setattr(dr, "finish", lambda rec, *a, **k: rec)
     rec = {}
     a = argparse.Namespace()
@@ -199,3 +200,13 @@ def test_pinned_files_disagreeing_with_name_status_takes_normal_path(monkeypatch
 def test_pinned_without_pinned_diff_takes_normal_path(monkeypatch):
     head = "def f(x):\n    # add one to x\n    return x + 1\n\n\ny = 2\n"
     assert _pinned(monkeypatch, {"pkg/m.py": (BASE, head)}, "", ["pkg/m.py"], ignored=False) is None
+
+
+def test_classify_without_name_status_takes_normal_path():
+    head = "def f(x):\n    # add one to x\n    return x + 1\n\n\ny = 2\n"
+    diff = _diff({"pkg/m.py": (BASE, head)})
+    reader = lambda side, path: BASE if side == "base" else head  # noqa: E731
+    assert co.classify(diff, reader) is None
+    assert co.classify(diff, reader, None) is None
+    assert co.classify(diff, reader, []) is None
+    assert co.classify(diff, reader, [("M", "pkg/m.py")])["kind"] == "comment_only"

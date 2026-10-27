@@ -149,7 +149,7 @@ def parse_name_status(raw: bytes) -> list:
 
 def classify(diff: str, read: Callable[[str, str], "bytes | str | None"], names: list | None = None) -> dict | None:
     """read(side, path) returns the file bytes (or text) on "base" or "head", or None when it cannot be read.
-    names, when given, is the changed-file list from the pinned clone: [(status, path)]. Any listed file that the
+    names is the changed-file list from the pinned clone: [(status, path)]. Any listed file that the
     diff does not account for, or a status other than M for code, sends the PR to the normal check.
 
     Returns {"kind": "comment_only"|"docstring_only", "comments": {path: lines}, "docstrings": {...},
@@ -157,12 +157,11 @@ def classify(diff: str, read: Callable[[str, str], "bytes | str | None"], names:
     files = split_diff(diff)
     if not files:
         return None
-    if names is not None:
-        if not names or {p for _, p in names} != set(files):
-            return None
-        for st, path in names:
-            if st != "M" and files[path]["status"] == "modified":
-                files[path]["status"] = "renamed" if st in "RC" else {"A": "added", "D": "deleted"}.get(st, "other")
+    if not names or {p for _, p in names} != set(files):
+        return None   # no name-status file list (or it disagrees with the diff): normal check
+    for st, path in names:
+        if st != "M" and files[path]["status"] == "modified":
+            files[path]["status"] = "renamed" if st in "RC" else {"A": "added", "D": "deleted"}.get(st, "other")
     comments, docstrings, docs = {}, {}, {}
     for path, info in files.items():
         if info["status"] == "binary":
