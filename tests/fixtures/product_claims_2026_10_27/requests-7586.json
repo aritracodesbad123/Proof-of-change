@@ -1,0 +1,679 @@
+{
+ "comparison_executed": {
+  "main": 216,
+  "pr": 218
+ },
+ "pr": {
+  "base_sha": "f361ead047be5cb873174218582f7d8b9fcd9f49",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "9820a0c297d4c3e3f7359b617b5082f24c63c79e",
+  "merge_commit": null,
+  "number": 7586,
+  "repo": "psf/requests",
+  "tested_main_sha": "f361ead047be5cb873174218582f7d8b9fcd9f49",
+  "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)",
+  "title": "fix: honor ports in IPv4 no_proxy entries",
+  "url": "https://github.com/psf/requests/pull/7586"
+ },
+ "probes": {
+  "items": [
+   {
+    "about": "Test IPv4 with port matching and plain IPv4/CIDR preservation",
+    "claims": [
+     {
+      "covers": [
+       "C1.ipv4_with_port.match"
+      ],
+      "expect": "differs",
+      "id": "C1",
+      "source": "PR description",
+      "text": "The PR makes `no_proxy` honor IPv4 entries that include a port (e.g., `192.168.0.1:5000`)."
+     },
+     {
+      "covers": [
+       "C2.plain_ipv4.match",
+       "C2.cidr.match"
+      ],
+      "expect": "same",
+      "id": "C2",
+      "source": "PR description",
+      "text": "Plain IPv4 addresses and CIDR ranges in `no_proxy` continue to match as before."
+     },
+     {
+      "covers": [
+       "C3.ipv4_with_port_specific_port.match"
+      ],
+      "expect": "differs",
+      "id": "C3",
+      "source": "PR description",
+      "text": "After the change, a request to `http://192.168.0.1:5000/` will bypass the proxy when `NO_PROXY` contains `192.168.0.1:5000`."
+     },
+     {
+      "covers": [
+       "C4.ipv4_with_port_different_port.match"
+      ],
+      "expect": "differs",
+      "id": "C4",
+      "source": "PR description",
+      "text": "After the change, a request to `http://192.168.0.1:6000/` will NOT bypass the proxy when `NO_PROXY` contains `192.168.0.1:5000`."
+     }
+    ],
+    "id": "model-probe1",
+    "observations": [
+     {
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"C1.ipv4_with_port.match\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"C1.ipv4_with_port.match\""
+       }
+      },
+      "claim": "C1",
+      "diffs": [
+       {
+        "field": "",
+        "main": false,
+        "pr": true
+       }
+      ],
+      "label": "proven",
+      "main": false,
+      "name": "C1.ipv4_with_port.match",
+      "pr": true,
+      "state": "differs"
+     },
+     {
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"C2.cidr.match\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"C2.cidr.match\""
+       }
+      },
+      "claim": "C2",
+      "label": "proven",
+      "main": true,
+      "name": "C2.cidr.match",
+      "pr": true,
+      "state": "same"
+     },
+     {
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-main-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"C2.plain_ipv4.match\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"C2.plain_ipv4.match\""
+       }
+      },
+      "claim": "C2",
+      "label": "proven",
+      "main": true,
+      "name": "C2.plain_ipv4.match",
+      "pr": true,
+      "state": "same"
+     },
+     {
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-main-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"C3.ipv4_with_port_specific_port.match\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"C3.ipv4_with_port_specific_port.match\""
+       }
+      },
+      "claim": "C3",
+      "diffs": [
+       {
+        "field": "",
+        "main": false,
+        "pr": true
+       }
+      ],
+      "label": "proven",
+      "main": false,
+      "name": "C3.ipv4_with_port_specific_port.match",
+      "pr": true,
+      "state": "differs"
+     },
+     {
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-main-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"C4.ipv4_with_port_different_port.match\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"C4.ipv4_with_port_different_port.match\""
+       }
+      },
+      "claim": "C4",
+      "label": "needs_human",
+      "main": false,
+      "name": "C4.ipv4_with_port_different_port.match",
+      "pr": false,
+      "state": "same"
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-probe1-main-1.jsonl",
+      "probe-model-probe1-main-2.jsonl",
+      "probe-model-probe1-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-probe1-pr-1.jsonl",
+      "probe-model-probe1-pr-2.jsonl",
+      "probe-model-probe1-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "C1.ipv4_with_port.match": false,
+       "C2.cidr.match": true,
+       "C2.plain_ipv4.match": true,
+       "C3.ipv4_with_port_specific_port.match": false,
+       "C4.ipv4_with_port_different_port.match": false
+      },
+      {
+       "C1.ipv4_with_port.match": false,
+       "C2.cidr.match": true,
+       "C2.plain_ipv4.match": true,
+       "C3.ipv4_with_port_specific_port.match": false,
+       "C4.ipv4_with_port_different_port.match": false
+      },
+      {
+       "C1.ipv4_with_port.match": false,
+       "C2.cidr.match": true,
+       "C2.plain_ipv4.match": true,
+       "C3.ipv4_with_port_specific_port.match": false,
+       "C4.ipv4_with_port_different_port.match": false
+      }
+     ],
+     "pr": [
+      {
+       "C1.ipv4_with_port.match": true,
+       "C2.cidr.match": true,
+       "C2.plain_ipv4.match": true,
+       "C3.ipv4_with_port_specific_port.match": true,
+       "C4.ipv4_with_port_different_port.match": false
+      },
+      {
+       "C1.ipv4_with_port.match": true,
+       "C2.cidr.match": true,
+       "C2.plain_ipv4.match": true,
+       "C3.ipv4_with_port_specific_port.match": true,
+       "C4.ipv4_with_port_different_port.match": false
+      },
+      {
+       "C1.ipv4_with_port.match": true,
+       "C2.cidr.match": true,
+       "C2.plain_ipv4.match": true,
+       "C3.ipv4_with_port_specific_port.match": true,
+       "C4.ipv4_with_port_different_port.match": false
+      }
+     ]
+    },
+    "source": "model",
+    "target": "psf/requests#7586"
+   },
+   {
+    "about": "Public functions touched by the PR, called with type-appropriate inputs on both sides.",
+    "claims": [],
+    "id": "diff-api",
+    "observations": [
+     {
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"requests.utils.should_bypass_proxies.input0\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"requests.utils.should_bypass_proxies.input0\""
+       }
+      },
+      "claim": null,
+      "label": "no_difference",
+      "main": {
+       "raises": "AttributeError"
+      },
+      "name": "requests.utils.should_bypass_proxies.input0",
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "state": "same"
+     },
+     {
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"requests.utils.should_bypass_proxies.input1\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"requests.utils.should_bypass_proxies.input1\""
+       }
+      },
+      "claim": null,
+      "label": "no_difference",
+      "main": true,
+      "name": "requests.utils.should_bypass_proxies.input1",
+      "pr": true,
+      "state": "same"
+     },
+     {
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"requests.utils.should_bypass_proxies.input10\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"requests.utils.should_bypass_proxies.input10\""
+       }
+      },
+      "claim": null,
+      "label": "no_difference",
+      "main": true,
+      "name": "requests.utils.should_bypass_proxies.input10",
+      "pr": true,
+      "state": "same"
+     },
+     {
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"requests.utils.should_bypass_proxies.input11\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"requests.utils.should_bypass_proxies.input11\""
+       }
+      },
+      "claim": null,
+      "label": "no_difference",
+      "main": true,
+      "name": "requests.utils.should_bypass_proxies.input11",
+      "pr": true,
+      "state": "same"
+     },
+     {
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"requests.utils.should_bypass_proxies.input2\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"requests.utils.should_bypass_proxies.input2\""
+       }
+      },
+      "claim": null,
+      "label": "no_difference",
+      "main": {
+       "raises": "AttributeError"
+      },
+      "name": "requests.utils.should_bypass_proxies.input2",
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "state": "same"
+     },
+     {
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"requests.utils.should_bypass_proxies.input3\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"requests.utils.should_bypass_proxies.input3\""
+       }
+      },
+      "claim": null,
+      "label": "no_difference",
+      "main": {
+       "raises": "AttributeError"
+      },
+      "name": "requests.utils.should_bypass_proxies.input3",
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "state": "same"
+     },
+     {
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 7,
+        "quote": "\"observation\": \"requests.utils.should_bypass_proxies.input4\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 7,
+        "quote": "\"observation\": \"requests.utils.should_bypass_proxies.input4\""
+       }
+      },
+      "claim": null,
+      "label": "no_difference",
+      "main": true,
+      "name": "requests.utils.should_bypass_proxies.input4",
+      "pr": true,
+      "state": "same"
+     },
+     {
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 8,
+        "quote": "\"observation\": \"requests.utils.should_bypass_proxies.input5\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 8,
+        "quote": "\"observation\": \"requests.utils.should_bypass_proxies.input5\""
+       }
+      },
+      "claim": null,
+      "label": "no_difference",
+      "main": {
+       "raises": "AttributeError"
+      },
+      "name": "requests.utils.should_bypass_proxies.input5",
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "state": "same"
+     },
+     {
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 9,
+        "quote": "\"observation\": \"requests.utils.should_bypass_proxies.input6\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 9,
+        "quote": "\"observation\": \"requests.utils.should_bypass_proxies.input6\""
+       }
+      },
+      "claim": null,
+      "label": "no_difference",
+      "main": true,
+      "name": "requests.utils.should_bypass_proxies.input6",
+      "pr": true,
+      "state": "same"
+     },
+     {
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 10,
+        "quote": "\"observation\": \"requests.utils.should_bypass_proxies.input7\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 10,
+        "quote": "\"observation\": \"requests.utils.should_bypass_proxies.input7\""
+       }
+      },
+      "claim": null,
+      "label": "no_difference",
+      "main": {
+       "raises": "AttributeError"
+      },
+      "name": "requests.utils.should_bypass_proxies.input7",
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "state": "same"
+     },
+     {
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 11,
+        "quote": "\"observation\": \"requests.utils.should_bypass_proxies.input8\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 11,
+        "quote": "\"observation\": \"requests.utils.should_bypass_proxies.input8\""
+       }
+      },
+      "claim": null,
+      "label": "no_difference",
+      "main": true,
+      "name": "requests.utils.should_bypass_proxies.input8",
+      "pr": true,
+      "state": "same"
+     },
+     {
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 12,
+        "quote": "\"observation\": \"requests.utils.should_bypass_proxies.input9\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 12,
+        "quote": "\"observation\": \"requests.utils.should_bypass_proxies.input9\""
+       }
+      },
+      "claim": null,
+      "label": "no_difference",
+      "main": true,
+      "name": "requests.utils.should_bypass_proxies.input9",
+      "pr": true,
+      "state": "same"
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-diff-api-main-1.jsonl",
+      "probe-diff-api-main-2.jsonl",
+      "probe-diff-api-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-diff-api-pr-1.jsonl",
+      "probe-diff-api-pr-2.jsonl",
+      "probe-diff-api-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "requests.utils.should_bypass_proxies.input0": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.should_bypass_proxies.input1": true,
+       "requests.utils.should_bypass_proxies.input10": true,
+       "requests.utils.should_bypass_proxies.input11": true,
+       "requests.utils.should_bypass_proxies.input2": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.should_bypass_proxies.input3": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.should_bypass_proxies.input4": true,
+       "requests.utils.should_bypass_proxies.input5": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.should_bypass_proxies.input6": true,
+       "requests.utils.should_bypass_proxies.input7": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.should_bypass_proxies.input8": true,
+       "requests.utils.should_bypass_proxies.input9": true
+      },
+      {
+       "requests.utils.should_bypass_proxies.input0": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.should_bypass_proxies.input1": true,
+       "requests.utils.should_bypass_proxies.input10": true,
+       "requests.utils.should_bypass_proxies.input11": true,
+       "requests.utils.should_bypass_proxies.input2": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.should_bypass_proxies.input3": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.should_bypass_proxies.input4": true,
+       "requests.utils.should_bypass_proxies.input5": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.should_bypass_proxies.input6": true,
+       "requests.utils.should_bypass_proxies.input7": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.should_bypass_proxies.input8": true,
+       "requests.utils.should_bypass_proxies.input9": true
+      },
+      {
+       "requests.utils.should_bypass_proxies.input0": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.should_bypass_proxies.input1": true,
+       "requests.utils.should_bypass_proxies.input10": true,
+       "requests.utils.should_bypass_proxies.input11": true,
+       "requests.utils.should_bypass_proxies.input2": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.should_bypass_proxies.input3": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.should_bypass_proxies.input4": true,
+       "requests.utils.should_bypass_proxies.input5": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.should_bypass_proxies.input6": true,
+       "requests.utils.should_bypass_proxies.input7": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.should_bypass_proxies.input8": true,
+       "requests.utils.should_bypass_proxies.input9": true
+      }
+     ],
+     "pr": [
+      {
+       "requests.utils.should_bypass_proxies.input0": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.should_bypass_proxies.input1": true,
+       "requests.utils.should_bypass_proxies.input10": true,
+       "requests.utils.should_bypass_proxies.input11": true,
+       "requests.utils.should_bypass_proxies.input2": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.should_bypass_proxies.input3": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.should_bypass_proxies.input4": true,
+       "requests.utils.should_bypass_proxies.input5": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.should_bypass_proxies.input6": true,
+       "requests.utils.should_bypass_proxies.input7": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.should_bypass_proxies.input8": true,
+       "requests.utils.should_bypass_proxies.input9": true
+      },
+      {
+       "requests.utils.should_bypass_proxies.input0": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.should_bypass_proxies.input1": true,
+       "requests.utils.should_bypass_proxies.input10": true,
+       "requests.utils.should_bypass_proxies.input11": true,
+       "requests.utils.should_bypass_proxies.input2": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.should_bypass_proxies.input3": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.should_bypass_proxies.input4": true,
+       "requests.utils.should_bypass_proxies.input5": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.should_bypass_proxies.input6": true,
+       "requests.utils.should_bypass_proxies.input7": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.should_bypass_proxies.input8": true,
+       "requests.utils.should_bypass_proxies.input9": true
+      },
+      {
+       "requests.utils.should_bypass_proxies.input0": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.should_bypass_proxies.input1": true,
+       "requests.utils.should_bypass_proxies.input10": true,
+       "requests.utils.should_bypass_proxies.input11": true,
+       "requests.utils.should_bypass_proxies.input2": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.should_bypass_proxies.input3": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.should_bypass_proxies.input4": true,
+       "requests.utils.should_bypass_proxies.input5": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.should_bypass_proxies.input6": true,
+       "requests.utils.should_bypass_proxies.input7": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.should_bypass_proxies.input8": true,
+       "requests.utils.should_bypass_proxies.input9": true
+      }
+     ]
+    },
+    "source": "diff",
+    "target": "psf/requests#7586"
+   }
+  ],
+  "status": "ran"
+ },
+ "reason": "probe: 1 observation(s) need attention: C4.ipv4_with_port_different_port.match does not differ although the claim says it does (C4); probe: claim(s) C1, C2, C3 proven; tests: 216 test(s) ran on main, 218 on the PR; 2 new test(s) pass, 229 unchanged (13 of them skipped on both sides)",
+ "repo": "psf/requests",
+ "state": "closed",
+ "verdict": "needs_attention"
+}

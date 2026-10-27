@@ -809,6 +809,8 @@ def source_pair(repo: str, item: dict, work: Path, log: Path, python: str, timeo
     Benchmark mode (ops/bench.py) checks both sides out at pinned SHAs beforehand and passes them in item["bench_sides"]."""
     if item.get("bench_sides"):
         return item["bench_sides"]
+    if item.get("pinned_sides"):
+        return pinned_source_pair(repo, item["pinned_sides"], work, log)
     env = base_env(work / "home-git")
     src = work / "src"
     res: dict = {}
@@ -852,6 +854,67 @@ def source_pair(repo: str, item: dict, work: Path, log: Path, python: str, timeo
         rc, _ = run(["git", "-C", src, "worktree", "add", "-q", "--detach",
                     (work / f"side-{side}").resolve(), res[f"{side}_sha"]],
                     log, env=env, timeout=900)
+        if rc != 0:
+            return {"ok": False, "why": f"checkout of {side} side failed"}
+    res["ok"] = True
+    return res
+
+
+def pinned_clone(repo: str, pinned: dict, work: Path, log: Path) -> str | None:
+    """Blobless clone of the repo into work/src with both pinned commits fetched. None on success, else why."""
+    env = base_env(work / "home-git")
+    src = work / "src"
+    if (src / ".git").exists():
+        return None
+    steps = [["git", "clone", "-q", "--filter=blob:none", "--no-checkout", f"https://github.com/{repo}.git", src],
+             ["git", "-C", src, "fetch", "-q", "origin", pinned["main"], pinned["pr"]]]
+    for c in steps:
+        rc, _ = run(c, log, env=env, timeout=900)
+        if rc != 0:
+            return f"git step failed ({rc}): {' '.join(map(str, c[:4]))}"
+    return None
+
+
+def apply_pinned_diff(repo: str, item: dict, pkg: str, work: Path, log: Path) -> str | None:
+    """When a check is pinned (--base-sha/--head-sha), replace the PR diff and changed-file list taken from GitHub's
+    current PR view with `git diff base_sha head_sha` from the pinned clone, so pr.diff, claims, file mapping and line
+    coverage all describe the commits actually tested. Records head_moved when the live PR head differs from the
+    pinned head. Returns None on success, else why."""
+    pinned = item["pinned_sides"]
+    why = pinned_clone(repo, pinned, work, log)
+    if why:
+        return why
+    try:
+        d = subprocess.run(["git", "-C", str(work / "src"), "diff", "--no-color", "--no-ext-diff",
+                            pinned["main"], pinned["pr"]], capture_output=True, text=True, timeout=600,
+                           env=base_env(work / "home-git"))
+    except (OSError, subprocess.TimeoutExpired) as e:
+        return f"git diff of pinned commits failed: {e}"
+    if d.returncode != 0:
+        return f"git diff of pinned commits failed ({d.returncode})"
+    item["github_diff_ignored"] = True
+    item["diff"] = d.stdout
+    item["files"] = classify_files(diff_files(d.stdout), pkg)
+    item["diff_source"] = "git diff base_sha head_sha (pinned commits)"
+    live = item.get("current_head_sha")
+    item["head_moved"] = bool(live) and live != pinned["pr"]
+    return None
+
+
+def pinned_source_pair(repo: str, pinned: dict, work: Path, log: Path) -> dict:
+    """Both sides at the exact commits a benchmark case file pins (--base-sha / --head-sha): main = base_sha,
+    PR = head_sha. No base-branch tip, merge ref or merge-base is looked up, so a case keeps testing the commits it
+    was written for after upstream moves on."""
+    env = base_env(work / "home-git")
+    src = work / "src"
+    why = pinned_clone(repo, pinned, work, log)
+    if why:
+        return {"ok": False, "why": why}
+    res = {"comparison_basis": "pinned base vs pinned PR head (benchmark case file)",
+           "main_sha": pinned["main"], "pr_sha": pinned["pr"], "pinned": True}
+    for side in ("main", "pr"):
+        rc, _ = run(["git", "-C", src, "worktree", "add", "-q", "--detach",
+                    (work / f"side-{side}").resolve(), res[f"{side}_sha"]], log, env=env, timeout=900)
         if rc != 0:
             return {"ok": False, "why": f"checkout of {side} side failed"}
     res["ok"] = True
@@ -2798,8 +2861,18 @@ def contree_only_extra_shell(declared: list[str], optional: list[str], base: str
     return "\n".join(lines)
 
 
+def repo_addopts_flag(keep: bool) -> str:
+    """Shell form of the addopts override. A product check keeps the repository's own pytest addopts (for example
+    a plugin it loads with ``-p``); the study route blanks them as before."""
+    return "" if keep else "-o addopts= "
+
+
+def repo_addopts_args(keep: bool) -> list[str]:
+    return [] if keep else ["-o", "addopts="]
+
+
 def _contree_pytest_once(side: str, targets: list[str], test_timeout: int, run_timeout: int,
-                         workers: str, jx: Path, lg: Path) -> tuple[int | str, float]:
+                         workers: str, jx: Path, lg: Path, keep_addopts: bool = False) -> tuple[int | str, float]:
     """One Contree disposable pytest; junit+log written locally from the remote shell output."""
     from poc import contree_sandboxes
     sess = contree_sandboxes.session()
@@ -2809,13 +2882,13 @@ def _contree_pytest_once(side: str, targets: list[str], test_timeout: int, run_t
     shell = (
         "set +e\ncd /work/src\n"
         f"python -m pytest {tg} -p no:cacheprovider -q -rfE --timeout={int(test_timeout)} "
-        f"-o addopts= -o junit_family=xunit2 --junitxml=/tmp/poc-junit.xml {nflag}"
+        f"{repo_addopts_flag(keep_addopts)}-o junit_family=xunit2 --junitxml=/tmp/poc-junit.xml {nflag}"
         ">/tmp/poc-pytest.log 2>&1\n"
         "ec=$?\n"
         "if grep -q 'different tests were collected' /tmp/poc-pytest.log 2>/dev/null && "
         f"[ {shlex.quote(workers)} != 0 ]; then\n"
         f"  python -m pytest {tg} -p no:cacheprovider -q -rfE --timeout={int(test_timeout)} "
-        "-o addopts= -o junit_family=xunit2 --junitxml=/tmp/poc-junit.xml "
+        f"{repo_addopts_flag(keep_addopts)}-o junit_family=xunit2 --junitxml=/tmp/poc-junit.xml "
         ">/tmp/poc-pytest.log 2>&1\n  ec=$?\nfi\n"
         "printf '___POC_EXIT___%s\\n' \"$ec\"\n"
         "printf '___POC_JUNIT___\\n'\ncat /tmp/poc-junit.xml 2>/dev/null\n"
@@ -2843,7 +2916,8 @@ def _contree_pytest_once(side: str, targets: list[str], test_timeout: int, run_t
 
 
 def run_tests(side_venvs: dict, targets_by_side: dict, rdir: Path, workdir: Path, runs: int, workers: str,
-              test_timeout: int, run_timeout: int, cwds: dict | None = None) -> tuple[list[dict], dict]:
+              test_timeout: int, run_timeout: int, cwds: dict | None = None,
+              keep_addopts: bool = False) -> tuple[list[dict], dict]:
     """targets are relative to site-packages (nightly routes) or to the side's checkout (cwds given).
     per_run entries use the shared schema shape (side old/new, all counts present).
     When a Contree session with main/PR checkpoints is active, pytest runs remotely (source-pair)."""
@@ -2871,10 +2945,11 @@ def run_tests(side_venvs: dict, targets_by_side: dict, rdir: Path, workdir: Path
                 run_progress.emit("pytest", "code", f"after run {i}/{runs}")
                 continue
             if use_contree:
-                rc, secs = _contree_pytest_once(side, tg, test_timeout, run_timeout, workers, jx, lg)
+                rc, secs = _contree_pytest_once(side, tg, test_timeout, run_timeout, workers, jx, lg, keep_addopts)
             else:
                 cmd = [venv / "bin/python", "-m", "pytest", *tg, "-p", "no:cacheprovider", "-q", "-rfE",
-                       f"--timeout={test_timeout}", "-o", "addopts=", "-o", "junit_family=xunit2", f"--junitxml={jin}"]
+                       f"--timeout={test_timeout}", *repo_addopts_args(keep_addopts), "-o", "junit_family=xunit2",
+                       f"--junitxml={jin}"]
                 if workers != "0":
                     cmd += ["-n", workers]
                 rc, secs = run(cmd, lg, cwd=(cwds[side] if cwds else side_cwd(venv)), env=envs[side],
@@ -2942,7 +3017,7 @@ def coverage_run(item: dict, venv: Path, main_root: Path, pr_root: Path, targets
     oin = side_out(venv) / out.name
     base = cwd or pr_root
     cmd = [venv / "bin/python", "-m", "pytest", *[str(base / t) for t in targets], "-p", "no:cacheprovider", "-q",
-           f"--timeout={a.test_timeout}", "-o", "addopts=", *[f"--cov={s}" for s in sorted(sources)],
+           f"--timeout={a.test_timeout}", *repo_addopts_args(product_route(a)), *[f"--cov={s}" for s in sorted(sources)],
            f"--cov-report=json:{oin}"]
     if a.workers != "0":
         cmd += ["-n", a.workers]
@@ -3081,7 +3156,7 @@ def contree_coverage_run(item: dict, main_root: Path, pr_root: Path, targets: li
     shell = (
         "set +e\ncd /work/src\n"
         f"python -m pytest {tg} -p no:cacheprovider -q --timeout={int(a.test_timeout)} "
-        f"-o addopts= {nflag}{cov} --cov-report=json:/tmp/poc-cov.json "
+        f"{repo_addopts_flag(product_route(a))}{nflag}{cov} --cov-report=json:/tmp/poc-cov.json "
         ">/tmp/poc-cov-pytest.log 2>&1\n"
         "ec=$?\n"
         "printf '___POC_EXIT___%s\\n' \"$ec\"\n"
@@ -3541,6 +3616,7 @@ def verdict_for(cmp: dict | None, cnv_reason: str | None, exits: dict | None = N
         return (Verdict.COULD_NOT_VERIFY.value,
                 "unsupported: main and PR sides are the same commit, so nothing was compared; "
                 "a docstring-only result cannot be claimed", ["identical_sides"])
+    hygiene = (probe_results or {}).get("claim_hygiene") if isinstance(probe_results, dict) else None
     probe_results = probe_items(probe_results, baseline)
     v, reason, fl = with_probes(cmp, cnv_reason, exits, files, probe_results)
     if uses(baseline, "claim_flags") and claims and v == Verdict.VERIFIED.value and not behaviour_claims.probe_covers(
@@ -3561,6 +3637,22 @@ def verdict_for(cmp: dict | None, cnv_reason: str | None, exits: dict | None = N
         return (Verdict.COULD_NOT_VERIFY.value,
                 f"could not verify: claim(s) {shown}{extra} expect a difference but no observation matches ({reason})",
                 fl + ["unmatched_differs_claim"])
+    advisory = sorted({str(it.get("id")) for it in (probe_results or {}).get("items") or []
+                       for o in it.get("observations") or [] if o.get("advisory")})
+    if advisory and v == Verdict.VERIFIED.value:
+        # A claim-less probe saw a difference nobody claimed. It does not raise needs attention, but it is
+        # unexplained, so the PR cannot be verified either.
+        return (Verdict.COULD_NOT_VERIFY.value,
+                f"could not verify: probe(s) {', '.join(advisory)} have no linked claims and saw a difference no "
+                f"claim covers, so the change is not confirmed ({reason})", fl + ["advisory_unclaimed_difference"])
+    if hygiene and hygiene.get("held_back") and v == Verdict.VERIFIED.value:
+        return (Verdict.COULD_NOT_VERIFY.value,
+                f"could not verify: claim(s) {', '.join(hygiene['held_back'][:4])} expect a difference but no "
+                f"observation matches ({reason})", fl + ["unmatched_differs_claim"])
+    if hygiene and hygiene.get("dropped_flagged") and v == Verdict.VERIFIED.value:
+        from poc import claim_hygiene
+        return (Verdict.COULD_NOT_VERIFY.value, f"could not verify: {claim_hygiene.note_text(hygiene)} ({reason})",
+                fl + ["dropped_flagged_probe"])
     return v, reason, fl
 
 
@@ -3787,6 +3879,8 @@ def plan_probes(repo: str, item: dict, rec: dict, base_root: Path, pr_roots: lis
             note["model_claims"] = res.get("claims", [])
             note["model_rejected_claims"] = res.get("rejected_claims", [])
             note["errors"] += res.get("errors", [])
+            if res.get("loose_quote_matches"):   # product checks: quotes matched after removing Markdown marks
+                note["model_loose_quote_matches"] = res["loose_quote_matches"]
             if res.get("rewritten_imports"):   # product checks: src/ layout imports rewritten to the installed name
                 note["rewritten_imports"] = res["rewritten_imports"]
             plan += [{"path": x["path"], "source": "model", "freeze": x["freeze"],
@@ -4181,7 +4275,7 @@ def new_record(repo: str, cfg: dict, item: dict, a, machine: dict, run_date: str
     if getattr(a, "invocation", None):
         rec["tested_invocation"] = a.invocation
     stamp_model_use(rec, a)
-    for k in ("head_moved", "current_head_sha", "frozen_from", "state", "mergeable", "mergeable_state"):
+    for k in ("head_moved", "current_head_sha", "diff_source", "frozen_from", "state", "mergeable", "mergeable_state"):
         if item.get(k) is not None:
             rec[k] = item[k]
     return rec
@@ -4253,6 +4347,12 @@ def settle_probes(rec: dict) -> None:
     if not pr or not pr.get("items"):
         return
     from poc import probe_adequacy
+    if rec.get("product_check"):   # product route only: the study route keeps the model's claims as written
+        from poc import claim_hygiene
+        pr = claim_hygiene.apply(pr)
+        note = claim_hygiene.note_text(pr.get("claim_hygiene"))
+        if note:
+            rec["claim_hygiene_note"] = note
     rec["probes"] = probes.apply_status(pr)
     rec["probe_changed_line_coverage"] = probe_adequacy.summary(rec["probes"]["items"])
 
@@ -4318,7 +4418,7 @@ def execute_tests(rec: dict, venvs: dict, targets: dict, prdir: Path, work: Path
     A failure that then shows the same exception on the base side is recorded as the backend, not as a pull-request
     finding (verdict could_not_verify when that is the only finding)."""
     per_run, results = run_tests(venvs, targets, prdir, work, a.runs, a.workers, a.test_timeout, a.run_timeout,
-                                 cwds=cwds)
+                                 cwds=cwds, keep_addopts=product_route(a))
     cmp, cnv, ex = finalize_tests(rec, per_run, results, a)
     if not cmp:
         return cmp, cnv, ex
@@ -4334,7 +4434,7 @@ def execute_tests(rec: dict, venvs: dict, targets: dict, prdir: Path, work: Path
         return cmp, cnv, ex
     rec["test_extras"] = list(dict.fromkeys([*(rec.get("test_extras") or []), *wheels]))
     per_run, results = run_tests(venvs, targets, prdir, work, a.runs, a.workers, a.test_timeout, a.run_timeout,
-                                 cwds=cwds)
+                                 cwds=cwds, keep_addopts=product_route(a))
     cmp, cnv, ex = finalize_tests(rec, per_run, results, a)
     if not cmp:
         return cmp, cnv, ex
@@ -4434,7 +4534,8 @@ def _contree_only_pair(a, rec: dict, repo: str, cfg: dict, item: dict, sp: dict,
     else:
         run_progress.emit("pytest", "code", "dual-run pytest on main and PR (Contree)")
         per_run, results = run_tests({"main": vm, "pr": vp}, targets, prdir, work, a.runs, a.workers,
-                                     a.test_timeout, a.run_timeout, cwds={"main": cm, "pr": cp})
+                                     a.test_timeout, a.run_timeout, cwds={"main": cm, "pr": cp},
+                                     keep_addopts=product_route(a))
         cmp, cnv, ex = finalize_tests(rec, per_run, results, a)
         if cmp:
             ex = exit_check(rec.get("per_run", []), results, cmp)
@@ -4460,6 +4561,64 @@ def _contree_only_pair(a, rec: dict, repo: str, cfg: dict, item: dict, sp: dict,
     return cmp, cnv, ex, targets
 
 
+STATE_UNREADABLE = ("refused: the pull request's state could not be read from GitHub, so it was not tested; "
+                    "a live check only tests open pull requests")
+
+
+def live_pr_refusal(repo: str, item: dict, a, gh_factory=None) -> str | None:
+    """Live checks only (console, GitHub App, request worker: ``--live-check``). Re-reads the pull request's state
+    from GitHub just before running. A closed or merged pull request, a missing state, or a failed read all refuse
+    (fail closed) with a plain reason; nothing raises. Benchmark, known-answer and replay runs never set the flag."""
+    try:
+        gh = (gh_factory or (lambda: GitHub(None, fail_fast_auth=True)))()
+        p = gh.json(f"/repos/{repo}/pulls/{item['pr']}")
+        state = p.get("state") if isinstance(p, dict) else None
+        if isinstance(p, dict) and p.get("merged_at") and state:
+            state = "merged"
+    except (KeyboardInterrupt, SystemExit):
+        raise
+    except BaseException:  # noqa: BLE001 - GitHubAuthError is a BaseException; a live check must not crash here
+        return STATE_UNREADABLE
+    if state:
+        item["state"] = state
+    return closed_pr_reason({"state": state})
+
+
+def closed_pr_reason(item: dict) -> str | None:
+    """A live check only tests an open pull request. A closed or merged one, or one with no state, is refused."""
+    state = str(item.get("state") or "").lower()
+    if not state:
+        return STATE_UNREADABLE
+    if state != "open":
+        merged = " or merged" if state == "closed" else ""
+        return (f"refused: this pull request is {state}{merged}, not open, so it was not tested; "
+                "a product check only tests open pull requests")
+    return None
+
+
+TIMING_NAMES = {"fetch_pr": "sandbox prep (checkout)", "setup_lookup": "Tavily setup lookup",
+                "setup_python": "Python setup", "install_deps": "dependency install", "install_main": "main side install",
+                "install_pr": "PR side install", "claims": "model: claims/probe writing", "pytest": "tests (both sides)",
+                "probes": "probes", "verdict": "verdict", "report": "record"}
+
+
+def step_timings(rec: dict) -> dict:
+    """Seconds per step for the record (timing only). Per-side test time comes from the saved test runs; model
+    calls from the model log when it has per-call seconds."""
+    from poc import run_progress
+    t = {TIMING_NAMES.get(k, k): v for k, v in run_progress.timings().items()}
+    side: dict[str, float] = {}
+    for e in rec.get("per_run") or []:
+        sd = {"old": "main", "new": "PR", "main": "main", "pr": "PR"}.get(e.get("side")) if isinstance(e, dict) else None
+        if sd and isinstance(e.get("seconds"), (int, float)):
+            side[sd] = side.get(sd, 0.0) + e["seconds"]
+    for k, v in side.items():
+        t[f"tests ({k} side)"] = round(v, 1)
+    for i, (task, secs) in enumerate(run_progress.model_call_timings(), 1):
+        t[f"model call {i} ({task})"] = secs
+    return t
+
+
 def product_route(a) -> bool:
     """True for a product check (console, request-a-check, Codespaces, GitHub App): a single pull request started with
     ``--product-check`` (not inferred from ``--related-reports``). False for a study run and the daily study."""
@@ -4472,15 +4631,27 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
     from poc import run_progress
     t0 = time.time()
     begin_pr(a)
+    run_progress.reset_timings()
     run_progress.emit("fetch_pr", detail=f"{repo}#{item['pr']}")
     tag = f"{cfg['pkg']}-{item['pr']}"
     prdir = rdir / tag; prdir.mkdir(parents=True, exist_ok=True)
     work = workroot / tag
     shutil.rmtree(work, ignore_errors=True); work.mkdir(parents=True)
+    pin_why = (apply_pinned_diff(repo, item, cfg["pkg"], work, prdir / "git.log")
+               if item.get("pinned_sides") else None)
     (prdir / "pr.diff").write_text(item["diff"])
     rec = new_record(repo, cfg, item, a, machine, rdir.name, run_date_for(rdir))
+    if pin_why:   # pinned commits could not be diffed: never fall back to GitHub's current PR diff
+        rec["verdict"], rec["reason"], _ = verdict_for(None, f"pinned commits unavailable: {pin_why}")
+        return finish(rec, prdir, work, t0, a)
     if product_route(a):
         rec["product_check"] = True   # coverage gate: on a product check, verified needs measured coverage
+    if product_route(a) and getattr(a, "live_check", False):
+        closed = live_pr_refusal(repo, item, a)
+        if closed:   # a live product check: refuse before any lookup, install or run
+            rec["pr_state_refusal"] = closed
+            rec["verdict"], rec["reason"], _ = verdict_for(None, closed)
+            return finish(rec, prdir, work, t0, a)
     from poc import demo_helper
     if demo_helper.active(a):
         demo_helper.begin_check(a, rec, repo, cfg.get("dist") or cfg.get("pkg"), prdir)
@@ -4739,6 +4910,8 @@ def finish(rec: dict, prdir: Path, work: Path, t0: float, runner=None) -> dict:
     if rec.get("pr_side", {}).get("build_seconds") is not None:
         rec["duration_s"]["build"] = rec["pr_side"]["build_seconds"]
     rec["cost"] = cost.take(rec["duration_s"])
+    if rec.get("product_check"):  # timing only; study records stay byte-identical
+        rec["timings"] = step_timings(rec)
     mark_bench_model_invalid(rec, runner)
     errs = check_record(rec)
     if errs:
@@ -5592,8 +5765,9 @@ def skip_unused_model(a) -> None:
         a.model_skipped = "AI calls skipped because --no-probes was set"
 
 
-def tavily_start_refusal(a, env=None) -> str | None:
-    """One line when a product check has no Tavily key. None for a study run and the daily study.
+def product_keys_start_refusal(a, env=None) -> str | None:
+    """One line when a product check is missing any of NEBIUS_API_KEY, TAVILY_API_KEY or NEBIUS_PROJECT_ID.
+    None for a study run and the daily study. Benchmark runs always pass --product-check, so they need all three.
 
     Report rebuilds and selection-only runs do not call the lookup, so they are not refused here.
     The line never contains the key.
@@ -5603,7 +5777,18 @@ def tavily_start_refusal(a, env=None) -> str | None:
     if getattr(a, "select_only", False) or getattr(a, "report_only", False):
         return None
     from poc import tavily_docs
-    return tavily_docs.missing_key_line(env)
+    e = os.environ if env is None else env
+    missing = [k for k in PRODUCT_KEYS if not str(e.get(k) or "").strip()]
+    if not missing:
+        return None
+    line = ("refusing: a product check needs NEBIUS_API_KEY, TAVILY_API_KEY and NEBIUS_PROJECT_ID; missing: "
+            + ", ".join(missing) + ".")
+    if "TAVILY_API_KEY" in missing:
+        line += " " + tavily_docs.MISSING_KEY
+    return line
+
+
+PRODUCT_KEYS = ("NEBIUS_API_KEY", "TAVILY_API_KEY", "NEBIUS_PROJECT_ID")
 
 
 def _batch_lookup(repo: str, cfg: dict) -> bool:
@@ -5769,6 +5954,13 @@ def _main(argv=None) -> int:
                          "if this flag is set on a benchmark. A product check does not start without "
                          "TAVILY_API_KEY. If this lookup fails, the reason is recorded and the reports are "
                          "left out of the write-up. The verdict is left as it was. It does not choose packages.")
+    ap.add_argument("--base-sha", default=None,
+                    help="benchmark runner only: test the main side at exactly this commit (needs --head-sha and one --pr)")
+    ap.add_argument("--head-sha", default=None,
+                    help="benchmark runner only: test the PR side at exactly this commit (needs --base-sha and one --pr)")
+    ap.add_argument("--live-check", action="store_true",
+                    help="set only by live product checks (console, GitHub App, request worker): a pull request that "
+                         "is not open, or whose state cannot be read, is refused. Benchmark and replay runs omit it.")
     ap.add_argument("--product-check", action="store_true",
                     help="set only by product routes (console, request-a-check, Codespaces, GitHub App) on a single "
                          "pull-request check: 'verified' then needs measured coverage. Ignored on a benchmark or "
@@ -5849,11 +6041,11 @@ def _main(argv=None) -> int:
         print(stop, file=sys.stderr)
         raise SystemExit(1)
     a.swarm = agents.swarm_enabled(bool(a.swarm))
-    stop = model_provider.key_refusal(a.model_provider)
+    stop = product_keys_start_refusal(a)  # product checks: all three keys, before any work
     if stop:
         print(stop, file=sys.stderr)
         raise SystemExit(1)
-    stop = tavily_start_refusal(a)
+    stop = model_provider.key_refusal(a.model_provider)
     if stop:
         print(stop, file=sys.stderr)
         raise SystemExit(1)
@@ -5895,6 +6087,10 @@ def _main(argv=None) -> int:
 
     started = now_ist()
     single = parse_pr_urls(a.pr)
+    pin_problem = pinned_args_problem(a, single)
+    if pin_problem:
+        print(pin_problem, file=sys.stderr)
+        return 2
     default_name = started.strftime("%Y-%m-%d") + (started.strftime("-check-%H%M") if single else "")
     if single and product_route(a):
         # Product checks get seconds and the first PR number, so two checks started in the same minute do not
@@ -5968,10 +6164,13 @@ def _main(argv=None) -> int:
                                  "test_deps": [], "nightly": False}
         try:
             if single:
-                chosen, sk = chosen_items(gh, repo, cfg, [{"pr": n, "head_sha": None, "install": None, "test_cmd": None}
-                                                        for n in single[repo]]), []
+                chosen, sk = chosen_items(gh, repo, cfg, [{"pr": n, "head_sha": a.head_sha, "install": None,
+                                                         "test_cmd": None} for n in single[repo]]), []
                 for c in chosen:
                     c["ci_state"], c["ci_detail"] = "not checked (single-PR check)", "checked on request with --pr"
+                    if a.base_sha:
+                        c["pinned_sides"] = {"main": a.base_sha, "pr": a.head_sha}
+                        c["base_sha"] = a.base_sha
             elif repo in chosen_prs:   # PRs chosen by name for today; selection filters do not apply
                 chosen, sk = chosen_items(gh, repo, cfg, chosen_prs[repo]), []
             elif frozen.get(repo):
@@ -6071,13 +6270,34 @@ def _main(argv=None) -> int:
     return 0 if not problems else 1
 
 
+def pinned_args_problem(a, single: dict) -> str | None:
+    """--base-sha / --head-sha come together, as full hex SHAs, with exactly one --pr."""
+    base, head = getattr(a, "base_sha", None), getattr(a, "head_sha", None)
+    if not base and not head:
+        return None
+    if not (base and head):
+        return "refusing: --base-sha and --head-sha must be given together"
+    if not all(re.fullmatch(r"[0-9a-f]{40}", x) for x in (base, head)):
+        return "refusing: --base-sha / --head-sha must be full 40-character commit SHAs"
+    if sum(len(v) for v in single.values()) != 1:
+        return "refusing: --base-sha / --head-sha need exactly one --pr"
+    return None
+
+
 def reviewer_reports(rdir: Path, a, records: list[dict], kind: str) -> None:
     """HTML/PDF/MD reviewer reports + daily SUMMARY via reports/pr_report.py (the single report generator)."""
     if not records or a.no_report:
         return
     from reports.pr_report import render_run
     out = Path(a.report_dir) if a.report_dir else REPO_ROOT / "reports" / "daily" / rdir.name
-    render_run(rdir, out, title=f"Proof-of-Change {kind}: {rdir.name}")
+    t_rep = time.time()
+    try:
+        render_run(rdir, out, title=f"Proof-of-Change {kind}: {rdir.name}")
+        print(f"report and PDF: {round(time.time() - t_rep, 1)} s", flush=True)
+    except Exception as e:  # noqa: BLE001 - reports are a view of the saved records; they never change a verdict or exit code
+        print(f"reviewer reports could not be written ({type(e).__name__}); records and verdicts are unchanged",
+              file=sys.stderr, flush=True)
+        return
     print(f"\nDONE. Open this file to read the results:\n  {out / 'SUMMARY.html'}")
 
 

@@ -1,0 +1,108 @@
+{
+ "comparison_executed": null,
+ "pr": {
+  "base_sha": "41d12cdbb4a35a7877768d93d8dc50a9117a8d8c",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "9db686b39dbf05b16e7b0c68f47dc4d20eb119d8",
+  "merge_commit": "1dacb29f71b6eccc9a9dce3c4bf97425bca0369b",
+  "number": 15265,
+  "repo": "pytest-dev/pytest",
+  "tested_main_sha": "41d12cdbb4a35a7877768d93d8dc50a9117a8d8c",
+  "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)",
+  "title": "Fix tmp path retention 14998",
+  "url": "https://github.com/pytest-dev/pytest/pull/15265"
+ },
+ "probes": {
+  "items": [
+   {
+    "about": "tmp_path fixture teardown behavior when policy='failed' and teardown fails in a dependent fixture",
+    "claims": [
+     {
+      "covers": [
+       "C1*"
+      ],
+      "expect": "differs",
+      "id": "C1",
+      "source": "PR description",
+      "text": "With tmp_path_retention_policy='failed', temporary directories are not removed when fixture setup or teardown fails."
+     },
+     {
+      "covers": [
+       "C2*"
+      ],
+      "expect": "differs",
+      "id": "C2",
+      "source": "PR description",
+      "text": "Cleanup of temporary directories is deferred until the teardown report is available, so pytest considers failures during setup, call, and teardown when deciding retention."
+     }
+    ],
+    "id": "model-p1",
+    "observations": [
+     {
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"tmp_path.retained.when_teardown_fails.policy_failed\""
+       },
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"tmp_path.retained.when_teardown_fails.policy_failed\""
+       }
+      },
+      "claim": null,
+      "label": "no_difference",
+      "main": false,
+      "name": "tmp_path.retained.when_teardown_fails.policy_failed",
+      "pr": false,
+      "state": "same"
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-p1-main-1.jsonl",
+      "probe-model-p1-main-2.jsonl",
+      "probe-model-p1-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-p1-pr-1.jsonl",
+      "probe-model-p1-pr-2.jsonl",
+      "probe-model-p1-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "tmp_path.retained.when_teardown_fails.policy_failed": false
+      },
+      {
+       "tmp_path.retained.when_teardown_fails.policy_failed": false
+      },
+      {
+       "tmp_path.retained.when_teardown_fails.policy_failed": false
+      }
+     ],
+     "pr": [
+      {
+       "tmp_path.retained.when_teardown_fails.policy_failed": false
+      },
+      {
+       "tmp_path.retained.when_teardown_fails.policy_failed": false
+      },
+      {
+       "tmp_path.retained.when_teardown_fails.policy_failed": false
+      }
+     ]
+    },
+    "source": "model",
+    "target": "pytest-dev/pytest#15265"
+   }
+  ],
+  "status": "rejected"
+ },
+ "reason": "tests produced no results on one side (collection failed; see pytest logs); rejected: claim pattern(s) C1, C2 match none of this probe's observation names, so the probe is not counted",
+ "repo": "pytest-dev/pytest",
+ "state": "open",
+ "verdict": "could_not_verify"
+}

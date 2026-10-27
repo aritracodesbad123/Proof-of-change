@@ -1,0 +1,341 @@
+{
+ "comparison_executed": {
+  "main": 83,
+  "pr": 84
+ },
+ "pr": {
+  "base_sha": "46cebbb032f920eb096efbaf23cdc6fe9dd541f7",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "3bd56b51d8b7fbaf54a8ed092ce12d2a010ae7d9",
+  "merge_commit": "17555f568f4a3598d9f52649bac8377b27006769",
+  "number": 4147,
+  "repo": "Textualize/rich",
+  "tested_main_sha": "9d8f9a372cc5916fd4781fec207ced7ddac2f08f",
+  "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)",
+  "title": "Fix adjacent tag matching in ReprHighlighter",
+  "url": "https://github.com/Textualize/rich/pull/4147"
+ },
+ "probes": {
+  "items": [
+   {
+    "about": "Check adjacent tag merging",
+    "claims": [
+     {
+      "covers": [
+       "adjacent_tag_merged"
+      ],
+      "expect": "differs",
+      "id": "C2",
+      "source": "PR description",
+      "text": "After the fix, adjacent tags are correctly handled (i.e., not merged into a single match)."
+     }
+    ],
+    "id": "model-p1",
+    "observations": [
+     {
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"adjacent_tag_merged\""
+       },
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"adjacent_tag_merged\""
+       }
+      },
+      "claim": "C2",
+      "diffs": [
+       {
+        "field": "",
+        "main": true,
+        "pr": false
+       }
+      ],
+      "label": "proven",
+      "main": true,
+      "name": "adjacent_tag_merged",
+      "pr": false,
+      "state": "differs"
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-p1-main-1.jsonl",
+      "probe-model-p1-main-2.jsonl",
+      "probe-model-p1-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-p1-pr-1.jsonl",
+      "probe-model-p1-pr-2.jsonl",
+      "probe-model-p1-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "adjacent_tag_merged": true
+      },
+      {
+       "adjacent_tag_merged": true
+      },
+      {
+       "adjacent_tag_merged": true
+      }
+     ],
+     "pr": [
+      {
+       "adjacent_tag_merged": false
+      },
+      {
+       "adjacent_tag_merged": false
+      },
+      {
+       "adjacent_tag_merged": false
+      }
+     ]
+    },
+    "source": "model",
+    "target": "Textualize/rich#4147"
+   },
+   {
+    "about": "Check non-adjacent tags not merged",
+    "claims": [
+     {
+      "covers": [
+       "adjacent_tag_merged"
+      ],
+      "expect": "same",
+      "id": "C3",
+      "source": "PR description",
+      "text": "Existing behavior for non\u2011adjacent tags is preserved."
+     }
+    ],
+    "id": "model-p2",
+    "observations": [
+     {
+      "citations": {
+       "main": {
+        "file": "probe-model-p2-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"adjacent_tag_merged\""
+       },
+       "pr": {
+        "file": "probe-model-p2-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"adjacent_tag_merged\""
+       }
+      },
+      "claim": "C3",
+      "label": "proven",
+      "main": true,
+      "name": "adjacent_tag_merged",
+      "pr": true,
+      "state": "same"
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-p2-main-1.jsonl",
+      "probe-model-p2-main-2.jsonl",
+      "probe-model-p2-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-p2-pr-1.jsonl",
+      "probe-model-p2-pr-2.jsonl",
+      "probe-model-p2-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "adjacent_tag_merged": true
+      },
+      {
+       "adjacent_tag_merged": true
+      },
+      {
+       "adjacent_tag_merged": true
+      }
+     ],
+     "pr": [
+      {
+       "adjacent_tag_merged": true
+      },
+      {
+       "adjacent_tag_merged": true
+      },
+      {
+       "adjacent_tag_merged": true
+      }
+     ]
+    },
+    "source": "model",
+    "target": "Textualize/rich#4147"
+   },
+   {
+    "about": "Regression test for adjacent tags",
+    "claims": [
+     {
+      "covers": [
+       "regression_test_pass"
+      ],
+      "expect": "same",
+      "id": "C4",
+      "source": "PR description",
+      "text": "The regression test covering adjacent tags passes."
+     }
+    ],
+    "id": "model-p3",
+    "observations": [
+     {
+      "citations": {
+       "main": {
+        "file": "probe-model-p3-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"regression_test_pass\""
+       },
+       "pr": {
+        "file": "probe-model-p3-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"regression_test_pass\""
+       }
+      },
+      "claim": "C4",
+      "diffs": [
+       {
+        "field": "",
+        "main": false,
+        "pr": true
+       }
+      ],
+      "label": "false_claim",
+      "main": false,
+      "name": "regression_test_pass",
+      "pr": true,
+      "state": "differs"
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-p3-main-1.jsonl",
+      "probe-model-p3-main-2.jsonl",
+      "probe-model-p3-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-p3-pr-1.jsonl",
+      "probe-model-p3-pr-2.jsonl",
+      "probe-model-p3-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "regression_test_pass": false
+      },
+      {
+       "regression_test_pass": false
+      },
+      {
+       "regression_test_pass": false
+      }
+     ],
+     "pr": [
+      {
+       "regression_test_pass": true
+      },
+      {
+       "regression_test_pass": true
+      },
+      {
+       "regression_test_pass": true
+      }
+     ]
+    },
+    "source": "model",
+    "target": "Textualize/rich#4147"
+   },
+   {
+    "about": "Check highlighter module imports",
+    "claims": [
+     {
+      "covers": [
+       "import_success"
+      ],
+      "expect": "same",
+      "id": "C5",
+      "source": "PR description",
+      "text": "Running the test suite for the highlighter results in 84 tests passed."
+     }
+    ],
+    "id": "model-p4",
+    "observations": [
+     {
+      "citations": {
+       "main": {
+        "file": "probe-model-p4-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"import_success\""
+       },
+       "pr": {
+        "file": "probe-model-p4-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"import_success\""
+       }
+      },
+      "claim": "C5",
+      "label": "proven",
+      "main": true,
+      "name": "import_success",
+      "pr": true,
+      "state": "same"
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-p4-main-1.jsonl",
+      "probe-model-p4-main-2.jsonl",
+      "probe-model-p4-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-p4-pr-1.jsonl",
+      "probe-model-p4-pr-2.jsonl",
+      "probe-model-p4-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "import_success": true
+      },
+      {
+       "import_success": true
+      },
+      {
+       "import_success": true
+      }
+     ],
+     "pr": [
+      {
+       "import_success": true
+      },
+      {
+       "import_success": true
+      },
+      {
+       "import_success": true
+      }
+     ]
+    },
+    "source": "model",
+    "target": "Textualize/rich#4147"
+   }
+  ],
+  "status": "ran"
+ },
+ "reason": "probe: 1 observation(s) need attention: regression_test_pass differs although the claim says it does not (C4); probe: claim(s) C2, C3, C5 proven; tests: 83 test(s) ran on main, 84 on the PR; 1 new test(s) pass, 83 unchanged",
+ "repo": "Textualize/rich",
+ "state": "open",
+ "verdict": "needs_attention"
+}

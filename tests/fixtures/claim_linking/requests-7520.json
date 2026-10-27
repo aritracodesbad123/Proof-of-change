@@ -1,0 +1,674 @@
+{
+ "baseline": "full",
+ "behaviour_claims": [],
+ "comparison": {
+  "environment": [],
+  "executed": {
+   "main": 216,
+   "pr": 220
+  },
+  "fixed": [],
+  "flaky": [],
+  "load_failed_both": [],
+  "load_failed_main": [],
+  "load_failed_pr": [],
+  "messages": {},
+  "new_tests_failing": [],
+  "new_tests_passing": 5,
+  "new_tests_skipped": [],
+  "other_changes": [],
+  "pr_unstable": [],
+  "pr_unstable_noisy": [],
+  "preexisting_failures": [],
+  "regressions": [],
+  "removed_tests": [],
+  "reparametrized": [
+   {
+    "added_ids": [
+     "tests.test_utils::test_parse_header_links[-expected8]",
+     "tests.test_utils::test_parse_header_links[<http:/.../front.jpeg>; title=\"a,<b\",<http://.../back.jpeg>;-expected7]",
+     "tests.test_utils::test_parse_header_links[<http:/.../front.jpeg>; title=\"a,<b\"; rel=\"next\"-expected6]",
+     "tests.test_utils::test_parse_header_links[<http:/.../front.jpeg>; title=\"a=b\"; rel=\"next\"-expected4]",
+     "tests.test_utils::test_parse_header_links[<http:/.../front.jpeg>; title=\"a=b;c\"; rel=\"next\"-expected5]"
+    ],
+    "removed_ids": [
+     "tests.test_utils::test_parse_header_links[-expected4]"
+    ],
+    "test": "tests.test_utils::test_parse_header_links"
+   }
+  ],
+  "same": 228,
+  "same_skipped_both": 13,
+  "skipped_missing_dependency": []
+ },
+ "exit_check": {
+  "detail": "all runs exited 0",
+  "explained": true,
+  "problems": []
+ },
+ "files": {
+  "all": [
+   "src/requests/utils.py",
+   "tests/test_utils.py"
+  ],
+  "compiled": [],
+  "other": [
+   "tests/test_utils.py"
+  ],
+  "package_py": [
+   "src/requests/utils.py"
+  ]
+ },
+ "model_rejected_claims": [
+  {
+   "expect": "same",
+   "id": "C1",
+   "rejected": "source_quote not found in the PR text",
+   "source_quote": "Such a value produces 3+ parts and raises ValueError: too many values to unpack, which the bare except ValueError: break swallows \u2014 silently dropping that parameter and every parameter after it in the link.",
+   "testable": true,
+   "text": "The current implementation drops a Link header parameter whose value contains '=' and also drops any subsequent parameters."
+  },
+  {
+   "expect": "differs",
+   "id": "C2",
+   "rejected": "source_quote not found in the PR text",
+   "source_quote": "param.split(\"=\") \u2192 param.split(\"=\", 1) in parse_header_links, so the value keeps its = and following parameters are preserved.",
+   "testable": true,
+   "text": "Changing the split to use maxsplit=1 preserves the '=' inside parameter values and keeps following parameters intact."
+  },
+  {
+   "expect": "differs",
+   "id": "C3",
+   "rejected": "source_quote not found in the PR text",
+   "source_quote": "Added a test_parse_header_links parametrization with a value containing = (title=\"a=b\") followed by rel=\"next\". It fails on main (both title and the trailing rel are dropped) and passes with the fix.",
+   "testable": true,
+   "text": "The added test fails on the base branch (both title and the trailing rel are dropped) and passes after applying the fix."
+  }
+ ],
+ "pr": 7520,
+ "probes": {
+  "items": [
+   {
+    "about": "src/requests/utils.py:parse_header_links",
+    "claims": [],
+    "id": "model-probe1",
+    "observations": [
+     {
+      "claim": null,
+      "label": "no_difference",
+      "main": "[]",
+      "name": "test_empty.output",
+      "pr": "[]",
+      "state": "same"
+     },
+     {
+      "claim": null,
+      "diffs": [
+       {
+        "field": "",
+        "main": "[{'url': 'http://example.com/1', 'rel': 'next'}, {'url': 'http://example.com/2', 'rel': 'prev'}]",
+        "pr": "[{'url': 'http://example.com/1', 'rel': 'next', 'title': 'a=b'}, {'url': 'http://example.com/2', 'rel': 'prev'}]"
+       }
+      ],
+      "label": "unmentioned",
+      "main": "[{'url': 'http://example.com/1', 'rel': 'next'}, {'url': 'http://example.com/2', 'rel': 'prev'}]",
+      "name": "test_multiple_links.output",
+      "pr": "[{'url': 'http://example.com/1', 'rel': 'next', 'title': 'a=b'}, {'url': 'http://example.com/2', 'rel': 'prev'}]",
+      "state": "differs"
+     },
+     {
+      "claim": null,
+      "label": "no_difference",
+      "main": "[{'url': 'http://example.com', 'rel': 'next'}]",
+      "name": "test_simple.output",
+      "pr": "[{'url': 'http://example.com', 'rel': 'next'}]",
+      "state": "same"
+     },
+     {
+      "claim": null,
+      "diffs": [
+       {
+        "field": "",
+        "main": "[{'url': 'http://example.com'}]",
+        "pr": "[{'url': 'http://example.com', 'title': 'a=b', 'rel': 'next'}]"
+       }
+      ],
+      "label": "unmentioned",
+      "main": "[{'url': 'http://example.com'}]",
+      "name": "test_value_with_equals.output",
+      "pr": "[{'url': 'http://example.com', 'title': 'a=b', 'rel': 'next'}]",
+      "state": "differs"
+     },
+     {
+      "claim": null,
+      "diffs": [
+       {
+        "field": "",
+        "main": "[{'url': 'http://example.com'}]",
+        "pr": "[{'url': 'http://example.com', 'title': 'a=b', 'rel': 'next', 'type': 'text/html'}]"
+       }
+      ],
+      "label": "unmentioned",
+      "main": "[{'url': 'http://example.com'}]",
+      "name": "test_value_with_equals_and_following_param.output",
+      "pr": "[{'url': 'http://example.com', 'title': 'a=b', 'rel': 'next', 'type': 'text/html'}]",
+      "state": "differs"
+     }
+    ],
+    "probe_changed_line_coverage": {
+     "adequacy": "adequate",
+     "changed_lines_covered": 4,
+     "changed_lines_total": 4,
+     "data": "probe-cov-model-probe1.json",
+     "exit": 0,
+     "files": [
+      {
+       "changed_lines_covered": 4,
+       "changed_lines_total": 4,
+       "file": "src/requests/utils.py"
+      }
+     ],
+     "note": "ran 4 of 4 changed line(s) on the main side",
+     "status": "measured",
+     "where": "contree"
+    },
+    "runs": {
+     "main": [
+      {
+       "test_empty.output": "[]",
+       "test_multiple_links.output": "[{'url': 'http://example.com/1', 'rel': 'next'}, {'url': 'http://example.com/2', 'rel': 'prev'}]",
+       "test_simple.output": "[{'url': 'http://example.com', 'rel': 'next'}]",
+       "test_value_with_equals.output": "[{'url': 'http://example.com'}]",
+       "test_value_with_equals_and_following_param.output": "[{'url': 'http://example.com'}]"
+      },
+      {
+       "test_empty.output": "[]",
+       "test_multiple_links.output": "[{'url': 'http://example.com/1', 'rel': 'next'}, {'url': 'http://example.com/2', 'rel': 'prev'}]",
+       "test_simple.output": "[{'url': 'http://example.com', 'rel': 'next'}]",
+       "test_value_with_equals.output": "[{'url': 'http://example.com'}]",
+       "test_value_with_equals_and_following_param.output": "[{'url': 'http://example.com'}]"
+      },
+      {
+       "test_empty.output": "[]",
+       "test_multiple_links.output": "[{'url': 'http://example.com/1', 'rel': 'next'}, {'url': 'http://example.com/2', 'rel': 'prev'}]",
+       "test_simple.output": "[{'url': 'http://example.com', 'rel': 'next'}]",
+       "test_value_with_equals.output": "[{'url': 'http://example.com'}]",
+       "test_value_with_equals_and_following_param.output": "[{'url': 'http://example.com'}]"
+      }
+     ],
+     "pr": [
+      {
+       "test_empty.output": "[]",
+       "test_multiple_links.output": "[{'url': 'http://example.com/1', 'rel': 'next', 'title': 'a=b'}, {'url': 'http://example.com/2', 'rel': 'prev'}]",
+       "test_simple.output": "[{'url': 'http://example.com', 'rel': 'next'}]",
+       "test_value_with_equals.output": "[{'url': 'http://example.com', 'title': 'a=b', 'rel': 'next'}]",
+       "test_value_with_equals_and_following_param.output": "[{'url': 'http://example.com', 'title': 'a=b', 'rel': 'next', 'type': 'text/html'}]"
+      },
+      {
+       "test_empty.output": "[]",
+       "test_multiple_links.output": "[{'url': 'http://example.com/1', 'rel': 'next', 'title': 'a=b'}, {'url': 'http://example.com/2', 'rel': 'prev'}]",
+       "test_simple.output": "[{'url': 'http://example.com', 'rel': 'next'}]",
+       "test_value_with_equals.output": "[{'url': 'http://example.com', 'title': 'a=b', 'rel': 'next'}]",
+       "test_value_with_equals_and_following_param.output": "[{'url': 'http://example.com', 'title': 'a=b', 'rel': 'next', 'type': 'text/html'}]"
+      },
+      {
+       "test_empty.output": "[]",
+       "test_multiple_links.output": "[{'url': 'http://example.com/1', 'rel': 'next', 'title': 'a=b'}, {'url': 'http://example.com/2', 'rel': 'prev'}]",
+       "test_simple.output": "[{'url': 'http://example.com', 'rel': 'next'}]",
+       "test_value_with_equals.output": "[{'url': 'http://example.com', 'title': 'a=b', 'rel': 'next'}]",
+       "test_value_with_equals_and_following_param.output": "[{'url': 'http://example.com', 'title': 'a=b', 'rel': 'next', 'type': 'text/html'}]"
+      }
+     ]
+    },
+    "source": "model",
+    "status": "ran",
+    "target": "psf/requests#7520"
+   },
+   {
+    "about": "Public functions touched by the PR, called with type-appropriate inputs on both sides.",
+    "claims": [],
+    "id": "diff-api",
+    "observations": [
+     {
+      "claim": null,
+      "label": "no_difference",
+      "main": {
+       "repr": "{'User-Agent': 'python-requests/2.34.2', 'Accept-Encoding': 'gzip, deflate, br', 'Accept': '*/*', 'Connection': 'keep-alive'}",
+       "type": "CaseInsensitiveDict"
+      },
+      "name": "requests.utils.default_headers.input0",
+      "pr": {
+       "repr": "{'User-Agent': 'python-requests/2.34.2', 'Accept-Encoding': 'gzip, deflate, br', 'Accept': '*/*', 'Connection': 'keep-alive'}",
+       "type": "CaseInsensitiveDict"
+      },
+      "state": "same"
+     },
+     {
+      "claim": null,
+      "label": "no_difference",
+      "main": {
+       "raises": "AttributeError"
+      },
+      "name": "requests.utils.parse_header_links.input0",
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "state": "same"
+     },
+     {
+      "claim": null,
+      "label": "no_difference",
+      "main": {
+       "raises": "AttributeError"
+      },
+      "name": "requests.utils.parse_header_links.input1",
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "state": "same"
+     },
+     {
+      "claim": null,
+      "label": "no_difference",
+      "main": {
+       "raises": "AttributeError"
+      },
+      "name": "requests.utils.parse_header_links.input10",
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "state": "same"
+     },
+     {
+      "claim": null,
+      "label": "no_difference",
+      "main": {
+       "raises": "AttributeError"
+      },
+      "name": "requests.utils.parse_header_links.input11",
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "state": "same"
+     },
+     {
+      "claim": null,
+      "label": "no_difference",
+      "main": {
+       "raises": "AttributeError"
+      },
+      "name": "requests.utils.parse_header_links.input2",
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "state": "same"
+     },
+     {
+      "claim": null,
+      "label": "no_difference",
+      "main": {
+       "raises": "AttributeError"
+      },
+      "name": "requests.utils.parse_header_links.input3",
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "state": "same"
+     },
+     {
+      "claim": null,
+      "label": "no_difference",
+      "main": [
+       {
+        "url": "abc"
+       }
+      ],
+      "name": "requests.utils.parse_header_links.input4",
+      "pr": [
+       {
+        "url": "abc"
+       }
+      ],
+      "state": "same"
+     },
+     {
+      "claim": null,
+      "label": "no_difference",
+      "main": {
+       "raises": "AttributeError"
+      },
+      "name": "requests.utils.parse_header_links.input5",
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "state": "same"
+     },
+     {
+      "claim": null,
+      "label": "no_difference",
+      "main": {
+       "raises": "AttributeError"
+      },
+      "name": "requests.utils.parse_header_links.input6",
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "state": "same"
+     },
+     {
+      "claim": null,
+      "label": "no_difference",
+      "main": {
+       "raises": "AttributeError"
+      },
+      "name": "requests.utils.parse_header_links.input7",
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "state": "same"
+     },
+     {
+      "claim": null,
+      "label": "no_difference",
+      "main": {
+       "raises": "AttributeError"
+      },
+      "name": "requests.utils.parse_header_links.input8",
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "state": "same"
+     },
+     {
+      "claim": null,
+      "label": "no_difference",
+      "main": [],
+      "name": "requests.utils.parse_header_links.input9",
+      "pr": [],
+      "state": "same"
+     }
+    ],
+    "probe_changed_line_coverage": {
+     "adequacy": "adequate",
+     "changed_lines_covered": 4,
+     "changed_lines_total": 4,
+     "data": "probe-cov-diff-api.json",
+     "exit": 0,
+     "files": [
+      {
+       "changed_lines_covered": 4,
+       "changed_lines_total": 4,
+       "file": "src/requests/utils.py"
+      }
+     ],
+     "note": "ran 4 of 4 changed line(s) on the main side",
+     "status": "measured",
+     "where": "contree"
+    },
+    "runs": {
+     "main": [
+      {
+       "requests.utils.default_headers.input0": {
+        "repr": "{'User-Agent': 'python-requests/2.34.2', 'Accept-Encoding': 'gzip, deflate, br', 'Accept': '*/*', 'Connection': 'keep-alive'}",
+        "type": "CaseInsensitiveDict"
+       },
+       "requests.utils.parse_header_links.input0": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.parse_header_links.input1": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.parse_header_links.input10": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.parse_header_links.input11": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.parse_header_links.input2": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.parse_header_links.input3": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.parse_header_links.input4": [
+        {
+         "url": "abc"
+        }
+       ],
+       "requests.utils.parse_header_links.input5": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.parse_header_links.input6": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.parse_header_links.input7": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.parse_header_links.input8": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.parse_header_links.input9": []
+      },
+      {
+       "requests.utils.default_headers.input0": {
+        "repr": "{'User-Agent': 'python-requests/2.34.2', 'Accept-Encoding': 'gzip, deflate, br', 'Accept': '*/*', 'Connection': 'keep-alive'}",
+        "type": "CaseInsensitiveDict"
+       },
+       "requests.utils.parse_header_links.input0": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.parse_header_links.input1": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.parse_header_links.input10": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.parse_header_links.input11": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.parse_header_links.input2": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.parse_header_links.input3": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.parse_header_links.input4": [
+        {
+         "url": "abc"
+        }
+       ],
+       "requests.utils.parse_header_links.input5": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.parse_header_links.input6": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.parse_header_links.input7": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.parse_header_links.input8": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.parse_header_links.input9": []
+      },
+      {
+       "requests.utils.default_headers.input0": {
+        "repr": "{'User-Agent': 'python-requests/2.34.2', 'Accept-Encoding': 'gzip, deflate, br', 'Accept': '*/*', 'Connection': 'keep-alive'}",
+        "type": "CaseInsensitiveDict"
+       },
+       "requests.utils.parse_header_links.input0": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.parse_header_links.input1": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.parse_header_links.input10": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.parse_header_links.input11": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.parse_header_links.input2": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.parse_header_links.input3": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.parse_header_links.input4": [
+        {
+         "url": "abc"
+        }
+       ],
+       "requests.utils.parse_header_links.input5": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.parse_header_links.input6": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.parse_header_links.input7": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.parse_header_links.input8": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.parse_header_links.input9": []
+      }
+     ],
+     "pr": [
+      {
+       "requests.utils.default_headers.input0": {
+        "repr": "{'User-Agent': 'python-requests/2.34.2', 'Accept-Encoding': 'gzip, deflate, br', 'Accept': '*/*', 'Connection': 'keep-alive'}",
+        "type": "CaseInsensitiveDict"
+       },
+       "requests.utils.parse_header_links.input0": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.parse_header_links.input1": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.parse_header_links.input10": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.parse_header_links.input11": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.parse_header_links.input2": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.parse_header_links.input3": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.parse_header_links.input4": [
+        {
+         "url": "abc"
+        }
+       ],
+       "requests.utils.parse_header_links.input5": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.parse_header_links.input6": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.parse_header_links.input7": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.parse_header_links.input8": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.parse_header_links.input9": []
+      },
+      {
+       "requests.utils.default_headers.input0": {
+        "repr": "{'User-Agent': 'python-requests/2.34.2', 'Accept-Encoding': 'gzip, deflate, br', 'Accept': '*/*', 'Connection': 'keep-alive'}",
+        "type": "CaseInsensitiveDict"
+       },
+       "requests.utils.parse_header_links.input0": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.parse_header_links.input1": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.parse_header_links.input10": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.parse_header_links.input11": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.parse_header_links.input2": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.parse_header_links.input3": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.parse_header_links.input4": [
+        {
+         "url": "abc"
+        }
+       ],
+       "requests.utils.parse_header_links.input5": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.parse_header_links.input6": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.parse_header_links.input7": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.parse_header_links.input8": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.parse_header_links.input9": []
+      },
+      {
+       "requests.utils.default_headers.input0": {
+        "repr": "{'User-Agent': 'python-requests/2.34.2', 'Accept-Encoding': 'gzip, deflate, br', 'Accept': '*/*', 'Connection': 'keep-alive'}",
+        "type": "CaseInsensitiveDict"
+       },
+       "requests.utils.parse_header_links.input0": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.parse_header_links.input1": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.parse_header_links.input10": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.parse_header_links.input11": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.parse_header_links.input2": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.parse_header_links.input3": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.parse_header_links.input4": [
+        {
+         "url": "abc"
+        }
+       ],
+       "requests.utils.parse_header_links.input5": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.parse_header_links.input6": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.parse_header_links.input7": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.parse_header_links.input8": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.parse_header_links.input9": []
+      }
+     ]
+    },
+    "source": "diff",
+    "status": "ran",
+    "target": "psf/requests#7520"
+   }
+  ]
+ },
+ "repo": "psf/requests",
+ "verdict_at_fcc3c08": "needs_attention"
+}

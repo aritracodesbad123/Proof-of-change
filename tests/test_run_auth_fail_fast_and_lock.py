@@ -111,6 +111,8 @@ PR_URL = "https://github.com/example-org/widgets/pull/7"
 def _main_env(monkeypatch, tmp_path, seen):
     """main() up to PR selection, with GitHub answering 401 to every API call."""
     monkeypatch.setenv("TAVILY_API_KEY", "test-tavily-key-for-product-checks")
+    monkeypatch.setenv("NEBIUS_API_KEY", "test-nebius-key-for-product-checks")
+    monkeypatch.setenv("NEBIUS_PROJECT_ID", "test-project-for-product-checks")
     monkeypatch.setattr(daily_run, "sync_to_origin_main", lambda *_a, **_k: "a" * 40)
     monkeypatch.setattr(daily_run, "resolve_poc_commit", lambda *_a, **_k: "a" * 40)
     monkeypatch.setattr(daily_run, "resolve_python", lambda _p: "python3")

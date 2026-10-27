@@ -1,0 +1,692 @@
+{
+ "baseline": "full",
+ "behaviour_claims": [],
+ "comparison": {
+  "environment": [],
+  "executed": {
+   "main": 51,
+   "pr": 52
+  },
+  "fixed": [],
+  "flaky": [],
+  "load_failed_both": [],
+  "load_failed_main": [],
+  "load_failed_pr": [],
+  "messages": {},
+  "new_tests_failing": [],
+  "new_tests_passing": 1,
+  "new_tests_skipped": [],
+  "other_changes": [],
+  "pr_unstable": [],
+  "pr_unstable_noisy": [],
+  "preexisting_failures": [],
+  "regressions": [],
+  "removed_tests": [],
+  "reparametrized": [],
+  "same": 51,
+  "same_skipped_both": 0,
+  "skipped_missing_dependency": []
+ },
+ "exit_check": {
+  "detail": "all runs exited 0",
+  "explained": true,
+  "problems": []
+ },
+ "files": {
+  "all": [
+   "toolz/itertoolz.py",
+   "toolz/tests/test_itertoolz.py"
+  ],
+  "compiled": [],
+  "other": [],
+  "package_py": [
+   "toolz/itertoolz.py",
+   "toolz/tests/test_itertoolz.py"
+  ]
+ },
+ "model_rejected_claims": [],
+ "pr": 650,
+ "probes": {
+  "items": [
+   {
+    "about": "Test isdistinct on reusable iterable without __len__ (should not raise TypeError)",
+    "claims": [
+     {
+      "covers": [
+       "C1"
+      ],
+      "expect": "differs",
+      "id": "C1",
+      "source": "PR description",
+      "text": "isdistinct() no longer raises TypeError for reusable iterables without a length."
+     }
+    ],
+    "id": "model-probe-c1-reusable-nolen",
+    "observations": [
+     {
+      "claim": null,
+      "diffs": [
+       {
+        "field": "",
+        "main": "TypeError",
+        "pr": true
+       }
+      ],
+      "label": "unmentioned",
+      "main": "TypeError",
+      "name": "c1.empty",
+      "pr": true,
+      "state": "differs"
+     },
+     {
+      "claim": null,
+      "diffs": [
+       {
+        "field": "",
+        "main": "TypeError",
+        "pr": false
+       }
+      ],
+      "label": "unmentioned",
+      "main": "TypeError",
+      "name": "c1.repeat",
+      "pr": false,
+      "state": "differs"
+     },
+     {
+      "claim": null,
+      "diffs": [
+       {
+        "field": "",
+        "main": "TypeError",
+        "pr": true
+       }
+      ],
+      "label": "unmentioned",
+      "main": "TypeError",
+      "name": "c1.unique",
+      "pr": true,
+      "state": "differs"
+     }
+    ],
+    "probe_changed_line_coverage": {
+     "adequacy": "adequate",
+     "changed_lines_covered": 2,
+     "changed_lines_total": 2,
+     "data": "probe-cov-model-probe-c1-reusable-nolen.json",
+     "exit": 0,
+     "files": [
+      {
+       "changed_lines_covered": 2,
+       "changed_lines_total": 2,
+       "file": "toolz/itertoolz.py"
+      }
+     ],
+     "note": "ran 2 of 2 changed line(s) on the main side",
+     "status": "measured",
+     "where": "contree"
+    },
+    "runs": {
+     "main": [
+      {
+       "c1.empty": "TypeError",
+       "c1.repeat": "TypeError",
+       "c1.unique": "TypeError"
+      },
+      {
+       "c1.empty": "TypeError",
+       "c1.repeat": "TypeError",
+       "c1.unique": "TypeError"
+      },
+      {
+       "c1.empty": "TypeError",
+       "c1.repeat": "TypeError",
+       "c1.unique": "TypeError"
+      }
+     ],
+     "pr": [
+      {
+       "c1.empty": true,
+       "c1.repeat": false,
+       "c1.unique": true
+      },
+      {
+       "c1.empty": true,
+       "c1.repeat": false,
+       "c1.unique": true
+      },
+      {
+       "c1.empty": true,
+       "c1.repeat": false,
+       "c1.unique": true
+      }
+     ]
+    },
+    "source": "model",
+    "status": "rejected",
+    "target": "pytoolz/toolz#650"
+   },
+   {
+    "about": "Test isdistinct on sized containers to ensure fast path unchanged",
+    "claims": [
+     {
+      "covers": [
+       "C2"
+      ],
+      "expect": "same",
+      "id": "C2",
+      "source": "PR description",
+      "text": "For sized containers, isdistinct() continues to use the fast path and its behavior is unchanged."
+     }
+    ],
+    "id": "model-probe-c2-sized-fastpath",
+    "observations": [
+     {
+      "claim": null,
+      "label": "no_difference",
+      "main": true,
+      "name": "c2.empty",
+      "pr": true,
+      "state": "same"
+     },
+     {
+      "claim": null,
+      "label": "no_difference",
+      "main": false,
+      "name": "c2.repeat",
+      "pr": false,
+      "state": "same"
+     },
+     {
+      "claim": null,
+      "label": "no_difference",
+      "main": true,
+      "name": "c2.unique",
+      "pr": true,
+      "state": "same"
+     }
+    ],
+    "probe_changed_line_coverage": {
+     "adequacy": "adequate",
+     "changed_lines_covered": 2,
+     "changed_lines_total": 2,
+     "data": "probe-cov-model-probe-c2-sized-fastpath.json",
+     "exit": 0,
+     "files": [
+      {
+       "changed_lines_covered": 2,
+       "changed_lines_total": 2,
+       "file": "toolz/itertoolz.py"
+      }
+     ],
+     "note": "ran 2 of 2 changed line(s) on the main side",
+     "status": "measured",
+     "where": "contree"
+    },
+    "runs": {
+     "main": [
+      {
+       "c2.empty": true,
+       "c2.repeat": false,
+       "c2.unique": true
+      },
+      {
+       "c2.empty": true,
+       "c2.repeat": false,
+       "c2.unique": true
+      },
+      {
+       "c2.empty": true,
+       "c2.repeat": false,
+       "c2.unique": true
+      }
+     ],
+     "pr": [
+      {
+       "c2.empty": true,
+       "c2.repeat": false,
+       "c2.unique": true
+      },
+      {
+       "c2.empty": true,
+       "c2.repeat": false,
+       "c2.unique": true
+      },
+      {
+       "c2.empty": true,
+       "c2.repeat": false,
+       "c2.unique": true
+      }
+     ]
+    },
+    "source": "model",
+    "status": "rejected",
+    "target": "pytoolz/toolz#650"
+   },
+   {
+    "about": "Regression tests for empty, unique, repeated values using a generator (streaming path)",
+    "claims": [
+     {
+      "covers": [
+       "C3"
+      ],
+      "expect": "same",
+      "id": "C3",
+      "source": "PR description",
+      "text": "Regression tests confirm correct behavior for empty, unique, and repeated values."
+     }
+    ],
+    "id": "model-probe-c3-regression",
+    "observations": [
+     {
+      "claim": null,
+      "label": "no_difference",
+      "main": true,
+      "name": "c3.empty",
+      "pr": true,
+      "state": "same"
+     },
+     {
+      "claim": null,
+      "label": "no_difference",
+      "main": false,
+      "name": "c3.repeat",
+      "pr": false,
+      "state": "same"
+     },
+     {
+      "claim": null,
+      "label": "no_difference",
+      "main": true,
+      "name": "c3.unique",
+      "pr": true,
+      "state": "same"
+     }
+    ],
+    "probe_changed_line_coverage": {
+     "adequacy": "adequate",
+     "changed_lines_covered": 2,
+     "changed_lines_total": 2,
+     "data": "probe-cov-model-probe-c3-regression.json",
+     "exit": 0,
+     "files": [
+      {
+       "changed_lines_covered": 2,
+       "changed_lines_total": 2,
+       "file": "toolz/itertoolz.py"
+      }
+     ],
+     "note": "ran 2 of 2 changed line(s) on the main side",
+     "status": "measured",
+     "where": "contree"
+    },
+    "runs": {
+     "main": [
+      {
+       "c3.empty": true,
+       "c3.repeat": false,
+       "c3.unique": true
+      },
+      {
+       "c3.empty": true,
+       "c3.repeat": false,
+       "c3.unique": true
+      },
+      {
+       "c3.empty": true,
+       "c3.repeat": false,
+       "c3.unique": true
+      }
+     ],
+     "pr": [
+      {
+       "c3.empty": true,
+       "c3.repeat": false,
+       "c3.unique": true
+      },
+      {
+       "c3.empty": true,
+       "c3.repeat": false,
+       "c3.unique": true
+      },
+      {
+       "c3.empty": true,
+       "c3.repeat": false,
+       "c3.unique": true
+      }
+     ]
+    },
+    "source": "model",
+    "status": "rejected",
+    "target": "pytoolz/toolz#650"
+   },
+   {
+    "about": "Public functions touched by the PR, called with type-appropriate inputs on both sides.",
+    "claims": [],
+    "id": "diff-api",
+    "observations": [
+     {
+      "claim": null,
+      "label": "no_difference",
+      "main": {
+       "raises": "TypeError"
+      },
+      "name": "toolz.itertoolz.isdistinct.input0",
+      "pr": {
+       "raises": "TypeError"
+      },
+      "state": "same"
+     },
+     {
+      "claim": null,
+      "label": "no_difference",
+      "main": {
+       "raises": "TypeError"
+      },
+      "name": "toolz.itertoolz.isdistinct.input1",
+      "pr": {
+       "raises": "TypeError"
+      },
+      "state": "same"
+     },
+     {
+      "claim": null,
+      "label": "no_difference",
+      "main": true,
+      "name": "toolz.itertoolz.isdistinct.input10",
+      "pr": true,
+      "state": "same"
+     },
+     {
+      "claim": null,
+      "label": "no_difference",
+      "main": true,
+      "name": "toolz.itertoolz.isdistinct.input11",
+      "pr": true,
+      "state": "same"
+     },
+     {
+      "claim": null,
+      "label": "no_difference",
+      "main": {
+       "raises": "TypeError"
+      },
+      "name": "toolz.itertoolz.isdistinct.input2",
+      "pr": {
+       "raises": "TypeError"
+      },
+      "state": "same"
+     },
+     {
+      "claim": null,
+      "label": "no_difference",
+      "main": {
+       "raises": "TypeError"
+      },
+      "name": "toolz.itertoolz.isdistinct.input3",
+      "pr": {
+       "raises": "TypeError"
+      },
+      "state": "same"
+     },
+     {
+      "claim": null,
+      "label": "no_difference",
+      "main": true,
+      "name": "toolz.itertoolz.isdistinct.input4",
+      "pr": true,
+      "state": "same"
+     },
+     {
+      "claim": null,
+      "label": "no_difference",
+      "main": true,
+      "name": "toolz.itertoolz.isdistinct.input5",
+      "pr": true,
+      "state": "same"
+     },
+     {
+      "claim": null,
+      "label": "no_difference",
+      "main": {
+       "raises": "TypeError"
+      },
+      "name": "toolz.itertoolz.isdistinct.input6",
+      "pr": {
+       "raises": "TypeError"
+      },
+      "state": "same"
+     },
+     {
+      "claim": null,
+      "label": "no_difference",
+      "main": {
+       "raises": "TypeError"
+      },
+      "name": "toolz.itertoolz.isdistinct.input7",
+      "pr": {
+       "raises": "TypeError"
+      },
+      "state": "same"
+     },
+     {
+      "claim": null,
+      "label": "no_difference",
+      "main": {
+       "raises": "TypeError"
+      },
+      "name": "toolz.itertoolz.isdistinct.input8",
+      "pr": {
+       "raises": "TypeError"
+      },
+      "state": "same"
+     },
+     {
+      "claim": null,
+      "label": "no_difference",
+      "main": true,
+      "name": "toolz.itertoolz.isdistinct.input9",
+      "pr": true,
+      "state": "same"
+     }
+    ],
+    "probe_changed_line_coverage": {
+     "adequacy": "adequate",
+     "changed_lines_covered": 2,
+     "changed_lines_total": 2,
+     "data": "probe-cov-diff-api.json",
+     "exit": 0,
+     "files": [
+      {
+       "changed_lines_covered": 2,
+       "changed_lines_total": 2,
+       "file": "toolz/itertoolz.py"
+      }
+     ],
+     "note": "ran 2 of 2 changed line(s) on the main side",
+     "status": "measured",
+     "where": "contree"
+    },
+    "runs": {
+     "main": [
+      {
+       "toolz.itertoolz.isdistinct.input0": {
+        "raises": "TypeError"
+       },
+       "toolz.itertoolz.isdistinct.input1": {
+        "raises": "TypeError"
+       },
+       "toolz.itertoolz.isdistinct.input10": true,
+       "toolz.itertoolz.isdistinct.input11": true,
+       "toolz.itertoolz.isdistinct.input2": {
+        "raises": "TypeError"
+       },
+       "toolz.itertoolz.isdistinct.input3": {
+        "raises": "TypeError"
+       },
+       "toolz.itertoolz.isdistinct.input4": true,
+       "toolz.itertoolz.isdistinct.input5": true,
+       "toolz.itertoolz.isdistinct.input6": {
+        "raises": "TypeError"
+       },
+       "toolz.itertoolz.isdistinct.input7": {
+        "raises": "TypeError"
+       },
+       "toolz.itertoolz.isdistinct.input8": {
+        "raises": "TypeError"
+       },
+       "toolz.itertoolz.isdistinct.input9": true
+      },
+      {
+       "toolz.itertoolz.isdistinct.input0": {
+        "raises": "TypeError"
+       },
+       "toolz.itertoolz.isdistinct.input1": {
+        "raises": "TypeError"
+       },
+       "toolz.itertoolz.isdistinct.input10": true,
+       "toolz.itertoolz.isdistinct.input11": true,
+       "toolz.itertoolz.isdistinct.input2": {
+        "raises": "TypeError"
+       },
+       "toolz.itertoolz.isdistinct.input3": {
+        "raises": "TypeError"
+       },
+       "toolz.itertoolz.isdistinct.input4": true,
+       "toolz.itertoolz.isdistinct.input5": true,
+       "toolz.itertoolz.isdistinct.input6": {
+        "raises": "TypeError"
+       },
+       "toolz.itertoolz.isdistinct.input7": {
+        "raises": "TypeError"
+       },
+       "toolz.itertoolz.isdistinct.input8": {
+        "raises": "TypeError"
+       },
+       "toolz.itertoolz.isdistinct.input9": true
+      },
+      {
+       "toolz.itertoolz.isdistinct.input0": {
+        "raises": "TypeError"
+       },
+       "toolz.itertoolz.isdistinct.input1": {
+        "raises": "TypeError"
+       },
+       "toolz.itertoolz.isdistinct.input10": true,
+       "toolz.itertoolz.isdistinct.input11": true,
+       "toolz.itertoolz.isdistinct.input2": {
+        "raises": "TypeError"
+       },
+       "toolz.itertoolz.isdistinct.input3": {
+        "raises": "TypeError"
+       },
+       "toolz.itertoolz.isdistinct.input4": true,
+       "toolz.itertoolz.isdistinct.input5": true,
+       "toolz.itertoolz.isdistinct.input6": {
+        "raises": "TypeError"
+       },
+       "toolz.itertoolz.isdistinct.input7": {
+        "raises": "TypeError"
+       },
+       "toolz.itertoolz.isdistinct.input8": {
+        "raises": "TypeError"
+       },
+       "toolz.itertoolz.isdistinct.input9": true
+      }
+     ],
+     "pr": [
+      {
+       "toolz.itertoolz.isdistinct.input0": {
+        "raises": "TypeError"
+       },
+       "toolz.itertoolz.isdistinct.input1": {
+        "raises": "TypeError"
+       },
+       "toolz.itertoolz.isdistinct.input10": true,
+       "toolz.itertoolz.isdistinct.input11": true,
+       "toolz.itertoolz.isdistinct.input2": {
+        "raises": "TypeError"
+       },
+       "toolz.itertoolz.isdistinct.input3": {
+        "raises": "TypeError"
+       },
+       "toolz.itertoolz.isdistinct.input4": true,
+       "toolz.itertoolz.isdistinct.input5": true,
+       "toolz.itertoolz.isdistinct.input6": {
+        "raises": "TypeError"
+       },
+       "toolz.itertoolz.isdistinct.input7": {
+        "raises": "TypeError"
+       },
+       "toolz.itertoolz.isdistinct.input8": {
+        "raises": "TypeError"
+       },
+       "toolz.itertoolz.isdistinct.input9": true
+      },
+      {
+       "toolz.itertoolz.isdistinct.input0": {
+        "raises": "TypeError"
+       },
+       "toolz.itertoolz.isdistinct.input1": {
+        "raises": "TypeError"
+       },
+       "toolz.itertoolz.isdistinct.input10": true,
+       "toolz.itertoolz.isdistinct.input11": true,
+       "toolz.itertoolz.isdistinct.input2": {
+        "raises": "TypeError"
+       },
+       "toolz.itertoolz.isdistinct.input3": {
+        "raises": "TypeError"
+       },
+       "toolz.itertoolz.isdistinct.input4": true,
+       "toolz.itertoolz.isdistinct.input5": true,
+       "toolz.itertoolz.isdistinct.input6": {
+        "raises": "TypeError"
+       },
+       "toolz.itertoolz.isdistinct.input7": {
+        "raises": "TypeError"
+       },
+       "toolz.itertoolz.isdistinct.input8": {
+        "raises": "TypeError"
+       },
+       "toolz.itertoolz.isdistinct.input9": true
+      },
+      {
+       "toolz.itertoolz.isdistinct.input0": {
+        "raises": "TypeError"
+       },
+       "toolz.itertoolz.isdistinct.input1": {
+        "raises": "TypeError"
+       },
+       "toolz.itertoolz.isdistinct.input10": true,
+       "toolz.itertoolz.isdistinct.input11": true,
+       "toolz.itertoolz.isdistinct.input2": {
+        "raises": "TypeError"
+       },
+       "toolz.itertoolz.isdistinct.input3": {
+        "raises": "TypeError"
+       },
+       "toolz.itertoolz.isdistinct.input4": true,
+       "toolz.itertoolz.isdistinct.input5": true,
+       "toolz.itertoolz.isdistinct.input6": {
+        "raises": "TypeError"
+       },
+       "toolz.itertoolz.isdistinct.input7": {
+        "raises": "TypeError"
+       },
+       "toolz.itertoolz.isdistinct.input8": {
+        "raises": "TypeError"
+       },
+       "toolz.itertoolz.isdistinct.input9": true
+      }
+     ]
+    },
+    "source": "diff",
+    "status": "ran",
+    "target": "pytoolz/toolz#650"
+   }
+  ]
+ },
+ "repo": "pytoolz/toolz",
+ "verdict_at_fcc3c08": "needs_attention"
+}
