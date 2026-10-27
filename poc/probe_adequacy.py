@@ -37,9 +37,11 @@ from poc.verdict import COLOUR, FindingLabel
 ADEQUATE, NOT_ADEQUATE, UNMEASURED = "adequate", "not_adequate", "unmeasured"
 
 
-def main_side_lines(main_text: str | None, pr_text: str | None) -> set[int]:
+def main_side_lines(main_text: str | None, pr_text: str | None, statement_start: bool = False) -> set[int]:
     """1-based lines of main_text that the PR replaces or deletes; for pure insertions, the main lines just before
-    and after the insertion point. None (file absent on main) -> empty set."""
+    and after the insertion point. None (file absent on main) -> empty set.
+    statement_start (product checks): each line is mapped to the first line of the main-side statement that holds
+    it (coverage_gate.statement_starts), since coverage reports a multi-line statement only at its first line."""
     if main_text is None:
         return set()
     old = main_text.splitlines()
@@ -50,7 +52,7 @@ def main_side_lines(main_text: str | None, pr_text: str | None) -> set[int]:
             out.update(range(i1 + 1, i2 + 1))
         elif tag == "insert":
             out.update(x for x in (i1, i1 + 1) if 1 <= x <= len(old))
-    return out
+    return coverage_gate.statement_starts(main_text, out) if statement_start else out
 
 
 def assess(cov: dict | None) -> dict:
