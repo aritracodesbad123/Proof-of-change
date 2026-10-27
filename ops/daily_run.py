@@ -3976,6 +3976,104 @@ def probe_coverage(item: dict, probe_results: dict | None, vm: Path, main_root: 
     return probe_adequacy.summary(items)
 
 
+def contree_probe_coverage(item: dict, probe_results: dict | None, main_root: Path, pr_root: Path, prdir: Path,
+                           a) -> dict:
+    """Probe adequacy for a Contree-only product check (the Contree twin of probe_coverage).
+
+    Each probe runs once more on the main checkpoint under coverage.py (already in the checkpoint; nothing is
+    installed here), limited to the changed files. The report is packed to a file inside Contree and fetched in
+    checksummed pieces (fetch_contree_coverage), then mapped to the main-side changed lines. Any failure (no
+    session, run error, no report, a short or corrupt fetch, a bad report) leaves that probe 'unmeasured', so the
+    cap stays."""
+    from poc import contree_sandboxes, probe_adequacy, test_settings
+    items = (probe_results or {}).get("items") or []
+    if not items:
+        return probe_adequacy.summary([])
+
+    def unmeasured(it: dict, why: str) -> None:
+        it["probe_changed_line_coverage"] = probe_adequacy.assess({"status": "not measured", "why": why})
+
+    def all_unmeasured(why: str) -> dict:
+        for it in items:
+            unmeasured(it, why)
+        return probe_adequacy.summary(items)
+
+    if getattr(a, "no_coverage", False) or _coverage_skipped_by_env():
+        return all_unmeasured("--no-coverage")
+    changed = {}
+    for rel in coverage_gate.python_sources(item["files"]):
+        old, new = Path(main_root) / rel, Path(pr_root) / rel
+        changed[rel] = probe_adequacy.main_side_lines(old.read_text(errors="replace") if old.is_file() else None,
+                                                      new.read_text(errors="replace") if new.is_file() else None)
+    if not changed:
+        return all_unmeasured("no changed non-test Python files")
+    on_main = sorted(rel for rel in changed if (Path(main_root) / rel).is_file())
+    sess = contree_sandboxes.session()
+    if sess is None or not getattr(sess, "main_uuid", None):
+        return all_unmeasured(CONTREE_ONLY_COVERAGE_WHY)
+    include = ",".join(str(PurePosixPath("/work/src") / rel) for rel in on_main)
+    want = " ".join(shlex.quote(r) for r in on_main)
+    exports = test_settings.shell_exports(_CONTREE_CHECKOUTS.get("settings"))
+    log_parts = []
+    for it in items:
+        if not on_main:
+            it["probe_changed_line_coverage"] = probe_adequacy.measure(changed, {})
+            continue
+        path = Path(it["path"]) if Path(it["path"]).is_absolute() else REPO_ROOT / it["path"]
+        if not path.is_file() and (prdir / it["path"]).is_file():
+            path = prdir / it["path"]
+        if not path.is_file():
+            unmeasured(it, "the probe file was not found for the coverage run")
+            continue
+        try:
+            timeout = int(probes.read_spec(path).get("timeout_s", 120))
+        except probes.ProbeError:
+            timeout = 120
+        remote = f"/work/probes/{path.name}"
+        shell = (
+            "set +e\ncd /work/src 2>/dev/null || cd /work\n" + exports +
+            f"python -m coverage run --data-file=/tmp/poc-probe-cov --include={shlex.quote(include)} "
+            f"{shlex.quote(remote)} >/tmp/poc-probe-cov.log 2>&1\n"
+            "ec=$?\n"
+            "python -m coverage json --data-file=/tmp/poc-probe-cov -o /tmp/poc-probe-cov.json -q "
+            ">>/tmp/poc-probe-cov.log 2>&1\n"
+            "printf '___POC_EXIT___%s\\n' \"$ec\"\n"
+            f"python -c {shlex.quote(_COV_PACK)} /tmp/poc-probe-cov.json {want} 2>/dev/null\n"
+            "printf '___POC_LOG___\\n'\ntail -c 4000 /tmp/poc-probe-cov.log 2>/dev/null\n"
+        )
+        try:
+            raw = sess.run_op("main", shell, disposable=False, timeout=timeout + int(a.run_timeout),
+                              files={remote: path})
+        except Exception as e:  # noqa: BLE001 - keep the cap instead of crashing the check
+            unmeasured(it, f"the Contree probe coverage run failed ({type(e).__name__})")
+            continue
+        raw = raw if isinstance(raw, dict) else {}
+        out = (raw.get("stdout") or "") + "\n" + (raw.get("stderr") or "")
+        log_parts.append(f"$ contree probe coverage (main) {it.get('id')}\n"
+                         + (out.split("___POC_LOG___\n", 1)[-1] if "___POC_LOG___" in out else out))
+        m = re.search(r"___POC_COV_FILE___(\d+) ([0-9a-f]{64})", out)
+        if not m:
+            unmeasured(it, f"{COV_FETCH_FAILED} (no report file was written); see probe-coverage.log")
+            continue
+        blob, why = fetch_contree_coverage(sess, raw.get("uuid") or "", int(m.group(1)), m.group(2),
+                                           int(a.run_timeout))
+        if blob is None:
+            unmeasured(it, f"{why}; see probe-coverage.log")
+            continue
+        cov_files, why = coverage_gate.parse_report(blob)
+        if cov_files is None:
+            unmeasured(it, f"{why}; see probe-coverage.log")
+            continue
+        dest = prdir / f"probe-cov-{it['id']}.json"
+        dest.write_text(blob.strip() + "\n")
+        exit_m = re.search(r"___POC_EXIT___(\S+)", out)
+        rc = int(exit_m.group(1)) if exit_m and exit_m.group(1).isdigit() else raw.get("exit_code")
+        it["probe_changed_line_coverage"] = probe_adequacy.measure(changed, cov_files) | {
+            "exit": rc, "data": dest.name, "where": "contree"}
+    (prdir / "probe-coverage.log").write_text(contree_sandboxes.redact("\n".join(log_parts)))
+    return probe_adequacy.summary(items)
+
+
 def begin_pr(a) -> None:
     """Start one pull request.
 
@@ -4328,10 +4426,14 @@ def _contree_only_pair(a, rec: dict, repo: str, cfg: dict, item: dict, sp: dict,
     rec["probes"] = run_probes(repo, item["pr"], {"main": vm / "bin/python", "pr": vp / "bin/python"}, prdir,
                                work, a, plan, pr_started)
     from poc import probe_adequacy
-    for it in (rec["probes"] or {}).get("items") or []:
-        it["probe_changed_line_coverage"] = probe_adequacy.assess(
-            {"status": "not measured", "why": "Contree-only check: probe coverage needs a local side"})
-    rec["probe_changed_line_coverage"] = probe_adequacy.summary((rec["probes"] or {}).get("items") or [])
+    if measure_coverage:  # product route: each probe runs once more on the main checkpoint under coverage
+        run_progress.emit("probes", "super", "probe coverage inside Contree")
+        rec["probe_changed_line_coverage"] = contree_probe_coverage(item, rec["probes"], cm, cp, prdir, a)
+    else:
+        for it in (rec["probes"] or {}).get("items") or []:
+            it["probe_changed_line_coverage"] = probe_adequacy.assess(
+                {"status": "not measured", "why": "Contree-only check: probe coverage needs a local side"})
+        rec["probe_changed_line_coverage"] = probe_adequacy.summary((rec["probes"] or {}).get("items") or [])
     settle_probes(rec)
     if change_is_docstring_only(rec.get("files"), cm, cp):
         rec["docstring_only"] = True
