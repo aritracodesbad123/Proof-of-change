@@ -326,6 +326,8 @@ def test_console_child_gets_past_the_operator_approval_stop(tmp_path):
     env["POC_SWARM"] = "1"
     env["POC_PROGRESS_PATH"] = str(tmp_path / "progress.jsonl")
     env["TAVILY_API_KEY"] = "test-tavily-key-for-product-checks"
+    env["NEBIUS_API_KEY"] = "test-nebius-key-for-product-checks"
+    env["NEBIUS_PROJECT_ID"] = "test-project-for-product-checks"
     # A dirty checkout stops at the git check, which runs after the operator-approval check,
     # and it keeps this test from fetching or switching branches.
     marker = ROOT / "console-job-probe.txt"
@@ -499,6 +501,8 @@ def test_github_app_and_request_a_check_stay_automatic_when_console_review_is_on
 
     monkeypatch.setattr(request_worker.subprocess, "run", fake_run)
     monkeypatch.setenv("TAVILY_API_KEY", "test-tavily-key-for-product-checks")
+    monkeypatch.setenv("NEBIUS_API_KEY", "test-nebius-key-for-product-checks")
+    monkeypatch.setenv("NEBIUS_PROJECT_ID", "test-project-for-product-checks")
     try:
         request_worker.run_check("https://github.com/me/demo/pull/8", request_worker.Settings(root=tmp_path), [])
     except Exception:

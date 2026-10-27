@@ -46,13 +46,57 @@ def _norm(s: str) -> str:
     return re.sub(r"\s+", " ", s or "").strip()
 
 
-def grounded_claims(raw: dict, title: str, body: str | None) -> tuple[list, list]:
-    """(kept, rejected): a claim is kept only if its source_quote is found in the title or description."""
+# Product checks only: a quote may lose its Markdown when the model copies it ("`a=b`" quoted as "a=b"). Only
+# PAIRED marks around a span are removed (`code`, **b**, __b__, *i*, _i_ at word boundaries); an underscore inside a
+# word is kept, so "abc" never matches "a_b_c". Dashes, arrows and quotes are unified. Study runs keep the exact match.
+_PAIRED = [re.compile(r"`([^`\n]+)`"),
+           re.compile(r"\*\*(?=\S)([^*\n]+?)(?<=\S)\*\*"),
+           re.compile(r"(?<![\w_])__(?=\S)([^_\n]+?)(?<=\S)__(?![\w_])"),
+           re.compile(r"(?<![\w*])\*(?=[^\s*])([^*\n]+?)(?<=[^\s*])\*(?![\w*])"),
+           re.compile(r"(?<![\w_])_(?=[^\s_])([^_\n]+?)(?<=[^\s_])_(?![\w_])")]
+_LOOSE_MAP = str.maketrans({"\u2010": "-", "\u2011": "-", "\u2012": "-", "\u2013": "-", "\u2014": "-",
+                            "\u2015": "-", "\u2212": "-", "\u2018": "'", "\u2019": "'", "\u201a": "'",
+                            "\u201b": "'", "\u2032": "'", "\u201c": '"', "\u201d": '"', "\u201e": '"',
+                            "\u201f": '"', "\u2033": '"', "\u2192": "->", "\u27f6": "->", "\u21d2": "=>",
+                            "\u27f9": "=>"})
+LOOSE_MIN_CHARS = 20      # a shorter quote must match exactly
+LOOSE_MIN_KEPT = 0.8      # a quote that loses more than a fifth of its characters to normalising is not matched
+
+
+def loose_norm(s: str) -> str:
+    """Whitespace collapsed, paired Markdown marks removed, dashes, arrows and quotes unified."""
+    t = _norm((s or "").translate(_LOOSE_MAP))
+    for rx in _PAIRED:
+        t = rx.sub(r"\1", t)
+    return _norm(t)
+
+
+def loose_quote_ok(quote: str) -> str | None:
+    """The normalised quote if it may be matched loosely, else None (too short, or mostly lost to normalising)."""
+    raw = _norm(quote)
+    lq = loose_norm(quote)
+    if len(lq) < LOOSE_MIN_CHARS or not raw or len(lq) < LOOSE_MIN_KEPT * len(raw):
+        return None
+    return lq
+
+
+def grounded_claims(raw: dict, title: str, body: str | None, loose: bool = False) -> tuple[list, list]:
+    """(kept, rejected): a claim is kept only if its source_quote is found in the title or description.
+
+    loose (product checks only): a quote that is not found as written is compared again after loose_norm on both
+    sides. A claim kept that way carries quote_match "loose", so the record shows every such match."""
     text = _norm(title) + " \n " + _norm(body)
+    loose_text = (loose_norm(title) + " \n " + loose_norm(body)) if loose else ""
     kept, rejected = [], []
     for c in (raw or {}).get("claims", [])[:20]:
         q = _norm(c.get("source_quote", ""))
-        ok = bool(q) and q in text and c.get("expect") in ("same", "differs") and c.get("id")
+        valid = c.get("expect") in ("same", "differs") and c.get("id")
+        ok = bool(q) and q in text and valid
+        if not ok and loose and valid:
+            lq = loose_quote_ok(c.get("source_quote", ""))
+            if lq and lq in loose_text:
+                kept.append(c | {"quote_match": "loose"})
+                continue
         (kept if ok else rejected).append(c | ({} if ok else {"rejected": "source_quote not found in the PR text"}))
     return kept, rejected
 
@@ -254,8 +298,11 @@ def generate(provider: Provider, repo: str, pr: int, title: str, body: str | Non
     except ProviderError as e:
         out["errors"].append(str(e))
         return out
-    kept, rejected = grounded_claims(raw, title, body)
+    kept, rejected = grounded_claims(raw, title, body, loose=product)
     out["claims"], out["rejected_claims"] = kept, rejected
+    loose = [{"claim": c.get("id"), "source_quote": c.get("source_quote")} for c in kept if c.get("quote_match") == "loose"]
+    if loose:
+        out["loose_quote_matches"] = loose
     testable = [c for c in kept if c.get("testable")]
     if not testable and not base_files:
         return out

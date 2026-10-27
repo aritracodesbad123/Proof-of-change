@@ -20,6 +20,7 @@ from poc import tavily_docs
 
 FLAG = "--related-reports"
 PRODUCT_CHECK_FLAG = "--product-check"   # marks a product check for the coverage cap; separate from FLAG
+LIVE_CHECK_FLAG = "--live-check"   # a live check (console, app, worker): closed or merged pull requests are refused
 REPORT_LABEL = "Background (related public bug reports, not used for the verdict)"
 FAIL_LOG = "the Tavily lookup failed"
 MAX_ITEMS = 3
@@ -37,7 +38,7 @@ def product_flags() -> list[str]:
 
     ``--product-check`` is what turns on the product coverage cap. It does not depend on ``--related-reports``,
     so dropping the bug-report lookup cannot switch the cap off."""
-    return [PRODUCT_CHECK_FLAG, FLAG]
+    return [PRODUCT_CHECK_FLAG, FLAG, LIVE_CHECK_FLAG]
 
 
 def enabled(flag: bool = False, *, bench: bool = False, single_pr: bool = True) -> bool:
