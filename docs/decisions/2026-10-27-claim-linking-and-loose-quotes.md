@@ -1,6 +1,6 @@
 # Product checks: link claim ids in code, unlinked probes are advisory, quotes grounded without Markdown
 
-**Status:** proposed
+**Status:** accepted
 
 Date: 2026-10-27. Applies to the product route only (`--product-check`). The study route is unchanged.
 
