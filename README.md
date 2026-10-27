@@ -40,6 +40,8 @@ The AI writes the claims and the checks fresh on every run. The same pull reques
 
 Tests and probes in the local sandbox have no internet. The network is on only while packages are installed. Secret keys are not given to that sandbox, and they are not placed in a Contree shell. A behaviour that needs a network service, a password or a key cannot be tested.
 
+A product check also needs `TAVILY_API_KEY` for its setup lookup, and it does not start when that key is missing or blank. On a hosted console the key is a private setting on the server, and the start form does not ask for it. A Codespace or other local run refuses with one line that names the variable. A study run does not call the lookup. The daily study skips it when the key is not set. The key is never printed. It stays with the checker and is not given to the code under test, so the limit in the previous paragraph still holds.
+
 Verified means the behaviour the change described still holds. Needs attention means the check found a difference a person should look at. Could not verify means the check cannot say whether the change is fine. Passing probes never raise the verdict. The tool never approves a pull request and never merges one. A person decides.
 
 Not built: the same-commit guard on a study run. A product check stops when main and the pull request are the same commit. A study run does not apply that guard.
@@ -90,7 +92,7 @@ This is the main link. It is the operator console in replay mode: light page, th
 
 Do not paste an email address, a key, or any private information into the issue. The issue is public.
 
-The checker on the project machine takes one request at a time. It does not start between 10:40 and 12:30 IST. It stops after five checks per day unless that limit is changed on the machine. Each of those checks runs with the advisory swarm on. A study run and a benchmark run still leave that swarm off unless the run asks. The worker reads `TAVILY_API_KEY` from that machine. When the variable is missing it logs that the lookup was skipped and still runs the check. The key value is never printed. If a study run has the machine, your request stays in the queue. If the checker has not checked in recently, a short reply says it is offline and points back at the results page. The repository needs the labels `request-a-check`, `request-running`, and `request-done` (create them once under Issues → Labels). `request-running` is on the issue while a check is in progress.
+The checker on the project machine takes one request at a time. It does not start between 10:40 and 12:30 IST. It stops after five checks per day unless that limit is changed on the machine. Each of those checks runs with the advisory swarm on. A study run and a benchmark run still leave that swarm off unless the run asks. The worker reads `TAVILY_API_KEY` from that machine. When the variable is missing or blank, the check does not start. The log is one line that names the variable. The key value is never printed. If a study run has the machine, your request stays in the queue. If the checker has not checked in recently, a short reply says it is offline and points back at the results page. The repository needs the labels `request-a-check`, `request-running`, and `request-done` (create them once under Issues → Labels). `request-running` is on the issue while a check is in progress.
 
 ### Try it yourself in a Codespace
 
@@ -104,7 +106,7 @@ A Codespace usually cannot start bubblewrap, the local safety sandbox. A live ch
    - **Pull request URL** (required).
    - **Nebius API key** (required for a live check). Without it the check is refused with "Add your Nebius API key to run a live check."; only the saved sample button runs without a key.
    - **Nebius project ID** (optional, the Contree project ID). With your key, the design runs the check in Contree sandboxes and bills that account. Running with a judge's own Nebius account is not confirmed on the live Contree service.
-   - **Tavily API key** (optional). The setup lookup needs it; without it the lookup is skipped. Tavily keys are free ([sign up](https://app.tavily.com/)). Codespaces also asks for it as the recommended secret `TAVILY_API_KEY`. Tavily can suggest package names, but one is installed only if its PyPI page links back to the same repo.
+   - **Tavily API key** (required on this Codespace). A check does not start without `TAVILY_API_KEY`. The setup lookup needs it. Tavily keys are free ([sign up](https://app.tavily.com/)). Codespaces also asks for it as the recommended secret `TAVILY_API_KEY`. A hosted console does not show this field: the operator sets `TAVILY_API_KEY` on that server, and a missing key refuses the check in one line. The key is never printed. Tavily can suggest package names, but one is installed only if its PyPI page links back to the same repo.
    - **Review the AI's probes** (ticked by default).
 4. Click **Run check** once. Everything is sent together; there are no separate save buttons. Keys you typed are kept only in this browser tab's session storage, so they survive a page refresh and clear when the tab closes. They are never put in local storage or cookies. On the server they stay in memory for the session and are never written to disk, logs, reports, or the reply, and pull-request code never sees them. Leave a field blank to keep the value already sent this session.
 5. If the check cannot start, the reason appears in plain words right above the button, for example "No sandbox available: add your Nebius project ID", or, when both are set but Contree cannot start, a message saying so without asking for them again.
@@ -641,7 +643,8 @@ run uses just the date. These folders stay on your computer only. They are never
   short summary and suggest labels; those are advice only.
 - **Never lets a web page decide the verdict.** On a product check, a few related public bug reports may be
   passed to the advisory AI as quoted background. A study run does not look them up. They do not change the verdict
-  and they do not choose a package.
+  and they do not choose a package. If that lookup fails, the reason is recorded and the reports are left out of
+  the write-up. The verdict stays as the check already decided. Quoted pages still do not decide a verdict.
 - **Never sends your Nebius key or GitHub token into the sandbox where PR code runs.** Keys stay in the orchestrator
   process only.
 
@@ -657,10 +660,13 @@ run uses just the date. These folders stay on your computer only. They are never
   `.venv/bin/pip install -e ".[contree]"`), the probe freeze rule, and the optional GitHub App
   (`POC_DEMO_REPOS`, webhook secret, installation token, `POC_REPORT_BASE_URL`, `python -m poc.github_app`).
   On a product check, `--related-reports` (passed by the operator console, request-a-check, and the GitHub App)
-  looks up a few related public bug reports when `TAVILY_API_KEY` is set and the advisory swarm will run, and
-  passes them to that AI as quoted background. The report labels the text
-  "Background (related public bug reports, not used for the verdict)". A study run leaves this off. When the
-  swarm is off, the lookup is not called. Without the key, the check logs one line and continues. The key is never printed.
+  looks up a few related public bug reports when the advisory swarm will run, and passes them to that AI as
+  quoted background. The report labels the text "Background (related public bug reports, not used for the verdict)".
+  A study run and the daily study leave this off. When the swarm is off, the lookup is not called.
+  `TAVILY_API_KEY` is required for a product check: the check does not start without it. If the setup lookup
+  fails, the check stops as could not verify and records the reason. If the related-reports lookup fails, the
+  reason is recorded and those reports are left out of the write-up. The verdict is left as it was. The key is
+  never printed. On a hosted console the key is the server's `TAVILY_API_KEY`. The form there does not ask for one.
 - Model ids on Token Factory: `nvidia/nemotron-3-super-120b-a12b` (claims, probes, summary),
   `nvidia/Nemotron-3-Ultra-550b-a55b` (advisory labels), `nvidia/Nemotron-3_5-Lightning` with fallback
   `nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B` (advisory tips).

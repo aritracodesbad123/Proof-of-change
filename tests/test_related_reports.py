@@ -1,7 +1,7 @@
 """Related public bug reports are background for product checks only.
 
 On in the console and GitHub App commands. Off for a study run and the daily study.
-Skipped, with one log line, when the Tavily key is unset. The key is never logged.
+A missing Tavily key refuses the lookup. The key is never logged.
 A fixed fake input gets the same verdict with the background and without it.
 """
 from __future__ import annotations
@@ -185,10 +185,11 @@ def test_skipped_without_key(monkeypatch, capsys):
     payload = related_reports.collect(_record(), fetch=fetch)
     out = capsys.readouterr()
     assert called["n"] == 0
-    assert payload["status"] == "skipped"
+    assert payload["status"] == "refused"
     assert payload["text"] == ""
     assert payload["items"] == []
-    assert related_reports.SKIP_LOG in out.out
+    assert payload["reason"] == tavily_docs.MISSING_KEY
+    assert tavily_docs.MISSING_KEY in out.out
     assert SECRET not in out.out + out.err
 
 

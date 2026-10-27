@@ -21,7 +21,7 @@
   "postStartCommand": "bash .devcontainer/start-console.sh || echo 'Console start failed; see /tmp/poc-console.log'",
   "secrets": {
     "TAVILY_API_KEY": {
-      "description": "Your own Tavily API key. The setup lookup needs it. This project does not ship or share a key. Tavily keys are free. Without a key the lookup is skipped and the check continues. The value is not stored in the repository.",
+      "description": "Your own Tavily API key. A check cannot run without the setup lookup. This project does not ship or share a key. Tavily keys are free. Set TAVILY_API_KEY before a check. The value is not stored in the repository.",
       "documentationUrl": "https://app.tavily.com/"
     }
   },

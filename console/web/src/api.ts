@@ -109,6 +109,8 @@ export type Health = {
   approval_default?: boolean
   github_token?: boolean
   chrome?: boolean
+  /** True only on a local or Codespace console, which still asks for a Tavily key. */
+  tavily_key_field?: boolean
 }
 
 export type Job = {
