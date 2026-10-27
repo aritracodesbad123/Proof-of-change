@@ -21,13 +21,21 @@ A person starts a check from the command line, the web console, or the GitHub Ap
 writes its own PR comment and check result. The check loads the recorded head commit and a base side, reads claims
 that must quote the pull request text, and drafts probes; on the web console a person can keep or drop those probes
 and add up to 20 test ideas in plain words. It reads the project's own setup files and a crawl of the repository and
-its docs, then installs the code in a sandbox that gets no secret keys and has a network only while packages are
-installed. Tests and probes run on main and on the pull request, coverage checks whether the changed lines ran, and
-plain rules set one of three verdicts; a passing probe never raises the verdict, and the second opinion does not
-change it. A setup failure can be diagnosed from the real error and the crawled pages, then fixed and run again, up
-to 3 times, without retrying a failure the pull request caused or changing what a claim expects. The report is HTML
-and Markdown, plus a PDF when Chrome is present, and it shows the evidence and how long each step took; a person
-decides, and the tool never approves or merges.
+its docs, then runs the code in a sandbox: local bubblewrap, or Contree. The sandbox gets no secret keys, and the
+network is on only for installs. Tests and probes run on main and on the pull request, and coverage checks whether
+the changed lines ran. The verdict comes from the test evidence for each claim, and the second opinion does not
+change it.
+
+When setup or an import fails, the checker can look up the real error, install the same fix on both sides and run
+the check again, up to 3 logged tries. A repair only lets the check run; the verdict comes from the same rules as
+any other run. It never retries a failure the PR caused and never installs OS packages.
+
+The report is HTML and Markdown, and it shows the evidence and how long each step took. The PDF always arrives:
+Chrome makes it when it works, and otherwise the built-in reportlab maker does. A person decides, and the tool
+never approves or merges.
+
+Each check logs the Tavily credits it uses. When `POC_TAVILY_CREDIT_CAP` is set, a check that might go over stops
+before its first Tavily call and reports could not verify.
 
 ## Current limitations
 

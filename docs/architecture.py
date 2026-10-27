@@ -47,7 +47,7 @@ panel(
 )
 panel(
     0.22, 0.66,
-    "4b. Sandbox (local or Contree)\nno keys; network only while installing\ninstalls the pull request's own code",
+    "4b. Sandbox\nlocal bubblewrap, or Contree\nno secret keys; network only for installs",
     c=NEW, e=NE, h=0.065,
 )
 panel(
@@ -57,7 +57,7 @@ panel(
 )
 panel(
     0.5, 0.395,
-    "7. Verdict rules\nevidence per claim\na passing probe never raises the verdict",
+    "7. Verdict rules\nverdict comes from the test evidence per claim",
     h=0.065,
 )
 panel(0.5, 0.315, "8. Second opinion (Nemotron 3 Ultra)\nadvisory only; it does not change the verdict")
@@ -66,8 +66,8 @@ panel(0.16, 0.315, "Tavily diagnosis\nreads the real error\n+ crawled setup page
 panel(0.16, 0.41, "Fix setup in sandbox\nand retest\n(up to 3 tries)", c=NEW, e=NE, w=0.26, h=0.065)
 panel(
     0.5, 0.135,
-    "10. Report: HTML and Markdown,\nPDF when Chrome is present\nshows the evidence and step timings",
-    w=0.5, h=0.065,
+    "10. Report: HTML + Markdown + PDF (always arrives)\nshows the evidence and step timings",
+    w=0.55, h=0.065,
 )
 panel(0.5, 0.055, "11. Human reviewer decides\nthe tool never approves or merges", c=HUM, e=HE)
 arr(0.5, 0.912, 0.5, 0.888)
@@ -90,7 +90,7 @@ arr(0.5, 0.107, 0.5, 0.083)
 ax.text(
     0.5, 0.012,
     "The orange loop fixes setup only. It does not retry a failure the pull request caused, "
-    "and it does not change what a claim expects.",
+    "and it does not install operating-system packages.",
     ha="center", fontsize=9.5, color="#555",
 )
 plt.savefig("docs/architecture.png", dpi=130, bbox_inches="tight")

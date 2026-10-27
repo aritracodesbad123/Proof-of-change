@@ -96,7 +96,7 @@ Related bug reports are background. The report labels them as not used for the v
 | Verdicts do not merge or block | Live | `poc/verdict.py:3`, `poc/verdict.py:37` |
 | Coverage gate and AI-probe gate only lower verified | Live | `poc/coverage_gate.py:5`, `ops/daily_run.py:2351` |
 | A partial or malformed coverage report stays not measured | Live | `poc/coverage_gate.py:120` |
-| Setup recovery can raise could not verify only after a small-change remeasure | Live | `poc/demo_helper.py:1388` |
+| A setup repair is judged by the same rules as any other run; a large change that skips the fresh probe measurement stays could not verify | Live | `poc/demo_helper.py:2957` |
 | Swarm does not change the verdict | Live | `poc/agents.py:108` |
 | No key in the untrusted environment | Live | `guardrails/isolation.py:61` |
 | User checks ignore the server key | Live | `poc/console_api.py:57`, `poc/console_api.py:79` |
