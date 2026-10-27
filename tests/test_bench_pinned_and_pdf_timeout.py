@@ -212,14 +212,26 @@ def test_moved_pr_head_does_not_change_pr_diff(tmp_path):
     assert item2["diff"] == item["diff"] and item2["head_moved"] is False
 
 
-def test_moved_head_is_reported_not_run(tmp_path):
+def test_moved_live_head_is_info_only(tmp_path):
     c = cases()["fx-safe"]
     rec = record(c, "verified")
-    assert not [p for p in run.sha_check(c, rec) if "moved" in p]
     rec["head_moved"], rec["current_head_sha"] = True, "f" * 40
-    assert any("moved" in p for p in run.sha_check(c, rec))
+    assert run.sha_check(c, rec) == []
+    r = run.result_for(c, "tests", ["x"], rec, 0, 1.0)
+    assert r["outcome"] == "ran" and r["verdict"] == "verified"
+    assert r["head_moved"] is True and r["current_head_sha"] == "f" * 40
+
+
+def test_mismatched_tested_commits_are_not_run(tmp_path):
+    c = cases()["fx-safe"]
+    rec = record(c, "verified")
+    rec["sides"] = dict(rec.get("sides") or {}, main_sha="e" * 40)
+    assert any("base" in p for p in run.sha_check(c, rec))
     r = run.result_for(c, "tests", ["x"], rec, 0, 1.0)
     assert r["outcome"] == "not_run" and r["verdict"] is None
+    rec2 = record(c, "verified")
+    rec2.setdefault("chosen", {})["head_sha"] = "d" * 40
+    assert run.result_for(c, "tests", ["x"], rec2, 0, 1.0)["outcome"] == "not_run"
 
 
 def test_leftover_chrome_on_temp_profile_is_killed(tmp_path):
