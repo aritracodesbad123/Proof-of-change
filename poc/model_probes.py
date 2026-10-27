@@ -31,6 +31,13 @@ ID_RE = re.compile(r"^[a-z0-9][a-z0-9-]{0,39}$")
 # sometimes call json.dumps without importing it, and then the probe fails the same way on both sides and tests
 # nothing. The harness adds the import itself; it changes no behaviour of the code under test.
 JSON_IMPORT = "import json  # added by the harness: the observations line is printed as JSON\n"
+# Product checks only: two extra rules for the probes prompt. Study runs keep PROBES_PROMPT exactly as it is.
+PRODUCT_PROBE_RULES = (
+    "\n\nImports: the package under test is installed on both sides. Import it by its installed import name, the "
+    "way a user of the package would. Never import through the repository folder that holds the code (for "
+    "example a src. prefix): that folder is not on the import path. Output: print the last line with "
+    "print(json.dumps({\"observations\": obs})). Never print the dict itself, its repr or str: only JSON is read.")
+SRC_DIR = "src"
 UNLINKED_REASON = ("no probe listed the claim ids it checks, so its results could not be tied to any claim; in each "
                    "probe, \"claims\" must name the claim ids it checks and the observation names that cover them")
 
@@ -113,6 +120,90 @@ def validate_probe(p: dict, claim_ids: set) -> str | None:
     return None
 
 
+def src_packages(base_root) -> set:
+    """Top-level import names under a src layout: the base side has a src/ folder that is not itself a package,
+    and each name is a package folder or a module inside it. Empty when the project has no such layout."""
+    src = Path(base_root) / SRC_DIR
+    if not src.is_dir() or (src / "__init__.py").exists():
+        return set()
+    out = set()
+    for c in src.iterdir():
+        if c.is_dir() and c.name.isidentifier() and ((c / "__init__.py").is_file() or any(c.glob("*.py"))):
+            out.add(c.name)
+        elif c.is_file() and c.suffix == ".py" and c.stem.isidentifier():
+            out.add(c.stem)
+    return out
+
+
+def fix_src_imports(code: str, packages: set) -> tuple[str, str | None]:
+    """(code, None) with every import of the layout folder rewritten to the installed import name, or
+    (code, why) when the probe imports that folder in a way that cannot be rewritten safely.
+
+    `import src.pkg.mod` -> `import pkg.mod` only with an alias (otherwise the name src would still be used);
+    `from src.pkg.mod import x` -> `from pkg.mod import x`; `from src import pkg` -> `import pkg`. Anything else
+    that names src (bare `import src`, a relative import, a name not under the src folder, any other use of the
+    name src) is rejected, so the probe never runs with an import that cannot work."""
+    if not packages:
+        return code, None
+    try:
+        tree = ast.parse(code)
+    except SyntaxError:
+        return code, None   # validate_probe reports it
+    edits = []   # (lineno, end_lineno, replacement source)
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            if not any(a.name == SRC_DIR or a.name.startswith(SRC_DIR + ".") for a in node.names):
+                continue
+            parts = []
+            for a in node.names:
+                if a.name == SRC_DIR or a.name.startswith(SRC_DIR + "."):
+                    rest = a.name[len(SRC_DIR) + 1:]
+                    if not rest or rest.split(".")[0] not in packages or not a.asname:
+                        return code, f"imports the {SRC_DIR}/ folder ({a.name}); import the installed package by its import name"
+                    parts.append(f"{rest} as {a.asname}")
+                else:
+                    parts.append(a.name + (f" as {a.asname}" if a.asname else ""))
+            edits.append((node, "import " + ", ".join(parts)))
+        elif isinstance(node, ast.ImportFrom) and node.module and (
+                node.module == SRC_DIR or node.module.startswith(SRC_DIR + ".")):
+            if node.level:
+                continue   # a relative import is not the layout folder
+            rest = node.module[len(SRC_DIR) + 1:]
+            names = ", ".join(a.name + (f" as {a.asname}" if a.asname else "") for a in node.names)
+            if rest:
+                if rest.split(".")[0] not in packages:
+                    return code, f"imports {node.module}, which is not a package in the {SRC_DIR}/ folder"
+                edits.append((node, f"from {rest} import {names}"))
+            else:
+                if not all(a.name in packages for a in node.names):
+                    return code, f"imports from the {SRC_DIR}/ folder a name that is not a package in it"
+                edits.append((node, f"import {names}"))
+    if not edits:
+        return code, None
+    lines = code.splitlines(keepends=True)
+    for node, new in sorted(edits, key=lambda e: e[0].lineno, reverse=True):
+        start, end = node.lineno - 1, node.end_lineno - 1
+        indent = lines[start][:node.col_offset]
+        # Rewrite only an import that is the whole statement on its own lines, so nothing else can change.
+        tail = lines[end][node.end_col_offset:].strip()
+        if indent.strip() or (tail and not tail.startswith("#")):
+            return code, f"imports the {SRC_DIR}/ folder on a line shared with other code"
+        lines[start:end + 1] = [indent + new + "\n"]
+    fixed = "".join(lines)
+    try:
+        ftree = ast.parse(fixed)
+    except SyntaxError:
+        return code, f"imports the {SRC_DIR}/ folder and could not be rewritten"
+    for node in ast.walk(ftree):   # fail closed: nothing may still refer to the layout folder
+        if isinstance(node, ast.Name) and node.id == SRC_DIR:
+            return code, f"uses the name {SRC_DIR} after its imports were rewritten"
+        if isinstance(node, ast.Import) and any(a.name.split(".")[0] == SRC_DIR for a in node.names):
+            return code, f"imports the {SRC_DIR}/ folder"
+        if isinstance(node, ast.ImportFrom) and not node.level and (node.module or "").split(".")[0] == SRC_DIR:
+            return code, f"imports the {SRC_DIR}/ folder"
+    return fixed, None
+
+
 def probe_file(p: dict, target: str, claims_by_id: dict, gen_label: str) -> str:
     spec = {"id": f"model-{p['id']}", "target": target, "about": p.get("about", "")[:300],
             "claims": [{"id": c["id"], "source": "PR description", "text": claims_by_id[c["id"]]["text"],
@@ -145,8 +236,13 @@ def _usable(resp, claim_ids: set) -> list:
 
 
 def generate(provider: Provider, repo: str, pr: int, title: str, body: str | None, base_files: dict,
-             base_root: Path, pr_roots: list, outdir: Path) -> dict:
+             base_root: Path, pr_roots: list, outdir: Path, product: bool = False) -> dict:
+    """product: a product check. It adds PRODUCT_PROBE_RULES to the probes prompt and rewrites or rejects imports
+    of a src/ layout folder. A study run (product False) is unchanged."""
     from poc import run_progress
+
+    probes_prompt = PROBES_PROMPT + PRODUCT_PROBE_RULES if product else PROBES_PROMPT
+    layout = src_packages(base_root) if product else set()
 
     inputs = freeze.base_inputs(title, body, base_files, base_root, pr_roots)   # raises on PR-side input paths
     ctx = {"repo": repo, "pr": pr}
@@ -174,7 +270,7 @@ def generate(provider: Provider, repo: str, pr: int, title: str, body: str | Non
                 "list.\n\n" + _context(base_files))
     run_progress.emit("probes", "super", "Super is writing behaviour probes")
     try:
-        resp = provider.complete_json("probes", PROBES_PROMPT, user, PROBES_SCHEMA, ctx)
+        resp = provider.complete_json("probes", probes_prompt, user, PROBES_SCHEMA, ctx)
     except ProviderError as e:
         out["errors"].append(str(e))
         return out
@@ -189,7 +285,7 @@ def generate(provider: Provider, repo: str, pr: int, title: str, body: str | Non
         retry_user = (user + "\n\nYour previous answer contained no usable probe (" + "; ".join(map(str, reasons[:5]))
                       + "). Follow the coverage rule: write at least one probe per testable claim.")
         try:
-            resp = provider.complete_json("probes", PROBES_PROMPT, retry_user, PROBES_SCHEMA, ctx)
+            resp = provider.complete_json("probes", probes_prompt, retry_user, PROBES_SCHEMA, ctx)
         except ProviderError as e:
             out["errors"].append(f"retry: {e}")
     elif by_id and not any(p.get("claims") for p in usable):
@@ -200,7 +296,7 @@ def generate(provider: Provider, repo: str, pr: int, title: str, body: str | Non
         retry_user = (user + "\n\nYour previous answer had probes, but " + UNLINKED_REASON
                       + ". Follow the coverage rule: write at least one probe per testable claim.")
         try:
-            again = provider.complete_json("probes", PROBES_PROMPT, retry_user, PROBES_SCHEMA, ctx)
+            again = provider.complete_json("probes", probes_prompt, retry_user, PROBES_SCHEMA, ctx)
         except ProviderError as e:
             out["errors"].append(f"retry: {e}")
         else:
@@ -219,6 +315,11 @@ def generate(provider: Provider, repo: str, pr: int, title: str, body: str | Non
             if not str(p.get("about") or "").strip():   # the probe runner requires a non-empty description
                 p["about"] = "model-written probe of the changed files (no description given)"
         why = validate_probe(p, set(by_id))
+        if not why and layout:
+            before = p["code"]
+            p["code"], why = fix_src_imports(before, layout)
+            if not why and p["code"] != before:
+                out.setdefault("rewritten_imports", []).append(p["id"])
         if why:
             out["errors"].append(f"probe {p.get('id')!r} rejected: {why}")
             continue

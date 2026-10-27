@@ -3736,7 +3736,7 @@ def probe_launcher(venv: Path, path: Path):
 _CONTREE_CHECKOUTS: dict = {}   # "settings": the test settings for this PR's Contree probe runs (product checks)
 
 
-def _contree_probe_once(side: str, path: Path, timeout: int) -> tuple[dict, str, float]:
+def _contree_probe_once(side: str, path: Path, timeout: int, literal_output: bool = False) -> tuple[dict, str, float]:
     """Run one probe file on a Contree checkpoint (upload probe, disposable run)."""
     from poc import contree_sandboxes
     sess = contree_sandboxes.session()
@@ -3755,7 +3755,7 @@ def _contree_probe_once(side: str, path: Path, timeout: int) -> tuple[dict, str,
     if code is None:
         code = "error"
     log = out[-4000:] + ("\n--- stderr ---\n" + err[-4000:] if err else "")
-    return probes.observations_of(out, code), log, secs
+    return probes.observations_of(out, code, literal_output), log, secs
 
 
 def plan_probes(repo: str, item: dict, rec: dict, base_root: Path, pr_roots: list, prdir: Path, a) -> list[dict]:
@@ -3780,12 +3780,15 @@ def plan_probes(repo: str, item: dict, rec: dict, base_root: Path, pr_roots: lis
                           if (Path(base_root) / rel).is_file()}
             try:
                 res = model_probes.generate(provider, repo, item["pr"], item["title"], item.get("body"), base_files,
-                                            base_root, pr_roots, prdir / "model-probes")
+                                            base_root, pr_roots, prdir / "model-probes",
+                                            product=product_route(a))
             except freeze.FreezeError as e:
                 res = {"errors": [str(e)], "probes": [], "claims": [], "rejected_claims": []}
             note["model_claims"] = res.get("claims", [])
             note["model_rejected_claims"] = res.get("rejected_claims", [])
             note["errors"] += res.get("errors", [])
+            if res.get("rewritten_imports"):   # product checks: src/ layout imports rewritten to the installed name
+                note["rewritten_imports"] = res["rewritten_imports"]
             plan += [{"path": x["path"], "source": "model", "freeze": x["freeze"],
                       **({"origin": x["origin"]} if x.get("origin") else {})} for x in res.get("probes", [])]
             if res.get("human_review"):
@@ -3843,11 +3846,11 @@ def run_probes(repo: str, pr: int, pythons: dict, prdir: Path, work: Path, a, pl
         try:
             guard(path)
             if use_contree:
-                it = _contree_run_probe(path, prdir, a.runs, x["source"], guard)
+                it = _contree_run_probe(path, prdir, a.runs, x["source"], guard, literal_output=product_route(a))
             else:
                 it = probes.run_probe(path, pythons, prdir, cwds, envs, runs=a.runs, source=x["source"],
                                       launchers={side: probe_launcher(v, path) for side, v in venvs.items()},
-                                      guard=guard)
+                                      guard=guard, literal_output=product_route(a))
             it["path"] = repo_relative(path) if x["source"] == "library" else str(path.relative_to(prdir))
             it["generator"] = fz["generator"]
             if x.get("origin"):
@@ -3869,7 +3872,7 @@ def run_probes(repo: str, pr: int, pythons: dict, prdir: Path, work: Path, a, pl
     return out
 
 
-def _contree_run_probe(path: Path, outdir: Path, runs: int, source: str, guard) -> dict:
+def _contree_run_probe(path: Path, outdir: Path, runs: int, source: str, guard, literal_output: bool = False) -> dict:
     """Contree dual-run of one frozen probe (same alternating schedule as probes.run_probe)."""
     spec = probes.read_spec(path)
     got: dict = {"main": [], "pr": []}
@@ -3880,7 +3883,7 @@ def _contree_run_probe(path: Path, outdir: Path, runs: int, source: str, guard) 
         for side in ("main", "pr"):
             if side == "pr" and guard:
                 guard(path)
-            obs, log, secs = _contree_probe_once(side, path, timeout)
+            obs, log, secs = _contree_probe_once(side, path, timeout, literal_output)
             fname = f"probe-{spec['id']}-{side}-{i}.jsonl"
             probes.write_output(outdir / fname, obs)
             (outdir / f"probe-{spec['id']}-{side}-{i}.log").write_text(log)
