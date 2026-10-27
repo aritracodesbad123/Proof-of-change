@@ -38,7 +38,6 @@ from poc import session_key
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 RUNS_ROOT = Path(os.environ.get("POC_OPS_RUNS", REPO_ROOT / "ops" / "runs"))
-HOSTED = REPO_ROOT / "reports" / "hosted"
 REPORTS_DAILY = Path(os.environ.get("POC_REPORT_DIR") or (REPO_ROOT / "reports" / "daily"))
 CONSOLE_JOB_TIMEOUT_S = 45 * 60
 OWNER_FILE = "console_owner.txt"
@@ -402,11 +401,17 @@ def _row_from_record(rec: dict, path: Path | None = None) -> dict:
 
 
 
+def _hosted_dir() -> Path:
+    """Hosted HTML reports: POC_HOSTED_REPORTS_DIR, else reports/hosted (shared with the GitHub App)."""
+    from poc import github_app
+    return github_app.hosted_reports_dir()
+
+
 def remember_run(rec: dict, path: Path | None = None, *, owner: str | None = None) -> dict:
     """Keep a finished PR record in RAM so the console still lists it after Render wipes disk."""
     row = _row_from_record(rec, path)
     rid = row["id"]
-    hosted = HOSTED / f"{rid}.html"
+    hosted = _hosted_dir() / f"{rid}.html"
     links = report_links(rid, folder=row["folder"], rec=rec)
     if owner is None and path is not None:
         owner = read_run_owner(path.parent)
@@ -521,7 +526,7 @@ def get_run(run_id: str, owner: str | None = None, *, admin: bool = False) -> di
             remember_run(rec, path)
             rid = str(rec.get("id") or run_id)
             folder = _display_path(path.parent)
-            hosted = HOSTED / f"{rid}.html"
+            hosted = _hosted_dir() / f"{rid}.html"
             links = report_links(rid, folder=folder, rec=rec)
             return {
                 "record": rec,
@@ -882,11 +887,8 @@ def start_check(pr_url: str, *, model_provider: str = "nebius", owner: str | Non
         run_note = f"{provider_note} {run_note}".strip() if run_note else provider_note
     approval_on = console_approval_on(approval)
     job_id = uuid.uuid4().hex[:12]
-    # Tests retarget REPO_ROOT. POC_OPS_RUNS (a Space home directory) wins when it is set.
-    if (os.environ.get("POC_OPS_RUNS") or "").strip():
-        jobs_dir = RUNS_ROOT / "_jobs" / job_id
-    else:
-        jobs_dir = REPO_ROOT / "ops" / "runs" / "_jobs" / job_id
+    # Job folders live under the run folders: POC_OPS_RUNS when set, else ops/runs (RUNS_ROOT).
+    jobs_dir = RUNS_ROOT / "_jobs" / job_id
     jobs_dir.mkdir(parents=True, exist_ok=True)
     progress_path = jobs_dir / "progress.jsonl"
     console_log = jobs_dir / "console.log"

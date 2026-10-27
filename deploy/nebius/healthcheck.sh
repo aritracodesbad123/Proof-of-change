@@ -9,6 +9,17 @@ check "console (local)"  http://127.0.0.1:8787/api/health
 check "github app (local)" http://127.0.0.1:8080/health
 site="$(sed -n 's/^POC_PUBLIC_URL=//p' /etc/proof-of-change/env 2>/dev/null | head -1)"
 if [ -n "$site" ]; then check "console (public HTTPS)" "$site/api/health"; else echo "skip  public check (POC_PUBLIC_URL empty or env not readable; run with sudo)"; fi
+# Each data folder must be writable by the service user: write a small file there as that user, then remove it.
+for d in /var/lib/proof-of-change /var/lib/proof-of-change/runs /var/lib/proof-of-change/reports/daily \
+         /var/lib/proof-of-change/reports/hosted /var/lib/proof-of-change/work/heavy-builds \
+         /var/lib/proof-of-change/github-app; do
+  probe="$d/.healthcheck-$$"
+  if runuser -u proof-of-change -- sh -c 'echo ok > "$1" && rm -f "$1"' sh "$probe" 2>/dev/null; then
+    echo "ok    writable by proof-of-change: $d"
+  else
+    echo "FAIL  not writable by proof-of-change: $d (run with sudo)"; fail=1
+  fi
+done
 for u in proof-of-change-console proof-of-change-app caddy; do
   if systemctl is-active --quiet "$u"; then echo "ok    $u running"; else echo "FAIL  $u not running"; fail=1; fi
 done

@@ -12,7 +12,9 @@ EnvironmentFile=/etc/proof-of-change/env
 Environment=HOME=/var/lib/proof-of-change
 Environment=POC_OPS_DIR=/var/lib/proof-of-change
 Environment=POC_OPS_RUNS=/var/lib/proof-of-change/runs
-Environment=POC_REPORT_DIR=/var/lib/proof-of-change/reports
+Environment=POC_REPORT_DIR=/var/lib/proof-of-change/reports/daily
+Environment=POC_HOSTED_REPORTS_DIR=/var/lib/proof-of-change/reports/hosted
+Environment=POC_HEAVY_BUILD_DIR=/var/lib/proof-of-change/work/heavy-builds
 Environment=PYTHONUNBUFFERED=1
 Environment=PYTHONDONTWRITEBYTECODE=1
 # Caddy forwards only POST /webhook here. Every App check uses --sandbox-backend contree --require-contree.

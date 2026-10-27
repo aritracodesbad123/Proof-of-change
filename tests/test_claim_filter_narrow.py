@@ -274,6 +274,7 @@ def test_console_and_swarm_share_the_verdict_code(tmp_path, monkeypatch):
     (root / "ops").mkdir(parents=True)
     (root / "ops" / "daily_run.py").write_text("# stub\n")
     monkeypatch.setattr(console_api, "REPO_ROOT", root)
+    monkeypatch.setattr(console_api, "RUNS_ROOT", root / "ops" / "runs")
     monkeypatch.setattr(console_api.subprocess, "Popen", fake_popen)
     monkeypatch.setattr(console_api.threading, "Thread", ImmediateThread)
     monkeypatch.setattr(console_api, "console_run_flags", lambda *_a, **_k: console_api.ConsoleRunPlan([], None, False, None))
