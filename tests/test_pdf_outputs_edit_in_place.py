@@ -140,7 +140,7 @@ def test_resume_restarts_preparing_and_fails_old_ones(tmp_path, monkeypatch):
     (old / ps.STATUS_FILE).write_text(json.dumps(s))
     started = []
     out = ps.resume_pending([tmp_path], start=lambda d: started.append(d.name) or True)
-    assert out == {"resumed": ["fresh"], "failed": ["old"]} and started == ["fresh"]
+    assert out == {"resumed": ["fresh"], "failed": ["old"], "reposted": []} and started == ["fresh"]
     assert ps.read_state(old) == ps.ERROR
     assert json.loads((done / ps.STATUS_FILE).read_text())["state"] == ps.READY
 
@@ -174,3 +174,65 @@ def test_hosted_app_refuses_without_report_base():
     assert ga.require_report_base({"POC_REPORT_BASE_URL": "https://r.example"})
     with pytest.raises(SystemExit):
         ga.serve(env={})
+
+
+def _flaky(fails, calls, kind):
+    state = {"n": 0}
+
+    def f(repo, ident, data, tok, env=None):
+        state["n"] += 1
+        if state["n"] <= fails:
+            raise ga.GitHubAppError("GitHub API PATCH failed: HTTP 502")
+        calls.append((kind, ident))
+        return {}
+    return f
+
+
+def test_failed_edit_is_retried_with_backoff_then_marked_done(tmp_path):
+    d = _dir(tmp_path)
+    _saved(d)
+    calls, slept = [], []
+    pc, pk = _flaky(1, calls, "comment"), _flaky(2, calls, "check")
+    assert ga.update_posts_for_pdf(d, ps.READY, ENV, pc, pk, delays=(1, 2, 3), sleep=slept.append)
+    assert calls == [("comment", 11), ("check", 22)]  # each item edited exactly once
+    assert slept == [1, 2, 3]
+    assert json.loads((d / ga.COMMENT_FILE).read_text())["done"] == ps.READY
+
+
+def test_edit_still_failing_leaves_done_null(tmp_path):
+    d = _dir(tmp_path)
+    _saved(d)
+    calls, slept = [], []
+    pc, pk = _flaky(99, calls, "comment"), _flaky(0, calls, "check")
+    assert not ga.update_posts_for_pdf(d, ps.READY, ENV, pc, pk, delays=(1, 1), sleep=slept.append)
+    assert slept == [1, 1] and calls == []
+    assert json.loads((d / ga.COMMENT_FILE).read_text())["done"] is None
+    assert ga.posts_pending(d)
+
+
+def test_resume_pending_retries_edit_for_ready_folder_with_done_null(tmp_path, monkeypatch):
+    d = _dir(tmp_path)
+    (d / ps.PDF_FILE).write_bytes(b"%PDF-1.4 x" * 50)
+    ps.write_status(d, ps.READY, 1)
+    _saved(d)
+    calls = []
+    monkeypatch.setattr(ga, "patch_pr_comment", _flaky(0, calls, "comment"))
+    monkeypatch.setattr(ga, "patch_check_run", _flaky(0, calls, "check"))
+    monkeypatch.setattr(ga, "installation_token", lambda env=None: "t")
+    out = ps.resume_pending([tmp_path], start=lambda d: False)
+    assert out["reposted"] == ["run-1"] and calls == [("comment", 11), ("check", 22)]
+    assert json.loads((d / ga.COMMENT_FILE).read_text())["done"] == ps.READY
+    out = ps.resume_pending([tmp_path], start=lambda d: False)  # done now: no second edit
+    assert out["reposted"] == [] and len(calls) == 2
+
+
+def test_resume_pending_retries_edit_for_error_folder(tmp_path, monkeypatch):
+    d = _dir(tmp_path)
+    ps.write_status(d, ps.ERROR, 3)
+    _saved(d)
+    calls = []
+    monkeypatch.setattr(ga, "patch_pr_comment", _flaky(0, calls, "comment"))
+    monkeypatch.setattr(ga, "patch_check_run", _flaky(0, calls, "check"))
+    monkeypatch.setattr(ga, "installation_token", lambda env=None: "t")
+    assert ps.resume_pending([tmp_path], start=lambda d: False)["reposted"] == ["run-1"]
+    assert json.loads((d / ga.COMMENT_FILE).read_text())["done"] == ps.ERROR

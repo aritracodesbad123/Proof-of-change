@@ -263,14 +263,20 @@ def _log_error(msg: str, *args) -> None:
     logging.getLogger("proof_of_change.github_app").error(msg, *args)
 
 
+EDIT_RETRY_DELAYS_S = (2, 5, 15)
+
+
 def update_posts_for_pdf(report_dir: str | Path, state: str, env: dict | None = None,
                          patch_comment: Callable[..., dict] | None = None,
-                         patch_check: Callable[..., dict] | None = None) -> bool:
+                         patch_check: Callable[..., dict] | None = None,
+                         delays=EDIT_RETRY_DELAYS_S, sleep: Callable[[float], Any] = time.sleep) -> bool:
     """When the PDF is ready (or has finally failed), edit the App's saved comment and check run in place.
 
     'PDF preparing…' becomes the PDF link, or 'PDF could not be generated.' Nothing happens without a saved
     id, after a previous edit (idempotent), or without a token. Only the saved items on the saved demo-repo
-    PR are touched; nothing new is posted.
+    PR are touched; nothing new is posted. A failed edit (GitHub, network or token error) is retried with a
+    short bounded backoff; 'done' is saved only after every edit succeeded, so a later resume tries again.
+    Progress of each edit is saved, so a retry never edits the same item twice.
     """
     from reports import pdf_status
     if state not in (pdf_status.READY, pdf_status.ERROR):
@@ -287,27 +293,49 @@ def update_posts_for_pdf(report_dir: str | Path, state: str, env: dict | None = 
     if not repo or not url:
         return False
     new_text = f"[PDF report]({url})" if state == pdf_status.READY else FAILED_TEXT
-    try:
-        token = installation_token(env)
-        if not token:
-            _log_error("PDF %s but no App token to edit the PR comment/check run", state)
+    waits = list(delays or ())
+    attempt = 0
+    while True:
+        attempt += 1
+        try:
+            token = installation_token(env)
+            if not token:
+                raise GitHubAppError("no App token")
+            if info.get("comment_id") and PREPARING_TEXT in str(info.get("comment_body") or ""):
+                body = str(info["comment_body"]).replace(PREPARING_TEXT, new_text, 1)
+                (patch_comment or patch_pr_comment)(repo, int(info["comment_id"]), body, token, env=env)
+                info["comment_body"] = body
+                p.write_text(json.dumps(info))
+            if info.get("check_run_id") and not info.get("check_done"):
+                line = f"PDF: {url}" if state == pdf_status.READY else FAILED_TEXT
+                summary = (str(info.get("check_summary") or "") + "\n\n" + line)[:65000]
+                (patch_check or patch_check_run)(repo, int(info["check_run_id"]), {
+                    "output": {"title": str(info.get("check_title") or "Proof-of-Change"), "summary": summary}},
+                    token, env=env)
+                info["check_done"] = True
+                p.write_text(json.dumps(info))
+            break
+        except PermissionError as e:  # not a demo repo: retrying cannot help
+            _log_error("PDF %s but the App comment/check run may not be edited: %s", state, type(e).__name__)
             return False
-        if info.get("comment_id") and PREPARING_TEXT in str(info.get("comment_body") or ""):
-            body = str(info["comment_body"]).replace(PREPARING_TEXT, new_text, 1)
-            (patch_comment or patch_pr_comment)(repo, int(info["comment_id"]), body, token, env=env)
-            info["comment_body"] = body
-        if info.get("check_run_id"):
-            line = f"PDF: {url}" if state == pdf_status.READY else FAILED_TEXT
-            summary = (str(info.get("check_summary") or "") + "\n\n" + line)[:65000]
-            (patch_check or patch_check_run)(repo, int(info["check_run_id"]), {
-                "output": {"title": str(info.get("check_title") or "Proof-of-Change"), "summary": summary}},
-                token, env=env)
-    except (GitHubAppError, PermissionError, ValueError) as e:
-        _log_error("PDF %s but the App comment/check run could not be edited: %s", state, type(e).__name__)
-        return False
+        except (GitHubAppError, OSError, ValueError) as e:
+            if not waits:
+                _log_error("PDF %s but the App comment/check run could not be edited after %d tries: %s; "
+                           "will retry on next resume", state, attempt, type(e).__name__)
+                return False
+            sleep(waits.pop(0))
     info["done"] = state
     p.write_text(json.dumps(info))
     return True
+
+
+def posts_pending(report_dir: str | Path) -> bool:
+    """True while the App's saved comment/check run still waits for its PDF edit (done is null)."""
+    try:
+        info = json.loads((Path(report_dir) / COMMENT_FILE).read_text())
+    except (OSError, ValueError):
+        return False
+    return isinstance(info, dict) and not info.get("done") and bool(info.get("comment_id") or info.get("check_run_id"))
 
 
 PDF_PREPARING_MARK = "<!--pdf-preparing:{name}-->"

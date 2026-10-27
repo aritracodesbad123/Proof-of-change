@@ -203,6 +203,19 @@ def _retry_locked(d: Path, delays, sleep, to_pdf) -> str:
     return ERROR
 
 
+def _retry_posts(d: Path, out: dict) -> None:
+    """Folder already ready/error but the App comment/check run edit never succeeded: try it again."""
+    state = read_state(d)
+    if state not in (READY, ERROR):
+        return
+    try:
+        from poc import github_app
+        if github_app.posts_pending(d) and github_app.update_posts_for_pdf(d, state, delays=()):
+            out["reposted"].append(d.name)
+    except Exception as e:  # noqa: BLE001 - startup must go on; the next resume tries again
+        log.error("PDF %s for report %s but the App outputs were not updated: %s", state, d.name, type(e).__name__)
+
+
 def resume_pending(roots=None, *, now: float | None = None, start=None, time_limit: float = TIME_LIMIT_S) -> dict:
     """On startup: restart the retry for folders still 'preparing'; mark failed those past the time limit."""
     if roots is None:
@@ -210,7 +223,7 @@ def resume_pending(roots=None, *, now: float | None = None, start=None, time_lim
         roots = [Path(os.environ.get("POC_REPORT_DIR") or (repo_root / "reports" / "daily"))]
     now = time.time() if now is None else now
     start = start_background_retry if start is None else start
-    out = {"resumed": [], "failed": []}
+    out = {"resumed": [], "failed": [], "reposted": []}
     for root in roots:
         root = Path(root)
         if not root.is_dir():
@@ -225,6 +238,7 @@ def resume_pending(roots=None, *, now: float | None = None, start=None, time_lim
                             _notify(d, READY)
                     except (OSError, ValueError):
                         pass
+                _retry_posts(d, out)
                 continue
             try:
                 info = json.loads(sp.read_text())
