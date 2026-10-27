@@ -52,7 +52,8 @@ def test_tavily_unavailable_product_route_writes_could_not_verify_record(tmp_pat
 
 def test_source_pair_is_only_reached_through_finish():
     src = inspect.getsource(daily_run)
-    calls = [line.strip() for line in src.splitlines() if "test_source_pair(" in line and "def " not in line and not line.strip().startswith("#")]
+    lines = [line.strip() for line in src.splitlines()]
+    calls = [x for x in lines if "test_source_pair(" in x and not x.startswith(("def ", "#"))]
     assert calls and all(c.startswith("return finish(test_source_pair(") for c in calls)
 
 
