@@ -6,7 +6,8 @@ Roles (REQUIREMENTS §4a):
   summary  Super 120B — plain-language report text that may only quote real record fields
 
 Claims and probes stay in poc/model_probes.py (Super). This module runs after probes and the
-code verdict so the swarm cannot change the merge advice silently.
+code verdict so the swarm cannot change the merge advice silently. The helper prompt is also
+the Nano fallback prompt. There is no second notes prompt.
 
     out = run_swarm(provider, rec)   # mutates rec with agents / explanation; returns out
 """
@@ -18,6 +19,7 @@ from typing import Any
 
 from poc import model_provider
 from poc.model_provider import HELPER_FALLBACK, Provider, ProviderError
+from poc.prompt_text import UNTRUSTED_RULES, untrusted_block
 
 JUDGE_SCHEMA = {
     "type": "object", "additionalProperties": False, "required": ["labels"],
@@ -40,16 +42,56 @@ SUMMARY_SCHEMA = {
         "text": {"type": "string"},
         "quotes": {"type": "array", "items": {"type": "string"}}}}
 
-JUDGE_PROMPT = """You label each finding from a pull-request check. For every finding give id, label
-(proven | false | unmentioned | needs_human), and a one-sentence reason. Labels are advisory only;
-plain code owns the verdict. Answer with JSON only."""
+JUDGE_PROMPT = (
+    "Role: second-opinion judge.\n"
+    "Task: label each finding from a pull-request check. "
+    "Your labels are advisory only. Plain code owns the verdict. You do not change it.\n"
+    "\n"
+    + UNTRUSTED_RULES
+    + "\n\n"
+    "Abstain by setting label to needs_human when the finding data is not enough to choose "
+    "proven, false, or unmentioned.\n"
+    "\n"
+    "For every finding in the data, return one object with exactly these fields:\n"
+    "- id: the finding id from the data, unchanged\n"
+    "- label: one of proven, false, unmentioned, needs_human\n"
+    "- reason: one sentence that uses only the finding data\n"
+    "\n"
+    "Label every finding id in the data. Do not add an id that is not in the data.\n"
+    "Return one JSON object with a single field, labels. Do not add fields. Do not add prose.\n"
+)
 
-HELPER_PROMPT = """You suggest short, optional notes: noise patterns to ignore in future diffs, or
-install hints. Do not invent failures. At most 5 short notes. Answer with JSON only."""
+HELPER_PROMPT = (
+    "Role: notes writer.\n"
+    "Task: suggest short optional notes. A note is a noise pattern to ignore in a future diff, or an install hint. "
+    "This is the only task. The same rules apply on the first notes call and on a fallback notes call.\n"
+    "\n"
+    + UNTRUSTED_RULES
+    + "\n\n"
+    "Abstain by returning an empty notes list when the data does not support a note.\n"
+    "\n"
+    "Do not invent failures. Write at most 5 short notes.\n"
+    "Return one JSON object with a single field, notes, whose value is a list of strings. "
+    "Do not add fields. Do not add prose.\n"
+)
+# Lightning and the Nano fallback share this prompt. A second notes prompt would drift.
+NANO_FALLBACK_PROMPT = HELPER_PROMPT
 
-SUMMARY_PROMPT = """Write a short plain-English summary of this PR check for a human reviewer.
-Quote only strings that appear in the provided record excerpt (put those strings in "quotes").
-Do not invent log lines. Answer with JSON only."""
+SUMMARY_PROMPT = (
+    "Role: summary writer.\n"
+    "Task: write a short plain-English summary of this pull-request check for a human reviewer.\n"
+    "\n"
+    + UNTRUSTED_RULES
+    + "\n\n"
+    "Abstain by setting text to \"could not verify from the record excerpt\" and quotes to an empty list "
+    "when the excerpt does not support a summary.\n"
+    "\n"
+    "The text may only state what the record excerpt states. "
+    "Copy any words you rely on into the quotes field. "
+    "Each string in quotes must appear exactly in the record excerpt. "
+    "Do not invent log lines.\n"
+    "Return one JSON object with exactly these fields: text, quotes. Do not add fields. Do not add prose.\n"
+)
 
 
 def swarm_enabled(flag: bool = False) -> bool:
@@ -142,6 +184,11 @@ def _with_background(rec: dict, body: str) -> str:
     return body + "\n\n" + block
 
 
+def _data_user(rec: dict, label: str, body: str) -> str:
+    """One untrusted data block, plus quoted web background when a check stored it."""
+    return _with_background(rec, untrusted_block(label, body))
+
+
 def _run_swarm_roles(provider: Provider, rec: dict, ctx: dict, agents: list, out: dict,
                      run_judge: bool, run_helper: bool, run_summary: bool) -> None:
     from poc import run_progress
@@ -152,7 +199,8 @@ def _run_swarm_roles(provider: Provider, rec: dict, ctx: dict, agents: list, out
         role = _role(provider, "judge")
         agents.append(role)
         try:
-            user = _with_background(rec, "Findings:\n" + json.dumps(_findings_payload(rec), indent=1)[:8000])
+            findings = json.dumps(_findings_payload(rec), indent=1)[:8000]
+            user = _data_user(rec, "findings", findings)
             raw = _call(provider, "judge", JUDGE_PROMPT, user, JUDGE_SCHEMA, ctx)
             role["status"] = "ok"
             role["labels"] = raw.get("labels") or []
@@ -169,7 +217,7 @@ def _run_swarm_roles(provider: Provider, rec: dict, ctx: dict, agents: list, out
         role = _role(provider, "helper")
         agents.append(role)
         try:
-            user = _with_background(rec, "Record excerpt:\n" + _record_excerpt(rec))
+            user = _data_user(rec, "record excerpt", _record_excerpt(rec))
             raw = _call(provider, "helper", HELPER_PROMPT, user, HELPER_SCHEMA, ctx)
             role["status"] = "ok"
             role["notes"] = raw.get("notes") or []
@@ -182,8 +230,8 @@ def _run_swarm_roles(provider: Provider, rec: dict, ctx: dict, agents: list, out
                 role["model"] = HELPER_FALLBACK
                 role["note"] = f"fell back to Nano after {type(e).__name__}"
                 try:
-                    user = _with_background(rec, "Record excerpt:\n" + _record_excerpt(rec))
-                    raw = _call(provider, "helper", HELPER_PROMPT, user, HELPER_SCHEMA, ctx)
+                    user = _data_user(rec, "record excerpt", _record_excerpt(rec))
+                    raw = _call(provider, "helper", NANO_FALLBACK_PROMPT, user, HELPER_SCHEMA, ctx)
                     role["status"] = "ok"
                     role["notes"] = raw.get("notes") or []
                     out["helper"] = raw
@@ -209,7 +257,7 @@ def _run_swarm_roles(provider: Provider, rec: dict, ctx: dict, agents: list, out
         role = _role(provider, "summary")
         agents.append(role)
         try:
-            user = _with_background(rec, "Record excerpt:\n" + _record_excerpt(rec))
+            user = _data_user(rec, "record excerpt", _record_excerpt(rec))
             raw = _call(provider, "summary", SUMMARY_PROMPT, user, SUMMARY_SCHEMA, ctx)
             text = str(raw.get("text") or raw.get("summary") or "").strip()
             # Super sometimes double-encodes: {"text": "{\"summary\": \"...\"}"}
