@@ -46,9 +46,11 @@ panel(
     c=NEW, e=NE, h=0.065,
 )
 panel(
-    0.22, 0.66,
-    "4b. Sandbox\nlocal bubblewrap, or Contree\nno secret keys; network only for installs",
-    c=NEW, e=NE, h=0.065,
+    0.22, 0.655,
+    "4b. Sandbox\nGitHub App, request worker, hosted console\n"
+    "PR code only in Contree; else could not verify\n"
+    "CLI, local console, study: local bubblewrap",
+    c=NEW, e=NE, w=0.44, h=0.09,
 )
 panel(
     0.5, 0.49,
@@ -75,9 +77,9 @@ arr(0.55, 0.833, 0.72, 0.798)
 arr(0.45, 0.833, 0.28, 0.805)
 arr(0.75, 0.743, 0.75, 0.708)
 arr(0.75, 0.653, 0.75, 0.62)
-arr(0.25, 0.736, 0.25, 0.695)
+arr(0.25, 0.736, 0.25, 0.708)
 arr(0.75, 0.551, 0.58, 0.524)
-arr(0.25, 0.626, 0.42, 0.524)
+arr(0.25, 0.602, 0.42, 0.524)
 arr(0.5, 0.456, 0.5, 0.423)
 arr(0.5, 0.368, 0.5, 0.343)
 arr(0.5, 0.288, 0.5, 0.253)

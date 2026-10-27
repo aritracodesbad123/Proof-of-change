@@ -21,8 +21,11 @@ A person starts a check from the command line, the web console, or the GitHub Ap
 writes its own PR comment and check result. The check loads the recorded head commit and a base side, reads claims
 that must quote the pull request text, and drafts probes; on the web console a person can keep or drop those probes
 and add up to 20 test ideas in plain words. It reads the project's own setup files and a crawl of the repository and
-its docs, then runs the code in a sandbox: local bubblewrap, or Contree. The sandbox gets no secret keys, and the
-network is on only for installs. Tests and probes run on main and on the pull request, and coverage checks whether
+its docs. The GitHub App, the request worker, and a hosted console run pull-request code only in Contree.
+A hosted console is one with POC_HOSTED=1, or one on Render or a Space, and not a single-user Codespace.
+If Contree cannot start, the check stops and the result is could not verify. The command line, a local
+console, and a study run are unchanged: local bubblewrap is still the default. The sandbox gets no secret
+keys, and the network is on only for installs. Tests and probes run on main and on the pull request, and coverage checks whether
 the changed lines ran. The verdict comes from the test evidence for each claim, and the second opinion does not
 change it.
 
