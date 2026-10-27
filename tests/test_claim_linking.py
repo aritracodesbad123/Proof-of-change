@@ -94,7 +94,7 @@ def test_41_c1_never_links_c10():
     out = claim_hygiene.apply({"items": [item]})
     got = {o["name"]: (o["claim"], o["label"]) for o in out["items"][0]["observations"]}
     assert got == {"C1.x": ("C1", FindingLabel.PROVEN.value), "C10.x": ("C10", FindingLabel.PROVEN.value)}
-    # a C10 change is never credited to C1
+    # a C10 change is never counted for C1
     item["runs"]["pr"] = [{"C1.x": 1, "C10.x": 6}] * 3
     item["claims"][1]["expect"] = "same"
     out = claim_hygiene.apply({"items": [probes.rejudge_entry(item)]})
