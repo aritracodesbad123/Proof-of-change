@@ -49,6 +49,21 @@ Measuring how much of the project's own tests ran the changed lines, inside Cont
 step. That step is built, and it is not confirmed on the live Contree service. When the report from
 that step is missing, a product check stays could not verify.
 
+### Line coverage on the main side
+
+Line coverage of a probe is measured only on the main side, in main's line numbers. A line the
+pull request adds is judged by the main lines next to it, so a check can pass without ever
+running a newly added branch of the code. A pull request that only adds new files cannot be
+verified.
+
+A probe counts as measured when only some of the changed files show up in its coverage.
+
+### Fresh claims and checks
+
+The AI writes the claims and the checks fresh on every run. The same pull request on the same
+code can get a different verdict on another run. An earlier run of one pull request came out
+needs attention, and a later run came out verified.
+
 ### Network and keys
 
 Tests and probes in the local sandbox have no internet. The network is turned on only while

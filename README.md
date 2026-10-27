@@ -32,6 +32,12 @@ A project that needs compiling is not supported. That includes code written in C
 
 Not built: in a Contree-only run the tool does not measure which changed lines a probe ran. A probe without that measurement is dropped and does not count. That alone keeps a Contree-only result from verified.
 
+Line coverage of a probe is measured only on the main side, in main's line numbers. A line the pull request adds is judged by the main lines next to it, so a check can pass without ever running a newly added branch of the code. A pull request that only adds new files cannot be verified.
+
+A probe counts as measured when only some of the changed files show up in its coverage.
+
+The AI writes the claims and the checks fresh on every run. The same pull request on the same code can get a different verdict on another run. An earlier run of one pull request came out needs attention, and a later run came out verified.
+
 Tests and probes in the local sandbox have no internet. The network is on only while packages are installed. Secret keys are not given to that sandbox, and they are not placed in a Contree shell. A behaviour that needs a network service, a password or a key cannot be tested.
 
 Verified means the behaviour the change described still holds. Needs attention means the check found a difference a person should look at. Could not verify means the check cannot say whether the change is fine. Passing probes never raise the verdict. The tool never approves a pull request and never merges one. A person decides.
