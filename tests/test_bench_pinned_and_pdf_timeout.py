@@ -91,19 +91,56 @@ def test_source_pair_uses_pinned_sides_not_tips(tmp_path, monkeypatch):
     assert "pull/7" not in flat and "merge-base" not in flat and "origin/main" not in flat
 
 
-def test_pdf_timeout_skips_pdf_only(tmp_path, monkeypatch):
-    html = tmp_path / "r.html"
-    html.write_text("<p>x</p>")
-    fake_chrome = tmp_path / "chrome"
-    fake_chrome.write_text("#!/bin/sh\nsleep 30 &\nsleep 30\n")
-    fake_chrome.chmod(0o755)
-    monkeypatch.setattr(reviewer, "find_chrome", lambda: str(fake_chrome))
+def _hanging_chrome(tmp_path, monkeypatch):
+    fake = tmp_path / "chrome"
+    fake.write_text("#!/bin/sh\nsleep 30 &\nsleep 30\n")  # hangs, and leaves a helper holding the pipe
+    fake.chmod(0o755)
+    monkeypatch.setattr(reviewer, "find_chrome", lambda: str(fake))
     monkeypatch.setattr(reviewer, "PDF_TIMEOUT_S", 1)
+
+
+def test_chrome_hang_falls_back_to_builtin_pdf(tmp_path, monkeypatch, capsys):
     import time
+    _hanging_chrome(tmp_path, monkeypatch)
+    html = tmp_path / "r.html"
+    html.write_text("<h1>Verdict: VERIFIED</h1><p>x</p><ul><li>a</li></ul><table><tr><td>1</td><td>2</td></tr></table>")
     t0 = time.time()
     err = reviewer.to_pdf(str(html), str(tmp_path / "r.pdf"))
     assert time.time() - t0 < 15
-    assert err and "PDF timed out" in err and not (tmp_path / "r.pdf").exists()
+    assert err is None
+    pdf = (tmp_path / "r.pdf").read_bytes()
+    assert pdf.startswith(b"%PDF") and len(pdf) > 500
+    assert "PDF timed out" in capsys.readouterr().err
+
+
+def test_chrome_missing_falls_back(tmp_path, monkeypatch):
+    monkeypatch.setattr(reviewer, "find_chrome", lambda: None)
+    html = tmp_path / "r.html"
+    html.write_text("<p>hello</p>")
+    assert reviewer.to_pdf(str(html), str(tmp_path / "r.pdf")) is None
+    assert (tmp_path / "r.pdf").stat().st_size > 0
+
+
+def test_both_makers_failing_is_logged_error_not_verdict(tmp_path, monkeypatch, capsys):
+    _hanging_chrome(tmp_path, monkeypatch)
+    monkeypatch.setattr(reviewer, "_fallback_pdf", lambda h, p: (_ for _ in ()).throw(RuntimeError("x")))
+    html = tmp_path / "r.html"
+    html.write_text("<p>x</p>")
+    err = reviewer.to_pdf(str(html), str(tmp_path / "r.pdf"))
+    assert err.startswith("ERROR: PDF not generated") and "ERROR" in capsys.readouterr().err
+
+
+def test_pr_report_with_hanging_chrome_keeps_verdict(tmp_path, monkeypatch):
+    import shutil as sh
+    from reports.generate import main as pr_main
+    _hanging_chrome(tmp_path, monkeypatch)
+    src = Path(__file__).resolve().parents[1] / "evals" / "fixtures" / "record_rev2_example.json"
+    sh.copy(src, tmp_path / "rec.json")
+    before = (tmp_path / "rec.json").read_text()
+    assert pr_main([str(tmp_path / "rec.json"), "--out", str(tmp_path / "o"), "--formats", "md,html,pdf"]) == 0
+    assert (tmp_path / "rec.json").read_text() == before
+    pdfs = list((tmp_path / "o").rglob("*.pdf"))
+    assert pdfs and all(p.stat().st_size > 0 for p in pdfs)
 
 
 def test_report_failure_never_changes_exit_or_records(tmp_path, monkeypatch, capsys):
@@ -118,3 +155,23 @@ def test_report_failure_never_changes_exit_or_records(tmp_path, monkeypatch, cap
     assert daily_run.reviewer_reports(tmp_path, a, [rec], "check") is None
     assert json.loads((tmp_path / "records.jsonl").read_text())["verdict"] == "verified"
     assert "verdicts are unchanged" in capsys.readouterr().err
+
+
+def test_step_timings_recorded_and_shown(monkeypatch):
+    from poc import run_progress
+    clock = iter([100.0, 103.0, 110.0, 111.5])
+    monkeypatch.setattr(run_progress.time, "time", lambda: next(clock))
+    run_progress.reset_timings()
+    run_progress.emit("fetch_pr")
+    run_progress.emit("setup_lookup")
+    run_progress.emit("setup_lookup")  # a progress tick does not split the step
+    run_progress.note_model_call("claims", 4.24)
+    t = run_progress.timings(now=120.0)
+    assert t == {"fetch_pr": 3.0, "setup_lookup": 17.0}
+    rec = {"per_run": [{"side": "old", "seconds": 2.0}, {"side": "new", "seconds": 3.0}, {"side": "old", "seconds": 1.0}],
+           "verdict": "verified"}
+    monkeypatch.setattr(run_progress, "timings", lambda now=None: {"fetch_pr": 3.0, "setup_lookup": 17.0})
+    st = daily_run.step_timings(rec)
+    assert st["sandbox prep (checkout)"] == 3.0 and st["Tavily setup lookup"] == 17.0
+    assert st["tests (main side)"] == 3.0 and st["tests (PR side)"] == 3.0 and st["model call 1 (claims)"] == 4.2
+    assert rec["verdict"] == "verified" and "timings" not in rec

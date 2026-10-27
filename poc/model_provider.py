@@ -182,6 +182,8 @@ class NebiusProvider(Provider):
                                      method="POST")  # br-allow-external: model inference call, creates nothing
         raw_dir = os.environ.get("POC_RAW_DIR")
         data, err = None, None
+        import time as _tm
+        _call_t0 = _tm.time()
         try:
             with urllib.request.urlopen(req, timeout=self.timeout) as r:   # noqa: S310 (fixed https URL)
                 data = json.loads(r.read())
@@ -205,6 +207,8 @@ class NebiusProvider(Provider):
             raise ProviderError(f"{self.name} {task} request failed: {type(e).__name__}") from None
         finally:
             self._remember(task, err is None)
+            from poc import run_progress as _rp
+            _rp.note_model_call(task, _tm.time() - _call_t0)
             from poc import cost as _cost
             _cost.record_call((data or {}).get("model") or body["model"], (data or {}).get("usage"), ok=err is None)
             if raw_dir:

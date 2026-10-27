@@ -100,7 +100,8 @@ def arm_dir_name(arm: str) -> str:
 def command(case: dict, arm: str, ops_dir: Path, run_name: str) -> list[str]:
     return [sys.executable, str(REPO_ROOT / "ops" / "daily_run.py"), "--pr", case["pr_url"], "--product-check",
             "--sandbox-backend", "contree", *ARMS[arm], "--ops-dir", str(ops_dir), "--date", run_name, "--no-report",
-            "--base-sha", case["base_sha"], "--head-sha", case["head_sha"]]
+            *(["--base-sha", case["base_sha"], "--head-sha", case["head_sha"]]
+              if case.get("base_sha") and case.get("head_sha") else [])]
 
 
 TRANSPORT_ERROR = "ContreeTransportError"

@@ -29,6 +29,7 @@ import re
 import shlex
 import shutil
 import subprocess
+import sys
 import tempfile
 import xml.etree.ElementTree as ET
 from pathlib import Path
@@ -1154,32 +1155,62 @@ def find_chrome() -> str | None:
 
 
 def to_pdf(html_path: str, pdf_path: str) -> str | None:
-    """Print HTML to A4 PDF with headless Chrome/Chromium. Returns None on success, else an error string."""
+    """Print HTML to an A4 PDF. Returns None when a non-empty PDF exists, else an error string.
+
+    First a fresh headless Chrome/Chromium (own temp profile, own process group, hard time limit, whole group
+    killed on a hang). If Chrome is missing, fails or hangs, the built-in pure-Python PDF maker (reportlab)
+    renders the same report right away. A PDF problem never touches a record or a verdict."""
+    chrome_err = _chrome_pdf(html_path, pdf_path)
+    if chrome_err is None:
+        return None
+    try:
+        _fallback_pdf(html_path, pdf_path)
+    except Exception as e:  # noqa: BLE001
+        msg = f"ERROR: PDF not generated: Chrome: {chrome_err}; built-in PDF maker: {type(e).__name__}: {e}"
+        print(msg, file=sys.stderr, flush=True)
+        return msg
+    if _pdf_ok(pdf_path):
+        print(f"PDF made with the built-in PDF maker (Chrome: {chrome_err})", file=sys.stderr, flush=True)
+        return None
+    msg = f"ERROR: PDF not generated: Chrome: {chrome_err}; built-in PDF maker wrote an empty file"
+    print(msg, file=sys.stderr, flush=True)
+    return msg
+
+
+PDF_TIMEOUT_S = 60
+CHROME_FLAGS = ("--headless=new", "--no-sandbox", "--disable-gpu", "--disable-dev-shm-usage", "--no-first-run",
+                "--no-default-browser-check", "--disable-extensions", "--disable-background-networking",
+                "--disable-component-update", "--disable-sync", "--password-store=basic", "--use-mock-keychain",
+                "--run-all-compositor-stages-before-draw", "--virtual-time-budget=10000", "--no-pdf-header-footer")
+
+
+def _pdf_ok(pdf_path: str) -> bool:
+    return os.path.exists(pdf_path) and os.path.getsize(pdf_path) > 0
+
+
+def _chrome_pdf(html_path: str, pdf_path: str) -> str | None:
     chrome = find_chrome()
     if not chrome:
-        return "no chrome/chromium on PATH (set BR_CHROME); PDF not generated"
+        return "no chrome/chromium on PATH (set BR_CHROME)"
     if os.path.exists(pdf_path):
         os.remove(pdf_path)
     with tempfile.TemporaryDirectory() as prof:
-        # Own process group, so a timeout kills Chrome and every helper it started (a helper left holding the
-        # output pipe used to keep the run waiting forever). A timeout only skips the PDF; HTML/MD and the
-        # record are already written and the verdict is never touched.
-        p = subprocess.Popen([chrome, "--headless=new", "--no-sandbox", "--disable-gpu", f"--user-data-dir={prof}",
-                              "--no-pdf-header-footer", f"--print-to-pdf={pdf_path}",
-                              "file://" + os.path.abspath(html_path)],
-                             stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, text=True, start_new_session=True)
+        try:
+            p = subprocess.Popen([chrome, *CHROME_FLAGS, f"--user-data-dir={prof}", f"--print-to-pdf={pdf_path}",
+                                  "file://" + os.path.abspath(html_path)],
+                                 stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE,
+                                 text=True, start_new_session=True)
+        except OSError as e:
+            return f"could not start Chrome: {e}"
         try:
             _, err = p.communicate(timeout=PDF_TIMEOUT_S)
         except subprocess.TimeoutExpired:
             _kill_group(p)
             if os.path.exists(pdf_path):
                 os.remove(pdf_path)
-            return f"PDF timed out after {PDF_TIMEOUT_S} s; PDF not generated (HTML and Markdown reports are unaffected)"
-    ok = os.path.exists(pdf_path) and os.path.getsize(pdf_path) > 0
-    return None if ok else f"chrome failed: {(err or '')[-300:]}"
-
-
-PDF_TIMEOUT_S = 180
+            return f"PDF timed out after {PDF_TIMEOUT_S} s"
+        _kill_group(p)  # helpers Chrome left behind
+    return None if _pdf_ok(pdf_path) else f"chrome failed: {(err or '')[-300:]}"
 
 
 def _kill_group(p: subprocess.Popen) -> None:
@@ -1187,11 +1218,71 @@ def _kill_group(p: subprocess.Popen) -> None:
     try:
         os.killpg(p.pid, signal.SIGKILL)
     except (ProcessLookupError, PermissionError, OSError):
-        p.kill()
+        pass
     try:
         p.communicate(timeout=10)
-    except subprocess.TimeoutExpired:
+    except (subprocess.TimeoutExpired, ValueError):
         pass
+
+
+def _html_blocks(text: str) -> list[tuple[str, str]]:
+    """(kind, text) blocks from the report HTML: h1-h3 headings, list items, table rows, paragraphs."""
+    from html.parser import HTMLParser
+
+    class P(HTMLParser):
+        def __init__(self):
+            super().__init__()
+            self.out, self.buf, self.kind, self.skip = [], [], "p", 0
+
+        def flush(self):
+            t = " ".join("".join(self.buf).split())
+            if t:
+                self.out.append((self.kind, t))
+            self.buf, self.kind = [], "p"
+
+        def handle_starttag(self, tag, attrs):
+            if tag in ("style", "script", "head"):
+                self.skip += 1
+            elif tag in ("h1", "h2", "h3", "h4", "p", "li", "tr", "pre", "div", "br"):
+                self.flush()
+                self.kind = {"h1": "h1", "h2": "h2", "h3": "h3", "h4": "h3", "li": "li", "tr": "tr",
+                             "pre": "pre"}.get(tag, "p")
+            elif tag in ("td", "th"):
+                self.buf.append(" | ")
+
+        def handle_endtag(self, tag):
+            if tag in ("style", "script", "head"):
+                self.skip = max(0, self.skip - 1)
+            elif tag in ("h1", "h2", "h3", "h4", "p", "li", "tr", "pre", "div"):
+                self.flush()
+
+        def handle_data(self, data):
+            if not self.skip:
+                self.buf.append(data)
+
+    p = P()
+    p.feed(text)
+    p.close()
+    p.flush()
+    return p.out
+
+
+def _fallback_pdf(html_path: str, pdf_path: str) -> None:
+    """Pure-Python A4 PDF of the same report (text, headings, lists, tables as rows). No browser, no network."""
+    from reportlab.lib.pagesizes import A4
+    from reportlab.lib.styles import getSampleStyleSheet
+    from reportlab.lib.units import mm
+    from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer
+    ss = getSampleStyleSheet()
+    style = {"h1": ss["Heading1"], "h2": ss["Heading2"], "h3": ss["Heading3"], "li": ss["Bullet"],
+             "tr": ss["BodyText"], "pre": ss["Code"], "p": ss["BodyText"]}
+    blocks = _html_blocks(Path(html_path).read_text(encoding="utf-8", errors="replace")) or [("p", "(empty report)")]
+    story = []
+    for kind, t in blocks:
+        story.append(Paragraph(html.escape(("\u2022 " if kind == "li" else "") + t), style[kind]))
+        story.append(Spacer(1, 1.5 * mm))
+    SimpleDocTemplate(pdf_path, pagesize=A4, leftMargin=15 * mm, rightMargin=15 * mm, topMargin=15 * mm,
+                      bottomMargin=15 * mm, title=os.path.basename(html_path)).build(story)
 
 
 # ---------------------------------------------------------------- daily summary

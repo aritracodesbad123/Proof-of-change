@@ -4558,6 +4558,29 @@ def closed_pr_reason(item: dict) -> str | None:
     return None
 
 
+TIMING_NAMES = {"fetch_pr": "sandbox prep (checkout)", "setup_lookup": "Tavily setup lookup",
+                "setup_python": "Python setup", "install_deps": "dependency install", "install_main": "main side install",
+                "install_pr": "PR side install", "claims": "model: claims/probe writing", "pytest": "tests (both sides)",
+                "probes": "probes", "verdict": "verdict", "report": "record"}
+
+
+def step_timings(rec: dict) -> dict:
+    """Seconds per step for the record (timing only). Per-side test time comes from the saved test runs; model
+    calls from the model log when it has per-call seconds."""
+    from poc import run_progress
+    t = {TIMING_NAMES.get(k, k): v for k, v in run_progress.timings().items()}
+    side: dict[str, float] = {}
+    for e in rec.get("per_run") or []:
+        sd = {"old": "main", "new": "PR", "main": "main", "pr": "PR"}.get(e.get("side")) if isinstance(e, dict) else None
+        if sd and isinstance(e.get("seconds"), (int, float)):
+            side[sd] = side.get(sd, 0.0) + e["seconds"]
+    for k, v in side.items():
+        t[f"tests ({k} side)"] = round(v, 1)
+    for i, (task, secs) in enumerate(run_progress.model_call_timings(), 1):
+        t[f"model call {i} ({task})"] = secs
+    return t
+
+
 def product_route(a) -> bool:
     """True for a product check (console, request-a-check, Codespaces, GitHub App): a single pull request started with
     ``--product-check`` (not inferred from ``--related-reports``). False for a study run and the daily study."""
@@ -4570,6 +4593,7 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
     from poc import run_progress
     t0 = time.time()
     begin_pr(a)
+    run_progress.reset_timings()
     run_progress.emit("fetch_pr", detail=f"{repo}#{item['pr']}")
     tag = f"{cfg['pkg']}-{item['pr']}"
     prdir = rdir / tag; prdir.mkdir(parents=True, exist_ok=True)
@@ -4843,6 +4867,8 @@ def finish(rec: dict, prdir: Path, work: Path, t0: float, runner=None) -> dict:
     if rec.get("pr_side", {}).get("build_seconds") is not None:
         rec["duration_s"]["build"] = rec["pr_side"]["build_seconds"]
     rec["cost"] = cost.take(rec["duration_s"])
+    if product_route(a):  # timing only; study records stay byte-identical
+        rec["timings"] = step_timings(rec)
     mark_bench_model_invalid(rec, runner)
     errs = check_record(rec)
     if errs:
@@ -6209,8 +6235,10 @@ def reviewer_reports(rdir: Path, a, records: list[dict], kind: str) -> None:
         return
     from reports.pr_report import render_run
     out = Path(a.report_dir) if a.report_dir else REPO_ROOT / "reports" / "daily" / rdir.name
+    t_rep = time.time()
     try:
         render_run(rdir, out, title=f"Proof-of-Change {kind}: {rdir.name}")
+        print(f"report and PDF: {round(time.time() - t_rep, 1)} s", flush=True)
     except Exception as e:  # noqa: BLE001 - reports are a view of the saved records; they never change a verdict or exit code
         print(f"reviewer reports could not be written ({type(e).__name__}); records and verdicts are unchanged",
               file=sys.stderr, flush=True)

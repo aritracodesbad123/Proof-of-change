@@ -45,7 +45,40 @@ _SWARM_STAGES = {
 }
 
 
+_marks: list[tuple[str, float]] = []
+
+
+_model_calls: list[tuple[str, float]] = []
+
+
+def reset_timings() -> None:
+    """Start a fresh step timer for one check (timing only; nothing reads it to decide anything)."""
+    _marks.clear()
+    _model_calls.clear()
+
+
+def note_model_call(task: str, seconds: float) -> None:
+    _model_calls.append((task, round(max(0.0, seconds), 1)))
+
+
+def model_call_timings() -> list[tuple[str, float]]:
+    return list(_model_calls)
+
+
+def timings(now: float | None = None) -> dict[str, float]:
+    """Seconds spent in each step since reset_timings(): a step runs from its first emit until the next emit of a
+    different step. Repeated emits of the same step (progress ticks) do not split it."""
+    out: dict[str, float] = {}
+    end = time.time() if now is None else now
+    for i, (stage, at) in enumerate(_marks):
+        nxt = _marks[i + 1][1] if i + 1 < len(_marks) else end
+        out[stage] = round(out.get(stage, 0.0) + max(0.0, nxt - at), 1)
+    return out
+
+
 def emit(stage: str, agent: str | None = None, detail: str | None = None) -> None:
+    if not _marks or _marks[-1][0] != stage:
+        _marks.append((stage, time.time()))
     path = os.environ.get("POC_PROGRESS_PATH")
     if not path:
         return
