@@ -1,6 +1,5 @@
 """PDF outcome reaches every surface: App comment and check run are edited in place, never re-posted."""
 import json
-import threading
 from pathlib import Path
 
 import pytest
