@@ -1,5 +1,5 @@
 """On a hosted console a user check uses only the typed Tavily key; a Codespace keeps its secret."""
-from poc import console_api, related_reports, session_key
+from poc import console_api, related_reports, session_key, tavily_docs
 
 SERVER = "server-tavily-key-000"
 TYPED = "typed-tavily-key-111"
@@ -11,15 +11,18 @@ def _env(**extra):
     return base
 
 
-def test_hosted_without_typed_key_gets_no_tavily_key_and_skips_lookup(capsys):
+def test_hosted_without_typed_key_gets_no_tavily_key_and_refuses_lookup(capsys):
     session_key.clear_key("hosted-a")
     env, secrets = console_api.child_environment(_env(), "recorded", "hosted-a")
     assert "TAVILY_API_KEY" not in env
     assert SERVER in secrets
     called = []
     out = related_reports.collect({"title": "x", "repo": "a/b"}, env=env, fetch=lambda q: called.append(q))
-    assert out["status"] == "skipped" and not called
-    assert related_reports.SKIP_LOG in capsys.readouterr().out
+    assert out["status"] == "refused" and not called
+    assert out["reason"] == tavily_docs.MISSING_KEY
+    logged = capsys.readouterr().out
+    assert tavily_docs.MISSING_KEY in logged
+    assert SERVER not in logged
 
 
 def test_hosted_with_typed_key_uses_the_typed_key():

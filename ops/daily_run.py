@@ -4362,6 +4362,11 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
     from poc import demo_helper
     if demo_helper.active(a):
         demo_helper.begin_check(a, rec, repo, cfg.get("dist") or cfg.get("pkg"), prdir)
+    if product_route(a):
+        reason = demo_helper.lookup_stop_reason(rec)
+        if reason:
+            rec["verdict"], rec["reason"], _ = verdict_for(None, reason)
+            return finish(rec, prdir, work, t0, a)
     if mark_typing_only(rec, item.get("files")):
         return finish_typing_only(rec, prdir, work, t0, a)
     set_contree_only(contree_only_wanted(getattr(a, "sandbox_backend", None)))
@@ -4529,13 +4534,24 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
     return finish(gate(rec), prdir, work, t0, a)
 
 
+def _record_related_failure(rec: dict, payload: dict) -> None:
+    """A refused or failed related-reports lookup stops the check as could not verify."""
+    rec["related_reports"] = payload
+    if not isinstance(payload, dict) or payload.get("status") not in ("refused", "error"):
+        return
+    from poc import related_reports
+    reason = str(payload.get("reason") or related_reports.FAIL_LOG)
+    rec["verdict"] = "could_not_verify"
+    rec["reason"] = reason
+
+
 def _attach_related_reports(rec: dict, runner) -> None:
     """Store related bug reports when this product check asked and the swarm will run.
 
     The text is background for the advisory AI. A study run, the daily study, and a check
-    whose swarm is off leave the record alone and do not call Tavily. A missing key or a
-    failed lookup is one log line. The exception text is not printed, because it can
-    contain the key. This never changes the verdict.
+    whose swarm is off leave the record alone and do not call Tavily. A missing key refuses.
+    A failed lookup stops the check as could not verify. The exception text is not printed
+    raw, because it can contain the key.
     """
     from poc import agents, related_reports
     if not agents.swarm_enabled(bool(getattr(runner, "swarm", False))):
@@ -4548,29 +4564,45 @@ def _attach_related_reports(rec: dict, runner) -> None:
             single_pr=bool(getattr(runner, "pr", None))):
         return
     try:
-        rec["related_reports"] = related_reports.collect(rec)
+        payload = related_reports.collect(rec)
     except Exception:  # noqa: BLE001 — do not print the message; it may contain the key
-        print(related_reports.FAIL_LOG, flush=True)
-        rec["related_reports"] = {"status": "error", "text": "", "items": [], "untrusted": True}
+        reason = f"{related_reports.FAIL_LOG}: the lookup failed"
+        print(reason, flush=True)
+        payload = {"status": "error", "text": "", "items": [], "result_count": 0, "untrusted": True,
+                   "reason": reason}
+    _record_related_failure(rec, payload)
 
 
 def finish(rec: dict, prdir: Path, work: Path, t0: float, runner=None) -> dict:
     # Agent swarm (judge/helper/summary) after the code verdict; advisory only — never changes rec["verdict"].
     # Off unless the run asked (--swarm / POC_SWARM). Skip also when model_skipped is set
     # (--no-probes / baseline without claim probes) so the stamp stays honest.
-    from poc import contree_sandboxes, hitl, run_progress
+    from poc import contree_sandboxes, demo_helper, hitl, run_progress
     contree_sandboxes.clear_session()
     # Requested comes from the settings (--swarm / POC_SWARM, and POC_HITL). Ran stays off when
     # that step never started: no model, probes skipped, or the approval step was not entered.
     swarm_requested = agents.swarm_enabled(bool(getattr(runner, "swarm", False)))
     ran_swarm = False
-    if (swarm_requested and runner is not None and getattr(runner, "provider", None) is not None
+    lookup_stopped = demo_helper.lookup_stop_reason(rec) is not None
+    if lookup_stopped:
+        # The setup lookup already stopped the check. Do not call Tavily again.
+        if "agents" not in rec:
+            note = "the check stopped because the setup lookup failed"
+            rec["agents"] = {"status": "skipped", "note": note, "roles": []}
+            rec.setdefault("explanation", {"status": "not yet wired", "why": note})
+    elif (swarm_requested and runner is not None and getattr(runner, "provider", None) is not None
             and not getattr(runner, "model_skipped", None)):
-        # Related bug reports are background for this advisory step only. The verdict above
-        # this function is already final. When the swarm is off, Tavily is not called.
+        # Related bug reports are background for this advisory step only. A failed lookup
+        # stops the check as could not verify. When the swarm is off, Tavily is not called.
         _attach_related_reports(rec, runner)
-        agents.run_swarm(runner.provider, rec)
-        ran_swarm = True
+        related = rec.get("related_reports") if isinstance(rec.get("related_reports"), dict) else {}
+        if related.get("status") in ("refused", "error"):
+            note = "the check stopped because the Tavily lookup failed"
+            rec["agents"] = {"status": "skipped", "note": note, "roles": []}
+            rec.setdefault("explanation", {"status": "not yet wired", "why": note})
+        else:
+            agents.run_swarm(runner.provider, rec)
+            ran_swarm = True
     elif runner is not None and getattr(runner, "model_skipped", None) and "agents" not in rec:
         rec["agents"] = {"status": "skipped", "note": runner.model_skipped, "roles": []}
         rec.setdefault("explanation", {"status": "not yet wired", "why": runner.model_skipped})
@@ -4673,6 +4705,11 @@ def test_source_pair(repo: str, cfg: dict, item: dict, prdir: Path, work: Path, 
     helper_on = demo_helper.active(a)
     if helper_on and not (rec.get("demo_helper") or {}).get("tavily"):
         demo_helper.begin_check(a, rec, repo, cfg.get("dist") or cfg.get("pkg"), prdir)
+    if product_route(a):
+        reason = demo_helper.lookup_stop_reason(rec)
+        if reason:
+            rec["verdict"], rec["reason"], _ = verdict_for(None, reason)
+            return rec
     run_progress.emit("fetch_pr", detail="checking out main / PR sides")
     if helper_on:
         def _checkout():
@@ -5440,14 +5477,36 @@ def skip_unused_model(a) -> None:
         a.model_skipped = "AI calls skipped because --no-probes was set"
 
 
+def tavily_start_refusal(a, env=None) -> str | None:
+    """One line when a product check has no Tavily key. None for a study run and the daily study.
+
+    Report rebuilds and selection-only runs do not call the lookup, so they are not refused here.
+    The line never contains the key.
+    """
+    if not product_route(a):
+        return None
+    if getattr(a, "select_only", False) or getattr(a, "report_only", False):
+        return None
+    from poc import tavily_docs
+    return tavily_docs.missing_key_line(env)
+
+
 def _batch_lookup(repo: str, cfg: dict) -> bool:
-    """The per-PR setup lookup gate. With no lookup key the gate is off and the PR goes straight to setup."""
+    """The per-PR setup lookup gate. A missing key or a failed lookup does not let the PR skip it."""
     from poc import demo_helper, tavily_docs
-    if not tavily_docs.available():
-        return True
+    missing = tavily_docs.missing_key_line()
+    if missing:
+        print(missing, flush=True)
+        return False
     query = demo_helper.lookup_queries(repo, cfg.get("dist") or cfg.get("pkg") or "")[0]
     got = demo_helper.live_fetch(query)
-    return bool(got.get("ok"))
+    if not isinstance(got, dict) or not got.get("ok"):
+        detail = "the lookup returned nothing usable"
+        if isinstance(got, dict) and got.get("error"):
+            detail = demo_helper.redact(str(got.get("error")))
+        print(f"could not verify: the setup lookup failed: {detail}", flush=True)
+        return False
+    return True
 
 
 def _batch_diagnose(a, item: tuple, why: str) -> None:
@@ -5592,8 +5651,9 @@ def _main(argv=None) -> int:
     ap.add_argument("--related-reports", action="store_true",
                     help="on a product check, look up a few related public bug reports and pass them to the "
                          "advisory AI as quoted background. Off for a study run and the daily study, even "
-                         "if this flag is set on a benchmark. Skipped when TAVILY_API_KEY is not set. "
-                         "Does not change the verdict and does not choose packages.")
+                         "if this flag is set on a benchmark. A product check does not start without "
+                         "TAVILY_API_KEY. If this lookup fails, the check stops as could not verify. "
+                         "It does not choose packages.")
     ap.add_argument("--product-check", action="store_true",
                     help="set only by product routes (console, request-a-check, Codespaces, GitHub App) on a single "
                          "pull-request check: 'verified' then needs measured coverage. Ignored on a benchmark or "
@@ -5675,6 +5735,10 @@ def _main(argv=None) -> int:
         raise SystemExit(1)
     a.swarm = agents.swarm_enabled(bool(a.swarm))
     stop = model_provider.key_refusal(a.model_provider)
+    if stop:
+        print(stop, file=sys.stderr)
+        raise SystemExit(1)
+    stop = tavily_start_refusal(a)
     if stop:
         print(stop, file=sys.stderr)
         raise SystemExit(1)

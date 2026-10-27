@@ -160,7 +160,7 @@ export function StartForm({
         onChange={(event) => set('nebiusProjectId', event.target.value)}
         placeholder={keyHint(stored.contree_project)}
       />
-      <label htmlFor="tavily-key">Tavily API key (optional)</label>
+      <label htmlFor="tavily-key">Tavily API key (required)</label>
       <input
         id="tavily-key"
         type="password"
@@ -174,7 +174,8 @@ export function StartForm({
         Keys are kept only in this browser tab and survive a page refresh; closing the tab clears them. They are
         sent with Run check, kept in the server's memory for the session, and never saved to disk, logs, or the
         report. Pull-request code never sees them. A check needs your own Nebius API key;
-        only the saved sample runs without one. Without a Tavily key, the lookup is skipped. Tavily keys are free at
+        only the saved sample runs without one. A check needs a Tavily API key for the setup lookup and does not
+        start without one. The saved sample still plays back without it. Tavily keys are free at
         https://app.tavily.com/. A Nebius project ID lets the check run in a Nebius cloud sandbox, billed to your
         own Nebius account.
       </p>

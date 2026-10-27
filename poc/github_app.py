@@ -13,6 +13,7 @@ import hmac
 import json
 import os
 import re
+import sys
 import time
 import urllib.error
 import urllib.request
@@ -343,6 +344,11 @@ def apply(plan: dict, *, dry_run: bool | None = None, env: dict | None = None,
         # still allow a pre-supplied record via plan["record"]
         rec = plan.get("record")
     else:
+        from poc import tavily_docs
+        missing = tavily_docs.missing_key_line(env)
+        if missing:
+            print(missing, file=sys.stderr)
+            return {"ok": False, "error": missing, "action": action, "repo": repo, "pr": pr, "dry_run": False}
         if runner is not None:
             run_exit = runner(argv)
         else:

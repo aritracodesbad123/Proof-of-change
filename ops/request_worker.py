@@ -6,8 +6,8 @@ Run this on the project Linux machine (not in GitHub Actions):
 
 The token is read from the environment and sent only as a request header. It is never
 printed and never included in an issue comment. ``TAVILY_API_KEY`` is also read from
-the environment. When it is missing, the worker logs that the lookup was skipped and
-still runs the check. The key value is never printed. Each loop writes a heartbeat the
+the environment. When it is missing or blank, the check does not start. The log is one
+line that names the variable and does not print the key. Each loop writes a heartbeat the
 offline notice can read. The check itself is ``ops/daily_run.py --swarm --pr <url>``,
 so pull-request code stays sandboxed and the advisory swarm is on.
 
@@ -33,6 +33,7 @@ from datetime import datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
+from poc import tavily_docs
 from poc.session_key import scrub
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -388,11 +389,11 @@ class GitHubClient:
         return self._put_file(path, markdown, "check report")
 
 
-TAVILY_MISSING = "Tavily lookup skipped: TAVILY_API_KEY is not set."
+TAVILY_MISSING = tavily_docs.MISSING_KEY
 
 
 def tavily_key(env: dict[str, str] | None = None) -> str:
-    """The Tavily key from the environment. Empty when the lookup should be skipped."""
+    """The Tavily key from the environment. Empty when the key is missing or blank."""
     env = os.environ if env is None else env
     return (env.get("TAVILY_API_KEY") or "").strip()
 
@@ -405,10 +406,17 @@ def tavily_notice(env: dict[str, str] | None = None) -> str | None:
 
 
 def run_check(pr_url: str, settings: Settings, secrets: list[str]) -> CheckResult:
-    """Run the normal check. Stdout is scrubbed before it can be shown."""
+    """Run the normal check. Stdout is scrubbed before it can be shown.
+
+    A missing Tavily key refuses the check before the child process starts. The reason is the
+    one-line message. The key value is never printed.
+    """
     notice = tavily_notice()
     if notice:
         print(notice, file=sys.stderr)
+        return CheckResult(
+            verdict="could_not_verify", reason=notice, report_markdown=None, run_id="check", ok=False,
+        )
     argv = default_check_argv(settings.python, settings.root, pr_url)
     child_env = os.environ.copy()
     # No person is present for a requested check, so it never pauses for human review,
@@ -533,6 +541,13 @@ def process_queue(client, settings: Settings, now: datetime, state: dict, *,
         print(f"closed non-python request {number}")
         return state
     url = f"https://github.com/{owner}/{name}/pull/{_pr}"
+    notice = tavily_notice()
+    if notice:
+        # The check does not start, and this request does not use a daily slot. One comment, then it waits.
+        if not already_said(comments, "Tavily key missing"):
+            client.comment(number, scrub(f"{notice}\n\nResults page: {settings.results_url}", secrets))
+        print(notice, file=sys.stderr)
+        return state
     state = note_started(state, now)
     save_state(settings.state_path, state)
     client.add_labels(number, [RUNNING_LABEL])

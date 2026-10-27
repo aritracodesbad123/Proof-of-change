@@ -664,6 +664,22 @@ def _has_typed_key(session_token: str | None) -> bool:
     return session_key.has_key(session_token)
 
 
+def _has_tavily_key(session_token: str | None, base: dict | None = None) -> bool:
+    """Whether this check has a Tavily key it is allowed to use. The value is never returned.
+
+    A hosted console counts only the key typed into the session. A Codespace also counts
+    ``TAVILY_API_KEY`` from the environment, because that secret belongs to the person running it.
+    """
+    pasted = (session_key.get_tavily_key(session_token) or "").strip()
+    if pasted:
+        return True
+    base = os.environ if base is None else base
+    from poc import console_auth
+    if console_auth.single_user_requested(base):
+        return bool((base.get("TAVILY_API_KEY") or "").strip())
+    return False
+
+
 NO_KEY_MESSAGE = "Add your Nebius API key to run a live check."
 
 
@@ -738,6 +754,10 @@ def start_check(pr_url: str, *, model_provider: str = "nebius", owner: str | Non
         # Only the saved sample may use the recorded AI answers. Any other check needs the user's own key.
         raise CheckRefused(NO_KEY_MESSAGE)
     playback = spaces_host.playback_only(pr_url, model_provider)
+    if not playback and not _has_tavily_key(session_token):
+        # Playing the saved sample does not run a check. Every other check needs the setup lookup.
+        from poc import tavily_docs
+        raise CheckRefused(tavily_docs.MISSING_KEY)
     requested = model_provider
     model_provider, provider_note = resolve_console_provider(requested, session_token)
     plan = console_run_flags(session_token)
