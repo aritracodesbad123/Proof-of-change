@@ -12,8 +12,10 @@ the running check, so the parallel side preparation of one check adds up. Checks
 another (the console starts each check in its own process). If a second check ever started before the first
 was taken, both totals are marked `overlapped` rather than silently mixed.
 
-The repository crawl cache is keyed by repository and base commit and kept on disk, so a later run of the same
-pull request at the same commit makes no crawl or extract call. Before crawling, a run now takes an exclusive
+The repository crawl cache is keyed by the exact repository and base commit (plus the docs site and
+`CRAWL_VERSION`) and kept on disk. A saved crawl is reused only by a later check of the same repository at the
+same base commit; it then makes no crawl or extract call. Any new base commit, including a newer tip of the
+same branch or another pull request on a newer commit, misses the cache and pays for a full crawl. Before crawling, a run now takes an exclusive
 file lock (`fcntl`) on that cache entry and reads the cache again once it holds the lock. Of several runs that
 start at the same moment, one crawls and writes the entry, and the others wait and read it. Each write goes to
 its own temporary file from `tempfile.mkstemp`, so neither processes nor threads share one, and is then

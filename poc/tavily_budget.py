@@ -56,7 +56,11 @@ SETUP_SEARCHES, GAP_SEARCHES, RELATED_SEARCHES = 3, 4, 1
 
 
 def worst_case(crawl_bodies=None, extract_body=None) -> int:
-    """Worst case for one check, from the crawl and extract request bodies the code really sends."""
+    """Worst case for one check, from the crawl and extract request bodies the code really sends.
+
+    The crawl terms are charged in full whenever the check's base commit has no saved crawl: the cache is
+    reused only for the same repository at the same base commit, so every new base commit pays for a full
+    crawl."""
     from poc import tavily_crawl
     if crawl_bodies is None:
         crawl_bodies = tavily_crawl.worst_case_bodies()["crawl"]
