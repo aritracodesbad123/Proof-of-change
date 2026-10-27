@@ -1,0 +1,32 @@
+[Unit]
+Description=Proof-of-Change hosted console (one process, local only)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=proof-of-change
+Group=proof-of-change
+WorkingDirectory=/opt/proof-of-change/app
+# Read by systemd as root before it drops to the service user, so the file stays root-only.
+EnvironmentFile=/etc/proof-of-change/env
+Environment=HOME=/var/lib/proof-of-change
+Environment=POC_OPS_DIR=/var/lib/proof-of-change
+Environment=POC_OPS_RUNS=/var/lib/proof-of-change/runs
+Environment=POC_REPORT_DIR=/var/lib/proof-of-change/reports
+Environment=POC_ACCOUNTS_FILE=/var/lib/proof-of-change/console-accounts.json
+Environment=PYTHONUNBUFFERED=1
+Environment=PYTHONDONTWRITEBYTECODE=1
+# Bound to 127.0.0.1: only Caddy on this machine can reach it.
+ExecStart=/opt/proof-of-change/venv/bin/python -m poc.console_api --host 127.0.0.1 --port 8787
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+# The app code under /opt is owned by root and read-only here; only the data folder is writable.
+ReadWritePaths=/var/lib/proof-of-change
+
+[Install]
+WantedBy=multi-user.target

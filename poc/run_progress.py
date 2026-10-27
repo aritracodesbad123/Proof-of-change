@@ -76,10 +76,14 @@ def timings(now: float | None = None) -> dict[str, float]:
     return out
 
 
-def emit(stage: str, agent: str | None = None, detail: str | None = None) -> None:
+def emit(
+    stage: str, agent: str | None = None, detail: str | None = None, path: str | Path | None = None
+) -> None:
+    """Record a stage. ``path`` targets one check's file without touching the process environment."""
     if not _marks or _marks[-1][0] != stage:
         _marks.append((stage, time.time()))
-    path = os.environ.get("POC_PROGRESS_PATH")
+    if path is None:
+        path = os.environ.get("POC_PROGRESS_PATH")
     if not path:
         return
     ev = {"at": time.time(), "stage": stage, "agent": agent, "detail": detail}

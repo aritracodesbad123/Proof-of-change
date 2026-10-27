@@ -162,3 +162,39 @@ def test_recorded_demo_flags_are_not_the_study_defaults():
     argv = console_api.console_daily_run_argv("https://github.com/me/demo/pull/3", "none", [])
     assert "--swarm" in argv and "--console-job" in argv
     assert "--runs" not in argv
+
+
+def _finish_playback(tmp_path, monkeypatch):
+    monkeypatch.setenv("SPACE_ID", "demo-space")
+    monkeypatch.delenv("NEBIUS_API_KEY", raising=False)
+    monkeypatch.delenv("NEBIUS_PROJECT_ID", raising=False)
+    import guardrails.sandbox as sb
+    monkeypatch.setattr(sb, "check", lambda: (False, "bwrap: user namespaces are not available"))
+    monkeypatch.setattr(console_api, "RUNS_ROOT", tmp_path)
+    monkeypatch.setattr(console_api, "REPO_ROOT", tmp_path)
+    monkeypatch.setattr(spaces_host.time, "sleep", lambda _s: None)
+    job = console_api.start_check(spaces_host.VETTED_URL, model_provider="recorded", owner="ada")
+    import time as real_time
+    deadline = real_time.monotonic() + 10
+    got = None
+    while real_time.monotonic() < deadline:
+        got = console_api.get_job(job["id"], owner="ada")
+        if got and got["status"] in {"done", "failed", "timed out"}:
+            break
+        real_time.sleep(0.02)
+    assert got is not None and got["status"] == "done"
+    return got
+
+
+@pytest.mark.parametrize("before", [None, "/elsewhere/progress.jsonl"])
+def test_playback_leaves_the_progress_variable_unchanged(tmp_path, monkeypatch, before):
+    import os
+    if before is None:
+        monkeypatch.delenv("POC_PROGRESS_PATH", raising=False)
+    else:
+        monkeypatch.setenv("POC_PROGRESS_PATH", before)
+    got = _finish_playback(tmp_path, monkeypatch)
+    assert os.environ.get("POC_PROGRESS_PATH") == before
+    # The check's own progress still reaches its own file.
+    assert "done" in [ev["stage"] for ev in got.get("stages") or []]
+    assert got.get("current_stage") == "done"

@@ -927,18 +927,14 @@ def start_check(pr_url: str, *, model_provider: str = "nebius", owner: str | Non
     with _jobs_lock:
         _jobs[job_id] = job
     # Seed progress file so UI shows queued before the child starts.
-    prev = os.environ.get("POC_PROGRESS_PATH")
-    os.environ["POC_PROGRESS_PATH"] = str(progress_path)
-    try:
-        run_progress.emit("queued", detail=f"{m.group(1)}#{m.group(2)}")
-    finally:
-        if prev is None:
-            os.environ.pop("POC_PROGRESS_PATH", None)
-        else:
-            os.environ["POC_PROGRESS_PATH"] = prev
+    run_progress.emit("queued", detail=f"{m.group(1)}#{m.group(2)}", path=progress_path)
 
     def work():
         from poc import run_progress as rp
+
+        def emit(stage, detail=None):
+            # Per-check target; the process-wide POC_PROGRESS_PATH is never set here.
+            rp.emit(stage, detail=detail, path=progress_path)
 
         env = os.environ.copy()
         env["POC_PROGRESS_PATH"] = str(progress_path)
@@ -955,10 +951,9 @@ def start_check(pr_url: str, *, model_provider: str = "nebius", owner: str | Non
         with _jobs_lock:
             job["status"] = "running"
             job["started_at"] = time.time()
-        os.environ["POC_PROGRESS_PATH"] = str(progress_path)
         if job.get("playback"):
             try:
-                rec = spaces_host.play(lambda stage, detail=None: rp.emit(stage, detail=detail))
+                rec = spaces_host.play(lambda stage, detail=None: emit(stage, detail=detail))
                 folder = RUNS_ROOT / "playback" / "mlxtend-1229"
                 folder.mkdir(parents=True, exist_ok=True)
                 (folder / "record.json").write_text(json.dumps(rec))
@@ -976,25 +971,25 @@ def start_check(pr_url: str, *, model_provider: str = "nebius", owner: str | Non
                     job["log_tail"] = "Playback of the vetted sample. No pull-request code ran.\n"
                     job.update(report_links(row["id"], folder=row["folder"], rec=stored))
             except Exception as e:  # noqa: BLE001
-                rp.emit("failed", detail=f"{type(e).__name__}: {e}"[:200])
+                emit("failed", detail=f"{type(e).__name__}: {e}"[:200])
                 with _jobs_lock:
                     job["status"] = "failed"
                     job["error"] = f"{type(e).__name__}: {e}"
                     job["finished_at"] = time.time()
             return
-        rp.emit("fetch_pr", detail="loading pull request")
+        emit("fetch_pr", detail="loading pull request")
         flags = list(job.get("run_flags") or [])
         note = job.get("run_note")
         notice = job.get("warning") or note
         if notice:
-            rp.emit("fetch_pr", detail=str(notice)[:200])
+            emit("fetch_pr", detail=str(notice)[:200])
         if job.get("refused"):
             message = str(note or "Proof-of-Change will not run pull-request code without a sandbox.")
             with _jobs_lock:
                 job["status"] = "failed"
                 job["error"] = message
                 job["finished_at"] = time.time()
-            rp.emit("failed", detail=message[:200])
+            emit("failed", detail=message[:200])
             return
         child_flags = list(flags)
         child_flags.extend(recorded_demo_flags(requested))
@@ -1026,16 +1021,15 @@ def start_check(pr_url: str, *, model_provider: str = "nebius", owner: str | Non
             file_tail = _tail_bytes(console_log, 8192)
             if file_tail:
                 tail = session_key.scrub(file_tail, secrets)
-            os.environ["POC_PROGRESS_PATH"] = str(progress_path)
             found = find_record_for_pr(m.group(1), int(m.group(2)))
             # A written record means the check produced analysis — surface it even if exit!=0 (problems list).
             ok = (returncode == 0 or found is not None) and not timed_out
             if timed_out:
-                rp.emit("failed", detail="timed out")
+                emit("failed", detail="timed out")
             elif ok:
-                rp.emit("done", detail="check finished" if returncode == 0 else "finished with problems")
+                emit("done", detail="check finished" if returncode == 0 else "finished with problems")
             else:
-                rp.emit("failed", detail=(fail_reason or f"exit {returncode}")[:200])
+                emit("failed", detail=(fail_reason or f"exit {returncode}")[:200])
             # remember_run takes _jobs_lock — must not run while we hold it (deadlocks Lock).
             saved = None
             if found:
@@ -1059,8 +1053,7 @@ def start_check(pr_url: str, *, model_provider: str = "nebius", owner: str | Non
                     job["folder"] = row["folder"]
                     job.update(report_links(row["id"], folder=row["folder"], rec=rec))
         except Exception as e:  # noqa: BLE001
-            os.environ["POC_PROGRESS_PATH"] = str(progress_path)
-            rp.emit("failed", detail=f"{type(e).__name__}: {e}"[:200])
+            emit("failed", detail=f"{type(e).__name__}: {e}"[:200])
             with _jobs_lock:
                 job["status"] = "failed"
                 job["error"] = f"{type(e).__name__}: {e}"

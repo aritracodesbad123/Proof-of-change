@@ -1,0 +1,28 @@
+# setup.sh replaces __SITE__ with <ip-with-dashes>.sslip.io (or your domain).
+# Caddy gets and renews the HTTPS certificate on its own, and redirects port 80 to HTTPS.
+__SITE__ {
+	encode gzip
+
+	# GitHub App deliveries. Only POST /webhook is passed on; the listener checks the signature.
+	@webhook {
+		method POST
+		path /webhook
+	}
+	handle @webhook {
+		request_body {
+			max_size 5MB
+		}
+		reverse_proxy 127.0.0.1:8080
+	}
+
+	# Everything else is the console, including GET /api/health.
+	handle {
+		reverse_proxy 127.0.0.1:8787 {
+			# A check streams progress for several minutes.
+			flush_interval -1
+			transport http {
+				read_timeout 0
+			}
+		}
+	}
+}
