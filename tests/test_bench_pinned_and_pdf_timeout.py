@@ -234,6 +234,24 @@ def test_mismatched_tested_commits_are_not_run(tmp_path):
     assert run.result_for(c, "tests", ["x"], rec2, 0, 1.0)["outcome"] == "not_run"
 
 
+def test_missing_tested_head_is_not_run_even_with_current_head(tmp_path):
+    c = cases()["fx-safe"]
+    rec = record(c, "verified")
+    rec.setdefault("chosen", {}).pop("head_sha", None)
+    rec["current_head_sha"] = c["head_sha"]   # live head must never stand in for the tested head
+    assert "tested PR head unknown" in run.sha_check(c, rec)
+    r = run.result_for(c, "tests", ["x"], rec, 0, 1.0)
+    assert r["outcome"] == "not_run" and r["verdict"] is None
+    assert "tested PR head unknown" in r["not_run_why"]
+
+
+def test_missing_record_is_not_run(tmp_path):
+    c = cases()["fx-safe"]
+    r = run.result_for(c, "tests", ["x"], None, 1, 1.0)
+    assert r["outcome"] == "not_run" and r["verdict"] is None
+    assert r["not_run_why"] == ["no usable record (exit 1)"]
+
+
 def test_leftover_chrome_on_temp_profile_is_killed(tmp_path):
     prof = str(tmp_path / "prof")
     p = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(60)", f"--user-data-dir={prof}"])

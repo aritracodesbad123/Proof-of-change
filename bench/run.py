@@ -169,9 +169,11 @@ def sha_check(case: dict, rec: dict | None) -> list[str]:
         return []
     sides = rec.get("sides") or {}
     main_sha = sides.get("main_sha")
-    head = (rec.get("chosen") or {}).get("head_sha") or rec.get("current_head_sha")
+    head = (rec.get("chosen") or {}).get("head_sha")
     p = []
-    if head != case["head_sha"]:
+    if not head:
+        p.append("tested PR head unknown")
+    elif head != case["head_sha"]:
         p.append(f"tested PR head {head} is not the manifest head_sha")
     # A moved live PR head is information only (kept in the result as head_moved / current_head_sha):
     # the check tested the pinned commits, so only a mismatch in the tested commits marks a case not run.
