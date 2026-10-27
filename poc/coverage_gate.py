@@ -108,17 +108,48 @@ def changed_lines(old_text: str | None, new_text: str, statement_start: bool = F
     return statement_starts(new_text, out) if statement_start else out
 
 
+_HEADER_FIELDS = ("test", "target", "iter", "items", "subject", "args", "returns", "bases", "keywords",
+                  "type_params")
+
+
+def _own_spans(tree: ast.AST) -> list[tuple[int, int]]:
+    """(first line, last line) of the part of each statement that coverage.py reports at its first line.
+
+    A simple statement owns all its lines. A compound statement (def, class, if, for, while, with, try, match)
+    owns only its header: from its first line to the last line of its header expressions (a multi-line signature
+    or condition). Its body, else, except, finally and case clauses are not part of it."""
+    out = []
+    for n in ast.walk(tree):
+        if not isinstance(n, ast.stmt) or not isinstance(getattr(n, "end_lineno", None), int):
+            continue
+        if not any(isinstance(getattr(n, f, None), list) and getattr(n, f) and isinstance(getattr(n, f)[0], ast.stmt)
+                   for f in ("body", "orelse", "finalbody", "handlers")) and not isinstance(n, ast.Match):
+            out.append((n.lineno, n.end_lineno))
+            continue
+        end = n.lineno
+        for f in _HEADER_FIELDS:
+            v = getattr(n, f, None)
+            for x in (v if isinstance(v, list) else [v]):
+                if isinstance(x, ast.AST):
+                    for sub in ast.walk(x):
+                        e = getattr(sub, "end_lineno", None)
+                        if isinstance(e, int):
+                            end = max(end, e)
+        out.append((n.lineno, end))
+    return out
+
+
 def statement_starts(text: str | None, lines: set[int]) -> set[int]:
-    """Each line mapped to the FIRST line of the innermost statement that contains it.
+    """Each changed line that coverage.py cannot see, mapped to the first line of the statement it belongs to.
 
     coverage.py reports a statement that spans several lines (a long list, dict, call or string) only at its first
-    line, so a change on a later line of that statement would otherwise look non-executable and be dropped. The
-    innermost statement is the one with the latest first line among those whose line range holds the line, so a
-    line in the body of an if or def maps to its own statement, and a line in a multi-line header maps to the header.
-    Lines outside every statement (blank lines, comments between statements) are kept as they are.
+    line, so a change on a later line of that statement would otherwise look non-executable. Only such a line is
+    remapped: one strictly inside a multi-line simple statement, or inside the multi-line header of a def, class
+    or compound statement. A line that is the first line of any statement is kept, and so are blank lines,
+    comment lines, decorators and else, except, finally and case lines; a body line is never mapped onto its def,
+    class or block header.
 
-    Fails closed: when the text cannot be parsed, the lines are returned unchanged, so nothing is ever credited
-    that the plain diff did not already name."""
+    Fails closed: when the text cannot be parsed, the lines are returned unchanged."""
     lines = set(lines)
     if not text or not lines:
         return lines
@@ -126,17 +157,17 @@ def statement_starts(text: str | None, lines: set[int]) -> set[int]:
         tree = ast.parse(text)
     except (SyntaxError, ValueError, RecursionError, MemoryError):
         return lines
-    spans = sorted({(n.lineno, n.end_lineno) for n in ast.walk(tree)
-                    if isinstance(n, ast.stmt) and isinstance(getattr(n, "end_lineno", None), int)})
+    src = text.splitlines()
+    spans = _own_spans(tree)
+    firsts = {a for a, _b in spans}
     out = set()
     for ln in lines:
-        start = None
-        for a, b in spans:
-            if a > ln:
-                break
-            if b >= ln:
-                start = a   # spans are sorted by first line, so the last match is the innermost
-        out.add(start if start is not None else ln)
+        body = src[ln - 1].strip() if 1 <= ln <= len(src) else ""
+        if ln in firsts or not body or body.startswith("#"):
+            out.add(ln)
+            continue
+        owner = [a for a, b in spans if a < ln <= b]
+        out.add(max(owner) if owner else ln)
     return out
 
 

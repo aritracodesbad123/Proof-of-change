@@ -41,12 +41,22 @@ writes to observe behaviour on both sides of a pull request); the third is for h
   numbers, true, false, null, lists and dicts with string keys. Anything else, such as an extra key, a tuple, a set,
   bytes, a non-string key or an object's printout, stays unparsed and is recorded as before. The usual output
   contract (size cap, number and length of names, exit code) still applies.
-- Statements are found with Python's own parser (the AST). A line maps to the innermost statement whose line range
-  holds it, so a line inside the body of an `if` or a function keeps its own statement, and a line of a multi-line
-  header maps to that header. Lines outside every statement, such as comments between statements, stay as they
-  are. If the file cannot be parsed, the lines are left unchanged, so nothing is credited that the plain diff did
-  not already name. A pure insertion is still judged by the main lines just before and after it; those lines are
-  mapped the same way.
+- Statements are found with Python's own parser (the AST). Only a line that coverage cannot see is remapped: a
+  line strictly inside a multi-line simple statement (a long list, dict, call or string), or a continuation line
+  of a multi-line header (a def signature, a class's bases, an if or while condition, a for target, a with item).
+  Such a line maps to that statement's first line.
+- Everything else is left as it is: the first line of any statement (coverage already counts it), blank lines,
+  comment lines, decorators, and else, except, finally and case lines. A line in the body of a def, class or block
+  is never mapped onto its header, because a header runs even when its body or branch does not (a def line runs
+  when the module is imported). So a probe that only imports a module is not credited with a change in a
+  function body.
+- A pure insertion is still judged by the main lines just before and after it, mapped by the same rule.
+- If the file cannot be parsed, the lines are left unchanged, so nothing is credited that the plain diff did not
+  already name.
+- The same mapping is applied to the pull-request-side changed lines of the test-coverage gate on product checks.
+  This changes that gate's totals: a change inside a multi-line statement now counts as one executable line at the
+  statement's first line instead of being dropped as non-executable, so the gate's "ran X of Y changed lines" can
+  differ from before for the same pull request.
 
 ## Alternatives and tradeoffs
 - Adding `src/` to the import path would run the checkout's files instead of the installed package, which can

@@ -276,3 +276,102 @@ def test_study_changed_lines_are_unchanged():
     assert probe_adequacy.main_side_lines(DICT_MAIN, DICT_PR) == {4, 5}
     assert probe_adequacy.main_side_lines(DICT_MAIN, DICT_PR, statement_start=False) == {4, 5}
     assert coverage_gate.changed_lines(DICT_MAIN, DICT_PR) == {5}
+
+
+# ---------------------------------------------------------------- mapping never credits code that did not run
+SHAPES = '''import functools
+
+
+class Thing:
+    @functools.lru_cache(
+        maxsize=None)
+    def method(self, value,
+               other=None):
+        total = value
+
+        # a comment in the body
+        try:
+            total += 1
+        except (ValueError,
+                TypeError):
+            total = 0
+        finally:
+            pass
+        if total > (
+                1):
+            return total
+        else:
+            return -1
+
+
+def pick(x):
+    match x:
+        case 1:
+            return "one"
+        case _:
+            return "other"
+'''
+
+
+def _line(text, needle, nth=1):
+    hits = [i for i, ln in enumerate(text.splitlines(), 1) if needle in ln]
+    return hits[nth - 1]
+
+
+@pytest.mark.parametrize("needle", [
+    "",                                    # blank line in a function body
+    "# a comment in the body",
+    "except (ValueError,", "TypeError):",  # except clause lines (not part of any statement's own lines)
+    "finally:", "else:", "case 1:", "case _:",
+    "@functools.lru_cache(", "maxsize=None)",   # a decorator, never the class or def line
+    "total = value", "total += 1", "return total", "match x:", "try:",   # first lines of statements
+])
+def test_lines_coverage_already_sees_or_must_not_credit_stay_as_they_are(needle):
+    ln = _line(SHAPES, needle) if needle else _line(SHAPES, "total = value") + 1
+    assert needle or SHAPES.splitlines()[ln - 1].strip() == ""
+    assert coverage_gate.statement_starts(SHAPES, {ln}) == {ln}
+
+
+@pytest.mark.parametrize("needle,owner", [
+    ("other=None):", "def method"),        # a multi-line def signature belongs to its def line
+    ("1):", "if total > ("),               # a multi-line if condition belongs to its if line
+])
+def test_only_lines_inside_a_multi_line_header_map_to_the_header(needle, owner):
+    assert coverage_gate.statement_starts(SHAPES, {_line(SHAPES, needle)}) == {_line(SHAPES, owner)}
+
+
+def test_body_lines_never_map_to_the_class_or_def_line():
+    mapped = coverage_gate.statement_starts(SHAPES, set(range(1, len(SHAPES.splitlines()) + 1)))
+    for header in ("class Thing:", "def method", "def pick", "try:", "match x:"):
+        h = _line(SHAPES, header)
+        # only the header's own continuation lines may land on it
+        sources = {ln for ln in range(1, len(SHAPES.splitlines()) + 1)
+                   if coverage_gate.statement_starts(SHAPES, {ln}) == {h}}
+        assert sources <= {h, h + 1}, (header, sources)
+    assert mapped
+
+
+BODY_MAIN = '''def work(x):
+    y = x + 1
+
+    # keep y small
+    return y
+'''
+BODY_PR = BODY_MAIN.replace("\n    # keep y small\n", "\n    y = min(y, 10)\n    # keep y small\n")
+
+
+def test_an_import_only_probe_does_not_cover_an_insertion_between_blank_and_comment_lines(tmp_path):
+    changed = probe_adequacy.main_side_lines(BODY_MAIN, BODY_PR, statement_start=True)
+    assert changed == {3, 4}                                  # the blank and the comment next to the insertion
+    execd, miss = _executable(BODY_MAIN, tmp_path, "bodymod", lambda m: None)   # only imported
+    assert 1 in execd                                         # the def line ran at import time
+    cov = probe_adequacy.measure({"m.py": changed}, {"m.py": {"executed_lines": sorted(execd),
+                                                              "missing_lines": sorted(miss)}})
+    assert cov["adequacy"] != probe_adequacy.ADEQUATE and cov["changed_lines_covered"] == 0
+
+
+def test_a_dict_printed_on_a_non_zero_exit_is_recorded_like_json():
+    lit = "{'observations': {'a': 1, 'b': None}}"
+    js = json.dumps({"observations": {"a": 1, "b": None}})
+    for code in (1, "1", 2):
+        assert probes.observations_of(lit, code, literal_output=True) == probes.observations_of(js, code)
