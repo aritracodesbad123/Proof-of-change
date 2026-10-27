@@ -2760,6 +2760,38 @@ def _maybe_prepare_contree(a, repo: str, main_sha: str, pr_sha: str, rec: dict, 
         return refusal
 
 
+def _prepare_while_planning(rec: dict, prepare, plan_fn) -> tuple:
+    """Product checks: build the Contree checkpoints (prepare) in a background thread while the model writes and
+    freezes the probes (plan_fn) in this one, then wait for both. prepare writes into its own copy of the record,
+    merged back after the join, so the two never write the same record at once. Errors surface as before: an
+    exception from planning is raised first (the sequential path plans first), then one from setup."""
+    import concurrent.futures as cf
+    scratch = dict(rec)
+    before = {k: v for k, v in scratch.items()}
+    t0 = time.time()
+    with cf.ThreadPoolExecutor(max_workers=1, thread_name_prefix="poc-setup") as ex:
+        fut = ex.submit(prepare, scratch)
+        t_plan = time.time()
+        try:
+            plan = plan_fn()
+            plan_err = None
+        except BaseException as e:  # noqa: BLE001 - re-raised below once setup has finished
+            plan, plan_err = None, e
+        t_plan_end = time.time()
+        cf.wait([fut])
+    for k, v in scratch.items():
+        if k not in before or before[k] is not v:
+            rec[k] = v
+    ps = rec.get("parallel_sides")
+    if isinstance(ps, dict):
+        ps.setdefault("steps", {})["plan_probes"] = {"start": round(t_plan, 3), "end": round(t_plan_end, 3),
+                                                     "seconds": round(t_plan_end - t_plan, 2)}
+        _step_time(rec, "setup_and_plan", t0)
+    if plan_err is not None:
+        raise plan_err
+    return fut.result(), plan
+
+
 def own_index_refusal(a, cnv: str | None, *checkouts) -> str | None:
     """A Contree setup failure on a product check whose project needs its own index or uv sources: could not verify
     with that limitation as the reason instead of the generic setup failure. Anything else is returned unchanged."""
@@ -2854,14 +2886,46 @@ def _contree_pytest_once(side: str, targets: list[str], test_timeout: int, run_t
 
 def run_tests(side_venvs: dict, targets_by_side: dict, rdir: Path, workdir: Path, runs: int, workers: str,
               test_timeout: int, run_timeout: int, cwds: dict | None = None,
-              keep_addopts: bool = False) -> tuple[list[dict], dict]:
+              keep_addopts: bool = False, parallel: bool = False) -> tuple[list[dict], dict]:
     """targets are relative to site-packages (nightly routes) or to the side's checkout (cwds given).
     per_run entries use the shared schema shape (side old/new, all counts present).
-    When a Contree session with main/PR checkpoints is active, pytest runs remotely (source-pair)."""
+    When a Contree session with main/PR checkpoints is active, pytest runs remotely (source-pair).
+    parallel (product checks on Contree only): run i of main and run i of PR go at the same time, each on its own
+    checkpoint; results are still recorded main first, then PR, so the order is the same as the sequential run."""
     from poc import run_progress
     use_contree = _contree_ready() and cwds is not None
     envs = ({side: base_env(side_home(v)) for side, v in side_venvs.items()} if not use_contree else {})
     per_run, results = [], {"main": [], "pr": []}
+    if parallel and use_contree:
+        for i in range(1, runs + 1):
+            run_progress.emit("pytest", "code", f"before run {i}/{runs} (main and PR together)")
+
+            def one(side, i=i):
+                tg = list(targets_by_side[side])
+                jx = rdir / f"junit-{side}-{i}.xml"; lg = rdir / f"pytest-{side}-{i}.log"
+                if not tg:
+                    return None
+                return _contree_pytest_once(side, tg, test_timeout, run_timeout, workers, jx, lg, keep_addopts)
+            got = _both_sides(one)
+            for side in ("main", "pr"):
+                jx = rdir / f"junit-{side}-{i}.xml"; lg = rdir / f"pytest-{side}-{i}.log"
+                entry = {"side": SIDE_KEY[side], "run": i, "passed": 0, "failed": 0, "error": 0, "skipped": 0,
+                         "collection_errors": 0}
+                if got[side] is None:
+                    results[side].append({}); per_run.append(entry | {"exit": "no-targets", "seconds": 0,
+                                                                       "pytest_summary": "", "junit": False})
+                    continue
+                rc, secs = got[side]
+                parsed = parse_junit(jx)
+                results[side].append(parsed)
+                for o, _ in parsed.values():
+                    entry["error" if o == "load_error" else o] += 1
+                text = lg.read_text(errors="replace")
+                entry["collection_errors"] = len(re.findall(r"^ERROR collecting ", text, re.M))
+                tail = (text.strip().splitlines() or [""])[-1][:200]
+                per_run.append(entry | {"exit": rc, "seconds": secs, "pytest_summary": tail, "junit": jx.exists()})
+            run_progress.emit("pytest", "code", f"after run {i}/{runs} (main and PR together)")
+        return per_run, results
     for i in range(1, runs + 1):
         for side in ("main", "pr"):
             run_progress.emit("pytest", "code", f"before run {i}/{runs}")
@@ -3877,7 +3941,8 @@ def run_probes(repo: str, pr: int, pythons: dict, prdir: Path, work: Path, a, pl
         try:
             guard(path)
             if use_contree:
-                it = _contree_run_probe(path, prdir, a.runs, x["source"], guard, literal_output=product_route(a))
+                it = _contree_run_probe(path, prdir, a.runs, x["source"], guard, literal_output=product_route(a),
+                                        parallel=parallel_sides(a))
             else:
                 it = probes.run_probe(path, pythons, prdir, cwds, envs, runs=a.runs, source=x["source"],
                                       launchers={side: probe_launcher(v, path) for side, v in venvs.items()},
@@ -3903,18 +3968,28 @@ def run_probes(repo: str, pr: int, pythons: dict, prdir: Path, work: Path, a, pl
     return out
 
 
-def _contree_run_probe(path: Path, outdir: Path, runs: int, source: str, guard, literal_output: bool = False) -> dict:
-    """Contree dual-run of one frozen probe (same alternating schedule as probes.run_probe)."""
+def _contree_run_probe(path: Path, outdir: Path, runs: int, source: str, guard, literal_output: bool = False,
+                       parallel: bool = False) -> dict:
+    """Contree dual-run of one frozen probe (same alternating schedule as probes.run_probe).
+    parallel: run i goes on main and PR at the same time (each its own checkpoint); the freeze guard is checked
+    before the PR side starts, and results are recorded main first, then PR, as in the sequential run."""
     spec = probes.read_spec(path)
     got: dict = {"main": [], "pr": []}
     files: dict = {"main": [], "pr": []}
     per_run = []
     timeout = int(spec.get("timeout_s", 120))
     for i in range(1, runs + 1):
-        for side in ("main", "pr"):
-            if side == "pr" and guard:
+        if parallel:
+            if guard:
                 guard(path)
-            obs, log, secs = _contree_probe_once(side, path, timeout, literal_output)
+            both = _both_sides(lambda side: _contree_probe_once(side, path, timeout, literal_output))
+        for side in ("main", "pr"):
+            if parallel:
+                obs, log, secs = both[side]
+            else:
+                if side == "pr" and guard:
+                    guard(path)
+                obs, log, secs = _contree_probe_once(side, path, timeout, literal_output)
             fname = f"probe-{spec['id']}-{side}-{i}.jsonl"
             probes.write_output(outdir / fname, obs)
             (outdir / f"probe-{spec['id']}-{side}-{i}.log").write_text(log)
@@ -4426,9 +4501,17 @@ def _contree_only_pair(a, rec: dict, repo: str, cfg: dict, item: dict, sp: dict,
     for v in (vm, vp):
         (v / "bin").mkdir(parents=True, exist_ok=True)
     setup_plan = _product_plan(a, rec, repo, cfg, [cm, cp], out_dir=prdir) if helper_on else None
-    run_progress.emit("claims", "super", "planning behaviour claims / probes")
-    plan = plan_probes(repo, item, rec, cm, [cp, work / "src"], prdir, a)
-    rec["pr_side_started_at"] = pr_started = freeze.now()   # nothing below may create or change a probe
+    overlap = parallel_sides(a)
+    if overlap:
+        rec["parallel_sides"] = {"enabled": True}
+    elif product_route(a):
+        rec["parallel_sides"] = {"enabled": False}
+    if not overlap:
+        run_progress.emit("claims", "super", "planning behaviour claims / probes")
+        t_plan = time.time()
+        plan = plan_probes(repo, item, rec, cm, [cp, work / "src"], prdir, a)
+        _step_time(rec, "plan_probes", t_plan)
+        rec["pr_side_started_at"] = pr_started = freeze.now()   # nothing below may create or change a probe
     chosen_tg = chosen_test_targets(item.get("chosen"))
     if chosen_tg:
         targets = {"main": [t for t in chosen_tg if (cm / t).exists()],
@@ -4449,13 +4532,29 @@ def _contree_only_pair(a, rec: dict, repo: str, cfg: dict, item: dict, sp: dict,
                            "declared_test_deps": decl, "optional_backends": optional,
                            "not_run_locally": not_local}
     rec["coverage"] = {"status": "not measured", "why": CONTREE_ONLY_COVERAGE_WHY}
-    run_progress.emit("install_main", detail="installing main and PR sides in Contree")
     blocked = _groups_blocked(a, setup_plan)
+    if overlap and blocked:   # nothing is prepared: plan the probes on their own, as the sequential path does
+        run_progress.emit("claims", "super", "planning behaviour claims / probes")
+        plan = plan_probes(repo, item, rec, cm, [cp, work / "src"], prdir, a)
+        rec["pr_side_started_at"] = freeze.now()
+    run_progress.emit("install_main", detail="installing main and PR sides in Contree")
     if blocked:
         rec["contree_only"]["note"] = "Contree mode: Contree did not run, so nothing from the pull request was run"
         return None, blocked, None, targets
-    cnv = _maybe_prepare_contree(a, repo, sp["main_sha"], sp["pr_sha"], rec, a.build_timeout,
-                                 extra_shell=contree_only_extra_shell(decl, optional, base), main_dir=cm)
+    prepare = lambda target: _maybe_prepare_contree(  # noqa: E731
+        a, repo, sp["main_sha"], sp["pr_sha"], target, a.build_timeout,
+        extra_shell=contree_only_extra_shell(decl, optional, base), main_dir=cm)
+    if overlap:
+        cnv, plan = _prepare_while_planning(
+            rec, prepare,
+            lambda: (run_progress.emit("claims", "super", "planning behaviour claims / probes"),
+                     plan_probes(repo, item, rec, cm, [cp, work / "src"], prdir, a))[1])
+        # Probes are written and frozen before any probe or test runs on the PR side.
+        rec["pr_side_started_at"] = pr_started = freeze.now()
+    else:
+        t_setup = time.time()
+        cnv = prepare(rec)
+        _step_time(rec, "setup", t_setup)
     cnv = own_index_refusal(a, cnv, cm, cp)
     cmp = ex = None
     if cnv:
@@ -4470,9 +4569,11 @@ def _contree_only_pair(a, rec: dict, repo: str, cfg: dict, item: dict, sp: dict,
         cnv = "no tests could be mapped to the touched files"
     else:
         run_progress.emit("pytest", "code", "dual-run pytest on main and PR (Contree)")
+        t_tests = time.time()
         per_run, results = run_tests({"main": vm, "pr": vp}, targets, prdir, work, a.runs, a.workers,
                                      a.test_timeout, a.run_timeout, cwds={"main": cm, "pr": cp},
-                                     keep_addopts=product_route(a))
+                                     keep_addopts=product_route(a), parallel=parallel_sides(a))
+        _step_time(rec, "tests", t_tests)
         cmp, cnv, ex = finalize_tests(rec, per_run, results, a)
         if cmp:
             ex = exit_check(rec.get("per_run", []), results, cmp)
@@ -4481,8 +4582,10 @@ def _contree_only_pair(a, rec: dict, repo: str, cfg: dict, item: dict, sp: dict,
         run_progress.emit("pytest", "code", "coverage inside Contree")
         rec["coverage"] = contree_coverage_run(item, cm, cp, targets["pr"], prdir, a)
     run_progress.emit("probes", "super", "running behaviour probes (Contree)")
+    t_probes = time.time()
     rec["probes"] = run_probes(repo, item["pr"], {"main": vm / "bin/python", "pr": vp / "bin/python"}, prdir,
                                work, a, plan, pr_started)
+    _step_time(rec, "probes", t_probes)
     from poc import probe_adequacy
     if measure_coverage:  # product route: each probe runs once more on the main checkpoint under coverage
         run_progress.emit("probes", "super", "probe coverage inside Contree")
@@ -4539,6 +4642,37 @@ def product_route(a) -> bool:
     if getattr(a, "bench", None) or not getattr(a, "pr", None):
         return False
     return bool(getattr(a, "product_check", False))
+
+
+PARALLEL_ENV = "POC_PARALLEL_SIDES"
+
+
+def parallel_sides(a) -> bool:
+    """True when a product check may overlap Contree setup with probe planning and run the main and PR sides at the
+    same time. Off for a study run and the daily study (byte-identical to before). POC_PARALLEL_SIDES=0 (or
+    --no-parallel-sides) switches it off on a product check too."""
+    if not product_route(a) or getattr(a, "no_parallel_sides", False):
+        return False
+    return (os.environ.get(PARALLEL_ENV) or "1").strip().lower() not in {"0", "false", "no", "off"}
+
+
+def _both_sides(fn, sides=("main", "pr")) -> dict:
+    """Run fn(side) for each side at the same time, each in its own thread (each side uses its own sandbox; the
+    Contree slot limit still applies). Returns {side: result} in side order. If any side raised, the error of the
+    first side in order is re-raised after every side has finished, so no thread is left running."""
+    import concurrent.futures as cf
+    with cf.ThreadPoolExecutor(max_workers=len(sides), thread_name_prefix="poc-side") as ex:
+        futs = {side: ex.submit(fn, side) for side in sides}
+        cf.wait(list(futs.values()))
+    return {side: futs[side].result() for side in sides}
+
+
+def _step_time(rec: dict, name: str, t0: float) -> None:
+    """Product checks: wall-clock start/end of a step under rec["parallel_sides"]["steps"]. Never read by a verdict."""
+    ps = rec.get("parallel_sides")
+    if isinstance(ps, dict):
+        ps.setdefault("steps", {})[name] = {"start": round(t0, 3), "end": round(time.time(), 3),
+                                            "seconds": round(time.time() - t0, 2)}
 
 
 def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, machine: dict) -> dict:
@@ -5851,6 +5985,9 @@ def _main(argv=None) -> int:
     ap.add_argument("--live-check", action="store_true",
                     help="set only by live product checks (console, GitHub App, request worker): a pull request that "
                          "is not open, or whose state cannot be read, is refused. Benchmark and replay runs omit it.")
+    ap.add_argument("--no-parallel-sides", action="store_true",
+                    help="product checks: run Contree setup after probe planning and the main and PR sides one "
+                         "after the other (same as POC_PARALLEL_SIDES=0)")
     ap.add_argument("--product-check", action="store_true",
                     help="set only by product routes (console, request-a-check, Codespaces, GitHub App) on a single "
                          "pull-request check: 'verified' then needs measured coverage. Ignored on a benchmark or "
