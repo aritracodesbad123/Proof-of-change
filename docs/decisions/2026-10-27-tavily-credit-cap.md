@@ -22,13 +22,43 @@ renamed into place. Tests cover a later process (a cache hit) and two processes 
 a saving.
 
 With `POC_TAVILY_CREDIT_CAP` set, a product check reads the account's current usage from Tavily's usage
-endpoint before its first Tavily call. If one check's worst case (19 credits: 3 setup searches, 3 setup-gap
-searches plus the batch gate search, 1 related-reports search, 2 crawl seeds of up to 40 pages at 4 credits
-each, and 1 extract of up to 12 pages at 3 credits; a test ties each term to the code's own limits) would take usage past the cap, or past the plan
+endpoint before its first Tavily call. If one check's worst case (43 credits, derived below) would take usage past the cap, or past the plan
 limit Tavily reports, the check stops at could not verify with "Tavily credit limit reached" and the numbers.
 If the cap is set but the key is missing or the usage cannot be read, the check also refuses, because the cap
 cannot be confirmed; with no key, `/usage` is never called.
 Without the variable nothing changes.
+
+## How the worst case is derived
+
+Tavily's published rules ([API credits](https://docs.tavily.com/documentation/api-credits)):
+
+> Basic Search (`basic`): Each request costs 1 API credit.
+>
+> Basic Extract (`basic`): Every 5 successful URL extractions cost 1 API credit. Advanced Extract (`advanced`):
+> Every 5 successful URL extractions cost 2 API credits.
+>
+> Regular Mapping: Every 10 successful pages returned cost 1 API credit. Map with (`instructions`): Every 10
+> successful pages returned cost 2 API credits.
+>
+> Crawl Cost = Mapping Cost + Extraction Cost
+
+The code applies these rules to the request bodies it really sends:
+
+- Searches, all basic: 3 setup queries, 3 setup-gap repair tries plus the batch gate search, and 1
+  related-reports search, for 8 credits.
+- Crawl, per seed: `limit` 40, `instructions` set, `extract_depth` basic. Mapping is 40/10 x 2 = 8 and
+  extraction is 40/5 x 1 = 8, so 16 credits. A repository with a docs site has 2 seeds, so 32.
+- Extract: at most 12 URLs at basic depth, so ceil(12/5) = 3 credits.
+- Total: 8 + 32 + 3 = **43 credits**.
+
+A test builds the crawl and extract bodies through the same functions the live calls use. It prices them
+with this formula, checks it against the docs' own examples (10 pages basic = 3, advanced = 5), and ties the
+search counts to the setup queries and the repair-try limit. If a limit or a depth changes, the worst case
+changes with it.
+
+A crawl that returns fewer pages costs less: 10 crawled pages and 8 extracted cost
+ceil(10/10) x 2 + ceil(10/5) + ceil(8/5) = 6 by this rule. Tavily reported 5 for such a run, so the formula is
+an upper bound.
 
 ## Why
 

@@ -20,21 +20,51 @@ CAP_ENV = "POC_TAVILY_CREDIT_CAP"
 USAGE_API = "https://api.tavily.com/usage"
 LIMIT_REACHED = "Tavily credit limit reached"
 SEARCH_CREDITS = {"basic": 1.0, "advanced": 2.0}
-# Worst case for one check, built from the real call limits (a test ties each term to its source):
-#   setup searches: one per demo_helper.lookup_queries entry (3)
-#   setup-gap searches: one per repair try (3) plus the batch gate search (1)
-#   related-reports search: 1
-#   crawl: one call per seed (at most 2), each capped at tavily_crawl.CRAWL_LIMIT pages; basic crawl is
-#          1 credit per 10 pages, so ceil(40 / 10) = 4 per seed
-#   extract: one call of at most tavily_crawl.EXTRACT_MAX pages; basic extract is 1 credit per 5 pages, so 3
+# Tavily's published credit rules (https://docs.tavily.com/documentation/api-credits):
+#   search: basic 1 credit, advanced 2 credits per request
+#   map: every 10 pages returned 1 credit, or 2 credits when natural-language instructions are given
+#   extract: every 5 successful URL extractions 1 credit at basic depth, 2 at advanced
+#   crawl = mapping cost + extraction cost of the pages it returns
+MAP_PAGES, EXTRACT_PAGES = 10, 5
+
+
+def _per(pages: int, size: int) -> int:
+    return -(-max(0, int(pages)) // size)
+
+
+def extract_credits(pages: int, depth: str = "basic") -> int:
+    return _per(pages, EXTRACT_PAGES) * (2 if depth == "advanced" else 1)
+
+
+def crawl_credits(pages: int, *, instructions: bool, depth: str = "basic") -> int:
+    return _per(pages, MAP_PAGES) * (2 if instructions else 1) + extract_credits(pages, depth)
+
+
+def request_credits(api: str, body: dict) -> int:
+    """The most a request with this body can cost, by the published rules."""
+    if api.endswith("/crawl"):
+        return crawl_credits(int(body.get("limit") or 0), instructions=bool(body.get("instructions")),
+                             depth=str(body.get("extract_depth") or "basic"))
+    if api.endswith("/extract"):
+        return extract_credits(len(body.get("urls") or []), str(body.get("extract_depth") or "basic"))
+    return int(SEARCH_CREDITS.get(str(body.get("search_depth") or "basic"), 1))
+
+
+# Searches per check, each tied by a test to the code: one per setup query (3), one per setup-gap repair try
+# (3) plus the batch gate search (1), and one related-reports search (1). All are basic.
 SETUP_SEARCHES, GAP_SEARCHES, RELATED_SEARCHES = 3, 4, 1
-CRAWL_SEEDS, CRAWL_PAGES_PER_CREDIT, EXTRACT_PAGES_PER_CREDIT = 2, 10, 5
 
 
-def worst_case(crawl_limit: int = 40, extract_max: int = 12) -> int:
-    crawl = CRAWL_SEEDS * -(-crawl_limit // CRAWL_PAGES_PER_CREDIT)
-    extract = -(-extract_max // EXTRACT_PAGES_PER_CREDIT)
-    return SETUP_SEARCHES + GAP_SEARCHES + RELATED_SEARCHES + crawl + extract
+def worst_case(crawl_bodies=None, extract_body=None) -> int:
+    """Worst case for one check, from the crawl and extract request bodies the code really sends."""
+    from poc import tavily_crawl
+    if crawl_bodies is None:
+        crawl_bodies = tavily_crawl.worst_case_bodies()["crawl"]
+    if extract_body is None:
+        extract_body = tavily_crawl.worst_case_bodies()["extract"]
+    searches = (SETUP_SEARCHES + GAP_SEARCHES + RELATED_SEARCHES) * SEARCH_CREDITS["basic"]
+    crawls = sum(request_credits("/crawl", b) for b in crawl_bodies)
+    return int(searches + crawls + request_credits("/extract", extract_body))
 
 
 WORST_CASE_CHECK = worst_case()

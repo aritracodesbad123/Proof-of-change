@@ -168,13 +168,30 @@ def test_cap_without_a_key_refuses_before_reading_usage(monkeypatch):
     assert line.startswith(tavily_budget.LIMIT_REACHED) and "TAVILY_API_KEY is not set" in line
 
 
-def test_worst_case_matches_the_real_call_limits():
+def test_formula_matches_the_published_examples():
+    # docs.tavily.com/documentation/api-credits: 10 pages basic = 1 + 2 = 3; advanced = 1 + 4 = 5
+    assert tavily_budget.crawl_credits(10, instructions=False) == 3
+    assert tavily_budget.crawl_credits(10, instructions=False, depth="advanced") == 5
+    assert tavily_budget.crawl_credits(10, instructions=True) == 4
+    assert tavily_budget.extract_credits(12) == 3 and tavily_budget.extract_credits(12, "advanced") == 6
+
+
+def test_worst_case_is_priced_from_the_bodies_the_code_really_sends(monkeypatch):
     from poc import demo_helper
+    sent = []
+    monkeypatch.setattr(tavily_crawl, "_post", lambda api, body, env, timeout: sent.append((api, body)) or {})
+    for s in tavily_crawl.seeds(REPO, SHA, "docs.example.org"):
+        tavily_crawl.crawl(s["url"], select_domains=s["select_domains"], select_paths=s["select_paths"], env={})
+    tavily_crawl.extract([f"https://x/{i}" for i in range(tavily_crawl.EXTRACT_MAX)], env={})
+    real = sum(tavily_budget.request_credits(api, body) for api, body in sent)
+    assert all(b["instructions"] and b["extract_depth"] == "basic" and b["limit"] == tavily_crawl.CRAWL_LIMIT
+               for api, b in sent if api == tavily_crawl.CRAWL_API)
     assert tavily_budget.SETUP_SEARCHES == len(demo_helper.lookup_queries("acme/widget", "widget"))
     assert tavily_budget.GAP_SEARCHES == demo_helper.MAX_GAP_TRIES + 1   # one per repair try plus the batch gate
-    assert tavily_budget.CRAWL_SEEDS == len(tavily_crawl.seeds(REPO, SHA, "docs.example.org"))
-    assert tavily_budget.WORST_CASE_CHECK == tavily_budget.worst_case(tavily_crawl.CRAWL_LIMIT,
-                                                                       tavily_crawl.EXTRACT_MAX) == 19
+    searches = tavily_budget.SETUP_SEARCHES + tavily_budget.GAP_SEARCHES + tavily_budget.RELATED_SEARCHES
+    assert tavily_budget.WORST_CASE_CHECK == tavily_budget.worst_case() == searches + real
+    # 40 pages with instructions: map 4 x 2 = 8, extract 8 x 1 = 8, so 16 per seed; 2 seeds; extract 12 = 3
+    assert real == 2 * 16 + 3 and tavily_budget.WORST_CASE_CHECK == 43
 
 
 def test_capped_check_end_to_end_refuses_with_no_tavily_call(tmp_path, monkeypatch):

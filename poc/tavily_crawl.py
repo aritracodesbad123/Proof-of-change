@@ -80,22 +80,41 @@ def _post(api: str, body: dict, env: dict, timeout: float) -> dict:
     return data
 
 
-def crawl(url: str, *, select_domains, select_paths=None, instructions: str = INSTRUCTIONS,
-          limit: int = CRAWL_LIMIT, max_depth: int = 2, env: dict | None = None, timeout: float = TIMEOUT) -> dict:
-    env = os.environ if env is None else env
+def crawl_body(url: str, *, select_domains, select_paths=None, instructions: str = INSTRUCTIONS,
+               limit: int = CRAWL_LIMIT, max_depth: int = 2, timeout: float = TIMEOUT) -> dict:
     body = {"url": url, "instructions": instructions, "max_depth": max_depth, "max_breadth": 40, "limit": limit,
             "select_domains": list(select_domains), "allow_external": False, "extract_depth": "basic",
             "format": "markdown", "chunks_per_source": 3, "timeout": timeout, "include_usage": True}
     if select_paths:
         body["select_paths"] = list(select_paths)
+    return body
+
+
+def extract_body(urls, *, timeout: float = 60) -> dict:
+    return {"urls": list(urls), "extract_depth": "basic", "format": "markdown", "include_usage": True,
+            "timeout": timeout}
+
+
+def crawl(url: str, *, select_domains, select_paths=None, instructions: str = INSTRUCTIONS,
+          limit: int = CRAWL_LIMIT, max_depth: int = 2, env: dict | None = None, timeout: float = TIMEOUT) -> dict:
+    env = os.environ if env is None else env
+    body = crawl_body(url, select_domains=select_domains, select_paths=select_paths, instructions=instructions,
+                      limit=limit, max_depth=max_depth, timeout=timeout)
     return _post(CRAWL_API, body, env, timeout)
 
 
 def extract(urls, *, env: dict | None = None, timeout: float = 60) -> dict:
     env = os.environ if env is None else env
-    body = {"urls": list(urls), "extract_depth": "basic", "format": "markdown", "include_usage": True,
-            "timeout": timeout}
-    return _post(EXTRACT_API, body, env, timeout)
+    return _post(EXTRACT_API, extract_body(urls, timeout=timeout), env, timeout)
+
+
+def worst_case_bodies() -> dict:
+    """The largest requests one check can send: every seed (a repository with a docs site) at the default
+    crawl settings, and one extract of EXTRACT_MAX pages. Used only to price a check up front."""
+    sha = "0" * 40
+    crawls = [crawl_body(s["url"], select_domains=s["select_domains"], select_paths=s["select_paths"])
+              for s in seeds("o/r", sha, "docs.example.org")]
+    return {"crawl": crawls, "extract": extract_body([f"https://example.org/{i}" for i in range(EXTRACT_MAX)])}
 
 
 # ---------------------------------------------------------------- scope
