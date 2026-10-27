@@ -2928,7 +2928,7 @@ def coverage_run(item: dict, venv: Path, main_root: Path, pr_root: Path, targets
             continue  # deleted by the PR, or not part of the installed package
         old = main_root / rel
         changed[rel] = coverage_gate.changed_lines(old.read_text(errors="replace") if old.is_file() else None,
-                                                   new.read_text(errors="replace"))
+                                                   new.read_text(errors="replace"), statement_start=product_route(a))
         sources.add(str(new.parent))
     if not changed:
         return {"status": "failed", "why": "none of the changed Python files exist on the PR side"}
@@ -2961,7 +2961,7 @@ def coverage_run(item: dict, venv: Path, main_root: Path, pr_root: Path, targets
     return res | {"seconds": secs, "exit": rc, "log": "coverage-pytest.log"}
 
 
-def _coverage_changed(item: dict, main_root: Path, pr_root: Path) -> tuple[dict, dict]:
+def _coverage_changed(item: dict, main_root: Path, pr_root: Path, a=None) -> tuple[dict, dict]:
     """Changed lines for the coverage gate, or a status dict when there is nothing to measure."""
     if not coverage_gate.python_sources(item["files"]):
         return {}, {"status": "not needed", "why": "no changed non-test Python files"}
@@ -2972,7 +2972,7 @@ def _coverage_changed(item: dict, main_root: Path, pr_root: Path) -> tuple[dict,
             continue
         old = main_root / rel
         changed[rel] = coverage_gate.changed_lines(old.read_text(errors="replace") if old.is_file() else None,
-                                                   new.read_text(errors="replace"))
+                                                   new.read_text(errors="replace"), statement_start=product_route(a))
     if not changed:
         return {}, {"status": "failed", "why": "none of the changed Python files exist on the PR side"}
     return changed, {}
@@ -3067,7 +3067,7 @@ def contree_coverage_run(item: dict, main_root: Path, pr_root: Path, targets: li
         return {"status": "skipped", "why": "--no-coverage"}
     if not uses(getattr(a, "baseline", None), "coverage"):
         return {"status": "skipped", "why": f"baseline {a.baseline} does not use the coverage gate"}
-    changed, early = _coverage_changed(item, main_root, pr_root)
+    changed, early = _coverage_changed(item, main_root, pr_root, a)
     if early:
         return early
     from poc import contree_sandboxes
@@ -3941,7 +3941,8 @@ def probe_coverage(item: dict, probe_results: dict | None, vm: Path, main_root: 
     for rel in coverage_gate.python_sources(item["files"]):
         old, new = Path(main_root) / rel, Path(pr_root) / rel
         changed[rel] = probe_adequacy.main_side_lines(old.read_text(errors="replace") if old.is_file() else None,
-                                                      new.read_text(errors="replace") if new.is_file() else None)
+                                                      new.read_text(errors="replace") if new.is_file() else None,
+                                                      statement_start=product_route(a))
     if not changed:
         return unmeasured("no changed non-test Python files")
     log = prdir / "probe-coverage.log"
@@ -4007,7 +4008,8 @@ def contree_probe_coverage(item: dict, probe_results: dict | None, main_root: Pa
     for rel in coverage_gate.python_sources(item["files"]):
         old, new = Path(main_root) / rel, Path(pr_root) / rel
         changed[rel] = probe_adequacy.main_side_lines(old.read_text(errors="replace") if old.is_file() else None,
-                                                      new.read_text(errors="replace") if new.is_file() else None)
+                                                      new.read_text(errors="replace") if new.is_file() else None,
+                                                      statement_start=product_route(a))
     if not changed:
         return all_unmeasured("no changed non-test Python files")
     on_main = sorted(rel for rel in changed if (Path(main_root) / rel).is_file())

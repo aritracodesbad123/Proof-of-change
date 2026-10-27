@@ -95,8 +95,9 @@ def ast_equal_ignoring_docstrings(old_text: str, new_text: str) -> bool:
     return ast.dump(old) == ast.dump(new)
 
 
-def changed_lines(old_text: str | None, new_text: str) -> set[int]:
-    """1-based line numbers of new_text that are added or changed relative to old_text (whole file if new)."""
+def changed_lines(old_text: str | None, new_text: str, statement_start: bool = False) -> set[int]:
+    """1-based line numbers of new_text that are added or changed relative to old_text (whole file if new).
+    statement_start (product checks): map each line to the first line of its statement (statement_starts)."""
     new = new_text.splitlines()
     if old_text is None:
         return set(range(1, len(new) + 1))
@@ -104,6 +105,38 @@ def changed_lines(old_text: str | None, new_text: str) -> set[int]:
     for tag, _i1, _i2, j1, j2 in difflib.SequenceMatcher(None, old_text.splitlines(), new, autojunk=False).get_opcodes():
         if tag in ("replace", "insert"):
             out.update(range(j1 + 1, j2 + 1))
+    return statement_starts(new_text, out) if statement_start else out
+
+
+def statement_starts(text: str | None, lines: set[int]) -> set[int]:
+    """Each line mapped to the FIRST line of the innermost statement that contains it.
+
+    coverage.py reports a statement that spans several lines (a long list, dict, call or string) only at its first
+    line, so a change on a later line of that statement would otherwise look non-executable and be dropped. The
+    innermost statement is the one with the latest first line among those whose line range holds the line, so a
+    line in the body of an if or def maps to its own statement, and a line in a multi-line header maps to the header.
+    Lines outside every statement (blank lines, comments between statements) are kept as they are.
+
+    Fails closed: when the text cannot be parsed, the lines are returned unchanged, so nothing is ever credited
+    that the plain diff did not already name."""
+    lines = set(lines)
+    if not text or not lines:
+        return lines
+    try:
+        tree = ast.parse(text)
+    except (SyntaxError, ValueError, RecursionError, MemoryError):
+        return lines
+    spans = sorted({(n.lineno, n.end_lineno) for n in ast.walk(tree)
+                    if isinstance(n, ast.stmt) and isinstance(getattr(n, "end_lineno", None), int)})
+    out = set()
+    for ln in lines:
+        start = None
+        for a, b in spans:
+            if a > ln:
+                break
+            if b >= ln:
+                start = a   # spans are sorted by first line, so the last match is the innermost
+        out.add(start if start is not None else ln)
     return out
 
 

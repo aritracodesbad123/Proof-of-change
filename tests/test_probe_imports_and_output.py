@@ -188,3 +188,91 @@ def test_run_probe_reads_literal_output_only_when_asked(tmp_path):
         out.mkdir()
         it = probes.run_probe(p, py, out, tmp_path / "cwd", {"main": env, "pr": env}, runs=1, literal_output=flag)
         assert all(r["ok"] is ok for r in it["per_run"])
+
+
+# ---------------------------------------------------------------- multi-line statements and changed lines
+from poc import coverage_gate, probe_adequacy  # noqa: E402
+
+# A class attribute holding a multi-line list of regexes; the PR changes its second line (a regex highlighter).
+REGEX_MAIN = '''import re
+
+
+class ReprHighlighter:
+    base_style = "repr."
+    highlights = [
+        r"(?P<tag_start><)(?P<tag_name>[-\\w.:|]*)(?P<tag_contents>[\\w\\W]*)(?P<tag_end>>)",
+        r'(?P<attrib_name>[\\w_]{1,50})=(?P<attrib_value>"?[\\w_]+"?)?',
+        r"(?P<brace>[][{}()])",
+    ]
+
+
+def first(text):
+    return re.search(ReprHighlighter.highlights[0], text)
+'''
+REGEX_PR = REGEX_MAIN.replace(r"(?P<tag_contents>[\w\W]*)(?P<tag_end>>)",
+                              r"(?P<tag_contents>[\w\W]*?)(?P<tag_end>>(?=<|$))")
+
+# A multi-line dict of irregular plurals inside a function; the PR inserts one entry in the middle.
+DICT_MAIN = '''def plural_of(word):
+    irregular = {
+        'ox': 'oxen', 'paralysis': 'paralyses', 'parenthesis': 'parentheses',
+        'person': 'people', 'phenomenon': 'phenomena', 'potato': 'potatoes',
+        'radius': 'radii', 'scarf': 'scarves', 'scissors': 'scissors',
+    }
+    return irregular.get(word, word + 's')
+'''
+DICT_PR = DICT_MAIN.replace("'potato': 'potatoes',\n", "'potato': 'potatoes',\n        'quiz': 'quizzes',\n")
+
+
+def _executable(text, tmp_path, name, call):
+    """coverage.py's executed and missing lines for text, run with call(module)."""
+    coverage = pytest.importorskip("coverage")
+    import importlib.util
+    f = tmp_path / f"{name}.py"
+    f.write_text(text)
+    cov = coverage.Coverage(data_file=None, include=[str(f)])
+    cov.start()
+    try:
+        spec = importlib.util.spec_from_file_location(name, f)
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        call(mod)
+    finally:
+        cov.stop()
+    _, stmts, _, missing, _ = cov.analysis2(str(f))
+    return set(stmts) - set(missing), set(missing)
+
+
+@pytest.mark.parametrize("main,pr,name,call,start", [
+    (REGEX_MAIN, REGEX_PR, "regexmod", lambda m: m.first("<a>x</a>"), 6),
+    (DICT_MAIN, DICT_PR, "dictmod", lambda m: m.plural_of("quiz"), 2),
+])
+def test_changed_line_inside_a_multi_line_statement_counts_at_its_first_line(main, pr, name, call, start, tmp_path):
+    raw = probe_adequacy.main_side_lines(main, pr)
+    assert raw and start not in raw                      # the diff names later lines of the statement only
+    execd, miss = _executable(main, tmp_path, name, call)
+    assert not raw & (execd | miss)                      # so, unmapped, the change looks non-executable
+    mapped = probe_adequacy.main_side_lines(main, pr, statement_start=True)
+    assert mapped == {start} and start in execd          # mapped, it is the statement coverage reports as run
+    cov = probe_adequacy.measure({"m.py": mapped}, {"m.py": {"executed_lines": sorted(execd),
+                                                             "missing_lines": sorted(miss)}})
+    assert cov["changed_lines_covered"] == 1 and cov["adequacy"] == probe_adequacy.ADEQUATE
+    # PR-side changed lines (test coverage gate) map the same way on the PR text
+    assert coverage_gate.changed_lines(main, pr, statement_start=True) == {start}
+    assert start not in coverage_gate.changed_lines(main, pr)
+
+
+def test_statement_starts_keeps_body_lines_and_fails_closed():
+    code = "def f(x):\n    if (x and\n            x > 1):\n        return [1,\n                2]\n    return 0\n"
+    assert coverage_gate.statement_starts(code, {3}) == {2}       # multi-line header -> the if
+    assert coverage_gate.statement_starts(code, {5}) == {4}       # inside the body -> its own statement
+    assert coverage_gate.statement_starts(code, {6}) == {6}
+    assert coverage_gate.statement_starts("x = 1\n\n# note\ny = 2\n", {3}) == {3}   # outside any statement
+    assert coverage_gate.statement_starts("def f(:\n  x = [1,\n 2]\n", {3}) == {3}   # unparsable: unchanged
+    assert coverage_gate.statement_starts(None, {2}) == {2}
+
+
+def test_study_changed_lines_are_unchanged():
+    assert probe_adequacy.main_side_lines(DICT_MAIN, DICT_PR) == {4, 5}
+    assert probe_adequacy.main_side_lines(DICT_MAIN, DICT_PR, statement_start=False) == {4, 5}
+    assert coverage_gate.changed_lines(DICT_MAIN, DICT_PR) == {5}
