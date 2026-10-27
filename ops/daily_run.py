@@ -2798,8 +2798,18 @@ def contree_only_extra_shell(declared: list[str], optional: list[str], base: str
     return "\n".join(lines)
 
 
+def repo_addopts_flag(keep: bool) -> str:
+    """Shell form of the addopts override. A product check keeps the repository's own pytest addopts (for example
+    a plugin it loads with ``-p``); the study route blanks them as before."""
+    return "" if keep else "-o addopts= "
+
+
+def repo_addopts_args(keep: bool) -> list[str]:
+    return [] if keep else ["-o", "addopts="]
+
+
 def _contree_pytest_once(side: str, targets: list[str], test_timeout: int, run_timeout: int,
-                         workers: str, jx: Path, lg: Path) -> tuple[int | str, float]:
+                         workers: str, jx: Path, lg: Path, keep_addopts: bool = False) -> tuple[int | str, float]:
     """One Contree disposable pytest; junit+log written locally from the remote shell output."""
     from poc import contree_sandboxes
     sess = contree_sandboxes.session()
@@ -2809,13 +2819,13 @@ def _contree_pytest_once(side: str, targets: list[str], test_timeout: int, run_t
     shell = (
         "set +e\ncd /work/src\n"
         f"python -m pytest {tg} -p no:cacheprovider -q -rfE --timeout={int(test_timeout)} "
-        f"-o addopts= -o junit_family=xunit2 --junitxml=/tmp/poc-junit.xml {nflag}"
+        f"{repo_addopts_flag(keep_addopts)}-o junit_family=xunit2 --junitxml=/tmp/poc-junit.xml {nflag}"
         ">/tmp/poc-pytest.log 2>&1\n"
         "ec=$?\n"
         "if grep -q 'different tests were collected' /tmp/poc-pytest.log 2>/dev/null && "
         f"[ {shlex.quote(workers)} != 0 ]; then\n"
         f"  python -m pytest {tg} -p no:cacheprovider -q -rfE --timeout={int(test_timeout)} "
-        "-o addopts= -o junit_family=xunit2 --junitxml=/tmp/poc-junit.xml "
+        f"{repo_addopts_flag(keep_addopts)}-o junit_family=xunit2 --junitxml=/tmp/poc-junit.xml "
         ">/tmp/poc-pytest.log 2>&1\n  ec=$?\nfi\n"
         "printf '___POC_EXIT___%s\\n' \"$ec\"\n"
         "printf '___POC_JUNIT___\\n'\ncat /tmp/poc-junit.xml 2>/dev/null\n"
@@ -2843,7 +2853,8 @@ def _contree_pytest_once(side: str, targets: list[str], test_timeout: int, run_t
 
 
 def run_tests(side_venvs: dict, targets_by_side: dict, rdir: Path, workdir: Path, runs: int, workers: str,
-              test_timeout: int, run_timeout: int, cwds: dict | None = None) -> tuple[list[dict], dict]:
+              test_timeout: int, run_timeout: int, cwds: dict | None = None,
+              keep_addopts: bool = False) -> tuple[list[dict], dict]:
     """targets are relative to site-packages (nightly routes) or to the side's checkout (cwds given).
     per_run entries use the shared schema shape (side old/new, all counts present).
     When a Contree session with main/PR checkpoints is active, pytest runs remotely (source-pair)."""
@@ -2871,10 +2882,11 @@ def run_tests(side_venvs: dict, targets_by_side: dict, rdir: Path, workdir: Path
                 run_progress.emit("pytest", "code", f"after run {i}/{runs}")
                 continue
             if use_contree:
-                rc, secs = _contree_pytest_once(side, tg, test_timeout, run_timeout, workers, jx, lg)
+                rc, secs = _contree_pytest_once(side, tg, test_timeout, run_timeout, workers, jx, lg, keep_addopts)
             else:
                 cmd = [venv / "bin/python", "-m", "pytest", *tg, "-p", "no:cacheprovider", "-q", "-rfE",
-                       f"--timeout={test_timeout}", "-o", "addopts=", "-o", "junit_family=xunit2", f"--junitxml={jin}"]
+                       f"--timeout={test_timeout}", *repo_addopts_args(keep_addopts), "-o", "junit_family=xunit2",
+                       f"--junitxml={jin}"]
                 if workers != "0":
                     cmd += ["-n", workers]
                 rc, secs = run(cmd, lg, cwd=(cwds[side] if cwds else side_cwd(venv)), env=envs[side],
@@ -2942,7 +2954,7 @@ def coverage_run(item: dict, venv: Path, main_root: Path, pr_root: Path, targets
     oin = side_out(venv) / out.name
     base = cwd or pr_root
     cmd = [venv / "bin/python", "-m", "pytest", *[str(base / t) for t in targets], "-p", "no:cacheprovider", "-q",
-           f"--timeout={a.test_timeout}", "-o", "addopts=", *[f"--cov={s}" for s in sorted(sources)],
+           f"--timeout={a.test_timeout}", *repo_addopts_args(product_route(a)), *[f"--cov={s}" for s in sorted(sources)],
            f"--cov-report=json:{oin}"]
     if a.workers != "0":
         cmd += ["-n", a.workers]
@@ -3081,7 +3093,7 @@ def contree_coverage_run(item: dict, main_root: Path, pr_root: Path, targets: li
     shell = (
         "set +e\ncd /work/src\n"
         f"python -m pytest {tg} -p no:cacheprovider -q --timeout={int(a.test_timeout)} "
-        f"-o addopts= {nflag}{cov} --cov-report=json:/tmp/poc-cov.json "
+        f"{repo_addopts_flag(product_route(a))}{nflag}{cov} --cov-report=json:/tmp/poc-cov.json "
         ">/tmp/poc-cov-pytest.log 2>&1\n"
         "ec=$?\n"
         "printf '___POC_EXIT___%s\\n' \"$ec\"\n"
@@ -3541,6 +3553,7 @@ def verdict_for(cmp: dict | None, cnv_reason: str | None, exits: dict | None = N
         return (Verdict.COULD_NOT_VERIFY.value,
                 "unsupported: main and PR sides are the same commit, so nothing was compared; "
                 "a docstring-only result cannot be claimed", ["identical_sides"])
+    hygiene = (probe_results or {}).get("claim_hygiene") if isinstance(probe_results, dict) else None
     probe_results = probe_items(probe_results, baseline)
     v, reason, fl = with_probes(cmp, cnv_reason, exits, files, probe_results)
     if uses(baseline, "claim_flags") and claims and v == Verdict.VERIFIED.value and not behaviour_claims.probe_covers(
@@ -3561,6 +3574,22 @@ def verdict_for(cmp: dict | None, cnv_reason: str | None, exits: dict | None = N
         return (Verdict.COULD_NOT_VERIFY.value,
                 f"could not verify: claim(s) {shown}{extra} expect a difference but no observation matches ({reason})",
                 fl + ["unmatched_differs_claim"])
+    advisory = sorted({str(it.get("id")) for it in (probe_results or {}).get("items") or []
+                       for o in it.get("observations") or [] if o.get("advisory")})
+    if advisory and v == Verdict.VERIFIED.value:
+        # A claim-less probe saw a difference nobody claimed. It does not raise needs attention, but it is
+        # unexplained, so the PR cannot be verified either.
+        return (Verdict.COULD_NOT_VERIFY.value,
+                f"could not verify: probe(s) {', '.join(advisory)} have no claims attached and saw a difference no "
+                f"claim covers, so the change is not confirmed ({reason})", fl + ["advisory_unclaimed_difference"])
+    if hygiene and hygiene.get("held_back") and v == Verdict.VERIFIED.value:
+        return (Verdict.COULD_NOT_VERIFY.value,
+                f"could not verify: claim(s) {', '.join(hygiene['held_back'][:4])} expect a difference but no "
+                f"observation matches ({reason})", fl + ["unmatched_differs_claim"])
+    if hygiene and hygiene.get("dropped_flagged") and v == Verdict.VERIFIED.value:
+        from poc import claim_hygiene
+        return (Verdict.COULD_NOT_VERIFY.value, f"could not verify: {claim_hygiene.note_text(hygiene)} ({reason})",
+                fl + ["dropped_flagged_probe"])
     return v, reason, fl
 
 
@@ -4253,6 +4282,12 @@ def settle_probes(rec: dict) -> None:
     if not pr or not pr.get("items"):
         return
     from poc import probe_adequacy
+    if rec.get("product_check"):   # product route only: the study route keeps the model's claims as written
+        from poc import claim_hygiene
+        pr = claim_hygiene.apply(pr)
+        note = claim_hygiene.note_text(pr.get("claim_hygiene"))
+        if note:
+            rec["claim_hygiene_note"] = note
     rec["probes"] = probes.apply_status(pr)
     rec["probe_changed_line_coverage"] = probe_adequacy.summary(rec["probes"]["items"])
 
@@ -4318,7 +4353,7 @@ def execute_tests(rec: dict, venvs: dict, targets: dict, prdir: Path, work: Path
     A failure that then shows the same exception on the base side is recorded as the backend, not as a pull-request
     finding (verdict could_not_verify when that is the only finding)."""
     per_run, results = run_tests(venvs, targets, prdir, work, a.runs, a.workers, a.test_timeout, a.run_timeout,
-                                 cwds=cwds)
+                                 cwds=cwds, keep_addopts=product_route(a))
     cmp, cnv, ex = finalize_tests(rec, per_run, results, a)
     if not cmp:
         return cmp, cnv, ex
@@ -4334,7 +4369,7 @@ def execute_tests(rec: dict, venvs: dict, targets: dict, prdir: Path, work: Path
         return cmp, cnv, ex
     rec["test_extras"] = list(dict.fromkeys([*(rec.get("test_extras") or []), *wheels]))
     per_run, results = run_tests(venvs, targets, prdir, work, a.runs, a.workers, a.test_timeout, a.run_timeout,
-                                 cwds=cwds)
+                                 cwds=cwds, keep_addopts=product_route(a))
     cmp, cnv, ex = finalize_tests(rec, per_run, results, a)
     if not cmp:
         return cmp, cnv, ex
@@ -4434,7 +4469,8 @@ def _contree_only_pair(a, rec: dict, repo: str, cfg: dict, item: dict, sp: dict,
     else:
         run_progress.emit("pytest", "code", "dual-run pytest on main and PR (Contree)")
         per_run, results = run_tests({"main": vm, "pr": vp}, targets, prdir, work, a.runs, a.workers,
-                                     a.test_timeout, a.run_timeout, cwds={"main": cm, "pr": cp})
+                                     a.test_timeout, a.run_timeout, cwds={"main": cm, "pr": cp},
+                                     keep_addopts=product_route(a))
         cmp, cnv, ex = finalize_tests(rec, per_run, results, a)
         if cmp:
             ex = exit_check(rec.get("per_run", []), results, cmp)
@@ -4460,6 +4496,41 @@ def _contree_only_pair(a, rec: dict, repo: str, cfg: dict, item: dict, sp: dict,
     return cmp, cnv, ex, targets
 
 
+STATE_UNREADABLE = ("refused: the pull request's state could not be read from GitHub, so it was not tested; "
+                    "a live check only tests open pull requests")
+
+
+def live_pr_refusal(repo: str, item: dict, a, gh_factory=None) -> str | None:
+    """Live checks only (console, GitHub App, request worker: ``--live-check``). Re-reads the pull request's state
+    from GitHub just before running. A closed or merged pull request, a missing state, or a failed read all refuse
+    (fail closed) with a plain reason; nothing raises. Benchmark, known-answer and replay runs never set the flag."""
+    try:
+        gh = (gh_factory or (lambda: GitHub(None, fail_fast_auth=True)))()
+        p = gh.json(f"/repos/{repo}/pulls/{item['pr']}")
+        state = p.get("state") if isinstance(p, dict) else None
+        if isinstance(p, dict) and p.get("merged_at") and state:
+            state = "merged"
+    except (KeyboardInterrupt, SystemExit):
+        raise
+    except BaseException:  # noqa: BLE001 - GitHubAuthError is a BaseException; a live check must not crash here
+        return STATE_UNREADABLE
+    if state:
+        item["state"] = state
+    return closed_pr_reason({"state": state})
+
+
+def closed_pr_reason(item: dict) -> str | None:
+    """A live check only tests an open pull request. A closed or merged one, or one with no state, is refused."""
+    state = str(item.get("state") or "").lower()
+    if not state:
+        return STATE_UNREADABLE
+    if state != "open":
+        merged = " or merged" if state == "closed" else ""
+        return (f"refused: this pull request is {state}{merged}, not open, so it was not tested; "
+                "a product check only tests open pull requests")
+    return None
+
+
 def product_route(a) -> bool:
     """True for a product check (console, request-a-check, Codespaces, GitHub App): a single pull request started with
     ``--product-check`` (not inferred from ``--related-reports``). False for a study run and the daily study."""
@@ -4481,6 +4552,12 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
     rec = new_record(repo, cfg, item, a, machine, rdir.name, run_date_for(rdir))
     if product_route(a):
         rec["product_check"] = True   # coverage gate: on a product check, verified needs measured coverage
+    if product_route(a) and getattr(a, "live_check", False):
+        closed = live_pr_refusal(repo, item, a)
+        if closed:   # a live product check: refuse before any lookup, install or run
+            rec["pr_state_refusal"] = closed
+            rec["verdict"], rec["reason"], _ = verdict_for(None, closed)
+            return finish(rec, prdir, work, t0, a)
     from poc import demo_helper
     if demo_helper.active(a):
         demo_helper.begin_check(a, rec, repo, cfg.get("dist") or cfg.get("pkg"), prdir)
@@ -5769,6 +5846,9 @@ def _main(argv=None) -> int:
                          "if this flag is set on a benchmark. A product check does not start without "
                          "TAVILY_API_KEY. If this lookup fails, the reason is recorded and the reports are "
                          "left out of the write-up. The verdict is left as it was. It does not choose packages.")
+    ap.add_argument("--live-check", action="store_true",
+                    help="set only by live product checks (console, GitHub App, request worker): a pull request that "
+                         "is not open, or whose state cannot be read, is refused. Benchmark and replay runs omit it.")
     ap.add_argument("--product-check", action="store_true",
                     help="set only by product routes (console, request-a-check, Codespaces, GitHub App) on a single "
                          "pull-request check: 'verified' then needs measured coverage. Ignored on a benchmark or "

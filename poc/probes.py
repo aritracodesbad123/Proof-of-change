@@ -507,8 +507,10 @@ def summarize(items: list[dict]) -> dict:
     pr_only_noisy = [o for o in obs if o.get("pr_only") == "noisy"]
     noisy = [o for o in raw_flagged if o["label"] == FindingLabel.FLAKY.value and o.get("pr_only") != "noisy"]
     # Flaky on one side is noise. Unstable only on the pull request is not, even when it is too mixed to call.
+    # "advisory" is only ever set by the product route (poc/claim_hygiene.py) on a claim-less model probe.
+    advisory = [o for o in raw_flagged if o.get("advisory")]
     flagged = [o for o in raw_flagged
-               if o["label"] != FindingLabel.FLAKY.value and o.get("pr_only") != "noisy"]
+               if o["label"] != FindingLabel.FLAKY.value and o.get("pr_only") != "noisy" and not o.get("advisory")]
     warning_only = [o for o in flagged if is_warning_observation(o["name"])]
     if flagged and len(warning_only) == len(flagged):
         flagged = []
@@ -533,6 +535,8 @@ def summarize(items: list[dict]) -> dict:
                     "too mixed to call")
     if warning_only:
         bits.append(f"probe: {len(warning_only)} warning-only difference(s) not counted on their own")
+    if advisory:
+        bits.append(f"probe: {len(advisory)} difference(s) from a probe with no claims shown as advisory only")
     if proven:
         bits.append(f"probe: claim(s) {', '.join(proven)} proven")
     same = sum(1 for o in obs if o["label"] == FindingLabel.NO_DIFFERENCE.value)
