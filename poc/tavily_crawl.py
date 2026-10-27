@@ -411,13 +411,49 @@ def _cache_read(path: Path, now: float, ttl: float):
 
 
 def _cache_write(path: Path, data: dict) -> bool:
+    """Write atomically. mkstemp gives every writer, process or thread, its own temporary file."""
+    import tempfile
     try:
         path.parent.mkdir(parents=True, exist_ok=True)
-        tmp = path.with_suffix(f".{os.getpid()}.tmp")   # unique per process, so parallel runs never clash
-        tmp.write_text(json.dumps(data))
-        tmp.replace(path)
+        fd, tmp = tempfile.mkstemp(dir=path.parent, prefix=path.stem + ".", suffix=".tmp")
+        try:
+            with os.fdopen(fd, "w") as fh:
+                fh.write(json.dumps(data))
+            os.replace(tmp, path)
+        except BaseException:
+            Path(tmp).unlink(missing_ok=True)
+            raise
         return True
     except OSError:
+        return False
+
+
+class _EntryLock:
+    """An exclusive lock on one cache entry, held across the re-check, the crawl and the write, so of several
+    runs at the same repository and commit only one crawls and the others read its result. If the lock file
+    cannot be opened the crawl still runs, unlocked, since the cache is only a saving."""
+
+    def __init__(self, path: Path):
+        self.path = path.with_suffix(".lock")
+        self.fh = None
+
+    def __enter__(self):
+        import fcntl
+        try:
+            self.path.parent.mkdir(parents=True, exist_ok=True)
+            self.fh = open(self.path, "a")
+            fcntl.flock(self.fh.fileno(), fcntl.LOCK_EX)
+        except OSError:
+            if self.fh is not None:
+                self.fh.close()
+            self.fh = None
+        return self
+
+    def __exit__(self, *_exc):
+        if self.fh is not None:
+            import fcntl
+            fcntl.flock(self.fh.fileno(), fcntl.LOCK_UN)
+            self.fh.close()
         return False
 
 
@@ -443,11 +479,24 @@ def crawl_repo(repo: str, base_sha: str, checkout, env: dict | None = None, craw
     block["cache"]["key"] = f"v{CRAWL_VERSION}|{repo}@{base_sha}"
     hit = _cache_read(cpath, now, ttl)
     if hit is not None:
-        # Same project version: the same pages give the same steps, with no Tavily call and no credits.
-        block.update(docs_domain=docs, seeds=list(hit.get("seeds") or []))
-        block["cache"]["hit"] = True
-        block["cache"]["age_seconds"] = int(now - float(hit.get("saved_at") or now))
-        return _finish(block, dict(hit.get("pages") or {}), dict(hit.get("full") or {}), checkout)
+        return _from_cache(block, hit, docs, now, checkout)
+    with _EntryLock(cpath):
+        hit = _cache_read(cpath, now, ttl)   # another run may have crawled while this one waited for the lock
+        if hit is not None:
+            return _from_cache(block, hit, docs, now, checkout)
+        return _crawl_and_store(block, repo, base_sha, checkout, docs, cpath, now, env, crawl_fn, extract_fn)
+
+
+def _from_cache(block: dict, hit: dict, docs: str, now: float, checkout) -> dict:
+    # Same project version: the same pages give the same steps, with no Tavily call and no credits.
+    block.update(docs_domain=docs, seeds=list(hit.get("seeds") or []))
+    block["cache"]["hit"] = True
+    block["cache"]["age_seconds"] = int(now - float(hit.get("saved_at") or now))
+    return _finish(block, dict(hit.get("pages") or {}), dict(hit.get("full") or {}), checkout)
+
+
+def _crawl_and_store(block: dict, repo: str, base_sha: str, checkout, docs: str, cpath: Path, now: float, env,
+                     crawl_fn, extract_fn) -> dict:
     crawl_fn = crawl_fn or (lambda url, **kw: crawl(url, env=env, **kw))
     extract_fn = extract_fn or (lambda urls: extract(urls, env=env))
     block["docs_domain"] = docs

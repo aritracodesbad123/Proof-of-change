@@ -4793,7 +4793,7 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
             return finish(rec, prdir, work, t0, a)
     from poc import demo_helper, tavily_budget
     if product_route(a):
-        tavily_budget.reset()   # meter this check's Tavily calls for the record and the log
+        rec["_tavily_meter"] = tavily_budget.begin(f"{repo}#{item['pr']}")   # this check's Tavily calls
         capped = tavily_budget.refusal()
         if capped:   # refuse up front, before any Tavily call, rather than fail halfway
             print(capped, flush=True)
@@ -5060,7 +5060,7 @@ def finish(rec: dict, prdir: Path, work: Path, t0: float, runner=None) -> dict:
     if rec.get("product_check"):  # timing only; study records stay byte-identical
         rec["timings"] = step_timings(rec)
         from poc import tavily_budget
-        credits = tavily_budget.take()
+        credits = tavily_budget.take(rec.pop("_tavily_meter", None))
         if credits is not None:
             rec["tavily_credits"] = credits
             print(tavily_budget.log_line(credits), flush=True)

@@ -20,44 +20,70 @@ CAP_ENV = "POC_TAVILY_CREDIT_CAP"
 USAGE_API = "https://api.tavily.com/usage"
 LIMIT_REACHED = "Tavily credit limit reached"
 SEARCH_CREDITS = {"basic": 1.0, "advanced": 2.0}
-# Worst case for one check: 3 setup searches, up to 4 setup-gap searches, 1 related-reports search, and an
-# uncached repository crawl (2 seeds x 40 pages, about 4 credits each) plus one extract of up to 12 pages.
-WORST_CASE_CHECK = 3 + 4 + 1 + 8 + 3
+# Worst case for one check, built from the real call limits (a test ties each term to its source):
+#   setup searches: one per demo_helper.lookup_queries entry (3)
+#   setup-gap searches: one per repair try (3) plus the batch gate search (1)
+#   related-reports search: 1
+#   crawl: one call per seed (at most 2), each capped at tavily_crawl.CRAWL_LIMIT pages; basic crawl is
+#          1 credit per 10 pages, so ceil(40 / 10) = 4 per seed
+#   extract: one call of at most tavily_crawl.EXTRACT_MAX pages; basic extract is 1 credit per 5 pages, so 3
+SETUP_SEARCHES, GAP_SEARCHES, RELATED_SEARCHES = 3, 4, 1
+CRAWL_SEEDS, CRAWL_PAGES_PER_CREDIT, EXTRACT_PAGES_PER_CREDIT = 2, 10, 5
+
+
+def worst_case(crawl_limit: int = 40, extract_max: int = 12) -> int:
+    crawl = CRAWL_SEEDS * -(-crawl_limit // CRAWL_PAGES_PER_CREDIT)
+    extract = -(-extract_max // EXTRACT_PAGES_PER_CREDIT)
+    return SETUP_SEARCHES + GAP_SEARCHES + RELATED_SEARCHES + crawl + extract
+
+
+WORST_CASE_CHECK = worst_case()
 
 _lock = threading.Lock()
-_meter: dict = {}
+_active: dict | None = None   # the meter of the check now running in this process
 
 
-def reset() -> None:
+def begin(check: str = "") -> dict:
+    """Start metering one check and return its meter. Calls from any thread count toward it, so the parallel
+    side preparation of one check adds up correctly. Checks in one process run one after another; if a second
+    check starts before the first is taken, both meters are marked ``overlapped`` so neither total is trusted."""
+    global _active
+    meter = {"check": check, "search_calls": 0, "search_credits": 0.0, "crawl_calls": 0, "crawl_credits": 0.0,
+             "extract_calls": 0, "extract_credits": 0.0, "overlapped": False}
     with _lock:
-        _meter.clear()
-        _meter.update(search_calls=0, search_credits=0.0, crawl_calls=0, crawl_credits=0.0,
-                      extract_calls=0, extract_credits=0.0)
+        if _active is not None:
+            _active["overlapped"] = True
+            meter["overlapped"] = True
+        _active = meter
+    return meter
 
 
 def record(kind: str, *, depth: str = "basic", payload: dict | None = None) -> None:
-    """Count one Tavily call. kind is search, crawl or extract."""
+    """Count one Tavily call toward the running check. kind is search, crawl or extract."""
+    if kind == "search":
+        credits = SEARCH_CREDITS.get(depth, 1.0)
+    else:
+        usage = (payload or {}).get("usage") if isinstance(payload, dict) else None
+        try:
+            credits = float((usage or {}).get("credits") or 0)
+        except (TypeError, ValueError):
+            credits = 0.0
     with _lock:
-        if not _meter:
+        if _active is None:
             return
-        if kind == "search":
-            credits = SEARCH_CREDITS.get(depth, 1.0)
-        else:
-            usage = (payload or {}).get("usage") if isinstance(payload, dict) else None
-            try:
-                credits = float((usage or {}).get("credits") or 0)
-            except (TypeError, ValueError):
-                credits = 0.0
-        _meter[f"{kind}_calls"] = _meter.get(f"{kind}_calls", 0) + 1
-        _meter[f"{kind}_credits"] = _meter.get(f"{kind}_credits", 0.0) + credits
+        _active[f"{kind}_calls"] += 1
+        _active[f"{kind}_credits"] += credits
 
 
-def take() -> dict | None:
-    """The per-check totals, or None when no check is being metered."""
+def take(meter: dict | None) -> dict | None:
+    """The totals of this check's meter, and stop metering it. None when the check was not metered."""
+    global _active
+    if not meter:
+        return None
     with _lock:
-        if not _meter:
-            return None
-        out = dict(_meter)
+        if _active is meter:
+            _active = None
+        out = dict(meter)
     out["total_credits"] = round(out["search_credits"] + out["crawl_credits"] + out["extract_credits"], 2)
     return out
 
@@ -123,6 +149,8 @@ def refusal(env: dict | None = None, fetch=None, need: float = WORST_CASE_CHECK)
         return None
     if cap < 0:
         return f"{LIMIT_REACHED}: {CAP_ENV} is not a number"
+    if fetch is None and not str(env.get("TAVILY_API_KEY") or "").strip():
+        return f"{LIMIT_REACHED}: TAVILY_API_KEY is not set, so the usage under the cap cannot be read"
     got = (fetch or (lambda: fetch_usage(env)))()
     if not isinstance(got, dict) or not got.get("ok"):
         detail = (got or {}).get("error") if isinstance(got, dict) else "no response"
