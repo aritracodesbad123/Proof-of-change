@@ -1,5 +1,7 @@
 # Product checks: keep the project's pytest addopts, clean up model claims, refuse closed pull requests
 
+**Status:** accepted
+
 Date: 2026-10-27. Applies to the product route only (`--product-check`). The study route is unchanged.
 
 ## Context
