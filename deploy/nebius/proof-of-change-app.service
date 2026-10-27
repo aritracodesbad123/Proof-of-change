@@ -14,15 +14,17 @@ Environment=POC_OPS_DIR=/var/lib/proof-of-change
 Environment=POC_OPS_RUNS=/var/lib/proof-of-change/runs
 Environment=POC_REPORT_DIR=/var/lib/proof-of-change/reports
 Environment=PYTHONUNBUFFERED=1
+Environment=PYTHONDONTWRITEBYTECODE=1
 # Caddy forwards only POST /webhook here. Every App check uses --sandbox-backend contree --require-contree.
 ExecStart=/opt/proof-of-change/venv/bin/python -m poc.github_app --host 127.0.0.1 --port 8080
 Restart=on-failure
 RestartSec=5
 NoNewPrivileges=true
 PrivateTmp=true
-ProtectSystem=full
+ProtectSystem=strict
 ProtectHome=true
-ReadWritePaths=/var/lib/proof-of-change /opt/proof-of-change/app
+# The app code under /opt is owned by root and read-only here; only the data folder is writable.
+ReadWritePaths=/var/lib/proof-of-change
 
 [Install]
 WantedBy=multi-user.target

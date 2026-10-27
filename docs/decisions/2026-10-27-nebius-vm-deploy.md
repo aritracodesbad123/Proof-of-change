@@ -32,6 +32,13 @@ runs in Contree, so the VM only serves the console, receives webhooks and writes
   Contree, never by the setup script.
 - With no domain, the address is `<ip-with-dashes>.sslip.io`, so Caddy can get a Let's Encrypt certificate.
 
+- The app code and its Python environment under `/opt/proof-of-change` belong to root; the services run with
+  `ProtectSystem=strict` and can write only to `/var/lib/proof-of-change`. The two folders the code writes to by
+  fixed path (`reports/hosted`, `ops/runs`) are links into that data folder.
+- Sign-up is invite-only: setup generates `POC_INVITE_CODE` into the root-only file. `POC_SIGNUP_DISABLED` is left
+  empty, because setting it closes sign-up even with the code.
+- The temporary Node download is checked against Node's published `SHASUMS256.txt` before it is extracted.
+
 ## Limits
 
 - The GitHub App listener runs the check inside the webhook request. GitHub stops waiting after 10 seconds and

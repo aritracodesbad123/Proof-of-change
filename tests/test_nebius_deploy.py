@@ -74,3 +74,29 @@ def test_health_paths_exist_in_the_code():
     assert '"/api/health"' in (ROOT / "poc" / "console_api.py").read_text()
     gh = (ROOT / "poc" / "github_app.py").read_text()
     assert '"/health"' in gh and '"/webhook"' in gh
+
+
+def test_app_code_is_read_only_to_the_services():
+    for name in ("proof-of-change-console.service", "proof-of-change-app.service"):
+        unit = (DEPLOY / name).read_text()
+        rw = [ln for ln in unit.splitlines() if ln.startswith("ReadWritePaths=")]
+        assert rw == ["ReadWritePaths=/var/lib/proof-of-change"], name
+        assert "ProtectSystem=strict" in unit
+    setup = (DEPLOY / "setup.sh").read_text()
+    assert 'chown -R root:root "$APP"' in setup
+    assert "proof-of-change:proof-of-change \"$APP\"" not in setup
+
+
+def test_signup_needs_an_invite_code_generated_at_setup():
+    t = _template()
+    assert t["POC_INVITE_CODE"] == "" and t["POC_SIGNUP_DISABLED"] == ""
+    auth = (ROOT / "poc" / "console_auth.py").read_text()
+    assert '"POC_INVITE_CODE"' in auth and '"POC_SIGNUP_DISABLED"' in auth
+    assert "set_if_empty POC_INVITE_CODE" in (DEPLOY / "setup.sh").read_text()
+
+
+def test_node_download_is_checked_before_extracting():
+    setup = (DEPLOY / "setup.sh").read_text()
+    assert "SHASUMS256.txt" in setup
+    assert setup.index("sha256sum -c") < setup.index("tar -xJf")
+    assert "| tar" not in setup  # never stream an unchecked download into tar

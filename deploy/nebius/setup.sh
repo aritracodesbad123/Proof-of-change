@@ -63,6 +63,8 @@ set_if_empty() { # name value
   fi
 }
 set_if_empty POC_PUBLIC_URL "https://$SITE"
+# Sign-up is invite-only: a new account needs this code. It lives only in the root-only file.
+set_if_empty POC_INVITE_CODE "$(python3 -c 'import secrets; print(secrets.token_urlsafe(12))')"
 set_if_empty SECRET_KEY "$(python3 -c 'import secrets; print(secrets.token_urlsafe(48))')"
 
 log "App code ($APP)"
@@ -74,18 +76,25 @@ git -C "$SRC" rev-parse HEAD > "$APP.new/.deployed-commit"
 log "Console page (temporary Node $NODE_VERSION, removed afterwards)"
 NODE_TMP="$(mktemp -d)"
 arch="$(uname -m)"; case "$arch" in x86_64) narch=x64 ;; aarch64) narch=arm64 ;; *) echo "unsupported CPU $arch" >&2; exit 1 ;; esac
-curl -fsSL "https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-$narch.tar.xz" | tar -xJ -C "$NODE_TMP" --strip-components=1
-(cd "$APP.new/console/web" && PATH="$NODE_TMP/bin:$PATH" npm ci --no-audit --no-fund && PATH="$NODE_TMP/bin:$PATH" npm run build)
+NODE_TAR="node-v$NODE_VERSION-linux-$narch.tar.xz"
+curl -fsSL -o "$NODE_TMP/$NODE_TAR" "https://nodejs.org/dist/v$NODE_VERSION/$NODE_TAR"
+curl -fsSL -o "$NODE_TMP/SHASUMS256.txt" "https://nodejs.org/dist/v$NODE_VERSION/SHASUMS256.txt"
+# Extract only if the download matches the SHA-256 that Node publishes for it.
+(cd "$NODE_TMP" && grep " $NODE_TAR\$" SHASUMS256.txt | sha256sum -c -) \
+  || { echo "Node download does not match its published SHA-256; stopping" >&2; exit 1; }
+mkdir "$NODE_TMP/node" && tar -xJf "$NODE_TMP/$NODE_TAR" -C "$NODE_TMP/node" --strip-components=1
+(cd "$APP.new/console/web" && PATH="$NODE_TMP/node/bin:$PATH" npm ci --no-audit --no-fund && PATH="$NODE_TMP/node/bin:$PATH" npm run build)
 rm -rf "$NODE_TMP" "$APP.new/console/web/node_modules"
 
 rm -rf "$APP.old"; [ -d "$APP" ] && mv "$APP" "$APP.old"; mv "$APP.new" "$APP"; rm -rf "$APP.old"
-chown -R proof-of-change:proof-of-change "$APP"
+chown -R root:root "$APP" && chmod -R go-w "$APP"
 
 log "Python packages ($VENV)"
 [ -x "$VENV/bin/python" ] || python3 -m venv "$VENV"
 "$VENV/bin/pip" install -q --upgrade pip
 # The app plus the Contree SDK (sandbox), uv (the runner's installer) and PyJWT (GitHub App sign-in).
 "$VENV/bin/pip" install -q "$APP[ops,contree,github]"
+chown -R root:root "$VENV" && chmod -R go-w "$VENV"
 
 log "systemd services (console on 127.0.0.1:8787, GitHub App on 127.0.0.1:8080)"
 install -m 644 "$HERE/proof-of-change-console.service" /etc/systemd/system/

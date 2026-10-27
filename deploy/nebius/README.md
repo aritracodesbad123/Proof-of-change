@@ -12,7 +12,8 @@ This folder puts the hosted console and the GitHub App on one small Nebius virtu
 | `sshd-hardening.conf` | SSH by key only. |
 | `healthcheck.sh` | Checks that everything answers. |
 
-Nothing listens on the internet except Caddy (ports 443 and 80) and SSH (22). The console and the App listener
+The app code in `/opt/proof-of-change` belongs to root and is read-only to the services; they can write only to
+`/var/lib/proof-of-change`. Nothing listens on the internet except Caddy (ports 443 and 80) and SSH (22). The console and the App listener
 answer only on the machine itself.
 
 ## The machine
@@ -46,6 +47,16 @@ check ends as "could not verify". So 2 vCPU is enough. It runs one check at a ti
 8. **Connect the GitHub App (optional).** In the App's settings set the webhook URL to
    `https://<site>/webhook` and the secret to the same value as `GITHUB_WEBHOOK_SECRET`. Fill the
    `GITHUB_APP_*` settings and `POC_DEMO_REPOS`, then restart as in step 6.
+
+## Letting judges in
+
+Sign-up is invite-only. Setup generates an invite code and stores it as `POC_INVITE_CODE` in the root-only
+settings file; it is never committed. To see it on the VM: `sudo grep '^POC_INVITE_CODE=' /etc/proof-of-change/env`.
+Send it to the judges privately (for example in the submission form or a direct message), never in the public
+README or a public issue. They enter it once, when they create their account. Accounts are created by email code
+(needs the `SMTP_*` settings) or by Google or GitHub sign-in (needs those `*_CLIENT_ID`/`*_CLIENT_SECRET`
+settings). To change the code, edit the file and restart the console. After judging, set `POC_SIGNUP_DISABLED=1`
+to close sign-up completely.
 
 ## Updating
 
