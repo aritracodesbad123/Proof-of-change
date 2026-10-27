@@ -2798,18 +2798,25 @@ def contree_only_extra_shell(declared: list[str], optional: list[str], base: str
     return "\n".join(lines)
 
 
-def repo_addopts_flag(keep: bool) -> str:
+def repo_addopts_flag(keep: bool, root: Path | None = None) -> str:
     """Shell form of the addopts override. A product check keeps the repository's own pytest addopts (for example
-    a plugin it loads with ``-p``); the study route blanks them as before."""
-    return "" if keep else "-o addopts= "
+    a plugin it loads with ``-p``), minus only the flags our own command sets (read from ``root``'s pytest config);
+    the study route blanks them as before."""
+    if not keep:
+        return "-o addopts= "
+    return "".join(shlex.quote(x) + " " for x in repo_addopts_args(True, root))
 
 
-def repo_addopts_args(keep: bool) -> list[str]:
-    return [] if keep else ["-o", "addopts="]
+def repo_addopts_args(keep: bool, root: Path | None = None) -> list[str]:
+    if not keep:
+        return ["-o", "addopts="]
+    from poc import pytest_addopts
+    return pytest_addopts.filtered_override(root)
 
 
 def _contree_pytest_once(side: str, targets: list[str], test_timeout: int, run_timeout: int,
-                         workers: str, jx: Path, lg: Path, keep_addopts: bool = False) -> tuple[int | str, float]:
+                         workers: str, jx: Path, lg: Path, keep_addopts: bool = False,
+                         root: Path | None = None) -> tuple[int | str, float]:
     """One Contree disposable pytest; junit+log written locally from the remote shell output."""
     from poc import contree_sandboxes
     sess = contree_sandboxes.session()
@@ -2819,13 +2826,13 @@ def _contree_pytest_once(side: str, targets: list[str], test_timeout: int, run_t
     shell = (
         "set +e\ncd /work/src\n"
         f"python -m pytest {tg} -p no:cacheprovider -q -rfE --timeout={int(test_timeout)} "
-        f"{repo_addopts_flag(keep_addopts)}-o junit_family=xunit2 --junitxml=/tmp/poc-junit.xml {nflag}"
+        f"{repo_addopts_flag(keep_addopts, root)}-o junit_family=xunit2 --junitxml=/tmp/poc-junit.xml {nflag}"
         ">/tmp/poc-pytest.log 2>&1\n"
         "ec=$?\n"
         "if grep -q 'different tests were collected' /tmp/poc-pytest.log 2>/dev/null && "
         f"[ {shlex.quote(workers)} != 0 ]; then\n"
         f"  python -m pytest {tg} -p no:cacheprovider -q -rfE --timeout={int(test_timeout)} "
-        f"{repo_addopts_flag(keep_addopts)}-o junit_family=xunit2 --junitxml=/tmp/poc-junit.xml "
+        f"{repo_addopts_flag(keep_addopts, root)}-o junit_family=xunit2 --junitxml=/tmp/poc-junit.xml "
         ">/tmp/poc-pytest.log 2>&1\n  ec=$?\nfi\n"
         "printf '___POC_EXIT___%s\\n' \"$ec\"\n"
         "printf '___POC_JUNIT___\\n'\ncat /tmp/poc-junit.xml 2>/dev/null\n"
@@ -2882,10 +2889,11 @@ def run_tests(side_venvs: dict, targets_by_side: dict, rdir: Path, workdir: Path
                 run_progress.emit("pytest", "code", f"after run {i}/{runs}")
                 continue
             if use_contree:
-                rc, secs = _contree_pytest_once(side, tg, test_timeout, run_timeout, workers, jx, lg, keep_addopts)
+                rc, secs = _contree_pytest_once(side, tg, test_timeout, run_timeout, workers, jx, lg, keep_addopts,
+                                                 root=(cwds[side] if cwds else None))
             else:
                 cmd = [venv / "bin/python", "-m", "pytest", *tg, "-p", "no:cacheprovider", "-q", "-rfE",
-                       f"--timeout={test_timeout}", *repo_addopts_args(keep_addopts), "-o", "junit_family=xunit2",
+                       f"--timeout={test_timeout}", *repo_addopts_args(keep_addopts, cwds[side] if cwds else None), "-o", "junit_family=xunit2",
                        f"--junitxml={jin}"]
                 if workers != "0":
                     cmd += ["-n", workers]
@@ -2954,7 +2962,7 @@ def coverage_run(item: dict, venv: Path, main_root: Path, pr_root: Path, targets
     oin = side_out(venv) / out.name
     base = cwd or pr_root
     cmd = [venv / "bin/python", "-m", "pytest", *[str(base / t) for t in targets], "-p", "no:cacheprovider", "-q",
-           f"--timeout={a.test_timeout}", *repo_addopts_args(product_route(a)), *[f"--cov={s}" for s in sorted(sources)],
+           f"--timeout={a.test_timeout}", *repo_addopts_args(product_route(a), cwd), *[f"--cov={s}" for s in sorted(sources)],
            f"--cov-report=json:{oin}"]
     if a.workers != "0":
         cmd += ["-n", a.workers]
@@ -3093,7 +3101,7 @@ def contree_coverage_run(item: dict, main_root: Path, pr_root: Path, targets: li
     shell = (
         "set +e\ncd /work/src\n"
         f"python -m pytest {tg} -p no:cacheprovider -q --timeout={int(a.test_timeout)} "
-        f"{repo_addopts_flag(product_route(a))}{nflag}{cov} --cov-report=json:/tmp/poc-cov.json "
+        f"{repo_addopts_flag(product_route(a), pr_root)}{nflag}{cov} --cov-report=json:/tmp/poc-cov.json "
         ">/tmp/poc-cov-pytest.log 2>&1\n"
         "ec=$?\n"
         "printf '___POC_EXIT___%s\\n' \"$ec\"\n"
