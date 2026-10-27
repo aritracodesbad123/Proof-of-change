@@ -33,8 +33,11 @@ runs in Contree, so the VM only serves the console, receives webhooks and writes
 - With no domain, the address is `<ip-with-dashes>.sslip.io`, so Caddy can get a Let's Encrypt certificate.
 
 - The app code and its Python environment under `/opt/proof-of-change` belong to root; the services run with
-  `ProtectSystem=strict` and can write only to `/var/lib/proof-of-change`. The two folders the code writes to by
-  fixed path (`reports/hosted`, `ops/runs`) are links into that data folder.
+  `ProtectSystem=strict` and can write only to `/var/lib/proof-of-change`. There are no links into the code
+  folder: the service files set `POC_OPS_DIR`, `POC_OPS_RUNS`, `POC_REPORT_DIR`, `POC_HOSTED_REPORTS_DIR` and
+  `POC_HEAVY_BUILD_DIR` to folders under `/var/lib/proof-of-change` (see
+  `2026-10-27-data-folder-settings.md`). (An earlier version of this note said the folders were links; the
+  setup script never created them.)
 - Sign-up is invite-only: setup generates `POC_INVITE_CODE` into the root-only file. `POC_SIGNUP_DISABLED` is left
   empty, because setting it closes sign-up even with the code.
 - The temporary Node download is checked against Node's published `SHASUMS256.txt` before it is extracted.

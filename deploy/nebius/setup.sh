@@ -47,7 +47,10 @@ fi
 
 log "Service user and folders"
 id proof-of-change >/dev/null 2>&1 || useradd --system --home-dir "$DATA" --shell /usr/sbin/nologin proof-of-change
-install -d -o proof-of-change -g proof-of-change -m 750 "$DATA" "$DATA/runs" "$DATA/reports"
+# Every place the services write. The service files point the app's settings (POC_OPS_DIR, POC_OPS_RUNS,
+# POC_REPORT_DIR, POC_HOSTED_REPORTS_DIR, POC_HEAVY_BUILD_DIR) here; the app code itself stays read-only.
+install -d -o proof-of-change -g proof-of-change -m 750 "$DATA" "$DATA/runs" "$DATA/reports" \
+  "$DATA/reports/daily" "$DATA/reports/hosted" "$DATA/work" "$DATA/work/heavy-builds" "$DATA/github-app"
 install -d -o root -g root -m 700 "$ETC"
 
 log "Server settings ($ENVF, root only)"

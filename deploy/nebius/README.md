@@ -13,7 +13,8 @@ This folder puts the hosted console and the GitHub App on one small Nebius virtu
 | `healthcheck.sh` | Checks that everything answers. |
 
 The app code in `/opt/proof-of-change` belongs to root and is read-only to the services; they can write only to
-`/var/lib/proof-of-change`. Nothing listens on the internet except Caddy (ports 443 and 80) and SSH (22). The console and the App listener
+`/var/lib/proof-of-change`. The service files point every folder the app writes to there (run folders,
+reviewer and hosted reports, build space, the App's delivery list). Nothing listens on the internet except Caddy (ports 443 and 80) and SSH (22). The console and the App listener
 answer only on the machine itself.
 
 ## The machine
@@ -47,6 +48,15 @@ check ends as "could not verify". So 2 vCPU is enough. It runs one check at a ti
 8. **Connect the GitHub App (optional).** In the App's settings set the webhook URL to
    `https://<site>/webhook` and the secret to the same value as `GITHUB_WEBHOOK_SECRET`. Fill the
    `GITHUB_APP_*` settings and `POC_DEMO_REPOS`, then restart as in step 6.
+
+## Known limits
+
+- **The GitHub App's queue is in memory.** If the App listener restarts, checks still waiting in its queue are
+  lost; ask again with a new `/prove` comment or a push.
+- **A daily-cap refusal only shows in the log.** When `POC_DAILY_CAP` is reached, an App check is not run and
+  nothing is posted to GitHub; see `sudo journalctl -u proof-of-change-app`.
+- **Sign-up needs email (SMTP).** New accounts get a code by email, so the `SMTP_*` settings must be filled.
+  Those credentials live only in the server settings file `/etc/proof-of-change/env`, never in the repository.
 
 ## Letting judges in
 

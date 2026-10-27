@@ -36,6 +36,24 @@ API = "https://api.github.com"
 PROVE_RE = re.compile(r"^/prove(?:\s+(.+))?$", re.I | re.M)
 REPO_ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_HOSTED = REPO_ROOT / "reports" / "hosted"
+HOSTED_REPORTS_ENV = "POC_HOSTED_REPORTS_DIR"
+OPS_RUNS_ENV = "POC_OPS_RUNS"
+
+
+def hosted_reports_dir(env: dict | None = None) -> Path:
+    """Where hosted HTML reports are written and read: POC_HOSTED_REPORTS_DIR, else reports/hosted in the repo.
+
+    The console reads the same setting, so a deploy can keep the app code read-only."""
+    env = os.environ if env is None else env
+    raw = (env.get(HOSTED_REPORTS_ENV) or "").strip()
+    return Path(raw) if raw else DEFAULT_HOSTED
+
+
+def ops_runs_dir(env: dict | None = None) -> Path:
+    """Run folders: POC_OPS_RUNS (the console's setting), else ops/runs in the repo."""
+    env = os.environ if env is None else env
+    raw = (env.get(OPS_RUNS_ENV) or "").strip()
+    return Path(raw) if raw else REPO_ROOT / "ops" / "runs"
 
 
 class GitHubAppError(RuntimeError):
@@ -228,7 +246,7 @@ def report_url_for(path: Path, env: dict | None = None) -> str | None:
 
 def write_hosted_report(rec: dict, out_dir: Path | None = None) -> Path:
     """Static behavior-map HTML for one PR record (hosted or opened locally)."""
-    out_dir = Path(out_dir) if out_dir is not None else DEFAULT_HOSTED
+    out_dir = Path(out_dir) if out_dir is not None else hosted_reports_dir()
     out_dir.mkdir(parents=True, exist_ok=True)
     rid = rec.get("id") or "run"
     path = out_dir / f"{rid}.html"
@@ -277,9 +295,9 @@ sandbox {_esc(rec.get('sandbox_backend') or 'local')}</p>
     return path
 
 
-def _load_latest_record(repo: str, pr: int) -> dict | None:
-    """Best-effort: newest record.json under ops/runs matching this PR."""
-    runs = REPO_ROOT / "ops" / "runs"
+def _load_latest_record(repo: str, pr: int, env: dict | None = None) -> dict | None:
+    """Best-effort: newest record.json under the run folders (POC_OPS_RUNS, else ops/runs) matching this PR."""
+    runs = ops_runs_dir(env)
     if not runs.is_dir():
         return None
     needle = f"-{pr}"
@@ -315,8 +333,16 @@ def check_argv(pr_url: str, env: dict | None = None) -> list[str]:
     env = os.environ if env is None else env
     from poc import related_reports
     provider = env.get("POC_MODEL_PROVIDER") or "nebius"
+    # Same as the console: run folders and reviewer reports go where POC_OPS_DIR / POC_REPORT_DIR say.
+    extra: list[str] = []
+    ops_dir = (env.get("POC_OPS_DIR") or "").strip()
+    if ops_dir:
+        extra.extend(["--ops-dir", ops_dir])
+    report_dir = (env.get("POC_REPORT_DIR") or "").strip()
+    if report_dir:
+        extra.extend(["--report-dir", report_dir])
     return ["--pr", pr_url, "--model-provider", provider, "--swarm", *related_reports.product_flags(),
-            *CONTREE_FLAGS]
+            *CONTREE_FLAGS, *extra]
 
 
 def apply(plan: dict, *, dry_run: bool | None = None, env: dict | None = None,
@@ -367,7 +393,7 @@ def apply(plan: dict, *, dry_run: bool | None = None, env: dict | None = None,
         else:
             from ops import daily_run
             run_exit = daily_run.main(argv)
-        rec = plan.get("record") or _load_latest_record(str(repo), int(pr))
+        rec = plan.get("record") or _load_latest_record(str(repo), int(pr), env)
 
     if not isinstance(rec, dict):
         out = {"ok": run_exit == 0 if run_exit is not None else force_dry, "action": action,
@@ -375,7 +401,7 @@ def apply(plan: dict, *, dry_run: bool | None = None, env: dict | None = None,
                "note": note or "no record.json found after run"}
         return out
 
-    report_path = write_hosted_report(rec, hosted_dir or DEFAULT_HOSTED)
+    report_path = write_hosted_report(rec, hosted_dir or hosted_reports_dir(env))
     url = report_url_for(report_path, env)
     verdict = str(rec.get("verdict") or "could_not_verify")
     reason = str(rec.get("reason") or "")
