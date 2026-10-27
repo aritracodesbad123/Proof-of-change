@@ -39,6 +39,11 @@ local report with no remote fonts or images, so the cause is Chrome start-up, no
    report shows it as a short table. Report and PDF time is printed by the run. Timing only; study
    records do not get the field.
 
+5. A product check (command line, console, GitHub App or request worker) refuses to start unless
+   `NEBIUS_API_KEY`, `TAVILY_API_KEY` and `NEBIUS_PROJECT_ID` are all set and non-empty. The one-line
+   message names the missing ones and never prints a value. This extends the existing Tavily start
+   check and runs before any other work. Study, benchmark-mode and report-only runs are unchanged.
+
 ## What did not change
 
 - Verdict rules, the answer key and the study route: without the new flags every run behaves exactly as

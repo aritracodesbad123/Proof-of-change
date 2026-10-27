@@ -4867,7 +4867,7 @@ def finish(rec: dict, prdir: Path, work: Path, t0: float, runner=None) -> dict:
     if rec.get("pr_side", {}).get("build_seconds") is not None:
         rec["duration_s"]["build"] = rec["pr_side"]["build_seconds"]
     rec["cost"] = cost.take(rec["duration_s"])
-    if product_route(a):  # timing only; study records stay byte-identical
+    if rec.get("product_check"):  # timing only; study records stay byte-identical
         rec["timings"] = step_timings(rec)
     mark_bench_model_invalid(rec, runner)
     errs = check_record(rec)
@@ -5733,7 +5733,18 @@ def tavily_start_refusal(a, env=None) -> str | None:
     if getattr(a, "select_only", False) or getattr(a, "report_only", False):
         return None
     from poc import tavily_docs
-    return tavily_docs.missing_key_line(env)
+    e = os.environ if env is None else env
+    missing = [k for k in PRODUCT_KEYS if not str(e.get(k) or "").strip()]
+    if not missing:
+        return None
+    line = ("refusing: a product check needs NEBIUS_API_KEY, TAVILY_API_KEY and NEBIUS_PROJECT_ID; missing: "
+            + ", ".join(missing) + ".")
+    if "TAVILY_API_KEY" in missing:
+        line += " " + tavily_docs.MISSING_KEY
+    return line
+
+
+PRODUCT_KEYS = ("NEBIUS_API_KEY", "TAVILY_API_KEY", "NEBIUS_PROJECT_ID")
 
 
 def _batch_lookup(repo: str, cfg: dict) -> bool:
@@ -5986,11 +5997,11 @@ def _main(argv=None) -> int:
         print(stop, file=sys.stderr)
         raise SystemExit(1)
     a.swarm = agents.swarm_enabled(bool(a.swarm))
-    stop = model_provider.key_refusal(a.model_provider)
+    stop = tavily_start_refusal(a)  # product checks: all three keys, before any work
     if stop:
         print(stop, file=sys.stderr)
         raise SystemExit(1)
-    stop = tavily_start_refusal(a)
+    stop = model_provider.key_refusal(a.model_provider)
     if stop:
         print(stop, file=sys.stderr)
         raise SystemExit(1)

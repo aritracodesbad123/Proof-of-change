@@ -225,7 +225,9 @@ def test_study_paths_are_not_refused(monkeypatch, capsys, tmp_path):
     for args in (study, bench, plain, select, report):
         assert daily_run.tavily_start_refusal(args) is None
     product = SimpleNamespace(pr=[PR], product_check=True, bench=None, select_only=False, report_only=False)
-    assert daily_run.tavily_start_refusal(product) == tavily_docs.MISSING_KEY
+    monkeypatch.setenv("NEBIUS_API_KEY", "n-key")
+    monkeypatch.setenv("NEBIUS_PROJECT_ID", "n-proj")
+    assert daily_run.tavily_start_refusal(product).endswith(tavily_docs.MISSING_KEY)
     monkeypatch.setenv("TAVILY_API_KEY", SECRET)
     assert daily_run.tavily_start_refusal(product) is None
 
