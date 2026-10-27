@@ -1,0 +1,18 @@
+{
+  "schema": "poc-bench-case/1",
+  "id": "markupsafe-pr512-safe",
+  "repo": "pallets/markupsafe",
+  "pr_url": "https://github.com/pallets/markupsafe/pull/512",
+  "base_sha": "b2e4d9c7687be25695fffbe93a37622302b24fb1",
+  "head_sha": "4ec455858376338b448ad4317aa36735ce04b879",
+  "category": "known_safe",
+  "expected_verdict": "verified",
+  "rationale": "Upstream open PR; no known regression; head suite result (Python 3.14.7, wheels only, no outside network): 42 passed, 44 skipped in 0.28s. No failures.",
+  "source": "upstream PR pallets/markupsafe#512, SHAs from GitHub API 2026-10-22 ~22:40 IST",
+  "notes": {
+    "base_ref": "main",
+    "base_is_merge_base_as_of_2026-10-22_22:40_IST": true,
+    "refresh_before_run": "base_sha was the base-branch tip and the merge base as of 2026-10-22 22:40 IST. It is refreshed, and the head checked again, right before the pilot; if it has moved the runner reports not run.",
+    "clean_head_preexisting_failures": []
+  }
+}
