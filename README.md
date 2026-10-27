@@ -120,6 +120,13 @@ Do not paste an email address, a key, or any private information into the issue.
 
 The checker on the project machine takes one request at a time. It does not start between 10:40 and 12:30 IST. It stops after five checks per day unless that limit is changed on the machine. Each of those checks runs with the advisory swarm on. A study run and a benchmark run still leave that swarm off unless the run asks. The worker reads `TAVILY_API_KEY` from that machine. When the variable is missing or blank, the check does not start. The log is one line that names the variable. The key value is never printed. If a study run has the machine, your request stays in the queue. If the checker has not checked in recently, a short reply says it is offline and points back at the results page. The repository needs the labels `request-a-check`, `request-running`, and `request-done` (create them once under Issues → Labels). `request-running` is on the issue while a check is in progress.
 
+### Host it on a Nebius VM
+
+To give judges a live console, run it on one small Nebius virtual machine (2 vCPU, 8 GiB, about $0.08 an hour).
+One script installs it, puts HTTPS in front with a free certificate, opens only ports 443, 80 and SSH, and keeps
+the keys in a root-only settings file. Pull-request code still runs only in Contree. Plain-words steps:
+[deploy/nebius/README.md](deploy/nebius/README.md).
+
 ### Try it yourself in a Codespace
 
 Live checks in a Codespace have not been confirmed to work yet. For a result you can rely on, use the results page or [Request a check](#request-a-check). The steps below are for trying it anyway.
