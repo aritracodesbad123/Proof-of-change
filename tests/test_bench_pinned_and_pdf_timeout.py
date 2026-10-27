@@ -97,6 +97,8 @@ def _hanging_chrome(tmp_path, monkeypatch):
     fake.chmod(0o755)
     monkeypatch.setattr(reviewer, "find_chrome", lambda: str(fake))
     monkeypatch.setattr(reviewer, "PDF_TIMEOUT_S", 1)
+    monkeypatch.setattr(reviewer, "CHROME_PROBE_TIMEOUT_S", 1)
+    monkeypatch.setattr(reviewer, "_CHROME_READY", {})
 
 
 def test_chrome_hang_falls_back_to_builtin_pdf(tmp_path, monkeypatch, capsys):
@@ -110,7 +112,7 @@ def test_chrome_hang_falls_back_to_builtin_pdf(tmp_path, monkeypatch, capsys):
     assert err is None
     pdf = (tmp_path / "r.pdf").read_bytes()
     assert pdf.startswith(b"%PDF") and len(pdf) > 500
-    assert "PDF timed out" in capsys.readouterr().err
+    assert "timed out" in capsys.readouterr().err
 
 
 def test_chrome_missing_falls_back(tmp_path, monkeypatch):
