@@ -5,7 +5,13 @@ The decision is made from the code alone (base and head file contents plus the d
 A changed file qualifies when it is
   (a) a Python file whose syntax tree is identical on both sides (comments are not part of the tree, so only
       comments differ), or
-  (b) a documentation file that is not Python: *.md, *.rst, *.txt, or any non-.py file under a docs/ folder.
+  (b) a documentation file on a strict allowlist: *.md or *.rst anywhere, or a known doc name such as README,
+      CHANGES, CHANGELOG, HISTORY, LICENSE, AUTHORS, CONTRIBUTORS or NEWS (optionally .txt). Every other file,
+      including requirements*.txt, constraints*.txt and CMakeLists.txt, takes the normal check.
+
+Files are parsed as raw bytes, so the encoding cookie is honoured; a change to the coding line in the first two
+lines always takes the normal check. When the caller gives the changed-file list from the pinned clone
+(git diff --name-status -z), every listed file must be accounted for in the diff, or the normal check runs.
 
 A .py file anywhere (docs/conf.py included) is code. Docstrings are code too, because a program can read them
 through __doc__: a Python file that differs only in docstrings is "docstring_only", which the caller checks by
@@ -18,7 +24,11 @@ import ast
 import re
 from typing import Callable
 
-DOC_EXTS = (".md", ".rst", ".txt")
+DOC_EXTS = (".md", ".rst")
+DOC_NAMES = {"readme", "changes", "changelog", "history", "license", "licence", "copying", "authors",
+             "contributors", "news", "notice", "thanks", "credits", "maintainers", "code_of_conduct",
+             "contributing", "security"}
+_CODING = re.compile(rb"^[ \t\f]*#.*?coding[:=]")
 _DIFF_HEAD = re.compile(r"^diff --git a/(\S+) b/(\S+)$", re.M)
 _HUNK = re.compile(r"^@@ -\d+(?:,\d+)? \+(\d+)(?:,(\d+))? @@")
 
@@ -27,6 +37,7 @@ BEHAVIOUR_CLAIM = re.compile(
     r"\b(fix(?:es|ed|ing)?|bug(?:fix)?s?|crash(?:es|ed|ing)?|regression|"
     r"adds?|added|adding|implement(?:s|ed)?|introduc(?:e|es|ed)|"
     r"(?:changes?|changed|changing|alters?|altered)\s+(?:the\s+)?(?:behaviou?r|output|result|default)s?|"
+    r"improv(?:e|es|ed|ing)|speed(?:s|ed)?\s+up|faster|optimi[sz](?:e|es|ed|ing|ation)|"
     r"behaviou?r\s+change|now\s+(?:returns?|raises?|handles?|supports?)|resolves?|closes?\s+#\d+)\b",
     re.I)
 
@@ -35,7 +46,19 @@ def is_doc_file(path: str) -> bool:
     p = path.replace("\\", "/").lower()
     if p.endswith(".py") or p.endswith(".pyi"):
         return False
-    return p.endswith(DOC_EXTS) or p.startswith("docs/") or "/docs/" in p
+    if p.endswith(DOC_EXTS):
+        return True
+    base = p.rsplit("/", 1)[-1]
+    stem, dot, ext = base.partition(".")
+    return stem in DOC_NAMES and ext in ("", "txt")
+
+
+def _coding_lines(src: bytes) -> list:
+    return [ln for ln in src.splitlines()[:2] if _CODING.match(ln)]
+
+
+def _as_bytes(x):
+    return x.encode("utf-8") if isinstance(x, str) else x
 
 
 def split_diff(diff: str) -> dict:
@@ -92,8 +115,13 @@ def _strip_docstrings(tree: ast.AST) -> ast.AST:
     return tree
 
 
-def compare_python(base: str, head: str) -> str | None:
-    """"comment" when only comments differ, "docstring" when only docstrings (and comments) differ, else None."""
+def compare_python(base, head) -> str | None:
+    """"comment" when only comments differ, "docstring" when only docstrings (and comments) differ, else None.
+
+    Takes raw bytes (str is encoded as UTF-8) so the parser applies the file's own encoding cookie."""
+    base, head = _as_bytes(base), _as_bytes(head)
+    if _coding_lines(base) != _coding_lines(head):
+        return None
     try:
         tb, th = ast.parse(base), ast.parse(head)
     except (SyntaxError, ValueError):
@@ -105,20 +133,42 @@ def compare_python(base: str, head: str) -> str | None:
     return None
 
 
-def classify(diff: str, read: Callable[[str, str], str | None]) -> dict | None:
-    """read(side, path) returns the file text on "base" or "head", or None when it cannot be read.
+def parse_name_status(raw: bytes) -> list:
+    """[(status letter, path), ...] from `git diff --name-status -z` output (renames and copies give the new path)."""
+    parts = raw.split(b"\0")
+    out, i = [], 0
+    while i < len(parts) and parts[i]:
+        st = parts[i].decode("utf-8", "replace")
+        n = 2 if st[:1] in ("R", "C") else 1
+        if i + n >= len(parts):
+            break
+        out.append((st[:1], parts[i + n].decode("utf-8", "surrogateescape")))
+        i += n + 1
+    return out
+
+
+def classify(diff: str, read: Callable[[str, str], "bytes | str | None"], names: list | None = None) -> dict | None:
+    """read(side, path) returns the file bytes (or text) on "base" or "head", or None when it cannot be read.
+    names, when given, is the changed-file list from the pinned clone: [(status, path)]. Any listed file that the
+    diff does not account for, or a status other than M for code, sends the PR to the normal check.
 
     Returns {"kind": "comment_only"|"docstring_only", "comments": {path: lines}, "docstrings": {...},
     "docs": {...}, "py_files": [...]} or None for the normal check."""
     files = split_diff(diff)
     if not files:
         return None
+    if names is not None:
+        if not names or {p for _, p in names} != set(files):
+            return None
+        for st, path in names:
+            if st != "M" and files[path]["status"] == "modified":
+                files[path]["status"] = "renamed" if st in "RC" else {"A": "added", "D": "deleted"}.get(st, "other")
     comments, docstrings, docs = {}, {}, {}
     for path, info in files.items():
         if info["status"] == "binary":
             return None
         if is_doc_file(path):
-            if info["status"] == "renamed":
+            if info["status"] in ("renamed", "other"):
                 return None
             docs[path] = info["lines"]
             continue
@@ -174,7 +224,8 @@ def modules_for(py_files: list) -> list:
 def doc_test_shell(py_files: list) -> str:
     """Shell run in the sandbox at /work/src: doctests in the changed modules plus tests that import them.
 
-    Exit 5 (nothing collected) means the doc text could not be checked."""
+    Exit 5 (nothing collected) means the doc text could not be checked. The time limit is enforced outside the
+    shell (coreutils timeout plus the sandbox op limit), so no pytest plugin is needed."""
     import shlex
     mods = modules_for(py_files)
     pat = "|".join(re.escape(m) for m in mods)
@@ -183,5 +234,5 @@ def doc_test_shell(py_files: list) -> str:
         "set -uo pipefail\ncd /work/src\n"
         f"TESTS=$(grep -rlE --include='test_*.py' --include='*_test.py' "
         f"'(import|from)[[:space:]]+({pat})([[:space:].]|$)' . 2>/dev/null | head -50 | tr '\\n' ' ')\n"
-        f"python -m pytest -q -p no:cacheprovider --timeout=300 --doctest-modules {files} $TESTS"
+        f"timeout -k 10 600 python -m pytest -q -p no:cacheprovider --doctest-modules {files} $TESTS"
     )

@@ -4534,7 +4534,10 @@ def closed_pr_reason(item: dict) -> str | None:
 
 
 def _pr_file_reader(repo: str, item: dict, work: Path):
-    """read(side, path) for the comment-only check: one shallow fetch of the base and head commits."""
+    """read(side, path) for the comment-only check: one shallow fetch of the base and head commits.
+
+    read.name_status() gives the changed-file list from `git diff --name-status -z base head` in that clone."""
+    from poc import comment_only
     src = work / "comment-only-src"
     shutil.rmtree(src, ignore_errors=True); src.mkdir(parents=True)
     shas = {"base": item.get("base_sha"), "head": item.get("head_sha")}
@@ -4555,10 +4558,15 @@ def _pr_file_reader(repo: str, item: dict, work: Path):
         r = subprocess.run(["git", "-C", str(src), "show", f"{shas[side]}:{path}"], capture_output=True, env=env)
         if r.returncode != 0:
             return None
-        try:
-            return r.stdout.decode("utf-8")
-        except UnicodeDecodeError:
+        return r.stdout   # raw bytes: the parser applies the file's own encoding cookie
+
+    def name_status():
+        if not ok:
             return None
+        r = subprocess.run(["git", "-C", str(src), "diff", "--no-renames", "--name-status", "-z", str(shas["base"]),
+                            str(shas["head"])], capture_output=True, env=env)
+        return comment_only.parse_name_status(r.stdout) if r.returncode == 0 else None
+    read.name_status = name_status
     return read
 
 
@@ -4591,7 +4599,13 @@ def comment_only_fast_path(repo: str, item: dict, rec: dict, prdir: Path, work: 
     behaviour changed, the result is needs_attention. Returns the finished record, or None for the normal check."""
     from poc import comment_only
     try:
-        res = comment_only.classify(item.get("diff") or "", reader or _pr_file_reader(repo, item, work))
+        rd = reader or _pr_file_reader(repo, item, work)
+        ns = getattr(rd, "name_status", None)
+        names = ns() if ns else None
+        if ns and names is None:
+            res = None   # the pinned file list could not be read: normal check
+        else:
+            res = comment_only.classify(item.get("diff") or "", rd, names)
     except Exception:  # noqa: BLE001
         res = None
     if res is None:

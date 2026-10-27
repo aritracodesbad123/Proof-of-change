@@ -41,3 +41,18 @@ full check on it spent minutes and often ended in could not verify or needs atte
 reviewer nothing useful.
 
 This supersedes the 22 October decision to keep the current behaviour for comment-only pull requests.
+
+## Review follow-up
+
+- Documentation means a strict allowlist: `.md` and `.rst` files anywhere (docs/ included), and known doc names
+  such as README, CHANGES, CHANGELOG, HISTORY, LICENSE, AUTHORS, CONTRIBUTORS and NEWS, with no extension or
+  `.txt`. Every other file, including `requirements*`, `constraints*` and `CMakeLists.txt`, takes the normal check.
+- The changed-file list comes from `git diff --name-status -z base head` in the pinned clone. If any listed file
+  is not accounted for by the diff (for example a path with spaces), or the list cannot be read, the normal
+  check runs.
+- Python files are parsed from raw bytes so the encoding cookie applies. A change to the coding line in the
+  first two lines always takes the normal check.
+- Lines such as `# type:`, `# noqa` and `# pragma` are comments to the parser, so a change to them alone counts
+  as a comment-only change.
+- The doc-test step has an outer time limit (600 seconds, plus the sandbox limit) instead of a pytest plugin flag.
+- Claim words now include improve, speed up, faster and optimise/optimize.

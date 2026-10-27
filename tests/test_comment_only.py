@@ -70,11 +70,11 @@ def test_code_hidden_in_non_docstring_string_takes_normal_path(monkeypatch):
 
 
 def test_docs_only_is_verified(monkeypatch):
-    rec, _ = _run({"README.md": ("# A\nold\n", "# A\nnew\n"), "docs/guide.txt": ("a\n", "b\n")},
+    rec, _ = _run({"README.md": ("# A\nold\n", "# A\nnew\n"), "docs/guide.rst": ("a\n", "b\n")},
                   monkeypatch=monkeypatch)
     assert rec["verdict"] == "verified" and rec["fast_path"] == "comment_only"
     assert "Docs changed in README.md lines 2" in rec["reason"]
-    assert "docs changed in docs/guide.txt lines 1" in rec["reason"]
+    assert "docs changed in docs/guide.rst lines 1" in rec["reason"]
 
 
 def test_docs_conf_py_is_code(monkeypatch):
@@ -117,3 +117,55 @@ def test_fast_path_only_on_product_route():
     src = open(dr.__file__).read()
     i = src.index("done = comment_only_fast_path(")
     assert "if product_route(a):" in src[i - 80:i]
+
+
+def test_dependency_and_build_files_take_normal_path(monkeypatch):
+    for path in ("requirements.txt", "requirements-dev.txt", "constraints.txt", "CMakeLists.txt",
+                 "docs/requirements.txt", "docs/conf.cfg", "notes.txt"):
+        assert _run({path: ("foo==1\n", "foo==2\n")}, monkeypatch=monkeypatch)[0] is None, path
+    for path in ("README", "README.txt", "CHANGES.txt", "license", "AUTHORS", "docs/guide.rst", "a/b.md"):
+        assert co.is_doc_file(path), path
+
+
+def test_file_missing_from_diff_parse_takes_normal_path(monkeypatch, tmp_path):
+    import subprocess
+    g = lambda *c: subprocess.run(["git", "-C", str(tmp_path), *c], check=True, capture_output=True).stdout  # noqa: E731
+    g("init", "-q"); g("config", "user.email", "t@t"); g("config", "user.name", "t")
+    (tmp_path / "my pkg").mkdir()
+    (tmp_path / "my pkg" / "x.py").write_text("x = 1\n"); (tmp_path / "README.md").write_text("a\n")
+    g("add", "-A"); g("commit", "-qm", "b"); base = g("rev-parse", "HEAD").decode().strip()
+    (tmp_path / "my pkg" / "x.py").write_text("x = 2\n"); (tmp_path / "README.md").write_text("b\n")
+    g("commit", "-qam", "h"); head = g("rev-parse", "HEAD").decode().strip()
+    names = co.parse_name_status(g("diff", "--no-renames", "--name-status", "-z", base, head))
+    assert ("M", "my pkg/x.py") in names and ("M", "README.md") in names
+    diff = g("diff", base, head).decode()
+    files = {"README.md": ("a\n", "b\n"), "my pkg/x.py": ("x = 1\n", "x = 2\n")}
+    reader = lambda side, path: files[path][0 if side == "base" else 1]  # noqa: E731
+    assert co.classify(diff, reader, names) is None
+    reader.name_status = lambda: names
+    item = {"diff": diff, "title": "Tidy", "body": "", "head_sha": head, "base_sha": base}
+    monkeypatch.setattr(dr, "finish", lambda rec, *a, **k: rec)
+    assert dr.comment_only_fast_path("o/r", item, {}, None, None, 0.0, argparse.Namespace(), reader=reader,
+                                     doc_tests=lambda *x: (True, "")) is None
+    reader.name_status = lambda: None   # file list unreadable
+    assert dr.comment_only_fast_path("o/r", item, {}, None, None, 0.0, argparse.Namespace(), reader=reader,
+                                     doc_tests=lambda *x: (True, "")) is None
+
+
+def test_coding_cookie_change_takes_normal_path(monkeypatch):
+    base = b"# -*- coding: utf-8 -*-\ns = '\xc3\xa9'\n"
+    head = b"# -*- coding: latin-1 -*-\ns = '\xc3\xa9'\n"
+    assert co.compare_python(base, head) is None
+    assert co.compare_python(base, base.replace(b"\ns", b"\n# hi\ns")) == "comment"
+    b2 = BASE.replace("def", "# -*- coding: utf-8 -*-\ndef", 1)
+    assert _run({"pkg/m.py": (b2, b2.replace("utf-8", "latin-1"))}, monkeypatch=monkeypatch)[0] is None
+
+
+def test_doc_test_shell_has_outer_time_limit():
+    sh = co.doc_test_shell(["pkg/m.py"])
+    assert "--timeout" not in sh and "timeout -k 10 600 python -m pytest" in sh
+
+
+def test_performance_claims_count():
+    for t in ("Improve parsing", "Speed up import", "Faster load", "Optimise loop", "optimize cache"):
+        assert co.claimed_behaviour_change(t, "") is not None, t
