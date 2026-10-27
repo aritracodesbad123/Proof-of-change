@@ -22,6 +22,26 @@ comment; it never posts to random upstream projects.
 - Contree is confirmed end-to-end only for a real product check (apprise pull request #1783, confirmed on commit cecf851) run from main in Contree-only mode (`POC_REQUIRE_CONTREE=1`), where the verdict matched the local run and nothing ran outside Contree. Not confirmed on the live Contree service: test coverage measured inside Contree, which shell runs setup, hiding of failure text, and running with a judge's own Nebius account.
 - Projects that need their own package index or uv sources, or that run on a pre-release (test) build of Python, end as COULD NOT VERIFY by design. Main and the pull request must run the exact same Python version, or the result is COULD NOT VERIFY.
 
+## What we can and can't test
+
+A longer version of this section is in [docs/LIMITATIONS.md](docs/LIMITATIONS.md#what-we-can-and-cant-test).
+
+Proof-of-Change checks Python projects. A project in another language is not supported. The tested set is these 19 small Python libraries: pytest, requests, rich, attrs, click, isort, jsonschema, boltons, python-barcode, httpx, urllib3, python-qrcode, itsdangerous, markupsafe, prettytable, loguru, sqlparse, toolz and invoke.
+
+A project that needs compiling is not supported. That includes code written in C, C++ or Rust. The daily run enforces this for dependencies before it selects pull requests. It resolves the project's runtime requirements and allows only ready-built packages, so that step compiles nothing and installs nothing. If a requirement has no ready-built package, that project's pull requests are left out of the run. The check reads the dependencies in the project file and the plain lines of a top-level requirements file. It does not open the project's own compiled code, and it does not read optional or test requirements, so a project can still reach setup and fail there. A check of one named pull request does not run this test. When a check needs a compiler, the check does not install one. Setup fails, and the result is could not verify.
+
+Not built: in a Contree-only run the tool does not measure which changed lines a probe ran. A probe without that measurement is dropped and does not count. That alone keeps a Contree-only result from verified.
+
+Tests and probes in the local sandbox have no internet. The network is on only while packages are installed. Secret keys are not given to that sandbox, and they are not placed in a Contree shell. A behaviour that needs a network service, a password or a key cannot be tested.
+
+Verified means the behaviour the change described still holds. Needs attention means the check found a difference a person should look at. Could not verify means the check cannot say whether the change is fine. Passing probes never raise the verdict. The tool never approves a pull request and never merges one. A person decides.
+
+Not built: the same-commit guard on a study run. A product check stops when main and the pull request are the same commit. A study run does not apply that guard.
+
+Built, and not confirmed on the live Contree service: measuring test coverage inside Contree, which shell runs setup, hiding of failure text, and running with a person's own Nebius account.
+
+Of 12 pull requests from the tested libraries, 0 were verified, 4 need attention (isort, jsonschema, rich, prettytable) and 8 could not be verified (requests, attrs, click, urllib3, sqlparse, toolz, markupsafe, boltons). In every record, main differed from the pull request. The missing probe measurement above is what keeps any of them from verified. The probes crashed on main for requests, sqlparse, toolz and attrs. For attrs, the new tests passed, but the check written for the pull request's claim crashed on main, so the claim itself was never tested. markupsafe had a setup failure. click, urllib3 and boltons had no probe that ran a changed line.
+
 ## For hackathon judges (quick answers)
 
 | Question | Answer |
@@ -154,7 +174,7 @@ Catches, misses and false alarms count only where there is outside proof of the 
 
 ---
 
-**Contents:** [Current limitations](#current-limitations) · [Scoring](#scoring) · [Setup](#1-one-time-setup-on-a-mac) · [Check one PR](#2-check-one-pr) ·
+**Contents:** [Current limitations](#current-limitations) · [What we can and can't test](#what-we-can-and-cant-test) · [Scoring](#scoring) · [Setup](#1-one-time-setup-on-a-mac) · [Check one PR](#2-check-one-pr) ·
 [Operator console](#2b-operator-console-browse--start-checks) ·
 [How a report is made](#3-exactly-how-a-report-gets-generated) ·
 [Read a report](#4-how-to-read-a-report) · [Where files live](#5-where-files-live) ·
