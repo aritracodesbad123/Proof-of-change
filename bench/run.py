@@ -169,13 +169,14 @@ def sha_check(case: dict, rec: dict | None) -> list[str]:
         return []
     sides = rec.get("sides") or {}
     main_sha = sides.get("main_sha")
-    head = (rec.get("chosen") or {}).get("head_sha") or rec.get("current_head_sha")
+    head = (rec.get("chosen") or {}).get("head_sha")
     p = []
-    if head != case["head_sha"]:
+    if not head:
+        p.append("tested PR head unknown")
+    elif head != case["head_sha"]:
         p.append(f"tested PR head {head} is not the manifest head_sha")
-    live = rec.get("current_head_sha")
-    if rec.get("head_moved") or (live and live != case["head_sha"]):
-        p.append(f"PR head moved: live head {live} is not the pinned head_sha (case file: report not run)")
+    # A moved live PR head is information only (kept in the result as head_moved / current_head_sha):
+    # the check tested the pinned commits, so only a mismatch in the tested commits marks a case not run.
     p += pr_side(case, sides)[1]
     if main_sha != case["base_sha"]:
         p.append(f"tested base {main_sha} is not the manifest base_sha")
@@ -209,6 +210,8 @@ def result_for(case: dict, arm: str, cmd: list[str], rec: dict | None, exit_code
         "model": {"ai_calls": cost.get("ai_calls"), "failed_ai_calls": cost.get("failed_ai_calls"),
                   "input_tokens": cost.get("input_tokens"), "output_tokens": cost.get("output_tokens"),
                   "cost_usd": cost.get("cost_usd"), "provider": (rec or {}).get("model_provider")},
+        "head_moved": bool((rec or {}).get("head_moved")),
+        "current_head_sha": (rec or {}).get("current_head_sha"),
         "tested": {"base_sha": ((rec or {}).get("sides") or {}).get("main_sha"),
                    "pr_sha": ((rec or {}).get("sides") or {}).get("pr_sha"),
                    "head_sha": ((rec or {}).get("chosen") or {}).get("head_sha"),
