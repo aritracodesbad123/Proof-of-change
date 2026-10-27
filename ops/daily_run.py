@@ -4533,6 +4533,98 @@ def closed_pr_reason(item: dict) -> str | None:
     return None
 
 
+def _pr_file_reader(repo: str, item: dict, work: Path):
+    """read(side, path) for the comment-only check: one shallow fetch of the base and head commits."""
+    src = work / "comment-only-src"
+    shutil.rmtree(src, ignore_errors=True); src.mkdir(parents=True)
+    shas = {"base": item.get("base_sha"), "head": item.get("head_sha")}
+    log = work / "comment-only-fetch.log"
+    env = base_env(work / "home-git")
+    ok = all(shas.values())
+    for cmd in (["git", "-C", str(src), "init", "-q"],
+                ["git", "-C", str(src), "fetch", "-q", "--depth", "1", f"https://github.com/{repo}.git",
+                 str(shas["base"]), str(shas["head"])]):
+        if not ok:
+            break
+        rc, _ = run(cmd, log, env=env, timeout=600)
+        ok = rc == 0
+
+    def read(side: str, path: str):
+        if not ok:
+            return None
+        r = subprocess.run(["git", "-C", str(src), "show", f"{shas[side]}:{path}"], capture_output=True, env=env)
+        if r.returncode != 0:
+            return None
+        try:
+            return r.stdout.decode("utf-8")
+        except UnicodeDecodeError:
+            return None
+    return read
+
+
+def _docstring_doc_tests(repo: str, item: dict, py_files: list, a) -> tuple[bool, str]:
+    """Run the project's doc tests for the changed modules on the PR's code in Contree. (passed, note)."""
+    from poc import comment_only
+    from poc import contree_sandboxes as cs
+    try:
+        if cs.select("contree")[0] != "contree":
+            return False, "the Contree sandbox is not available"
+        sess = cs.new_session(retry_transient=True)
+        sess.checkpoint_main(cs.install_shell_source(repo, item["head_sha"], deps_only_fallback=True),
+                             timeout=getattr(a, "build_timeout", 1800) or 1800)
+        raw = sess.run_op("main", comment_only.doc_test_shell(py_files), disposable=True, timeout=900)
+    except Exception as e:  # noqa: BLE001
+        return False, f"doc tests could not run ({type(e).__name__})"
+    code = raw.get("exit_code")
+    if code == 0:
+        return True, "doc tests passed"
+    if code == 5:
+        return False, "no doc tests or tests import the changed modules"
+    return False, f"doc tests failed (exit {code})"
+
+
+def comment_only_fast_path(repo: str, item: dict, rec: dict, prdir: Path, work: Path, t0: float, a,
+                           reader=None, doc_tests=None) -> dict | None:
+    """Product route: a PR that changes only comments or docs is verified without a full check.
+
+    Decided from the code alone. Docstring changes need the project's doc tests to pass. If the PR text says
+    behaviour changed, the result is needs_attention. Returns the finished record, or None for the normal check."""
+    from poc import comment_only
+    try:
+        res = comment_only.classify(item.get("diff") or "", reader or _pr_file_reader(repo, item, work))
+    except Exception:  # noqa: BLE001
+        res = None
+    if res is None:
+        return None
+    where = comment_only.describe(res)
+    where = where[:1].upper() + where[1:]
+    if res["kind"] == "docstring_only":
+        passed, note = (doc_tests or _docstring_doc_tests)(repo, item, res["py_files"], a)
+        rec["fast_path_doc_tests"] = note
+        if not passed:
+            rec["fast_path_skipped"] = f"docstring_only: {note}"
+            return None
+        lead = f"Documentation text only: no code was altered and {note}. "
+    else:
+        lead = "Comment-only change: no code was altered. "
+    rec["fast_path"] = res["kind"]
+    rec["fast_path_lines"] = {k: res[k] for k in ("comments", "docstrings", "docs")}
+    claim = comment_only.claimed_behaviour_change(item.get("title"), item.get("body"))
+    if claim:
+        rec["verdict"] = Verdict.NEEDS_ATTENTION.value
+        rec["reason"] = (f"The pull request text says it changes behaviour (\"{claim}\"), but only comments or "
+                         f"documentation changed, so it does not do what it says. {where}.")
+    else:
+        rec["verdict"] = Verdict.VERIFIED.value
+        rec["reason"] = lead + where + "."
+    saved = getattr(a, "model_skipped", None)
+    a.model_skipped = f"{res['kind'].replace('_', '-')} change; the model was not called"
+    try:
+        return finish(rec, prdir, work, t0, a)
+    finally:
+        a.model_skipped = saved
+
+
 def product_route(a) -> bool:
     """True for a product check (console, request-a-check, Codespaces, GitHub App): a single pull request started with
     ``--product-check`` (not inferred from ``--related-reports``). False for a study run and the daily study."""
@@ -4560,6 +4652,10 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
             rec["pr_state_refusal"] = closed
             rec["verdict"], rec["reason"], _ = verdict_for(None, closed)
             return finish(rec, prdir, work, t0, a)
+    if product_route(a):
+        done = comment_only_fast_path(repo, item, rec, prdir, work, t0, a)
+        if done is not None:   # comments or docs only: no sandbox for comments, no lookup, no model
+            return done
     from poc import demo_helper
     if demo_helper.active(a):
         demo_helper.begin_check(a, rec, repo, cfg.get("dist") or cfg.get("pkg"), prdir)
