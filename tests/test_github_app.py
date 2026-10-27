@@ -85,7 +85,8 @@ def test_apply_posts_with_mock(tmp_path, monkeypatch):
     plan = {"action": "run", "repo": "me/demo", "pr": 2, "record": rec, "head_sha": "cafebabe"}
     out = github_app.apply(plan, dry_run=False, env={
         "POC_DEMO_REPOS": "me/demo", "GITHUB_APP_INSTALLATION_TOKEN": "tok",
-        "POC_REPORT_BASE_URL": "https://example.test/r"},
+        "POC_REPORT_BASE_URL": "https://example.test/r",
+        "TAVILY_API_KEY": "test-tavily-key-for-app-checks"},
         runner=lambda argv: 0, hosted_dir=tmp_path)
     assert out["ok"] and not out["dry_run"]
     assert out["github_app"]["check_run_id"] == 11
@@ -139,7 +140,8 @@ def test_apply_runs_the_check_with_the_swarm_on(tmp_path, monkeypatch):
     plan = {"action": "run", "repo": "me/demo", "pr": 3, "record": rec, "head_sha": "abc"}
     out = github_app.apply(
         plan, dry_run=False,
-        env={"POC_DEMO_REPOS": "me/demo", "GITHUB_APP_INSTALLATION_TOKEN": "tok"},
+        env={"POC_DEMO_REPOS": "me/demo", "GITHUB_APP_INSTALLATION_TOKEN": "tok",
+             "TAVILY_API_KEY": "test-tavily-key-for-app-checks"},
         runner=runner, hosted_dir=tmp_path)
     assert out["ok"] and not out["dry_run"]
     argv = seen["argv"]
@@ -167,7 +169,8 @@ def test_app_check_leaves_study_runs_off(tmp_path, monkeypatch):
            "pr": {"number": 3, "head_sha": "abc"}, "behaviour_claims": [], "probes": {"items": []}}
     github_app.apply({"action": "run", "repo": "me/demo", "pr": 3, "record": rec, "head_sha": "abc"},
                      dry_run=False,
-                     env={"POC_DEMO_REPOS": "me/demo", "GITHUB_APP_INSTALLATION_TOKEN": "tok"},
+                     env={"POC_DEMO_REPOS": "me/demo", "GITHUB_APP_INSTALLATION_TOKEN": "tok",
+                          "TAVILY_API_KEY": "test-tavily-key-for-app-checks"},
                      runner=lambda argv: 0, hosted_dir=tmp_path)
     assert "POC_SWARM" not in os.environ
     assert agents.swarm_enabled(False) is False

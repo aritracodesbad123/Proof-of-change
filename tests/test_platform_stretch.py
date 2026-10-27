@@ -163,7 +163,12 @@ def test_mcp_tools_and_prove_dry():
 def test_tavily_skipped_without_key(monkeypatch):
     monkeypatch.delenv("TAVILY_API_KEY", raising=False)
     assert not tavily_docs.available()
-    assert tavily_docs.lookup("pandas changelog")["ok"] is False
+    got = tavily_docs.lookup("pandas changelog")
+    assert got["ok"] is False
+    assert got["error"] == tavily_docs.MISSING_KEY
+    assert got.get("refused") is True
+    assert got["results"] == []
+    assert "skipped" not in got["error"].lower()
 
 
 def test_contree_smoke_skipped_without_creds(monkeypatch):

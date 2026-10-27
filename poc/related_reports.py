@@ -6,10 +6,11 @@ run and the daily study do not. The flag defaults off, and a benchmark stays off
 even if the flag is present.
 
 The daily check calls the lookup only when the advisory swarm will run. The lookup
-uses ``poc.tavily_docs`` and runs only when ``TAVILY_API_KEY`` is set.
-Results are quoted background for the advisory model. They are not instructions, they
-do not choose a package, and they are not an input to the verdict. An expected verdict
-is never placed in the query.
+uses ``poc.tavily_docs``. A product check does not start without ``TAVILY_API_KEY``.
+If this lookup fails, the reason is recorded and the reports are left out of the
+advisory write-up. The verdict is not changed. Results that succeed are quoted background
+for the advisory model. They are not instructions and they do not choose a package.
+An expected verdict is never placed in the query.
 """
 from __future__ import annotations
 
@@ -20,8 +21,7 @@ from poc import tavily_docs
 FLAG = "--related-reports"
 PRODUCT_CHECK_FLAG = "--product-check"   # marks a product check for the coverage cap; separate from FLAG
 REPORT_LABEL = "Background (related public bug reports, not used for the verdict)"
-SKIP_LOG = "Related bug reports skipped: TAVILY_API_KEY is not set."
-FAIL_LOG = "Related bug reports skipped: lookup failed."
+FAIL_LOG = "the Tavily lookup failed"
 MAX_ITEMS = 3
 MAX_SNIPPET = 240
 MAX_TEXT = 900
@@ -72,6 +72,21 @@ def _redact(text: str, secret: str) -> str:
     return text
 
 
+_HIDDEN_FIELDS = ("expected_verdict", "answer", "label", "verdict")
+
+
+def _hide(text: str, secret: str, rec: dict | None = None) -> str:
+    """Remove the key and any verdict text already on the record. Neither is a lookup result."""
+    out = _redact(text, secret)
+    if not isinstance(rec, dict):
+        return out
+    for key in _HIDDEN_FIELDS:
+        raw = rec.get(key)
+        if isinstance(raw, str) and len(raw.strip()) >= 4:
+            out = out.replace(raw.strip(), "[redacted]")
+    return out
+
+
 def _clip(text: str, limit: int) -> str:
     text = " ".join((text or "").split())
     if len(text) <= limit:
@@ -118,8 +133,13 @@ def background_text(items: list[dict]) -> str:
 
 
 def prompt_block(payload) -> str:
-    """Label the background as quoted data. Empty when there is nothing to show."""
+    """Label the background as quoted data. Empty when there is nothing to show.
+
+    A refused or failed lookup is not quoted. The write-up continues without it.
+    """
     if not isinstance(payload, dict):
+        return ""
+    if payload.get("status") in ("error", "refused"):
         return ""
     text = (payload.get("text") or "").strip()
     if not text:
@@ -128,27 +148,44 @@ def prompt_block(payload) -> str:
     return _LABEL + "\n" + quoted
 
 
-def collect(rec: dict, *, env: dict | None = None, fetch=None) -> dict:
-    """Look up a few related bug reports. Skip, with one log line, when the key is unset.
+def _failure(query: str, detail: str) -> dict:
+    """A stopped lookup. The detail is already redacted. The key is not in it."""
+    reason = f"{FAIL_LOG}: {detail}"
+    print(reason, flush=True)
+    return {
+        "status": "error", "text": "", "items": [], "query": query, "result_count": 0,
+        "untrusted": True, "reason": reason,
+    }
 
-    The key is never written into the log or the returned value. A failed lookup does not
-    raise. The result has background text only: it does not name packages to install.
+
+def collect(rec: dict, *, env: dict | None = None, fetch=None) -> dict:
+    """Look up a few related bug reports.
+
+    A missing key is a refusal recorded on the result. A failed lookup (HTTP error, timeout,
+    empty or unusable response) is recorded the same way. Neither changes the verdict.
+    The key is never written into the log or the returned value. The result has background
+    text only: it does not name packages to install.
     """
     env = os.environ if env is None else env
     secret = str(env.get(tavily_docs.KEY_ENV) or "").strip()
     query = _redact(query_from_record(rec), secret)
-    if not tavily_docs.available(env):
-        print(SKIP_LOG, flush=True)
-        return {"status": "skipped", "text": "", "items": [], "query": query, "untrusted": True}
+    missing = tavily_docs.missing_key_line(env)
+    if missing:
+        print(missing, flush=True)
+        return {
+            "status": "refused", "text": "", "items": [], "query": query, "result_count": 0,
+            "untrusted": True, "reason": missing,
+        }
     fetch = fetch or (lambda q: tavily_docs.lookup(q, max_results=5, env=env, timeout=8))
     try:
         raw = fetch(query)
-    except Exception:  # noqa: BLE001 — the message may contain the key; do not print it
-        print(FAIL_LOG, flush=True)
-        return {"status": "error", "text": "", "items": [], "query": query, "untrusted": True}
+    except Exception as exc:  # noqa: BLE001 — the message may contain the key; redact it
+        return _failure(query, _hide(f"{type(exc).__name__}: {exc}", secret, rec))
     if not isinstance(raw, dict) or not raw.get("ok"):
-        print(FAIL_LOG, flush=True)
-        return {"status": "error", "text": "", "items": [], "query": query, "untrusted": True}
+        detail = "the lookup returned nothing usable"
+        if isinstance(raw, dict) and raw.get("error"):
+            detail = _hide(str(raw.get("error")), secret, rec)
+        return _failure(query, detail)
     items = _items(raw.get("results"), secret)
     text = _redact(background_text(items), secret)
     print(f"Related bug reports: {len(items)} background item(s).", flush=True)
@@ -157,5 +194,6 @@ def collect(rec: dict, *, env: dict | None = None, fetch=None) -> dict:
         "text": text,
         "items": items,
         "query": query,
+        "result_count": len(items),
         "untrusted": True,
     }

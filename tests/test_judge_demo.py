@@ -244,7 +244,8 @@ def test_codespace_start_turns_the_swarm_on():
     assert "gh codespace ports" in script
     secret = cfg["secrets"]["TAVILY_API_KEY"]
     assert "Your own Tavily API key" in secret["description"]
-    assert "lookup is skipped" in secret["description"]
+    assert "cannot run without the setup lookup" in secret["description"]
+    assert "lookup is skipped" not in secret["description"]
     assert secret["documentationUrl"] == "https://app.tavily.com/"
     assert "tvly-" not in raw
     argv = console_api.console_daily_run_argv("https://github.com/me/demo/pull/3", "recorded")
@@ -307,7 +308,7 @@ def test_request_form_warns_and_names_the_running_label():
     assert "Do not make port 8787 public" in readme
 
 
-def test_tavily_session_key_reaches_the_check_and_is_not_echoed(monkeypatch):
+def test_tavily_session_key_reaches_a_codespace_check_and_is_not_echoed(monkeypatch):
     secret = "tavily-session-secret-value"
     monkeypatch.delenv("TAVILY_API_KEY", raising=False)
     session_key.clear_key("sess-t")
@@ -316,7 +317,11 @@ def test_tavily_session_key_reaches_the_check_and_is_not_echoed(monkeypatch):
     assert status["tavily_key"] is True
     assert status["nebius_key"] is False
     assert secret not in json.dumps(status)
-    env, secrets = console_api.child_environment({"PATH": "/usr/bin"}, "recorded", "sess-t")
+    hosted, hosted_secrets = console_api.child_environment(
+        {"PATH": "/usr/bin", "TAVILY_API_KEY": "server-tavily-key-999"}, "recorded", "sess-t")
+    assert hosted["TAVILY_API_KEY"] == "server-tavily-key-999"
+    assert secret in hosted_secrets
+    env, secrets = console_api.child_environment({"PATH": "/usr/bin", "CODESPACES": "true"}, "recorded", "sess-t")
     assert env["TAVILY_API_KEY"] == secret
     assert secret in secrets
     assert secret not in os.environ.get("TAVILY_API_KEY", "")
@@ -346,9 +351,11 @@ def test_worker_logs_a_missing_tavily_key_and_keeps_the_swarm(tmp_path, monkeypa
     result = request_worker.run_check(url, _settings(tmp_path), [])
     err = capsys.readouterr().err
     assert request_worker.TAVILY_MISSING in err
-    assert "--swarm" in seen["argv"]
-    assert "TAVILY_API_KEY" not in seen["env"]
-    assert "TAVILY_API_KEY" not in result.reason
+    assert "argv" not in seen
+    assert result.ok is False
+    assert result.verdict == "could_not_verify"
+    assert result.reason == request_worker.TAVILY_MISSING
+    assert "--swarm" in request_worker.default_check_argv("python3", tmp_path, url)
 
 
 def test_requested_check_runs_the_tavily_lookup(tmp_path, monkeypatch):
@@ -515,7 +522,8 @@ def test_worker_does_not_start_during_the_window_cap_or_study(tmp_path, capsys):
 QUIET = request_worker.QUIET_MARKER
 
 
-def test_worker_runs_one_sandboxed_check_and_hides_the_token(tmp_path, capsys):
+def test_worker_runs_one_sandboxed_check_and_hides_the_token(tmp_path, capsys, monkeypatch):
+    monkeypatch.setenv("TAVILY_API_KEY", "worker-tavily-key-not-printed")
     url = "https://github.com/pandas-dev/pandas/pull/70520"
     calls = []
 

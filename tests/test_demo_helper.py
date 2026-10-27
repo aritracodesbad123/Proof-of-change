@@ -605,7 +605,15 @@ def test_lookup_records_a_live_call_and_skips_cleanly(tmp_path):
     assert "present-but-not-logged" not in (tmp_path / "cache.json").read_text()
     skipped = demo_helper.lookup_project(REPO, "widget", demo_helper.MemoryCache(), env={}, fetch=fetch)
     assert skipped["live_call"] is False and skipped["skipped"] is True
+    assert skipped["stop"] is False
     assert "TAVILY_API_KEY" in skipped["lines"][0]
+    from poc import tavily_docs
+    refused = demo_helper.lookup_project(
+        REPO, "widget", demo_helper.MemoryCache(), env={}, fetch=fetch, required=True)
+    assert refused["skipped"] is False and refused["stop"] is True
+    assert refused["stop_reason"] == tavily_docs.MISSING_KEY
+    assert refused["result_count"] == 0
+    assert refused["queries"]
 
     def offline(_query, timeout=8, env=None):
         return {"ok": False, "error": "URLError: [Errno -2] Name or service not known", "query": _query, "results": []}

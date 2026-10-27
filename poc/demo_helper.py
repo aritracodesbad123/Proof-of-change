@@ -516,14 +516,60 @@ def _result_lines(queries: list[str], results: list[dict], errors: list[str], li
     return lines
 
 
-def lookup_project(repo: str, project: str, cache, env: dict | None = None, fetch=None) -> dict:
-    """Look up setup instructions. A live call is recorded only when a fetch actually runs."""
+def product_runner(runner) -> bool:
+    """True for a product check. False for a study run, the daily study, and a missing runner.
+
+    Matches ``ops.daily_run.product_route``: a single pull request with the product-check flag, and not a
+    benchmark. A study run keeps the lookup optional.
+    """
+    if runner is None or getattr(runner, "bench", None):
+        return False
+    if not getattr(runner, "pr", None):
+        return False
+    return bool(getattr(runner, "product_check", False))
+
+
+def lookup_stop_reason(rec: dict | None) -> str | None:
+    """The plain reason a product check must stop, or None when the lookup did not stop it."""
+    if not isinstance(rec, dict):
+        return None
+    tavily = (rec.get("demo_helper") or {}).get("tavily") if isinstance(rec.get("demo_helper"), dict) else None
+    if not isinstance(tavily, dict) or not tavily.get("stop"):
+        return None
+    reason = str(tavily.get("stop_reason") or "").strip()
+    return reason or None
+
+
+def _lookup_body(queries, results, *, ok, skipped, refused, failed, stop, stop_reason, live, cached,
+                 text, errors, lines) -> dict:
+    return {
+        "ok": ok, "skipped": skipped, "refused": refused, "failed": failed, "stop": stop,
+        "stop_reason": stop_reason, "live_call": live, "cached": cached, "queries": list(queries),
+        "results": [{"title": item["title"], "url": item["url"], "query": item["query"]} for item in results],
+        "result_count": len(results), "text": text, "errors": list(errors), "lines": list(lines),
+    }
+
+
+def lookup_project(repo: str, project: str, cache, env: dict | None = None, fetch=None,
+                   required: bool = False) -> dict:
+    """Look up setup instructions. A live call is recorded only when a fetch actually runs.
+
+    ``required`` is a product check. A missing key then refuses, and a failed lookup stops the check.
+    A study run and the daily study pass ``required`` false and keep the earlier skip.
+    """
+    from poc import tavily_docs
     env = os.environ if env is None else env
     queries = lookup_queries(repo, project)
     if not str(env.get("TAVILY_API_KEY") or "").strip():
-        return {"ok": False, "skipped": True, "live_call": False, "cached": False, "queries": queries,
-                "results": [], "text": "", "errors": [],
-                "lines": ["Tavily lookup skipped: TAVILY_API_KEY is not set."]}
+        if required:
+            line = tavily_docs.MISSING_KEY
+            return _lookup_body(
+                queries, [], ok=False, skipped=False, refused=True, failed=True, stop=True,
+                stop_reason=line, live=False, cached=False, text="", errors=[line], lines=[line])
+        return _lookup_body(
+            queries, [], ok=False, skipped=True, refused=False, failed=False, stop=False, stop_reason="",
+            live=False, cached=False, text="", errors=[],
+            lines=["Tavily lookup skipped: TAVILY_API_KEY is not set."])
     fetch = fetch or live_fetch
     gathered, answers, errors = [], [], []
     live = False
@@ -567,12 +613,22 @@ def lookup_project(repo: str, project: str, cache, env: dict | None = None, fetc
     for item in results:
         if item.get("content"):
             texts.append(str(item["content"]))
-    lines = _result_lines(queries, results, errors, live)
-    return {"ok": bool(results) and not errors, "skipped": False, "live_call": live,
-            "cached": cached_any and not fresh_any, "queries": queries,
-            "results": [{"title": item["title"], "url": item["url"], "query": item["query"]} for item in results],
-            "text": redact("\n".join(texts), env), "errors": [redact(err, env) for err in errors],
-            "lines": [redact(line, env) for line in lines]}
+    lines = [redact(line, env) for line in _result_lines(queries, results, errors, live)]
+    clean_errors = [redact(err, env) for err in errors]
+    text = redact("\n".join(texts), env)
+    failed = bool(clean_errors)
+    stop = bool(required and failed)
+    stop_reason = ""
+    if stop:
+        why = clean_errors[0] if clean_errors else "the lookup returned nothing usable"
+        stop_reason = why if why.lower().startswith("could not verify") else (
+            f"could not verify: the setup lookup failed: {why}")
+        if stop_reason not in lines:
+            lines = [stop_reason, *lines]
+    return _lookup_body(
+        queries, results, ok=not failed, skipped=False, refused=False, failed=failed, stop=stop,
+        stop_reason=stop_reason, live=live, cached=cached_any and not fresh_any, text=text,
+        errors=clean_errors, lines=lines)
 
 
 def begin_check(runner, rec: dict, repo: str, project: str, cache_dir, env: dict | None = None, fetch=None):
@@ -587,7 +643,7 @@ def begin_check(runner, rec: dict, repo: str, project: str, cache_dir, env: dict
         cache = FileCache(Path(cache_dir) / "tavily-cache.json") if cache_dir else MemoryCache()
         from poc import run_progress
         run_progress.emit("setup_lookup", detail="Looking up how this project is set up (Python, config, libraries)")
-        looked = lookup_project(repo, project, cache, env=env, fetch=fetch)
+        looked = lookup_project(repo, project, cache, env=env, fetch=fetch, required=product_runner(runner))
         block = rec.setdefault("demo_helper", {})
         block["preflight"] = {"ok": info["ok"]}
         block["tavily"] = looked
@@ -598,6 +654,18 @@ def begin_check(runner, rec: dict, repo: str, project: str, cache_dir, env: dict
         announce(info["lines"] + looked["lines"], env=env)
         return block
     except Exception as exc:  # noqa: BLE001 — do not print the message; it might contain a key
+        detail = redact(f"{type(exc).__name__}: {exc}", env)
+        if product_runner(runner):
+            reason = f"could not verify: the setup lookup failed: {detail}"
+            block = rec.setdefault("demo_helper", {})
+            block["tavily"] = _lookup_body(
+                [], [], ok=False, skipped=False, refused=False, failed=True, stop=True,
+                stop_reason=reason, live=False, cached=False, text="", errors=[detail], lines=[reason])
+            notes = list(block.get("notes") or [])
+            notes.append(reason)
+            block["notes"] = _unique([redact(line, env) for line in notes])
+            announce([reason], env=env)
+            return block
         announce([f"Demo helper: {type(exc).__name__}"], env=env)
         return None
 

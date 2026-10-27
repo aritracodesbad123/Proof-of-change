@@ -16,6 +16,7 @@ def _reset_operator_approval_mark():
 
 def pytest_configure(config):
     config.addinivalue_line("markers", "real_key_gate: run with the console's real typed-key gate")
+    config.addinivalue_line("markers", "real_tavily_gate: run with the console's real Tavily-key gate")
 
 
 @pytest.fixture(autouse=True)
@@ -25,6 +26,16 @@ def _typed_key_gate(request, monkeypatch):
     if request.node.get_closest_marker("real_key_gate") is None:
         from poc import console_api
         monkeypatch.setattr(console_api, "_has_typed_key", lambda _token: True)
+    yield
+
+
+@pytest.fixture(autouse=True)
+def _tavily_key_gate(request, monkeypatch):
+    """Most console tests exercise later stages, so they pass the Tavily key gate.
+    Tests marked real_tavily_gate check the gate itself."""
+    if request.node.get_closest_marker("real_tavily_gate") is None:
+        from poc import console_api
+        monkeypatch.setattr(console_api, "_has_tavily_key", lambda _token, base=None: True)
     yield
 
 
