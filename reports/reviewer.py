@@ -1160,9 +1160,16 @@ def to_pdf(html_path: str, pdf_path: str) -> str | None:
     First a fresh headless Chrome/Chromium (own temp profile, own process group, hard time limit, whole group
     killed on a hang). If Chrome is missing, fails or hangs, the built-in pure-Python PDF maker (reportlab)
     renders the same report right away. A PDF problem never touches a record or a verdict."""
-    chrome_err = _chrome_pdf(html_path, pdf_path)
+    chrome_err = chrome_ready()
     if chrome_err is None:
-        return None
+        chrome_err = _chrome_pdf(html_path, pdf_path)
+        if chrome_err is None:
+            return None
+        if "timed out" in chrome_err:
+            # probe passed but the real page hung: remember it so later PDFs in this process skip Chrome
+            chrome = find_chrome()
+            if chrome:
+                _CHROME_READY[chrome] = chrome_err
     try:
         _fallback_pdf(html_path, pdf_path)
     except Exception as e:  # noqa: BLE001
@@ -1184,17 +1191,46 @@ CHROME_FLAGS = ("--headless=new", "--no-sandbox", "--disable-gpu", "--disable-de
                 "--run-all-compositor-stages-before-draw", "--virtual-time-budget=10000", "--no-pdf-header-footer")
 
 
+CHROME_PROBE_TIMEOUT_S = 5
+_CHROME_READY: dict = {}  # per process: chrome path -> None (ready) or the reason it is not
+
+
+def chrome_ready() -> str | None:
+    """Short readiness probe: print a tiny page within CHROME_PROBE_TIMEOUT_S. Cached per process, so a Chrome
+    that hangs (e.g. one whose managed policy force-installs extensions, which keeps headless printing from
+    exiting) costs a few seconds once instead of the full PDF_TIMEOUT_S on every report."""
+    chrome = find_chrome()
+    if not chrome:
+        return "no chrome/chromium on PATH (set BR_CHROME)"
+    if chrome in _CHROME_READY:
+        return _CHROME_READY[chrome]
+    err = "readiness probe failed"
+    try:
+        with tempfile.TemporaryDirectory() as d:
+            html, pdf = os.path.join(d, "probe.html"), os.path.join(d, "probe.pdf")
+            with open(html, "w") as f:
+                f.write("<html><body>ok</body></html>")
+            err = _chrome_pdf(html, pdf, timeout=CHROME_PROBE_TIMEOUT_S)
+    except OSError:
+        pass
+    if err and "timed out" in err:
+        err = f"readiness probe timed out after {CHROME_PROBE_TIMEOUT_S} s"
+    _CHROME_READY[chrome] = err
+    return err
+
+
 def _pdf_ok(pdf_path: str) -> bool:
     return os.path.exists(pdf_path) and os.path.getsize(pdf_path) > 0
 
 
-def _chrome_pdf(html_path: str, pdf_path: str) -> str | None:
+def _chrome_pdf(html_path: str, pdf_path: str, timeout: float | None = None) -> str | None:
+    timeout = PDF_TIMEOUT_S if timeout is None else timeout
     chrome = find_chrome()
     if not chrome:
         return "no chrome/chromium on PATH (set BR_CHROME)"
     if os.path.exists(pdf_path):
         os.remove(pdf_path)
-    with tempfile.TemporaryDirectory() as prof:
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as prof:
         try:
             p = subprocess.Popen([chrome, *CHROME_FLAGS, f"--user-data-dir={prof}", f"--print-to-pdf={pdf_path}",
                                   "file://" + os.path.abspath(html_path)],
@@ -1203,13 +1239,13 @@ def _chrome_pdf(html_path: str, pdf_path: str) -> str | None:
         except OSError as e:
             return f"could not start Chrome: {e}"
         try:
-            _, err = p.communicate(timeout=PDF_TIMEOUT_S)
+            _, err = p.communicate(timeout=timeout)
         except subprocess.TimeoutExpired:
             _kill_group(p)
             _kill_profile_users(prof)
             if os.path.exists(pdf_path):
                 os.remove(pdf_path)
-            return f"PDF timed out after {PDF_TIMEOUT_S} s"
+            return f"PDF timed out after {timeout:g} s"
         _kill_group(p)  # helpers Chrome left behind
         _kill_profile_users(prof)
     return None if _pdf_ok(pdf_path) else f"chrome failed: {(err or '')[-300:]}"
