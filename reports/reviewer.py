@@ -1161,11 +1161,37 @@ def to_pdf(html_path: str, pdf_path: str) -> str | None:
     if os.path.exists(pdf_path):
         os.remove(pdf_path)
     with tempfile.TemporaryDirectory() as prof:
-        r = subprocess.run([chrome, "--headless=new", "--no-sandbox", "--disable-gpu", f"--user-data-dir={prof}",
-                            "--no-pdf-header-footer", f"--print-to-pdf={pdf_path}", "file://" + os.path.abspath(html_path)],
-                           capture_output=True, text=True, timeout=180)
+        # Own process group, so a timeout kills Chrome and every helper it started (a helper left holding the
+        # output pipe used to keep the run waiting forever). A timeout only skips the PDF; HTML/MD and the
+        # record are already written and the verdict is never touched.
+        p = subprocess.Popen([chrome, "--headless=new", "--no-sandbox", "--disable-gpu", f"--user-data-dir={prof}",
+                              "--no-pdf-header-footer", f"--print-to-pdf={pdf_path}",
+                              "file://" + os.path.abspath(html_path)],
+                             stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, text=True, start_new_session=True)
+        try:
+            _, err = p.communicate(timeout=PDF_TIMEOUT_S)
+        except subprocess.TimeoutExpired:
+            _kill_group(p)
+            if os.path.exists(pdf_path):
+                os.remove(pdf_path)
+            return f"PDF timed out after {PDF_TIMEOUT_S} s; PDF not generated (HTML and Markdown reports are unaffected)"
     ok = os.path.exists(pdf_path) and os.path.getsize(pdf_path) > 0
-    return None if ok else f"chrome failed: {r.stderr[-300:]}"
+    return None if ok else f"chrome failed: {(err or '')[-300:]}"
+
+
+PDF_TIMEOUT_S = 180
+
+
+def _kill_group(p: subprocess.Popen) -> None:
+    import signal
+    try:
+        os.killpg(p.pid, signal.SIGKILL)
+    except (ProcessLookupError, PermissionError, OSError):
+        p.kill()
+    try:
+        p.communicate(timeout=10)
+    except subprocess.TimeoutExpired:
+        pass
 
 
 # ---------------------------------------------------------------- daily summary

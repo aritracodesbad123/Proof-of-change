@@ -809,6 +809,8 @@ def source_pair(repo: str, item: dict, work: Path, log: Path, python: str, timeo
     Benchmark mode (ops/bench.py) checks both sides out at pinned SHAs beforehand and passes them in item["bench_sides"]."""
     if item.get("bench_sides"):
         return item["bench_sides"]
+    if item.get("pinned_sides"):
+        return pinned_source_pair(repo, item["pinned_sides"], work, log)
     env = base_env(work / "home-git")
     src = work / "src"
     res: dict = {}
@@ -852,6 +854,29 @@ def source_pair(repo: str, item: dict, work: Path, log: Path, python: str, timeo
         rc, _ = run(["git", "-C", src, "worktree", "add", "-q", "--detach",
                     (work / f"side-{side}").resolve(), res[f"{side}_sha"]],
                     log, env=env, timeout=900)
+        if rc != 0:
+            return {"ok": False, "why": f"checkout of {side} side failed"}
+    res["ok"] = True
+    return res
+
+
+def pinned_source_pair(repo: str, pinned: dict, work: Path, log: Path) -> dict:
+    """Both sides at the exact commits a benchmark case file pins (--base-sha / --head-sha): main = base_sha,
+    PR = head_sha. No base-branch tip, merge ref or merge-base is looked up, so a case keeps testing the commits it
+    was written for after upstream moves on."""
+    env = base_env(work / "home-git")
+    src = work / "src"
+    steps = [["git", "clone", "-q", "--filter=blob:none", "--no-checkout", f"https://github.com/{repo}.git", src],
+             ["git", "-C", src, "fetch", "-q", "origin", pinned["main"], pinned["pr"]]]
+    for c in steps:
+        rc, _ = run(c, log, env=env, timeout=900)
+        if rc != 0:
+            return {"ok": False, "why": f"git step failed ({rc}): {' '.join(map(str, c[:4]))}"}
+    res = {"comparison_basis": "pinned base vs pinned PR head (benchmark case file)",
+           "main_sha": pinned["main"], "pr_sha": pinned["pr"], "pinned": True}
+    for side in ("main", "pr"):
+        rc, _ = run(["git", "-C", src, "worktree", "add", "-q", "--detach",
+                    (work / f"side-{side}").resolve(), res[f"{side}_sha"]], log, env=env, timeout=900)
         if rc != 0:
             return {"ok": False, "why": f"checkout of {side} side failed"}
     res["ok"] = True
@@ -5848,6 +5873,10 @@ def _main(argv=None) -> int:
                          "if this flag is set on a benchmark. A product check does not start without "
                          "TAVILY_API_KEY. If this lookup fails, the reason is recorded and the reports are "
                          "left out of the write-up. The verdict is left as it was. It does not choose packages.")
+    ap.add_argument("--base-sha", default=None,
+                    help="benchmark runner only: test the main side at exactly this commit (needs --head-sha and one --pr)")
+    ap.add_argument("--head-sha", default=None,
+                    help="benchmark runner only: test the PR side at exactly this commit (needs --base-sha and one --pr)")
     ap.add_argument("--live-check", action="store_true",
                     help="set only by live product checks (console, GitHub App, request worker): a pull request that "
                          "is not open, or whose state cannot be read, is refused. Benchmark and replay runs omit it.")
@@ -5977,6 +6006,10 @@ def _main(argv=None) -> int:
 
     started = now_ist()
     single = parse_pr_urls(a.pr)
+    pin_problem = pinned_args_problem(a, single)
+    if pin_problem:
+        print(pin_problem, file=sys.stderr)
+        return 2
     default_name = started.strftime("%Y-%m-%d") + (started.strftime("-check-%H%M") if single else "")
     if single and product_route(a):
         # Product checks get seconds and the first PR number, so two checks started in the same minute do not
@@ -6050,10 +6083,13 @@ def _main(argv=None) -> int:
                                  "test_deps": [], "nightly": False}
         try:
             if single:
-                chosen, sk = chosen_items(gh, repo, cfg, [{"pr": n, "head_sha": None, "install": None, "test_cmd": None}
-                                                        for n in single[repo]]), []
+                chosen, sk = chosen_items(gh, repo, cfg, [{"pr": n, "head_sha": a.head_sha, "install": None,
+                                                         "test_cmd": None} for n in single[repo]]), []
                 for c in chosen:
                     c["ci_state"], c["ci_detail"] = "not checked (single-PR check)", "checked on request with --pr"
+                    if a.base_sha:
+                        c["pinned_sides"] = {"main": a.base_sha, "pr": a.head_sha}
+                        c["base_sha"] = a.base_sha
             elif repo in chosen_prs:   # PRs chosen by name for today; selection filters do not apply
                 chosen, sk = chosen_items(gh, repo, cfg, chosen_prs[repo]), []
             elif frozen.get(repo):
@@ -6153,13 +6189,32 @@ def _main(argv=None) -> int:
     return 0 if not problems else 1
 
 
+def pinned_args_problem(a, single: dict) -> str | None:
+    """--base-sha / --head-sha come together, as full hex SHAs, with exactly one --pr."""
+    base, head = getattr(a, "base_sha", None), getattr(a, "head_sha", None)
+    if not base and not head:
+        return None
+    if not (base and head):
+        return "refusing: --base-sha and --head-sha must be given together"
+    if not all(re.fullmatch(r"[0-9a-f]{40}", x) for x in (base, head)):
+        return "refusing: --base-sha / --head-sha must be full 40-character commit SHAs"
+    if sum(len(v) for v in single.values()) != 1:
+        return "refusing: --base-sha / --head-sha need exactly one --pr"
+    return None
+
+
 def reviewer_reports(rdir: Path, a, records: list[dict], kind: str) -> None:
     """HTML/PDF/MD reviewer reports + daily SUMMARY via reports/pr_report.py (the single report generator)."""
     if not records or a.no_report:
         return
     from reports.pr_report import render_run
     out = Path(a.report_dir) if a.report_dir else REPO_ROOT / "reports" / "daily" / rdir.name
-    render_run(rdir, out, title=f"Proof-of-Change {kind}: {rdir.name}")
+    try:
+        render_run(rdir, out, title=f"Proof-of-Change {kind}: {rdir.name}")
+    except Exception as e:  # noqa: BLE001 - reports are a view of the saved records; they never change a verdict or exit code
+        print(f"reviewer reports could not be written ({type(e).__name__}); records and verdicts are unchanged",
+              file=sys.stderr, flush=True)
+        return
     print(f"\nDONE. Open this file to read the results:\n  {out / 'SUMMARY.html'}")
 
 
