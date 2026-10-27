@@ -56,6 +56,18 @@ verified.
 
 A probe counts as measured when only some of the changed files show up in its coverage.
 
+### Multi-line lambdas
+
+Not supported: a changed line on a later line of a multi-line lambda is judged by the line
+where the lambda is assigned. That line runs when the module is imported, so the change can be
+counted as reached even if the lambda never ran.
+
+### Plugin flags
+
+Not supported: a project whose own test suite needs a plugin flag passed to the test run, for
+example pytest's own repository needing `-p pytester`. The tool does not add per-project flags,
+so these end as could not verify.
+
 ### Fresh claims and checks
 
 The AI writes the claims and the checks fresh on every run. The same pull request on the same

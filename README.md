@@ -36,6 +36,10 @@ Line coverage of a probe is measured only on the main side, in main's line numbe
 
 A probe counts as measured when only some of the changed files show up in its coverage.
 
+Not supported: a changed line on a later line of a multi-line lambda is judged by the line where the lambda is assigned. That line runs when the module is imported, so the change can be counted as reached even if the lambda never ran.
+
+Not supported: a project whose own test suite needs a plugin flag passed to the test run, for example pytest's own repository needing `-p pytester`. The tool does not add per-project flags, so these end as could not verify.
+
 The AI writes the claims and the checks fresh on every run. The same pull request on the same code can get a different verdict on another run. An earlier run of one pull request came out needs attention, and a later run came out verified.
 
 Tests and probes in the local sandbox have no internet. The network is on only while packages are installed. Secret keys are not given to that sandbox, and they are not placed in a Contree shell. A behaviour that needs a network service, a password or a key cannot be tested.
