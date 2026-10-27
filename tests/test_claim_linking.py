@@ -121,7 +121,7 @@ def test_41_c1_star_alone_never_takes_c10():
 def test_41_separators():
     claim = {"id": "C1", "covers": ["C1"], "expect": "differs", "text": "x"}
     names = ["C1.a", "C1_a", "c1-a", "C1", "C10", "C10_a", "C1a", "C1 a"]
-    assert claim_hygiene.linked_names(claim, names) == ["C1.a", "C1_a", "c1-a", "C1"]
+    assert claim_hygiene.linked_names(claim, names) == ["C1.a", "c1-a", "C1"]   # C1_a stays unlinked
 
 
 def test_41_relinked_claim_must_still_hold():

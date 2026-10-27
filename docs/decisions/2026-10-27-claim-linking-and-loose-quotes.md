@@ -19,8 +19,10 @@ A root-cause check of the 27 Oct product run found three generic causes of wrong
 ## Decision
 
 1. **Claim ids link in code.** On a product check, a cover equal to its claim id, optionally ending in `*`, links
-   the observation named exactly that id or starting with the id followed by `.`, `_` or `-` (`C1.a`, `C1_a`,
-   `C1-a`), ignoring case. It never links a longer id:
+   the observation named exactly that id or starting with the id followed by `.` or `-` (`C1.a`,
+   `C1-a`), ignoring case. `_` is deliberately not a separator (`C1_a` stays unlinked): accepting it linked a
+   known-safe benchmark PR's claim to unrelated observations and added a false alarm, while an unlinked claim
+   fails safe as could not verify. It never links a longer id:
    `C1` and `C1*` never link `C10` or `C10.x`. A claim with such a cover is always matched this way, even when that
    leaves it linking nothing; it never falls back to plain pattern matching. Other cover patterns are matched
    ignoring case. The covers as written are kept on the claim (`covers_as_written`), each repaired link is listed in `probes.claim_hygiene.relinked`, and the

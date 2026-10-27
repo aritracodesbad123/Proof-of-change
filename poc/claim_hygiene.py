@@ -8,7 +8,7 @@ into verified on its own):
 
 0. A model often writes a claim's covers as the claim id ("C1", "C1*", any case) instead of observation-name
    patterns. Such a cover links the claim to the observation named exactly that id or starting with the id and
-   ".", "_" or "-", ignoring case, and never to a longer id ("C1" or "C1*" never links "C10.x"). A claim with
+   "." or "-", ignoring case, and never to a longer id ("C1" or "C1*" never links "C10.x"). A claim with
    such a cover is always matched this way, even when that leaves it linking nothing. Other patterns are matched ignoring case.
    The covers as written are kept on the claim (covers_as_written) and each repaired link is listed in
    ``relinked``. A link only says which claim an observation belongs to; the claim still has to hold.
@@ -68,9 +68,9 @@ def says_stays_same(text: str) -> bool:
     return bool(_STAYS_SAME.search(t)) and not _SAYS_CHANGE.search(t)
 
 
-# What may follow the claim id in an observation name: "C1.a", "C1_a", "C1-a". A digit or letter never does, so "C1"
+# What may follow the claim id in an observation name: "C1.a", "C1-a". "_", a digit or a letter never does, so "C1"
 # never links "C10" or "C1a".
-ID_SEPARATORS = "._-"
+ID_SEPARATORS = ".-"
 
 
 def _has_id_cover(claim: dict) -> bool:
@@ -91,7 +91,7 @@ def _escape(name: str) -> str:
 
 def linked_names(claim: dict, names: list[str]) -> list[str]:
     """Observation names a claim covers (rule 0): a cover equal to the claim id (optionally ending in *) means the
-    name equal to the id or starting with the id and ".", "_" or "-"; any other cover is an fnmatch pattern, compared ignoring case."""
+    name equal to the id or starting with the id and "." or "-"; any other cover is an fnmatch pattern, compared ignoring case."""
     cid = str(claim.get("id") or "")
     out = []
     for n in names:
