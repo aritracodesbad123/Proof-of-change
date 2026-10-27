@@ -180,10 +180,11 @@ def test_38_retyped_same_claim_fails_closed_when_it_differs():
 
 def test_38_phrases():
     for t in ["will NOT bypass the proxy", "existing behavior is preserved", "output is unchanged",
-              "plain IPs still match", "continues to work as before", "does not affect CIDR"]:
+              "continues to work as before", "CIDR ranges are unaffected", "won't touch other ports"]:
         assert claim_hygiene.says_stays_same(t), t
     for t in ["no longer crashes", "is not merged anymore, it now splits", "now returns a list",
-              "parses links with equals signs", "fixes the crash"]:
+              "parses links with equals signs", "fixes the crash", "parse() does not raise on empty input",
+              "adjacent tags are not merged", "the parser still handles quotes", "will not raise on empty input"]:
         assert not claim_hygiene.says_stays_same(t), t
 
 
@@ -210,7 +211,8 @@ def test_39_phrases():
               "All tests pass", "CI is green and passes"]:
         assert claim_hygiene.is_test_outcome_claim(t), t
     for t in ["adjacent tags are no longer merged", "a request to port 6000 will NOT bypass the proxy",
-              "Existing behavior for non-adjacent tags is preserved."]:
+              "Existing behavior for non-adjacent tags is preserved.", "parsing an empty string results in a list",
+              "the test helper now returns a dict", "tests the value of the header"]:
         assert not claim_hygiene.is_test_outcome_claim(t), t
 
 
@@ -232,68 +234,110 @@ def test_settle_probes_cleans_only_product_records():
     assert "claim_hygiene" in prod["probes"] and prod["claim_hygiene_note"]
 
 
-# ---- 40: closed or merged pull requests are refused --------------------------------------------------------------
+# ---- 40: live checks refuse closed or merged pull requests; benchmark and replay runs do not -------------------
 
-def test_40_closed_pr_refused_requests_7586():
+class _GH:
+    def __init__(self, payload=None, exc=None):
+        self.payload, self.exc = payload, exc
+
+    def json(self, path):
+        if self.exc:
+            raise self.exc
+        return self.payload
+
+
+def test_40_closed_reason_and_missing_state_fail_closed():
     r = _rec("requests-7586")
     assert r["state"] == "closed"
     why = dr.closed_pr_reason({"state": r["state"]})
-    assert why and why.startswith("refused:") and "closed or merged" in why
-    assert dr.verdict_for(None, why)[0] == "could_not_verify"
+    assert why.startswith("refused:") and "closed or merged" in why
     assert dr.closed_pr_reason({"state": "open"}) is None
     assert dr.closed_pr_reason({"state": "merged"}).startswith("refused:")
+    assert dr.closed_pr_reason({}) == dr.STATE_UNREADABLE              # no state: refuse
+    assert dr.verdict_for(None, why)[0] == "could_not_verify"
 
 
-def test_40_test_pr_refuses_before_any_run(tmp_path, monkeypatch):
-    finished = {}
-
-    def fake_finish(rec, *a):
-        finished.update(rec)
-        return rec
-
-    def boom(*a, **k):
-        raise AssertionError("nothing may run for a closed pull request")
-
-    monkeypatch.setattr(dr, "finish", fake_finish)
-    monkeypatch.setattr(dr, "new_record", lambda *a, **k: {})
-    monkeypatch.setattr(dr, "begin_pr", lambda a: None)
-    monkeypatch.setattr(dr, "test_source_pair", boom)
-    from poc import demo_helper
-    monkeypatch.setattr(demo_helper, "begin_check", boom)
-    a = SimpleNamespace(pr="https://github.com/o/r/pull/1", product_check=True, bench=None)
-    item = {"pr": 1, "diff": "", "state": "closed"}
-    dr.test_pr("o/r", {"pkg": "r"}, item, tmp_path / "r", tmp_path / "w", a, {})
-    assert finished["verdict"] == "could_not_verify"
-    assert finished["reason"].startswith("refused:") and finished["pr_state_refusal"]
+def test_40_live_refusal_reads_github_and_never_crashes():
+    a = SimpleNamespace()
+    item = {"pr": 1}
+    assert dr.live_pr_refusal("o/r", item, a, lambda: _GH({"state": "open"})) is None
+    assert "merged" in dr.live_pr_refusal("o/r", {"pr": 1}, a, lambda: _GH({"state": "closed", "merged_at": "x"}))
+    assert dr.live_pr_refusal("o/r", {"pr": 1}, a, lambda: _GH({})) == dr.STATE_UNREADABLE
+    assert dr.live_pr_refusal("o/r", {"pr": 1}, a, lambda: _GH(exc=RuntimeError("HTTP 502"))) == dr.STATE_UNREADABLE
+    assert dr.live_pr_refusal("o/r", {"pr": 1}, a,
+                              lambda: _GH(exc=dr.GitHubAuthError("401"))) == dr.STATE_UNREADABLE
 
 
-def test_40_known_answer_case_runs_merged_and_closed_prs(tmp_path, monkeypatch):
+def _drive_test_pr(tmp_path, monkeypatch, a, state, gh):
+    """Run test_pr up to the first step after the state check. Returns the finished record, or 'ran'."""
     class Reached(Exception):
         pass
 
-    def reached(*a, **k):
+    def reached(*x, **k):
         raise Reached
 
-    monkeypatch.setattr(dr, "finish", lambda rec, *a: (_ for _ in ()).throw(AssertionError(rec.get("reason"))))
-    monkeypatch.setattr(dr, "new_record", lambda *a, **k: {})
+    finished = {}
+    monkeypatch.setattr(dr, "finish", lambda rec, *x: finished.update(rec) or rec)
+    monkeypatch.setattr(dr, "new_record", lambda *x, **k: {})
     monkeypatch.setattr(dr, "begin_pr", lambda a: None)
+    monkeypatch.setattr(dr, "GitHub", lambda *x, **k: gh)
     from poc import demo_helper
-    monkeypatch.setattr(demo_helper, "begin_check", reached)
     monkeypatch.setattr(demo_helper, "active", lambda a: True)
-    a = SimpleNamespace(pr="https://github.com/o/r/pull/1", product_check=True, bench=None, known_answer_case=True)
-    for state in ("closed", "merged"):
-        import pytest
-        with pytest.raises(Reached):   # went past the state check into the check itself
-            dr.test_pr("o/r", {"pkg": "r"}, {"pr": 1, "diff": "", "state": state}, tmp_path / state, tmp_path / "w",
-                       a, {})
+    monkeypatch.setattr(demo_helper, "begin_check", reached)
+    try:
+        dr.test_pr("o/r", {"pkg": "r"}, {"pr": 1, "diff": "", "state": state}, tmp_path / str(state),
+                   tmp_path / "w", a, {})
+    except Reached:
+        return "ran"
+    return finished
 
 
-def test_40_benchmark_runner_marks_its_cases_known_answer(tmp_path):
+def test_40_live_check_refuses_closed_before_any_run(tmp_path, monkeypatch):
+    a = SimpleNamespace(pr="https://github.com/o/r/pull/1", product_check=True, bench=None, live_check=True)
+    rec = _drive_test_pr(tmp_path, monkeypatch, a, "closed", _GH({"state": "closed"}))
+    assert rec["verdict"] == "could_not_verify" and rec["reason"].startswith("refused:") and rec["pr_state_refusal"]
+    rec = _drive_test_pr(tmp_path, monkeypatch, a, "open", _GH(exc=RuntimeError("down")))
+    assert rec["verdict"] == "could_not_verify" and rec["reason"] == dr.STATE_UNREADABLE
+    assert _drive_test_pr(tmp_path, monkeypatch, a, "open", _GH({"state": "open"})) == "ran"
+
+
+def test_40_benchmark_and_replay_runs_are_not_refused(tmp_path, monkeypatch):
+    """bench/run.py and replays use --pr --product-check without --live-check: merged and closed cases still run,
+    and GitHub is not even asked."""
     from bench import run
-    case = {"pr_url": "https://github.com/o/r/pull/1"}
     for arm in run.ARMS:
-        cmd = run.command(case, arm, tmp_path, "n")
-        assert "--known-answer-case" in cmd and "--product-check" in cmd
-    ns = dr.build_parser().parse_args(["--pr", "x", "--product-check"]) if hasattr(dr, "build_parser") else None
-    if ns is not None:
-        assert ns.known_answer_case is False
+        cmd = run.command({"pr_url": "https://github.com/o/r/pull/1"}, arm, tmp_path, "n")
+        assert "--product-check" in cmd and "--live-check" not in cmd
+    a = SimpleNamespace(pr="https://github.com/o/r/pull/1", product_check=True, bench=None, live_check=False)
+    for state in ("closed", "merged", None):
+        assert _drive_test_pr(tmp_path, monkeypatch, a, state, _GH(exc=AssertionError("no lookup"))) == "ran"
+
+
+def test_40_live_routes_set_the_flag():
+    from poc import related_reports
+    assert "--live-check" in related_reports.product_flags()
+    import argparse  # noqa: F401
+    src = (ROOT / "ops/daily_run.py").read_text()
+    assert '"--live-check"' in src
+
+
+def test_38_retyped_claim_never_lifts_unmatched_differs_cap():
+    spec = {"id": "m", "target": "o/r#1", "about": "x",
+            "claims": [{"id": "C9", "text": "Other ports will not bypass the proxy.", "covers": ["nothing.here"],
+                        "expect": "differs"}]}
+    item = probes.entry(spec, {"main": [{"a": 1}] * 3, "pr": [{"a": 1}] * 3}, None, [], "model", None)
+    before = probes.apply_status({"status": "ran", "items": [item]})
+    assert _verdict(before)[0] == "could_not_verify"                  # study: unmatched differs cap
+    after = probes.apply_status(claim_hygiene.apply({"status": "ran", "items": [item]}))
+    assert after["claim_hygiene"]["retyped_same"] and after["claim_hygiene"]["held_back"] == ["C9"]
+    assert _verdict(after)[0] == "could_not_verify"                   # still capped after retyping
+
+
+def test_39_dropped_unmet_differs_claim_still_holds_back():
+    spec = {"id": "m", "target": "o/r#1", "about": "x",
+            "claims": [{"id": "C7", "text": "The regression test passes.", "covers": ["nothing.here"],
+                        "expect": "differs"}]}
+    item = probes.entry(spec, {"main": [{"a": 1}] * 3, "pr": [{"a": 1}] * 3}, None, [], "model", None)
+    after = probes.apply_status(claim_hygiene.apply({"status": "ran", "items": [item]}))
+    assert after["claim_hygiene"]["dropped_probes"] == ["m"] and after["claim_hygiene"]["held_back"] == ["C7"]
+    assert _verdict(after)[0] == "could_not_verify"

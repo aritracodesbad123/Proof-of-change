@@ -3582,6 +3582,10 @@ def verdict_for(cmp: dict | None, cnv_reason: str | None, exits: dict | None = N
         return (Verdict.COULD_NOT_VERIFY.value,
                 f"could not verify: probe(s) {', '.join(advisory)} have no claims attached and saw a difference no "
                 f"claim covers, so the change is not confirmed ({reason})", fl + ["advisory_unclaimed_difference"])
+    if hygiene and hygiene.get("held_back") and v == Verdict.VERIFIED.value:
+        return (Verdict.COULD_NOT_VERIFY.value,
+                f"could not verify: claim(s) {', '.join(hygiene['held_back'][:4])} expect a difference but no "
+                f"observation matches ({reason})", fl + ["unmatched_differs_claim"])
     if hygiene and hygiene.get("dropped_flagged") and v == Verdict.VERIFIED.value:
         from poc import claim_hygiene
         return (Verdict.COULD_NOT_VERIFY.value, f"could not verify: {claim_hygiene.note_text(hygiene)} ({reason})",
@@ -4492,10 +4496,35 @@ def _contree_only_pair(a, rec: dict, repo: str, cfg: dict, item: dict, sp: dict,
     return cmp, cnv, ex, targets
 
 
+STATE_UNREADABLE = ("refused: the pull request's state could not be read from GitHub, so it was not tested; "
+                    "a live check only tests open pull requests")
+
+
+def live_pr_refusal(repo: str, item: dict, a, gh_factory=None) -> str | None:
+    """Live checks only (console, GitHub App, request worker: ``--live-check``). Re-reads the pull request's state
+    from GitHub just before running. A closed or merged pull request, a missing state, or a failed read all refuse
+    (fail closed) with a plain reason; nothing raises. Benchmark, known-answer and replay runs never set the flag."""
+    try:
+        gh = (gh_factory or (lambda: GitHub(None, fail_fast_auth=True)))()
+        p = gh.json(f"/repos/{repo}/pulls/{item['pr']}")
+        state = p.get("state") if isinstance(p, dict) else None
+        if isinstance(p, dict) and p.get("merged_at") and state:
+            state = "merged"
+    except (KeyboardInterrupt, SystemExit):
+        raise
+    except BaseException:  # noqa: BLE001 - GitHubAuthError is a BaseException; a live check must not crash here
+        return STATE_UNREADABLE
+    if state:
+        item["state"] = state
+    return closed_pr_reason({"state": state})
+
+
 def closed_pr_reason(item: dict) -> str | None:
-    """A product check only tests an open pull request. A closed or merged one is refused with a plain message."""
+    """A live check only tests an open pull request. A closed or merged one, or one with no state, is refused."""
     state = str(item.get("state") or "").lower()
-    if state and state != "open":
+    if not state:
+        return STATE_UNREADABLE
+    if state != "open":
         merged = " or merged" if state == "closed" else ""
         return (f"refused: this pull request is {state}{merged}, not open, so it was not tested; "
                 "a product check only tests open pull requests")
@@ -4523,14 +4552,9 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
     rec = new_record(repo, cfg, item, a, machine, rdir.name, run_date_for(rdir))
     if product_route(a):
         rec["product_check"] = True   # coverage gate: on a product check, verified needs measured coverage
-    if product_route(a):
-        closed = closed_pr_reason(item)
-        if closed and getattr(a, "known_answer_case", False):
-            # A benchmark or known-answer case tests fixed commits on purpose, merged or closed included: label only.
-            rec["pr_state_note"] = ("known-answer case: this pull request is "
-                                    f"{item.get('state')}; its fixed commits were tested on purpose")
-            closed = None
-        if closed:   # a user-requested product check: refuse before any lookup, install or run
+    if product_route(a) and getattr(a, "live_check", False):
+        closed = live_pr_refusal(repo, item, a)
+        if closed:   # a live product check: refuse before any lookup, install or run
             rec["pr_state_refusal"] = closed
             rec["verdict"], rec["reason"], _ = verdict_for(None, closed)
             return finish(rec, prdir, work, t0, a)
@@ -5822,9 +5846,9 @@ def _main(argv=None) -> int:
                          "if this flag is set on a benchmark. A product check does not start without "
                          "TAVILY_API_KEY. If this lookup fails, the reason is recorded and the reports are "
                          "left out of the write-up. The verdict is left as it was. It does not choose packages.")
-    ap.add_argument("--known-answer-case", action="store_true",
-                    help="set by benchmark and known-answer runners: the pull request's fixed commits are tested "
-                         "even when it is closed or merged (the state is labelled in the record, not refused)")
+    ap.add_argument("--live-check", action="store_true",
+                    help="set only by live product checks (console, GitHub App, request worker): a pull request that "
+                         "is not open, or whose state cannot be read, is refused. Benchmark and replay runs omit it.")
     ap.add_argument("--product-check", action="store_true",
                     help="set only by product routes (console, request-a-check, Codespaces, GitHub App) on a single "
                          "pull-request check: 'verified' then needs measured coverage. Ignored on a benchmark or "

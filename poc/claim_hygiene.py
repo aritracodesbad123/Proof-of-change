@@ -13,8 +13,11 @@ Three rules, each fail closed (none of them can turn a run into verified on its 
 2. A claim that says something stays the same ("will NOT bypass", "is preserved", "unchanged", "still",
    "continues to", "as before") is typed expect "same", even when the model typed it "differs".
 3. A model probe with no claims attached cannot say which differences the PR intended. Its "differs and no claim
-   covers it" observations are kept and shown, but marked advisory and do not decide the verdict. The tests and
-   the other probes still decide.
+   covers it" observations are kept and shown, marked advisory: they do not raise needs attention, but a run with
+   one is held at could not verify (never verified).
+
+A claim that expected a difference and matched no observation before the clean-up keeps holding the run back
+(``held_back``), whether it was retyped or dropped.
 """
 from __future__ import annotations
 
@@ -24,23 +27,26 @@ import re
 from poc import probes
 from poc.verdict import COLOUR, FindingLabel
 
-# Rule 1: sentences about a test run, not about the product.
+# Rule 1: sentences about a test run, not about the product. Narrow on purpose: a test word as the subject plus a
+# pass word, or a count of tests passed. "parsing results in a list" is a behaviour claim and is kept.
 _TEST_OUTCOME = re.compile(
     r"(?ix)"
-    r"\b\d+\s+(?:tests?|cases?)\s+(?:passed|pass|passing|failed|fail|ran|run)\b"
-    r"|\b(?:regression\s+|unit\s+|new\s+|existing\s+|the\s+)?(?:tests?|test\s+suite|test\s+cases?)\b"
-    r"[^.]{0,60}?\b(?:pass|passes|passed|passing|succeed|succeeds|green|results?\s+in)\b"
-    r"|\b(?:ci|pytest|tox|nox)\b[^.]{0,40}?\b(?:pass|passes|passed|green)\b")
+    r"\b\d+\s+tests?\s+(?:passed|pass|passing|failed)\b"
+    r"|\b(?:regression|unit|integration|new|existing|added)\s+tests?\b[^.;:]{0,40}?\b(?:pass|passes|passed)\b"
+    r"|\b(?:all|the)\s+tests?\s+(?:now\s+)?(?:pass|passes|passed)\b"
+    r"|\btest\s+suite\b[^.;:]{0,40}?\b(?:pass|passes|passed)\b"
+    r"|\bci\s+(?:is\s+green|passes|passed)\b")
 
-# Rule 2: the claim says the behaviour is kept.
+# Rule 2: the claim says the behaviour is kept. Narrow on purpose: "does not raise", "is not merged" or "still"
+# often describe the fix itself, so they are not on this list.
 _STAYS_SAME = re.compile(
     r"(?ix)"
-    r"\bunchanged\b|\bpreserved?\b|\bpreserves\b|\bstill\b|\bcontinues?\s+to\b|\bas\s+before\b|\bremains?\b"
-    r"|\bstays?\b|\bis\s+kept\b|\bkeeps?\b|\bnot\s+affected\b|\bunaffected\b|\bsame\s+as\s+before\b"
-    r"|\b(?:will|does|do|is|are|should)\s+not\b|\b(?:won['’]t|doesn['’]t|don['’]t|isn['’]t|aren['’]t)\b")
+    r"\bunchanged\b|\bpreserved\b|\bpreserves\b|\bas\s+before\b|\bunaffected\b|\bnot\s+affected\b"
+    r"|\bcontinues?\s+to\b|\bwill\s+not\b|\bwon['’]t\b")
 # ... unless it says the old behaviour stops ("no longer", "not ... anymore", "now", "instead").
 _SAYS_CHANGE = re.compile(r"(?i)\bno\s+longer\b|\banymore\b|\bany\s+more\b|\binstead\b|\bnow\b|\bfixe[sd]\b"
-                          r"|\bused\s+to\b|\bpreviously\b|\bbefore\s+(?:this|the)\s+(?:change|fix|pr)\b")
+                          r"|\bused\s+to\b|\bpreviously\b|\bbefore\s+(?:this|the)\s+(?:change|fix|pr)\b"
+                          r"|\b(?:raise|crash|fail|error|hang)s?\b")
 
 
 def is_test_outcome_claim(text: str) -> bool:
@@ -62,7 +68,10 @@ def apply(probe_results: dict | None) -> dict | None:
     if not probe_results or not probe_results.get("items"):
         return probe_results
     out = copy.deepcopy(probe_results)
-    notes = {"dropped_claims": [], "retyped_same": [], "dropped_probes": [], "dropped_flagged": [],
+    # Claims that expect a difference and match no observation, before any clean-up. A retyped or dropped claim must
+    # never lift that cap, so it is kept and checked again in ops/daily_run.verdict_for.
+    held = probes.unmatched_differs_claims(probe_results)
+    notes = {"held_back": list(held), "dropped_claims": [], "retyped_same": [], "dropped_probes": [], "dropped_flagged": [],
              "advisory_probes": []}
     kept_items = []
     for it in out["items"]:
@@ -100,8 +109,12 @@ def apply(probe_results: dict | None) -> dict | None:
                 notes["advisory_probes"].append(it["id"])
         kept_items.append(it)
     out["items"] = kept_items
-    if any(notes.values()):
+    if any(v for k, v in notes.items() if k != "held_back") or (notes["held_back"] and "claim_hygiene" not in out):
+        prev = (out.get("claim_hygiene") or {}).get("held_back") or []
+        notes["held_back"] = sorted(set(notes["held_back"]) | set(prev))
         out["claim_hygiene"] = notes
+    elif out.get("claim_hygiene"):
+        out["claim_hygiene"]["held_back"] = sorted(set(out["claim_hygiene"].get("held_back") or []) | set(held))
     return out
 
 
@@ -118,6 +131,9 @@ def note_text(notes: dict | None) -> str:
     if notes.get("advisory_probes"):
         bits.append("probe(s) " + ", ".join(notes["advisory_probes"])
                     + " carry no claims, so their unclaimed differences are shown as advisory only")
+    if notes.get("held_back"):
+        bits.append("claim(s) " + ", ".join(notes["held_back"]) + " expected a difference that no observation "
+                    "showed; cleaning up claims never lifts that")
     if notes.get("dropped_flagged"):
         bits.append("probe(s) " + ", ".join(notes["dropped_flagged"])
                     + " were planned for a claim the pull request does not make and flagged a difference; "
