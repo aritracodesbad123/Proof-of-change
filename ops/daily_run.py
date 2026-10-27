@@ -5788,6 +5788,25 @@ def product_keys_start_refusal(a, env=None) -> str | None:
     return line
 
 
+def pdf_maker_start_refusal(a, importer=None) -> str | None:
+    """One plain line when a product check would start without the built-in PDF maker (reportlab).
+
+    Chrome can hang or be missing; reportlab is the PDF fallback, so a product check refuses to start without it
+    rather than finishing with no PDF. None for a study run, a selection-only run or --no-report.
+    """
+    if not product_route(a):
+        return None
+    if getattr(a, "select_only", False) or getattr(a, "no_report", False):
+        return None
+    import importlib
+    try:
+        (importer or importlib.import_module)("reportlab")
+    except Exception:  # noqa: BLE001
+        return ("refusing: a product check needs the built-in PDF maker (the reportlab package, listed in "
+                "pyproject.toml) so the PDF never fails; install the project's dependencies and start again.")
+    return None
+
+
 PRODUCT_KEYS = ("NEBIUS_API_KEY", "TAVILY_API_KEY", "NEBIUS_PROJECT_ID")
 
 
@@ -6042,6 +6061,10 @@ def _main(argv=None) -> int:
         raise SystemExit(1)
     a.swarm = agents.swarm_enabled(bool(a.swarm))
     stop = product_keys_start_refusal(a)  # product checks: all three keys, before any work
+    if stop:
+        print(stop, file=sys.stderr)
+        raise SystemExit(1)
+    stop = pdf_maker_start_refusal(a)  # product checks: the PDF fallback must be importable, before any work
     if stop:
         print(stop, file=sys.stderr)
         raise SystemExit(1)
