@@ -1,5 +1,7 @@
-# Re-judging recomputes the broad-claims gate
+# Re-judging recomputes the broad-claims gate, and never releases a saved hold
 
-A broad "nothing else changes" claim needs at least 3 varied inputs (poc/broad_claims.py). That gate was applied only in a live run and saved on the record, so re-judging trusted the saved copy, and records written before the gate existed (or under an older minimum) skipped it.
+A broad "nothing else changes" claim needs at least 3 varied inputs (poc/broad_claims.py). That gate was applied only in a live run and saved on the record, so re-judging trusted the saved copy, and product-check records written before the gate existed skipped it.
 
-Re-judging now recomputes the gate on the product route from the recomputed probe results with current code, replaces any saved copy, and refreshes the record's note. The study route is unchanged. The gate only lowers verified to could_not_verify, so this never produces verified.
+Re-judging a record marked as a product check now recomputes the gate from the re-judged probe results with current code and keeps the union of the saved and the recomputed holds: a claim held back when the record was written stays held back. So the gate can only lower verified to could_not_verify, never raise a verdict, and never produces verified. The record's note is refreshed.
+
+Scope: only records with product_check set. Records without that key (older study-route and benchmark records) are re-judged as before, with no broad-claims gate.

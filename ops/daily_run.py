@@ -7225,9 +7225,17 @@ def rejudge_probes(pr_probes: dict | None, product_check: bool = False) -> dict 
     if product_check:
         items = [_keep_advisory(old, new) for old, new in zip(pr_probes["items"], items)]
     out = dict(pr_probes, items=items, summary=probes.summarize(items))
-    if product_check:   # the broad-claims gate is recomputed from current code, never taken from the saved copy
+    if product_check:   # the broad-claims gate is recomputed from current code; a saved hold is never released
         from poc import broad_claims
+        saved = pr_probes.get("broad_claims") if isinstance(pr_probes.get("broad_claims"), dict) else None
         out = broad_claims.apply(out)
+        if saved and saved.get("held_back"):
+            now = dict(out.get("broad_claims") or {"min_inputs": broad_claims.MIN_INPUTS, "claims": [],
+                                                    "inputs": {}, "held_back": []})
+            now["held_back"] = sorted(set(now.get("held_back") or []) | set(saved["held_back"]))
+            now["claims"] = sorted(set(now.get("claims") or []) | set(saved.get("claims") or []))
+            now["inputs"] = {**(saved.get("inputs") or {}), **(now.get("inputs") or {})}
+            out = dict(out, broad_claims=now)
     return out
 
 
