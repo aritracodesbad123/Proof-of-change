@@ -3118,7 +3118,7 @@ def repo_addopts_args(keep: bool) -> list[str]:
 # which tests decide the verdict, and it only lets the run start. A plugin the project's config names is kept.
 STARTUP_PLUGIN_PY = r"""
 import re, sys, pathlib, importlib.metadata as md
-log = pathlib.Path('/tmp/poc-pytest.log').read_text(errors='replace')
+log = pathlib.Path(sys.argv[1] if len(sys.argv) > 1 else '/tmp/poc-pytest.log').read_text(errors='replace')
 if 'INTERNALERROR' not in log: sys.exit()
 mods = set(re.findall(r'site-packages/([A-Za-z0-9_]+)/', '\n'.join(l for l in log.splitlines() if 'INTERNALERROR' in l)))
 mods -= {'pluggy', '_pytest', 'pytest'}
@@ -3135,18 +3135,27 @@ for ep in md.entry_points(group='pytest11'):
         out.append(ep.name)
 print(' '.join(sorted(set(out))))
 """
-STARTUP_PLUGIN_RETRY_SHELL = (
+STARTUP_PLUGIN_RETRY_TEMPLATE = (
     "if [ \"$ec\" = 3 ]; then\n"
-    "  off=$(python -c " + shlex.quote(STARTUP_PLUGIN_PY) + " 2>/dev/null)\n"
+    "  off=$(python -c " + shlex.quote(STARTUP_PLUGIN_PY) + " {LOG} 2>/dev/null)\n"
     "  if [ -n \"$off\" ]; then\n"
     "    pf=''; for n in $off; do pf=\"$pf -p no:$n\"; done\n"
-    "    cp /tmp/poc-pytest.log /tmp/poc-pytest-startup.log\n"
-    "    {RERUN}$pf >/tmp/poc-pytest.log 2>&1\n    ec=$?\n"
+    "    cp {LOG} {LOG}.startup\n"
+    "    {RERUN}$pf >{LOG} 2>&1\n    ec=$?\n"
     "    { echo \"Setup repair: pytest stopped at startup in plugin(s) the project's test config does not name: $off. "
-    "Run again with them turned off (-p no:<name>). First output:\"; head -n 40 /tmp/poc-pytest-startup.log; echo; "
-    "cat /tmp/poc-pytest.log; } > /tmp/poc-pytest.log.new && mv /tmp/poc-pytest.log.new /tmp/poc-pytest.log\n"
+    "Run again with them turned off (-p no:<name>). First output:\"; head -n 40 {LOG}.startup; echo; "
+    "cat {LOG}; } > {LOG}.new && mv {LOG}.new {LOG}\n"
     "  fi\nfi\n"
 )
+
+
+def startup_plugin_retry_shell(rerun: str, log: str = "/tmp/poc-pytest.log") -> str:
+    """The startup-plugin setup repair for one pytest command whose output goes to `log` (timed runs and the
+    coverage run alike). It only lets the run start; it never raises a verdict."""
+    return STARTUP_PLUGIN_RETRY_TEMPLATE.replace("{LOG}", log).replace("{RERUN}", rerun)
+
+
+STARTUP_PLUGIN_RETRY_SHELL = STARTUP_PLUGIN_RETRY_TEMPLATE.replace("{LOG}", "/tmp/poc-pytest.log")
 
 
 def _contree_pytest_once(side: str, targets: list[str], test_timeout: int, run_timeout: int,
@@ -3455,6 +3464,7 @@ def contree_coverage_run(item: dict, main_root: Path, pr_root: Path, targets: li
         f"{repo_addopts_flag(product_route(a))}{nflag}{cov} --cov-report=json:/tmp/poc-cov.json "
         ">/tmp/poc-cov-pytest.log 2>&1\n"
         "ec=$?\n"
+        "{COV_RETRY}"
         "printf '___POC_EXIT___%s\\n' \"$ec\"\n"
         "printf '___POC_COV_START___\\n'\n"
         f"python -c {shlex.quote(_COV_SHRINK)} /tmp/poc-cov.json {' '.join(shlex.quote(r) for r in sorted(changed))}"
@@ -3462,6 +3472,8 @@ def contree_coverage_run(item: dict, main_root: Path, pr_root: Path, targets: li
         "printf '\\n___POC_COV_END___\\n'\n"
         "printf '___POC_LOG___\\n'\ncat /tmp/poc-cov-pytest.log 2>/dev/null\n"
     )
+    cov_cmd = shell.split("cd /work/src\n", 1)[1].split(" >/tmp/poc-cov-pytest.log", 1)[0].split(">/tmp/poc-cov-pytest.log", 1)[0]
+    shell = shell.replace("{COV_RETRY}", startup_plugin_retry_shell(cov_cmd, "/tmp/poc-cov-pytest.log"), 1)
     product = product_route(a)
     if product:  # report goes to a file in the sandbox, not through the capped output
         want = " ".join(shlex.quote(r) for r in sorted(changed))

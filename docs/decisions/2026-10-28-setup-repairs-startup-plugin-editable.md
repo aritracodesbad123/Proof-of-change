@@ -20,3 +20,5 @@ Both are setup repairs. They only let a check run and never raise a verdict.
   that names the plugin and keeps the first output (pytest #15256: pytest-asyncio's deprecation warning was
   turned into an error by pytest's own `filterwarnings = error`). A plugin the config names is never turned
   off. Nothing is per repository, and no package name is hardcoded.
+- **The coverage run is a separate pytest start.** The same startup repair is applied there, with its own log,
+  so the plugin that was turned off for the timed runs does not stop the coverage measurement either.

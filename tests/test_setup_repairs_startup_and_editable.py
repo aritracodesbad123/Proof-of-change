@@ -71,3 +71,42 @@ def test_editable_failure_reaches_fallback_under_set_e(tmp_path):
 def test_product_install_uses_work_tmpdir_and_study_does_not():
     assert "export TMPDIR=/work/.poc-tmp" in cs.install_shell_source("o/r", "a" * 40, deps_only_fallback=True)
     assert "TMPDIR" not in cs.install_shell_source("o/r", "a" * 40)
+
+
+def test_coverage_run_gets_the_same_startup_repair(tmp_path, monkeypatch):
+    """The coverage run is a separate pytest start, so the same unnamed crashing plugin is turned off there too."""
+    from types import SimpleNamespace
+    (tmp_path / "main" / "widget").mkdir(parents=True)
+    (tmp_path / "pr" / "widget").mkdir(parents=True)
+    (tmp_path / "main" / "widget" / "core.py").write_text("def f():\n    return 1\n")
+    (tmp_path / "pr" / "widget" / "core.py").write_text("def f():\n    return 2\n")
+    item = {"files": {"all": ["widget/core.py"]}}
+    a = SimpleNamespace(no_coverage=False, baseline="full", test_timeout=30, workers="0", run_timeout=60)
+    seen = {}
+
+    class Sess:
+        pr_uuid = "pr-1"
+
+        def run_op(self, side, shell, **k):
+            seen["shell"] = shell
+            return {"exit_code": 1, "stdout": "___POC_EXIT___1\n___POC_LOG___\nno report\n", "stderr": ""}
+
+    monkeypatch.setattr("poc.contree_sandboxes.session", lambda: Sess())
+    dr.contree_coverage_run(item, tmp_path / "main", tmp_path / "pr", ["tests/t.py"], tmp_path, a)
+    run_part = seen["shell"].split("printf '___POC_EXIT___", 1)[0]
+    assert "python -c" in run_part and "/tmp/poc-cov-pytest.log.startup" in run_part
+    # Execute the run part with a fake python: pytest crashes at startup (exit 3) unless the plugin is turned off.
+    log = tmp_path / "cov.log"
+    fake = tmp_path / "bin"
+    fake.mkdir()
+    (fake / "python").write_text(
+        '#!/bin/sh\nif [ "$1" = -c ]; then echo px; exit 0; fi\n'
+        'case "$*" in *"-p no:px"*) echo "1 passed"; exit 0;; esac\necho "INTERNALERROR> boom"; exit 3\n')
+    (fake / "python").chmod(0o755)
+    body = run_part.replace("/tmp/poc-cov-pytest.log", str(log)).replace("cd /work/src\n", "")
+    body = body.replace("/tmp/poc-coveragerc", str(tmp_path / "rc"))
+    r = subprocess.run(["bash", "-c", body + 'echo "ec=$ec"'], env=dict(os.environ, PATH=f"{fake}:{os.environ['PATH']}"),
+                       capture_output=True, text=True)
+    assert "ec=0" in r.stdout, r.stdout + r.stderr
+    text = log.read_text()
+    assert text.startswith("Setup repair:") and "px" in text.splitlines()[0] and "1 passed" in text
