@@ -27,6 +27,7 @@ per-test and per-run timeouts. Comparison and verdict are plain code (poc/diff.p
 from __future__ import annotations
 
 import argparse
+import copy
 import csv
 import datetime as dt
 import fcntl
@@ -1729,6 +1730,8 @@ def _product_plan(a, rec: dict, repo: str, cfg: dict, checkouts, pypi=None, pyth
         # Inside Contree the image's Python is what runs, and any version can be installed during setup, so the
         # orchestrator machine's interpreters must not steer the choice.
         from poc import contree_sandboxes
+        if product:
+            _pick_contree_python(rec, main_dir, pr_dir)
         current = contree_sandboxes.image_python()
         if python_available is None:
             python_available = lambda version: True  # noqa: E731
@@ -2857,6 +2860,27 @@ def _contree_ready() -> bool:
             and bool(sess.main_uuid) and bool(sess.pr_uuid))
 
 
+def _pick_contree_python(rec: dict, main_dir, pr_dir) -> dict:
+    """Pick the sandbox image's Python from the project's requires-python and classifiers (poc/probe_python.py), and
+    select that image for this check's Contree sessions. The pick is kept in rec["contree_python"]; version None means
+    no available image fits, and _maybe_prepare_contree refuses the check with that reason."""
+    from poc import contree_sandboxes, demo_helper, probe_python
+    contree_sandboxes.select_image(None)
+    specs, declared = demo_helper._python_from_checkout(Path(main_dir)) if main_dir else ([], [])
+    sources = {}
+    for rel in coverage_gate.python_sources(rec.get("files") or {}) if pr_dir else []:
+        f = Path(pr_dir) / rel
+        if f.is_file():
+            sources[rel] = f.read_text(errors="replace")
+    base = contree_sandboxes.image_python()
+    pick = probe_python.choose(specs, declared, sources, base)
+    if pick["version"] and pick["version"] != base:
+        pick["image"] = probe_python.image_for(pick["version"], contree_sandboxes.BASE_IMAGE)
+        contree_sandboxes.select_image(pick["image"])
+    rec["contree_python"] = pick
+    return pick
+
+
 def _maybe_prepare_contree(a, repo: str, main_sha: str, pr_sha: str, rec: dict, timeout: int,
                            extra_shell: str = "", main_dir=None, module: str = "") -> str | None:
     """Build Contree main/PR checkpoints for source-pair. On failure return a refusal; there is no local bubblewrap
@@ -2868,6 +2892,12 @@ def _maybe_prepare_contree(a, repo: str, main_sha: str, pr_sha: str, rec: dict, 
     if getattr(a, "sandbox_backend", None) != "contree":
         return None
     contree_sandboxes.clear_session()
+    pick = rec.get("contree_python")
+    if product_route(a) and isinstance(pick, dict) and not pick.get("version"):
+        rec["sandbox_backend"] = "contree"
+        rec["sandbox_backend_note"] = pick["why"]
+        rec["machine"] = "contree (not run)"
+        return pick["why"]
     try:
         sess = contree_sandboxes.prepare_source_pair(repo, main_sha, pr_sha, timeout=timeout, extra_shell=extra_shell,
                                                      **({"deps_only_fallback": True, "deps_exclude": _aggregate_names(rec),
@@ -3550,8 +3580,27 @@ def contree_coverage_run(item: dict, main_root: Path, pr_root: Path, targets: li
 def gate(rec: dict) -> dict:
     """Apply the coverage gate (poc/coverage_gate.py) to a finished record; baselines without coverage skip it."""
     if not uses(rec.get("baseline"), "coverage"):
+        return cap_rewrite(broken_probe_gate(rec))
+    return cap_rewrite(broken_probe_gate(ai_probe_gate(coverage_gate.apply(rec))))
+
+
+def all_broken(item: dict) -> bool:
+    """Every observation of this probe is probe-broken (the same exception or skip value on both sides)."""
+    obs = item.get("observations") or []
+    return bool(obs) and all(o.get("probe_broken") for o in obs)
+
+
+def broken_probe_gate(rec: dict) -> dict:
+    """A run whose probes are all broken has no probe evidence at all: it cannot be verified. Idempotent."""
+    items = (rec.get("probes") or {}).get("items") or []
+    if rec.get("verdict") != Verdict.VERIFIED.value or not items or not all(all_broken(it) for it in items):
         return rec
-    return ai_probe_gate(coverage_gate.apply(rec))
+    out = dict(rec)
+    out.setdefault("verdict_before_broken_probe_gate", rec["verdict"])
+    out["verdict"] = Verdict.COULD_NOT_VERIFY.value
+    out["reason"] = ("could not verify: every probe is broken (it raised the same exception or skipped the same way "
+                     "on both sides, so it never reached the claimed call); " + (rec.get("reason") or ""))
+    return out
 
 
 def ai_probe_gate_on(baseline: str | None) -> bool:
@@ -3589,6 +3638,7 @@ def ai_probe_gate(rec: dict) -> dict:
     items = (rec.get("probes") or {}).get("items") or []
     ran = [it.get("id") for it in items if it.get("source") == "model"
            and it.get("status") not in ("crashed", "error", "uninformative", "not_run", "rejected")
+           and not all_broken(it)
            and ((it.get("probe_changed_line_coverage") or {}).get("changed_lines_covered") or 0) > 0]
     if ran:
         return rec
@@ -4187,6 +4237,14 @@ def _contree_probe_once(side: str, path: Path, timeout: int, literal_output: boo
     return probes.observations_of(out, code, literal_output), log, secs
 
 
+def probe_python_version(a) -> str | None:
+    """The Python the probes will run on, for a product check in Contree (the chosen image); else None."""
+    if not product_route(a) or getattr(a, "sandbox_backend", None) != "contree":
+        return None
+    from poc import contree_sandboxes
+    return contree_sandboxes.image_python() or None
+
+
 def plan_probes(repo: str, item: dict, rec: dict, base_root: Path, pr_roots: list, prdir: Path, a) -> list[dict]:
     """Write and FREEZE every probe of this PR before any PR-side execution (poc/freeze.py). Inputs: the PR title and
     description and base-side code only (base_root). Returns [{path, source, freeze}]; notes go to rec["probe_plan"].
@@ -4210,7 +4268,7 @@ def plan_probes(repo: str, item: dict, rec: dict, base_root: Path, pr_roots: lis
             try:
                 res = model_probes.generate(provider, repo, item["pr"], item["title"], item.get("body"), base_files,
                                             base_root, pr_roots, prdir / "model-probes",
-                                            product=product_route(a))
+                                            product=product_route(a), python_version=probe_python_version(a))
             except freeze.FreezeError as e:
                 res = {"errors": [str(e)], "probes": [], "claims": [], "rejected_claims": []}
             note["model_claims"] = res.get("claims", [])
@@ -4270,7 +4328,7 @@ def run_probes(repo: str, pr: int, pythons: dict, prdir: Path, work: Path, a, pl
     if use_contree:
         _CONTREE_CHECKOUTS.clear()
         _CONTREE_CHECKOUTS["settings"] = settings
-    for x in plan:
+    def run_one(x, pr_started=pr_started):
         path, fz = Path(x["path"]), x["freeze"]
         def guard(p, fz=fz):
             freeze.verify(p, fz, pr_started)
@@ -4287,12 +4345,23 @@ def run_probes(repo: str, pr: int, pythons: dict, prdir: Path, work: Path, a, pl
             if x.get("origin"):
                 it["origin"] = x["origin"]
             it["freeze"] = fz | {"verified": True, "pr_started_at": pr_started}
-            items.append(it)
+            return it
         except freeze.FreezeError as e:
             refused.append({"path": path.name, "source": x["source"], "why": str(e)})
         except probes.ProbeError as e:
             errors.append(str(e).replace(str(REPO_ROOT) + "/", ""))
+        return None
+
+    for x in plan:
+        it = run_one(x)
+        if it is not None:
+            items.append(it)
+    rewrite = None
+    if product_route(a) and getattr(a, "provider", None) is not None:
+        rewrite = rewrite_crashed_probes(items, prdir, a, run_one)
     out = {"status": "ran" if items else "error", "items": items, "summary": probes.summarize(items)}
+    if rewrite:
+        out["rewrite"] = rewrite
     if settings is not None:
         from poc import test_settings
         out["test_settings"] = test_settings.summary(settings)
@@ -4301,6 +4370,101 @@ def run_probes(repo: str, pr: int, pythons: dict, prdir: Path, work: Path, a, pl
     if refused:
         out["refused"] = refused
     return out
+
+
+def _main_error(it: dict, prdir: Path) -> str:
+    """The main-side error output of a crashed probe: its first main-side log, else the recorded error."""
+    for name in (it.get("files") or {}).get("main") or []:
+        log = Path(prdir) / str(name).replace(".jsonl", ".log")
+        if log.is_file():
+            return log.read_text(errors="replace")
+    runs = (it.get("runs") or {}).get("main") or []
+    return json.dumps(runs[0].get(probes.PROBE_ERROR)) if runs and isinstance(runs[0], dict) else ""
+
+
+def rewrite_crashed_probes(items: list, prdir: Path, a, run_one) -> dict | None:
+    """One rewrite for each AI-written probe that crashed on every main-side run (probes.crash_reason), with its
+    main-side error fed back. The rewrite is frozen before its own PR-side runs and replaces the crashed probe in
+    items. Returns {"before": the items without any rewrite, "probes": notes}, or None when nothing crashed. The
+    verdict can only stay or go down: gate() takes the lower of the verdicts with and without the rewrite."""
+    crashed = [i for i, it in enumerate(items) if it.get("source") == "model" and probes.crash_reason(it)]
+    if not crashed:
+        return None
+    from poc import contree_sandboxes
+    version = contree_sandboxes.image_python() if _contree_ready() else None
+    before = copy.deepcopy(items)
+    notes = []
+    for i in crashed:
+        it = items[i]
+        old = Path(it["path"]) if Path(it["path"]).is_absolute() else prdir / it["path"]
+        text = old.read_text()
+        head, sep, code = text.partition(model_probes.JSON_IMPORT)
+        note = {"probe": it.get("id"), "error": _main_error(it, prdir)[-300:]}
+        notes.append(note)
+        if not sep:
+            note["result"] = "not rewritten: the probe file has no harness header"
+            continue
+        new_code, why = model_probes.rewrite_probe(a.provider, {"repo": None, "pr": None, "rewrite_of": it.get("id")},
+                                                   code, _main_error(it, prdir), version, product=True)
+        if why:
+            note["result"] = f"not rewritten: {why}"
+            continue
+        sid = it.get("id")
+        path = old.with_name(old.stem + "-rewrite.py")
+        path.write_text(head.replace(f"'id': {sid!r}", f"'id': {sid + '-rewrite'!r}", 1) + sep + new_code.rstrip()
+                        + "\n")
+        fz = freeze.freeze(path, it["freeze"]["generator"], None)
+        fz["rewrite_of"] = it["freeze"].get("sha256")
+        new = run_one({"path": path, "source": "model", "freeze": fz}, freeze.now())
+        if new is None:
+            note["result"] = "rewritten probe was refused or failed to run"
+            continue
+        new["rewrite_of"] = it.get("id")
+        items[i] = new
+        note["result"] = "rewritten once" + (" (still crashes on main)" if probes.crash_reason(new) else "")
+    return {"before": before, "probes": notes}
+
+
+VERDICT_RANK = {Verdict.NEEDS_ATTENTION.value: 1, Verdict.COULD_NOT_VERIFY.value: 2,
+                Verdict.NO_CODE_CHANGE.value: 2, Verdict.VERIFIED.value: 3}
+
+
+def lower_verdict(a: str, b: str) -> str:
+    return a if VERDICT_RANK.get(a, 0) <= VERDICT_RANK.get(b, 0) else b
+
+
+def without_rewrite(rec: dict) -> dict | None:
+    """The record with its probes as they were before the one rewrite, or None when no rewrite happened."""
+    pr = rec.get("probes") or {}
+    before = (pr.get("rewrite") or {}).get("before")
+    if before is None:
+        return None
+    alt = copy.deepcopy(rec)
+    alt["probes"] = {k: v for k, v in pr.items() if k != "rewrite"} | {"items": before,
+                                                                         "summary": probes.summarize(before)}
+    return alt
+
+
+def cap_rewrite(rec: dict) -> dict:
+    """A probe rewrite (rewrite_crashed_probes) may keep or lower a verdict, never raise it: the verdict is derived
+    again with the probes as they were before the rewrite, and the lower of the two is kept."""
+    pr = rec.get("probes") or {}
+    before = (pr.get("rewrite") or {}).get("before")
+    if before is None or not rec.get("verdict"):
+        return rec
+    from evals.checks import derive_verdict
+    alt = copy.deepcopy(rec)
+    alt["probes"] = {k: v for k, v in pr.items() if k != "rewrite"} | {"items": before,
+                                                                         "summary": probes.summarize(before)}
+    without = derive_verdict(alt, rec.get("baseline"))
+    got = rec["verdict"]
+    final = lower_verdict(got, without)
+    rec["probe_rewrite_cap"] = {"with_rewrite": got, "without_rewrite": without, "final": final}
+    if final != got:
+        rec["verdict"] = final
+        rec["reason"] = (f"{rec.get('reason') or ''}; a probe rewrite cannot raise the verdict: without the rewrite "
+                         f"it is {final}").lstrip("; ")
+    return rec
 
 
 def _contree_run_probe(path: Path, outdir: Path, runs: int, source: str, guard, literal_output: bool = False) -> dict:
@@ -6142,6 +6306,20 @@ def given_commit(root: Path | None, expected: str) -> str:
     return got
 
 
+def commit_label_note(actual: str, env=None) -> str | None:
+    """After the self-update, make POC_COMMIT name the commit that actually runs. A label set before the update (for
+    example by a wrapper script) can name an older commit; it is replaced, and the change is reported once."""
+    env = os.environ if env is None else env
+    actual = (actual or "").strip().lower()
+    before = (env.get("POC_COMMIT") or "").strip().lower()
+    if not actual:
+        return None
+    env["POC_COMMIT"] = actual
+    if before and not actual.startswith(before) and not before.startswith(actual):
+        return f"POC commit: {actual[:7]} (POC_COMMIT was {before[:7]} before the self-update; it now names {actual[:7]})"
+    return None
+
+
 def resolve_poc_commit(root: Path | None = None) -> str:
     """Stamp every run with a known Proof-of-Change commit.
 
@@ -6492,6 +6670,9 @@ def _main(argv=None) -> int:
         a.poc_commit = given_commit(REPO_ROOT, expected)
     else:
         a.poc_commit = resolve_poc_commit(REPO_ROOT)
+        note = commit_label_note(a.poc_commit)
+        if note:
+            print(note)
     sandbox.configure(not a.unsafe_no_sandbox)
     from poc import contree_sandboxes
     if getattr(a, "require_contree", False):
@@ -6743,6 +6924,8 @@ def reviewer_reports(rdir: Path, a, records: list[dict], kind: str) -> None:
               file=sys.stderr, flush=True)
         return
     print(f"\nDONE. Open this file to read the results:\n  {out / 'SUMMARY.html'}")
+    if getattr(a, "poc_commit", None):
+        print(f"commit={a.poc_commit[:7]}")
 
 
 def scoring_inputs(rdir: Path, a, chosen_path: Path) -> tuple[dict, dict]:
