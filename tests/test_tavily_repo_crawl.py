@@ -143,8 +143,8 @@ def test_study_install_shell_unchanged_product_reinstalls_own_checkout_last():
     study = contree_sandboxes.install_shell_source(REPO, SHA)
     assert "--no-deps -e ." not in study
     product = contree_sandboxes.install_shell_source(REPO, SHA, deps_only_fallback=True)
-    last = [line for line in product.splitlines() if line.strip()][-1]
-    assert last.startswith("python -m pip install -q --no-deps -e .")
+    tail = product.split("python -m pip install -q pytest ", 1)[1]
+    assert "python -m pip install --no-deps -e . > /work/poc-editable.log 2>&1" in tail
 
 
 def test_own_checkout_import_check():

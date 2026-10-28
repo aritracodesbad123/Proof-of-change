@@ -2960,6 +2960,53 @@ _ORIGIN_CODE = (
     "print(json.dumps({{'root':r,'file':os.path.realpath(f) if f else '','namespace':not f,'paths':p}}))")
 
 
+_INSTALL_REPORT_CODE = (
+    "import sys,subprocess;print('python='+sys.executable);"
+    "print(open({report!r}).read().strip()) if __import__('os').path.exists({report!r}) else print('install_report=missing');"
+    "r=subprocess.run([sys.executable,'-m','pip','show',{module!r}],capture_output=True,text=True);"
+    "print('pip_show_exit=%d'%r.returncode);[print('pip_show_'+l.split(':',1)[0].strip().lower().replace('-','_')+'='"
+    "+l.split(':',1)[1].strip()) for l in r.stdout.splitlines() if l.split(':',1)[0] in ('Name','Version','Location',"
+    "'Editable project location')]")
+
+
+def parse_install_report(text: str) -> dict:
+    """key=value lines from the in-sandbox install report (python, version source, editable exit, pip show)."""
+    out: dict = {}
+    for line in str(text or "").splitlines():
+        k, sep, v = line.partition("=")
+        if sep and re.fullmatch(r"[a-z_]+", k.strip()):
+            out[k.strip()] = v.strip()
+    return out
+
+
+def _read_install_reports(sess, module: str) -> dict:
+    """Per side, with the same python the tests use and from /work/src: the checkout version source, the editable
+    install's exit code (and the tail of its output when it failed) and pip show for the package. Logged and recorded."""
+    from poc import contree_sandboxes
+    report = getattr(contree_sandboxes, "INSTALL_REPORT", "/work/poc-install.txt")
+    edlog = getattr(contree_sandboxes, "EDITABLE_LOG", "/work/poc-editable.log")
+    code = _INSTALL_REPORT_CODE.format(report=report, module=module)
+    res: dict = {}
+    for side in ("main", "pr"):
+        try:
+            raw = sess.run_argv(side, ["python", "-c", code], timeout=120, cwd=OWN_CHECKOUT_ROOT)
+        except contree_sandboxes.ContreeError as e:
+            raw = {"exit_code": None, "stdout": "", "stderr": type(e).__name__}
+        info = parse_install_report(raw.get("stdout") or "")
+        if info.get("editable_exit") not in (None, "0"):
+            try:
+                tail = sess.run_argv(side, ["tail", "-c", "2000", edlog], timeout=60, cwd=OWN_CHECKOUT_ROOT)
+                info["editable_output_tail"] = str(tail.get("stdout") or "")[-2000:]
+            except contree_sandboxes.ContreeError:
+                pass
+        res[side] = info
+        shown = ", ".join(f"{k}={v}" for k, v in info.items() if k != "editable_output_tail")
+        print(f"Checkout install ({side}): {shown or 'no report'}", flush=True)
+        if info.get("editable_output_tail"):
+            print(f"Checkout install ({side}) editable output tail:\n{info['editable_output_tail']}", flush=True)
+    return res
+
+
 def _check_own_checkout(sess, rec: dict, module: str) -> str | None:
     """Product checks: from the directory the tests run in, import the package on each side and read its __file__.
 
@@ -2974,7 +3021,7 @@ def _check_own_checkout(sess, rec: dict, module: str) -> str | None:
         out["status"] = "not checked: no importable package name"
         return None
     code = _ORIGIN_CODE.format(root=OWN_CHECKOUT_ROOT, module=module)
-    problems, namespace = [], []
+    problems, namespace, missing = [], [], []
     for side in ("main", "pr"):
         try:
             raw = sess.run_argv(side, ["python", "-c", code], timeout=120, cwd=OWN_CHECKOUT_ROOT)
@@ -2989,6 +3036,7 @@ def _check_own_checkout(sess, rec: dict, module: str) -> str | None:
                 info = {}
         if not isinstance(info, dict) or not info:
             out[side] = "not importable"
+            missing.append(side)
             continue
         root = str(info.get("root") or OWN_CHECKOUT_ROOT)
         out[f"{side}_checkout_real"] = root
@@ -3005,8 +3053,19 @@ def _check_own_checkout(sess, rec: dict, module: str) -> str | None:
         why = own_checkout_problem(side, module, path, root)
         if why:
             problems.append(why)
+    installs = _read_install_reports(sess, module)
+    out["install"] = installs
+    for side in missing:
+        failed = (installs.get(side) or {}).get("editable_exit")
+        if failed not in (None, "0"):
+            problems.append(f"could not verify: on the {side} side the pull request's own checkout did not install "
+                            f"(editable install exit {failed}) and {module} does not import from it, so the change "
+                            "could not be tested")
     if problems:
-        out["status"] = "outside the checkout"
+        out["status"] = ("not installed" if any("did not install" in p for p in problems)
+                         else "outside the checkout")
+    elif any(out.get(sd) == "not importable" for sd in ("main", "pr")):
+        out["status"] = "not importable (recorded only)"
     elif namespace:
         out["status"] = "namespace package (" + ", ".join(namespace) + "): a path is in the checkout"
     else:
@@ -5176,6 +5235,7 @@ def finish(rec: dict, prdir: Path, work: Path, t0: float, runner=None) -> dict:
     rec["cost"] = cost.take(rec["duration_s"])
     if rec.get("product_check"):  # timing only; study records stay byte-identical
         rec["timings"] = step_timings(rec)
+        print("Time per stage: " + ", ".join(f"{k} {v} s" for k, v in rec["timings"].items()), flush=True)
         from poc import tavily_budget
         credits = tavily_budget.take(rec.pop("_tavily_meter", None))
         if credits is not None:

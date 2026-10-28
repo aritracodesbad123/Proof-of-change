@@ -621,6 +621,49 @@ NO_INDEX_CONFIG_SHELL = (
 )
 
 
+INSTALL_REPORT = "/work/poc-install.txt"
+EDITABLE_LOG = "/work/poc-editable.log"
+
+# Same text on both sides. Tags first: when the checkout has a tag in its history the version comes from it. Only when
+# no tag is reachable is a setuptools_scm pretend version set, from the repository's latest version tag (one value for
+# both sides), scoped to the project's own distribution name when pyproject names it. Nothing is per repository.
+CHECKOUT_VERSION_SHELL = (
+    f": > {INSTALL_REPORT}\n"
+    "if d=$(git describe --tags 2>/dev/null); then\n"
+    f"  echo \"version_source=tag $d\" >> {INSTALL_REPORT}\n"
+    "else\n"
+    "  t=$(git ls-remote --tags --sort=-v:refname origin 2>/dev/null | sed -n 's#.*refs/tags/##p' "
+    "| grep -v '\\^{}$' | grep -E '^v?[0-9]' | head -n 1)\n"
+    "  if [ -n \"$t\" ]; then\n"
+    "    n=$(python -c \"import tomllib,re;print(re.sub(r'[^A-Za-z0-9]+','_',"
+    "tomllib.load(open('pyproject.toml','rb'))['project']['name']).upper())\" 2>/dev/null)\n"
+    "    if [ -n \"$n\" ]; then export \"SETUPTOOLS_SCM_PRETEND_VERSION_FOR_$n=${t#v}\"; "
+    "else export SETUPTOOLS_SCM_PRETEND_VERSION=\"${t#v}\"; fi\n"
+    f"    echo \"version_source=no tag in history; pretend version ${{t#v}} from latest tag $t\" >> {INSTALL_REPORT}\n"
+    "  else\n"
+    f"    echo \"version_source=no tags\" >> {INSTALL_REPORT}\n"
+    "  fi\n"
+    "fi\n"
+)
+
+# Product checks: reinstall the checkout itself last, without dependencies, so a test tool installed above cannot
+# replace the pull request's own code with a separately installed copy. The exit code and output are kept. When the
+# editable build fails (for example an optional C extension whose build-and-retry breaks pip's editable wheel when
+# there is no compiler), the checkout's source directory (src/ layout or root) is put on the path instead and that is
+# recorded; the import-origin check then confirms the package imports from /work/src or stops the check loudly.
+EDITABLE_REINSTALL_SHELL = (
+    f"python -m pip install --no-deps -e . > {EDITABLE_LOG} 2>&1\n"
+    "ec=$?\n"
+    f"echo \"editable_exit=$ec\" >> {INSTALL_REPORT}\n"
+    "if [ \"$ec\" != 0 ]; then\n"
+    "  sp=$(python -c \"import sysconfig;print(sysconfig.get_paths()['purelib'])\")\n"
+    "  d=/work/src; [ -d /work/src/src ] && d=/work/src/src\n"
+    "  echo \"$d\" > \"$sp/_poc_own_checkout.pth\"\n"
+    f"  echo \"editable_fallback=source path $d\" >> {INSTALL_REPORT}\n"
+    "fi\n"
+)
+
+
 def install_shell_source(repo: str, sha: str, extra: str = "", deps_only_fallback: bool = False,
                          deps_exclude=()) -> str:
     """Clone a public GitHub SHA into /work/src and pip-install editable + pytest (source-pair style).
@@ -640,8 +683,12 @@ def install_shell_source(repo: str, sha: str, extra: str = "", deps_only_fallbac
         "mkdir -p /work/src && cd /work/src\n"
         "git init -q\n"
         f"git remote add origin https://github.com/{repo}.git\n"
-        f"git fetch -q --depth 1 origin {sha}\n"
-        "git checkout -q FETCH_HEAD\n"
+        # Product checks: full commit history (no file contents) and tags, so setuptools_scm and similar tools see
+        # the real version instead of 0.1.dev1; falls back to the plain shallow fetch when partial clones are refused.
+        + (f"git fetch -q --filter=tree:0 --tags origin {sha} 2>/dev/null || git fetch -q --depth 1 origin {sha}\n"
+           if deps_only_fallback else f"git fetch -q --depth 1 origin {sha}\n")
+        + "git checkout -q FETCH_HEAD\n"
+        + (CHECKOUT_VERSION_SHELL if deps_only_fallback else "") +
         "python -m pip install -q -e '.[dev]' 2>/dev/null "
         "|| python -m pip install -q -e '.[test]' 2>/dev/null "
         "|| python -m pip install -q -e '.[tests]' 2>/dev/null "
@@ -651,7 +698,7 @@ def install_shell_source(repo: str, sha: str, extra: str = "", deps_only_fallbac
     if deps_only_fallback:
         # Product checks: reinstall the checkout itself last, without dependencies, so a test tool installed above
         # cannot replace the pull request's own code with a separately installed copy.
-        shell += "python -m pip install -q --no-deps -e . 2>/dev/null || true\n"
+        shell += EDITABLE_REINSTALL_SHELL
     extra = (extra or "").strip()
     if not extra:
         return shell
