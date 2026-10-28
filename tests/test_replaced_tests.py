@@ -93,3 +93,28 @@ def test_nothing_ran_on_both_sides_keeps_the_removal_a_finding():
                    {"test_mod::test_new": ("passed", ""), "test_mod::k": ("skipped", "")})
     assert replaced_tests(skipped, FILES) == []
     assert _verdict_of(skipped, None, None, FILES)[0] != "verified"
+
+
+def test_saved_comparison_without_ids_keeps_the_finding():
+    """A comparison saved before new_tests_passing_ids existed has no ids: no replacement is assumed."""
+    cmp = _cmp({"test_mod::test_old": ("passed", ""), "test_mod::k": ("passed", "")},
+               {"test_mod::test_new[a]": ("passed", ""), "test_mod::k": ("passed", "")})
+    old = {k: v for k, v in cmp.items() if k != "new_tests_passing_ids"}
+    assert replaced_tests(old, FILES) == []
+    assert _verdict_of(old, None, None, FILES)[0] == "needs_attention"
+
+
+def test_ids_are_rebuilt_from_saved_junit(tmp_path):
+    def junit(path, names):
+        cases = "".join(f'<testcase classname="test_mod" name="{n}"/>' for n in names)
+        path.write_text(f'<testsuites><testsuite name="s" tests="{len(names)}">{cases}</testsuite></testsuites>')
+    for i in (1, 2, 3):
+        junit(tmp_path / f"junit-main-{i}.xml", ["test_old", "k"])
+        junit(tmp_path / f"junit-pr-{i}.xml", ["test_new", "k"])
+    saved = {k: v for k, v in _cmp({"test_mod::test_old": ("passed", ""), "test_mod::k": ("passed", "")},
+                                    {"test_mod::test_new": ("passed", ""), "test_mod::k": ("passed", "")}).items()
+             if k != "new_tests_passing_ids"}
+    rec = {"comparison": saved, "runs_per_side": 3, "files": FILES, "per_run": [], "verdict": "needs_attention",
+           "reason": ""}
+    out = daily_run.rejudge(rec, tmp_path)
+    assert out["comparison"]["new_tests_passing_ids"] and replaced_tests(out["comparison"], FILES)

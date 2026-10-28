@@ -10,3 +10,5 @@ A test the pull request removes used to need attention every time, even when the
 A replaced test never makes a pull request verified: the old test did not run against the new code, so the result is could not verify, with the reason given. Any other removed test still needs attention.
 
 The comparison now also lists the ids of new passing tests (`new_tests_passing_ids`) so the same-file count can be made.
+
+Saved records: `new_tests_passing_ids` is not in any record written before this change. Re-judging a record from its saved JUnit files (ops/daily_run.rejudge) recomputes the comparison and so rebuilds the ids, and the rule applies. A record re-judged from its saved comparison alone (no JUnit files) has no ids, so the rule finds no replacement and the removed test stays a finding: there the change only helps future runs. In the saved records the rule rebuilds a replacement for rich #4143, which still needs attention for a separate probe finding, so no saved verdict moves.
