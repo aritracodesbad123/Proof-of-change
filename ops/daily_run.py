@@ -3285,6 +3285,24 @@ def _coverage_skipped_by_env() -> bool:
     return (os.environ.get("POC_SKIP_COVERAGE") or "").strip().lower() in {"1", "true", "yes", "on"}
 
 
+# The coverage gate measures with its own coverage settings, not the project's. Combining our --cov=<folder> (a
+# coverage "source") with a project's own [coverage:run] include makes coverage warn "--include is ignored because
+# --source is set"; a project whose pytest config turns warnings into errors (filterwarnings = error) then stops at
+# startup and coverage records nothing (pytest #15256). Our own settings file removes the conflict, and coverage's own
+# setup warnings are turned off inside coverage (disable_warnings), so the project's warning filters for its own code
+# stay exactly as they are. This only lets the measurement run; it never raises a verdict.
+COVERAGE_RC = (
+    "[run]\n"
+    "disable_warnings =\n"
+    "    include-ignored\n    module-not-imported\n    module-not-measured\n    module-not-python\n"
+    "    no-data-collected\n    no-ctracer\n    no-sysmon\n    already-imported\n    couldnt-parse\n"
+    "    dynamic-conflict\n"
+)
+COVERAGE_RC_NOTE = ("Coverage setup: measured with the check's own coverage settings (the project's coverage "
+                    "settings are not read, and coverage's own setup warnings are off); the project's warning "
+                    "filters are unchanged.")
+
+
 def coverage_run(item: dict, venv: Path, main_root: Path, pr_root: Path, targets: list[str], prdir: Path,
                  workdir: Path, a, cwd: Path | None = None) -> dict:
     """Coverage gate measurement: ONE extra, untimed PR-side run of the same test subset under coverage.py
@@ -3321,13 +3339,18 @@ def coverage_run(item: dict, venv: Path, main_root: Path, pr_root: Path, targets
     out = prdir / "coverage-pr.json"
     oin = side_out(venv) / out.name
     base = cwd or pr_root
+    rcfile = side_out(venv) / "poc-coveragerc"
+    rcfile.write_text(COVERAGE_RC)
     cmd = [venv / "bin/python", "-m", "pytest", *[str(base / t) for t in targets], "-p", "no:cacheprovider", "-q",
            f"--timeout={a.test_timeout}", *repo_addopts_args(product_route(a)), *[f"--cov={s}" for s in sorted(sources)],
-           f"--cov-report=json:{oin}"]
+           f"--cov-config={rcfile}", f"--cov-report=json:{oin}"]
     if a.workers != "0":
         cmd += ["-n", a.workers]
     rc, secs = run(cmd, prdir / "coverage-pytest.log", cwd=cwd or side_cwd(venv), env=base_env(side_home(venv)),
                    timeout=a.run_timeout, sbx=side_sandbox(venv))
+    cov_log = prdir / "coverage-pytest.log"
+    if cov_log.exists():
+        cov_log.write_text(f"{COVERAGE_RC_NOTE}\n{cov_log.read_text(errors='replace')}")
     out.unlink(missing_ok=True)
     if oin.exists():
         shutil.move(oin, out)
@@ -3459,9 +3482,10 @@ def contree_coverage_run(item: dict, main_root: Path, pr_root: Path, targets: li
     cov = " ".join(f"--cov={shlex.quote(s)}" for s in sources)
     nflag = f"-n {shlex.quote(str(a.workers))} " if str(a.workers) != "0" else ""
     shell = (
-        "set +e\ncd /work/src\n"
+        f"set +e\nprintf %s {shlex.quote(COVERAGE_RC)} > /tmp/poc-coveragerc\ncd /work/src\n"
         f"python -m pytest {tg} -p no:cacheprovider -q --timeout={int(a.test_timeout)} "
-        f"{repo_addopts_flag(product_route(a))}{nflag}{cov} --cov-report=json:/tmp/poc-cov.json "
+        f"{repo_addopts_flag(product_route(a))}{nflag}{cov} --cov-config=/tmp/poc-coveragerc "
+        "--cov-report=json:/tmp/poc-cov.json "
         ">/tmp/poc-cov-pytest.log 2>&1\n"
         "ec=$?\n"
         "{COV_RETRY}"
@@ -3492,7 +3516,7 @@ def contree_coverage_run(item: dict, main_root: Path, pr_root: Path, targets: li
     secs = round(time.time() - t0, 1)
     out = (raw.get("stdout") or "") + "\n" + (raw.get("stderr") or "")
     log = out.split("___POC_LOG___\n", 1)[-1] if "___POC_LOG___" in out else out
-    (prdir / "coverage-pytest.log").write_text(f"$ contree coverage (pr)\n{log}")
+    (prdir / "coverage-pytest.log").write_text(f"$ contree coverage (pr)\n{COVERAGE_RC_NOTE}\n{log}")
     blob = ""
     if product:
         m = re.search(r"___POC_COV_FILE___(\d+) ([0-9a-f]{64})", out)
