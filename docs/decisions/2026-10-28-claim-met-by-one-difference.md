@@ -19,7 +19,7 @@ Unchanged:
 - A value that differs although the claim says it does not, or a difference no claim covers, still needs
   attention.
 - A value that is unstable only on the pull request keeps its own rule.
-- The rule never raises a verdict past what the tests and other probes allow.
+- Removing a flag can raise a verdict. That is what this rule does for requests #7520, which moves from needs_attention to could_not_verify. The check that it changes nothing else is the re-judge of all 74 stored benchmark records with the old and new code (`scripts/rejudge_records.py`). Only requests #7520 changes.
 
 The rule is general: there is no project, package or per-repo setting.
 
