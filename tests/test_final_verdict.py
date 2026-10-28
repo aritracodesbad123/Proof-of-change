@@ -71,3 +71,45 @@ def test_legacy_record_without_gate_block_is_still_gated():
     rec = _ungated(_rec())
     assert not final_verdict.is_final(rec)
     assert "coverage_gate" in final_verdict.final(rec)
+
+
+# Verdict order: needs_attention is the strictest, then could_not_verify, then verified.
+_ORDER = ["needs_attention", "could_not_verify", "verified"]
+
+
+def test_verdict_rank_order():
+    r = daily_run.VERDICT_RANK
+    assert r["needs_attention"] < r["could_not_verify"] < r["verified"]
+
+
+@pytest.mark.parametrize("a", _ORDER)
+@pytest.mark.parametrize("b", _ORDER)
+def test_lower_verdict_keeps_the_stricter(a, b):
+    want = _ORDER[min(_ORDER.index(a), _ORDER.index(b))]
+    assert daily_run.lower_verdict(a, b) == want == daily_run.lower_verdict(b, a)
+
+
+@pytest.mark.parametrize("got", _ORDER)
+@pytest.mark.parametrize("without", _ORDER)
+def test_cap_rewrite_never_softens(got, without, monkeypatch):
+    import evals.checks as checks
+    monkeypatch.setattr(daily_run, "without_rewrite", lambda rec: rec)
+    monkeypatch.setattr(checks, "derive_verdict", lambda rec, baseline=None: without)
+    rec = {"verdict": got, "reason": "r", "probes": {"items": [], "rewrite": {"before": []}}}
+    out = daily_run.cap_rewrite(rec)
+    want = _ORDER[min(_ORDER.index(got), _ORDER.index(without))]
+    assert out["verdict"] == want
+    assert _ORDER.index(out["verdict"]) <= _ORDER.index(got)
+    assert out["probe_rewrite_cap"] == {"with_rewrite": got, "without_rewrite": without, "final": want}
+
+
+def test_keep_advisory_only_marks_unmentioned_changes():
+    """The carried-over advisory mark never reaches a difference a claim covers, so a claimed contradiction still
+    flags needs_attention."""
+    from poc import probes
+    old = {"observations": [{"name": "a", "advisory": True}, {"name": "b", "advisory": True}]}
+    new = {"observations": [{"name": "a", "label": probes.FindingLabel.UNMENTIONED_CHANGE.value},
+                            {"name": "b", "label": probes.FindingLabel.FALSE_CLAIM.value}]}
+    out = daily_run._keep_advisory(old, new)["observations"]
+    assert out[0].get("advisory") is True
+    assert "advisory" not in out[1]
