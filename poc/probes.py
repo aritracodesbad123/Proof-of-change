@@ -457,6 +457,12 @@ def classify_item(item: dict) -> dict:
         out["uninformative_reason"] = reason
         _downgrade_coverage(out, reason, zero=True)
         return out
+    if all(o.get("probe_broken") for o in obs):
+        reason = "uninformative: every observation is probe-broken (the same exception or skip value on both sides)"
+        out["status"] = "uninformative"
+        out["uninformative_reason"] = reason
+        _downgrade_coverage(out, reason + "; not counted as ran or adequate", zero=True)
+        return out
     names = []
     for o in obs:
         if o.get("state") != "same":

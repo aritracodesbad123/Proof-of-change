@@ -1,6 +1,5 @@
 """Probe syntax is checked with the Python that runs the probe, and a probe that crashed on main gets one rewrite
 that can never raise the verdict."""
-import sys
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -12,13 +11,25 @@ from poc import contree_sandboxes, freeze, model_probes, probe_python, probes
 MATCH = "match x:\n    case 1:\n        pass\n"
 
 
+def test_grammar_error_uses_the_real_interpreter_312_fstrings():
+    # Nested same quotes in an f-string are valid from 3.12 only; ast's feature_version does not model this.
+    if not (probe_python.interpreter_for("3.11") and probe_python.interpreter_for("3.12")):
+        pytest.skip("Python 3.11 and 3.12 interpreters not available")
+    code = 'd = {"a": 1}\nx = f"{d["a"]}"\n'
+    assert probe_python.grammar_error(code, "3.11")
+    assert probe_python.grammar_error(code, "3.12") is None
+
+
 def test_grammar_error_uses_the_target_version():
+    if not probe_python.interpreter_for("3.9"):
+        pytest.skip("Python 3.9 not available")
     assert probe_python.grammar_error(MATCH, "3.9")
     assert probe_python.grammar_error(MATCH, "3.10") is None
 
 
-@pytest.mark.skipif(sys.version_info < (3, 14), reason="t-strings need a 3.14 parser")
 def test_t_string_is_rejected_for_3_12():
+    if not (probe_python.interpreter_for("3.12") and probe_python.interpreter_for("3.14")):
+        pytest.skip("Python 3.12 and 3.14 interpreters not available")
     assert probe_python.grammar_error("x = t'hi'\n", "3.12")
     assert probe_python.grammar_error("x = t'hi'\n", "3.14") is None
 
@@ -176,3 +187,35 @@ def test_commit_label_names_the_commit_after_the_self_update():
     assert env["POC_COMMIT"].startswith("7562f53") and "ed1e7b5" in note and "7562f53" in note
     same = {"POC_COMMIT": "7562f53"}
     assert daily_run.commit_label_note("7562f53" + "0" * 33, same) is None
+
+
+def test_classify_item_treats_all_broken_probe_as_uninformative():
+    it = probes.classify_item(_ran(DIFFERS, {"r": "TypeError", "r2": {"skipped": "x"}},
+                                   {"r": "TypeError", "r2": {"skipped": "x"}}))
+    assert it["status"] == "uninformative"
+    assert it["probe_changed_line_coverage"]["changed_lines_covered"] == 0
+
+
+@pytest.mark.parametrize("baseline", ["tests+probes", "full"])
+def test_every_probe_broken_is_could_not_verify(baseline):
+    a = dict(_ran(DIFFERS, {"r": "TypeError"}, {"r": "TypeError"}, pid="p1"), source="model")
+    b = dict(_ran(SAME, {"r": {"raises": "KeyError"}}, {"r": {"raises": "KeyError"}}, pid="p2"), source="model")
+    rec = {"verdict": "verified", "reason": "tests pass", "baseline": baseline,
+           "probes": {"status": "ran", "items": [a, b]}}
+    out = daily_run.gate(rec)
+    assert out["verdict"] == "could_not_verify"
+    assert baseline == "full" or "every probe is broken" in out["reason"]
+    # and a model probe whose results are all broken never satisfies the AI-probe gate
+    assert daily_run.ai_probe_gate({**rec, "baseline": "full"})["verdict"] == "could_not_verify"
+
+
+def test_derive_verdict_enforces_lower_one_wins(monkeypatch):
+    # A rejudge (derive_verdict) applies the rewrite cap too: a rewrite that would lift the verdict is ignored.
+    from evals import checks
+    good = _ran(DIFFERS, {"r": 1}, {"r": 2})
+    bad = _ran(SAME, {"r": 1}, {"r": 2})                      # a false claim: needs_attention
+    rec = {"comparison": _cmp_verified(), "baseline": "tests+probes", "reason": "",
+           "probes": {"status": "ran", "items": [good], "rewrite": {"before": [bad], "probes": ["p"]}}}
+    assert checks.derive_verdict(rec, "tests+probes") == "needs_attention"
+    no_rw = {**rec, "probes": {"status": "ran", "items": [good]}}
+    assert checks.derive_verdict(no_rw, "tests+probes") == "verified"

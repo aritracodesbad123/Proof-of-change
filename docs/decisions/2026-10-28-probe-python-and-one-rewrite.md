@@ -55,3 +55,21 @@ Re-judging 755 stored records (benchmark result sets, replayed checks and the he
 After the self-update, the run sets POC_COMMIT to the commit that actually runs, says so when a label set
 earlier named another commit, and prints `commit=<sha>` after DONE. A wrapper can read that line instead of
 the value it set before the update.
+
+## Review changes
+
+- **Syntax is checked by the real target interpreter.** The probe text is compiled (never run) by a CPython of the
+  target version, found or fetched with uv (or named by `POC_PYTHON_X_Y`). `ast.parse(feature_version=...)` on the
+  host is gone: it does not model every grammar change, for example the 3.12 f-string rules. When no interpreter of
+  that version can be found the check is skipped, and the sandbox run still reports a SyntaxError.
+- **A probe whose results are all broken is uninformative.** `classify_item` marks it so, and the AI-probe gate never
+  counts it as a model probe that ran a changed line.
+- **Every probe broken means could_not_verify.** A new gate (`broken_probe_gate`) runs in `gate()` and in
+  `derive_verdict`, so it holds for live runs and rejudges.
+- **A rejudge enforces "lower one wins".** `derive_verdict` derives the verdict with and without the rewrite and
+  keeps the lower one, the same rule as `cap_rewrite`.
+
+## Follow-up (not in this change)
+
+- `TypeError: x` on main versus `TypeError: y` on the PR currently counts as proven for a "differs" claim: the
+  exception type is the same, only the message differs. It should probably count as probe-broken.

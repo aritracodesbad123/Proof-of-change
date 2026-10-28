@@ -7,11 +7,12 @@ The image is picked from the project's own metadata (requires-python and the ver
 per-repository setting: the default image is kept whenever it fits, so checks that already ran keep their Python."""
 from __future__ import annotations
 
-import ast
+import hashlib
 import os
 import re
+import shutil
+import subprocess
 import sys
-import warnings
 
 PYTHONS_ENV = "POC_CONTREE_PYTHONS"
 DEFAULT_PYTHONS = ("3.10", "3.11", "3.12", "3.13", "3.14")
@@ -36,21 +37,65 @@ def image_for(version: str, base_image: str) -> str:
     return f"{head}/{new}" if head else new
 
 
+_CHECK = ("import sys\n"
+          "src = sys.stdin.read()\n"
+          "try:\n"
+          "    compile(src, '<probe>', 'exec', dont_inherit=True)\n"
+          "except SyntaxError as e:\n"
+          "    print(f'{e.lineno or 0}\\t{e.msg}')\n")
+_INTERPRETERS: dict[str, str | None] = {}
+_RESULTS: dict[tuple[str, str], str | None] = {}
+
+
+def interpreter_for(version: str) -> str | None:
+    """Path of a real CPython X.Y on this machine, found (or fetched) with uv; None when there is none.
+    POC_PYTHON_X_Y overrides the lookup. Only used to compile text, never to run it."""
+    if version in _INTERPRETERS:
+        return _INTERPRETERS[version]
+    path = os.environ.get("POC_PYTHON_" + version.replace(".", "_"))
+    if not path:
+        if sys.version_info[:2] == _minor(version):
+            path = sys.executable
+        else:
+            uv = shutil.which("uv")
+            for cmd in (["python", "find", version], ["python", "install", "-q", version], ["python", "find", version]):
+                if not uv:
+                    break
+                try:
+                    r = subprocess.run([uv, *cmd], capture_output=True, text=True, timeout=300)
+                except (OSError, subprocess.TimeoutExpired):
+                    break
+                if cmd[1] == "find" and r.returncode == 0 and r.stdout.strip():
+                    path = r.stdout.strip().splitlines()[-1]
+                    break
+    _INTERPRETERS[version] = path or None
+    return _INTERPRETERS[version]
+
+
 def grammar_error(code: str, version: str | None) -> str | None:
-    """None when code parses with version's grammar, else a one-line reason. ast's feature_version reaches back to
-    3.7; a version newer than the running interpreter is parsed with the running grammar."""
-    mv = _minor(version or "")
-    kw = {}
-    if mv and (3, 7) <= mv < sys.version_info[:2]:
-        kw["feature_version"] = mv
-    try:
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            ast.parse(code, **kw)
-    except SyntaxError as e:
-        where = f" (line {e.lineno})" if e.lineno else ""
-        return f"not valid Python {version or 'syntax'}{where}: {e.msg}"
-    return None
+    """None when code compiles with the real Python `version`, else a one-line reason. The text is compiled (never
+    run) by that interpreter itself, so grammar changes that ast's feature_version does not model (for example the
+    3.12 f-string rules) are caught. No version: the running interpreter. When no interpreter of that version can be
+    found, the check cannot be made and None is returned (the sandbox run still reports a SyntaxError)."""
+    v = version if version and _minor(version) else f"{sys.version_info[0]}.{sys.version_info[1]}"
+    key = (v, hashlib.sha256(code.encode("utf-8", "surrogatepass")).hexdigest())
+    if key in _RESULTS:
+        return _RESULTS[key]
+    exe = interpreter_for(v)
+    out = None
+    if exe:
+        try:
+            r = subprocess.run([exe, "-I", "-S", "-c", _CHECK], input=code, capture_output=True, text=True,
+                               timeout=60)
+            line = r.stdout.strip()
+            if line:
+                ln, _, msg = line.partition("\t")
+                where = f" (line {ln})" if ln not in ("", "0") else ""
+                out = f"not valid Python {version or v}{where}: {msg}"
+        except (OSError, subprocess.TimeoutExpired):
+            out = None
+    _RESULTS[key] = out
+    return out
 
 
 def choose(specs: list[str], declared: list[str], sources: dict[str, str], base_version: str,

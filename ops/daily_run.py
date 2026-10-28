@@ -3580,8 +3580,27 @@ def contree_coverage_run(item: dict, main_root: Path, pr_root: Path, targets: li
 def gate(rec: dict) -> dict:
     """Apply the coverage gate (poc/coverage_gate.py) to a finished record; baselines without coverage skip it."""
     if not uses(rec.get("baseline"), "coverage"):
-        return cap_rewrite(rec)
-    return cap_rewrite(ai_probe_gate(coverage_gate.apply(rec)))
+        return cap_rewrite(broken_probe_gate(rec))
+    return cap_rewrite(broken_probe_gate(ai_probe_gate(coverage_gate.apply(rec))))
+
+
+def all_broken(item: dict) -> bool:
+    """Every observation of this probe is probe-broken (the same exception or skip value on both sides)."""
+    obs = item.get("observations") or []
+    return bool(obs) and all(o.get("probe_broken") for o in obs)
+
+
+def broken_probe_gate(rec: dict) -> dict:
+    """A run whose probes are all broken has no probe evidence at all: it cannot be verified. Idempotent."""
+    items = (rec.get("probes") or {}).get("items") or []
+    if rec.get("verdict") != Verdict.VERIFIED.value or not items or not all(all_broken(it) for it in items):
+        return rec
+    out = dict(rec)
+    out.setdefault("verdict_before_broken_probe_gate", rec["verdict"])
+    out["verdict"] = Verdict.COULD_NOT_VERIFY.value
+    out["reason"] = ("could not verify: every probe is broken (it raised the same exception or skipped the same way "
+                     "on both sides, so it never reached the claimed call); " + (rec.get("reason") or ""))
+    return out
 
 
 def ai_probe_gate_on(baseline: str | None) -> bool:
@@ -3619,6 +3638,7 @@ def ai_probe_gate(rec: dict) -> dict:
     items = (rec.get("probes") or {}).get("items") or []
     ran = [it.get("id") for it in items if it.get("source") == "model"
            and it.get("status") not in ("crashed", "error", "uninformative", "not_run", "rejected")
+           and not all_broken(it)
            and ((it.get("probe_changed_line_coverage") or {}).get("changed_lines_covered") or 0) > 0]
     if ran:
         return rec
@@ -4409,6 +4429,22 @@ VERDICT_RANK = {Verdict.NEEDS_ATTENTION.value: 1, Verdict.COULD_NOT_VERIFY.value
                 Verdict.NO_CODE_CHANGE.value: 2, Verdict.VERIFIED.value: 3}
 
 
+def lower_verdict(a: str, b: str) -> str:
+    return a if VERDICT_RANK.get(a, 0) <= VERDICT_RANK.get(b, 0) else b
+
+
+def without_rewrite(rec: dict) -> dict | None:
+    """The record with its probes as they were before the one rewrite, or None when no rewrite happened."""
+    pr = rec.get("probes") or {}
+    before = (pr.get("rewrite") or {}).get("before")
+    if before is None:
+        return None
+    alt = copy.deepcopy(rec)
+    alt["probes"] = {k: v for k, v in pr.items() if k != "rewrite"} | {"items": before,
+                                                                         "summary": probes.summarize(before)}
+    return alt
+
+
 def cap_rewrite(rec: dict) -> dict:
     """A probe rewrite (rewrite_crashed_probes) may keep or lower a verdict, never raise it: the verdict is derived
     again with the probes as they were before the rewrite, and the lower of the two is kept."""
@@ -4422,7 +4458,7 @@ def cap_rewrite(rec: dict) -> dict:
                                                                          "summary": probes.summarize(before)}
     without = derive_verdict(alt, rec.get("baseline"))
     got = rec["verdict"]
-    final = got if VERDICT_RANK.get(got, 0) <= VERDICT_RANK.get(without, 0) else without
+    final = lower_verdict(got, without)
     rec["probe_rewrite_cap"] = {"with_rewrite": got, "without_rewrite": without, "final": final}
     if final != got:
         rec["verdict"] = final
