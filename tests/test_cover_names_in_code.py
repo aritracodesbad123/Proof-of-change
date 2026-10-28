@@ -52,3 +52,8 @@ def test_matching_covers_are_not_retried(tmp_path):
 
 def test_prompt_asks_for_covers_that_match_printed_names():
     assert "Every cover must be an observation name your" in model_provider.PROBES_PROMPT
+
+
+def test_a_cover_that_is_only_the_claim_id_is_not_asked_about():
+    p = {"claims": [{"id": "C1", "covers": ["C1", "c1.*"]}], "code": CODE_C2}
+    assert model_probes.unmatched_covers(p) == []

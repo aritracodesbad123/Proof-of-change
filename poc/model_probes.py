@@ -370,7 +370,18 @@ def unmatched_covers(p: dict) -> list[str]:
         return []
     names, prefixes = found
     return [f"{c.get('id')}:{pat}" for c in p.get("claims") or [] if isinstance(c, dict)
-            for pat in c.get("covers") or [] if isinstance(pat, str) and not _pattern_can_match(pat, names, prefixes)]
+            for pat in c.get("covers") or [] if isinstance(pat, str) and not _is_id_cover(pat, c.get("id"))
+            and not _pattern_can_match(pat, names, prefixes)]
+
+
+def _is_id_cover(pat: str, cid) -> bool:
+    """A cover that is only the claim's own id ("C1", "c1*", "C1.*"). Judging already links such covers by id
+    (poc/claim_hygiene.py), so it is not asked about again."""
+    return str(pat).lower().rstrip("*").rstrip(".") == str(cid or "").lower() and bool(cid)
+
+
+def _linked_ids(probes: list) -> set:
+    return {c.get("id") for q in probes for c in q.get("claims") or [] if isinstance(c, dict)}
 
 
 def _usable(resp, claim_ids: set) -> list:
@@ -474,9 +485,8 @@ def generate(provider: Provider, repo: str, pr: int, title: str, body: str | Non
                 out["errors"].append(f"retry: {e}")
             else:
                 usable2 = _usable(again, set(by_id))
-                linked = lambda ps: {c.get("id") for q in ps for c in q.get("claims") or []}
                 bad2 = [x for p in usable2 for x in unmatched_covers(p)]
-                if usable2 and linked(usable2) >= linked(usable) and len(bad2) < len(bad):
+                if usable2 and _linked_ids(usable2) >= _linked_ids(usable) and len(bad2) < len(bad):
                     resp = again
                 else:
                     out["retried"]["kept_first_answer"] = "the retry did not leave fewer unmatched covers"
