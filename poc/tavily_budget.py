@@ -71,7 +71,18 @@ def worst_case(crawl_bodies=None, extract_body=None) -> int:
     return int(searches + crawls + request_credits("/extract", extract_body))
 
 
+# The docs-site seed is crawled only when the repository gives fewer than tavily_crawl.MIN_REPO_STEPS setup
+# steps, so most checks cost REPO_ONLY_CHECK. The cap still prices WORST_CASE_CHECK, with both seeds, because a
+# check cannot know before crawling whether it will need the docs site.
 WORST_CASE_CHECK = worst_case()
+
+
+def _repo_only() -> int:
+    from poc import tavily_crawl
+    return worst_case(crawl_bodies=tavily_crawl.worst_case_bodies()["crawl"][:1])
+
+
+REPO_ONLY_CHECK = _repo_only()
 
 _lock = threading.Lock()
 _active: dict | None = None   # the meter of the check now running in this process

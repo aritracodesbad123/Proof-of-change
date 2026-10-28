@@ -72,7 +72,8 @@ def _run(tmp_path, fake=None, **kw):
     return got, fake
 
 
-def test_crawl_is_scoped_to_repo_at_base_commit_and_docs_domain(tmp_path):
+def test_crawl_is_scoped_to_repo_at_base_commit_and_docs_domain(tmp_path, monkeypatch):
+    monkeypatch.setattr(tavily_crawl, "MIN_REPO_STEPS", 99)   # force the docs-site seed so its scope is checked
     got, fake = _run(tmp_path)
     urls = [u for u, _ in fake.crawls]
     assert urls == [f"https://github.com/acme/widget/tree/{SHA}", "https://widget.example.org/"]

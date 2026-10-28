@@ -2897,6 +2897,36 @@ def _maybe_prepare_contree(a, repo: str, main_sha: str, pr_sha: str, rec: dict, 
         return refusal
 
 
+
+CONTREE_UNAVAILABLE = "Contree unavailable"
+
+
+def both_sandbox_flags_refusal(a) -> str | None:
+    """--require-contree with --unsafe-no-sandbox is refused outright, before any work."""
+    if getattr(a, "require_contree", False) and getattr(a, "unsafe_no_sandbox", False):
+        return ("STOPPED: --require-contree and --unsafe-no-sandbox cannot be used together. "
+                "Result: could not verify.")
+    return None
+
+
+def contree_required_refusal(a, env: dict | None = None) -> str | None:
+    """For --require-contree: select Contree with no local fallback. Returns a plain could-not-verify note
+    ('STOPPED: Contree unavailable: ...') when Contree cannot start, else None. No pull-request code runs then."""
+    from poc import contree_sandboxes
+    env = dict(os.environ if env is None else env)
+    env[contree_sandboxes.REQUIRE_ENV] = "1"
+    a.sandbox_backend = "contree"
+    try:
+        a.sandbox_backend, a.sandbox_backend_note = contree_sandboxes.select("contree", env=env)
+    except contree_sandboxes.ContreeError as e:
+        why = str(e).replace("STOPPED: ", "", 1)
+        return (f"STOPPED: {CONTREE_UNAVAILABLE}: {why} This check runs pull-request code only in Contree, "
+                "so nothing was run. Result: could not verify.")
+    if a.sandbox_backend != "contree":
+        return (f"STOPPED: {CONTREE_UNAVAILABLE}. This check runs pull-request code only in Contree, "
+                "so nothing was run. Result: could not verify.")
+    return None
+
 def own_index_refusal(a, cnv: str | None, *checkouts) -> str | None:
     """A Contree setup failure on a product check whose project needs its own index or uv sources: could not verify
     with that limitation as the reason instead of the generic setup failure. Anything else is returned unchanged."""
@@ -6274,6 +6304,11 @@ def _main(argv=None) -> int:
                          "Nebius Token Factory Sandboxes (needs NEBIUS_API_KEY, NEBIUS_PROJECT_ID, and "
                          "pip install -e '.[contree]'; falls back to local with a note if those are missing; "
                          "set POC_REQUIRE_CONTREE=1 to refuse instead)")
+    ap.add_argument("--require-contree", action="store_true",
+                    help="set only by hosted product routes (GitHub App, hosted console, request worker): run "
+                         "pull-request code only in Contree. If Contree cannot start, the check stops with "
+                         "'Contree unavailable' (could not verify) instead of running locally. Implies "
+                         "--sandbox-backend contree. The CLI and the study never set it.")
     ap.add_argument("--recorded-dir", default=None,
                     help="recorded model responses (default: evals/fixtures/model_responses)")
     ap.add_argument("--no-coverage", action="store_true",
@@ -6329,6 +6364,9 @@ def _main(argv=None) -> int:
     ap.add_argument("--ids", default=None, help="with --bench: comma-separated case IDs (default: all), e.g. B01,B14")
     ap.add_argument("--bench-out", default=None, help="with --bench: result folder (default: runs/bench-v0)")
     a = ap.parse_args(argv)
+    if both_sandbox_flags_refusal(a):
+        print(both_sandbox_flags_refusal(a), file=sys.stderr)
+        raise SystemExit(1)
     refused = batch_order_refusal(a)
     if refused:
         ap.error(refused)
@@ -6360,11 +6398,17 @@ def _main(argv=None) -> int:
         a.poc_commit = resolve_poc_commit(REPO_ROOT)
     sandbox.configure(not a.unsafe_no_sandbox)
     from poc import contree_sandboxes
-    try:
-        a.sandbox_backend, a.sandbox_backend_note = contree_sandboxes.select(a.sandbox_backend)
-    except contree_sandboxes.ContreeError as e:
-        print(str(e), file=sys.stderr)
-        raise SystemExit(1)
+    if getattr(a, "require_contree", False):
+        stop = contree_required_refusal(a)
+        if stop:
+            print(stop, file=sys.stderr)
+            raise SystemExit(1)
+    else:
+        try:
+            a.sandbox_backend, a.sandbox_backend_note = contree_sandboxes.select(a.sandbox_backend)
+        except contree_sandboxes.ContreeError as e:
+            print(str(e), file=sys.stderr)
+            raise SystemExit(1)
     if a.sandbox_backend_note and a.sandbox_backend == "local" and "contree requested" in a.sandbox_backend_note:
         print(f"note: {a.sandbox_backend_note}", file=sys.stderr)
     a.provider, a.model_note = model_provider.select(

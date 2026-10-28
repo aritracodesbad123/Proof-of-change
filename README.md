@@ -13,6 +13,30 @@ comment; it never posts to random upstream projects.
 
 > New words are explained the first time they appear. There is also a [glossary](#glossary) at the end.
 
+## How a check works
+
+![How one PR check works](docs/architecture.png)
+
+A person starts a check from the command line, the web console, or the GitHub App, which reads the code and only
+writes its own PR comment and check result. The check loads the recorded head commit and a base side, reads claims
+that must quote the pull request text, and drafts probes; on the web console a person can keep or drop those probes
+and add up to 20 test ideas in plain words. It reads the project's own setup files and a crawl of the repository and
+its docs, then runs the code in a sandbox: local bubblewrap, or Contree. The sandbox gets no secret keys, and the
+network is on only for installs. Tests and probes run on main and on the pull request, and coverage checks whether
+the changed lines ran. The verdict comes from the test evidence for each claim, and the second opinion does not
+change it.
+
+When setup or an import fails, the checker can look up the real error, install the same fix on both sides and run
+the check again, up to 3 logged tries. A repair only lets the check run; the verdict comes from the same rules as
+any other run. It never retries a failure the PR caused and never installs OS packages.
+
+The report is HTML and Markdown, and it shows the evidence and how long each step took. The PDF always arrives:
+Chrome makes it when it works, and otherwise the built-in reportlab maker does. A person decides, and the tool
+never approves or merges.
+
+Each check logs the Tavily credits it uses. When `POC_TAVILY_CREDIT_CAP` is set, a check that might go over stops
+before its first Tavily call and reports could not verify.
+
 ## Current limitations
 
 - Big applications with huge dependency lists (for example home-assistant, erpnext, or vllm-scale projects) usually end as COULD NOT VERIFY. Setup installs too much, and anything that needs a C or system build fails in Contree, because pull-request checks never install operating-system packages.
@@ -95,6 +119,13 @@ This is the main link. It is the operator console in replay mode: light page, th
 Do not paste an email address, a key, or any private information into the issue. The issue is public.
 
 The checker on the project machine takes one request at a time. It does not start between 10:40 and 12:30 IST. It stops after five checks per day unless that limit is changed on the machine. Each of those checks runs with the advisory swarm on. A study run and a benchmark run still leave that swarm off unless the run asks. The worker reads `TAVILY_API_KEY` from that machine. When the variable is missing or blank, the check does not start. The log is one line that names the variable. The key value is never printed. If a study run has the machine, your request stays in the queue. If the checker has not checked in recently, a short reply says it is offline and points back at the results page. The repository needs the labels `request-a-check`, `request-running`, and `request-done` (create them once under Issues → Labels). `request-running` is on the issue while a check is in progress.
+
+### Host it on a Nebius VM
+
+To give judges a live console, run it on one small Nebius virtual machine (2 vCPU, 8 GiB, about $0.08 an hour).
+One script installs it, puts HTTPS in front with a free certificate, opens only ports 443, 80 and SSH, and keeps
+the keys in a root-only settings file. Pull-request code still runs only in Contree. Plain-words steps:
+[deploy/nebius/README.md](deploy/nebius/README.md).
 
 ### Try it yourself in a Codespace
 

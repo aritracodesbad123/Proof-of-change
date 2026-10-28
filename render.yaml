@@ -1,8 +1,9 @@
 # Free-tier web service: https://dashboard.render.com → New → Blueprint
 # Set secret NEBIUS_API_KEY in the Render dashboard (Token Factory).
 # RENDER_GIT_COMMIT is injected by Render (stamps runs; image has no .git).
-# bwrap uid maps fail on free Render → console auto-uses --unsafe-no-sandbox
-# unless NEBIUS_PROJECT_ID is set (Contree) or POC_UNSAFE_NO_SANDBOX=0.
+# A hosted console runs pull-request code only in Contree (--require-contree). It never
+# falls back to local bubblewrap or runs unsandboxed: without a usable Nebius key and
+# project ID the check refuses with "Contree unavailable" (could not verify).
 # After deploy you get https://<name>.onrender.com — open it like GCP.
 #
 # Note: free instances sleep when idle (~1 min cold start). Heavy PR checks

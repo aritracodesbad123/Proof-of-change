@@ -5,15 +5,22 @@ neutral/success advice only. Local HTML reports stay the offline path.
 
 Wire a real App: set GITHUB_APP_INSTALLATION_TOKEN (or App JWT env) + GITHUB_WEBHOOK_SECRET and
 POC_DEMO_REPOS=owner/repo,... then: python -m poc.github_app
+
+POST /webhook checks the signature, skips a delivery ID it has seen (kept under the state dir), queues the
+check and replies 202. One worker runs one check at a time; on a hosted deploy each check counts toward
+POC_DAILY_CAP through the console's own counter.
 """
 from __future__ import annotations
 
+import fcntl
 import hashlib
 import hmac
 import json
 import os
+import queue
 import re
 import sys
+import threading
 import time
 import urllib.error
 import urllib.request
@@ -29,6 +36,24 @@ API = "https://api.github.com"
 PROVE_RE = re.compile(r"^/prove(?:\s+(.+))?$", re.I | re.M)
 REPO_ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_HOSTED = REPO_ROOT / "reports" / "hosted"
+HOSTED_REPORTS_ENV = "POC_HOSTED_REPORTS_DIR"
+OPS_RUNS_ENV = "POC_OPS_RUNS"
+
+
+def hosted_reports_dir(env: dict | None = None) -> Path:
+    """Where hosted HTML reports are written and read: POC_HOSTED_REPORTS_DIR, else reports/hosted in the repo.
+
+    The console reads the same setting, so a deploy can keep the app code read-only."""
+    env = os.environ if env is None else env
+    raw = (env.get(HOSTED_REPORTS_ENV) or "").strip()
+    return Path(raw) if raw else DEFAULT_HOSTED
+
+
+def ops_runs_dir(env: dict | None = None) -> Path:
+    """Run folders: POC_OPS_RUNS (the console's setting), else ops/runs in the repo."""
+    env = os.environ if env is None else env
+    raw = (env.get(OPS_RUNS_ENV) or "").strip()
+    return Path(raw) if raw else REPO_ROOT / "ops" / "runs"
 
 
 class GitHubAppError(RuntimeError):
@@ -221,7 +246,7 @@ def report_url_for(path: Path, env: dict | None = None) -> str | None:
 
 def write_hosted_report(rec: dict, out_dir: Path | None = None) -> Path:
     """Static behavior-map HTML for one PR record (hosted or opened locally)."""
-    out_dir = Path(out_dir) if out_dir is not None else DEFAULT_HOSTED
+    out_dir = Path(out_dir) if out_dir is not None else hosted_reports_dir()
     out_dir.mkdir(parents=True, exist_ok=True)
     rid = rec.get("id") or "run"
     path = out_dir / f"{rid}.html"
@@ -270,9 +295,9 @@ sandbox {_esc(rec.get('sandbox_backend') or 'local')}</p>
     return path
 
 
-def _load_latest_record(repo: str, pr: int) -> dict | None:
-    """Best-effort: newest record.json under ops/runs matching this PR."""
-    runs = REPO_ROOT / "ops" / "runs"
+def _load_latest_record(repo: str, pr: int, env: dict | None = None) -> dict | None:
+    """Best-effort: newest record.json under the run folders (POC_OPS_RUNS, else ops/runs) matching this PR."""
+    runs = ops_runs_dir(env)
     if not runs.is_dir():
         return None
     needle = f"-{pr}"
@@ -293,17 +318,31 @@ def _load_latest_record(repo: str, pr: int) -> dict | None:
     return json.loads(newest.read_text())
 
 
+CONTREE_FLAGS = ("--sandbox-backend", "contree", "--require-contree")
+
+
 def check_argv(pr_url: str, env: dict | None = None) -> list[str]:
     """Arguments for one product check started by the GitHub App.
 
     ``--related-reports`` is quoted background for the advisory AI. ``--swarm`` turns the
     advisory swarm on for every App check. A study run uses neither. The App does not set
     ``POC_SWARM`` in the environment, so nothing else in the process is turned on.
+    Pull-request code runs only in Contree: ``--require-contree`` stops the check with
+    'Contree unavailable' (could not verify) instead of falling back to local bubblewrap.
     """
     env = os.environ if env is None else env
     from poc import related_reports
     provider = env.get("POC_MODEL_PROVIDER") or "nebius"
-    return ["--pr", pr_url, "--model-provider", provider, "--swarm", *related_reports.product_flags()]
+    # Same as the console: run folders and reviewer reports go where POC_OPS_DIR / POC_REPORT_DIR say.
+    extra: list[str] = []
+    ops_dir = (env.get("POC_OPS_DIR") or "").strip()
+    if ops_dir:
+        extra.extend(["--ops-dir", ops_dir])
+    report_dir = (env.get("POC_REPORT_DIR") or "").strip()
+    if report_dir:
+        extra.extend(["--report-dir", report_dir])
+    return ["--pr", pr_url, "--model-provider", provider, "--swarm", *related_reports.product_flags(),
+            *CONTREE_FLAGS, *extra]
 
 
 def apply(plan: dict, *, dry_run: bool | None = None, env: dict | None = None,
@@ -354,7 +393,7 @@ def apply(plan: dict, *, dry_run: bool | None = None, env: dict | None = None,
         else:
             from ops import daily_run
             run_exit = daily_run.main(argv)
-        rec = plan.get("record") or _load_latest_record(str(repo), int(pr))
+        rec = plan.get("record") or _load_latest_record(str(repo), int(pr), env)
 
     if not isinstance(rec, dict):
         out = {"ok": run_exit == 0 if run_exit is not None else force_dry, "action": action,
@@ -362,7 +401,7 @@ def apply(plan: dict, *, dry_run: bool | None = None, env: dict | None = None,
                "note": note or "no record.json found after run"}
         return out
 
-    report_path = write_hosted_report(rec, hosted_dir or DEFAULT_HOSTED)
+    report_path = write_hosted_report(rec, hosted_dir or hosted_reports_dir(env))
     url = report_url_for(report_path, env)
     verdict = str(rec.get("verdict") or "could_not_verify")
     reason = str(rec.get("reason") or "")
@@ -399,21 +438,119 @@ def _esc(s) -> str:
     return (str(s) if s is not None else "").replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
 
 
+def state_dir(env: dict | None = None) -> Path:
+    """Where the App keeps what must survive a restart: under POC_OPS_DIR (the deploy's data folder) when set."""
+    env = os.environ if env is None else env
+    base = (env.get("POC_OPS_DIR") or "").strip()
+    return (Path(base) if base else REPO_ROOT / "ops") / "github-app"
+
+
+def claim_delivery(delivery_id: str, root: Path) -> bool:
+    """Record one X-GitHub-Delivery ID. True the first time, False for a duplicate (a redelivery or retry).
+
+    The list is a file under the state dir, read and appended under an exclusive fcntl lock, so it holds
+    across restarts and across processes."""
+    root.mkdir(parents=True, exist_ok=True)
+    path = root / "deliveries.txt"
+    with open(path, "a+") as fh:
+        fcntl.flock(fh, fcntl.LOCK_EX)
+        try:
+            fh.seek(0)
+            if delivery_id in {ln.strip() for ln in fh}:
+                return False
+            fh.seek(0, os.SEEK_END)
+            fh.write(delivery_id + "\n")
+            fh.flush()
+            os.fsync(fh.fileno())
+            return True
+        finally:
+            fcntl.flock(fh, fcntl.LOCK_UN)
+
+
+def daily_cap_refusal(env: dict) -> str | None:
+    """App checks count toward POC_DAILY_CAP through the console's own counter (same file, same fcntl lock).
+
+    Only on a hosted deploy (POC_HOSTED=1), where the console also counts; that call also requires
+    POC_TAVILY_CREDIT_CAP. A local run is not capped."""
+    from poc import console_api
+    if not console_api.hosted_console(env):
+        return None
+    return console_api.hosted_budget_refusal(env)
+
+
+class CheckQueue:
+    """One worker thread runs queued checks one at a time, in arrival order."""
+
+    def __init__(self, env: dict, apply_fn: Callable = None, refusal_fn: Callable = None):
+        self.env = env
+        self.apply_fn = apply_fn or apply
+        self.refusal_fn = refusal_fn or daily_cap_refusal
+        self.q: queue.Queue = queue.Queue()
+        self.results: list[dict] = []
+        self._worker: threading.Thread | None = None
+
+    def start(self) -> CheckQueue:
+        if self._worker is None:
+            self._worker = threading.Thread(target=self._run, name="poc-app-worker", daemon=True)
+            self._worker.start()
+        return self
+
+    def put(self, plan: dict) -> int:
+        self.q.put(plan)
+        return self.q.qsize()
+
+    def run_one(self, plan: dict) -> dict:
+        stop = self.refusal_fn(self.env)
+        if stop:
+            result = {"ok": False, "action": "refuse", "why": stop, "repo": plan.get("repo"), "pr": plan.get("pr")}
+        else:
+            try:
+                result = self.apply_fn(plan, env=self.env)
+            except Exception as e:  # noqa: BLE001 - one bad check must not stop the worker
+                result = {"ok": False, "error": f"{type(e).__name__}: {e}", "repo": plan.get("repo"),
+                          "pr": plan.get("pr")}
+        self.results.append(result)
+        print(f"app check {plan.get('repo')}#{plan.get('pr')}: ok={result.get('ok')} "
+              f"{result.get('why') or result.get('error') or result.get('verdict') or ''}", flush=True)
+        return result
+
+    def _run(self) -> None:
+        while True:
+            plan = self.q.get()
+            if plan is None:
+                return
+            try:
+                self.run_one(plan)
+            finally:
+                self.q.task_done()
+
+    def stop(self) -> None:
+        if self._worker is not None:
+            self.q.put(None)
+            self._worker.join(timeout=10)
+            self._worker = None
+
+
 class _WebhookHandler(BaseHTTPRequestHandler):
     env: dict = os.environ  # overridden in serve()
-    apply_fn: Callable = staticmethod(apply)
+    checks: CheckQueue | None = None
+    state: Path = DEFAULT_HOSTED
 
     def log_message(self, fmt, *args):  # quieter
         pass
 
+    def _json(self, code: int, obj: dict) -> None:
+        body = json.dumps(obj, default=str).encode()
+        self.send_response(code)
+        self.send_header("Content-Type", "application/json")
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
+
     def do_GET(self):  # noqa: N802
         if self.path.split("?")[0] in ("/health", "/"):
-            body = json.dumps({"ok": True, "service": "proof-of-change-github-app"}).encode()
-            self.send_response(200)
-            self.send_header("Content-Type", "application/json")
-            self.send_header("Content-Length", str(len(body)))
-            self.end_headers()
-            self.wfile.write(body)
+            queued = self.checks.q.qsize() if self.checks else 0
+            self._json(200, {"ok": True, "service": "proof-of-change-github-app", "queued": queued})
             return
         self.send_error(404)
 
@@ -428,36 +565,45 @@ class _WebhookHandler(BaseHTTPRequestHandler):
         if not verify_webhook(raw, sig, secret):
             self.send_error(401, "bad signature")
             return
+        delivery = (self.headers.get("X-GitHub-Delivery") or "").strip()
+        if not re.fullmatch(r"[A-Za-z0-9-]{1,100}", delivery):
+            self.send_error(400, "missing X-GitHub-Delivery")
+            return
         event = self.headers.get("X-GitHub-Event") or ""
         try:
             payload = json.loads(raw.decode() or "{}")
         except json.JSONDecodeError:
             self.send_error(400, "bad json")
             return
+        if not claim_delivery(delivery, self.state):
+            self._json(200, {"duplicate": True, "delivery": delivery})
+            return
         plan = handle_event(event, payload, self.env)
-        # Acknowledge quickly; MVP runs apply inline (document timeout risk).
-        # ponytail: sync apply; async queue if webhooks time out under long PR runs
-        result = {"plan": plan}
-        if plan.get("action") in ("prove", "run"):
-            result = self.apply_fn(plan, env=self.env)
-        body = json.dumps(result, default=str).encode()
-        self.send_response(200)
-        self.send_header("Content-Type", "application/json")
-        self.send_header("Content-Length", str(len(body)))
-        self.end_headers()
-        self.wfile.write(body)
+        if plan.get("action") in ("prove", "run") and self.checks is not None:
+            position = self.checks.put(plan)
+            self._json(202, {"queued": True, "delivery": delivery, "position": position,
+                             "action": plan.get("action"), "repo": plan.get("repo"), "pr": plan.get("pr")})
+            return
+        self._json(200, {"delivery": delivery, "plan": plan})
 
 
-def serve(host: str = "0.0.0.0", port: int = 8080, env: dict | None = None) -> None:
+def make_server(host: str, port: int, env: dict | None = None, *, checks: CheckQueue | None = None,
+                state: Path | None = None) -> HTTPServer:
     env = os.environ if env is None else env
 
     class H(_WebhookHandler):
         pass
 
     H.env = env
-    H.apply_fn = apply
-    httpd = HTTPServer((host, port), H)
-    print(f"proof-of-change github app listening on http://{host}:{port}  POST /webhook  GET /health", flush=True)
+    H.checks = checks if checks is not None else CheckQueue(env).start()
+    H.state = state or state_dir(env)
+    return HTTPServer((host, port), H)
+
+
+def serve(host: str = "0.0.0.0", port: int = 8080, env: dict | None = None) -> None:
+    httpd = make_server(host, port, env)
+    print(f"proof-of-change github app listening on http://{host}:{port}  POST /webhook  GET /health "
+          "(one check at a time; webhooks answered 202 when queued)", flush=True)
     httpd.serve_forever()
 
 
