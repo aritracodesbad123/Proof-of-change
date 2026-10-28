@@ -4162,6 +4162,33 @@ def with_probes(cmp: dict | None, cnv_reason: str | None, exits: dict | None = N
     return v, (f"{reason}; {s['reason']}" if s["reason"] else reason), fl
 
 
+def _test_module(test_id: str) -> str:
+    """'tests/test_x.py::T::t[1]', 'tests.test_x::t' or 'test_x::t' -> 'test_x'."""
+    head = test_id.split("::", 1)[0]
+    head = head.rsplit("/", 1)[-1]
+    if head.endswith(".py"):
+        head = head[:-3]
+    return head.rsplit(".", 1)[-1]
+
+
+def replaced_tests(cmp: dict, files: dict | None) -> list[str]:
+    """Removed tests that the PR replaced: each lives in a test file the PR edits, the PR adds at least as many new
+    passing tests as it removes, and no test regresses or newly fails. Anything else removed stays a finding."""
+    removed = cmp.get("removed_tests") or []
+    if not removed or cmp.get("regressions") or cmp.get("new_tests_failing") or cmp.get("pr_unstable"):
+        return []
+    if (cmp.get("new_tests_passing") or 0) < len(removed):
+        return []
+    changed = set()
+    for f in (files or {}).get("all") or []:
+        name = str(f).rsplit("/", 1)[-1]
+        if name.endswith(".py"):
+            changed.add(name[:-3])
+    if not all(_test_module(t) in changed for t in removed):
+        return []
+    return list(removed)
+
+
 def tests_verdict(cmp: dict | None, cnv_reason: str | None, exits: dict | None = None,
                   files: dict | None = None) -> tuple[str, str, list[str]]:
     """Verdict from the test comparison alone (claims are checked by probes, see verdict_for).
@@ -4193,7 +4220,8 @@ def tests_verdict(cmp: dict | None, cnv_reason: str | None, exits: dict | None =
     findings += [FindingLabel.UNMENTIONED_CHANGE] * (len(cmp["regressions"]) + len(cmp["new_tests_failing"]))
     findings += [FindingLabel.UNMENTIONED_CHANGE] * len(cmp.get("pr_unstable") or [])
     findings += [FindingLabel.FLAKY] * len(cmp["flaky"])
-    findings += [FindingLabel.NEEDS_HUMAN] * (len(cmp["removed_tests"]) + len(cmp["other_changes"]))
+    replaced = replaced_tests(cmp, files)
+    findings += [FindingLabel.NEEDS_HUMAN] * (len(cmp["removed_tests"]) - len(replaced) + len(cmp["other_changes"]))
     findings += [FindingLabel.PROVEN] * len(cmp["fixed"])
     if (cmp["same"] or cmp["new_tests_passing"]) and not nothing_ran:
         findings.append(FindingLabel.NO_DIFFERENCE)
@@ -4217,8 +4245,11 @@ def tests_verdict(cmp: dict | None, cnv_reason: str | None, exits: dict | None =
         more = f" (+{len(pr_noisy) - 5})" if len(pr_noisy) > 5 else ""
         bits.append(f"{len(pr_noisy)} test(s) stable on the base and unstable only on the pull request, "
                     f"too mixed to call a regression: {shown}{more}")
-    if cmp["removed_tests"]:
-        bits.append(f"{len(cmp['removed_tests'])} test(s) removed on the PR side")
+    if len(cmp["removed_tests"]) > len(replaced):
+        bits.append(f"{len(cmp['removed_tests']) - len(replaced)} test(s) removed on the PR side")
+    if replaced:
+        bits.append(f"{len(replaced)} test(s) removed from a test file the PR edits, with new passing tests added "
+                    "(replaced, not a finding)")
     if cmp["other_changes"]:
         bits.append(f"{len(cmp['other_changes'])} other outcome change(s)")
     if cmp["fixed"]:
@@ -4285,6 +4316,10 @@ def tests_verdict(cmp: dict | None, cnv_reason: str | None, exits: dict | None =
         return cnv, f"not fully verified: {dep_note} ({reason})", fl
     if pr_noisy:
         return cnv, f"not fully verified: {reason}", fl
+    if replaced and not [f for f in verdict_findings if f is FindingLabel.NEEDS_HUMAN]:
+        # The old test was not run against the PR's code, so the PR cannot be verified, but a test the PR itself
+        # replaced in a test file it edits is not a finding either.
+        return cnv, f"not fully verified: a replaced test was not run on the PR ({reason})", fl
     v = pr_verdict(RunSummary(build_ok=True, claims=[Claim("tests", testable=True, probed=True, proven=True)],
                               findings=verdict_findings))
     # Noise rule: a project test whose result changes between runs on the same side is shown in the reason but
