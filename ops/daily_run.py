@@ -54,8 +54,19 @@ sys.path.insert(0, str(REPO_ROOT))
 from guardrails import sandbox  # noqa: E402
 from guardrails.isolation import untrusted_env  # noqa: E402
 from harness.machine import detect_machine_type  # noqa: E402
-from poc import agents, behaviour_claims, cost, coverage_gate, diff_probes, freeze, local_config, model_probes, model_provider, probes  # noqa: E402,E501
-from poc import pdf_always  # noqa: E402
+from poc import (  # noqa: E402,E501
+    agents,
+    behaviour_claims,
+    cost,
+    coverage_gate,
+    diff_probes,
+    freeze,
+    local_config,
+    model_probes,
+    model_provider,
+    pdf_always,
+    probes,
+)
 from poc.diff import confirm, pr_runs_too_noisy  # noqa: E402
 from poc.pr_text import github_read_token  # noqa: E402
 from poc.tool_setup import ToolSetupError, ensure_tools, uv_bin  # noqa: E402
