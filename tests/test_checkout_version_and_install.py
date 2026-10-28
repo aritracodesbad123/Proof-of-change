@@ -87,13 +87,14 @@ def test_editable_failure_is_recorded_and_src_layout_put_on_path(tmp_path):
     shell = (contree_sandboxes.EDITABLE_REINSTALL_SHELL
              .replace("/work/", f"{work}/")
              .replace("python -m pip install --no-deps -e .", "sh -c 'echo build failed; exit 7'")
+             .replace("python -m pip install --no-cache-dir --no-deps -e .", "sh -c 'echo retry failed; exit 7'")
              .replace("sp=$(python -c \"import sysconfig;print(sysconfig.get_paths()['purelib'])\")", f"sp={site}"))
     open(work / "poc-install.txt", "w").close()
     r = _run(shell, work / "src")
     assert r.returncode == 0, r.stderr
     rep = (work / "poc-install.txt").read_text()
-    assert "editable_exit=7" in rep and f"editable_fallback=source path {work}/src/src" in rep
-    assert (work / "poc-editable.log").read_text().strip() == "build failed"
+    assert "editable_retry=tmpdir" in rep and "editable_exit=7" in rep and f"editable_fallback=source path {work}/src/src" in rep
+    assert (work / "poc-editable.log").read_text().split() == ["build", "failed", "retry", "failed"]
     assert (site / "_poc_own_checkout.pth").read_text().strip() == f"{work}/src/src"
 
 
