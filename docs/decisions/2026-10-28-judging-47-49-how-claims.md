@@ -52,3 +52,7 @@ changed verdicts is in the pull request description. No known catch is lost.
 ## Follow-up: no evidence any changed line ran caps at could_not_verify
 
 If a run has probes, every probe ran 0 changed lines on the main side, and the tests' coverage was not measured or showed none, nothing shows the change was exercised. Such a run is capped at could_not_verify (`no_evidence_gate`, applied in `gate` and mirrored in `derive_verdict`). The cap only lowers a verified verdict; it never raises one. Test: a case shaped like a CLI fix whose two probes ran 0 of 5 changed lines and raised the same exception on both sides.
+
+## Follow-up: fix 49, same shape as a proven sibling
+
+An unclaimed difference whose shape matches a proven claimed sibling in the same probe (the same main-side exception type turning into a value on the PR side) is advisory, with the note "probably the claimed change, check" (`linked_by: "shape"`). It stays labelled unmentioned and visible, and advisory observations still hold a verified run at could_not_verify. A difference of any other shape, or one with no proven sibling, still flags.

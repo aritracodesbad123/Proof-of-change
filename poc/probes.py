@@ -353,7 +353,40 @@ def judge(spec: dict, runs: dict, files: dict | None = None) -> list[dict]:
             res["citations"] = {side: citation(files[side][0], runs[side][0], name) for side in ("main", "pr")
                                 if name in runs[side][0]}
         out.append(res)
+    _shape_link(out)
     return out
+
+
+SHAPE_NOTE = "probably the claimed change, check"
+
+
+_EXC_NAME_RE = re.compile(r"^[A-Za-z_][\w.]*(?:Error|Exception)$")
+
+
+def _exc_of(value) -> str | None:
+    """The exception type of an observation value: {"raises": "Name"} or a bare "NameError" string."""
+    if isinstance(value, str):
+        return value if _EXC_NAME_RE.match(value) else None
+    return _exception_name(value)
+
+
+def _shape(res: dict) -> str | None:
+    """"<Exception>->value" when main raised and the PR returned a value (not an exception), else None."""
+    exc = _exc_of(res.get("main"))
+    if res.get("state") != "differs" or not exc or _exc_of(res.get("pr")) or res.get("pr") == ABSENT:
+        return None
+    return exc
+
+
+def _shape_link(out: list[dict]) -> None:
+    """Fix 49: an unclaimed difference with the same shape as a proven claimed sibling in the same probe (the same
+    main exception type turning into a value on the PR) is advisory, "probably the claimed change, check". It stays
+    unmentioned_change and visible; it just no longer raises attention on its own."""
+    proven = {_shape(r) for r in out if r.get("label") == FindingLabel.PROVEN.value and r.get("claim")} - {None}
+    for r in out:
+        if (r.get("label") == FindingLabel.UNMENTIONED_CHANGE.value and not r.get("advisory")
+                and not r.get("pr_only") and _shape(r) in proven):
+            r["advisory"], r["linked_by"], r["note"] = True, "shape", SHAPE_NOTE
 
 
 def run_once(path: Path, python: Path, cwd: Path, env: dict, timeout: int, launch=None,

@@ -147,3 +147,23 @@ def test_no_evidence_any_changed_line_ran_caps_at_could_not_verify():
     # with the tests' coverage showing a changed line ran, the cap does not apply
     ran = {**rec, "coverage": {"status": "measured", "changed_lines_covered": 1, "changed_lines_total": 5}}
     assert dr.no_evidence_gate({**ran, "verdict": VER})["verdict"] == VER
+
+
+def test_unclaimed_difference_shaped_like_a_proven_sibling_is_advisory():
+    from poc import probes as pr
+    spec = {"id": "model-p1", "source": "model",
+            "claims": [{"id": "C1", "covers": ["c1.*"], "expect": "differs", "text": "accepts the new setting"},
+                       {"id": "C3", "covers": ["c3.*"], "expect": "differs", "text": "setting can be false"}]}
+    main = {"c1.accepted": "TypeError", "c2.set_true": "TypeError", "c3.set_false": "TypeError", "c9.other": 1}
+    prs = {"c1.accepted": None, "c2.set_true": True, "c3.set_false": False, "c9.other": 2}
+    obs = {o["name"]: o for o in pr.judge(spec, {"main": [main] * 3, "pr": [prs] * 3})}
+    assert obs["c1.accepted"]["label"] == "proven"
+    c2 = obs["c2.set_true"]
+    assert c2["label"] == "unmentioned" and c2["advisory"] and c2["linked_by"] == "shape"
+    assert c2["note"] == "probably the claimed change, check"
+    # a real unclaimed change of another shape (value -> other value) still flags
+    assert obs["c9.other"]["label"] == "unmentioned" and not obs["c9.other"].get("advisory")
+    # without a proven sibling, the same difference is not advisory
+    lone = {o["name"]: o for o in pr.judge({**spec, "claims": []},
+                                           {"main": [main] * 3, "pr": [prs] * 3})}
+    assert not lone["c2.set_true"].get("advisory")
