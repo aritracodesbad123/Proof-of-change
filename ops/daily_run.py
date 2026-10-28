@@ -6576,7 +6576,7 @@ def _run_batch_order(queue: list, rdir: Path, workroot: Path, a, machine: dict, 
             raise
         except Exception as e:  # noqa: BLE001
             problems.append(f"{repo}#{c['pr']}: harness error: {type(e).__name__}: {e}")
-            return None
+            return harness_error_record(repo, cfg, c, rdir, a, machine, e)
         print(f"    -> {rec['verdict']}: {rec['reason'][:140]} ({rec['duration_s']['total_wall']}s)", flush=True)
         return rec
 
@@ -6937,6 +6937,9 @@ def _main(argv=None) -> int:
                 return 1
             except Exception as e:  # noqa: BLE001
                 problems.append(f"{repo}#{c['pr']}: harness error: {type(e).__name__}: {e}")
+                rec = harness_error_record(repo, cfg, c, rdir, a, machine, e)
+                if rec is not None:   # reported as could_not_verify; not marked seen, so it is tested again
+                    records.append(rec)
                 continue
             records.append(rec)
             print(f"    -> {rec['verdict']}: {rec['reason'][:140]} ({rec['duration_s']['total_wall']}s)", flush=True)
@@ -7004,6 +7007,28 @@ def pinned_args_problem(a, single: dict) -> str | None:
     if sum(len(v) for v in single.values()) != 1:
         return "refusing: --base-sha / --head-sha need exactly one --pr"
     return None
+
+
+def harness_error_record(repo: str, cfg: dict, item: dict, rdir: Path, a, machine: dict, err: BaseException) -> dict | None:
+    """A check that crashed or timed out partway still gets a record, so its report and PDF are written.
+
+    The verdict is could_not_verify and the reason names the error. Returns None only if even this record
+    cannot be built; the run's problems list already names the error."""
+    reason = f"harness error: {type(err).__name__}: {err}"[:500]
+    try:
+        rec = new_record(repo, cfg, item, a, machine, rdir.name, run_date_for(rdir))
+    except Exception:  # noqa: BLE001 - fall back to the smallest record the report can show
+        rec = {"repo": repo, "library": cfg.get("pkg"), "pr": item.get("pr"), "title": item.get("title", "")}
+    rec["verdict"], rec["reason"] = "could_not_verify", reason
+    rec["harness_error"] = reason
+    rec.setdefault("duration_s", {}).setdefault("total_wall", 0)
+    try:
+        prdir = rdir / f"{cfg['pkg']}-{item['pr']}"
+        prdir.mkdir(parents=True, exist_ok=True)
+        (prdir / "record.json").write_text(json.dumps(rec, indent=1, default=str))
+    except Exception:  # noqa: BLE001
+        return None
+    return rec
 
 
 def reviewer_reports(rdir: Path, a, records: list[dict], kind: str) -> bool:

@@ -770,8 +770,8 @@ def render_run(run_dir: str | Path, out: str | Path, formats=("md", "html", "pdf
     if not recs:
         raise SystemExit(f"no */record.json under {run_dir}: is this an ops/runs/<date> folder?")
     if "pdf" in formats and not rv.find_chrome():
-        print("note: no Chrome/Chromium found, so no PDFs; HTML and Markdown are written", file=sys.stderr)
-        formats = tuple(f for f in formats if f != "pdf")
+        # to_pdf falls back to the built-in PDF maker, so PDFs are still written without Chrome
+        print("note: no Chrome/Chromium found; PDFs are made with the built-in PDF maker", file=sys.stderr)
     rows = []
     for rec, prdir in recs:
         od = out / run_id(rec)
