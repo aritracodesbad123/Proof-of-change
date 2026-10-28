@@ -7197,6 +7197,13 @@ def rejudge(rec: dict, prdir: Path) -> dict:
     out.update(comparison=cmp, exit_check=ex, verdict=v, reason=reason)
     if pr_probes:
         out["probes"] = pr_probes
+        if rec.get("product_check"):
+            from poc import broad_claims
+            bnote = broad_claims.note_text(pr_probes.get("broad_claims"))
+            if bnote:
+                out["broad_claims_note"] = bnote
+            else:
+                out.pop("broad_claims_note", None)
     out = gate(out)
     if (out["verdict"], out["reason"]) != (rec.get("verdict"), rec.get("reason")):
         out["rejudged"] = {"at_ist": now_ist().strftime("%Y-%m-%d %H:%M IST"),
@@ -7217,7 +7224,11 @@ def rejudge_probes(pr_probes: dict | None, product_check: bool = False) -> dict 
     items = [probes.rejudge_entry(it) for it in pr_probes["items"]]
     if product_check:
         items = [_keep_advisory(old, new) for old, new in zip(pr_probes["items"], items)]
-    return dict(pr_probes, items=items, summary=probes.summarize(items))
+    out = dict(pr_probes, items=items, summary=probes.summarize(items))
+    if product_check:   # the broad-claims gate is recomputed from current code, never taken from the saved copy
+        from poc import broad_claims
+        out = broad_claims.apply(out)
+    return out
 
 
 def _keep_advisory(old: dict, new: dict) -> dict:
