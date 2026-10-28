@@ -3298,6 +3298,12 @@ COVERAGE_RC = (
     "    no-data-collected\n    no-ctracer\n    no-sysmon\n    already-imported\n    couldnt-parse\n"
     "    dynamic-conflict\n"
 )
+# Probe coverage runs coverage.py directly, so without --rcfile it reads the project's own settings: its [run] source
+# beats our --include, its parallel = true renames the data file and makes `coverage json` combine every file sharing
+# the prefix (it read our log and stopped with "file is not a database"), and its fail_under applies to the report.
+# Our own file, passed with --rcfile to every probe coverage command, means none of the project's settings apply.
+PROBE_COVERAGE_RC = COVERAGE_RC + "parallel = False\n[report]\nfail_under = 0\n"
+
 COVERAGE_RC_NOTE = ("Coverage setup: measured with the check's own coverage settings (the project's coverage "
                     "settings are not read, and coverage's own setup warnings are off); the project's warning "
                     "filters are unchanged.")
@@ -4396,10 +4402,13 @@ def probe_coverage(item: dict, probe_results: dict | None, vm: Path, main_root: 
         data, js = out / f".probe-cov-{it['id']}", out / f"probe-cov-{it['id']}.json"
         sbx = side_sandbox(vm, ro=(path,))
         env = probe_env(vm, probe_settings(a, {"main": vm, "pr": vm.parent / "venv-pr"}))
-        rc, _ = run([py, "-m", "coverage", "run", f"--data-file={data}", f"--include={include}", path], log,
-                    cwd=side_cwd(vm), env=env, timeout=int(probes.read_spec(path).get("timeout_s", 120)), sbx=sbx)
-        run([py, "-m", "coverage", "json", f"--data-file={data}", "-o", js, "-q"], log, cwd=side_cwd(vm), env=env,
-            timeout=300, sbx=sbx)
+        rcfile = out / "poc-probe-coveragerc"
+        rcfile.write_text(PROBE_COVERAGE_RC)
+        rc, _ = run([py, "-m", "coverage", "run", f"--rcfile={rcfile}", f"--data-file={data}", f"--include={include}",
+                     path], log, cwd=side_cwd(vm), env=env, timeout=int(probes.read_spec(path).get("timeout_s", 120)),
+                    sbx=sbx)
+        run([py, "-m", "coverage", "json", f"--rcfile={rcfile}", f"--data-file={data}", "-o", js, "-q"], log,
+            cwd=side_cwd(vm), env=env, timeout=300, sbx=sbx)
         if not js.exists():
             it["probe_changed_line_coverage"] = probe_adequacy.assess(
                 {"status": "not measured", "why": f"coverage produced no data (exit {rc}); see probe-coverage.log"})
@@ -4472,15 +4481,17 @@ def contree_probe_coverage(item: dict, probe_results: dict | None, main_root: Pa
             continue
         remote = f"/work/probes/{path.name}"
         shell = (
-            "set +e\ncd /work/src 2>/dev/null || cd /work\n" + exports +
-            f"python -m coverage run --data-file=/tmp/poc-probe-cov --include={shlex.quote(include)} "
-            f"{shlex.quote(remote)} >/tmp/poc-probe-cov.log 2>&1\n"
+            f"set +e\nprintf %s {shlex.quote(PROBE_COVERAGE_RC)} > /tmp/poc-probe-coveragerc\n"
+            "rm -f /tmp/poc-probe-cov-data /tmp/poc-probe-cov-data.*\n"
+            "cd /work/src 2>/dev/null || cd /work\n" + exports +
+            "python -m coverage run --rcfile=/tmp/poc-probe-coveragerc --data-file=/tmp/poc-probe-cov-data "
+            f"--include={shlex.quote(include)} {shlex.quote(remote)} >/tmp/poc-probe-run.log 2>&1\n"
             "ec=$?\n"
-            "python -m coverage json --data-file=/tmp/poc-probe-cov -o /tmp/poc-probe-cov.json -q "
-            ">>/tmp/poc-probe-cov.log 2>&1\n"
+            "python -m coverage json --rcfile=/tmp/poc-probe-coveragerc --data-file=/tmp/poc-probe-cov-data "
+            "-o /tmp/poc-probe-report.json -q >>/tmp/poc-probe-run.log 2>&1\n"
             "printf '___POC_EXIT___%s\\n' \"$ec\"\n"
-            f"python -c {shlex.quote(_COV_PACK)} /tmp/poc-probe-cov.json {want} 2>/dev/null\n"
-            "printf '___POC_LOG___\\n'\ntail -c 4000 /tmp/poc-probe-cov.log 2>/dev/null\n"
+            f"python -c {shlex.quote(_COV_PACK)} /tmp/poc-probe-report.json {want} 2>/dev/null\n"
+            "printf '___POC_LOG___\\n'\ntail -c 4000 /tmp/poc-probe-run.log 2>/dev/null\n"
         )
         try:
             raw = sess.run_op("main", shell, disposable=False, timeout=timeout + int(a.run_timeout),
