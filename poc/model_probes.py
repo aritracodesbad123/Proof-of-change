@@ -15,6 +15,7 @@ capped at MODEL_TIMEOUT_S, and with the output size and contract checks of poc/p
 from __future__ import annotations
 
 import ast
+import fnmatch
 import json
 import re
 from pathlib import Path
@@ -316,6 +317,111 @@ def _context(base_files: dict) -> str:
     return "\n\n".join(parts)
 
 
+COVER_REASON = ("some \"covers\" name no observation the probe code records ({}); each cover must be an observation "
+                "name the code prints, or an fnmatch pattern that matches some of them")
+
+
+def recorded_names(code: str) -> tuple[set, set] | None:
+    """(names, prefixes) of observation names a probe's code can record: string keys of dict literals and of
+    subscript stores (obs["c1.x"] = ...), and the constant start of f-string keys (obs[f"c1.{w}"] -> "c1.").
+    None when the code also stores under a key that is neither, or does not parse: then nothing can be told."""
+    try:
+        tree = ast.parse(code or "")
+    except SyntaxError:
+        return None
+    names, prefixes = set(), set()
+
+    def key(k) -> bool:
+        if isinstance(k, ast.Constant) and isinstance(k.value, str):
+            names.add(k.value)
+            return True
+        if isinstance(k, ast.JoinedStr):
+            head = ""
+            for part in k.values:
+                if not (isinstance(part, ast.Constant) and isinstance(part.value, str)):
+                    break
+                head += part.value
+            prefixes.add(head)
+            return True
+        return False
+
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Dict):
+            for k in node.keys:
+                if k is not None:
+                    key(k)
+        elif isinstance(node, ast.Subscript) and isinstance(node.ctx, ast.Store) and not key(node.slice):
+            return None
+    return names, prefixes
+
+
+def _pattern_can_match(pat: str, names: set, prefixes: set) -> bool:
+    if any(fnmatch.fnmatchcase(n, pat) for n in names):
+        return True
+    head = re.split(r"[*?\[]", pat, maxsplit=1)[0]
+    return any(head.startswith(pre) or pre.startswith(head) for pre in prefixes)
+
+
+def unmatched_covers(p: dict, id_covers_count: bool = False) -> list[str]:
+    """"C1:c1.row0" for each cover of a probe's claims that no observation name its code records can match. Empty
+    when the code's names cannot be told (recorded_names returns None): a cover is never judged on a guess."""
+    found = recorded_names(_unescape_code(p.get("code")))
+    if found is None:
+        return []
+    names, prefixes = found
+    return [f"{c.get('id')}:{pat}" for c in p.get("claims") or [] if isinstance(c, dict)
+            for pat in c.get("covers") or [] if isinstance(pat, str)
+            and (id_covers_count or not _is_id_cover(pat, c.get("id")))
+            and not _pattern_can_match(pat, names, prefixes)]
+
+
+def _is_id_cover(pat: str, cid) -> bool:
+    """A cover that is only the claim's own id ("C1", "c1*", "C1.*"). Judging already links such covers by id
+    (poc/claim_hygiene.py), so it is not asked about again."""
+    return str(pat).lower().rstrip("*").rstrip(".") == str(cid or "").lower() and bool(cid)
+
+
+def _names_per_claim(probes: list) -> dict:
+    """Claim id -> the observation names (or name prefixes) its covers match, over all probes. A probe whose
+    names cannot be told adds nothing, so a retry that hides its names never counts as keeping them."""
+    got: dict = {}
+    for q in probes:
+        found = recorded_names(_unescape_code(q.get("code")))
+        for c in q.get("claims") or []:
+            if not isinstance(c, dict):
+                continue
+            hit = got.setdefault(c.get("id"), set())
+            if found is None:
+                continue
+            names, prefixes = found
+            for pat in c.get("covers") or []:
+                if isinstance(pat, str) and not _is_id_cover(pat, c.get("id")):
+                    hit |= {n for n in names if fnmatch.fnmatchcase(n, pat)}
+                    head = re.split(r"[*?\[]", pat, maxsplit=1)[0]
+                    hit |= {pre + "*" for pre in prefixes if head.startswith(pre) or pre.startswith(head)}
+    return got
+
+
+def retry_weakens(first: list, retry: list) -> str | None:
+    """Why a retry answer is not kept, or None. Kept only when it has (a) at least as many usable probes,
+    (b) for each claim at least as many matched observation names, and (c) fewer unmatched covers, where a
+    cover that is only the claim id counts as unmatched, so swapping a real name for "C1.*" is no gain."""
+    if len(retry) < len(first):
+        return "the retry had fewer usable probes"
+    n1, n2 = _names_per_claim(first), _names_per_claim(retry)
+    lost = sorted(str(k) for k, v in n1.items() if len(n2.get(k, ())) < len(v))
+    if lost:
+        return "the retry matched fewer observation names for " + ", ".join(lost)
+    strict = lambda ps: sum(len(unmatched_covers(q, id_covers_count=True)) for q in ps)  # noqa: E731
+    if strict(retry) >= strict(first):
+        return "the retry did not leave fewer unmatched covers"
+    return None
+
+
+def _linked_ids(probes: list) -> set:
+    return {c.get("id") for q in probes for c in q.get("claims") or [] if isinstance(c, dict)}
+
+
 def _usable(resp, claim_ids: set) -> list:
     """The probes of a reply that pass validate_probe (after tidying ids and unescaping code)."""
     return [p for p in (resp or {}).get("probes", [])[:MAX_PROBES] if isinstance(p, dict)
@@ -402,6 +508,28 @@ def generate(provider: Provider, repo: str, pr: int, title: str, body: str | Non
                 resp = again
             else:
                 out["retried"]["kept_first_answer"] = "the retry linked no claim either"
+    elif by_id:
+        # Claims are linked, but a cover names no observation the code records. Its claim would then see nothing
+        # and the differences under the real names would look unclaimed. Ask once more; keep the retry only when
+        # retry_weakens finds nothing (a model call only, no search credits), so no probe, link or name is lost.
+        bad = [x for p in usable for x in unmatched_covers(p)]
+        if bad:
+            why = COVER_REASON.format(", ".join(bad[:6]))
+            out["retried"] = {"why": [why]}
+            try:
+                again = provider.complete_json("probes", probes_prompt, user + "\n\nYour previous answer had probes, but "
+                                               + why + ".", PROBES_SCHEMA, ctx)
+            except ProviderError as e:
+                out["errors"].append(f"retry: {e}")
+            else:
+                usable2 = _usable(again, set(by_id))
+                weak = retry_weakens(usable, usable2)
+                if weak is None and not _linked_ids(usable) <= _linked_ids(usable2):
+                    weak = "the retry linked fewer claims"
+                if weak is None:
+                    resp = again
+                else:
+                    out["retried"]["kept_first_answer"] = weak
     draft_probes: list = []
     for p in (resp or {}).get("probes", [])[:MAX_PROBES]:
         # Models name probes "P1" or "probe_x"; the id is only a file name, so normalise it rather than drop the probe
@@ -422,6 +550,9 @@ def generate(provider: Provider, repo: str, pr: int, title: str, body: str | Non
             continue
         draft_probes.append(p)
 
+    left = [x for p in draft_probes for x in unmatched_covers(p)]
+    if left:
+        out["unmatched_covers"] = left   # shown on the record; judging still decides from the observed names
     # Console HITL: freeze only after the operator approves / adds scenarios.
     from poc import hitl
     if hitl.hitl_enabled():
