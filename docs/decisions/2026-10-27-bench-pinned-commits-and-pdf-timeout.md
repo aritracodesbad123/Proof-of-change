@@ -30,7 +30,7 @@ local report with no remote fonts or images, so the cause is Chrome start-up, no
 2. The benchmark runner retries a case once, and only when the record says Contree could not be reached
    (`ContreeTransportError`). A test failure, a setup gap, any other Contree failure or any verdict from
    tests that ran is never retried. The result notes whether a retry happened.
-3. The PDF report is saved with each run and emailed when created by the main PDF maker. Each PDF starts a fresh headless Chrome with its own temporary profile, extra
+3. The PDF report is saved with every run. Each PDF starts a fresh headless Chrome with its own temporary profile, extra
    flags that stop background network, keychain and first-run waits, a 60-second hard limit and its own
    process group; on a hang the whole group is killed, and any process still using the temporary profile folder is killed after every PDF (a leftover helper holding the output pipe was what
    kept the run waiting). If Chrome is missing, fails or hangs, a built-in pure-Python PDF maker
