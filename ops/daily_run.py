@@ -54,7 +54,19 @@ sys.path.insert(0, str(REPO_ROOT))
 from guardrails import sandbox  # noqa: E402
 from guardrails.isolation import untrusted_env  # noqa: E402
 from harness.machine import detect_machine_type  # noqa: E402
-from poc import agents, behaviour_claims, cost, coverage_gate, diff_probes, freeze, local_config, model_probes, model_provider, probes  # noqa: E402,E501
+from poc import (  # noqa: E402,E501
+    agents,
+    behaviour_claims,
+    cost,
+    coverage_gate,
+    diff_probes,
+    freeze,
+    local_config,
+    model_probes,
+    model_provider,
+    pdf_always,
+    probes,
+)
 from poc.diff import confirm, pr_runs_too_noisy  # noqa: E402
 from poc.pr_text import github_read_token  # noqa: E402
 from poc.tool_setup import ToolSetupError, ensure_tools, uv_bin  # noqa: E402
@@ -5287,6 +5299,16 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
     run_progress.emit("fetch_pr", detail=f"{repo}#{item['pr']}")
     tag = f"{cfg['pkg']}-{item['pr']}"
     prdir = rdir / tag; prdir.mkdir(parents=True, exist_ok=True)
+    if not getattr(a, "no_report", False):
+        try:   # could-not-verify until the real report replaces it; a killed check still leaves this PDF
+            pdf_always.placeholder(report_dir_for(a, rdir), tag, f"{repo}#{item['pr']}")
+        except Exception as e:  # noqa: BLE001
+            print(f"note: placeholder PDF not written ({type(e).__name__})", file=sys.stderr)
+    try:   # could-not-verify record until finish() writes the real one; a killed check is counted as could_not_verify
+        (prdir / "record.json").write_text(json.dumps(
+            pdf_always.placeholder_record(repo, cfg["pkg"], item["pr"], item.get("title", "")), indent=1))
+    except Exception as e:  # noqa: BLE001
+        print(f"note: placeholder record not written ({type(e).__name__})", file=sys.stderr)
     work = workroot / tag
     shutil.rmtree(work, ignore_errors=True); work.mkdir(parents=True)
     pin_why = (apply_pinned_diff(repo, item, cfg["pkg"], work, prdir / "git.log")
@@ -6601,12 +6623,80 @@ def _run_batch_order(queue: list, rdir: Path, workroot: Path, a, machine: dict, 
     return out
 
 
+# Where this invocation's PDFs go, and whether its SUMMARY.pdf was written (poc/pdf_always.py fills the gaps).
+PDF_TARGET: dict = {"dir": None, "name": None, "summary_done": False}
+
+
+def report_dir_for(a, rdir: Path) -> Path:
+    return Path(a.report_dir) if getattr(a, "report_dir", None) else pdf_always.reports_root() / rdir.name
+
+
+class _StderrTail:
+    """Passes stderr through and keeps the last lines, so a refusal's reason can go into its PDF."""
+
+    def __init__(self, inner):
+        self.inner, self.lines = inner, []
+
+    def write(self, s):
+        self.lines.extend(x for x in str(s).splitlines() if x.strip())
+        del self.lines[:-20]
+        return self.inner.write(s)
+
+    def flush(self):
+        return self.inner.flush()
+
+    def __getattr__(self, k):
+        return getattr(self.inner, k)
+
+
+def _on_sigterm(signum, frame):  # noqa: ARG001
+    raise SystemExit(143)
+
+
 def main(argv=None) -> int:
+    """Runs _main; any run that ends without its SUMMARY.pdf (refused, provider refusal, stop signal, crash) gets
+    a no-go SUMMARY.pdf with the reason, made by the built-in PDF maker alone."""
+    args = list(sys.argv[1:] if argv is None else argv)
+    PDF_TARGET.update(dir=None, name=None, summary_done=False)
+    old_term = None
     try:
-        return _main(argv)
+        old_term = signal.signal(signal.SIGTERM, _on_sigterm)
+    except ValueError:   # not the main thread
+        pass
+    tail, real_err = _StderrTail(sys.stderr), sys.stderr
+    sys.stderr = tail
+    rc, reason = 1, None
+    try:
+        rc = _main(argv)
+        return rc
     except GitHubAuthError:
         print(AUTH_FAIL_MESSAGE, file=sys.stderr, flush=True)
-        return AUTH_FAIL_EXIT
+        rc = AUTH_FAIL_EXIT
+        return rc
+    except SystemExit as e:
+        rc = e.code
+        if isinstance(e.code, str):
+            reason = e.code
+        elif e.code == 143:
+            reason = "stopped by a stop signal (SIGTERM) before it finished"
+        raise
+    except BaseException as e:
+        rc, reason = 1, f"crashed: {type(e).__name__}: {e}"
+        raise
+    finally:
+        sys.stderr = real_err
+        if old_term is not None:
+            signal.signal(signal.SIGTERM, old_term)
+        skip = "--no-report" in args or "--select-only" in args or rc in (0, None)
+        if not skip and not PDF_TARGET["summary_done"]:
+            name = PDF_TARGET["name"] or ("refused-" + now_ist().strftime("%Y-%m-%d-%H%M%S"))
+            where = PDF_TARGET["dir"] or pdf_always.reports_root() / name
+            why = reason or (tail.lines[-1] if tail.lines else f"exit code {rc}")
+            try:
+                p = pdf_always.nogo_summary(where, name, why)
+                print(f"no-go summary PDF: {p}", file=real_err, flush=True)
+            except Exception as e:  # noqa: BLE001
+                print(f"ERROR: no-go summary PDF not written: {type(e).__name__}: {e}", file=real_err, flush=True)
 
 
 def _main(argv=None) -> int:
@@ -6830,6 +6920,12 @@ def _main(argv=None) -> int:
         return report_only(rdir, a)
     rdir.mkdir(parents=True, exist_ok=True)
     leave_run_pointer(rdir, started)
+    PDF_TARGET.update(dir=report_dir_for(a, rdir), name=rdir.name)
+    if not a.no_report and not a.select_only:
+        try:   # replaced by the real SUMMARY.pdf when the run finishes; a killed run still leaves this one
+            pdf_always.run_placeholder_summary(PDF_TARGET["dir"], rdir.name)
+        except Exception as e:  # noqa: BLE001
+            print(f"note: placeholder summary PDF not written ({type(e).__name__})", file=sys.stderr)
     if product_route(a):   # study runs and the daily study are unchanged: no lock
         try:
             a.run_lock = acquire_run_lock(rdir)
@@ -6921,7 +7017,8 @@ def _main(argv=None) -> int:
             rec = None
             if a.resume and prev.exists():
                 old = json.loads(prev.read_text())
-                if old.get("record_kind") == "pr_run" and old["pr"]["head_sha"] == c["head_sha"]:
+                if (old.get("record_kind") == "pr_run" and not old.get("harness_error")
+                        and old["pr"]["head_sha"] == c["head_sha"]):
                     rec = old
                     reused.append({"repo": repo, "pr": c["pr"],
                                    "from_invocation": old.get("tested_invocation") or 1,
@@ -7036,22 +7133,35 @@ def reviewer_reports(rdir: Path, a, records: list[dict], kind: str) -> bool:
 
     Returns False when the reports or summary show a verdict other than the final one in record.json
     (poc/final_verdict.py); the run then fails its self-check. Any other report error leaves the run's result alone."""
-    if not records or a.no_report:
+    if a.no_report:
+        return True
+    out = report_dir_for(a, rdir)
+    if not records:
+        pdf_always.records_pdfs(out, rdir.name, [], note="nothing tested")
+        PDF_TARGET["summary_done"] = True
+        print(f"nothing tested; summary PDF: {out / 'SUMMARY.pdf'}", flush=True)
         return True
     from reports.pr_report import VerdictMismatch, render_run
-    out = Path(a.report_dir) if a.report_dir else REPO_ROOT / "reports" / "daily" / rdir.name
     t_rep = time.time()
     try:
         render_run(rdir, out, title=f"Proof-of-Change {kind}: {rdir.name}")
         print(f"report and PDF: {round(time.time() - t_rep, 1)} s", flush=True)
     except VerdictMismatch as e:
+        PDF_TARGET["summary_done"] = True   # render_run wrote the summary before the self-check
         print("Self-check FAILED: the reports do not match record.json:\n" + "\n".join(f"- {x}" for x in e.lines),
               file=sys.stderr, flush=True)
         return False
-    except Exception as e:  # noqa: BLE001 - reports are a view of the saved records; they never change a verdict or exit code
+    except BaseException as e:  # noqa: BLE001 - reports are a view of the saved records; they never change a verdict or exit code
         print(f"reviewer reports could not be written ({type(e).__name__}); records and verdicts are unchanged",
               file=sys.stderr, flush=True)
+        rows = [((r.get("logs") or "").strip("/") or f"{r.get('library', 'pr')}-{r.get('pr')}", r) for r in records]
+        pdf_always.records_pdfs(out, rdir.name, rows, note=f"the full report could not be made ({type(e).__name__})")
+        PDF_TARGET["summary_done"] = True
+        print(f"simple PDFs written: {out / 'SUMMARY.pdf'}", file=sys.stderr, flush=True)
+        if isinstance(e, KeyboardInterrupt) or (isinstance(e, SystemExit) and e.code == 143):
+            raise
         return True
+    PDF_TARGET["summary_done"] = True
     print(f"\nDONE. Open this file to read the results:\n  {out / 'SUMMARY.html'}")
     if getattr(a, "poc_commit", None):
         print(f"commit={a.poc_commit[:7]}")

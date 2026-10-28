@@ -643,6 +643,20 @@ def _kill_process_group(pid: int) -> None:
             pass
 
 
+def timeout_pdfs(repo: str, pr: int, seconds: float) -> str | None:
+    """After a time-limit kill: a could-not-verify REPORT.pdf and a no-go SUMMARY.pdf (built-in maker only)."""
+    from poc import pdf_always
+    rid = f"{repo.split('/')[-1]}-{pr}"
+    where = REPORTS_DAILY / (time.strftime("%Y-%m-%d-%H%M%S") + f"-console-timeout-{rid}")
+    try:
+        rec = {"verdict": "could_not_verify",
+               "reason": f"the check was stopped after the {int(seconds)} s time limit, before it finished"}
+        return str(pdf_always.records_pdfs(where, f"{repo}#{pr}", [(rid, rec)], stopped="timed out"))
+    except Exception as e:  # noqa: BLE001
+        print(f"ERROR: timeout PDF not written: {type(e).__name__}: {e}", file=sys.stderr, flush=True)
+        return None
+
+
 def _read_child(proc: subprocess.Popen, logf, collected: list[str], deadline: float) -> tuple[int, bool]:
     """Read stdout until the child exits or the deadline. A silent child still hits the deadline.
 
@@ -1025,9 +1039,12 @@ def start_check(pr_url: str, *, model_provider: str = "nebius", owner: str | Non
                 tail = session_key.scrub(file_tail, secrets)
             found = find_record_for_pr(m.group(1), int(m.group(2)))
             # A written record means the check produced analysis — surface it even if exit!=0 (problems list).
-            ok = (returncode == 0 or found is not None) and not timed_out
+            from poc.pdf_always import is_placeholder
+            real = found is not None and not is_placeholder(found[0])
+            ok = (returncode == 0 or real) and not timed_out
             if timed_out:
                 emit("failed", detail="timed out")
+                job["timeout_pdf"] = timeout_pdfs(m.group(1), int(m.group(2)), CONSOLE_JOB_TIMEOUT_S)
             elif ok:
                 emit("done", detail="check finished" if returncode == 0 else "finished with problems")
             else:

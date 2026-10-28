@@ -19,7 +19,12 @@ def is_final(rec: dict) -> bool:
 
 
 def final(rec: dict) -> dict:
-    """The record with its final verdict and reason. Gated records are returned unchanged (a copy)."""
+    """The record with its final verdict and reason. Gated records are returned unchanged (a copy).
+
+    A placeholder (a check that started but did not finish, poc/pdf_always.py) is always could_not_verify."""
+    if rec.get("placeholder") or rec.get("record_kind") == "placeholder":
+        from poc.pdf_always import PLACEHOLDER_REASON
+        return dict(rec, verdict="could_not_verify", reason=rec.get("reason") or PLACEHOLDER_REASON)
     if is_final(rec):
         return dict(rec)
     from poc import coverage_gate
