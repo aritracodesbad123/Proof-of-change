@@ -201,7 +201,17 @@ def citation(fname: str, obs: dict, name: str) -> dict | None:
 
 
 def claim_for(spec: dict, name: str) -> dict | None:
-    return next((c for c in spec.get("claims", []) if _covers_name(c.get("covers"), name)), None)
+    """The claim an observation belongs to. When several claims cover the name, the most specific one wins: a cover
+    equal to the name beats a wildcard match, then the claim with fewer cover patterns, then the first claim."""
+    best, rank = None, None
+    for i, c in enumerate(spec.get("claims", []) or []):
+        if not isinstance(c, dict) or not _covers_name(c.get("covers"), name):
+            continue
+        covers = [p for p in c.get("covers") or [] if isinstance(p, str)]
+        r = (0 if name in covers else 1, len(covers), i)
+        if rank is None or r < rank:
+            best, rank = c, r
+    return best
 
 
 def _covers_name(covers, name: str) -> bool:
@@ -446,6 +456,60 @@ def _shape_link(out: list[dict]) -> None:
             r["advisory"], r["linked_by"], r["note"] = True, "shape", SHAPE_NOTE
 
 
+SIBLING_NOTE = "the same difference is proven by a claim in another probe, check"
+
+
+def _value_key(r: dict) -> tuple:
+    return (r.get("name"), json.dumps(r.get("main"), sort_keys=True, default=str),
+            json.dumps(r.get("pr"), sort_keys=True, default=str))
+
+
+def _all_runs(it: dict, name: str) -> str:
+    runs = it.get("runs") or {}
+    return json.dumps({side: [o.get(name, "<absent>") if isinstance(o, dict) else None for o in runs.get(side) or []]
+                       for side in ("main", "pr")}, sort_keys=True, default=str)
+
+
+def _exact_cover(claims: list, cid, name: str) -> bool:
+    """The claim names this observation exactly: a cover pattern equal to the name, with no wildcard."""
+    return any(isinstance(c, dict) and c.get("id") == cid and name in [p for p in c.get("covers") or []
+                                                                         if isinstance(p, str) and not any(
+                                                                             ch in p for ch in "*?[")]
+               for c in claims or [])
+
+
+def link_across_probes(items: list[dict]) -> list[dict]:
+    """Probes of one PR often print each other's observations. An unclaimed difference, or one that contradicts a
+    "same" claim, is advisory ("the same difference is proven by a claim in another probe, check") when another
+    probe of the same PR proves it for a claimed difference, and both of these hold:
+    - it is the same check: the same name with the same recorded values in every run on both sides, and
+    - the proving claim names it exactly (a cover with no wildcard).
+    A proving result that is itself advisory or unstable only on the PR never links. Differences unstable only on the
+    PR are never linked. It caps the verdict at could_not_verify instead of raising attention. Returns new items;
+    the input is not changed."""
+    proven: dict = {}
+    for it in items:
+        for r in it.get("observations") or []:
+            if (r.get("label") == FindingLabel.PROVEN.value and r.get("state") == "differs" and r.get("claim")
+                    and not r.get("advisory") and not r.get("pr_only")
+                    and _exact_cover(it.get("claims"), r.get("claim"), r.get("name"))):
+                key = (_value_key(r), _all_runs(it, r.get("name")))
+                proven.setdefault(key, set()).add(it.get("id"))
+    if not proven:
+        return items
+    out = []
+    for it in items:
+        obs = []
+        for r in it.get("observations") or []:
+            if (r.get("label") in (FindingLabel.UNMENTIONED_CHANGE.value, FindingLabel.FALSE_CLAIM.value)
+                    and r.get("state") == "differs" and not r.get("advisory") and not r.get("pr_only")
+                    and proven.get((_value_key(r), _all_runs(it, r.get("name"))), set()) - {it.get("id")}):
+                r = dict(r, advisory=True, linked_by="sibling", note=SIBLING_NOTE)
+            obs.append(r)
+        out.append(dict(it, observations=obs))
+    return out
+
+
 def run_once(path: Path, python: Path, cwd: Path, env: dict, timeout: int, launch=None,
              literal_output: bool = False) -> tuple[dict, str, float]:
     """launch(argv, env, cwd) -> (argv, env, cwd) wraps the command, e.g. into the sandbox (guardrails/sandbox.py)."""
@@ -610,7 +674,7 @@ def apply_status(probe_results: dict | None) -> dict | None:
     """Set each item's status and the overall status. Overall is uninformative only when every item is."""
     if not probe_results or not probe_results.get("items"):
         return probe_results
-    items = [classify_item(it) for it in probe_results["items"]]
+    items = link_across_probes([classify_item(it) for it in probe_results["items"]])
     statuses = [it.get("status") for it in items]
     if any(s == "ran" for s in statuses):
         status = "ran"
