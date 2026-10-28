@@ -3583,6 +3583,36 @@ def contree_coverage_run(item: dict, main_root: Path, pr_root: Path, targets: li
     return res | {"seconds": secs, "exit": rc, "log": "coverage-pytest.log", "where": "contree"}
 
 
+# Every run is findable under ops/runs/<date>/ (fix 51): a run written elsewhere (another --ops-dir, or a --date
+# name that is not a date) leaves a pointer line there, so the monitor and the daily check find it.
+RUNS_INDEX = REPO_ROOT / "ops" / "runs"
+RUN_POINTERS = "RUN_POINTERS.jsonl"
+
+
+def leave_run_pointer(rdir: Path, started: dt.datetime, index: Path | None = None) -> Path | None:
+    """Append {"run_dir", "started_ist"} to <index>/<YYYY-MM-DD>/RUN_POINTERS.jsonl unless rdir is already inside
+    that date folder or is a dated run folder directly under the index. Never fails the run."""
+    index = Path(index or RUNS_INDEX).resolve()
+    day = started.strftime("%Y-%m-%d")
+    rdir = Path(rdir).resolve()
+    if rdir.parent == index and rdir.name.startswith(day):
+        return None
+    if rdir == index / day or index / day in rdir.parents:
+        return None
+    try:
+        dest = index / day / RUN_POINTERS
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        line = json.dumps({"run_dir": str(rdir), "started_ist": started.strftime("%Y-%m-%d %H:%M:%S")})
+        seen = dest.read_text().splitlines() if dest.exists() else []
+        if not any(json.loads(x).get("run_dir") == str(rdir) for x in seen if x.strip()):
+            with dest.open("a") as fh:
+                fh.write(line + "\n")
+        return dest
+    except (OSError, ValueError) as e:
+        print(f"could not leave a run pointer under {index / day}: {e}", file=sys.stderr)
+        return None
+
+
 def gate(rec: dict) -> dict:
     """Apply the coverage gate (poc/coverage_gate.py) to a finished record; baselines without coverage skip it."""
     if not uses(rec.get("baseline"), "coverage"):
@@ -6787,6 +6817,7 @@ def _main(argv=None) -> int:
     if a.report_only:
         return report_only(rdir, a)
     rdir.mkdir(parents=True, exist_ok=True)
+    leave_run_pointer(rdir, started)
     if product_route(a):   # study runs and the daily study are unchanged: no lock
         try:
             a.run_lock = acquire_run_lock(rdir)
