@@ -1,0 +1,4075 @@
+{
+"schema_version": "1",
+"record_kind": "pr_run",
+"repo": "Textualize/rich",
+"pr": {
+"repo": "Textualize/rich",
+"number": 4147,
+"url": "https://github.com/Textualize/rich/pull/4147",
+"title": "Fix adjacent tag matching in ReprHighlighter",
+"base_sha": "46cebbb032f920eb096efbaf23cdc6fe9dd541f7",
+"base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+"head_sha": "3bd56b51d8b7fbaf54a8ed092ce12d2a010ae7d9",
+"merge_commit": "17555f568f4a3598d9f52649bac8377b27006769",
+"tested_main_sha": "9d8f9a372cc5916fd4781fec207ced7ddac2f08f",
+"tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+},
+"product_check": true,
+"verdict": "could_not_verify",
+"reason": "could not verify: probe(s) model-p1 have no linked claims and saw a difference no claim covers, so the change is not confirmed (83 test(s) ran on main, 84 on the PR; 1 new test(s) pass, 83 unchanged; probe: 8 difference(s) from a probe with no linked claims shown as advisory only; probe: 12 other observation(s) identical on both sides)",
+"comparison": {
+"same": 83,
+"same_skipped_both": 0,
+"regressions": [],
+"fixed": [],
+"new_tests_passing": 1,
+"new_tests_passing_ids": [
+"test_highlighter::test_repr_highlighter_adjacent_tags"
+],
+"new_tests_failing": [],
+"new_tests_skipped": [],
+"removed_tests": [],
+"reparametrized": [],
+"skipped_missing_dependency": [],
+"flaky": [],
+"pr_unstable": [],
+"pr_unstable_noisy": [],
+"environment": [],
+"other_changes": [],
+"preexisting_failures": [],
+"load_failed_both": [],
+"load_failed_pr": [],
+"load_failed_main": [],
+"executed": {
+"main": 83,
+"pr": 84
+},
+"messages": {}
+},
+"exit_check": {
+"explained": true,
+"problems": [],
+"detail": "all runs exited 0"
+},
+"coverage_gate": {
+"kind": "python",
+"changed": false,
+"confidence": "normal",
+"note": "1 of 1 changed executable line(s) ran (100%)",
+"measurement": "measured"
+},
+"changed_lines_total": 1,
+"changed_lines_covered": 1,
+"probe_changed_line_coverage": {
+"status": "measured",
+"side": "main",
+"probes": {
+"model-p1": {
+"status": "measured",
+"changed_lines_covered": 1,
+"changed_lines_total": 1,
+"adequacy": "adequate"
+}
+},
+"not_adequate": []
+},
+"tested": {
+"main": "main @ 9d8f9a372cc5 (base tip = first parent of the merge commit)",
+"pr": "GitHub test merge commit 17555f568f4a (refs/pull/4147/merge) of head 3bd56b51d8b7"
+},
+"sides": {
+"comparison_basis": "base tip vs GitHub test merge (refs/pull/N/merge)",
+"main_sha": "9d8f9a372cc5916fd4781fec207ced7ddac2f08f",
+"pr_sha": "17555f568f4a3598d9f52649bac8377b27006769",
+"merge_commit": "17555f568f4a3598d9f52649bac8377b27006769",
+"merge_parents": [
+"9d8f9a372cc5916fd4781fec207ced7ddac2f08f",
+"3bd56b51d8b7fbaf54a8ed092ce12d2a010ae7d9"
+],
+"merge_head_matches_pinned_head": true
+},
+"probes": {
+"status": "ran",
+"items": [
+{
+"id": "model-p1",
+"source": "model",
+"sha256": "9bfa725910a4f18501fef60511f671a354d1d2e787e1c5c79bae30afa01a514e",
+"target": "Textualize/rich#4147",
+"about": "model-written probe of the changed files (no description given)",
+"claims": [],
+"runs_per_side": 3,
+"per_run": [
+{
+"side": "main",
+"run": 1,
+"seconds": 3.9,
+"ok": true
+},
+{
+"side": "pr",
+"run": 1,
+"seconds": 3.0,
+"ok": true
+},
+{
+"side": "main",
+"run": 2,
+"seconds": 3.3,
+"ok": true
+},
+{
+"side": "pr",
+"run": 2,
+"seconds": 3.3,
+"ok": true
+},
+{
+"side": "main",
+"run": 3,
+"seconds": 3.0,
+"ok": true
+},
+{
+"side": "pr",
+"run": 3,
+"seconds": 3.0,
+"ok": true
+}
+],
+"runs": {
+"main": [
+{
+"c1.adjacent_spancount": 8,
+"c1.adjacent_spans": [
+[
+0,
+1,
+"<"
+],
+[
+1,
+2,
+"a"
+],
+[
+2,
+29,
+">content1</a><b>content2</b"
+],
+[
+29,
+30,
+">"
+],
+[
+12,
+13,
+"/"
+],
+[
+13,
+14,
+"a"
+],
+[
+27,
+28,
+"/"
+],
+[
+28,
+29,
+"b"
+]
+],
+"c2.adjacent_spancount": 8,
+"c2.adjacent_spans": [
+[
+0,
+1,
+"<"
+],
+[
+1,
+2,
+"a"
+],
+[
+2,
+29,
+">content1</a><b>content2</b"
+],
+[
+29,
+30,
+">"
+],
+[
+12,
+13,
+"/"
+],
+[
+13,
+14,
+"a"
+],
+[
+27,
+28,
+"/"
+],
+[
+28,
+29,
+"b"
+]
+],
+"c1.single_spancount": 6,
+"c1.single_spans": [
+[
+0,
+1,
+"<"
+],
+[
+1,
+4,
+"tag"
+],
+[
+4,
+15,
+">value</tag"
+],
+[
+15,
+16,
+">"
+],
+[
+11,
+12,
+"/"
+],
+[
+12,
+15,
+"tag"
+]
+],
+"c2.single_spancount": 6,
+"c2.single_spans": [
+[
+0,
+1,
+"<"
+],
+[
+1,
+4,
+"tag"
+],
+[
+4,
+15,
+">value</tag"
+],
+[
+15,
+16,
+">"
+],
+[
+11,
+12,
+"/"
+],
+[
+12,
+15,
+"tag"
+]
+],
+"c1.none_spancount": 0,
+"c1.none_spans": [],
+"c2.none_spancount": 0,
+"c2.none_spans": [],
+"c1.attrs_spancount": 8,
+"c1.attrs_spans": [
+[
+0,
+1,
+"<"
+],
+[
+1,
+2,
+"a"
+],
+[
+2,
+21,
+" href='url'>link</a"
+],
+[
+21,
+22,
+">"
+],
+[
+3,
+7,
+"href"
+],
+[
+8,
+13,
+"'url'"
+],
+[
+19,
+20,
+"/"
+],
+[
+20,
+21,
+"a"
+]
+],
+"c2.attrs_spancount": 8,
+"c2.attrs_spans": [
+[
+0,
+1,
+"<"
+],
+[
+1,
+2,
+"a"
+],
+[
+2,
+21,
+" href='url'>link</a"
+],
+[
+21,
+22,
+">"
+],
+[
+3,
+7,
+"href"
+],
+[
+8,
+13,
+"'url'"
+],
+[
+19,
+20,
+"/"
+],
+[
+20,
+21,
+"a"
+]
+],
+"c1.nested_spancount": 8,
+"c1.nested_spans": [
+[
+0,
+1,
+"<"
+],
+[
+1,
+2,
+"a"
+],
+[
+2,
+18,
+"><b>inner</b></a"
+],
+[
+18,
+19,
+">"
+],
+[
+12,
+13,
+"/"
+],
+[
+13,
+14,
+"b"
+],
+[
+16,
+17,
+"/"
+],
+[
+17,
+18,
+"a"
+]
+],
+"c2.nested_spancount": 8,
+"c2.nested_spans": [
+[
+0,
+1,
+"<"
+],
+[
+1,
+2,
+"a"
+],
+[
+2,
+18,
+"><b>inner</b></a"
+],
+[
+18,
+19,
+">"
+],
+[
+12,
+13,
+"/"
+],
+[
+13,
+14,
+"b"
+],
+[
+16,
+17,
+"/"
+],
+[
+17,
+18,
+"a"
+]
+]
+},
+{
+"c1.adjacent_spancount": 8,
+"c1.adjacent_spans": [
+[
+0,
+1,
+"<"
+],
+[
+1,
+2,
+"a"
+],
+[
+2,
+29,
+">content1</a><b>content2</b"
+],
+[
+29,
+30,
+">"
+],
+[
+12,
+13,
+"/"
+],
+[
+13,
+14,
+"a"
+],
+[
+27,
+28,
+"/"
+],
+[
+28,
+29,
+"b"
+]
+],
+"c2.adjacent_spancount": 8,
+"c2.adjacent_spans": [
+[
+0,
+1,
+"<"
+],
+[
+1,
+2,
+"a"
+],
+[
+2,
+29,
+">content1</a><b>content2</b"
+],
+[
+29,
+30,
+">"
+],
+[
+12,
+13,
+"/"
+],
+[
+13,
+14,
+"a"
+],
+[
+27,
+28,
+"/"
+],
+[
+28,
+29,
+"b"
+]
+],
+"c1.single_spancount": 6,
+"c1.single_spans": [
+[
+0,
+1,
+"<"
+],
+[
+1,
+4,
+"tag"
+],
+[
+4,
+15,
+">value</tag"
+],
+[
+15,
+16,
+">"
+],
+[
+11,
+12,
+"/"
+],
+[
+12,
+15,
+"tag"
+]
+],
+"c2.single_spancount": 6,
+"c2.single_spans": [
+[
+0,
+1,
+"<"
+],
+[
+1,
+4,
+"tag"
+],
+[
+4,
+15,
+">value</tag"
+],
+[
+15,
+16,
+">"
+],
+[
+11,
+12,
+"/"
+],
+[
+12,
+15,
+"tag"
+]
+],
+"c1.none_spancount": 0,
+"c1.none_spans": [],
+"c2.none_spancount": 0,
+"c2.none_spans": [],
+"c1.attrs_spancount": 8,
+"c1.attrs_spans": [
+[
+0,
+1,
+"<"
+],
+[
+1,
+2,
+"a"
+],
+[
+2,
+21,
+" href='url'>link</a"
+],
+[
+21,
+22,
+">"
+],
+[
+3,
+7,
+"href"
+],
+[
+8,
+13,
+"'url'"
+],
+[
+19,
+20,
+"/"
+],
+[
+20,
+21,
+"a"
+]
+],
+"c2.attrs_spancount": 8,
+"c2.attrs_spans": [
+[
+0,
+1,
+"<"
+],
+[
+1,
+2,
+"a"
+],
+[
+2,
+21,
+" href='url'>link</a"
+],
+[
+21,
+22,
+">"
+],
+[
+3,
+7,
+"href"
+],
+[
+8,
+13,
+"'url'"
+],
+[
+19,
+20,
+"/"
+],
+[
+20,
+21,
+"a"
+]
+],
+"c1.nested_spancount": 8,
+"c1.nested_spans": [
+[
+0,
+1,
+"<"
+],
+[
+1,
+2,
+"a"
+],
+[
+2,
+18,
+"><b>inner</b></a"
+],
+[
+18,
+19,
+">"
+],
+[
+12,
+13,
+"/"
+],
+[
+13,
+14,
+"b"
+],
+[
+16,
+17,
+"/"
+],
+[
+17,
+18,
+"a"
+]
+],
+"c2.nested_spancount": 8,
+"c2.nested_spans": [
+[
+0,
+1,
+"<"
+],
+[
+1,
+2,
+"a"
+],
+[
+2,
+18,
+"><b>inner</b></a"
+],
+[
+18,
+19,
+">"
+],
+[
+12,
+13,
+"/"
+],
+[
+13,
+14,
+"b"
+],
+[
+16,
+17,
+"/"
+],
+[
+17,
+18,
+"a"
+]
+]
+},
+{
+"c1.adjacent_spancount": 8,
+"c1.adjacent_spans": [
+[
+0,
+1,
+"<"
+],
+[
+1,
+2,
+"a"
+],
+[
+2,
+29,
+">content1</a><b>content2</b"
+],
+[
+29,
+30,
+">"
+],
+[
+12,
+13,
+"/"
+],
+[
+13,
+14,
+"a"
+],
+[
+27,
+28,
+"/"
+],
+[
+28,
+29,
+"b"
+]
+],
+"c2.adjacent_spancount": 8,
+"c2.adjacent_spans": [
+[
+0,
+1,
+"<"
+],
+[
+1,
+2,
+"a"
+],
+[
+2,
+29,
+">content1</a><b>content2</b"
+],
+[
+29,
+30,
+">"
+],
+[
+12,
+13,
+"/"
+],
+[
+13,
+14,
+"a"
+],
+[
+27,
+28,
+"/"
+],
+[
+28,
+29,
+"b"
+]
+],
+"c1.single_spancount": 6,
+"c1.single_spans": [
+[
+0,
+1,
+"<"
+],
+[
+1,
+4,
+"tag"
+],
+[
+4,
+15,
+">value</tag"
+],
+[
+15,
+16,
+">"
+],
+[
+11,
+12,
+"/"
+],
+[
+12,
+15,
+"tag"
+]
+],
+"c2.single_spancount": 6,
+"c2.single_spans": [
+[
+0,
+1,
+"<"
+],
+[
+1,
+4,
+"tag"
+],
+[
+4,
+15,
+">value</tag"
+],
+[
+15,
+16,
+">"
+],
+[
+11,
+12,
+"/"
+],
+[
+12,
+15,
+"tag"
+]
+],
+"c1.none_spancount": 0,
+"c1.none_spans": [],
+"c2.none_spancount": 0,
+"c2.none_spans": [],
+"c1.attrs_spancount": 8,
+"c1.attrs_spans": [
+[
+0,
+1,
+"<"
+],
+[
+1,
+2,
+"a"
+],
+[
+2,
+21,
+" href='url'>link</a"
+],
+[
+21,
+22,
+">"
+],
+[
+3,
+7,
+"href"
+],
+[
+8,
+13,
+"'url'"
+],
+[
+19,
+20,
+"/"
+],
+[
+20,
+21,
+"a"
+]
+],
+"c2.attrs_spancount": 8,
+"c2.attrs_spans": [
+[
+0,
+1,
+"<"
+],
+[
+1,
+2,
+"a"
+],
+[
+2,
+21,
+" href='url'>link</a"
+],
+[
+21,
+22,
+">"
+],
+[
+3,
+7,
+"href"
+],
+[
+8,
+13,
+"'url'"
+],
+[
+19,
+20,
+"/"
+],
+[
+20,
+21,
+"a"
+]
+],
+"c1.nested_spancount": 8,
+"c1.nested_spans": [
+[
+0,
+1,
+"<"
+],
+[
+1,
+2,
+"a"
+],
+[
+2,
+18,
+"><b>inner</b></a"
+],
+[
+18,
+19,
+">"
+],
+[
+12,
+13,
+"/"
+],
+[
+13,
+14,
+"b"
+],
+[
+16,
+17,
+"/"
+],
+[
+17,
+18,
+"a"
+]
+],
+"c2.nested_spancount": 8,
+"c2.nested_spans": [
+[
+0,
+1,
+"<"
+],
+[
+1,
+2,
+"a"
+],
+[
+2,
+18,
+"><b>inner</b></a"
+],
+[
+18,
+19,
+">"
+],
+[
+12,
+13,
+"/"
+],
+[
+13,
+14,
+"b"
+],
+[
+16,
+17,
+"/"
+],
+[
+17,
+18,
+"a"
+]
+]
+}
+],
+"pr": [
+{
+"c1.adjacent_spancount": 12,
+"c1.adjacent_spans": [
+[
+0,
+1,
+"<"
+],
+[
+1,
+2,
+"a"
+],
+[
+2,
+14,
+">content1</a"
+],
+[
+14,
+15,
+">"
+],
+[
+15,
+16,
+"<"
+],
+[
+16,
+17,
+"b"
+],
+[
+17,
+29,
+">content2</b"
+],
+[
+29,
+30,
+">"
+],
+[
+12,
+13,
+"/"
+],
+[
+13,
+14,
+"a"
+],
+[
+27,
+28,
+"/"
+],
+[
+28,
+29,
+"b"
+]
+],
+"c2.adjacent_spancount": 12,
+"c2.adjacent_spans": [
+[
+0,
+1,
+"<"
+],
+[
+1,
+2,
+"a"
+],
+[
+2,
+14,
+">content1</a"
+],
+[
+14,
+15,
+">"
+],
+[
+15,
+16,
+"<"
+],
+[
+16,
+17,
+"b"
+],
+[
+17,
+29,
+">content2</b"
+],
+[
+29,
+30,
+">"
+],
+[
+12,
+13,
+"/"
+],
+[
+13,
+14,
+"a"
+],
+[
+27,
+28,
+"/"
+],
+[
+28,
+29,
+"b"
+]
+],
+"c1.single_spancount": 6,
+"c1.single_spans": [
+[
+0,
+1,
+"<"
+],
+[
+1,
+4,
+"tag"
+],
+[
+4,
+15,
+">value</tag"
+],
+[
+15,
+16,
+">"
+],
+[
+11,
+12,
+"/"
+],
+[
+12,
+15,
+"tag"
+]
+],
+"c2.single_spancount": 6,
+"c2.single_spans": [
+[
+0,
+1,
+"<"
+],
+[
+1,
+4,
+"tag"
+],
+[
+4,
+15,
+">value</tag"
+],
+[
+15,
+16,
+">"
+],
+[
+11,
+12,
+"/"
+],
+[
+12,
+15,
+"tag"
+]
+],
+"c1.none_spancount": 0,
+"c1.none_spans": [],
+"c2.none_spancount": 0,
+"c2.none_spans": [],
+"c1.attrs_spancount": 8,
+"c1.attrs_spans": [
+[
+0,
+1,
+"<"
+],
+[
+1,
+2,
+"a"
+],
+[
+2,
+21,
+" href='url'>link</a"
+],
+[
+21,
+22,
+">"
+],
+[
+3,
+7,
+"href"
+],
+[
+8,
+13,
+"'url'"
+],
+[
+19,
+20,
+"/"
+],
+[
+20,
+21,
+"a"
+]
+],
+"c2.attrs_spancount": 8,
+"c2.attrs_spans": [
+[
+0,
+1,
+"<"
+],
+[
+1,
+2,
+"a"
+],
+[
+2,
+21,
+" href='url'>link</a"
+],
+[
+21,
+22,
+">"
+],
+[
+3,
+7,
+"href"
+],
+[
+8,
+13,
+"'url'"
+],
+[
+19,
+20,
+"/"
+],
+[
+20,
+21,
+"a"
+]
+],
+"c1.nested_spancount": 14,
+"c1.nested_spans": [
+[
+0,
+1,
+"<"
+],
+[
+1,
+2,
+"a"
+],
+[
+2,
+3,
+">"
+],
+[
+3,
+4,
+"<"
+],
+[
+4,
+5,
+"b"
+],
+[
+5,
+14,
+">inner</b"
+],
+[
+14,
+15,
+">"
+],
+[
+15,
+16,
+"<"
+],
+[
+16,
+18,
+"/a"
+],
+[
+18,
+19,
+">"
+],
+[
+12,
+13,
+"/"
+],
+[
+13,
+14,
+"b"
+],
+[
+16,
+17,
+"/"
+],
+[
+17,
+18,
+"a"
+]
+],
+"c2.nested_spancount": 14,
+"c2.nested_spans": [
+[
+0,
+1,
+"<"
+],
+[
+1,
+2,
+"a"
+],
+[
+2,
+3,
+">"
+],
+[
+3,
+4,
+"<"
+],
+[
+4,
+5,
+"b"
+],
+[
+5,
+14,
+">inner</b"
+],
+[
+14,
+15,
+">"
+],
+[
+15,
+16,
+"<"
+],
+[
+16,
+18,
+"/a"
+],
+[
+18,
+19,
+">"
+],
+[
+12,
+13,
+"/"
+],
+[
+13,
+14,
+"b"
+],
+[
+16,
+17,
+"/"
+],
+[
+17,
+18,
+"a"
+]
+]
+},
+{
+"c1.adjacent_spancount": 12,
+"c1.adjacent_spans": [
+[
+0,
+1,
+"<"
+],
+[
+1,
+2,
+"a"
+],
+[
+2,
+14,
+">content1</a"
+],
+[
+14,
+15,
+">"
+],
+[
+15,
+16,
+"<"
+],
+[
+16,
+17,
+"b"
+],
+[
+17,
+29,
+">content2</b"
+],
+[
+29,
+30,
+">"
+],
+[
+12,
+13,
+"/"
+],
+[
+13,
+14,
+"a"
+],
+[
+27,
+28,
+"/"
+],
+[
+28,
+29,
+"b"
+]
+],
+"c2.adjacent_spancount": 12,
+"c2.adjacent_spans": [
+[
+0,
+1,
+"<"
+],
+[
+1,
+2,
+"a"
+],
+[
+2,
+14,
+">content1</a"
+],
+[
+14,
+15,
+">"
+],
+[
+15,
+16,
+"<"
+],
+[
+16,
+17,
+"b"
+],
+[
+17,
+29,
+">content2</b"
+],
+[
+29,
+30,
+">"
+],
+[
+12,
+13,
+"/"
+],
+[
+13,
+14,
+"a"
+],
+[
+27,
+28,
+"/"
+],
+[
+28,
+29,
+"b"
+]
+],
+"c1.single_spancount": 6,
+"c1.single_spans": [
+[
+0,
+1,
+"<"
+],
+[
+1,
+4,
+"tag"
+],
+[
+4,
+15,
+">value</tag"
+],
+[
+15,
+16,
+">"
+],
+[
+11,
+12,
+"/"
+],
+[
+12,
+15,
+"tag"
+]
+],
+"c2.single_spancount": 6,
+"c2.single_spans": [
+[
+0,
+1,
+"<"
+],
+[
+1,
+4,
+"tag"
+],
+[
+4,
+15,
+">value</tag"
+],
+[
+15,
+16,
+">"
+],
+[
+11,
+12,
+"/"
+],
+[
+12,
+15,
+"tag"
+]
+],
+"c1.none_spancount": 0,
+"c1.none_spans": [],
+"c2.none_spancount": 0,
+"c2.none_spans": [],
+"c1.attrs_spancount": 8,
+"c1.attrs_spans": [
+[
+0,
+1,
+"<"
+],
+[
+1,
+2,
+"a"
+],
+[
+2,
+21,
+" href='url'>link</a"
+],
+[
+21,
+22,
+">"
+],
+[
+3,
+7,
+"href"
+],
+[
+8,
+13,
+"'url'"
+],
+[
+19,
+20,
+"/"
+],
+[
+20,
+21,
+"a"
+]
+],
+"c2.attrs_spancount": 8,
+"c2.attrs_spans": [
+[
+0,
+1,
+"<"
+],
+[
+1,
+2,
+"a"
+],
+[
+2,
+21,
+" href='url'>link</a"
+],
+[
+21,
+22,
+">"
+],
+[
+3,
+7,
+"href"
+],
+[
+8,
+13,
+"'url'"
+],
+[
+19,
+20,
+"/"
+],
+[
+20,
+21,
+"a"
+]
+],
+"c1.nested_spancount": 14,
+"c1.nested_spans": [
+[
+0,
+1,
+"<"
+],
+[
+1,
+2,
+"a"
+],
+[
+2,
+3,
+">"
+],
+[
+3,
+4,
+"<"
+],
+[
+4,
+5,
+"b"
+],
+[
+5,
+14,
+">inner</b"
+],
+[
+14,
+15,
+">"
+],
+[
+15,
+16,
+"<"
+],
+[
+16,
+18,
+"/a"
+],
+[
+18,
+19,
+">"
+],
+[
+12,
+13,
+"/"
+],
+[
+13,
+14,
+"b"
+],
+[
+16,
+17,
+"/"
+],
+[
+17,
+18,
+"a"
+]
+],
+"c2.nested_spancount": 14,
+"c2.nested_spans": [
+[
+0,
+1,
+"<"
+],
+[
+1,
+2,
+"a"
+],
+[
+2,
+3,
+">"
+],
+[
+3,
+4,
+"<"
+],
+[
+4,
+5,
+"b"
+],
+[
+5,
+14,
+">inner</b"
+],
+[
+14,
+15,
+">"
+],
+[
+15,
+16,
+"<"
+],
+[
+16,
+18,
+"/a"
+],
+[
+18,
+19,
+">"
+],
+[
+12,
+13,
+"/"
+],
+[
+13,
+14,
+"b"
+],
+[
+16,
+17,
+"/"
+],
+[
+17,
+18,
+"a"
+]
+]
+},
+{
+"c1.adjacent_spancount": 12,
+"c1.adjacent_spans": [
+[
+0,
+1,
+"<"
+],
+[
+1,
+2,
+"a"
+],
+[
+2,
+14,
+">content1</a"
+],
+[
+14,
+15,
+">"
+],
+[
+15,
+16,
+"<"
+],
+[
+16,
+17,
+"b"
+],
+[
+17,
+29,
+">content2</b"
+],
+[
+29,
+30,
+">"
+],
+[
+12,
+13,
+"/"
+],
+[
+13,
+14,
+"a"
+],
+[
+27,
+28,
+"/"
+],
+[
+28,
+29,
+"b"
+]
+],
+"c2.adjacent_spancount": 12,
+"c2.adjacent_spans": [
+[
+0,
+1,
+"<"
+],
+[
+1,
+2,
+"a"
+],
+[
+2,
+14,
+">content1</a"
+],
+[
+14,
+15,
+">"
+],
+[
+15,
+16,
+"<"
+],
+[
+16,
+17,
+"b"
+],
+[
+17,
+29,
+">content2</b"
+],
+[
+29,
+30,
+">"
+],
+[
+12,
+13,
+"/"
+],
+[
+13,
+14,
+"a"
+],
+[
+27,
+28,
+"/"
+],
+[
+28,
+29,
+"b"
+]
+],
+"c1.single_spancount": 6,
+"c1.single_spans": [
+[
+0,
+1,
+"<"
+],
+[
+1,
+4,
+"tag"
+],
+[
+4,
+15,
+">value</tag"
+],
+[
+15,
+16,
+">"
+],
+[
+11,
+12,
+"/"
+],
+[
+12,
+15,
+"tag"
+]
+],
+"c2.single_spancount": 6,
+"c2.single_spans": [
+[
+0,
+1,
+"<"
+],
+[
+1,
+4,
+"tag"
+],
+[
+4,
+15,
+">value</tag"
+],
+[
+15,
+16,
+">"
+],
+[
+11,
+12,
+"/"
+],
+[
+12,
+15,
+"tag"
+]
+],
+"c1.none_spancount": 0,
+"c1.none_spans": [],
+"c2.none_spancount": 0,
+"c2.none_spans": [],
+"c1.attrs_spancount": 8,
+"c1.attrs_spans": [
+[
+0,
+1,
+"<"
+],
+[
+1,
+2,
+"a"
+],
+[
+2,
+21,
+" href='url'>link</a"
+],
+[
+21,
+22,
+">"
+],
+[
+3,
+7,
+"href"
+],
+[
+8,
+13,
+"'url'"
+],
+[
+19,
+20,
+"/"
+],
+[
+20,
+21,
+"a"
+]
+],
+"c2.attrs_spancount": 8,
+"c2.attrs_spans": [
+[
+0,
+1,
+"<"
+],
+[
+1,
+2,
+"a"
+],
+[
+2,
+21,
+" href='url'>link</a"
+],
+[
+21,
+22,
+">"
+],
+[
+3,
+7,
+"href"
+],
+[
+8,
+13,
+"'url'"
+],
+[
+19,
+20,
+"/"
+],
+[
+20,
+21,
+"a"
+]
+],
+"c1.nested_spancount": 14,
+"c1.nested_spans": [
+[
+0,
+1,
+"<"
+],
+[
+1,
+2,
+"a"
+],
+[
+2,
+3,
+">"
+],
+[
+3,
+4,
+"<"
+],
+[
+4,
+5,
+"b"
+],
+[
+5,
+14,
+">inner</b"
+],
+[
+14,
+15,
+">"
+],
+[
+15,
+16,
+"<"
+],
+[
+16,
+18,
+"/a"
+],
+[
+18,
+19,
+">"
+],
+[
+12,
+13,
+"/"
+],
+[
+13,
+14,
+"b"
+],
+[
+16,
+17,
+"/"
+],
+[
+17,
+18,
+"a"
+]
+],
+"c2.nested_spancount": 14,
+"c2.nested_spans": [
+[
+0,
+1,
+"<"
+],
+[
+1,
+2,
+"a"
+],
+[
+2,
+3,
+">"
+],
+[
+3,
+4,
+"<"
+],
+[
+4,
+5,
+"b"
+],
+[
+5,
+14,
+">inner</b"
+],
+[
+14,
+15,
+">"
+],
+[
+15,
+16,
+"<"
+],
+[
+16,
+18,
+"/a"
+],
+[
+18,
+19,
+">"
+],
+[
+12,
+13,
+"/"
+],
+[
+13,
+14,
+"b"
+],
+[
+16,
+17,
+"/"
+],
+[
+17,
+18,
+"a"
+]
+]
+}
+]
+},
+"observations": [
+{
+"name": "c1.adjacent_spancount",
+"state": "differs",
+"label": "unmentioned",
+"claim": null,
+"main": 8,
+"pr": 12,
+"diffs": [
+{
+"field": "",
+"main": 8,
+"pr": 12
+}
+],
+"citations": {
+"main": {
+"file": "probe-model-p1-main-1.jsonl",
+"line": 1,
+"quote": "\"observation\": \"c1.adjacent_spancount\""
+},
+"pr": {
+"file": "probe-model-p1-pr-1.jsonl",
+"line": 1,
+"quote": "\"observation\": \"c1.adjacent_spancount\""
+}
+},
+"advisory": true
+},
+{
+"name": "c1.adjacent_spans",
+"state": "differs",
+"label": "unmentioned",
+"claim": null,
+"main": [
+[
+0,
+1,
+"<"
+],
+[
+1,
+2,
+"a"
+],
+[
+2,
+29,
+">content1</a><b>content2</b"
+],
+[
+29,
+30,
+">"
+],
+[
+12,
+13,
+"/"
+],
+[
+13,
+14,
+"a"
+],
+[
+27,
+28,
+"/"
+],
+[
+28,
+29,
+"b"
+]
+],
+"pr": [
+[
+0,
+1,
+"<"
+],
+[
+1,
+2,
+"a"
+],
+[
+2,
+14,
+">content1</a"
+],
+[
+14,
+15,
+">"
+],
+[
+15,
+16,
+"<"
+],
+[
+16,
+17,
+"b"
+],
+[
+17,
+29,
+">content2</b"
+],
+[
+29,
+30,
+">"
+],
+[
+12,
+13,
+"/"
+],
+[
+13,
+14,
+"a"
+],
+[
+27,
+28,
+"/"
+],
+[
+28,
+29,
+"b"
+]
+],
+"diffs": [
+{
+"field": "",
+"main": [
+[
+0,
+1,
+"<"
+],
+[
+1,
+2,
+"a"
+],
+[
+2,
+29,
+">content1</a><b>content2</b"
+],
+[
+29,
+30,
+">"
+],
+[
+12,
+13,
+"/"
+],
+[
+13,
+14,
+"a"
+],
+[
+27,
+28,
+"/"
+],
+[
+28,
+29,
+"b"
+]
+],
+"pr": [
+[
+0,
+1,
+"<"
+],
+[
+1,
+2,
+"a"
+],
+[
+2,
+14,
+">content1</a"
+],
+[
+14,
+15,
+">"
+],
+[
+15,
+16,
+"<"
+],
+[
+16,
+17,
+"b"
+],
+[
+17,
+29,
+">content2</b"
+],
+[
+29,
+30,
+">"
+],
+[
+12,
+13,
+"/"
+],
+[
+13,
+14,
+"a"
+],
+[
+27,
+28,
+"/"
+],
+[
+28,
+29,
+"b"
+]
+]
+}
+],
+"citations": {
+"main": {
+"file": "probe-model-p1-main-1.jsonl",
+"line": 2,
+"quote": "\"observation\": \"c1.adjacent_spans\""
+},
+"pr": {
+"file": "probe-model-p1-pr-1.jsonl",
+"line": 2,
+"quote": "\"observation\": \"c1.adjacent_spans\""
+}
+},
+"advisory": true
+},
+{
+"name": "c1.attrs_spancount",
+"state": "same",
+"label": "no_difference",
+"claim": null,
+"main": 8,
+"pr": 8,
+"citations": {
+"main": {
+"file": "probe-model-p1-main-1.jsonl",
+"line": 3,
+"quote": "\"observation\": \"c1.attrs_spancount\""
+},
+"pr": {
+"file": "probe-model-p1-pr-1.jsonl",
+"line": 3,
+"quote": "\"observation\": \"c1.attrs_spancount\""
+}
+}
+},
+{
+"name": "c1.attrs_spans",
+"state": "same",
+"label": "no_difference",
+"claim": null,
+"main": [
+[
+0,
+1,
+"<"
+],
+[
+1,
+2,
+"a"
+],
+[
+2,
+21,
+" href='url'>link</a"
+],
+[
+21,
+22,
+">"
+],
+[
+3,
+7,
+"href"
+],
+[
+8,
+13,
+"'url'"
+],
+[
+19,
+20,
+"/"
+],
+[
+20,
+21,
+"a"
+]
+],
+"pr": [
+[
+0,
+1,
+"<"
+],
+[
+1,
+2,
+"a"
+],
+[
+2,
+21,
+" href='url'>link</a"
+],
+[
+21,
+22,
+">"
+],
+[
+3,
+7,
+"href"
+],
+[
+8,
+13,
+"'url'"
+],
+[
+19,
+20,
+"/"
+],
+[
+20,
+21,
+"a"
+]
+],
+"citations": {
+"main": {
+"file": "probe-model-p1-main-1.jsonl",
+"line": 4,
+"quote": "\"observation\": \"c1.attrs_spans\""
+},
+"pr": {
+"file": "probe-model-p1-pr-1.jsonl",
+"line": 4,
+"quote": "\"observation\": \"c1.attrs_spans\""
+}
+}
+},
+{
+"name": "c1.nested_spancount",
+"state": "differs",
+"label": "unmentioned",
+"claim": null,
+"main": 8,
+"pr": 14,
+"diffs": [
+{
+"field": "",
+"main": 8,
+"pr": 14
+}
+],
+"citations": {
+"main": {
+"file": "probe-model-p1-main-1.jsonl",
+"line": 5,
+"quote": "\"observation\": \"c1.nested_spancount\""
+},
+"pr": {
+"file": "probe-model-p1-pr-1.jsonl",
+"line": 5,
+"quote": "\"observation\": \"c1.nested_spancount\""
+}
+},
+"advisory": true
+},
+{
+"name": "c1.nested_spans",
+"state": "differs",
+"label": "unmentioned",
+"claim": null,
+"main": [
+[
+0,
+1,
+"<"
+],
+[
+1,
+2,
+"a"
+],
+[
+2,
+18,
+"><b>inner</b></a"
+],
+[
+18,
+19,
+">"
+],
+[
+12,
+13,
+"/"
+],
+[
+13,
+14,
+"b"
+],
+[
+16,
+17,
+"/"
+],
+[
+17,
+18,
+"a"
+]
+],
+"pr": [
+[
+0,
+1,
+"<"
+],
+[
+1,
+2,
+"a"
+],
+[
+2,
+3,
+">"
+],
+[
+3,
+4,
+"<"
+],
+[
+4,
+5,
+"b"
+],
+[
+5,
+14,
+">inner</b"
+],
+[
+14,
+15,
+">"
+],
+[
+15,
+16,
+"<"
+],
+[
+16,
+18,
+"/a"
+],
+[
+18,
+19,
+">"
+],
+[
+12,
+13,
+"/"
+],
+[
+13,
+14,
+"b"
+],
+[
+16,
+17,
+"/"
+],
+[
+17,
+18,
+"a"
+]
+],
+"diffs": [
+{
+"field": "",
+"main": [
+[
+0,
+1,
+"<"
+],
+[
+1,
+2,
+"a"
+],
+[
+2,
+18,
+"><b>inner</b></a"
+],
+[
+18,
+19,
+">"
+],
+[
+12,
+13,
+"/"
+],
+[
+13,
+14,
+"b"
+],
+[
+16,
+17,
+"/"
+],
+[
+17,
+18,
+"a"
+]
+],
+"pr": [
+[
+0,
+1,
+"<"
+],
+[
+1,
+2,
+"a"
+],
+[
+2,
+3,
+">"
+],
+[
+3,
+4,
+"<"
+],
+[
+4,
+5,
+"b"
+],
+[
+5,
+14,
+">inner</b"
+],
+[
+14,
+15,
+">"
+],
+[
+15,
+16,
+"<"
+],
+[
+16,
+18,
+"/a"
+],
+[
+18,
+19,
+">"
+],
+[
+12,
+13,
+"/"
+],
+[
+13,
+14,
+"b"
+],
+[
+16,
+17,
+"/"
+],
+[
+17,
+18,
+"a"
+]
+]
+}
+],
+"citations": {
+"main": {
+"file": "probe-model-p1-main-1.jsonl",
+"line": 6,
+"quote": "\"observation\": \"c1.nested_spans\""
+},
+"pr": {
+"file": "probe-model-p1-pr-1.jsonl",
+"line": 6,
+"quote": "\"observation\": \"c1.nested_spans\""
+}
+},
+"advisory": true
+},
+{
+"name": "c1.none_spancount",
+"state": "same",
+"label": "no_difference",
+"claim": null,
+"main": 0,
+"pr": 0,
+"citations": {
+"main": {
+"file": "probe-model-p1-main-1.jsonl",
+"line": 7,
+"quote": "\"observation\": \"c1.none_spancount\""
+},
+"pr": {
+"file": "probe-model-p1-pr-1.jsonl",
+"line": 7,
+"quote": "\"observation\": \"c1.none_spancount\""
+}
+}
+},
+{
+"name": "c1.none_spans",
+"state": "same",
+"label": "no_difference",
+"claim": null,
+"main": [],
+"pr": [],
+"citations": {
+"main": {
+"file": "probe-model-p1-main-1.jsonl",
+"line": 8,
+"quote": "\"observation\": \"c1.none_spans\""
+},
+"pr": {
+"file": "probe-model-p1-pr-1.jsonl",
+"line": 8,
+"quote": "\"observation\": \"c1.none_spans\""
+}
+}
+},
+{
+"name": "c1.single_spancount",
+"state": "same",
+"label": "no_difference",
+"claim": null,
+"main": 6,
+"pr": 6,
+"citations": {
+"main": {
+"file": "probe-model-p1-main-1.jsonl",
+"line": 9,
+"quote": "\"observation\": \"c1.single_spancount\""
+},
+"pr": {
+"file": "probe-model-p1-pr-1.jsonl",
+"line": 9,
+"quote": "\"observation\": \"c1.single_spancount\""
+}
+}
+},
+{
+"name": "c1.single_spans",
+"state": "same",
+"label": "no_difference",
+"claim": null,
+"main": [
+[
+0,
+1,
+"<"
+],
+[
+1,
+4,
+"tag"
+],
+[
+4,
+15,
+">value</tag"
+],
+[
+15,
+16,
+">"
+],
+[
+11,
+12,
+"/"
+],
+[
+12,
+15,
+"tag"
+]
+],
+"pr": [
+[
+0,
+1,
+"<"
+],
+[
+1,
+4,
+"tag"
+],
+[
+4,
+15,
+">value</tag"
+],
+[
+15,
+16,
+">"
+],
+[
+11,
+12,
+"/"
+],
+[
+12,
+15,
+"tag"
+]
+],
+"citations": {
+"main": {
+"file": "probe-model-p1-main-1.jsonl",
+"line": 10,
+"quote": "\"observation\": \"c1.single_spans\""
+},
+"pr": {
+"file": "probe-model-p1-pr-1.jsonl",
+"line": 10,
+"quote": "\"observation\": \"c1.single_spans\""
+}
+}
+},
+{
+"name": "c2.adjacent_spancount",
+"state": "differs",
+"label": "unmentioned",
+"claim": null,
+"main": 8,
+"pr": 12,
+"diffs": [
+{
+"field": "",
+"main": 8,
+"pr": 12
+}
+],
+"citations": {
+"main": {
+"file": "probe-model-p1-main-1.jsonl",
+"line": 11,
+"quote": "\"observation\": \"c2.adjacent_spancount\""
+},
+"pr": {
+"file": "probe-model-p1-pr-1.jsonl",
+"line": 11,
+"quote": "\"observation\": \"c2.adjacent_spancount\""
+}
+},
+"advisory": true
+},
+{
+"name": "c2.adjacent_spans",
+"state": "differs",
+"label": "unmentioned",
+"claim": null,
+"main": [
+[
+0,
+1,
+"<"
+],
+[
+1,
+2,
+"a"
+],
+[
+2,
+29,
+">content1</a><b>content2</b"
+],
+[
+29,
+30,
+">"
+],
+[
+12,
+13,
+"/"
+],
+[
+13,
+14,
+"a"
+],
+[
+27,
+28,
+"/"
+],
+[
+28,
+29,
+"b"
+]
+],
+"pr": [
+[
+0,
+1,
+"<"
+],
+[
+1,
+2,
+"a"
+],
+[
+2,
+14,
+">content1</a"
+],
+[
+14,
+15,
+">"
+],
+[
+15,
+16,
+"<"
+],
+[
+16,
+17,
+"b"
+],
+[
+17,
+29,
+">content2</b"
+],
+[
+29,
+30,
+">"
+],
+[
+12,
+13,
+"/"
+],
+[
+13,
+14,
+"a"
+],
+[
+27,
+28,
+"/"
+],
+[
+28,
+29,
+"b"
+]
+],
+"diffs": [
+{
+"field": "",
+"main": [
+[
+0,
+1,
+"<"
+],
+[
+1,
+2,
+"a"
+],
+[
+2,
+29,
+">content1</a><b>content2</b"
+],
+[
+29,
+30,
+">"
+],
+[
+12,
+13,
+"/"
+],
+[
+13,
+14,
+"a"
+],
+[
+27,
+28,
+"/"
+],
+[
+28,
+29,
+"b"
+]
+],
+"pr": [
+[
+0,
+1,
+"<"
+],
+[
+1,
+2,
+"a"
+],
+[
+2,
+14,
+">content1</a"
+],
+[
+14,
+15,
+">"
+],
+[
+15,
+16,
+"<"
+],
+[
+16,
+17,
+"b"
+],
+[
+17,
+29,
+">content2</b"
+],
+[
+29,
+30,
+">"
+],
+[
+12,
+13,
+"/"
+],
+[
+13,
+14,
+"a"
+],
+[
+27,
+28,
+"/"
+],
+[
+28,
+29,
+"b"
+]
+]
+}
+],
+"citations": {
+"main": {
+"file": "probe-model-p1-main-1.jsonl",
+"line": 12,
+"quote": "\"observation\": \"c2.adjacent_spans\""
+},
+"pr": {
+"file": "probe-model-p1-pr-1.jsonl",
+"line": 12,
+"quote": "\"observation\": \"c2.adjacent_spans\""
+}
+},
+"advisory": true
+},
+{
+"name": "c2.attrs_spancount",
+"state": "same",
+"label": "no_difference",
+"claim": null,
+"main": 8,
+"pr": 8,
+"citations": {
+"main": {
+"file": "probe-model-p1-main-1.jsonl",
+"line": 13,
+"quote": "\"observation\": \"c2.attrs_spancount\""
+},
+"pr": {
+"file": "probe-model-p1-pr-1.jsonl",
+"line": 13,
+"quote": "\"observation\": \"c2.attrs_spancount\""
+}
+}
+},
+{
+"name": "c2.attrs_spans",
+"state": "same",
+"label": "no_difference",
+"claim": null,
+"main": [
+[
+0,
+1,
+"<"
+],
+[
+1,
+2,
+"a"
+],
+[
+2,
+21,
+" href='url'>link</a"
+],
+[
+21,
+22,
+">"
+],
+[
+3,
+7,
+"href"
+],
+[
+8,
+13,
+"'url'"
+],
+[
+19,
+20,
+"/"
+],
+[
+20,
+21,
+"a"
+]
+],
+"pr": [
+[
+0,
+1,
+"<"
+],
+[
+1,
+2,
+"a"
+],
+[
+2,
+21,
+" href='url'>link</a"
+],
+[
+21,
+22,
+">"
+],
+[
+3,
+7,
+"href"
+],
+[
+8,
+13,
+"'url'"
+],
+[
+19,
+20,
+"/"
+],
+[
+20,
+21,
+"a"
+]
+],
+"citations": {
+"main": {
+"file": "probe-model-p1-main-1.jsonl",
+"line": 14,
+"quote": "\"observation\": \"c2.attrs_spans\""
+},
+"pr": {
+"file": "probe-model-p1-pr-1.jsonl",
+"line": 14,
+"quote": "\"observation\": \"c2.attrs_spans\""
+}
+}
+},
+{
+"name": "c2.nested_spancount",
+"state": "differs",
+"label": "unmentioned",
+"claim": null,
+"main": 8,
+"pr": 14,
+"diffs": [
+{
+"field": "",
+"main": 8,
+"pr": 14
+}
+],
+"citations": {
+"main": {
+"file": "probe-model-p1-main-1.jsonl",
+"line": 15,
+"quote": "\"observation\": \"c2.nested_spancount\""
+},
+"pr": {
+"file": "probe-model-p1-pr-1.jsonl",
+"line": 15,
+"quote": "\"observation\": \"c2.nested_spancount\""
+}
+},
+"advisory": true
+},
+{
+"name": "c2.nested_spans",
+"state": "differs",
+"label": "unmentioned",
+"claim": null,
+"main": [
+[
+0,
+1,
+"<"
+],
+[
+1,
+2,
+"a"
+],
+[
+2,
+18,
+"><b>inner</b></a"
+],
+[
+18,
+19,
+">"
+],
+[
+12,
+13,
+"/"
+],
+[
+13,
+14,
+"b"
+],
+[
+16,
+17,
+"/"
+],
+[
+17,
+18,
+"a"
+]
+],
+"pr": [
+[
+0,
+1,
+"<"
+],
+[
+1,
+2,
+"a"
+],
+[
+2,
+3,
+">"
+],
+[
+3,
+4,
+"<"
+],
+[
+4,
+5,
+"b"
+],
+[
+5,
+14,
+">inner</b"
+],
+[
+14,
+15,
+">"
+],
+[
+15,
+16,
+"<"
+],
+[
+16,
+18,
+"/a"
+],
+[
+18,
+19,
+">"
+],
+[
+12,
+13,
+"/"
+],
+[
+13,
+14,
+"b"
+],
+[
+16,
+17,
+"/"
+],
+[
+17,
+18,
+"a"
+]
+],
+"diffs": [
+{
+"field": "",
+"main": [
+[
+0,
+1,
+"<"
+],
+[
+1,
+2,
+"a"
+],
+[
+2,
+18,
+"><b>inner</b></a"
+],
+[
+18,
+19,
+">"
+],
+[
+12,
+13,
+"/"
+],
+[
+13,
+14,
+"b"
+],
+[
+16,
+17,
+"/"
+],
+[
+17,
+18,
+"a"
+]
+],
+"pr": [
+[
+0,
+1,
+"<"
+],
+[
+1,
+2,
+"a"
+],
+[
+2,
+3,
+">"
+],
+[
+3,
+4,
+"<"
+],
+[
+4,
+5,
+"b"
+],
+[
+5,
+14,
+">inner</b"
+],
+[
+14,
+15,
+">"
+],
+[
+15,
+16,
+"<"
+],
+[
+16,
+18,
+"/a"
+],
+[
+18,
+19,
+">"
+],
+[
+12,
+13,
+"/"
+],
+[
+13,
+14,
+"b"
+],
+[
+16,
+17,
+"/"
+],
+[
+17,
+18,
+"a"
+]
+]
+}
+],
+"citations": {
+"main": {
+"file": "probe-model-p1-main-1.jsonl",
+"line": 16,
+"quote": "\"observation\": \"c2.nested_spans\""
+},
+"pr": {
+"file": "probe-model-p1-pr-1.jsonl",
+"line": 16,
+"quote": "\"observation\": \"c2.nested_spans\""
+}
+},
+"advisory": true
+},
+{
+"name": "c2.none_spancount",
+"state": "same",
+"label": "no_difference",
+"claim": null,
+"main": 0,
+"pr": 0,
+"citations": {
+"main": {
+"file": "probe-model-p1-main-1.jsonl",
+"line": 17,
+"quote": "\"observation\": \"c2.none_spancount\""
+},
+"pr": {
+"file": "probe-model-p1-pr-1.jsonl",
+"line": 17,
+"quote": "\"observation\": \"c2.none_spancount\""
+}
+}
+},
+{
+"name": "c2.none_spans",
+"state": "same",
+"label": "no_difference",
+"claim": null,
+"main": [],
+"pr": [],
+"citations": {
+"main": {
+"file": "probe-model-p1-main-1.jsonl",
+"line": 18,
+"quote": "\"observation\": \"c2.none_spans\""
+},
+"pr": {
+"file": "probe-model-p1-pr-1.jsonl",
+"line": 18,
+"quote": "\"observation\": \"c2.none_spans\""
+}
+}
+},
+{
+"name": "c2.single_spancount",
+"state": "same",
+"label": "no_difference",
+"claim": null,
+"main": 6,
+"pr": 6,
+"citations": {
+"main": {
+"file": "probe-model-p1-main-1.jsonl",
+"line": 19,
+"quote": "\"observation\": \"c2.single_spancount\""
+},
+"pr": {
+"file": "probe-model-p1-pr-1.jsonl",
+"line": 19,
+"quote": "\"observation\": \"c2.single_spancount\""
+}
+}
+},
+{
+"name": "c2.single_spans",
+"state": "same",
+"label": "no_difference",
+"claim": null,
+"main": [
+[
+0,
+1,
+"<"
+],
+[
+1,
+4,
+"tag"
+],
+[
+4,
+15,
+">value</tag"
+],
+[
+15,
+16,
+">"
+],
+[
+11,
+12,
+"/"
+],
+[
+12,
+15,
+"tag"
+]
+],
+"pr": [
+[
+0,
+1,
+"<"
+],
+[
+1,
+4,
+"tag"
+],
+[
+4,
+15,
+">value</tag"
+],
+[
+15,
+16,
+">"
+],
+[
+11,
+12,
+"/"
+],
+[
+12,
+15,
+"tag"
+]
+],
+"citations": {
+"main": {
+"file": "probe-model-p1-main-1.jsonl",
+"line": 20,
+"quote": "\"observation\": \"c2.single_spans\""
+},
+"pr": {
+"file": "probe-model-p1-pr-1.jsonl",
+"line": 20,
+"quote": "\"observation\": \"c2.single_spans\""
+}
+}
+}
+],
+"probe_changed_line_coverage": {
+"status": "measured",
+"changed_lines_total": 1,
+"changed_lines_covered": 1,
+"files": [
+{
+"file": "rich/highlighter.py",
+"changed_lines_total": 1,
+"changed_lines_covered": 1
+}
+],
+"adequacy": "adequate",
+"note": "ran 1 of 1 changed line(s) on the main side",
+"exit": 0,
+"data": "probe-cov-model-p1.json",
+"where": "contree"
+},
+"status": "ran"
+}
+]
+},
+"probe_plan": {
+"model_claims": [
+{
+"id": "C1",
+"text": "Previously, the regex used a greedy match for tag contents, causing adjacent tags such as `<a>content1</a><b>content2</b>` to be merged into a single match.",
+"source_quote": "Previously, the regex used a greedy match for tag contents, causing adjacent tags such as:\n\n<a>content1</a><b>content2</b>\n\nto be merged into a single match.",
+"testable": true,
+"expect": "differs"
+},
+{
+"id": "C2",
+"text": "The regex has been updated to correctly handle adjacent tags while preserving existing behavior.",
+"source_quote": "The regex has been updated to correctly handle adjacent tags while preserving existing behavior.",
+"testable": true,
+"expect": "same"
+}
+]
+}
+}
