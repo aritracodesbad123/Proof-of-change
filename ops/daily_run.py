@@ -830,7 +830,8 @@ def source_pair(repo: str, item: dict, work: Path, log: Path, python: str, timeo
     steps = [["git", "clone", "-q", "--filter=blob:none", "--no-checkout", f"https://github.com/{repo}.git", src],
              ["git", "-C", src, "fetch", "-q", "origin", f"pull/{item['pr']}/head", item["base_ref"]]]
     for c in steps:
-        rc, _ = run(c, log, env=env, timeout=900)
+        rc, _ = (clone_with_retry(c, src, log, env, timeout=900) if c[1] == "clone"
+                 else run(c, log, env=env, timeout=900))
         if rc != 0:
             return {"ok": False, "why": f"git step failed ({rc}): {' '.join(map(str, c[:4]))}"}
     head = item["head_sha"]
@@ -846,7 +847,10 @@ def source_pair(repo: str, item: dict, work: Path, log: Path, python: str, timeo
                                                              " (pinned head differs from current head)"),
                 "main_sha": mb, "pr_sha": head}
     else:
-        rc, _ = run(["git", "-C", src, "fetch", "-q", "origin", f"pull/{item['pr']}/merge"], log, env=env, timeout=300)
+        merge_fetch = ["git", "-C", src, "fetch", "-q", "origin", f"pull/{item['pr']}/merge"]
+        rc, _ = run(merge_fetch, log, env=env, timeout=300)
+        if rc != 0:   # retry once before falling back to a merge-base comparison
+            rc, _ = run(merge_fetch, log, env=env, timeout=300)
         merge = subprocess.run(["git", "-C", src, "rev-parse", "FETCH_HEAD"], env=env, capture_output=True, text=True).stdout.strip()
         if rc != 0 or not merge:
             mb = subprocess.run(["git", "-C", src, "merge-base", head, base_tip], env=env, capture_output=True, text=True).stdout.strip()
@@ -882,7 +886,8 @@ def pinned_clone(repo: str, pinned: dict, work: Path, log: Path) -> str | None:
     steps = [["git", "clone", "-q", "--filter=blob:none", "--no-checkout", f"https://github.com/{repo}.git", src],
              ["git", "-C", src, "fetch", "-q", "origin", pinned["main"], pinned["pr"]]]
     for c in steps:
-        rc, _ = run(c, log, env=env, timeout=900)
+        rc, _ = (clone_with_retry(c, src, log, env, timeout=900) if c[1] == "clone"
+                 else run(c, log, env=env, timeout=900))
         if rc != 0:
             return f"git step failed ({rc}): {' '.join(map(str, c[:4]))}"
     return None
@@ -1669,7 +1674,7 @@ def _project_file_dirs(repo: str, item: dict, work: Path, log: Path) -> list[Pat
     if ref:
         cmd.extend(["--branch", ref])
     cmd.extend([f"https://github.com/{repo}.git", str(dest)])
-    rc, _ = run(cmd, log, env=base_env(work / "home-git"), timeout=900)
+    rc, _ = clone_with_retry(cmd, dest, log, base_env(work / "home-git"), timeout=900)
     if rc != 0 or not dest.is_dir() or not any(dest.iterdir()):
         shutil.rmtree(dest, ignore_errors=True)
         return []
@@ -2401,24 +2406,47 @@ def _wait_child(p: subprocess.Popen, timeout, t0: float):
             _heartbeat(int(time.time() - t0))
 
 
-GIT_LOW_SPEED_LIMIT = 1000   # bytes/s; a git download slower than this for GIT_LOW_SPEED_TIME seconds gives up
+GIT_LOW_SPEED_LIMIT = 1000   # bytes/s; a clone slower than this for GIT_LOW_SPEED_TIME seconds gives up and is retried
 GIT_LOW_SPEED_TIME = 60
-_GIT_NETWORK = {"clone", "fetch", "pull", "ls-remote"}
+GIT_CLONE_ATTEMPTS = 3       # attempts with the limit; then one last attempt without it (step timeout only)
 
 
 def with_stall_limit(cmd):
-    """A git clone/fetch gets low-speed limits so a stalled download fails within about a minute, not at the step
-    timeout. Any other command is returned unchanged."""
+    """A `git clone` gets low-speed limits so a stalled download fails within about a minute, not at the step
+    timeout. Only clone: a fetch (pull/N/head, pull/N/merge, a pinned SHA) can sit silent while GitHub packs a large
+    repo, and a failed merge-ref fetch quietly changes the comparison basis, so fetches are left alone. Any other
+    command is returned unchanged."""
     cmd = list(cmd)
     if not cmd or Path(str(cmd[0])).name != "git":
         return cmd
     i = 1
     while i < len(cmd) and str(cmd[i]) in ("-C", "-c"):
         i += 2
-    if i >= len(cmd) or str(cmd[i]) not in _GIT_NETWORK:
+    if i >= len(cmd) or str(cmd[i]) != "clone":
         return cmd
     return [cmd[0], "-c", f"http.lowSpeedLimit={GIT_LOW_SPEED_LIMIT}",
             "-c", f"http.lowSpeedTime={GIT_LOW_SPEED_TIME}", *cmd[1:]]
+
+
+def clone_with_retry(cmd, dest, log_path: Path, env, timeout=900, attempts: int | None = None) -> tuple[int, float]:
+    """Run a `git clone` with the stall limit, retrying a failed attempt (the partial dest is removed first) up to
+    GIT_CLONE_ATTEMPTS times. If every limited attempt fails, one last attempt runs without the limit, bounded only by
+    the step timeout, so a repo that is merely slow to pack still clones. Returns (rc of the last attempt,
+    total seconds)."""
+    attempts = GIT_CLONE_ATTEMPTS if attempts is None else attempts
+    total, rc = 0.0, 1
+    for n in range(attempts + 1):
+        shutil.rmtree(dest, ignore_errors=True)
+        c = with_stall_limit(cmd) if n < attempts else list(cmd)
+        if n:
+            with open(log_path, "a") as fh:
+                fh.write(f"[git clone attempt {n + 1} of {attempts + 1}"
+                         f"{', without the stall limit' if n == attempts else ''}]\n")
+        rc, dt = run(c, log_path, env=env, timeout=timeout)
+        total += dt if isinstance(dt, (int, float)) else 0.0
+        if rc == 0:
+            break
+    return rc, total
 
 
 def run(cmd, log_path: Path, cwd=None, env=None, timeout=None, sbx=HOST) -> tuple[int, float]:
@@ -2427,7 +2455,6 @@ def run(cmd, log_path: Path, cwd=None, env=None, timeout=None, sbx=HOST) -> tupl
     if env is None:
         raise ValueError("run() needs an explicit allowlisted env (base_env)")
     t0 = time.time()
-    cmd = with_stall_limit(cmd)
     shown = list(map(str, cmd))
     if sbx is not None and _CONTREE_ONLY:
         with open(log_path, "a") as fh:
