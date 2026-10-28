@@ -3,10 +3,10 @@ from poc import probes
 FL = probes.FindingLabel
 
 
-def _item(pid, claims, main, pr):
+def _item(pid, claims, main, pr):  # noqa: D103
     spec = {"id": pid, "source": "model", "claims": claims}
     runs = {"main": [dict(main) for _ in range(3)], "pr": [dict(pr) for _ in range(3)]}
-    return {"id": pid, "claims": claims, "observations": probes.judge(spec, runs)}
+    return {"id": pid, "claims": claims, "runs": runs, "observations": probes.judge(spec, runs)}
 
 
 C1 = [{"id": "C1", "text": "x echoes ^D", "covers": ["C1.out"], "expect": "differs"}]
@@ -42,3 +42,25 @@ def test_same_claim_contradiction_proven_elsewhere_is_advisory():
     items = probes.link_across_probes([_item("model-p1", C1, M, P), _item("model-p2", same, M, P)])
     o = _obs(items, "model-p2", "C1.out")
     assert o["label"] == FL.FALSE_CLAIM.value and o["advisory"]
+
+
+def test_wildcard_cover_does_not_link():
+    wild = [{"id": "C1", "text": "x echoes ^D", "covers": ["C1.*"], "expect": "differs"}]
+    items = probes.link_across_probes([_item("model-p1", wild, M, P), _item("model-p2", C2, M, P)])
+    assert not _obs(items, "model-p2", "C1.out").get("advisory")
+
+
+def test_different_runs_are_a_different_check():
+    a = _item("model-p1", C1, M, P)
+    b = _item("model-p2", C2, M, P)
+    b["runs"]["main"][1] = dict(M, **{"C1.out": 5})   # one run of the sibling saw another value
+    items = probes.link_across_probes([a, b])
+    assert not _obs(items, "model-p2", "C1.out").get("advisory")
+
+
+def test_advisory_or_pr_unstable_proof_does_not_link():
+    for mark in ({"advisory": True}, {"pr_only": "regression"}):
+        a = _item("model-p1", C1, M, P)
+        a["observations"] = [dict(o, **mark) if o["name"] == "C1.out" else o for o in a["observations"]]
+        items = probes.link_across_probes([a, _item("model-p2", C2, M, P)])
+        assert not _obs(items, "model-p2", "C1.out").get("advisory"), mark

@@ -454,17 +454,37 @@ def _value_key(r: dict) -> tuple:
             json.dumps(r.get("pr"), sort_keys=True, default=str))
 
 
+def _all_runs(it: dict, name: str) -> str:
+    runs = it.get("runs") or {}
+    return json.dumps({side: [o.get(name, "<absent>") if isinstance(o, dict) else None for o in runs.get(side) or []]
+                       for side in ("main", "pr")}, sort_keys=True, default=str)
+
+
+def _exact_cover(claims: list, cid, name: str) -> bool:
+    """The claim names this observation exactly: a cover pattern equal to the name, with no wildcard."""
+    return any(isinstance(c, dict) and c.get("id") == cid and name in [p for p in c.get("covers") or []
+                                                                         if isinstance(p, str) and not any(
+                                                                             ch in p for ch in "*?[")]
+               for c in claims or [])
+
+
 def link_across_probes(items: list[dict]) -> list[dict]:
     """Probes of one PR often print each other's observations. An unclaimed difference, or one that contradicts a
     "same" claim, is advisory ("the same difference is proven by a claim in another probe, check") when another
-    probe of the same PR proves a claimed difference with the same name and the same base and PR values. It caps the
-    verdict at could_not_verify instead of raising attention. Differences unstable only on the PR are never linked.
-    Returns new items; the input is not changed."""
+    probe of the same PR proves it for a claimed difference, and both of these hold:
+    - it is the same check: the same name with the same recorded values in every run on both sides, and
+    - the proving claim names it exactly (a cover with no wildcard).
+    A proving result that is itself advisory or unstable only on the PR never links. Differences unstable only on the
+    PR are never linked. It caps the verdict at could_not_verify instead of raising attention. Returns new items;
+    the input is not changed."""
     proven: dict = {}
     for it in items:
         for r in it.get("observations") or []:
-            if r.get("label") == FindingLabel.PROVEN.value and r.get("state") == "differs" and r.get("claim"):
-                proven.setdefault(_value_key(r), set()).add(it.get("id"))
+            if (r.get("label") == FindingLabel.PROVEN.value and r.get("state") == "differs" and r.get("claim")
+                    and not r.get("advisory") and not r.get("pr_only")
+                    and _exact_cover(it.get("claims"), r.get("claim"), r.get("name"))):
+                key = (_value_key(r), _all_runs(it, r.get("name")))
+                proven.setdefault(key, set()).add(it.get("id"))
     if not proven:
         return items
     out = []
@@ -473,7 +493,7 @@ def link_across_probes(items: list[dict]) -> list[dict]:
         for r in it.get("observations") or []:
             if (r.get("label") in (FindingLabel.UNMENTIONED_CHANGE.value, FindingLabel.FALSE_CLAIM.value)
                     and r.get("state") == "differs" and not r.get("advisory") and not r.get("pr_only")
-                    and proven.get(_value_key(r), set()) - {it.get("id")}):
+                    and proven.get((_value_key(r), _all_runs(it, r.get("name"))), set()) - {it.get("id")}):
                 r = dict(r, advisory=True, linked_by="sibling", note=SIBLING_NOTE)
             obs.append(r)
         out.append(dict(it, observations=obs))
