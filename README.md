@@ -21,8 +21,11 @@ A person starts a check from the command line, the web console, or the GitHub Ap
 writes its own PR comment and check result. The check loads the recorded head commit and a base side, reads claims
 that must quote the pull request text, and drafts probes; on the web console a person can keep or drop those probes
 and add up to 20 test ideas in plain words. It reads the project's own setup files and a crawl of the repository and
-its docs, then runs the code in a sandbox: local bubblewrap, or Contree. The sandbox gets no secret keys, and the
-network is on only for installs. Tests and probes run on main and on the pull request, and coverage checks whether
+its docs. The GitHub App, the request worker, and a hosted console run pull-request code only in Contree.
+A hosted console is one with POC_HOSTED=1, or one on Render or a Space, and not a single-user Codespace.
+If Contree cannot start, the check stops and the result is could not verify. The command line, a local
+console, and a study run are unchanged: local bubblewrap is still the default. The sandbox gets no secret
+keys, and the network is on only for installs. Tests and probes run on main and on the pull request, and coverage checks whether
 the changed lines ran. The verdict comes from the test evidence for each claim, and the second opinion does not
 change it.
 
@@ -84,19 +87,9 @@ Built, and not confirmed on the live Contree service: measuring test coverage in
 | **What is different?** | Models may write claims/probes and explanations, but **plain code owns the verdict**. |
 | **What does the swarm do?** | After the code verdict: **Ultra** labels findings, **Lightning** suggests noise/install notes, **Super** writes a quote-checked summary. Those three roles are **advisory**. **Super** also extracts claims and writes probes earlier (that path *can* affect the verdict via executed probe diffs). |
 | **NVIDIA Nemotron?** | Super / Ultra / Lightning (Nano fallback) via configured model IDs in `poc/model_provider.py`. |
-| **Nebius at runtime?** | OpenAI-compatible chat completions at `https://api.tokenfactory.nebius.com/v1` using `NEBIUS_API_KEY` in the orchestrator only. Optional Contree sandboxes need the project ID as `NEBIUS_PROJECT_ID` for command-line and daily runs; a console check uses only the key and project ID typed into its start form. |
+| **Nebius at runtime?** | OpenAI-compatible chat completions at `https://api.tokenfactory.nebius.com/v1` using `NEBIUS_API_KEY` in the orchestrator only. Optional Contree sandboxes need the project ID as `NEBIUS_PROJECT_ID` for command-line and daily runs; a local console uses the key and project ID typed into its start form, while a hosted console ignores typed keys and uses only the server's private settings (`NEBIUS_API_KEY` and `NEBIUS_PROJECT_ID`). |
 | **Try it?** | Judges: see [For judges](#for-judges). The results page replays finished checks in the browser. A request issue can run a new check. A Codespace can try one, but live checks there are not confirmed yet. Live checks need Linux. |
 | **Reproduce evaluation?** | See [`reports/AGENT_SWARM_EVALUATION.md`](reports/AGENT_SWARM_EVALUATION.md). Quick gate: `make test` (or `python -m evals.run_evals --observations evals/fixtures/golden_v1.jsonl --require-golden --require-v1`). |
-| **Demo video** | _TODO: public YouTube ≤3 min_ — script in [`reports/DEMO_SCRIPT_3MIN.md`](reports/DEMO_SCRIPT_3MIN.md). |
-
-```mermaid
-flowchart TD
-  prInput[PR_URL] --> claimsProbes[Super_claims_and_probes]
-  claimsProbes --> dualRun[Base_vs_PR_pytest_and_probes]
-  dualRun --> codeVerdict[verdict_for_plus_gates]
-  codeVerdict --> swarm[advisory_Ultra_Lightning_Super]
-  swarm --> report[record_and_report]
-```
 
 ## For judges
 
@@ -131,7 +124,7 @@ the keys in a root-only settings file. Pull-request code still runs only in Cont
 
 Live checks in a Codespace have not been confirmed to work yet. For a result you can rely on, use the results page or [Request a check](#request-a-check). The steps below are for trying it anyway.
 
-A Codespace usually cannot start bubblewrap, the local safety sandbox. A live check there therefore runs in Contree sandboxes, and that needs your own Nebius API key and Contree project ID. The design bills a Contree run to the Nebius account whose key you type. Running with a judge's own Nebius account is not confirmed on the live Contree service. Type them into the console's start form, where they stay in this tab's session storage and the server's memory for that session. A console check uses only the values typed into the form: it never uses `NEBIUS_API_KEY` or a project ID from the server's environment or Codespaces secrets. This project does not ship a key. The keys are used only for the check's own Contree and model calls and are never passed to pull-request code. With Contree, the design is that installs, tests and behaviour probes all run inside Contree. A product check is designed to measure test coverage inside Contree; this is not confirmed on the live Contree service. If that coverage file is missing, the result stays could not verify. A full check still needs an AI probe that ran a changed line. In a Contree run, each probe is measured on the main side inside Contree. If that measurement fails for any reason, the probe is left unmeasured and cannot count toward verified. If neither sandbox can start, the console refuses to run pull-request code and says which keys to add.
+A Codespace usually cannot start bubblewrap, the local safety sandbox. A live check there therefore runs in Contree sandboxes, and that needs your own Nebius API key and Contree project ID. The design bills a Contree run to the Nebius account whose key you type. Running with a judge's own Nebius account is not confirmed on the live Contree service. Type them into the console's start form, where they stay in this tab's session storage and the server's memory for that session. A local console check uses only the values typed into the form: it never uses `NEBIUS_API_KEY` or a project ID from the server's environment or Codespaces secrets. A hosted console is the opposite: it ignores typed keys and uses only the server's private settings. This project does not ship a key. The keys are used only for the check's own Contree and model calls and are never passed to pull-request code. With Contree, the design is that installs, tests and behaviour probes all run inside Contree. A product check is designed to measure test coverage inside Contree; this is not confirmed on the live Contree service. If that coverage file is missing, the result stays could not verify. A full check still needs an AI probe that ran a changed line. In a Contree run, each probe is measured on the main side inside Contree. If that measurement fails for any reason, the probe is left unmeasured and cannot count toward verified. If neither sandbox can start, the console refuses to run pull-request code and says which keys to add.
 
 1. Click the badge above, or use Code → Codespaces → Create.
 2. Wait until setup finishes and the terminal says the console is listening on port 8787 (setup log: `/tmp/poc-setup.log`, console log: `/tmp/poc-console.log`). If the page on port 8787 does not load, run `bash .devcontainer/start-console.sh` in the terminal. Open the forwarded port **8787**. Do not make port 8787 public. It stays private. If that port is public, the console does not start and tells you to set it back to private. Sign-in is not skipped while the port is public.
@@ -475,25 +468,6 @@ summary page lists the attempts under **Re-runs**.
 ## 3. Exactly how a report gets generated
 
 From a PR link to the HTML/PDF in `reports/`, in order:
-
-```mermaid
-flowchart TD
-    A["You type: make check PR=link<br/>(or make daily chooses PRs)"] --> B["1. Read the PR from GitHub<br/>(read-only: title, changed files, diff)"]
-    B --> C{"2. What does the PR change?"}
-    C -->|"Python files in numpy / pandas / scikit-learn"| D["3a. main = today's nightly build<br/>PR = same build + the PR's change"]
-    C -->|"compiled code (C, Cython)"| E["3b. main = nightly build<br/>PR = built from source"]
-    C -->|"any other library"| F["3c. main and PR both<br/>built from GitHub source"]
-    D --> G["4. Pick the tests that cover the changed files"]
-    E --> G
-    F --> G
-    G --> H["5. Run the tests 3 times on each side,<br/>alternating main / PR / main / PR ..., one CPU thread"]
-    H --> I["6. Compare every test, main vs PR<br/>verdict: verified / needs attention / could not verify"]
-    I --> CG["6b. Coverage gate: one extra PR run under coverage.py<br/>did the changed lines actually run?"]
-    CG --> J["7. Save the evidence in ops/runs/&lt;date&gt;/&lt;pr&gt;/<br/>record.json + every pytest log"]
-    J --> K["8. Write the report: claims, log-line citations,<br/>checks, verdict, recommended action"]
-    K --> L["reports/daily/&lt;date&gt;/&lt;pr&gt;/REPORT.html + .pdf + .md"]
-    K --> M["reports/daily/&lt;date&gt;/SUMMARY.html + .pdf<br/>(needs attention first)"]
-```
 
 1. **Read the PR.** Proof-of-Change downloads the PR's title, the list of changed files and the change itself
    (the *diff*) from GitHub. It only reads; it never writes to GitHub.

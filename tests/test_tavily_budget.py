@@ -195,6 +195,8 @@ def test_worst_case_is_priced_from_the_bodies_the_code_really_sends(monkeypatch)
 
 
 def test_capped_check_end_to_end_refuses_with_no_tavily_call(tmp_path, monkeypatch):
+    from ops import daily_run as _dr
+    monkeypatch.setattr(_dr, "live_pr_refusal", lambda *a, **k: None)   # an open pull request
     from types import SimpleNamespace
 
     from ops import daily_run
