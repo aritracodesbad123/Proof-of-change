@@ -50,3 +50,46 @@ def test_path_style_ids_match_the_edited_file():
     cmp = _cmp({"tests/test_mod.py::T::test_old": ("passed", ""), "tests/test_mod.py::k": ("passed", "")},
                {"tests/test_mod.py::T::test_new": ("passed", ""), "tests/test_mod.py::k": ("passed", "")})
     assert replaced_tests(cmp, FILES) == ["tests/test_mod.py::T::test_old"]
+
+
+def test_an_empty_test_added_in_a_different_file_does_not_cover_a_removal():
+    files = {"all": ["pkg/mod.py", "tests/test_mod.py", "tests/test_other.py"]}
+    cmp = _cmp({"test_mod::test_real": ("passed", ""), "test_mod::k": ("passed", "")},
+               {"test_other::test_empty": ("passed", ""), "test_mod::k": ("passed", "")})
+    assert replaced_tests(cmp, files) == []
+    assert _verdict_of(cmp, None, None, files)[0] == "needs_attention"
+
+
+def test_a_same_named_test_file_in_another_folder_does_not_match():
+    files = {"all": ["pkg/mod.py", "tests/b/test_mod.py"]}
+    cmp = _cmp({"tests/a/test_mod.py::test_old": ("passed", ""), "tests/b/test_mod.py::k": ("passed", "")},
+               {"tests/b/test_mod.py::test_new": ("passed", ""), "tests/b/test_mod.py::k": ("passed", "")})
+    assert replaced_tests(cmp, files) == []
+    dotted = _cmp({"tests.a.test_mod::test_old": ("passed", ""), "tests.b.test_mod::k": ("passed", "")},
+                  {"tests.b.test_mod::test_new": ("passed", ""), "tests.b.test_mod::k": ("passed", "")})
+    assert replaced_tests(dotted, files) == []
+    assert _verdict_of(dotted, None, None, files)[0] == "needs_attention"
+
+
+def test_a_bare_module_id_matching_two_edited_folders_matches_neither():
+    files = {"all": ["tests/a/test_mod.py", "tests/b/test_mod.py"]}
+    cmp = _cmp({"test_mod::test_old": ("passed", ""), "test_mod::k": ("passed", "")},
+               {"test_mod::test_new": ("passed", ""), "test_mod::k": ("passed", "")})
+    assert replaced_tests(cmp, files) == []
+
+
+def test_editing_a_non_test_file_of_the_same_name_does_not_cover_a_removal():
+    files = {"all": ["pkg/mod.py"]}
+    cmp = _cmp({"mod::test_old": ("passed", ""), "mod::k": ("passed", "")},
+               {"mod::test_new": ("passed", ""), "mod::k": ("passed", "")})
+    assert replaced_tests(cmp, files) == []
+    assert _verdict_of(cmp, None, None, files)[0] == "needs_attention"
+
+
+def test_nothing_ran_on_both_sides_keeps_the_removal_a_finding():
+    cmp = _cmp({"test_mod::test_old": ("passed", "")}, {"test_mod::test_new": ("passed", "")})
+    assert replaced_tests(cmp, FILES) == []
+    skipped = _cmp({"test_mod::test_old": ("passed", ""), "test_mod::k": ("skipped", "")},
+                   {"test_mod::test_new": ("passed", ""), "test_mod::k": ("skipped", "")})
+    assert replaced_tests(skipped, FILES) == []
+    assert _verdict_of(skipped, None, None, FILES)[0] != "verified"

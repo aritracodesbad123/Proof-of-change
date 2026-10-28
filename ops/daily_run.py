@@ -3864,7 +3864,7 @@ def compare_sides(results: dict) -> dict:
     ids = set()
     for r in results["main"] + results["pr"]:
         ids |= set(r)
-    out = {"same": 0, "same_skipped_both": 0, "regressions": [], "fixed": [], "new_tests_passing": 0,
+    out = {"same": 0, "same_skipped_both": 0, "regressions": [], "fixed": [], "new_tests_passing": 0, "new_tests_passing_ids": [],
            "new_tests_failing": [], "new_tests_skipped": [], "removed_tests": [], "reparametrized": [], "skipped_missing_dependency": [],
            "flaky": [], "pr_unstable": [], "pr_unstable_noisy": [], "environment": [], "other_changes": [],
            "preexisting_failures": [], "load_failed_both": [],
@@ -3941,6 +3941,7 @@ def compare_sides(results: dict) -> dict:
             out["fixed"].append(t)
         elif mo == "absent" and po == "passed":
             out["new_tests_passing"] += 1
+            out["new_tests_passing_ids"].append(t)
         elif mo == "absent" and po in bad:
             out["new_tests_failing"].append(t)
         elif mo == "absent" and po == "skipped":
@@ -4162,30 +4163,51 @@ def with_probes(cmp: dict | None, cnv_reason: str | None, exits: dict | None = N
     return v, (f"{reason}; {s['reason']}" if s["reason"] else reason), fl
 
 
-def _test_module(test_id: str) -> str:
-    """'tests/test_x.py::T::t[1]', 'tests.test_x::t' or 'test_x::t' -> 'test_x'."""
+def _id_module(test_id: str) -> str:
+    """'tests/test_x.py::T::t[1]' -> 'tests/test_x.py'; 'tests.test_x::t' -> 'tests/test_x.py'; 'test_x::t' -> 'test_x.py'.
+
+    The module part of a test id as a relative file path (JUnit ids are relative to pytest's rootdir)."""
     head = test_id.split("::", 1)[0]
-    head = head.rsplit("/", 1)[-1]
     if head.endswith(".py"):
-        head = head[:-3]
-    return head.rsplit(".", 1)[-1]
+        return head.lstrip("./")
+    return head.replace(".", "/") + ".py"
+
+
+def is_test_file(path: str) -> bool:
+    name = path.rsplit("/", 1)[-1]
+    return name.endswith(".py") and (name.startswith("test_") or name.endswith("_test.py"))
+
+
+def _edited_test_file(test_id: str, edited: list[str]) -> str | None:
+    """The one edited test file the test lives in, by full relative path: the id's module path must equal the file's
+    path or be a whole-folder suffix of it. Two candidates (same name in different folders) match none."""
+    mod = _id_module(test_id)
+    hits = [f for f in edited if f == mod or f.endswith("/" + mod)]
+    return hits[0] if len(hits) == 1 else None
 
 
 def replaced_tests(cmp: dict, files: dict | None) -> list[str]:
-    """Removed tests that the PR replaced: each lives in a test file the PR edits, the PR adds at least as many new
-    passing tests as it removes, and no test regresses or newly fails. Anything else removed stays a finding."""
+    """Removed tests that the PR replaced. Every removed test must live in a test file the PR edits (matched by full
+    path, test files only), that same file must gain at least as many new passing tests as it lost, nothing may
+    regress or newly fail, and at least one test must have run on both sides with the same result. Anything else
+    removed stays a finding."""
     removed = cmp.get("removed_tests") or []
     if not removed or cmp.get("regressions") or cmp.get("new_tests_failing") or cmp.get("pr_unstable"):
         return []
-    if (cmp.get("new_tests_passing") or 0) < len(removed):
+    ran_both = (cmp.get("same") or 0) - (cmp.get("same_skipped_both") or 0)
+    if ran_both < 1:
         return []
-    changed = set()
-    for f in (files or {}).get("all") or []:
-        name = str(f).rsplit("/", 1)[-1]
-        if name.endswith(".py"):
-            changed.add(name[:-3])
-    if not all(_test_module(t) in changed for t in removed):
-        return []
+    edited = sorted({str(f).lstrip("./") for f in (files or {}).get("all") or [] if is_test_file(str(f))})
+    lost: dict = {}
+    for t in removed:
+        f = _edited_test_file(t, edited)
+        if f is None:
+            return []
+        lost.setdefault(f, []).append(t)
+    for f, gone in lost.items():
+        gained = [t for t in cmp.get("new_tests_passing_ids") or [] if _edited_test_file(t, edited) == f]
+        if len(gained) < len(gone):
+            return []
     return list(removed)
 
 
