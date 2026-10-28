@@ -451,8 +451,13 @@ ONE_SIDE_NOTE = "the claim describes one side only (before or after the fix), ch
 # "Before the fix, X raises TypeError" or "After the change, X returns 1" says what one side does, so a difference
 # does not contradict it, even when the claim was extracted as "same".
 # The single shape "Before the fix, X raises/returns Y": a statement of the old behaviour only.
-_ONE_SIDE_RE = re.compile(r"^\s*before\s+(?:the|this)\s+(?:fix|change|patch|pr|pull request)\s*,?\s+.+?\b"
-                          r"(?:raises?|raised|returns?|returned)\b", re.I)
+# The single shape "Before the fix, X raises/returns Y": one sentence about the old behaviour only, anchored at both
+# ends. A second clause (and, but, while, whereas, after, a comma, semicolon or second sentence) is not this shape.
+_ONE_SIDE_RE = re.compile(r"^\s*before\s+(?:the|this)\s+(?:fix|change|patch|pr|pull request)\s*,?\s+"
+                          r"(?:(?!\b(?:and|but|while|whereas|after|afterwards|then|also|too)\b)[^,;.!?])+?"
+                          r"\b(?:raises?|raised|returns?|returned)\b"
+                          r"(?:(?!\b(?:and|but|while|whereas|after|afterwards|then|also|too)\b)[^,;!?])*?"
+                          r"\.?\s*$", re.I)
 # Words that make a claim about keeping behaviour, where a difference is a real contradiction.
 _KEEP_RE = re.compile(r"\b(?:preserv\w*|still|unchanged|as before|continu\w*|existing|keeps?|retains?|same|"
                       r"regress\w*|break\w*|no longer)\b", re.I)

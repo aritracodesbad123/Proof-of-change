@@ -51,3 +51,14 @@ def test_other_shapes_stay_needs_attention(text):
 def test_before_the_fix_raises_is_one_side():
     assert probes.is_one_side_claim({"id": "C1", "text": "Before the fix, parse('') raises ValueError",
                                      "expect": "same"})
+
+
+@pytest.mark.parametrize("text", [
+    "Before the fix, parse() returns 1 and after it parse() returns 1 too",
+    "Before the fix, load('x') raises KeyError, and the fix keeps that",
+    "Before the fix, size() returns 0; after the fix size() still returns 0",
+])
+def test_second_clause_stays_needs_attention(text):
+    assert not probes.is_one_side_claim({"id": "C1", "text": text, "expect": "same"})
+    o = _obs(text)
+    assert o["label"] == FL.FALSE_CLAIM.value and not o.get("advisory"), text
