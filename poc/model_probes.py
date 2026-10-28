@@ -38,6 +38,43 @@ PRODUCT_PROBE_RULES = (
     "example a src. prefix): that folder is not on the import path. Output: print the last line with "
     "print(json.dumps({\"observations\": obs})). Never print the dict itself, its repr or str: only JSON is read.")
 SRC_DIR = "src"
+
+
+def python_rule(version: str) -> str:
+    """Prompt rule naming the Python that runs the probes."""
+    return (f"\n\nPython version: the probes run on Python {version}. Use only syntax and standard library "
+            f"features that exist in Python {version}.")
+
+
+# One rewrite of a probe that crashed on every main-side run. It sees only the probe's own code and its main-side
+# error output, never anything from the PR side. The verdict cap is enforced in code (ops/daily_run.cap_rewrite).
+REWRITE_PROMPT = """A probe you wrote crashed on the BASE side of a pull request on every run, so it observed
+nothing. You get its code and the error output from the base side. Rewrite it so it runs. Keep what it checks, the
+observation names it prints and the JSON last line. Use the package's public API, the way its users and its own
+test suite do (for example pytest's pytester fixture for pytest plugins and hooks); do not construct internal or
+private objects directly, and do not rely on deprecated constructors. Answer with JSON only: {"probes": [one probe
+with the same id, about, claims and the new code]}."""
+MAX_ERROR_CHARS = 4000
+
+
+def rewrite_probe(provider, ctx: dict, code: str, main_error: str, python_version: str | None,
+                  product: bool = False) -> tuple[str | None, str | None]:
+    """(new code, None) or (None, why not). The new code passes the same checks as a first answer."""
+    prompt = REWRITE_PROMPT + (PRODUCT_PROBE_RULES if product else "") + (
+        python_rule(python_version) if python_version else "")
+    user = f"Probe code:\n{code}\n\nBase-side error output (last part):\n{(main_error or '')[-MAX_ERROR_CHARS:]}"
+    try:
+        resp = provider.complete_json("probes", prompt, user, PROBES_SCHEMA, ctx)
+    except ProviderError as e:
+        return None, f"rewrite request failed: {e}"
+    got = ((resp or {}).get("probes") or [None])[0]
+    if not isinstance(got, dict):
+        return None, "the rewrite answer had no probe"
+    new = _unescape_code(got.get("code"))
+    why = validate_probe({"id": "rewrite", "code": new, "claims": []}, set(), python_version)
+    if why:
+        return None, f"rewrite rejected: {why}"
+    return new, None
 UNLINKED_REASON = ("no probe listed the claim ids it checks, so its results could not be tied to any claim; in each "
                    "probe, \"claims\" must name the claim ids it checks and the observation names that cover them")
 
@@ -140,8 +177,9 @@ def has_test_code(tree: ast.AST) -> bool:
     return False
 
 
-def validate_probe(p: dict, claim_ids: set) -> str | None:
-    """None if the model's probe is acceptable, else why not."""
+def validate_probe(p: dict, claim_ids: set, python_version: str | None = None) -> str | None:
+    """None if the model's probe is acceptable, else why not. python_version: the Python that will run the probe;
+    the code must also parse with that version's grammar (poc/probe_python.py)."""
     if not ID_RE.match(str(p.get("id", ""))):
         return f"bad probe id {p.get('id')!r}"
     code = p.get("code") or ""
@@ -151,6 +189,11 @@ def validate_probe(p: dict, claim_ids: set) -> str | None:
         tree = ast.parse(code)
     except SyntaxError as e:
         return f"code does not parse: {e.msg} (line {e.lineno})"
+    if python_version:
+        from poc import probe_python
+        why = probe_python.grammar_error(code, python_version)
+        if why:
+            return f"code is {why}"
     if not has_test_code(tree):
         return EMPTY_PROBE
     for node in ast.walk(tree):
@@ -280,12 +323,16 @@ def _usable(resp, claim_ids: set) -> list:
 
 
 def generate(provider: Provider, repo: str, pr: int, title: str, body: str | None, base_files: dict,
-             base_root: Path, pr_roots: list, outdir: Path, product: bool = False) -> dict:
+             base_root: Path, pr_roots: list, outdir: Path, product: bool = False,
+             python_version: str | None = None) -> dict:
     """product: a product check. It adds PRODUCT_PROBE_RULES to the probes prompt and rewrites or rejects imports
-    of a src/ layout folder. A study run (product False) is unchanged."""
+    of a src/ layout folder. A study run (product False) is unchanged. python_version: the Python that will run the
+    probes; the prompt names it and probes that do not parse with its grammar are rejected."""
     from poc import run_progress
 
     probes_prompt = PROBES_PROMPT + PRODUCT_PROBE_RULES if product else PROBES_PROMPT
+    if python_version:
+        probes_prompt += python_rule(python_version)
     layout = src_packages(base_root) if product else set()
 
     inputs = freeze.base_inputs(title, body, base_files, base_root, pr_roots)   # raises on PR-side input paths
@@ -364,7 +411,7 @@ def generate(provider: Provider, repo: str, pr: int, title: str, body: str | Non
             p["code"] = _unescape_code(p.get("code"))
             if not str(p.get("about") or "").strip():   # the probe runner requires a non-empty description
                 p["about"] = "model-written probe of the changed files (no description given)"
-        why = validate_probe(p, set(by_id))
+        why = validate_probe(p, set(by_id), python_version)
         if not why and layout:
             before = p["code"]
             p["code"], why = fix_src_imports(before, layout)

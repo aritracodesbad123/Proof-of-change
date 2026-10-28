@@ -1072,10 +1072,15 @@ def test_contree_python_choice_ignores_host_pythons(tmp_path, monkeypatch):
     monkeypatch.setattr(demo_helper, "find_python", lambda version, which=None: None)
     a = SimpleNamespace(python="3.14", bench=None, sandbox_backend="contree", pr=["x"], product_check=True)
     root = _checkout(tmp_path, python=">=3.14")
-    plan = daily_run._product_plan(a, {}, "acme/widget", {"dist": "widget"}, [root], pypi=_pypi)
-    assert plan["python"]["requested"] == "3.14" and plan["python"]["current"] == "3.12"
-    assert plan["python"]["provision"] == "3.14"
-    assert "uv python install -q 3.14" in demo_helper.contree_shell(plan)
+    rec = {}
+    try:
+        plan = daily_run._product_plan(a, rec, "acme/widget", {"dist": "widget"}, [root], pypi=_pypi)
+        # The image is picked from requires-python (poc/probe_python.py): a 3.14 image, not the host's 3.14.
+        assert rec["contree_python"]["version"] == "3.14"
+        assert contree_sandboxes.current_image() == "docker.io/library/python:3.14-slim-bookworm"
+        assert plan["python"]["requested"] == "3.14" and plan["python"]["current"] == "3.14"
+    finally:
+        contree_sandboxes.select_image(None)
 
 
 def test_contree_lowest_matching_version_not_host_choice(tmp_path, monkeypatch):
@@ -1086,8 +1091,11 @@ def test_contree_lowest_matching_version_not_host_choice(tmp_path, monkeypatch):
                         lambda version, which=None: "/usr/bin/python3.13" if version == "3.13" else None)
     a = SimpleNamespace(python="3.13", bench=None, sandbox_backend="contree", pr=["x"], product_check=True)
     root = _checkout(tmp_path, python=">=3.11")
-    plan = daily_run._product_plan(a, {}, "acme/widget", {"dist": "widget"}, [root], pypi=_pypi)
-    assert plan["python"]["requested"] == "3.11" and plan["python"]["provision"] == "3.11"
+    try:
+        plan = daily_run._product_plan(a, {}, "acme/widget", {"dist": "widget"}, [root], pypi=_pypi)
+        assert plan["python"]["requested"] == "3.11" and contree_sandboxes.image_python() == "3.11"
+    finally:
+        contree_sandboxes.select_image(None)
 
 
 @pytest.mark.parametrize("image,want", [("docker.io/library/python:3.12-slim-bookworm", "3.12"),
