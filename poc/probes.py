@@ -410,8 +410,8 @@ def judge(spec: dict, runs: dict, files: dict | None = None) -> list[dict]:
             res["citations"] = {side: citation(files[side][0], runs[side][0], name) for side in ("main", "pr")
                                 if name in runs[side][0]}
         out.append(res)
-    _shape_link(out)
     _one_side_claim_link(spec, out)
+    _shape_link(out)
     return out
 
 
@@ -450,37 +450,6 @@ def _shape_link(out: list[dict]) -> None:
 ONE_SIDE_NOTE = "the claim describes one side only (before or after the fix), check"
 # "Before the fix, X raises TypeError" or "After the change, X returns 1" says what one side does, so a difference
 # does not contradict it, even when the claim was extracted as "same".
-# The single shape "Before the fix, X raises/returns Y": a statement of the old behaviour only.
-# The single shape "Before the fix, X raises/returns Y": one sentence about the old behaviour only, anchored at both
-# ends. A second clause (and, but, while, whereas, after, a comma, semicolon or second sentence) is not this shape.
-_ONE_SIDE_RE = re.compile(r"^\s*before\s+(?:the|this)\s+(?:fix|change|patch|pr|pull request)\s*,?\s+"
-                          r"(?:(?!\b(?:and|but|while|whereas|after|afterwards|then|also|too)\b)[^,;.!?])+?"
-                          r"\b(?:raises?|raised|returns?|returned)\b"
-                          r"(?:(?!\b(?:and|but|while|whereas|after|afterwards|then|also|too)\b)[^,;!?])*?"
-                          r"\.?\s*$", re.I)
-# Words that make a claim about keeping behaviour, where a difference is a real contradiction.
-_KEEP_RE = re.compile(r"\b(?:preserv\w*|still|unchanged|as before|continu\w*|existing|keeps?|retains?|same|"
-                      r"regress\w*|break\w*|no longer)\b", re.I)
-
-
-def is_one_side_claim(claim: dict | None) -> bool:
-    """True for a "same" claim that only states what one side does, with no wording about keeping behaviour."""
-    from poc.claim_hygiene import says_stays_same
-    text = str((claim or {}).get("text") or "")
-    return (bool(claim) and claim.get("expect") == "same" and bool(_ONE_SIDE_RE.search(text))
-            and not _KEEP_RE.search(text) and not says_stays_same(text))
-
-
-def _one_side_claim_link(spec: dict, out: list[dict]) -> None:
-    """A difference against a "same" claim that describes one side only (is_one_side_claim) is advisory, not a
-    contradiction. It caps the verdict at could_not_verify. Differences unstable only on the PR are never linked."""
-    claims = {c.get("id"): c for c in spec.get("claims") or [] if isinstance(c, dict)}
-    for r in out:
-        if (r.get("label") == FindingLabel.FALSE_CLAIM.value and r.get("state") == "differs" and not r.get("advisory")
-                and not r.get("pr_only") and is_one_side_claim(claims.get(r.get("claim")))):
-            r["advisory"], r["linked_by"], r["note"] = True, "one_side_claim", ONE_SIDE_NOTE
-
-
 def run_once(path: Path, python: Path, cwd: Path, env: dict, timeout: int, launch=None,
              literal_output: bool = False) -> tuple[dict, str, float]:
     """launch(argv, env, cwd) -> (argv, env, cwd) wraps the command, e.g. into the sandbox (guardrails/sandbox.py)."""
@@ -745,3 +714,34 @@ def summarize(items: list[dict]) -> dict:
             "ignored_noise": [o["name"] for o in noisy], "ignored_warning_only": [o["name"] for o in warning_only],
             "pr_only_noisy": [o["name"] for o in pr_only_noisy],
             "advisory_unchanged_subchecks": [o["name"] for o in unchanged_sub]}
+
+
+# The single shape "Before the fix, X raises/returns Y": a statement of the old behaviour only.
+# The single shape "Before the fix, X raises/returns Y": one sentence about the old behaviour only, anchored at both
+# ends. A second clause (and, but, while, whereas, after, a comma, semicolon or second sentence) is not this shape.
+_ONE_SIDE_RE = re.compile(r"^\s*before\s+(?:the|this)\s+(?:fix|change|patch|pr|pull request)\s*,?\s+"
+                          r"(?:(?!\b(?:and|but|while|whereas|after|afterwards|then|also|too)\b)[^,;.!?])+?"
+                          r"\b(?:raises?|raised|returns?|returned)\b"
+                          r"(?:(?!\b(?:and|but|while|whereas|after|afterwards|then|also|too)\b)[^,;!?])*?"
+                          r"\.?\s*$", re.I)
+# Words that make a claim about keeping behaviour, where a difference is a real contradiction.
+_KEEP_RE = re.compile(r"\b(?:preserv\w*|still|unchanged|as before|continu\w*|existing|keeps?|retains?|same|"
+                      r"regress\w*|break\w*|no longer)\b", re.I)
+
+
+def is_one_side_claim(claim: dict | None) -> bool:
+    """True for a "same" claim that only states what one side does, with no wording about keeping behaviour."""
+    from poc.claim_hygiene import says_stays_same
+    text = str((claim or {}).get("text") or "")
+    return (bool(claim) and claim.get("expect") == "same" and bool(_ONE_SIDE_RE.search(text))
+            and not _KEEP_RE.search(text) and not says_stays_same(text))
+
+
+def _one_side_claim_link(spec: dict, out: list[dict]) -> None:
+    """A difference against a "same" claim that describes one side only (is_one_side_claim) is advisory, not a
+    contradiction. It caps the verdict at could_not_verify. Differences unstable only on the PR are never linked."""
+    claims = {c.get("id"): c for c in spec.get("claims") or [] if isinstance(c, dict)}
+    for r in out:
+        if (r.get("label") == FindingLabel.FALSE_CLAIM.value and r.get("state") == "differs" and not r.get("advisory")
+                and not r.get("pr_only") and is_one_side_claim(claims.get(r.get("claim")))):
+            r["advisory"], r["linked_by"], r["note"] = True, "one_side_claim", ONE_SIDE_NOTE
