@@ -3111,6 +3111,44 @@ def repo_addopts_args(keep: bool) -> list[str]:
     return [] if keep else ["-o", "addopts="]
 
 
+# A pytest plugin that pytest auto-loads from site-packages and that crashes pytest at startup (INTERNALERROR, exit 3,
+# for example a deprecation warning turned into an error by the project's own filterwarnings) stops the run before
+# any test. When the crashing plugin is not named in the project's own test config, the run is repeated once with
+# that plugin turned off (-p no:<entry point>) and a plain note is written. This is a setup repair: it never changes
+# which tests decide the verdict, and it only lets the run start. A plugin the project's config names is kept.
+STARTUP_PLUGIN_PY = r"""
+import re, sys, pathlib, importlib.metadata as md
+log = pathlib.Path('/tmp/poc-pytest.log').read_text(errors='replace')
+if 'INTERNALERROR' not in log: sys.exit()
+mods = set(re.findall(r'site-packages/([A-Za-z0-9_]+)/', '\n'.join(l for l in log.splitlines() if 'INTERNALERROR' in l)))
+mods -= {'pluggy', '_pytest', 'pytest'}
+cfg = ''.join(p.read_text(errors='replace') for p in map(pathlib.Path, ['pyproject.toml', 'pytest.ini', 'tox.ini',
+      'setup.cfg', 'conftest.py']) if p.is_file()).lower()
+out = []
+for ep in md.entry_points(group='pytest11'):
+    top = ep.value.split(':')[0].split('.')[0]
+    dist = (ep.dist.name if ep.dist else '').lower()
+    names = [re.escape(d) for d in {dist, dist.replace('-', '_')} if d]
+    named = re.search(r'-p\s*' + re.escape(ep.name.lower()) + r'(?![\w.-])', cfg) or any(
+        re.search(r'(?<![\w.-])' + n + r'(?![\w.-])', cfg) for n in names)
+    if top in mods and not named:
+        out.append(ep.name)
+print(' '.join(sorted(set(out))))
+"""
+STARTUP_PLUGIN_RETRY_SHELL = (
+    "if [ \"$ec\" = 3 ]; then\n"
+    "  off=$(python -c " + shlex.quote(STARTUP_PLUGIN_PY) + " 2>/dev/null)\n"
+    "  if [ -n \"$off\" ]; then\n"
+    "    pf=''; for n in $off; do pf=\"$pf -p no:$n\"; done\n"
+    "    cp /tmp/poc-pytest.log /tmp/poc-pytest-startup.log\n"
+    "    {RERUN}$pf >/tmp/poc-pytest.log 2>&1\n    ec=$?\n"
+    "    { echo \"Setup repair: pytest stopped at startup in plugin(s) the project's test config does not name: $off. "
+    "Run again with them turned off (-p no:<name>). First output:\"; head -n 40 /tmp/poc-pytest-startup.log; echo; "
+    "cat /tmp/poc-pytest.log; } > /tmp/poc-pytest.log.new && mv /tmp/poc-pytest.log.new /tmp/poc-pytest.log\n"
+    "  fi\nfi\n"
+)
+
+
 def _contree_pytest_once(side: str, targets: list[str], test_timeout: int, run_timeout: int,
                          workers: str, jx: Path, lg: Path, keep_addopts: bool = False) -> tuple[int | str, float]:
     """One Contree disposable pytest; junit+log written locally from the remote shell output."""
@@ -3130,7 +3168,10 @@ def _contree_pytest_once(side: str, targets: list[str], test_timeout: int, run_t
         f"  python -m pytest {tg} -p no:cacheprovider -q -rfE --timeout={int(test_timeout)} "
         f"{repo_addopts_flag(keep_addopts)}-o junit_family=xunit2 --junitxml=/tmp/poc-junit.xml "
         ">/tmp/poc-pytest.log 2>&1\n  ec=$?\nfi\n"
-        "printf '___POC_EXIT___%s\\n' \"$ec\"\n"
+        + STARTUP_PLUGIN_RETRY_SHELL.replace("{RERUN}", f"python -m pytest {tg} -p no:cacheprovider -q -rfE "
+                                              f"--timeout={int(test_timeout)} {repo_addopts_flag(keep_addopts)}"
+                                              f"-o junit_family=xunit2 --junitxml=/tmp/poc-junit.xml {nflag}")
+        + "printf '___POC_EXIT___%s\\n' \"$ec\"\n"
         "printf '___POC_JUNIT___\\n'\ncat /tmp/poc-junit.xml 2>/dev/null\n"
         "printf '___POC_LOG___\\n'\ncat /tmp/poc-pytest.log 2>/dev/null\n"
     )
