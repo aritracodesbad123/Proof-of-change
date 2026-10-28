@@ -6,7 +6,6 @@ Each ref is exported with `git archive` to a temporary folder. Every stored run 
 recorded verdict and probe items) under the record folders is re-judged offline with each version's
 `evals.checks.derive_verdict`. Nothing runs tests or calls the network.
 """
-import glob
 import json
 import os
 import subprocess
