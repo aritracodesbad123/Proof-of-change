@@ -429,10 +429,22 @@ def _dangling_cover_link(spec: dict, out: list[dict]) -> None:
         return
     if any(_covers_name(claims[0].get("covers"), r.get("name")) for r in out):
         return
+    # Only a difference whose name starts with the claim id or with the first part of one of its covers
+    # ("c1.x" next to claim C1, "result.x" next to cover "result.y") is linked. Any other difference in the probe
+    # stays unclaimed and still needs attention.
+    heads = {_name_head(claims[0].get("id"))} | {_name_head(c) for c in claims[0].get("covers") or [] if isinstance(c, str)}
+    heads -= {""}
     for r in out:
         if (r.get("label") == FindingLabel.UNMENTIONED_CHANGE.value and r.get("state") == "differs"
-                and not r.get("advisory") and not r.get("pr_only")):
+                and not r.get("advisory") and not r.get("pr_only") and _name_head(r.get("name")) in heads):
             r["advisory"], r["linked_by"], r["note"] = True, "dangling_cover", DANGLING_NOTE
+
+
+def _name_head(name) -> str:
+    """The first part of an observation name or cover, lower case: "C1.x" -> "c1", "c1_x" -> "c1". Empty when that
+    part holds a wildcard, so a bare "*" or "c*" never links."""
+    head = re.split(r"[._]", str(name or ""), maxsplit=1)[0].lower()
+    return "" if any(ch in head for ch in "*?[") else head
 
 
 SHAPE_NOTE = "probably the claimed change, check"
