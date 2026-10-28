@@ -320,6 +320,8 @@ def test_saved_sample_playback_does_not_need_the_key(monkeypatch):
 
 
 def test_lookup_failure_mid_run_stops_with_a_reason(tmp_path, monkeypatch, capsys):
+    from ops import daily_run as _dr
+    monkeypatch.setattr(_dr, "live_pr_refusal", lambda *a, **k: None)   # an open pull request
     monkeypatch.setenv("TAVILY_API_KEY", SECRET)
 
     def failed(_query, timeout=None, env=None):
