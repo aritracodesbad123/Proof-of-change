@@ -352,9 +352,16 @@ def recorded_names(code: str) -> tuple[set, set] | None:
             for k in node.keys:
                 if k is not None:
                     key(k)
-        elif isinstance(node, ast.Subscript) and isinstance(node.ctx, ast.Store) and not key(node.slice):
+        elif (isinstance(node, ast.Subscript) and isinstance(node.ctx, ast.Store) and not _is_sys_modules(node.value)
+              and not key(node.slice)):
             return None
     return names, prefixes
+
+
+def _is_sys_modules(node) -> bool:
+    """sys.modules[...] = ... installs a module; it is not an observation key."""
+    return (isinstance(node, ast.Attribute) and node.attr == "modules" and isinstance(node.value, ast.Name)
+            and node.value.id == "sys")
 
 
 def _pattern_can_match(pat: str, names: set, prefixes: set) -> bool:
@@ -588,7 +595,7 @@ def _ast_counts(code) -> dict | None:
         ks = []
         if isinstance(node, ast.Dict):
             ks = [k for k in node.keys if k is not None]
-        elif isinstance(node, ast.Subscript) and isinstance(node.ctx, ast.Store):
+        elif isinstance(node, ast.Subscript) and isinstance(node.ctx, ast.Store) and not _is_sys_modules(node.value):
             ks = [node.slice]
         for k in ks:
             if isinstance(k, ast.Constant) and isinstance(k.value, str) and _OBS_KEY.fullmatch(repr(k.value)):

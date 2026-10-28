@@ -41,3 +41,9 @@ those keys.
   rejected. On the saved probes, 53 of 607 distinct probes would be rejected this way if they were the repair.
 - Weaker repairs could pass through a text fallback. That is why the fallback was removed: a repair that hides
   dropped keys in comments or strings and stores under a computed key is now rejected instead of passing.
+
+## Follow-up: sys.modules stores are not keys
+
+recorded_names no longer treats `sys.modules[...] = ...` as an observation key. That store installs a module, so a
+probe that stubs a module this way can still have its keys read. Every other computed key stays unreadable, so a
+repair that uses one is still rejected: `obs[name]`, `obs[key]`, `observations[obs_name + ...]`.

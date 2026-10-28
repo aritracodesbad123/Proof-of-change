@@ -200,3 +200,12 @@ def test_line_breaks_alone_do_not_change_the_count():
     counts = {model_probes._token_obs_keys(c + "if x:\nprint(x)\n") for c in (one, split)}
     assert counts == {3} and model_probes._token_obs_keys(escaped) == 3
     assert model_probes.repair_counts(one)["keys"] == model_probes.repair_counts(split)["keys"] == 3
+
+
+def test_sys_modules_stores_are_not_keys():
+    code = ("import sys, types\nname = 'pkg.fake'\nsys.modules[name] = types.ModuleType(name)\n"
+            "sys.modules['pkg.other'] = None\nobs = {}\nobs['f.a'] = 1\n")
+    assert model_probes.recorded_names(code) == ({"f.a"}, set())
+    assert model_probes.repair_counts(code)["keys"] == 1
+    # a dynamic observation key is still unreadable
+    assert model_probes.recorded_names(code + "k = 'f.b'\nobs[k] = 2\n") is None
