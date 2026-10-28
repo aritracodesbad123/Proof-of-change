@@ -12,3 +12,6 @@ The claim must be a single sentence: a dot is allowed only inside a value ("1.5"
 ("Before the fix, load() returns None. The PR does not alter this." still flags). Wording about both sides or about
 keeping behaviour ("identical", "equal", "both versions", "either", "each", "does not alter") also keeps the
 claim a real "same" claim, so a difference still needs attention.
+
+"all", "any", "regardless", "version" and "versions" are also stop words: "Before the fix, f() returns 2 in all
+versions" speaks about both sides, so a difference still needs attention.

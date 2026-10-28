@@ -68,6 +68,8 @@ def test_second_clause_stays_needs_attention(text):
     "Before this change, valid input returns identical output on both versions",
     "Before the fix, load() returns None. The PR does not alter this.",
     "Before the fix, f() returns 2 for both versions",
+    "Before the fix, f() returns 2 in all versions",
+    "Before the fix, f() returns 2 regardless of version",
 ])
 def test_both_sides_or_second_sentence_stays_needs_attention(text):
     assert not probes.is_one_side_claim({"id": "C1", "text": text, "expect": "same"})
