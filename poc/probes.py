@@ -201,7 +201,17 @@ def citation(fname: str, obs: dict, name: str) -> dict | None:
 
 
 def claim_for(spec: dict, name: str) -> dict | None:
-    return next((c for c in spec.get("claims", []) if _covers_name(c.get("covers"), name)), None)
+    """The claim an observation belongs to. When several claims cover the name, the most specific one wins: a cover
+    equal to the name beats a wildcard match, then the claim with fewer cover patterns, then the first claim."""
+    best, rank = None, None
+    for i, c in enumerate(spec.get("claims", []) or []):
+        if not isinstance(c, dict) or not _covers_name(c.get("covers"), name):
+            continue
+        covers = [p for p in c.get("covers") or [] if isinstance(p, str)]
+        r = (0 if name in covers else 1, len(covers), i)
+        if rank is None or r < rank:
+            best, rank = c, r
+    return best
 
 
 def _covers_name(covers, name: str) -> bool:
