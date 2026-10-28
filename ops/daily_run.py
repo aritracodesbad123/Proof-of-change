@@ -7072,19 +7072,27 @@ def rejudge(rec: dict, prdir: Path) -> dict:
 def rejudge_probes(pr_probes: dict | None, product_check: bool = False) -> dict | None:
     """Probe results recomputed from their recorded runs with the current rules (poc/probes.py).
 
-    Recomputing observations drops the marks a real run adds afterwards (settle_probes). On the product route the
-    same claim clean-up runs again (claim_hygiene, broad_claims), so an advisory difference stays advisory and a
-    rejudged record reaches the same verdict as the run that wrote it. The study route is unchanged."""
+    Recomputing observations drops the advisory mark a product run adds afterwards (settle_probes ->
+    poc/claim_hygiene.apply: an unclaimed difference from a probe with no linked claims). On the product route that
+    mark is carried over from the stored observation of the same name while it is still an unclaimed difference, so a
+    rejudged record keeps the judgment of the run that wrote it. Nothing else is re-cleaned here, so a rejudge can
+    never lift a verdict through a claim clean-up the run did not make. The study route is unchanged."""
     if not pr_probes or not pr_probes.get("items"):
         return pr_probes
     items = [probes.rejudge_entry(it) for it in pr_probes["items"]]
-    out = dict(pr_probes, items=items, summary=probes.summarize(items))
-    if not product_check:
-        return out
-    from poc import broad_claims, claim_hygiene
-    out = broad_claims.apply(claim_hygiene.apply(out)) or out
-    out = probes.apply_status(out)
-    return dict(out, summary=probes.summarize(out["items"]))
+    if product_check:
+        items = [_keep_advisory(old, new) for old, new in zip(pr_probes["items"], items)]
+    return dict(pr_probes, items=items, summary=probes.summarize(items))
+
+
+def _keep_advisory(old: dict, new: dict) -> dict:
+    marked = {o.get("name") for o in old.get("observations") or [] if isinstance(o, dict) and o.get("advisory")}
+    if not marked:
+        return new
+    obs = [dict(o, advisory=True) if o.get("name") in marked
+           and o.get("label") == probes.FindingLabel.UNMENTIONED_CHANGE.value else o
+           for o in new.get("observations") or []]
+    return dict(new, observations=obs)
 
 
 def migrate_record(rec: dict, rdir: Path, redo: bool = False) -> dict:
