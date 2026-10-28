@@ -53,6 +53,7 @@ import ast
 import fnmatch
 import hashlib
 import json
+import re
 import resource
 import subprocess
 import tempfile
@@ -274,11 +275,28 @@ def probe_broken(main, pr) -> bool:
     """The probe never reached the call it is about: the observation is the same raised exception type, or the same
     skip value, on both sides. That says nothing about the change, so it is 'probe broken': never 'does not differ'
     and never 'proven'."""
-    exc = _exception_name(main)
-    if exc and exc == _exception_name(pr):
+    exc = _exception_name(main) or _error_text(main)
+    if exc and exc == (_exception_name(pr) or _error_text(pr)):
         return True
     return (isinstance(main, dict) and isinstance(pr, dict) and "skipped" in main
             and main.get("skipped") == pr.get("skipped"))
+
+
+_ERROR_TEXT = re.compile(r"(?:[A-Za-z_][\w.]*\.)?([A-Z]\w*(?:Error|Exception|Failure))(?::.*)?|(skip(?:ped)?\b.*)",
+                         re.IGNORECASE | re.DOTALL)
+
+
+def _error_text(value) -> str | None:
+    """A probe that records a failure as plain text: an exception type name ('TypeError', 'TypeError: msg',
+    'SkippedDueToClassCreationFailure') or a skip note ('skipped: ...'). Returns the type name or skip note."""
+    if not isinstance(value, str) or len(value) > 500:
+        return None
+    m = _ERROR_TEXT.fullmatch(value.strip())
+    if not m:
+        return None
+    if m.group(1) and not m.group(1)[0].isupper():
+        return None
+    return m.group(1) or m.group(2).lower()
 
 
 def judge(spec: dict, runs: dict, files: dict | None = None) -> list[dict]:

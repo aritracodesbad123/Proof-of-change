@@ -143,7 +143,8 @@ def _ran(claims, main, pr, pid="p"):
 
 
 @pytest.mark.parametrize("claims", [DIFFERS, SAME, []])
-@pytest.mark.parametrize("value", [{"raises": "TypeError"}, {"skipped": "no type-aware input"}])
+@pytest.mark.parametrize("value", [{"raises": "TypeError"}, {"skipped": "no type-aware input"}, "TypeError",
+                                   "SkippedDueToClassCreationFailure"])
 def test_probe_broken_is_never_does_not_differ_or_proven(claims, value):
     it = _ran(claims, {"r": value}, {"r": value})
     (o,) = it["observations"]
