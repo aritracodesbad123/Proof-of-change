@@ -4474,6 +4474,9 @@ def plan_probes(repo: str, item: dict, rec: dict, base_root: Path, pr_roots: lis
                 note["model_loose_quote_matches"] = res["loose_quote_matches"]
             if res.get("rewritten_imports"):   # product checks: src/ layout imports rewritten to the installed name
                 note["rewritten_imports"] = res["rewritten_imports"]
+            for k in ("parse_repairs", "retried", "unmatched_covers"):   # repair and retry trail, shown on the record
+                if res.get(k):
+                    note[f"model_{k}"] = res[k]
             plan += [{"path": x["path"], "source": "model", "freeze": x["freeze"],
                       **({"origin": x["origin"]} if x.get("origin") else {})} for x in res.get("probes", [])]
             if res.get("human_review"):
@@ -5700,6 +5703,7 @@ def finish(rec: dict, prdir: Path, work: Path, t0: float, runner=None) -> dict:
     if rec.get("product_check"):  # timing only; study records stay byte-identical
         rec["timings"] = step_timings(rec)
         print("Time per stage: " + ", ".join(f"{k} {v} s" for k, v in rec["timings"].items()), flush=True)
+    if rec.get("_tavily_meter") is not None:   # metered checks only (product route), also when the check failed
         from poc import tavily_budget
         credits = tavily_budget.take(rec.pop("_tavily_meter", None))
         if credits is not None:
@@ -7224,6 +7228,11 @@ def harness_error_record(repo: str, cfg: dict, item: dict, rdir: Path, a, machin
     rec["verdict"], rec["reason"] = "could_not_verify", reason
     rec["harness_error"] = reason
     rec.setdefault("duration_s", {}).setdefault("total_wall", 0)
+    from poc import tavily_budget
+    credits = tavily_budget.take_active()   # the crashed check's Tavily calls still count, from the API's own figures
+    if credits is not None:
+        rec["tavily_credits"] = credits
+        print(tavily_budget.log_line(credits), flush=True)
     try:
         prdir = rdir / f"{cfg['pkg']}-{item['pr']}"
         prdir.mkdir(parents=True, exist_ok=True)

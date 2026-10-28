@@ -94,7 +94,8 @@ def begin(check: str = "") -> dict:
     check starts before the first is taken, both meters are marked ``overlapped`` so neither total is trusted."""
     global _active
     meter = {"check": check, "search_calls": 0, "search_credits": 0.0, "crawl_calls": 0, "crawl_credits": 0.0,
-             "extract_calls": 0, "extract_credits": 0.0, "overlapped": False}
+             "extract_calls": 0, "extract_credits": 0.0, "overlapped": False, "calls": [],
+             "api_reported_credits": 0.0, "estimated_credits": 0.0}
     with _lock:
         if _active is not None:
             _active["overlapped"] = True
@@ -103,21 +104,31 @@ def begin(check: str = "") -> dict:
     return meter
 
 
-def record(kind: str, *, depth: str = "basic", payload: dict | None = None) -> None:
-    """Count one Tavily call toward the running check. kind is search, crawl or extract."""
-    if kind == "search":
-        credits = SEARCH_CREDITS.get(depth, 1.0)
-    else:
-        usage = (payload or {}).get("usage") if isinstance(payload, dict) else None
+def call_credits(kind: str, depth: str = "basic", payload: dict | None = None) -> tuple[float, str, dict | None]:
+    """(credits, source, usage) for one answered call. source is "api" when the response carries its own
+    ``usage.credits`` (requested with include_usage), else "estimate" from Tavily's published rates: a search by
+    depth, a crawl or extract with no usage block as 0."""
+    usage = payload.get("usage") if isinstance(payload, dict) else None
+    if isinstance(usage, dict) and usage.get("credits") is not None:
         try:
-            credits = float((usage or {}).get("credits") or 0)
+            return float(usage["credits"]), "api", usage
         except (TypeError, ValueError):
-            credits = 0.0
+            pass
+    return (SEARCH_CREDITS.get(depth, 1.0) if kind == "search" else 0.0), "estimate", usage if isinstance(usage, dict) else None
+
+
+def record(kind: str, *, depth: str = "basic", payload: dict | None = None) -> None:
+    """Count one Tavily call toward the running check. kind is search, crawl or extract. Each call is also kept
+    in the meter's ``calls`` list with its credits, where they came from, and the usage block exactly as returned."""
+    credits, source, usage = call_credits(kind, depth, payload)
     with _lock:
         if _active is None:
             return
         _active[f"{kind}_calls"] += 1
         _active[f"{kind}_credits"] += credits
+        _active["api_reported_credits" if source == "api" else "estimated_credits"] += credits
+        _active["calls"].append({"kind": kind, "credits": credits, "source": source,
+                                 **({"usage": usage} if usage is not None else {})})
 
 
 def take(meter: dict | None) -> dict | None:
@@ -130,7 +141,18 @@ def take(meter: dict | None) -> dict | None:
             _active = None
         out = dict(meter)
     out["total_credits"] = round(out["search_credits"] + out["crawl_credits"] + out["extract_credits"], 2)
+    out["calls"] = list(out["calls"])
+    out["api_reported_credits"] = round(out["api_reported_credits"], 2)
+    out["estimated_credits"] = round(out["estimated_credits"], 2)
     return out
+
+
+def take_active() -> dict | None:
+    """The totals of whichever check is still being metered, and stop metering it: for a check that crashed or
+    timed out before its record could take its own meter."""
+    with _lock:
+        meter = _active
+    return take(meter)
 
 
 def log_line(totals: dict | None) -> str:
@@ -138,7 +160,8 @@ def log_line(totals: dict | None) -> str:
         return ""
     return (f"Tavily credits used: {totals['total_credits']:g} (search {totals['search_calls']} call(s) "
             f"{totals['search_credits']:g}, crawl {totals['crawl_calls']} {totals['crawl_credits']:g}, "
-            f"extract {totals['extract_calls']} {totals['extract_credits']:g})")
+            f"extract {totals['extract_calls']} {totals['extract_credits']:g}; "
+            f"API-reported {totals.get('api_reported_credits', 0):g}, estimated {totals.get('estimated_credits', 0):g})")
 
 
 def _cap(env: dict) -> float | None:

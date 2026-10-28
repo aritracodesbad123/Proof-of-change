@@ -422,6 +422,63 @@ def _linked_ids(probes: list) -> set:
     return {c.get("id") for q in probes for c in q.get("claims") or [] if isinstance(c, dict)}
 
 
+PARSE_REPAIR_TRIES = 2   # fixed cap on repair calls for probes whose code does not parse; model calls only
+
+
+def parse_error(code) -> dict | None:
+    """The exact SyntaxError of a probe's code (after unescaping), or None when it parses."""
+    code = _unescape_code(code)
+    try:
+        ast.parse(code if isinstance(code, str) else "")
+    except SyntaxError as e:
+        text = (e.text or "").rstrip("\n")
+        return {"message": e.msg, "line": e.lineno, "offset": e.offset, "code_line": text[:300]}
+    return None
+
+
+def _repair_parse_errors(provider, probes_prompt: str, user: str, ctx: dict, resp, out: dict):
+    """Ask the model to fix probes whose code does not parse, giving it each exact parse error (message, line and
+    offending code line) and the full code, up to PARSE_REPAIR_TRIES times. A fixed probe replaces the broken one
+    (matched by id, or by position when the reply has exactly as many probes). Every attempt is recorded in
+    out["parse_repairs"] with its error, attempt number and outcome."""
+    attempts = out.setdefault("parse_repairs", [])
+    for n in range(1, PARSE_REPAIR_TRIES + 1):
+        probes = [p for p in (resp or {}).get("probes", [])[:MAX_PROBES] if isinstance(p, dict)]
+        broken = [(i, p, parse_error(p.get("code"))) for i, p in enumerate(probes)]
+        broken = [(i, p, e) for i, p, e in broken if e]
+        if not broken:
+            return resp
+        lines = []
+        for _, p, e in broken:
+            lines.append(f"Probe {p.get('id')!r}: SyntaxError: {e['message']} (line {e['line']}, column {e['offset']})"
+                         f"\nOffending line: {e['code_line']}\nFull code as received:\n{_unescape_code(p.get('code'))}")
+        ask = (user + "\n\nThese probes from your previous answer do not parse as Python. Return the same probes "
+               "with their code fixed (same ids, real line breaks, no escaped newlines):\n\n" + "\n\n".join(lines))
+        try:
+            again = provider.complete_json("probes", probes_prompt, ask, PROBES_SCHEMA, ctx)
+        except ProviderError as ex:
+            for _, p, e in broken:
+                attempts.append({"attempt": n, "probe": p.get("id"), "error": e, "outcome": f"provider error: {ex}"})
+            return resp
+        got = [q for q in (again or {}).get("probes", []) if isinstance(q, dict)]
+        by_id = {_tidy_id(q.get("id")): q for q in got if isinstance(q.get("id"), str)}
+        fixed_list = list(probes)
+        for k, (i, p, e) in enumerate(broken):
+            q = by_id.get(_tidy_id(p.get("id")) if isinstance(p.get("id"), str) else None)
+            if q is None and len(got) == len(broken):
+                q = got[k]
+            if q is None:
+                outcome = "no fixed probe returned"
+            else:
+                still = parse_error(q.get("code"))
+                outcome = "fixed" if still is None else f"still fails: {still['message']} (line {still['line']})"
+                if still is None:
+                    fixed_list[i] = dict(q, id=p.get("id"))
+            attempts.append({"attempt": n, "probe": p.get("id"), "error": e, "outcome": outcome})
+        resp = dict(resp or {}, probes=fixed_list)
+    return resp
+
+
 def _usable(resp, claim_ids: set) -> list:
     """The probes of a reply that pass validate_probe (after tidying ids and unescaping code)."""
     return [p for p in (resp or {}).get("probes", [])[:MAX_PROBES] if isinstance(p, dict)
@@ -478,6 +535,9 @@ def generate(provider: Provider, repo: str, pr: int, title: str, body: str | Non
         out["errors"].append(str(e))
         return out
     by_id = {c["id"]: c for c in testable}
+    resp = _repair_parse_errors(provider, probes_prompt, user, ctx, resp, out)
+    if not out["parse_repairs"]:
+        out.pop("parse_repairs")
     usable = _usable(resp, set(by_id))
     if not usable:
         # One retry, same gate and same BASE-side inputs: say why the first answer was unusable (generic reasons only)
