@@ -12,6 +12,22 @@ import time
 from pathlib import Path
 
 PLACEHOLDER_REASON = "the check started but did not finish, so this placeholder was never replaced"
+PLACEHOLDER_KIND = "placeholder"
+
+
+def placeholder_record(repo: str, library: str, pr, title: str = "") -> dict:
+    """A could-not-verify record.json written before a check starts; the real record replaces it.
+
+    record_kind is not "pr_run", so --resume never reuses it, and poc/final_verdict.final() always reads it as
+    could_not_verify, so it can never count as a result beyond that."""
+    return {"record_kind": PLACEHOLDER_KIND, "placeholder": True, "repo": repo, "library": library, "pr": pr,
+            "title": title, "verdict": "could_not_verify", "reason": PLACEHOLDER_REASON,
+            "coverage_gate": {"kind": PLACEHOLDER_KIND, "changed": False, "confidence": "low",
+                              "note": "the check did not finish", "measurement": None}}
+
+
+def is_placeholder(rec: dict) -> bool:
+    return bool(rec.get("placeholder")) or rec.get("record_kind") == PLACEHOLDER_KIND
 
 
 def _esc(s: str) -> str:
@@ -93,10 +109,15 @@ def records_pdfs(report_dir: str | Path, name: str, rows: list[tuple[str, dict]]
     out = Path(report_dir)
     lines, any_attention, any_cnv = [], False, False
     for rid, rec in rows:
-        v = str(rec.get("verdict") or "could_not_verify")
+        from poc.final_verdict import final
+        try:
+            fin = final(rec)
+        except Exception:  # noqa: BLE001 - a record the gates cannot read is never shown as better than this
+            fin = {"verdict": "could_not_verify", "reason": f"record could not be read: {rec.get('reason') or ''}"}
+        v = str(fin.get("verdict") or "could_not_verify")
         any_attention |= v == "needs_attention"
         any_cnv |= v not in ("verified", "needs_attention", "no_code_change")
-        why = str(rec.get("reason") or "")
+        why = str(fin.get("reason") or "")
         try:
             write_pdf(out / rid / "REPORT.pdf", f"Reviewer report {rid}: {v.replace('_', ' ').upper()}",
                       [f"Verdict: {v}", f"Reason: {why}"] + ([f"Note: {note}"] if note else []))

@@ -5293,6 +5293,11 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
             pdf_always.placeholder(report_dir_for(a, rdir), tag, f"{repo}#{item['pr']}")
         except Exception as e:  # noqa: BLE001
             print(f"note: placeholder PDF not written ({type(e).__name__})", file=sys.stderr)
+    try:   # could-not-verify record until finish() writes the real one; a killed check is counted as could_not_verify
+        (prdir / "record.json").write_text(json.dumps(
+            pdf_always.placeholder_record(repo, cfg["pkg"], item["pr"], item.get("title", "")), indent=1))
+    except Exception as e:  # noqa: BLE001
+        print(f"note: placeholder record not written ({type(e).__name__})", file=sys.stderr)
     work = workroot / tag
     shutil.rmtree(work, ignore_errors=True); work.mkdir(parents=True)
     pin_why = (apply_pinned_diff(repo, item, cfg["pkg"], work, prdir / "git.log")
@@ -7001,7 +7006,8 @@ def _main(argv=None) -> int:
             rec = None
             if a.resume and prev.exists():
                 old = json.loads(prev.read_text())
-                if old.get("record_kind") == "pr_run" and old["pr"]["head_sha"] == c["head_sha"]:
+                if (old.get("record_kind") == "pr_run" and not old.get("harness_error")
+                        and old["pr"]["head_sha"] == c["head_sha"]):
                     rec = old
                     reused.append({"repo": repo, "pr": c["pr"],
                                    "from_invocation": old.get("tested_invocation") or 1,

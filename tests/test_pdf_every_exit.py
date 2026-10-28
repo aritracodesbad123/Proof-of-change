@@ -228,3 +228,82 @@ def test_console_job_timeout_path_calls_timeout_pdfs(tmp_path, monkeypatch):
     s = _only_summary(tmp_path / "reports")
     assert "NO-GO" in _text(s) and (s.parent / "demo-3" / "REPORT.pdf").exists()
     assert status == "timed out"
+
+
+def test_simple_pdfs_use_the_final_gated_verdict(tmp_path):
+    from poc import final_verdict
+    # An older record without the gate block: stored "verified", but coverage was never measured, so the gate
+    # lowers it to could_not_verify. The PDF must show the gated verdict, not the stored one.
+    rec = {"verdict": "verified", "reason": "tests pass", "product_check": True, "files": {"all": ["src/lib/a.py"]}}
+    assert final_verdict.final(rec)["verdict"] == "could_not_verify"
+    pdf_always.records_pdfs(tmp_path, "x", [("lib-1", rec)])
+    t = _text(tmp_path / "lib-1" / "REPORT.pdf")
+    assert "COULD NOT VERIFY" in t and "VERIFIED" not in t.replace("COULD NOT VERIFY", "")
+    assert "NO-GO" in _text(tmp_path / "SUMMARY.pdf")
+
+
+def test_login_failure_writes_nogo_summary(reports, monkeypatch):
+    def login_refused(argv=None):
+        raise dr.GitHubAuthError(dr.AUTH_FAIL_MESSAGE)
+    monkeypatch.setattr(dr, "_main", login_refused)
+    assert dr.main([]) == dr.AUTH_FAIL_EXIT
+    t = _text(_only_summary(reports))
+    assert "NO-GO" in t and "GitHub" in t
+
+
+def test_lock_already_held_writes_nogo_summary(reports, tmp_path, monkeypatch):
+    rdir = tmp_path / "run"
+    held = dr.acquire_run_lock(rdir)   # another run holds the lock
+
+    def second_run(argv=None):   # the same steps _main takes for a product check's lock
+        try:
+            dr.acquire_run_lock(rdir)
+        except dr.RunLockHeld as e:
+            print(str(e), file=sys.stderr, flush=True)
+            return dr.LOCK_HELD_EXIT
+        return 0
+    monkeypatch.setattr(dr, "_main", second_run)
+    try:
+        assert dr.main([]) == dr.LOCK_HELD_EXIT
+    finally:
+        held.close()
+    t = _text(_only_summary(reports))
+    assert "NO-GO" in t and "lock" in t
+
+
+def test_killed_check_leaves_placeholder_record_counted_as_could_not_verify(tmp_path, monkeypatch):
+    from poc import final_verdict
+    a = types.SimpleNamespace(no_report=False, report_dir=str(tmp_path / "o"), resume=True)
+    monkeypatch.setattr(dr, "new_record", lambda *x, **k: (_ for _ in ()).throw(SystemExit(143)))
+    with pytest.raises(SystemExit):
+        dr.test_pr("o/lib", {"pkg": "lib"}, {"pr": 5, "diff": "", "title": "t"}, tmp_path / "run", tmp_path / "w", a, {})
+    rj = tmp_path / "run" / "lib-5" / "record.json"
+    rec = json.loads(rj.read_text())
+    assert pdf_always.is_placeholder(rec) and rec["record_kind"] != "pr_run"   # --resume never reuses it
+    # even if someone edits it to claim a better verdict, it is read as could_not_verify
+    for v in ("verified", "needs_attention", "no_code_change"):
+        assert final_verdict.final(dict(rec, verdict=v))["verdict"] == "could_not_verify"
+    # the summary built from the run folder shows it as could not verify
+    import reports.pr_report as pr
+    monkeypatch.setattr(pr.rv, "find_chrome", lambda: None)
+    rows = pr.render_run(tmp_path / "run", tmp_path / "o")
+    assert [r["verdict"] for r in rows] == ["COULD NOT VERIFY"]
+    assert "COULD NOT VERIFY" in _text(tmp_path / "o" / "lib-5" / "REPORT.pdf")
+    assert (tmp_path / "o" / "SUMMARY.pdf").exists()
+
+
+def test_real_record_replaces_placeholder(tmp_path, monkeypatch):
+    a = types.SimpleNamespace(no_report=False, report_dir=str(tmp_path / "o"))
+    seen = {}
+
+    def fake_new_record(*x, **k):
+        seen["placeholder"] = json.loads((tmp_path / "run" / "lib-6" / "record.json").read_text())
+        raise RuntimeError("stop here")
+    monkeypatch.setattr(dr, "new_record", fake_new_record)
+    with pytest.raises(RuntimeError):
+        dr.test_pr("o/lib", {"pkg": "lib"}, {"pr": 6, "diff": "", "title": "t"}, tmp_path / "run", tmp_path / "w", a, {})
+    assert pdf_always.is_placeholder(seen["placeholder"])
+    rec = dr.harness_error_record("o/lib", {"pkg": "lib"}, {"pr": 6, "title": "t"}, tmp_path / "run", a, {},
+                                  RuntimeError("stop here"))
+    on_disk = json.loads((tmp_path / "run" / "lib-6" / "record.json").read_text())
+    assert not pdf_always.is_placeholder(on_disk) and on_disk["reason"] == rec["reason"]

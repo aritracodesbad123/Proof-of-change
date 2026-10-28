@@ -1039,7 +1039,9 @@ def start_check(pr_url: str, *, model_provider: str = "nebius", owner: str | Non
                 tail = session_key.scrub(file_tail, secrets)
             found = find_record_for_pr(m.group(1), int(m.group(2)))
             # A written record means the check produced analysis — surface it even if exit!=0 (problems list).
-            ok = (returncode == 0 or found is not None) and not timed_out
+            from poc.pdf_always import is_placeholder
+            real = found is not None and not is_placeholder(found[0])
+            ok = (returncode == 0 or real) and not timed_out
             if timed_out:
                 emit("failed", detail="timed out")
                 job["timeout_pdf"] = timeout_pdfs(m.group(1), int(m.group(2)), CONSOLE_JOB_TIMEOUT_S)
