@@ -652,17 +652,8 @@ CHECKOUT_VERSION_SHELL = (
 # there is no compiler), the checkout's source directory (src/ layout or root) is put on the path instead and that is
 # recorded; the import-origin check then confirms the package imports from /work/src or stops the check loudly.
 EDITABLE_REINSTALL_SHELL = (
-    # The checkpoint shell runs under set -e: the exit code is caught here, so a failed editable build reaches the
-    # fallback below instead of stopping the whole install.
-    f"if python -m pip install --no-deps -e . > {EDITABLE_LOG} 2>&1; then ec=0; else ec=$?; fi\n"
-    # One retry with pip's build and wheel-cache folders on /work. A build that cannot set timestamps in the default
-    # temporary folder ("Cannot update time stamp of directory ... egg-info") then gets an ordinary folder.
-    "if [ \"$ec\" != 0 ]; then\n"
-    "  mkdir -p /work/.poc-tmp\n"
-    f"  if TMPDIR=/work/.poc-tmp python -m pip install --no-cache-dir --no-deps -e . >> {EDITABLE_LOG} 2>&1; "
-    "then ec=0; else ec=$?; fi\n"
-    f"  echo \"editable_retry=tmpdir /work/.poc-tmp exit $ec\" >> {INSTALL_REPORT}\n"
-    "fi\n"
+    f"python -m pip install --no-deps -e . > {EDITABLE_LOG} 2>&1\n"
+    "ec=$?\n"
     f"echo \"editable_exit=$ec\" >> {INSTALL_REPORT}\n"
     "if [ \"$ec\" != 0 ]; then\n"
     "  sp=$(python -c \"import sysconfig;print(sysconfig.get_paths()['purelib'])\")\n"
@@ -697,9 +688,7 @@ def install_shell_source(repo: str, sha: str, extra: str = "", deps_only_fallbac
         + (f"git fetch -q --filter=tree:0 --tags origin {sha} 2>/dev/null || git fetch -q --depth 1 origin {sha}\n"
            if deps_only_fallback else f"git fetch -q --depth 1 origin {sha}\n")
         + "git checkout -q FETCH_HEAD\n"
-        + (CHECKOUT_VERSION_SHELL if deps_only_fallback else "")
-        # Product checks: pip's temporary build folders live on /work, the same disk as the checkout.
-        + ("mkdir -p /work/.poc-tmp && export TMPDIR=/work/.poc-tmp\n" if deps_only_fallback else "") +
+        + (CHECKOUT_VERSION_SHELL if deps_only_fallback else "") +
         "python -m pip install -q -e '.[dev]' 2>/dev/null "
         "|| python -m pip install -q -e '.[test]' 2>/dev/null "
         "|| python -m pip install -q -e '.[tests]' 2>/dev/null "
