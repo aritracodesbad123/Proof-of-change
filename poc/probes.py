@@ -422,7 +422,40 @@ def judge(spec: dict, runs: dict, files: dict | None = None) -> list[dict]:
         out.append(res)
     _one_side_claim_link(spec, out)
     _shape_link(out)
+    _dangling_cover_link(spec, out)
     return out
+
+
+DANGLING_NOTE = "the probe's only claim names none of its observations, so this difference is probably that claim, check"
+
+
+def _dangling_cover_link(spec: dict, out: list[dict]) -> None:
+    """A probe with exactly one claim, a difference claim whose cover patterns match none of the probe's observation
+    names (a cover that repeats the claim id, or a prefix the probe never printed): its unclaimed differences are
+    advisory ("probably that claim, check"), not unclaimed. They stay unmentioned and visible, and cap the verdict at
+    could_not_verify; they are never proven. Probes with no claims, or with several, are unchanged, and differences
+    unstable only on the PR are never linked."""
+    claims = [c for c in spec.get("claims") or [] if isinstance(c, dict)]
+    if len(claims) != 1 or claims[0].get("expect") != "differs":
+        return
+    if any(_covers_name(claims[0].get("covers"), r.get("name")) for r in out):
+        return
+    # Only a difference whose name starts with the claim id or with the first part of one of its covers
+    # ("c1.x" next to claim C1, "result.x" next to cover "result.y") is linked. Any other difference in the probe
+    # stays unclaimed and still needs attention.
+    heads = {_name_head(claims[0].get("id"))} | {_name_head(c) for c in claims[0].get("covers") or [] if isinstance(c, str)}
+    heads -= {""}
+    for r in out:
+        if (r.get("label") == FindingLabel.UNMENTIONED_CHANGE.value and r.get("state") == "differs"
+                and not r.get("advisory") and not r.get("pr_only") and _name_head(r.get("name")) in heads):
+            r["advisory"], r["linked_by"], r["note"] = True, "dangling_cover", DANGLING_NOTE
+
+
+def _name_head(name) -> str:
+    """The first part of an observation name or cover, lower case: "C1.x" -> "c1", "c1_x" -> "c1". Empty when that
+    part holds a wildcard, so a bare "*" or "c*" never links."""
+    head = re.split(r"[._]", str(name or ""), maxsplit=1)[0].lower()
+    return "" if any(ch in head for ch in "*?[") else head
 
 
 SHAPE_NOTE = "probably the claimed change, check"
