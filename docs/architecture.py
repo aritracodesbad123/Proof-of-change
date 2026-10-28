@@ -68,8 +68,10 @@ panel(0.16, 0.315, "Tavily diagnosis\nreads the real error\n+ crawled setup page
 panel(0.16, 0.41, "Fix setup in sandbox\nand retest\n(up to 3 tries)", c=NEW, e=NE, w=0.26, h=0.065)
 panel(
     0.5, 0.135,
-    "10. Report: HTML + Markdown + PDF (always arrives)\nshows the evidence and step timings",
-    w=0.55, h=0.065,
+    "10. Report: HTML + Markdown + PDF\n"
+    "saved with each run; emailed when the main PDF maker creates it\n"
+    "shows the evidence and step timings",
+    w=0.62, h=0.078,
 )
 panel(0.5, 0.055, "11. Human reviewer decides\nthe tool never approves or merges", c=HUM, e=HE)
 arr(0.5, 0.912, 0.5, 0.888)
@@ -88,8 +90,8 @@ ax.text(0.04, 0.24, "Could not verify\n(setup / missing package)", fontsize=9.5,
 arr(0.16, 0.348, 0.16, 0.376, col=NE)
 arr(0.29, 0.43, 0.35, 0.475, col=NE)
 ax.text(0.28, 0.458, "retest", fontsize=9.5, color=NE, ha="right", va="bottom", style="italic")
-arr(0.5, 0.198, 0.5, 0.163, "final verdict")
-arr(0.5, 0.107, 0.5, 0.083)
+arr(0.5, 0.198, 0.5, 0.178, "final verdict")
+arr(0.5, 0.092, 0.5, 0.083)
 ax.text(
     0.5, 0.012,
     "The orange loop fixes setup only. It does not retry a failure the pull request caused, "
