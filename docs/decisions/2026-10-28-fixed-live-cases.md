@@ -18,6 +18,6 @@ Known bug (must be needs_attention; anything else is a miss):
 
 - Textualize/rich#4147
 
-Live rate = needs_attention on known-safe cases / 9. could_not_verify results are counted separately, with their reasons. Runs that fail for infrastructure reasons are set aside and rerun.
+Live rate = needs_attention on known-safe cases / 9. could_not_verify results are counted separately, with their reasons. Runs that fail for infrastructure reasons are set aside with their reason, and that reason is reported with the results.
 
 It does not change any verdict.
