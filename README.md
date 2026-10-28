@@ -34,8 +34,7 @@ the check again, up to 3 logged tries. A repair only lets the check run; the ver
 any other run. It never retries a failure the PR caused and never installs OS packages.
 
 The report is HTML and Markdown, and it shows the evidence and how long each step took. The PDF report is saved
-with each run and emailed when created by the main PDF maker. A person decides, and the tool never approves or
-merges.
+with every run. A person decides, and the tool never approves or merges.
 
 Each check logs the Tavily credits it uses. When `POC_TAVILY_CREDIT_CAP` is set, a check that might go over stops
 before its first Tavily call and reports could not verify.

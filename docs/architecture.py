@@ -69,7 +69,7 @@ panel(0.16, 0.41, "Fix setup in sandbox\nand retest\n(up to 3 tries)", c=NEW, e=
 panel(
     0.5, 0.135,
     "10. Report: HTML + Markdown + PDF\n"
-    "saved with each run; emailed when the main PDF maker creates it\n"
+    "saved with every run\n"
     "shows the evidence and step timings",
     w=0.62, h=0.078,
 )
