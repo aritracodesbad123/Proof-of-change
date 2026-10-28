@@ -14,6 +14,13 @@ def _reset_operator_approval_mark():
     _hitl.reset_approval_ran()
 
 
+@pytest.fixture(autouse=True)
+def _reports_in_tmp(tmp_path, monkeypatch):
+    """Fallback and refusal PDFs from tests go to a temp folder, not the repo's reports folder."""
+    monkeypatch.setenv("POC_REPORT_DIR", str(tmp_path / "_reports"))
+    yield
+
+
 def pytest_configure(config):
     config.addinivalue_line("markers", "real_key_gate: run with the console's real typed-key gate")
     config.addinivalue_line("markers", "real_tavily_gate: run with the console's real Tavily-key gate")

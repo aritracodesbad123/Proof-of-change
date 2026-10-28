@@ -253,40 +253,97 @@ def run_case(dr, a, row: dict, inputs_meta: dict, out: Path, workroot: Path, mac
 
 
 def run(a, dr) -> int:
-    """Entry point from ops/daily_run.py main() (dr is that module)."""
-    from poc import hitl
+    """Entry point from ops/daily_run.py main() (dr is that module).
+
+    In a finally block, every bench run writes PDFs: one per case (a crashed case says could not verify with the
+    reason) and a go/no-go SUMMARY.pdf; a refused run gets a no-go SUMMARY.pdf with the reason. Built-in maker only."""
+    st = {"out": None, "rows": [], "reason": None}
+    rc = 1
+    try:
+        rc = _run(a, dr, st)
+        return rc
+    except SystemExit as e:
+        rc = e.code
+        st["reason"] = st["reason"] or (e.code if isinstance(e.code, str) else
+                                        "stopped by a stop signal (SIGTERM)" if e.code == 143 else None)
+        raise
+    except BaseException as e:
+        st["reason"] = st["reason"] or f"crashed: {type(e).__name__}: {e}"
+        raise
+    finally:
+        if not getattr(a, "no_report", False):
+            _bench_pdfs(a, dr, st, rc)
+
+
+def _bench_pdfs(a, dr, st: dict, rc) -> None:
+    from poc import pdf_always
+    try:
+        if getattr(a, "report_dir", None):
+            where = Path(a.report_dir)
+        elif st["out"] is not None:
+            where = Path(st["out"]) / "reports"
+        else:
+            where = pdf_always.reports_root() / ("bench-refused-" + time.strftime("%Y-%m-%d-%H%M%S"))
+        name = "bench " + (Path(a.bench).name if getattr(a, "bench", None) else "run")
+        if st["rows"] or st["reason"] is None:
+            pdf_always.records_pdfs(where, name, st["rows"], stopped=st["reason"])
+        else:
+            pdf_always.nogo_summary(where, name, st["reason"])
+        if hasattr(dr, "PDF_TARGET"):
+            dr.PDF_TARGET["summary_done"] = True
+        print(f"bench PDFs: {where / 'SUMMARY.pdf'}", flush=True)
+    except Exception as e:  # noqa: BLE001
+        print(f"ERROR: bench PDFs not written: {type(e).__name__}: {e}", file=sys.stderr, flush=True)
+
+
+def _run(a, dr, st: dict) -> int:
+    from poc import hitl, pdf_always
     stop = hitl.study_operator_approval_stop(
         bench=True, console_job=bool(getattr(a, "console_job", False)), single_pr=bool(getattr(a, "pr", None)))
     if stop:
         print(stop, file=sys.stderr)
+        st["reason"] = stop
         return 2
     try:
         rows = select(read_inputs(a.bench), a.ids)
     except (AnswerKeyRefused, BenchInputError, OSError) as e:
         print(f"Stopped: {e}", file=sys.stderr)
+        st["reason"] = f"Stopped: {e}"
         return 2
     from poc import model_provider
     stop = model_provider.auth_refusal(getattr(a, "provider", None))
     if stop:
         print(stop, file=sys.stderr)
+        st["reason"] = stop
         return 1
     raw = Path(a.bench).read_bytes()
     meta = {"inputs_file": Path(a.bench).name, "inputs_sha256": hashlib.sha256(raw).hexdigest()}
     out = labelled_study_out(a.bench_out or dr.REPO_ROOT / DEFAULT_OUT, bool(getattr(a, "swarm", False)))
+    st["out"] = out
     workroot = Path(a.work_dir or Path(a.ops_dir) / "work")
     a.python_full = dr.resolve_python(a.python)
     machine = dict(dr.detect_machine_type())
     problems = 0
+    pdir = Path(a.report_dir) if getattr(a, "report_dir", None) else Path(out) / "reports"
     for row in rows:
         print(f"[{row['id']}] {row['repo']}#{row['pr']} {row['pr_title'][:60]} ...", flush=True)
+        if not getattr(a, "no_report", False):
+            try:   # replaced when the case finishes; a killed case still leaves this could-not-verify PDF
+                pdf_always.placeholder(pdir, str(row["id"]), f"{row['repo']}#{row['pr']}")
+            except Exception:  # noqa: BLE001
+                pass
         try:
             rec = run_case(dr, a, row, meta, out, workroot, machine)
             print(f"    -> {rec['verdict']}: {rec['reason'][:160]}", flush=True)
+            st["rows"].append((str(row["id"]), rec))
         except model_provider.ProviderRejected as e:
             print(str(e), file=sys.stderr)
+            st["reason"] = f"provider refused: {e}"
             return 1
         except Exception as e:  # noqa: BLE001
             problems += 1
             print(f"    -> harness error: {type(e).__name__}: {e}", flush=True)
+            st["rows"].append((str(row["id"]), {"verdict": "could_not_verify",
+                                                "reason": f"harness error: {type(e).__name__}: {e}"}))
     print(f"results: {out}")
     return 1 if problems else 0
