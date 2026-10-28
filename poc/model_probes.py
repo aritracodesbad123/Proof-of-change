@@ -362,7 +362,7 @@ def _pattern_can_match(pat: str, names: set, prefixes: set) -> bool:
     return any(head.startswith(pre) or pre.startswith(head) for pre in prefixes)
 
 
-def unmatched_covers(p: dict) -> list[str]:
+def unmatched_covers(p: dict, id_covers_count: bool = False) -> list[str]:
     """"C1:c1.row0" for each cover of a probe's claims that no observation name its code records can match. Empty
     when the code's names cannot be told (recorded_names returns None): a cover is never judged on a guess."""
     found = recorded_names(_unescape_code(p.get("code")))
@@ -370,7 +370,8 @@ def unmatched_covers(p: dict) -> list[str]:
         return []
     names, prefixes = found
     return [f"{c.get('id')}:{pat}" for c in p.get("claims") or [] if isinstance(c, dict)
-            for pat in c.get("covers") or [] if isinstance(pat, str) and not _is_id_cover(pat, c.get("id"))
+            for pat in c.get("covers") or [] if isinstance(pat, str)
+            and (id_covers_count or not _is_id_cover(pat, c.get("id")))
             and not _pattern_can_match(pat, names, prefixes)]
 
 
@@ -378,6 +379,43 @@ def _is_id_cover(pat: str, cid) -> bool:
     """A cover that is only the claim's own id ("C1", "c1*", "C1.*"). Judging already links such covers by id
     (poc/claim_hygiene.py), so it is not asked about again."""
     return str(pat).lower().rstrip("*").rstrip(".") == str(cid or "").lower() and bool(cid)
+
+
+def _names_per_claim(probes: list) -> dict:
+    """Claim id -> the observation names (or name prefixes) its covers match, over all probes. A probe whose
+    names cannot be told adds nothing, so a retry that hides its names never counts as keeping them."""
+    got: dict = {}
+    for q in probes:
+        found = recorded_names(_unescape_code(q.get("code")))
+        for c in q.get("claims") or []:
+            if not isinstance(c, dict):
+                continue
+            hit = got.setdefault(c.get("id"), set())
+            if found is None:
+                continue
+            names, prefixes = found
+            for pat in c.get("covers") or []:
+                if isinstance(pat, str) and not _is_id_cover(pat, c.get("id")):
+                    hit |= {n for n in names if fnmatch.fnmatchcase(n, pat)}
+                    head = re.split(r"[*?\[]", pat, maxsplit=1)[0]
+                    hit |= {pre + "*" for pre in prefixes if head.startswith(pre) or pre.startswith(head)}
+    return got
+
+
+def retry_weakens(first: list, retry: list) -> str | None:
+    """Why a retry answer is not kept, or None. Kept only when it has (a) at least as many usable probes,
+    (b) for each claim at least as many matched observation names, and (c) fewer unmatched covers, where a
+    cover that is only the claim id counts as unmatched, so swapping a real name for "C1.*" is no gain."""
+    if len(retry) < len(first):
+        return "the retry had fewer usable probes"
+    n1, n2 = _names_per_claim(first), _names_per_claim(retry)
+    lost = sorted(str(k) for k, v in n1.items() if len(n2.get(k, ())) < len(v))
+    if lost:
+        return "the retry matched fewer observation names for " + ", ".join(lost)
+    strict = lambda ps: sum(len(unmatched_covers(q, id_covers_count=True)) for q in ps)  # noqa: E731
+    if strict(retry) >= strict(first):
+        return "the retry did not leave fewer unmatched covers"
+    return None
 
 
 def _linked_ids(probes: list) -> set:
@@ -472,8 +510,8 @@ def generate(provider: Provider, repo: str, pr: int, title: str, body: str | Non
                 out["retried"]["kept_first_answer"] = "the retry linked no claim either"
     elif by_id:
         # Claims are linked, but a cover names no observation the code records. Its claim would then see nothing
-        # and the differences under the real names would look unclaimed. Ask once more; keep the retry only when it
-        # is usable, links at least as many claims and leaves fewer such covers, so no probe or link is lost.
+        # and the differences under the real names would look unclaimed. Ask once more; keep the retry only when
+        # retry_weakens finds nothing (a model call only, no search credits), so no probe, link or name is lost.
         bad = [x for p in usable for x in unmatched_covers(p)]
         if bad:
             why = COVER_REASON.format(", ".join(bad[:6]))
@@ -485,11 +523,13 @@ def generate(provider: Provider, repo: str, pr: int, title: str, body: str | Non
                 out["errors"].append(f"retry: {e}")
             else:
                 usable2 = _usable(again, set(by_id))
-                bad2 = [x for p in usable2 for x in unmatched_covers(p)]
-                if usable2 and _linked_ids(usable2) >= _linked_ids(usable) and len(bad2) < len(bad):
+                weak = retry_weakens(usable, usable2)
+                if weak is None and not _linked_ids(usable) <= _linked_ids(usable2):
+                    weak = "the retry linked fewer claims"
+                if weak is None:
                     resp = again
                 else:
-                    out["retried"]["kept_first_answer"] = "the retry did not leave fewer unmatched covers"
+                    out["retried"]["kept_first_answer"] = weak
     draft_probes: list = []
     for p in (resp or {}).get("probes", [])[:MAX_PROBES]:
         # Models name probes "P1" or "probe_x"; the id is only a file name, so normalise it rather than drop the probe

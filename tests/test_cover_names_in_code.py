@@ -57,3 +57,41 @@ def test_prompt_asks_for_covers_that_match_printed_names():
 def test_a_cover_that_is_only_the_claim_id_is_not_asked_about():
     p = {"claims": [{"id": "C1", "covers": ["C1", "c1.*"]}], "code": CODE_C2}
     assert model_probes.unmatched_covers(p) == []
+
+
+def _probe(pid, cid, covers, code=CODE_C2):
+    return {"id": pid, "about": "f", "claims": [{"id": cid, "covers": covers, "expect": "differs"}], "code": code}
+
+
+CODE_C1 = "import json\nobs = {'x.a': 1, 'x.b': 2}\nprint(json.dumps({'observations': obs}))\n"
+
+
+def test_retry_with_fewer_usable_probes_is_not_kept():
+    first = [_probe("P1", "C1", ["x.zz"], CODE_C1), _probe("P2", "C1", ["x.a"], CODE_C1)]
+    assert "fewer usable probes" in model_probes.retry_weakens(first, [_probe("P1", "C1", ["x.*"], CODE_C1)])
+
+
+def test_retry_matching_fewer_names_for_a_claim_is_not_kept():
+    first = [_probe("P1", "C1", ["x.*", "zz"], CODE_C1)]
+    assert "fewer observation names for C1" in model_probes.retry_weakens(first, [_probe("P1", "C1", ["x.a"], CODE_C1)])
+
+
+def test_retry_hiding_its_names_is_not_kept():
+    hidden = "obs = {}\nfor k in ks:\n    obs[k] = 1\n"
+    first = [_probe("P1", "C1", ["x.a", "zz"], CODE_C1)]
+    assert "fewer observation names" in model_probes.retry_weakens(first, [_probe("P1", "C1", ["x.a"], hidden)])
+
+
+def test_replacing_a_real_cover_with_an_id_cover_is_no_gain():
+    first = [_probe("P1", "C1", ["x.a", "zz"], CODE_C1)]
+    assert "fewer unmatched" in model_probes.retry_weakens(first, [_probe("P1", "C1", ["x.a", "C1.*"], CODE_C1)])
+
+
+def test_retry_with_same_unmatched_count_is_not_kept():
+    first = [_probe("P1", "C1", ["x.a", "zz"], CODE_C1)]
+    assert "fewer unmatched" in model_probes.retry_weakens(first, [_probe("P1", "C1", ["x.a", "yy"], CODE_C1)])
+
+
+def test_a_strictly_better_retry_is_kept():
+    first = [_probe("P1", "C1", ["x.a", "zz"], CODE_C1)]
+    assert model_probes.retry_weakens(first, [_probe("P1", "C1", ["x.*"], CODE_C1)]) is None
