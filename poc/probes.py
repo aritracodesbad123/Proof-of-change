@@ -497,6 +497,13 @@ def is_warning_observation(name: str) -> bool:
     return "warn" in str(name).lower()
 
 
+def _input_of(name: str) -> str | None:
+    """The input an observation belongs to: its dotted name without the last part ("c2.case1.rel" -> "c2.case1").
+    None for an undotted name, whose input cannot be told apart."""
+    name = str(name)
+    return name.rsplit(".", 1)[0] if "." in name else None
+
+
 def summarize(items: list[dict]) -> dict:
     """Findings over all probes of a PR: labels, red/amber observations, proven claims, reason text."""
     obs = [o | {"probe": it["id"]} for it in items for o in it["observations"]]
@@ -509,8 +516,17 @@ def summarize(items: list[dict]) -> dict:
     # Flaky on one side is noise. Unstable only on the pull request is not, even when it is too mixed to call.
     # "advisory" is only ever set by the product route (poc/claim_hygiene.py) on a model probe with no linked claim.
     advisory = [o for o in raw_flagged if o.get("advisory")]
+    # General rule for any claim that says something changes, checked per input: when one input reports several
+    # values ("case1.title", "case1.rel") and at least one of them differs as claimed, the claim is met for that
+    # input, and its other values that rightly stayed the same are advisory only. An input on which no value of the
+    # claim differs still needs attention. Inputs are told apart only by a dotted observation name.
+    met = {(o["claim"], _input_of(o["name"])) for o in obs if o.get("claim") and _input_of(o["name"])
+           and o["label"] == FindingLabel.PROVEN.value and o.get("state") == "differs"}
+    unchanged_sub = [o for o in raw_flagged if o["label"] == FindingLabel.NEEDS_HUMAN.value and o.get("state") == "same"
+                     and not o.get("advisory") and (o.get("claim"), _input_of(o["name"])) in met]
     flagged = [o for o in raw_flagged
-               if o["label"] != FindingLabel.FLAKY.value and o.get("pr_only") != "noisy" and not o.get("advisory")]
+               if o["label"] != FindingLabel.FLAKY.value and o.get("pr_only") != "noisy" and not o.get("advisory")
+               and o not in unchanged_sub]
     warning_only = [o for o in flagged if is_warning_observation(o["name"])]
     if flagged and len(warning_only) == len(flagged):
         flagged = []
@@ -537,6 +553,9 @@ def summarize(items: list[dict]) -> dict:
         bits.append(f"probe: {len(warning_only)} warning-only difference(s) not counted on their own")
     if advisory:
         bits.append(f"probe: {len(advisory)} difference(s) from a probe with no linked claims shown as advisory only")
+    if unchanged_sub:
+        bits.append(f"probe: {len(unchanged_sub)} unchanged sub-check(s) of an input where the claim's change was seen, shown as "
+                    "advisory only: " + "; ".join(f"{o['name']} ({o['claim']})" for o in unchanged_sub[:4]))
     if proven:
         bits.append(f"probe: claim(s) {', '.join(proven)} proven")
     same = sum(1 for o in obs if o["label"] == FindingLabel.NO_DIFFERENCE.value)
@@ -549,4 +568,5 @@ def summarize(items: list[dict]) -> dict:
                                                              for o in flagged],
             "proven_claims": proven, "reason": "; ".join(bits),
             "ignored_noise": [o["name"] for o in noisy], "ignored_warning_only": [o["name"] for o in warning_only],
-            "pr_only_noisy": [o["name"] for o in pr_only_noisy]}
+            "pr_only_noisy": [o["name"] for o in pr_only_noisy],
+            "advisory_unchanged_subchecks": [o["name"] for o in unchanged_sub]}
