@@ -273,22 +273,46 @@ def is_how_claim(claim: dict | None) -> bool:
     return bool(claim) and claim.get("expect") == "differs" and bool(_HOW_RE.search(str(claim.get("text") or "")))
 
 
-# Observation names may carry a claim id in any case followed by ".", "-" or "_" ("c2.x", "C2_x").
-_ID_PREFIX_RE = re.compile(r"^([A-Za-z]{1,8}\d+)[._-]")
+# Observation names may carry claim ids in any case: "c2.x", "C2_x", or several joined ("c1_c2.result").
+_ID_RE = re.compile(r"[A-Za-z]{1,8}\d+")
+
+
+def _name_ids(spec: dict, name: str) -> list[str]:
+    """The claim ids an observation name starts with, lower case, or [] when it starts with none.
+
+    The first dot-separated segment is read. When it is only this probe's own name ("probe1" for probe
+    "model-probe1") and that name is not also one of its claim ids ("model-c4" with claim C4), the next one
+    is. The segment's leading "_"/"-" separated parts that look like ids are the ids ("c1_c2" -> c1, c2;
+    "C1_x" -> c1). Something must follow them (a separator or more text): a bare "c1" is not a link."""
+    segs = name.split(".")
+    own = str(spec.get("id") or "").lower().removeprefix("model-")
+    claim_ids = {str(c.get("id") or "").lower() for c in spec.get("claims") or [] if isinstance(c, dict)}
+    if own and len(segs) > 1 and segs[0].lower() == own and own not in claim_ids:
+        segs = segs[1:]
+    parts = re.split(r"[_-]", segs[0])
+    ids = []
+    for part in parts:
+        if not _ID_RE.fullmatch(part):
+            break
+        ids.append(part.lower())
+    if not ids or (len(ids) == len(parts) and len(segs) == 1):
+        return []
+    return ids
 
 
 def _text_link(spec: dict, name: str) -> str | None:
-    """"id" when a model probe's observation name starts with the exact, full id of one of this probe's own claims,
-    number included, in any case and followed by ".", "-" or "_" ("c1.x" or "C1_x" next to claim "C1"), but matches
-    no cover. "c9.x" next to only "C1" is not linked. A word shared with a claim's text is never a link: that would
-    hide real unclaimed changes."""
+    """"id" when a model probe's observation name starts with claim ids that are ALL exact, full ids of this probe's
+    own claims, number included, in any case ("c1.x" or "C1_x" next to claim "C1"; "c1_c2.result" next to claims C1
+    and C2), but the name matches no cover. One id that is not this probe's claim breaks the link: "c9.x" next to
+    only "C1", or "c1_c9.x" next to "C1", is not linked and still flags. A word shared with a claim's text is never
+    a link: that would hide real unclaimed changes."""
     if spec.get("source") != "model" or not spec.get("claims"):
         return None
-    m = _ID_PREFIX_RE.match(name)
-    if not m:
+    found = _name_ids(spec, name)
+    if not found:
         return None
     ids = {str(c.get("id") or "").lower() for c in spec["claims"] if isinstance(c, dict)}
-    return "id" if m.group(1).lower() in ids else None
+    return "id" if all(i in ids for i in found) else None
 
 
 def label_for(state: str, claim: dict | None, name: str, crashed_both: bool) -> str:
