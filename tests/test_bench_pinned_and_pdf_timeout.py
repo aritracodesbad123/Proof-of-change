@@ -155,7 +155,7 @@ def test_report_failure_never_changes_exit_or_records(tmp_path, monkeypatch, cap
         raise subprocess.TimeoutExpired("chrome", 1)
     monkeypatch.setattr(pr, "render_run", boom)
     a = types.SimpleNamespace(no_report=False, report_dir=str(tmp_path / "out"))
-    assert daily_run.reviewer_reports(tmp_path, a, [rec], "check") is None
+    assert daily_run.reviewer_reports(tmp_path, a, [rec], "check") is True
     assert json.loads((tmp_path / "records.jsonl").read_text())["verdict"] == "verified"
     assert "verdicts are unchanged" in capsys.readouterr().err
 

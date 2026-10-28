@@ -353,7 +353,7 @@ def derive_verdict(rec: dict, baseline: str | None, pp: dict | None = None) -> s
                              baseline, pp)
         return lower_verdict(got, derive_verdict(alt, baseline))
     if pp is None:
-        pp = rejudge_probes(rec.get("probes"))
+        pp = rejudge_probes(rec.get("probes"), bool(rec.get("product_check")))
     cmp = rec.get("comparison")
     cnv = None if cmp else (rec.get("reason") or "no comparison")
     v = verdict_for(cmp, cnv, rec.get("exit_check"), rec.get("files"), pp, rec.get("behaviour_claims"), baseline,
@@ -377,7 +377,7 @@ def check_golden_pr_case(rec: dict, case: dict) -> Result:
     from evals.pr_metrics import record_is_blind
     from ops.daily_run import rejudge_probes, verdict_for
     exp, problems = case["expect"], []
-    pp = rejudge_probes(rec.get("probes"))
+    pp = rejudge_probes(rec.get("probes"), bool(rec.get("product_check")))
     cmp = rec.get("comparison")
     cnv = None if cmp else (rec.get("reason") or "no comparison")
     v_tests = verdict_for(cmp, cnv, rec.get("exit_check"), rec.get("files"))
