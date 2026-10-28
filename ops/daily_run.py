@@ -3912,7 +3912,7 @@ def compare_sides(results: dict) -> dict:
     ids = set()
     for r in results["main"] + results["pr"]:
         ids |= set(r)
-    out = {"same": 0, "same_skipped_both": 0, "regressions": [], "fixed": [], "new_tests_passing": 0,
+    out = {"same": 0, "same_skipped_both": 0, "regressions": [], "fixed": [], "new_tests_passing": 0, "new_tests_passing_ids": [],
            "new_tests_failing": [], "new_tests_skipped": [], "removed_tests": [], "reparametrized": [], "skipped_missing_dependency": [],
            "flaky": [], "pr_unstable": [], "pr_unstable_noisy": [], "environment": [], "other_changes": [],
            "preexisting_failures": [], "load_failed_both": [],
@@ -3989,6 +3989,7 @@ def compare_sides(results: dict) -> dict:
             out["fixed"].append(t)
         elif mo == "absent" and po == "passed":
             out["new_tests_passing"] += 1
+            out["new_tests_passing_ids"].append(t)
         elif mo == "absent" and po in bad:
             out["new_tests_failing"].append(t)
         elif mo == "absent" and po == "skipped":
@@ -4210,6 +4211,54 @@ def with_probes(cmp: dict | None, cnv_reason: str | None, exits: dict | None = N
     return v, (f"{reason}; {s['reason']}" if s["reason"] else reason), fl
 
 
+def _id_module(test_id: str) -> str:
+    """'tests/test_x.py::T::t[1]' -> 'tests/test_x.py'; 'tests.test_x::t' -> 'tests/test_x.py'; 'test_x::t' -> 'test_x.py'.
+
+    The module part of a test id as a relative file path (JUnit ids are relative to pytest's rootdir)."""
+    head = test_id.split("::", 1)[0]
+    if head.endswith(".py"):
+        return head.lstrip("./")
+    return head.replace(".", "/") + ".py"
+
+
+def is_test_file(path: str) -> bool:
+    name = path.rsplit("/", 1)[-1]
+    return name.endswith(".py") and (name.startswith("test_") or name.endswith("_test.py"))
+
+
+def _edited_test_file(test_id: str, edited: list[str]) -> str | None:
+    """The one edited test file the test lives in, by full relative path: the id's module path must equal the file's
+    path or be a whole-folder suffix of it. Two candidates (same name in different folders) match none."""
+    mod = _id_module(test_id)
+    hits = [f for f in edited if f == mod or f.endswith("/" + mod)]
+    return hits[0] if len(hits) == 1 else None
+
+
+def replaced_tests(cmp: dict, files: dict | None) -> list[str]:
+    """Removed tests that the PR replaced. Every removed test must live in a test file the PR edits (matched by full
+    path, test files only), that same file must gain at least as many new passing tests as it lost, nothing may
+    regress or newly fail, and at least one test must have run on both sides with the same result. Anything else
+    removed stays a finding."""
+    removed = cmp.get("removed_tests") or []
+    if not removed or cmp.get("regressions") or cmp.get("new_tests_failing") or cmp.get("pr_unstable"):
+        return []
+    ran_both = (cmp.get("same") or 0) - (cmp.get("same_skipped_both") or 0)
+    if ran_both < 1:
+        return []
+    edited = sorted({str(f).lstrip("./") for f in (files or {}).get("all") or [] if is_test_file(str(f))})
+    lost: dict = {}
+    for t in removed:
+        f = _edited_test_file(t, edited)
+        if f is None:
+            return []
+        lost.setdefault(f, []).append(t)
+    for f, gone in lost.items():
+        gained = [t for t in cmp.get("new_tests_passing_ids") or [] if _edited_test_file(t, edited) == f]
+        if len(gained) < len(gone):
+            return []
+    return list(removed)
+
+
 def tests_verdict(cmp: dict | None, cnv_reason: str | None, exits: dict | None = None,
                   files: dict | None = None) -> tuple[str, str, list[str]]:
     """Verdict from the test comparison alone (claims are checked by probes, see verdict_for).
@@ -4241,7 +4290,8 @@ def tests_verdict(cmp: dict | None, cnv_reason: str | None, exits: dict | None =
     findings += [FindingLabel.UNMENTIONED_CHANGE] * (len(cmp["regressions"]) + len(cmp["new_tests_failing"]))
     findings += [FindingLabel.UNMENTIONED_CHANGE] * len(cmp.get("pr_unstable") or [])
     findings += [FindingLabel.FLAKY] * len(cmp["flaky"])
-    findings += [FindingLabel.NEEDS_HUMAN] * (len(cmp["removed_tests"]) + len(cmp["other_changes"]))
+    replaced = replaced_tests(cmp, files)
+    findings += [FindingLabel.NEEDS_HUMAN] * (len(cmp["removed_tests"]) - len(replaced) + len(cmp["other_changes"]))
     findings += [FindingLabel.PROVEN] * len(cmp["fixed"])
     if (cmp["same"] or cmp["new_tests_passing"]) and not nothing_ran:
         findings.append(FindingLabel.NO_DIFFERENCE)
@@ -4265,8 +4315,11 @@ def tests_verdict(cmp: dict | None, cnv_reason: str | None, exits: dict | None =
         more = f" (+{len(pr_noisy) - 5})" if len(pr_noisy) > 5 else ""
         bits.append(f"{len(pr_noisy)} test(s) stable on the base and unstable only on the pull request, "
                     f"too mixed to call a regression: {shown}{more}")
-    if cmp["removed_tests"]:
-        bits.append(f"{len(cmp['removed_tests'])} test(s) removed on the PR side")
+    if len(cmp["removed_tests"]) > len(replaced):
+        bits.append(f"{len(cmp['removed_tests']) - len(replaced)} test(s) removed on the PR side")
+    if replaced:
+        bits.append(f"{len(replaced)} test(s) removed from a test file the PR edits, with new passing tests added "
+                    "(replaced, not a finding)")
     if cmp["other_changes"]:
         bits.append(f"{len(cmp['other_changes'])} other outcome change(s)")
     if cmp["fixed"]:
@@ -4333,6 +4386,10 @@ def tests_verdict(cmp: dict | None, cnv_reason: str | None, exits: dict | None =
         return cnv, f"not fully verified: {dep_note} ({reason})", fl
     if pr_noisy:
         return cnv, f"not fully verified: {reason}", fl
+    if replaced and not [f for f in verdict_findings if f is FindingLabel.NEEDS_HUMAN]:
+        # The old test was not run against the PR's code, so the PR cannot be verified, but a test the PR itself
+        # replaced in a test file it edits is not a finding either.
+        return cnv, f"not fully verified: a replaced test was not run on the PR ({reason})", fl
     v = pr_verdict(RunSummary(build_ok=True, claims=[Claim("tests", testable=True, probed=True, proven=True)],
                               findings=verdict_findings))
     # Noise rule: a project test whose result changes between runs on the same side is shown in the reason but
