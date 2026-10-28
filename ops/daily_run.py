@@ -4127,6 +4127,11 @@ def verdict_for(cmp: dict | None, cnv_reason: str | None, exits: dict | None = N
         from poc import claim_hygiene
         return (Verdict.COULD_NOT_VERIFY.value, f"could not verify: {claim_hygiene.note_text(hygiene)} ({reason})",
                 fl + ["dropped_flagged_probe"])
+    unproven = probes.unproven_claims(probe_results)
+    if unproven and v == Verdict.VERIFIED.value:
+        return (Verdict.COULD_NOT_VERIFY.value,
+                f"could not verify: claim(s) {', '.join(unproven[:4])} not proven (checked on one example only, or "
+                f"only by an import or runs-only check) ({reason})", fl + ["claim_not_proven"])
     if broad and broad.get("held_back") and v == Verdict.VERIFIED.value:
         from poc import broad_claims
         return (Verdict.COULD_NOT_VERIFY.value, f"could not verify: {broad_claims.note_text(broad)} ({reason})",

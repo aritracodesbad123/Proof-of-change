@@ -411,6 +411,7 @@ def judge(spec: dict, runs: dict, files: dict | None = None) -> list[dict]:
                                 if name in runs[side][0]}
         out.append(res)
     _shape_link(out)
+    _not_proof(spec, out)
     return out
 
 
@@ -444,6 +445,82 @@ def _shape_link(out: list[dict]) -> None:
         if (r.get("label") == FindingLabel.UNMENTIONED_CHANGE.value and not r.get("advisory")
                 and not r.get("pr_only") and _shape(r) in proven):
             r["advisory"], r["linked_by"], r["note"] = True, "shape", SHAPE_NOTE
+
+
+RUNS_ONLY_NOTE = "an import or runs-only check proves no claim"
+ONE_EXAMPLE_NOTE = "a 'stays the same' claim checked on one example only is not proof"
+_RUNS_WORDS = {"import", "imports", "imported", "importable", "run", "runs", "ran", "executes", "executed", "loads",
+               "loaded"}
+_RUN_VALUES = (True, None, "ok", "OK", "True")
+# Words that name what was measured about an input, not the input: "single_tag_match_count" and
+# "single_tag_matches" are both about the input "single_tag".
+_METRIC_WORDS = {"count", "counts", "len", "length", "match", "matches", "matched", "result", "results", "output",
+                 "outputs", "value", "values", "type", "types", "repr", "str", "spans", "span", "list", "ok", "n",
+                 "num", "size", "raises", "error", "exception", "returns", "return", "equal", "equals", "is", "has"}
+
+
+def _tokens(name: str) -> list[str]:
+    return [t for t in re.split(r"[._\-\s]+", str(name).lower()) if t]
+
+
+def is_runs_only(r: dict) -> bool:
+    """True for an observation that only shows an import worked or the code ran: a name about importing or running
+    and the same plain success value (True, None, "ok") on both sides."""
+    return (r.get("state") == "same" and bool(set(_tokens(r.get("name"))) & _RUNS_WORDS)
+            and any(r.get("main") == v and type(r.get("main")) is type(v) for v in _RUN_VALUES)
+            and r.get("pr") == r.get("main"))
+
+
+def _example_of(name: str, claim_id: str | None) -> str:
+    """The example (input) an observation is about: a dotted "<claim>.<input>.<value>" name gives "<input>"; else the
+    name without a leading claim id and without its trailing measurement words."""
+    segs = str(name).split(".")
+    if claim_id and segs and segs[0].lower() == str(claim_id).lower():
+        segs = segs[1:]
+    if len(segs) >= 2:
+        return ".".join(segs[:-1]).lower()
+    toks = _tokens(segs[0] if segs else name)
+    while len(toks) > 1 and toks[-1] in _METRIC_WORDS:
+        toks.pop()
+    for i, t in enumerate(toks):
+        if i and t in _METRIC_WORDS:
+            toks = toks[:i]
+            break
+    return "_".join(toks)
+
+
+def _not_proof(spec: dict, out: list[dict]) -> None:
+    """Two kinds of "proven" are not proof, so they are relabelled not_testable with a note (never a flag):
+    1. an import or runs-only check (is_runs_only) proves no claim;
+    2. a broad claim that expects "same" ("existing behaviour is preserved", poc/broad_claims.is_broad) proven on
+       one example only: one input says nothing about all the behaviour that is said to stay the same. A claim
+       about one specific input ("tail(0, x) stays empty") is still proven by that input.
+    ops/daily_run.verdict_for then keeps a verified result at could_not_verify when a claim is left unproven this
+    way. Nothing that needed attention changes."""
+    from poc.broad_claims import is_broad
+    proven = FindingLabel.PROVEN.value
+    for r in out:
+        if r.get("label") == proven and r.get("claim") and is_runs_only(r):
+            r["label"], r["not_proof"] = FindingLabel.NOT_TESTABLE.value, RUNS_ONLY_NOTE
+    claims = {c.get("id"): c for c in spec.get("claims") or [] if isinstance(c, dict)}
+    for cid, c in claims.items():
+        if c.get("expect") != "same" or not is_broad(" ".join(str(c.get(k) or "") for k in ("text", "source_quote"))):
+            continue
+        mine = [r for r in out if r.get("claim") == cid and r.get("label") == proven and r.get("state") == "same"]
+        if mine and len({_example_of(r["name"], cid) for r in mine}) == 1:
+            for r in mine:
+                r["label"], r["not_proof"] = FindingLabel.NOT_TESTABLE.value, ONE_EXAMPLE_NOTE
+
+
+def unproven_claims(probe_results: dict | None) -> list[str]:
+    """Claim ids left with no proving observation because their only "proof" was not proof (_not_proof)."""
+    found = []
+    for it in (probe_results or {}).get("items") or []:
+        obs = it.get("observations") or []
+        for cid in sorted({str(o.get("claim")) for o in obs if o.get("not_proof") and o.get("claim")}):
+            if not any(str(o.get("claim")) == cid and o.get("label") == FindingLabel.PROVEN.value for o in obs):
+                found.append(cid)
+    return found
 
 
 def run_once(path: Path, python: Path, cwd: Path, env: dict, timeout: int, launch=None,
@@ -701,7 +778,11 @@ def summarize(items: list[dict]) -> dict:
     same = sum(1 for o in obs if o["label"] == FindingLabel.NO_DIFFERENCE.value)
     if same:
         bits.append(f"probe: {same} other observation(s) identical on both sides")
-    errors = [o for o in obs if o["label"] == FindingLabel.NOT_TESTABLE.value]
+    not_proof = [o for o in obs if o.get("not_proof")]
+    if not_proof:
+        bits.append(f"probe: {len(not_proof)} observation(s) not counted as proof: "
+                    + "; ".join(f"{o['name']} ({o['not_proof']})" for o in not_proof[:4]))
+    errors = [o for o in obs if o["label"] == FindingLabel.NOT_TESTABLE.value and not o.get("not_proof")]
     if errors:
         bits.append(f"probe: {len(errors)} probe(s) could not run on either side")
     return {"labels": [x.value for x in labels], "flagged": [{k: o[k] for k in ("probe", "name", "label", "claim")}
