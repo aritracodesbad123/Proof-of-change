@@ -2401,12 +2401,33 @@ def _wait_child(p: subprocess.Popen, timeout, t0: float):
             _heartbeat(int(time.time() - t0))
 
 
+GIT_LOW_SPEED_LIMIT = 1000   # bytes/s; a git download slower than this for GIT_LOW_SPEED_TIME seconds gives up
+GIT_LOW_SPEED_TIME = 60
+_GIT_NETWORK = {"clone", "fetch", "pull", "ls-remote"}
+
+
+def with_stall_limit(cmd):
+    """A git clone/fetch gets low-speed limits so a stalled download fails within about a minute, not at the step
+    timeout. Any other command is returned unchanged."""
+    cmd = list(cmd)
+    if not cmd or Path(str(cmd[0])).name != "git":
+        return cmd
+    i = 1
+    while i < len(cmd) and str(cmd[i]) in ("-C", "-c"):
+        i += 2
+    if i >= len(cmd) or str(cmd[i]) not in _GIT_NETWORK:
+        return cmd
+    return [cmd[0], "-c", f"http.lowSpeedLimit={GIT_LOW_SPEED_LIMIT}",
+            "-c", f"http.lowSpeedTime={GIT_LOW_SPEED_TIME}", *cmd[1:]]
+
+
 def run(cmd, log_path: Path, cwd=None, env=None, timeout=None, sbx=HOST) -> tuple[int, float]:
     """Run cmd with output to log_path. env is required: always an allowlisted base_env(...). sbx: the sandbox of a
     side (side_sandbox(...)); every command that may run PR or package code passes one."""
     if env is None:
         raise ValueError("run() needs an explicit allowlisted env (base_env)")
     t0 = time.time()
+    cmd = with_stall_limit(cmd)
     shown = list(map(str, cmd))
     if sbx is not None and _CONTREE_ONLY:
         with open(log_path, "a") as fh:
