@@ -411,7 +411,28 @@ def judge(spec: dict, runs: dict, files: dict | None = None) -> list[dict]:
                                 if name in runs[side][0]}
         out.append(res)
     _shape_link(out)
+    _dangling_cover_link(spec, out)
     return out
+
+
+DANGLING_NOTE = "the probe's only claim names none of its observations, so this difference is probably that claim, check"
+
+
+def _dangling_cover_link(spec: dict, out: list[dict]) -> None:
+    """A probe with exactly one claim, a difference claim whose cover patterns match none of the probe's observation
+    names (a cover that repeats the claim id, or a prefix the probe never printed): its unclaimed differences are
+    advisory ("probably that claim, check"), not unclaimed. They stay unmentioned and visible, and cap the verdict at
+    could_not_verify; they are never proven. Probes with no claims, or with several, are unchanged, and differences
+    unstable only on the PR are never linked."""
+    claims = [c for c in spec.get("claims") or [] if isinstance(c, dict)]
+    if len(claims) != 1 or claims[0].get("expect") != "differs":
+        return
+    if any(_covers_name(claims[0].get("covers"), r.get("name")) for r in out):
+        return
+    for r in out:
+        if (r.get("label") == FindingLabel.UNMENTIONED_CHANGE.value and r.get("state") == "differs"
+                and not r.get("advisory") and not r.get("pr_only")):
+            r["advisory"], r["linked_by"], r["note"] = True, "dangling_cover", DANGLING_NOTE
 
 
 SHAPE_NOTE = "probably the claimed change, check"
