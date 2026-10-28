@@ -4512,12 +4512,26 @@ def lower_verdict(a: str, b: str) -> str:
     return a if VERDICT_RANK.get(a, 0) <= VERDICT_RANK.get(b, 0) else b
 
 
+def _annotated_before(before: list, current: list) -> list:
+    """The pre-rewrite probes judged the same way as the kept ones. The snapshot is taken before probe status,
+    claim-link rejection and per-probe coverage are added, so a probe kept unchanged by the rewrite (same id and
+    content sha256) takes its annotated current entry, and every other one gets its status from
+    poc/probes.classify_item. Otherwise the same probe could count as evidence on one side of cap_rewrite only."""
+    kept = {(it.get("id"), it.get("sha256")): it for it in current or [] if isinstance(it, dict) and it.get("sha256")}
+    out = []
+    for it in before or []:
+        cur = kept.get((it.get("id"), it.get("sha256"))) if isinstance(it, dict) and it.get("sha256") else None
+        out.append(cur if cur is not None else (probes.classify_item(it) if isinstance(it, dict) else it))
+    return out
+
+
 def without_rewrite(rec: dict) -> dict | None:
     """The record with its probes as they were before the one rewrite, or None when no rewrite happened."""
     pr = rec.get("probes") or {}
     before = (pr.get("rewrite") or {}).get("before")
     if before is None:
         return None
+    before = _annotated_before(before, pr.get("items") or [])
     alt = copy.deepcopy(rec)
     alt["probes"] = {k: v for k, v in pr.items() if k != "rewrite"} | {"items": before,
                                                                          "summary": probes.summarize(before)}
@@ -4532,9 +4546,7 @@ def cap_rewrite(rec: dict) -> dict:
     if before is None or not rec.get("verdict"):
         return rec
     from evals.checks import derive_verdict
-    alt = copy.deepcopy(rec)
-    alt["probes"] = {k: v for k, v in pr.items() if k != "rewrite"} | {"items": before,
-                                                                         "summary": probes.summarize(before)}
+    alt = without_rewrite(rec)
     without = derive_verdict(alt, rec.get("baseline"))
     got = rec["verdict"]
     final = lower_verdict(got, without)
@@ -6976,8 +6988,8 @@ def _main(argv=None) -> int:
     if demo_helper.attach_self_check(rp, meta, records, a):
         (rdir / "run_meta.json").write_text(json.dumps(meta, indent=1))
     print(f"run log: {rp}")
-    reviewer_reports(rdir, a, records, "check" if single else "daily summary")
-    return 0 if not problems else 1
+    reports_ok = reviewer_reports(rdir, a, records, "check" if single else "daily summary")
+    return 0 if not problems and reports_ok else 1
 
 
 def pinned_args_problem(a, single: dict) -> str | None:
@@ -6994,23 +7006,31 @@ def pinned_args_problem(a, single: dict) -> str | None:
     return None
 
 
-def reviewer_reports(rdir: Path, a, records: list[dict], kind: str) -> None:
-    """HTML/PDF/MD reviewer reports + daily SUMMARY via reports/pr_report.py (the single report generator)."""
+def reviewer_reports(rdir: Path, a, records: list[dict], kind: str) -> bool:
+    """HTML/PDF/MD reviewer reports + daily SUMMARY via reports/pr_report.py (the single report generator).
+
+    Returns False when the reports or summary show a verdict other than the final one in record.json
+    (poc/final_verdict.py); the run then fails its self-check. Any other report error leaves the run's result alone."""
     if not records or a.no_report:
-        return
-    from reports.pr_report import render_run
+        return True
+    from reports.pr_report import VerdictMismatch, render_run
     out = Path(a.report_dir) if a.report_dir else REPO_ROOT / "reports" / "daily" / rdir.name
     t_rep = time.time()
     try:
         render_run(rdir, out, title=f"Proof-of-Change {kind}: {rdir.name}")
         print(f"report and PDF: {round(time.time() - t_rep, 1)} s", flush=True)
+    except VerdictMismatch as e:
+        print("Self-check FAILED: the reports do not match record.json:\n" + "\n".join(f"- {x}" for x in e.lines),
+              file=sys.stderr, flush=True)
+        return False
     except Exception as e:  # noqa: BLE001 - reports are a view of the saved records; they never change a verdict or exit code
         print(f"reviewer reports could not be written ({type(e).__name__}); records and verdicts are unchanged",
               file=sys.stderr, flush=True)
-        return
+        return True
     print(f"\nDONE. Open this file to read the results:\n  {out / 'SUMMARY.html'}")
     if getattr(a, "poc_commit", None):
         print(f"commit={a.poc_commit[:7]}")
+    return True
 
 
 def scoring_inputs(rdir: Path, a, chosen_path: Path) -> tuple[dict, dict]:
@@ -7034,7 +7054,7 @@ def rejudge(rec: dict, prdir: Path) -> dict:
     cmp["skipped_missing_dependency"] = [d for d in cmp["skipped_missing_dependency"] if d["test"] in kept]
     cmp["new_tests_failing"] = sorted(cmp["new_tests_failing"])
     ex = exit_check(rec.get("per_run", []), results, cmp)
-    pr_probes = rejudge_probes(rec.get("probes"))
+    pr_probes = rejudge_probes(rec.get("probes"), bool(rec.get("product_check")))
     v, reason, _ = verdict_for(cmp, None, ex, rec.get("files"), pr_probes, rec.get("behaviour_claims"),
                                rec.get("baseline"))
     v, reason = cap_for_review(rec, v, reason)
@@ -7049,12 +7069,22 @@ def rejudge(rec: dict, prdir: Path) -> dict:
     return out
 
 
-def rejudge_probes(pr_probes: dict | None) -> dict | None:
-    """Probe results recomputed from their recorded runs with the current rules (poc/probes.py)."""
+def rejudge_probes(pr_probes: dict | None, product_check: bool = False) -> dict | None:
+    """Probe results recomputed from their recorded runs with the current rules (poc/probes.py).
+
+    Recomputing observations drops the marks a real run adds afterwards (settle_probes). On the product route the
+    same claim clean-up runs again (claim_hygiene, broad_claims), so an advisory difference stays advisory and a
+    rejudged record reaches the same verdict as the run that wrote it. The study route is unchanged."""
     if not pr_probes or not pr_probes.get("items"):
         return pr_probes
     items = [probes.rejudge_entry(it) for it in pr_probes["items"]]
-    return dict(pr_probes, items=items, summary=probes.summarize(items))
+    out = dict(pr_probes, items=items, summary=probes.summarize(items))
+    if not product_check:
+        return out
+    from poc import broad_claims, claim_hygiene
+    out = broad_claims.apply(claim_hygiene.apply(out)) or out
+    out = probes.apply_status(out)
+    return dict(out, summary=probes.summarize(out["items"]))
 
 
 def migrate_record(rec: dict, rdir: Path, redo: bool = False) -> dict:
@@ -7209,8 +7239,7 @@ def report_only(rdir: Path, a) -> int:
     if demo_helper.attach_self_check(rp, meta, records, a):
         (rdir / "run_meta.json").write_text(json.dumps(meta, indent=1))
     print(f"run log (rebuilt from records, nothing re-tested): {rp}")
-    reviewer_reports(rdir, a, records, "daily summary (rebuilt)")
-    return 0
+    return 0 if reviewer_reports(rdir, a, records, "daily summary (rebuilt)") else 1
 
 
 def resolve_python(spec: str) -> str:
