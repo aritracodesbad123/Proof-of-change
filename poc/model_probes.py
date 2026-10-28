@@ -16,8 +16,10 @@ from __future__ import annotations
 
 import ast
 import fnmatch
+import io
 import json
 import re
+import tokenize
 from pathlib import Path
 
 from poc import freeze
@@ -350,9 +352,16 @@ def recorded_names(code: str) -> tuple[set, set] | None:
             for k in node.keys:
                 if k is not None:
                     key(k)
-        elif isinstance(node, ast.Subscript) and isinstance(node.ctx, ast.Store) and not key(node.slice):
+        elif (isinstance(node, ast.Subscript) and isinstance(node.ctx, ast.Store) and not _is_sys_modules(node.value)
+              and not key(node.slice)):
             return None
     return names, prefixes
+
+
+def _is_sys_modules(node) -> bool:
+    """sys.modules[...] = ... installs a module; it is not an observation key."""
+    return (isinstance(node, ast.Attribute) and node.attr == "modules" and isinstance(node.value, ast.Name)
+            and node.value.id == "sys")
 
 
 def _pattern_can_match(pat: str, names: set, prefixes: set) -> bool:
@@ -458,56 +467,236 @@ def parse_error(code) -> dict | None:
 
 
 _OBS_KEY = re.compile(r"""['"]([A-Za-z_][\w-]*(?:\.[\w-]+)+)['"]""")
-_FOR_IN = re.compile(r"\bfor\s+[^\n]+?\s+in\s+(?:[\w.]+\()?([\[(])")
 
 
-def _text_obs_keys(code) -> int:
-    """Distinct quoted dotted names (observation keys) in the code text; works when the code does not parse."""
-    return len(set(_OBS_KEY.findall(_unescape_code(code) if isinstance(code, str) else "")))
+def _const_len(node) -> int | None:
+    """How many items a for-loop's iterable has, when that can be read: a literal list/tuple/set, range() with
+    constant arguments, or enumerate()/list()/tuple()/sorted()/reversed() of one of those."""
+    if isinstance(node, (ast.List, ast.Tuple, ast.Set)):
+        return len(node.elts)
+    if isinstance(node, ast.Call) and isinstance(node.func, ast.Name) and not node.keywords:
+        f, args = node.func.id, node.args
+        if f == "range" and args and all(isinstance(x, ast.Constant) and type(x.value) is int for x in args):
+            try:
+                return len(range(*[x.value for x in args]))
+            except ValueError:
+                return None
+        if f in ("enumerate", "list", "tuple", "sorted", "reversed") and len(args) >= 1:
+            return _const_len(args[0])
+    return None
 
 
-def _text_inputs(code) -> int:
-    """The most top-level items in a literal list or tuple looped over by `for ... in [...]`, read from text."""
+_STOPS = (ast.Break, ast.Continue, ast.Return, ast.Raise)
+
+
+def _live(stmts: list) -> list:
+    """The statements of a block that can run: none after an unconditional break/continue/return/raise, and no
+    `if False:` / `if 0:` bodies (their else is kept)."""
+    out = []
+    for st in stmts:
+        if isinstance(st, ast.If) and isinstance(st.test, ast.Constant):
+            out += _live(st.body if st.test.value else st.orelse)
+            continue
+        out.append(st)
+        if isinstance(st, _STOPS):
+            break
+    return out
+
+
+def _ast_counts(code) -> dict | None:
+    """Observation keys and inputs of code that parses, read from its AST so keys in comments, docstrings and dead
+    code do not count. Keys: dotted names from recorded_names (#177) found in live code; an f-string key inside a loop
+    over a readable iterable counts once per item. Inputs: the most items of a readable loop, 1 when its body breaks
+    unconditionally. None when the code does not parse or stores under a key that cannot be read."""
+    code = _unescape_code(code) if isinstance(code, str) else ""
+    try:
+        tree = ast.parse(code)
+    except SyntaxError:
+        return None
+    if recorded_names(code) is None:
+        return None
+    names, fkeys, inputs = set(), set(), [0]
+
+    def walk(stmts, mult):
+        for st in _live(stmts):
+            if isinstance(st, (ast.For, ast.AsyncFor)):
+                n = _const_len(st.iter)
+                body = _live(st.body)
+                if n is not None and any(isinstance(b, ast.Break) for b in body):
+                    n = min(n, 1)
+                if n is not None:
+                    inputs[0] = max(inputs[0], n)
+                walk(st.body, mult * n if n else mult)
+                walk(st.orelse, mult)
+                continue
+            if isinstance(st, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+                walk(st.body, mult)
+                continue
+            subs = [getattr(st, f) for f in ("body", "orelse", "finalbody") if isinstance(getattr(st, f, None), list)]
+            subs += [h.body for h in getattr(st, "handlers", [])]
+            for node in ast.walk(st) if not subs else _shallow(st):
+                _keys(node, mult)
+            for b in subs:
+                walk(b, mult)
+
+    def _keys(node, mult):
+        if isinstance(node, ast.comprehension):   # [... for i in range(100)] reads 100 inputs, as the text does
+            n = _const_len(node.iter)
+            if n is not None:
+                inputs[0] = max(inputs[0], n)
+        ks = []
+        if isinstance(node, ast.Dict):
+            ks = [k for k in node.keys if k is not None]
+        elif isinstance(node, ast.Subscript) and isinstance(node.ctx, ast.Store) and not _is_sys_modules(node.value):
+            ks = [node.slice]
+        for k in ks:
+            if isinstance(k, ast.Constant) and isinstance(k.value, str) and _OBS_KEY.fullmatch(repr(k.value)):
+                names.add(k.value)
+            elif isinstance(k, ast.JoinedStr):
+                fkeys.add((ast.dump(k), mult))
+
+    walk(tree.body, 1)
+    return {"keys": len(names) + sum(m for _, m in fkeys), "inputs": inputs[0]}
+
+
+def _shallow(st):
+    """Nodes of a compound statement outside its nested blocks (its test, iterable, items...)."""
+    for f, v in ast.iter_fields(st):
+        if f in ("body", "orelse", "finalbody", "handlers"):
+            continue
+        for x in v if isinstance(v, list) else [v]:
+            if isinstance(x, ast.AST):
+                yield from ast.walk(x)
+
+
+def _tolerant_tokens(code) -> list:
+    """(type, string) tokens of code that may not parse, without comments, line breaks or indentation. A line that
+    breaks tokenizing is skipped and tokenizing goes on from the next one, so line breaks alone change nothing."""
     text = _unescape_code(code) if isinstance(code, str) else ""
+    toks, lines = [], text.splitlines(keepends=True)
+    start = 0
+    while start < len(lines):
+        last = start
+        try:
+            for t in tokenize.generate_tokens(io.StringIO("".join(lines[start:])).readline):
+                last = start + t.start[0] - 1
+                if t.type in (tokenize.COMMENT, tokenize.NL, tokenize.NEWLINE, tokenize.INDENT, tokenize.DEDENT):
+                    continue
+                toks.append((t.type, t.string))
+            break
+        except (tokenize.TokenError, IndentationError, SyntaxError) as e:
+            # skip past the line that broke tokenizing and go on from the next one
+            line = (e.args[1][0] if isinstance(e, tokenize.TokenError) and len(e.args) > 1
+                    and isinstance(e.args[1], tuple) else getattr(e, "lineno", None))
+            stop = start + line if isinstance(line, int) and line > 0 else last + 1
+            start = max(stop, last + 1, start + 1)
+            toks.append((tokenize.OP, ";"))
+    return toks
+
+
+def _token_obs_keys(code) -> int:
+    """Distinct dotted string keys of code that may not parse, read from its tokens: a string right after `{` or `,`
+    and followed by `:` (a dict key), or between `[` and `] =` (a subscript store). Comments, docstrings and other
+    strings (import_module('pkg.mod'), mock.patch('pkg.mod.f')) are not in a key position. Tokenizing stops at the
+    first token error and keeps what it read; line breaks alone do not change the count."""
+    toks = _tolerant_tokens(code)
+    names = set()
+    for i, (kind, val) in enumerate(toks):
+        if kind != tokenize.STRING or i == 0:
+            continue
+        prev, nxt = toks[i - 1][1], toks[i + 1][1] if i + 1 < len(toks) else ""
+        after = toks[i + 2][1] if i + 2 < len(toks) else ""
+        dict_key = prev in ("{", ",") and nxt == ":"
+        store = (prev == "[" and nxt == "]" and after == "="
+                 and [x[1] for x in toks[max(0, i - 4):i - 1]] != ["sys", ".", "modules"])
+        if not (dict_key or store):
+            continue
+        try:
+            v = ast.literal_eval(val)
+        except (ValueError, SyntaxError):
+            continue
+        if isinstance(v, str) and _OBS_KEY.fullmatch(repr(v)):
+            names.add(v)
+    return len(names)
+
+
+_WRAPS = ("enumerate", "list", "tuple", "sorted", "reversed")
+
+
+def _token_inputs(code) -> int:
+    """The most items of a loop (statement or comprehension) over a literal list, tuple or set, or over range() with
+    constant arguments, optionally wrapped in enumerate()/list()/tuple()/sorted()/reversed(); read from the tokens,
+    so loops in comments and strings do not count. Mirrors _const_len on the AST."""
+    toks = _tolerant_tokens(code)
+    vals = [v for _, v in toks]
     best = 0
-    for m in _FOR_IN.finditer(text):
-        depth, items, seen, quote, j = 0, 0, False, None, m.end(1) - 1
-        while j < len(text):
-            c = text[j]
-            if quote:
-                if c == "\\":
-                    j += 1
-                elif c == quote:
-                    quote = None
-            elif c in "'\"":
-                quote, seen = c, True
-            elif c in "([{":
-                depth += 1
-                if depth > 1:
-                    seen = True
-            elif c in ")]}":
-                depth -= 1
-                if depth == 0:
-                    items += 1 if seen else 0
+    for i, v in enumerate(vals):
+        if v != "for" or toks[i][0] != tokenize.NAME:
+            continue
+        j = next((k for k in range(i + 1, min(i + 30, len(vals))) if vals[k] == "in"), None)
+        if j is None:
+            continue
+        j += 1
+        while j + 1 < len(vals) and vals[j] in _WRAPS and vals[j + 1] == "(":
+            j += 2
+        if j + 1 < len(vals) and vals[j] == "range" and vals[j + 1] == "(":
+            args, k = [], j + 2
+            while k < len(vals) and vals[k] != ")":
+                if vals[k] != ",":
+                    args.append(vals[k])
+                k += 1
+            try:
+                best = max(best, len(range(*[int(x) for x in args])))
+            except (ValueError, TypeError):
+                pass
+            continue
+        if j < len(vals) and vals[j] in ("[", "(", "{"):
+            depth, items, seen = 0, 0, False
+            for k in range(j, len(vals)):
+                x = vals[k]
+                if x in ("[", "(", "{"):
+                    depth += 1
+                    if depth > 1:
+                        seen = True
+                elif x in ("]", ")", "}"):
+                    depth -= 1
+                    if depth == 0:
+                        items += 1 if seen else 0
+                        break
+                elif x == "," and depth == 1:
+                    items, seen = items + (1 if seen else 0), False
+                elif x == "for" and depth == 1:   # a comprehension, not a literal
+                    items = 0
                     break
-            elif c == "," and depth == 1:
-                items, seen = items + (1 if seen else 0), False
-            elif not c.isspace() and depth >= 1:
-                seen = True
-            j += 1
-        best = max(best, items)
+                else:
+                    seen = True
+            best = max(best, items)
     return best
 
 
-def _repair_loses(old_code, new_code) -> str | None:
-    """Why a parse repair is rejected: it records fewer observation keys or loops over fewer inputs."""
-    o, n = _text_obs_keys(old_code), _text_obs_keys(new_code)
-    if n < o:
-        return f"the repair has fewer observation keys ({n} < {o})"
-    o, n = _text_inputs(old_code), _text_inputs(new_code)
-    if n < o:
-        return f"the repair has fewer inputs ({n} < {o})"
-    return None
+def original_counts(code) -> dict:
+    """Keys and inputs of the original (broken) probe, both read from its tokens."""
+    return {"keys": _token_obs_keys(code), "inputs": _token_inputs(code), "read": "tokens"}
+
+
+def repair_counts(code) -> dict | None:
+    """Keys and inputs of a repair, read from its AST only; None when a key cannot be read (no text fallback)."""
+    c = _ast_counts(code)
+    return dict(c, read="ast") if c is not None else None
+
+
+def _repair_loses(old_code, new_code) -> tuple[str | None, dict]:
+    """Why a parse repair is rejected, and the before and after counts. The broken original is read from its tokens;
+    the repair, which parses, from its AST. A repair whose keys cannot be read is rejected."""
+    before, after = original_counts(old_code), repair_counts(new_code)
+    counts = {"before": before, "after": after}
+    if after is None:
+        return "the repair stores under a key that cannot be read", counts
+    if after["keys"] < before["keys"]:
+        return f"the repair has fewer observation keys ({after['keys']} < {before['keys']})", counts
+    if after["inputs"] < before["inputs"]:
+        return f"the repair has fewer inputs ({after['inputs']} < {before['inputs']})", counts
+    return None, counts
 
 
 def _repair_parse_errors(provider, probes_prompt: str, user: str, ctx: dict, resp, out: dict):
@@ -541,11 +730,12 @@ def _repair_parse_errors(provider, probes_prompt: str, user: str, ctx: dict, res
         fixed_list = list(probes)
         for i, p, e in broken:
             q = by_id.get(_tidy_id(p.get("id")) if isinstance(p.get("id"), str) else None)
+            counts = None
             if q is None:
                 outcome = "no fixed probe returned"
             else:
                 still = parse_error(q.get("code"))
-                lost = _repair_loses(p.get("code"), q.get("code"))
+                lost, counts = _repair_loses(p.get("code"), q.get("code"))
                 if still is not None:
                     outcome = f"still fails: {still['message']} (line {still['line']})"
                 elif lost:
@@ -553,7 +743,8 @@ def _repair_parse_errors(provider, probes_prompt: str, user: str, ctx: dict, res
                 else:
                     outcome = "fixed"
                     fixed_list[i] = dict(p, code=q.get("code"))
-            attempts.append({"attempt": n, "probe": p.get("id"), "error": e, "outcome": outcome})
+            attempts.append({"attempt": n, "probe": p.get("id"), "error": e, "outcome": outcome,
+                             **({"counts": counts} if counts else {})})
         resp = dict(resp or {}, probes=fixed_list)
     return resp
 
