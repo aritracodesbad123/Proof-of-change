@@ -450,8 +450,9 @@ def _shape_link(out: list[dict]) -> None:
 ONE_SIDE_NOTE = "the claim describes one side only (before or after the fix), check"
 # "Before the fix, X raises TypeError" or "After the change, X returns 1" says what one side does, so a difference
 # does not contradict it, even when the claim was extracted as "same".
-_ONE_SIDE_RE = re.compile(r"\b(?:before|after)\s+(?:the|this)\s+(?:fix|change|patch|pr|pull request)\b"
-                          r"|\bin the base version\b|\bon the current main\b|\bcurrently\b", re.I)
+# The single shape "Before the fix, X raises/returns Y": a statement of the old behaviour only.
+_ONE_SIDE_RE = re.compile(r"^\s*before\s+(?:the|this)\s+(?:fix|change|patch|pr|pull request)\s*,?\s+.+?\b"
+                          r"(?:raises?|raised|returns?|returned)\b", re.I)
 # Words that make a claim about keeping behaviour, where a difference is a real contradiction.
 _KEEP_RE = re.compile(r"\b(?:preserv\w*|still|unchanged|as before|continu\w*|existing|keeps?|retains?|same|"
                       r"regress\w*|break\w*|no longer)\b", re.I)
