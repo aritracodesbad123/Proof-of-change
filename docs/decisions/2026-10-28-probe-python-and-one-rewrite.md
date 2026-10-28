@@ -41,7 +41,7 @@ now labelled not_testable and marked `probe_broken`. It is advisory only: it nev
 ('TypeError', 'TypeError: ...', 'SkippedDueTo...Failure', 'skipped: ...') are recognised as well as
 `{"raises": ...}` and `{"skipped": ...}`. Different exceptions on the two sides are still a difference.
 
-Re-judging 755 stored records (benchmark result sets, replayed checks and the held-out live picks), old code vs new:
+Re-judging 755 stored records (benchmark result sets, replayed checks and the held-out live checks), old code vs new:
 - attrs #1648: needs_attention -> verified. Expected verified; the old result was a false alarm.
 - sqlparse #928 (safe case): needs_attention -> verified. Expected verified.
 - click #3878 (ambiguous case, not scored), one record: needs_attention -> verified. The flag came only from
