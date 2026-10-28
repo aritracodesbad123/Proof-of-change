@@ -53,3 +53,26 @@ def test_input_not_changed():
     orig = copy.deepcopy(p)
     dr.rejudge_probes(p, product_check=True)
     assert p == orig
+
+
+def test_record_without_product_check_key_gets_the_gate():
+    rec = {"probes": _probes(1)}
+    assert dr.broad_gate_for(rec) is True
+    pp = dr.rejudge_probes(rec["probes"], bool(rec.get("product_check")), broad_gate=dr.broad_gate_for(rec))
+    assert pp["broad_claims"]["held_back"] == ["C1"]
+
+
+def test_explicit_false_still_skips_the_gate():
+    rec = {"product_check": False, "probes": _probes(1)}
+    assert dr.broad_gate_for(rec) is False
+    pp = dr.rejudge_probes(rec["probes"], False, broad_gate=dr.broad_gate_for(rec))
+    assert "broad_claims" not in pp
+
+
+def test_missing_key_keeps_study_advisory_handling():
+    # The gate is applied, but the product-only advisory carry-over is not: the record's route is still unknown.
+    old = _probes(1)
+    old["items"][0]["observations"] = [{"name": "C1.in0", "advisory": True, "label": "x"}]
+    pp = dr.rejudge_probes(old, False, broad_gate=True)
+    assert all(not o.get("advisory") for o in pp["items"][0].get("observations") or [])
+    assert pp["broad_claims"]["held_back"] == ["C1"]

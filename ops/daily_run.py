@@ -7294,7 +7294,7 @@ def rejudge(rec: dict, prdir: Path) -> dict:
     cmp["skipped_missing_dependency"] = [d for d in cmp["skipped_missing_dependency"] if d["test"] in kept]
     cmp["new_tests_failing"] = sorted(cmp["new_tests_failing"])
     ex = exit_check(rec.get("per_run", []), results, cmp)
-    pr_probes = rejudge_probes(rec.get("probes"), bool(rec.get("product_check")))
+    pr_probes = rejudge_probes(rec.get("probes"), bool(rec.get("product_check")), broad_gate=broad_gate_for(rec))
     v, reason, _ = verdict_for(cmp, None, ex, rec.get("files"), pr_probes, rec.get("behaviour_claims"),
                                rec.get("baseline"))
     v, reason = cap_for_review(rec, v, reason)
@@ -7302,7 +7302,7 @@ def rejudge(rec: dict, prdir: Path) -> dict:
     out.update(comparison=cmp, exit_check=ex, verdict=v, reason=reason)
     if pr_probes:
         out["probes"] = pr_probes
-        if rec.get("product_check"):
+        if broad_gate_for(rec):
             from poc import broad_claims
             bnote = broad_claims.note_text(pr_probes.get("broad_claims"))
             if bnote:
@@ -7316,12 +7316,19 @@ def rejudge(rec: dict, prdir: Path) -> dict:
     return out
 
 
+def broad_gate_for(rec: dict) -> bool:
+    """Whether re-judging applies the broad-claims gate to a saved record: on the product route, and also when the
+    record has no product_check key at all (records written before the key existed cannot say which route they
+    took, so they get the stricter reading; the gate only ever holds claims back). Only an explicit False skips it."""
+    return rec.get("product_check", True) is not False
+
+
 def _with_broad_gate(fn):
     """Re-judging recomputes the broad-claims gate (poc/broad_claims.py) on the product route from current code, and
     keeps the union of the saved and the recomputed holds: a saved hold is never released."""
-    def wrapped(pr_probes: dict | None, product_check: bool = False) -> dict | None:
+    def wrapped(pr_probes: dict | None, product_check: bool = False, broad_gate: bool | None = None) -> dict | None:
         out = fn(pr_probes, product_check)
-        if not product_check or not out or not out.get("items"):
+        if not (product_check if broad_gate is None else broad_gate) or not out or not out.get("items"):
             return out
         from poc import broad_claims
         saved = pr_probes.get("broad_claims") if isinstance(pr_probes.get("broad_claims"), dict) else None
