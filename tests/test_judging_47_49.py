@@ -143,7 +143,12 @@ def test_no_evidence_any_changed_line_ran_caps_at_could_not_verify():
            "probes": {"status": "ran", "items": [p1, p2]}}
     assert derive_verdict(rec, "tests+probes") == "could_not_verify"
     live = dr.gate({**rec, "verdict": VER, "reason": "tests pass"})
-    assert live["verdict"] == "could_not_verify" and "no evidence any changed line ran" in live["reason"]
+    assert live["verdict"] == "could_not_verify"
+    # the no-evidence rule on its own: probes that are not broken but ran 0 changed lines still cannot verify
+    unbroken = {**rec, "verdict": VER, "reason": "tests pass",
+                "probes": {"status": "ran", "items": [{**p1, "observations": [{"name": "C1.stdout", "state": "same"}]}]}}
+    only = dr.no_evidence_gate(unbroken)
+    assert only["verdict"] == "could_not_verify" and "no evidence any changed line ran" in only["reason"]
     # with the tests' coverage showing a changed line ran, the cap does not apply
     ran = {**rec, "coverage": {"status": "measured", "changed_lines_covered": 1, "changed_lines_total": 5}}
     assert dr.no_evidence_gate({**ran, "verdict": VER})["verdict"] == VER

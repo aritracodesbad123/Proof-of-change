@@ -29,14 +29,24 @@ def image_python(image: str | None = None) -> str:
 
     Version selection for a Contree check uses this, not the Pythons on the machine that runs the orchestrator."""
     import re
-    tag = (image or BASE_IMAGE).rsplit("/", 1)[-1]
+    tag = (image or current_image()).rsplit("/", 1)[-1]
     if not tag.startswith("python:"):
         return ""
     m = re.search(r":(\d+)\.(\d+)(?:[.-]|$)", tag)
     return f"{m.group(1)}.{m.group(2)}" if m else ""
 
 _sem = threading.Semaphore(MAX_OPS)
-_state: dict[str, Any] = {"backend": "local", "note": "local bubblewrap", "session": None}
+_state: dict[str, Any] = {"backend": "local", "note": "local bubblewrap", "session": None, "image": None}
+
+
+def current_image() -> str:
+    """The image new sessions start from: the one select_image chose for this check, else BASE_IMAGE."""
+    return _state.get("image") or BASE_IMAGE
+
+
+def select_image(image: str | None) -> None:
+    """Use image for the next sessions (None: back to BASE_IMAGE)."""
+    _state["image"] = image
 
 
 class ContreeError(RuntimeError):
@@ -558,6 +568,7 @@ def side_pythons(sess: "ContreeSession", specs: list[str], *, timeout: int = 120
 
 
 def new_session(**kw) -> ContreeSession:
+    kw.setdefault("base_image", current_image())
     sess = ContreeSession(**kw)
     _state["session"] = sess
     return sess

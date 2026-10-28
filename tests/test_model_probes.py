@@ -325,7 +325,7 @@ def test_diff_probe_finds_a_behaviour_change(tmp_path):
     assert obs["pkg.m.scale.input0"]["main"] == 2 and obs["pkg.m.scale.input0"]["pr"] == 3
     assert obs["pkg.m.scale.input0"]["label"] == "unmentioned"
     assert obs["pkg.m.scale.input6"]["main"] == {"raises": "TypeError"}         # None * 2
-    assert obs["pkg.m.scale.input6"]["label"] == "no_difference"
+    assert obs["pkg.m.scale.input6"]["label"] == "not_testable"   # the same error on both sides is no evidence
 
 
 # ---------------------------------------------------------------- baselines

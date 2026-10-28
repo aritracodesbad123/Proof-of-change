@@ -305,6 +305,34 @@ def label_for(state: str, claim: dict | None, name: str, crashed_both: bool) -> 
     return (FindingLabel.FALSE_CLAIM if claim["expect"] == "same" else FindingLabel.NEEDS_HUMAN).value
 
 
+def probe_broken(main, pr) -> bool:
+    """The probe never reached the call it is about: the observation is the same raised exception type, or the same
+    skip value, on both sides. That says nothing about the change, so it is 'probe broken': never 'does not differ'
+    and never 'proven'."""
+    exc = _exception_name(main) or _error_text(main)
+    if exc and exc == (_exception_name(pr) or _error_text(pr)):
+        return True
+    return (isinstance(main, dict) and isinstance(pr, dict) and "skipped" in main
+            and main.get("skipped") == pr.get("skipped"))
+
+
+_ERROR_TEXT = re.compile(r"(?:[A-Za-z_][\w.]*\.)?([A-Z]\w*(?:Error|Exception|Failure))(?::.*)?|(skip(?:ped)?\b.*)",
+                         re.IGNORECASE | re.DOTALL)
+
+
+def _error_text(value) -> str | None:
+    """A probe that records a failure as plain text: an exception type name ('TypeError', 'TypeError: msg',
+    'SkippedDueToClassCreationFailure') or a skip note ('skipped: ...'). Returns the type name or skip note."""
+    if not isinstance(value, str) or len(value) > 500:
+        return None
+    m = _ERROR_TEXT.fullmatch(value.strip())
+    if not m:
+        return None
+    if m.group(1) and not m.group(1)[0].isupper():
+        return None
+    return m.group(1) or m.group(2).lower()
+
+
 def judge(spec: dict, runs: dict, files: dict | None = None) -> list[dict]:
     """runs = {"main": [obs, obs, obs], "pr": [...]} -> one result per observation name (sorted).
     files = {"main": [file names], "pr": [...]} of the saved outputs, for citations."""
@@ -316,7 +344,7 @@ def judge(spec: dict, runs: dict, files: dict | None = None) -> list[dict]:
         p = [{"v": o.get(name, ABSENT)} for o in runs["pr"]]
         state = confirm(m, p)
         claim = claim_for(spec, name)
-        pr_only = None
+        pr_only, broken = None, False
         if state == "pr_unstable":
             # Stored state stays "flaky" (the recorded vocabulary). The label is what the verdict reads.
             if pr_runs_too_noisy(p):
@@ -333,11 +361,16 @@ def judge(spec: dict, runs: dict, files: dict | None = None) -> list[dict]:
                     label = FindingLabel.NEEDS_HUMAN.value
         else:
             label = label_for(state, claim, name, crashed_both)
+            broken = state == "same" and probe_broken(m[0]["v"], p[0]["v"])
+            if broken:
+                label = FindingLabel.NOT_TESTABLE.value   # probe broken: advisory only, never a pass or a flag
         res = {"name": name, "state": state, "label": label,
                "claim": claim["id"] if claim else None,
                "main": m[0]["v"], "pr": p[0]["v"]}
         if pr_only:
             res["pr_only"] = pr_only
+        if broken:
+            res["probe_broken"] = "the same exception or skip value on both sides: the probe never reached the call"
         if label == FindingLabel.NOT_TESTABLE.value and state == "same" and is_how_claim(claim):
             res["how_claim"] = True
         link = _text_link(spec, name) if label == FindingLabel.UNMENTIONED_CHANGE.value else None
@@ -499,6 +532,12 @@ def classify_item(item: dict) -> dict:
         out["status"] = "not_run"
         out["uninformative_reason"] = reason
         _downgrade_coverage(out, reason, zero=True)
+        return out
+    if all(o.get("probe_broken") for o in obs):
+        reason = "uninformative: every observation is probe-broken (the same exception or skip value on both sides)"
+        out["status"] = "uninformative"
+        out["uninformative_reason"] = reason
+        _downgrade_coverage(out, reason + "; not counted as ran or adequate", zero=True)
         return out
     names = []
     for o in obs:
