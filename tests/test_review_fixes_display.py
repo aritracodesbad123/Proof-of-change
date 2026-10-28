@@ -39,6 +39,8 @@ def test_fixture_verdicts_match_the_previous_normalize():
         data = json.loads(path.read_text())
         if not isinstance(data, dict) or "verdict" not in data:
             continue
+        if "final_verdict" in path.parts:
+            continue   # a record gated at run time: views show its stored verdict (tests/test_final_verdict.py)
         found += 1
         got = pr_report.normalize(copy.deepcopy(data))["verdict"]
         previous = coverage_gate.apply(copy.deepcopy(data))["verdict"]

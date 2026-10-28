@@ -1,0 +1,2692 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-pallets-click-3896-ee07b7cabdba-rerun-click_3896",
+ "date_ist": "2026-10-28 15:53 IST",
+ "run_date": "2026-10-28",
+ "who": "ops/daily_run.py",
+ "repo": "pallets/click",
+ "library": "click",
+ "pr": {
+  "repo": "pallets/click",
+  "number": 3896,
+  "url": "https://github.com/pallets/click/pull/3896",
+  "title": "Add `context_settings` parameter to `CliRunner.invoke`",
+  "base_sha": "8c73ff134480f436faa0d041bd19aaf949aac22c",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "ee07b7cabdbac3be50bc3ba920e7dca56d2b06f9",
+  "merge_commit": "aab4b289246fc4f75e101e69ca111a935733cab7",
+  "tested_main_sha": "8c73ff134480f436faa0d041bd19aaf949aac22c",
+  "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+ },
+ "author": "kdeldycke",
+ "base_ref": "stable",
+ "updated_at_utc": "2026-10-26T10:14:16Z",
+ "updated_at_ist": "2026-10-26 15:44 IST",
+ "ci_state": "not checked (single-PR check)",
+ "ci_detail": "checked on request with --pr",
+ "tested_at_ist": "2026-10-28 15:53 IST",
+ "files": {
+  "all": [
+   "CHANGES.md",
+   "docs/testing.md",
+   "src/click/testing.py",
+   "tests/test_termui.py",
+   "tests/test_testing.py"
+  ],
+  "package_py": [
+   "src/click/testing.py"
+  ],
+  "compiled": [],
+  "other": [
+   "CHANGES.md",
+   "docs/testing.md",
+   "tests/test_termui.py",
+   "tests/test_testing.py"
+  ]
+ },
+ "machine_type": {
+  "arch": "x86_64",
+  "os": "Linux",
+  "platform": "Linux-6.12.94+-x86_64-with-glibc2.41",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": null,
+  "cpu_model": "Intel(R) Xeon(R) Processor",
+  "ram_gb": 15.6
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 3,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.15",
+ "test_selection": "mapped from touched files: tests/test_termui.py, tests/test_testing.py",
+ "per_run": [
+  {
+   "side": "old",
+   "run": 1,
+   "passed": 303,
+   "failed": 0,
+   "error": 0,
+   "skipped": 24,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 4.1,
+   "pytest_summary": "303 passed, 24 skipped in 0.87s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 1,
+   "passed": 321,
+   "failed": 0,
+   "error": 0,
+   "skipped": 24,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 3.9,
+   "pytest_summary": "321 passed, 24 skipped in 0.85s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 2,
+   "passed": 303,
+   "failed": 0,
+   "error": 0,
+   "skipped": 24,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 3.9,
+   "pytest_summary": "303 passed, 24 skipped in 0.82s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 2,
+   "passed": 321,
+   "failed": 0,
+   "error": 0,
+   "skipped": 24,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 3.9,
+   "pytest_summary": "321 passed, 24 skipped in 0.85s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 3,
+   "passed": 303,
+   "failed": 0,
+   "error": 0,
+   "skipped": 24,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 3.9,
+   "pytest_summary": "303 passed, 24 skipped in 0.88s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 3,
+   "passed": 321,
+   "failed": 0,
+   "error": 0,
+   "skipped": 24,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 4.8,
+   "pytest_summary": "321 passed, 24 skipped in 0.97s",
+   "junit": true
+  }
+ ],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "contree",
+ "sandbox_backend_note": "contree (Token Factory Sandboxes, sdk 0.3.6)",
+ "machine": "contree",
+ "tool_setup": {
+  "installed": [],
+  "tries": 0,
+  "note": "All required tools were already installed.",
+  "refused": []
+ },
+ "posted_upstream": false,
+ "logs": "click-3896/",
+ "freeze": {},
+ "poc_commit": "10a28c9b2fc0fe3166459661cefa23e4413875c2",
+ "route": "source-pair",
+ "current_head_sha": "ee07b7cabdbac3be50bc3ba920e7dca56d2b06f9",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "state": "open",
+ "mergeable": true,
+ "mergeable_state": "clean",
+ "product_check": true,
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": {
+   "ok": true,
+   "skipped": false,
+   "refused": false,
+   "failed": false,
+   "stop": false,
+   "stop_reason": "",
+   "live_call": true,
+   "cached": false,
+   "queries": [
+    "click python setup install instructions https://github.com/pallets/click site:github.com/pallets/click",
+    "click python documentation install https://github.com/pallets/click site:github.com/pallets/click",
+    "click python install requirements https://pypi.org/project/click/ https://github.com/pallets/click site:pypi.org"
+   ],
+   "results": [
+    {
+     "title": "nulink-click",
+     "url": "https://pypi.org/project/nulink-click/",
+     "query": "click python install requirements https://pypi.org/project/click/ https://github.com/pallets/click site:pypi.org"
+    },
+    {
+     "title": "click",
+     "url": "https://pypi.org/project/click/",
+     "query": "click python install requirements https://pypi.org/project/click/ https://github.com/pallets/click site:pypi.org"
+    },
+    {
+     "title": "click-pathlib",
+     "url": "https://pypi.org/project/click-pathlib/",
+     "query": "click python install requirements https://pypi.org/project/click/ https://github.com/pallets/click site:pypi.org"
+    },
+    {
+     "title": "Add python 3.9 support \u00b7 Issue #1684 \u00b7 pallets/click \u00b7 GitHub",
+     "url": "https://github.com/pallets/click/issues/1684",
+     "query": "click python setup install instructions https://github.com/pallets/click site:github.com/pallets/click"
+    },
+    {
+     "title": "Context different in `click.pass_context` and `shell_complete` \u00b7 Issue #2303 \u00b7 pallets/click \u00b7 GitHub",
+     "url": "https://github.com/pallets/click/issues/2303",
+     "query": "click python setup install instructions https://github.com/pallets/click site:github.com/pallets/click"
+    },
+    {
+     "title": "Regression in click>=8; click.Path says file doesn't exist when it does \u00b7 Issue #1921 \u00b7 pallets/click \u00b7 GitHub",
+     "url": "https://github.com/pallets/click/issues/1921",
+     "query": "click python setup install instructions https://github.com/pallets/click site:github.com/pallets/click"
+    },
+    {
+     "title": "no_args_is_help for Command: documentation vs code is wrong \u00b7 Issue #1259 \u00b7 pallets/click \u00b7 GitHub",
+     "url": "https://github.com/pallets/click/issues/1259",
+     "query": "click python documentation install https://github.com/pallets/click site:github.com/pallets/click"
+    },
+    {
+     "title": "GitHub - pallets/click: Python composable command line interface toolkit \u00b7 GitHub",
+     "url": "https://github.com/pallets/click",
+     "query": "click python documentation install https://github.com/pallets/click site:github.com/pallets/click"
+    },
+    {
+     "title": "click/src/click/decorators.py at main \u00b7 pallets/click \u00b7 GitHub",
+     "url": "https://github.com/pallets/click/blob/master/src/click/decorators.py",
+     "query": "click python documentation install https://github.com/pallets/click site:github.com/pallets/click"
+    }
+   ],
+   "result_count": 9,
+   "text": "To install Click, you can run `pip install .` in the folder containing `yourscript.py` and `setup.py` in a virtual environment. The `setup.py` file includes the necessary setup configuration, such as `entry_points` for console scripts. The sources do not provide a definitive answer for specific installation instructions beyond this general setup.\nThe sources indicate that the `command` decorator in Click creates a new `Command` and uses the decorated function as a callback, automatically attaching all decorated `option`s and `argument`s as parameters to the command. The documentation for the `Command` class is mentioned in the context of a GitHub issue where discrepancies between the documentation and the code are noted. The GitHub repository for Click includes a `README.md` and other files, but does not provide specific instructions for installation. The sources do not provide a definitive answer regarding the installation of Click via `pip install click`.\nTo install the \"click\" package, use the command: \"$ pip install -U click\". This package is for creating beautiful command line interfaces in a composable way with as little code as necessary, maintained by the Pallets organization. Another related package is \"nulink-click\", which is a Python package for creating beautiful command line interfaces, installable with \"$ pip install -U\". Additionally, \"click-pathlib\" is a Python click type which returns a Pathlib.Path and supports Python 3.8+.\nNulink click is a Python package for creating beautiful command line interfaces. Installing Install and update using pip: $ pip install -U\nClick Click is a Python package for creating beautiful command line interfaces in a composable way with as little code as necessary. Pallets organization\nA Python click type which is similar to click.Path but returns a Pathlib.Path. This supports Python 3.8+. GitHub at https://github.com/pallets/click/issues/405\ntox -e py39 GLOB sdist-make: /root/checked_repos/click/setup.py py39 create: /root/checked_repos/click/.tox/py39 py39 installdeps: -rrequirements/tests.txt py39 inst: /root/checked_repos/click/.tox/.tmp/package/1/click-8.0.0.dev0.zip py39 installed: attrs==19.3.0,click @ [...] @ file:///root/checked_repos/click/.tox/.tmp/package/1/click-8.0.0.dev0.zip,colorama==0.4.3,importlib-metadata==2.0.0,iniconfig==1.0.0,packaging==20.4,pluggy==0.13.1,py==1.9.0,pyparsing==2.4.7,pytest==6.1.0,six==1.15.0,tom\nFile name: `setup.py`\n\n```\nfrom setuptools import setup setup name = \"yourscript\" version =\"0.1\" py_modules = \"yourscript\" install_requires = \"Click\" entry_points = \"\"\" [console_scripts] yourscript=yourscript:cli  \"\"\"\n```\n\nStack trace: [...] ## Steps to reproduce\n\n1. Run `pip install .` in the folder with `yourscript.py` and `setup.py` in a virtual environment.\n2. Setup shell completion by following the docs.\n3. Run `yourscript clone` and notice output without errors.\n4. Run `youscript clone` an\n% mkdir click-bug % cd click-bug % python3 -m venv venv % source venv/bin/activate (venv) % pip install click Collecting click Downloading click-8.0.1-py3-none-any.whl (97 kB) |\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 97 kB 5.7 MB/s Installing collected packages: click Successfully installed click-8.0.1 (venv) % mkdir tst (venv) % cd tst (venv) % touch foo (venv) % ln -s foo bar (venv) % cd .. (venv) % vi test.py (venv) % python test.py tst/bar Usage: test.py [OPTIONS] FILENAME Try 'test.py --help' [..\nCopy link\n\nClosed\n\nClosed\n\nno\\_args\\_is\\_help for Command: documentation vs code is wrong#1259\n\nCopy link\n\nLabels\n\ndocsUpdates to documentation, readme, docstrings, typosUpdates to documentation, readme, docstrings, typos\n\n## Description\n\n@ericnchen\n\nericnchen\n\nopened on Mar 14, 2019\n\nIssue body actions\n\nI am using Python 3.7 and have Click 7.0 installed via `pip install click`.\n\nIn the current API documentation the documentation for the `command` decorator says the following: [...] > Creates a \n| README.md | README.md |  |  |\n| pyproject.toml | pyproject.toml |  |  |\n| uv.lock | uv.lock |  |  |\n|  | [...] ## Contributing\n\nSee our detailed contributing documentation for many ways to contribute, including reporting issues, requesting features, asking or answering questions, and making PRs.\n\n## About\n\nPython composable command line interface toolkit\n\nclick.palletsprojects.com\n\n### Topics\n\ncliclickpalletspython\n\n### Resources\n\nReadme\n\nBSD-3-Clause license\n\n### Code of conduct\n\nCode of cond\nr\"\"\"Creates a new :class:`Command` and uses the decorated function as\n\ncallback. This will also automatically attach all decorated\n\n:func:`option`\\s and :func:`argument`\\s as parameters to the command.\n\nThe name of the command defaults to the name of the function, converted to\n\nlowercase, with underscores ``\\_`` replaced by dashes ``-``, and the suffixes\n\n``\\_command``, ``\\_cmd``, ``\\_group``, and ``\\_grp`` are removed. For example,\n\n``init\\_data\\_command`` becomes ``init-data``. [...] Add the `",
+   "errors": [],
+   "lines": [
+    "Looked up with Tavily: 9 results",
+    "Query: click python setup install instructions https://github.com/pallets/click site:github.com/pallets/click",
+    "Query: click python documentation install https://github.com/pallets/click site:github.com/pallets/click",
+    "Query: click python install requirements https://pypi.org/project/click/ https://github.com/pallets/click site:pypi.org",
+    "Source: nulink-click \u2014 https://pypi.org/project/nulink-click/",
+    "Source: click \u2014 https://pypi.org/project/click/",
+    "Source: click-pathlib \u2014 https://pypi.org/project/click-pathlib/",
+    "Source: Add python 3.9 support \u00b7 Issue #1684 \u00b7 pallets/click \u00b7 GitHub \u2014 https://github.com/pallets/click/issues/1684",
+    "Source: Context different in `click.pass_context` and `shell_complete` \u00b7 Issue #2303 \u00b7 pallets/click \u00b7 GitHub \u2014 https://github.com/pallets/click/issues/2303",
+    "Source: Regression in click>=8; click.Path says file doesn't exist when it does \u00b7 Issue #1921 \u00b7 pallets/click \u00b7 GitHub \u2014 https://github.com/pallets/click/issues/1921",
+    "Source: no_args_is_help for Command: documentation vs code is wrong \u00b7 Issue #1259 \u00b7 pallets/click \u00b7 GitHub \u2014 https://github.com/pallets/click/issues/1259",
+    "Source: GitHub - pallets/click: Python composable command line interface toolkit \u00b7 GitHub \u2014 https://github.com/pallets/click",
+    "Source: click/src/click/decorators.py at main \u00b7 pallets/click \u00b7 GitHub \u2014 https://github.com/pallets/click/blob/master/src/click/decorators.py"
+   ]
+  },
+  "notes": [
+   "Setup check: GitHub token: present.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory 6.4 GB (of 15.6 GB).",
+   "Setup check: free disk 89.7 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: 9 results",
+   "Query: click python setup install instructions https://github.com/pallets/click site:github.com/pallets/click",
+   "Query: click python documentation install https://github.com/pallets/click site:github.com/pallets/click",
+   "Query: click python install requirements https://pypi.org/project/click/ https://github.com/pallets/click site:pypi.org",
+   "Source: nulink-click \u2014 https://pypi.org/project/nulink-click/",
+   "Source: click \u2014 https://pypi.org/project/click/",
+   "Source: click-pathlib \u2014 https://pypi.org/project/click-pathlib/",
+   "Source: Add python 3.9 support \u00b7 Issue #1684 \u00b7 pallets/click \u00b7 GitHub \u2014 https://github.com/pallets/click/issues/1684",
+   "Source: Context different in `click.pass_context` and `shell_complete` \u00b7 Issue #2303 \u00b7 pallets/click \u00b7 GitHub \u2014 https://github.com/pallets/click/issues/2303",
+   "Source: Regression in click>=8; click.Path says file doesn't exist when it does \u00b7 Issue #1921 \u00b7 pallets/click \u00b7 GitHub \u2014 https://github.com/pallets/click/issues/1921",
+   "Source: no_args_is_help for Command: documentation vs code is wrong \u00b7 Issue #1259 \u00b7 pallets/click \u00b7 GitHub \u2014 https://github.com/pallets/click/issues/1259",
+   "Source: GitHub - pallets/click: Python composable command line interface toolkit \u00b7 GitHub \u2014 https://github.com/pallets/click",
+   "Source: click/src/click/decorators.py at main \u00b7 pallets/click \u00b7 GitHub \u2014 https://github.com/pallets/click/blob/master/src/click/decorators.py",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: install pytest (listed in the tests extra) on main and pr.",
+   "Setup plan: install ruff (listed in a dependency group) on main and pr.",
+   "Setup plan: install tox (listed in a dependency group) on main and pr.",
+   "Setup plan: install tox-uv (listed in a dependency group) on main and pr.",
+   "Setup plan: install myst-parser (listed in a dependency group) on main and pr.",
+   "Setup plan: install pallets-sphinx-themes (listed in a dependency group) on main and pr.",
+   "Setup plan: install sphinx (listed in a dependency group) on main and pr.",
+   "Setup plan: install sphinx-tabs (listed in a dependency group) on main and pr.",
+   "Setup plan: install sphinxcontrib-log-cabinet (listed in a dependency group) on main and pr.",
+   "Setup plan: install sphinx-autobuild (listed in a dependency group) on main and pr.",
+   "Setup plan: install gha-update ; python_full_version >= '3.12' (listed in a dependency group) on main and pr.",
+   "Setup plan: install pre-commit (listed in a dependency group) on main and pr.",
+   "Setup plan: install pre-commit-uv (listed in a dependency group) on main and pr.",
+   "Setup plan: install pytest-randomly (listed in a dependency group) on main and pr.",
+   "Setup plan: install pytest-xdist (listed in a dependency group) on main and pr.",
+   "Setup plan: install mypy (listed in a dependency group) on main and pr.",
+   "Setup plan: install pyright (listed in a dependency group) on main and pr.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >=3.10",
+   "Setup plan: Python rule: one Python version is used on both sides: the lowest version that meets the requirements of both main and the pull request; if none meets both, the check stops as a setup problem and records both.",
+   "Repository crawl: 1 page(s) crawled, 5 read in full, 0 setup step(s) used first in the sandbox (0 Tavily call(s), 0.0 credit(s))."
+  ],
+  "install_docs": [
+   "README.md",
+   "pyproject.toml",
+   "docs/contributing.md",
+   ".github/workflows/pre-commit.yaml",
+   ".github/workflows/publish.yaml",
+   ".github/workflows/zizmor.yaml",
+   ".github/workflows/nightly.yaml",
+   ".github/workflows/tests.yaml",
+   ".github/workflows/lock.yaml",
+   "examples/README"
+  ],
+  "install_docs_from": "main",
+  "repo_crawl": {
+   "ok": true,
+   "stop": false,
+   "stop_reason": "",
+   "base_sha": "8c73ff134480f436faa0d041bd19aaf949aac22c",
+   "docs_domain": "click.palletsprojects.com",
+   "seeds": [
+    "https://github.com/pallets/click/tree/8c73ff134480f436faa0d041bd19aaf949aac22c",
+    "https://click.palletsprojects.com/"
+   ],
+   "pages_crawled": [
+    "https://github.com/pallets/click/tree/8c73ff134480f436faa0d041bd19aaf949aac22c"
+   ],
+   "pages_extracted": [
+    "https://github.com/pallets/click/blob/8c73ff134480f436faa0d041bd19aaf949aac22c/docs/contributing.md",
+    "https://github.com/pallets/click/blob/8c73ff134480f436faa0d041bd19aaf949aac22c/docs/testing.md",
+    "https://github.com/pallets/click/blob/8c73ff134480f436faa0d041bd19aaf949aac22c/README.md",
+    "https://github.com/pallets/click/blob/8c73ff134480f436faa0d041bd19aaf949aac22c/.github/workflows/tests.yaml",
+    "https://github.com/pallets/click/blob/8c73ff134480f436faa0d041bd19aaf949aac22c/pyproject.toml"
+   ],
+   "steps": [
+    {
+     "kind": "pytest_config",
+     "value": "pytest settings section",
+     "source": "https://github.com/pallets/click/blob/8c73ff134480f436faa0d041bd19aaf949aac22c/docs/testing.md",
+     "used": false,
+     "why": "recorded for the setup plan; not an install step"
+    }
+   ],
+   "shell": "",
+   "calls": 0,
+   "credits": 0.0,
+   "errors": [],
+   "cache": {
+    "hit": true,
+    "key": "v2|pallets/click@8c73ff134480f436faa0d041bd19aaf949aac22c",
+    "saved": false,
+    "age_seconds": 11713
+   },
+   "seed_decisions": [
+    {
+     "url": "https://github.com/pallets/click/tree/8c73ff134480f436faa0d041bd19aaf949aac22c",
+     "crawled": true,
+     "why": "the repository seed is always crawled"
+    },
+    {
+     "url": "https://click.palletsprojects.com/",
+     "crawled": true,
+     "why": "the repository gave 0 setup step(s), fewer than 2"
+    }
+   ],
+   "applied_in_sandbox": false,
+   "used_steps": [],
+   "crawl_base_sha": "8c73ff134480f436faa0d041bd19aaf949aac22c",
+   "checkout_sha": "8c73ff134480f436faa0d041bd19aaf949aac22c",
+   "commits_match": true
+  },
+  "setup_plan": {
+   "packages": [
+    {
+     "requirement": "pytest",
+     "name": "pytest",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the tests extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "ruff",
+     "name": "ruff",
+     "kind": "dependency-group",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in a dependency group",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "tox",
+     "name": "tox",
+     "kind": "dependency-group",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in a dependency group",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "tox-uv",
+     "name": "tox-uv",
+     "kind": "dependency-group",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in a dependency group",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "myst-parser",
+     "name": "myst-parser",
+     "kind": "dependency-group",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in a dependency group",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pallets-sphinx-themes",
+     "name": "pallets-sphinx-themes",
+     "kind": "dependency-group",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in a dependency group",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "sphinx",
+     "name": "sphinx",
+     "kind": "dependency-group",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in a dependency group",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "sphinx-tabs",
+     "name": "sphinx-tabs",
+     "kind": "dependency-group",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in a dependency group",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "sphinxcontrib-log-cabinet",
+     "name": "sphinxcontrib-log-cabinet",
+     "kind": "dependency-group",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in a dependency group",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "sphinx-autobuild",
+     "name": "sphinx-autobuild",
+     "kind": "dependency-group",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in a dependency group",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "gha-update ; python_full_version >= '3.12'",
+     "name": "gha-update",
+     "kind": "dependency-group",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in a dependency group",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pre-commit",
+     "name": "pre-commit",
+     "kind": "dependency-group",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in a dependency group",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pre-commit-uv",
+     "name": "pre-commit-uv",
+     "kind": "dependency-group",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in a dependency group",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest-randomly",
+     "name": "pytest-randomly",
+     "kind": "dependency-group",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in a dependency group",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest-xdist",
+     "name": "pytest-xdist",
+     "kind": "dependency-group",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in a dependency group",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "mypy",
+     "name": "mypy",
+     "kind": "dependency-group",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in a dependency group",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pyright",
+     "name": "pyright",
+     "kind": "dependency-group",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in a dependency group",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    }
+   ],
+   "scope_blocked": "",
+   "component": null,
+   "aggregate_names": [],
+   "extra_reqs": [
+    "pytest",
+    "ruff",
+    "tox",
+    "tox-uv",
+    "myst-parser",
+    "pallets-sphinx-themes",
+    "sphinx",
+    "sphinx-tabs",
+    "sphinxcontrib-log-cabinet",
+    "sphinx-autobuild",
+    "gha-update ; python_full_version >= '3.12'",
+    "pre-commit",
+    "pre-commit-uv",
+    "pytest-randomly",
+    "pytest-xdist",
+    "mypy",
+    "pyright"
+   ],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >=3.10",
+    "rule": "one Python version is used on both sides: the lowest version that meets the requirements of both main and the pull request; if none meets both, the check stops as a setup problem and records both",
+    "gate_failed": false
+   },
+   "system": [],
+   "refused": [],
+   "groups_blocked": "",
+   "crawl_context": "pytest_config: pytest settings section (not used; https://github.com/pallets/click/blob/8c73ff134480f436faa0d041bd19aaf949aac22c/docs/testing.md)",
+   "crawl_shell": ""
+  },
+  "steps": {
+   "setup_lookup": "Found 17 setup item(s) in the project's files and the web lookup.",
+   "setup_python": "Python 3.12: Python 3.12 already meets >=3.10",
+   "install_deps": "Wrote requirements.txt and installed it on main and pr: pytest, ruff, tox, tox-uv, myst-parser, pallets-sphinx-themes, sphinx, sphinx-tabs, sphinxcontrib-log-cabinet, sphinx-autobuild, gha-update ; python_full_version >= '3.12', pre-commit."
+  },
+  "run_files": {
+   "requirements": "requirements.txt",
+   "plan": "setup-plan.json",
+   "count": 17
+  }
+ },
+ "chosen": {
+  "pr": 3896,
+  "head_sha": null,
+  "install": null,
+  "test_cmd": null
+ },
+ "sides": {
+  "comparison_basis": "base tip vs GitHub test merge (refs/pull/N/merge)",
+  "main_sha": "8c73ff134480f436faa0d041bd19aaf949aac22c",
+  "pr_sha": "aab4b289246fc4f75e101e69ca111a935733cab7",
+  "merge_commit": "aab4b289246fc4f75e101e69ca111a935733cab7",
+  "merge_parents": [
+   "8c73ff134480f436faa0d041bd19aaf949aac22c",
+   "ee07b7cabdbac3be50bc3ba920e7dca56d2b06f9"
+  ],
+  "merge_head_matches_pinned_head": true
+ },
+ "tested": {
+  "main": "stable @ 8c73ff134480 (base tip = first parent of the merge commit)",
+  "pr": "GitHub test merge commit aab4b289246f (refs/pull/3896/merge) of head ee07b7cabdba"
+ },
+ "contree_python": {
+  "version": "3.12",
+  "why": "default image Python 3.12 fits"
+ },
+ "probe_plan": {
+  "baseline": "full",
+  "model": "model provider: nebius (Token Factory, live)",
+  "errors": [],
+  "model_claims": [
+   {
+    "id": "C1",
+    "text": "This PR adds a `context_settings` parameter to `CliRunner.invoke()`, allowing tests to pass context-specific settings to the command's `Context`.",
+    "source_quote": "This PR adds a `context_settings` parameter to `CliRunner.invoke()`, allowing tests to pass context-specific settings to the command's `Context`.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C2",
+    "text": "`CliRunner.invoke()` passes its extra keyword arguments to the `Context` of the command, except `color`: its own `color` parameter takes that name.",
+    "source_quote": "`CliRunner.invoke()` passes its extra keyword arguments to the `Context` of the command, except `color`: its own `color` parameter takes that name.",
+    "testable": true,
+    "expect": "same"
+   },
+   {
+    "id": "C3",
+    "text": "`context_settings` solves this collision.",
+    "source_quote": "`context_settings` solves this collision.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C4",
+    "text": "And now a test can set what its terminal supports, as well as the `color` of the context in the same call.",
+    "source_quote": "And now a test can set what its terminal supports, as well as the `color` of the context in the same call.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C5",
+    "text": "With this addition, I can now test cases that were previously difficult or impossible to cover, such as verifying how the command behaves with different `Context` settings.",
+    "source_quote": "With this addition, I can now test cases that were previously difficult or impossible to cover, such as verifying how the command behaves with different `Context` settings.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C6",
+    "text": "For evidence, I used the new `context_settings` parameter to extend and simplify existing checks. See `test_prompt_and_confirm_ansi_respects_color` and `test_tempfile_pager_handles_ansi`.",
+    "source_quote": "For evidence, I used the new `context_settings` parameter to extend and simplify existing checks. See `test_prompt_and_confirm_ansi_respects_color` and `test_tempfile_pager_handles_ansi`.",
+    "testable": true,
+    "expect": "differs"
+   }
+  ],
+  "model_rejected_claims": [],
+  "diff_targets": [],
+  "frozen": [
+   {
+    "path": "model-probes/model-p1.py",
+    "source": "model",
+    "sha256": "afc5c4a92300cb07aec788898ab601c99e6ae93fd513cdb6bce9b046dfe39d25",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-10-28T10:25:20.312928+00:00",
+    "inputs_sha256": "1b72c3624b76d23177f5b397eb3f5f893c1df04ce77ce9ea69f3bb68b60b4a69",
+    "inputs": {
+     "title_chars": 54,
+     "body_chars": 1066,
+     "base_files": {
+      "src/click/testing.py": "76f4e649bc53000d667c8c0deff1591970fa034b0f085a207165839b2301019a"
+     }
+    }
+   },
+   {
+    "path": "model-probes/model-p2.py",
+    "source": "model",
+    "sha256": "f16eacf8f8e2f4eb3ceaefc7c87f526487a03620ee3c353c78e172ff7ad5280a",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-10-28T10:25:20.313496+00:00",
+    "inputs_sha256": "1b72c3624b76d23177f5b397eb3f5f893c1df04ce77ce9ea69f3bb68b60b4a69",
+    "inputs": {
+     "title_chars": 54,
+     "body_chars": 1066,
+     "base_files": {
+      "src/click/testing.py": "76f4e649bc53000d667c8c0deff1591970fa034b0f085a207165839b2301019a"
+     }
+    }
+   },
+   {
+    "path": "model-probes/model-p3.py",
+    "source": "model",
+    "sha256": "9c14ace0293b30b44f28c0272d79318ffbd33bfe95faf70c0d562cacec8182a7",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-10-28T10:25:20.313617+00:00",
+    "inputs_sha256": "1b72c3624b76d23177f5b397eb3f5f893c1df04ce77ce9ea69f3bb68b60b4a69",
+    "inputs": {
+     "title_chars": 54,
+     "body_chars": 1066,
+     "base_files": {
+      "src/click/testing.py": "76f4e649bc53000d667c8c0deff1591970fa034b0f085a207165839b2301019a"
+     }
+    }
+   },
+   {
+    "path": "model-probes/model-p4.py",
+    "source": "model",
+    "sha256": "d97ec4febc12d9e30590413cb3cd1afc9948b7e2121a8b854db2bc31b64f6de8",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-10-28T10:25:20.313706+00:00",
+    "inputs_sha256": "1b72c3624b76d23177f5b397eb3f5f893c1df04ce77ce9ea69f3bb68b60b4a69",
+    "inputs": {
+     "title_chars": 54,
+     "body_chars": 1066,
+     "base_files": {
+      "src/click/testing.py": "76f4e649bc53000d667c8c0deff1591970fa034b0f085a207165839b2301019a"
+     }
+    }
+   }
+  ]
+ },
+ "pr_side_started_at": "2026-10-28T10:25:20.325540+00:00",
+ "test_targets": {
+  "main": [
+   "tests/test_termui.py",
+   "tests/test_testing.py"
+  ],
+  "pr": [
+   "tests/test_termui.py",
+   "tests/test_testing.py"
+  ]
+ },
+ "contree_only": {
+  "note": "Contree mode: installs, tests and probes ran in Contree; nothing from the pull request ran locally",
+  "declared_test_deps": [
+   "pytest-randomly",
+   "pytest-xdist"
+  ],
+  "optional_backends": [],
+  "not_run_locally": [
+   "local freeze",
+   "installed-commit guard",
+   "probe coverage",
+   "optional-module retry"
+  ]
+ },
+ "coverage": {
+  "status": "measured",
+  "changed_lines_total": 2,
+  "changed_lines_covered": 2,
+  "files": [
+   {
+    "file": "src/click/testing.py",
+    "changed_lines_total": 2,
+    "changed_lines_covered": 2
+   }
+  ],
+  "seconds": 7.7,
+  "exit": 0,
+  "log": "coverage-pytest.log",
+  "where": "contree"
+ },
+ "contree": {
+  "main_uuid": "31fec302-532e-498f-9781-1b43e966f6c3",
+  "pr_uuid": "72b02ddd-1c5d-4ac6-9800-1bb0bcc8724f",
+  "max_ops": 40,
+  "sdk": "0.3.6",
+  "base_image": "docker.io/library/python:3.12-slim-bookworm",
+  "python": {
+   "requires_python": [
+    ">=3.10"
+   ],
+   "requires_python_found": true,
+   "main": "3.12.15",
+   "pr": "3.12.15",
+   "problems": []
+  },
+  "own_checkout": {
+   "module": "click",
+   "checkout": "/work/src",
+   "main_checkout_real": "/work/src",
+   "main": "/work/src/src/click/__init__.py",
+   "pr_checkout_real": "/work/src",
+   "pr": "/work/src/src/click/__init__.py",
+   "install": {
+    "main": {
+     "python": "/usr/local/bin/python",
+     "version_source": "tag 8.5.0-44-g8c73ff1",
+     "editable_exit": "0",
+     "pip_show_exit": "0",
+     "pip_show_name": "click",
+     "pip_show_version": "8.5.1.dev0",
+     "pip_show_location": "/usr/local/lib/python3.12/site-packages"
+    },
+    "pr": {
+     "python": "/usr/local/bin/python",
+     "version_source": "tag 8.5.0-46-gaab4b28",
+     "editable_exit": "0",
+     "pip_show_exit": "0",
+     "pip_show_name": "click",
+     "pip_show_version": "8.5.1.dev0",
+     "pip_show_location": "/usr/local/lib/python3.12/site-packages"
+    }
+   },
+   "status": "ok"
+  }
+ },
+ "declared_test_deps": {
+  "requested": [
+   "pytest-randomly",
+   "pytest-xdist"
+  ],
+  "installed": true,
+  "where": "contree"
+ },
+ "test_extras": [
+  "pytest-randomly",
+  "pytest-xdist"
+ ],
+ "comparison": {
+  "same": 323,
+  "same_skipped_both": 24,
+  "regressions": [],
+  "fixed": [],
+  "new_tests_passing": 22,
+  "new_tests_failing": [],
+  "new_tests_skipped": [],
+  "removed_tests": [],
+  "reparametrized": [
+   {
+    "test": "tests.test_termui::test_prompt_and_confirm_ansi_respects_color",
+    "removed_ids": [
+     "tests.test_termui::test_prompt_and_confirm_ansi_respects_color[confirm-color]",
+     "tests.test_termui::test_prompt_and_confirm_ansi_respects_color[confirm-no-color]",
+     "tests.test_termui::test_prompt_and_confirm_ansi_respects_color[prompt-color]",
+     "tests.test_termui::test_prompt_and_confirm_ansi_respects_color[prompt-no-color]"
+    ],
+    "added_ids": [
+     "tests.test_termui::test_prompt_and_confirm_ansi_respects_color[color-confirm]",
+     "tests.test_termui::test_prompt_and_confirm_ansi_respects_color[color-prompt]",
+     "tests.test_termui::test_prompt_and_confirm_ansi_respects_color[context-color-confirm]",
+     "tests.test_termui::test_prompt_and_confirm_ansi_respects_color[context-color-prompt]",
+     "tests.test_termui::test_prompt_and_confirm_ansi_respects_color[context-no-color-confirm]",
+     "tests.test_termui::test_prompt_and_confirm_ansi_respects_color[context-no-color-prompt]",
+     "tests.test_termui::test_prompt_and_confirm_ansi_respects_color[no-color-confirm]",
+     "tests.test_termui::test_prompt_and_confirm_ansi_respects_color[no-color-prompt]"
+    ]
+   }
+  ],
+  "skipped_missing_dependency": [],
+  "flaky": [],
+  "pr_unstable": [],
+  "pr_unstable_noisy": [],
+  "environment": [],
+  "other_changes": [],
+  "preexisting_failures": [],
+  "load_failed_both": [],
+  "load_failed_pr": [],
+  "load_failed_main": [],
+  "executed": {
+   "main": 303,
+   "pr": 321
+  },
+  "messages": {}
+ },
+ "exit_check": {
+  "explained": true,
+  "problems": [],
+  "detail": "all runs exited 0"
+ },
+ "probes": {
+  "status": "ran",
+  "items": [
+   {
+    "id": "model-p1",
+    "source": "model",
+    "path": "model-probes/model-p1.py",
+    "sha256": "afc5c4a92300cb07aec788898ab601c99e6ae93fd513cdb6bce9b046dfe39d25",
+    "target": "pallets/click#3896",
+    "about": "Check if CliRunner.invoke has context_settings parameter",
+    "claims": [
+     {
+      "id": "C1",
+      "source": "PR description",
+      "text": "This PR adds a `context_settings` parameter to `CliRunner.invoke()`, allowing tests to pass context-specific settings to the command's `Context`.",
+      "covers": [
+       "C1"
+      ],
+      "expect": "differs"
+     },
+     {
+      "id": "C3",
+      "source": "PR description",
+      "text": "`context_settings` solves this collision.",
+      "covers": [
+       "C3"
+      ],
+      "expect": "differs"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 3.6,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 2.8,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 2.8,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 2.8,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 2.8,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 2.8,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-p1-main-1.jsonl",
+      "probe-model-p1-main-2.jsonl",
+      "probe-model-p1-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-p1-pr-1.jsonl",
+      "probe-model-p1-pr-2.jsonl",
+      "probe-model-p1-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "P1.result": false
+      },
+      {
+       "P1.result": false
+      },
+      {
+       "P1.result": false
+      }
+     ],
+     "pr": [
+      {
+       "P1.result": true
+      },
+      {
+       "P1.result": true
+      },
+      {
+       "P1.result": true
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "P1.result",
+      "state": "differs",
+      "label": "unmentioned",
+      "claim": null,
+      "main": false,
+      "pr": true,
+      "diffs": [
+       {
+        "field": "",
+        "main": false,
+        "pr": true
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"P1.result\""
+       },
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"P1.result\""
+       }
+      },
+      "advisory": true
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "afc5c4a92300cb07aec788898ab601c99e6ae93fd513cdb6bce9b046dfe39d25",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-10-28T10:25:20.312928+00:00",
+     "inputs_sha256": "1b72c3624b76d23177f5b397eb3f5f893c1df04ce77ce9ea69f3bb68b60b4a69",
+     "inputs": {
+      "title_chars": 54,
+      "body_chars": 1066,
+      "base_files": {
+       "src/click/testing.py": "76f4e649bc53000d667c8c0deff1591970fa034b0f085a207165839b2301019a"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-10-28T10:25:20.325540+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 2,
+     "changed_lines_covered": 1,
+     "files": [
+      {
+       "file": "src/click/testing.py",
+       "changed_lines_total": 2,
+       "changed_lines_covered": 1
+      }
+     ],
+     "adequacy": "adequate",
+     "note": "ran 1 of 2 changed line(s) on the main side",
+     "exit": 0,
+     "data": "probe-cov-model-p1.json",
+     "where": "contree"
+    },
+    "status": "rejected",
+    "rejected_reason": "rejected: claim pattern(s) C1, C3 match none of this probe's observation names, so the probe is not counted"
+   },
+   {
+    "id": "model-p2",
+    "source": "model",
+    "path": "model-probes/model-p2.py",
+    "sha256": "f16eacf8f8e2f4eb3ceaefc7c87f526487a03620ee3c353c78e172ff7ad5280a",
+    "target": "pallets/click#3896",
+    "about": "Test that extra keyword arguments (non-color) are passed to the context",
+    "claims": [
+     {
+      "id": "C2",
+      "source": "PR description",
+      "text": "`CliRunner.invoke()` passes its extra keyword arguments to the `Context` of the command, except `color`: its own `color` parameter takes that name.",
+      "covers": [
+       "C2"
+      ],
+      "expect": "same"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 3.7,
+      "ok": false
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 2.8,
+      "ok": false
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 2.8,
+      "ok": false
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 3.1,
+      "ok": false
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 2.8,
+      "ok": false
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 2.8,
+      "ok": false
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-p2-main-1.jsonl",
+      "probe-model-p2-main-2.jsonl",
+      "probe-model-p2-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-p2-pr-1.jsonl",
+      "probe-model-p2-pr-2.jsonl",
+      "probe-model-p2-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      },
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      },
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      }
+     ],
+     "pr": [
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      },
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      },
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "probe.error",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "crash": "non-json output",
+       "exit_code": 1
+      },
+      "pr": {
+       "crash": "non-json output",
+       "exit_code": 1
+      },
+      "citations": {
+       "main": {
+        "file": "probe-model-p2-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"probe.error\""
+       },
+       "pr": {
+        "file": "probe-model-p2-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"probe.error\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "f16eacf8f8e2f4eb3ceaefc7c87f526487a03620ee3c353c78e172ff7ad5280a",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-10-28T10:25:20.313496+00:00",
+     "inputs_sha256": "1b72c3624b76d23177f5b397eb3f5f893c1df04ce77ce9ea69f3bb68b60b4a69",
+     "inputs": {
+      "title_chars": 54,
+      "body_chars": 1066,
+      "base_files": {
+       "src/click/testing.py": "76f4e649bc53000d667c8c0deff1591970fa034b0f085a207165839b2301019a"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-10-28T10:25:20.325540+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "not measured",
+     "why": "coverage run produced no data; see probe-coverage.log",
+     "adequacy": "not_adequate",
+     "note": "the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate"
+    },
+    "status": "crashed",
+    "uninformative_reason": "the probe crashed or printed no parsed output on every main-side run"
+   },
+   {
+    "id": "model-p3-rewrite",
+    "source": "model",
+    "path": "model-probes/model-p3-rewrite.py",
+    "sha256": "8d1847000d584d58d38f2c8262817b4a9148c39e334eab7e3e47b99b5b485cd2",
+    "target": "pallets/click#3896",
+    "about": "Test collision when setting runner color and context color setting via extra",
+    "claims": [
+     {
+      "id": "C3",
+      "source": "PR description",
+      "text": "`context_settings` solves this collision.",
+      "covers": [
+       "C3"
+      ],
+      "expect": "differs"
+     },
+     {
+      "id": "C4",
+      "source": "PR description",
+      "text": "And now a test can set what its terminal supports, as well as the `color` of the context in the same call.",
+      "covers": [
+       "C4"
+      ],
+      "expect": "differs"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 5.0,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 2.9,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 2.8,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 2.8,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 2.8,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 2.8,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-p3-rewrite-main-1.jsonl",
+      "probe-model-p3-rewrite-main-2.jsonl",
+      "probe-model-p3-rewrite-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-p3-rewrite-pr-1.jsonl",
+      "probe-model-p3-rewrite-pr-2.jsonl",
+      "probe-model-p3-rewrite-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "P3a.base_collision_error": true,
+       "P3b.pr_collision_success": false
+      },
+      {
+       "P3a.base_collision_error": true,
+       "P3b.pr_collision_success": false
+      },
+      {
+       "P3a.base_collision_error": true,
+       "P3b.pr_collision_success": false
+      }
+     ],
+     "pr": [
+      {
+       "P3a.base_collision_error": true,
+       "P3b.pr_collision_success": false
+      },
+      {
+       "P3a.base_collision_error": true,
+       "P3b.pr_collision_success": false
+      },
+      {
+       "P3a.base_collision_error": true,
+       "P3b.pr_collision_success": false
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "P3a.base_collision_error",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": true,
+      "pr": true,
+      "citations": {
+       "main": {
+        "file": "probe-model-p3-rewrite-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"P3a.base_collision_error\""
+       },
+       "pr": {
+        "file": "probe-model-p3-rewrite-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"P3a.base_collision_error\""
+       }
+      }
+     },
+     {
+      "name": "P3b.pr_collision_success",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": false,
+      "pr": false,
+      "citations": {
+       "main": {
+        "file": "probe-model-p3-rewrite-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"P3b.pr_collision_success\""
+       },
+       "pr": {
+        "file": "probe-model-p3-rewrite-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"P3b.pr_collision_success\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "8d1847000d584d58d38f2c8262817b4a9148c39e334eab7e3e47b99b5b485cd2",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-10-28T10:28:43.041460+00:00",
+     "inputs_sha256": null,
+     "inputs": null,
+     "rewrite_of": "9c14ace0293b30b44f28c0272d79318ffbd33bfe95faf70c0d562cacec8182a7",
+     "verified": true,
+     "pr_started_at": "2026-10-28T10:28:43.041476+00:00"
+    },
+    "rewrite_of": "model-p3",
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 2,
+     "changed_lines_covered": 2,
+     "files": [
+      {
+       "file": "src/click/testing.py",
+       "changed_lines_total": 2,
+       "changed_lines_covered": 2
+      }
+     ],
+     "adequacy": "adequate",
+     "note": "ran 2 of 2 changed line(s) on the main side",
+     "exit": 0,
+     "data": "probe-cov-model-p3-rewrite.json",
+     "where": "contree"
+    },
+    "status": "rejected",
+    "rejected_reason": "rejected: claim pattern(s) C3, C4 match none of this probe's observation names, so the probe is not counted"
+   },
+   {
+    "id": "model-p4-rewrite",
+    "source": "model",
+    "path": "model-probes/model-p4-rewrite.py",
+    "sha256": "a7669269f60a649aa08673d6e1c49d16a283f4f1821c36cf469b002b9df38ed7",
+    "target": "pallets/click#3896",
+    "about": "Test independent control of runner color and context color setting on output",
+    "claims": [
+     {
+      "id": "C5",
+      "source": "PR description",
+      "text": "With this addition, I can now test cases that were previously difficult or impossible to cover, such as verifying how the command behaves with different `Context` settings.",
+      "covers": [
+       "C5"
+      ],
+      "expect": "differs"
+     },
+     {
+      "id": "C6",
+      "source": "PR description",
+      "text": "For evidence, I used the new `context_settings` parameter to extend and simplify existing checks. See `test_prompt_and_confirm_ansi_respects_color` and `test_tempfile_pager_handles_ansi`.",
+      "covers": [
+       "C6"
+      ],
+      "expect": "differs"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 4.9,
+      "ok": false
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 2.8,
+      "ok": false
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 2.8,
+      "ok": false
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 2.8,
+      "ok": false
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 2.8,
+      "ok": false
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 2.8,
+      "ok": false
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-p4-rewrite-main-1.jsonl",
+      "probe-model-p4-rewrite-main-2.jsonl",
+      "probe-model-p4-rewrite-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-p4-rewrite-pr-1.jsonl",
+      "probe-model-p4-rewrite-pr-2.jsonl",
+      "probe-model-p4-rewrite-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      },
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      },
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      }
+     ],
+     "pr": [
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      },
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      },
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "probe.error",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "crash": "non-json output",
+       "exit_code": 1
+      },
+      "pr": {
+       "crash": "non-json output",
+       "exit_code": 1
+      },
+      "citations": {
+       "main": {
+        "file": "probe-model-p4-rewrite-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"probe.error\""
+       },
+       "pr": {
+        "file": "probe-model-p4-rewrite-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"probe.error\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "a7669269f60a649aa08673d6e1c49d16a283f4f1821c36cf469b002b9df38ed7",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-10-28T10:29:16.963505+00:00",
+     "inputs_sha256": null,
+     "inputs": null,
+     "rewrite_of": "d97ec4febc12d9e30590413cb3cd1afc9948b7e2121a8b854db2bc31b64f6de8",
+     "verified": true,
+     "pr_started_at": "2026-10-28T10:29:16.963522+00:00"
+    },
+    "rewrite_of": "model-p4",
+    "probe_changed_line_coverage": {
+     "status": "not measured",
+     "why": "coverage run produced no data; see probe-coverage.log",
+     "adequacy": "not_adequate",
+     "note": "the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate"
+    },
+    "status": "crashed",
+    "uninformative_reason": "the probe crashed or printed no parsed output on every main-side run"
+   }
+  ],
+  "summary": {
+   "labels": [],
+   "flagged": [],
+   "proven_claims": [],
+   "reason": "the probe crashed or printed no parsed output on every main-side run; the probe crashed or printed no parsed output on every main-side run; rejected: claim pattern(s) C1, C3 match none of this probe's observation names, so the probe is not counted; rejected: claim pattern(s) C3, C4 match none of this probe's observation names, so the probe is not counted",
+   "ignored_noise": [],
+   "ignored_warning_only": [],
+   "pr_only_noisy": [],
+   "advisory_unchanged_subchecks": []
+  },
+  "rewrite": {
+   "before": [
+    {
+     "id": "model-p1",
+     "source": "model",
+     "path": "model-probes/model-p1.py",
+     "sha256": "afc5c4a92300cb07aec788898ab601c99e6ae93fd513cdb6bce9b046dfe39d25",
+     "target": "pallets/click#3896",
+     "about": "Check if CliRunner.invoke has context_settings parameter",
+     "claims": [
+      {
+       "id": "C1",
+       "source": "PR description",
+       "text": "This PR adds a `context_settings` parameter to `CliRunner.invoke()`, allowing tests to pass context-specific settings to the command's `Context`.",
+       "covers": [
+        "C1"
+       ],
+       "expect": "differs"
+      },
+      {
+       "id": "C3",
+       "source": "PR description",
+       "text": "`context_settings` solves this collision.",
+       "covers": [
+        "C3"
+       ],
+       "expect": "differs"
+      }
+     ],
+     "runs_per_side": 3,
+     "per_run": [
+      {
+       "side": "main",
+       "run": 1,
+       "seconds": 3.6,
+       "ok": true
+      },
+      {
+       "side": "pr",
+       "run": 1,
+       "seconds": 2.8,
+       "ok": true
+      },
+      {
+       "side": "main",
+       "run": 2,
+       "seconds": 2.8,
+       "ok": true
+      },
+      {
+       "side": "pr",
+       "run": 2,
+       "seconds": 2.8,
+       "ok": true
+      },
+      {
+       "side": "main",
+       "run": 3,
+       "seconds": 2.8,
+       "ok": true
+      },
+      {
+       "side": "pr",
+       "run": 3,
+       "seconds": 2.8,
+       "ok": true
+      }
+     ],
+     "outputs": {
+      "main": [
+       "probe-model-p1-main-1.jsonl",
+       "probe-model-p1-main-2.jsonl",
+       "probe-model-p1-main-3.jsonl"
+      ],
+      "pr": [
+       "probe-model-p1-pr-1.jsonl",
+       "probe-model-p1-pr-2.jsonl",
+       "probe-model-p1-pr-3.jsonl"
+      ]
+     },
+     "runs": {
+      "main": [
+       {
+        "P1.result": false
+       },
+       {
+        "P1.result": false
+       },
+       {
+        "P1.result": false
+       }
+      ],
+      "pr": [
+       {
+        "P1.result": true
+       },
+       {
+        "P1.result": true
+       },
+       {
+        "P1.result": true
+       }
+      ]
+     },
+     "observations": [
+      {
+       "name": "P1.result",
+       "state": "differs",
+       "label": "unmentioned",
+       "claim": null,
+       "main": false,
+       "pr": true,
+       "diffs": [
+        {
+         "field": "",
+         "main": false,
+         "pr": true
+        }
+       ],
+       "citations": {
+        "main": {
+         "file": "probe-model-p1-main-1.jsonl",
+         "line": 1,
+         "quote": "\"observation\": \"P1.result\""
+        },
+        "pr": {
+         "file": "probe-model-p1-pr-1.jsonl",
+         "line": 1,
+         "quote": "\"observation\": \"P1.result\""
+        }
+       }
+      }
+     ],
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "freeze": {
+      "sha256": "afc5c4a92300cb07aec788898ab601c99e6ae93fd513cdb6bce9b046dfe39d25",
+      "generator": {
+       "kind": "model",
+       "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+       "model": "nvidia/nemotron-3-super-120b-a12b",
+       "provider": "nebius",
+       "provenance": "live",
+       "blind": true
+      },
+      "frozen_at": "2026-10-28T10:25:20.312928+00:00",
+      "inputs_sha256": "1b72c3624b76d23177f5b397eb3f5f893c1df04ce77ce9ea69f3bb68b60b4a69",
+      "inputs": {
+       "title_chars": 54,
+       "body_chars": 1066,
+       "base_files": {
+        "src/click/testing.py": "76f4e649bc53000d667c8c0deff1591970fa034b0f085a207165839b2301019a"
+       }
+      },
+      "verified": true,
+      "pr_started_at": "2026-10-28T10:25:20.325540+00:00"
+     }
+    },
+    {
+     "id": "model-p2",
+     "source": "model",
+     "path": "model-probes/model-p2.py",
+     "sha256": "f16eacf8f8e2f4eb3ceaefc7c87f526487a03620ee3c353c78e172ff7ad5280a",
+     "target": "pallets/click#3896",
+     "about": "Test that extra keyword arguments (non-color) are passed to the context",
+     "claims": [
+      {
+       "id": "C2",
+       "source": "PR description",
+       "text": "`CliRunner.invoke()` passes its extra keyword arguments to the `Context` of the command, except `color`: its own `color` parameter takes that name.",
+       "covers": [
+        "C2"
+       ],
+       "expect": "same"
+      }
+     ],
+     "runs_per_side": 3,
+     "per_run": [
+      {
+       "side": "main",
+       "run": 1,
+       "seconds": 3.7,
+       "ok": false
+      },
+      {
+       "side": "pr",
+       "run": 1,
+       "seconds": 2.8,
+       "ok": false
+      },
+      {
+       "side": "main",
+       "run": 2,
+       "seconds": 2.8,
+       "ok": false
+      },
+      {
+       "side": "pr",
+       "run": 2,
+       "seconds": 3.1,
+       "ok": false
+      },
+      {
+       "side": "main",
+       "run": 3,
+       "seconds": 2.8,
+       "ok": false
+      },
+      {
+       "side": "pr",
+       "run": 3,
+       "seconds": 2.8,
+       "ok": false
+      }
+     ],
+     "outputs": {
+      "main": [
+       "probe-model-p2-main-1.jsonl",
+       "probe-model-p2-main-2.jsonl",
+       "probe-model-p2-main-3.jsonl"
+      ],
+      "pr": [
+       "probe-model-p2-pr-1.jsonl",
+       "probe-model-p2-pr-2.jsonl",
+       "probe-model-p2-pr-3.jsonl"
+      ]
+     },
+     "runs": {
+      "main": [
+       {
+        "probe.error": {
+         "crash": "non-json output",
+         "exit_code": 1
+        }
+       },
+       {
+        "probe.error": {
+         "crash": "non-json output",
+         "exit_code": 1
+        }
+       },
+       {
+        "probe.error": {
+         "crash": "non-json output",
+         "exit_code": 1
+        }
+       }
+      ],
+      "pr": [
+       {
+        "probe.error": {
+         "crash": "non-json output",
+         "exit_code": 1
+        }
+       },
+       {
+        "probe.error": {
+         "crash": "non-json output",
+         "exit_code": 1
+        }
+       },
+       {
+        "probe.error": {
+         "crash": "non-json output",
+         "exit_code": 1
+        }
+       }
+      ]
+     },
+     "observations": [
+      {
+       "name": "probe.error",
+       "state": "same",
+       "label": "not_testable",
+       "claim": null,
+       "main": {
+        "crash": "non-json output",
+        "exit_code": 1
+       },
+       "pr": {
+        "crash": "non-json output",
+        "exit_code": 1
+       },
+       "citations": {
+        "main": {
+         "file": "probe-model-p2-main-1.jsonl",
+         "line": 1,
+         "quote": "\"observation\": \"probe.error\""
+        },
+        "pr": {
+         "file": "probe-model-p2-pr-1.jsonl",
+         "line": 1,
+         "quote": "\"observation\": \"probe.error\""
+        }
+       }
+      }
+     ],
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "freeze": {
+      "sha256": "f16eacf8f8e2f4eb3ceaefc7c87f526487a03620ee3c353c78e172ff7ad5280a",
+      "generator": {
+       "kind": "model",
+       "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+       "model": "nvidia/nemotron-3-super-120b-a12b",
+       "provider": "nebius",
+       "provenance": "live",
+       "blind": true
+      },
+      "frozen_at": "2026-10-28T10:25:20.313496+00:00",
+      "inputs_sha256": "1b72c3624b76d23177f5b397eb3f5f893c1df04ce77ce9ea69f3bb68b60b4a69",
+      "inputs": {
+       "title_chars": 54,
+       "body_chars": 1066,
+       "base_files": {
+        "src/click/testing.py": "76f4e649bc53000d667c8c0deff1591970fa034b0f085a207165839b2301019a"
+       }
+      },
+      "verified": true,
+      "pr_started_at": "2026-10-28T10:25:20.325540+00:00"
+     }
+    },
+    {
+     "id": "model-p3",
+     "source": "model",
+     "path": "model-probes/model-p3.py",
+     "sha256": "9c14ace0293b30b44f28c0272d79318ffbd33bfe95faf70c0d562cacec8182a7",
+     "target": "pallets/click#3896",
+     "about": "Test collision when setting runner color and context color setting via extra",
+     "claims": [
+      {
+       "id": "C3",
+       "source": "PR description",
+       "text": "`context_settings` solves this collision.",
+       "covers": [
+        "C3"
+       ],
+       "expect": "differs"
+      },
+      {
+       "id": "C4",
+       "source": "PR description",
+       "text": "And now a test can set what its terminal supports, as well as the `color` of the context in the same call.",
+       "covers": [
+        "C4"
+       ],
+       "expect": "differs"
+      }
+     ],
+     "runs_per_side": 3,
+     "per_run": [
+      {
+       "side": "main",
+       "run": 1,
+       "seconds": 3.6,
+       "ok": false
+      },
+      {
+       "side": "pr",
+       "run": 1,
+       "seconds": 2.8,
+       "ok": false
+      },
+      {
+       "side": "main",
+       "run": 2,
+       "seconds": 2.8,
+       "ok": false
+      },
+      {
+       "side": "pr",
+       "run": 2,
+       "seconds": 2.8,
+       "ok": false
+      },
+      {
+       "side": "main",
+       "run": 3,
+       "seconds": 2.8,
+       "ok": false
+      },
+      {
+       "side": "pr",
+       "run": 3,
+       "seconds": 2.8,
+       "ok": false
+      }
+     ],
+     "outputs": {
+      "main": [
+       "probe-model-p3-main-1.jsonl",
+       "probe-model-p3-main-2.jsonl",
+       "probe-model-p3-main-3.jsonl"
+      ],
+      "pr": [
+       "probe-model-p3-pr-1.jsonl",
+       "probe-model-p3-pr-2.jsonl",
+       "probe-model-p3-pr-3.jsonl"
+      ]
+     },
+     "runs": {
+      "main": [
+       {
+        "probe.error": {
+         "crash": "non-json output",
+         "exit_code": 1
+        }
+       },
+       {
+        "probe.error": {
+         "crash": "non-json output",
+         "exit_code": 1
+        }
+       },
+       {
+        "probe.error": {
+         "crash": "non-json output",
+         "exit_code": 1
+        }
+       }
+      ],
+      "pr": [
+       {
+        "probe.error": {
+         "crash": "non-json output",
+         "exit_code": 1
+        }
+       },
+       {
+        "probe.error": {
+         "crash": "non-json output",
+         "exit_code": 1
+        }
+       },
+       {
+        "probe.error": {
+         "crash": "non-json output",
+         "exit_code": 1
+        }
+       }
+      ]
+     },
+     "observations": [
+      {
+       "name": "probe.error",
+       "state": "same",
+       "label": "not_testable",
+       "claim": null,
+       "main": {
+        "crash": "non-json output",
+        "exit_code": 1
+       },
+       "pr": {
+        "crash": "non-json output",
+        "exit_code": 1
+       },
+       "citations": {
+        "main": {
+         "file": "probe-model-p3-main-1.jsonl",
+         "line": 1,
+         "quote": "\"observation\": \"probe.error\""
+        },
+        "pr": {
+         "file": "probe-model-p3-pr-1.jsonl",
+         "line": 1,
+         "quote": "\"observation\": \"probe.error\""
+        }
+       }
+      }
+     ],
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "freeze": {
+      "sha256": "9c14ace0293b30b44f28c0272d79318ffbd33bfe95faf70c0d562cacec8182a7",
+      "generator": {
+       "kind": "model",
+       "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+       "model": "nvidia/nemotron-3-super-120b-a12b",
+       "provider": "nebius",
+       "provenance": "live",
+       "blind": true
+      },
+      "frozen_at": "2026-10-28T10:25:20.313617+00:00",
+      "inputs_sha256": "1b72c3624b76d23177f5b397eb3f5f893c1df04ce77ce9ea69f3bb68b60b4a69",
+      "inputs": {
+       "title_chars": 54,
+       "body_chars": 1066,
+       "base_files": {
+        "src/click/testing.py": "76f4e649bc53000d667c8c0deff1591970fa034b0f085a207165839b2301019a"
+       }
+      },
+      "verified": true,
+      "pr_started_at": "2026-10-28T10:25:20.325540+00:00"
+     }
+    },
+    {
+     "id": "model-p4",
+     "source": "model",
+     "path": "model-probes/model-p4.py",
+     "sha256": "d97ec4febc12d9e30590413cb3cd1afc9948b7e2121a8b854db2bc31b64f6de8",
+     "target": "pallets/click#3896",
+     "about": "Test independent control of runner color and context color setting on output",
+     "claims": [
+      {
+       "id": "C5",
+       "source": "PR description",
+       "text": "With this addition, I can now test cases that were previously difficult or impossible to cover, such as verifying how the command behaves with different `Context` settings.",
+       "covers": [
+        "C5"
+       ],
+       "expect": "differs"
+      },
+      {
+       "id": "C6",
+       "source": "PR description",
+       "text": "For evidence, I used the new `context_settings` parameter to extend and simplify existing checks. See `test_prompt_and_confirm_ansi_respects_color` and `test_tempfile_pager_handles_ansi`.",
+       "covers": [
+        "C6"
+       ],
+       "expect": "differs"
+      }
+     ],
+     "runs_per_side": 3,
+     "per_run": [
+      {
+       "side": "main",
+       "run": 1,
+       "seconds": 3.6,
+       "ok": false
+      },
+      {
+       "side": "pr",
+       "run": 1,
+       "seconds": 2.8,
+       "ok": false
+      },
+      {
+       "side": "main",
+       "run": 2,
+       "seconds": 2.8,
+       "ok": false
+      },
+      {
+       "side": "pr",
+       "run": 2,
+       "seconds": 2.8,
+       "ok": false
+      },
+      {
+       "side": "main",
+       "run": 3,
+       "seconds": 2.8,
+       "ok": false
+      },
+      {
+       "side": "pr",
+       "run": 3,
+       "seconds": 3.1,
+       "ok": false
+      }
+     ],
+     "outputs": {
+      "main": [
+       "probe-model-p4-main-1.jsonl",
+       "probe-model-p4-main-2.jsonl",
+       "probe-model-p4-main-3.jsonl"
+      ],
+      "pr": [
+       "probe-model-p4-pr-1.jsonl",
+       "probe-model-p4-pr-2.jsonl",
+       "probe-model-p4-pr-3.jsonl"
+      ]
+     },
+     "runs": {
+      "main": [
+       {
+        "probe.error": {
+         "crash": "non-json output",
+         "exit_code": 1
+        }
+       },
+       {
+        "probe.error": {
+         "crash": "non-json output",
+         "exit_code": 1
+        }
+       },
+       {
+        "probe.error": {
+         "crash": "non-json output",
+         "exit_code": 1
+        }
+       }
+      ],
+      "pr": [
+       {
+        "probe.error": {
+         "crash": "non-json output",
+         "exit_code": 1
+        }
+       },
+       {
+        "probe.error": {
+         "crash": "non-json output",
+         "exit_code": 1
+        }
+       },
+       {
+        "probe.error": {
+         "crash": "non-json output",
+         "exit_code": 1
+        }
+       }
+      ]
+     },
+     "observations": [
+      {
+       "name": "probe.error",
+       "state": "same",
+       "label": "not_testable",
+       "claim": null,
+       "main": {
+        "crash": "non-json output",
+        "exit_code": 1
+       },
+       "pr": {
+        "crash": "non-json output",
+        "exit_code": 1
+       },
+       "citations": {
+        "main": {
+         "file": "probe-model-p4-main-1.jsonl",
+         "line": 1,
+         "quote": "\"observation\": \"probe.error\""
+        },
+        "pr": {
+         "file": "probe-model-p4-pr-1.jsonl",
+         "line": 1,
+         "quote": "\"observation\": \"probe.error\""
+        }
+       }
+      }
+     ],
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "freeze": {
+      "sha256": "d97ec4febc12d9e30590413cb3cd1afc9948b7e2121a8b854db2bc31b64f6de8",
+      "generator": {
+       "kind": "model",
+       "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+       "model": "nvidia/nemotron-3-super-120b-a12b",
+       "provider": "nebius",
+       "provenance": "live",
+       "blind": true
+      },
+      "frozen_at": "2026-10-28T10:25:20.313706+00:00",
+      "inputs_sha256": "1b72c3624b76d23177f5b397eb3f5f893c1df04ce77ce9ea69f3bb68b60b4a69",
+      "inputs": {
+       "title_chars": 54,
+       "body_chars": 1066,
+       "base_files": {
+        "src/click/testing.py": "76f4e649bc53000d667c8c0deff1591970fa034b0f085a207165839b2301019a"
+       }
+      },
+      "verified": true,
+      "pr_started_at": "2026-10-28T10:25:20.325540+00:00"
+     }
+    }
+   ],
+   "probes": [
+    {
+     "probe": "model-p2",
+     "error": "{\"crash\": \"non-json output\", \"exit_code\": 1}",
+     "result": "not rewritten: rewrite rejected: code does not parse: unmatched '}' (line 13)"
+    },
+    {
+     "probe": "model-p3",
+     "error": "{\"crash\": \"non-json output\", \"exit_code\": 1}",
+     "result": "rewritten once"
+    },
+    {
+     "probe": "model-p4",
+     "error": "{\"crash\": \"non-json output\", \"exit_code\": 1}",
+     "result": "rewritten once (still crashes on main)"
+    }
+   ]
+  },
+  "test_settings": {
+   "applied": true,
+   "read_from": "main checkout (same values on both sides)",
+   "source": [
+    "pyproject.toml"
+   ],
+   "variables": [],
+   "pythonpath": [],
+   "pr_changed": []
+  },
+  "claim_hygiene": {
+   "held_back": [
+    "C1",
+    "C3",
+    "C4",
+    "C5",
+    "C6"
+   ],
+   "dropped_claims": [],
+   "retyped_same": [],
+   "dropped_probes": [],
+   "dropped_flagged": [],
+   "advisory_probes": [],
+   "relinked": [],
+   "unlinked_probes": [
+    "model-p1"
+   ]
+  }
+ },
+ "probe_changed_line_coverage": {
+  "status": "partly measured",
+  "side": "main",
+  "probes": {
+   "model-p1": {
+    "status": "measured",
+    "changed_lines_covered": 1,
+    "changed_lines_total": 2,
+    "adequacy": "adequate"
+   },
+   "model-p2": {
+    "status": "not measured",
+    "changed_lines_covered": null,
+    "changed_lines_total": null,
+    "adequacy": "not_adequate"
+   },
+   "model-p3-rewrite": {
+    "status": "measured",
+    "changed_lines_covered": 2,
+    "changed_lines_total": 2,
+    "adequacy": "adequate"
+   },
+   "model-p4-rewrite": {
+    "status": "not measured",
+    "changed_lines_covered": null,
+    "changed_lines_total": null,
+    "adequacy": "not_adequate"
+   }
+  },
+  "not_adequate": [
+   "model-p2",
+   "model-p4-rewrite"
+  ]
+ },
+ "claim_hygiene_note": "probe(s) model-p1 link none of their claims to an observation, so their differences are shown as advisory only; claim(s) C1, C3, C4, C5, C6 expected a difference that no observation showed; cleaning up claims never lifts that",
+ "verdict": "needs_attention",
+ "reason": "could not verify: claim(s) C1, C3, C3, C4 (+2 more) expect a difference but no observation matches (1 test(s) re-parametrized (4 -> 8 ids); 303 test(s) ran on main, 321 on the PR; 22 new test(s) pass, 323 unchanged (24 of them skipped on both sides); probe: 1 difference(s) from a probe with no linked claims shown as advisory only; rejected: claim pattern(s) C1, C3 match none of this probe's observation names, so the probe is not counted; probe model-p2 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count; rejected: claim pattern(s) C3, C4 match none of this probe's observation names, so the probe is not counted; probe model-p4-rewrite is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count); a probe rewrite cannot raise the verdict: without the rewrite it is needs_attention",
+ "verdict_before_coverage_gate": "could_not_verify",
+ "reason_before_coverage_gate": "could not verify: claim(s) C1, C3, C3, C4 (+2 more) expect a difference but no observation matches (1 test(s) re-parametrized (4 -> 8 ids); 303 test(s) ran on main, 321 on the PR; 22 new test(s) pass, 323 unchanged (24 of them skipped on both sides); probe: 1 difference(s) from a probe with no linked claims shown as advisory only; rejected: claim pattern(s) C1, C3 match none of this probe's observation names, so the probe is not counted; probe model-p2 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count; rejected: claim pattern(s) C3, C4 match none of this probe's observation names, so the probe is not counted; probe model-p4-rewrite is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count)",
+ "changed_lines_total": 2,
+ "changed_lines_covered": 2,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "normal",
+  "note": "2 of 2 changed executable line(s) ran (100%)",
+  "measurement": "measured"
+ },
+ "probe_rewrite_cap": {
+  "with_rewrite": "could_not_verify",
+  "without_rewrite": "needs_attention",
+  "final": "needs_attention"
+ },
+ "related_reports": {
+  "status": "ok",
+  "text": "1. \"`testing.CliRunner.invoke` cannot pass `color` for Context instantiation \u00b7 Issue #2110 \u00b7 pallets/click \u00b7 GitHub\"\n   https://github.com/pallets/click/issues/2110\n   \"can be handled with `context_settings`. [...] All in all, should we consider this as a `testing.CliRunner.invoke` bug? By the way, how do you test that case in Click itself? 5. ### davidismcommentedon Oct 26, 2021 @davidism davidism on Oct...\"\n2. \"Error: Got unexpected extra argument while try to calling another command in a cli group \u00b7 Issue #1181 \u00b7 pallets/click \u00b7 GitHub\"\n   https://github.com/pallets/click/issues/1181\n   \"But when I set ``` context_settings=dict( allow_extra_args=True, ) ``` into a command. It still exposed this error. ``` 7. ### Mon-iuscommentedon Dec 13, 2018 @Mon-ius Mon-ius on Dec 13, 2018 Author More actions The minimal code is little b...\"\n3. \"Testing Click Applications \u2014 Click Documentation (8.5...",
+  "items": [
+   {
+    "title": "`testing.CliRunner.invoke` cannot pass `color` for Context instantiation \u00b7 Issue #2110 \u00b7 pallets/click \u00b7 GitHub",
+    "url": "https://github.com/pallets/click/issues/2110",
+    "content": "can be handled with `context_settings`. [...] All in all, should we consider this as a `testing.CliRunner.invoke` bug? By the way, how do you test that case in Click itself? 5. ### davidismcommentedon Oct 26, 2021 @davidism davidism on Oct..."
+   },
+   {
+    "title": "Error: Got unexpected extra argument while try to calling another command in a cli group \u00b7 Issue #1181 \u00b7 pallets/click \u00b7 GitHub",
+    "url": "https://github.com/pallets/click/issues/1181",
+    "content": "But when I set ``` context_settings=dict( allow_extra_args=True, ) ``` into a command. It still exposed this error. ``` 7. ### Mon-iuscommentedon Dec 13, 2018 @Mon-ius Mon-ius on Dec 13, 2018 Author More actions The minimal code is little b..."
+   },
+   {
+    "title": "Testing Click Applications \u2014 Click Documentation (8.5.x)",
+    "url": "https://click.palletsprojects.com/en/stable/testing",
+    "content": "`CliRunner.invoke()` is different. While a command runs it swaps several pieces of process-global state into place (like `sys.stdout`, `sys.stderr`, `sys.stdin`, etc). Two invocations active at the same time in one interpreter overwrite eac..."
+   }
+  ],
+  "query": "pallets/click Add `context_settings` parameter to `CliRunner.invoke` bug report issue",
+  "result_count": 3,
+  "untrusted": true
+ },
+ "explanation": {
+  "status": "wired",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "text": "could not verify: claim(s) C1, C3, C3, C4 (+2 more) expect a difference but no observation matches",
+  "quotes": [
+   "could not verify: claim(s) C1, C3, C3, C4 (+2 more) expect a difference but no observation matches"
+  ],
+  "advisory": true
+ },
+ "agents": {
+  "status": "ran",
+  "advisory": true,
+  "note": "judge/helper/summary are advisory; code owns the verdict",
+  "roles": [
+   {
+    "role": "judge",
+    "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+    "status": "ok",
+    "note": null,
+    "labels": [
+     {
+      "id": "probe-model-p1",
+      "label": "proven",
+      "reason": "Click's CliRunner.invoke method accepts a context_settings parameter to pass settings to the Context constructor."
+     },
+     {
+      "id": "probe-model-p2",
+      "label": "proven",
+      "reason": "Extra keyword arguments given to CliRunner.invoke are forwarded to the Context as **extra."
+     },
+     {
+      "id": "probe-model-p3-rewrite",
+      "label": "needs_human",
+      "reason": "Collision behavior between runner color and context color setting via extra requires manual verification of precedence rules."
+     },
+     {
+      "id": "probe-model-p4-rewrite",
+      "label": "needs_human",
+      "reason": "Independent control of runner color and context color setting on output needs human inspection of actual rendering results."
+     }
+    ]
+   },
+   {
+    "role": "helper",
+    "model": "nvidia/Nemotron-3_5-Lightning",
+    "status": "ok",
+    "note": null,
+    "notes": [
+     "Probes model-p2 and model-p4-rewrite consistently not_adequate; add to ignored_noise.",
+     "Claim patterns C1, C3, C4 matched no observations; ignore in future diffs.",
+     "Verify Click version compatibility when using context_settings with CliRunner.invoke.",
+     "Auto-suppress probes with no parsed output on every main-side run as known noise.",
+     "Current ignored_noise list empty; populate based on probe and claim pattern observations."
+    ]
+   },
+   {
+    "role": "summary",
+    "model": "nvidia/nemotron-3-super-120b-a12b",
+    "status": "ok",
+    "note": null
+   }
+  ],
+  "provider": {
+   "provider": "nebius",
+   "models": {
+    "claims": "nvidia/nemotron-3-super-120b-a12b",
+    "probes": "nvidia/nemotron-3-super-120b-a12b",
+    "judge": "nvidia/Nemotron-3-Ultra-550b-a55b",
+    "helper": "nvidia/Nemotron-3_5-Lightning",
+    "summary": "nvidia/nemotron-3-super-120b-a12b"
+   },
+   "blind": true
+  }
+ },
+ "swarm_requested": true,
+ "operator_approval_requested": false,
+ "swarm": "on",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [
+   "src/click/testing.py"
+  ],
+  "compiled_files": [],
+  "other_files": [
+   "CHANGES.md",
+   "docs/testing.md",
+   "tests/test_termui.py",
+   "tests/test_testing.py"
+  ]
+ },
+ "duration_s": {
+  "total_wall": 428.9,
+  "tests": 24.5
+ },
+ "cost": {
+  "ai_calls": 5,
+  "failed_ai_calls": 0,
+  "input_tokens": 9593,
+  "output_tokens": 15696,
+  "thinking_tokens": 13694,
+  "cost_usd": 0.017004,
+  "calls_without_usage": 0,
+  "ai_cost_usd": 0.017004,
+  "cost_complete": true,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 428.9,
+   "tests": 24.5
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.028593,
+  "total_cost_usd": 0.045597,
+  "swarm": {
+   "ai_calls": 3,
+   "failed_ai_calls": 0,
+   "input_tokens": 793,
+   "output_tokens": 637,
+   "thinking_tokens": 560,
+   "cost_usd": 0.000811,
+   "calls_without_usage": 2,
+   "ai_cost_usd": 0.000811,
+   "cost_complete": false,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ },
+ "timings": {
+  "sandbox prep (checkout)": 36.5,
+  "Tavily setup lookup": 19.1,
+  "demo_helper": 0.0,
+  "Python setup": 0.0,
+  "dependency install": 0.0,
+  "model: claims/probe writing": 10.3,
+  "probes": 223.2,
+  "main side install": 70.9,
+  "tests (both sides)": 32.3,
+  "verdict": 3.3,
+  "agent_judge": 4.9,
+  "agent_helper": 22.7,
+  "agent_summary": 5.7,
+  "record": 0.0,
+  "tests (main side)": 11.9,
+  "tests (PR side)": 12.6,
+  "model call 1 (claims)": 10.3,
+  "model call 2 (probes)": 47.5,
+  "model call 3 (probes)": 7.5,
+  "model call 4 (probes)": 20.8,
+  "model call 5 (probes)": 15.0,
+  "model call 6 (judge)": 4.9,
+  "model call 7 (helper)": 22.7,
+  "model call 8 (summary)": 5.7
+ },
+ "tavily_credits": {
+  "check": "pallets/click#3896",
+  "search_calls": 4,
+  "search_credits": 4.0,
+  "crawl_calls": 0,
+  "crawl_credits": 0.0,
+  "extract_calls": 0,
+  "extract_credits": 0.0,
+  "overlapped": false,
+  "total_credits": 4.0
+ }
+}

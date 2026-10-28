@@ -76,12 +76,8 @@ def normalize(rec: dict, dirname: str | None = None) -> dict:
     r.setdefault("_dir", dirname or logs or None)
     if not r["_dir"]:
         r.pop("_dir")
-    downgraded = _ai_probe_downgraded(r)
-    out = coverage_gate.apply(r)
-    if downgraded:
-        from ops.daily_run import ai_probe_gate
-        out = ai_probe_gate(out)
-    return out
+    from poc.final_verdict import final
+    return final(r)
 
 
 def side_of(x: dict) -> str:
@@ -307,7 +303,8 @@ def decide(rec: dict, chk: list[list]) -> dict:
     bad_replay = rv.replay_failure(None, rv.latest_replay())
     if bad_replay:  # rule: a failed known-answer replay means no report is trusted
         return dict(verdict="COULD NOT VERIFY", colour="grey", action="Re-run", confidence="Low",
-                    conf_why="The known-answer tests failed in the latest replay.", why=bad_replay)
+                    conf_why="The known-answer tests failed in the latest replay.", why=bad_replay,
+                    trust_override=v != "could_not_verify")
     if v == "no_code_change":
         return dict(verdict="NO CODE CHANGE", colour="grey", action="Approve with notes", confidence="High",
                     conf_why="Every changed file is a type stub or a py.typed marker, so behaviour was not checked.",
@@ -328,7 +325,8 @@ def decide(rec: dict, chk: list[list]) -> dict:
     if v == "could_not_verify" or fails:
         why = rec.get("reason") if v == "could_not_verify" else "the run failed its own checks: " + "; ".join(c[0] for c in fails)
         return dict(verdict="COULD NOT VERIFY", colour="grey", action="Re-run", confidence="Low",
-                    conf_why="The run did not finish cleanly, so it says nothing about the PR.", why=why)
+                    conf_why="The run did not finish cleanly, so it says nothing about the PR.", why=why,
+                    trust_override=v != "could_not_verify")
     verdict, colour = VERDICT[v]
     conf = "Medium" if warns else "High"
     conf_why = (("Some checks gave warnings: " + "; ".join(c[0] for c in warns)) if warns
@@ -750,16 +748,25 @@ def build(rec: dict, prdir: Path, out_dir: Path, decision: dict | None = None) -
     summary = dict(id=run_id(rec), subject=subject, dependent="its own tests", verdict=d["verdict"], action=d["action"],
                    confidence=d["confidence"], colour=d["colour"], why=d["why"] or "-",
                    evals="APPROVE" if not [x for x in chk if x[1] == "FAIL"] else "REJECT", claims=[r["status"] for r in rows],
-                   citations=cstat)
+                   citations=cstat, trust_override=bool(d.get("trust_override")))
     return R, summary
+
+
+class VerdictMismatch(Exception):
+    """The reports and summary do not show the final verdict stored in record.json."""
+
+    def __init__(self, lines: list[str]):
+        super().__init__("; ".join(lines))
+        self.lines = lines
 
 
 def render_run(run_dir: str | Path, out: str | Path, formats=("md", "html", "pdf"), title: str | None = None) -> list[dict]:
     """Render every PR in an ops/daily_run.py run folder. Returns the summary rows."""
     run_dir, out = Path(run_dir).resolve(), Path(out).resolve()
-    recs = []
+    recs, raw = [], []
     for p in sorted(run_dir.glob("*/record.json")):
-        recs.append((normalize(json.loads(p.read_text()), p.parent.name), p.parent))
+        raw.append(json.loads(p.read_text()))
+        recs.append((normalize(raw[-1], p.parent.name), p.parent))
     if not recs:
         raise SystemExit(f"no */record.json under {run_dir}: is this an ops/runs/<date> folder?")
     if "pdf" in formats and not rv.find_chrome():
@@ -795,6 +802,12 @@ def render_run(run_dir: str | Path, out: str | Path, formats=("md", "html", "pdf
                        f"{len(h['selected'])} PR(s), {len(h['verdicts'])} record(s)." for h in hist])
 
     rv.write_summary(rows, str(out), title or f"Proof-of-Change daily summary: {run_dir.name}", formats, extra)
+    from poc.final_verdict import disagreements
+    # A run that failed its own trust checks is shown as COULD NOT VERIFY on purpose (decide: trust_override);
+    # that is a statement about the run, not a second verdict. Every other row must show record.json's verdict.
+    bad = disagreements((r, s["verdict"]) for r, s in zip(raw, rows) if not s.get("trust_override"))
+    if bad:
+        raise VerdictMismatch(bad)
     print(f"summary: {out / 'SUMMARY.html'}")
     return rows
 
