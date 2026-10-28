@@ -478,15 +478,137 @@ def _text_inputs(code) -> int:
     return best
 
 
-def _repair_loses(old_code, new_code) -> str | None:
-    """Why a parse repair is rejected: it records fewer observation keys or loops over fewer inputs."""
-    o, n = _text_obs_keys(old_code), _text_obs_keys(new_code)
-    if n < o:
-        return f"the repair has fewer observation keys ({n} < {o})"
-    o, n = _text_inputs(old_code), _text_inputs(new_code)
-    if n < o:
-        return f"the repair has fewer inputs ({n} < {o})"
+_TEXT_RANGE = re.compile(r"\bfor\s+[^\n]+?\s+in\s+range\(\s*(-?\d+)\s*(?:,\s*(-?\d+)\s*)?(?:,\s*(-?\d+)\s*)?\)")
+
+
+def _text_range_inputs(text: str) -> int:
+    best = 0
+    for m in _TEXT_RANGE.finditer(text):
+        a = [int(g) for g in m.groups() if g is not None]
+        try:
+            best = max(best, len(range(*a)))
+        except ValueError:
+            pass
+    return best
+
+
+def _const_len(node) -> int | None:
+    """How many items a for-loop's iterable has, when that can be read: a literal list/tuple/set, range() with
+    constant arguments, or enumerate()/list()/tuple()/sorted()/reversed() of one of those."""
+    if isinstance(node, (ast.List, ast.Tuple, ast.Set)):
+        return len(node.elts)
+    if isinstance(node, ast.Call) and isinstance(node.func, ast.Name) and not node.keywords:
+        f, args = node.func.id, node.args
+        if f == "range" and args and all(isinstance(x, ast.Constant) and type(x.value) is int for x in args):
+            try:
+                return len(range(*[x.value for x in args]))
+            except ValueError:
+                return None
+        if f in ("enumerate", "list", "tuple", "sorted", "reversed") and len(args) >= 1:
+            return _const_len(args[0])
     return None
+
+
+_STOPS = (ast.Break, ast.Continue, ast.Return, ast.Raise)
+
+
+def _live(stmts: list) -> list:
+    """The statements of a block that can run: none after an unconditional break/continue/return/raise, and no
+    `if False:` / `if 0:` bodies (their else is kept)."""
+    out = []
+    for st in stmts:
+        if isinstance(st, ast.If) and isinstance(st.test, ast.Constant):
+            out += _live(st.body if st.test.value else st.orelse)
+            continue
+        out.append(st)
+        if isinstance(st, _STOPS):
+            break
+    return out
+
+
+def _ast_counts(code) -> dict | None:
+    """Observation keys and inputs of code that parses, read from its AST so keys in comments, docstrings and dead
+    code do not count. Keys: dotted names from recorded_names (#177) found in live code; an f-string key inside a loop
+    over a readable iterable counts once per item. Inputs: the most items of a readable loop, 1 when its body breaks
+    unconditionally. None when the code does not parse or stores under a key that cannot be read."""
+    code = _unescape_code(code) if isinstance(code, str) else ""
+    try:
+        tree = ast.parse(code)
+    except SyntaxError:
+        return None
+    if recorded_names(code) is None:
+        return None
+    names, fkeys, inputs = set(), set(), [0]
+
+    def walk(stmts, mult):
+        for st in _live(stmts):
+            if isinstance(st, (ast.For, ast.AsyncFor)):
+                n = _const_len(st.iter)
+                body = _live(st.body)
+                if n is not None and any(isinstance(b, ast.Break) for b in body):
+                    n = min(n, 1)
+                if n is not None:
+                    inputs[0] = max(inputs[0], n)
+                walk(st.body, mult * n if n else mult)
+                walk(st.orelse, mult)
+                continue
+            if isinstance(st, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+                walk(st.body, mult)
+                continue
+            subs = [getattr(st, f) for f in ("body", "orelse", "finalbody") if isinstance(getattr(st, f, None), list)]
+            subs += [h.body for h in getattr(st, "handlers", [])]
+            for node in ast.walk(st) if not subs else _shallow(st):
+                _keys(node, mult)
+            for b in subs:
+                walk(b, mult)
+
+    def _keys(node, mult):
+        ks = []
+        if isinstance(node, ast.Dict):
+            ks = [k for k in node.keys if k is not None]
+        elif isinstance(node, ast.Subscript) and isinstance(node.ctx, ast.Store):
+            ks = [node.slice]
+        for k in ks:
+            if isinstance(k, ast.Constant) and isinstance(k.value, str) and _OBS_KEY.fullmatch(repr(k.value)):
+                names.add(k.value)
+            elif isinstance(k, ast.JoinedStr):
+                fkeys.add((ast.dump(k), mult))
+
+    walk(tree.body, 1)
+    return {"keys": len(names) + sum(m for _, m in fkeys), "inputs": inputs[0]}
+
+
+def _shallow(st):
+    """Nodes of a compound statement outside its nested blocks (its test, iterable, items...)."""
+    for f, v in ast.iter_fields(st):
+        if f in ("body", "orelse", "finalbody", "handlers"):
+            continue
+        for x in v if isinstance(v, list) else [v]:
+            if isinstance(x, ast.AST):
+                yield from ast.walk(x)
+
+
+def _text_counts(code) -> dict:
+    text = _unescape_code(code) if isinstance(code, str) else ""
+    return {"keys": _text_obs_keys(code), "inputs": max(_text_inputs(code), _text_range_inputs(text))}
+
+
+def repair_counts(code) -> dict:
+    """Keys and inputs of a probe's code, with how they were read: the AST when the code parses, else the text."""
+    c = _ast_counts(code)
+    return dict(c, read="ast") if c is not None else dict(_text_counts(code), read="text")
+
+
+def _repair_loses(old_code, new_code) -> tuple[str | None, dict]:
+    """Why a parse repair is rejected (fewer observation keys or fewer inputs than the original), and the before and
+    after counts. The broken original is read from its text; the repair, which parses, from its AST."""
+    before, after = repair_counts(old_code), repair_counts(new_code)
+    counts = {"before": before, "after": after}
+    if after["keys"] < before["keys"]:
+        return f"the repair has fewer observation keys ({after['keys']} < {before['keys']})", counts
+    if after["inputs"] < before["inputs"]:
+        return f"the repair has fewer inputs ({after['inputs']} < {before['inputs']})", counts
+    return None, counts
 
 
 def _repair_parse_errors(provider, probes_prompt: str, user: str, ctx: dict, resp, out: dict):
@@ -520,11 +642,12 @@ def _repair_parse_errors(provider, probes_prompt: str, user: str, ctx: dict, res
         fixed_list = list(probes)
         for i, p, e in broken:
             q = by_id.get(_tidy_id(p.get("id")) if isinstance(p.get("id"), str) else None)
+            counts = None
             if q is None:
                 outcome = "no fixed probe returned"
             else:
                 still = parse_error(q.get("code"))
-                lost = _repair_loses(p.get("code"), q.get("code"))
+                lost, counts = _repair_loses(p.get("code"), q.get("code"))
                 if still is not None:
                     outcome = f"still fails: {still['message']} (line {still['line']})"
                 elif lost:
@@ -532,7 +655,8 @@ def _repair_parse_errors(provider, probes_prompt: str, user: str, ctx: dict, res
                 else:
                     outcome = "fixed"
                     fixed_list[i] = dict(p, code=q.get("code"))
-            attempts.append({"attempt": n, "probe": p.get("id"), "error": e, "outcome": outcome})
+            attempts.append({"attempt": n, "probe": p.get("id"), "error": e, "outcome": outcome,
+                             **({"counts": counts} if counts else {})})
         resp = dict(resp or {}, probes=fixed_list)
     return resp
 

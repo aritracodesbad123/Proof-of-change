@@ -23,7 +23,9 @@ def test_repair_feeds_the_exact_error_and_keeps_the_fix(tmp_path):
     assert "unexpected character after line continuation character (line 1" in ask
     assert "Offending line: " + BROKEN_CODE in ask and "Full code as received" in ask
     assert out["parse_repairs"] == [{"attempt": 1, "probe": "p1", "outcome": "fixed",
-                                     "error": model_probes.parse_error(BROKEN_CODE)}]
+                                     "error": model_probes.parse_error(BROKEN_CODE),
+                                     "counts": {"before": {"keys": 0, "inputs": 0, "read": "text"},
+                                                "after": {"keys": 1, "inputs": 0, "read": "ast"}}}]
     assert len(out["probes"]) == 1 and "retried" not in out
 
 
@@ -72,7 +74,9 @@ def test_repair_and_retry_trail_lands_in_the_saved_record(tmp_path, monkeypatch)
     dr.finish(rec, prdir, work, time.time())
     plan = json.loads((prdir / "record.json").read_text())["probe_plan"]
     assert plan["model_parse_repairs"] == [{"attempt": 1, "probe": "p1", "outcome": "fixed",
-                                            "error": model_probes.parse_error(BROKEN_CODE)}]
+                                            "error": model_probes.parse_error(BROKEN_CODE),
+                                     "counts": {"before": {"keys": 0, "inputs": 0, "read": "text"},
+                                                "after": {"keys": 1, "inputs": 0, "read": "ast"}}}]
     assert plan["model_retried"]["kept_first_answer"]
     # the repair's code is kept with the original's covers (f.*), which that code does not record
     assert plan["model_unmatched_covers"] == ["C1:f.*"]
@@ -112,3 +116,55 @@ def test_repair_takes_only_code_and_pairs_by_id(tmp_path):
                                              "", "u", {}, {"probes": [orig]}, {})
     got = resp["probes"][0]
     assert got["code"] == reply["code"] and got["about"] == "orig" and got["claims"] == orig["claims"]
+
+
+# Each way the text count of a repair could be fooled; the repair parses, so it is read from its AST.
+def _keys(code):
+    c = model_probes.repair_counts(code)
+    assert c["read"] == "ast"
+    return c["keys"], c["inputs"]
+
+
+def test_ast_ignores_keys_in_comments():
+    assert _keys("obs = {}\n# obs['f.b'] = 2  obs['f.c'] = 3\nobs['f.a'] = 1\n") == (1, 0)
+
+
+def test_ast_ignores_keys_in_docstrings_and_plain_strings():
+    code = '"""Records f.b and f.c."""\nobs = {}\nnote = "f.b f.c"\nobs["f.a"] = 1\n'
+    assert _keys(code) == (1, 0)
+
+
+def test_ast_ignores_dead_code():
+    code = ("obs = {}\nif False:\n    obs['f.b'] = 2\nfor x in [1, 2]:\n    obs['f.a'] = x\n    continue\n"
+            "    obs['f.c'] = 3\nif 0:\n    obs['f.d'] = 4\nelse:\n    obs['f.e'] = 5\n")
+    assert _keys(code) == (2, 2)
+
+
+def test_ast_early_break_runs_one_input():
+    code = "obs = {}\nfor x in [1, 2, 3]:\n    obs['f.a'] = x\n    break\n"
+    assert _keys(code) == (1, 1)
+    cond = "obs = {}\nfor x in [1, 2, 3]:\n    obs['f.a'] = x\n    if x > 9:\n        break\n"
+    assert _keys(cond) == (1, 3)
+
+
+def test_range_inputs_read_from_text_and_ast():
+    code = "obs = {}\nfor i in range(2, 8, 2):\n    obs['f.a'] = i\n"
+    assert _keys(code) == (1, 3)
+    assert model_probes.repair_counts(code + "if x:\nprint(x)\n")["inputs"] == 3
+
+
+def test_fstring_keys_count_once_per_input():
+    code = "obs = {}\nfor w in ['a', 'b', 'c']:\n    obs[f'f.{w}'] = 1\n"
+    assert _keys(code) == (3, 3)
+
+
+def test_repair_hiding_dropped_keys_in_a_comment_is_rejected(tmp_path):
+    broken = dict(GOOD["probes"][0], id="p1", code=THREE + "if x:\nprint(x)\n")
+    sly = ONE + "# obs['f.b'] = 2; obs['f.c'] = 3\n"
+    assert model_probes._text_obs_keys(sly) == 3   # the text count is fooled
+    drop = {"probes": [dict(GOOD["probes"][0], id="p1", code=sly)]}
+    _, out = _run(tmp_path, [{"probes": [broken]}] + [drop] * model_probes.PARSE_REPAIR_TRIES + [{"probes": []}])
+    r = out["parse_repairs"][0]
+    assert r["outcome"] == "rejected: the repair has fewer observation keys (1 < 3)"
+    assert r["counts"] == {"before": {"keys": 3, "inputs": 3, "read": "text"},
+                           "after": {"keys": 1, "inputs": 1, "read": "ast"}}
