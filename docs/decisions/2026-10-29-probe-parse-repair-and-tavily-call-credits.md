@@ -26,3 +26,9 @@ Searches now send `include_usage: true` (crawl and extract already did), and eve
 otherwise "estimate" at the published rate) and the `usage` block as returned. The totals add
 `api_reported_credits` and `estimated_credits`, and the run log line shows both. A check that ends in a harness
 error now still records and logs its credits.
+
+## Follow-up: repairs change code only
+
+A parse repair now keeps the original probe's claims, covers, expect and about, and takes only the new code. Repairs
+are paired to originals by id only, never by position. A repair is rejected when it has fewer observation keys or
+fewer looped inputs than the original. Both counts are read from the code text, so a broken original still counts.
