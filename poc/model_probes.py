@@ -467,54 +467,6 @@ def parse_error(code) -> dict | None:
 
 
 _OBS_KEY = re.compile(r"""['"]([A-Za-z_][\w-]*(?:\.[\w-]+)+)['"]""")
-_FOR_IN = re.compile(r"\bfor\s+[^\n]+?\s+in\s+(?:[\w.]+\()?([\[(])")
-
-
-def _text_inputs(code) -> int:
-    """The most top-level items in a literal list or tuple looped over by `for ... in [...]`, read from text."""
-    text = _unescape_code(code) if isinstance(code, str) else ""
-    best = 0
-    for m in _FOR_IN.finditer(text):
-        depth, items, seen, quote, j = 0, 0, False, None, m.end(1) - 1
-        while j < len(text):
-            c = text[j]
-            if quote:
-                if c == "\\":
-                    j += 1
-                elif c == quote:
-                    quote = None
-            elif c in "'\"":
-                quote, seen = c, True
-            elif c in "([{":
-                depth += 1
-                if depth > 1:
-                    seen = True
-            elif c in ")]}":
-                depth -= 1
-                if depth == 0:
-                    items += 1 if seen else 0
-                    break
-            elif c == "," and depth == 1:
-                items, seen = items + (1 if seen else 0), False
-            elif not c.isspace() and depth >= 1:
-                seen = True
-            j += 1
-        best = max(best, items)
-    return best
-
-
-_TEXT_RANGE = re.compile(r"\bfor\s+[^\n]+?\s+in\s+range\(\s*(-?\d+)\s*(?:,\s*(-?\d+)\s*)?(?:,\s*(-?\d+)\s*)?\)")
-
-
-def _text_range_inputs(text: str) -> int:
-    best = 0
-    for m in _TEXT_RANGE.finditer(text):
-        a = [int(g) for g in m.groups() if g is not None]
-        try:
-            best = max(best, len(range(*a)))
-        except ValueError:
-            pass
-    return best
 
 
 def _const_len(node) -> int | None:
@@ -617,11 +569,9 @@ def _shallow(st):
                 yield from ast.walk(x)
 
 
-def _token_obs_keys(code) -> int:
-    """Distinct dotted string keys of code that may not parse, read from its tokens: a string right after `{` or `,`
-    and followed by `:` (a dict key), or between `[` and `] =` (a subscript store). Comments, docstrings and other
-    strings (import_module('pkg.mod'), mock.patch('pkg.mod.f')) are not in a key position. Tokenizing stops at the
-    first token error and keeps what it read; line breaks alone do not change the count."""
+def _tolerant_tokens(code) -> list:
+    """(type, string) tokens of code that may not parse, without comments, line breaks or indentation. A line that
+    breaks tokenizing is skipped and tokenizing goes on from the next one, so line breaks alone change nothing."""
     text = _unescape_code(code) if isinstance(code, str) else ""
     toks, lines = [], text.splitlines(keepends=True)
     start = 0
@@ -641,6 +591,15 @@ def _token_obs_keys(code) -> int:
             stop = start + line if isinstance(line, int) and line > 0 else last + 1
             start = max(stop, last + 1, start + 1)
             toks.append((tokenize.OP, ";"))
+    return toks
+
+
+def _token_obs_keys(code) -> int:
+    """Distinct dotted string keys of code that may not parse, read from its tokens: a string right after `{` or `,`
+    and followed by `:` (a dict key), or between `[` and `] =` (a subscript store). Comments, docstrings and other
+    strings (import_module('pkg.mod'), mock.patch('pkg.mod.f')) are not in a key position. Tokenizing stops at the
+    first token error and keeps what it read; line breaks alone do not change the count."""
+    toks = _tolerant_tokens(code)
     names = set()
     for i, (kind, val) in enumerate(toks):
         if kind != tokenize.STRING or i == 0:
@@ -648,7 +607,8 @@ def _token_obs_keys(code) -> int:
         prev, nxt = toks[i - 1][1], toks[i + 1][1] if i + 1 < len(toks) else ""
         after = toks[i + 2][1] if i + 2 < len(toks) else ""
         dict_key = prev in ("{", ",") and nxt == ":"
-        store = prev == "[" and nxt == "]" and after == "="
+        store = (prev == "[" and nxt == "]" and after == "="
+                 and [x[1] for x in toks[max(0, i - 4):i - 1]] != ["sys", ".", "modules"])
         if not (dict_key or store):
             continue
         try:
@@ -660,11 +620,63 @@ def _token_obs_keys(code) -> int:
     return len(names)
 
 
+_WRAPS = ("enumerate", "list", "tuple", "sorted", "reversed")
+
+
+def _token_inputs(code) -> int:
+    """The most items of a loop (statement or comprehension) over a literal list, tuple or set, or over range() with
+    constant arguments, optionally wrapped in enumerate()/list()/tuple()/sorted()/reversed(); read from the tokens,
+    so loops in comments and strings do not count. Mirrors _const_len on the AST."""
+    toks = _tolerant_tokens(code)
+    vals = [v for _, v in toks]
+    best = 0
+    for i, v in enumerate(vals):
+        if v != "for" or toks[i][0] != tokenize.NAME:
+            continue
+        j = next((k for k in range(i + 1, min(i + 30, len(vals))) if vals[k] == "in"), None)
+        if j is None:
+            continue
+        j += 1
+        while j + 1 < len(vals) and vals[j] in _WRAPS and vals[j + 1] == "(":
+            j += 2
+        if j + 1 < len(vals) and vals[j] == "range" and vals[j + 1] == "(":
+            args, k = [], j + 2
+            while k < len(vals) and vals[k] != ")":
+                if vals[k] != ",":
+                    args.append(vals[k])
+                k += 1
+            try:
+                best = max(best, len(range(*[int(x) for x in args])))
+            except (ValueError, TypeError):
+                pass
+            continue
+        if j < len(vals) and vals[j] in ("[", "(", "{"):
+            depth, items, seen = 0, 0, False
+            for k in range(j, len(vals)):
+                x = vals[k]
+                if x in ("[", "(", "{"):
+                    depth += 1
+                    if depth > 1:
+                        seen = True
+                elif x in ("]", ")", "}"):
+                    depth -= 1
+                    if depth == 0:
+                        items += 1 if seen else 0
+                        break
+                elif x == "," and depth == 1:
+                    items, seen = items + (1 if seen else 0), False
+                elif x == "for" and depth == 1:   # a comprehension, not a literal
+                    items = 0
+                    break
+                else:
+                    seen = True
+            best = max(best, items)
+    return best
+
+
 def original_counts(code) -> dict:
-    """Keys and inputs of the original (broken) probe: keys from its tokens, inputs from its text."""
-    text = _unescape_code(code) if isinstance(code, str) else ""
-    return {"keys": _token_obs_keys(code), "inputs": max(_text_inputs(code), _text_range_inputs(text)),
-            "read": "tokens"}
+    """Keys and inputs of the original (broken) probe, both read from its tokens."""
+    return {"keys": _token_obs_keys(code), "inputs": _token_inputs(code), "read": "tokens"}
 
 
 def repair_counts(code) -> dict | None:

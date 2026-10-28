@@ -90,8 +90,8 @@ ONE = "import json\nobs = {}\nfor x in [1]:\n    obs['f.a'] = 1\nprint(json.dump
 def test_text_counts_read_a_broken_original():
     broken = THREE.replace("obs = {}", "obs = {}\\n)")
     assert model_probes.parse_error(broken) is not None
-    assert model_probes._token_obs_keys(broken) == 3 and model_probes._text_inputs(broken) == 3
-    assert model_probes._token_obs_keys(ONE) == 1 and model_probes._text_inputs(ONE) == 1
+    assert model_probes._token_obs_keys(broken) == 3 and model_probes._token_inputs(broken) == 3
+    assert model_probes._token_obs_keys(ONE) == 1 and model_probes._token_inputs(ONE) == 1
 
 
 def test_repair_that_drops_observations_is_rejected(tmp_path):
@@ -209,3 +209,26 @@ def test_sys_modules_stores_are_not_keys():
     assert model_probes.repair_counts(code)["keys"] == 1
     # a dynamic observation key is still unreadable
     assert model_probes.recorded_names(code + "k = 'f.b'\nobs[k] = 2\n") is None
+
+
+def test_comprehension_inputs_cut_by_the_repair_are_rejected():
+    head = "import json\nobs = {}\nobs['f.a'] = 1\n"
+    orig = head + "vals = [i * 2 for i in (1, 2, 3)]\nif x:\nprint(x)\n"
+    cut = head + "vals = [i * 2 for i in (1,)]\n"
+    why, counts = model_probes._repair_loses(orig, cut)
+    assert why == "the repair has fewer inputs (1 < 3)"
+    assert counts["before"]["inputs"] == 3 and counts["after"]["inputs"] == 1
+
+
+def test_sys_modules_store_in_the_original_is_not_a_key():
+    code = "import sys, types\nsys.modules['a.b'] = types.ModuleType('a.b')\nobs = {}\nobs['f.a'] = 1\n"
+    assert model_probes._token_obs_keys(code + "if x:\nprint(x)\n") == 1
+    why, counts = model_probes._repair_loses(code + "if x:\nprint(x)\n", code)
+    assert why is None and counts["before"]["keys"] == counts["after"]["keys"] == 1
+
+
+def test_loops_in_comments_do_not_count_as_inputs():
+    code = "obs = {}\n# for x in [1, 2, 3, 4, 5]:\ns = 'for y in [1, 2, 3, 4]'\nfor x in [1, 2]:\n    obs['f.a'] = x\n"
+    assert model_probes._token_inputs(code + "if x:\nprint(x)\n") == 2
+    why, counts = model_probes._repair_loses(code + "if x:\nprint(x)\n", code)
+    assert why is None and counts["before"]["inputs"] == counts["after"]["inputs"] == 2

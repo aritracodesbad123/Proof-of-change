@@ -38,7 +38,7 @@ those keys.
 
 - Honest repairs can be rejected when the two counts disagree, because the original is read from tokens and the
   repair from the AST. Repairs that store under a computed key (obs[name] = ..., sys.modules[name] = ...) are always
-  rejected. On the saved probes, 53 of 607 distinct probes would be rejected this way if they were the repair.
+  rejected. See "Final figure" below for how many saved probes this affects.
 - Weaker repairs could pass through a text fallback. That is why the fallback was removed: a repair that hides
   dropped keys in comments or strings and stores under a computed key is now rejected instead of passing.
 
@@ -47,3 +47,20 @@ those keys.
 recorded_names no longer treats `sys.modules[...] = ...` as an observation key. That store installs a module, so a
 probe that stubs a module this way can still have its keys read. Every other computed key stays unreadable, so a
 repair that uses one is still rejected: `obs[name]`, `obs[key]`, `observations[obs_name + ...]`.
+
+## Follow-up: original inputs from tokens, sys.modules in the original
+
+- The original's inputs are now counted from the same tolerant token stream as its keys, not from the raw text. A
+  loop inside a comment or a string (`# for x in [1, 2, 3, 4, 5]:`) no longer counts. Inputs read: a statement or
+  comprehension loop over a literal list, tuple or set, or over range() with constant arguments, optionally wrapped
+  in enumerate(), list(), tuple(), sorted() or reversed(). This matches what the repair's AST count reads.
+- In the original's token count, `[ 'a.b' ] =` right after `sys . modules` is not a key, which matches recorded_names.
+- A test checks that a comprehension cut from (1, 2, 3) to (1,) is rejected, so turning off comprehension input
+  counting fails a test.
+
+## Final figure
+
+The test set is every distinct saved model-written probe from past runs: each file named model-*.py, deduplicated by the
+sha1 of its bytes. Each probe gets a broken trailing line to stand in for the original, and the probe itself is used
+as the repair. 55 of 679 would be rejected, all because they store under a key that cannot be read, such as
+obs[name] or observations[obs_name + '.units']. No probe is rejected for fewer keys or fewer inputs.
