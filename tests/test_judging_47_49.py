@@ -74,8 +74,9 @@ def test_49_id_cover_links_underscore_and_any_case():
     assert claim_hygiene.linked_names(c, ["c2_a", "c2.b", "C2-c", "c20_a", "c2a"]) == ["c2_a", "c2.b", "C2-c"]
 
 
-def test_49_difference_matching_no_cover_is_advisory_linked_by_text():
-    it = _item([{"id": "C1", "covers": ["C1"], "expect": "differs", "text": "param accepted"}],
+def test_49_difference_matching_no_cover_is_advisory_linked_by_id():
+    it = _item([{"id": "C1", "covers": ["c1.ok"], "expect": "differs", "text": "param accepted"},
+                {"id": "C2", "covers": ["c2.other"], "expect": "differs", "text": "colour set"}],
                {"c1.ok": 1, "c2.color_set": "TypeError"}, {"c1.ok": 2, "c2.color_set": True})
     obs = {o["name"]: o for o in it["observations"]}
     assert obs["c2.color_set"]["advisory"] and obs["c2.color_set"]["linked_by"] == "id"
@@ -85,7 +86,7 @@ def test_49_difference_matching_no_cover_is_advisory_linked_by_text():
 
 def test_49_shared_word_or_other_id_form_still_flags():
     # A word shared with a claim's text, or a prefix like "claim1" next to claims "C1", is not a link.
-    for name in ("flag_value", "claim1.result"):
+    for name in ("flag_value", "claim1.result", "c9.x", "c10.x"):
         it = _item([{"id": "C1", "covers": ["C1"], "expect": "differs", "text": "the flag value is accepted"}],
                    {"C1.ok": 1, name: 1}, {"C1.ok": 2, name: 2})
         assert _verdict(it)[0] == NA, name
@@ -115,4 +116,14 @@ def test_behaviour_claim_showing_no_difference_still_flags():
            "text": "A string value is now parsed into its items instead of characters."}
     assert not probes.is_how_claim(beh)
     it = _item([beh], {"C1.v": ["a"]}, {"C1.v": ["a"]})
+    assert _verdict(it)[0] == NA
+
+
+def test_47_real_flag_from_a_probe_that_reaches_the_change_survives():
+    # The probe ran the changed line (adequate): its unclaimed difference still raises attention.
+    it = _item([{"id": "C1", "covers": ["C1*"], "expect": "differs", "text": "x"}],
+               {"C1.v": 1, "other": 1}, {"C1.v": 2, "other": 2})
+    from poc.probe_adequacy import deciding_items
+    kept, _ = deciding_items([it])
+    assert any(o["name"] == "other" for o in kept[0]["observations"])
     assert _verdict(it)[0] == NA

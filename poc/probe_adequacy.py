@@ -132,7 +132,8 @@ def deciding_items(items: list[dict]) -> tuple[list[dict], list[str]]:
             continue
         if adequacy_of(it) == NOT_ADEQUATE and it.get("status") not in ("crashed", "error"):
             # A probe shown not to reach the change counts neither way: it can no more raise attention than
-            # support verified, which is what this note says.
+            # support verified. Safe because its differences cannot come from the change (main and PR run the same
+            # code on its path), and it is never evidence for verified either; see the decision note for fix 47.
             notes.append(f"probe {it['id']} is not_adequate ({it['probe_changed_line_coverage'].get('note')}); its "
                          f"results do not count either way")
             out.append(dict(it, observations=[]))

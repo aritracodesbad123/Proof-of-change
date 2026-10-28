@@ -7,6 +7,14 @@ Date: 2026-10-28
 - **47. A not_adequate probe never raises attention.** Its observations are dropped from the verdict entirely, not
   just its green ones, so the behaviour matches the note "its results do not count either way". A crashed probe keeps
   its red/amber results as before (its coverage is zeroed by the crash, not measured as missing the change).
+  Why dropping its red and amber flags is safe: coverage is measured on the main side and the probe ran none of the
+  changed main lines, so on its path main and the PR execute the same code. Any difference it reports comes from
+  something other than the change (nondeterminism, set-up, environment), and a "does not differ" result says nothing
+  about a change it never reached. Nothing is promoted by the drop: the probe is also never evidence for verified,
+  and under the baselines with the AI-probe gate (the product default) a model probe that ran a changed line is
+  still required, so a run whose probes are all not_adequate ends at could_not_verify, not verified. Under a
+  baseline without that gate the tests alone decide, as for a run with no probe. A probe that does reach the change keeps every flag (test
+  `test_47_real_flag_from_a_probe_that_reaches_the_change_survives`).
 - **48. Pure insertions anchor on executable lines.** For a hunk that only adds lines, the main-side lines used for
   changed-line coverage are now the nearest non-blank, non-comment line before and after the insertion point. Before
   this, the line right before and after could be a blank line (which never runs) or a branch that does not run on the
@@ -15,7 +23,8 @@ Date: 2026-10-28
 - **49. Id prefixes in any case or separator, and text-linked observations are advisory.** A claim whose cover is its
   own id also links observation names starting with the id followed by `.`, `-` or `_`, in any case (not `C10`, not
   `C1a`). In a model probe with claims, an observation that differs and matches no cover, but whose name starts with
-  a claim id of the same form as the probe's claim ids (`c2.` or `C2_` next to `C1`, `C3`), is reported as advisory
+  the exact full id of one of that probe's own claims, number included (`c2.` or `C2_` next to claim `C2`; `c9.`
+  next to only `C1` still flags), is reported as advisory
   ("linked by claim id, check") instead of unclaimed. A word shared with a claim's text is deliberately not a link:
   measured on saved records it hid a real catch (a probe named after the patched function, with every claim's text
   naming that function). An advisory observation still holds a verified run at could_not_verify. A difference
@@ -35,3 +44,7 @@ expectations in `tests/test_probe_adequacy.py`, `tests/test_claim_linking.py` an
 
 Rejudged every saved record (frozen benchmark plus held-out checked pull requests) before and after; the list of
 changed verdicts is in the pull request description. No known catch is lost.
+
+## Follow-up (not in this change)
+
+- `TypeError: x` on main versus `TypeError: y` on the PR currently counts as proven for a "differs" claim.

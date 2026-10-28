@@ -278,18 +278,17 @@ _ID_PREFIX_RE = re.compile(r"^([A-Za-z]{1,8}\d+)[._-]")
 
 
 def _text_link(spec: dict, name: str) -> str | None:
-    """"id" when a model probe's observation name starts with a claim id of the same form as this probe's claim ids
-    ("c2.x" or "C2_x" next to claims "C1", "C3"), so it was planned for a claim but matches no cover. A word shared
-    with a claim's text is not enough: that would hide real unclaimed changes."""
+    """"id" when a model probe's observation name starts with the exact, full id of one of this probe's own claims,
+    number included, in any case and followed by ".", "-" or "_" ("c1.x" or "C1_x" next to claim "C1"), but matches
+    no cover. "c9.x" next to only "C1" is not linked. A word shared with a claim's text is never a link: that would
+    hide real unclaimed changes."""
     if spec.get("source") != "model" or not spec.get("claims"):
         return None
     m = _ID_PREFIX_RE.match(name)
     if not m:
         return None
-    letters = re.sub(r"\d+$", "", m.group(1)).lower()
-    forms = {re.sub(r"\d+$", "", str(c.get("id") or "")).lower() for c in spec["claims"] if isinstance(c, dict)
-             and re.fullmatch(r"[A-Za-z]{1,8}\d+", str(c.get("id") or ""))}
-    return "id" if letters in forms else None
+    ids = {str(c.get("id") or "").lower() for c in spec["claims"] if isinstance(c, dict)}
+    return "id" if m.group(1).lower() in ids else None
 
 
 def label_for(state: str, claim: dict | None, name: str, crashed_both: bool) -> str:
@@ -343,8 +342,8 @@ def judge(spec: dict, runs: dict, files: dict | None = None) -> list[dict]:
             res["how_claim"] = True
         link = _text_link(spec, name) if label == FindingLabel.UNMENTIONED_CHANGE.value else None
         if link:
-            # A model probe planned this check for a claim (its name carries a claim id, or a word of a claim's
-            # text); the name just matches no cover. Shown as advisory ("linked by text, check"), not as unclaimed.
+            # The name starts with the full id of one of this probe's claims but matches no cover: shown as advisory
+            # ("linked by claim id, check"), not as unclaimed. Claim text is never used for linking.
             res["advisory"] = True
             res["linked_by"] = link
         if state != "same":
