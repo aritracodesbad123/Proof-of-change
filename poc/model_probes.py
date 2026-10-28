@@ -315,6 +315,9 @@ def generate(provider: Provider, repo: str, pr: int, title: str, body: str | Non
         user = (pr_text + "\n\nClaims: none were testable. Still write at least one probe that calls the functions "
                 "in the BASE-side files below with representative and edge-case inputs; give it an empty claims "
                 "list.\n\n" + _context(base_files))
+    if product and testable:   # product checks only: broad "nothing else changes" claims need varied inputs
+        from poc import broad_claims
+        probes_prompt = probes_prompt + broad_claims.probe_rule(testable)
     run_progress.emit("probes", "super", "Super is writing behaviour probes")
     try:
         resp = provider.complete_json("probes", probes_prompt, user, PROBES_SCHEMA, ctx)

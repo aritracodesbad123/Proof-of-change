@@ -3872,6 +3872,7 @@ def verdict_for(cmp: dict | None, cnv_reason: str | None, exits: dict | None = N
                 "unsupported: main and PR sides are the same commit, so nothing was compared; "
                 "a docstring-only result cannot be claimed", ["identical_sides"])
     hygiene = (probe_results or {}).get("claim_hygiene") if isinstance(probe_results, dict) else None
+    broad = (probe_results or {}).get("broad_claims") if isinstance(probe_results, dict) else None
     probe_results = probe_items(probe_results, baseline)
     v, reason, fl = with_probes(cmp, cnv_reason, exits, files, probe_results)
     if uses(baseline, "claim_flags") and claims and v == Verdict.VERIFIED.value and not behaviour_claims.probe_covers(
@@ -3908,6 +3909,10 @@ def verdict_for(cmp: dict | None, cnv_reason: str | None, exits: dict | None = N
         from poc import claim_hygiene
         return (Verdict.COULD_NOT_VERIFY.value, f"could not verify: {claim_hygiene.note_text(hygiene)} ({reason})",
                 fl + ["dropped_flagged_probe"])
+    if broad and broad.get("held_back") and v == Verdict.VERIFIED.value:
+        from poc import broad_claims
+        return (Verdict.COULD_NOT_VERIFY.value, f"could not verify: {broad_claims.note_text(broad)} ({reason})",
+                fl + ["broad_claim_few_inputs"])
     return v, reason, fl
 
 
@@ -4608,6 +4613,11 @@ def settle_probes(rec: dict) -> None:
         note = claim_hygiene.note_text(pr.get("claim_hygiene"))
         if note:
             rec["claim_hygiene_note"] = note
+        from poc import broad_claims
+        pr = broad_claims.apply(pr)
+        bnote = broad_claims.note_text((pr or {}).get("broad_claims"))
+        if bnote:
+            rec["broad_claims_note"] = bnote
     rec["probes"] = probes.apply_status(pr)
     rec["probe_changed_line_coverage"] = probe_adequacy.summary(rec["probes"]["items"])
 
@@ -4923,6 +4933,15 @@ def product_route(a) -> bool:
     return bool(getattr(a, "product_check", False))
 
 
+def refuses_pr_state(a, item: dict) -> bool:
+    """Which runs re-read the pull request's state and refuse one that is not open: every product check that tests
+    the pull request's current code (``--live-check``, or ``--product-check`` without pinned commits). A benchmark
+    case pins both commits with --base-sha/--head-sha, so a closed known-answer pull request still runs."""
+    if not product_route(a):
+        return False
+    return bool(getattr(a, "live_check", False) or not item.get("pinned_sides"))
+
+
 def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, machine: dict) -> dict:
     from poc import run_progress
     t0 = time.time()
@@ -4942,9 +4961,9 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
         return finish(rec, prdir, work, t0, a)
     if product_route(a):
         rec["product_check"] = True   # coverage gate: on a product check, verified needs measured coverage
-    if product_route(a) and getattr(a, "live_check", False):
+    if refuses_pr_state(a, item):
         closed = live_pr_refusal(repo, item, a)
-        if closed:   # a live product check: refuse before any lookup, install or run
+        if closed:   # a product check of a pull request's current code: refuse before any lookup, install or run
             rec["pr_state_refusal"] = closed
             rec["verdict"], rec["reason"], _ = verdict_for(None, closed)
             return finish(rec, prdir, work, t0, a)

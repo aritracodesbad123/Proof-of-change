@@ -301,16 +301,32 @@ def test_40_live_check_refuses_closed_before_any_run(tmp_path, monkeypatch):
     assert _drive_test_pr(tmp_path, monkeypatch, a, "open", _GH({"state": "open"})) == "ran"
 
 
-def test_40_benchmark_and_replay_runs_are_not_refused(tmp_path, monkeypatch):
-    """bench/run.py and replays use --pr --product-check without --live-check: merged and closed cases still run,
-    and GitHub is not even asked."""
-    from bench import run
-    for arm in run.ARMS:
-        cmd = run.command({"pr_url": "https://github.com/o/r/pull/1"}, arm, tmp_path, "n")
-        assert "--product-check" in cmd and "--live-check" not in cmd
+def test_40_unpinned_product_check_refuses_closed_without_live_flag(tmp_path, monkeypatch):
+    """A product check of a pull request's current code refuses a closed or merged one even without --live-check
+    (a hand-started --product-check run once tested a closed pull request)."""
     a = SimpleNamespace(pr="https://github.com/o/r/pull/1", product_check=True, bench=None, live_check=False)
-    for state in ("closed", "merged", None):
-        assert _drive_test_pr(tmp_path, monkeypatch, a, state, _GH(exc=AssertionError("no lookup"))) == "ran"
+    for gh_state, word in (({"state": "closed"}, "closed or merged"),
+                           ({"state": "closed", "merged_at": "2026-01-01T00:00:00Z"}, "merged")):
+        rec = _drive_test_pr(tmp_path, monkeypatch, a, "open", _GH(gh_state))
+        assert rec["verdict"] == "could_not_verify" and rec["reason"].startswith("refused:") and word in rec["reason"]
+    assert _drive_test_pr(tmp_path, monkeypatch, a, "open", _GH({"state": "open"})) == "ran"
+
+
+def test_40_pinned_benchmark_runs_are_not_refused(tmp_path, monkeypatch):
+    """Benchmark cases pin both commits (--base-sha/--head-sha): merged and closed known-answer cases still run, and
+    GitHub is not even asked. Every shipped case is pinned."""
+    import json
+
+    from bench import run
+    for f in sorted((ROOT / "bench/cases").glob("*.json")):
+        case = json.loads(f.read_text())
+        cmd = run.command(case, next(iter(run.ARMS)), tmp_path, "n")
+        assert "--base-sha" in cmd and "--head-sha" in cmd and "--live-check" not in cmd, f.name
+    a = SimpleNamespace(pr="https://github.com/o/r/pull/1", product_check=True, bench=None, live_check=False)
+    assert not dr.refuses_pr_state(a, {"pinned_sides": {"main": "a", "pr": "b"}})
+    assert dr.refuses_pr_state(a, {}) and dr.refuses_pr_state(SimpleNamespace(**{**vars(a), "live_check": True}),
+                                                               {"pinned_sides": {"main": "a", "pr": "b"}})
+    assert not dr.refuses_pr_state(SimpleNamespace(pr=None, product_check=True, bench=None), {})
 
 
 def test_40_live_routes_set_the_flag():

@@ -46,9 +46,11 @@ panel(
     c=NEW, e=NE, h=0.065,
 )
 panel(
-    0.22, 0.66,
-    "4b. Sandbox\nlocal bubblewrap, or Contree\nno secret keys; network only for installs",
-    c=NEW, e=NE, h=0.065,
+    0.30, 0.64,
+    "4b. Sandbox\nGitHub App, request worker,\nhosted console: Contree only\n"
+    "cannot start: could not verify\nCLI, local console, study:\nlocal bubblewrap\n"
+    "no secret keys; network only for installs",
+    c=NEW, e=NE, w=0.36, h=0.115,
 )
 panel(
     0.5, 0.49,
@@ -75,16 +77,17 @@ arr(0.55, 0.833, 0.72, 0.798)
 arr(0.45, 0.833, 0.28, 0.805)
 arr(0.75, 0.743, 0.75, 0.708)
 arr(0.75, 0.653, 0.75, 0.62)
-arr(0.25, 0.736, 0.25, 0.695)
+arr(0.24, 0.732, 0.30, 0.706)
 arr(0.75, 0.551, 0.58, 0.524)
-arr(0.25, 0.626, 0.42, 0.524)
+arr(0.34, 0.574, 0.42, 0.530)
 arr(0.5, 0.456, 0.5, 0.423)
 arr(0.5, 0.368, 0.5, 0.343)
 arr(0.5, 0.288, 0.5, 0.253)
 arr(0.32, 0.225, 0.20, 0.282, col=NE)
 ax.text(0.04, 0.24, "Could not verify\n(setup / missing package)", fontsize=9.5, color=NE, style="italic")
 arr(0.16, 0.348, 0.16, 0.376, col=NE)
-arr(0.29, 0.43, 0.35, 0.475, "retest", col=NE)
+arr(0.29, 0.43, 0.35, 0.475, col=NE)
+ax.text(0.28, 0.458, "retest", fontsize=9.5, color=NE, ha="right", va="bottom", style="italic")
 arr(0.5, 0.198, 0.5, 0.163, "final verdict")
 arr(0.5, 0.107, 0.5, 0.083)
 ax.text(
