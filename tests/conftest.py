@@ -124,3 +124,10 @@ def _isolate_progress_and_run_memory(monkeypatch):
     from poc import console_api
     monkeypatch.setattr(console_api, "_recent_runs", {})
     yield
+
+
+@pytest.fixture(autouse=True)
+def _run_pointer_index(tmp_path_factory, monkeypatch):
+    """Runs started by tests leave their pointer in a scratch index, never in the repository's ops/runs."""
+    from ops import daily_run
+    monkeypatch.setattr(daily_run, "RUNS_INDEX", tmp_path_factory.mktemp("runs-index"))
