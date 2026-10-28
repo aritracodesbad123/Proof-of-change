@@ -97,15 +97,16 @@ def test_unmeasured_coverage_does_not_cover_the_change():
                        probe_results=_probe(SAME, {"r": 1}, {"r": 1}, "unmeasured"))[0] == "could_not_verify"
 
 
-def test_not_adequate_probe_still_flags_differences():
+def test_47_not_adequate_probe_never_raises_attention():
+    # Fix 47: a probe shown not to reach the change counts neither way, as its note says.
     v, reason, _ = verdict_for(_cmp_verified(), None, probe_results=_probe([], {"c": 1}, {"c": 2}, "not_adequate"))
-    assert v == "needs_attention" and "differs and no claim covers it" in reason
+    assert v != "needs_attention" and "do not count either way" in reason
 
 
-def test_deciding_items_keeps_only_red_and_amber_of_not_adequate():
+def test_47_deciding_items_drops_all_results_of_not_adequate():
     pr = _probe([], {"c": 1, "d": 1}, {"c": 2, "d": 1}, "not_adequate")
     items, notes = pa.deciding_items(pr["items"])
-    assert [o["name"] for o in items[0]["observations"]] == ["c"] and len(notes) == 1
+    assert items[0]["observations"] == [] and len(notes) == 1
     assert pr["items"][0]["observations"][1]["name"] == "d"      # the record itself is not changed
 
 
