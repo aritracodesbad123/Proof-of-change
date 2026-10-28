@@ -31,3 +31,27 @@ Study runs are unchanged.
 When the default image does not fit, the check now starts from an image that has the right Python, instead of
 installing that Python on top of the default image during setup. A project the default image already fits gets
 exactly the same setup as before.
+
+## Probe broken (fix 46)
+Sometimes an observation is the same exception type, or the same skip value, on both sides, because the probe never
+reached the call it was about. Two examples: a class built without its required argument raises TypeError on both
+sides, and a probe that called a function that does not exist fails the same way on both. Such an observation is
+now labelled not_testable and marked `probe_broken`. It is advisory only: it never counts as "does not differ"
+(which used to raise attention), "no difference" or "proven". Failures that a probe records as plain text
+('TypeError', 'TypeError: ...', 'SkippedDueTo...Failure', 'skipped: ...') are recognised as well as
+`{"raises": ...}` and `{"skipped": ...}`. Different exceptions on the two sides are still a difference.
+
+Re-judging 755 stored records (benchmark result sets, replayed checks and the held-out live picks), old code vs new:
+- attrs #1648: needs_attention -> verified. Expected verified; the old result was a false alarm.
+- sqlparse #928 (safe case): needs_attention -> verified. Expected verified.
+- click #3878 (ambiguous case, not scored), one record: needs_attention -> verified. The flag came only from
+  ValueError on both sides.
+- connectlife-ha #742 (32 copies of one stored run): needs_attention -> could_not_verify. The flag came only from
+  ModuleNotFoundError on both sides, and that run was already marked untrustworthy.
+- The other 720 records are unchanged, including every boltons #586 record. No known catch is lost, and the
+  known-answer suite still scores 35/35.
+
+## Commit label (small fix)
+After the self-update, the run sets POC_COMMIT to the commit that actually runs, says so when a label set
+earlier named another commit, and prints `commit=<sha>` after DONE. A wrapper can read that line instead of
+the value it set before the update.
