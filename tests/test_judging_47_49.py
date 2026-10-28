@@ -22,8 +22,8 @@ def _cmp():
     return dr.compare_sides({"main": [{"t::a": ("passed", "")}] * 3, "pr": [{"t::a": ("passed", "")}] * 3})
 
 
-def _item(claims, main, pr, cov=ADEQ, source="model"):
-    it = {"id": "model-p", "source": source, "target": "t", "about": "a", "claims": claims,
+def _item(claims, main, pr, cov=ADEQ, source="model", pid="model-p"):
+    it = {"id": pid, "source": source, "target": "t", "about": "a", "claims": claims,
           "runs": {"main": [main] * 3, "pr": [pr] * 3}, "probe_changed_line_coverage": dict(cov)}
     it = probes.rejudge_entry(it)
     it["probe_changed_line_coverage"] = probe_adequacy.assess(cov)
@@ -192,3 +192,32 @@ def test_advisory_difference_alone_caps_at_could_not_verify():
         live = dr.gate({**rec, "verdict": VER, "reason": "tests pass"})
         assert live["verdict"] == "could_not_verify" and how in live["reason"]
         assert dr.advisory_gate({**rec, "verdict": "needs_attention"})["verdict"] == "needs_attention"
+
+
+def test_combined_name_links_only_when_every_id_is_this_probes_claim():
+    claims = [{"id": "C1", "covers": ["C1.ok"], "expect": "differs", "text": "one"},
+              {"id": "C2", "covers": ["C2.ok"], "expect": "differs", "text": "two"}]
+    for name in ("c1_c2.result", "probe1.c1_c2.result", "C1-C2.x"):
+        it = _item(claims, {"C1.ok": 1, name: 1}, {"C1.ok": 2, name: 2}, pid="model-probe1")
+        obs = {o["name"]: o for o in it["observations"]}
+        assert obs[name].get("linked_by") == "id", name
+        assert _verdict(it)[0] != NA, name
+    for name in ("c1_c9.x", "c9_c1.x", "probe1.c1_c9.result", "c1_c2_c3.x"):
+        it = _item(claims, {"C1.ok": 1, name: 1}, {"C1.ok": 2, name: 2}, pid="model-probe1")
+        obs = {o["name"]: o for o in it["observations"]}
+        assert not obs[name].get("advisory"), name
+        assert _verdict(it)[0] == NA, name
+
+
+def test_other_probes_name_prefix_is_not_skipped():
+    claims = [{"id": "C1", "covers": ["C1.ok"], "expect": "differs", "text": "one"}]
+    it = _item(claims, {"C1.ok": 1, "probe7.c1.x": 1}, {"C1.ok": 2, "probe7.c1.x": 2}, pid="model-probe1")
+    assert _verdict(it)[0] == NA
+
+
+def test_probe_named_like_its_claim_still_links_by_that_id():
+    claims = [{"id": "C4", "covers": ["C4.ok"], "expect": "differs", "text": "four"}]
+    it = _item(claims, {"C4.ok": 1, "C4.Update_available": "ImportError"}, {"C4.ok": 2, "C4.Update_available": "ok"},
+               pid="model-c4")
+    obs = {o["name"]: o for o in it["observations"]}
+    assert obs["C4.Update_available"].get("linked_by") == "id"
