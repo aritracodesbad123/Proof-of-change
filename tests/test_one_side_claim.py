@@ -62,3 +62,18 @@ def test_second_clause_stays_needs_attention(text):
     assert not probes.is_one_side_claim({"id": "C1", "text": text, "expect": "same"})
     o = _obs(text)
     assert o["label"] == FL.FALSE_CLAIM.value and not o.get("advisory"), text
+
+
+@pytest.mark.parametrize("text", [
+    "Before this change, valid input returns identical output on both versions",
+    "Before the fix, load() returns None. The PR does not alter this.",
+    "Before the fix, f() returns 2 for both versions",
+])
+def test_both_sides_or_second_sentence_stays_needs_attention(text):
+    assert not probes.is_one_side_claim({"id": "C1", "text": text, "expect": "same"})
+    o = _obs(text)
+    assert o["label"] == FL.FALSE_CLAIM.value and not o.get("advisory"), text
+
+
+def test_a_dot_inside_a_value_is_still_one_sentence():
+    assert probes.is_one_side_claim({"id": "C1", "text": "Before the fix, ratio() returns 1.5.", "expect": "same"})

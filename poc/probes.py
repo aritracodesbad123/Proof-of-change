@@ -719,11 +719,12 @@ ONE_SIDE_NOTE = "the claim describes the old behaviour only (before the fix), ch
 _ONE_SIDE_RE = re.compile(r"^\s*before\s+(?:the|this)\s+(?:fix|change|patch|pr|pull request)\s*,?\s+"
                           r"(?:(?!\b(?:and|but|while|whereas|after|afterwards|then|also|too)\b)[^,;.!?])+?"
                           r"\b(?:raises?|raised|returns?|returned)\b"
-                          r"(?:(?!\b(?:and|but|while|whereas|after|afterwards|then|also|too)\b)[^,;!?])*?"
+                          r"(?:(?!\b(?:and|but|while|whereas|after|afterwards|then|also|too)\b)(?:[^,;.!?]|\.(?=\S)))*?"
                           r"\.?\s*$", re.I)
-# Words that make a claim about keeping behaviour, where a difference is a real contradiction.
+# Words that make a claim about keeping behaviour or about both sides, where a difference is a real contradiction.
+# A second sentence is never allowed: only a dot inside a value ("1.5", "a.b") may appear before the end.
 _KEEP_RE = re.compile(r"\b(?:preserv\w*|still|unchanged|as before|continu\w*|existing|keeps?|retains?|same|"
-                      r"regress\w*|break\w*|no longer)\b", re.I)
+                      r"regress\w*|break\w*|no longer|identical\w*|equal\w*|alter\w*|both|either|each)\b", re.I)
 
 
 def is_one_side_claim(claim: dict | None) -> bool:

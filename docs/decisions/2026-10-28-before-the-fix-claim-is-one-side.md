@@ -5,3 +5,10 @@ A "same" claim of the single shape "Before the fix, X raises/returns Y" states t
 No other wording counts: "after the fix", "currently", and claims about keeping behaviour stay real "same" claims, and a difference against them still needs attention. Differences unstable only on the PR are never linked.
 
 The shape is anchored at both ends: one sentence and nothing after it. A second clause ("and after it ...", "but ...", a comma or semicolon clause, a second sentence) is not this shape, so such claims stay real "same" claims and a difference against them still needs attention.
+
+## Review follow-up: one sentence, one side
+
+The claim must be a single sentence: a dot is allowed only inside a value ("1.5"), never before a second sentence
+("Before the fix, load() returns None. The PR does not alter this." still flags). Wording about both sides or about
+keeping behaviour ("identical", "equal", "both versions", "either", "each", "does not alter") also keeps the
+claim a real "same" claim, so a difference still needs attention.
