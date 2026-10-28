@@ -6,7 +6,7 @@ requires-python = ">=3.11"
 dependencies = ["uv==0.13.1", "reportlab==4.4.4"]  # the runner shells out to uv (and git); poc/tool_setup.py installs any missing one at start-up
 
 [project.optional-dependencies]
-dev = ["pytest>=8", "pytest-timeout>=2", "ruff>=0.6", "jsonschema>=4", "coverage>=7"]  # jsonschema: cross-checks the stdlib validators in tests
+dev = ["pytest>=8", "pytest-timeout>=2", "ruff>=0.6", "jsonschema>=4", "coverage>=7", "pytest-cov>=5"]  # jsonschema: cross-checks the stdlib validators in tests
 ops = ["uv>=0.4"]  # the PR runner creates its test environments with uv
 contree = ["contree-sdk==0.3.6"]  # Nebius Token Factory Sandboxes (optional remote dual-run)
 github = ["PyJWT[crypto]>=2.8"]  # GitHub App JWT → installation token (optional; or set GITHUB_APP_INSTALLATION_TOKEN)
