@@ -127,3 +127,23 @@ def test_47_real_flag_from_a_probe_that_reaches_the_change_survives():
     kept, _ = deciding_items([it])
     assert any(o["name"] == "other" for o in kept[0]["observations"])
     assert _verdict(it)[0] == NA
+
+
+def test_no_evidence_any_changed_line_ran_caps_at_could_not_verify():
+    # Shaped like click #3878: tests pass, coverage gate skipped, two model probes each ran 0 of 5 changed lines,
+    # their only flags were the same exception on both sides.
+    from evals.checks import derive_verdict
+    na = {"status": "measured", "changed_lines_total": 5, "changed_lines_covered": 0}
+    p1 = _item([{"id": "C1", "covers": ["C1.*"], "expect": "differs", "text": "echoes ^D"}],
+               {"C1.stdout": {"raises": "AttributeError"}}, {"C1.stdout": {"raises": "AttributeError"}}, cov=na)
+    p2 = _item([{"id": "C3", "covers": ["C3.*"], "expect": "differs", "text": "no longer passes the bytes"}],
+               {"C3.len": {"raises": "AttributeError"}}, {"C3.len": {"raises": "AttributeError"}}, cov=na)
+    rec = {"comparison": _cmp(), "baseline": "tests+probes", "reason": "",
+           "coverage": {"status": "skipped", "why": "baseline tests+probes does not use the coverage gate"},
+           "probes": {"status": "ran", "items": [p1, p2]}}
+    assert derive_verdict(rec, "tests+probes") == "could_not_verify"
+    live = dr.gate({**rec, "verdict": VER, "reason": "tests pass"})
+    assert live["verdict"] == "could_not_verify" and "no evidence any changed line ran" in live["reason"]
+    # with the tests' coverage showing a changed line ran, the cap does not apply
+    ran = {**rec, "coverage": {"status": "measured", "changed_lines_covered": 1, "changed_lines_total": 5}}
+    assert dr.no_evidence_gate({**ran, "verdict": VER})["verdict"] == VER

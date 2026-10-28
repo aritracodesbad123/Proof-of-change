@@ -333,7 +333,7 @@ def derive_verdict(rec: dict, baseline: str | None, pp: dict | None = None) -> s
     (ops/daily_run.ai_probe_gate). So under a baseline with claim probes, 'verified' needs a model-written probe that
     actually executed a changed line; a docs-only or docstring-only change has no such line and cannot be verified.
     pp: probe results already re-judged (rejudge_probes); re-judged here when omitted."""
-    from ops.daily_run import ai_probe_gate, rejudge_probes, uses, verdict_for
+    from ops.daily_run import ai_probe_gate, no_evidence_gate, rejudge_probes, uses, verdict_for
     from poc import coverage_gate
     if pp is None:
         pp = rejudge_probes(rec.get("probes"))
@@ -341,12 +341,13 @@ def derive_verdict(rec: dict, baseline: str | None, pp: dict | None = None) -> s
     cnv = None if cmp else (rec.get("reason") or "no comparison")
     v = verdict_for(cmp, cnv, rec.get("exit_check"), rec.get("files"), pp, rec.get("behaviour_claims"), baseline,
                     docstring_only=bool(rec.get("docstring_only")))
+    base = {k: x for k, x in rec.items() if not k.endswith(("_before_coverage_gate", "_before_ai_probe_gate",
+                                                              "_before_no_evidence_gate"))}
     if not uses(baseline, "coverage"):
-        return v[0]
-    base = {k: x for k, x in rec.items() if not k.endswith(("_before_coverage_gate", "_before_ai_probe_gate"))}
+        return no_evidence_gate(base | {"probes": pp, "verdict": v[0], "reason": v[1]})["verdict"]
     gated = coverage_gate.apply(base | {"probes": pp if pp is not None else rec.get("probes"),
                                         "verdict": v[0], "reason": v[1], "baseline": baseline})
-    return ai_probe_gate(gated)["verdict"]
+    return no_evidence_gate(ai_probe_gate(gated))["verdict"]
 
 
 def check_golden_pr_case(rec: dict, case: dict) -> Result:

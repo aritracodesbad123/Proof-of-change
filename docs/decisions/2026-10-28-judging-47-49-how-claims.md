@@ -48,3 +48,7 @@ changed verdicts is in the pull request description. No known catch is lost.
 ## Follow-up (not in this change)
 
 - `TypeError: x` on main versus `TypeError: y` on the PR currently counts as proven for a "differs" claim.
+
+## Follow-up: no evidence any changed line ran caps at could_not_verify
+
+If a run has probes, every probe ran 0 changed lines on the main side, and the tests' coverage was not measured or showed none, nothing shows the change was exercised. Such a run is capped at could_not_verify (`no_evidence_gate`, applied in `gate` and mirrored in `derive_verdict`). The cap only lowers a verified verdict; it never raises one. Test: a case shaped like a CLI fix whose two probes ran 0 of 5 changed lines and raised the same exception on both sides.

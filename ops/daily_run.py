@@ -3550,8 +3550,30 @@ def contree_coverage_run(item: dict, main_root: Path, pr_root: Path, targets: li
 def gate(rec: dict) -> dict:
     """Apply the coverage gate (poc/coverage_gate.py) to a finished record; baselines without coverage skip it."""
     if not uses(rec.get("baseline"), "coverage"):
+        return no_evidence_gate(rec)
+    return no_evidence_gate(ai_probe_gate(coverage_gate.apply(rec)))
+
+
+def _tests_ran_changed_line(rec: dict) -> bool:
+    cov = rec.get("coverage") or {}
+    return cov.get("status") == "measured" and (cov.get("changed_lines_covered") or 0) > 0
+
+
+def no_evidence_gate(rec: dict) -> dict:
+    """No evidence that any changed line ran: there are probes, every one of them ran 0 changed lines on the main
+    side, and the tests' coverage was not measured or showed none. Such a run cannot be verified (could_not_verify),
+    whatever the baseline. Idempotent; it never raises a verdict."""
+    items = (rec.get("probes") or {}).get("items") or []
+    if rec.get("verdict") != Verdict.VERIFIED.value or not items or _tests_ran_changed_line(rec):
         return rec
-    return ai_probe_gate(coverage_gate.apply(rec))
+    if any(((it.get("probe_changed_line_coverage") or {}).get("changed_lines_covered") or 0) > 0 for it in items):
+        return rec
+    out = dict(rec)
+    out.setdefault("verdict_before_no_evidence_gate", rec["verdict"])
+    out["verdict"] = Verdict.COULD_NOT_VERIFY.value
+    out["reason"] = ("could not verify: no evidence any changed line ran (every probe ran 0 changed lines on main and "
+                     "the tests' coverage was not measured or showed none); " + (rec.get("reason") or ""))
+    return out
 
 
 def ai_probe_gate_on(baseline: str | None) -> bool:
