@@ -362,7 +362,7 @@ BODY_PR = BODY_MAIN.replace("\n    # keep y small\n", "\n    y = min(y, 10)\n   
 
 def test_an_import_only_probe_does_not_cover_an_insertion_between_blank_and_comment_lines(tmp_path):
     changed = probe_adequacy.main_side_lines(BODY_MAIN, BODY_PR, statement_start=True)
-    assert changed == {3, 4}                                  # the blank and the comment next to the insertion
+    assert changed == {2, 5}          # the nearest executable lines around the insertion, never the blank or comment
     execd, miss = _executable(BODY_MAIN, tmp_path, "bodymod", lambda m: None)   # only imported
     assert 1 in execd                                         # the def line ran at import time
     cov = probe_adequacy.measure({"m.py": changed}, {"m.py": {"executed_lines": sorted(execd),

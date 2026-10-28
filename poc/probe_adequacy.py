@@ -51,8 +51,24 @@ def main_side_lines(main_text: str | None, pr_text: str | None, statement_start:
         if tag in ("replace", "delete"):
             out.update(range(i1 + 1, i2 + 1))
         elif tag == "insert":
-            out.update(x for x in (i1, i1 + 1) if 1 <= x <= len(old))
+            out.update(_insertion_anchors(old, i1))
     return coverage_gate.statement_starts(main_text, out) if statement_start else out
+
+
+def _executable(line: str) -> bool:
+    t = line.strip()
+    return bool(t) and not t.startswith("#")
+
+
+def _insertion_anchors(old: list[str], i1: int) -> set[int]:
+    """Main lines around a pure insertion before 0-based index i1: the nearest executable (non-blank, non-comment)
+    line before it and the nearest one after it. A blank or comment line never runs, so it can never anchor."""
+    out = set()
+    for rng in (range(i1 - 1, -1, -1), range(i1, len(old))):
+        hit = next((k for k in rng if _executable(old[k])), None)
+        if hit is not None:
+            out.add(hit + 1)
+    return out
 
 
 def assess(cov: dict | None) -> dict:
@@ -114,7 +130,15 @@ def deciding_items(items: list[dict]) -> tuple[list[dict], list[str]]:
             notes.append(why_reject or f"probe {it['id']} is rejected; its matching results do not count")
             out.append(dict(it, observations=_red_amber(it)))
             continue
-        if adequacy_of(it) == NOT_ADEQUATE:
+        if adequacy_of(it) == NOT_ADEQUATE and it.get("status") not in ("crashed", "error"):
+            # A probe shown not to reach the change counts neither way: it can no more raise attention than
+            # support verified. Safe because its differences cannot come from the change (main and PR run the same
+            # code on its path), and it is never evidence for verified either; see the decision note for fix 47.
+            notes.append(f"probe {it['id']} is not_adequate ({it['probe_changed_line_coverage'].get('note')}); its "
+                         f"results do not count either way")
+            out.append(dict(it, observations=[]))
+            continue
+        if adequacy_of(it) == NOT_ADEQUATE:   # a crashed probe: its red/amber results are still reported
             notes.append(f"probe {it['id']} is not_adequate ({it['probe_changed_line_coverage'].get('note')}); its "
                          f"matching results do not count")
             out.append(dict(it, observations=_red_amber(it)))

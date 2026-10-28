@@ -68,9 +68,9 @@ def says_stays_same(text: str) -> bool:
     return bool(_STAYS_SAME.search(t)) and not _SAYS_CHANGE.search(t)
 
 
-# What may follow the claim id in an observation name: "C1.a", "C1-a". "_", a digit or a letter never does, so "C1"
-# never links "C10" or "C1a".
-ID_SEPARATORS = ".-"
+# What may follow the claim id in an observation name: "C1.a", "C1-a", "c1_a". A digit or a letter never does, so
+# "C1" never links "C10" or "C1a".
+ID_SEPARATORS = ".-_"
 
 
 def _has_id_cover(claim: dict) -> bool:
@@ -91,7 +91,7 @@ def _escape(name: str) -> str:
 
 def linked_names(claim: dict, names: list[str]) -> list[str]:
     """Observation names a claim covers (rule 0): a cover equal to the claim id (optionally ending in *) means the
-    name equal to the id or starting with the id and "." or "-"; any other cover is an fnmatch pattern, compared ignoring case."""
+    name equal to the id or starting with the id and ".", "-" or "_"; any other cover is an fnmatch pattern, compared ignoring case."""
     cid = str(claim.get("id") or "")
     out = []
     for n in names:

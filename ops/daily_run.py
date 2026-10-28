@@ -3616,8 +3616,8 @@ def leave_run_pointer(rdir: Path, started: dt.datetime, index: Path | None = Non
 def gate(rec: dict) -> dict:
     """Apply the coverage gate (poc/coverage_gate.py) to a finished record; baselines without coverage skip it."""
     if not uses(rec.get("baseline"), "coverage"):
-        return cap_rewrite(broken_probe_gate(rec))
-    return cap_rewrite(broken_probe_gate(ai_probe_gate(coverage_gate.apply(rec))))
+        return cap_rewrite(advisory_gate(no_evidence_gate(broken_probe_gate(rec))))
+    return cap_rewrite(advisory_gate(no_evidence_gate(broken_probe_gate(ai_probe_gate(coverage_gate.apply(rec))))))
 
 
 def all_broken(item: dict) -> bool:
@@ -3636,6 +3636,49 @@ def broken_probe_gate(rec: dict) -> dict:
     out["verdict"] = Verdict.COULD_NOT_VERIFY.value
     out["reason"] = ("could not verify: every probe is broken (it raised the same exception or skipped the same way "
                      "on both sides, so it never reached the claimed call); " + (rec.get("reason") or ""))
+    return out
+
+
+def _tests_ran_changed_line(rec: dict) -> bool:
+    cov = rec.get("coverage") or {}
+    return cov.get("status") == "measured" and (cov.get("changed_lines_covered") or 0) > 0
+
+
+def no_evidence_gate(rec: dict) -> dict:
+    """No evidence that any changed line ran: there are probes, every one of them ran 0 changed lines on the main
+    side, and the tests' coverage was not measured or showed none. Such a run cannot be verified (could_not_verify),
+    whatever the baseline. Idempotent; it never raises a verdict."""
+    items = (rec.get("probes") or {}).get("items") or []
+    if rec.get("verdict") != Verdict.VERIFIED.value or not items or _tests_ran_changed_line(rec):
+        return rec
+    if any(((it.get("probe_changed_line_coverage") or {}).get("changed_lines_covered") or 0) > 0 for it in items):
+        return rec
+    out = dict(rec)
+    out.setdefault("verdict_before_no_evidence_gate", rec["verdict"])
+    out["verdict"] = Verdict.COULD_NOT_VERIFY.value
+    out["reason"] = ("could not verify: no evidence any changed line ran (every probe ran 0 changed lines on main and "
+                     "the tests' coverage was not measured or showed none); " + (rec.get("reason") or ""))
+    return out
+
+
+def advisory_gate(rec: dict) -> dict:
+    """A check with any advisory difference (linked to a claim by id or by shape, or seen by a claim-less probe) is
+    never verified: it is capped at could_not_verify and the advisory notes are shown. It never raises a verdict, so
+    an advisory difference alone can lower needs_attention only through the judging, never past could_not_verify."""
+    notes = []
+    for it in (rec.get("probes") or {}).get("items") or []:
+        for o in it.get("observations") or []:
+            if o.get("advisory"):
+                how = {"id": "linked by claim id, check", "shape": o.get("note") or "probably the claimed change, check"}
+                notes.append(f"{it.get('id')} {o.get('name')}: {how.get(o.get('linked_by'), 'no claim covers it, check')}")
+    if rec.get("verdict") != Verdict.VERIFIED.value or not notes:
+        return rec
+    out = dict(rec)
+    out.setdefault("verdict_before_advisory_gate", rec["verdict"])
+    out["verdict"] = Verdict.COULD_NOT_VERIFY.value
+    out["advisory_notes"] = notes
+    out["reason"] = ("could not verify: advisory difference(s) " + "; ".join(notes[:4])
+                     + (f" (+{len(notes) - 4} more)" if len(notes) > 4 else "") + "; " + (rec.get("reason") or ""))
     return out
 
 

@@ -251,12 +251,44 @@ def unmatched_differs_claims(probe_results: dict | None) -> list[str]:
             continue
         names = _observation_names(it)
         for c in it.get("claims") or []:
-            if not isinstance(c, dict) or c.get("expect") != "differs":
+            if not isinstance(c, dict) or c.get("expect") != "differs" or is_how_claim(c):
                 continue
             if any(_covers_name(c.get("covers"), n) for n in names):
                 continue
             found.append(str(c.get("id") or "claim"))
     return found
+
+
+# A claim that only says how the fix works ("is processed by `_as_list()`", "now calls `x`"): it names code, not a
+# behaviour. Calling that code gives the same result on both sides, so "no difference" says nothing against it.
+_HOW_RE = re.compile(
+    r"(?:\b(?:is|are|gets?|get|now|will be|being)\s+(?:\w+ly\s+)?(?:processed|handled|parsed|passed|routed|delegated|"
+    r"converted|normali[sz]ed|computed|implemented|done|dispatched|wrapped)\s+(?:by|via|through|using|with|in)\s+"
+    r"|\b(?:uses|calls|now calls|delegates to|goes through|is routed through|reuses|relies on)\s+(?:the\s+)?)"
+    r"(?:`[^`]+`|[A-Za-z_][\w.]*\(\))", re.I)
+
+
+def is_how_claim(claim: dict | None) -> bool:
+    """True for a claim that only describes how the fix works, naming the code it goes through."""
+    return bool(claim) and claim.get("expect") == "differs" and bool(_HOW_RE.search(str(claim.get("text") or "")))
+
+
+# Observation names may carry a claim id in any case followed by ".", "-" or "_" ("c2.x", "C2_x").
+_ID_PREFIX_RE = re.compile(r"^([A-Za-z]{1,8}\d+)[._-]")
+
+
+def _text_link(spec: dict, name: str) -> str | None:
+    """"id" when a model probe's observation name starts with the exact, full id of one of this probe's own claims,
+    number included, in any case and followed by ".", "-" or "_" ("c1.x" or "C1_x" next to claim "C1"), but matches
+    no cover. "c9.x" next to only "C1" is not linked. A word shared with a claim's text is never a link: that would
+    hide real unclaimed changes."""
+    if spec.get("source") != "model" or not spec.get("claims"):
+        return None
+    m = _ID_PREFIX_RE.match(name)
+    if not m:
+        return None
+    ids = {str(c.get("id") or "").lower() for c in spec["claims"] if isinstance(c, dict)}
+    return "id" if m.group(1).lower() in ids else None
 
 
 def label_for(state: str, claim: dict | None, name: str, crashed_both: bool) -> str:
@@ -268,6 +300,8 @@ def label_for(state: str, claim: dict | None, name: str, crashed_both: bool) -> 
         return (FindingLabel.NO_DIFFERENCE if state == "same" else FindingLabel.UNMENTIONED_CHANGE).value
     if state == claim["expect"]:
         return FindingLabel.PROVEN.value
+    if state == "same" and is_how_claim(claim):
+        return FindingLabel.NOT_TESTABLE.value
     return (FindingLabel.FALSE_CLAIM if claim["expect"] == "same" else FindingLabel.NEEDS_HUMAN).value
 
 
@@ -337,6 +371,14 @@ def judge(spec: dict, runs: dict, files: dict | None = None) -> list[dict]:
             res["pr_only"] = pr_only
         if broken:
             res["probe_broken"] = "the same exception or skip value on both sides: the probe never reached the call"
+        if label == FindingLabel.NOT_TESTABLE.value and state == "same" and is_how_claim(claim):
+            res["how_claim"] = True
+        link = _text_link(spec, name) if label == FindingLabel.UNMENTIONED_CHANGE.value else None
+        if link:
+            # The name starts with the full id of one of this probe's claims but matches no cover: shown as advisory
+            # ("linked by claim id, check"), not as unclaimed. Claim text is never used for linking.
+            res["advisory"] = True
+            res["linked_by"] = link
         if state != "same":
             res["diffs"] = [dict(d, field=d["field"].split(".", 1)[1] if "." in d["field"] else "")
                             for d in compare({"v": m[0]["v"]}, {"v": p[0]["v"]})]
@@ -344,7 +386,40 @@ def judge(spec: dict, runs: dict, files: dict | None = None) -> list[dict]:
             res["citations"] = {side: citation(files[side][0], runs[side][0], name) for side in ("main", "pr")
                                 if name in runs[side][0]}
         out.append(res)
+    _shape_link(out)
     return out
+
+
+SHAPE_NOTE = "probably the claimed change, check"
+
+
+_EXC_NAME_RE = re.compile(r"^[A-Za-z_][\w.]*(?:Error|Exception)$")
+
+
+def _exc_of(value) -> str | None:
+    """The exception type of an observation value: {"raises": "Name"} or a bare "NameError" string."""
+    if isinstance(value, str):
+        return value if _EXC_NAME_RE.match(value) else None
+    return _exception_name(value)
+
+
+def _shape(res: dict) -> str | None:
+    """"<Exception>->value" when main raised and the PR returned a value (not an exception), else None."""
+    exc = _exc_of(res.get("main"))
+    if res.get("state") != "differs" or not exc or _exc_of(res.get("pr")) or res.get("pr") == ABSENT:
+        return None
+    return exc
+
+
+def _shape_link(out: list[dict]) -> None:
+    """Fix 49: an unclaimed difference with the same shape as a proven claimed sibling in the same probe (the same
+    main exception type turning into a value on the PR) is advisory, "probably the claimed change, check". It stays
+    unmentioned_change and visible; it just no longer raises attention on its own."""
+    proven = {_shape(r) for r in out if r.get("label") == FindingLabel.PROVEN.value and r.get("claim")} - {None}
+    for r in out:
+        if (r.get("label") == FindingLabel.UNMENTIONED_CHANGE.value and not r.get("advisory")
+                and not r.get("pr_only") and _shape(r) in proven):
+            r["advisory"], r["linked_by"], r["note"] = True, "shape", SHAPE_NOTE
 
 
 def run_once(path: Path, python: Path, cwd: Path, env: dict, timeout: int, launch=None,
@@ -408,7 +483,7 @@ def run_probe(path: Path, pythons: dict, outdir: Path, cwd: Path | dict, envs: d
 
 
 def entry(spec: dict, got: dict, files: dict, per_run: list, source: str, path: Path | str | None) -> dict:
-    results = judge(spec, got, files)
+    results = judge(dict(spec, source=source), got, files)
     return {"id": spec["id"], "source": source, "path": str(path) if path else None, "sha256": spec.get("sha256"),
             "target": spec["target"], "about": spec["about"], "claims": spec.get("claims", []),
             "runs_per_side": len(got["main"]), "per_run": per_run, "outputs": files, "runs": got,
@@ -417,7 +492,8 @@ def entry(spec: dict, got: dict, files: dict, per_run: list, source: str, path: 
 
 def rejudge_entry(item: dict) -> dict:
     """Recompute an entry's observations from its recorded runs (no files, no environments needed)."""
-    spec = {"id": item["id"], "target": item["target"], "about": item["about"], "claims": item.get("claims", [])}
+    spec = {"id": item["id"], "target": item["target"], "about": item["about"], "claims": item.get("claims", []),
+            "source": item.get("source")}
     return dict(item, observations=judge(spec, item["runs"], item.get("outputs")))
 
 
