@@ -270,6 +270,17 @@ def label_for(state: str, claim: dict | None, name: str, crashed_both: bool) -> 
     return (FindingLabel.FALSE_CLAIM if claim["expect"] == "same" else FindingLabel.NEEDS_HUMAN).value
 
 
+def probe_broken(main, pr) -> bool:
+    """The probe never reached the call it is about: the observation is the same raised exception type, or the same
+    skip value, on both sides. That says nothing about the change, so it is 'probe broken': never 'does not differ'
+    and never 'proven'."""
+    exc = _exception_name(main)
+    if exc and exc == _exception_name(pr):
+        return True
+    return (isinstance(main, dict) and isinstance(pr, dict) and "skipped" in main
+            and main.get("skipped") == pr.get("skipped"))
+
+
 def judge(spec: dict, runs: dict, files: dict | None = None) -> list[dict]:
     """runs = {"main": [obs, obs, obs], "pr": [...]} -> one result per observation name (sorted).
     files = {"main": [file names], "pr": [...]} of the saved outputs, for citations."""
@@ -298,11 +309,16 @@ def judge(spec: dict, runs: dict, files: dict | None = None) -> list[dict]:
                     label = FindingLabel.NEEDS_HUMAN.value
         else:
             label = label_for(state, claim, name, crashed_both)
+            broken = state == "same" and probe_broken(m[0]["v"], p[0]["v"])
+            if broken:
+                label = FindingLabel.NOT_TESTABLE.value   # probe broken: advisory only, never a pass or a flag
         res = {"name": name, "state": state, "label": label,
                "claim": claim["id"] if claim else None,
                "main": m[0]["v"], "pr": p[0]["v"]}
         if pr_only:
             res["pr_only"] = pr_only
+        if state not in ("flaky", "pr_unstable") and label == FindingLabel.NOT_TESTABLE.value and name != PROBE_ERROR:
+            res["probe_broken"] = "the same exception or skip value on both sides: the probe never reached the call"
         if state != "same":
             res["diffs"] = [dict(d, field=d["field"].split(".", 1)[1] if "." in d["field"] else "")
                             for d in compare({"v": m[0]["v"]}, {"v": p[0]["v"]})]

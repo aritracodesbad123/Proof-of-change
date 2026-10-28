@@ -6270,6 +6270,20 @@ def given_commit(root: Path | None, expected: str) -> str:
     return got
 
 
+def commit_label_note(actual: str, env=None) -> str | None:
+    """After the self-update, make POC_COMMIT name the commit that actually runs. A label set before the update (for
+    example by a wrapper script) can name an older commit; it is replaced, and the change is reported once."""
+    env = os.environ if env is None else env
+    actual = (actual or "").strip().lower()
+    before = (env.get("POC_COMMIT") or "").strip().lower()
+    if not actual:
+        return None
+    env["POC_COMMIT"] = actual
+    if before and not actual.startswith(before) and not before.startswith(actual):
+        return f"POC commit: {actual[:7]} (POC_COMMIT was {before[:7]} before the self-update; it now names {actual[:7]})"
+    return None
+
+
 def resolve_poc_commit(root: Path | None = None) -> str:
     """Stamp every run with a known Proof-of-Change commit.
 
@@ -6620,6 +6634,9 @@ def _main(argv=None) -> int:
         a.poc_commit = given_commit(REPO_ROOT, expected)
     else:
         a.poc_commit = resolve_poc_commit(REPO_ROOT)
+        note = commit_label_note(a.poc_commit)
+        if note:
+            print(note)
     sandbox.configure(not a.unsafe_no_sandbox)
     from poc import contree_sandboxes
     if getattr(a, "require_contree", False):
@@ -6871,6 +6888,8 @@ def reviewer_reports(rdir: Path, a, records: list[dict], kind: str) -> None:
               file=sys.stderr, flush=True)
         return
     print(f"\nDONE. Open this file to read the results:\n  {out / 'SUMMARY.html'}")
+    if getattr(a, "poc_commit", None):
+        print(f"commit={a.poc_commit[:7]}")
 
 
 def scoring_inputs(rdir: Path, a, chosen_path: Path) -> tuple[dict, dict]:

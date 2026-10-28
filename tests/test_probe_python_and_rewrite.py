@@ -123,3 +123,55 @@ def test_rewrite_can_never_raise_the_verdict(monkeypatch, with_rw, without, fina
 def test_no_rewrite_leaves_the_record_alone():
     rec = {"verdict": "verified", "probes": {"items": []}}
     assert daily_run.cap_rewrite(dict(rec)) == rec
+
+
+# --- probe broken: the same exception or skip value on both sides --------------------------------------------
+
+from ops.daily_run import verdict_for  # noqa: E402
+from poc.verdict import FindingLabel  # noqa: E402
+from tests.test_unmatched_differs_claim import _cmp_verified  # noqa: E402
+
+DIFFERS = [{"id": "C1", "text": "accepts the new argument", "covers": ["r*"], "expect": "differs"}]
+SAME = [{"id": "C1", "text": "results stay", "covers": ["r*"], "expect": "same"}]
+
+
+def _ran(claims, main, pr, pid="p"):
+    spec = {"id": pid, "target": "o/r#1", "about": "x", "claims": claims}
+    it = probes.entry(spec, {"main": [main] * 3, "pr": [pr] * 3}, {"main": ["m"], "pr": ["p"]}, [], "library", None)
+    it["probe_changed_line_coverage"] = {"status": "measured", "changed_lines_covered": 2, "changed_lines_total": 2}
+    return it
+
+
+@pytest.mark.parametrize("claims", [DIFFERS, SAME, []])
+@pytest.mark.parametrize("value", [{"raises": "TypeError"}, {"skipped": "no type-aware input"}])
+def test_probe_broken_is_never_does_not_differ_or_proven(claims, value):
+    it = _ran(claims, {"r": value}, {"r": value})
+    (o,) = it["observations"]
+    assert o["label"] == FindingLabel.NOT_TESTABLE.value and o.get("probe_broken")
+
+
+def test_probe_broken_alone_does_not_raise_attention():
+    # A probe that forgot a required argument raises TypeError on both sides before reaching the claimed call.
+    it = _ran(DIFFERS, {"r": {"raises": "TypeError"}}, {"r": {"raises": "TypeError"}})
+    v, _, _ = verdict_for(_cmp_verified(), None, probe_results={"status": "ran", "items": [it]})
+    assert v != "needs_attention"
+
+
+def test_real_bug_still_needs_attention_next_to_a_broken_probe():
+    dead = _ran(DIFFERS, {"r": {"raises": "TypeError"}}, {"r": {"raises": "TypeError"}}, "dead")
+    bug = _ran(SAME, {"r": 1}, {"r": 2}, "bug")   # the claim says the result stays; it changed
+    v, _, _ = verdict_for(_cmp_verified(), None, probe_results={"status": "ran", "items": [dead, bug]})
+    assert v == "needs_attention"
+
+
+def test_different_exceptions_are_still_a_difference():
+    it = _ran(SAME, {"r": {"raises": "TypeError"}}, {"r": {"raises": "ValueError"}})
+    assert it["observations"][0]["label"] == FindingLabel.FALSE_CLAIM.value
+
+
+def test_commit_label_names_the_commit_after_the_self_update():
+    env = {"POC_COMMIT": "ed1e7b5"}
+    note = daily_run.commit_label_note("7562f53" + "0" * 33, env)
+    assert env["POC_COMMIT"].startswith("7562f53") and "ed1e7b5" in note and "7562f53" in note
+    same = {"POC_COMMIT": "7562f53"}
+    assert daily_run.commit_label_note("7562f53" + "0" * 33, same) is None
