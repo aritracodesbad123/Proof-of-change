@@ -310,7 +310,7 @@ def judge(spec: dict, runs: dict, files: dict | None = None) -> list[dict]:
         p = [{"v": o.get(name, ABSENT)} for o in runs["pr"]]
         state = confirm(m, p)
         claim = claim_for(spec, name)
-        pr_only = None
+        pr_only, broken = None, False
         if state == "pr_unstable":
             # Stored state stays "flaky" (the recorded vocabulary). The label is what the verdict reads.
             if pr_runs_too_noisy(p):
@@ -335,7 +335,7 @@ def judge(spec: dict, runs: dict, files: dict | None = None) -> list[dict]:
                "main": m[0]["v"], "pr": p[0]["v"]}
         if pr_only:
             res["pr_only"] = pr_only
-        if state not in ("flaky", "pr_unstable") and label == FindingLabel.NOT_TESTABLE.value and name != PROBE_ERROR:
+        if broken:
             res["probe_broken"] = "the same exception or skip value on both sides: the probe never reached the call"
         if state != "same":
             res["diffs"] = [dict(d, field=d["field"].split(".", 1)[1] if "." in d["field"] else "")
