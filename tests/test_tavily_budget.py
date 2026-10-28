@@ -224,3 +224,43 @@ def test_capped_check_end_to_end_refuses_with_no_tavily_call(tmp_path, monkeypat
     saved = json.loads((tmp_path / "run" / "widgets-4" / "record.json").read_text())
     assert saved["tavily_credits"]["total_credits"] == 0 and "_tavily_meter" not in saved
     assert "tvly-e2e-not-real" not in json.dumps(saved)
+
+
+def test_api_usage_block_is_the_source_per_call():
+    from poc import tavily_budget as tb
+    m = tb.begin("o/r#1")
+    tb.record("search", payload={"usage": {"credits": 2}})          # e.g. auto-upgraded to advanced
+    tb.record("search")                                             # no usage block: estimated at basic rate
+    tb.record("crawl", payload={"usage": {"credits": 3}})
+    t = tb.take(m)
+    assert t["total_credits"] == 6 and t["api_reported_credits"] == 5 and t["estimated_credits"] == 1
+    assert [c["source"] for c in t["calls"]] == ["api", "estimate", "api"]
+    assert t["calls"][0]["usage"] == {"credits": 2}
+    assert "API-reported 5, estimated 1" in tb.log_line(t)
+
+
+def test_take_active_returns_a_crashed_checks_meter():
+    from poc import tavily_budget as tb
+    tb.begin("o/r#2")
+    tb.record("search", payload={"usage": {"credits": 1}})
+    t = tb.take_active()
+    assert t["total_credits"] == 1 and tb.take_active() is None
+
+
+def test_search_asks_for_usage(monkeypatch):
+    import io
+    import json
+    import urllib.request
+
+    from poc import tavily_budget as tb
+    from poc import tavily_docs
+    sent = {}
+
+    def fake(req, timeout=None):
+        sent.update(json.loads(req.data))
+        return io.BytesIO(json.dumps({"results": [], "usage": {"credits": 1}}).encode())
+    monkeypatch.setattr(urllib.request, "urlopen", fake)
+    m = tb.begin("o/r#3")
+    tavily_docs.lookup("q", env={"TAVILY_API_KEY": "k"})
+    t = tb.take(m)
+    assert sent["include_usage"] is True and t["calls"][0]["source"] == "api"

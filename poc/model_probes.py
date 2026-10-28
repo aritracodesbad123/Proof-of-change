@@ -422,6 +422,121 @@ def _linked_ids(probes: list) -> set:
     return {c.get("id") for q in probes for c in q.get("claims") or [] if isinstance(c, dict)}
 
 
+PARSE_REPAIR_TRIES = 2   # fixed cap on repair calls for probes whose code does not parse; model calls only
+
+
+def parse_error(code) -> dict | None:
+    """The exact SyntaxError of a probe's code (after unescaping), or None when it parses."""
+    code = _unescape_code(code)
+    try:
+        ast.parse(code if isinstance(code, str) else "")
+    except SyntaxError as e:
+        text = (e.text or "").rstrip("\n")
+        return {"message": e.msg, "line": e.lineno, "offset": e.offset, "code_line": text[:300]}
+    return None
+
+
+_OBS_KEY = re.compile(r"""['"]([A-Za-z_][\w-]*(?:\.[\w-]+)+)['"]""")
+_FOR_IN = re.compile(r"\bfor\s+[^\n]+?\s+in\s+(?:[\w.]+\()?([\[(])")
+
+
+def _text_obs_keys(code) -> int:
+    """Distinct quoted dotted names (observation keys) in the code text; works when the code does not parse."""
+    return len(set(_OBS_KEY.findall(_unescape_code(code) if isinstance(code, str) else "")))
+
+
+def _text_inputs(code) -> int:
+    """The most top-level items in a literal list or tuple looped over by `for ... in [...]`, read from text."""
+    text = _unescape_code(code) if isinstance(code, str) else ""
+    best = 0
+    for m in _FOR_IN.finditer(text):
+        depth, items, seen, quote, j = 0, 0, False, None, m.end(1) - 1
+        while j < len(text):
+            c = text[j]
+            if quote:
+                if c == "\\":
+                    j += 1
+                elif c == quote:
+                    quote = None
+            elif c in "'\"":
+                quote, seen = c, True
+            elif c in "([{":
+                depth += 1
+                if depth > 1:
+                    seen = True
+            elif c in ")]}":
+                depth -= 1
+                if depth == 0:
+                    items += 1 if seen else 0
+                    break
+            elif c == "," and depth == 1:
+                items, seen = items + (1 if seen else 0), False
+            elif not c.isspace() and depth >= 1:
+                seen = True
+            j += 1
+        best = max(best, items)
+    return best
+
+
+def _repair_loses(old_code, new_code) -> str | None:
+    """Why a parse repair is rejected: it records fewer observation keys or loops over fewer inputs."""
+    o, n = _text_obs_keys(old_code), _text_obs_keys(new_code)
+    if n < o:
+        return f"the repair has fewer observation keys ({n} < {o})"
+    o, n = _text_inputs(old_code), _text_inputs(new_code)
+    if n < o:
+        return f"the repair has fewer inputs ({n} < {o})"
+    return None
+
+
+def _repair_parse_errors(provider, probes_prompt: str, user: str, ctx: dict, resp, out: dict):
+    """Ask the model to fix probes whose code does not parse, giving it each exact parse error (message, line and
+    offending code line) and the full code, up to PARSE_REPAIR_TRIES times. A fixed probe replaces the broken one
+    (matched by id only). Only the repaired `code` is taken; the original's claims, covers, expect and about are
+    kept. A repair with fewer observation keys or fewer inputs than the original (text counts, so a broken original
+    still counts) is rejected. Every attempt is recorded in out["parse_repairs"] with its error, attempt number and
+    outcome."""
+    attempts = out.setdefault("parse_repairs", [])
+    for n in range(1, PARSE_REPAIR_TRIES + 1):
+        probes = [p for p in (resp or {}).get("probes", [])[:MAX_PROBES] if isinstance(p, dict)]
+        broken = [(i, p, parse_error(p.get("code"))) for i, p in enumerate(probes)]
+        broken = [(i, p, e) for i, p, e in broken if e]
+        if not broken:
+            return resp
+        lines = []
+        for _, p, e in broken:
+            lines.append(f"Probe {p.get('id')!r}: SyntaxError: {e['message']} (line {e['line']}, column {e['offset']})"
+                         f"\nOffending line: {e['code_line']}\nFull code as received:\n{_unescape_code(p.get('code'))}")
+        ask = (user + "\n\nThese probes from your previous answer do not parse as Python. Return the same probes "
+               "with their code fixed (same ids, real line breaks, no escaped newlines):\n\n" + "\n\n".join(lines))
+        try:
+            again = provider.complete_json("probes", probes_prompt, ask, PROBES_SCHEMA, ctx)
+        except ProviderError as ex:
+            for _, p, e in broken:
+                attempts.append({"attempt": n, "probe": p.get("id"), "error": e, "outcome": f"provider error: {ex}"})
+            return resp
+        got = [q for q in (again or {}).get("probes", []) if isinstance(q, dict)]
+        by_id = {_tidy_id(q.get("id")): q for q in got if isinstance(q.get("id"), str)}
+        fixed_list = list(probes)
+        for i, p, e in broken:
+            q = by_id.get(_tidy_id(p.get("id")) if isinstance(p.get("id"), str) else None)
+            if q is None:
+                outcome = "no fixed probe returned"
+            else:
+                still = parse_error(q.get("code"))
+                lost = _repair_loses(p.get("code"), q.get("code"))
+                if still is not None:
+                    outcome = f"still fails: {still['message']} (line {still['line']})"
+                elif lost:
+                    outcome = "rejected: " + lost
+                else:
+                    outcome = "fixed"
+                    fixed_list[i] = dict(p, code=q.get("code"))
+            attempts.append({"attempt": n, "probe": p.get("id"), "error": e, "outcome": outcome})
+        resp = dict(resp or {}, probes=fixed_list)
+    return resp
+
+
 def _usable(resp, claim_ids: set) -> list:
     """The probes of a reply that pass validate_probe (after tidying ids and unescaping code)."""
     return [p for p in (resp or {}).get("probes", [])[:MAX_PROBES] if isinstance(p, dict)
@@ -478,6 +593,9 @@ def generate(provider: Provider, repo: str, pr: int, title: str, body: str | Non
         out["errors"].append(str(e))
         return out
     by_id = {c["id"]: c for c in testable}
+    resp = _repair_parse_errors(provider, probes_prompt, user, ctx, resp, out)
+    if not out["parse_repairs"]:
+        out.pop("parse_repairs")
     usable = _usable(resp, set(by_id))
     if not usable:
         # One retry, same gate and same BASE-side inputs: say why the first answer was unusable (generic reasons only)
