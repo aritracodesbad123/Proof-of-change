@@ -447,9 +447,6 @@ def _shape_link(out: list[dict]) -> None:
             r["advisory"], r["linked_by"], r["note"] = True, "shape", SHAPE_NOTE
 
 
-ONE_SIDE_NOTE = "the claim describes one side only (before or after the fix), check"
-# "Before the fix, X raises TypeError" or "After the change, X returns 1" says what one side does, so a difference
-# does not contradict it, even when the claim was extracted as "same".
 def run_once(path: Path, python: Path, cwd: Path, env: dict, timeout: int, launch=None,
              literal_output: bool = False) -> tuple[dict, str, float]:
     """launch(argv, env, cwd) -> (argv, env, cwd) wraps the command, e.g. into the sandbox (guardrails/sandbox.py)."""
@@ -716,7 +713,7 @@ def summarize(items: list[dict]) -> dict:
             "advisory_unchanged_subchecks": [o["name"] for o in unchanged_sub]}
 
 
-# The single shape "Before the fix, X raises/returns Y": a statement of the old behaviour only.
+ONE_SIDE_NOTE = "the claim describes the old behaviour only (before the fix), check"
 # The single shape "Before the fix, X raises/returns Y": one sentence about the old behaviour only, anchored at both
 # ends. A second clause (and, but, while, whereas, after, a comma, semicolon or second sentence) is not this shape.
 _ONE_SIDE_RE = re.compile(r"^\s*before\s+(?:the|this)\s+(?:fix|change|patch|pr|pull request)\s*,?\s+"
