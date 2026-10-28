@@ -15,8 +15,10 @@ Date: 2026-10-28
 - **49. Id prefixes in any case or separator, and text-linked observations are advisory.** A claim whose cover is its
   own id also links observation names starting with the id followed by `.`, `-` or `_`, in any case (not `C10`, not
   `C1a`). In a model probe with claims, an observation that differs and matches no cover, but whose name starts with
-  a claim id or shares a word (four letters or more) with a claim's text, is reported as advisory ("linked by text,
-  check") instead of unclaimed. An advisory observation still holds a verified run at could_not_verify. A difference
+  a claim id of the same form as the probe's claim ids (`c2.` or `C2_` next to `C1`, `C3`), is reported as advisory
+  ("linked by claim id, check") instead of unclaimed. A word shared with a claim's text is deliberately not a link:
+  measured on saved records it hid a real catch (a probe named after the patched function, with every claim's text
+  naming that function). An advisory observation still holds a verified run at could_not_verify. A difference
   tied to no claim at all still flags (fix 42 unchanged).
 - **How-it-works claims need no difference.** A claim that only says which code the fix goes through ("is processed
   by `_as_list()`", "now calls `x`"), naming that code, does not fail when calling it gives the same result on both

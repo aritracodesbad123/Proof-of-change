@@ -277,22 +277,19 @@ def is_how_claim(claim: dict | None) -> bool:
 _ID_PREFIX_RE = re.compile(r"^([A-Za-z]{1,8}\d+)[._-]")
 
 
-def _words(text: str) -> set[str]:
-    return {w for w in re.split(r"[^a-z0-9]+", text.lower()) if len(w) >= 4}
-
-
 def _text_link(spec: dict, name: str) -> str | None:
-    """"id" or "text" when a model probe's observation name is tied to a claim without matching its cover: the name
-    starts with a claim id ("c2.x", "C2_x"), or a word of four letters or more in it appears in a claim's text."""
+    """"id" when a model probe's observation name starts with a claim id of the same form as this probe's claim ids
+    ("c2.x" or "C2_x" next to claims "C1", "C3"), so it was planned for a claim but matches no cover. A word shared
+    with a claim's text is not enough: that would hide real unclaimed changes."""
     if spec.get("source") != "model" or not spec.get("claims"):
         return None
     m = _ID_PREFIX_RE.match(name)
-    if m:
-        return "id"
-    words = _words(name)
-    if words and any(words & _words(str(c.get("text") or "")) for c in spec["claims"] if isinstance(c, dict)):
-        return "text"
-    return None
+    if not m:
+        return None
+    letters = re.sub(r"\d+$", "", m.group(1)).lower()
+    forms = {re.sub(r"\d+$", "", str(c.get("id") or "")).lower() for c in spec["claims"] if isinstance(c, dict)
+             and re.fullmatch(r"[A-Za-z]{1,8}\d+", str(c.get("id") or ""))}
+    return "id" if letters in forms else None
 
 
 def label_for(state: str, claim: dict | None, name: str, crashed_both: bool) -> str:

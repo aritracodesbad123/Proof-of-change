@@ -83,11 +83,12 @@ def test_49_difference_matching_no_cover_is_advisory_linked_by_text():
     assert v not in (NA, VER)
 
 
-def test_49_text_link():
-    it = _item([{"id": "C1", "covers": ["C1"], "expect": "differs", "text": "the colour flag is accepted"}],
-               {"C1.ok": 1, "flag_value": 1}, {"C1.ok": 2, "flag_value": 2})
-    o = next(o for o in it["observations"] if o["name"] == "flag_value")
-    assert o["advisory"] and o["linked_by"] == "text"
+def test_49_shared_word_or_other_id_form_still_flags():
+    # A word shared with a claim's text, or a prefix like "claim1" next to claims "C1", is not a link.
+    for name in ("flag_value", "claim1.result"):
+        it = _item([{"id": "C1", "covers": ["C1"], "expect": "differs", "text": "the flag value is accepted"}],
+                   {"C1.ok": 1, name: 1}, {"C1.ok": 2, name: 2})
+        assert _verdict(it)[0] == NA, name
 
 
 def test_49_real_bug_unclaimed_change_tied_to_no_claim_still_flags():
