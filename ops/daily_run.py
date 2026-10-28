@@ -7302,6 +7302,13 @@ def rejudge(rec: dict, prdir: Path) -> dict:
     out.update(comparison=cmp, exit_check=ex, verdict=v, reason=reason)
     if pr_probes:
         out["probes"] = pr_probes
+        if rec.get("product_check"):
+            from poc import broad_claims
+            bnote = broad_claims.note_text(pr_probes.get("broad_claims"))
+            if bnote:
+                out["broad_claims_note"] = bnote
+            else:
+                out.pop("broad_claims_note", None)
     out = gate(out)
     if (out["verdict"], out["reason"]) != (rec.get("verdict"), rec.get("reason")):
         out["rejudged"] = {"at_ist": now_ist().strftime("%Y-%m-%d %H:%M IST"),
@@ -7309,6 +7316,29 @@ def rejudge(rec: dict, prdir: Path) -> dict:
     return out
 
 
+def _with_broad_gate(fn):
+    """Re-judging recomputes the broad-claims gate (poc/broad_claims.py) on the product route from current code, and
+    keeps the union of the saved and the recomputed holds: a saved hold is never released."""
+    def wrapped(pr_probes: dict | None, product_check: bool = False) -> dict | None:
+        out = fn(pr_probes, product_check)
+        if not product_check or not out or not out.get("items"):
+            return out
+        from poc import broad_claims
+        saved = pr_probes.get("broad_claims") if isinstance(pr_probes.get("broad_claims"), dict) else None
+        out = broad_claims.apply(out)
+        if saved and saved.get("held_back"):
+            now = dict(out.get("broad_claims") or {"min_inputs": broad_claims.MIN_INPUTS, "claims": [],
+                                                    "inputs": {}, "held_back": []})
+            now["held_back"] = sorted(set(now.get("held_back") or []) | set(saved["held_back"]))
+            now["claims"] = sorted(set(now.get("claims") or []) | set(saved.get("claims") or []))
+            now["inputs"] = {**(saved.get("inputs") or {}), **(now.get("inputs") or {})}
+            out = dict(out, broad_claims=now)
+        return out
+    wrapped.__doc__, wrapped.__name__ = fn.__doc__, fn.__name__
+    return wrapped
+
+
+@_with_broad_gate
 def rejudge_probes(pr_probes: dict | None, product_check: bool = False) -> dict | None:
     """Probe results recomputed from their recorded runs with the current rules (poc/probes.py).
 
