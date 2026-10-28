@@ -85,6 +85,7 @@ def test_write_and_wait_approval(tmp_path, monkeypatch):
 
 def test_submit_job_scenarios_400_without_business_answers(tmp_path, monkeypatch):
     monkeypatch.setattr(console_api, "REPO_ROOT", tmp_path)
+    monkeypatch.setattr(console_api, "RUNS_ROOT", tmp_path / "ops" / "runs")
     job_id = "hitljob1"
     hdir = tmp_path / "ops" / "runs" / "_jobs" / job_id
     hdir.mkdir(parents=True)
@@ -116,6 +117,7 @@ def test_submit_job_scenarios_400_without_business_answers(tmp_path, monkeypatch
 
 def test_submit_job_scenarios_writes_approval(tmp_path, monkeypatch):
     monkeypatch.setattr(console_api, "REPO_ROOT", tmp_path)
+    monkeypatch.setattr(console_api, "RUNS_ROOT", tmp_path / "ops" / "runs")
     job_id = "hitljob2"
     hdir = tmp_path / "ops" / "runs" / "_jobs" / job_id
     hdir.mkdir(parents=True)
