@@ -24,7 +24,7 @@ def test_repair_feeds_the_exact_error_and_keeps_the_fix(tmp_path):
     assert "Offending line: " + BROKEN_CODE in ask and "Full code as received" in ask
     assert out["parse_repairs"] == [{"attempt": 1, "probe": "p1", "outcome": "fixed",
                                      "error": model_probes.parse_error(BROKEN_CODE),
-                                     "counts": {"before": {"keys": 0, "inputs": 0, "read": "text"},
+                                     "counts": {"before": {"keys": 0, "inputs": 0, "read": "tokens"},
                                                 "after": {"keys": 1, "inputs": 0, "read": "ast"}}}]
     assert len(out["probes"]) == 1 and "retried" not in out
 
@@ -75,7 +75,7 @@ def test_repair_and_retry_trail_lands_in_the_saved_record(tmp_path, monkeypatch)
     plan = json.loads((prdir / "record.json").read_text())["probe_plan"]
     assert plan["model_parse_repairs"] == [{"attempt": 1, "probe": "p1", "outcome": "fixed",
                                             "error": model_probes.parse_error(BROKEN_CODE),
-                                     "counts": {"before": {"keys": 0, "inputs": 0, "read": "text"},
+                                     "counts": {"before": {"keys": 0, "inputs": 0, "read": "tokens"},
                                                 "after": {"keys": 1, "inputs": 0, "read": "ast"}}}]
     assert plan["model_retried"]["kept_first_answer"]
     # the repair's code is kept with the original's covers (f.*), which that code does not record
@@ -90,8 +90,8 @@ ONE = "import json\nobs = {}\nfor x in [1]:\n    obs['f.a'] = 1\nprint(json.dump
 def test_text_counts_read_a_broken_original():
     broken = THREE.replace("obs = {}", "obs = {}\\n)")
     assert model_probes.parse_error(broken) is not None
-    assert model_probes._text_obs_keys(broken) == 3 and model_probes._text_inputs(broken) == 3
-    assert model_probes._text_obs_keys(ONE) == 1 and model_probes._text_inputs(ONE) == 1
+    assert model_probes._token_obs_keys(broken) == 3 and model_probes._text_inputs(broken) == 3
+    assert model_probes._token_obs_keys(ONE) == 1 and model_probes._text_inputs(ONE) == 1
 
 
 def test_repair_that_drops_observations_is_rejected(tmp_path):
@@ -150,7 +150,7 @@ def test_ast_early_break_runs_one_input():
 def test_range_inputs_read_from_text_and_ast():
     code = "obs = {}\nfor i in range(2, 8, 2):\n    obs['f.a'] = i\n"
     assert _keys(code) == (1, 3)
-    assert model_probes.repair_counts(code + "if x:\nprint(x)\n")["inputs"] == 3
+    assert model_probes.original_counts(code + "if x:\nprint(x)\n")["inputs"] == 3
 
 
 def test_fstring_keys_count_once_per_input():
@@ -161,10 +161,42 @@ def test_fstring_keys_count_once_per_input():
 def test_repair_hiding_dropped_keys_in_a_comment_is_rejected(tmp_path):
     broken = dict(GOOD["probes"][0], id="p1", code=THREE + "if x:\nprint(x)\n")
     sly = ONE + "# obs['f.b'] = 2; obs['f.c'] = 3\n"
-    assert model_probes._text_obs_keys(sly) == 3   # the text count is fooled
+    assert model_probes._token_obs_keys(sly) == 1   # comments are not key positions
     drop = {"probes": [dict(GOOD["probes"][0], id="p1", code=sly)]}
     _, out = _run(tmp_path, [{"probes": [broken]}] + [drop] * model_probes.PARSE_REPAIR_TRIES + [{"probes": []}])
     r = out["parse_repairs"][0]
     assert r["outcome"] == "rejected: the repair has fewer observation keys (1 < 3)"
-    assert r["counts"] == {"before": {"keys": 3, "inputs": 3, "read": "text"},
+    assert r["counts"] == {"before": {"keys": 3, "inputs": 3, "read": "tokens"},
                            "after": {"keys": 1, "inputs": 1, "read": "ast"}}
+
+
+IMPORTS = ("import importlib, json\nfrom unittest import mock\nm = importlib.import_module('pkg.mod')\n"
+           "obs = {'f.a': 1}\nwith mock.patch('pkg.mod.f'):\n    obs['f.b'] = 2\n"
+           "print(json.dumps({'observations': obs}))\n")
+
+
+def test_identical_repair_with_import_and_patch_strings_passes():
+    broken = IMPORTS + "if x:\nprint(x)\n"
+    assert model_probes._token_obs_keys(broken) == 2
+    why, counts = model_probes._repair_loses(broken, IMPORTS)
+    assert why is None and counts["before"]["keys"] == counts["after"]["keys"] == 2
+
+
+def test_unreadable_key_with_keys_hidden_in_a_comment_is_rejected(tmp_path):
+    broken = dict(GOOD["probes"][0], id="p1", code=THREE + "if x:\nprint(x)\n")
+    sly = "import json\nk = 'f.a'\no = {}\no[k] = 1\n# o['f.b'] = 2; o['f.c'] = 3\nprint(json.dumps(o))\n"
+    assert model_probes.repair_counts(sly) is None
+    drop = {"probes": [dict(GOOD["probes"][0], id="p1", code=sly)]}
+    _, out = _run(tmp_path, [{"probes": [broken]}] + [drop] * model_probes.PARSE_REPAIR_TRIES + [{"probes": []}])
+    r = out["parse_repairs"][0]
+    assert r["outcome"] == "rejected: the repair stores under a key that cannot be read"
+    assert r["counts"]["after"] is None and r["counts"]["before"]["keys"] == 3
+
+
+def test_line_breaks_alone_do_not_change_the_count():
+    one = "obs = {'f.a': 1, 'f.b': 2}\nobs['f.c'] = 3\n"
+    split = "obs = {\n    'f.a': 1,\n\n    'f.b':\n        2,\n}\nobs[\n    'f.c'\n] = 3\n"
+    escaped = one.replace("\n", "\\n")
+    counts = {model_probes._token_obs_keys(c + "if x:\nprint(x)\n") for c in (one, split)}
+    assert counts == {3} and model_probes._token_obs_keys(escaped) == 3
+    assert model_probes.repair_counts(one)["keys"] == model_probes.repair_counts(split)["keys"] == 3

@@ -16,8 +16,10 @@ from __future__ import annotations
 
 import ast
 import fnmatch
+import io
 import json
 import re
+import tokenize
 from pathlib import Path
 
 from poc import freeze
@@ -440,11 +442,6 @@ _OBS_KEY = re.compile(r"""['"]([A-Za-z_][\w-]*(?:\.[\w-]+)+)['"]""")
 _FOR_IN = re.compile(r"\bfor\s+[^\n]+?\s+in\s+(?:[\w.]+\()?([\[(])")
 
 
-def _text_obs_keys(code) -> int:
-    """Distinct quoted dotted names (observation keys) in the code text; works when the code does not parse."""
-    return len(set(_OBS_KEY.findall(_unescape_code(code) if isinstance(code, str) else "")))
-
-
 def _text_inputs(code) -> int:
     """The most top-level items in a literal list or tuple looped over by `for ... in [...]`, read from text."""
     text = _unescape_code(code) if isinstance(code, str) else ""
@@ -563,6 +560,10 @@ def _ast_counts(code) -> dict | None:
                 walk(b, mult)
 
     def _keys(node, mult):
+        if isinstance(node, ast.comprehension):   # [... for i in range(100)] reads 100 inputs, as the text does
+            n = _const_len(node.iter)
+            if n is not None:
+                inputs[0] = max(inputs[0], n)
         ks = []
         if isinstance(node, ast.Dict):
             ks = [k for k in node.keys if k is not None]
@@ -588,22 +589,69 @@ def _shallow(st):
                 yield from ast.walk(x)
 
 
-def _text_counts(code) -> dict:
+def _token_obs_keys(code) -> int:
+    """Distinct dotted string keys of code that may not parse, read from its tokens: a string right after `{` or `,`
+    and followed by `:` (a dict key), or between `[` and `] =` (a subscript store). Comments, docstrings and other
+    strings (import_module('pkg.mod'), mock.patch('pkg.mod.f')) are not in a key position. Tokenizing stops at the
+    first token error and keeps what it read; line breaks alone do not change the count."""
     text = _unescape_code(code) if isinstance(code, str) else ""
-    return {"keys": _text_obs_keys(code), "inputs": max(_text_inputs(code), _text_range_inputs(text))}
+    toks, lines = [], text.splitlines(keepends=True)
+    start = 0
+    while start < len(lines):
+        last = start
+        try:
+            for t in tokenize.generate_tokens(io.StringIO("".join(lines[start:])).readline):
+                last = start + t.start[0] - 1
+                if t.type in (tokenize.COMMENT, tokenize.NL, tokenize.NEWLINE, tokenize.INDENT, tokenize.DEDENT):
+                    continue
+                toks.append((t.type, t.string))
+            break
+        except (tokenize.TokenError, IndentationError, SyntaxError) as e:
+            # skip past the line that broke tokenizing and go on from the next one
+            line = (e.args[1][0] if isinstance(e, tokenize.TokenError) and len(e.args) > 1
+                    and isinstance(e.args[1], tuple) else getattr(e, "lineno", None))
+            stop = start + line if isinstance(line, int) and line > 0 else last + 1
+            start = max(stop, last + 1, start + 1)
+            toks.append((tokenize.OP, ";"))
+    names = set()
+    for i, (kind, val) in enumerate(toks):
+        if kind != tokenize.STRING or i == 0:
+            continue
+        prev, nxt = toks[i - 1][1], toks[i + 1][1] if i + 1 < len(toks) else ""
+        after = toks[i + 2][1] if i + 2 < len(toks) else ""
+        dict_key = prev in ("{", ",") and nxt == ":"
+        store = prev == "[" and nxt == "]" and after == "="
+        if not (dict_key or store):
+            continue
+        try:
+            v = ast.literal_eval(val)
+        except (ValueError, SyntaxError):
+            continue
+        if isinstance(v, str) and _OBS_KEY.fullmatch(repr(v)):
+            names.add(v)
+    return len(names)
 
 
-def repair_counts(code) -> dict:
-    """Keys and inputs of a probe's code, with how they were read: the AST when the code parses, else the text."""
+def original_counts(code) -> dict:
+    """Keys and inputs of the original (broken) probe: keys from its tokens, inputs from its text."""
+    text = _unescape_code(code) if isinstance(code, str) else ""
+    return {"keys": _token_obs_keys(code), "inputs": max(_text_inputs(code), _text_range_inputs(text)),
+            "read": "tokens"}
+
+
+def repair_counts(code) -> dict | None:
+    """Keys and inputs of a repair, read from its AST only; None when a key cannot be read (no text fallback)."""
     c = _ast_counts(code)
-    return dict(c, read="ast") if c is not None else dict(_text_counts(code), read="text")
+    return dict(c, read="ast") if c is not None else None
 
 
 def _repair_loses(old_code, new_code) -> tuple[str | None, dict]:
-    """Why a parse repair is rejected (fewer observation keys or fewer inputs than the original), and the before and
-    after counts. The broken original is read from its text; the repair, which parses, from its AST."""
-    before, after = repair_counts(old_code), repair_counts(new_code)
+    """Why a parse repair is rejected, and the before and after counts. The broken original is read from its tokens;
+    the repair, which parses, from its AST. A repair whose keys cannot be read is rejected."""
+    before, after = original_counts(old_code), repair_counts(new_code)
     counts = {"before": before, "after": after}
+    if after is None:
+        return "the repair stores under a key that cannot be read", counts
     if after["keys"] < before["keys"]:
         return f"the repair has fewer observation keys ({after['keys']} < {before['keys']})", counts
     if after["inputs"] < before["inputs"]:
