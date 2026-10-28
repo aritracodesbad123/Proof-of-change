@@ -56,6 +56,8 @@ def lookup(query: str, *, max_results: int = 3, env: dict | None = None, timeout
     except Exception as e:  # noqa: BLE001
         message = f"{type(e).__name__}: {e}".replace(secret, "[redacted]")
         return {"ok": False, "error": message, "query": query, "results": []}
+    from poc import tavily_budget
+    tavily_budget.record("search", depth=str(body.get("search_depth") or "basic"))   # an answered call is billed
     if not raw or not raw.strip():
         return {"ok": False, "error": EMPTY_RESPONSE, "query": query, "results": []}
     try:

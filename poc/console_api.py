@@ -18,6 +18,7 @@ Serves console/web/dist when built. CORS open for local Vite (5173).
 """
 from __future__ import annotations
 
+import fcntl
 import json
 import os
 import re
@@ -37,7 +38,6 @@ from poc import session_key
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 RUNS_ROOT = Path(os.environ.get("POC_OPS_RUNS", REPO_ROOT / "ops" / "runs"))
-HOSTED = REPO_ROOT / "reports" / "hosted"
 REPORTS_DAILY = Path(os.environ.get("POC_REPORT_DIR") or (REPO_ROOT / "reports" / "daily"))
 CONSOLE_JOB_TIMEOUT_S = 45 * 60
 OWNER_FILE = "console_owner.txt"
@@ -58,7 +58,11 @@ def resolve_console_provider(requested: str, session_token: str | None = None) -
     """Live checks need a key typed into this session. The server's key is never used. Otherwise recorded answers."""
     if requested != "nebius":
         return requested, None
-    if session_key.has_key(session_token):
+    if hosted_console():
+        # A hosted console's model calls use only the server's key (a decision; see the decision log).
+        if (os.environ.get("NEBIUS_API_KEY") or "").strip():
+            return "nebius", None
+    elif session_key.has_key(session_token):
         return "nebius", None
     return "recorded", (
         "No Nebius key for this session, so this check uses the recorded AI answers. "
@@ -77,11 +81,16 @@ def child_environment(base: dict[str, str], provider: str, session_token: str | 
     pasted = session_key.get_key(session_token)
     if pasted and len(pasted) >= 8:
         secrets.append(pasted)
-    # A user check never runs on the server's Nebius account: drop the server's values, keep them only for redaction.
+    # Drop the server's values (kept only for redaction). A local check never runs on the server's Nebius account;
+    # a hosted check gets the server key back below.
     for name in ("NEBIUS_API_KEY", "NEBIUS_PROJECT_ID", "CONTREE_PROJECT_ID"):
         server_value = (env.pop(name, None) or "").strip()
         if len(server_value) >= 8 and server_value not in secrets:
             secrets.append(server_value)
+    if hosted_console(base):
+        pasted = None   # a hosted console never uses a typed key
+        if provider == "nebius" and len(host) >= 8:
+            env["NEBIUS_API_KEY"] = host   # hosted model calls use the server's key
     if provider == "nebius" and pasted:
         env["NEBIUS_API_KEY"] = pasted
     from poc import console_auth
@@ -125,9 +134,16 @@ class _ScrubWriter:
 
 
 def contree_credentials(session_token: str | None = None) -> tuple[str, str]:
-    """The user's own Nebius key and Contree project ID for a console check: only the values typed into this
-    session. The server's NEBIUS_API_KEY / NEBIUS_PROJECT_ID / CONTREE_PROJECT_ID are never used for a user check,
-    so one person's check can never run on the server's Nebius account."""
+    """The Nebius key and project ID Contree uses for a console check.
+
+    A hosted console (POC_HOSTED=1, Render or a Space) reads them only from the private server settings
+    NEBIUS_API_KEY and NEBIUS_PROJECT_ID; anything typed into a session is ignored. Every hosted check is then
+    charged to the daily cap and POC_TAVILY_CREDIT_CAP (hosted_budget_refusal). A local console uses only the
+    values typed into this session, so a local user's check never runs on the server's Nebius account.
+    The values are never shown, logged or echoed."""
+    if hosted_console():
+        return ((os.environ.get("NEBIUS_API_KEY") or "").strip(),
+                (os.environ.get("NEBIUS_PROJECT_ID") or "").strip())
     key = (session_key.get_key(session_token) or "").strip()
     project = (session_key.get_contree_project(session_token) or "").strip()
     return key, project
@@ -221,6 +237,12 @@ def console_run_flags(session_token: str | None = None) -> ConsoleRunPlan:
     POC_UNSAFE_NO_SANDBOX=1, which adds --unsafe-no-sandbox and a visible warning.
     """
     force = _unsafe_opt_in()
+    if hosted_console():
+        # A hosted console runs pull-request code only in Contree. No local bubblewrap, no unsandboxed opt-in.
+        if contree_usable(session_token):
+            return ConsoleRunPlan(["--sandbox-backend", "contree", "--require-contree"],
+                                  "using Contree sandboxes", False, None)
+        return ConsoleRunPlan([], refusal_message(session_token), True, None)
     if contree_usable(session_token):
         if force:
             return ConsoleRunPlan(
@@ -379,11 +401,17 @@ def _row_from_record(rec: dict, path: Path | None = None) -> dict:
 
 
 
+def _hosted_dir() -> Path:
+    """Hosted HTML reports: POC_HOSTED_REPORTS_DIR, else reports/hosted (shared with the GitHub App)."""
+    from poc import github_app
+    return github_app.hosted_reports_dir()
+
+
 def remember_run(rec: dict, path: Path | None = None, *, owner: str | None = None) -> dict:
     """Keep a finished PR record in RAM so the console still lists it after Render wipes disk."""
     row = _row_from_record(rec, path)
     rid = row["id"]
-    hosted = HOSTED / f"{rid}.html"
+    hosted = _hosted_dir() / f"{rid}.html"
     links = report_links(rid, folder=row["folder"], rec=rec)
     if owner is None and path is not None:
         owner = read_run_owner(path.parent)
@@ -498,7 +526,7 @@ def get_run(run_id: str, owner: str | None = None, *, admin: bool = False) -> di
             remember_run(rec, path)
             rid = str(rec.get("id") or run_id)
             folder = _display_path(path.parent)
-            hosted = HOSTED / f"{rid}.html"
+            hosted = _hosted_dir() / f"{rid}.html"
             links = report_links(rid, folder=folder, rec=rec)
             return {
                 "record": rec,
@@ -660,7 +688,10 @@ def _read_child(proc: subprocess.Popen, logf, collected: list[str], deadline: fl
 
 
 def _has_typed_key(session_token: str | None) -> bool:
-    """Whether this session has the user's own typed Nebius key. The server's key never counts."""
+    """Whether this check has a Nebius key it may use. Locally: the user's own typed key; the server's never
+    counts. Hosted: only the server setting counts; a typed key is never stored or used."""
+    if hosted_console():
+        return bool((os.environ.get("NEBIUS_API_KEY") or "").strip())
     return session_key.has_key(session_token)
 
 
@@ -698,11 +729,82 @@ def _contree_sdk_installed() -> bool:
     return True
 
 
+CONTREE_UNAVAILABLE = "Contree unavailable"
+
+
+def hosted_console(env=None) -> bool:
+    """True for a hosted console: POC_HOSTED=1 (set as a server setting on a hosted deploy), Render, or a Space,
+    and never a single-user Codespace. There, pull-request code runs only in Contree and a check refuses with
+    'Contree unavailable' when Contree cannot start. A local console keeps its bubblewrap default."""
+    from poc import console_auth, spaces_host
+    env = os.environ if env is None else env
+    if console_auth.single_user_requested(env):
+        return False
+    flag = str(env.get("POC_HOSTED") or "").strip().lower() in ("1", "true", "yes")
+    return flag or console_auth.on_render(env) or spaces_host.on_spaces(env)
+
+
+DAILY_CAP_REACHED = "Daily check limit reached"
+CREDIT_CAP_MISSING = ("This hosted console has no Tavily credit cap set (POC_TAVILY_CREDIT_CAP), so it does not "
+                      "start checks. The operator needs to set it.")
+_daily_lock = threading.Lock()
+
+
+def _ist_day(now: float | None = None) -> str:
+    return time.strftime("%Y-%m-%d", time.gmtime((time.time() if now is None else now) + 5.5 * 3600))
+
+
+def daily_cap(env=None) -> int:
+    env = os.environ if env is None else env
+    try:
+        return max(0, int((env.get("POC_DAILY_CAP") or "").strip() or 5))
+    except ValueError:
+        return 5
+
+
+def hosted_budget_refusal(env=None, *, path: Path | None = None, now: float | None = None) -> str | None:
+    """On a hosted console, charge this check to the daily cap and require POC_TAVILY_CREDIT_CAP.
+
+    Returns a refusal (one plain line, no values) or None after counting the check for today (IST).
+    The Tavily credit cap itself is enforced inside the check, before its first Tavily call."""
+    env = os.environ if env is None else env
+    if not str(env.get("POC_TAVILY_CREDIT_CAP") or "").strip():
+        return CREDIT_CAP_MISSING
+    cap = daily_cap(env)
+    path = path or (RUNS_ROOT / "_console_daily.json")
+    day = _ist_day(now)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    # The console and the GitHub App listener are separate processes sharing this counter, so the read and the
+    # write happen under an exclusive fcntl lock on a side file (the thread lock covers threads in one process).
+    with _daily_lock, open(str(path) + ".lock", "a") as lock_fh:
+        fcntl.flock(lock_fh, fcntl.LOCK_EX)
+        try:
+            try:
+                data = json.loads(path.read_text())
+            except (OSError, ValueError):
+                data = {}
+            used = int(data.get(day) or 0) if isinstance(data, dict) else 0
+            if used >= cap:
+                return f"{DAILY_CAP_REACHED} ({cap} checks per day on this console). Try again tomorrow."
+            tmp = path.with_name(path.name + f".{os.getpid()}.tmp")
+            tmp.write_text(json.dumps({day: used + 1}))
+            os.replace(tmp, path)
+        finally:
+            fcntl.flock(lock_fh, fcntl.LOCK_UN)
+    return None
+
+
 def refusal_message(session_token: str | None = None) -> str:
     """Plain words for a check refused because no sandbox can start. Never asks for a field already given.
 
     Only this session's typed values count; the server's environment is never described as "your key"."""
     key, project = contree_credentials(session_token)
+    if hosted_console():
+        prefix = f"{CONTREE_UNAVAILABLE} (could not verify; no pull-request code was run): "
+        if key and project:
+            return prefix + "Contree could not start on this server. Try again in a moment."
+        return prefix + ("the operator has not set up Contree on this server "
+                         "(NEBIUS_API_KEY and NEBIUS_PROJECT_ID are private server settings).")
     if key and project:
         if not _contree_sdk_installed():
             return ("No sandbox available: your Nebius key and project ID are set, but the Contree software is not "
@@ -728,10 +830,11 @@ def apply_start_fields(session_token: str | None, body: dict) -> None:
     Raises ValueError with a plain message. Values are never echoed, logged, or written to disk.
     """
     from poc import console_auth
-    setters = [
-        ("nebius_api_key", session_key.set_key),
-        *[(name, session_key.set_contree_project) for name in _PROJECT_FIELDS],
-    ]
+    # A hosted console stores no typed key or project ID at all: the server settings are the only ones.
+    if hosted_console():
+        return
+    setters = [("nebius_api_key", session_key.set_key)]
+    setters.extend((name, session_key.set_contree_project) for name in _PROJECT_FIELDS)
     # A hosted console never reads a typed Tavily key. The server setting is the only one.
     if console_auth.single_user_requested():
         setters.insert(1, ("tavily_api_key", session_key.set_tavily_key))
@@ -776,15 +879,16 @@ def start_check(pr_url: str, *, model_provider: str = "nebius", owner: str | Non
         flags, run_note, refused, warning = plan.flags, plan.note, plan.refused, plan.warning
         if refused:
             raise CheckRefused(refusal_message(session_token))
+        if hosted_console():
+            over = hosted_budget_refusal()
+            if over:
+                raise CheckRefused(over)
     if provider_note and not playback:
         run_note = f"{provider_note} {run_note}".strip() if run_note else provider_note
     approval_on = console_approval_on(approval)
     job_id = uuid.uuid4().hex[:12]
-    # Tests retarget REPO_ROOT. POC_OPS_RUNS (a Space home directory) wins when it is set.
-    if (os.environ.get("POC_OPS_RUNS") or "").strip():
-        jobs_dir = RUNS_ROOT / "_jobs" / job_id
-    else:
-        jobs_dir = REPO_ROOT / "ops" / "runs" / "_jobs" / job_id
+    # Job folders live under the run folders: POC_OPS_RUNS when set, else ops/runs (RUNS_ROOT).
+    jobs_dir = RUNS_ROOT / "_jobs" / job_id
     jobs_dir.mkdir(parents=True, exist_ok=True)
     progress_path = jobs_dir / "progress.jsonl"
     console_log = jobs_dir / "console.log"
@@ -825,18 +929,14 @@ def start_check(pr_url: str, *, model_provider: str = "nebius", owner: str | Non
     with _jobs_lock:
         _jobs[job_id] = job
     # Seed progress file so UI shows queued before the child starts.
-    prev = os.environ.get("POC_PROGRESS_PATH")
-    os.environ["POC_PROGRESS_PATH"] = str(progress_path)
-    try:
-        run_progress.emit("queued", detail=f"{m.group(1)}#{m.group(2)}")
-    finally:
-        if prev is None:
-            os.environ.pop("POC_PROGRESS_PATH", None)
-        else:
-            os.environ["POC_PROGRESS_PATH"] = prev
+    run_progress.emit("queued", detail=f"{m.group(1)}#{m.group(2)}", path=progress_path)
 
     def work():
         from poc import run_progress as rp
+
+        def emit(stage, detail=None):
+            # Per-check target; the process-wide POC_PROGRESS_PATH is never set here.
+            rp.emit(stage, detail=detail, path=progress_path)
 
         env = os.environ.copy()
         env["POC_PROGRESS_PATH"] = str(progress_path)
@@ -853,10 +953,9 @@ def start_check(pr_url: str, *, model_provider: str = "nebius", owner: str | Non
         with _jobs_lock:
             job["status"] = "running"
             job["started_at"] = time.time()
-        os.environ["POC_PROGRESS_PATH"] = str(progress_path)
         if job.get("playback"):
             try:
-                rec = spaces_host.play(lambda stage, detail=None: rp.emit(stage, detail=detail))
+                rec = spaces_host.play(lambda stage, detail=None: emit(stage, detail=detail))
                 folder = RUNS_ROOT / "playback" / "mlxtend-1229"
                 folder.mkdir(parents=True, exist_ok=True)
                 (folder / "record.json").write_text(json.dumps(rec))
@@ -874,25 +973,25 @@ def start_check(pr_url: str, *, model_provider: str = "nebius", owner: str | Non
                     job["log_tail"] = "Playback of the vetted sample. No pull-request code ran.\n"
                     job.update(report_links(row["id"], folder=row["folder"], rec=stored))
             except Exception as e:  # noqa: BLE001
-                rp.emit("failed", detail=f"{type(e).__name__}: {e}"[:200])
+                emit("failed", detail=f"{type(e).__name__}: {e}"[:200])
                 with _jobs_lock:
                     job["status"] = "failed"
                     job["error"] = f"{type(e).__name__}: {e}"
                     job["finished_at"] = time.time()
             return
-        rp.emit("fetch_pr", detail="loading pull request")
+        emit("fetch_pr", detail="loading pull request")
         flags = list(job.get("run_flags") or [])
         note = job.get("run_note")
         notice = job.get("warning") or note
         if notice:
-            rp.emit("fetch_pr", detail=str(notice)[:200])
+            emit("fetch_pr", detail=str(notice)[:200])
         if job.get("refused"):
             message = str(note or "Proof-of-Change will not run pull-request code without a sandbox.")
             with _jobs_lock:
                 job["status"] = "failed"
                 job["error"] = message
                 job["finished_at"] = time.time()
-            rp.emit("failed", detail=message[:200])
+            emit("failed", detail=message[:200])
             return
         child_flags = list(flags)
         child_flags.extend(recorded_demo_flags(requested))
@@ -924,16 +1023,15 @@ def start_check(pr_url: str, *, model_provider: str = "nebius", owner: str | Non
             file_tail = _tail_bytes(console_log, 8192)
             if file_tail:
                 tail = session_key.scrub(file_tail, secrets)
-            os.environ["POC_PROGRESS_PATH"] = str(progress_path)
             found = find_record_for_pr(m.group(1), int(m.group(2)))
             # A written record means the check produced analysis — surface it even if exit!=0 (problems list).
             ok = (returncode == 0 or found is not None) and not timed_out
             if timed_out:
-                rp.emit("failed", detail="timed out")
+                emit("failed", detail="timed out")
             elif ok:
-                rp.emit("done", detail="check finished" if returncode == 0 else "finished with problems")
+                emit("done", detail="check finished" if returncode == 0 else "finished with problems")
             else:
-                rp.emit("failed", detail=(fail_reason or f"exit {returncode}")[:200])
+                emit("failed", detail=(fail_reason or f"exit {returncode}")[:200])
             # remember_run takes _jobs_lock — must not run while we hold it (deadlocks Lock).
             saved = None
             if found:
@@ -957,8 +1055,7 @@ def start_check(pr_url: str, *, model_provider: str = "nebius", owner: str | Non
                     job["folder"] = row["folder"]
                     job.update(report_links(row["id"], folder=row["folder"], rec=rec))
         except Exception as e:  # noqa: BLE001
-            os.environ["POC_PROGRESS_PATH"] = str(progress_path)
-            rp.emit("failed", detail=f"{type(e).__name__}: {e}"[:200])
+            emit("failed", detail=f"{type(e).__name__}: {e}"[:200])
             with _jobs_lock:
                 job["status"] = "failed"
                 job["error"] = f"{type(e).__name__}: {e}"

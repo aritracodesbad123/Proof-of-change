@@ -67,6 +67,7 @@ def test_start_check_sets_hitl_env(tmp_path, monkeypatch):
     monkeypatch.setattr(console_api.threading, "Thread", FakeThread)
     monkeypatch.setattr(console_api, "console_run_flags", lambda *_a, **_k: console_api.ConsoleRunPlan([], None, False, None))
     monkeypatch.setattr(console_api, "REPO_ROOT", tmp_path)
+    monkeypatch.setattr(console_api, "RUNS_ROOT", tmp_path / "ops" / "runs")
     (tmp_path / "ops" / "runs" / "_jobs").mkdir(parents=True)
     (tmp_path / "ops" / "daily_run.py").write_text("# stub\n")
     job = console_api.start_check("https://github.com/me/demo/pull/3", model_provider="none")
@@ -79,6 +80,7 @@ def test_start_check_sets_hitl_env(tmp_path, monkeypatch):
 
 def test_find_reviewer_report_under_daily(tmp_path, monkeypatch):
     monkeypatch.setattr(console_api, "REPO_ROOT", tmp_path)
+    monkeypatch.setattr(console_api, "RUNS_ROOT", tmp_path / "ops" / "runs")
     monkeypatch.setattr(console_api, "REPORTS_DAILY", tmp_path / "reports" / "daily")
     day = tmp_path / "reports" / "daily" / "2026-10-17-check-1200"
     rid = "marshmallow-3079"
@@ -116,6 +118,7 @@ def test_remember_run_under_jobs_lock_does_not_deadlock(tmp_path, monkeypatch):
     import threading
 
     monkeypatch.setattr(console_api, "REPO_ROOT", tmp_path)
+    monkeypatch.setattr(console_api, "RUNS_ROOT", tmp_path / "ops" / "runs")
     console_api._recent_runs.clear()
     rec = {
         "record_kind": "pr_run",

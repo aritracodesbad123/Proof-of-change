@@ -354,6 +354,7 @@ def test_swarm_on_study_uses_a_labelled_folder():
 def test_console_turns_swarm_and_approval_on_explicitly(monkeypatch, tmp_path):
     _quiet_env(monkeypatch)
     monkeypatch.setattr(console_api, "REPO_ROOT", tmp_path)
+    monkeypatch.setattr(console_api, "RUNS_ROOT", tmp_path / "ops" / "runs")
     monkeypatch.setattr(console_api, "find_record_for_pr", lambda *a, **k: None)
     (tmp_path / "ops").mkdir()
     captured = {}
@@ -402,6 +403,7 @@ def test_console_human_review_is_on_by_default_and_can_be_skipped(monkeypatch, t
     monkeypatch.delenv("POC_CONSOLE_APPROVAL", raising=False)
     monkeypatch.setenv("POC_HITL", "1")
     monkeypatch.setattr(console_api, "REPO_ROOT", tmp_path)
+    monkeypatch.setattr(console_api, "RUNS_ROOT", tmp_path / "ops" / "runs")
     monkeypatch.setattr(console_api, "find_record_for_pr", lambda *a, **k: None)
     (tmp_path / "ops").mkdir()
     captured = {}

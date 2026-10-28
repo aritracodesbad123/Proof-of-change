@@ -21,6 +21,7 @@ packages = ["poc", "harness", "evals", "guardrails", "reports"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["."]
+filterwarnings = ["error::pytest.PytestUnhandledThreadExceptionWarning"]  # a leaked thread error fails the test
 
 [tool.ruff]
 line-length = 140

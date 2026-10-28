@@ -2844,6 +2844,12 @@ def _aggregate_names(rec: dict) -> list[str]:
     return [str(n) for n in plan.get("aggregate_names") or []]
 
 
+def parallel_on(a) -> bool:
+    """POC_PARALLEL=1 (off by default): product checks only build both Contree checkpoints at once, prepare them
+    while probes are written, and run each main/PR pair of timed runs at the same time. Study runs never use it."""
+    return product_route(a) and (os.environ.get("POC_PARALLEL") or "").strip().lower() in {"1", "true", "yes", "on"}
+
+
 def _contree_ready() -> bool:
     from poc import contree_sandboxes
     sess = contree_sandboxes.session()
@@ -2865,9 +2871,14 @@ def _maybe_prepare_contree(a, repo: str, main_sha: str, pr_sha: str, rec: dict, 
     try:
         sess = contree_sandboxes.prepare_source_pair(repo, main_sha, pr_sha, timeout=timeout, extra_shell=extra_shell,
                                                      **({"deps_only_fallback": True, "deps_exclude": _aggregate_names(rec),
-                                                        "retry_transient": True}
+                                                        "retry_transient": True,
+                                                        **({"parallel": True, "deps_touched":
+                                                            contree_sandboxes.touches_dependency_files(rec.get("files"))}
+                                                           if parallel_on(a) else {})}
                                                         if product_route(a) else {}))
         rec["contree"] = sess.describe()
+        if getattr(sess, "parallel_fallback", None):
+            rec["contree"]["parallel_fallback"] = sess.parallel_fallback
         rec["machine"] = "contree"
         rec["sandbox_backend"] = "contree"
         rec["sandbox_backend_note"] = contree_sandboxes.note()
@@ -2877,12 +2888,44 @@ def _maybe_prepare_contree(a, repo: str, main_sha: str, pr_sha: str, rec: dict, 
     except contree_sandboxes.ContreeError as e:
         contree_sandboxes.clear_session()
         refusal, entry = contree_refusal(e)
+        if getattr(e, "pr_build", None):
+            entry["pr_build"] = e.pr_build
         rec["sandbox_backend"] = "contree"
         rec["sandbox_backend_note"] = refusal
         rec["machine"] = "contree (not run)"
         rec["contree"] = entry
         return refusal
 
+
+
+CONTREE_UNAVAILABLE = "Contree unavailable"
+
+
+def both_sandbox_flags_refusal(a) -> str | None:
+    """--require-contree with --unsafe-no-sandbox is refused outright, before any work."""
+    if getattr(a, "require_contree", False) and getattr(a, "unsafe_no_sandbox", False):
+        return ("STOPPED: --require-contree and --unsafe-no-sandbox cannot be used together. "
+                "Result: could not verify.")
+    return None
+
+
+def contree_required_refusal(a, env: dict | None = None) -> str | None:
+    """For --require-contree: select Contree with no local fallback. Returns a plain could-not-verify note
+    ('STOPPED: Contree unavailable: ...') when Contree cannot start, else None. No pull-request code runs then."""
+    from poc import contree_sandboxes
+    env = dict(os.environ if env is None else env)
+    env[contree_sandboxes.REQUIRE_ENV] = "1"
+    a.sandbox_backend = "contree"
+    try:
+        a.sandbox_backend, a.sandbox_backend_note = contree_sandboxes.select("contree", env=env)
+    except contree_sandboxes.ContreeError as e:
+        why = str(e).replace("STOPPED: ", "", 1)
+        return (f"STOPPED: {CONTREE_UNAVAILABLE}: {why} This check runs pull-request code only in Contree, "
+                "so nothing was run. Result: could not verify.")
+    if a.sandbox_backend != "contree":
+        return (f"STOPPED: {CONTREE_UNAVAILABLE}. This check runs pull-request code only in Contree, "
+                "so nothing was run. Result: could not verify.")
+    return None
 
 def own_index_refusal(a, cnv: str | None, *checkouts) -> str | None:
     """A Contree setup failure on a product check whose project needs its own index or uv sources: could not verify
@@ -3055,14 +3098,17 @@ def _contree_pytest_once(side: str, targets: list[str], test_timeout: int, run_t
 
 def run_tests(side_venvs: dict, targets_by_side: dict, rdir: Path, workdir: Path, runs: int, workers: str,
               test_timeout: int, run_timeout: int, cwds: dict | None = None,
-              keep_addopts: bool = False) -> tuple[list[dict], dict]:
-    """targets are relative to site-packages (nightly routes) or to the side's checkout (cwds given).
+              keep_addopts: bool = False, parallel: bool = False) -> tuple[list[dict], dict]:
+    """parallel (POC_PARALLEL, Contree only): run i's main and PR pytest start together in their own sandboxes;
+    results are recorded in the same order as the serial schedule.
+    targets are relative to site-packages (nightly routes) or to the side's checkout (cwds given).
     per_run entries use the shared schema shape (side old/new, all counts present).
     When a Contree session with main/PR checkpoints is active, pytest runs remotely (source-pair)."""
     from poc import run_progress
     use_contree = _contree_ready() and cwds is not None
     envs = ({side: base_env(side_home(v)) for side, v in side_venvs.items()} if not use_contree else {})
     per_run, results = [], {"main": [], "pr": []}
+    pending_pr = None
     for i in range(1, runs + 1):
         for side in ("main", "pr"):
             run_progress.emit("pytest", "code", f"before run {i}/{runs}")
@@ -3083,7 +3129,19 @@ def run_tests(side_venvs: dict, targets_by_side: dict, rdir: Path, workdir: Path
                 run_progress.emit("pytest", "code", f"after run {i}/{runs}")
                 continue
             if use_contree:
-                rc, secs = _contree_pytest_once(side, tg, test_timeout, run_timeout, workers, jx, lg, keep_addopts)
+                if parallel and side == "main" and all(targets_by_side[s] for s in ("main", "pr")):
+                    from concurrent.futures import ThreadPoolExecutor
+                    with ThreadPoolExecutor(max_workers=2) as ex:
+                        futs = {s: ex.submit(_contree_pytest_once, s, list(targets_by_side[s]), test_timeout,
+                                             run_timeout, workers, rdir / f"junit-{s}-{i}.xml",
+                                             rdir / f"pytest-{s}-{i}.log", keep_addopts) for s in ("main", "pr")}
+                        pending_pr = futs["pr"]
+                    rc, secs = futs["main"].result()
+                elif parallel and side == "pr" and pending_pr is not None:
+                    rc, secs = pending_pr.result()
+                    pending_pr = None
+                else:
+                    rc, secs = _contree_pytest_once(side, tg, test_timeout, run_timeout, workers, jx, lg, keep_addopts)
             else:
                 cmd = [venv / "bin/python", "-m", "pytest", *tg, "-p", "no:cacheprovider", "-q", "-rfE",
                        f"--timeout={test_timeout}", *repo_addopts_args(keep_addopts), "-o", "junit_family=xunit2",
@@ -4637,9 +4695,11 @@ def _contree_only_pair(a, rec: dict, repo: str, cfg: dict, item: dict, sp: dict,
     for v in (vm, vp):
         (v / "bin").mkdir(parents=True, exist_ok=True)
     setup_plan = _product_plan(a, rec, repo, cfg, [cm, cp], out_dir=prdir) if helper_on else None
-    run_progress.emit("claims", "super", "planning behaviour claims / probes")
-    plan = plan_probes(repo, item, rec, cm, [cp, work / "src"], prdir, a)
-    rec["pr_side_started_at"] = pr_started = freeze.now()   # nothing below may create or change a probe
+    par = parallel_on(a)   # POC_PARALLEL: prep while probes are written, timed runs in pairs (product only)
+    if not par:
+        run_progress.emit("claims", "super", "planning behaviour claims / probes")
+        plan = plan_probes(repo, item, rec, cm, [cp, work / "src"], prdir, a)
+        rec["pr_side_started_at"] = pr_started = freeze.now()   # nothing below may create or change a probe
     chosen_tg = chosen_test_targets(item.get("chosen"))
     if chosen_tg:
         targets = {"main": [t for t in chosen_tg if (cm / t).exists()],
@@ -4663,11 +4723,22 @@ def _contree_only_pair(a, rec: dict, repo: str, cfg: dict, item: dict, sp: dict,
     run_progress.emit("install_main", detail="installing main and PR sides in Contree")
     blocked = _groups_blocked(a, setup_plan)
     if blocked:
+        if par:   # same record as flag-off: probes are planned and frozen before the blocked return
+            run_progress.emit("claims", "super", "planning behaviour claims / probes")
+            plan_probes(repo, item, rec, cm, [cp, work / "src"], prdir, a)
+            rec["pr_side_started_at"] = freeze.now()
         rec["contree_only"]["note"] = "Contree mode: Contree did not run, so nothing from the pull request was run"
         return None, blocked, None, targets
-    cnv = _maybe_prepare_contree(a, repo, sp["main_sha"], sp["pr_sha"], rec, a.build_timeout,
-                                 extra_shell=contree_only_extra_shell(decl, optional, base), main_dir=cm,
-                                 module=cfg.get("pkg") or "")
+    extra = contree_only_extra_shell(decl, optional, base)
+    module = cfg.get("pkg") or ""
+    if par:
+        # Probe planning reads only local files and the model; the PR checkpoint runs only the project's install.
+        # pr_side_started_at is set after both, so probes are still frozen before any pull-request code runs.
+        cnv, plan = _prepare_while_planning(a, repo, item, rec, sp, cm, cp, work, prdir, extra, module)
+        rec["pr_side_started_at"] = pr_started = freeze.now()   # nothing below may create or change a probe
+    else:
+        cnv = _maybe_prepare_contree(a, repo, sp["main_sha"], sp["pr_sha"], rec, a.build_timeout,
+                                     extra_shell=extra, main_dir=cm, module=module)
     cnv = own_index_refusal(a, cnv, cm, cp)
     cmp = ex = None
     if cnv:
@@ -4684,7 +4755,7 @@ def _contree_only_pair(a, rec: dict, repo: str, cfg: dict, item: dict, sp: dict,
         run_progress.emit("pytest", "code", "dual-run pytest on main and PR (Contree)")
         per_run, results = run_tests({"main": vm, "pr": vp}, targets, prdir, work, a.runs, a.workers,
                                      a.test_timeout, a.run_timeout, cwds={"main": cm, "pr": cp},
-                                     keep_addopts=product_route(a))
+                                     keep_addopts=product_route(a), **({"parallel": True} if par else {}))
         cmp, cnv, ex = finalize_tests(rec, per_run, results, a)
         if cmp:
             ex = exit_check(rec.get("per_run", []), results, cmp)
@@ -4708,6 +4779,33 @@ def _contree_only_pair(a, rec: dict, repo: str, cfg: dict, item: dict, sp: dict,
     if change_is_docstring_only(rec.get("files"), cm, cp):
         rec["docstring_only"] = True
     return cmp, cnv, ex, targets
+
+
+
+def _prepare_while_planning(a, repo: str, item: dict, rec: dict, sp: dict, cm: Path, cp: Path, work: Path,
+                            prdir: Path, extra: str, module: str = "") -> tuple:
+    """Parallel mode: build the Contree checkpoints in the background while the probes are planned.
+
+    A probe-planning error is raised as itself: the checkpoint build is still waited for (it is never left running
+    against the session), but its own result or error never replaces the planning error."""
+    from concurrent.futures import ThreadPoolExecutor
+
+    from poc import run_progress
+    with ThreadPoolExecutor(max_workers=1) as pool:
+        prep = pool.submit(_maybe_prepare_contree, a, repo, sp["main_sha"], sp["pr_sha"], rec, a.build_timeout,
+                           extra_shell=extra, main_dir=cm, module=module)
+        run_progress.emit("claims", "super", "planning behaviour claims / probes")
+        try:
+            plan = plan_probes(repo, item, rec, cm, [cp, work / "src"], prdir, a)
+        except BaseException as err:
+            run_progress.emit("claims", "super", f"probe planning failed ({type(err).__name__}); waiting for the "
+                                                 "Contree setup to finish before reporting it")
+            try:
+                prep.result()
+            except Exception:  # noqa: BLE001, S110 - the planning error is the one reported
+                pass
+            raise
+        return prep.result(), plan
 
 
 STATE_UNREADABLE = ("refused: the pull request's state could not be read from GitHub, so it was not tested; "
@@ -4801,7 +4899,15 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
             rec["pr_state_refusal"] = closed
             rec["verdict"], rec["reason"], _ = verdict_for(None, closed)
             return finish(rec, prdir, work, t0, a)
-    from poc import demo_helper
+    from poc import demo_helper, tavily_budget
+    if product_route(a):
+        rec["_tavily_meter"] = tavily_budget.begin(f"{repo}#{item['pr']}")   # this check's Tavily calls
+        capped = tavily_budget.refusal()
+        if capped:   # refuse up front, before any Tavily call, rather than fail halfway
+            print(capped, flush=True)
+            rec["tavily_credit_refusal"] = capped
+            rec["verdict"], rec["reason"], _ = verdict_for(None, capped)
+            return finish(rec, prdir, work, t0, a)
     if demo_helper.active(a):
         demo_helper.begin_check(a, rec, repo, cfg.get("dist") or cfg.get("pkg"), prdir)
     if product_route(a):
@@ -5061,6 +5167,11 @@ def finish(rec: dict, prdir: Path, work: Path, t0: float, runner=None) -> dict:
     rec["cost"] = cost.take(rec["duration_s"])
     if rec.get("product_check"):  # timing only; study records stay byte-identical
         rec["timings"] = step_timings(rec)
+        from poc import tavily_budget
+        credits = tavily_budget.take(rec.pop("_tavily_meter", None))
+        if credits is not None:
+            rec["tavily_credits"] = credits
+            print(tavily_budget.log_line(credits), flush=True)
     mark_bench_model_invalid(rec, runner)
     errs = check_record(rec)
     if errs:
@@ -6143,6 +6254,11 @@ def _main(argv=None) -> int:
                          "Nebius Token Factory Sandboxes (needs NEBIUS_API_KEY, NEBIUS_PROJECT_ID, and "
                          "pip install -e '.[contree]'; falls back to local with a note if those are missing; "
                          "set POC_REQUIRE_CONTREE=1 to refuse instead)")
+    ap.add_argument("--require-contree", action="store_true",
+                    help="set only by hosted product routes (GitHub App, hosted console, request worker): run "
+                         "pull-request code only in Contree. If Contree cannot start, the check stops with "
+                         "'Contree unavailable' (could not verify) instead of running locally. Implies "
+                         "--sandbox-backend contree. The CLI and the study never set it.")
     ap.add_argument("--recorded-dir", default=None,
                     help="recorded model responses (default: evals/fixtures/model_responses)")
     ap.add_argument("--no-coverage", action="store_true",
@@ -6198,6 +6314,9 @@ def _main(argv=None) -> int:
     ap.add_argument("--ids", default=None, help="with --bench: comma-separated case IDs (default: all), e.g. B01,B14")
     ap.add_argument("--bench-out", default=None, help="with --bench: result folder (default: runs/bench-v0)")
     a = ap.parse_args(argv)
+    if both_sandbox_flags_refusal(a):
+        print(both_sandbox_flags_refusal(a), file=sys.stderr)
+        raise SystemExit(1)
     refused = batch_order_refusal(a)
     if refused:
         ap.error(refused)
@@ -6229,11 +6348,17 @@ def _main(argv=None) -> int:
         a.poc_commit = resolve_poc_commit(REPO_ROOT)
     sandbox.configure(not a.unsafe_no_sandbox)
     from poc import contree_sandboxes
-    try:
-        a.sandbox_backend, a.sandbox_backend_note = contree_sandboxes.select(a.sandbox_backend)
-    except contree_sandboxes.ContreeError as e:
-        print(str(e), file=sys.stderr)
-        raise SystemExit(1)
+    if getattr(a, "require_contree", False):
+        stop = contree_required_refusal(a)
+        if stop:
+            print(stop, file=sys.stderr)
+            raise SystemExit(1)
+    else:
+        try:
+            a.sandbox_backend, a.sandbox_backend_note = contree_sandboxes.select(a.sandbox_backend)
+        except contree_sandboxes.ContreeError as e:
+            print(str(e), file=sys.stderr)
+            raise SystemExit(1)
     if a.sandbox_backend_note and a.sandbox_backend == "local" and "contree requested" in a.sandbox_backend_note:
         print(f"note: {a.sandbox_backend_note}", file=sys.stderr)
     a.provider, a.model_note = model_provider.select(
