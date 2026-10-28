@@ -4160,14 +4160,20 @@ def verdict_for(cmp: dict | None, cnv_reason: str | None, exits: dict | None = N
         return (Verdict.COULD_NOT_VERIFY.value,
                 f"could not verify: claim(s) {shown}{extra} expect a difference but no observation matches ({reason})",
                 fl + ["unmatched_differs_claim"])
-    advisory = sorted({str(it.get("id")) for it in (probe_results or {}).get("items") or []
-                       for o in it.get("observations") or [] if o.get("advisory")})
-    if advisory and v == Verdict.VERIFIED.value:
-        # A claim-less probe saw a difference nobody claimed. It does not raise needs attention, but it is
-        # unexplained, so the PR cannot be verified either.
+    adv_items = [it for it in (probe_results or {}).get("items") or []
+                 if any(o.get("advisory") for o in it.get("observations") or [])]
+    if adv_items and v == Verdict.VERIFIED.value:
+        # A probe saw a difference nobody claimed. It does not raise needs attention, but it is unexplained, so the
+        # PR cannot be verified either. A probe that links claims is named by its uncovered differences instead.
+        bare = sorted(str(it.get("id")) for it in adv_items if not it.get("claims"))
+        names = [f"{it.get('id')} {o.get('name')}" for it in adv_items if it.get("claims")
+                 for o in it.get("observations") or [] if o.get("advisory")]
+        bits = ([f"probe(s) {', '.join(bare)} have no linked claims and saw a difference no claim covers"] * bool(bare)
+                + [f"difference(s) no linked claim covers ({', '.join(names[:4])}"
+                   + (f" +{len(names) - 4} more" if len(names) > 4 else "") + ")"] * bool(names))
         return (Verdict.COULD_NOT_VERIFY.value,
-                f"could not verify: probe(s) {', '.join(advisory)} have no linked claims and saw a difference no "
-                f"claim covers, so the change is not confirmed ({reason})", fl + ["advisory_unclaimed_difference"])
+                f"could not verify: {'; '.join(bits)}, so the change is not confirmed ({reason})",
+                fl + ["advisory_unclaimed_difference"])
     if hygiene and hygiene.get("held_back") and v == Verdict.VERIFIED.value:
         return (Verdict.COULD_NOT_VERIFY.value,
                 f"could not verify: claim(s) {', '.join(hygiene['held_back'][:4])} expect a difference but no "

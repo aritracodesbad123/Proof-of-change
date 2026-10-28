@@ -27,8 +27,44 @@ advisory exactly as today. No guard test is weakened and no uncovered difference
 
 ## Tests
 
-`tests/test_unlinked_retry_claim_ids.py` uses the saved #4147 probe code and record (claim C1, probe model-p1 with
-`claims: []`) under `tests/fixtures/unlinked_retry/`. With a stubbed retry naming C1 the probe ends up linked to C1,
-and re-judging the saved runs still does not give `verified`. A retry naming no claim keeps the first answer and the
-differences advisory. Retries with an unlinked probe, an unknown claim id, or fewer probes are not kept. No live
-checks were run and no search credits were spent.
+`tests/test_unlinked_retry_claim_ids.py` uses the saved #4147 probe code and record (claims C1 and C2, probe
+model-p1 with `claims: []`) under `tests/fixtures/unlinked_retry/`. Verdicts are recomputed with
+`ops/daily_run.rejudge_probes` and `verdict_for` from the saved probe runs and test comparison. `final_verdict.final`
+returns a gated record unchanged, so it cannot test a re-judge. The tests check the exact verdict and reason:
+
+- unlinked (as saved): could_not_verify, "probe(s) model-p1 have no linked claims ...";
+- C1 covering `c1.*` only: could_not_verify (`advisory_unclaimed_difference`), naming the uncovered `c2.*`
+  differences;
+- every difference covered: verified.
+
+The retry tests check four cases:
+
+- A stubbed retry naming C1 is kept and links C1.
+- A retry naming no claim keeps the first answer, so the differences stay advisory.
+- Retries with an unlinked probe, an unknown claim id, or fewer probes are not kept.
+- The #177 cover retry still rejects a retry that does not leave fewer unmatched covers.
+
+No live checks were run and no search credits were spent.
+
+## Reason text for linked probes
+
+When a probe links claims but some of its differences fall outside its covers and are advisory, `verdict_for`
+(and the probe summary) now name those differences ("difference(s) no linked claim covers (model-p1
+c2.adjacent_spans, ...)") instead of saying the probe has no linked claims. The verdict and the
+`advisory_unclaimed_difference` flag are unchanged, and `_keep_advisory` is unchanged. A probe with no claims keeps
+the old text.
+
+## What this means for rich #4147
+
+Linking alone cannot flip #4147. Tonight's probe records the same inputs twice, under `c1.*` and under `c2.*`.
+Linking C1 to `c1.*` proves C1 and leaves the `c2.*` copies as uncovered advisory differences, so the check stays
+could_not_verify. Those `c2.*` differences are inputs the fix is meant to change. Reading them as a broken "same"
+claim would be a false alarm, so no "every same claim must be named" rule was added.
+
+None of the saved #4147 copies is a confirmed catch:
+
+- rerun-final's needs_attention was a false alarm. Its claim C4 expected a brand-new regression test to "pass" on
+  both sides, and the test cannot pass on main.
+- live140's needs_attention (`C2.space_after` lost its tag highlighting) needs human review before it counts.
+
+Expect more `retried.kept_first_answer` outcomes, where the retry is not kept and the differences stay advisory.
