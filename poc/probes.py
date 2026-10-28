@@ -446,6 +446,40 @@ def _shape_link(out: list[dict]) -> None:
             r["advisory"], r["linked_by"], r["note"] = True, "shape", SHAPE_NOTE
 
 
+SIBLING_NOTE = "the same difference is proven by a claim in another probe, check"
+
+
+def _value_key(r: dict) -> tuple:
+    return (r.get("name"), json.dumps(r.get("main"), sort_keys=True, default=str),
+            json.dumps(r.get("pr"), sort_keys=True, default=str))
+
+
+def link_across_probes(items: list[dict]) -> list[dict]:
+    """Probes of one PR often print each other's observations. An unclaimed difference, or one that contradicts a
+    "same" claim, is advisory ("the same difference is proven by a claim in another probe, check") when another
+    probe of the same PR proves a claimed difference with the same name and the same base and PR values. It caps the
+    verdict at could_not_verify instead of raising attention. Differences unstable only on the PR are never linked.
+    Returns new items; the input is not changed."""
+    proven: dict = {}
+    for it in items:
+        for r in it.get("observations") or []:
+            if r.get("label") == FindingLabel.PROVEN.value and r.get("state") == "differs" and r.get("claim"):
+                proven.setdefault(_value_key(r), set()).add(it.get("id"))
+    if not proven:
+        return items
+    out = []
+    for it in items:
+        obs = []
+        for r in it.get("observations") or []:
+            if (r.get("label") in (FindingLabel.UNMENTIONED_CHANGE.value, FindingLabel.FALSE_CLAIM.value)
+                    and r.get("state") == "differs" and not r.get("advisory") and not r.get("pr_only")
+                    and proven.get(_value_key(r), set()) - {it.get("id")}):
+                r = dict(r, advisory=True, linked_by="sibling", note=SIBLING_NOTE)
+            obs.append(r)
+        out.append(dict(it, observations=obs))
+    return out
+
+
 def run_once(path: Path, python: Path, cwd: Path, env: dict, timeout: int, launch=None,
              literal_output: bool = False) -> tuple[dict, str, float]:
     """launch(argv, env, cwd) -> (argv, env, cwd) wraps the command, e.g. into the sandbox (guardrails/sandbox.py)."""
@@ -610,7 +644,7 @@ def apply_status(probe_results: dict | None) -> dict | None:
     """Set each item's status and the overall status. Overall is uninformative only when every item is."""
     if not probe_results or not probe_results.get("items"):
         return probe_results
-    items = [classify_item(it) for it in probe_results["items"]]
+    items = link_across_probes([classify_item(it) for it in probe_results["items"]])
     statuses = [it.get("status") for it in items]
     if any(s == "ran" for s in statuses):
         status = "ran"

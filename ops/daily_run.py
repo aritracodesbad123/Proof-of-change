@@ -7217,6 +7217,7 @@ def rejudge_probes(pr_probes: dict | None, product_check: bool = False) -> dict 
     items = [probes.rejudge_entry(it) for it in pr_probes["items"]]
     if product_check:
         items = [_keep_advisory(old, new) for old, new in zip(pr_probes["items"], items)]
+    items = probes.link_across_probes(items)
     return dict(pr_probes, items=items, summary=probes.summarize(items))
 
 
