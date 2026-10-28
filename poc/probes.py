@@ -790,7 +790,17 @@ def summarize(items: list[dict]) -> dict:
     if warning_only:
         bits.append(f"probe: {len(warning_only)} warning-only difference(s) not counted on their own")
     if advisory:
-        bits.append(f"probe: {len(advisory)} difference(s) from a probe with no linked claims shown as advisory only")
+        # A probe that links claims can still carry advisory differences (a mark kept from the run that wrote the
+        # record, or a link by id, shape or sibling). Name those differences rather than say it has no linked claims.
+        linked = {it["id"] for it in items if it.get("claims")}
+        bare = [o for o in advisory if o["probe"] not in linked]
+        named = [o for o in advisory if o["probe"] in linked]
+        if bare:
+            bits.append(f"probe: {len(bare)} difference(s) from a probe with no linked claims shown as advisory only")
+        if named:
+            bits.append(f"probe: {len(named)} difference(s) no linked claim covers, shown as advisory only: "
+                        + ", ".join(o["name"] for o in named[:4]) + (f" (+{len(named) - 4} more)" if len(named) > 4
+                                                                     else ""))
     if unchanged_sub:
         bits.append(f"probe: {len(unchanged_sub)} unchanged sub-check(s) of an input where the claim's change was seen, shown as "
                     "advisory only: " + "; ".join(f"{o['name']} ({o['claim']})" for o in unchanged_sub[:4]))

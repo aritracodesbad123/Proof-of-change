@@ -404,10 +404,12 @@ def _names_per_claim(probes: list) -> dict:
     return got
 
 
-def retry_weakens(first: list, retry: list) -> str | None:
+def retry_weakens(first: list, retry: list, covers_must_drop: bool = True) -> str | None:
     """Why a retry answer is not kept, or None. Kept only when it has (a) at least as many usable probes,
     (b) for each claim at least as many matched observation names, and (c) fewer unmatched covers, where a
-    cover that is only the claim id counts as unmatched, so swapping a real name for "C1.*" is no gain."""
+    cover that is only the claim id counts as unmatched, so swapping a real name for "C1.*" is no gain.
+    covers_must_drop=False skips (c) only; the unlinked retry uses it, as a first answer with no linked claim
+    has no covers that could drop."""
     if len(retry) < len(first):
         return "the retry had fewer usable probes"
     n1, n2 = _names_per_claim(first), _names_per_claim(retry)
@@ -415,13 +417,32 @@ def retry_weakens(first: list, retry: list) -> str | None:
     if lost:
         return "the retry matched fewer observation names for " + ", ".join(lost)
     strict = lambda ps: sum(len(unmatched_covers(q, id_covers_count=True)) for q in ps)  # noqa: E731
-    if strict(retry) >= strict(first):
+    if covers_must_drop and strict(retry) >= strict(first):
         return "the retry did not leave fewer unmatched covers"
     return None
 
 
 def _linked_ids(probes: list) -> set:
     return {c.get("id") for q in probes for c in q.get("claims") or [] if isinstance(c, dict)}
+
+
+def unlinked_retry_rule(claims: list) -> str:
+    """The retry text for probes that linked no claim: the testable claims with their ids, and the rule that every
+    probe names at least one of those ids."""
+    listed = "\n".join(f"- {c.get('id')} (expect {c.get('expect')}): {c.get('text')}" for c in claims)
+    return ("The testable claims, with their ids, are:\n" + listed + "\nEvery probe must list at least one of these "
+            "claim ids in its \"claims\", with the observation names that cover it. Follow the coverage rule: write at "
+            "least one probe per testable claim.")
+
+
+def unlinked_retry_weakens(first: list, retry: list, claim_ids: set) -> str | None:
+    """Why the retry for probes that linked no claim is not kept, or None. Every usable probe must name at least one
+    known claim id, and the #177 rules (retry_weakens) still apply."""
+    if not retry or not _linked_ids(retry) & claim_ids:
+        return "the retry linked no claim either"
+    if any(not {c.get("id") for c in q.get("claims") or [] if isinstance(c, dict)} & claim_ids for q in retry):
+        return "a retry probe named no claim id"
+    return retry_weakens(first, retry, covers_must_drop=False)
 
 
 PARSE_REPAIR_TRIES = 2   # fixed cap on repair calls for probes whose code does not parse; model calls only
@@ -785,19 +806,22 @@ def generate(provider: Provider, repo: str, pr: int, title: str, body: str | Non
         # Testable claims exist but no probe says which claim it checks. Its differences would then all look
         # unclaimed. Ask once more (same gate, same BASE-side inputs); keep the first answer unless the retry is
         # usable and links at least one claim, so no probe is lost.
+        # The retry is sent the claim list with its ids and must name at least one of them in every probe. Links
+        # come only from the model's own answer; nothing here links a probe to a claim by name or any other guess.
         out["retried"] = {"why": [UNLINKED_REASON]}
-        retry_user = (user + "\n\nYour previous answer had probes, but " + UNLINKED_REASON
-                      + ". Follow the coverage rule: write at least one probe per testable claim.")
+        retry_user = (user + "\n\nYour previous answer had probes, but " + UNLINKED_REASON + ". "
+                      + unlinked_retry_rule(testable))
         try:
             again = provider.complete_json("probes", probes_prompt, retry_user, PROBES_SCHEMA, ctx)
         except ProviderError as e:
             out["errors"].append(f"retry: {e}")
         else:
-            linked = [p for p in _usable(again, set(by_id)) if p.get("claims")]
-            if linked:
+            usable2 = _usable(again, set(by_id))
+            weak = unlinked_retry_weakens(usable, usable2, set(by_id))
+            if weak is None:
                 resp = again
             else:
-                out["retried"]["kept_first_answer"] = "the retry linked no claim either"
+                out["retried"]["kept_first_answer"] = weak
     elif by_id:
         # Claims are linked, but a cover names no observation the code records. Its claim would then see nothing
         # and the differences under the real names would look unclaimed. Ask once more; keep the retry only when
