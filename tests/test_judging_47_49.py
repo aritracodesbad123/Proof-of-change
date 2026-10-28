@@ -172,3 +172,23 @@ def test_unclaimed_difference_shaped_like_a_proven_sibling_is_advisory():
     lone = {o["name"]: o for o in pr.judge({**spec, "claims": []},
                                            {"main": [main] * 3, "pr": [prs] * 3})}
     assert not lone["c2.set_true"].get("advisory")
+
+
+def test_advisory_difference_alone_caps_at_could_not_verify():
+    # Everything passes: tests clean, the probe is adequate and proves its claim. The only flag is an advisory
+    # difference, linked by shape (c2) or by id (c1.extra). It must be could_not_verify, never verified.
+    from evals.checks import derive_verdict
+    claims = [{"id": "C1", "covers": ["c1.accepted"], "expect": "differs", "text": "accepts the new setting"}]
+    shape = _item(claims, {"c1.accepted": "TypeError", "c2.set_true": "TypeError"},
+                  {"c1.accepted": None, "c2.set_true": True})
+    by_id = _item(claims, {"c1.accepted": "TypeError", "c1.extra": 1}, {"c1.accepted": None, "c1.extra": 2})
+    for it, how in ((shape, "probably the claimed change, check"), (by_id, "linked by claim id, check")):
+        adv = [o for o in it["observations"] if o.get("advisory")]
+        assert len(adv) == 1 and all(o["label"] != "proven" for o in adv)
+        rec = {"comparison": _cmp(), "baseline": "tests+probes", "reason": "",
+               "coverage": {"status": "measured", "changed_lines_covered": 1, "changed_lines_total": 1},
+               "probes": {"status": "ran", "items": [it]}}
+        assert derive_verdict(rec, "tests+probes") == "could_not_verify"
+        live = dr.gate({**rec, "verdict": VER, "reason": "tests pass"})
+        assert live["verdict"] == "could_not_verify" and how in live["reason"]
+        assert dr.advisory_gate({**rec, "verdict": "needs_attention"})["verdict"] == "needs_attention"

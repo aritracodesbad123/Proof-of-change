@@ -56,3 +56,7 @@ If a run has probes, every probe ran 0 changed lines on the main side, and the t
 ## Follow-up: fix 49, same shape as a proven sibling
 
 An unclaimed difference whose shape matches a proven claimed sibling in the same probe (the same main-side exception type turning into a value on the PR side) is advisory, with the note "probably the claimed change, check" (`linked_by: "shape"`). It stays labelled unmentioned and visible, and advisory observations still hold a verified run at could_not_verify. A difference of any other shape, or one with no proven sibling, still flags.
+
+## Follow-up: an advisory difference caps the check at could_not_verify
+
+Any advisory difference, linked by claim id or by shape, caps the check at could_not_verify, and its note is shown in the reason ("linked by claim id, check" or "probably the claimed change, check"). It can stop a check being needs_attention but can never make it verified. `advisory_gate` runs last in `gate()` (before the rewrite cap) and in `derive_verdict`. Test: an advisory difference as the only flag, with everything else passing.
