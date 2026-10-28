@@ -281,12 +281,13 @@ def _name_ids(spec: dict, name: str) -> list[str]:
     """The claim ids an observation name starts with, lower case, or [] when it starts with none.
 
     The first dot-separated segment is read; when it is only this probe's own name ("probe1" for probe
-    "model-probe1"), the next one is. The segment's leading "_"/"-" separated parts that look like ids are the ids
+    "model-probe1") and that name is not also one of its claim ids ("model-c4" with claim C4), the next one is. The segment's leading "_"/"-" separated parts that look like ids are the ids
     ("c1_c2" -> c1, c2; "C1_x" -> c1). Something must follow them (a separator or more text): a bare "c1" is not a
     link."""
     segs = name.split(".")
     own = str(spec.get("id") or "").lower().removeprefix("model-")
-    if own and len(segs) > 1 and segs[0].lower() == own:
+    claim_ids = {str(c.get("id") or "").lower() for c in spec.get("claims") or [] if isinstance(c, dict)}
+    if own and len(segs) > 1 and segs[0].lower() == own and own not in claim_ids:
         segs = segs[1:]
     parts = re.split(r"[_-]", segs[0])
     ids = []

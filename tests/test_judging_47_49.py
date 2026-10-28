@@ -213,3 +213,11 @@ def test_other_probes_name_prefix_is_not_skipped():
     claims = [{"id": "C1", "covers": ["C1.ok"], "expect": "differs", "text": "one"}]
     it = _item(claims, {"C1.ok": 1, "probe7.c1.x": 1}, {"C1.ok": 2, "probe7.c1.x": 2}, pid="model-probe1")
     assert _verdict(it)[0] == NA
+
+
+def test_probe_named_like_its_claim_still_links_by_that_id():
+    claims = [{"id": "C4", "covers": ["C4.ok"], "expect": "differs", "text": "four"}]
+    it = _item(claims, {"C4.ok": 1, "C4.Update_available": "ImportError"}, {"C4.ok": 2, "C4.Update_available": "ok"},
+               pid="model-c4")
+    obs = {o["name"]: o for o in it["observations"]}
+    assert obs["C4.Update_available"].get("linked_by") == "id"
