@@ -8,8 +8,9 @@ Product checks only (`poc/boundary_probes.py`, called from `model_probes.generat
 
 - **Trigger.** The rule fires only when the PR diff edits an existing pattern in a source file: a removed line and
   an added line of the same hunk each hold a pattern literal, and the two are similar enough to be one pattern
-  edited. A brand-new pattern never fires, and neither do test files, non-Python files or a pattern that is only
-  re-wrapped.
+  edited. A brand-new pattern never fires. Adjacent string literals are joined first, so a pattern only re-wrapped
+  or split across literals stays silent. Test files (by name or by folder, such as a helper in a tests folder) and
+  non-Python files are ignored.
 - **Prompt.** When it fires, the probes prompt gets one more paragraph. It names the pattern by its base-side file,
   line and old text only, and asks for at least one probe on inputs just past the old match boundary: the match
   followed by a space, by other text, by a newline with text after it (`"<Widget>\nnext"`; a bare trailing newline
@@ -32,11 +33,14 @@ This rule asks for that kind of input every time an existing pattern is edited.
 
 - Fires on the saved diff that edits the tag pattern (line 85 of the highlighter module). Stays silent on the saved
   diff that adds a new keyword pattern with a lookahead.
-- A fixture is copied unchanged from the saved catch. Judged again from its runs, the trailing-space observation is
+- A fixture keeps 2 of the saved catch's 8 observations (the plain tag and the trailing space), copied unchanged
+  with all 3 runs per side. Judged again from its runs, the trailing-space observation is
   false_claim (red) and the plain tag is proven.
 - Mutations: each rule broken in turn makes a test fail. These covered the trigger (a new pattern fires, any
-  similarity counts, test files counted), the prompt (boundary wording or the newline-with-text form removed), the
-  exclusion (test re-runs allowed, test names ignored) and the wiring (the rule added to study runs).
+  similarity counts, test files counted, the folder check off, literals not joined), the
+  prompt (boundary wording or the newline-with-text form removed), the
+  exclusion (test re-runs allowed, test names ignored) and the wiring (the rule added to study runs, the
+  edited patterns not copied to the probe plan).
 - The rule changes only the prompt, so judging and verdicts on saved records are unchanged. A re-score of the 72
   saved records with `final()` gives the same counts as main.
 

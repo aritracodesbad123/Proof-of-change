@@ -11,7 +11,8 @@ Rules:
 1. modified_patterns(diff): the trigger. It fires only when the diff REPLACES an existing pattern in a source file:
    a removed line and an added line of the same hunk each hold a pattern literal, and the two patterns are close
    enough to be the same pattern edited. A brand-new pattern (an added line with no removed pattern it replaces)
-   never fires. Test files and non-Python files are ignored.
+   never fires, and neither does a re-wrap: adjacent string literals are joined first, so a pattern only split
+   across literals or lines is the same pattern. Test files (by name or by folder) and non-Python files are ignored.
 2. probe_rule(modified, claims): the extra probes-prompt paragraph. It names each modified pattern by its BASE-side
    file, line and old text only (never the new text: probes are written from the PR text and base-side code), and
    asks for observations on inputs just past the old match boundary, including the "<Widget>\\nnext" form (text
@@ -31,23 +32,33 @@ import re
 
 from poc import claim_hygiene
 
-# A pattern literal: a raw string, or a string passed straight to a re function, holding at least one regex token.
-_RAW = re.compile(r"""\b[rR][bB]?(?P<q>['"])(?P<s>(?:\\.|(?!(?P=q)).)*)(?P=q)""")
-_RE_CALL = re.compile(r"""\bre\.(?:compile|match|search|fullmatch|findall|finditer|sub|subn|split)\(\s*[bB]?(?P<q>['"])"""
-                      r"""(?P<s>(?:\\.|(?!(?P=q)).)*)(?P=q)""")
+# String literals. Adjacent literals (only spaces, newlines, comments or a line continuation between them) are one
+# string to Python, so they are joined before anything is compared: splitting a pattern across two literals is a
+# re-wrap, not an edit.
+_LIT = re.compile(r"""(?P<p>[rRbBuU]{0,2})(?P<q>['"])(?P<s>(?:\\.|(?!(?P=q)).)*)(?P=q)""")
+_GAP = re.compile(r"(?:\s|\\\n|#[^\n]*)*\Z")
+_RE_CALL = re.compile(r"\bre\.(?:compile|match|search|fullmatch|findall|finditer|sub|subn|split)\(\s*\Z")
 _REGEX_TOKEN = re.compile(r"\\[wdsbWDSBAZ]|\(\?|[*+?]\)?|\[[^\]]*\]|\|")
 SIMILAR = 0.6
 _HUNK = re.compile(r"^@@ -(\d+)(?:,\d+)? \+\d+(?:,\d+)? @@")
 _TEST_NAME = re.compile(r"^\+\s*(?:async\s+)?def\s+(test\w*)\s*\(", re.M)
 
 
-def _patterns(line: str) -> list[str]:
+def _patterns(lines: list[str]) -> list[tuple[int, str]]:
+    """Pattern literals in some lines of code, adjacent literals joined: [(index of the first line, text)]. A pattern
+    is a joined literal holding a regex token that is raw, or passed straight to a re function."""
+    text = "\n".join(lines)
+    runs: list[list] = []   # [start, end, text, raw]
+    for m in _LIT.finditer(text):
+        raw = "r" in m.group("p").lower()
+        if runs and _GAP.match(text[runs[-1][1]:m.start()]):
+            runs[-1][1:] = [m.end(), runs[-1][2] + m.group("s"), runs[-1][3] or raw]
+        else:
+            runs.append([m.start(), m.end(), m.group("s"), raw])
     out = []
-    for rx in (_RAW, _RE_CALL):
-        for m in rx.finditer(line):
-            s = m.group("s")
-            if _REGEX_TOKEN.search(s) and s not in out:
-                out.append(s)
+    for start, _end, s, raw in runs:
+        if (raw or _RE_CALL.search(text[:start])) and _REGEX_TOKEN.search(s) and s not in [x for _, x in out]:
+            out.append((text.count("\n", 0, start), s))
     return out
 
 
@@ -98,15 +109,14 @@ def modified_patterns(diff: str | None) -> list[dict]:
     for path, removed, added in _hunks(diff or ""):
         if not _is_source(path):
             continue
-        new = [p for line in added for p in _patterns(line)]
+        new = [x for _, x in _patterns(added)]
         if not new:
             continue
-        for no, line in removed:
-            for old in _patterns(line):
-                if old in new:   # unchanged pattern on a re-indented or re-wrapped line
-                    continue
-                if any(difflib.SequenceMatcher(None, old, n).ratio() >= SIMILAR for n in new):
-                    out.append({"file": path, "line": no, "old": old})
+        for i, old in _patterns([t for _, t in removed]):
+            if old in new:   # the same pattern, only re-indented, re-wrapped or split across literals
+                continue
+            if any(difflib.SequenceMatcher(None, old, n).ratio() >= SIMILAR for n in new):
+                out.append({"file": path, "line": removed[i][0], "old": old})
     return out
 
 

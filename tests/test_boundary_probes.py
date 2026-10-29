@@ -55,7 +55,20 @@ def test_unchanged_pattern_on_a_rewrapped_line_does_not_fire():
     assert bp.modified_patterns(d) == []
 
 
-@pytest.mark.parametrize("path", ["tests/test_lex.py", "pkg/test_lex.py", "pkg/conftest.py", "README.md"])
+def test_pattern_split_across_adjacent_literals_stays_silent():
+    d = _diff("pkg/lex.py", ["    P = re.compile(r'<(\\w+)>[\\w\\W]*</\\1>')"],
+              ["    P = re.compile(r'<(\\w+)>'", "                   r'[\\w\\W]*</\\1>')"])
+    assert bp.modified_patterns(d) == []
+    one_line = _diff("pkg/lex.py", ["P = (r'a[\\w\\W]*' r'b')"], ["P = (r'a[\\w\\W]*b')"])
+    assert bp.modified_patterns(one_line) == []
+    # an edit hidden in the split is still an edit
+    edited = _diff("pkg/lex.py", ["    P = re.compile(r'<(\\w+)>[\\w\\W]*</\\1>')"],
+                   ["    P = re.compile(r'<(\\w+)>'", "                   r'[\\w\\W]*?</\\1>(?=\\s|$)')"])
+    assert [m["old"] for m in bp.modified_patterns(edited)] == [r"<(\w+)>[\w\W]*</\1>"]
+
+
+@pytest.mark.parametrize("path", ["tests/helpers.py", "pkg/testing/util.py", 
+                                  "tests/test_lex.py", "pkg/test_lex.py", "pkg/conftest.py", "README.md"])
 def test_patterns_in_tests_and_non_python_files_are_ignored(path):
     d = _diff(path, ["P = r'a[\\w\\W]*b'"], ["P = r'a[\\w\\W]*?b'"])
     assert bp.modified_patterns(d) == []
@@ -145,6 +158,27 @@ def test_generate_adds_the_rule_on_a_product_check_with_an_edited_pattern(tmp_pa
     prompt, res = _gen(tmp_path, EDITED, True)
     assert prompt.endswith(bp.probe_rule(EDITED, [dict(c, source_quote=BODY) for c in SAVED["claims_extracted"]]))
     assert res["boundary_rule"] == bp.modified_patterns(EDITED)
+
+
+def test_plan_probes_records_the_boundary_rule(tmp_path, monkeypatch):
+    import types
+
+    from ops import daily_run
+    seen = {}
+
+    def fake_generate(*args, **kw):
+        seen["diff"] = kw.get("diff")
+        return {"probes": [], "claims": [], "rejected_claims": [], "errors": [],
+                "boundary_rule": bp.modified_patterns(kw.get("diff"))}
+    monkeypatch.setattr(model_probes, "generate", fake_generate)
+    monkeypatch.setattr(daily_run.probes, "find_probes", lambda *x: [])
+    item = {"pr": 1, "title": "Fix tags", "body": BODY, "files": {"all": []}, "diff": EDITED}
+    a = types.SimpleNamespace(baseline=None, model_note=None, provider=object(), product_check=True, pr=1,
+                              bench=None, no_probes=False)
+    rec = {}
+    daily_run.plan_probes("o/r", item, rec, tmp_path, [], tmp_path, a)
+    assert seen["diff"] == EDITED
+    assert rec["probe_plan"]["model_boundary_rule"] == bp.modified_patterns(EDITED)
 
 
 @pytest.mark.parametrize("diff,product", [(ADDED, True), (None, True), (EDITED, False)])
