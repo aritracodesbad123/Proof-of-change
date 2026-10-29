@@ -55,6 +55,14 @@ def test_unchanged_pattern_on_a_rewrapped_line_does_not_fire():
     assert bp.modified_patterns(d) == []
 
 
+def test_plain_string_outside_a_re_call_is_not_a_pattern():
+    d = _diff("pkg/fmt.py", ['SEP = "a|b"'], ['SEP = "a|c"'])
+    assert bp.modified_patterns(d) == []
+    # the same literal passed straight to a re function is a pattern
+    d = _diff("pkg/fmt.py", ['SEP = re.compile("a|b")'], ['SEP = re.compile("a|c")'])
+    assert [m["old"] for m in bp.modified_patterns(d)] == ["a|b"]
+
+
 def test_pattern_split_across_adjacent_literals_stays_silent():
     d = _diff("pkg/lex.py", ["    P = re.compile(r'<(\\w+)>[\\w\\W]*</\\1>')"],
               ["    P = re.compile(r'<(\\w+)>'", "                   r'[\\w\\W]*</\\1>')"])
