@@ -218,3 +218,12 @@ def test_rule_stays_silent_on_every_safe_case(case):
     d = _safe_diff(case)
     assert d.startswith("diff --git")
     assert bp.modified_patterns(d) == [] and bp.probe_rule(d, []) == ""
+
+
+@pytest.mark.parametrize("case", sorted(set(FIXED_SAFE) | set(BENCH_SAFE)))
+def test_seeded_boundary_claim_stays_silent_on_every_safe_case(case):
+    """poc/boundary_claims seeds nothing on a safe case, even with a claim that says behaviour is preserved."""
+    from poc import boundary_claims
+    d = _safe_diff(case)
+    claim = {"id": "C1", "text": "Fixes the bug while preserving existing behavior.", "testable": True}
+    assert boundary_claims.seed([claim], bp.modified_patterns(d), bp.pr_test_names(d)) == []
