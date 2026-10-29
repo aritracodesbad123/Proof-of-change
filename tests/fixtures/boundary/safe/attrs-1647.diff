@@ -1,0 +1,317 @@
+diff --git a/changelog.d/1647.change.md b/changelog.d/1647.change.md
+new file mode 100644
+index 000000000..f6d2033a1
+--- /dev/null
++++ b/changelog.d/1647.change.md
+@@ -0,0 +1 @@
++`attrs.astuple()` and `attr.astuple()` now recurse into collections that are nested inside other collections, so *attrs* classes that are nested deeper than one collection are converted into tuples -- just like `attrs.asdict()` does.
+diff --git a/src/attr/_funcs.py b/src/attr/_funcs.py
+index c88c175a1..4225c188c 100644
+--- a/src/attr/_funcs.py
++++ b/src/attr/_funcs.py
+@@ -243,7 +243,8 @@ def astuple(
+         inst: Instance of an *attrs*-decorated class.
+ 
+         recurse (bool):
+-            Recurse into classes that are also *attrs*-decorated.
++            Recurse into classes that are also *attrs*-decorated -- including
++            those that are nested inside collections.
+ 
+         filter (~typing.Callable):
+             A callable whose return code determines whether an attribute or
+@@ -268,6 +269,10 @@ def astuple(
+             If *cls* is not an *attrs* class.
+ 
+     ..  versionadded:: 16.2.0
++    ..  versionchanged:: 26.2.0
++        Collections nested inside collections are recursed into now -- just
++        like `attrs.asdict` does -- so *attrs* classes that are nested deeper
++        than one collection are serialized as tuples, too.
+     """
+     attrs = fields(inst.__class__)
+     rv = []
+@@ -293,16 +298,12 @@ def astuple(
+             elif issubclass(value_type, (tuple, list, set, frozenset)):
+                 cf = v.__class__ if retain is True else list
+                 items = [
+-                    (
+-                        astuple(
+-                            j,
+-                            recurse=True,
+-                            filter=filter,
+-                            tuple_factory=tuple_factory,
+-                            retain_collection_types=retain,
+-                        )
+-                        if type(j) not in _ATOMIC_TYPES and has(j.__class__)
+-                        else j
++                    _astuple_anything(
++                        j,
++                        is_key=False,
++                        filter=filter,
++                        tuple_factory=tuple_factory,
++                        retain_collection_types=retain,
+                     )
+                     for j in v
+                 ]
+@@ -319,23 +320,19 @@ def astuple(
+                 rv.append(
+                     df(
+                         (
+-                            (
+-                                astuple(
+-                                    kk,
+-                                    tuple_factory=tuple_factory,
+-                                    retain_collection_types=retain,
+-                                )
+-                                if has(kk.__class__)
+-                                else kk
++                            _astuple_anything(
++                                kk,
++                                is_key=True,
++                                filter=filter,
++                                tuple_factory=tuple_factory,
++                                retain_collection_types=retain,
+                             ),
+-                            (
+-                                astuple(
+-                                    vv,
+-                                    tuple_factory=tuple_factory,
+-                                    retain_collection_types=retain,
+-                                )
+-                                if has(vv.__class__)
+-                                else vv
++                            _astuple_anything(
++                                vv,
++                                is_key=False,
++                                filter=filter,
++                                tuple_factory=tuple_factory,
++                                retain_collection_types=retain,
+                             ),
+                         )
+                         for kk, vv in v.items()
+@@ -349,6 +346,84 @@ def astuple(
+     return rv if tuple_factory is list else tuple_factory(rv)
+ 
+ 
++def _astuple_anything(
++    val,
++    is_key,
++    filter,
++    tuple_factory,
++    retain_collection_types,
++):
++    """
++    ``astuple`` only works on attrs instances, this works on anything.
++    """
++    val_type = type(val)
++    if val_type in _ATOMIC_TYPES:
++        rv = val
++    elif has(val_type):
++        rv = astuple(
++            val,
++            recurse=True,
++            filter=filter,
++            tuple_factory=tuple_factory,
++            retain_collection_types=retain_collection_types,
++        )
++    elif issubclass(val_type, (tuple, list, set, frozenset)):
++        if retain_collection_types is True:
++            cf = val.__class__
++        elif is_key:
++            cf = tuple
++        else:
++            cf = list
++
++        items = [
++            _astuple_anything(
++                i,
++                is_key=False,
++                filter=filter,
++                tuple_factory=tuple_factory,
++                retain_collection_types=retain_collection_types,
++            )
++            for i in val
++        ]
++        try:
++            rv = cf(items)
++        except TypeError:
++            if not issubclass(cf, tuple):
++                raise
++            # Workaround for TypeError: cf.__new__() missing 1 required
++            # positional argument (which appears, for a namedtuple)
++            rv = cf(*items)
++    elif issubclass(val_type, dict):
++        df = val.__class__ if retain_collection_types is True else dict
++        mapping = {
++            _astuple_anything(
++                kk,
++                is_key=True,
++                filter=filter,
++                tuple_factory=tuple_factory,
++                retain_collection_types=retain_collection_types,
++            ): _astuple_anything(
++                vv,
++                is_key=False,
++                filter=filter,
++                tuple_factory=tuple_factory,
++                retain_collection_types=retain_collection_types,
++            )
++            for kk, vv in val.items()
++        }
++        try:
++            rv = df(mapping)
++        except TypeError:
++            # Not every mapping can be built from a mapping object, e.g.
++            # `defaultdict`.  Fall back to a plain dict, just like `asdict`
++            # does.
++            rv = mapping
++    else:
++        rv = val
++
++    return rv
++
++
+ def has(cls):
+     """
+     Check whether *cls* is a class with *attrs* attributes.
+diff --git a/tests/test_funcs.py b/tests/test_funcs.py
+index f35a9a564..b4b921728 100644
+--- a/tests/test_funcs.py
++++ b/tests/test_funcs.py
+@@ -6,7 +6,7 @@
+ 
+ import re
+ 
+-from collections import OrderedDict
++from collections import OrderedDict, defaultdict
+ from typing import Generic, NamedTuple, TypeVar
+ 
+ import pytest
+@@ -409,6 +409,127 @@ def test_dicts(self, C, tuple_factory):
+         assert tuple_factory([1, {"a": tuple_factory([4, 5])}]) == res
+         assert isinstance(res, tuple_factory)
+ 
++    def test_nested_lists(self, C):
++        """
++        Test unstructuring deeply nested lists.
++        """
++        inner = C(1, 2)
++        outer = C([[inner]], None)
++
++        assert ([[(1, 2)]], None) == astuple(outer)
++
++    def test_nested_lists_retain_type(self, C):
++        """
++        Deeply nested lists and tuples keep their types if
++        retain_collection_types is True.
++        """
++        inner = C(1, 2)
++        outer = C([[inner], (inner,)], None)
++
++        assert ([[(1, 2)], ((1, 2),)], None) == astuple(
++            outer, retain_collection_types=True
++        )
++
++    def test_nested_dicts(self, C):
++        """
++        Test unstructuring deeply nested dictionaries.
++        """
++        inner = C(1, 2)
++        outer = C({1: {2: inner}, "l": [inner]}, None)
++
++        assert ({1: {2: (1, 2)}, "l": [(1, 2)]}, None) == astuple(outer)
++
++    def test_nested_dicts_retain_type(self, C):
++        """
++        Deeply nested mappings keep their types if
++        retain_collection_types is True.
++        """
++        inner = C(1, 2)
++        outer = C(OrderedDict({1: OrderedDict({2: inner})}), None)
++
++        assert (OrderedDict({1: OrderedDict({2: (1, 2)})}), None) == astuple(
++            outer, retain_collection_types=True
++        )
++
++    def test_nested_defaultdict(self, C):
++        """
++        Nested mappings that can't be built from key-value pairs are
++        converted into dicts instead of raising a TypeError.
++        """
++        inner = C(1, 2)
++        outer = C([defaultdict(list, {1: inner})], None)
++
++        assert ([{1: (1, 2)}], None) == astuple(
++            outer, retain_collection_types=True
++        )
++
++    def test_nested_named_tuple_retain_type(self, C):
++        """
++        Namedtuples nested in collections can be serialized if
++        retain_collection_types is True.
++
++        See #1164
++        """
++
++        class Pair(NamedTuple):
++            inner: object
++            n: int
++
++        inner = C(1, 2)
++        outer = C([Pair(inner, 3)], None)
++
++        assert ([(Pair((1, 2), 3))], None) == astuple(
++            outer, retain_collection_types=True
++        )
++
++    def test_nested_non_atomic_types(self, C):
++        """
++        Non-atomic types nested in collections are left alone.
++        """
++
++        class Int(int):
++            pass
++
++        i = Int(1)
++        outer = C([i, [i]], None)
++
++        result = astuple(outer)
++
++        assert ([i, [i]], None) == result
++        assert type(result[0][0]) is Int
++        assert type(result[0][1][0]) is Int
++
++    def test_nested_tuple_keys(self, C):
++        """
++        Containers nested in keys of nested mappings are converted into
++        tuples to stay hashable.
++        """
++        inner = C(1, 2)
++        outer = C({1: {(2, 3): inner}}, None)
++
++        assert ({1: {(2, 3): (1, 2)}}, None) == astuple(outer)
++
++    def test_nested_type_error_with_retain_type(self, C):
++        """
++        Serialization that fails with TypeError leaves the error through if
++        they're not tuples, even when nested in another collection.
++
++        See #1164
++        """
++
++        message = "__new__() missing 1 required positional argument (astuple)"
++
++        class Coordinates(list):
++            def __init__(self, first, *rest):
++                if isinstance(first, list):
++                    raise TypeError(message)
++                super().__init__([first, *rest])
++
++        outer = C([Coordinates(50.419019, 30.516225)], None)
++
++        with pytest.raises(TypeError, match=re.escape(message)):
++            astuple(outer, retain_collection_types=True)
++
+     @given(container=st.sampled_from(SEQUENCE_TYPES))
+     def test_lists_tuples_retain_type(self, container, C):
+         """

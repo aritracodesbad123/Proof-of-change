@@ -1,0 +1,63 @@
+diff --git a/changelog/5328.bugfix.rst b/changelog/5328.bugfix.rst
+new file mode 100644
+index 0000000000..8b13c1bf1a
+--- /dev/null
++++ b/changelog/5328.bugfix.rst
+@@ -0,0 +1 @@
++Fixed ``Retry.sleep()`` applying the backoff delay when ``Retry-After`` was 0 seconds or a date that had already passed. A missing header still uses the backoff.
+diff --git a/src/urllib3/util/retry.py b/src/urllib3/util/retry.py
+index 4fc2036c8c..6ea10dc8f3 100644
+--- a/src/urllib3/util/retry.py
++++ b/src/urllib3/util/retry.py
+@@ -375,11 +375,14 @@ def get_retry_after(self, response: BaseHTTPResponse) -> float | None:
+ 
+     def sleep_for_retry(self, response: BaseHTTPResponse) -> bool:
+         retry_after = self.get_retry_after(response)
+-        if retry_after:
+-            time.sleep(retry_after)
+-            return True
++        # ``0`` is a real delay: the server said to retry immediately. Treating
++        # it as missing would also apply the backoff delay.
++        if retry_after is None:
++            return False
+ 
+-        return False
++        if retry_after > 0:
++            time.sleep(retry_after)
++        return True
+ 
+     def _sleep_backoff(self) -> None:
+         backoff = self.get_backoff_time()
+diff --git a/test/test_retry.py b/test/test_retry.py
+index cf015a62d4..c3b4ddcff4 100644
+--- a/test/test_retry.py
++++ b/test/test_retry.py
+@@ -466,3 +466,28 @@ def test_respect_retry_after_header_sleep(
+                 sleep_mock.assert_called_with(sleep_duration)
+             else:
+                 sleep_mock.assert_not_called()
++
++    def test_retry_after_zero_does_not_fall_through_to_backoff(self) -> None:
++        """A present Retry-After of 0 seconds is a delay, not a missing header.
++
++        Two earlier failures make the backoff delay 2 seconds. That delay must
++        not be added on top of a header that already said to retry immediately.
++        """
++        history = (
++            RequestHistory("GET", "/", None, 503, None),
++            RequestHistory("GET", "/", None, 503, None),
++        )
++        retry = Retry(backoff_factor=1, history=history)
++        response = HTTPResponse(status=503, headers={"Retry-After": "0"})
++
++        with mock.patch("time.sleep") as sleep_mock:
++            retry.sleep(response)
++
++        sleep_mock.assert_not_called()
++
++        # The same history still backs off when the server sent no header.
++        response = HTTPResponse(status=503)
++        with mock.patch("time.sleep") as sleep_mock:
++            retry.sleep(response)
++
++        sleep_mock.assert_called_once_with(2)

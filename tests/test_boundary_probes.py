@@ -193,3 +193,28 @@ def test_plan_probes_records_the_boundary_rule(tmp_path, monkeypatch):
 def test_generate_leaves_the_prompt_alone_otherwise(tmp_path, diff, product):
     prompt, res = _gen(tmp_path, diff, product)
     assert "Modified pattern" not in prompt and "boundary_rule" not in res
+
+
+# ---------------------------------------------------------------- safe cases: the trigger stays silent
+# The 9 known-safe live cases (docs/decisions/2026-10-28-fixed-live-cases.md) and the 10 safe benchmark cases, 13
+# distinct PRs. Their saved diffs are copied unchanged. The rule must not fire on any of them, so it cannot change
+# their prompts. Only the known bug case fires (test_fires_on_an_edited_existing_pattern).
+FIXED_SAFE = ["attrs-1647", "click-3878", "jsonschema-1515", "sqlparse-928", "toolz-650", "markupsafe-512",
+              "rich-4143", "prettytable-524", "requests-7520"]
+BENCH_SAFE = ["boltons-586", "isort-2737", "jsonschema-1515", "markupsafe-512", "prettytable-524", "requests-7586",
+              "rich-4143", "sqlparse-928", "toolz-650", "urllib3-5328"]
+
+
+def _safe_diff(case):
+    return ADDED if case == "sqlparse-928" else (FX / "safe" / f"{case}.diff").read_text()
+
+
+def test_the_safe_candidates_are_13_distinct_cases():
+    assert len(FIXED_SAFE) == 9 and len(BENCH_SAFE) == 10 and len(set(FIXED_SAFE) | set(BENCH_SAFE)) == 13
+
+
+@pytest.mark.parametrize("case", sorted(set(FIXED_SAFE) | set(BENCH_SAFE)))
+def test_rule_stays_silent_on_every_safe_case(case):
+    d = _safe_diff(case)
+    assert d.startswith("diff --git")
+    assert bp.modified_patterns(d) == [] and bp.probe_rule(d, []) == ""

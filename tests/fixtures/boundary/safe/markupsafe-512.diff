@@ -1,0 +1,160 @@
+diff --git a/CHANGES.rst b/CHANGES.rst
+index 7a94e8f8..c5ee9875 100644
+--- a/CHANGES.rst
++++ b/CHANGES.rst
+@@ -5,6 +5,7 @@ Unreleased
+ 
+ -   Drop support for Python 3.9.
+ -   Remove previously deprecated code.
++-   Support Python 3.14 template strings. :issue:`511`
+ 
+ 
+ Version 3.0.3
+diff --git a/docs/formatting.rst b/docs/formatting.rst
+index c14f9170..3a786650 100644
+--- a/docs/formatting.rst
++++ b/docs/formatting.rst
+@@ -6,6 +6,26 @@ String Formatting
+ The :class:`Markup` class can be used as a format string. Objects
+ formatted into a markup string will be escaped first.
+ 
++t-strings
++---------
++
++.. versionadded:: 3.1.0
++
++On Python 3.14 :ref:`python:t-strings` can be passed to :class:`Markup`
++(or :func:`escape`), any interpolated value will be escaped while literal
++content will be treated as as markup.
++
++.. code-block:: pycon
++
++    >>> uid, name = 3, "<script>"
++    >>> Markup(t'<a href="/user/{uid}">{name}</a>')
++    Markup('<a href="/user/3">&lt;script&gt;</a>')
++
++.. seealso::
++
++    - :ref:`What's new in Python 3.14: template string literals <python:whatsnew314-template-string-literals>`
++    - :pep:`750`
++    - :mod:`string.templatelib`
+ 
+ Format Method
+ -------------
+diff --git a/src/markupsafe/__init__.py b/src/markupsafe/__init__.py
+index f8a0d58b..3168e746 100644
+--- a/src/markupsafe/__init__.py
++++ b/src/markupsafe/__init__.py
+@@ -9,6 +9,12 @@
+ except ImportError:
+     from ._native import _escape_inner
+ 
++try:
++    from string.templatelib import Interpolation  # type: ignore[import-not-found]
++    from string.templatelib import Template
++except ImportError:
++    Template = Interpolation = None
++
+ if t.TYPE_CHECKING:
+     import typing_extensions as te
+ 
+@@ -36,9 +42,13 @@ def escape(s: t.Any, /) -> Markup:
+     # conversion. This is the most common use case.
+     # Use type(s) instead of s.__class__ because a proxy object may be reporting
+     # the __class__ of the proxied value.
+-    if type(s) is str:
++    s_type = type(s)
++    if s_type is str:
+         return Markup(_escape_inner(s))
+ 
++    if s_type is Template:
++        return _template__html__(s)
++
+     if hasattr(s, "__html__"):
+         return Markup(s.__html__())
+ 
+@@ -122,7 +132,10 @@ class Markup(str):
+     def __new__(
+         cls, object: t.Any = "", encoding: str | None = None, errors: str = "strict"
+     ) -> te.Self:
+-        if hasattr(object, "__html__"):
++        if type(object) is Template:
++            object = _template__html__(object)
++
++        elif hasattr(object, "__html__"):
+             object = object.__html__()
+ 
+         if encoding is None:
+@@ -377,3 +390,21 @@ def __int__(self, /) -> int:
+ 
+     def __float__(self, /) -> float:
+         return float(self.obj)
++
++
++def _template__html__(
++    s: Template,
++    *,
++    escape: t.Callable[[t.Any], Markup] = escape,
++    str: t.Callable[[t.Any], str] = str,
++    Markup: t.Callable[[t.Any], Markup] = Markup,
++    format: t.Callable[[t.Any, str], str] = format,
++) -> Markup:
++    return Markup("").join(
++        Markup(value)
++        if value.__class__ is str
++        else escape(value.value)
++        if value.format_spec is None
++        else escape(format(value.value, value.format_spec))
++        for value in s
++    )
+diff --git a/tests/test_markupsafe.py b/tests/test_markupsafe.py
+index 85d9ea16..161efc00 100644
+--- a/tests/test_markupsafe.py
++++ b/tests/test_markupsafe.py
+@@ -2,6 +2,12 @@
+ 
+ import typing as t
+ 
++try:
++    from string.templatelib import Interpolation  # type: ignore[import-not-found]
++    from string.templatelib import Template
++except ImportError:
++    Template = Interpolation = None
++
+ import pytest
+ 
+ from markupsafe import escape
+@@ -25,14 +31,31 @@ def test_adding() -> None:
+             {"username": "<bad user>"},
+             "<em>&lt;bad user&gt;</em>",
+         ),
+-        ("%i", 3.14, "3"),
+-        ("%.2f", 3.14, "3.14"),
++        ("%i", 3.1415, "3"),
++        ("%.2f", 3.1415, "3.14"),
+     ),
+ )
+ def test_string_interpolation(template: str, data: t.Any, expect: str) -> None:
+     assert Markup(template) % data == expect
+ 
+ 
++@pytest.mark.skipif(Template is None, reason="requires Python 3.14+")
++@pytest.mark.parametrize(
++    ("template", "expect"),
++    (
++        (
++            lambda: Template("<em>", Interpolation("<bad user>", "username"), "</em>"),
++            "<em>&lt;bad user&gt;</em>",
++        ),
++        (lambda: Template(Interpolation(3.1415, "value", None, ".0f")), "3"),
++        (lambda: Template(Interpolation(3.1415, "value", None, ".2f")), "3.14"),
++    ),
++)
++def test_string_template(template: t.Callable[[], Template], expect: str) -> None:
++    assert Markup(template()) == expect
++    assert escape(template()) == expect
++
++
+ def test_type_behavior() -> None:
+     assert type(Markup("foo") + "bar") is Markup
+     x = Markup("foo")
