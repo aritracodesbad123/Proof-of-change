@@ -1,0 +1,1610 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-Textualize-rich-4147-3bd56b51d8b7-2026-10-29-check-103104-pr4147",
+ "date_ist": "2026-10-29 10:31 IST",
+ "run_date": "2026-10-29",
+ "who": "ops/daily_run.py",
+ "repo": "Textualize/rich",
+ "library": "rich",
+ "pr": {
+  "repo": "Textualize/rich",
+  "number": 4147,
+  "url": "https://github.com/Textualize/rich/pull/4147",
+  "title": "Fix adjacent tag matching in ReprHighlighter",
+  "base_sha": "9d8f9a372cc5916fd4781fec207ced7ddac2f08f",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "3bd56b51d8b7fbaf54a8ed092ce12d2a010ae7d9",
+  "merge_commit": null,
+  "tested_main_sha": "9d8f9a372cc5916fd4781fec207ced7ddac2f08f",
+  "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+ },
+ "author": "mariettakyriazi",
+ "base_ref": "main",
+ "updated_at_utc": "2026-10-16T21:55:22Z",
+ "updated_at_ist": "2026-10-17 03:25 IST",
+ "ci_state": "not checked (single-PR check)",
+ "ci_detail": "checked on request with --pr",
+ "tested_at_ist": "2026-10-29 10:31 IST",
+ "files": {
+  "all": [
+   "README.cn.md",
+   "README.de-ch.md",
+   "README.de.md",
+   "README.es.md",
+   "README.fa.md",
+   "README.fr.md",
+   "README.hi.md",
+   "README.id.md",
+   "README.it.md",
+   "README.ja.md",
+   "README.kr.md",
+   "README.md",
+   "README.pl.md",
+   "README.pt-br.md",
+   "README.ru.md",
+   "README.sv.md",
+   "README.tr.md",
+   "README.zh-tw.md",
+   "rich/highlighter.py",
+   "tests/test_highlighter.py"
+  ],
+  "package_py": [
+   "rich/highlighter.py"
+  ],
+  "compiled": [],
+  "other": [
+   "README.cn.md",
+   "README.de-ch.md",
+   "README.de.md",
+   "README.es.md",
+   "README.fa.md",
+   "README.fr.md",
+   "README.hi.md",
+   "README.id.md",
+   "README.it.md",
+   "README.ja.md",
+   "README.kr.md",
+   "README.md",
+   "README.pl.md",
+   "README.pt-br.md",
+   "README.ru.md",
+   "README.sv.md",
+   "README.tr.md",
+   "README.zh-tw.md",
+   "tests/test_highlighter.py"
+  ]
+ },
+ "machine_type": {
+  "arch": "x86_64",
+  "os": "Linux",
+  "platform": "Linux-6.12.94+-x86_64-with-glibc2.41",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": null,
+  "cpu_model": "Intel(R) Xeon(R) Processor",
+  "ram_gb": 15.6
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 3,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.15",
+ "test_selection": "mapped from touched files: tests/test_highlighter.py",
+ "per_run": [
+  {
+   "side": "old",
+   "run": 1,
+   "passed": 83,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 3.5,
+   "pytest_summary": "83 passed in 0.48s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 1,
+   "passed": 84,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 2.8,
+   "pytest_summary": "84 passed in 0.47s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 2,
+   "passed": 83,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 2.8,
+   "pytest_summary": "83 passed in 0.47s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 2,
+   "passed": 84,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 3.1,
+   "pytest_summary": "84 passed in 0.48s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 3,
+   "passed": 83,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 2.8,
+   "pytest_summary": "83 passed in 0.46s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 3,
+   "passed": 84,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 2.8,
+   "pytest_summary": "84 passed in 0.46s",
+   "junit": true
+  }
+ ],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "contree",
+ "sandbox_backend_note": "contree (Token Factory Sandboxes, sdk 0.3.6)",
+ "machine": "contree",
+ "tool_setup": {
+  "installed": [],
+  "tries": 0,
+  "note": "All required tools were already installed.",
+  "refused": []
+ },
+ "posted_upstream": false,
+ "logs": "rich-4147/",
+ "freeze": {},
+ "poc_commit": "d2e7290084cfb88e9891e1d50c00757077ffea39",
+ "route": "source-pair",
+ "current_head_sha": "3bd56b51d8b7fbaf54a8ed092ce12d2a010ae7d9",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "head_moved": false,
+ "diff_source": "git diff base_sha head_sha (pinned commits)",
+ "state": "open",
+ "mergeable": true,
+ "mergeable_state": "blocked",
+ "product_check": true,
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": {
+   "ok": true,
+   "skipped": false,
+   "refused": false,
+   "failed": false,
+   "stop": false,
+   "stop_reason": "",
+   "live_call": true,
+   "cached": false,
+   "queries": [
+    "rich python setup install instructions https://github.com/Textualize/rich site:github.com/Textualize/rich",
+    "rich python documentation install https://github.com/Textualize/rich site:github.com/Textualize/rich",
+    "rich python install requirements https://pypi.org/project/rich/ https://github.com/Textualize/rich site:pypi.org"
+   ],
+   "results": [
+    {
+     "title": "rich",
+     "url": "https://pypi.org/project/rich/",
+     "query": "rich python install requirements https://pypi.org/project/rich/ https://github.com/Textualize/rich site:pypi.org"
+    },
+    {
+     "title": "rich-pyfiglet",
+     "url": "https://pypi.org/project/rich-pyfiglet/",
+     "query": "rich python install requirements https://pypi.org/project/rich/ https://github.com/Textualize/rich site:pypi.org"
+    },
+    {
+     "title": "rich-cli",
+     "url": "https://pypi.org/project/rich-cli/",
+     "query": "rich python install requirements https://pypi.org/project/rich/ https://github.com/Textualize/rich site:pypi.org"
+    },
+    {
+     "title": "GitHub - Textualize/rich: Rich is a Python library for rich text and beautiful formatting in the terminal. \u00b7 GitHub",
+     "url": "https://github.com/textualize/rich",
+     "query": "rich python setup install instructions https://github.com/Textualize/rich site:github.com/Textualize/rich"
+    },
+    {
+     "title": "[BUG] rich fails to install using pip in editable mode \u00b7 Issue #346 \u00b7 Textualize/rich \u00b7 GitHub",
+     "url": "https://github.com/Textualize/rich/issues/346",
+     "query": "rich python setup install instructions https://github.com/Textualize/rich site:github.com/Textualize/rich"
+    },
+    {
+     "title": "GitHub - Textualize/rich-cli: Rich-cli is a command line toolbox for fancy output in the terminal \u00b7 GitHub",
+     "url": "https://github.com/textualize/rich-cli",
+     "query": "rich python setup install instructions https://github.com/Textualize/rich site:github.com/Textualize/rich"
+    },
+    {
+     "title": "rich/README.ru.md at main \u00b7 Textualize/rich \u00b7 GitHub",
+     "url": "https://github.com/textualize/rich/blob/master/README.ru.md",
+     "query": "rich python documentation install https://github.com/Textualize/rich site:github.com/Textualize/rich"
+    },
+    {
+     "title": "rich/.readthedocs.yml at main \u00b7 Textualize/rich \u00b7 GitHub",
+     "url": "https://github.com/Textualize/rich/blob/main/.readthedocs.yml",
+     "query": "rich python documentation install https://github.com/Textualize/rich site:github.com/Textualize/rich"
+    }
+   ],
+   "result_count": 8,
+   "text": "To install the rich Python library, use `pip` with the command `python -m pip install rich`. Rich is compatible with Linux, macOS, and Windows, and requires Python 3.8 or later. For testing Rich output, run `python -m rich`. For Rich-CLI, you can install it with Homebrew on macOS, `pip` or `conda` on universal systems, or `pipx` on Windows/Linux. The sources do not provide a definitive answer for installing rich in editable mode.\nTo install the rich Python library, use `pip` with the command `python -m pip install rich`. Rich is compatible with Linux, macOS, and Windows, requiring Python 3.8 or later. It works with Jupyter notebooks without additional configuration. To test Rich output on your terminal, run `python -m rich`. The library supports multiple languages in its documentation, including English, Chinese, Spanish, German, Swedish, Japanese, Korean, French, and more.\nTo install the \"rich\" Python package, you need Python 3.8 or later. The installation can be done using pip. The sources do not provide specific installation commands or additional requirements beyond the Python version requirement. For rendering ASCII art in the terminal, the \"rich-pyfiglet\" library can be installed with pip. The sources also mention that \"rich\" works with Jupyter notebooks without additional configuration.\nRich requires Python 3.8 or later. Rich works with Jupyter notebooks with no additional configuration required. Installing. Install with pip or your favorite\nA library that wraps PyFiglet with the Rich library for rendering ASCII art in the terminal. pip install rich-pyfiglet ... https://github.com/Textualize/rich. And\nThe rich command can read files from the internet you give it a URL starting with http:// or https:// . rich https://raw.githubusercontent.com/Textualize/rich-\n## Compatibility\n\nRich works with Linux, macOS and Windows. True color / emoji works with new Windows Terminal, classic terminal is limited to 16 colors. Rich requires Python 3.8 or later.\n\nRich works with Jupyter notebooks with no additional configuration required.\n\n## Installing\n\nInstall with `pip` or your favorite PyPI package manager.\n\n```\npython -m pip install rich\n```\n\nRun the following to test Rich output on your terminal:\n\n```\npython -m rich\n```\n\n## Rich Print [...] | README.tr.md | READ\n-c 'import sys, setuptools, tokenize; sys.argv = '\"'\"'/Users/ssbarnea/c/os/rich/setup.py'\"'\"'; __file__='\"'\"'/Users/ssbarnea/c/os/rich/setup.py'\"'\"';f=getattr(tokenize, '\"'\"'open'\"'\"', open)(__file__);code=f.read().replace('\"'\"'\\r\\n'\"'\"', '\"'\"'\\n'\"'\"');f.close();exec(compile(code, __file__, '\"'\"'exec'\"'\"'))' develop --no-deps cwd: /Users/ssbarnea/c/os/rich/ Complete output (3 lines): Traceback (most recent call last): File \"\", line 1, in  ModuleNotFoundError: No module named 'setuptools' [...] n\n### MacOS\n\nYou can install Rich-CLI with Homebrew.\n\n```\nbrew install rich \n```\n\n### Universal\n\nRich-CLI may be installed as a Python package, either using `pip`:\n\n```\npython -m pip install rich-cli \n```\n\nOr using `conda` or `mamba`:\n\n```\nmamba install -c conda-forge rich-cli \n```\n\n## Rich command\n\nOnce installed you should have the `rich` command in your path. Run the following to see usage / help:\n\n```\nrich --help \n```\n\n## Syntax highlighting [...] ```\nrich \"I must not fear. Fear is the mind-ki\n## C\u043e\u0432\u043c\u0435\u0441\u0442\u0438\u043c\u043e\u0441\u0442\u044c\n\nRich \u0440\u0430\u0431\u043e\u0442\u0430\u0435\u0442 \u0441 Linux, OSX \u0438 Windows. True color / \u044d\u043c\u043e\u0434\u0436\u0438 \u0440\u0430\u0431\u043e\u0442\u0430\u044e\u0442 \u0441 \u043d\u043e\u0432\u044b\u043c \u0442\u0435\u0440\u043c\u0438\u043d\u0430\u043b\u043e\u043c Windows, \u043a\u043b\u0430\u0441\u0441\u0438\u0447\u0435\u0441\u043a\u0438\u0439 \u0442\u0435\u0440\u043c\u0438\u043d\u0430\u043b \u043b\u0438\u043c\u0438\u0442\u0438\u0440\u043e\u0432\u0430\u043d 16 \u0446\u0432\u0435\u0442\u0430\u043c\u0438. Rich \u0442\u0440\u0435\u0431\u0443\u0435\u0442 Python 3.6.3 \u0438\u043b\u0438 \u0431\u043e\u043b\u0435\u0435 \u043d\u043e\u0432\u044b\u0439.\n\nRich \u0440\u0430\u0431\u043e\u0442\u0430\u0435\u0442 \u0441 Jupyter notebooks \u0431\u0435\u0437 \u0434\u043e\u043f\u043e\u043b\u043d\u0438\u0442\u0435\u043b\u044c\u043d\u043e\u0439 \u043a\u043e\u043d\u0444\u0438\u0433\u0443\u0440\u0430\u0446\u0438\u0438.\n\n## \u0423\u0441\u0442\u0430\u043d\u043e\u0432\u043a\u0430\n\n\u0423\u0441\u0442\u0430\u043d\u043e\u0432\u0438\u0442\u0435 \u0441 \u043f\u043e\u043c\u043e\u0449\u044c\u044e `pip` \u0438\u043b\u0438 \u0432\u0430\u0448\u0435\u0433\u043e \u043b\u044e\u0431\u0438\u043c\u043e\u0433\u043e PyPI \u043c\u0435\u043d\u0435\u0434\u0436\u0435\u0440\u0430 \u043f\u0430\u043a\u0435\u0442\u043e\u0432.\n\n```\npython -m pip install rich\n```\n\n\u0417\u0430\u043f\u0443\u0441\u0442\u0438\u0442\u0435 \u0441\u043b\u0435\u0434\u0443\u044e\u0449\u0443\u044e \u043a\u043e\u043c\u0430\u043d\u0434\u0443, \u0447\u0442\u043e\u0431\u044b \u043f\u0440\u043e\u0432\u0435\u0440\u0438\u0442\u044c Rich \u0432\u044b\u0432\u043e\u0434 \u0432 \u0432\u0430\u0448\u0435\u043c \u0442\u0435\u0440\u043c\u0438\u043d\u0430\u043b\u0435:\n\n```\npython -m rich\n``` [...] En\nsphinx:\n\nconfiguration: docs/source/conf.py\n\n# Optionally build your docs in additional formats such as PDF and ePub\n\nformats: all\n\nbuild:\n\nos: \"ubuntu-24.04\"\n\ntools:\n\npython: \"3.12\"\n\npython:\n\ninstall:\n\n- requirements: docs/requirements.txt\n\n- method: pip\n\npath: .\n\nYou can\u2019t perform that action at this time. [...] More file actions\n\n## Latest commit\n\n## History\n\nHistory\n\nHistory\n\n23 lines (18 loc) \u00b7 474 Bytes\n\n/\n\n# .readthedocs.yml\n\nCopy path\n\n## File metadata and controls\n\n23 lines (18 loc) \u00b7 4",
+   "errors": [],
+   "lines": [
+    "Looked up with Tavily: 8 results",
+    "Query: rich python setup install instructions https://github.com/Textualize/rich site:github.com/Textualize/rich",
+    "Query: rich python documentation install https://github.com/Textualize/rich site:github.com/Textualize/rich",
+    "Query: rich python install requirements https://pypi.org/project/rich/ https://github.com/Textualize/rich site:pypi.org",
+    "Source: rich \u2014 https://pypi.org/project/rich/",
+    "Source: rich-pyfiglet \u2014 https://pypi.org/project/rich-pyfiglet/",
+    "Source: rich-cli \u2014 https://pypi.org/project/rich-cli/",
+    "Source: GitHub - Textualize/rich: Rich is a Python library for rich text and beautiful formatting in the terminal. \u00b7 GitHub \u2014 https://github.com/textualize/rich",
+    "Source: [BUG] rich fails to install using pip in editable mode \u00b7 Issue #346 \u00b7 Textualize/rich \u00b7 GitHub \u2014 https://github.com/Textualize/rich/issues/346",
+    "Source: GitHub - Textualize/rich-cli: Rich-cli is a command line toolbox for fancy output in the terminal \u00b7 GitHub \u2014 https://github.com/textualize/rich-cli",
+    "Source: rich/README.ru.md at main \u00b7 Textualize/rich \u00b7 GitHub \u2014 https://github.com/textualize/rich/blob/master/README.ru.md",
+    "Source: rich/.readthedocs.yml at main \u00b7 Textualize/rich \u00b7 GitHub \u2014 https://github.com/Textualize/rich/blob/main/.readthedocs.yml"
+   ]
+  },
+  "notes": [
+   "Setup check: GitHub token: present.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory 10.5 GB (of 15.6 GB).",
+   "Setup check: free disk 87.4 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: 8 results",
+   "Query: rich python setup install instructions https://github.com/Textualize/rich site:github.com/Textualize/rich",
+   "Query: rich python documentation install https://github.com/Textualize/rich site:github.com/Textualize/rich",
+   "Query: rich python install requirements https://pypi.org/project/rich/ https://github.com/Textualize/rich site:pypi.org",
+   "Source: rich \u2014 https://pypi.org/project/rich/",
+   "Source: rich-pyfiglet \u2014 https://pypi.org/project/rich-pyfiglet/",
+   "Source: rich-cli \u2014 https://pypi.org/project/rich-cli/",
+   "Source: GitHub - Textualize/rich: Rich is a Python library for rich text and beautiful formatting in the terminal. \u00b7 GitHub \u2014 https://github.com/textualize/rich",
+   "Source: [BUG] rich fails to install using pip in editable mode \u00b7 Issue #346 \u00b7 Textualize/rich \u00b7 GitHub \u2014 https://github.com/Textualize/rich/issues/346",
+   "Source: GitHub - Textualize/rich-cli: Rich-cli is a command line toolbox for fancy output in the terminal \u00b7 GitHub \u2014 https://github.com/textualize/rich-cli",
+   "Source: rich/README.ru.md at main \u00b7 Textualize/rich \u00b7 GitHub \u2014 https://github.com/textualize/rich/blob/master/README.ru.md",
+   "Source: rich/.readthedocs.yml at main \u00b7 Textualize/rich \u00b7 GitHub \u2014 https://github.com/Textualize/rich/blob/main/.readthedocs.yml",
+   "Setup plan: the PR changes install docs (README.cn.md, README.de-ch.md, README.de.md, README.es.md, README.fa.md); setup was read from main's copy and applied the same on both sides.",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: install alabaster==1.0.0 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install Sphinx==8.2.3 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install sphinx-rtd-theme==3.0.2 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install sphinx-copybutton==0.5.2 (listed in requirements.txt) on main and pr.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >=3.9.0",
+   "Setup plan: Python rule: one Python version is used on both sides: the lowest version that meets the requirements of both main and the pull request; if none meets both, the check stops as a setup problem and records both.",
+   "Setup plan: refused rich-cli: its PyPI page does not link to this GitHub repository",
+   "Repository crawl: 13 page(s) crawled, 9 read in full, 0 setup step(s) used first in the sandbox (0 Tavily call(s), 0.0 credit(s))."
+  ],
+  "install_docs": [
+   "setup.py",
+   "README.kr.md",
+   "CONTRIBUTING.md",
+   "Makefile",
+   "README.md",
+   "README.zh-tw.md",
+   "README.hi.md",
+   "README.id.md",
+   "README.ru.md",
+   "README.es.md",
+   "README.ja.md",
+   "README.sv.md",
+   "README.tr.md",
+   "README.cn.md",
+   "README.pl.md",
+   "README.fa.md",
+   "README.it.md",
+   "README.de.md",
+   "README.de-ch.md",
+   "pyproject.toml",
+   "README.pt-br.md",
+   "README.fr.md",
+   "tox.ini",
+   "questions/README.md",
+   "docs/Makefile",
+   ".github/workflows/pythonpackage.yml",
+   ".github/workflows/readmechanged.yml",
+   ".github/workflows/codeql.yml",
+   ".github/workflows/comment.yml",
+   ".github/workflows/codespell.yml",
+   ".github/workflows/newissue.yml",
+   "tools/README.md",
+   "benchmarks/README.md",
+   "examples/README.md"
+  ],
+  "install_docs_from": "main",
+  "install_docs_pr_changed": [
+   "README.cn.md",
+   "README.de-ch.md",
+   "README.de.md",
+   "README.es.md",
+   "README.fa.md",
+   "README.fr.md",
+   "README.hi.md",
+   "README.id.md",
+   "README.it.md",
+   "README.ja.md",
+   "README.kr.md",
+   "README.md",
+   "README.pl.md",
+   "README.pt-br.md",
+   "README.ru.md",
+   "README.sv.md",
+   "README.tr.md",
+   "README.zh-tw.md"
+  ],
+  "repo_crawl": {
+   "ok": true,
+   "stop": false,
+   "stop_reason": "",
+   "base_sha": "9d8f9a372cc5916fd4781fec207ced7ddac2f08f",
+   "docs_domain": "rich.readthedocs.io",
+   "seeds": [
+    "https://github.com/Textualize/rich/tree/9d8f9a372cc5916fd4781fec207ced7ddac2f08f",
+    "https://rich.readthedocs.io/"
+   ],
+   "pages_crawled": [
+    "https://github.com/Textualize/rich/blob/9d8f9a372cc5916fd4781fec207ced7ddac2f08f/.pre-commit-config.yaml",
+    "https://github.com/Textualize/rich/blob/9d8f9a372cc5916fd4781fec207ced7ddac2f08f/CONTRIBUTING.md",
+    "https://github.com/Textualize/rich/blob/9d8f9a372cc5916fd4781fec207ced7ddac2f08f/Makefile",
+    "https://github.com/Textualize/rich/blob/9d8f9a372cc5916fd4781fec207ced7ddac2f08f/README.md",
+    "https://github.com/Textualize/rich/blob/9d8f9a372cc5916fd4781fec207ced7ddac2f08f/poetry.lock",
+    "https://github.com/Textualize/rich/blob/9d8f9a372cc5916fd4781fec207ced7ddac2f08f/pyproject.toml",
+    "https://github.com/Textualize/rich/blob/9d8f9a372cc5916fd4781fec207ced7ddac2f08f/setup.py",
+    "https://github.com/Textualize/rich/blob/9d8f9a372cc5916fd4781fec207ced7ddac2f08f/tox.ini",
+    "https://github.com/Textualize/rich/tree/9d8f9a372cc5916fd4781fec207ced7ddac2f08f/tests",
+    "https://github.com/Textualize/rich/tree/9d8f9a372cc5916fd4781fec207ced7ddac2f08f/.github/workflows",
+    "https://github.com/Textualize/rich/blob/9d8f9a372cc5916fd4781fec207ced7ddac2f08f/tests/pytest.ini",
+    "https://github.com/Textualize/rich/blob/9d8f9a372cc5916fd4781fec207ced7ddac2f08f/tests/conftest.py",
+    "https://github.com/Textualize/rich/blob/9d8f9a372cc5916fd4781fec207ced7ddac2f08f/tests/__init__.py"
+   ],
+   "pages_extracted": [
+    "https://github.com/Textualize/rich/blob/9d8f9a372cc5916fd4781fec207ced7ddac2f08f/CONTRIBUTING.md",
+    "https://github.com/Textualize/rich/blob/9d8f9a372cc5916fd4781fec207ced7ddac2f08f/README.md",
+    "https://github.com/Textualize/rich/blob/9d8f9a372cc5916fd4781fec207ced7ddac2f08f/pyproject.toml",
+    "https://github.com/Textualize/rich/blob/9d8f9a372cc5916fd4781fec207ced7ddac2f08f/setup.py",
+    "https://github.com/Textualize/rich/blob/9d8f9a372cc5916fd4781fec207ced7ddac2f08f/tox.ini",
+    "https://github.com/Textualize/rich/tree/9d8f9a372cc5916fd4781fec207ced7ddac2f08f/tests",
+    "https://github.com/Textualize/rich/blob/9d8f9a372cc5916fd4781fec207ced7ddac2f08f/tests/conftest.py",
+    "https://github.com/Textualize/rich/blob/9d8f9a372cc5916fd4781fec207ced7ddac2f08f/.github/workflows/pythonpackage.yml",
+    "https://github.com/Textualize/rich/blob/9d8f9a372cc5916fd4781fec207ced7ddac2f08f/tests/pytest.ini"
+   ],
+   "steps": [
+    {
+     "kind": "requirements_file",
+     "value": "requirements.txt",
+     "source": "https://github.com/Textualize/rich/blob/9d8f9a372cc5916fd4781fec207ced7ddac2f08f/CONTRIBUTING.md",
+     "used": false,
+     "why": "file not present in the repository at the base commit"
+    },
+    {
+     "kind": "package",
+     "value": "requirements.txt",
+     "source": "https://github.com/Textualize/rich/blob/9d8f9a372cc5916fd4781fec207ced7ddac2f08f/CONTRIBUTING.md",
+     "used": false,
+     "why": "not declared in the project's own files, so not installed"
+    },
+    {
+     "kind": "package",
+     "value": "rich",
+     "source": "https://github.com/Textualize/rich/blob/9d8f9a372cc5916fd4781fec207ced7ddac2f08f/README.md",
+     "used": false,
+     "why": "not declared in the project's own files, so not installed"
+    },
+    {
+     "kind": "python",
+     "value": "3.9",
+     "source": "https://github.com/Textualize/rich/blob/9d8f9a372cc5916fd4781fec207ced7ddac2f08f/.github/workflows/pythonpackage.yml",
+     "used": false,
+     "why": "recorded for the setup plan; not an install step"
+    },
+    {
+     "kind": "python",
+     "value": "3.10",
+     "source": "https://github.com/Textualize/rich/blob/9d8f9a372cc5916fd4781fec207ced7ddac2f08f/.github/workflows/pythonpackage.yml",
+     "used": false,
+     "why": "recorded for the setup plan; not an install step"
+    },
+    {
+     "kind": "python",
+     "value": "3.11",
+     "source": "https://github.com/Textualize/rich/blob/9d8f9a372cc5916fd4781fec207ced7ddac2f08f/.github/workflows/pythonpackage.yml",
+     "used": false,
+     "why": "recorded for the setup plan; not an install step"
+    },
+    {
+     "kind": "python",
+     "value": "3.12",
+     "source": "https://github.com/Textualize/rich/blob/9d8f9a372cc5916fd4781fec207ced7ddac2f08f/.github/workflows/pythonpackage.yml",
+     "used": false,
+     "why": "recorded for the setup plan; not an install step"
+    },
+    {
+     "kind": "python",
+     "value": "3.13",
+     "source": "https://github.com/Textualize/rich/blob/9d8f9a372cc5916fd4781fec207ced7ddac2f08f/.github/workflows/pythonpackage.yml",
+     "used": false,
+     "why": "recorded for the setup plan; not an install step"
+    },
+    {
+     "kind": "python",
+     "value": "3.14",
+     "source": "https://github.com/Textualize/rich/blob/9d8f9a372cc5916fd4781fec207ced7ddac2f08f/.github/workflows/pythonpackage.yml",
+     "used": false,
+     "why": "recorded for the setup plan; not an install step"
+    }
+   ],
+   "shell": "",
+   "calls": 0,
+   "credits": 0.0,
+   "errors": [],
+   "cache": {
+    "hit": true,
+    "key": "v2|Textualize/rich@9d8f9a372cc5916fd4781fec207ced7ddac2f08f",
+    "saved": false,
+    "age_seconds": 132649
+   },
+   "seed_decisions": [
+    {
+     "url": "https://github.com/Textualize/rich/tree/9d8f9a372cc5916fd4781fec207ced7ddac2f08f",
+     "crawled": true,
+     "why": "read from a crawl saved for this repository and base commit"
+    },
+    {
+     "url": "https://rich.readthedocs.io/",
+     "crawled": true,
+     "why": "read from a crawl saved for this repository and base commit"
+    }
+   ],
+   "applied_in_sandbox": false,
+   "used_steps": [],
+   "crawl_base_sha": "9d8f9a372cc5916fd4781fec207ced7ddac2f08f",
+   "checkout_sha": "9d8f9a372cc5916fd4781fec207ced7ddac2f08f",
+   "commits_match": true
+  },
+  "setup_plan": {
+   "packages": [
+    {
+     "requirement": "alabaster==1.0.0",
+     "name": "alabaster",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "Sphinx==8.2.3",
+     "name": "Sphinx",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "sphinx-rtd-theme==3.0.2",
+     "name": "sphinx-rtd-theme",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "sphinx-copybutton==0.5.2",
+     "name": "sphinx-copybutton",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    }
+   ],
+   "scope_blocked": "",
+   "component": null,
+   "aggregate_names": [],
+   "extra_reqs": [
+    "alabaster==1.0.0",
+    "Sphinx==8.2.3",
+    "sphinx-rtd-theme==3.0.2",
+    "sphinx-copybutton==0.5.2"
+   ],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >=3.9.0",
+    "rule": "one Python version is used on both sides: the lowest version that meets the requirements of both main and the pull request; if none meets both, the check stops as a setup problem and records both",
+    "gate_failed": false
+   },
+   "system": [],
+   "refused": [
+    {
+     "name": "rich-cli",
+     "reason": "its PyPI page does not link to this GitHub repository"
+    }
+   ],
+   "groups_blocked": "",
+   "crawl_context": "requirements_file: requirements.txt (not used; https://github.com/Textualize/rich/blob/9d8f9a372cc5916fd4781fec207ced7ddac2f08f/CONTRIBUTING.md)\npackage: requirements.txt (not used; https://github.com/Textualize/rich/blob/9d8f9a372cc5916fd4781fec207ced7ddac2f08f/CONTRIBUTING.md)\npackage: rich (not used; https://github.com/Textualize/rich/blob/9d8f9a372cc5916fd4781fec207ced7ddac2f08f/README.md)\npython: 3.9 (not used; https://github.com/Textualize/rich/blob/9d8f9a372cc5916fd4781fec207ced7ddac2f08f/.github/workflows/pythonpackage.yml)\npython: 3.10 (not used; https://github.com/Textualize/rich/blob/9d8f9a372cc5916fd4781fec207ced7ddac2f08f/.github/workflows/pythonpackage.yml)\npython: 3.11 (not used; https://github.com/Textualize/rich/blob/9d8f9a372cc5916fd4781fec207ced7ddac2f08f/.github/workflows/pythonpackage.yml)\npython: 3.12 (not used; https://github.com/Textualize/rich/blob/9d8f9a372cc5916fd4781fec207ced7ddac2f08f/.github/workflows/pythonpackage.yml)\npython: 3.13 (not used; https://github.com/Textualize/rich/blob/9d8f9a372cc5916fd4781fec207ced7ddac2f08f/.github/workflows/pythonpackage.yml)\npython: 3.14 (not used; https://github.com/Textualize/rich/blob/9d8f9a372cc5916fd4781fec207ced7ddac2f08f/.github/workflows/pythonpackage.yml)",
+   "crawl_shell": ""
+  },
+  "steps": {
+   "setup_lookup": "Found 4 setup item(s) in the project's files and the web lookup. Refused: rich-cli (its PyPI page does not link to this GitHub repository).",
+   "setup_python": "Python 3.12: Python 3.12 already meets >=3.9.0",
+   "install_deps": "Wrote requirements.txt and installed it on main and pr: alabaster==1.0.0, Sphinx==8.2.3, sphinx-rtd-theme==3.0.2, sphinx-copybutton==0.5.2."
+  },
+  "run_files": {
+   "requirements": "requirements.txt",
+   "plan": "setup-plan.json",
+   "count": 4
+  }
+ },
+ "chosen": {
+  "pr": 4147,
+  "head_sha": "3bd56b51d8b7fbaf54a8ed092ce12d2a010ae7d9",
+  "install": null,
+  "test_cmd": null
+ },
+ "sides": {
+  "comparison_basis": "pinned base vs pinned PR head (benchmark case file)",
+  "main_sha": "9d8f9a372cc5916fd4781fec207ced7ddac2f08f",
+  "pr_sha": "3bd56b51d8b7fbaf54a8ed092ce12d2a010ae7d9",
+  "pinned": true
+ },
+ "tested": {
+  "main": "main @ 9d8f9a372cc5 (base tip = first parent of the merge commit)",
+  "pr": "PR head 3bd56b51d8b7"
+ },
+ "contree_python": {
+  "version": "3.12",
+  "why": "default image Python 3.12 fits"
+ },
+ "probe_plan": {
+  "baseline": "full",
+  "model": "model provider: nebius (Token Factory, live)",
+  "errors": [],
+  "model_claims": [
+   {
+    "id": "C1",
+    "text": "This PR fixes adjacent tag matching in ReprHighlighter.",
+    "source_quote": "This PR fixes adjacent tag matching in ReprHighlighter.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C2",
+    "text": "Previously, the regex used a greedy match for tag contents, causing adjacent tags such as:\n<a>content1</a><b>content2</b>\nto be merged into a single match.",
+    "source_quote": "Previously, the regex used a greedy match for tag contents, causing adjacent tags such as:\n<a>content1</a><b>content2</b>\nto be merged into a single match.",
+    "testable": false,
+    "expect": "same"
+   },
+   {
+    "id": "C3",
+    "text": "The regex has been updated to correctly handle adjacent tags while preserving existing behavior.",
+    "source_quote": "The regex has been updated to correctly handle adjacent tags while preserving existing behavior.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C4",
+    "text": "Added a regression test covering adjacent tags",
+    "source_quote": "Added a regression test covering adjacent tags",
+    "testable": false,
+    "expect": "same"
+   }
+  ],
+  "model_rejected_claims": [],
+  "model_retried": {
+   "why": [
+    "no probe listed the claim ids it checks, so its results could not be tied to any claim; in each probe, \"claims\" must name the claim ids it checks and the observation names that cover them"
+   ],
+   "kept_first_answer": "the retry had fewer usable probes"
+  },
+  "model_boundary_rule": [
+   {
+    "file": "rich/highlighter.py",
+    "line": 85,
+    "old": "(?P<tag_start><)(?P<tag_name>[-\\w.:|]*)(?P<tag_contents>[\\w\\W]*)(?P<tag_end>>)"
+   }
+  ],
+  "diff_targets": [],
+  "frozen": [
+   {
+    "path": "model-probes/model-probe-c1.py",
+    "source": "model",
+    "sha256": "7203efb2d901627f71df8c63d1026afd85176a6f57d4e8667cd81bea06b3bfa1",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-10-29T05:02:21.930546+00:00",
+    "inputs_sha256": "ad19b3bc9ae40e6eb8284eb7c373e1b3d4d8a2852f4a7379994abf40d9d19635",
+    "inputs": {
+     "title_chars": 44,
+     "body_chars": 536,
+     "base_files": {
+      "rich/highlighter.py": "3086a95b08d1f1a85472c0e2720378c4b45b6a76e1e71fd0ce1e647dd0eb28a9"
+     }
+    }
+   },
+   {
+    "path": "model-probes/model-probe-c3.py",
+    "source": "model",
+    "sha256": "cae98e59c907aa74f9b9e8f2bc61845985749ebcf29f3c921de147654ad66273",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-10-29T05:02:21.930649+00:00",
+    "inputs_sha256": "ad19b3bc9ae40e6eb8284eb7c373e1b3d4d8a2852f4a7379994abf40d9d19635",
+    "inputs": {
+     "title_chars": 44,
+     "body_chars": 536,
+     "base_files": {
+      "rich/highlighter.py": "3086a95b08d1f1a85472c0e2720378c4b45b6a76e1e71fd0ce1e647dd0eb28a9"
+     }
+    }
+   }
+  ]
+ },
+ "pr_side_started_at": "2026-10-29T05:02:21.933988+00:00",
+ "test_targets": {
+  "main": [
+   "tests/test_highlighter.py"
+  ],
+  "pr": [
+   "tests/test_highlighter.py"
+  ]
+ },
+ "contree_only": {
+  "note": "Contree mode: installs, tests and probes ran in Contree; nothing from the pull request ran locally",
+  "declared_test_deps": [],
+  "optional_backends": [],
+  "not_run_locally": [
+   "local freeze",
+   "installed-commit guard",
+   "probe coverage",
+   "optional-module retry"
+  ]
+ },
+ "coverage": {
+  "status": "measured",
+  "changed_lines_total": 1,
+  "changed_lines_covered": 1,
+  "files": [
+   {
+    "file": "rich/highlighter.py",
+    "changed_lines_total": 1,
+    "changed_lines_covered": 1
+   }
+  ],
+  "seconds": 7.4,
+  "exit": 0,
+  "log": "coverage-pytest.log",
+  "where": "contree"
+ },
+ "contree": {
+  "main_uuid": "2cdd58d9-c7fc-4455-b2a5-a4778b76e83c",
+  "pr_uuid": "c958490f-aa80-4199-8ba9-8a85bd281eba",
+  "max_ops": 40,
+  "sdk": "0.3.6",
+  "base_image": "docker.io/library/python:3.12-slim-bookworm",
+  "python": {
+   "requires_python": [],
+   "requires_python_found": false,
+   "main": "3.12.15",
+   "pr": "3.12.15",
+   "problems": []
+  },
+  "own_checkout": {
+   "module": "rich",
+   "checkout": "/work/src",
+   "main_checkout_real": "/work/src",
+   "main": "/work/src/rich/__init__.py",
+   "pr_checkout_real": "/work/src",
+   "pr": "/work/src/rich/__init__.py",
+   "install": {
+    "main": {
+     "python": "/usr/local/bin/python",
+     "version_source": "tag v15.0.0-3-g9d8f9a3",
+     "editable_exit": "0",
+     "pip_show_exit": "0",
+     "pip_show_name": "rich",
+     "pip_show_version": "15.0.0",
+     "pip_show_location": "/usr/local/lib/python3.12/site-packages"
+    },
+    "pr": {
+     "python": "/usr/local/bin/python",
+     "version_source": "tag v15.0.0-2-g3bd56b5",
+     "editable_exit": "0",
+     "pip_show_exit": "0",
+     "pip_show_name": "rich",
+     "pip_show_version": "15.0.0",
+     "pip_show_location": "/usr/local/lib/python3.12/site-packages"
+    }
+   },
+   "status": "ok"
+  }
+ },
+ "comparison": {
+  "same": 83,
+  "same_skipped_both": 0,
+  "regressions": [],
+  "fixed": [],
+  "new_tests_passing": 1,
+  "new_tests_passing_ids": [
+   "test_highlighter::test_repr_highlighter_adjacent_tags"
+  ],
+  "new_tests_failing": [],
+  "new_tests_skipped": [],
+  "removed_tests": [],
+  "reparametrized": [],
+  "skipped_missing_dependency": [],
+  "flaky": [],
+  "pr_unstable": [],
+  "pr_unstable_noisy": [],
+  "environment": [],
+  "other_changes": [],
+  "preexisting_failures": [],
+  "load_failed_both": [],
+  "load_failed_pr": [],
+  "load_failed_main": [],
+  "executed": {
+   "main": 83,
+   "pr": 84
+  },
+  "messages": {}
+ },
+ "exit_check": {
+  "explained": true,
+  "problems": [],
+  "detail": "all runs exited 0"
+ },
+ "probes": {
+  "status": "ran",
+  "items": [
+   {
+    "id": "model-probe-c1",
+    "source": "model",
+    "path": "model-probes/model-probe-c1.py.txt",
+    "sha256": "7203efb2d901627f71df8c63d1026afd85176a6f57d4e8667cd81bea06b3bfa1",
+    "target": "Textualize/rich#4147",
+    "about": "model-written probe of the changed files (no description given)",
+    "claims": [],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 3.8,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 2.7,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 2.7,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 2.7,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 2.7,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 2.9,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-probe-c1-main-1.jsonl",
+      "probe-model-probe-c1-main-2.jsonl",
+      "probe-model-probe-c1-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-probe-c1-pr-1.jsonl",
+      "probe-model-probe-c1-pr-2.jsonl",
+      "probe-model-probe-c1-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "c1.adjacent": [],
+       "c1.single": [],
+       "c1.preceded": [],
+       "c1.followed": [],
+       "c1.newline": [],
+       "c1.pre_newline": []
+      },
+      {
+       "c1.adjacent": [],
+       "c1.single": [],
+       "c1.preceded": [],
+       "c1.followed": [],
+       "c1.newline": [],
+       "c1.pre_newline": []
+      },
+      {
+       "c1.adjacent": [],
+       "c1.single": [],
+       "c1.preceded": [],
+       "c1.followed": [],
+       "c1.newline": [],
+       "c1.pre_newline": []
+      }
+     ],
+     "pr": [
+      {
+       "c1.adjacent": [],
+       "c1.single": [],
+       "c1.preceded": [],
+       "c1.followed": [],
+       "c1.newline": [],
+       "c1.pre_newline": []
+      },
+      {
+       "c1.adjacent": [],
+       "c1.single": [],
+       "c1.preceded": [],
+       "c1.followed": [],
+       "c1.newline": [],
+       "c1.pre_newline": []
+      },
+      {
+       "c1.adjacent": [],
+       "c1.single": [],
+       "c1.preceded": [],
+       "c1.followed": [],
+       "c1.newline": [],
+       "c1.pre_newline": []
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "c1.adjacent",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": [],
+      "pr": [],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe-c1-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c1.adjacent\""
+       },
+       "pr": {
+        "file": "probe-model-probe-c1-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c1.adjacent\""
+       }
+      }
+     },
+     {
+      "name": "c1.followed",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": [],
+      "pr": [],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe-c1-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c1.followed\""
+       },
+       "pr": {
+        "file": "probe-model-probe-c1-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c1.followed\""
+       }
+      }
+     },
+     {
+      "name": "c1.newline",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": [],
+      "pr": [],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe-c1-main-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"c1.newline\""
+       },
+       "pr": {
+        "file": "probe-model-probe-c1-pr-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"c1.newline\""
+       }
+      }
+     },
+     {
+      "name": "c1.pre_newline",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": [],
+      "pr": [],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe-c1-main-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"c1.pre_newline\""
+       },
+       "pr": {
+        "file": "probe-model-probe-c1-pr-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"c1.pre_newline\""
+       }
+      }
+     },
+     {
+      "name": "c1.preceded",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": [],
+      "pr": [],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe-c1-main-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"c1.preceded\""
+       },
+       "pr": {
+        "file": "probe-model-probe-c1-pr-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"c1.preceded\""
+       }
+      }
+     },
+     {
+      "name": "c1.single",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": [],
+      "pr": [],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe-c1-main-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"c1.single\""
+       },
+       "pr": {
+        "file": "probe-model-probe-c1-pr-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"c1.single\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "7203efb2d901627f71df8c63d1026afd85176a6f57d4e8667cd81bea06b3bfa1",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-10-29T05:02:21.930546+00:00",
+     "inputs_sha256": "ad19b3bc9ae40e6eb8284eb7c373e1b3d4d8a2852f4a7379994abf40d9d19635",
+     "inputs": {
+      "title_chars": 44,
+      "body_chars": 536,
+      "base_files": {
+       "rich/highlighter.py": "3086a95b08d1f1a85472c0e2720378c4b45b6a76e1e71fd0ce1e647dd0eb28a9"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-10-29T05:02:21.933988+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 1,
+     "changed_lines_covered": 1,
+     "files": [
+      {
+       "file": "rich/highlighter.py",
+       "changed_lines_total": 1,
+       "changed_lines_covered": 1
+      }
+     ],
+     "adequacy": "adequate",
+     "note": "ran 1 of 1 changed line(s) on the main side",
+     "exit": 0,
+     "data": "probe-cov-model-probe-c1.json",
+     "where": "contree"
+    },
+    "status": "ran"
+   },
+   {
+    "id": "model-probe-c3",
+    "source": "model",
+    "path": "model-probes/model-probe-c3.py.txt",
+    "sha256": "cae98e59c907aa74f9b9e8f2bc61845985749ebcf29f3c921de147654ad66273",
+    "target": "Textualize/rich#4147",
+    "about": "model-written probe of the changed files (no description given)",
+    "claims": [],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 3.5,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 2.7,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 2.7,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 2.7,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 2.7,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 2.7,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-probe-c3-main-1.jsonl",
+      "probe-model-probe-c3-main-2.jsonl",
+      "probe-model-probe-c3-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-probe-c3-pr-1.jsonl",
+      "probe-model-probe-c3-pr-2.jsonl",
+      "probe-model-probe-c3-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "c3.adjacent": [],
+       "c3.single": [],
+       "c3.preceded": [],
+       "c3.followed": [],
+       "c3.newline": [],
+       "c3.pre_newline": []
+      },
+      {
+       "c3.adjacent": [],
+       "c3.single": [],
+       "c3.preceded": [],
+       "c3.followed": [],
+       "c3.newline": [],
+       "c3.pre_newline": []
+      },
+      {
+       "c3.adjacent": [],
+       "c3.single": [],
+       "c3.preceded": [],
+       "c3.followed": [],
+       "c3.newline": [],
+       "c3.pre_newline": []
+      }
+     ],
+     "pr": [
+      {
+       "c3.adjacent": [],
+       "c3.single": [],
+       "c3.preceded": [],
+       "c3.followed": [],
+       "c3.newline": [],
+       "c3.pre_newline": []
+      },
+      {
+       "c3.adjacent": [],
+       "c3.single": [],
+       "c3.preceded": [],
+       "c3.followed": [],
+       "c3.newline": [],
+       "c3.pre_newline": []
+      },
+      {
+       "c3.adjacent": [],
+       "c3.single": [],
+       "c3.preceded": [],
+       "c3.followed": [],
+       "c3.newline": [],
+       "c3.pre_newline": []
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "c3.adjacent",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": [],
+      "pr": [],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe-c3-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c3.adjacent\""
+       },
+       "pr": {
+        "file": "probe-model-probe-c3-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c3.adjacent\""
+       }
+      }
+     },
+     {
+      "name": "c3.followed",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": [],
+      "pr": [],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe-c3-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c3.followed\""
+       },
+       "pr": {
+        "file": "probe-model-probe-c3-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c3.followed\""
+       }
+      }
+     },
+     {
+      "name": "c3.newline",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": [],
+      "pr": [],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe-c3-main-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"c3.newline\""
+       },
+       "pr": {
+        "file": "probe-model-probe-c3-pr-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"c3.newline\""
+       }
+      }
+     },
+     {
+      "name": "c3.pre_newline",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": [],
+      "pr": [],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe-c3-main-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"c3.pre_newline\""
+       },
+       "pr": {
+        "file": "probe-model-probe-c3-pr-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"c3.pre_newline\""
+       }
+      }
+     },
+     {
+      "name": "c3.preceded",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": [],
+      "pr": [],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe-c3-main-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"c3.preceded\""
+       },
+       "pr": {
+        "file": "probe-model-probe-c3-pr-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"c3.preceded\""
+       }
+      }
+     },
+     {
+      "name": "c3.single",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": [],
+      "pr": [],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe-c3-main-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"c3.single\""
+       },
+       "pr": {
+        "file": "probe-model-probe-c3-pr-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"c3.single\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "cae98e59c907aa74f9b9e8f2bc61845985749ebcf29f3c921de147654ad66273",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-10-29T05:02:21.930649+00:00",
+     "inputs_sha256": "ad19b3bc9ae40e6eb8284eb7c373e1b3d4d8a2852f4a7379994abf40d9d19635",
+     "inputs": {
+      "title_chars": 44,
+      "body_chars": 536,
+      "base_files": {
+       "rich/highlighter.py": "3086a95b08d1f1a85472c0e2720378c4b45b6a76e1e71fd0ce1e647dd0eb28a9"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-10-29T05:02:21.933988+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 1,
+     "changed_lines_covered": 1,
+     "files": [
+      {
+       "file": "rich/highlighter.py",
+       "changed_lines_total": 1,
+       "changed_lines_covered": 1
+      }
+     ],
+     "adequacy": "adequate",
+     "note": "ran 1 of 1 changed line(s) on the main side",
+     "exit": 0,
+     "data": "probe-cov-model-probe-c3.json",
+     "where": "contree"
+    },
+    "status": "ran"
+   }
+  ],
+  "summary": {
+   "labels": [
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference"
+   ],
+   "flagged": [],
+   "proven_claims": [],
+   "reason": "probe: 12 other observation(s) identical on both sides",
+   "ignored_noise": [],
+   "ignored_warning_only": [],
+   "pr_only_noisy": [],
+   "advisory_unchanged_subchecks": []
+  },
+  "test_settings": {
+   "applied": true,
+   "read_from": "main checkout (same values on both sides)",
+   "source": [
+    "pyproject.toml"
+   ],
+   "variables": [],
+   "pythonpath": [],
+   "pr_changed": []
+  }
+ },
+ "probe_changed_line_coverage": {
+  "status": "measured",
+  "side": "main",
+  "probes": {
+   "model-probe-c1": {
+    "status": "measured",
+    "changed_lines_covered": 1,
+    "changed_lines_total": 1,
+    "adequacy": "adequate"
+   },
+   "model-probe-c3": {
+    "status": "measured",
+    "changed_lines_covered": 1,
+    "changed_lines_total": 1,
+    "adequacy": "adequate"
+   }
+  },
+  "not_adequate": []
+ },
+ "verdict": "verified",
+ "reason": "83 test(s) ran on main, 84 on the PR; 1 new test(s) pass, 83 unchanged; probe: 12 other observation(s) identical on both sides",
+ "verdict_before_coverage_gate": "verified",
+ "reason_before_coverage_gate": "83 test(s) ran on main, 84 on the PR; 1 new test(s) pass, 83 unchanged; probe: 12 other observation(s) identical on both sides",
+ "changed_lines_total": 1,
+ "changed_lines_covered": 1,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "normal",
+  "note": "1 of 1 changed executable line(s) ran (100%)",
+  "measurement": "measured"
+ },
+ "agents": {
+  "status": "skipped",
+  "note": "advisory swarm is off",
+  "roles": []
+ },
+ "explanation": {
+  "status": "not yet wired",
+  "why": "advisory swarm is off"
+ },
+ "swarm_requested": false,
+ "operator_approval_requested": false,
+ "swarm": "off",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [
+   "rich/highlighter.py"
+  ],
+  "compiled_files": [],
+  "other_files": [
+   "README.cn.md",
+   "README.de-ch.md",
+   "README.de.md",
+   "README.es.md",
+   "README.fa.md",
+   "README.fr.md",
+   "README.hi.md",
+   "README.id.md",
+   "README.it.md",
+   "README.ja.md",
+   "README.kr.md",
+   "README.md",
+   "README.pl.md",
+   "README.pt-br.md",
+   "README.ru.md",
+   "README.sv.md",
+   "README.tr.md",
+   "README.zh-tw.md",
+   "tests/test_highlighter.py"
+  ]
+ },
+ "duration_s": {
+  "total_wall": 205.1,
+  "tests": 17.8
+ },
+ "cost": {
+  "ai_calls": 3,
+  "failed_ai_calls": 0,
+  "input_tokens": 10153,
+  "output_tokens": 6187,
+  "thinking_tokens": 4829,
+  "cost_usd": 0.008614,
+  "calls_without_usage": 0,
+  "ai_cost_usd": 0.008614,
+  "cost_complete": true,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 205.1,
+   "tests": 17.8
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.013673,
+  "total_cost_usd": 0.022287,
+  "swarm": {
+   "ai_calls": 0,
+   "failed_ai_calls": 0,
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "thinking_tokens": 0,
+   "cost_usd": 0.0,
+   "calls_without_usage": 0,
+   "ai_cost_usd": 0.0,
+   "cost_complete": true,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ },
+ "timings": {
+  "sandbox prep (checkout)": 20.0,
+  "Tavily setup lookup": 11.8,
+  "demo_helper": 0.0,
+  "Python setup": 0.0,
+  "dependency install": 0.0,
+  "model: claims/probe writing": 9.7,
+  "probes": 75.0,
+  "main side install": 63.3,
+  "tests (both sides)": 25.3,
+  "verdict": 0.0,
+  "record": 0.0,
+  "tests (main side)": 9.1,
+  "tests (PR side)": 8.7,
+  "model call 1 (claims)": 9.7,
+  "model call 2 (probes)": 15.5,
+  "model call 3 (probes)": 14.0
+ },
+ "tavily_credits": {
+  "check": "Textualize/rich#4147",
+  "search_calls": 3,
+  "search_credits": 3.0,
+  "crawl_calls": 0,
+  "crawl_credits": 0.0,
+  "extract_calls": 0,
+  "extract_credits": 0.0,
+  "overlapped": false,
+  "calls": [
+   {
+    "kind": "search",
+    "credits": 1.0,
+    "source": "api",
+    "usage": {
+     "credits": 1
+    }
+   },
+   {
+    "kind": "search",
+    "credits": 1.0,
+    "source": "api",
+    "usage": {
+     "credits": 1
+    }
+   },
+   {
+    "kind": "search",
+    "credits": 1.0,
+    "source": "api",
+    "usage": {
+     "credits": 1
+    }
+   }
+  ],
+  "api_reported_credits": 3.0,
+  "estimated_credits": 0.0,
+  "total_credits": 3.0
+ }
+}

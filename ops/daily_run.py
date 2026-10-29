@@ -5131,6 +5131,13 @@ def settle_probes(rec: dict) -> None:
     rec["probe_changed_line_coverage"] = probe_adequacy.summary(rec["probes"]["items"])
 
 
+def settle_boundary_claims(rec: dict, prdir: Path) -> None:
+    """Product route: past-boundary differences against a seeded "behaviour kept" claim (poc/boundary_claims.py)."""
+    if rec.get("product_check") and rec.get("probes"):
+        from poc import boundary_claims
+        rec["probes"] = boundary_claims.apply(rec["probes"], rec, prdir)
+
+
 def install_optional_modules(venvs: dict, modules: list[str], log: Path, timeout: int,
                              isolated: bool = False) -> tuple[bool, str]:
     """Install plain pip wheels for missing optional modules, on both sides. isolated: see isolated_install."""
@@ -5344,6 +5351,7 @@ def _contree_only_pair(a, rec: dict, repo: str, cfg: dict, item: dict, sp: dict,
                 {"status": "not measured", "why": "Contree-only check: probe coverage needs a local side"})
         rec["probe_changed_line_coverage"] = probe_adequacy.summary((rec["probes"] or {}).get("items") or [])
     settle_probes(rec)
+    settle_boundary_claims(rec, prdir)
     if change_is_docstring_only(rec.get("files"), cm, cp):
         rec["docstring_only"] = True
     return cmp, cnv, ex, targets
@@ -5640,6 +5648,7 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
         rec["probe_changed_line_coverage"] = probe_coverage(item, rec["probes"], vm, site_packages(vm), site_packages(vp),
                                                             prdir, a)
         settle_probes(rec)
+        settle_boundary_claims(rec, prdir)
         if change_is_docstring_only(rec.get("files"), site_packages(vm), site_packages(vp)):
             rec["docstring_only"] = True
     run_progress.emit("verdict", "code", "computing code verdict")
@@ -7371,6 +7380,9 @@ def rejudge(rec: dict, prdir: Path) -> dict:
     cmp["new_tests_failing"] = sorted(cmp["new_tests_failing"])
     ex = exit_check(rec.get("per_run", []), results, cmp)
     pr_probes = rejudge_probes(rec.get("probes"), bool(rec.get("product_check")), broad_gate=broad_gate_for(rec))
+    if rec.get("product_check"):
+        from poc import boundary_claims
+        pr_probes = boundary_claims.apply(pr_probes, rec, prdir)
     v, reason, _ = verdict_for(cmp, None, ex, rec.get("files"), pr_probes, rec.get("behaviour_claims"),
                                rec.get("baseline"))
     v, reason = cap_for_review(rec, v, reason)
