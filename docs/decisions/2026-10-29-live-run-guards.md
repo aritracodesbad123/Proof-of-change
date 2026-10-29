@@ -10,15 +10,22 @@ Date: 2026-10-29
   - A call is also refused when spend so far plus that call's worst case would pass USD. The worst case is input at 2 characters a token plus the full output budget.
   - Calls whose usage the server did not report stay at their worst case.
   - A refusal stops the whole run. The key check (`GET /models`) is not a model call and is not counted.
-- **`--require-contree` never retries a Contree timeout.** Product checks used to retry a Contree API timeout or 5xx before a run started, up to 3 tries. Under `--require-contree` that retry is now off: the first timeout gives "could not verify" and nothing is retried.
+- **`--no-contree-retry`** (new, watched run only). The first Contree timeout or 5xx gives could not verify, with no retry.
+  - Product checks retry a Contree API timeout or 5xx before a run starts, up to 3 tries.
+  - Hosted routes (GitHub App, hosted console, request worker) pass `--require-contree` but not this flag, so they keep that retry. A test checks this.
+  - Tying the no-retry to `--require-contree` was rejected for exactly that reason.
+- **A guard stop leaves a record.**
+  - The stop is a `SystemExit`, so it passes the per-check `Exception` handler.
+  - Before it is raised, the running check's `record.json` is written as could_not_verify. That record carries the stop reason in `reason` and `run_limit_stop`, plus the probe plan when one was made.
+  - `configure` clears the call list, the call count and the watched record, so a second run in the same process starts fresh.
 - All stop reasons are plain text and never contain a key.
 
 ## Why
 
-A watched live check has to stop by itself at the agreed points (wrong trigger, a 5th call, $0.10), not by someone killing it.
+A watched live check has to stop by itself at the agreed points (wrong trigger, a 5th call, $0.10), not by someone killing it, and leave a record that says why.
 
 ## Not changed
 
 - Every flag is off by default, so runs without them behave as before.
-- Product checks without `--require-contree` keep the start-up retry.
+- Every route that does not pass `--no-contree-retry` keeps the start-up retry.
 - No verdict or prompt changes.

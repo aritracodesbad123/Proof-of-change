@@ -15,9 +15,36 @@ class RunLimitStop(SystemExit):
     """A run limit was reached. Carries the plain stop reason as its exit code text."""
 
 
+_current: dict = {"rec": None, "prdir": None}
+
+
 def configure(max_calls: int | None = None, max_cost_usd: float | None = None) -> None:
+    """Set the limits and start a fresh count. Earlier calls in the same process (a second run) never count."""
     with _lock:
         _state.update(max_calls=max_calls, max_cost=max_cost_usd, sent=0)
+        _calls.clear()
+        _current.update(rec=None, prdir=None)
+
+
+def watch_record(rec: dict, prdir) -> None:
+    """The record of the check that is running now. A guard stop writes it to prdir/record.json first."""
+    _current.update(rec=rec, prdir=prdir)
+
+
+def stop(reason: str):
+    """Write the running check's record as could_not_verify with the stop reason (and its probe plan, if any),
+    then raise RunLimitStop. The record write never hides the stop."""
+    rec, prdir = _current.get("rec"), _current.get("prdir")
+    if rec is not None and prdir is not None:
+        try:
+            import json
+            from pathlib import Path
+            rec["verdict"], rec["reason"], rec["run_limit_stop"] = "could_not_verify", reason, reason
+            Path(prdir).mkdir(parents=True, exist_ok=True)
+            (Path(prdir) / "record.json").write_text(json.dumps(rec, indent=1, default=str))
+        except Exception:  # noqa: BLE001, S110 - the stop itself still happens
+            pass
+    raise RunLimitStop(reason)
 
 
 def worst_case_usd(model: str, system: str, user: str, max_tokens: int) -> float:
@@ -42,12 +69,12 @@ def before_call(task: str, model: str, system: str, user: str, max_tokens: int) 
     with _lock:
         n, cap_n, cap_usd = _state["sent"] + 1, _state["max_calls"], _state["max_cost"]
         if cap_n is not None and n > cap_n:
-            raise RunLimitStop(f"STOPPED: provider call {n} ({task}) refused: --max-provider-calls is {cap_n}. "
+            stop(f"STOPPED: provider call {n} ({task}) refused: --max-provider-calls is {cap_n}. "
                                "Nothing more was sent. Result: could not verify.")
         worst = worst_case_usd(model, system, user, max_tokens)
         spent = _spent_locked()
         if cap_usd is not None and spent + worst > cap_usd:
-            raise RunLimitStop(f"STOPPED: provider call {n} ({task}) refused: ${spent:.4f} spent plus up to "
+            stop(f"STOPPED: provider call {n} ({task}) refused: ${spent:.4f} spent plus up to "
                                f"${worst:.4f} for this call would pass --max-cost-usd {cap_usd:.2f}. "
                                "Nothing more was sent. Result: could not verify.")
         _state["sent"] = n
@@ -74,6 +101,7 @@ def reset() -> None:
     with _lock:
         _state.update(max_calls=None, max_cost=None, sent=0)
         _calls.clear()
+        _current.update(rec=None, prdir=None)
 
 
 def boundary_rule_stop(expected: str | None, found) -> str | None:

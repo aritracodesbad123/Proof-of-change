@@ -130,7 +130,7 @@ def test_plan_probes_stops_after_the_plan_is_written(tmp_path, monkeypatch):
     with pytest.raises(run_limits.RunLimitStop) as e:
         daily_run.plan_probes("o/r", item, rec, tmp_path, [tmp_path], tmp_path, a)
     assert rec["probe_plan"]["model_boundary_rule"] == found   # the plan is on the record
-    assert "rich/highlighter.py:90" in str(e.value.code) and rec["run_limit_stop"] == e.value.code
+    assert "rich/highlighter.py:90" in str(e.value.code)
     a.require_boundary_rule = "rich/highlighter.py:90"
     daily_run.plan_probes("o/r", item, {}, tmp_path, [tmp_path], tmp_path, a)   # a match goes on
 
@@ -143,7 +143,7 @@ def test_boundary_rule_turns_parallel_prep_off(monkeypatch):
     assert daily_run.parallel_on(a) is False
 
 
-def test_require_contree_never_retries_a_contree_timeout(monkeypatch):
+def _prep_seen(monkeypatch, **flags):
     seen = {}
 
     def prep(*args, **kw):
@@ -151,7 +151,85 @@ def test_require_contree_never_retries_a_contree_timeout(monkeypatch):
         raise cs.ContreeError("contree request failed: ApiTimeoutError")
     monkeypatch.setattr(cs, "prepare_source_pair", prep)
     monkeypatch.setattr(daily_run, "run", lambda *a, **k: pytest.fail("ran locally"))
-    a = SimpleNamespace(sandbox_backend="contree", product_check=True, pr=1, bench=None, require_contree=True)
+    a = SimpleNamespace(**({"sandbox_backend": "contree", "product_check": True, "pr": 1, "bench": None} | flags))
     why = daily_run._maybe_prepare_contree(a, "o/r", "a" * 40, "b" * 40, {"files": {"all": []}}, 60)
-    assert seen.get("retry_transient") is False
     assert why and "ApiTimeoutError" in why
+    return seen
+
+
+def test_no_contree_retry_flag_turns_the_retry_off(monkeypatch):
+    seen = _prep_seen(monkeypatch, require_contree=True, no_contree_retry=True)
+    assert seen.get("retry_transient") is False
+
+
+def test_hosted_require_contree_keeps_its_retries(monkeypatch):
+    seen = _prep_seen(monkeypatch, require_contree=True)
+    assert seen.get("retry_transient") is True
+    a = daily_run_args(["--pr", "https://github.com/o/r/pull/1", "--product-check", "--require-contree",
+                        "--live-check"])
+    assert a.no_contree_retry is False
+    assert _prep_seen(monkeypatch, **vars(a) | {"sandbox_backend": "contree"}).get("retry_transient") is True
+
+
+def daily_run_args(argv):
+    """The arguments _main parses, without starting a run."""
+    import argparse
+    got, orig = {}, argparse.ArgumentParser.parse_args
+
+    def parse(self, args=None, namespace=None):
+        got["a"] = orig(self, args, namespace)
+        raise SystemExit("captured")
+    with pytest.MonkeyPatch.context() as m:
+        m.setattr(argparse.ArgumentParser, "parse_args", parse)
+        with pytest.raises(SystemExit):
+            daily_run._main(argv)
+    return got["a"]
+
+
+def test_configure_starts_a_fresh_count(monkeypatch):
+    _fake_http(monkeypatch, usage={})
+    monkeypatch.setenv("POC_MAX_TOKENS", "32000")
+    run_limits.configure(max_calls=4, max_cost_usd=0.10)
+    p = _provider()
+    for _ in range(3):
+        p.complete_json("probes", "s", "u", {}, {})
+    run_limits.configure(max_calls=4, max_cost_usd=0.10)   # a second run in the same process
+    assert run_limits.spent_usd() == 0
+    for _ in range(3):
+        p.complete_json("probes", "s", "u", {}, {})
+
+
+def test_provider_stop_writes_a_could_not_verify_record(monkeypatch, tmp_path):
+    _fake_http(monkeypatch)
+    run_limits.configure(max_calls=0)
+    rec = {"repo": "o/r", "probe_plan": {"model_boundary_rule": []}}
+    run_limits.watch_record(rec, tmp_path / "r-1")
+    with pytest.raises(run_limits.RunLimitStop) as e:
+        _provider().complete_json("claims", "s", "u", {}, {})
+    on_disk = json.loads((tmp_path / "r-1" / "record.json").read_text())
+    assert on_disk["verdict"] == "could_not_verify" and on_disk["reason"] == e.value.code
+    assert on_disk["run_limit_stop"] == e.value.code and "probe_plan" in on_disk
+
+
+def test_boundary_stop_writes_the_probe_plan_to_disk(tmp_path, monkeypatch):
+    found = [{"file": "rich/highlighter.py", "line": 90, "old": "x"}]
+    monkeypatch.setattr(daily_run.model_probes, "generate", lambda *a, **k: {"probes": [], "claims": [],
+                                                                              "boundary_rule": found})
+    monkeypatch.setattr(daily_run.probes, "find_probes", lambda *a: [])
+    a = SimpleNamespace(baseline="tests+probes", no_probes=False, provider=object(), model_note=None,
+                        require_boundary_rule="rich/highlighter.py:85", product_check=True, bench=None)
+    item = {"pr": 4147, "title": "t", "body": "", "files": {"all": []}, "diff": ""}
+    rec = {"repo": "o/r"}
+    run_limits.watch_record(rec, tmp_path / "rich-4147")
+    with pytest.raises(run_limits.RunLimitStop):
+        daily_run.plan_probes("o/r", item, rec, tmp_path, [tmp_path], tmp_path, a)
+    on_disk = json.loads((tmp_path / "rich-4147" / "record.json").read_text())
+    assert on_disk["verdict"] == "could_not_verify"
+    assert on_disk["probe_plan"]["model_boundary_rule"] == found
+    assert "rich/highlighter.py:90" in on_disk["run_limit_stop"]
+
+
+def test_test_pr_watches_its_record():
+    import inspect
+    src = inspect.getsource(daily_run.test_pr)
+    assert "run_limits.watch_record(rec, prdir)" in src
