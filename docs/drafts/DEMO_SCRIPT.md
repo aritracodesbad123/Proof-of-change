@@ -1,7 +1,7 @@
 # Proof-of-Change — Demo Video Script (target 2:45, hard cap 3:00)
 
 > Internal draft. Narration is plain language for a non-technical viewer.
-> **CLEARED LIVE CATCH: pending Jonathan** — do not add any live #4147 catch line until cleared.
+> **CLEARED LIVE CATCH: pending clearance** — do not add any live #4147 catch line until cleared.
 
 ## 0:00–0:20 — The problem
 **On screen:** a pull request description saying "fixes X, existing behaviour preserved."
@@ -23,7 +23,7 @@
 **On screen:** banner: **"Recorded example from a saved run (live140) — not a live run on today's code."** Show the trailing-space case: claim says behaviour preserved, probe shows output changed → needs attention, false claim.
 **Narration:** "Here's a recorded example from a saved run. The PR said behaviour was preserved; the probe showed trailing spaces changed. Verdict: needs attention, with the exact input and both outputs attached. Every run also saves a PDF report — no browser needed to produce it."
 
-[PLACEHOLDER — CLEARED LIVE CATCH: pending Jonathan. Insert only if cleared; otherwise skip.]
+[PLACEHOLDER — CLEARED LIVE CATCH: pending clearance. Insert only if cleared; otherwise skip.]
 
 ## 2:20–2:45 — Where we fit + honest gaps
 **On screen:** short related-work card, then a gaps card.

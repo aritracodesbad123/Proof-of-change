@@ -6,6 +6,6 @@ These are draft packaging docs for the NVIDIA × Nebius hackathon honesty frame.
 - `README_HONESTY_SKELETON.md`
 - `CURSOR_HERO_CASE.md`
 
-Shipping numbers stay gated until Jonathan clears the live run.
+Shipping numbers stay gated pending the live-run clearance.
 
 HTML comments must be removed before public README use.

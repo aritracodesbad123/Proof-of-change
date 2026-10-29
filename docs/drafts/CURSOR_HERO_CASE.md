@@ -1,6 +1,6 @@
 # Hero case handoff — live140 trailing-space (recorded example)
 
-**Status:** recorded example from a saved run. NOT a live catch on current main. CLEARED LIVE CATCH: pending Jonathan.
+**Status:** recorded example from a saved run. NOT a live catch on current main. CLEARED LIVE CATCH: pending clearance.
 
 ## What to film
 1. The saved live140 run record (PR text → claims list).
