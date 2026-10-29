@@ -67,7 +67,7 @@ def test_pattern_split_across_adjacent_literals_stays_silent():
     assert [m["old"] for m in bp.modified_patterns(edited)] == [r"<(\w+)>[\w\W]*</\1>"]
 
 
-@pytest.mark.parametrize("path", ["tests/helpers.py", "pkg/testing/util.py", 
+@pytest.mark.parametrize("path", ["tests/helpers.py", "pkg/testing/util.py",
                                   "tests/test_lex.py", "pkg/test_lex.py", "pkg/conftest.py", "README.md"])
 def test_patterns_in_tests_and_non_python_files_are_ignored(path):
     d = _diff(path, ["P = r'a[\\w\\W]*b'"], ["P = r'a[\\w\\W]*?b'"])
