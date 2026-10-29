@@ -2910,6 +2910,8 @@ def _aggregate_names(rec: dict) -> list[str]:
 def parallel_on(a) -> bool:
     """POC_PARALLEL=1 (off by default): product checks only build both Contree checkpoints at once, prepare them
     while probes are written, and run each main/PR pair of timed runs at the same time. Study runs never use it."""
+    if getattr(a, "require_boundary_rule", None):   # the rule is checked before any PR-side work, so never overlap
+        return False
     return product_route(a) and (os.environ.get("POC_PARALLEL") or "").strip().lower() in {"1", "true", "yes", "on"}
 
 
@@ -2961,7 +2963,7 @@ def _maybe_prepare_contree(a, repo: str, main_sha: str, pr_sha: str, rec: dict, 
     try:
         sess = contree_sandboxes.prepare_source_pair(repo, main_sha, pr_sha, timeout=timeout, extra_shell=extra_shell,
                                                      **({"deps_only_fallback": True, "deps_exclude": _aggregate_names(rec),
-                                                        "retry_transient": True,
+                                                        "retry_transient": not getattr(a, "no_contree_retry", False),
                                                         **({"parallel": True, "deps_touched":
                                                             contree_sandboxes.touches_dependency_files(rec.get("files"))}
                                                            if parallel_on(a) else {})}
@@ -4508,6 +4510,10 @@ def plan_probes(repo: str, item: dict, rec: dict, base_root: Path, pr_roots: lis
                                            else str(Path(x["path"]).relative_to(prdir)), "source": x["source"],
                                            **({"origin": x["origin"]} if x.get("origin") else {}),
                                            **x["freeze"]} for x in plan]}
+    from poc import run_limits
+    stop = run_limits.boundary_rule_stop(getattr(a, "require_boundary_rule", None), note.get("model_boundary_rule"))
+    if stop:   # the plan is on the record; nothing from the pull request has run yet
+        run_limits.stop(stop)   # writes the record (probe plan included) as could_not_verify, then stops
     return plan
 
 
@@ -5430,6 +5436,8 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
                if item.get("pinned_sides") else None)
     (prdir / "pr.diff").write_text(item["diff"])
     rec = new_record(repo, cfg, item, a, machine, rdir.name, run_date_for(rdir))
+    from poc import run_limits
+    run_limits.watch_record(rec, prdir)   # a guard stop writes this record before it ends the run
     if pin_why:   # pinned commits could not be diffed: never fall back to GitHub's current PR diff
         rec["verdict"], rec["reason"], _ = verdict_for(None, f"pinned commits unavailable: {pin_why}")
         return finish(rec, prdir, work, t0, a)
@@ -6880,6 +6888,17 @@ def _main(argv=None) -> int:
                          "Nebius Token Factory Sandboxes (needs NEBIUS_API_KEY, NEBIUS_PROJECT_ID, and "
                          "pip install -e '.[contree]'; falls back to local with a note if those are missing; "
                          "set POC_REQUIRE_CONTREE=1 to refuse instead)")
+    ap.add_argument("--require-boundary-rule", default=None, metavar="FILE:LINE",
+                    help="watched live checks: stop after the probe plan is written, before any pull-request code "
+                         "runs, unless the edited-pattern rule found exactly FILE:LINE")
+    ap.add_argument("--no-contree-retry", action="store_true",
+                    help="watched live checks: never retry a Contree timeout or 5xx; the first one gives could not "
+                         "verify. Hosted routes do not pass it and keep their start-up retries")
+    ap.add_argument("--max-provider-calls", type=int, default=None, metavar="N",
+                    help="refuse provider call N+1 before it is sent and stop the run")
+    ap.add_argument("--max-cost-usd", type=float, default=None, metavar="USD",
+                    help="refuse a provider call before it is sent when spend so far plus that call's worst case "
+                         "(full output budget) would pass USD, and stop the run")
     ap.add_argument("--require-contree", action="store_true",
                     help="set only by hosted product routes (GitHub App, hosted console, request worker): run "
                          "pull-request code only in Contree. If Contree cannot start, the check stops with "
@@ -6940,6 +6959,8 @@ def _main(argv=None) -> int:
     ap.add_argument("--ids", default=None, help="with --bench: comma-separated case IDs (default: all), e.g. B01,B14")
     ap.add_argument("--bench-out", default=None, help="with --bench: result folder (default: runs/bench-v0)")
     a = ap.parse_args(argv)
+    from poc import run_limits
+    run_limits.configure(a.max_provider_calls, a.max_cost_usd)   # before anything can call the provider
     if both_sandbox_flags_refusal(a):
         print(both_sandbox_flags_refusal(a), file=sys.stderr)
         raise SystemExit(1)

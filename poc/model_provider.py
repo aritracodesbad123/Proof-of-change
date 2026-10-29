@@ -182,6 +182,8 @@ class NebiusProvider(Provider):
                                      headers={"Content-Type": "application/json",
                                               "Authorization": f"Bearer {self._key}"},
                                      method="POST")  # br-allow-external: model inference call, creates nothing
+        from poc import run_limits
+        run_limits.before_call(task, body["model"], system, user, body["max_tokens"])   # refuses before sending
         raw_dir = os.environ.get("POC_RAW_DIR")
         data, err = None, None
         import time as _tm
@@ -213,6 +215,7 @@ class NebiusProvider(Provider):
             _rp.note_model_call(task, _tm.time() - _call_t0)
             from poc import cost as _cost
             _cost.record_call((data or {}).get("model") or body["model"], (data or {}).get("usage"), ok=err is None)
+            run_limits.after_call((data or {}).get("model") or body["model"], (data or {}).get("usage"))
             if raw_dir:
                 import time as _t
                 d = Path(raw_dir)
