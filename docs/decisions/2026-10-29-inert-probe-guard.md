@@ -14,9 +14,11 @@ on both sides" let the check end as verified, although the probes never saw the 
   "broken probe, every value it returned is empty on both sides". `all_inert` holds when every observation's main
   and PR value and every value of every saved run is `None`, `[]`, `{}` or `""`. `0` and `False` are values, not
   empty. The gate never raises a verdict and is idempotent. Rejudging an old record applies it too.
-- `PRODUCT_PROBE_RULES` (product route probes prompt): observe the value the changed call returns, with the
-  highlighter example `t = h(Text(s))`; all-empty values prove nothing; every probe must list the claim ids it
-  checks and start its observation names with them.
+- `PRODUCT_PROBE_RULES` (product route probes prompt): observe the value the changed call returns, because many
+  calls return a new object and leave their argument unchanged, so read the result from the return value, not
+  from the input. All-empty values prove nothing. Every probe must list the claim ids it checks and start its
+  observation names with them. The rule is generic on purpose: it names no rich class or call, so a later #4147
+  check stays an unaided measurement.
 
 ## Offline proof (no live run, no credits)
 
@@ -45,6 +47,11 @@ model wrote it. One inert probe next to a probe with real values does not trip t
 gate. No guard test is weakened.
 
 ## Tests
+
+The full-gate fixture carries the live record's coverage block (the tests ran the changed line), so
+`no_evidence_gate` leaves it alone and only the inert guard demotes it; a test replaces the guard with a no-op
+and checks the record then stays verified.
+
 
 `tests/test_inert_probe_gate.py`: the live record's probe items (fixture) trip the gate and the full `gate` chain;
 one non-empty value anywhere clears it; the gate never raises a verdict; the prompt rule wording; the offline proof

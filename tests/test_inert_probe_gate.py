@@ -23,7 +23,18 @@ def test_live_all_empty_record_is_not_verified():
 
 
 def test_full_gate_chain_trips_on_live_pattern():
-    assert gate(_rec())["verdict"] == "could_not_verify"
+    rec = _rec()
+    out = gate(rec)
+    assert out["verdict"] == "could_not_verify"
+    assert "verdict_before_inert_probe_gate" in out and "verdict_before_no_evidence_gate" not in out
+
+
+def test_without_inert_guard_the_live_pattern_stays_verified(monkeypatch):
+    """The fixture's coverage shows the tests ran the changed line, so no other gate demotes it: only the inert
+    guard does. Removing the guard must leave it verified (this is what the test above relies on)."""
+    import ops.daily_run as dr
+    monkeypatch.setattr(dr, "inert_probe_gate", lambda r: r)
+    assert dr.gate(_rec())["verdict"] == "verified"
 
 
 def test_one_non_empty_value_anywhere_is_not_inert():
@@ -50,7 +61,8 @@ def test_scalar_zero_and_false_are_values_not_empty():
 
 def test_prompt_rule_mentions_return_value_and_claim_ids():
     from poc.model_probes import PRODUCT_PROBE_RULES
-    assert "t = h(Text(s))" in PRODUCT_PROBE_RULES and "returns a new" in PRODUCT_PROBE_RULES
+    assert "read the result from the return value, not from the input" in PRODUCT_PROBE_RULES
+    assert "Text" not in PRODUCT_PROBE_RULES and "Highlighter" not in PRODUCT_PROBE_RULES  # no hint for rich#4147
     assert "claim ids" in PRODUCT_PROBE_RULES
 
 
