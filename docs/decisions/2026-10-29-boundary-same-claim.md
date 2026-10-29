@@ -73,3 +73,10 @@ existing pattern is edited. This is a fixed parametrised test in `tests/test_bou
 - **Input tables.** Only inputs written as a literal string table are seen. Probes built in other ways are not
   covered, and stay as they are.
 - **Not shown live.** Whether the live claims step plus probes produce this is not yet shown. No live run was made.
+
+## Route wiring tests
+
+`tests/test_boundary_settle_routes.py` drives each live route (the local nightly route in `test_pr` and
+`_contree_only_pair`) with its build, test and probe steps stubbed, and asserts `settle_boundary_claims` runs once,
+after `settle_probes`, with that check's directory. Removing the call from either route fails its test
+(both drop mutations checked).
