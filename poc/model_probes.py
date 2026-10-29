@@ -757,10 +757,11 @@ def _usable(resp, claim_ids: set) -> list:
 
 def generate(provider: Provider, repo: str, pr: int, title: str, body: str | None, base_files: dict,
              base_root: Path, pr_roots: list, outdir: Path, product: bool = False,
-             python_version: str | None = None) -> dict:
+             python_version: str | None = None, diff: str | None = None) -> dict:
     """product: a product check. It adds PRODUCT_PROBE_RULES to the probes prompt and rewrites or rejects imports
     of a src/ layout folder. A study run (product False) is unchanged. python_version: the Python that will run the
-    probes; the prompt names it and probes that do not parse with its grammar are rejected."""
+    probes; the prompt names it and probes that do not parse with its grammar are rejected. diff: the PR diff, read
+    only to see whether an existing pattern is edited (poc/boundary_probes.py); only base-side text reaches the prompt."""
     from poc import run_progress
 
     probes_prompt = PROBES_PROMPT + PRODUCT_PROBE_RULES if product else PROBES_PROMPT
@@ -798,6 +799,12 @@ def generate(provider: Provider, repo: str, pr: int, title: str, body: str | Non
     if product and testable:   # product checks only: broad "nothing else changes" claims need varied inputs
         from poc import broad_claims
         probes_prompt = probes_prompt + broad_claims.probe_rule(testable)
+    if product:   # product checks only: an edited existing pattern needs inputs just past the old match boundary
+        from poc import boundary_probes
+        rule = boundary_probes.probe_rule(diff, testable)
+        if rule:
+            probes_prompt = probes_prompt + rule
+            out["boundary_rule"] = boundary_probes.modified_patterns(diff)
     run_progress.emit("probes", "super", "Super is writing behaviour probes")
     try:
         resp = provider.complete_json("probes", probes_prompt, user, PROBES_SCHEMA, ctx)

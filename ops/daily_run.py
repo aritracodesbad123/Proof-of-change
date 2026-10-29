@@ -4470,7 +4470,8 @@ def plan_probes(repo: str, item: dict, rec: dict, base_root: Path, pr_roots: lis
             try:
                 res = model_probes.generate(provider, repo, item["pr"], item["title"], item.get("body"), base_files,
                                             base_root, pr_roots, prdir / "model-probes",
-                                            product=product_route(a), python_version=probe_python_version(a))
+                                            product=product_route(a), python_version=probe_python_version(a),
+                                            diff=item.get("diff"))
             except freeze.FreezeError as e:
                 res = {"errors": [str(e)], "probes": [], "claims": [], "rejected_claims": []}
             note["model_claims"] = res.get("claims", [])
@@ -4480,7 +4481,7 @@ def plan_probes(repo: str, item: dict, rec: dict, base_root: Path, pr_roots: lis
                 note["model_loose_quote_matches"] = res["loose_quote_matches"]
             if res.get("rewritten_imports"):   # product checks: src/ layout imports rewritten to the installed name
                 note["rewritten_imports"] = res["rewritten_imports"]
-            for k in ("parse_repairs", "retried", "unmatched_covers"):   # repair and retry trail, shown on the record
+            for k in ("parse_repairs", "retried", "unmatched_covers", "boundary_rule"):   # repair and retry trail, shown on the record
                 if res.get(k):
                     note[f"model_{k}"] = res[k]
             plan += [{"path": x["path"], "source": "model", "freeze": x["freeze"],
