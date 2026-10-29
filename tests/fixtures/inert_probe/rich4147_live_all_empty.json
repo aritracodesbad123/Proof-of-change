@@ -1,0 +1,227 @@
+{
+ "source": "rich#4147 live run 2026-10-29 10:31 IST, ops run 2026-10-29-check-103104-pr4147 (probe items only)",
+ "verdict": "verified",
+ "reason": "83 test(s) ran on main, 84 on the PR; 1 new test(s) pass, 83 unchanged; probe: 12 other observation(s) identical on both sides",
+ "probes": {
+  "items": [
+   {
+    "id": "model-probe-c1",
+    "claims": [],
+    "status": "ran",
+    "runs": {
+     "main": [
+      {
+       "c1.adjacent": [],
+       "c1.single": [],
+       "c1.preceded": [],
+       "c1.followed": [],
+       "c1.newline": [],
+       "c1.pre_newline": []
+      },
+      {
+       "c1.adjacent": [],
+       "c1.single": [],
+       "c1.preceded": [],
+       "c1.followed": [],
+       "c1.newline": [],
+       "c1.pre_newline": []
+      },
+      {
+       "c1.adjacent": [],
+       "c1.single": [],
+       "c1.preceded": [],
+       "c1.followed": [],
+       "c1.newline": [],
+       "c1.pre_newline": []
+      }
+     ],
+     "pr": [
+      {
+       "c1.adjacent": [],
+       "c1.single": [],
+       "c1.preceded": [],
+       "c1.followed": [],
+       "c1.newline": [],
+       "c1.pre_newline": []
+      },
+      {
+       "c1.adjacent": [],
+       "c1.single": [],
+       "c1.preceded": [],
+       "c1.followed": [],
+       "c1.newline": [],
+       "c1.pre_newline": []
+      },
+      {
+       "c1.adjacent": [],
+       "c1.single": [],
+       "c1.preceded": [],
+       "c1.followed": [],
+       "c1.newline": [],
+       "c1.pre_newline": []
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "c1.adjacent",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": [],
+      "pr": []
+     },
+     {
+      "name": "c1.followed",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": [],
+      "pr": []
+     },
+     {
+      "name": "c1.newline",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": [],
+      "pr": []
+     },
+     {
+      "name": "c1.pre_newline",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": [],
+      "pr": []
+     },
+     {
+      "name": "c1.preceded",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": [],
+      "pr": []
+     },
+     {
+      "name": "c1.single",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": [],
+      "pr": []
+     }
+    ]
+   },
+   {
+    "id": "model-probe-c3",
+    "claims": [],
+    "status": "ran",
+    "runs": {
+     "main": [
+      {
+       "c3.adjacent": [],
+       "c3.single": [],
+       "c3.preceded": [],
+       "c3.followed": [],
+       "c3.newline": [],
+       "c3.pre_newline": []
+      },
+      {
+       "c3.adjacent": [],
+       "c3.single": [],
+       "c3.preceded": [],
+       "c3.followed": [],
+       "c3.newline": [],
+       "c3.pre_newline": []
+      },
+      {
+       "c3.adjacent": [],
+       "c3.single": [],
+       "c3.preceded": [],
+       "c3.followed": [],
+       "c3.newline": [],
+       "c3.pre_newline": []
+      }
+     ],
+     "pr": [
+      {
+       "c3.adjacent": [],
+       "c3.single": [],
+       "c3.preceded": [],
+       "c3.followed": [],
+       "c3.newline": [],
+       "c3.pre_newline": []
+      },
+      {
+       "c3.adjacent": [],
+       "c3.single": [],
+       "c3.preceded": [],
+       "c3.followed": [],
+       "c3.newline": [],
+       "c3.pre_newline": []
+      },
+      {
+       "c3.adjacent": [],
+       "c3.single": [],
+       "c3.preceded": [],
+       "c3.followed": [],
+       "c3.newline": [],
+       "c3.pre_newline": []
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "c3.adjacent",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": [],
+      "pr": []
+     },
+     {
+      "name": "c3.followed",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": [],
+      "pr": []
+     },
+     {
+      "name": "c3.newline",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": [],
+      "pr": []
+     },
+     {
+      "name": "c3.pre_newline",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": [],
+      "pr": []
+     },
+     {
+      "name": "c3.preceded",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": [],
+      "pr": []
+     },
+     {
+      "name": "c3.single",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": [],
+      "pr": []
+     }
+    ]
+   }
+  ]
+ }
+}
