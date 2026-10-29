@@ -1,0 +1,42 @@
+"""Offline: tonight's rich#4147 record with the two probes' runs replaced by the hand-fixed probes' real outputs
+(rich base 9d8f9a37 / head 3bd56b51, 3 runs each), re-judged with this branch's code. Three claim links."""
+import copy, json, sys
+from pathlib import Path
+sys.path.insert(0, sys.argv[1])
+from ops.daily_run import rejudge
+from poc.final_verdict import final
+P = Path(__file__).parent
+SRC = Path("<live run case folder>")
+base = json.loads((SRC / "record.json").read_text())
+cl = {c["id"]: c for c in base["probe_plan"]["model_claims"]}
+def runs(kind, c):
+    return {side: [json.loads((P / f"out-{kind}-{c}-{sha}-{i}.json").read_text().splitlines()[-1])["observations"]
+                   for i in (1, 2, 3)] for side, sha in (("main", "9d8f9a37"), ("pr", "3bd56b51"))}
+def link(cid, expect, text):
+    return {"id": cid, "source": "PR description", "text": text, "covers": [f"{cid}.*"], "expect": expect}
+variants = {
+  "orig_as_run": ("orig", {}),
+  "fixed_as_run_no_claims": ("fixed", {}),
+  "fixed_linked_model_claims": ("fixed", {"c1": [link("C1", cl["C1"]["expect"], cl["C1"]["text"])],
+                                          "c3": [link("C3", cl["C3"]["expect"], cl["C3"]["text"])]}),
+  "fixed_linked_preserve_claim": ("fixed", {"c3": [link("C3", "same", "Tags not adjacent to another tag are "
+                                                      "highlighted as before (existing behavior preserved).")]}),
+}
+out = {}
+for name, (kind, links) in variants.items():
+    rec = copy.deepcopy(base)
+    rec.pop("coverage_gate", None)  # let rejudge + gate recompute from scratch
+    for it in rec["probes"]["items"]:
+        c = it["id"].rsplit("-", 1)[-1]
+        it["runs"] = runs(kind, c)
+        it["claims"] = links.get(c, [])
+        if links.get(c):
+            for o in it["observations"]:
+                o["name"] = o["name"].replace(f"{c}.", f"{c.upper()}.")
+            it["runs"] = {s: [{k.replace(f"{c}.", f"{c.upper()}."): v for k, v in r.items()} for r in rs]
+                          for s, rs in it["runs"].items()}
+    f = final(rejudge(rec, SRC))
+    flagged = (f.get("probes") or {}).get("summary", {}).get("flagged", [])
+    out[name] = {"verdict": f["verdict"], "reason": f["reason"][:400], "flagged": flagged}
+    print(name, "->", f["verdict"], "|", [(x["name"], x["label"]) for x in flagged][:6])
+json.dump(out, open(P / "simulate-result.json", "w"), indent=1)

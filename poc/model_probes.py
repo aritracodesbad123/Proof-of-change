@@ -39,7 +39,12 @@ PRODUCT_PROBE_RULES = (
     "\n\nImports: the package under test is installed on both sides. Import it by its installed import name, the "
     "way a user of the package would. Never import through the repository folder that holds the code (for "
     "example a src. prefix): that folder is not on the import path. Output: print the last line with "
-    "print(json.dumps({\"observations\": obs})). Never print the dict itself, its repr or str: only JSON is read.")
+    "print(json.dumps({\"observations\": obs})). Never print the dict itself, its repr or str: only JSON is read."
+    " Return values: observe what the changed call returns, not the object you passed in. Many calls return a new"
+    " object and leave their argument unchanged;"
+    " read the result from the return value, not from the input. A probe whose values are all empty on both sides"
+    " proves nothing and the check cannot be verified. Claims: every probe must list in \"claims\" the claim"
+    " ids it checks, and its observation names must start with those ids.")
 SRC_DIR = "src"
 
 

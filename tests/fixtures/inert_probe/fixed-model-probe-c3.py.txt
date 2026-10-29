@@ -1,0 +1,30 @@
+"""Model-written probe for Textualize/rich#4147 (model (nvidia/nemotron-3-super-120b-a12b, live)). Generated from the PR text and base-side code only;
+frozen before any PR-side execution. Untrusted: runs only in the sandbox without network."""
+PROBE = {'id': 'model-probe-c3', 'target': 'Textualize/rich#4147', 'about': 'model-written probe of the changed files (no description given)', 'claims': [], 'timeout_s': 60, 'generator': 'model (nvidia/nemotron-3-super-120b-a12b, live)'}
+
+import json  # added by the harness: the observations line is printed as JSON
+import json
+from rich.highlighter import ReprHighlighter
+from rich.text import Text
+
+def get_spans(s):
+    h = ReprHighlighter()
+    t = h(Text(s))  # hand-fix: read spans from the returned Text
+    return [(span.start, span.end, span.style) for span in t.spans]
+
+inputs = {
+    "adjacent": "<a>content1</a><b>content2</b>",
+    "single": "<a>content</a>",
+    "preceded": "xx<a>content</a>yy",
+    "followed": "<a>content</a>zz",
+    "newline": "<a>content</a>\\nnext",
+    "pre_newline": "before<a>content</a>\\nnext",
+}
+obs = {}
+for k, inp in inputs.items():
+    try:
+        obs[f"c3.{k}"] = get_spans(inp)
+    except Exception as e:
+        obs[f"c3.{k}"] = {"exception": type(e).__name__}
+
+print(json.dumps({"observations": obs}))

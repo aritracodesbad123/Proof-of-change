@@ -3678,8 +3678,8 @@ def leave_run_pointer(rdir: Path, started: dt.datetime, index: Path | None = Non
 def gate(rec: dict) -> dict:
     """Apply the coverage gate (poc/coverage_gate.py) to a finished record; baselines without coverage skip it."""
     if not uses(rec.get("baseline"), "coverage"):
-        return cap_rewrite(advisory_gate(no_evidence_gate(broken_probe_gate(rec))))
-    return cap_rewrite(advisory_gate(no_evidence_gate(broken_probe_gate(ai_probe_gate(coverage_gate.apply(rec))))))
+        return cap_rewrite(advisory_gate(no_evidence_gate(inert_probe_gate(broken_probe_gate(rec)))))
+    return cap_rewrite(advisory_gate(no_evidence_gate(inert_probe_gate(broken_probe_gate(ai_probe_gate(coverage_gate.apply(rec)))))))
 
 
 def all_broken(item: dict) -> bool:
@@ -3698,6 +3698,45 @@ def broken_probe_gate(rec: dict) -> dict:
     out["verdict"] = Verdict.COULD_NOT_VERIFY.value
     out["reason"] = ("could not verify: every probe is broken (it raised the same exception or skipped the same way "
                      "on both sides, so it never reached the claimed call); " + (rec.get("reason") or ""))
+    return out
+
+
+def _empty(v) -> bool:
+    return v is None or (isinstance(v, (list, dict, str, tuple)) and len(v) == 0)
+
+
+def all_inert(item: dict) -> bool:
+    """Every observation of this probe returned an empty value (None, [], {} or "") on both sides and every run: the
+    probe read something the changed code never touched (rich#4147, 2026-10-29: spans read from the Text passed in,
+    not from the new Text the highlighter returned), so its "identical on both sides" is no evidence."""
+    obs = item.get("observations") or []
+    if not obs:
+        return False
+    runs = item.get("runs") if isinstance(item.get("runs"), dict) else {}
+    for o in obs:
+        if not (_empty(o.get("main")) and _empty(o.get("pr"))):
+            return False
+    for side in ("main", "pr"):
+        for run in runs.get(side) or []:
+            vals = run.values() if isinstance(run, dict) else []
+            if any(not _empty(v) for v in vals):
+                return False
+    return True
+
+
+def inert_probe_gate(rec: dict) -> dict:
+    """A run whose probes are each inert (all values empty on both sides) or broken has no probe evidence: it is
+    never verified, it is could_not_verify. Idempotent; it never raises a verdict."""
+    items = (rec.get("probes") or {}).get("items") or []
+    if rec.get("verdict") != Verdict.VERIFIED.value or not items:
+        return rec
+    if not all(all_inert(it) or all_broken(it) for it in items) or not any(all_inert(it) for it in items):
+        return rec
+    out = dict(rec)
+    out.setdefault("verdict_before_inert_probe_gate", rec["verdict"])
+    out["verdict"] = Verdict.COULD_NOT_VERIFY.value
+    out["reason"] = ("could not verify: broken probe, every value it returned is empty on both sides, so it never "
+                     "observed the changed behaviour; " + (rec.get("reason") or ""))
     return out
 
 

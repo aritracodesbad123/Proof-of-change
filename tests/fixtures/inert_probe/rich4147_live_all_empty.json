@@ -1,0 +1,303 @@
+{
+ "source": "rich#4147 live run 2026-10-29 10:31 IST, ops run 2026-10-29-check-103104-pr4147 (probe items only)",
+ "verdict": "verified",
+ "reason": "83 test(s) ran on main, 84 on the PR; 1 new test(s) pass, 83 unchanged; probe: 12 other observation(s) identical on both sides",
+ "probes": {
+  "items": [
+   {
+    "id": "model-probe-c1",
+    "claims": [],
+    "status": "ran",
+    "runs": {
+     "main": [
+      {
+       "c1.adjacent": [],
+       "c1.single": [],
+       "c1.preceded": [],
+       "c1.followed": [],
+       "c1.newline": [],
+       "c1.pre_newline": []
+      },
+      {
+       "c1.adjacent": [],
+       "c1.single": [],
+       "c1.preceded": [],
+       "c1.followed": [],
+       "c1.newline": [],
+       "c1.pre_newline": []
+      },
+      {
+       "c1.adjacent": [],
+       "c1.single": [],
+       "c1.preceded": [],
+       "c1.followed": [],
+       "c1.newline": [],
+       "c1.pre_newline": []
+      }
+     ],
+     "pr": [
+      {
+       "c1.adjacent": [],
+       "c1.single": [],
+       "c1.preceded": [],
+       "c1.followed": [],
+       "c1.newline": [],
+       "c1.pre_newline": []
+      },
+      {
+       "c1.adjacent": [],
+       "c1.single": [],
+       "c1.preceded": [],
+       "c1.followed": [],
+       "c1.newline": [],
+       "c1.pre_newline": []
+      },
+      {
+       "c1.adjacent": [],
+       "c1.single": [],
+       "c1.preceded": [],
+       "c1.followed": [],
+       "c1.newline": [],
+       "c1.pre_newline": []
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "c1.adjacent",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": [],
+      "pr": []
+     },
+     {
+      "name": "c1.followed",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": [],
+      "pr": []
+     },
+     {
+      "name": "c1.newline",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": [],
+      "pr": []
+     },
+     {
+      "name": "c1.pre_newline",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": [],
+      "pr": []
+     },
+     {
+      "name": "c1.preceded",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": [],
+      "pr": []
+     },
+     {
+      "name": "c1.single",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": [],
+      "pr": []
+     }
+    ],
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 1,
+     "changed_lines_covered": 1,
+     "files": [
+      {
+       "file": "rich/highlighter.py",
+       "changed_lines_total": 1,
+       "changed_lines_covered": 1
+      }
+     ],
+     "adequacy": "adequate",
+     "note": "ran 1 of 1 changed line(s) on the main side",
+     "exit": 0,
+     "data": "probe-cov-model-probe-c1.json",
+     "where": "contree"
+    },
+    "source": "model"
+   },
+   {
+    "id": "model-probe-c3",
+    "claims": [],
+    "status": "ran",
+    "runs": {
+     "main": [
+      {
+       "c3.adjacent": [],
+       "c3.single": [],
+       "c3.preceded": [],
+       "c3.followed": [],
+       "c3.newline": [],
+       "c3.pre_newline": []
+      },
+      {
+       "c3.adjacent": [],
+       "c3.single": [],
+       "c3.preceded": [],
+       "c3.followed": [],
+       "c3.newline": [],
+       "c3.pre_newline": []
+      },
+      {
+       "c3.adjacent": [],
+       "c3.single": [],
+       "c3.preceded": [],
+       "c3.followed": [],
+       "c3.newline": [],
+       "c3.pre_newline": []
+      }
+     ],
+     "pr": [
+      {
+       "c3.adjacent": [],
+       "c3.single": [],
+       "c3.preceded": [],
+       "c3.followed": [],
+       "c3.newline": [],
+       "c3.pre_newline": []
+      },
+      {
+       "c3.adjacent": [],
+       "c3.single": [],
+       "c3.preceded": [],
+       "c3.followed": [],
+       "c3.newline": [],
+       "c3.pre_newline": []
+      },
+      {
+       "c3.adjacent": [],
+       "c3.single": [],
+       "c3.preceded": [],
+       "c3.followed": [],
+       "c3.newline": [],
+       "c3.pre_newline": []
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "c3.adjacent",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": [],
+      "pr": []
+     },
+     {
+      "name": "c3.followed",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": [],
+      "pr": []
+     },
+     {
+      "name": "c3.newline",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": [],
+      "pr": []
+     },
+     {
+      "name": "c3.pre_newline",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": [],
+      "pr": []
+     },
+     {
+      "name": "c3.preceded",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": [],
+      "pr": []
+     },
+     {
+      "name": "c3.single",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": [],
+      "pr": []
+     }
+    ],
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 1,
+     "changed_lines_covered": 1,
+     "files": [
+      {
+       "file": "rich/highlighter.py",
+       "changed_lines_total": 1,
+       "changed_lines_covered": 1
+      }
+     ],
+     "adequacy": "adequate",
+     "note": "ran 1 of 1 changed line(s) on the main side",
+     "exit": 0,
+     "data": "probe-cov-model-probe-c3.json",
+     "where": "contree"
+    },
+    "source": "model"
+   }
+  ]
+ },
+ "coverage": {
+  "status": "measured",
+  "changed_lines_total": 1,
+  "changed_lines_covered": 1,
+  "files": [
+   {
+    "file": "rich/highlighter.py",
+    "changed_lines_total": 1,
+    "changed_lines_covered": 1
+   }
+  ],
+  "seconds": 7.4,
+  "exit": 0,
+  "log": "coverage-pytest.log",
+  "where": "contree"
+ },
+ "_note": "coverage fields copied from the live record (tests and probes ran the changed line), so only the inert guard can flip this record",
+ "baseline": "full",
+ "probe_changed_line_coverage": {
+  "status": "measured",
+  "side": "main",
+  "probes": {
+   "model-probe-c1": {
+    "status": "measured",
+    "changed_lines_covered": 1,
+    "changed_lines_total": 1,
+    "adequacy": "adequate"
+   },
+   "model-probe-c3": {
+    "status": "measured",
+    "changed_lines_covered": 1,
+    "changed_lines_total": 1,
+    "adequacy": "adequate"
+   }
+  },
+  "not_adequate": []
+ },
+ "changed_lines_total": 1,
+ "changed_lines_covered": 1,
+ "product_check": true
+}
