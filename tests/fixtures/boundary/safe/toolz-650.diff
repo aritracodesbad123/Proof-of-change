@@ -1,0 +1,47 @@
+diff --git a/toolz/itertoolz.py b/toolz/itertoolz.py
+index 05c36cca..9cd24553 100644
+--- a/toolz/itertoolz.py
++++ b/toolz/itertoolz.py
+@@ -4,7 +4,7 @@
+ import operator
+ from functools import partial
+ from itertools import filterfalse, zip_longest
+-from collections.abc import Sequence
++from collections.abc import Sequence, Sized
+ from toolz.utils import no_default
+ 
+ 
+@@ -297,7 +297,7 @@ def isdistinct(seq):
+     >>> isdistinct("World")
+     True
+     """
+-    if iter(seq) is seq:
++    if iter(seq) is seq or not isinstance(seq, Sized):
+         seen = set()
+         seen_add = seen.add
+         for item in seq:
+diff --git a/toolz/tests/test_itertoolz.py b/toolz/tests/test_itertoolz.py
+index d20da2b8..0e196ed8 100644
+--- a/toolz/tests/test_itertoolz.py
++++ b/toolz/tests/test_itertoolz.py
+@@ -147,6 +147,20 @@ def test_isdistinct():
+     assert isdistinct(iter([1, 2, 1])) is False
+ 
+ 
++def test_isdistinct_unsized_iterable():
++    class Iterable:
++        def __init__(self, values):
++            self.values = values
++
++        def __iter__(self):
++            return iter(self.values)
++
++    for values, expected in [([], True), ([1, 2, 3], True), ([1, 2, 1], False)]:
++        seq = Iterable(values)
++        assert isdistinct(seq) is expected
++        assert isdistinct(seq) is expected
++
++
+ def test_nth():
+     assert nth(2, 'ABCDE') == 'C'
+     assert nth(2, iter('ABCDE')) == 'C'

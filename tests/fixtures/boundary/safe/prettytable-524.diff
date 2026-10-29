@@ -1,0 +1,80 @@
+diff --git a/src/prettytable/prettytable.py b/src/prettytable/prettytable.py
+index 4cf2f389..2e41bfbe 100644
+--- a/src/prettytable/prettytable.py
++++ b/src/prettytable/prettytable.py
+@@ -427,7 +427,7 @@ def __init__(self, field_names: Sequence[str] | None = None, **kwargs) -> None:
+         self._hrules = kwargs["hrules"] or HRuleStyle.FRAME
+         self._vrules = kwargs["vrules"] or VRuleStyle.ALL
+ 
+-        self._sortby = kwargs["sortby"] or None
++        self._sortby = kwargs["sortby"]
+         if kwargs["reversesort"] in (True, False):
+             self._reversesort = kwargs["reversesort"]
+         else:
+@@ -2152,7 +2152,7 @@ def _get_rows(self, options: OptionsType) -> list[RowType]:
+         rows = [row for row in rows if options["row_filter"](row)]
+ 
+         # Sort
+-        if options["sortby"]:
++        if options["sortby"] is not None:
+             sortindex = self._field_names.index(options["sortby"])
+             # Decorate
+             rows = [[row[sortindex]] + row for row in rows]
+@@ -2178,7 +2178,7 @@ def _get_dividers(self, options: OptionsType) -> list[bool]:
+         else:
+             dividers = self._dividers
+ 
+-        if options["sortby"]:
++        if options["sortby"] is not None:
+             dividers = [False for divider in dividers]
+ 
+         return dividers
+diff --git a/tests/test_sorting.py b/tests/test_sorting.py
+index 172e6347..fc1a7760 100644
+--- a/tests/test_sorting.py
++++ b/tests/test_sorting.py
+@@ -1,11 +1,44 @@
+ from __future__ import annotations
+ 
++import pytest
+ from test_prettytable import CITY_DATA, CITY_DATA_HEADER
+ 
+ from prettytable import PrettyTable, RowType
+ 
+ 
+ class TestSorting:
++    @pytest.mark.parametrize("entrypoint", ["constructor", "attribute", "render"])
++    @pytest.mark.parametrize(
++        ("reverse", "expected_rows"),
++        [
++            (False, [[1, "first"], [2, "second"]]),
++            (True, [[2, "second"], [1, "first"]]),
++        ],
++    )
++    def test_sort_by_empty_field_name(
++        self, entrypoint: str, reverse: bool, expected_rows: list[RowType]
++    ) -> None:
++        if entrypoint == "constructor":
++            table = PrettyTable(["", "name"], sortby="", reversesort=reverse)
++            assert table.sortby == ""
++        else:
++            table = PrettyTable(["", "name"])
++        table.add_row([2, "second"], divider=True)
++        table.add_row([1, "first"])
++
++        if entrypoint == "attribute":
++            table.sortby = ""
++            table.reversesort = reverse
++
++        if entrypoint == "render":
++            actual = table.get_string(sortby="", reversesort=reverse)
++        else:
++            actual = table.get_string()
++
++        expected = PrettyTable(["", "name"])
++        expected.add_rows(expected_rows)
++        assert actual == expected.get_string()
++
+     def test_sort_by_different_per_columns(self, city_data: PrettyTable) -> None:
+         city_data.sortby = city_data.field_names[0]
+         old = city_data.get_string()

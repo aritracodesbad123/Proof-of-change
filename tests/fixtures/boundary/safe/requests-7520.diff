@@ -1,0 +1,126 @@
+diff --git a/src/requests/utils.py b/src/requests/utils.py
+index fff6edf4be..6e654a9d16 100644
+--- a/src/requests/utils.py
++++ b/src/requests/utils.py
+@@ -962,6 +962,61 @@ def default_headers() -> CaseInsensitiveDict[str]:
+     )
+ 
+ 
++def _parse_header_links_params(value: str) -> list[str]:
++    """Split Link header parameters without splitting quoted values."""
++    params: list[str] = []
++    start = 0
++    in_quotes = False
++    escaped = False
++
++    for index, char in enumerate(value):
++        if escaped:
++            escaped = False
++        elif char == "\\" and in_quotes:
++            escaped = True
++        elif char == '"':
++            in_quotes = not in_quotes
++        elif char == ";" and not in_quotes:
++            params.append(value[start:index])
++            start = index + 1
++
++    params.append(value[start:])
++    return params
++
++
++def _split_link_header_entries(value: str) -> list[str]:
++    """Split a Link header value into individual "<url>; params" entries
++    without splitting on a ", *<" that occurs inside a quoted parameter
++    value (RFC 8288 quoted-strings may contain commas)."""
++    entries: list[str] = []
++    start = 0
++    in_quotes = False
++    escaped = False
++    length = len(value)
++    index = 0
++
++    while index < length:
++        char = value[index]
++        if escaped:
++            escaped = False
++        elif char == "\\" and in_quotes:
++            escaped = True
++        elif char == '"':
++            in_quotes = not in_quotes
++        elif char == "," and not in_quotes:
++            lookahead = index + 1
++            while lookahead < length and value[lookahead] == " ":
++                lookahead += 1
++            if lookahead < length and value[lookahead] == "<":
++                entries.append(value[start:index])
++                start = lookahead + 1
++                index = lookahead
++        index += 1
++
++    entries.append(value[start:])
++    return entries
++
++
+ def parse_header_links(value: str) -> list[dict[str, str]]:
+     """Return a list of parsed link headers proxies.
+ 
+@@ -978,7 +1033,7 @@ def parse_header_links(value: str) -> list[dict[str, str]]:
+     if not value:
+         return links
+ 
+-    for val in re.split(", *<", value):
++    for val in _split_link_header_entries(value):
+         try:
+             url, params = val.split(";", 1)
+         except ValueError:
+@@ -986,9 +1041,9 @@ def parse_header_links(value: str) -> list[dict[str, str]]:
+ 
+         link: dict[str, str] = {"url": url.strip("<> '\"")}
+ 
+-        for param in params.split(";"):
++        for param in _parse_header_links_params(params):
+             try:
+-                key, value = param.split("=")
++                key, value = param.split("=", 1)
+             except ValueError:
+                 break
+ 
+diff --git a/tests/test_utils.py b/tests/test_utils.py
+index 091a9fd6f3..963fb88cb3 100644
+--- a/tests/test_utils.py
++++ b/tests/test_utils.py
+@@ -690,6 +690,34 @@ def test_iter_slices(value, length):
+                 {"url": "http://.../back.jpeg"},
+             ],
+         ),
++        (
++            # A quoted parameter value may itself contain "=" (RFC 8288);
++            # it must be kept and must not drop the parameters after it.
++            '<http:/.../front.jpeg>; title="a=b"; rel="next"',
++            [{"url": "http:/.../front.jpeg", "title": "a=b", "rel": "next"}],
++        ),
++        (
++            # Quoted parameter values may contain both "=" and ";"; separators
++            # inside the quoted string must not create another parameter.
++            '<http:/.../front.jpeg>; title="a=b;c"; rel="next"',
++            [{"url": "http:/.../front.jpeg", "title": "a=b;c", "rel": "next"}],
++        ),
++        (
++            # A quoted parameter value may contain "," immediately followed by
++            # "<" (RFC 8288 quoted-strings may contain commas); this must not
++            # be mistaken for the separator between two link entries.
++            '<http:/.../front.jpeg>; title="a,<b"; rel="next"',
++            [{"url": "http:/.../front.jpeg", "title": "a,<b", "rel": "next"}],
++        ),
++        (
++            # The same comma-before-"<" case, but with a second, real link
++            # entry following it, to prove the split still finds it.
++            '<http:/.../front.jpeg>; title="a,<b",<http://.../back.jpeg>;',
++            [
++                {"url": "http:/.../front.jpeg", "title": "a,<b"},
++                {"url": "http://.../back.jpeg"},
++            ],
++        ),
+         ("", []),
+     ),
+ )

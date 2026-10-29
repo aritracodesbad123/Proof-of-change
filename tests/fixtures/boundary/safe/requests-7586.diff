@@ -1,0 +1,43 @@
+diff --git a/src/requests/utils.py b/src/requests/utils.py
+index fff6edf4be..d12edc0988 100644
+--- a/src/requests/utils.py
++++ b/src/requests/utils.py
+@@ -837,11 +837,15 @@ def get_proxy(key: str) -> str | None:
+         no_proxy_hosts = (host for host in no_proxy.replace(" ", "").split(",") if host)
+ 
+         if is_ipv4_address(hostname):
++            host_with_port = hostname
++            if parsed.port:
++                host_with_port += f":{parsed.port}"
++
+             for proxy_ip in no_proxy_hosts:
+                 if is_valid_cidr(proxy_ip):
+                     if address_in_network(hostname, proxy_ip):
+                         return True
+-                elif hostname == proxy_ip:
++                elif hostname == proxy_ip or host_with_port == proxy_ip:
+                     # If no_proxy ip was defined in plain IP notation instead of cidr notation &
+                     # matches the IP of the index
+                     return True
+diff --git a/tests/test_utils.py b/tests/test_utils.py
+index 091a9fd6f3..2db063bd79 100644
+--- a/tests/test_utils.py
++++ b/tests/test_utils.py
+@@ -844,6 +844,17 @@ def test_should_bypass_proxies_no_proxy(url, expected, monkeypatch):
+     assert should_bypass_proxies(url, no_proxy=no_proxy) == expected
+ 
+ 
++@pytest.mark.parametrize(
++    "url, no_proxy, expected",
++    (
++        ("http://192.168.0.1:5000/", "192.168.0.1:5000", True),
++        ("http://192.168.0.1:5001/", "192.168.0.1:5000", False),
++    ),
++)
++def test_should_bypass_proxies_ipv4_port(url, no_proxy, expected):
++    assert should_bypass_proxies(url, no_proxy=no_proxy) == expected
++
++
+ @pytest.mark.parametrize(
+     "url, expected",
+     (

@@ -1,0 +1,193 @@
+diff --git a/CHANGES.md b/CHANGES.md
+index 0c26e0108..d4414b2aa 100644
+--- a/CHANGES.md
++++ b/CHANGES.md
+@@ -19,6 +19,9 @@ Unreleased
+   for options, so its value changes from `my_option` to `--my-option`. Click no
+   longer reads it, and a subclass that overrides it gets a warning when the class
+   is defined. {pr}`3877`
++- With `echo_stdin=True`, {class}`CliRunner` echoes the `\x04` and `\x1a`
++  `<stdin>` bytes to `<stdout>` as `^D` and `^Z`, and no longer passes them to
++  the command. {pr}`3878`
+ 
+ ## Version 8.5.1
+ 
+diff --git a/docs/testing.md b/docs/testing.md
+index f4ee0cbc0..6ea4aa681 100644
+--- a/docs/testing.md
++++ b/docs/testing.md
+@@ -222,6 +222,39 @@ Prompts will be emulated so they write the input data to
+ the output stream as well. If hidden input is expected then this
+ does not happen.
+ 
++Set `echo_stdin=True` on the runner to echo every read from `<stdin>` to
++`<stdout>`. The echo translate the bytes that end `<stdin>` and print them
++in the terminal as their key, and does not pass them to the command.
++
++| `<stdin>` byte | Echoed to `<stdout>` as | Pressed keys             |
++|----------------|-------------------------|--------------------------|
++| `\x04`         | `^D\n`                  | {kbd}`Ctrl+D` on Unix    |
++| `\x1a`         | `^Z\n`                  | {kbd}`Ctrl+Z` on Windows |
++
++```{code-block} python
++:caption: shout.py
++
++import sys
++import click
++
++@click.command()
++def shout():
++   click.echo(sys.stdin.read().upper(), nl=False)
++```
++
++```{code-block} python
++:caption: test_shout.py
++
++from click.testing import CliRunner
++from shout import shout
++
++def test_shout():
++   runner = CliRunner(echo_stdin=True)
++   result = runner.invoke(shout, input='hello\n\x04')
++   assert not result.exception
++   assert result.output == 'hello\n^D\nHELLO\n'
++```
++
+ ## Capture modes
+ 
+ {class}`CliRunner` captures output by replacing `sys.stdout` and `sys.stderr`
+diff --git a/src/click/testing.py b/src/click/testing.py
+index cc123d4d1..660816577 100644
+--- a/src/click/testing.py
++++ b/src/click/testing.py
+@@ -28,6 +28,15 @@
+     CaptureMode: t.TypeAlias = t.Literal["sys", "fd"]  # pyright: ignore[reportRedeclaration]
+ ExceptionInfo: t.TypeAlias = tuple[type[BaseException], BaseException, TracebackType]
+ 
++# Translation table for EchoingStdin to print the bytes that end `<stdin>` in a
++# terminal. Both are recognized on all platforms.
++_CONTROL_ECHO = {
++    # Ctrl+D on Unix.
++    b"\x04": b"^D\n",
++    # Ctrl+Z on Windows.
++    b"\x1a": b"^Z\n",
++}
++
+ 
+ class EchoingStdin:
+     _input: t.BinaryIO
+@@ -43,8 +52,20 @@ def __getattr__(self, x: str) -> t.Any:
+         return getattr(self._input, x)
+ 
+     def _echo(self, rv: bytes) -> bytes:
++        """Echo ``rv`` to `<stdout>` and return what the reader of `<stdin>` gets.
++
++        A byte in ``_CONTROL_ECHO`` is echoed with caret-leading notation (``^...``) and
++        removed from the returned value. A string made only of such bytes is returned as
++        empty.
++        """
++        echo = rv
++
++        for char, caret in _CONTROL_ECHO.items():
++            echo = echo.replace(char, caret)
++            rv = rv.replace(char, b"")
++
+         if not self._paused:
+-            self._output.write(rv)
++            self._output.write(echo)
+ 
+         return rv
+ 
+@@ -58,10 +79,13 @@ def readline(self, n: int = -1) -> bytes:
+         return self._echo(self._input.readline(n))
+ 
+     def readlines(self) -> list[bytes]:
+-        return [self._echo(x) for x in self._input.readlines()]
++        # A line made only of control bytes comes back empty: it ends
++        # `<stdin>` and is not a line.
++        return [rv for x in self._input.readlines() if (rv := self._echo(x))]
+ 
+     def __iter__(self) -> cabc.Iterator[bytes]:
+-        return iter(self._echo(x) for x in self._input)
++        # Skips the same empty line as readlines().
++        return iter(rv for x in self._input if (rv := self._echo(x)))
+ 
+     def __repr__(self) -> str:
+         return repr(self._input)
+@@ -325,7 +349,9 @@ class CliRunner:
+     :param echo_stdin: if this is set to `True`, then reading from `<stdin>` writes
+                        to `<stdout>`.  This is useful for showing examples in
+                        some circumstances.  Note that regular prompts
+-                       will automatically echo the input.
++                       will automatically echo the input. The `<stdin>` bytes
++                       ``\\x04`` and ``\\x1a`` are echoed to `<stdout>` as
++                       ``^D`` and ``^Z``, and are not passed to the command.
+     :param catch_exceptions: Whether to catch any exceptions other than
+                              ``SystemExit`` when running :meth:`~CliRunner.invoke`.
+     :param capture: Selects the output capture strategy. ``sys`` (default)
+@@ -337,6 +363,10 @@ class CliRunner:
+         output from stale stream references, C extensions, and subprocesses.
+         ``fd`` is not supported on Windows.
+ 
++    .. versionchanged:: 8.6.0
++        ``echo_stdin`` echoes the `<stdin>` bytes ``\\x04`` and ``\\x1a`` to
++        `<stdout>` as ``^D`` and ``^Z`` and no longer passes them to the command.
++
+     .. versionchanged:: 8.4.0
+         Added the ``capture`` parameter. The default ``sys`` mode no longer
+         exposes the original fd through :meth:`fileno`, reverting the change
+diff --git a/tests/test_testing.py b/tests/test_testing.py
+index 870d95c97..c85683fb9 100644
+--- a/tests/test_testing.py
++++ b/tests/test_testing.py
+@@ -89,6 +89,50 @@ def test_multiple_prompts(foo, bar):
+     assert result.output == "Foo: one\nBar: two\nfoo=one, bar=two\n"
+ 
+ 
++@pytest.mark.parametrize(
++    ("data", "echo", "read"),
++    [
++        pytest.param("bar\n\x04", "bar\n^D\n", b"bar\n", id="eot-ends-input"),
++        pytest.param("bar\n\x1a", "bar\n^Z\n", b"bar\n", id="sub-ends-input"),
++        pytest.param("\x04", "^D\n", b"", id="eot-alone"),
++        pytest.param("bar\x04baz\n", "bar^D\nbaz\n", b"barbaz\n", id="eot-mid-chunk"),
++        pytest.param("bar\n", "bar\n", b"bar\n", id="no-control-byte"),
++    ],
++)
++def test_echo_stdin_control_bytes(data, echo, read):
++    """A control byte of `<stdin>` is echoed to `<stdout>` in caret notation and
++    removed from the command.
++    """
++
++    @click.command()
++    def test():
++        click.echo(repr(_get_binary_stream("stdin").read()))
++
++    result = CliRunner(echo_stdin=True).invoke(test, input=data)
++    assert not result.exception
++    assert result.output == f"{echo}{read!r}\n"
++
++
++@pytest.mark.parametrize(
++    "read_lines",
++    [
++        pytest.param(lambda: list(sys.stdin), id="text"),
++        pytest.param(lambda: list(_get_binary_stream("stdin")), id="binary"),
++        pytest.param(lambda: _get_binary_stream("stdin").readlines(), id="readlines"),
++    ],
++)
++def test_echo_stdin_control_byte_is_not_a_line(read_lines):
++    """A control byte that ends `<stdin>` is not handed over as a last line."""
++
++    @click.command()
++    def test():
++        click.echo(len(read_lines()))
++
++    result = CliRunner(echo_stdin=True).invoke(test, input="bar\nbaz\n\x04")
++    assert not result.exception
++    assert result.output == "bar\nbaz\n^D\n2\n"
++
++
+ def test_runner_with_stream():
+     @click.command()
+     def test():
