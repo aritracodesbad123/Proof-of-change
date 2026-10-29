@@ -232,3 +232,7 @@ def test_loops_in_comments_do_not_count_as_inputs():
     assert model_probes._token_inputs(code + "if x:\nprint(x)\n") == 2
     why, counts = model_probes._repair_loses(code + "if x:\nprint(x)\n", code)
     assert why is None and counts["before"]["inputs"] == counts["after"]["inputs"] == 2
+
+
+def test_token_inputs_do_not_count_a_comprehension_built_list():
+    assert model_probes._token_inputs("for x in [f(i) for i in data]:\n    pass\n") == 0
