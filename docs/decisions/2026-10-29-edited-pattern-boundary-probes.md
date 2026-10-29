@@ -50,5 +50,7 @@ This rule asks for that kind of input every time an existing pattern is edited.
   text reaches the prompt. That is close to the changed-path list the freeze rule already allows.
 - **Not shown live.** Whether a live model writes the right inputs is not yet shown: one saved catch, no live run.
 - **Noise.** More probe inputs may raise the false-alarm rate. That should be measured before any wider use.
+- **Plain strings.** A plain (not raw) string such as `"a|b"` counts as a pattern only when it is passed straight
+  to a re function, and a test fails if that check is dropped.
 - **Pattern detection is lexical.** A raw string or a string passed to a re function that holds regex tokens counts
   as a pattern. Patterns built in other ways are missed.
