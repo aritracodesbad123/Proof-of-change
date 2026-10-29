@@ -45,7 +45,8 @@ def lookup(query: str, *, max_results: int = 3, env: dict | None = None, timeout
     if not key or not str(key).strip():
         return {"ok": False, "error": MISSING_KEY, "query": query, "results": [], "refused": True}
     secret = str(key).strip()
-    body = {"api_key": secret, "query": query, "max_results": max_results, "include_answer": True}
+    body = {"api_key": secret, "query": query, "max_results": max_results, "include_answer": True,
+            "include_usage": True}
     req = urllib.request.Request(
         API, data=json.dumps(body).encode(),
         headers={"Content-Type": "application/json"},
@@ -57,7 +58,12 @@ def lookup(query: str, *, max_results: int = 3, env: dict | None = None, timeout
         message = f"{type(e).__name__}: {e}".replace(secret, "[redacted]")
         return {"ok": False, "error": message, "query": query, "results": []}
     from poc import tavily_budget
-    tavily_budget.record("search", depth=str(body.get("search_depth") or "basic"))   # an answered call is billed
+    try:   # an answered call is billed; its own usage block says how much when it can be read
+        parsed = json.loads(raw) if raw and raw.strip() else None
+    except json.JSONDecodeError:
+        parsed = None
+    tavily_budget.record("search", depth=str(body.get("search_depth") or "basic"),
+                         payload=parsed if isinstance(parsed, dict) else None)
     if not raw or not raw.strip():
         return {"ok": False, "error": EMPTY_RESPONSE, "query": query, "results": []}
     try:

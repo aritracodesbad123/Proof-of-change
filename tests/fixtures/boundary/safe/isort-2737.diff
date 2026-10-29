@@ -1,0 +1,67 @@
+diff --git a/isort/literal.py b/isort/literal.py
+index 974a11028..3be7f7c02 100644
+--- a/isort/literal.py
++++ b/isort/literal.py
+@@ -40,8 +40,11 @@ def assignment(code: str, sort_type: str, extension: str, config: Config = DEFAU
+             f"Defined sort types are {', '.join(type_mapping.keys())}."
+         )
+ 
+-    variable_name, literal = code.split("=", 1)
+-    variable_name = variable_name.strip()
++    target, literal = code.split("=", 1)
++    target = target.strip()
++    # an augmented assignment such as ``__all__ += [...]`` keeps its operator
++    variable_name = target.rstrip("+-*/%@&|^<>").rstrip()
++    operator = target[len(variable_name) :].strip() + "="
+     literal = literal.lstrip()
+     try:
+         parsed = ast.parse(literal, mode="eval")
+@@ -66,11 +69,11 @@ def assignment(code: str, sort_type: str, extension: str, config: Config = DEFAU
+ 
+     line_separator = _infer_line_separator(code, config.line_ending)
+ 
+-    prefix_length = len(f"{variable_name} = ")
++    prefix_length = len(f"{variable_name} {operator} ")
+     variable_value = sort_function(
+         value, config, prefix_length, preserve_trailing_comma, line_separator
+     )
+-    sorted_value_code = f"{variable_name} = {variable_value}"
++    sorted_value_code = f"{variable_name} {operator} {variable_value}"
+     if config.formatting_function:
+         sorted_value_code = config.formatting_function(
+             sorted_value_code, extension, config
+diff --git a/tests/unit/test_isort.py b/tests/unit/test_isort.py
+index d4b783789..5228ee74a 100644
+--- a/tests/unit/test_isort.py
++++ b/tests/unit/test_isort.py
+@@ -5753,6 +5753,14 @@ def test_reexport_keeps_trailing_comment_with_equals() -> None:
+     assert isort.code(test_input, config=Config(sort_reexports=True)) == expd_output
+ 
+ 
++def test_reexport_augmented_assignment() -> None:
++    test_input = """__all__ += ['foo', 'bar']
++"""
++    expd_output = """__all__ += ["bar", "foo"]
++"""
++    assert isort.code(test_input, config=Config(sort_reexports=True)) == expd_output
++
++
+ def test_isort_list_keeps_trailing_comment_with_equals() -> None:
+     test_input = """# isort: list
+ __all__ = ['foo', 'bar']  # note: key = value
+diff --git a/tests/unit/test_literal.py b/tests/unit/test_literal.py
+index 1fe273c59..8977bfe09 100644
+--- a/tests/unit/test_literal.py
++++ b/tests/unit/test_literal.py
+@@ -34,6 +34,11 @@ def test_list_uses_double_quotes() -> None:
+     assert isort.literal.assignment("x = ['b', 'a']", "list", "py") == 'x = ["a", "b"]'
+ 
+ 
++def test_augmented_assignment_keeps_its_operator() -> None:
++    assert isort.literal.assignment("x += ['b', 'a']", "list", "py") == 'x += ["a", "b"]'
++    assert isort.literal.assignment("x |= {'b', 'a'}", "set", "py") == 'x |= {"a", "b"}'
++
++
+ def test_list_preserves_bracket_type_tuple() -> None:
+     assert isort.literal.assignment("x = ('b', 'a')", "tuple", "py") == 'x = ("a", "b")'
+ 

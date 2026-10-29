@@ -1,0 +1,30 @@
+import json
+from rich.highlighter import ReprHighlighter
+from rich.text import Text
+
+def get_spans_info(text_obj):
+    """Return list of (start, end, substring) for each span."""
+    return [(s.start, s.end, text_obj.plain[s.start:s.end]) for s in text_obj.spans]
+
+highlighter = ReprHighlighter()
+obs = {}
+
+# Test cases
+test_cases = [
+    ("adjacent", "<a>content1</a><b>content2</b>"),
+    ("single", "<tag>value</tag>"),
+    ("none", "plain text"),
+    ("attrs", "<a href='url'>link</a>"),
+    ("nested", "<a><b>inner</b></a>"),
+]
+
+for name, s in test_cases:
+    txt = Text(s)
+    highlighter.highlight(txt)
+    spans = get_spans_info(txt)
+    obs[f"c1.{name}_spancount"] = len(spans)
+    obs[f"c1.{name}_spans"] = spans
+    obs[f"c2.{name}_spancount"] = len(spans)
+    obs[f"c2.{name}_spans"] = spans
+
+print(json.dumps({"observations": obs}))

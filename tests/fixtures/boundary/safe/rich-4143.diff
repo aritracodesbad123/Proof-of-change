@@ -1,0 +1,94 @@
+diff --git a/CHANGELOG.md b/CHANGELOG.md
+index 8b016d4846..8a394349b2 100644
+--- a/CHANGELOG.md
++++ b/CHANGELOG.md
+@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
+ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+ 
++## [Unreleased]
++
++### Fixed
++
++- Fixed `Text.from_ansi` CRLF handling https://github.com/Textualize/rich/issues/4090
++
+ ## [15.0.0] - 2026-04-12
+ 
+ ### Changed
+diff --git a/CONTRIBUTORS.md b/CONTRIBUTORS.md
+index 2155a42a4d..beeecb9719 100644
+--- a/CONTRIBUTORS.md
++++ b/CONTRIBUTORS.md
+@@ -76,6 +76,7 @@ The following people have contributed to the development of Rich:
+ - [Aaron Stephens](https://github.com/aaronst)
+ - [Karolina Surma](https://github.com/befeleme)
+ - [Gabriele N. Tornetta](https://github.com/p403n1x87)
++- [Kevin Van Brunt](https://github.com/kmvanbrunt)
+ - [Nils Vu](https://github.com/nilsvu)
+ - [Arian Mollik Wasi](https://github.com/wasi-master)
+ - [Jan van Wijk](https://github.com/jdvanwijk)
+diff --git a/rich/ansi.py b/rich/ansi.py
+index 7bbcb0bfcc..ffe657f276 100644
+--- a/rich/ansi.py
++++ b/rich/ansi.py
+@@ -133,7 +133,7 @@ def decode(self, terminal_text: str) -> Iterable[Text]:
+             Text: Marked up Text.
+         """
+         for line in re.split(r"(?<=\n)", terminal_text):
+-            yield self.decode_line(line.rstrip("\n"))
++            yield self.decode_line(line.rstrip("\r\n"))
+ 
+     def decode_line(self, line: str) -> Text:
+         """Decode a line containing ansi codes.
+diff --git a/tests/test_ansi.py b/tests/test_ansi.py
+index 21e20b4403..c6ede86ca3 100644
+--- a/tests/test_ansi.py
++++ b/tests/test_ansi.py
+@@ -86,19 +86,35 @@ def test_strip_private_escape_sequences(code):
+     assert capture.get() == expected
+ 
+ 
+-def test_decode_newlines():
+-    """Test newlines are preserved.
++@pytest.mark.parametrize("line_break", ["\n", "\r\n"])
++def test_decode_line_breaks(line_break: str) -> None:
++    """Test line breaks are preserved and converted to newlines.
+     Regression test for https://github.com/Textualize/rich/issues/3577
+     """
+     assert Text.from_ansi("").plain == ""
+-    assert Text.from_ansi("\n").plain == "\n"
+-    assert Text.from_ansi("\n\n").plain == "\n\n"
++    assert Text.from_ansi(f"{line_break}").plain == "\n"
++    assert Text.from_ansi(f"{line_break}{line_break}").plain == "\n\n"
+     assert Text.from_ansi("Hello").plain == "Hello"
+-    assert Text.from_ansi("\nHello").plain == "\nHello"
+-    assert Text.from_ansi("Hello\n").plain == "Hello\n"
+-    assert Text.from_ansi("Hello\n\n").plain == "Hello\n\n"
+-    assert Text.from_ansi("Hello\nWorld").plain == "Hello\nWorld"
+-    assert Text.from_ansi("Hello\n\nWorld").plain == "Hello\n\nWorld"
+-    assert Text.from_ansi("Hello\nWorld\n").plain == "Hello\nWorld\n"
+-    assert Text.from_ansi("Hello\nWorld\n\n").plain == "Hello\nWorld\n\n"
+-    assert Text.from_ansi("\nHello\nWorld\n\n").plain == "\nHello\nWorld\n\n"
++    assert Text.from_ansi(f"{line_break}Hello").plain == "\nHello"
++    assert Text.from_ansi(f"Hello{line_break}").plain == "Hello\n"
++    assert Text.from_ansi(f"Hello{line_break}{line_break}").plain == "Hello\n\n"
++    assert Text.from_ansi(f"Hello{line_break}World").plain == "Hello\nWorld"
++    assert (
++        Text.from_ansi(f"Hello{line_break}{line_break}World").plain == "Hello\n\nWorld"
++    )
++    assert (
++        Text.from_ansi(f"Hello{line_break}World{line_break}").plain == "Hello\nWorld\n"
++    )
++    assert (
++        Text.from_ansi(f"Hello{line_break}World{line_break}{line_break}").plain
++        == "Hello\nWorld\n\n"
++    )
++    assert (
++        Text.from_ansi(
++            f"{line_break}Hello{line_break}World{line_break}{line_break}"
++        ).plain
++        == "\nHello\nWorld\n\n"
++    )
++
++    # Include a mixture of line break types
++    assert Text.from_ansi(f"Hello{line_break}\n\r\nWorld").plain == "Hello\n\n\nWorld"

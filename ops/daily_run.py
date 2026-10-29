@@ -2910,6 +2910,8 @@ def _aggregate_names(rec: dict) -> list[str]:
 def parallel_on(a) -> bool:
     """POC_PARALLEL=1 (off by default): product checks only build both Contree checkpoints at once, prepare them
     while probes are written, and run each main/PR pair of timed runs at the same time. Study runs never use it."""
+    if getattr(a, "require_boundary_rule", None):   # the rule is checked before any PR-side work, so never overlap
+        return False
     return product_route(a) and (os.environ.get("POC_PARALLEL") or "").strip().lower() in {"1", "true", "yes", "on"}
 
 
@@ -2961,7 +2963,7 @@ def _maybe_prepare_contree(a, repo: str, main_sha: str, pr_sha: str, rec: dict, 
     try:
         sess = contree_sandboxes.prepare_source_pair(repo, main_sha, pr_sha, timeout=timeout, extra_shell=extra_shell,
                                                      **({"deps_only_fallback": True, "deps_exclude": _aggregate_names(rec),
-                                                        "retry_transient": True,
+                                                        "retry_transient": not getattr(a, "no_contree_retry", False),
                                                         **({"parallel": True, "deps_touched":
                                                             contree_sandboxes.touches_dependency_files(rec.get("files"))}
                                                            if parallel_on(a) else {})}
@@ -3676,8 +3678,8 @@ def leave_run_pointer(rdir: Path, started: dt.datetime, index: Path | None = Non
 def gate(rec: dict) -> dict:
     """Apply the coverage gate (poc/coverage_gate.py) to a finished record; baselines without coverage skip it."""
     if not uses(rec.get("baseline"), "coverage"):
-        return cap_rewrite(advisory_gate(no_evidence_gate(broken_probe_gate(rec))))
-    return cap_rewrite(advisory_gate(no_evidence_gate(broken_probe_gate(ai_probe_gate(coverage_gate.apply(rec))))))
+        return cap_rewrite(advisory_gate(no_evidence_gate(inert_probe_gate(broken_probe_gate(rec)))))
+    return cap_rewrite(advisory_gate(no_evidence_gate(inert_probe_gate(broken_probe_gate(ai_probe_gate(coverage_gate.apply(rec)))))))
 
 
 def all_broken(item: dict) -> bool:
@@ -3696,6 +3698,45 @@ def broken_probe_gate(rec: dict) -> dict:
     out["verdict"] = Verdict.COULD_NOT_VERIFY.value
     out["reason"] = ("could not verify: every probe is broken (it raised the same exception or skipped the same way "
                      "on both sides, so it never reached the claimed call); " + (rec.get("reason") or ""))
+    return out
+
+
+def _empty(v) -> bool:
+    return v is None or (isinstance(v, (list, dict, str, tuple)) and len(v) == 0)
+
+
+def all_inert(item: dict) -> bool:
+    """Every observation of this probe returned an empty value (None, [], {} or "") on both sides and every run: the
+    probe read something the changed code never touched (rich#4147, 2026-10-29: spans read from the Text passed in,
+    not from the new Text the highlighter returned), so its "identical on both sides" is no evidence."""
+    obs = item.get("observations") or []
+    if not obs:
+        return False
+    runs = item.get("runs") if isinstance(item.get("runs"), dict) else {}
+    for o in obs:
+        if not (_empty(o.get("main")) and _empty(o.get("pr"))):
+            return False
+    for side in ("main", "pr"):
+        for run in runs.get(side) or []:
+            vals = run.values() if isinstance(run, dict) else []
+            if any(not _empty(v) for v in vals):
+                return False
+    return True
+
+
+def inert_probe_gate(rec: dict) -> dict:
+    """A run whose probes are each inert (all values empty on both sides) or broken has no probe evidence: it is
+    never verified, it is could_not_verify. Idempotent; it never raises a verdict."""
+    items = (rec.get("probes") or {}).get("items") or []
+    if rec.get("verdict") != Verdict.VERIFIED.value or not items:
+        return rec
+    if not all(all_inert(it) or all_broken(it) for it in items) or not any(all_inert(it) for it in items):
+        return rec
+    out = dict(rec)
+    out.setdefault("verdict_before_inert_probe_gate", rec["verdict"])
+    out["verdict"] = Verdict.COULD_NOT_VERIFY.value
+    out["reason"] = ("could not verify: broken probe, every value it returned is empty on both sides, so it never "
+                     "observed the changed behaviour; " + (rec.get("reason") or ""))
     return out
 
 
@@ -4160,14 +4201,20 @@ def verdict_for(cmp: dict | None, cnv_reason: str | None, exits: dict | None = N
         return (Verdict.COULD_NOT_VERIFY.value,
                 f"could not verify: claim(s) {shown}{extra} expect a difference but no observation matches ({reason})",
                 fl + ["unmatched_differs_claim"])
-    advisory = sorted({str(it.get("id")) for it in (probe_results or {}).get("items") or []
-                       for o in it.get("observations") or [] if o.get("advisory")})
-    if advisory and v == Verdict.VERIFIED.value:
-        # A claim-less probe saw a difference nobody claimed. It does not raise needs attention, but it is
-        # unexplained, so the PR cannot be verified either.
+    adv_items = [it for it in (probe_results or {}).get("items") or []
+                 if any(o.get("advisory") for o in it.get("observations") or [])]
+    if adv_items and v == Verdict.VERIFIED.value:
+        # A probe saw a difference nobody claimed. It does not raise needs attention, but it is unexplained, so the
+        # PR cannot be verified either. A probe that links claims is named by its uncovered differences instead.
+        bare = sorted(str(it.get("id")) for it in adv_items if not it.get("claims"))
+        names = [f"{it.get('id')} {o.get('name')}" for it in adv_items if it.get("claims")
+                 for o in it.get("observations") or [] if o.get("advisory")]
+        bits = ([f"probe(s) {', '.join(bare)} have no linked claims and saw a difference no claim covers"] * bool(bare)
+                + [f"difference(s) no linked claim covers ({', '.join(names[:4])}"
+                   + (f" +{len(names) - 4} more" if len(names) > 4 else "") + ")"] * bool(names))
         return (Verdict.COULD_NOT_VERIFY.value,
-                f"could not verify: probe(s) {', '.join(advisory)} have no linked claims and saw a difference no "
-                f"claim covers, so the change is not confirmed ({reason})", fl + ["advisory_unclaimed_difference"])
+                f"could not verify: {'; '.join(bits)}, so the change is not confirmed ({reason})",
+                fl + ["advisory_unclaimed_difference"])
     if hygiene and hygiene.get("held_back") and v == Verdict.VERIFIED.value:
         return (Verdict.COULD_NOT_VERIFY.value,
                 f"could not verify: claim(s) {', '.join(hygiene['held_back'][:4])} expect a difference but no "
@@ -4464,7 +4511,8 @@ def plan_probes(repo: str, item: dict, rec: dict, base_root: Path, pr_roots: lis
             try:
                 res = model_probes.generate(provider, repo, item["pr"], item["title"], item.get("body"), base_files,
                                             base_root, pr_roots, prdir / "model-probes",
-                                            product=product_route(a), python_version=probe_python_version(a))
+                                            product=product_route(a), python_version=probe_python_version(a),
+                                            diff=item.get("diff"))
             except freeze.FreezeError as e:
                 res = {"errors": [str(e)], "probes": [], "claims": [], "rejected_claims": []}
             note["model_claims"] = res.get("claims", [])
@@ -4474,6 +4522,9 @@ def plan_probes(repo: str, item: dict, rec: dict, base_root: Path, pr_roots: lis
                 note["model_loose_quote_matches"] = res["loose_quote_matches"]
             if res.get("rewritten_imports"):   # product checks: src/ layout imports rewritten to the installed name
                 note["rewritten_imports"] = res["rewritten_imports"]
+            for k in ("parse_repairs", "retried", "unmatched_covers", "boundary_rule"):   # repair and retry trail, shown on the record
+                if res.get(k):
+                    note[f"model_{k}"] = res[k]
             plan += [{"path": x["path"], "source": "model", "freeze": x["freeze"],
                       **({"origin": x["origin"]} if x.get("origin") else {})} for x in res.get("probes", [])]
             if res.get("human_review"):
@@ -4498,6 +4549,10 @@ def plan_probes(repo: str, item: dict, rec: dict, base_root: Path, pr_roots: lis
                                            else str(Path(x["path"]).relative_to(prdir)), "source": x["source"],
                                            **({"origin": x["origin"]} if x.get("origin") else {}),
                                            **x["freeze"]} for x in plan]}
+    from poc import run_limits
+    stop = run_limits.boundary_rule_stop(getattr(a, "require_boundary_rule", None), note.get("model_boundary_rule"))
+    if stop:   # the plan is on the record; nothing from the pull request has run yet
+        run_limits.stop(stop)   # writes the record (probe plan included) as could_not_verify, then stops
     return plan
 
 
@@ -5076,6 +5131,13 @@ def settle_probes(rec: dict) -> None:
     rec["probe_changed_line_coverage"] = probe_adequacy.summary(rec["probes"]["items"])
 
 
+def settle_boundary_claims(rec: dict, prdir: Path) -> None:
+    """Product route: past-boundary differences against a seeded "behaviour kept" claim (poc/boundary_claims.py)."""
+    if rec.get("product_check") and rec.get("probes"):
+        from poc import boundary_claims
+        rec["probes"] = boundary_claims.apply(rec["probes"], rec, prdir)
+
+
 def install_optional_modules(venvs: dict, modules: list[str], log: Path, timeout: int,
                              isolated: bool = False) -> tuple[bool, str]:
     """Install plain pip wheels for missing optional modules, on both sides. isolated: see isolated_install."""
@@ -5289,6 +5351,7 @@ def _contree_only_pair(a, rec: dict, repo: str, cfg: dict, item: dict, sp: dict,
                 {"status": "not measured", "why": "Contree-only check: probe coverage needs a local side"})
         rec["probe_changed_line_coverage"] = probe_adequacy.summary((rec["probes"] or {}).get("items") or [])
     settle_probes(rec)
+    settle_boundary_claims(rec, prdir)
     if change_is_docstring_only(rec.get("files"), cm, cp):
         rec["docstring_only"] = True
     return cmp, cnv, ex, targets
@@ -5420,6 +5483,8 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
                if item.get("pinned_sides") else None)
     (prdir / "pr.diff").write_text(item["diff"])
     rec = new_record(repo, cfg, item, a, machine, rdir.name, run_date_for(rdir))
+    from poc import run_limits
+    run_limits.watch_record(rec, prdir)   # a guard stop writes this record before it ends the run
     if pin_why:   # pinned commits could not be diffed: never fall back to GitHub's current PR diff
         rec["verdict"], rec["reason"], _ = verdict_for(None, f"pinned commits unavailable: {pin_why}")
         return finish(rec, prdir, work, t0, a)
@@ -5583,6 +5648,7 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
         rec["probe_changed_line_coverage"] = probe_coverage(item, rec["probes"], vm, site_packages(vm), site_packages(vp),
                                                             prdir, a)
         settle_probes(rec)
+        settle_boundary_claims(rec, prdir)
         if change_is_docstring_only(rec.get("files"), site_packages(vm), site_packages(vp)):
             rec["docstring_only"] = True
     run_progress.emit("verdict", "code", "computing code verdict")
@@ -5700,6 +5766,7 @@ def finish(rec: dict, prdir: Path, work: Path, t0: float, runner=None) -> dict:
     if rec.get("product_check"):  # timing only; study records stay byte-identical
         rec["timings"] = step_timings(rec)
         print("Time per stage: " + ", ".join(f"{k} {v} s" for k, v in rec["timings"].items()), flush=True)
+    if rec.get("_tavily_meter") is not None:   # metered checks only (product route), also when the check failed
         from poc import tavily_budget
         credits = tavily_budget.take(rec.pop("_tavily_meter", None))
         if credits is not None:
@@ -6869,6 +6936,17 @@ def _main(argv=None) -> int:
                          "Nebius Token Factory Sandboxes (needs NEBIUS_API_KEY, NEBIUS_PROJECT_ID, and "
                          "pip install -e '.[contree]'; falls back to local with a note if those are missing; "
                          "set POC_REQUIRE_CONTREE=1 to refuse instead)")
+    ap.add_argument("--require-boundary-rule", default=None, metavar="FILE:LINE",
+                    help="watched live checks: stop after the probe plan is written, before any pull-request code "
+                         "runs, unless the edited-pattern rule found exactly FILE:LINE")
+    ap.add_argument("--no-contree-retry", action="store_true",
+                    help="watched live checks: never retry a Contree timeout or 5xx; the first one gives could not "
+                         "verify. Hosted routes do not pass it and keep their start-up retries")
+    ap.add_argument("--max-provider-calls", type=int, default=None, metavar="N",
+                    help="refuse provider call N+1 before it is sent and stop the run")
+    ap.add_argument("--max-cost-usd", type=float, default=None, metavar="USD",
+                    help="refuse a provider call before it is sent when spend so far plus that call's worst case "
+                         "(full output budget) would pass USD, and stop the run")
     ap.add_argument("--require-contree", action="store_true",
                     help="set only by hosted product routes (GitHub App, hosted console, request worker): run "
                          "pull-request code only in Contree. If Contree cannot start, the check stops with "
@@ -6929,6 +7007,8 @@ def _main(argv=None) -> int:
     ap.add_argument("--ids", default=None, help="with --bench: comma-separated case IDs (default: all), e.g. B01,B14")
     ap.add_argument("--bench-out", default=None, help="with --bench: result folder (default: runs/bench-v0)")
     a = ap.parse_args(argv)
+    from poc import run_limits
+    run_limits.configure(a.max_provider_calls, a.max_cost_usd)   # before anything can call the provider
     if both_sandbox_flags_refusal(a):
         print(both_sandbox_flags_refusal(a), file=sys.stderr)
         raise SystemExit(1)
@@ -7224,6 +7304,11 @@ def harness_error_record(repo: str, cfg: dict, item: dict, rdir: Path, a, machin
     rec["verdict"], rec["reason"] = "could_not_verify", reason
     rec["harness_error"] = reason
     rec.setdefault("duration_s", {}).setdefault("total_wall", 0)
+    from poc import tavily_budget
+    credits = tavily_budget.take_active()   # the crashed check's Tavily calls still count, from the API's own figures
+    if credits is not None:
+        rec["tavily_credits"] = credits
+        print(tavily_budget.log_line(credits), flush=True)
     try:
         prdir = rdir / f"{cfg['pkg']}-{item['pr']}"
         prdir.mkdir(parents=True, exist_ok=True)
@@ -7295,6 +7380,9 @@ def rejudge(rec: dict, prdir: Path) -> dict:
     cmp["new_tests_failing"] = sorted(cmp["new_tests_failing"])
     ex = exit_check(rec.get("per_run", []), results, cmp)
     pr_probes = rejudge_probes(rec.get("probes"), bool(rec.get("product_check")), broad_gate=broad_gate_for(rec))
+    if rec.get("product_check"):
+        from poc import boundary_claims
+        pr_probes = boundary_claims.apply(pr_probes, rec, prdir)
     v, reason, _ = verdict_for(cmp, None, ex, rec.get("files"), pr_probes, rec.get("behaviour_claims"),
                                rec.get("baseline"))
     v, reason = cap_for_review(rec, v, reason)

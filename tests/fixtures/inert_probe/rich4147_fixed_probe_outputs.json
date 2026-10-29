@@ -1,0 +1,2361 @@
+{
+ "about": "Offline proof for rich#4147 (2026-10-29): the two frozen model probes from the live run, original and hand-fixed (t = h(Text(s))), run 3 times each on rich base 9d8f9a37 and head 3bd56b51. Values are the printed observations.",
+ "probes": {
+  "c1": {
+   "orig": {
+    "main": [
+     {
+      "c1.adjacent": [],
+      "c1.single": [],
+      "c1.preceded": [],
+      "c1.followed": [],
+      "c1.newline": [],
+      "c1.pre_newline": []
+     },
+     {
+      "c1.adjacent": [],
+      "c1.single": [],
+      "c1.preceded": [],
+      "c1.followed": [],
+      "c1.newline": [],
+      "c1.pre_newline": []
+     },
+     {
+      "c1.adjacent": [],
+      "c1.single": [],
+      "c1.preceded": [],
+      "c1.followed": [],
+      "c1.newline": [],
+      "c1.pre_newline": []
+     }
+    ],
+    "pr": [
+     {
+      "c1.adjacent": [],
+      "c1.single": [],
+      "c1.preceded": [],
+      "c1.followed": [],
+      "c1.newline": [],
+      "c1.pre_newline": []
+     },
+     {
+      "c1.adjacent": [],
+      "c1.single": [],
+      "c1.preceded": [],
+      "c1.followed": [],
+      "c1.newline": [],
+      "c1.pre_newline": []
+     },
+     {
+      "c1.adjacent": [],
+      "c1.single": [],
+      "c1.preceded": [],
+      "c1.followed": [],
+      "c1.newline": [],
+      "c1.pre_newline": []
+     }
+    ]
+   },
+   "fixed": {
+    "main": [
+     {
+      "c1.adjacent": [
+       [
+        0,
+        1,
+        "repr.tag_start"
+       ],
+       [
+        1,
+        2,
+        "repr.tag_name"
+       ],
+       [
+        2,
+        29,
+        "repr.tag_contents"
+       ],
+       [
+        29,
+        30,
+        "repr.tag_end"
+       ],
+       [
+        12,
+        13,
+        "repr.path"
+       ],
+       [
+        13,
+        14,
+        "repr.filename"
+       ],
+       [
+        27,
+        28,
+        "repr.path"
+       ],
+       [
+        28,
+        29,
+        "repr.filename"
+       ]
+      ],
+      "c1.single": [
+       [
+        0,
+        1,
+        "repr.tag_start"
+       ],
+       [
+        1,
+        2,
+        "repr.tag_name"
+       ],
+       [
+        2,
+        13,
+        "repr.tag_contents"
+       ],
+       [
+        13,
+        14,
+        "repr.tag_end"
+       ],
+       [
+        11,
+        12,
+        "repr.path"
+       ],
+       [
+        12,
+        13,
+        "repr.filename"
+       ]
+      ],
+      "c1.preceded": [
+       [
+        2,
+        3,
+        "repr.tag_start"
+       ],
+       [
+        3,
+        4,
+        "repr.tag_name"
+       ],
+       [
+        4,
+        15,
+        "repr.tag_contents"
+       ],
+       [
+        15,
+        16,
+        "repr.tag_end"
+       ],
+       [
+        13,
+        14,
+        "repr.path"
+       ],
+       [
+        14,
+        15,
+        "repr.filename"
+       ]
+      ],
+      "c1.followed": [
+       [
+        0,
+        1,
+        "repr.tag_start"
+       ],
+       [
+        1,
+        2,
+        "repr.tag_name"
+       ],
+       [
+        2,
+        13,
+        "repr.tag_contents"
+       ],
+       [
+        13,
+        14,
+        "repr.tag_end"
+       ],
+       [
+        11,
+        12,
+        "repr.path"
+       ],
+       [
+        12,
+        13,
+        "repr.filename"
+       ]
+      ],
+      "c1.newline": [
+       [
+        0,
+        1,
+        "repr.tag_start"
+       ],
+       [
+        1,
+        2,
+        "repr.tag_name"
+       ],
+       [
+        2,
+        13,
+        "repr.tag_contents"
+       ],
+       [
+        13,
+        14,
+        "repr.tag_end"
+       ],
+       [
+        11,
+        12,
+        "repr.path"
+       ],
+       [
+        12,
+        13,
+        "repr.filename"
+       ]
+      ],
+      "c1.pre_newline": [
+       [
+        6,
+        7,
+        "repr.tag_start"
+       ],
+       [
+        7,
+        8,
+        "repr.tag_name"
+       ],
+       [
+        8,
+        19,
+        "repr.tag_contents"
+       ],
+       [
+        19,
+        20,
+        "repr.tag_end"
+       ],
+       [
+        17,
+        18,
+        "repr.path"
+       ],
+       [
+        18,
+        19,
+        "repr.filename"
+       ]
+      ]
+     },
+     {
+      "c1.adjacent": [
+       [
+        0,
+        1,
+        "repr.tag_start"
+       ],
+       [
+        1,
+        2,
+        "repr.tag_name"
+       ],
+       [
+        2,
+        29,
+        "repr.tag_contents"
+       ],
+       [
+        29,
+        30,
+        "repr.tag_end"
+       ],
+       [
+        12,
+        13,
+        "repr.path"
+       ],
+       [
+        13,
+        14,
+        "repr.filename"
+       ],
+       [
+        27,
+        28,
+        "repr.path"
+       ],
+       [
+        28,
+        29,
+        "repr.filename"
+       ]
+      ],
+      "c1.single": [
+       [
+        0,
+        1,
+        "repr.tag_start"
+       ],
+       [
+        1,
+        2,
+        "repr.tag_name"
+       ],
+       [
+        2,
+        13,
+        "repr.tag_contents"
+       ],
+       [
+        13,
+        14,
+        "repr.tag_end"
+       ],
+       [
+        11,
+        12,
+        "repr.path"
+       ],
+       [
+        12,
+        13,
+        "repr.filename"
+       ]
+      ],
+      "c1.preceded": [
+       [
+        2,
+        3,
+        "repr.tag_start"
+       ],
+       [
+        3,
+        4,
+        "repr.tag_name"
+       ],
+       [
+        4,
+        15,
+        "repr.tag_contents"
+       ],
+       [
+        15,
+        16,
+        "repr.tag_end"
+       ],
+       [
+        13,
+        14,
+        "repr.path"
+       ],
+       [
+        14,
+        15,
+        "repr.filename"
+       ]
+      ],
+      "c1.followed": [
+       [
+        0,
+        1,
+        "repr.tag_start"
+       ],
+       [
+        1,
+        2,
+        "repr.tag_name"
+       ],
+       [
+        2,
+        13,
+        "repr.tag_contents"
+       ],
+       [
+        13,
+        14,
+        "repr.tag_end"
+       ],
+       [
+        11,
+        12,
+        "repr.path"
+       ],
+       [
+        12,
+        13,
+        "repr.filename"
+       ]
+      ],
+      "c1.newline": [
+       [
+        0,
+        1,
+        "repr.tag_start"
+       ],
+       [
+        1,
+        2,
+        "repr.tag_name"
+       ],
+       [
+        2,
+        13,
+        "repr.tag_contents"
+       ],
+       [
+        13,
+        14,
+        "repr.tag_end"
+       ],
+       [
+        11,
+        12,
+        "repr.path"
+       ],
+       [
+        12,
+        13,
+        "repr.filename"
+       ]
+      ],
+      "c1.pre_newline": [
+       [
+        6,
+        7,
+        "repr.tag_start"
+       ],
+       [
+        7,
+        8,
+        "repr.tag_name"
+       ],
+       [
+        8,
+        19,
+        "repr.tag_contents"
+       ],
+       [
+        19,
+        20,
+        "repr.tag_end"
+       ],
+       [
+        17,
+        18,
+        "repr.path"
+       ],
+       [
+        18,
+        19,
+        "repr.filename"
+       ]
+      ]
+     },
+     {
+      "c1.adjacent": [
+       [
+        0,
+        1,
+        "repr.tag_start"
+       ],
+       [
+        1,
+        2,
+        "repr.tag_name"
+       ],
+       [
+        2,
+        29,
+        "repr.tag_contents"
+       ],
+       [
+        29,
+        30,
+        "repr.tag_end"
+       ],
+       [
+        12,
+        13,
+        "repr.path"
+       ],
+       [
+        13,
+        14,
+        "repr.filename"
+       ],
+       [
+        27,
+        28,
+        "repr.path"
+       ],
+       [
+        28,
+        29,
+        "repr.filename"
+       ]
+      ],
+      "c1.single": [
+       [
+        0,
+        1,
+        "repr.tag_start"
+       ],
+       [
+        1,
+        2,
+        "repr.tag_name"
+       ],
+       [
+        2,
+        13,
+        "repr.tag_contents"
+       ],
+       [
+        13,
+        14,
+        "repr.tag_end"
+       ],
+       [
+        11,
+        12,
+        "repr.path"
+       ],
+       [
+        12,
+        13,
+        "repr.filename"
+       ]
+      ],
+      "c1.preceded": [
+       [
+        2,
+        3,
+        "repr.tag_start"
+       ],
+       [
+        3,
+        4,
+        "repr.tag_name"
+       ],
+       [
+        4,
+        15,
+        "repr.tag_contents"
+       ],
+       [
+        15,
+        16,
+        "repr.tag_end"
+       ],
+       [
+        13,
+        14,
+        "repr.path"
+       ],
+       [
+        14,
+        15,
+        "repr.filename"
+       ]
+      ],
+      "c1.followed": [
+       [
+        0,
+        1,
+        "repr.tag_start"
+       ],
+       [
+        1,
+        2,
+        "repr.tag_name"
+       ],
+       [
+        2,
+        13,
+        "repr.tag_contents"
+       ],
+       [
+        13,
+        14,
+        "repr.tag_end"
+       ],
+       [
+        11,
+        12,
+        "repr.path"
+       ],
+       [
+        12,
+        13,
+        "repr.filename"
+       ]
+      ],
+      "c1.newline": [
+       [
+        0,
+        1,
+        "repr.tag_start"
+       ],
+       [
+        1,
+        2,
+        "repr.tag_name"
+       ],
+       [
+        2,
+        13,
+        "repr.tag_contents"
+       ],
+       [
+        13,
+        14,
+        "repr.tag_end"
+       ],
+       [
+        11,
+        12,
+        "repr.path"
+       ],
+       [
+        12,
+        13,
+        "repr.filename"
+       ]
+      ],
+      "c1.pre_newline": [
+       [
+        6,
+        7,
+        "repr.tag_start"
+       ],
+       [
+        7,
+        8,
+        "repr.tag_name"
+       ],
+       [
+        8,
+        19,
+        "repr.tag_contents"
+       ],
+       [
+        19,
+        20,
+        "repr.tag_end"
+       ],
+       [
+        17,
+        18,
+        "repr.path"
+       ],
+       [
+        18,
+        19,
+        "repr.filename"
+       ]
+      ]
+     }
+    ],
+    "pr": [
+     {
+      "c1.adjacent": [
+       [
+        0,
+        1,
+        "repr.tag_start"
+       ],
+       [
+        1,
+        2,
+        "repr.tag_name"
+       ],
+       [
+        2,
+        14,
+        "repr.tag_contents"
+       ],
+       [
+        14,
+        15,
+        "repr.tag_end"
+       ],
+       [
+        15,
+        16,
+        "repr.tag_start"
+       ],
+       [
+        16,
+        17,
+        "repr.tag_name"
+       ],
+       [
+        17,
+        29,
+        "repr.tag_contents"
+       ],
+       [
+        29,
+        30,
+        "repr.tag_end"
+       ],
+       [
+        12,
+        13,
+        "repr.path"
+       ],
+       [
+        13,
+        14,
+        "repr.filename"
+       ],
+       [
+        27,
+        28,
+        "repr.path"
+       ],
+       [
+        28,
+        29,
+        "repr.filename"
+       ]
+      ],
+      "c1.single": [
+       [
+        0,
+        1,
+        "repr.tag_start"
+       ],
+       [
+        1,
+        2,
+        "repr.tag_name"
+       ],
+       [
+        2,
+        13,
+        "repr.tag_contents"
+       ],
+       [
+        13,
+        14,
+        "repr.tag_end"
+       ],
+       [
+        11,
+        12,
+        "repr.path"
+       ],
+       [
+        12,
+        13,
+        "repr.filename"
+       ]
+      ],
+      "c1.preceded": [
+       [
+        13,
+        14,
+        "repr.path"
+       ],
+       [
+        14,
+        15,
+        "repr.filename"
+       ]
+      ],
+      "c1.followed": [
+       [
+        11,
+        12,
+        "repr.path"
+       ],
+       [
+        12,
+        13,
+        "repr.filename"
+       ]
+      ],
+      "c1.newline": [
+       [
+        11,
+        12,
+        "repr.path"
+       ],
+       [
+        12,
+        13,
+        "repr.filename"
+       ]
+      ],
+      "c1.pre_newline": [
+       [
+        17,
+        18,
+        "repr.path"
+       ],
+       [
+        18,
+        19,
+        "repr.filename"
+       ]
+      ]
+     },
+     {
+      "c1.adjacent": [
+       [
+        0,
+        1,
+        "repr.tag_start"
+       ],
+       [
+        1,
+        2,
+        "repr.tag_name"
+       ],
+       [
+        2,
+        14,
+        "repr.tag_contents"
+       ],
+       [
+        14,
+        15,
+        "repr.tag_end"
+       ],
+       [
+        15,
+        16,
+        "repr.tag_start"
+       ],
+       [
+        16,
+        17,
+        "repr.tag_name"
+       ],
+       [
+        17,
+        29,
+        "repr.tag_contents"
+       ],
+       [
+        29,
+        30,
+        "repr.tag_end"
+       ],
+       [
+        12,
+        13,
+        "repr.path"
+       ],
+       [
+        13,
+        14,
+        "repr.filename"
+       ],
+       [
+        27,
+        28,
+        "repr.path"
+       ],
+       [
+        28,
+        29,
+        "repr.filename"
+       ]
+      ],
+      "c1.single": [
+       [
+        0,
+        1,
+        "repr.tag_start"
+       ],
+       [
+        1,
+        2,
+        "repr.tag_name"
+       ],
+       [
+        2,
+        13,
+        "repr.tag_contents"
+       ],
+       [
+        13,
+        14,
+        "repr.tag_end"
+       ],
+       [
+        11,
+        12,
+        "repr.path"
+       ],
+       [
+        12,
+        13,
+        "repr.filename"
+       ]
+      ],
+      "c1.preceded": [
+       [
+        13,
+        14,
+        "repr.path"
+       ],
+       [
+        14,
+        15,
+        "repr.filename"
+       ]
+      ],
+      "c1.followed": [
+       [
+        11,
+        12,
+        "repr.path"
+       ],
+       [
+        12,
+        13,
+        "repr.filename"
+       ]
+      ],
+      "c1.newline": [
+       [
+        11,
+        12,
+        "repr.path"
+       ],
+       [
+        12,
+        13,
+        "repr.filename"
+       ]
+      ],
+      "c1.pre_newline": [
+       [
+        17,
+        18,
+        "repr.path"
+       ],
+       [
+        18,
+        19,
+        "repr.filename"
+       ]
+      ]
+     },
+     {
+      "c1.adjacent": [
+       [
+        0,
+        1,
+        "repr.tag_start"
+       ],
+       [
+        1,
+        2,
+        "repr.tag_name"
+       ],
+       [
+        2,
+        14,
+        "repr.tag_contents"
+       ],
+       [
+        14,
+        15,
+        "repr.tag_end"
+       ],
+       [
+        15,
+        16,
+        "repr.tag_start"
+       ],
+       [
+        16,
+        17,
+        "repr.tag_name"
+       ],
+       [
+        17,
+        29,
+        "repr.tag_contents"
+       ],
+       [
+        29,
+        30,
+        "repr.tag_end"
+       ],
+       [
+        12,
+        13,
+        "repr.path"
+       ],
+       [
+        13,
+        14,
+        "repr.filename"
+       ],
+       [
+        27,
+        28,
+        "repr.path"
+       ],
+       [
+        28,
+        29,
+        "repr.filename"
+       ]
+      ],
+      "c1.single": [
+       [
+        0,
+        1,
+        "repr.tag_start"
+       ],
+       [
+        1,
+        2,
+        "repr.tag_name"
+       ],
+       [
+        2,
+        13,
+        "repr.tag_contents"
+       ],
+       [
+        13,
+        14,
+        "repr.tag_end"
+       ],
+       [
+        11,
+        12,
+        "repr.path"
+       ],
+       [
+        12,
+        13,
+        "repr.filename"
+       ]
+      ],
+      "c1.preceded": [
+       [
+        13,
+        14,
+        "repr.path"
+       ],
+       [
+        14,
+        15,
+        "repr.filename"
+       ]
+      ],
+      "c1.followed": [
+       [
+        11,
+        12,
+        "repr.path"
+       ],
+       [
+        12,
+        13,
+        "repr.filename"
+       ]
+      ],
+      "c1.newline": [
+       [
+        11,
+        12,
+        "repr.path"
+       ],
+       [
+        12,
+        13,
+        "repr.filename"
+       ]
+      ],
+      "c1.pre_newline": [
+       [
+        17,
+        18,
+        "repr.path"
+       ],
+       [
+        18,
+        19,
+        "repr.filename"
+       ]
+      ]
+     }
+    ]
+   }
+  },
+  "c3": {
+   "orig": {
+    "main": [
+     {
+      "c3.adjacent": [],
+      "c3.single": [],
+      "c3.preceded": [],
+      "c3.followed": [],
+      "c3.newline": [],
+      "c3.pre_newline": []
+     },
+     {
+      "c3.adjacent": [],
+      "c3.single": [],
+      "c3.preceded": [],
+      "c3.followed": [],
+      "c3.newline": [],
+      "c3.pre_newline": []
+     },
+     {
+      "c3.adjacent": [],
+      "c3.single": [],
+      "c3.preceded": [],
+      "c3.followed": [],
+      "c3.newline": [],
+      "c3.pre_newline": []
+     }
+    ],
+    "pr": [
+     {
+      "c3.adjacent": [],
+      "c3.single": [],
+      "c3.preceded": [],
+      "c3.followed": [],
+      "c3.newline": [],
+      "c3.pre_newline": []
+     },
+     {
+      "c3.adjacent": [],
+      "c3.single": [],
+      "c3.preceded": [],
+      "c3.followed": [],
+      "c3.newline": [],
+      "c3.pre_newline": []
+     },
+     {
+      "c3.adjacent": [],
+      "c3.single": [],
+      "c3.preceded": [],
+      "c3.followed": [],
+      "c3.newline": [],
+      "c3.pre_newline": []
+     }
+    ]
+   },
+   "fixed": {
+    "main": [
+     {
+      "c3.adjacent": [
+       [
+        0,
+        1,
+        "repr.tag_start"
+       ],
+       [
+        1,
+        2,
+        "repr.tag_name"
+       ],
+       [
+        2,
+        29,
+        "repr.tag_contents"
+       ],
+       [
+        29,
+        30,
+        "repr.tag_end"
+       ],
+       [
+        12,
+        13,
+        "repr.path"
+       ],
+       [
+        13,
+        14,
+        "repr.filename"
+       ],
+       [
+        27,
+        28,
+        "repr.path"
+       ],
+       [
+        28,
+        29,
+        "repr.filename"
+       ]
+      ],
+      "c3.single": [
+       [
+        0,
+        1,
+        "repr.tag_start"
+       ],
+       [
+        1,
+        2,
+        "repr.tag_name"
+       ],
+       [
+        2,
+        13,
+        "repr.tag_contents"
+       ],
+       [
+        13,
+        14,
+        "repr.tag_end"
+       ],
+       [
+        11,
+        12,
+        "repr.path"
+       ],
+       [
+        12,
+        13,
+        "repr.filename"
+       ]
+      ],
+      "c3.preceded": [
+       [
+        2,
+        3,
+        "repr.tag_start"
+       ],
+       [
+        3,
+        4,
+        "repr.tag_name"
+       ],
+       [
+        4,
+        15,
+        "repr.tag_contents"
+       ],
+       [
+        15,
+        16,
+        "repr.tag_end"
+       ],
+       [
+        13,
+        14,
+        "repr.path"
+       ],
+       [
+        14,
+        15,
+        "repr.filename"
+       ]
+      ],
+      "c3.followed": [
+       [
+        0,
+        1,
+        "repr.tag_start"
+       ],
+       [
+        1,
+        2,
+        "repr.tag_name"
+       ],
+       [
+        2,
+        13,
+        "repr.tag_contents"
+       ],
+       [
+        13,
+        14,
+        "repr.tag_end"
+       ],
+       [
+        11,
+        12,
+        "repr.path"
+       ],
+       [
+        12,
+        13,
+        "repr.filename"
+       ]
+      ],
+      "c3.newline": [
+       [
+        0,
+        1,
+        "repr.tag_start"
+       ],
+       [
+        1,
+        2,
+        "repr.tag_name"
+       ],
+       [
+        2,
+        13,
+        "repr.tag_contents"
+       ],
+       [
+        13,
+        14,
+        "repr.tag_end"
+       ],
+       [
+        11,
+        12,
+        "repr.path"
+       ],
+       [
+        12,
+        13,
+        "repr.filename"
+       ]
+      ],
+      "c3.pre_newline": [
+       [
+        6,
+        7,
+        "repr.tag_start"
+       ],
+       [
+        7,
+        8,
+        "repr.tag_name"
+       ],
+       [
+        8,
+        19,
+        "repr.tag_contents"
+       ],
+       [
+        19,
+        20,
+        "repr.tag_end"
+       ],
+       [
+        17,
+        18,
+        "repr.path"
+       ],
+       [
+        18,
+        19,
+        "repr.filename"
+       ]
+      ]
+     },
+     {
+      "c3.adjacent": [
+       [
+        0,
+        1,
+        "repr.tag_start"
+       ],
+       [
+        1,
+        2,
+        "repr.tag_name"
+       ],
+       [
+        2,
+        29,
+        "repr.tag_contents"
+       ],
+       [
+        29,
+        30,
+        "repr.tag_end"
+       ],
+       [
+        12,
+        13,
+        "repr.path"
+       ],
+       [
+        13,
+        14,
+        "repr.filename"
+       ],
+       [
+        27,
+        28,
+        "repr.path"
+       ],
+       [
+        28,
+        29,
+        "repr.filename"
+       ]
+      ],
+      "c3.single": [
+       [
+        0,
+        1,
+        "repr.tag_start"
+       ],
+       [
+        1,
+        2,
+        "repr.tag_name"
+       ],
+       [
+        2,
+        13,
+        "repr.tag_contents"
+       ],
+       [
+        13,
+        14,
+        "repr.tag_end"
+       ],
+       [
+        11,
+        12,
+        "repr.path"
+       ],
+       [
+        12,
+        13,
+        "repr.filename"
+       ]
+      ],
+      "c3.preceded": [
+       [
+        2,
+        3,
+        "repr.tag_start"
+       ],
+       [
+        3,
+        4,
+        "repr.tag_name"
+       ],
+       [
+        4,
+        15,
+        "repr.tag_contents"
+       ],
+       [
+        15,
+        16,
+        "repr.tag_end"
+       ],
+       [
+        13,
+        14,
+        "repr.path"
+       ],
+       [
+        14,
+        15,
+        "repr.filename"
+       ]
+      ],
+      "c3.followed": [
+       [
+        0,
+        1,
+        "repr.tag_start"
+       ],
+       [
+        1,
+        2,
+        "repr.tag_name"
+       ],
+       [
+        2,
+        13,
+        "repr.tag_contents"
+       ],
+       [
+        13,
+        14,
+        "repr.tag_end"
+       ],
+       [
+        11,
+        12,
+        "repr.path"
+       ],
+       [
+        12,
+        13,
+        "repr.filename"
+       ]
+      ],
+      "c3.newline": [
+       [
+        0,
+        1,
+        "repr.tag_start"
+       ],
+       [
+        1,
+        2,
+        "repr.tag_name"
+       ],
+       [
+        2,
+        13,
+        "repr.tag_contents"
+       ],
+       [
+        13,
+        14,
+        "repr.tag_end"
+       ],
+       [
+        11,
+        12,
+        "repr.path"
+       ],
+       [
+        12,
+        13,
+        "repr.filename"
+       ]
+      ],
+      "c3.pre_newline": [
+       [
+        6,
+        7,
+        "repr.tag_start"
+       ],
+       [
+        7,
+        8,
+        "repr.tag_name"
+       ],
+       [
+        8,
+        19,
+        "repr.tag_contents"
+       ],
+       [
+        19,
+        20,
+        "repr.tag_end"
+       ],
+       [
+        17,
+        18,
+        "repr.path"
+       ],
+       [
+        18,
+        19,
+        "repr.filename"
+       ]
+      ]
+     },
+     {
+      "c3.adjacent": [
+       [
+        0,
+        1,
+        "repr.tag_start"
+       ],
+       [
+        1,
+        2,
+        "repr.tag_name"
+       ],
+       [
+        2,
+        29,
+        "repr.tag_contents"
+       ],
+       [
+        29,
+        30,
+        "repr.tag_end"
+       ],
+       [
+        12,
+        13,
+        "repr.path"
+       ],
+       [
+        13,
+        14,
+        "repr.filename"
+       ],
+       [
+        27,
+        28,
+        "repr.path"
+       ],
+       [
+        28,
+        29,
+        "repr.filename"
+       ]
+      ],
+      "c3.single": [
+       [
+        0,
+        1,
+        "repr.tag_start"
+       ],
+       [
+        1,
+        2,
+        "repr.tag_name"
+       ],
+       [
+        2,
+        13,
+        "repr.tag_contents"
+       ],
+       [
+        13,
+        14,
+        "repr.tag_end"
+       ],
+       [
+        11,
+        12,
+        "repr.path"
+       ],
+       [
+        12,
+        13,
+        "repr.filename"
+       ]
+      ],
+      "c3.preceded": [
+       [
+        2,
+        3,
+        "repr.tag_start"
+       ],
+       [
+        3,
+        4,
+        "repr.tag_name"
+       ],
+       [
+        4,
+        15,
+        "repr.tag_contents"
+       ],
+       [
+        15,
+        16,
+        "repr.tag_end"
+       ],
+       [
+        13,
+        14,
+        "repr.path"
+       ],
+       [
+        14,
+        15,
+        "repr.filename"
+       ]
+      ],
+      "c3.followed": [
+       [
+        0,
+        1,
+        "repr.tag_start"
+       ],
+       [
+        1,
+        2,
+        "repr.tag_name"
+       ],
+       [
+        2,
+        13,
+        "repr.tag_contents"
+       ],
+       [
+        13,
+        14,
+        "repr.tag_end"
+       ],
+       [
+        11,
+        12,
+        "repr.path"
+       ],
+       [
+        12,
+        13,
+        "repr.filename"
+       ]
+      ],
+      "c3.newline": [
+       [
+        0,
+        1,
+        "repr.tag_start"
+       ],
+       [
+        1,
+        2,
+        "repr.tag_name"
+       ],
+       [
+        2,
+        13,
+        "repr.tag_contents"
+       ],
+       [
+        13,
+        14,
+        "repr.tag_end"
+       ],
+       [
+        11,
+        12,
+        "repr.path"
+       ],
+       [
+        12,
+        13,
+        "repr.filename"
+       ]
+      ],
+      "c3.pre_newline": [
+       [
+        6,
+        7,
+        "repr.tag_start"
+       ],
+       [
+        7,
+        8,
+        "repr.tag_name"
+       ],
+       [
+        8,
+        19,
+        "repr.tag_contents"
+       ],
+       [
+        19,
+        20,
+        "repr.tag_end"
+       ],
+       [
+        17,
+        18,
+        "repr.path"
+       ],
+       [
+        18,
+        19,
+        "repr.filename"
+       ]
+      ]
+     }
+    ],
+    "pr": [
+     {
+      "c3.adjacent": [
+       [
+        0,
+        1,
+        "repr.tag_start"
+       ],
+       [
+        1,
+        2,
+        "repr.tag_name"
+       ],
+       [
+        2,
+        14,
+        "repr.tag_contents"
+       ],
+       [
+        14,
+        15,
+        "repr.tag_end"
+       ],
+       [
+        15,
+        16,
+        "repr.tag_start"
+       ],
+       [
+        16,
+        17,
+        "repr.tag_name"
+       ],
+       [
+        17,
+        29,
+        "repr.tag_contents"
+       ],
+       [
+        29,
+        30,
+        "repr.tag_end"
+       ],
+       [
+        12,
+        13,
+        "repr.path"
+       ],
+       [
+        13,
+        14,
+        "repr.filename"
+       ],
+       [
+        27,
+        28,
+        "repr.path"
+       ],
+       [
+        28,
+        29,
+        "repr.filename"
+       ]
+      ],
+      "c3.single": [
+       [
+        0,
+        1,
+        "repr.tag_start"
+       ],
+       [
+        1,
+        2,
+        "repr.tag_name"
+       ],
+       [
+        2,
+        13,
+        "repr.tag_contents"
+       ],
+       [
+        13,
+        14,
+        "repr.tag_end"
+       ],
+       [
+        11,
+        12,
+        "repr.path"
+       ],
+       [
+        12,
+        13,
+        "repr.filename"
+       ]
+      ],
+      "c3.preceded": [
+       [
+        13,
+        14,
+        "repr.path"
+       ],
+       [
+        14,
+        15,
+        "repr.filename"
+       ]
+      ],
+      "c3.followed": [
+       [
+        11,
+        12,
+        "repr.path"
+       ],
+       [
+        12,
+        13,
+        "repr.filename"
+       ]
+      ],
+      "c3.newline": [
+       [
+        11,
+        12,
+        "repr.path"
+       ],
+       [
+        12,
+        13,
+        "repr.filename"
+       ]
+      ],
+      "c3.pre_newline": [
+       [
+        17,
+        18,
+        "repr.path"
+       ],
+       [
+        18,
+        19,
+        "repr.filename"
+       ]
+      ]
+     },
+     {
+      "c3.adjacent": [
+       [
+        0,
+        1,
+        "repr.tag_start"
+       ],
+       [
+        1,
+        2,
+        "repr.tag_name"
+       ],
+       [
+        2,
+        14,
+        "repr.tag_contents"
+       ],
+       [
+        14,
+        15,
+        "repr.tag_end"
+       ],
+       [
+        15,
+        16,
+        "repr.tag_start"
+       ],
+       [
+        16,
+        17,
+        "repr.tag_name"
+       ],
+       [
+        17,
+        29,
+        "repr.tag_contents"
+       ],
+       [
+        29,
+        30,
+        "repr.tag_end"
+       ],
+       [
+        12,
+        13,
+        "repr.path"
+       ],
+       [
+        13,
+        14,
+        "repr.filename"
+       ],
+       [
+        27,
+        28,
+        "repr.path"
+       ],
+       [
+        28,
+        29,
+        "repr.filename"
+       ]
+      ],
+      "c3.single": [
+       [
+        0,
+        1,
+        "repr.tag_start"
+       ],
+       [
+        1,
+        2,
+        "repr.tag_name"
+       ],
+       [
+        2,
+        13,
+        "repr.tag_contents"
+       ],
+       [
+        13,
+        14,
+        "repr.tag_end"
+       ],
+       [
+        11,
+        12,
+        "repr.path"
+       ],
+       [
+        12,
+        13,
+        "repr.filename"
+       ]
+      ],
+      "c3.preceded": [
+       [
+        13,
+        14,
+        "repr.path"
+       ],
+       [
+        14,
+        15,
+        "repr.filename"
+       ]
+      ],
+      "c3.followed": [
+       [
+        11,
+        12,
+        "repr.path"
+       ],
+       [
+        12,
+        13,
+        "repr.filename"
+       ]
+      ],
+      "c3.newline": [
+       [
+        11,
+        12,
+        "repr.path"
+       ],
+       [
+        12,
+        13,
+        "repr.filename"
+       ]
+      ],
+      "c3.pre_newline": [
+       [
+        17,
+        18,
+        "repr.path"
+       ],
+       [
+        18,
+        19,
+        "repr.filename"
+       ]
+      ]
+     },
+     {
+      "c3.adjacent": [
+       [
+        0,
+        1,
+        "repr.tag_start"
+       ],
+       [
+        1,
+        2,
+        "repr.tag_name"
+       ],
+       [
+        2,
+        14,
+        "repr.tag_contents"
+       ],
+       [
+        14,
+        15,
+        "repr.tag_end"
+       ],
+       [
+        15,
+        16,
+        "repr.tag_start"
+       ],
+       [
+        16,
+        17,
+        "repr.tag_name"
+       ],
+       [
+        17,
+        29,
+        "repr.tag_contents"
+       ],
+       [
+        29,
+        30,
+        "repr.tag_end"
+       ],
+       [
+        12,
+        13,
+        "repr.path"
+       ],
+       [
+        13,
+        14,
+        "repr.filename"
+       ],
+       [
+        27,
+        28,
+        "repr.path"
+       ],
+       [
+        28,
+        29,
+        "repr.filename"
+       ]
+      ],
+      "c3.single": [
+       [
+        0,
+        1,
+        "repr.tag_start"
+       ],
+       [
+        1,
+        2,
+        "repr.tag_name"
+       ],
+       [
+        2,
+        13,
+        "repr.tag_contents"
+       ],
+       [
+        13,
+        14,
+        "repr.tag_end"
+       ],
+       [
+        11,
+        12,
+        "repr.path"
+       ],
+       [
+        12,
+        13,
+        "repr.filename"
+       ]
+      ],
+      "c3.preceded": [
+       [
+        13,
+        14,
+        "repr.path"
+       ],
+       [
+        14,
+        15,
+        "repr.filename"
+       ]
+      ],
+      "c3.followed": [
+       [
+        11,
+        12,
+        "repr.path"
+       ],
+       [
+        12,
+        13,
+        "repr.filename"
+       ]
+      ],
+      "c3.newline": [
+       [
+        11,
+        12,
+        "repr.path"
+       ],
+       [
+        12,
+        13,
+        "repr.filename"
+       ]
+      ],
+      "c3.pre_newline": [
+       [
+        17,
+        18,
+        "repr.path"
+       ],
+       [
+        18,
+        19,
+        "repr.filename"
+       ]
+      ]
+     }
+    ]
+   }
+  }
+ },
+ "rejudge": {
+  "orig_as_run": {
+   "verdict": "could_not_verify",
+   "reason": "could not verify: broken probe, every value it returned is empty on both sides, so it never observed the changed behaviour; 83 test(s) ran on main, 84 on the PR; 1 new test(s) pass, 83 unchanged; probe: 12 other observation(s) identical on both sides",
+   "flagged": []
+  },
+  "fixed_as_run_no_claims": {
+   "verdict": "needs_attention",
+   "reason": "probe: 10 observation(s) need attention: c1.adjacent differs and no claim covers it; c1.followed differs and no claim covers it; c1.newline differs and no claim covers it; c1.pre_newline differs and no claim covers it; probe: 2 other observation(s) identical on both sides; tests: 83 test(s) ran on main, 84 on the PR; 1 new test(s) pass, 83 unchanged",
+   "flagged": [
+    {
+     "probe": "model-probe-c1",
+     "name": "c1.adjacent",
+     "label": "unmentioned",
+     "claim": null
+    },
+    {
+     "probe": "model-probe-c1",
+     "name": "c1.followed",
+     "label": "unmentioned",
+     "claim": null
+    },
+    {
+     "probe": "model-probe-c1",
+     "name": "c1.newline",
+     "label": "unmentioned",
+     "claim": null
+    },
+    {
+     "probe": "model-probe-c1",
+     "name": "c1.pre_newline",
+     "label": "unmentioned",
+     "claim": null
+    },
+    {
+     "probe": "model-probe-c1",
+     "name": "c1.preceded",
+     "label": "unmentioned",
+     "claim": null
+    },
+    {
+     "probe": "model-probe-c3",
+     "name": "c3.adjacent",
+     "label": "unmentioned",
+     "claim": null
+    },
+    {
+     "probe": "model-probe-c3",
+     "name": "c3.followed",
+     "label": "unmentioned",
+     "claim": null
+    },
+    {
+     "probe": "model-probe-c3",
+     "name": "c3.newline",
+     "label": "unmentioned",
+     "claim": null
+    },
+    {
+     "probe": "model-probe-c3",
+     "name": "c3.pre_newline",
+     "label": "unmentioned",
+     "claim": null
+    },
+    {
+     "probe": "model-probe-c3",
+     "name": "c3.preceded",
+     "label": "unmentioned",
+     "claim": null
+    }
+   ]
+  },
+  "fixed_linked_model_claims": {
+   "verdict": "verified",
+   "reason": "83 test(s) ran on main, 84 on the PR; 1 new test(s) pass, 83 unchanged; probe: 2 unchanged sub-check(s) of an input where the claim's change was seen, shown as advisory only: C1.single (C1); C3.single (C3); probe: claim(s) C1, C3 proven",
+   "flagged": []
+  },
+  "fixed_linked_preserve_claim": {
+   "verdict": "needs_attention",
+   "reason": "probe: 10 observation(s) need attention: c1.adjacent differs and no claim covers it; c1.followed differs and no claim covers it; c1.newline differs and no claim covers it; c1.pre_newline differs and no claim covers it; probe: claim(s) C3 proven; probe: 1 other observation(s) identical on both sides; tests: 83 test(s) ran on main, 84 on the PR; 1 new test(s) pass, 83 unchanged",
+   "flagged": [
+    {
+     "probe": "model-probe-c1",
+     "name": "c1.adjacent",
+     "label": "unmentioned",
+     "claim": null
+    },
+    {
+     "probe": "model-probe-c1",
+     "name": "c1.followed",
+     "label": "unmentioned",
+     "claim": null
+    },
+    {
+     "probe": "model-probe-c1",
+     "name": "c1.newline",
+     "label": "unmentioned",
+     "claim": null
+    },
+    {
+     "probe": "model-probe-c1",
+     "name": "c1.pre_newline",
+     "label": "unmentioned",
+     "claim": null
+    },
+    {
+     "probe": "model-probe-c1",
+     "name": "c1.preceded",
+     "label": "unmentioned",
+     "claim": null
+    },
+    {
+     "probe": "model-probe-c3",
+     "name": "C3.adjacent",
+     "label": "false_claim",
+     "claim": "C3"
+    },
+    {
+     "probe": "model-probe-c3",
+     "name": "C3.followed",
+     "label": "false_claim",
+     "claim": "C3"
+    },
+    {
+     "probe": "model-probe-c3",
+     "name": "C3.newline",
+     "label": "false_claim",
+     "claim": "C3"
+    },
+    {
+     "probe": "model-probe-c3",
+     "name": "C3.pre_newline",
+     "label": "false_claim",
+     "claim": "C3"
+    },
+    {
+     "probe": "model-probe-c3",
+     "name": "C3.preceded",
+     "label": "false_claim",
+     "claim": "C3"
+    }
+   ]
+  }
+ }
+}
