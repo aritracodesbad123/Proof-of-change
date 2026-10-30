@@ -81,6 +81,66 @@ def past_boundary(text: str, old_patterns: list[str]) -> bool:
     return False
 
 
+TAILS = (("_pb_space", " tail"), ("_pb_text", "tail"), ("_pb_newline", "\ntail"))
+
+
+def force_inputs(code: str, old_patterns: list[str]) -> tuple[str, list[str]]:
+    """Probe code with past-boundary inputs added, and the names added.
+
+    For every dict literal of string names to string inputs (the probe's input table), each input that an old
+    pattern matches with nothing left outside the match gets three siblings: the same input followed by a space and
+    text, by text, and by a newline and text (never a bare trailing newline). Names already present are not touched.
+    Code with no such table, or no old pattern, comes back unchanged: the model's own probe is never weakened, and
+    the base side stays the reference because the added inputs only feed the same calls the model wrote."""
+    if not old_patterns or not code:
+        return code, []
+    try:
+        tree = ast.parse(code)
+    except SyntaxError:
+        return code, []
+    added: list[str] = []
+    for node in ast.walk(tree):
+        if not (isinstance(node, ast.Dict) and node.keys and all(
+                isinstance(k, ast.Constant) and isinstance(k.value, str) for k in node.keys) and all(
+                isinstance(v, ast.Constant) and isinstance(v.value, str) for v in node.values)):
+            continue
+        have = {k.value for k in node.keys}
+        for k, v in list(zip(node.keys, node.values)):
+            if not _matches(v.value, old_patterns) or past_boundary(v.value, old_patterns):
+                continue
+            for suf, tail in TAILS:
+                name = k.value + suf
+                if name in have:
+                    continue
+                node.keys.append(ast.Constant(name))
+                node.values.append(ast.Constant(v.value + tail))
+                have.add(name)
+                added.append(name)
+    if not added:
+        return code, []
+    return ast.unparse(ast.fix_missing_locations(tree)) + "\n", added
+
+
+def _matches(text: str, old_patterns: list[str]) -> bool:
+    for pat in old_patterns:
+        try:
+            if any(m.end() > m.start() for m in re.finditer(pat, text)):
+                return True
+        except re.error:
+            continue
+    return False
+
+
+def input_for(name: str, inputs: dict) -> str | None:
+    """The input an observation reads: its last dotted part is an input name, or starts or ends with one joined by
+    "_" ("adjacent_pb_text_span_count" reads "adjacent_pb_text"). The longest such name wins."""
+    key = str(name or "").rsplit(".", 1)[-1]
+    if key in inputs:
+        return key
+    hits = [k for k in inputs if key.startswith(k + "_") or key.endswith("_" + k)]
+    return max(hits, key=len) if hits else None
+
+
 def probe_inputs(source: str) -> dict[str, str]:
     """{input name: input text} from dict literals whose keys and values are all string constants."""
     try:
@@ -118,8 +178,8 @@ def apply(pr_probes: dict | None, rec: dict, prdir: Path | str | None) -> dict |
         inputs = probe_inputs(src.read_text(errors="replace")) if src and src.is_file() else {}
         new_obs = []
         for o in it.get("observations") or []:
-            key = str(o.get("name") or "").rsplit(".", 1)[-1]
-            if (o.get("state") == "differs" and key in inputs and past_boundary(inputs[key], olds)
+            key = input_for(o.get("name"), inputs)
+            if (o.get("state") == "differs" and key is not None and past_boundary(inputs[key], olds)
                     and o.get("label") != FALSE_CLAIM):
                 o = dict(o, label=FALSE_CLAIM, claim=cid, linked_by="boundary", advisory=False,
                          note="input just past the edited pattern's old match boundary")

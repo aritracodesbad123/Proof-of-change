@@ -1,0 +1,44 @@
+diff --git a/rich/highlighter.py b/rich/highlighter.py
+index df28048..c3065fd 100644
+--- a/rich/highlighter.py
++++ b/rich/highlighter.py
+@@ -82,7 +82,7 @@ class ReprHighlighter(RegexHighlighter):
+ 
+     base_style = "repr."
+     highlights: ClassVar[Sequence[str]] = [
+-        r"(?P<tag_start><)(?P<tag_name>[-\w.:|]*)(?P<tag_contents>[\w\W]*)(?P<tag_end>>)",
++        r"(?P<tag_start><)(?P<tag_name>[-\w.:|]*)(?P<tag_contents>[\w\W]*?)(?P<tag_end>>(?=<|$))",
+         r'(?P<attrib_name>[\w_]{1,50})=(?P<attrib_value>"?[\w_]+"?)?',
+         r"(?P<brace>[][{}()])",
+         _combine_regex(
+diff --git a/tests/test_highlighter.py b/tests/test_highlighter.py
+index d199282..4db90ce 100644
+--- a/tests/test_highlighter.py
++++ b/tests/test_highlighter.py
+@@ -461,3 +461,25 @@ def test_highlight_iso8601_regex(test: str, spans: List[Span]):
+     highlighter.highlight(text)
+     print(text.spans)
+     assert text.spans == spans
++
++def test_repr_highlighter_adjacent_tags():
++    from rich.highlighter import ReprHighlighter
++
++    highlighter = ReprHighlighter()
++
++    text = highlighter("<a>content1</a><b>content2</b>")
++
++    tag_contents_spans = [
++        span for span in text.spans
++        if span.style == "repr.tag_contents"
++    ]
++
++    assert len(tag_contents_spans) == 2
++
++    assert [
++      (span.start, span.end)
++       for span in tag_contents_spans
++    ] == [
++       (2, 14),
++       (17, 29),
++    ]
+\ No newline at end of file

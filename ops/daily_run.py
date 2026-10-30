@@ -4522,7 +4522,8 @@ def plan_probes(repo: str, item: dict, rec: dict, base_root: Path, pr_roots: lis
                 note["model_loose_quote_matches"] = res["loose_quote_matches"]
             if res.get("rewritten_imports"):   # product checks: src/ layout imports rewritten to the installed name
                 note["rewritten_imports"] = res["rewritten_imports"]
-            for k in ("parse_repairs", "retried", "unmatched_covers", "boundary_rule"):   # repair and retry trail, shown on the record
+            # repair and retry trail, and inputs forced past an edited pattern's old boundary, shown on the record
+            for k in ("parse_repairs", "retried", "unmatched_covers", "boundary_rule", "forced_boundary_inputs"):
                 if res.get(k):
                     note[f"model_{k}"] = res[k]
             plan += [{"path": x["path"], "source": "model", "freeze": x["freeze"],

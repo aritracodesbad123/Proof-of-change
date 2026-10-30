@@ -457,6 +457,9 @@ def unlinked_retry_weakens(first: list, retry: list, claim_ids: set) -> str | No
     return retry_weakens(first, retry, covers_must_drop=False)
 
 
+UNLINKED_PROBE = "it names no claim id although testable claims exist"
+
+
 PARSE_REPAIR_TRIES = 2   # fixed cap on repair calls for probes whose code does not parse; model calls only
 
 
@@ -828,7 +831,7 @@ def generate(provider: Provider, repo: str, pr: int, title: str, body: str | Non
                    (resp or {}).get("probes", [])[:MAX_PROBES] if isinstance(p, dict)] or ["the probes list was empty"]
         out["retried"] = {"why": reasons[:5]}
         retry_user = (user + "\n\nYour previous answer contained no usable probe (" + "; ".join(map(str, reasons[:5]))
-                      + "). Follow the coverage rule: write at least one probe per testable claim.")
+                      + "). " + unlinked_retry_rule(testable))
         try:
             resp = provider.complete_json("probes", probes_prompt, retry_user, PROBES_SCHEMA, ctx)
         except ProviderError as e:
@@ -893,6 +896,18 @@ def generate(provider: Provider, repo: str, pr: int, title: str, body: str | Non
         if why:
             out["errors"].append(f"probe {p.get('id')!r} rejected: {why}")
             continue
+        if product and by_id and not p.get("claims"):
+            # Product checks with testable claims: a probe that names no claim id cannot be tied to any claim, so its
+            # differences could never confirm or refute one. Reject it (the retries above already asked for ids).
+            out["errors"].append(f"probe {p.get('id')!r} rejected: {UNLINKED_PROBE}")
+            continue
+        if out.get("boundary_rule"):
+            # An edited existing pattern: do not rely on the model alone for inputs just past the old match boundary.
+            from poc import boundary_claims
+            olds = [m.get("old") for m in out["boundary_rule"] if m.get("old")]
+            p["code"], added = boundary_claims.force_inputs(p["code"], olds)
+            if added:
+                out.setdefault("forced_boundary_inputs", {})[p["id"]] = added
         draft_probes.append(p)
 
     left = [x for p in draft_probes for x in unmatched_covers(p)]
