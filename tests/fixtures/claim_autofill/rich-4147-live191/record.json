@@ -1,0 +1,62 @@
+{
+  "note": "Saved miss for rich#4147. Three probes were rejected for naming no claim id, so none ran and no probe source was stored. Claims, the rejection errors, and the edited-pattern rule are copied from that run. Home and machine paths are not included.",
+  "repo": "Textualize/rich",
+  "pr": {
+    "number": 4147,
+    "head_sha": "3bd56b51d8b7fbaf54a8ed092ce12d2a010ae7d9",
+    "tested_main_sha": "9d8f9a372cc5916fd4781fec207ced7ddac2f08f"
+  },
+  "product_check": true,
+  "baseline": "full",
+  "verdict": "could_not_verify",
+  "reason": "not verified: no AI-written probe ran any changed line, so the change itself was not exercised by a probe; 83 test(s) ran on main, 84 on the PR; 1 new test(s) pass, 83 unchanged",
+  "probes": {
+    "status": "none",
+    "items": []
+  },
+  "probe_plan": {
+    "errors": [
+      "probe 'p1' rejected: it names no claim id although testable claims exist",
+      "probe 'p2' rejected: it names no claim id although testable claims exist",
+      "probe 'p3' rejected: it names no claim id although testable claims exist"
+    ],
+    "model_claims": [
+      {
+        "id": "C1",
+        "text": "This PR fixes adjacent tag matching in ReprHighlighter.",
+        "source_quote": "This PR fixes adjacent tag matching in ReprHighlighter.",
+        "testable": true,
+        "expect": "differs"
+      },
+      {
+        "id": "C2",
+        "text": "Previously, the regex used a greedy match for tag contents, causing adjacent tags such as: <a>content1</a><b>content2</b> to be merged into a single match.",
+        "source_quote": "Previously, the regex used a greedy match for tag contents, causing adjacent tags such as:\n<a>content1</a><b>content2</b>\nto be merged into a single match.",
+        "testable": true,
+        "expect": "same"
+      },
+      {
+        "id": "C3",
+        "text": "The regex has been updated to correctly handle adjacent tags while preserving existing behavior.",
+        "source_quote": "The regex has been updated to correctly handle adjacent tags while preserving existing behavior.",
+        "testable": true,
+        "expect": "differs"
+      }
+    ],
+    "model_rejected_claims": [],
+    "model_retried": {
+      "why": [
+        "empty probe: the code has no test statements (only imports, comments or a docstring)",
+        "empty probe: the code has no test statements (only imports, comments or a docstring)"
+      ]
+    },
+    "model_boundary_rule": [
+      {
+        "file": "rich/highlighter.py",
+        "line": 85,
+        "old": "(?P<tag_start><)(?P<tag_name>[-\\w.:|]*)(?P<tag_contents>[\\w\\W]*)(?P<tag_end>>)"
+      }
+    ],
+    "frozen": []
+  }
+}

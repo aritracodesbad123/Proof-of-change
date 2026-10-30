@@ -460,6 +460,65 @@ def unlinked_retry_weakens(first: list, retry: list, claim_ids: set) -> str | No
 UNLINKED_PROBE = "it names no claim id although testable claims exist"
 
 
+def claims_are_blank(p: dict) -> bool:
+    """True when the probe names no claim id: no claims, or every entry lacks a non-empty id."""
+    claims = p.get("claims") or []
+    if not isinstance(claims, list) or not claims:
+        return True
+    return not any(isinstance(c, dict) and isinstance(c.get("id"), str) and c["id"].strip() for c in claims)
+
+
+def fill_blank_claims(p: dict, testable: list) -> dict:
+    """A copy of the probe with each known testable claim attached, when it named none.
+
+    Returned unchanged when the probe already names a claim id, or when no known claim has an id and an expect of
+    same or differs. Covers are the claim id plus ".*", which judging links to observation names that start with
+    that id. The claim's own expect is kept. An id the probe already wrote that is not a known claim is left as it
+    was, so validation still rejects it."""
+    if not claims_are_blank(p):
+        return p
+    filled = []
+    for c in testable or []:
+        if not isinstance(c, dict):
+            continue
+        cid, expect = c.get("id"), c.get("expect")
+        if not isinstance(cid, str) or not cid.strip() or expect not in ("same", "differs"):
+            continue
+        filled.append({"id": cid, "covers": [f"{cid}.*"], "expect": expect})
+    if not filled:
+        return p
+    return dict(p, claims=filled)
+
+
+def _drop_blank_claim_entries(p: dict) -> dict:
+    """Drop claim entries that name no id, when the probe already names at least one."""
+    claims = p.get("claims") or []
+    if not isinstance(claims, list):
+        return p
+    named = [c for c in claims if isinstance(c, dict) and isinstance(c.get("id"), str) and c["id"].strip()]
+    if not named or len(named) == len(claims):
+        return p
+    return dict(p, claims=named)
+
+
+def scrub_blank_claim_entries(resp, product: bool, testable: list):
+    """A reply whose linked probes no longer carry claim entries with a blank id.
+
+    A blank entry fails validation, and that would discard a probe which already names a real claim. Probes that
+    name no id are left blank so the fill step can attach the known claims. Study runs and replies with no
+    testable claims are unchanged."""
+    if not product or not testable or not isinstance(resp, dict):
+        return resp
+    probes, changed = [], False
+    for p in resp.get("probes") or []:
+        if isinstance(p, dict) and not claims_are_blank(p):
+            nxt = _drop_blank_claim_entries(p)
+            changed = changed or nxt is not p
+            p = nxt
+        probes.append(p)
+    return dict(resp, probes=probes) if changed else resp
+
+
 PARSE_REPAIR_TRIES = 2   # fixed cap on repair calls for probes whose code does not parse; model calls only
 
 
@@ -823,6 +882,7 @@ def generate(provider: Provider, repo: str, pr: int, title: str, body: str | Non
     resp = _repair_parse_errors(provider, probes_prompt, user, ctx, resp, out)
     if not out["parse_repairs"]:
         out.pop("parse_repairs")
+    resp = scrub_blank_claim_entries(resp, product, testable)
     usable = _usable(resp, set(by_id))
     if not usable:
         # One retry, same gate and same BASE-side inputs: say why the first answer was unusable (generic reasons only)
@@ -836,12 +896,15 @@ def generate(provider: Provider, repo: str, pr: int, title: str, body: str | Non
             resp = provider.complete_json("probes", probes_prompt, retry_user, PROBES_SCHEMA, ctx)
         except ProviderError as e:
             out["errors"].append(f"retry: {e}")
+        else:
+            resp = scrub_blank_claim_entries(resp, product, testable)
     elif by_id and not any(p.get("claims") for p in usable):
         # Testable claims exist but no probe says which claim it checks. Its differences would then all look
         # unclaimed. Ask once more (same gate, same BASE-side inputs); keep the first answer unless the retry is
         # usable and links at least one claim, so no probe is lost.
-        # The retry is sent the claim list with its ids and must name at least one of them in every probe. Links
-        # come only from the model's own answer; nothing here links a probe to a claim by name or any other guess.
+        # The retry is sent the claim list with its ids and must name at least one of them in every probe. If the
+        # kept answer still names no claim id, the known testable claims are attached below (product checks only).
+        # An id that is not a known claim is not guessed: validation still rejects that probe.
         out["retried"] = {"why": [UNLINKED_REASON]}
         retry_user = (user + "\n\nYour previous answer had probes, but " + UNLINKED_REASON + ". "
                       + unlinked_retry_rule(testable))
@@ -850,6 +913,7 @@ def generate(provider: Provider, repo: str, pr: int, title: str, body: str | Non
         except ProviderError as e:
             out["errors"].append(f"retry: {e}")
         else:
+            again = scrub_blank_claim_entries(again, product, testable)
             usable2 = _usable(again, set(by_id))
             weak = unlinked_retry_weakens(usable, usable2, set(by_id))
             if weak is None:
@@ -870,6 +934,7 @@ def generate(provider: Provider, repo: str, pr: int, title: str, body: str | Non
             except ProviderError as e:
                 out["errors"].append(f"retry: {e}")
             else:
+                again = scrub_blank_claim_entries(again, product, testable)
                 usable2 = _usable(again, set(by_id))
                 weak = retry_weakens(usable, usable2)
                 if weak is None and not _linked_ids(usable) <= _linked_ids(usable2):
@@ -887,6 +952,17 @@ def generate(provider: Provider, repo: str, pr: int, title: str, body: str | Non
             p["code"] = _unescape_code(p.get("code"))
             if not str(p.get("about") or "").strip():   # the probe runner requires a non-empty description
                 p["about"] = "model-written probe of the changed files (no description given)"
+        filled_ids = None
+        if isinstance(p, dict) and product and by_id:
+            # Blank claim ids are filled from the known testable claims. A probe that already names an id keeps
+            # that link; a blank entry beside a real id is dropped so it does not throw the probe away.
+            if claims_are_blank(p):
+                nxt = fill_blank_claims(p, testable)
+                if nxt.get("claims") and not claims_are_blank(nxt):
+                    filled_ids = [c["id"] for c in nxt["claims"]]
+                    p = nxt
+            else:
+                p = _drop_blank_claim_entries(p)
         why = validate_probe(p, set(by_id), python_version)
         if not why and layout:
             before = p["code"]
@@ -896,11 +972,13 @@ def generate(provider: Provider, repo: str, pr: int, title: str, body: str | Non
         if why:
             out["errors"].append(f"probe {p.get('id')!r} rejected: {why}")
             continue
-        if product and by_id and not p.get("claims"):
-            # Product checks with testable claims: a probe that names no claim id cannot be tied to any claim, so its
-            # differences could never confirm or refute one. Reject it (the retries above already asked for ids).
+        if product and by_id and claims_are_blank(p):
+            # Still no claim id after the fill above (no known claim could be attached). The probe cannot be tied
+            # to a claim, so it is rejected. Evidence that is kept is claim-linked.
             out["errors"].append(f"probe {p.get('id')!r} rejected: {UNLINKED_PROBE}")
             continue
+        if filled_ids:
+            out.setdefault("claims_filled", []).append({"id": p["id"], "claims": filled_ids})
         if out.get("boundary_rule"):
             # An edited existing pattern: do not rely on the model alone for inputs just past the old match boundary.
             from poc import boundary_claims

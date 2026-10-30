@@ -4,6 +4,7 @@ Offline proof on the live188 miss (rich#4147, 2026-10-30): the model's probe tes
 match and named no claim id, so the run came out could_not_verify. With forced inputs (real outputs from rich base
 9d8f9a3 and head 3bd56b5) and the probe tied to the model's own claim ids, the same record reaches needs_attention
 from false_claim on past-boundary inputs."""
+import ast
 import copy
 import json
 from pathlib import Path
@@ -124,7 +125,19 @@ def _gen(tmp_path, answers, monkeypatch):
                                  {"m.py": "P = 1"}, tmp_path, [], tmp_path / "out", product=True, diff=DIFF)
 
 
-def test_probe_without_claim_ids_is_rejected(tmp_path, monkeypatch):
+def test_blank_claim_ids_are_filled_and_inputs_are_forced(tmp_path, monkeypatch):
+    bare = {"probes": [{"id": "p1", "about": "x", "code": CODE, "claims": []}]}
+    out = _gen(tmp_path, [bare, bare], monkeypatch)
+    assert len(out["probes"]) == 1 and not any(model_probes.UNLINKED_PROBE in e for e in out["errors"])
+    assert out["claims_filled"] == [{"id": "p1", "claims": ["C1"]}]
+    assert out["forced_boundary_inputs"]["p1"] == ["a_pb_space", "a_pb_text", "a_pb_newline"]
+    spec = ast.literal_eval(next(ln for ln in out["probes"][0]["path"].read_text().splitlines()
+                                  if ln.startswith("PROBE = "))[len("PROBE = "):])
+    assert [c["id"] for c in spec["claims"]] == ["C1"]
+
+
+def test_blank_probe_is_still_rejected_when_it_cannot_be_filled(tmp_path, monkeypatch):
+    monkeypatch.setattr(model_probes, "fill_blank_claims", lambda p, claims: p)
     bare = {"probes": [{"id": "p1", "about": "x", "code": CODE, "claims": []}]}
     out = _gen(tmp_path, [bare, bare], monkeypatch)
     assert out["probes"] == [] and any(model_probes.UNLINKED_PROBE in e for e in out["errors"])
