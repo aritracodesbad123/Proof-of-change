@@ -1,0 +1,22 @@
+"""Model-written probe for Textualize/rich#4147 (model (nvidia/nemotron-3-super-120b-a12b, live)). Generated from the PR text and base-side code only;
+frozen before any PR-side execution. Untrusted: runs only in the sandbox without network."""
+PROBE = {'id': 'model-probe1', 'target': 'Textualize/rich#4147', 'about': 'ReprHighlighter tag matching', 'claims': [], 'timeout_s': 60, 'generator': 'model (nvidia/nemotron-3-super-120b-a12b, live)'}
+import json
+import json
+from rich.highlighter import ReprHighlighter
+
+def get_spans(s):
+    h = ReprHighlighter()
+    txt = h(s)
+    return [(span.start, span.end) for span in txt.spans]
+inputs = {'adjacent': '<a>content1</a><b>content2</b>', 'single': '<a>foo</a>', 'nonadj_space': '<a>foo</a> <b>bar</b>', 'nonadj_text': '<a>foo</a>xxx<b>bar</b>', 'adjacent_pb_space': '<a>content1</a><b>content2</b> tail', 'adjacent_pb_text': '<a>content1</a><b>content2</b>tail', 'adjacent_pb_newline': '<a>content1</a><b>content2</b>\ntail', 'single_pb_space': '<a>foo</a> tail', 'single_pb_text': '<a>foo</a>tail', 'single_pb_newline': '<a>foo</a>\ntail', 'nonadj_space_pb_space': '<a>foo</a> <b>bar</b> tail', 'nonadj_space_pb_text': '<a>foo</a> <b>bar</b>tail', 'nonadj_space_pb_newline': '<a>foo</a> <b>bar</b>\ntail', 'nonadj_text_pb_space': '<a>foo</a>xxx<b>bar</b> tail', 'nonadj_text_pb_text': '<a>foo</a>xxx<b>bar</b>tail', 'nonadj_text_pb_newline': '<a>foo</a>xxx<b>bar</b>\ntail'}
+obs = {}
+for name, inp in inputs.items():
+    spans = get_spans(inp)
+    obs[f'c1.{name}_span_count'] = len(spans)
+    obs[f'c2.{name}_span_count'] = len(spans)
+    obs[f'c3.{name}_span_count'] = len(spans)
+    obs[f'c1.{name}_spans'] = spans
+    obs[f'c2.{name}_spans'] = spans
+    obs[f'c3.{name}_spans'] = spans
+print(json.dumps({'observations': obs}))
