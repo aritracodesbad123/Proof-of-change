@@ -1,0 +1,991 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-pyutils-line_profiler-322-550d1aa314ad-line_profiler-322",
+ "date_ist": "2026-10-24 07:16 IST",
+ "run_date": "2026-10-24",
+ "who": "ops/daily_run.py",
+ "repo": "pyutils/line_profiler",
+ "library": "line_profiler",
+ "pr": {
+  "repo": "pyutils/line_profiler",
+  "number": 322,
+  "url": "https://github.com/pyutils/line_profiler/pull/322",
+  "title": "feat: Add reset_stats method to LineProfiler for resetting accumulated profiling data",
+  "base_sha": "61afe6e6624f02c8a2485099edcbb028188f5675",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "550d1aa314ad3d7276b0cae1bcd73e2f51b04cfb",
+  "merge_commit": "f63dc8dfb09266eed73a3c6b00dc2eef23e6a7a5",
+  "tested_main_sha": "d3400d7f458bc1e1f172145e6dfa973b89034f23",
+  "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+ },
+ "author": "hidva",
+ "base_ref": "main",
+ "updated_at_utc": "2025-07-18T00:23:14Z",
+ "updated_at_ist": "2025-07-18 05:53 IST",
+ "ci_state": "not checked (single-PR check)",
+ "ci_detail": "checked on request with --pr",
+ "tested_at_ist": "2026-10-24 07:16 IST",
+ "files": {
+  "all": [
+   "line_profiler/_line_profiler.pyx",
+   "tests/test_explicit_profile.py"
+  ],
+  "package_py": [],
+  "compiled": [
+   "line_profiler/_line_profiler.pyx"
+  ],
+  "other": [
+   "tests/test_explicit_profile.py"
+  ]
+ },
+ "machine_type": {
+  "arch": "arm64",
+  "os": "Darwin",
+  "platform": "macOS-15.5-arm64-arm-64bit-Mach-O",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": "Apple clang version 14.0.3 (clang-1403.0.22.14.1)",
+  "cpu_model": null,
+  "ram_gb": null
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 3,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.14",
+ "test_selection": "mapped from touched files: tests/test_explicit_profile.py",
+ "per_run": [
+  {
+   "side": "old",
+   "run": 1,
+   "passed": 0,
+   "failed": 0,
+   "error": 1,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 2.2,
+   "pytest_summary": "1 error in 0.37s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 1,
+   "passed": 0,
+   "failed": 0,
+   "error": 1,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 2.2,
+   "pytest_summary": "1 error in 0.38s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 2,
+   "passed": 0,
+   "failed": 0,
+   "error": 1,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 2.1,
+   "pytest_summary": "1 error in 0.36s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 2,
+   "passed": 0,
+   "failed": 0,
+   "error": 1,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 2.2,
+   "pytest_summary": "1 error in 0.37s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 3,
+   "passed": 0,
+   "failed": 0,
+   "error": 1,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 2.2,
+   "pytest_summary": "1 error in 0.37s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 3,
+   "passed": 0,
+   "failed": 0,
+   "error": 1,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 2.2,
+   "pytest_summary": "1 error in 0.39s",
+   "junit": true
+  }
+ ],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "contree",
+ "sandbox_backend_note": "contree (Token Factory Sandboxes, sdk 0.3.6)",
+ "machine": "contree",
+ "tool_setup": {
+  "installed": [],
+  "tries": 0,
+  "note": "All required tools were already installed.",
+  "refused": []
+ },
+ "posted_upstream": false,
+ "logs": "line_profiler-322/",
+ "freeze": {},
+ "poc_commit": "863751e9580b866fe64247737975cb2e04e97215",
+ "route": "source-pair",
+ "current_head_sha": "550d1aa314ad3d7276b0cae1bcd73e2f51b04cfb",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "state": "open",
+ "mergeable": true,
+ "mergeable_state": "clean",
+ "product_check": true,
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": {
+   "ok": true,
+   "skipped": false,
+   "live_call": true,
+   "cached": false,
+   "queries": [
+    "line_profiler python setup install instructions https://github.com/pyutils/line_profiler site:github.com/pyutils/line_profiler",
+    "line_profiler python documentation install https://github.com/pyutils/line_profiler site:github.com/pyutils/line_profiler",
+    "line_profiler python install requirements https://pypi.org/project/line_profiler/ https://github.com/pyutils/line_profiler site:pypi.org"
+   ],
+   "results": [
+    {
+     "title": "GitHub - pyutils/line_profiler: Line-by-line profiling for Python \u00b7 GitHub",
+     "url": "https://github.com/pyutils/line_profiler",
+     "query": "line_profiler python setup install instructions https://github.com/pyutils/line_profiler site:github.com/pyutils/line_profiler"
+    },
+    {
+     "title": "pyutils/line_profiler at blog.easecloud.io",
+     "url": "https://github.com/pyutils/line_profiler?ref=blog.easecloud.io",
+     "query": "line_profiler python setup install instructions https://github.com/pyutils/line_profiler site:github.com/pyutils/line_profiler"
+    },
+    {
+     "title": "ModuleNotFoundError: No module named 'line_profiler._line_profiler' \u00b7 Issue #50 \u00b7 pyutils/line_profiler \u00b7 GitHub",
+     "url": "https://github.com/pyutils/line_profiler/issues/50",
+     "query": "line_profiler python setup install instructions https://github.com/pyutils/line_profiler site:github.com/pyutils/line_profiler"
+    },
+    {
+     "title": "line_profiler/line_profiler/_line_profiler.pyx at main \u00b7 pyutils/line_profiler \u00b7 GitHub",
+     "url": "https://github.com/pyutils/line_profiler/blob/main/line_profiler/_line_profiler.pyx",
+     "query": "line_profiler python documentation install https://github.com/pyutils/line_profiler site:github.com/pyutils/line_profiler"
+    },
+    {
+     "title": "line_profiler/LICENSE_Python.txt at main \u00b7 pyutils/line_profiler \u00b7 GitHub",
+     "url": "https://github.com/pyutils/line_profiler/blob/main/LICENSE_Python.txt",
+     "query": "line_profiler python documentation install https://github.com/pyutils/line_profiler site:github.com/pyutils/line_profiler"
+    }
+   ],
+   "text": "To install line_profiler, use the command `$ pip install line_profiler`. For compatibility with IPython, use `$ pip install line_profiler[ipython]`. Ensure you are using Python 3.10 or newer. After installation, import `profile` in your relevant file(s) and decorate the functions you want to profile with `@profile`. Set the environment variable `LINE_PROFILE=1` and run your script as normal. Upon completion, a summary of profile results will be written to stdout.\nTo install `line_profiler`, use pip with the command `$ pip install line_profiler`. For ensuring compatibility with IPython, use `$ pip install line_profiler[ipython]`. The module requires Python 3.10 or newer. To use it, import `profile` in the relevant file(s) and decorate the functions you want to profile with `@profile`. Set the environment variable `LINE_PROFILE=1` and run your script as normal. The profiling results will be written to stdout when the script ends. The module is available under a BSD license.\nTo install line_profiler, you can download the source distribution from PyPI. The latest version available is 5.0.2, which includes files for various Python versions and platforms such as `line_profiler-5.0.2-cp314-cp314-musllinux_1_2_x86_64.whl`. If you're not sure which file to choose, you can learn more about installing packages on PyPI. The project description indicates that line_profiler profiles the time individual lines of code take to execute, implemented in C via Cython to reduce overhead. The script `kernprof.py` is also included for convenient profiling of Python applications and scripts.\n```\n$ pip install line_profiler \n```\n\nCurrent releases require Python 3.10 or newer. Older Python versions require older `line_profiler` releases.\n\nInstallation while ensuring a compatible IPython version can also be installed using pip:\n\n```\n$ pip install line_profiler[ipython] \n``` [...] Install line\\_profiler: `pip install line_profiler`.\n In the relevant file(s), import `profile` and decorate function(s) you want to profile:\n\n  ```\n  from line_profiler import profile @profile def slow_functi\nThis guide is for versions of line profiler starting at 4.1.0 . To profile a python script: Install line_profiler: pip install line_profiler . installed using\n-mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -I$PREFIX/include -fdebug-prefix-map=$SRC_DIR=/usr/local/src/conda/line_profiler-3.2.1 -fdebug-prefix-map=$PREFIX=/usr/local/src/conda-prefix -CMAKE_PREFIX_PATH=:$PREFIX:/tmp/build/80754af9/line_profiler_1619527124040/_build_env/x86_64-conda_cos6-linux-gnu/sysroot/usr -_CONDA_PYTHON_SYSCONFIGDATA_NAME=_sysconfigdata_x86_64_conda_cos6_linux_gnu -CPPFLAGS=-DNDEBUG -D_FORTIFY_SOURCE=2 -O2 [...] -O2\nimport sys\n\ncimport cython\n\nfrom cython.operator cimport dereference as deref\n\nfrom cpython.object cimport PyObject\\_Hash\n\nfrom cpython.bytes cimport PyBytes\\_AS\\_STRING, PyBytes\\_GET\\_SIZE\n\nfrom cpython.version cimport PY\\_VERSION\\_HEX\n\nfrom libc.stdint cimport int64\\_t, intptr\\_t\n\nfrom libcpp.unordered\\_map cimport unordered\\_map\n\nimport functools\n\nimport threading\n\nimport opcode\n\nimport os\n\nimport types\n\nfrom warnings import warn\n\nfrom line\\_profiler.\\_diagnostics import ( [...] .. \\_PY\\_YIEL\ninstalling or otherwise using Python 1.6.1, Licensee agrees to be\n\nbound by the terms and conditions of this License Agreement.\n\nCWI LICENSE AGREEMENT FOR PYTHON 0.9.0 THROUGH 1.2\n\nCopyright (c) 1991 - 1995, Stichting Mathematisch Centrum Amsterdam,\n\nThe Netherlands. All rights reserved.\n\nPermission to use, copy, modify, and distribute this software and its\n\ndocumentation for any purpose and without fee is hereby granted,\n\nprovided that the above copyright notice appear in all copies and that [.",
+   "errors": [],
+   "lines": [
+    "Looked up with Tavily: 5 results",
+    "Query: line_profiler python setup install instructions https://github.com/pyutils/line_profiler site:github.com/pyutils/line_profiler",
+    "Query: line_profiler python documentation install https://github.com/pyutils/line_profiler site:github.com/pyutils/line_profiler",
+    "Query: line_profiler python install requirements https://pypi.org/project/line_profiler/ https://github.com/pyutils/line_profiler site:pypi.org",
+    "Source: GitHub - pyutils/line_profiler: Line-by-line profiling for Python \u00b7 GitHub \u2014 https://github.com/pyutils/line_profiler",
+    "Source: pyutils/line_profiler at blog.easecloud.io \u2014 https://github.com/pyutils/line_profiler?ref=blog.easecloud.io",
+    "Source: ModuleNotFoundError: No module named 'line_profiler._line_profiler' \u00b7 Issue #50 \u00b7 pyutils/line_profiler \u00b7 GitHub \u2014 https://github.com/pyutils/line_profiler/issues/50",
+    "Source: line_profiler/line_profiler/_line_profiler.pyx at main \u00b7 pyutils/line_profiler \u00b7 GitHub \u2014 https://github.com/pyutils/line_profiler/blob/main/line_profiler/_line_profiler.pyx",
+    "Source: line_profiler/LICENSE_Python.txt at main \u00b7 pyutils/line_profiler \u00b7 GitHub \u2014 https://github.com/pyutils/line_profiler/blob/main/LICENSE_Python.txt"
+   ]
+  },
+  "notes": [
+   "Setup check: GitHub token: missing.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory could not be read.",
+   "Setup check: free disk 38.2 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: 5 results",
+   "Query: line_profiler python setup install instructions https://github.com/pyutils/line_profiler site:github.com/pyutils/line_profiler",
+   "Query: line_profiler python documentation install https://github.com/pyutils/line_profiler site:github.com/pyutils/line_profiler",
+   "Query: line_profiler python install requirements https://pypi.org/project/line_profiler/ https://github.com/pyutils/line_profiler site:pypi.org",
+   "Source: GitHub - pyutils/line_profiler: Line-by-line profiling for Python \u00b7 GitHub \u2014 https://github.com/pyutils/line_profiler",
+   "Source: pyutils/line_profiler at blog.easecloud.io \u2014 https://github.com/pyutils/line_profiler?ref=blog.easecloud.io",
+   "Source: ModuleNotFoundError: No module named 'line_profiler._line_profiler' \u00b7 Issue #50 \u00b7 pyutils/line_profiler \u00b7 GitHub \u2014 https://github.com/pyutils/line_profiler/issues/50",
+   "Source: line_profiler/line_profiler/_line_profiler.pyx at main \u00b7 pyutils/line_profiler \u00b7 GitHub \u2014 https://github.com/pyutils/line_profiler/blob/main/line_profiler/_line_profiler.pyx",
+   "Source: line_profiler/LICENSE_Python.txt at main \u00b7 pyutils/line_profiler \u00b7 GitHub \u2014 https://github.com/pyutils/line_profiler/blob/main/LICENSE_Python.txt",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >=3.10",
+   "Setup plan: Python rule: one Python version is used on both sides: the lowest version that meets the requirements of both main and the pull request; if none meets both, the check stops as a setup problem and records both.",
+   "Setup plan: refused ubelt: not listed by the project and not a link-back suggestion",
+   "Before rerun: could_not_verify: no test actually ran on either side: 0 tests ran; 0 new test(s) pass, 0 unchanged; 1 test module(s) fail to load on both sides (tests.test_explicit_profile), so their tests did not run; probe model-p1 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count; probe model-p2 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count",
+   "After rerun: not rerun. could not verify: setup gap ubelt: ERROR collecting tests/test_explicit_profile.py ________________ | ModuleNotFoundError: No module named 'ubelt'"
+  ],
+  "install_docs": [
+   "pyproject.toml",
+   "README.rst",
+   "docs/Makefile",
+   ".github/workflows/release.yml",
+   ".github/workflows/tests.yml"
+  ],
+  "install_docs_from": "main",
+  "setup_plan": {
+   "packages": [],
+   "scope_blocked": "",
+   "component": null,
+   "aggregate_names": [],
+   "extra_reqs": [],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >=3.10",
+    "rule": "one Python version is used on both sides: the lowest version that meets the requirements of both main and the pull request; if none meets both, the check stops as a setup problem and records both",
+    "gate_failed": false
+   },
+   "system": [],
+   "refused": [],
+   "groups_blocked": ""
+  },
+  "steps": {
+   "setup_lookup": "Found 0 setup item(s) in the project's files and the web lookup.",
+   "setup_python": "Python 3.12: Python 3.12 already meets >=3.10",
+   "install_deps": "Nothing extra to install; the project's own install covers it."
+  },
+  "run_files": {
+   "requirements": "requirements.txt",
+   "plan": "setup-plan.json",
+   "count": 0
+  },
+  "gap_retry": {
+   "reran": false,
+   "rounds": [
+    {
+     "round": 1,
+     "verdict": "could_not_verify",
+     "reason": "no test actually ran on either side: 0 tests ran; 0 new test(s) pass, 0 unchanged; 1 test module(s) fail to load on both sides (tests.test_explicit_profile), so their tests did not run; probe model-p1 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count; probe model-p2 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count"
+    }
+   ],
+   "installed": [],
+   "tries": [
+    {
+     "try": 1,
+     "problem": "ubelt",
+     "lookup": "pyutils/line_profiler ubelt install ERROR collecting tests/test_explicit_profile.py ________________",
+     "sources": [
+      "https://github.com/pyutils/line_profiler/issues/159",
+      "https://github.com/pyutils/line_profiler"
+     ],
+     "planned": [],
+     "installed": [],
+     "rerun": false,
+     "result": "nothing safe to install"
+    }
+   ],
+   "max_tries": 3
+  }
+ },
+ "chosen": {
+  "pr": 322,
+  "head_sha": null,
+  "install": null,
+  "test_cmd": null
+ },
+ "sides": {
+  "comparison_basis": "base tip vs GitHub test merge (refs/pull/N/merge)",
+  "main_sha": "d3400d7f458bc1e1f172145e6dfa973b89034f23",
+  "pr_sha": "f63dc8dfb09266eed73a3c6b00dc2eef23e6a7a5",
+  "merge_commit": "f63dc8dfb09266eed73a3c6b00dc2eef23e6a7a5",
+  "merge_parents": [
+   "d3400d7f458bc1e1f172145e6dfa973b89034f23",
+   "550d1aa314ad3d7276b0cae1bcd73e2f51b04cfb"
+  ],
+  "merge_head_matches_pinned_head": true
+ },
+ "tested": {
+  "main": "main @ d3400d7f458b (base tip = first parent of the merge commit)",
+  "pr": "GitHub test merge commit f63dc8dfb092 (refs/pull/322/merge) of head 550d1aa314ad"
+ },
+ "probe_plan": {
+  "baseline": "full",
+  "model": "model provider: nebius (Token Factory, live)",
+  "errors": [],
+  "model_claims": [
+   {
+    "id": "C1",
+    "text": "After applying this PR, the LineProfiler class provides a reset_stats() method.",
+    "source_quote": "This PR introduces a new method `reset_stats()` to the `LineProfiler` class",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C2",
+    "text": "Calling reset_stats() on a LineProfiler instance resets its internal profiling statistics.",
+    "source_quote": "allowing users to reset internal profiling statistics without recreating the profiler instance.",
+    "testable": true,
+    "expect": "differs"
+   }
+  ],
+  "model_rejected_claims": [],
+  "diff_targets": [],
+  "frozen": [
+   {
+    "path": "model-probes/model-p1.py",
+    "source": "model",
+    "sha256": "824c3c9fad38a6d5b0cf714294cdadab3de798a7437ce8ccc4bdb86d6a749ea5",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-10-24T01:47:34.968250+00:00",
+    "inputs_sha256": "3a1c61007a052e631a2ebbc9f6799c2788d08f0819023b6d51a087b734eaa051",
+    "inputs": {
+     "title_chars": 85,
+     "body_chars": 626,
+     "base_files": {}
+    }
+   },
+   {
+    "path": "model-probes/model-p2.py",
+    "source": "model",
+    "sha256": "92a780a55731f90a802c0f72a4083feb5d2cb72eb64aabfa350befa5b49bd44f",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-10-24T01:47:34.969003+00:00",
+    "inputs_sha256": "3a1c61007a052e631a2ebbc9f6799c2788d08f0819023b6d51a087b734eaa051",
+    "inputs": {
+     "title_chars": 85,
+     "body_chars": 626,
+     "base_files": {}
+    }
+   }
+  ]
+ },
+ "pr_side_started_at": "2026-10-24T01:47:34.971037+00:00",
+ "test_targets": {
+  "main": [
+   "tests/test_explicit_profile.py"
+  ],
+  "pr": [
+   "tests/test_explicit_profile.py"
+  ]
+ },
+ "contree_only": {
+  "note": "Contree mode: installs, tests and probes ran in Contree; nothing from the pull request ran locally",
+  "declared_test_deps": [],
+  "optional_backends": [],
+  "not_run_locally": [
+   "local freeze",
+   "installed-commit guard",
+   "probe coverage",
+   "optional-module retry"
+  ]
+ },
+ "coverage": {
+  "status": "not needed",
+  "why": "no changed non-test Python files"
+ },
+ "contree": {
+  "main_uuid": "19c61a40-7aec-4f1f-8998-c689cbac0f5d",
+  "pr_uuid": "02730051-e398-477e-a47a-4dd7aa6c06f3",
+  "max_ops": 40,
+  "sdk": "0.3.6",
+  "base_image": "docker.io/library/python:3.12-slim-bookworm",
+  "python": {
+   "requires_python": [
+    ">=3.10"
+   ],
+   "requires_python_found": true,
+   "main": "3.12.15",
+   "pr": "3.12.15",
+   "problems": []
+  }
+ },
+ "comparison": {
+  "same": 0,
+  "same_skipped_both": 0,
+  "regressions": [],
+  "fixed": [],
+  "new_tests_passing": 0,
+  "new_tests_failing": [],
+  "new_tests_skipped": [],
+  "removed_tests": [],
+  "reparametrized": [],
+  "skipped_missing_dependency": [],
+  "flaky": [],
+  "pr_unstable": [],
+  "pr_unstable_noisy": [],
+  "environment": [],
+  "other_changes": [],
+  "preexisting_failures": [],
+  "load_failed_both": [
+   "tests.test_explicit_profile"
+  ],
+  "load_failed_pr": [],
+  "load_failed_main": [],
+  "executed": {
+   "main": 0,
+   "pr": 0
+  },
+  "messages": {}
+ },
+ "exit_check": {
+  "explained": true,
+  "problems": [],
+  "detail": "pytest exit 1; no identical pre-existing failures"
+ },
+ "probes": {
+  "status": "error",
+  "items": [
+   {
+    "id": "model-p1",
+    "source": "model",
+    "path": "model-probes/model-p1.py",
+    "sha256": "824c3c9fad38a6d5b0cf714294cdadab3de798a7437ce8ccc4bdb86d6a749ea5",
+    "target": "pyutils/line_profiler#322",
+    "about": "Check existence and callability of reset_stats method",
+    "claims": [],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 2.1,
+      "ok": false
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 1.8,
+      "ok": false
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 1.8,
+      "ok": false
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 1.8,
+      "ok": false
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 1.8,
+      "ok": false
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 1.8,
+      "ok": false
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-p1-main-1.jsonl",
+      "probe-model-p1-main-2.jsonl",
+      "probe-model-p1-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-p1-pr-1.jsonl",
+      "probe-model-p1-pr-2.jsonl",
+      "probe-model-p1-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      },
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      },
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      }
+     ],
+     "pr": [
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      },
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      },
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "probe.error",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "crash": "non-json output",
+       "exit_code": 1
+      },
+      "pr": {
+       "crash": "non-json output",
+       "exit_code": 1
+      },
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"probe.error\""
+       },
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"probe.error\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "824c3c9fad38a6d5b0cf714294cdadab3de798a7437ce8ccc4bdb86d6a749ea5",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-10-24T01:47:34.968250+00:00",
+     "inputs_sha256": "3a1c61007a052e631a2ebbc9f6799c2788d08f0819023b6d51a087b734eaa051",
+     "inputs": {
+      "title_chars": 85,
+      "body_chars": 626,
+      "base_files": {}
+     },
+     "verified": true,
+     "pr_started_at": "2026-10-24T01:47:34.971037+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "not measured",
+     "why": "Contree-only check: probe coverage needs a local side",
+     "adequacy": "not_adequate",
+     "note": "the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate"
+    },
+    "status": "crashed",
+    "uninformative_reason": "the probe crashed or printed no parsed output on every main-side run"
+   },
+   {
+    "id": "model-p2",
+    "source": "model",
+    "path": "model-probes/model-p2.py",
+    "sha256": "92a780a55731f90a802c0f72a4083feb5d2cb72eb64aabfa350befa5b49bd44f",
+    "target": "pyutils/line_profiler#322",
+    "about": "Verify that reset_stats clears accumulated profiling data",
+    "claims": [],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 2.1,
+      "ok": false
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 1.8,
+      "ok": false
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 1.8,
+      "ok": false
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 1.8,
+      "ok": false
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 1.8,
+      "ok": false
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 1.8,
+      "ok": false
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-p2-main-1.jsonl",
+      "probe-model-p2-main-2.jsonl",
+      "probe-model-p2-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-p2-pr-1.jsonl",
+      "probe-model-p2-pr-2.jsonl",
+      "probe-model-p2-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      },
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      },
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      }
+     ],
+     "pr": [
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      },
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      },
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "probe.error",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "crash": "non-json output",
+       "exit_code": 1
+      },
+      "pr": {
+       "crash": "non-json output",
+       "exit_code": 1
+      },
+      "citations": {
+       "main": {
+        "file": "probe-model-p2-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"probe.error\""
+       },
+       "pr": {
+        "file": "probe-model-p2-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"probe.error\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "92a780a55731f90a802c0f72a4083feb5d2cb72eb64aabfa350befa5b49bd44f",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-10-24T01:47:34.969003+00:00",
+     "inputs_sha256": "3a1c61007a052e631a2ebbc9f6799c2788d08f0819023b6d51a087b734eaa051",
+     "inputs": {
+      "title_chars": 85,
+      "body_chars": 626,
+      "base_files": {}
+     },
+     "verified": true,
+     "pr_started_at": "2026-10-24T01:47:34.971037+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "not measured",
+     "why": "Contree-only check: probe coverage needs a local side",
+     "adequacy": "not_adequate",
+     "note": "the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate"
+    },
+    "status": "crashed",
+    "uninformative_reason": "the probe crashed or printed no parsed output on every main-side run"
+   }
+  ],
+  "summary": {
+   "labels": [],
+   "flagged": [],
+   "proven_claims": [],
+   "reason": "the probe crashed or printed no parsed output on every main-side run; the probe crashed or printed no parsed output on every main-side run",
+   "ignored_noise": [],
+   "ignored_warning_only": [],
+   "pr_only_noisy": []
+  },
+  "test_settings": {
+   "applied": true,
+   "read_from": "main checkout (same values on both sides)",
+   "source": [
+    "pyproject.toml"
+   ],
+   "variables": [],
+   "pythonpath": [],
+   "pr_changed": []
+  }
+ },
+ "probe_changed_line_coverage": {
+  "status": "not measured",
+  "side": "main",
+  "probes": {
+   "model-p1": {
+    "status": "not measured",
+    "changed_lines_covered": null,
+    "changed_lines_total": null,
+    "adequacy": "not_adequate"
+   },
+   "model-p2": {
+    "status": "not measured",
+    "changed_lines_covered": null,
+    "changed_lines_total": null,
+    "adequacy": "not_adequate"
+   }
+  },
+  "not_adequate": [
+   "model-p1",
+   "model-p2"
+  ]
+ },
+ "verdict": "could_not_verify",
+ "reason": "could not verify: setup gap ubelt: ERROR collecting tests/test_explicit_profile.py ________________ | ModuleNotFoundError: No module named 'ubelt'",
+ "verdict_before_coverage_gate": "could_not_verify",
+ "reason_before_coverage_gate": "could not verify: setup gap ubelt: ERROR collecting tests/test_explicit_profile.py ________________ | ModuleNotFoundError: No module named 'ubelt'",
+ "changed_lines_total": null,
+ "changed_lines_covered": null,
+ "coverage_gate": {
+  "kind": "compiled",
+  "changed": false,
+  "confidence": "normal",
+  "note": "compiled code changed (line_profiler/_line_profiler.pyx); coverage.py cannot see compiled code and the PR adds or changes no test for it",
+  "measurement": "not needed"
+ },
+ "explanation": {
+  "status": "wired",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "text": "Verdict: could_not_verify. could not verify: setup gap ubelt: ERROR collecting tests/test_explicit_profile.py ________________ | ModuleNotFoundError: No module named 'ubelt'",
+  "quotes": [],
+  "advisory": true
+ },
+ "agents": {
+  "status": "ran",
+  "advisory": true,
+  "note": "judge/helper/summary are advisory; code owns the verdict",
+  "roles": [
+   {
+    "role": "judge",
+    "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+    "status": "ok",
+    "note": null,
+    "labels": [
+     {
+      "id": "probe-model-p1",
+      "label": "needs_human",
+      "reason": "Human review required to confirm reset_stats method exists and is callable in the codebase."
+     },
+     {
+      "id": "probe-model-p2",
+      "label": "needs_human",
+      "reason": "Human review required to verify reset_stats correctly clears accumulated profiling data."
+     }
+    ]
+   },
+   {
+    "role": "helper",
+    "model": "nvidia/Nemotron-3_5-Lightning",
+    "status": "ok",
+    "note": null,
+    "notes": [
+     "install: pip install ubelt to resolve ModuleNotFoundError",
+     "noise: ubelt import failure during test collection, unrelated to profiler change",
+     "ignore: ModuleNotFoundError for ubelt in future diffs",
+     "setup: ensure ubelt is available in test environment",
+     "note: probe verdict depends on ubelt availability"
+    ]
+   },
+   {
+    "role": "summary",
+    "model": "nvidia/nemotron-3-super-120b-a12b",
+    "status": "ok",
+    "note": "model returned empty text; filled from code verdict/reason"
+   }
+  ],
+  "provider": {
+   "provider": "nebius",
+   "models": {
+    "claims": "nvidia/nemotron-3-super-120b-a12b",
+    "probes": "nvidia/nemotron-3-super-120b-a12b",
+    "judge": "nvidia/Nemotron-3-Ultra-550b-a55b",
+    "helper": "nvidia/Nemotron-3_5-Lightning",
+    "summary": "nvidia/nemotron-3-super-120b-a12b"
+   },
+   "blind": true
+  }
+ },
+ "swarm_requested": true,
+ "operator_approval_requested": false,
+ "swarm": "on",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [],
+  "compiled_files": [
+   "line_profiler/_line_profiler.pyx"
+  ],
+  "other_files": [
+   "tests/test_explicit_profile.py"
+  ]
+ },
+ "duration_s": {
+  "total_wall": 167.8,
+  "tests": 13.1
+ },
+ "cost": {
+  "ai_calls": 3,
+  "failed_ai_calls": 0,
+  "input_tokens": 1883,
+  "output_tokens": 4850,
+  "thinking_tokens": 4258,
+  "cost_usd": 0.00493,
+  "calls_without_usage": 0,
+  "ai_cost_usd": 0.00493,
+  "cost_complete": true,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 167.8,
+   "tests": 13.1
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.011187,
+  "total_cost_usd": 0.016117,
+  "swarm": {
+   "ai_calls": 3,
+   "failed_ai_calls": 0,
+   "input_tokens": 227,
+   "output_tokens": 696,
+   "thinking_tokens": 683,
+   "cost_usd": 0.000695,
+   "calls_without_usage": 2,
+   "ai_cost_usd": 0.000695,
+   "cost_complete": false,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ }
+}

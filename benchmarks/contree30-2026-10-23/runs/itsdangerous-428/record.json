@@ -1,0 +1,2188 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-pallets-itsdangerous-428-d9f3b250e0ca-itsdangerous-428",
+ "date_ist": "2026-10-23 11:24 IST",
+ "run_date": "2026-10-23",
+ "who": "ops/daily_run.py",
+ "repo": "pallets/itsdangerous",
+ "library": "itsdangerous",
+ "pr": {
+  "repo": "pallets/itsdangerous",
+  "number": 428,
+  "url": "https://github.com/pallets/itsdangerous/pull/428",
+  "title": "require padding when decoding base64 on Python 3.15+",
+  "base_sha": "672971d66a2ef9f85151e53283113f33d642dabd",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "d9f3b250e0cac90529e9dd2c6806d4f9d46901fb",
+  "merge_commit": "08c336cc549ea319f92abf254667c8e6c7789f9f",
+  "tested_main_sha": "672971d66a2ef9f85151e53283113f33d642dabd",
+  "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+ },
+ "author": "mgorny",
+ "base_ref": "main",
+ "updated_at_utc": "2026-08-05T18:30:35Z",
+ "updated_at_ist": "2026-08-06 00:00 IST",
+ "ci_state": "not checked (single-PR check)",
+ "ci_detail": "checked on request with --pr",
+ "tested_at_ist": "2026-10-23 11:24 IST",
+ "files": {
+  "all": [
+   "CHANGES.rst",
+   "src/itsdangerous/encoding.py"
+  ],
+  "package_py": [
+   "src/itsdangerous/encoding.py"
+  ],
+  "compiled": [],
+  "other": [
+   "CHANGES.rst"
+  ]
+ },
+ "machine_type": {
+  "arch": "arm64",
+  "os": "Darwin",
+  "platform": "macOS-15.5-arm64-arm-64bit-Mach-O",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": "Apple clang version 14.0.3 (clang-1403.0.22.14.1)",
+  "cpu_model": null,
+  "ram_gb": null
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 3,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.14",
+ "test_selection": "mapped from touched files: tests/test_itsdangerous/test_encoding.py",
+ "per_run": [
+  {
+   "side": "old",
+   "run": 1,
+   "passed": 8,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 2.5,
+   "pytest_summary": "8 passed in 0.53s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 1,
+   "passed": 8,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 2.9,
+   "pytest_summary": "8 passed in 0.52s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 2,
+   "passed": 8,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 3.8,
+   "pytest_summary": "8 passed in 0.52s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 2,
+   "passed": 8,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 2.6,
+   "pytest_summary": "8 passed in 0.52s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 3,
+   "passed": 8,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 2.9,
+   "pytest_summary": "8 passed in 0.54s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 3,
+   "passed": 8,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 2.6,
+   "pytest_summary": "8 passed in 0.52s",
+   "junit": true
+  }
+ ],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "contree",
+ "sandbox_backend_note": "contree (Token Factory Sandboxes, sdk 0.3.6)",
+ "machine": "contree",
+ "tool_setup": {
+  "installed": [],
+  "tries": 0,
+  "note": "All required tools were already installed.",
+  "refused": []
+ },
+ "posted_upstream": false,
+ "logs": "itsdangerous-428/",
+ "freeze": {},
+ "poc_commit": "863751e9580b866fe64247737975cb2e04e97215",
+ "route": "source-pair",
+ "current_head_sha": "d9f3b250e0cac90529e9dd2c6806d4f9d46901fb",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "state": "open",
+ "mergeable": true,
+ "mergeable_state": "clean",
+ "product_check": true,
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": {
+   "ok": true,
+   "skipped": false,
+   "live_call": true,
+   "cached": false,
+   "queries": [
+    "itsdangerous python setup install instructions https://github.com/pallets/itsdangerous site:github.com/pallets/itsdangerous",
+    "itsdangerous python documentation install https://github.com/pallets/itsdangerous site:github.com/pallets/itsdangerous",
+    "itsdangerous python install requirements https://pypi.org/project/itsdangerous/ https://github.com/pallets/itsdangerous site:pypi.org"
+   ],
+   "results": [
+    {
+     "title": "Releases \u00b7 pallets/itsdangerous \u00b7 GitHub",
+     "url": "https://github.com/pallets/itsdangerous/releases",
+     "query": "itsdangerous python documentation install https://github.com/pallets/itsdangerous site:github.com/pallets/itsdangerous"
+    },
+    {
+     "title": "serializer.py - pallets/itsdangerous",
+     "url": "https://github.com/pallets/itsdangerous/blob/main/src/itsdangerous/serializer.py",
+     "query": "itsdangerous python documentation install https://github.com/pallets/itsdangerous site:github.com/pallets/itsdangerous"
+    },
+    {
+     "title": "TimestampSigner writes local-time timestamps and reads ...",
+     "url": "https://github.com/pallets/itsdangerous/issues/137",
+     "query": "itsdangerous python documentation install https://github.com/pallets/itsdangerous site:github.com/pallets/itsdangerous"
+    }
+   ],
+   "text": "The sources provided do not contain any information related to the installation instructions for the itsdangerous Python package. The sources include content about blocked websites due to legislation, adult video streaming sites, and unrelated Indonesian content, none of which pertain to the installation of Python packages. Therefore, no definitive answer or relevant information about the installation of itsdangerous can be provided based on the given sources.\nThe sources indicate that the ItsDangerous library has dropped support for Python 3.7 and now uses modern packaging metadata with `pyproject.toml` instead of `setup.cfg`. It also uses `flit_core` instead of `setuptools` as the build backend. The `__version__` attribute has been deprecated in favor of feature detection or `importlib.metadata.version(\"itsdangerous\")`. The `Serializer` class now supports generic type checking, and the default `hashlib.sha1` may not be available in FIPS builds. The library is still available at runtime on Python < 3.13.\nDrop support for Python 3.7.\n Use modern packaging metadata with `pyproject.toml` instead of `setup.cfg`.\n Use `flit_core` instead of `setuptools` as build backend.\n Deprecate the `__version__` attribute. Use feature detection, or `importlib.metadata.version(\"itsdangerous\")`, instead. [...] GPG key ID: 4AEE18F83AFDEB23\n\nExpired\n\nVerified\n\nLearn about vigilant mode.\n\nNew major versions of all the core Pallets libraries, including ItsDangerous 2.0, have been released! \ud83c\udf89\n\n Read the announcement on \nSafely pass trusted data to untrusted environments and back. pallets/itsdangerous. pallets itsdangerous. Still available at runtime on Python < 3.13, but\nTimestampSigner writes local-time timestamps and reads them as UTC pallets/itsdangerous Reload to refresh your session. TimestampSigner uses",
+   "errors": [],
+   "lines": [
+    "Looked up with Tavily: 3 results",
+    "Query: itsdangerous python setup install instructions https://github.com/pallets/itsdangerous site:github.com/pallets/itsdangerous",
+    "Query: itsdangerous python documentation install https://github.com/pallets/itsdangerous site:github.com/pallets/itsdangerous",
+    "Query: itsdangerous python install requirements https://pypi.org/project/itsdangerous/ https://github.com/pallets/itsdangerous site:pypi.org",
+    "Source: Releases \u00b7 pallets/itsdangerous \u00b7 GitHub \u2014 https://github.com/pallets/itsdangerous/releases",
+    "Source: serializer.py - pallets/itsdangerous \u2014 https://github.com/pallets/itsdangerous/blob/main/src/itsdangerous/serializer.py",
+    "Source: TimestampSigner writes local-time timestamps and reads ... \u2014 https://github.com/pallets/itsdangerous/issues/137"
+   ]
+  },
+  "notes": [
+   "Setup check: GitHub token: missing.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory could not be read.",
+   "Setup check: free disk 37.4 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: 3 results",
+   "Query: itsdangerous python setup install instructions https://github.com/pallets/itsdangerous site:github.com/pallets/itsdangerous",
+   "Query: itsdangerous python documentation install https://github.com/pallets/itsdangerous site:github.com/pallets/itsdangerous",
+   "Query: itsdangerous python install requirements https://pypi.org/project/itsdangerous/ https://github.com/pallets/itsdangerous site:pypi.org",
+   "Source: Releases \u00b7 pallets/itsdangerous \u00b7 GitHub \u2014 https://github.com/pallets/itsdangerous/releases",
+   "Source: serializer.py - pallets/itsdangerous \u2014 https://github.com/pallets/itsdangerous/blob/main/src/itsdangerous/serializer.py",
+   "Source: TimestampSigner writes local-time timestamps and reads ... \u2014 https://github.com/pallets/itsdangerous/issues/137",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: install freezegun (listed in the tests extra) on main and pr.",
+   "Setup plan: install pytest (listed in the tests extra) on main and pr.",
+   "Setup plan: install ruff (listed in a dependency group) on main and pr.",
+   "Setup plan: install tox (listed in a dependency group) on main and pr.",
+   "Setup plan: install tox-uv (listed in a dependency group) on main and pr.",
+   "Setup plan: install pallets-sphinx-themes (listed in a dependency group) on main and pr.",
+   "Setup plan: install sphinx (listed in a dependency group) on main and pr.",
+   "Setup plan: install sphinxcontrib-log-cabinet (listed in a dependency group) on main and pr.",
+   "Setup plan: install sphinx-autobuild (listed in a dependency group) on main and pr.",
+   "Setup plan: install gha-update ; python_full_version >= '3.12' (listed in a dependency group) on main and pr.",
+   "Setup plan: install pre-commit (listed in a dependency group) on main and pr.",
+   "Setup plan: install pre-commit-uv (listed in a dependency group) on main and pr.",
+   "Setup plan: install mypy (listed in a dependency group) on main and pr.",
+   "Setup plan: install pyright (listed in a dependency group) on main and pr.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >=3.10, >=3.8",
+   "Setup plan: Python rule: one Python version is used on both sides: the lowest version that meets the requirements of both main and the pull request; if none meets both, the check stops as a setup problem and records both."
+  ],
+  "install_docs": [
+   "pyproject.toml",
+   "README.md",
+   "docs/Makefile",
+   ".github/workflows/lock.yaml",
+   ".github/workflows/tests.yaml",
+   ".github/workflows/pre-commit.yaml",
+   ".github/workflows/publish.yaml"
+  ],
+  "install_docs_from": "main",
+  "setup_plan": {
+   "packages": [
+    {
+     "requirement": "freezegun",
+     "name": "freezegun",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the tests extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest",
+     "name": "pytest",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the tests extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "ruff",
+     "name": "ruff",
+     "kind": "dependency-group",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in a dependency group",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "tox",
+     "name": "tox",
+     "kind": "dependency-group",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in a dependency group",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "tox-uv",
+     "name": "tox-uv",
+     "kind": "dependency-group",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in a dependency group",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pallets-sphinx-themes",
+     "name": "pallets-sphinx-themes",
+     "kind": "dependency-group",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in a dependency group",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "sphinx",
+     "name": "sphinx",
+     "kind": "dependency-group",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in a dependency group",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "sphinxcontrib-log-cabinet",
+     "name": "sphinxcontrib-log-cabinet",
+     "kind": "dependency-group",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in a dependency group",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "sphinx-autobuild",
+     "name": "sphinx-autobuild",
+     "kind": "dependency-group",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in a dependency group",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "gha-update ; python_full_version >= '3.12'",
+     "name": "gha-update",
+     "kind": "dependency-group",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in a dependency group",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pre-commit",
+     "name": "pre-commit",
+     "kind": "dependency-group",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in a dependency group",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pre-commit-uv",
+     "name": "pre-commit-uv",
+     "kind": "dependency-group",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in a dependency group",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "mypy",
+     "name": "mypy",
+     "kind": "dependency-group",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in a dependency group",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pyright",
+     "name": "pyright",
+     "kind": "dependency-group",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in a dependency group",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    }
+   ],
+   "scope_blocked": "",
+   "component": null,
+   "aggregate_names": [],
+   "extra_reqs": [
+    "freezegun",
+    "pytest",
+    "ruff",
+    "tox",
+    "tox-uv",
+    "pallets-sphinx-themes",
+    "sphinx",
+    "sphinxcontrib-log-cabinet",
+    "sphinx-autobuild",
+    "gha-update ; python_full_version >= '3.12'",
+    "pre-commit",
+    "pre-commit-uv",
+    "mypy",
+    "pyright"
+   ],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >=3.10, >=3.8",
+    "rule": "one Python version is used on both sides: the lowest version that meets the requirements of both main and the pull request; if none meets both, the check stops as a setup problem and records both",
+    "gate_failed": false
+   },
+   "system": [],
+   "refused": [],
+   "groups_blocked": ""
+  },
+  "steps": {
+   "setup_lookup": "Found 14 setup item(s) in the project's files and the web lookup.",
+   "setup_python": "Python 3.12: Python 3.12 already meets >=3.10, >=3.8",
+   "install_deps": "Wrote requirements.txt and installed it on main and pr: freezegun, pytest, ruff, tox, tox-uv, pallets-sphinx-themes, sphinx, sphinxcontrib-log-cabinet, sphinx-autobuild, gha-update ; python_full_version >= '3.12', pre-commit, pre-commit-uv."
+  },
+  "run_files": {
+   "requirements": "requirements.txt",
+   "plan": "setup-plan.json",
+   "count": 14
+  }
+ },
+ "chosen": {
+  "pr": 428,
+  "head_sha": null,
+  "install": null,
+  "test_cmd": null
+ },
+ "sides": {
+  "comparison_basis": "base tip vs GitHub test merge (refs/pull/N/merge)",
+  "main_sha": "672971d66a2ef9f85151e53283113f33d642dabd",
+  "pr_sha": "08c336cc549ea319f92abf254667c8e6c7789f9f",
+  "merge_commit": "08c336cc549ea319f92abf254667c8e6c7789f9f",
+  "merge_parents": [
+   "672971d66a2ef9f85151e53283113f33d642dabd",
+   "d9f3b250e0cac90529e9dd2c6806d4f9d46901fb"
+  ],
+  "merge_head_matches_pinned_head": true
+ },
+ "tested": {
+  "main": "main @ 672971d66a2e (base tip = first parent of the merge commit)",
+  "pr": "GitHub test merge commit 08c336cc549e (refs/pull/428/merge) of head d9f3b250e0ca"
+ },
+ "probe_plan": {
+  "baseline": "full",
+  "model": "model provider: nebius (Token Factory, live)",
+  "errors": [],
+  "model_claims": [
+   {
+    "id": "C1",
+    "text": "On Python 3.15+, urlsafe_b64decode requires proper padding for input.",
+    "source_quote": "require padding when decoding base64 on Python 3.15+",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C2",
+    "text": "The change prevents urlsafe_b64decode from incorrectly raising BadData for certain malformed inputs.",
+    "source_quote": "Restore the old behavior of `urlsafe_b64decode()` to require padding when running on Python 3.15+, in order to fix raising `BadData` in some cases of malformed input.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C3",
+    "text": "After the PR, the \"bad payload\" tests pass when using zlib-ng as the compression library.",
+    "source_quote": "This fixes the test failures in \"bad payload\" tests that incidentally surface when using zlib-ng as the compression library.",
+    "testable": true,
+    "expect": "differs"
+   }
+  ],
+  "model_rejected_claims": [],
+  "diff_targets": [
+   "itsdangerous.encoding.base64_decode"
+  ],
+  "frozen": [
+   {
+    "path": "model-probes/model-p1.py",
+    "source": "model",
+    "sha256": "599498c05dfed053103208ae485f660591d2844472f13f08405658754418a0af",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-10-23T05:55:38.336847+00:00",
+    "inputs_sha256": "55726b9377b8192973a811024e955710e5c0f39d20f6b1dc1da3642ccbbee2a8",
+    "inputs": {
+     "title_chars": 52,
+     "body_chars": 306,
+     "base_files": {
+      "src/itsdangerous/encoding.py": "c304f3e6aff7ccb71a01dba793afef4a84adc06a9859edf4ed997f53ceda4453"
+     }
+    }
+   },
+   {
+    "path": "model-probes/model-p2.py",
+    "source": "model",
+    "sha256": "7a343a59d6ae6ee4f44f47d92a227eb78fc1a12506637acab50e054ac81fe494",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-10-23T05:55:38.337515+00:00",
+    "inputs_sha256": "55726b9377b8192973a811024e955710e5c0f39d20f6b1dc1da3642ccbbee2a8",
+    "inputs": {
+     "title_chars": 52,
+     "body_chars": 306,
+     "base_files": {
+      "src/itsdangerous/encoding.py": "c304f3e6aff7ccb71a01dba793afef4a84adc06a9859edf4ed997f53ceda4453"
+     }
+    }
+   },
+   {
+    "path": "model-probes/model-p3.py",
+    "source": "model",
+    "sha256": "9cf4f2684e7afd84fe7cc3bc485568b182edf1db258e0a87e82b8c0cb17d8a5a",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-10-23T05:55:38.337939+00:00",
+    "inputs_sha256": "55726b9377b8192973a811024e955710e5c0f39d20f6b1dc1da3642ccbbee2a8",
+    "inputs": {
+     "title_chars": 52,
+     "body_chars": 306,
+     "base_files": {
+      "src/itsdangerous/encoding.py": "c304f3e6aff7ccb71a01dba793afef4a84adc06a9859edf4ed997f53ceda4453"
+     }
+    }
+   },
+   {
+    "path": "diff-probes/diff-api.py",
+    "source": "diff",
+    "sha256": "f3e1bb07f6c2282b481b2cf7b076a8dafa3a597a4f8d03a36cd0efbabfb6784d",
+    "generator": {
+     "kind": "diff",
+     "label": "diff (auto-derived from base-side code, model-free)",
+     "model": null,
+     "provider": null,
+     "provenance": "auto-derived",
+     "blind": false
+    },
+    "frozen_at": "2026-10-23T05:55:38.343148+00:00",
+    "inputs_sha256": "aeb543057f5c0fa8291546fa5547ad1be0437fa9a12ea5c40d82b622ac0ec564",
+    "inputs": {
+     "title_chars": 0,
+     "body_chars": 0,
+     "base_files": {
+      "src/itsdangerous/encoding.py": "c304f3e6aff7ccb71a01dba793afef4a84adc06a9859edf4ed997f53ceda4453"
+     }
+    }
+   }
+  ]
+ },
+ "pr_side_started_at": "2026-10-23T05:55:38.343424+00:00",
+ "test_targets": {
+  "main": [
+   "tests/test_itsdangerous/test_encoding.py"
+  ],
+  "pr": [
+   "tests/test_itsdangerous/test_encoding.py"
+  ]
+ },
+ "contree_only": {
+  "note": "Contree mode: installs, tests and probes ran in Contree; nothing from the pull request ran locally",
+  "declared_test_deps": [],
+  "optional_backends": [],
+  "not_run_locally": [
+   "local freeze",
+   "installed-commit guard",
+   "probe coverage",
+   "optional-module retry"
+  ]
+ },
+ "coverage": {
+  "status": "measured",
+  "changed_lines_total": 4,
+  "changed_lines_covered": 3,
+  "files": [
+   {
+    "file": "src/itsdangerous/encoding.py",
+    "changed_lines_total": 4,
+    "changed_lines_covered": 3
+   }
+  ],
+  "seconds": 4.8,
+  "exit": 0,
+  "log": "coverage-pytest.log",
+  "where": "contree"
+ },
+ "contree": {
+  "main_uuid": "8031bdac-260c-4db5-9292-789fdd483795",
+  "pr_uuid": "1f245de3-fcde-4100-9c6d-3530e80b4f8c",
+  "max_ops": 40,
+  "sdk": "0.3.6",
+  "base_image": "docker.io/library/python:3.12-slim-bookworm",
+  "python": {
+   "requires_python": [
+    ">=3.10"
+   ],
+   "requires_python_found": true,
+   "main": "3.12.15",
+   "pr": "3.12.15",
+   "problems": []
+  }
+ },
+ "comparison": {
+  "same": 8,
+  "same_skipped_both": 0,
+  "regressions": [],
+  "fixed": [],
+  "new_tests_passing": 0,
+  "new_tests_failing": [],
+  "new_tests_skipped": [],
+  "removed_tests": [],
+  "reparametrized": [],
+  "skipped_missing_dependency": [],
+  "flaky": [],
+  "pr_unstable": [],
+  "pr_unstable_noisy": [],
+  "environment": [],
+  "other_changes": [],
+  "preexisting_failures": [],
+  "load_failed_both": [],
+  "load_failed_pr": [],
+  "load_failed_main": [],
+  "executed": {
+   "main": 8,
+   "pr": 8
+  },
+  "messages": {}
+ },
+ "exit_check": {
+  "explained": true,
+  "problems": [],
+  "detail": "all runs exited 0"
+ },
+ "probes": {
+  "status": "ran",
+  "items": [
+   {
+    "id": "model-p1",
+    "source": "model",
+    "path": "model-probes/model-p1.py",
+    "sha256": "599498c05dfed053103208ae485f660591d2844472f13f08405658754418a0af",
+    "target": "pallets/itsdangerous#428",
+    "about": "Test urlsafe_b64decode padding requirement on Python 3.15+",
+    "claims": [
+     {
+      "id": "C1",
+      "source": "PR description",
+      "text": "On Python 3.15+, urlsafe_b64decode requires proper padding for input.",
+      "covers": [
+       "decode_no_pad_exception",
+       "decode_no_pad_result",
+       "decode_pad_exception",
+       "decode_pad_result"
+      ],
+      "expect": "differs"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 2.0,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 49.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 1.8,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 1.3,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 631.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 1.3,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-p1-main-1.jsonl",
+      "probe-model-p1-main-2.jsonl",
+      "probe-model-p1-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-p1-pr-1.jsonl",
+      "probe-model-p1-pr-2.jsonl",
+      "probe-model-p1-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "decode_no_pad_result": "abc",
+       "decode_no_pad_exception": null,
+       "decode_pad_result": "abc",
+       "decode_pad_exception": null
+      },
+      {
+       "decode_no_pad_result": "abc",
+       "decode_no_pad_exception": null,
+       "decode_pad_result": "abc",
+       "decode_pad_exception": null
+      },
+      {
+       "decode_no_pad_result": "abc",
+       "decode_no_pad_exception": null,
+       "decode_pad_result": "abc",
+       "decode_pad_exception": null
+      }
+     ],
+     "pr": [
+      {
+       "decode_no_pad_result": "abc",
+       "decode_no_pad_exception": null,
+       "decode_pad_result": "abc",
+       "decode_pad_exception": null
+      },
+      {
+       "decode_no_pad_result": "abc",
+       "decode_no_pad_exception": null,
+       "decode_pad_result": "abc",
+       "decode_pad_exception": null
+      },
+      {
+       "decode_no_pad_result": "abc",
+       "decode_no_pad_exception": null,
+       "decode_pad_result": "abc",
+       "decode_pad_exception": null
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "decode_no_pad_exception",
+      "state": "same",
+      "label": "needs_human",
+      "claim": "C1",
+      "main": null,
+      "pr": null,
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"decode_no_pad_exception\""
+       },
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"decode_no_pad_exception\""
+       }
+      }
+     },
+     {
+      "name": "decode_no_pad_result",
+      "state": "same",
+      "label": "needs_human",
+      "claim": "C1",
+      "main": "abc",
+      "pr": "abc",
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"decode_no_pad_result\""
+       },
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"decode_no_pad_result\""
+       }
+      }
+     },
+     {
+      "name": "decode_pad_exception",
+      "state": "same",
+      "label": "needs_human",
+      "claim": "C1",
+      "main": null,
+      "pr": null,
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"decode_pad_exception\""
+       },
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"decode_pad_exception\""
+       }
+      }
+     },
+     {
+      "name": "decode_pad_result",
+      "state": "same",
+      "label": "needs_human",
+      "claim": "C1",
+      "main": "abc",
+      "pr": "abc",
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"decode_pad_result\""
+       },
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"decode_pad_result\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "599498c05dfed053103208ae485f660591d2844472f13f08405658754418a0af",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-10-23T05:55:38.336847+00:00",
+     "inputs_sha256": "55726b9377b8192973a811024e955710e5c0f39d20f6b1dc1da3642ccbbee2a8",
+     "inputs": {
+      "title_chars": 52,
+      "body_chars": 306,
+      "base_files": {
+       "src/itsdangerous/encoding.py": "c304f3e6aff7ccb71a01dba793afef4a84adc06a9859edf4ed997f53ceda4453"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-10-23T05:55:38.343424+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "not measured",
+     "why": "Contree-only check: probe coverage needs a local side",
+     "adequacy": "unmeasured",
+     "note": "probe coverage not measured (Contree-only check: probe coverage needs a local side)"
+    },
+    "status": "ran"
+   },
+   {
+    "id": "model-p2",
+    "source": "model",
+    "path": "model-probes/model-p2.py",
+    "sha256": "7a343a59d6ae6ee4f44f47d92a227eb78fc1a12506637acab50e054ac81fe494",
+    "target": "pallets/itsdangerous#428",
+    "about": "Test urlsafe_b64decode on malformed input that previously raised BadData incorrectly",
+    "claims": [
+     {
+      "id": "C2",
+      "source": "PR description",
+      "text": "The change prevents urlsafe_b64decode from incorrectly raising BadData for certain malformed inputs.",
+      "covers": [
+       "malformed_exception_type"
+      ],
+      "expect": "differs"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 2.0,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 174.4,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 1.9,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 1.3,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 1.6,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 1.3,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-p2-main-1.jsonl",
+      "probe-model-p2-main-2.jsonl",
+      "probe-model-p2-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-p2-pr-1.jsonl",
+      "probe-model-p2-pr-2.jsonl",
+      "probe-model-p2-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "malformed_result": "abc",
+       "malformed_exception_type": null
+      },
+      {
+       "malformed_result": "abc",
+       "malformed_exception_type": null
+      },
+      {
+       "malformed_result": "abc",
+       "malformed_exception_type": null
+      }
+     ],
+     "pr": [
+      {
+       "malformed_result": "abc",
+       "malformed_exception_type": null
+      },
+      {
+       "malformed_result": "abc",
+       "malformed_exception_type": null
+      },
+      {
+       "malformed_result": "abc",
+       "malformed_exception_type": null
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "malformed_exception_type",
+      "state": "same",
+      "label": "needs_human",
+      "claim": "C2",
+      "main": null,
+      "pr": null,
+      "citations": {
+       "main": {
+        "file": "probe-model-p2-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"malformed_exception_type\""
+       },
+       "pr": {
+        "file": "probe-model-p2-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"malformed_exception_type\""
+       }
+      }
+     },
+     {
+      "name": "malformed_result",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": "abc",
+      "pr": "abc",
+      "citations": {
+       "main": {
+        "file": "probe-model-p2-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"malformed_result\""
+       },
+       "pr": {
+        "file": "probe-model-p2-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"malformed_result\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "7a343a59d6ae6ee4f44f47d92a227eb78fc1a12506637acab50e054ac81fe494",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-10-23T05:55:38.337515+00:00",
+     "inputs_sha256": "55726b9377b8192973a811024e955710e5c0f39d20f6b1dc1da3642ccbbee2a8",
+     "inputs": {
+      "title_chars": 52,
+      "body_chars": 306,
+      "base_files": {
+       "src/itsdangerous/encoding.py": "c304f3e6aff7ccb71a01dba793afef4a84adc06a9859edf4ed997f53ceda4453"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-10-23T05:55:38.343424+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "not measured",
+     "why": "Contree-only check: probe coverage needs a local side",
+     "adequacy": "unmeasured",
+     "note": "probe coverage not measured (Contree-only check: probe coverage needs a local side)"
+    },
+    "status": "ran"
+   },
+   {
+    "id": "model-p3",
+    "source": "model",
+    "path": "model-probes/model-p3.py",
+    "sha256": "9cf4f2684e7afd84fe7cc3bc485568b182edf1db258e0a87e82b8c0cb17d8a5a",
+    "target": "pallets/itsdangerous#428",
+    "about": "Test itsdangerous.base64_decode on bad payload that should raise BadData",
+    "claims": [
+     {
+      "id": "C3",
+      "source": "PR description",
+      "text": "After the PR, the \"bad payload\" tests pass when using zlib-ng as the compression library.",
+      "covers": [
+       "badpayload_exception_type"
+      ],
+      "expect": "differs"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 2.2,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 1.9,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 2.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 1.9,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 1.9,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 1.9,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-p3-main-1.jsonl",
+      "probe-model-p3-main-2.jsonl",
+      "probe-model-p3-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-p3-pr-1.jsonl",
+      "probe-model-p3-pr-2.jsonl",
+      "probe-model-p3-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "badpayload_result": "abc",
+       "badpayload_exception_type": null
+      },
+      {
+       "badpayload_result": "abc",
+       "badpayload_exception_type": null
+      },
+      {
+       "badpayload_result": "abc",
+       "badpayload_exception_type": null
+      }
+     ],
+     "pr": [
+      {
+       "badpayload_result": "abc",
+       "badpayload_exception_type": null
+      },
+      {
+       "badpayload_result": "abc",
+       "badpayload_exception_type": null
+      },
+      {
+       "badpayload_result": "abc",
+       "badpayload_exception_type": null
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "badpayload_exception_type",
+      "state": "same",
+      "label": "needs_human",
+      "claim": "C3",
+      "main": null,
+      "pr": null,
+      "citations": {
+       "main": {
+        "file": "probe-model-p3-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"badpayload_exception_type\""
+       },
+       "pr": {
+        "file": "probe-model-p3-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"badpayload_exception_type\""
+       }
+      }
+     },
+     {
+      "name": "badpayload_result",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": "abc",
+      "pr": "abc",
+      "citations": {
+       "main": {
+        "file": "probe-model-p3-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"badpayload_result\""
+       },
+       "pr": {
+        "file": "probe-model-p3-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"badpayload_result\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "9cf4f2684e7afd84fe7cc3bc485568b182edf1db258e0a87e82b8c0cb17d8a5a",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-10-23T05:55:38.337939+00:00",
+     "inputs_sha256": "55726b9377b8192973a811024e955710e5c0f39d20f6b1dc1da3642ccbbee2a8",
+     "inputs": {
+      "title_chars": 52,
+      "body_chars": 306,
+      "base_files": {
+       "src/itsdangerous/encoding.py": "c304f3e6aff7ccb71a01dba793afef4a84adc06a9859edf4ed997f53ceda4453"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-10-23T05:55:38.343424+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "not measured",
+     "why": "Contree-only check: probe coverage needs a local side",
+     "adequacy": "unmeasured",
+     "note": "probe coverage not measured (Contree-only check: probe coverage needs a local side)"
+    },
+    "status": "ran"
+   },
+   {
+    "id": "diff-api",
+    "source": "diff",
+    "path": "diff-probes/diff-api.py",
+    "sha256": "f3e1bb07f6c2282b481b2cf7b076a8dafa3a597a4f8d03a36cd0efbabfb6784d",
+    "target": "pallets/itsdangerous#428",
+    "about": "Public functions touched by the PR, called with type-appropriate inputs on both sides.",
+    "claims": [],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 2.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 1.7,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 1.7,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 2.9,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 2.7,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 1.7,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-diff-api-main-1.jsonl",
+      "probe-diff-api-main-2.jsonl",
+      "probe-diff-api-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-diff-api-pr-1.jsonl",
+      "probe-diff-api-pr-2.jsonl",
+      "probe-diff-api-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "itsdangerous.encoding.base64_decode.input0": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input1": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input10": {
+        "raises": "BadData"
+       },
+       "itsdangerous.encoding.base64_decode.input11": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input2": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input3": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input4": {
+        "repr": "b'i\\xb7'",
+        "type": "bytes"
+       },
+       "itsdangerous.encoding.base64_decode.input5": {
+        "raises": "BadData"
+       },
+       "itsdangerous.encoding.base64_decode.input6": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input7": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input8": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input9": {
+        "repr": "b''",
+        "type": "bytes"
+       }
+      },
+      {
+       "itsdangerous.encoding.base64_decode.input0": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input1": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input10": {
+        "raises": "BadData"
+       },
+       "itsdangerous.encoding.base64_decode.input11": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input2": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input3": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input4": {
+        "repr": "b'i\\xb7'",
+        "type": "bytes"
+       },
+       "itsdangerous.encoding.base64_decode.input5": {
+        "raises": "BadData"
+       },
+       "itsdangerous.encoding.base64_decode.input6": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input7": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input8": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input9": {
+        "repr": "b''",
+        "type": "bytes"
+       }
+      },
+      {
+       "itsdangerous.encoding.base64_decode.input0": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input1": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input10": {
+        "raises": "BadData"
+       },
+       "itsdangerous.encoding.base64_decode.input11": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input2": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input3": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input4": {
+        "repr": "b'i\\xb7'",
+        "type": "bytes"
+       },
+       "itsdangerous.encoding.base64_decode.input5": {
+        "raises": "BadData"
+       },
+       "itsdangerous.encoding.base64_decode.input6": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input7": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input8": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input9": {
+        "repr": "b''",
+        "type": "bytes"
+       }
+      }
+     ],
+     "pr": [
+      {
+       "itsdangerous.encoding.base64_decode.input0": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input1": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input10": {
+        "raises": "BadData"
+       },
+       "itsdangerous.encoding.base64_decode.input11": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input2": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input3": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input4": {
+        "repr": "b'i\\xb7'",
+        "type": "bytes"
+       },
+       "itsdangerous.encoding.base64_decode.input5": {
+        "raises": "BadData"
+       },
+       "itsdangerous.encoding.base64_decode.input6": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input7": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input8": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input9": {
+        "repr": "b''",
+        "type": "bytes"
+       }
+      },
+      {
+       "itsdangerous.encoding.base64_decode.input0": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input1": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input10": {
+        "raises": "BadData"
+       },
+       "itsdangerous.encoding.base64_decode.input11": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input2": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input3": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input4": {
+        "repr": "b'i\\xb7'",
+        "type": "bytes"
+       },
+       "itsdangerous.encoding.base64_decode.input5": {
+        "raises": "BadData"
+       },
+       "itsdangerous.encoding.base64_decode.input6": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input7": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input8": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input9": {
+        "repr": "b''",
+        "type": "bytes"
+       }
+      },
+      {
+       "itsdangerous.encoding.base64_decode.input0": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input1": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input10": {
+        "raises": "BadData"
+       },
+       "itsdangerous.encoding.base64_decode.input11": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input2": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input3": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input4": {
+        "repr": "b'i\\xb7'",
+        "type": "bytes"
+       },
+       "itsdangerous.encoding.base64_decode.input5": {
+        "raises": "BadData"
+       },
+       "itsdangerous.encoding.base64_decode.input6": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input7": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input8": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input9": {
+        "repr": "b''",
+        "type": "bytes"
+       }
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "itsdangerous.encoding.base64_decode.input0",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"itsdangerous.encoding.base64_decode.input0\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"itsdangerous.encoding.base64_decode.input0\""
+       }
+      }
+     },
+     {
+      "name": "itsdangerous.encoding.base64_decode.input1",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"itsdangerous.encoding.base64_decode.input1\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"itsdangerous.encoding.base64_decode.input1\""
+       }
+      }
+     },
+     {
+      "name": "itsdangerous.encoding.base64_decode.input10",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": {
+       "raises": "BadData"
+      },
+      "pr": {
+       "raises": "BadData"
+      },
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"itsdangerous.encoding.base64_decode.input10\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"itsdangerous.encoding.base64_decode.input10\""
+       }
+      }
+     },
+     {
+      "name": "itsdangerous.encoding.base64_decode.input11",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"itsdangerous.encoding.base64_decode.input11\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"itsdangerous.encoding.base64_decode.input11\""
+       }
+      }
+     },
+     {
+      "name": "itsdangerous.encoding.base64_decode.input2",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"itsdangerous.encoding.base64_decode.input2\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"itsdangerous.encoding.base64_decode.input2\""
+       }
+      }
+     },
+     {
+      "name": "itsdangerous.encoding.base64_decode.input3",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"itsdangerous.encoding.base64_decode.input3\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"itsdangerous.encoding.base64_decode.input3\""
+       }
+      }
+     },
+     {
+      "name": "itsdangerous.encoding.base64_decode.input4",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": {
+       "repr": "b'i\\xb7'",
+       "type": "bytes"
+      },
+      "pr": {
+       "repr": "b'i\\xb7'",
+       "type": "bytes"
+      },
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 7,
+        "quote": "\"observation\": \"itsdangerous.encoding.base64_decode.input4\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 7,
+        "quote": "\"observation\": \"itsdangerous.encoding.base64_decode.input4\""
+       }
+      }
+     },
+     {
+      "name": "itsdangerous.encoding.base64_decode.input5",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": {
+       "raises": "BadData"
+      },
+      "pr": {
+       "raises": "BadData"
+      },
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 8,
+        "quote": "\"observation\": \"itsdangerous.encoding.base64_decode.input5\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 8,
+        "quote": "\"observation\": \"itsdangerous.encoding.base64_decode.input5\""
+       }
+      }
+     },
+     {
+      "name": "itsdangerous.encoding.base64_decode.input6",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 9,
+        "quote": "\"observation\": \"itsdangerous.encoding.base64_decode.input6\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 9,
+        "quote": "\"observation\": \"itsdangerous.encoding.base64_decode.input6\""
+       }
+      }
+     },
+     {
+      "name": "itsdangerous.encoding.base64_decode.input7",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 10,
+        "quote": "\"observation\": \"itsdangerous.encoding.base64_decode.input7\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 10,
+        "quote": "\"observation\": \"itsdangerous.encoding.base64_decode.input7\""
+       }
+      }
+     },
+     {
+      "name": "itsdangerous.encoding.base64_decode.input8",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 11,
+        "quote": "\"observation\": \"itsdangerous.encoding.base64_decode.input8\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 11,
+        "quote": "\"observation\": \"itsdangerous.encoding.base64_decode.input8\""
+       }
+      }
+     },
+     {
+      "name": "itsdangerous.encoding.base64_decode.input9",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": {
+       "repr": "b''",
+       "type": "bytes"
+      },
+      "pr": {
+       "repr": "b''",
+       "type": "bytes"
+      },
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 12,
+        "quote": "\"observation\": \"itsdangerous.encoding.base64_decode.input9\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 12,
+        "quote": "\"observation\": \"itsdangerous.encoding.base64_decode.input9\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "diff",
+     "label": "diff (auto-derived from base-side code, model-free)",
+     "model": null,
+     "provider": null,
+     "provenance": "auto-derived",
+     "blind": false
+    },
+    "freeze": {
+     "sha256": "f3e1bb07f6c2282b481b2cf7b076a8dafa3a597a4f8d03a36cd0efbabfb6784d",
+     "generator": {
+      "kind": "diff",
+      "label": "diff (auto-derived from base-side code, model-free)",
+      "model": null,
+      "provider": null,
+      "provenance": "auto-derived",
+      "blind": false
+     },
+     "frozen_at": "2026-10-23T05:55:38.343148+00:00",
+     "inputs_sha256": "aeb543057f5c0fa8291546fa5547ad1be0437fa9a12ea5c40d82b622ac0ec564",
+     "inputs": {
+      "title_chars": 0,
+      "body_chars": 0,
+      "base_files": {
+       "src/itsdangerous/encoding.py": "c304f3e6aff7ccb71a01dba793afef4a84adc06a9859edf4ed997f53ceda4453"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-10-23T05:55:38.343424+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "not measured",
+     "why": "Contree-only check: probe coverage needs a local side",
+     "adequacy": "unmeasured",
+     "note": "probe coverage not measured (Contree-only check: probe coverage needs a local side)"
+    },
+    "status": "ran"
+   }
+  ],
+  "summary": {
+   "labels": [
+    "needs_human",
+    "needs_human",
+    "needs_human",
+    "needs_human",
+    "needs_human",
+    "no_difference",
+    "needs_human",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference"
+   ],
+   "flagged": [
+    {
+     "probe": "model-p1",
+     "name": "decode_no_pad_exception",
+     "label": "needs_human",
+     "claim": "C1"
+    },
+    {
+     "probe": "model-p1",
+     "name": "decode_no_pad_result",
+     "label": "needs_human",
+     "claim": "C1"
+    },
+    {
+     "probe": "model-p1",
+     "name": "decode_pad_exception",
+     "label": "needs_human",
+     "claim": "C1"
+    },
+    {
+     "probe": "model-p1",
+     "name": "decode_pad_result",
+     "label": "needs_human",
+     "claim": "C1"
+    },
+    {
+     "probe": "model-p2",
+     "name": "malformed_exception_type",
+     "label": "needs_human",
+     "claim": "C2"
+    },
+    {
+     "probe": "model-p3",
+     "name": "badpayload_exception_type",
+     "label": "needs_human",
+     "claim": "C3"
+    }
+   ],
+   "proven_claims": [],
+   "reason": "probe: 6 observation(s) need attention: decode_no_pad_exception does not differ although the claim says it does (C1); decode_no_pad_result does not differ although the claim says it does (C1); decode_pad_exception does not differ although the claim says it does (C1); decode_pad_result does not differ although the claim says it does (C1); probe: 14 other observation(s) identical on both sides",
+   "ignored_noise": [],
+   "ignored_warning_only": [],
+   "pr_only_noisy": []
+  },
+  "test_settings": {
+   "applied": true,
+   "read_from": "main checkout (same values on both sides)",
+   "source": [
+    "pyproject.toml"
+   ],
+   "variables": [],
+   "pythonpath": [],
+   "pr_changed": []
+  }
+ },
+ "probe_changed_line_coverage": {
+  "status": "not measured",
+  "side": "main",
+  "probes": {
+   "model-p1": {
+    "status": "not measured",
+    "changed_lines_covered": null,
+    "changed_lines_total": null,
+    "adequacy": "unmeasured"
+   },
+   "model-p2": {
+    "status": "not measured",
+    "changed_lines_covered": null,
+    "changed_lines_total": null,
+    "adequacy": "unmeasured"
+   },
+   "model-p3": {
+    "status": "not measured",
+    "changed_lines_covered": null,
+    "changed_lines_total": null,
+    "adequacy": "unmeasured"
+   },
+   "diff-api": {
+    "status": "not measured",
+    "changed_lines_covered": null,
+    "changed_lines_total": null,
+    "adequacy": "unmeasured"
+   }
+  },
+  "not_adequate": []
+ },
+ "verdict": "needs_attention",
+ "reason": "probe: 6 observation(s) need attention: decode_no_pad_exception does not differ although the claim says it does (C1); decode_no_pad_result does not differ although the claim says it does (C1); decode_pad_exception does not differ although the claim says it does (C1); decode_pad_result does not differ although the claim says it does (C1); probe model-p1 has no measured line coverage (Contree-only check: probe coverage needs a local side); it does not count as covering the change; probe model-p2 has no measured line coverage (Contree-only check: probe coverage needs a local side); it does not count as covering the change; probe model-p3 has no measured line coverage (Contree-only check: probe coverage needs a local side); it does not count as covering the change; tests: 8 test(s) ran on main, 8 on the PR; 0 new test(s) pass, 8 unchanged",
+ "verdict_before_coverage_gate": "needs_attention",
+ "reason_before_coverage_gate": "probe: 6 observation(s) need attention: decode_no_pad_exception does not differ although the claim says it does (C1); decode_no_pad_result does not differ although the claim says it does (C1); decode_pad_exception does not differ although the claim says it does (C1); decode_pad_result does not differ although the claim says it does (C1); probe model-p1 has no measured line coverage (Contree-only check: probe coverage needs a local side); it does not count as covering the change; probe model-p2 has no measured line coverage (Contree-only check: probe coverage needs a local side); it does not count as covering the change; probe model-p3 has no measured line coverage (Contree-only check: probe coverage needs a local side); it does not count as covering the change; tests: 8 test(s) ran on main, 8 on the PR; 0 new test(s) pass, 8 unchanged",
+ "changed_lines_total": 4,
+ "changed_lines_covered": 3,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "normal",
+  "note": "3 of 4 changed executable line(s) ran (75%)",
+  "measurement": "measured"
+ },
+ "explanation": {
+  "status": "wired",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "text": "Verdict: needs_attention. probe: 6 observation(s) need attention: decode_no_pad_exception does not differ although the claim says it does (C1); decode_no_pad_result does not differ although the claim says it does (C1); decode_pad_exception does not differ although the claim says it does (C1); decode_pad_result does not differ although the claim says it does (C1); probe model-p1 has no measured line coverage (Contree-only check: probe coverage needs a local side); it does not count as covering the change; probe model-p2 has no measured line coverage (Contree-only check: probe coverage needs a local side); it does not count as covering the change; probe model-p3 has no measured line coverage (Contree-only check: probe",
+  "quotes": [],
+  "advisory": true
+ },
+ "agents": {
+  "status": "ran",
+  "advisory": true,
+  "note": "judge/helper/summary are advisory; code owns the verdict",
+  "roles": [
+   {
+    "role": "judge",
+    "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+    "status": "ok",
+    "note": null,
+    "labels": [
+     {
+      "id": "probe-model-p1",
+      "label": "needs_human",
+      "reason": "Probe test for urlsafe_b64decode padding behavior on Python 3.15+ requires human evaluation of test outcome."
+     },
+     {
+      "id": "probe-model-p2",
+      "label": "needs_human",
+      "reason": "Probe test for malformed input handling in urlsafe_b64decode needs human verification of BadData raising."
+     },
+     {
+      "id": "probe-model-p3",
+      "label": "needs_human",
+      "reason": "Probe test for itsdangerous.base64_decode bad payload behavior requires human assessment of BadData exception."
+     },
+     {
+      "id": "probe-diff-api",
+      "label": "needs_human",
+      "reason": "Diff-api probe comparing public function behavior before and after PR needs human interpretation of results."
+     }
+    ]
+   },
+   {
+    "role": "helper",
+    "model": "nvidia/Nemotron-3_5-Lightning",
+    "status": "ok",
+    "note": null,
+    "notes": [
+     "model-p1/p2/p3 coverage missing; skip automated filtering until local side coverage available.",
+     "decode_no_pad/result and decode_pad/exception show no diff despite C1 claim; treat as expected-stable in future diffs.",
+     "14/20 observations identical; mark as baseline noise for regression tracking.",
+     "Python 3.15+ base64 padding probe: current data shows no behavioral shift; no immediate action needed.",
+     "All flagged probes labeled needs_human; defer automated ignore rules until manual review completes."
+    ]
+   },
+   {
+    "role": "summary",
+    "model": "nvidia/nemotron-3-super-120b-a12b",
+    "status": "ok",
+    "note": "model returned empty text; filled from code verdict/reason"
+   }
+  ],
+  "provider": {
+   "provider": "nebius",
+   "models": {
+    "claims": "nvidia/nemotron-3-super-120b-a12b",
+    "probes": "nvidia/nemotron-3-super-120b-a12b",
+    "judge": "nvidia/Nemotron-3-Ultra-550b-a55b",
+    "helper": "nvidia/Nemotron-3_5-Lightning",
+    "summary": "nvidia/nemotron-3-super-120b-a12b"
+   },
+   "blind": true
+  }
+ },
+ "swarm_requested": true,
+ "operator_approval_requested": false,
+ "swarm": "on",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [
+   "src/itsdangerous/encoding.py"
+  ],
+  "compiled_files": [],
+  "other_files": [
+   "CHANGES.rst"
+  ]
+ },
+ "duration_s": {
+  "total_wall": 1040.9,
+  "tests": 17.3
+ },
+ "cost": {
+  "ai_calls": 3,
+  "failed_ai_calls": 0,
+  "input_tokens": 2586,
+  "output_tokens": 6059,
+  "thinking_tokens": 4863,
+  "cost_usd": 0.006229,
+  "calls_without_usage": 0,
+  "ai_cost_usd": 0.006229,
+  "cost_complete": true,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 1040.9,
+   "tests": 17.3
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.069393,
+  "total_cost_usd": 0.075622,
+  "swarm": {
+   "ai_calls": 3,
+   "failed_ai_calls": 0,
+   "input_tokens": 819,
+   "output_tokens": 1196,
+   "thinking_tokens": 1183,
+   "cost_usd": 0.001322,
+   "calls_without_usage": 2,
+   "ai_cost_usd": 0.001322,
+   "cost_complete": false,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ }
+}

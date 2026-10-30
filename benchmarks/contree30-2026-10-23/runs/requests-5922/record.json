@@ -1,0 +1,548 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-psf-requests-5922-62b3d6a26ad2-requests-5922",
+ "date_ist": "2026-10-23 15:50 IST",
+ "run_date": "2026-10-23",
+ "who": "ops/daily_run.py",
+ "repo": "psf/requests",
+ "library": "requests",
+ "pr": {
+  "repo": "psf/requests",
+  "number": 5922,
+  "url": "https://github.com/psf/requests/pull/5922",
+  "title": "Always use value of session.verify when set, fixes #5921",
+  "base_sha": "aae78010e987a414c176bddbf474cd554505219c",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "62b3d6a26ad2568e63a6603076479723128ca09e",
+  "merge_commit": null,
+  "tested_main_sha": "aae78010e987a414c176bddbf474cd554505219c",
+  "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+ },
+ "author": "brmzkw",
+ "base_ref": "main",
+ "updated_at_utc": "2021-09-01T12:47:59Z",
+ "updated_at_ist": "2021-09-01 18:17 IST",
+ "ci_state": "not checked (single-PR check)",
+ "ci_detail": "checked on request with --pr",
+ "tested_at_ist": "2026-10-23 15:50 IST",
+ "files": {
+  "all": [
+   "requests/sessions.py",
+   "tests/test_requests.py"
+  ],
+  "package_py": [
+   "requests/sessions.py"
+  ],
+  "compiled": [],
+  "other": [
+   "tests/test_requests.py"
+  ]
+ },
+ "machine_type": {
+  "arch": "arm64",
+  "os": "Darwin",
+  "platform": "macOS-15.5-arm64-arm-64bit-Mach-O",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": "Apple clang version 14.0.3 (clang-1403.0.22.14.1)",
+  "cpu_model": null,
+  "ram_gb": null
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 0,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.14",
+ "test_selection": "mapped from touched files: tests/test_requests.py",
+ "per_run": [],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "contree",
+ "sandbox_backend_note": "Contree could not prepare the main and PR sides (contree request failed: ApiTimeoutError). In Contree mode nothing from the pull request runs locally, so Proof-of-Change will not run pull-request code.",
+ "machine": "contree (not run)",
+ "tool_setup": {
+  "installed": [],
+  "tries": 0,
+  "note": "All required tools were already installed.",
+  "refused": []
+ },
+ "posted_upstream": false,
+ "logs": "requests-5922/",
+ "freeze": {},
+ "poc_commit": "863751e9580b866fe64247737975cb2e04e97215",
+ "route": "source-pair",
+ "current_head_sha": "62b3d6a26ad2568e63a6603076479723128ca09e",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "state": "open",
+ "mergeable": false,
+ "mergeable_state": "dirty",
+ "product_check": true,
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": {
+   "ok": false,
+   "skipped": false,
+   "live_call": true,
+   "cached": false,
+   "queries": [
+    "requests python setup install instructions https://github.com/psf/requests site:github.com/psf/requests",
+    "requests python documentation install https://github.com/psf/requests site:github.com/psf/requests",
+    "requests python install requirements https://pypi.org/project/requests/ https://github.com/psf/requests site:pypi.org"
+   ],
+   "results": [
+    {
+     "title": "requests/docs/user/install.rst at main \u00b7 psf/requests \u00b7 GitHub",
+     "url": "https://github.com/psf/requests/blob/main/docs/user/install.rst",
+     "query": "requests python documentation install https://github.com/psf/requests site:github.com/psf/requests"
+    },
+    {
+     "title": "GitHub - psf/requests at blog.datachef.co \u00b7 GitHub",
+     "url": "https://github.com/psf/requests?ref=blog.datachef.co",
+     "query": "requests python documentation install https://github.com/psf/requests site:github.com/psf/requests"
+    },
+    {
+     "title": "requests/docs/user/advanced.rst at main \u00b7 psf/requests \u00b7 GitHub",
+     "url": "https://github.com/psf/requests/blob/master/docs/user/advanced.rst",
+     "query": "requests python documentation install https://github.com/psf/requests site:github.com/psf/requests"
+    },
+    {
+     "title": "Python Requests - GeeksforGeeks",
+     "url": "https://geeksforgeeks.org/python/python-requests-tutorial",
+     "query": "requests python install requirements https://pypi.org/project/requests/ https://github.com/psf/requests site:pypi.org"
+    },
+    {
+     "title": "Requests (software) - Wikipedia",
+     "url": "https://en.wikipedia.org/wiki/Requests_(software)",
+     "query": "requests python install requirements https://pypi.org/project/requests/ https://github.com/psf/requests site:pypi.org"
+    },
+    {
+     "title": "Requests: HTTP for Humans\u2122 \u2014 Requests 2.34.2 documentation",
+     "url": "https://requests.readthedocs.io",
+     "query": "requests python install requirements https://pypi.org/project/requests/ https://github.com/psf/requests site:pypi.org"
+    }
+   ],
+   "text": "To install the Requests library, run the command `$ python -m pip install requests` in your terminal. Requests supports Python 3.10+. For advanced features like SOCKS proxy support, install with `$ python -m pip install \\'requests[socks]\\'`. The sources do not provide specific details on the installation process beyond these commands.\nTo install the requests library in Python, use the command \"pip install requests\". The library was originally authored by Kenneth Reitz and is maintained by Cory Benfield, Ian Stapleton Cordasco, and Nate Prewitt. The stable release as of May 14, 2026, is version 2.34.2. It is written in Python and is licensed under the Apache License 2.0. The official documentation and source code are available on requests.readthedocs.io and GitHub respectively.\n## Navigation Menu\n\n## Repository navigation\n\n## FilesExpand file tree\n\n## Breadcrumbs\n\n# install.rst\n\n## Latest commit\n\n## History\n\n## Breadcrumbs\n\n# install.rst\n\n## File metadata and controls\n\n# Installation of Requests\n\nThis part of the documentation covers the installation of Requests.\nThe first step to using any software package is getting it properly installed.\n\n## $ python -m pip install requests\n\nTo install Requests, simply run this simple command in your terminal of choice: [...] ## Get\n```\npython -m pip install requests\n```\n\nRequests officially supports Python 3.10+.\n\n## Supported Features & Best\u2013Practices\n\nRequests is ready for the demands of building robust and reliable HTTP\u2013speaking applications, for the needs of today. [...] Requests allows you to send HTTP/1.1 requests extremely easily. There\u2019s no need to manually add query strings to your URLs, or to form-encode your `PUT` & `POST` data \u2014 but nowadays, just use the `json` method!\n\nRequests is one of the most downloaded P\nIn addition to basic HTTP proxies, Requests also supports proxies using the SOCKS protocol. This is an optional feature that requires that additional third-party libraries be installed before use.\n\nYou can get the dependencies for this feature from `pip`:\n\n```\n$ python -m pip install 'requests[socks]' \n```\n\nOnce you've installed those dependencies, using a SOCKS proxy is just as easy as using a HTTP one: [...] Requests ships with a single Transport Adapter, the :class:`HTTPAdapter `. This adapte\n## Installation\n\nTo install requests library via pip, use the following command:\n\n> pip install requests\n\n## Syntax\n\n> requests.get(url, params={key: value}, \\\\kwargs)\n\nParameter:\n\n url: The URL you want to send the request to. (Required)\n params: Dictionary or bytes to be sent in the query string for GET requests. (Optional)\n \\\\kwargs: Additional optional arguments such as headers, cookies, authentication, timeout, proxies, verify (SSL), stream, etc. [...] ## Why do we need Requests Library\n\n S\n| Requests |\n\n| Original author | Kenneth Reitz |\n| Developers | Cory Benfield, Ian Stapleton Cordasco, Nate Prewitt |\n| Release | 14 February 2011 (2011-02-14) |\n| Stable release | 2.34.2 Edit this on Wikidata / 14 May 2026; 4 months ago (14 May 2026) |\n|  |\n| Written in | Python \"Python (programming language)\") |\n| License | Apache License 2.0 |\n| Website | requests.readthedocs.io Edit this at Wikidata |\n| Repository \"Repository (version control)\") | github.com/psf/requests | [...] Requests is\nInstallation of Requests\n  + $ python -m pip install requests\n  + Get the Source Code\n Quickstart\n  + Make a Request\n  + Passing Parameters In URLs\n  + Response Content\n  + Binary Response Content\n  + JSON Response Content\n  + Raw Response Content\n  + Custom Headers\n  + More complicated POST requests\n  + POST a Multipart-Encoded File\n  + Response Status Codes\n  + Response Headers\n  + Cookies\n  + Redirection and History\n  + Timeouts\n  + Errors and Exceptions\n Advanced Usage\n  + Session Objects [.",
+   "errors": [
+    "TimeoutError: The read operation timed out"
+   ],
+   "lines": [
+    "Looked up with Tavily: 6 results",
+    "Query: requests python setup install instructions https://github.com/psf/requests site:github.com/psf/requests",
+    "Query: requests python documentation install https://github.com/psf/requests site:github.com/psf/requests",
+    "Query: requests python install requirements https://pypi.org/project/requests/ https://github.com/psf/requests site:pypi.org",
+    "Source: requests/docs/user/install.rst at main \u00b7 psf/requests \u00b7 GitHub \u2014 https://github.com/psf/requests/blob/main/docs/user/install.rst",
+    "Source: GitHub - psf/requests at blog.datachef.co \u00b7 GitHub \u2014 https://github.com/psf/requests?ref=blog.datachef.co",
+    "Source: requests/docs/user/advanced.rst at main \u00b7 psf/requests \u00b7 GitHub \u2014 https://github.com/psf/requests/blob/master/docs/user/advanced.rst",
+    "Source: Python Requests - GeeksforGeeks \u2014 https://geeksforgeeks.org/python/python-requests-tutorial",
+    "Source: Requests (software) - Wikipedia \u2014 https://en.wikipedia.org/wiki/Requests_(software)",
+    "Source: Requests: HTTP for Humans\u2122 \u2014 Requests 2.34.2 documentation \u2014 https://requests.readthedocs.io"
+   ]
+  },
+  "notes": [
+   "Setup check: GitHub token: missing.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory could not be read.",
+   "Setup check: free disk 37.3 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: 6 results",
+   "Query: requests python setup install instructions https://github.com/psf/requests site:github.com/psf/requests",
+   "Query: requests python documentation install https://github.com/psf/requests site:github.com/psf/requests",
+   "Query: requests python install requirements https://pypi.org/project/requests/ https://github.com/psf/requests site:pypi.org",
+   "Source: requests/docs/user/install.rst at main \u00b7 psf/requests \u00b7 GitHub \u2014 https://github.com/psf/requests/blob/main/docs/user/install.rst",
+   "Source: GitHub - psf/requests at blog.datachef.co \u00b7 GitHub \u2014 https://github.com/psf/requests?ref=blog.datachef.co",
+   "Source: requests/docs/user/advanced.rst at main \u00b7 psf/requests \u00b7 GitHub \u2014 https://github.com/psf/requests/blob/master/docs/user/advanced.rst",
+   "Source: Python Requests - GeeksforGeeks \u2014 https://geeksforgeeks.org/python/python-requests-tutorial",
+   "Source: Requests (software) - Wikipedia \u2014 https://en.wikipedia.org/wiki/Requests_(software)",
+   "Source: Requests: HTTP for Humans\u2122 \u2014 Requests 2.34.2 documentation \u2014 https://requests.readthedocs.io",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: install pytest>=2.8.0,<=3.10.1 (listed in requirements-dev.txt) on main and pr.",
+   "Setup plan: install pytest-cov (listed in requirements-dev.txt) on main and pr.",
+   "Setup plan: install pytest-httpbin==1.0.0 (listed in requirements-dev.txt) on main and pr.",
+   "Setup plan: install pytest-mock==2.0.0 (listed in requirements-dev.txt) on main and pr.",
+   "Setup plan: install httpbin==0.7.0 (listed in requirements-dev.txt) on main and pr.",
+   "Setup plan: install Flask>=1.0,<2.0 (listed in requirements-dev.txt) on main and pr.",
+   "Setup plan: install trustme (listed in requirements-dev.txt) on main and pr.",
+   "Setup plan: install wheel (listed in requirements-dev.txt) on main and pr.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*, !=3.5.*, >=3.10",
+   "Setup plan: Python rule: one Python version is used on both sides: the lowest version that meets the requirements of both main and the pull request; if none meets both, the check stops as a setup problem and records both."
+  ],
+  "install_docs": [
+   "Makefile",
+   "README.md",
+   "setup.py",
+   "tox.ini",
+   "setup.cfg",
+   "docs/Makefile",
+   ".github/CONTRIBUTING.md",
+   ".github/workflows/codeql-analysis.yml",
+   ".github/workflows/run-tests.yml",
+   ".github/workflows/lock-issues.yml"
+  ],
+  "install_docs_from": "main",
+  "setup_plan": {
+   "packages": [
+    {
+     "requirement": "pytest>=2.8.0,<=3.10.1",
+     "name": "pytest",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements-dev.txt",
+     "reason": "listed in requirements-dev.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest-cov",
+     "name": "pytest-cov",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements-dev.txt",
+     "reason": "listed in requirements-dev.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest-httpbin==1.0.0",
+     "name": "pytest-httpbin",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements-dev.txt",
+     "reason": "listed in requirements-dev.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest-mock==2.0.0",
+     "name": "pytest-mock",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements-dev.txt",
+     "reason": "listed in requirements-dev.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "httpbin==0.7.0",
+     "name": "httpbin",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements-dev.txt",
+     "reason": "listed in requirements-dev.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "Flask>=1.0,<2.0",
+     "name": "Flask",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements-dev.txt",
+     "reason": "listed in requirements-dev.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "trustme",
+     "name": "trustme",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements-dev.txt",
+     "reason": "listed in requirements-dev.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "wheel",
+     "name": "wheel",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements-dev.txt",
+     "reason": "listed in requirements-dev.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    }
+   ],
+   "scope_blocked": "",
+   "component": null,
+   "aggregate_names": [],
+   "extra_reqs": [
+    "pytest>=2.8.0,<=3.10.1",
+    "pytest-cov",
+    "pytest-httpbin==1.0.0",
+    "pytest-mock==2.0.0",
+    "httpbin==0.7.0",
+    "Flask>=1.0,<2.0",
+    "trustme",
+    "wheel"
+   ],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*, !=3.5.*, >=3.10",
+    "rule": "one Python version is used on both sides: the lowest version that meets the requirements of both main and the pull request; if none meets both, the check stops as a setup problem and records both",
+    "gate_failed": false
+   },
+   "system": [],
+   "refused": [],
+   "groups_blocked": ""
+  },
+  "steps": {
+   "setup_lookup": "Found 8 setup item(s) in the project's files and the web lookup.",
+   "setup_python": "Python 3.12: Python 3.12 already meets >=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*, !=3.5.*, >=3.10",
+   "install_deps": "Wrote requirements.txt and installed it on main and pr: pytest>=2.8.0,<=3.10.1, pytest-cov, pytest-httpbin==1.0.0, pytest-mock==2.0.0, httpbin==0.7.0, Flask>=1.0,<2.0, trustme, wheel."
+  },
+  "run_files": {
+   "requirements": "requirements.txt",
+   "plan": "setup-plan.json",
+   "count": 8
+  }
+ },
+ "chosen": {
+  "pr": 5922,
+  "head_sha": null,
+  "install": null,
+  "test_cmd": null
+ },
+ "sides": {
+  "comparison_basis": "merge-base vs PR head (PR conflicts with base)",
+  "main_sha": "aae78010e987a414c176bddbf474cd554505219c",
+  "pr_sha": "62b3d6a26ad2568e63a6603076479723128ca09e"
+ },
+ "tested": {
+  "main": "main @ aae78010e987 (merge-base with the PR head)",
+  "pr": "PR head 62b3d6a26ad2"
+ },
+ "probe_plan": {
+  "baseline": "full",
+  "model": "model provider: nebius (Token Factory, live)",
+  "errors": [],
+  "model_claims": [
+   {
+    "id": "C1",
+    "text": "When session.verify is explicitly set, requests will use that value for SSL certificate verification and ignore the REQUESTS_CA_BUNDLE environment variable.",
+    "source_quote": "Always use value of session.verify when set",
+    "testable": true,
+    "expect": "differs"
+   }
+  ],
+  "model_rejected_claims": [],
+  "diff_targets": [],
+  "frozen": [
+   {
+    "path": "model-probes/model-p1.py",
+    "source": "model",
+    "sha256": "8d0e32dfdc26f258f07030ddb477dfc74dfdd0071334389bfbfa0f1b4f35e877",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-10-23T10:24:26.431483+00:00",
+    "inputs_sha256": "8984159da7fb31728879dca8cd2fc5fe919803f65337af80c5b2336e0088703f",
+    "inputs": {
+     "title_chars": 56,
+     "body_chars": 168,
+     "base_files": {
+      "requests/sessions.py": "e7b3b8b9df7244be9e2d887e76d15ba82d643b877f13065c0a0617124ba395fb"
+     }
+    }
+   }
+  ]
+ },
+ "pr_side_started_at": "2026-10-23T10:24:26.440716+00:00",
+ "test_targets": {
+  "main": [
+   "tests/test_requests.py"
+  ],
+  "pr": [
+   "tests/test_requests.py"
+  ]
+ },
+ "contree_only": {
+  "note": "Contree mode: Contree did not run, so nothing from the pull request was run",
+  "declared_test_deps": [],
+  "optional_backends": [],
+  "not_run_locally": [
+   "local freeze",
+   "installed-commit guard",
+   "probe coverage",
+   "optional-module retry"
+  ]
+ },
+ "coverage": {
+  "status": "not measured",
+  "why": "Contree mode: coverage runs only inside Contree, and it was not run there"
+ },
+ "contree": {
+  "failed": "contree request failed: ApiTimeoutError",
+  "fallback": null,
+  "exit_code": null,
+  "stderr_tail": "",
+  "auth_error": false
+ },
+ "verdict": "could_not_verify",
+ "reason": "Contree could not prepare the main and PR sides (contree request failed: ApiTimeoutError). In Contree mode nothing from the pull request runs locally, so Proof-of-Change will not run pull-request code.",
+ "verdict_before_coverage_gate": "could_not_verify",
+ "reason_before_coverage_gate": "Contree could not prepare the main and PR sides (contree request failed: ApiTimeoutError). In Contree mode nothing from the pull request runs locally, so Proof-of-Change will not run pull-request code.",
+ "changed_lines_total": null,
+ "changed_lines_covered": null,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "lower",
+  "note": "coverage of the changed Python lines was NOT MEASURED (Contree mode: coverage runs only inside Contree, and it was not run there)",
+  "measurement": "not measured"
+ },
+ "explanation": {
+  "status": "wired",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "text": "Verdict: could_not_verify. Contree could not prepare the main and PR sides (contree request failed: ApiTimeoutError). In Contree mode nothing from the pull request runs locally, so Proof-of-Change will not run pull-request code.",
+  "quotes": [],
+  "advisory": true
+ },
+ "agents": {
+  "status": "ran",
+  "advisory": true,
+  "note": "judge/helper/summary are advisory; code owns the verdict",
+  "roles": [
+   {
+    "role": "judge",
+    "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+    "status": "ok",
+    "note": null,
+    "labels": []
+   },
+   {
+    "role": "helper",
+    "model": "nvidia/Nemotron-3_5-Lightning",
+    "status": "ok",
+    "note": null,
+    "notes": [
+     "ContreeApiTimeoutNoise: ignore transient API timeouts in future diffs",
+     "ContreeRemoteExecution: PR code runs on contree server, local proof may skip PR logic",
+     "SessionVerifyExplicit: prefer explicit session.verify setting over defaults",
+     "ContreeAuthRequired: authenticate contree CLI to prevent request failures",
+     "ProbeSummaryEmpty: consider adding debug output if verification times out"
+    ]
+   },
+   {
+    "role": "summary",
+    "model": "nvidia/nemotron-3-super-120b-a12b",
+    "status": "ok",
+    "note": "model returned empty text; filled from code verdict/reason"
+   }
+  ],
+  "provider": {
+   "provider": "nebius",
+   "models": {
+    "claims": "nvidia/nemotron-3-super-120b-a12b",
+    "probes": "nvidia/nemotron-3-super-120b-a12b",
+    "judge": "nvidia/Nemotron-3-Ultra-550b-a55b",
+    "helper": "nvidia/Nemotron-3_5-Lightning",
+    "summary": "nvidia/nemotron-3-super-120b-a12b"
+   },
+   "blind": true
+  }
+ },
+ "swarm_requested": true,
+ "operator_approval_requested": false,
+ "swarm": "on",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [
+   "requests/sessions.py"
+  ],
+  "compiled_files": [],
+  "other_files": [
+   "tests/test_requests.py"
+  ]
+ },
+ "duration_s": {
+  "total_wall": 879.3,
+  "tests": 0
+ },
+ "cost": {
+  "ai_calls": 2,
+  "failed_ai_calls": 0,
+  "input_tokens": 7409,
+  "output_tokens": 7671,
+  "thinking_tokens": 7284,
+  "cost_usd": 0.009127,
+  "calls_without_usage": 0,
+  "ai_cost_usd": 0.009127,
+  "cost_complete": true,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 879.3,
+   "tests": 0
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.05862,
+  "total_cost_usd": 0.067747,
+  "swarm": {
+   "ai_calls": 3,
+   "failed_ai_calls": 0,
+   "input_tokens": 156,
+   "output_tokens": 504,
+   "thinking_tokens": 491,
+   "cost_usd": 0.0005,
+   "calls_without_usage": 2,
+   "ai_cost_usd": 0.0005,
+   "cost_complete": false,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ }
+}

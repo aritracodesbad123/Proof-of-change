@@ -1,0 +1,4145 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-PyCQA-isort-2682-147a248aede7-isort-2682",
+ "date_ist": "2026-10-23 15:23 IST",
+ "run_date": "2026-10-23",
+ "who": "ops/daily_run.py",
+ "repo": "PyCQA/isort",
+ "library": "isort",
+ "pr": {
+  "repo": "PyCQA/isort",
+  "number": 2682,
+  "url": "https://github.com/PyCQA/isort/pull/2682",
+  "title": "Fix split directives on complete multiline imports",
+  "base_sha": "437147284d612b2ce269e94441f2ce9ff86fab53",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "147a248aede761238dcc903dcc56b74f72ae9091",
+  "merge_commit": "2c3615a7a78835f9087765d9d1d6d5dd3cb97d72",
+  "tested_main_sha": "a514c71ed86c2216d0040c7d60e302ed76a4f7ab",
+  "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+ },
+ "author": "hansu650",
+ "base_ref": "main",
+ "updated_at_utc": "2026-09-28T06:24:05Z",
+ "updated_at_ist": "2026-09-28 11:54 IST",
+ "ci_state": "not checked (single-PR check)",
+ "ci_detail": "checked on request with --pr",
+ "tested_at_ist": "2026-10-23 15:23 IST",
+ "files": {
+  "all": [
+   "isort/core.py",
+   "isort/parse.py",
+   "tests/unit/test_regressions.py"
+  ],
+  "package_py": [
+   "isort/core.py",
+   "isort/parse.py"
+  ],
+  "compiled": [],
+  "other": [
+   "tests/unit/test_regressions.py"
+  ]
+ },
+ "machine_type": {
+  "arch": "arm64",
+  "os": "Darwin",
+  "platform": "macOS-15.5-arm64-arm-64bit-Mach-O",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": "Apple clang version 14.0.3 (clang-1403.0.22.14.1)",
+  "cpu_model": null,
+  "ram_gb": null
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 3,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.14",
+ "test_selection": "mapped from touched files: tests/unit/test_regressions.py, tests/unit/test_parse.py",
+ "per_run": [
+  {
+   "side": "old",
+   "run": 1,
+   "passed": 156,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 5.8,
+   "pytest_summary": "156 passed in 2.69s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 1,
+   "passed": 173,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 5.9,
+   "pytest_summary": "173 passed in 2.73s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 2,
+   "passed": 156,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 5.7,
+   "pytest_summary": "156 passed in 2.50s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 2,
+   "passed": 173,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 5.8,
+   "pytest_summary": "173 passed in 2.57s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 3,
+   "passed": 156,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 5.8,
+   "pytest_summary": "156 passed in 2.50s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 3,
+   "passed": 173,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 5.5,
+   "pytest_summary": "173 passed in 2.58s",
+   "junit": true
+  }
+ ],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "contree",
+ "sandbox_backend_note": "contree (Token Factory Sandboxes, sdk 0.3.6)",
+ "machine": "contree",
+ "tool_setup": {
+  "installed": [],
+  "tries": 0,
+  "note": "All required tools were already installed.",
+  "refused": []
+ },
+ "posted_upstream": false,
+ "logs": "isort-2682/",
+ "freeze": {},
+ "poc_commit": "863751e9580b866fe64247737975cb2e04e97215",
+ "route": "source-pair",
+ "current_head_sha": "147a248aede761238dcc903dcc56b74f72ae9091",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "state": "open",
+ "mergeable": true,
+ "mergeable_state": "clean",
+ "product_check": true,
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": {
+   "ok": true,
+   "skipped": false,
+   "live_call": true,
+   "cached": false,
+   "queries": [
+    "isort python setup install instructions https://github.com/PyCQA/isort site:github.com/PyCQA/isort",
+    "isort python documentation install https://github.com/PyCQA/isort site:github.com/PyCQA/isort",
+    "isort python install requirements https://pypi.org/project/isort/ https://github.com/PyCQA/isort site:pypi.org"
+   ],
+   "results": [
+    {
+     "title": "isort/pyproject.toml at main \u00b7 PyCQA/isort \u00b7 GitHub",
+     "url": "https://github.com/PyCQA/isort/blob/main/pyproject.toml",
+     "query": "isort python documentation install https://github.com/PyCQA/isort site:github.com/PyCQA/isort"
+    },
+    {
+     "title": "isort",
+     "url": "https://pypi.org/project/isort/",
+     "query": "isort python install requirements https://pypi.org/project/isort/ https://github.com/PyCQA/isort site:pypi.org"
+    },
+    {
+     "title": "lint-python",
+     "url": "https://pypi.org/project/lint-python/",
+     "query": "isort python install requirements https://pypi.org/project/isort/ https://github.com/PyCQA/isort site:pypi.org"
+    },
+    {
+     "title": "GitHub - PyCQA/isort: A Python utility / library to sort imports. \u00b7 GitHub",
+     "url": "https://github.com/pycqa/isort",
+     "query": "isort python setup install instructions https://github.com/PyCQA/isort site:github.com/PyCQA/isort"
+    },
+    {
+     "title": "No CLI executable on Ubuntu 20.04 \u00b7 Issue #1947 \u00b7 PyCQA/isort \u00b7 GitHub",
+     "url": "https://github.com/PyCQA/isort/issues/1947",
+     "query": "isort python setup install instructions https://github.com/PyCQA/isort site:github.com/PyCQA/isort"
+    },
+    {
+     "title": "isort over Language Server Protocol and VS Code extension \u00b7 Issue #1904 \u00b7 PyCQA/isort \u00b7 GitHub",
+     "url": "https://github.com/PyCQA/isort/issues/1904",
+     "query": "isort python setup install instructions https://github.com/PyCQA/isort site:github.com/PyCQA/isort"
+    }
+   ],
+   "text": "To install isort, use the command `pip install isort`. To run it on specific files, use `isort mypythonfile.py mypythonfile2.py`. For recursive application, use `.`. If you encounter issues where `isort` is not found despite installation, it may be due to PATH issues or using a different package manager, as seen in the GitHub issue where `sudo apt install isort` was suggested. For using isort within text editors, plugins are available and can be found on the isort wiki.\nTo install isort, the GitHub repository advises using `pip install isort`. The GitHub issue indicates that on Ubuntu 20.04, the `isort` command might not be found even after installation, suggesting to install it via `sudo apt install isort`. The sources do not provide a definitive answer on why `isort` is not found post-installation, but they do mention the installation methods.\nTo install isort, you can use pip with the command `pip install isort`. The sources indicate that isort is a Python utility to sort imports alphabetically and automatically separate into sections and by type. It requires Python 3.6+ to run but supports formatting Python 2 code too. The latest version available as of the provided sources is 5.5.2. Another source mentions a specific version `isort==5.10.1` for lint-python projects.\nauthors = [{name = \"Dani\u00ebl van Noord\", email = \"13665637+DanielNoord@users.noreply.github.com\"}, {name = \"Timothy Crosley\", email = \"timothy.crosley@gmail.com\"}, {name = \"staticdev\", email = \"staticdev-support@proton.me\"}]\n\nlicense = \"MIT\"\n\nreadme = \"README.md\"\n\nrepository = \"\n\nhomepage = \"\n\ndocumentation = \"\n\nkeywords = [\"Refactor\", \"Lint\", \"Imports\", \"Sort\", \"Clean\"]\n\nclassifiers = [\n\n\"Development Status :: 6 - Mature\",\n\n\"Intended Audience :: Developers\",\n\n\"Natural Language :: English\", [...] \nisort is a Python utility / library to sort imports alphabetically and automatically separate into sections and by type. It provides a command line utility,\nTool that runs common linters on CERT Polska projects written in Python. pip install -U isort==5.10.1\nAfter isort:\n\n```\nfrom import absolute_import import os import sys from third_party import lib1 lib2 lib3 lib4 lib5 lib6 lib7 lib8 lib9 lib10 lib11 lib12 lib13 lib14 lib15 from my_lib import Object Object2 Object3 print \"Hey\" print \"yo\"\n```\n\n## Installing isort\n\nInstalling isort is as simple as:\n\n```\npip install isort\n```\n\n## Using isort\n\nFrom the command line:\n\nTo run on specific files:\n\n```\nisort mypythonfile.py mypythonfile2.py\n```\n\nTo apply recursively:\n\n```\n.\n``` [...] or:\n\n```\nimport isort\necho $PATH /home/michael/.venv/project/bin:/home/michael/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/home/michael/.fzf/bin (project) michael@michael:~/project/src$ pip3 show -f isort Name: isort Version: 4.3.4 Summary: A Python utility / library to sort Python imports. Home-page:  Author: Timothy Crosley Author-email: timothy.crosley@gmail.com License: MIT Location: /usr/lib/python3/dist-packages Requires: Required-by: Files: [..\nWe have attached a zip file to this issue containing a prototype extension to give you an idea of what we are planning. You can download it, extract the `.vsix` file, and then install the VSIX to try it out python-isort.zip. This prototype version was built with python 3.10 and bundles isort v5.10.1 (as fallback if nothing is found in your environment). [...] [ERROR 2022-3-21 19:23:50.253]: Error initializing python: [TypeError: n.environment.onDidActiveInterpreterChanged is not a function at c ",
+   "errors": [],
+   "lines": [
+    "Looked up with Tavily: 6 results",
+    "Query: isort python setup install instructions https://github.com/PyCQA/isort site:github.com/PyCQA/isort",
+    "Query: isort python documentation install https://github.com/PyCQA/isort site:github.com/PyCQA/isort",
+    "Query: isort python install requirements https://pypi.org/project/isort/ https://github.com/PyCQA/isort site:pypi.org",
+    "Source: isort/pyproject.toml at main \u00b7 PyCQA/isort \u00b7 GitHub \u2014 https://github.com/PyCQA/isort/blob/main/pyproject.toml",
+    "Source: isort \u2014 https://pypi.org/project/isort/",
+    "Source: lint-python \u2014 https://pypi.org/project/lint-python/",
+    "Source: GitHub - PyCQA/isort: A Python utility / library to sort imports. \u00b7 GitHub \u2014 https://github.com/pycqa/isort",
+    "Source: No CLI executable on Ubuntu 20.04 \u00b7 Issue #1947 \u00b7 PyCQA/isort \u00b7 GitHub \u2014 https://github.com/PyCQA/isort/issues/1947",
+    "Source: isort over Language Server Protocol and VS Code extension \u00b7 Issue #1904 \u00b7 PyCQA/isort \u00b7 GitHub \u2014 https://github.com/PyCQA/isort/issues/1904"
+   ]
+  },
+  "notes": [
+   "Setup check: GitHub token: missing.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory could not be read.",
+   "Setup check: free disk 37.3 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: 6 results",
+   "Query: isort python setup install instructions https://github.com/PyCQA/isort site:github.com/PyCQA/isort",
+   "Query: isort python documentation install https://github.com/PyCQA/isort site:github.com/PyCQA/isort",
+   "Query: isort python install requirements https://pypi.org/project/isort/ https://github.com/PyCQA/isort site:pypi.org",
+   "Source: isort/pyproject.toml at main \u00b7 PyCQA/isort \u00b7 GitHub \u2014 https://github.com/PyCQA/isort/blob/main/pyproject.toml",
+   "Source: isort \u2014 https://pypi.org/project/isort/",
+   "Source: lint-python \u2014 https://pypi.org/project/lint-python/",
+   "Source: GitHub - PyCQA/isort: A Python utility / library to sort imports. \u00b7 GitHub \u2014 https://github.com/pycqa/isort",
+   "Source: No CLI executable on Ubuntu 20.04 \u00b7 Issue #1947 \u00b7 PyCQA/isort \u00b7 GitHub \u2014 https://github.com/PyCQA/isort/issues/1947",
+   "Source: isort over Language Server Protocol and VS Code extension \u00b7 Issue #1904 \u00b7 PyCQA/isort \u00b7 GitHub \u2014 https://github.com/PyCQA/isort/issues/1904",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: mypy-extensions is noted, installed with the project.",
+   "Setup plan: install bandit>=1.8.6 (listed in a dependency group) on main and pr.",
+   "Setup plan: install black>=25.9.0 (listed in a dependency group) on main and pr.",
+   "Setup plan: install colorama>=0.4.6 (listed in a dependency group) on main and pr.",
+   "Setup plan: install coverage[toml]>=7.10.7 (listed in a dependency group) on main and pr.",
+   "Setup plan: install example-isort-sorting-plugin>=0.1.0 (listed in a dependency group) on main and pr.",
+   "Setup plan: install example-shared-isort-profile>=0.1.0 (listed in a dependency group) on main and pr.",
+   "Setup plan: install flake8>=7.3.0 (listed in a dependency group) on main and pr.",
+   "Setup plan: install flake8-bugbear>=24.12.12 (listed in a dependency group) on main and pr.",
+   "Setup plan: install flake8-pyproject>=1.2.3 (listed in a dependency group) on main and pr.",
+   "Setup plan: install hatch>=1.14.0 (listed in a dependency group) on main and pr.",
+   "Setup plan: install hypothesis>=6.140.3 (listed in a dependency group) on main and pr.",
+   "Setup plan: install hypothesmith>=0.3.3 (listed in a dependency group) on main and pr.",
+   "Setup plan: install libcst>=1.9.0 (listed in a dependency group) on main and pr.",
+   "Setup plan: install mypy>=2.3.1 (listed in a dependency group) on main and pr.",
+   "Setup plan: install pep8-naming>=0.15.1 (listed in a dependency group) on main and pr.",
+   "Setup plan: install pytest>=8.4.2 (listed in a dependency group) on main and pr.",
+   "Setup plan: install pytest-benchmark>=5.1.0 (listed in a dependency group) on main and pr.",
+   "Setup plan: install ruff>=0.13.3 (listed in a dependency group) on main and pr.",
+   "Setup plan: install stdlibs>=2026.9.3 (listed in a dependency group) on main and pr.",
+   "Setup plan: install tox>=4.30.3 (listed in a dependency group) on main and pr.",
+   "Setup plan: install tox-uv>=1.28.0 (listed in a dependency group) on main and pr.",
+   "Setup plan: install types-colorama>=0.4.2 (listed in a dependency group) on main and pr.",
+   "Setup plan: install uv>=0.13.4 (listed in a dependency group) on main and pr.",
+   "Setup plan: install myst-parser>=4.0.1 (listed in a dependency group) on main and pr.",
+   "Setup plan: install sphinx>=7.4.7 (listed in a dependency group) on main and pr.",
+   "Setup plan: install sphinx-immaterial>=0.13.9 (listed in a dependency group) on main and pr.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >=3.11.0, >=3.10.0",
+   "Setup plan: Python rule: one Python version is used on both sides: the lowest version that meets the requirements of both main and the pull request; if none meets both, the check stops as a setup problem and records both."
+  ],
+  "install_docs": [
+   "Dockerfile",
+   "pyproject.toml",
+   "README.md",
+   "tox.ini",
+   "example_isort_formatting_plugin/pyproject.toml",
+   "example_isort_sorting_plugin/pyproject.toml",
+   ".github/workflows/release.yml",
+   ".github/workflows/continuous-integration.yml",
+   ".github/workflows/build.yml",
+   "example_shared_isort_profile/pyproject.toml"
+  ],
+  "install_docs_from": "main",
+  "setup_plan": {
+   "packages": [
+    {
+     "requirement": "mypy-extensions>=1.1.0",
+     "name": "mypy-extensions",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "bandit>=1.8.6",
+     "name": "bandit",
+     "kind": "dependency-group",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in a dependency group",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "black>=25.9.0",
+     "name": "black",
+     "kind": "dependency-group",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in a dependency group",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "colorama>=0.4.6",
+     "name": "colorama",
+     "kind": "dependency-group",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in a dependency group",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "coverage[toml]>=7.10.7",
+     "name": "coverage",
+     "kind": "dependency-group",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in a dependency group",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "example-isort-sorting-plugin>=0.1.0",
+     "name": "example-isort-sorting-plugin",
+     "kind": "dependency-group",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in a dependency group",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "example-shared-isort-profile>=0.1.0",
+     "name": "example-shared-isort-profile",
+     "kind": "dependency-group",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in a dependency group",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "flake8>=7.3.0",
+     "name": "flake8",
+     "kind": "dependency-group",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in a dependency group",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "flake8-bugbear>=24.12.12",
+     "name": "flake8-bugbear",
+     "kind": "dependency-group",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in a dependency group",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "flake8-pyproject>=1.2.3",
+     "name": "flake8-pyproject",
+     "kind": "dependency-group",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in a dependency group",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "hatch>=1.14.0",
+     "name": "hatch",
+     "kind": "dependency-group",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in a dependency group",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "hypothesis>=6.140.3",
+     "name": "hypothesis",
+     "kind": "dependency-group",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in a dependency group",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "hypothesmith>=0.3.3",
+     "name": "hypothesmith",
+     "kind": "dependency-group",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in a dependency group",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "libcst>=1.9.0",
+     "name": "libcst",
+     "kind": "dependency-group",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in a dependency group",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "mypy>=2.3.1",
+     "name": "mypy",
+     "kind": "dependency-group",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in a dependency group",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pep8-naming>=0.15.1",
+     "name": "pep8-naming",
+     "kind": "dependency-group",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in a dependency group",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest>=8.4.2",
+     "name": "pytest",
+     "kind": "dependency-group",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in a dependency group",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest-benchmark>=5.1.0",
+     "name": "pytest-benchmark",
+     "kind": "dependency-group",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in a dependency group",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "ruff>=0.13.3",
+     "name": "ruff",
+     "kind": "dependency-group",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in a dependency group",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "stdlibs>=2026.9.3",
+     "name": "stdlibs",
+     "kind": "dependency-group",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in a dependency group",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "tox>=4.30.3",
+     "name": "tox",
+     "kind": "dependency-group",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in a dependency group",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "tox-uv>=1.28.0",
+     "name": "tox-uv",
+     "kind": "dependency-group",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in a dependency group",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "types-colorama>=0.4.2",
+     "name": "types-colorama",
+     "kind": "dependency-group",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in a dependency group",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "uv>=0.13.4",
+     "name": "uv",
+     "kind": "dependency-group",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in a dependency group",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "myst-parser>=4.0.1",
+     "name": "myst-parser",
+     "kind": "dependency-group",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in a dependency group",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "sphinx>=7.4.7",
+     "name": "sphinx",
+     "kind": "dependency-group",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in a dependency group",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "sphinx-immaterial>=0.13.9",
+     "name": "sphinx-immaterial",
+     "kind": "dependency-group",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in a dependency group",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    }
+   ],
+   "scope_blocked": "",
+   "component": null,
+   "aggregate_names": [],
+   "extra_reqs": [
+    "bandit>=1.8.6",
+    "black>=25.9.0",
+    "colorama>=0.4.6",
+    "coverage[toml]>=7.10.7",
+    "example-isort-sorting-plugin>=0.1.0",
+    "example-shared-isort-profile>=0.1.0",
+    "flake8>=7.3.0",
+    "flake8-bugbear>=24.12.12",
+    "flake8-pyproject>=1.2.3",
+    "hatch>=1.14.0",
+    "hypothesis>=6.140.3",
+    "hypothesmith>=0.3.3",
+    "libcst>=1.9.0",
+    "mypy>=2.3.1",
+    "pep8-naming>=0.15.1",
+    "pytest>=8.4.2",
+    "pytest-benchmark>=5.1.0",
+    "ruff>=0.13.3",
+    "stdlibs>=2026.9.3",
+    "tox>=4.30.3",
+    "tox-uv>=1.28.0",
+    "types-colorama>=0.4.2",
+    "uv>=0.13.4",
+    "myst-parser>=4.0.1",
+    "sphinx>=7.4.7",
+    "sphinx-immaterial>=0.13.9"
+   ],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >=3.11.0, >=3.10.0",
+    "rule": "one Python version is used on both sides: the lowest version that meets the requirements of both main and the pull request; if none meets both, the check stops as a setup problem and records both",
+    "gate_failed": false
+   },
+   "system": [],
+   "refused": [],
+   "groups_blocked": ""
+  },
+  "steps": {
+   "setup_lookup": "Found 27 setup item(s) in the project's files and the web lookup.",
+   "setup_python": "Python 3.12: Python 3.12 already meets >=3.11.0, >=3.10.0",
+   "install_deps": "Wrote requirements.txt and installed it on main and pr: bandit>=1.8.6, black>=25.9.0, colorama>=0.4.6, coverage[toml]>=7.10.7, example-isort-sorting-plugin>=0.1.0, example-shared-isort-profile>=0.1.0, flake8>=7.3.0, flake8-bugbear>=24.12.12, flake8-pyproject>=1.2.3, hatch>=1.14.0, hypothesis>=6.140.3, hypothesmith>=0.3.3. 1 more come with the project install."
+  },
+  "run_files": {
+   "requirements": "requirements.txt",
+   "plan": "setup-plan.json",
+   "count": 26
+  }
+ },
+ "chosen": {
+  "pr": 2682,
+  "head_sha": null,
+  "install": null,
+  "test_cmd": null
+ },
+ "sides": {
+  "comparison_basis": "base tip vs GitHub test merge (refs/pull/N/merge)",
+  "main_sha": "a514c71ed86c2216d0040c7d60e302ed76a4f7ab",
+  "pr_sha": "2c3615a7a78835f9087765d9d1d6d5dd3cb97d72",
+  "merge_commit": "2c3615a7a78835f9087765d9d1d6d5dd3cb97d72",
+  "merge_parents": [
+   "a514c71ed86c2216d0040c7d60e302ed76a4f7ab",
+   "147a248aede761238dcc903dcc56b74f72ae9091"
+  ],
+  "merge_head_matches_pinned_head": true
+ },
+ "tested": {
+  "main": "main @ a514c71ed86c (base tip = first parent of the merge commit)",
+  "pr": "GitHub test merge commit 2c3615a7a788 (refs/pull/2682/merge) of head 147a248aede7"
+ },
+ "probe_plan": {
+  "baseline": "full",
+  "model": "model provider: nebius (Token Factory, live)",
+  "errors": [],
+  "model_claims": [
+   {
+    "id": "C1",
+    "text": "Split directives are applied correctly to complete multiline imports.",
+    "source_quote": "Fix split directives on complete multiline imports",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C2",
+    "text": "A multiline import is treated as one statement before applying isort: split, including the float-to-top preprocessing pass.",
+    "source_quote": "Treat a multiline import as one statement before applying `isort: split`, including the float-to-top preprocessing pass.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C3",
+    "text": "A split-marked statement is preserved verbatim instead of having its continuation lines sorted into the preceding section.",
+    "source_quote": "Preserve a split-marked statement verbatim instead of sorting its continuation lines into the preceding section.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C4",
+    "text": "The implementation reuses the existing continuation reader and avoids reading import-like text inside strings.",
+    "source_quote": "Reuse the existing continuation reader, and avoid reading import-like text inside strings.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C5",
+    "text": "All 34 regressions for #2680 and #2681 pass after the PR.",
+    "source_quote": "All **34** regressions for #2680 and #2681 passed together",
+    "testable": true,
+    "expect": "differs"
+   }
+  ],
+  "model_rejected_claims": [],
+  "diff_targets": [
+   "isort.core.process",
+   "isort.parse.file_contents"
+  ],
+  "frozen": [
+   {
+    "path": "model-probes/model-p1.py",
+    "source": "model",
+    "sha256": "25cb5a9d138f7d41c5945c8cd84ca64db45e6d43ecb21d916caac9d485930019",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-10-23T09:55:20.921601+00:00",
+    "inputs_sha256": "941c4bd1e4ded391a7770417d94111d2cb52cda22e4932411daae0b084511c7b",
+    "inputs": {
+     "title_chars": 50,
+     "body_chars": 3003,
+     "base_files": {
+      "isort/core.py": "3cd563517b7e3f203589e87f037504fdac3cd9a8806a2c8cb40a1ec9dcdc04a2",
+      "isort/parse.py": "01a8f49b97229dc298a813c6ee907f10cecc9a08e551bbef64afae333fa44efb"
+     }
+    }
+   },
+   {
+    "path": "model-probes/model-p2.py",
+    "source": "model",
+    "sha256": "70c20fdf89cc82fdad2b63ed2958cce6950a01b486a58b0e32a4f13debd945c5",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-10-23T09:55:20.922604+00:00",
+    "inputs_sha256": "941c4bd1e4ded391a7770417d94111d2cb52cda22e4932411daae0b084511c7b",
+    "inputs": {
+     "title_chars": 50,
+     "body_chars": 3003,
+     "base_files": {
+      "isort/core.py": "3cd563517b7e3f203589e87f037504fdac3cd9a8806a2c8cb40a1ec9dcdc04a2",
+      "isort/parse.py": "01a8f49b97229dc298a813c6ee907f10cecc9a08e551bbef64afae333fa44efb"
+     }
+    }
+   },
+   {
+    "path": "model-probes/model-p3.py",
+    "source": "model",
+    "sha256": "e34ff6ce1abe4ccfe611a9b57a46362e5c0173abaeaac1c1dd3b6d1a52003e93",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-10-23T09:55:20.923026+00:00",
+    "inputs_sha256": "941c4bd1e4ded391a7770417d94111d2cb52cda22e4932411daae0b084511c7b",
+    "inputs": {
+     "title_chars": 50,
+     "body_chars": 3003,
+     "base_files": {
+      "isort/core.py": "3cd563517b7e3f203589e87f037504fdac3cd9a8806a2c8cb40a1ec9dcdc04a2",
+      "isort/parse.py": "01a8f49b97229dc298a813c6ee907f10cecc9a08e551bbef64afae333fa44efb"
+     }
+    }
+   },
+   {
+    "path": "model-probes/model-p4.py",
+    "source": "model",
+    "sha256": "56906973712ea788a72cdf5f0343a3f4bc2640453f57a8bfef418efd80ca703f",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-10-23T09:55:20.923425+00:00",
+    "inputs_sha256": "941c4bd1e4ded391a7770417d94111d2cb52cda22e4932411daae0b084511c7b",
+    "inputs": {
+     "title_chars": 50,
+     "body_chars": 3003,
+     "base_files": {
+      "isort/core.py": "3cd563517b7e3f203589e87f037504fdac3cd9a8806a2c8cb40a1ec9dcdc04a2",
+      "isort/parse.py": "01a8f49b97229dc298a813c6ee907f10cecc9a08e551bbef64afae333fa44efb"
+     }
+    }
+   },
+   {
+    "path": "diff-probes/diff-api.py",
+    "source": "diff",
+    "sha256": "55036d6957c1d2b927fdc9e19cf70aba8fe6b92c717be767880f3fd381d09dc3",
+    "generator": {
+     "kind": "diff",
+     "label": "diff (auto-derived from base-side code, model-free)",
+     "model": null,
+     "provider": null,
+     "provenance": "auto-derived",
+     "blind": false
+    },
+    "frozen_at": "2026-10-23T09:55:20.938927+00:00",
+    "inputs_sha256": "c73417b726c36eaeb473ac8ccb26d9da3a7e94800fafd44c575ba0ce123ec618",
+    "inputs": {
+     "title_chars": 0,
+     "body_chars": 0,
+     "base_files": {
+      "isort/core.py": "3cd563517b7e3f203589e87f037504fdac3cd9a8806a2c8cb40a1ec9dcdc04a2",
+      "isort/parse.py": "01a8f49b97229dc298a813c6ee907f10cecc9a08e551bbef64afae333fa44efb"
+     }
+    }
+   }
+  ]
+ },
+ "pr_side_started_at": "2026-10-23T09:55:20.939153+00:00",
+ "test_targets": {
+  "main": [
+   "tests/unit/test_regressions.py",
+   "tests/unit/test_parse.py"
+  ],
+  "pr": [
+   "tests/unit/test_regressions.py",
+   "tests/unit/test_parse.py"
+  ]
+ },
+ "contree_only": {
+  "note": "Contree mode: installs, tests and probes ran in Contree; nothing from the pull request ran locally",
+  "declared_test_deps": [],
+  "optional_backends": [],
+  "not_run_locally": [
+   "local freeze",
+   "installed-commit guard",
+   "probe coverage",
+   "optional-module retry"
+  ]
+ },
+ "coverage": {
+  "status": "measured",
+  "changed_lines_total": 44,
+  "changed_lines_covered": 43,
+  "files": [
+   {
+    "file": "isort/core.py",
+    "changed_lines_total": 40,
+    "changed_lines_covered": 39
+   },
+   {
+    "file": "isort/parse.py",
+    "changed_lines_total": 4,
+    "changed_lines_covered": 4
+   }
+  ],
+  "seconds": 10.3,
+  "exit": 1,
+  "log": "coverage-pytest.log",
+  "where": "contree"
+ },
+ "contree": {
+  "main_uuid": "4dcc476a-9747-46bf-b5a1-fe05092e0d5d",
+  "pr_uuid": "1289e203-6d98-41bc-8fec-43e3e88ed1d9",
+  "max_ops": 40,
+  "sdk": "0.3.6",
+  "base_image": "docker.io/library/python:3.12-slim-bookworm",
+  "python": {
+   "requires_python": [
+    ">=3.11.0"
+   ],
+   "requires_python_found": true,
+   "main": "3.12.15",
+   "pr": "3.12.15",
+   "problems": []
+  }
+ },
+ "comparison": {
+  "same": 156,
+  "same_skipped_both": 0,
+  "regressions": [],
+  "fixed": [],
+  "new_tests_passing": 17,
+  "new_tests_failing": [],
+  "new_tests_skipped": [],
+  "removed_tests": [],
+  "reparametrized": [],
+  "skipped_missing_dependency": [],
+  "flaky": [],
+  "pr_unstable": [],
+  "pr_unstable_noisy": [],
+  "environment": [],
+  "other_changes": [],
+  "preexisting_failures": [],
+  "load_failed_both": [],
+  "load_failed_pr": [],
+  "load_failed_main": [],
+  "executed": {
+   "main": 156,
+   "pr": 173
+  },
+  "messages": {}
+ },
+ "exit_check": {
+  "explained": true,
+  "problems": [],
+  "detail": "all runs exited 0"
+ },
+ "probes": {
+  "status": "ran",
+  "items": [
+   {
+    "id": "model-p1",
+    "source": "model",
+    "path": "model-probes/model-p1.py",
+    "sha256": "25cb5a9d138f7d41c5945c8cd84ca64db45e6d43ecb21d916caac9d485930019",
+    "target": "PyCQA/isort#2682",
+    "about": "Multiline import with split on opening line",
+    "claims": [
+     {
+      "id": "C1",
+      "source": "PR description",
+      "text": "Split directives are applied correctly to complete multiline imports.",
+      "covers": [
+       "P1.output",
+       "P1.changed"
+      ],
+      "expect": "differs"
+     },
+     {
+      "id": "C2",
+      "source": "PR description",
+      "text": "A multiline import is treated as one statement before applying isort: split, including the float-to-top preprocessing pass.",
+      "covers": [
+       "P1.output",
+       "P1.changed"
+      ],
+      "expect": "differs"
+     },
+     {
+      "id": "C3",
+      "source": "PR description",
+      "text": "A split-marked statement is preserved verbatim instead of having its continuation lines sorted into the preceding section.",
+      "covers": [
+       "P1.output",
+       "P1.changed"
+      ],
+      "expect": "differs"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 2.0,
+      "ok": false
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 1.9,
+      "ok": false
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 1.9,
+      "ok": false
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 1.6,
+      "ok": false
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 1.7,
+      "ok": false
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 1.7,
+      "ok": false
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-p1-main-1.jsonl",
+      "probe-model-p1-main-2.jsonl",
+      "probe-model-p1-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-p1-pr-1.jsonl",
+      "probe-model-p1-pr-2.jsonl",
+      "probe-model-p1-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 0
+       }
+      },
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 0
+       }
+      },
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 0
+       }
+      }
+     ],
+     "pr": [
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 0
+       }
+      },
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 0
+       }
+      },
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 0
+       }
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "probe.error",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "crash": "non-json output",
+       "exit_code": 0
+      },
+      "pr": {
+       "crash": "non-json output",
+       "exit_code": 0
+      },
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"probe.error\""
+       },
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"probe.error\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "25cb5a9d138f7d41c5945c8cd84ca64db45e6d43ecb21d916caac9d485930019",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-10-23T09:55:20.921601+00:00",
+     "inputs_sha256": "941c4bd1e4ded391a7770417d94111d2cb52cda22e4932411daae0b084511c7b",
+     "inputs": {
+      "title_chars": 50,
+      "body_chars": 3003,
+      "base_files": {
+       "isort/core.py": "3cd563517b7e3f203589e87f037504fdac3cd9a8806a2c8cb40a1ec9dcdc04a2",
+       "isort/parse.py": "01a8f49b97229dc298a813c6ee907f10cecc9a08e551bbef64afae333fa44efb"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-10-23T09:55:20.939153+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "not measured",
+     "why": "Contree-only check: probe coverage needs a local side",
+     "adequacy": "not_adequate",
+     "note": "the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate"
+    },
+    "status": "crashed",
+    "uninformative_reason": "the probe crashed or printed no parsed output on every main-side run"
+   },
+   {
+    "id": "model-p2",
+    "source": "model",
+    "path": "model-probes/model-p2.py",
+    "sha256": "70c20fdf89cc82fdad2b63ed2958cce6950a01b486a58b0e32a4f13debd945c5",
+    "target": "PyCQA/isort#2682",
+    "about": "Multiline import with split on inner line",
+    "claims": [
+     {
+      "id": "C1",
+      "source": "PR description",
+      "text": "Split directives are applied correctly to complete multiline imports.",
+      "covers": [
+       "P2.output",
+       "P2.changed"
+      ],
+      "expect": "differs"
+     },
+     {
+      "id": "C2",
+      "source": "PR description",
+      "text": "A multiline import is treated as one statement before applying isort: split, including the float-to-top preprocessing pass.",
+      "covers": [
+       "P2.output",
+       "P2.changed"
+      ],
+      "expect": "differs"
+     },
+     {
+      "id": "C3",
+      "source": "PR description",
+      "text": "A split-marked statement is preserved verbatim instead of having its continuation lines sorted into the preceding section.",
+      "covers": [
+       "P2.output",
+       "P2.changed"
+      ],
+      "expect": "differs"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 2.0,
+      "ok": false
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 1.7,
+      "ok": false
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 1.7,
+      "ok": false
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 1.7,
+      "ok": false
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 1.7,
+      "ok": false
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 1.7,
+      "ok": false
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-p2-main-1.jsonl",
+      "probe-model-p2-main-2.jsonl",
+      "probe-model-p2-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-p2-pr-1.jsonl",
+      "probe-model-p2-pr-2.jsonl",
+      "probe-model-p2-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 0
+       }
+      },
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 0
+       }
+      },
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 0
+       }
+      }
+     ],
+     "pr": [
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 0
+       }
+      },
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 0
+       }
+      },
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 0
+       }
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "probe.error",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "crash": "non-json output",
+       "exit_code": 0
+      },
+      "pr": {
+       "crash": "non-json output",
+       "exit_code": 0
+      },
+      "citations": {
+       "main": {
+        "file": "probe-model-p2-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"probe.error\""
+       },
+       "pr": {
+        "file": "probe-model-p2-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"probe.error\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "70c20fdf89cc82fdad2b63ed2958cce6950a01b486a58b0e32a4f13debd945c5",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-10-23T09:55:20.922604+00:00",
+     "inputs_sha256": "941c4bd1e4ded391a7770417d94111d2cb52cda22e4932411daae0b084511c7b",
+     "inputs": {
+      "title_chars": 50,
+      "body_chars": 3003,
+      "base_files": {
+       "isort/core.py": "3cd563517b7e3f203589e87f037504fdac3cd9a8806a2c8cb40a1ec9dcdc04a2",
+       "isort/parse.py": "01a8f49b97229dc298a813c6ee907f10cecc9a08e551bbef64afae333fa44efb"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-10-23T09:55:20.939153+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "not measured",
+     "why": "Contree-only check: probe coverage needs a local side",
+     "adequacy": "not_adequate",
+     "note": "the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate"
+    },
+    "status": "crashed",
+    "uninformative_reason": "the probe crashed or printed no parsed output on every main-side run"
+   },
+   {
+    "id": "model-p3",
+    "source": "model",
+    "path": "model-probes/model-p3.py",
+    "sha256": "e34ff6ce1abe4ccfe611a9b57a46362e5c0173abaeaac1c1dd3b6d1a52003e93",
+    "target": "PyCQA/isort#2682",
+    "about": "Multiline import with split on closing line",
+    "claims": [
+     {
+      "id": "C1",
+      "source": "PR description",
+      "text": "Split directives are applied correctly to complete multiline imports.",
+      "covers": [
+       "P3.output",
+       "P3.changed"
+      ],
+      "expect": "differs"
+     },
+     {
+      "id": "C2",
+      "source": "PR description",
+      "text": "A multiline import is treated as one statement before applying isort: split, including the float-to-top preprocessing pass.",
+      "covers": [
+       "P3.output",
+       "P3.changed"
+      ],
+      "expect": "differs"
+     },
+     {
+      "id": "C3",
+      "source": "PR description",
+      "text": "A split-marked statement is preserved verbatim instead of having its continuation lines sorted into the preceding section.",
+      "covers": [
+       "P3.output",
+       "P3.changed"
+      ],
+      "expect": "differs"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 1.9,
+      "ok": false
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 1.6,
+      "ok": false
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 1.7,
+      "ok": false
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 1.6,
+      "ok": false
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 1.7,
+      "ok": false
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 1.6,
+      "ok": false
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-p3-main-1.jsonl",
+      "probe-model-p3-main-2.jsonl",
+      "probe-model-p3-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-p3-pr-1.jsonl",
+      "probe-model-p3-pr-2.jsonl",
+      "probe-model-p3-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 0
+       }
+      },
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 0
+       }
+      },
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 0
+       }
+      }
+     ],
+     "pr": [
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 0
+       }
+      },
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 0
+       }
+      },
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 0
+       }
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "probe.error",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "crash": "non-json output",
+       "exit_code": 0
+      },
+      "pr": {
+       "crash": "non-json output",
+       "exit_code": 0
+      },
+      "citations": {
+       "main": {
+        "file": "probe-model-p3-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"probe.error\""
+       },
+       "pr": {
+        "file": "probe-model-p3-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"probe.error\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "e34ff6ce1abe4ccfe611a9b57a46362e5c0173abaeaac1c1dd3b6d1a52003e93",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-10-23T09:55:20.923026+00:00",
+     "inputs_sha256": "941c4bd1e4ded391a7770417d94111d2cb52cda22e4932411daae0b084511c7b",
+     "inputs": {
+      "title_chars": 50,
+      "body_chars": 3003,
+      "base_files": {
+       "isort/core.py": "3cd563517b7e3f203589e87f037504fdac3cd9a8806a2c8cb40a1ec9dcdc04a2",
+       "isort/parse.py": "01a8f49b97229dc298a813c6ee907f10cecc9a08e551bbef64afae333fa44efb"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-10-23T09:55:20.939153+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "not measured",
+     "why": "Contree-only check: probe coverage needs a local side",
+     "adequacy": "not_adequate",
+     "note": "the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate"
+    },
+    "status": "crashed",
+    "uninformative_reason": "the probe crashed or printed no parsed output on every main-side run"
+   },
+   {
+    "id": "model-p4",
+    "source": "model",
+    "path": "model-probes/model-p4.py",
+    "sha256": "56906973712ea788a72cdf5f0343a3f4bc2640453f57a8bfef418efd80ca703f",
+    "target": "PyCQA/isort#2682",
+    "about": "Backslash continuation with split directive",
+    "claims": [
+     {
+      "id": "C1",
+      "source": "PR description",
+      "text": "Split directives are applied correctly to complete multiline imports.",
+      "covers": [
+       "P4.output",
+       "P4.changed"
+      ],
+      "expect": "differs"
+     },
+     {
+      "id": "C2",
+      "source": "PR description",
+      "text": "A multiline import is treated as one statement before applying isort: split, including the float-to-top preprocessing pass.",
+      "covers": [
+       "P4.output",
+       "P4.changed"
+      ],
+      "expect": "differs"
+     },
+     {
+      "id": "C3",
+      "source": "PR description",
+      "text": "A split-marked statement is preserved verbatim instead of having its continuation lines sorted into the preceding section.",
+      "covers": [
+       "P4.output",
+       "P4.changed"
+      ],
+      "expect": "differs"
+     },
+     {
+      "id": "C4",
+      "source": "PR description",
+      "text": "The implementation reuses the existing continuation reader and avoids reading import-like text inside strings.",
+      "covers": [
+       "P4.output",
+       "P4.changed"
+      ],
+      "expect": "differs"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 1.9,
+      "ok": false
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 1.6,
+      "ok": false
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 1.7,
+      "ok": false
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 1.7,
+      "ok": false
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 1.6,
+      "ok": false
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 1.7,
+      "ok": false
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-p4-main-1.jsonl",
+      "probe-model-p4-main-2.jsonl",
+      "probe-model-p4-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-p4-pr-1.jsonl",
+      "probe-model-p4-pr-2.jsonl",
+      "probe-model-p4-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 0
+       }
+      },
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 0
+       }
+      },
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 0
+       }
+      }
+     ],
+     "pr": [
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 0
+       }
+      },
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 0
+       }
+      },
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 0
+       }
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "probe.error",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "crash": "non-json output",
+       "exit_code": 0
+      },
+      "pr": {
+       "crash": "non-json output",
+       "exit_code": 0
+      },
+      "citations": {
+       "main": {
+        "file": "probe-model-p4-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"probe.error\""
+       },
+       "pr": {
+        "file": "probe-model-p4-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"probe.error\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "56906973712ea788a72cdf5f0343a3f4bc2640453f57a8bfef418efd80ca703f",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-10-23T09:55:20.923425+00:00",
+     "inputs_sha256": "941c4bd1e4ded391a7770417d94111d2cb52cda22e4932411daae0b084511c7b",
+     "inputs": {
+      "title_chars": 50,
+      "body_chars": 3003,
+      "base_files": {
+       "isort/core.py": "3cd563517b7e3f203589e87f037504fdac3cd9a8806a2c8cb40a1ec9dcdc04a2",
+       "isort/parse.py": "01a8f49b97229dc298a813c6ee907f10cecc9a08e551bbef64afae333fa44efb"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-10-23T09:55:20.939153+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "not measured",
+     "why": "Contree-only check: probe coverage needs a local side",
+     "adequacy": "not_adequate",
+     "note": "the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate"
+    },
+    "status": "crashed",
+    "uninformative_reason": "the probe crashed or printed no parsed output on every main-side run"
+   },
+   {
+    "id": "diff-api",
+    "source": "diff",
+    "path": "diff-probes/diff-api.py",
+    "sha256": "55036d6957c1d2b927fdc9e19cf70aba8fe6b92c717be767880f3fd381d09dc3",
+    "target": "PyCQA/isort#2682",
+    "about": "Public functions touched by the PR, called with type-appropriate inputs on both sides.",
+    "claims": [],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 2.0,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 1.7,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 1.7,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 1.8,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 1.7,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 1.7,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-diff-api-main-1.jsonl",
+      "probe-diff-api-main-2.jsonl",
+      "probe-diff-api-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-diff-api-pr-1.jsonl",
+      "probe-diff-api-pr-2.jsonl",
+      "probe-diff-api-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "isort.core.process.input0": {
+        "raises": "TypeError"
+       },
+       "isort.core.process.input1": {
+        "raises": "TypeError"
+       },
+       "isort.core.process.input10": false,
+       "isort.core.process.input11": false,
+       "isort.core.process.input2": {
+        "raises": "TypeError"
+       },
+       "isort.core.process.input3": {
+        "raises": "TypeError"
+       },
+       "isort.core.process.input4": {
+        "raises": "AttributeError"
+       },
+       "isort.core.process.input5": {
+        "raises": "AttributeError"
+       },
+       "isort.core.process.input6": {
+        "raises": "TypeError"
+       },
+       "isort.core.process.input7": {
+        "raises": "TypeError"
+       },
+       "isort.core.process.input8": {
+        "raises": "TypeError"
+       },
+       "isort.core.process.input9": false,
+       "isort.parse.file_contents.input0": {
+        "raises": "TypeError"
+       },
+       "isort.parse.file_contents.input1": {
+        "raises": "TypeError"
+       },
+       "isort.parse.file_contents.input10": {
+        "raises": "AttributeError"
+       },
+       "isort.parse.file_contents.input11": {
+        "raises": "AttributeError"
+       },
+       "isort.parse.file_contents.input2": {
+        "raises": "TypeError"
+       },
+       "isort.parse.file_contents.input3": {
+        "raises": "TypeError"
+       },
+       "isort.parse.file_contents.input4": [
+        [
+         "abc"
+        ],
+        [
+         "abc"
+        ],
+        -1,
+        {},
+        {},
+        {
+         "from": {},
+         "straight": {}
+        },
+        {
+         "FIRSTPARTY": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "FUTURE": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "LOCALFOLDER": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "STDLIB": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "THIRDPARTY": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         }
+        },
+        {
+         "above": {
+          "from": {},
+          "straight": {}
+         },
+         "from": {},
+         "nested": {},
+         "straight": {}
+        },
+        0,
+        1,
+        "\n",
+        [
+         "FUTURE",
+         "STDLIB",
+         "THIRDPARTY",
+         "FIRSTPARTY",
+         "LOCALFOLDER"
+        ],
+        [],
+        {
+         "repr": "set()",
+         "type": "set"
+        }
+       ],
+       "isort.parse.file_contents.input5": {
+        "raises": "AttributeError"
+       },
+       "isort.parse.file_contents.input6": {
+        "raises": "AttributeError"
+       },
+       "isort.parse.file_contents.input7": {
+        "raises": "TypeError"
+       },
+       "isort.parse.file_contents.input8": {
+        "raises": "TypeError"
+       },
+       "isort.parse.file_contents.input9": [
+        [],
+        [],
+        -1,
+        {},
+        {},
+        {
+         "from": {},
+         "straight": {}
+        },
+        {
+         "FIRSTPARTY": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "FUTURE": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "LOCALFOLDER": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "STDLIB": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "THIRDPARTY": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         }
+        },
+        {
+         "above": {
+          "from": {},
+          "straight": {}
+         },
+         "from": {},
+         "nested": {},
+         "straight": {}
+        },
+        0,
+        0,
+        "\n",
+        [
+         "FUTURE",
+         "STDLIB",
+         "THIRDPARTY",
+         "FIRSTPARTY",
+         "LOCALFOLDER"
+        ],
+        [],
+        {
+         "repr": "set()",
+         "type": "set"
+        }
+       ]
+      },
+      {
+       "isort.core.process.input0": {
+        "raises": "TypeError"
+       },
+       "isort.core.process.input1": {
+        "raises": "TypeError"
+       },
+       "isort.core.process.input10": false,
+       "isort.core.process.input11": false,
+       "isort.core.process.input2": {
+        "raises": "TypeError"
+       },
+       "isort.core.process.input3": {
+        "raises": "TypeError"
+       },
+       "isort.core.process.input4": {
+        "raises": "AttributeError"
+       },
+       "isort.core.process.input5": {
+        "raises": "AttributeError"
+       },
+       "isort.core.process.input6": {
+        "raises": "TypeError"
+       },
+       "isort.core.process.input7": {
+        "raises": "TypeError"
+       },
+       "isort.core.process.input8": {
+        "raises": "TypeError"
+       },
+       "isort.core.process.input9": false,
+       "isort.parse.file_contents.input0": {
+        "raises": "TypeError"
+       },
+       "isort.parse.file_contents.input1": {
+        "raises": "TypeError"
+       },
+       "isort.parse.file_contents.input10": {
+        "raises": "AttributeError"
+       },
+       "isort.parse.file_contents.input11": {
+        "raises": "AttributeError"
+       },
+       "isort.parse.file_contents.input2": {
+        "raises": "TypeError"
+       },
+       "isort.parse.file_contents.input3": {
+        "raises": "TypeError"
+       },
+       "isort.parse.file_contents.input4": [
+        [
+         "abc"
+        ],
+        [
+         "abc"
+        ],
+        -1,
+        {},
+        {},
+        {
+         "from": {},
+         "straight": {}
+        },
+        {
+         "FIRSTPARTY": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "FUTURE": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "LOCALFOLDER": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "STDLIB": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "THIRDPARTY": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         }
+        },
+        {
+         "above": {
+          "from": {},
+          "straight": {}
+         },
+         "from": {},
+         "nested": {},
+         "straight": {}
+        },
+        0,
+        1,
+        "\n",
+        [
+         "FUTURE",
+         "STDLIB",
+         "THIRDPARTY",
+         "FIRSTPARTY",
+         "LOCALFOLDER"
+        ],
+        [],
+        {
+         "repr": "set()",
+         "type": "set"
+        }
+       ],
+       "isort.parse.file_contents.input5": {
+        "raises": "AttributeError"
+       },
+       "isort.parse.file_contents.input6": {
+        "raises": "AttributeError"
+       },
+       "isort.parse.file_contents.input7": {
+        "raises": "TypeError"
+       },
+       "isort.parse.file_contents.input8": {
+        "raises": "TypeError"
+       },
+       "isort.parse.file_contents.input9": [
+        [],
+        [],
+        -1,
+        {},
+        {},
+        {
+         "from": {},
+         "straight": {}
+        },
+        {
+         "FIRSTPARTY": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "FUTURE": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "LOCALFOLDER": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "STDLIB": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "THIRDPARTY": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         }
+        },
+        {
+         "above": {
+          "from": {},
+          "straight": {}
+         },
+         "from": {},
+         "nested": {},
+         "straight": {}
+        },
+        0,
+        0,
+        "\n",
+        [
+         "FUTURE",
+         "STDLIB",
+         "THIRDPARTY",
+         "FIRSTPARTY",
+         "LOCALFOLDER"
+        ],
+        [],
+        {
+         "repr": "set()",
+         "type": "set"
+        }
+       ]
+      },
+      {
+       "isort.core.process.input0": {
+        "raises": "TypeError"
+       },
+       "isort.core.process.input1": {
+        "raises": "TypeError"
+       },
+       "isort.core.process.input10": false,
+       "isort.core.process.input11": false,
+       "isort.core.process.input2": {
+        "raises": "TypeError"
+       },
+       "isort.core.process.input3": {
+        "raises": "TypeError"
+       },
+       "isort.core.process.input4": {
+        "raises": "AttributeError"
+       },
+       "isort.core.process.input5": {
+        "raises": "AttributeError"
+       },
+       "isort.core.process.input6": {
+        "raises": "TypeError"
+       },
+       "isort.core.process.input7": {
+        "raises": "TypeError"
+       },
+       "isort.core.process.input8": {
+        "raises": "TypeError"
+       },
+       "isort.core.process.input9": false,
+       "isort.parse.file_contents.input0": {
+        "raises": "TypeError"
+       },
+       "isort.parse.file_contents.input1": {
+        "raises": "TypeError"
+       },
+       "isort.parse.file_contents.input10": {
+        "raises": "AttributeError"
+       },
+       "isort.parse.file_contents.input11": {
+        "raises": "AttributeError"
+       },
+       "isort.parse.file_contents.input2": {
+        "raises": "TypeError"
+       },
+       "isort.parse.file_contents.input3": {
+        "raises": "TypeError"
+       },
+       "isort.parse.file_contents.input4": [
+        [
+         "abc"
+        ],
+        [
+         "abc"
+        ],
+        -1,
+        {},
+        {},
+        {
+         "from": {},
+         "straight": {}
+        },
+        {
+         "FIRSTPARTY": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "FUTURE": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "LOCALFOLDER": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "STDLIB": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "THIRDPARTY": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         }
+        },
+        {
+         "above": {
+          "from": {},
+          "straight": {}
+         },
+         "from": {},
+         "nested": {},
+         "straight": {}
+        },
+        0,
+        1,
+        "\n",
+        [
+         "FUTURE",
+         "STDLIB",
+         "THIRDPARTY",
+         "FIRSTPARTY",
+         "LOCALFOLDER"
+        ],
+        [],
+        {
+         "repr": "set()",
+         "type": "set"
+        }
+       ],
+       "isort.parse.file_contents.input5": {
+        "raises": "AttributeError"
+       },
+       "isort.parse.file_contents.input6": {
+        "raises": "AttributeError"
+       },
+       "isort.parse.file_contents.input7": {
+        "raises": "TypeError"
+       },
+       "isort.parse.file_contents.input8": {
+        "raises": "TypeError"
+       },
+       "isort.parse.file_contents.input9": [
+        [],
+        [],
+        -1,
+        {},
+        {},
+        {
+         "from": {},
+         "straight": {}
+        },
+        {
+         "FIRSTPARTY": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "FUTURE": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "LOCALFOLDER": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "STDLIB": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "THIRDPARTY": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         }
+        },
+        {
+         "above": {
+          "from": {},
+          "straight": {}
+         },
+         "from": {},
+         "nested": {},
+         "straight": {}
+        },
+        0,
+        0,
+        "\n",
+        [
+         "FUTURE",
+         "STDLIB",
+         "THIRDPARTY",
+         "FIRSTPARTY",
+         "LOCALFOLDER"
+        ],
+        [],
+        {
+         "repr": "set()",
+         "type": "set"
+        }
+       ]
+      }
+     ],
+     "pr": [
+      {
+       "isort.core.process.input0": {
+        "raises": "TypeError"
+       },
+       "isort.core.process.input1": {
+        "raises": "TypeError"
+       },
+       "isort.core.process.input10": false,
+       "isort.core.process.input11": false,
+       "isort.core.process.input2": {
+        "raises": "TypeError"
+       },
+       "isort.core.process.input3": {
+        "raises": "TypeError"
+       },
+       "isort.core.process.input4": {
+        "raises": "AttributeError"
+       },
+       "isort.core.process.input5": {
+        "raises": "AttributeError"
+       },
+       "isort.core.process.input6": {
+        "raises": "TypeError"
+       },
+       "isort.core.process.input7": {
+        "raises": "TypeError"
+       },
+       "isort.core.process.input8": {
+        "raises": "TypeError"
+       },
+       "isort.core.process.input9": false,
+       "isort.parse.file_contents.input0": {
+        "raises": "TypeError"
+       },
+       "isort.parse.file_contents.input1": {
+        "raises": "TypeError"
+       },
+       "isort.parse.file_contents.input10": {
+        "raises": "AttributeError"
+       },
+       "isort.parse.file_contents.input11": {
+        "raises": "AttributeError"
+       },
+       "isort.parse.file_contents.input2": {
+        "raises": "TypeError"
+       },
+       "isort.parse.file_contents.input3": {
+        "raises": "TypeError"
+       },
+       "isort.parse.file_contents.input4": [
+        [
+         "abc"
+        ],
+        [
+         "abc"
+        ],
+        -1,
+        {},
+        {},
+        {
+         "from": {},
+         "straight": {}
+        },
+        {
+         "FIRSTPARTY": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "FUTURE": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "LOCALFOLDER": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "STDLIB": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "THIRDPARTY": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         }
+        },
+        {
+         "above": {
+          "from": {},
+          "straight": {}
+         },
+         "from": {},
+         "nested": {},
+         "straight": {}
+        },
+        0,
+        1,
+        "\n",
+        [
+         "FUTURE",
+         "STDLIB",
+         "THIRDPARTY",
+         "FIRSTPARTY",
+         "LOCALFOLDER"
+        ],
+        [],
+        {
+         "repr": "set()",
+         "type": "set"
+        }
+       ],
+       "isort.parse.file_contents.input5": {
+        "raises": "AttributeError"
+       },
+       "isort.parse.file_contents.input6": {
+        "raises": "AttributeError"
+       },
+       "isort.parse.file_contents.input7": {
+        "raises": "TypeError"
+       },
+       "isort.parse.file_contents.input8": {
+        "raises": "TypeError"
+       },
+       "isort.parse.file_contents.input9": [
+        [],
+        [],
+        -1,
+        {},
+        {},
+        {
+         "from": {},
+         "straight": {}
+        },
+        {
+         "FIRSTPARTY": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "FUTURE": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "LOCALFOLDER": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "STDLIB": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "THIRDPARTY": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         }
+        },
+        {
+         "above": {
+          "from": {},
+          "straight": {}
+         },
+         "from": {},
+         "nested": {},
+         "straight": {}
+        },
+        0,
+        0,
+        "\n",
+        [
+         "FUTURE",
+         "STDLIB",
+         "THIRDPARTY",
+         "FIRSTPARTY",
+         "LOCALFOLDER"
+        ],
+        [],
+        {
+         "repr": "set()",
+         "type": "set"
+        }
+       ]
+      },
+      {
+       "isort.core.process.input0": {
+        "raises": "TypeError"
+       },
+       "isort.core.process.input1": {
+        "raises": "TypeError"
+       },
+       "isort.core.process.input10": false,
+       "isort.core.process.input11": false,
+       "isort.core.process.input2": {
+        "raises": "TypeError"
+       },
+       "isort.core.process.input3": {
+        "raises": "TypeError"
+       },
+       "isort.core.process.input4": {
+        "raises": "AttributeError"
+       },
+       "isort.core.process.input5": {
+        "raises": "AttributeError"
+       },
+       "isort.core.process.input6": {
+        "raises": "TypeError"
+       },
+       "isort.core.process.input7": {
+        "raises": "TypeError"
+       },
+       "isort.core.process.input8": {
+        "raises": "TypeError"
+       },
+       "isort.core.process.input9": false,
+       "isort.parse.file_contents.input0": {
+        "raises": "TypeError"
+       },
+       "isort.parse.file_contents.input1": {
+        "raises": "TypeError"
+       },
+       "isort.parse.file_contents.input10": {
+        "raises": "AttributeError"
+       },
+       "isort.parse.file_contents.input11": {
+        "raises": "AttributeError"
+       },
+       "isort.parse.file_contents.input2": {
+        "raises": "TypeError"
+       },
+       "isort.parse.file_contents.input3": {
+        "raises": "TypeError"
+       },
+       "isort.parse.file_contents.input4": [
+        [
+         "abc"
+        ],
+        [
+         "abc"
+        ],
+        -1,
+        {},
+        {},
+        {
+         "from": {},
+         "straight": {}
+        },
+        {
+         "FIRSTPARTY": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "FUTURE": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "LOCALFOLDER": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "STDLIB": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "THIRDPARTY": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         }
+        },
+        {
+         "above": {
+          "from": {},
+          "straight": {}
+         },
+         "from": {},
+         "nested": {},
+         "straight": {}
+        },
+        0,
+        1,
+        "\n",
+        [
+         "FUTURE",
+         "STDLIB",
+         "THIRDPARTY",
+         "FIRSTPARTY",
+         "LOCALFOLDER"
+        ],
+        [],
+        {
+         "repr": "set()",
+         "type": "set"
+        }
+       ],
+       "isort.parse.file_contents.input5": {
+        "raises": "AttributeError"
+       },
+       "isort.parse.file_contents.input6": {
+        "raises": "AttributeError"
+       },
+       "isort.parse.file_contents.input7": {
+        "raises": "TypeError"
+       },
+       "isort.parse.file_contents.input8": {
+        "raises": "TypeError"
+       },
+       "isort.parse.file_contents.input9": [
+        [],
+        [],
+        -1,
+        {},
+        {},
+        {
+         "from": {},
+         "straight": {}
+        },
+        {
+         "FIRSTPARTY": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "FUTURE": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "LOCALFOLDER": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "STDLIB": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "THIRDPARTY": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         }
+        },
+        {
+         "above": {
+          "from": {},
+          "straight": {}
+         },
+         "from": {},
+         "nested": {},
+         "straight": {}
+        },
+        0,
+        0,
+        "\n",
+        [
+         "FUTURE",
+         "STDLIB",
+         "THIRDPARTY",
+         "FIRSTPARTY",
+         "LOCALFOLDER"
+        ],
+        [],
+        {
+         "repr": "set()",
+         "type": "set"
+        }
+       ]
+      },
+      {
+       "isort.core.process.input0": {
+        "raises": "TypeError"
+       },
+       "isort.core.process.input1": {
+        "raises": "TypeError"
+       },
+       "isort.core.process.input10": false,
+       "isort.core.process.input11": false,
+       "isort.core.process.input2": {
+        "raises": "TypeError"
+       },
+       "isort.core.process.input3": {
+        "raises": "TypeError"
+       },
+       "isort.core.process.input4": {
+        "raises": "AttributeError"
+       },
+       "isort.core.process.input5": {
+        "raises": "AttributeError"
+       },
+       "isort.core.process.input6": {
+        "raises": "TypeError"
+       },
+       "isort.core.process.input7": {
+        "raises": "TypeError"
+       },
+       "isort.core.process.input8": {
+        "raises": "TypeError"
+       },
+       "isort.core.process.input9": false,
+       "isort.parse.file_contents.input0": {
+        "raises": "TypeError"
+       },
+       "isort.parse.file_contents.input1": {
+        "raises": "TypeError"
+       },
+       "isort.parse.file_contents.input10": {
+        "raises": "AttributeError"
+       },
+       "isort.parse.file_contents.input11": {
+        "raises": "AttributeError"
+       },
+       "isort.parse.file_contents.input2": {
+        "raises": "TypeError"
+       },
+       "isort.parse.file_contents.input3": {
+        "raises": "TypeError"
+       },
+       "isort.parse.file_contents.input4": [
+        [
+         "abc"
+        ],
+        [
+         "abc"
+        ],
+        -1,
+        {},
+        {},
+        {
+         "from": {},
+         "straight": {}
+        },
+        {
+         "FIRSTPARTY": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "FUTURE": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "LOCALFOLDER": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "STDLIB": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "THIRDPARTY": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         }
+        },
+        {
+         "above": {
+          "from": {},
+          "straight": {}
+         },
+         "from": {},
+         "nested": {},
+         "straight": {}
+        },
+        0,
+        1,
+        "\n",
+        [
+         "FUTURE",
+         "STDLIB",
+         "THIRDPARTY",
+         "FIRSTPARTY",
+         "LOCALFOLDER"
+        ],
+        [],
+        {
+         "repr": "set()",
+         "type": "set"
+        }
+       ],
+       "isort.parse.file_contents.input5": {
+        "raises": "AttributeError"
+       },
+       "isort.parse.file_contents.input6": {
+        "raises": "AttributeError"
+       },
+       "isort.parse.file_contents.input7": {
+        "raises": "TypeError"
+       },
+       "isort.parse.file_contents.input8": {
+        "raises": "TypeError"
+       },
+       "isort.parse.file_contents.input9": [
+        [],
+        [],
+        -1,
+        {},
+        {},
+        {
+         "from": {},
+         "straight": {}
+        },
+        {
+         "FIRSTPARTY": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "FUTURE": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "LOCALFOLDER": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "STDLIB": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         },
+         "THIRDPARTY": {
+          "from": {},
+          "lazy_from": {},
+          "lazy_straight": {},
+          "straight": {}
+         }
+        },
+        {
+         "above": {
+          "from": {},
+          "straight": {}
+         },
+         "from": {},
+         "nested": {},
+         "straight": {}
+        },
+        0,
+        0,
+        "\n",
+        [
+         "FUTURE",
+         "STDLIB",
+         "THIRDPARTY",
+         "FIRSTPARTY",
+         "LOCALFOLDER"
+        ],
+        [],
+        {
+         "repr": "set()",
+         "type": "set"
+        }
+       ]
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "isort.core.process.input0",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"isort.core.process.input0\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"isort.core.process.input0\""
+       }
+      }
+     },
+     {
+      "name": "isort.core.process.input1",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"isort.core.process.input1\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"isort.core.process.input1\""
+       }
+      }
+     },
+     {
+      "name": "isort.core.process.input10",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": false,
+      "pr": false,
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"isort.core.process.input10\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"isort.core.process.input10\""
+       }
+      }
+     },
+     {
+      "name": "isort.core.process.input11",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": false,
+      "pr": false,
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"isort.core.process.input11\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"isort.core.process.input11\""
+       }
+      }
+     },
+     {
+      "name": "isort.core.process.input2",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"isort.core.process.input2\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"isort.core.process.input2\""
+       }
+      }
+     },
+     {
+      "name": "isort.core.process.input3",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"isort.core.process.input3\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"isort.core.process.input3\""
+       }
+      }
+     },
+     {
+      "name": "isort.core.process.input4",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 7,
+        "quote": "\"observation\": \"isort.core.process.input4\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 7,
+        "quote": "\"observation\": \"isort.core.process.input4\""
+       }
+      }
+     },
+     {
+      "name": "isort.core.process.input5",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 8,
+        "quote": "\"observation\": \"isort.core.process.input5\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 8,
+        "quote": "\"observation\": \"isort.core.process.input5\""
+       }
+      }
+     },
+     {
+      "name": "isort.core.process.input6",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 9,
+        "quote": "\"observation\": \"isort.core.process.input6\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 9,
+        "quote": "\"observation\": \"isort.core.process.input6\""
+       }
+      }
+     },
+     {
+      "name": "isort.core.process.input7",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 10,
+        "quote": "\"observation\": \"isort.core.process.input7\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 10,
+        "quote": "\"observation\": \"isort.core.process.input7\""
+       }
+      }
+     },
+     {
+      "name": "isort.core.process.input8",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 11,
+        "quote": "\"observation\": \"isort.core.process.input8\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 11,
+        "quote": "\"observation\": \"isort.core.process.input8\""
+       }
+      }
+     },
+     {
+      "name": "isort.core.process.input9",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": false,
+      "pr": false,
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 12,
+        "quote": "\"observation\": \"isort.core.process.input9\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 12,
+        "quote": "\"observation\": \"isort.core.process.input9\""
+       }
+      }
+     },
+     {
+      "name": "isort.parse.file_contents.input0",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 13,
+        "quote": "\"observation\": \"isort.parse.file_contents.input0\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 13,
+        "quote": "\"observation\": \"isort.parse.file_contents.input0\""
+       }
+      }
+     },
+     {
+      "name": "isort.parse.file_contents.input1",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 14,
+        "quote": "\"observation\": \"isort.parse.file_contents.input1\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 14,
+        "quote": "\"observation\": \"isort.parse.file_contents.input1\""
+       }
+      }
+     },
+     {
+      "name": "isort.parse.file_contents.input10",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 15,
+        "quote": "\"observation\": \"isort.parse.file_contents.input10\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 15,
+        "quote": "\"observation\": \"isort.parse.file_contents.input10\""
+       }
+      }
+     },
+     {
+      "name": "isort.parse.file_contents.input11",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 16,
+        "quote": "\"observation\": \"isort.parse.file_contents.input11\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 16,
+        "quote": "\"observation\": \"isort.parse.file_contents.input11\""
+       }
+      }
+     },
+     {
+      "name": "isort.parse.file_contents.input2",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 17,
+        "quote": "\"observation\": \"isort.parse.file_contents.input2\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 17,
+        "quote": "\"observation\": \"isort.parse.file_contents.input2\""
+       }
+      }
+     },
+     {
+      "name": "isort.parse.file_contents.input3",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 18,
+        "quote": "\"observation\": \"isort.parse.file_contents.input3\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 18,
+        "quote": "\"observation\": \"isort.parse.file_contents.input3\""
+       }
+      }
+     },
+     {
+      "name": "isort.parse.file_contents.input4",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": [
+       [
+        "abc"
+       ],
+       [
+        "abc"
+       ],
+       -1,
+       {},
+       {},
+       {
+        "from": {},
+        "straight": {}
+       },
+       {
+        "FIRSTPARTY": {
+         "from": {},
+         "lazy_from": {},
+         "lazy_straight": {},
+         "straight": {}
+        },
+        "FUTURE": {
+         "from": {},
+         "lazy_from": {},
+         "lazy_straight": {},
+         "straight": {}
+        },
+        "LOCALFOLDER": {
+         "from": {},
+         "lazy_from": {},
+         "lazy_straight": {},
+         "straight": {}
+        },
+        "STDLIB": {
+         "from": {},
+         "lazy_from": {},
+         "lazy_straight": {},
+         "straight": {}
+        },
+        "THIRDPARTY": {
+         "from": {},
+         "lazy_from": {},
+         "lazy_straight": {},
+         "straight": {}
+        }
+       },
+       {
+        "above": {
+         "from": {},
+         "straight": {}
+        },
+        "from": {},
+        "nested": {},
+        "straight": {}
+       },
+       0,
+       1,
+       "\n",
+       [
+        "FUTURE",
+        "STDLIB",
+        "THIRDPARTY",
+        "FIRSTPARTY",
+        "LOCALFOLDER"
+       ],
+       [],
+       {
+        "repr": "set()",
+        "type": "set"
+       }
+      ],
+      "pr": [
+       [
+        "abc"
+       ],
+       [
+        "abc"
+       ],
+       -1,
+       {},
+       {},
+       {
+        "from": {},
+        "straight": {}
+       },
+       {
+        "FIRSTPARTY": {
+         "from": {},
+         "lazy_from": {},
+         "lazy_straight": {},
+         "straight": {}
+        },
+        "FUTURE": {
+         "from": {},
+         "lazy_from": {},
+         "lazy_straight": {},
+         "straight": {}
+        },
+        "LOCALFOLDER": {
+         "from": {},
+         "lazy_from": {},
+         "lazy_straight": {},
+         "straight": {}
+        },
+        "STDLIB": {
+         "from": {},
+         "lazy_from": {},
+         "lazy_straight": {},
+         "straight": {}
+        },
+        "THIRDPARTY": {
+         "from": {},
+         "lazy_from": {},
+         "lazy_straight": {},
+         "straight": {}
+        }
+       },
+       {
+        "above": {
+         "from": {},
+         "straight": {}
+        },
+        "from": {},
+        "nested": {},
+        "straight": {}
+       },
+       0,
+       1,
+       "\n",
+       [
+        "FUTURE",
+        "STDLIB",
+        "THIRDPARTY",
+        "FIRSTPARTY",
+        "LOCALFOLDER"
+       ],
+       [],
+       {
+        "repr": "set()",
+        "type": "set"
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 19,
+        "quote": "\"observation\": \"isort.parse.file_contents.input4\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 19,
+        "quote": "\"observation\": \"isort.parse.file_contents.input4\""
+       }
+      }
+     },
+     {
+      "name": "isort.parse.file_contents.input5",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 20,
+        "quote": "\"observation\": \"isort.parse.file_contents.input5\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 20,
+        "quote": "\"observation\": \"isort.parse.file_contents.input5\""
+       }
+      }
+     },
+     {
+      "name": "isort.parse.file_contents.input6",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 21,
+        "quote": "\"observation\": \"isort.parse.file_contents.input6\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 21,
+        "quote": "\"observation\": \"isort.parse.file_contents.input6\""
+       }
+      }
+     },
+     {
+      "name": "isort.parse.file_contents.input7",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 22,
+        "quote": "\"observation\": \"isort.parse.file_contents.input7\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 22,
+        "quote": "\"observation\": \"isort.parse.file_contents.input7\""
+       }
+      }
+     },
+     {
+      "name": "isort.parse.file_contents.input8",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 23,
+        "quote": "\"observation\": \"isort.parse.file_contents.input8\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 23,
+        "quote": "\"observation\": \"isort.parse.file_contents.input8\""
+       }
+      }
+     },
+     {
+      "name": "isort.parse.file_contents.input9",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": [
+       [],
+       [],
+       -1,
+       {},
+       {},
+       {
+        "from": {},
+        "straight": {}
+       },
+       {
+        "FIRSTPARTY": {
+         "from": {},
+         "lazy_from": {},
+         "lazy_straight": {},
+         "straight": {}
+        },
+        "FUTURE": {
+         "from": {},
+         "lazy_from": {},
+         "lazy_straight": {},
+         "straight": {}
+        },
+        "LOCALFOLDER": {
+         "from": {},
+         "lazy_from": {},
+         "lazy_straight": {},
+         "straight": {}
+        },
+        "STDLIB": {
+         "from": {},
+         "lazy_from": {},
+         "lazy_straight": {},
+         "straight": {}
+        },
+        "THIRDPARTY": {
+         "from": {},
+         "lazy_from": {},
+         "lazy_straight": {},
+         "straight": {}
+        }
+       },
+       {
+        "above": {
+         "from": {},
+         "straight": {}
+        },
+        "from": {},
+        "nested": {},
+        "straight": {}
+       },
+       0,
+       0,
+       "\n",
+       [
+        "FUTURE",
+        "STDLIB",
+        "THIRDPARTY",
+        "FIRSTPARTY",
+        "LOCALFOLDER"
+       ],
+       [],
+       {
+        "repr": "set()",
+        "type": "set"
+       }
+      ],
+      "pr": [
+       [],
+       [],
+       -1,
+       {},
+       {},
+       {
+        "from": {},
+        "straight": {}
+       },
+       {
+        "FIRSTPARTY": {
+         "from": {},
+         "lazy_from": {},
+         "lazy_straight": {},
+         "straight": {}
+        },
+        "FUTURE": {
+         "from": {},
+         "lazy_from": {},
+         "lazy_straight": {},
+         "straight": {}
+        },
+        "LOCALFOLDER": {
+         "from": {},
+         "lazy_from": {},
+         "lazy_straight": {},
+         "straight": {}
+        },
+        "STDLIB": {
+         "from": {},
+         "lazy_from": {},
+         "lazy_straight": {},
+         "straight": {}
+        },
+        "THIRDPARTY": {
+         "from": {},
+         "lazy_from": {},
+         "lazy_straight": {},
+         "straight": {}
+        }
+       },
+       {
+        "above": {
+         "from": {},
+         "straight": {}
+        },
+        "from": {},
+        "nested": {},
+        "straight": {}
+       },
+       0,
+       0,
+       "\n",
+       [
+        "FUTURE",
+        "STDLIB",
+        "THIRDPARTY",
+        "FIRSTPARTY",
+        "LOCALFOLDER"
+       ],
+       [],
+       {
+        "repr": "set()",
+        "type": "set"
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 24,
+        "quote": "\"observation\": \"isort.parse.file_contents.input9\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 24,
+        "quote": "\"observation\": \"isort.parse.file_contents.input9\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "diff",
+     "label": "diff (auto-derived from base-side code, model-free)",
+     "model": null,
+     "provider": null,
+     "provenance": "auto-derived",
+     "blind": false
+    },
+    "freeze": {
+     "sha256": "55036d6957c1d2b927fdc9e19cf70aba8fe6b92c717be767880f3fd381d09dc3",
+     "generator": {
+      "kind": "diff",
+      "label": "diff (auto-derived from base-side code, model-free)",
+      "model": null,
+      "provider": null,
+      "provenance": "auto-derived",
+      "blind": false
+     },
+     "frozen_at": "2026-10-23T09:55:20.938927+00:00",
+     "inputs_sha256": "c73417b726c36eaeb473ac8ccb26d9da3a7e94800fafd44c575ba0ce123ec618",
+     "inputs": {
+      "title_chars": 0,
+      "body_chars": 0,
+      "base_files": {
+       "isort/core.py": "3cd563517b7e3f203589e87f037504fdac3cd9a8806a2c8cb40a1ec9dcdc04a2",
+       "isort/parse.py": "01a8f49b97229dc298a813c6ee907f10cecc9a08e551bbef64afae333fa44efb"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-10-23T09:55:20.939153+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "not measured",
+     "why": "Contree-only check: probe coverage needs a local side",
+     "adequacy": "unmeasured",
+     "note": "probe coverage not measured (Contree-only check: probe coverage needs a local side)"
+    },
+    "status": "ran"
+   }
+  ],
+  "summary": {
+   "labels": [
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference"
+   ],
+   "flagged": [],
+   "proven_claims": [],
+   "reason": "probe: 24 other observation(s) identical on both sides; the probe crashed or printed no parsed output on every main-side run; the probe crashed or printed no parsed output on every main-side run; the probe crashed or printed no parsed output on every main-side run; the probe crashed or printed no parsed output on every main-side run",
+   "ignored_noise": [],
+   "ignored_warning_only": [],
+   "pr_only_noisy": []
+  },
+  "test_settings": {
+   "applied": true,
+   "read_from": "main checkout (same values on both sides)",
+   "source": [
+    "pyproject.toml"
+   ],
+   "variables": [],
+   "pythonpath": [],
+   "pr_changed": []
+  }
+ },
+ "probe_changed_line_coverage": {
+  "status": "not measured",
+  "side": "main",
+  "probes": {
+   "model-p1": {
+    "status": "not measured",
+    "changed_lines_covered": null,
+    "changed_lines_total": null,
+    "adequacy": "not_adequate"
+   },
+   "model-p2": {
+    "status": "not measured",
+    "changed_lines_covered": null,
+    "changed_lines_total": null,
+    "adequacy": "not_adequate"
+   },
+   "model-p3": {
+    "status": "not measured",
+    "changed_lines_covered": null,
+    "changed_lines_total": null,
+    "adequacy": "not_adequate"
+   },
+   "model-p4": {
+    "status": "not measured",
+    "changed_lines_covered": null,
+    "changed_lines_total": null,
+    "adequacy": "not_adequate"
+   },
+   "diff-api": {
+    "status": "not measured",
+    "changed_lines_covered": null,
+    "changed_lines_total": null,
+    "adequacy": "unmeasured"
+   }
+  },
+  "not_adequate": [
+   "model-p1",
+   "model-p2",
+   "model-p3",
+   "model-p4"
+  ]
+ },
+ "verdict": "could_not_verify",
+ "reason": "could not verify: claim(s) C1, C2, C3, C1 (+9 more) expect a difference but no observation matches (156 test(s) ran on main, 173 on the PR; 17 new test(s) pass, 156 unchanged; probe model-p1 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count; probe model-p2 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count; probe model-p3 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count; probe model-p4 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count)",
+ "verdict_before_coverage_gate": "could_not_verify",
+ "reason_before_coverage_gate": "could not verify: claim(s) C1, C2, C3, C1 (+9 more) expect a difference but no observation matches (156 test(s) ran on main, 173 on the PR; 17 new test(s) pass, 156 unchanged; probe model-p1 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count; probe model-p2 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count; probe model-p3 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count; probe model-p4 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count)",
+ "changed_lines_total": 44,
+ "changed_lines_covered": 43,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "normal",
+  "note": "43 of 44 changed executable line(s) ran (98%)",
+  "measurement": "measured"
+ },
+ "explanation": {
+  "status": "wired",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "text": "could not verify: claim(s) C1, C2, C3, C1 (+9 more) expect a difference but no observation matches",
+  "quotes": [
+   "could not verify: claim(s) C1, C2, C3, C1 (+9 more) expect a difference but no observation matches"
+  ],
+  "advisory": true
+ },
+ "agents": {
+  "status": "ran",
+  "advisory": true,
+  "note": "judge/helper/summary are advisory; code owns the verdict",
+  "roles": [
+   {
+    "role": "judge",
+    "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+    "status": "ok",
+    "note": null,
+    "labels": [
+     {
+      "id": "probe-model-p1",
+      "label": "proven",
+      "reason": "The multiline import with split on opening line is correctly handled by the parser."
+     },
+     {
+      "id": "probe-model-p2",
+      "label": "proven",
+      "reason": "The multiline import with split on inner line is correctly handled by the parser."
+     },
+     {
+      "id": "probe-model-p3",
+      "label": "proven",
+      "reason": "The multiline import with split on closing line is correctly handled by the parser."
+     },
+     {
+      "id": "probe-model-p4",
+      "label": "proven",
+      "reason": "The backslash continuation with split directive is correctly handled by the parser."
+     },
+     {
+      "id": "probe-diff-api",
+      "label": "proven",
+      "reason": "Public functions touched by the PR are called with type-appropriate inputs on both sides, confirming API compatibility."
+     }
+    ]
+   },
+   {
+    "role": "helper",
+    "model": "nvidia/Nemotron-3_5-Lightning",
+    "status": "ok",
+    "note": null,
+    "notes": [
+     "24 observations identical on both sides; no divergent noise to ignore.",
+     "Probe models p1-p4 produced no output on main side; verify test environment.",
+     "17 new tests pass; consider reviewing for inclusion.",
+     "156 tests unchanged; no regressions detected.",
+     "Claim verification failed due to missing observations; review probe configuration."
+    ]
+   },
+   {
+    "role": "summary",
+    "model": "nvidia/nemotron-3-super-120b-a12b",
+    "status": "ok",
+    "note": null
+   }
+  ],
+  "provider": {
+   "provider": "nebius",
+   "models": {
+    "claims": "nvidia/nemotron-3-super-120b-a12b",
+    "probes": "nvidia/nemotron-3-super-120b-a12b",
+    "judge": "nvidia/Nemotron-3-Ultra-550b-a55b",
+    "helper": "nvidia/Nemotron-3_5-Lightning",
+    "summary": "nvidia/nemotron-3-super-120b-a12b"
+   },
+   "blind": true
+  }
+ },
+ "swarm_requested": true,
+ "operator_approval_requested": false,
+ "swarm": "on",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [
+   "isort/core.py",
+   "isort/parse.py"
+  ],
+  "compiled_files": [],
+  "other_files": [
+   "tests/unit/test_regressions.py"
+  ]
+ },
+ "duration_s": {
+  "total_wall": 299.7,
+  "tests": 34.5
+ },
+ "cost": {
+  "ai_calls": 3,
+  "failed_ai_calls": 0,
+  "input_tokens": 23412,
+  "output_tokens": 16766,
+  "thinking_tokens": 14019,
+  "cost_usd": 0.022113,
+  "calls_without_usage": 0,
+  "ai_cost_usd": 0.022113,
+  "cost_complete": true,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 299.7,
+   "tests": 34.5
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.01998,
+  "total_cost_usd": 0.042093,
+  "swarm": {
+   "ai_calls": 3,
+   "failed_ai_calls": 0,
+   "input_tokens": 576,
+   "output_tokens": 519,
+   "thinking_tokens": 441,
+   "cost_usd": 0.00064,
+   "calls_without_usage": 2,
+   "ai_cost_usd": 0.00064,
+   "cost_complete": false,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ }
+}

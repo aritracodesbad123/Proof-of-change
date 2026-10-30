@@ -1,0 +1,306 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-urllib3-urllib3-2888-b9d9e2b8bf61-urllib3-2888",
+ "date_ist": "2026-10-23 20:47 IST",
+ "run_date": "2026-10-23",
+ "who": "ops/daily_run.py",
+ "repo": "urllib3/urllib3",
+ "library": "urllib3",
+ "pr": {
+  "repo": "urllib3/urllib3",
+  "number": 2888,
+  "url": "https://github.com/urllib3/urllib3/pull/2888",
+  "title": "Keep hostname's trailing dot",
+  "base_sha": "4e9060bfa03af9d6057423b3a54f67e0cd2e7892",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "b9d9e2b8bf615e88d498d1b56f86992ce05bcc98",
+  "merge_commit": null
+ },
+ "author": "zhanpon",
+ "base_ref": "main",
+ "updated_at_utc": "2023-11-24T04:08:47Z",
+ "updated_at_ist": "2023-11-24 09:38 IST",
+ "ci_state": "not checked (single-PR check)",
+ "ci_detail": "checked on request with --pr",
+ "tested_at_ist": "2026-10-23 20:47 IST",
+ "files": {
+  "all": [
+   "changelog/2873.bugfix.rst",
+   "src/urllib3/connection.py",
+   "test/with_dummyserver/test_socketlevel.py",
+   "test/with_dummyserver/test_trailing_dot.py"
+  ],
+  "package_py": [
+   "src/urllib3/connection.py"
+  ],
+  "compiled": [],
+  "other": [
+   "changelog/2873.bugfix.rst",
+   "test/with_dummyserver/test_socketlevel.py",
+   "test/with_dummyserver/test_trailing_dot.py"
+  ]
+ },
+ "machine_type": {
+  "arch": "arm64",
+  "os": "Darwin",
+  "platform": "macOS-15.5-arm64-arm-64bit-Mach-O",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": "Apple clang version 14.0.3 (clang-1403.0.22.14.1)",
+  "cpu_model": null,
+  "ram_gb": null
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 0,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.14",
+ "test_selection": "",
+ "per_run": [],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "contree",
+ "sandbox_backend_note": "contree (Token Factory Sandboxes, sdk 0.3.6)",
+ "machine": "contree (not run)",
+ "tool_setup": {
+  "installed": [],
+  "tries": 0,
+  "note": "All required tools were already installed.",
+  "refused": []
+ },
+ "posted_upstream": false,
+ "logs": "urllib3-2888/",
+ "freeze": {},
+ "poc_commit": "863751e9580b866fe64247737975cb2e04e97215",
+ "route": "source-pair",
+ "current_head_sha": "b9d9e2b8bf615e88d498d1b56f86992ce05bcc98",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "state": "open",
+ "mergeable": false,
+ "mergeable_state": "dirty",
+ "product_check": true,
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": {
+   "ok": false,
+   "skipped": false,
+   "live_call": true,
+   "cached": false,
+   "queries": [
+    "urllib3 python setup install instructions https://github.com/urllib3/urllib3 site:github.com/urllib3/urllib3",
+    "urllib3 python documentation install https://github.com/urllib3/urllib3 site:github.com/urllib3/urllib3",
+    "urllib3 python install requirements https://pypi.org/project/urllib3/ https://github.com/urllib3/urllib3 site:pypi.org"
+   ],
+   "results": [
+    {
+     "title": "GitHub - urllib3/urllib3: urllib3 is a user-friendly HTTP client library for Python \u00b7 GitHub",
+     "url": "https://github.com/urllib3/urllib3",
+     "query": "urllib3 python documentation install https://github.com/urllib3/urllib3 site:github.com/urllib3/urllib3"
+    },
+    {
+     "title": "GitHub - urllib3/urllib3 at zzun.app \u00b7 GitHub",
+     "url": "https://github.com/urllib3/urllib3?ref=zzun.app",
+     "query": "urllib3 python documentation install https://github.com/urllib3/urllib3 site:github.com/urllib3/urllib3"
+    },
+    {
+     "title": "urllib3/docs/user-guide.rst at main \u00b7 urllib3/urllib3 \u00b7 GitHub",
+     "url": "https://github.com/urllib3/urllib3/blob/main/docs/user-guide.rst",
+     "query": "urllib3 python documentation install https://github.com/urllib3/urllib3 site:github.com/urllib3/urllib3"
+    }
+   ],
+   "text": "To install urllib3, you can use pip with the command `$ python -m pip install urllib3`. Alternatively, you can download the latest source code from the GitHub repository at https://github.com/urllib3/urllib3. For usage and reference documentation, visit urllib3.readthedocs.io. The sources also mention that urllib3 can be installed with pip and provide the command for that. The GitHub repository contains various files including README.md, LICENSE.txt, and pyproject.toml.\nMuch of the Python ecosystem already uses urllib3 and you should too.\n\n## Installing\n\nurllib3 can be installed with pip:\n\n```\n$ python -m pip install urllib3\n```\n\nAlternatively, you can grab the latest source code from GitHub:\n\n```\ncd.\n```\n\n## Getting Started\n\nurllib3 is easy to use:\n\n```\n>>> import urllib3>>> resp = urllib3 request \"GET\"\" resp status 200>>> resp datab\"User-agent: \\nDisallow: /deny\\n\" \\n \\n\n```\n\nurllib3 has usage and reference documentation at urllib3.readthedocs.io. [...] ## Re\nMuch of the Python ecosystem already uses urllib3 and you should too.\n\n## Installing\n\nurllib3 can be installed with pip:\n\n```\n$ python -m pip install urllib3\n```\n\nAlternatively, you can grab the latest source code from GitHub:\n\n```\ncd.\n```\n\n## Getting Started\n\nurllib3 is easy to use:\n\n```\n>>> import urllib3>>> resp = urllib3 request \"GET\"\" resp status 200>>> resp datab\"User-agent: \\nDisallow: /deny\\n\" \\n \\n\n```\n\nurllib3 has usage and reference documentation at urllib3.readthedocs.io. [...] ## Re\nOutline\n\nEdit and raw actions\n\n# User Guide\n\n```\n.. currentmodule:: urllib3 \n```\n\n## Installing\n\nurllib3 can be installed with pip\n\n```\n$ python -m pip install urllib3\n```\n\n## Making Requests\n\nFirst things first, import the urllib3 module:\n\n```\nimport urllib3\n```\n\nYou'll need a :class:`~poolmanager.PoolManager` instance to make requests. This object handles all of the details of connection pooling and thread safety so that you don't have to:\n\n```\nhttp = urllib3 PoolManager\n``` [...] Unless other",
+   "errors": [
+    "URLError: <urlopen error _ssl.c:1015: The handshake operation timed out>"
+   ],
+   "lines": [
+    "Looked up with Tavily: 3 results",
+    "Query: urllib3 python setup install instructions https://github.com/urllib3/urllib3 site:github.com/urllib3/urllib3",
+    "Query: urllib3 python documentation install https://github.com/urllib3/urllib3 site:github.com/urllib3/urllib3",
+    "Query: urllib3 python install requirements https://pypi.org/project/urllib3/ https://github.com/urllib3/urllib3 site:pypi.org",
+    "Source: GitHub - urllib3/urllib3: urllib3 is a user-friendly HTTP client library for Python \u00b7 GitHub \u2014 https://github.com/urllib3/urllib3",
+    "Source: GitHub - urllib3/urllib3 at zzun.app \u00b7 GitHub \u2014 https://github.com/urllib3/urllib3?ref=zzun.app",
+    "Source: urllib3/docs/user-guide.rst at main \u00b7 urllib3/urllib3 \u00b7 GitHub \u2014 https://github.com/urllib3/urllib3/blob/main/docs/user-guide.rst"
+   ]
+  },
+  "notes": [
+   "Setup check: GitHub token: missing.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory could not be read.",
+   "Setup check: free disk 37.0 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: 3 results",
+   "Query: urllib3 python setup install instructions https://github.com/urllib3/urllib3 site:github.com/urllib3/urllib3",
+   "Query: urllib3 python documentation install https://github.com/urllib3/urllib3 site:github.com/urllib3/urllib3",
+   "Query: urllib3 python install requirements https://pypi.org/project/urllib3/ https://github.com/urllib3/urllib3 site:pypi.org",
+   "Source: GitHub - urllib3/urllib3: urllib3 is a user-friendly HTTP client library for Python \u00b7 GitHub \u2014 https://github.com/urllib3/urllib3",
+   "Source: GitHub - urllib3/urllib3 at zzun.app \u00b7 GitHub \u2014 https://github.com/urllib3/urllib3?ref=zzun.app",
+   "Source: urllib3/docs/user-guide.rst at main \u00b7 urllib3/urllib3 \u00b7 GitHub \u2014 https://github.com/urllib3/urllib3/blob/main/docs/user-guide.rst",
+   "rerun, setup problem: source checkout failed after 3 tries.",
+   "Demo helper: setup failure already labelled; the probe was not rerun."
+  ],
+  "setup": {
+   "label": "rerun, setup problem",
+   "counts_as_verdict": false,
+   "step": "source checkout",
+   "attempts": 3,
+   "detail": "git step failed (128): git -C <home>/Desktop/Proof-of-Change/proof-of-change/ops/runs/contree30/work/urllib3-2888/src fetch"
+  }
+ },
+ "chosen": {
+  "pr": 2888,
+  "head_sha": null,
+  "install": null,
+  "test_cmd": null
+ },
+ "sides": {
+  "why": "git step failed (128): git -C <home>/Desktop/Proof-of-Change/proof-of-change/ops/runs/contree30/work/urllib3-2888/src fetch"
+ },
+ "verdict": "could_not_verify",
+ "reason": "git step failed (128): git -C <home>/Desktop/Proof-of-Change/proof-of-change/ops/runs/contree30/work/urllib3-2888/src fetch",
+ "verdict_before_coverage_gate": "could_not_verify",
+ "reason_before_coverage_gate": "git step failed (128): git -C <home>/Desktop/Proof-of-Change/proof-of-change/ops/runs/contree30/work/urllib3-2888/src fetch",
+ "changed_lines_total": null,
+ "changed_lines_covered": null,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "lower",
+  "note": "coverage of the changed Python lines was NOT MEASURED (record predates the coverage gate: no coverage run exists for it, so this is not a measurement result)",
+  "measurement": "not measured: predates gate"
+ },
+ "explanation": {
+  "status": "wired",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "text": "The check titled \"Keep hostname's trailing dot\" could not be verified because the git step failed (128): git -C <home>/Desktop/Proof-of-Change/proof-of-change/ops/runs/contree30/work/urllib3-2888/src fetch.",
+  "quotes": [
+   "Keep hostname's trailing dot"
+  ],
+  "advisory": true
+ },
+ "agents": {
+  "status": "ran",
+  "advisory": true,
+  "note": "judge/helper/summary are advisory; code owns the verdict",
+  "roles": [
+   {
+    "role": "judge",
+    "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+    "status": "ok",
+    "note": null,
+    "labels": []
+   },
+   {
+    "role": "helper",
+    "model": "nvidia/Nemotron-3_5-Lightning",
+    "status": "ok",
+    "note": null,
+    "notes": [
+     "git fetch exit 128: verify remote URL and network access",
+     "Check repository permissions or submodule initialization status",
+     "Add retry logic or timeout for git fetch in CI pipelines",
+     "If intermittent, mark as expected noise in diff tracking",
+     "Ensure working directory has proper git configuration set"
+    ]
+   },
+   {
+    "role": "summary",
+    "model": "nvidia/nemotron-3-super-120b-a12b",
+    "status": "ok",
+    "note": null
+   }
+  ],
+  "provider": {
+   "provider": "nebius",
+   "models": {
+    "claims": "nvidia/nemotron-3-super-120b-a12b",
+    "probes": "nvidia/nemotron-3-super-120b-a12b",
+    "judge": "nvidia/Nemotron-3-Ultra-550b-a55b",
+    "helper": "nvidia/Nemotron-3_5-Lightning",
+    "summary": "nvidia/nemotron-3-super-120b-a12b"
+   },
+   "blind": true
+  }
+ },
+ "swarm_requested": true,
+ "operator_approval_requested": false,
+ "swarm": "on",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [
+   "src/urllib3/connection.py"
+  ],
+  "compiled_files": [],
+  "other_files": [
+   "changelog/2873.bugfix.rst",
+   "test/with_dummyserver/test_socketlevel.py",
+   "test/with_dummyserver/test_trailing_dot.py"
+  ]
+ },
+ "duration_s": {
+  "total_wall": 19817.5,
+  "tests": 0
+ },
+ "cost": {
+  "ai_calls": 0,
+  "failed_ai_calls": 0,
+  "input_tokens": 0,
+  "output_tokens": 0,
+  "thinking_tokens": 0,
+  "cost_usd": 0.0,
+  "calls_without_usage": 0,
+  "ai_cost_usd": 0.0,
+  "cost_complete": true,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 19817.5,
+   "tests": 0
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 1.321167,
+  "total_cost_usd": 1.321167,
+  "swarm": {
+   "ai_calls": 3,
+   "failed_ai_calls": 0,
+   "input_tokens": 153,
+   "output_tokens": 1061,
+   "thinking_tokens": 967,
+   "cost_usd": 0.001001,
+   "calls_without_usage": 2,
+   "ai_cost_usd": 0.001001,
+   "cost_complete": false,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ }
+}
