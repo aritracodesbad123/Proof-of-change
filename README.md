@@ -113,9 +113,25 @@ Do not paste an email address, a key, or any private information into the issue.
 
 The checker on the project machine takes one request at a time. It does not start between 10:40 and 12:30 IST. It stops after five checks per day unless that limit is changed on the machine. Each of those checks runs with the advisory swarm on. A study run and a benchmark run still leave that swarm off unless the run asks. The worker reads `TAVILY_API_KEY` from that machine. When the variable is missing or blank, the check does not start. The log is one line that names the variable. The key value is never printed. If a study run has the machine, your request stays in the queue. If the checker has not checked in recently, a short reply says it is offline and points back at the results page. The repository needs the labels `request-a-check`, `request-running`, and `request-done` (create them once under Issues → Labels). `request-running` is on the issue while a check is in progress.
 
-### Host it on a Nebius VM
+### Host the public demo on free Render
 
-To give judges a live console, run it on one small Nebius virtual machine (2 vCPU, 8 GiB, about $0.08 an hour).
+For tonight's submit, free Render is the quick way to a public demo URL. It avoids standing up a Nebius VM before the deadline. The Blueprint is the existing [`render.yaml`](render.yaml): service `poc-console`, Docker, plan free.
+
+Recommended minimum configuration:
+
+- Free plan, and a Docker web service from that Blueprint.
+- `NEBIUS_API_KEY` and `NEBIUS_PROJECT_ID`. Hosted checks need Contree. There is no local fallback.
+- `GITHUB_TOKEN` (read-only), so shared Render IPs do not hit GitHub's anonymous rate limit.
+
+Honest limits:
+
+- The free instance sleeps when idle. A cold start takes about a minute.
+- A heavy pull-request check may hit the free timeout. That is fine for a short demo, not a stress load.
+- Free memory is tight (about 512 MB). A check can restart mid-test when that memory runs out.
+
+### Host it on a Nebius VM (optional)
+
+A Nebius virtual machine is an optional stronger host: an always-on console with more memory than free Render (about 512 MB). Use one small machine (2 vCPU, 8 GiB, about $0.08 an hour). The submit can use the free Render demo above.
 One script installs it, puts HTTPS in front with a free certificate, opens only ports 443, 80 and SSH, and keeps
 the keys in a root-only settings file. Pull-request code still runs only in Contree. Plain-words steps:
 [deploy/nebius/README.md](deploy/nebius/README.md).
@@ -438,7 +454,7 @@ make console-build && make console-api
 # then open http://127.0.0.1:8787
 ```
 
-**Public website without paying Nebius Compute:** use **Render free** (Blueprint = [`render.yaml`](render.yaml)) or a local tunnel — details in [docs/OPERATIONS.md](docs/OPERATIONS.md) (Free public URL). Keep `NEBIUS_API_KEY` for models only.
+**Public demo on free Render:** [Host the public demo on free Render](#host-the-public-demo-on-free-render). Blueprint [`render.yaml`](render.yaml): service `poc-console`, Docker, plan free. Set `NEBIUS_API_KEY` and `NEBIUS_PROJECT_ID` (hosted checks need Contree; no local fallback) and a read-only `GITHUB_TOKEN`. A local tunnel is the other option in [docs/OPERATIONS.md](docs/OPERATIONS.md) (Free public URL).
 
 **Nebius Endpoint** (only if you have AI Cloud credits): `make docker-console` + `make nebius-console`. Local bind: `make console-host`.
 
