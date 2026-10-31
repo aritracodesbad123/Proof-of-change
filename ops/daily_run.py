@@ -4569,7 +4569,7 @@ def plan_probes(repo: str, item: dict, rec: dict, base_root: Path, pr_roots: lis
                 note["rewritten_imports"] = res["rewritten_imports"]
             # repair and retry trail, and inputs forced past an edited pattern's old boundary, shown on the record
             for k in ("parse_repairs", "retried", "unmatched_covers", "boundary_rule", "forced_boundary_inputs",
-                      "claims_filled"):
+                      "claims_filled", "claims_timeout_retry"):
                 if res.get(k):
                     note[f"model_{k}"] = res[k]
             plan += [{"path": x["path"], "source": "model", "freeze": x["freeze"],

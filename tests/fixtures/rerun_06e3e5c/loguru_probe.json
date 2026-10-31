@@ -1,0 +1,14 @@
+{
+  "probe": {
+    "id": "model-probe1",
+    "about": "Probe for counting bytes in rotation and newline handling",
+    "claims": []
+  },
+  "observation_names": [
+    "c1.ascii_count",
+    "c1.nonascii_count",
+    "c2.count.newline_None",
+    "c6.none_matches_os_linesep"
+  ],
+  "claim_ids": ["C1", "C2", "C3", "C4", "C5", "C6"]
+}
