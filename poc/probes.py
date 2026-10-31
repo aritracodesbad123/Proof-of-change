@@ -44,7 +44,10 @@ Judging (``judge``): each observation is compared over 3 alternating runs per si
 
 Any red or amber label (false_claim, unmentioned, needs_human) makes the PR verdict needs_attention, except two
 cases kept at could_not_verify: tests collected nothing on both sides, and a differs claim whose only probe used
-inputs where the old and new code agree because it never reached the change. Flaky
+inputs where the old and new code agree because it never reached the change. A differs claim whose covered
+observations all agree is advisory, and does not raise needs_attention, when another differs claim on the same
+record is already proven: the claim was not shown on these inputs, and a related change was proven. With no
+proven differs claim, that case still needs attention. Flaky
 observations are ignored as noise when the base side is unstable or both sides are. An observation that is stable
 on the base and unstable only on the pull request is not that noise: it needs attention, or could not verify when
 every pull-request run differs. Differences that are only about warnings never count on their own.
@@ -878,6 +881,34 @@ def _input_of(name: str) -> str | None:
     return name.rsplit(".", 1)[0] if "." in name else None
 
 
+def _agreeing_differs_when_proven(obs: list[dict]) -> list[dict]:
+    """Covered observations of a differs claim that all agree, once another differs claim is proven.
+
+    Each one is labelled needs_human with state "same" ("does not differ although the claim says it does").
+    They are advisory: the claim was not shown on these inputs, and a related change was proven. Returned in
+    observation order. A claim with any other covered observation (a difference, a contradiction, a flaky or
+    unstable result, or a probe that did not run) is not this case. Nothing is returned when no differs claim
+    is proven, or when the only proof is a claim that the result stays the same."""
+    proven = {o.get("claim") for o in obs
+              if o.get("claim") and o.get("label") == FindingLabel.PROVEN.value and o.get("state") == "differs"
+              and not o.get("advisory") and not o.get("pr_only")}
+    if not proven:
+        return []
+    groups: dict[str, list[dict]] = {}
+    for o in obs:
+        cid = o.get("claim")
+        if cid:
+            groups.setdefault(cid, []).append(o)
+    out = []
+    for cid, group in groups.items():
+        if cid in proven or not group:
+            continue
+        if all(o.get("state") == "same" and o.get("label") == FindingLabel.NEEDS_HUMAN.value
+               and not o.get("advisory") and not o.get("pr_only") for o in group):
+            out.extend(group)
+    return out
+
+
 def summarize(items: list[dict]) -> dict:
     """Findings over all probes of a PR: labels, red/amber observations, proven claims, reason text."""
     obs = [o | {"probe": it["id"]} for it in items for o in it["observations"]]
@@ -898,9 +929,13 @@ def summarize(items: list[dict]) -> dict:
            and o["label"] == FindingLabel.PROVEN.value and o.get("state") == "differs"}
     unchanged_sub = [o for o in raw_flagged if o["label"] == FindingLabel.NEEDS_HUMAN.value and o.get("state") == "same"
                      and not o.get("advisory") and (o.get("claim"), _input_of(o["name"])) in met]
+    # A whole differs claim that was not shown (every covered observation agrees) is advisory when some other
+    # differs claim on this record is already proven. It does not raise needs attention. A claim that is only
+    # partly shown, or a record with nothing proven, is unchanged.
+    unshown = _agreeing_differs_when_proven(obs)
     flagged = [o for o in raw_flagged
                if o["label"] != FindingLabel.FLAKY.value and o.get("pr_only") != "noisy" and not o.get("advisory")
-               and o not in unchanged_sub]
+               and o not in unchanged_sub and o not in unshown]
     warning_only = [o for o in flagged if is_warning_observation(o["name"])]
     if flagged and len(warning_only) == len(flagged):
         flagged = []
@@ -940,6 +975,11 @@ def summarize(items: list[dict]) -> dict:
     if unchanged_sub:
         bits.append(f"probe: {len(unchanged_sub)} unchanged sub-check(s) of an input where the claim's change was seen, shown as "
                     "advisory only: " + "; ".join(f"{o['name']} ({o['claim']})" for o in unchanged_sub[:4]))
+    if unshown:
+        more = f" (+{len(unshown) - 4} more)" if len(unshown) > 4 else ""
+        bits.append(f"probe: {len(unshown)} observation(s) shown as advisory only "
+                    "(claim not shown on these inputs; a related change was proven): "
+                    + "; ".join(f"{o['name']} ({o['claim']})" for o in unshown[:4]) + more)
     if proven:
         bits.append(f"probe: claim(s) {', '.join(proven)} proven")
     same = sum(1 for o in obs if o["label"] == FindingLabel.NO_DIFFERENCE.value)
@@ -953,7 +993,8 @@ def summarize(items: list[dict]) -> dict:
             "proven_claims": proven, "reason": "; ".join(bits),
             "ignored_noise": [o["name"] for o in noisy], "ignored_warning_only": [o["name"] for o in warning_only],
             "pr_only_noisy": [o["name"] for o in pr_only_noisy],
-            "advisory_unchanged_subchecks": [o["name"] for o in unchanged_sub]}
+            "advisory_unchanged_subchecks": [o["name"] for o in unchanged_sub],
+            "advisory_agreeing_differs": [o["name"] for o in unshown]}
 
 
 ONE_SIDE_NOTE = "the claim describes the old behaviour only (before the fix), check"

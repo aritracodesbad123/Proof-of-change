@@ -125,10 +125,16 @@ def test_41_separators():
 
 
 def test_41_relinked_claim_must_still_hold():
-    """Linking only says which claim an observation belongs to: an unmet claim still needs attention."""
+    """Linking only says which claim an observation belongs to. It does not prove the claim.
+
+    C4's covered observations all agree. C1 and C3 are proven differs, so C4 is advisory: the claim was
+    not shown on these inputs, and a related change was proven. The label stays needs human."""
     pr = _product("attrs-1647")
     assert _labels(pr, "model-p4")["C4.nested_astuple_eq_expected"][0] == FindingLabel.NEEDS_HUMAN.value
-    assert dr.verdict_for(_cmp(), None, probe_results=pr)[0] == NA
+    v, reason, _ = dr.verdict_for(_cmp(), None, probe_results=pr)
+    assert v == VER
+    assert "C4.nested_astuple_eq_expected" in reason
+    assert "claim not shown on these inputs; a related change was proven" in reason
 
 
 def test_41_study_route_unchanged():
@@ -173,7 +179,7 @@ def test_42_linked_probe_still_flags_unclaimed_difference():
 
 
 def test_41_42_today_records_combined():
-    want = {"attrs-1647": NA, "toolz-650": VER, "isort-2737": VER, "pytest-15265": CNV,
+    want = {"attrs-1647": VER, "toolz-650": VER, "isort-2737": VER, "pytest-15265": CNV,
             "requests-7520": CNV, "urllib3-5328": CNV}
     got = {n: dr.verdict_for(_cmp(), None, probe_results=_product(n))[0] for n in want}
     assert got == want
