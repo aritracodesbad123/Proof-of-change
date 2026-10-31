@@ -482,6 +482,87 @@ def claims_are_blank(p: dict) -> bool:
     return not any(isinstance(c, dict) and isinstance(c.get("id"), str) and c["id"].strip() for c in claims)
 
 
+_CLAIM_TOKEN = re.compile(r"(?<![A-Za-z0-9])([Cc]\d+)(?![A-Za-z0-9])")
+_OBS_PREFIX = re.compile(r"^([A-Za-z]{1,8}\d+)([._])")
+
+
+def _signal_claim_keys(p: dict) -> set[str]:
+    """Upper-case claim ids this probe already points at: its about text, its id (``probe-c1`` is C1), and
+    observation names or prefixes the code records (``c1_exception``, ``c1.row``)."""
+    found = set()
+
+    def add(token) -> None:
+        key = str(token).upper()
+        if re.fullmatch(r"C\d+", key):
+            found.add(key)
+
+    for m in _CLAIM_TOKEN.finditer(str(p.get("about") or "")):
+        add(m.group(1))
+    for part in re.split(r"[-_]", str(p.get("id") or "")):
+        if re.fullmatch(r"[Cc]\d+", part):
+            add(part)
+    recorded = recorded_names(_unescape_code(p.get("code") or ""))
+    if recorded:
+        names, prefixes = recorded
+        for blob in list(names) + list(prefixes):
+            m = _OBS_PREFIX.match(str(blob))
+            if m:
+                add(m.group(1))
+    return found
+
+
+def _signal_covers(cid: str, code: str) -> list[str]:
+    """Covers that match the observation prefixes this claim's id already has in the probe code."""
+    low = cid.lower()
+    pats: list[str] = []
+    recorded = recorded_names(_unescape_code(code or ""))
+    blobs = []
+    if recorded:
+        names, prefixes = recorded
+        blobs = sorted(names) + sorted(prefixes)
+    for blob in blobs:
+        m = _OBS_PREFIX.match(str(blob))
+        if not m or m.group(1).lower() != low:
+            continue
+        pat = f"{m.group(1)}{m.group(2)}*"
+        if pat not in pats:
+            pats.append(pat)
+    return pats or [f"{low}.*", f"{low}_*"]
+
+
+def fill_signalled_claims(p: dict, testable: list) -> dict:
+    """Attach the known claims a blank probe already names, after a retry that still linked nothing.
+
+    A claim counts when the about text names it, the probe id ends in it (``probe-c1`` is C1, ``probe1`` is not),
+    or the code records an observation whose name starts ``c1_`` or ``c1.``. Other known claims are not attached.
+    The probe is unchanged when it already names a claim id, or when none of those signals names a known claim.
+    Covers are the prefixes the code records, so judging can match ``c1_exception`` and ``c1.row``. A claim
+    without ``same`` or ``differs`` is not attached."""
+    if not claims_are_blank(p):
+        return p
+    keys = _signal_claim_keys(p)
+    if not keys:
+        return p
+    filled = []
+    seen = set()
+    for c in testable or []:
+        if not isinstance(c, dict):
+            continue
+        cid, expect = c.get("id"), c.get("expect")
+        if not isinstance(cid, str) or cid.upper() not in keys or cid in seen or expect not in ("same", "differs"):
+            continue
+        seen.add(cid)
+        filled.append({"id": cid, "covers": _signal_covers(cid, p.get("code") or ""), "expect": expect})
+    if not filled:
+        return p
+    return dict(p, claims=filled)
+
+
+def _claims_timed_out(exc: BaseException) -> bool:
+    """True when a claims call failed because the provider timed out, not for any other model error."""
+    return isinstance(exc, TimeoutError) or (isinstance(exc, ProviderError) and str(exc).endswith("TimeoutError"))
+
+
 def fill_blank_claims(p: dict, testable: list) -> dict:
     """A copy of the probe with each known testable claim attached, when it named none.
 
@@ -859,8 +940,18 @@ def generate(provider: Provider, repo: str, pr: int, title: str, body: str | Non
     try:
         raw = provider.complete_json("claims", CLAIMS_PROMPT, pr_text, CLAIMS_SCHEMA, ctx)
     except ProviderError as e:
-        out["errors"].append(str(e))
-        return out
+        if not _claims_timed_out(e):
+            out["errors"].append(str(e))
+            return out
+        # One more claims call. A timeout is the provider, not an empty answer, and it is not literal_output.
+        out["claims_timeout_retry"] = {"why": "TimeoutError"}
+        try:
+            raw = provider.complete_json("claims", CLAIMS_PROMPT, pr_text, CLAIMS_SCHEMA, ctx)
+        except ProviderError as again:
+            out["claims_timeout_retry"]["second"] = "failed"
+            out["errors"].append(str(again))
+            return out
+        out["claims_timeout_retry"]["second"] = "ok"
     kept, rejected = grounded_claims(raw, title, body, loose=True)
     out["claims"], out["rejected_claims"] = kept, rejected
     loose = [{"claim": c.get("id"), "source_quote": c.get("source_quote")} for c in kept if c.get("quote_match") == "loose"]
@@ -918,8 +1009,9 @@ def generate(provider: Provider, repo: str, pr: int, title: str, body: str | Non
         # unclaimed. Ask once more (same gate, same BASE-side inputs); keep the first answer unless the retry is
         # usable and links at least one claim, so no probe is lost.
         # The retry is sent the claim list with its ids and must name at least one of them in every probe. If the
-        # kept answer still names no claim id, the known testable claims are attached below (product checks only).
-        # An id that is not a known claim is not guessed: validation still rejects that probe.
+        # kept answer still names no claim id, a product check attaches every known testable claim below. A study
+        # run attaches only the claims the probe's about, id, or observation prefixes already name. An id that is
+        # not a known claim is not guessed: validation still rejects that probe.
         out["retried"] = {"why": [UNLINKED_REASON]}
         retry_user = (user + "\n\nYour previous answer had probes, but " + UNLINKED_REASON + ". "
                       + unlinked_retry_rule(testable))
@@ -978,6 +1070,12 @@ def generate(provider: Provider, repo: str, pr: int, title: str, body: str | Non
                     p = nxt
             else:
                 p = _drop_blank_claim_entries(p)
+        elif isinstance(p, dict) and by_id and out.get("retried") and claims_are_blank(p):
+            # Study run: the retry still linked nothing. Attach only the claims this probe already names.
+            nxt = fill_signalled_claims(p, testable)
+            if nxt is not p and not claims_are_blank(nxt):
+                filled_ids = [c["id"] for c in nxt["claims"]]
+                p = nxt
         why = validate_probe(p, set(by_id), python_version)
         if not why and layout:
             before = p["code"]

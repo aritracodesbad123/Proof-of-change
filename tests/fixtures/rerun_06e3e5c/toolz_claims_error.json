@@ -1,0 +1,4 @@
+{
+  "error": "nebius claims request failed: TimeoutError",
+  "fallback": "AI call fell back or failed (claims)"
+}

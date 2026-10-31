@@ -424,6 +424,7 @@ def judge(spec: dict, runs: dict, files: dict | None = None) -> list[dict]:
                                 if name in runs[side][0]}
         out.append(res)
     _one_side_claim_link(spec, out)
+    _link_split_raise_value(spec, out)
     _shape_link(out)
     _dangling_cover_link(spec, out)
     return out
@@ -475,11 +476,94 @@ def _exc_of(value) -> str | None:
 
 
 def _shape(res: dict) -> str | None:
-    """The exception name when main raised and the PR returned a value (not an exception), else None."""
+    """The exception name when main raised and the PR returned a value (not an exception), else None.
+
+    A sibling pair that splits the same change across two observations (main raises and the pull request is
+    absent on one, main is absent and the pull request returns a value on the other) carries that exception on
+    ``split_shape``. It is the same shape as one observation with both sides."""
+    split = res.get("split_shape")
+    if isinstance(split, str) and split:
+        return split
     exc = _exc_of(res.get("main"))
     if res.get("state") != "differs" or not exc or _exc_of(res.get("pr")) or res.get("pr") == ABSENT:
         return None
     return exc
+
+
+_OBS_PREFIX = re.compile(r"^([A-Za-z]{1,8}\d+)[._]")
+SPLIT_SHAPE_NOTE = "main raised and the pull request returned a value, split across two observations"
+
+
+def _obs_prefix(name) -> str | None:
+    """The claim id at the start of an observation name: ``c1_exception`` and ``c1.result`` are both ``c1``."""
+    m = _OBS_PREFIX.match(str(name or ""))
+    return m.group(1).lower() if m else None
+
+
+def _raise_half(res: dict) -> str | None:
+    """The exception main raised when this observation has nothing on the pull request."""
+    if res.get("state") != "differs" or res.get("pr_only") or res.get("pr") != ABSENT:
+        return None
+    return _exc_of(res.get("main"))
+
+
+def _value_half(res: dict) -> bool:
+    """True when main is absent and the pull request returned a value that is not an exception."""
+    return (res.get("state") == "differs" and not res.get("pr_only") and res.get("main") == ABSENT
+            and res.get("pr") != ABSENT and not _exc_of(res.get("pr")))
+
+
+def split_raise_value(observations: list) -> dict[str, str]:
+    """Observation name to exception, for a raise→value change recorded as two siblings.
+
+    ``c1_exception`` (main ``IndexError``, pull request absent) together with ``c1_result`` (main absent, pull
+    request a value) is one shape: main raised IndexError and the pull request returned a value. The two names
+    share the claim-id prefix (``c1_`` or ``c1.``). A prefix with any other count of those halves is left alone,
+    so two values are not paired with one exception by guesswork."""
+    groups: dict[str, list] = {}
+    for res in observations or []:
+        if not isinstance(res, dict):
+            continue
+        prefix = _obs_prefix(res.get("name"))
+        if prefix and isinstance(res.get("name"), str):
+            groups.setdefault(prefix, []).append(res)
+    out: dict[str, str] = {}
+    for group in groups.values():
+        raised = [(res, exc) for res in group if (exc := _raise_half(res))]
+        values = [res for res in group if _value_half(res)]
+        if len(raised) != 1 or len(values) != 1:
+            continue
+        exc = raised[0][1]
+        out[raised[0][0]["name"]] = exc
+        out[values[0]["name"]] = exc
+    return out
+
+
+def _link_split_raise_value(spec: dict, out: list[dict]) -> None:
+    """Give a split raise→value pair the shape of one observation, and link it to the claim its names name.
+
+    The claim id is the shared prefix (``c1_exception`` links claim C1) when that claim expects a difference.
+    The two observations are then that claim, not two unclaimed differences. A pair whose prefix is not a
+    differs claim on this probe keeps the shape (so a title claim can still cover it) and stays unclaimed here."""
+    shapes = split_raise_value(out)
+    if not shapes:
+        return
+    by_id = {str(c.get("id") or "").lower(): c for c in spec.get("claims") or [] if isinstance(c, dict)}
+    for res in out:
+        exc = shapes.get(res.get("name"))
+        if not exc:
+            continue
+        res["split_shape"] = exc
+        claim = by_id.get(_obs_prefix(res.get("name")) or "")
+        if not claim or claim.get("expect") != "differs" or res.get("pr_only") or res.get("state") != "differs":
+            continue
+        if res.get("label") != FindingLabel.UNMENTIONED_CHANGE.value:
+            continue
+        res.pop("advisory", None)
+        res["claim"] = claim["id"]
+        res["label"] = FindingLabel.PROVEN.value
+        res["linked_by"] = "shape"
+        res["note"] = SPLIT_SHAPE_NOTE
 
 
 # "Don't raise IndexError ..." in a pull-request title. The name has to look like an exception type.
@@ -503,8 +587,10 @@ def dont_raise_names(title: str) -> list[str]:
 def apply_title_claim(probe_results: dict | None, title: str) -> dict | None:
     """Count the pull-request title as a claim.
 
-    "Don't raise X" covers any unclaimed difference where main raises X and the PR returns a value. Those
-    observations are re-judged as proven by a claim whose id is ``title``. Anything else is left as it was."""
+    "Don't raise X" covers any unclaimed difference where main raises X and the PR returns a value, including
+    when that change is split across two sibling observations (one raises on main, the other returns the value
+    on the pull request). Those observations are re-judged as proven by a claim whose id is ``title``. Anything
+    else is left as it was."""
     names = dont_raise_names(title)
     if not probe_results or not names:
         return probe_results
@@ -513,9 +599,13 @@ def apply_title_claim(probe_results: dict | None, title: str) -> dict | None:
         if not isinstance(it, dict):
             items.append(it)
             continue
+        # A split pair (raise on one name, value on its sibling) is the same shape as one observation that
+        # has both sides. Rule 55 covers those names too.
+        paired = split_raise_value(it.get("observations") or [])
         covered = [o.get("name") for o in it.get("observations") or []
                    if isinstance(o, dict) and o.get("label") == FindingLabel.UNMENTIONED_CHANGE.value
-                   and not o.get("advisory") and _shape(o) in names and o.get("name")]
+                   and not o.get("advisory") and o.get("name")
+                   and (_shape(o) in names or paired.get(o.get("name")) in names)]
         if not covered or not it.get("runs"):
             items.append(it)
             continue

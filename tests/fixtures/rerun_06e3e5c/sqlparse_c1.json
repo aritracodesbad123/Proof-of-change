@@ -1,0 +1,27 @@
+{
+  "title": "Don't raise IndexError on short parenthesis groups in StripWhitespaceFilter",
+  "probe": {
+    "id": "model-probe-c1",
+    "about": "C1",
+    "claims": []
+  },
+  "runs": {
+    "main": [
+      {"c1_exception": "IndexError"},
+      {"c1_exception": "IndexError"},
+      {"c1_exception": "IndexError"}
+    ],
+    "pr": [
+      {"c1_result": "( AS )"},
+      {"c1_result": "( AS )"},
+      {"c1_result": "( AS )"}
+    ]
+  },
+  "claims": [
+    {
+      "id": "C1",
+      "expect": "differs",
+      "text": "Using sqlparse.format with strip_whitespace=True on the input \"( AS )\" no longer raises IndexError and returns the string unchanged as \"( AS )\"."
+    }
+  ]
+}

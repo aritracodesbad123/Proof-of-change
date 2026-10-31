@@ -114,10 +114,14 @@ def test_retry_naming_c1_is_kept_and_linked_but_not_verified(tmp_path):
     assert _judge(claims)[0] == "could_not_verify"
 
 
-def test_retry_naming_no_claim_keeps_differences_advisory(tmp_path):
+def test_retry_naming_no_claim_fills_ids_the_probe_already_printed(tmp_path):
+    """The retry is still not kept. The probe prints c1.* and c2.*, so those known claims are attached afterwards.
+    Passing no claims to the judge is still advisory: the fill is what links them."""
     _, out = _run(tmp_path, [UNLINKED, copy.deepcopy(UNLINKED)])
     assert out["retried"]["kept_first_answer"] == "the retry linked no claim either"
-    assert _frozen_claims(out) == []
+    claims = _frozen_claims(out)
+    assert [c["id"] for c in claims] == ["C1", "C2"]
+    assert [c["covers"] for c in claims] == [["c1.*"], ["c2.*"]]
     assert _judge([])[0] == "could_not_verify"
 
 
@@ -130,7 +134,7 @@ def test_retry_with_an_unlinked_probe_is_not_kept(tmp_path):
 def test_retry_naming_an_unknown_claim_id_is_not_kept(tmp_path):
     _, out = _run(tmp_path, [UNLINKED, _answer(dict(C1, id="C9"))])
     assert out["retried"].get("kept_first_answer")
-    assert _frozen_claims(out) == []
+    assert [c["id"] for c in _frozen_claims(out)] == ["C1", "C2"]
 
 
 def test_retry_with_fewer_probes_is_not_kept(tmp_path):
