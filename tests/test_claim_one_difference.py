@@ -38,8 +38,11 @@ def test_no_differing_value_still_needs_attention():
 
 
 def test_other_claim_or_undotted_names_do_not_count():
+    # A different claim whose covered observations all agree is advisory once a differs claim is proven.
+    # An undotted leftover of the same claim has no separate input, and that claim was partly shown, so it
+    # still needs attention.
     s = _sum(_o("c1.case1.title", "differs", P, "C1"), _o("c1.case1.rel", "same", NH, "C2"))
-    assert [f["name"] for f in s["flagged"]] == ["c1.case1.rel"]
+    assert s["flagged"] == [] and s["advisory_agreeing_differs"] == ["c1.case1.rel"]
     s = _sum(_o("tc1_out", "differs", P), _o("tc2_out", "same", NH))
     assert [f["name"] for f in s["flagged"]] == ["tc2_out"]
 

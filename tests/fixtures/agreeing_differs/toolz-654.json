@@ -1,0 +1,578 @@
+{
+ "record_kind": "pr_run",
+ "repo": "pytoolz/toolz",
+ "library": "toolz",
+ "pr": {
+  "repo": "pytoolz/toolz",
+  "number": 654,
+  "title": "Preserve insertion order in dissoc's set-based branch"
+ },
+ "baseline": "full",
+ "files": {
+  "all": [
+   "toolz/dicttoolz.py",
+   "toolz/tests/test_dicttoolz.py"
+  ],
+  "package_py": [
+   "toolz/dicttoolz.py",
+   "toolz/tests/test_dicttoolz.py"
+  ],
+  "compiled": [],
+  "other": []
+ },
+ "comparison": {
+  "same": 51,
+  "same_skipped_both": 0,
+  "regressions": [],
+  "fixed": [],
+  "new_tests_passing": 16,
+  "new_tests_passing_ids": [
+   "toolz.tests.test_dicttoolz::test_dissoc_preserves_insertion_order[keys0-remaining0-OrderedDict-OrderedDict]",
+   "toolz.tests.test_dicttoolz::test_dissoc_preserves_insertion_order[keys0-remaining0-OrderedDict-dict]",
+   "toolz.tests.test_dicttoolz::test_dissoc_preserves_insertion_order[keys0-remaining0-dict-OrderedDict]",
+   "toolz.tests.test_dicttoolz::test_dissoc_preserves_insertion_order[keys0-remaining0-dict-dict]",
+   "toolz.tests.test_dicttoolz::test_dissoc_preserves_insertion_order[keys1-remaining1-OrderedDict-OrderedDict]",
+   "toolz.tests.test_dicttoolz::test_dissoc_preserves_insertion_order[keys1-remaining1-OrderedDict-dict]",
+   "toolz.tests.test_dicttoolz::test_dissoc_preserves_insertion_order[keys1-remaining1-dict-OrderedDict]",
+   "toolz.tests.test_dicttoolz::test_dissoc_preserves_insertion_order[keys1-remaining1-dict-dict]",
+   "toolz.tests.test_dicttoolz::test_dissoc_preserves_insertion_order[keys2-remaining2-OrderedDict-OrderedDict]",
+   "toolz.tests.test_dicttoolz::test_dissoc_preserves_insertion_order[keys2-remaining2-OrderedDict-dict]",
+   "toolz.tests.test_dicttoolz::test_dissoc_preserves_insertion_order[keys2-remaining2-dict-OrderedDict]",
+   "toolz.tests.test_dicttoolz::test_dissoc_preserves_insertion_order[keys2-remaining2-dict-dict]",
+   "toolz.tests.test_dicttoolz::test_dissoc_preserves_insertion_order[keys3-remaining3-OrderedDict-OrderedDict]",
+   "toolz.tests.test_dicttoolz::test_dissoc_preserves_insertion_order[keys3-remaining3-OrderedDict-dict]",
+   "toolz.tests.test_dicttoolz::test_dissoc_preserves_insertion_order[keys3-remaining3-dict-OrderedDict]",
+   "toolz.tests.test_dicttoolz::test_dissoc_preserves_insertion_order[keys3-remaining3-dict-dict]"
+  ],
+  "new_tests_failing": [],
+  "new_tests_skipped": [],
+  "removed_tests": [],
+  "reparametrized": [],
+  "skipped_missing_dependency": [],
+  "flaky": [],
+  "pr_unstable": [],
+  "pr_unstable_noisy": [],
+  "environment": [],
+  "other_changes": [],
+  "preexisting_failures": [],
+  "load_failed_both": [],
+  "load_failed_pr": [],
+  "load_failed_main": [],
+  "executed": {
+   "main": 51,
+   "pr": 67
+  },
+  "messages": {}
+ },
+ "exit_check": {
+  "explained": true,
+  "problems": [],
+  "detail": "all runs exited 0"
+ },
+ "coverage": {
+  "status": "measured",
+  "changed_lines_total": 3,
+  "changed_lines_covered": 3,
+  "files": [
+   {
+    "file": "toolz/dicttoolz.py",
+    "changed_lines_total": 3,
+    "changed_lines_covered": 3
+   }
+  ]
+ },
+ "behaviour_claims": [],
+ "probes": {
+  "status": "ran",
+  "items": [
+   {
+    "id": "model-p1",
+    "source": "model",
+    "target": "pytoolz/toolz#654",
+    "about": "Test set-based branch preserves insertion order (C1)",
+    "claims": [
+     {
+      "id": "C1",
+      "text": "In the set-based branch of dissoc(), insertion order of the returned mapping is preserved (matches source order).",
+      "covers": [
+       "c1.order"
+      ],
+      "expect": "differs",
+      "source": "PR description"
+     }
+    ],
+    "runs": {
+     "main": [
+      {
+       "c1.order": [
+        6,
+        7,
+        8,
+        9
+       ]
+      },
+      {
+       "c1.order": [
+        6,
+        7,
+        8,
+        9
+       ]
+      },
+      {
+       "c1.order": [
+        6,
+        7,
+        8,
+        9
+       ]
+      }
+     ],
+     "pr": [
+      {
+       "c1.order": [
+        6,
+        7,
+        8,
+        9
+       ]
+      },
+      {
+       "c1.order": [
+        6,
+        7,
+        8,
+        9
+       ]
+      },
+      {
+       "c1.order": [
+        6,
+        7,
+        8,
+        9
+       ]
+      }
+     ]
+    },
+    "status": "ran",
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 2,
+     "changed_lines_covered": 2,
+     "adequacy": "adequate"
+    }
+   },
+   {
+    "id": "model-p2",
+    "source": "model",
+    "target": "pytoolz/toolz#654",
+    "about": "Test set-based branch preserves order for dict input (C3)",
+    "claims": [
+     {
+      "id": "C3",
+      "text": "After the fix, dissoc() retains the remaining-key set but iterates the source mapping and copies surviving entries in source order, preserving insertion order while keeping linear complexity unchanged.",
+      "covers": [
+       "c3.order"
+      ],
+      "expect": "differs",
+      "source": "PR description"
+     }
+    ],
+    "runs": {
+     "main": [
+      {
+       "c3.order": [
+        5,
+        6,
+        7
+       ]
+      },
+      {
+       "c3.order": [
+        5,
+        6,
+        7
+       ]
+      },
+      {
+       "c3.order": [
+        5,
+        6,
+        7
+       ]
+      }
+     ],
+     "pr": [
+      {
+       "c3.order": [
+        5,
+        6,
+        7
+       ]
+      },
+      {
+       "c3.order": [
+        5,
+        6,
+        7
+       ]
+      },
+      {
+       "c3.order": [
+        5,
+        6,
+        7
+       ]
+      }
+     ]
+    },
+    "status": "ran",
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 2,
+     "changed_lines_covered": 2,
+     "adequacy": "adequate"
+    }
+   },
+   {
+    "id": "model-p3",
+    "source": "model",
+    "target": "pytoolz/toolz#654",
+    "about": "Exact example from description (C4)",
+    "claims": [
+     {
+      "id": "C4",
+      "text": "The example shows that before the fix dissoc returned [0, 1, 2, 3] and after the fix it returns [3, 2, 1, 0].",
+      "covers": [
+       "c4.result"
+      ],
+      "expect": "differs",
+      "source": "PR description"
+     }
+    ],
+    "runs": {
+     "main": [
+      {
+       "c4.result": [
+        0,
+        1,
+        2,
+        3
+       ]
+      },
+      {
+       "c4.result": [
+        0,
+        1,
+        2,
+        3
+       ]
+      },
+      {
+       "c4.result": [
+        0,
+        1,
+        2,
+        3
+       ]
+      }
+     ],
+     "pr": [
+      {
+       "c4.result": [
+        3,
+        2,
+        1,
+        0
+       ]
+      },
+      {
+       "c4.result": [
+        3,
+        2,
+        1,
+        0
+       ]
+      },
+      {
+       "c4.result": [
+        3,
+        2,
+        1,
+        0
+       ]
+      }
+     ]
+    },
+    "status": "ran",
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 2,
+     "changed_lines_covered": 2,
+     "adequacy": "adequate"
+    }
+   },
+   {
+    "id": "model-p4",
+    "source": "model",
+    "target": "pytoolz/toolz#654",
+    "about": "Regression style checks counting passes (C5)",
+    "claims": [
+     {
+      "id": "C5",
+      "text": "Sixteen regression cases cover dict and OrderedDict inputs and output factories, small/large removal sets, absent keys, repeated keys, result type, and unchanged source items; before the fix 12 tests failed and 4 passed, after the fix the test suite passes (284 passed, 2 skipped).",
+      "covers": [
+       "c5.pass_count"
+      ],
+      "expect": "differs",
+      "source": "PR description"
+     }
+    ],
+    "runs": {
+     "main": [
+      {
+       "c5.pass_count": 6
+      },
+      {
+       "c5.pass_count": 6
+      },
+      {
+       "c5.pass_count": 6
+      }
+     ],
+     "pr": [
+      {
+       "c5.pass_count": 6
+      },
+      {
+       "c5.pass_count": 6
+      },
+      {
+       "c5.pass_count": 6
+      }
+     ]
+    },
+    "status": "ran",
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 2,
+     "changed_lines_covered": 2,
+     "adequacy": "adequate"
+    }
+   },
+   {
+    "id": "diff-api",
+    "source": "diff",
+    "target": "pytoolz/toolz#654",
+    "about": "Public functions touched by the PR, called with type-appropriate inputs on both sides.",
+    "claims": [],
+    "runs": {
+     "main": [
+      {
+       "toolz.dicttoolz.dissoc.input0": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input1": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input10": {},
+       "toolz.dicttoolz.dissoc.input11": {},
+       "toolz.dicttoolz.dissoc.input2": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input3": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input4": {
+        "raises": "ValueError"
+       },
+       "toolz.dicttoolz.dissoc.input5": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input6": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input7": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input8": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input9": {}
+      },
+      {
+       "toolz.dicttoolz.dissoc.input0": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input1": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input10": {},
+       "toolz.dicttoolz.dissoc.input11": {},
+       "toolz.dicttoolz.dissoc.input2": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input3": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input4": {
+        "raises": "ValueError"
+       },
+       "toolz.dicttoolz.dissoc.input5": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input6": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input7": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input8": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input9": {}
+      },
+      {
+       "toolz.dicttoolz.dissoc.input0": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input1": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input10": {},
+       "toolz.dicttoolz.dissoc.input11": {},
+       "toolz.dicttoolz.dissoc.input2": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input3": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input4": {
+        "raises": "ValueError"
+       },
+       "toolz.dicttoolz.dissoc.input5": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input6": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input7": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input8": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input9": {}
+      }
+     ],
+     "pr": [
+      {
+       "toolz.dicttoolz.dissoc.input0": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input1": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input10": {},
+       "toolz.dicttoolz.dissoc.input11": {},
+       "toolz.dicttoolz.dissoc.input2": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input3": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input4": {
+        "raises": "ValueError"
+       },
+       "toolz.dicttoolz.dissoc.input5": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input6": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input7": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input8": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input9": {}
+      },
+      {
+       "toolz.dicttoolz.dissoc.input0": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input1": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input10": {},
+       "toolz.dicttoolz.dissoc.input11": {},
+       "toolz.dicttoolz.dissoc.input2": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input3": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input4": {
+        "raises": "ValueError"
+       },
+       "toolz.dicttoolz.dissoc.input5": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input6": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input7": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input8": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input9": {}
+      },
+      {
+       "toolz.dicttoolz.dissoc.input0": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input1": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input10": {},
+       "toolz.dicttoolz.dissoc.input11": {},
+       "toolz.dicttoolz.dissoc.input2": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input3": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input4": {
+        "raises": "ValueError"
+       },
+       "toolz.dicttoolz.dissoc.input5": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input6": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input7": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input8": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input9": {}
+      }
+     ]
+    },
+    "status": "ran",
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 2,
+     "changed_lines_covered": 1,
+     "adequacy": "adequate"
+    }
+   }
+  ]
+ }
+}

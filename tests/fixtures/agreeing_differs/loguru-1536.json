@@ -1,0 +1,187 @@
+{
+ "record_kind": "pr_run",
+ "repo": "Delgan/loguru",
+ "library": "loguru",
+ "pr": {
+  "repo": "Delgan/loguru",
+  "number": 1536,
+  "title": "Count bytes, not characters, in size-based rotation"
+ },
+ "baseline": "full",
+ "files": {
+  "all": [
+   "CHANGELOG.rst",
+   "loguru/_file_sink.py",
+   "tests/test_filesink_rotation.py"
+  ],
+  "package_py": [
+   "loguru/_file_sink.py"
+  ],
+  "compiled": [],
+  "other": [
+   "CHANGELOG.rst",
+   "tests/test_filesink_rotation.py"
+  ]
+ },
+ "comparison": {
+  "same": 153,
+  "same_skipped_both": 3,
+  "regressions": [],
+  "fixed": [],
+  "new_tests_passing": 5,
+  "new_tests_passing_ids": [
+   "tests.test_filesink_rotation::test_size_rotation_counts_encoded_bytes",
+   "tests.test_filesink_rotation::test_size_rotation_counts_translated_newlines[-2]",
+   "tests.test_filesink_rotation::test_size_rotation_counts_translated_newlines[\\n-2]",
+   "tests.test_filesink_rotation::test_size_rotation_counts_translated_newlines[\\r\\n-3]",
+   "tests.test_filesink_rotation::test_size_rotation_default_newline_uses_os_linesep"
+  ],
+  "new_tests_failing": [],
+  "new_tests_skipped": [],
+  "removed_tests": [],
+  "reparametrized": [],
+  "skipped_missing_dependency": [],
+  "flaky": [],
+  "pr_unstable": [],
+  "pr_unstable_noisy": [],
+  "environment": [],
+  "other_changes": [],
+  "preexisting_failures": [],
+  "load_failed_both": [],
+  "load_failed_pr": [],
+  "load_failed_main": [],
+  "executed": {
+   "main": 150,
+   "pr": 155
+  },
+  "messages": {}
+ },
+ "exit_check": {
+  "explained": true,
+  "problems": [],
+  "detail": "all runs exited 0"
+ },
+ "coverage": {
+  "status": "measured",
+  "changed_lines_total": 13,
+  "changed_lines_covered": 13,
+  "files": [
+   {
+    "file": "loguru/_file_sink.py",
+    "changed_lines_total": 13,
+    "changed_lines_covered": 13
+   }
+  ]
+ },
+ "behaviour_claims": [],
+ "probes": {
+  "status": "ran",
+  "items": [
+   {
+    "id": "model-p1",
+    "source": "model",
+    "target": "Delgan/loguru#1536",
+    "about": "model-written probe of the changed files (no description given)",
+    "claims": [
+     {
+      "id": "C1",
+      "text": "The rotation size calculation now measures the message as it will be written, translating newlines according to the sink's newline argument (or os.linesep when None) and then encoding with the file's encoding and error handler.",
+      "covers": [
+       "c1.*"
+      ],
+      "expect": "differs",
+      "source": "PR description"
+     },
+     {
+      "id": "C2",
+      "text": "With non-ASCII messages, rotation occurs at the byte limit rather than after exceeding the limit due to counting characters.",
+      "covers": [
+       "c2.*"
+      ],
+      "expect": "differs",
+      "source": "PR description"
+     },
+     {
+      "id": "C3",
+      "text": "When newline=\"\\r\\n\", newline=\"\\n\", or newline=\"\" (empty string), rotation respects the respective newline translation (the \\r\\n case covers Windows behavior on any OS).",
+      "covers": [
+       "c3.*"
+      ],
+      "expect": "differs",
+      "source": "PR description"
+     },
+     {
+      "id": "C4",
+      "text": "Default newline=None follows os.linesep (as demonstrated by monkeypatching in tests).",
+      "covers": [
+       "c4.*"
+      ],
+      "expect": "differs",
+      "source": "PR description"
+     }
+    ],
+    "runs": {
+     "main": [
+      {
+       "c1.case1": false,
+       "c1.case2": false,
+       "c1.case3": false,
+       "c2.case1": false,
+       "c3.case2": false,
+       "c4.case3": false
+      },
+      {
+       "c1.case1": false,
+       "c1.case2": false,
+       "c1.case3": false,
+       "c2.case1": false,
+       "c3.case2": false,
+       "c4.case3": false
+      },
+      {
+       "c1.case1": false,
+       "c1.case2": false,
+       "c1.case3": false,
+       "c2.case1": false,
+       "c3.case2": false,
+       "c4.case3": false
+      }
+     ],
+     "pr": [
+      {
+       "c1.case1": true,
+       "c1.case2": false,
+       "c1.case3": false,
+       "c2.case1": true,
+       "c3.case2": false,
+       "c4.case3": false
+      },
+      {
+       "c1.case1": true,
+       "c1.case2": false,
+       "c1.case3": false,
+       "c2.case1": true,
+       "c3.case2": false,
+       "c4.case3": false
+      },
+      {
+       "c1.case1": true,
+       "c1.case2": false,
+       "c1.case3": false,
+       "c2.case1": true,
+       "c3.case2": false,
+       "c4.case3": false
+      }
+     ]
+    },
+    "status": "ran",
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 8,
+     "changed_lines_covered": 5,
+     "adequacy": "adequate"
+    }
+   }
+  ]
+ }
+}
