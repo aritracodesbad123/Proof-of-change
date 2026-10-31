@@ -4236,11 +4236,40 @@ def verdict_for(cmp: dict | None, cnv_reason: str | None, exits: dict | None = N
     return v, reason, fl
 
 
+def nothing_collected_both(cmp: dict | None, cnv_reason: str | None) -> bool:
+    """True when neither side collected a test: empty results on both sides, or only collection errors.
+
+    A test that was collected and then skipped is not this case. ``cnv_reason`` is the line finalize_tests writes
+    when a side's JUnit is empty."""
+    if cnv_reason and "no results on both sides" in cnv_reason:
+        return True
+    if not isinstance(cmp, dict):
+        return False
+    ex = cmp.get("executed") or {}
+    if ex.get("main") != 0 or ex.get("pr") != 0:
+        return False
+    quiet = ("same", "new_tests_passing", "regressions", "new_tests_failing", "fixed", "new_tests_skipped",
+             "removed_tests", "other_changes", "flaky", "pr_unstable", "pr_unstable_noisy")
+    return not any(cmp.get(k) for k in quiet)
+
+
+def _agreeing_inputs_only(items: list[dict], flagged: list[dict]) -> bool:
+    """A differs claim whose flagged observations all 'do not differ', and every one of those probes was marked
+    unable to reach the change. The inputs are ones where the old and new code agree."""
+    from poc.verdict import FindingLabel
+    if not flagged or any(o.get("label") != FindingLabel.NEEDS_HUMAN.value for o in flagged):
+        return False
+    by_id = {it.get("id"): it for it in items}
+    return all((by_id.get(o.get("probe")) or {}).get("unable_to_reach") for o in flagged)
+
+
 def with_probes(cmp: dict | None, cnv_reason: str | None, exits: dict | None = None, files: dict | None = None,
                 probe_results: dict | None = None) -> tuple[str, str, list[str]]:
     """The PR verdict: the tests' verdict (tests_verdict), then the probes (poc/probes.py). An observation that needs
     attention (it differs and no claim covers it, or it contradicts a claim) makes the verdict
-    needs_attention, also when the tests alone could not verify the PR. Flaky observations are shown but never
+    needs_attention, also when the tests alone could not verify the PR. Two cases stay could_not_verify: tests
+    collected nothing on both sides, and a differs claim whose only probe used inputs where both sides agree
+    because the probe never reached the change. Flaky observations are shown but never
     decide the verdict, except one that is stable on the base and unstable only on the pull request: that needs
     attention, or could not verify when every pull-request run differs. Warning-only differences never decide.
     Probes never upgrade a verdict: all-green
@@ -4251,6 +4280,9 @@ def with_probes(cmp: dict | None, cnv_reason: str | None, exits: dict | None = N
     if not items:
         return v, reason, fl
     items, notes = probe_adequacy.deciding_items(items)   # a not_adequate probe never leads to verified
+    for it in items:
+        if it.get("unable_to_reach"):
+            notes.append(f"probe {it.get('id')}: {it['unable_to_reach']}")
     s = probes.summarize(items)
     s["reason"] = "; ".join([s["reason"]] * bool(s["reason"]) + notes)
     fl = fl + s["labels"]
@@ -4260,6 +4292,13 @@ def with_probes(cmp: dict | None, cnv_reason: str | None, exits: dict | None = N
                 f"could not verify: observation(s) {names} are stable on the base and unstable only on the PR, "
                 f"too mixed to call ({reason})", fl)
     if s["flagged"] and v != Verdict.NEEDS_ATTENTION.value:
+        if nothing_collected_both(cmp, cnv_reason):
+            return v, (f"{reason}; {s['reason']}" if s["reason"] else reason), fl
+        if _agreeing_inputs_only(items, s["flagged"]):
+            ids = ", ".join(sorted({str(o.get("claim") or "claim") for o in s["flagged"]}))
+            return (Verdict.COULD_NOT_VERIFY.value,
+                    f"could not verify: claim(s) {ids} expect a difference but the only probe used inputs where "
+                    f"both sides agree ({s['reason']}) ({reason})", fl)
         return Verdict.NEEDS_ATTENTION.value, f"{s['reason']}; tests: {reason}", fl
     return v, (f"{reason}; {s['reason']}" if s["reason"] else reason), fl
 
@@ -5039,7 +5078,10 @@ def new_record(repo: str, cfg: dict, item: dict, a, machine: dict, run_date: str
             # "contree" only once both checkpoints were really built there (_maybe_prepare_contree sets it).
             "machine": "local" if getattr(a, "sandbox_backend", None) != "contree" else "contree (not run)",
             "tool_setup": getattr(a, "tool_setup", None) or tool_setup_result(),
-           "posted_upstream": False, "logs": f"{cfg['pkg']}-{item['pr']}/", "freeze": {}}
+           "posted_upstream": False, "logs": f"{cfg['pkg']}-{item['pr']}/", "freeze": {},
+           # Present on every new record, so a check that never ran coverage is "not measured", not a record
+           # that predates the coverage gate. coverage_run replaces this when it runs.
+           "coverage": {"status": "not measured", "why": "coverage has not been run for this check"}}
     sha = getattr(a, "poc_commit", None)
     if isinstance(sha, str) and _COMMIT.fullmatch(sha):
         rec["poc_commit"] = sha
@@ -5069,7 +5111,9 @@ def finalize_tests(rec: dict, per_run: list[dict], results: dict, a) -> tuple[di
     if any(r.get("exit") == "timeout" for r in per_run):
         return None, f"a test run exceeded the {a.run_timeout}s run timeout", None
     if not any(results["pr"]) or not any(results["main"]):
-        return None, "tests produced no results on one side (collection failed; see pytest logs)", None
+        both = not any(results.get("pr") or []) and not any(results.get("main") or [])
+        where = "both sides" if both else "one side"
+        return None, f"tests produced no results on {where} (collection failed; see pytest logs)", None
     cmp = compare_sides(results)
     ex = exit_check(per_run, results, cmp)
     rec["comparison"], rec["exit_check"] = cmp, ex
@@ -5118,12 +5162,45 @@ def mark_holds_by_construction(claims: list | None) -> list:
     return [{**c, "status": "holds by construction"} for c in (claims or [])]
 
 
-def settle_probes(rec: dict) -> None:
-    """Mark uninformative probes after coverage, and refresh the coverage summary to match."""
+def _probe_source(item: dict, prdir: Path | None) -> str:
+    """The probe file's text, from its recorded path or from the run folder."""
+    path = item.get("path")
+    candidates = []
+    if path:
+        candidates.append(Path(path))
+    if prdir is not None and item.get("id"):
+        candidates += [Path(prdir) / f"{item['id']}.py", Path(prdir) / "model-probes" / f"{item['id']}.py"]
+    for cand in candidates:
+        if cand.is_file():
+            return cand.read_text(errors="replace")
+    return str(item.get("code") or "")
+
+
+def _pr_diff_text(prdir: Path | None, items: list) -> str:
+    """The saved pull-request diff, next to the probes or in the run folder."""
+    folders = []
+    if prdir is not None:
+        folders.append(Path(prdir))
+    for it in items:
+        path = it.get("path") if isinstance(it, dict) else None
+        if path:
+            folders += [Path(path).parent, Path(path).parent.parent]
+    for folder in folders:
+        diff = folder / "pr.diff"
+        if diff.is_file():
+            return diff.read_text(errors="replace")
+    return ""
+
+
+def settle_probes(rec: dict, prdir: Path | None = None) -> None:
+    """Mark uninformative probes after coverage, count the PR title as a claim, and refresh the coverage summary.
+
+    A probe that calls an internal helper without the PR's new arguments, and does not go through a public entry
+    point, is marked unable to reach the change."""
     pr = rec.get("probes")
     if not pr or not pr.get("items"):
         return
-    from poc import probe_adequacy
+    from poc import probe_adequacy, probe_reach
     if rec.get("product_check"):   # product route only: the study route keeps the model's claims as written
         from poc import claim_hygiene
         pr = claim_hygiene.apply(pr)
@@ -5135,6 +5212,20 @@ def settle_probes(rec: dict) -> None:
         bnote = broad_claims.note_text((pr or {}).get("broad_claims"))
         if bnote:
             rec["broad_claims_note"] = bnote
+    title = ""
+    pr_obj = rec.get("pr")
+    if isinstance(pr_obj, dict):
+        title = str(pr_obj.get("title") or "")
+    title = title or str(rec.get("title") or "")
+    pr = probes.apply_title_claim(pr, title)
+    diff = _pr_diff_text(prdir, pr.get("items") or [])
+    if diff:
+        for it in pr.get("items") or []:
+            if not isinstance(it, dict):
+                continue
+            why = probe_reach.unable_to_reach(_probe_source(it, prdir), diff)
+            if why:
+                it["unable_to_reach"] = why
     rec["probes"] = probes.apply_status(pr)
     rec["probe_changed_line_coverage"] = probe_adequacy.summary(rec["probes"]["items"])
 
@@ -5358,7 +5449,7 @@ def _contree_only_pair(a, rec: dict, repo: str, cfg: dict, item: dict, sp: dict,
             it["probe_changed_line_coverage"] = probe_adequacy.assess(
                 {"status": "not measured", "why": "Contree-only check: probe coverage needs a local side"})
         rec["probe_changed_line_coverage"] = probe_adequacy.summary((rec["probes"] or {}).get("items") or [])
-    settle_probes(rec)
+    settle_probes(rec, prdir)
     settle_boundary_claims(rec, prdir)
     if change_is_docstring_only(rec.get("files"), cm, cp):
         rec["docstring_only"] = True
@@ -5655,7 +5746,7 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
         run_progress.emit("pytest", "code", "before coverage")
         rec["probe_changed_line_coverage"] = probe_coverage(item, rec["probes"], vm, site_packages(vm), site_packages(vp),
                                                             prdir, a)
-        settle_probes(rec)
+        settle_probes(rec, prdir)
         settle_boundary_claims(rec, prdir)
         if change_is_docstring_only(rec.get("files"), site_packages(vm), site_packages(vp)):
             rec["docstring_only"] = True
@@ -5670,14 +5761,14 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
                                                work, a)
             rec["probes"] = run_probes(repo, item["pr"], {"main": vm / "bin/python", "pr": vp / "bin/python"}, prdir,
                                        work, a, plan, pr_started)
-            settle_probes(rec)
+            settle_probes(rec, prdir)
             _store_verdict(rec, cmp, cnv, ex)
             return {"verdict": rec["verdict"], "reason": rec["reason"]}
 
         def _recheck_nightly():
             rec["probe_changed_line_coverage"] = probe_coverage(
                 item, rec.get("probes"), vm, site_packages(vm), site_packages(vp), prdir, a)
-            settle_probes(rec)
+            settle_probes(rec, prdir)
             _store_verdict(rec, cmp, cnv, ex)
             return {"verdict": rec.get("verdict"), "reason": rec.get("reason")}
 
@@ -6008,7 +6099,7 @@ def test_source_pair(repo: str, cfg: dict, item: dict, prdir: Path, work: Path, 
                                        work, a, plan, pr_started)
             run_progress.emit("pytest", "code", "before coverage")
             rec["probe_changed_line_coverage"] = probe_coverage(item, rec["probes"], vm, cm, cp, prdir, a)
-            settle_probes(rec)
+            settle_probes(rec, prdir)
             if change_is_docstring_only(rec.get("files"), cm, cp):
                 rec["docstring_only"] = True
     run_progress.emit("verdict", "code", "computing code verdict")
@@ -6023,13 +6114,13 @@ def test_source_pair(repo: str, cfg: dict, item: dict, prdir: Path, work: Path, 
                 rec["coverage"] = coverage_run(item, vp, cm, cp, targets["pr"], prdir, work, a, cwd=cp)
             rec["probes"] = run_probes(repo, item["pr"], {"main": vm / "bin/python", "pr": vp / "bin/python"}, prdir,
                                        work, a, plan, pr_started)
-            settle_probes(rec)
+            settle_probes(rec, prdir)
             _store_verdict(rec, cmp, cnv, ex)
             return {"verdict": rec["verdict"], "reason": rec["reason"]}
 
         def _recheck_pair():
             rec["probe_changed_line_coverage"] = probe_coverage(item, rec.get("probes"), vm, cm, cp, prdir, a)
-            settle_probes(rec)
+            settle_probes(rec, prdir)
             _store_verdict(rec, cmp, cnv, ex)
             return {"verdict": rec.get("verdict"), "reason": rec.get("reason")}
 

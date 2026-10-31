@@ -303,7 +303,11 @@ def test_report_has_a_cited_probes_section(tmp_path):
     assert "Citation check (PASS): 10 citation(s)" in sec
     assert any(ln.startswith("| Every probe observation cites its output line |") and "PASS" in ln for ln in md.splitlines())
     (d / "probe-feature-groups-permutation-pr-1.jsonl").write_text("edited\n")
-    render_run(run, tmp_path / "out2", formats=("md",))
+    # The record stays needs attention. A citation failure used to rewrite the report to could not verify
+    # and the self-check let that pass. The written report is still produced, then the check fails.
+    from reports.pr_report import VerdictMismatch
+    with pytest.raises(VerdictMismatch):
+        render_run(run, tmp_path / "out2", formats=("md",))
     assert "do not match their log line" in (tmp_path / "out2" / "mlxtend-1229" / "REPORT.md").read_text()
 
 

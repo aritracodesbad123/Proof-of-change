@@ -42,7 +42,9 @@ Judging (``judge``): each observation is compared over 3 alternating runs per si
     same,    claim expects differs  -> needs_human       differs, no claim              -> unmentioned
     flaky                           -> flaky             probe crashed on both sides    -> not_testable
 
-Any red or amber label (false_claim, unmentioned, needs_human) makes the PR verdict needs_attention. Flaky
+Any red or amber label (false_claim, unmentioned, needs_human) makes the PR verdict needs_attention, except two
+cases kept at could_not_verify: tests collected nothing on both sides, and a differs claim whose only probe used
+inputs where the old and new code agree because it never reached the change. Flaky
 observations are ignored as noise when the base side is unstable or both sides are. An observation that is stable
 on the base and unstable only on the pull request is not that noise: it needs attention, or could not verify when
 every pull-request run differs. Differences that are only about warnings never count on their own.
@@ -473,11 +475,54 @@ def _exc_of(value) -> str | None:
 
 
 def _shape(res: dict) -> str | None:
-    """"<Exception>->value" when main raised and the PR returned a value (not an exception), else None."""
+    """The exception name when main raised and the PR returned a value (not an exception), else None."""
     exc = _exc_of(res.get("main"))
     if res.get("state") != "differs" or not exc or _exc_of(res.get("pr")) or res.get("pr") == ABSENT:
         return None
     return exc
+
+
+# "Don't raise IndexError ..." in a pull-request title. The name has to look like an exception type.
+_DONT_RAISE = re.compile(
+    r"(?i)\b(?:don['’]t|do\s+not|does\s+not|doesn['’]t|should\s+not|shouldn['’]t|must\s+not|never)\s+raise\b")
+_EXC_WORD = re.compile(r"\b([A-Za-z_]\w*(?:Error|Exception|Failure))\b")
+
+
+def dont_raise_names(title: str) -> list[str]:
+    """Exception names a title says the code should not raise, in order, short form (``pkg.IndexError`` -> IndexError)."""
+    out = []
+    for m in _DONT_RAISE.finditer(title or ""):
+        window = re.split(r"[.!?]", (title or "")[m.end():m.end() + 80], maxsplit=1)[0]
+        for name in _EXC_WORD.findall(window):
+            short = name.split(".")[-1]
+            if short not in out:
+                out.append(short)
+    return out
+
+
+def apply_title_claim(probe_results: dict | None, title: str) -> dict | None:
+    """Count the pull-request title as a claim.
+
+    "Don't raise X" covers any unclaimed difference where main raises X and the PR returns a value. Those
+    observations are re-judged as proven by a claim whose id is ``title``. Anything else is left as it was."""
+    names = dont_raise_names(title)
+    if not probe_results or not names:
+        return probe_results
+    items = []
+    for it in probe_results.get("items") or []:
+        if not isinstance(it, dict):
+            items.append(it)
+            continue
+        covered = [o.get("name") for o in it.get("observations") or []
+                   if isinstance(o, dict) and o.get("label") == FindingLabel.UNMENTIONED_CHANGE.value
+                   and not o.get("advisory") and _shape(o) in names and o.get("name")]
+        if not covered or not it.get("runs"):
+            items.append(it)
+            continue
+        claims = [c for c in it.get("claims") or [] if not (isinstance(c, dict) and c.get("id") == "title")]
+        claims.append({"id": "title", "text": title, "expect": "differs", "source": "PR title", "covers": covered})
+        items.append(rejudge_entry(dict(it, claims=claims)))
+    return dict(probe_results, items=items)
 
 
 def _shape_link(out: list[dict]) -> None:

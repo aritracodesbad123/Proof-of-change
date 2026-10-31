@@ -321,7 +321,7 @@ def _pair(monkeypatch, tmp_path, parallel, real_prep=False, blocked="", files=("
             "_contree_pytest_once": _junit_pytest(**kw),
             "contree_coverage_run": lambda *a, **k: {"status": "stub"},
             "run_probes": lambda *a, **k: {"items": []}, "contree_probe_coverage": lambda *a, **k: {"status": "stub"},
-            "settle_probes": lambda rec: None, "change_is_docstring_only": lambda *a: False,
+            "settle_probes": lambda rec, prdir=None: None, "change_is_docstring_only": lambda *a: False,
             "_product_plan": lambda *a, **k: ({"groups_blocked": blocked} if blocked else {})}
     if real_prep:
         run = _contree_runner(drift=drift, outside=outside)

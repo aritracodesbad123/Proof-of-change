@@ -138,14 +138,14 @@ def test_study_collection_gap_reads_extras_from_the_checkout(tmp_path, monkeypat
     assert any(str(req).startswith("freezegun") for req in seen["declared"])
 
 
-def test_sqlparse_loose_quotes_keep_the_markdown_claim_and_reject_a_changed_quote():
+def test_sqlparse_loose_quotes_keep_markdown_and_a_changed_quote_mark():
     raw = {"claims": SQLPARSE_QUOTES}
     title = "Don't raise IndexError on short parenthesis groups in StripWhitespaceFilter"
     exact, _ = model_probes.grounded_claims(raw, title, SQLPARSE_BODY)
     assert exact == []
     kept, rejected = model_probes.grounded_claims(raw, title, SQLPARSE_BODY, loose=True)
-    assert [c["id"] for c in kept] == ["C2"] and kept[0]["quote_match"] == "loose"
-    assert [c["id"] for c in rejected] == ["C1"]
+    assert [c["id"] for c in kept] == ["C1", "C2"] and rejected == []
+    assert all(c["quote_match"] == "loose" for c in kept)
 
 
 def test_study_route_grounds_quotes_loosely(tmp_path):
@@ -164,9 +164,11 @@ def test_study_route_grounds_quotes_loosely(tmp_path):
 
     out = model_probes.generate(P(), "andialbrecht/sqlparse", 941, "t", body, {}, tmp_path, [], tmp_path / "out",
                                 product=False)
-    assert [c["id"] for c in out["claims"]] == ["C2"]
-    assert out["loose_quote_matches"] == [{"claim": "C2", "source_quote": SQLPARSE_QUOTES[1]["source_quote"]}]
-    assert [c["id"] for c in out["rejected_claims"]] == ["C1"]
+    assert [c["id"] for c in out["claims"]] == ["C1", "C2"]
+    assert out["loose_quote_matches"] == [
+        {"claim": "C1", "source_quote": SQLPARSE_QUOTES[0]["source_quote"]},
+        {"claim": "C2", "source_quote": SQLPARSE_QUOTES[1]["source_quote"]}]
+    assert out["rejected_claims"] == []
 
 
 def test_a_printed_dict_parses_when_literal_output_is_on_and_matches_the_recorded_crash():

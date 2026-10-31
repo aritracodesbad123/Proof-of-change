@@ -27,7 +27,7 @@ def test_contree_only_pair_settles_boundary_claims(monkeypatch, tmp_path):
 
 def test_test_pr_local_route_settles_boundary_claims(monkeypatch, tmp_path):
     calls = _spy(monkeypatch)
-    monkeypatch.setattr(dr, "settle_probes", lambda rec: rec.update(_settled_probes=True))
+    monkeypatch.setattr(dr, "settle_probes", lambda rec, prdir=None: rec.update(_settled_probes=True))
 
     def stop(*a, **k):   # first step after the probe settle: stop here, nothing more needs to run
         raise _Reached
