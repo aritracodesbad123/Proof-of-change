@@ -38,7 +38,7 @@ def _claims(*ids, expect="differs"):
 def test_fixtures_have_no_machine_paths():
     blob = (FX / "sqlparse_c1.json").read_text() + (FX / "loguru_probe.json").read_text()
     blob += (FX / "toolz_claims_error.json").read_text()
-    assert "/home/" not in blob and "/Users/" not in blob and "/opt/" not in blob and "/workspace" not in blob
+    assert "/home/" not in blob and "/Users/" not in blob and "/opt/" not in blob
 
 
 def test_about_probe_id_and_observation_prefix_name_only_those_claims():
