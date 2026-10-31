@@ -200,6 +200,7 @@ async def main() -> None:
         raise SystemExit(f"missing silent video: {silent}")
     out = ROOT / "proof-of-change-demo.mp4"
     tmp = ROOT / "proof-of-change-demo-voiced.tmp.mp4"
+    # Stereo + loudness boost: some players (and chat embeds) drop or bury mono tracks.
     subprocess.check_call(
         [
             "ffmpeg",
@@ -210,17 +211,23 @@ async def main() -> None:
             str(silent),
             "-i",
             str(narration),
+            "-filter_complex",
+            "[1:a]volume=4.5dB,aformat=channel_layouts=stereo[a]",
             "-map",
             "0:v:0",
             "-map",
-            "1:a:0",
+            "[a]",
             "-c:v",
             "copy",
             "-c:a",
             "aac",
             "-b:a",
             "192k",
+            "-ac",
+            "2",
             "-shortest",
+            "-movflags",
+            "+faststart",
             str(tmp),
         ]
     )

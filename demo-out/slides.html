@@ -260,6 +260,7 @@ new: path spans only
   const started = performance.now();
 
   function tick(now) {
+    if (window.__DEMO_LOCK) return;
     const t = Math.min(TOTAL, (now - started) / 1000);
     bar.style.width = (t / TOTAL * 100) + '%';
     let active = slides[0];
