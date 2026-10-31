@@ -3288,6 +3288,17 @@ def _table_cells(line: str) -> list[str]:
     return [cell.strip() for cell in line.strip().strip("|").split("|")]
 
 
+def _pr_section(markdown: str, tag: str) -> str:
+    """The per-PR block of the daily report (``### repo#n: ...``), or '' when it is not there."""
+    parts = re.split(r"(?m)^### ", markdown or "")
+    prefix = tag + ":"
+    for part in parts[1:]:
+        head, _, body = part.partition("\n")
+        if head.startswith(prefix):
+            return body
+    return ""
+
+
 def check_report(records, markdown: str) -> dict:
     """Compare the summary table with the records. A setup problem is not a verdict count."""
     mismatches = []
@@ -3319,6 +3330,19 @@ def check_report(records, markdown: str) -> dict:
             continue
         verdict = rec.get("verdict")
         record_counts[verdict] = record_counts.get(verdict, 0) + 1
+        shown = lines.get(tag)
+        if shown:
+            cells = _table_cells(shown)
+            cell = cells[3].replace("**", "").strip() if len(cells) > 3 else ""
+            if cell in VERDICTS and cell != verdict:
+                mismatches.append(f"{tag}: record says {verdict} but the summary shows {cell}")
+        section = _pr_section(markdown, tag)
+        if section:
+            marker = f"**Verdict: {verdict}**"
+            if marker not in section:
+                found = re.search(r"\*\*Verdict: ([^*]+)\*\*", section)
+                got = found.group(1).strip() if found else "no verdict"
+                mismatches.append(f"{tag}: record says {verdict} but the per-PR report shows {got}")
         reason = rec.get("reason") or ""
         gap = "could not verify: setup gap"
         if gap in reason and reason not in (markdown or "") and gap not in (markdown or ""):

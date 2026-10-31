@@ -304,7 +304,7 @@ def decide(rec: dict, chk: list[list]) -> dict:
     if bad_replay:  # rule: a failed known-answer replay means no report is trusted
         return dict(verdict="COULD NOT VERIFY", colour="grey", action="Re-run", confidence="Low",
                     conf_why="The known-answer tests failed in the latest replay.", why=bad_replay,
-                    trust_override=v != "could_not_verify")
+                    trust_override=v != "could_not_verify", trust_kind="replay")
     if v == "no_code_change":
         return dict(verdict="NO CODE CHANGE", colour="grey", action="Approve with notes", confidence="High",
                     conf_why="Every changed file is a type stub or a py.typed marker, so behaviour was not checked.",
@@ -326,7 +326,7 @@ def decide(rec: dict, chk: list[list]) -> dict:
         why = rec.get("reason") if v == "could_not_verify" else "the run failed its own checks: " + "; ".join(c[0] for c in fails)
         return dict(verdict="COULD NOT VERIFY", colour="grey", action="Re-run", confidence="Low",
                     conf_why="The run did not finish cleanly, so it says nothing about the PR.", why=why,
-                    trust_override=v != "could_not_verify")
+                    trust_override=v != "could_not_verify", trust_kind="checks")
     verdict, colour = VERDICT[v]
     conf = "Medium" if warns else "High"
     conf_why = (("Some checks gave warnings: " + "; ".join(c[0] for c in warns)) if warns
@@ -748,7 +748,8 @@ def build(rec: dict, prdir: Path, out_dir: Path, decision: dict | None = None) -
     summary = dict(id=run_id(rec), subject=subject, dependent="its own tests", verdict=d["verdict"], action=d["action"],
                    confidence=d["confidence"], colour=d["colour"], why=d["why"] or "-",
                    evals="APPROVE" if not [x for x in chk if x[1] == "FAIL"] else "REJECT", claims=[r["status"] for r in rows],
-                   citations=cstat, trust_override=bool(d.get("trust_override")))
+                   citations=cstat, trust_override=bool(d.get("trust_override")),
+                   trust_kind=d.get("trust_kind"))
     return R, summary
 
 
@@ -758,6 +759,102 @@ class VerdictMismatch(Exception):
     def __init__(self, lines: list[str]):
         super().__init__("; ".join(lines))
         self.lines = lines
+
+
+def source_info(run_dir, out, formats, rec: dict) -> dict:
+    """Where a report came from: the run folder, both commits that were compared, and the tool commit.
+
+    ``base_sha`` is the pull request's base. ``main_sha`` is the main side that was tested (the base, when that
+    is what was checked out). ``head_sha`` is the pull request head. ``tool_commit`` is the Proof-of-Change
+    commit the run used (``poc_commit`` on the record)."""
+    pr = rec.get("pr") if isinstance(rec.get("pr"), dict) else {}
+    head = pr.get("head_sha") or rec.get("head_sha")
+    base = pr.get("base_sha") or rec.get("base_sha")
+    main = pr.get("tested_main_sha") or rec.get("tested_main_sha") or base
+    tool = rec.get("poc_commit") or rec.get("tool_commit")
+    return {"run_dir": str(run_dir), "out": str(out), "formats": list(formats),
+            "head_sha": head, "base_sha": base, "main_sha": main, "tool_commit": tool}
+
+
+_SHOWN = "NEEDS ATTENTION|COULD NOT VERIFY|VERIFIED|NO CODE CHANGE"
+
+
+def banner_verdict(report_md: str) -> str | None:
+    """The verdict in a per-PR report's banner, or None when the file has no banner."""
+    m = re.search(rf"^> ## \S+ ({_SHOWN})\s*$", report_md or "", re.M)
+    return m.group(1) if m else None
+
+
+def html_verdict(report_html: str) -> str | None:
+    m = re.search(rf"<div class='v'>({_SHOWN})</div>", report_html or "")
+    return m.group(1) if m else None
+
+
+def summary_row_verdict(summary_text: str, run_id: str) -> str | None:
+    """The verdict cell of this run's row in SUMMARY.md or SUMMARY.html."""
+    if not summary_text or not run_id:
+        return None
+    pieces = re.findall(r"<tr>(.*?)</tr>", summary_text, re.S) if "<tr>" in summary_text else summary_text.splitlines()
+    for line in pieces:
+        if f"{run_id}/REPORT" not in line:
+            continue
+        m = re.search(rf"\*\*({_SHOWN})\*\*|<span class=\"badge[^\"]*\">({_SHOWN})</span>|({_SHOWN})", line)
+        if not m:
+            continue
+        return next(g for g in m.groups() if g)
+    return None
+
+
+def _trust_display(rec: dict, row: dict) -> bool:
+    """A shown verdict that is allowed to differ from the record.
+
+    A failed known-answer replay forces could not verify. So does a verified record whose own checks failed:
+    that run is not trusted. A needs-attention record shown as something else is a real disagreement."""
+    if not row.get("trust_override"):
+        return False
+    if row.get("trust_kind") == "replay":
+        return True
+    from poc.final_verdict import final, label
+    return row.get("trust_kind") == "checks" and label(final(rec).get("verdict")) == "VERIFIED" and row.get("verdict") == "COULD NOT VERIFY"
+
+
+def _written_disagreements(out: Path, raw: list[dict], rows: list[dict]) -> list[str]:
+    """Compare each record with the summary file and the per-PR report that were just written."""
+    from poc.final_verdict import final, label
+    summary_md = (out / "SUMMARY.md").read_text() if (out / "SUMMARY.md").is_file() else ""
+    summary_html = (out / "SUMMARY.html").read_text() if (out / "SUMMARY.html").is_file() else ""
+    bad = []
+    for rec, row in zip(raw, rows):
+        if _trust_display(rec, row):
+            continue
+        want = label(final(rec).get("verdict"))
+        rid = row.get("id") or ""
+        folder = out / rid
+        shown = []
+        if summary_md:
+            got = summary_row_verdict(summary_md, rid)
+            if got:
+                shown.append(("summary", got))
+        if summary_html:
+            got = summary_row_verdict(summary_html, rid)
+            if got:
+                shown.append(("summary html", got))
+        report_md = folder / "REPORT.md"
+        report_html = folder / "REPORT.html"
+        if report_md.is_file():
+            got = banner_verdict(report_md.read_text())
+            if got:
+                shown.append(("per-PR report", got))
+        if report_html.is_file():
+            got = html_verdict(report_html.read_text())
+            if got:
+                shown.append(("per-PR report html", got))
+        for where, got in shown:
+            if got != want:
+                tag = f"{rec.get('repo') or (rec.get('pr') or {}).get('repo')}#" \
+                      f"{(rec.get('pr') or {}).get('number') if isinstance(rec.get('pr'), dict) else rec.get('pr')}"
+                bad.append(f"{tag}: record.json says {want} but the {where} shows {got}")
+    return bad
 
 
 def render_run(run_dir: str | Path, out: str | Path, formats=("md", "html", "pdf"), title: str | None = None) -> list[dict]:
@@ -773,12 +870,12 @@ def render_run(run_dir: str | Path, out: str | Path, formats=("md", "html", "pdf
         # to_pdf falls back to the built-in PDF maker, so PDFs are still written without Chrome
         print("note: no Chrome/Chromium found; PDFs are made with the built-in PDF maker", file=sys.stderr)
     rows = []
-    for rec, prdir in recs:
+    for rec, prdir, original in ((r, d, o) for (r, d), o in zip(recs, raw)):
         od = out / run_id(rec)
         od.mkdir(parents=True, exist_ok=True)
         dec_p = od / "DECISION.json"
         R, s = build(rec, prdir, od, json.loads(dec_p.read_text()) if dec_p.exists() else None)
-        (od / "SOURCE.json").write_text(json.dumps({"run_dir": str(run_dir), "out": str(out), "formats": list(formats)}))
+        (od / "SOURCE.json").write_text(json.dumps(source_info(run_dir, out, formats, original), indent=1) + "\n")
         if "md" in formats:
             (od / "REPORT.md").write_text(rv.to_md(R))
         (od / "REPORT.html").write_text(rv.to_html(R, f"Reviewer report {run_id(rec)}"))
@@ -803,9 +900,11 @@ def render_run(run_dir: str | Path, out: str | Path, formats=("md", "html", "pdf
 
     rv.write_summary(rows, str(out), title or f"Proof-of-Change daily summary: {run_dir.name}", formats, extra)
     from poc.final_verdict import disagreements
-    # A run that failed its own trust checks is shown as COULD NOT VERIFY on purpose (decide: trust_override);
-    # that is a statement about the run, not a second verdict. Every other row must show record.json's verdict.
-    bad = disagreements((r, s["verdict"]) for r, s in zip(raw, rows) if not s.get("trust_override"))
+    # A failed known-answer replay, and a verified record whose own checks failed, are shown as COULD NOT
+    # VERIFY on purpose. Every other row must show record.json's verdict in the summary and the per-PR report.
+    kept = [(r, s) for r, s in zip(raw, rows) if not _trust_display(r, s)]
+    bad = disagreements((r, s["verdict"]) for r, s in kept)
+    bad += _written_disagreements(out, [r for r, _s in kept], [s for _r, s in kept])
     if bad:
         raise VerdictMismatch(bad)
     print(f"summary: {out / 'SUMMARY.html'}")

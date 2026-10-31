@@ -109,12 +109,24 @@ LOOSE_MIN_CHARS = 20      # a shorter quote must match exactly
 LOOSE_MIN_KEPT = 0.8      # a quote that loses more than a fifth of its characters to normalising is not matched
 
 
+# Straight quotes, backticks left after Markdown is stripped, and curly quotes are one character. Markdown pairs
+# are removed first, so `code` still unwraps; a quote mark that is part of the words is what gets unified.
+_QUOTE_SAME = str.maketrans({
+    '"': "'", "`": "'",
+    "\u2018": "'", "\u2019": "'", "\u201a": "'", "\u201b": "'", "\u2032": "'",
+    "\u201c": "'", "\u201d": "'", "\u201e": "'", "\u201f": "'", "\u2033": "'",
+})
+
+
 def loose_norm(s: str) -> str:
-    """Whitespace collapsed, paired Markdown marks removed, dashes, arrows and quotes unified."""
+    """Whitespace collapsed, paired Markdown marks removed, dashes and arrows unified.
+
+    ``"``, ``'``, `` ` `` and curly single or double quotes are the same character, so a quote that only changed
+    its quote marks still matches."""
     t = _norm((s or "").translate(_LOOSE_MAP))
     for rx in _PAIRED:
         t = rx.sub(r"\1", t)
-    return _norm(t)
+    return _norm(t.translate(_QUOTE_SAME))
 
 
 def loose_quote_ok(quote: str) -> str | None:
