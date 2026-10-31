@@ -805,6 +805,16 @@ def summary_row_verdict(summary_text: str, run_id: str) -> str | None:
     return None
 
 
+def _stored_verdict(rec: dict) -> str | None:
+    """The record's verdict when it is one of the four labels, else None.
+
+    A blast-radius fixture with no verdict is not a disagreement: the report may say could not verify
+    because its own checks failed."""
+    from poc.final_verdict import final
+    v = final(rec).get("verdict")
+    return v if v in ("verified", "needs_attention", "could_not_verify", "no_code_change") else None
+
+
 def _trust_display(rec: dict, row: dict) -> bool:
     """A shown verdict that is allowed to differ from the record.
 
@@ -902,7 +912,7 @@ def render_run(run_dir: str | Path, out: str | Path, formats=("md", "html", "pdf
     from poc.final_verdict import disagreements
     # A failed known-answer replay, and a verified record whose own checks failed, are shown as COULD NOT
     # VERIFY on purpose. Every other row must show record.json's verdict in the summary and the per-PR report.
-    kept = [(r, s) for r, s in zip(raw, rows) if not _trust_display(r, s)]
+    kept = [(r, s) for r, s in zip(raw, rows) if _stored_verdict(r) and not _trust_display(r, s)]
     bad = disagreements((r, s["verdict"]) for r, s in kept)
     bad += _written_disagreements(out, [r for r, _s in kept], [s for _r, s in kept])
     if bad:
