@@ -956,15 +956,12 @@ def meson_build_requires(checkout: Path) -> list[str] | None:
 
 
 def pyproject_test_extras(checkout: Path) -> list[str]:
-    pp = checkout / "pyproject.toml"
-    if not pp.exists():
-        return []
-    import tomllib
-    try:
-        opt = tomllib.loads(pp.read_text()).get("project", {}).get("optional-dependencies", {})
-    except Exception:  # noqa: BLE001
-        return []
-    return test_extras(list(opt))
+    """Extras to put on the install line.
+
+    test, tests, or testing when the project has one of those. Otherwise ``dev``, and any extra that
+    lists a module imported by conftest.py (poc/demo_helper.py)."""
+    from poc import demo_helper
+    return demo_helper.pyproject_install_extras(checkout)
 
 
 def pyproject_test_groups(checkout: Path) -> list[str]:
@@ -2142,8 +2139,10 @@ def _retry_setup_gap(a, rec, repo, prdir, venvs: dict, rerun, recheck_coverage=N
             _cache.put(query, stored)
             return stored
 
-    if product_route(a):
-        # ``checkouts`` is main's tree only. A dependency declared only on the pull request is not added.
+    # ``checkouts`` is main's tree only. A dependency declared only on the pull request is not added.
+    # A study run adds those lines only for a collection import, so the retry can install a package that
+    # lives in an extra the first install did not request. Other study gaps keep the setup-plan list.
+    if product_route(a) or demo_helper.collection_import_gap(demo_helper.gap_text(rec)):
         for checkout in checkouts or []:
             for req in demo_helper.declared_requirement_lines(checkout):
                 if req not in declared:
@@ -2677,7 +2676,14 @@ def nightly_commit(version: str, venv: Path, cfg: dict, env: dict) -> tuple[str 
 
 
 def test_extras(meta_extras: list[str]) -> list[str]:
-    return [e for e in meta_extras if e.lower() in TEST_EXTRA_NAMES]
+    """test/tests/testing extras. When the metadata names none of those, also ``dev``.
+
+    A checkout can also match an extra to a conftest import (pyproject_test_extras). Wheel metadata
+    has no conftest, so this list only adds ``dev``."""
+    named = [e for e in meta_extras if e.lower() in TEST_EXTRA_NAMES]
+    if named:
+        return named
+    return [e for e in meta_extras if e.lower() == "dev"]
 
 
 def dist_extras(venv: Path, dist: str, env: dict) -> list[str]:
@@ -4518,7 +4524,7 @@ def plan_probes(repo: str, item: dict, rec: dict, base_root: Path, pr_roots: lis
             note["model_claims"] = res.get("claims", [])
             note["model_rejected_claims"] = res.get("rejected_claims", [])
             note["errors"] += res.get("errors", [])
-            if res.get("loose_quote_matches"):   # product checks: quotes matched after removing Markdown marks
+            if res.get("loose_quote_matches"):   # quotes matched after removing Markdown marks
                 note["model_loose_quote_matches"] = res["loose_quote_matches"]
             if res.get("rewritten_imports"):   # product checks: src/ layout imports rewritten to the installed name
                 note["rewritten_imports"] = res["rewritten_imports"]
@@ -4588,11 +4594,11 @@ def run_probes(repo: str, pr: int, pythons: dict, prdir: Path, work: Path, a, pl
         try:
             guard(path)
             if use_contree:
-                it = _contree_run_probe(path, prdir, a.runs, x["source"], guard, literal_output=product_route(a))
+                it = _contree_run_probe(path, prdir, a.runs, x["source"], guard, literal_output=True)
             else:
                 it = probes.run_probe(path, pythons, prdir, cwds, envs, runs=a.runs, source=x["source"],
                                       launchers={side: probe_launcher(v, path) for side, v in venvs.items()},
-                                      guard=guard, literal_output=product_route(a))
+                                      guard=guard, literal_output=True)
             it["path"] = repo_relative(path) if x["source"] == "library" else str(path.relative_to(prdir))
             it["generator"] = fz["generator"]
             if x.get("origin"):

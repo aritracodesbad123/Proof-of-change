@@ -154,8 +154,9 @@ def literal_observations(stdout: str):
 def observations_of(stdout: str, exit_code, literal_output: bool = False) -> dict:
     """{name: value} from one probe run. A run without usable observations becomes one PROBE_ERROR observation.
 
-    literal_output (product checks only): when the last line is not JSON, also accept a Python literal of the same
-    {"observations": {...}} object (see literal_observations). Study runs leave it off, so their parsing is unchanged."""
+    literal_output: when the last line is not JSON, also accept a Python literal of the same
+    {"observations": {...}} object (see literal_observations). Study runs and product checks both pass True.
+    The default stays off, so a caller that does not ask still accepts JSON only."""
     if len(stdout.encode(errors="replace")) > MAX_OUTPUT_BYTES:
         return {PROBE_ERROR: {"contract": f"output larger than {MAX_OUTPUT_BYTES} bytes", "exit_code": exit_code}}
     obj = parse_probe_output(stdout, exit_code)

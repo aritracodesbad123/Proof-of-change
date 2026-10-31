@@ -942,7 +942,7 @@ def test_gap_text_reads_the_pytest_collection_error(tmp_path):
     assert "No module named 'gitlab'" in demo_helper.failure_line(text)
     summary = {"verdict": "could_not_verify", "reason": "collection failed; see pytest logs",
                "per_run": [{"pytest_summary": "E   ModuleNotFoundError: No module named 'requests'\n"}]}
-    assert demo_helper.gap_name(demo_helper.gap_text(summary)) == "setup"
+    assert demo_helper.gap_name(demo_helper.gap_text(summary)) == "requests"
     assert demo_helper.gap_name(demo_helper.gap_text(summary, log_dir=tmp_path)) == "requests"
 
 
