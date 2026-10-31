@@ -187,7 +187,7 @@ def test_43_markdown_quotes_grounded_requests_7520():
     raw = {"claims": [{k: v for k, v in c.items() if k != "rejected"} for c in rec["model_rejected_claims"]]}
     title = "Keep Link header parameter values that contain '='"
     kept, _ = model_probes.grounded_claims(raw, title, body)
-    assert kept == []                                   # study route: exact match, unchanged
+    assert kept == []                                   # the function default is still an exact match
     kept, rejected = model_probes.grounded_claims(raw, title, body, loose=True)
     assert {c["id"] for c in kept} == {"C1", "C2"}
     assert all(c["quote_match"] == "loose" for c in kept)
@@ -236,10 +236,12 @@ def test_43_generate_logs_loose_matches(tmp_path):
                                     "source_quote": 'param.split("=") keeps every parameter', "text": "x"}]}
             return {"probes": []}
 
+    want = [{"claim": "C1", "source_quote": 'param.split("=") keeps every parameter'}]
     out = model_probes.generate(P(), "o/r", 1, "t", body, {}, tmp_path, [], tmp_path / "o", product=True)
-    assert out["loose_quote_matches"] == [{"claim": "C1", "source_quote": 'param.split("=") keeps every parameter'}]
+    assert out["loose_quote_matches"] == want
     out = model_probes.generate(P(), "o/r", 1, "t", body, {}, tmp_path, [], tmp_path / "o2", product=False)
-    assert "loose_quote_matches" not in out and out["claims"] == []
+    assert out["loose_quote_matches"] == want
+    assert out["claims"][0]["quote_match"] == "loose"
 
 
 # ---- 44 (fixed in 36): the repository's addopts are kept on product checks ---------------------------------------

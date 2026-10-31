@@ -91,9 +91,10 @@ def _norm(s: str) -> str:
     return re.sub(r"\s+", " ", s or "").strip()
 
 
-# Product checks only: a quote may lose its Markdown when the model copies it ("`a=b`" quoted as "a=b"). Only
+# A quote may lose its Markdown when the model copies it ("`a=b`" quoted as "a=b"). Only
 # PAIRED marks around a span are removed (`code`, **b**, __b__, *i*, _i_ at word boundaries); an underscore inside a
-# word is kept, so "abc" never matches "a_b_c". Dashes, arrows and quotes are unified. Study runs keep the exact match.
+# word is kept, so "abc" never matches "a_b_c". Dashes, arrows and quotes are unified. Study runs and product
+# checks both pass loose=True. Callers that omit it still require an exact match.
 _PAIRED = [re.compile(r"`([^`\n]+)`"),
            re.compile(r"\*\*(?=\S)([^*\n]+?)(?<=\S)\*\*"),
            re.compile(r"(?<![\w_])__(?=\S)([^_\n]+?)(?<=\S)__(?![\w_])"),
@@ -128,8 +129,9 @@ def loose_quote_ok(quote: str) -> str | None:
 def grounded_claims(raw: dict, title: str, body: str | None, loose: bool = False) -> tuple[list, list]:
     """(kept, rejected): a claim is kept only if its source_quote is found in the title or description.
 
-    loose (product checks only): a quote that is not found as written is compared again after loose_norm on both
-    sides. A claim kept that way carries quote_match "loose", so the record shows every such match."""
+    loose: a quote that is not found as written is compared again after loose_norm on both sides. Study runs and
+    product checks both pass loose=True. A claim kept that way carries quote_match "loose", so the record shows
+    every such match. The default is an exact match."""
     text = _norm(title) + " \n " + _norm(body)
     loose_text = (loose_norm(title) + " \n " + loose_norm(body)) if loose else ""
     kept, rejected = [], []
@@ -826,7 +828,8 @@ def generate(provider: Provider, repo: str, pr: int, title: str, body: str | Non
              base_root: Path, pr_roots: list, outdir: Path, product: bool = False,
              python_version: str | None = None, diff: str | None = None) -> dict:
     """product: a product check. It adds PRODUCT_PROBE_RULES to the probes prompt and rewrites or rejects imports
-    of a src/ layout folder. A study run (product False) is unchanged. python_version: the Python that will run the
+    of a src/ layout folder. A study run (product False) does not do those. Both routes ground claim quotes with
+    loose=True. python_version: the Python that will run the
     probes; the prompt names it and probes that do not parse with its grammar are rejected. diff: the PR diff, read
     only to see whether an existing pattern is edited (poc/boundary_probes.py); only base-side text reaches the prompt."""
     from poc import run_progress
@@ -846,7 +849,7 @@ def generate(provider: Provider, repo: str, pr: int, title: str, body: str | Non
     except ProviderError as e:
         out["errors"].append(str(e))
         return out
-    kept, rejected = grounded_claims(raw, title, body, loose=product)
+    kept, rejected = grounded_claims(raw, title, body, loose=True)
     out["claims"], out["rejected_claims"] = kept, rejected
     loose = [{"claim": c.get("id"), "source_quote": c.get("source_quote")} for c in kept if c.get("quote_match") == "loose"]
     if loose:

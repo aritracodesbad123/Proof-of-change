@@ -7,6 +7,7 @@ a search suggestion's PyPI page links back to the same GitHub repository.
 """
 from __future__ import annotations
 
+import ast
 import json
 import os
 import re
@@ -35,6 +36,8 @@ MAX_SUGGESTIONS = 8
 SMALL_CHANGED_LINES = 200
 SIDES = ("main", "pr")
 TEST_EXTRAS = ("test", "tests", "testing")
+_TEST_EXTRA_NORM = {re.sub(r"[-_.]+", "-", name).lower() for name in TEST_EXTRAS}
+_DEV_EXTRA = "dev"
 SECRET_ENVS = (
     "NEBIUS_API_KEY",
     "TAVILY_API_KEY",
@@ -714,6 +717,123 @@ def _add_pkg(found: list[dict], seen: set, requirement: str, *, kind: str, actio
                   "reason": reason, "sides": ["main", "pr"]})
 
 
+def _conftest_imports(checkout) -> set[str]:
+    """Top-level modules imported by conftest.py files. The files are parsed, never run.
+
+    The standard library is left out. A checkout that is not a directory imports nothing."""
+    root = Path(checkout)
+    if not root.is_dir():
+        return set()
+    stdlib = {norm(name) for name in getattr(sys, "stdlib_module_names", ())}
+    found: set[str] = set()
+    seen = 0
+    for dirpath, dirnames, filenames in os.walk(root):
+        dirnames[:] = [d for d in dirnames if d not in SKIP_DIRS and not d.startswith(".")]
+        if "conftest.py" not in filenames:
+            continue
+        seen += 1
+        if seen > 20:
+            break
+        try:
+            tree = ast.parse(_read(Path(dirpath) / "conftest.py"))
+        except SyntaxError:
+            continue
+        for node in ast.walk(tree):
+            mods: list[str] = []
+            if isinstance(node, ast.Import):
+                mods = [alias.name for alias in node.names]
+            elif isinstance(node, ast.ImportFrom) and node.level == 0 and node.module:
+                mods = [node.module]
+            for mod in mods:
+                top = norm(mod.split(".")[0])
+                if top and top not in stdlib:
+                    found.add(top)
+    return found
+
+
+def _req_matches_import(req: str, imports: set[str]) -> bool:
+    """True when a requirement's distribution name is a module conftest imports.
+
+    ``python-gitlab`` matches an ``import gitlab``. pytest itself does not pull an extra in: the
+    test runner is installed separately."""
+    name = norm(req_name(req))
+    if not name or name == "pytest" or name.startswith("pytest-"):
+        return False
+    if name in imports:
+        return True
+    return any(len(imp) >= 3 and name.endswith("-" + imp) for imp in imports)
+
+
+def _is_fallback_extra(name: str, reqs, imports: set[str]) -> bool:
+    """An extra to install when the project has no test, tests, or testing extra.
+
+    ``dev`` is taken whole. Any other extra is taken when one of its requirements is a module
+    conftest imports."""
+    if norm(str(name)) == _DEV_EXTRA:
+        return True
+    if not isinstance(reqs, list):
+        return False
+    return any(isinstance(req, str) and _req_matches_import(req, imports) for req in reqs)
+
+
+def _take_extra(name: str, reqs, fallback: bool, imports: set[str]) -> bool:
+    if norm(str(name)) in _TEST_EXTRA_NORM:
+        return not fallback
+    return bool(fallback and _is_fallback_extra(name, reqs, imports))
+
+
+def _project_has_test_extra(root: Path) -> bool:
+    """True when pyproject, setup.cfg, or setup.py names an extra or group test, tests, or testing."""
+    data = _pyproject(root / "pyproject.toml")
+    project = data.get("project") if isinstance(data.get("project"), dict) else {}
+    tables = [project.get("optional-dependencies"), data.get("dependency-groups")]
+    cfg = root / "setup.cfg"
+    if cfg.is_file():
+        import configparser
+        parser = configparser.ConfigParser()
+        try:
+            parser.read_string(_read(cfg))
+        except (configparser.Error, OSError):
+            parser = None
+        if parser is not None and parser.has_section("options.extras_require"):
+            tables.append({name: [] for name, _value in parser.items("options.extras_require")})
+    setup_py = _read(root / "setup.py")
+    for name in TEST_EXTRAS:
+        if _section(setup_py, name):
+            return True
+    for name in _setup_py_extras(setup_py):
+        if norm(name) in _TEST_EXTRA_NORM:
+            return True
+    for table in tables:
+        if isinstance(table, dict) and any(norm(str(name)) in _TEST_EXTRA_NORM for name in table):
+            return True
+    return False
+
+
+def _setup_py_extras(text: str) -> dict[str, list[str]]:
+    """``extras_require`` entries in setup.py: {name: [requirement, ...]}. Strings only."""
+    out: dict[str, list[str]] = {}
+    for match in re.finditer(r"""['\"]([^'\"]+)['\"]\s*:\s*\[([^\]]*)\]""", _section(text, "extras_require"), re.S):
+        out[match.group(1)] = re.findall(r"""['\"]([^'\"]+)['\"]""", match.group(2))
+    return out
+
+
+def pyproject_install_extras(checkout) -> list[str]:
+    """Optional-dependency names to request on the install line.
+
+    test, tests, or testing when the project has one. Otherwise ``dev``, and any extra that lists a
+    module imported by conftest.py."""
+    root = Path(checkout)
+    data = _pyproject(root / "pyproject.toml")
+    project = data.get("project") if isinstance(data.get("project"), dict) else {}
+    opt = project.get("optional-dependencies")
+    if not isinstance(opt, dict):
+        return []
+    fallback = not _project_has_test_extra(root)
+    imports = _conftest_imports(root) if fallback else set()
+    return [str(name) for name, reqs in opt.items() if _take_extra(name, reqs, fallback, imports)]
+
+
 def declared_packages(checkout, self_dist: str = "", skip_files=()) -> list[dict]:
     """Packages the checkout lists. Runtime deps are noted. Test extras and requirements are installed.
 
@@ -722,17 +842,26 @@ def declared_packages(checkout, self_dist: str = "", skip_files=()) -> list[dict
     skip = {Path(f).resolve() for f in skip_files or ()}
     found: list[dict] = []
     seen: set = set()
+    # No extra named test/tests/testing: also install `dev`, and extras that list a module conftest imports.
+    # A dependency group is still included only when its name is test, tests, or testing.
+    fallback = not _project_has_test_extra(root)
+    imports = _conftest_imports(root) if fallback else set()
     data = _pyproject(root / "pyproject.toml")
     project = data.get("project") if isinstance(data.get("project"), dict) else {}
     for req in project.get("dependencies") or []:
         if isinstance(req, str):
             _add_pkg(found, seen, req, kind="runtime", action="noted", source="pyproject",
                      reason="runtime dependency, installed with the project", self_dist=self_dist)
-    for bucket, label in ((project.get("optional-dependencies"), "pyproject"), (data.get("dependency-groups"), "pyproject")):
+    for bucket, label, groups_only in (
+            (project.get("optional-dependencies"), "pyproject", False),
+            (data.get("dependency-groups"), "pyproject", True)):
         if not isinstance(bucket, dict):
             continue
         for extra, reqs in bucket.items():
-            if norm(str(extra)) not in TEST_EXTRAS or not isinstance(reqs, list):
+            if not isinstance(reqs, list):
+                continue
+            take = (norm(str(extra)) in _TEST_EXTRA_NORM) if groups_only else _take_extra(extra, reqs, fallback, imports)
+            if not take:
                 continue
             for req in reqs:
                 if isinstance(req, str):
@@ -753,20 +882,33 @@ def declared_packages(checkout, self_dist: str = "", skip_files=()) -> list[dict
                              reason="runtime dependency, installed with the project", self_dist=self_dist)
             if parser.has_section("options.extras_require"):
                 for extra, value in parser.items("options.extras_require"):
-                    if norm(extra) not in TEST_EXTRAS:
+                    reqs = _req_lines(value)
+                    if not _take_extra(extra, reqs, fallback, imports):
                         continue
-                    for req in _req_lines(value):
+                    for req in reqs:
                         _add_pkg(found, seen, req, kind="test-extra", action="install", source="setup.cfg",
                                  reason=f"listed in the {extra} extra", self_dist=self_dist)
     setup_py = _read(root / "setup.py")
     for req in re.findall(r"""['\"]([^'\"]+)['\"]""", _section(setup_py, "install_requires")):
         _add_pkg(found, seen, req, kind="runtime", action="noted", source="setup.py",
                  reason="runtime dependency, installed with the project", self_dist=self_dist)
-    for extra in TEST_EXTRAS:
-        blob = _section(setup_py, extra)
-        for req in re.findall(r"""['\"]([^'\"]+)['\"]""", blob):
-            _add_pkg(found, seen, req, kind="test-extra", action="install", source="setup.py",
-                     reason=f"listed in the {extra} extra", self_dist=self_dist)
+    if fallback:
+        py_extras = _setup_py_extras(setup_py)
+        dev_blob = _section(setup_py, "dev")
+        if dev_blob and "dev" not in py_extras:
+            py_extras["dev"] = re.findall(r"""['\"]([^'\"]+)['\"]""", dev_blob)
+        for extra, reqs in py_extras.items():
+            if not _is_fallback_extra(extra, reqs, imports):
+                continue
+            for req in reqs:
+                _add_pkg(found, seen, req, kind="test-extra", action="install", source="setup.py",
+                         reason=f"listed in the {extra} extra", self_dist=self_dist)
+    else:
+        for extra in TEST_EXTRAS:
+            blob = _section(setup_py, extra)
+            for req in re.findall(r"""['\"]([^'\"]+)['\"]""", blob):
+                _add_pkg(found, seen, req, kind="test-extra", action="install", source="setup.py",
+                         reason=f"listed in the {extra} extra", self_dist=self_dist)
     for path in _requirement_files(root):
         if path.resolve() in skip:
             continue
@@ -2590,7 +2732,23 @@ def shown_outcome(rec: dict) -> str:
     return rec.get("verdict")
 
 
+def collection_import_gap(text: str) -> bool:
+    """True when collection stopped on ImportError or ModuleNotFoundError.
+
+    A new test that ran and raised ModuleNotFoundError is not this case. The text has to say collection
+    failed, or that conftest or a collected module failed to import."""
+    low = (text or "").lower()
+    if not any(mark in low for mark in ("modulenotfounderror", "importerror", "no module named")):
+        return False
+    return any(mark in low for mark in (
+        "collection failed", "while loading conftest", "error collecting", "while importing test module"))
+
+
 def is_setup_gap(verdict, text: str) -> bool:
+    # A collection import is a setup gap even when probes already need attention, so the install-and-retry
+    # runs. A needs-attention result that only names a module, with no collection failure, is not retried.
+    if verdict == "needs_attention" and collection_import_gap(text):
+        return True
     if verdict != "could_not_verify":
         return False
     low = (text or "").lower()
@@ -2652,12 +2810,11 @@ def gap_text(rec: dict, log_dir=None) -> str:
         messages = comparison.get("messages") or {}
         if isinstance(messages, dict):
             parts.extend(str(value) for value in messages.values())
-    # Log files are read only when a caller passes a directory. The study path calls this with no directory,
-    # so its gap text stays the reason, the probes and the comparison messages.
-    if log_dir is not None:
-        logged = pytest_error_text(log_dir, rec)
-        if logged:
-            parts.append(logged)
+    # Per-run pytest summaries are on the record, so a study run sees a collection import without log files.
+    # Log files are still read only when a caller passes a directory.
+    logged = pytest_error_text(log_dir, rec)
+    if logged:
+        parts.append(logged)
     return "\n".join(part for part in parts if part)
 
 
@@ -2849,7 +3006,9 @@ def retry_unverified_study(rec: dict, rerun, install_one, declared, tavily_text:
                      allow_system: bool = False, install_system=None, lookup=None, recheck_coverage=None) -> dict:
     """Study and daily-study path, unchanged from before the product check flow.
 
-    One rerun when a could-not-verify result is a setup gap. Tavily text alone never changes the verdict.
+    One rerun when a could-not-verify result is a setup gap, and when collection failed on an import error
+    even if probes already need attention. If that collection import is not repaired, the recorded
+    needs-attention verdict is kept. Tavily text alone never changes the verdict.
     A repair only lets the check run; the verdict comes from the same rules as any other run.
     When the record has probes, a fresh probe line-coverage measurement runs only when the change is small.
     A larger change skips that measurement, and the verdict stays could_not_verify.
@@ -2902,7 +3061,21 @@ def retry_unverified_study(rec: dict, rerun, install_one, declared, tavily_text:
             notes.append(f"Setup plan: refused {module}: not listed by the project and not a link-back suggestion")
     # A system package comes from the project's own files, applied with the setup plan.
     # Lookup text never adds one, even when the error names a missing library.
+    def _keep_attention(installed=None) -> bool:
+        """A collection import on a needs-attention result is retried. If it is not repaired, the recorded
+        verdict stays: a probe finding is not replaced by a setup-gap line."""
+        if rec.get("verdict") != "needs_attention":
+            return False
+        notes.append(f"Before rerun: {before['verdict']}: {before['reason']}")
+        notes.append("After rerun: not rerun. The collection import was a setup gap, but it was not repaired, "
+                     "so the recorded verdict was kept.")
+        block["notes"] = _unique(notes)
+        block["gap_retry"] = {"reran": False, "rounds": [before], "installed": installed or []}
+        return True
+
     if not specs:
+        if _keep_attention():
+            return rec
         rec["verdict"] = "could_not_verify"
         rec["reason"] = _gap_reason(name)
         notes.append(f"Before rerun: {before['verdict']}: {before['reason']}")
@@ -2911,6 +3084,8 @@ def retry_unverified_study(rec: dict, rerun, install_one, declared, tavily_text:
         block["gap_retry"] = {"reran": False, "rounds": [before], "installed": []}
         return rec
     if rerun is None:
+        if _keep_attention():
+            return rec
         rec["verdict"] = "could_not_verify"
         rec["reason"] = _gap_reason(name)
         notes.append(rec["reason"])
@@ -2923,6 +3098,8 @@ def retry_unverified_study(rec: dict, rerun, install_one, declared, tavily_text:
     installed = [row for row in logs if not str(row["versions"].get("main", "")).startswith("failed")
                  and not str(row["versions"].get("pr", "")).startswith("failed")]
     if not installed:
+        if _keep_attention(logs):
+            return rec
         rec["verdict"] = "could_not_verify"
         rec["reason"] = _gap_reason(name)
         notes.append(f"Before rerun: {before['verdict']}: {before['reason']}")
@@ -3089,7 +3266,11 @@ def retry_unverified(rec: dict, rerun, install_one, declared, tavily_text: str, 
         tries.append(entry)
         if not entry["result"].startswith("still"):
             break
-    if not reran or is_setup_gap(rec.get("verdict"), f"{rec.get('verdict')}\n{rec.get('reason')}"):
+    if not reran and rounds and rounds[0].get("verdict") == "needs_attention":
+        # Collection import on a needs-attention result: nothing was installed, so the probe finding stays.
+        rec["verdict"] = rounds[0]["verdict"]
+        rec["reason"] = rounds[0]["reason"]
+    elif not reran or is_setup_gap(rec.get("verdict"), f"{rec.get('verdict')}\n{rec.get('reason')}"):
         rec["verdict"] = "could_not_verify"
         rec["reason"] = _gap_reason(gap_name(text), text)
     notes.append(f"Before rerun: {rounds[0]['verdict']}: {rounds[0]['reason']}")
