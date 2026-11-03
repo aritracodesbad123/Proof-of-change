@@ -1,0 +1,10 @@
+{
+  "files": ["pkg/mod.py", "tests/test_mod.py", "tests/helper.py"],
+  "package_py": ["pkg/mod.py"],
+  "test": "tests.test_mod::test_helper",
+  "test_file": "tests/test_mod.py",
+  "outcome": "error",
+  "message": "ModuleNotFoundError: No module named 'tests.helper'",
+  "traceback": "tests/test_mod.py:1: in <module>\n    import tests.helper\nE   ModuleNotFoundError: No module named 'tests.helper'",
+  "counts": false
+}

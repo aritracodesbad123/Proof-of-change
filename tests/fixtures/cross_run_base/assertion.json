@@ -1,0 +1,11 @@
+{
+  "files": ["pkg/mod.py", "tests/test_mod.py"],
+  "package_py": ["pkg/mod.py"],
+  "test": "tests.test_mod::test_answer",
+  "test_file": "tests/test_mod.py",
+  "outcome": "failed",
+  "message": "AssertionError: assert 1 == 2",
+  "traceback": "tests/test_mod.py:3: in test_answer\n    assert answer() == 2\nE   AssertionError: assert 1 == 2",
+  "counts": true,
+  "stored": "AssertionError: assert 1 == 2"
+}
