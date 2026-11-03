@@ -612,6 +612,9 @@ def build(rec: dict, prdir: Path, out_dir: Path, decision: dict | None = None) -
         R.p("These notes are background from the console and the daily check. They do not change the verdict.")
         R.p(demo_helper.RETRY_LIMITS)
         R.bullets([str(note) for note in helper_notes])
+    plugin_note = rec.get("collection_plugin_note")
+    if isinstance(plugin_note, str) and plugin_note.strip():
+        R.p(plugin_note.strip())
     from poc import related_reports
     background = rec.get("related_reports") if isinstance(rec.get("related_reports"), dict) else None
     background_text = str((background or {}).get("text") or "").strip()
