@@ -4673,6 +4673,7 @@ def compare_sides(results: dict) -> dict:
            "preexisting_failures": [], "load_failed_both": [],
            "load_failed_pr": [], "load_failed_main": []}
     msgs, removed, added = {}, [], []
+    base_notes = {}
     bad = ("failed", "error")
 
     def load_state(runs, t):
@@ -4743,6 +4744,9 @@ def compare_sides(results: dict) -> dict:
             out["regressions"].append(t)
         elif mo in bad and po == "passed":
             out["fixed"].append(t)
+            bmsg = next((r[t][1] for r in results["main"] if t in r and r[t][1]), "")
+            if bmsg:
+                base_notes[t] = bmsg
         elif mo == "absent" and po == "passed":
             out["new_tests_passing"] += 1
             out["new_tests_passing_ids"].append(t)
@@ -4769,6 +4773,10 @@ def compare_sides(results: dict) -> dict:
             out["removed_tests"].extend(gone)
     out["executed"] = executed_counts(results)
     out["messages"] = {t: msgs[t] for t in (out["regressions"] + out["new_tests_failing"])[:20] if t in msgs}
+    if base_notes:
+        # The exception type and the first line of its message, for a test that failed on the base and passed
+        # on the pull request. The verdict does not read this.
+        out["base_messages"] = base_notes
     return out
 
 
@@ -6260,8 +6268,10 @@ def messages_from_pr_only_files(targets: dict, venvs: dict, cwds: dict | None, p
     return [msg for outcome, msg in parsed.values() if outcome in ("failed", "error") and msg]
 
 
-_CROSS_IMPORT_RE = re.compile(
-    r"\b(?:ImportError|ModuleNotFoundError)\b|No module named|cannot import name", re.I)
+_EXC_HEAD = re.compile(r"^([A-Za-z_][A-Za-z0-9_]*)\s*:\s*(.*)$")
+_TB_FRAME = re.compile(r'(?m)(?:File "([^"]+\.py)"|((?:[\w./@+-]+)\.py)):\d+')
+_SUPPORT_ERRS = frozenset({"ImportError", "ModuleNotFoundError", "AttributeError", "NameError"})
+_SUPPORT_STEMS = frozenset({"helper", "helpers", "fixture", "fixtures", "conftest"})
 
 
 def _clean_rel(rel: str) -> str:
@@ -6292,16 +6302,139 @@ def changed_test_files(files: dict | None) -> list[str]:
     return sorted(set(out))
 
 
-def _base_failure_to_keep(outcome: str, message: str) -> bool:
-    """A real test failure on the base.
+def _format_exc(typ: str, rest: str) -> str:
+    """Exception type and the first line of its message, nothing after that line."""
+    line = ""
+    if rest:
+        line = rest.strip().splitlines()[0].strip()
+    note = f"{typ}: {line}" if line else typ
+    return note[:200]
 
-    A collection error, or an import error (a helper the new tests added that the base tree does not have),
-    is not a cross-run and is not a pass."""
-    if outcome == "load_error":
+
+def _base_failure_note(message: str, body: str = "") -> str:
+    """The exception type and the first line of its message, from a pytest failure.
+
+    The message attribute is preferred. The body is used when the type is only on an ``E`` line, or when the
+    failure is a bare assertion."""
+    candidates = []
+    if message:
+        candidates.append(message.strip().splitlines()[0].strip())
+    for raw in (body or "").splitlines():
+        line = raw.strip()
+        if line.startswith("E ") or line.startswith("E\t"):
+            line = line[1:].strip()
+        if line:
+            candidates.append(line)
+    for line in candidates:
+        match = _EXC_HEAD.match(line)
+        if match and match.group(1) not in ("File",):
+            return _format_exc(match.group(1), match.group(2))
+        if line.startswith("assert "):
+            return _format_exc("AssertionError", line)
+    return (candidates[0][:200] if candidates else "")
+
+
+def _changed_rels(files: dict | None) -> list[str]:
+    out = []
+    for raw in (files or {}).get("all") or []:
+        rel = _clean_rel(raw)
+        if _rel_inside(rel):
+            out.append(rel)
+    return out
+
+
+def _is_test_support(rel: str) -> bool:
+    """A helper, conftest or fixture file. The test module itself is not support."""
+    if is_test_file(rel):
         return False
-    if outcome in ("failed", "error") and _CROSS_IMPORT_RE.search(message or ""):
+    path = PurePosixPath(_clean_rel(rel))
+    if path.name == "conftest.py":
+        return True
+    stem = path.stem.lower()
+    if stem in _SUPPORT_STEMS or stem.endswith("_helper") or stem.endswith("_fixture"):
+        return True
+    return any(part.lower() in _SUPPORT_STEMS for part in path.parts[:-1])
+
+
+def _match_changed(path: str, changed: list[str]) -> str | None:
+    """The changed file `path` refers to, by equal path or a whole-folder suffix. Absolute prefixes are ignored."""
+    path = path.replace("\\", "/")
+    if path.startswith("./"):
+        path = path[2:]
+    for rel in changed:
+        if path == rel or path.endswith("/" + rel):
+            return rel
+    return None
+
+
+def _traceback_end(text: str, changed: list[str]) -> str | None:
+    """The changed file the traceback ends in, or None when the last frame is not one of those files."""
+    frames = []
+    for match in _TB_FRAME.finditer(text or ""):
+        raw = match.group(1) or match.group(2) or ""
+        if raw:
+            frames.append(raw)
+    if not frames:
+        return None
+    return _match_changed(frames[-1], changed)
+
+
+def _module_files(dotted: str) -> list[str]:
+    if not re.fullmatch(r"[A-Za-z_][\w.]*", dotted):
+        return []
+    parts = dotted.split(".")
+    base = "/".join(parts)
+    return [base + ".py", base + "/__init__.py"]
+
+
+def _points_at_support(note: str, body: str, support: set[str]) -> bool:
+    """An import, attribute or name error that names a helper, conftest or fixture the pull request changes."""
+    typ = (note or "").split(":", 1)[0].strip()
+    if typ not in _SUPPORT_ERRS or not support:
         return False
-    return outcome in ("failed", "error")
+    text = f"{note}\n{body or ''}"
+    for name in re.findall(r"['\"]([A-Za-z_][\w.]*)['\"]", text):
+        for rel in _module_files(name):
+            if rel in support or any(s == rel or s.endswith("/" + rel) for s in support):
+                return True
+    if typ == "NameError":
+        match = re.search(r"name '([A-Za-z_]\w*)' is not defined", text)
+        if match and any(PurePosixPath(s).stem == match.group(1) for s in support):
+            return True
+    return False
+
+
+def _is_assertion(note: str, body: str) -> bool:
+    typ = (note or "").split(":", 1)[0].strip()
+    if typ in ("AssertionError", "Failed"):
+        return True
+    if (note or "").lstrip().startswith("assert "):
+        return True
+    return bool(re.search(r"(?m)^(?:E[ \t]+)?assert\s+\S", body or ""))
+
+
+def _base_failure_counts(outcome: str, note: str, body: str, files: dict | None) -> bool:
+    """Whether this base failure may be counted in ``fixed``.
+
+    It counts when it is an assertion, or when the traceback ends in non-test code the pull request changed.
+    It does not count when the traceback ends in a helper, conftest or fixture file the pull request changes,
+    or when an ImportError, ModuleNotFoundError, AttributeError or NameError points at one of those files.
+    Anything else, including a collection error, does not count and is not a pass."""
+    if outcome not in ("failed", "error"):
+        return False
+    changed = _changed_rels(files)
+    support = {rel for rel in changed if _is_test_support(rel)}
+    non_test = {rel for rel in changed
+                if rel.endswith(".py") and not coverage_gate.is_test(rel) and not _is_test_support(rel)
+                and not is_test_file(rel)}
+    end = _traceback_end(f"{note}\n{body or ''}", changed)
+    if end in support:
+        return False
+    if _points_at_support(note, body, support):
+        return False
+    if _is_assertion(note, body):
+        return True
+    return end in non_test
 
 
 def _target_covers(rel: str, targets: list | None) -> bool:
@@ -6402,6 +6535,39 @@ def _splice_junit(path: Path, test_id: str, outcome: str, message: str) -> None:
         pass
 
 
+def parse_cross_junit(path: Path) -> dict:
+    """{test id: (outcome, note, body)} for one cross-run junit.
+
+    note is the exception type and the first line of its message. body is the failure text, used only to see
+    where the traceback ends. A pass has an empty note. Outcomes match parse_junit."""
+    res = {}
+    if not path.exists():
+        return res
+    try:
+        root = ET.parse(path).getroot()
+    except ET.ParseError:
+        return res
+    for tc in root.iter("testcase"):
+        cls = side_independent(tc.get("classname") or "")
+        name = tc.get("name") or ""
+        if not cls:
+            name = side_independent(name)
+        tid = cls + "::" + name
+        outcome, note, body = "passed", "", ""
+        for ch in tc:
+            if ch.tag in ("failure", "error"):
+                outcome = "failed" if ch.tag == "failure" else ("load_error" if not cls else "error")
+                message = (ch.get("message") or "").strip()
+                body = (ch.text or "").strip()
+                note = _base_failure_note(message, body)
+                break
+            if ch.tag == "skipped":
+                outcome = "skipped"
+                note = f"{ch.get('type') or 'skip'}: {(ch.get('message') or '').strip()[:200]}"
+        res[tid] = (outcome, note, body)
+    return res
+
+
 def _cross_pytest(side: str, venv: Path, rels: list[str], root: Path, prdir: Path, a, keep: bool,
                   use_contree: bool, files: dict | None, index: int) -> dict:
     """One pytest of these files on one side. A start that raises is an empty result, not a pass."""
@@ -6412,7 +6578,7 @@ def _cross_pytest(side: str, venv: Path, rels: list[str], root: Path, prdir: Pat
         if use_contree:
             _contree_pytest_once(side, rels, int(a.test_timeout), int(a.run_timeout), str(a.workers),
                                  jx, lg, keep, files=files)
-            return parse_junit(jx)
+            return parse_cross_junit(jx)
         env = base_env(side_home(venv))
         jin = side_out(venv) / jx.name
         tg = [str(root / rel) for rel in rels]
@@ -6421,7 +6587,7 @@ def _cross_pytest(side: str, venv: Path, rels: list[str], root: Path, prdir: Pat
         jx.unlink(missing_ok=True)
         if jin.exists():
             shutil.move(jin, jx)
-        return parse_junit(jx)
+        return parse_cross_junit(jx)
     except Exception as exc:  # noqa: BLE001 - a cross-run that cannot start leaves the comparison as it was
         try:
             with lg.open("a") as fh:
@@ -6431,10 +6597,21 @@ def _cross_pytest(side: str, venv: Path, rels: list[str], root: Path, prdir: Pat
         return {}
 
 
-def _fold_cross_run(results: dict, base_runs: list, pr_extra: list | None, rels: list[str], prdir: Path) -> None:
-    """Write real base failures into the results the comparison is built from, when the PR side passed.
+def _row_parts(row) -> tuple[str, str, str] | None:
+    """(outcome, note, body) from a 2-tuple (outcome, message) or a 3-tuple that already split them."""
+    if not isinstance(row, tuple) or len(row) < 2:
+        return None
+    outcome, message = row[0], row[1]
+    body = row[2] if len(row) > 2 else message
+    return outcome, _base_failure_note(message, body), body or ""
 
-    An import or collection error on the base is left out, so it becomes neither ``fixed`` nor a pass."""
+
+def _fold_cross_run(results: dict, base_runs: list, pr_extra: list | None, rels: list[str], prdir: Path,
+                    files: dict | None = None) -> None:
+    """Write qualifying base failures into the results the comparison is built from, when the PR side passed.
+
+    The stored message is the exception type and the first line of its message. A failure that does not qualify
+    is left out, so it becomes neither ``fixed`` nor a pass."""
     n = len(results["main"])
     if len(base_runs) != n or len(results["pr"]) != n:
         return
@@ -6457,17 +6634,20 @@ def _fold_cross_run(results: dict, base_runs: list, pr_extra: list | None, rels:
             pr_rows = [run.get(tid) for run in results["pr"]]
             from_extra = False
         if from_extra and all(row is not None for row in pr_rows):
-            for i, (outcome, msg) in enumerate(pr_rows):
+            for i, row in enumerate(pr_rows):
+                outcome, msg = row[0], row[1]
                 results["pr"][i][tid] = (outcome, msg)
                 _splice_junit(prdir / f"junit-pr-{i + 1}.xml", tid, outcome, msg)
-        kept = (all(row is not None for row in base_rows)
-                and all(_base_failure_to_keep(outcome, msg) for outcome, msg in base_rows))
-        passed = all(row is not None and row[0] == "passed" for row in pr_rows)
+        parts = [_row_parts(row) for row in base_rows]
+        kept = (all(part is not None for part in parts)
+                and all(_base_failure_counts(part[0], part[1], part[2], files) for part in parts))
+        pr_parts = [_row_parts(row) if row is not None else None for row in pr_rows]
+        passed = all(part is not None and part[0] == "passed" for part in pr_parts)
         if not (kept and passed):
             continue
-        for i, (outcome, msg) in enumerate(base_rows):
-            results["main"][i][tid] = (outcome, msg)
-            _splice_junit(prdir / f"junit-main-{i + 1}.xml", tid, outcome, msg)
+        for i, part in enumerate(parts):
+            results["main"][i][tid] = (part[0], part[1])
+            _splice_junit(prdir / f"junit-main-{i + 1}.xml", tid, part[0], part[1])
 
 
 def _cross_files(side: str, venv: Path, rels: list[str], root: Path, prdir: Path, a, keep: bool,
@@ -6494,8 +6674,11 @@ def record_cross_run(rec: dict, venvs: dict, targets: dict | None, prdir: Path, 
     The files are the pull request's text. On the base they run in the base sandbox and environment, against
     the base source. They also run on the pull request when that file was not already a target. A test that
     fails on the base and passes on the pull request is written into the per-run results, so ``compare_sides``
-    puts it in ``fixed``, which is the list ``cross_run_test_ids`` reads. A collection or import error on the
-    base is not written."""
+    puts it in ``fixed``, which is the list ``cross_run_test_ids`` reads. The base message kept with that result
+    is the exception type and the first line of its message. A failure counts only when it is an assertion, or
+    the traceback ends in non-test code the diff changed. An import, attribute or name error that points at a
+    helper, conftest or fixture the diff also changes, and any error whose traceback ends in such a file, is
+    not written."""
     if not isinstance(results, dict):
         return results
     main_runs, pr_runs = results.get("main"), results.get("pr")
@@ -6528,7 +6711,8 @@ def record_cross_run(rec: dict, venvs: dict, targets: dict | None, prdir: Path, 
         if extra:
             pr_extra = [_cross_files("pr", venvs["pr"], extra, pr_root, prdir, a, keep, use_contree,
                                      None, i + 1) for i in range(len(pr_runs))]
-        _fold_cross_run(results, base_runs, pr_extra, rels, prdir)
+        _fold_cross_run(results, base_runs, pr_extra, rels, prdir,
+                        rec.get("files") if isinstance(rec, dict) else None)
     finally:
         _restore_overlay(saved)
     return results

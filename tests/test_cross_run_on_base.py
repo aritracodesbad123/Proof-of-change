@@ -6,6 +6,7 @@ fixtures stay not verified. Nothing here contacts GitHub.
 """
 
 import importlib.util
+import json
 import sys
 from pathlib import Path
 from types import SimpleNamespace
@@ -49,16 +50,59 @@ def test_an_import_error_on_the_base_is_not_stored_as_a_failure_or_a_pass(tmp_pa
         }
     ]
     results = {"main": [{}], "pr": [dict(pr[0])]}
-    dr._fold_cross_run(results, base, None, rels, tmp_path)
-    assert results["main"][0]["tests.test_mod::test_answer"][0] == "failed"
+    files = {"all": ["pkg/mod.py", "tests/test_mod.py", "tests/helper.py"], "package_py": ["pkg/mod.py"]}
+    dr._fold_cross_run(results, base, None, rels, tmp_path, files)
+    assert results["main"][0]["tests.test_mod::test_answer"] == ("failed", "AssertionError: assert 1 == 2")
     assert "tests.test_helper::test_helper" not in results["main"][0]
     assert "tests.test_mod::test_already" not in results["main"][0]
     cmp = dr.compare_sides(results)
-    files = {"all": rels + ["pkg/mod.py"], "package_py": ["pkg/mod.py"]}
     ids = dr.cross_run_test_ids(cmp, files)
     assert any(i.endswith("test_answer") for i in ids)
+    assert cmp["base_messages"]["tests.test_mod::test_answer"] == "AssertionError: assert 1 == 2"
     assert not any("test_helper" in i for i in ids)
     assert any(i.endswith("test_helper") for i in cmp["new_tests_passing_ids"])
+
+
+def test_base_failure_fixtures_keep_an_assertion_and_drop_a_missing_helper(tmp_path):
+    root = Path(__file__).resolve().parent / "fixtures" / "cross_run_base"
+    seen = set()
+    for path in sorted(root.glob("*.json")):
+        spec = json.loads(path.read_text())
+        seen.add(path.name)
+        files = {"all": spec["files"], "package_py": spec.get("package_py") or []}
+        body = spec.get("traceback") or ""
+        note = dr._base_failure_note(spec["message"], body)
+        assert dr._base_failure_counts(spec["outcome"], note, body, files) is spec["counts"], path.name
+        tid = spec["test"]
+        results = {"main": [{}], "pr": [{tid: ("passed", "")}]}
+        dr._fold_cross_run(results, [{tid: (spec["outcome"], spec["message"], body)}], None,
+                           [spec["test_file"]], tmp_path, files)
+        cmp = dr.compare_sides(results)
+        if spec["counts"]:
+            assert note == spec["stored"]
+            assert "\n" not in note
+            assert tid in cmp["fixed"]
+            assert cmp["base_messages"][tid] == spec["stored"]
+            assert dr.cross_run_test_ids(cmp, files) == [tid]
+        else:
+            assert tid not in results["main"][0]
+            assert tid not in cmp["fixed"]
+            assert tid not in (cmp.get("base_messages") or {})
+            assert dr.cross_run_test_ids(cmp, files) == []
+    assert seen == {"assertion.json", "missing-helper.json"}
+
+
+def test_an_exception_in_changed_code_counts_and_one_in_support_does_not():
+    files = {"all": ["pkg/mod.py", "tests/test_mod.py", "tests/helper.py", "tests/conftest.py"],
+             "package_py": ["pkg/mod.py"]}
+    raised = "pkg/mod.py:4: in answer\n    raise ValueError('nope')\nE   ValueError: nope"
+    assert dr._base_failure_counts("failed", "ValueError: nope", raised, files)
+    assert dr._base_failure_note("ValueError: nope\nmore", raised) == "ValueError: nope"
+    ended = "tests/helper.py:2: in setup\n    raise ValueError('nope')\nE   ValueError: nope"
+    assert not dr._base_failure_counts("error", "ValueError: nope", ended, files)
+    attr = "E   AttributeError: module 'tests.conftest' has no attribute 'fix'"
+    assert not dr._base_failure_counts("error", "AttributeError: module 'tests.conftest' has no attribute 'fix'",
+                                       attr, files)
 
 
 def _agreed_differs():
@@ -110,8 +154,8 @@ def _project(root: Path, answer: str, with_new_tests: bool) -> None:
     if not with_new_tests:
         return
     _write(root / "tests" / "test_mod.py", "from pkg.mod import answer\n\ndef test_answer():\n    assert answer() == 2\n")
-    _write(root / "tests" / "only_on_pr.py", "OK = True\n")
-    _write(root / "tests" / "test_helper.py", "import tests.only_on_pr as helper\n\ndef test_helper():\n    assert helper.OK\n")
+    _write(root / "tests" / "helper.py", "OK = True\n")
+    _write(root / "tests" / "test_helper.py", "import tests.helper as helper\n\ndef test_helper():\n    assert helper.OK\n")
 
 
 def test_a_fake_pr_stores_the_cross_run_and_an_import_error_does_not_count(tmp_path):
@@ -127,10 +171,10 @@ def test_a_fake_pr_stores_the_cross_run_and_an_import_error_does_not_count(tmp_p
     _project(pr, "2", with_new_tests=True)
     venvs = {"main": _venv(work, "venv-main"), "pr": _venv(work, "venv-pr")}
     files = {
-        "all": ["pkg/mod.py", "tests/test_mod.py", "tests/test_helper.py", "tests/only_on_pr.py"],
+        "all": ["pkg/mod.py", "tests/test_mod.py", "tests/test_helper.py", "tests/helper.py"],
         "package_py": ["pkg/mod.py"],
         "compiled": [],
-        "other": ["tests/test_mod.py", "tests/test_helper.py", "tests/only_on_pr.py"],
+        "other": ["tests/test_mod.py", "tests/test_helper.py", "tests/helper.py"],
     }
     rec = {"files": files}
     (tmp_path / "run").mkdir()
@@ -154,10 +198,14 @@ def test_a_fake_pr_stores_the_cross_run_and_an_import_error_does_not_count(tmp_p
     assert cnv is None and cmp is not None
     assert not (main / "tests" / "test_mod.py").exists()
     assert not (main / "tests" / "test_helper.py").exists()
+    assert not (main / "tests" / "helper.py").exists()
     assert "return 1" in (main / "pkg" / "mod.py").read_text()
     ids = dr.cross_run_test_ids(cmp, files)
     assert any(i.endswith("test_answer") for i in ids)
-    assert not any("test_helper" in i or "only_on_pr" in i for i in ids)
+    answer = next(i for i in ids if i.endswith("test_answer"))
+    stored = cmp["base_messages"][answer]
+    assert stored.startswith("AssertionError") and "\n" not in stored
+    assert not any("test_helper" in i or "helper.py" in i for i in ids)
     assert not any("test_helper" in i for i in cmp["fixed"])
     assert any(i.endswith("test_helper") for i in cmp["new_tests_passing_ids"])
     assert not cmp.get("load_failed_main")
