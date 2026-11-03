@@ -71,6 +71,9 @@ def test_default_python_files_when_the_setting_is_absent(tmp_path):
 def test_catch_all_pattern_keeps_tests_and_skips_the_package_module(tmp_path):
     root = _checkout(tmp_path)
     _write(root, "pytest.ini", "[pytest]\npython_files = *\n")
+    # A catch-all pattern only keeps a file that parses as a test. These two do.
+    _write(root, "tests/task.py", "def test_task():\n    assert True\n")
+    _write(root, "tests/runners.py", "def test_runner():\n    assert True\n")
     files = {"all": ["pkg/runners.py", "tests/task.py"], "package_py": ["pkg/runners.py"]}
     got = dr.map_repo_tests(files, root)
     assert got == ["tests/task.py", "tests/runners.py"]

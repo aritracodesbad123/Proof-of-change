@@ -301,7 +301,7 @@ def _checkout_facts(checkout) -> dict:
         except (configparser.Error, OSError):
             pass
     for path in list(root.glob("*requirements*.txt")) + list(root.glob("requirements/*.txt")) + \
-            list(root.glob("*/requirements*.txt")):
+            list(root.glob("*/*requirements*.txt")):
         rel = str(path.relative_to(root))
         facts["files"].add(rel)
         try:
