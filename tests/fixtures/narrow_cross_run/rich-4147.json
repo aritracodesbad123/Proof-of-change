@@ -1,0 +1,29 @@
+{
+  "files": ["rich/highlighter.py", "tests/test_highlighter.py"],
+  "package_py": ["rich/highlighter.py"],
+  "tests": {
+    "main": {
+      "tests/test_highlighter.py::test_adjacent_tags": "failed",
+      "tests/test_highlighter.py::test_repr_existing": "passed"
+    },
+    "pr": {
+      "tests/test_highlighter.py::test_adjacent_tags": "passed",
+      "tests/test_highlighter.py::test_repr_existing": "passed"
+    }
+  },
+  "probes": [
+    {
+      "id": "model-p1",
+      "claims": [
+        {
+          "id": "C1",
+          "text": "adjacent tags are no longer merged into one match",
+          "covers": ["adjacent"],
+          "expect": "differs"
+        }
+      ],
+      "main": {"adjacent": true, "space_after": "tag"},
+      "pr": {"adjacent": true, "space_after": "plain"}
+    }
+  ]
+}

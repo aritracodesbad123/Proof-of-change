@@ -1,0 +1,37 @@
+{
+  "files": ["dask/utils.py", "dask/tests/test_utils.py"],
+  "package_py": ["dask/utils.py"],
+  "tests": {
+    "main": {
+      "dask/tests/test_utils.py::test_parse_timedelta[.5s]": "failed",
+      "dask/tests/test_utils.py::test_parse_timedelta[.25 seconds]": "failed",
+      "dask/tests/test_utils.py::test_parse_timedelta[5s]": "passed"
+    },
+    "pr": {
+      "dask/tests/test_utils.py::test_parse_timedelta[.5s]": "passed",
+      "dask/tests/test_utils.py::test_parse_timedelta[.25 seconds]": "passed",
+      "dask/tests/test_utils.py::test_parse_timedelta[5s]": "passed"
+    }
+  },
+  "probes": [
+    {
+      "id": "model-p1",
+      "claims": [
+        {
+          "id": "C1",
+          "text": "a leading-dot duration such as .5s changes from 1.5 to 0.5",
+          "covers": ["dot"],
+          "expect": "differs"
+        },
+        {
+          "id": "C2",
+          "text": "a unit-only string such as ms still returns 0.001",
+          "covers": ["unit"],
+          "expect": "same"
+        }
+      ],
+      "main": {"dot": 1.5, "unit": 0.001},
+      "pr": {"dot": 1.5, "unit": 1.001}
+    }
+  ]
+}
