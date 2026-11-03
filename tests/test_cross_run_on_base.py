@@ -269,6 +269,7 @@ def test_contree_cross_run_uses_the_plugin_retry_and_does_not_override_python_fi
     uploaded = {}
     for _side, shell, sent in calls:
         assert "INTERNALERROR" in shell and "-p no:" in shell
+        assert f"{dr.venv_python(contree=True)} -m pytest" in shell
         assert "python_files" not in shell
         uploaded.update(sent or {})
     assert set(uploaded) == {f"{dr.OWN_CHECKOUT_ROOT}/tests/test_mod.py", f"{dr.OWN_CHECKOUT_ROOT}/tests/test_helper.py"}
