@@ -3565,32 +3565,65 @@ def _parse_entry_points(text: str) -> list[tuple[str, str, str]]:
     return [tuple(item) for item in data if isinstance(item, list) and len(item) == 3]
 
 
-def installed_pytest_entry_points(venvs: dict) -> list[tuple[str, str, str]]:
-    """pytest11 entry points from a side that already has the project installed. Main first, then the PR side."""
+def _short_reason(text: str) -> str:
+    """One short line, with folder names taken out so a record does not keep a machine path."""
+    text = _SIDE_DIR.sub("side", text or "")
+    text = re.sub(r"(?:[A-Za-z]:)?(?:[/\\][^\s\"'`]+)+", "...", text)
+    text = " ".join(text.split())
+    return text[:180]
+
+
+def installed_pytest_entry_points(venvs: dict) -> tuple[list[tuple[str, str, str]], str]:
+    """(pytest11 entry points, reason). The reason is empty when the list was read.
+
+    Main is tried first, then the pull-request side. When neither side yields a list, the reason says why,
+    in plain words. The caller records that reason. It is not dropped."""
+    problems: list[str] = []
     if _contree_ready():
         from poc import contree_sandboxes
         sess = contree_sandboxes.session()
+        if sess is None:
+            return [], "the sandbox session was not available, so the installed pytest plugins could not be read"
         for side in ("main", "pr"):
             try:
                 raw = sess.run_argv(side, ["python", "-c", PYTEST_ENTRY_POINTS_PY], timeout=60)
-            except Exception:  # noqa: BLE001 - no metadata means the retry cannot name a plugin
-                raw = {}
-            found = _parse_entry_points((raw or {}).get("stdout") or "")
+            except Exception as exc:  # noqa: BLE001 - the reason is recorded, the check continues
+                problems.append(f"the {side} side failed ({type(exc).__name__})")
+                continue
+            if not isinstance(raw, dict):
+                problems.append(f"the {side} side returned nothing")
+                continue
+            found = _parse_entry_points(raw.get("stdout") or "")
             if found:
-                return found
-        return []
+                return found, ""
+            err = (raw.get("stderr") or "").strip().splitlines()
+            detail = _short_reason(err[-1]) if err else "no plugin list in the output"
+            problems.append(f"the {side} side: {detail}")
+        return [], "the installed pytest plugins could not be read (" + "; ".join(problems) + ")"
+    if not venvs:
+        return [], "no run environment was available to read the installed pytest plugins"
     for side in ("main", "pr"):
-        venv = (venvs or {}).get(side)
+        venv = venvs.get(side)
         if not venv:
+            problems.append(f"the {side} side had no environment")
             continue
         py = Path(venv) / "bin" / "python"
         if not py.is_file():
+            problems.append(f"the {side} side had no Python interpreter")
             continue
-        cp = in_side(venv, [str(py), "-c", PYTEST_ENTRY_POINTS_PY], timeout=60)
+        try:
+            cp = in_side(venv, [str(py), "-c", PYTEST_ENTRY_POINTS_PY], timeout=60)
+        except Exception as exc:  # noqa: BLE001 - the reason is recorded, the check continues
+            problems.append(f"the {side} side failed ({type(exc).__name__})")
+            continue
         found = _parse_entry_points(getattr(cp, "stdout", "") or "")
         if found:
-            return found
-    return []
+            return found, ""
+        err = (getattr(cp, "stderr", "") or "").strip().splitlines()
+        detail = _short_reason(err[-1]) if err else "no plugin list in the output"
+        code = getattr(cp, "returncode", None)
+        problems.append(f"the {side} side (exit {code}): {detail}")
+    return [], "the installed pytest plugins could not be read (" + "; ".join(problems or ["no output"]) + ")"
 
 
 def _pytest_output_names(runs: int) -> list[str]:
@@ -3626,6 +3659,91 @@ def _side_pytest_logs(rdir: Path, runs: int) -> tuple[str, str]:
     return read("main"), read("pr")
 
 
+def _first_error_line(log: str) -> str:
+    """The first exception, warning, or collection-error line in a pytest log."""
+    plain = _plain_pytest_log(log).splitlines()
+    for raw in plain:
+        match = _EXC_LINE.match(raw.strip())
+        if match:
+            text = _SIDE_DIR.sub("side", match.group("exc"))
+            text = re.sub(r"(?:[A-Za-z]:)?[^:\s\"'`]*site-packages/", "site-packages/", text)
+            return " ".join(text.split())[:200]
+    for raw in plain:
+        if "ERROR collecting" in raw or raw.strip().startswith("E "):
+            return " ".join(raw.split())[:200]
+    for raw in plain:
+        text = raw.strip()
+        if text and not text.startswith(("=", "!", "$")):
+            return " ".join(text.split())[:200]
+    return ""
+
+
+def _plugin_flags(names: list[str]) -> str:
+    return " ".join(f"-p no:{name}" for name in names)
+
+
+def _keep_retry_logs(rdir: Path, runs: int) -> None:
+    """Copy this attempt's pytest output to pytest-main-retry.log and pytest-pr-retry.log.
+
+    The numbered logs are the runs the verdict reads. These copies stay beside the record either way."""
+    for side in ("main", "pr"):
+        parts = []
+        for i in range(1, runs + 1):
+            path = rdir / f"pytest-{side}-{i}.log"
+            if path.is_file():
+                parts.append(path.read_text(errors="replace"))
+        if parts:
+            (rdir / f"pytest-{side}-retry.log").write_text("\n".join(parts))
+
+
+def plugin_retry_note(info: dict) -> str:
+    """Plain sentence for the run report. It states the attempt and does not choose a verdict."""
+    where = ("Pytest stopped at startup the same way on both sides" if info.get("kind") == "startup"
+             else "Collection failed the same way on both sides")
+    plugins = ", ".join(info.get("plugins") or []) or "none"
+    if info.get("plugin_list_read"):
+        listed = "The installed pytest plugin list was read"
+        if info.get("plugin_list_why"):
+            listed += f" ({info['plugin_list_why']})"
+        listed += "."
+    else:
+        why = info.get("plugin_list_why") or "no reason was recorded"
+        listed = f"The installed pytest plugin list could not be read: {why}."
+    flags = info.get("flags") or "none"
+    outcome = info.get("outcome") or "not run"
+    if outcome == "worked" and info.get("plugins"):
+        head = collection_plugin_note(list(info["plugins"]), info.get("trigger_error") or "",
+                                      startup=info.get("kind") == "startup")
+        return (f"{head} Detection fired. {where}. Plugin chosen: {plugins}. {listed} "
+                f"Retry flags: {flags}. Outcome: worked.")
+    tail = ""
+    if outcome == "failed again":
+        tail = (f" Main: {info.get('main_error') or 'no error line'}."
+                f" PR: {info.get('pr_error') or 'no error line'}."
+                " The first result was kept.")
+    elif outcome == "not run":
+        tail = " The first result was kept."
+    return (f"Setup: detection fired. {where}. Plugin chosen: {plugins}. {listed} "
+            f"Retry flags: {flags}. Outcome: {outcome}.{tail} "
+            "This does not change how the verdict is chosen.")
+
+
+def _remember_plugin_retry(rec: dict, info: dict) -> None:
+    rec["plugin_retry"] = {
+        "detection_fired": True,
+        "kind": info.get("kind") or "",
+        "plugins": list(info.get("plugins") or []),
+        "plugin_list_read": bool(info.get("plugin_list_read")),
+        "plugin_list_why": info.get("plugin_list_why") or "",
+        "flags": info.get("flags") or "",
+        "outcome": info.get("outcome") or "not run",
+        "main_error": info.get("main_error") or "",
+        "pr_error": info.get("pr_error") or "",
+    }
+    rec["collection_plugin_note"] = plugin_retry_note(info)
+    print(rec["collection_plugin_note"], flush=True)
+
+
 def _retry_collected(results: dict) -> bool:
     """True when both sides collected something that ran or skipped, not only a load error."""
     for side in ("main", "pr"):
@@ -3650,26 +3768,51 @@ def retry_collection_plugin(rec: dict, per_run: list, results: dict, venvs: dict
     startup = startup_failed_same_way(main_log, pr_log)
     if not startup and not collection_failed_same_way(main_log, pr_log):
         return per_run, results
+    kind = "startup" if startup else "collection"
+    trigger = _collection_error(main_log)
+    installed, why = installed_pytest_entry_points(venvs)
+    base = {"kind": kind, "trigger_error": trigger, "detection_fired": True}
+    if not installed:
+        _remember_plugin_retry(rec, base | {
+            "plugins": [], "plugin_list_read": False, "plugin_list_why": why,
+            "flags": "", "outcome": "not run", "main_error": "", "pr_error": ""})
+        return per_run, results
     frames = (_startup_configure_frames(main_log) if startup else _collection_frames(main_log))
-    installed = installed_pytest_entry_points(venvs)
     names = plugin_entry_points(frames, installed)
     if startup:
         roots = [cwds.get(side) for side in ("main", "pr") if isinstance(cwds, dict) and cwds.get(side)]
         dist_of = {str(ep_name): str(dist or "") for ep_name, _value, dist in installed}
-        names = [name for name in names if not plugin_named_in_pytest_config(roots, name, dist_of.get(name, ""))]
+        blocked = [name for name in names if plugin_named_in_pytest_config(roots, name, dist_of.get(name, ""))]
+        names = [name for name in names if name not in blocked]
+    else:
+        blocked = []
     if not names:
+        skipped = ("the project's pytest config names " + ", ".join(blocked)
+                   if blocked else "no installed plugin matched the traceback")
+        _remember_plugin_retry(rec, base | {
+            "plugins": blocked, "plugin_list_read": True, "plugin_list_why": skipped,
+            "flags": "", "outcome": "not run", "main_error": "", "pr_error": ""})
         return per_run, results
+    # One retry, with every chosen plugin on that single command. Plugins are not tried one at a time.
+    flags = _plugin_flags(names)
     saved = _snapshot_pytest_outputs(prdir, runs)
     kwargs = {"cwds": cwds, "keep_addopts": keep_addopts, "disable_plugins": names}
     if parallel:
         kwargs["parallel"] = True
     per2, res2 = run_tests(venvs, targets, prdir, work, a.runs, a.workers, a.test_timeout, a.run_timeout, **kwargs)
+    _keep_retry_logs(prdir, runs)
+    retry_main, retry_pr = _side_pytest_logs(prdir, runs)
     if not _retry_collected(res2):
         _restore_pytest_outputs(prdir, saved)
+        _remember_plugin_retry(rec, base | {
+            "plugins": names, "plugin_list_read": True, "plugin_list_why": "",
+            "flags": flags, "outcome": "failed again",
+            "main_error": _first_error_line(retry_main), "pr_error": _first_error_line(retry_pr)})
         return per_run, results
     rec["pytest_plugins_off"] = list(names)
-    rec["collection_plugin_note"] = collection_plugin_note(names, _collection_error(main_log), startup=startup)
-    print(rec["collection_plugin_note"], flush=True)
+    _remember_plugin_retry(rec, base | {
+        "plugins": names, "plugin_list_read": True, "plugin_list_why": "",
+        "flags": flags, "outcome": "worked", "main_error": "", "pr_error": ""})
     return per2, res2
 
 
