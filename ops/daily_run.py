@@ -68,7 +68,7 @@ from poc import (  # noqa: E402,E501
     pdf_always,
     probes,
 )
-from poc.diff import confirm, pr_runs_too_noisy  # noqa: E402
+from poc.diff import confirm, normalise, pr_runs_too_noisy  # noqa: E402
 from poc.pr_text import github_read_token  # noqa: E402
 from poc.tool_setup import ToolSetupError, ensure_tools, uv_bin  # noqa: E402
 from poc.tool_setup import last_result as tool_setup_result  # noqa: E402
@@ -4466,6 +4466,28 @@ def attribute_backend_errors(cmp: dict, results: dict, also_on_base: list[str] |
     cmp["messages"] = {t: messages[t] for t in (cmp["regressions"] + cmp["new_tests_failing"])[:20] if t in messages}
 
 
+def _failure_signature(results: dict, test_id: str) -> dict:
+    """Whether one test fails the same way on the base and on the pull request.
+
+    Same way means every run has the same outcome, and the same exception type after side-path normalisation
+    (poc.diff.normalise: side-main and side-pr, and the same pair for venv, cwd, home and out, plus the other
+    noise rules). A message that names no exception type is not that case: the type was not shown, so the
+    failure still blocks a cross-run."""
+    rows = []
+    for side in ("main", "pr"):
+        for run in results.get(side) or []:
+            outcome, msg = run.get(test_id, ("absent", ""))
+            text = normalise(msg) if isinstance(msg, str) else ""
+            rows.append((outcome, tuple(sorted(exception_types(text)))))
+    outcomes = {outcome for outcome, _types in rows}
+    types = {exc for _outcome, exc in rows}
+    same = (bool(rows) and outcomes <= {"failed", "error"} and len(outcomes) == 1
+            and len(types) == 1 and len(next(iter(types))) >= 1)
+    return {"same": same,
+            "outcome": next(iter(outcomes)) if len(outcomes) == 1 else None,
+            "exception": sorted(next(iter(types))) if len(types) == 1 else []}
+
+
 def compare_sides(results: dict) -> dict:
     """Plain-code comparison of per-test outcomes over the 3 runs per side (poc.diff.confirm).
 
@@ -4525,6 +4547,7 @@ def compare_sides(results: dict) -> dict:
             out["same"] += 1
             if m[0]["o"] in bad:
                 out["preexisting_failures"].append(t)
+                out.setdefault("failure_signatures", {})[t] = _failure_signature(results, t)
             elif m[0]["o"] == "skipped":
                 out["same_skipped_both"] += 1
             continue
@@ -4734,11 +4757,23 @@ def pr_side_crash(probe_results) -> bool:
     return False
 
 
-def _tests_fail_on_pr(cmp: dict | None) -> bool:
-    """True when any recorded test fails on the pull-request side, including one that already failed on the base."""
+def _tests_fail_on_pr(cmp: dict | None, files: dict | None = None) -> bool:
+    """True when a pull-request failure blocks a cross-run from settling.
+
+    A test that fails the same way on both sides does not block: the same outcome on every repeat, and the same
+    exception type after side-path normalisation (see _failure_signature). These still block: a regression
+    (passes on the base, fails on the pull request), a new test that fails, a test in a file the pull request
+    edits that fails, and a test that is unstable on the pull request (its repeats do not agree)."""
     if not isinstance(cmp, dict):
         return False
-    return any(cmp.get(key) for key in ("regressions", "new_tests_failing", "pr_unstable", "preexisting_failures"))
+    if any(cmp.get(key) for key in ("regressions", "new_tests_failing", "pr_unstable")):
+        return True
+    edited = sorted({str(f).lstrip("./") for f in (files or {}).get("all") or [] if is_test_file(str(f))})
+    for test_id in cmp.get("preexisting_failures") or []:
+        tid = str(test_id)
+        if _edited_test_file(tid, edited) or not (cmp.get("failure_signatures") or {}).get(tid, {}).get("same"):
+            return True
+    return False
 
 
 def _same_claim_differed(probe_results) -> bool:
@@ -4766,9 +4801,12 @@ def _unclaimed_difference(probe_results) -> bool:
     return False
 
 
-def _cross_run_blocked(cmp, probe_results) -> bool:
-    """The cross-run must not verify a record that has any of the four exclusions."""
-    return (_tests_fail_on_pr(cmp) or _same_claim_differed(probe_results)
+def _cross_run_blocked(cmp, probe_results, files=None) -> bool:
+    """The cross-run must not verify a record that has any of the four exclusions.
+
+    The failing-test exclusion does not include a test that fails the same way on both sides. The other three
+    exclusions are unchanged."""
+    return (_tests_fail_on_pr(cmp, files) or _same_claim_differed(probe_results)
             or _unclaimed_difference(probe_results) or pr_side_crash(probe_results))
 
 
@@ -4844,7 +4882,7 @@ def _narrow_cross_run(v, reason, fl, cmp, cnv_reason, exits, files, probe_result
     is no cross-run. It does not settle a differs claim whose agreeing observations sit on an input where
     another claim was proven different."""
     ids = cross_run_test_ids(cmp, files)
-    if not ids or v == Verdict.VERIFIED.value or _cross_run_blocked(cmp, probe_results):
+    if not ids or v == Verdict.VERIFIED.value or _cross_run_blocked(cmp, probe_results, files):
         return v, reason, fl
     settle = settleable_differs_claims(probe_results)
     if not settle:
@@ -4879,8 +4917,10 @@ def verdict_for(cmp: dict | None, cnv_reason: str | None, exits: dict | None = N
     A cross-run (the PR's new or changed tests fail on the base and pass on the PR) may then settle a differs
     claim as proven, only when that claim's probes all agreed or never ran. It does not settle a differs claim
     whose agreeing observations sit on an input where another claim was proven different. It never verifies a
-    record that has a same claim whose behaviour differed, an unclaimed difference, a crash on the PR side, or a
-    test that fails on the PR. With no cross-run, nothing changes."""
+    record that has a same claim whose behaviour differed, an unclaimed difference, a crash on the PR side, a
+    regression, a new or edited test that fails on the PR, or a test that is unstable on the PR. A test that
+    fails the same way on both sides (the same outcome and the same exception type after side-path
+    normalisation) does not block. With no cross-run, nothing changes."""
     if same_sides:
         return (Verdict.COULD_NOT_VERIFY.value,
                 "unsupported: main and PR sides are the same commit, so nothing was compared; "
@@ -5008,14 +5048,74 @@ def with_probes(cmp: dict | None, cnv_reason: str | None, exits: dict | None = N
     return v, (f"{reason}; {s['reason']}" if s["reason"] else reason), fl
 
 
-def _id_module(test_id: str) -> str:
-    """'tests/test_x.py::T::t[1]' -> 'tests/test_x.py'; 'tests.test_x::t' -> 'tests/test_x.py'; 'test_x::t' -> 'test_x.py'.
+def _module_candidates(dotted: str) -> list[tuple[str, list[str]]]:
+    """Longest prefix first. Each prefix is a ``.py`` file, then that prefix as a package ``__init__.py``.
 
-    The module part of a test id as a relative file path (JUnit ids are relative to pytest's rootdir)."""
-    head = test_id.split("::", 1)[0]
-    if head.endswith(".py"):
-        return head.lstrip("./")
-    return head.replace(".", "/") + ".py"
+    ``tests.x.TestCls`` yields ``tests/x/TestCls.py``, ``tests/x/TestCls/__init__.py``, ``tests/x.py``,
+    ``tests/x/__init__.py``, ``tests.py``, ``tests/__init__.py``. The leftover parts are the class names."""
+    parts = [p for p in dotted.split(".") if p and p != ".."]
+    found = []
+    for i in range(len(parts), 0, -1):
+        prefix, rest = parts[:i], parts[i:]
+        stem = "/".join(prefix)
+        found.append((stem + ".py", rest))
+        found.append((stem + "/__init__.py", rest))
+    return found
+
+
+def _path_is_real(path: str, root: Path | None, known: list[str] | None) -> bool:
+    """True when ``path`` is a real ``.py`` file under ``root``, or one of the known relative paths.
+
+    Known paths are the pull request's files when the checkout is not mounted. A path is not real just because
+    a file of that name exists in the process's current directory."""
+    if not path.endswith(".py") or ".." in path.split("/"):
+        return False
+    if root is not None:
+        base = Path(root).resolve()
+        try:
+            candidate = (base / path).resolve()
+        except OSError:
+            candidate = None
+        if candidate is not None and candidate.is_file() and (candidate == base or base in candidate.parents):
+            return True
+    for raw in known or []:
+        rel = str(raw).lstrip("./")
+        if rel == path or rel.endswith("/" + path):
+            return True
+    return False
+
+
+def resolve_test_id(test_id: str, root: Path | None = None, known: list[str] | None = None) -> str:
+    """Rewrite a dotted test id so the module is the longest prefix that is a real ``.py`` file.
+
+    ``tests.x.TestCls::t`` becomes ``tests/x.py::TestCls::t`` when ``tests/x.py`` exists and
+    ``tests/x/TestCls.py`` does not. Nested classes stay as extra ``::`` parts (``Outer.Inner`` becomes
+    ``Outer::Inner``). A parameter id stays on the test name (``t[a.b]``). A plain function
+    ``tests.x::t`` becomes ``tests/x.py::t``. An id that already names a ``.py`` file is unchanged.
+    When no prefix is a real file, the old rule remains: every dot in the module part becomes a slash."""
+    raw = test_id[2:] if test_id.startswith("./") else test_id
+    head, sep, tail = raw.partition("::")
+    if "/" in head or head.endswith(".py"):
+        return raw
+    for path, rest in _module_candidates(head):
+        if not _path_is_real(path, root, known):
+            continue
+        pieces = [path]
+        if rest:
+            pieces.append("::".join(rest))
+        if sep:
+            pieces.append(tail)
+        return "::".join(pieces)
+    fallback = "/".join(p for p in head.split(".") if p) + ".py" if head else head
+    return "::".join([fallback, tail]) if sep else fallback
+
+
+def _id_module(test_id: str, root: Path | None = None, known: list[str] | None = None) -> str:
+    """The module path of a test id: ``tests/x.py`` from ``tests.x.TestCls::t`` when that file is real.
+
+    ``tests/test_x.py::T::t[1]`` stays ``tests/test_x.py``. ``tests.test_x::t`` is ``tests/test_x.py`` when that
+    file is real, and the same path by the dot-to-slash fallback when no prefix is a real file."""
+    return resolve_test_id(test_id, root=root, known=known).split("::", 1)[0]
 
 
 def is_test_file(path: str) -> bool:
@@ -5023,10 +5123,13 @@ def is_test_file(path: str) -> bool:
     return name.endswith(".py") and (name.startswith("test_") or name.endswith("_test.py"))
 
 
-def _edited_test_file(test_id: str, edited: list[str]) -> str | None:
-    """The one edited test file the test lives in, by full relative path: the id's module path must equal the file's
-    path or be a whole-folder suffix of it. Two candidates (same name in different folders) match none."""
-    mod = _id_module(test_id)
+def _edited_test_file(test_id: str, edited: list[str], root: Path | None = None) -> str | None:
+    """The one edited test file the test lives in, by full relative path.
+
+    The module path is the longest dotted prefix that is a real ``.py`` file (under ``root``, or equal to an
+    edited path when the checkout is not mounted). That path must equal the file or be a whole-folder suffix of
+    it. Two candidates (the same name in different folders) match none."""
+    mod = _id_module(test_id, root=root, known=edited)
     hits = [f for f in edited if f == mod or f.endswith("/" + mod)]
     return hits[0] if len(hits) == 1 else None
 

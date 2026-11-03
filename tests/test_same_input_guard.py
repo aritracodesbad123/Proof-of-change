@@ -132,7 +132,7 @@ def test_rejudge_report_counts_what_stays_settled_and_what_flips():
     spec.loader.exec_module(mod)
     text = "\n".join(mod.collect())
     print(text)
-    assert "stay settled: 6" in text
+    assert "stay settled: 7" in text
     assert "flip back: 0" in text
     assert "  none" in text
     assert "stored record.json verdict changes: none" in text
@@ -143,6 +143,7 @@ def test_rejudge_report_counts_what_stays_settled_and_what_flips():
         "attrs #1647 linked, stored comparison: could_not_verify",
         "narrow agreeing-settled: verified",
         "narrow never-ran-settled: verified",
+        "narrow same-failure-settled: verified",
         "python-barcode #162 modelled, no cross-run: verified -> needs_attention",
         "python-barcode #162 modelled, passing cross-run: verified -> needs_attention",
     ):
