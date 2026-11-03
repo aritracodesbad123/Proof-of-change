@@ -77,6 +77,25 @@ def test_catch_all_pattern_keeps_tests_and_skips_the_package_module(tmp_path):
     assert "pkg/runners.py" not in got
 
 
+@pytest.fixture
+def catch_all_checkout(tmp_path):
+    """A project whose tests directory contains conftest.py, __init__.py, and one real test module."""
+    src = ROOT / "tests" / "fixtures" / "python_files" / "catch_all"
+    dest = tmp_path / "catch_all"
+    shutil.copytree(src, dest)
+    return dest
+
+
+@pytest.mark.parametrize("pattern", ["*", "*.py"])
+def test_catch_all_does_not_count_conftest_or_init_in_a_test_directory(catch_all_checkout, pattern):
+    (catch_all_checkout / "pytest.ini").write_text(f"[pytest]\npython_files = {pattern}\n")
+    files = {"all": ["pkg/mod.py", "tests/conftest.py", "tests/__init__.py", "tests/mod.py"],
+             "package_py": ["pkg/mod.py"]}
+    got = dr.map_repo_tests(files, catch_all_checkout)
+    assert got == ["tests/mod.py"]
+    assert "tests/conftest.py" not in got and "tests/__init__.py" not in got
+
+
 def test_a_line_inside_a_multi_line_statement_counts_as_executable():
     start = 2  # the `return (` line, which is the line coverage.py records
     lines = dr.changed_lines_for_coverage(_BEFORE, _AFTER)

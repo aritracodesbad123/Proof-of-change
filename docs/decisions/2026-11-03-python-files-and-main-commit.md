@@ -7,7 +7,8 @@ The mapping from a changed source file to the test files that should run now rea
 are test modules. It is read from the first of `pytest.ini`, `pyproject.toml`, `tox.ini` and `setup.cfg` that
 pytest itself would use. When the project does not set it, the mapping uses pytest's own default,
 `test_*.py` and `*_test.py`. A pattern that matches every file (`*` or `*.py`) counts a file as a test only
-when it sits in a test directory, so a package module is not run as a test.
+when it sits in a test directory, so a package module is not run as a test. `conftest.py` and `__init__.py`
+are not test files, including when they sit in that test directory.
 
 A line that sits inside a statement spanning several lines now counts as executable when changed-line coverage
 is decided. coverage.py (the tool that records which lines ran) reports that whole statement on its first line,
@@ -63,6 +64,7 @@ a go/no-go summary that says why it stopped.
 
 `tests/test_python_files_and_commit.py` builds a tiny checkout for a custom `python_files` setting (in each of
 the four config files), for the default when the setting is absent, and for a change on a later line of a
-multi-line statement. It also pins a run to one commit, moves main after the first pull request, and checks
-that the second is not run and that the PDFs and the go/no-go summary are still written. Nothing from a live
-pull request is run.
+multi-line statement. `tests/fixtures/python_files/catch_all` is a checkout whose tests directory holds
+`conftest.py`, `__init__.py`, and a real test module; the same test checks both `*` and `*.py`. It also pins a
+run to one commit, moves main after the first pull request, and checks that the second is not run and that the
+PDFs and the go/no-go summary are still written. Nothing from a live pull request is run.
