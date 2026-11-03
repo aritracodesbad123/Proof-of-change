@@ -1,0 +1,12 @@
+============================= test session starts ==============================
+collected 0 items / 1 error
+
+==================================== ERRORS ====================================
+________________ ERROR collecting test/test_pool.py _________________
+/usr/local/side-pr/lib/python3.12/site-packages/plugx/plugin.py:9: in pytest_configure
+    stack = pytest.missing_stack
+E   AttributeError: module 'pytest' has no attribute 'missing_stack' (/usr/local/side-pr/pkg)
+=========================== short test summary info ============================
+ERROR test/test_pool.py - AttributeError: module 'pytest' has no attribute 'missing_stack'
+!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+==================== no tests ran in 0.12s =====================
