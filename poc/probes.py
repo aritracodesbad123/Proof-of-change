@@ -47,7 +47,10 @@ cases kept at could_not_verify: tests collected nothing on both sides, and a dif
 inputs where the old and new code agree because it never reached the change. A differs claim whose covered
 observations all agree is advisory, and does not raise needs_attention, when another differs claim on the same
 record is already proven: the claim was not shown on these inputs, and a related change was proven. With no
-proven differs claim, that case still needs attention. Flaky
+proven differs claim, that case still needs attention, unless a cross-run settles it (the pull request's new or
+changed tests fail on the base and pass on the pull request, every probe of that claim agreed or never ran, and
+the record has no contradicted same claim, no unclaimed difference, no crash on the pull-request side, and no
+test that fails there). Flaky
 observations are ignored as noise when the base side is unstable or both sides are. An observation that is stable
 on the base and unstable only on the pull request is not that noise: it needs attention, or could not verify when
 every pull-request run differs. Differences that are only about warnings never count on their own.

@@ -4236,10 +4236,177 @@ def probe_items(probe_results: dict | None, baseline: str | None) -> dict | None
     return dict(probe_results, items=items)
 
 
+def _probe_items(probe_results) -> list:
+    if not isinstance(probe_results, dict):
+        return []
+    return [it for it in probe_results.get("items") or [] if isinstance(it, dict)]
+
+
+def cross_run_test_ids(cmp: dict | None, files: dict | None) -> list[str]:
+    """The pull request's new or changed tests that fail on the base and pass on the pull request.
+
+    Those are the ``fixed`` tests (failed on every base run, passed on every pull-request run) that live in a
+    test file the pull request adds or edits. A test that is only ``new_tests_passing`` was absent on the base,
+    so it did not fail there. A test in a file the pull request did not touch is not new or changed. No such
+    test means there is no cross-run."""
+    if not isinstance(cmp, dict):
+        return []
+    edited = sorted({str(f).lstrip("./") for f in (files or {}).get("all") or [] if is_test_file(str(f))})
+    if not edited:
+        return []
+    return [str(t) for t in (cmp.get("fixed") or []) if _edited_test_file(str(t), edited)]
+
+
+def _crash_value(value) -> bool:
+    """A probe value that is a crash or a timeout, not a normal result."""
+    return isinstance(value, dict) and ("crash" in value or value.get("timeout") is True)
+
+
+def pr_side_crash(probe_results) -> bool:
+    """True when a probe crashed or timed out on the pull-request side.
+
+    The same exception on both sides is still a crash on the pull-request side: it is not a result the cross-run
+    may treat as proof."""
+    for it in _probe_items(probe_results):
+        runs = it.get("runs") if isinstance(it.get("runs"), dict) else {}
+        for run in runs.get("pr") or []:
+            if isinstance(run, dict) and (probes.PROBE_ERROR in run or any(_crash_value(v) for v in run.values())):
+                return True
+        for obs in it.get("observations") or []:
+            if obs.get("name") == probes.PROBE_ERROR or _crash_value(obs.get("pr")):
+                return True
+    return False
+
+
+def _tests_fail_on_pr(cmp: dict | None) -> bool:
+    """True when any recorded test fails on the pull-request side, including one that already failed on the base."""
+    if not isinstance(cmp, dict):
+        return False
+    return any(cmp.get(key) for key in ("regressions", "new_tests_failing", "pr_unstable", "preexisting_failures"))
+
+
+def _same_claim_differed(probe_results) -> bool:
+    """A claim that says the result stays the same, whose behaviour was seen to differ."""
+    for it in _probe_items(probe_results):
+        expects = {c.get("id"): c.get("expect") for c in it.get("claims") or [] if isinstance(c, dict)}
+        for obs in it.get("observations") or []:
+            if obs.get("state") != "differs" or obs.get("pr_only") == "noisy":
+                continue
+            if obs.get("label") == FindingLabel.FALSE_CLAIM.value or expects.get(obs.get("claim")) == "same":
+                return True
+    return False
+
+
+def _unclaimed_difference(probe_results) -> bool:
+    """A behaviour difference no claim covers. Warning-only names are not behaviour."""
+    for it in _probe_items(probe_results):
+        for obs in it.get("observations") or []:
+            if obs.get("state") != "differs" or obs.get("pr_only") == "noisy":
+                continue
+            if probes.is_warning_observation(obs.get("name")):
+                continue
+            if obs.get("label") == FindingLabel.UNMENTIONED_CHANGE.value:
+                return True
+    return False
+
+
+def _cross_run_blocked(cmp, probe_results) -> bool:
+    """The cross-run must not verify a record that has any of the four exclusions."""
+    return (_tests_fail_on_pr(cmp) or _same_claim_differed(probe_results)
+            or _unclaimed_difference(probe_results) or pr_side_crash(probe_results))
+
+
+def _agreed_observation(obs: dict) -> bool:
+    """Old and new code behaved the same on this probe input, and the claim said they would differ."""
+    return (obs.get("state") == "same" and obs.get("label") == FindingLabel.NEEDS_HUMAN.value
+            and not obs.get("advisory") and not obs.get("pr_only") and not obs.get("probe_broken"))
+
+
+def _expect_of(items: list, cid: str) -> str | None:
+    for it in items:
+        for claim in it.get("claims") or []:
+            if isinstance(claim, dict) and str(claim.get("id")) == cid:
+                return claim.get("expect")
+    return None
+
+
+def settleable_differs_claims(probe_results) -> list[str]:
+    """Differs claims a cross-run may settle.
+
+    A claim qualifies when every probe observation linked to it agreed (the same value on both sides), or when
+    its probes never ran (no observation matches it). A claim whose probes did not all agree does not qualify.
+    """
+    items = _probe_items(probe_results)
+    groups: dict[str, list] = {}
+    for it in items:
+        for obs in it.get("observations") or []:
+            cid = obs.get("claim")
+            if cid:
+                groups.setdefault(str(cid), []).append(obs)
+    settle = []
+    for cid, obs in groups.items():
+        if _expect_of(items, cid) == "differs" and obs and all(_agreed_observation(o) for o in obs):
+            settle.append(cid)
+    linked = set(groups)
+    for cid in probes.unmatched_differs_claims(probe_results):
+        if cid not in linked:
+            settle.append(cid)
+    hygiene = probe_results.get("claim_hygiene") if isinstance(probe_results, dict) else None
+    if isinstance(hygiene, dict):
+        for cid in hygiene.get("held_back") or []:
+            if str(cid) not in linked and str(cid) not in settle:
+                settle.append(str(cid))
+    return sorted(set(settle))
+
+
+def _without_settled_claims(probe_results, claim_ids: set[str]) -> dict:
+    """A copy with those differs claims, and the observations linked to them, taken out.
+
+    Used only to ask whether anything besides those claims is holding the verdict down."""
+    out = copy.deepcopy(probe_results) if isinstance(probe_results, dict) else {"items": []}
+    for it in out.get("items") or []:
+        if not isinstance(it, dict):
+            continue
+        it["claims"] = [c for c in it.get("claims") or []
+                        if not (isinstance(c, dict) and str(c.get("id")) in claim_ids)]
+        it["observations"] = [o for o in it.get("observations") or [] if str(o.get("claim")) not in claim_ids]
+    hygiene = out.get("claim_hygiene")
+    if isinstance(hygiene, dict):
+        hygiene["held_back"] = [c for c in hygiene.get("held_back") or [] if str(c) not in claim_ids]
+    return out
+
+
+def _narrow_cross_run(v, reason, fl, cmp, cnv_reason, exits, files, probe_results, claims, baseline,
+                      docstring_only, same_sides):
+    """Settle agreeing or never-run differs claims from a cross-run, or leave the verdict as it was.
+
+    The rule only raises a held-back verdict to verified. It never lowers one, and it does nothing when there
+    is no cross-run."""
+    ids = cross_run_test_ids(cmp, files)
+    if not ids or v == Verdict.VERIFIED.value or _cross_run_blocked(cmp, probe_results):
+        return v, reason, fl
+    settle = settleable_differs_claims(probe_results)
+    if not settle:
+        return v, reason, fl
+    alt = _without_settled_claims(probe_results, set(settle))
+    v2, reason2, fl2 = verdict_for(cmp, cnv_reason, exits, files, alt, claims, baseline, docstring_only, same_sides,
+                                   _apply_cross_run=False)
+    if v2 != Verdict.VERIFIED.value:
+        return v, reason, fl
+    shown = ", ".join(settle[:4])
+    extra = f" (+{len(settle) - 4} more)" if len(settle) > 4 else ""
+    listed = ", ".join(ids[:3])
+    more = f" (+{len(ids) - 3} more)" if len(ids) > 3 else ""
+    note = (f"cross-run settled differs claim(s) {shown}{extra} as proven "
+            f"({len(ids)} new or changed test(s) fail on the base and pass on the PR: {listed}{more})")
+    flags = list(dict.fromkeys([*fl2, "cross_run_settled"]))
+    return Verdict.VERIFIED.value, f"{note}; {reason2}", flags
+
+
 def verdict_for(cmp: dict | None, cnv_reason: str | None, exits: dict | None = None, files: dict | None = None,
                 probe_results: dict | None = None, claims: list | None = None,
                 baseline: str | None = None, docstring_only: bool = False,
-                same_sides: bool = False) -> tuple[str, str, list[str]]:
+                same_sides: bool = False, *, _apply_cross_run: bool = True) -> tuple[str, str, list[str]]:
     """tests, then probes (with_probes), then behaviour-preservation claims (poc/behaviour_claims.py): a 'verified'
     PR whose title or description claims results stay the same, with no probe checking that, becomes
     could_not_verify ('unverified behaviour claim: "<quote>"; needs a probe'). With a probe, the probe decides.
@@ -4247,7 +4414,11 @@ def verdict_for(cmp: dict | None, cnv_reason: str | None, exits: dict | None = N
     A docstring-only change (AST equal after blanking docstrings) is verified: the claim holds by construction,
     unless the tests already need attention.
     A probe claim that expects a difference but matches no observation on that probe can only lower a verified
-    result to could_not_verify. It never raises a verdict."""
+    result to could_not_verify. It never raises a verdict.
+    A cross-run (the PR's new or changed tests fail on the base and pass on the PR) may then settle a differs
+    claim as proven, only when that claim's probes all agreed or never ran. It never verifies a record that has
+    a same claim whose behaviour differed, an unclaimed difference, a crash on the PR side, or a test that fails
+    on the PR. With no cross-run, nothing changes."""
     if same_sides:
         return (Verdict.COULD_NOT_VERIFY.value,
                 "unsupported: main and PR sides are the same commit, so nothing was compared; "
@@ -4271,9 +4442,9 @@ def verdict_for(cmp: dict | None, cnv_reason: str | None, exits: dict | None = N
     if missing and v == Verdict.VERIFIED.value:
         shown = ", ".join(missing[:4])
         extra = f" (+{len(missing) - 4} more)" if len(missing) > 4 else ""
-        return (Verdict.COULD_NOT_VERIFY.value,
-                f"could not verify: claim(s) {shown}{extra} expect a difference but no observation matches ({reason})",
-                fl + ["unmatched_differs_claim"])
+        v, reason, fl = (Verdict.COULD_NOT_VERIFY.value,
+                         f"could not verify: claim(s) {shown}{extra} expect a difference but no observation matches ({reason})",
+                         fl + ["unmatched_differs_claim"])
     adv_items = [it for it in (probe_results or {}).get("items") or []
                  if any(o.get("advisory") for o in it.get("observations") or [])]
     if adv_items and v == Verdict.VERIFIED.value:
@@ -4285,21 +4456,26 @@ def verdict_for(cmp: dict | None, cnv_reason: str | None, exits: dict | None = N
         bits = ([f"probe(s) {', '.join(bare)} have no linked claims and saw a difference no claim covers"] * bool(bare)
                 + [f"difference(s) no linked claim covers ({', '.join(names[:4])}"
                    + (f" +{len(names) - 4} more" if len(names) > 4 else "") + ")"] * bool(names))
-        return (Verdict.COULD_NOT_VERIFY.value,
-                f"could not verify: {'; '.join(bits)}, so the change is not confirmed ({reason})",
-                fl + ["advisory_unclaimed_difference"])
+        v, reason, fl = (Verdict.COULD_NOT_VERIFY.value,
+                         f"could not verify: {'; '.join(bits)}, so the change is not confirmed ({reason})",
+                         fl + ["advisory_unclaimed_difference"])
     if hygiene and hygiene.get("held_back") and v == Verdict.VERIFIED.value:
-        return (Verdict.COULD_NOT_VERIFY.value,
-                f"could not verify: claim(s) {', '.join(hygiene['held_back'][:4])} expect a difference but no "
-                f"observation matches ({reason})", fl + ["unmatched_differs_claim"])
+        v, reason, fl = (Verdict.COULD_NOT_VERIFY.value,
+                         f"could not verify: claim(s) {', '.join(hygiene['held_back'][:4])} expect a difference but no "
+                         f"observation matches ({reason})", fl + ["unmatched_differs_claim"])
     if hygiene and hygiene.get("dropped_flagged") and v == Verdict.VERIFIED.value:
         from poc import claim_hygiene
-        return (Verdict.COULD_NOT_VERIFY.value, f"could not verify: {claim_hygiene.note_text(hygiene)} ({reason})",
-                fl + ["dropped_flagged_probe"])
+        v, reason, fl = (Verdict.COULD_NOT_VERIFY.value,
+                         f"could not verify: {claim_hygiene.note_text(hygiene)} ({reason})",
+                         fl + ["dropped_flagged_probe"])
     if broad and broad.get("held_back") and v == Verdict.VERIFIED.value:
         from poc import broad_claims
-        return (Verdict.COULD_NOT_VERIFY.value, f"could not verify: {broad_claims.note_text(broad)} ({reason})",
-                fl + ["broad_claim_few_inputs"])
+        v, reason, fl = (Verdict.COULD_NOT_VERIFY.value,
+                         f"could not verify: {broad_claims.note_text(broad)} ({reason})",
+                         fl + ["broad_claim_few_inputs"])
+    if _apply_cross_run:
+        v, reason, fl = _narrow_cross_run(v, reason, fl, cmp, cnv_reason, exits, files, probe_results, claims,
+                                          baseline, docstring_only, same_sides)
     return v, reason, fl
 
 
