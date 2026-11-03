@@ -40,8 +40,9 @@ ADEQUATE, NOT_ADEQUATE, UNMEASURED = "adequate", "not_adequate", "unmeasured"
 def main_side_lines(main_text: str | None, pr_text: str | None, statement_start: bool = False) -> set[int]:
     """1-based lines of main_text that the PR replaces or deletes; for pure insertions, the main lines just before
     and after the insertion point. None (file absent on main) -> empty set.
-    statement_start (product checks): each line is mapped to the first line of the main-side statement that holds
-    it (coverage_gate.statement_starts), since coverage reports a multi-line statement only at its first line."""
+    statement_start: each line is mapped to the first line of the main-side statement that holds it
+    (coverage_gate.statement_starts), since coverage reports a multi-line statement only at its first line.
+    Changed-line coverage passes True."""
     if main_text is None:
         return set()
     old = main_text.splitlines()

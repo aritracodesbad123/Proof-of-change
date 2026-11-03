@@ -31,6 +31,7 @@ import copy
 import csv
 import datetime as dt
 import fcntl
+import fnmatch
 import glob
 import hashlib
 import json
@@ -737,42 +738,122 @@ def chosen_test_targets(chosen: dict | None) -> list[str]:
     return out
 
 
-def _repo_test_file(name: str) -> bool:
-    """A test module in either common layout: test_foo.py or foo_test.py."""
-    return name.endswith(".py") and (name.startswith("test_") or name.endswith("_test.py"))
+# pytest's own default for python_files (a space-separated list of file-name globs).
+_DEFAULT_PYTHON_FILES = ("test_*.py", "*_test.py")
+# A pattern this broad matches every module. Those files are tests only inside a test directory, so a package
+# module is not run as a test just because the project collects every Python file.
+_CATCH_ALL_PYTHON_FILES = {"*", "*.py"}
+_TEST_DIR_NAMES = {"tests", "test", "testing"}
+
+
+def _split_python_files(raw) -> list[str]:
+    """pytest's python_files value (a string, or a list from a toml file) as separate globs."""
+    if raw is None:
+        return []
+    if isinstance(raw, (list, tuple)):
+        out = []
+        for item in raw:
+            out.extend(_split_python_files(item))
+        return out
+    text = str(raw).strip()
+    if not text:
+        return []
+    try:
+        parts = shlex.split(text, posix=True)
+    except ValueError:
+        parts = text.split()
+    return [p for p in parts if p and p != "#"]
+
+
+def python_file_patterns(checkout: Path) -> list[str]:
+    """The project's pytest ``python_files`` globs, or pytest's default ``test_*.py`` and ``*_test.py``.
+
+    Read from the config file pytest would use (pytest.ini, pyproject.toml, tox.ini, setup.cfg). A project
+    that sets the option replaces the default; one that does not set it keeps the default. Nothing here is
+    special to one repository.
+    """
+    from poc.test_settings import pytest_config
+    _name, opts = pytest_config(Path(checkout))
+    got = _split_python_files(opts.get("python_files")) if opts else []
+    return got or list(_DEFAULT_PYTHON_FILES)
+
+
+def _name_matches(name: str, patterns: list[str]) -> bool:
+    return any(fnmatch.fnmatchcase(name, pat) for pat in patterns)
+
+
+def _is_mapped_test(path: str, patterns: list[str]) -> bool:
+    """True when pytest would collect this path as a test module under ``patterns``.
+
+    ``conftest.py`` and ``__init__.py`` are not test modules. A catch-all pattern (``*`` or ``*.py``) matches
+    every file, so only a file inside a test directory counts; a narrower pattern matches by file name anywhere.
+    """
+    rel = str(path).replace("\\", "/")
+    name = rel.rsplit("/", 1)[-1]
+    if not name.endswith(".py") or name in {"conftest.py", "__init__.py"}:
+        return False
+    specific = [p for p in patterns if p not in _CATCH_ALL_PYTHON_FILES]
+    if specific and _name_matches(name, specific):
+        return True
+    broad = [p for p in patterns if p in _CATCH_ALL_PYTHON_FILES]
+    if broad and _name_matches(name, broad):
+        return any(part in _TEST_DIR_NAMES for part in PurePosixPath(rel).parts[:-1])
+    return False
+
+
+def _names_for_stem(stem: str, patterns: list[str]) -> list[str]:
+    """File names a source stem would have under those python_files globs (``graph`` + ``test_*.py`` -> ``test_graph.py``)."""
+    if not stem:
+        return []
+    names: list[str] = []
+    for pat in patterns:
+        if "*" not in pat:
+            base = pat if pat.endswith(".py") else f"{pat}.py"
+            if stem in os.path.splitext(os.path.basename(base))[0]:
+                names.append(base)
+            continue
+        filled = pat.replace("*", stem)
+        if not filled.endswith(".py"):
+            filled += ".py"
+        if "*" in filled or not filled.endswith(".py"):
+            continue
+        if filled not in names:
+            names.append(filled)
+    return names
 
 
 def map_repo_tests(files: dict, checkout: Path, max_targets: int = 6) -> list[str]:
     """Touched files -> test modules.
 
-    A test file the change itself edits is kept. For a changed source file, the sibling
-    ``<directory>/tests/test_<stem>.py`` (and ``<stem>_test.py``) is preferred over a global name match, so
+    Which names count as tests comes from the project's pytest ``python_files`` setting (see
+    ``python_file_patterns``). A test file the change itself edits is kept. For a changed source file, the
+    sibling ``<directory>/tests/<name>`` is preferred over a global name match, so
     ``networkx/algorithms/connectivity/connectivity.py`` maps to
     ``networkx/algorithms/connectivity/tests/test_connectivity.py`` before other ``test_connectivity.py`` files.
     """
+    patterns = python_file_patterns(checkout)
     targets: list[str] = []
     for f in files["all"]:
-        b = os.path.basename(f)
-        if _repo_test_file(b) and (checkout / f).is_file():
+        if _is_mapped_test(f, patterns) and (checkout / f).is_file():
             targets.append(f)
-    for f in files["package_py"]:
+    for f in files.get("package_py") or []:
         stem = os.path.splitext(os.path.basename(f))[0].lstrip("_")
-        patterns = [f"test_{stem}.py"] + ([f"{stem}_test.py"] if stem else [])
+        names = _names_for_stem(stem, patterns)
         preferred: list[Path] = []
         parent = Path(f).parent
-        for pat in patterns:
-            sib = checkout / parent / "tests" / pat
+        for name in names:
+            sib = checkout / parent / "tests" / name
             if sib.is_file():
                 preferred.append(sib)
         hits = list(preferred)
-        for pat in patterns:
-            hits += [Path(p) for p in sorted(glob.glob(str(checkout / "**" / pat), recursive=True))]
+        for name in names:
+            hits += [Path(p) for p in sorted(glob.glob(str(checkout / "**" / name), recursive=True))]
         added, seen_hit = 0, set()
         for hit in hits:
             if added >= 2:
                 break
             rel = os.path.relpath(hit, checkout)
-            if rel in seen_hit:
+            if rel in seen_hit or not _is_mapped_test(rel, patterns):
                 continue
             seen_hit.add(rel)
             if rel not in targets:
@@ -3950,6 +4031,21 @@ def _coverage_skipped_by_env() -> bool:
     return (os.environ.get("POC_SKIP_COVERAGE") or "").strip().lower() in {"1", "true", "yes", "on"}
 
 
+def changed_lines_for_coverage(old_text: str | None, new_text: str) -> set[int]:
+    """PR-side changed lines for the coverage gate.
+
+    A line inside a multi-line statement counts as the first line of that statement. coverage.py reports the
+    whole statement on that first line, so a change on a later line would otherwise look non-executable.
+    """
+    return coverage_gate.changed_lines(old_text, new_text, statement_start=True)
+
+
+def main_lines_for_coverage(old_text: str | None, new_text: str | None) -> set[int]:
+    """Main-side changed lines for probe coverage. Same multi-line rule as changed_lines_for_coverage."""
+    from poc import probe_adequacy
+    return probe_adequacy.main_side_lines(old_text, new_text, statement_start=True)
+
+
 # The coverage gate measures with its own coverage settings, not the project's. Combining our --cov=<folder> (a
 # coverage "source") with a project's own [coverage:run] include makes coverage warn "--include is ignored because
 # --source is set"; a project whose pytest config turns warnings into errors (filterwarnings = error) then stops at
@@ -3996,8 +4092,8 @@ def coverage_run(item: dict, venv: Path, main_root: Path, pr_root: Path, targets
         if not new.is_file():
             continue  # deleted by the PR, or not part of the installed package
         old = main_root / rel
-        changed[rel] = coverage_gate.changed_lines(old.read_text(errors="replace") if old.is_file() else None,
-                                                   new.read_text(errors="replace"), statement_start=product_route(a))
+        changed[rel] = changed_lines_for_coverage(old.read_text(errors="replace") if old.is_file() else None,
+                                                   new.read_text(errors="replace"))
         sources.add(str(new.parent))
     if not changed:
         return {"status": "failed", "why": "none of the changed Python files exist on the PR side"}
@@ -4046,8 +4142,8 @@ def _coverage_changed(item: dict, main_root: Path, pr_root: Path, a=None) -> tup
         if not new.is_file():
             continue
         old = main_root / rel
-        changed[rel] = coverage_gate.changed_lines(old.read_text(errors="replace") if old.is_file() else None,
-                                                   new.read_text(errors="replace"), statement_start=product_route(a))
+        changed[rel] = changed_lines_for_coverage(old.read_text(errors="replace") if old.is_file() else None,
+                                                   new.read_text(errors="replace"))
     if not changed:
         return {}, {"status": "failed", "why": "none of the changed Python files exist on the PR side"}
     return changed, {}
@@ -5597,9 +5693,8 @@ def probe_coverage(item: dict, probe_results: dict | None, vm: Path, main_root: 
     changed = {}
     for rel in coverage_gate.python_sources(item["files"]):
         old, new = Path(main_root) / rel, Path(pr_root) / rel
-        changed[rel] = probe_adequacy.main_side_lines(old.read_text(errors="replace") if old.is_file() else None,
-                                                      new.read_text(errors="replace") if new.is_file() else None,
-                                                      statement_start=product_route(a))
+        changed[rel] = main_lines_for_coverage(old.read_text(errors="replace") if old.is_file() else None,
+                                                new.read_text(errors="replace") if new.is_file() else None)
     if not changed:
         return unmeasured("no changed non-test Python files")
     log = prdir / "probe-coverage.log"
@@ -5667,9 +5762,8 @@ def contree_probe_coverage(item: dict, probe_results: dict | None, main_root: Pa
     changed = {}
     for rel in coverage_gate.python_sources(item["files"]):
         old, new = Path(main_root) / rel, Path(pr_root) / rel
-        changed[rel] = probe_adequacy.main_side_lines(old.read_text(errors="replace") if old.is_file() else None,
-                                                      new.read_text(errors="replace") if new.is_file() else None,
-                                                      statement_start=product_route(a))
+        changed[rel] = main_lines_for_coverage(old.read_text(errors="replace") if old.is_file() else None,
+                                                new.read_text(errors="replace") if new.is_file() else None)
     if not changed:
         return all_unmeasured("no changed non-test Python files")
     on_main = sorted(rel for rel in changed if (Path(main_root) / rel).is_file())
@@ -7436,35 +7530,68 @@ def sync_to_origin_main(root: Path | None = None) -> str:
     return got
 
 
-def given_commit(root: Path | None, expected: str) -> str:
-    """Bench mode: run this checkout as it stands. Never fetch, check out, or merge.
+def given_commit(root: Path | None, expected: str, *, bench: bool = True) -> str:
+    """Run this checkout as it stands. Never fetch, check out, or merge.
 
     Refuse when the work tree is dirty, when `expected` is not a 40-character commit, or when HEAD is not
-    that commit. The checkout is left where it was.
+    that commit. The checkout is left where it was. ``bench`` only changes the wording: a benchmark says
+    bench mode, any other pinned run says main.
     """
     root = root or REPO_ROOT
+    held = "Bench mode did not move the checkout." if bench else "The checkout was not moved."
     status = _git(root, "status", "--porcelain")
     if status.returncode != 0:
         detail = (status.stderr or status.stdout).strip()
         raise SystemExit("Stopped: could not read the git status of this checkout"
-                         + (f": {detail}" if detail else "") + ". Bench mode did not move the checkout.")
+                         + (f": {detail}" if detail else "") + ". " + held)
     if status.stdout.strip():
-        raise SystemExit("Stopped: the checkout has uncommitted changes, so bench mode will not start. "
+        who = "bench mode will not start" if bench else "this run will not start"
+        raise SystemExit(f"Stopped: the checkout has uncommitted changes, so {who}. "
                          "The checkout was not moved. Commit or discard the changes, then run again.")
     expected = (expected or "").strip().lower()
     if not _COMMIT.fullmatch(expected):
-        raise SystemExit("Stopped: bench mode needs the commit it should run, as --expect-commit or "
-                         "POC_EXPECT_COMMIT, a 40-character commit. The checkout was not moved.")
+        if bench:
+            raise SystemExit("Stopped: bench mode needs the commit it should run, as --expect-commit or "
+                             "POC_EXPECT_COMMIT, a 40-character commit. The checkout was not moved.")
+        raise SystemExit("Stopped: --expect-commit (or POC_EXPECT_COMMIT) must be a 40-character commit. "
+                         "The checkout was not moved.")
     head = _git(root, "rev-parse", "HEAD")
     got = head.stdout.strip()
     if head.returncode != 0 or not _COMMIT.fullmatch(got):
         detail = (head.stderr or head.stdout).strip()
-        raise SystemExit("Stopped: could not read HEAD" + (f": {detail}" if detail else "")
-                         + ". Bench mode did not move the checkout.")
+        raise SystemExit("Stopped: could not read HEAD" + (f": {detail}" if detail else "") + ". " + held)
     if got != expected:
-        raise SystemExit(f"Stopped: HEAD is {got}, not the expected commit {expected}. "
-                         "Bench mode runs the code it was given and does not move the checkout.")
+        if bench:
+            raise SystemExit(f"Stopped: HEAD is {got}, not the expected commit {expected}. "
+                             "Bench mode runs the code it was given and does not move the checkout.")
+        raise SystemExit(f"Stopped: main is {got}, not the expected commit {expected}. "
+                         "The checkout was not moved.")
     return got
+
+
+def named_expect_commit(a) -> str:
+    """The commit named by --expect-commit or POC_EXPECT_COMMIT, or '' when this run did not pin one."""
+    return (getattr(a, "expect_commit", None) or os.environ.get("POC_EXPECT_COMMIT") or "").strip().lower()
+
+
+def commit_moved_reason(expected: str | None, root: Path | None = None) -> str | None:
+    """None when this run did not pin a commit, or main's head is still that commit.
+
+    A plain-words reason when main's head has changed, so the caller stops before the next pull request.
+    The checkout is not fetched and not moved. Git's own error text is left out: it can name a machine path.
+    """
+    expected = (expected or "").strip().lower()
+    if not _COMMIT.fullmatch(expected):
+        return None
+    root = root or REPO_ROOT
+    head = _git(root, "rev-parse", "HEAD")
+    got = (head.stdout or "").strip().lower()
+    if head.returncode != 0 or not _COMMIT.fullmatch(got):
+        return "Stopped: main's commit could not be read, so this run will not check another pull request."
+    if got == expected:
+        return None
+    return (f"Stopped: main has moved from {expected} to {got}. "
+            "This run will not check another pull request on a different commit.")
 
 
 def commit_label_note(actual: str, env=None) -> str | None:
@@ -7617,6 +7744,14 @@ def _batch_diagnose(a, item: tuple, why: str) -> None:
         raise RuntimeError("lookup failed")
 
 
+class MainMoved(Exception):
+    """Main's head is no longer the commit this run was started on. The reason is plain words, with no path."""
+
+    def __init__(self, reason: str):
+        super().__init__(reason)
+        self.reason = reason
+
+
 def batch_order_refusal(a) -> str | None:
     """--batch-order and its diagnosed retries are for product runs only. A study run and the daily study refuse it,
     so their results stay as they were."""
@@ -7632,7 +7767,12 @@ def _run_batch_order(queue: list, rdir: Path, workroot: Path, a, machine: dict, 
     def key(item):
         return f"{item[0]}#{item[2]['pr']}"
 
+    kept: list = []
+
     def run(item):
+        reason = commit_moved_reason(getattr(a, "pinned_commit", None))
+        if reason:
+            raise MainMoved(reason)
         repo, cfg, c = item
         print(f"  testing #{c['pr']} {c['title'][:60]} ...", flush=True)
         try:
@@ -7643,6 +7783,7 @@ def _run_batch_order(queue: list, rdir: Path, workroot: Path, a, machine: dict, 
             problems.append(f"{repo}#{c['pr']}: harness error: {type(e).__name__}: {e}")
             return harness_error_record(repo, cfg, c, rdir, a, machine, e)
         print(f"    -> {rec['verdict']}: {rec['reason'][:140]} ({rec['duration_s']['total_wall']}s)", flush=True)
+        kept.append(rec)
         return rec
 
     def give_up(item, why):
@@ -7654,9 +7795,14 @@ def _run_batch_order(queue: list, rdir: Path, workroot: Path, a, machine: dict, 
     if batch_order_refusal(a):
         raise SystemExit(batch_order_refusal(a))
     log = batch_order.OrderLog(rdir / "batch-order.jsonl")
-    out = batch_order.run_batch(queue, key, lambda item: _batch_lookup(item[0], item[1]), run,
-                                diagnose=lambda item, why: _batch_diagnose(a, item, why),
-                                give_up=give_up, log=log)
+    try:
+        out = batch_order.run_batch(queue, key, lambda item: _batch_lookup(item[0], item[1]), run,
+                                    diagnose=lambda item, why: _batch_diagnose(a, item, why),
+                                    give_up=give_up, log=log)
+    except MainMoved as e:
+        problems.append(e.reason)
+        print(e.reason, file=sys.stderr, flush=True)
+        out = kept
     for rec in out:
         repo, n = rec.get("repo"), prn(rec)
         if repo and n is not None:
@@ -7872,9 +8018,10 @@ def _main(argv=None) -> int:
                          "Does not fetch or check out another commit: the checkout must already be the one named by "
                          "--expect-commit (or POC_EXPECT_COMMIT), and the work tree must be clean")
     ap.add_argument("--expect-commit", default=None, metavar="SHA",
-                    help="with --bench: the 40-character commit this checkout must already be on. "
-                         "Bench mode refuses to start if HEAD is different or the tree is dirty, and it never "
-                         "moves the checkout. POC_EXPECT_COMMIT is the same setting when this flag is omitted")
+                    help="the 40-character commit this checkout must already be on. The run does not fetch or "
+                         "move the checkout, and it refuses to start if HEAD is different or the tree is dirty. "
+                         "It checks again before each pull request and stops if main's head has moved. "
+                         "Required with --bench. POC_EXPECT_COMMIT is the same setting when this flag is omitted")
     ap.add_argument("--ids", default=None, help="with --bench: comma-separated case IDs (default: all), e.g. B01,B14")
     ap.add_argument("--bench-out", default=None, help="with --bench: result folder (default: runs/bench-v0)")
     a = ap.parse_args(argv)
@@ -7907,10 +8054,12 @@ def _main(argv=None) -> int:
     if stop:
         print(stop, file=sys.stderr)
         raise SystemExit(1)
-    if a.bench:
-        expected = (a.expect_commit or os.environ.get("POC_EXPECT_COMMIT") or "").strip().lower()
-        a.poc_commit = given_commit(REPO_ROOT, expected)
+    pinned = named_expect_commit(a)
+    if a.bench or pinned:
+        a.poc_commit = given_commit(REPO_ROOT, pinned, bench=bool(a.bench))
+        a.pinned_commit = a.poc_commit
     else:
+        a.pinned_commit = None
         a.poc_commit = resolve_poc_commit(REPO_ROOT)
         note = commit_label_note(a.poc_commit)
         if note:
@@ -8037,10 +8186,13 @@ def _main(argv=None) -> int:
     records, skipped, selection, reused = [], {}, {}, []
     no_prs: list[dict] = []
     batch_queue: list = []
+    moved = None
     inv_root = rdir / "invocations"
     a.invocation = (1 + len([p for p in inv_root.glob("invocation-*") if p.is_dir()])
                     if inv_root.is_dir() else 1)
     for row in rows:
+        if moved:
+            break
         repo = row["repo"]
         cfg = LIBS.get(repo) or {"dist": row["library"], "pkg": row["library"].lower().replace("-", "_"), "deps": [],
                                  "test_deps": [], "nightly": False}
@@ -8087,6 +8239,11 @@ def _main(argv=None) -> int:
             if getattr(a, "batch_order", False):
                 batch_queue.append((repo, cfg, c))
                 continue
+            moved = commit_moved_reason(getattr(a, "pinned_commit", None))
+            if moved:
+                problems.append(moved)
+                print(moved, file=sys.stderr, flush=True)
+                break
             prev = rdir / f"{cfg['pkg']}-{c['pr']}" / "record.json"
             rec = None
             if a.resume and prev.exists():
@@ -8116,16 +8273,20 @@ def _main(argv=None) -> int:
             print(f"    -> {rec['verdict']}: {rec['reason'][:140]} ({rec['duration_s']['total_wall']}s)", flush=True)
             seen["prs"].setdefault(repo, {})[str(c["pr"])] = {"head_sha": c["head_sha"], "tested_at_ist": rec["tested_at_ist"],
                                                               "verdict": rec["verdict"], "run": rdir.name}
+        if moved:
+            break
         if run_date_of(seen, repo) != rdir.name:   # keep the previous day's cut-off so same-day re-runs reselect
             seen.setdefault("prior_run_utc", {})[repo] = seen["last_run_utc"].get(repo)
         seen["last_run_utc"][repo] = started.astimezone(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
         seen.setdefault("last_run_date", {})[repo] = rdir.name
-    if batch_queue and not a.select_only:
+    if batch_queue and not a.select_only and not moved:
         try:
             records.extend(_run_batch_order(batch_queue, rdir, workroot, a, machine, seen, problems))
         except model_provider.ProviderRejected as e:
             print(str(e), file=sys.stderr)
             return 1
+        if not moved:
+            moved = next((p for p in problems if isinstance(p, str) and p.startswith("Stopped: main")), None)
     (rdir / "selection.json").write_text(json.dumps(
         {"selected": selection, "skipped": skipped, "no_prs": no_prs}, indent=1))
     if a.select_only:
@@ -8164,6 +8325,13 @@ def _main(argv=None) -> int:
         (rdir / "run_meta.json").write_text(json.dumps(meta, indent=1))
     print(f"run log: {rp}")
     reports_ok = reviewer_reports(rdir, a, records, "check" if single else "daily summary")
+    # A stop because main moved still leaves the per-check PDFs. The go/no-go summary then says why the run stopped.
+    if moved and not a.no_report:
+        try:
+            pdf_always.nogo_summary(report_dir_for(a, rdir), rdir.name, moved)
+            PDF_TARGET["summary_done"] = True
+        except Exception as e:  # noqa: BLE001
+            print(f"ERROR: go/no-go summary not written: {type(e).__name__}: {e}", file=sys.stderr, flush=True)
     return 0 if not problems and reports_ok else 1
 
 

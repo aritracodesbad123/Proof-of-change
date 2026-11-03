@@ -97,7 +97,8 @@ def ast_equal_ignoring_docstrings(old_text: str, new_text: str) -> bool:
 
 def changed_lines(old_text: str | None, new_text: str, statement_start: bool = False) -> set[int]:
     """1-based line numbers of new_text that are added or changed relative to old_text (whole file if new).
-    statement_start (product checks): map each line to the first line of its statement (statement_starts)."""
+    statement_start: map each line to the first line of its statement (statement_starts). Changed-line
+    coverage passes True, so a line inside a multi-line statement counts as that executable line."""
     new = new_text.splitlines()
     if old_text is None:
         return set(range(1, len(new) + 1))
