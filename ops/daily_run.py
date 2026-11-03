@@ -3374,6 +3374,11 @@ def _norm_dist(dist: str) -> str:
     return re.sub(r"[^a-z0-9]+", "_", (dist or "").lower()).strip("_")
 
 
+def _pep503(name: str) -> str:
+    """PEP 503 name: lowercase, with runs of '-', '_' and '.' folded to one '-'."""
+    return re.sub(r"[-_.]+", "-", (name or "").strip().lower())
+
+
 def _collection_frames(log: str) -> list[tuple[str, str]]:
     """(dotted module, function) for site-packages frames that are not pytest itself, in order."""
     found = []
@@ -3491,26 +3496,35 @@ def _config_text(root) -> str:
     return "\n".join(parts).lower()
 
 
-def plugin_named_in_pytest_config(roots, name: str) -> bool:
-    """True when a pytest config names this entry point in addopts (-p) or required_plugins.
+def _names_plugin(text: str, aliases: set[str]) -> bool:
+    """True when an addopts -p value or a required_plugins entry matches one alias.
 
-    A dependency line that only installs the package does not count. roots is one checkout or a list of them
-    (main and the pull request). Either side naming the plugin is enough to keep it."""
-    if not _PLUGIN_NAME.fullmatch(str(name or "")):
+    aliases are PEP 503 forms of the entry-point name and of the distribution that provides it.
+    `pytest-asyncio`, `pytest_asyncio` and `pytest.asyncio` are the same name."""
+    if not text or not aliases:
         return False
-    ep = str(name).lower()
-    folders = roots if isinstance(roots, (list, tuple)) else [roots]
-    flag = re.compile(_P_FLAG + re.escape(ep) + r"(?![\w.-])")
-    for root in folders:
-        cfg = _config_text(root)
-        if not cfg:
-            continue
-        if flag.search(cfg):
+    for match in re.finditer(_P_FLAG + r"([A-Za-z0-9_.-]+)", text):
+        if _pep503(match.group(1)) in aliases:
             return True
-        for match in re.finditer(r"required_plugins\s*=\s*(\[[^\]]*\]|[^\n#]+)", cfg):
-            if re.search(r"(?<![\w.-])" + re.escape(ep) + r"(?![\w.-])", match.group(1)):
+    for match in re.finditer(r"required_plugins\s*=\s*(\[[^\]]*\]|[^\n#]+)", text):
+        for token in re.findall(r"[A-Za-z0-9_.-]+", match.group(1)):
+            if _pep503(token) in aliases:
                 return True
     return False
+
+
+def plugin_named_in_pytest_config(roots, name: str, dist: str = "") -> bool:
+    """True when a pytest config names this plugin in addopts (-p) or required_plugins.
+
+    The config may use the entry-point name or the distribution name from installed metadata. Comparison is
+    PEP 503 (lowercase; '-', '_' and '.' are the same). A dependency line that only installs the package does
+    not count. roots is one checkout or a list of them (main and the pull request). Either side naming the
+    plugin is enough to keep it."""
+    if not _PLUGIN_NAME.fullmatch(str(name or "")):
+        return False
+    aliases = {form for form in (_pep503(name), _pep503(dist)) if form}
+    folders = roots if isinstance(roots, (list, tuple)) else [roots]
+    return any(_names_plugin(_config_text(root), aliases) for root in folders)
 
 
 def collection_plugins_to_disable(main_log: str, pr_log: str, entry_points, results: dict | None = None) -> list[str]:
@@ -3637,10 +3651,12 @@ def retry_collection_plugin(rec: dict, per_run: list, results: dict, venvs: dict
     if not startup and not collection_failed_same_way(main_log, pr_log):
         return per_run, results
     frames = (_startup_configure_frames(main_log) if startup else _collection_frames(main_log))
-    names = plugin_entry_points(frames, installed_pytest_entry_points(venvs))
+    installed = installed_pytest_entry_points(venvs)
+    names = plugin_entry_points(frames, installed)
     if startup:
         roots = [cwds.get(side) for side in ("main", "pr") if isinstance(cwds, dict) and cwds.get(side)]
-        names = [name for name in names if not plugin_named_in_pytest_config(roots, name)]
+        dist_of = {str(ep_name): str(dist or "") for ep_name, _value, dist in installed}
+        names = [name for name in names if not plugin_named_in_pytest_config(roots, name, dist_of.get(name, ""))]
     if not names:
         return per_run, results
     saved = _snapshot_pytest_outputs(prdir, runs)

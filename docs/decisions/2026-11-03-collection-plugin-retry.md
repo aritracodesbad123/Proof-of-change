@@ -36,7 +36,10 @@ a collection error, so the both-sides retry skipped it.
   `pytest_configure`, and the exception line matches after side folder names are removed. `INTERNALERROR>` is
   removed before the line is read. A name ending in Warning counts, as well as Error and Exception.
 - That startup retry does not turn a plugin off when either side's pytest config names it with `-p` or
-  `required_plugins`. Listing the package as a dependency does not, by itself, count as naming it.
+  `required_plugins`. The name may be the entry point (`asyncio`) or the distribution that provides it
+  (`pytest-asyncio`), read from the installed plugin metadata. Those names are compared in PEP 503 form:
+  lowercase, with `-`, `_` and `.` treated as the same character. Listing the package as a dependency does
+  not, by itself, count as naming it.
 - One retry, on both sides. A log that already records the older in-command startup repair is not retried again.
   The coverage run uses the same flags when that retry is the result that is kept.
 - If the retry still does not collect tests, the logs and the results from the first run are put back.
@@ -64,8 +67,9 @@ whatever results were kept.
 
 `tests/fixtures/collection_plugin/` is a pair of pytest logs: the same collection error, with the side folder name
 as the only difference, and the traceback inside a third-party plugin. `tests/fixtures/startup_plugin/` is the
-startup shape: `INTERNALERROR>` lines, `pytest_configure` in a third-party plugin, and a Warning. The config file
-there names the plugin with `-p` and `required_plugins`. `tests/test_collection_plugin_retry.py` checks the entry
+startup shape: `INTERNALERROR>` lines, `pytest_configure` in a third-party plugin, and a Warning. One config
+names the entry point. Two more name the distribution, one in `required_plugins` and one with `-p`.
+`tests/test_collection_plugin_retry.py` checks the entry
 point, including `asyncio` for that startup log, that a named plugin is not retried, that a different error, a
 project file, or a side that already ran tests is not retried, that a failed retry keeps the first logs, and that
 the report states the plugin was turned off. Nothing from those pull requests is run again.

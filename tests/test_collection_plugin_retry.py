@@ -182,12 +182,23 @@ def test_a_plugin_the_pytest_config_names_is_not_turned_off(tmp_path):
     bare = tmp_path / "bare"
     bare.mkdir()
     (bare / "pyproject.toml").write_text('[project.optional-dependencies]\ndev = ["pytest-asyncio"]\n')
-    assert not dr.plugin_named_in_pytest_config([bare], "asyncio")
+    assert not dr.plugin_named_in_pytest_config([bare], "asyncio", "pytest-asyncio")
     only_p = tmp_path / "flag"
     only_p.mkdir()
     (only_p / "pytest.ini").write_text("[pytest]\naddopts = -p asyncio\n")
     assert dr.plugin_named_in_pytest_config([only_p], "asyncio")
     assert not dr.plugin_named_in_pytest_config([only_p], "other")
+    required = tmp_path / "required"
+    required.mkdir()
+    (required / "pyproject.toml").write_text((START / "required-dist.toml").read_text())
+    assert dr.plugin_named_in_pytest_config([required], "asyncio", "pytest-asyncio")
+    assert dr.plugin_named_in_pytest_config([required], "asyncio", "pytest_asyncio")
+    assert dr.plugin_named_in_pytest_config([required], "asyncio", "Pytest.Asyncio")
+    assert not dr.plugin_named_in_pytest_config([required], "asyncio")
+    flagged = tmp_path / "addopts"
+    flagged.mkdir()
+    (flagged / "pyproject.toml").write_text((START / "addopts-dist.toml").read_text())
+    assert dr.plugin_named_in_pytest_config([flagged], "asyncio", "pytest-asyncio")
 
 
 def test_startup_retry_once_unless_the_config_names_the_plugin(tmp_path, monkeypatch):
@@ -242,6 +253,34 @@ def test_startup_retry_once_unless_the_config_names_the_plugin(tmp_path, monkeyp
     assert "pytest_plugins_off" not in rec2
     assert all("no:asyncio" not in c for c in seen)
     assert "PytestDeprecationWarning" in (rdir2 / "pytest-main-1.log").read_text()
+
+    seen.clear()
+    dist_named = tmp_path / "dist"
+    dist_named.mkdir()
+    (dist_named / "pyproject.toml").write_text((START / "required-dist.toml").read_text())
+    rec3 = {}
+    rdir3 = tmp_path / "run3"
+    rdir3.mkdir()
+    _cmp, cnv3, _ex = dr.execute_tests(
+        rec3, {"main": tmp_path / "vm", "pr": tmp_path / "vp"},
+        {"main": ["t.py"], "pr": ["t.py"]}, rdir3, tmp_path, a, cwds={"main": dist_named, "pr": dist_named})
+    assert cnv3 and "collection failed" in cnv3
+    assert "pytest_plugins_off" not in rec3
+    assert all("no:asyncio" not in c for c in seen)
+
+    seen.clear()
+    flag_named = tmp_path / "pflag"
+    flag_named.mkdir()
+    (flag_named / "pyproject.toml").write_text((START / "addopts-dist.toml").read_text())
+    rec4 = {}
+    rdir4 = tmp_path / "run4"
+    rdir4.mkdir()
+    _cmp, cnv4, _ex = dr.execute_tests(
+        rec4, {"main": tmp_path / "vm", "pr": tmp_path / "vp"},
+        {"main": ["t.py"], "pr": ["t.py"]}, rdir4, tmp_path, a, cwds={"main": flag_named, "pr": flag_named})
+    assert cnv4 and "collection failed" in cnv4
+    assert "pytest_plugins_off" not in rec4
+    assert all("no:asyncio" not in c for c in seen)
 
 
 def test_contree_commands_carry_the_same_flag(tmp_path, monkeypatch):

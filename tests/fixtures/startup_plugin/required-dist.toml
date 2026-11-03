@@ -1,0 +1,2 @@
+[tool.pytest.ini_options]
+required_plugins = ["pytest-asyncio"]
