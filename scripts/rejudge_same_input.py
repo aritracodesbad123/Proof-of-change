@@ -97,12 +97,30 @@ def _spec_probes(spec):
     return {"status": "ran", "items": items}
 
 
-def _comparison(spec):
-    def side(rows):
-        one = {k: (v, "assertion failed" if v in ("failed", "error") else "") for k, v in rows.items()}
-        return [one] * 3
+def _cell(value):
+    if isinstance(value, dict):
+        outcome = value["outcome"]
+        message = value.get("message") or ""
+        if outcome in ("failed", "error") and not message:
+            message = "assertion failed"
+        return outcome, message
+    if value in ("failed", "error"):
+        return value, "assertion failed"
+    return value, ""
 
-    return compare_sides({"main": side(spec["tests"]["main"]), "pr": side(spec["tests"]["pr"])})
+
+def _comparison(spec):
+    def runs(rows):
+        built = []
+        for i in range(3):
+            one = {}
+            for key, value in rows.items():
+                cell = value[i] if isinstance(value, list) else value
+                one[key] = _cell(cell)
+            built.append(one)
+        return built
+
+    return compare_sides({"main": runs(spec["tests"]["main"]), "pr": runs(spec["tests"]["pr"])})
 
 
 def judge_spec(spec, cross_run: bool) -> dict:

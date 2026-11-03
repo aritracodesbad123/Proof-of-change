@@ -1,0 +1,35 @@
+{
+  "files": ["pkg/mod.py", "pkg/tests/test_mod.py"],
+  "package_py": ["pkg/mod.py"],
+  "tests": {
+    "main": {
+      "pkg.tests.test_mod.TestCls::test_new_case": "failed",
+      "pkg.tests.test_mod.TestCls::test_keep": {
+        "outcome": "failed",
+        "message": "AssertionError: side-main/pkg/mod.py:10"
+      }
+    },
+    "pr": {
+      "pkg.tests.test_mod.TestCls::test_new_case": "passed",
+      "pkg.tests.test_mod.TestCls::test_keep": {
+        "outcome": "failed",
+        "message": "AssertionError: side-pr/pkg/mod.py:10"
+      }
+    }
+  },
+  "probes": [
+    {
+      "id": "model-p1",
+      "claims": [
+        {
+          "id": "C1",
+          "text": "the returned value changes",
+          "covers": ["out"],
+          "expect": "differs"
+        }
+      ],
+      "main": {"out": 1},
+      "pr": {"out": 1}
+    }
+  ]
+}

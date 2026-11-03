@@ -51,9 +51,11 @@ observation stays needs_attention when that other claim is proven different on t
 without its last part): the change was reached there. With no proven differs claim, that case still needs
 attention, unless a cross-run settles it (the pull request's new or
 changed tests fail on the base and pass on the pull request, every probe of that claim agreed or never ran, and
-the record has no contradicted same claim, no unclaimed difference, no crash on the pull-request side, and no
-test that fails there). A cross-run does not settle a differs claim whose agreeing observations sit on an input
-where another claim was proven different. Flaky
+the record has no contradicted same claim, no unclaimed difference, no crash on the pull-request side, no
+regression, no new or edited test that fails there, and no test that is unstable on the pull request). A test
+that fails the same way on both sides, the same outcome and the same exception type after side-path
+normalisation, does not block. A cross-run does not settle a differs claim whose agreeing observations sit on
+an input where another claim was proven different. Flaky
 observations are ignored as noise when the base side is unstable or both sides are. An observation that is stable
 on the base and unstable only on the pull request is not that noise: it needs attention, or could not verify when
 every pull-request run differs. Differences that are only about warnings never count on their own.

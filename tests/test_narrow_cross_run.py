@@ -1,7 +1,9 @@
 """Narrow cross-run: new or changed tests that fail on the base and pass on the PR may settle a differs claim.
 
-The two regression fixtures are modelled on dask #12645 and rich #4147. Both pass the cross-run and both stay
-not verified. Nothing from those pull requests is run again.
+The regression fixtures modelled on dask #12645 and rich #4147 pass the cross-run and stay not verified, as does
+the barcode #162 fixture judged in tests/test_same_input_guard.py. A test that fails the same way on both sides
+does not block. A regression, a new or edited failing test, and a pull-request-unstable test still do.
+Nothing from those pull requests is run again.
 """
 import copy
 import json
@@ -19,12 +21,30 @@ def _load(name):
     return json.loads((FX / name).read_text())
 
 
-def _comparison(spec):
-    def side(rows):
-        one = {k: (v, "assertion failed" if v in ("failed", "error") else "") for k, v in rows.items()}
-        return [one] * 3
+def _cell(value):
+    if isinstance(value, dict):
+        outcome = value["outcome"]
+        message = value.get("message") or ""
+        if outcome in ("failed", "error") and not message:
+            message = "assertion failed"
+        return outcome, message
+    if value in ("failed", "error"):
+        return value, "assertion failed"
+    return value, ""
 
-    return compare_sides({"main": side(spec["tests"]["main"]), "pr": side(spec["tests"]["pr"])})
+
+def _comparison(spec):
+    def runs(rows):
+        built = []
+        for i in range(3):
+            one = {}
+            for key, value in rows.items():
+                cell = value[i] if isinstance(value, list) else value
+                one[key] = _cell(cell)
+            built.append(one)
+        return built
+
+    return compare_sides({"main": runs(spec["tests"]["main"]), "pr": runs(spec["tests"]["pr"])})
 
 
 def _files(spec):
@@ -151,15 +171,72 @@ def test_tests_that_fail_on_the_pr_are_not_verified():
     assert "fail on the PR" in reason
 
 
-def test_a_failure_already_on_both_sides_is_not_verified():
+def test_a_failure_with_no_exception_type_still_blocks():
+    """The message is only 'assertion failed', so the exception type was not shown."""
     spec = _load("agreeing-settled.json")
-    spec["tests"]["main"]["pkg/tests/test_mod.py::test_pre"] = "failed"
-    spec["tests"]["pr"]["pkg/tests/test_mod.py::test_pre"] = "failed"
+    spec["tests"]["main"]["tests/test_other.py::test_pre"] = "failed"
+    spec["tests"]["pr"]["tests/test_other.py::test_pre"] = "failed"
     files = _files(spec)
     cmp = _comparison(spec)
-    assert cmp["preexisting_failures"] and cross_run_test_ids(cmp, files)
+    tid = "tests/test_other.py::test_pre"
+    assert tid in cmp["preexisting_failures"] and cross_run_test_ids(cmp, files)
+    assert cmp["failure_signatures"][tid]["same"] is False
     v, _reason, fl = verdict_for(cmp, None, None, files, _probes(spec))
     assert v != "verified" and "cross_run_settled" not in fl
+
+
+def test_a_new_test_that_fails_on_the_pr_is_not_verified():
+    _spec, files, cmp, _pp, (v, _reason, fl) = _judge("exclusion-new-test-fails.json")
+    assert cross_run_test_ids(cmp, files)
+    assert cmp["new_tests_failing"]
+    assert v != "verified" and "cross_run_settled" not in fl
+
+
+def test_an_edited_test_that_fails_the_same_way_is_not_verified():
+    _spec, files, cmp, _pp, (v, _reason, fl) = _judge("exclusion-edited-test-fails.json")
+    kept = "pkg.tests.test_mod.TestCls::test_keep"
+    assert cross_run_test_ids(cmp, files)
+    assert kept in cmp["preexisting_failures"]
+    assert cmp["failure_signatures"][kept]["same"] is True
+    assert cmp["failure_signatures"][kept]["exception"] == ["AssertionError"]
+    assert v != "verified" and "cross_run_settled" not in fl
+
+
+def test_a_pr_unstable_test_is_not_verified():
+    _spec, files, cmp, _pp, (v, _reason, fl) = _judge("exclusion-pr-unstable.json")
+    assert cross_run_test_ids(cmp, files)
+    assert cmp["pr_unstable"]
+    assert v != "verified" and "cross_run_settled" not in fl
+
+
+def test_the_same_failure_on_both_sides_does_not_block():
+    _spec, files, cmp, _pp, (v, reason, fl) = _judge("same-failure-settled.json")
+    old = "tests/test_other.py::test_old"
+    assert old in cmp["preexisting_failures"]
+    assert cmp["failure_signatures"][old]["same"] is True
+    assert cmp["failure_signatures"][old]["exception"] == ["AssertionError"]
+    assert any(i.endswith("TestCls::test_new_case") for i in cross_run_test_ids(cmp, files))
+    assert v == "verified" and "cross_run_settled" in fl
+    assert "need attention" not in reason
+
+
+def test_a_different_exception_type_on_the_pr_still_blocks():
+    _spec, files, cmp, _pp, (v, _reason, fl) = _judge("exclusion-different-exception.json")
+    old = "tests/test_other.py::test_old"
+    assert old in cmp["preexisting_failures"] and cross_run_test_ids(cmp, files)
+    assert cmp["failure_signatures"][old]["same"] is False
+    assert v != "verified" and "cross_run_settled" not in fl
+
+
+def test_a_temporary_path_is_normalised_before_the_exception_type():
+    tid = "tests/test_other.py::test_old"
+    main = {tid: ("failed", "AssertionError: see /tmp/side-main/FakeError"),
+            "pkg/tests/test_mod.py::test_keep": ("passed", "")}
+    pr = {tid: ("failed", "AssertionError: see /tmp/side-pr/OtherError"),
+          "pkg/tests/test_mod.py::test_keep": ("passed", "")}
+    cmp = compare_sides({"main": [main] * 3, "pr": [pr] * 3})
+    assert cmp["failure_signatures"][tid]["same"] is True
+    assert cmp["failure_signatures"][tid]["exception"] == ["AssertionError"]
 
 
 def test_no_new_tests_means_no_cross_run_and_nothing_changes():
