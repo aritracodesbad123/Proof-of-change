@@ -46,11 +46,14 @@ Any red or amber label (false_claim, unmentioned, needs_human) makes the PR verd
 cases kept at could_not_verify: tests collected nothing on both sides, and a differs claim whose only probe used
 inputs where the old and new code agree because it never reached the change. A differs claim whose covered
 observations all agree is advisory, and does not raise needs_attention, when another differs claim on the same
-record is already proven: the claim was not shown on these inputs, and a related change was proven. With no
-proven differs claim, that case still needs attention, unless a cross-run settles it (the pull request's new or
+record is already proven: the claim was not shown on these inputs, and a related change was proven. An agreeing
+observation stays needs_attention when that other claim is proven different on the same input (the dotted name
+without its last part): the change was reached there. With no proven differs claim, that case still needs
+attention, unless a cross-run settles it (the pull request's new or
 changed tests fail on the base and pass on the pull request, every probe of that claim agreed or never ran, and
 the record has no contradicted same claim, no unclaimed difference, no crash on the pull-request side, and no
-test that fails there). Flaky
+test that fails there). A cross-run does not settle a differs claim whose agreeing observations sit on an input
+where another claim was proven different. Flaky
 observations are ignored as noise when the base side is unstable or both sides are. An observation that is stable
 on the base and unstable only on the pull request is not that noise: it needs attention, or could not verify when
 every pull-request run differs. Differences that are only about warnings never count on their own.
@@ -930,14 +933,38 @@ def _input_of(name: str) -> str | None:
     return name.rsplit(".", 1)[0] if "." in name else None
 
 
+def other_claim_proven_on_input(observations: list, claim_id, name) -> bool:
+    """True when a different claim is proven different on this observation's input.
+
+    The input is the dotted name without its last part (``_input_of``). An undotted name has no input that can
+    be told apart, so it is never this case. Proven different means labelled proven, state differs, not advisory,
+    and not unstable only on the pull request."""
+    inp = _input_of(str(name or ""))
+    if not inp or not claim_id:
+        return False
+    for o in observations:
+        if not isinstance(o, dict):
+            continue
+        other = o.get("claim")
+        if not other or other == claim_id:
+            continue
+        if _input_of(str(o.get("name") or "")) != inp:
+            continue
+        if (o.get("label") == FindingLabel.PROVEN.value and o.get("state") == "differs"
+                and not o.get("advisory") and not o.get("pr_only")):
+            return True
+    return False
+
+
 def _agreeing_differs_when_proven(obs: list[dict]) -> list[dict]:
     """Covered observations of a differs claim that all agree, once another differs claim is proven.
 
     Each one is labelled needs_human with state "same" ("does not differ although the claim says it does").
-    They are advisory: the claim was not shown on these inputs, and a related change was proven. Returned in
-    observation order. A claim with any other covered observation (a difference, a contradiction, a flaky or
-    unstable result, or a probe that did not run) is not this case. Nothing is returned when no differs claim
-    is proven, or when the only proof is a claim that the result stays the same."""
+    They are advisory: the claim was not shown on these inputs, and a related change was proven. An observation
+    is left out when another claim is proven different on that same input: the change was reached, so it still
+    needs attention. Returned in observation order. A claim with any other covered observation (a difference, a
+    contradiction, a flaky or unstable result, or a probe that did not run) is not this case. Nothing is returned
+    when no differs claim is proven, or when the only proof is a claim that the result stays the same."""
     proven = {o.get("claim") for o in obs
               if o.get("claim") and o.get("label") == FindingLabel.PROVEN.value and o.get("state") == "differs"
               and not o.get("advisory") and not o.get("pr_only")}
@@ -954,7 +981,7 @@ def _agreeing_differs_when_proven(obs: list[dict]) -> list[dict]:
             continue
         if all(o.get("state") == "same" and o.get("label") == FindingLabel.NEEDS_HUMAN.value
                and not o.get("advisory") and not o.get("pr_only") for o in group):
-            out.extend(group)
+            out.extend(o for o in group if not other_claim_proven_on_input(obs, cid, o.get("name")))
     return out
 
 
@@ -979,7 +1006,8 @@ def summarize(items: list[dict]) -> dict:
     unchanged_sub = [o for o in raw_flagged if o["label"] == FindingLabel.NEEDS_HUMAN.value and o.get("state") == "same"
                      and not o.get("advisory") and (o.get("claim"), _input_of(o["name"])) in met]
     # A whole differs claim that was not shown (every covered observation agrees) is advisory when some other
-    # differs claim on this record is already proven. It does not raise needs attention. A claim that is only
+    # differs claim on this record is already proven, except an observation on an input where that other claim
+    # was proven different. That observation was reached, so it still needs attention. A claim that is only
     # partly shown, or a record with nothing proven, is unchanged.
     unshown = _agreeing_differs_when_proven(obs)
     flagged = [o for o in raw_flagged

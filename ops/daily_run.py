@@ -4695,17 +4695,21 @@ def settleable_differs_claims(probe_results) -> list[str]:
 
     A claim qualifies when every probe observation linked to it agreed (the same value on both sides), or when
     its probes never ran (no observation matches it). A claim whose probes did not all agree does not qualify.
+    A claim whose agreeing observations sit on an input where another claim was proven different does not
+    qualify either: that input reached the change, so the agreeing result still needs attention.
     """
     items = _probe_items(probe_results)
+    flat = [o for it in items for o in (it.get("observations") or []) if isinstance(o, dict)]
     groups: dict[str, list] = {}
-    for it in items:
-        for obs in it.get("observations") or []:
-            cid = obs.get("claim")
-            if cid:
-                groups.setdefault(str(cid), []).append(obs)
+    for obs in flat:
+        cid = obs.get("claim")
+        if cid:
+            groups.setdefault(str(cid), []).append(obs)
     settle = []
     for cid, obs in groups.items():
         if _expect_of(items, cid) == "differs" and obs and all(_agreed_observation(o) for o in obs):
+            if any(probes.other_claim_proven_on_input(flat, cid, o.get("name")) for o in obs):
+                continue
             settle.append(cid)
     linked = set(groups)
     for cid in probes.unmatched_differs_claims(probe_results):
@@ -4741,7 +4745,8 @@ def _narrow_cross_run(v, reason, fl, cmp, cnv_reason, exits, files, probe_result
     """Settle agreeing or never-run differs claims from a cross-run, or leave the verdict as it was.
 
     The rule only raises a held-back verdict to verified. It never lowers one, and it does nothing when there
-    is no cross-run."""
+    is no cross-run. It does not settle a differs claim whose agreeing observations sit on an input where
+    another claim was proven different."""
     ids = cross_run_test_ids(cmp, files)
     if not ids or v == Verdict.VERIFIED.value or _cross_run_blocked(cmp, probe_results):
         return v, reason, fl
@@ -4776,9 +4781,10 @@ def verdict_for(cmp: dict | None, cnv_reason: str | None, exits: dict | None = N
     A probe claim that expects a difference but matches no observation on that probe can only lower a verified
     result to could_not_verify. It never raises a verdict.
     A cross-run (the PR's new or changed tests fail on the base and pass on the PR) may then settle a differs
-    claim as proven, only when that claim's probes all agreed or never ran. It never verifies a record that has
-    a same claim whose behaviour differed, an unclaimed difference, a crash on the PR side, or a test that fails
-    on the PR. With no cross-run, nothing changes."""
+    claim as proven, only when that claim's probes all agreed or never ran. It does not settle a differs claim
+    whose agreeing observations sit on an input where another claim was proven different. It never verifies a
+    record that has a same claim whose behaviour differed, an unclaimed difference, a crash on the PR side, or a
+    test that fails on the PR. With no cross-run, nothing changes."""
     if same_sides:
         return (Verdict.COULD_NOT_VERIFY.value,
                 "unsupported: main and PR sides are the same commit, so nothing was compared; "

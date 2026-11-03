@@ -1,0 +1,59 @@
+{
+  "repo": "WhyNotHugo/python-barcode",
+  "pr": 162,
+  "files": ["barcode/codex.py", "tests/test_codex.py"],
+  "package_py": ["barcode/codex.py"],
+  "tests": {
+    "main": {
+      "tests/test_codex.py::test_high_characters": "failed",
+      "tests/test_codex.py::test_keep": "passed"
+    },
+    "pr": {
+      "tests/test_codex.py::test_high_characters": "passed",
+      "tests/test_codex.py::test_keep": "passed"
+    }
+  },
+  "probes": [
+    {
+      "id": "model-p1",
+      "source": "model",
+      "about": "charset A and B on a low and a high character",
+      "claims": [
+        {
+          "id": "C1",
+          "text": "charset A accepts a character above 127 instead of raising IllegalCharacterError",
+          "covers": ["*.c1"],
+          "expect": "differs"
+        },
+        {
+          "id": "C2",
+          "text": "charset B accepts a character above 127 instead of raising IllegalCharacterError",
+          "covers": ["*.c2"],
+          "expect": "differs"
+        },
+        {
+          "id": "C3",
+          "text": "FNC4 is used for high characters in charsets A and B",
+          "covers": ["*.uses_fnc4"],
+          "expect": "differs"
+        }
+      ],
+      "main": {
+        "low160.c1": {"raises": "IllegalCharacterError"},
+        "low160.c2": {"raises": "IllegalCharacterError"},
+        "low160.uses_fnc4": false,
+        "high255.c1": {"raises": "IllegalCharacterError"},
+        "high255.c2": {"raises": "IllegalCharacterError"},
+        "high255.uses_fnc4": false
+      },
+      "pr": {
+        "low160.c1": "accepted",
+        "low160.c2": "accepted",
+        "low160.uses_fnc4": false,
+        "high255.c1": "accepted",
+        "high255.c2": "accepted",
+        "high255.uses_fnc4": false
+      }
+    }
+  ]
+}
