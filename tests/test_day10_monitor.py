@@ -44,19 +44,21 @@ def _flagged_probe():
 
 
 # ---------------------------------------------------------------- (52) empty collection
-def test_52_nothing_collected_on_both_sides_stays_could_not_verify():
+def test_52_nothing_collected_on_both_sides_with_a_flag_needs_attention():
     reason = "tests produced no results on both sides (collection failed; see pytest logs)"
     v, text, _ = dr.verdict_for(None, reason, probe_results=_flagged_probe())
-    assert v == "could_not_verify"
+    assert v == "needs_attention"
+    assert "flagged observation(s) c" in text and "no tests ran" in text
     assert "no results on both sides" in text
 
 
-def test_52_collection_errors_only_on_both_sides_stay_could_not_verify():
+def test_52_collection_errors_only_on_both_sides_with_a_flag_needs_attention():
     res = {"main": [{"::pkg.tests.test_mod": E}] * 3, "pr": [{"::pkg.tests.test_mod": E}] * 3}
     cmp = dr.compare_sides(res)
     v, text, _ = dr.verdict_for(cmp, None, probe_results=_flagged_probe())
     assert cmp["executed"] == {"main": 0, "pr": 0}
-    assert v == "could_not_verify"
+    assert v == "needs_attention"
+    assert "flagged observation(s) c" in text and "no tests ran" in text
     assert "no test actually ran" in text
 
 

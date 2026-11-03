@@ -1,0 +1,19 @@
+{
+  "repo": "example/pkg",
+  "pr": 1,
+  "files": ["pkg/mod.py"],
+  "package_py": ["pkg/mod.py"],
+  "tests": {"main": {}, "pr": {}},
+  "probes": [
+    {
+      "id": "model-p1",
+      "source": "model",
+      "about": "the result the claim says stays the same",
+      "claims": [
+        {"id": "C1", "text": "the result stays 1", "covers": ["out"], "expect": "same"}
+      ],
+      "main": {"out": 1},
+      "pr": {"out": 2}
+    }
+  ]
+}

@@ -3990,20 +3990,36 @@ def _short_reason(text: str) -> str:
     return text[:180]
 
 
+def venv_python(venv: Path | None = None, *, contree: bool = False) -> str:
+    """The interpreter the pytest command runs on one side.
+
+    Local and bubblewrap both exec ``<venv>/bin/python`` and let the side sandbox resolve it (``run`` and
+    ``in_side``). uv writes that name as a symlink to the interpreter the sandbox mounts. On the host that
+    target is not a regular file, so a separate existence check says the interpreter is missing after the
+    tests have already run it. Contree runs ``python`` in the checkpoint, the same program as
+    ``python -m pytest``. Callers pass this string on. They do not look the interpreter up again.
+    """
+    if contree:
+        return "python"
+    return str(Path(venv) / "bin" / "python")
+
+
 def installed_pytest_entry_points(venvs: dict) -> tuple[list[tuple[str, str, str]], str]:
     """(pytest11 entry points, reason). The reason is empty when the list was read.
 
-    Main is tried first, then the pull-request side. When neither side yields a list, the reason says why,
-    in plain words. The caller records that reason. It is not dropped."""
+    Each side is read with ``venv_python``, the interpreter that side's pytest command uses. Main is tried
+    first, then the pull-request side. When neither side yields a list, the reason says why, in plain words.
+    The caller records that reason. It is not dropped."""
     problems: list[str] = []
     if _contree_ready():
         from poc import contree_sandboxes
         sess = contree_sandboxes.session()
         if sess is None:
             return [], "the sandbox session was not available, so the installed pytest plugins could not be read"
+        py = venv_python(contree=True)
         for side in ("main", "pr"):
             try:
-                raw = sess.run_argv(side, ["python", "-c", PYTEST_ENTRY_POINTS_PY], timeout=60)
+                raw = sess.run_argv(side, [py, "-c", PYTEST_ENTRY_POINTS_PY], timeout=60)
             except Exception as exc:  # noqa: BLE001 - the reason is recorded, the check continues
                 problems.append(f"the {side} side failed ({type(exc).__name__})")
                 continue
@@ -4024,12 +4040,9 @@ def installed_pytest_entry_points(venvs: dict) -> tuple[list[tuple[str, str, str
         if not venv:
             problems.append(f"the {side} side had no environment")
             continue
-        py = Path(venv) / "bin" / "python"
-        if not py.is_file():
-            problems.append(f"the {side} side had no Python interpreter")
-            continue
+        py = venv_python(venv)
         try:
-            cp = in_side(venv, [str(py), "-c", PYTEST_ENTRY_POINTS_PY], timeout=60)
+            cp = in_side(venv, [py, "-c", PYTEST_ENTRY_POINTS_PY], timeout=60)
         except Exception as exc:  # noqa: BLE001 - the reason is recorded, the check continues
             problems.append(f"the {side} side failed ({type(exc).__name__})")
             continue
@@ -4248,18 +4261,19 @@ def _contree_pytest_once(side: str, targets: list[str], test_timeout: int, run_t
     tg = " ".join(shlex.quote(t) for t in targets)
     nflag = f"-n {shlex.quote(workers)} " if workers != "0" else ""
     off = plugin_off_shell(plugins_off)
+    py = venv_python(contree=True)
     shell = (
         "set +e\ncd /work/src\n"
-        f"python -m pytest {tg} -p no:cacheprovider {off}-q -rfE --timeout={int(test_timeout)} "
+        f"{py} -m pytest {tg} -p no:cacheprovider {off}-q -rfE --timeout={int(test_timeout)} "
         f"{repo_addopts_flag(keep_addopts)}-o junit_family=xunit2 --junitxml=/tmp/poc-junit.xml {nflag}"
         ">/tmp/poc-pytest.log 2>&1\n"
         "ec=$?\n"
         "if grep -q 'different tests were collected' /tmp/poc-pytest.log 2>/dev/null && "
         f"[ {shlex.quote(workers)} != 0 ]; then\n"
-        f"  python -m pytest {tg} -p no:cacheprovider {off}-q -rfE --timeout={int(test_timeout)} "
+        f"  {py} -m pytest {tg} -p no:cacheprovider {off}-q -rfE --timeout={int(test_timeout)} "
         f"{repo_addopts_flag(keep_addopts)}-o junit_family=xunit2 --junitxml=/tmp/poc-junit.xml "
         ">/tmp/poc-pytest.log 2>&1\n  ec=$?\nfi\n"
-        + STARTUP_PLUGIN_RETRY_SHELL.replace("{RERUN}", f"python -m pytest {tg} -p no:cacheprovider {off}-q -rfE "
+        + STARTUP_PLUGIN_RETRY_SHELL.replace("{RERUN}", f"{py} -m pytest {tg} -p no:cacheprovider {off}-q -rfE "
                                               f"--timeout={int(test_timeout)} {repo_addopts_flag(keep_addopts)}"
                                               f"-o junit_family=xunit2 --junitxml=/tmp/poc-junit.xml {nflag}")
         + "printf '___POC_EXIT___%s\\n' \"$ec\"\n"
@@ -4297,7 +4311,7 @@ def _local_pytest_once(venv: Path, tg: list, test_timeout: int, run_timeout: int
 
     The project's python_files setting is left as it is. When workers disagree about which tests exist, the
     run is repeated once without workers, as the timed runs do. disable_plugins is the same `-p no:` list."""
-    cmd = [venv / "bin/python", "-m", "pytest", *tg, "-p", "no:cacheprovider",
+    cmd = [venv_python(venv), "-m", "pytest", *tg, "-p", "no:cacheprovider",
            *plugin_off_args(disable_plugins), "-q", "-rfE",
            f"--timeout={test_timeout}", *repo_addopts_args(keep_addopts), "-o", "junit_family=xunit2",
            f"--junitxml={jin}"]
@@ -4462,7 +4476,7 @@ def coverage_run(item: dict, venv: Path, main_root: Path, pr_root: Path, targets
     base = cwd or pr_root
     rcfile = side_out(venv) / "poc-coveragerc"
     rcfile.write_text(COVERAGE_RC)
-    cmd = [venv / "bin/python", "-m", "pytest", *[str(base / t) for t in targets], "-p", "no:cacheprovider",
+    cmd = [venv_python(venv), "-m", "pytest", *[str(base / t) for t in targets], "-p", "no:cacheprovider",
            *plugin_off_args(plugins_off), "-q",
            f"--timeout={a.test_timeout}", *repo_addopts_args(product_route(a)), *[f"--cov={s}" for s in sorted(sources)],
            f"--cov-config={rcfile}", f"--cov-report=json:{oin}"]
@@ -4605,9 +4619,10 @@ def contree_coverage_run(item: dict, main_root: Path, pr_root: Path, targets: li
     cov = " ".join(f"--cov={shlex.quote(s)}" for s in sources)
     nflag = f"-n {shlex.quote(str(a.workers))} " if str(a.workers) != "0" else ""
     off = plugin_off_shell(plugins_off)
+    py = venv_python(contree=True)
     shell = (
         f"set +e\nprintf %s {shlex.quote(COVERAGE_RC)} > /tmp/poc-coveragerc\ncd /work/src\n"
-        f"python -m pytest {tg} -p no:cacheprovider {off}-q --timeout={int(a.test_timeout)} "
+        f"{py} -m pytest {tg} -p no:cacheprovider {off}-q --timeout={int(a.test_timeout)} "
         f"{repo_addopts_flag(product_route(a))}{nflag}{cov} --cov-config=/tmp/poc-coveragerc "
         "--cov-report=json:/tmp/poc-cov.json "
         ">/tmp/poc-cov-pytest.log 2>&1\n"
@@ -5517,13 +5532,14 @@ def with_probes(cmp: dict | None, cnv_reason: str | None, exits: dict | None = N
                 probe_results: dict | None = None) -> tuple[str, str, list[str]]:
     """The PR verdict: the tests' verdict (tests_verdict), then the probes (poc/probes.py). An observation that needs
     attention (it differs and no claim covers it, or it contradicts a claim) makes the verdict
-    needs_attention, also when the tests alone could not verify the PR. Two cases stay could_not_verify: tests
-    collected nothing on both sides, and a differs claim whose only probe used inputs where both sides agree
-    because the probe never reached the change. Flaky observations are shown but never
-    decide the verdict, except one that is stable on the base and unstable only on the pull request: that needs
-    attention, or could not verify when every pull-request run differs. Warning-only differences never decide.
-    Probes never upgrade a verdict: all-green
-    probes leave it as the tests decided. Without probes the verdict is exactly the tests' verdict."""
+    needs_attention, also when the tests alone could not verify the PR, and also when no test was collected on
+    either side. The reason then names the flagged claim and says that no tests ran. One case stays
+    could_not_verify: a differs claim whose only probe used inputs where both sides agree because the probe never
+    reached the change. That case stays could_not_verify even when nothing was collected. Flaky observations are
+    shown but never decide the verdict, except one that is stable on the base and unstable only on the pull
+    request: that needs attention, or could not verify when every pull-request run differs. Warning-only
+    differences never decide. Probes never upgrade a verdict: all-green probes leave it as the tests decided.
+    Without probes the verdict is exactly the tests' verdict."""
     from poc import probe_adequacy
     v, reason, fl = tests_verdict(cmp, cnv_reason, exits, files)
     items = (probe_results or {}).get("items") or []
@@ -5543,6 +5559,17 @@ def with_probes(cmp: dict | None, cnv_reason: str | None, exits: dict | None = N
                 f"too mixed to call ({reason})", fl)
     if s["flagged"] and v != Verdict.NEEDS_ATTENTION.value:
         if nothing_collected_both(cmp, cnv_reason):
+            # A flagged claim is needs attention even when neither side collected a test. A differs claim
+            # whose only probe never reached the change keeps the old could-not-verify return.
+            if not _agreeing_inputs_only(items, s["flagged"]):
+                claims = sorted({str(o["claim"]) for o in s["flagged"] if o.get("claim")})
+                if claims:
+                    who = "claim(s) " + ", ".join(claims)
+                else:
+                    names = sorted({str(o.get("name")) for o in s["flagged"] if o.get("name")})
+                    who = "observation(s) " + ", ".join(names)
+                return (Verdict.NEEDS_ATTENTION.value,
+                        f"needs attention: flagged {who}; no tests ran ({reason})", fl)
             return v, (f"{reason}; {s['reason']}" if s["reason"] else reason), fl
         if _agreeing_inputs_only(items, s["flagged"]):
             ids = ", ".join(sorted({str(o.get("claim") or "claim") for o in s["flagged"]}))
@@ -6588,7 +6615,7 @@ def messages_from_pr_only_files(targets: dict, venvs: dict, cwds: dict | None, p
     venv = venvs["main"]
     junit = side_out(venv) / "junit-base-optional.xml"
     log = prdir / "pytest-base-optional.log"
-    cmd = [venv / "bin/python", "-m", "pytest", *[str(main_root / r) for r in rels], "-p", "no:cacheprovider",
+    cmd = [venv_python(venv), "-m", "pytest", *[str(main_root / r) for r in rels], "-p", "no:cacheprovider",
            "-q", "-rfE", f"--timeout={a.test_timeout}", "-o", "addopts=", "-o", "junit_family=xunit2",
            f"--junitxml={junit}"]
     try:
