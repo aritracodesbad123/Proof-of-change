@@ -2,7 +2,7 @@
 
 ## What changed
 
-A pip requirements file counts when its name contains `requirements` and ends in `.txt`. `dev-requirements.txt` and `test-requirements.txt` are included, not only names that start with `requirements`. A line `-r` or `--requirement` in those files, and the same line in a tox `deps` setting, is followed, including when the included file includes another. A cycle stops. A path with `..`, a URL, or a path that leaves the project is not followed. Those lines are declared test dependencies: they are installed with the other requirement files, and the setup-gap retry can see them. The same filename rule is what the dependencies-only install reads.
+Plain `requirements.txt` is still a test dependency, as it was before. Any other requirements file is a test dependency only when its name contains `test` or `dev`, in any case. That covers `dev-requirements.txt`, `requirements-test.txt` and `test_requirements.txt`. It does not cover `docs-requirements.txt` or `requirements-lint.txt`. A line `-r` or `--requirement` in a file that is already followed, and the same line in a tox `deps` setting, is followed, including when the included file includes another. A lint or docs file is read when one of those lines names it, and not otherwise. A cycle stops. A path with `..`, a URL, or a path that leaves the project is not followed. Those lines are declared test dependencies: they are installed with the other requirement files, and the setup-gap retry can see them. The dependencies-only install uses the same filename rule. The check that finds an aggregate requirements file, or a file that only pins lint tools, still looks at every top-level `requirements*.txt`, so a component app is unchanged.
 
 For a repository that is not one of the built-in libraries, the import package is read from the checkout. `packages` and `package-dir` in `setup.cfg` or `pyproject.toml` win when they name a single top-level package. Otherwise the one top-level directory, or child of `src/`, that contains `__init__.py` and is not `tests` or `docs` is used. The changed files are split again with that name. A built-in library keeps the name already configured for it. When the checkout does not show exactly one package, the previous guess (the library name, hyphens turned into underscores) stays.
 
@@ -14,7 +14,7 @@ No verdict rule changed.
 
 ## Why
 
-A project can list its test dependencies in `dev-requirements.txt`, and tox can pull that file in with `-r`, without a file whose name starts with `requirements`. The setup-gap retry then does not recognise the missing distribution, so it is not installed.
+A project can list its test dependencies in `dev-requirements.txt`, and tox can pull a file in with `-r`, without that file's name starting with `requirements`. The setup-gap retry then does not recognise the missing distribution, so it is not installed. Reading every file whose name contains `requirements` also installs documentation and lint pins that the tests do not need.
 
 The import name is not always the repository name with hyphens turned into underscores. A checkout whose package directory is `barcode/` was treated as `python_barcode`, so the changed files were not package files and no tests were mapped.
 
@@ -24,7 +24,7 @@ With `python_files = *`, every Python file under a test directory was treated as
 
 ## Decision
 
-- Treat every `*requirements*.txt` as a declared test-dependency source, except a system-package list whose name does not start with `requirements` (`system-requirements.txt` is an apt list). Follow `-r` and `--requirement` recursively from those files and from tox `deps`. Do not follow `-c` constraints.
+- Keep plain `requirements.txt` as a test dependency. Also take a requirements file whose name contains `test` or `dev`, ignoring case. Do not take `docs-requirements.txt` or `requirements-lint.txt` unless a followed file or tox `deps` includes it with `-r` or `--requirement`. Follow those includes recursively. Do not follow `-c` constraints. Leave the aggregate and lint-pin scan on `requirements*.txt`.
 - For a repository outside the built-in list, take the import package from the checkout once that checkout exists, and classify the diff again. Do not special-case a repository or a package name.
 - After the stem match finds nothing for a changed package file, select up to the same per-file cap of test files in the nearest tests directory that mention the module.
 - Under a catch-all `python_files` pattern, require a test function or a test class, found by parsing the file.
@@ -32,6 +32,7 @@ With `python_files = *`, every Python file under a test directory was treated as
 ## Alternatives and tradeoffs
 
 - Hard-coding one project's requirement filename, package directory, or support path would fix that project and miss the next one.
+- Treating every `*requirements*.txt` as a test dependency installs documentation and lint pins. Limiting the name rule to `test` and `dev`, and still following `-r`, installs a lint file only when the project points at it.
 - Following every file under a `requirements/` directory would install files that are not requirement lists. Includes are followed only when a requirement file or tox `deps` names them.
 - Installing every package in a tox docs environment pulls documentation packages, not only test packages. Tox `deps` is the list the project itself says to install for a test run, so the whole list is taken.
 - Scanning every tests directory, not only the nearest, would map more files and would also run tests that belong to a different part of the tree. The nearest directory is the one the site-packages mapper already walks to.
@@ -39,8 +40,8 @@ With `python_files = *`, every Python file under a test directory was treated as
 
 ## What it means for you
 
-A project that keeps test dependencies in `dev-requirements.txt` or behind tox `-r` gets those packages installed, and a missing one named by the error can be installed on the setup-gap retry. A package directory that is not the repository's name is the one the check uses, once the checkout is on disk. A change whose tests mention the module but do not share its file name still gets those tests. Support files under a catch-all pytest pattern are not run as tests.
+A project that keeps test dependencies in `dev-requirements.txt`, or behind tox `-r`, gets those packages installed, and a missing one named by the error can be installed on the setup-gap retry. A docs or lint requirements file is not installed unless something includes it. Plain `requirements.txt` is still installed. A package directory that is not the repository's name is the one the check uses, once the checkout is on disk. A change whose tests mention the module but do not share its file name still gets those tests. Support files under a catch-all pytest pattern are not run as tests.
 
 ## Offline proof
 
-`tests/test_setup_sources_and_mapping.py` builds a temporary checkout for each rule: a `dev-requirements.txt` that includes another file, a cycle, a `..` include that is not followed, tox `deps` with `-r` and a direct name, the import package from a directory and from `setup.cfg` / `pyproject.toml`, the nearest tests directory, and a catch-all pattern whose support file has no test. Nothing from a live pull request is run.
+`tests/test_setup_sources_and_mapping.py` builds a temporary checkout for each rule: a `dev-requirements.txt` that includes another file, a cycle, a `..` include that is not followed, tox `deps` with `-r` and a direct name, `docs-requirements.txt` and `requirements-lint.txt` left unread, the lint file read when tox `deps` points at it, plain `requirements.txt` still read, the import package from a directory and from `setup.cfg` / `pyproject.toml`, the nearest tests directory, and a catch-all pattern whose support file has no test. Nothing from a live pull request is run.

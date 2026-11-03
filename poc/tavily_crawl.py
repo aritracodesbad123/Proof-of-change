@@ -300,8 +300,13 @@ def _checkout_facts(checkout) -> dict:
                 facts["self"] = facts["self"] or _norm(parser.get("metadata", "name"))
         except (configparser.Error, OSError):
             pass
+    from poc.demo_helper import _requirement_filename
     for path in list(root.glob("*requirements*.txt")) + list(root.glob("requirements/*.txt")) + \
             list(root.glob("*/*requirements*.txt")):
+        # A name that says requirements is a test source only when _requirement_filename says so.
+        # A file inside requirements/ whose own name does not say requirements is unchanged.
+        if "requirements" in path.name.lower() and not _requirement_filename(path.name):
+            continue
         rel = str(path.relative_to(root))
         facts["files"].add(rel)
         try:

@@ -145,7 +145,11 @@ def test_deps_only_plan_excludes_aggregate_files(tmp_path):
     assert set(names) == {"requirements_all.txt", "requirements_test_all.txt"}
     got = demo_helper.deps_only_plan(main, exclude=names)
     assert got["files"] == ["requirements.txt", "requirements_test.txt"]
-    assert "requirements_all.txt" in demo_helper.deps_only_plan(main)["files"]   # default unchanged
+    default = demo_helper.deps_only_plan(main)["files"]
+    # requirements.txt stays. requirements_all.txt is not a test or dev file, so it is not a source.
+    # requirements_test_all.txt contains "test", so it is a source until the aggregate list excludes it.
+    assert "requirements.txt" in default and "requirements_test_all.txt" in default
+    assert "requirements_all.txt" not in default
 
 
 def test_daily_run_flat_and_contree_paths_get_aggregate_names(tmp_path, monkeypatch):
@@ -222,9 +226,10 @@ def test_lint_only_requirement_file_is_skipped_from_content(tmp_path):
         "repos:\n  - repo: https://github.com/example/lint-tool-pre-commit\n    hooks: [{id: lint-tool}]\n"
         "  - repo: https://github.com/example/spell_checker\n")
     (main / "requirements_lint_pins.txt").write_text("lint-tool==1.0\nspell-checker==2.0\n")
-    (main / "requirements_other.txt").write_text("lint-tool==1.0\nreal-lib==1.0\n")    # not lint-only
+    # A dev requirements file is a test source. A lint-only file is not, unless something includes it.
+    (main / "requirements-dev.txt").write_text("lint-tool==1.0\nreal-lib==1.0\n")
     plan = _plan(main, main, ["app/components/two/x.py"])
-    assert "lint-tool==1.0" in plan["extra_reqs"]          # still pulled in by requirements_other.txt
+    assert "lint-tool==1.0" in plan["extra_reqs"]          # still pulled in by requirements-dev.txt
     assert "spell-checker==2.0" not in plan["extra_reqs"] and "real-lib==1.0" in plan["extra_reqs"]
     names = [p.name for p in demo_helper.lint_only_requirement_files(main)]
     assert names == ["requirements_lint_pins.txt"]

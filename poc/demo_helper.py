@@ -1038,27 +1038,39 @@ def _section(text: str, name: str) -> str:
 
 
 def _requirement_filename(name: str) -> bool:
-    """True for a pip requirements file, whatever sits before the word requirements.
+    """True when this requirements file is a test-dependency source on its own.
 
-    ``requirements.txt``, ``dev-requirements.txt`` and ``test-requirements.txt`` all count.
-    A system-package list whose name does not itself start with ``requirements`` does not
-    (``system-requirements.txt`` is an apt list). ``requirements-apt.txt`` still counts, as it did
-    when only names starting with ``requirements`` were read.
+    Plain ``requirements.txt`` is kept, as it was before. Any other ``*requirements*.txt`` counts only
+    when the name contains ``test`` or ``dev`` in any case (``dev-requirements.txt``,
+    ``requirements-test.txt``, ``test_requirements.txt``). ``docs-requirements.txt`` and
+    ``requirements-lint.txt`` do not. A file that fails this check is still read when a followed
+    requirements file or tox ``deps`` includes it with ``-r`` or ``--requirement``.
     """
-    if not name.endswith(".txt") or "requirements" not in name:
+    if not str(name).endswith(".txt"):
         return False
-    if name in APT_FILES and not name.startswith("requirements"):
+    if name == "requirements.txt":
+        return True
+    low = name.lower()
+    if "requirements" not in low or name in APT_FILES:
         return False
-    return True
+    return "test" in low or "dev" in low
 
 
 def _top_requirement_files(root: Path) -> list[Path]:
-    """Top-level ``*requirements*.txt`` files that are pip requirement lists."""
+    """Top-level requirement files that are test-dependency sources on their own."""
     root = Path(root)
     if not root.is_dir():
         return []
     return sorted(path for path in root.glob("*requirements*.txt")
                   if path.is_file() and _requirement_filename(path.name))
+
+
+def _requirements_star_files(root: Path) -> list[Path]:
+    """Top-level ``requirements*.txt`` files, the set the aggregate and lint checks have always used."""
+    root = Path(root)
+    if not root.is_dir():
+        return []
+    return sorted(path for path in root.glob("requirements*.txt") if path.is_file())
 
 
 def _requirement_files(root: Path) -> list[Path]:
@@ -1222,7 +1234,7 @@ def aggregate_requirement_files(root, components: dict[str, list[str]]) -> list[
     root = Path(root)
     if len(components) < 3:
         return []
-    candidates = [p for p in _top_requirement_files(root) if p.is_file()]
+    candidates = _requirements_star_files(root)
     if len([p for p in candidates if p.is_file()]) < 2:
         return []
     owner: dict[str, set] = {}
@@ -1289,7 +1301,7 @@ def lint_only_requirement_files(root, ignore=()) -> list[Path]:
     hooks = re.sub(r"[-_.]+", "-", _read(config).lower())
     skip = {Path(p).name for p in ignore}
     out = []
-    for path in _top_requirement_files(root):
+    for path in _requirements_star_files(root):
         if path.name in skip or not path.is_file():
             continue
         raw = list(_requirement_lines(_read(path)))
@@ -2408,7 +2420,8 @@ def deps_only_plan(checkout, exclude=()) -> dict | None:
     """How to install only what the project declares, without building the project itself.
 
     uv.lock (with pyproject): ``uv sync --no-install-project --frozen``. pyproject with [project]
-    dependencies: ``uv sync --no-install-project``. Otherwise ``*requirements*.txt`` files. None when the
+    dependencies: ``uv sync --no-install-project``. Otherwise ``requirements.txt`` and requirement files whose
+    names contain ``test`` or ``dev``. None when the
     project declares nothing usable. ``exclude``: requirements file names never to install (a product check on a
     component app passes its aggregate files).
     """

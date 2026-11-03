@@ -1,10 +1,11 @@
 """Offline checks for requirement sources, the import package, and test mapping.
 
-A requirements file counts whatever sits before the word requirements, and ``-r`` / ``--requirement``
-includes are followed, including from tox ``deps``. The import package of a repo that is not a built-in
-library comes from the checkout. A changed file with no stem-matched test uses test files in the nearest
-tests directory that mention it. With ``python_files = *``, a support file that has no test function and
-no test class is not a test. No pull request is contacted.
+Plain ``requirements.txt`` is still a test dependency. Another requirements file is too only when its
+name contains ``test`` or ``dev``, or when a followed file or tox ``deps`` includes it with ``-r``.
+The import package of a repo that is not a built-in library comes from the checkout. A changed file
+with no stem-matched test uses test files in the nearest tests directory that mention it. With
+``python_files = *``, a support file that has no test function and no test class is not a test.
+No pull request is contacted.
 """
 from pathlib import Path
 
@@ -27,18 +28,28 @@ def test_requirement_files_follow_includes_and_tox_deps(tmp_path):
     _write(tmp_path, "dev-requirements.txt",
            "-r nested/more.txt\n-r nested/escape.txt\npytest-relaxed>=2\n-e .\n")
     _write(tmp_path, "test-requirements.txt", "coverage\n")
+    _write(tmp_path, "requirements-test.txt", "from-requirements-test==1\n")
+    _write(tmp_path, "test_requirements.txt", "from-test-requirements==1\n")
+    _write(tmp_path, "Test_Requirements.txt", "from-cased-name==1\n")
+    _write(tmp_path, "requirements.txt", "base-lib==1\n")
+    _write(tmp_path, "requirements-misc.txt", "misc-lib==1\n")
+    _write(tmp_path, "docs-requirements.txt", "docs-only==1\n")
+    _write(tmp_path, "requirements-lint.txt", "lint-only==1\n")
     _write(tmp_path, "system-requirements.txt", "libffi-dev\n")
     _write(tmp_path, "notes.txt", "not-a-requirement\n")
     _write(tmp_path, "constraints.txt", "should-not-appear==1\n")
     _write(tmp_path, "extra/pins.txt", "pins-pkg==3\n")
     _write(tmp_path, "tox.ini",
            "[testenv]\ndeps =\n    -r{toxinidir}/test-requirements.txt\n    -r extra/pins.txt\n"
+           "    -r requirements-lint.txt\n"
            "    -c constraints.txt\n    pytest-timeout\n"
            "[testenv:docs]\ndeps = sphinx\n")
     lines = demo_helper.declared_requirement_lines(tmp_path)
     names = {demo_helper.req_name(line) for line in lines}
     assert {"pytest-relaxed", "freezegun", "alpha", "beta", "coverage", "pins-pkg",
-            "pytest-timeout", "sphinx"} <= names
+            "pytest-timeout", "sphinx", "base-lib", "from-requirements-test",
+            "from-test-requirements", "from-cased-name", "lint-only"} <= names
+    assert "docs-only" not in names and "misc-lib" not in names
     assert "escaped" not in names and "should-not-appear" not in names and "not-a-requirement" not in names
     assert "libffi-dev" not in names
     installed = {item["name"]: item for item in demo_helper.declared_packages(tmp_path)}
@@ -46,8 +57,13 @@ def test_requirement_files_follow_includes_and_tox_deps(tmp_path):
     assert installed["pytest-relaxed"]["source"] == "dev-requirements.txt"
     assert installed["pytest-timeout"]["source"] == "tox.ini"
     assert installed["pins-pkg"]["source"] == "pins.txt"
+    assert installed["lint-only"]["source"] == "requirements-lint.txt"
+    assert "docs-only" not in installed and "misc-lib" not in installed
     plan = demo_helper.deps_only_plan(tmp_path)
-    assert plan["files"] == ["dev-requirements.txt", "test-requirements.txt"]
+    assert "requirements.txt" in plan["files"] and "dev-requirements.txt" in plan["files"]
+    assert "test-requirements.txt" in plan["files"] and "requirements-test.txt" in plan["files"]
+    assert "docs-requirements.txt" not in plan["files"] and "requirements-lint.txt" not in plan["files"]
+    assert "requirements-misc.txt" not in plan["files"]
 
 
 def test_package_name_comes_from_the_checkout(tmp_path):
