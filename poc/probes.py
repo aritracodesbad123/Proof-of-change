@@ -42,9 +42,10 @@ Judging (``judge``): each observation is compared over 3 alternating runs per si
     same,    claim expects differs  -> needs_human       differs, no claim              -> unmentioned
     flaky                           -> flaky             probe crashed on both sides    -> not_testable
 
-Any red or amber label (false_claim, unmentioned, needs_human) makes the PR verdict needs_attention, except two
-cases kept at could_not_verify: tests collected nothing on both sides, and a differs claim whose only probe used
-inputs where the old and new code agree because it never reached the change. A differs claim whose covered
+Any red or amber label (false_claim, unmentioned, needs_human) makes the PR verdict needs_attention, including
+when tests collected nothing on both sides. The reason names the flagged claim and says that no tests ran. One
+case stays could_not_verify: a differs claim whose only probe used inputs where the old and new code agree
+because it never reached the change. A differs claim whose covered
 observations all agree is advisory, and does not raise needs_attention, when another differs claim on the same
 record is already proven: the claim was not shown on these inputs, and a related change was proven. An agreeing
 observation stays needs_attention when that other claim is proven different on the same input (the dotted name

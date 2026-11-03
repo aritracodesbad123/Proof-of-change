@@ -5198,13 +5198,14 @@ def with_probes(cmp: dict | None, cnv_reason: str | None, exits: dict | None = N
                 probe_results: dict | None = None) -> tuple[str, str, list[str]]:
     """The PR verdict: the tests' verdict (tests_verdict), then the probes (poc/probes.py). An observation that needs
     attention (it differs and no claim covers it, or it contradicts a claim) makes the verdict
-    needs_attention, also when the tests alone could not verify the PR. Two cases stay could_not_verify: tests
-    collected nothing on both sides, and a differs claim whose only probe used inputs where both sides agree
-    because the probe never reached the change. Flaky observations are shown but never
-    decide the verdict, except one that is stable on the base and unstable only on the pull request: that needs
-    attention, or could not verify when every pull-request run differs. Warning-only differences never decide.
-    Probes never upgrade a verdict: all-green
-    probes leave it as the tests decided. Without probes the verdict is exactly the tests' verdict."""
+    needs_attention, also when the tests alone could not verify the PR, and also when no test was collected on
+    either side. The reason then names the flagged claim and says that no tests ran. One case stays
+    could_not_verify: a differs claim whose only probe used inputs where both sides agree because the probe never
+    reached the change. That case stays could_not_verify even when nothing was collected. Flaky observations are
+    shown but never decide the verdict, except one that is stable on the base and unstable only on the pull
+    request: that needs attention, or could not verify when every pull-request run differs. Warning-only
+    differences never decide. Probes never upgrade a verdict: all-green probes leave it as the tests decided.
+    Without probes the verdict is exactly the tests' verdict."""
     from poc import probe_adequacy
     v, reason, fl = tests_verdict(cmp, cnv_reason, exits, files)
     items = (probe_results or {}).get("items") or []
@@ -5224,6 +5225,17 @@ def with_probes(cmp: dict | None, cnv_reason: str | None, exits: dict | None = N
                 f"too mixed to call ({reason})", fl)
     if s["flagged"] and v != Verdict.NEEDS_ATTENTION.value:
         if nothing_collected_both(cmp, cnv_reason):
+            # A flagged claim is needs attention even when neither side collected a test. A differs claim
+            # whose only probe never reached the change keeps the old could-not-verify return.
+            if not _agreeing_inputs_only(items, s["flagged"]):
+                claims = sorted({str(o["claim"]) for o in s["flagged"] if o.get("claim")})
+                if claims:
+                    who = "claim(s) " + ", ".join(claims)
+                else:
+                    names = sorted({str(o.get("name")) for o in s["flagged"] if o.get("name")})
+                    who = "observation(s) " + ", ".join(names)
+                return (Verdict.NEEDS_ATTENTION.value,
+                        f"needs attention: flagged {who}; no tests ran ({reason})", fl)
             return v, (f"{reason}; {s['reason']}" if s["reason"] else reason), fl
         if _agreeing_inputs_only(items, s["flagged"]):
             ids = ", ".join(sorted({str(o.get("claim") or "claim") for o in s["flagged"]}))
