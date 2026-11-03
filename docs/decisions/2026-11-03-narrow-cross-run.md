@@ -69,6 +69,12 @@ base and pass on the pull request, can now come out verified. The reason says th
 check with a contradicted same claim, an unclaimed difference, a crash on the pull request, or a failing test stays
 not verified. A check with no new or changed tests is unchanged.
 
+## Known limit
+
+Any single fixed test (it fails on the base and passes on the pull request) settles every qualifying differs claim
+on the record. Nothing ties that test to a particular claim. That is accepted for now, because the four exclusions
+still hold. If a held-out case ever slips through, the next step is a link from each claim to its test.
+
 ## Offline proof
 
 The fixtures under `tests/fixtures/narrow_cross_run/` are synthetic records, trimmed to what the verdict reads.
