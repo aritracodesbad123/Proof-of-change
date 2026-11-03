@@ -6569,21 +6569,25 @@ def parse_cross_junit(path: Path) -> dict:
 
 
 def _cross_pytest(side: str, venv: Path, rels: list[str], root: Path, prdir: Path, a, keep: bool,
-                  use_contree: bool, files: dict | None, index: int) -> dict:
-    """One pytest of these files on one side. A start that raises is an empty result, not a pass."""
+                  use_contree: bool, files: dict | None, index: int,
+                  plugins_off: list | None = None) -> dict:
+    """One pytest of these files on one side. A start that raises is an empty result, not a pass.
+
+    plugins_off is the same list the timed runs use after a collection retry, so the base-side run does not
+    load a plugin that was turned off for the comparison."""
     stem = _clean_rel(rels[0]).replace("/", "_") if len(rels) == 1 else "all"
     jx = prdir / f"junit-cross-{side}-{index}-{stem}.xml"
     lg = prdir / f"pytest-cross-{side}-{index}-{stem}.log"
     try:
         if use_contree:
             _contree_pytest_once(side, rels, int(a.test_timeout), int(a.run_timeout), str(a.workers),
-                                 jx, lg, keep, files=files)
+                                 jx, lg, keep, plugins_off, files=files)
             return parse_cross_junit(jx)
         env = base_env(side_home(venv))
         jin = side_out(venv) / jx.name
         tg = [str(root / rel) for rel in rels]
         _local_pytest_once(venv, tg, int(a.test_timeout), int(a.run_timeout), str(a.workers), jin, lg, keep,
-                           root, env)
+                           root, env, plugins_off)
         jx.unlink(missing_ok=True)
         if jin.exists():
             shutil.move(jin, jx)
@@ -6651,7 +6655,8 @@ def _fold_cross_run(results: dict, base_runs: list, pr_extra: list | None, rels:
 
 
 def _cross_files(side: str, venv: Path, rels: list[str], root: Path, prdir: Path, a, keep: bool,
-                 use_contree: bool, files: dict | None, index: int) -> dict:
+                 use_contree: bool, files: dict | None, index: int,
+                 plugins_off: list | None = None) -> dict:
     """Run each test file on its own and merge the outcomes.
 
     Pytest stops a start when one file fails to collect. A new helper that the base tree cannot import
@@ -6663,7 +6668,8 @@ def _cross_files(side: str, venv: Path, rels: list[str], root: Path, prdir: Path
             key = f"{OWN_CHECKOUT_ROOT}/{_clean_rel(rel)}"
             if key in files:
                 chosen = {key: files[key]}
-        merged.update(_cross_pytest(side, venv, [rel], root, prdir, a, keep, use_contree, chosen, index))
+        merged.update(_cross_pytest(side, venv, [rel], root, prdir, a, keep, use_contree, chosen, index,
+                                    plugins_off))
     return merged
 
 
@@ -6697,6 +6703,7 @@ def record_cross_run(rec: dict, venvs: dict, targets: dict | None, prdir: Path, 
     run_progress.emit("pytest", "code", "PR tests against the base tree")
     use_contree = _contree_ready() and cwds is not None
     keep = product_route(a)
+    plugins_off = rec.get("pytest_plugins_off") if isinstance(rec, dict) else None
     saved: list = []
     try:
         if not use_contree:
@@ -6705,12 +6712,12 @@ def record_cross_run(rec: dict, venvs: dict, targets: dict | None, prdir: Path, 
         # One file per pytest start. A collection error in one file stops that start, and must not hide
         # a real failure in another file.
         base_runs = [_cross_files("main", venvs["main"], rels, main_root, prdir, a, keep, use_contree,
-                                  uploaded, i + 1) for i in range(len(main_runs))]
+                                  uploaded, i + 1, plugins_off) for i in range(len(main_runs))]
         extra = [rel for rel in rels if not _target_covers(rel, (targets or {}).get("pr"))]
         pr_extra = None
         if extra:
             pr_extra = [_cross_files("pr", venvs["pr"], extra, pr_root, prdir, a, keep, use_contree,
-                                     None, i + 1) for i in range(len(pr_runs))]
+                                     None, i + 1, plugins_off) for i in range(len(pr_runs))]
         _fold_cross_run(results, base_runs, pr_extra, rels, prdir,
                         rec.get("files") if isinstance(rec, dict) else None)
     finally:
