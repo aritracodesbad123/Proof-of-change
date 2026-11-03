@@ -16,10 +16,12 @@ unauthenticated (60 requests/hour). A rate limit (403/429 with remaining 0) wait
 
 Once the PDFs (each REPORT.pdf, SUMMARY.pdf, and a refused or no-go PDF) and the go/no-go summary are written, the
 same token is used to push those PDFs and record.json to the `runs` branch on origin, under
-runs/<date>/<short poc commit>/<pr id>/. The push is a separate temporary clone, so this checkout and main are left
-as they are. The branch is created as an orphan when it is missing. PDFs are never emailed. If the token is missing,
-or the push still fails after retries, the run finishes, the local files stay, and the report and run.log say
-`PDFs NOT saved to GitHub: <reason>`.
+runs/<date>/<short poc commit>/<pr id>/. Text is scrubbed with the public-file rules first (machine paths become
+relative; keys and tokens are removed). A PDF whose extracted text still fails that check is not pushed. The token
+is never written into the remote address, the report, run.log, or pdf_push.url. The push is a separate temporary
+clone, so this checkout and main are left as they are. The branch is created as an orphan when it is missing.
+PDFs are never emailed. If the token is missing, a PDF is refused, or the push still fails after retries, the run
+finishes, the local files stay, and the report and run.log say `PDFs NOT saved to GitHub: <reason>`.
 
 How a PR is tested (route "nightly+patch", used for pure-Python PRs):
   main side = latest scientific-python nightly wheel of the library (main branch build)
