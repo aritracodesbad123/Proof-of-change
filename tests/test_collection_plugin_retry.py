@@ -88,7 +88,7 @@ def test_retry_once_on_both_sides_and_the_report_says_why(tmp_path, monkeypatch)
     monkeypatch.setattr(dr, "side_out", lambda v: tmp_path / "out")
     (tmp_path / "out").mkdir()
     monkeypatch.setattr(dr, "side_sandbox", lambda *a, **k: None)
-    monkeypatch.setattr(dr, "installed_pytest_entry_points", lambda venvs: list(EPS))
+    monkeypatch.setattr(dr, "installed_pytest_entry_points", lambda venvs: (list(EPS), ""))
     rec = {}
     a = SimpleNamespace(runs=1, workers="0", test_timeout=30, run_timeout=60, pr=None, product_check=False, bench=None)
     rdir = tmp_path / "run"
@@ -99,7 +99,12 @@ def test_retry_once_on_both_sides_and_the_report_says_why(tmp_path, monkeypatch)
     assert cnv is None and cmp["same"] == 1
     assert "verdict" not in rec
     assert rec["pytest_plugins_off"] == ["px"]
-    assert rec["collection_plugin_note"].startswith("Setup: pytest plugin px was turned off.")
+    attempt = rec["plugin_retry"]
+    assert attempt["detection_fired"] is True and attempt["plugin_list_read"] is True
+    assert attempt["plugins"] == ["px"] and attempt["flags"] == "-p no:px" and attempt["outcome"] == "worked"
+    assert "Detection fired" in rec["collection_plugin_note"] and "Outcome: worked" in rec["collection_plugin_note"]
+    assert "1 passed" in (rdir / "pytest-main-retry.log").read_text()
+    assert "1 passed" in (rdir / "pytest-pr-retry.log").read_text()
     assert sum("no:px" in c for c in seen) == 2
     assert sum("no:px" not in c for c in seen) == 2
     meta = {"date": "2026-11-03", "started_ist": "s", "finished_ist": "f", "wall_min": 1, "runs": 1,
@@ -140,7 +145,7 @@ def test_a_failed_retry_keeps_the_original_logs(tmp_path, monkeypatch):
     monkeypatch.setattr(dr, "side_out", lambda v: tmp_path / "out")
     (tmp_path / "out").mkdir()
     monkeypatch.setattr(dr, "side_sandbox", lambda *a, **k: None)
-    monkeypatch.setattr(dr, "installed_pytest_entry_points", lambda venvs: list(EPS))
+    monkeypatch.setattr(dr, "installed_pytest_entry_points", lambda venvs: (list(EPS), ""))
     rec = {}
     a = SimpleNamespace(runs=1, workers="0", test_timeout=30, run_timeout=60, pr=None, product_check=False, bench=None)
     rdir = tmp_path / "run"
@@ -149,10 +154,17 @@ def test_a_failed_retry_keeps_the_original_logs(tmp_path, monkeypatch):
         rec, {"main": tmp_path / "vm", "pr": tmp_path / "vp"},
         {"main": ["t.py"], "pr": ["t.py"]}, rdir, tmp_path, a, cwds={"main": tmp_path, "pr": tmp_path})
     assert cnv and "collection failed" in cnv
-    assert "collection_plugin_note" not in rec and "pytest_plugins_off" not in rec
+    assert "verdict" not in rec and "pytest_plugins_off" not in rec
+    attempt = rec["plugin_retry"]
+    assert attempt["detection_fired"] is True and attempt["outcome"] == "failed again"
+    assert attempt["plugins"] == ["px"] and attempt["flags"] == "-p no:px" and attempt["plugin_list_read"] is True
+    assert "ERROR collecting" in attempt["main_error"] and "ERROR collecting" in attempt["pr_error"]
+    assert "failed again" in rec["collection_plugin_note"] and "The first result was kept" in rec["collection_plugin_note"]
     assert "missing_stack" in (rdir / "pytest-main-1.log").read_text()
     assert "still broken" not in (rdir / "pytest-main-1.log").read_text()
     assert "still broken" not in (rdir / "pytest-pr-1.log").read_text()
+    assert "still broken" in (rdir / "pytest-main-retry.log").read_text()
+    assert "still broken" in (rdir / "pytest-pr-retry.log").read_text()
 
 
 START = Path(__file__).resolve().parents[1] / "tests" / "fixtures" / "startup_plugin"
@@ -222,7 +234,7 @@ def test_startup_retry_once_unless_the_config_names_the_plugin(tmp_path, monkeyp
     monkeypatch.setattr(dr, "side_out", lambda v: tmp_path / "out")
     (tmp_path / "out").mkdir()
     monkeypatch.setattr(dr, "side_sandbox", lambda *a, **k: None)
-    monkeypatch.setattr(dr, "installed_pytest_entry_points", lambda venvs: list(ASYNCIO))
+    monkeypatch.setattr(dr, "installed_pytest_entry_points", lambda venvs: (list(ASYNCIO), ""))
     rec = {}
     a = SimpleNamespace(runs=1, workers="0", test_timeout=30, run_timeout=60, pr=None, product_check=False, bench=None)
     rdir = tmp_path / "run"
@@ -281,6 +293,42 @@ def test_startup_retry_once_unless_the_config_names_the_plugin(tmp_path, monkeyp
     assert cnv4 and "collection failed" in cnv4
     assert "pytest_plugins_off" not in rec4
     assert all("no:asyncio" not in c for c in seen)
+
+
+def test_an_unreadable_plugin_list_is_recorded(tmp_path, monkeypatch):
+    calls = []
+
+    def fake_run(cmd, log, **kw):
+        calls.append([str(c) for c in cmd])
+        Path(log).write_text(MAIN if "-main-" in Path(log).name else PR)
+        return 2, 0.1
+
+    monkeypatch.setattr(dr, "run", fake_run)
+    monkeypatch.setattr(dr, "_contree_ready", lambda: False)
+    monkeypatch.setattr(dr, "base_env", lambda *a, **k: {})
+    monkeypatch.setattr(dr, "side_home", lambda v: tmp_path)
+    monkeypatch.setattr(dr, "side_out", lambda v: tmp_path / "out")
+    (tmp_path / "out").mkdir()
+    monkeypatch.setattr(dr, "side_sandbox", lambda *a, **k: None)
+    why = "the main side had no Python interpreter"
+    monkeypatch.setattr(dr, "installed_pytest_entry_points", lambda venvs: ([], why))
+    rec = {}
+    a = SimpleNamespace(runs=1, workers="0", test_timeout=30, run_timeout=60, pr=None, product_check=False, bench=None)
+    rdir = tmp_path / "run"
+    rdir.mkdir()
+    _cmp, cnv, _ex = dr.execute_tests(
+        rec, {"main": tmp_path / "vm", "pr": tmp_path / "vp"},
+        {"main": ["t.py"], "pr": ["t.py"]}, rdir, tmp_path, a, cwds={"main": tmp_path, "pr": tmp_path})
+    assert cnv and "collection failed" in cnv
+    assert "verdict" not in rec and "pytest_plugins_off" not in rec
+    attempt = rec["plugin_retry"]
+    assert attempt["detection_fired"] is True and attempt["plugin_list_read"] is False
+    assert attempt["plugins"] == [] and attempt["flags"] == "" and attempt["outcome"] == "not run"
+    assert attempt["plugin_list_why"] == why
+    assert why in rec["collection_plugin_note"] and "could not be read" in rec["collection_plugin_note"]
+    assert len(calls) == 2
+    assert all("no:px" not in " ".join(cmd) for cmd in calls)
+    assert not (rdir / "pytest-main-retry.log").exists()
 
 
 def test_contree_commands_carry_the_same_flag(tmp_path, monkeypatch):
