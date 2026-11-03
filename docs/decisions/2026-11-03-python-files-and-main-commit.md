@@ -64,7 +64,8 @@ a go/no-go summary that says why it stopped.
 
 `tests/test_python_files_and_commit.py` builds a tiny checkout for a custom `python_files` setting (in each of
 the four config files), for the default when the setting is absent, and for a change on a later line of a
-multi-line statement. `tests/fixtures/python_files/catch_all` is a checkout whose tests directory holds
-`conftest.py`, `__init__.py`, and a real test module; the same test checks both `*` and `*.py`. It also pins a
+multi-line statement. The catch-all case is built in a temporary directory, not stored under `tests/`, because
+a `tests` package with `conftest.py` and `__init__.py` would be imported by this repository's own test run. That
+temporary tree holds both files next to a real test module, and the test checks `*` and `*.py`. It also pins a
 run to one commit, moves main after the first pull request, and checks that the second is not run and that the
 PDFs and the go/no-go summary are still written. Nothing from a live pull request is run.

@@ -77,21 +77,26 @@ def test_catch_all_pattern_keeps_tests_and_skips_the_package_module(tmp_path):
     assert "pkg/runners.py" not in got
 
 
-@pytest.fixture
-def catch_all_checkout(tmp_path):
-    """A project whose tests directory contains conftest.py, __init__.py, and one real test module."""
-    src = ROOT / "tests" / "fixtures" / "python_files" / "catch_all"
-    dest = tmp_path / "catch_all"
-    shutil.copytree(src, dest)
-    return dest
+def _catch_all_checkout(tmp_path, pattern):
+    """A project built only for this test, so its conftest and package are not on the suite's path.
+
+    The tests directory holds conftest.py, __init__.py, and one real test module.
+    """
+    root = tmp_path / "catch_all"
+    _write(root, "pytest.ini", f"[pytest]\npython_files = {pattern}\n")
+    _write(root, "pkg/mod.py", "def value():\n    return 1\n")
+    _write(root, "tests/__init__.py", "")
+    _write(root, "tests/conftest.py", "def pytest_configure(config):\n    return None\n")
+    _write(root, "tests/mod.py", "def test_value():\n    assert True\n")
+    return root
 
 
 @pytest.mark.parametrize("pattern", ["*", "*.py"])
-def test_catch_all_does_not_count_conftest_or_init_in_a_test_directory(catch_all_checkout, pattern):
-    (catch_all_checkout / "pytest.ini").write_text(f"[pytest]\npython_files = {pattern}\n")
+def test_catch_all_does_not_count_conftest_or_init_in_a_test_directory(tmp_path, pattern):
+    root = _catch_all_checkout(tmp_path, pattern)
     files = {"all": ["pkg/mod.py", "tests/conftest.py", "tests/__init__.py", "tests/mod.py"],
              "package_py": ["pkg/mod.py"]}
-    got = dr.map_repo_tests(files, catch_all_checkout)
+    got = dr.map_repo_tests(files, root)
     assert got == ["tests/mod.py"]
     assert "tests/conftest.py" not in got and "tests/__init__.py" not in got
 
