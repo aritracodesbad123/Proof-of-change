@@ -6,6 +6,8 @@ from the traceback and the installed pytest11 metadata. Verdict rules are not an
 from __future__ import annotations
 
 import inspect
+import json
+import subprocess
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -329,6 +331,150 @@ def test_an_unreadable_plugin_list_is_recorded(tmp_path, monkeypatch):
     assert len(calls) == 2
     assert all("no:px" not in " ".join(cmd) for cmd in calls)
     assert not (rdir / "pytest-main-retry.log").exists()
+
+
+def _symlink_side_venv(root: Path, side: str) -> Path:
+    """One side's venv: bin/python is a symlink the host does not see as a regular file.
+
+    A bubblewrap install leaves this layout. The symlink names the interpreter the sandbox mounts.
+    On the host that target is not a file, so a separate existence check used to skip the plugin list
+    after the tests had already run this path.
+    """
+    from guardrails import sandbox
+
+    venv = root / f"venv-{side}"
+    link = venv / "bin" / "python"
+    link.parent.mkdir(parents=True)
+    link.symlink_to(Path(sandbox.INSIDE_PYTHON) / "not-on-the-host" / "bin" / "python3")
+    return venv
+
+
+def _per_side_symlink_venvs(root: Path) -> dict:
+    return {side: _symlink_side_venv(root, side) for side in ("main", "pr")}
+
+
+def test_a_symlink_venv_python_is_the_one_the_plugin_list_runs(tmp_path, monkeypatch):
+    """The list is read by execing each side's venv python, not by a host is_file check."""
+    venvs = _per_side_symlink_venvs(tmp_path / "work")
+    for side, venv in venvs.items():
+        py = Path(dr.venv_python(venv))
+        assert py == venv / "bin" / "python"
+        assert py.is_symlink() and not py.is_file(), side
+    seen = []
+
+    def fake_in_side(venv, cmd, **_kw):
+        argv = [str(c) for c in cmd]
+        seen.append(argv)
+        text = json.dumps([["asyncio", "pytest_asyncio.plugin", "pytest-asyncio"]]) + "\n"
+        return subprocess.CompletedProcess(argv, 0, text, "")
+
+    monkeypatch.setattr(dr, "_contree_ready", lambda: False)
+    monkeypatch.setattr(dr, "in_side", fake_in_side)
+    found, why = dr.installed_pytest_entry_points(venvs)
+    assert why == "" and found == [("asyncio", "pytest_asyncio.plugin", "pytest-asyncio")]
+    assert seen == [[dr.venv_python(venvs["main"]), "-c", dr.PYTEST_ENTRY_POINTS_PY]]
+    assert "no Python interpreter" not in why
+
+
+def test_the_retry_runs_when_the_venv_python_is_only_a_symlink(tmp_path, monkeypatch):
+    venvs = _per_side_symlink_venvs(tmp_path / "work")
+    seen = []
+
+    def fake_run(cmd, log, **_kw):
+        cmd = [str(c) for c in cmd]
+        junit = next(c.split("=", 1)[1] for c in cmd if c.startswith("--junitxml="))
+        seen.append(cmd)
+        if "no:asyncio" in cmd:
+            Path(log).write_text("1 passed\n")
+            Path(junit).write_text(JUNIT)
+            return 0, 0.1
+        Path(log).write_text(START_MAIN if "-main-" in Path(log).name else START_PR)
+        return 3, 0.1
+
+    def fake_in_side(venv, cmd, **_kw):
+        argv = [str(c) for c in cmd]
+        assert argv[0] == dr.venv_python(venv)
+        text = json.dumps(list(ASYNCIO)) + "\n"
+        return subprocess.CompletedProcess(argv, 0, text, "")
+
+    monkeypatch.setattr(dr, "run", fake_run)
+    monkeypatch.setattr(dr, "in_side", fake_in_side)
+    monkeypatch.setattr(dr, "_contree_ready", lambda: False)
+    monkeypatch.setattr(dr, "base_env", lambda *a, **k: {})
+    monkeypatch.setattr(dr, "side_home", lambda v: tmp_path)
+    monkeypatch.setattr(dr, "side_out", lambda v: tmp_path / "out")
+    (tmp_path / "out").mkdir()
+    monkeypatch.setattr(dr, "side_sandbox", lambda *a, **k: None)
+    rec = {}
+    a = SimpleNamespace(runs=1, workers="0", test_timeout=30, run_timeout=60, pr=None, product_check=False, bench=None)
+    rdir = tmp_path / "run"
+    rdir.mkdir()
+    checkout = tmp_path / "src"
+    checkout.mkdir()
+    (checkout / "pyproject.toml").write_text("[tool.pytest]\naddopts = ['-p', 'pytester']\n")
+    cmp, cnv, _ex = dr.execute_tests(
+        rec, venvs, {"main": ["t.py"], "pr": ["t.py"]}, rdir, tmp_path, a,
+        cwds={"main": checkout, "pr": checkout})
+    assert cnv is None and cmp["same"] == 1
+    assert "verdict" not in rec
+    assert rec["pytest_plugins_off"] == ["asyncio"]
+    attempt = rec["plugin_retry"]
+    assert attempt["detection_fired"] is True and attempt["kind"] == "startup"
+    assert attempt["plugin_list_read"] is True and attempt["plugins"] == ["asyncio"]
+    assert attempt["flags"] == "-p no:asyncio" and attempt["outcome"] == "worked"
+    assert "no Python interpreter" not in attempt["plugin_list_why"]
+    assert seen[0][0] == dr.venv_python(venvs["main"])
+    assert seen[1][0] == dr.venv_python(venvs["pr"])
+    assert sum("no:asyncio" in c for c in seen) == 2
+
+
+def test_the_base_side_pytest_uses_that_same_python(tmp_path, monkeypatch):
+    work = tmp_path / "work"
+    venvs = _per_side_symlink_venvs(work)
+    pr = work / "side-pr"
+    main = work / "side-main"
+    main.mkdir()
+    (pr / "tests").mkdir(parents=True)
+    (pr / "tests" / "test_mod.py").write_text("def test_answer():\n    assert False\n")
+    cmds = []
+
+    def fake_run(cmd, log, **_kw):
+        cmds.append([str(c) for c in cmd])
+        Path(log).write_text("1 passed\n")
+        return 0, 0.1
+
+    monkeypatch.setattr(dr, "run", fake_run)
+    monkeypatch.setattr(dr, "_contree_ready", lambda: False)
+    files = {"all": ["pkg/mod.py", "tests/test_mod.py"], "package_py": ["pkg/mod.py"]}
+    a = SimpleNamespace(runs=1, workers="0", test_timeout=30, run_timeout=60, pr=None, product_check=False, bench=None)
+    (tmp_path / "run").mkdir()
+    dr.record_cross_run(
+        {"files": files}, venvs, {"main": [], "pr": ["tests/test_mod.py"]}, tmp_path / "run", a,
+        {"main": [{}], "pr": [{"tests.test_mod::test_answer": ("passed", "")}]},
+        cwds={"main": main, "pr": pr})
+    assert cmds and cmds[0][0] == dr.venv_python(venvs["main"])
+    assert cmds[0][1:3] == ["-m", "pytest"]
+    assert Path(cmds[0][0]).is_symlink() and not Path(cmds[0][0]).is_file()
+
+
+def test_contree_reads_plugins_with_the_checkpoint_python(tmp_path, monkeypatch):
+    """A host symlink that is not a regular file must not hide the checkpoint interpreter."""
+    venvs = _per_side_symlink_venvs(tmp_path / "work")
+    assert all(not Path(dr.venv_python(v)).is_file() for v in venvs.values())
+    calls = []
+
+    class Sess:
+        def run_argv(self, side, argv, timeout=60):
+            calls.append((side, list(argv)))
+            text = json.dumps([["asyncio", "pytest_asyncio.plugin", "pytest-asyncio"]]) + "\n"
+            return {"stdout": text, "stderr": "", "exit_code": 0}
+
+    monkeypatch.setattr(dr, "_contree_ready", lambda: True)
+    monkeypatch.setattr("poc.contree_sandboxes.session", lambda: Sess())
+    found, why = dr.installed_pytest_entry_points(venvs)
+    assert why == "" and found[0][0] == "asyncio"
+    assert calls[0] == ("main", [dr.venv_python(contree=True), "-c", dr.PYTEST_ENTRY_POINTS_PY])
+    assert calls[0][1][0] == "python"
 
 
 def test_contree_commands_carry_the_same_flag(tmp_path, monkeypatch):
