@@ -22,7 +22,9 @@ PRs that touch compiled sources (.c/.pyx/.cpp/meson.build, ...) take route "sour
 from source with a timeout; main is the nightly wheel. A failed or timed-out build is recorded as could_not_verify
 with its build log.
 Tests: only test files mapped from the touched modules, 3 alternating runs per side, single-thread env,
-per-test and per-run timeouts. Comparison and verdict are plain code (poc/diff.py, poc/verdict.py).
+per-test and per-run timeouts. The pull request's added or edited test files are also run, as the pull
+request wrote them, against the base tree in the base side's sandbox. Comparison and verdict are plain
+code (poc/diff.py, poc/verdict.py).
 """
 from __future__ import annotations
 
@@ -3899,8 +3901,13 @@ def retry_collection_plugin(rec: dict, per_run: list, results: dict, venvs: dict
 
 def _contree_pytest_once(side: str, targets: list[str], test_timeout: int, run_timeout: int,
                          workers: str, jx: Path, lg: Path, keep_addopts: bool = False,
-                         plugins_off: list | None = None) -> tuple[int | str, float]:
-    """One Contree disposable pytest; junit+log written locally from the remote shell output."""
+                         plugins_off: list | None = None, *, files: dict | None = None) -> tuple[int | str, float]:
+    """One Contree disposable pytest; junit+log written locally from the remote shell output.
+
+    files, when set, is uploaded into that disposable sandbox before pytest starts (remote path -> local
+    file). The startup-plugin retry and the project's python_files setting are the same as every other
+    pytest start: the command does not override python_files. plugins_off is the same `-p no:` list the
+    timed runs use after a collection retry."""
     from poc import contree_sandboxes
     sess = contree_sandboxes.session()
     assert sess is not None
@@ -3926,7 +3933,10 @@ def _contree_pytest_once(side: str, targets: list[str], test_timeout: int, run_t
         "printf '___POC_LOG___\\n'\ncat /tmp/poc-pytest.log 2>/dev/null\n"
     )
     t0 = time.time()
-    raw = sess.run_op(side, shell, disposable=True, timeout=run_timeout)
+    op = {"disposable": True, "timeout": run_timeout}
+    if files:
+        op["files"] = files
+    raw = sess.run_op(side, shell, **op)
     secs = round(time.time() - t0, 1)
     out = (raw.get("stdout") or "") + "\n" + (raw.get("stderr") or "")
     exit_m = re.search(r"___POC_EXIT___(\S+)", out)
@@ -3943,6 +3953,28 @@ def _contree_pytest_once(side: str, targets: list[str], test_timeout: int, run_t
             rc = int(exit_m.group(1))
         except ValueError:
             rc = "timeout" if exit_m.group(1) == "timeout" else exit_m.group(1)
+    return rc, secs
+
+
+def _local_pytest_once(venv: Path, tg: list, test_timeout: int, run_timeout: int, workers: str, jin: Path,
+                       lg: Path, keep_addopts: bool, cwd, env,
+                       disable_plugins: list | None = None) -> tuple[int | str, float]:
+    """One local pytest, the same command the timed runs use.
+
+    The project's python_files setting is left as it is. When workers disagree about which tests exist, the
+    run is repeated once without workers, as the timed runs do. disable_plugins is the same `-p no:` list."""
+    cmd = [venv / "bin/python", "-m", "pytest", *tg, "-p", "no:cacheprovider",
+           *plugin_off_args(disable_plugins), "-q", "-rfE",
+           f"--timeout={test_timeout}", *repo_addopts_args(keep_addopts), "-o", "junit_family=xunit2",
+           f"--junitxml={jin}"]
+    if workers != "0":
+        cmd += ["-n", workers]
+    rc, secs = run(cmd, lg, cwd=cwd, env=env, timeout=run_timeout, sbx=side_sandbox(venv))
+    if workers != "0" and XDIST_MISMATCH in lg.read_text(errors="replace"):
+        # pytest-xdist refuses suites whose test ids differ between worker processes; rerun serially
+        jin.unlink(missing_ok=True)
+        rc, s2 = run(cmd[:-2], lg, cwd=cwd, env=env, timeout=run_timeout, sbx=side_sandbox(venv))
+        secs += s2
     return rc, secs
 
 
@@ -3997,20 +4029,8 @@ def run_tests(side_venvs: dict, targets_by_side: dict, rdir: Path, workdir: Path
                     args = (side, tg, test_timeout, run_timeout, workers, jx, lg, keep_addopts)
                     rc, secs = _contree_pytest_once(*args, *([disable_plugins] if disable_plugins else []))
             else:
-                cmd = [venv / "bin/python", "-m", "pytest", *tg, "-p", "no:cacheprovider",
-                       *plugin_off_args(disable_plugins), "-q", "-rfE",
-                       f"--timeout={test_timeout}", *repo_addopts_args(keep_addopts), "-o", "junit_family=xunit2",
-                       f"--junitxml={jin}"]
-                if workers != "0":
-                    cmd += ["-n", workers]
-                rc, secs = run(cmd, lg, cwd=(cwds[side] if cwds else side_cwd(venv)), env=envs[side],
-                               timeout=run_timeout, sbx=side_sandbox(venv))
-                if workers != "0" and XDIST_MISMATCH in lg.read_text(errors="replace"):
-                    # pytest-xdist refuses suites whose test ids differ between worker processes; rerun serially
-                    jin.unlink(missing_ok=True)
-                    rc, s2 = run(cmd[:-2], lg, cwd=(cwds[side] if cwds else side_cwd(venv)), env=envs[side],
-                                 timeout=run_timeout, sbx=side_sandbox(venv))
-                    secs += s2
+                rc, secs = _local_pytest_once(venv, tg, test_timeout, run_timeout, workers, jin, lg, keep_addopts,
+                                              cwds[side] if cwds else side_cwd(venv), envs[side], disable_plugins)
                 jx.unlink(missing_ok=True)
                 if jin.exists():
                     shutil.move(jin, jx)
@@ -6240,10 +6260,286 @@ def messages_from_pr_only_files(targets: dict, venvs: dict, cwds: dict | None, p
     return [msg for outcome, msg in parsed.values() if outcome in ("failed", "error") and msg]
 
 
+_CROSS_IMPORT_RE = re.compile(
+    r"\b(?:ImportError|ModuleNotFoundError)\b|No module named|cannot import name", re.I)
+
+
+def _clean_rel(rel: str) -> str:
+    """Drop one leading ./ and normalise slashes. A parent segment is left in place so the caller can reject it."""
+    rel = str(rel).replace("\\", "/").strip()
+    if rel.startswith("./"):
+        rel = rel[2:]
+    return rel
+
+
+def _rel_inside(rel: str) -> bool:
+    """A repo-relative path with no parent segments and no absolute root."""
+    path = PurePosixPath(_clean_rel(rel))
+    return bool(path.parts) and not path.is_absolute() and ".." not in path.parts
+
+
+def changed_test_files(files: dict | None) -> list[str]:
+    """Test files the pull request adds or edits.
+
+    The name rule is pytest's default python_files patterns (``test_*.py`` and ``*_test.py``), the same rule
+    ``cross_run_test_ids`` uses. The pytest command does not override a project's own python_files setting, so
+    collection still follows that file. Nothing here names a repository."""
+    out = []
+    for raw in (files or {}).get("all") or []:
+        rel = _clean_rel(raw)
+        if _rel_inside(rel) and is_test_file(rel):
+            out.append(rel)
+    return sorted(set(out))
+
+
+def _base_failure_to_keep(outcome: str, message: str) -> bool:
+    """A real test failure on the base.
+
+    A collection error, or an import error (a helper the new tests added that the base tree does not have),
+    is not a cross-run and is not a pass."""
+    if outcome == "load_error":
+        return False
+    if outcome in ("failed", "error") and _CROSS_IMPORT_RE.search(message or ""):
+        return False
+    return outcome in ("failed", "error")
+
+
+def _target_covers(rel: str, targets: list | None) -> bool:
+    """True when this file was already a pytest target (the file itself, or a directory above it)."""
+    rel = _clean_rel(rel)
+    for raw in targets or []:
+        target = _clean_rel(raw).rstrip("/")
+        if target and (rel == target or rel.startswith(target + "/")):
+            return True
+    return False
+
+
+def _side_tree(side: str, venvs: dict, cwds: dict | None) -> Path | None:
+    """The directory repo-relative paths resolve against: the checkout, or site-packages on the nightly routes."""
+    if cwds and cwds.get(side):
+        root = Path(cwds[side])
+        return root if root.is_dir() else None
+    venv = (venvs or {}).get(side)
+    if venv is None:
+        return None
+    try:
+        root = site_packages(Path(venv))
+    except IndexError:
+        return None
+    return root if root.is_dir() else None
+
+
+def _overlay_pr_tests(main_root: Path, pr_root: Path, rels: list[str]) -> list[tuple[Path, bytes | None]]:
+    """Copy the pull request's test files onto the base tree. Returns (path, previous bytes or None) to restore."""
+    saved = []
+    root = main_root.resolve()
+    for rel in rels:
+        src = pr_root / rel
+        if not src.is_file():
+            continue
+        dest = main_root / rel
+        try:
+            resolved = dest.resolve() if dest.exists() else dest.parent.resolve() / dest.name
+        except OSError:
+            continue
+        if resolved != root and root not in resolved.parents:
+            continue
+        previous = dest.read_bytes() if dest.is_file() else None
+        data = src.read_bytes()
+        if previous == data:
+            continue
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        dest.write_bytes(data)
+        saved.append((dest, previous))
+    return saved
+
+
+def _restore_overlay(saved: list[tuple[Path, bytes | None]]) -> None:
+    for dest, previous in reversed(saved):
+        try:
+            if previous is None:
+                dest.unlink(missing_ok=True)
+            else:
+                dest.write_bytes(previous)
+        except OSError:
+            pass
+
+
+def _contree_test_files(pr_root: Path, rels: list[str]) -> dict:
+    """Remote path -> local pull-request file, for one disposable base sandbox."""
+    out = {}
+    for rel in rels:
+        src = pr_root / rel
+        if src.is_file():
+            out[f"{OWN_CHECKOUT_ROOT}/{_clean_rel(rel)}"] = src
+    return out
+
+
+def _splice_junit(path: Path, test_id: str, outcome: str, message: str) -> None:
+    """Append one testcase so a later re-judge, which reads the JUnit files, sees this outcome.
+
+    parse_junit keeps the last testcase for an id, so an appended failure replaces a pass from the old test."""
+    if not path.is_file():
+        return
+    cls, sep, name = test_id.partition("::")
+    if not sep or not name:
+        return
+    try:
+        tree = ET.parse(path)
+    except ET.ParseError:
+        return
+    root = tree.getroot()
+    suite = root if root.tag == "testsuite" else root.find("testsuite")
+    if suite is None:
+        return
+    case = ET.SubElement(suite, "testcase", {"classname": cls, "name": name})
+    if outcome in ("failed", "error"):
+        text = "".join(ch for ch in (message or outcome) if ch == "\t" or ord(ch) >= 32)[:500]
+        ET.SubElement(case, "failure" if outcome == "failed" else "error", {"message": text})
+    try:
+        tree.write(path, encoding="unicode", xml_declaration=True)
+    except OSError:
+        pass
+
+
+def _cross_pytest(side: str, venv: Path, rels: list[str], root: Path, prdir: Path, a, keep: bool,
+                  use_contree: bool, files: dict | None, index: int) -> dict:
+    """One pytest of these files on one side. A start that raises is an empty result, not a pass."""
+    stem = _clean_rel(rels[0]).replace("/", "_") if len(rels) == 1 else "all"
+    jx = prdir / f"junit-cross-{side}-{index}-{stem}.xml"
+    lg = prdir / f"pytest-cross-{side}-{index}-{stem}.log"
+    try:
+        if use_contree:
+            _contree_pytest_once(side, rels, int(a.test_timeout), int(a.run_timeout), str(a.workers),
+                                 jx, lg, keep, files=files)
+            return parse_junit(jx)
+        env = base_env(side_home(venv))
+        jin = side_out(venv) / jx.name
+        tg = [str(root / rel) for rel in rels]
+        _local_pytest_once(venv, tg, int(a.test_timeout), int(a.run_timeout), str(a.workers), jin, lg, keep,
+                           root, env)
+        jx.unlink(missing_ok=True)
+        if jin.exists():
+            shutil.move(jin, jx)
+        return parse_junit(jx)
+    except Exception as exc:  # noqa: BLE001 - a cross-run that cannot start leaves the comparison as it was
+        try:
+            with lg.open("a") as fh:
+                fh.write(f"\ncross-run did not start ({type(exc).__name__})\n")
+        except OSError:
+            pass
+        return {}
+
+
+def _fold_cross_run(results: dict, base_runs: list, pr_extra: list | None, rels: list[str], prdir: Path) -> None:
+    """Write real base failures into the results the comparison is built from, when the PR side passed.
+
+    An import or collection error on the base is left out, so it becomes neither ``fixed`` nor a pass."""
+    n = len(results["main"])
+    if len(base_runs) != n or len(results["pr"]) != n:
+        return
+    if pr_extra is not None and len(pr_extra) != n:
+        pr_extra = None
+    ids: set[str] = set()
+    for run in base_runs:
+        ids.update(run)
+    if pr_extra:
+        for run in pr_extra:
+            ids.update(run)
+    for tid in sorted(ids):
+        if tid.startswith("::") or _edited_test_file(tid, rels) is None:
+            continue
+        base_rows = [run.get(tid) for run in base_runs]
+        if pr_extra and any(tid in run for run in pr_extra):
+            pr_rows = [run.get(tid) for run in pr_extra]
+            from_extra = True
+        else:
+            pr_rows = [run.get(tid) for run in results["pr"]]
+            from_extra = False
+        if from_extra and all(row is not None for row in pr_rows):
+            for i, (outcome, msg) in enumerate(pr_rows):
+                results["pr"][i][tid] = (outcome, msg)
+                _splice_junit(prdir / f"junit-pr-{i + 1}.xml", tid, outcome, msg)
+        kept = (all(row is not None for row in base_rows)
+                and all(_base_failure_to_keep(outcome, msg) for outcome, msg in base_rows))
+        passed = all(row is not None and row[0] == "passed" for row in pr_rows)
+        if not (kept and passed):
+            continue
+        for i, (outcome, msg) in enumerate(base_rows):
+            results["main"][i][tid] = (outcome, msg)
+            _splice_junit(prdir / f"junit-main-{i + 1}.xml", tid, outcome, msg)
+
+
+def _cross_files(side: str, venv: Path, rels: list[str], root: Path, prdir: Path, a, keep: bool,
+                 use_contree: bool, files: dict | None, index: int) -> dict:
+    """Run each test file on its own and merge the outcomes.
+
+    Pytest stops a start when one file fails to collect. A new helper that the base tree cannot import
+    must not hide a real failure in another file, and it must not be recorded as a pass."""
+    merged: dict = {}
+    for rel in rels:
+        chosen = None
+        if files:
+            key = f"{OWN_CHECKOUT_ROOT}/{_clean_rel(rel)}"
+            if key in files:
+                chosen = {key: files[key]}
+        merged.update(_cross_pytest(side, venv, [rel], root, prdir, a, keep, use_contree, chosen, index))
+    return merged
+
+
+def record_cross_run(rec: dict, venvs: dict, targets: dict | None, prdir: Path, a, results: dict,
+                     cwds: dict | None = None) -> dict:
+    """Run the pull request's added or edited test files and store the outcomes the cross-run rule reads.
+
+    The files are the pull request's text. On the base they run in the base sandbox and environment, against
+    the base source. They also run on the pull request when that file was not already a target. A test that
+    fails on the base and passes on the pull request is written into the per-run results, so ``compare_sides``
+    puts it in ``fixed``, which is the list ``cross_run_test_ids`` reads. A collection or import error on the
+    base is not written."""
+    if not isinstance(results, dict):
+        return results
+    main_runs, pr_runs = results.get("main"), results.get("pr")
+    if not isinstance(main_runs, list) or not isinstance(pr_runs, list) or not main_runs or not pr_runs:
+        return results
+    if len(main_runs) != len(pr_runs) or "main" not in (venvs or {}) or "pr" not in (venvs or {}):
+        return results
+    main_root, pr_root = _side_tree("main", venvs, cwds), _side_tree("pr", venvs, cwds)
+    if main_root is None or pr_root is None:
+        return results
+    rels = [rel for rel in changed_test_files(rec.get("files") if isinstance(rec, dict) else None)
+            if (pr_root / rel).is_file()]
+    if not rels:
+        return results
+    from poc import run_progress
+    run_progress.emit("pytest", "code", "PR tests against the base tree")
+    use_contree = _contree_ready() and cwds is not None
+    keep = product_route(a)
+    saved: list = []
+    try:
+        if not use_contree:
+            saved = _overlay_pr_tests(main_root, pr_root, rels)
+        uploaded = _contree_test_files(pr_root, rels) if use_contree else None
+        # One file per pytest start. A collection error in one file stops that start, and must not hide
+        # a real failure in another file.
+        base_runs = [_cross_files("main", venvs["main"], rels, main_root, prdir, a, keep, use_contree,
+                                  uploaded, i + 1) for i in range(len(main_runs))]
+        extra = [rel for rel in rels if not _target_covers(rel, (targets or {}).get("pr"))]
+        pr_extra = None
+        if extra:
+            pr_extra = [_cross_files("pr", venvs["pr"], extra, pr_root, prdir, a, keep, use_contree,
+                                     None, i + 1) for i in range(len(pr_runs))]
+        _fold_cross_run(results, base_runs, pr_extra, rels, prdir)
+    finally:
+        _restore_overlay(saved)
+    return results
+
+
 def execute_tests(rec: dict, venvs: dict, targets: dict, prdir: Path, work: Path, a,
                   cwds: dict | None = None) -> tuple:
     """Run the mapped tests. When new tests skip for a plain pip module, install it on both sides and run again.
 
+    The pull request's added or edited test files are then run against the base tree (and against the pull
+    request when that file was not already a target) and folded into the same results.
     A failure that then shows the same exception on the base side is recorded as the backend, not as a pull-request
     finding (verdict could_not_verify when that is the only finding)."""
     keep = product_route(a)
@@ -6251,6 +6547,7 @@ def execute_tests(rec: dict, venvs: dict, targets: dict, prdir: Path, work: Path
                                  cwds=cwds, keep_addopts=keep, disable_plugins=rec.get("pytest_plugins_off"))
     if not rec.get("pytest_plugins_off"):
         per_run, results = retry_collection_plugin(rec, per_run, results, venvs, targets, prdir, work, a, cwds, keep)
+    results = record_cross_run(rec, venvs, targets, prdir, a, results, cwds)
     cmp, cnv, ex = finalize_tests(rec, per_run, results, a)
     if not cmp:
         return cmp, cnv, ex
@@ -6267,6 +6564,7 @@ def execute_tests(rec: dict, venvs: dict, targets: dict, prdir: Path, work: Path
     rec["test_extras"] = list(dict.fromkeys([*(rec.get("test_extras") or []), *wheels]))
     per_run, results = run_tests(venvs, targets, prdir, work, a.runs, a.workers, a.test_timeout, a.run_timeout,
                                  cwds=cwds, keep_addopts=keep, disable_plugins=rec.get("pytest_plugins_off"))
+    results = record_cross_run(rec, venvs, targets, prdir, a, results, cwds)
     cmp, cnv, ex = finalize_tests(rec, per_run, results, a)
     if not cmp:
         return cmp, cnv, ex
@@ -6388,6 +6686,8 @@ def _contree_only_pair(a, rec: dict, repo: str, cfg: dict, item: dict, sp: dict,
             per_run, results = retry_collection_plugin(
                 rec, per_run, results, {"main": vm, "pr": vp}, targets, prdir, work, a,
                 {"main": cm, "pr": cp}, keep, parallel=par)
+        results = record_cross_run(rec, {"main": vm, "pr": vp}, targets, prdir, a, results,
+                                   cwds={"main": cm, "pr": cp})
         cmp, cnv, ex = finalize_tests(rec, per_run, results, a)
         if cmp:
             ex = exit_check(rec.get("per_run", []), results, cmp)
