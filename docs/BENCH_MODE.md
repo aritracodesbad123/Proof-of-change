@@ -11,7 +11,9 @@ python3 ops/daily_run.py --bench bench/benchmark-v0.csv --ids B01,B14 \
 
 - The tool runs the Proof-of-Change commit the checkout is already on. `--expect-commit` (or `POC_EXPECT_COMMIT`)
   names that commit. If HEAD is different, or the work tree is dirty, the run stops and the checkout is left
-  where it was. Benchmark mode does not fetch `origin` and does not check out `main`.
+  where it was. The same check runs again before each case. If main's head has moved, the run stops, says so
+  in plain words, and still writes the PDFs and the go/no-go summary. Benchmark mode does not fetch `origin`
+  and does not check out `main`.
 - Every result record stores that commit as `poc_commit`.
 - Main side = the first parent of the merge commit; PR side = the merge commit (what actually landed). Both are
   fetched by SHA. If the merge commit's first parent is not the main SHA in the inputs file, the case is refused.
