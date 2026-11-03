@@ -14,6 +14,9 @@ NOISE_RULES: list[tuple[str, str]] = [
     (r"\b\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}(\.\d+)?(Z|[+-]\d{2}:?\d{2})?\b", "<timestamp>"),
     (r"/tmp/[^\s'\"]+", "<tmp>"),
     (r"127\.0\.0\.1:\d+|localhost:\d+", "<local>:<port>"),
+    # Per-side folders the harness creates (side-main / side-pr, and the same for venv, cwd, home, out).
+    # A crash that only names a different side's folder is the same crash.
+    (r"(?<![\w.-])(?:side|venv|cwd|home|out)-(?:main|pr)(?![\w.-])", "<side>"),
 ]
 VOLATILE_KEYS = {"duration", "duration_s", "elapsed", "seconds", "pid", "port"}
 

@@ -1,0 +1,20 @@
+{
+  "claim": {
+    "id": "C1",
+    "text": "a missing argument is reported under its command-line name",
+    "covers": ["c1.error"],
+    "expect": "differs"
+  },
+  "main": {
+    "c1.error": {
+      "raises": "ParseError",
+      "message": "Traceback (most recent call last):\n  File \"work/side-main/invoke/parser/parser.py\", line 342, in complete_context\ninvoke.exceptions.ParseError: 'mytask' did not receive required positional arguments: 'param_1'"
+    }
+  },
+  "pr": {
+    "c1.error": {
+      "raises": "ParseError",
+      "message": "Traceback (most recent call last):\n  File \"work/side-pr/invoke/parser/parser.py\", line 342, in complete_context\ninvoke.exceptions.ParseError: 'mytask' did not receive required positional arguments: 'param_1'"
+    }
+  }
+}

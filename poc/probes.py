@@ -65,7 +65,7 @@ import tempfile
 import time
 from pathlib import Path
 
-from poc.diff import compare, confirm, parse_probe_output, pr_runs_too_noisy
+from poc.diff import compare, confirm, normalise, parse_probe_output, pr_runs_too_noisy
 from poc.verdict import COLOUR, FindingLabel
 
 PROBES_DIR = Path(__file__).resolve().parent.parent / "probes"
@@ -346,18 +346,32 @@ def label_for(state: str, claim: dict | None, name: str, crashed_both: bool) -> 
 
 
 def probe_broken(main, pr) -> bool:
-    """The probe never reached the call it is about: the observation is the same raised exception type, or the same
-    skip value, on both sides. That says nothing about the change, so it is 'probe broken': never 'does not differ'
-    and never 'proven'."""
+    """The probe never reached the call it is about: the observation is the same raised exception, or the same
+    skip value, on both sides. Side folder names are removed first (poc.diff.normalise), so a crash whose text
+    differs only by side-main versus side-pr is the same crash. That says nothing about the change, so it is
+    'probe broken': never 'does not differ' and never 'proven'."""
     exc = _exception_name(main) or _error_text(main)
     if exc and exc == (_exception_name(pr) or _error_text(pr)):
         return True
-    return (isinstance(main, dict) and isinstance(pr, dict) and "skipped" in main
-            and main.get("skipped") == pr.get("skipped"))
+    if (isinstance(main, dict) and isinstance(pr, dict) and "skipped" in main
+            and main.get("skipped") == pr.get("skipped")):
+        return True
+    # Same exception, or the same skip note, once side folder names are gone. A message that still differs
+    # after that is a real difference and is left alone. A skip note is included so a path is not proof either.
+    if isinstance(main, str) and isinstance(pr, str) and normalise(main) == normalise(pr):
+        note = _error_text(normalise(main))
+        if note and str(note).lower().startswith("skip"):
+            return True
+    return bool(_contains_exception(main) and _contains_exception(pr) and normalise(main) == normalise(pr))
 
 
 _ERROR_TEXT = re.compile(r"(?:[A-Za-z_][\w.]*\.)?([A-Z]\w*(?:Error|Exception|Failure))(?::.*)?|(skip(?:ped)?\b.*)",
                          re.IGNORECASE | re.DOTALL)
+# A recorded crash: the type name (including UnexpectedExit and SystemExit), optionally with ': message'.
+_EXC_TEXT = re.compile(
+    r"(?:[A-Za-z_][\w.]*\.)?([A-Z]\w*(?:Error|Exception|Failure|Exit))\b(?::.*)?",
+    re.DOTALL)
+_EXC_KEYS = {"raises", "message", "traceback", "error", "exception", "stderr", "tb", "trace"}
 
 
 def _error_text(value) -> str | None:
@@ -371,6 +385,38 @@ def _error_text(value) -> str | None:
     if m.group(1) and not m.group(1)[0].isupper():
         return None
     return m.group(1) or m.group(2).lower()
+
+
+def _exception_payload(value) -> str | None:
+    """Type name when ``value`` is an exception string or a traceback, else None. A skip note is not an exception."""
+    if not isinstance(value, str):
+        return None
+    text = value.strip()
+    if text.lower().startswith("skip"):
+        return None
+    m = _EXC_TEXT.fullmatch(text)
+    if m and m.group(1)[0].isupper():
+        return m.group(1)
+    if "Traceback (most recent call last)" in text:
+        found = _EXC_TEXT.search(text)
+        if found and found.group(1)[0].isupper():
+            return found.group(1)
+    return None
+
+
+def _contains_exception(value) -> bool:
+    """True when this observation value is a raised exception, a traceback, or a short record of one.
+
+    A normal result that merely mentions an exception in some other field is not one: only the value itself, a
+    ``raises`` name, or a message / traceback / error string is read."""
+    if _exception_payload(value):
+        return True
+    if not isinstance(value, dict):
+        return False
+    name = value.get("raises")
+    if isinstance(name, str) and name.strip():
+        return True
+    return any(k in _EXC_KEYS and _exception_payload(v) for k, v in value.items())
 
 
 def judge(spec: dict, runs: dict, files: dict | None = None) -> list[dict]:
