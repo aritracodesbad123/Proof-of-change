@@ -27,6 +27,13 @@ def pytest_configure(config):
 
 
 @pytest.fixture(autouse=True)
+def _no_runs_branch_push(monkeypatch):
+    """A test run must not copy PDFs to a remote. The offline push tests call publish_run_outputs directly."""
+    from ops import daily_run
+    monkeypatch.setattr(daily_run, "publish_written_pdfs", lambda *a, **k: None)
+
+
+@pytest.fixture(autouse=True)
 def _typed_key_gate(request, monkeypatch):
     """Most console tests exercise later stages, so they pass the typed-key gate.
     Tests marked real_key_gate check the gate itself."""
