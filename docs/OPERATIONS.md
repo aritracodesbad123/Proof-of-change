@@ -20,6 +20,10 @@ to `origin/main`. Benchmark mode does not: it runs the commit the checkout is al
 unless that commit is the one named by `--expect-commit` (or `POC_EXPECT_COMMIT`) and the work tree is clean.
 It never fetches or checks out another commit.
 
+Any run that is given `--expect-commit` (or `POC_EXPECT_COMMIT`) stays on that commit, including a daily run.
+The commit is checked again before each pull request. If main's head has moved, the run stops and says so in
+plain words. The PDFs and the go/no-go summary are still written.
+
 That commit is the Proof-of-Change code the run actually used. Its full SHA is stored on every record as
 `poc_commit` (schema rev 8; optional in the schema so an older record still validates) and printed in the run-log
 header next to the words "Proof-of-Change commit". The reviewer report header shows the same SHA when the record has it.

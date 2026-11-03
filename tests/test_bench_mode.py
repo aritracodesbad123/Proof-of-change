@@ -98,7 +98,7 @@ def _forbid_sync(*_a, **_k):
 def test_cli_refuses_answers_file(tmp_path, capsys, monkeypatch):
     monkeypatch.setenv(model_provider.KEY_ENV, "test-key")
     monkeypatch.setattr(dr, "sync_to_origin_main", _forbid_sync)
-    monkeypatch.setattr(dr, "given_commit", lambda root, expected: "a" * 40)
+    monkeypatch.setattr(dr, "given_commit", lambda root, expected, **_k: "a" * 40)
     p = tmp_path / "x-answers.csv"
     p.write_text(SYN.read_text())
     assert dr.main(["--bench", str(p), "--ids", "B01", "--expect-commit", "a" * 40, "--unsafe-no-sandbox"]) == 2
@@ -206,11 +206,12 @@ def test_run_writes_one_result_per_id_and_never_opens_the_answer_key(tmp_path, m
     monkeypatch.setattr(dr, "sync_to_origin_main", _forbid_sync)
     noted = {}
 
-    def fake_given(root, expected):
+    def fake_given(root, expected, **_k):
         noted["expected"] = expected
         return "a" * 40
 
     monkeypatch.setattr(dr, "given_commit", fake_given)
+    monkeypatch.setattr(dr, "commit_moved_reason", lambda *_a, **_k: None)
     monkeypatch.setattr(model_provider.NebiusProvider, "confirm_key", lambda self: None)
     monkeypatch.setattr(bench, "CLONE_URL", str(merged_repo["path"]))
     monkeypatch.setattr(bench, "pr_text", lambda _dr, row: {"title": row["pr_title"], "body": "Changes f.",

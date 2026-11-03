@@ -120,7 +120,7 @@ def test_no_report_flag_and_success_write_no_extra_pdf(reports, monkeypatch):
 def test_bench_refusal_writes_nogo_summary(tmp_path, monkeypatch):
     monkeypatch.setenv(model_provider.KEY_ENV, "test-key")
     monkeypatch.setattr(dr, "sync_to_origin_main", lambda *a, **k: (_ for _ in ()).throw(AssertionError("sync")))
-    monkeypatch.setattr(dr, "given_commit", lambda root, expected: "a" * 40)
+    monkeypatch.setattr(dr, "given_commit", lambda root, expected, **_k: "a" * 40)
     p = tmp_path / "x-answers.csv"
     p.write_text(SYN.read_text())
     out = tmp_path / "pdfs"

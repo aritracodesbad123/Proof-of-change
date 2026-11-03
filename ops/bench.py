@@ -324,8 +324,14 @@ def _run(a, dr, st: dict) -> int:
     a.python_full = dr.resolve_python(a.python)
     machine = dict(dr.detect_machine_type())
     problems = 0
+    stopped = None
     pdir = Path(a.report_dir) if getattr(a, "report_dir", None) else Path(out) / "reports"
     for row in rows:
+        reason = dr.commit_moved_reason(getattr(a, "pinned_commit", None))
+        if reason:
+            print(reason, file=sys.stderr, flush=True)
+            st["reason"] = stopped = reason
+            break
         print(f"[{row['id']}] {row['repo']}#{row['pr']} {row['pr_title'][:60]} ...", flush=True)
         if not getattr(a, "no_report", False):
             try:   # replaced when the case finishes; a killed case still leaves this could-not-verify PDF
@@ -346,4 +352,4 @@ def _run(a, dr, st: dict) -> int:
             st["rows"].append((str(row["id"]), {"verdict": "could_not_verify",
                                                 "reason": f"harness error: {type(e).__name__}: {e}"}))
     print(f"results: {out}")
-    return 1 if problems else 0
+    return 1 if problems or stopped else 0
