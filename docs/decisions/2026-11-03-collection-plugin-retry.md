@@ -4,17 +4,24 @@
 
 When test collection fails the same way on the main side and the pull-request side, and the traceback is inside a
 third-party pytest plugin, the check reads that plugin's entry-point name and runs the tests once more on both sides
-with the plugin turned off (`-p no:<name>`). The run report says, in plain words, which plugin was turned off and
-why. If the second run still collects nothing, the first result is kept. The same flags are passed to the coverage
-run, which is another pytest start. How a verdict is chosen is unchanged.
+with the plugin turned off (`-p no:<name>`). The same retry also runs when pytest stops at startup with an internal
+error raised in a third-party plugin's `pytest_configure`, including a warning (a name ending in Warning) printed on
+an `INTERNALERROR>` line. The plugin is left on when the project's own pytest config names it, in `addopts` / `-p` or
+in `required_plugins`, in `pyproject.toml`, `pytest.ini`, `tox.ini`, or `setup.cfg`. The run report says, in plain
+words, which plugin was turned off and why. If the second run still produces no test results, the first result is
+kept. The same flags are passed to the coverage run, which is another pytest start. How a verdict is chosen is
+unchanged.
 
 ## Why
 
 urllib3 pull requests 5278 and 5352 failed while collecting tests on both sides. The error was
 `module 'pytest' has no attribute 'pyodide_options_stack'`. A dev extra had installed pytest-pyodide, and pytest
 loaded that plugin automatically. The crash was the same on both sides, so it was not a difference the pull request
-introduced. The existing startup repair did not apply: that repair only runs when pytest stops with an internal
-error before collection, and it leaves a plugin in place when the project's own files name it.
+introduced. The in-command startup repair did not see this pair of logs: it runs inside one Contree pytest command
+when that command exits 3, and it does not compare the two sides. pytest pull request 15324 then died at startup
+in a third-party plugin's `pytest_configure`, on an `INTERNALERROR>` line whose exception is a Warning
+(`PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset`). That is not
+a collection error, so the both-sides retry skipped it.
 
 ## Decision
 
@@ -25,7 +32,13 @@ error before collection, and it leaves a plugin in place when the project's own 
 - The entry-point name comes from the traceback module matched to the installed pytest plugins (the pytest11
   entry points). If the module does not match, the distribution name is used. The flag is `-p no:<entry point>`,
   not the distribution name.
-- One retry, on both sides. The coverage run uses the same flags when that retry is the result that is kept.
+- A startup internal error is included when both sides show it, the frames meet in a third-party plugin's
+  `pytest_configure`, and the exception line matches after side folder names are removed. `INTERNALERROR>` is
+  removed before the line is read. A name ending in Warning counts, as well as Error and Exception.
+- That startup retry does not turn a plugin off when either side's pytest config names it with `-p` or
+  `required_plugins`. Listing the package as a dependency does not, by itself, count as naming it.
+- One retry, on both sides. A log that already records the older in-command startup repair is not retried again.
+  The coverage run uses the same flags when that retry is the result that is kept.
 - If the retry still does not collect tests, the logs and the results from the first run are put back.
 - The report sentence is recorded on the run. It does not feed the verdict.
 
@@ -41,15 +54,18 @@ error before collection, and it leaves a plugin in place when the project's own 
 
 ## What it means for you
 
-A check whose tests cannot be collected, with the same traceback on both sides pointing into a third-party pytest
-plugin, runs the tests again with that plugin turned off. The run report says so. If that second run still cannot
-collect tests, you see the original failure. The verdict is still the one the usual rules produce from whatever
-results were kept.
+A check whose tests cannot be collected, or whose pytest stops at startup with the same internal error on both
+sides inside a third-party plugin, runs the tests again with that plugin turned off. The run report says so. A
+plugin the project's pytest config names with `-p` or `required_plugins` stays on. If that second run still cannot
+produce test results, you see the original failure. The verdict is still the one the usual rules produce from
+whatever results were kept.
 
 ## Offline proof
 
 `tests/fixtures/collection_plugin/` is a pair of pytest logs: the same collection error, with the side folder name
-as the only difference, and the traceback inside a third-party plugin. `tests/test_collection_plugin_retry.py`
-checks that the entry-point name comes from the traceback and the installed metadata, that a different error, a
+as the only difference, and the traceback inside a third-party plugin. `tests/fixtures/startup_plugin/` is the
+startup shape: `INTERNALERROR>` lines, `pytest_configure` in a third-party plugin, and a Warning. The config file
+there names the plugin with `-p` and `required_plugins`. `tests/test_collection_plugin_retry.py` checks the entry
+point, including `asyncio` for that startup log, that a named plugin is not retried, that a different error, a
 project file, or a side that already ran tests is not retried, that a failed retry keeps the first logs, and that
 the report states the plugin was turned off. Nothing from those pull requests is run again.

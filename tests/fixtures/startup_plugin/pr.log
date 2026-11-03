@@ -1,0 +1,10 @@
+============================= test session starts ==============================
+INTERNALERROR> Traceback (most recent call last):
+INTERNALERROR>   File "/usr/local/side-pr/lib/python3.12/site-packages/pluggy/_manager.py", line 120, in _hookexec
+INTERNALERROR>   File "/usr/local/side-pr/lib/python3.12/site-packages/_pytest/config/__init__.py", line 200, in pytest_configure
+INTERNALERROR>   File "/usr/local/side-pr/lib/python3.12/site-packages/pytest_asyncio/plugin.py", line 247, in pytest_configure
+INTERNALERROR>     warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+INTERNALERROR>     ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+INTERNALERROR> pytest.PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+INTERNALERROR> The event loop scope for asynchronous fixtures will default to the fixture caching scope.
+=========================== no tests ran in 0.04s ============================

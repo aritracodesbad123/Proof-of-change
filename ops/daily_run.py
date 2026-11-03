@@ -3337,7 +3337,10 @@ _FRAME_SHORT = re.compile(
     r"^(?P<path>.+?/site-packages/(?P<mod>[A-Za-z0-9_]+(?:/[A-Za-z0-9_]+)*)\.py):\d+: in (?P<func>\S+)", re.M)
 _FRAME_LONG = re.compile(
     r'File "(?P<path>[^"]*?site-packages/(?P<mod>[A-Za-z0-9_]+(?:/[A-Za-z0-9_]+)*)\.py)", line \d+, in (?P<func>\S+)')
-_EXC_LINE = re.compile(r"^(?:E\s+)?(?P<exc>[A-Za-z_][\w.]*(?:Error|Exception): .+)$", re.M)
+_EXC_LINE = re.compile(r"^(?:E\s+)?(?P<exc>[A-Za-z_][\w.]*(?:Error|Exception|Warning): .+)$", re.M)
+_PYTEST_CONFIGS = ("pyproject.toml", "pytest.ini", "tox.ini", "setup.cfg")
+# `-p asyncio`, `-p=asyncio`, and the split form "-p", "asyncio" in an addopts list.
+_P_FLAG = r"""-p['\"]?\s*(?:=\s*['\"]?|,\s*['\"]?|\s+['\"]?)"""
 _SIDE_DIR = re.compile(r"\b(?:side|venv|cwd|home|out)-(?:main|pr)\b")
 _RAN = ("passed", "failed", "error", "skipped")
 PYTEST_ENTRY_POINTS_PY = (
@@ -3385,10 +3388,22 @@ def _collection_frames(log: str) -> list[tuple[str, str]]:
     return found
 
 
+def _plain_pytest_log(log: str) -> str:
+    """Drop pytest's INTERNALERROR> prefix so the traceback can be read like any other log."""
+    out = []
+    for line in (log or "").splitlines():
+        if line.startswith("INTERNALERROR>"):
+            line = line[len("INTERNALERROR>"):]
+            if line.startswith(" "):
+                line = line[1:]
+        out.append(line)
+    return "\n".join(out)
+
+
 def _collection_error(log: str) -> str:
-    """The last exception line, with side folder names and absolute prefixes removed."""
+    """The last exception or warning line, with side folder names and absolute prefixes removed."""
     lines = []
-    for raw in (log or "").splitlines():
+    for raw in _plain_pytest_log(log).splitlines():
         m = _EXC_LINE.match(raw.strip())
         if not m:
             continue
@@ -3445,6 +3460,59 @@ def plugin_entry_points(frames: list[tuple[str, str]], entry_points) -> list[str
     return sorted(set(specific or broad or by_dist))
 
 
+def _startup_configure_frames(log: str) -> list[tuple[str, str]]:
+    """Third-party frames for pytest_configure, after the INTERNALERROR> prefix is removed."""
+    return [item for item in _collection_frames(_plain_pytest_log(log)) if item[1] == "pytest_configure"]
+
+
+def startup_failed_same_way(main_log: str, pr_log: str) -> bool:
+    """Both logs are a startup internal error raised in a third-party plugin's pytest_configure.
+
+    Side folder names are ignored. A collection error is not this case, and neither is an internal error
+    whose traceback stays inside pytest itself."""
+    if "INTERNALERROR" not in (main_log or "") or "INTERNALERROR" not in (pr_log or ""):
+        return False
+    main_frames, pr_frames = _startup_configure_frames(main_log), _startup_configure_frames(pr_log)
+    if not main_frames or main_frames != pr_frames:
+        return False
+    main_error, pr_error = _collection_error(main_log), _collection_error(pr_log)
+    return bool(main_error) and main_error == pr_error
+
+
+def _config_text(root) -> str:
+    if not root:
+        return ""
+    parts = []
+    base = Path(root)
+    for name in _PYTEST_CONFIGS:
+        path = base / name
+        if path.is_file():
+            parts.append(path.read_text(errors="replace"))
+    return "\n".join(parts).lower()
+
+
+def plugin_named_in_pytest_config(roots, name: str) -> bool:
+    """True when a pytest config names this entry point in addopts (-p) or required_plugins.
+
+    A dependency line that only installs the package does not count. roots is one checkout or a list of them
+    (main and the pull request). Either side naming the plugin is enough to keep it."""
+    if not _PLUGIN_NAME.fullmatch(str(name or "")):
+        return False
+    ep = str(name).lower()
+    folders = roots if isinstance(roots, (list, tuple)) else [roots]
+    flag = re.compile(_P_FLAG + re.escape(ep) + r"(?![\w.-])")
+    for root in folders:
+        cfg = _config_text(root)
+        if not cfg:
+            continue
+        if flag.search(cfg):
+            return True
+        for match in re.finditer(r"required_plugins\s*=\s*(\[[^\]]*\]|[^\n#]+)", cfg):
+            if re.search(r"(?<![\w.-])" + re.escape(ep) + r"(?![\w.-])", match.group(1)):
+                return True
+    return False
+
+
 def collection_plugins_to_disable(main_log: str, pr_log: str, entry_points, results: dict | None = None) -> list[str]:
     """Plugin entry points to turn off, or none.
 
@@ -3456,7 +3524,7 @@ def collection_plugins_to_disable(main_log: str, pr_log: str, entry_points, resu
     return plugin_entry_points(_collection_frames(main_log), entry_points)
 
 
-def collection_plugin_note(names: list[str], error: str) -> str:
+def collection_plugin_note(names: list[str], error: str, startup: bool = False) -> str:
     """One plain sentence for the run report."""
     shown = ", ".join(names)
     one = len(names) == 1
@@ -3464,10 +3532,12 @@ def collection_plugin_note(names: list[str], error: str) -> str:
     verb = "was" if one else "were"
     where = "that third-party plugin" if one else "those third-party plugins"
     again = "the plugin" if one else "those plugins"
+    happened = ("Pytest stopped at startup the same way on both sides" if startup
+                else "Collection failed the same way on both sides")
     err = " ".join((error or "the traceback was inside the plugin").split())
     if len(err) > 200:
         err = err[:200].rstrip() + "..."
-    return (f"Setup: pytest {kind} {shown} {verb} turned off. Collection failed the same way on both sides, "
+    return (f"Setup: pytest {kind} {shown} {verb} turned off. {happened}, "
             f"and the traceback pointed into {where} ({err}). "
             f"The tests were run again with {again} turned off. This does not change how the verdict is chosen.")
 
@@ -3560,9 +3630,17 @@ def retry_collection_plugin(rec: dict, per_run: list, results: dict, venvs: dict
     main_log, pr_log = _side_pytest_logs(prdir, runs)
     if not _no_tests_ran(results, "main") or not _no_tests_ran(results, "pr"):
         return per_run, results
-    if not collection_failed_same_way(main_log, pr_log):
+    # The Contree shell already retries an exit-3 startup crash once. A log that records that repair is left as it is.
+    if "Setup repair:" in main_log or "Setup repair:" in pr_log:
         return per_run, results
-    names = plugin_entry_points(_collection_frames(main_log), installed_pytest_entry_points(venvs))
+    startup = startup_failed_same_way(main_log, pr_log)
+    if not startup and not collection_failed_same_way(main_log, pr_log):
+        return per_run, results
+    frames = (_startup_configure_frames(main_log) if startup else _collection_frames(main_log))
+    names = plugin_entry_points(frames, installed_pytest_entry_points(venvs))
+    if startup:
+        roots = [cwds.get(side) for side in ("main", "pr") if isinstance(cwds, dict) and cwds.get(side)]
+        names = [name for name in names if not plugin_named_in_pytest_config(roots, name)]
     if not names:
         return per_run, results
     saved = _snapshot_pytest_outputs(prdir, runs)
@@ -3574,7 +3652,7 @@ def retry_collection_plugin(rec: dict, per_run: list, results: dict, venvs: dict
         _restore_pytest_outputs(prdir, saved)
         return per_run, results
     rec["pytest_plugins_off"] = list(names)
-    rec["collection_plugin_note"] = collection_plugin_note(names, _collection_error(main_log))
+    rec["collection_plugin_note"] = collection_plugin_note(names, _collection_error(main_log), startup=startup)
     print(rec["collection_plugin_note"], flush=True)
     return per2, res2
 

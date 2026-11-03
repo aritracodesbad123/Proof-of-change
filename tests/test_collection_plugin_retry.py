@@ -155,6 +155,95 @@ def test_a_failed_retry_keeps_the_original_logs(tmp_path, monkeypatch):
     assert "still broken" not in (rdir / "pytest-pr-1.log").read_text()
 
 
+START = Path(__file__).resolve().parents[1] / "tests" / "fixtures" / "startup_plugin"
+START_MAIN = (START / "main.log").read_text()
+START_PR = (START / "pr.log").read_text()
+ASYNCIO = [("asyncio", "pytest_asyncio.plugin", "pytest-asyncio"), ("other", "other.mod", "pytest-other")]
+
+
+def test_startup_internal_error_resolves_to_the_entry_point():
+    assert dr.startup_failed_same_way(START_MAIN, START_PR)
+    assert dr.collection_plugins_to_disable(START_MAIN, START_PR, ASYNCIO) == []
+    frames = dr._startup_configure_frames(START_MAIN)
+    assert dr.plugin_entry_points(frames, ASYNCIO) == ["asyncio"]
+    assert "side-main" not in dr._collection_error(START_MAIN)
+    assert dr._collection_error(START_MAIN) == dr._collection_error(START_PR)
+    assert "PytestDeprecationWarning" in dr._collection_error(START_MAIN)
+    note = dr.collection_plugin_note(["asyncio"], dr._collection_error(START_MAIN), startup=True)
+    assert note.startswith("Setup: pytest plugin asyncio was turned off.")
+    assert "stopped at startup" in note
+
+
+def test_a_plugin_the_pytest_config_names_is_not_turned_off(tmp_path):
+    named = tmp_path / "named"
+    named.mkdir()
+    (named / "pyproject.toml").write_text((START / "names-the-plugin.toml").read_text())
+    assert dr.plugin_named_in_pytest_config([named], "asyncio")
+    bare = tmp_path / "bare"
+    bare.mkdir()
+    (bare / "pyproject.toml").write_text('[project.optional-dependencies]\ndev = ["pytest-asyncio"]\n')
+    assert not dr.plugin_named_in_pytest_config([bare], "asyncio")
+    only_p = tmp_path / "flag"
+    only_p.mkdir()
+    (only_p / "pytest.ini").write_text("[pytest]\naddopts = -p asyncio\n")
+    assert dr.plugin_named_in_pytest_config([only_p], "asyncio")
+    assert not dr.plugin_named_in_pytest_config([only_p], "other")
+
+
+def test_startup_retry_once_unless_the_config_names_the_plugin(tmp_path, monkeypatch):
+    seen = []
+
+    def fake_run(cmd, log, **kw):
+        cmd = [str(c) for c in cmd]
+        junit = next(c.split("=", 1)[1] for c in cmd if c.startswith("--junitxml="))
+        seen.append(cmd)
+        if "no:asyncio" in cmd:
+            Path(log).write_text("1 passed\n")
+            Path(junit).write_text(JUNIT)
+            return 0, 0.1
+        Path(log).write_text(START_MAIN if "-main-" in Path(log).name else START_PR)
+        return 3, 0.1
+
+    monkeypatch.setattr(dr, "run", fake_run)
+    monkeypatch.setattr(dr, "_contree_ready", lambda: False)
+    monkeypatch.setattr(dr, "base_env", lambda *a, **k: {})
+    monkeypatch.setattr(dr, "side_home", lambda v: tmp_path)
+    monkeypatch.setattr(dr, "side_out", lambda v: tmp_path / "out")
+    (tmp_path / "out").mkdir()
+    monkeypatch.setattr(dr, "side_sandbox", lambda *a, **k: None)
+    monkeypatch.setattr(dr, "installed_pytest_entry_points", lambda venvs: list(ASYNCIO))
+    rec = {}
+    a = SimpleNamespace(runs=1, workers="0", test_timeout=30, run_timeout=60, pr=None, product_check=False, bench=None)
+    rdir = tmp_path / "run"
+    rdir.mkdir()
+    checkout = tmp_path / "src"
+    checkout.mkdir()
+    (checkout / "pyproject.toml").write_text("[tool.pytest]\naddopts = ['-p', 'pytester']\n")
+    cmp, cnv, _ex = dr.execute_tests(
+        rec, {"main": tmp_path / "vm", "pr": tmp_path / "vp"},
+        {"main": ["t.py"], "pr": ["t.py"]}, rdir, tmp_path, a, cwds={"main": checkout, "pr": checkout})
+    assert cnv is None and cmp["same"] == 1
+    assert "verdict" not in rec
+    assert rec["pytest_plugins_off"] == ["asyncio"]
+    assert "stopped at startup" in rec["collection_plugin_note"]
+    assert sum("no:asyncio" in c for c in seen) == 2
+
+    seen.clear()
+    named = tmp_path / "named"
+    named.mkdir()
+    (named / "pyproject.toml").write_text((START / "names-the-plugin.toml").read_text())
+    rec2 = {}
+    rdir2 = tmp_path / "run2"
+    rdir2.mkdir()
+    _cmp, cnv2, _ex = dr.execute_tests(
+        rec2, {"main": tmp_path / "vm", "pr": tmp_path / "vp"},
+        {"main": ["t.py"], "pr": ["t.py"]}, rdir2, tmp_path, a, cwds={"main": named, "pr": named})
+    assert cnv2 and "collection failed" in cnv2
+    assert "pytest_plugins_off" not in rec2
+    assert all("no:asyncio" not in c for c in seen)
+    assert "PytestDeprecationWarning" in (rdir2 / "pytest-main-1.log").read_text()
+
+
 def test_contree_commands_carry_the_same_flag(tmp_path, monkeypatch):
     shells = []
 
