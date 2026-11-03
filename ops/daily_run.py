@@ -515,6 +515,9 @@ _SECTION_RE = re.compile(r"(?m)^## \d+\. ")
 _PR_HEADING_RE = re.compile(r"(?m)^### .*?#(\d+)")
 _OPEN_PR_RE = re.compile(r"\*\*Open PR:\*\* #(\d+)")
 _REPO_RE = re.compile(r"https://github\.com/([\w.-]+/[\w.-]+)")
+# The rest of a `## N. ...` heading, which split() leaves as the section's first line.
+# `owner/name #123` names the repository and the pull request. A title with no slash does not.
+_HEADING_TAIL_RE = re.compile(r"(?P<repo>[\w.-]+/[\w.-]+)(?:\s*#(?P<pr>\d+)\b.*)?")
 _HEAD_SHA_RE = re.compile(r"Head SHA: `([0-9a-f]{40})`")
 _INSTALL_RE = re.compile(r"- Install: `([^`]+)`")
 _TEST_SUBSET_RE = re.compile(r"- Test \(subset[^)]*\): `([^`]+)`")
@@ -529,6 +532,37 @@ def _library_sections(text: str) -> list[str]:
 def _repo_of(sec: str) -> str | None:
     m = _REPO_RE.search(sec)
     return m.group(1).rstrip(".") if m else None
+
+
+def _heading_repo_pr(sec: str) -> tuple[str | None, int | None]:
+    """Repository and pull request number from the heading tail (`owner/name` or `owner/name #123`)."""
+    line = sec.lstrip("\n").split("\n", 1)[0].strip()
+    m = _HEADING_TAIL_RE.fullmatch(line)
+    if not m:
+        return None, None
+    pr = int(m.group("pr")) if m.group("pr") else None
+    return m.group("repo"), pr
+
+
+def _section_repo(sec: str) -> str | None:
+    """owner/name on the heading, else the github.com link in the section."""
+    repo, _pr = _heading_repo_pr(sec)
+    return repo or _repo_of(sec)
+
+
+def _section_blocks(sec: str) -> list[tuple[int, str, str]]:
+    """Pull requests in one library section.
+
+    A `###` heading or a `**Open PR:** #N` line wins when the section has one. Otherwise the number on the
+    heading (`## 1. owner/name #123`) is the pull request, and the section text is its own text.
+    """
+    blocks = _pr_blocks(sec)
+    if blocks:
+        return blocks
+    _repo, pr = _heading_repo_pr(sec)
+    if pr is None:
+        return []
+    return [(pr, sec, "")]
 
 
 def _group1(pattern: re.Pattern, text: str) -> str | None:
@@ -579,9 +613,10 @@ def _test_cmd(block: str, preamble: str) -> str | None:
 def parse_chosen(path: Path) -> dict:
     """Chosen-PRs file (<date>.md) -> {repo: [ {pr, head_sha, install, test_cmd} ]}.
 
-    A library section (`## N. name`) is one `**Open PR:** #N` entry, or several `###` sub-headings that each name
-    a pull request. Each sub-heading keeps its own head SHA. Install and test commands may sit in the preamble or
-    in a sub-section; a sub-section's own command wins.
+    A library section is a heading `## N. owner/name #123`, or `## N. owner/name` with a `**Open PR:** #N` line,
+    or the older `## N. name` heading plus a github.com link and one `**Open PR:** #N` entry, or several `###`
+    sub-headings that each name a pull request. Each sub-heading keeps its own head SHA. Install and test commands
+    may sit in the preamble or in a sub-section; a sub-section's own command wins.
 
     Expected verdicts are deliberately NOT read here. They are read by read_expectations() only after every verdict
     of the run has been computed (see main()), so they cannot influence selection, testing or verdicts.
@@ -590,15 +625,47 @@ def parse_chosen(path: Path) -> dict:
     if not path.exists():
         return out
     for sec in _library_sections(path.read_text()):
-        repo = _repo_of(sec)
+        repo = _section_repo(sec)
         if not repo:
             continue
-        for pr, block, preamble in _pr_blocks(sec):
+        for pr, block, preamble in _section_blocks(sec):
             out.setdefault(repo, []).append({
                 "pr": pr, "head_sha": _group1(_HEAD_SHA_RE, block),
                 "install": _group1(_INSTALL_RE, block) or _group1(_INSTALL_RE, preamble),
                 "test_cmd": _test_cmd(block, preamble)})
     return out
+
+
+def empty_chosen_stop(path: Path, chosen: dict) -> str | None:
+    """When the chosen-PRs file is present but names no pull request, the run must stop.
+
+    A missing file means nothing was chosen and the run may look for open pull requests. None means proceed.
+    """
+    if not path.exists() or chosen:
+        return None
+    return (f"Stopped: {path.name} is present but names no pull request. "
+            "This run will not look for other open pull requests. "
+            "Name each one on the heading (`## 1. owner/name #123`) "
+            "or on a `**Open PR:** #123` line under a repository.")
+
+
+def no_pull_request_reason(*, in_file: bool, file_present: bool, skipped: list, frozen: bool) -> str:
+    """One plain sentence for a library that ended selection with no pull request."""
+    if skipped:
+        whys: list[str] = []
+        for item in skipped:
+            why = str(item.get("why") or "set aside")
+            if why not in whys:
+                whys.append(why)
+        return "no pull request was checked: every candidate was set aside (" + "; ".join(whys[:8]) + ")"
+    if frozen:
+        return "no pull request was checked: an earlier attempt of this run saved none for this library"
+    if in_file:
+        return "no pull request was checked: the library was named, but no pull request number could be read"
+    if file_present:
+        return ("no pull request was checked: the chosen-PRs file does not name this library, "
+                "and no open pull request was found")
+    return "no pull request was checked: no open pull request was found"
 
 
 def read_expectations(path: Path) -> dict:
@@ -611,10 +678,10 @@ def read_expectations(path: Path) -> dict:
     if not path.exists():
         return exp
     for sec in _library_sections(path.read_text()):
-        repo = _repo_of(sec)
+        repo = _section_repo(sec)
         if not repo:
             continue
-        for pr, block, _preamble in _pr_blocks(sec):
+        for pr, block, _preamble in _section_blocks(sec):
             v = _EXPECT_RE.search(block)
             if v:
                 exp[(repo, pr)] = v.group(1).strip().replace(" ", "_")
@@ -6367,7 +6434,7 @@ def how_to_fix(r: dict) -> str:
 
 def write_report(rdir: Path, meta: dict, records: list[dict], skipped: dict, problems: list[str],
                  expectations: dict | None = None, verification: dict | None = None,
-                 history: list[dict] | None = None) -> Path:
+                 history: list[dict] | None = None, no_prs: list | None = None) -> Path:
     from poc import demo_helper
 
     def line(r):
@@ -6537,6 +6604,11 @@ def write_report(rdir: Path, meta: dict, records: list[dict], skipped: dict, pro
         md += score_table("Scored against independent verification",
                           "Verdicts of an independent re-check (verification.jsonl; only PRs the checker gave a verdict "
                           "for). Read only after all verdicts were computed.", records, verification, "Checker")
+    if no_prs:
+        md += ["## Libraries with no pull request", ""]
+        for item in no_prs:
+            md.append(f"- {item['repo']}: {item['why']}")
+        md.append("")
     md += ["## Skipped while selecting", ""]
     for repo, sk in skipped.items():
         for s_ in sk[:12]:
@@ -7250,12 +7322,20 @@ def _main(argv=None) -> int:
         rows = [r for r in rows if r["library"] in want]
     chosen_path = chosen_prs_path(a, rdir)
     chosen_prs = parse_chosen(chosen_path)
+    if not single:
+        stop = empty_chosen_stop(chosen_path, chosen_prs)
+        if stop:
+            print(stop, file=sys.stderr)
+            if not a.no_report:
+                (rdir / "REPORT.md").write_text(f"# Proof-of-Change daily ops run: {rdir.name}\n\n{stop}\n")
+            return 2
     gh = GitHub(None, fail_fast_auth=product_route(a))
     a.python_full = resolve_python(a.python)
     machine = dict(detect_machine_type())
     machine.setdefault("cpu_model", cpu_model())
     machine.setdefault("ram_gb", ram_gb())
     records, skipped, selection, reused = [], {}, {}, []
+    no_prs: list[dict] = []
     batch_queue: list = []
     inv_root = rdir / "invocations"
     a.invocation = (1 + len([p for p in inv_root.glob("invocation-*") if p.is_dir()])
@@ -7264,6 +7344,8 @@ def _main(argv=None) -> int:
         repo = row["repo"]
         cfg = LIBS.get(repo) or {"dist": row["library"], "pkg": row["library"].lower().replace("-", "_"), "deps": [],
                                  "test_deps": [], "nightly": False}
+        in_file = repo in chosen_prs
+        from_frozen = bool(frozen.get(repo)) and not in_file
         try:
             if single:
                 chosen, sk = chosen_items(gh, repo, cfg, [{"pr": n, "head_sha": a.head_sha, "install": None,
@@ -7273,7 +7355,7 @@ def _main(argv=None) -> int:
                     if a.base_sha:
                         c["pinned_sides"] = {"main": a.base_sha, "pr": a.head_sha}
                         c["base_sha"] = a.base_sha
-            elif repo in chosen_prs:   # PRs chosen by name for today; selection filters do not apply
+            elif in_file:   # PRs chosen by name for today; selection filters do not apply
                 chosen, sk = chosen_items(gh, repo, cfg, chosen_prs[repo]), []
             elif frozen.get(repo):
                 chosen, sk = frozen_items(gh, repo, cfg, frozen[repo]), []
@@ -7283,14 +7365,22 @@ def _main(argv=None) -> int:
                                       python=None if getattr(a, "no_wheel_check", False) else a.python)
         except Exception as e:  # noqa: BLE001
             problems.append(f"{repo}: PR selection failed: {e}")
+            no_prs.append({"repo": repo, "why": f"no pull request was checked: selection failed ({type(e).__name__}: {e})"})
             continue
         skipped[repo] = sk
         selection[repo] = [{k: c[k] for k in ("pr", "title", "url", "author", "head_sha", "updated_at_ist", "ci_state")}
                            | {"route": ("source-pair" if not cfg.get("nightly") else "source-build" if c["files"]["compiled"]
                                          else "nightly+patch"), "frozen_from": c.get("frozen_from")} for c in chosen]
-        how = "frozen selection of earlier attempts" if frozen.get(repo) and repo not in chosen_prs else (
-            "chosen PRs" if repo in chosen_prs else "selected")
-        print(f"[{repo}] priority {row.get('priority')}: {how}: {[c['pr'] for c in chosen]}", flush=True)
+        how = "frozen selection of earlier attempts" if from_frozen else (
+            "chosen PRs" if in_file else "selected")
+        shown = [c["pr"] for c in chosen]
+        if shown:
+            print(f"[{repo}] priority {row.get('priority')}: {how}: {shown}", flush=True)
+        else:
+            why = no_pull_request_reason(in_file=in_file and not single, file_present=chosen_path.exists() and not single,
+                                         skipped=sk, frozen=from_frozen and not single)
+            no_prs.append({"repo": repo, "why": why})
+            print(f"[{repo}] {why}", flush=True)
         if a.select_only:
             continue
         for c in chosen:
@@ -7336,7 +7426,8 @@ def _main(argv=None) -> int:
         except model_provider.ProviderRejected as e:
             print(str(e), file=sys.stderr)
             return 1
-    (rdir / "selection.json").write_text(json.dumps({"selected": selection, "skipped": skipped}, indent=1))
+    (rdir / "selection.json").write_text(json.dumps(
+        {"selected": selection, "skipped": skipped, "no_prs": no_prs}, indent=1))
     if a.select_only:
         print(json.dumps(selection, indent=1))
         return 0
@@ -7367,7 +7458,7 @@ def _main(argv=None) -> int:
     write_schema_check_log(rdir, records)
     # Expectations and independent verification are read only now, after every verdict above is final.
     rp = write_report(rdir, meta, records, skipped, problems, *scoring_inputs(rdir, a, chosen_path),
-                      attempt_history(rdir))
+                      attempt_history(rdir), no_prs=no_prs)
     from poc import demo_helper
     if demo_helper.attach_self_check(rp, meta, records, a):
         (rdir / "run_meta.json").write_text(json.dumps(meta, indent=1))
@@ -7705,9 +7796,10 @@ def report_only(rdir: Path, a) -> int:
         with open(rdir / "records.jsonl", "w") as fh:
             for r in records:
                 fh.write(json.dumps(r) + "\n")
-    skipped = json.loads((rdir / "selection.json").read_text()).get("skipped", {})
+    sel = json.loads((rdir / "selection.json").read_text())
+    skipped = sel.get("skipped", {})
     rp = write_report(rdir, meta, records, skipped, problems, *scoring_inputs(rdir, a, chosen_prs_path(a, rdir)),
-                      attempt_history(rdir))
+                      attempt_history(rdir), no_prs=sel.get("no_prs") or [])
     from poc import demo_helper
     if demo_helper.attach_self_check(rp, meta, records, a):
         (rdir / "run_meta.json").write_text(json.dumps(meta, indent=1))
