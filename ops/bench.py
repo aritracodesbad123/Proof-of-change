@@ -291,6 +291,13 @@ def _bench_pdfs(a, dr, st: dict, rc) -> None:
             pdf_always.nogo_summary(where, name, st["reason"])
         if hasattr(dr, "PDF_TARGET"):
             dr.PDF_TARGET["summary_done"] = True
+            dr.PDF_TARGET["dir"] = where
+            dr.PDF_TARGET["poc_commit"] = getattr(a, "poc_commit", None)
+            dr.PDF_TARGET["run_dir"] = st.get("out")
+        if hasattr(dr, "publish_written_pdfs"):
+            dr.publish_written_pdfs(
+                report_dir=where, run_dir=st.get("out"), poc_commit=getattr(a, "poc_commit", None),
+                records=[rec for _rid, rec in st["rows"] if isinstance(rec, dict)])
         print(f"bench PDFs: {where / 'SUMMARY.pdf'}", flush=True)
     except Exception as e:  # noqa: BLE001
         print(f"ERROR: bench PDFs not written: {type(e).__name__}: {e}", file=sys.stderr, flush=True)

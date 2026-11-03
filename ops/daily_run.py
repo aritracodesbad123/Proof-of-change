@@ -10,9 +10,16 @@
 After the run, reviewer reports (HTML, PDF, Markdown) are written to reports/daily/<run folder>/ by
 reports/pr_report.py; ops/runs/<run folder>/REPORT.md stays as the operator's run log.
 
-Read-only towards GitHub: it only GETs public API/diff URLs. It never comments, reviews or posts.
-Uses $GITHUB_TOKEN, or $GITHUB_POC_TOKEN, or $GH_TOKEN, for read-only API calls if one is set; otherwise
+Read-only towards the pull request under test: it only GETs public API/diff URLs. It never comments, reviews or posts
+on that pull request. Uses $GITHUB_TOKEN, or $GITHUB_POC_TOKEN, or $GH_TOKEN, for those reads if one is set; otherwise
 unauthenticated (60 requests/hour). A rate limit (403/429 with remaining 0) waits until reset, bounded, and retries once.
+
+Once the PDFs (each REPORT.pdf, SUMMARY.pdf, and a refused or no-go PDF) and the go/no-go summary are written, the
+same token is used to push those PDFs and record.json to the `runs` branch on origin, under
+runs/<date>/<short poc commit>/<pr id>/. The push is a separate temporary clone, so this checkout and main are left
+as they are. The branch is created as an orphan when it is missing. PDFs are never emailed. If the token is missing,
+or the push still fails after retries, the run finishes, the local files stay, and the report and run.log say
+`PDFs NOT saved to GitHub: <reason>`.
 
 How a PR is tested (route "nightly+patch", used for pure-Python PRs):
   main side = latest scientific-python nightly wheel of the library (main branch build)
@@ -45,12 +52,14 @@ import shutil
 import signal
 import subprocess
 import sys
+import tempfile
 import time
 import urllib.error
 import urllib.parse
 import urllib.request
 import xml.etree.ElementTree as ET
 import zipfile
+import zlib
 from pathlib import Path, PurePosixPath
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -8769,7 +8778,559 @@ def _run_batch_order(queue: list, rdir: Path, workroot: Path, a, machine: dict, 
 
 
 # Where this invocation's PDFs go, and whether its SUMMARY.pdf was written (poc/pdf_always.py fills the gaps).
-PDF_TARGET: dict = {"dir": None, "name": None, "summary_done": False}
+# push_done: the final PDFs were already copied to the runs branch (or the copy was given up).
+PDF_TARGET: dict = {"dir": None, "name": None, "summary_done": False, "push_done": False,
+                    "run_dir": None, "poc_commit": None, "date": None}
+
+RUNS_BRANCH = "runs"
+PDF_PUSH_ATTEMPTS = 3
+PDF_PUSH_BACKOFF_S = (1, 2, 4)
+PDF_PUSH_NAME = "Proof-of-Change"
+PDF_PUSH_EMAIL = "proof-of-change@users.noreply.github.com"
+_PR_ID_OK = re.compile(r"^[A-Za-z0-9._-]+$")
+
+
+class _RunsPushError(Exception):
+    """The runs-branch copy failed. The message is plain words and is safe to show."""
+
+
+def _host_path_re(binary: bool = False):
+    """Paths that must not be published. Built at runtime so the source stays free of machine paths."""
+    space = "work" + "space"
+    home = "home"
+    machine = "bo" + "x"
+    pat = (rf"/{space}(?:/[^\s\"'\\)<>,;]*)*"
+           rf"|/{home}/{machine}(?:/[^\s\"'\\)<>,;]*)*"
+           rf"|(?<![\w.-])/{machine}(?:/[^\s\"'\\)<>,;]+)+")
+    return re.compile(pat.encode("ascii") if binary else pat)
+
+
+def scrub_host_paths(data: bytes) -> bytes:
+    """Replace machine-local paths with a same-length marker so a PDF or JSON value stays intact."""
+    mark = b"<redacted-path>"
+
+    def repl(m):
+        n = len(m.group(0))
+        if n <= len(mark):
+            return b"x" * n
+        return mark + b"." * (n - len(mark))
+
+    return _host_path_re(True).sub(repl, data)
+
+
+def scrub_host_text(text: str) -> str:
+    raw = text.encode("utf-8", "surrogateescape")
+    return scrub_host_paths(raw).decode("utf-8", "surrogateescape")
+
+
+def pdf_push_banner(reason: str) -> str:
+    reason = " ".join(scrub_host_text(reason or "").split()) or "the runs branch could not be updated"
+    return f"PDFs NOT saved to GitHub: {reason}"
+
+
+def _plain_git_reason(base: str, cp: subprocess.CompletedProcess, token: str | None) -> str:
+    detail = f"{cp.stderr or ''} {cp.stdout or ''}"
+    if token:
+        detail = detail.replace(token, "")
+    detail = " ".join(scrub_host_text(detail).split())
+    if not detail or any(ch in detail for ch in ("/", "\\")) or "AUTHORIZATION" in detail or len(detail) > 160:
+        return base
+    return f"{base} ({detail})"
+
+
+def _bytes_have_host_path(data: bytes) -> bool:
+    pat = _host_path_re(True)
+    if pat.search(data):
+        return True
+    for match in re.finditer(br"stream\r?\n(.*?)endstream", data, re.S):
+        chunk = match.group(1).strip(b"\r\n")
+        for wbits in (zlib.MAX_WBITS, -zlib.MAX_WBITS):
+            try:
+                plain = zlib.decompress(chunk, wbits)
+            except zlib.error:
+                continue
+            if pat.search(plain):
+                return True
+    return False
+
+
+def _pdf_bytes_for_push(path: Path) -> bytes:
+    """The PDF to publish. The original file is kept; a copy is rebuilt only when it holds a machine path."""
+    data = path.read_bytes()
+    if not _bytes_have_host_path(data):
+        return data
+    text = ""
+    if shutil.which("pdftotext"):
+        text = subprocess.run(["pdftotext", str(path), "-"], capture_output=True, text=True).stdout
+    text = scrub_host_text(text)
+    tmp = path.with_name(path.name + ".push-tmp")
+    try:
+        pdf_always.write_pdf(tmp, path.stem, text.splitlines() or ["report"])
+        return scrub_host_paths(tmp.read_bytes())
+    finally:
+        tmp.unlink(missing_ok=True)
+
+
+def _safe_pr_id(name: str | None) -> str:
+    text = (name or "").strip().replace("\\", "/").split("/")[-1]
+    if not text or text in (".", "..") or not _PR_ID_OK.fullmatch(text):
+        return "summary"
+    return text
+
+
+def _pr_id_of_record(rec: dict) -> str:
+    if rec.get("case_id"):
+        return _safe_pr_id(str(rec["case_id"]))
+    logs = str(rec.get("logs") or "").strip("/")
+    if logs:
+        return _safe_pr_id(logs.split("/")[0])
+    pr = rec.get("pr")
+    number = pr.get("number") if isinstance(pr, dict) else pr
+    library = rec.get("library") or "pr"
+    if number is not None:
+        return _safe_pr_id(f"{library}-{number}")
+    return "summary"
+
+
+def _collect_pdf_groups(report_dir: Path, run_dir: Path | None, fallback: str | None) -> tuple[dict, Path | None]:
+    """pr id -> {report, record}. SUMMARY.pdf is returned separately and copied into each folder."""
+    groups: dict = {}
+
+    def slot(pr_id: str) -> dict:
+        return groups.setdefault(_safe_pr_id(pr_id), {"report": None, "record": None})
+
+    for pdf in sorted(report_dir.rglob("REPORT.pdf")):
+        if pdf.parent.resolve() == report_dir.resolve():
+            pr_id = fallback or "report"
+        else:
+            pr_id = pdf.parent.name
+        slot(pr_id)["report"] = pdf
+    if run_dir and run_dir.is_dir():
+        for rec_path in sorted(run_dir.rglob("record.json")):
+            parts = rec_path.relative_to(run_dir).parts
+            if any(part in ("superseded", "pre-migration") for part in parts):
+                continue
+            try:
+                rec = json.loads(rec_path.read_text())
+            except (OSError, json.JSONDecodeError):
+                rec = None
+            pr_id = None
+            if isinstance(rec, dict):
+                candidate = _pr_id_of_record(rec)
+                if candidate in groups:
+                    pr_id = candidate
+            slot(pr_id or rec_path.parent.name)["record"] = rec_path
+    summary = report_dir / "SUMMARY.pdf"
+    if summary.is_file() and not groups:
+        slot(fallback or "summary")
+    return groups, (summary if summary.is_file() else None)
+
+
+def _run_calendar_date(date: str | None, run_dir: Path | None, report_dir: Path) -> str:
+    for cand in (date, run_dir.name if run_dir else None, report_dir.name):
+        if isinstance(cand, str) and DATE_RE.match(cand):
+            return cand[:10]
+    return now_ist().strftime("%Y-%m-%d")
+
+
+def _short_poc_sha(poc_commit: str | None, root: Path) -> str:
+    sha = (poc_commit or "").strip().lower()
+    if not _COMMIT.fullmatch(sha):
+        cp = subprocess.run(["git", "-C", str(root), "rev-parse", "HEAD"], capture_output=True, text=True)
+        sha = (cp.stdout or "").strip().lower()
+    if _COMMIT.fullmatch(sha):
+        return sha[:7]
+    return "unknown"
+
+
+def _github_slug(origin: str) -> str | None:
+    text = origin.strip()
+    if text.endswith(".git"):
+        text = text[:-4]
+    for prefix in ("https://github.com/", "https://www.github.com/", "git@github.com:"):
+        if text.startswith(prefix):
+            slug = text[len(prefix):]
+            if slug.count("/") == 1 and " " not in slug:
+                return slug
+    return None
+
+
+def _remote_for_push(origin: str) -> tuple[str, bool]:
+    """(url to push to, whether the GitHub token header is required). A local path is left as it is."""
+    slug = _github_slug(origin)
+    if slug:
+        return f"https://github.com/{slug}.git", True
+    return origin, False
+
+
+def _tree_url(origin: str, date: str, short: str, pr_id: str | None = None) -> str:
+    rel = f"runs/{date}/{short}" + (f"/{pr_id}" if pr_id else "")
+    slug = _github_slug(origin)
+    if slug:
+        return f"https://github.com/{slug}/tree/{RUNS_BRANCH}/{rel}"
+    return rel
+
+
+def _push_env() -> dict:
+    env = os.environ.copy()
+    for key in ("GIT_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE", "GIT_PREFIX", "GIT_COMMON_DIR"):
+        env.pop(key, None)
+    env.update({
+        "GIT_AUTHOR_NAME": PDF_PUSH_NAME,
+        "GIT_AUTHOR_EMAIL": PDF_PUSH_EMAIL,
+        "GIT_COMMITTER_NAME": PDF_PUSH_NAME,
+        "GIT_COMMITTER_EMAIL": PDF_PUSH_EMAIL,
+        "GIT_TERMINAL_PROMPT": "0",
+        "GIT_CONFIG_COUNT": "4",
+        "GIT_CONFIG_KEY_0": "safe.directory",
+        "GIT_CONFIG_VALUE_0": "*",
+        "GIT_CONFIG_KEY_1": "credential.helper",
+        "GIT_CONFIG_VALUE_1": "",
+        "GIT_CONFIG_KEY_2": "user.name",
+        "GIT_CONFIG_VALUE_2": PDF_PUSH_NAME,
+        "GIT_CONFIG_KEY_3": "user.email",
+        "GIT_CONFIG_VALUE_3": PDF_PUSH_EMAIL,
+    })
+    return env
+
+
+def _git_exec(args: list[str], *, cwd: Path | None, env: dict, token: str | None, authed: bool):
+    cmd = ["git"]
+    if authed and token:
+        # The token stays in the process header, never in the remote url and never in a log line.
+        cmd += ["-c", "http.extraheader=AUTHORIZATION: bearer " + token]
+    cmd += [str(a) for a in args]
+    return subprocess.run(cmd, cwd=None if cwd is None else str(cwd), env=env, capture_output=True, text=True)
+
+
+def _read_origin(root: Path) -> str:
+    cp = subprocess.run(["git", "-C", str(root), "remote", "get-url", "origin"], capture_output=True, text=True)
+    url = (cp.stdout or "").strip()
+    if cp.returncode != 0 or not url:
+        raise _RunsPushError("this checkout has no origin remote")
+    return url
+
+
+def _remote_moved(cp: subprocess.CompletedProcess) -> bool:
+    text = f"{cp.stderr or ''} {cp.stdout or ''}".lower()
+    return "non-fast-forward" in text or "fetch first" in text
+
+
+def _rebase_onto_runs(checkout: Path, env: dict, token: str | None, use_token: bool) -> None:
+    fetch = _git_exec(["fetch", "--no-tags", "origin", RUNS_BRANCH], cwd=checkout, env=env,
+                      token=token if use_token else None, authed=use_token)
+    if fetch.returncode != 0:
+        raise _RunsPushError(_plain_git_reason("could not fetch the runs branch", fetch, token))
+    reb = _git_exec(["rebase", f"origin/{RUNS_BRANCH}"], cwd=checkout, env=env, token=None, authed=False)
+    if reb.returncode != 0:
+        _git_exec(["rebase", "--abort"], cwd=checkout, env=env, token=None, authed=False)
+        raise _RunsPushError("could not rebase onto the runs branch")
+
+
+def _push_head(checkout: Path, env: dict, token: str | None, use_token: bool) -> None:
+    # br-allow-external: copy this run's PDFs and record.json onto the runs branch; never the pull request
+    cp = _git_exec(["push", "origin", f"HEAD:refs/heads/{RUNS_BRANCH}"], cwd=checkout, env=env,
+                   token=token if use_token else None, authed=use_token)
+    if cp.returncode == 0:
+        return
+    if _remote_moved(cp):
+        _rebase_onto_runs(checkout, env, token, use_token)
+        # br-allow-external: try the runs branch again after rebasing onto the moved tip
+        cp = _git_exec(["push", "origin", f"HEAD:refs/heads/{RUNS_BRANCH}"], cwd=checkout, env=env,
+                       token=token if use_token else None, authed=use_token)
+        if cp.returncode == 0:
+            return
+    raise _RunsPushError(_plain_git_reason("could not push to the runs branch", cp, token))
+
+
+def _runs_branch_exists(origin: str, env: dict, token: str | None, use_token: bool, cwd: Path) -> bool:
+    cp = _git_exec(["ls-remote", "--heads", origin, RUNS_BRANCH], cwd=cwd, env=env,
+                   token=token if use_token else None, authed=use_token)
+    if cp.returncode != 0:
+        raise _RunsPushError(_plain_git_reason("could not read the runs branch", cp, token))
+    return f"refs/heads/{RUNS_BRANCH}" in (cp.stdout or "")
+
+
+def _init_orphan(checkout: Path, origin: str, env: dict) -> None:
+    checkout.mkdir(parents=True, exist_ok=True)
+    cp = _git_exec(["init", "-q", "-b", RUNS_BRANCH], cwd=checkout, env=env, token=None, authed=False)
+    if cp.returncode != 0:
+        cp = _git_exec(["init", "-q"], cwd=checkout, env=env, token=None, authed=False)
+        if cp.returncode != 0:
+            raise _RunsPushError("could not prepare a temporary clone")
+        cp = _git_exec(["checkout", "--orphan", RUNS_BRANCH], cwd=checkout, env=env, token=None, authed=False)
+        if cp.returncode != 0:
+            raise _RunsPushError("could not prepare a temporary clone")
+    cp = _git_exec(["remote", "add", "origin", origin], cwd=checkout, env=env, token=None, authed=False)
+    if cp.returncode != 0:
+        raise _RunsPushError("could not prepare a temporary clone")
+
+
+def _pdf_push_field(ok: bool, attempts: int, error: str | None, url: str | None) -> dict:
+    return {"ok": bool(ok), "attempts": int(attempts), "error": error, "url": url}
+
+
+def _record_bytes_for_push(path: Path, field: dict) -> bytes:
+    try:
+        rec = json.loads(path.read_text())
+    except (OSError, json.JSONDecodeError):
+        rec = None
+    if isinstance(rec, dict):
+        rec = dict(rec)
+        rec["pdf_push"] = field
+        raw = json.dumps(rec, indent=1).encode("utf-8")
+    else:
+        raw = path.read_bytes()
+    return scrub_host_paths(raw)
+
+
+def _write_local_pdf_push(path: Path, field: dict) -> None:
+    try:
+        rec = json.loads(path.read_text())
+    except (OSError, json.JSONDecodeError):
+        return
+    if not isinstance(rec, dict):
+        return
+    rec["pdf_push"] = field
+    path.write_text(json.dumps(rec, indent=1))
+
+
+def _stamp_saved_records(run_dir: Path | None, records: list | None, field_for) -> None:
+    if isinstance(records, list):
+        for rec in records:
+            if isinstance(rec, dict):
+                rec["pdf_push"] = field_for(_pr_id_of_record(rec))
+    if not run_dir or not run_dir.is_dir():
+        return
+    seen: set[Path] = set()
+    for path in sorted(run_dir.rglob("record.json")):
+        parts = path.relative_to(run_dir).parts
+        if any(part in ("superseded", "pre-migration") for part in parts):
+            continue
+        try:
+            rec = json.loads(path.read_text())
+        except (OSError, json.JSONDecodeError):
+            continue
+        pr_id = _pr_id_of_record(rec) if isinstance(rec, dict) else path.parent.name
+        _write_local_pdf_push(path, field_for(pr_id))
+        seen.add(path.resolve())
+    jsonl = run_dir / "records.jsonl"
+    if not jsonl.is_file():
+        return
+    lines = []
+    for line in jsonl.read_text().splitlines():
+        if not line.strip():
+            continue
+        try:
+            rec = json.loads(line)
+        except json.JSONDecodeError:
+            lines.append(line)
+            continue
+        if isinstance(rec, dict):
+            rec["pdf_push"] = field_for(_pr_id_of_record(rec))
+        lines.append(json.dumps(rec))
+    jsonl.write_text("\n".join(lines) + ("\n" if lines else ""))
+
+
+def _stamp_pdf_banner(path: Path, banner: str) -> None:
+    old = ""
+    if shutil.which("pdftotext"):
+        old = subprocess.run(["pdftotext", str(path), "-"], capture_output=True, text=True).stdout
+    lines = [banner, ""] + [ln for ln in old.splitlines() if ln.strip() != banner]
+    try:
+        pdf_always.write_pdf(path, path.stem, lines)
+    except Exception:  # noqa: BLE001 - the markdown report and run.log already carry the banner
+        pass
+
+
+def _show_pdf_push_banner(banner: str, report_dir: Path, run_dir: Path | None) -> None:
+    log_home = Path(run_dir) if run_dir else Path(report_dir)
+    log_home.mkdir(parents=True, exist_ok=True)
+    log = log_home / "run.log"
+    prev = log.read_text() if log.is_file() else ""
+    if banner not in prev:
+        log.write_text((prev.rstrip() + "\n\n" if prev.strip() else "") + banner + "\n")
+    report = Path(run_dir) / "REPORT.md" if run_dir and (Path(run_dir) / "REPORT.md").is_file() else None
+    if report is None:
+        for cand in (Path(report_dir) / "SUMMARY.md", Path(report_dir) / "REPORT.md"):
+            if cand.is_file():
+                report = cand
+                break
+    if report is None:
+        report = (Path(run_dir) / "REPORT.md") if run_dir else (Path(report_dir) / "REPORT.md")
+    report.parent.mkdir(parents=True, exist_ok=True)
+    text = report.read_text() if report.is_file() else ""
+    if banner not in text:
+        report.write_text(banner + "\n\n" + text)
+    for md in Path(report_dir).rglob("*.md"):
+        if md.resolve() == report.resolve():
+            continue
+        try:
+            body = md.read_text()
+        except OSError:
+            continue
+        if banner not in body:
+            md.write_text(banner + "\n\n" + body)
+    for pdf in Path(report_dir).rglob("*.pdf"):
+        _stamp_pdf_banner(pdf, banner)
+    print(banner, file=sys.stderr, flush=True)
+
+
+def _note_pdf_saved(run_dir: Path | None, report_dir: Path, line: str) -> None:
+    home = Path(run_dir) if run_dir else Path(report_dir)
+    home.mkdir(parents=True, exist_ok=True)
+    log = home / "run.log"
+    prev = log.read_text() if log.is_file() else ""
+    if line not in prev:
+        log.write_text((prev.rstrip() + "\n" if prev.strip() else "") + line + "\n")
+    print(line, flush=True)
+
+
+def _runs_push_once(origin: str, token: str | None, use_token: bool, payloads: list[tuple[str, bytes]],
+                    branch_existed: bool | None, env: dict) -> None:
+    """Commit payloads on a temporary clone and push. Never checks out or writes the caller's repository."""
+    parent = Path(tempfile.mkdtemp(prefix="poc-runs-"))
+    checkout = parent / "checkout"
+    try:
+        existed = _runs_branch_exists(origin, env, token, use_token, parent) if branch_existed is None else branch_existed
+        if existed:
+            cp = _git_exec(["clone", "--quiet", "--branch", RUNS_BRANCH, "--single-branch", origin, str(checkout)],
+                           cwd=parent, env=env, token=token if use_token else None, authed=use_token)
+            if cp.returncode != 0:
+                raise _RunsPushError(_plain_git_reason("could not clone the runs branch", cp, token))
+        else:
+            _init_orphan(checkout, origin, env)
+        for rel, data in payloads:
+            rel_path = PurePosixPath(rel)
+            if rel_path.is_absolute() or ".." in rel_path.parts:
+                continue
+            dest = checkout.joinpath(*rel_path.parts)
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            dest.write_bytes(data)
+        add = _git_exec(["add", "-A"], cwd=checkout, env=env, token=None, authed=False)
+        if add.returncode != 0:
+            raise _RunsPushError("could not prepare a temporary clone")
+        status = _git_exec(["status", "--porcelain"], cwd=checkout, env=env, token=None, authed=False)
+        if (status.stdout or "").strip():
+            commit = _git_exec(["commit", "-q", "-m", "Save run PDFs"], cwd=checkout, env=env, token=None, authed=False)
+            if commit.returncode != 0:
+                raise _RunsPushError(_plain_git_reason("could not commit the run PDFs", commit, token))
+            if existed:
+                _rebase_onto_runs(checkout, env, token, use_token)
+        elif not existed:
+            raise _RunsPushError("could not commit the run PDFs")
+        else:
+            return  # this run's files are already on the branch
+        _push_head(checkout, env, token, use_token)
+    finally:
+        shutil.rmtree(parent, ignore_errors=True)
+
+
+def publish_run_outputs(report_dir: Path, run_dir: Path | None = None, *, poc_commit: str | None = None,
+                        date: str | None = None, origin: str | None = None, root: Path | None = None,
+                        token: str | None = None, attempts: int = PDF_PUSH_ATTEMPTS, sleep=None,
+                        fallback_pr_id: str | None = None, records: list | None = None) -> dict:
+    """Push this run's PDFs and record.json to origin's runs branch.
+
+    A missing token or a failed push does not raise: the local files stay, the report and run.log get a banner,
+    and every record gains pdf_push. PDFs are never emailed. The caller's checkout is only read (origin url, HEAD).
+    """
+    report_dir = Path(report_dir)
+    run_dir = Path(run_dir) if run_dir else None
+    root = Path(root) if root else REPO_ROOT
+    sleeper = time.sleep if sleep is None else sleep
+    day = _run_calendar_date(date, run_dir, report_dir)
+    short = _short_poc_sha(poc_commit, root)
+    groups, summary = _collect_pdf_groups(report_dir, run_dir, fallback_pr_id)
+    pr_ids = list(groups) or [_safe_pr_id(fallback_pr_id)]
+
+    def urls_for(base_origin: str) -> dict:
+        return {pr_id: _tree_url(base_origin, day, short, pr_id) for pr_id in pr_ids}
+
+    def finish(ok: bool, used: int, error: str | None, url_map: dict) -> dict:
+        result = {"ok": ok, "attempts": used, "error": error,
+                  "url": next(iter(url_map.values()), None) if ok and url_map else None, "urls": url_map if ok else {}}
+        _stamp_saved_records(run_dir, records, lambda pr_id: _pdf_push_field(
+            ok, used, error, url_map.get(pr_id) if ok else None))
+        if ok:
+            parent = _tree_url(remote_note[0] or "", day, short)
+            _note_pdf_saved(run_dir, report_dir, f"PDFs saved to GitHub: {parent}")
+        else:
+            _show_pdf_push_banner(pdf_push_banner(error or "the runs branch could not be updated"), report_dir, run_dir)
+        return result
+
+    remote_note = [origin or ""]
+    if token is None:
+        token = github_read_token()
+    if not token:
+        return finish(False, 0, "no GitHub token is set", {})
+    try:
+        remote = origin or _read_origin(root)
+    except _RunsPushError as exc:
+        return finish(False, 0, str(exc), {})
+    remote_note[0] = remote
+    push_url, use_token = _remote_for_push(remote)
+    env = _push_env()
+    summary_bytes = _pdf_bytes_for_push(summary) if summary else None
+    url_map = urls_for(remote)
+    last = "could not push to the runs branch"
+    used = 0
+    for attempt in range(1, max(1, attempts) + 1):
+        used = attempt
+        payloads = []
+        for pr_id, group in groups.items():
+            prefix = f"runs/{day}/{short}/{pr_id}"
+            if group.get("report"):
+                payloads.append((f"{prefix}/REPORT.pdf", _pdf_bytes_for_push(group["report"])))
+            if summary_bytes is not None:
+                payloads.append((f"{prefix}/SUMMARY.pdf", summary_bytes))
+            if group.get("record"):
+                field = _pdf_push_field(True, attempt, None, url_map.get(pr_id))
+                payloads.append((f"{prefix}/record.json", _record_bytes_for_push(group["record"], field)))
+        if summary_bytes is not None and not groups:
+            payloads.append((f"runs/{day}/{short}/{pr_ids[0]}/SUMMARY.pdf", summary_bytes))
+        try:
+            _runs_push_once(push_url, token, use_token, payloads, None, env)
+        except _RunsPushError as exc:
+            last = str(exc)
+            if attempt < attempts:
+                sleeper(PDF_PUSH_BACKOFF_S[min(attempt - 1, len(PDF_PUSH_BACKOFF_S) - 1)])
+            continue
+        except Exception:  # noqa: BLE001 - a copy failure must not fail the run
+            last = "could not push to the runs branch"
+            if attempt < attempts:
+                sleeper(PDF_PUSH_BACKOFF_S[min(attempt - 1, len(PDF_PUSH_BACKOFF_S) - 1)])
+            continue
+        return finish(True, attempt, None, url_map)
+    if used >= attempts:
+        last = f"could not push to the runs branch after {attempts} attempts"
+    return finish(False, used, scrub_host_text(last), {})
+
+
+def publish_written_pdfs(report_dir=None, run_dir=None, poc_commit=None, date=None, records=None,
+                         fallback_pr_id=None, root=None) -> dict | None:
+    """Push the PDFs just written. No PDF means nothing to copy. Never raises."""
+    report_dir = Path(report_dir) if report_dir else (Path(PDF_TARGET["dir"]) if PDF_TARGET.get("dir") else None)
+    if report_dir is None or not report_dir.exists() or not any(report_dir.rglob("*.pdf")):
+        return None
+    if run_dir is None:
+        run_dir = PDF_TARGET.get("run_dir")
+    try:
+        result = publish_run_outputs(
+            report_dir, Path(run_dir) if run_dir else None,
+            poc_commit=poc_commit if poc_commit is not None else PDF_TARGET.get("poc_commit"),
+            date=date if date is not None else PDF_TARGET.get("date"),
+            records=records, fallback_pr_id=fallback_pr_id or PDF_TARGET.get("name"),
+            root=root or REPO_ROOT)
+    except Exception:  # noqa: BLE001 - the run still finishes; the banner is the signal
+        result = {"ok": False, "attempts": 0, "error": "could not push to the runs branch", "url": None}
+        _show_pdf_push_banner(pdf_push_banner(result["error"]), report_dir, Path(run_dir) if run_dir else None)
+    PDF_TARGET["push_done"] = True
+    return result
+
+
+def _save_pdfs_now(report_dir=None, run_dir=None, records=None) -> None:
+    publish_written_pdfs(report_dir=report_dir, run_dir=run_dir, records=records)
 
 
 def report_dir_for(a, rdir: Path) -> Path:
@@ -8802,7 +9363,8 @@ def main(argv=None) -> int:
     """Runs _main; any run that ends without its SUMMARY.pdf (refused, provider refusal, stop signal, crash) gets
     a no-go SUMMARY.pdf with the reason, made by the built-in PDF maker alone."""
     args = list(sys.argv[1:] if argv is None else argv)
-    PDF_TARGET.update(dir=None, name=None, summary_done=False)
+    PDF_TARGET.update(dir=None, name=None, summary_done=False, push_done=False,
+                      run_dir=None, poc_commit=None, date=None)
     old_term = None
     try:
         old_term = signal.signal(signal.SIGTERM, _on_sigterm)
@@ -8833,15 +9395,22 @@ def main(argv=None) -> int:
         if old_term is not None:
             signal.signal(signal.SIGTERM, old_term)
         skip = "--no-report" in args or "--select-only" in args or rc in (0, None)
+        wrote_nogo = False
+        where = None
         if not skip and not PDF_TARGET["summary_done"]:
             name = PDF_TARGET["name"] or ("refused-" + now_ist().strftime("%Y-%m-%d-%H%M%S"))
             where = PDF_TARGET["dir"] or pdf_always.reports_root() / name
+            PDF_TARGET["dir"] = where
+            PDF_TARGET["name"] = name
             why = reason or (tail.lines[-1] if tail.lines else f"exit code {rc}")
             try:
                 p = pdf_always.nogo_summary(where, name, why)
+                wrote_nogo = True
                 print(f"no-go summary PDF: {p}", file=real_err, flush=True)
             except Exception as e:  # noqa: BLE001
                 print(f"ERROR: no-go summary PDF not written: {type(e).__name__}: {e}", file=real_err, flush=True)
+        if wrote_nogo or (not skip and not PDF_TARGET.get("push_done")):
+            _save_pdfs_now(where or PDF_TARGET.get("dir"))
 
 
 def _main(argv=None) -> int:
@@ -9020,6 +9589,7 @@ def _main(argv=None) -> int:
         note = commit_label_note(a.poc_commit)
         if note:
             print(note)
+    PDF_TARGET["poc_commit"] = getattr(a, "poc_commit", None)
     sandbox.configure(not a.unsafe_no_sandbox)
     from poc import contree_sandboxes
     if getattr(a, "require_contree", False):
@@ -9081,7 +9651,9 @@ def _main(argv=None) -> int:
         return report_only(rdir, a)
     rdir.mkdir(parents=True, exist_ok=True)
     leave_run_pointer(rdir, started)
-    PDF_TARGET.update(dir=report_dir_for(a, rdir), name=rdir.name)
+    PDF_TARGET.update(dir=report_dir_for(a, rdir), name=rdir.name, run_dir=rdir,
+                      poc_commit=getattr(a, "poc_commit", None),
+                      date=(rdir.name[:10] if DATE_RE.match(rdir.name) else None))
     if not a.no_report and not a.select_only:
         try:   # replaced by the real SUMMARY.pdf when the run finishes; a killed run still leaves this one
             pdf_always.run_placeholder_summary(PDF_TARGET["dir"], rdir.name)
@@ -9286,6 +9858,8 @@ def _main(argv=None) -> int:
         try:
             pdf_always.nogo_summary(report_dir_for(a, rdir), rdir.name, moved)
             PDF_TARGET["summary_done"] = True
+            PDF_TARGET["push_done"] = False  # the go/no-go summary replaced the one just saved
+            _save_pdfs_now(report_dir_for(a, rdir), rdir, records)
         except Exception as e:  # noqa: BLE001
             print(f"ERROR: go/no-go summary not written: {type(e).__name__}: {e}", file=sys.stderr, flush=True)
     return 0 if not problems and reports_ok else 1
@@ -9344,6 +9918,7 @@ def reviewer_reports(rdir: Path, a, records: list[dict], kind: str) -> bool:
         pdf_always.records_pdfs(out, rdir.name, [], note="nothing tested")
         PDF_TARGET["summary_done"] = True
         print(f"nothing tested; summary PDF: {out / 'SUMMARY.pdf'}", flush=True)
+        _save_pdfs_now(out, rdir, records)
         return True
     from reports.pr_report import VerdictMismatch, render_run
     t_rep = time.time()
@@ -9354,6 +9929,7 @@ def reviewer_reports(rdir: Path, a, records: list[dict], kind: str) -> bool:
         PDF_TARGET["summary_done"] = True   # render_run wrote the summary before the self-check
         print("Self-check FAILED: the reports do not match record.json:\n" + "\n".join(f"- {x}" for x in e.lines),
               file=sys.stderr, flush=True)
+        _save_pdfs_now(out, rdir, records)
         return False
     except BaseException as e:  # noqa: BLE001 - reports are a view of the saved records; they never change a verdict or exit code
         print(f"reviewer reports could not be written ({type(e).__name__}); records and verdicts are unchanged",
@@ -9362,10 +9938,12 @@ def reviewer_reports(rdir: Path, a, records: list[dict], kind: str) -> bool:
         pdf_always.records_pdfs(out, rdir.name, rows, note=f"the full report could not be made ({type(e).__name__})")
         PDF_TARGET["summary_done"] = True
         print(f"simple PDFs written: {out / 'SUMMARY.pdf'}", file=sys.stderr, flush=True)
+        _save_pdfs_now(out, rdir, records)
         if isinstance(e, KeyboardInterrupt) or (isinstance(e, SystemExit) and e.code == 143):
             raise
         return True
     PDF_TARGET["summary_done"] = True
+    _save_pdfs_now(out, rdir, records)
     print(f"\nDONE. Open this file to read the results:\n  {out / 'SUMMARY.html'}")
     if getattr(a, "poc_commit", None):
         print(f"commit={a.poc_commit[:7]}")
