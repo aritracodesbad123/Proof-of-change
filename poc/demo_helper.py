@@ -909,12 +909,14 @@ def declared_packages(checkout, self_dist: str = "", skip_files=()) -> list[dict
             for req in re.findall(r"""['\"]([^'\"]+)['\"]""", blob):
                 _add_pkg(found, seen, req, kind="test-extra", action="install", source="setup.py",
                          reason=f"listed in the {extra} extra", self_dist=self_dist)
-    for path in _requirement_files(root):
-        if path.resolve() in skip:
-            continue
+    files, tox_lines = _requirement_sources(root, skip)
+    for path in files:
         for req in _req_lines(_read(path)):
             _add_pkg(found, seen, req, kind="requirements", action="install", source=path.name,
                      reason=f"listed in {path.name}", self_dist=self_dist)
+    for req in _req_lines("\n".join(tox_lines)):
+        _add_pkg(found, seen, req, kind="requirements", action="install", source="tox.ini",
+                 reason="listed in tox.ini deps", self_dist=self_dist)
     return found
 
 
@@ -965,8 +967,10 @@ def declared_requirement_lines(checkout) -> list[str]:
     extras_blob = _section(setup_py, "extras_require")
     for match in re.finditer(r"""['\"][^'\"]+['\"]\s*:\s*\[([^\]]*)\]""", extras_blob):
         _collect_reqs(found, seen, re.findall(r"""['\"]([^'\"]+)['\"]""", match.group(1)))
-    for path in _requirement_files(root):
+    files, tox_lines = _requirement_sources(root)
+    for path in files:
         _collect_reqs(found, seen, _req_lines(_read(path)))
+    _collect_reqs(found, seen, _req_lines("\n".join(tox_lines)))
     return found
 
 
@@ -1033,6 +1037,42 @@ def _section(text: str, name: str) -> str:
     return match.group(1) if match else ""
 
 
+def _requirement_filename(name: str) -> bool:
+    """True when this requirements file is a test-dependency source on its own.
+
+    Plain ``requirements.txt`` is kept, as it was before. Any other ``*requirements*.txt`` counts only
+    when the name contains ``test`` or ``dev`` in any case (``dev-requirements.txt``,
+    ``requirements-test.txt``, ``test_requirements.txt``). ``docs-requirements.txt`` and
+    ``requirements-lint.txt`` do not. A file that fails this check is still read when a followed
+    requirements file or tox ``deps`` includes it with ``-r`` or ``--requirement``.
+    """
+    if not str(name).endswith(".txt"):
+        return False
+    if name == "requirements.txt":
+        return True
+    low = name.lower()
+    if "requirements" not in low or name in APT_FILES:
+        return False
+    return "test" in low or "dev" in low
+
+
+def _top_requirement_files(root: Path) -> list[Path]:
+    """Top-level requirement files that are test-dependency sources on their own."""
+    root = Path(root)
+    if not root.is_dir():
+        return []
+    return sorted(path for path in root.glob("*requirements*.txt")
+                  if path.is_file() and _requirement_filename(path.name))
+
+
+def _requirements_star_files(root: Path) -> list[Path]:
+    """Top-level ``requirements*.txt`` files, the set the aggregate and lint checks have always used."""
+    root = Path(root)
+    if not root.is_dir():
+        return []
+    return sorted(path for path in root.glob("requirements*.txt") if path.is_file())
+
+
 def _requirement_files(root: Path) -> list[Path]:
     out = []
     if not root.is_dir():
@@ -1043,9 +1083,115 @@ def _requirement_files(root: Path) -> list[Path]:
         if len(rel.parts) > 2:
             continue
         for name in sorted(filenames):
-            if name.startswith("requirements") and name.endswith(".txt"):
+            if _requirement_filename(name):
                 out.append(Path(dirpath) / name)
     return out
+
+
+# ``-r`` / ``--requirement`` only. A constraint (``-c``) is not a package to install.
+_REQ_INCLUDE = re.compile(r"^(?:-r|--requirement)(?:\s+|=)?(\S+)\s*$")
+
+
+def _include_path(base: Path, raw: str, root: Path) -> Path | None:
+    """The file a ``-r`` / ``--requirement`` line names, inside the project, or None.
+
+    ``{toxinidir}`` is the project root. Other substitutions are not invented. A ``..`` part, an
+    absolute path, a URL, or a path that resolves outside the project (symlinks included) is skipped.
+    """
+    target = raw.strip().strip("\"'")
+    from_root = "{toxinidir}" in target
+    target = target.replace("{toxinidir}", ".")
+    if "{" in target or "}" in target:
+        return None
+    posix = target.replace("\\", "/")
+    if ".." in PurePosixPath(posix).parts or posix.startswith(("/", "~")) or "://" in target:
+        return None
+    full = ((root if from_root else base) / target).resolve()
+    try:
+        full.relative_to(Path(root).resolve())
+    except (OSError, ValueError):
+        return None
+    return full if full.is_file() else None
+
+
+def _tox_dep_lines(root: Path) -> list[str]:
+    """Lines of every ``deps`` setting under ``[testenv]`` and ``[testenv:...]`` in tox.ini."""
+    path = Path(root) / "tox.ini"
+    if not path.is_file():
+        return []
+    import configparser
+    parser = configparser.ConfigParser(interpolation=None)
+    try:
+        parser.read_string(_read(path))
+    except (configparser.Error, OSError):
+        return []
+    lines = []
+    for section in parser.sections():
+        if section != "testenv" and not section.startswith("testenv:"):
+            continue
+        if not parser.has_option(section, "deps"):
+            continue
+        for raw in parser.get(section, "deps").splitlines():
+            line = raw.split("#", 1)[0].strip()
+            if line:
+                lines.append(line)
+    return lines
+
+
+def _follow_requirement_includes(root: Path, seeds: list[Path], extra_lines: list[str] | None = None,
+                                 skip: set | None = None) -> tuple[list[Path], list[str]]:
+    """Requirement files plus files they include with ``-r`` / ``--requirement``, and direct tox lines.
+
+    Includes are followed from the seed files and from the extra lines (tox ``deps``). A cycle stops.
+    A skipped file is not read and its includes are not followed. Direct lines are the extra lines
+    that are not includes.
+    """
+    root = Path(root)
+    skip = skip or set()
+    seen: set[Path] = set()
+    files: list[Path] = []
+    direct: list[str] = []
+
+    def add(path: Path) -> None:
+        try:
+            key = path.resolve()
+        except OSError:
+            return
+        if key in seen or key in skip:
+            return
+        seen.add(key)
+        files.append(path)
+        for line in _requirement_lines(_read(path)):
+            match = _REQ_INCLUDE.match(line)
+            if not match:
+                continue
+            nxt = _include_path(path.parent, match.group(1), root)
+            if nxt is not None:
+                add(nxt)
+
+    for path in seeds:
+        add(path)
+    for line in extra_lines or []:
+        match = _REQ_INCLUDE.match(line)
+        if match:
+            nxt = _include_path(root, match.group(1), root)
+            if nxt is not None:
+                add(nxt)
+            continue
+        direct.append(line)
+    return files, direct
+
+
+def _requirement_sources(root: Path, skip=()) -> tuple[list[Path], list[str]]:
+    """Pip requirement files (including ``-r`` includes) and tox ``deps`` lines that are not includes."""
+    root = Path(root)
+    skipped = set()
+    for item in skip or ():
+        try:
+            skipped.add(Path(item).resolve())
+        except OSError:
+            continue
+    return _follow_requirement_includes(root, _requirement_files(root), _tox_dep_lines(root), skipped)
 
 
 # ---------------------------------------------------------------- component apps (product checks only)
@@ -1088,7 +1234,7 @@ def aggregate_requirement_files(root, components: dict[str, list[str]]) -> list[
     root = Path(root)
     if len(components) < 3:
         return []
-    candidates = sorted(root.glob("requirements*.txt")) if root.is_dir() else []
+    candidates = _requirements_star_files(root)
     if len([p for p in candidates if p.is_file()]) < 2:
         return []
     owner: dict[str, set] = {}
@@ -1155,7 +1301,7 @@ def lint_only_requirement_files(root, ignore=()) -> list[Path]:
     hooks = re.sub(r"[-_.]+", "-", _read(config).lower())
     skip = {Path(p).name for p in ignore}
     out = []
-    for path in sorted(root.glob("requirements*.txt")):
+    for path in _requirements_star_files(root):
         if path.name in skip or not path.is_file():
             continue
         raw = list(_requirement_lines(_read(path)))
@@ -2274,7 +2420,8 @@ def deps_only_plan(checkout, exclude=()) -> dict | None:
     """How to install only what the project declares, without building the project itself.
 
     uv.lock (with pyproject): ``uv sync --no-install-project --frozen``. pyproject with [project]
-    dependencies: ``uv sync --no-install-project``. Otherwise requirements*.txt files. None when the
+    dependencies: ``uv sync --no-install-project``. Otherwise ``requirements.txt`` and requirement files whose
+    names contain ``test`` or ``dev``. None when the
     project declares nothing usable. ``exclude``: requirements file names never to install (a product check on a
     component app passes its aggregate files).
     """
@@ -2285,7 +2432,7 @@ def deps_only_plan(checkout, exclude=()) -> dict | None:
         frozen = (root / "uv.lock").is_file()
         return {"kind": "uv-sync", "frozen": frozen,
                 "source": "uv.lock" if frozen else "pyproject.toml"}
-    reqs = sorted(p.name for p in root.glob("requirements*.txt") if p.is_file() and p.name not in skip)
+    reqs = sorted(p.name for p in _top_requirement_files(root) if p.name not in skip)
     if reqs:
         return {"kind": "requirements", "files": reqs, "source": ", ".join(reqs)}
     return None

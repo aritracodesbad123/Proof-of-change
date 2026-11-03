@@ -29,6 +29,7 @@ code (poc/diff.py, poc/verdict.py).
 from __future__ import annotations
 
 import argparse
+import ast
 import copy
 import csv
 import datetime as dt
@@ -288,6 +289,188 @@ def classify_files(files: list[str], pkg: str) -> dict:
     build_cfg = [f for f in files if os.path.basename(f) in COMPILED_NAMES and "/" not in f.strip("/")]
     return {"all": files, "package_py": py, "compiled": compiled + build_cfg,
             "other": [f for f in files if f not in py and f not in compiled and f not in build_cfg]}
+
+
+_PKG_SKIP = {"tests", "docs"}
+_PKG_IDENT = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
+
+
+def _pkg_lines(text: str) -> list[str]:
+    return [line.strip() for line in (text or "").splitlines() if line.strip() and not line.strip().startswith("#")]
+
+
+def _as_str_list(value) -> list[str]:
+    if isinstance(value, str):
+        return [value] if value.strip() else []
+    if isinstance(value, list):
+        return [str(item) for item in value if isinstance(item, str) and str(item).strip()]
+    return []
+
+
+def _top_package_names(names: list[str]) -> list[str]:
+    """First component of each dotted package name, in order, identifiers only."""
+    out = []
+    for name in names:
+        top = str(name).split(".", 1)[0].strip()
+        if _PKG_IDENT.fullmatch(top) and top not in out and top not in _PKG_SKIP:
+            out.append(top)
+    return out
+
+
+def _dirs_with_init(root: Path) -> list[str]:
+    """Directory names directly inside ``root`` that are packages (they contain ``__init__.py``)."""
+    if not root.is_dir():
+        return []
+    found = []
+    try:
+        children = sorted(root.iterdir(), key=lambda path: path.name)
+    except OSError:
+        return []
+    for child in children:
+        if not child.is_dir() or child.name.startswith(".") or child.name in _PKG_SKIP:
+            continue
+        if child.name in {".git", ".venv", "venv", "node_modules", "__pycache__"}:
+            continue
+        if (child / "__init__.py").is_file() and child.name not in found:
+            found.append(child.name)
+    return found
+
+
+def _inside(root: Path, path: Path) -> bool:
+    try:
+        path.resolve().relative_to(root.resolve())
+    except (OSError, ValueError):
+        return False
+    return True
+
+
+def _packaging_hints(root: Path) -> tuple[list[str], list[str]]:
+    """Package names and search roots declared in setup.cfg or pyproject. Nothing is executed."""
+    names: list[str] = []
+    roots: list[str] = []
+    cfg = root / "setup.cfg"
+    if cfg.is_file():
+        import configparser
+        parser = configparser.ConfigParser(interpolation=None)
+        try:
+            parser.read_string(cfg.read_text(errors="replace"))
+        except (configparser.Error, OSError):
+            parser = None
+        if parser is not None and parser.has_option("options", "packages"):
+            for line in _pkg_lines(parser.get("options", "packages")):
+                if line not in {"find:", "find_namespace:"}:
+                    names.append(line)
+        if parser is not None and parser.has_option("options", "package_dir"):
+            for line in _pkg_lines(parser.get("options", "package_dir")):
+                if "=" not in line:
+                    continue
+                key, val = [part.strip() for part in line.split("=", 1)]
+                if key:
+                    names.append(key)
+                elif val:
+                    roots.append(val)
+        if parser is not None and parser.has_option("options.packages.find", "where"):
+            roots.extend(_pkg_lines(parser.get("options.packages.find", "where")))
+    pp = root / "pyproject.toml"
+    if pp.is_file():
+        import tomllib
+        try:
+            data = tomllib.loads(pp.read_text(errors="replace"))
+        except (tomllib.TOMLDecodeError, OSError):
+            data = {}
+        tool = data.get("tool") if isinstance(data.get("tool"), dict) else {}
+        setuptools = tool.get("setuptools") if isinstance(tool.get("setuptools"), dict) else {}
+        packages = setuptools.get("packages")
+        if isinstance(packages, list):
+            names.extend(_as_str_list(packages))
+        elif isinstance(packages, dict):
+            found = packages.get("find") if isinstance(packages.get("find"), dict) else {}
+            roots.extend(_as_str_list(found.get("where")))
+        package_dir = setuptools.get("package-dir")
+        if isinstance(package_dir, dict):
+            for key, val in package_dir.items():
+                if str(key).strip():
+                    names.append(str(key))
+                elif isinstance(val, str) and val.strip():
+                    roots.append(val.strip())
+        poetry = tool.get("poetry") if isinstance(tool.get("poetry"), dict) else {}
+        for item in poetry.get("packages") or []:
+            if isinstance(item, dict) and isinstance(item.get("include"), str):
+                names.append(item["include"])
+            elif isinstance(item, str):
+                names.append(item)
+        hatch = tool.get("hatch") if isinstance(tool.get("hatch"), dict) else {}
+        targets = ((hatch.get("build") or {}) if isinstance(hatch.get("build"), dict) else {}).get("targets")
+        if isinstance(targets, dict):
+            for target in targets.values():
+                if isinstance(target, dict):
+                    for item in _as_str_list(target.get("packages")):
+                        names.append(PurePosixPath(item).name.removesuffix(".py"))
+    return names, roots
+
+
+def package_from_checkout(checkout: Path) -> str | None:
+    """The import package named by the checkout, or None when it does not name exactly one.
+
+    setup.cfg and pyproject are read for ``packages`` and ``package-dir`` (a single top-level name wins).
+    Otherwise the one top-level directory, or child of ``src/``, that contains ``__init__.py`` and is not
+    ``tests`` or ``docs``. Two such directories is not a guess.
+    """
+    root = Path(checkout)
+    if not root.is_dir():
+        return None
+    names, search = _packaging_hints(root)
+    tops = _top_package_names(names)
+    if len(tops) == 1:
+        return tops[0]
+    bases: list[Path] = []
+    for rel in search:
+        text = str(rel).strip().replace("\\", "/")
+        if not text or ".." in PurePosixPath(text).parts or text.startswith(("/", "~")):
+            continue
+        path = (root / text).resolve()
+        if path.is_dir() and _inside(root, path) and path not in bases:
+            bases.append(path)
+    found: list[str] = []
+    if bases:
+        for base in bases:
+            for name in _dirs_with_init(base):
+                if name not in found:
+                    found.append(name)
+    else:
+        found = _dirs_with_init(root)
+        src_children = _dirs_with_init(root / "src")
+        if src_children:
+            found = [name for name in found if name != "src"]
+            for name in src_children:
+                if name not in found:
+                    found.append(name)
+    if len(found) == 1:
+        return found[0]
+    return None
+
+
+def use_checkout_package(repo: str, cfg: dict, checkout: Path, item: dict | None = None,
+                         rec: dict | None = None) -> str:
+    """Set ``cfg['pkg']`` from the checkout when this repo is not one of the built-in libraries.
+
+    The changed-file split is redone so a package directory that is not the library's name still counts.
+    A built-in library keeps its configured name. When the checkout does not show one package, the
+    previous name is kept.
+    """
+    current = str(cfg.get("pkg") or "")
+    if repo in LIBS:
+        return current
+    found = package_from_checkout(Path(checkout))
+    if not found or found == current:
+        return current
+    cfg["pkg"] = found
+    files = item.get("files") if isinstance(item, dict) else None
+    if isinstance(files, dict) and isinstance(files.get("all"), list):
+        item["files"] = classify_files(list(files["all"]), found)
+        if isinstance(rec, dict):
+            rec["files"] = dict(item["files"])
+    return found
 
 
 def _is_typing_file(path: str) -> bool:
@@ -784,11 +967,84 @@ def _name_matches(name: str, patterns: list[str]) -> bool:
     return any(fnmatch.fnmatchcase(name, pat) for pat in patterns)
 
 
-def _is_mapped_test(path: str, patterns: list[str]) -> bool:
+# xunit hooks are not tests. A spec-style class (its name ends with "_") still needs a real method.
+_NOT_TEST_METHODS = {
+    "setup_module", "setup_function", "setup_class", "setup_method",
+    "teardown_module", "teardown_function", "teardown_class", "teardown_method",
+}
+
+
+def _base_name(expr) -> str:
+    if isinstance(expr, ast.Name):
+        return expr.id
+    if isinstance(expr, ast.Attribute):
+        return expr.attr
+    return ""
+
+
+def _class_has_method(node: ast.ClassDef) -> bool:
+    for child in node.body:
+        if isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            if child.name.startswith("test"):
+                return True
+            if not child.name.startswith("_") and child.name not in _NOT_TEST_METHODS:
+                return True
+        elif isinstance(child, ast.ClassDef) and _class_has_method(child):
+            return True
+    return False
+
+
+def _class_is_test_class(node: ast.ClassDef) -> bool:
+    """A class pytest collects: named ``Test*``, a ``TestCase``, or a spec class whose name ends with ``_``."""
+    if node.name.startswith("Test"):
+        return True
+    for base in node.bases:
+        name = _base_name(base)
+        if name == "TestCase" or name.startswith("Test"):
+            return True
+    if node.name.startswith("_") or not node.name.endswith("_"):
+        return False
+    return _class_has_method(node)
+
+
+def _source_has_tests(text: str) -> bool:
+    """True when the source contains a test function (``test*``) or a test class. Parsed, never executed."""
+    try:
+        tree = ast.parse(text)
+    except SyntaxError:
+        return False
+    for node in tree.body:
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) and node.name.startswith("test"):
+            return True
+        if isinstance(node, ast.ClassDef) and (_class_is_test_class(node) or _nested_test(node)):
+            return True
+    return False
+
+
+def _nested_test(node: ast.ClassDef) -> bool:
+    for child in node.body:
+        if isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef)) and child.name.startswith("test"):
+            return True
+        if isinstance(child, ast.ClassDef) and (_class_is_test_class(child) or _nested_test(child)):
+            return True
+    return False
+
+
+def _file_has_tests(path: Path) -> bool:
+    try:
+        text = path.read_text(errors="replace")
+    except OSError:
+        return False
+    return _source_has_tests(text)
+
+
+def _is_mapped_test(path: str, patterns: list[str], checkout: Path | None = None) -> bool:
     """True when pytest would collect this path as a test module under ``patterns``.
 
     ``conftest.py`` and ``__init__.py`` are not test modules. A catch-all pattern (``*`` or ``*.py``) matches
-    every file, so only a file inside a test directory counts; a narrower pattern matches by file name anywhere.
+    every file, so only a file inside a test directory counts, and only when parsing it shows a test function
+    or a test class. A support module of plain functions does not count. A narrower pattern matches by file
+    name anywhere.
     """
     rel = str(path).replace("\\", "/")
     name = rel.rsplit("/", 1)[-1]
@@ -799,8 +1055,77 @@ def _is_mapped_test(path: str, patterns: list[str]) -> bool:
         return True
     broad = [p for p in patterns if p in _CATCH_ALL_PYTHON_FILES]
     if broad and _name_matches(name, broad):
-        return any(part in _TEST_DIR_NAMES for part in PurePosixPath(rel).parts[:-1])
+        if not any(part in _TEST_DIR_NAMES for part in PurePosixPath(rel).parts[:-1]):
+            return False
+        if checkout is None:
+            return True
+        return _file_has_tests(Path(checkout) / rel)
     return False
+
+
+def _changed_module_names(rel: str) -> list[str]:
+    """Dotted module and its last component for a changed package file (``src/`` stripped)."""
+    path = PurePosixPath(str(rel).replace("\\", "/"))
+    parts = list(path.parts)
+    if parts[:1] == ["src"]:
+        parts = parts[1:]
+    if not parts:
+        return []
+    stem = path.stem
+    if stem in {"__init__", "__main__"}:
+        parts = parts[:-1]
+        dotted = ".".join(parts)
+        short = parts[-1] if parts else ""
+    else:
+        short = stem.lstrip("_") or stem
+        dotted = ".".join([*parts[:-1], stem])
+    names = []
+    for name in (dotted, short):
+        if name and name not in names and name not in {"src", "init"}:
+            names.append(name)
+    return names
+
+
+def _mentions_module(text: str, names: list[str]) -> bool:
+    for name in names:
+        if "." in name:
+            if name in text:
+                return True
+            continue
+        if re.search(rf"(?<![A-Za-z0-9_]){re.escape(name)}(?![A-Za-z0-9_])", text):
+            return True
+    return False
+
+
+def _tests_mentioning_module(checkout: Path, rel_file: str, patterns: list[str]) -> list[str]:
+    """Test files in the nearest tests directory whose text names the changed module."""
+    nearest = nearest_tests_dir(rel_file, checkout)
+    names = _changed_module_names(rel_file)
+    if not nearest or not names:
+        return []
+    dotted = [name for name in names if "." in name]
+    found = []
+    base = checkout / nearest
+    try:
+        paths = sorted(base.rglob("*.py"))
+    except OSError:
+        return []
+    for hit in paths:
+        if not hit.is_file():
+            continue
+        rel = Path(os.path.relpath(hit, checkout)).as_posix()
+        if rel == str(rel_file).replace("\\", "/") or not _is_mapped_test(rel, patterns, checkout):
+            continue
+        try:
+            text = hit.read_text(errors="replace")
+        except OSError:
+            continue
+        if not _mentions_module(text, names):
+            continue
+        rank = 0 if any(name in text for name in dotted) else 1
+        found.append((rank, rel))
+    found.sort()
+    return [rel for _rank, rel in found]
 
 
 def _names_for_stem(stem: str, patterns: list[str]) -> list[str]:
@@ -832,11 +1157,13 @@ def map_repo_tests(files: dict, checkout: Path, max_targets: int = 6) -> list[st
     sibling ``<directory>/tests/<name>`` is preferred over a global name match, so
     ``networkx/algorithms/connectivity/connectivity.py`` maps to
     ``networkx/algorithms/connectivity/tests/test_connectivity.py`` before other ``test_connectivity.py`` files.
+    When that name match finds nothing, test files in the nearest tests directory that mention the changed
+    module are used, so the run does not stop with no tests mapped.
     """
     patterns = python_file_patterns(checkout)
     targets: list[str] = []
     for f in files["all"]:
-        if _is_mapped_test(f, patterns) and (checkout / f).is_file():
+        if _is_mapped_test(f, patterns, checkout) and (checkout / f).is_file():
             targets.append(f)
     for f in files.get("package_py") or []:
         stem = os.path.splitext(os.path.basename(f))[0].lstrip("_")
@@ -854,13 +1181,20 @@ def map_repo_tests(files: dict, checkout: Path, max_targets: int = 6) -> list[st
         for hit in hits:
             if added >= 2:
                 break
-            rel = os.path.relpath(hit, checkout)
-            if rel in seen_hit or not _is_mapped_test(rel, patterns):
+            rel = Path(os.path.relpath(hit, checkout)).as_posix()
+            if rel in seen_hit or not _is_mapped_test(rel, patterns, checkout):
                 continue
             seen_hit.add(rel)
             if rel not in targets:
                 targets.append(rel)
                 added += 1
+        if added == 0:
+            for rel in _tests_mentioning_module(checkout, f, patterns):
+                if added >= 2:
+                    break
+                if rel not in targets:
+                    targets.append(rel)
+                    added += 1
     return targets[:max_targets]
 
 
@@ -7457,6 +7791,7 @@ def test_source_pair(repo: str, cfg: dict, item: dict, prdir: Path, work: Path, 
     if sp.get("merge_commit"):
         rec["pr"]["merge_commit"] = sp["merge_commit"]
     if sp.get("ok"):
+        use_checkout_package(repo, cfg, work / "side-main", item, rec)
         rec["tested"] = {"main": f"{item['base_ref']} @ {sp['main_sha'][:12]}"
                                  + (" (merge-base with the PR head)" if "merge-base" in sp["comparison_basis"]
                                     else " (base tip = first parent of the merge commit)"),
