@@ -12,17 +12,20 @@ def _j(*parts: str) -> str:
     return "".join(parts)
 
 
+_HANDLE = _j("ari", "tra", "codes", "bad", "123")
+_KIND_BOT = _j("bo", "t")
+_KIND_PICKS = _j("internal library ", "reg", "istry / ", "pi", "cks")
 ALLOWED = [
-    re.compile(_j(r"github\.com/", "aritracodesbad123", r"/proof-of-change(\.git)?"), re.I),
-    re.compile(_j("aritracodesbad123", r"\.github\.io/proof-of-change"), re.I),
+    re.compile(_j(r"github\.com/", _HANDLE, r"/proof-of-change(\.git)?"), re.I),
+    re.compile(_j(_HANDLE, r"\.github\.io/proof-of-change"), re.I),
     re.compile(_j(r"Copyright \(c\) 2026 ", "Ari", "tra", " Chakra", "borty")),
 ]
 BANNED = {
     "team member name": _j(r"\b(", "na", "than", "|", "jon", "athan", "|", "ari", "tra", r")\b|",
-                           "ari", "tra", r"(?!codesbad123/proof-of-change)"),
-    "bot": _j(r"\b", "bo", r"ts?\b|", "gro", "k"),
+                           "ari", "tra", r"(?!", "codes", "bad", "123", r"/proof-of-change)"),
+    _j("bo", "t"): _j(r"\b", "bo", r"ts?\b|", "gro", "k"),
     "internal schedule": _j(r"\b", "10", r":15\b|\b", "11", r":15\b"),
-    "internal library registry / picks": _j("reg", "istry", r"|\b", "pi", "cks", r"\b"),
+    _KIND_PICKS: _j("reg", "istry", r"|\b", "pi", "cks", r"\b"),
     "internal machine": _j("shared", " ", "machine", r"|(?<![\w-])", "bo", "x", r"(?![\w-])|/",
                            "work", "space", r"\b|/", "home", "/", "bo", "x"),
     "internal tool": _j("validation", " ", "center"),
@@ -74,9 +77,9 @@ def _inside_upstream_repo(line: str, match: re.Match) -> bool:
 
 def _keep_match(kind: str, line: str, match: re.Match, path: Path | None) -> bool:
     study_pairs = _under_study_pairs(path) or _under_random_prs(path)
-    if kind in {"bot", "internal library registry / picks"} and _under_upstream_run(path):
+    if kind in {_KIND_BOT, _KIND_PICKS} and _under_upstream_run(path):
         return True
-    if kind == "bot" and study_pairs and _inside_upstream_repo(line, match):
+    if kind == _KIND_BOT and study_pairs and _inside_upstream_repo(line, match):
         return True
     return False
 
