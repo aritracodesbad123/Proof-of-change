@@ -3323,26 +3323,378 @@ def startup_plugin_retry_shell(rerun: str, log: str = "/tmp/poc-pytest.log") -> 
 STARTUP_PLUGIN_RETRY_SHELL = STARTUP_PLUGIN_RETRY_TEMPLATE.replace("{LOG}", "/tmp/poc-pytest.log")
 
 
+# A third-party pytest plugin can crash while tests are being collected, the same way on both sides, because a dev
+# extra installed it and it cannot run in this environment. That is a setup problem, not a difference in the pull
+# request. The entry-point name comes from the traceback's site-packages module, matched to the installed pytest11
+# entry points (or, when the module does not match, to the distribution name). The tests are run once more on both
+# sides with that plugin turned off (-p no:<entry point>). If that run still collects nothing, the first result is
+# kept. Nothing here chooses a verdict.
+_PLUGIN_NAME = re.compile(r"^[A-Za-z0-9_.-]+$")
+_PYTEST_TOPS = {"pytest", "_pytest", "pluggy", "py", "iniconfig"}
+_COLLECTION_MARK = re.compile(r"ERROR collecting |errors? during collection|while loading conftest|while importing",
+                              re.I)
+_FRAME_SHORT = re.compile(
+    r"^(?P<path>.+?/site-packages/(?P<mod>[A-Za-z0-9_]+(?:/[A-Za-z0-9_]+)*)\.py):\d+: in (?P<func>\S+)", re.M)
+_FRAME_LONG = re.compile(
+    r'File "(?P<path>[^"]*?site-packages/(?P<mod>[A-Za-z0-9_]+(?:/[A-Za-z0-9_]+)*)\.py)", line \d+, in (?P<func>\S+)')
+_EXC_LINE = re.compile(r"^(?:E\s+)?(?P<exc>[A-Za-z_][\w.]*(?:Error|Exception|Warning): .+)$", re.M)
+_PYTEST_CONFIGS = ("pyproject.toml", "pytest.ini", "tox.ini", "setup.cfg")
+# `-p asyncio`, `-p=asyncio`, and the split form "-p", "asyncio" in an addopts list.
+_P_FLAG = r"""-p['\"]?\s*(?:=\s*['\"]?|,\s*['\"]?|\s+['\"]?)"""
+_SIDE_DIR = re.compile(r"\b(?:side|venv|cwd|home|out)-(?:main|pr)\b")
+_RAN = ("passed", "failed", "error", "skipped")
+PYTEST_ENTRY_POINTS_PY = (
+    "import importlib.metadata as md, json\n"
+    "out = []\n"
+    "try:\n    eps = md.entry_points(group='pytest11')\n"
+    "except TypeError:\n    eps = md.entry_points().get('pytest11', [])\n"
+    "for ep in eps:\n"
+    "    dist = ''\n"
+    "    try:\n        dist = ep.dist.name if ep.dist else ''\n    except Exception:\n        dist = ''\n"
+    "    out.append([ep.name, ep.value, dist])\n"
+    "print(json.dumps(out))\n"
+)
+
+
+def plugin_off_args(names) -> list[str]:
+    """`-p no:<entry point>` for each safe plugin name. Anything else is ignored."""
+    out = []
+    for name in names or []:
+        if _PLUGIN_NAME.fullmatch(str(name)):
+            out += ["-p", f"no:{name}"]
+    return out
+
+
+def plugin_off_shell(names) -> str:
+    """The same flags for a remote shell, with a trailing space when there is one, else empty."""
+    return "".join(f"-p no:{n} " for n in (names or []) if _PLUGIN_NAME.fullmatch(str(n)))
+
+
+def _norm_dist(dist: str) -> str:
+    return re.sub(r"[^a-z0-9]+", "_", (dist or "").lower()).strip("_")
+
+
+def _pep503(name: str) -> str:
+    """PEP 503 name: lowercase, with runs of '-', '_' and '.' folded to one '-'."""
+    return re.sub(r"[-_.]+", "-", (name or "").strip().lower())
+
+
+def _collection_frames(log: str) -> list[tuple[str, str]]:
+    """(dotted module, function) for site-packages frames that are not pytest itself, in order."""
+    found = []
+    for rx in (_FRAME_SHORT, _FRAME_LONG):
+        for m in rx.finditer(log or ""):
+            parts = m.group("mod").split("/")
+            if parts[0] in _PYTEST_TOPS:
+                continue
+            item = (".".join(parts), m.group("func"))
+            if item not in found:
+                found.append(item)
+    return found
+
+
+def _plain_pytest_log(log: str) -> str:
+    """Drop pytest's INTERNALERROR> prefix so the traceback can be read like any other log."""
+    out = []
+    for line in (log or "").splitlines():
+        if line.startswith("INTERNALERROR>"):
+            line = line[len("INTERNALERROR>"):]
+            if line.startswith(" "):
+                line = line[1:]
+        out.append(line)
+    return "\n".join(out)
+
+
+def _collection_error(log: str) -> str:
+    """The last exception or warning line, with side folder names and absolute prefixes removed."""
+    lines = []
+    for raw in _plain_pytest_log(log).splitlines():
+        m = _EXC_LINE.match(raw.strip())
+        if not m:
+            continue
+        text = _SIDE_DIR.sub("side", m.group("exc"))
+        text = re.sub(r"(?:[A-Za-z]:)?[^:\s\"'`]*site-packages/", "site-packages/", text)
+        lines.append(" ".join(text.split()))
+    return lines[-1] if lines else ""
+
+
+def _ran_outcome(pair) -> str:
+    return pair[0] if isinstance(pair, tuple) else ""
+
+
+def _no_tests_ran(results: dict, side: str) -> bool:
+    runs = (results or {}).get(side) or []
+    if not runs:
+        return True
+    for run in runs:
+        for pair in (run or {}).values():
+            if _ran_outcome(pair) in _RAN:
+                return False
+    return True
+
+
+def collection_failed_same_way(main_log: str, pr_log: str) -> bool:
+    """Both logs are a collection failure whose third-party frames and exception line match."""
+    if not _COLLECTION_MARK.search(main_log or "") or not _COLLECTION_MARK.search(pr_log or ""):
+        return False
+    main_frames, pr_frames = _collection_frames(main_log), _collection_frames(pr_log)
+    if not main_frames or main_frames != pr_frames:
+        return False
+    main_error, pr_error = _collection_error(main_log), _collection_error(pr_log)
+    return bool(main_error) and main_error == pr_error
+
+
+def plugin_entry_points(frames: list[tuple[str, str]], entry_points) -> list[str]:
+    """Entry-point names for the traceback modules. The module match wins; the distribution name is the fallback."""
+    modules = [mod for mod, _func in frames]
+    tops = {mod.split(".")[0] for mod in modules}
+    specific, broad, by_dist = [], [], []
+    for name, value, dist in entry_points or []:
+        if not _PLUGIN_NAME.fullmatch(str(name or "")):
+            continue
+        mod = str(value or "").split(":")[0]
+        top = mod.split(".")[0] if mod else ""
+        if top in _PYTEST_TOPS:
+            continue
+        if mod and any(m == mod or m.startswith(mod + ".") for m in modules):
+            specific.append(name)
+        elif top and top in tops:
+            broad.append(name)
+        elif _norm_dist(dist) in {t.lower() for t in tops} and _norm_dist(dist) not in _PYTEST_TOPS:
+            by_dist.append(name)
+    return sorted(set(specific or broad or by_dist))
+
+
+def _startup_configure_frames(log: str) -> list[tuple[str, str]]:
+    """Third-party frames for pytest_configure, after the INTERNALERROR> prefix is removed."""
+    return [item for item in _collection_frames(_plain_pytest_log(log)) if item[1] == "pytest_configure"]
+
+
+def startup_failed_same_way(main_log: str, pr_log: str) -> bool:
+    """Both logs are a startup internal error raised in a third-party plugin's pytest_configure.
+
+    Side folder names are ignored. A collection error is not this case, and neither is an internal error
+    whose traceback stays inside pytest itself."""
+    if "INTERNALERROR" not in (main_log or "") or "INTERNALERROR" not in (pr_log or ""):
+        return False
+    main_frames, pr_frames = _startup_configure_frames(main_log), _startup_configure_frames(pr_log)
+    if not main_frames or main_frames != pr_frames:
+        return False
+    main_error, pr_error = _collection_error(main_log), _collection_error(pr_log)
+    return bool(main_error) and main_error == pr_error
+
+
+def _config_text(root) -> str:
+    if not root:
+        return ""
+    parts = []
+    base = Path(root)
+    for name in _PYTEST_CONFIGS:
+        path = base / name
+        if path.is_file():
+            parts.append(path.read_text(errors="replace"))
+    return "\n".join(parts).lower()
+
+
+def _names_plugin(text: str, aliases: set[str]) -> bool:
+    """True when an addopts -p value or a required_plugins entry matches one alias.
+
+    aliases are PEP 503 forms of the entry-point name and of the distribution that provides it.
+    `pytest-asyncio`, `pytest_asyncio` and `pytest.asyncio` are the same name."""
+    if not text or not aliases:
+        return False
+    for match in re.finditer(_P_FLAG + r"([A-Za-z0-9_.-]+)", text):
+        if _pep503(match.group(1)) in aliases:
+            return True
+    for match in re.finditer(r"required_plugins\s*=\s*(\[[^\]]*\]|[^\n#]+)", text):
+        for token in re.findall(r"[A-Za-z0-9_.-]+", match.group(1)):
+            if _pep503(token) in aliases:
+                return True
+    return False
+
+
+def plugin_named_in_pytest_config(roots, name: str, dist: str = "") -> bool:
+    """True when a pytest config names this plugin in addopts (-p) or required_plugins.
+
+    The config may use the entry-point name or the distribution name from installed metadata. Comparison is
+    PEP 503 (lowercase; '-', '_' and '.' are the same). A dependency line that only installs the package does
+    not count. roots is one checkout or a list of them (main and the pull request). Either side naming the
+    plugin is enough to keep it."""
+    if not _PLUGIN_NAME.fullmatch(str(name or "")):
+        return False
+    aliases = {form for form in (_pep503(name), _pep503(dist)) if form}
+    folders = roots if isinstance(roots, (list, tuple)) else [roots]
+    return any(_names_plugin(_config_text(root), aliases) for root in folders)
+
+
+def collection_plugins_to_disable(main_log: str, pr_log: str, entry_points, results: dict | None = None) -> list[str]:
+    """Plugin entry points to turn off, or none.
+
+    results, when given, must show that neither side ran a test. A side that ran tests is left alone."""
+    if results is not None and (not _no_tests_ran(results, "main") or not _no_tests_ran(results, "pr")):
+        return []
+    if not collection_failed_same_way(main_log, pr_log):
+        return []
+    return plugin_entry_points(_collection_frames(main_log), entry_points)
+
+
+def collection_plugin_note(names: list[str], error: str, startup: bool = False) -> str:
+    """One plain sentence for the run report."""
+    shown = ", ".join(names)
+    one = len(names) == 1
+    kind = "plugin" if one else "plugins"
+    verb = "was" if one else "were"
+    where = "that third-party plugin" if one else "those third-party plugins"
+    again = "the plugin" if one else "those plugins"
+    happened = ("Pytest stopped at startup the same way on both sides" if startup
+                else "Collection failed the same way on both sides")
+    err = " ".join((error or "the traceback was inside the plugin").split())
+    if len(err) > 200:
+        err = err[:200].rstrip() + "..."
+    return (f"Setup: pytest {kind} {shown} {verb} turned off. {happened}, "
+            f"and the traceback pointed into {where} ({err}). "
+            f"The tests were run again with {again} turned off. This does not change how the verdict is chosen.")
+
+
+def _parse_entry_points(text: str) -> list[tuple[str, str, str]]:
+    line = next((ln for ln in (text or "").splitlines() if ln.strip().startswith("[")), "")
+    try:
+        data = json.loads(line) if line else []
+    except ValueError:
+        return []
+    return [tuple(item) for item in data if isinstance(item, list) and len(item) == 3]
+
+
+def installed_pytest_entry_points(venvs: dict) -> list[tuple[str, str, str]]:
+    """pytest11 entry points from a side that already has the project installed. Main first, then the PR side."""
+    if _contree_ready():
+        from poc import contree_sandboxes
+        sess = contree_sandboxes.session()
+        for side in ("main", "pr"):
+            try:
+                raw = sess.run_argv(side, ["python", "-c", PYTEST_ENTRY_POINTS_PY], timeout=60)
+            except Exception:  # noqa: BLE001 - no metadata means the retry cannot name a plugin
+                raw = {}
+            found = _parse_entry_points((raw or {}).get("stdout") or "")
+            if found:
+                return found
+        return []
+    for side in ("main", "pr"):
+        venv = (venvs or {}).get(side)
+        if not venv:
+            continue
+        py = Path(venv) / "bin" / "python"
+        if not py.is_file():
+            continue
+        cp = in_side(venv, [str(py), "-c", PYTEST_ENTRY_POINTS_PY], timeout=60)
+        found = _parse_entry_points(getattr(cp, "stdout", "") or "")
+        if found:
+            return found
+    return []
+
+
+def _pytest_output_names(runs: int) -> list[str]:
+    return [f"{kind}-{side}-{i}.{ext}" for i in range(1, runs + 1) for side in ("main", "pr")
+            for kind, ext in (("pytest", "log"), ("junit", "xml"))]
+
+
+def _snapshot_pytest_outputs(rdir: Path, runs: int) -> dict:
+    saved = {}
+    for name in _pytest_output_names(runs):
+        path = rdir / name
+        saved[name] = path.read_bytes() if path.is_file() else None
+    return saved
+
+
+def _restore_pytest_outputs(rdir: Path, saved: dict) -> None:
+    for name, data in saved.items():
+        path = rdir / name
+        if data is None:
+            path.unlink(missing_ok=True)
+        else:
+            path.write_bytes(data)
+
+
+def _side_pytest_logs(rdir: Path, runs: int) -> tuple[str, str]:
+    def read(side: str) -> str:
+        parts = []
+        for i in range(1, runs + 1):
+            path = rdir / f"pytest-{side}-{i}.log"
+            if path.is_file():
+                parts.append(path.read_text(errors="replace"))
+        return "\n".join(parts)
+    return read("main"), read("pr")
+
+
+def _retry_collected(results: dict) -> bool:
+    """True when both sides collected something that ran or skipped, not only a load error."""
+    for side in ("main", "pr"):
+        runs = (results or {}).get(side) or []
+        if not any(runs):
+            return False
+        if not any(_ran_outcome(pair) in _RAN for run in runs for pair in (run or {}).values()):
+            return False
+    return True
+
+
+def retry_collection_plugin(rec: dict, per_run: list, results: dict, venvs: dict, targets: dict, prdir: Path,
+                            work: Path, a, cwds: dict | None, keep_addopts: bool, parallel: bool = False):
+    """One retry with the crashing plugin turned off. A retry that still collects nothing keeps the first result."""
+    runs = int(getattr(a, "runs", 1) or 1)
+    main_log, pr_log = _side_pytest_logs(prdir, runs)
+    if not _no_tests_ran(results, "main") or not _no_tests_ran(results, "pr"):
+        return per_run, results
+    # The Contree shell already retries an exit-3 startup crash once. A log that records that repair is left as it is.
+    if "Setup repair:" in main_log or "Setup repair:" in pr_log:
+        return per_run, results
+    startup = startup_failed_same_way(main_log, pr_log)
+    if not startup and not collection_failed_same_way(main_log, pr_log):
+        return per_run, results
+    frames = (_startup_configure_frames(main_log) if startup else _collection_frames(main_log))
+    installed = installed_pytest_entry_points(venvs)
+    names = plugin_entry_points(frames, installed)
+    if startup:
+        roots = [cwds.get(side) for side in ("main", "pr") if isinstance(cwds, dict) and cwds.get(side)]
+        dist_of = {str(ep_name): str(dist or "") for ep_name, _value, dist in installed}
+        names = [name for name in names if not plugin_named_in_pytest_config(roots, name, dist_of.get(name, ""))]
+    if not names:
+        return per_run, results
+    saved = _snapshot_pytest_outputs(prdir, runs)
+    kwargs = {"cwds": cwds, "keep_addopts": keep_addopts, "disable_plugins": names}
+    if parallel:
+        kwargs["parallel"] = True
+    per2, res2 = run_tests(venvs, targets, prdir, work, a.runs, a.workers, a.test_timeout, a.run_timeout, **kwargs)
+    if not _retry_collected(res2):
+        _restore_pytest_outputs(prdir, saved)
+        return per_run, results
+    rec["pytest_plugins_off"] = list(names)
+    rec["collection_plugin_note"] = collection_plugin_note(names, _collection_error(main_log), startup=startup)
+    print(rec["collection_plugin_note"], flush=True)
+    return per2, res2
+
+
 def _contree_pytest_once(side: str, targets: list[str], test_timeout: int, run_timeout: int,
-                         workers: str, jx: Path, lg: Path, keep_addopts: bool = False) -> tuple[int | str, float]:
+                         workers: str, jx: Path, lg: Path, keep_addopts: bool = False,
+                         plugins_off: list | None = None) -> tuple[int | str, float]:
     """One Contree disposable pytest; junit+log written locally from the remote shell output."""
     from poc import contree_sandboxes
     sess = contree_sandboxes.session()
     assert sess is not None
     tg = " ".join(shlex.quote(t) for t in targets)
     nflag = f"-n {shlex.quote(workers)} " if workers != "0" else ""
+    off = plugin_off_shell(plugins_off)
     shell = (
         "set +e\ncd /work/src\n"
-        f"python -m pytest {tg} -p no:cacheprovider -q -rfE --timeout={int(test_timeout)} "
+        f"python -m pytest {tg} -p no:cacheprovider {off}-q -rfE --timeout={int(test_timeout)} "
         f"{repo_addopts_flag(keep_addopts)}-o junit_family=xunit2 --junitxml=/tmp/poc-junit.xml {nflag}"
         ">/tmp/poc-pytest.log 2>&1\n"
         "ec=$?\n"
         "if grep -q 'different tests were collected' /tmp/poc-pytest.log 2>/dev/null && "
         f"[ {shlex.quote(workers)} != 0 ]; then\n"
-        f"  python -m pytest {tg} -p no:cacheprovider -q -rfE --timeout={int(test_timeout)} "
+        f"  python -m pytest {tg} -p no:cacheprovider {off}-q -rfE --timeout={int(test_timeout)} "
         f"{repo_addopts_flag(keep_addopts)}-o junit_family=xunit2 --junitxml=/tmp/poc-junit.xml "
         ">/tmp/poc-pytest.log 2>&1\n  ec=$?\nfi\n"
-        + STARTUP_PLUGIN_RETRY_SHELL.replace("{RERUN}", f"python -m pytest {tg} -p no:cacheprovider -q -rfE "
+        + STARTUP_PLUGIN_RETRY_SHELL.replace("{RERUN}", f"python -m pytest {tg} -p no:cacheprovider {off}-q -rfE "
                                               f"--timeout={int(test_timeout)} {repo_addopts_flag(keep_addopts)}"
                                               f"-o junit_family=xunit2 --junitxml=/tmp/poc-junit.xml {nflag}")
         + "printf '___POC_EXIT___%s\\n' \"$ec\"\n"
@@ -3372,7 +3724,8 @@ def _contree_pytest_once(side: str, targets: list[str], test_timeout: int, run_t
 
 def run_tests(side_venvs: dict, targets_by_side: dict, rdir: Path, workdir: Path, runs: int, workers: str,
               test_timeout: int, run_timeout: int, cwds: dict | None = None,
-              keep_addopts: bool = False, parallel: bool = False) -> tuple[list[dict], dict]:
+              keep_addopts: bool = False, parallel: bool = False,
+              disable_plugins: list | None = None) -> tuple[list[dict], dict]:
     """parallel (POC_PARALLEL, Contree only): run i's main and PR pytest start together in their own sandboxes;
     results are recorded in the same order as the serial schedule.
     targets are relative to site-packages (nightly routes) or to the side's checkout (cwds given).
@@ -3408,16 +3761,20 @@ def run_tests(side_venvs: dict, targets_by_side: dict, rdir: Path, workdir: Path
                     with ThreadPoolExecutor(max_workers=2) as ex:
                         futs = {s: ex.submit(_contree_pytest_once, s, list(targets_by_side[s]), test_timeout,
                                              run_timeout, workers, rdir / f"junit-{s}-{i}.xml",
-                                             rdir / f"pytest-{s}-{i}.log", keep_addopts) for s in ("main", "pr")}
+                                             rdir / f"pytest-{s}-{i}.log", keep_addopts,
+                                             *( [disable_plugins] if disable_plugins else []))
+                                for s in ("main", "pr")}
                         pending_pr = futs["pr"]
                     rc, secs = futs["main"].result()
                 elif parallel and side == "pr" and pending_pr is not None:
                     rc, secs = pending_pr.result()
                     pending_pr = None
                 else:
-                    rc, secs = _contree_pytest_once(side, tg, test_timeout, run_timeout, workers, jx, lg, keep_addopts)
+                    args = (side, tg, test_timeout, run_timeout, workers, jx, lg, keep_addopts)
+                    rc, secs = _contree_pytest_once(*args, *([disable_plugins] if disable_plugins else []))
             else:
-                cmd = [venv / "bin/python", "-m", "pytest", *tg, "-p", "no:cacheprovider", "-q", "-rfE",
+                cmd = [venv / "bin/python", "-m", "pytest", *tg, "-p", "no:cacheprovider",
+                       *plugin_off_args(disable_plugins), "-q", "-rfE",
                        f"--timeout={test_timeout}", *repo_addopts_args(keep_addopts), "-o", "junit_family=xunit2",
                        f"--junitxml={jin}"]
                 if workers != "0":
@@ -3475,7 +3832,7 @@ COVERAGE_RC_NOTE = ("Coverage setup: measured with the check's own coverage sett
 
 
 def coverage_run(item: dict, venv: Path, main_root: Path, pr_root: Path, targets: list[str], prdir: Path,
-                 workdir: Path, a, cwd: Path | None = None) -> dict:
+                 workdir: Path, a, cwd: Path | None = None, plugins_off: list | None = None) -> dict:
     """Coverage gate measurement: ONE extra, untimed PR-side run of the same test subset under coverage.py
     (pytest-cov, so it also works with -n workers), after the 3 timed runs, so their timings stay clean.
 
@@ -3512,7 +3869,8 @@ def coverage_run(item: dict, venv: Path, main_root: Path, pr_root: Path, targets
     base = cwd or pr_root
     rcfile = side_out(venv) / "poc-coveragerc"
     rcfile.write_text(COVERAGE_RC)
-    cmd = [venv / "bin/python", "-m", "pytest", *[str(base / t) for t in targets], "-p", "no:cacheprovider", "-q",
+    cmd = [venv / "bin/python", "-m", "pytest", *[str(base / t) for t in targets], "-p", "no:cacheprovider",
+           *plugin_off_args(plugins_off), "-q",
            f"--timeout={a.test_timeout}", *repo_addopts_args(product_route(a)), *[f"--cov={s}" for s in sorted(sources)],
            f"--cov-config={rcfile}", f"--cov-report=json:{oin}"]
     if a.workers != "0":
@@ -3631,7 +3989,8 @@ def fetch_contree_coverage(sess, image: str, length: int, digest: str, timeout: 
         return None, f"{COV_FETCH_FAILED} (the report could not be decoded)"
 
 
-def contree_coverage_run(item: dict, main_root: Path, pr_root: Path, targets: list[str], prdir: Path, a) -> dict:
+def contree_coverage_run(item: dict, main_root: Path, pr_root: Path, targets: list[str], prdir: Path, a,
+                         plugins_off: list | None = None) -> dict:
     """Coverage gate measurement inside the Contree PR checkpoint.
 
     pytest and coverage run remotely. The JSON report comes back in the command output and is fed to
@@ -3652,9 +4011,10 @@ def contree_coverage_run(item: dict, main_root: Path, pr_root: Path, targets: li
     tg = " ".join(shlex.quote(t) for t in targets)
     cov = " ".join(f"--cov={shlex.quote(s)}" for s in sources)
     nflag = f"-n {shlex.quote(str(a.workers))} " if str(a.workers) != "0" else ""
+    off = plugin_off_shell(plugins_off)
     shell = (
         f"set +e\nprintf %s {shlex.quote(COVERAGE_RC)} > /tmp/poc-coveragerc\ncd /work/src\n"
-        f"python -m pytest {tg} -p no:cacheprovider -q --timeout={int(a.test_timeout)} "
+        f"python -m pytest {tg} -p no:cacheprovider {off}-q --timeout={int(a.test_timeout)} "
         f"{repo_addopts_flag(product_route(a))}{nflag}{cov} --cov-config=/tmp/poc-coveragerc "
         "--cov-report=json:/tmp/poc-cov.json "
         ">/tmp/poc-cov-pytest.log 2>&1\n"
@@ -5546,8 +5906,11 @@ def execute_tests(rec: dict, venvs: dict, targets: dict, prdir: Path, work: Path
 
     A failure that then shows the same exception on the base side is recorded as the backend, not as a pull-request
     finding (verdict could_not_verify when that is the only finding)."""
+    keep = product_route(a)
     per_run, results = run_tests(venvs, targets, prdir, work, a.runs, a.workers, a.test_timeout, a.run_timeout,
-                                 cwds=cwds, keep_addopts=product_route(a))
+                                 cwds=cwds, keep_addopts=keep, disable_plugins=rec.get("pytest_plugins_off"))
+    if not rec.get("pytest_plugins_off"):
+        per_run, results = retry_collection_plugin(rec, per_run, results, venvs, targets, prdir, work, a, cwds, keep)
     cmp, cnv, ex = finalize_tests(rec, per_run, results, a)
     if not cmp:
         return cmp, cnv, ex
@@ -5563,7 +5926,7 @@ def execute_tests(rec: dict, venvs: dict, targets: dict, prdir: Path, work: Path
         return cmp, cnv, ex
     rec["test_extras"] = list(dict.fromkeys([*(rec.get("test_extras") or []), *wheels]))
     per_run, results = run_tests(venvs, targets, prdir, work, a.runs, a.workers, a.test_timeout, a.run_timeout,
-                                 cwds=cwds, keep_addopts=product_route(a))
+                                 cwds=cwds, keep_addopts=keep, disable_plugins=rec.get("pytest_plugins_off"))
     cmp, cnv, ex = finalize_tests(rec, per_run, results, a)
     if not cmp:
         return cmp, cnv, ex
@@ -5676,16 +6039,23 @@ def _contree_only_pair(a, rec: dict, repo: str, cfg: dict, item: dict, sp: dict,
         cnv = "no tests could be mapped to the touched files"
     else:
         run_progress.emit("pytest", "code", "dual-run pytest on main and PR (Contree)")
+        keep = product_route(a)
         per_run, results = run_tests({"main": vm, "pr": vp}, targets, prdir, work, a.runs, a.workers,
                                      a.test_timeout, a.run_timeout, cwds={"main": cm, "pr": cp},
-                                     keep_addopts=product_route(a), **({"parallel": True} if par else {}))
+                                     keep_addopts=keep, disable_plugins=rec.get("pytest_plugins_off"),
+                                     **({"parallel": True} if par else {}))
+        if not rec.get("pytest_plugins_off"):
+            per_run, results = retry_collection_plugin(
+                rec, per_run, results, {"main": vm, "pr": vp}, targets, prdir, work, a,
+                {"main": cm, "pr": cp}, keep, parallel=par)
         cmp, cnv, ex = finalize_tests(rec, per_run, results, a)
         if cmp:
             ex = exit_check(rec.get("per_run", []), results, cmp)
             rec["exit_check"] = ex
     if measure_coverage and targets["pr"] and not cnv:
         run_progress.emit("pytest", "code", "coverage inside Contree")
-        rec["coverage"] = contree_coverage_run(item, cm, cp, targets["pr"], prdir, a)
+        rec["coverage"] = contree_coverage_run(item, cm, cp, targets["pr"], prdir, a,
+                                               plugins_off=rec.get("pytest_plugins_off"))
     run_progress.emit("probes", "super", "running behaviour probes (Contree)")
     rec["probes"] = run_probes(repo, item["pr"], {"main": vm / "bin/python", "pr": vp / "bin/python"}, prdir,
                                work, a, plan, pr_started)
@@ -5980,7 +6350,7 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
             if cmp:
                 run_progress.emit("pytest", "code", "before coverage")
                 rec["coverage"] = coverage_run(item, vp, site_packages(vm), site_packages(vp), targets["pr"], prdir,
-                                               work, a)
+                                               work, a, plugins_off=rec.get("pytest_plugins_off"))
     commit = (main.get("build") or {}).get("commit")
     if isinstance(commit, str) and re.fullmatch(r"[0-9a-f]{7,40}", commit):
         rec["pr"]["tested_main_sha"] = commit
@@ -6007,7 +6377,7 @@ def test_pr(repo: str, cfg: dict, item: dict, rdir: Path, workroot: Path, a, mac
             cmp, cnv, ex = execute_tests(rec, {"main": vm, "pr": vp}, targets, prdir, work, a)
             if cmp:
                 rec["coverage"] = coverage_run(item, vp, site_packages(vm), site_packages(vp), targets["pr"], prdir,
-                                               work, a)
+                                               work, a, plugins_off=rec.get("pytest_plugins_off"))
             rec["probes"] = run_probes(repo, item["pr"], {"main": vm / "bin/python", "pr": vp / "bin/python"}, prdir,
                                        work, a, plan, pr_started)
             settle_probes(rec, prdir)
@@ -6342,7 +6712,8 @@ def test_source_pair(repo: str, cfg: dict, item: dict, prdir: Path, work: Path, 
                 if cmp:
                     # Coverage stays on the local sides (Contree disposable runs do not keep coverage data).
                     run_progress.emit("pytest", "code", "before coverage")
-                    rec["coverage"] = coverage_run(item, vp, cm, cp, targets["pr"], prdir, work, a, cwd=cp)
+                    rec["coverage"] = coverage_run(item, vp, cm, cp, targets["pr"], prdir, work, a, cwd=cp,
+                                                   plugins_off=rec.get("pytest_plugins_off"))
             run_progress.emit("probes", "super", "running behaviour probes")
             rec["probes"] = run_probes(repo, item["pr"], {"main": vm / "bin/python", "pr": vp / "bin/python"}, prdir,
                                        work, a, plan, pr_started)
@@ -6360,7 +6731,8 @@ def test_source_pair(repo: str, cfg: dict, item: dict, prdir: Path, work: Path, 
             cmp, cnv, ex = execute_tests(rec, {"main": vm, "pr": vp}, targets, prdir, work, a,
                                          cwds={"main": cm, "pr": cp})
             if cmp:
-                rec["coverage"] = coverage_run(item, vp, cm, cp, targets["pr"], prdir, work, a, cwd=cp)
+                rec["coverage"] = coverage_run(item, vp, cm, cp, targets["pr"], prdir, work, a, cwd=cp,
+                                               plugins_off=rec.get("pytest_plugins_off"))
             rec["probes"] = run_probes(repo, item["pr"], {"main": vm / "bin/python", "pr": vp / "bin/python"}, prdir,
                                        work, a, plan, pr_started)
             settle_probes(rec, prdir)
@@ -6764,6 +7136,9 @@ def write_report(rdir: Path, meta: dict, records: list[dict], skipped: dict, pro
         if r.get("exit_check"):
             md.append(f"- Exit codes: {r['exit_check']['detail']}" +
                       ("" if r["exit_check"]["explained"] else " (NOT explained: " + "; ".join(r["exit_check"]["problems"][:3]) + ")"))
+        plugin_note = r.get("collection_plugin_note")
+        if isinstance(plugin_note, str) and plugin_note.strip():
+            md.append(f"- {plugin_note.strip()}")
         if r.get("per_run"):
             md.append("- Runs: " + "; ".join(f"{'main' if x['side'] == 'old' else 'pr'}#{x['run']} exit={x['exit']} "
                                              f"{x.get('seconds', '-')}s {x.get('pytest_summary', '')[:60]}"
