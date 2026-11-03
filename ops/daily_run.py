@@ -59,7 +59,6 @@ import urllib.parse
 import urllib.request
 import xml.etree.ElementTree as ET
 import zipfile
-import zlib
 from pathlib import Path, PurePosixPath
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -8794,81 +8793,147 @@ class _RunsPushError(Exception):
     """The runs-branch copy failed. The message is plain words and is safe to show."""
 
 
-def _host_path_re(binary: bool = False):
-    """Paths that must not be published. Built at runtime so the source stays free of machine paths."""
-    space = "work" + "space"
-    home = "home"
-    machine = "bo" + "x"
-    pat = (rf"/{space}(?:/[^\s\"'\\)<>,;]*)*"
-           rf"|/{home}/{machine}(?:/[^\s\"'\\)<>,;]*)*"
-           rf"|(?<![\w.-])/{machine}(?:/[^\s\"'\\)<>,;]+)+")
-    return re.compile(pat.encode("ascii") if binary else pat)
+class _PublishRefused(_RunsPushError):
+    """The files are not safe to publish. Retrying will not change that."""
 
 
-def scrub_host_paths(data: bytes) -> bytes:
-    """Replace machine-local paths with a same-length marker so a PDF or JSON value stays intact."""
-    mark = b"<redacted-path>"
-
-    def repl(m):
-        n = len(m.group(0))
-        if n <= len(mark):
-            return b"x" * n
-        return mark + b"." * (n - len(mark))
-
-    return _host_path_re(True).sub(repl, data)
+def _path_roots() -> tuple[str, str, str, str]:
+    """(workspace, home, tmp, path-segment). Built here so this file does not name them outright."""
+    return ("work" + "space", "home", "tmp", "bo" + "x")
 
 
-def scrub_host_text(text: str) -> str:
-    raw = text.encode("utf-8", "surrogateescape")
-    return scrub_host_paths(raw).decode("utf-8", "surrogateescape")
+def _internal_path_re() -> re.Pattern:
+    space, home, tmp, machine = _path_roots()
+    tail = r"(?:/[^\s\"'\\)<>,;]*)*"
+    return re.compile(rf"/{space}{tail}|/{tmp}{tail}|/{home}{tail}|(?:/[\w.-]+)*/{machine}{tail}")
 
 
-def pdf_push_banner(reason: str) -> str:
-    reason = " ".join(scrub_host_text(reason or "").split()) or "the runs branch could not be updated"
-    return f"PDFs NOT saved to GitHub: {reason}"
+def _relative_path(match: str) -> str:
+    """Drop a machine root and keep the rest of the path."""
+    raw = match
+    lead = ""
+    if raw[:1] in " \t\"'(=":
+        lead, raw = raw[0], raw[1:]
+    segs = [part for part in raw.split("/") if part]
+    space, home, tmp, machine = _path_roots()
+    if segs and segs[0] in (space, tmp):
+        segs = segs[1:]
+    elif segs and segs[0] == home:
+        segs = segs[2:] if len(segs) >= 2 else []
+    elif machine in segs:
+        segs = segs[segs.index(machine) + 1:]
+    return lead + ("/".join(segs) or ".")
+
+
+def relativize_internal_paths(text: str) -> str:
+    return _internal_path_re().sub(lambda m: _relative_path(m.group(0)), text)
+
+
+def _text_has_internal_path(text: str) -> bool:
+    return _internal_path_re().search(text) is not None
+
+
+_SECRET_NAME = re.compile(r"(?i)nebius|tavily|github|gh[_-]?token|api[_-]?key|secret|authorization|bearer|password")
+_GH_TOKEN = re.compile(r"\b(?:gh[pousr]_[A-Za-z0-9]{8,}|github_pat_[A-Za-z0-9_]{8,})")
+_BEARER = re.compile(r"(?i)(?:authorization\s*[:=]\s*)?bearer\s+\S+")
+_NAMED_SECRET = re.compile(
+    r"""(?ix)\b((?:nebius|tavily|github|gh)[a-z0-9_]*)(\s*[:=]\s*)("[^"]*"|'[^']*'|\S+)""")
+_USERINFO = re.compile(r"(https?://)[^/\s:@]+:[^/\s@]+@")
+
+
+def _hide_token(text: str, token: str | None) -> str:
+    if token and len(token) >= 4:
+        text = text.replace(token, "[redacted]")
+    return _USERINFO.sub(r"\1", text)
+
+
+def scrub_secrets(text: str, token: str | None = None) -> str:
+    """Remove keys and tokens. Names of settings can stay; their values do not."""
+    from poc import demo_helper
+    text = _hide_token(text, token)
+    text = demo_helper.redact(text)
+
+    def named(match: re.Match) -> str:
+        return match.group(1) + match.group(2) + "[redacted]"
+
+    text = _NAMED_SECRET.sub(named, text)
+    text = _GH_TOKEN.sub("[redacted]", text)
+    text = _BEARER.sub("Bearer [redacted]", text)
+    return text
+
+
+def _scrub_json_value(value, token: str | None):
+    if isinstance(value, dict):
+        out = {}
+        for key, item in value.items():
+            if _SECRET_NAME.search(str(key)) and not str(key).startswith("pdf_push"):
+                out[key] = "[redacted]"
+            else:
+                out[key] = _scrub_json_value(item, token)
+        return out
+    if isinstance(value, list):
+        return [_scrub_json_value(item, token) for item in value]
+    if isinstance(value, str):
+        return scrub_secrets(relativize_internal_paths(value), token)
+    return value
+
+
+def scrub_published_text(text: str, token: str | None = None, path: Path | None = None) -> str:
+    """Paths become relative, secrets are removed, then the public-file check is applied."""
+    from guardrails.public_hygiene import findings, scrub_public_text
+    text = scrub_secrets(relativize_internal_paths(text), token)
+    for _ in range(4):
+        if not findings(text, path):
+            return text
+        text = scrub_public_text(text, path)
+    return text
+
+
+def pdf_push_banner(reason: str, token: str | None = None) -> str:
+    reason = " ".join(_hide_token(relativize_internal_paths(reason or ""), token).split())
+    return "PDFs NOT saved to GitHub: " + (reason or "the runs branch could not be updated")
 
 
 def _plain_git_reason(base: str, cp: subprocess.CompletedProcess, token: str | None) -> str:
-    detail = f"{cp.stderr or ''} {cp.stdout or ''}"
-    if token:
-        detail = detail.replace(token, "")
-    detail = " ".join(scrub_host_text(detail).split())
-    if not detail or any(ch in detail for ch in ("/", "\\")) or "AUTHORIZATION" in detail or len(detail) > 160:
+    detail = _hide_token(f"{cp.stderr or ''} {cp.stdout or ''}", token)
+    detail = " ".join(relativize_internal_paths(detail).split())
+    if not detail or any(ch in detail for ch in ("/", "\\")) or "authorization" in detail.lower() or len(detail) > 160:
+        return base
+    if token and token in detail:
         return base
     return f"{base} ({detail})"
 
 
-def _bytes_have_host_path(data: bytes) -> bool:
-    pat = _host_path_re(True)
-    if pat.search(data):
+def _pdf_text(path: Path) -> str | None:
+    if not shutil.which("pdftotext"):
+        return None
+    cp = subprocess.run(["pdftotext", str(path), "-"], capture_output=True)
+    return cp.stdout.decode("utf-8", "replace")
+
+
+def _pdf_refusal(path: Path, token: str | None) -> None:
+    """Raise when the PDF's text fails the public check. The PDF is not copied."""
+    from guardrails.public_hygiene import findings
+    text = _pdf_text(path)
+    if text is None:
+        raise _PublishRefused("could not read a PDF, so it was not saved")
+    if _text_has_secret(text, token) or _text_has_internal_path(text) or findings(text, Path(path.name)):
+        raise _PublishRefused("a PDF still contains an internal path or a secret, so it was not saved")
+
+
+def _text_has_secret(text: str, token: str | None) -> bool:
+    if token and len(token) >= 4 and token in text:
         return True
-    for match in re.finditer(br"stream\r?\n(.*?)endstream", data, re.S):
-        chunk = match.group(1).strip(b"\r\n")
-        for wbits in (zlib.MAX_WBITS, -zlib.MAX_WBITS):
-            try:
-                plain = zlib.decompress(chunk, wbits)
-            except zlib.error:
-                continue
-            if pat.search(plain):
-                return True
+    if _GH_TOKEN.search(text):
+        return True
+    for match in _NAMED_SECRET.finditer(text):
+        value = match.group(3).strip("\"'")
+        if value and value != "[redacted]":
+            return True
+    for match in _BEARER.finditer(text):
+        if "[redacted]" not in match.group(0):
+            return True
     return False
-
-
-def _pdf_bytes_for_push(path: Path) -> bytes:
-    """The PDF to publish. The original file is kept; a copy is rebuilt only when it holds a machine path."""
-    data = path.read_bytes()
-    if not _bytes_have_host_path(data):
-        return data
-    text = ""
-    if shutil.which("pdftotext"):
-        text = subprocess.run(["pdftotext", str(path), "-"], capture_output=True, text=True).stdout
-    text = scrub_host_text(text)
-    tmp = path.with_name(path.name + ".push-tmp")
-    try:
-        pdf_always.write_pdf(tmp, path.stem, text.splitlines() or ["report"])
-        return scrub_host_paths(tmp.read_bytes())
-    finally:
-        tmp.unlink(missing_ok=True)
 
 
 def _safe_pr_id(name: str | None) -> str:
@@ -8943,24 +9008,29 @@ def _short_poc_sha(poc_commit: str | None, root: Path) -> str:
     return "unknown"
 
 
+def _strip_userinfo(url: str) -> str:
+    """Drop user:password@ from an https URL so a token cannot ride along in the address."""
+    return _USERINFO.sub(r"\1", url.strip())
+
+
 def _github_slug(origin: str) -> str | None:
-    text = origin.strip()
+    text = _strip_userinfo(origin)
     if text.endswith(".git"):
         text = text[:-4]
     for prefix in ("https://github.com/", "https://www.github.com/", "git@github.com:"):
         if text.startswith(prefix):
             slug = text[len(prefix):]
-            if slug.count("/") == 1 and " " not in slug:
+            if slug.count("/") == 1 and " " not in slug and "@" not in slug:
                 return slug
     return None
 
 
 def _remote_for_push(origin: str) -> tuple[str, bool]:
-    """(url to push to, whether the GitHub token header is required). A local path is left as it is."""
+    """(url to push to, whether the GitHub token is required). The url never contains the token."""
     slug = _github_slug(origin)
     if slug:
         return f"https://github.com/{slug}.git", True
-    return origin, False
+    return _strip_userinfo(origin), False
 
 
 def _tree_url(origin: str, date: str, short: str, pr_id: str | None = None) -> str:
@@ -8973,7 +9043,8 @@ def _tree_url(origin: str, date: str, short: str, pr_id: str | None = None) -> s
 
 def _push_env() -> dict:
     env = os.environ.copy()
-    for key in ("GIT_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE", "GIT_PREFIX", "GIT_COMMON_DIR"):
+    for key in ("GIT_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE", "GIT_PREFIX", "GIT_COMMON_DIR",
+                "GIT_ASKPASS", "SSH_ASKPASS", "POC_RUNS_GIT_TOKEN"):
         env.pop(key, None)
     env.update({
         "GIT_AUTHOR_NAME": PDF_PUSH_NAME,
@@ -8981,6 +9052,7 @@ def _push_env() -> dict:
         "GIT_COMMITTER_NAME": PDF_PUSH_NAME,
         "GIT_COMMITTER_EMAIL": PDF_PUSH_EMAIL,
         "GIT_TERMINAL_PROMPT": "0",
+        "GCM_INTERACTIVE": "never",
         "GIT_CONFIG_COUNT": "4",
         "GIT_CONFIG_KEY_0": "safe.directory",
         "GIT_CONFIG_VALUE_0": "*",
@@ -8994,13 +9066,20 @@ def _push_env() -> dict:
     return env
 
 
-def _git_exec(args: list[str], *, cwd: Path | None, env: dict, token: str | None, authed: bool):
-    cmd = ["git"]
-    if authed and token:
-        # The token stays in the process header, never in the remote url and never in a log line.
-        cmd += ["-c", "http.extraheader=AUTHORIZATION: bearer " + token]
-    cmd += [str(a) for a in args]
-    return subprocess.run(cmd, cwd=None if cwd is None else str(cwd), env=env, capture_output=True, text=True)
+def _arm_askpass(directory: Path, env: dict, token: str) -> None:
+    """Git asks this script for a username and password. The token is only in the script's environment."""
+    script = directory / "askpass"
+    script.write_text("#!/bin/sh\ncase \"$1\" in\n*[Uu]sername*) printf '%s\\n' 'x-access-token' ;;\n"
+                      "*) printf '%s\\n' \"$POC_RUNS_GIT_TOKEN\" ;;\nesac\n")
+    script.chmod(0o700)
+    env["GIT_ASKPASS"] = str(script)
+    env["SSH_ASKPASS"] = str(script)
+    env["POC_RUNS_GIT_TOKEN"] = token
+
+
+def _git_exec(args: list[str], *, cwd: Path | None, env: dict):
+    return subprocess.run(["git", *[str(a) for a in args]], cwd=None if cwd is None else str(cwd),
+                          env=env, capture_output=True, text=True)
 
 
 def _read_origin(root: Path) -> str:
@@ -9016,36 +9095,32 @@ def _remote_moved(cp: subprocess.CompletedProcess) -> bool:
     return "non-fast-forward" in text or "fetch first" in text
 
 
-def _rebase_onto_runs(checkout: Path, env: dict, token: str | None, use_token: bool) -> None:
-    fetch = _git_exec(["fetch", "--no-tags", "origin", RUNS_BRANCH], cwd=checkout, env=env,
-                      token=token if use_token else None, authed=use_token)
+def _rebase_onto_runs(checkout: Path, env: dict, token: str | None) -> None:
+    fetch = _git_exec(["fetch", "--no-tags", "origin", RUNS_BRANCH], cwd=checkout, env=env)
     if fetch.returncode != 0:
         raise _RunsPushError(_plain_git_reason("could not fetch the runs branch", fetch, token))
-    reb = _git_exec(["rebase", f"origin/{RUNS_BRANCH}"], cwd=checkout, env=env, token=None, authed=False)
+    reb = _git_exec(["rebase", f"origin/{RUNS_BRANCH}"], cwd=checkout, env=env)
     if reb.returncode != 0:
-        _git_exec(["rebase", "--abort"], cwd=checkout, env=env, token=None, authed=False)
+        _git_exec(["rebase", "--abort"], cwd=checkout, env=env)
         raise _RunsPushError("could not rebase onto the runs branch")
 
 
-def _push_head(checkout: Path, env: dict, token: str | None, use_token: bool) -> None:
+def _push_head(checkout: Path, env: dict, token: str | None) -> None:
     # br-allow-external: copy this run's PDFs and record.json onto the runs branch; never the pull request
-    cp = _git_exec(["push", "origin", f"HEAD:refs/heads/{RUNS_BRANCH}"], cwd=checkout, env=env,
-                   token=token if use_token else None, authed=use_token)
+    cp = _git_exec(["push", "origin", f"HEAD:refs/heads/{RUNS_BRANCH}"], cwd=checkout, env=env)
     if cp.returncode == 0:
         return
     if _remote_moved(cp):
-        _rebase_onto_runs(checkout, env, token, use_token)
+        _rebase_onto_runs(checkout, env, token)
         # br-allow-external: try the runs branch again after rebasing onto the moved tip
-        cp = _git_exec(["push", "origin", f"HEAD:refs/heads/{RUNS_BRANCH}"], cwd=checkout, env=env,
-                       token=token if use_token else None, authed=use_token)
+        cp = _git_exec(["push", "origin", f"HEAD:refs/heads/{RUNS_BRANCH}"], cwd=checkout, env=env)
         if cp.returncode == 0:
             return
     raise _RunsPushError(_plain_git_reason("could not push to the runs branch", cp, token))
 
 
-def _runs_branch_exists(origin: str, env: dict, token: str | None, use_token: bool, cwd: Path) -> bool:
-    cp = _git_exec(["ls-remote", "--heads", origin, RUNS_BRANCH], cwd=cwd, env=env,
-                   token=token if use_token else None, authed=use_token)
+def _runs_branch_exists(origin: str, env: dict, token: str | None, cwd: Path) -> bool:
+    cp = _git_exec(["ls-remote", "--heads", origin, RUNS_BRANCH], cwd=cwd, env=env)
     if cp.returncode != 0:
         raise _RunsPushError(_plain_git_reason("could not read the runs branch", cp, token))
     return f"refs/heads/{RUNS_BRANCH}" in (cp.stdout or "")
@@ -9053,15 +9128,15 @@ def _runs_branch_exists(origin: str, env: dict, token: str | None, use_token: bo
 
 def _init_orphan(checkout: Path, origin: str, env: dict) -> None:
     checkout.mkdir(parents=True, exist_ok=True)
-    cp = _git_exec(["init", "-q", "-b", RUNS_BRANCH], cwd=checkout, env=env, token=None, authed=False)
+    cp = _git_exec(["init", "-q", "-b", RUNS_BRANCH], cwd=checkout, env=env)
     if cp.returncode != 0:
-        cp = _git_exec(["init", "-q"], cwd=checkout, env=env, token=None, authed=False)
+        cp = _git_exec(["init", "-q"], cwd=checkout, env=env)
         if cp.returncode != 0:
             raise _RunsPushError("could not prepare a temporary clone")
-        cp = _git_exec(["checkout", "--orphan", RUNS_BRANCH], cwd=checkout, env=env, token=None, authed=False)
+        cp = _git_exec(["checkout", "--orphan", RUNS_BRANCH], cwd=checkout, env=env)
         if cp.returncode != 0:
             raise _RunsPushError("could not prepare a temporary clone")
-    cp = _git_exec(["remote", "add", "origin", origin], cwd=checkout, env=env, token=None, authed=False)
+    cp = _git_exec(["remote", "add", "origin", origin], cwd=checkout, env=env)
     if cp.returncode != 0:
         raise _RunsPushError("could not prepare a temporary clone")
 
@@ -9070,18 +9145,23 @@ def _pdf_push_field(ok: bool, attempts: int, error: str | None, url: str | None)
     return {"ok": bool(ok), "attempts": int(attempts), "error": error, "url": url}
 
 
-def _record_bytes_for_push(path: Path, field: dict) -> bytes:
+def _record_bytes_for_push(path: Path, field: dict, token: str | None) -> bytes:
+    from guardrails.public_hygiene import findings
     try:
         rec = json.loads(path.read_text())
     except (OSError, json.JSONDecodeError):
         rec = None
+    label = Path("record.json")
     if isinstance(rec, dict):
-        rec = dict(rec)
+        rec = _scrub_json_value(dict(rec), token)
         rec["pdf_push"] = field
-        raw = json.dumps(rec, indent=1).encode("utf-8")
+        text = json.dumps(rec, indent=1)
     else:
-        raw = path.read_bytes()
-    return scrub_host_paths(raw)
+        text = path.read_bytes().decode("utf-8", "replace")
+    text = scrub_published_text(text, token, label)
+    if findings(text, label) or _text_has_internal_path(text) or _text_has_secret(text, token):
+        raise _PublishRefused("a file still contains text that cannot be published, so it was not saved")
+    return text.encode("utf-8")
 
 
 def _write_local_pdf_push(path: Path, field: dict) -> None:
@@ -9186,16 +9266,16 @@ def _note_pdf_saved(run_dir: Path | None, report_dir: Path, line: str) -> None:
     print(line, flush=True)
 
 
-def _runs_push_once(origin: str, token: str | None, use_token: bool, payloads: list[tuple[str, bytes]],
+def _runs_push_once(origin: str, token: str | None, payloads: list[tuple[str, bytes]],
                     branch_existed: bool | None, env: dict) -> None:
     """Commit payloads on a temporary clone and push. Never checks out or writes the caller's repository."""
     parent = Path(tempfile.mkdtemp(prefix="poc-runs-"))
     checkout = parent / "checkout"
     try:
-        existed = _runs_branch_exists(origin, env, token, use_token, parent) if branch_existed is None else branch_existed
+        existed = _runs_branch_exists(origin, env, token, parent) if branch_existed is None else branch_existed
         if existed:
             cp = _git_exec(["clone", "--quiet", "--branch", RUNS_BRANCH, "--single-branch", origin, str(checkout)],
-                           cwd=parent, env=env, token=token if use_token else None, authed=use_token)
+                           cwd=parent, env=env)
             if cp.returncode != 0:
                 raise _RunsPushError(_plain_git_reason("could not clone the runs branch", cp, token))
         else:
@@ -9207,21 +9287,21 @@ def _runs_push_once(origin: str, token: str | None, use_token: bool, payloads: l
             dest = checkout.joinpath(*rel_path.parts)
             dest.parent.mkdir(parents=True, exist_ok=True)
             dest.write_bytes(data)
-        add = _git_exec(["add", "-A"], cwd=checkout, env=env, token=None, authed=False)
+        add = _git_exec(["add", "-A"], cwd=checkout, env=env)
         if add.returncode != 0:
             raise _RunsPushError("could not prepare a temporary clone")
-        status = _git_exec(["status", "--porcelain"], cwd=checkout, env=env, token=None, authed=False)
+        status = _git_exec(["status", "--porcelain"], cwd=checkout, env=env)
         if (status.stdout or "").strip():
-            commit = _git_exec(["commit", "-q", "-m", "Save run PDFs"], cwd=checkout, env=env, token=None, authed=False)
+            commit = _git_exec(["commit", "-q", "-m", "Save run PDFs"], cwd=checkout, env=env)
             if commit.returncode != 0:
                 raise _RunsPushError(_plain_git_reason("could not commit the run PDFs", commit, token))
             if existed:
-                _rebase_onto_runs(checkout, env, token, use_token)
+                _rebase_onto_runs(checkout, env, token)
         elif not existed:
             raise _RunsPushError("could not commit the run PDFs")
         else:
             return  # this run's files are already on the branch
-        _push_head(checkout, env, token, use_token)
+        _push_head(checkout, env, token)
     finally:
         shutil.rmtree(parent, ignore_errors=True)
 
@@ -9248,15 +9328,18 @@ def publish_run_outputs(report_dir: Path, run_dir: Path | None = None, *, poc_co
         return {pr_id: _tree_url(base_origin, day, short, pr_id) for pr_id in pr_ids}
 
     def finish(ok: bool, used: int, error: str | None, url_map: dict) -> dict:
+        error = _hide_token(error, token) if error else None
+        clean = {key: _hide_token(value, token) for key, value in url_map.items()} if ok else {}
         result = {"ok": ok, "attempts": used, "error": error,
-                  "url": next(iter(url_map.values()), None) if ok and url_map else None, "urls": url_map if ok else {}}
+                  "url": next(iter(clean.values()), None) if ok and clean else None, "urls": clean}
         _stamp_saved_records(run_dir, records, lambda pr_id: _pdf_push_field(
-            ok, used, error, url_map.get(pr_id) if ok else None))
+            ok, used, error, clean.get(pr_id) if ok else None))
         if ok:
-            parent = _tree_url(remote_note[0] or "", day, short)
+            parent = _hide_token(_tree_url(remote_note[0] or "", day, short), token)
             _note_pdf_saved(run_dir, report_dir, f"PDFs saved to GitHub: {parent}")
         else:
-            _show_pdf_push_banner(pdf_push_banner(error or "the runs branch could not be updated"), report_dir, run_dir)
+            _show_pdf_push_banner(pdf_push_banner(error or "the runs branch could not be updated", token),
+                                  report_dir, run_dir)
         return result
 
     remote_note = [origin or ""]
@@ -9268,43 +9351,63 @@ def publish_run_outputs(report_dir: Path, run_dir: Path | None = None, *, poc_co
         remote = origin or _read_origin(root)
     except _RunsPushError as exc:
         return finish(False, 0, str(exc), {})
-    remote_note[0] = remote
+    remote_note[0] = _strip_userinfo(remote)
     push_url, use_token = _remote_for_push(remote)
-    env = _push_env()
-    summary_bytes = _pdf_bytes_for_push(summary) if summary else None
-    url_map = urls_for(remote)
-    last = "could not push to the runs branch"
-    used = 0
-    for attempt in range(1, max(1, attempts) + 1):
-        used = attempt
-        payloads = []
-        for pr_id, group in groups.items():
-            prefix = f"runs/{day}/{short}/{pr_id}"
-            if group.get("report"):
-                payloads.append((f"{prefix}/REPORT.pdf", _pdf_bytes_for_push(group["report"])))
-            if summary_bytes is not None:
-                payloads.append((f"{prefix}/SUMMARY.pdf", summary_bytes))
-            if group.get("record"):
-                field = _pdf_push_field(True, attempt, None, url_map.get(pr_id))
-                payloads.append((f"{prefix}/record.json", _record_bytes_for_push(group["record"], field)))
-        if summary_bytes is not None and not groups:
-            payloads.append((f"runs/{day}/{short}/{pr_ids[0]}/SUMMARY.pdf", summary_bytes))
+    url_map = urls_for(remote_note[0])
+    ask_dir = Path(tempfile.mkdtemp(prefix="poc-ask-"))
+    try:
+        env = _push_env()
+        if use_token:
+            _arm_askpass(ask_dir, env, token)
         try:
-            _runs_push_once(push_url, token, use_token, payloads, None, env)
-        except _RunsPushError as exc:
-            last = str(exc)
-            if attempt < attempts:
-                sleeper(PDF_PUSH_BACKOFF_S[min(attempt - 1, len(PDF_PUSH_BACKOFF_S) - 1)])
-            continue
-        except Exception:  # noqa: BLE001 - a copy failure must not fail the run
-            last = "could not push to the runs branch"
-            if attempt < attempts:
-                sleeper(PDF_PUSH_BACKOFF_S[min(attempt - 1, len(PDF_PUSH_BACKOFF_S) - 1)])
-            continue
-        return finish(True, attempt, None, url_map)
-    if used >= attempts:
-        last = f"could not push to the runs branch after {attempts} attempts"
-    return finish(False, used, scrub_host_text(last), {})
+            summary_bytes = summary.read_bytes() if summary else None
+            if summary is not None:
+                _pdf_refusal(summary, token)
+            report_bytes = {}
+            for pr_id, group in groups.items():
+                if group.get("report"):
+                    _pdf_refusal(group["report"], token)
+                    report_bytes[pr_id] = group["report"].read_bytes()
+        except _PublishRefused as exc:
+            return finish(False, 1, str(exc), {})
+        last = "could not push to the runs branch"
+        used = 0
+        for attempt in range(1, max(1, attempts) + 1):
+            used = attempt
+            payloads = []
+            try:
+                for pr_id, group in groups.items():
+                    prefix = f"runs/{day}/{short}/{pr_id}"
+                    if pr_id in report_bytes:
+                        payloads.append((f"{prefix}/REPORT.pdf", report_bytes[pr_id]))
+                    if summary_bytes is not None:
+                        payloads.append((f"{prefix}/SUMMARY.pdf", summary_bytes))
+                    if group.get("record"):
+                        field = _pdf_push_field(True, attempt, None, url_map.get(pr_id))
+                        payloads.append((f"{prefix}/record.json",
+                                         _record_bytes_for_push(group["record"], field, token)))
+                if summary_bytes is not None and not groups:
+                    payloads.append((f"runs/{day}/{short}/{pr_ids[0]}/SUMMARY.pdf", summary_bytes))
+            except _PublishRefused as exc:
+                return finish(False, 1, str(exc), {})
+            try:
+                _runs_push_once(push_url, token, payloads, None, env)
+            except _RunsPushError as exc:
+                last = str(exc)
+                if attempt < attempts:
+                    sleeper(PDF_PUSH_BACKOFF_S[min(attempt - 1, len(PDF_PUSH_BACKOFF_S) - 1)])
+                continue
+            except Exception:  # noqa: BLE001 - a copy failure must not fail the run
+                last = "could not push to the runs branch"
+                if attempt < attempts:
+                    sleeper(PDF_PUSH_BACKOFF_S[min(attempt - 1, len(PDF_PUSH_BACKOFF_S) - 1)])
+                continue
+            return finish(True, attempt, None, url_map)
+        if used >= attempts:
+            last = f"could not push to the runs branch after {attempts} attempts"
+        return finish(False, used, _hide_token(last, token), {})
+    finally:
+        shutil.rmtree(ask_dir, ignore_errors=True)
 
 
 def publish_written_pdfs(report_dir=None, run_dir=None, poc_commit=None, date=None, records=None,

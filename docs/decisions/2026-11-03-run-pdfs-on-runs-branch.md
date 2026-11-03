@@ -16,10 +16,19 @@ uses for reads (`GITHUB_TOKEN`, then `GITHUB_POC_TOKEN`, then `GH_TOKEN`) is use
 The copy is tried up to 3 times. After a failed try it waits 1 second, then 2. If the remote branch moved, the
 temporary clone rebases onto that tip and tries the update again. PDFs are never emailed.
 
+Before anything is copied, every file is checked with the same public-file rules used on main. In `record.json`
+and other text, machine-local paths are rewritten as relative paths, and keys and tokens (including a bearer
+header) are removed. A PDF is read with `pdftotext`. If that text still has an internal path, a secret, or any
+other public-file failure, the PDF is not copied. That is a failed save, with the same banner, and nothing
+unscrubbed is pushed.
+
+The GitHub token is not put in the remote address, in a command, or in anything the run prints. Git asks a
+small helper for the password. `run.log`, the report, error text and `pdf_push.url` are checked again so a
+token cannot remain there.
+
 If there is no token, or every try fails, the run still finishes and the local files stay. The report and
 `run.log` then start with the line `PDFs NOT saved to GitHub: <reason>`. Each record gains
-`pdf_push`, with `ok`, `attempts`, `error` and `url`. Machine-local paths are left out of the copies that are
-pushed.
+`pdf_push`, with `ok`, `attempts`, `error` and `url`.
 
 ## Why
 
@@ -35,6 +44,8 @@ under test and without changing the checkout the operator is using.
   the branch.
 - Retry 3 times with a short wait. A failed copy never fails the run.
 - Say so in plain words in the report and in `run.log`, and store `pdf_push` on the record.
+- Scrub text with the public-file rules before copying it. Do not copy a PDF whose text still fails those rules.
+- Keep the token out of the remote address and out of every line the run prints.
 - Do not email PDFs. Do not change how a verdict is chosen.
 
 ## Alternatives and tradeoffs
@@ -58,4 +69,6 @@ Nothing is sent by email. The verdict is unchanged.
 `tests/test_run_pdf_push.py` uses a local bare repository as origin. It covers a first successful copy onto a
 new orphan branch, a retry after one rejection (the earlier remote commit is kept), a rejection on every try
 (the banner, and the local files stay), and a run with no token (no branch is created, and the banner is
-shown). No pull request is contacted.
+shown). A record that names a machine path and a fake key is copied only after that text is rewritten. A PDF
+whose text still names a machine path is not copied, and the banner says so. `run.log`, the report and
+`pdf_push` do not contain the token on a success or a failure. No pull request is contacted.

@@ -3,77 +3,16 @@ machine-local paths. This guard fails CI if any of them reappear in a tracked fi
 pdftotext is available). The owner's handle may appear only in this repository's clone URL and its GitHub Pages
 address."""
 import os
-import re
 import shutil
 import subprocess
 from pathlib import Path
 
 import pytest
 
+from guardrails.public_hygiene import findings
+
 ROOT = Path(__file__).resolve().parent.parent
 SELF = Path(__file__).resolve()
-ALLOWED = [
-    re.compile(r"github\.com/aritracodesbad123/proof-of-change(\.git)?", re.I),
-    # GitHub Pages uses the owner handle as the site name. The name still fails in prose.
-    re.compile(r"aritracodesbad123\.github\.io/proof-of-change", re.I),
-    # The licence file carries this copyright line on purpose. The name still fails anywhere else.
-    re.compile(r"Copyright \(c\) 2026 Aritra Chakraborty"),
-]
-BANNED = {
-    "team member name": r"\b(nathan|jonathan|aritra)\b|aritra(?!codesbad123/proof-of-change)",
-    "bot": r"\bbots?\b|grok",
-    "internal schedule": r"\b10:15\b|\b11:15\b",
-    "internal library registry / picks": r"registry|\bpicks\b",
-    "internal machine": r"shared machine|(?<![\w-])box(?![\w-])|/workspace\b|/home/box",
-    "internal tool": r"validation center",
-    "personal credit": r"\bcredit(ed|s)? (to|by)\b",
-}
-PATTERNS = {k: re.compile(v, re.I) for k, v in BANNED.items()}
-# owner/name, or the same pair in a github.com URL. Used only to recognise an upstream repository name.
-UPSTREAM_REPO = re.compile(r"(?:https?://github\.com/)?[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+", re.I)
-
-
-def _under_study_pairs(path: Path | None) -> bool:
-    """True when path is a file inside evals/study_pairs/."""
-    if path is None:
-        return False
-    parts = path.parts
-    return any(parts[i] == "evals" and i + 1 < len(parts) and parts[i + 1] == "study_pairs"
-               for i in range(len(parts)))
-
-
-def _under_random_prs(path: Path | None) -> bool:
-    """True inside benchmarks/random-prs/ or benchmarks/batch30-*/ (lists of upstream PRs): "bot" is allowed only inside an owner/name."""
-    if path is None:
-        return False
-    parts = path.parts
-    return any(parts[i] == "benchmarks" and i + 1 < len(parts)
-               and (parts[i + 1] == "random-prs" or parts[i + 1].startswith("batch30-"))
-               for i in range(len(parts)))
-
-
-def _under_upstream_run(path: Path | None) -> bool:
-    """True only for stored upstream run output: the tool's own record and report files.
-
-    Our own write-ups (README, SCORING, notes) next to them are not covered.
-    """
-    if path is None:
-        return False
-    parts = path.parts
-    for i in range(len(parts) - 1):
-        if (parts[i] == "benchmarks" and parts[i + 1].startswith("batch30-") and "runs" in parts[i + 2:-1]
-                and path.name in {"record.json", "REPORT.md", "REPORT.html"}):
-            return True
-        if parts[i] == "replay" and parts[i + 1] == "catalog.json":
-            return True  # generated only from the stored records by ops/export_replay.py
-        if parts[i] == "replay" and parts[i + 1] == "checks" and path.name in {"record.json", "REPORT.md", "REPORT.html"}:
-            return True
-    return False
-
-
-def _inside_upstream_repo(line: str, match: re.Match) -> bool:
-    """True when the match sits inside an upstream repository name on this line."""
-    return any(repo.start() <= match.start() and match.end() <= repo.end() for repo in UPSTREAM_REPO.finditer(line))
 
 
 def tracked_files() -> list[Path]:
@@ -98,25 +37,6 @@ def text_of(p: Path) -> str | None:
     if p.suffix.lower() in (".png", ".jpg", ".jpeg", ".gif", ".ico", ".woff", ".woff2"):
         return None
     return p.read_bytes().decode("utf-8", "replace")
-
-
-def findings(text: str, path: Path | None = None) -> list[str]:
-    for a in ALLOWED:
-        text = a.sub("<repo-url>", text)
-    study_pairs = _under_study_pairs(path) or _under_random_prs(path)
-    out = []
-    for i, line in enumerate(text.splitlines(), 1):
-        for kind, pat in PATTERNS.items():
-            matches = list(pat.finditer(line))
-            if kind in {"bot", "internal library registry / picks"} and _under_upstream_run(path):
-                # Upstream package, test and repository names in stored run output. Machine paths still fail.
-                matches = []
-            if kind == "bot" and study_pairs:
-                # Repository names under the study-pair files may contain this word. Prose still fails.
-                matches = [m for m in matches if not _inside_upstream_repo(line, m)]
-            if matches:
-                out.append(f"line {i}: {kind}: {matches[0].group(0)!r}")
-    return out
 
 
 def test_no_internal_names_or_paths_in_tracked_files():

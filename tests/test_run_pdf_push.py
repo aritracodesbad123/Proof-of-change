@@ -13,6 +13,7 @@ SHA = "46c8a6c" + ("b" * 33)
 DAY = "2026-11-03"
 PR = "widgets-7"
 TOKEN_NAMES = ("GITHUB_TOKEN", "GITHUB_POC_TOKEN", "GH_TOKEN")
+TOKEN = "ghp_" + "LocalTestTokenValue12"
 
 
 def _host_paths() -> list[str]:
@@ -56,9 +57,9 @@ def _layout(tmp: Path) -> tuple[Path, Path, dict]:
     (report / PR).mkdir(parents=True)
     note = " and ".join(_host_paths())
     pdf_always.write_pdf(report / PR / "REPORT.pdf", "Reviewer report widgets-7",
-                         ["Verdict: verified", "Reason: the mapped tests agree", note])
+                         ["Verdict: verified", "Reason: the mapped tests agree"])
     pdf_always.write_pdf(report / "SUMMARY.pdf", "Proof-of-Change summary",
-                         ["Go/no-go: GO", "widgets-7: verified", note])
+                         ["Go/no-go: GO", "widgets-7: verified"])
     rec = {"repo": "example/widgets", "library": "widgets", "logs": f"{PR}/",
            "pr": {"number": 7, "repo": "example/widgets"}, "verdict": "verified",
            "reason": "the mapped tests agree", "note": note}
@@ -149,13 +150,19 @@ def _publish(report, run, user, sleep):
     return dr.publish_run_outputs(report, run, poc_commit=SHA, date=DAY, root=user, sleep=sleep)
 
 
+def _assert_no_token(*texts: str) -> None:
+    for text in texts:
+        assert TOKEN not in text
+        assert "x-access-token:" + TOKEN not in text
+
+
 def test_push_creates_an_orphan_runs_branch(tmp_path, monkeypatch):
     bare, user = tmp_path / "origin.git", tmp_path / "checkout"
     _bare(bare)
     _user_repo(user, bare)
     before = _snap(user)
     _clear_tokens(monkeypatch)
-    monkeypatch.setenv("GITHUB_POC_TOKEN", "local-test-token")
+    monkeypatch.setenv("GITHUB_POC_TOKEN", TOKEN)
     report, run, rec = _layout(tmp_path)
     slept = []
     result = _publish(report, run, user, slept.append)
@@ -183,11 +190,13 @@ def test_push_creates_an_orphan_runs_branch(tmp_path, monkeypatch):
     raw = b"\n".join(_blob(bare, f"{prefix}/{name}") for name in ("record.json", "REPORT.pdf", "SUMMARY.pdf"))
     for path in _host_paths():
         assert path.encode() not in raw
-    assert b"local-test-token" not in raw
+    assert TOKEN.encode() not in raw
     local = json.loads((run / PR / "record.json").read_text())
     assert local["pdf_push"]["ok"] is True
     assert rec["note"] in local["note"]  # the local file keeps its own text
-    assert "PDFs saved to GitHub:" in (run / "run.log").read_text()
+    log = (run / "run.log").read_text()
+    assert "PDFs saved to GitHub:" in log
+    _assert_no_token(log, (run / "REPORT.md").read_text(), json.dumps(local["pdf_push"]), json.dumps(pushed["pdf_push"]))
     import inspect
     banned = "smtp" + "lib"
     assert banned not in inspect.getsource(dr.publish_run_outputs)
@@ -202,7 +211,7 @@ def test_push_retries_after_one_failure_and_keeps_the_remote_commit(tmp_path, mo
     _reject_once(bare)
     before = _snap(user)
     _clear_tokens(monkeypatch)
-    monkeypatch.setenv("GITHUB_TOKEN", "local-test-token")
+    monkeypatch.setenv("GITHUB_TOKEN", TOKEN)
     report, run, _rec = _layout(tmp_path)
     delays = []
 
@@ -228,7 +237,7 @@ def test_push_failure_keeps_local_files_and_shows_the_banner(tmp_path, monkeypat
     _reject_always(bare)
     before = _snap(user)
     _clear_tokens(monkeypatch)
-    monkeypatch.setenv("GITHUB_TOKEN", "local-test-token")
+    monkeypatch.setenv("GITHUB_TOKEN", TOKEN)
     report, run, _rec = _layout(tmp_path)
     pdf_before = (report / "SUMMARY.pdf").read_bytes()
     delays = []
@@ -251,6 +260,7 @@ def test_push_failure_keeps_local_files_and_shows_the_banner(tmp_path, monkeypat
     assert saved["pdf_push"] == {"ok": False, "attempts": 3,
                                  "error": "could not push to the runs branch after 3 attempts", "url": None}
     assert (report / PR / "REPORT.pdf").is_file()
+    _assert_no_token((run / "run.log").read_text(), report_text, json.dumps(saved["pdf_push"]), json.dumps(result))
 
 
 def test_no_token_does_not_push_and_shows_the_banner(tmp_path, monkeypatch):
@@ -275,3 +285,71 @@ def test_no_token_does_not_push_and_shows_the_banner(tmp_path, monkeypatch):
     saved = json.loads((run / PR / "record.json").read_text())
     assert saved["pdf_push"]["ok"] is False and saved["pdf_push"]["attempts"] == 0
     assert (report / "SUMMARY.pdf").is_file() and (report / PR / "REPORT.pdf").is_file()
+
+
+def test_record_paths_and_keys_are_scrubbed_on_the_runs_branch(tmp_path, monkeypatch):
+    bare, user = tmp_path / "origin.git", tmp_path / "checkout"
+    _bare(bare)
+    _user_repo(user, bare)
+    _clear_tokens(monkeypatch)
+    monkeypatch.setenv("GITHUB_TOKEN", TOKEN)
+    report, run, _rec = _layout(tmp_path)
+    secret = "nsk-" + "notarealkeyvalue99"
+    space = "/" + "work" + "space" + "/ops/daily/note.txt"
+    home = "/" + "home" + "/" + "alice" + "/proj/log.txt"
+    tmp_path_text = "/" + "tmp" + "/pytest/case"
+    rec_path = run / PR / "record.json"
+    rec = json.loads(rec_path.read_text())
+    rec["note"] = f"see {space} and {home} and {tmp_path_text} NEBIUS_API_KEY={secret} Authorization: Bearer {secret}"
+    rec["nebius_api_key"] = secret
+    rec_path.write_text(json.dumps(rec))
+    result = _publish(report, run, user, lambda _s: None)
+    assert result["ok"] is True and result["error"] is None
+    pushed = json.loads(_blob(bare, f"runs/{DAY}/{SHA[:7]}/{PR}/record.json"))
+    dumped = json.dumps(pushed)
+    assert space not in dumped and home not in dumped and tmp_path_text not in dumped and secret not in dumped
+    assert "ops/daily/note.txt" in pushed["note"]
+    assert "proj/log.txt" in pushed["note"]
+    assert "pytest/case" in pushed["note"]
+    assert pushed["nebius_api_key"] == "[redacted]"
+    assert "Authorization" in pushed["note"] and "[redacted]" in pushed["note"]
+    from guardrails.public_hygiene import findings
+    assert not findings(dumped, rec_path)
+    _assert_no_token((run / "run.log").read_text(), (run / "REPORT.md").read_text(),
+                     json.dumps(pushed["pdf_push"]), json.dumps(result))
+
+
+def test_pdf_with_an_internal_path_is_refused(tmp_path, monkeypatch):
+    bare, user = tmp_path / "origin.git", tmp_path / "checkout"
+    _bare(bare)
+    _user_repo(user, bare)
+    _clear_tokens(monkeypatch)
+    monkeypatch.setenv("GITHUB_POC_TOKEN", TOKEN)
+    report, run, _rec = _layout(tmp_path)
+    space = "/" + "work" + "space" + "/ops/daily/note.txt"
+    pdf_always.write_pdf(report / PR / "REPORT.pdf", "Reviewer report widgets-7",
+                         ["Verdict: verified", space])
+    delays = []
+    result = _publish(report, run, user, delays.append)
+    banner = "PDFs NOT saved to GitHub: a PDF still contains an internal path or a secret, so it was not saved"
+    assert result["ok"] is False and result["attempts"] == 1 and result["url"] is None
+    assert result["error"] == "a PDF still contains an internal path or a secret, so it was not saved"
+    assert delays == []
+    assert _count(bare) == 0
+    assert banner in (run / "run.log").read_text()
+    assert (run / "REPORT.md").read_text().startswith(banner)
+    saved = json.loads((run / PR / "record.json").read_text())
+    assert saved["pdf_push"]["ok"] is False
+    _assert_no_token((run / "run.log").read_text(), (run / "REPORT.md").read_text(),
+                     json.dumps(saved["pdf_push"]), json.dumps(result))
+    assert (report / PR / "REPORT.pdf").is_file()
+
+
+def test_remote_url_and_tree_url_do_not_carry_the_token():
+    origin = "https://x-access-token:" + TOKEN + "@github.com/acme/widgets.git"
+    url, use_token = dr._remote_for_push(origin)
+    assert use_token is True
+    assert url == "https://github.com/acme/widgets.git"
+    tree = dr._tree_url(origin, DAY, SHA[:7], PR)
+    assert tree == f"https://github.com/acme/widgets/tree/runs/runs/{DAY}/{SHA[:7]}/{PR}"
+    _assert_no_token(url, tree)
