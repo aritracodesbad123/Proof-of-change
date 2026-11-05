@@ -342,6 +342,7 @@ def test_pdf_with_an_internal_path_is_scrubbed_and_pushed(tmp_path, monkeypatch)
     text = subprocess.run(["pdftotext", str(pdf_path), "-"], capture_output=True, text=True).stdout
     assert space not in text
     assert "ops/daily/note.txt" in text or "Verdict: verified" in text
+    assert "rebuilt from cleaned text" in text
     assert TOKEN not in text
     saved = json.loads((run / PR / "record.json").read_text())
     assert saved["pdf_push"]["ok"] is True
@@ -363,16 +364,68 @@ def test_uncleanable_pdf_is_skipped_and_named(tmp_path, monkeypatch):
                          ["Verdict: verified", space])
     monkeypatch.setattr(dr, "scrub_published_text", lambda text, token=None, path=None: text)
     result = _publish(report, run, user, lambda _s: None)
-    assert result["ok"] is False
-    err = result["error"] or ""
-    assert "REPORT.pdf" in err
-    assert PR in err  # skipped file is named with its PR id
-    assert "skipped" in err.lower() or "cannot be published" in err.lower() or "still fails" in err.lower()
+    # REPORT is held back, but record.json and SUMMARY.pdf still push when they clean.
+    assert result["ok"] is True
+    skipped = result.get("skipped") or []
+    assert any(s.startswith(f"{PR}/REPORT.pdf:") for s in skipped)
+    names = _names(bare)
+    assert not any(name.endswith(f"/{PR}/REPORT.pdf") for name in names)
+    assert any(name.endswith(f"/{PR}/record.json") for name in names)
+    assert any(name.endswith(f"/{PR}/SUMMARY.pdf") for name in names)
     log = (run / "run.log").read_text()
-    assert "REPORT.pdf" in log or "PDFs NOT saved" in log
-    assert _count(bare) == 0
+    assert f"{PR}/REPORT.pdf" in log
     saved = json.loads((run / PR / "record.json").read_text())
     assert saved["pdf_push"]["ok"] is False
+    assert saved["pdf_push"]["error"].startswith(f"{PR}/")
+
+
+
+def test_one_held_report_does_not_steal_another_prs_skip_reason(tmp_path, monkeypatch):
+    """Two PRs: only gadgets-9 REPORT is uncleanable. widgets-7 keeps its own clean stamp."""
+    bare, user = tmp_path / "origin.git", tmp_path / "checkout"
+    _bare(bare)
+    _user_repo(user, bare)
+    _clear_tokens(monkeypatch)
+    monkeypatch.setenv("GITHUB_POC_TOKEN", TOKEN)
+    report, run, _rec = _layout(tmp_path)
+    other = "gadgets-9"
+    (report / other).mkdir(parents=True)
+    (run / other).mkdir(parents=True)
+    space = "/" + "work" + "space" + "/secret/path"
+    pdf_always.write_pdf(report / other / "REPORT.pdf", "Reviewer report gadgets-9",
+                         ["Verdict: needs attention", space])
+    pdf_always.write_pdf(report / "SUMMARY.pdf", "Proof-of-Change summary",
+                         ["Go/no-go: GO", f"{PR}: verified", f"{other}: needs attention"])
+    other_rec = {"repo": "example/gadgets", "library": "gadgets", "logs": f"{other}/",
+                 "pr": {"number": 9, "repo": "example/gadgets"}, "verdict": "needs_attention",
+                 "reason": "a probe disagreed"}
+    (run / other / "record.json").write_text(json.dumps(other_rec))
+    # Only leave banned paths in place for gadgets-9's REPORT (scrub stub is global, so
+    # also rewrite widgets-7 REPORT after the stub by making scrub pass for clean text).
+    real_scrub = dr.scrub_published_text
+
+    def selective(text, token=None, path=None):
+        if space in text:
+            return text  # leave uncleanable
+        return real_scrub(text, token, path)
+
+    monkeypatch.setattr(dr, "scrub_published_text", selective)
+    result = _publish(report, run, user, lambda _s: None)
+    assert result["ok"] is True
+    skipped = result.get("skipped") or []
+    assert any(s.startswith(f"{other}/REPORT.pdf:") for s in skipped)
+    assert not any(s.startswith(f"{PR}/") for s in skipped)
+    names = _names(bare)
+    assert any(name.endswith(f"/{PR}/REPORT.pdf") for name in names)
+    assert not any(name.endswith(f"/{other}/REPORT.pdf") for name in names)
+    assert any(name.endswith(f"/{other}/record.json") for name in names)
+    assert any(name.endswith(f"/{other}/SUMMARY.pdf") for name in names)
+    clean = json.loads((run / PR / "record.json").read_text())
+    dirty = json.loads((run / other / "record.json").read_text())
+    assert clean["pdf_push"]["ok"] is True
+    assert dirty["pdf_push"]["ok"] is False
+    assert dirty["pdf_push"]["error"].startswith(f"{other}/")
+    assert PR not in (dirty["pdf_push"]["error"] or "")
 
 
 def test_publish_one_pr_pushes_immediately(tmp_path, monkeypatch):

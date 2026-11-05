@@ -45,3 +45,11 @@ will now save the cleaned reports. If a file truly cannot be cleaned, the run
 log names that file and the rest still go up. Mid-run, each finished pull
 request's folder appears on the `runs` branch without waiting for the whole
 day to finish.
+
+## Follow-up
+
+When a `REPORT.pdf` cannot be cleaned, that pull request's `record.json` and
+`SUMMARY.pdf` are still pushed if they clean on their own. A skip reason is
+matched only by the `{pr-id}/` prefix, so one pull request never inherits
+another's skip. A PDF rebuilt from cleaned text includes the line
+"rebuilt from cleaned text".

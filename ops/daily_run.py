@@ -8938,7 +8938,9 @@ def _pdf_bytes_for_push(path: Path, token: str | None) -> tuple[bytes | None, st
     tmp_dir = Path(tempfile.mkdtemp(prefix="poc-pdf-scrub-"))
     try:
         tmp = tmp_dir / path.name
-        lines = scrubbed.splitlines() or [scrubbed]
+        lines = list(scrubbed.splitlines() or [scrubbed])
+        if "rebuilt from cleaned text" not in '\n'.join(lines):
+            lines.append("rebuilt from cleaned text")
         title = path.stem.replace("_", " ")
         pdf_always.write_pdf(tmp, title, lines)
         check = _pdf_text(tmp)
@@ -9404,9 +9406,8 @@ def publish_run_outputs(report_dir: Path, run_dir: Path | None = None, *, poc_co
                     reason = f"SUMMARY.pdf: {reason}"
                 skipped.append(reason)
         report_bytes: dict = {}
-        record_ok: dict = {}
+        report_held: set = set()
         for pr_id, group in groups.items():
-            record_ok[pr_id] = True
             if group.get("report"):
                 data, skip = _pdf_bytes_for_push(group["report"], token)
                 if data is None:
@@ -9416,7 +9417,7 @@ def publish_run_outputs(report_dir: Path, run_dir: Path | None = None, *, poc_co
                             detail = detail[len(prefix):].strip()
                             break
                     skipped.append(f"{pr_id}/REPORT.pdf: {detail}")
-                    record_ok[pr_id] = False
+                    report_held.add(pr_id)
                 else:
                     report_bytes[pr_id] = data
         last = "could not push to the runs branch"
@@ -9429,15 +9430,18 @@ def publish_run_outputs(report_dir: Path, run_dir: Path | None = None, *, poc_co
                     prefix = f"runs/{day}/{short}/{pr_id}"
                     if pr_id in report_bytes:
                         payloads.append((f"{prefix}/REPORT.pdf", report_bytes[pr_id]))
-                    if summary_bytes is not None and record_ok.get(pr_id, True):
+                    # SUMMARY and record still go up when REPORT is held back, if they clean.
+                    if summary_bytes is not None:
                         payloads.append((f"{prefix}/SUMMARY.pdf", summary_bytes))
-                    if group.get("record") and record_ok.get(pr_id, True):
-                        field = _pdf_push_field(True, attempt, None, url_map.get(pr_id))
+                    if group.get("record"):
+                        if pr_id in report_held:
+                            reason = next((s for s in skipped if s.startswith(f"{pr_id}/")),
+                                          "PDF could not be cleaned")
+                            field = _pdf_push_field(False, attempt, reason, None)
+                        else:
+                            field = _pdf_push_field(True, attempt, None, url_map.get(pr_id))
                         payloads.append((f"{prefix}/record.json",
                                          _record_bytes_for_push(group["record"], field, token)))
-                    elif group.get("record") and not record_ok.get(pr_id, True):
-                        # stamp the local record with the skip; nothing from this PR is pushed
-                        pass
                 if summary_bytes is not None and not groups:
                     payloads.append((f"runs/{day}/{short}/{pr_ids[0]}/SUMMARY.pdf", summary_bytes))
                 if not payloads:
@@ -9464,12 +9468,12 @@ def publish_run_outputs(report_dir: Path, run_dir: Path | None = None, *, poc_co
                 _note_pdf_saved(run_dir, report_dir, loud)
                 _show_pdf_push_banner(loud, report_dir, run_dir)
                 result["skipped"] = list(skipped)
-                # mark skipped PRs on records
+                # Stamp each PR from its own skip lines only (prefix "{pr_id}/").
                 def field_for(pr_id):
-                    if not record_ok.get(pr_id, True):
-                        return _pdf_push_field(False, attempt,
-                                               next((s for s in skipped if pr_id in s or "REPORT.pdf" in s),
-                                                    "PDF could not be cleaned"), None)
+                    if pr_id in report_held:
+                        reason = next((s for s in skipped if s.startswith(f"{pr_id}/")),
+                                      "PDF could not be cleaned")
+                        return _pdf_push_field(False, attempt, reason, None)
                     return _pdf_push_field(True, attempt, None, url_map.get(pr_id))
                 _stamp_saved_records(run_dir, records, field_for)
             return result
