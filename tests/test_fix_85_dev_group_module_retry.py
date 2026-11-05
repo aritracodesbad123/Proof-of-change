@@ -4,6 +4,7 @@ Covers:
 - isort #2781 shape (base 841e4312 / head 3936b83f): hypothesis and black live only in
   ``[dependency-groups] dev``, not in a test/tests/testing extra.
 - A held-out repo whose only match is a ``dev`` group entry (no per-repo cases, no fixed maps).
+
 """
 from __future__ import annotations
 
@@ -11,7 +12,7 @@ from pathlib import Path
 
 from poc import demo_helper
 
-# Real isort #2781 SHAs Jonathan named; the fixture mirrors pyproject at the base.
+# Real isort #2781 SHAs under test; the fixture mirrors pyproject at the base.
 ISORT_BASE = "841e4312"
 ISORT_HEAD = "3936b83f"
 
