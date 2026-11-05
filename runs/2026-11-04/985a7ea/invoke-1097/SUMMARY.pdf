@@ -1,0 +1,89 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>
+endobj
+4 0 obj
+<< /Length 2791 >>
+stream
+BT
+/F1 11 Tf
+14 TL
+50 800 Td
+(SUMMARY) Tj T*
+() Tj T*
+(SUMMARY) Tj T*
+(PDFs skipped \(could not clean\): REPORT.pdf: rewritten PDF still fails the public check) Tj T*
+(SUMMARY) Tj T*
+(PDFs NOT saved to GitHub: [redacted] PDF still contains an internal path or a secret, so it was) Tj T*
+( not save) Tj T*
+(d) Tj T*
+(Proof-of-Change daily summary: 2026-11-04) Tj T*
+(Generated 2026-11-05 11:47 IST. 34 report\(s\): 11 need attention, 13 could not be verified, 10) Tj T*
+(verified. Items that) Tj T*
+(need a decision are listed first.) Tj T*
+(Needs attention first) Tj T*
+(? NEEDS ATTENTION / Reject \(Medium confidence\): mahmoud/boltons#728: Preserve) Tj T*
+(independent capture) Tj T*
+(groups in MultiReplace, tested against its own tests. Probe: 11 observation\(s\) need attention:) Tj T*
+(c11.test_result) Tj T*
+(differs although the claim says it does not \(C11\); c12.production_logic differs although the cl) Tj T*
+(aim) Tj T*
+(says it does not) Tj T*
+(\(C12\); c13.git_diff_check_passed differs although the claim says it does not \(C13\);) Tj T*
+(c3_combined_order1 differs) Tj T*
+(although the claim says it does not \(C3\); probe model-probe1 is not_adequate \(the probe crashed) Tj T*
+(or printed no) Tj T*
+(parsed output on every main-side run; not counted as ran or adequate\); its matching results do) Tj T*
+(not) Tj T*
+(count; tests: 4) Tj T*
+(test\(s\) fail on main and pass on the PR; 37 test\(s\) ran on main, 68 on the PR; 31 new test\(s\) p) Tj T*
+(ass,) Tj T*
+(33) Tj T*
+(unchanged. Open report \(PDF\)) Tj T*
+(? NEEDS ATTENTION / Reject \(High confidence\): pallets/click#3902: Help pages no longer break a) Tj T*
+(line within a) Tj T*
+(hyphenated word, tested against its own tests. 7 test\(s\) removed on the PR side; 9 test\(s\) fail) Tj T*
+(on) Tj T*
+(main and pass) Tj T*
+(on the PR; 1 test\(s\) re-parametrized \(1 -> 1 ids\); 279 test\(s\) ran on main, 272 on the PR; 1 ne) Tj T*
+(w) Tj T*
+(test\(s\) pass, 262) Tj T*
+(unchanged; probe: claim\(s\) C1, C2, C3 proven. Open report \(PDF\)) Tj T*
+(? NEEDS ATTENTION / Reject \(High confidence\): pyinvoke/invoke#1099: Use explicit re-exports) Tj T*
+(for mypy strict) Tj T*
+(mode, tested against its own tests. Probe: 8 observation\(s\) need attention:) Tj T*
+(c1.invoke_explicit_task_import_ok) Tj T*
+(does not differ although the claim says it does \(C1\); c1.invoke_star_has_task does not differ) Tj T*
+(although the claim) Tj T*
+(says it does \(C1\); c4.parser_all_contains_context differs although the claim says it does not \() Tj T*
+(C4\);) Tj T*
+(c4.parser_all_contains_parser differs although the claim says it does not \(C4\); probe model-p1) Tj T*
+(has) Tj T*
+(no measured) Tj T*
+(line coverage \(no coverage data\); it does not count as covering the change; tests: 32 test\(s\) f) Tj T*
+(ail on) Tj T*
+ET
+endstream
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000241 00000 n 
+0000003084 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+3154
+%%EOF
