@@ -894,6 +894,13 @@ def render_run(run_dir: str | Path, out: str | Path, formats=("md", "html", "pdf
         (od / "REPORT.html").write_text(rv.to_html(R, f"Reviewer report {run_id(rec)}"))
         if "pdf" in formats:
             s["pdf_error"] = rv.to_pdf(str(od / "REPORT.html"), str(od / "REPORT.pdf"))
+            # Push this PR's PDF and record as soon as they are written (runs branch).
+            try:
+                from ops import daily_run as _dr
+                _dr.publish_one_pr_outputs(out, run_id(rec), run_dir=run_dir)
+            except Exception as exc:  # noqa: BLE001 - a mid-run push must not stop report writing
+                print(f"note: could not push {run_id(rec)} to the runs branch ({type(exc).__name__})",
+                      file=sys.stderr)
         rows.append(s)
         print(f"{s['id']}: {s['verdict']} | {s['action']} | confidence {s['confidence']} | citations {s['citations']}")
     gated = [(r, s) for (r, _), s in zip(recs, rows) if (r.get("coverage_gate") or {}).get("changed")]

@@ -319,7 +319,7 @@ def test_record_paths_and_keys_are_scrubbed_on_the_runs_branch(tmp_path, monkeyp
                      json.dumps(pushed["pdf_push"]), json.dumps(result))
 
 
-def test_pdf_with_an_internal_path_is_refused(tmp_path, monkeypatch):
+def test_pdf_with_an_internal_path_is_scrubbed_and_pushed(tmp_path, monkeypatch):
     bare, user = tmp_path / "origin.git", tmp_path / "checkout"
     _bare(bare)
     _user_repo(user, bare)
@@ -331,18 +331,62 @@ def test_pdf_with_an_internal_path_is_refused(tmp_path, monkeypatch):
                          ["Verdict: verified", space])
     delays = []
     result = _publish(report, run, user, delays.append)
-    banner = "PDFs NOT saved to GitHub: a PDF still contains an internal path or a secret, so it was not saved"
-    assert result["ok"] is False and result["attempts"] == 1 and result["url"] is None
-    assert result["error"] == "a PDF still contains an internal path or a secret, so it was not saved"
+    assert result["ok"] is True and result["error"] is None and result["url"]
     assert delays == []
+    assert _count(bare) >= 1
+    prefix = f"runs/{DAY}/{SHA[:7]}/{PR}"
+    pushed_pdf = _blob(bare, f"{prefix}/REPORT.pdf")
+    assert pushed_pdf.startswith(b"%PDF")
+    pdf_path = tmp_path / "pushed-report.pdf"
+    pdf_path.write_bytes(pushed_pdf)
+    text = subprocess.run(["pdftotext", str(pdf_path), "-"], capture_output=True, text=True).stdout
+    assert space not in text
+    assert "ops/daily/note.txt" in text or "Verdict: verified" in text
+    assert TOKEN not in text
+    saved = json.loads((run / PR / "record.json").read_text())
+    assert saved["pdf_push"]["ok"] is True
+    _assert_no_token((run / "run.log").read_text(), json.dumps(saved["pdf_push"]), json.dumps(result))
+    # local PDF may still hold the original path; the runs-branch copy is what must be clean
+    assert (report / PR / "REPORT.pdf").is_file()
+
+
+def test_uncleanable_pdf_is_skipped_and_named(tmp_path, monkeypatch):
+    bare, user = tmp_path / "origin.git", tmp_path / "checkout"
+    _bare(bare)
+    _user_repo(user, bare)
+    _clear_tokens(monkeypatch)
+    monkeypatch.setenv("GITHUB_POC_TOKEN", TOKEN)
+    report, run, _rec = _layout(tmp_path)
+    # Force scrub failure by stubbing scrub_published_text to leave a banned path in place
+    space = "/" + "work" + "space" + "/secret/path"
+    pdf_always.write_pdf(report / PR / "REPORT.pdf", "Reviewer report widgets-7",
+                         ["Verdict: verified", space])
+    monkeypatch.setattr(dr, "scrub_published_text", lambda text, token=None, path=None: text)
+    result = _publish(report, run, user, lambda _s: None)
+    assert result["ok"] is False
+    assert "REPORT.pdf" in (result["error"] or "")
+    assert "skipped" in (result["error"] or "").lower() or "cannot be published" in (result["error"] or "")
+    log = (run / "run.log").read_text()
+    assert "REPORT.pdf" in log or "PDFs NOT saved" in log
     assert _count(bare) == 0
-    assert banner in (run / "run.log").read_text()
-    assert (run / "REPORT.md").read_text().startswith(banner)
     saved = json.loads((run / PR / "record.json").read_text())
     assert saved["pdf_push"]["ok"] is False
-    _assert_no_token((run / "run.log").read_text(), (run / "REPORT.md").read_text(),
-                     json.dumps(saved["pdf_push"]), json.dumps(result))
-    assert (report / PR / "REPORT.pdf").is_file()
+
+
+def test_publish_one_pr_pushes_immediately(tmp_path, monkeypatch):
+    bare, user = tmp_path / "origin.git", tmp_path / "checkout"
+    _bare(bare)
+    _user_repo(user, bare)
+    _clear_tokens(monkeypatch)
+    monkeypatch.setenv("GITHUB_POC_TOKEN", TOKEN)
+    report, run, _rec = _layout(tmp_path)
+    # Drop SUMMARY so this looks like a mid-run single-PR push
+    (report / "SUMMARY.pdf").unlink()
+    result = dr.publish_one_pr_outputs(report, PR, run_dir=run, poc_commit=SHA, date=DAY, root=user)
+    assert result and result["ok"] is True
+    names = _names(bare)
+    assert any(name.endswith(f"/{PR}/REPORT.pdf") for name in names)
+    assert any(name.endswith(f"/{PR}/record.json") for name in names)
 
 
 def test_remote_url_and_tree_url_do_not_carry_the_token():
