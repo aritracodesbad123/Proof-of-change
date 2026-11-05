@@ -17,10 +17,12 @@ unauthenticated (60 requests/hour). A rate limit (403/429 with remaining 0) wait
 Once the PDFs (each REPORT.pdf, SUMMARY.pdf, and a refused or no-go PDF) and the go/no-go summary are written, the
 same token is used to push those PDFs and record.json to the `runs` branch on origin, under
 runs/<date>/<short poc commit>/<pr id>/. Text is scrubbed with the public-file rules first (machine paths become
-relative; keys and tokens are removed). A PDF whose extracted text still fails that check is not pushed. The token
+relative; keys and tokens are removed). Offending text in a PDF is blanked and the cleaned file is still
+pushed; only a file that cannot be cleaned is skipped, and it is named in the report. Each PR's PDF and
+record are pushed as soon as they are written, not only at the end. The token
 is never written into the remote address, the report, run.log, or pdf_push.url. The push is a separate temporary
 clone, so this checkout and main are left as they are. The branch is created as an orphan when it is missing.
-PDFs are never emailed. If the token is missing, a PDF is refused, or the push still fails after retries, the run
+PDFs are never emailed. If the token is missing, every file is skipped, or the push still fails after retries, the run
 finishes, the local files stay, and the report and run.log say `PDFs NOT saved to GitHub: <reason>`.
 
 How a PR is tested (route "nightly+patch", used for pure-Python PRs):
@@ -8913,14 +8915,47 @@ def _pdf_text(path: Path) -> str | None:
     return cp.stdout.decode("utf-8", "replace")
 
 
-def _pdf_refusal(path: Path, token: str | None) -> None:
-    """Raise when the PDF's text fails the public check. The PDF is not copied."""
+def _pdf_still_dirty(text: str, token: str | None, label: Path) -> bool:
     from guardrails.public_hygiene import findings
-    text = _pdf_text(path)
-    if text is None:
-        raise _PublishRefused("could not read a PDF, so it was not saved")
-    if _text_has_secret(text, token) or _text_has_internal_path(text) or findings(text, Path(path.name)):
-        raise _PublishRefused("a PDF still contains an internal path or a secret, so it was not saved")
+    return bool(_text_has_secret(text, token) or _text_has_internal_path(text) or findings(text, label))
+
+
+def _pdf_bytes_for_push(path: Path, token: str | None) -> tuple[bytes | None, str | None]:
+    """Return scrubbed PDF bytes for the runs branch, or (None, skip reason).
+
+    Offending paths and secrets are blanked or relativized. Only a file that still fails the public
+    check after scrubbing is skipped; the reason names the file.
+    """
+    label = Path(path.name)
+    raw_text = _pdf_text(path)
+    if raw_text is None:
+        return None, f"{path.name}: could not read PDF text, so it was skipped"
+    if not _pdf_still_dirty(raw_text, token, label):
+        return path.read_bytes(), None
+    scrubbed = scrub_published_text(raw_text, token, label)
+    if _pdf_still_dirty(scrubbed, token, label):
+        return None, f"{path.name}: still contains text that cannot be published after scrubbing"
+    tmp_dir = Path(tempfile.mkdtemp(prefix="poc-pdf-scrub-"))
+    try:
+        tmp = tmp_dir / path.name
+        lines = list(scrubbed.splitlines() or [scrubbed])
+        if "rebuilt from cleaned text" not in '\n'.join(lines):
+            lines.append("rebuilt from cleaned text")
+        title = path.stem.replace("_", " ")
+        pdf_always.write_pdf(tmp, title, lines)
+        check = _pdf_text(tmp)
+        if check is None or _pdf_still_dirty(check, token, label):
+            return None, f"{path.name}: rewritten PDF still fails the public check"
+        return tmp.read_bytes(), None
+    finally:
+        shutil.rmtree(tmp_dir, ignore_errors=True)
+
+
+def _pdf_refusal(path: Path, token: str | None) -> None:
+    """Deprecated path: raise when a PDF cannot be scrubbed for publish. Prefer _pdf_bytes_for_push."""
+    data, reason = _pdf_bytes_for_push(path, token)
+    if data is None:
+        raise _PublishRefused(reason or "a PDF could not be cleaned, so it was not saved")
 
 
 def _text_has_secret(text: str, token: str | None) -> bool:
@@ -9361,17 +9396,30 @@ def publish_run_outputs(report_dir: Path, run_dir: Path | None = None, *, poc_co
         env = _push_env()
         if use_token:
             _arm_askpass(ask_dir, env, token)
-        try:
-            summary_bytes = summary.read_bytes() if summary else None
-            if summary is not None:
-                _pdf_refusal(summary, token)
-            report_bytes = {}
-            for pr_id, group in groups.items():
-                if group.get("report"):
-                    _pdf_refusal(group["report"], token)
-                    report_bytes[pr_id] = group["report"].read_bytes()
-        except _PublishRefused as exc:
-            return finish(False, 1, str(exc), {})
+        skipped: list[str] = []
+        summary_bytes = None
+        if summary is not None:
+            summary_bytes, skip = _pdf_bytes_for_push(summary, token)
+            if summary_bytes is None:
+                reason = skip or f"{summary.name}: skipped"
+                if "SUMMARY" not in reason:
+                    reason = f"SUMMARY.pdf: {reason}"
+                skipped.append(reason)
+        report_bytes: dict = {}
+        report_held: set = set()
+        for pr_id, group in groups.items():
+            if group.get("report"):
+                data, skip = _pdf_bytes_for_push(group["report"], token)
+                if data is None:
+                    detail = skip or "PDF could not be cleaned"
+                    for prefix in (f"{pr_id}/REPORT.pdf:", "REPORT.pdf:"):
+                        if detail.startswith(prefix):
+                            detail = detail[len(prefix):].strip()
+                            break
+                    skipped.append(f"{pr_id}/REPORT.pdf: {detail}")
+                    report_held.add(pr_id)
+                else:
+                    report_bytes[pr_id] = data
         last = "could not push to the runs branch"
         used = 0
         for attempt in range(1, max(1, attempts) + 1):
@@ -9382,14 +9430,24 @@ def publish_run_outputs(report_dir: Path, run_dir: Path | None = None, *, poc_co
                     prefix = f"runs/{day}/{short}/{pr_id}"
                     if pr_id in report_bytes:
                         payloads.append((f"{prefix}/REPORT.pdf", report_bytes[pr_id]))
+                    # SUMMARY and record still go up when REPORT is held back, if they clean.
                     if summary_bytes is not None:
                         payloads.append((f"{prefix}/SUMMARY.pdf", summary_bytes))
                     if group.get("record"):
-                        field = _pdf_push_field(True, attempt, None, url_map.get(pr_id))
+                        if pr_id in report_held:
+                            reason = next((s for s in skipped if s.startswith(f"{pr_id}/")),
+                                          "PDF could not be cleaned")
+                            field = _pdf_push_field(False, attempt, reason, None)
+                        else:
+                            field = _pdf_push_field(True, attempt, None, url_map.get(pr_id))
                         payloads.append((f"{prefix}/record.json",
                                          _record_bytes_for_push(group["record"], field, token)))
                 if summary_bytes is not None and not groups:
                     payloads.append((f"runs/{day}/{short}/{pr_ids[0]}/SUMMARY.pdf", summary_bytes))
+                if not payloads:
+                    skip_msg = "skipped uncleanable files: " + "; ".join(skipped) if skipped else (
+                        "no PDFs or records were left to save")
+                    return finish(False, 1, skip_msg, {})
             except _PublishRefused as exc:
                 return finish(False, 1, str(exc), {})
             try:
@@ -9404,7 +9462,21 @@ def publish_run_outputs(report_dir: Path, run_dir: Path | None = None, *, poc_co
                 if attempt < attempts:
                     sleeper(PDF_PUSH_BACKOFF_S[min(attempt - 1, len(PDF_PUSH_BACKOFF_S) - 1)])
                 continue
-            return finish(True, attempt, None, url_map)
+            result = finish(True, attempt, None, url_map)
+            if skipped:
+                loud = "PDFs skipped (could not clean): " + "; ".join(skipped)
+                _note_pdf_saved(run_dir, report_dir, loud)
+                _show_pdf_push_banner(loud, report_dir, run_dir)
+                result["skipped"] = list(skipped)
+                # Stamp each PR from its own skip lines only (prefix "{pr_id}/").
+                def field_for(pr_id):
+                    if pr_id in report_held:
+                        reason = next((s for s in skipped if s.startswith(f"{pr_id}/")),
+                                      "PDF could not be cleaned")
+                        return _pdf_push_field(False, attempt, reason, None)
+                    return _pdf_push_field(True, attempt, None, url_map.get(pr_id))
+                _stamp_saved_records(run_dir, records, field_for)
+            return result
         if used >= attempts:
             last = f"could not push to the runs branch after {attempts} attempts"
         return finish(False, used, _hide_token(last, token), {})
@@ -9436,6 +9508,45 @@ def publish_written_pdfs(report_dir=None, run_dir=None, poc_commit=None, date=No
 
 def _save_pdfs_now(report_dir=None, run_dir=None, records=None) -> None:
     publish_written_pdfs(report_dir=report_dir, run_dir=run_dir, records=records)
+
+
+def publish_one_pr_outputs(report_dir: Path, pr_id: str, run_dir: Path | None = None, *,
+                           poc_commit: str | None = None, date: str | None = None,
+                           records: list | None = None, root: Path | None = None) -> dict | None:
+    """Push one PR's REPORT.pdf and record.json as soon as they are written. Never raises."""
+    report_dir = Path(report_dir)
+    pr_id = _safe_pr_id(pr_id)
+    pr_report = report_dir / pr_id
+    if not (pr_report / "REPORT.pdf").is_file():
+        return None
+    # Temporarily narrow the report dir view by publishing via a staging folder of just this PR
+    # plus any SUMMARY already present (SUMMARY may be added later).
+    stage = Path(tempfile.mkdtemp(prefix="poc-one-pr-"))
+    try:
+        dest = stage / pr_id
+        dest.mkdir(parents=True)
+        shutil.copy2(pr_report / "REPORT.pdf", dest / "REPORT.pdf")
+        summary = report_dir / "SUMMARY.pdf"
+        if summary.is_file():
+            shutil.copy2(summary, stage / "SUMMARY.pdf")
+        run_stage = None
+        if run_dir:
+            run_dir = Path(run_dir)
+            src_rec = run_dir / pr_id / "record.json"
+            if src_rec.is_file():
+                run_stage = stage / "run"
+                (run_stage / pr_id).mkdir(parents=True)
+                shutil.copy2(src_rec, run_stage / pr_id / "record.json")
+        return publish_run_outputs(
+            stage, run_stage,
+            poc_commit=poc_commit if poc_commit is not None else PDF_TARGET.get("poc_commit"),
+            date=date if date is not None else PDF_TARGET.get("date"),
+            records=records, fallback_pr_id=pr_id,
+            root=root or REPO_ROOT)
+    except Exception:  # noqa: BLE001 - a mid-run push must not stop the check
+        return {"ok": False, "attempts": 0, "error": "could not push to the runs branch", "url": None}
+    finally:
+        shutil.rmtree(stage, ignore_errors=True)
 
 
 def report_dir_for(a, rdir: Path) -> Path:
