@@ -8926,7 +8926,6 @@ def _pdf_bytes_for_push(path: Path, token: str | None) -> tuple[bytes | None, st
     Offending paths and secrets are blanked or relativized. Only a file that still fails the public
     check after scrubbing is skipped; the reason names the file.
     """
-    from guardrails.public_hygiene import findings
     label = Path(path.name)
     raw_text = _pdf_text(path)
     if raw_text is None:
