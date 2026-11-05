@@ -1,0 +1,96 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>
+endobj
+4 0 obj
+<< /Length 2742 >>
+stream
+BT
+/F1 11 Tf
+14 TL
+50 800 Td
+(REPORT) Tj T*
+() Tj T*
+(REPORT) Tj T*
+(PDFs NOT saved to GitHub: [redacted] PDF still contains an internal path or a secret, so it was) Tj T*
+( not saved) Tj T*
+() Tj T*
+(Reviewer report: pallets/markupsafe#512: Add support for) Tj T*
+(t-strings) Tj T*
+(Run markupsafe-512, tested 2026-11-04 12:45 IST by ops/daily_run.py \(route source-pair\).) Tj T*
+(Proof-of-Change) Tj T*
+(commit 985a7eade681b1d88256d5a185e129da53855144. Report generated 2026-11-05 11:47) Tj T*
+(IST by) Tj T*
+(reports/pr_report.py.) Tj T*
+(Baseline: full \(test comparison + claim probes + coverage gate + claim flagging \(differential p) Tj T*
+(robes) Tj T*
+(shown,) Tj T*
+(informational\)\).) Tj T*
+(NEEDS ATTENTION) Tj T*
+(Recommended action: Reject Confidence: High) Tj T*
+(The run is trustworthy and found a difference a person should look at. Every check passed and) Tj T*
+(every claim cites) Tj T*
+(a log line.) Tj T*
+(Advice only: Proof-of-Change never blocks a merge and never posts on GitHub.) Tj T*
+() Tj T*
+(Summary in plain English) Tj T*
+(? What it says it does: Add support for t-strings \(pallets/markupsafe#512\).) Tj T*
+(? What we observed: probe: 3 observation\(s\) need attention: c1.markup_vs_expected does not) Tj T*
+(differ although) Tj T*
+(the claim says it does \(C1\); c2.escape_instance does not differ although the claim says it does) Tj T*
+(\(C2\);) Tj T*
+(c2.markup_instance does not differ although the claim says it does \(C2\); probe: claim\(s\) C4 pro) Tj T*
+(ven;) Tj T*
+(probe) Tj T*
+(model-p2 is uninformative \(uninformative: every observation is probe-broken \(the same exception) Tj T*
+(or skip value) Tj T*
+(on both sides\)\); its matching results do not count; tests: 6 new test\(s\) skipped on the PR \(the) Tj T*
+(y did) Tj T*
+(not exist) Tj T*
+(before; listed, not a finding\); 1 test\(s\) re-parametrized \(4 -> 4 ids\); 76 test\(s\) ran on main,) Tj T*
+( 76 on the) Tj T*
+(PR; 4 new) Tj T*
+(test\(s\) pass, 72 unchanged.) Tj T*
+(? What you should do: Do not approve as is. Read 'What changed in behavior' and decide with the) Tj T*
+(PR author.) Tj T*
+() Tj T*
+(Demo helper) Tj T*
+(These notes are background from the console and the daily check. They do not change the verdict) Tj T*
+(.) Tj T*
+() Tj T*
+() Tj T*
+(If setup fails, the helper retries the install up to 2 times. If a test still can't be verified) Tj T*
+( because) Tj T*
+(something is) Tj T*
+(missing or fails to import, it looks up the cause, installs the fix on both sides and reruns th) Tj T*
+(at step, up) Tj T*
+(to 3 tries.) Tj T*
+(? Setup check: GitHub token: present.) Tj T*
+(? Setup check: Nebius token: present.) Tj T*
+(? Setup check: free memory 6.6 GB \(of 15.6 GB\).) Tj T*
+(? Setup check: free disk 94.7 GB.) Tj T*
+ET
+endstream
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000241 00000 n 
+0000003035 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+3105
+%%EOF

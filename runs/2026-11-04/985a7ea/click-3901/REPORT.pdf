@@ -1,0 +1,95 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>
+endobj
+4 0 obj
+<< /Length 2803 >>
+stream
+BT
+/F1 11 Tf
+14 TL
+50 800 Td
+(REPORT) Tj T*
+() Tj T*
+(REPORT) Tj T*
+(PDFs NOT saved to GitHub: [redacted] PDF still contains an internal path or a secret, so it was) Tj T*
+( not saved) Tj T*
+() Tj T*
+(Reviewer report: pallets/click#3901: Stop passing a) Tj T*
+(deprecated command's help text through gettext) Tj T*
+(Run click-3901, tested 2026-11-04 11:43 IST by ops/daily_run.py \(route source-pair\).) Tj T*
+(Proof-of-Change commit) Tj T*
+(985a7eade681b1d88256d5a185e129da53855144. Report generated 2026-11-05 11:47 IST by) Tj T*
+(reports/pr_report.py.) Tj T*
+(Baseline: full \(test comparison + claim probes + coverage gate + claim flagging \(differential p) Tj T*
+(robes) Tj T*
+(shown,) Tj T*
+(informational\)\).) Tj T*
+(VERIFIED) Tj T*
+(Recommended action: Approve with notes Confidence: High) Tj T*
+(The PR's tests behave the same or better than on main, in all 3 runs per side. Every check pass) Tj T*
+(ed) Tj T*
+(and every) Tj T*
+(claim cites a log line.) Tj T*
+(Advice only: Proof-of-Change never blocks a merge and never posts on GitHub.) Tj T*
+() Tj T*
+(Summary in plain English) Tj T*
+(? What it says it does: Stop passing a deprecated command's help text through gettext) Tj T*
+(\(pallets/click#3901\).) Tj T*
+(? What we observed: 1 test\(s\) fail on main and pass on the PR; 142 test\(s\) ran on main, 142 on ) Tj T*
+(the) Tj T*
+(PR; 0 new) Tj T*
+(test\(s\) pass, 141 unchanged; probe: claim\(s\) C1 proven.) Tj T*
+(? What you should do: You can approve; read the notes under 'What went wrong' first.) Tj T*
+() Tj T*
+(Demo helper) Tj T*
+(These notes are background from the console and the daily check. They do not change the verdict) Tj T*
+(.) Tj T*
+(If setup fails, the helper retries the install up to 2 times. If a test still can't be verified) Tj T*
+( because) Tj T*
+(something is) Tj T*
+(missing or fails to import, it looks up the cause, installs the fix on both sides and reruns th) Tj T*
+(at step, up) Tj T*
+(to 3 tries.) Tj T*
+(? Setup check: GitHub token: present.) Tj T*
+(? Setup check: Nebius token: present.) Tj T*
+(? Setup check: free memory 10.1 GB \(of 15.6 GB\).) Tj T*
+(? Setup check: free disk 94.9 GB.) Tj T*
+(? Demo helper: git is installed.) Tj T*
+(? Demo helper: python3 is installed.) Tj T*
+() Tj T*
+() Tj T*
+(? Demo helper: uv is installed.) Tj T*
+(? Looked up with Tavily: [redacted] results) Tj T*
+(? Query: click python setup install instructions https://github.com/pallets/click) Tj T*
+(site:github.com/pallets/click) Tj T*
+(? Query: click python documentation install https://github.com/pallets/click) Tj T*
+(site:github.com/pallets/click) Tj T*
+(? Query: click python install requirements https://pypi.org/project/click/) Tj T*
+(https://github.com/pallets/click site:pypi.org) Tj T*
+(? Source: nulink-click ? https://pypi.org/project/nulink-click/) Tj T*
+ET
+endstream
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000241 00000 n 
+0000003096 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+3166
+%%EOF

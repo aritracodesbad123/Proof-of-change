@@ -1,0 +1,1093 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-python-attrs-attrs-1641-9dbbede1f14c-2026-11-04",
+ "date_ist": "2026-11-04 11:32 IST",
+ "run_date": "2026-11-04",
+ "who": "ops/daily_run.py",
+ "repo": "python-attrs/attrs",
+ "library": "attrs",
+ "pr": {
+  "repo": "python-attrs/attrs",
+  "number": 1641,
+  "url": "https://github.com/python-attrs/attrs/pull/1641",
+  "title": "Preserve astuple filters for dictionary keys and values",
+  "base_sha": "644b4e165bfbeee7e127de6fcbda08b64014316f",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "9dbbede1f14c1f60ad155b75a208d53fbce55f98",
+  "merge_commit": "d8fbab863c1a3681ec077083563c7d4814d05288",
+  "tested_main_sha": "9d9f94a043de7fc4012459853a4ed597a5577855",
+  "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+ },
+ "author": "skyon0522-ai",
+ "base_ref": "main",
+ "updated_at_utc": "2026-10-08T08:57:26Z",
+ "updated_at_ist": "2026-10-08 14:27 IST",
+ "ci_state": "not checked (chosen PR)",
+ "ci_detail": "chosen by name; selection filters not applied",
+ "tested_at_ist": "2026-11-04 11:32 IST",
+ "files": {
+  "all": [
+   "changelog.d/1641.change.md",
+   "src/attr/_funcs.py",
+   "tests/test_funcs.py"
+  ],
+  "package_py": [],
+  "compiled": [],
+  "other": [
+   "changelog.d/1641.change.md",
+   "src/attr/_funcs.py",
+   "tests/test_funcs.py"
+  ]
+ },
+ "machine_type": {
+  "arch": "x86_64",
+  "os": "Linux",
+  "platform": "Linux-6.12.94+-x86_64-with-glibc2.41",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": null,
+  "cpu_model": "Intel(R) Xeon(R) Processor",
+  "ram_gb": 15.6
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 3,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.15",
+ "test_selection": "mapped from touched files: tests/test_funcs.py",
+ "per_run": [
+  {
+   "side": "old",
+   "run": 1,
+   "passed": 53,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 4.8,
+   "pytest_summary": "53 passed in 3.41s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 1,
+   "passed": 57,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 4.8,
+   "pytest_summary": "57 passed in 3.51s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 2,
+   "passed": 53,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 3.8,
+   "pytest_summary": "53 passed in 2.47s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 2,
+   "passed": 57,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 3.9,
+   "pytest_summary": "57 passed in 2.61s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 3,
+   "passed": 53,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 4.0,
+   "pytest_summary": "53 passed in 2.69s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 3,
+   "passed": 57,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 4.0,
+   "pytest_summary": "57 passed in 2.67s",
+   "junit": true
+  }
+ ],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "local",
+ "sandbox_backend_note": "local bubblewrap",
+ "machine": "local",
+ "tool_setup": {
+  "installed": [],
+  "tries": 0,
+  "note": "All required tools were already installed.",
+  "refused": []
+ },
+ "posted_upstream": false,
+ "logs": "attrs-1641/",
+ "freeze": {
+  "main": "freeze-main.txt",
+  "pr": "freeze-pr.txt"
+ },
+ "coverage": {
+  "status": "measured",
+  "changed_lines_total": 1,
+  "changed_lines_covered": 1,
+  "files": [
+   {
+    "file": "src/attr/_funcs.py",
+    "changed_lines_total": 1,
+    "changed_lines_covered": 1
+   }
+  ],
+  "seconds": 5.3,
+  "exit": 0,
+  "log": "coverage-pytest.log"
+ },
+ "poc_commit": "985a7eade681b1d88256d5a185e129da53855144",
+ "route": "source-pair",
+ "current_head_sha": "9dbbede1f14c1f60ad155b75a208d53fbce55f98",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "model_provider_fallback": "AI call fell back or failed (probes); some AI probes were rejected",
+ "state": "open",
+ "mergeable_state": "unknown",
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": "[redacted]",
+  "notes": [
+   "Setup check: GitHub token: present.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory 9.4 GB (of 15.6 GB).",
+   "Setup check: free disk 94.9 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: [redacted] results",
+   "Query: attrs python setup install instructions https://github.com/python-attrs/attrs site:github.com/python-attrs/attrs",
+   "Query: attrs python documentation install https://github.com/python-attrs/attrs site:github.com/python-attrs/attrs",
+   "Query: attrs python install requirements https://pypi.org/project/attrs/ https://github.com/python-attrs/attrs site:pypi.org",
+   "Source: attrs/pyproject.toml at main \u00b7 python-attrs/attrs \u00b7 GitHub \u2014 https://github.com/python-attrs/attrs/blob/main/pyproject.toml",
+   "Source: attrs/pyproject.toml at main \u00b7 python-attrs/attrs \u00b7 GitHub \u2014 https://github.com/python-attrs/attrs/blob/master/pyproject.toml",
+   "Source: attrs \u2014 https://pypi.org/project/attrs/",
+   "Source: Simplify contributing guide \u00b7 python-attrs/attrs@f2571ea \u00b7 GitHub \u2014 https://github.com/python-attrs/attrs/commit/f2571ea1443b2ec992e9712eedd76faf786ad2a2",
+   "Source: attrs/docs/conf.py at main \u00b7 python-attrs/attrs \u00b7 GitHub \u2014 https://github.com/python-attrs/attrs/blob/main/docs/conf.py",
+   "Source: GitHub - python-attrs/attrs: Python Classes Without Boilerplate \u00b7 GitHub \u2014 https://github.com/python-attrs/attrs",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: install cloudpickle; platform_python_implementation == \"CPython\" (listed in the tests extra) on main and pr.",
+   "Setup plan: install hypothesis (listed in the tests extra) on main and pr.",
+   "Setup plan: install pympler (listed in the tests extra) on main and pr.",
+   "Setup plan: install pytest>9 (listed in the tests extra) on main and pr.",
+   "Setup plan: install pytest-xdist[psutil] (listed in the tests extra) on main and pr.",
+   "Setup plan: install watchfiles (listed in tox.ini deps) on main and pr.",
+   "Setup plan: install cogapp (listed in tox.ini deps) on main and pr.",
+   "Setup plan: install doc2dash (listed in tox.ini deps) on main and pr.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >=3.10, >=3.9",
+   "Installed cloudpickle 3.1.2 from pyproject (listed in the tests extra) on main and pr.",
+   "Installed hypothesis 6.170.14 from pyproject (listed in the tests extra) on main and pr.",
+   "Installed pympler 1.1 from pyproject (listed in the tests extra) on main and pr.",
+   "Installed pytest 9.2.0 from pyproject (listed in the tests extra) on main and pr.",
+   "Installed pytest-xdist 3.8.0 from pyproject (listed in the tests extra) on main and pr.",
+   "Installed watchfiles 1.3.0 from tox.ini (listed in tox.ini deps) on main and pr.",
+   "Installed cogapp 3.6.0 from tox.ini (listed in tox.ini deps) on main and pr.",
+   "Installed doc2dash 3.1.0 from tox.ini (listed in tox.ini deps) on main and pr."
+  ],
+  "install_docs": [
+   "README.md",
+   "pyproject.toml",
+   "tox.ini",
+   "docs/Makefile",
+   ".github/CONTRIBUTING.md",
+   ".github/workflows/codspeed.yml",
+   ".github/workflows/pypi-package.yml",
+   ".github/workflows/zizmor.yml",
+   ".github/workflows/build-docset.yml",
+   ".github/workflows/ci.yml",
+   ".github/workflows/codeql-analysis.yml",
+   "typing_tests/README.md"
+  ],
+  "install_docs_from": "main",
+  "setup_plan": {
+   "packages": [
+    {
+     "requirement": "cloudpickle; platform_python_implementation == \"CPython\"",
+     "name": "cloudpickle",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the tests extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "hypothesis",
+     "name": "hypothesis",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the tests extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pympler",
+     "name": "pympler",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the tests extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest>9",
+     "name": "pytest",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the tests extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest-xdist[psutil]",
+     "name": "pytest-xdist",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the tests extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "watchfiles",
+     "name": "watchfiles",
+     "kind": "requirements",
+     "action": "install",
+     "source": "tox.ini",
+     "reason": "listed in tox.ini deps",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "cogapp",
+     "name": "cogapp",
+     "kind": "requirements",
+     "action": "install",
+     "source": "tox.ini",
+     "reason": "listed in tox.ini deps",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "doc2dash",
+     "name": "doc2dash",
+     "kind": "requirements",
+     "action": "install",
+     "source": "tox.ini",
+     "reason": "listed in tox.ini deps",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    }
+   ],
+   "scope_blocked": "",
+   "component": null,
+   "aggregate_names": [],
+   "extra_reqs": [
+    "cloudpickle; platform_python_implementation == \"CPython\"",
+    "hypothesis",
+    "pympler",
+    "pytest>9",
+    "pytest-xdist[psutil]",
+    "watchfiles",
+    "cogapp",
+    "doc2dash"
+   ],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >=3.10, >=3.9"
+   },
+   "system": [],
+   "refused": [],
+   "groups_blocked": ""
+  },
+  "steps": {
+   "setup_lookup": "Found 8 setup item(s) in the project's files and the web lookup.",
+   "setup_python": "Python 3.12: Python 3.12 already meets >=3.10, >=3.9",
+   "install_deps": "Wrote requirements.txt and installed it on main and pr: cloudpickle; platform_python_implementation == \"CPython\", hypothesis, pympler, pytest>9, pytest-xdist[psutil], watchfiles, cogapp, doc2dash."
+  },
+  "run_files": {
+   "requirements": "requirements.txt",
+   "plan": "setup-plan.json",
+   "count": 8
+  },
+  "installs": [
+   {
+    "package": "cloudpickle",
+    "requirement": "cloudpickle; platform_python_implementation == \"CPython\"",
+    "version": "3.1.2",
+    "versions": {
+     "main": "3.1.2",
+     "pr": "3.1.2"
+    },
+    "source": "pyproject",
+    "reason": "listed in the tests extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "hypothesis",
+    "requirement": "hypothesis",
+    "version": "6.170.14",
+    "versions": {
+     "main": "6.170.14",
+     "pr": "6.170.14"
+    },
+    "source": "pyproject",
+    "reason": "listed in the tests extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "pympler",
+    "requirement": "pympler",
+    "version": "1.1",
+    "versions": {
+     "main": "1.1",
+     "pr": "1.1"
+    },
+    "source": "pyproject",
+    "reason": "listed in the tests extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "pytest",
+    "requirement": "pytest>9",
+    "version": "9.2.0",
+    "versions": {
+     "main": "9.2.0",
+     "pr": "9.2.0"
+    },
+    "source": "pyproject",
+    "reason": "listed in the tests extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "pytest-xdist",
+    "requirement": "pytest-xdist[psutil]",
+    "version": "3.8.0",
+    "versions": {
+     "main": "3.8.0",
+     "pr": "3.8.0"
+    },
+    "source": "pyproject",
+    "reason": "listed in the tests extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "watchfiles",
+    "requirement": "watchfiles",
+    "version": "1.3.0",
+    "versions": {
+     "main": "1.3.0",
+     "pr": "1.3.0"
+    },
+    "source": "tox.ini",
+    "reason": "listed in tox.ini deps",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "cogapp",
+    "requirement": "cogapp",
+    "version": "3.6.0",
+    "versions": {
+     "main": "3.6.0",
+     "pr": "3.6.0"
+    },
+    "source": "tox.ini",
+    "reason": "listed in tox.ini deps",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "doc2dash",
+    "requirement": "doc2dash",
+    "version": "3.1.0",
+    "versions": {
+     "main": "3.1.0",
+     "pr": "3.1.0"
+    },
+    "source": "tox.ini",
+    "reason": "listed in tox.ini deps",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   }
+  ]
+ },
+ "chosen": {
+  "pr": 1641,
+  "head_sha": null,
+  "install": null,
+  "test_cmd": null
+ },
+ "sides": {
+  "comparison_basis": "base tip vs GitHub test merge (refs/pull/N/merge)",
+  "main_sha": "9d9f94a043de7fc4012459853a4ed597a5577855",
+  "pr_sha": "d8fbab863c1a3681ec077083563c7d4814d05288",
+  "merge_commit": "d8fbab863c1a3681ec077083563c7d4814d05288",
+  "merge_parents": [
+   "9d9f94a043de7fc4012459853a4ed597a5577855",
+   "9dbbede1f14c1f60ad155b75a208d53fbce55f98"
+  ],
+  "merge_head_matches_pinned_head": true
+ },
+ "tested": {
+  "main": "main @ 9d9f94a043de (base tip = first parent of the merge commit)",
+  "pr": "GitHub test merge commit d8fbab863c1a (refs/pull/1641/merge) of head 9dbbede1f14c"
+ },
+ "probe_plan": {
+  "baseline": "full",
+  "model": "model provider: nebius (Token Factory, live)",
+  "errors": [
+   "retry: nebius probes request failed: HTTPError",
+   "probe 'p2' rejected: code does not parse: unexpected character after line continuation character (line 1)"
+  ],
+  "model_claims": [
+   {
+    "id": "C1",
+    "text": "When `astuple()` converts attrs instances stored in dictionary keys or values, it drops the supplied filter during recursion.",
+    "source_quote": "When `astuple()` converts attrs instances stored in dictionary keys or values, it drops the supplied filter during recursion.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C2",
+    "text": "Forwarding the filter to both dictionary recursion calls ensures the filter is applied to attrs instances in dict keys and values, for both dict and OrderedDict and both collection-retention settings.",
+    "source_quote": "Forward the filter to both dictionary recursion calls.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C3",
+    "text": "All four new regression cases failed on the unchanged base commit 644b4e165bfbeee7e127de6fcbda08b64014316f.",
+    "source_quote": "All four new regression cases failed on unchanged base `644b4e165bfbeee7e127de6fcbda08b64014316f`.",
+    "testable": true,
+    "expect": "same"
+   },
+   {
+    "id": "C4",
+    "text": "After the fix, the test suite `tests/test_funcs.py` passes with 57 tests.",
+    "source_quote": "After the fix, `tests/test_funcs.py`: **57 passed**.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C5",
+    "text": "Running the full test suite on the source-and-tests revision 3eb74883d6a04ee3a9198cef3291f86b94f97efc yields 1405 passed, 10 skipped, 1 xfailed.",
+    "source_quote": "Full `pytest tests -q` on source-and-tests revision `3eb74883d6a04ee3a9198cef3291f86b94f97efc`: **1405 passed, 10 skipped, 1 xfailed**.",
+    "testable": true,
+    "expect": "differs"
+   }
+  ],
+  "model_rejected_claims": [],
+  "model_parse_repairs": [
+   {
+    "attempt": 1,
+    "probe": "p2",
+    "error": {
+     "message": "unexpected character after line continuation character",
+     "line": 1,
+     "offset": 14,
+     "code_line": "import attrs\\nfrom collections import OrderedDict\\nfrom attr import astuple\\n\\n@attrs.define(hash=True)\\nclass HashableC:\\n    x: int = attrs.field()\\n    y: int = attrs.field()\\n\\n@attrs.define(hash=True)\\nclass ContainerKey:\\n    data: object = attrs.field()\\n\\n@attrs.define(hash=True)\\nclass Cont"
+    },
+    "outcome": "no fixed probe returned"
+   },
+   {
+    "attempt": 2,
+    "probe": "p2",
+    "error": {
+     "message": "unexpected character after line continuation character",
+     "line": 1,
+     "offset": 14,
+     "code_line": "import attrs\\nfrom collections import OrderedDict\\nfrom attr import astuple\\n\\n@attrs.define(hash=True)\\nclass HashableC:\\n    x: int = attrs.field()\\n    y: int = attrs.field()\\n\\n@attrs.define(hash=True)\\nclass ContainerKey:\\n    data: object = attrs.field()\\n\\n@attrs.define(hash=True)\\nclass Cont"
+    },
+    "outcome": "rejected: the repair stores under a key that cannot be read",
+    "counts": {
+     "before": {
+      "keys": 0,
+      "inputs": 0,
+      "read": "tokens"
+     },
+     "after": null
+    }
+   }
+  ],
+  "model_retried": {
+   "why": [
+    "no probe listed the claim ids it checks, so its results could not be tied to any claim; in each probe, \"claims\" must name the claim ids it checks and the observation names that cover them"
+   ]
+  },
+  "model_claims_filled": [
+   {
+    "id": "p1",
+    "claims": [
+     "C1"
+    ]
+   }
+  ],
+  "diff_targets": [],
+  "frozen": [
+   {
+    "path": "model-probes/model-p1.py",
+    "source": "model",
+    "sha256": "30b3bbf9efc2f734d359a3c7da9b7d786e9003cc3a6bb8ef74ed92c10748a4cf",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-04T06:08:12.989792+00:00",
+    "inputs_sha256": "f817b9382f2e74dcc5064e32cbcc41995558029966eb73a6b75b8d033a860c79",
+    "inputs": {
+     "title_chars": 55,
+     "body_chars": 4944,
+     "base_files": {
+      "src/attr/_funcs.py": "eb6623ffeb7a3052483a39635fda25da4ebbe36e4ca6d8dfe66d6e02d8ed9b88"
+     }
+    }
+   }
+  ]
+ },
+ "test_extras": [
+  "pytest-xdist[psutil]"
+ ],
+ "pr_side_started_at": "2026-11-04T06:08:13.216401+00:00",
+ "test_targets": {
+  "main": [
+   "tests/test_funcs.py"
+  ],
+  "pr": [
+   "tests/test_funcs.py"
+  ]
+ },
+ "installed_commit": {
+  "main": {
+   "dist": "attrs",
+   "expected": "9d9f94a043de7fc4012459853a4ed597a5577855",
+   "installed": "9d9f94a043de7fc4012459853a4ed597a5577855",
+   "ok": true
+  },
+  "pr": {
+   "dist": "attrs",
+   "expected": "d8fbab863c1a3681ec077083563c7d4814d05288",
+   "installed": "d8fbab863c1a3681ec077083563c7d4814d05288",
+   "ok": true
+  }
+ },
+ "declared_test_deps": {
+  "requested": [
+   "pytest-xdist[psutil]"
+  ],
+  "installed": true
+ },
+ "comparison": {
+  "same": 53,
+  "same_skipped_both": 0,
+  "regressions": [],
+  "fixed": [
+   "tests.test_funcs.TestAsTuple::test_dicts_filter[OrderedDict-False]",
+   "tests.test_funcs.TestAsTuple::test_dicts_filter[OrderedDict-True]",
+   "tests.test_funcs.TestAsTuple::test_dicts_filter[dict-False]",
+   "tests.test_funcs.TestAsTuple::test_dicts_filter[dict-True]"
+  ],
+  "new_tests_passing": 0,
+  "new_tests_passing_ids": [],
+  "new_tests_failing": [],
+  "new_tests_skipped": [],
+  "removed_tests": [],
+  "reparametrized": [],
+  "skipped_missing_dependency": [],
+  "flaky": [],
+  "pr_unstable": [],
+  "pr_unstable_noisy": [],
+  "environment": [],
+  "other_changes": [],
+  "preexisting_failures": [],
+  "load_failed_both": [],
+  "load_failed_pr": [],
+  "load_failed_main": [],
+  "executed": {
+   "main": 57,
+   "pr": 57
+  },
+  "messages": {},
+  "base_messages": {
+   "tests.test_funcs.TestAsTuple::test_dicts_filter[OrderedDict-False]": "AssertionError: assert ({(1,): (3,)},) == ({(1, 2): (3, 4)},)",
+   "tests.test_funcs.TestAsTuple::test_dicts_filter[OrderedDict-True]": "AssertionError: assert ({(1,): (3,)},) == (OrderedDict(...2): (3, 4)}),)",
+   "tests.test_funcs.TestAsTuple::test_dicts_filter[dict-False]": "AssertionError: assert ({(1,): (3,)},) == ({(1, 2): (3, 4)},)",
+   "tests.test_funcs.TestAsTuple::test_dicts_filter[dict-True]": "AssertionError: assert ({(1,): (3,)},) == ({(1, 2): (3, 4)},)"
+  }
+ },
+ "exit_check": {
+  "explained": true,
+  "problems": [],
+  "detail": "all runs exited 0"
+ },
+ "probes": {
+  "status": "ran",
+  "items": [
+   {
+    "id": "model-p1",
+    "source": "model",
+    "path": "model-probes/model-p1.py",
+    "sha256": "30b3bbf9efc2f734d359a3c7da9b7d786e9003cc3a6bb8ef74ed92c10748a4cf",
+    "target": "python-attrs/attrs#1641",
+    "about": "Test C1: astuple filter for dict keys and values with retain_collection_types=False",
+    "claims": [
+     {
+      "id": "C1",
+      "source": "PR description",
+      "text": "When `astuple()` converts attrs instances stored in dictionary keys or values, it drops the supplied filter during recursion.",
+      "covers": [
+       "c1.*"
+      ],
+      "expect": "differs"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-p1-main-1.jsonl",
+      "probe-model-p1-main-2.jsonl",
+      "probe-model-p1-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-p1-pr-1.jsonl",
+      "probe-model-p1-pr-2.jsonl",
+      "probe-model-p1-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "c1.dict_no_retain_key": [
+        1,
+        2
+       ],
+       "c1.dict_no_retain_value": [
+        1,
+        2
+       ]
+      },
+      {
+       "c1.dict_no_retain_key": [
+        1,
+        2
+       ],
+       "c1.dict_no_retain_value": [
+        1,
+        2
+       ]
+      },
+      {
+       "c1.dict_no_retain_key": [
+        1,
+        2
+       ],
+       "c1.dict_no_retain_value": [
+        1,
+        2
+       ]
+      }
+     ],
+     "pr": [
+      {
+       "c1.dict_no_retain_key": [
+        2
+       ],
+       "c1.dict_no_retain_value": [
+        2
+       ]
+      },
+      {
+       "c1.dict_no_retain_key": [
+        2
+       ],
+       "c1.dict_no_retain_value": [
+        2
+       ]
+      },
+      {
+       "c1.dict_no_retain_key": [
+        2
+       ],
+       "c1.dict_no_retain_value": [
+        2
+       ]
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "c1.dict_no_retain_key",
+      "state": "differs",
+      "label": "proven",
+      "claim": "C1",
+      "main": [
+       1,
+       2
+      ],
+      "pr": [
+       2
+      ],
+      "diffs": [
+       {
+        "field": "",
+        "main": [
+         1,
+         2
+        ],
+        "pr": [
+         2
+        ]
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c1.dict_no_retain_key\""
+       },
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c1.dict_no_retain_key\""
+       }
+      }
+     },
+     {
+      "name": "c1.dict_no_retain_value",
+      "state": "differs",
+      "label": "proven",
+      "claim": "C1",
+      "main": [
+       1,
+       2
+      ],
+      "pr": [
+       2
+      ],
+      "diffs": [
+       {
+        "field": "",
+        "main": [
+         1,
+         2
+        ],
+        "pr": [
+         2
+        ]
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c1.dict_no_retain_value\""
+       },
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c1.dict_no_retain_value\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "30b3bbf9efc2f734d359a3c7da9b7d786e9003cc3a6bb8ef74ed92c10748a4cf",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-04T06:08:12.989792+00:00",
+     "inputs_sha256": "f817b9382f2e74dcc5064e32cbcc41995558029966eb73a6b75b8d033a860c79",
+     "inputs": {
+      "title_chars": 55,
+      "body_chars": 4944,
+      "base_files": {
+       "src/attr/_funcs.py": "eb6623ffeb7a3052483a39635fda25da4ebbe36e4ca6d8dfe66d6e02d8ed9b88"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-04T06:08:13.216401+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 1,
+     "changed_lines_covered": 1,
+     "files": [
+      {
+       "file": "src/attr/_funcs.py",
+       "changed_lines_total": 1,
+       "changed_lines_covered": 1
+      }
+     ],
+     "adequacy": "adequate",
+     "note": "ran 1 of 1 changed line(s) on the main side",
+     "exit": 0,
+     "data": "probe-cov-model-p1.json"
+    },
+    "status": "ran"
+   }
+  ],
+  "summary": {
+   "labels": [
+    "proven",
+    "proven"
+   ],
+   "flagged": [],
+   "proven_claims": [
+    "C1"
+   ],
+   "reason": "probe: claim(s) C1 proven",
+   "ignored_noise": [],
+   "ignored_warning_only": [],
+   "pr_only_noisy": [],
+   "advisory_unchanged_subchecks": [],
+   "advisory_agreeing_differs": []
+  }
+ },
+ "probe_changed_line_coverage": {
+  "status": "measured",
+  "side": "main",
+  "probes": {
+   "model-p1": {
+    "status": "measured",
+    "changed_lines_covered": 1,
+    "changed_lines_total": 1,
+    "adequacy": "adequate"
+   }
+  },
+  "not_adequate": []
+ },
+ "verdict": "verified",
+ "reason": "4 test(s) fail on main and pass on the PR; 57 test(s) ran on main, 57 on the PR; 0 new test(s) pass, 53 unchanged; probe: claim(s) C1 proven",
+ "verdict_before_coverage_gate": "verified",
+ "reason_before_coverage_gate": "4 test(s) fail on main and pass on the PR; 57 test(s) ran on main, 57 on the PR; 0 new test(s) pass, 53 unchanged; probe: claim(s) C1 proven",
+ "changed_lines_total": 1,
+ "changed_lines_covered": 1,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "normal",
+  "note": "1 of 1 changed executable line(s) ran (100%)",
+  "measurement": "measured"
+ },
+ "agents": {
+  "status": "skipped",
+  "note": "advisory swarm is off",
+  "roles": []
+ },
+ "explanation": {
+  "status": "not yet wired",
+  "why": "advisory swarm is off"
+ },
+ "swarm_requested": false,
+ "operator_approval_requested": false,
+ "swarm": "off",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [],
+  "compiled_files": [],
+  "other_files": [
+   "changelog.d/1641.change.md",
+   "src/attr/_funcs.py",
+   "tests/test_funcs.py"
+  ]
+ },
+ "duration_s": {
+  "total_wall": 374.7,
+  "tests": 25.3
+ },
+ "cost": {
+  "ai_calls": 5,
+  "failed_ai_calls": 1,
+  "input_tokens": 19808,
+  "output_tokens": 34644,
+  "thinking_tokens": 31997,
+  "cost_usd": 0.037122,
+  "calls_without_usage": 1,
+  "ai_cost_usd": 0.037122,
+  "cost_complete": false,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 374.7,
+   "tests": 25.3
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.02498,
+  "total_cost_usd": 0.062102,
+  "swarm": {
+   "ai_calls": 0,
+   "failed_ai_calls": 0,
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "thinking_tokens": 0,
+   "cost_usd": 0.0,
+   "calls_without_usage": 0,
+   "ai_cost_usd": 0.0,
+   "cost_complete": true,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ },
+ "pdf_push": {
+  "ok": true,
+  "attempts": 1,
+  "error": null,
+  "url": "https://github.com/aritracodesbad123/Proof-of-change/tree/runs/runs/2026-11-04/985a7ea/attrs-1641"
+ }
+}

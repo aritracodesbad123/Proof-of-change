@@ -1,0 +1,1011 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-jazzband-prettytable-534-ea413085a3b1-2026-11-04",
+ "date_ist": "2026-11-04 14:45 IST",
+ "run_date": "2026-11-04",
+ "who": "ops/daily_run.py",
+ "repo": "jazzband/prettytable",
+ "library": "prettytable",
+ "pr": {
+  "repo": "jazzband/prettytable",
+  "number": 534,
+  "url": "https://github.com/prettytable/prettytable/pull/534",
+  "title": "Honor min_width when no data rows are rendered",
+  "base_sha": "6f87f05d0b8128b880bf96fc7b06eef15338347f",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "ea413085a3b1b3110a2649b59e133386db5068bd",
+  "merge_commit": "18f8716670decbf3ff95b831f61501a2e2dd10e8",
+  "tested_main_sha": "8eda8ac64493a85209ec99edbd1ce23921b62093",
+  "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+ },
+ "author": "Zhuyuyangyy",
+ "base_ref": "main",
+ "updated_at_utc": "2026-10-30T21:59:09Z",
+ "updated_at_ist": "2026-10-31 03:29 IST",
+ "ci_state": "none",
+ "ci_detail": "no check runs visible",
+ "tested_at_ist": "2026-11-04 14:45 IST",
+ "files": {
+  "all": [
+   "src/prettytable/prettytable.py",
+   "tests/test_prettytable.py"
+  ],
+  "package_py": [
+   "src/prettytable/prettytable.py"
+  ],
+  "compiled": [],
+  "other": [
+   "tests/test_prettytable.py"
+  ]
+ },
+ "machine_type": {
+  "arch": "x86_64",
+  "os": "Linux",
+  "platform": "Linux-6.12.94+-x86_64-with-glibc2.41",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": null,
+  "cpu_model": "Intel(R) Xeon(R) Processor",
+  "ram_gb": 15.6
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 3,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.15",
+ "test_selection": "mapped from touched files: tests/test_prettytable.py, tests/test_style.py, tests/test_colortable.py",
+ "per_run": [
+  {
+   "side": "old",
+   "run": 1,
+   "passed": 280,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.7,
+   "pytest_summary": "280 passed in 0.90s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 1,
+   "passed": 293,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.5,
+   "pytest_summary": "293 passed in 0.92s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 2,
+   "passed": 280,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.5,
+   "pytest_summary": "280 passed in 0.88s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 2,
+   "passed": 293,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.5,
+   "pytest_summary": "293 passed in 0.87s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 3,
+   "passed": 280,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.5,
+   "pytest_summary": "280 passed in 0.88s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 3,
+   "passed": 293,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.6,
+   "pytest_summary": "293 passed in 0.97s",
+   "junit": true
+  }
+ ],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "local",
+ "sandbox_backend_note": "local bubblewrap",
+ "machine": "local",
+ "tool_setup": {
+  "installed": [],
+  "tries": 0,
+  "note": "All required tools were already installed.",
+  "refused": []
+ },
+ "posted_upstream": false,
+ "logs": "prettytable-534/",
+ "freeze": {
+  "main": "freeze-main.txt",
+  "pr": "freeze-pr.txt"
+ },
+ "coverage": {
+  "status": "measured",
+  "changed_lines_total": 3,
+  "changed_lines_covered": 3,
+  "files": [
+   {
+    "file": "src/prettytable/prettytable.py",
+    "changed_lines_total": 3,
+    "changed_lines_covered": 3
+   }
+  ],
+  "seconds": 2.3,
+  "exit": 0,
+  "log": "coverage-pytest.log"
+ },
+ "poc_commit": "985a7eade681b1d88256d5a185e129da53855144",
+ "route": "source-pair",
+ "current_head_sha": "ea413085a3b1b3110a2649b59e133386db5068bd",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": "[redacted]",
+  "notes": [
+   "Setup check: GitHub token: present.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory 3.9 GB (of 15.6 GB).",
+   "Setup check: free disk 94.7 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: [redacted] results",
+   "Query: prettytable python setup install instructions https://github.com/jazzband/prettytable site:github.com/jazzband/prettytable",
+   "Query: prettytable python documentation install https://github.com/jazzband/prettytable site:github.com/jazzband/prettytable",
+   "Query: prettytable python install requirements https://pypi.org/project/prettytable/ https://github.com/jazzband/prettytable site:pypi.org",
+   "Source: prettytable/README.md at main \u00b7 prettytable/prettytable \u00b7 GitHub \u2014 https://github.com/jazzband/prettytable/blob/main/README.md",
+   "Source: prettytable \u00b7 PyPI \u2014 https://pypi.org/project/prettytable/",
+   "Source: GitHub - prettytable/prettytable: Display tabular data in a visually appealing ASCII table format \u00b7 GitHub \u2014 https://github.com/jazzband/prettytable",
+   "Source: Unable to import prettytable \u00b7 Issue #120 \u00b7 prettytable/prettytable \u00b7 GitHub \u2014 https://github.com/jazzband/prettytable/issues/120",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: wcwidth is noted, installed with the project.",
+   "Setup plan: install pytest>=9 (listed in the tests extra) on main and pr.",
+   "Setup plan: install pytest-cov (listed in the tests extra) on main and pr.",
+   "Setup plan: install pytest-lazy-fixtures (listed in the tests extra) on main and pr.",
+   "Setup plan: install mypy==2.4.0 (listed in requirements-mypy.txt) on main and pr.",
+   "Setup plan: install types-colorama (listed in requirements-mypy.txt) on main and pr.",
+   "Setup plan: install prek (listed in tox.ini deps) on main and pr.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >=3.11",
+   "Installed pytest 9.2.0 from pyproject (listed in the tests extra) on main and pr.",
+   "Installed pytest-cov 7.1.0 from pyproject (listed in the tests extra) on main and pr.",
+   "Installed pytest-lazy-fixtures 1.4.1 from pyproject (listed in the tests extra) on main and pr.",
+   "Installed mypy 2.4.0 from requirements-mypy.txt (listed in requirements-mypy.txt) on main and pr.",
+   "Installed types-colorama 0.4.15.20260508 from requirements-mypy.txt (listed in requirements-mypy.txt) on main and pr.",
+   "Installed prek 0.5.10 from tox.ini (listed in tox.ini deps) on main and pr."
+  ],
+  "install_docs": [
+   "README.md",
+   "pyproject.toml",
+   "tox.ini",
+   ".github/workflows/lint.yml",
+   ".github/workflows/require-pr-label.yml",
+   ".github/workflows/release-drafter.yml",
+   ".github/workflows/release.yml",
+   ".github/workflows/labels.yml",
+   ".github/workflows/test.yml"
+  ],
+  "install_docs_from": "main",
+  "setup_plan": {
+   "packages": [
+    {
+     "requirement": "wcwidth>=0.3.5",
+     "name": "wcwidth",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest>=9",
+     "name": "pytest",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the tests extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest-cov",
+     "name": "pytest-cov",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the tests extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest-lazy-fixtures",
+     "name": "pytest-lazy-fixtures",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the tests extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "mypy==2.4.0",
+     "name": "mypy",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements-mypy.txt",
+     "reason": "listed in requirements-mypy.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "types-colorama",
+     "name": "types-colorama",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements-mypy.txt",
+     "reason": "listed in requirements-mypy.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "prek",
+     "name": "prek",
+     "kind": "requirements",
+     "action": "install",
+     "source": "tox.ini",
+     "reason": "listed in tox.ini deps",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    }
+   ],
+   "scope_blocked": "",
+   "component": null,
+   "aggregate_names": [],
+   "extra_reqs": [
+    "pytest>=9",
+    "pytest-cov",
+    "pytest-lazy-fixtures",
+    "mypy==2.4.0",
+    "types-colorama",
+    "prek"
+   ],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >=3.11"
+   },
+   "system": [],
+   "refused": [],
+   "groups_blocked": ""
+  },
+  "steps": {
+   "setup_lookup": "Found 7 setup item(s) in the project's files and the web lookup.",
+   "setup_python": "Python 3.12: Python 3.12 already meets >=3.11",
+   "install_deps": "Wrote requirements.txt and installed it on main and pr: pytest>=9, pytest-cov, pytest-lazy-fixtures, mypy==2.4.0, types-colorama, prek. 1 more come with the project install."
+  },
+  "run_files": {
+   "requirements": "requirements.txt",
+   "plan": "setup-plan.json",
+   "count": 6
+  },
+  "installs": [
+   {
+    "package": "pytest",
+    "requirement": "pytest>=9",
+    "version": "9.2.0",
+    "versions": {
+     "main": "9.2.0",
+     "pr": "9.2.0"
+    },
+    "source": "pyproject",
+    "reason": "listed in the tests extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "pytest-cov",
+    "requirement": "pytest-cov",
+    "version": "7.1.0",
+    "versions": {
+     "main": "7.1.0",
+     "pr": "7.1.0"
+    },
+    "source": "pyproject",
+    "reason": "listed in the tests extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "pytest-lazy-fixtures",
+    "requirement": "pytest-lazy-fixtures",
+    "version": "1.4.1",
+    "versions": {
+     "main": "1.4.1",
+     "pr": "1.4.1"
+    },
+    "source": "pyproject",
+    "reason": "listed in the tests extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "mypy",
+    "requirement": "mypy==2.4.0",
+    "version": "2.4.0",
+    "versions": {
+     "main": "2.4.0",
+     "pr": "2.4.0"
+    },
+    "source": "requirements-mypy.txt",
+    "reason": "listed in requirements-mypy.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "types-colorama",
+    "requirement": "types-colorama",
+    "version": "0.4.15.20260508",
+    "versions": {
+     "main": "0.4.15.20260508",
+     "pr": "0.4.15.20260508"
+    },
+    "source": "requirements-mypy.txt",
+    "reason": "listed in requirements-mypy.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "prek",
+    "requirement": "prek",
+    "version": "0.5.10",
+    "versions": {
+     "main": "0.5.10",
+     "pr": "0.5.10"
+    },
+    "source": "tox.ini",
+    "reason": "listed in tox.ini deps",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   }
+  ]
+ },
+ "sides": {
+  "comparison_basis": "base tip vs GitHub test merge (refs/pull/N/merge)",
+  "main_sha": "8eda8ac64493a85209ec99edbd1ce23921b62093",
+  "pr_sha": "18f8716670decbf3ff95b831f61501a2e2dd10e8",
+  "merge_commit": "18f8716670decbf3ff95b831f61501a2e2dd10e8",
+  "merge_parents": [
+   "8eda8ac64493a85209ec99edbd1ce23921b62093",
+   "ea413085a3b1b3110a2649b59e133386db5068bd"
+  ],
+  "merge_head_matches_pinned_head": true
+ },
+ "tested": {
+  "main": "main @ 8eda8ac64493 (base tip = first parent of the merge commit)",
+  "pr": "GitHub test merge commit 18f8716670de (refs/pull/534/merge) of head ea413085a3b1"
+ },
+ "probe_plan": {
+  "baseline": "full",
+  "model": "model provider: nebius (Token Factory, live)",
+  "errors": [],
+  "model_claims": [
+   {
+    "id": "C1",
+    "text": "When a table has headers and no data rows rendered, the column width will honor the min_width setting.",
+    "source_quote": "Honor min_width when no data rows are rendered",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C2",
+    "text": "After calling clear_rows() on a table, the column width will honor min_width even though there are no rows.",
+    "source_quote": "The same problem occurs after clear_rows() or when start selects an empty slice",
+    "testable": true,
+    "expect": "differs",
+    "quote_match": "loose"
+   },
+   {
+    "id": "C3",
+    "text": "When slicing a table with an empty selection (start >= number of rows), the column width will honor min_width.",
+    "source_quote": "The same problem occurs after clear_rows() or when start selects an empty slice",
+    "testable": true,
+    "expect": "differs",
+    "quote_match": "loose"
+   },
+   {
+    "id": "C4",
+    "text": "For tables that contain at least one data row, the column width behavior remains unchanged relative to the base implementation.",
+    "source_quote": "For nonempty tables, the max() constraints are equivalent",
+    "testable": true,
+    "expect": "same",
+    "quote_match": "loose"
+   },
+   {
+    "id": "C5",
+    "text": "Markdown-specific width policies are unchanged by the modification.",
+    "source_quote": "Markdown-specific and table-level width policies are unchanged",
+    "testable": true,
+    "expect": "same"
+   },
+   {
+    "id": "C6",
+    "text": "Table-level width policies are unchanged by the modification.",
+    "source_quote": "Markdown-specific and table-level width policies are unchanged",
+    "testable": true,
+    "expect": "same"
+   }
+  ],
+  "model_rejected_claims": [],
+  "model_loose_quote_matches": [
+   {
+    "claim": "C2",
+    "source_quote": "The same problem occurs after clear_rows() or when start selects an empty slice"
+   },
+   {
+    "claim": "C3",
+    "source_quote": "The same problem occurs after clear_rows() or when start selects an empty slice"
+   },
+   {
+    "claim": "C4",
+    "source_quote": "For nonempty tables, the max() constraints are equivalent"
+   }
+  ],
+  "diff_targets": [],
+  "frozen": [
+   {
+    "path": "model-probes/model-p1.py",
+    "source": "model",
+    "sha256": "568ebe038528c691d13daa13c160600fa9a960bfb65b4bc2dabbca0d5c33b633",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-04T18:01:33.500067+00:00",
+    "inputs_sha256": "c9d8f63b249eb7a8e334c59869d6598a9399db60e3f32867cf0fd8e4528aa660",
+    "inputs": {
+     "title_chars": 46,
+     "body_chars": 1815,
+     "base_files": {
+      "src/prettytable/prettytable.py": "cf724d61caa80b76af883a91b1d2646ce911bf545246a16979ff48b36c1b5ddc"
+     }
+    }
+   }
+  ]
+ },
+ "test_extras": [
+  "pytest",
+  "pytest-cov",
+  "pytest-lazy-fixtures"
+ ],
+ "pr_side_started_at": "2026-11-04T18:01:33.696579+00:00",
+ "test_targets": {
+  "main": [
+   "tests/test_prettytable.py",
+   "tests/test_style.py",
+   "tests/test_colortable.py"
+  ],
+  "pr": [
+   "tests/test_prettytable.py",
+   "tests/test_style.py",
+   "tests/test_colortable.py"
+  ]
+ },
+ "installed_commit": {
+  "main": {
+   "dist": "prettytable",
+   "expected": "8eda8ac64493a85209ec99edbd1ce23921b62093",
+   "installed": "8eda8ac64493a85209ec99edbd1ce23921b62093",
+   "ok": true
+  },
+  "pr": {
+   "dist": "prettytable",
+   "expected": "18f8716670decbf3ff95b831f61501a2e2dd10e8",
+   "installed": "18f8716670decbf3ff95b831f61501a2e2dd10e8",
+   "ok": true
+  }
+ },
+ "declared_test_deps": {
+  "requested": [
+   "pytest-lazy-fixtures"
+  ],
+  "installed": true
+ },
+ "comparison": {
+  "same": 280,
+  "same_skipped_both": 0,
+  "regressions": [],
+  "fixed": [
+   "tests.test_prettytable.TestOptionAttribute::test_min_width_without_rows[cleared-False-5]",
+   "tests.test_prettytable.TestOptionAttribute::test_min_width_without_rows[cleared-False-min_width1]",
+   "tests.test_prettytable.TestOptionAttribute::test_min_width_without_rows[cleared-True-5]",
+   "tests.test_prettytable.TestOptionAttribute::test_min_width_without_rows[cleared-True-min_width1]",
+   "tests.test_prettytable.TestOptionAttribute::test_min_width_without_rows[empty-False-5]",
+   "tests.test_prettytable.TestOptionAttribute::test_min_width_without_rows[empty-False-min_width1]",
+   "tests.test_prettytable.TestOptionAttribute::test_min_width_without_rows[empty-True-5]",
+   "tests.test_prettytable.TestOptionAttribute::test_min_width_without_rows[empty-True-min_width1]",
+   "tests.test_prettytable.TestOptionAttribute::test_min_width_without_rows[filtered-False-5]",
+   "tests.test_prettytable.TestOptionAttribute::test_min_width_without_rows[filtered-False-min_width1]",
+   "tests.test_prettytable.TestOptionAttribute::test_min_width_without_rows[filtered-True-5]",
+   "tests.test_prettytable.TestOptionAttribute::test_min_width_without_rows[filtered-True-min_width1]",
+   "tests.test_prettytable.TestOptionAttribute::test_min_width_without_rows_for_individual_columns"
+  ],
+  "new_tests_passing": 0,
+  "new_tests_passing_ids": [],
+  "new_tests_failing": [],
+  "new_tests_skipped": [],
+  "removed_tests": [],
+  "reparametrized": [],
+  "skipped_missing_dependency": [],
+  "flaky": [],
+  "pr_unstable": [],
+  "pr_unstable_noisy": [],
+  "environment": [],
+  "other_changes": [],
+  "preexisting_failures": [],
+  "load_failed_both": [],
+  "load_failed_pr": [],
+  "load_failed_main": [],
+  "executed": {
+   "main": 293,
+   "pr": 293
+  },
+  "messages": {},
+  "base_messages": {
+   "tests.test_prettytable.TestOptionAttribute::test_min_width_without_rows[cleared-False-5]": "AssertionError: assert '+--+\\n|  |\\n+--+\\n+--+' == '+-------+\\n|...-+\\n+-------+'",
+   "tests.test_prettytable.TestOptionAttribute::test_min_width_without_rows[cleared-False-min_width1]": "AssertionError: assert '+--+\\n|  |\\n+--+\\n+--+' == '+-------+\\n|...-+\\n+-------+'",
+   "tests.test_prettytable.TestOptionAttribute::test_min_width_without_rows[cleared-True-5]": "AssertionError: assert '+---+\\n| x |\\n+---+\\n+---+' == '+-------+\\n|...-+\\n+-------+'",
+   "tests.test_prettytable.TestOptionAttribute::test_min_width_without_rows[cleared-True-min_width1]": "AssertionError: assert '+---+\\n| x |\\n+---+\\n+---+' == '+-------+\\n|...-+\\n+-------+'",
+   "tests.test_prettytable.TestOptionAttribute::test_min_width_without_rows[empty-False-5]": "AssertionError: assert '+--+\\n|  |\\n+--+\\n+--+' == '+-------+\\n|...-+\\n+-------+'",
+   "tests.test_prettytable.TestOptionAttribute::test_min_width_without_rows[empty-False-min_width1]": "AssertionError: assert '+--+\\n|  |\\n+--+\\n+--+' == '+-------+\\n|...-+\\n+-------+'",
+   "tests.test_prettytable.TestOptionAttribute::test_min_width_without_rows[empty-True-5]": "AssertionError: assert '+---+\\n| x |\\n+---+\\n+---+' == '+-------+\\n|...-+\\n+-------+'",
+   "tests.test_prettytable.TestOptionAttribute::test_min_width_without_rows[empty-True-min_width1]": "AssertionError: assert '+---+\\n| x |\\n+---+\\n+---+' == '+-------+\\n|...-+\\n+-------+'",
+   "tests.test_prettytable.TestOptionAttribute::test_min_width_without_rows[filtered-False-5]": "AssertionError: assert '+--+\\n|  |\\n+--+\\n+--+' == '+-------+\\n|...-+\\n+-------+'",
+   "tests.test_prettytable.TestOptionAttribute::test_min_width_without_rows[filtered-False-min_width1]": "AssertionError: assert '+--+\\n|  |\\n+--+\\n+--+' == '+-------+\\n|...-+\\n+-------+'",
+   "tests.test_prettytable.TestOptionAttribute::test_min_width_without_rows[filtered-True-5]": "AssertionError: assert '+---+\\n| x |\\n+---+\\n+---+' == '+-------+\\n|...-+\\n+-------+'",
+   "tests.test_prettytable.TestOptionAttribute::test_min_width_without_rows[filtered-True-min_width1]": "AssertionError: assert '+---+\\n| x |\\n+---+\\n+---+' == '+-------+\\n|...-+\\n+-------+'",
+   "tests.test_prettytable.TestOptionAttribute::test_min_width_without_rows_for_individual_columns": "AssertionError: assert '| x | long_header |' == '|   x   | long_header |'"
+  }
+ },
+ "exit_check": {
+  "explained": true,
+  "problems": [],
+  "detail": "all runs exited 0"
+ },
+ "probes": {
+  "status": "error",
+  "items": [
+   {
+    "id": "model-p1",
+    "source": "model",
+    "path": "model-probes/model-p1.py",
+    "sha256": "568ebe038528c691d13daa13c160600fa9a960bfb65b4bc2dabbca0d5c33b633",
+    "target": "jazzband/prettytable#534",
+    "about": "Test min_width in various scenarios",
+    "claims": [
+     {
+      "id": "C1",
+      "source": "PR description",
+      "text": "When a table has headers and no data rows rendered, the column width will honor the min_width setting.",
+      "covers": [
+       "c1_*",
+       "c2_*",
+       "c3_*"
+      ],
+      "expect": "differs"
+     },
+     {
+      "id": "C2",
+      "source": "PR description",
+      "text": "After calling clear_rows() on a table, the column width will honor min_width even though there are no rows.",
+      "covers": [
+       "c2_*"
+      ],
+      "expect": "differs"
+     },
+     {
+      "id": "C3",
+      "source": "PR description",
+      "text": "When slicing a table with an empty selection (start >= number of rows), the column width will honor min_width.",
+      "covers": [
+       "c3_*"
+      ],
+      "expect": "differs"
+     },
+     {
+      "id": "C4",
+      "source": "PR description",
+      "text": "For tables that contain at least one data row, the column width behavior remains unchanged relative to the base implementation.",
+      "covers": [
+       "c4_*"
+      ],
+      "expect": "same"
+     },
+     {
+      "id": "C5",
+      "source": "PR description",
+      "text": "Markdown-specific width policies are unchanged by the modification.",
+      "covers": [
+       "c5_*"
+      ],
+      "expect": "same"
+     },
+     {
+      "id": "C6",
+      "source": "PR description",
+      "text": "Table-level width policies are unchanged by the modification.",
+      "covers": [
+       "c6_*"
+      ],
+      "expect": "same"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": false
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": false
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": false
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": false
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": false
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": false
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-p1-main-1.jsonl",
+      "probe-model-p1-main-2.jsonl",
+      "probe-model-p1-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-p1-pr-1.jsonl",
+      "probe-model-p1-pr-2.jsonl",
+      "probe-model-p1-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      },
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      },
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      }
+     ],
+     "pr": [
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      },
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      },
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "probe.error",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "crash": "non-json output",
+       "exit_code": 1
+      },
+      "pr": {
+       "crash": "non-json output",
+       "exit_code": 1
+      },
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"probe.error\""
+       },
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"probe.error\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "568ebe038528c691d13daa13c160600fa9a960bfb65b4bc2dabbca0d5c33b633",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-04T18:01:33.500067+00:00",
+     "inputs_sha256": "c9d8f63b249eb7a8e334c59869d6598a9399db60e3f32867cf0fd8e4528aa660",
+     "inputs": {
+      "title_chars": 46,
+      "body_chars": 1815,
+      "base_files": {
+       "src/prettytable/prettytable.py": "cf724d61caa80b76af883a91b1d2646ce911bf545246a16979ff48b36c1b5ddc"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-04T18:01:33.696579+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 4,
+     "changed_lines_covered": 0,
+     "files": [
+      {
+       "file": "src/prettytable/prettytable.py",
+       "changed_lines_total": 4,
+       "changed_lines_covered": 3
+      }
+     ],
+     "adequacy": "not_adequate",
+     "note": "the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate",
+     "exit": 1,
+     "data": "probe-cov-model-p1.json",
+     "changed_lines_touched": 3
+    },
+    "status": "crashed",
+    "uninformative_reason": "the probe crashed or printed no parsed output on every main-side run"
+   }
+  ],
+  "summary": {
+   "labels": [],
+   "flagged": [],
+   "proven_claims": [],
+   "reason": "the probe crashed or printed no parsed output on every main-side run",
+   "ignored_noise": [],
+   "ignored_warning_only": [],
+   "pr_only_noisy": [],
+   "advisory_unchanged_subchecks": [],
+   "advisory_agreeing_differs": []
+  }
+ },
+ "probe_changed_line_coverage": {
+  "status": "measured",
+  "side": "main",
+  "probes": {
+   "model-p1": {
+    "status": "measured",
+    "changed_lines_covered": 0,
+    "changed_lines_total": 4,
+    "adequacy": "not_adequate"
+   }
+  },
+  "not_adequate": [
+   "model-p1"
+  ]
+ },
+ "verdict": "could_not_verify",
+ "reason": "could not verify: claim(s) C1, C2, C3 expect a difference but no observation matches (13 test(s) fail on main and pass on the PR; 293 test(s) ran on main, 293 on the PR; 0 new test(s) pass, 280 unchanged; probe model-p1 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count)",
+ "verdict_before_coverage_gate": "could_not_verify",
+ "reason_before_coverage_gate": "could not verify: claim(s) C1, C2, C3 expect a difference but no observation matches (13 test(s) fail on main and pass on the PR; 293 test(s) ran on main, 293 on the PR; 0 new test(s) pass, 280 unchanged; probe model-p1 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count)",
+ "changed_lines_total": 3,
+ "changed_lines_covered": 3,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "normal",
+  "note": "3 of 3 changed executable line(s) ran (100%)",
+  "measurement": "measured"
+ },
+ "agents": {
+  "status": "skipped",
+  "note": "advisory swarm is off",
+  "roles": []
+ },
+ "explanation": {
+  "status": "not yet wired",
+  "why": "advisory swarm is off"
+ },
+ "swarm_requested": false,
+ "operator_approval_requested": false,
+ "swarm": "off",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [
+   "src/prettytable/prettytable.py"
+  ],
+  "compiled_files": [],
+  "other_files": [
+   "tests/test_prettytable.py"
+  ]
+ },
+ "duration_s": {
+  "total_wall": 31607.7,
+  "tests": 9.3
+ },
+ "cost": {
+  "ai_calls": 2,
+  "failed_ai_calls": 0,
+  "input_tokens": 15814,
+  "output_tokens": 8154,
+  "thinking_tokens": 6571,
+  "cost_usd": 0.012083,
+  "calls_without_usage": 0,
+  "ai_cost_usd": 0.012083,
+  "cost_complete": true,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 31607.7,
+   "tests": 9.3
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 2.10718,
+  "total_cost_usd": 2.119263,
+  "swarm": {
+   "ai_calls": 0,
+   "failed_ai_calls": 0,
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "thinking_tokens": 0,
+   "cost_usd": 0.0,
+   "calls_without_usage": 0,
+   "ai_cost_usd": 0.0,
+   "cost_complete": true,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ },
+ "pdf_push": {
+  "ok": true,
+  "attempts": 1,
+  "error": null,
+  "url": "https://github.com/aritracodesbad123/Proof-of-change/tree/runs/runs/2026-11-04/985a7ea/prettytable-534"
+ }
+}

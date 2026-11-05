@@ -1,0 +1,96 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>
+endobj
+4 0 obj
+<< /Length 2895 >>
+stream
+BT
+/F1 11 Tf
+14 TL
+50 800 Td
+(REPORT) Tj T*
+() Tj T*
+(REPORT) Tj T*
+(PDFs NOT saved to GitHub: [redacted] PDF still contains an internal path or a secret, so it was) Tj T*
+( not saved) Tj T*
+() Tj T*
+(Reviewer report: andialbrecht/sqlparse#884:) Tj T*
+(identifier_case: keep the case of backtick-, acute- and) Tj T*
+(bracket-quoted identifiers) Tj T*
+(Run sqlparse-884, tested 2026-11-05 11:29 IST by ops/daily_run.py \(route source-pair\).) Tj T*
+(Proof-of-Change) Tj T*
+(commit 985a7eade681b1d88256d5a185e129da53855144. Report generated 2026-11-05 11:47) Tj T*
+(IST by) Tj T*
+(reports/pr_report.py.) Tj T*
+(Baseline: full \(test comparison + claim probes + coverage gate + claim flagging \(differential p) Tj T*
+(robes) Tj T*
+(shown,) Tj T*
+(informational\)\).) Tj T*
+(NEEDS ATTENTION) Tj T*
+(Recommended action: Reject Confidence: High) Tj T*
+(The run is trustworthy and found a difference a person should look at. Every check passed and) Tj T*
+(every claim cites) Tj T*
+(a log line.) Tj T*
+(Advice only: Proof-of-Change never blocks a merge and never posts on GitHub.) Tj T*
+() Tj T*
+(Summary in plain English) Tj T*
+(? What it says it does: identifier_case: keep the case of backtick-, acute- and bracket-quoted) Tj T*
+(identifiers) Tj T*
+(\(andialbrecht/sqlparse#884\).) Tj T*
+(? What we observed: probe: 5 observation\(s\) need attention: c2.acute_no_ws.upper does not diffe) Tj T*
+(r) Tj T*
+(although the) Tj T*
+(claim says it does \(C2\); c2.acute_ws.upper does not differ although the claim says it does \(C2\)) Tj T*
+(;) Tj T*
+(c2.dq_no_ws.upper does not differ although the claim says it does \(C2\); c2.dq_ws.upper does not) Tj T*
+(differ although) Tj T*
+(the claim says it does \(C2\); probe: claim\(s\) C2 proven; probe model-p-c3 has no measured line) Tj T*
+(coverage) Tj T*
+(\(coverage produced no data \(exit 0\); see probe-coverage.log\); it does not count as covering the) Tj T*
+(change; probe) Tj T*
+(model-p-c4 has no measured line coverage \(coverage produced no data \(exit 0\); see) Tj T*
+(probe-coverage.log\); it) Tj T*
+(does not count as covering the change; tests: 9 test\(s\) fail on main and pass on the PR; 181 te) Tj T*
+(st\(s\)) Tj T*
+(ran on main,) Tj T*
+(181 on the PR; 0 new test\(s\) pass, 174 unchanged \(2 of them skipped on both sides\).) Tj T*
+(? What you should do: Do not approve as is. Read 'What changed in behavior' and decide with the) Tj T*
+(PR author.) Tj T*
+() Tj T*
+() Tj T*
+(Demo helper) Tj T*
+(These notes are background from the console and the daily check. They do not change the verdict) Tj T*
+(.) Tj T*
+(If setup fails, the helper retries the install up to 2 times. If a test still can't be verified) Tj T*
+( because) Tj T*
+(something is) Tj T*
+(missing or fails to import, it looks up the cause, installs the fix on both sides and reruns th) Tj T*
+(at step, up) Tj T*
+(to 3 tries.) Tj T*
+(? Setup check: GitHub token: present.) Tj T*
+ET
+endstream
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000241 00000 n 
+0000003188 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+3258
+%%EOF

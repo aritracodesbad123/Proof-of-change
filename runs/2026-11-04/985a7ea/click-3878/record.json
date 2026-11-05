@@ -1,0 +1,1194 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-pallets-click-3878-f8c5a8efc17d-2026-11-04",
+ "date_ist": "2026-11-04 11:45 IST",
+ "run_date": "2026-11-04",
+ "who": "ops/daily_run.py",
+ "repo": "pallets/click",
+ "library": "click",
+ "pr": {
+  "repo": "pallets/click",
+  "number": 3878,
+  "url": "https://github.com/pallets/click/pull/3878",
+  "title": "Print `\\x04` and `\\x1a` input bytes as `^D` and `^Z` in `CliRunner`",
+  "base_sha": "2247b35ea1c47c727d7a06e51fa280e12a863ff6",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "f8c5a8efc17d01a9fb10bba961def4c3215ce369",
+  "merge_commit": "1745213e67f0e0b88c170edb2292001849cad47d",
+  "tested_main_sha": "2247b35ea1c47c727d7a06e51fa280e12a863ff6",
+  "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+ },
+ "author": "kdeldycke",
+ "base_ref": "main",
+ "updated_at_utc": "2026-10-27T14:04:31Z",
+ "updated_at_ist": "2026-10-27 19:34 IST",
+ "ci_state": "passing",
+ "ci_detail": "11 check runs completed without failure",
+ "tested_at_ist": "2026-11-04 11:45 IST",
+ "files": {
+  "all": [
+   "CHANGES.md",
+   "docs/testing.md",
+   "src/click/testing.py",
+   "tests/test_testing.py"
+  ],
+  "package_py": [
+   "src/click/testing.py"
+  ],
+  "compiled": [],
+  "other": [
+   "CHANGES.md",
+   "docs/testing.md",
+   "tests/test_testing.py"
+  ]
+ },
+ "machine_type": {
+  "arch": "x86_64",
+  "os": "Linux",
+  "platform": "Linux-6.12.94+-x86_64-with-glibc2.41",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": null,
+  "cpu_model": "Intel(R) Xeon(R) Processor",
+  "ram_gb": 15.6
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 3,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.15",
+ "test_selection": "mapped from touched files: tests/test_testing.py, tests/test_context.py, tests/test_options.py",
+ "per_run": [
+  {
+   "side": "old",
+   "run": 1,
+   "passed": 773,
+   "failed": 0,
+   "error": 0,
+   "skipped": 1,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 2.3,
+   "pytest_summary": "773 passed, 1 skipped in 1.51s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 1,
+   "passed": 781,
+   "failed": 0,
+   "error": 0,
+   "skipped": 1,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 2.2,
+   "pytest_summary": "781 passed, 1 skipped in 1.46s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 2,
+   "passed": 773,
+   "failed": 0,
+   "error": 0,
+   "skipped": 1,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 2.1,
+   "pytest_summary": "773 passed, 1 skipped in 1.46s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 2,
+   "passed": 781,
+   "failed": 0,
+   "error": 0,
+   "skipped": 1,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 2.5,
+   "pytest_summary": "781 passed, 1 skipped in 1.76s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 3,
+   "passed": 773,
+   "failed": 0,
+   "error": 0,
+   "skipped": 1,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 2.2,
+   "pytest_summary": "773 passed, 1 skipped in 1.54s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 3,
+   "passed": 781,
+   "failed": 0,
+   "error": 0,
+   "skipped": 1,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 2.1,
+   "pytest_summary": "781 passed, 1 skipped in 1.45s",
+   "junit": true
+  }
+ ],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "local",
+ "sandbox_backend_note": "local bubblewrap",
+ "machine": "local",
+ "tool_setup": {
+  "installed": [],
+  "tries": 0,
+  "note": "All required tools were already installed.",
+  "refused": []
+ },
+ "posted_upstream": false,
+ "logs": "click-3878/",
+ "freeze": {
+  "main": "freeze-main.txt",
+  "pr": "freeze-pr.txt"
+ },
+ "coverage": {
+  "status": "measured",
+  "changed_lines_total": 8,
+  "changed_lines_covered": 8,
+  "files": [
+   {
+    "file": "src/click/testing.py",
+    "changed_lines_total": 8,
+    "changed_lines_covered": 8
+   }
+  ],
+  "seconds": 3.5,
+  "exit": 0,
+  "log": "coverage-pytest.log"
+ },
+ "poc_commit": "985a7eade681b1d88256d5a185e129da53855144",
+ "route": "source-pair",
+ "current_head_sha": "f8c5a8efc17d01a9fb10bba961def4c3215ce369",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "model_provider_fallback": "AI call fell back or failed (probes)",
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": "[redacted]",
+  "notes": [
+   "Setup check: GitHub token: present.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory 9.2 GB (of 15.6 GB).",
+   "Setup check: free disk 94.9 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: [redacted] results",
+   "Query: click python setup install instructions https://github.com/pallets/click site:github.com/pallets/click",
+   "Query: click python documentation install https://github.com/pallets/click site:github.com/pallets/click",
+   "Query: click python install requirements https://pypi.org/project/click/ https://github.com/pallets/click site:pypi.org",
+   "Source: nulink-click \u2014 https://pypi.org/project/nulink-click/",
+   "Source: click \u2014 https://pypi.org/project/click/",
+   "Source: click-log \u2014 https://pypi.org/project/click-log/",
+   "Source: Add python 3.9 support \u00b7 Issue #1684 \u00b7 pallets/click \u00b7 GitHub \u2014 https://github.com/pallets/click/issues/1684",
+   "Source: Context different in `click.pass_context` and `shell_complete` \u00b7 Issue #2303 \u00b7 pallets/click \u00b7 GitHub \u2014 https://github.com/pallets/click/issues/2303",
+   "Source: Regression in click>=8; click.Path says file doesn't exist when it does \u00b7 Issue #1921 \u00b7 pallets/click \u00b7 GitHub \u2014 https://github.com/pallets/click/issues/1921",
+   "Source: GitHub - pallets/click: Python composable command line interface toolkit \u00b7 GitHub \u2014 https://github.com/pallets/click",
+   "Source: GitHub - pallets/click at developer-service.blog \u00b7 GitHub \u2014 https://github.com/pallets/click?ref=developer-service.blog",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: install pytest (listed in the tests extra) on main and pr.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >=3.10",
+   "Installed pytest 9.2.0 from pyproject (listed in the tests extra) on main and pr."
+  ],
+  "install_docs": [
+   "README.md",
+   "pyproject.toml",
+   "docs/contributing.md",
+   ".github/workflows/pre-commit.yaml",
+   ".github/workflows/publish.yaml",
+   ".github/workflows/zizmor.yaml",
+   ".github/workflows/nightly.yaml",
+   ".github/workflows/tests.yaml",
+   ".github/workflows/lock.yaml",
+   "examples/README"
+  ],
+  "install_docs_from": "main",
+  "setup_plan": {
+   "packages": [
+    {
+     "requirement": "pytest",
+     "name": "pytest",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the tests extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    }
+   ],
+   "scope_blocked": "",
+   "component": null,
+   "aggregate_names": [],
+   "extra_reqs": [
+    "pytest"
+   ],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >=3.10"
+   },
+   "system": [],
+   "refused": [],
+   "groups_blocked": ""
+  },
+  "steps": {
+   "setup_lookup": "Found 1 setup item(s) in the project's files and the web lookup.",
+   "setup_python": "Python 3.12: Python 3.12 already meets >=3.10",
+   "install_deps": "Wrote requirements.txt and installed it on main and pr: pytest."
+  },
+  "run_files": {
+   "requirements": "requirements.txt",
+   "plan": "setup-plan.json",
+   "count": 1
+  },
+  "installs": [
+   {
+    "package": "pytest",
+    "requirement": "pytest",
+    "version": "9.2.0",
+    "versions": {
+     "main": "9.2.0",
+     "pr": "9.2.0"
+    },
+    "source": "pyproject",
+    "reason": "listed in the tests extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   }
+  ]
+ },
+ "sides": {
+  "comparison_basis": "base tip vs GitHub test merge (refs/pull/N/merge)",
+  "main_sha": "2247b35ea1c47c727d7a06e51fa280e12a863ff6",
+  "pr_sha": "1745213e67f0e0b88c170edb2292001849cad47d",
+  "merge_commit": "1745213e67f0e0b88c170edb2292001849cad47d",
+  "merge_parents": [
+   "2247b35ea1c47c727d7a06e51fa280e12a863ff6",
+   "f8c5a8efc17d01a9fb10bba961def4c3215ce369"
+  ],
+  "merge_head_matches_pinned_head": true
+ },
+ "tested": {
+  "main": "main @ 2247b35ea1c4 (base tip = first parent of the merge commit)",
+  "pr": "GitHub test merge commit 1745213e67f0 (refs/pull/3878/merge) of head f8c5a8efc17d"
+ },
+ "probe_plan": {
+  "baseline": "full",
+  "model": "model provider: nebius (Token Factory, live)",
+  "errors": [],
+  "model_claims": [
+   {
+    "id": "C1",
+    "text": "When stdin receives the byte \\x04, CliRunner echoes ^D\\n to stdout.",
+    "source_quote": "`\\x04`         | `^D\\n`",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C2",
+    "text": "When stdin receives the byte \\x1a, CliRunner echoes ^Z\\n to stdout.",
+    "source_quote": "`\\x1a`         | `^Z\\n`",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C3",
+    "text": "CliRunner no longer passes the bytes \\x04 and \\x1a to the underlying command.",
+    "source_quote": "It also no longer passes these bytes to the command.",
+    "testable": true,
+    "expect": "differs"
+   }
+  ],
+  "model_rejected_claims": [],
+  "model_parse_repairs": [
+   {
+    "attempt": 1,
+    "probe": "probe3b",
+    "error": {
+     "message": "unmatched '}'",
+     "line": 17,
+     "offset": 51,
+     "code_line": "print({\"observations\": {\"c3b.stdout_bytes\": obs}})}], "
+    },
+    "outcome": "provider error: nebius probes request failed: JSONDecodeError"
+   }
+  ],
+  "model_retried": {
+   "why": [
+    "no probe listed the claim ids it checks, so its results could not be tied to any claim; in each probe, \"claims\" must name the claim ids it checks and the observation names that cover them"
+   ]
+  },
+  "diff_targets": [],
+  "frozen": [
+   {
+    "path": "model-probes/model-probe1.py",
+    "source": "model",
+    "sha256": "9652bac692baaf602661f8daf7910ac3122eb9ad64263bf2923056e8ae882710",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-04T06:18:40.841909+00:00",
+    "inputs_sha256": "e887e1f5c34f763c4d8e2fc10977d6a359d3002bf6a795baa98669cc00845668",
+    "inputs": {
+     "title_chars": 67,
+     "body_chars": 700,
+     "base_files": {
+      "src/click/testing.py": "76f4e649bc53000d667c8c0deff1591970fa034b0f085a207165839b2301019a"
+     }
+    }
+   },
+   {
+    "path": "model-probes/model-probe2.py",
+    "source": "model",
+    "sha256": "c6a14a60828cffc477fecd97f33807f0fbc648b2cd754b55146a3da9fda98971",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-04T06:18:40.842060+00:00",
+    "inputs_sha256": "e887e1f5c34f763c4d8e2fc10977d6a359d3002bf6a795baa98669cc00845668",
+    "inputs": {
+     "title_chars": 67,
+     "body_chars": 700,
+     "base_files": {
+      "src/click/testing.py": "76f4e649bc53000d667c8c0deff1591970fa034b0f085a207165839b2301019a"
+     }
+    }
+   },
+   {
+    "path": "model-probes/model-probe3.py",
+    "source": "model",
+    "sha256": "9e3614aba2a81b138ad750218bc536f8361ce0b0c22a7a78c64f9ddcbe585771",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-04T06:18:40.842146+00:00",
+    "inputs_sha256": "e887e1f5c34f763c4d8e2fc10977d6a359d3002bf6a795baa98669cc00845668",
+    "inputs": {
+     "title_chars": 67,
+     "body_chars": 700,
+     "base_files": {
+      "src/click/testing.py": "76f4e649bc53000d667c8c0deff1591970fa034b0f085a207165839b2301019a"
+     }
+    }
+   }
+  ]
+ },
+ "test_extras": [
+  "pytest-randomly",
+  "pytest-xdist"
+ ],
+ "pr_side_started_at": "2026-11-04T06:18:41.073773+00:00",
+ "test_targets": {
+  "main": [
+   "tests/test_testing.py",
+   "tests/test_context.py",
+   "tests/test_options.py"
+  ],
+  "pr": [
+   "tests/test_testing.py",
+   "tests/test_context.py",
+   "tests/test_options.py"
+  ]
+ },
+ "installed_commit": {
+  "main": {
+   "dist": "click",
+   "expected": "2247b35ea1c47c727d7a06e51fa280e12a863ff6",
+   "installed": "2247b35ea1c47c727d7a06e51fa280e12a863ff6",
+   "ok": true
+  },
+  "pr": {
+   "dist": "click",
+   "expected": "1745213e67f0e0b88c170edb2292001849cad47d",
+   "installed": "1745213e67f0e0b88c170edb2292001849cad47d",
+   "ok": true
+  }
+ },
+ "declared_test_deps": {
+  "requested": [
+   "pytest-randomly",
+   "pytest-xdist"
+  ],
+  "installed": true
+ },
+ "comparison": {
+  "same": 774,
+  "same_skipped_both": 1,
+  "regressions": [],
+  "fixed": [
+   "tests.test_testing::test_echo_stdin_control_byte_is_not_a_line[binary]",
+   "tests.test_testing::test_echo_stdin_control_byte_is_not_a_line[readlines]",
+   "tests.test_testing::test_echo_stdin_control_byte_is_not_a_line[text]",
+   "tests.test_testing::test_echo_stdin_control_bytes[eot-alone]",
+   "tests.test_testing::test_echo_stdin_control_bytes[eot-ends-input]",
+   "tests.test_testing::test_echo_stdin_control_bytes[eot-mid-chunk]",
+   "tests.test_testing::test_echo_stdin_control_bytes[sub-ends-input]"
+  ],
+  "new_tests_passing": 1,
+  "new_tests_passing_ids": [
+   "tests.test_testing::test_echo_stdin_control_bytes[no-control-byte]"
+  ],
+  "new_tests_failing": [],
+  "new_tests_skipped": [],
+  "removed_tests": [],
+  "reparametrized": [],
+  "skipped_missing_dependency": [],
+  "flaky": [],
+  "pr_unstable": [],
+  "pr_unstable_noisy": [],
+  "environment": [],
+  "other_changes": [],
+  "preexisting_failures": [],
+  "load_failed_both": [],
+  "load_failed_pr": [],
+  "load_failed_main": [],
+  "executed": {
+   "main": 780,
+   "pr": 781
+  },
+  "messages": {},
+  "base_messages": {
+   "tests.test_testing::test_echo_stdin_control_byte_is_not_a_line[binary]": "AssertionError: assert 'bar\\nbaz\\n\\x043\\n' == 'bar\\nbaz\\n^D\\n2\\n'",
+   "tests.test_testing::test_echo_stdin_control_byte_is_not_a_line[readlines]": "AssertionError: assert 'bar\\nbaz\\n\\x043\\n' == 'bar\\nbaz\\n^D\\n2\\n'",
+   "tests.test_testing::test_echo_stdin_control_byte_is_not_a_line[text]": "AssertionError: assert 'bar\\nbaz\\n\\x043\\n' == 'bar\\nbaz\\n^D\\n2\\n'",
+   "tests.test_testing::test_echo_stdin_control_bytes[eot-alone]": "AssertionError: assert \"\\x04b'\\\\x04'\\n\" == \"^D\\nb''\\n\"",
+   "tests.test_testing::test_echo_stdin_control_bytes[eot-ends-input]": "AssertionError: assert \"bar\\n\\x04b'bar\\\\n\\\\x04'\\n\" == \"bar\\n^D\\nb'bar\\\\n'\\n\"",
+   "tests.test_testing::test_echo_stdin_control_bytes[eot-mid-chunk]": "AssertionError: assert \"bar\\x04baz\\n...\\x04baz\\\\n'\\n\" == \"bar^D\\nbaz\\nb'barbaz\\\\n'\\n\"",
+   "tests.test_testing::test_echo_stdin_control_bytes[sub-ends-input]": "AssertionError: assert \"bar\\n\\x1ab'bar\\\\n\\\\x1a'\\n\" == \"bar\\n^Z\\nb'bar\\\\n'\\n\""
+  }
+ },
+ "exit_check": {
+  "explained": true,
+  "problems": [],
+  "detail": "all runs exited 0"
+ },
+ "probes": {
+  "status": "ran",
+  "items": [
+   {
+    "id": "model-probe1",
+    "source": "model",
+    "path": "model-probes/model-probe1.py",
+    "sha256": "9652bac692baaf602661f8daf7910ac3122eb9ad64263bf2923056e8ae882710",
+    "target": "pallets/click#3878",
+    "about": "Test C1: echo of \\x04",
+    "claims": [
+     {
+      "id": "C1",
+      "source": "PR description",
+      "text": "When stdin receives the byte \\x04, CliRunner echoes ^D\\n to stdout.",
+      "covers": [
+       "c1.stdout"
+      ],
+      "expect": "differs"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.2,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-probe1-main-1.jsonl",
+      "probe-model-probe1-main-2.jsonl",
+      "probe-model-probe1-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-probe1-pr-1.jsonl",
+      "probe-model-probe1-pr-2.jsonl",
+      "probe-model-probe1-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "c1.stdout": ""
+      },
+      {
+       "c1.stdout": ""
+      },
+      {
+       "c1.stdout": ""
+      }
+     ],
+     "pr": [
+      {
+       "c1.stdout": ""
+      },
+      {
+       "c1.stdout": ""
+      },
+      {
+       "c1.stdout": ""
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "c1.stdout",
+      "state": "same",
+      "label": "needs_human",
+      "claim": "C1",
+      "main": "",
+      "pr": "",
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c1.stdout\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c1.stdout\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "9652bac692baaf602661f8daf7910ac3122eb9ad64263bf2923056e8ae882710",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-04T06:18:40.841909+00:00",
+     "inputs_sha256": "e887e1f5c34f763c4d8e2fc10977d6a359d3002bf6a795baa98669cc00845668",
+     "inputs": {
+      "title_chars": 67,
+      "body_chars": 700,
+      "base_files": {
+       "src/click/testing.py": "76f4e649bc53000d667c8c0deff1591970fa034b0f085a207165839b2301019a"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-04T06:18:41.073773+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 7,
+     "changed_lines_covered": 3,
+     "files": [
+      {
+       "file": "src/click/testing.py",
+       "changed_lines_total": 7,
+       "changed_lines_covered": 3
+      }
+     ],
+     "adequacy": "adequate",
+     "note": "ran 3 of 7 changed line(s) on the main side",
+     "exit": 0,
+     "data": "probe-cov-model-probe1.json"
+    },
+    "status": "ran"
+   },
+   {
+    "id": "model-probe2",
+    "source": "model",
+    "path": "model-probes/model-probe2.py",
+    "sha256": "c6a14a60828cffc477fecd97f33807f0fbc648b2cd754b55146a3da9fda98971",
+    "target": "pallets/click#3878",
+    "about": "Test C2: echo of \\x1a",
+    "claims": [
+     {
+      "id": "C2",
+      "source": "PR description",
+      "text": "When stdin receives the byte \\x1a, CliRunner echoes ^Z\\n to stdout.",
+      "covers": [
+       "c2.stdout"
+      ],
+      "expect": "differs"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.2,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-probe2-main-1.jsonl",
+      "probe-model-probe2-main-2.jsonl",
+      "probe-model-probe2-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-probe2-pr-1.jsonl",
+      "probe-model-probe2-pr-2.jsonl",
+      "probe-model-probe2-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "c2.stdout": ""
+      },
+      {
+       "c2.stdout": ""
+      },
+      {
+       "c2.stdout": ""
+      }
+     ],
+     "pr": [
+      {
+       "c2.stdout": ""
+      },
+      {
+       "c2.stdout": ""
+      },
+      {
+       "c2.stdout": ""
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "c2.stdout",
+      "state": "same",
+      "label": "needs_human",
+      "claim": "C2",
+      "main": "",
+      "pr": "",
+      "citations": {
+       "main": {
+        "file": "probe-model-probe2-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c2.stdout\""
+       },
+       "pr": {
+        "file": "probe-model-probe2-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c2.stdout\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "c6a14a60828cffc477fecd97f33807f0fbc648b2cd754b55146a3da9fda98971",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-04T06:18:40.842060+00:00",
+     "inputs_sha256": "e887e1f5c34f763c4d8e2fc10977d6a359d3002bf6a795baa98669cc00845668",
+     "inputs": {
+      "title_chars": 67,
+      "body_chars": 700,
+      "base_files": {
+       "src/click/testing.py": "76f4e649bc53000d667c8c0deff1591970fa034b0f085a207165839b2301019a"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-04T06:18:41.073773+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 7,
+     "changed_lines_covered": 3,
+     "files": [
+      {
+       "file": "src/click/testing.py",
+       "changed_lines_total": 7,
+       "changed_lines_covered": 3
+      }
+     ],
+     "adequacy": "adequate",
+     "note": "ran 3 of 7 changed line(s) on the main side",
+     "exit": 0,
+     "data": "probe-cov-model-probe2.json"
+    },
+    "status": "ran"
+   },
+   {
+    "id": "model-probe3",
+    "source": "model",
+    "path": "model-probes/model-probe3.py",
+    "sha256": "9e3614aba2a81b138ad750218bc536f8361ce0b0c22a7a78c64f9ddcbe585771",
+    "target": "pallets/click#3878",
+    "about": "Test C3: bytes not passed to command",
+    "claims": [
+     {
+      "id": "C3",
+      "source": "PR description",
+      "text": "CliRunner no longer passes the bytes \\x04 and \\x1a to the underlying command.",
+      "covers": [
+       "c3.len0",
+       "c3.len1"
+      ],
+      "expect": "differs"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.2,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-probe3-main-1.jsonl",
+      "probe-model-probe3-main-2.jsonl",
+      "probe-model-probe3-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-probe3-pr-1.jsonl",
+      "probe-model-probe3-pr-2.jsonl",
+      "probe-model-probe3-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "c3.len0": 4,
+       "c3.len1": 4
+      },
+      {
+       "c3.len0": 4,
+       "c3.len1": 4
+      },
+      {
+       "c3.len0": 4,
+       "c3.len1": 4
+      }
+     ],
+     "pr": [
+      {
+       "c3.len0": 4,
+       "c3.len1": 4
+      },
+      {
+       "c3.len0": 4,
+       "c3.len1": 4
+      },
+      {
+       "c3.len0": 4,
+       "c3.len1": 4
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "c3.len0",
+      "state": "same",
+      "label": "needs_human",
+      "claim": "C3",
+      "main": 4,
+      "pr": 4,
+      "citations": {
+       "main": {
+        "file": "probe-model-probe3-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c3.len0\""
+       },
+       "pr": {
+        "file": "probe-model-probe3-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c3.len0\""
+       }
+      }
+     },
+     {
+      "name": "c3.len1",
+      "state": "same",
+      "label": "needs_human",
+      "claim": "C3",
+      "main": 4,
+      "pr": 4,
+      "citations": {
+       "main": {
+        "file": "probe-model-probe3-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c3.len1\""
+       },
+       "pr": {
+        "file": "probe-model-probe3-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c3.len1\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "9e3614aba2a81b138ad750218bc536f8361ce0b0c22a7a78c64f9ddcbe585771",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-04T06:18:40.842146+00:00",
+     "inputs_sha256": "e887e1f5c34f763c4d8e2fc10977d6a359d3002bf6a795baa98669cc00845668",
+     "inputs": {
+      "title_chars": 67,
+      "body_chars": 700,
+      "base_files": {
+       "src/click/testing.py": "76f4e649bc53000d667c8c0deff1591970fa034b0f085a207165839b2301019a"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-04T06:18:41.073773+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 7,
+     "changed_lines_covered": 3,
+     "files": [
+      {
+       "file": "src/click/testing.py",
+       "changed_lines_total": 7,
+       "changed_lines_covered": 3
+      }
+     ],
+     "adequacy": "adequate",
+     "note": "ran 3 of 7 changed line(s) on the main side",
+     "exit": 0,
+     "data": "probe-cov-model-probe3.json"
+    },
+    "status": "ran"
+   }
+  ],
+  "summary": {
+   "labels": [
+    "needs_human",
+    "needs_human",
+    "needs_human",
+    "needs_human"
+   ],
+   "flagged": [
+    {
+     "probe": "model-probe1",
+     "name": "c1.stdout",
+     "label": "needs_human",
+     "claim": "C1"
+    },
+    {
+     "probe": "model-probe2",
+     "name": "c2.stdout",
+     "label": "needs_human",
+     "claim": "C2"
+    },
+    {
+     "probe": "model-probe3",
+     "name": "c3.len0",
+     "label": "needs_human",
+     "claim": "C3"
+    },
+    {
+     "probe": "model-probe3",
+     "name": "c3.len1",
+     "label": "needs_human",
+     "claim": "C3"
+    }
+   ],
+   "proven_claims": [],
+   "reason": "probe: 4 observation(s) need attention: c1.stdout does not differ although the claim says it does (C1); c2.stdout does not differ although the claim says it does (C2); c3.len0 does not differ although the claim says it does (C3); c3.len1 does not differ although the claim says it does (C3)",
+   "ignored_noise": [],
+   "ignored_warning_only": [],
+   "pr_only_noisy": [],
+   "advisory_unchanged_subchecks": [],
+   "advisory_agreeing_differs": []
+  }
+ },
+ "probe_changed_line_coverage": {
+  "status": "measured",
+  "side": "main",
+  "probes": {
+   "model-probe1": {
+    "status": "measured",
+    "changed_lines_covered": 3,
+    "changed_lines_total": 7,
+    "adequacy": "adequate"
+   },
+   "model-probe2": {
+    "status": "measured",
+    "changed_lines_covered": 3,
+    "changed_lines_total": 7,
+    "adequacy": "adequate"
+   },
+   "model-probe3": {
+    "status": "measured",
+    "changed_lines_covered": 3,
+    "changed_lines_total": 7,
+    "adequacy": "adequate"
+   }
+  },
+  "not_adequate": []
+ },
+ "verdict": "verified",
+ "reason": "cross-run settled differs claim(s) C1, C2, C3 as proven (7 new or changed test(s) fail on the base and pass on the PR: tests.test_testing::test_echo_stdin_control_byte_is_not_a_line[binary], tests.test_testing::test_echo_stdin_control_byte_is_not_a_line[readlines], tests.test_testing::test_echo_stdin_control_byte_is_not_a_line[text] (+4 more)); 7 test(s) fail on main and pass on the PR; 780 test(s) ran on main, 781 on the PR; 1 new test(s) pass, 774 unchanged (1 of them skipped on both sides)",
+ "verdict_before_coverage_gate": "verified",
+ "reason_before_coverage_gate": "cross-run settled differs claim(s) C1, C2, C3 as proven (7 new or changed test(s) fail on the base and pass on the PR: tests.test_testing::test_echo_stdin_control_byte_is_not_a_line[binary], tests.test_testing::test_echo_stdin_control_byte_is_not_a_line[readlines], tests.test_testing::test_echo_stdin_control_byte_is_not_a_line[text] (+4 more)); 7 test(s) fail on main and pass on the PR; 780 test(s) ran on main, 781 on the PR; 1 new test(s) pass, 774 unchanged (1 of them skipped on both sides)",
+ "changed_lines_total": 8,
+ "changed_lines_covered": 8,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "normal",
+  "note": "8 of 8 changed executable line(s) ran (100%)",
+  "measurement": "measured"
+ },
+ "agents": {
+  "status": "skipped",
+  "note": "advisory swarm is off",
+  "roles": []
+ },
+ "explanation": {
+  "status": "not yet wired",
+  "why": "advisory swarm is off"
+ },
+ "swarm_requested": false,
+ "operator_approval_requested": false,
+ "swarm": "off",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [
+   "src/click/testing.py"
+  ],
+  "compiled_files": [],
+  "other_files": [
+   "CHANGES.md",
+   "docs/testing.md",
+   "tests/test_testing.py"
+  ]
+ },
+ "duration_s": {
+  "total_wall": 218.6,
+  "tests": 13.4
+ },
+ "cost": {
+  "ai_calls": 4,
+  "failed_ai_calls": 1,
+  "input_tokens": 23154,
+  "output_tokens": 44510,
+  "thinking_tokens": 14191,
+  "cost_usd": 0.047005,
+  "calls_without_usage": 0,
+  "ai_cost_usd": 0.047005,
+  "cost_complete": true,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 218.6,
+   "tests": 13.4
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.014573,
+  "total_cost_usd": 0.061578,
+  "swarm": {
+   "ai_calls": 0,
+   "failed_ai_calls": 0,
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "thinking_tokens": 0,
+   "cost_usd": 0.0,
+   "calls_without_usage": 0,
+   "ai_cost_usd": 0.0,
+   "cost_complete": true,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ },
+ "pdf_push": {
+  "ok": true,
+  "attempts": 1,
+  "error": null,
+  "url": "https://github.com/aritracodesbad123/Proof-of-change/tree/runs/runs/2026-11-04/985a7ea/click-3878"
+ }
+}

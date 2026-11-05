@@ -1,0 +1,1972 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-pallets-click-3902-708edcb4844c-2026-11-04",
+ "date_ist": "2026-11-04 11:40 IST",
+ "run_date": "2026-11-04",
+ "who": "ops/daily_run.py",
+ "repo": "pallets/click",
+ "library": "click",
+ "pr": {
+  "repo": "pallets/click",
+  "number": 3902,
+  "url": "https://github.com/pallets/click/pull/3902",
+  "title": "Help pages no longer break a line within a hyphenated word",
+  "base_sha": "6d34602f4b0668a61873af1c547bfd40cb7deffc",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "708edcb4844c02d38dba02deab3a78e919abb9f0",
+  "merge_commit": "5597b7d3290c51088c991f9f5eea45eb1c227a15",
+  "tested_main_sha": "6d34602f4b0668a61873af1c547bfd40cb7deffc",
+  "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+ },
+ "author": "kdeldycke",
+ "base_ref": "stable",
+ "updated_at_utc": "2026-11-03T14:24:30Z",
+ "updated_at_ist": "2026-11-03 19:54 IST",
+ "ci_state": "passing",
+ "ci_detail": "11 check runs completed without failure",
+ "tested_at_ist": "2026-11-04 11:40 IST",
+ "files": {
+  "all": [
+   "CHANGES.md",
+   "docs/documentation.md",
+   "src/click/_textwrap.py",
+   "src/click/formatting.py",
+   "tests/test_compat.py",
+   "tests/test_formatting.py"
+  ],
+  "package_py": [
+   "src/click/_textwrap.py",
+   "src/click/formatting.py"
+  ],
+  "compiled": [],
+  "other": [
+   "CHANGES.md",
+   "docs/documentation.md",
+   "tests/test_compat.py",
+   "tests/test_formatting.py"
+  ]
+ },
+ "machine_type": {
+  "arch": "x86_64",
+  "os": "Linux",
+  "platform": "Linux-6.12.94+-x86_64-with-glibc2.41",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": null,
+  "cpu_model": "Intel(R) Xeon(R) Processor",
+  "ram_gb": 15.6
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 3,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.15",
+ "test_selection": "mapped from touched files: tests/test_compat.py, tests/test_formatting.py, tests/test_shell_completion.py",
+ "per_run": [
+  {
+   "side": "old",
+   "run": 1,
+   "passed": 270,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.9,
+   "pytest_summary": "270 passed in 1.19s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 1,
+   "passed": 272,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 2.0,
+   "pytest_summary": "272 passed in 1.23s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 2,
+   "passed": 270,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.9,
+   "pytest_summary": "270 passed in 1.19s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 2,
+   "passed": 272,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 2.1,
+   "pytest_summary": "272 passed in 1.33s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 3,
+   "passed": 270,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 2.1,
+   "pytest_summary": "270 passed in 1.29s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 3,
+   "passed": 272,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.9,
+   "pytest_summary": "272 passed in 1.16s",
+   "junit": true
+  }
+ ],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "local",
+ "sandbox_backend_note": "local bubblewrap",
+ "machine": "local",
+ "tool_setup": {
+  "installed": [],
+  "tries": 0,
+  "note": "All required tools were already installed.",
+  "refused": []
+ },
+ "posted_upstream": false,
+ "logs": "click-3902/",
+ "freeze": {
+  "main": "freeze-main.txt",
+  "pr": "freeze-pr.txt"
+ },
+ "coverage": {
+  "status": "measured",
+  "changed_lines_total": 2,
+  "changed_lines_covered": 2,
+  "files": [
+   {
+    "file": "src/click/_textwrap.py",
+    "changed_lines_total": 1,
+    "changed_lines_covered": 1
+   },
+   {
+    "file": "src/click/formatting.py",
+    "changed_lines_total": 1,
+    "changed_lines_covered": 1
+   }
+  ],
+  "seconds": 2.9,
+  "exit": 0,
+  "log": "coverage-pytest.log"
+ },
+ "poc_commit": "985a7eade681b1d88256d5a185e129da53855144",
+ "route": "source-pair",
+ "current_head_sha": "708edcb4844c02d38dba02deab3a78e919abb9f0",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": "[redacted]",
+  "notes": [
+   "Setup check: GitHub token: present.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory 10.1 GB (of 15.6 GB).",
+   "Setup check: free disk 94.9 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: [redacted] results",
+   "Query: click python setup install instructions https://github.com/pallets/click site:github.com/pallets/click",
+   "Query: click python documentation install https://github.com/pallets/click site:github.com/pallets/click",
+   "Query: click python install requirements https://pypi.org/project/click/ https://github.com/pallets/click site:pypi.org",
+   "Source: nulink-click \u2014 https://pypi.org/project/nulink-click/",
+   "Source: click \u2014 https://pypi.org/project/click/",
+   "Source: click-log \u2014 https://pypi.org/project/click-log/",
+   "Source: Add python 3.9 support \u00b7 Issue #1684 \u00b7 pallets/click \u00b7 GitHub \u2014 https://github.com/pallets/click/issues/1684",
+   "Source: Context different in `click.pass_context` and `shell_complete` \u00b7 Issue #2303 \u00b7 pallets/click \u00b7 GitHub \u2014 https://github.com/pallets/click/issues/2303",
+   "Source: Regression in click>=8; click.Path says file doesn't exist when it does \u00b7 Issue #1921 \u00b7 pallets/click \u00b7 GitHub \u2014 https://github.com/pallets/click/issues/1921",
+   "Source: GitHub - pallets/click: Python composable command line interface toolkit \u00b7 GitHub \u2014 https://github.com/pallets/click",
+   "Source: GitHub - pallets/click at developer-service.blog \u00b7 GitHub \u2014 https://github.com/pallets/click?ref=developer-service.blog",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: install pytest (listed in the tests extra) on main and pr.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >=3.10",
+   "Installed pytest 9.2.0 from pyproject (listed in the tests extra) on main and pr."
+  ],
+  "install_docs": [
+   "README.md",
+   "pyproject.toml",
+   "docs/contributing.md",
+   ".github/workflows/pre-commit.yaml",
+   ".github/workflows/publish.yaml",
+   ".github/workflows/zizmor.yaml",
+   ".github/workflows/nightly.yaml",
+   ".github/workflows/tests.yaml",
+   ".github/workflows/lock.yaml",
+   "examples/README"
+  ],
+  "install_docs_from": "main",
+  "setup_plan": {
+   "packages": [
+    {
+     "requirement": "pytest",
+     "name": "pytest",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the tests extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    }
+   ],
+   "scope_blocked": "",
+   "component": null,
+   "aggregate_names": [],
+   "extra_reqs": [
+    "pytest"
+   ],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >=3.10"
+   },
+   "system": [],
+   "refused": [],
+   "groups_blocked": ""
+  },
+  "steps": {
+   "setup_lookup": "Found 1 setup item(s) in the project's files and the web lookup.",
+   "setup_python": "Python 3.12: Python 3.12 already meets >=3.10",
+   "install_deps": "Wrote requirements.txt and installed it on main and pr: pytest."
+  },
+  "run_files": {
+   "requirements": "requirements.txt",
+   "plan": "setup-plan.json",
+   "count": 1
+  },
+  "installs": [
+   {
+    "package": "pytest",
+    "requirement": "pytest",
+    "version": "9.2.0",
+    "versions": {
+     "main": "9.2.0",
+     "pr": "9.2.0"
+    },
+    "source": "pyproject",
+    "reason": "listed in the tests extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   }
+  ]
+ },
+ "sides": {
+  "comparison_basis": "base tip vs GitHub test merge (refs/pull/N/merge)",
+  "main_sha": "6d34602f4b0668a61873af1c547bfd40cb7deffc",
+  "pr_sha": "5597b7d3290c51088c991f9f5eea45eb1c227a15",
+  "merge_commit": "5597b7d3290c51088c991f9f5eea45eb1c227a15",
+  "merge_parents": [
+   "6d34602f4b0668a61873af1c547bfd40cb7deffc",
+   "708edcb4844c02d38dba02deab3a78e919abb9f0"
+  ],
+  "merge_head_matches_pinned_head": true
+ },
+ "tested": {
+  "main": "stable @ 6d34602f4b06 (base tip = first parent of the merge commit)",
+  "pr": "GitHub test merge commit 5597b7d3290c (refs/pull/3902/merge) of head 708edcb4844c"
+ },
+ "probe_plan": {
+  "baseline": "full",
+  "model": "model provider: nebius (Token Factory, live)",
+  "errors": [],
+  "model_claims": [
+   {
+    "id": "C1",
+    "text": "Help pages no longer break a line within a hyphenated word.",
+    "source_quote": "Help pages no longer break a line within a hyphenated word",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C2",
+    "text": "write_usage no longer breaks a line inside an argument.",
+    "source_quote": "Also fixes `write_usage` breaking a line inside an argument.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C3",
+    "text": "Long-word truncation behavior is reverted (differs) compared to the base.",
+    "source_quote": "Also reverts part of https://github.com/pallets/click/pull/3420 now that long words truncation is simplified.",
+    "testable": true,
+    "expect": "differs"
+   }
+  ],
+  "model_rejected_claims": [],
+  "model_retried": {
+   "why": [
+    "no probe listed the claim ids it checks, so its results could not be tied to any claim; in each probe, \"claims\" must name the claim ids it checks and the observation names that cover them"
+   ]
+  },
+  "diff_targets": [
+   "click.formatting.wrap_text"
+  ],
+  "frozen": [
+   {
+    "path": "model-probes/model-p1.py",
+    "source": "model",
+    "sha256": "1fbf5f6d759b9e9253941d7b46de8a4c659683611165a660fd21949398a060f2",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-04T06:13:04.868675+00:00",
+    "inputs_sha256": "3d7620130e4a2f27dbfe43e86c6963a637f0ac691e630d066b3572bcc937d67f",
+    "inputs": {
+     "title_chars": 58,
+     "body_chars": 187,
+     "base_files": {
+      "src/click/_textwrap.py": "ed9d0ded59a7fbae933524d4c29e8e5c96dc5174666044fd87d736b9c0fca104",
+      "src/click/formatting.py": "f125b628692f8dfcfd43535b7a88cc1ee64137471f9d0243b389aa0cfea85e6b"
+     }
+    }
+   },
+   {
+    "path": "model-probes/model-p2.py",
+    "source": "model",
+    "sha256": "a3521623e903be6a67c130630338e072627929de2b82a4624707ab474cac7bf5",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-04T06:13:04.868840+00:00",
+    "inputs_sha256": "3d7620130e4a2f27dbfe43e86c6963a637f0ac691e630d066b3572bcc937d67f",
+    "inputs": {
+     "title_chars": 58,
+     "body_chars": 187,
+     "base_files": {
+      "src/click/_textwrap.py": "ed9d0ded59a7fbae933524d4c29e8e5c96dc5174666044fd87d736b9c0fca104",
+      "src/click/formatting.py": "f125b628692f8dfcfd43535b7a88cc1ee64137471f9d0243b389aa0cfea85e6b"
+     }
+    }
+   },
+   {
+    "path": "model-probes/model-p3.py",
+    "source": "model",
+    "sha256": "1345497d901f0a738fd51aff453d5c7fc878b7959ebd3e4a1e9e5d112e4e76e6",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-04T06:13:04.868920+00:00",
+    "inputs_sha256": "3d7620130e4a2f27dbfe43e86c6963a637f0ac691e630d066b3572bcc937d67f",
+    "inputs": {
+     "title_chars": 58,
+     "body_chars": 187,
+     "base_files": {
+      "src/click/_textwrap.py": "ed9d0ded59a7fbae933524d4c29e8e5c96dc5174666044fd87d736b9c0fca104",
+      "src/click/formatting.py": "f125b628692f8dfcfd43535b7a88cc1ee64137471f9d0243b389aa0cfea85e6b"
+     }
+    }
+   },
+   {
+    "path": "diff-probes/diff-api.py",
+    "source": "diff",
+    "sha256": "9146d5be3f65d04d6116e214dc1725508d97090db2c585cdc4a02f647cf77487",
+    "generator": {
+     "kind": "diff",
+     "label": "diff (auto-derived from base-side code, model-free)",
+     "model": null,
+     "provider": null,
+     "provenance": "auto-derived",
+     "blind": false
+    },
+    "frozen_at": "2026-11-04T06:13:04.872760+00:00",
+    "inputs_sha256": "009acb33a564e4fb69e6238070d4bb8cf41c8aee04ec3fd4c6cf8165c9bca54b",
+    "inputs": {
+     "title_chars": 0,
+     "body_chars": 0,
+     "base_files": {
+      "src/click/formatting.py": "f125b628692f8dfcfd43535b7a88cc1ee64137471f9d0243b389aa0cfea85e6b"
+     }
+    }
+   }
+  ]
+ },
+ "test_extras": [
+  "pytest-randomly",
+  "pytest-xdist"
+ ],
+ "pr_side_started_at": "2026-11-04T06:13:05.102987+00:00",
+ "test_targets": {
+  "main": [
+   "tests/test_compat.py",
+   "tests/test_formatting.py",
+   "tests/test_shell_completion.py"
+  ],
+  "pr": [
+   "tests/test_compat.py",
+   "tests/test_formatting.py",
+   "tests/test_shell_completion.py"
+  ]
+ },
+ "installed_commit": {
+  "main": {
+   "dist": "click",
+   "expected": "6d34602f4b0668a61873af1c547bfd40cb7deffc",
+   "installed": "6d34602f4b0668a61873af1c547bfd40cb7deffc",
+   "ok": true
+  },
+  "pr": {
+   "dist": "click",
+   "expected": "5597b7d3290c51088c991f9f5eea45eb1c227a15",
+   "installed": "5597b7d3290c51088c991f9f5eea45eb1c227a15",
+   "ok": true
+  }
+ },
+ "declared_test_deps": {
+  "requested": [
+   "pytest-randomly",
+   "pytest-xdist"
+  ],
+  "installed": true
+ },
+ "comparison": {
+  "same": 262,
+  "same_skipped_both": 0,
+  "regressions": [],
+  "fixed": [
+   "tests.test_formatting::test_help_formatter_keeps_words_whole[write_dl]",
+   "tests.test_formatting::test_help_formatter_keeps_words_whole[write_text]",
+   "tests.test_formatting::test_help_formatter_keeps_words_whole[write_usage]",
+   "tests.test_formatting::test_help_formatter_write_usage_keeps_arguments_whole[argument-wider-than-line]",
+   "tests.test_formatting::test_help_formatter_write_usage_keeps_arguments_whole[arguments-below-program-name]",
+   "tests.test_formatting::test_help_formatter_write_usage_keeps_arguments_whole[hyphenated-options]",
+   "tests.test_formatting::test_wrap_text_keeps_words_whole[hyphenated-word]",
+   "tests.test_formatting::test_wrap_text_keeps_words_whole[long-word]",
+   "tests.test_formatting::test_wrap_text_keeps_words_whole[styled-long-word]"
+  ],
+  "new_tests_passing": 1,
+  "new_tests_passing_ids": [
+   "tests.test_formatting::test_wrap_text_visible_width[styled-long-word-stays-whole]"
+  ],
+  "new_tests_failing": [],
+  "new_tests_skipped": [],
+  "removed_tests": [
+   "tests.test_compat::test_truncate_visible[\\x1b[31mabc\\x1b[0m-3-\\x1b[31mabc]",
+   "tests.test_compat::test_truncate_visible[\\x1b[31mabcdef\\x1b[0m-3-\\x1b[31mabc]",
+   "tests.test_compat::test_truncate_visible[\\x1b[38:2:1:2:3mabcdef-3-\\x1b[38:2:1:2:3mabc]",
+   "tests.test_compat::test_truncate_visible[abc--1-]",
+   "tests.test_compat::test_truncate_visible[abc-0-]",
+   "tests.test_compat::test_truncate_visible[abc-10-abc]",
+   "tests.test_compat::test_truncate_visible[abcdef-3-abc]"
+  ],
+  "reparametrized": [
+   {
+    "test": "tests.test_formatting::test_wrap_text_visible_width",
+    "removed_ids": [
+     "tests.test_formatting::test_wrap_text_visible_width[styled-long-word-breaks-on-visible-width]"
+    ],
+    "added_ids": [
+     "tests.test_formatting::test_wrap_text_visible_width[styled-long-word-stays-whole]"
+    ]
+   }
+  ],
+  "skipped_missing_dependency": [],
+  "flaky": [],
+  "pr_unstable": [],
+  "pr_unstable_noisy": [],
+  "environment": [],
+  "other_changes": [],
+  "preexisting_failures": [],
+  "load_failed_both": [],
+  "load_failed_pr": [],
+  "load_failed_main": [],
+  "executed": {
+   "main": 279,
+   "pr": 272
+  },
+  "messages": {},
+  "base_messages": {
+   "tests.test_formatting::test_help_formatter_keeps_words_whole[write_dl]": "AssertionError: assert ['to', 'visit...l', 'by', ...] == ['Add', '--av...l', 'by', ...]",
+   "tests.test_formatting::test_help_formatter_keeps_words_whole[write_text]": "AssertionError: assert ['motorways',...l', 'by', ...] == ['Add', '--av...l', 'by', ...]",
+   "tests.test_formatting::test_help_formatter_keeps_words_whole[write_usage]": "AssertionError: assert ['Llan', 'fai...l', 'by', ...] == ['Add', '--av...l', 'by', ...]",
+   "tests.test_formatting::test_help_formatter_write_usage_keeps_arguments_whole[argument-wider-than-line]": "AssertionError: assert ['Usage: fore...erature CITY'] == ['Usage: fore...        CITY']",
+   "tests.test_formatting::test_help_formatter_write_usage_keeps_arguments_whole[arguments-below-program-name]": "AssertionError: assert ['Usage: fore...  ightl', ...] == ['Usage: fore...        CITY']",
+   "tests.test_formatting::test_help_formatter_write_usage_keeps_arguments_whole[hyphenated-options]": "AssertionError: assert ['Usage: fore...point-offset'] == ['Usage: fore...point-offset']",
+   "tests.test_formatting::test_wrap_text_keeps_words_whole[hyphenated-word]": "AssertionError: assert ['Add --avoid...untry roads.'] == ['Add', '--av...ry', 'roads.']",
+   "tests.test_formatting::test_wrap_text_keeps_words_whole[long-word]": "AssertionError: assert ['Visit Llan'...in', 'Wales.'] == ['Visit', 'Ll..., 'in Wales.']",
+   "tests.test_formatting::test_wrap_text_keeps_words_whole[styled-long-word]": "AssertionError: assert ['Visit \\x1b[...in', 'Wales.'] == ['Visit', '\\x..., 'in Wales.']"
+  }
+ },
+ "exit_check": {
+  "explained": true,
+  "problems": [],
+  "detail": "all runs exited 0"
+ },
+ "probes": {
+  "status": "ran",
+  "items": [
+   {
+    "id": "model-p1",
+    "source": "model",
+    "path": "model-probes/model-p1.py",
+    "sha256": "1fbf5f6d759b9e9253941d7b46de8a4c659683611165a660fd21949398a060f2",
+    "target": "pallets/click#3902",
+    "about": "Test hyphenated word wrapping",
+    "claims": [
+     {
+      "id": "C1",
+      "source": "PR description",
+      "text": "Help pages no longer break a line within a hyphenated word.",
+      "covers": [
+       "c1.wrapped_lines"
+      ],
+      "expect": "differs"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.2,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-p1-main-1.jsonl",
+      "probe-model-p1-main-2.jsonl",
+      "probe-model-p1-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-p1-pr-1.jsonl",
+      "probe-model-p1-pr-2.jsonl",
+      "probe-model-p1-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "c1.wrapped_lines": [
+        "Check this super-",
+        "duper-long-word."
+       ]
+      },
+      {
+       "c1.wrapped_lines": [
+        "Check this super-",
+        "duper-long-word."
+       ]
+      },
+      {
+       "c1.wrapped_lines": [
+        "Check this super-",
+        "duper-long-word."
+       ]
+      }
+     ],
+     "pr": [
+      {
+       "c1.wrapped_lines": [
+        "Check this",
+        "super-duper-long-word."
+       ]
+      },
+      {
+       "c1.wrapped_lines": [
+        "Check this",
+        "super-duper-long-word."
+       ]
+      },
+      {
+       "c1.wrapped_lines": [
+        "Check this",
+        "super-duper-long-word."
+       ]
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "c1.wrapped_lines",
+      "state": "differs",
+      "label": "proven",
+      "claim": "C1",
+      "main": [
+       "Check this super-",
+       "duper-long-word."
+      ],
+      "pr": [
+       "Check this",
+       "super-duper-long-word."
+      ],
+      "diffs": [
+       {
+        "field": "",
+        "main": [
+         "Check this super-",
+         "duper-long-word."
+        ],
+        "pr": [
+         "Check this",
+         "super-duper-long-word."
+        ]
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c1.wrapped_lines\""
+       },
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c1.wrapped_lines\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "1fbf5f6d759b9e9253941d7b46de8a4c659683611165a660fd21949398a060f2",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-04T06:13:04.868675+00:00",
+     "inputs_sha256": "3d7620130e4a2f27dbfe43e86c6963a637f0ac691e630d066b3572bcc937d67f",
+     "inputs": {
+      "title_chars": 58,
+      "body_chars": 187,
+      "base_files": {
+       "src/click/_textwrap.py": "ed9d0ded59a7fbae933524d4c29e8e5c96dc5174666044fd87d736b9c0fca104",
+       "src/click/formatting.py": "f125b628692f8dfcfd43535b7a88cc1ee64137471f9d0243b389aa0cfea85e6b"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-04T06:13:05.102987+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 55,
+     "changed_lines_covered": 8,
+     "files": [
+      {
+       "file": "src/click/_textwrap.py",
+       "changed_lines_total": 53,
+       "changed_lines_covered": 6
+      },
+      {
+       "file": "src/click/formatting.py",
+       "changed_lines_total": 2,
+       "changed_lines_covered": 2
+      }
+     ],
+     "adequacy": "adequate",
+     "note": "ran 8 of 55 changed line(s) on the main side",
+     "exit": 0,
+     "data": "probe-cov-model-p1.json"
+    },
+    "status": "ran"
+   },
+   {
+    "id": "model-p2",
+    "source": "model",
+    "path": "model-probes/model-p2.py",
+    "sha256": "a3521623e903be6a67c130630338e072627929de2b82a4624707ab474cac7bf5",
+    "target": "pallets/click#3902",
+    "about": "Test write_usage line breaking inside argument",
+    "claims": [
+     {
+      "id": "C2",
+      "source": "PR description",
+      "text": "write_usage no longer breaks a line inside an argument.",
+      "covers": [
+       "c2.usage_lines"
+      ],
+      "expect": "differs"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.3,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.2,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-p2-main-1.jsonl",
+      "probe-model-p2-main-2.jsonl",
+      "probe-model-p2-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-p2-pr-1.jsonl",
+      "probe-model-p2-pr-2.jsonl",
+      "probe-model-p2-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "c2.usage_lines": [
+        "Usage: myprog ",
+        "           --very-long-",
+        "           argument-name-",
+        "           that-might-",
+        "           cause-break"
+       ]
+      },
+      {
+       "c2.usage_lines": [
+        "Usage: myprog ",
+        "           --very-long-",
+        "           argument-name-",
+        "           that-might-",
+        "           cause-break"
+       ]
+      },
+      {
+       "c2.usage_lines": [
+        "Usage: myprog ",
+        "           --very-long-",
+        "           argument-name-",
+        "           that-might-",
+        "           cause-break"
+       ]
+      }
+     ],
+     "pr": [
+      {
+       "c2.usage_lines": [
+        "Usage: myprog ",
+        "           --very-long-argument-name-that-might-cause-break"
+       ]
+      },
+      {
+       "c2.usage_lines": [
+        "Usage: myprog ",
+        "           --very-long-argument-name-that-might-cause-break"
+       ]
+      },
+      {
+       "c2.usage_lines": [
+        "Usage: myprog ",
+        "           --very-long-argument-name-that-might-cause-break"
+       ]
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "c2.usage_lines",
+      "state": "differs",
+      "label": "proven",
+      "claim": "C2",
+      "main": [
+       "Usage: myprog ",
+       "           --very-long-",
+       "           argument-name-",
+       "           that-might-",
+       "           cause-break"
+      ],
+      "pr": [
+       "Usage: myprog ",
+       "           --very-long-argument-name-that-might-cause-break"
+      ],
+      "diffs": [
+       {
+        "field": "",
+        "main": [
+         "Usage: myprog ",
+         "           --very-long-",
+         "           argument-name-",
+         "           that-might-",
+         "           cause-break"
+        ],
+        "pr": [
+         "Usage: myprog ",
+         "           --very-long-argument-name-that-might-cause-break"
+        ]
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-p2-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c2.usage_lines\""
+       },
+       "pr": {
+        "file": "probe-model-p2-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c2.usage_lines\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "a3521623e903be6a67c130630338e072627929de2b82a4624707ab474cac7bf5",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-04T06:13:04.868840+00:00",
+     "inputs_sha256": "3d7620130e4a2f27dbfe43e86c6963a637f0ac691e630d066b3572bcc937d67f",
+     "inputs": {
+      "title_chars": 58,
+      "body_chars": 187,
+      "base_files": {
+       "src/click/_textwrap.py": "ed9d0ded59a7fbae933524d4c29e8e5c96dc5174666044fd87d736b9c0fca104",
+       "src/click/formatting.py": "f125b628692f8dfcfd43535b7a88cc1ee64137471f9d0243b389aa0cfea85e6b"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-04T06:13:05.102987+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 55,
+     "changed_lines_covered": 8,
+     "files": [
+      {
+       "file": "src/click/_textwrap.py",
+       "changed_lines_total": 53,
+       "changed_lines_covered": 6
+      },
+      {
+       "file": "src/click/formatting.py",
+       "changed_lines_total": 2,
+       "changed_lines_covered": 2
+      }
+     ],
+     "adequacy": "adequate",
+     "note": "ran 8 of 55 changed line(s) on the main side",
+     "exit": 0,
+     "data": "probe-cov-model-p2.json"
+    },
+    "status": "ran"
+   },
+   {
+    "id": "model-p3",
+    "source": "model",
+    "path": "model-probes/model-p3.py",
+    "sha256": "1345497d901f0a738fd51aff453d5c7fc878b7959ebd3e4a1e9e5d112e4e76e6",
+    "target": "pallets/click#3902",
+    "about": "Test long-word truncation behavior",
+    "claims": [
+     {
+      "id": "C3",
+      "source": "PR description",
+      "text": "Long-word truncation behavior is reverted (differs) compared to the base.",
+      "covers": [
+       "c3.wrapped_lines"
+      ],
+      "expect": "differs"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.2,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-p3-main-1.jsonl",
+      "probe-model-p3-main-2.jsonl",
+      "probe-model-p3-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-p3-pr-1.jsonl",
+      "probe-model-p3-pr-2.jsonl",
+      "probe-model-p3-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "c3.wrapped_lines": [
+        "extraordin",
+        "arilylongw",
+        "ordwithout",
+        "spaces"
+       ]
+      },
+      {
+       "c3.wrapped_lines": [
+        "extraordin",
+        "arilylongw",
+        "ordwithout",
+        "spaces"
+       ]
+      },
+      {
+       "c3.wrapped_lines": [
+        "extraordin",
+        "arilylongw",
+        "ordwithout",
+        "spaces"
+       ]
+      }
+     ],
+     "pr": [
+      {
+       "c3.wrapped_lines": [
+        "extraordinarilylongwordwithoutspaces"
+       ]
+      },
+      {
+       "c3.wrapped_lines": [
+        "extraordinarilylongwordwithoutspaces"
+       ]
+      },
+      {
+       "c3.wrapped_lines": [
+        "extraordinarilylongwordwithoutspaces"
+       ]
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "c3.wrapped_lines",
+      "state": "differs",
+      "label": "proven",
+      "claim": "C3",
+      "main": [
+       "extraordin",
+       "arilylongw",
+       "ordwithout",
+       "spaces"
+      ],
+      "pr": [
+       "extraordinarilylongwordwithoutspaces"
+      ],
+      "diffs": [
+       {
+        "field": "",
+        "main": [
+         "extraordin",
+         "arilylongw",
+         "ordwithout",
+         "spaces"
+        ],
+        "pr": [
+         "extraordinarilylongwordwithoutspaces"
+        ]
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-p3-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c3.wrapped_lines\""
+       },
+       "pr": {
+        "file": "probe-model-p3-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c3.wrapped_lines\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "1345497d901f0a738fd51aff453d5c7fc878b7959ebd3e4a1e9e5d112e4e76e6",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-04T06:13:04.868920+00:00",
+     "inputs_sha256": "3d7620130e4a2f27dbfe43e86c6963a637f0ac691e630d066b3572bcc937d67f",
+     "inputs": {
+      "title_chars": 58,
+      "body_chars": 187,
+      "base_files": {
+       "src/click/_textwrap.py": "ed9d0ded59a7fbae933524d4c29e8e5c96dc5174666044fd87d736b9c0fca104",
+       "src/click/formatting.py": "f125b628692f8dfcfd43535b7a88cc1ee64137471f9d0243b389aa0cfea85e6b"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-04T06:13:05.102987+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 55,
+     "changed_lines_covered": 30,
+     "files": [
+      {
+       "file": "src/click/_textwrap.py",
+       "changed_lines_total": 53,
+       "changed_lines_covered": 28
+      },
+      {
+       "file": "src/click/formatting.py",
+       "changed_lines_total": 2,
+       "changed_lines_covered": 2
+      }
+     ],
+     "adequacy": "adequate",
+     "note": "ran 30 of 55 changed line(s) on the main side",
+     "exit": 0,
+     "data": "probe-cov-model-p3.json"
+    },
+    "status": "ran"
+   },
+   {
+    "id": "diff-api",
+    "source": "diff",
+    "path": "diff-probes/diff-api.py",
+    "sha256": "9146d5be3f65d04d6116e214dc1725508d97090db2c585cdc4a02f647cf77487",
+    "target": "pallets/click#3902",
+    "about": "Public functions touched by the PR, called with type-appropriate inputs on both sides.",
+    "claims": [],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.2,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-diff-api-main-1.jsonl",
+      "probe-diff-api-main-2.jsonl",
+      "probe-diff-api-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-diff-api-pr-1.jsonl",
+      "probe-diff-api-pr-2.jsonl",
+      "probe-diff-api-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "click.formatting.wrap_text.input0": {
+        "raises": "AttributeError"
+       },
+       "click.formatting.wrap_text.input1": {
+        "raises": "AttributeError"
+       },
+       "click.formatting.wrap_text.input10": {
+        "raises": "AttributeError"
+       },
+       "click.formatting.wrap_text.input11": {
+        "raises": "AttributeError"
+       },
+       "click.formatting.wrap_text.input2": {
+        "raises": "AttributeError"
+       },
+       "click.formatting.wrap_text.input3": {
+        "raises": "AttributeError"
+       },
+       "click.formatting.wrap_text.input4": "abc",
+       "click.formatting.wrap_text.input5": {
+        "raises": "AttributeError"
+       },
+       "click.formatting.wrap_text.input6": {
+        "raises": "AttributeError"
+       },
+       "click.formatting.wrap_text.input7": {
+        "raises": "AttributeError"
+       },
+       "click.formatting.wrap_text.input8": {
+        "raises": "AttributeError"
+       },
+       "click.formatting.wrap_text.input9": ""
+      },
+      {
+       "click.formatting.wrap_text.input0": {
+        "raises": "AttributeError"
+       },
+       "click.formatting.wrap_text.input1": {
+        "raises": "AttributeError"
+       },
+       "click.formatting.wrap_text.input10": {
+        "raises": "AttributeError"
+       },
+       "click.formatting.wrap_text.input11": {
+        "raises": "AttributeError"
+       },
+       "click.formatting.wrap_text.input2": {
+        "raises": "AttributeError"
+       },
+       "click.formatting.wrap_text.input3": {
+        "raises": "AttributeError"
+       },
+       "click.formatting.wrap_text.input4": "abc",
+       "click.formatting.wrap_text.input5": {
+        "raises": "AttributeError"
+       },
+       "click.formatting.wrap_text.input6": {
+        "raises": "AttributeError"
+       },
+       "click.formatting.wrap_text.input7": {
+        "raises": "AttributeError"
+       },
+       "click.formatting.wrap_text.input8": {
+        "raises": "AttributeError"
+       },
+       "click.formatting.wrap_text.input9": ""
+      },
+      {
+       "click.formatting.wrap_text.input0": {
+        "raises": "AttributeError"
+       },
+       "click.formatting.wrap_text.input1": {
+        "raises": "AttributeError"
+       },
+       "click.formatting.wrap_text.input10": {
+        "raises": "AttributeError"
+       },
+       "click.formatting.wrap_text.input11": {
+        "raises": "AttributeError"
+       },
+       "click.formatting.wrap_text.input2": {
+        "raises": "AttributeError"
+       },
+       "click.formatting.wrap_text.input3": {
+        "raises": "AttributeError"
+       },
+       "click.formatting.wrap_text.input4": "abc",
+       "click.formatting.wrap_text.input5": {
+        "raises": "AttributeError"
+       },
+       "click.formatting.wrap_text.input6": {
+        "raises": "AttributeError"
+       },
+       "click.formatting.wrap_text.input7": {
+        "raises": "AttributeError"
+       },
+       "click.formatting.wrap_text.input8": {
+        "raises": "AttributeError"
+       },
+       "click.formatting.wrap_text.input9": ""
+      }
+     ],
+     "pr": [
+      {
+       "click.formatting.wrap_text.input0": {
+        "raises": "AttributeError"
+       },
+       "click.formatting.wrap_text.input1": {
+        "raises": "AttributeError"
+       },
+       "click.formatting.wrap_text.input10": {
+        "raises": "AttributeError"
+       },
+       "click.formatting.wrap_text.input11": {
+        "raises": "AttributeError"
+       },
+       "click.formatting.wrap_text.input2": {
+        "raises": "AttributeError"
+       },
+       "click.formatting.wrap_text.input3": {
+        "raises": "AttributeError"
+       },
+       "click.formatting.wrap_text.input4": "abc",
+       "click.formatting.wrap_text.input5": {
+        "raises": "AttributeError"
+       },
+       "click.formatting.wrap_text.input6": {
+        "raises": "AttributeError"
+       },
+       "click.formatting.wrap_text.input7": {
+        "raises": "AttributeError"
+       },
+       "click.formatting.wrap_text.input8": {
+        "raises": "AttributeError"
+       },
+       "click.formatting.wrap_text.input9": ""
+      },
+      {
+       "click.formatting.wrap_text.input0": {
+        "raises": "AttributeError"
+       },
+       "click.formatting.wrap_text.input1": {
+        "raises": "AttributeError"
+       },
+       "click.formatting.wrap_text.input10": {
+        "raises": "AttributeError"
+       },
+       "click.formatting.wrap_text.input11": {
+        "raises": "AttributeError"
+       },
+       "click.formatting.wrap_text.input2": {
+        "raises": "AttributeError"
+       },
+       "click.formatting.wrap_text.input3": {
+        "raises": "AttributeError"
+       },
+       "click.formatting.wrap_text.input4": "abc",
+       "click.formatting.wrap_text.input5": {
+        "raises": "AttributeError"
+       },
+       "click.formatting.wrap_text.input6": {
+        "raises": "AttributeError"
+       },
+       "click.formatting.wrap_text.input7": {
+        "raises": "AttributeError"
+       },
+       "click.formatting.wrap_text.input8": {
+        "raises": "AttributeError"
+       },
+       "click.formatting.wrap_text.input9": ""
+      },
+      {
+       "click.formatting.wrap_text.input0": {
+        "raises": "AttributeError"
+       },
+       "click.formatting.wrap_text.input1": {
+        "raises": "AttributeError"
+       },
+       "click.formatting.wrap_text.input10": {
+        "raises": "AttributeError"
+       },
+       "click.formatting.wrap_text.input11": {
+        "raises": "AttributeError"
+       },
+       "click.formatting.wrap_text.input2": {
+        "raises": "AttributeError"
+       },
+       "click.formatting.wrap_text.input3": {
+        "raises": "AttributeError"
+       },
+       "click.formatting.wrap_text.input4": "abc",
+       "click.formatting.wrap_text.input5": {
+        "raises": "AttributeError"
+       },
+       "click.formatting.wrap_text.input6": {
+        "raises": "AttributeError"
+       },
+       "click.formatting.wrap_text.input7": {
+        "raises": "AttributeError"
+       },
+       "click.formatting.wrap_text.input8": {
+        "raises": "AttributeError"
+       },
+       "click.formatting.wrap_text.input9": ""
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "click.formatting.wrap_text.input0",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"click.formatting.wrap_text.input0\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"click.formatting.wrap_text.input0\""
+       }
+      }
+     },
+     {
+      "name": "click.formatting.wrap_text.input1",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"click.formatting.wrap_text.input1\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"click.formatting.wrap_text.input1\""
+       }
+      }
+     },
+     {
+      "name": "click.formatting.wrap_text.input10",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"click.formatting.wrap_text.input10\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"click.formatting.wrap_text.input10\""
+       }
+      }
+     },
+     {
+      "name": "click.formatting.wrap_text.input11",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"click.formatting.wrap_text.input11\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"click.formatting.wrap_text.input11\""
+       }
+      }
+     },
+     {
+      "name": "click.formatting.wrap_text.input2",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"click.formatting.wrap_text.input2\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"click.formatting.wrap_text.input2\""
+       }
+      }
+     },
+     {
+      "name": "click.formatting.wrap_text.input3",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"click.formatting.wrap_text.input3\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"click.formatting.wrap_text.input3\""
+       }
+      }
+     },
+     {
+      "name": "click.formatting.wrap_text.input4",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": "abc",
+      "pr": "abc",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 7,
+        "quote": "\"observation\": \"click.formatting.wrap_text.input4\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 7,
+        "quote": "\"observation\": \"click.formatting.wrap_text.input4\""
+       }
+      }
+     },
+     {
+      "name": "click.formatting.wrap_text.input5",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 8,
+        "quote": "\"observation\": \"click.formatting.wrap_text.input5\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 8,
+        "quote": "\"observation\": \"click.formatting.wrap_text.input5\""
+       }
+      }
+     },
+     {
+      "name": "click.formatting.wrap_text.input6",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 9,
+        "quote": "\"observation\": \"click.formatting.wrap_text.input6\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 9,
+        "quote": "\"observation\": \"click.formatting.wrap_text.input6\""
+       }
+      }
+     },
+     {
+      "name": "click.formatting.wrap_text.input7",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 10,
+        "quote": "\"observation\": \"click.formatting.wrap_text.input7\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 10,
+        "quote": "\"observation\": \"click.formatting.wrap_text.input7\""
+       }
+      }
+     },
+     {
+      "name": "click.formatting.wrap_text.input8",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 11,
+        "quote": "\"observation\": \"click.formatting.wrap_text.input8\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 11,
+        "quote": "\"observation\": \"click.formatting.wrap_text.input8\""
+       }
+      }
+     },
+     {
+      "name": "click.formatting.wrap_text.input9",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": "",
+      "pr": "",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 12,
+        "quote": "\"observation\": \"click.formatting.wrap_text.input9\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 12,
+        "quote": "\"observation\": \"click.formatting.wrap_text.input9\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "diff",
+     "label": "diff (auto-derived from base-side code, model-free)",
+     "model": null,
+     "provider": null,
+     "provenance": "auto-derived",
+     "blind": false
+    },
+    "freeze": {
+     "sha256": "9146d5be3f65d04d6116e214dc1725508d97090db2c585cdc4a02f647cf77487",
+     "generator": {
+      "kind": "diff",
+      "label": "diff (auto-derived from base-side code, model-free)",
+      "model": null,
+      "provider": null,
+      "provenance": "auto-derived",
+      "blind": false
+     },
+     "frozen_at": "2026-11-04T06:13:04.872760+00:00",
+     "inputs_sha256": "009acb33a564e4fb69e6238070d4bb8cf41c8aee04ec3fd4c6cf8165c9bca54b",
+     "inputs": {
+      "title_chars": 0,
+      "body_chars": 0,
+      "base_files": {
+       "src/click/formatting.py": "f125b628692f8dfcfd43535b7a88cc1ee64137471f9d0243b389aa0cfea85e6b"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-04T06:13:05.102987+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 55,
+     "changed_lines_covered": 8,
+     "files": [
+      {
+       "file": "src/click/_textwrap.py",
+       "changed_lines_total": 53,
+       "changed_lines_covered": 6
+      },
+      {
+       "file": "src/click/formatting.py",
+       "changed_lines_total": 2,
+       "changed_lines_covered": 2
+      }
+     ],
+     "adequacy": "adequate",
+     "note": "ran 8 of 55 changed line(s) on the main side",
+     "exit": 0,
+     "data": "probe-cov-diff-api.json"
+    },
+    "status": "ran"
+   }
+  ],
+  "summary": {
+   "labels": [
+    "proven",
+    "proven",
+    "proven",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "no_difference",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "no_difference"
+   ],
+   "flagged": [],
+   "proven_claims": [
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "reason": "probe: claim(s) C1, C2, C3 proven; probe: 2 other observation(s) identical on both sides; probe: 10 probe(s) could not run on either side",
+   "ignored_noise": [],
+   "ignored_warning_only": [],
+   "pr_only_noisy": [],
+   "advisory_unchanged_subchecks": [],
+   "advisory_agreeing_differs": []
+  }
+ },
+ "probe_changed_line_coverage": {
+  "status": "measured",
+  "side": "main",
+  "probes": {
+   "model-p1": {
+    "status": "measured",
+    "changed_lines_covered": 8,
+    "changed_lines_total": 55,
+    "adequacy": "adequate"
+   },
+   "model-p2": {
+    "status": "measured",
+    "changed_lines_covered": 8,
+    "changed_lines_total": 55,
+    "adequacy": "adequate"
+   },
+   "model-p3": {
+    "status": "measured",
+    "changed_lines_covered": 30,
+    "changed_lines_total": 55,
+    "adequacy": "adequate"
+   },
+   "diff-api": {
+    "status": "measured",
+    "changed_lines_covered": 8,
+    "changed_lines_total": 55,
+    "adequacy": "adequate"
+   }
+  },
+  "not_adequate": []
+ },
+ "verdict": "needs_attention",
+ "reason": "7 test(s) removed on the PR side; 9 test(s) fail on main and pass on the PR; 1 test(s) re-parametrized (1 -> 1 ids); 279 test(s) ran on main, 272 on the PR; 1 new test(s) pass, 262 unchanged; probe: claim(s) C1, C2, C3 proven",
+ "verdict_before_coverage_gate": "needs_attention",
+ "reason_before_coverage_gate": "7 test(s) removed on the PR side; 9 test(s) fail on main and pass on the PR; 1 test(s) re-parametrized (1 -> 1 ids); 279 test(s) ran on main, 272 on the PR; 1 new test(s) pass, 262 unchanged; probe: claim(s) C1, C2, C3 proven",
+ "changed_lines_total": 2,
+ "changed_lines_covered": 2,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "normal",
+  "note": "2 of 2 changed executable line(s) ran (100%)",
+  "measurement": "measured"
+ },
+ "agents": {
+  "status": "skipped",
+  "note": "advisory swarm is off",
+  "roles": []
+ },
+ "explanation": {
+  "status": "not yet wired",
+  "why": "advisory swarm is off"
+ },
+ "swarm_requested": false,
+ "operator_approval_requested": false,
+ "swarm": "off",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [
+   "src/click/_textwrap.py",
+   "src/click/formatting.py"
+  ],
+  "compiled_files": [],
+  "other_files": [
+   "CHANGES.md",
+   "docs/documentation.md",
+   "tests/test_compat.py",
+   "tests/test_formatting.py"
+  ]
+ },
+ "duration_s": {
+  "total_wall": 196.5,
+  "tests": 11.9
+ },
+ "cost": {
+  "ai_calls": 3,
+  "failed_ai_calls": 0,
+  "input_tokens": 9233,
+  "output_tokens": 17902,
+  "thinking_tokens": 16690,
+  "cost_usd": 0.018882,
+  "calls_without_usage": 0,
+  "ai_cost_usd": 0.018882,
+  "cost_complete": true,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 196.5,
+   "tests": 11.9
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.0131,
+  "total_cost_usd": 0.031982,
+  "swarm": {
+   "ai_calls": 0,
+   "failed_ai_calls": 0,
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "thinking_tokens": 0,
+   "cost_usd": 0.0,
+   "calls_without_usage": 0,
+   "ai_cost_usd": 0.0,
+   "cost_complete": true,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ },
+ "pdf_push": {
+  "ok": true,
+  "attempts": 1,
+  "error": null,
+  "url": "https://github.com/aritracodesbad123/Proof-of-change/tree/runs/runs/2026-11-04/985a7ea/click-3902"
+ }
+}

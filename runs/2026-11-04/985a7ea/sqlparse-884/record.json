@@ -1,0 +1,1440 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-andialbrecht-sqlparse-884-51d5063be131-2026-11-04",
+ "date_ist": "2026-11-05 11:29 IST",
+ "run_date": "2026-11-04",
+ "who": "ops/daily_run.py",
+ "repo": "andialbrecht/sqlparse",
+ "library": "sqlparse",
+ "pr": {
+  "repo": "andialbrecht/sqlparse",
+  "number": 884,
+  "url": "https://github.com/andialbrecht/sqlparse/pull/884",
+  "title": "identifier_case: keep the case of backtick-, acute- and bracket-quoted identifiers",
+  "base_sha": "20caed831605ec341ed670302f6b0f17685f156d",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "51d5063be13171c9a320fd97844df5b3f27a79ac",
+  "merge_commit": "62b5bcea621a7e05ce55373b297fbaadb0d8c7bb",
+  "tested_main_sha": "20caed831605ec341ed670302f6b0f17685f156d",
+  "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+ },
+ "author": "dylanpulver",
+ "base_ref": "master",
+ "updated_at_utc": "2026-11-01T12:30:51Z",
+ "updated_at_ist": "2026-11-01 18:00 IST",
+ "ci_state": "none",
+ "ci_detail": "no check runs visible",
+ "tested_at_ist": "2026-11-05 11:29 IST",
+ "files": {
+  "all": [
+   "CHANGELOG",
+   "sqlparse/filters/tokens.py",
+   "tests/test_format.py"
+  ],
+  "package_py": [
+   "sqlparse/filters/tokens.py"
+  ],
+  "compiled": [],
+  "other": [
+   "CHANGELOG",
+   "tests/test_format.py"
+  ]
+ },
+ "machine_type": {
+  "arch": "x86_64",
+  "os": "Linux",
+  "platform": "Linux-6.12.94+-x86_64-with-glibc2.41",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": null,
+  "cpu_model": "Intel(R) Xeon(R) Processor",
+  "ram_gb": 15.6
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 3,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.15",
+ "test_selection": "mapped from touched files: tests/test_format.py, tests/test_dos_prevention.py, tests/test_grouping.py",
+ "per_run": [
+  {
+   "side": "old",
+   "run": 1,
+   "passed": 172,
+   "failed": 0,
+   "error": 0,
+   "skipped": 2,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.8,
+   "pytest_summary": "172 passed, 2 xfailed in 1.28s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 1,
+   "passed": 181,
+   "failed": 0,
+   "error": 0,
+   "skipped": 2,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.8,
+   "pytest_summary": "181 passed, 2 xfailed in 1.36s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 2,
+   "passed": 172,
+   "failed": 0,
+   "error": 0,
+   "skipped": 2,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.9,
+   "pytest_summary": "172 passed, 2 xfailed in 1.38s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 2,
+   "passed": 181,
+   "failed": 0,
+   "error": 0,
+   "skipped": 2,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.7,
+   "pytest_summary": "181 passed, 2 xfailed in 1.21s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 3,
+   "passed": 172,
+   "failed": 0,
+   "error": 0,
+   "skipped": 2,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.8,
+   "pytest_summary": "172 passed, 2 xfailed in 1.28s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 3,
+   "passed": 181,
+   "failed": 0,
+   "error": 0,
+   "skipped": 2,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.8,
+   "pytest_summary": "181 passed, 2 xfailed in 1.22s",
+   "junit": true
+  }
+ ],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "local",
+ "sandbox_backend_note": "local bubblewrap",
+ "machine": "local",
+ "tool_setup": {
+  "installed": [],
+  "tries": 0,
+  "note": "All required tools were already installed.",
+  "refused": []
+ },
+ "posted_upstream": false,
+ "logs": "sqlparse-884/",
+ "freeze": {
+  "main": "freeze-main.txt",
+  "pr": "freeze-pr.txt"
+ },
+ "coverage": {
+  "status": "measured",
+  "changed_lines_total": 2,
+  "changed_lines_covered": 2,
+  "files": [
+   {
+    "file": "sqlparse/filters/tokens.py",
+    "changed_lines_total": 2,
+    "changed_lines_covered": 2
+   }
+  ],
+  "seconds": 2.9,
+  "exit": 0,
+  "log": "coverage-pytest.log"
+ },
+ "poc_commit": "985a7eade681b1d88256d5a185e129da53855144",
+ "route": "source-pair",
+ "current_head_sha": "51d5063be13171c9a320fd97844df5b3f27a79ac",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": "[redacted]",
+  "notes": [
+   "Setup check: GitHub token: present.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory 6.9 GB (of 15.6 GB).",
+   "Setup check: free disk 94.8 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: [redacted] results",
+   "Query: sqlparse python setup install instructions https://github.com/andialbrecht/sqlparse site:github.com/andialbrecht/sqlparse",
+   "Query: sqlparse python documentation install https://github.com/andialbrecht/sqlparse site:github.com/andialbrecht/sqlparse",
+   "Query: sqlparse python install requirements https://pypi.org/project/sqlparse/ https://github.com/andialbrecht/sqlparse site:pypi.org",
+   "Source: sqlparse \u00b7 PyPI \u2014 https://pypi.org/project/sqlparse/",
+   "Source: GitHub - andialbrecht/sqlparse: A non-validating SQL parser module for Python \u00b7 GitHub \u2014 https://github.com/andialbrecht/sqlparse",
+   "Source: sqlparse/.github/workflows/python-app.yml at master \u00b7 andialbrecht/sqlparse \u00b7 GitHub \u2014 https://github.com/andialbrecht/sqlparse/blob/master/.github/workflows/python-app.yml",
+   "Source: Issues \u00b7 andialbrecht/sqlparse \u00b7 GitHub \u2014 https://github.com/andialbrecht/sqlparse/issues",
+   "Source: sqlparse/CHANGELOG at master \u00b7 andialbrecht/sqlparse \u00b7 GitHub \u2014 https://github.com/andialbrecht/sqlparse/blob/master/CHANGELOG",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: install build (listed in the dev extra) on main and pr.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >=3.10",
+   "Installed build 1.6.1 from pyproject (listed in the dev extra) on main and pr."
+  ],
+  "install_docs": [
+   "CONTRIBUTING.md",
+   "Makefile",
+   "README.md",
+   "pyproject.toml",
+   "docs/Makefile",
+   ".github/workflows/python-app.yml",
+   ".github/workflows/codeql-analysis.yml",
+   "benchmarks/README.md"
+  ],
+  "install_docs_from": "main",
+  "setup_plan": {
+   "packages": [
+    {
+     "requirement": "build",
+     "name": "build",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the dev extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    }
+   ],
+   "scope_blocked": "",
+   "component": null,
+   "aggregate_names": [],
+   "extra_reqs": [
+    "build"
+   ],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >=3.10"
+   },
+   "system": [],
+   "refused": [],
+   "groups_blocked": ""
+  },
+  "steps": {
+   "setup_lookup": "Found 1 setup item(s) in the project's files and the web lookup.",
+   "setup_python": "Python 3.12: Python 3.12 already meets >=3.10",
+   "install_deps": "Wrote requirements.txt and installed it on main and pr: build."
+  },
+  "run_files": {
+   "requirements": "requirements.txt",
+   "plan": "setup-plan.json",
+   "count": 1
+  },
+  "installs": [
+   {
+    "package": "build",
+    "requirement": "build",
+    "version": "1.6.1",
+    "versions": {
+     "main": "1.6.1",
+     "pr": "1.6.1"
+    },
+    "source": "pyproject",
+    "reason": "listed in the dev extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   }
+  ]
+ },
+ "sides": {
+  "comparison_basis": "base tip vs GitHub test merge (refs/pull/N/merge)",
+  "main_sha": "20caed831605ec341ed670302f6b0f17685f156d",
+  "pr_sha": "62b5bcea621a7e05ce55373b297fbaadb0d8c7bb",
+  "merge_commit": "62b5bcea621a7e05ce55373b297fbaadb0d8c7bb",
+  "merge_parents": [
+   "20caed831605ec341ed670302f6b0f17685f156d",
+   "51d5063be13171c9a320fd97844df5b3f27a79ac"
+  ],
+  "merge_head_matches_pinned_head": true
+ },
+ "tested": {
+  "main": "master @ 20caed831605 (base tip = first parent of the merge commit)",
+  "pr": "GitHub test merge commit 62b5bcea621a (refs/pull/884/merge) of head 51d5063be131"
+ },
+ "probe_plan": {
+  "baseline": "full",
+  "model": "model provider: nebius (Token Factory, live)",
+  "errors": [],
+  "model_claims": [
+   {
+    "id": "C2",
+    "text": "The test_identifiercase_quotes test is extended to verify that backtick, acute, and bracket\u2011quoted identifiers retain their original case when identifier_case filtering is applied.",
+    "source_quote": "`test_identifiercase_quotes` already pins the intended behaviour for `\"...\"`; this extends it to the other three.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C3",
+    "text": "After the changes, the test suite passes 515 tests (up from 506 on the unmodified master), the increase corresponding to nine new parametrized test cases.",
+    "source_quote": "**Ran:** `make test` \u2192 **515 passed** on 3.10/3.11/3.12/3.13/3.14 (unmodified master in the same session: **506 passed**; the 9 extra are the new parametrized cases).",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C4",
+    "text": "The new tests discriminate between a complete fix and partial fixes, as reverting only filters/tokens.py fails all nine new cases while exempting only the backtick fails six of them.",
+    "source_quote": "**Two mutants, same command and env:** reverting only `filters/tokens.py` fails 9/9 of the new cases; a naive fix that exempts just the backtick still fails 6/9. So the test does discriminate between remedies rather than merely passing.",
+    "testable": true,
+    "expect": "same"
+   },
+   {
+    "id": "C5",
+    "text": "An alternative approach of making the lexer emit T.String.Symbol for all four identifier quoting styles would change a public token type and thus be a breaking change.",
+    "source_quote": "**Alternative I did not take:** make the lexer emit `T.String.Symbol` for all four styles, which is where the asymmetry originates. That changes a public token type, so it is breaking and belongs on its own.",
+    "testable": false,
+    "expect": "same"
+   },
+   {
+    "id": "C6",
+    "text": "In dialects where delimited identifiers are case\u2011insensitive, the modification has no effect (is a no\u2011op) rather than fixing an issue.",
+    "source_quote": "**Not covered:** dialects where a delimited identifier is case\u2011insensitive anyway \u2014 there this is a no-op rather than a fix.",
+    "testable": false,
+    "expect": "same",
+    "quote_match": "loose"
+   }
+  ],
+  "model_rejected_claims": [
+   {
+    "id": "C1",
+    "text": "Using sqlparse.format with identifier_case='upper' converts the content inside backtick\u2011quoted identifiers to uppercase (e.g., `MyTbl` becomes `MYTBL`).",
+    "source_quote": "```pycon\n>>> sqlparse.format('select * from `MyTbl`', identifier_case='upper')\n'select * from `MYTBL`'```",
+    "testable": true,
+    "expect": "same",
+    "rejected": "source_quote not found in the PR text"
+   }
+  ],
+  "model_loose_quote_matches": [
+   {
+    "claim": "C6",
+    "source_quote": "**Not covered:** dialects where a delimited identifier is case\u2011insensitive anyway \u2014 there this is a no-op rather than a fix."
+   }
+  ],
+  "diff_targets": [],
+  "frozen": [
+   {
+    "path": "model-probes/model-p-c2.py",
+    "source": "model",
+    "sha256": "cce8edfc11e570f2c5cc6e9db2cece065f7d3eb875c2d7a17897dc36baeceee2",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-05T06:00:52.467464+00:00",
+    "inputs_sha256": "1bbaf7cfa241c5babfdc5bef80f41b72365824a5fbd3ee1c5bdadb913a3059a9",
+    "inputs": {
+     "title_chars": 82,
+     "body_chars": 2313,
+     "base_files": {
+      "sqlparse/filters/tokens.py": "099c03c0ccf339dab4aaf4d120889cef0e7d839e108701603363a9f7ddf666f9"
+     }
+    }
+   },
+   {
+    "path": "model-probes/model-p-c3.py",
+    "source": "model",
+    "sha256": "fd91c97e702bf83a114208bbd369a14bfa5562083de21a238a3fc6da75286690",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-05T06:00:52.467611+00:00",
+    "inputs_sha256": "1bbaf7cfa241c5babfdc5bef80f41b72365824a5fbd3ee1c5bdadb913a3059a9",
+    "inputs": {
+     "title_chars": 82,
+     "body_chars": 2313,
+     "base_files": {
+      "sqlparse/filters/tokens.py": "099c03c0ccf339dab4aaf4d120889cef0e7d839e108701603363a9f7ddf666f9"
+     }
+    }
+   },
+   {
+    "path": "model-probes/model-p-c4.py",
+    "source": "model",
+    "sha256": "4e005117a5f2c2a5f9b86d634ec47454eeaefc7250f98ae2b83a86e7aef6a389",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-05T06:00:52.467696+00:00",
+    "inputs_sha256": "1bbaf7cfa241c5babfdc5bef80f41b72365824a5fbd3ee1c5bdadb913a3059a9",
+    "inputs": {
+     "title_chars": 82,
+     "body_chars": 2313,
+     "base_files": {
+      "sqlparse/filters/tokens.py": "099c03c0ccf339dab4aaf4d120889cef0e7d839e108701603363a9f7ddf666f9"
+     }
+    }
+   }
+  ]
+ },
+ "test_extras": [
+  "build"
+ ],
+ "pr_side_started_at": "2026-11-05T06:00:52.599491+00:00",
+ "test_targets": {
+  "main": [
+   "tests/test_format.py",
+   "tests/test_dos_prevention.py",
+   "tests/test_grouping.py"
+  ],
+  "pr": [
+   "tests/test_format.py",
+   "tests/test_dos_prevention.py",
+   "tests/test_grouping.py"
+  ]
+ },
+ "installed_commit": {
+  "main": {
+   "dist": "sqlparse",
+   "expected": "20caed831605ec341ed670302f6b0f17685f156d",
+   "installed": "20caed831605ec341ed670302f6b0f17685f156d",
+   "ok": true
+  },
+  "pr": {
+   "dist": "sqlparse",
+   "expected": "62b5bcea621a7e05ce55373b297fbaadb0d8c7bb",
+   "installed": "62b5bcea621a7e05ce55373b297fbaadb0d8c7bb",
+   "ok": true
+  }
+ },
+ "comparison": {
+  "same": 174,
+  "same_skipped_both": 2,
+  "regressions": [],
+  "fixed": [
+   "tests.test_format.TestFormat::test_identifiercase_non_ansi_quotes[capitalize-select * from [myS].[Tbl]]",
+   "tests.test_format.TestFormat::test_identifiercase_non_ansi_quotes[capitalize-select * from \\xb4myS\\xb4.\\xb4Tbl\\xb4]",
+   "tests.test_format.TestFormat::test_identifiercase_non_ansi_quotes[capitalize-select * from `myS`.`Tbl`]",
+   "tests.test_format.TestFormat::test_identifiercase_non_ansi_quotes[lower-select * from [myS].[Tbl]]",
+   "tests.test_format.TestFormat::test_identifiercase_non_ansi_quotes[lower-select * from \\xb4myS\\xb4.\\xb4Tbl\\xb4]",
+   "tests.test_format.TestFormat::test_identifiercase_non_ansi_quotes[lower-select * from `myS`.`Tbl`]",
+   "tests.test_format.TestFormat::test_identifiercase_non_ansi_quotes[upper-select * from [myS].[Tbl]]",
+   "tests.test_format.TestFormat::test_identifiercase_non_ansi_quotes[upper-select * from \\xb4myS\\xb4.\\xb4Tbl\\xb4]",
+   "tests.test_format.TestFormat::test_identifiercase_non_ansi_quotes[upper-select * from `myS`.`Tbl`]"
+  ],
+  "new_tests_passing": 0,
+  "new_tests_passing_ids": [],
+  "new_tests_failing": [],
+  "new_tests_skipped": [],
+  "removed_tests": [],
+  "reparametrized": [],
+  "skipped_missing_dependency": [],
+  "flaky": [],
+  "pr_unstable": [],
+  "pr_unstable_noisy": [],
+  "environment": [],
+  "other_changes": [],
+  "preexisting_failures": [],
+  "load_failed_both": [],
+  "load_failed_pr": [],
+  "load_failed_main": [],
+  "executed": {
+   "main": 181,
+   "pr": 181
+  },
+  "messages": {},
+  "base_messages": {
+   "tests.test_format.TestFormat::test_identifiercase_non_ansi_quotes[capitalize-select * from [myS].[Tbl]]": "AssertionError: assert 'select * from [mys].[tbl]' == 'select * from [myS].[Tbl]'",
+   "tests.test_format.TestFormat::test_identifiercase_non_ansi_quotes[capitalize-select * from \\xb4myS\\xb4.\\xb4Tbl\\xb4]": "AssertionError: assert 'select * from \u00b4mys\u00b4.\u00b4tbl\u00b4' == 'select * from \u00b4myS\u00b4.\u00b4Tbl\u00b4'",
+   "tests.test_format.TestFormat::test_identifiercase_non_ansi_quotes[capitalize-select * from `myS`.`Tbl`]": "AssertionError: assert 'select * from `mys`.`tbl`' == 'select * from `myS`.`Tbl`'",
+   "tests.test_format.TestFormat::test_identifiercase_non_ansi_quotes[lower-select * from [myS].[Tbl]]": "AssertionError: assert 'select * from [mys].[tbl]' == 'select * from [myS].[Tbl]'",
+   "tests.test_format.TestFormat::test_identifiercase_non_ansi_quotes[lower-select * from \\xb4myS\\xb4.\\xb4Tbl\\xb4]": "AssertionError: assert 'select * from \u00b4mys\u00b4.\u00b4tbl\u00b4' == 'select * from \u00b4myS\u00b4.\u00b4Tbl\u00b4'",
+   "tests.test_format.TestFormat::test_identifiercase_non_ansi_quotes[lower-select * from `myS`.`Tbl`]": "AssertionError: assert 'select * from `mys`.`tbl`' == 'select * from `myS`.`Tbl`'",
+   "tests.test_format.TestFormat::test_identifiercase_non_ansi_quotes[upper-select * from [myS].[Tbl]]": "AssertionError: assert 'select * from [MYS].[TBL]' == 'select * from [myS].[Tbl]'",
+   "tests.test_format.TestFormat::test_identifiercase_non_ansi_quotes[upper-select * from \\xb4myS\\xb4.\\xb4Tbl\\xb4]": "AssertionError: assert 'select * from \u00b4MYS\u00b4.\u00b4TBL\u00b4' == 'select * from \u00b4myS\u00b4.\u00b4Tbl\u00b4'",
+   "tests.test_format.TestFormat::test_identifiercase_non_ansi_quotes[upper-select * from `myS`.`Tbl`]": "AssertionError: assert 'select * from `MYS`.`TBL`' == 'select * from `myS`.`Tbl`'"
+  }
+ },
+ "exit_check": {
+  "explained": true,
+  "problems": [],
+  "detail": "all runs exited 0"
+ },
+ "probes": {
+  "status": "ran",
+  "items": [
+   {
+    "id": "model-p-c2",
+    "source": "model",
+    "path": "model-probes/model-p-c2.py",
+    "sha256": "cce8edfc11e570f2c5cc6e9db2cece065f7d3eb875c2d7a17897dc36baeceee2",
+    "target": "andialbrecht/sqlparse#884",
+    "about": "Test IdentifierCaseFilter for backtick, acute, bracket, and double-quoted identifiers.",
+    "claims": [
+     {
+      "id": "C2",
+      "source": "PR description",
+      "text": "The test_identifiercase_quotes test is extended to verify that backtick, acute, and bracket\u2011quoted identifiers retain their original case when identifier_case filtering is applied.",
+      "covers": [
+       "c2.backtick_no_ws.upper",
+       "c2.backtick_ws.upper",
+       "c2.acute_no_ws.upper",
+       "c2.acute_ws.upper",
+       "c2.bracket_no_ws.upper",
+       "c2.bracket_ws.upper",
+       "c2.dq_no_ws.upper",
+       "c2.dq_ws.upper",
+       "c2.plain.upper",
+       "c2.backtick_no_ws.lower"
+      ],
+      "expect": "differs"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-p-c2-main-1.jsonl",
+      "probe-model-p-c2-main-2.jsonl",
+      "probe-model-p-c2-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-p-c2-pr-1.jsonl",
+      "probe-model-p-c2-pr-2.jsonl",
+      "probe-model-p-c2-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "c2.backtick_no_ws.upper": "`MYTABLE`",
+       "c2.backtick_ws.upper": "  `MYTABLE`  ",
+       "c2.acute_no_ws.upper": "\\U00B4MYTABLE\\U00B4",
+       "c2.acute_ws.upper": "  \\U00B4MYTABLE\\U00B4  ",
+       "c2.bracket_no_ws.upper": "[MYTABLE]",
+       "c2.bracket_ws.upper": "  [MYTABLE]  ",
+       "c2.dq_no_ws.upper": "\"myTable\"",
+       "c2.dq_ws.upper": "  \"myTable\"  ",
+       "c2.plain.upper": "MYTABLE",
+       "c2.backtick_no_ws.lower": "`mytable`"
+      },
+      {
+       "c2.backtick_no_ws.upper": "`MYTABLE`",
+       "c2.backtick_ws.upper": "  `MYTABLE`  ",
+       "c2.acute_no_ws.upper": "\\U00B4MYTABLE\\U00B4",
+       "c2.acute_ws.upper": "  \\U00B4MYTABLE\\U00B4  ",
+       "c2.bracket_no_ws.upper": "[MYTABLE]",
+       "c2.bracket_ws.upper": "  [MYTABLE]  ",
+       "c2.dq_no_ws.upper": "\"myTable\"",
+       "c2.dq_ws.upper": "  \"myTable\"  ",
+       "c2.plain.upper": "MYTABLE",
+       "c2.backtick_no_ws.lower": "`mytable`"
+      },
+      {
+       "c2.backtick_no_ws.upper": "`MYTABLE`",
+       "c2.backtick_ws.upper": "  `MYTABLE`  ",
+       "c2.acute_no_ws.upper": "\\U00B4MYTABLE\\U00B4",
+       "c2.acute_ws.upper": "  \\U00B4MYTABLE\\U00B4  ",
+       "c2.bracket_no_ws.upper": "[MYTABLE]",
+       "c2.bracket_ws.upper": "  [MYTABLE]  ",
+       "c2.dq_no_ws.upper": "\"myTable\"",
+       "c2.dq_ws.upper": "  \"myTable\"  ",
+       "c2.plain.upper": "MYTABLE",
+       "c2.backtick_no_ws.lower": "`mytable`"
+      }
+     ],
+     "pr": [
+      {
+       "c2.backtick_no_ws.upper": "`myTable`",
+       "c2.backtick_ws.upper": "  `myTable`  ",
+       "c2.acute_no_ws.upper": "\\U00B4MYTABLE\\U00B4",
+       "c2.acute_ws.upper": "  \\U00B4MYTABLE\\U00B4  ",
+       "c2.bracket_no_ws.upper": "[myTable]",
+       "c2.bracket_ws.upper": "  [myTable]  ",
+       "c2.dq_no_ws.upper": "\"myTable\"",
+       "c2.dq_ws.upper": "  \"myTable\"  ",
+       "c2.plain.upper": "MYTABLE",
+       "c2.backtick_no_ws.lower": "`MyTable`"
+      },
+      {
+       "c2.backtick_no_ws.upper": "`myTable`",
+       "c2.backtick_ws.upper": "  `myTable`  ",
+       "c2.acute_no_ws.upper": "\\U00B4MYTABLE\\U00B4",
+       "c2.acute_ws.upper": "  \\U00B4MYTABLE\\U00B4  ",
+       "c2.bracket_no_ws.upper": "[myTable]",
+       "c2.bracket_ws.upper": "  [myTable]  ",
+       "c2.dq_no_ws.upper": "\"myTable\"",
+       "c2.dq_ws.upper": "  \"myTable\"  ",
+       "c2.plain.upper": "MYTABLE",
+       "c2.backtick_no_ws.lower": "`MyTable`"
+      },
+      {
+       "c2.backtick_no_ws.upper": "`myTable`",
+       "c2.backtick_ws.upper": "  `myTable`  ",
+       "c2.acute_no_ws.upper": "\\U00B4MYTABLE\\U00B4",
+       "c2.acute_ws.upper": "  \\U00B4MYTABLE\\U00B4  ",
+       "c2.bracket_no_ws.upper": "[myTable]",
+       "c2.bracket_ws.upper": "  [myTable]  ",
+       "c2.dq_no_ws.upper": "\"myTable\"",
+       "c2.dq_ws.upper": "  \"myTable\"  ",
+       "c2.plain.upper": "MYTABLE",
+       "c2.backtick_no_ws.lower": "`MyTable`"
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "c2.acute_no_ws.upper",
+      "state": "same",
+      "label": "needs_human",
+      "claim": "C2",
+      "main": "\\U00B4MYTABLE\\U00B4",
+      "pr": "\\U00B4MYTABLE\\U00B4",
+      "citations": {
+       "main": {
+        "file": "probe-model-p-c2-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c2.acute_no_ws.upper\""
+       },
+       "pr": {
+        "file": "probe-model-p-c2-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c2.acute_no_ws.upper\""
+       }
+      }
+     },
+     {
+      "name": "c2.acute_ws.upper",
+      "state": "same",
+      "label": "needs_human",
+      "claim": "C2",
+      "main": "  \\U00B4MYTABLE\\U00B4  ",
+      "pr": "  \\U00B4MYTABLE\\U00B4  ",
+      "citations": {
+       "main": {
+        "file": "probe-model-p-c2-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c2.acute_ws.upper\""
+       },
+       "pr": {
+        "file": "probe-model-p-c2-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c2.acute_ws.upper\""
+       }
+      }
+     },
+     {
+      "name": "c2.backtick_no_ws.lower",
+      "state": "differs",
+      "label": "proven",
+      "claim": "C2",
+      "main": "`mytable`",
+      "pr": "`MyTable`",
+      "diffs": [
+       {
+        "field": "",
+        "main": "`mytable`",
+        "pr": "`MyTable`"
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-p-c2-main-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"c2.backtick_no_ws.lower\""
+       },
+       "pr": {
+        "file": "probe-model-p-c2-pr-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"c2.backtick_no_ws.lower\""
+       }
+      }
+     },
+     {
+      "name": "c2.backtick_no_ws.upper",
+      "state": "differs",
+      "label": "proven",
+      "claim": "C2",
+      "main": "`MYTABLE`",
+      "pr": "`myTable`",
+      "diffs": [
+       {
+        "field": "",
+        "main": "`MYTABLE`",
+        "pr": "`myTable`"
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-p-c2-main-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"c2.backtick_no_ws.upper\""
+       },
+       "pr": {
+        "file": "probe-model-p-c2-pr-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"c2.backtick_no_ws.upper\""
+       }
+      }
+     },
+     {
+      "name": "c2.backtick_ws.upper",
+      "state": "differs",
+      "label": "proven",
+      "claim": "C2",
+      "main": "  `MYTABLE`  ",
+      "pr": "  `myTable`  ",
+      "diffs": [
+       {
+        "field": "",
+        "main": "  `MYTABLE`  ",
+        "pr": "  `myTable`  "
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-p-c2-main-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"c2.backtick_ws.upper\""
+       },
+       "pr": {
+        "file": "probe-model-p-c2-pr-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"c2.backtick_ws.upper\""
+       }
+      }
+     },
+     {
+      "name": "c2.bracket_no_ws.upper",
+      "state": "differs",
+      "label": "proven",
+      "claim": "C2",
+      "main": "[MYTABLE]",
+      "pr": "[myTable]",
+      "diffs": [
+       {
+        "field": "",
+        "main": "[MYTABLE]",
+        "pr": "[myTable]"
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-p-c2-main-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"c2.bracket_no_ws.upper\""
+       },
+       "pr": {
+        "file": "probe-model-p-c2-pr-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"c2.bracket_no_ws.upper\""
+       }
+      }
+     },
+     {
+      "name": "c2.bracket_ws.upper",
+      "state": "differs",
+      "label": "proven",
+      "claim": "C2",
+      "main": "  [MYTABLE]  ",
+      "pr": "  [myTable]  ",
+      "diffs": [
+       {
+        "field": "",
+        "main": "  [MYTABLE]  ",
+        "pr": "  [myTable]  "
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-p-c2-main-1.jsonl",
+        "line": 7,
+        "quote": "\"observation\": \"c2.bracket_ws.upper\""
+       },
+       "pr": {
+        "file": "probe-model-p-c2-pr-1.jsonl",
+        "line": 7,
+        "quote": "\"observation\": \"c2.bracket_ws.upper\""
+       }
+      }
+     },
+     {
+      "name": "c2.dq_no_ws.upper",
+      "state": "same",
+      "label": "needs_human",
+      "claim": "C2",
+      "main": "\"myTable\"",
+      "pr": "\"myTable\"",
+      "citations": {
+       "main": {
+        "file": "probe-model-p-c2-main-1.jsonl",
+        "line": 8,
+        "quote": "\"observation\": \"c2.dq_no_ws.upper\""
+       },
+       "pr": {
+        "file": "probe-model-p-c2-pr-1.jsonl",
+        "line": 8,
+        "quote": "\"observation\": \"c2.dq_no_ws.upper\""
+       }
+      }
+     },
+     {
+      "name": "c2.dq_ws.upper",
+      "state": "same",
+      "label": "needs_human",
+      "claim": "C2",
+      "main": "  \"myTable\"  ",
+      "pr": "  \"myTable\"  ",
+      "citations": {
+       "main": {
+        "file": "probe-model-p-c2-main-1.jsonl",
+        "line": 9,
+        "quote": "\"observation\": \"c2.dq_ws.upper\""
+       },
+       "pr": {
+        "file": "probe-model-p-c2-pr-1.jsonl",
+        "line": 9,
+        "quote": "\"observation\": \"c2.dq_ws.upper\""
+       }
+      }
+     },
+     {
+      "name": "c2.plain.upper",
+      "state": "same",
+      "label": "needs_human",
+      "claim": "C2",
+      "main": "MYTABLE",
+      "pr": "MYTABLE",
+      "citations": {
+       "main": {
+        "file": "probe-model-p-c2-main-1.jsonl",
+        "line": 10,
+        "quote": "\"observation\": \"c2.plain.upper\""
+       },
+       "pr": {
+        "file": "probe-model-p-c2-pr-1.jsonl",
+        "line": 10,
+        "quote": "\"observation\": \"c2.plain.upper\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "cce8edfc11e570f2c5cc6e9db2cece065f7d3eb875c2d7a17897dc36baeceee2",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-05T06:00:52.467464+00:00",
+     "inputs_sha256": "1bbaf7cfa241c5babfdc5bef80f41b72365824a5fbd3ee1c5bdadb913a3059a9",
+     "inputs": {
+      "title_chars": 82,
+      "body_chars": 2313,
+      "base_files": {
+       "sqlparse/filters/tokens.py": "099c03c0ccf339dab4aaf4d120889cef0e7d839e108701603363a9f7ddf666f9"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-05T06:00:52.599491+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 3,
+     "changed_lines_covered": 3,
+     "files": [
+      {
+       "file": "sqlparse/filters/tokens.py",
+       "changed_lines_total": 3,
+       "changed_lines_covered": 3
+      }
+     ],
+     "adequacy": "adequate",
+     "note": "ran 3 of 3 changed line(s) on the main side",
+     "exit": 0,
+     "data": "probe-cov-model-p-c2.json"
+    },
+    "status": "ran"
+   },
+   {
+    "id": "model-p-c3",
+    "source": "model",
+    "path": "model-probes/model-p-c3.py",
+    "sha256": "fd91c97e702bf83a114208bbd369a14bfa5562083de21a238a3fc6da75286690",
+    "target": "andialbrecht/sqlparse#884",
+    "about": "Placeholder for C3: test suite pass count (untested in probe).",
+    "claims": [
+     {
+      "id": "C3",
+      "source": "PR description",
+      "text": "After the changes, the test suite passes 515 tests (up from 506 on the unmodified master), the increase corresponding to nine new parametrized test cases.",
+      "covers": [
+       "c3.test_suite_pass_count"
+      ],
+      "expect": "same"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.0,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-p-c3-main-1.jsonl",
+      "probe-model-p-c3-main-2.jsonl",
+      "probe-model-p-c3-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-p-c3-pr-1.jsonl",
+      "probe-model-p-c3-pr-2.jsonl",
+      "probe-model-p-c3-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "c3.test_suite_pass_count": "untested"
+      },
+      {
+       "c3.test_suite_pass_count": "untested"
+      },
+      {
+       "c3.test_suite_pass_count": "untested"
+      }
+     ],
+     "pr": [
+      {
+       "c3.test_suite_pass_count": "untested"
+      },
+      {
+       "c3.test_suite_pass_count": "untested"
+      },
+      {
+       "c3.test_suite_pass_count": "untested"
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "c3.test_suite_pass_count",
+      "state": "same",
+      "label": "proven",
+      "claim": "C3",
+      "main": "untested",
+      "pr": "untested",
+      "citations": {
+       "main": {
+        "file": "probe-model-p-c3-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c3.test_suite_pass_count\""
+       },
+       "pr": {
+        "file": "probe-model-p-c3-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c3.test_suite_pass_count\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "fd91c97e702bf83a114208bbd369a14bfa5562083de21a238a3fc6da75286690",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-05T06:00:52.467611+00:00",
+     "inputs_sha256": "1bbaf7cfa241c5babfdc5bef80f41b72365824a5fbd3ee1c5bdadb913a3059a9",
+     "inputs": {
+      "title_chars": 82,
+      "body_chars": 2313,
+      "base_files": {
+       "sqlparse/filters/tokens.py": "099c03c0ccf339dab4aaf4d120889cef0e7d839e108701603363a9f7ddf666f9"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-05T06:00:52.599491+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "not measured",
+     "why": "coverage produced no data (exit 0); see probe-coverage.log",
+     "adequacy": "unmeasured",
+     "note": "probe coverage not measured (coverage produced no data (exit 0); see probe-coverage.log)"
+    },
+    "status": "ran"
+   },
+   {
+    "id": "model-p-c4",
+    "source": "model",
+    "path": "model-probes/model-p-c4.py",
+    "sha256": "4e005117a5f2c2a5f9b86d634ec47454eeaefc7250f98ae2b83a86e7aef6a389",
+    "target": "andialbrecht/sqlparse#884",
+    "about": "Placeholder for C4: test discrimination (untested in probe).",
+    "claims": [
+     {
+      "id": "C4",
+      "source": "PR description",
+      "text": "The new tests discriminate between a complete fix and partial fixes, as reverting only filters/tokens.py fails all nine new cases while exempting only the backtick fails six of them.",
+      "covers": [
+       "c4.test_discrimination"
+      ],
+      "expect": "same"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.0,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-p-c4-main-1.jsonl",
+      "probe-model-p-c4-main-2.jsonl",
+      "probe-model-p-c4-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-p-c4-pr-1.jsonl",
+      "probe-model-p-c4-pr-2.jsonl",
+      "probe-model-p-c4-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "c4.test_discrimination": "untested"
+      },
+      {
+       "c4.test_discrimination": "untested"
+      },
+      {
+       "c4.test_discrimination": "untested"
+      }
+     ],
+     "pr": [
+      {
+       "c4.test_discrimination": "untested"
+      },
+      {
+       "c4.test_discrimination": "untested"
+      },
+      {
+       "c4.test_discrimination": "untested"
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "c4.test_discrimination",
+      "state": "same",
+      "label": "proven",
+      "claim": "C4",
+      "main": "untested",
+      "pr": "untested",
+      "citations": {
+       "main": {
+        "file": "probe-model-p-c4-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c4.test_discrimination\""
+       },
+       "pr": {
+        "file": "probe-model-p-c4-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c4.test_discrimination\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "4e005117a5f2c2a5f9b86d634ec47454eeaefc7250f98ae2b83a86e7aef6a389",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-05T06:00:52.467696+00:00",
+     "inputs_sha256": "1bbaf7cfa241c5babfdc5bef80f41b72365824a5fbd3ee1c5bdadb913a3059a9",
+     "inputs": {
+      "title_chars": 82,
+      "body_chars": 2313,
+      "base_files": {
+       "sqlparse/filters/tokens.py": "099c03c0ccf339dab4aaf4d120889cef0e7d839e108701603363a9f7ddf666f9"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-05T06:00:52.599491+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "not measured",
+     "why": "coverage produced no data (exit 0); see probe-coverage.log",
+     "adequacy": "unmeasured",
+     "note": "probe coverage not measured (coverage produced no data (exit 0); see probe-coverage.log)"
+    },
+    "status": "ran"
+   }
+  ],
+  "summary": {
+   "labels": [
+    "needs_human",
+    "needs_human",
+    "proven",
+    "proven",
+    "proven",
+    "proven",
+    "proven",
+    "needs_human",
+    "needs_human",
+    "needs_human",
+    "proven",
+    "proven"
+   ],
+   "flagged": [
+    {
+     "probe": "model-p-c2",
+     "name": "c2.acute_no_ws.upper",
+     "label": "needs_human",
+     "claim": "C2"
+    },
+    {
+     "probe": "model-p-c2",
+     "name": "c2.acute_ws.upper",
+     "label": "needs_human",
+     "claim": "C2"
+    },
+    {
+     "probe": "model-p-c2",
+     "name": "c2.dq_no_ws.upper",
+     "label": "needs_human",
+     "claim": "C2"
+    },
+    {
+     "probe": "model-p-c2",
+     "name": "c2.dq_ws.upper",
+     "label": "needs_human",
+     "claim": "C2"
+    },
+    {
+     "probe": "model-p-c2",
+     "name": "c2.plain.upper",
+     "label": "needs_human",
+     "claim": "C2"
+    }
+   ],
+   "proven_claims": [
+    "C2",
+    "C3",
+    "C4"
+   ],
+   "reason": "probe: 5 observation(s) need attention: c2.acute_no_ws.upper does not differ although the claim says it does (C2); c2.acute_ws.upper does not differ although the claim says it does (C2); c2.dq_no_ws.upper does not differ although the claim says it does (C2); c2.dq_ws.upper does not differ although the claim says it does (C2); probe: claim(s) C2, C3, C4 proven",
+   "ignored_noise": [],
+   "ignored_warning_only": [],
+   "pr_only_noisy": [],
+   "advisory_unchanged_subchecks": [],
+   "advisory_agreeing_differs": []
+  }
+ },
+ "probe_changed_line_coverage": {
+  "status": "partly measured",
+  "side": "main",
+  "probes": {
+   "model-p-c2": {
+    "status": "measured",
+    "changed_lines_covered": 3,
+    "changed_lines_total": 3,
+    "adequacy": "adequate"
+   },
+   "model-p-c3": {
+    "status": "not measured",
+    "changed_lines_covered": null,
+    "changed_lines_total": null,
+    "adequacy": "unmeasured"
+   },
+   "model-p-c4": {
+    "status": "not measured",
+    "changed_lines_covered": null,
+    "changed_lines_total": null,
+    "adequacy": "unmeasured"
+   }
+  },
+  "not_adequate": []
+ },
+ "verdict": "needs_attention",
+ "reason": "probe: 5 observation(s) need attention: c2.acute_no_ws.upper does not differ although the claim says it does (C2); c2.acute_ws.upper does not differ although the claim says it does (C2); c2.dq_no_ws.upper does not differ although the claim says it does (C2); c2.dq_ws.upper does not differ although the claim says it does (C2); probe: claim(s) C2 proven; probe model-p-c3 has no measured line coverage (coverage produced no data (exit 0); see probe-coverage.log); it does not count as covering the change; probe model-p-c4 has no measured line coverage (coverage produced no data (exit 0); see probe-coverage.log); it does not count as covering the change; tests: 9 test(s) fail on main and pass on the PR; 181 test(s) ran on main, 181 on the PR; 0 new test(s) pass, 174 unchanged (2 of them skipped on both sides)",
+ "verdict_before_coverage_gate": "needs_attention",
+ "reason_before_coverage_gate": "probe: 5 observation(s) need attention: c2.acute_no_ws.upper does not differ although the claim says it does (C2); c2.acute_ws.upper does not differ although the claim says it does (C2); c2.dq_no_ws.upper does not differ although the claim says it does (C2); c2.dq_ws.upper does not differ although the claim says it does (C2); probe: claim(s) C2 proven; probe model-p-c3 has no measured line coverage (coverage produced no data (exit 0); see probe-coverage.log); it does not count as covering the change; probe model-p-c4 has no measured line coverage (coverage produced no data (exit 0); see probe-coverage.log); it does not count as covering the change; tests: 9 test(s) fail on main and pass on the PR; 181 test(s) ran on main, 181 on the PR; 0 new test(s) pass, 174 unchanged (2 of them skipped on both sides)",
+ "changed_lines_total": 2,
+ "changed_lines_covered": 2,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "normal",
+  "note": "2 of 2 changed executable line(s) ran (100%)",
+  "measurement": "measured"
+ },
+ "agents": {
+  "status": "skipped",
+  "note": "advisory swarm is off",
+  "roles": []
+ },
+ "explanation": {
+  "status": "not yet wired",
+  "why": "advisory swarm is off"
+ },
+ "swarm_requested": false,
+ "operator_approval_requested": false,
+ "swarm": "off",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [
+   "sqlparse/filters/tokens.py"
+  ],
+  "compiled_files": [],
+  "other_files": [
+   "CHANGELOG",
+   "tests/test_format.py"
+  ]
+ },
+ "duration_s": {
+  "total_wall": 128.5,
+  "tests": 10.8
+ },
+ "cost": {
+  "ai_calls": 2,
+  "failed_ai_calls": 0,
+  "input_tokens": 2571,
+  "output_tokens": 16080,
+  "thinking_tokens": 14691,
+  "cost_usd": 0.015243,
+  "calls_without_usage": 0,
+  "ai_cost_usd": 0.015243,
+  "cost_complete": true,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 128.5,
+   "tests": 10.8
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.008567,
+  "total_cost_usd": 0.02381,
+  "swarm": {
+   "ai_calls": 0,
+   "failed_ai_calls": 0,
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "thinking_tokens": 0,
+   "cost_usd": 0.0,
+   "calls_without_usage": 0,
+   "ai_cost_usd": 0.0,
+   "cost_complete": true,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ },
+ "pdf_push": {
+  "ok": true,
+  "attempts": 1,
+  "error": null,
+  "url": "https://github.com/aritracodesbad123/Proof-of-change/tree/runs/runs/2026-11-04/985a7ea/sqlparse-884"
+ }
+}

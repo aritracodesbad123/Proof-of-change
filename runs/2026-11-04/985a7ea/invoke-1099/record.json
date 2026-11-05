@@ -1,0 +1,1498 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-pyinvoke-invoke-1099-06f3320e772b-2026-11-04",
+ "date_ist": "2026-11-05 11:31 IST",
+ "run_date": "2026-11-04",
+ "who": "ops/daily_run.py",
+ "repo": "pyinvoke/invoke",
+ "library": "invoke",
+ "pr": {
+  "repo": "pyinvoke/invoke",
+  "number": 1099,
+  "url": "https://github.com/pyinvoke/invoke/pull/1099",
+  "title": "Use explicit re-exports for mypy strict mode",
+  "base_sha": "6a71e680c535ba6520e935c497099fbca011d03c",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "06f3320e772b52ace941d562c04362043b850cfa",
+  "merge_commit": "9b691513995c396a3b9113d5ead306a95dcb49c9",
+  "tested_main_sha": "6a71e680c535ba6520e935c497099fbca011d03c",
+  "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+ },
+ "author": "momoikura",
+ "base_ref": "main",
+ "updated_at_utc": "2026-11-02T07:49:18Z",
+ "updated_at_ist": "2026-11-02 13:19 IST",
+ "ci_state": "passing",
+ "ci_detail": "3 check runs completed without failure",
+ "tested_at_ist": "2026-11-05 11:31 IST",
+ "files": {
+  "all": [
+   "invoke/__init__.py",
+   "invoke/parser/__init__.py",
+   "tests/test_public_exports.py"
+  ],
+  "package_py": [
+   "invoke/__init__.py",
+   "invoke/parser/__init__.py"
+  ],
+  "compiled": [],
+  "other": [
+   "tests/test_public_exports.py"
+  ]
+ },
+ "machine_type": {
+  "arch": "x86_64",
+  "os": "Linux",
+  "platform": "Linux-6.12.94+-x86_64-with-glibc2.41",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": null,
+  "cpu_model": "Intel(R) Xeon(R) Processor",
+  "ram_gb": 15.6
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 3,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.15",
+ "test_selection": "mapped from touched files: tests/test_public_exports.py, tests/_support/depth_first.py, tests/collection.py, tests/executor.py, tests/parser_argument.py",
+ "per_run": [
+  {
+   "side": "old",
+   "run": 1,
+   "passed": 164,
+   "failed": 0,
+   "error": 8,
+   "skipped": 1,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 2.1,
+   "pytest_summary": "164 passed, 1 skipped, 5 warnings, 9 errors in 1.15s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 1,
+   "passed": 196,
+   "failed": 0,
+   "error": 8,
+   "skipped": 1,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 2.0,
+   "pytest_summary": "196 passed, 1 skipped, 5 warnings, 9 errors in 1.17s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 2,
+   "passed": 164,
+   "failed": 0,
+   "error": 8,
+   "skipped": 1,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 2.0,
+   "pytest_summary": "164 passed, 1 skipped, 5 warnings, 9 errors in 1.12s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 2,
+   "passed": 196,
+   "failed": 0,
+   "error": 8,
+   "skipped": 1,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 2.0,
+   "pytest_summary": "196 passed, 1 skipped, 5 warnings, 9 errors in 1.13s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 3,
+   "passed": 164,
+   "failed": 0,
+   "error": 8,
+   "skipped": 1,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 2.0,
+   "pytest_summary": "164 passed, 1 skipped, 5 warnings, 9 errors in 1.12s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 3,
+   "passed": 196,
+   "failed": 0,
+   "error": 8,
+   "skipped": 1,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 2.1,
+   "pytest_summary": "196 passed, 1 skipped, 5 warnings, 9 errors in 1.26s",
+   "junit": true
+  }
+ ],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "local",
+ "sandbox_backend_note": "local bubblewrap",
+ "machine": "local",
+ "tool_setup": {
+  "installed": [],
+  "tries": 0,
+  "note": "All required tools were already installed.",
+  "refused": []
+ },
+ "posted_upstream": false,
+ "logs": "invoke-1099/",
+ "freeze": {
+  "main": "freeze-main.txt",
+  "pr": "freeze-pr.txt"
+ },
+ "coverage": {
+  "status": "measured",
+  "changed_lines_total": 19,
+  "changed_lines_covered": 19,
+  "files": [
+   {
+    "file": "invoke/__init__.py",
+    "changed_lines_total": 13,
+    "changed_lines_covered": 13
+   },
+   {
+    "file": "invoke/parser/__init__.py",
+    "changed_lines_total": 6,
+    "changed_lines_covered": 6
+   }
+  ],
+  "seconds": 3.8,
+  "exit": 1,
+  "log": "coverage-pytest.log"
+ },
+ "poc_commit": "985a7eade681b1d88256d5a185e129da53855144",
+ "route": "source-pair",
+ "current_head_sha": "06f3320e772b52ace941d562c04362043b850cfa",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": "[redacted]",
+  "notes": [
+   "Setup check: GitHub token: present.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory 7.8 GB (of 15.6 GB).",
+   "Setup check: free disk 94.8 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: [redacted] results",
+   "Query: invoke python setup install instructions https://github.com/pyinvoke/invoke site:github.com/pyinvoke/invoke",
+   "Query: invoke python documentation install https://github.com/pyinvoke/invoke site:github.com/pyinvoke/invoke",
+   "Query: invoke python install requirements https://pypi.org/project/invoke/ https://github.com/pyinvoke/invoke site:pypi.org",
+   "Source: invoke-common-tasks \u00b7 PyPI \u2014 https://pypi.org/project/invoke-common-tasks/",
+   "Source: invoke \u00b7 PyPI \u2014 https://pypi.org/project/invoke/",
+   "Source: Dealing with virtual environments \u00b7 Issue #838 \u00b7 pyinvoke/invoke \u00b7 GitHub \u2014 https://github.com/pyinvoke/invoke/issues/838",
+   "Source: ImportError: cannot import name yaml2 \u00b7 Issue #319 \u00b7 pyinvoke/invoke \u00b7 GitHub \u2014 https://github.com/pyinvoke/invoke/issues/319",
+   "Source: Support `python -m invoke` \u00b7 Issue #444 \u00b7 pyinvoke/invoke \u00b7 GitHub \u2014 https://github.com/pyinvoke/invoke/issues/444",
+   "Source: Running a task from inside a Python script \u00b7 Issue #112 \u00b7 pyinvoke/invoke \u00b7 GitHub \u2014 https://github.com/pyinvoke/invoke/issues/112",
+   "Source: Issue with Python 3.11, or type annotations: the inspect module changed \u00b7 Issue #833 \u00b7 pyinvoke/invoke \u00b7 GitHub \u2014 https://github.com/pyinvoke/invoke/issues/833",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >=3.9",
+   "Installed icecream 2.2.0 from project (named by the error and listed in the project) on main and pr.",
+   "Before rerun: needs_attention: needs attention: flagged claim(s) C4; no tests ran (tests produced no results on both sides (collection failed; see pytest logs))",
+   "After rerun: needs_attention: probe: 8 observation(s) need attention: c1.invoke_explicit_task_import_ok does not differ although the claim says it does (C1); c1.invoke_star_has_task does not differ although the claim says it does (C1); c4.parser_all_contains_context differs although the claim says it does not (C4); c4.parser_all_contains_parser differs although the claim says it does not (C4); probe model-p1 has no measured line coverage (no coverage data); it does not count as covering the change; tests: 32 test(s) fail on main and pass on the PR; 204 test(s) ran on main, 204 on the PR; 0 new test(s) pass, 165 unchanged (1 of them skipped on both sides); 8 test failure(s) pre-existing and identical on both sides"
+  ],
+  "install_docs": [
+   "README.rst",
+   "pyproject.toml"
+  ],
+  "install_docs_from": "main",
+  "setup_plan": {
+   "packages": [],
+   "scope_blocked": "",
+   "component": null,
+   "aggregate_names": [],
+   "extra_reqs": [],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >=3.9"
+   },
+   "system": [],
+   "refused": [],
+   "groups_blocked": ""
+  },
+  "steps": {
+   "setup_lookup": "Found 0 setup item(s) in the project's files and the web lookup.",
+   "setup_python": "Python 3.12: Python 3.12 already meets >=3.9",
+   "install_deps": "Nothing extra to install; the project's own install covers it."
+  },
+  "run_files": {
+   "requirements": "requirements.txt",
+   "plan": "setup-plan.json",
+   "count": 0
+  },
+  "installs": [
+   {
+    "package": "icecream",
+    "requirement": "icecream>=2.1",
+    "version": "2.2.0",
+    "versions": {
+     "main": "2.2.0",
+     "pr": "2.2.0"
+    },
+    "source": "project",
+    "reason": "named by the error and listed in the project",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   }
+  ],
+  "gap_retry": {
+   "reran": true,
+   "rounds": [
+    {
+     "round": 1,
+     "verdict": "needs_attention",
+     "reason": "needs attention: flagged claim(s) C4; no tests ran (tests produced no results on both sides (collection failed; see pytest logs))"
+    },
+    {
+     "round": 2,
+     "verdict": "needs_attention",
+     "reason": "probe: 8 observation(s) need attention: c1.invoke_explicit_task_import_ok does not differ although the claim says it does (C1); c1.invoke_star_has_task does not differ although the claim says it does (C1); c4.parser_all_contains_context differs although the claim says it does not (C4); c4.parser_all_contains_parser differs although the claim says it does not (C4); probe model-p1 has no measured line coverage (no coverage data); it does not count as covering the change; tests: 32 test(s) fail on main and pass on the PR; 204 test(s) ran on main, 204 on the PR; 0 new test(s) pass, 165 unchanged (1 of them skipped on both sides); 8 test failure(s) pre-existing and identical on both sides"
+    }
+   ],
+   "installed": [
+    {
+     "package": "icecream",
+     "requirement": "icecream>=2.1",
+     "version": "2.2.0",
+     "versions": {
+      "main": "2.2.0",
+      "pr": "2.2.0"
+     },
+     "source": "project",
+     "reason": "named by the error and listed in the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    }
+   ]
+  }
+ },
+ "sides": {
+  "comparison_basis": "base tip vs GitHub test merge (refs/pull/N/merge)",
+  "main_sha": "6a71e680c535ba6520e935c497099fbca011d03c",
+  "pr_sha": "9b691513995c396a3b9113d5ead306a95dcb49c9",
+  "merge_commit": "9b691513995c396a3b9113d5ead306a95dcb49c9",
+  "merge_parents": [
+   "6a71e680c535ba6520e935c497099fbca011d03c",
+   "06f3320e772b52ace941d562c04362043b850cfa"
+  ],
+  "merge_head_matches_pinned_head": true
+ },
+ "tested": {
+  "main": "main @ 6a71e680c535 (base tip = first parent of the merge commit)",
+  "pr": "GitHub test merge commit 9b691513995c (refs/pull/1099/merge) of head 06f3320e772b"
+ },
+ "probe_plan": {
+  "baseline": "full",
+  "model": "model provider: nebius (Token Factory, live)",
+  "errors": [],
+  "model_claims": [
+   {
+    "id": "C1",
+    "text": "After applying this PR, mypy with `--no-implicit-reexport` passes for `from invoke import task`.",
+    "source_quote": "mypy --no-implicit-reexport on from invoke import task and other public imports fails on the original code and passes with this change",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C2",
+    "text": "Explicit imports such as `from invoke import task` continue to work after the PR.",
+    "source_quote": "Explicit imports such as `from invoke import task` keep working;",
+    "testable": true,
+    "expect": "same"
+   },
+   {
+    "id": "C3",
+    "text": "`from invoke import *` is now restricted by `__all__` and does not leak internal names like `metadata`.",
+    "source_quote": "`from invoke import *` is now restricted by `__all__` and no longer leaks internals such as `metadata`.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C4",
+    "text": "The `ParserContext as Context` alias is retained in `invoke/parser/__init__.py` and the star import remains alongside explicit `Parser` and `ParseResult` re-exports.",
+    "source_quote": "Review closely: `ParserContext as Context` alias is kept in `invoke/parser/__init__.py`, and the `*` import is kept alongside explicit `Parser` and `ParseResult` re-exports.",
+    "testable": true,
+    "expect": "same"
+   },
+   {
+    "id": "C5",
+    "text": "Tests in `tests/test_public_exports.py` verify that `__all__` exists in both packages, lists the expected public names, and that star import exposes `task` without leaking `metadata`.",
+    "source_quote": "- `tests/test_public_exports.py`: add tests that check `__all__` exists in both packages, contains the expected public names, and that star import exposes `task` without leaking `metadata`.",
+    "testable": true,
+    "expect": "same"
+   },
+   {
+    "id": "C6",
+    "text": "The new tests in `tests/test_public_exports.py` fail on the original code and pass after applying the PR.",
+    "source_quote": "New tests in `tests/test_public_exports.py` fail on the original code and pass with the fix.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C7",
+    "text": "The test suite shows 891 of 1016 tests passing, 114 failing (all pre-existing), with no new failures introduced by the PR.",
+    "source_quote": "Sandbox: 891/1016 tests pass, 114 failing (114 of them already failed on the original code and are not caused by the patch).",
+    "testable": true,
+    "expect": "same"
+   },
+   {
+    "id": "C8",
+    "text": "The code compiles without errors, has zero lint issues, and introduces no new Bandit security findings.",
+    "source_quote": "Compiles: true. Lint: 0 issues. Bandit: 0 new findings.",
+    "testable": true,
+    "expect": "same"
+   },
+   {
+    "id": "C9",
+    "text": "The proof shows that on the original code the new tests fail with an AssertionError about missing `__all__`, and they pass after the fix.",
+    "source_quote": "Failure on the original code: `AssertionError: invoke must define __all__ listing its public re-exports so mypy --no-implicit-reexport accepts 'from invoke import task'; fix by defining __all__ in invoke/__init__.py",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C10",
+    "text": "Independent edge-case tests show 2 of 3 passing (with one pre-existing failure).",
+    "source_quote": "Edge-case tests written independently by muse-wonder-1.0: 2 of 3 pass.",
+    "testable": true,
+    "expect": "same"
+   }
+  ],
+  "model_rejected_claims": [],
+  "model_retried": {
+   "why": [
+    "no probe listed the claim ids it checks, so its results could not be tied to any claim; in each probe, \"claims\" must name the claim ids it checks and the observation names that cover them"
+   ],
+   "kept_first_answer": "the retry linked no claim either"
+  },
+  "model_claims_filled": [
+   {
+    "id": "p1",
+    "claims": [
+     "C1",
+     "C4",
+     "C8"
+    ]
+   }
+  ],
+  "diff_targets": [],
+  "frozen": [
+   {
+    "path": "model-probes/model-p1.py",
+    "source": "model",
+    "sha256": "ce010c63dbdf62ea172d91ce06b5466ec7326a8177df6ced8e12d2cfececa9a9",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-05T06:05:54.752498+00:00",
+    "inputs_sha256": "cbc2cc5b0e7a0e84d45c33f317fd424c73efcbca64cb59a2565562d8b21bc556",
+    "inputs": {
+     "title_chars": 44,
+     "body_chars": 2980,
+     "base_files": {
+      "invoke/__init__.py": "ef0a747ba2d0ff27f5b93bbe6bed5317d4ddc8fbae969fab91770d13acdc0fdb",
+      "invoke/parser/__init__.py": "1e9481fecc76699ac2394cb90a5fcb3327c206e1b0ac1f7e775392e3cdb50f3b"
+     }
+    }
+   }
+  ]
+ },
+ "test_extras": [
+  "pytest-relaxed>=2"
+ ],
+ "pr_side_started_at": "2026-11-05T06:05:54.902035+00:00",
+ "test_targets": {
+  "main": [
+   "tests/_support/depth_first.py",
+   "tests/collection.py",
+   "tests/executor.py",
+   "tests/parser_argument.py"
+  ],
+  "pr": [
+   "tests/test_public_exports.py",
+   "tests/_support/depth_first.py",
+   "tests/collection.py",
+   "tests/executor.py",
+   "tests/parser_argument.py"
+  ]
+ },
+ "installed_commit": {
+  "main": {
+   "dist": "invoke",
+   "expected": "6a71e680c535ba6520e935c497099fbca011d03c",
+   "installed": "6a71e680c535ba6520e935c497099fbca011d03c",
+   "ok": true
+  },
+  "pr": {
+   "dist": "invoke",
+   "expected": "9b691513995c396a3b9113d5ead306a95dcb49c9",
+   "installed": "9b691513995c396a3b9113d5ead306a95dcb49c9",
+   "ok": true
+  }
+ },
+ "declared_test_deps": {
+  "requested": [
+   "pytest-relaxed>=2"
+  ],
+  "installed": true
+ },
+ "probes": {
+  "status": "ran",
+  "items": [
+   {
+    "id": "model-p1",
+    "source": "model",
+    "path": "model-probes/model-p1.py",
+    "sha256": "ce010c63dbdf62ea172d91ce06b5466ec7326a8177df6ced8e12d2cfececa9a9",
+    "target": "pyinvoke/invoke#1099",
+    "about": "Probe for checking invoke and invoke.parser modules",
+    "claims": [
+     {
+      "id": "C1",
+      "source": "PR description",
+      "text": "After applying this PR, mypy with `--no-implicit-reexport` passes for `from invoke import task`.",
+      "covers": [
+       "c1.*"
+      ],
+      "expect": "differs"
+     },
+     {
+      "id": "C4",
+      "source": "PR description",
+      "text": "The `ParserContext as Context` alias is retained in `invoke/parser/__init__.py` and the star import remains alongside explicit `Parser` and `ParseResult` re-exports.",
+      "covers": [
+       "c4.*"
+      ],
+      "expect": "same"
+     },
+     {
+      "id": "C8",
+      "source": "PR description",
+      "text": "The code compiles without errors, has zero lint issues, and introduces no new Bandit security findings.",
+      "covers": [
+       "c8.*"
+      ],
+      "expect": "same"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.3,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.3,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.3,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.3,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.3,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.3,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-p1-main-1.jsonl",
+      "probe-model-p1-main-2.jsonl",
+      "probe-model-p1-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-p1-pr-1.jsonl",
+      "probe-model-p1-pr-2.jsonl",
+      "probe-model-p1-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "c8.invoke_compiles": true,
+       "c1.invoke_has_all": false,
+       "c1.invoke_all_list_length": null,
+       "c1.invoke_all_contains_task": null,
+       "c1.invoke_all_contains_metadata": null,
+       "c1.invoke_explicit_task_import_ok": true,
+       "c1.invoke_star_leaks_metadata": true,
+       "c1.invoke_star_has_task": true,
+       "c8.parser_compiles": true,
+       "c4.parser_has_all": false,
+       "c4.parser_all_list_length": null,
+       "c4.parser_all_contains_parser": null,
+       "c4.parser_all_contains_parseresult": null,
+       "c4.parser_all_contains_context": null,
+       "c4.parser_explicit_parser_import_ok": true,
+       "c4.parser_explicit_parseresult_import_ok": true,
+       "c4.parser_explicit_context_import_ok": true,
+       "c4.parser_star_names_eq_all": null
+      },
+      {
+       "c8.invoke_compiles": true,
+       "c1.invoke_has_all": false,
+       "c1.invoke_all_list_length": null,
+       "c1.invoke_all_contains_task": null,
+       "c1.invoke_all_contains_metadata": null,
+       "c1.invoke_explicit_task_import_ok": true,
+       "c1.invoke_star_leaks_metadata": true,
+       "c1.invoke_star_has_task": true,
+       "c8.parser_compiles": true,
+       "c4.parser_has_all": false,
+       "c4.parser_all_list_length": null,
+       "c4.parser_all_contains_parser": null,
+       "c4.parser_all_contains_parseresult": null,
+       "c4.parser_all_contains_context": null,
+       "c4.parser_explicit_parser_import_ok": true,
+       "c4.parser_explicit_parseresult_import_ok": true,
+       "c4.parser_explicit_context_import_ok": true,
+       "c4.parser_star_names_eq_all": null
+      },
+      {
+       "c8.invoke_compiles": true,
+       "c1.invoke_has_all": false,
+       "c1.invoke_all_list_length": null,
+       "c1.invoke_all_contains_task": null,
+       "c1.invoke_all_contains_metadata": null,
+       "c1.invoke_explicit_task_import_ok": true,
+       "c1.invoke_star_leaks_metadata": true,
+       "c1.invoke_star_has_task": true,
+       "c8.parser_compiles": true,
+       "c4.parser_has_all": false,
+       "c4.parser_all_list_length": null,
+       "c4.parser_all_contains_parser": null,
+       "c4.parser_all_contains_parseresult": null,
+       "c4.parser_all_contains_context": null,
+       "c4.parser_explicit_parser_import_ok": true,
+       "c4.parser_explicit_parseresult_import_ok": true,
+       "c4.parser_explicit_context_import_ok": true,
+       "c4.parser_star_names_eq_all": null
+      }
+     ],
+     "pr": [
+      {
+       "c8.invoke_compiles": true,
+       "c1.invoke_has_all": true,
+       "c1.invoke_all_list_length": 42,
+       "c1.invoke_all_contains_task": true,
+       "c1.invoke_all_contains_metadata": false,
+       "c1.invoke_explicit_task_import_ok": true,
+       "c1.invoke_star_leaks_metadata": false,
+       "c1.invoke_star_has_task": true,
+       "c8.parser_compiles": true,
+       "c4.parser_has_all": true,
+       "c4.parser_all_list_length": 7,
+       "c4.parser_all_contains_parser": true,
+       "c4.parser_all_contains_parseresult": true,
+       "c4.parser_all_contains_context": true,
+       "c4.parser_explicit_parser_import_ok": true,
+       "c4.parser_explicit_parseresult_import_ok": true,
+       "c4.parser_explicit_context_import_ok": true,
+       "c4.parser_star_names_eq_all": false
+      },
+      {
+       "c8.invoke_compiles": true,
+       "c1.invoke_has_all": true,
+       "c1.invoke_all_list_length": 42,
+       "c1.invoke_all_contains_task": true,
+       "c1.invoke_all_contains_metadata": false,
+       "c1.invoke_explicit_task_import_ok": true,
+       "c1.invoke_star_leaks_metadata": false,
+       "c1.invoke_star_has_task": true,
+       "c8.parser_compiles": true,
+       "c4.parser_has_all": true,
+       "c4.parser_all_list_length": 7,
+       "c4.parser_all_contains_parser": true,
+       "c4.parser_all_contains_parseresult": true,
+       "c4.parser_all_contains_context": true,
+       "c4.parser_explicit_parser_import_ok": true,
+       "c4.parser_explicit_parseresult_import_ok": true,
+       "c4.parser_explicit_context_import_ok": true,
+       "c4.parser_star_names_eq_all": false
+      },
+      {
+       "c8.invoke_compiles": true,
+       "c1.invoke_has_all": true,
+       "c1.invoke_all_list_length": 42,
+       "c1.invoke_all_contains_task": true,
+       "c1.invoke_all_contains_metadata": false,
+       "c1.invoke_explicit_task_import_ok": true,
+       "c1.invoke_star_leaks_metadata": false,
+       "c1.invoke_star_has_task": true,
+       "c8.parser_compiles": true,
+       "c4.parser_has_all": true,
+       "c4.parser_all_list_length": 7,
+       "c4.parser_all_contains_parser": true,
+       "c4.parser_all_contains_parseresult": true,
+       "c4.parser_all_contains_context": true,
+       "c4.parser_explicit_parser_import_ok": true,
+       "c4.parser_explicit_parseresult_import_ok": true,
+       "c4.parser_explicit_context_import_ok": true,
+       "c4.parser_star_names_eq_all": false
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "c1.invoke_all_contains_metadata",
+      "state": "differs",
+      "label": "proven",
+      "claim": "C1",
+      "main": null,
+      "pr": false,
+      "diffs": [
+       {
+        "field": "",
+        "main": null,
+        "pr": false
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c1.invoke_all_contains_metadata\""
+       },
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c1.invoke_all_contains_metadata\""
+       }
+      }
+     },
+     {
+      "name": "c1.invoke_all_contains_task",
+      "state": "differs",
+      "label": "proven",
+      "claim": "C1",
+      "main": null,
+      "pr": true,
+      "diffs": [
+       {
+        "field": "",
+        "main": null,
+        "pr": true
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c1.invoke_all_contains_task\""
+       },
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c1.invoke_all_contains_task\""
+       }
+      }
+     },
+     {
+      "name": "c1.invoke_all_list_length",
+      "state": "differs",
+      "label": "proven",
+      "claim": "C1",
+      "main": null,
+      "pr": 42,
+      "diffs": [
+       {
+        "field": "",
+        "main": null,
+        "pr": 42
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"c1.invoke_all_list_length\""
+       },
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"c1.invoke_all_list_length\""
+       }
+      }
+     },
+     {
+      "name": "c1.invoke_explicit_task_import_ok",
+      "state": "same",
+      "label": "needs_human",
+      "claim": "C1",
+      "main": true,
+      "pr": true,
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"c1.invoke_explicit_task_import_ok\""
+       },
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"c1.invoke_explicit_task_import_ok\""
+       }
+      }
+     },
+     {
+      "name": "c1.invoke_has_all",
+      "state": "differs",
+      "label": "proven",
+      "claim": "C1",
+      "main": false,
+      "pr": true,
+      "diffs": [
+       {
+        "field": "",
+        "main": false,
+        "pr": true
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"c1.invoke_has_all\""
+       },
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"c1.invoke_has_all\""
+       }
+      }
+     },
+     {
+      "name": "c1.invoke_star_has_task",
+      "state": "same",
+      "label": "needs_human",
+      "claim": "C1",
+      "main": true,
+      "pr": true,
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"c1.invoke_star_has_task\""
+       },
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"c1.invoke_star_has_task\""
+       }
+      }
+     },
+     {
+      "name": "c1.invoke_star_leaks_metadata",
+      "state": "differs",
+      "label": "proven",
+      "claim": "C1",
+      "main": true,
+      "pr": false,
+      "diffs": [
+       {
+        "field": "",
+        "main": true,
+        "pr": false
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 7,
+        "quote": "\"observation\": \"c1.invoke_star_leaks_metadata\""
+       },
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 7,
+        "quote": "\"observation\": \"c1.invoke_star_leaks_metadata\""
+       }
+      }
+     },
+     {
+      "name": "c4.parser_all_contains_context",
+      "state": "differs",
+      "label": "false_claim",
+      "claim": "C4",
+      "main": null,
+      "pr": true,
+      "diffs": [
+       {
+        "field": "",
+        "main": null,
+        "pr": true
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 8,
+        "quote": "\"observation\": \"c4.parser_all_contains_context\""
+       },
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 8,
+        "quote": "\"observation\": \"c4.parser_all_contains_context\""
+       }
+      }
+     },
+     {
+      "name": "c4.parser_all_contains_parser",
+      "state": "differs",
+      "label": "false_claim",
+      "claim": "C4",
+      "main": null,
+      "pr": true,
+      "diffs": [
+       {
+        "field": "",
+        "main": null,
+        "pr": true
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 9,
+        "quote": "\"observation\": \"c4.parser_all_contains_parser\""
+       },
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 9,
+        "quote": "\"observation\": \"c4.parser_all_contains_parser\""
+       }
+      }
+     },
+     {
+      "name": "c4.parser_all_contains_parseresult",
+      "state": "differs",
+      "label": "false_claim",
+      "claim": "C4",
+      "main": null,
+      "pr": true,
+      "diffs": [
+       {
+        "field": "",
+        "main": null,
+        "pr": true
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 10,
+        "quote": "\"observation\": \"c4.parser_all_contains_parseresult\""
+       },
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 10,
+        "quote": "\"observation\": \"c4.parser_all_contains_parseresult\""
+       }
+      }
+     },
+     {
+      "name": "c4.parser_all_list_length",
+      "state": "differs",
+      "label": "false_claim",
+      "claim": "C4",
+      "main": null,
+      "pr": 7,
+      "diffs": [
+       {
+        "field": "",
+        "main": null,
+        "pr": 7
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 11,
+        "quote": "\"observation\": \"c4.parser_all_list_length\""
+       },
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 11,
+        "quote": "\"observation\": \"c4.parser_all_list_length\""
+       }
+      }
+     },
+     {
+      "name": "c4.parser_explicit_context_import_ok",
+      "state": "same",
+      "label": "proven",
+      "claim": "C4",
+      "main": true,
+      "pr": true,
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 12,
+        "quote": "\"observation\": \"c4.parser_explicit_context_import_ok\""
+       },
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 12,
+        "quote": "\"observation\": \"c4.parser_explicit_context_import_ok\""
+       }
+      }
+     },
+     {
+      "name": "c4.parser_explicit_parser_import_ok",
+      "state": "same",
+      "label": "proven",
+      "claim": "C4",
+      "main": true,
+      "pr": true,
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 13,
+        "quote": "\"observation\": \"c4.parser_explicit_parser_import_ok\""
+       },
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 13,
+        "quote": "\"observation\": \"c4.parser_explicit_parser_import_ok\""
+       }
+      }
+     },
+     {
+      "name": "c4.parser_explicit_parseresult_import_ok",
+      "state": "same",
+      "label": "proven",
+      "claim": "C4",
+      "main": true,
+      "pr": true,
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 14,
+        "quote": "\"observation\": \"c4.parser_explicit_parseresult_import_ok\""
+       },
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 14,
+        "quote": "\"observation\": \"c4.parser_explicit_parseresult_import_ok\""
+       }
+      }
+     },
+     {
+      "name": "c4.parser_has_all",
+      "state": "differs",
+      "label": "false_claim",
+      "claim": "C4",
+      "main": false,
+      "pr": true,
+      "diffs": [
+       {
+        "field": "",
+        "main": false,
+        "pr": true
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 15,
+        "quote": "\"observation\": \"c4.parser_has_all\""
+       },
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 15,
+        "quote": "\"observation\": \"c4.parser_has_all\""
+       }
+      }
+     },
+     {
+      "name": "c4.parser_star_names_eq_all",
+      "state": "differs",
+      "label": "false_claim",
+      "claim": "C4",
+      "main": null,
+      "pr": false,
+      "diffs": [
+       {
+        "field": "",
+        "main": null,
+        "pr": false
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 16,
+        "quote": "\"observation\": \"c4.parser_star_names_eq_all\""
+       },
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 16,
+        "quote": "\"observation\": \"c4.parser_star_names_eq_all\""
+       }
+      }
+     },
+     {
+      "name": "c8.invoke_compiles",
+      "state": "same",
+      "label": "proven",
+      "claim": "C8",
+      "main": true,
+      "pr": true,
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 17,
+        "quote": "\"observation\": \"c8.invoke_compiles\""
+       },
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 17,
+        "quote": "\"observation\": \"c8.invoke_compiles\""
+       }
+      }
+     },
+     {
+      "name": "c8.parser_compiles",
+      "state": "same",
+      "label": "proven",
+      "claim": "C8",
+      "main": true,
+      "pr": true,
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 18,
+        "quote": "\"observation\": \"c8.parser_compiles\""
+       },
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 18,
+        "quote": "\"observation\": \"c8.parser_compiles\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "ce010c63dbdf62ea172d91ce06b5466ec7326a8177df6ced8e12d2cfececa9a9",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-05T06:05:54.752498+00:00",
+     "inputs_sha256": "cbc2cc5b0e7a0e84d45c33f317fd424c73efcbca64cb59a2565562d8b21bc556",
+     "inputs": {
+      "title_chars": 44,
+      "body_chars": 2980,
+      "base_files": {
+       "invoke/__init__.py": "ef0a747ba2d0ff27f5b93bbe6bed5317d4ddc8fbae969fab91770d13acdc0fdb",
+       "invoke/parser/__init__.py": "1e9481fecc76699ac2394cb90a5fcb3327c206e1b0ac1f7e775392e3cdb50f3b"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-05T06:05:54.902035+00:00"
+    },
+    "status": "ran"
+   }
+  ],
+  "summary": {
+   "labels": [
+    "proven",
+    "proven",
+    "proven",
+    "needs_human",
+    "proven",
+    "needs_human",
+    "proven",
+    "false_claim",
+    "false_claim",
+    "false_claim",
+    "false_claim",
+    "proven",
+    "proven",
+    "proven",
+    "false_claim",
+    "false_claim",
+    "proven",
+    "proven"
+   ],
+   "flagged": [
+    {
+     "probe": "model-p1",
+     "name": "c4.parser_all_contains_context",
+     "label": "false_claim",
+     "claim": "C4"
+    },
+    {
+     "probe": "model-p1",
+     "name": "c4.parser_all_contains_parser",
+     "label": "false_claim",
+     "claim": "C4"
+    },
+    {
+     "probe": "model-p1",
+     "name": "c4.parser_all_contains_parseresult",
+     "label": "false_claim",
+     "claim": "C4"
+    },
+    {
+     "probe": "model-p1",
+     "name": "c4.parser_all_list_length",
+     "label": "false_claim",
+     "claim": "C4"
+    },
+    {
+     "probe": "model-p1",
+     "name": "c4.parser_has_all",
+     "label": "false_claim",
+     "claim": "C4"
+    },
+    {
+     "probe": "model-p1",
+     "name": "c4.parser_star_names_eq_all",
+     "label": "false_claim",
+     "claim": "C4"
+    }
+   ],
+   "proven_claims": [
+    "C1",
+    "C4",
+    "C8"
+   ],
+   "reason": "probe: 6 observation(s) need attention: c4.parser_all_contains_context differs although the claim says it does not (C4); c4.parser_all_contains_parser differs although the claim says it does not (C4); c4.parser_all_contains_parseresult differs although the claim says it does not (C4); c4.parser_all_list_length differs although the claim says it does not (C4); probe: 2 unchanged sub-check(s) of an input where the claim's change was seen, shown as advisory only: c1.invoke_explicit_task_import_ok (C1); c1.invoke_star_has_task (C1); probe: claim(s) C1, C4, C8 proven",
+   "ignored_noise": [],
+   "ignored_warning_only": [],
+   "pr_only_noisy": [],
+   "advisory_unchanged_subchecks": [
+    "c1.invoke_explicit_task_import_ok",
+    "c1.invoke_star_has_task"
+   ],
+   "advisory_agreeing_differs": []
+  }
+ },
+ "probe_changed_line_coverage": {
+  "status": "not measured",
+  "side": "main",
+  "probes": {
+   "model-p1": {
+    "status": null,
+    "changed_lines_covered": null,
+    "changed_lines_total": null,
+    "adequacy": null
+   }
+  },
+  "not_adequate": []
+ },
+ "verdict": "needs_attention",
+ "reason": "probe: 8 observation(s) need attention: c1.invoke_explicit_task_import_ok does not differ although the claim says it does (C1); c1.invoke_star_has_task does not differ although the claim says it does (C1); c4.parser_all_contains_context differs although the claim says it does not (C4); c4.parser_all_contains_parser differs although the claim says it does not (C4); probe model-p1 has no measured line coverage (no coverage data); it does not count as covering the change; tests: 32 test(s) fail on main and pass on the PR; 204 test(s) ran on main, 204 on the PR; 0 new test(s) pass, 165 unchanged (1 of them skipped on both sides); 8 test failure(s) pre-existing and identical on both sides",
+ "comparison": {
+  "same": 173,
+  "same_skipped_both": 1,
+  "regressions": [],
+  "fixed": [
+   "tests.test_public_exports::test_invoke_defines_explicit_export_list",
+   "tests.test_public_exports::test_invoke_export_list_includes_expected_name[Argument]",
+   "tests.test_public_exports::test_invoke_export_list_includes_expected_name[Call]",
+   "tests.test_public_exports::test_invoke_export_list_includes_expected_name[CollectionNotFound]",
+   "tests.test_public_exports::test_invoke_export_list_includes_expected_name[Collection]",
+   "tests.test_public_exports::test_invoke_export_list_includes_expected_name[Config]",
+   "tests.test_public_exports::test_invoke_export_list_includes_expected_name[Context]",
+   "tests.test_public_exports::test_invoke_export_list_includes_expected_name[Executor]",
+   "tests.test_public_exports::test_invoke_export_list_includes_expected_name[Exit]",
+   "tests.test_public_exports::test_invoke_export_list_includes_expected_name[Failure]",
+   "tests.test_public_exports::test_invoke_export_list_includes_expected_name[Local]",
+   "tests.test_public_exports::test_invoke_export_list_includes_expected_name[MockContext]",
+   "tests.test_public_exports::test_invoke_export_list_includes_expected_name[ParseResult]",
+   "tests.test_public_exports::test_invoke_export_list_includes_expected_name[ParserContext]",
+   "tests.test_public_exports::test_invoke_export_list_includes_expected_name[Parser]",
+   "tests.test_public_exports::test_invoke_export_list_includes_expected_name[Program]",
+   "tests.test_public_exports::test_invoke_export_list_includes_expected_name[Responder]",
+   "tests.test_public_exports::test_invoke_export_list_includes_expected_name[Result]",
+   "tests.test_public_exports::test_invoke_export_list_includes_expected_name[Runner]",
+   "tests.test_public_exports::test_invoke_export_list_includes_expected_name[Task]",
+   "tests.test_public_exports::test_invoke_export_list_includes_expected_name[call]",
+   "tests.test_public_exports::test_invoke_export_list_includes_expected_name[pty_size]",
+   "tests.test_public_exports::test_invoke_export_list_includes_expected_name[task]",
+   "tests.test_public_exports::test_invoke_star_import_exposes_task_without_leaking_internals",
+   "tests.test_public_exports::test_parser_defines_explicit_export_list",
+   "tests.test_public_exports::test_parser_export_list_includes_expected_name[Argument]",
+   "tests.test_public_exports::test_parser_export_list_includes_expected_name[Context]",
+   "tests.test_public_exports::test_parser_export_list_includes_expected_name[ParseResult]",
+   "tests.test_public_exports::test_parser_export_list_includes_expected_name[ParserContext]",
+   "tests.test_public_exports::test_parser_export_list_includes_expected_name[Parser]",
+   "tests.test_public_exports::test_parser_export_list_includes_expected_name[to_flag]",
+   "tests.test_public_exports::test_parser_export_list_includes_expected_name[translate_underscores]"
+  ],
+  "new_tests_passing": 0,
+  "new_tests_passing_ids": [],
+  "new_tests_failing": [],
+  "new_tests_skipped": [],
+  "removed_tests": [],
+  "reparametrized": [],
+  "skipped_missing_dependency": [],
+  "flaky": [],
+  "pr_unstable": [],
+  "pr_unstable_noisy": [],
+  "environment": [],
+  "other_changes": [],
+  "preexisting_failures": [
+   "tests._support.depth_first::build",
+   "tests._support.depth_first::clean",
+   "tests._support.depth_first::clean_html",
+   "tests._support.depth_first::clean_tgz",
+   "tests._support.depth_first::deploy",
+   "tests._support.depth_first::makedirs",
+   "tests._support.depth_first::pretest",
+   "tests._support.depth_first::test"
+  ],
+  "load_failed_both": [],
+  "load_failed_pr": [],
+  "load_failed_main": [],
+  "failure_signatures": {
+   "tests._support.depth_first::build": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "tests._support.depth_first::clean": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "tests._support.depth_first::clean_html": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "tests._support.depth_first::clean_tgz": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "tests._support.depth_first::deploy": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "tests._support.depth_first::makedirs": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "tests._support.depth_first::pretest": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "tests._support.depth_first::test": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   }
+  },
+  "executed": {
+   "main": 204,
+   "pr": 204
+  },
+  "messages": {},
+  "base_messages": {
+   "tests.test_public_exports::test_invoke_defines_explicit_export_list": "AssertionError: invoke must define __all__ listing its public re-exports so mypy --no-implicit-reexport accepts 'from invoke import task'; fix by defining __all__ in invoke/__init__.py",
+   "tests.test_public_exports::test_invoke_export_list_includes_expected_name[Argument]": "AssertionError: invoke.__all__ is missing 'Argument'; add it to __all__ in invoke/__init__.py so it is an explicit re-export",
+   "tests.test_public_exports::test_invoke_export_list_includes_expected_name[Call]": "AssertionError: invoke.__all__ is missing 'Call'; add it to __all__ in invoke/__init__.py so it is an explicit re-export",
+   "tests.test_public_exports::test_invoke_export_list_includes_expected_name[CollectionNotFound]": "AssertionError: invoke.__all__ is missing 'CollectionNotFound'; add it to __all__ in invoke/__init__.py so it is an explicit re-export",
+   "tests.test_public_exports::test_invoke_export_list_includes_expected_name[Collection]": "AssertionError: invoke.__all__ is missing 'Collection'; add it to __all__ in invoke/__init__.py so it is an explicit re-export",
+   "tests.test_public_exports::test_invoke_export_list_includes_expected_name[Config]": "AssertionError: invoke.__all__ is missing 'Config'; add it to __all__ in invoke/__init__.py so it is an explicit re-export",
+   "tests.test_public_exports::test_invoke_export_list_includes_expected_name[Context]": "AssertionError: invoke.__all__ is missing 'Context'; add it to __all__ in invoke/__init__.py so it is an explicit re-export",
+   "tests.test_public_exports::test_invoke_export_list_includes_expected_name[Executor]": "AssertionError: invoke.__all__ is missing 'Executor'; add it to __all__ in invoke/__init__.py so it is an explicit re-export",
+   "tests.test_public_exports::test_invoke_export_list_includes_expected_name[Exit]": "AssertionError: invoke.__all__ is missing 'Exit'; add it to __all__ in invoke/__init__.py so it is an explicit re-export",
+   "tests.test_public_exports::test_invoke_export_list_includes_expected_name[Failure]": "AssertionError: invoke.__all__ is missing 'Failure'; add it to __all__ in invoke/__init__.py so it is an explicit re-export",
+   "tests.test_public_exports::test_invoke_export_list_includes_expected_name[Local]": "AssertionError: invoke.__all__ is missing 'Local'; add it to __all__ in invoke/__init__.py so it is an explicit re-export",
+   "tests.test_public_exports::test_invoke_export_list_includes_expected_name[MockContext]": "AssertionError: invoke.__all__ is missing 'MockContext'; add it to __all__ in invoke/__init__.py so it is an explicit re-export",
+   "tests.test_public_exports::test_invoke_export_list_includes_expected_name[ParseResult]": "AssertionError: invoke.__all__ is missing 'ParseResult'; add it to __all__ in invoke/__init__.py so it is an explicit re-export",
+   "tests.test_public_exports::test_invoke_export_list_includes_expected_name[ParserContext]": "AssertionError: invoke.__all__ is missing 'ParserContext'; add it to __all__ in invoke/__init__.py so it is an explicit re-export",
+   "tests.test_public_exports::test_invoke_export_list_includes_expected_name[Parser]": "AssertionError: invoke.__all__ is missing 'Parser'; add it to __all__ in invoke/__init__.py so it is an explicit re-export",
+   "tests.test_public_exports::test_invoke_export_list_includes_expected_name[Program]": "AssertionError: invoke.__all__ is missing 'Program'; add it to __all__ in invoke/__init__.py so it is an explicit re-export",
+   "tests.test_public_exports::test_invoke_export_list_includes_expected_name[Responder]": "AssertionError: invoke.__all__ is missing 'Responder'; add it to __all__ in invoke/__init__.py so it is an explicit re-export",
+   "tests.test_public_exports::test_invoke_export_list_includes_expected_name[Result]": "AssertionError: invoke.__all__ is missing 'Result'; add it to __all__ in invoke/__init__.py so it is an explicit re-export",
+   "tests.test_public_exports::test_invoke_export_list_includes_expected_name[Runner]": "AssertionError: invoke.__all__ is missing 'Runner'; add it to __all__ in invoke/__init__.py so it is an explicit re-export",
+   "tests.test_public_exports::test_invoke_export_list_includes_expected_name[Task]": "AssertionError: invoke.__all__ is missing 'Task'; add it to __all__ in invoke/__init__.py so it is an explicit re-export",
+   "tests.test_public_exports::test_invoke_export_list_includes_expected_name[call]": "AssertionError: invoke.__all__ is missing 'call'; add it to __all__ in invoke/__init__.py so it is an explicit re-export",
+   "tests.test_public_exports::test_invoke_export_list_includes_expected_name[pty_size]": "AssertionError: invoke.__all__ is missing 'pty_size'; add it to __all__ in invoke/__init__.py so it is an explicit re-export",
+   "tests.test_public_exports::test_invoke_export_list_includes_expected_name[task]": "AssertionError: invoke.__all__ is missing 'task'; add it to __all__ in invoke/__init__.py so it is an explicit re-export",
+   "tests.test_public_exports::test_invoke_star_import_exposes_task_without_leaking_internals": "AssertionError: 'from invoke import *' leaked 'metadata'; fix by defining __all__ in invoke/__init__.py containing only the public API",
+   "tests.test_public_exports::test_parser_defines_explicit_export_list": "AssertionError: invoke.parser must define __all__ listing its public re-exports so mypy --no-implicit-reexport accepts its consumers; fix by defining __all__ in invoke/parser/__init__.py",
+   "tests.test_public_exports::test_parser_export_list_includes_expected_name[Argument]": "AssertionError: invoke.parser.__all__ is missing 'Argument'; add it to __all__ in invoke/parser/__init__.py so it is an explicit re-export",
+   "tests.test_public_exports::test_parser_export_list_includes_expected_name[Context]": "AssertionError: invoke.parser.__all__ is missing 'Context'; add it to __all__ in invoke/parser/__init__.py so it is an explicit re-export",
+   "tests.test_public_exports::test_parser_export_list_includes_expected_name[ParseResult]": "AssertionError: invoke.parser.__all__ is missing 'ParseResult'; add it to __all__ in invoke/parser/__init__.py so it is an explicit re-export",
+   "tests.test_public_exports::test_parser_export_list_includes_expected_name[ParserContext]": "AssertionError: invoke.parser.__all__ is missing 'ParserContext'; add it to __all__ in invoke/parser/__init__.py so it is an explicit re-export",
+   "tests.test_public_exports::test_parser_export_list_includes_expected_name[Parser]": "AssertionError: invoke.parser.__all__ is missing 'Parser'; add it to __all__ in invoke/parser/__init__.py so it is an explicit re-export",
+   "tests.test_public_exports::test_parser_export_list_includes_expected_name[to_flag]": "AssertionError: invoke.parser.__all__ is missing 'to_flag'; add it to __all__ in invoke/parser/__init__.py so it is an explicit re-export",
+   "tests.test_public_exports::test_parser_export_list_includes_expected_name[translate_underscores]": "AssertionError: invoke.parser.__all__ is missing 'translate_underscores'; add it to __all__ in invoke/parser/__init__.py so it is an explicit re-export"
+  }
+ },
+ "exit_check": {
+  "explained": true,
+  "problems": [],
+  "detail": "pytest exit 1; 8 failure(s)/error(s) pre-existing and identical on both sides"
+ },
+ "verdict_before_coverage_gate": "needs_attention",
+ "reason_before_coverage_gate": "probe: 8 observation(s) need attention: c1.invoke_explicit_task_import_ok does not differ although the claim says it does (C1); c1.invoke_star_has_task does not differ although the claim says it does (C1); c4.parser_all_contains_context differs although the claim says it does not (C4); c4.parser_all_contains_parser differs although the claim says it does not (C4); probe model-p1 has no measured line coverage (no coverage data); it does not count as covering the change; tests: 32 test(s) fail on main and pass on the PR; 204 test(s) ran on main, 204 on the PR; 0 new test(s) pass, 165 unchanged (1 of them skipped on both sides); 8 test failure(s) pre-existing and identical on both sides",
+ "changed_lines_total": 19,
+ "changed_lines_covered": 19,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "normal",
+  "note": "19 of 19 changed executable line(s) ran (100%)",
+  "measurement": "measured"
+ },
+ "agents": {
+  "status": "skipped",
+  "note": "advisory swarm is off",
+  "roles": []
+ },
+ "explanation": {
+  "status": "not yet wired",
+  "why": "advisory swarm is off"
+ },
+ "swarm_requested": false,
+ "operator_approval_requested": false,
+ "swarm": "off",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [
+   "invoke/__init__.py",
+   "invoke/parser/__init__.py"
+  ],
+  "compiled_files": [],
+  "other_files": [
+   "tests/test_public_exports.py"
+  ]
+ },
+ "duration_s": {
+  "total_wall": 296.9,
+  "tests": 12.2
+ },
+ "cost": {
+  "ai_calls": 3,
+  "failed_ai_calls": 0,
+  "input_tokens": 7088,
+  "output_tokens": 28494,
+  "thinking_tokens": 26417,
+  "cost_usd": 0.027771,
+  "calls_without_usage": 0,
+  "ai_cost_usd": 0.027771,
+  "cost_complete": true,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 296.9,
+   "tests": 12.2
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.019793,
+  "total_cost_usd": 0.047564,
+  "swarm": {
+   "ai_calls": 0,
+   "failed_ai_calls": 0,
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "thinking_tokens": 0,
+   "cost_usd": 0.0,
+   "calls_without_usage": 0,
+   "ai_cost_usd": 0.0,
+   "cost_complete": true,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ },
+ "pdf_push": {
+  "ok": true,
+  "attempts": 1,
+  "error": null,
+  "url": "https://github.com/aritracodesbad123/Proof-of-change/tree/runs/runs/2026-11-04/985a7ea/invoke-1099"
+ }
+}

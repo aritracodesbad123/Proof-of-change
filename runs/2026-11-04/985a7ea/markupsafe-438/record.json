@@ -1,0 +1,1087 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-pallets-markupsafe-438-e395cfa3fbca-2026-11-04",
+ "date_ist": "2026-11-04 14:38 IST",
+ "run_date": "2026-11-04",
+ "who": "ops/daily_run.py",
+ "repo": "pallets/markupsafe",
+ "library": "markupsafe",
+ "pr": {
+  "repo": "pallets/markupsafe",
+  "number": 438,
+  "url": "https://github.com/pallets/markupsafe/pull/438",
+  "title": "implement speedups with rust v2",
+  "base_sha": "dfa58162f6ba9a0afebab7e924af362cd0bede66",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "e395cfa3fbca7edd7c7d29247e39eda16b472941",
+  "merge_commit": "da5d908658bf661160b3438aeec1871a08eb32c7",
+  "tested_main_sha": "4e111271b1494995708a9e878a10829b5e10c7ba",
+  "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+ },
+ "author": "carsonburr",
+ "base_ref": "main",
+ "updated_at_utc": "2025-05-29T04:09:28Z",
+ "updated_at_ist": "2025-05-29 09:39 IST",
+ "ci_state": "none",
+ "ci_detail": "no check runs visible",
+ "tested_at_ist": "2026-11-04 14:38 IST",
+ "files": {
+  "all": [
+   ".gitignore",
+   "MANIFEST.in",
+   "bench.py",
+   "pyproject.toml",
+   "setup.py",
+   "src/markupsafe/__init__.py",
+   "src/markupsafe/_rust_speedups.pyi",
+   "src/rust/Cargo.lock",
+   "src/rust/Cargo.toml",
+   "src/rust/src/lib.rs"
+  ],
+  "package_py": [
+   "src/markupsafe/__init__.py",
+   "src/markupsafe/_rust_speedups.pyi"
+  ],
+  "compiled": [
+   "pyproject.toml",
+   "setup.py"
+  ],
+  "other": [
+   ".gitignore",
+   "MANIFEST.in",
+   "bench.py",
+   "src/rust/Cargo.lock",
+   "src/rust/Cargo.toml",
+   "src/rust/src/lib.rs"
+  ]
+ },
+ "machine_type": {
+  "arch": "x86_64",
+  "os": "Linux",
+  "platform": "Linux-6.12.94+-x86_64-with-glibc2.41",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": null,
+  "cpu_model": "Intel(R) Xeon(R) Processor",
+  "ram_gb": 15.6
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 3,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.15",
+ "test_selection": "mapped from touched files: tests/test_escape.py, tests/test_exception_custom_html.py",
+ "per_run": [
+  {
+   "side": "old",
+   "run": 1,
+   "passed": 26,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.1,
+   "pytest_summary": "26 passed in 0.60s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 1,
+   "passed": 26,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.1,
+   "pytest_summary": "26 passed in 0.61s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 2,
+   "passed": 26,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.1,
+   "pytest_summary": "26 passed in 0.64s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 2,
+   "passed": 26,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.1,
+   "pytest_summary": "26 passed in 0.66s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 3,
+   "passed": 26,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.1,
+   "pytest_summary": "26 passed in 0.59s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 3,
+   "passed": 26,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.1,
+   "pytest_summary": "26 passed in 0.63s",
+   "junit": true
+  }
+ ],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "local",
+ "sandbox_backend_note": "local bubblewrap",
+ "machine": "local",
+ "tool_setup": {
+  "installed": [],
+  "tries": 0,
+  "note": "All required tools were already installed.",
+  "refused": []
+ },
+ "posted_upstream": false,
+ "logs": "markupsafe-438/",
+ "freeze": {
+  "main": "freeze-main.txt",
+  "pr": "freeze-pr.txt"
+ },
+ "coverage": {
+  "status": "measured",
+  "changed_lines_total": 2,
+  "changed_lines_covered": 1,
+  "files": [
+   {
+    "file": "bench.py",
+    "changed_lines_total": 1,
+    "changed_lines_covered": 0
+   },
+   {
+    "file": "src/markupsafe/__init__.py",
+    "changed_lines_total": 1,
+    "changed_lines_covered": 1
+   }
+  ],
+  "seconds": 1.5,
+  "exit": 0,
+  "log": "coverage-pytest.log"
+ },
+ "poc_commit": "985a7eade681b1d88256d5a185e129da53855144",
+ "route": "source-pair",
+ "current_head_sha": "e395cfa3fbca7edd7c7d29247e39eda16b472941",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": "[redacted]",
+  "notes": [
+   "Setup check: GitHub token: present.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory 3.4 GB (of 15.6 GB).",
+   "Setup check: free disk 94.7 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: [redacted] results",
+   "Query: markupsafe python setup install instructions https://github.com/pallets/markupsafe site:github.com/pallets/markupsafe",
+   "Query: markupsafe python documentation install https://github.com/pallets/markupsafe site:github.com/pallets/markupsafe",
+   "Query: markupsafe python install requirements https://pypi.org/project/markupsafe/ https://github.com/pallets/markupsafe site:pypi.org",
+   "Source: markupsafe/pyproject.toml at main \u00b7 pallets/markupsafe \u00b7 GitHub \u2014 https://github.com/pallets/markupsafe/blob/main/pyproject.toml",
+   "Source: MarkupSafe \u00b7 PyPI \u2014 https://pypi.org/project/markupsafe/",
+   "Source: Installing MarkupSafe-2.0.1 on macOS 11.5 \u00b7 Issue #241 \u00b7 pallets/markupsafe \u00b7 GitHub \u2014 https://github.com/pallets/markupsafe/issues/241",
+   "Source: Fail to install MarkupSafe \u00b7 Issue #167 \u00b7 pallets/markupsafe \u00b7 GitHub \u2014 https://github.com/pallets/markupsafe/issues/167",
+   "Source: \"No module named 'markupsafe'\" when installing MarkupSafe \u00b7 Issue #285 \u00b7 pallets/markupsafe \u00b7 GitHub \u2014 https://github.com/pallets/markupsafe/issues/285",
+   "Source: No module named 'markupsafe' when installing MarkupSafe >= 2.1.0 \u00b7 Issue #289 \u00b7 pallets/markupsafe \u00b7 GitHub \u2014 https://github.com/pallets/markupsafe/issues/289",
+   "Source: bug in pre-release \u00b7 Issue #118 \u00b7 pallets/markupsafe \u00b7 GitHub \u2014 https://github.com/pallets/markupsafe/issues/118",
+   "Setup plan: the PR changes install docs (pyproject.toml, setup.py); setup was read from main's copy and applied the same on both sides.",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: install pytest (listed in the tests extra) on main and pr.",
+   "Setup plan: install pytest-run-parallel; python_full_version >= '3.13' (listed in the tests extra) on main and pr.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >=3.11, >=3.9",
+   "Installed pytest 9.2.0 from pyproject (listed in the tests extra) on main and pr.",
+   "Installed pytest-run-parallel  from pyproject (listed in the tests extra) on main and pr."
+  ],
+  "install_docs": [
+   "setup.py",
+   "README.md",
+   "pyproject.toml",
+   "docs/Makefile",
+   ".github/workflows/pre-commit.yaml",
+   ".github/workflows/publish.yaml",
+   ".github/workflows/zizmor.yaml",
+   ".github/workflows/tests.yaml",
+   ".github/workflows/lock.yaml"
+  ],
+  "install_docs_from": "main",
+  "install_docs_pr_changed": [
+   "pyproject.toml",
+   "setup.py"
+  ],
+  "setup_plan": {
+   "packages": [
+    {
+     "requirement": "pytest",
+     "name": "pytest",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the tests extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest-run-parallel; python_full_version >= '3.13'",
+     "name": "pytest-run-parallel",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the tests extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    }
+   ],
+   "scope_blocked": "",
+   "component": null,
+   "aggregate_names": [],
+   "extra_reqs": [
+    "pytest",
+    "pytest-run-parallel; python_full_version >= '3.13'"
+   ],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >=3.11, >=3.9"
+   },
+   "system": [],
+   "refused": [],
+   "groups_blocked": ""
+  },
+  "steps": {
+   "setup_lookup": "Found 2 setup item(s) in the project's files and the web lookup.",
+   "setup_python": "Python 3.12: Python 3.12 already meets >=3.11, >=3.9",
+   "install_deps": "Wrote requirements.txt and installed it on main and pr: pytest, pytest-run-parallel; python_full_version >= '3.13'."
+  },
+  "run_files": {
+   "requirements": "requirements.txt",
+   "plan": "setup-plan.json",
+   "count": 2
+  },
+  "installs": [
+   {
+    "package": "pytest",
+    "requirement": "pytest",
+    "version": "9.2.0",
+    "versions": {
+     "main": "9.2.0",
+     "pr": "9.2.0"
+    },
+    "source": "pyproject",
+    "reason": "listed in the tests extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "pytest-run-parallel",
+    "requirement": "pytest-run-parallel; python_full_version >= '3.13'",
+    "version": "",
+    "versions": {
+     "main": "",
+     "pr": ""
+    },
+    "source": "pyproject",
+    "reason": "listed in the tests extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   }
+  ]
+ },
+ "sides": {
+  "comparison_basis": "base tip vs GitHub test merge (refs/pull/N/merge)",
+  "main_sha": "4e111271b1494995708a9e878a10829b5e10c7ba",
+  "pr_sha": "da5d908658bf661160b3438aeec1871a08eb32c7",
+  "merge_commit": "da5d908658bf661160b3438aeec1871a08eb32c7",
+  "merge_parents": [
+   "4e111271b1494995708a9e878a10829b5e10c7ba",
+   "e395cfa3fbca7edd7c7d29247e39eda16b472941"
+  ],
+  "merge_head_matches_pinned_head": true
+ },
+ "tested": {
+  "main": "main @ 4e111271b149 (base tip = first parent of the merge commit)",
+  "pr": "GitHub test merge commit da5d908658bf (refs/pull/438/merge) of head e395cfa3fbca"
+ },
+ "probe_plan": {
+  "baseline": "full",
+  "model": "model provider: nebius (Token Factory, live)",
+  "errors": [],
+  "model_claims": [
+   {
+    "id": "C1",
+    "text": "`pip install -e .` in a virtualenv should build src/markupsafe/_rust_speedups.???.so, assuming you have Rust installed.",
+    "source_quote": "`pip install -e .` in a virtualenv should build src/markupsafe/_rust_speedups.???.so, assuming you have Rust installed.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C2",
+    "text": "`python bench.py` to run all benchmarks, rust included.",
+    "source_quote": "`python bench.py` to run all benchmarks, rust included.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C3",
+    "text": "rust_speedups reduces mean time for short escape compared to native (522 ns < 656 ns).",
+    "source_quote": "short escape rust_speedups: Mean +- std dev: 522 ns +- 15 ns",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C4",
+    "text": "rust_speedups reduces mean time for long escape compared to native (6.71 us < 17.3 us).",
+    "source_quote": "long escape rust_speedups: Mean +- std dev: 6.71 us +- 0.08 us",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C5",
+    "text": "rust_speedups reduces mean time for short plain compared to native (401 ns < 505 ns).",
+    "source_quote": "short plain rust_speedups: Mean +- std dev: 401 ns +- 4 ns",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C6",
+    "text": "rust_speedups reduces mean time for long plain compared to native (6.73 us < 17.2 us).",
+    "source_quote": "long plain rust_speedups: Mean +- std dev: 6.73 us +- 0.15 us",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C7",
+    "text": "rust_speedups reduces mean time for long suffix compared to native (58.3 us < 134 us).",
+    "source_quote": "long suffix rust_speedups: Mean +- std dev: 58.3 us +- 1.2 us",
+    "testable": true,
+    "expect": "differs"
+   }
+  ],
+  "model_rejected_claims": [],
+  "model_retried": {
+   "why": [
+    "no probe listed the claim ids it checks, so its results could not be tied to any claim; in each probe, \"claims\" must name the claim ids it checks and the observation names that cover them"
+   ]
+  },
+  "diff_targets": [],
+  "frozen": [
+   {
+    "path": "model-probes/model-probe-a.py",
+    "source": "model",
+    "sha256": "28987a147bab5dd802f000be3488d1b76a680137fa3cb6212c4c01362ee60082",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-04T09:09:50.708972+00:00",
+    "inputs_sha256": "7334d7ebd36b95bd1cc4dd1b252d74b53a59768b5430698c956df9117f8190e2",
+    "inputs": {
+     "title_chars": 31,
+     "body_chars": 1120,
+     "base_files": {
+      "bench.py": "a6ee8de5384f23129a36823f2834212ca614074a52dc6941e604c5d2d26929fb",
+      "src/markupsafe/__init__.py": "310afadaabdd94a53d5b57c84cbd56b1ebe1877454be8ba986237d142e533df0"
+     }
+    }
+   },
+   {
+    "path": "model-probes/model-probe-b.py",
+    "source": "model",
+    "sha256": "98b1ea6110022babba353c89f5294b1572df96e281e31f14ec13a2a2607a38c0",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-04T09:09:50.709175+00:00",
+    "inputs_sha256": "7334d7ebd36b95bd1cc4dd1b252d74b53a59768b5430698c956df9117f8190e2",
+    "inputs": {
+     "title_chars": 31,
+     "body_chars": 1120,
+     "base_files": {
+      "bench.py": "a6ee8de5384f23129a36823f2834212ca614074a52dc6941e604c5d2d26929fb",
+      "src/markupsafe/__init__.py": "310afadaabdd94a53d5b57c84cbd56b1ebe1877454be8ba986237d142e533df0"
+     }
+    }
+   }
+  ]
+ },
+ "test_extras": [
+  "pytest-run-parallel; python_full_version >= '3.13'"
+ ],
+ "pr_side_started_at": "2026-11-04T09:09:50.854074+00:00",
+ "test_targets": {
+  "main": [
+   "tests/test_escape.py",
+   "tests/test_exception_custom_html.py"
+  ],
+  "pr": [
+   "tests/test_escape.py",
+   "tests/test_exception_custom_html.py"
+  ]
+ },
+ "installed_commit": {
+  "main": {
+   "dist": "MarkupSafe",
+   "expected": "4e111271b1494995708a9e878a10829b5e10c7ba",
+   "installed": "4e111271b1494995708a9e878a10829b5e10c7ba",
+   "ok": true
+  },
+  "pr": {
+   "dist": "MarkupSafe",
+   "expected": "da5d908658bf661160b3438aeec1871a08eb32c7",
+   "installed": "da5d908658bf661160b3438aeec1871a08eb32c7",
+   "ok": true
+  }
+ },
+ "declared_test_deps": {
+  "requested": [
+   "pytest-run-parallel; python_full_version >= '3.13'"
+  ],
+  "installed": true
+ },
+ "comparison": {
+  "same": 26,
+  "same_skipped_both": 0,
+  "regressions": [],
+  "fixed": [],
+  "new_tests_passing": 0,
+  "new_tests_passing_ids": [],
+  "new_tests_failing": [],
+  "new_tests_skipped": [],
+  "removed_tests": [],
+  "reparametrized": [],
+  "skipped_missing_dependency": [],
+  "flaky": [],
+  "pr_unstable": [],
+  "pr_unstable_noisy": [],
+  "environment": [],
+  "other_changes": [],
+  "preexisting_failures": [],
+  "load_failed_both": [],
+  "load_failed_pr": [],
+  "load_failed_main": [],
+  "executed": {
+   "main": 26,
+   "pr": 26
+  },
+  "messages": {}
+ },
+ "exit_check": {
+  "explained": true,
+  "problems": [],
+  "detail": "all runs exited 0"
+ },
+ "probes": {
+  "status": "ran",
+  "items": [
+   {
+    "id": "model-probe-a",
+    "source": "model",
+    "path": "model-probes/model-probe-a.py",
+    "sha256": "28987a147bab5dd802f000be3488d1b76a680137fa3cb6212c4c01362ee60082",
+    "target": "pallets/markupsafe#438",
+    "about": "Check existence of rust speedups module.",
+    "claims": [
+     {
+      "id": "C1",
+      "source": "PR description",
+      "text": "`pip install -e .` in a virtualenv should build src/markupsafe/_rust_speedups.???.so, assuming you have Rust installed.",
+      "covers": [
+       "c1.module_exists"
+      ],
+      "expect": "differs"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.0,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-probe-a-main-1.jsonl",
+      "probe-model-probe-a-main-2.jsonl",
+      "probe-model-probe-a-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-probe-a-pr-1.jsonl",
+      "probe-model-probe-a-pr-2.jsonl",
+      "probe-model-probe-a-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "c1.module_exists": false,
+       "c1.error": "ModuleNotFoundError"
+      },
+      {
+       "c1.module_exists": false,
+       "c1.error": "ModuleNotFoundError"
+      },
+      {
+       "c1.module_exists": false,
+       "c1.error": "ModuleNotFoundError"
+      }
+     ],
+     "pr": [
+      {
+       "c1.module_exists": true
+      },
+      {
+       "c1.module_exists": true
+      },
+      {
+       "c1.module_exists": true
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "c1.error",
+      "state": "differs",
+      "label": "unmentioned",
+      "claim": null,
+      "main": "ModuleNotFoundError",
+      "pr": "<absent>",
+      "advisory": true,
+      "linked_by": "id",
+      "diffs": [
+       {
+        "field": "",
+        "main": "ModuleNotFoundError",
+        "pr": "<absent>"
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe-a-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c1.error\""
+       }
+      }
+     },
+     {
+      "name": "c1.module_exists",
+      "state": "differs",
+      "label": "proven",
+      "claim": "C1",
+      "main": false,
+      "pr": true,
+      "diffs": [
+       {
+        "field": "",
+        "main": false,
+        "pr": true
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe-a-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c1.module_exists\""
+       },
+       "pr": {
+        "file": "probe-model-probe-a-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c1.module_exists\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "28987a147bab5dd802f000be3488d1b76a680137fa3cb6212c4c01362ee60082",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-04T09:09:50.708972+00:00",
+     "inputs_sha256": "7334d7ebd36b95bd1cc4dd1b252d74b53a59768b5430698c956df9117f8190e2",
+     "inputs": {
+      "title_chars": 31,
+      "body_chars": 1120,
+      "base_files": {
+       "bench.py": "a6ee8de5384f23129a36823f2834212ca614074a52dc6941e604c5d2d26929fb",
+       "src/markupsafe/__init__.py": "310afadaabdd94a53d5b57c84cbd56b1ebe1877454be8ba986237d142e533df0"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-04T09:09:50.854074+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 1,
+     "changed_lines_covered": 1,
+     "files": [
+      {
+       "file": "bench.py",
+       "changed_lines_total": null,
+       "changed_lines_covered": null,
+       "note": "file not measured by coverage"
+      },
+      {
+       "file": "src/markupsafe/__init__.py",
+       "changed_lines_total": 1,
+       "changed_lines_covered": 1
+      }
+     ],
+     "adequacy": "adequate",
+     "note": "ran 1 of 1 changed line(s) on the main side",
+     "exit": 0,
+     "data": "probe-cov-model-probe-a.json"
+    },
+    "status": "ran"
+   },
+   {
+    "id": "model-probe-b",
+    "source": "model",
+    "path": "model-probes/model-probe-b.py",
+    "sha256": "98b1ea6110022babba353c89f5294b1572df96e281e31f14ec13a2a2607a38c0",
+    "target": "pallets/markupsafe#438",
+    "about": "Run bench.py and collect timings for rust_speedups vs native.",
+    "claims": [
+     {
+      "id": "C2",
+      "source": "PR description",
+      "text": "`python bench.py` to run all benchmarks, rust included.",
+      "covers": [
+       "c2.rust_in_output"
+      ],
+      "expect": "differs"
+     },
+     {
+      "id": "C3",
+      "source": "PR description",
+      "text": "rust_speedups reduces mean time for short escape compared to native (522 ns < 656 ns).",
+      "covers": [
+       "c3.short_escape_native_mean_ns",
+       "c3.short_escape_rust_mean_ns"
+      ],
+      "expect": "differs"
+     },
+     {
+      "id": "C4",
+      "source": "PR description",
+      "text": "rust_speedups reduces mean time for long escape compared to native (6.71 us < 17.3 us).",
+      "covers": [
+       "c4.long_escape_native_mean_us",
+       "c4.long_escape_rust_mean_us"
+      ],
+      "expect": "differs"
+     },
+     {
+      "id": "C5",
+      "source": "PR description",
+      "text": "rust_speedups reduces mean time for short plain compared to native (401 ns < 505 ns).",
+      "covers": [
+       "c5.short_plain_native_mean_ns",
+       "c5.short_plain_rust_mean_ns"
+      ],
+      "expect": "differs"
+     },
+     {
+      "id": "C6",
+      "source": "PR description",
+      "text": "rust_speedups reduces mean time for long plain compared to native (6.73 us < 17.2 us).",
+      "covers": [
+       "c6.long_plain_native_mean_us",
+       "c6.long_plain_rust_mean_us"
+      ],
+      "expect": "differs"
+     },
+     {
+      "id": "C7",
+      "source": "PR description",
+      "text": "rust_speedups reduces mean time for long suffix compared to native (58.3 us < 134 us).",
+      "covers": [
+       "c7.long_suffix_native_mean_us",
+       "c7.long_suffix_rust_mean_us"
+      ],
+      "expect": "differs"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-probe-b-main-1.jsonl",
+      "probe-model-probe-b-main-2.jsonl",
+      "probe-model-probe-b-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-probe-b-pr-1.jsonl",
+      "probe-model-probe-b-pr-2.jsonl",
+      "probe-model-probe-b-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "c2.rust_in_output": false
+      },
+      {
+       "c2.rust_in_output": false
+      },
+      {
+       "c2.rust_in_output": false
+      }
+     ],
+     "pr": [
+      {
+       "c2.rust_in_output": false
+      },
+      {
+       "c2.rust_in_output": false
+      },
+      {
+       "c2.rust_in_output": false
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "c2.rust_in_output",
+      "state": "same",
+      "label": "needs_human",
+      "claim": "C2",
+      "main": false,
+      "pr": false,
+      "citations": {
+       "main": {
+        "file": "probe-model-probe-b-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c2.rust_in_output\""
+       },
+       "pr": {
+        "file": "probe-model-probe-b-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c2.rust_in_output\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "98b1ea6110022babba353c89f5294b1572df96e281e31f14ec13a2a2607a38c0",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-04T09:09:50.709175+00:00",
+     "inputs_sha256": "7334d7ebd36b95bd1cc4dd1b252d74b53a59768b5430698c956df9117f8190e2",
+     "inputs": {
+      "title_chars": 31,
+      "body_chars": 1120,
+      "base_files": {
+       "bench.py": "a6ee8de5384f23129a36823f2834212ca614074a52dc6941e604c5d2d26929fb",
+       "src/markupsafe/__init__.py": "310afadaabdd94a53d5b57c84cbd56b1ebe1877454be8ba986237d142e533df0"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-04T09:09:50.854074+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "not measured",
+     "why": "coverage produced no data (exit 0); see probe-coverage.log",
+     "adequacy": "unmeasured",
+     "note": "probe coverage not measured (coverage produced no data (exit 0); see probe-coverage.log)"
+    },
+    "status": "ran"
+   }
+  ],
+  "summary": {
+   "labels": [
+    "unmentioned",
+    "proven",
+    "needs_human"
+   ],
+   "flagged": [],
+   "proven_claims": [
+    "C1"
+   ],
+   "reason": "probe: 1 difference(s) no linked claim covers, shown as advisory only: c1.error; probe: 1 observation(s) shown as advisory only (claim not shown on these inputs; a related change was proven): c2.rust_in_output (C2); probe: claim(s) C1 proven",
+   "ignored_noise": [],
+   "ignored_warning_only": [],
+   "pr_only_noisy": [],
+   "advisory_unchanged_subchecks": [],
+   "advisory_agreeing_differs": [
+    "c2.rust_in_output"
+   ]
+  }
+ },
+ "probe_changed_line_coverage": {
+  "status": "partly measured",
+  "side": "main",
+  "probes": {
+   "model-probe-a": {
+    "status": "measured",
+    "changed_lines_covered": 1,
+    "changed_lines_total": 1,
+    "adequacy": "adequate"
+   },
+   "model-probe-b": {
+    "status": "not measured",
+    "changed_lines_covered": null,
+    "changed_lines_total": null,
+    "adequacy": "unmeasured"
+   }
+  },
+  "not_adequate": []
+ },
+ "verdict": "could_not_verify",
+ "reason": "could not verify: claim(s) C3, C4, C5, C6 (+1 more) expect a difference but no observation matches (26 test(s) ran on main, 26 on the PR; 0 new test(s) pass, 26 unchanged; probe: 1 difference(s) no linked claim covers, shown as advisory only: c1.error; probe: 1 observation(s) shown as advisory only (claim not shown on these inputs; a related change was proven): c2.rust_in_output (C2); probe: claim(s) C1 proven; probe model-probe-b has no measured line coverage (coverage produced no data (exit 0); see probe-coverage.log); it does not count as covering the change)",
+ "verdict_before_coverage_gate": "could_not_verify",
+ "reason_before_coverage_gate": "could not verify: claim(s) C3, C4, C5, C6 (+1 more) expect a difference but no observation matches (26 test(s) ran on main, 26 on the PR; 0 new test(s) pass, 26 unchanged; probe: 1 difference(s) no linked claim covers, shown as advisory only: c1.error; probe: 1 observation(s) shown as advisory only (claim not shown on these inputs; a related change was proven): c2.rust_in_output (C2); probe: claim(s) C1 proven; probe model-probe-b has no measured line coverage (coverage produced no data (exit 0); see probe-coverage.log); it does not count as covering the change)",
+ "changed_lines_total": 2,
+ "changed_lines_covered": 1,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "normal",
+  "note": "1 of 2 changed executable line(s) ran (50%)",
+  "measurement": "measured"
+ },
+ "agents": {
+  "status": "skipped",
+  "note": "advisory swarm is off",
+  "roles": []
+ },
+ "explanation": {
+  "status": "not yet wired",
+  "why": "advisory swarm is off"
+ },
+ "swarm_requested": false,
+ "operator_approval_requested": false,
+ "swarm": "off",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [
+   "src/markupsafe/__init__.py",
+   "src/markupsafe/_rust_speedups.pyi"
+  ],
+  "compiled_files": [
+   "pyproject.toml",
+   "setup.py"
+  ],
+  "other_files": [
+   ".gitignore",
+   "MANIFEST.in",
+   "bench.py",
+   "src/rust/Cargo.lock",
+   "src/rust/Cargo.toml",
+   "src/rust/src/lib.rs"
+  ]
+ },
+ "duration_s": {
+  "total_wall": 125.8,
+  "tests": 6.6
+ },
+ "cost": {
+  "ai_calls": 3,
+  "failed_ai_calls": 0,
+  "input_tokens": 11259,
+  "output_tokens": 12397,
+  "thinking_tokens": 9828,
+  "cost_usd": 0.014535,
+  "calls_without_usage": 0,
+  "ai_cost_usd": 0.014535,
+  "cost_complete": true,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 125.8,
+   "tests": 6.6
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.008387,
+  "total_cost_usd": 0.022922,
+  "swarm": {
+   "ai_calls": 0,
+   "failed_ai_calls": 0,
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "thinking_tokens": 0,
+   "cost_usd": 0.0,
+   "calls_without_usage": 0,
+   "ai_cost_usd": 0.0,
+   "cost_complete": true,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ },
+ "pdf_push": {
+  "ok": true,
+  "attempts": 1,
+  "error": null,
+  "url": "https://github.com/aritracodesbad123/Proof-of-change/tree/runs/runs/2026-11-04/985a7ea/markupsafe-438"
+ }
+}
