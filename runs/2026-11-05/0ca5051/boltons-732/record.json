@@ -1,0 +1,975 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-mahmoud-boltons-732-7d74a6a63266-2026-11-05-fix85-boltons-732",
+ "date_ist": "2026-11-05 12:50 IST",
+ "run_date": "2026-11-05",
+ "who": "ops/daily_run.py",
+ "repo": "mahmoud/boltons",
+ "library": "boltons",
+ "pr": {
+  "repo": "mahmoud/boltons",
+  "number": 732,
+  "url": "https://github.com/mahmoud/boltons/pull/732",
+  "title": "Parse adjacent timedelta values without losing units",
+  "base_sha": "d31d821d56c8f7756af9c30a864077f2e5855321",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "7d74a6a63266a1d7b6d4da046482c5d0d41d5a5f",
+  "merge_commit": null,
+  "tested_main_sha": "d31d821d56c8f7756af9c30a864077f2e5855321",
+  "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+ },
+ "author": "Lushiyao5",
+ "base_ref": "master",
+ "updated_at_utc": "2026-11-04T09:10:32Z",
+ "updated_at_ist": "2026-11-04 14:40 IST",
+ "ci_state": "not checked (single-PR check)",
+ "ci_detail": "checked on request with --pr",
+ "tested_at_ist": "2026-11-05 12:50 IST",
+ "files": {
+  "all": [
+   "boltons/timeutils.py",
+   "tests/test_timeutils.py"
+  ],
+  "package_py": [
+   "boltons/timeutils.py"
+  ],
+  "compiled": [],
+  "other": [
+   "tests/test_timeutils.py"
+  ]
+ },
+ "machine_type": {
+  "arch": "x86_64",
+  "os": "Linux",
+  "platform": "Linux-6.12.94+-x86_64-with-glibc2.41",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": null,
+  "cpu_model": "Intel(R) Xeon(R) Processor",
+  "ram_gb": 15.6
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 1,
+ "runs_per_side_planned": 1,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.15",
+ "test_selection": "mapped from touched files: tests/test_timeutils.py",
+ "per_run": [
+  {
+   "side": "old",
+   "run": 1,
+   "passed": 17,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.2,
+   "pytest_summary": "17 passed in 0.63s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 1,
+   "passed": 18,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.1,
+   "pytest_summary": "18 passed in 0.63s",
+   "junit": true
+  }
+ ],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "local",
+ "sandbox_backend_note": "local bubblewrap",
+ "machine": "local",
+ "tool_setup": {
+  "installed": [],
+  "tries": 0,
+  "note": "All required tools were already installed.",
+  "refused": []
+ },
+ "posted_upstream": false,
+ "logs": "boltons-732/",
+ "freeze": {
+  "main": "freeze-main.txt",
+  "pr": "freeze-pr.txt"
+ },
+ "coverage": {
+  "status": "measured",
+  "changed_lines_total": 13,
+  "changed_lines_covered": 12,
+  "files": [
+   {
+    "file": "boltons/timeutils.py",
+    "changed_lines_total": 13,
+    "changed_lines_covered": 12
+   }
+  ],
+  "seconds": 2.2,
+  "exit": 0,
+  "log": "coverage-pytest.log"
+ },
+ "poc_commit": "0ca5051b97d318fcc8abb64638707a1dd6631665",
+ "route": "source-pair",
+ "current_head_sha": "7d74a6a63266a1d7b6d4da046482c5d0d41d5a5f",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "model_provider_fallback": "the AI answered but no probe was usable, so only fixed probes ran",
+ "head_moved": false,
+ "diff_source": "git diff base_sha head_sha (pinned commits)",
+ "state": "open",
+ "mergeable": true,
+ "mergeable_state": "unstable",
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": "[redacted]",
+  "notes": [
+   "Setup check: GitHub token: present.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory 11.3 GB (of 15.6 GB).",
+   "Setup check: free disk 94.7 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: [redacted] results",
+   "Query: boltons python setup install instructions https://github.com/mahmoud/boltons site:github.com/mahmoud/boltons",
+   "Query: boltons python documentation install https://github.com/mahmoud/boltons site:github.com/mahmoud/boltons",
+   "Query: boltons python install requirements https://pypi.org/project/boltons/ https://github.com/mahmoud/boltons site:pypi.org",
+   "Source: boltons/pyproject.toml at master \u00b7 mahmoud/boltons \u00b7 GitHub \u2014 https://github.com/mahmoud/boltons/blob/master/pyproject.toml",
+   "Source: boltons/README.md at master \u00b7 mahmoud/boltons \u00b7 GitHub \u2014 https://github.com/mahmoud/boltons/blob/master/README.md",
+   "Source: boltons/README.md at 4e5faa3d7e4008d89e0d8bf1ea87b6d9a061a16d \u00b7 mahmoud/boltons \u00b7 GitHub \u2014 https://github.com/mahmoud/boltons/blob/4e5faa3d7e4008d89e0d8bf1ea87b6d9a061a16d/README.md",
+   "Source: boltons \u00b7 PyPI \u2014 https://pypi.org/project/boltons/",
+   "Source: boltons/boltons/ecoutils.py at 4b1d728f31a8378b193be9c966c853be0a57527d \u00b7 mahmoud/boltons \u00b7 GitHub \u2014 https://github.com/mahmoud/boltons/blob/4b1d728f31a8378b193be9c966c853be0a57527d/boltons/ecoutils.py",
+   "Source: boltons/.readthedocs.yaml at master \u00b7 mahmoud/boltons \u00b7 GitHub \u2014 https://github.com/mahmoud/boltons/blob/master/.readthedocs.yaml",
+   "Source: boltons/docs/index.rst at master \u00b7 mahmoud/boltons \u00b7 GitHub \u2014 https://github.com/mahmoud/boltons/blob/master/docs/index.rst",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >=3.7"
+  ],
+  "install_docs": [
+   "README.md",
+   "setup.cfg",
+   "pyproject.toml",
+   "tox.ini",
+   "docs/Makefile",
+   ".github/workflows/publish.yml",
+   ".github/workflows/tests.yaml"
+  ],
+  "install_docs_from": "main",
+  "setup_plan": {
+   "packages": [],
+   "scope_blocked": "",
+   "component": null,
+   "aggregate_names": [],
+   "extra_reqs": [],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >=3.7"
+   },
+   "system": [],
+   "refused": [],
+   "groups_blocked": ""
+  },
+  "steps": {
+   "setup_lookup": "Found 0 setup item(s) in the project's files and the web lookup.",
+   "setup_python": "Python 3.12: Python 3.12 already meets >=3.7",
+   "install_deps": "Nothing extra to install; the project's own install covers it."
+  },
+  "run_files": {
+   "requirements": "requirements.txt",
+   "plan": "setup-plan.json",
+   "count": 0
+  }
+ },
+ "chosen": {
+  "pr": 732,
+  "head_sha": "7d74a6a63266a1d7b6d4da046482c5d0d41d5a5f",
+  "install": null,
+  "test_cmd": null
+ },
+ "sides": {
+  "comparison_basis": "pinned base vs pinned PR head (benchmark case file)",
+  "main_sha": "d31d821d56c8f7756af9c30a864077f2e5855321",
+  "pr_sha": "7d74a6a63266a1d7b6d4da046482c5d0d41d5a5f",
+  "pinned": true
+ },
+ "tested": {
+  "main": "master @ d31d821d56c8 (base tip = first parent of the merge commit)",
+  "pr": "PR head 7d74a6a63266"
+ },
+ "probe_plan": {
+  "baseline": "full",
+  "model": "model provider: nebius (Token Factory, live)",
+  "errors": [
+   "probe 'probe-c1' rejected: empty probe: the code has no test statements (only imports, comments or a docstring)"
+  ],
+  "model_claims": [
+   {
+    "id": "C1",
+    "text": "parse_timedelta('1s2m') returns 0:02:01 (instead of 0:00:01)",
+    "source_quote": "- `parse_timedelta('1s2m')` returned `0:00:01` instead of `0:02:01`.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C2",
+    "text": "parse_timedelta('1h30m45.5s') returns 1:30:45.5 (instead of 1:00:00.5)",
+    "source_quote": "- `parse_timedelta('1h30m45.5s')` returned `1:00:00.5` instead of `1:30:45.5`.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C3",
+    "text": "parse_timedelta('1hour1minute') returns 1:01:00 (instead of 1:00:00)",
+    "source_quote": "- `parse_timedelta('1hour1minute')` returned `1:00:00` instead of `1:01:00`.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C4",
+    "text": "Adjacent units now accumulate correctly (e.g., '1h2m3s' parses as 1h+2m+3s rather than just 1h)",
+    "source_quote": "The unit suffix pattern also consumed following digits, so `1h2m3s` became a single `1h` match with the `2m3s` swallowed as suffix text.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C6",
+    "text": "Full unit aliases (hour/minute/week/etc.) continue to work alongside single\u2011letter short forms",
+    "source_quote": "Full unit aliases (`hour`/`minute`/`week`/etc.) keep working alongside the single-letter short forms; unsupported units such as `ms` are still rejected, consistent with #689/#691.",
+    "testable": true,
+    "expect": "same"
+   },
+   {
+    "id": "C7",
+    "text": "Unsupported units such as 'ms' are still rejected",
+    "source_quote": "Full unit aliases (`hour`/`minute`/`week`/etc.) keep working alongside the single-letter short forms; unsupported units such as `ms` are still rejected, consistent with #689/#691.",
+    "testable": true,
+    "expect": "same"
+   }
+  ],
+  "model_rejected_claims": [
+   {
+    "id": "C5",
+    "text": "Every non\u2011whitespace part of the input must be covered by a match; otherwise a ValueError is raised",
+    "source_quote": "...requires a non\u2011numeric/non\u2011dot predecessor for each new value (allowing the previous match to end), and validates that every non\u2011whitespace part of the input is covered by a match.... Malformed numeric runs raise `ValueError` instead of being partially parsed.",
+    "testable": true,
+    "expect": "differs",
+    "rejected": "source_quote not found in the PR text"
+   }
+  ],
+  "model_retried": {
+   "why": [
+    "bad probe id ''"
+   ]
+  },
+  "diff_targets": [
+   "boltons.timeutils.parse_timedelta"
+  ],
+  "frozen": [
+   {
+    "path": "diff-probes/diff-api.py",
+    "source": "diff",
+    "sha256": "fa812166bf2e1243a4ead5e39cb8f016285668f56dfc8c6eed24c0103e7034be",
+    "generator": {
+     "kind": "diff",
+     "label": "diff (auto-derived from base-side code, model-free)",
+     "model": null,
+     "provider": null,
+     "provenance": "auto-derived",
+     "blind": false
+    },
+    "frozen_at": "2026-11-05T07:21:23.566298+00:00",
+    "inputs_sha256": "9c91c9ed30c4ea94eef77be343cf354b1575fd6a221dd4a35641234138fd4b88",
+    "inputs": {
+     "title_chars": 0,
+     "body_chars": 0,
+     "base_files": {
+      "boltons/timeutils.py": "316c05c7061bfc8da0184523a6d3e87600112c4c4be9c4d6619d3f9605b7f321"
+     }
+    }
+   }
+  ]
+ },
+ "test_extras": [],
+ "pr_side_started_at": "2026-11-05T07:21:23.726804+00:00",
+ "test_targets": {
+  "main": [
+   "tests/test_timeutils.py"
+  ],
+  "pr": [
+   "tests/test_timeutils.py"
+  ]
+ },
+ "installed_commit": {
+  "main": {
+   "dist": "boltons",
+   "expected": "d31d821d56c8f7756af9c30a864077f2e5855321",
+   "installed": "d31d821d56c8f7756af9c30a864077f2e5855321",
+   "ok": true
+  },
+  "pr": {
+   "dist": "boltons",
+   "expected": "7d74a6a63266a1d7b6d4da046482c5d0d41d5a5f",
+   "installed": "7d74a6a63266a1d7b6d4da046482c5d0d41d5a5f",
+   "ok": true
+  }
+ },
+ "comparison": {
+  "same": 17,
+  "same_skipped_both": 0,
+  "regressions": [],
+  "fixed": [
+   "tests.test_timeutils::test_parse_timedelta_adjacent_values"
+  ],
+  "new_tests_passing": 0,
+  "new_tests_passing_ids": [],
+  "new_tests_failing": [],
+  "new_tests_skipped": [],
+  "removed_tests": [],
+  "reparametrized": [],
+  "skipped_missing_dependency": [],
+  "flaky": [],
+  "pr_unstable": [],
+  "pr_unstable_noisy": [],
+  "environment": [],
+  "other_changes": [],
+  "preexisting_failures": [],
+  "load_failed_both": [],
+  "load_failed_pr": [],
+  "load_failed_main": [],
+  "executed": {
+   "main": 18,
+   "pr": 18
+  },
+  "messages": {},
+  "base_messages": {
+   "tests.test_timeutils::test_parse_timedelta_adjacent_values": "AssertionError: assert datetime.timedelta(seconds=1) == datetime.timedelta(seconds=121)"
+  }
+ },
+ "exit_check": {
+  "explained": true,
+  "problems": [],
+  "detail": "all runs exited 0"
+ },
+ "probes": {
+  "status": "ran",
+  "items": [
+   {
+    "id": "diff-api",
+    "source": "diff",
+    "path": "diff-probes/diff-api.py",
+    "sha256": "fa812166bf2e1243a4ead5e39cb8f016285668f56dfc8c6eed24c0103e7034be",
+    "target": "mahmoud/boltons#732",
+    "about": "Public functions touched by the PR, called with type-appropriate inputs on both sides.",
+    "claims": [],
+    "runs_per_side": 1,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-diff-api-main-1.jsonl"
+     ],
+     "pr": [
+      "probe-diff-api-pr-1.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "boltons.timeutils.parse_timedelta.input0": {
+        "raises": "TypeError"
+       },
+       "boltons.timeutils.parse_timedelta.input1": {
+        "raises": "TypeError"
+       },
+       "boltons.timeutils.parse_timedelta.input10": {
+        "raises": "TypeError"
+       },
+       "boltons.timeutils.parse_timedelta.input11": {
+        "raises": "TypeError"
+       },
+       "boltons.timeutils.parse_timedelta.input2": {
+        "raises": "TypeError"
+       },
+       "boltons.timeutils.parse_timedelta.input3": {
+        "raises": "TypeError"
+       },
+       "boltons.timeutils.parse_timedelta.input4": {
+        "raises": "ValueError"
+       },
+       "boltons.timeutils.parse_timedelta.input5": {
+        "raises": "TypeError"
+       },
+       "boltons.timeutils.parse_timedelta.input6": {
+        "raises": "TypeError"
+       },
+       "boltons.timeutils.parse_timedelta.input7": {
+        "raises": "TypeError"
+       },
+       "boltons.timeutils.parse_timedelta.input8": {
+        "raises": "TypeError"
+       },
+       "boltons.timeutils.parse_timedelta.input9": {
+        "repr": "datetime.timedelta(0)",
+        "type": "timedelta"
+       }
+      }
+     ],
+     "pr": [
+      {
+       "boltons.timeutils.parse_timedelta.input0": {
+        "raises": "TypeError"
+       },
+       "boltons.timeutils.parse_timedelta.input1": {
+        "raises": "TypeError"
+       },
+       "boltons.timeutils.parse_timedelta.input10": {
+        "raises": "TypeError"
+       },
+       "boltons.timeutils.parse_timedelta.input11": {
+        "raises": "TypeError"
+       },
+       "boltons.timeutils.parse_timedelta.input2": {
+        "raises": "TypeError"
+       },
+       "boltons.timeutils.parse_timedelta.input3": {
+        "raises": "TypeError"
+       },
+       "boltons.timeutils.parse_timedelta.input4": {
+        "raises": "ValueError"
+       },
+       "boltons.timeutils.parse_timedelta.input5": {
+        "raises": "TypeError"
+       },
+       "boltons.timeutils.parse_timedelta.input6": {
+        "raises": "TypeError"
+       },
+       "boltons.timeutils.parse_timedelta.input7": {
+        "raises": "TypeError"
+       },
+       "boltons.timeutils.parse_timedelta.input8": {
+        "raises": "TypeError"
+       },
+       "boltons.timeutils.parse_timedelta.input9": {
+        "repr": "datetime.timedelta(0)",
+        "type": "timedelta"
+       }
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "boltons.timeutils.parse_timedelta.input0",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"boltons.timeutils.parse_timedelta.input0\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"boltons.timeutils.parse_timedelta.input0\""
+       }
+      }
+     },
+     {
+      "name": "boltons.timeutils.parse_timedelta.input1",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"boltons.timeutils.parse_timedelta.input1\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"boltons.timeutils.parse_timedelta.input1\""
+       }
+      }
+     },
+     {
+      "name": "boltons.timeutils.parse_timedelta.input10",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"boltons.timeutils.parse_timedelta.input10\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"boltons.timeutils.parse_timedelta.input10\""
+       }
+      }
+     },
+     {
+      "name": "boltons.timeutils.parse_timedelta.input11",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"boltons.timeutils.parse_timedelta.input11\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"boltons.timeutils.parse_timedelta.input11\""
+       }
+      }
+     },
+     {
+      "name": "boltons.timeutils.parse_timedelta.input2",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"boltons.timeutils.parse_timedelta.input2\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"boltons.timeutils.parse_timedelta.input2\""
+       }
+      }
+     },
+     {
+      "name": "boltons.timeutils.parse_timedelta.input3",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"boltons.timeutils.parse_timedelta.input3\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"boltons.timeutils.parse_timedelta.input3\""
+       }
+      }
+     },
+     {
+      "name": "boltons.timeutils.parse_timedelta.input4",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "ValueError"
+      },
+      "pr": {
+       "raises": "ValueError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 7,
+        "quote": "\"observation\": \"boltons.timeutils.parse_timedelta.input4\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 7,
+        "quote": "\"observation\": \"boltons.timeutils.parse_timedelta.input4\""
+       }
+      }
+     },
+     {
+      "name": "boltons.timeutils.parse_timedelta.input5",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 8,
+        "quote": "\"observation\": \"boltons.timeutils.parse_timedelta.input5\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 8,
+        "quote": "\"observation\": \"boltons.timeutils.parse_timedelta.input5\""
+       }
+      }
+     },
+     {
+      "name": "boltons.timeutils.parse_timedelta.input6",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 9,
+        "quote": "\"observation\": \"boltons.timeutils.parse_timedelta.input6\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 9,
+        "quote": "\"observation\": \"boltons.timeutils.parse_timedelta.input6\""
+       }
+      }
+     },
+     {
+      "name": "boltons.timeutils.parse_timedelta.input7",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 10,
+        "quote": "\"observation\": \"boltons.timeutils.parse_timedelta.input7\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 10,
+        "quote": "\"observation\": \"boltons.timeutils.parse_timedelta.input7\""
+       }
+      }
+     },
+     {
+      "name": "boltons.timeutils.parse_timedelta.input8",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 11,
+        "quote": "\"observation\": \"boltons.timeutils.parse_timedelta.input8\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 11,
+        "quote": "\"observation\": \"boltons.timeutils.parse_timedelta.input8\""
+       }
+      }
+     },
+     {
+      "name": "boltons.timeutils.parse_timedelta.input9",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": {
+       "repr": "datetime.timedelta(0)",
+       "type": "timedelta"
+      },
+      "pr": {
+       "repr": "datetime.timedelta(0)",
+       "type": "timedelta"
+      },
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 12,
+        "quote": "\"observation\": \"boltons.timeutils.parse_timedelta.input9\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 12,
+        "quote": "\"observation\": \"boltons.timeutils.parse_timedelta.input9\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "diff",
+     "label": "diff (auto-derived from base-side code, model-free)",
+     "model": null,
+     "provider": null,
+     "provenance": "auto-derived",
+     "blind": false
+    },
+    "freeze": {
+     "sha256": "fa812166bf2e1243a4ead5e39cb8f016285668f56dfc8c6eed24c0103e7034be",
+     "generator": {
+      "kind": "diff",
+      "label": "diff (auto-derived from base-side code, model-free)",
+      "model": null,
+      "provider": null,
+      "provenance": "auto-derived",
+      "blind": false
+     },
+     "frozen_at": "2026-11-05T07:21:23.566298+00:00",
+     "inputs_sha256": "9c91c9ed30c4ea94eef77be343cf354b1575fd6a221dd4a35641234138fd4b88",
+     "inputs": {
+      "title_chars": 0,
+      "body_chars": 0,
+      "base_files": {
+       "boltons/timeutils.py": "316c05c7061bfc8da0184523a6d3e87600112c4c4be9c4d6619d3f9605b7f321"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-05T07:21:23.726804+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 7,
+     "changed_lines_covered": 5,
+     "files": [
+      {
+       "file": "boltons/timeutils.py",
+       "changed_lines_total": 7,
+       "changed_lines_covered": 5
+      }
+     ],
+     "adequacy": "adequate",
+     "note": "ran 5 of 7 changed line(s) on the main side",
+     "exit": 0,
+     "data": "probe-cov-diff-api.json"
+    },
+    "status": "ran"
+   }
+  ],
+  "summary": {
+   "labels": [
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "no_difference"
+   ],
+   "flagged": [],
+   "proven_claims": [],
+   "reason": "probe: 1 other observation(s) identical on both sides; probe: 11 probe(s) could not run on either side",
+   "ignored_noise": [],
+   "ignored_warning_only": [],
+   "pr_only_noisy": [],
+   "advisory_unchanged_subchecks": [],
+   "advisory_agreeing_differs": []
+  }
+ },
+ "probe_changed_line_coverage": {
+  "status": "measured",
+  "side": "main",
+  "probes": {
+   "diff-api": {
+    "status": "measured",
+    "changed_lines_covered": 5,
+    "changed_lines_total": 7,
+    "adequacy": "adequate"
+   }
+  },
+  "not_adequate": []
+ },
+ "verdict": "could_not_verify",
+ "reason": "not verified: no AI-written probe ran any changed line, so the change itself was not exercised by a probe; 1 test(s) fail on main and pass on the PR; 18 test(s) ran on main, 18 on the PR; 0 new test(s) pass, 17 unchanged",
+ "verdict_before_coverage_gate": "verified",
+ "reason_before_coverage_gate": "1 test(s) fail on main and pass on the PR; 18 test(s) ran on main, 18 on the PR; 0 new test(s) pass, 17 unchanged",
+ "changed_lines_total": 13,
+ "changed_lines_covered": 12,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "normal",
+  "note": "12 of 13 changed executable line(s) ran (92%)",
+  "measurement": "measured"
+ },
+ "verdict_before_ai_probe_gate": "verified",
+ "agents": {
+  "status": "skipped",
+  "note": "advisory swarm is off",
+  "roles": []
+ },
+ "explanation": {
+  "status": "not yet wired",
+  "why": "advisory swarm is off"
+ },
+ "swarm_requested": false,
+ "operator_approval_requested": false,
+ "swarm": "off",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [
+   "boltons/timeutils.py"
+  ],
+  "compiled_files": [],
+  "other_files": [
+   "tests/test_timeutils.py"
+  ]
+ },
+ "duration_s": {
+  "total_wall": 96.3,
+  "tests": 2.3
+ },
+ "cost": {
+  "ai_calls": 3,
+  "failed_ai_calls": 0,
+  "input_tokens": 19110,
+  "output_tokens": 11168,
+  "thinking_tokens": 10378,
+  "cost_usd": 0.015784,
+  "calls_without_usage": 0,
+  "ai_cost_usd": 0.015784,
+  "cost_complete": true,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 96.3,
+   "tests": 2.3
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.00642,
+  "total_cost_usd": 0.022204,
+  "swarm": {
+   "ai_calls": 0,
+   "failed_ai_calls": 0,
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "thinking_tokens": 0,
+   "cost_usd": 0.0,
+   "calls_without_usage": 0,
+   "ai_cost_usd": 0.0,
+   "cost_complete": true,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ },
+ "pdf_push": {
+  "ok": true,
+  "attempts": 1,
+  "error": null,
+  "url": "https://github.com/aritracodesbad123/Proof-of-change/tree/runs/runs/2026-11-05/0ca5051/boltons-732"
+ }
+}
