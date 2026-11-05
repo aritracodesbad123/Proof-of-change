@@ -1,0 +1,884 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-PyCQA-isort-2781-3936b83f0531-2026-11-05",
+ "date_ist": "2026-11-05 11:34 IST",
+ "run_date": "2026-11-05",
+ "who": "ops/daily_run.py",
+ "repo": "PyCQA/isort",
+ "library": "isort",
+ "pr": {
+  "repo": "PyCQA/isort",
+  "number": 2781,
+  "url": "https://github.com/PyCQA/isort/pull/2781",
+  "title": "Keep the grouping of commented `from` imports stable across runs",
+  "base_sha": "841e43126cd2ca74751b421afd00d90ca36932e5",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "3936b83f05317a8049a572fcf192a98bbb9d4be1",
+  "merge_commit": "619f482977ab7a5be248d6932ff74be519581107",
+  "tested_main_sha": "841e43126cd2ca74751b421afd00d90ca36932e5",
+  "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+ },
+ "author": "PDGGK",
+ "base_ref": "main",
+ "updated_at_utc": "2026-11-03T10:11:41Z",
+ "updated_at_ist": "2026-11-03 15:41 IST",
+ "ci_state": "not checked (chosen PR)",
+ "ci_detail": "chosen by name; selection filters not applied",
+ "tested_at_ist": "2026-11-05 11:34 IST",
+ "files": {
+  "all": [
+   "isort/output.py",
+   "tests/unit/test_regressions.py"
+  ],
+  "package_py": [
+   "isort/output.py"
+  ],
+  "compiled": [],
+  "other": [
+   "tests/unit/test_regressions.py"
+  ]
+ },
+ "machine_type": {
+  "arch": "x86_64",
+  "os": "Linux",
+  "platform": "Linux-6.12.94+-x86_64-with-glibc2.41",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": null,
+  "cpu_model": "Intel(R) Xeon(R) Processor",
+  "ram_gb": 15.6
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 3,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.15",
+ "test_selection": "mapped from touched files: tests/unit/test_regressions.py, tests/unit/test_output.py",
+ "per_run": [
+  {
+   "side": "old",
+   "run": 1,
+   "passed": 139,
+   "failed": 1,
+   "error": 1,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 1.7,
+   "pytest_summary": "1 failed, 139 passed, 1 error in 1.22s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 1,
+   "passed": 140,
+   "failed": 1,
+   "error": 1,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 2.0,
+   "pytest_summary": "1 failed, 140 passed, 1 error in 1.26s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 2,
+   "passed": 139,
+   "failed": 1,
+   "error": 1,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 1.7,
+   "pytest_summary": "1 failed, 139 passed, 1 error in 1.20s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 2,
+   "passed": 140,
+   "failed": 1,
+   "error": 1,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 1.7,
+   "pytest_summary": "1 failed, 140 passed, 1 error in 1.22s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 3,
+   "passed": 139,
+   "failed": 1,
+   "error": 1,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 1.7,
+   "pytest_summary": "1 failed, 139 passed, 1 error in 1.20s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 3,
+   "passed": 140,
+   "failed": 1,
+   "error": 1,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 1.7,
+   "pytest_summary": "1 failed, 140 passed, 1 error in 1.27s",
+   "junit": true
+  }
+ ],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "local",
+ "sandbox_backend_note": "local bubblewrap",
+ "machine": "local",
+ "tool_setup": {
+  "installed": [],
+  "tries": 0,
+  "note": "All required tools were already installed.",
+  "refused": []
+ },
+ "posted_upstream": false,
+ "logs": "isort-2781/",
+ "freeze": {
+  "main": "freeze-main.txt",
+  "pr": "freeze-pr.txt"
+ },
+ "coverage": {
+  "status": "measured",
+  "changed_lines_total": 16,
+  "changed_lines_covered": 16,
+  "files": [
+   {
+    "file": "isort/output.py",
+    "changed_lines_total": 16,
+    "changed_lines_covered": 16
+   }
+  ],
+  "seconds": 3.2,
+  "exit": 1,
+  "log": "coverage-pytest.log"
+ },
+ "poc_commit": "985a7eade681b1d88256d5a185e129da53855144",
+ "route": "source-pair",
+ "current_head_sha": "3936b83f05317a8049a572fcf192a98bbb9d4be1",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "state": "open",
+ "mergeable": true,
+ "mergeable_state": "unstable",
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": "[redacted]",
+  "notes": [
+   "Setup check: GitHub token: present.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory 7.8 GB (of 15.6 GB).",
+   "Setup check: free disk 94.8 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: [redacted] results",
+   "Query: isort python setup install instructions https://github.com/PyCQA/isort site:github.com/PyCQA/isort",
+   "Query: isort python documentation install https://github.com/PyCQA/isort site:github.com/PyCQA/isort",
+   "Query: isort python install requirements https://pypi.org/project/isort/ https://github.com/PyCQA/isort site:pypi.org",
+   "Source: isort/pyproject.toml at main \u00b7 PyCQA/isort \u00b7 GitHub \u2014 https://github.com/PyCQA/isort/blob/main/pyproject.toml",
+   "Source: isort - PyPI \u2014 https://pypi.org/project/isort/",
+   "Source: isort/docs/quick_start/0.-try.md at main \u00b7 PyCQA/isort \u00b7 GitHub \u2014 https://github.com/PyCQA/isort/blob/main/docs/quick_start/0.-try.md",
+   "Source: GitHub - PyCQA/isort: A Python utility / library to sort imports. \u00b7 GitHub \u2014 https://github.com/pycqa/isort",
+   "Source: No module named 'setuptools' when installing through pre-commit \u00b7 Issue #1874 \u00b7 PyCQA/isort \u00b7 GitHub \u2014 https://github.com/PyCQA/isort/issues/1874",
+   "Source: No CLI executable on Ubuntu 20.04 \u00b7 Issue #1947 \u00b7 PyCQA/isort \u00b7 GitHub \u2014 https://github.com/PyCQA/isort/issues/1947",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: mypy-extensions is noted, installed with the project.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >=3.11.0, >=3.10.0",
+   "Before rerun: could_not_verify: not fully verified: the changed code's test module(s) tests.unit.test_output failed to load on both sides, so they did not run: 1 test(s) fail on main and pass on the PR; 141 test(s) ran on main, 141 on the PR; 0 new test(s) pass, 139 unchanged; 1 test failure(s) pre-existing and identical on both sides; 1 test module(s) fail to load on both sides (tests.unit.test_output), so their tests did not run; probe model-probe1 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count",
+   "After rerun: not rerun. could not verify: setup gap setup"
+  ],
+  "install_docs": [
+   "Dockerfile",
+   "README.md",
+   "pyproject.toml",
+   "tox.ini",
+   "example_isort_sorting_plugin/pyproject.toml",
+   ".github/workflows/continuous-integration.yml",
+   ".github/workflows/build.yml",
+   ".github/workflows/release.yml",
+   "example_shared_isort_profile/pyproject.toml",
+   "example_isort_formatting_plugin/pyproject.toml"
+  ],
+  "install_docs_from": "main",
+  "setup_plan": {
+   "packages": [
+    {
+     "requirement": "mypy-extensions>=1.1.0",
+     "name": "mypy-extensions",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    }
+   ],
+   "scope_blocked": "",
+   "component": null,
+   "aggregate_names": [],
+   "extra_reqs": [],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >=3.11.0, >=3.10.0"
+   },
+   "system": [],
+   "refused": [],
+   "groups_blocked": ""
+  },
+  "steps": {
+   "setup_lookup": "Found 1 setup item(s) in the project's files and the web lookup.",
+   "setup_python": "Python 3.12: Python 3.12 already meets >=3.11.0, >=3.10.0",
+   "install_deps": "Nothing extra to install; the project's own install covers it. 1 more come with the project install."
+  },
+  "run_files": {
+   "requirements": "requirements.txt",
+   "plan": "setup-plan.json",
+   "count": 0
+  },
+  "gap_retry": {
+   "reran": false,
+   "rounds": [
+    {
+     "round": 1,
+     "verdict": "could_not_verify",
+     "reason": "not fully verified: the changed code's test module(s) tests.unit.test_output failed to load on both sides, so they did not run: 1 test(s) fail on main and pass on the PR; 141 test(s) ran on main, 141 on the PR; 0 new test(s) pass, 139 unchanged; 1 test failure(s) pre-existing and identical on both sides; 1 test module(s) fail to load on both sides (tests.unit.test_output), so their tests did not run; probe model-probe1 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count"
+    }
+   ],
+   "installed": []
+  }
+ },
+ "chosen": {
+  "pr": 2781,
+  "head_sha": null,
+  "install": null,
+  "test_cmd": null
+ },
+ "sides": {
+  "comparison_basis": "base tip vs GitHub test merge (refs/pull/N/merge)",
+  "main_sha": "841e43126cd2ca74751b421afd00d90ca36932e5",
+  "pr_sha": "619f482977ab7a5be248d6932ff74be519581107",
+  "merge_commit": "619f482977ab7a5be248d6932ff74be519581107",
+  "merge_parents": [
+   "841e43126cd2ca74751b421afd00d90ca36932e5",
+   "3936b83f05317a8049a572fcf192a98bbb9d4be1"
+  ],
+  "merge_head_matches_pinned_head": true
+ },
+ "tested": {
+  "main": "main @ 841e43126cd2 (base tip = first parent of the merge commit)",
+  "pr": "GitHub test merge commit 619f482977ab (refs/pull/2781/merge) of head 3936b83f0531"
+ },
+ "probe_plan": {
+  "baseline": "full",
+  "model": "model provider: nebius (Token Factory, live)",
+  "errors": [],
+  "model_claims": [
+   {
+    "id": "C1",
+    "text": "After applying this change, running isort twice on a file produces identical output (the second run does not modify the file).",
+    "source_quote": "With this branch both files stay the same on the second run.",
+    "testable": true,
+    "expect": "same"
+   },
+   {
+    "id": "C2",
+    "text": "The grouping loop now skips a conflicting name instead of stopping at it, allowing names without a comment to be placed in the first statement.",
+    "source_quote": "Names without a comment all go into the first statement. The loop skips a conflicting name instead of stopping at it.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C3",
+    "text": "Each later statement contains a single commented name, kept on one line when possible, so the comment remains attached to that name.",
+    "source_quote": "Each later statement holds a single commented name, on one line when it fits, so the comment stays with that name.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C4",
+    "text": "Comments added by combine_as_imports to the first statement are considered during grouping because they ultimately appear there.",
+    "source_quote": "Comments that `combine_as_imports` adds to the first statement are taken into account while grouping, since they end up there anyway.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C6",
+    "text": "With this branch, none of the files in the test set change on a second isort run (output is stable across runs).",
+    "source_quote": "With this branch both files stay the same on the second run.",
+    "testable": true,
+    "expect": "same"
+   },
+   {
+    "id": "C7",
+    "text": "The added regression test fails on the current main branch.",
+    "source_quote": "It fails on `main`.",
+    "testable": true,
+    "expect": "same"
+   },
+   {
+    "id": "C8",
+    "text": "Reverting any single part of the change causes one of the regression test assertions to fail, showing each part is necessary.",
+    "source_quote": "Each of the three parts above is needed: reverting any single piece of the change makes one of its assertions fail.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C9",
+    "text": "The number of import blocks that still change on a second sort drops from 1,337 on main to 108 with this branch.",
+    "source_quote": "The number that still changed on a second sort was 1,337 on `main`, 196 on 9.0.2 and 108 with this branch.",
+    "testable": true,
+    "expect": "differs"
+   }
+  ],
+  "model_rejected_claims": [
+   {
+    "id": "C5",
+    "text": "After the change, `isort --check` passes and flake8 reports no F401 warnings on the sorted file.",
+    "source_quote": "With this branch: ... All three commands exit 0.",
+    "testable": true,
+    "expect": "differs",
+    "rejected": "source_quote not found in the PR text"
+   }
+  ],
+  "diff_targets": [],
+  "frozen": [
+   {
+    "path": "model-probes/model-probe1.py",
+    "source": "model",
+    "sha256": "47e6f1c96c91216bc272190d3592cd82d412ddbe7a10c513fc8a959bd8ba29c3",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-05T06:07:08.307863+00:00",
+    "inputs_sha256": "9dbfaf139b820a6544e419281c7daadaefc3cddd8608deac1af319ff5dcc59d3",
+    "inputs": {
+     "title_chars": 64,
+     "body_chars": 4633,
+     "base_files": {
+      "isort/output.py": "4631a7f238742004ed2e072b395cc53b60a482f4ea79b76719cc1dd57afd5439"
+     }
+    }
+   }
+  ]
+ },
+ "test_extras": [],
+ "pr_side_started_at": "2026-11-05T06:07:08.447165+00:00",
+ "test_targets": {
+  "main": [
+   "tests/unit/test_regressions.py",
+   "tests/unit/test_output.py"
+  ],
+  "pr": [
+   "tests/unit/test_regressions.py",
+   "tests/unit/test_output.py"
+  ]
+ },
+ "installed_commit": {
+  "main": {
+   "dist": "isort",
+   "expected": "841e43126cd2ca74751b421afd00d90ca36932e5",
+   "installed": "841e43126cd2ca74751b421afd00d90ca36932e5",
+   "ok": true
+  },
+  "pr": {
+   "dist": "isort",
+   "expected": "619f482977ab7a5be248d6932ff74be519581107",
+   "installed": "619f482977ab7a5be248d6932ff74be519581107",
+   "ok": true
+  }
+ },
+ "comparison": {
+  "same": 140,
+  "same_skipped_both": 0,
+  "regressions": [],
+  "fixed": [
+   "tests.unit.test_regressions::test_commented_from_imports_are_grouped_the_same_way_on_the_next_run"
+  ],
+  "new_tests_passing": 0,
+  "new_tests_passing_ids": [],
+  "new_tests_failing": [],
+  "new_tests_skipped": [],
+  "removed_tests": [],
+  "reparametrized": [],
+  "skipped_missing_dependency": [],
+  "flaky": [],
+  "pr_unstable": [],
+  "pr_unstable_noisy": [],
+  "environment": [],
+  "other_changes": [],
+  "preexisting_failures": [
+   "tests.unit.test_regressions::test_sort_reexports_output_is_black_stable_issue_2280"
+  ],
+  "load_failed_both": [
+   "tests.unit.test_output"
+  ],
+  "load_failed_pr": [],
+  "load_failed_main": [],
+  "failure_signatures": {
+   "tests.unit.test_regressions::test_sort_reexports_output_is_black_stable_issue_2280": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ModuleNotFoundError"
+    ]
+   }
+  },
+  "executed": {
+   "main": 141,
+   "pr": 141
+  },
+  "messages": {},
+  "base_messages": {
+   "tests.unit.test_regressions::test_commented_from_imports_are_grouped_the_same_way_on_the_next_run": "AssertionError: assert 'from x impor... noqa: F401\\n' == 'from x impor... noqa: F401\\n'"
+  }
+ },
+ "exit_check": {
+  "explained": true,
+  "problems": [],
+  "detail": "pytest exit 1; 1 failure(s)/error(s) pre-existing and identical on both sides"
+ },
+ "probes": {
+  "status": "error",
+  "items": [
+   {
+    "id": "model-probe1",
+    "source": "model",
+    "path": "model-probes/model-probe1.py",
+    "sha256": "47e6f1c96c91216bc272190d3592cd82d412ddbe7a10c513fc8a959bd8ba29c3",
+    "target": "PyCQA/isort#2781",
+    "about": "Test stability and grouping behavior with and without combine_as_imports",
+    "claims": [
+     {
+      "id": "C1",
+      "source": "PR description",
+      "text": "After applying this change, running isort twice on a file produces identical output (the second run does not modify the file).",
+      "covers": [
+       "c1.*"
+      ],
+      "expect": "same"
+     },
+     {
+      "id": "C2",
+      "source": "PR description",
+      "text": "The grouping loop now skips a conflicting name instead of stopping at it, allowing names without a comment to be placed in the first statement.",
+      "covers": [
+       "c2.*"
+      ],
+      "expect": "differs"
+     },
+     {
+      "id": "C3",
+      "source": "PR description",
+      "text": "Each later statement contains a single commented name, kept on one line when possible, so the comment remains attached to that name.",
+      "covers": [
+       "c3.*"
+      ],
+      "expect": "differs"
+     },
+     {
+      "id": "C4",
+      "source": "PR description",
+      "text": "Comments added by combine_as_imports to the first statement are considered during grouping because they ultimately appear there.",
+      "covers": [
+       "c4.*"
+      ],
+      "expect": "differs"
+     },
+     {
+      "id": "C6",
+      "source": "PR description",
+      "text": "With this branch, none of the files in the test set change on a second isort run (output is stable across runs).",
+      "covers": [
+       "c6.*"
+      ],
+      "expect": "same"
+     },
+     {
+      "id": "C7",
+      "source": "PR description",
+      "text": "The added regression test fails on the current main branch.",
+      "covers": [
+       "c7.*"
+      ],
+      "expect": "same"
+     },
+     {
+      "id": "C8",
+      "source": "PR description",
+      "text": "Reverting any single part of the change causes one of the regression test assertions to fail, showing each part is necessary.",
+      "covers": [
+       "c8.*"
+      ],
+      "expect": "differs"
+     },
+     {
+      "id": "C9",
+      "source": "PR description",
+      "text": "The number of import blocks that still change on a second sort drops from 1,337 on main to 108 with this branch.",
+      "covers": [
+       "c9.*"
+      ],
+      "expect": "differs"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.2,
+      "ok": false
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.2,
+      "ok": false
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.2,
+      "ok": false
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.2,
+      "ok": false
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.2,
+      "ok": false
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.2,
+      "ok": false
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-probe1-main-1.jsonl",
+      "probe-model-probe1-main-2.jsonl",
+      "probe-model-probe1-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-probe1-pr-1.jsonl",
+      "probe-model-probe1-pr-2.jsonl",
+      "probe-model-probe1-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "probe.error": {
+        "c1.error": "AttributeError",
+        "c4.error": "AttributeError",
+        "c6.stable": false,
+        "c7.regression_test_passed": 0,
+        "c8.parts_necessary": 0,
+        "c9.number_that_change": 0
+       }
+      },
+      {
+       "probe.error": {
+        "c1.error": "AttributeError",
+        "c4.error": "AttributeError",
+        "c6.stable": false,
+        "c7.regression_test_passed": 0,
+        "c8.parts_necessary": 0,
+        "c9.number_that_change": 0
+       }
+      },
+      {
+       "probe.error": {
+        "c1.error": "AttributeError",
+        "c4.error": "AttributeError",
+        "c6.stable": false,
+        "c7.regression_test_passed": 0,
+        "c8.parts_necessary": 0,
+        "c9.number_that_change": 0
+       }
+      }
+     ],
+     "pr": [
+      {
+       "probe.error": {
+        "c1.error": "AttributeError",
+        "c4.error": "AttributeError",
+        "c6.stable": false,
+        "c7.regression_test_passed": 0,
+        "c8.parts_necessary": 0,
+        "c9.number_that_change": 0
+       }
+      },
+      {
+       "probe.error": {
+        "c1.error": "AttributeError",
+        "c4.error": "AttributeError",
+        "c6.stable": false,
+        "c7.regression_test_passed": 0,
+        "c8.parts_necessary": 0,
+        "c9.number_that_change": 0
+       }
+      },
+      {
+       "probe.error": {
+        "c1.error": "AttributeError",
+        "c4.error": "AttributeError",
+        "c6.stable": false,
+        "c7.regression_test_passed": 0,
+        "c8.parts_necessary": 0,
+        "c9.number_that_change": 0
+       }
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "probe.error",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "c1.error": "AttributeError",
+       "c4.error": "AttributeError",
+       "c6.stable": false,
+       "c7.regression_test_passed": 0,
+       "c8.parts_necessary": 0,
+       "c9.number_that_change": 0
+      },
+      "pr": {
+       "c1.error": "AttributeError",
+       "c4.error": "AttributeError",
+       "c6.stable": false,
+       "c7.regression_test_passed": 0,
+       "c8.parts_necessary": 0,
+       "c9.number_that_change": 0
+      },
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"probe.error\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"probe.error\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "47e6f1c96c91216bc272190d3592cd82d412ddbe7a10c513fc8a959bd8ba29c3",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-05T06:07:08.307863+00:00",
+     "inputs_sha256": "9dbfaf139b820a6544e419281c7daadaefc3cddd8608deac1af319ff5dcc59d3",
+     "inputs": {
+      "title_chars": 64,
+      "body_chars": 4633,
+      "base_files": {
+       "isort/output.py": "4631a7f238742004ed2e072b395cc53b60a482f4ea79b76719cc1dd57afd5439"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-05T06:07:08.447165+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 20,
+     "changed_lines_covered": 0,
+     "files": [
+      {
+       "file": "isort/output.py",
+       "changed_lines_total": 20,
+       "changed_lines_covered": 1
+      }
+     ],
+     "adequacy": "not_adequate",
+     "note": "the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate",
+     "exit": 0,
+     "data": "probe-cov-model-probe1.json",
+     "changed_lines_touched": 1
+    },
+    "status": "crashed",
+    "uninformative_reason": "the probe crashed or printed no parsed output on every main-side run"
+   }
+  ],
+  "summary": {
+   "labels": [],
+   "flagged": [],
+   "proven_claims": [],
+   "reason": "the probe crashed or printed no parsed output on every main-side run",
+   "ignored_noise": [],
+   "ignored_warning_only": [],
+   "pr_only_noisy": [],
+   "advisory_unchanged_subchecks": [],
+   "advisory_agreeing_differs": []
+  }
+ },
+ "probe_changed_line_coverage": {
+  "status": "measured",
+  "side": "main",
+  "probes": {
+   "model-probe1": {
+    "status": "measured",
+    "changed_lines_covered": 0,
+    "changed_lines_total": 20,
+    "adequacy": "not_adequate"
+   }
+  },
+  "not_adequate": [
+   "model-probe1"
+  ]
+ },
+ "verdict": "could_not_verify",
+ "reason": "could not verify: setup gap setup",
+ "verdict_before_coverage_gate": "could_not_verify",
+ "reason_before_coverage_gate": "could not verify: setup gap setup",
+ "changed_lines_total": 16,
+ "changed_lines_covered": 16,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "normal",
+  "note": "16 of 16 changed executable line(s) ran (100%)",
+  "measurement": "measured"
+ },
+ "agents": {
+  "status": "skipped",
+  "note": "advisory swarm is off",
+  "roles": []
+ },
+ "explanation": {
+  "status": "not yet wired",
+  "why": "advisory swarm is off"
+ },
+ "swarm_requested": false,
+ "operator_approval_requested": false,
+ "swarm": "off",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [
+   "isort/output.py"
+  ],
+  "compiled_files": [],
+  "other_files": [
+   "tests/unit/test_regressions.py"
+  ]
+ },
+ "duration_s": {
+  "total_wall": 194.4,
+  "tests": 10.5
+ },
+ "cost": {
+  "ai_calls": 2,
+  "failed_ai_calls": 0,
+  "input_tokens": 11728,
+  "output_tokens": 16149,
+  "thinking_tokens": 14504,
+  "cost_usd": 0.018052,
+  "calls_without_usage": 0,
+  "ai_cost_usd": 0.018052,
+  "cost_complete": true,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 194.4,
+   "tests": 10.5
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.01296,
+  "total_cost_usd": 0.031012,
+  "swarm": {
+   "ai_calls": 0,
+   "failed_ai_calls": 0,
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "thinking_tokens": 0,
+   "cost_usd": 0.0,
+   "calls_without_usage": 0,
+   "ai_cost_usd": 0.0,
+   "cost_complete": true,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ },
+ "pdf_push": {
+  "ok": true,
+  "attempts": 1,
+  "error": null,
+  "url": "https://github.com/aritracodesbad123/Proof-of-change/tree/runs/runs/2026-11-05/985a7ea/isort-2781"
+ }
+}
