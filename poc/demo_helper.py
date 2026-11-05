@@ -974,6 +974,44 @@ def declared_requirement_lines(checkout) -> list[str]:
     return found
 
 
+def modules_missing_on_both_sides(log_dir) -> list[str]:
+    """Import names that ModuleNotFoundError reports on both main and pr pytest logs.
+
+    Order follows first appearance on the main side. Empty when either side has no such error,
+    or when the log directory is missing.
+    """
+    root = Path(log_dir) if log_dir else None
+    if root is None or not root.is_dir():
+        return []
+    main_text = []
+    pr_text = []
+    try:
+        for path in sorted(root.glob("pytest-main-*.log")) + sorted(root.glob("junit-main-*.xml")):
+            main_text.append(path.read_text(errors="replace"))
+        for path in sorted(root.glob("pytest-pr-*.log")) + sorted(root.glob("junit-pr-*.xml")):
+            pr_text.append(path.read_text(errors="replace"))
+    except OSError:
+        return []
+    main_mods = _modules('\n'.join(main_text))
+    pr_mods = set(_modules('\n'.join(pr_text)))
+    return [name for name in main_mods if name in pr_mods]
+
+
+def requirement_for_module_anywhere(checkout, module: str) -> str | None:
+    """The project's declared requirement for ``module``, searching every extra and group.
+
+    Looks in ``[project.optional-dependencies]`` and PEP 735 ``[dependency-groups]`` (including
+    ``dev``), then in setup.cfg / setup.py extras. Returns the first matching requirement line,
+    or None. No fixed module-to-package map and no per-repository cases.
+    """
+    if not module:
+        return None
+    # Prefer a direct match against every declared line (extras and groups included).
+    for req in declared_requirement_lines(checkout):
+        if norm(req_name(req)) == norm(module):
+            return req
+    return None
+
 def _plain_req_lines(text: str):
     for raw in (text or "").splitlines():
         line = raw.split("#", 1)[0].strip()
@@ -3150,7 +3188,8 @@ def _emit_retry(detail: str) -> None:
 
 
 def retry_unverified_study(rec: dict, rerun, install_one, declared, tavily_text: str, pypi, repo: str,
-                     allow_system: bool = False, install_system=None, lookup=None, recheck_coverage=None) -> dict:
+                     allow_system: bool = False, install_system=None, lookup=None, recheck_coverage=None,
+                     log_dir=None, checkouts=None) -> dict:
     """Study and daily-study path, unchanged from before the product check flow.
 
     One rerun when a could-not-verify result is a setup gap, and when collection failed on an import error
@@ -3171,11 +3210,27 @@ def retry_unverified_study(rec: dict, rerun, install_one, declared, tavily_text:
         notes.append("Demo helper: setup failure already labelled; the probe was not rerun.")
         block["notes"] = _unique(notes)
         return rec
-    text = gap_text(rec)
-    if not is_setup_gap(rec.get("verdict"), text):
+    text = gap_text(rec, log_dir=log_dir)
+    # When both sides name the same missing module, pull its requirement from any extra or group.
+    declared = list(declared or [])
+    both = modules_missing_on_both_sides(log_dir)
+    for module in both:
+        for checkout in checkouts or []:
+            req = requirement_for_module_anywhere(checkout, module)
+            if req and req not in declared:
+                declared.append(req)
+                notes.append(f"Setup repair: {module} is listed by the project; installing it on both sides.")
+    block["notes"] = _unique(notes)
+    if not is_setup_gap(rec.get("verdict"), text) and not both:
         block["notes"] = _unique(notes)
         return rec
+    # A both-sides ModuleNotFound is a setup gap even when the short reason omitted the module name.
+    if both and not is_setup_gap(rec.get("verdict"), text):
+        text = text + "\n" + "\n".join(
+            f"ModuleNotFoundError: No module named '{m}'" for m in both)
     name = gap_name(text)
+    if name in ("setup", "import") and both:
+        name = both[0]
     if lookup is not None:
         try:
             extra = lookup(f"{repo} {name} python install")
@@ -3281,7 +3336,7 @@ def retry_unverified(rec: dict, rerun, install_one, declared, tavily_text: str, 
                      allow_system: bool = False, install_system=None, lookup=None, recheck_coverage=None,
                      max_tries: int = MAX_GAP_TRIES, declared_urls=(), apt_check=None,
                      project_text: str = "", log_dir=None, crawl_context: str = "",
-                     product_repair: bool = False) -> dict:
+                     product_repair: bool = False, checkouts=None) -> dict:
     """Up to ``max_tries`` reruns when a could-not-verify result is a setup or import gap.
 
     Each try looks up the real error (Tavily, when a lookup is given), installs the same fix on main and pr,
@@ -3308,9 +3363,23 @@ def retry_unverified(rec: dict, rerun, install_one, declared, tavily_text: str, 
         block["notes"] = _unique(notes)
         return rec
     text = gap_text(rec, log_dir=log_dir)
-    if not is_setup_gap(rec.get("verdict"), text):
+    declared = list(declared or [])
+    both = modules_missing_on_both_sides(log_dir)
+    # When both sides name the same missing module, pull its requirement from any extra or group
+    # (including ``dev``). No fixed module-to-package map and no per-repository cases.
+    for module in both:
+        for checkout in checkouts or []:
+            req = requirement_for_module_anywhere(checkout, module)
+            if req and req not in declared:
+                declared.append(req)
+                notes.append(f"Setup repair: {module} is listed by the project; installing it on both sides.")
+    block["notes"] = _unique(notes)
+    if not is_setup_gap(rec.get("verdict"), text) and not both:
         block["notes"] = _unique(notes)
         return rec
+    if both and not is_setup_gap(rec.get("verdict"), text):
+        text = text + "\n" + "\n".join(
+            f"ModuleNotFoundError: No module named '{m}'" for m in both)
     parts = split_repo(repo or "")
     owner, repo_name = parts if parts else ("", "")
     apt_check = apt_check or apt_available
@@ -3324,6 +3393,8 @@ def retry_unverified(rec: dict, rerun, install_one, declared, tavily_text: str, 
         lookup_text = lookup_text + "\n" + crawl_context
     for attempt in range(1, max(0, max_tries) + 1):
         name = gap_name(text)
+        if name in ("setup", "import") and both:
+            name = both[0]
         if product_repair:
             # The real error line, never a banner, and a different angle on each try so all tries are used.
             err = real_error_line(text) or name

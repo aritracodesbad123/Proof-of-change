@@ -2636,26 +2636,35 @@ def _retry_setup_gap(a, rec, repo, prdir, venvs: dict, rerun, recheck_coverage=N
             return stored
 
     # ``checkouts`` is main's tree only. A dependency declared only on the pull request is not added.
-    # A study run adds those lines only for a collection import, so the retry can install a package that
-    # lives in an extra the first install did not request. Other study gaps keep the setup-plan list.
-    if product_route(a) or demo_helper.collection_import_gap(demo_helper.gap_text(rec)):
+    # Expand the declared list for a collection import, and also when both sides name the same
+    # ModuleNotFoundError module that the project lists in any optional-dependency or dependency-group
+    # (including ``dev``). No fixed module-to-package map and no per-repository cases.
+    both_missing = demo_helper.modules_missing_on_both_sides(prdir)
+    if product_route(a) or demo_helper.collection_import_gap(demo_helper.gap_text(rec, log_dir=prdir)) or both_missing:
         for checkout in checkouts or []:
             for req in demo_helper.declared_requirement_lines(checkout):
                 if req not in declared:
                     declared.append(req)
+        for module in both_missing:
+            for checkout in checkouts or []:
+                req = demo_helper.requirement_for_module_anywhere(checkout, module)
+                if req and req not in declared:
+                    declared.append(req)
     if not product_route(a):
         # Study runs and the daily study keep the earlier single setup-gap rerun, unchanged.
         # allow_system and install_system are unused and are not passed.
+        # Pass log_dir so ModuleNotFoundError lines in pytest logs are visible to the gap finder,
+        # and checkouts so a module listed only in a dependency-group (for example ``dev``) can be installed.
         demo_helper.retry_unverified_study(
             rec, rerun, install_one, declared, tavily.get("text") or "", demo_helper.fetch_pypi, repo,
-            lookup=lookup, recheck_coverage=recheck_coverage)
+            lookup=lookup, recheck_coverage=recheck_coverage, log_dir=prdir, checkouts=checkouts)
         return
     demo_helper.retry_unverified(
         rec, rerun, install_one, declared, tavily.get("text") or "", demo_helper.fetch_pypi, repo,
         lookup=lookup, recheck_coverage=recheck_coverage,
         project_text=_INSTALL_DOCS.get(_batch_key(repo, rec), ""),
         declared_urls=_DECLARED_URLS.get(_batch_key(repo, rec), []), log_dir=prdir,
-        crawl_context=str(plan.get("crawl_context") or ""), product_repair=True)
+        crawl_context=str(plan.get("crawl_context") or ""), product_repair=True, checkouts=checkouts)
 
 
 def _install_system_package(rec, name, run_side) -> bool:
