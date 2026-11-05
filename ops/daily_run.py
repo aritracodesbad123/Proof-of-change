@@ -9400,7 +9400,10 @@ def publish_run_outputs(report_dir: Path, run_dir: Path | None = None, *, poc_co
         if summary is not None:
             summary_bytes, skip = _pdf_bytes_for_push(summary, token)
             if summary_bytes is None:
-                skipped.append(skip or f"{summary.name}: skipped")
+                reason = skip or f"{summary.name}: skipped"
+                if "SUMMARY" not in reason:
+                    reason = f"SUMMARY.pdf: {reason}"
+                skipped.append(reason)
         report_bytes: dict = {}
         record_ok: dict = {}
         for pr_id, group in groups.items():
@@ -9408,7 +9411,12 @@ def publish_run_outputs(report_dir: Path, run_dir: Path | None = None, *, poc_co
             if group.get("report"):
                 data, skip = _pdf_bytes_for_push(group["report"], token)
                 if data is None:
-                    skipped.append(skip or f"{pr_id}/REPORT.pdf: skipped")
+                    detail = skip or "PDF could not be cleaned"
+                    for prefix in (f"{pr_id}/REPORT.pdf:", "REPORT.pdf:"):
+                        if detail.startswith(prefix):
+                            detail = detail[len(prefix):].strip()
+                            break
+                    skipped.append(f"{pr_id}/REPORT.pdf: {detail}")
                     record_ok[pr_id] = False
                 else:
                     report_bytes[pr_id] = data

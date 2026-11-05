@@ -364,8 +364,10 @@ def test_uncleanable_pdf_is_skipped_and_named(tmp_path, monkeypatch):
     monkeypatch.setattr(dr, "scrub_published_text", lambda text, token=None, path=None: text)
     result = _publish(report, run, user, lambda _s: None)
     assert result["ok"] is False
-    assert "REPORT.pdf" in (result["error"] or "")
-    assert "skipped" in (result["error"] or "").lower() or "cannot be published" in (result["error"] or "")
+    err = result["error"] or ""
+    assert "REPORT.pdf" in err
+    assert PR in err  # skipped file is named with its PR id
+    assert "skipped" in err.lower() or "cannot be published" in err.lower() or "still fails" in err.lower()
     log = (run / "run.log").read_text()
     assert "REPORT.pdf" in log or "PDFs NOT saved" in log
     assert _count(bare) == 0
