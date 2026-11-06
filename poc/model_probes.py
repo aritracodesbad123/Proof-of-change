@@ -922,23 +922,46 @@ def _checked_code(code, product: bool, layout: set) -> str:
     return JSON_IMPORT + code
 
 
-def _repair_missing_names(provider, probes_prompt: str, user: str, ctx: dict, resp, base_root, out: dict,
-                          product: bool, layout: set):
-    """One regeneration when a probe imports or calls a name the base tree does not have.
-
-    The model is told the missing name and, when the parent module exists, the names that parent
-    actually contains. Nothing is renamed by a table. Only the new code is taken, and only when
-    that code parses, still has test statements, and no longer has a required name missing.
-    Claims, covers, expect and about stay as they were. One model call for every broken probe
-    in the answer, then stop."""
+def _name_problems(resp, base_root, product: bool, layout: set) -> list[tuple]:
+    """(index, probe, messages, checked code) for probes whose base names or keywords do not exist."""
     from poc import probe_names
-    probes = [p for p in (resp or {}).get("probes", [])[:MAX_PROBES] if isinstance(p, dict)]
     broken = []
-    for i, p in enumerate(probes):
+    for i, p in enumerate([q for q in (resp or {}).get("probes", [])[:MAX_PROBES] if isinstance(q, dict)]):
         code = _checked_code(p.get("code"), product, layout)
         msgs = probe_names.problems(code, base_root)
         if msgs:
             broken.append((i, p, msgs, code))
+    return broken
+
+
+def _name_feedback(resp, base_root, product: bool, layout: set) -> str:
+    """Text appended to the one existing retry so a missing name or keyword is fixed in that same call.
+
+    Empty when nothing is missing. This does not call the model."""
+    broken = _name_problems(resp, base_root, product, layout)
+    if not broken:
+        return ""
+    lines = [f"Probe {p.get('id')!r}: " + "; ".join(msgs) + "\nFull code:\n" + code
+             for _, p, msgs, code in broken]
+    return ("\n\nThese probes also use an import, call, or keyword that does not exist on the BASE side. "
+            "Fix that in this same answer. Every import, and every call or attribute on an imported module, "
+            "must name something that exists there. A keyword must be a parameter of that function or class; "
+            "the message lists the parameters. Do not hide the missing name with hasattr, getattr with a "
+            "default, or try/except that records a fallback for that same name.\n\n" + "\n\n".join(lines))
+
+
+def _repair_missing_names(provider, probes_prompt: str, user: str, ctx: dict, resp, base_root, out: dict,
+                          product: bool, layout: set):
+    """The one feedback call, used only when no unusable, unlinked, or cover retry already took it.
+
+    The model is told the missing name or keyword and, when the parent exists, the names it actually
+    contains. Nothing is renamed by a table. Only the new code is taken, and only when that code parses,
+    still has test statements, and no longer has a required name or keyword missing. Claims, covers,
+    expect and about stay as they were. One model call, then stop. A later unlinked or cover retry does
+    not get another call: those prompts already carry this same feedback when it applies."""
+    from poc import probe_names
+    probes = [p for p in (resp or {}).get("probes", [])[:MAX_PROBES] if isinstance(p, dict)]
+    broken = _name_problems(resp, base_root, product, layout)
     if not broken:
         return resp
     attempts = out.setdefault("name_checks", [])
@@ -1071,6 +1094,11 @@ def generate(provider: Provider, repo: str, pr: int, title: str, body: str | Non
         out.pop("parse_repairs")
     resp = scrub_blank_claim_entries(resp, product, testable)
     usable = _usable(resp, set(by_id))
+    # Codes from the first probe answer, before the one feedback retry. A later answer that only
+    # hides one of these misses is not kept.
+    first_codes = {(_tidy_id(p.get("id")) if isinstance(p.get("id"), str) else None):
+                   _checked_code(p.get("code"), product, layout)
+                   for p in (resp or {}).get("probes", [])[:MAX_PROBES] if isinstance(p, dict)}
     if not usable:
         # One retry, same gate and same BASE-side inputs: say why the first answer was unusable (generic reasons only)
         reasons = [validate_probe(dict(p, id=_tidy_id(p.get("id")), code=_unescape_code(p.get("code"))),
@@ -1078,7 +1106,8 @@ def generate(provider: Provider, repo: str, pr: int, title: str, body: str | Non
                    (resp or {}).get("probes", [])[:MAX_PROBES] if isinstance(p, dict)] or ["the probes list was empty"]
         out["retried"] = {"why": reasons[:5]}
         retry_user = (user + "\n\nYour previous answer contained no usable probe (" + "; ".join(map(str, reasons[:5]))
-                      + "). " + unlinked_retry_rule(testable))
+                      + "). " + unlinked_retry_rule(testable)
+                      + _name_feedback(resp, base_root, product, layout))
         try:
             resp = provider.complete_json("probes", probes_prompt, retry_user, PROBES_SCHEMA, ctx)
         except ProviderError as e:
@@ -1095,7 +1124,8 @@ def generate(provider: Provider, repo: str, pr: int, title: str, body: str | Non
         # not a known claim is not guessed: validation still rejects that probe.
         out["retried"] = {"why": [UNLINKED_REASON]}
         retry_user = (user + "\n\nYour previous answer had probes, but " + UNLINKED_REASON + ". "
-                      + unlinked_retry_rule(testable))
+                      + unlinked_retry_rule(testable)
+                      + _name_feedback(resp, base_root, product, layout))
         try:
             again = provider.complete_json("probes", probes_prompt, retry_user, PROBES_SCHEMA, ctx)
         except ProviderError as e:
@@ -1117,8 +1147,11 @@ def generate(provider: Provider, repo: str, pr: int, title: str, body: str | Non
             why = COVER_REASON.format(", ".join(bad[:6]))
             out["retried"] = {"why": [why]}
             try:
-                again = provider.complete_json("probes", probes_prompt, user + "\n\nYour previous answer had probes, but "
-                                               + why + ".", PROBES_SCHEMA, ctx)
+                again = provider.complete_json(
+                    "probes", probes_prompt,
+                    user + "\n\nYour previous answer had probes, but " + why + "."
+                    + _name_feedback(resp, base_root, product, layout),
+                    PROBES_SCHEMA, ctx)
             except ProviderError as e:
                 out["errors"].append(f"retry: {e}")
             else:
@@ -1131,10 +1164,11 @@ def generate(provider: Provider, repo: str, pr: int, title: str, body: str | Non
                     resp = again
                 else:
                     out["retried"]["kept_first_answer"] = weak
-    # Before a probe is written or frozen: a name it uses as a real object must exist on the base
-    # side. One regeneration, with the missing name in the request. A probe that is still missing
-    # a required name is rejected below and is never executed.
-    resp = _repair_missing_names(provider, probes_prompt, user, ctx, resp, base_root, out, product, layout)
+    # One feedback call in total, shared with the unusable, unlinked, and cover retries above.
+    # If one of those already ran, it was given any missing name or keyword in that same prompt.
+    # There is no second call. A probe that is still missing a required name is rejected below.
+    if "retried" not in out:
+        resp = _repair_missing_names(provider, probes_prompt, user, ctx, resp, base_root, out, product, layout)
     draft_probes: list = []
     for p in (resp or {}).get("probes", [])[:MAX_PROBES]:
         # Models name probes "P1" or "probe_x"; the id is only a file name, so normalise it rather than drop the probe
@@ -1169,10 +1203,14 @@ def generate(provider: Provider, repo: str, pr: int, title: str, body: str | Non
                 out.setdefault("rewritten_imports", []).append(p["id"])
         if not why:
             from poc import probe_names
-            # Same view as the regeneration check: harness json import included, src/ imports rewritten.
-            missing = probe_names.problems(_checked_code(p.get("code") or "", bool(layout), layout), base_root)
+            checked = _checked_code(p.get("code") or "", bool(layout), layout)
+            missing = probe_names.problems(checked, base_root)
             if missing:
                 why = "; ".join(missing)
+            else:
+                hidden = probe_names.hides_required_miss(first_codes.get(p.get("id")), checked, base_root)
+                if hidden:
+                    why = hidden
         if why:
             out["errors"].append(f"probe {p.get('id')!r} rejected: {why}")
             continue

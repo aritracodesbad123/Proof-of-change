@@ -968,12 +968,16 @@ def _skip(name: str) -> bool:
 
 
 def _is_package_dir(path: Path) -> bool:
+    """A directory we can check as a package: it has ``__init__.py``, or it holds a subpackage that does.
+
+    A folder that only contains a loose module (no ``__init__.py``) is not treated as the whole library.
+    An import of some other name under that folder is then left alone, the same as a third-party import.
+    A package that does have ``__init__.py`` is checked: a submodule the probe names and the folder does not
+    contain is missing."""
     if (path / "__init__.py").is_file():
         return True
     try:
         for child in path.iterdir():
-            if child.is_file() and _module_stem(child):
-                return True
             if child.is_dir() and not _skip(child.name) and (child / "__init__.py").is_file():
                 return True
     except OSError:

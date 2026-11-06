@@ -24,7 +24,12 @@ probe calls a name it never defined.
 
 Check the base tree before the probe is frozen. Do not guess a replacement name. The message
 lists the names that are really in the parent module, and the model gets one chance to use one
-of them.
+of them. That chance is the same single repair as a bad keyword, and it is the same one retry the
+generator already spends on an unusable probe, an unlinked claim, or an unmatched cover. If
+that retry is already happening, the missing name is added to its prompt and there is no
+further call. A directory that only holds a loose module is not a package the base tree has
+(`__init__.py`, or a subpackage that has one), so an import under it is not sent back for
+repair and is not rejected when the probe is written.
 
 A name the probe only checks for absence is allowed to be missing, when that is how the probe
 was written the first time. That is a `try` / `except`, or `pytest.raises` /

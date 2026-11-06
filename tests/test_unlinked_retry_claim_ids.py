@@ -100,6 +100,9 @@ def test_retry_is_sent_the_claim_ids_and_the_rule(tmp_path):
     prov, out = _run(tmp_path, [UNLINKED, _answer(C1)])
     retry = prov.prompts[-1][1]
     assert [t for t, _ in prov.prompts] == ["claims", "probes", "probes"]
+    # rich/highlighter.py without __init__.py is not the whole rich package. rich.text.Text is not
+    # a second repair, and the two scripted answers are the whole model sequence.
+    assert "name_checks" not in out
     for c in CLAIMS["claims"]:
         assert f"- {c['id']} (expect {c['expect']}):" in retry
     assert "Every probe must list at least one of these claim ids" in retry

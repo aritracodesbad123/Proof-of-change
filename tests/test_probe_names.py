@@ -147,7 +147,47 @@ def test_a_broad_except_does_not_make_a_missing_import_optional(tmp_path):
     assert any("arguments" in m for m in probe_names.problems(code, tmp_path))
 
 
-def test_stdlib_imports_are_not_required_to_live_in_the_tree(tmp_path):
+def test_unlinked_retry_and_a_missing_name_share_one_model_call(tmp_path):
+    """The unlinked retry is the one feedback call. It is also told the missing module.
+
+    A second answer that links the claim but still imports the missing module is not followed
+    by another call, and no probe file is written."""
+    base = tmp_path / "base"
+    _parser_package(base, 1)
+    bad = {"id": "p1", "about": "answer", "claims": [], "code": _bad_import()}
+    still = {"id": "p1", "about": "answer", "claims": LINKS, "code": _bad_import()}
+    fixed = {"id": "p1", "about": "answer", "claims": LINKS, "code": _good_import()}
+    prov = Sequence([[bad], [still]])
+    out = model_probes.generate(prov, "o/r", 1, "Keep answer", BODY,
+                                {"widget/calc.py": base / "widget" / "calc.py"}, base,
+                                [tmp_path / "pr"], tmp_path / "out")
+    assert prov.probe_calls == 2
+    assert len(prov.users) == 2
+    assert "widget.parser.arguments" in prov.users[1]
+    assert "claim ids" in prov.users[1].lower() or "Every probe must list" in prov.users[1]
+    assert out["probes"] == []
+    assert not list((tmp_path / "out").glob("*.py"))
+    prov2 = Sequence([[bad], [fixed]])
+    out2 = model_probes.generate(prov2, "o/r", 1, "Keep answer", BODY,
+                                 {"widget/calc.py": base / "widget" / "calc.py"}, base,
+                                 [tmp_path / "pr"], tmp_path / "out2")
+    assert prov2.probe_calls == 2
+    assert out2["probes"] and "widget.parser.arguments" not in out2["probes"][0]["path"].read_text()
+
+
+def test_a_loose_module_directory_is_not_the_whole_package(tmp_path):
+    """rich/highlighter.py and no __init__.py: importing rich.text is not a missing-name repair."""
+    rich = tmp_path / "rich"
+    rich.mkdir()
+    (rich / "highlighter.py").write_text("class ReprHighlighter:\n    pass\n")
+    code = ("from rich.highlighter import ReprHighlighter\n"
+            "from rich.text import Text\n"
+            "print(ReprHighlighter(), Text('x'))\n")
+    assert probe_names.problems(code, tmp_path) == []
+    (rich / "__init__.py").write_text("")
+    (rich / "highlighter.py").write_text("class ReprHighlighter:\n    pass\n")
+    text = " ".join(probe_names.problems(code, tmp_path))
+    assert "rich.text" in text and "highlighter" in text
     _parser_package(tmp_path, 1)
     code = "import json\nprint(json.dumps({'observations': {'c1.value': 1}}))\n"
     assert probe_names.problems(code, tmp_path) == []
