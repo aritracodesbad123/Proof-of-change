@@ -9312,6 +9312,119 @@ def _note_pdf_saved(run_dir: Path | None, report_dir: Path, line: str) -> None:
     print(line, flush=True)
 
 
+_PUSH_STATUS_PREFIXES = ("PDFs NOT saved to GitHub:", "PDFs saved to GitHub:", "PDFs skipped (could not clean):")
+
+
+def _is_push_status_line(line: str) -> bool:
+    return line.strip().startswith(_PUSH_STATUS_PREFIXES)
+
+
+def _drop_status_lines(text: str) -> str:
+    out = [ln for ln in text.splitlines() if not _is_push_status_line(ln)]
+    while out and not out[0].strip():
+        out.pop(0)
+    return "\n".join(out) + ("\n" if out else "")
+
+
+def clear_push_status(report_dir: Path, run_dir: Path | None) -> None:
+    """Remove every earlier saved / NOT saved / skipped line, so only the final push result is shown.
+
+    Fix 98: a later success used to leave an old "PDFs NOT saved" banner in SUMMARY.md and run.log.
+    """
+    homes = [Path(report_dir)] + ([Path(run_dir)] if run_dir else [])
+    seen: set = set()
+    for home in homes:
+        if not home.is_dir():
+            continue
+        for path in list(home.rglob("*.md")) + list(home.rglob("run.log")):
+            key = path.resolve()
+            if key in seen:
+                continue
+            seen.add(key)
+            try:
+                text = path.read_text()
+            except OSError:
+                continue
+            if any(_is_push_status_line(ln) for ln in text.splitlines()):
+                path.write_text(_drop_status_lines(text))
+    for pdf in Path(report_dir).rglob("*.pdf"):
+        text = _pdf_text(pdf)
+        if text and any(_is_push_status_line(ln) for ln in text.splitlines()):
+            lines = [ln for ln in text.splitlines() if not _is_push_status_line(ln)]
+            while lines and not lines[0].strip():
+                lines.pop(0)
+            try:
+                pdf_always.write_pdf(pdf, pdf.stem, lines)
+            except Exception:  # noqa: BLE001 - the markdown and log are already cleared
+                pass
+
+
+def _forced_clean_lines(text: str, token: str | None, label: Path) -> list[str]:
+    """Scrub, then blank any line that still fails the public check. Never returns nothing."""
+    from guardrails.public_hygiene import findings
+    scrubbed = scrub_published_text(text or "", token, label)
+    lines = []
+    for ln in scrubbed.splitlines():
+        if _text_has_secret(ln, token) or _text_has_internal_path(ln) or findings(ln, label):
+            lines.append("[line removed: could not be cleaned]")
+        else:
+            lines.append(ln)
+    return [ln for ln in lines if not _is_push_status_line(ln)] or ["(no summary text)"]
+
+
+def run_summary_payloads(report_dir: Path, token: str | None) -> tuple[list[tuple[str, bytes]], list[str]]:
+    """The run-level go/no-go SUMMARY.pdf (and SUMMARY.md) for the run folder. Never skipped.
+
+    Standing rule: this PDF must never be lost. A file that cannot be cleaned is rebuilt from its
+    text with the offending lines blanked; if its text cannot be read, it is rebuilt from SUMMARY.md.
+    Returns ([(name, bytes)], notes).
+    """
+    report_dir = Path(report_dir)
+    pdf, md = report_dir / "SUMMARY.pdf", report_dir / "SUMMARY.md"
+    out: list = []
+    notes: list = []
+    md_text = None
+    if md.is_file():
+        try:
+            md_text = md.read_text()
+        except OSError:
+            md_text = None
+    if md_text is not None:
+        clean_md = "\n".join(_forced_clean_lines(_drop_status_lines(md_text), token, Path("SUMMARY.md"))) + "\n"
+        out.append(("SUMMARY.md", clean_md.encode("utf-8")))
+    if pdf.is_file() or md_text is not None:
+        data = None
+        if pdf.is_file():
+            data, _skip = _pdf_bytes_for_push(pdf, token)
+            if data is not None:
+                txt = None
+                tmp_dir = Path(tempfile.mkdtemp(prefix="poc-sum-"))
+                try:
+                    (tmp_dir / "s.pdf").write_bytes(data)
+                    txt = _pdf_text(tmp_dir / "s.pdf")
+                finally:
+                    shutil.rmtree(tmp_dir, ignore_errors=True)
+                if txt and any(_is_push_status_line(ln) for ln in txt.splitlines()):
+                    data = None  # carries a stale banner: rebuild below
+        if data is None:
+            source = _pdf_text(pdf) if pdf.is_file() else None
+            if not source:
+                source = md_text or ""
+                notes.append("SUMMARY.pdf rebuilt from SUMMARY.md")
+            lines = _forced_clean_lines(source, token, Path("SUMMARY.pdf"))
+            if "rebuilt from cleaned text" not in lines:
+                lines.append("rebuilt from cleaned text")
+            tmp_dir = Path(tempfile.mkdtemp(prefix="poc-sum-"))
+            try:
+                pdf_always.write_pdf(tmp_dir / "SUMMARY.pdf", "SUMMARY", lines)
+                data = (tmp_dir / "SUMMARY.pdf").read_bytes()
+            finally:
+                shutil.rmtree(tmp_dir, ignore_errors=True)
+            notes.append("SUMMARY.pdf: cleaned and rebuilt, pushed anyway")
+        out.append(("SUMMARY.pdf", data))
+    return out, notes
+
+
 def _runs_push_once(origin: str, token: str | None, payloads: list[tuple[str, bytes]],
                     branch_existed: bool | None, env: dict) -> None:
     """Commit payloads on a temporary clone and push. Never checks out or writes the caller's repository."""
@@ -9389,6 +9502,7 @@ def publish_run_outputs(report_dir: Path, run_dir: Path | None = None, *, poc_co
         return result
 
     remote_note = [origin or ""]
+    clear_push_status(report_dir, run_dir)
     if token is None:
         token = github_read_token()
     if not token:
@@ -9414,6 +9528,10 @@ def publish_run_outputs(report_dir: Path, run_dir: Path | None = None, *, poc_co
                 if "SUMMARY" not in reason:
                     reason = f"SUMMARY.pdf: {reason}"
                 skipped.append(reason)
+        run_level, run_level_notes = run_summary_payloads(report_dir, token)
+        if summary_bytes is None and dict(run_level).get("SUMMARY.pdf") is not None:
+            summary_bytes = dict(run_level)["SUMMARY.pdf"]
+            skipped = [s for s in skipped if not s.startswith("SUMMARY")]
         report_bytes: dict = {}
         report_held: set = set()
         for pr_id, group in groups.items():
@@ -9449,8 +9567,16 @@ def publish_run_outputs(report_dir: Path, run_dir: Path | None = None, *, poc_co
                             field = _pdf_push_field(False, attempt, reason, None)
                         else:
                             field = _pdf_push_field(True, attempt, None, url_map.get(pr_id))
-                        payloads.append((f"{prefix}/record.json",
-                                         _record_bytes_for_push(group["record"], field, token)))
+                        try:
+                            payloads.append((f"{prefix}/record.json",
+                                             _record_bytes_for_push(group["record"], field, token)))
+                        except _PublishRefused:
+                            note = f"{pr_id}/record.json: still contains text that cannot be published"
+                            if note not in skipped:
+                                skipped.append(note)
+                # Fix 98: the run-level go/no-go always goes into the run folder itself.
+                for name, data in run_level:
+                    payloads.append((f"runs/{day}/{short}/{name}", data))
                 if summary_bytes is not None and not groups:
                     payloads.append((f"runs/{day}/{short}/{pr_ids[0]}/SUMMARY.pdf", summary_bytes))
                 if not payloads:
