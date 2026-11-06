@@ -1,8 +1,8 @@
 {
  "schema_version": "1",
  "record_kind": "pr_run",
- "id": "pr-Delgan-loguru-1515-6c91de2c42d3-2026-11-06-check-122355-pr1515",
- "date_ist": "2026-11-06 12:24 IST",
+ "id": "pr-Delgan-loguru-1515-6c91de2c42d3-2026-11-06-check-122923-pr1515",
+ "date_ist": "2026-11-06 12:29 IST",
  "run_date": "2026-11-06",
  "who": "ops/daily_run.py",
  "repo": "Delgan/loguru",
@@ -25,7 +25,7 @@
  "updated_at_ist": "2026-11-01 07:47 IST",
  "ci_state": "not checked (single-PR check)",
  "ci_detail": "checked on request with --pr",
- "tested_at_ist": "2026-11-06 12:24 IST",
+ "tested_at_ist": "2026-11-06 12:29 IST",
  "files": {
   "all": [
    ".github/workflows/docs.yml",
@@ -79,15 +79,94 @@
   "BLIS_NUM_THREADS": "1",
   "PYTHONHASHSEED": "0"
  },
- "runs_per_side": 0,
+ "runs_per_side": 3,
  "runs_per_side_planned": 3,
  "workers": "4",
  "test_timeout_s": 120,
  "run_timeout_s": 900,
  "build_timeout_s": 1800,
  "python": "3.12.15",
- "test_selection": "",
- "per_run": [],
+ "test_selection": "mapped from touched files: tests/test_filesink_rotation.py, tests/test_type_hinting.py",
+ "per_run": [
+  {
+   "side": "old",
+   "run": 1,
+   "passed": 148,
+   "failed": 0,
+   "error": 0,
+   "skipped": 3,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 30.2,
+   "pytest_summary": "148 passed, 3 skipped in 26.44s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 1,
+   "passed": 149,
+   "failed": 0,
+   "error": 0,
+   "skipped": 3,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 30.0,
+   "pytest_summary": "149 passed, 3 skipped in 26.46s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 2,
+   "passed": 148,
+   "failed": 0,
+   "error": 0,
+   "skipped": 3,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 30.3,
+   "pytest_summary": "148 passed, 3 skipped in 26.50s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 2,
+   "passed": 149,
+   "failed": 0,
+   "error": 0,
+   "skipped": 3,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 30.0,
+   "pytest_summary": "149 passed, 3 skipped in 26.48s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 3,
+   "passed": 148,
+   "failed": 0,
+   "error": 0,
+   "skipped": 3,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 29.9,
+   "pytest_summary": "148 passed, 3 skipped in 26.46s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 3,
+   "passed": 149,
+   "failed": 0,
+   "error": 0,
+   "skipped": 3,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 30.3,
+   "pytest_summary": "149 passed, 3 skipped in 26.47s",
+   "junit": true
+  }
+ ],
  "notes": null,
  "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
  "behaviour_claims": [],
@@ -98,9 +177,9 @@
   "note": "model provider: nebius (Token Factory, live)",
   "blind": false
  },
- "sandbox_backend": "local",
- "sandbox_backend_note": "local bubblewrap",
- "machine": "local",
+ "sandbox_backend": "contree",
+ "sandbox_backend_note": "contree (Token Factory Sandboxes, sdk 0.3.6)",
+ "machine": "contree",
  "tool_setup": {
   "installed": [],
   "tries": 0,
@@ -111,8 +190,20 @@
  "logs": "loguru-1515/",
  "freeze": {},
  "coverage": {
-  "status": "not measured",
-  "why": "coverage has not been run for this check"
+  "status": "measured",
+  "changed_lines_total": 5,
+  "changed_lines_covered": 5,
+  "files": [
+   {
+    "file": "loguru/_file_sink.py",
+    "changed_lines_total": 5,
+    "changed_lines_covered": 5
+   }
+  ],
+  "seconds": 32.6,
+  "exit": 0,
+  "log": "coverage-pytest.log",
+  "where": "contree"
  },
  "poc_commit": "14c10b48937f407ce8cef337dc9c54d687789f06",
  "route": "source-pair",
@@ -133,7 +224,7 @@
   "notes": [
    "Setup check: GitHub token: present.",
    "Setup check: Nebius token: present.",
-   "Setup check: free memory 12.1 GB (of 15.6 GB).",
+   "Setup check: free memory 11.5 GB (of 15.6 GB).",
    "Setup check: free disk 94.3 GB.",
    "Demo helper: git is installed.",
    "Demo helper: python3 is installed.",
@@ -172,7 +263,7 @@
    "Setup plan: Python 3.12: Python 3.12 already meets >=3.5, <4.0,>=3.5",
    "Setup plan: Python rule: one Python version is used on both sides: the lowest version that meets the requirements of both main and the pull request; if none meets both, the check stops as a setup problem and records both.",
    "Setup plan: refused pip: its PyPI page does not link to this GitHub repository",
-   "Repository crawl: 8 page(s) crawled, 7 read in full, 1 setup step(s) used first in the sandbox (3 Tavily call(s), 4.0 credit(s))."
+   "Repository crawl: 8 page(s) crawled, 7 read in full, 1 setup step(s) used first in the sandbox (0 Tavily call(s), 0.0 credit(s))."
   ],
   "install_docs": [
    "README.md",
@@ -275,13 +366,14 @@
     }
    ],
    "shell": "python -m pip install -q tox || echo 'crawled step failed: packages'",
-   "calls": 3,
-   "credits": 4.0,
+   "calls": 0,
+   "credits": 0.0,
    "errors": [],
    "cache": {
-    "hit": false,
+    "hit": true,
     "key": "v2|Delgan/loguru@0412a60d6aff63a4ed009c7445993b42d294c2f1",
-    "saved": true
+    "saved": false,
+    "age_seconds": 317
    },
    "seed_decisions": [
     {
@@ -569,18 +661,1102 @@
   "main": "master @ 0412a60d6aff (base tip = first parent of the merge commit)",
   "pr": "PR head 6c91de2c42d3"
  },
+ "contree_python": {
+  "version": "3.12",
+  "why": "default image Python 3.12 fits"
+ },
+ "probe_plan": {
+  "baseline": "full",
+  "model": "model provider: nebius (Token Factory, live)",
+  "errors": [],
+  "model_claims": [
+   {
+    "id": "C1",
+    "text": "Evaluating every rotation condition prevents a skipped condition from firing spuriously.",
+    "source_quote": "Evaluate every rotation condition so a skipped one cannot fire spuriously",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C3",
+    "text": "A skipped condition leaves a stale _limit in the past, causing it to fire on the very next logged message and produce a spurious extra rotation.",
+    "source_quote": "A skipped condition is left holding a limit that is now in the past, and it therefore fires on the **very next logged message** \u2014 producing a second, immediate, spurious rotation.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C4",
+    "text": "After the change, all rotation conditions are evaluated even after one returns True, preserving the side\u2011effect of limit updates.",
+    "source_quote": "# Note that the conditions must all be evaluated, even after one of them returned\n# True, because \"RotationTime\" instances keep their limit up-to-date as a side-effect\n# of being called. Skipping them would leave a stale limit in the past, causing a\n# spurious extra rotation on the next logged message.\nshould_rotate = False\nfor rotation in self._rotations:\n    if rotation(message, file):\n        should_rotate = True\nreturn should_rotate",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C5",
+    "text": "The return value still indicates true if any rotation condition is true, preserving the \"any of which can trigger the rotation\" contract.",
+    "source_quote": "This keeps the documented \"any of which can trigger the rotation\" contract for the return value while restoring the side effect the conditions rely on.",
+    "testable": true,
+    "expect": "same"
+   },
+   {
+    "id": "C7",
+    "text": "The test test_multiple_rotation_conditions_all_evaluated fails before the change (assert 3 == 2) and passes after the change.",
+    "source_quote": "`test_multiple_rotation_conditions_all_evaluated` is added to `tests/test_filesink_rotation.py`.\n- Fails before the change with `assert 3 == 2`; passes after.",
+    "testable": true,
+    "expect": "differs"
+   }
+  ],
+  "model_rejected_claims": [
+   {
+    "id": "C2",
+    "text": "Using any() over a generator short-circuits, causing remaining rotation conditions to never be invoked and their _limit not advanced.",
+    "source_quote": "any() over a generator **short-circuits**. That is fine for the return value, but each `RotationTime` condition is *stateful*: it lazily computes `self._limit` on first call and then advances it as a side effect of being invoked ... When the first condition returns `True`, the remaining conditions are never invoked, so their `_limit` is never advanced past the current time.",
+    "testable": true,
+    "expect": "differs",
+    "rejected": "source_quote not found in the PR text"
+   },
+   {
+    "id": "C6",
+    "text": "With rotation conditions [\"13:00\", \"12:00\"], a file created at 06:00 and two messages logged at 13:00:01 results in exactly two log files after the fix (instead of three before).",
+    "source_quote": "Message \"b\" legitimately rotates at 13:00:01; \"c\" should not.\n\nafter \u2014 2 files (correct):\n  file.2020-01-01_06-00-00_000000.log     'a\\n'\n  file.log                                'b\\nc\\n'",
+    "testable": true,
+    "expect": "differs",
+    "rejected": "source_quote not found in the PR text"
+   }
+  ],
+  "model_parse_repairs": [
+   {
+    "attempt": 1,
+    "probe": "p1",
+    "error": {
+     "message": "unexpected character after line continuation character",
+     "line": 1,
+     "offset": 13,
+     "code_line": "import json\\nimport os\\nfrom unittest.mock import patch\\nfrom datetime import datetime\\nfrom loguru import logger\\nfrom loguru._file_sink import FileSink, Rotation\\n\\nclass MockMessage:\\n    def __init__(self, dt):\\n        self.record = {\\\"time\\\": dt}\\n\\nfake_path = \\\"/fake/path/file.log\\\"\\nfake_cr"
+    },
+    "outcome": "fixed",
+    "counts": {
+     "before": {
+      "keys": 0,
+      "inputs": 0,
+      "read": "tokens"
+     },
+     "after": {
+      "keys": 0,
+      "inputs": 0,
+      "read": "ast"
+     }
+    }
+   }
+  ],
+  "model_retried": {
+   "why": [
+    "empty probe: the code has no test statements (only imports, comments or a docstring)"
+   ]
+  },
+  "diff_targets": [],
+  "frozen": [
+   {
+    "path": "model-probes/model-probe-a.py",
+    "source": "model",
+    "sha256": "78c28e0261ad05125d3ec3efe264fc14ece583eb6cdf0594c4516adff1645099",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-06T07:01:48.110073+00:00",
+    "inputs_sha256": "7be977c1fff3eb715e976ea32c76234bbee3f7a4984ceda8e6a56bdbea11e09a",
+    "inputs": {
+     "title_chars": 73,
+     "body_chars": 3344,
+     "base_files": {
+      "loguru/_file_sink.py": "d9f27b56f581db5a178ae6df357107b6b022c6ad94b639b52809c5c7fc9dd0cb"
+     }
+    }
+   },
+   {
+    "path": "model-probes/model-probe-b.py",
+    "source": "model",
+    "sha256": "708b511d04bfe9e33bee583c7e742cb2d2266b1807cc64bd49309aba20eb93c5",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-06T07:01:48.110361+00:00",
+    "inputs_sha256": "7be977c1fff3eb715e976ea32c76234bbee3f7a4984ceda8e6a56bdbea11e09a",
+    "inputs": {
+     "title_chars": 73,
+     "body_chars": 3344,
+     "base_files": {
+      "loguru/_file_sink.py": "d9f27b56f581db5a178ae6df357107b6b022c6ad94b639b52809c5c7fc9dd0cb"
+     }
+    }
+   }
+  ]
+ },
+ "pr_side_started_at": "2026-11-06T07:01:48.111229+00:00",
+ "test_targets": {
+  "main": [
+   "tests/test_filesink_rotation.py",
+   "tests/test_type_hinting.py"
+  ],
+  "pr": [
+   "tests/test_filesink_rotation.py",
+   "tests/test_type_hinting.py"
+  ]
+ },
+ "contree_only": {
+  "note": "Contree mode: installs, tests and probes ran in Contree; nothing from the pull request ran locally",
+  "declared_test_deps": [],
+  "optional_backends": [],
+  "not_run_locally": [
+   "local freeze",
+   "installed-commit guard",
+   "probe coverage",
+   "optional-module retry"
+  ]
+ },
+ "contree": {
+  "main_uuid": "67b56ec6-50f3-422f-8fec-555453ee608d",
+  "pr_uuid": "207d0fc1-05c8-49ec-9e79-947f1a23da98",
+  "max_ops": 40,
+  "sdk": "0.3.6",
+  "base_image": "docker.io/library/python:3.12-slim-bookworm",
+  "python": {
+   "requires_python": [
+    ">=3.5"
+   ],
+   "requires_python_found": true,
+   "main": "3.12.15",
+   "pr": "3.12.15",
+   "problems": []
+  },
+  "own_checkout": {
+   "module": "loguru",
+   "checkout": "/work/src",
+   "main_checkout_real": "/work/src",
+   "main": "/work/src/loguru/__init__.py",
+   "pr_checkout_real": "/work/src",
+   "pr": "/work/src/loguru/__init__.py",
+   "install": {
+    "main": {
+     "python": "/usr/local/bin/python",
+     "version_source": "tag 0.7.3-163-g0412a60",
+     "editable_exit": "0",
+     "pip_show_exit": "0",
+     "pip_show_name": "loguru",
+     "pip_show_version": "0.7.3",
+     "pip_show_location": "/usr/local/lib/python3.12/site-packages"
+    },
+    "pr": {
+     "python": "/usr/local/bin/python",
+     "version_source": "tag 0.7.3-154-g6c91de2",
+     "editable_exit": "0",
+     "pip_show_exit": "0",
+     "pip_show_name": "loguru",
+     "pip_show_version": "0.7.3",
+     "pip_show_location": "/usr/local/lib/python3.12/site-packages"
+    }
+   },
+   "status": "ok"
+  }
+ },
+ "comparison": {
+  "same": 151,
+  "same_skipped_both": 3,
+  "regressions": [],
+  "fixed": [
+   "tests.test_filesink_rotation::test_multiple_rotation_conditions_all_evaluated"
+  ],
+  "new_tests_passing": 0,
+  "new_tests_passing_ids": [],
+  "new_tests_failing": [],
+  "new_tests_skipped": [],
+  "removed_tests": [],
+  "reparametrized": [],
+  "skipped_missing_dependency": [],
+  "flaky": [],
+  "pr_unstable": [],
+  "pr_unstable_noisy": [],
+  "environment": [],
+  "other_changes": [],
+  "preexisting_failures": [],
+  "load_failed_both": [],
+  "load_failed_pr": [],
+  "load_failed_main": [],
+  "executed": {
+   "main": 149,
+   "pr": 149
+  },
+  "messages": {},
+  "base_messages": {
+   "tests.test_filesink_rotation::test_multiple_rotation_conditions_all_evaluated": "AssertionError: assert 3 == 2"
+  }
+ },
+ "exit_check": {
+  "explained": true,
+  "problems": [],
+  "detail": "all runs exited 0"
+ },
+ "probes": {
+  "status": "ran",
+  "items": [
+   {
+    "id": "model-probe-a",
+    "source": "model",
+    "path": "model-probes/model-probe-a.py",
+    "sha256": "78c28e0261ad05125d3ec3efe264fc14ece583eb6cdf0594c4516adff1645099",
+    "target": "Delgan/loguru#1515",
+    "about": "Check side-effects and return value of RotationGroup with two time-based conditions.",
+    "claims": [
+     {
+      "id": "C1",
+      "source": "PR description",
+      "text": "Evaluating every rotation condition prevents a skipped condition from firing spuriously.",
+      "covers": [
+       "c1.would_trigger_cond2_again"
+      ],
+      "expect": "differs"
+     },
+     {
+      "id": "C3",
+      "source": "PR description",
+      "text": "A skipped condition leaves a stale _limit in the past, causing it to fire on the very next logged message and produce a spurious extra rotation.",
+      "covers": [
+       "c3.would_trigger_cond2_again"
+      ],
+      "expect": "differs"
+     },
+     {
+      "id": "C4",
+      "source": "PR description",
+      "text": "After the change, all rotation conditions are evaluated even after one returns True, preserving the side\u2011effect of limit updates.",
+      "covers": [
+       "c4.cond2_limit_is_none"
+      ],
+      "expect": "differs"
+     },
+     {
+      "id": "C5",
+      "source": "PR description",
+      "text": "The return value still indicates true if any rotation condition is true, preserving the \"any of which can trigger the rotation\" contract.",
+      "covers": [
+       "c5.return_value"
+      ],
+      "expect": "same"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 3.6,
+      "ok": false
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 2.8,
+      "ok": false
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 3.0,
+      "ok": false
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 2.8,
+      "ok": false
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 2.8,
+      "ok": false
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 2.8,
+      "ok": false
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-probe-a-main-1.jsonl",
+      "probe-model-probe-a-main-2.jsonl",
+      "probe-model-probe-a-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-probe-a-pr-1.jsonl",
+      "probe-model-probe-a-pr-2.jsonl",
+      "probe-model-probe-a-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      },
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      },
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      }
+     ],
+     "pr": [
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      },
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      },
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "probe.error",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "crash": "non-json output",
+       "exit_code": 1
+      },
+      "pr": {
+       "crash": "non-json output",
+       "exit_code": 1
+      },
+      "citations": {
+       "main": {
+        "file": "probe-model-probe-a-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"probe.error\""
+       },
+       "pr": {
+        "file": "probe-model-probe-a-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"probe.error\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "78c28e0261ad05125d3ec3efe264fc14ece583eb6cdf0594c4516adff1645099",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-06T07:01:48.110073+00:00",
+     "inputs_sha256": "7be977c1fff3eb715e976ea32c76234bbee3f7a4984ceda8e6a56bdbea11e09a",
+     "inputs": {
+      "title_chars": 73,
+      "body_chars": 3344,
+      "base_files": {
+       "loguru/_file_sink.py": "d9f27b56f581db5a178ae6df357107b6b022c6ad94b639b52809c5c7fc9dd0cb"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-06T07:01:48.111229+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 1,
+     "changed_lines_covered": 0,
+     "files": [
+      {
+       "file": "loguru/_file_sink.py",
+       "changed_lines_total": 1,
+       "changed_lines_covered": 1
+      }
+     ],
+     "adequacy": "not_adequate",
+     "note": "the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate",
+     "exit": 1,
+     "data": "probe-cov-model-probe-a.json",
+     "where": "contree",
+     "changed_lines_touched": 1
+    },
+    "status": "crashed",
+    "uninformative_reason": "the probe crashed or printed no parsed output on every main-side run"
+   },
+   {
+    "id": "model-probe-b-rewrite",
+    "source": "model",
+    "path": "model-probes/model-probe-b-rewrite.py",
+    "sha256": "26e6b63c7efcb7d2dc330be2815c14e6afb0b62a950b3b5f4069ed16f06f29ec",
+    "target": "Delgan/loguru#1515",
+    "about": "Count how many times the rotation group returns True over two identical messages to detect spurious extra rotation.",
+    "claims": [
+     {
+      "id": "C7",
+      "source": "PR description",
+      "text": "The test test_multiple_rotation_conditions_all_evaluated fails before the change (assert 3 == 2) and passes after the change.",
+      "covers": [
+       "c7.group_true_count_two_msgs"
+      ],
+      "expect": "differs"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 5.6,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 2.9,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 2.8,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 3.0,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 2.8,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 2.8,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-probe-b-rewrite-main-1.jsonl",
+      "probe-model-probe-b-rewrite-main-2.jsonl",
+      "probe-model-probe-b-rewrite-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-probe-b-rewrite-pr-1.jsonl",
+      "probe-model-probe-b-rewrite-pr-2.jsonl",
+      "probe-model-probe-b-rewrite-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "c7.group_true_count_two_msgs": 2
+      },
+      {
+       "c7.group_true_count_two_msgs": 2
+      },
+      {
+       "c7.group_true_count_two_msgs": 2
+      }
+     ],
+     "pr": [
+      {
+       "c7.group_true_count_two_msgs": 2
+      },
+      {
+       "c7.group_true_count_two_msgs": 2
+      },
+      {
+       "c7.group_true_count_two_msgs": 2
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "c7.group_true_count_two_msgs",
+      "state": "same",
+      "label": "needs_human",
+      "claim": "C7",
+      "main": 2,
+      "pr": 2,
+      "citations": {
+       "main": {
+        "file": "probe-model-probe-b-rewrite-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c7.group_true_count_two_msgs\""
+       },
+       "pr": {
+        "file": "probe-model-probe-b-rewrite-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c7.group_true_count_two_msgs\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "26e6b63c7efcb7d2dc330be2815c14e6afb0b62a950b3b5f4069ed16f06f29ec",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-06T07:09:35.614361+00:00",
+     "inputs_sha256": null,
+     "inputs": null,
+     "rewrite_of": "708b511d04bfe9e33bee583c7e742cb2d2266b1807cc64bd49309aba20eb93c5",
+     "verified": true,
+     "pr_started_at": "2026-11-06T07:09:35.614396+00:00"
+    },
+    "rewrite_of": "model-probe-b",
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 1,
+     "changed_lines_covered": 0,
+     "files": [
+      {
+       "file": "loguru/_file_sink.py",
+       "changed_lines_total": 1,
+       "changed_lines_covered": 0
+      }
+     ],
+     "adequacy": "not_adequate",
+     "note": "ran none of the 1 changed line(s) on the main side",
+     "exit": 0,
+     "data": "probe-cov-model-probe-b-rewrite.json",
+     "where": "contree"
+    },
+    "status": "ran"
+   }
+  ],
+  "summary": {
+   "labels": [
+    "needs_human"
+   ],
+   "flagged": [
+    {
+     "probe": "model-probe-b-rewrite",
+     "name": "c7.group_true_count_two_msgs",
+     "label": "needs_human",
+     "claim": "C7"
+    }
+   ],
+   "proven_claims": [],
+   "reason": "probe: 1 observation(s) need attention: c7.group_true_count_two_msgs does not differ although the claim says it does (C7); the probe crashed or printed no parsed output on every main-side run",
+   "ignored_noise": [],
+   "ignored_warning_only": [],
+   "pr_only_noisy": [],
+   "advisory_unchanged_subchecks": [],
+   "advisory_agreeing_differs": []
+  },
+  "rewrite": {
+   "before": [
+    {
+     "id": "model-probe-a",
+     "source": "model",
+     "path": "model-probes/model-probe-a.py",
+     "sha256": "78c28e0261ad05125d3ec3efe264fc14ece583eb6cdf0594c4516adff1645099",
+     "target": "Delgan/loguru#1515",
+     "about": "Check side-effects and return value of RotationGroup with two time-based conditions.",
+     "claims": [
+      {
+       "id": "C1",
+       "source": "PR description",
+       "text": "Evaluating every rotation condition prevents a skipped condition from firing spuriously.",
+       "covers": [
+        "c1.would_trigger_cond2_again"
+       ],
+       "expect": "differs"
+      },
+      {
+       "id": "C3",
+       "source": "PR description",
+       "text": "A skipped condition leaves a stale _limit in the past, causing it to fire on the very next logged message and produce a spurious extra rotation.",
+       "covers": [
+        "c3.would_trigger_cond2_again"
+       ],
+       "expect": "differs"
+      },
+      {
+       "id": "C4",
+       "source": "PR description",
+       "text": "After the change, all rotation conditions are evaluated even after one returns True, preserving the side\u2011effect of limit updates.",
+       "covers": [
+        "c4.cond2_limit_is_none"
+       ],
+       "expect": "differs"
+      },
+      {
+       "id": "C5",
+       "source": "PR description",
+       "text": "The return value still indicates true if any rotation condition is true, preserving the \"any of which can trigger the rotation\" contract.",
+       "covers": [
+        "c5.return_value"
+       ],
+       "expect": "same"
+      }
+     ],
+     "runs_per_side": 3,
+     "per_run": [
+      {
+       "side": "main",
+       "run": 1,
+       "seconds": 3.6,
+       "ok": false
+      },
+      {
+       "side": "pr",
+       "run": 1,
+       "seconds": 2.8,
+       "ok": false
+      },
+      {
+       "side": "main",
+       "run": 2,
+       "seconds": 3.0,
+       "ok": false
+      },
+      {
+       "side": "pr",
+       "run": 2,
+       "seconds": 2.8,
+       "ok": false
+      },
+      {
+       "side": "main",
+       "run": 3,
+       "seconds": 2.8,
+       "ok": false
+      },
+      {
+       "side": "pr",
+       "run": 3,
+       "seconds": 2.8,
+       "ok": false
+      }
+     ],
+     "outputs": {
+      "main": [
+       "probe-model-probe-a-main-1.jsonl",
+       "probe-model-probe-a-main-2.jsonl",
+       "probe-model-probe-a-main-3.jsonl"
+      ],
+      "pr": [
+       "probe-model-probe-a-pr-1.jsonl",
+       "probe-model-probe-a-pr-2.jsonl",
+       "probe-model-probe-a-pr-3.jsonl"
+      ]
+     },
+     "runs": {
+      "main": [
+       {
+        "probe.error": {
+         "crash": "non-json output",
+         "exit_code": 1
+        }
+       },
+       {
+        "probe.error": {
+         "crash": "non-json output",
+         "exit_code": 1
+        }
+       },
+       {
+        "probe.error": {
+         "crash": "non-json output",
+         "exit_code": 1
+        }
+       }
+      ],
+      "pr": [
+       {
+        "probe.error": {
+         "crash": "non-json output",
+         "exit_code": 1
+        }
+       },
+       {
+        "probe.error": {
+         "crash": "non-json output",
+         "exit_code": 1
+        }
+       },
+       {
+        "probe.error": {
+         "crash": "non-json output",
+         "exit_code": 1
+        }
+       }
+      ]
+     },
+     "observations": [
+      {
+       "name": "probe.error",
+       "state": "same",
+       "label": "not_testable",
+       "claim": null,
+       "main": {
+        "crash": "non-json output",
+        "exit_code": 1
+       },
+       "pr": {
+        "crash": "non-json output",
+        "exit_code": 1
+       },
+       "citations": {
+        "main": {
+         "file": "probe-model-probe-a-main-1.jsonl",
+         "line": 1,
+         "quote": "\"observation\": \"probe.error\""
+        },
+        "pr": {
+         "file": "probe-model-probe-a-pr-1.jsonl",
+         "line": 1,
+         "quote": "\"observation\": \"probe.error\""
+        }
+       }
+      }
+     ],
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "freeze": {
+      "sha256": "78c28e0261ad05125d3ec3efe264fc14ece583eb6cdf0594c4516adff1645099",
+      "generator": {
+       "kind": "model",
+       "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+       "model": "nvidia/nemotron-3-super-120b-a12b",
+       "provider": "nebius",
+       "provenance": "live",
+       "blind": true
+      },
+      "frozen_at": "2026-11-06T07:01:48.110073+00:00",
+      "inputs_sha256": "7be977c1fff3eb715e976ea32c76234bbee3f7a4984ceda8e6a56bdbea11e09a",
+      "inputs": {
+       "title_chars": 73,
+       "body_chars": 3344,
+       "base_files": {
+        "loguru/_file_sink.py": "d9f27b56f581db5a178ae6df357107b6b022c6ad94b639b52809c5c7fc9dd0cb"
+       }
+      },
+      "verified": true,
+      "pr_started_at": "2026-11-06T07:01:48.111229+00:00"
+     }
+    },
+    {
+     "id": "model-probe-b",
+     "source": "model",
+     "path": "model-probes/model-probe-b.py",
+     "sha256": "708b511d04bfe9e33bee583c7e742cb2d2266b1807cc64bd49309aba20eb93c5",
+     "target": "Delgan/loguru#1515",
+     "about": "Count how many times the rotation group returns True over two identical messages to detect spurious extra rotation.",
+     "claims": [
+      {
+       "id": "C7",
+       "source": "PR description",
+       "text": "The test test_multiple_rotation_conditions_all_evaluated fails before the change (assert 3 == 2) and passes after the change.",
+       "covers": [
+        "c7.group_true_count_two_msgs"
+       ],
+       "expect": "differs"
+      }
+     ],
+     "runs_per_side": 3,
+     "per_run": [
+      {
+       "side": "main",
+       "run": 1,
+       "seconds": 3.6,
+       "ok": false
+      },
+      {
+       "side": "pr",
+       "run": 1,
+       "seconds": 2.8,
+       "ok": false
+      },
+      {
+       "side": "main",
+       "run": 2,
+       "seconds": 2.8,
+       "ok": false
+      },
+      {
+       "side": "pr",
+       "run": 2,
+       "seconds": 3.0,
+       "ok": false
+      },
+      {
+       "side": "main",
+       "run": 3,
+       "seconds": 3.1,
+       "ok": false
+      },
+      {
+       "side": "pr",
+       "run": 3,
+       "seconds": 2.8,
+       "ok": false
+      }
+     ],
+     "outputs": {
+      "main": [
+       "probe-model-probe-b-main-1.jsonl",
+       "probe-model-probe-b-main-2.jsonl",
+       "probe-model-probe-b-main-3.jsonl"
+      ],
+      "pr": [
+       "probe-model-probe-b-pr-1.jsonl",
+       "probe-model-probe-b-pr-2.jsonl",
+       "probe-model-probe-b-pr-3.jsonl"
+      ]
+     },
+     "runs": {
+      "main": [
+       {
+        "probe.error": {
+         "crash": "non-json output",
+         "exit_code": 1
+        }
+       },
+       {
+        "probe.error": {
+         "crash": "non-json output",
+         "exit_code": 1
+        }
+       },
+       {
+        "probe.error": {
+         "crash": "non-json output",
+         "exit_code": 1
+        }
+       }
+      ],
+      "pr": [
+       {
+        "probe.error": {
+         "crash": "non-json output",
+         "exit_code": 1
+        }
+       },
+       {
+        "probe.error": {
+         "crash": "non-json output",
+         "exit_code": 1
+        }
+       },
+       {
+        "probe.error": {
+         "crash": "non-json output",
+         "exit_code": 1
+        }
+       }
+      ]
+     },
+     "observations": [
+      {
+       "name": "probe.error",
+       "state": "same",
+       "label": "not_testable",
+       "claim": null,
+       "main": {
+        "crash": "non-json output",
+        "exit_code": 1
+       },
+       "pr": {
+        "crash": "non-json output",
+        "exit_code": 1
+       },
+       "citations": {
+        "main": {
+         "file": "probe-model-probe-b-main-1.jsonl",
+         "line": 1,
+         "quote": "\"observation\": \"probe.error\""
+        },
+        "pr": {
+         "file": "probe-model-probe-b-pr-1.jsonl",
+         "line": 1,
+         "quote": "\"observation\": \"probe.error\""
+        }
+       }
+      }
+     ],
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "freeze": {
+      "sha256": "708b511d04bfe9e33bee583c7e742cb2d2266b1807cc64bd49309aba20eb93c5",
+      "generator": {
+       "kind": "model",
+       "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+       "model": "nvidia/nemotron-3-super-120b-a12b",
+       "provider": "nebius",
+       "provenance": "live",
+       "blind": true
+      },
+      "frozen_at": "2026-11-06T07:01:48.110361+00:00",
+      "inputs_sha256": "7be977c1fff3eb715e976ea32c76234bbee3f7a4984ceda8e6a56bdbea11e09a",
+      "inputs": {
+       "title_chars": 73,
+       "body_chars": 3344,
+       "base_files": {
+        "loguru/_file_sink.py": "d9f27b56f581db5a178ae6df357107b6b022c6ad94b639b52809c5c7fc9dd0cb"
+       }
+      },
+      "verified": true,
+      "pr_started_at": "2026-11-06T07:01:48.111229+00:00"
+     }
+    }
+   ],
+   "probes": [
+    {
+     "probe": "model-probe-a",
+     "error": "{\"crash\": \"non-json output\", \"exit_code\": 1}",
+     "result": "not rewritten: rewrite rejected: code does not parse: unexpected character after line continuation character (line 1)"
+    },
+    {
+     "probe": "model-probe-b",
+     "error": "{\"crash\": \"non-json output\", \"exit_code\": 1}",
+     "result": "rewritten once"
+    }
+   ]
+  },
+  "test_settings": {
+   "applied": true,
+   "read_from": "main checkout (same values on both sides)",
+   "source": [
+    "pyproject.toml"
+   ],
+   "variables": [],
+   "pythonpath": [],
+   "pr_changed": [
+    "pyproject.toml"
+   ]
+  },
+  "claim_hygiene": {
+   "held_back": [
+    "C1",
+    "C3",
+    "C4"
+   ],
+   "dropped_claims": [],
+   "retyped_same": [],
+   "dropped_probes": [],
+   "dropped_flagged": [],
+   "advisory_probes": [],
+   "relinked": [],
+   "unlinked_probes": []
+  }
+ },
+ "probe_changed_line_coverage": {
+  "status": "measured",
+  "side": "main",
+  "probes": {
+   "model-probe-a": {
+    "status": "measured",
+    "changed_lines_covered": 0,
+    "changed_lines_total": 1,
+    "adequacy": "not_adequate"
+   },
+   "model-probe-b-rewrite": {
+    "status": "measured",
+    "changed_lines_covered": 0,
+    "changed_lines_total": 1,
+    "adequacy": "not_adequate"
+   }
+  },
+  "not_adequate": [
+   "model-probe-a",
+   "model-probe-b-rewrite"
+  ]
+ },
+ "claim_hygiene_note": "claim(s) C1, C3, C4 expected a difference that no observation showed; cleaning up claims never lifts that",
  "verdict": "could_not_verify",
- "reason": "UnsafeEnv: refusing to run untrusted code with this environment: not allowlisted ['PIP_CONFIG_FILE'], credential-like names [], URLs with credentials in []",
+ "reason": "could not verify: claim(s) C1, C3, C4 expect a difference but no observation matches (1 test(s) fail on main and pass on the PR; 149 test(s) ran on main, 149 on the PR; 0 new test(s) pass, 151 unchanged (3 of them skipped on both sides); probe model-probe-a is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count; probe model-probe-b-rewrite is not_adequate (ran none of the 1 changed line(s) on the main side); its results do not count either way)",
  "verdict_before_coverage_gate": "could_not_verify",
- "reason_before_coverage_gate": "UnsafeEnv: refusing to run untrusted code with this environment: not allowlisted ['PIP_CONFIG_FILE'], credential-like names [], URLs with credentials in []",
- "changed_lines_total": null,
- "changed_lines_covered": null,
+ "reason_before_coverage_gate": "could not verify: claim(s) C1, C3, C4 expect a difference but no observation matches (1 test(s) fail on main and pass on the PR; 149 test(s) ran on main, 149 on the PR; 0 new test(s) pass, 151 unchanged (3 of them skipped on both sides); probe model-probe-a is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count; probe model-probe-b-rewrite is not_adequate (ran none of the 1 changed line(s) on the main side); its results do not count either way)",
+ "changed_lines_total": 5,
+ "changed_lines_covered": 5,
  "coverage_gate": {
   "kind": "python",
   "changed": false,
-  "confidence": "lower",
-  "note": "coverage of the changed Python lines was NOT MEASURED (coverage has not been run for this check)",
-  "measurement": "not measured"
+  "confidence": "normal",
+  "note": "5 of 5 changed executable line(s) ran (100%)",
+  "measurement": "measured"
+ },
+ "probe_rewrite_cap": {
+  "with_rewrite": "could_not_verify",
+  "without_rewrite": "could_not_verify",
+  "final": "could_not_verify"
  },
  "related_reports": {
   "status": "ok",
@@ -609,11 +1785,13 @@
  "explanation": {
   "status": "wired",
   "model": "nvidia/nemotron-3-super-120b-a12b",
-  "text": "The check titled \"Evaluate every rotation condition so a skipped one cannot fire spuriously\" returned verdict \"could_not_verify\" because the environment was deemed unsafe: UnsafeEnv: refusing to run untrusted code with this environment: not allowlisted ['PIP_CONFIG_FILE'], credential-like names [], URLs with credentials in [].",
+  "text": "The check could not verify: \"could not verify: claim(s) C1, C3, C4 expect a difference but no observation matches\"; one test fails on main and passes on the PR; \"probe model-probe-a is not_adequate\"; \"probe model-probe-b-rewrite is not_adequate\"; flagged item \"c7.group_true_count_two_msgs\" needs human review because \"the probe crashed or printed no parsed output on every main-side run\"",
   "quotes": [
-   "Evaluate every rotation condition so a skipped one cannot fire spuriously",
-   "could_not_verify",
-   "UnsafeEnv: refusing to run untrusted code with this environment: not allowlisted ['PIP_CONFIG_FILE'], credential-like names [], URLs with credentials in []"
+   "could not verify: claim(s) C1, C3, C4 expect a difference but no observation matches",
+   "probe model-probe-a is not_adequate",
+   "probe model-probe-b-rewrite is not_adequate",
+   "c7.group_true_count_two_msgs",
+   "the probe crashed or printed no parsed output on every main-side run"
   ],
   "advisory": true
  },
@@ -627,7 +1805,23 @@
     "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
     "status": "ok",
     "note": null,
-    "labels": []
+    "labels": [
+     {
+      "id": "fixed-1",
+      "label": "proven",
+      "reason": "Test ensures all rotation conditions are evaluated, aligning with the fix for spurious rotations."
+     },
+     {
+      "id": "probe-model-probe-a",
+      "label": "needs_human",
+      "reason": "Probe checks side-effects and return values; human analysis needed to verify correctness."
+     },
+     {
+      "id": "probe-model-probe-b-rewrite",
+      "label": "needs_human",
+      "reason": "Probe counts rotation triggers to detect spurious extra rotations; requires human judgment on results."
+     }
+    ]
    },
    {
     "role": "helper",
@@ -635,11 +1829,11 @@
     "status": "ok",
     "note": null,
     "notes": [
-     "Ignore PIP_CONFIG_FILE env var changes when evaluating rotation conditions",
-     "Skip credential URL patterns in log rotation config diffs",
-     "Noise: allowlist credential names do not affect rotation logic",
-     "Install hint: verify log file permissions before rotation testing",
-     "Noise: unrelated env var modifications can be safely filtered out"
+     "Probes with no parsed output on main side should be excluded from diff analysis.",
+     "Claims expecting differences without matching observations may be safely ignored if skip-intended.",
+     "Add model-probe-a timeout/configuration check to install hints.",
+     "Flag rotation condition C7 as expected-no-diff if claim divergence is pre-existing.",
+     "Record probe crash patterns in ignored_noise for future CI runs."
     ]
    },
    {
@@ -683,56 +1877,67 @@
   ]
  },
  "duration_s": {
-  "total_wall": 86.1,
-  "tests": 0
+  "total_wall": 669.0,
+  "tests": 180.7
  },
  "cost": {
-  "ai_calls": 0,
+  "ai_calls": 6,
   "failed_ai_calls": 0,
-  "input_tokens": 0,
-  "output_tokens": 0,
-  "thinking_tokens": 0,
-  "cost_usd": 0.0,
+  "input_tokens": 20316,
+  "output_tokens": 28268,
+  "thinking_tokens": 24360,
+  "cost_usd": 0.031536,
   "calls_without_usage": 0,
-  "ai_cost_usd": 0.0,
+  "ai_cost_usd": 0.031536,
   "cost_complete": true,
   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
   "compute_seconds": {
-   "total_wall": 86.1,
-   "tests": 0
+   "total_wall": 669.0,
+   "tests": 180.7
   },
   "machine_usd_per_hour": 0.24,
   "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
-  "computer_cost_usd": 0.00574,
-  "total_cost_usd": 0.00574,
+  "computer_cost_usd": 0.0446,
+  "total_cost_usd": 0.076136,
   "swarm": {
    "ai_calls": 3,
    "failed_ai_calls": 0,
-   "input_tokens": 558,
-   "output_tokens": 1203,
-   "thinking_tokens": 1058,
-   "cost_usd": 0.00125,
+   "input_tokens": 857,
+   "output_tokens": 2156,
+   "thinking_tokens": 1954,
+   "cost_usd": 0.002197,
    "calls_without_usage": 2,
-   "ai_cost_usd": 0.00125,
+   "ai_cost_usd": 0.002197,
    "cost_complete": false,
    "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
   }
  },
  "timings": {
-  "sandbox prep (checkout)": 17.2,
+  "sandbox prep (checkout)": 16.7,
   "Tavily setup lookup": "[redacted]",
   "demo_helper": 0.0,
   "Python setup": 0.0,
-  "dependency install": 0.1,
-  "main side install": 0.0,
-  "verdict": 4.6,
-  "agent_judge": 2.2,
-  "agent_helper": 7.5,
-  "agent_summary": 7.3,
+  "dependency install": 0.0,
+  "model: claims/probe writing": 7.4,
+  "probes": 205.1,
+  "main side install": 77.3,
+  "tests (both sides)": 326.6,
+  "verdict": 1.7,
+  "agent_judge": 7.6,
+  "agent_helper": 7.3,
+  "agent_summary": 14.7,
   "record": 0.0,
-  "model call 1 (judge)": 2.2,
-  "model call 2 (helper)": 7.5,
-  "model call 3 (summary)": 7.3
+  "tests (main side)": 90.4,
+  "tests (PR side)": 90.3,
+  "model call 1 (claims)": 7.4,
+  "model call 2 (probes)": 41.8,
+  "model call 3 (probes)": 9.4,
+  "model call 4 (probes)": 59.4,
+  "model call 5 (probes)": 17.4,
+  "model call 6 (probes)": 10.3,
+  "model call 7 (judge)": 7.6,
+  "model call 8 (helper)": 7.3,
+  "model call 9 (summary)": 14.7
  },
  "tavily_credits": "[redacted]",
  "pdf_push": {
