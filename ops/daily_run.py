@@ -6725,6 +6725,7 @@ def finalize_tests(rec: dict, per_run: list[dict], results: dict, a) -> tuple[di
         return None, f"tests produced no results on {where} (collection failed; see pytest logs)", None
     cmp = compare_sides(results)
     _stamp_cross_run(rec, cmp)
+    _drop_unexecuted_shared(cmp)
     _drop_gap_new_passes(cmp)
     ex = exit_check(per_run, results, cmp)
     rec["comparison"], rec["exit_check"] = cmp, ex
@@ -7462,7 +7463,8 @@ def _new_ids_for(files: dict | None, main_root: Path, pr_root: Path, venvs: dict
     The base is collected as it is, before any pull-request test file is copied over. A file whose collection
     fails is recorded and contributes no ids, so a missing collection is not a passing test."""
     evidence = {"ids": [], "passed_on_base": [], "failed_on_base": [], "not_collected": [],
-                "collection_failed": [], "discovery_empty": [], "reproduced": False}
+                "collection_failed": [], "discovery_empty": [], "shared_ids": [], "not_executed": [],
+                "reproduced": False}
     found: dict[str, list[str]] = {}
     for rel in _candidate_test_files(files, pr_root):
         if not (pr_root / rel).is_file():
@@ -7482,9 +7484,15 @@ def _new_ids_for(files: dict | None, main_root: Path, pr_root: Path, venvs: dict
             if not _collection_succeeded(base_rc):
                 evidence["collection_failed"].append(rel)
                 continue
+            if not base_ids:
+                # The file exists and the base collection saw nothing. Those pull-request ids are not known
+                # to be new, so they are not run and not recorded as fixed or as new passes.
+                evidence["discovery_empty"].append(rel)
+                continue
         else:
             base_ids = []
         base_set = set(base_ids)
+        evidence["shared_ids"].extend(node for node in pr_ids if node in base_set)
         new = [node for node in pr_ids if node not in base_set]
         if new:
             found[rel] = new
@@ -7660,10 +7668,20 @@ def discovery_empty_paths(source: dict | None) -> list[str]:
     return _path_list(source, "discovery_empty")
 
 
+def not_executed_files(source: dict | None) -> list[str]:
+    """Files of shared tests the base collected but did not execute. Not a new pass."""
+    out: list[str] = []
+    for node in _evidence_dict(source).get("not_executed") or []:
+        path = str(node).split("::", 1)[0].replace("\\", "/").strip()
+        if path and path not in out:
+            out.append(path)
+    return out
+
+
 def unchecked_changed_files(source: dict | None) -> list[str]:
-    """Collection failures, then files that collected no tests. Duplicates are dropped."""
+    """Collection failures, empty collections, then shared tests the base did not run."""
     out = collection_failed_paths(source)
-    for rel in discovery_empty_paths(source):
+    for rel in discovery_empty_paths(source) + not_executed_files(source):
         if rel not in out:
             out.append(rel)
     return out
@@ -7691,14 +7709,54 @@ def collection_limitation_message(source: dict | None) -> str | None:
     does not decide the verdict. A file named here is not a pass, and the result does not cover it."""
     failed = collection_failed_paths(source)
     empty = [rel for rel in discovery_empty_paths(source) if rel not in failed]
+    missed = [str(node) for node in _evidence_dict(source).get("not_executed") or [] if str(node).strip()]
     parts = [sentence for sentence in (_gap_sentence(failed, False) if failed else "",
                                        _gap_sentence(empty, True) if empty else "") if sentence]
+    if missed:
+        shown = ", ".join(missed[:8])
+        more = f" (+{len(missed) - 8} more)" if len(missed) > 8 else ""
+        parts.append(f"Limitation: {shown}{more} did not run on the base. "
+                     "They are not a new pass, and this result does not cover them.")
     return " ".join(parts) or None
 
 
 def _id_in_files(test_id: str, files: set[str]) -> bool:
     path = str(test_id).split("::", 1)[0].replace("\\", "/")
-    return path in files
+    if path in files:
+        return True
+    resolved = resolve_test_id(str(test_id), known=sorted(files)).split("::", 1)[0]
+    return resolved in files
+
+
+def _drop_unexecuted_shared(cmp: dict) -> None:
+    """A test both sides collected is not a new pass when the base run has no row for it.
+
+    Passed, failed, and skipped rows are real executions. A skip is not a pass. ``fixed`` is not edited.
+    The id is listed on ``not_executed`` so the verified cap names the file instead of dropping the pass quietly."""
+    if not isinstance(cmp, dict):
+        return
+    info = _evidence_dict(cmp.get("base_new_tests") if isinstance(cmp.get("base_new_tests"), dict) else None)
+    if not info and isinstance(cmp.get("base_new_tests"), dict):
+        info = cmp["base_new_tests"]
+    shared = [str(node) for node in (info.get("shared_ids") or [])]
+    if not shared:
+        return
+    known = [node.split("::", 1)[0] for node in shared if node.split("::", 1)[0].endswith(".py")]
+    def canon(tid: str) -> str:
+        return resolve_test_id(str(tid), known=known)
+    by_canon = {canon(node): node for node in shared}
+    not_exec = [str(node) for node in info.get("not_executed") or []]
+    kept = []
+    for tid in cmp.get("new_tests_passing_ids") or []:
+        original = by_canon.get(canon(tid))
+        if original is not None:
+            if original not in not_exec:
+                not_exec.append(original)
+            continue
+        kept.append(tid)
+    cmp["new_tests_passing_ids"] = kept
+    cmp["new_tests_passing"] = len(kept)
+    info["not_executed"] = not_exec
 
 
 def _drop_gap_new_passes(cmp: dict) -> None:
@@ -7842,7 +7900,8 @@ def record_cross_run(rec: dict, venvs: dict, targets: dict | None, prdir: Path, 
         if blocked_copy:
             info = rec.setdefault("base_new_tests", {"ids": [], "passed_on_base": [], "failed_on_base": [],
                                                      "not_collected": [], "collection_failed": [],
-                                                     "discovery_empty": [], "reproduced": False})
+                                                     "discovery_empty": [], "shared_ids": [], "not_executed": [],
+                                                     "reproduced": False})
             failed = info.setdefault("collection_failed", [])
             for rel in blocked_copy:
                 if rel not in failed:
@@ -8755,7 +8814,7 @@ def cap_for_uncollected_file(cmp: dict | None, v: str, reason: str) -> tuple[str
     shown = ", ".join(files)
     noun = "file" if len(files) == 1 else "files"
     return (Verdict.COULD_NOT_VERIFY.value,
-            f"could not verify: pytest could not collect {shown}, so that changed test {noun} did not run ({reason})")
+            f"could not verify: pytest did not run {shown} on the base, so that changed test {noun} is not a pass ({reason})")
 
 
 def _store_verdict(rec: dict, cmp, cnv, ex) -> None:

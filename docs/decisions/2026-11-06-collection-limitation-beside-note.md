@@ -30,10 +30,14 @@ not a pass.
 - Write one plain limitation sentence that lists the files pytest could not collect. Put it on the record,
   after the note in the reason, and in the report beside the note.
 - Compute the verdict with the existing comparison first. A collection failure is not one of those inputs.
-- If that verdict is verified and any selected changed test file failed to collect, or collected no tests,
-  lower only that result to could not verify. The reason names the file. Tests that failed on the base and
-  passed on the pull request stay in the fixed list. The already-on-base note, when the new tests really
-  passed on the tested commit, is still attached. The commit is `tested_main_sha` when the run recorded it.
+- If that verdict is verified and any selected changed test file failed to collect, collected no tests, or
+  has a shared test the base did not execute, lower only that result to could not verify. A test both sides
+  collected is not a new pass when the base junit has no row. An existing file whose base collection saw
+  nothing does not make every pull-request id new, and it does not create a fixed result. A skip is not a
+  pass. Tests that failed on the base and passed on the pull request stay in the fixed list. The
+  already-on-base note, when the new tests really passed on the tested commit, is still attached. The commit
+  is `tested_main_sha` when the run recorded it. A flagged probe still keeps needs attention; the note does
+  not replace that verdict.
 - If that verdict is needs attention, leave it, including when a probe flagged a difference. The limitation
   sentence is the only addition. A collection failure never turns needs attention into could not verify.
 - Do not add a second go/no-go rule. The existing summary withholds "Nothing needs attention" whenever a
