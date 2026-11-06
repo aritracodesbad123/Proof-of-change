@@ -56,7 +56,12 @@ the record has no contradicted same claim, no unclaimed difference, no crash on 
 regression, no new or edited test that fails there, and no test that is unstable on the pull request). A test
 that fails the same way on both sides, the same outcome and the same exception type after side-path
 normalisation, does not block. A cross-run does not settle a differs claim whose agreeing observations sit on
-an input where another claim was proven different. Flaky
+an input where another claim was proven different. A preservation claim that names several explicit results,
+and that says those results stay the same, does not raise needs attention for one of those results when that
+result's change is exactly the count an intended differs claim already proved. The result stays labelled as a
+contradicted same claim and is listed as an invalid preservation claim. A result that is not one of those
+explicit targets, a cover that uses a wildcard, a claim that does not say the behaviour is preserved, and a
+claim whose every explicit result changed, still need attention. Flaky
 observations are ignored as noise when the base side is unstable or both sides are. An observation that is stable
 on the base and unstable only on the pull request is not that noise: it needs attention, or could not verify when
 every pull-request run differs. Differences that are only about warnings never count on their own.
@@ -988,6 +993,110 @@ def _agreeing_differs_when_proven(obs: list[dict]) -> list[dict]:
     return out
 
 
+# A claim that says a result is kept. "still" alone is not enough: a sentence can say the old broken result
+# "still" happens, and that is a different case from a claim that the behaviour is preserved.
+_PRESERVATION_RE = re.compile(
+    r"(?i)\b(?:preserv\w*|unchanged|as\s+before|stay(?:s|ed)?\s+the\s+same|remain(?:s|ed)?\s+the\s+same)\b")
+INVALID_PRESERVATION_NOTE = "invalid preservation claim; this part is the intended change already proven"
+
+
+def _exact_cover_names(covers) -> list[str]:
+    """Cover strings that name one observation, with no wildcard. Order is kept."""
+    out = []
+    for pat in covers or []:
+        if isinstance(pat, str) and pat and not any(ch in pat for ch in "*?["):
+            out.append(pat)
+    return out
+
+
+def _bool_bit(value):
+    """1 or 0 for a real boolean, else None. The integers 0 and 1 are not booleans."""
+    return int(value) if isinstance(value, bool) else None
+
+
+def _plain_number(value):
+    """An int or a float, else None. A boolean is not a count."""
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        return None
+    return value
+
+
+def invalid_preservation(items: list[dict]) -> list[tuple]:
+    """Probe id and observation name for a preservation false alarm that is the proven change.
+
+    The preservation claim expects the same result, its text says the behaviour is preserved, and it names
+    at least two observations exactly (no wildcard). At least one of those stays the same and at least one
+    differs. On both sides, the count of True among those observations equals a different claim's proven
+    differs observation, and that observation is itself an exact cover of the differs claim. The differing
+    parts are then the change that claim already proved, so they do not raise needs attention on their own.
+
+    Anything else is left out: a wildcard cover, a claim that does not say the behaviour is preserved, a
+    single named result, a claim whose every named result changed, a count that does not equal those
+    booleans, and an observation that is not one of the explicit names. Returned as (probe id, name) in
+    observation order."""
+    aggregates = []
+    for it in items:
+        claims = [c for c in it.get("claims") or [] if isinstance(c, dict)]
+        by_id = {c.get("id"): c for c in claims}
+        for obs in it.get("observations") or []:
+            if not isinstance(obs, dict):
+                continue
+            claim = by_id.get(obs.get("claim"))
+            if not claim or claim.get("expect") != "differs":
+                continue
+            if (obs.get("label") != FindingLabel.PROVEN.value or obs.get("state") != "differs"
+                    or obs.get("advisory") or obs.get("pr_only")):
+                continue
+            if obs.get("name") not in _exact_cover_names(claim.get("covers")):
+                continue
+            main, pr = _plain_number(obs.get("main")), _plain_number(obs.get("pr"))
+            if main is None or pr is None or main == pr:
+                continue
+            aggregates.append((claim.get("id"), main, pr))
+    found = []
+    for it in items:
+        claims = [c for c in it.get("claims") or [] if isinstance(c, dict)]
+        by_name = {}
+        for obs in it.get("observations") or []:
+            if isinstance(obs, dict) and isinstance(obs.get("name"), str) and obs["name"] not in by_name:
+                by_name[obs["name"]] = obs
+        for claim in claims:
+            if claim.get("expect") != "same" or not _PRESERVATION_RE.search(str(claim.get("text") or "")):
+                continue
+            names = _exact_cover_names(claim.get("covers"))
+            if len(names) < 2 or len(set(names)) != len(names):
+                continue
+            parts = []
+            for name in names:
+                obs = by_name.get(name)
+                if not obs or obs.get("claim") != claim.get("id"):
+                    parts = []
+                    break
+                if _bool_bit(obs.get("main")) is None or _bool_bit(obs.get("pr")) is None:
+                    parts = []
+                    break
+                parts.append(obs)
+            if len(parts) < 2:
+                continue
+            held = [o for o in parts if o.get("state") == "same" and o.get("label") == FindingLabel.PROVEN.value
+                    and not o.get("advisory") and not o.get("pr_only")]
+            flips = [o for o in parts if o.get("state") == "differs" and o.get("label") == FindingLabel.FALSE_CLAIM.value
+                     and not o.get("advisory") and not o.get("pr_only")]
+            if not held or not flips or len(held) + len(flips) != len(parts):
+                continue
+            total_main = sum(_bool_bit(o.get("main")) for o in parts)
+            total_pr = sum(_bool_bit(o.get("pr")) for o in parts)
+            if total_main == total_pr:
+                continue
+            linked = any(cid != claim.get("id") and main == total_main and pr == total_pr
+                         for cid, main, pr in aggregates)
+            if not linked:
+                continue
+            for obs in flips:
+                found.append((it.get("id"), obs.get("name")))
+    return found
+
+
 def summarize(items: list[dict]) -> dict:
     """Findings over all probes of a PR: labels, red/amber observations, proven claims, reason text."""
     obs = [o | {"probe": it["id"]} for it in items for o in it["observations"]]
@@ -1013,9 +1122,16 @@ def summarize(items: list[dict]) -> dict:
     # was proven different. That observation was reached, so it still needs attention. A claim that is only
     # partly shown, or a record with nothing proven, is unchanged.
     unshown = _agreeing_differs_when_proven(obs)
+    # A contradicted part of an explicit preservation claim, when that part is the count an intended claim
+    # already proved. The label stays false_claim. It is not an unclaimed difference, so it is not marked
+    # advisory on the observation, and it does not by itself raise needs attention.
+    invalid_keys = set(invalid_preservation(items))
+    invalid = [o for o in obs if (o.get("probe"), o.get("name")) in invalid_keys
+               and o.get("label") == FindingLabel.FALSE_CLAIM.value and o.get("state") == "differs"
+               and not o.get("advisory") and not o.get("pr_only")]
     flagged = [o for o in raw_flagged
                if o["label"] != FindingLabel.FLAKY.value and o.get("pr_only") != "noisy" and not o.get("advisory")
-               and o not in unchanged_sub and o not in unshown]
+               and o not in unchanged_sub and o not in unshown and o not in invalid]
     warning_only = [o for o in flagged if is_warning_observation(o["name"])]
     if flagged and len(warning_only) == len(flagged):
         flagged = []
@@ -1060,6 +1176,11 @@ def summarize(items: list[dict]) -> dict:
         bits.append(f"probe: {len(unshown)} observation(s) shown as advisory only "
                     "(claim not shown on these inputs; a related change was proven): "
                     + "; ".join(f"{o['name']} ({o['claim']})" for o in unshown[:4]) + more)
+    if invalid:
+        more = f" (+{len(invalid) - 4} more)" if len(invalid) > 4 else ""
+        bits.append(f"probe: {len(invalid)} observation(s) shown as advisory only "
+                    f"({INVALID_PRESERVATION_NOTE}): "
+                    + "; ".join(f"{o['name']} ({o['claim']})" for o in invalid[:4]) + more)
     if proven:
         bits.append(f"probe: claim(s) {', '.join(proven)} proven")
     same = sum(1 for o in obs if o["label"] == FindingLabel.NO_DIFFERENCE.value)
@@ -1074,7 +1195,8 @@ def summarize(items: list[dict]) -> dict:
             "ignored_noise": [o["name"] for o in noisy], "ignored_warning_only": [o["name"] for o in warning_only],
             "pr_only_noisy": [o["name"] for o in pr_only_noisy],
             "advisory_unchanged_subchecks": [o["name"] for o in unchanged_sub],
-            "advisory_agreeing_differs": [o["name"] for o in unshown]}
+            "advisory_agreeing_differs": [o["name"] for o in unshown],
+            "advisory_invalid_preservation": [o["name"] for o in invalid]}
 
 
 ONE_SIDE_NOTE = "the claim describes the old behaviour only (before the fix), check"
