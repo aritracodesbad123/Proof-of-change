@@ -1,8 +1,8 @@
 {
  "schema_version": "1",
  "record_kind": "pr_run",
- "id": "pr-Delgan-loguru-1515-6c91de2c42d3-2026-11-06-check-1124",
- "date_ist": "2026-11-06 11:24 IST",
+ "id": "pr-Delgan-loguru-1515-6c91de2c42d3-2026-11-06-check-1150",
+ "date_ist": "2026-11-06 11:50 IST",
  "run_date": "2026-11-06",
  "who": "ops/daily_run.py",
  "repo": "Delgan/loguru",
@@ -25,7 +25,7 @@
  "updated_at_ist": "2026-11-01 07:47 IST",
  "ci_state": "not checked (single-PR check)",
  "ci_detail": "checked on request with --pr",
- "tested_at_ist": "2026-11-06 11:24 IST",
+ "tested_at_ist": "2026-11-06 11:50 IST",
  "files": {
   "all": [
    ".github/workflows/docs.yml",
@@ -140,8 +140,8 @@
   "notes": [
    "Setup check: GitHub token: present.",
    "Setup check: Nebius token: present.",
-   "Setup check: free memory 7.5 GB (of 15.6 GB).",
-   "Setup check: free disk 94.7 GB.",
+   "Setup check: free memory 8.8 GB (of 15.6 GB).",
+   "Setup check: free disk 94.4 GB.",
    "Demo helper: git is installed.",
    "Demo helper: python3 is installed.",
    "Demo helper: uv is installed.",
@@ -464,59 +464,77 @@
   "model_claims": [
    {
     "id": "C1",
-    "text": "Evaluating every rotation condition prevents a skipped condition from firing spuriously.",
+    "text": "Evaluating every rotation condition prevents a skipped condition from causing a spurious extra rotation.",
     "source_quote": "Evaluate every rotation condition so a skipped one cannot fire spuriously",
     "testable": true,
     "expect": "differs"
    },
    {
     "id": "C2",
-    "text": "When the first condition returns True, the remaining conditions are never invoked, so their _limit is never advanced past the current time. A skipped condition is left holding a limit that is now in the past, and it therefore fires on the very next logged message \u2014 producing a second, immediate, spurious rotation.",
-    "source_quote": "When the first condition returns True, the remaining conditions are never invoked, so their _limit is never advanced past the current time. A skipped condition is left holding a limit that is now in the past, and it therefore fires on the very next logged message \u2014 producing a second, immediate, spurious rotation.",
+    "text": "Using any() to combine rotation conditions causes short\u2011circuit evaluation, leaving some stateful conditions unevaluated and their internal limits stale, which can lead to a spurious rotation on the next log message.",
+    "source_quote": "`any()` over a generator **short-circuits**. That is fine for the return value, but each `RotationTime` condition is *stateful*",
     "testable": true,
-    "expect": "differs",
+    "expect": "differs"
+   },
+   {
+    "id": "C3",
+    "text": "The change preserves the original semantics that the __call__ method returns True if any rotation condition would trigger rotation.",
+    "source_quote": "This keeps the documented 'any of which can trigger the rotation' contract for the return value while restoring the side effect the conditions rely on.",
+    "testable": true,
+    "expect": "same",
     "quote_match": "loose"
    },
    {
     "id": "C4",
-    "text": "test_multiple_rotation_conditions_all_evaluated is added to tests/test_filesink_rotation.py. - Fails before the change with assert 3 == 2; passes after.",
-    "source_quote": "test_multiple_rotation_conditions_all_evaluated is added to tests/test_filesink_rotation.py.\n- Fails before the change with assert 3 == 2; passes after.",
+    "text": "The added test `test_multiple_rotation_conditions_all_evaluated` asserts that only two log files are produced; it fails (expecting 3) before the fix and passes after.",
+    "source_quote": "Fails before the change with `assert 3 == 2`; passes after.",
     "testable": true,
-    "expect": "differs",
-    "quote_match": "loose"
-   }
-  ],
-  "model_rejected_claims": [
-   {
-    "id": "C3",
-    "text": "Note that the conditions must all be evaluated, even after one of them returned True, because \"RotationTime\" instances keep their limit up-to-date as a side-effect of being called. Skipping them would leave a stale limit in the past, causing a spurious extra rotation on the next logged message.",
-    "source_quote": "Note that the conditions must all be evaluated, even after one of them returned True, because \"RotationTime\" instances keep their limit up-to-date as a side-effect of being called. Skipping them would leave a stale limit in the past, causing a spurious extra rotation on the next logged message.",
-    "testable": true,
-    "expect": "same",
-    "rejected": "source_quote not found in the PR text"
-   }
-  ],
-  "model_loose_quote_matches": [
-   {
-    "claim": "C2",
-    "source_quote": "When the first condition returns True, the remaining conditions are never invoked, so their _limit is never advanced past the current time. A skipped condition is left holding a limit that is now in the past, and it therefore fires on the very next logged message \u2014 producing a second, immediate, spurious rotation."
+    "expect": "differs"
    },
    {
-    "claim": "C4",
-    "source_quote": "test_multiple_rotation_conditions_all_evaluated is added to tests/test_filesink_rotation.py.\n- Fails before the change with assert 3 == 2; passes after."
+    "id": "C5",
+    "text": "Running the filesink rotation test suite yields 147 passed tests after the change, compared to 146 passed before.",
+    "source_quote": "`pytest tests/test_filesink_rotation.py` \u2192 **147 passed, 4 skipped** (146 before).",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C6",
+    "text": "The full test suite after the change has zero failures, matching the baseline, with only one additional passing test.",
+    "source_quote": "Full suite \u2192 **1646 passed, 70 skipped, 0 failed**. The baseline on unmodified HEAD was 1645 passed, 0 failed, so the delta is exactly this one test.",
+    "testable": true,
+    "expect": "same"
+   }
+  ],
+  "model_rejected_claims": [],
+  "model_loose_quote_matches": [
+   {
+    "claim": "C3",
+    "source_quote": "This keeps the documented 'any of which can trigger the rotation' contract for the return value while restoring the side effect the conditions rely on."
    }
   ],
   "model_retried": {
    "why": [
     "no probe listed the claim ids it checks, so its results could not be tied to any claim; in each probe, \"claims\" must name the claim ids it checks and the observation names that cover them"
-   ]
+   ],
+   "kept_first_answer": "the retry linked no claim either"
   },
+  "model_claims_filled": [
+   {
+    "id": "p1",
+    "claims": [
+     "C2",
+     "C3",
+     "C4"
+    ]
+   }
+  ],
   "diff_targets": [],
   "frozen": [
    {
-    "path": "model-probes/model-probe1.py",
+    "path": "model-probes/model-p1.py",
     "source": "model",
-    "sha256": "4745780bea6ad61d98c1d27a3ff32c60c840719eabdfb0e9465aaecf61e8a451",
+    "sha256": "988f5136a76e51ef2495e834f2ec7f73a58a59b85ec61e127e342e96f58013de",
     "generator": {
      "kind": "model",
      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
@@ -525,7 +543,7 @@
      "provenance": "live",
      "blind": true
     },
-    "frozen_at": "2026-11-06T05:58:53.255539+00:00",
+    "frozen_at": "2026-11-06T06:22:47.188548+00:00",
     "inputs_sha256": "7be977c1fff3eb715e976ea32c76234bbee3f7a4984ceda8e6a56bdbea11e09a",
     "inputs": {
      "title_chars": 73,
@@ -553,7 +571,7 @@
   "build",
   "twine"
  ],
- "pr_side_started_at": "2026-11-06T05:58:53.407233+00:00",
+ "pr_side_started_at": "2026-11-06T06:22:47.333894+00:00",
  "verdict": "could_not_verify",
  "reason": "install failed (1); see setup-pr.log",
  "verdict_before_coverage_gate": "could_not_verify",
@@ -598,28 +616,28 @@
   ]
  },
  "duration_s": {
-  "total_wall": 246.9,
+  "total_wall": 126.2,
   "tests": 0
  },
  "cost": {
   "ai_calls": 3,
   "failed_ai_calls": 0,
-  "input_tokens": 11581,
-  "output_tokens": 32323,
-  "thinking_tokens": 30341,
-  "cost_usd": 0.032565,
+  "input_tokens": 12073,
+  "output_tokens": 25650,
+  "thinking_tokens": 24284,
+  "cost_usd": 0.026707,
   "calls_without_usage": 0,
-  "ai_cost_usd": 0.032565,
+  "ai_cost_usd": 0.026707,
   "cost_complete": true,
   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
   "compute_seconds": {
-   "total_wall": 246.9,
+   "total_wall": 126.2,
    "tests": 0
   },
   "machine_usd_per_hour": 0.24,
   "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
-  "computer_cost_usd": 0.01646,
-  "total_cost_usd": 0.049025,
+  "computer_cost_usd": 0.008413,
+  "total_cost_usd": 0.03512,
   "swarm": {
    "ai_calls": 0,
    "failed_ai_calls": 0,
