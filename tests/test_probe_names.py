@@ -514,15 +514,17 @@ def test_bad_constructor_keyword_is_repaired_once_or_dropped(tmp_path):
     assert out["name_checks"][0]["outcome"] == "fixed"
     text = out["probes"][0]["path"].read_text()
     assert "takes_value" not in text and "name=" in text
-    # A second answer that still passes the keyword is not written and is not coverage.
     again = Sequence([[_probe(bad)], [_probe(bad)]])
     out2 = model_probes.generate(again, "o/r", 1, "Keep answer", BODY,
                                  {"widget/parser/argument.py": base / "widget" / "parser" / "argument.py"},
                                  base, [tmp_path / "pr"], tmp_path / "out2")
     assert again.probe_calls == 2
-    assert out2["probes"] == []
     assert "unexpected keyword" in out2["name_checks"][0]["outcome"]
-    assert not list((tmp_path / "out2").glob("*.py"))
+    # The model left the unknown keyword. The valid positional stays; the keyword is removed.
+    # The probe is not replaced by a different call, and it is not dropped while that value remains.
+    text2 = out2["probes"][0]["path"].read_text()
+    assert "takes_value" not in text2 and "Argument('p')" in text2
+    assert out2["call_bindings"][0]["bindings"][0]["dropped"] == ["takes_value"]
 
 
 def test_unrelated_observations_are_not_claim_proof():

@@ -11,6 +11,7 @@ uses a different signature so the result does not depend on that fixture.
 """
 import json
 import os
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -19,6 +20,7 @@ from ops.daily_run import ai_probe_gate, compare_sides, verdict_for
 from poc import model_probes, model_provider, probe_names, probes
 
 HELD = Path(__file__).parent / "fixtures" / "call_binding" / "heldout.json"
+PARSER_BASE = Path(__file__).parent / "fixtures" / "call_binding" / "parser_base"
 BODY = "answer() stays the same."
 CLAIM = {"id": "C1", "text": "answer() stays the same.", "source_quote": "answer() stays the same.",
          "testable": True, "expect": "same"}
@@ -122,7 +124,9 @@ def test_constructor_binds_from_the_base_call_and_runs(tmp_path):
     code = _bad_maker()
     bound, notes, reject = probe_names.prepare_calls(code, base)
     assert reject is None
-    assert notes and notes[0]["how"] == "call_site"
+    filled = [note for note in notes if note.get("filled")]
+    assert filled and filled[0]["how"] == "filled"
+    assert filled[0]["filled"][0]["parameter"] == "initial"
     assert "from-base" in bound and "from-pr" not in bound and "contexts=" not in bound
     assert "names[0]" not in bound
     ran = _run(bound, base, tmp_path / "run")
@@ -132,9 +136,9 @@ def test_constructor_binds_from_the_base_call_and_runs(tmp_path):
     lone = tmp_path / "lone"
     _write(lone, {
         "widget/__init__.py": "",
-        "widget/box.py": "class Needs:\n    def __init__(self, key):\n        self.key = key\n",
+        "widget/needs.py": "class Needs:\n    def __init__(self, key):\n        self.key = key\n",
     })
-    omitted = "import widget.box as box\nprint(box.Needs())\n"
+    omitted = "import widget.needs as needs\nprint(needs.Needs())\n"
     _again, _notes, reason = probe_names.prepare_calls(omitted, lone)
     assert reason and "missing required" in reason and "not run" in reason
     assert probe_names.problems(omitted, lone)
@@ -148,9 +152,10 @@ def test_omission_abstains_and_a_real_difference_still_needs_attention(tmp_path)
     lone = tmp_path / "lone"
     _write(lone, {
         "widget/__init__.py": "",
-        "widget/box.py": "class Needs:\n    def __init__(self, key):\n        self.key = key\n",
+        "widget/needs.py": "class Needs:\n    def __init__(self, key):\n        self.key = key\n",
     })
-    _code, _notes, reason = probe_names.prepare_calls("import widget.box as box\nprint(box.Needs())\n", lone)
+    _code, _notes, reason = probe_names.prepare_calls(
+        "import widget.needs as needs\nprint(needs.Needs())\n", lone)
     assert reason
     blocked = probe_names.unusable_item("model-p1", "model", "model-p1.py", reason)
     blocked["claims"] = [{"id": "C1", "text": "the message changes", "covers": ["c1.error"], "expect": "differs"}]
@@ -214,7 +219,8 @@ def test_retry_shows_the_base_call_and_binds_when_the_model_repeats_it(tmp_path)
     assert out["probes"]
     text = out["probes"][0]["path"].read_text()
     assert "contexts=" not in text and "from-base" in text
-    assert out["call_bindings"][0]["bindings"][0]["how"] == "call_site"
+    filled = [note for note in out["call_bindings"][0]["bindings"] if note.get("filled")]
+    assert filled and filled[0]["how"] == "filled"
     env = os.environ.copy()
     env["PYTHONPATH"] = str(base)
     env.pop("PYTHONSAFEPATH", None)
@@ -247,10 +253,12 @@ def test_unconnected_signature_binds_its_own_call(tmp_path):
     code = "import widget.calc as calc\nprint(calc.blend(width=4))\n"
     assert any("unexpected keyword" in msg for msg in probe_names.problems(code, root))
     bound, notes, reject = probe_names.prepare_calls(code, root)
-    assert reject is None and notes[0]["how"] == "call_site"
+    assert reject is None and notes[0]["how"] == "filled"
+    assert {item["parameter"] for item in notes[0]["filled"]} == {"left", "right"}
     ran = _run(bound, root, tmp_path / "run")
     assert ran.returncode == 0, ran.stderr
     assert ran.stdout.strip() == "5"
+    assert "width" not in bound
 
 
 def test_reexport_uses_the_defining_signature(tmp_path):
@@ -275,35 +283,76 @@ def test_reexport_uses_the_defining_signature(tmp_path):
     text = " ".join(probe_names.problems(code, root))
     assert "unexpected keyword" in text and "contexts" in text and "initial" in text
     bound, notes, reject = probe_names.prepare_calls(code, root)
-    assert reject is None and notes[0]["how"] == "call_site"
+    assert reject is None and notes[0]["how"] == "filled"
+    assert notes[0]["filled"][0]["parameter"] == "initial"
     ran = _run(bound, root, tmp_path / "run")
     assert ran.returncode == 0, ran.stderr
     assert ran.stdout.strip() == "ok"
+    assert "contexts" not in bound
 
 
-def test_heldout_fixture_binds_and_runs(tmp_path):
-    """The held-out probe is data. The same binder runs it; the call site's value comes back."""
+def test_heldout_fixture_does_not_steal_another_call(tmp_path):
+    """A probe whose only argument is an unknown keyword is not replaced by the fixture's real call."""
     spec = json.loads(HELD.read_text())
     root = tmp_path / "base"
     _write(root, spec["files"])
     bound, notes, reject = probe_names.prepare_calls(spec["probe"], root)
-    assert reject is None and notes and notes[0]["how"] == "call_site"
-    assert spec["absent"] not in bound
+    assert reject and "not run" in reject and notes == []
+    assert bound == spec["probe"]
+    assert spec["expect"] not in bound
+
+
+def test_real_base_parser_call_is_cited_and_not_substituted(tmp_path):
+    """The base test's Parser(contexts=[mytask]) is a real call. It is not pasted over a different probe.
+
+    A probe that already passes a legal contexts value keeps that value and loses only the unknown
+    keyword. A probe whose only argument is unknown is not rewritten to Parser() or to mytask, and
+    the reason names the base call that was left unused. That result is not coverage."""
+    root = tmp_path / "base"
+    shutil.copytree(PARSER_BASE, root)
+    kept = ("from invoke.parser import Parser, Context\n"
+            "p = Parser(contexts=[Context(name='invoke', aliases=(), help={'task': 'lag'})], not_a_param=1)\n"
+            "print(p.contexts[0].name)\n")
+    bound, notes, reject = probe_names.prepare_calls(kept, root)
+    assert reject is None
+    assert "not_a_param" not in bound and "help=" not in bound
+    assert "invoke" in bound and "mytask" not in bound and "Parser()" not in bound
     ran = _run(bound, root, tmp_path / "run")
     assert ran.returncode == 0, ran.stderr
-    assert ran.stdout.strip() == spec["expect"]
+    assert ran.stdout.strip() == "invoke"
+    assert any(note.get("dropped") for note in notes)
+
+    bare = "from invoke.parser import Parser\nprint(Parser(not_a_param=1))\n"
+    again, notes2, reason = probe_names.prepare_calls(bare, root)
+    assert reason and "not run" in reason and "not copied" in reason
+    assert "parser_parser.py" in reason and "contexts" in reason
+    assert notes2 == [] and again == bare
+    assert "mytask" not in again
+    blocked = probe_names.unusable_item("model-p1", "model", "model-p1.py", reason)
+    blocked["claims"] = [{"id": "C1", "text": "the message changes", "covers": ["c1.error"], "expect": "differs"}]
+    assert blocked["observations"] == []
+    assert blocked["probe_changed_line_coverage"]["changed_lines_covered"] == 0
+    verdict, why, _flags = verdict_for(
+        _cmp_verified(), None, probe_results={"status": "ran", "items": [blocked]})
+    gated = ai_probe_gate({
+        "verdict": verdict, "reason": why, "baseline": "full",
+        "probes": {"status": "ran", "items": [blocked]},
+    })["verdict"]
+    assert gated != "needs_attention"
 
 
-def test_bad_keyword_with_only_defaults_uses_the_signature(tmp_path):
-    """When every parameter has a default and no base call can be copied, the bad keyword is dropped."""
+def test_bad_keyword_with_only_defaults_is_not_rewritten_to_the_default_call(tmp_path):
+    """Deleting the only argument would leave the default call. That is not this probe, so it is not run."""
     root = tmp_path / "base"
     _write(root, {
         "widget/__init__.py": "",
         "widget/calc.py": "def ready(scale=1):\n    return scale\n",
+        "tests/test_calc.py": "from widget.calc import ready\n\ndef test_ready():\n    assert ready() == 1\n",
     })
     code = "import widget.calc as calc\nprint(calc.ready(width=4))\n"
     bound, notes, reject = probe_names.prepare_calls(code, root)
-    assert reject is None and notes[0]["how"] == "signature"
-    ran = _run(bound, root, tmp_path / "run")
-    assert ran.returncode == 0, ran.stderr
-    assert ran.stdout.strip() == "1"
+    assert reject and "not run" in reject and "not copied" in reject
+    assert notes == [] and bound == code
+    blocked = probe_names.unusable_item("model-p1", "model", "model-p1.py", reject)
+    assert blocked["status"] == "not_run"
+    assert blocked["probe_changed_line_coverage"]["changed_lines_covered"] == 0

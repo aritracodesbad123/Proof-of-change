@@ -12,17 +12,24 @@ definition accepts, unless the definition has `*args`. A definition that accepts
 left alone, because any name is allowed. A class that does not write its own `__init__` is not
 counted this way, because a decorator may have added the constructor.
 
-When a call does not match, the arguments are taken from a real call of that same function in
-the base tree. Those calls are read from the base files, tests and source, as syntax only. The
-walk stops after a fixed number of files. It does not import the package and it does not use
-the network. A name used as an argument is copied only when the same function assigned it a
-value that can be copied (a constant, or another such call). A subscript such as `names[0]` in
-the implementation is not a call and is not used as an argument.
+When a call does not match, the arguments the definition accepts are kept, including the values
+the probe wrote. An unexpected keyword is removed. A required parameter that is still missing
+is filled from a base call that passes that same parameter, and the record names the file and
+the parameter. The rest of that call is not copied. A call that merely uses the same name, or
+the default call with no arguments, is not substituted for a different scenario.
 
-If no whole call can be copied, each required parameter is filled from a base call that shows
-a value for it. Parameters that have a default are left out, so a keyword the definition does
-not have is dropped. A required parameter that no base call shows is not filled with a guess.
-The probe is then not written and not run.
+Those calls are read from the base files, tests and source, as syntax only. The walk stops
+after a fixed number of files. It does not import the package and it does not use the network.
+A name used as an argument is copied only when the same function assigned it a value that can
+be copied (a constant, or another such call). A subscript such as `names[0]` in the
+implementation is not a call and is not used as an argument. An import that only says
+`from module import *` is followed one step when that module defines the name, so a test that
+imports the class through the package is still a real call.
+
+A required parameter that no base call shows is not filled with a guess. A call whose every
+argument was invalid is not rewritten into the default call. The probe is then not written
+and not run, and the reason names a base call that was deliberately not copied when one was
+found.
 
 The model's choice of which function to call is kept. Only the arguments change. A call that
 already matches the signature is not rewritten, so a later answer that is already valid is kept
@@ -74,8 +81,9 @@ invention this change refuses.
 
 ## What it means for you
 
-A probe that invents a parameter is rewritten to a call the base code already makes, when that
-call's values can be copied, and is otherwise dropped before it runs. A dropped probe covers
-no changed line. A probe that already calls the function correctly is unchanged. Offline tests
-do not re-run a live check. A live run of the pull request that showed this failure still has
-to be done with the real model after this is merged.
+A probe that invents a parameter keeps the arguments that were already valid. A missing required
+parameter is filled from a base call of that same parameter when one can be copied. A call with
+nothing valid left is not replaced by another call of the same name, and it is not run. A
+dropped probe covers no changed line. A probe that already calls the function correctly is
+unchanged. Offline tests do not re-run a live check. A live run of the pull request that showed
+this failure still has to be done with the real model after this is merged.

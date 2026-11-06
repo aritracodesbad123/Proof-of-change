@@ -11,10 +11,11 @@ NameError, or the string passed to hasattr or to getattr with a default. A bare 
 except Exception, is not that: the probe is still using the name as if it existed.
 
 A call the probe makes on a base function or class is also checked against that definition.
-An unexpected keyword, a missing required argument, or too many positionals is not run as
-written. When the base tree contains a real call of that same function, in its own tests or
-its own source, the arguments are taken from that call. A parameter with a default can be
-omitted. A required parameter with no such call is not invented, and the probe is not run.
+An unexpected keyword is removed. Arguments the signature already accepts stay, with the
+values the probe wrote. A required parameter that is still missing is filled from a base
+call that passes that same parameter, and only that parameter. A different call is not
+copied in just because it uses the same name. A call with nothing valid left is not turned
+into the default call, and the probe is not run.
 """
 from __future__ import annotations
 
@@ -779,16 +780,32 @@ def _lookup_def(checker, module: str, name: str, depth: int = 0):
                  and n.name == name), None)
     if node is not None:
         return tree, module, node
-    imported = _import_of(tree, name)
-    if imported is None:
-        return None
-    level, source, original = imported
     loc = locate(checker.root, module)
     is_package = loc is not None and loc.kind == "package"
-    target = _absolute_module(module, is_package, level, source)
-    if not target:
-        return None
-    return _lookup_def(checker, target, original, depth + 1)
+    imported = _import_of(tree, name)
+    if imported is not None:
+        level, source, original = imported
+        target = _absolute_module(module, is_package, level, source)
+        if target:
+            return _lookup_def(checker, target, original, depth + 1)
+    # ``from .other import *`` does not name the class. One more step finds it when that
+    # module actually defines this name. A cycle stops at the depth limit.
+    for level, source in _star_imports(tree):
+        target = _absolute_module(module, is_package, level, source)
+        if not target or target == module:
+            continue
+        found = _lookup_def(checker, target, name, depth + 1)
+        if found is not None:
+            return found
+    return None
+
+
+def _star_imports(tree: ast.AST) -> list[tuple[int, str | None]]:
+    found = []
+    for node in tree.body:
+        if isinstance(node, ast.ImportFrom) and any(alias.name == "*" for alias in node.names):
+            found.append((node.level or 0, node.module))
+    return found
 
 
 def _import_of(tree: ast.AST, name: str):
@@ -1273,25 +1290,25 @@ def prepare_calls(code: str, base_root):
 
     class _Bind(ast.NodeTransformer):
         def visit_Call(self, node):
-            info = by_id.get(id(node))
-            if info is not None and _call_problem(node, info["sig"]):
-                built = _bind_call(node, info, sites.get(info["dotted"], []), spelling)
-                if built is None:
-                    failed.append(info)
-                    self.generic_visit(node)
-                    return node
-                notes.append(built[1])
-                return built[0]
             self.generic_visit(node)
-            return node
+            info = by_id.get(id(node))
+            if info is None or _call_problem(node, info["sig"]) is None:
+                return node
+            built = _bind_call(node, info, sites.get(info["dotted"], []), spelling)
+            if built is None:
+                failed.append(info)
+                return node
+            notes.append(built[1])
+            return built[0]
 
     new_tree = _Bind().visit(checker.tree)
     if failed:
         info = failed[0]
         problem = _call_problem(info["node"], info["sig"]) or "the call does not match the base signature"
-        return (code or "", notes,
-                f"cannot bind {info['dotted']}: {problem}; no base call supplies the required arguments, "
-                "so the probe is not run")
+        where = _site_hint(sites.get(info["dotted"], []))
+        return (code or "", [],
+                f"cannot bind {info['dotted']}: {problem}; no safe binding from this call's own arguments."
+                f"{where} The probe is not run")
     if not notes:
         return code or "", [], None
     ast.fix_missing_locations(new_tree)
@@ -1331,31 +1348,62 @@ def _spell(dotted: str, spelling: dict):
     return None
 
 
+def _site_hint(sites: list) -> str:
+    """Where a real call of this name sits, so an abstain can name it without copying it."""
+    if not sites:
+        return " No base call of this name could be read."
+    shown = []
+    for site in sites[:2]:
+        shown.append(f"{site.rel}:{site.lineno} {site.text}")
+    return " A base call exists (" + "; ".join(shown) + ") and was not copied in its place."
+
+
 def _bind_call(node: ast.Call, info: dict, sites: list, spelling: dict):
-    """A new call with the probe's callee and arguments taken from a base call, or None."""
+    """Keep this call's valid arguments. Fill only a missing required parameter from a base call.
+
+    An unexpected keyword is removed. A keyword or positional the signature accepts stays, including
+    the value the probe wrote. A required parameter that is still missing is taken from a base call
+    that passes that same parameter, and the note names the file and the parameter. The rest of that
+    call is not copied. A call with nothing valid left is not turned into a different call, or into
+    a default-only call, even when the base tree contains one. None means the probe must not run."""
     sig = info["sig"]
-    usable = []
-    for site in sites:
-        if _call_problem(site.call, sig):
-            continue
-        rendered = _render_site(site, spelling)
-        if rendered is None:
-            continue
-        passed = len(rendered.args) + len(rendered.keywords)
-        text = ast.unparse(rendered)
-        usable.append((-passed, len(text), site.rel, site.lineno, rendered, site))
-    if usable:
-        usable.sort()
-        rendered, site = usable[0][4], usable[0][5]
-        call = ast.Call(func=node.func, args=rendered.args, keywords=rendered.keywords)
-        return call, {"target": info["dotted"], "how": "call_site", "from": f"{site.rel}:{site.lineno}",
-                      "call": ast.unparse(call)}
-    assembled = _assemble(sig, sites, spelling)
-    if assembled is None:
+    if (sig is None or sig.var_keyword or any(kw.arg is None for kw in node.keywords)
+            or any(isinstance(arg, ast.Starred) for arg in node.args)):
         return None
-    args, keywords, origin = assembled
-    call = ast.Call(func=node.func, args=args, keywords=keywords)
-    return call, {"target": info["dotted"], "how": "signature", "from": origin, "call": ast.unparse(call)}
+    pos_names = [name for name in sig.names if name not in sig.kwonly]
+    kept_pos = list(node.args) if sig.vararg else list(node.args[:sig.n_positional])
+    kept_kw = []
+    dropped = []
+    filled_names = set(pos_names[:len(kept_pos)])
+    for kw in node.keywords:
+        if kw.arg in sig.names and kw.arg not in sig.posonly and kw.arg not in filled_names:
+            kept_kw.append(ast.keyword(arg=kw.arg, value=kw.value))
+            filled_names.add(kw.arg)
+        else:
+            dropped.append(kw.arg)
+    missing = [name for name in sig.required if name not in filled_names]
+    if sig.vararg:
+        missing = [name for name in missing if name in sig.kwonly]
+    filled = []
+    for name in missing:
+        found = _piece(name, pos_names, sites, spelling)
+        if found is None:
+            return None
+        expr, origin = found
+        if name in sig.posonly:
+            if pos_names.index(name) != len(kept_pos):
+                return None
+            kept_pos.append(expr)
+        else:
+            kept_kw.append(ast.keyword(arg=name, value=expr))
+        filled.append({"parameter": name, "from": origin})
+    if not kept_pos and not kept_kw:
+        return None
+    call = ast.Call(func=node.func, args=kept_pos, keywords=kept_kw)
+    if _call_problem(call, sig):
+        return None
+    return call, {"target": info["dotted"], "how": "filled" if filled else "kept",
+                  "dropped": dropped, "filled": filled, "call": ast.unparse(call)}
 
 
 def _render_site(site: _Site, spelling: dict):
@@ -1449,38 +1497,6 @@ def _reduce(expr, scope: dict, resolve, spelling: dict, depth: int):
             keywords.append(ast.keyword(arg=kw.arg, value=got))
         return ast.Call(func=callee, args=args, keywords=keywords)
     return None
-
-
-def _assemble(sig: _Sig, sites: list, spelling: dict):
-    """Required arguments taken one by one from base calls. None when one required value is missing.
-
-    Parameters that have a default are omitted, so a bad keyword is dropped instead of being copied.
-    Nothing is filled with a guessed None."""
-    if not sig.explicit:
-        return None
-    pos_names = [name for name in sig.names if name not in sig.kwonly]
-    pieces = {}
-    origins = []
-    for name in sig.required:
-        found = _piece(name, pos_names, sites, spelling)
-        if found is None:
-            return None
-        pieces[name], origin = found
-        if origin not in origins:
-            origins.append(origin)
-    args, keywords = [], []
-    for name in pos_names:
-        if name not in sig.required:
-            break
-        if name in sig.posonly:
-            args.append(pieces[name])
-        else:
-            keywords.append(ast.keyword(arg=name, value=pieces[name]))
-    for name in sig.required:
-        if name in sig.kwonly:
-            keywords.append(ast.keyword(arg=name, value=pieces[name]))
-    origin = ", ".join(origins) if origins else "signature"
-    return args, keywords, origin
 
 
 def _piece(name: str, pos_names: list[str], sites: list, spelling: dict):
