@@ -283,9 +283,9 @@ def test_already_on_base_needs_every_new_test_and_does_not_change_needs_attentio
 
 
 def test_default_verdict_inputs_and_the_verified_only_cap():
-    """verdict_for does not read collection_failed. Only a verified result with the note is capped.
+    """verdict_for does not read collection_failed. A verified result with any uncollected file is capped.
 
-    A comparison that needs attention stays needs attention. The note is not removed.
+    A comparison that needs attention stays needs attention. The note is not removed. Fixed ids are kept.
     """
     passed = {"tests/test_old.py::test_old": ("passed", "")}
     files = {"all": ["pkg/mod.py", "tests/other_changed.py"], "package_py": ["pkg/mod.py"], "compiled": []}
@@ -320,13 +320,23 @@ def test_default_verdict_inputs_and_the_verified_only_cap():
     assert kept["verdict"] == "needs_attention"
     assert kept["already_on_base"] == "fix appears already present on master"
     assert "tests/other_changed.py" in kept["collection_limitation"]
-    # No note: a collection failure alone does not cap a verified result.
     plain = dr.compare_sides({"main": [passed], "pr": [passed]})
     plain["base_new_tests"] = {"ids": [], "passed_on_base": [], "failed_on_base": [], "not_collected": [],
                                "reproduced": False, "collection_failed": ["tests/checks.py"]}
     again = dr.verdict_for(plain, None, None, files)
     assert again[0] == "verified"
-    assert dr.cap_for_uncollected_file(plain, again[0], again[1])[0] == "verified"
+    # The note is not required. Any uncollected changed file keeps a verified result from being verified.
+    alone_v, alone_reason = dr.cap_for_uncollected_file(plain, again[0], again[1])
+    assert alone_v == "could_not_verify" and "tests/checks.py" in alone_reason
+    plain["fixed"] = ["tests/test_fix.py::test_answer"]
+    kept_fixed = list(plain["fixed"])
+    mixed_v, _mixed_reason = dr.cap_for_uncollected_file(plain, again[0], again[1])
+    assert mixed_v == "could_not_verify" and plain["fixed"] == kept_fixed
+    sha = "09dbe1eec31ed1b3cd05366748865f11ba427d32"
+    labelled = dr.already_on_base_message({"base_new_tests": gap}, "master", sha)
+    assert labelled == "fix appears already present on master at 09dbe1eec31e"
+    assert dr.already_on_base_message({"base_new_tests": {"ids": [], "passed_on_base": [], "failed_on_base": [],
+                                                          "not_collected": [], "reproduced": False}}, "master", sha) is None
 
 
 def _report_record(verdict: str, base_ref: str, failed: str) -> dict:

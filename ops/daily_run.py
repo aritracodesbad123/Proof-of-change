@@ -6725,6 +6725,7 @@ def finalize_tests(rec: dict, per_run: list[dict], results: dict, a) -> tuple[di
         return None, f"tests produced no results on {where} (collection failed; see pytest logs)", None
     cmp = compare_sides(results)
     _stamp_cross_run(rec, cmp)
+    _drop_gap_new_passes(cmp)
     ex = exit_check(per_run, results, cmp)
     rec["comparison"], rec["exit_check"] = cmp, ex
     return cmp, None, ex
@@ -7095,8 +7096,11 @@ def _side_tree(side: str, venvs: dict, cwds: dict | None) -> Path | None:
     return root if root.is_dir() else None
 
 
-def _overlay_pr_tests(main_root: Path, pr_root: Path, rels: list[str]) -> list[tuple[Path, bytes | None]]:
-    """Copy the pull request's test files onto the base tree. Returns (path, previous bytes or None) to restore."""
+def _overlay_pr_tests(main_root: Path, pr_root: Path, rels: list[str],
+                      blocked: list | None = None) -> list[tuple[Path, bytes | None]]:
+    """Copy the pull request's test files onto the base tree. Returns (path, previous bytes or None) to restore.
+
+    A parent path that is a file, or any other copy error, is named in ``blocked`` and skipped. It is not a pass."""
     saved = []
     root = main_root.resolve()
     for rel in rels:
@@ -7107,6 +7111,8 @@ def _overlay_pr_tests(main_root: Path, pr_root: Path, rels: list[str]) -> list[t
         try:
             resolved = dest.resolve() if dest.exists() else dest.parent.resolve() / dest.name
         except OSError:
+            if isinstance(blocked, list):
+                blocked.append(rel)
             continue
         if resolved != root and root not in resolved.parents:
             continue
@@ -7114,8 +7120,13 @@ def _overlay_pr_tests(main_root: Path, pr_root: Path, rels: list[str]) -> list[t
         data = src.read_bytes()
         if previous == data:
             continue
-        dest.parent.mkdir(parents=True, exist_ok=True)
-        dest.write_bytes(data)
+        try:
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            dest.write_bytes(data)
+        except OSError:
+            if isinstance(blocked, list):
+                blocked.append(rel)
+            continue
         saved.append((dest, previous))
     return saved
 
@@ -7451,7 +7462,7 @@ def _new_ids_for(files: dict | None, main_root: Path, pr_root: Path, venvs: dict
     The base is collected as it is, before any pull-request test file is copied over. A file whose collection
     fails is recorded and contributes no ids, so a missing collection is not a passing test."""
     evidence = {"ids": [], "passed_on_base": [], "failed_on_base": [], "not_collected": [],
-                "collection_failed": [], "reproduced": False}
+                "collection_failed": [], "discovery_empty": [], "reproduced": False}
     found: dict[str, list[str]] = {}
     for rel in _candidate_test_files(files, pr_root):
         if not (pr_root / rel).is_file():
@@ -7462,6 +7473,8 @@ def _new_ids_for(files: dict | None, main_root: Path, pr_root: Path, venvs: dict
             evidence["collection_failed"].append(rel)
             continue
         if not pr_ids:
+            # Collection ran and printed no tests. That is an abstention, not a pass and not a silent skip.
+            evidence["discovery_empty"].append(rel)
             continue
         if (main_root / rel).is_file():
             base_ids, base_rc = _collect_file("main", venvs["main"], main_root, rel, prdir, a, keep,
@@ -7563,8 +7576,16 @@ def _run_discovered_new_tests(rec: dict, venvs: dict, prdir: Path, a, results: d
     saved: list = []
     try:
         uploaded = _contree_test_files(pr_root, list(discovered)) if use_contree else None
+        blocked: list[str] = []
         if not use_contree:
-            saved = _overlay_pr_tests(main_root, pr_root, list(discovered))
+            saved = _overlay_pr_tests(main_root, pr_root, list(discovered), blocked)
+            for rel in blocked:
+                if rel not in evidence["collection_failed"]:
+                    evidence["collection_failed"].append(rel)
+            if blocked:
+                discovered = {rel: nodes for rel, nodes in discovered.items() if rel not in blocked}
+                if not discovered:
+                    return
         n = len(results["main"])
         base_runs = [_run_node_ids("main", venvs["main"], main_root, discovered, prdir, a, keep, use_contree,
                                    plugins_off, uploaded, i + 1) for i in range(n)]
@@ -7581,14 +7602,16 @@ def _run_discovered_new_tests(rec: dict, venvs: dict, prdir: Path, a, results: d
         _restore_overlay(saved)
 
 
-def already_on_base_message(cmp: dict | None, base_ref: str | None = None) -> str | None:
+def already_on_base_message(cmp: dict | None, base_ref: str | None = None,
+                            tested_sha: str | None = None) -> str | None:
     """The plain note when the pull request's new tests already pass on the base and the failure is not reproduced.
 
     It is None unless every new test collected from the diff was collected again on the base and passed there,
     and none of those tests failed. One unrelated passing test is not enough. A test that was not collected is
     not a pass. A different file that failed to collect is not read here, so it does not block the note.
-    The branch name is the recorded base ref (``master``, ``2.2``), not a hardcoded main. The verdict is not
-    read or changed here."""
+    The branch name is the recorded base ref (``master``, ``2.2``), not a hardcoded main. When the run recorded
+    the commit it actually tested, that sha is part of the sentence. The branch name alone is not evidence.
+    The verdict is not read or changed here."""
     info = cmp.get("base_new_tests") if isinstance(cmp, dict) else None
     if not isinstance(info, dict):
         return None
@@ -7601,9 +7624,27 @@ def already_on_base_message(cmp: dict | None, base_ref: str | None = None) -> st
     if missing or failed or set(passed) != set(ids):
         return None
     ref = str(base_ref or "").strip() or "main"
-    if ref == "main":
-        return "fix appears already present on main"
-    return f"fix appears already present on {ref}"
+    sentence = "fix appears already present on main" if ref == "main" else f"fix appears already present on {ref}"
+    sha = str(tested_sha or "").strip().lower()
+    if re.fullmatch(r"[0-9a-f]{7,40}", sha):
+        return f"{sentence} at {sha[:12]}"
+    return sentence
+
+
+def _evidence_dict(source: dict | None) -> dict:
+    if not isinstance(source, dict):
+        return {}
+    info = source.get("base_new_tests") if isinstance(source.get("base_new_tests"), dict) else source
+    return info if isinstance(info, dict) else {}
+
+
+def _path_list(source: dict | None, key: str) -> list[str]:
+    out: list[str] = []
+    for rel in _evidence_dict(source).get(key) or []:
+        text = str(rel).strip()
+        if text and text not in out:
+            out.append(text)
+    return out
 
 
 def collection_failed_paths(source: dict | None) -> list[str]:
@@ -7611,28 +7652,31 @@ def collection_failed_paths(source: dict | None) -> list[str]:
 
     ``source`` may be the comparison (it holds ``base_new_tests``) or the ``base_new_tests`` evidence itself.
     A file named here contributed no node ids. It is not a pass."""
-    if not isinstance(source, dict):
-        return []
-    info = source.get("base_new_tests") if isinstance(source.get("base_new_tests"), dict) else source
-    if not isinstance(info, dict):
-        return []
-    out: list[str] = []
-    for rel in info.get("collection_failed") or []:
-        text = str(rel).strip()
-        if text and text not in out:
-            out.append(text)
+    return _path_list(source, "collection_failed")
+
+
+def discovery_empty_paths(source: dict | None) -> list[str]:
+    """Changed test files pytest collected with no tests. An explicit abstention, not a pass."""
+    return _path_list(source, "discovery_empty")
+
+
+def unchecked_changed_files(source: dict | None) -> list[str]:
+    """Collection failures, then files that collected no tests. Duplicates are dropped."""
+    out = collection_failed_paths(source)
+    for rel in discovery_empty_paths(source):
+        if rel not in out:
+            out.append(rel)
     return out
 
 
-def collection_limitation_message(source: dict | None) -> str | None:
-    """Plain limitation naming the files pytest could not collect. None when that list is empty.
-
-    The sentence lists those files and nothing else. It does not remove the already-on-base note and it
-    does not decide the verdict. A file named here is not a pass, and the result does not cover it."""
-    files = collection_failed_paths(source)
-    if not files:
-        return None
+def _gap_sentence(files: list[str], empty: bool) -> str:
     shown = ", ".join(files)
+    if empty:
+        if len(files) == 1:
+            return (f"Limitation: pytest collected no tests from {shown}. "
+                    "That changed test file is not a pass, and this result does not cover it.")
+        return (f"Limitation: pytest collected no tests from {shown}. "
+                "Those changed test files are not a pass, and this result does not cover them.")
     if len(files) == 1:
         return (f"Limitation: pytest could not collect {shown}. "
                 "That changed test file is not a pass, and this result does not cover it.")
@@ -7640,17 +7684,49 @@ def collection_limitation_message(source: dict | None) -> str | None:
             "Those changed test files are not a pass, and this result does not cover them.")
 
 
+def collection_limitation_message(source: dict | None) -> str | None:
+    """Plain limitation naming files pytest could not collect, or collected with no tests.
+
+    The sentence lists those files and nothing else. It does not remove the already-on-base note and it
+    does not decide the verdict. A file named here is not a pass, and the result does not cover it."""
+    failed = collection_failed_paths(source)
+    empty = [rel for rel in discovery_empty_paths(source) if rel not in failed]
+    parts = [sentence for sentence in (_gap_sentence(failed, False) if failed else "",
+                                       _gap_sentence(empty, True) if empty else "") if sentence]
+    return " ".join(parts) or None
+
+
+def _id_in_files(test_id: str, files: set[str]) -> bool:
+    path = str(test_id).split("::", 1)[0].replace("\\", "/")
+    return path in files
+
+
+def _drop_gap_new_passes(cmp: dict) -> None:
+    """A test in a file that was not collected is not a new passing test.
+
+    ``fixed`` is left as it is. Only ids that were absent on the base and passed on the pull request,
+    and that live in an uncollected file, are removed."""
+    if not isinstance(cmp, dict):
+        return
+    gaps = set(unchecked_changed_files(cmp))
+    if not gaps:
+        return
+    ids = [t for t in cmp.get("new_tests_passing_ids") or [] if not _id_in_files(t, gaps)]
+    cmp["new_tests_passing_ids"] = ids
+    cmp["new_tests_passing"] = len(ids)
+
+
 def record_collection_gap(rec: dict | None) -> tuple[list[str], str]:
-    """Failed collection files and the limitation sentence for a record. Both empty when there is no gap."""
+    """Unchecked changed files and the limitation sentence for a record. Both empty when there is no gap."""
     if not isinstance(rec, dict):
         return [], ""
-    files: list[str] = []
-    for source in (rec.get("comparison"), rec.get("base_new_tests")):
-        found = collection_failed_paths(source if isinstance(source, dict) else None)
-        if found:
-            files = found
+    source = None
+    for candidate in (rec.get("comparison"), rec.get("base_new_tests")):
+        if unchecked_changed_files(candidate if isinstance(candidate, dict) else None):
+            source = candidate
             break
-    sentence = collection_limitation_message({"base_new_tests": {"collection_failed": files}}) if files else ""
+    files = unchecked_changed_files(source)
+    sentence = collection_limitation_message(source) if source is not None else ""
     stored = rec.get("collection_limitation")
     if not sentence and isinstance(stored, str) and stored.strip():
         sentence = stored.strip()
@@ -7677,7 +7753,9 @@ def _attach_already_on_base(rec: dict, cmp: dict | None) -> None:
     replaces the previous note and limitation instead of repeating them."""
     if not isinstance(rec, dict):
         return
-    note = already_on_base_message(cmp, rec.get("base_ref"))
+    pr = rec.get("pr") if isinstance(rec.get("pr"), dict) else {}
+    tested = pr.get("tested_main_sha") or rec.get("tested_main_sha")
+    note = already_on_base_message(cmp, rec.get("base_ref"), tested)
     limit = collection_limitation_message(cmp)
     previous_note = rec.get("already_on_base")
     previous_limit = rec.get("collection_limitation")
@@ -7738,11 +7816,13 @@ def record_cross_run(rec: dict, venvs: dict, targets: dict | None, prdir: Path, 
     use_contree = _contree_ready() and cwds is not None
     keep = product_route(a)
     plugins_off = rec.get("pytest_plugins_off") if isinstance(rec, dict) else None
+    blocked_copy: list[str] = []
     if rels:
         saved: list = []
         try:
             if not use_contree:
-                saved = _overlay_pr_tests(main_root, pr_root, rels)
+                saved = _overlay_pr_tests(main_root, pr_root, rels, blocked_copy)
+                rels = [rel for rel in rels if rel not in blocked_copy]
             uploaded = _contree_test_files(pr_root, rels) if use_contree else None
             # One file per pytest start. A collection error in one file stops that start, and must not hide
             # a real failure in another file.
@@ -7759,6 +7839,14 @@ def record_cross_run(rec: dict, venvs: dict, targets: dict | None, prdir: Path, 
     if isinstance(rec, dict):
         _run_discovered_new_tests(rec, venvs, prdir, a, results, main_root, pr_root, use_contree, keep,
                                   plugins_off)
+        if blocked_copy:
+            info = rec.setdefault("base_new_tests", {"ids": [], "passed_on_base": [], "failed_on_base": [],
+                                                     "not_collected": [], "collection_failed": [],
+                                                     "discovery_empty": [], "reproduced": False})
+            failed = info.setdefault("collection_failed", [])
+            for rel in blocked_copy:
+                if rel not in failed:
+                    failed.append(rel)
     return results
 
 
@@ -8654,16 +8742,14 @@ def cap_for_review(rec: dict, v: str, reason: str) -> tuple[str, str]:
 
 
 def cap_for_uncollected_file(cmp: dict | None, v: str, reason: str) -> tuple[str, str]:
-    """Lower only a verified result when the already-on-base note applies and another file failed to collect.
+    """Lower only a verified result when a selected changed test file was not collected.
 
-    ``verdict_for`` does not read ``collection_failed``. A passing comparison stays verified until this cap.
-    A needs-attention result is returned unchanged. The already-on-base note is attached after this and is
-    not removed."""
+    ``verdict_for`` does not read that list, so a passing comparison, including one that also has tests
+    fixed on the pull request, stays verified until this cap. A needs-attention result is returned unchanged.
+    The fixed list is not edited. The already-on-base note, when it applies, is attached afterwards."""
     if v != Verdict.VERIFIED.value or not isinstance(cmp, dict):
         return v, reason
-    if already_on_base_message(cmp) is None:
-        return v, reason
-    files = collection_failed_paths(cmp)
+    files = unchecked_changed_files(cmp)
     if not files:
         return v, reason
     shown = ", ".join(files)
