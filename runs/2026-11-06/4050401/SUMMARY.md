@@ -1,21 +1,16 @@
-# Proof-of-Change check: 2026-11-06-check-1150
+# Proof-of-Change go/no-go: 2026-11-06 on 4050401
 
-Generated 2026-11-06 11:53 IST. 1 report(s): 0 need attention, 1 could not be verified, 0 verified. Items that need a decision are listed first.
+3 report(s) in this folder: 0 need attention, 2 could not be verified, 1 verified. Built from every record.json stored in this folder, so a later one-PR run cannot narrow it.
 
-## Needs attention first
+## Needs a decision first
 
-- **COULD NOT VERIFY / Re-run** (Low confidence): Delgan/loguru#1515: Evaluate every rotation condition so a skipped one cannot fire spuriously, tested against its own tests. Install failed (1); see setup-pr.log. [Open report](loguru-1515/REPORT.html) ([PDF](loguru-1515/REPORT.pdf))
+- **COULD NOT VERIFY**: pyinvoke/invoke#1097: Use command-line names in missing-argument errors. Could not verify: claim(s) C1, C2, C4 expect a difference but no observation matches (134 test(s) ran on main, 137 on the PR; 3 new test(s) pass, 135 unchanged (1 of them skipped on both sides); probe model-p1 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count)
+- **COULD NOT VERIFY**: Delgan/loguru#1515: Evaluate every rotation condition so a skipped one cannot fire spuriously. Install failed (1); see setup-pr.log
 
 ## All reports
 
-| Verdict | Action | Confidence | Subject | Tested against | Why | Evals | Report |
-|---|---|---|---|---|---|---|---|
-| ⚪ **COULD NOT VERIFY** | ⚪ **Re-run** | Low | Delgan/loguru#1515: Evaluate every rotation condition so a skipped one cannot fire spuriously | its own tests | install failed (1); see setup-pr.log | 🟢 **APPROVE** | [HTML](loguru-1515/REPORT.html) · [PDF](loguru-1515/REPORT.pdf) · [MD](loguru-1515/REPORT.md) |
-
-## Verdict meanings
-
-| Verdict | Meaning |
-|---|---|
-| 🟠 **NEEDS ATTENTION** | The run is trustworthy and found a problem: breaks, import failures, or a false claim. |
-| ⚪ **COULD NOT VERIFY** | The run failed its own trust checks or the evals (no conclusion; re-run after fixing), or, for PR runs, the tests never exercised the changed code (review by hand). |
-| 🟢 **VERIFIED** | The run is trustworthy and found no behavior change. |
+| Verdict | Subject | Why | Report |
+|---|---|---|---|
+| COULD NOT VERIFY | pyinvoke/invoke#1097: Use command-line names in missing-argument errors | Could not verify: claim(s) C1, C2, C4 expect a difference but no observation matches (134 test(s) ran on main, 137 on the PR; 3 new test(s) pass, 135 unchanged (1 of them skipped on both sides); probe model-p1 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count) | [PDF](invoke-1097/REPORT.pdf) |
+| COULD NOT VERIFY | Delgan/loguru#1515: Evaluate every rotation condition so a skipped one cannot fire spuriously | Install failed (1); see setup-pr.log | [PDF](loguru-1515/REPORT.pdf) |
+| VERIFIED | andialbrecht/sqlparse#944: fix: avoid ValueError on malformed CASE with reindent_aligned | 175 test(s) ran on main, 177 on the PR; 2 new test(s) pass, 177 unchanged (2 of them skipped on both sides); probe: claim(s) C2 proven | [PDF](sqlparse-944/REPORT.pdf) |
