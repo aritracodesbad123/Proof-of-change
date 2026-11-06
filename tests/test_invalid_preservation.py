@@ -1,14 +1,21 @@
 """A contradicted part of an explicit preservation claim is advisory when it is the proven change.
 
-The fixture is general. It follows a recorded check in which one call's return stayed True and the next
-call's return went from True to False, while a differs claim's count of true returns went from 2 to 1.
-Nothing here names a repository, and nothing from a pull request is run again.
+The general fixture follows a recorded check in which one call's return stayed True and the next call's
+return went from True to False, while a differs claim's count of true returns went from 2 to 1. The
+phrase-off fixture is those saved run values and claim texts, with the recorded target removed. Nothing
+here names a repository, and nothing from a pull request is run again.
 """
-from ops.daily_run import compare_sides, rejudge_probes, verdict_for
+import json
+from pathlib import Path
+
+from evals.checks import derive_verdict
+from ops.daily_run import broad_gate_for, compare_sides, rejudge_probes, verdict_for
 from poc import probes
-from poc.probes import INVALID_PRESERVATION_NOTE
+from poc.probes import _PRESERVATION_RE, INVALID_PRESERVATION_NOTE
 from poc.verdict import FindingLabel
 from tests.test_same_input_guard import _judge, _load, _without_cross_run
+
+FX = Path(__file__).resolve().parent / "fixtures" / "invalid_preservation"
 
 P = FindingLabel.PROVEN.value
 FALSE = FindingLabel.FALSE_CLAIM.value
@@ -78,7 +85,7 @@ def test_preservation_part_that_is_the_proven_count_is_advisory():
 def test_second_message_should_rotate_and_the_new_code_does_not():
     """The second call should rotate and stays False. A proven change on that same input does not clear it."""
     claims = [
-        {"id": "D", "text": "The second message rotates.", "expect": "differs", "covers": ["turn.second"]},
+        {"id": "D", "text": "The second message now rotates.", "expect": "differs", "covers": ["turn.second"]},
         {"id": "M", "text": "The limit on that same call moves forward.", "expect": "differs",
          "covers": ["turn.limit"]},
     ]
@@ -141,6 +148,78 @@ def test_every_preservation_part_changing_stays_needs_attention():
     assert sorted(f["name"] for f in summary["flagged"]) == ["c2.ret_msg1", "c2.ret_msg2"]
     assert summary["advisory_invalid_preservation"] == []
     assert verdict == "needs_attention"
+
+
+def test_mixed_wildcard_cover_stays_needs_attention():
+    """Exact names beside a wildcard do not excuse the flip. The wildcard rejects the whole claim."""
+    claims = _rotation_claims()
+    claims[1] = dict(claims[1], covers=["c2.ret_msg1", "c2.ret_msg2", "c2.*"])
+    main, pr = _rotation_sides()
+    _pp, summary, (verdict, reason, _) = _checked(claims, main, pr)
+    assert [f["name"] for f in summary["flagged"]] == ["c2.ret_msg2"]
+    assert summary["advisory_invalid_preservation"] == []
+    assert verdict == "needs_attention"
+    assert "c2.ret_msg2 differs although the claim says it does not" in reason
+
+
+def test_exact_count_on_a_different_probe_stays_needs_attention():
+    """A 2-to-1 count on another probe, even with the same claim id, does not excuse this probe's flip."""
+    claims = [c for c in _rotation_claims() if c["id"] != "C4"]
+    main = {"c1.limit_after_first": None, "c2.ret_msg1": True, "c2.ret_msg2": True}
+    pr = {"c1.limit_after_first": "later", "c2.ret_msg1": True, "c2.ret_msg2": False}
+    own = _item(claims, main, pr, pid="model-p1")
+    other = _item(
+        [{"id": "C4", "text": "Fewer calls return True after the fix.", "expect": "differs",
+          "covers": ["c4.num_true_returns"]}],
+        {"c4.num_true_returns": 2}, {"c4.num_true_returns": 1}, pid="model-p2")
+    pp = rejudge_probes({"status": "ran", "items": [own, other]}, False)
+    assert [f["name"] for f in pp["summary"]["flagged"]] == ["c2.ret_msg2"]
+    assert pp["summary"]["advisory_invalid_preservation"] == []
+    verdict, reason, _ = verdict_for(_cmp_ok(), None, None, None, pp)
+    assert verdict == "needs_attention"
+    assert "c2.ret_msg2 differs although the claim says it does not" in reason
+
+
+def test_same_probe_count_still_waives_beside_another_probe():
+    main, pr = _rotation_sides()
+    own = _item(_rotation_claims(), main, pr, pid="model-p1")
+    other = _item(
+        [{"id": "C4", "text": "A different count changes.", "expect": "differs",
+          "covers": ["c4.num_true_returns"]}],
+        {"c4.num_true_returns": 9}, {"c4.num_true_returns": 8}, pid="model-p2")
+    pp = rejudge_probes({"status": "ran", "items": [own, other]}, False)
+    assert pp["summary"]["advisory_invalid_preservation"] == ["c2.ret_msg2"]
+    assert pp["summary"]["flagged"] == []
+    verdict, reason, _ = verdict_for(_cmp_ok(), None, None, None, pp)
+    assert verdict == "verified"
+    assert INVALID_PRESERVATION_NOTE in reason
+
+
+def test_frozen_phrase_removed_stays_needs_attention_and_c4_stays_proven():
+    """Saved run values. Turning the preservation wording off puts the flip back to needs attention."""
+    rec = json.loads((FX / "phrase_off.json").read_text())
+    rec["comparison"] = _cmp_ok()
+    turned = False
+    for it in rec["probes"]["items"]:
+        for claim in it.get("claims") or []:
+            if claim.get("id") != "C2":
+                continue
+            assert _PRESERVATION_RE.search(claim["text"])
+            claim["text"] = claim["text"].replace(
+                ", preserving the documented 'any of which can trigger the rotation' contract", "")
+            assert not _PRESERVATION_RE.search(claim["text"])
+            turned = True
+    assert turned
+    pp = rejudge_probes(rec["probes"], bool(rec.get("product_check")), broad_gate=broad_gate_for(rec))
+    obs = {o["name"]: o for it in pp["items"] for o in it["observations"]}
+    assert obs["c4.num_true_returns"]["label"] == P and obs["c4.num_true_returns"]["state"] == "differs"
+    assert obs["c2.ret_msg2"]["label"] == FALSE
+    assert [f["name"] for f in pp["summary"]["flagged"]] == ["c2.ret_msg2"]
+    assert pp["summary"]["advisory_invalid_preservation"] == []
+    verdict, reason, _ = verdict_for(rec["comparison"], None, rec.get("exit_check"), rec.get("files"), pp,
+                                     rec.get("behaviour_claims"), rec.get("baseline"))
+    assert verdict == "needs_attention" and "c2.ret_msg2" in reason
+    assert derive_verdict(rec, rec.get("baseline")) == "needs_attention"
 
 
 def test_wildcard_cover_is_not_an_explicit_target():

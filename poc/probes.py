@@ -58,10 +58,12 @@ that fails the same way on both sides, the same outcome and the same exception t
 normalisation, does not block. A cross-run does not settle a differs claim whose agreeing observations sit on
 an input where another claim was proven different. A preservation claim that names several explicit results,
 and that says those results stay the same, does not raise needs attention for one of those results when that
-result's change is exactly the count an intended differs claim already proved. The result stays labelled as a
-contradicted same claim and is listed as an invalid preservation claim. A result that is not one of those
-explicit targets, a cover that uses a wildcard, a claim that does not say the behaviour is preserved, and a
-claim whose every explicit result changed, still need attention. Flaky
+result's change is exactly the count an intended differs claim on the same probe already proved. Every cover
+on the preservation claim is an exact name: one wildcard rejects the claim. The count is an exact cover on
+that same probe. A count on another probe does not qualify, even when it reuses the claim id. The result
+stays labelled as a contradicted same claim and is listed as an invalid preservation claim. A result that is
+not one of those exact names, a claim that does not say the behaviour is preserved, and a claim whose every
+named result changed, still need attention. Flaky
 observations are ignored as noise when the base side is unstable or both sides are. An observation that is stable
 on the base and unstable only on the pull request is not that noise: it needs attention, or could not verify when
 every pull-request run differs. Differences that are only about warnings never count on their own.
@@ -1000,13 +1002,36 @@ _PRESERVATION_RE = re.compile(
 INVALID_PRESERVATION_NOTE = "invalid preservation claim; this part is the intended change already proven"
 
 
+def _is_wildcard_cover(pat) -> bool:
+    return isinstance(pat, str) and any(ch in pat for ch in "*?[")
+
+
 def _exact_cover_names(covers) -> list[str]:
-    """Cover strings that name one observation, with no wildcard. Order is kept."""
+    """Cover strings that name one observation, with no wildcard. Order is kept.
+
+    A wildcard in the same list is omitted here. Callers that require every cover to be exact use
+    ``_exclusively_exact_covers`` and do not keep the exact names beside a wildcard."""
     out = []
     for pat in covers or []:
-        if isinstance(pat, str) and pat and not any(ch in pat for ch in "*?["):
+        if isinstance(pat, str) and pat and not _is_wildcard_cover(pat):
             out.append(pat)
     return out
+
+
+def _exclusively_exact_covers(covers) -> list[str] | None:
+    """Every cover names one observation, or None when any cover is a wildcard or not a name.
+
+    One wildcard rejects the whole list. The exact names are not kept and the claim is not applied."""
+    if not isinstance(covers, list) or len(covers) < 2:
+        return None
+    names = []
+    for pat in covers:
+        if not isinstance(pat, str) or not pat or _is_wildcard_cover(pat):
+            return None
+        names.append(pat)
+    if len(set(names)) != len(names):
+        return None
+    return names
 
 
 def _bool_bit(value):
@@ -1024,16 +1049,17 @@ def _plain_number(value):
 def invalid_preservation(items: list[dict]) -> list[tuple]:
     """Probe id and observation name for a preservation false alarm that is the proven change.
 
-    The preservation claim expects the same result, its text says the behaviour is preserved, and it names
-    at least two observations exactly (no wildcard). At least one of those stays the same and at least one
-    differs. On both sides, the count of True among those observations equals a different claim's proven
-    differs observation, and that observation is itself an exact cover of the differs claim. The differing
-    parts are then the change that claim already proved, so they do not raise needs attention on their own.
+    The preservation claim expects the same result, its text says the behaviour is preserved, and every one
+    of its covers names an observation exactly. One wildcard rejects the claim; the exact names are not kept.
+    At least one of those named results stays the same and at least one differs. On both sides, the count of
+    True among them equals a proven differs observation on the same probe. That observation is an exact cover
+    of a different claim on that probe (claim ids are not shared across probes). The differing parts are then
+    the change that claim already proved, so they do not raise needs attention on their own.
 
-    Anything else is left out: a wildcard cover, a claim that does not say the behaviour is preserved, a
-    single named result, a claim whose every named result changed, a count that does not equal those
-    booleans, and an observation that is not one of the explicit names. Returned as (probe id, name) in
-    observation order."""
+    Anything else is left out: any wildcard cover, a claim that does not say the behaviour is preserved, a
+    single named result, a claim whose every named result changed, a count on another probe, a count that
+    does not equal those booleans, and an observation that is not one of the exact names. Returned as
+    (probe id, name) in observation order."""
     aggregates = []
     for it in items:
         claims = [c for c in it.get("claims") or [] if isinstance(c, dict)]
@@ -1047,12 +1073,13 @@ def invalid_preservation(items: list[dict]) -> list[tuple]:
             if (obs.get("label") != FindingLabel.PROVEN.value or obs.get("state") != "differs"
                     or obs.get("advisory") or obs.get("pr_only")):
                 continue
+            # Exact semantic target: the observation name is one cover, not a wildcard match.
             if obs.get("name") not in _exact_cover_names(claim.get("covers")):
                 continue
             main, pr = _plain_number(obs.get("main")), _plain_number(obs.get("pr"))
             if main is None or pr is None or main == pr:
                 continue
-            aggregates.append((claim.get("id"), main, pr))
+            aggregates.append((it.get("id"), claim.get("id"), main, pr))
     found = []
     for it in items:
         claims = [c for c in it.get("claims") or [] if isinstance(c, dict)]
@@ -1063,8 +1090,8 @@ def invalid_preservation(items: list[dict]) -> list[tuple]:
         for claim in claims:
             if claim.get("expect") != "same" or not _PRESERVATION_RE.search(str(claim.get("text") or "")):
                 continue
-            names = _exact_cover_names(claim.get("covers"))
-            if len(names) < 2 or len(set(names)) != len(names):
+            names = _exclusively_exact_covers(claim.get("covers"))
+            if not names:
                 continue
             parts = []
             for name in names:
@@ -1088,8 +1115,8 @@ def invalid_preservation(items: list[dict]) -> list[tuple]:
             total_pr = sum(_bool_bit(o.get("pr")) for o in parts)
             if total_main == total_pr:
                 continue
-            linked = any(cid != claim.get("id") and main == total_main and pr == total_pr
-                         for cid, main, pr in aggregates)
+            linked = any(pid == it.get("id") and cid != claim.get("id") and main == total_main and pr == total_pr
+                         for pid, cid, main, pr in aggregates)
             if not linked:
                 continue
             for obs in flips:
@@ -1123,8 +1150,9 @@ def summarize(items: list[dict]) -> dict:
     # partly shown, or a record with nothing proven, is unchanged.
     unshown = _agreeing_differs_when_proven(obs)
     # A contradicted part of an explicit preservation claim, when that part is the count an intended claim
-    # already proved. The label stays false_claim. It is not an unclaimed difference, so it is not marked
-    # advisory on the observation, and it does not by itself raise needs attention.
+    # on the same probe already proved. Every cover on that claim is exact. The label stays false_claim.
+    # It is not an unclaimed difference, so it is not marked advisory on the observation, and it does not
+    # by itself raise needs attention.
     invalid_keys = set(invalid_preservation(items))
     invalid = [o for o in obs if (o.get("probe"), o.get("name")) in invalid_keys
                and o.get("label") == FindingLabel.FALSE_CLAIM.value and o.get("state") == "differs"

@@ -18,7 +18,8 @@ as a broken preservation claim was a false alarm.
 The same shape must not clear a real miss. A second call that should rotate, and does not, still needs
 attention. An unrelated return that flips, with no claim, still needs attention. A preservation claim whose
 parts do not add up to the proven count still needs attention. So does a claim whose every named part
-changed, a cover that uses a wildcard, and a claim that only says something is "still" rejected.
+changed, a preservation claim that has any wildcard cover, a count proved on a different probe, and a
+claim that only says something is "still" rejected.
 
 ## Decision
 
@@ -26,12 +27,14 @@ changed, a cover that uses a wildcard, and a claim that only says something is "
   known. Claim clean-up cannot see which side changed, so it does not decide this.
 - The preservation claim expects "same", and its text says the behaviour is preserved: preserved, unchanged,
   as before, stays the same, or remains the same. "Still" on its own is not that wording.
-- It names at least two observations exactly. A wildcard is not an exact name. At least one named result
-  stays the same and is proven. At least one differs and is a contradicted same claim. Every named result is
-  a boolean. A claim whose every named result changed is left alone.
-- A different claim that expects a difference is proven by an observation it names exactly. That
-  observation's two numbers equal the count of True among the preservation claim's named results, on each
-  side. The differing parts are then that proven change.
+- It names at least two observations, and every cover is an exact name. One wildcard cover rejects the
+  claim. The exact names are not kept after a wildcard is dropped. At least one named result stays the same
+  and is proven. At least one differs and is a contradicted same claim. Every named result is a boolean. A
+  claim whose every named result changed is left alone.
+- A different claim on the same probe expects a difference and is proven by an observation it names exactly.
+  That observation's two numbers equal the count of True among the preservation claim's named results, on
+  each side. A count on another probe does not qualify, including when that probe reuses the claim id. The
+  differing parts are then that proven change.
 - Those parts are left out of the observations that raise needs attention. The reason names them and says
   "invalid preservation claim; this part is the intended change already proven". The label stays
   false_claim. They are not marked as an unclaimed difference, so they do not hold a check at could not
@@ -66,6 +69,10 @@ those records was executed. `scripts/rejudge_preservation.py` judges each `recor
 and with this code, from the saved probe runs only.
 
 Runs branch, 52 `record.json` files. 41 judged, 40 unchanged, 1 changed, 11 not judged, 0 errors.
+
+Requiring every preservation cover to be exact, and the proven count to be on the same probe, was re-judged
+on these same files. The only change is still the one record below. No cross-probe count and no mixed
+wildcard cleared a stored verdict.
 
 The one change is Delgan/loguru #1515 at
 `runs/2026-11-06/27fde03/loguru-1515/record.json`
