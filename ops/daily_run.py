@@ -6148,7 +6148,7 @@ def plan_probes(repo: str, item: dict, rec: dict, base_root: Path, pr_roots: lis
                 note["rewritten_imports"] = res["rewritten_imports"]
             # repair and retry trail, and inputs forced past an edited pattern's old boundary, shown on the record
             for k in ("parse_repairs", "retried", "unmatched_covers", "boundary_rule", "forced_boundary_inputs",
-                      "claims_filled", "claims_timeout_retry"):
+                      "claims_filled", "claims_timeout_retry", "name_checks"):
                 if res.get(k):
                     note[f"model_{k}"] = res[k]
             plan += [{"path": x["path"], "source": "model", "freeze": x["freeze"],
@@ -6211,6 +6211,20 @@ def run_probes(repo: str, pr: int, pythons: dict, prdir: Path, work: Path, a, pl
             freeze.verify(p, fz, pr_started)
         try:
             guard(path)
+            if x.get("source") == "model":
+                # An empty probe, or one that uses a name it never defines, is not run and is not coverage.
+                # A missing project import is rejected when the probe is written (poc/probe_names.py); this
+                # is the last check before either side executes the file.
+                from poc import probe_names
+                text = path.read_text(errors="replace") if path.is_file() else ""
+                local = probe_names.local_failure(text)
+                if local:
+                    errors.append(f"{path.name}: {local}")
+                    try:
+                        sid = probes.read_spec(path).get("id")
+                    except probes.ProbeError:
+                        sid = path.stem
+                    return probe_names.unusable_item(str(sid or path.stem), "model", str(path), local)
             if use_contree:
                 it = _contree_run_probe(path, prdir, a.runs, x["source"], guard, literal_output=True)
             else:

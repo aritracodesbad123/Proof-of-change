@@ -1,0 +1,4 @@
+{
+  "title": "Use command-line names in missing-argument errors",
+  "body": "When a required `param_1` argument is exposed as `param-1` on the command line, omitting it reports the Python attribute name instead of the CLI name."
+}
