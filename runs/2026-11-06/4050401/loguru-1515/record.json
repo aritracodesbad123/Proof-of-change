@@ -1,8 +1,8 @@
 {
  "schema_version": "1",
  "record_kind": "pr_run",
- "id": "pr-Delgan-loguru-1515-6c91de2c42d3-2026-11-06-check-1150",
- "date_ist": "2026-11-06 11:50 IST",
+ "id": "pr-Delgan-loguru-1515-6c91de2c42d3-2026-11-06-check-1154",
+ "date_ist": "2026-11-06 11:54 IST",
  "run_date": "2026-11-06",
  "who": "ops/daily_run.py",
  "repo": "Delgan/loguru",
@@ -25,7 +25,7 @@
  "updated_at_ist": "2026-11-01 07:47 IST",
  "ci_state": "not checked (single-PR check)",
  "ci_detail": "checked on request with --pr",
- "tested_at_ist": "2026-11-06 11:50 IST",
+ "tested_at_ist": "2026-11-06 11:54 IST",
  "files": {
   "all": [
    ".github/workflows/docs.yml",
@@ -79,15 +79,94 @@
   "BLIS_NUM_THREADS": "1",
   "PYTHONHASHSEED": "0"
  },
- "runs_per_side": 0,
+ "runs_per_side": 3,
  "runs_per_side_planned": 3,
  "workers": "4",
  "test_timeout_s": 120,
  "run_timeout_s": 900,
  "build_timeout_s": 1800,
  "python": "3.12.15",
- "test_selection": "",
- "per_run": [],
+ "test_selection": "mapped from touched files: tests/test_filesink_rotation.py, tests/test_type_hinting.py",
+ "per_run": [
+  {
+   "side": "old",
+   "run": 1,
+   "passed": 148,
+   "failed": 0,
+   "error": 0,
+   "skipped": 3,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 27.9,
+   "pytest_summary": "148 passed, 3 skipped in 26.84s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 1,
+   "passed": 149,
+   "failed": 0,
+   "error": 0,
+   "skipped": 3,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 27.7,
+   "pytest_summary": "149 passed, 3 skipped in 26.67s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 2,
+   "passed": 148,
+   "failed": 0,
+   "error": 0,
+   "skipped": 3,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 27.5,
+   "pytest_summary": "148 passed, 3 skipped in 26.53s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 2,
+   "passed": 149,
+   "failed": 0,
+   "error": 0,
+   "skipped": 3,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 27.4,
+   "pytest_summary": "149 passed, 3 skipped in 26.47s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 3,
+   "passed": 148,
+   "failed": 0,
+   "error": 0,
+   "skipped": 3,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 27.4,
+   "pytest_summary": "148 passed, 3 skipped in 26.49s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 3,
+   "passed": 149,
+   "failed": 0,
+   "error": 0,
+   "skipped": 3,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 28.3,
+   "pytest_summary": "149 passed, 3 skipped in 27.34s",
+   "junit": true
+  }
+ ],
  "notes": null,
  "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
  "behaviour_claims": [
@@ -116,17 +195,30 @@
  "posted_upstream": false,
  "logs": "loguru-1515/",
  "freeze": {
-  "main": "freeze-main.txt"
+  "main": "freeze-main.txt",
+  "pr": "freeze-pr.txt"
  },
  "coverage": {
-  "status": "not measured",
-  "why": "coverage has not been run for this check"
+  "status": "measured",
+  "changed_lines_total": 5,
+  "changed_lines_covered": 5,
+  "files": [
+   {
+    "file": "loguru/_file_sink.py",
+    "changed_lines_total": 5,
+    "changed_lines_covered": 5
+   }
+  ],
+  "seconds": 27.8,
+  "exit": 0,
+  "log": "coverage-pytest.log"
  },
- "poc_commit": "4050401d30fe09fa6a04495c8f41d7203ddf9de8",
+ "poc_commit": "f4f36d9b9c5152dfddfbfc04b4672b3cbbc47372",
  "route": "source-pair",
  "current_head_sha": "6c91de2c42d38e010a68d9618dc6aa4ba01e1372",
  "tested_invocation": 1,
  "model_provider_used": "nebius",
+ "model_provider_fallback": "the AI answered but no probe was usable, so only fixed probes ran",
  "head_moved": false,
  "diff_source": "git diff base_sha head_sha (pinned commits)",
  "state": "open",
@@ -136,16 +228,89 @@
   "preflight": {
    "ok": true
   },
-  "tavily": "[redacted]",
+  "tavily": {
+   "ok": true,
+   "skipped": false,
+   "refused": false,
+   "failed": false,
+   "stop": false,
+   "stop_reason": "",
+   "live_call": true,
+   "cached": false,
+   "queries": [
+    "loguru python setup install instructions https://github.com/Delgan/loguru site:github.com/Delgan/loguru",
+    "loguru python documentation install https://github.com/Delgan/loguru site:github.com/Delgan/loguru",
+    "loguru python install requirements https://pypi.org/project/loguru/ https://github.com/Delgan/loguru site:pypi.org"
+   ],
+   "results": [
+    {
+     "title": "loguru/pyproject.toml at master \u00b7 Delgan/loguru \u00b7 GitHub",
+     "url": "https://github.com/Delgan/loguru/blob/master/pyproject.toml",
+     "query": "loguru python documentation install https://github.com/Delgan/loguru site:github.com/Delgan/loguru"
+    },
+    {
+     "title": "lager",
+     "url": "https://pypi.org/project/lager/",
+     "query": "loguru python install requirements https://pypi.org/project/loguru/ https://github.com/Delgan/loguru site:pypi.org"
+    },
+    {
+     "title": "Python Logging (beans-logging)",
+     "url": "https://pypi.org/project/beans-logging/",
+     "query": "loguru python install requirements https://pypi.org/project/loguru/ https://github.com/Delgan/loguru site:pypi.org"
+    },
+    {
+     "title": "loguru",
+     "url": "https://pypi.org/project/loguru/",
+     "query": "loguru python install requirements https://pypi.org/project/loguru/ https://github.com/Delgan/loguru site:pypi.org"
+    },
+    {
+     "title": "loguru/CONTRIBUTING.rst at master \u00b7 Delgan/loguru \u00b7 GitHub",
+     "url": "https://github.com/Delgan/loguru/blob/master/CONTRIBUTING.rst",
+     "query": "loguru python setup install instructions https://github.com/Delgan/loguru site:github.com/Delgan/loguru"
+    },
+    {
+     "title": "GitHub - Delgan/loguru: Python logging made (stupidly) simple \u00b7 GitHub",
+     "url": "https://github.com/delgan/loguru",
+     "query": "loguru python setup install instructions https://github.com/Delgan/loguru site:github.com/Delgan/loguru"
+    },
+    {
+     "title": "Can\u2018t Import loguru \u00b7 Issue #116 \u00b7 Delgan/loguru \u00b7 GitHub",
+     "url": "https://github.com/Delgan/loguru/issues/116",
+     "query": "loguru python setup install instructions https://github.com/Delgan/loguru site:github.com/Delgan/loguru"
+    },
+    {
+     "title": "Suggestion/request: Documentation/tutorial for beginners \u00b7 Issue #71 \u00b7 Delgan/loguru \u00b7 GitHub",
+     "url": "https://github.com/Delgan/loguru/issues/71",
+     "query": "loguru python documentation install https://github.com/Delgan/loguru site:github.com/Delgan/loguru"
+    }
+   ],
+   "result_count": 8,
+   "text": "To install Loguru, use the command `pip install loguru` as stated in the repository's main documentation. For development purposes, clone the repository with `git clone git@github.com:your_name_here/loguru.git`, activate a virtual environment with `python -m venv env` and `source env/bin/activate`, and then install Loguru in development mode with `pip install -e \".[dev]\"`. Additionally, pre-commit hooks can be installed with `pre-commit install --install-hooks`.\nTo install the loguru Python library, use the command `pip install loguru`. The library aims to simplify Python logging by providing useful functionalities that address the limitations of standard loggers. The sources indicate that loguru is compatible with both CPython and PyPy implementations of Python. While the documentation suggests a minimal setup with `from loguru import logger`, the sources also mention that the repository lacks beginner-friendly documentation, recommending the \"Take the tour\" section in the README for a quick preview.\nThe sources indicate that Loguru is a library which aims to bring enjoyable logging in Python. The \"lager\" source mentions that Lager is a utility pack for Loguru and suggests checking out Loguru from its GitHub page: https://github.com/Delgan/loguru. The \"beans-logging\" source describes itself as a Loguru based custom logging package for Python projects. The \"loguru\" source on PyPI confirms Loguru's purpose as a library for Python logging. The sources do not provide specific installation requirements for Loguru.\n\"Programming Language :: Python :: Implementation :: PyPy\",\n\n\"Programming Language :: Python :: Implementation :: CPython\",\n\n]\n\ndependencies = [\n\n\"colorama>=0.3.4 ; sys\\_platform=='win32'\",\n\n\"aiocontextvars>=0.2.0 ; python\\_version<'3.7'\",\n\n\"win32-setctime>=1.0.0 ; sys\\_platform=='win32'\",\n\n]\n\ndescription = \"Python logging made (stupidly) simple\"\n\ndynamic = ['version']\n\nkeywords = [\"loguru\", \"logging\", \"logger\", \"log\"]\n\nlicense = { file = \"LICENSE\" }\n\nname = \"loguru\"\n\nreadme = 'README.md' [...] \nLager is really a utility pack for loguru. BTW: Loguru is an amazing lib. Check it out: https://github.com/Delgan/loguru. Usage: from lager import LOG, lager\nIt is a Loguru based custom logging package for python projects. \u2728 Features. Main logger based on Loguru logging - https://pypi.org/project/loguru; Logging\nLoguru is a library which aims to bring enjoyable logging in Python. Did you ever feel lazy about configuring a logger and used print() instead?\n```\n   $ git clone git@github.com:your_name_here/loguru.git $ cd loguru \n   ```\n3. Activate your virtual environment:\n\n   ```\n   $ python -m venv env $ source env/bin/activate \n   ```\n4. Install Loguru in development mode:\n\n   ```\n   $ pip install -e \".[dev]\" \n   ```\n5. Install pre-commit hooks that will check your commits:\n\n   ```\n   $ pre-commit install --install-hooks \n   ```\n6. Create a new branch from `master`: [...] The Python version you are using\n The Loguru version you are using (you ca\nAlso, this library is intended to make Python logging less painful by adding a bunch of useful functionalities that solve caveats of the standard loggers. Using logs in your application should be an automatism, Loguru tries to make it both pleasant and powerful.\n\n## Installation\n\n```\npip install loguru \n```\n\n## Features [...] ```\nimport apprise# Define the configuration constants. WEBHOOK_ID = \"123456790\" WEBHOOK_TOKEN = \"[redacted]\"# Prepare the object to send Discord notifications. notifier \nSuccessfully installed loguru-0.3.1 C:\\Users\\>python Python 3.4.3 (v3.4.3:9b73f1c3e601, Feb 24 2015, 22:43:06) [MSC v.1600 32 bit (Intel)] on win32 Type \"help\", \"copyright\", \"credits\" or \"license\" for more information. >>> import loguru Traceback (most recent call last): File \"\", line 1, in  File \"H:\\Python34\\lib\\site-packages\\loguru\\__init__.py\", line 10, in  from ._logger import Logger as _Logger File \"H:\\Python34\\lib\\site-packages\\loguru\\_logger.py\", line 996 async def catch_wrapper(args,\nIssue body actions\n\nI came across `loguru` today, but even as a moderately experienced python developer, I find it hard to pick up `loguru` using the documentation. Current documentation appears to be targeted towards people with experience in `logging` module. It lists all features that are provided by loguru, but it doesn't show what is needed to get going for beginners. I looked up for tutorial, but haven't found one yet. [...] Add a link to the \"Logging HOWTO\" Python documentation in the res",
+   "errors": [],
+   "lines": [
+    "Looked up with Tavily: 8 results",
+    "Query: loguru python setup install instructions https://github.com/Delgan/loguru site:github.com/Delgan/loguru",
+    "Query: loguru python documentation install https://github.com/Delgan/loguru site:github.com/Delgan/loguru",
+    "Query: loguru python install requirements https://pypi.org/project/loguru/ https://github.com/Delgan/loguru site:pypi.org",
+    "Source: loguru/pyproject.toml at master \u00b7 Delgan/loguru \u00b7 GitHub \u2014 https://github.com/Delgan/loguru/blob/master/pyproject.toml",
+    "Source: lager \u2014 https://pypi.org/project/lager/",
+    "Source: Python Logging (beans-logging) \u2014 https://pypi.org/project/beans-logging/",
+    "Source: loguru \u2014 https://pypi.org/project/loguru/",
+    "Source: loguru/CONTRIBUTING.rst at master \u00b7 Delgan/loguru \u00b7 GitHub \u2014 https://github.com/Delgan/loguru/blob/master/CONTRIBUTING.rst",
+    "Source: GitHub - Delgan/loguru: Python logging made (stupidly) simple \u00b7 GitHub \u2014 https://github.com/delgan/loguru",
+    "Source: Can\u2018t Import loguru \u00b7 Issue #116 \u00b7 Delgan/loguru \u00b7 GitHub \u2014 https://github.com/Delgan/loguru/issues/116",
+    "Source: Suggestion/request: Documentation/tutorial for beginners \u00b7 Issue #71 \u00b7 Delgan/loguru \u00b7 GitHub \u2014 https://github.com/Delgan/loguru/issues/71"
+   ]
+  },
   "notes": [
    "Setup check: GitHub token: present.",
    "Setup check: Nebius token: present.",
-   "Setup check: free memory 8.8 GB (of 15.6 GB).",
-   "Setup check: free disk 94.4 GB.",
+   "Setup check: free memory 9.7 GB (of 15.6 GB).",
+   "Setup check: free disk 94.3 GB.",
    "Demo helper: git is installed.",
    "Demo helper: python3 is installed.",
    "Demo helper: uv is installed.",
-   "Looked up with Tavily: [redacted] results",
+   "Looked up with Tavily: 8 results",
    "Query: loguru python setup install instructions https://github.com/Delgan/loguru site:github.com/Delgan/loguru",
    "Query: loguru python documentation install https://github.com/Delgan/loguru site:github.com/Delgan/loguru",
    "Query: loguru python install requirements https://pypi.org/project/loguru/ https://github.com/Delgan/loguru site:pypi.org",
@@ -176,8 +341,19 @@
    "Setup plan: install build==1.6.1 ; python_version>='3.11' (listed in the dev extra) on main and pr.",
    "Setup plan: install twine==7.0.0 ; python_version>='3.11' (listed in the dev extra) on main and pr.",
    "Setup plan: Python 3.12: Python 3.12 already meets >=3.5, <4.0,>=3.5",
-   "rerun, setup problem: PR install failed after 3 tries.",
-   "Demo helper: setup failure already labelled; the probe was not rerun."
+   "Installed pre-commit 4.6.0 from pyproject (listed in the dev extra) on main and pr.",
+   "Installed tox main 4.64.4, pr 4.56.1 from pyproject (listed in the dev extra) on main and pr.",
+   "Installed pytest 9.1.1 from pyproject (listed in the dev extra) on main and pr.",
+   "Installed pytest-cov 6.2.1 from pyproject (listed in the dev extra) on main and pr.",
+   "Installed pytest-mypy-plugins 4.0.3 from pyproject (listed in the dev extra) on main and pr.",
+   "Installed freezegun 1.5.0 from pyproject (listed in the dev extra) on main and pr.",
+   "Installed exceptiongroup  from pyproject (listed in the dev extra) on main and pr.",
+   "Installed mypy main 2.3.1, pr 2.1.0 from pyproject (listed in the dev extra) on main and pr.",
+   "Installed Sphinx 8.2.1 from pyproject (listed in the dev extra) on main and pr.",
+   "Installed sphinx-rtd-theme main 3.1.0, pr 3.0.2 from pyproject (listed in the dev extra) on main and pr.",
+   "Installed myst-parser 4.0.0 from pyproject (listed in the dev extra) on main and pr.",
+   "Installed build main 1.6.1, pr 1.3.0 from pyproject (listed in the dev extra) on main and pr.",
+   "Installed twine main 7.0.0, pr 6.2.0 from pyproject (listed in the dev extra) on main and pr."
   ],
   "install_docs": [
    "README.md",
@@ -433,13 +609,203 @@
    "plan": "setup-plan.json",
    "count": 13
   },
-  "setup": {
-   "label": "rerun, setup problem",
-   "counts_as_verdict": false,
-   "step": "PR install",
-   "attempts": 3,
-   "detail": "install failed (1); see setup-pr.log"
-  }
+  "installs": [
+   {
+    "package": "pre-commit",
+    "requirement": "pre-commit==4.6.0 ; python_version>='3.11'",
+    "version": "4.6.0",
+    "versions": {
+     "main": "4.6.0",
+     "pr": "4.6.0"
+    },
+    "source": "pyproject",
+    "reason": "listed in the dev extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "tox",
+    "requirement": "tox==3.27.1 ; python_version<'3.8'",
+    "version": "main 4.64.4, pr 4.56.1",
+    "versions": {
+     "main": "4.64.4",
+     "pr": "4.56.1"
+    },
+    "source": "pyproject",
+    "reason": "listed in the dev extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "pytest",
+    "requirement": "pytest==6.1.2 ; python_version<'3.8'",
+    "version": "9.1.1",
+    "versions": {
+     "main": "9.1.1",
+     "pr": "9.1.1"
+    },
+    "source": "pyproject",
+    "reason": "listed in the dev extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "pytest-cov",
+    "requirement": "pytest-cov==2.12.1 ; python_version<'3.8'",
+    "version": "6.2.1",
+    "versions": {
+     "main": "6.2.1",
+     "pr": "6.2.1"
+    },
+    "source": "pyproject",
+    "reason": "listed in the dev extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "pytest-mypy-plugins",
+    "requirement": "pytest-mypy-plugins==4.0.3 ; python_version>='3.12' and platform_python_implementation!='PyPy'",
+    "version": "4.0.3",
+    "versions": {
+     "main": "4.0.3",
+     "pr": "4.0.3"
+    },
+    "source": "pyproject",
+    "reason": "listed in the dev extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "freezegun",
+    "requirement": "freezegun==1.1.0 ; python_version<'3.8'",
+    "version": "1.5.0",
+    "versions": {
+     "main": "1.5.0",
+     "pr": "1.5.0"
+    },
+    "source": "pyproject",
+    "reason": "listed in the dev extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "exceptiongroup",
+    "requirement": "exceptiongroup==1.1.3 ; python_version>='3.7' and python_version<'3.11'",
+    "version": "",
+    "versions": {
+     "main": "",
+     "pr": ""
+    },
+    "source": "pyproject",
+    "reason": "listed in the dev extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "mypy",
+    "requirement": "mypy==v0.910 ; python_version<'3.6'",
+    "version": "main 2.3.1, pr 2.1.0",
+    "versions": {
+     "main": "2.3.1",
+     "pr": "2.1.0"
+    },
+    "source": "pyproject",
+    "reason": "listed in the dev extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "Sphinx",
+    "requirement": "Sphinx==8.2.1 ; python_version>='3.11'",
+    "version": "8.2.1",
+    "versions": {
+     "main": "8.2.1",
+     "pr": "8.2.1"
+    },
+    "source": "pyproject",
+    "reason": "listed in the dev extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "sphinx-rtd-theme",
+    "requirement": "sphinx-rtd-theme==3.1.0 ; python_version>='3.11'",
+    "version": "main 3.1.0, pr 3.0.2",
+    "versions": {
+     "main": "3.1.0",
+     "pr": "3.0.2"
+    },
+    "source": "pyproject",
+    "reason": "listed in the dev extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "myst-parser",
+    "requirement": "myst-parser==4.0.0 ; python_version>='3.11'",
+    "version": "4.0.0",
+    "versions": {
+     "main": "4.0.0",
+     "pr": "4.0.0"
+    },
+    "source": "pyproject",
+    "reason": "listed in the dev extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "build",
+    "requirement": "build==1.6.1 ; python_version>='3.11'",
+    "version": "main 1.6.1, pr 1.3.0",
+    "versions": {
+     "main": "1.6.1",
+     "pr": "1.3.0"
+    },
+    "source": "pyproject",
+    "reason": "listed in the dev extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "twine",
+    "requirement": "twine==7.0.0 ; python_version>='3.11'",
+    "version": "main 7.0.0, pr 6.2.0",
+    "versions": {
+     "main": "7.0.0",
+     "pr": "6.2.0"
+    },
+    "source": "pyproject",
+    "reason": "listed in the dev extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   }
+  ]
  },
  "chosen": {
   "pr": 1515,
@@ -460,53 +826,37 @@
  "probe_plan": {
   "baseline": "full",
   "model": "model provider: nebius (Token Factory, live)",
-  "errors": [],
+  "errors": [
+   "probe 'probe-c2' rejected: empty probe: the code has no test statements (only imports, comments or a docstring)",
+   "probe 'probe-c3' rejected: empty probe: the code has no test statements (only imports, comments or a docstring)"
+  ],
   "model_claims": [
    {
-    "id": "C1",
-    "text": "Evaluating every rotation condition prevents a skipped condition from causing a spurious extra rotation.",
-    "source_quote": "Evaluate every rotation condition so a skipped one cannot fire spuriously",
-    "testable": true,
-    "expect": "differs"
-   },
-   {
     "id": "C2",
-    "text": "Using any() to combine rotation conditions causes short\u2011circuit evaluation, leaving some stateful conditions unevaluated and their internal limits stale, which can lead to a spurious rotation on the next log message.",
-    "source_quote": "`any()` over a generator **short-circuits**. That is fine for the return value, but each `RotationTime` condition is *stateful*",
+    "text": "With rotation=[\"13:00\",\"12:00\"], a file created at 06:00 and two log messages after idle until 13:00:01 results in exactly two log files (the original and one rotated) rather than three files (including a spurious extra rotation).",
+    "source_quote": "before \u2014 3 files (BUG):\n  file.2020-01-01_06-00-00_000000.log     'a\\n'\n  file.2020-01-01_13-00-01_000000.log     'b\\n'    <-- spurious extra rotation\n  file.log                                'c\\n'\nafter \u2014 2 files (correct):\n  file.2020-01-01_06-00-00_000000.log     'a\\n'\n  file.log                                'b\\nc\\n'",
     "testable": true,
     "expect": "differs"
    },
    {
     "id": "C3",
-    "text": "The change preserves the original semantics that the __call__ method returns True if any rotation condition would trigger rotation.",
+    "text": "The function still returns True if any rotation condition would trigger, preserving the documented 'any of which can trigger the rotation' contract for the return value.",
     "source_quote": "This keeps the documented 'any of which can trigger the rotation' contract for the return value while restoring the side effect the conditions rely on.",
     "testable": true,
     "expect": "same",
     "quote_match": "loose"
-   },
-   {
-    "id": "C4",
-    "text": "The added test `test_multiple_rotation_conditions_all_evaluated` asserts that only two log files are produced; it fails (expecting 3) before the fix and passes after.",
-    "source_quote": "Fails before the change with `assert 3 == 2`; passes after.",
-    "testable": true,
-    "expect": "differs"
-   },
-   {
-    "id": "C5",
-    "text": "Running the filesink rotation test suite yields 147 passed tests after the change, compared to 146 passed before.",
-    "source_quote": "`pytest tests/test_filesink_rotation.py` \u2192 **147 passed, 4 skipped** (146 before).",
-    "testable": true,
-    "expect": "differs"
-   },
-   {
-    "id": "C6",
-    "text": "The full test suite after the change has zero failures, matching the baseline, with only one additional passing test.",
-    "source_quote": "Full suite \u2192 **1646 passed, 70 skipped, 0 failed**. The baseline on unmodified HEAD was 1645 passed, 0 failed, so the delta is exactly this one test.",
-    "testable": true,
-    "expect": "same"
    }
   ],
-  "model_rejected_claims": [],
+  "model_rejected_claims": [
+   {
+    "id": "C1",
+    "text": "Evaluating every rotation condition (instead of using any() short-circuit) prevents a skipped condition from firing spuriously on the next logged message.",
+    "source_quote": "Note that the conditions must all be evaluated, even after one of them returned True, because \"RotationTime\" instances keep their limit up-to-date as a side-effect of being called. Skipping them would leave a stale limit in the past, causing a spurious extra rotation on the next logged message.",
+    "testable": true,
+    "expect": "differs",
+    "rejected": "source_quote not found in the PR text"
+   }
+  ],
   "model_loose_quote_matches": [
    {
     "claim": "C3",
@@ -515,45 +865,11 @@
   ],
   "model_retried": {
    "why": [
-    "no probe listed the claim ids it checks, so its results could not be tied to any claim; in each probe, \"claims\" must name the claim ids it checks and the observation names that cover them"
-   ],
-   "kept_first_answer": "the retry linked no claim either"
+    "empty probe: the code has no test statements (only imports, comments or a docstring)"
+   ]
   },
-  "model_claims_filled": [
-   {
-    "id": "p1",
-    "claims": [
-     "C2",
-     "C3",
-     "C4"
-    ]
-   }
-  ],
   "diff_targets": [],
-  "frozen": [
-   {
-    "path": "model-probes/model-p1.py",
-    "source": "model",
-    "sha256": "988f5136a76e51ef2495e834f2ec7f73a58a59b85ec61e127e342e96f58013de",
-    "generator": {
-     "kind": "model",
-     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
-     "model": "nvidia/nemotron-3-super-120b-a12b",
-     "provider": "nebius",
-     "provenance": "live",
-     "blind": true
-    },
-    "frozen_at": "2026-11-06T06:22:47.188548+00:00",
-    "inputs_sha256": "7be977c1fff3eb715e976ea32c76234bbee3f7a4984ceda8e6a56bdbea11e09a",
-    "inputs": {
-     "title_chars": 73,
-     "body_chars": 3344,
-     "base_files": {
-      "loguru/_file_sink.py": "d9f27b56f581db5a178ae6df357107b6b022c6ad94b639b52809c5c7fc9dd0cb"
-     }
-    }
-   }
-  ]
+  "frozen": []
  },
  "test_extras": [
   "pre-commit",
@@ -571,19 +887,88 @@
   "build",
   "twine"
  ],
- "pr_side_started_at": "2026-11-06T06:22:47.333894+00:00",
+ "pr_side_started_at": "2026-11-06T06:26:09.521108+00:00",
+ "test_targets": {
+  "main": [
+   "tests/test_filesink_rotation.py",
+   "tests/test_type_hinting.py"
+  ],
+  "pr": [
+   "tests/test_filesink_rotation.py",
+   "tests/test_type_hinting.py"
+  ]
+ },
+ "installed_commit": {
+  "main": {
+   "dist": "loguru",
+   "expected": "0412a60d6aff63a4ed009c7445993b42d294c2f1",
+   "installed": "0412a60d6aff63a4ed009c7445993b42d294c2f1",
+   "ok": true
+  },
+  "pr": {
+   "dist": "loguru",
+   "expected": "6c91de2c42d38e010a68d9618dc6aa4ba01e1372",
+   "installed": "6c91de2c42d38e010a68d9618dc6aa4ba01e1372",
+   "ok": true
+  }
+ },
+ "comparison": {
+  "same": 151,
+  "same_skipped_both": 3,
+  "regressions": [],
+  "fixed": [
+   "tests.test_filesink_rotation::test_multiple_rotation_conditions_all_evaluated"
+  ],
+  "new_tests_passing": 0,
+  "new_tests_passing_ids": [],
+  "new_tests_failing": [],
+  "new_tests_skipped": [],
+  "removed_tests": [],
+  "reparametrized": [],
+  "skipped_missing_dependency": [],
+  "flaky": [],
+  "pr_unstable": [],
+  "pr_unstable_noisy": [],
+  "environment": [],
+  "other_changes": [],
+  "preexisting_failures": [],
+  "load_failed_both": [],
+  "load_failed_pr": [],
+  "load_failed_main": [],
+  "executed": {
+   "main": 149,
+   "pr": 149
+  },
+  "messages": {},
+  "base_messages": {
+   "tests.test_filesink_rotation::test_multiple_rotation_conditions_all_evaluated": "AssertionError: assert 3 == 2"
+  }
+ },
+ "exit_check": {
+  "explained": true,
+  "problems": [],
+  "detail": "all runs exited 0"
+ },
+ "probes": {
+  "status": "none",
+  "items": []
+ },
+ "probe_changed_line_coverage": {
+  "status": "no probes",
+  "probes": {}
+ },
  "verdict": "could_not_verify",
- "reason": "install failed (1); see setup-pr.log",
+ "reason": "unverified behaviour claim: \"I left it untouched.\"; needs a probe (1 test(s) fail on main and pass on the PR; 149 test(s) ran on main, 149 on the PR; 0 new test(s) pass, 151 unchanged (3 of them skipped on both sides))",
  "verdict_before_coverage_gate": "could_not_verify",
- "reason_before_coverage_gate": "install failed (1); see setup-pr.log",
- "changed_lines_total": null,
- "changed_lines_covered": null,
+ "reason_before_coverage_gate": "unverified behaviour claim: \"I left it untouched.\"; needs a probe (1 test(s) fail on main and pass on the PR; 149 test(s) ran on main, 149 on the PR; 0 new test(s) pass, 151 unchanged (3 of them skipped on both sides))",
+ "changed_lines_total": 5,
+ "changed_lines_covered": 5,
  "coverage_gate": {
   "kind": "python",
   "changed": false,
-  "confidence": "lower",
-  "note": "coverage of the changed Python lines was NOT MEASURED (coverage has not been run for this check)",
-  "measurement": "not measured"
+  "confidence": "normal",
+  "note": "5 of 5 changed executable line(s) ran (100%)",
+  "measurement": "measured"
  },
  "agents": {
   "status": "skipped",
@@ -616,28 +1001,28 @@
   ]
  },
  "duration_s": {
-  "total_wall": 126.2,
-  "tests": 0
+  "total_wall": 406.7,
+  "tests": 166.2
  },
  "cost": {
   "ai_calls": 3,
   "failed_ai_calls": 0,
-  "input_tokens": 12073,
-  "output_tokens": 25650,
-  "thinking_tokens": 24284,
-  "cost_usd": 0.026707,
+  "input_tokens": 11548,
+  "output_tokens": 22564,
+  "thinking_tokens": 22003,
+  "cost_usd": 0.023772,
   "calls_without_usage": 0,
-  "ai_cost_usd": 0.026707,
+  "ai_cost_usd": 0.023772,
   "cost_complete": true,
   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
   "compute_seconds": {
-   "total_wall": 126.2,
-   "tests": 0
+   "total_wall": 406.7,
+   "tests": 166.2
   },
   "machine_usd_per_hour": 0.24,
   "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
-  "computer_cost_usd": 0.008413,
-  "total_cost_usd": 0.03512,
+  "computer_cost_usd": 0.027113,
+  "total_cost_usd": 0.050885,
   "swarm": {
    "ai_calls": 0,
    "failed_ai_calls": 0,
@@ -655,6 +1040,6 @@
   "ok": true,
   "attempts": 1,
   "error": null,
-  "url": "https://github.com/aritracodesbad123/Proof-of-change/tree/runs/runs/2026-11-06/4050401/loguru-1515"
+  "url": "runs/2026-11-06/f4f36d9/loguru-1515"
  }
 }
