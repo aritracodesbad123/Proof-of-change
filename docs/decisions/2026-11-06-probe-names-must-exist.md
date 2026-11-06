@@ -26,11 +26,30 @@ Check the base tree before the probe is frozen. Do not guess a replacement name.
 lists the names that are really in the parent module, and the model gets one chance to use one
 of them.
 
-A name the probe only checks for absence is allowed to be missing. That is a `try` / `except`,
-or `pytest.raises` / `contextlib.suppress`, of `ImportError`, `ModuleNotFoundError`,
-`AttributeError` or `NameError`, or the string in `hasattr` or in `getattr` with a default. A
-bare `except`, or `except Exception`, is not that case: the probe is still using the name as if
-it existed.
+A name the probe only checks for absence is allowed to be missing, when that is how the probe
+was written the first time. That is a `try` / `except`, or `pytest.raises` /
+`contextlib.suppress`, of `ImportError`, `ModuleNotFoundError`, `AttributeError` or `NameError`,
+or the string in `hasattr` or in `getattr` with a default. A bare `except`, or `except
+Exception`, is not that case: the probe is still using the name as if it existed.
+
+The one repair is not allowed to turn a name that just failed into one of those absence checks.
+`getattr(module, "missing", 0)`, or `try` / `except` that records a fallback for the same name,
+is the same miss in disguise. Both sides would then print the same fallback. That repair is
+rejected, the probe is not written, and it is not coverage. A first answer that already checks
+for a symbol the change removes is left as it is.
+
+A call keyword is checked the same way, in that same single repair, when the callee is a function
+or class written in the base tree. The class's own `__init__` is read, or the function's parameters.
+A method is checked only when the call names the class and the method is defined on that class.
+If the definition accepts `**kwargs`, or a decorator other than `staticmethod` or `classmethod`
+wraps it, or the callee is not a base-tree function or class, the keyword is left alone. An
+unexpected keyword is sent back with the parameter names the base definition actually has. A
+repair that still passes the keyword is not written and is not coverage.
+
+A function body may call a function, class or import defined later in the module. The module
+finishes those bindings before the function runs. A name assigned in a class body is not visible
+inside a method or a comprehension in that class. Those look up names the way Python does, in the
+enclosing module or function, so `class T: x = 1; def m(self): return x` is an undefined name.
 
 Verdict rules are unchanged. A probe that runs and sees a real difference is still judged as
 before. Stored records are not re-read into a new verdict by this change.

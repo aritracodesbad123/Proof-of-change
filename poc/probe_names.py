@@ -24,6 +24,35 @@ _BROAD = {"Exception", "BaseException"}
 _LIST_LIMIT = 12
 
 
+def hides_required_miss(old: str, new: str, base_root) -> str | None:
+    """Why a repair is only hiding a name the previous probe used as a real object, or None.
+
+    An initial probe may check that a symbol is absent. A repair may not: if the previous code
+    failed because a name does not exist, wrapping that same name in hasattr, getattr with a
+    default, or try/except is a fallback, not a test of the change. Both sides then emit the
+    same fallback and it is not evidence."""
+    before = _analyze(old, base_root)
+    after = _analyze(new, base_root)
+    if before is None or after is None or not before.required_missing:
+        return None
+    hidden = [sym for sym in before.required_missing
+              if (flags := after.mentions.get(sym)) and all(flags)]
+    if not hidden:
+        return None
+    return ("hides missing name " + ", ".join(hidden)
+            + " behind an absence check; that fallback is not evidence")
+
+
+def _analyze(code: str, base_root):
+    try:
+        tree = ast.parse(code or "")
+    except SyntaxError:
+        return None
+    checker = _Checker(Path(base_root) if base_root else None, skip_undefined=_cannot_tell(tree))
+    checker.visit(tree)
+    return checker
+
+
 def problems(code: str, base_root) -> list[str]:
     """Concrete problems, in source order. Empty when every required name exists, or when the
     code does not parse (a parse error is reported by the parse repair, not here).
@@ -31,13 +60,8 @@ def problems(code: str, base_root) -> list[str]:
     base_root: the base checkout or its site-packages. None checks only undefined names in the
     probe itself (a name the probe uses and never binds). Imports of modules that are not in
     that tree (the standard library, or a third-party package) are left alone."""
-    try:
-        tree = ast.parse(code or "")
-    except SyntaxError:
-        return []
-    checker = _Checker(Path(base_root) if base_root else None, skip_undefined=_cannot_tell(tree))
-    checker.visit(tree)
-    return checker.messages()
+    checker = _analyze(code, base_root)
+    return checker.messages() if checker is not None else []
 
 
 def _strip_probe_assign(tree: ast.AST) -> ast.AST:
@@ -204,11 +228,22 @@ class _Checker(ast.NodeVisitor):
     def __init__(self, base_root: Path | None, skip_undefined: bool):
         self.root = base_root
         self.skip_undefined = skip_undefined
-        self.scopes = [_BUILTINS.copy()]
+        # ready: names bound so far (module and class bodies run top to bottom).
+        # complete: every name bound in a module or function, including ones later in that block.
+        # A function body runs only after its module has finished binding, so it sees `complete`.
+        # A class body name is not a lexical name inside a method or a comprehension.
+        self.ready = [_BUILTINS.copy()]
+        self.complete = [_BUILTINS.copy()]
+        self.kinds = ["module"]
         self.aliases = [{}]   # local name -> imported module, innermost last
+        self.symbols = [{}]   # local name -> ("mod", dotted) or ("attr", module, name)
+        self._file_ast = {}
         self.excuse = [set()]
+        self._in_body = False
         self._msgs = []
         self._undef = []
+        self.required_missing = []
+        self.mentions = {}   # qualified name -> whether each use is only an absence check
 
     def messages(self) -> list[str]:
         out = []
@@ -224,10 +259,22 @@ class _Checker(ast.NodeVisitor):
         return out
 
     def _bind(self, name: str) -> None:
-        self.scopes[-1].add(name)
+        """A name that has been executed in this block. Also recorded as a completed binding."""
+        self.ready[-1].add(name)
+        self.complete[-1].add(name)
 
     def _defined(self, name: str) -> bool:
-        return any(name in scope for scope in self.scopes)
+        seen_function = False
+        for i in range(len(self.kinds) - 1, -1, -1):
+            if self.kinds[i] == "function":
+                seen_function = True
+            # Methods and comprehensions do not close over the class body that contains them.
+            if self.kinds[i] == "class" and seen_function:
+                continue
+            pool = self.complete[i] if self._in_body and self.kinds[i] in ("module", "function") else self.ready[i]
+            if name in pool:
+                return True
+        return False
 
     def _alias(self, name: str) -> str | None:
         for table in reversed(self.aliases):
@@ -235,15 +282,121 @@ class _Checker(ast.NodeVisitor):
                 return table[name]
         return None
 
-    def _push(self) -> None:
-        self.scopes.append(set())
+    def _push(self, kind: str) -> None:
+        self.ready.append(set())
+        self.complete.append(set())
+        self.kinds.append(kind)
         self.aliases.append({})
+        self.symbols.append({})
         self.excuse.append(self.excuse[-1])
 
     def _pop(self) -> None:
-        self.scopes.pop()
+        self.ready.pop()
+        self.complete.pop()
+        self.kinds.pop()
         self.aliases.pop()
+        self.symbols.pop()
         self.excuse.pop()
+
+    def _symbol(self, name: str):
+        for table in reversed(self.symbols):
+            if name in table:
+                return table[name]
+        return None
+
+    def _mention(self, qualified: str, excused: bool) -> None:
+        self.mentions.setdefault(qualified, []).append(excused)
+
+    def _note_missing(self, qualified: str) -> None:
+        if qualified not in self.required_missing:
+            self.required_missing.append(qualified)
+
+    def visit_Module(self, node):
+        self._prebind_block(node.body)
+        for stmt in node.body:
+            self.visit(stmt)
+
+    def _prebind_block(self, stmts) -> None:
+        """Record names a module or function binds, including ones that appear later.
+
+        Function and class bodies are not entered: their assignments are not bindings of this
+        block. The function or class name itself is."""
+        for stmt in stmts:
+            self._prebind_stmt(stmt)
+
+    def _prebind_stmt(self, stmt) -> None:
+        if isinstance(stmt, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+            self.complete[-1].add(stmt.name)
+            return
+        if isinstance(stmt, ast.Assign):
+            for target in stmt.targets:
+                self.complete[-1].update(_assigned(target))
+            return
+        if isinstance(stmt, ast.AnnAssign):
+            self.complete[-1].update(_assigned(stmt.target))
+            return
+        if isinstance(stmt, ast.AugAssign):
+            self.complete[-1].update(_assigned(stmt.target))
+            return
+        if isinstance(stmt, (ast.Import, ast.ImportFrom)):
+            self._bind_aliases(stmt, into_complete=True)
+            return
+        if isinstance(stmt, (ast.For, ast.AsyncFor)):
+            self.complete[-1].update(_assigned(stmt.target))
+            self._prebind_block(stmt.body)
+            self._prebind_block(stmt.orelse)
+            return
+        if isinstance(stmt, ast.While):
+            self._prebind_block(stmt.body)
+            self._prebind_block(stmt.orelse)
+            return
+        if isinstance(stmt, (ast.With, ast.AsyncWith)):
+            for item in stmt.items:
+                if item.optional_vars:
+                    self.complete[-1].update(_assigned(item.optional_vars))
+            self._prebind_block(stmt.body)
+            return
+        if isinstance(stmt, ast.If):
+            self._prebind_block(stmt.body)
+            self._prebind_block(stmt.orelse)
+            return
+        if isinstance(stmt, ast.Try):
+            self._prebind_block(stmt.body)
+            for handler in stmt.handlers:
+                if handler.name:
+                    self.complete[-1].add(handler.name)
+                self._prebind_block(handler.body)
+            self._prebind_block(stmt.orelse)
+            self._prebind_block(stmt.finalbody)
+            return
+
+    def _bind_aliases(self, node, into_complete: bool) -> None:
+        if isinstance(node, ast.Import):
+            for alias in node.names:
+                local = alias.asname or alias.name.split(".")[0]
+                self._remember(local, into_complete)
+                dotted = alias.name if alias.asname else alias.name.split(".")[0]
+                self.aliases[-1][local] = dotted
+                self.symbols[-1][local] = ("mod", dotted)
+            return
+        for alias in node.names:
+            if alias.name == "*":
+                continue
+            local = alias.asname or alias.name
+            self._remember(local, into_complete)
+            if node.module and not node.level:
+                child = locate(self.root, node.module + "." + alias.name)
+                if child is not None and child.kind != "missing":
+                    self.aliases[-1][local] = node.module + "." + alias.name
+                    self.symbols[-1][local] = ("mod", node.module + "." + alias.name)
+                else:
+                    self.symbols[-1][local] = ("attr", node.module, alias.name)
+
+    def _remember(self, name: str, into_complete: bool) -> None:
+        if into_complete:
+            self.complete[-1].add(name)
+        else:
+            self._bind(name)
 
     def _add(self, msg: str | None) -> None:
         if msg and msg not in self._msgs:
@@ -281,44 +434,53 @@ class _Checker(ast.NodeVisitor):
         self._bind_target(node.target)
 
     def visit_Import(self, node):
+        self._bind_aliases(node, into_complete=False)
+        excused = "import" in self.excuse[-1]
         for alias in node.names:
-            local = alias.asname or alias.name.split(".")[0]
-            self._bind(local)
-            # `import a.b.c` binds `a`. Attribute lookup starts at `a`, not at `a.b.c`.
-            # `import a.b.c as c` binds the whole module.
-            self.aliases[-1][local] = alias.name if alias.asname else alias.name.split(".")[0]
-            if "import" not in self.excuse[-1]:
+            self._mention(alias.name, excused)
+            if excused:
+                continue
+            if _missing_module(self.root, alias.name):
                 self._add(_missing_module(self.root, alias.name))
+                self._note_missing(alias.name)
 
     def visit_ImportFrom(self, node):
-        for alias in node.names:
-            if alias.name != "*":
-                self._bind(alias.asname or alias.name)
+        self._bind_aliases(node, into_complete=False)
         if node.level or not node.module:
             return
-        if "import" in self.excuse[-1]:
-            return
-        self._add(_missing_module(self.root, node.module))
+        excused = "import" in self.excuse[-1]
+        self._mention(node.module, excused)
+        if not excused and _missing_module(self.root, node.module):
+            self._add(_missing_module(self.root, node.module))
+            self._note_missing(node.module)
         for alias in node.names:
             if alias.name == "*":
                 continue
-            self._add(_missing_attr(self.root, node.module, alias.name))
-            child = locate(self.root, node.module + "." + alias.name)
-            if child is not None and child.kind != "missing":
-                self.aliases[-1][alias.asname or alias.name] = node.module + "." + alias.name
+            qualified = node.module + "." + alias.name
+            self._mention(qualified, excused)
+            if excused:
+                continue
+            if _missing_attr(self.root, node.module, alias.name):
+                self._add(_missing_attr(self.root, node.module, alias.name))
+                self._note_missing(qualified)
 
     def visit_Attribute(self, node):
-        if isinstance(node.ctx, ast.Load) and "attr" not in self.excuse[-1]:
+        if isinstance(node.ctx, ast.Load):
             chain = _module_chain(node, self._alias)
             if chain:
+                # Record the use even inside an absence check, so a repair cannot hide the name.
                 self._require_chain(chain[0], chain[1], allow_missing_module="import" in self.excuse[-1])
         self.generic_visit(node)
 
     def visit_Call(self, node):
+        self._check_keywords(node)
         skip = _presence_skip(node)
         if skip is None:
             self.generic_visit(node)
             return
+        module = _expr_module(node.args[0], self._alias)
+        if module and _string(node.args[skip]):
+            self._mention(module + "." + node.args[skip].value, True)
         self.visit(node.func)
         for i, arg in enumerate(node.args):
             if i != skip:
@@ -341,15 +503,20 @@ class _Checker(ast.NodeVisitor):
         for default in list(args.defaults) + list(args.kw_defaults):
             if default is not None:
                 self.visit(default)
-        self._push()
+        self._push("function")
         for arg in list(args.posonlyargs) + list(args.args) + list(args.kwonlyargs):
             self._bind(arg.arg)
         if args.vararg:
             self._bind(args.vararg.arg)
         if args.kwarg:
             self._bind(args.kwarg.arg)
+        # Later defs in this function are visible to earlier nested functions.
+        self._prebind_block(node.body)
+        was = self._in_body
+        self._in_body = True
         for stmt in node.body:
             self.visit(stmt)
+        self._in_body = was
         self._pop()
 
     def visit_Lambda(self, node):
@@ -357,14 +524,17 @@ class _Checker(ast.NodeVisitor):
         for default in list(args.defaults) + list(args.kw_defaults):
             if default is not None:
                 self.visit(default)
-        self._push()
+        self._push("function")
         for arg in list(args.posonlyargs) + list(args.args) + list(args.kwonlyargs):
             self._bind(arg.arg)
         if args.vararg:
             self._bind(args.vararg.arg)
         if args.kwarg:
             self._bind(args.kwarg.arg)
+        was = self._in_body
+        self._in_body = True
         self.visit(node.body)
+        self._in_body = was
         self._pop()
 
     def visit_ClassDef(self, node):
@@ -373,7 +543,7 @@ class _Checker(ast.NodeVisitor):
             self.visit(deco)
         for base in node.bases:
             self.visit(base)
-        self._push()
+        self._push("class")
         for stmt in node.body:
             self.visit(stmt)
         self._pop()
@@ -439,37 +609,218 @@ class _Checker(ast.NodeVisitor):
     def _comp(self, node, visit_elt) -> None:
         # The first iterable is evaluated outside the comprehension. Later iterables see the
         # names bound by earlier targets (`for x in xs for y in x`).
+        was = self._in_body
         for i, gen in enumerate(node.generators):
             if i == 0:
                 self.visit(gen.iter)
-                self._push()
+                # A comprehension is a nested function. Inside a class it must not see the class
+                # body names; inside a function it runs when that function runs.
+                self._push("function")
+                if self._enclosing_is_function():
+                    self._in_body = True
             else:
                 self.visit(gen.iter)
             self._bind_target(gen.target)
             for test in gen.ifs:
                 self.visit(test)
         visit_elt()
+        if self._enclosing_is_function():
+            self._in_body = was
         self._pop()
+
+    def _enclosing_is_function(self) -> bool:
+        # The comprehension's own frame is the last one. Look outside it.
+        return any(kind == "function" for kind in self.kinds[:-1])
 
     def _require_chain(self, module: str, attrs: list[str], allow_missing_module: bool) -> None:
         cur = module
+        excused = "attr" in self.excuse[-1] or "import" in self.excuse[-1]
         for attr in attrs:
+            qualified = cur + "." + attr
+            self._mention(qualified, excused)
             loc = locate(self.root, cur)
             if loc is None:
                 return
             if loc.kind == "missing":
                 if not allow_missing_module:
                     self._add(_missing_module(self.root, cur))
+                    self._note_missing(cur)
                 return
-            child = locate(self.root, cur + "." + attr)
+            child = locate(self.root, qualified)
             if child is not None and child.kind != "missing":
-                cur = cur + "." + attr
+                cur = qualified
                 continue
             names = defined_names(loc)
             if names is None or attr in names:
                 return
-            self._add(_missing_attr(self.root, cur, attr))
+            if not excused:
+                self._add(_missing_attr(self.root, cur, attr))
+                self._note_missing(qualified)
             return
+
+    def _check_keywords(self, node: ast.Call) -> None:
+        """A keyword on a base-local function or class must be one of its parameters.
+
+        Skipped when the callable is not a function or class defined in the base tree, when a
+        decorator other than staticmethod/classmethod wraps it, or when the signature accepts
+        **kwargs. Third-party and builtin calls are not checked."""
+        if not node.keywords or any(kw.arg is None for kw in node.keywords):
+            return
+        sig = self._call_signature(node.func)
+        if sig is None or sig.var_keyword:
+            return
+        allowed = [name for name in sig.names if name not in sig.posonly]
+        bad = [kw.arg for kw in node.keywords if kw.arg not in allowed]
+        if not bad:
+            return
+        shown = ", ".join(allowed[:_LIST_LIMIT]) or "(none)"
+        extra = f" (+{len(allowed) - _LIST_LIMIT} more)" if len(allowed) > _LIST_LIMIT else ""
+        quoted = ", ".join(repr(name) for name in bad)
+        self._add(f"{sig.display}() got unexpected keyword(s) {quoted}; parameters: {shown}{extra}")
+
+    def _call_signature(self, func):
+        if isinstance(func, ast.Name):
+            info = self._symbol(func.id)
+            if not info or info[0] != "attr":
+                return None
+            return _signature_of(self, info[1], info[2])
+        chain = _module_chain(func, self._alias)
+        if not chain:
+            return None
+        return _signature_from_chain(self, chain[0], chain[1])
+
+    def _module_tree(self, module: str):
+        loc = locate(self.root, module)
+        if loc is None or loc.kind == "missing" or loc.path is None or not loc.path.is_file():
+            return None
+        key = str(loc.path)
+        if key not in self._file_ast:
+            try:
+                self._file_ast[key] = ast.parse(loc.path.read_text(errors="replace"))
+            except (OSError, SyntaxError):
+                self._file_ast[key] = None
+        return self._file_ast[key]
+
+
+class _Sig:
+    def __init__(self, display: str, names: list[str], posonly: set[str], var_keyword: bool):
+        self.display = display
+        self.names = names
+        self.posonly = posonly
+        self.var_keyword = var_keyword
+
+
+def _signature_from_chain(checker, module: str, attrs: list[str]):
+    """Resolve module.a.b.Callable or module.Class.method to a base signature, or None."""
+    cur = module
+    i = 0
+    while i < len(attrs) - 1:
+        nxt = cur + "." + attrs[i]
+        loc = locate(checker.root, nxt)
+        if loc is not None and loc.kind != "missing":
+            cur, i = nxt, i + 1
+            continue
+        break
+    name, rest = attrs[i], attrs[i + 1:]
+    if not rest:
+        return _signature_of(checker, cur, name)
+    if len(rest) == 1:
+        return _method_signature(checker, cur, name, rest[0])
+    return None
+
+
+def _signature_of(checker, module: str, name: str):
+    tree = checker._module_tree(module)
+    if tree is None:
+        return None
+    node = next((n for n in tree.body if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef))
+                 and n.name == name), None)
+    if isinstance(node, ast.ClassDef):
+        return _init_signature(tree, node)
+    if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+        return _function_signature(node, drop_first=False, display=node.name)
+    return None
+
+
+def _method_signature(checker, module: str, class_name: str, method: str):
+    tree = checker._module_tree(module)
+    if tree is None:
+        return None
+    cls = next((n for n in tree.body if isinstance(n, ast.ClassDef) and n.name == class_name), None)
+    if cls is None:
+        return None
+    fn = next((n for n in cls.body if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef)) and n.name == method),
+              None)
+    if fn is None:
+        return None
+    drop = True
+    for deco in fn.decorator_list:
+        if _decorator_name(deco) == "staticmethod":
+            drop = False
+    return _function_signature(fn, drop_first=drop, display=f"{class_name}.{method}")
+
+
+def _init_signature(tree: ast.AST, cls: ast.ClassDef, depth: int = 0):
+    if depth > 3:
+        return None
+    init = next((n for n in cls.body if isinstance(n, ast.FunctionDef) and n.name == "__init__"), None)
+    if init is not None:
+        return _function_signature(init, drop_first=True, display=cls.name)
+    if not cls.bases:
+        return _Sig(cls.name, [], set(), False)
+    for base in cls.bases:
+        if isinstance(base, ast.Name) and base.id == "object":
+            continue
+        if not isinstance(base, ast.Name):
+            return None
+        parent = next((n for n in tree.body if isinstance(n, ast.ClassDef) and n.name == base.id), None)
+        if parent is None:
+            return None
+        sig = _init_signature(tree, parent, depth + 1)
+        if sig is None:
+            return None
+        return _Sig(cls.name, sig.names, sig.posonly, sig.var_keyword)
+    return _Sig(cls.name, [], set(), False)
+
+
+def _decorator_name(node) -> str | None:
+    if isinstance(node, ast.Name):
+        return node.id
+    if isinstance(node, ast.Attribute):
+        return node.attr
+    return None
+
+
+def _function_signature(node, drop_first: bool, display: str):
+    """None when a decorator may have changed the callable. **kwargs means any keyword is allowed."""
+    for deco in node.decorator_list:
+        if _decorator_name(deco) not in {"staticmethod", "classmethod"}:
+            return None
+    if any(_decorator_name(deco) == "classmethod" for deco in node.decorator_list):
+        drop_first = True
+    if any(_decorator_name(deco) == "staticmethod" for deco in node.decorator_list):
+        drop_first = False
+    args = node.args
+    if args.kwarg is not None:
+        return _Sig(display, [], set(), True)
+    ordered = list(args.posonlyargs) + list(args.args) + list(args.kwonlyargs)
+    posonly = {arg.arg for arg in args.posonlyargs}
+    if drop_first and ordered:
+        if ordered[0].arg in posonly:
+            posonly.discard(ordered[0].arg)
+        ordered = ordered[1:]
+    return _Sig(display, [arg.arg for arg in ordered], posonly, False)
+
+
+def _expr_module(node, alias_of) -> str | None:
+    """The imported module a name or attribute chain refers to, if it is one."""
+    if isinstance(node, ast.Name):
+        return alias_of(node.id)
+    chain = _module_chain(node, alias_of)
+    if not chain:
+        return None
+    module, attrs = chain
+    return module + "." + ".".join(attrs)
 
 
 def _module_chain(node, alias_of) -> tuple[str, list[str]] | None:

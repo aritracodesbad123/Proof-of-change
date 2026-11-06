@@ -948,10 +948,11 @@ def _repair_missing_names(provider, probes_prompt: str, user: str, ctx: dict, re
     ask = (user + "\n\nThese probes use an import or a name that does not exist on the BASE side. Return the same "
            "probes with their code fixed (same ids). Every import, and every call or attribute on an imported "
            "module, must name something that exists there. Use only names that exist on the base side; do not "
-           "invent a module and do not rename one by guessing. A name the probe only checks for absence may stay "
-           "missing: inside pytest.raises or contextlib.suppress of ImportError, ModuleNotFoundError, "
-           "AttributeError or NameError; inside try/except of those same types; or as the string in hasattr or "
-           "getattr with a default.\n\n" + "\n\n".join(lines))
+           "invent a module and do not rename one by guessing. A keyword must be a parameter of that function "
+           "or class on the base side; the message lists the parameters. Do not hide the missing name. "
+           "hasattr, getattr with a default, or try/except that records a fallback for that same name is not "
+           "a fix and is rejected. A probe whose first version already checks that a symbol is absent is a "
+           "different case and is not this repair.\n\n" + "\n\n".join(lines))
     try:
         again = provider.complete_json("probes", probes_prompt, ask, PROBES_SCHEMA, ctx)
     except ProviderError as ex:
@@ -970,10 +971,13 @@ def _repair_missing_names(provider, probes_prompt: str, user: str, ctx: dict, re
             checked = _checked_code(new, product, layout)
             still_parse = parse_error(new)
             still = [] if still_parse else probe_names.problems(checked, base_root)
+            hidden = None if still_parse or still else probe_names.hides_required_miss(_code, checked, base_root)
             if still_parse is not None:
                 outcome = f"still does not parse: {still_parse['message']}"
             elif still:
                 outcome = "still missing: " + "; ".join(still)
+            elif hidden:
+                outcome = "not fixed: " + hidden
             else:
                 try:
                     tree = ast.parse(checked)

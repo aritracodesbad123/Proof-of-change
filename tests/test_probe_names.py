@@ -12,10 +12,14 @@ import os
 import sys
 from pathlib import Path
 
-from ops.daily_run import compare_sides, verdict_for
+import pytest
+
+from ops.daily_run import ai_probe_gate, compare_sides, verdict_for
 from poc import model_probes, model_provider, probe_adequacy, probe_names, probes
 
-FIX = Path(__file__).parent / "fixtures" / "pr_text" / "invoke-1097.json"
+# Scrubbed title and the one sentence this test quotes. Kept in this change so the test does not
+# depend on a fixture that lives only on main.
+FIX = Path(__file__).parent / "fixtures" / "probe_names" / "missing-argument-pr.json"
 BODY = "answer() stays the same."
 CLAIM = {"id": "C1", "text": "answer() stays the same.", "source_quote": "answer() stays the same.",
          "testable": True, "expect": "same"}
@@ -274,10 +278,18 @@ def test_repaired_probe_that_sees_a_difference_needs_attention(tmp_path):
     assert decided[0]["observations"] == []
     assert blocked["probe_changed_line_coverage"]["changed_lines_covered"] == 0
     assert blocked["probe_changed_line_coverage"]["changed_lines_touched"] == 1
-    blocked_verdict, blocked_reason, _flags = verdict_for(
+    blocked_tests, blocked_reason, _flags = verdict_for(
         _cmp_verified(), None, probe_results={"status": "ran", "items": [blocked]})
     assert "proven" not in blocked_reason
     assert "C1" not in blocked_reason
+    # The existing AI-probe gate: verified needs a model probe that ran a changed line.
+    # An unusable probe has none, so the matching fallback cannot leave the check verified.
+    blocked_verdict = ai_probe_gate({
+        "verdict": blocked_tests, "reason": blocked_reason, "baseline": "full",
+        "probes": {"status": "ran", "items": [blocked]},
+    })["verdict"]
+    assert blocked_verdict != "verified"
+    assert blocked_verdict == "could_not_verify"
 
 
 def test_an_undefined_probe_is_not_executed_and_is_not_coverage(tmp_path, monkeypatch):
@@ -303,6 +315,194 @@ def test_an_undefined_probe_is_not_executed_and_is_not_coverage(tmp_path, monkey
     assert item["probe_changed_line_coverage"]["changed_lines_covered"] == 0
     assert "undefined name" in item["uninformative_reason"]
     assert any("undefined name" in e for e in out["errors"])
+
+
+def test_fixture_paths_used_here_are_in_this_branch():
+    """The pull-request text this module opens is a file next to the test, with title and body."""
+    import re
+    text = Path(__file__).read_text()
+    root = Path(__file__).resolve().parents[1]
+    named = re.findall(r"fixtures/(?:probe_names|pr_text)/[\w.-]+\.json", text)
+    named.append("fixtures/probe_names/missing-argument-pr.json")
+    for rel in named:
+        path = root / "tests" / rel
+        assert path.is_file(), rel
+        got = json.loads(path.read_text())
+        assert got.get("title") and got.get("body")
+
+
+@pytest.mark.parametrize("dodge", [
+    "import widget.calc as calc\nprint(getattr(calc, 'missing', 0))\n",
+    "import widget.calc as calc\n"
+    "try:\n    value = calc.missing()\nexcept AttributeError:\n    value = 0\nprint(value)\n",
+    "try:\n    import widget.parser.arguments as arguments\n    value = 1\n"
+    "except ImportError:\n    value = 0\nprint(value)\n",
+])
+def test_repair_cannot_hide_a_missing_name_behind_an_absence_check(tmp_path, dodge):
+    first = ("import widget.calc as calc\nprint(calc.missing())\n"
+             if "arguments" not in dodge else _bad_import())
+    prov = Sequence([[_probe(first)], [_probe(dodge)]])
+    _base, _pr, out = _generate(tmp_path, prov)
+    assert prov.probe_calls == 2
+    assert out["probes"] == []
+    assert out["name_checks"][0]["outcome"].startswith("not fixed:")
+    assert "hides missing name" in out["name_checks"][0]["outcome"]
+    assert "absence check" in out["name_checks"][0]["outcome"]
+    assert not list((tmp_path / "out").glob("*.py"))
+
+
+def test_an_initial_absence_check_is_not_a_repair_and_is_kept(tmp_path):
+    code = ("try:\n    import widget.parser.arguments as arguments\n    present = True\n"
+            "except ImportError:\n    present = False\nprint(present)\n")
+    prov = Sequence([[_probe(code)]])
+    _base, _pr, out = _generate(tmp_path, prov)
+    assert prov.probe_calls == 1
+    assert "name_checks" not in out
+    assert out["probes"] and "arguments" in out["probes"][0]["path"].read_text()
+
+
+def test_a_later_module_function_is_visible_inside_an_earlier_one(tmp_path):
+    _parser_package(tmp_path, 1)
+    code = ("def run():\n    return helper(calc.answer())\n"
+            "def helper(x):\n    return x\n"
+            "import widget.calc as calc\n"
+            "print(run())\n")
+    assert probe_names.problems(code, tmp_path) == []
+    text = ('PROBE = {"id": "model-p1", "target": "o/r#1", "about": "x", "claims": []}\n' + code)
+    assert probe_names.local_failure(text) is None
+
+
+def test_forward_ref_probe_is_executed(tmp_path, monkeypatch):
+    from ops import daily_run
+    called = []
+
+    def fake(*args, **kwargs):
+        called.append(True)
+        return {"id": "model-p1", "observations": [], "runs": {"main": [], "pr": []}}
+
+    monkeypatch.setattr(daily_run.probes, "run_probe", fake)
+    monkeypatch.setattr(daily_run.freeze, "verify", lambda *a, **k: None)
+    monkeypatch.setattr(daily_run, "_contree_ready", lambda: False)
+    monkeypatch.setattr(daily_run, "probe_env", lambda v, settings=None: {})
+    path = tmp_path / "model-p1.py"
+    path.write_text('PROBE = {"id": "model-p1", "target": "o/r#1", "about": "x", "claims": []}\n'
+                    "def run():\n    return helper()\n"
+                    "def helper():\n    return 1\n"
+                    "print(run())\n")
+    py = tmp_path / "venv-main" / "bin" / "python"
+    py.parent.mkdir(parents=True)
+    plan = [{"path": path, "source": "model", "freeze": {"generator": {"kind": "model"}, "sha256": "x",
+                                                         "frozen_at": "t"}}]
+    a = type("A", (), {"runs": 1, "product_check": False, "provider": None})()
+    out = daily_run.run_probes("o/r", 1, {"main": py, "pr": py}, tmp_path, tmp_path, a, plan, "t")
+    assert called == [True]
+    assert out["items"][0].get("status") != "not_run"
+
+
+def test_a_class_body_name_is_not_visible_inside_a_method(tmp_path):
+    code = "class T:\n    x = 1\n    def m(self):\n        return x\nprint(T)\n"
+    assert any(m.startswith("undefined name: x") for m in probe_names.problems(code, tmp_path))
+    text = 'PROBE = {"id": "model-p1", "target": "o/r#1", "about": "x", "claims": []}\n' + code
+    assert probe_names.local_failure(text) and "undefined name: x" in probe_names.local_failure(text)
+    # The class body itself still sees x, and a method still sees a real global.
+    assert probe_names.problems("class T:\n    x = 1\n    y = x\nprint(T)\n", tmp_path) == []
+    assert probe_names.problems("x = 1\nclass T:\n    def m(self):\n        return x\nprint(T)\n", tmp_path) == []
+    # A comprehension in the class is its own function and does not see the class body either.
+    comp = "class T:\n    x = 1\n    ys = [x for _ in range(1)]\nprint(T)\n"
+    assert any("undefined name: x" in m for m in probe_names.problems(comp, tmp_path))
+    assert probe_names.problems("x = 1\nclass T:\n    ys = [x for _ in range(1)]\nprint(T)\n", tmp_path) == []
+
+
+def _argument_tree(root: Path) -> None:
+    parser = root / "widget" / "parser"
+    parser.mkdir(parents=True)
+    (root / "widget" / "__init__.py").write_text("")
+    (parser / "__init__.py").write_text("")
+    (parser / "argument.py").write_text(
+        "class Argument:\n"
+        "    def __init__(self, name, kind=str):\n"
+        "        self.name = name\n"
+        "        self.kind = kind\n"
+        "    def set_name(self, name):\n"
+        "        self.name = name\n"
+        "class Bag:\n"
+        "    def __init__(self, **kwargs):\n"
+        "        self.kwargs = kwargs\n"
+        "def parse(argv, allow_extra=False):\n"
+        "    return argv\n")
+
+
+def test_unexpected_constructor_keyword_is_reported_from_the_base_signature(tmp_path):
+    _argument_tree(tmp_path)
+    bad = ("import widget.parser.argument as argument\n"
+           "print(argument.Argument('p', takes_value=True).name)\n")
+    good = ("import widget.parser.argument as argument\n"
+            "print(argument.Argument('p', kind=str).name)\n")
+    text = " ".join(probe_names.problems(bad, tmp_path))
+    assert "takes_value" in text and "Argument()" in text and "name" in text and "kind" in text
+    assert probe_names.problems(good, tmp_path) == []
+    # A definition that accepts **kwargs, and a call that is not a base-tree symbol, are left alone.
+    flex = "import widget.parser.argument as argument\nprint(argument.Bag(takes_value=True))\n"
+    other = "import json\nprint(json.dumps({'a': 1}, indent=2))\n"
+    assert probe_names.problems(flex, tmp_path) == []
+    assert probe_names.problems(other, tmp_path) == []
+    method = ("import widget.parser.argument as argument\n"
+              "print(argument.Argument.set_name(None, takes_value=True))\n")
+    assert "takes_value" in " ".join(probe_names.problems(method, tmp_path))
+    fn = ("import widget.parser.argument as argument\n"
+          "print(argument.parse(['p'], takes_value=True))\n")
+    assert "takes_value" in " ".join(probe_names.problems(fn, tmp_path))
+    assert probe_names.problems(
+        "import widget.parser.argument as argument\nprint(argument.parse(['p'], allow_extra=True))\n",
+        tmp_path) == []
+
+
+def test_bad_constructor_keyword_is_repaired_once_or_dropped(tmp_path):
+    base = tmp_path / "base"
+    _argument_tree(base)
+    (tmp_path / "pr").mkdir()
+    bad = ("import widget.parser.argument as argument\n"
+           "print(argument.Argument('p', takes_value=True).name)\n")
+    good = ("import widget.parser.argument as argument\n"
+            "print(argument.Argument(name='p').name)\n")
+    prov = Sequence([[_probe(bad)], [_probe(good)]])
+    out = model_probes.generate(prov, "o/r", 1, "Keep answer", BODY,
+                                {"widget/parser/argument.py": base / "widget" / "parser" / "argument.py"},
+                                base, [tmp_path / "pr"], tmp_path / "out")
+    assert prov.probe_calls == 2
+    assert "takes_value" in prov.users[1] and "parameters:" in prov.users[1]
+    assert out["name_checks"][0]["outcome"] == "fixed"
+    text = out["probes"][0]["path"].read_text()
+    assert "takes_value" not in text and "name=" in text
+    # A second answer that still passes the keyword is not written and is not coverage.
+    again = Sequence([[_probe(bad)], [_probe(bad)]])
+    out2 = model_probes.generate(again, "o/r", 1, "Keep answer", BODY,
+                                 {"widget/parser/argument.py": base / "widget" / "parser" / "argument.py"},
+                                 base, [tmp_path / "pr"], tmp_path / "out2")
+    assert again.probe_calls == 2
+    assert out2["probes"] == []
+    assert "unexpected keyword" in out2["name_checks"][0]["outcome"]
+    assert not list((tmp_path / "out2").glob("*.py"))
+
+
+def test_unrelated_observations_are_not_claim_proof():
+    """Names like import_success do not prove a claim whose cover is scenario1."""
+    spec = {"id": "p", "target": "o/r#1", "about": "missing argument", "claims": [
+        {"id": "C1", "text": "the name stays", "covers": ["c1.scenario1"], "expect": "same"},
+        {"id": "C2", "text": "the error names the flag", "covers": ["c2.scenario1"], "expect": "differs"}],
+            "source": "model"}
+    obs = {"c1.import_success": True, "c2.parser_creation": True, "c3.parse_result": "ok"}
+    item = probes.entry(spec, {"main": [obs] * 3, "pr": [obs] * 3}, {"main": ["m"], "pr": ["p"]}, [], "model", None)
+    item["probe_changed_line_coverage"] = {
+        "status": "measured", "changed_lines_total": 1, "changed_lines_covered": 1, "adequacy": "adequate"}
+    item = probes.classify_item(item)
+    assert item["status"] == "rejected"
+    assert probes.rejection_reason(item)
+    verdict, reason, _flags = verdict_for(_cmp_verified(), None, probe_results={"status": "ran", "items": [item]})
+    assert verdict != "verified"
+    assert "proven" not in reason
+    decided, _notes = probe_adequacy.deciding_items([item])
+    assert not any(o.get("label") == "proven" for o in decided[0]["observations"])
 
 
 def test_an_empty_probe_file_is_not_executed(tmp_path, monkeypatch):
