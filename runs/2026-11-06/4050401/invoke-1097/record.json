@@ -1,0 +1,1180 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-pyinvoke-invoke-1097-f887e02c1959-2026-11-06-check-1118",
+ "date_ist": "2026-11-06 11:19 IST",
+ "run_date": "2026-11-06",
+ "who": "ops/daily_run.py",
+ "repo": "pyinvoke/invoke",
+ "library": "invoke",
+ "pr": {
+  "repo": "pyinvoke/invoke",
+  "number": 1097,
+  "url": "https://github.com/pyinvoke/invoke/pull/1097",
+  "title": "Use command-line names in missing-argument errors",
+  "base_sha": "0da941e176f4e0b28d8a69b8ac089cdbac2874e4",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "f887e02c1959ab9add3428ae3ab740c71cd41938",
+  "merge_commit": null,
+  "tested_main_sha": "0da941e176f4e0b28d8a69b8ac089cdbac2874e4",
+  "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+ },
+ "author": "Hugohong258",
+ "base_ref": "2.2",
+ "updated_at_utc": "2026-10-26T01:29:24Z",
+ "updated_at_ist": "2026-10-26 06:59 IST",
+ "ci_state": "not checked (single-PR check)",
+ "ci_detail": "checked on request with --pr",
+ "tested_at_ist": "2026-11-06 11:19 IST",
+ "files": {
+  "all": [
+   "invoke/parser/parser.py",
+   "sites/www/changelog.rst",
+   "tests/parser_parser.py"
+  ],
+  "package_py": [
+   "invoke/parser/parser.py"
+  ],
+  "compiled": [],
+  "other": [
+   "sites/www/changelog.rst",
+   "tests/parser_parser.py"
+  ]
+ },
+ "machine_type": {
+  "arch": "x86_64",
+  "os": "Linux",
+  "platform": "Linux-6.12.94+-x86_64-with-glibc2.41",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": null,
+  "cpu_model": "Intel(R) Xeon(R) Processor",
+  "ram_gb": 15.6
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 3,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.15",
+ "test_selection": "mapped from touched files: tests/parser_parser.py, tests/executor.py, tests/parser_argument.py",
+ "per_run": [
+  {
+   "side": "old",
+   "run": 1,
+   "passed": 134,
+   "failed": 0,
+   "error": 0,
+   "skipped": 1,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 2.5,
+   "pytest_summary": "134 passed, 1 skipped, 5 warnings in 1.36s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 1,
+   "passed": 137,
+   "failed": 0,
+   "error": 0,
+   "skipped": 1,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 2.3,
+   "pytest_summary": "137 passed, 1 skipped, 5 warnings in 1.29s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 2,
+   "passed": 134,
+   "failed": 0,
+   "error": 0,
+   "skipped": 1,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 2.3,
+   "pytest_summary": "134 passed, 1 skipped, 5 warnings in 1.29s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 2,
+   "passed": 137,
+   "failed": 0,
+   "error": 0,
+   "skipped": 1,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 2.5,
+   "pytest_summary": "137 passed, 1 skipped, 5 warnings in 1.36s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 3,
+   "passed": 134,
+   "failed": 0,
+   "error": 0,
+   "skipped": 1,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 2.3,
+   "pytest_summary": "134 passed, 1 skipped, 5 warnings in 1.29s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 3,
+   "passed": 137,
+   "failed": 0,
+   "error": 0,
+   "skipped": 1,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 2.3,
+   "pytest_summary": "137 passed, 1 skipped, 5 warnings in 1.30s",
+   "junit": true
+  }
+ ],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "local",
+ "sandbox_backend_note": "local bubblewrap",
+ "machine": "local",
+ "tool_setup": {
+  "installed": [],
+  "tries": 0,
+  "note": "All required tools were already installed.",
+  "refused": []
+ },
+ "posted_upstream": false,
+ "logs": "invoke-1097/",
+ "freeze": {
+  "main": "freeze-main.txt",
+  "pr": "freeze-pr.txt"
+ },
+ "coverage": {
+  "status": "measured",
+  "changed_lines_total": 1,
+  "changed_lines_covered": 1,
+  "files": [
+   {
+    "file": "invoke/parser/parser.py",
+    "changed_lines_total": 1,
+    "changed_lines_covered": 1
+   }
+  ],
+  "seconds": 3.1,
+  "exit": 0,
+  "log": "coverage-pytest.log"
+ },
+ "poc_commit": "4050401d30fe09fa6a04495c8f41d7203ddf9de8",
+ "route": "source-pair",
+ "current_head_sha": "f887e02c1959ab9add3428ae3ab740c71cd41938",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "head_moved": false,
+ "diff_source": "git diff base_sha head_sha (pinned commits)",
+ "state": "open",
+ "mergeable": true,
+ "mergeable_state": "clean",
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": "[redacted]",
+  "notes": [
+   "Setup check: GitHub token: present.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory 7.5 GB (of 15.6 GB).",
+   "Setup check: free disk 94.7 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: [redacted] results",
+   "Query: invoke python setup install instructions https://github.com/pyinvoke/invoke site:github.com/pyinvoke/invoke",
+   "Query: invoke python documentation install https://github.com/pyinvoke/invoke site:github.com/pyinvoke/invoke",
+   "Query: invoke python install requirements https://pypi.org/project/invoke/ https://github.com/pyinvoke/invoke site:pypi.org",
+   "Source: invoke-common-tasks \u00b7 PyPI \u2014 https://pypi.org/project/invoke-common-tasks/",
+   "Source: invoke \u00b7 PyPI \u2014 https://pypi.org/project/invoke/",
+   "Source: invoke/invoke/runners.py at main \u00b7 pyinvoke/invoke \u00b7 GitHub \u2014 https://github.com/pyinvoke/invoke/blob/master/invoke/runners.py",
+   "Source: ImportError: cannot import name yaml2 \u00b7 Issue #319 \u00b7 pyinvoke/invoke \u00b7 GitHub \u2014 https://github.com/pyinvoke/invoke/issues/319",
+   "Source: Dealing with virtual environments \u00b7 Issue #838 \u00b7 pyinvoke/invoke \u00b7 GitHub \u2014 https://github.com/pyinvoke/invoke/issues/838",
+   "Source: Invoke 0.13 breaks on Windows (unavailable default shell) \u00b7 Issue #371 \u00b7 pyinvoke/invoke \u00b7 GitHub \u2014 https://github.com/pyinvoke/invoke/issues/371",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: install invocations>=3.3 (listed in dev-requirements.txt) on main and pr.",
+   "Setup plan: install coverage>=6.2,<7 (listed in dev-requirements.txt) on main and pr.",
+   "Setup plan: install releases>=2 (listed in dev-requirements.txt) on main and pr.",
+   "Setup plan: install alabaster==0.7.12 (listed in dev-requirements.txt) on main and pr.",
+   "Setup plan: install pytest-relaxed>=2 (listed in dev-requirements.txt) on main and pr.",
+   "Setup plan: install pytest-cov>=4 (listed in dev-requirements.txt) on main and pr.",
+   "Setup plan: install flake8>=4,<5 (listed in dev-requirements.txt) on main and pr.",
+   "Setup plan: install black>=22.8,<22.9 (listed in dev-requirements.txt) on main and pr.",
+   "Setup plan: install setuptools>56 (listed in dev-requirements.txt) on main and pr.",
+   "Setup plan: install icecream>=2.1 (listed in dev-requirements.txt) on main and pr.",
+   "Setup plan: install mypy==0.971 (listed in dev-requirements.txt) on main and pr.",
+   "Setup plan: install types-PyYAML==6.0.12.4 (listed in dev-requirements.txt) on main and pr.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >=3.6, >=3.9",
+   "Installed invocations 4.0.2 from dev-requirements.txt (listed in dev-requirements.txt) on main and pr.",
+   "Installed coverage 6.5.0 from dev-requirements.txt (listed in dev-requirements.txt) on main and pr.",
+   "Installed releases 2.1.1 from dev-requirements.txt (listed in dev-requirements.txt) on main and pr.",
+   "Installed alabaster 0.7.12 from dev-requirements.txt (listed in dev-requirements.txt) on main and pr.",
+   "Installed pytest-relaxed 2.0.2 from dev-requirements.txt (listed in dev-requirements.txt) on main and pr.",
+   "Installed pytest-cov 5.0.0 from dev-requirements.txt (listed in dev-requirements.txt) on main and pr.",
+   "Installed flake8 4.0.1 from dev-requirements.txt (listed in dev-requirements.txt) on main and pr.",
+   "Installed black 22.8.0 from dev-requirements.txt (listed in dev-requirements.txt) on main and pr.",
+   "Installed setuptools 84.2.1 from dev-requirements.txt (listed in dev-requirements.txt) on main and pr.",
+   "Installed icecream 2.2.0 from dev-requirements.txt (listed in dev-requirements.txt) on main and pr.",
+   "Installed mypy 0.971 from dev-requirements.txt (listed in dev-requirements.txt) on main and pr.",
+   "Installed types-PyYAML 6.0.12.4 from dev-requirements.txt (listed in dev-requirements.txt) on main and pr."
+  ],
+  "install_docs": [
+   "setup.py",
+   "README.rst",
+   "pyproject.toml",
+   "tox.ini"
+  ],
+  "install_docs_from": "main",
+  "setup_plan": {
+   "packages": [
+    {
+     "requirement": "invocations>=3.3",
+     "name": "invocations",
+     "kind": "requirements",
+     "action": "install",
+     "source": "dev-requirements.txt",
+     "reason": "listed in dev-requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "coverage>=6.2,<7",
+     "name": "coverage",
+     "kind": "requirements",
+     "action": "install",
+     "source": "dev-requirements.txt",
+     "reason": "listed in dev-requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "releases>=2",
+     "name": "releases",
+     "kind": "requirements",
+     "action": "install",
+     "source": "dev-requirements.txt",
+     "reason": "listed in dev-requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "alabaster==0.7.12",
+     "name": "alabaster",
+     "kind": "requirements",
+     "action": "install",
+     "source": "dev-requirements.txt",
+     "reason": "listed in dev-requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest-relaxed>=2",
+     "name": "pytest-relaxed",
+     "kind": "requirements",
+     "action": "install",
+     "source": "dev-requirements.txt",
+     "reason": "listed in dev-requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest-cov>=4",
+     "name": "pytest-cov",
+     "kind": "requirements",
+     "action": "install",
+     "source": "dev-requirements.txt",
+     "reason": "listed in dev-requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "flake8>=4,<5",
+     "name": "flake8",
+     "kind": "requirements",
+     "action": "install",
+     "source": "dev-requirements.txt",
+     "reason": "listed in dev-requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "black>=22.8,<22.9",
+     "name": "black",
+     "kind": "requirements",
+     "action": "install",
+     "source": "dev-requirements.txt",
+     "reason": "listed in dev-requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "setuptools>56",
+     "name": "setuptools",
+     "kind": "requirements",
+     "action": "install",
+     "source": "dev-requirements.txt",
+     "reason": "listed in dev-requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "icecream>=2.1",
+     "name": "icecream",
+     "kind": "requirements",
+     "action": "install",
+     "source": "dev-requirements.txt",
+     "reason": "listed in dev-requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "mypy==0.971",
+     "name": "mypy",
+     "kind": "requirements",
+     "action": "install",
+     "source": "dev-requirements.txt",
+     "reason": "listed in dev-requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "types-PyYAML==6.0.12.4",
+     "name": "types-PyYAML",
+     "kind": "requirements",
+     "action": "install",
+     "source": "dev-requirements.txt",
+     "reason": "listed in dev-requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    }
+   ],
+   "scope_blocked": "",
+   "component": null,
+   "aggregate_names": [],
+   "extra_reqs": [
+    "invocations>=3.3",
+    "coverage>=6.2,<7",
+    "releases>=2",
+    "alabaster==0.7.12",
+    "pytest-relaxed>=2",
+    "pytest-cov>=4",
+    "flake8>=4,<5",
+    "black>=22.8,<22.9",
+    "setuptools>56",
+    "icecream>=2.1",
+    "mypy==0.971",
+    "types-PyYAML==6.0.12.4"
+   ],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >=3.6, >=3.9"
+   },
+   "system": [],
+   "refused": [],
+   "groups_blocked": ""
+  },
+  "steps": {
+   "setup_lookup": "Found 12 setup item(s) in the project's files and the web lookup.",
+   "setup_python": "Python 3.12: Python 3.12 already meets >=3.6, >=3.9",
+   "install_deps": "Wrote requirements.txt and installed it on main and pr: invocations>=3.3, coverage>=6.2,<7, releases>=2, alabaster==0.7.12, pytest-relaxed>=2, pytest-cov>=4, flake8>=4,<5, black>=22.8,<22.9, setuptools>56, icecream>=2.1, mypy==0.971, types-PyYAML==6.0.12.4."
+  },
+  "run_files": {
+   "requirements": "requirements.txt",
+   "plan": "setup-plan.json",
+   "count": 12
+  },
+  "installs": [
+   {
+    "package": "invocations",
+    "requirement": "invocations>=3.3",
+    "version": "4.0.2",
+    "versions": {
+     "main": "4.0.2",
+     "pr": "4.0.2"
+    },
+    "source": "dev-requirements.txt",
+    "reason": "listed in dev-requirements.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "coverage",
+    "requirement": "coverage>=6.2,<7",
+    "version": "6.5.0",
+    "versions": {
+     "main": "6.5.0",
+     "pr": "6.5.0"
+    },
+    "source": "dev-requirements.txt",
+    "reason": "listed in dev-requirements.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "releases",
+    "requirement": "releases>=2",
+    "version": "2.1.1",
+    "versions": {
+     "main": "2.1.1",
+     "pr": "2.1.1"
+    },
+    "source": "dev-requirements.txt",
+    "reason": "listed in dev-requirements.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "alabaster",
+    "requirement": "alabaster==0.7.12",
+    "version": "0.7.12",
+    "versions": {
+     "main": "0.7.12",
+     "pr": "0.7.12"
+    },
+    "source": "dev-requirements.txt",
+    "reason": "listed in dev-requirements.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "pytest-relaxed",
+    "requirement": "pytest-relaxed>=2",
+    "version": "2.0.2",
+    "versions": {
+     "main": "2.0.2",
+     "pr": "2.0.2"
+    },
+    "source": "dev-requirements.txt",
+    "reason": "listed in dev-requirements.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "pytest-cov",
+    "requirement": "pytest-cov>=4",
+    "version": "5.0.0",
+    "versions": {
+     "main": "5.0.0",
+     "pr": "5.0.0"
+    },
+    "source": "dev-requirements.txt",
+    "reason": "listed in dev-requirements.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "flake8",
+    "requirement": "flake8>=4,<5",
+    "version": "4.0.1",
+    "versions": {
+     "main": "4.0.1",
+     "pr": "4.0.1"
+    },
+    "source": "dev-requirements.txt",
+    "reason": "listed in dev-requirements.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "black",
+    "requirement": "black>=22.8,<22.9",
+    "version": "22.8.0",
+    "versions": {
+     "main": "22.8.0",
+     "pr": "22.8.0"
+    },
+    "source": "dev-requirements.txt",
+    "reason": "listed in dev-requirements.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "setuptools",
+    "requirement": "setuptools>56",
+    "version": "84.2.1",
+    "versions": {
+     "main": "84.2.1",
+     "pr": "84.2.1"
+    },
+    "source": "dev-requirements.txt",
+    "reason": "listed in dev-requirements.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "icecream",
+    "requirement": "icecream>=2.1",
+    "version": "2.2.0",
+    "versions": {
+     "main": "2.2.0",
+     "pr": "2.2.0"
+    },
+    "source": "dev-requirements.txt",
+    "reason": "listed in dev-requirements.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "mypy",
+    "requirement": "mypy==0.971",
+    "version": "0.971",
+    "versions": {
+     "main": "0.971",
+     "pr": "0.971"
+    },
+    "source": "dev-requirements.txt",
+    "reason": "listed in dev-requirements.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "types-PyYAML",
+    "requirement": "types-PyYAML==6.0.12.4",
+    "version": "6.0.12.4",
+    "versions": {
+     "main": "6.0.12.4",
+     "pr": "6.0.12.4"
+    },
+    "source": "dev-requirements.txt",
+    "reason": "listed in dev-requirements.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   }
+  ]
+ },
+ "chosen": {
+  "pr": 1097,
+  "head_sha": "f887e02c1959ab9add3428ae3ab740c71cd41938",
+  "install": null,
+  "test_cmd": null
+ },
+ "sides": {
+  "comparison_basis": "pinned base vs pinned PR head (benchmark case file)",
+  "main_sha": "0da941e176f4e0b28d8a69b8ac089cdbac2874e4",
+  "pr_sha": "f887e02c1959ab9add3428ae3ab740c71cd41938",
+  "pinned": true
+ },
+ "tested": {
+  "main": "2.2 @ 0da941e176f4 (base tip = first parent of the merge commit)",
+  "pr": "PR head f887e02c1959"
+ },
+ "probe_plan": {
+  "baseline": "full",
+  "model": "model provider: nebius (Token Factory, live)",
+  "errors": [],
+  "model_claims": [
+   {
+    "id": "C1",
+    "text": "When a required argument is omitted, the error message shows the Python attribute name instead of the CLI name.",
+    "source_quote": "When a required `param_1` argument is exposed as `param-1` on the command line, omitting it reports the Python attribute name instead of the CLI name.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C2",
+    "text": "Two new test cases added for regression coverage fail before the fix.",
+    "source_quote": "Validation: two new cases fail before the fix, with the control passing.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C3",
+    "text": "The control test case passes both before and after the fix.",
+    "source_quote": "Validation: two new cases fail before the fix, with the control passing.",
+    "testable": true,
+    "expect": "same"
+   },
+   {
+    "id": "C4",
+    "text": "Real CLI checks confirm that after the fix the missing-argument error uses the CLI name and successful `--param-1`/`--param-2` calls work.",
+    "source_quote": "Real CLI checks on Windows/Python 3.12.3 and Linux/Python 3.14.4 confirm both the missing-argument error and successful `--param-1`/`--param-2` calls.",
+    "testable": true,
+    "expect": "differs"
+   }
+  ],
+  "model_rejected_claims": [],
+  "model_parse_repairs": [
+   {
+    "attempt": 1,
+    "probe": "P1",
+    "error": {
+     "message": "unexpected character after line continuation character",
+     "line": 1,
+     "offset": 12,
+     "code_line": "import sys\\nimport json\\ntry:\\n    from invoke.parser.parser import Parser, ParseError\\n    from invoke.parser.context import ParserContext\\n    try:\\n        from invoke.parser.context import Argument\\n    except ImportError:\\n        try:\\n            from invoke.parser.arg import Argument\\n      "
+    },
+    "outcome": "rejected: the repair stores under a key that cannot be read",
+    "counts": {
+     "before": {
+      "keys": 0,
+      "inputs": 0,
+      "read": "tokens"
+     },
+     "after": null
+    }
+   },
+   {
+    "attempt": 2,
+    "probe": "P1",
+    "error": {
+     "message": "unexpected character after line continuation character",
+     "line": 1,
+     "offset": 12,
+     "code_line": "import sys\\nimport json\\ntry:\\n    from invoke.parser.parser import Parser, ParseError\\n    from invoke.parser.context import ParserContext\\n    try:\\n        from invoke.parser.context import Argument\\n    except ImportError:\\n        try:\\n            from invoke.parser.arg import Argument\\n      "
+    },
+    "outcome": "fixed",
+    "counts": {
+     "before": {
+      "keys": 0,
+      "inputs": 0,
+      "read": "tokens"
+     },
+     "after": {
+      "keys": 6,
+      "inputs": 0,
+      "read": "ast"
+     }
+    }
+   }
+  ],
+  "model_retried": {
+   "why": [
+    "some \"covers\" name no observation the probe code records (C2:c2.constant, C3:c3.constant, C4:c1.success); each cover must be an observation name the code prints, or an fnmatch pattern that matches some of them"
+   ]
+  },
+  "diff_targets": [],
+  "frozen": [
+   {
+    "path": "model-probes/model-p1.py",
+    "source": "model",
+    "sha256": "cc77e0ce80cde0cb3e99c550c3be9f6d3978b20b0cc55e7328686042d92867ea",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-06T05:53:26.327669+00:00",
+    "inputs_sha256": "fb7205cca79d89ac5b67d06c823ddfec523d852d64fe54acd2c88b9b682a4f50",
+    "inputs": {
+     "title_chars": 49,
+     "body_chars": 979,
+     "base_files": {
+      "invoke/parser/parser.py": "83df4d720cc719f123b0dcf0c85980a3f31186a9467fcd925d70733995ebe91c"
+     }
+    }
+   }
+  ]
+ },
+ "test_extras": [],
+ "pr_side_started_at": "2026-11-06T05:53:26.498296+00:00",
+ "test_targets": {
+  "main": [
+   "tests/parser_parser.py",
+   "tests/executor.py",
+   "tests/parser_argument.py"
+  ],
+  "pr": [
+   "tests/parser_parser.py",
+   "tests/executor.py",
+   "tests/parser_argument.py"
+  ]
+ },
+ "installed_commit": {
+  "main": {
+   "dist": "invoke",
+   "expected": "0da941e176f4e0b28d8a69b8ac089cdbac2874e4",
+   "installed": "0da941e176f4e0b28d8a69b8ac089cdbac2874e4",
+   "ok": true
+  },
+  "pr": {
+   "dist": "invoke",
+   "expected": "f887e02c1959ab9add3428ae3ab740c71cd41938",
+   "installed": "f887e02c1959ab9add3428ae3ab740c71cd41938",
+   "ok": true
+  }
+ },
+ "comparison": {
+  "same": 135,
+  "same_skipped_both": 1,
+  "regressions": [],
+  "fixed": [],
+  "new_tests_passing": 3,
+  "new_tests_passing_ids": [
+   "tests.parser_parser.Parser_.parse_argv.positional_arguments::omitted_positionals_report_cli_names[param-1-param_1]",
+   "tests.parser_parser.Parser_.parse_argv.positional_arguments::omitted_positionals_report_cli_names[param_1-None]",
+   "tests.parser_parser.Parser_.parse_argv.positional_arguments::omitted_positionals_report_cli_names[public-name-internal_name]"
+  ],
+  "new_tests_failing": [],
+  "new_tests_skipped": [],
+  "removed_tests": [],
+  "reparametrized": [],
+  "skipped_missing_dependency": [],
+  "flaky": [],
+  "pr_unstable": [],
+  "pr_unstable_noisy": [],
+  "environment": [],
+  "other_changes": [],
+  "preexisting_failures": [],
+  "load_failed_both": [],
+  "load_failed_pr": [],
+  "load_failed_main": [],
+  "executed": {
+   "main": 134,
+   "pr": 137
+  },
+  "messages": {}
+ },
+ "exit_check": {
+  "explained": true,
+  "problems": [],
+  "detail": "all runs exited 0"
+ },
+ "probes": {
+  "status": "error",
+  "items": [
+   {
+    "id": "model-p1",
+    "source": "model",
+    "path": "model-probes/model-p1.py",
+    "sha256": "cc77e0ce80cde0cb3e99c550c3be9f6d3978b20b0cc55e7328686042d92867ea",
+    "target": "pyinvoke/invoke#1097",
+    "about": "Test missing-argument error and success for dashed name, unrelated internal attribute name, and control scenarios.",
+    "claims": [
+     {
+      "id": "C1",
+      "source": "PR description",
+      "text": "When a required argument is omitted, the error message shows the Python attribute name instead of the CLI name.",
+      "covers": [
+       "c1.a_err"
+      ],
+      "expect": "differs"
+     },
+     {
+      "id": "C2",
+      "source": "PR description",
+      "text": "Two new test cases added for regression coverage fail before the fix.",
+      "covers": [
+       "c2.a_err",
+       "c2.b_err"
+      ],
+      "expect": "differs"
+     },
+     {
+      "id": "C3",
+      "source": "PR description",
+      "text": "The control test case passes both before and after the fix.",
+      "covers": [
+       "c3.ctrl_succ"
+      ],
+      "expect": "same"
+     },
+     {
+      "id": "C4",
+      "source": "PR description",
+      "text": "Real CLI checks confirm that after the fix the missing-argument error uses the CLI name and successful `--param-1`/`--param-2` calls work.",
+      "covers": [
+       "c4.a_err",
+       "c4.a_succ"
+      ],
+      "expect": "differs"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.3,
+      "ok": false
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.3,
+      "ok": false
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.3,
+      "ok": false
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.3,
+      "ok": false
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.3,
+      "ok": false
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.3,
+      "ok": false
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-p1-main-1.jsonl",
+      "probe-model-p1-main-2.jsonl",
+      "probe-model-p1-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-p1-pr-1.jsonl",
+      "probe-model-p1-pr-2.jsonl",
+      "probe-model-p1-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "probe.error": {
+        "c1.a_err": "ModuleNotFoundError",
+        "c2.a_err": "ModuleNotFoundError",
+        "c2.b_err": "ModuleNotFoundError",
+        "c3.ctrl_succ": "ModuleNotFoundError",
+        "c4.a_err": "ModuleNotFoundError",
+        "c4.a_succ": "ModuleNotFoundError"
+       }
+      },
+      {
+       "probe.error": {
+        "c1.a_err": "ModuleNotFoundError",
+        "c2.a_err": "ModuleNotFoundError",
+        "c2.b_err": "ModuleNotFoundError",
+        "c3.ctrl_succ": "ModuleNotFoundError",
+        "c4.a_err": "ModuleNotFoundError",
+        "c4.a_succ": "ModuleNotFoundError"
+       }
+      },
+      {
+       "probe.error": {
+        "c1.a_err": "ModuleNotFoundError",
+        "c2.a_err": "ModuleNotFoundError",
+        "c2.b_err": "ModuleNotFoundError",
+        "c3.ctrl_succ": "ModuleNotFoundError",
+        "c4.a_err": "ModuleNotFoundError",
+        "c4.a_succ": "ModuleNotFoundError"
+       }
+      }
+     ],
+     "pr": [
+      {
+       "probe.error": {
+        "c1.a_err": "ModuleNotFoundError",
+        "c2.a_err": "ModuleNotFoundError",
+        "c2.b_err": "ModuleNotFoundError",
+        "c3.ctrl_succ": "ModuleNotFoundError",
+        "c4.a_err": "ModuleNotFoundError",
+        "c4.a_succ": "ModuleNotFoundError"
+       }
+      },
+      {
+       "probe.error": {
+        "c1.a_err": "ModuleNotFoundError",
+        "c2.a_err": "ModuleNotFoundError",
+        "c2.b_err": "ModuleNotFoundError",
+        "c3.ctrl_succ": "ModuleNotFoundError",
+        "c4.a_err": "ModuleNotFoundError",
+        "c4.a_succ": "ModuleNotFoundError"
+       }
+      },
+      {
+       "probe.error": {
+        "c1.a_err": "ModuleNotFoundError",
+        "c2.a_err": "ModuleNotFoundError",
+        "c2.b_err": "ModuleNotFoundError",
+        "c3.ctrl_succ": "ModuleNotFoundError",
+        "c4.a_err": "ModuleNotFoundError",
+        "c4.a_succ": "ModuleNotFoundError"
+       }
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "probe.error",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "c1.a_err": "ModuleNotFoundError",
+       "c2.a_err": "ModuleNotFoundError",
+       "c2.b_err": "ModuleNotFoundError",
+       "c3.ctrl_succ": "ModuleNotFoundError",
+       "c4.a_err": "ModuleNotFoundError",
+       "c4.a_succ": "ModuleNotFoundError"
+      },
+      "pr": {
+       "c1.a_err": "ModuleNotFoundError",
+       "c2.a_err": "ModuleNotFoundError",
+       "c2.b_err": "ModuleNotFoundError",
+       "c3.ctrl_succ": "ModuleNotFoundError",
+       "c4.a_err": "ModuleNotFoundError",
+       "c4.a_succ": "ModuleNotFoundError"
+      },
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"probe.error\""
+       },
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"probe.error\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "cc77e0ce80cde0cb3e99c550c3be9f6d3978b20b0cc55e7328686042d92867ea",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-06T05:53:26.327669+00:00",
+     "inputs_sha256": "fb7205cca79d89ac5b67d06c823ddfec523d852d64fe54acd2c88b9b682a4f50",
+     "inputs": {
+      "title_chars": 49,
+      "body_chars": 979,
+      "base_files": {
+       "invoke/parser/parser.py": "83df4d720cc719f123b0dcf0c85980a3f31186a9467fcd925d70733995ebe91c"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-06T05:53:26.498296+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 1,
+     "changed_lines_covered": 0,
+     "files": [
+      {
+       "file": "invoke/parser/parser.py",
+       "changed_lines_total": 1,
+       "changed_lines_covered": 0
+      }
+     ],
+     "adequacy": "not_adequate",
+     "note": "the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate",
+     "exit": 0,
+     "data": "probe-cov-model-p1.json"
+    },
+    "status": "crashed",
+    "uninformative_reason": "the probe crashed or printed no parsed output on every main-side run"
+   }
+  ],
+  "summary": {
+   "labels": [],
+   "flagged": [],
+   "proven_claims": [],
+   "reason": "the probe crashed or printed no parsed output on every main-side run",
+   "ignored_noise": [],
+   "ignored_warning_only": [],
+   "pr_only_noisy": [],
+   "advisory_unchanged_subchecks": [],
+   "advisory_agreeing_differs": []
+  }
+ },
+ "probe_changed_line_coverage": {
+  "status": "measured",
+  "side": "main",
+  "probes": {
+   "model-p1": {
+    "status": "measured",
+    "changed_lines_covered": 0,
+    "changed_lines_total": 1,
+    "adequacy": "not_adequate"
+   }
+  },
+  "not_adequate": [
+   "model-p1"
+  ]
+ },
+ "verdict": "could_not_verify",
+ "reason": "could not verify: claim(s) C1, C2, C4 expect a difference but no observation matches (134 test(s) ran on main, 137 on the PR; 3 new test(s) pass, 135 unchanged (1 of them skipped on both sides); probe model-p1 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count)",
+ "verdict_before_coverage_gate": "could_not_verify",
+ "reason_before_coverage_gate": "could not verify: claim(s) C1, C2, C4 expect a difference but no observation matches (134 test(s) ran on main, 137 on the PR; 3 new test(s) pass, 135 unchanged (1 of them skipped on both sides); probe model-p1 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count)",
+ "changed_lines_total": 1,
+ "changed_lines_covered": 1,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "normal",
+  "note": "1 of 1 changed executable line(s) ran (100%)",
+  "measurement": "measured"
+ },
+ "agents": {
+  "status": "skipped",
+  "note": "advisory swarm is off",
+  "roles": []
+ },
+ "explanation": {
+  "status": "not yet wired",
+  "why": "advisory swarm is off"
+ },
+ "swarm_requested": false,
+ "operator_approval_requested": false,
+ "swarm": "off",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [
+   "invoke/parser/parser.py"
+  ],
+  "compiled_files": [],
+  "other_files": [
+   "sites/www/changelog.rst",
+   "tests/parser_parser.py"
+  ]
+ },
+ "duration_s": {
+  "total_wall": 289.7,
+  "tests": 14.2
+ },
+ "cost": {
+  "ai_calls": 5,
+  "failed_ai_calls": 0,
+  "input_tokens": 23566,
+  "output_tokens": 45400,
+  "thinking_tokens": 41097,
+  "cost_usd": 0.04793,
+  "calls_without_usage": 0,
+  "ai_cost_usd": 0.04793,
+  "cost_complete": true,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 289.7,
+   "tests": 14.2
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.019313,
+  "total_cost_usd": 0.067243,
+  "swarm": {
+   "ai_calls": 0,
+   "failed_ai_calls": 0,
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "thinking_tokens": 0,
+   "cost_usd": 0.0,
+   "calls_without_usage": 0,
+   "ai_cost_usd": 0.0,
+   "cost_complete": true,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ },
+ "pdf_push": {
+  "ok": true,
+  "attempts": 1,
+  "error": null,
+  "url": "https://github.com/aritracodesbad123/Proof-of-change/tree/runs/runs/2026-11-06/4050401/invoke-1097"
+ }
+}
