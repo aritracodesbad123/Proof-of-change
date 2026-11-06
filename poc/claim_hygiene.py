@@ -45,7 +45,10 @@ _TEST_OUTCOME = re.compile(
     r"|\b(?:regression|unit|integration|new|existing|added)\s+tests?\b[^.;:]{0,40}?\b(?:pass|passes|passed)\b"
     r"|\b(?:all|the)\s+tests?\s+(?:now\s+)?(?:pass|passes|passed)\b"
     r"|\btest\s+suite\b[^.;:]{0,40}?\b(?:pass|passes|passed)\b"
-    r"|\bci\s+(?:is\s+green|passes|passed)\b")
+    r"|\bci\s+(?:is\s+green|passes|passed)\b"
+    # "Two new test cases added for regression coverage fail before the fix", "The control test case passes both
+    # before and after the fix": the outcome of the PR's own tests, not a product behaviour.
+    r"|\btest\s+cases?\b[^.;:]{0,60}?\b(?:pass|passes|passed|passing|fail|fails|failed|failing)\b")
 
 # Rule 2: the claim says the behaviour is kept. Narrow on purpose: "does not raise", "is not merged" or "still"
 # often describe the fix itself, so they are not on this list.
