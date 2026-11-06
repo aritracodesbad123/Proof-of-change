@@ -1,0 +1,98 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>
+endobj
+4 0 obj
+<< /Length 2830 >>
+stream
+BT
+/F1 11 Tf
+14 TL
+50 800 Td
+(SUMMARY) Tj T*
+() Tj T*
+(SUMMARY) Tj T*
+() Tj T*
+(Proof-of-Change daily summary: 2026-11-05) Tj T*
+(Generated 2026-11-05 11:58 IST. 3 report\(s\): 1 need attention, 1 could not be verified, 1 verif) Tj T*
+(ied.) Tj T*
+(Items that need) Tj T*
+(a decision are listed first.) Tj T*
+() Tj T*
+(Needs attention first) Tj T*
+(? NEEDS ATTENTION / Reject \(High confidence\): mahmoud/boltons#732: Parse adjacent) Tj T*
+(timedelta values) Tj T*
+(without losing units, tested against its own tests. Probe: 1 observation\(s\) need attention: c8.) Tj T*
+(error) Tj T*
+(differs although) Tj T*
+(the claim says it does not \(C8\); probe: claim\(s\) C1, C2, C3, C4, C6, C7 proven; probe: 1 probe\() Tj T*
+(s\)) Tj T*
+(could not run) Tj T*
+(on either side; tests: 1 test\(s\) fail on main and pass on the PR; 18 test\(s\) ran on main, 18 on) Tj T*
+( the) Tj T*
+(PR; 0 new) Tj T*
+(test\(s\) pass, 17 unchanged. Open report \(PDF\)) Tj T*
+(? COULD NOT VERIFY / Re-run \(Low confidence\): PyCQA/isort#2781: Keep the grouping of) Tj T*
+(commented from) Tj T*
+(imports stable across runs, tested against its own tests. Could not verify: setup gap setup. Op) Tj T*
+(en) Tj T*
+(report \(PDF\)) Tj T*
+() Tj T*
+(All reports) Tj T*
+(| Verdict | Action | Confidence | Subject | Tested against | Why | Evals | Report) Tj T*
+(| NEEDS ATTENTION | Reject | High | mahmoud/boltons#732: Parse adjacent timedelta values) Tj T*
+(without losing) Tj T*
+(units | its own tests | probe: 1 observation\(s\) need attention: c8.error differs although the c) Tj T*
+(laim says) Tj T*
+(it does not) Tj T*
+(\(C8\); probe: claim\(s\) C1, C2, C3, C4, C6, C7 proven; probe: 1 probe\(s\) could not run on either ) Tj T*
+(side;) Tj T*
+(tests: 1) Tj T*
+(test\(s\) fail on main and pass on the PR; 18 test\(s\) ran on main, 18 on the PR; 0 new test\(s\) pa) Tj T*
+(ss,) Tj T*
+(17 unchanged |) Tj T*
+(APPROVE | HTML · PDF · MD) Tj T*
+(| COULD NOT VERIFY | Re-run | Low | PyCQA/isort#2781: Keep the grouping of commented from) Tj T*
+(imports stable) Tj T*
+(across runs | its own tests | could not verify: setup gap setup | APPROVE | HTML · PDF · MD) Tj T*
+(| VERIFIED | Approve | High | encode/httpx#3741: Fix no_proxy to support IPV6 CIDR format | its) Tj T*
+(own tests | 75) Tj T*
+(test\(s\) ran on main, 84 on the PR; 9 new test\(s\) pass, 65 unchanged; 10 test failure\(s\) pre-exi) Tj T*
+(sting) Tj T*
+(and identical) Tj T*
+() Tj T*
+() Tj T*
+(on both sides; probe: claim\(s\) C1 proven | APPROVE | HTML · PDF · MD) Tj T*
+() Tj T*
+(Verdict meanings) Tj T*
+(| Verdict | Meaning) Tj T*
+(| NEEDS ATTENTION | The run is trustworthy and found a problem: breaks, import failures, or a) Tj T*
+(false claim.) Tj T*
+(| COULD NOT VERIFY | The run failed its own trust checks or the evals \(no conclusion; re-run af) Tj T*
+(ter) Tj T*
+(fixing\), or, for) Tj T*
+ET
+endstream
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000241 00000 n 
+0000003123 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+3193
+%%EOF
