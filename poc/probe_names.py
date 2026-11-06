@@ -959,8 +959,8 @@ def _call_problem(node: ast.Call, sig: _Sig | None) -> str | None:
         if kw.arg in sig.names and kw.arg not in sig.posonly:
             filled.add(kw.arg)
     missing = [name for name in sig.required if name not in filled]
-    if sig.vararg:
-        missing = [name for name in missing if name in sig.kwonly]
+    # A parameter before *args is still required. *rest does not waive it. Only a keyword-only
+    # parameter is unaffected by the positional count; those are already in sig.required.
     if missing:
         quoted = ", ".join(repr(name) for name in missing)
         return f"{sig.display}() missing required argument(s) {quoted}; parameters: {_param_list(sig)}"

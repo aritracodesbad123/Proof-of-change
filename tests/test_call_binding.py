@@ -340,6 +340,33 @@ def test_real_base_parser_call_is_cited_and_not_substituted(tmp_path):
     assert gated != "needs_attention"
 
 
+def test_required_parameter_before_star_is_still_required(tmp_path):
+    """def f(first, second=0, *rest): f() is missing first. f(1) is valid. *rest does not waive first.
+
+    The call is not written with a star. A base call f('seen', 0) fills only first. second is not
+    copied. With no such call, f() is not run."""
+    root = tmp_path / "base"
+    _write(root, {
+        "pkg/__init__.py": "",
+        "pkg/m.py": "def f(first, second=0, *rest):\n    return first\n",
+        "tests/test_m.py": "from pkg.m import f\n\ndef test_f():\n    assert f('seen', 0) == 'seen'\n",
+    })
+    empty = "import pkg.m as m\nprint(m.f())\n"
+    one = "import pkg.m as m\nprint(m.f(1))\n"
+    assert any("missing required" in msg and "first" in msg for msg in probe_names.problems(empty, root))
+    assert probe_names.problems(one, root) == []
+    assert probe_names.prepare_calls(one, root)[0] == one
+    bound, notes, reject = probe_names.prepare_calls(empty, root)
+    assert reject is None and notes[0]["how"] == "filled"
+    assert [item["parameter"] for item in notes[0]["filled"]] == ["first"]
+    assert "seen" in bound and "second" not in bound
+    lone = tmp_path / "lone"
+    _write(lone, {"pkg/__init__.py": "", "pkg/m.py": "def f(first, second=0, *rest):\n    return first\n"})
+    again, no_notes, reason = probe_names.prepare_calls(empty, lone)
+    assert reason and "not run" in reason and "first" in reason and no_notes == []
+    assert again == empty
+
+
 def test_unchecked_calls_and_unreadable_inheritance_are_not_run(tmp_path):
     """A base call whose arguments cannot be checked is not run. A readable call is unchanged."""
     root = tmp_path / "base"

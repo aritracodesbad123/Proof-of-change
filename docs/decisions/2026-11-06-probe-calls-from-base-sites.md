@@ -7,18 +7,23 @@ tree is compared with that definition. The definition is the class or function i
 that only re-exports the name is followed to that definition.
 
 The comparison looks at three things. A keyword has to be one of the parameters. A parameter
-with no default has to be given. A call cannot pass more positional arguments than the
-definition accepts, unless the definition has `*args`. A definition that accepts `**kwargs` is
-left alone, because any name is allowed. A class that does not write its own `__init__` is not
-counted this way, because a decorator may have added the constructor.
+with no default has to be given, including one that sits before `*args`. Extra positional
+arguments are allowed only when the definition has `*args`. A definition that accepts
+`**kwargs` is not checked, because any name is allowed, and that probe is not run. A call
+written with `*args` or `**mapping` is not checked either, because those arguments are not
+visible. A class that does not write its own `__init__` is not counted this way, because a
+decorator may have added the constructor.
 
 When a call does not match, arguments the definition accepts stay, including the values the
 probe wrote. An unexpected keyword is not deleted: removing it would leave a different call, so
 the probe is not run, and the reason names the keyword. A required parameter that is still
 missing is filled from a base call that passes that same parameter, and the record names the
-file and the parameter. The rest of that call is not copied. A call we cannot check, because it
-uses `*args` or `**kwargs` or because the constructor or method is inherited from another file,
-is not run either. A matching signature is not by itself proof that the changed line ran.
+file and the parameter. The rest of that call is not copied. A call we cannot check, because
+the call itself is written with `*args` or `**mapping`, because the definition accepts
+`**kwargs`, or because the constructor or method is inherited from another file, is not run.
+A definition that merely allows extra positionals through `*args` does not hide a required
+parameter written before that star. A matching signature is not by itself proof that the
+changed line ran.
 
 Those calls are read from the base files, tests and source, as syntax only. The walk stops
 after a fixed number of files. It does not import the package and it does not use the network.
