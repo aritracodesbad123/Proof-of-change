@@ -4,8 +4,8 @@
  "pr": 7,
  "title": "t",
  "verdict": "could_not_verify",
- "reason": "harness error: TimeoutError: check timed out",
- "harness_error": "harness error: TimeoutError: check timed out",
+ "reason": "harness error: RuntimeError: crashed partway",
+ "harness_error": "harness error: RuntimeError: crashed partway",
  "duration_s": {
   "total_wall": 0
  },
