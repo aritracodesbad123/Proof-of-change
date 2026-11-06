@@ -715,8 +715,12 @@ _OPEN_PR_RE = re.compile(r"\*\*Open PR:\*\* #(\d+)")
 _REPO_RE = re.compile(r"https://github\.com/([\w.-]+/[\w.-]+)")
 # The rest of a `## N. ...` heading, which split() leaves as the section's first line.
 # `owner/name #123` names the repository and the pull request. A title with no slash does not.
-_HEADING_TAIL_RE = re.compile(r"(?P<repo>[\w.-]+/[\w.-]+)(?:\s*#(?P<pr>\d+)\b.*)?")
-_HEAD_SHA_RE = re.compile(r"Head SHA: `([0-9a-f]{40})`")
+# `owner/name PR #123` and `owner/name pull request #123` are read the same way; a `: title` may follow.
+_HEADING_TAIL_RE = re.compile(
+    r"(?P<repo>[\w.-]+/[\w.-]+)(?:\s+(?:PR|pull\s+request)\b)?(?:\s*#(?P<pr>\d+)\b.*)?", re.I)
+# `Head SHA: `abc``, `- Head: abc` and `- Head abc ; base def` all name the pinned commits.
+_HEAD_SHA_RE = re.compile(r"(?im)^\W*Head(?:\s+SHA)?\s*:?\s*`?([0-9a-f]{40})\b`?")
+_BASE_SHA_RE = re.compile(r"(?i)(?:^|[;\n]|-)\s*Base(?:\s+SHA)?\s*:?\s*`?([0-9a-f]{40})\b")
 _INSTALL_RE = re.compile(r"- Install: `([^`]+)`")
 _TEST_SUBSET_RE = re.compile(r"- Test \(subset[^)]*\): `([^`]+)`")
 _TEST_LINE_RE = re.compile(r"- Test: `([^`]+)`")
@@ -828,7 +832,7 @@ def parse_chosen(path: Path) -> dict:
             continue
         for pr, block, preamble in _section_blocks(sec):
             out.setdefault(repo, []).append({
-                "pr": pr, "head_sha": _group1(_HEAD_SHA_RE, block),
+                "pr": pr, "head_sha": _group1(_HEAD_SHA_RE, block), "base_sha": _group1(_BASE_SHA_RE, block),
                 "install": _group1(_INSTALL_RE, block) or _group1(_INSTALL_RE, preamble),
                 "test_cmd": _test_cmd(block, preamble)})
     return out
@@ -894,7 +898,7 @@ def chosen_items(gh: GitHub, repo: str, cfg: dict, chosen: list[dict]) -> list[d
         items.append({"pr": p["number"], "title": p["title"], "body": p.get("body") or "", "url": p["html_url"],
                       "author": p["user"]["login"],
                       "head_sha": pk["head_sha"] or p["head"]["sha"], "current_head_sha": p["head"]["sha"],
-                      "base_sha": p["base"]["sha"], "merge_commit_sha": p.get("merge_commit_sha"),
+                      "base_sha": pk.get("base_sha") or p["base"]["sha"], "merge_commit_sha": p.get("merge_commit_sha"),
                       "base_ref": p["base"]["ref"], "updated_at_utc": p["updated_at"],
                       "updated_at_ist": to_ist(p["updated_at"]), "files": classify_files(diff_files(d), cfg["pkg"]),
                       "diff": d, "mergeable": p.get("mergeable"), "mergeable_state": p.get("mergeable_state"),
@@ -9425,6 +9429,114 @@ def run_summary_payloads(report_dir: Path, token: str | None) -> tuple[list[tupl
     return out, notes
 
 
+# ------------------------------------------------- run-level go/no-go from every stored record
+_NOT_CLEAR_VERDICTS = ("needs_attention", "could_not_verify")
+_ALL_CLEAR_PHRASE = "Nothing needs attention"
+
+
+def _verdict_key(rec: dict) -> str:
+    return str(rec.get("verdict") or "could_not_verify").strip().lower().replace(" ", "_")
+
+
+def combined_run_summary_md(records: list[dict], title: str) -> str:
+    """One go/no-go covering every PR record in a date+commit folder.
+
+    A record without a verdict counts as could_not_verify. The all-clear sentence appears only when every
+    record is verified.
+    """
+    order = {"needs_attention": 0, "could_not_verify": 1, "verified": 2}
+    recs = sorted(records, key=lambda r: (order.get(_verdict_key(r), 1), str(r.get("_pr_id") or "")))
+    counts = {k: sum(1 for r in recs if _verdict_key(r) == k) for k in order}
+    other = len(recs) - sum(counts.values())
+    counts["could_not_verify"] += other
+    lines = [f"# {title}", "",
+             f"{len(recs)} report(s) in this folder: {counts['needs_attention']} need attention, "
+             f"{counts['could_not_verify']} could not be verified, {counts['verified']} verified. "
+             "Built from every record.json stored in this folder, so a later one-PR run cannot narrow it.", "",
+             "## Needs a decision first", ""]
+    need = [r for r in recs if _verdict_key(r) != "verified"]
+    if need:
+        for r in need:
+            lines.append(f"- **{_verdict_key(r).upper().replace('_', ' ')}**: {_subject_of(r)}. {_reason_of(r)}")
+    else:
+        lines.append(f"{_ALL_CLEAR_PHRASE}: every report is VERIFIED.")
+    lines += ["", "## All reports", "", "| Verdict | Subject | Why | Report |", "|---|---|---|---|"]
+    for r in recs:
+        pid = r.get("_pr_id") or ""
+        lines.append(f"| {_verdict_key(r).upper().replace('_', ' ')} | {_subject_of(r)} | "
+                     f"{_reason_of(r).replace('|', '/')} | [PDF]({pid}/REPORT.pdf) |")
+    text = "\n".join(lines) + "\n"
+    check_no_false_all_clear(text, recs)
+    return text
+
+
+def _subject_of(rec: dict) -> str:
+    pr = rec.get("pr") if isinstance(rec.get("pr"), dict) else {}
+    repo = pr.get("repo") or rec.get("repo") or "?"
+    num = pr.get("number") if pr else rec.get("pr")
+    title = pr.get("title") or rec.get("title") or ""
+    return f"{repo}#{num}" + (f": {title}" if title else "")
+
+
+def _reason_of(rec: dict) -> str:
+    reason = str(rec.get("reason") or "no reason recorded").strip()
+    return reason[0].upper() + reason[1:] if reason else reason
+
+
+def check_no_false_all_clear(text: str, records: list[dict]) -> None:
+    """Standing rule: a go/no-go never reads as an all-clear while any record is not verified."""
+    bad = [r for r in records if _verdict_key(r) != "verified"]
+    if (bad or not records) and _ALL_CLEAR_PHRASE.lower() in text.lower():
+        raise ValueError("summary says nothing needs attention, but "
+                         f"{len(bad)} record(s) are not verified" if bad else "summary has no records")
+
+
+def folder_records(folder: Path) -> list[dict]:
+    """Every <pr_id>/record.json directly under a date+commit folder (refused-* folders have none)."""
+    out = []
+    for path in sorted(Path(folder).glob("*/record.json")):
+        try:
+            rec = json.loads(path.read_text())
+        except (OSError, ValueError):
+            rec = {"verdict": "could_not_verify", "reason": "record.json could not be read"}
+        if isinstance(rec, dict):
+            rec["_pr_id"] = path.parent.name
+            out.append(rec)
+    return out
+
+
+def summary_needs_rebuild(folder: Path, pushed: set, prefix: str) -> bool:
+    """True when the folder holds a record this push did not write (an earlier one-PR run), or when its
+    SUMMARY.md reads as an all-clear while a record is not verified."""
+    folder = Path(folder)
+    for path in folder.glob("*/record.json"):
+        if f"{prefix}/{path.parent.name}/record.json" not in pushed:
+            return True
+    md = folder / "SUMMARY.md"
+    if md.is_file():
+        try:
+            check_no_false_all_clear(md.read_text(), folder_records(folder) or [{"verdict": "verified"}])
+        except ValueError:
+            return True
+    return False
+
+
+def rebuild_folder_summary(folder: Path, token: str | None = None) -> bool:
+    """Rewrite folder/SUMMARY.md and SUMMARY.pdf from all records in the folder. False when it holds none."""
+    folder = Path(folder)
+    recs = folder_records(folder)
+    if not recs:
+        return False
+    title = f"Proof-of-Change go/no-go: {folder.parent.name} on {folder.name}"
+    md = combined_run_summary_md(recs, title)
+    lines = _forced_clean_lines(md, token, Path("SUMMARY.md"))
+    clean = "\n".join(lines) + "\n"
+    check_no_false_all_clear(clean, recs)
+    (folder / "SUMMARY.md").write_text(clean)
+    pdf_always.write_pdf(folder / "SUMMARY.pdf", "SUMMARY", lines)
+    return True
+
+
 def _runs_push_once(origin: str, token: str | None, payloads: list[tuple[str, bytes]],
                     branch_existed: bool | None, env: dict) -> None:
     """Commit payloads on a temporary clone and push. Never checks out or writes the caller's repository."""
@@ -9446,6 +9558,17 @@ def _runs_push_once(origin: str, token: str | None, payloads: list[tuple[str, by
             dest = checkout.joinpath(*rel_path.parts)
             dest.parent.mkdir(parents=True, exist_ok=True)
             dest.write_bytes(data)
+        # The run-level go/no-go covers every record already stored in its date+commit folder,
+        # so a later one-PR run never overwrites or narrows it.
+        # The run's own summary is kept when it already covers every record and is not a false all-clear.
+        pushed = {PurePosixPath(rel).as_posix() for rel, _d in payloads}
+        for rel, _data in payloads:
+            parts = PurePosixPath(rel).parts
+            if len(parts) == 4 and parts[0] == "runs" and parts[3] in ("SUMMARY.md", "SUMMARY.pdf"):
+                folder = checkout.joinpath(*parts[:3])
+                if summary_needs_rebuild(folder, pushed, "/".join(parts[:3])):
+                    rebuild_folder_summary(folder, token)
+                break
         add = _git_exec(["add", "-A"], cwd=checkout, env=env)
         if add.returncode != 0:
             raise _RunsPushError("could not prepare a temporary clone")
