@@ -113,11 +113,15 @@ def _passwd(home: str) -> Path:
 def wrap(cmd: list, env: dict, rw: list, ro: list = (), network: bool = False, cwd=None) -> tuple[list, dict, None]:
     """(argv, env, cwd) to start cmd inside the sandbox. env is the allowlisted environment (base_env); its uv dirs
     are rewritten to the inside mount points and TMPDIR to a dir in the side's home (disk, not RAM). Installs
-    (env has UV_CACHE_DIR) get the cache overlay. Without the sandbox (--unsafe-no-sandbox) cmd runs unchanged."""
+    (env has UV_CACHE_DIR) get the cache overlay. Without the sandbox (--unsafe-no-sandbox) cmd runs unchanged.
+
+    A runner config-file path (PIP_CONFIG_FILE, UV_CONFIG_FILE) is dropped before the command is started, sandboxed
+    or not. The empty-file sentinel is kept. Authentication, proxy and TLS trust settings are not dropped here."""
+    from guardrails.isolation import without_host_config_paths
     cmd = [str(c) for c in cmd]
+    env = without_host_config_paths(dict(env))
     if not enabled():
         return cmd, env, cwd
-    env = dict(env)
     home = env["HOME"]
     tmp = Path(home) / ".tmp"
     tmp.mkdir(parents=True, exist_ok=True)

@@ -2858,6 +2858,11 @@ def run_setup(step: str, fn, *, active: bool = True, cleanup=None, max_retries: 
         try:
             ok, detail, value = _unpack(fn())
         except Exception as exc:  # noqa: BLE001
+            # An environment refusal is the runner, not a failed install of this pull request. It must not be
+            # stored as a setup result. Other exceptions stay a failed attempt, as before.
+            from guardrails.isolation import UnsafeEnv
+            if isinstance(exc, UnsafeEnv):
+                raise
             ok, detail, value = False, f"{type(exc).__name__}: {exc}", None
         detail = redact(detail, env)
         if ok or not is_setup_failure(detail):

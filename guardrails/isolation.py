@@ -19,6 +19,12 @@ UNTRUSTED_THREAD_ENV = {k: "1" for k in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREAD
                                          "NUMEXPR_NUM_THREADS", "VECLIB_MAXIMUM_THREADS", "BLIS_NUM_THREADS")}
 PASS_THROUGH = ("PATH", "LANG", "LC_ALL", "TERM", "TMPDIR", "SOURCE_DATE_EPOCH", "SSL_CERT_FILE")
 FIXED_ENV = UNTRUSTED_THREAD_ENV | {"PYTHONHASHSEED": "0", "PYTHONDONTWRITEBYTECODE": "1", "MPLBACKEND": "Agg"}
+# Runner config-file pointers. The value is a path on the machine that started the run (pip.conf, uv.toml).
+# It is not a credential, a proxy, or a TLS trust setting: SSL_CERT_FILE stays on PASS_THROUGH, and names such as
+# HTTPS_PROXY or NEBIUS_API_KEY are not in this set. A sandbox must not receive the path, and it must not be sent
+# to an external service. The only value kept is the empty-file sentinel (os.devnull): a product install sets
+# PIP_CONFIG_FILE to that so pip opens no config file. Any other value is a runner path and is dropped.
+HOST_CONFIG_FILES = frozenset({"PIP_CONFIG_FILE", "UV_CONFIG_FILE"})
 # Installs only: where uv keeps its download cache and its managed Pythons (so a per-env HOME does not force a
 # fresh download of everything), copy-not-link from that cache, and no uv config files (user or project).
 INSTALL_DIRS = ("UV_CACHE_DIR", "UV_PYTHON_INSTALL_DIR")
@@ -40,9 +46,31 @@ class UnsafeEnv(RuntimeError):
     """An environment for untrusted code contains something it must not."""
 
 
+def remedied_config_names(env: dict) -> list[str]:
+    """Host config-file names whose value is the empty-file sentinel, not a path on the runner.
+
+    The message that reports a refusal names variables only. This list is how a cleanly remedied setting
+    (PIP_CONFIG_FILE=/dev/null) is told apart from a runner path and from a real secret."""
+    return sorted(k for k, v in env.items() if k in HOST_CONFIG_FILES and v == os.devnull)
+
+
+def without_host_config_paths(env: dict) -> dict:
+    """Copy `env` without a runner config-file path.
+
+    PIP_CONFIG_FILE and UV_CONFIG_FILE are removed unless the value is exactly os.devnull (the remedied
+    sentinel). Nothing else is removed: authentication variables, proxy settings and TLS trust settings stay,
+    and a later allowlist check can still refuse them. The returned dict is new; `env` is not changed.
+    Values of dropped names are not copied into the result, so a local path cannot ride along."""
+    return {k: v for k, v in env.items() if k not in HOST_CONFIG_FILES or v == os.devnull}
+
+
 def check_untrusted_env(env: dict, allowlist: frozenset | set = INSTALL_ALLOWLIST) -> None:
-    """Fail loudly if env has a name outside the allowlist, a credential-looking name, or a URL with a password."""
-    extra = sorted(set(env) - set(allowlist))
+    """Fail loudly if env has a name outside the allowlist, a credential-looking name, or a URL with a password.
+
+    A remedied host config file (the empty-file sentinel) is not an extra name. A runner path is not remedied:
+    it is still outside the allowlist. The error names the variables and does not include their values."""
+    remedied = set(remedied_config_names(env))
+    extra = sorted((set(env) - set(allowlist)) - remedied)
     secret = sorted(k for k in env if SECRET_NAME.search(k))
     userinfo = sorted(k for k, v in env.items() if URL_USERINFO.search(str(v)))
     if extra or secret or userinfo:
@@ -78,6 +106,9 @@ def untrusted_env(home: str | Path, install: bool = False, extra: dict | None = 
         if k not in INSTALL_EXTRA or not install:
             raise UnsafeEnv(f"{k} is not an allowed extra variable")
         env[k] = v
+    # A runner config-file path is never part of the sandbox environment, even if a pass-through name is later
+    # widened. The sentinel, if a caller set it, is kept. The parent process environment is not modified.
+    env = without_host_config_paths(env)
     check_untrusted_env(env, INSTALL_ALLOWLIST if install else RUN_ALLOWLIST)
     return env
 
