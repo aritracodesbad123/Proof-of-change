@@ -140,7 +140,8 @@ def _run_probes(tmp_path, monkeypatch, a, venvs):
     monkeypatch.setattr(freeze, "verify", lambda *x, **k: None)
     monkeypatch.setattr(daily_run, "_contree_ready", lambda: False)
     probe = tmp_path / "p.py"
-    probe.write_text("")
+    probe.write_text('PROBE = {"id": "p", "target": "o/r#1", "about": "x", "claims": []}\n'
+                     'import json\nprint(json.dumps({"observations": {"v": 1}}))\n')
     plan = [{"path": str(probe), "source": "model", "freeze": {"generator": "g"}}]
     out = daily_run.run_probes("o/r", 1, {s: v / "bin/python" for s, v in venvs.items()}, tmp_path, tmp_path, a,
                                plan, "t")
