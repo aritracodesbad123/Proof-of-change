@@ -1,0 +1,18 @@
+{
+ "repo": "o/lib",
+ "library": "lib",
+ "pr": 7,
+ "title": "t",
+ "verdict": "could_not_verify",
+ "reason": "harness error: TimeoutError: check timed out",
+ "harness_error": "harness error: TimeoutError: check timed out",
+ "duration_s": {
+  "total_wall": 0
+ },
+ "pdf_push": {
+  "ok": true,
+  "attempts": 1,
+  "error": null,
+  "url": "https://github.com/aritracodesbad123/Proof-of-change/tree/runs/runs/2026-11-06/aaaaaaa/lib-7"
+ }
+}
