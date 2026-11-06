@@ -7385,7 +7385,9 @@ def already_on_base_message(cmp: dict | None, base_ref: str | None = None) -> st
 
     It is None unless every new test collected from the diff was collected again on the base and passed there,
     and none of those tests failed. One unrelated passing test is not enough. A test that was not collected is
-    not a pass. The verdict is not read or changed here."""
+    not a pass. A different file that failed to collect is not read here, so it does not block the note.
+    The branch name is the recorded base ref (``master``, ``2.2``), not a hardcoded main. The verdict is not
+    read or changed here."""
     info = cmp.get("base_new_tests") if isinstance(cmp, dict) else None
     if not isinstance(info, dict):
         return None
@@ -7403,26 +7405,100 @@ def already_on_base_message(cmp: dict | None, base_ref: str | None = None) -> st
     return f"fix appears already present on {ref}"
 
 
+def collection_failed_paths(source: dict | None) -> list[str]:
+    """Changed test files whose collection failed, in the order they were recorded, without duplicates.
+
+    ``source`` may be the comparison (it holds ``base_new_tests``) or the ``base_new_tests`` evidence itself.
+    A file named here contributed no node ids. It is not a pass."""
+    if not isinstance(source, dict):
+        return []
+    info = source.get("base_new_tests") if isinstance(source.get("base_new_tests"), dict) else source
+    if not isinstance(info, dict):
+        return []
+    out: list[str] = []
+    for rel in info.get("collection_failed") or []:
+        text = str(rel).strip()
+        if text and text not in out:
+            out.append(text)
+    return out
+
+
+def collection_limitation_message(source: dict | None) -> str | None:
+    """Plain limitation naming the files pytest could not collect. None when that list is empty.
+
+    The sentence lists those files and nothing else. It does not remove the already-on-base note and it
+    does not decide the verdict. A file named here is not a pass, and the result does not cover it."""
+    files = collection_failed_paths(source)
+    if not files:
+        return None
+    shown = ", ".join(files)
+    if len(files) == 1:
+        return (f"Limitation: pytest could not collect {shown}. "
+                "That changed test file is not a pass, and this result does not cover it.")
+    return (f"Limitation: pytest could not collect {shown}. "
+            "Those changed test files are not a pass, and this result does not cover them.")
+
+
+def record_collection_gap(rec: dict | None) -> tuple[list[str], str]:
+    """Failed collection files and the limitation sentence for a record. Both empty when there is no gap."""
+    if not isinstance(rec, dict):
+        return [], ""
+    files: list[str] = []
+    for source in (rec.get("comparison"), rec.get("base_new_tests")):
+        found = collection_failed_paths(source if isinstance(source, dict) else None)
+        if found:
+            files = found
+            break
+    sentence = collection_limitation_message({"base_new_tests": {"collection_failed": files}}) if files else ""
+    stored = rec.get("collection_limitation")
+    if not sentence and isinstance(stored, str) and stored.strip():
+        sentence = stored.strip()
+    return files, sentence
+
+
+def record_has_collection_limitation(rec: dict | None) -> bool:
+    """True when a changed test file failed to collect, whether or not the already-on-base note is present."""
+    files, sentence = record_collection_gap(rec)
+    return bool(files or sentence)
+
+
+def _drop_trailing_note(reason: str, previous) -> str:
+    """Remove a note this run appended earlier, so a second pass does not repeat it."""
+    if not isinstance(previous, str) or not previous:
+        return reason
+    suffix = f"; {previous}"
+    if reason.endswith(suffix):
+        return reason[:-len(suffix)]
+    if reason == previous:
+        return ""
+    return reason
+
+
 def _attach_already_on_base(rec: dict, cmp: dict | None) -> None:
-    """Put the already-on-base note on the record and at the end of the reason. The verdict is left as it is."""
+    """Put the already-on-base note and any collection limitation on the record. The verdict is left as it is.
+
+    The note is appended first. When a changed file failed to collect, the limitation is appended after the
+    note and stored on ``collection_limitation``. That failure does not remove the note. Calling this again
+    replaces the previous note and limitation instead of repeating them."""
     if not isinstance(rec, dict):
         return
     note = already_on_base_message(cmp, rec.get("base_ref"))
-    reason = str(rec.get("reason") or "")
-    previous = rec.get("already_on_base")
-    if isinstance(previous, str) and previous:
-        suffix = f"; {previous}"
-        if reason.endswith(suffix):
-            reason = reason[:-len(suffix)]
-        elif reason == previous:
-            reason = ""
+    limit = collection_limitation_message(cmp)
+    previous_note = rec.get("already_on_base")
+    previous_limit = rec.get("collection_limitation")
+    reason = _drop_trailing_note(str(rec.get("reason") or ""), previous_limit)
+    reason = _drop_trailing_note(reason, previous_note)
+    parts = [part for part in (reason, note, limit) if part]
     if note:
         rec["already_on_base"] = note
-        rec["reason"] = f"{reason}; {note}" if reason else note
     else:
         rec.pop("already_on_base", None)
-        if isinstance(previous, str) and previous:
-            rec["reason"] = reason
+    if limit:
+        rec["collection_limitation"] = limit
+    else:
+        rec.pop("collection_limitation", None)
+    if note or limit or previous_note or previous_limit:
+        rec["reason"] = "; ".join(parts)
 
 
 def _stamp_cross_run(rec: dict, cmp: dict) -> None:
@@ -9821,11 +9897,21 @@ def _verdict_key(rec: dict) -> str:
     return str(rec.get("verdict") or "could_not_verify").strip().lower().replace(" ", "_")
 
 
+def _blocks_all_clear(rec: dict) -> bool:
+    """True when this record must not be read as an all-clear.
+
+    A verdict other than verified counts. So does a verified record that still has a changed test file pytest
+    could not collect. The stored verdict stays verified. The gap stays visible, and the all-clear sentence
+    does not."""
+    return _verdict_key(rec) != "verified" or record_has_collection_limitation(rec)
+
+
 def combined_run_summary_md(records: list[dict], title: str) -> str:
     """One go/no-go covering every PR record in a date+commit folder.
 
     A record without a verdict counts as could_not_verify. The all-clear sentence appears only when every
-    record is verified.
+    record is verified and none of them has a changed test file that failed to collect. That gap does not
+    change the stored verdict. It is listed beside it.
     """
     order = {"needs_attention": 0, "could_not_verify": 1, "verified": 2}
     recs = sorted(records, key=lambda r: (order.get(_verdict_key(r), 1), str(r.get("_pr_id") or "")))
@@ -9835,14 +9921,28 @@ def combined_run_summary_md(records: list[dict], title: str) -> str:
     lines = [f"# {title}", "",
              f"{len(recs)} report(s) in this folder: {counts['needs_attention']} need attention, "
              f"{counts['could_not_verify']} could not be verified, {counts['verified']} verified. "
-             "Built from every record.json stored in this folder, so a later one-PR run cannot narrow it.", "",
-             "## Needs a decision first", ""]
+             "Built from every record.json stored in this folder, so a later one-PR run cannot narrow it.", ""]
+    if any(record_has_collection_limitation(r) for r in recs):
+        lines.append("At least one report has a changed test file pytest could not collect. "
+                     "That limitation is named on the report. It is listed below even when the verdict is verified.")
+        lines.append("")
+    lines += ["## Needs a decision first", ""]
     need = [r for r in recs if _verdict_key(r) != "verified"]
+    limited = [r for r in recs if _verdict_key(r) == "verified" and record_has_collection_limitation(r)]
     if need:
         for r in need:
             lines.append(f"- **{_verdict_key(r).upper().replace('_', ' ')}**: {_subject_of(r)}. {_reason_of(r)}")
-    else:
+    elif not limited:
         lines.append(f"{_ALL_CLEAR_PHRASE}: every report is VERIFIED.")
+    else:
+        lines.append("The stored verdicts are verified. "
+                     "A report below still leaves out a changed test file that pytest could not collect.")
+    if limited:
+        if need:
+            lines.append("")
+        lines.append("Verified, with a changed test file pytest could not collect:")
+        for r in limited:
+            lines.append(f"- **VERIFIED**: {_subject_of(r)}. {_reason_of(r)}")
     lines += ["", "## All reports", "", "| Verdict | Subject | Why | Report |", "|---|---|---|---|"]
     for r in recs:
         pid = r.get("_pr_id") or ""
@@ -9863,15 +9963,21 @@ def _subject_of(rec: dict) -> str:
 
 def _reason_of(rec: dict) -> str:
     reason = str(rec.get("reason") or "no reason recorded").strip()
+    _files, extra = record_collection_gap(rec)
+    if extra and extra not in reason:
+        reason = f"{reason}; {extra}" if reason else extra
     return reason[0].upper() + reason[1:] if reason else reason
 
 
 def check_no_false_all_clear(text: str, records: list[dict]) -> None:
-    """Standing rule: a go/no-go never reads as an all-clear while any record is not verified."""
-    bad = [r for r in records if _verdict_key(r) != "verified"]
+    """Standing rule: a go/no-go never reads as an all-clear while any record is not a clear pass.
+
+    A record that is not verified blocks the all-clear sentence. So does a verified record whose changed
+    test file failed to collect. The sentence is refused either way. The stored verdict is not rewritten."""
+    bad = [r for r in records if _blocks_all_clear(r)]
     if (bad or not records) and _ALL_CLEAR_PHRASE.lower() in text.lower():
         raise ValueError("summary says nothing needs attention, but "
-                         f"{len(bad)} record(s) are not verified" if bad else "summary has no records")
+                         f"{len(bad)} record(s) still need a look" if bad else "summary has no records")
 
 
 def folder_records(folder: Path) -> list[dict]:
@@ -9890,7 +9996,7 @@ def folder_records(folder: Path) -> list[dict]:
 
 def summary_needs_rebuild(folder: Path, pushed: set, prefix: str) -> bool:
     """True when the folder holds a record this push did not write (an earlier one-PR run), or when its
-    SUMMARY.md reads as an all-clear while a record is not verified."""
+    SUMMARY.md reads as an all-clear while a record is not verified or still has a collection gap."""
     folder = Path(folder)
     for path in folder.glob("*/record.json"):
         if f"{prefix}/{path.parent.name}/record.json" not in pushed:
