@@ -31,10 +31,12 @@ not a pass.
   after the note in the reason, and in the report beside the note.
 - Compute the verdict with the existing comparison first. A collection failure is not one of those inputs.
 - If that verdict is verified and any selected changed test file failed to collect, collected no tests, or
-  has a shared test the base did not execute, lower only that result to could not verify. A test both sides
-  collected is not a new pass when the base junit has no row. An existing file whose base collection saw
-  nothing does not make every pull-request id new, and it does not create a fixed result. A skip is not a
-  pass. Tests that failed on the base and passed on the pull request stay in the fixed list. The
+  has a shared test the base did not execute, lower only that result to could not verify. Shared ids in a
+  changed nested file are run on the base with the pull-request test body. A strengthened assertion that
+  fails there stays fixed. An import of a helper that exists only on the pull request, or a missing fixture,
+  is removed from fixed and from new passes and is named. A TypeError from the call under test can still be
+  a fix. A test both sides collected is not a new pass when the base junit has no row. An existing file whose
+  base collection saw nothing does not make every pull-request id new. A skip is not a pass. The
   already-on-base note, when the new tests really passed on the tested commit, is still attached. The commit
   is `tested_main_sha` when the run recorded it. A flagged probe still keeps needs attention; the note does
   not replace that verdict.
