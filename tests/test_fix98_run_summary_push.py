@@ -4,8 +4,7 @@ import subprocess
 
 from ops import daily_run as dr
 from poc import pdf_always
-from tests.test_run_pdf_push import (DAY, PR, SHA, TOKEN, _bare, _clear_tokens, _layout, _names, _publish,
-                                     _blob, _reject_always, _user_repo)
+from tests.test_run_pdf_push import DAY, PR, SHA, TOKEN, _bare, _blob, _clear_tokens, _layout, _names, _publish, _reject_always, _user_repo
 
 STALE = "PDFs NOT saved to GitHub: could not push to the runs branch after 3 attempts"
 
