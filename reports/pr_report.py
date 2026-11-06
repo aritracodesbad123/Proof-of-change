@@ -615,6 +615,18 @@ def build(rec: dict, prdir: Path, out_dir: Path, decision: dict | None = None) -
     plugin_note = rec.get("collection_plugin_note")
     if isinstance(plugin_note, str) and plugin_note.strip():
         R.p(plugin_note.strip())
+    evidence = (rec.get("comparison") or {}).get("new_test_evidence") if isinstance(rec.get("comparison"), dict) else None
+    if isinstance(evidence, dict):
+        lims = [item for item in evidence.get("limitations") or [] if isinstance(item, dict) and item.get("path")]
+        if lims:
+            R.h(3, "Test limitations")
+            R.bullets([f"{item['path']}: {item.get('kind') or 'limitation'}" for item in lims])
+        sha = str(evidence.get("tested_main_sha") or "")
+        if sha:
+            R.p(f"Base tests ran at tested base {sha}. The branch name is not the commit.", "meta")
+    already = rec.get("already_on_base")
+    if isinstance(already, str) and already.strip():
+        R.p(already.strip() + " This note does not change the verdict.")
     from poc import related_reports
     background = rec.get("related_reports") if isinstance(rec.get("related_reports"), dict) else None
     background_text = str((background or {}).get("text") or "").strip()
