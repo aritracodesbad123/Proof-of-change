@@ -1,0 +1,152 @@
+{
+ "baseline": "full",
+ "product_check": true,
+ "behaviour_claims": [],
+ "probes": {
+  "status": "ran",
+  "items": [
+   {
+    "id": "model-p1",
+    "source": "model",
+    "target": "o/r#1",
+    "about": "Tests the rotation group behavior for claims C1, C2, C3, and C4.",
+    "status": "ran",
+    "claims": [
+     {
+      "id": "C1",
+      "source": "PR description",
+      "text": "After the change, the __call__ method iterates through all rotation conditions and invokes each one, regardless of earlier results.",
+      "covers": [
+       "c1.cond0_limit_after_msg1",
+       "c1.cond0_limit_after_msg2",
+       "c1.cond1_limit_after_msg1",
+       "c1.cond1_limit_after_msg2",
+       "c1.cond1_initialized_after_msg1",
+       "c1.cond1_initialized_after_msg2"
+      ],
+      "expect": "differs"
+     },
+     {
+      "id": "C2",
+      "source": "PR description",
+      "text": "The method returns True exactly when at least one rotation condition evaluates to True, preserving the documented 'any of which can trigger the rotation' contract.",
+      "covers": [
+       "c2.ret_msg1",
+       "c2.ret_msg2"
+      ],
+      "expect": "same"
+     },
+     {
+      "id": "C3",
+      "source": "PR description",
+      "text": "When all rotation conditions are evaluated, a condition that would have been skipped does not retain a stale limit, thus it does not cause an extra rotation on the next message.",
+      "covers": [
+       "c3.cond1_limit_after_msg1_in_past",
+       "c3.cond1_limit_after_msg2_in_past"
+      ],
+      "expect": "differs"
+     },
+     {
+      "id": "C4",
+      "source": "PR description",
+      "text": "The test asserts that after two messages only two log files exist; before the change it fails because three files are created, after the change it passes.",
+      "covers": [
+       "c4.num_true_returns"
+      ],
+      "expect": "differs"
+     }
+    ],
+    "runs": {
+     "main": [
+      {
+       "c2.ret_msg1": true,
+       "c1.cond0_limit_after_msg1": "2020-01-02T13:00:00",
+       "c1.cond1_limit_after_msg1": null,
+       "c2.ret_msg2": true,
+       "c1.cond0_limit_after_msg2": "2020-01-02T13:00:00",
+       "c1.cond1_limit_after_msg2": "2020-01-02T12:00:00",
+       "c4.num_true_returns": 2,
+       "c1.cond1_initialized_after_msg1": false,
+       "c1.cond1_initialized_after_msg2": false,
+       "c3.cond1_limit_after_msg1_in_past": null,
+       "c3.cond1_limit_after_msg2_in_past": null
+      },
+      {
+       "c2.ret_msg1": true,
+       "c1.cond0_limit_after_msg1": "2020-01-02T13:00:00",
+       "c1.cond1_limit_after_msg1": null,
+       "c2.ret_msg2": true,
+       "c1.cond0_limit_after_msg2": "2020-01-02T13:00:00",
+       "c1.cond1_limit_after_msg2": "2020-01-02T12:00:00",
+       "c4.num_true_returns": 2,
+       "c1.cond1_initialized_after_msg1": false,
+       "c1.cond1_initialized_after_msg2": false,
+       "c3.cond1_limit_after_msg1_in_past": null,
+       "c3.cond1_limit_after_msg2_in_past": null
+      },
+      {
+       "c2.ret_msg1": true,
+       "c1.cond0_limit_after_msg1": "2020-01-02T13:00:00",
+       "c1.cond1_limit_after_msg1": null,
+       "c2.ret_msg2": true,
+       "c1.cond0_limit_after_msg2": "2020-01-02T13:00:00",
+       "c1.cond1_limit_after_msg2": "2020-01-02T12:00:00",
+       "c4.num_true_returns": 2,
+       "c1.cond1_initialized_after_msg1": false,
+       "c1.cond1_initialized_after_msg2": false,
+       "c3.cond1_limit_after_msg1_in_past": null,
+       "c3.cond1_limit_after_msg2_in_past": null
+      }
+     ],
+     "pr": [
+      {
+       "c2.ret_msg1": true,
+       "c1.cond0_limit_after_msg1": "2020-01-02T13:00:00",
+       "c1.cond1_limit_after_msg1": "2020-01-02T12:00:00",
+       "c2.ret_msg2": false,
+       "c1.cond0_limit_after_msg2": "2020-01-02T13:00:00",
+       "c1.cond1_limit_after_msg2": "2020-01-02T12:00:00",
+       "c4.num_true_returns": 1,
+       "c1.cond1_initialized_after_msg1": false,
+       "c1.cond1_initialized_after_msg2": false,
+       "c3.cond1_limit_after_msg1_in_past": null,
+       "c3.cond1_limit_after_msg2_in_past": null
+      },
+      {
+       "c2.ret_msg1": true,
+       "c1.cond0_limit_after_msg1": "2020-01-02T13:00:00",
+       "c1.cond1_limit_after_msg1": "2020-01-02T12:00:00",
+       "c2.ret_msg2": false,
+       "c1.cond0_limit_after_msg2": "2020-01-02T13:00:00",
+       "c1.cond1_limit_after_msg2": "2020-01-02T12:00:00",
+       "c4.num_true_returns": 1,
+       "c1.cond1_initialized_after_msg1": false,
+       "c1.cond1_initialized_after_msg2": false,
+       "c3.cond1_limit_after_msg1_in_past": null,
+       "c3.cond1_limit_after_msg2_in_past": null
+      },
+      {
+       "c2.ret_msg1": true,
+       "c1.cond0_limit_after_msg1": "2020-01-02T13:00:00",
+       "c1.cond1_limit_after_msg1": "2020-01-02T12:00:00",
+       "c2.ret_msg2": false,
+       "c1.cond0_limit_after_msg2": "2020-01-02T13:00:00",
+       "c1.cond1_limit_after_msg2": "2020-01-02T12:00:00",
+       "c4.num_true_returns": 1,
+       "c1.cond1_initialized_after_msg1": false,
+       "c1.cond1_initialized_after_msg2": false,
+       "c3.cond1_limit_after_msg1_in_past": null,
+       "c3.cond1_limit_after_msg2_in_past": null
+      }
+     ]
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 1,
+     "changed_lines_covered": 1,
+     "adequacy": "adequate"
+    }
+   }
+  ]
+ }
+}
