@@ -176,6 +176,12 @@ def cite_text(c: dict | None, rel) -> str:
     return link(f"{c['file']}:{c['line']}", rel(c["file"])) + f" «{c['quote']}»"
 
 
+def _collection_gap(rec: dict) -> tuple[list[str], str]:
+    """Failed collection files and the limitation sentence. Empty when every changed file collected."""
+    from ops.daily_run import record_collection_gap
+    return record_collection_gap(rec)
+
+
 # ---------------------------------------------------------------- checks and verdict
 def checks(rec: dict) -> list[list]:
     """Evals and guardrails for one PR run: [name, status, detail, how to fix]."""
@@ -289,6 +295,18 @@ def checks(rec: dict) -> list[list]:
     if cur and head and cur != head:
         out.append(["PR unchanged since tested", "WARN", f"tested {head[:12]}, PR now at {cur[:12]}",
                     "Run the check again to test the PR's latest commit."])
+    failed_files, limit_sentence = _collection_gap(rec)
+    if limit_sentence:
+        if len(failed_files) == 1:
+            detail = f"pytest could not collect `{failed_files[0]}`. That changed test file is not a pass."
+        elif failed_files:
+            detail = (f"pytest could not collect {', '.join(f'`{name}`' for name in failed_files)}. "
+                      "Those changed test files are not a pass.")
+        else:
+            detail = limit_sentence
+        out.append(["Changed test file failed to collect", "WARN", detail,
+                    "Keep this beside the already-on-base note when that note is present. "
+                    "The result does not cover a file that failed to collect."])
     rr = rv.replay_row(rv.latest_replay())
     out.append([rr[0], {"all passed": "PASS", "FAILED": "FAIL"}.get(rr[1][2], "SKIP"), rr[2],
                 "Run the known-answer tests again and fix what fails." if rr[1][2] == "FAILED" else ""])
@@ -567,11 +585,19 @@ def build(rec: dict, prdir: Path, out_dir: Path, decision: dict | None = None) -
     bl = rec.get("baseline") or "full"
     R.p(f"Baseline: **{bl}** ({BASELINE_TEXT.get(bl, bl)})" + ("" if rec.get("baseline") else
                                                                ", recorded before baselines existed") + ".", "meta")
+    _failed_files, limit_text = _collection_gap(rec)
     reason = {"VERIFIED": "The PR's tests behave the same or better than on main, in all 3 runs per side.",
               "NEEDS ATTENTION": "The run is trustworthy and found a difference a person should look at.",
               "COULD NOT VERIFY": "The run did not produce a usable comparison, so there is no conclusion about the PR."}[d["verdict"]]
     if d.get("gate"):
         reason = "Not fully verified: the tests ran cleanly, but the changed code never ran under them."
+    elif limit_text and d["verdict"] == "VERIFIED":
+        # The stored verdict stays verified. The banner names the file that was not collected.
+        reason = "The tests that were collected behave the same or better than on the base. " + limit_text
+    if limit_text and limit_text not in reason:
+        reason = f"{reason} {limit_text}"
+    if limit_text and limit_text not in (d.get("why") or ""):
+        d["why"] = f"{d['why']}; {limit_text}" if d.get("why") else limit_text
     R.banner(d["verdict"], d["action"], d["confidence"], reason + " " + d["conf_why"], d["colour"],
              "Advice only: Proof-of-Change never blocks a merge and never posts on GitHub.")
 
@@ -615,6 +641,13 @@ def build(rec: dict, prdir: Path, out_dir: Path, decision: dict | None = None) -
     plugin_note = rec.get("collection_plugin_note")
     if isinstance(plugin_note, str) and plugin_note.strip():
         R.p(plugin_note.strip())
+    # The phrase is also on the reason. Repeating it here keeps it visible when a later gate rewrites the reason.
+    # The collection limitation is the next paragraph, so a file that failed to collect stays beside the note.
+    already = rec.get("already_on_base")
+    if isinstance(already, str) and already.strip():
+        R.p(already.strip())
+    if limit_text:
+        R.p(limit_text)
     from poc import related_reports
     background = rec.get("related_reports") if isinstance(rec.get("related_reports"), dict) else None
     background_text = str((background or {}).get("text") or "").strip()

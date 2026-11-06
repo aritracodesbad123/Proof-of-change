@@ -444,6 +444,20 @@ def test_publish_one_pr_pushes_immediately(tmp_path, monkeypatch):
     assert any(name.endswith(f"/{PR}/record.json") for name in names)
 
 
+def test_the_pdf_writer_clock_is_not_the_internal_schedule(tmp_path):
+    """The generator stamp may use a banned clock time. The same time in the body still fails."""
+    hour, minute = "11", "15"
+    stamp = f"Written 2026-11-06 {hour}:{minute} UTC"
+    label = tmp_path / "REPORT.pdf"
+    assert dr._pdf_still_dirty(f"Verdict: verified\n{stamp}\n", TOKEN, label) is False
+    assert dr._pdf_still_dirty(f"Standup is at {hour}:{minute}\n{stamp}\n", TOKEN, label) is True
+    pdf = tmp_path / "REPORT.pdf"
+    pdf_always.write_pdf(pdf, "Reviewer report widgets-7",
+                         ["Verdict: verified", "Reason: the mapped tests agree"])
+    data, skip = dr._pdf_bytes_for_push(pdf, TOKEN)
+    assert data is not None and skip is None
+
+
 def test_remote_url_and_tree_url_do_not_carry_the_token():
     origin = "https://x-access-token:" + TOKEN + "@github.com/acme/widgets.git"
     url, use_token = dr._remote_for_push(origin)

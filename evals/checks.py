@@ -333,11 +333,15 @@ def derive_verdict(rec: dict, baseline: str | None, pp: dict | None = None) -> s
     (ops/daily_run.ai_probe_gate). So under a baseline with claim probes, 'verified' needs a model-written probe that
     actually executed a changed line; a docs-only or docstring-only change has no such line and cannot be verified.
     pp: probe results already re-judged (rejudge_probes); re-judged here when omitted."""
+    import copy
+
     from ops.daily_run import (
         advisory_gate,
         ai_probe_gate,
+        apply_execution_evidence_filters,
         broad_gate_for,
         broken_probe_gate,
+        cap_for_uncollected_file,
         lower_verdict,
         no_evidence_gate,
         rejudge_probes,
@@ -356,9 +360,14 @@ def derive_verdict(rec: dict, baseline: str | None, pp: dict | None = None) -> s
     if pp is None:
         pp = rejudge_probes(rec.get("probes"), bool(rec.get("product_check")), broad_gate=broad_gate_for(rec))
     cmp = rec.get("comparison")
+    if isinstance(cmp, dict):
+        # The caller's saved comparison stays as it was stored. The filters run on the copy.
+        cmp = copy.deepcopy(cmp)
+        apply_execution_evidence_filters(cmp)
     cnv = None if cmp else (rec.get("reason") or "no comparison")
     v = verdict_for(cmp, cnv, rec.get("exit_check"), rec.get("files"), pp, rec.get("behaviour_claims"), baseline,
                     docstring_only=bool(rec.get("docstring_only")))
+    v = cap_for_uncollected_file(cmp if isinstance(cmp, dict) else None, v[0], v[1])
     base = {k: x for k, x in rec.items() if not k.endswith(("_before_coverage_gate", "_before_ai_probe_gate",
                                                               "_before_broken_probe_gate",
                                                               "_before_no_evidence_gate", "_before_advisory_gate"))}

@@ -5480,19 +5480,62 @@ def _probe_items(probe_results) -> list:
     return [it for it in probe_results.get("items") or [] if isinstance(it, dict)]
 
 
-def cross_run_test_ids(cmp: dict | None, files: dict | None) -> list[str]:
-    """The pull request's new or changed tests that fail on the base and pass on the pull request.
+def _collected_test_files(cmp: dict | None) -> list[str]:
+    """Test modules this run collected from the diff, including ones pytest's default names would skip.
 
-    Those are the ``fixed`` tests (failed on every base run, passed on every pull-request run) that live in a
-    test file the pull request adds or edits. A test that is only ``new_tests_passing`` was absent on the base,
-    so it did not fail there. A test in a file the pull request did not touch is not new or changed. No such
-    test means there is no cross-run."""
+    Empty on a record that did not collect any. An older record has no such list, so its cross-run set stays
+    the default ``test_*.py`` / ``*_test.py`` files."""
+    if not isinstance(cmp, dict):
+        return []
+    out = []
+    for raw in cmp.get("collected_test_files") or []:
+        rel = _clean_rel(str(raw))
+        if _rel_inside(rel) and rel.endswith(".py"):
+            out.append(rel)
+    return out
+
+
+def _shared_execution_ids(cmp: dict) -> set[str]:
+    """Canonical ids of tests both sides already collected.
+
+    A shared id can be in ``fixed`` after the pull-request body is run on the base. That row is ordinary test
+    evidence. It is not, by itself, evidence for a differs claim. Matching uses the same id rewrite as the
+    junit rows (``resolve_test_id``). Claim text and file-name similarity are not read."""
+    info = cmp.get("base_new_tests") if isinstance(cmp.get("base_new_tests"), dict) else None
+    if not info:
+        return set()
+    shared = [str(node) for node in info.get("shared_ids") or [] if str(node).strip()]
+    known = [node.split("::", 1)[0] for node in shared if node.split("::", 1)[0].endswith(".py")]
+    return {resolve_test_id(node, known=known) for node in shared}
+
+
+def cross_run_test_ids(cmp: dict | None, files: dict | None) -> list[str]:
+    """Fixed tests that may settle a differs claim.
+
+    Eligible ids are ``fixed`` rows whose file is a default-named edited test file (``test_*.py`` or
+    ``*_test.py`` in the pull request's changed files). A file that is only in ``collected_test_files``
+    does not qualify, and a shared id does not qualify. Those rows stay in ``fixed`` for the ordinary
+    test verdict. They do not settle a differs claim. No wording or path guess binds a claim to a test."""
     if not isinstance(cmp, dict):
         return []
     edited = sorted({str(f).lstrip("./") for f in (files or {}).get("all") or [] if is_test_file(str(f))})
     if not edited:
         return []
-    return [str(t) for t in (cmp.get("fixed") or []) if _edited_test_file(str(t), edited)]
+    shared = _shared_execution_ids(cmp)
+    known = list(edited)
+    for node in shared:
+        path = node.split("::", 1)[0]
+        if path.endswith(".py") and path not in known:
+            known.append(path)
+    out = []
+    for raw in cmp.get("fixed") or []:
+        tid = str(raw)
+        if not _edited_test_file(tid, edited):
+            continue
+        if resolve_test_id(tid, known=known) in shared:
+            continue
+        out.append(tid)
+    return out
 
 
 def _crash_value(value) -> bool:
@@ -6706,6 +6749,8 @@ def finalize_tests(rec: dict, per_run: list[dict], results: dict, a) -> tuple[di
         where = "both sides" if both else "one side"
         return None, f"tests produced no results on {where} (collection failed; see pytest logs)", None
     cmp = compare_sides(results)
+    _stamp_cross_run(rec, cmp)
+    apply_execution_evidence_filters(cmp)
     ex = exit_check(per_run, results, cmp)
     rec["comparison"], rec["exit_check"] = cmp, ex
     return cmp, None, ex
@@ -7076,8 +7121,24 @@ def _side_tree(side: str, venvs: dict, cwds: dict | None) -> Path | None:
     return root if root.is_dir() else None
 
 
-def _overlay_pr_tests(main_root: Path, pr_root: Path, rels: list[str]) -> list[tuple[Path, bytes | None]]:
-    """Copy the pull request's test files onto the base tree. Returns (path, previous bytes or None) to restore."""
+def _git_head(root: Path) -> str | None:
+    """HEAD of a real checkout, or None when the tree is not a git repository."""
+    try:
+        done = subprocess.run(["git", "-C", str(root), "rev-parse", "HEAD"],
+                              capture_output=True, text=True, timeout=5)
+    except (OSError, subprocess.TimeoutExpired):
+        return None
+    sha = (done.stdout or "").strip().lower()
+    if done.returncode == 0 and re.fullmatch(r"[0-9a-f]{7,40}", sha):
+        return sha
+    return None
+
+
+def _overlay_pr_tests(main_root: Path, pr_root: Path, rels: list[str],
+                      blocked: list | None = None) -> list[tuple[Path, bytes | None]]:
+    """Copy the pull request's test files onto the base tree. Returns (path, previous bytes or None) to restore.
+
+    A parent path that is a file, or any other copy error, is named in ``blocked`` and skipped. It is not a pass."""
     saved = []
     root = main_root.resolve()
     for rel in rels:
@@ -7088,6 +7149,8 @@ def _overlay_pr_tests(main_root: Path, pr_root: Path, rels: list[str]) -> list[t
         try:
             resolved = dest.resolve() if dest.exists() else dest.parent.resolve() / dest.name
         except OSError:
+            if isinstance(blocked, list):
+                blocked.append(rel)
             continue
         if resolved != root and root not in resolved.parents:
             continue
@@ -7095,8 +7158,13 @@ def _overlay_pr_tests(main_root: Path, pr_root: Path, rels: list[str]) -> list[t
         data = src.read_bytes()
         if previous == data:
             continue
-        dest.parent.mkdir(parents=True, exist_ok=True)
-        dest.write_bytes(data)
+        try:
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            dest.write_bytes(data)
+        except OSError:
+            if isinstance(blocked, list):
+                blocked.append(rel)
+            continue
         saved.append((dest, previous))
     return saved
 
@@ -7184,22 +7252,24 @@ def parse_cross_junit(path: Path) -> dict:
 
 def _cross_pytest(side: str, venv: Path, rels: list[str], root: Path, prdir: Path, a, keep: bool,
                   use_contree: bool, files: dict | None, index: int,
-                  plugins_off: list | None = None) -> dict:
+                  plugins_off: list | None = None, nodes: list[str] | None = None) -> dict:
     """One pytest of these files on one side. A start that raises is an empty result, not a pass.
 
     plugins_off is the same list the timed runs use after a collection retry, so the base-side run does not
-    load a plugin that was turned off for the comparison."""
+    load a plugin that was turned off for the comparison. nodes, when set, are the collected node ids to run
+    instead of the whole file. A node id that pytest does not collect is absent from the result, not a pass."""
     stem = _clean_rel(rels[0]).replace("/", "_") if len(rels) == 1 else "all"
     jx = prdir / f"junit-cross-{side}-{index}-{stem}.xml"
     lg = prdir / f"pytest-cross-{side}-{index}-{stem}.log"
+    args = list(nodes) if nodes else list(rels)
     try:
         if use_contree:
-            _contree_pytest_once(side, rels, int(a.test_timeout), int(a.run_timeout), str(a.workers),
+            _contree_pytest_once(side, args, int(a.test_timeout), int(a.run_timeout), str(a.workers),
                                  jx, lg, keep, plugins_off, files=files)
             return parse_cross_junit(jx)
         env = base_env(side_home(venv))
         jin = side_out(venv) / jx.name
-        tg = [str(root / rel) for rel in rels]
+        tg = list(nodes) if nodes else [str(root / rel) for rel in rels]
         _local_pytest_once(venv, tg, int(a.test_timeout), int(a.run_timeout), str(a.workers), jin, lg, keep,
                            root, env, plugins_off)
         jx.unlink(missing_ok=True)
@@ -7287,6 +7357,696 @@ def _cross_files(side: str, venv: Path, rels: list[str], root: Path, prdir: Path
     return merged
 
 
+def _rel_nodeid(nodeid: str, root: Path | None) -> str:
+    """A pytest node id relative to the checkout. An absolute prefix, including the Contree checkout, is dropped."""
+    text = str(nodeid).strip().replace("\\", "/")
+    prefixes = []
+    if root is not None:
+        try:
+            prefixes.append(str(Path(root).resolve()).replace("\\", "/").rstrip("/"))
+        except OSError:
+            prefixes.append(str(root).replace("\\", "/").rstrip("/"))
+    prefixes.append(OWN_CHECKOUT_ROOT.rstrip("/"))
+    for prefix in prefixes:
+        if prefix and text.startswith(prefix + "/"):
+            return text[len(prefix) + 1:]
+    return text
+
+
+def collect_node_ids(text: str, root: Path | None = None) -> list[str]:
+    """Node ids pytest printed for ``--collect-only``.
+
+    A line is a node id when it names a ``.py`` file and a test (``::``). The command line, the summary, and
+    error lines are not node ids. The same id is kept once, in the order pytest printed it. Nothing here names
+    a repository, a class, or a decorator.
+    """
+    found, seen = [], set()
+    for raw in (text or "").splitlines():
+        line = raw.strip()
+        if not line or line.startswith(("$", "=", "ERROR", "FAILED", "PASSED", "SKIPPED", "WARNING", "E ", "!")):
+            continue
+        if ".py::" not in line.replace("\\", "/"):
+            continue
+        node = _rel_nodeid(line, root)
+        if node not in seen:
+            seen.add(node)
+            found.append(node)
+    return found
+
+
+def _collection_succeeded(rc) -> bool:
+    """True when pytest collected (including collecting nothing). A crash, a usage error, or a timeout did not."""
+    return rc in (0, 5)
+
+
+def _candidate_test_files(files: dict | None, checkout: Path) -> list[str]:
+    """Changed Python files that are not already default test names, which collection may still treat as tests.
+
+    Default ``test_*.py`` and ``*_test.py`` files are run as whole files by the existing cross-run. Everything
+    else here is a changed ``.py`` that the project's python_files would collect, or any changed ``.py`` inside
+    a test directory that is not a helper, conftest, or package init. Collection output, not the file name,
+    decides whether it has tests."""
+    patterns = python_file_patterns(checkout)
+    default = set(changed_test_files(files))
+    out = []
+    for raw in (files or {}).get("all") or []:
+        rel = _clean_rel(raw)
+        if not _rel_inside(rel) or not rel.endswith(".py") or rel in default:
+            continue
+        name = rel.rsplit("/", 1)[-1]
+        if name in {"conftest.py", "__init__.py"} or _is_test_support(rel):
+            continue
+        if _is_mapped_test(rel, patterns, checkout):
+            out.append(rel)
+            continue
+        if any(part in _TEST_DIR_NAMES for part in PurePosixPath(rel).parts[:-1]):
+            out.append(rel)
+    return sorted(set(out))
+
+
+def _contree_collect(side: str, rels: list[str], run_timeout: int, log: Path, keep: bool,
+                     plugins_off: list | None, files: dict | None) -> tuple[int | str, str]:
+    """``pytest --collect-only`` in one disposable Contree sandbox. The log text is what was collected."""
+    from poc import contree_sandboxes
+    sess = contree_sandboxes.session()
+    assert sess is not None
+    tg = " ".join(shlex.quote(t) for t in rels)
+    off = plugin_off_shell(plugins_off)
+    py = venv_python(contree=True)
+    shell = (
+        "set +e\ncd /work/src\n"
+        f"{py} -m pytest {tg} -p no:cacheprovider {off}--collect-only -q "
+        f"{repo_addopts_flag(keep)}>/tmp/poc-collect.log 2>&1\n"
+        "ec=$?\n"
+        "printf '___POC_EXIT___%s\\n' \"$ec\"\n"
+        "printf '___POC_LOG___\\n'\ncat /tmp/poc-collect.log 2>/dev/null\n"
+    )
+    op = {"disposable": True, "timeout": run_timeout}
+    if files:
+        op["files"] = files
+    raw = sess.run_op(side, shell, **op)
+    out = (raw.get("stdout") or "") + "\n" + (raw.get("stderr") or "")
+    exit_m = re.search(r"___POC_EXIT___(\S+)", out)
+    body = out.split("___POC_LOG___\n", 1)[-1] if "___POC_LOG___" in out else out
+    try:
+        log.write_text(body)
+    except OSError:
+        pass
+    if exit_m is None:
+        rc: int | str = raw.get("exit_code") if raw.get("exit_code") is not None else "error"
+    else:
+        try:
+            rc = int(exit_m.group(1))
+        except ValueError:
+            rc = exit_m.group(1)
+    return rc, body
+
+
+def _collect_file(side: str, venv: Path, root: Path, rel: str, prdir: Path, a, keep: bool,
+                  use_contree: bool, plugins_off: list | None, files: dict | None) -> tuple[list[str], int | str]:
+    """Collect one file. Returns (node ids, exit). An empty id list with a failed exit is not a pass."""
+    stem = _clean_rel(rel).replace("/", "_")
+    log = prdir / f"collect-cross-{side}-{stem}.log"
+    if use_contree:
+        rc, text = _contree_collect(side, [rel], int(a.run_timeout), log, keep, plugins_off, files)
+    else:
+        env = base_env(side_home(venv))
+        cmd = [venv_python(venv), "-m", "pytest", rel, "-p", "no:cacheprovider",
+               *plugin_off_args(plugins_off), "--collect-only", "-q", *repo_addopts_args(keep)]
+        rc, _secs = run(cmd, log, cwd=root, env=env, timeout=int(a.run_timeout), sbx=side_sandbox(venv))
+        try:
+            text = log.read_text(errors="replace")
+        except OSError:
+            text = ""
+    return collect_node_ids(text, root), rc
+
+
+def _canon_test_id(test_id: str, root: Path | None, known: list[str]) -> str:
+    return resolve_test_id(str(test_id), root=root, known=known)
+
+
+def _by_canon(run: dict, root: Path | None, known: list[str]) -> dict[str, tuple]:
+    """Map a collected node id onto the junit row that names the same test."""
+    out = {}
+    for tid, row in (run or {}).items():
+        out[_canon_test_id(tid, root, known)] = (tid, row)
+    return out
+
+
+def _new_ids_for(files: dict | None, main_root: Path, pr_root: Path, venvs: dict, prdir: Path, a,
+                 keep: bool, use_contree: bool, plugins_off) -> tuple[dict[str, list[str]], dict]:
+    """{file: node ids present on the PR and absent on the base}, plus the collection evidence.
+
+    The base is collected as it is, before any pull-request test file is copied over. A file whose collection
+    fails is recorded and contributes no ids, so a missing collection is not a passing test."""
+    evidence = {"ids": [], "passed_on_base": [], "failed_on_base": [], "not_collected": [],
+                "collection_failed": [], "discovery_empty": [], "shared_ids": [], "not_executed": [],
+                "reproduced": False}
+    found: dict[str, list[str]] = {}
+    for rel in _candidate_test_files(files, pr_root):
+        if not (pr_root / rel).is_file():
+            continue
+        pr_ids, pr_rc = _collect_file("pr", venvs["pr"], pr_root, rel, prdir, a, keep, use_contree,
+                                      plugins_off, None)
+        if not _collection_succeeded(pr_rc):
+            evidence["collection_failed"].append(rel)
+            continue
+        if not pr_ids:
+            # Collection ran and printed no tests. That is an abstention, not a pass and not a silent skip.
+            evidence["discovery_empty"].append(rel)
+            continue
+        if (main_root / rel).is_file():
+            base_ids, base_rc = _collect_file("main", venvs["main"], main_root, rel, prdir, a, keep,
+                                              use_contree, plugins_off, None)
+            if not _collection_succeeded(base_rc):
+                evidence["collection_failed"].append(rel)
+                continue
+            if not base_ids:
+                # The file exists and the base collection saw nothing. Those pull-request ids are not known
+                # to be new, so they are not run and not recorded as fixed or as new passes.
+                evidence["discovery_empty"].append(rel)
+                continue
+        else:
+            base_ids = []
+        base_set = set(base_ids)
+        evidence["shared_ids"].extend(node for node in pr_ids if node in base_set)
+        new = [node for node in pr_ids if node not in base_set]
+        if new:
+            found[rel] = new
+    evidence["ids"] = sorted({node for nodes in found.values() for node in nodes})
+    return found, evidence
+
+
+def _run_node_ids(side: str, venv: Path, root: Path, discovered: dict[str, list[str]], prdir: Path, a,
+                  keep: bool, use_contree: bool, plugins_off, uploaded: dict | None, index: int) -> dict:
+    """Run the collected new node ids, one file at a time. A file that fails to collect does not hide another."""
+    merged: dict = {}
+    for rel, nodes in discovered.items():
+        chosen = None
+        if uploaded:
+            key = f"{OWN_CHECKOUT_ROOT}/{_clean_rel(rel)}"
+            if key in uploaded:
+                chosen = {key: uploaded[key]}
+        merged.update(_cross_pytest(side, venv, [rel], root, prdir, a, keep, use_contree, chosen, index,
+                                    plugins_off, nodes=nodes))
+    return merged
+
+
+def _classify_new_on_base(evidence: dict, discovered: dict[str, list[str]], base_runs: list, pr_runs: list,
+                          root: Path, results: dict, prdir: Path) -> None:
+    """Record which new tests passed, failed, or were not collected on the base.
+
+    A pass is written into the base results only when every base run collected that test and passed it, and
+    every pull-request run passed it too. A test that was not collected is left absent. It is not a pass, and
+    it is not evidence that a reported failure is gone. A failure is left for the cross-run fold, which already
+    ran, and is marked reproduced."""
+    known = list(discovered)
+    wanted = set(evidence.get("ids") or [])
+    blocked = set(evidence.get("not_executed") or [])
+    passed, failed, missing = [], [], []
+    for node in sorted(wanted):
+        if node in blocked:
+            missing.append(node)
+            continue
+        base_rows = [_by_canon(run, root, known).get(node) for run in base_runs]
+        pr_rows = [_by_canon(run, root, known).get(node) for run in pr_runs]
+        if any(row is None for row in base_rows) or not base_rows:
+            missing.append(node)
+            continue
+        outcomes = [row[1][0] for row in base_rows]
+        pr_outcomes = [row[1][0] for row in pr_rows] if pr_rows and all(row is not None for row in pr_rows) else []
+        if any(outcome in ("failed", "error", "load_error") for outcome in outcomes):
+            failed.append(node)
+            continue
+        if outcomes and all(outcome == "passed" for outcome in outcomes) and pr_outcomes and all(
+                outcome == "passed" for outcome in pr_outcomes):
+            passed.append(node)
+            for i, row in enumerate(base_rows):
+                original = row[0]
+                if i < len(results.get("main") or []):
+                    results["main"][i][original] = ("passed", "")
+                    _splice_junit(prdir / f"junit-main-{i + 1}.xml", original, "passed", "")
+            continue
+        # Skipped, or no pull-request pass to pair with. Not a reproduced failure and not a pass.
+        missing.append(node)
+    evidence["passed_on_base"] = passed
+    evidence["failed_on_base"] = failed
+    evidence["not_collected"] = missing
+    evidence["reproduced"] = bool(failed) or bool(evidence.get("reproduced"))
+
+
+def _pr_runs_cover(runs: list, nodes: list[str], root: Path, known: list[str]) -> bool:
+    """True when every run already has every new node id (the normal test run collected them)."""
+    if not runs or not nodes:
+        return False
+    wanted = set(nodes)
+    for run in runs:
+        got = set(_by_canon(run, root, known))
+        if not wanted <= got:
+            return False
+    return True
+
+
+_FIXTURE_MISSING = re.compile(r"fixture ['\"]([^'\"]+)['\"] not found", re.I)
+
+
+def _environment_gap(outcome: str, note: str, body: str) -> str | None:
+    """A base error that is not evidence the pull request fixed a behavior.
+
+    Import and fixture-setup failures are named. A TypeError or ValueError in the test is not this case:
+    that can be the behavior the new test shows. None means the row may still be a real failure."""
+    if outcome not in ("failed", "error", "load_error"):
+        return None
+    text = f"{note}\n{body or ''}"
+    typ = (note or "").split(":", 1)[0].strip()
+    if outcome == "load_error" or typ in ("ImportError", "ModuleNotFoundError"):
+        missing = ""
+        match = re.search(r"No module named ['\"]([^'\"]+)['\"]", text)
+        if not match:
+            match = re.search(r"cannot import name ['\"]([^'\"]+)['\"]", text)
+        if match:
+            missing = match.group(1)
+        return f"base could not import {missing}" if missing else "base import failed"
+    found = _FIXTURE_MISSING.search(text)
+    if found or "FixtureLookupError" in text:
+        name = found.group(1) if found else "fixture"
+        return f"base fixture '{name}' was not found"
+    return None
+
+
+def _write_base_row(results: dict, prdir: Path, tid: str, outcome: str, note: str, index: int) -> None:
+    if str(tid).startswith("::") or index >= len(results.get("main") or []):
+        return
+    results["main"][index][tid] = (outcome, note)
+    _splice_junit(prdir / f"junit-main-{index + 1}.xml", tid, outcome, note)
+
+
+def _settle_ran_nodes(evidence: dict, nodes: list[str], base_runs: list, pr_runs: list, results: dict,
+                      prdir: Path, files: dict | None, root: Path) -> None:
+    """Apply base junit rows for ids we actually ran.
+
+    An assertion failure that passes on the pull request is written into the base results (it can be fixed).
+    An import or a missing fixture is named and is not a pass and not proof. A skip is not a pass. A shared
+    id that passed is written so the ordinary comparison does not call it new."""
+    known = sorted({str(node).split("::", 1)[0] for node in nodes})
+    not_exec = evidence.setdefault("not_executed", [])
+    notes = evidence.setdefault("environment_limits", [])
+    for node in nodes:
+        base_rows = [_by_canon(run, root, known).get(node) for run in base_runs]
+        pr_rows = [_by_canon(run, root, known).get(node) for run in pr_runs]
+        if any(row is None for row in base_rows) or not base_rows:
+            if node not in not_exec:
+                not_exec.append(node)
+            continue
+        parts = [_row_parts(row[1]) for row in base_rows]
+        pr_parts = [_row_parts(row[1]) for row in pr_rows] if pr_rows and all(row is not None for row in pr_rows) else []
+        if any(part is None for part in parts):
+            if node not in not_exec:
+                not_exec.append(node)
+            continue
+        gap = next((reason for part in parts if (reason := _environment_gap(part[0], part[1], part[2]))), None)
+        if gap:
+            if node not in not_exec:
+                not_exec.append(node)
+            line = f"{node}: {gap}"
+            if line not in notes:
+                notes.append(line)
+            continue
+        if any(part[0] == "skipped" for part in parts) or any(part and part[0] == "skipped" for part in pr_parts):
+            for index, row in enumerate(base_rows):
+                _write_base_row(results, prdir, row[0], "skipped", parts[index][1], index)
+            continue
+        if all(part[0] in ("failed", "error", "load_error") for part in parts):
+            proof = all(part[0] == "failed" or _base_failure_counts(part[0], part[1], part[2], files) for part in parts)
+            if proof and pr_parts and all(part and part[0] == "passed" for part in pr_parts):
+                for index, row in enumerate(base_rows):
+                    _write_base_row(results, prdir, row[0], parts[index][0], parts[index][1], index)
+                if node not in evidence["failed_on_base"]:
+                    evidence["failed_on_base"].append(node)
+                evidence["reproduced"] = True
+                continue
+            if node not in not_exec:
+                not_exec.append(node)
+            if any(part[0] == "error" for part in parts):
+                line = f"{node}: base error was not an assertion ({parts[0][1][:120]})"
+                if line not in notes:
+                    notes.append(line)
+            continue
+        if (all(part[0] == "passed" for part in parts) and pr_parts
+                and all(part and part[0] == "passed" for part in pr_parts)):
+            for index, row in enumerate(base_rows):
+                _write_base_row(results, prdir, row[0], "passed", "", index)
+            if node in set(evidence.get("ids") or []) and node not in evidence["passed_on_base"]:
+                evidence["passed_on_base"].append(node)
+
+
+def _ids_to_run(discovered: dict[str, list[str]], evidence: dict) -> dict[str, list[str]]:
+    """New ids plus shared ids in changed non-default files. An empty base collection stays out."""
+    blocked = set(evidence.get("collection_failed") or []) | set(evidence.get("discovery_empty") or [])
+    out = {rel: list(nodes) for rel, nodes in discovered.items() if rel not in blocked}
+    for node in evidence.get("shared_ids") or []:
+        rel = str(node).split("::", 1)[0]
+        if rel in blocked:
+            continue
+        bucket = out.setdefault(rel, [])
+        if node not in bucket:
+            bucket.append(node)
+    return out
+
+
+def _run_discovered_new_tests(rec: dict, venvs: dict, prdir: Path, a, results: dict, main_root: Path,
+                              pr_root: Path, use_contree: bool, keep: bool, plugins_off) -> None:
+    """Collect tests the default file names miss, and run new and shared ids on the base.
+
+    The ids come from pytest's own collection on each side, not from a class or decorator name. Copying
+    the pull-request test file onto the base happens after that collection. A shared id is one both sides
+    collected: the pull-request body is what runs on the base, so a strengthened assertion can fail there.
+    The copy is removed before this returns."""
+    files = rec.get("files") if isinstance(rec, dict) else None
+    if not _candidate_test_files(files, pr_root):
+        return
+    discovered, evidence = _new_ids_for(files, main_root, pr_root, venvs, prdir, a, keep, use_contree, plugins_off)
+    rec["base_new_tests"] = evidence
+    to_run = _ids_to_run(discovered, evidence)
+    if not to_run:
+        return
+    rec["cross_run_collected_files"] = sorted(to_run)
+    saved: list = []
+    try:
+        uploaded = _contree_test_files(pr_root, list(to_run)) if use_contree else None
+        blocked: list[str] = []
+        if not use_contree:
+            saved = _overlay_pr_tests(main_root, pr_root, list(to_run), blocked)
+            for rel in blocked:
+                if rel not in evidence["collection_failed"]:
+                    evidence["collection_failed"].append(rel)
+            if blocked:
+                to_run = {rel: nodes for rel, nodes in to_run.items() if rel not in blocked}
+                if not to_run:
+                    return
+        n = len(results["main"])
+        base_runs = [_run_node_ids("main", venvs["main"], main_root, to_run, prdir, a, keep, use_contree,
+                                   plugins_off, uploaded, i + 1) for i in range(n)]
+        known = list(to_run)
+        wanted = [node for nodes in to_run.values() for node in nodes]
+        pr_extra = None
+        if not _pr_runs_cover(results["pr"], wanted, pr_root, known):
+            pr_extra = [_run_node_ids("pr", venvs["pr"], pr_root, to_run, prdir, a, keep, use_contree,
+                                      plugins_off, None, i + 1) for i in range(n)]
+        pr_rows = pr_extra if pr_extra is not None else results["pr"]
+        _settle_ran_nodes(evidence, wanted, base_runs, pr_rows, results, prdir, files, main_root)
+        _fold_cross_run(results, base_runs, pr_extra, list(to_run), prdir, files)
+        _classify_new_on_base(evidence, discovered, base_runs, pr_rows, main_root, results, prdir)
+    finally:
+        _restore_overlay(saved)
+
+
+def already_on_base_message(cmp: dict | None, base_ref: str | None = None,
+                            tested_sha: str | None = None) -> str | None:
+    """The plain note when the pull request's new tests already pass on the base and the failure is not reproduced.
+
+    It is None unless every new test collected from the diff was collected again on the base and passed there,
+    and none of those tests failed. One unrelated passing test is not enough. A test that was not collected is
+    not a pass. A different file that failed to collect is not read here, so it does not block the note.
+    The branch name is the recorded base ref (``master``, ``2.2``), not a hardcoded main. When the run recorded
+    the commit it actually tested, that sha is part of the sentence. The branch name alone is not evidence.
+    The verdict is not read or changed here."""
+    info = cmp.get("base_new_tests") if isinstance(cmp, dict) else None
+    if not isinstance(info, dict):
+        return None
+    ids = [str(node) for node in info.get("ids") or []]
+    if not ids or info.get("reproduced"):
+        return None
+    missing = [str(node) for node in info.get("not_collected") or []]
+    failed = [str(node) for node in info.get("failed_on_base") or []]
+    passed = [str(node) for node in info.get("passed_on_base") or []]
+    if missing or failed or set(passed) != set(ids):
+        return None
+    ref = str(base_ref or "").strip() or "main"
+    sentence = "fix appears already present on main" if ref == "main" else f"fix appears already present on {ref}"
+    sha = str(tested_sha or "").strip().lower()
+    if re.fullmatch(r"[0-9a-f]{7,40}", sha):
+        return f"{sentence} at {sha[:12]}"
+    return sentence
+
+
+def _evidence_dict(source: dict | None) -> dict:
+    if not isinstance(source, dict):
+        return {}
+    info = source.get("base_new_tests") if isinstance(source.get("base_new_tests"), dict) else source
+    return info if isinstance(info, dict) else {}
+
+
+def _path_list(source: dict | None, key: str) -> list[str]:
+    out: list[str] = []
+    for rel in _evidence_dict(source).get(key) or []:
+        text = str(rel).strip()
+        if text and text not in out:
+            out.append(text)
+    return out
+
+
+def collection_failed_paths(source: dict | None) -> list[str]:
+    """Changed test files whose collection failed, in the order they were recorded, without duplicates.
+
+    ``source`` may be the comparison (it holds ``base_new_tests``) or the ``base_new_tests`` evidence itself.
+    A file named here contributed no node ids. It is not a pass."""
+    return _path_list(source, "collection_failed")
+
+
+def discovery_empty_paths(source: dict | None) -> list[str]:
+    """Changed test files pytest collected with no tests. An explicit abstention, not a pass."""
+    return _path_list(source, "discovery_empty")
+
+
+def not_executed_files(source: dict | None) -> list[str]:
+    """Files of shared tests the base collected but did not execute. Not a new pass."""
+    out: list[str] = []
+    for node in _evidence_dict(source).get("not_executed") or []:
+        path = str(node).split("::", 1)[0].replace("\\", "/").strip()
+        if path and path not in out:
+            out.append(path)
+    return out
+
+
+def unchecked_changed_files(source: dict | None) -> list[str]:
+    """Collection failures, empty collections, then shared tests the base did not run."""
+    out = collection_failed_paths(source)
+    for rel in discovery_empty_paths(source) + not_executed_files(source):
+        if rel not in out:
+            out.append(rel)
+    return out
+
+
+def _gap_sentence(files: list[str], empty: bool) -> str:
+    shown = ", ".join(files)
+    if empty:
+        if len(files) == 1:
+            return (f"Limitation: pytest collected no tests from {shown}. "
+                    "That changed test file is not a pass, and this result does not cover it.")
+        return (f"Limitation: pytest collected no tests from {shown}. "
+                "Those changed test files are not a pass, and this result does not cover them.")
+    if len(files) == 1:
+        return (f"Limitation: pytest could not collect {shown}. "
+                "That changed test file is not a pass, and this result does not cover it.")
+    return (f"Limitation: pytest could not collect {shown}. "
+            "Those changed test files are not a pass, and this result does not cover them.")
+
+
+def collection_limitation_message(source: dict | None) -> str | None:
+    """Plain limitation naming files pytest could not collect, or collected with no tests.
+
+    The sentence lists those files and nothing else. It does not remove the already-on-base note and it
+    does not decide the verdict. A file named here is not a pass, and the result does not cover it."""
+    failed = collection_failed_paths(source)
+    empty = [rel for rel in discovery_empty_paths(source) if rel not in failed]
+    missed = [str(node) for node in _evidence_dict(source).get("not_executed") or [] if str(node).strip()]
+    parts = [sentence for sentence in (_gap_sentence(failed, False) if failed else "",
+                                       _gap_sentence(empty, True) if empty else "") if sentence]
+    if missed:
+        shown = ", ".join(missed[:8])
+        more = f" (+{len(missed) - 8} more)" if len(missed) > 8 else ""
+        parts.append(f"Limitation: {shown}{more} did not run on the base. "
+                     "They are not a new pass, and this result does not cover them.")
+    extras = [str(item).strip() for item in _evidence_dict(source).get("environment_limits") or [] if str(item).strip()]
+    if extras:
+        parts.append("Limitation: " + "; ".join(extras[:6]) + ".")
+    return " ".join(parts) or None
+
+
+def _id_in_files(test_id: str, files: set[str]) -> bool:
+    path = str(test_id).split("::", 1)[0].replace("\\", "/")
+    if path in files:
+        return True
+    resolved = resolve_test_id(str(test_id), known=sorted(files)).split("::", 1)[0]
+    return resolved in files
+
+
+def apply_execution_evidence_filters(cmp: dict) -> None:
+    """The live evidence filters, in live order.
+
+    ``finalize_tests`` calls this after ``_stamp_cross_run``. ``rejudge`` calls it after restoring those
+    stamps from the saved comparison. ``derive_verdict`` calls it on a copy of the saved comparison.
+    All three run it before ``verdict_for``. The saved record's own objects are not replaced here."""
+    if not isinstance(cmp, dict):
+        return
+    _drop_unexecuted_shared(cmp)
+    _drop_gap_new_passes(cmp)
+    _drop_environment_fixed(cmp)
+
+
+def _drop_unexecuted_shared(cmp: dict) -> None:
+    """A test both sides collected is not a new pass when the base run has no row for it.
+
+    Passed, failed, and skipped rows are real executions. A skip is not a pass. ``fixed`` is not edited.
+    The id is listed on ``not_executed`` so the verified cap names the file instead of dropping the pass quietly."""
+    if not isinstance(cmp, dict):
+        return
+    info = _evidence_dict(cmp.get("base_new_tests") if isinstance(cmp.get("base_new_tests"), dict) else None)
+    if not info and isinstance(cmp.get("base_new_tests"), dict):
+        info = cmp["base_new_tests"]
+    shared = [str(node) for node in (info.get("shared_ids") or [])]
+    if not shared:
+        return
+    known = [node.split("::", 1)[0] for node in shared if node.split("::", 1)[0].endswith(".py")]
+    def canon(tid: str) -> str:
+        return resolve_test_id(str(tid), known=known)
+    by_canon = {canon(node): node for node in shared}
+    not_exec = [str(node) for node in info.get("not_executed") or []]
+    kept = []
+    for tid in cmp.get("new_tests_passing_ids") or []:
+        original = by_canon.get(canon(tid))
+        if original is not None:
+            if original not in not_exec:
+                not_exec.append(original)
+            continue
+        kept.append(tid)
+    cmp["new_tests_passing_ids"] = kept
+    cmp["new_tests_passing"] = len(kept)
+    info["not_executed"] = not_exec
+
+
+def _drop_environment_fixed(cmp: dict) -> None:
+    """A base ImportError or missing fixture is not a fix, even when the ordinary run recorded it.
+
+    The pull-request pass stays out of ``fixed`` and out of ``new_tests_passing``. The missing name is
+    kept on the collection evidence so a verified result becomes could not verify."""
+    if not isinstance(cmp, dict):
+        return
+    info = cmp.get("base_new_tests")
+    if not isinstance(info, dict):
+        return
+    notes = info.setdefault("environment_limits", [])
+    not_exec = info.setdefault("not_executed", [])
+    messages = cmp.get("base_messages") or {}
+    kept = []
+    for tid in cmp.get("fixed") or []:
+        msg = str(messages.get(tid) or "")
+        gap = _environment_gap("failed", msg, msg)
+        if gap:
+            if str(tid) not in not_exec:
+                not_exec.append(str(tid))
+            line = f"{tid}: {gap}"
+            if line not in notes:
+                notes.append(line)
+            continue
+        kept.append(tid)
+    cmp["fixed"] = kept
+
+
+def _drop_gap_new_passes(cmp: dict) -> None:
+    """A test in a file that was not collected is not a new passing test.
+
+    ``fixed`` is left as it is. Only ids that were absent on the base and passed on the pull request,
+    and that live in an uncollected file, are removed."""
+    if not isinstance(cmp, dict):
+        return
+    gaps = set(unchecked_changed_files(cmp))
+    if not gaps:
+        return
+    ids = [t for t in cmp.get("new_tests_passing_ids") or [] if not _id_in_files(t, gaps)]
+    cmp["new_tests_passing_ids"] = ids
+    cmp["new_tests_passing"] = len(ids)
+
+
+def record_collection_gap(rec: dict | None) -> tuple[list[str], str]:
+    """Unchecked changed files and the limitation sentence for a record. Both empty when there is no gap."""
+    if not isinstance(rec, dict):
+        return [], ""
+    source = None
+    for candidate in (rec.get("comparison"), rec.get("base_new_tests")):
+        if unchecked_changed_files(candidate if isinstance(candidate, dict) else None):
+            source = candidate
+            break
+    files = unchecked_changed_files(source)
+    sentence = collection_limitation_message(source) if source is not None else ""
+    stored = rec.get("collection_limitation")
+    if not sentence and isinstance(stored, str) and stored.strip():
+        sentence = stored.strip()
+    return files, sentence
+
+
+def _drop_trailing_note(reason: str, previous) -> str:
+    """Remove a note this run appended earlier, so a second pass does not repeat it."""
+    if not isinstance(previous, str) or not previous:
+        return reason
+    suffix = f"; {previous}"
+    if reason.endswith(suffix):
+        return reason[:-len(suffix)]
+    if reason == previous:
+        return ""
+    return reason
+
+
+def _attach_already_on_base(rec: dict, cmp: dict | None) -> None:
+    """Put the already-on-base note and any collection limitation on the record. The verdict is left as it is.
+
+    The note is appended first. When a changed file failed to collect, the limitation is appended after the
+    note and stored on ``collection_limitation``. That failure does not remove the note. Calling this again
+    replaces the previous note and limitation instead of repeating them."""
+    if not isinstance(rec, dict):
+        return
+    pr = rec.get("pr") if isinstance(rec.get("pr"), dict) else {}
+    tested = pr.get("tested_main_sha") or rec.get("tested_main_sha")
+    actual = str(rec.get("base_head_sha") or "").strip().lower()
+    stated = str(tested or "").strip().lower()
+    if actual and stated and not (actual.startswith(stated) or stated.startswith(actual)):
+        # The record names a commit the base checkout is not on. Do not attach that sha as evidence.
+        tested = None
+        suppress_note = True
+    else:
+        suppress_note = False
+        if actual and not stated:
+            tested = actual
+    note = None if suppress_note else already_on_base_message(cmp, rec.get("base_ref"), tested)
+    limit = collection_limitation_message(cmp)
+    previous_note = rec.get("already_on_base")
+    previous_limit = rec.get("collection_limitation")
+    reason = _drop_trailing_note(str(rec.get("reason") or ""), previous_limit)
+    reason = _drop_trailing_note(reason, previous_note)
+    parts = [part for part in (reason, note, limit) if part]
+    if note:
+        rec["already_on_base"] = note
+    else:
+        rec.pop("already_on_base", None)
+    if limit:
+        rec["collection_limitation"] = limit
+    else:
+        rec.pop("collection_limitation", None)
+    if note or limit or previous_note or previous_limit:
+        rec["reason"] = "; ".join(parts)
+
+
+def _stamp_cross_run(rec: dict, cmp: dict) -> None:
+    """Copy the collection evidence onto the comparison the verdict reads."""
+    files = rec.get("cross_run_collected_files") if isinstance(rec, dict) else None
+    if files:
+        cmp["collected_test_files"] = list(files)
+    info = rec.get("base_new_tests") if isinstance(rec, dict) else None
+    if isinstance(info, dict):
+        cmp["base_new_tests"] = info
+
+
 def record_cross_run(rec: dict, venvs: dict, targets: dict | None, prdir: Path, a, results: dict,
                      cwds: dict | None = None) -> dict:
     """Run the pull request's added or edited test files and store the outcomes the cross-run rule reads.
@@ -7309,33 +8069,52 @@ def record_cross_run(rec: dict, venvs: dict, targets: dict | None, prdir: Path, 
     main_root, pr_root = _side_tree("main", venvs, cwds), _side_tree("pr", venvs, cwds)
     if main_root is None or pr_root is None:
         return results
+    if isinstance(rec, dict):
+        head = _git_head(main_root)
+        if head:
+            rec["base_head_sha"] = head
     rels = [rel for rel in changed_test_files(rec.get("files") if isinstance(rec, dict) else None)
             if (pr_root / rel).is_file()]
-    if not rels:
+    file_info = rec.get("files") if isinstance(rec, dict) else None
+    if not rels and not _candidate_test_files(file_info, pr_root):
         return results
     from poc import run_progress
     run_progress.emit("pytest", "code", "PR tests against the base tree")
     use_contree = _contree_ready() and cwds is not None
     keep = product_route(a)
     plugins_off = rec.get("pytest_plugins_off") if isinstance(rec, dict) else None
-    saved: list = []
-    try:
-        if not use_contree:
-            saved = _overlay_pr_tests(main_root, pr_root, rels)
-        uploaded = _contree_test_files(pr_root, rels) if use_contree else None
-        # One file per pytest start. A collection error in one file stops that start, and must not hide
-        # a real failure in another file.
-        base_runs = [_cross_files("main", venvs["main"], rels, main_root, prdir, a, keep, use_contree,
-                                  uploaded, i + 1, plugins_off) for i in range(len(main_runs))]
-        extra = [rel for rel in rels if not _target_covers(rel, (targets or {}).get("pr"))]
-        pr_extra = None
-        if extra:
-            pr_extra = [_cross_files("pr", venvs["pr"], extra, pr_root, prdir, a, keep, use_contree,
-                                     None, i + 1, plugins_off) for i in range(len(pr_runs))]
-        _fold_cross_run(results, base_runs, pr_extra, rels, prdir,
-                        rec.get("files") if isinstance(rec, dict) else None)
-    finally:
-        _restore_overlay(saved)
+    blocked_copy: list[str] = []
+    if rels:
+        saved: list = []
+        try:
+            if not use_contree:
+                saved = _overlay_pr_tests(main_root, pr_root, rels, blocked_copy)
+                rels = [rel for rel in rels if rel not in blocked_copy]
+            uploaded = _contree_test_files(pr_root, rels) if use_contree else None
+            # One file per pytest start. A collection error in one file stops that start, and must not hide
+            # a real failure in another file.
+            base_runs = [_cross_files("main", venvs["main"], rels, main_root, prdir, a, keep, use_contree,
+                                      uploaded, i + 1, plugins_off) for i in range(len(main_runs))]
+            extra = [rel for rel in rels if not _target_covers(rel, (targets or {}).get("pr"))]
+            pr_extra = None
+            if extra:
+                pr_extra = [_cross_files("pr", venvs["pr"], extra, pr_root, prdir, a, keep, use_contree,
+                                         None, i + 1, plugins_off) for i in range(len(pr_runs))]
+            _fold_cross_run(results, base_runs, pr_extra, rels, prdir, file_info)
+        finally:
+            _restore_overlay(saved)
+    if isinstance(rec, dict):
+        _run_discovered_new_tests(rec, venvs, prdir, a, results, main_root, pr_root, use_contree, keep,
+                                  plugins_off)
+        if blocked_copy:
+            info = rec.setdefault("base_new_tests", {"ids": [], "passed_on_base": [], "failed_on_base": [],
+                                                     "not_collected": [], "collection_failed": [],
+                                                     "discovery_empty": [], "shared_ids": [], "not_executed": [],
+                                                     "reproduced": False})
+            failed = info.setdefault("collection_failed", [])
+            for rel in blocked_copy:
+                if rel not in failed:
+                    failed.append(rel)
     return results
 
 
@@ -8230,6 +9009,23 @@ def cap_for_review(rec: dict, v: str, reason: str) -> tuple[str, str]:
     return v, reason
 
 
+def cap_for_uncollected_file(cmp: dict | None, v: str, reason: str) -> tuple[str, str]:
+    """Lower only a verified result when a selected changed test file was not collected.
+
+    ``verdict_for`` does not read that list, so a passing comparison, including one that also has tests
+    fixed on the pull request, stays verified until this cap. A needs-attention result is returned unchanged.
+    The fixed list is not edited. The already-on-base note, when it applies, is attached afterwards."""
+    if v != Verdict.VERIFIED.value or not isinstance(cmp, dict):
+        return v, reason
+    files = unchecked_changed_files(cmp)
+    if not files:
+        return v, reason
+    shown = ", ".join(files)
+    noun = "file" if len(files) == 1 else "files"
+    return (Verdict.COULD_NOT_VERIFY.value,
+            f"could not verify: pytest did not run {shown} on the base, so that changed test {noun} is not a pass ({reason})")
+
+
 def _store_verdict(rec: dict, cmp, cnv, ex) -> None:
     """Write the verdict. A docstring-only change marks each behaviour claim as holding by construction."""
     same = bool(rec.get("product_check")) and sides_identical(rec)
@@ -8243,9 +9039,12 @@ def _store_verdict(rec: dict, cmp, cnv, ex) -> None:
         v = Verdict.NEEDS_ATTENTION.value
         reason = (f"needs attention: main installed with the same setup, but the PR side failed to build on both "
                   f"tries: {own.get('error') or own.get('why')}")[:400]
+    # After the build-failure promotion, so a needs-attention result is never lowered for a collection gap.
+    v, reason = cap_for_uncollected_file(cmp if isinstance(cmp, dict) else None, v, reason)
     rec["verdict"], rec["reason"] = v, reason
     if rec.get("docstring_only") and v == Verdict.VERIFIED.value:
         rec["behaviour_claims"] = mark_holds_by_construction(rec.get("behaviour_claims"))
+    _attach_already_on_base(rec, cmp)
 
 
 # ---------------------------------------------------------------- re-runs, frozen selection, audit trail
@@ -9179,8 +9978,20 @@ def _pdf_text(path: Path) -> str | None:
     return cp.stdout.decode("utf-8", "replace")
 
 
+_PDF_STAMP = re.compile(r"^Written \d{4}-\d{2}-\d{2} \d{2}:\d{2}(?: [A-Z]+)?$")
+
+
+def _pdf_check_text(text: str) -> str:
+    """Drop the generator's own timestamp line before the public check.
+
+    ``write_pdf`` appends ``Written YYYY-MM-DD HH:MM UTC``. The public check treats two morning
+    clock times as an internal schedule. A PDF written during one of those minutes is not that schedule."""
+    return "\n".join(line for line in text.splitlines() if not _PDF_STAMP.match(line.strip()))
+
+
 def _pdf_still_dirty(text: str, token: str | None, label: Path) -> bool:
     from guardrails.public_hygiene import findings
+    text = _pdf_check_text(text)
     return bool(_text_has_secret(text, token) or _text_has_internal_path(text) or findings(text, label))
 
 
@@ -9693,7 +10504,8 @@ def combined_run_summary_md(records: list[dict], title: str) -> str:
     """One go/no-go covering every PR record in a date+commit folder.
 
     A record without a verdict counts as could_not_verify. The all-clear sentence appears only when every
-    record is verified.
+    record is verified. A collection gap does not add a second rule: when it lowers a result, the stored
+    verdict is already could_not_verify, and this summary reads that verdict.
     """
     order = {"needs_attention": 0, "could_not_verify": 1, "verified": 2}
     recs = sorted(records, key=lambda r: (order.get(_verdict_key(r), 1), str(r.get("_pr_id") or "")))
@@ -10769,6 +11581,11 @@ def rejudge(rec: dict, prdir: Path) -> dict:
         return rec
     results = {s: [parse_junit(prdir / f"junit-{s}-{i}.xml") for i in range(1, n + 1)] for s in ("main", "pr")}
     cmp = compare_sides(results)
+    if old.get("collected_test_files"):
+        cmp["collected_test_files"] = list(old["collected_test_files"])
+    if isinstance(old.get("base_new_tests"), dict):
+        cmp["base_new_tests"] = copy.deepcopy(old["base_new_tests"])
+    apply_execution_evidence_filters(cmp)
     kept = {d["test"] for d in old.get("skipped_missing_dependency", [])}
     for d in [d for d in cmp["skipped_missing_dependency"] if d["test"] not in kept]:
         _unconfirmed_dependency(cmp, d)
@@ -10782,6 +11599,7 @@ def rejudge(rec: dict, prdir: Path) -> dict:
     v, reason, _ = verdict_for(cmp, None, ex, rec.get("files"), pr_probes, rec.get("behaviour_claims"),
                                rec.get("baseline"))
     v, reason = cap_for_review(rec, v, reason)
+    v, reason = cap_for_uncollected_file(cmp, v, reason)
     out = {k: x for k, x in rec.items() if k not in ("verdict_before_coverage_gate", "reason_before_coverage_gate")}
     out.update(comparison=cmp, exit_check=ex, verdict=v, reason=reason)
     if pr_probes:
@@ -10794,6 +11612,7 @@ def rejudge(rec: dict, prdir: Path) -> dict:
             else:
                 out.pop("broad_claims_note", None)
     out = gate(out)
+    _attach_already_on_base(out, out.get("comparison"))
     if (out["verdict"], out["reason"]) != (rec.get("verdict"), rec.get("reason")):
         out["rejudged"] = {"at_ist": now_ist().strftime("%Y-%m-%d %H:%M IST"),
                            "previous_verdict": rec.get("verdict"), "previous_reason": rec.get("reason", "")}

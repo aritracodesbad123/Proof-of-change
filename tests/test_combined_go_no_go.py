@@ -42,6 +42,39 @@ def test_all_clear_only_when_every_record_is_verified(tmp_path):
     assert "Nothing needs attention" in (folder / "SUMMARY.md").read_text()
 
 
+def test_capped_collection_gap_uses_the_existing_all_clear_rule(tmp_path):
+    """The summary reads the stored verdict. could_not_verify is not an all-clear. needs_attention stays."""
+    folder = tmp_path / "f"
+    (folder / "b-2").mkdir(parents=True)
+    (folder / "b-2" / "record.json").write_text(json.dumps({
+        "verdict": "could_not_verify",
+        "reason": "could not verify: pytest could not collect tests/other_changed.py, so that changed test "
+                  "file did not run (tests match); fix appears already present on 2.2; "
+                  "Limitation: pytest could not collect tests/other_changed.py. "
+                  "That changed test file is not a pass, and this result does not cover it.",
+        "already_on_base": "fix appears already present on 2.2",
+        "base_ref": "2.2",
+        "pr": {"repo": "o/b", "number": 2, "title": "t"},
+    }))
+    (folder / "a-1").mkdir()
+    (folder / "a-1" / "record.json").write_text(json.dumps({
+        "verdict": "needs_attention",
+        "reason": "1 test(s) pass on main but fail on the PR; fix appears already present on master; "
+                  "Limitation: pytest could not collect tests/other_changed.py. "
+                  "That changed test file is not a pass, and this result does not cover it.",
+        "already_on_base": "fix appears already present on master",
+        "pr": {"repo": "o/a", "number": 1, "title": "t"},
+    }))
+    assert daily_run.rebuild_folder_summary(folder)
+    md = (folder / "SUMMARY.md").read_text()
+    assert "Nothing needs attention" not in md
+    assert "tests/other_changed.py" in md
+    assert "already present on 2.2" in md and "already present on master" in md
+    assert "clean verification" not in md.lower()
+    assert "**COULD NOT VERIFY**" in md and "**NEEDS ATTENTION**" in md
+    assert "1 need attention" in md and "1 could not be verified" in md
+
+
 @pytest.mark.parametrize("verdict", ["could_not_verify", "needs_attention", None])
 def test_guard_refuses_false_all_clear(verdict):
     recs = [{"verdict": "verified"}, {"verdict": verdict}]

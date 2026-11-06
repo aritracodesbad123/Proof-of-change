@@ -71,9 +71,13 @@ not verified. A check with no new or changed tests is unchanged.
 
 ## Known limit
 
-Any single fixed test (it fails on the base and passes on the pull request) settles every qualifying differs claim
-on the record. Nothing ties that test to a particular claim. That is accepted for now, because the four exclusions
-still hold. If a held-out case ever slips through, the next step is a link from each claim to its test.
+Any single eligible fixed test settles every qualifying differs claim on the record. Nothing ties that test to a
+particular claim. The four exclusions still hold. A later link from each claim to its test is not this rule, and
+a wording or path guess is not that link.
+
+Eligible means a default-named edited test file (`test_*.py` or `*_test.py` in the changed files) and not a
+shared id. An id that is eligible only because its file was collected (`collected_test_files`), or because both
+sides already had that id, stays in `fixed` and does not settle a claim.
 
 ## Offline proof
 

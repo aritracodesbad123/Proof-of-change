@@ -107,6 +107,7 @@ def records_pdfs(report_dir: str | Path, name: str, rows: list[tuple[str, dict]]
                  stopped: str | None = None) -> Path:
     """One REPORT.pdf per (id, record), each written on its own, then a SUMMARY.pdf (even when rows is empty)."""
     out = Path(report_dir)
+    from ops.daily_run import record_collection_gap
     lines, any_attention, any_cnv = [], False, False
     for rid, rec in rows:
         from poc.final_verdict import final
@@ -118,12 +119,16 @@ def records_pdfs(report_dir: str | Path, name: str, rows: list[tuple[str, dict]]
         any_attention |= v == "needs_attention"
         any_cnv |= v not in ("verified", "needs_attention", "no_code_change")
         why = str(fin.get("reason") or "")
+        # The go/no-go still follows the stored verdict. The file name stays in the reason when present.
+        _gap_files, gap_sentence = record_collection_gap(rec if isinstance(rec, dict) else None)
+        if gap_sentence and gap_sentence not in why:
+            why = f"{why}; {gap_sentence}" if why else gap_sentence
         try:
             write_pdf(out / rid / "REPORT.pdf", f"Reviewer report {rid}: {v.replace('_', ' ').upper()}",
                       [f"Verdict: {v}", f"Reason: {why}"] + ([f"Note: {note}"] if note else []))
         except Exception:  # noqa: BLE001 - one PR's PDF failing never stops the others or the summary
             pass
-        lines.append(f"{rid}: {v}: {why[:160]}")
+        lines.append(f"{rid}: {v}: {why[:240]}")
     if not rows:
         go, lines = "NO-GO, nothing tested", ["No check produced a result."]
     elif any_attention:
