@@ -12,11 +12,13 @@ definition accepts, unless the definition has `*args`. A definition that accepts
 left alone, because any name is allowed. A class that does not write its own `__init__` is not
 counted this way, because a decorator may have added the constructor.
 
-When a call does not match, the arguments the definition accepts are kept, including the values
-the probe wrote. An unexpected keyword is removed. A required parameter that is still missing
-is filled from a base call that passes that same parameter, and the record names the file and
-the parameter. The rest of that call is not copied. A call that merely uses the same name, or
-the default call with no arguments, is not substituted for a different scenario.
+When a call does not match, arguments the definition accepts stay, including the values the
+probe wrote. An unexpected keyword is not deleted: removing it would leave a different call, so
+the probe is not run, and the reason names the keyword. A required parameter that is still
+missing is filled from a base call that passes that same parameter, and the record names the
+file and the parameter. The rest of that call is not copied. A call we cannot check, because it
+uses `*args` or `**kwargs` or because the constructor or method is inherited from another file,
+is not run either. A matching signature is not by itself proof that the changed line ran.
 
 Those calls are read from the base files, tests and source, as syntax only. The walk stops
 after a fixed number of files. It does not import the package and it does not use the network.

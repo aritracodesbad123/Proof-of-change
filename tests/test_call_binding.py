@@ -114,24 +114,29 @@ def _cmp_verified():
 
 
 def test_constructor_binds_from_the_base_call_and_runs(tmp_path):
-    """Required arguments come from the base test's call. The bound call runs and returns that value.
+    """A missing required argument is filled from the base test. An unknown keyword is not deleted.
 
     A subscript in the implementation (names[0]) is not a call. A call that exists only on the
-    pull-request side is not used."""
+    pull-request side is not used. Deleting contexts= would leave a different call, so that probe
+    is not run."""
     base, pr = tmp_path / "base", tmp_path / "pr"
     _maker_tree(base, "from-base", 1)
     _maker_tree(pr, "from-pr", 1)
-    code = _bad_maker()
+    refused, refused_notes, reason = probe_names.prepare_calls(_bad_maker(), base)
+    assert reason and "not removed" in reason and "not run" in reason
+    assert refused_notes == [] and "from-base" not in refused and "from-pr" not in refused
+    code = ("import widget.maker as maker\n"
+            "print(maker.Maker().label())\n")
     bound, notes, reject = probe_names.prepare_calls(code, base)
     assert reject is None
     filled = [note for note in notes if note.get("filled")]
     assert filled and filled[0]["how"] == "filled"
     assert filled[0]["filled"][0]["parameter"] == "initial"
-    assert "from-base" in bound and "from-pr" not in bound and "contexts=" not in bound
+    assert "from-base" in bound and "from-pr" not in bound
     assert "names[0]" not in bound
     ran = _run(bound, base, tmp_path / "run")
     assert ran.returncode == 0, ran.stderr
-    assert "from-base" in ran.stdout
+    assert ran.stdout.strip() == "from-base"
     # The same tree's signature, with the required argument omitted and no call that shows it, is not run.
     lone = tmp_path / "lone"
     _write(lone, {
@@ -216,18 +221,11 @@ def test_retry_shows_the_base_call_and_binds_when_the_model_repeats_it(tmp_path)
                                 [tmp_path / "pr"], tmp_path / "out")
     assert prov.probe_calls == 2
     assert "called in" in prov.users[1] and "initial=" in prov.users[1]
-    assert out["probes"]
-    text = out["probes"][0]["path"].read_text()
-    assert "contexts=" not in text and "from-base" in text
-    filled = [note for note in out["call_bindings"][0]["bindings"] if note.get("filled")]
-    assert filled and filled[0]["how"] == "filled"
-    env = os.environ.copy()
-    env["PYTHONPATH"] = str(base)
-    env.pop("PYTHONSAFEPATH", None)
-    cwd = tmp_path / "run"
-    cwd.mkdir(parents=True, exist_ok=True)
-    obs, _log, _secs = probes.run_once(out["probes"][0]["path"], Path(sys.executable), cwd, env, 30)
-    assert obs["c1.value"] == "from-base"
+    # The repeated answer still has the unknown keyword. It is not rewritten into a constructor
+    # that merely runs, and no probe file is written.
+    assert out["probes"] == []
+    assert any("not run" in err for err in out["errors"])
+    assert not list((tmp_path / "out").glob("*.py"))
 
     sound = _probe("import json\nimport widget.maker as maker\n"
                    "value = maker.Maker(initial=maker.Context('other')).label()\n"
@@ -250,11 +248,14 @@ def test_unconnected_signature_binds_its_own_call(tmp_path):
         "widget/calc.py": "def blend(left, right, scale=1):\n    return (left + right) * scale\n",
         "tests/test_calc.py": "from widget.calc import blend\n\ndef test_blend():\n    assert blend(2, 3) == 5\n",
     })
-    code = "import widget.calc as calc\nprint(calc.blend(width=4))\n"
-    assert any("unexpected keyword" in msg for msg in probe_names.problems(code, root))
+    refused = "import widget.calc as calc\nprint(calc.blend(width=4))\n"
+    assert any("unexpected keyword" in msg for msg in probe_names.problems(refused, root))
+    _same, no_notes, reason = probe_names.prepare_calls(refused, root)
+    assert reason and "not removed" in reason and no_notes == []
+    code = "import widget.calc as calc\nprint(calc.blend(2))\n"
     bound, notes, reject = probe_names.prepare_calls(code, root)
     assert reject is None and notes[0]["how"] == "filled"
-    assert {item["parameter"] for item in notes[0]["filled"]} == {"left", "right"}
+    assert notes[0]["filled"][0]["parameter"] == "right"
     ran = _run(bound, root, tmp_path / "run")
     assert ran.returncode == 0, ran.stderr
     assert ran.stdout.strip() == "5"
@@ -279,16 +280,18 @@ def test_reexport_uses_the_defining_signature(tmp_path):
             "    assert made.initial == 'ok'\n"
         ),
     })
-    code = "import widget.api as api\nprint(api.Unit(contexts=['x']).initial)\n"
-    text = " ".join(probe_names.problems(code, root))
+    bad = "import widget.api as api\nprint(api.Unit(contexts=['x']).initial)\n"
+    text = " ".join(probe_names.problems(bad, root))
     assert "unexpected keyword" in text and "contexts" in text and "initial" in text
+    _same, no_notes, reason = probe_names.prepare_calls(bad, root)
+    assert reason and "not removed" in reason and no_notes == []
+    code = "import widget.api as api\nprint(api.Unit().initial)\n"
     bound, notes, reject = probe_names.prepare_calls(code, root)
     assert reject is None and notes[0]["how"] == "filled"
     assert notes[0]["filled"][0]["parameter"] == "initial"
     ran = _run(bound, root, tmp_path / "run")
     assert ran.returncode == 0, ran.stderr
     assert ran.stdout.strip() == "ok"
-    assert "contexts" not in bound
 
 
 def test_heldout_fixture_does_not_steal_another_call(tmp_path):
@@ -305,22 +308,18 @@ def test_heldout_fixture_does_not_steal_another_call(tmp_path):
 def test_real_base_parser_call_is_cited_and_not_substituted(tmp_path):
     """The base test's Parser(contexts=[mytask]) is a real call. It is not pasted over a different probe.
 
-    A probe that already passes a legal contexts value keeps that value and loses only the unknown
-    keyword. A probe whose only argument is unknown is not rewritten to Parser() or to mytask, and
-    the reason names the base call that was left unused. That result is not coverage."""
+    An unknown keyword is not deleted to leave a constructor that merely runs. A probe whose only
+    argument is unknown is not rewritten to Parser() or to mytask, and the reason names the base
+    call that was left unused. That result is not coverage. A constructor does not call parse_argv."""
     root = tmp_path / "base"
     shutil.copytree(PARSER_BASE, root)
     kept = ("from invoke.parser import Parser, Context\n"
             "p = Parser(contexts=[Context(name='invoke', aliases=(), help={'task': 'lag'})], not_a_param=1)\n"
             "print(p.contexts[0].name)\n")
     bound, notes, reject = probe_names.prepare_calls(kept, root)
-    assert reject is None
-    assert "not_a_param" not in bound and "help=" not in bound
-    assert "invoke" in bound and "mytask" not in bound and "Parser()" not in bound
-    ran = _run(bound, root, tmp_path / "run")
-    assert ran.returncode == 0, ran.stderr
-    assert ran.stdout.strip() == "invoke"
-    assert any(note.get("dropped") for note in notes)
+    assert reject and "not removed" in reject and "not run" in reject
+    assert notes == [] and bound == kept
+    assert "parse_argv" not in bound
 
     bare = "from invoke.parser import Parser\nprint(Parser(not_a_param=1))\n"
     again, notes2, reason = probe_names.prepare_calls(bare, root)
@@ -339,6 +338,125 @@ def test_real_base_parser_call_is_cited_and_not_substituted(tmp_path):
         "probes": {"status": "ran", "items": [blocked]},
     })["verdict"]
     assert gated != "needs_attention"
+
+
+def test_unchecked_calls_and_unreadable_inheritance_are_not_run(tmp_path):
+    """A base call whose arguments cannot be checked is not run. A readable call is unchanged."""
+    root = tmp_path / "base"
+    _write(root, {
+        "pkg/__init__.py": "",
+        "pkg/base.py": (
+            "class Parent:\n"
+            "    def __init__(self, left):\n"
+            "        self.left = left\n"
+            "    def run(self, left):\n"
+            "        return left\n"
+        ),
+        "pkg/child.py": "from .base import Parent\nclass Child(Parent):\n    pass\n",
+        "pkg/flex.py": "def bag(**kwargs):\n    return kwargs\n",
+    })
+    star = "import pkg.flex as flex\nprint(flex.bag(width=1))\n"
+    _same, notes, reason = probe_names.prepare_calls(star, root)
+    assert reason and "**kwargs" in reason and "not run" in reason and notes == []
+    spread = "import pkg.flex as flex\nprint(flex.bag(*[1]))\n"
+    # *args on a **kwargs function is also unchecked. A visible call of a required function is not.
+    assert probe_names.prepare_calls(spread, root)[2]
+    hidden = "import pkg.child as child\nprint(child.Child(1).left)\n"
+    reason = probe_names.prepare_calls(hidden, root)[2]
+    assert reason and "not run" in reason and "cannot check" in reason
+    method = "import pkg.child as child\nprint(child.Child.run(None, 1))\n"
+    reason = probe_names.prepare_calls(method, root)[2]
+    assert reason and "cannot check" in reason
+
+
+# Verbatim from pyinvoke/invoke 0da941e176f4e0b28d8a69b8ac089cdbac2874e4.
+# argument.py property name, and parser.py ParseMachine.complete_context.
+_BASE_NAME = "return self.attr_name or self.names[0]\n"
+_BASE_FORMAT = "names = ', '.join(\"'{}'\".format(x.name) for x in missing)\n"
+_PR_FORMAT = "names = ', '.join(\"'{}'\".format(x.names[0]) for x in missing)\n"
+
+
+def _format_missing(source: str, args: list[dict]) -> tuple[str, bool]:
+    """Run one side's error line. Returns (message, whether that line ran)."""
+    reached = {"line": False}
+
+    def trace(frame, event, arg):
+        if event == "line" and frame.f_code.co_name == "format_missing":
+            reached["line"] = True
+        return trace
+
+    namespace: dict = {}
+    exec("class Arg:\n"
+         "    def __init__(self, names, attr_name=None):\n"
+         "        self.names = tuple(names)\n"
+         "        self.attr_name = attr_name\n"
+         "    @property\n"
+         "    def name(self):\n"
+         f"        {_BASE_NAME}"
+         "def format_missing(missing, task):\n"
+         f"    {source}"
+         "    return \"'{}' did not receive required positional arguments: {}\".format(task, names)\n",
+         namespace)
+    import sys
+    sys.settrace(trace)
+    try:
+        built = [namespace["Arg"](item["names"], item.get("attr_name")) for item in args]
+        message = namespace["format_missing"](built, "mytask")
+    finally:
+        sys.settrace(None)
+    return message, reached["line"]
+
+
+def test_real_base_parse_call_reaches_the_name_line_and_a_constructor_does_not():
+    """The base call that omits a positional reaches the error line. Parser() does not.
+
+    Argument('pos') has the same text on both sides, because name and names[0] are both 'pos'.
+    An attribute name that differs from the first public name is the line the pull request edits.
+    Reaching the line is not a verdict, and a constructor is not that call."""
+    positional = [{"names": ("pos",)}]
+    base_pos, base_hit = _format_missing(_BASE_FORMAT, positional)
+    pr_pos, pr_hit = _format_missing(_PR_FORMAT, positional)
+    assert base_hit and pr_hit
+    assert base_pos == pr_pos == "'mytask' did not receive required positional arguments: 'pos'"
+    dashed = [{"names": ("param-1", "p"), "attr_name": "param_1"}]
+    base_dash, base_dash_hit = _format_missing(_BASE_FORMAT, dashed)
+    pr_dash, pr_dash_hit = _format_missing(_PR_FORMAT, dashed)
+    assert base_dash_hit and pr_dash_hit
+    assert base_dash.endswith("'param_1'")
+    assert pr_dash.endswith("'param-1'")
+    assert base_dash != pr_dash
+    # The real package at that commit, when it is on disk, agrees on the positional message.
+    real = Path("/tmp/invoke-base")
+    if (real / "invoke" / "parser" / "parser.py").is_file():
+        env = os.environ.copy()
+        env["PYTHONPATH"] = str(real)
+        script = (
+            "from invoke.parser import Parser, Context, Argument, ParseError\n"
+            "arg = Argument('pos', positional=True)\n"
+            "task = Context(name='mytask', args=[arg])\n"
+            "hit = False\n"
+            "def trace(frame, event, arg):\n"
+            "    global hit\n"
+            "    if event == 'line' and frame.f_code.co_name == 'complete_context':\n"
+            "        hit = True\n"
+            "    return trace\n"
+            "import sys\n"
+            "sys.settrace(trace)\n"
+            "try:\n"
+            "    Parser(contexts=[task]).parse_argv(['mytask'])\n"
+            "except ParseError as exc:\n"
+            "    print(hit)\n"
+            "    print(str(exc))\n"
+            "finally:\n"
+            "    sys.settrace(None)\n"
+            "print('constructor', Parser().ignore_unknown)\n"
+        )
+        ran = subprocess.run([sys.executable, "-c", script], env=env, capture_output=True, text=True, timeout=30)
+        assert ran.returncode == 0, ran.stderr
+        lines = ran.stdout.splitlines()
+        assert lines[0] == "True"
+        assert lines[1] == "'mytask' did not receive required positional arguments: 'pos'"
+        assert lines[2] == "constructor False"
 
 
 def test_bad_keyword_with_only_defaults_is_not_rewritten_to_the_default_call(tmp_path):

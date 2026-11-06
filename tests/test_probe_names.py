@@ -520,11 +520,11 @@ def test_bad_constructor_keyword_is_repaired_once_or_dropped(tmp_path):
                                  base, [tmp_path / "pr"], tmp_path / "out2")
     assert again.probe_calls == 2
     assert "unexpected keyword" in out2["name_checks"][0]["outcome"]
-    # The model left the unknown keyword. The valid positional stays; the keyword is removed.
-    # The probe is not replaced by a different call, and it is not dropped while that value remains.
-    text2 = out2["probes"][0]["path"].read_text()
-    assert "takes_value" not in text2 and "Argument('p')" in text2
-    assert out2["call_bindings"][0]["bindings"][0]["dropped"] == ["takes_value"]
+    # takes_value is not a parameter. Deleting it would leave Argument('p'), which is a different
+    # call from the one the probe wrote, so the probe is not written and is not coverage.
+    assert out2["probes"] == []
+    assert any("not removed" in err for err in out2["errors"])
+    assert not list((tmp_path / "out2").glob("*.py"))
 
 
 def test_unrelated_observations_are_not_claim_proof():

@@ -11,11 +11,11 @@ NameError, or the string passed to hasattr or to getattr with a default. A bare 
 except Exception, is not that: the probe is still using the name as if it existed.
 
 A call the probe makes on a base function or class is also checked against that definition.
-An unexpected keyword is removed. Arguments the signature already accepts stay, with the
-values the probe wrote. A required parameter that is still missing is filled from a base
-call that passes that same parameter, and only that parameter. A different call is not
-copied in just because it uses the same name. A call with nothing valid left is not turned
-into the default call, and the probe is not run.
+An unexpected keyword is not deleted to make the call run: that would keep a different
+scenario. A required parameter that is still missing is filled from a base call that passes
+that same parameter, and only that parameter, while the probe's other valid arguments stay.
+A call we cannot check (*args, **kwargs, or a constructor or method whose parameters are not
+in the file) is not run. A different call is not copied in just because it uses the same name.
 """
 from __future__ import annotations
 
@@ -254,6 +254,7 @@ class _Checker(ast.NodeVisitor):
         self.required_missing = []
         self.mentions = {}   # qualified name -> whether each use is only an absence check
         self.calls = []      # base calls in this probe: {node, sig, dotted}
+        self.unreadable = []  # a base class or method whose parameters cannot be read
         self.tree = None
 
     def messages(self) -> list[str]:
@@ -677,7 +678,10 @@ class _Checker(ast.NodeVisitor):
         **kwargs. Third-party and builtin calls are not checked. An import that only re-exports
         the name is followed to the definition, so the parameters are the ones that actually run."""
         sig, dotted = self._resolve_callable(node.func)
-        if sig is not None and dotted:
+        if dotted and sig is None:
+            if dotted not in self.unreadable:
+                self.unreadable.append(dotted)
+        elif sig is not None and dotted:
             self.calls.append({"node": node, "sig": sig, "dotted": dotted})
         problem = _call_problem(node, sig)
         if problem:
@@ -759,10 +763,8 @@ def _resolve_named(checker, module: str, attrs: list[str]):
             return _function_signature(node, drop_first=False, display=node.name), dotted
         return None, None
     if len(rest) == 1 and isinstance(node, ast.ClassDef):
-        sig = _method_on(node, rest[0])
-        if sig is None:
-            return None, None
-        return sig, dotted + "." + rest[0]
+        # None signature: the method is not defined on this class, so a parent we cannot see may own it.
+        return _method_on(node, rest[0]), dotted + "." + rest[0]
     return None, None
 
 
@@ -914,6 +916,22 @@ def _param_list(sig: _Sig) -> str:
     shown = ", ".join(sig.names[:_LIST_LIMIT]) or "(none)"
     extra = f" (+{len(sig.names) - _LIST_LIMIT} more)" if len(sig.names) > _LIST_LIMIT else ""
     return shown + extra
+
+
+def _unchecked(node: ast.Call, sig: _Sig | None) -> str | None:
+    """Why this base call cannot be validated, or None when its arguments are visible.
+
+    Not being able to check is not the same as the call being sound. A call we cannot read must
+    not run. A third-party call (no base signature) is not this case."""
+    if sig is None:
+        return None
+    if sig.var_keyword:
+        return f"{sig.display}() accepts **kwargs, so its keywords cannot be checked"
+    if any(kw.arg is None for kw in node.keywords):
+        return f"{sig.display}() was called with **mapping, so its keywords cannot be checked"
+    if any(isinstance(arg, ast.Starred) for arg in node.args):
+        return f"{sig.display}() was called with *args, so its positional arguments cannot be checked"
+    return None
 
 
 def _call_problem(node: ast.Call, sig: _Sig | None) -> str | None:
@@ -1277,8 +1295,20 @@ def prepare_calls(code: str, base_root):
     required parameters. The probe's callee is kept: only the arguments change. A call that already
     matches the signature is left as written. Nothing here reads the pull-request tree or the network."""
     checker = _analyze(code, base_root)
-    if checker is None or base_root is None or not checker.calls:
+    if checker is None or base_root is None:
         return code or "", [], None
+    if checker.unreadable:
+        name = checker.unreadable[0]
+        return (code or "", [],
+                f"cannot check {name}: its parameters are not in this file (an inherited constructor or "
+                "method we cannot read); the probe is not run")
+    if not checker.calls:
+        return code or "", [], None
+    for item in checker.calls:
+        hidden = _unchecked(item["node"], item["sig"])
+        if hidden:
+            return (code or "", [],
+                    f"cannot bind {item['dotted']}: {hidden}; the probe is not run")
     unsound = [item for item in checker.calls if _call_problem(item["node"], item["sig"])]
     if not unsound:
         return code or "", [], None
@@ -1307,7 +1337,8 @@ def prepare_calls(code: str, base_root):
         problem = _call_problem(info["node"], info["sig"]) or "the call does not match the base signature"
         where = _site_hint(sites.get(info["dotted"], []))
         return (code or "", [],
-                f"cannot bind {info['dotted']}: {problem}; no safe binding from this call's own arguments."
+                f"cannot bind {info['dotted']}: {problem}; an unknown keyword was not removed, because "
+                "dropping it would discard the scenario, and it was not mapped to a base parameter."
                 f"{where} The probe is not run")
     if not notes:
         return code or "", [], None
@@ -1361,17 +1392,15 @@ def _site_hint(sites: list) -> str:
 def _bind_call(node: ast.Call, info: dict, sites: list, spelling: dict):
     """Keep this call's valid arguments. Fill only a missing required parameter from a base call.
 
-    An unexpected keyword is removed. A keyword or positional the signature accepts stays, including
-    the value the probe wrote. A required parameter that is still missing is taken from a base call
-    that passes that same parameter, and the note names the file and the parameter. The rest of that
-    call is not copied. A call with nothing valid left is not turned into a different call, or into
-    a default-only call, even when the base tree contains one. None means the probe must not run."""
+    A keyword or positional the signature accepts stays, including the value the probe wrote. An
+    unexpected keyword is not deleted: removing it would keep a different call, so this returns None
+    and the probe is not run. A required parameter that is still missing, and only that parameter,
+    is taken from a base call that passes it. None means the probe must not run."""
     sig = info["sig"]
-    if (sig is None or sig.var_keyword or any(kw.arg is None for kw in node.keywords)
-            or any(isinstance(arg, ast.Starred) for arg in node.args)):
+    if _unchecked(node, sig):
         return None
     pos_names = [name for name in sig.names if name not in sig.kwonly]
-    kept_pos = list(node.args) if sig.vararg else list(node.args[:sig.n_positional])
+    kept_pos = list(node.args[:sig.n_positional])
     kept_kw = []
     dropped = []
     filled_names = set(pos_names[:len(kept_pos)])
@@ -1381,9 +1410,11 @@ def _bind_call(node: ast.Call, info: dict, sites: list, spelling: dict):
             filled_names.add(kw.arg)
         else:
             dropped.append(kw.arg)
+    if dropped:
+        # The unknown keyword is part of what the probe was trying to do. Deleting it leaves a
+        # call that merely executes, which is not that scenario.
+        return None
     missing = [name for name in sig.required if name not in filled_names]
-    if sig.vararg:
-        missing = [name for name in missing if name in sig.kwonly]
     filled = []
     for name in missing:
         found = _piece(name, pos_names, sites, spelling)
