@@ -6727,6 +6727,7 @@ def finalize_tests(rec: dict, per_run: list[dict], results: dict, a) -> tuple[di
     _stamp_cross_run(rec, cmp)
     _drop_unexecuted_shared(cmp)
     _drop_gap_new_passes(cmp)
+    _drop_environment_fixed(cmp)
     ex = exit_check(per_run, results, cmp)
     rec["comparison"], rec["exit_check"] = cmp, ex
     return cmp, None, ex
@@ -7095,6 +7096,19 @@ def _side_tree(side: str, venvs: dict, cwds: dict | None) -> Path | None:
     except IndexError:
         return None
     return root if root.is_dir() else None
+
+
+def _git_head(root: Path) -> str | None:
+    """HEAD of a real checkout, or None when the tree is not a git repository."""
+    try:
+        done = subprocess.run(["git", "-C", str(root), "rev-parse", "HEAD"],
+                              capture_output=True, text=True, timeout=5)
+    except (OSError, subprocess.TimeoutExpired):
+        return None
+    sha = (done.stdout or "").strip().lower()
+    if done.returncode == 0 and re.fullmatch(r"[0-9a-f]{7,40}", sha):
+        return sha
+    return None
 
 
 def _overlay_pr_tests(main_root: Path, pr_root: Path, rels: list[str],
@@ -7525,8 +7539,12 @@ def _classify_new_on_base(evidence: dict, discovered: dict[str, list[str]], base
     ran, and is marked reproduced."""
     known = list(discovered)
     wanted = set(evidence.get("ids") or [])
+    blocked = set(evidence.get("not_executed") or [])
     passed, failed, missing = [], [], []
     for node in sorted(wanted):
+        if node in blocked:
+            missing.append(node)
+            continue
         base_rows = [_by_canon(run, root, known).get(node) for run in base_runs]
         pr_rows = [_by_canon(run, root, known).get(node) for run in pr_runs]
         if any(row is None for row in base_rows) or not base_rows:
@@ -7551,7 +7569,7 @@ def _classify_new_on_base(evidence: dict, discovered: dict[str, list[str]], base
     evidence["passed_on_base"] = passed
     evidence["failed_on_base"] = failed
     evidence["not_collected"] = missing
-    evidence["reproduced"] = bool(failed)
+    evidence["reproduced"] = bool(failed) or bool(evidence.get("reproduced"))
 
 
 def _pr_runs_cover(runs: list, nodes: list[str], root: Path, known: list[str]) -> bool:
@@ -7566,45 +7584,155 @@ def _pr_runs_cover(runs: list, nodes: list[str], root: Path, known: list[str]) -
     return True
 
 
+_FIXTURE_MISSING = re.compile(r"fixture ['\"]([^'\"]+)['\"] not found", re.I)
+
+
+def _environment_gap(outcome: str, note: str, body: str) -> str | None:
+    """A base error that is not evidence the pull request fixed a behavior.
+
+    Import and fixture-setup failures are named. A TypeError or ValueError in the test is not this case:
+    that can be the behavior the new test shows. None means the row may still be a real failure."""
+    if outcome not in ("failed", "error", "load_error"):
+        return None
+    text = f"{note}\n{body or ''}"
+    typ = (note or "").split(":", 1)[0].strip()
+    if outcome == "load_error" or typ in ("ImportError", "ModuleNotFoundError"):
+        missing = ""
+        match = re.search(r"No module named ['\"]([^'\"]+)['\"]", text)
+        if not match:
+            match = re.search(r"cannot import name ['\"]([^'\"]+)['\"]", text)
+        if match:
+            missing = match.group(1)
+        return f"base could not import {missing}" if missing else "base import failed"
+    found = _FIXTURE_MISSING.search(text)
+    if found or "FixtureLookupError" in text:
+        name = found.group(1) if found else "fixture"
+        return f"base fixture '{name}' was not found"
+    return None
+
+
+def _write_base_row(results: dict, prdir: Path, tid: str, outcome: str, note: str, index: int) -> None:
+    if str(tid).startswith("::") or index >= len(results.get("main") or []):
+        return
+    results["main"][index][tid] = (outcome, note)
+    _splice_junit(prdir / f"junit-main-{index + 1}.xml", tid, outcome, note)
+
+
+def _settle_ran_nodes(evidence: dict, nodes: list[str], base_runs: list, pr_runs: list, results: dict,
+                      prdir: Path, files: dict | None, root: Path) -> None:
+    """Apply base junit rows for ids we actually ran.
+
+    An assertion failure that passes on the pull request is written into the base results (it can be fixed).
+    An import or a missing fixture is named and is not a pass and not proof. A skip is not a pass. A shared
+    id that passed is written so the ordinary comparison does not call it new."""
+    known = sorted({str(node).split("::", 1)[0] for node in nodes})
+    not_exec = evidence.setdefault("not_executed", [])
+    notes = evidence.setdefault("environment_limits", [])
+    for node in nodes:
+        base_rows = [_by_canon(run, root, known).get(node) for run in base_runs]
+        pr_rows = [_by_canon(run, root, known).get(node) for run in pr_runs]
+        if any(row is None for row in base_rows) or not base_rows:
+            if node not in not_exec:
+                not_exec.append(node)
+            continue
+        parts = [_row_parts(row[1]) for row in base_rows]
+        pr_parts = [_row_parts(row[1]) for row in pr_rows] if pr_rows and all(row is not None for row in pr_rows) else []
+        if any(part is None for part in parts):
+            if node not in not_exec:
+                not_exec.append(node)
+            continue
+        gap = next((reason for part in parts if (reason := _environment_gap(part[0], part[1], part[2]))), None)
+        if gap:
+            if node not in not_exec:
+                not_exec.append(node)
+            line = f"{node}: {gap}"
+            if line not in notes:
+                notes.append(line)
+            continue
+        if any(part[0] == "skipped" for part in parts) or any(part and part[0] == "skipped" for part in pr_parts):
+            for index, row in enumerate(base_rows):
+                _write_base_row(results, prdir, row[0], "skipped", parts[index][1], index)
+            continue
+        if all(part[0] in ("failed", "error", "load_error") for part in parts):
+            proof = all(part[0] == "failed" or _base_failure_counts(part[0], part[1], part[2], files) for part in parts)
+            if proof and pr_parts and all(part and part[0] == "passed" for part in pr_parts):
+                for index, row in enumerate(base_rows):
+                    _write_base_row(results, prdir, row[0], parts[index][0], parts[index][1], index)
+                if node not in evidence["failed_on_base"]:
+                    evidence["failed_on_base"].append(node)
+                evidence["reproduced"] = True
+                continue
+            if node not in not_exec:
+                not_exec.append(node)
+            if any(part[0] == "error" for part in parts):
+                line = f"{node}: base error was not an assertion ({parts[0][1][:120]})"
+                if line not in notes:
+                    notes.append(line)
+            continue
+        if (all(part[0] == "passed" for part in parts) and pr_parts
+                and all(part and part[0] == "passed" for part in pr_parts)):
+            for index, row in enumerate(base_rows):
+                _write_base_row(results, prdir, row[0], "passed", "", index)
+            if node in set(evidence.get("ids") or []) and node not in evidence["passed_on_base"]:
+                evidence["passed_on_base"].append(node)
+
+
+def _ids_to_run(discovered: dict[str, list[str]], evidence: dict) -> dict[str, list[str]]:
+    """New ids plus shared ids in changed non-default files. An empty base collection stays out."""
+    blocked = set(evidence.get("collection_failed") or []) | set(evidence.get("discovery_empty") or [])
+    out = {rel: list(nodes) for rel, nodes in discovered.items() if rel not in blocked}
+    for node in evidence.get("shared_ids") or []:
+        rel = str(node).split("::", 1)[0]
+        if rel in blocked:
+            continue
+        bucket = out.setdefault(rel, [])
+        if node not in bucket:
+            bucket.append(node)
+    return out
+
+
 def _run_discovered_new_tests(rec: dict, venvs: dict, prdir: Path, a, results: dict, main_root: Path,
                               pr_root: Path, use_contree: bool, keep: bool, plugins_off) -> None:
-    """Collect tests the default file names miss, and run the ones that are new on the base.
+    """Collect tests the default file names miss, and run new and shared ids on the base.
 
-    The new ids come from pytest's own collection on each side, not from a class or decorator name. Copying
-    the pull-request test file onto the base happens after that collection, so a test that exists only in the
-    pull request is still new. The copy is removed before this returns."""
+    The ids come from pytest's own collection on each side, not from a class or decorator name. Copying
+    the pull-request test file onto the base happens after that collection. A shared id is one both sides
+    collected: the pull-request body is what runs on the base, so a strengthened assertion can fail there.
+    The copy is removed before this returns."""
     files = rec.get("files") if isinstance(rec, dict) else None
     if not _candidate_test_files(files, pr_root):
         return
     discovered, evidence = _new_ids_for(files, main_root, pr_root, venvs, prdir, a, keep, use_contree, plugins_off)
     rec["base_new_tests"] = evidence
-    if not discovered:
+    to_run = _ids_to_run(discovered, evidence)
+    if not to_run:
         return
-    rec["cross_run_collected_files"] = sorted(discovered)
+    rec["cross_run_collected_files"] = sorted(to_run)
     saved: list = []
     try:
-        uploaded = _contree_test_files(pr_root, list(discovered)) if use_contree else None
+        uploaded = _contree_test_files(pr_root, list(to_run)) if use_contree else None
         blocked: list[str] = []
         if not use_contree:
-            saved = _overlay_pr_tests(main_root, pr_root, list(discovered), blocked)
+            saved = _overlay_pr_tests(main_root, pr_root, list(to_run), blocked)
             for rel in blocked:
                 if rel not in evidence["collection_failed"]:
                     evidence["collection_failed"].append(rel)
             if blocked:
-                discovered = {rel: nodes for rel, nodes in discovered.items() if rel not in blocked}
-                if not discovered:
+                to_run = {rel: nodes for rel, nodes in to_run.items() if rel not in blocked}
+                if not to_run:
                     return
         n = len(results["main"])
-        base_runs = [_run_node_ids("main", venvs["main"], main_root, discovered, prdir, a, keep, use_contree,
+        base_runs = [_run_node_ids("main", venvs["main"], main_root, to_run, prdir, a, keep, use_contree,
                                    plugins_off, uploaded, i + 1) for i in range(n)]
-        known = list(discovered)
-        wanted = [node for nodes in discovered.values() for node in nodes]
+        known = list(to_run)
+        wanted = [node for nodes in to_run.values() for node in nodes]
         pr_extra = None
         if not _pr_runs_cover(results["pr"], wanted, pr_root, known):
-            pr_extra = [_run_node_ids("pr", venvs["pr"], pr_root, discovered, prdir, a, keep, use_contree,
+            pr_extra = [_run_node_ids("pr", venvs["pr"], pr_root, to_run, prdir, a, keep, use_contree,
                                       plugins_off, None, i + 1) for i in range(n)]
-        _fold_cross_run(results, base_runs, pr_extra, list(discovered), prdir, files)
         pr_rows = pr_extra if pr_extra is not None else results["pr"]
+        _settle_ran_nodes(evidence, wanted, base_runs, pr_rows, results, prdir, files, main_root)
+        _fold_cross_run(results, base_runs, pr_extra, list(to_run), prdir, files)
         _classify_new_on_base(evidence, discovered, base_runs, pr_rows, main_root, results, prdir)
     finally:
         _restore_overlay(saved)
@@ -7717,6 +7845,9 @@ def collection_limitation_message(source: dict | None) -> str | None:
         more = f" (+{len(missed) - 8} more)" if len(missed) > 8 else ""
         parts.append(f"Limitation: {shown}{more} did not run on the base. "
                      "They are not a new pass, and this result does not cover them.")
+    extras = [str(item).strip() for item in _evidence_dict(source).get("environment_limits") or [] if str(item).strip()]
+    if extras:
+        parts.append("Limitation: " + "; ".join(extras[:6]) + ".")
     return " ".join(parts) or None
 
 
@@ -7757,6 +7888,34 @@ def _drop_unexecuted_shared(cmp: dict) -> None:
     cmp["new_tests_passing_ids"] = kept
     cmp["new_tests_passing"] = len(kept)
     info["not_executed"] = not_exec
+
+
+def _drop_environment_fixed(cmp: dict) -> None:
+    """A base ImportError or missing fixture is not a fix, even when the ordinary run recorded it.
+
+    The pull-request pass stays out of ``fixed`` and out of ``new_tests_passing``. The missing name is
+    kept on the collection evidence so a verified result becomes could not verify."""
+    if not isinstance(cmp, dict):
+        return
+    info = cmp.get("base_new_tests")
+    if not isinstance(info, dict):
+        return
+    notes = info.setdefault("environment_limits", [])
+    not_exec = info.setdefault("not_executed", [])
+    messages = cmp.get("base_messages") or {}
+    kept = []
+    for tid in cmp.get("fixed") or []:
+        msg = str(messages.get(tid) or "")
+        gap = _environment_gap("failed", msg, msg)
+        if gap:
+            if str(tid) not in not_exec:
+                not_exec.append(str(tid))
+            line = f"{tid}: {gap}"
+            if line not in notes:
+                notes.append(line)
+            continue
+        kept.append(tid)
+    cmp["fixed"] = kept
 
 
 def _drop_gap_new_passes(cmp: dict) -> None:
@@ -7813,7 +7972,17 @@ def _attach_already_on_base(rec: dict, cmp: dict | None) -> None:
         return
     pr = rec.get("pr") if isinstance(rec.get("pr"), dict) else {}
     tested = pr.get("tested_main_sha") or rec.get("tested_main_sha")
-    note = already_on_base_message(cmp, rec.get("base_ref"), tested)
+    actual = str(rec.get("base_head_sha") or "").strip().lower()
+    stated = str(tested or "").strip().lower()
+    if actual and stated and not (actual.startswith(stated) or stated.startswith(actual)):
+        # The record names a commit the base checkout is not on. Do not attach that sha as evidence.
+        tested = None
+        suppress_note = True
+    else:
+        suppress_note = False
+        if actual and not stated:
+            tested = actual
+    note = None if suppress_note else already_on_base_message(cmp, rec.get("base_ref"), tested)
     limit = collection_limitation_message(cmp)
     previous_note = rec.get("already_on_base")
     previous_limit = rec.get("collection_limitation")
@@ -7864,6 +8033,10 @@ def record_cross_run(rec: dict, venvs: dict, targets: dict | None, prdir: Path, 
     main_root, pr_root = _side_tree("main", venvs, cwds), _side_tree("pr", venvs, cwds)
     if main_root is None or pr_root is None:
         return results
+    if isinstance(rec, dict):
+        head = _git_head(main_root)
+        if head:
+            rec["base_head_sha"] = head
     rels = [rel for rel in changed_test_files(rec.get("files") if isinstance(rec, dict) else None)
             if (pr_root / rel).is_file()]
     file_info = rec.get("files") if isinstance(rec, dict) else None

@@ -494,7 +494,13 @@ def test_the_note_is_in_the_report_and_the_pdf(tmp_path):
 
 
 def _pdf_strings(path: Path) -> str:
-    """Text drawn by the built-in PDF maker (ASCII85 and Flate streams, then the literal strings)."""
+    """Text of a report PDF. Chrome's PDF is read with pdftotext; the built-in maker is parsed directly."""
+    import shutil
+    import subprocess
+    if shutil.which("pdftotext"):
+        done = subprocess.run(["pdftotext", str(path), "-"], capture_output=True, text=True)
+        if done.returncode == 0 and done.stdout.strip():
+            return done.stdout
     import base64
     import re
     import zlib
