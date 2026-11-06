@@ -1,0 +1,23 @@
+{
+ "record_kind": "placeholder",
+ "placeholder": true,
+ "repo": "o/lib",
+ "library": "lib",
+ "pr": 5,
+ "title": "t",
+ "verdict": "could_not_verify",
+ "reason": "the check started but did not finish, so this placeholder was never replaced",
+ "coverage_gate": {
+  "kind": "placeholder",
+  "changed": false,
+  "confidence": "low",
+  "note": "the check did not finish",
+  "measurement": null
+ },
+ "pdf_push": {
+  "ok": true,
+  "attempts": 1,
+  "error": null,
+  "url": "https://github.com/aritracodesbad123/Proof-of-change/tree/runs/runs/2026-11-06/c1e751a/lib-5"
+ }
+}
