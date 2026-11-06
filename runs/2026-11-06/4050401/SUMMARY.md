@@ -1,16 +1,16 @@
-# Proof-of-Change check: 2026-11-06-check-1118
+# Proof-of-Change check: 2026-11-06-check-1124
 
-Generated 2026-11-06 11:24 IST. 1 report(s): 0 need attention, 1 could not be verified, 0 verified. Items that need a decision are listed first.
+Generated 2026-11-06 11:29 IST. 1 report(s): 0 need attention, 1 could not be verified, 0 verified. Items that need a decision are listed first.
 
 ## Needs attention first
 
-- **COULD NOT VERIFY / Re-run** (Low confidence): pyinvoke/invoke#1097: Use command-line names in missing-argument errors, tested against its own tests. Could not verify: claim(s) C1, C2, C4 expect a difference but no observation matches (134 test(s) ran on main, 137 on the PR; 3 new test(s) pass, 135 unchanged (1 of them skipped on both sides); probe model-p1 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count). [Open report](invoke-1097/REPORT.html) ([PDF](invoke-1097/REPORT.pdf))
+- **COULD NOT VERIFY / Re-run** (Low confidence): Delgan/loguru#1515: Evaluate every rotation condition so a skipped one cannot fire spuriously, tested against its own tests. Install failed (1); see setup-pr.log. [Open report](loguru-1515/REPORT.html) ([PDF](loguru-1515/REPORT.pdf))
 
 ## All reports
 
 | Verdict | Action | Confidence | Subject | Tested against | Why | Evals | Report |
 |---|---|---|---|---|---|---|---|
-| ⚪ **COULD NOT VERIFY** | ⚪ **Re-run** | Low | pyinvoke/invoke#1097: Use command-line names in missing-argument errors | its own tests | could not verify: claim(s) C1, C2, C4 expect a difference but no observation matches (134 test(s) ran on main, 137 on the PR; 3 new test(s) pass, 135 unchanged (1 of them skipped on both sides); probe model-p1 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count) | 🟢 **APPROVE** | [HTML](invoke-1097/REPORT.html) · [PDF](invoke-1097/REPORT.pdf) · [MD](invoke-1097/REPORT.md) |
+| ⚪ **COULD NOT VERIFY** | ⚪ **Re-run** | Low | Delgan/loguru#1515: Evaluate every rotation condition so a skipped one cannot fire spuriously | its own tests | install failed (1); see setup-pr.log | 🟢 **APPROVE** | [HTML](loguru-1515/REPORT.html) · [PDF](loguru-1515/REPORT.pdf) · [MD](loguru-1515/REPORT.md) |
 
 ## Verdict meanings
 
