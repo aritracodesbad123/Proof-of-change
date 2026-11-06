@@ -178,7 +178,12 @@ def sha_check(case: dict, rec: dict | None) -> list[str]:
     # A moved live PR head is information only (kept in the result as head_moved / current_head_sha):
     # the check tested the pinned commits, so only a mismatch in the tested commits marks a case not run.
     p += pr_side(case, sides)[1]
-    if main_sha != case["base_sha"]:
+    # A manifest base the head is behind is not the fork. The check then tests the merge-base of that
+    # supplied base and the head, and says so. Any other base is still a mismatch: a newer tip is not accepted.
+    resolved_fork = (main_sha != case["base_sha"] and sides.get("supplied_base_sha") == case["base_sha"]
+                     and sides.get("behind_target") is True and sides.get("authoritative_base") == "merge-base"
+                     and sides.get("pr_sha") == case["head_sha"])
+    if main_sha != case["base_sha"] and not resolved_fork:
         p.append(f"tested base {main_sha} is not the manifest base_sha")
     if main_sha and head and main_sha == head:
         p.append("base and PR head are the same commit")

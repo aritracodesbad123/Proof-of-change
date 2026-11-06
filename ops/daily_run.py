@@ -294,6 +294,41 @@ def diff_files(diff: str) -> list[str]:
     return files
 
 
+_HUNK_NEW = re.compile(r"^@@ -\d+(?:,\d+)? \+(\d+)(?:,(\d+))? @@")
+
+
+def diff_new_lines(diff: str) -> dict[str, set[int]]:
+    """New-side line numbers a unified diff adds or replaces, per path.
+
+    A context line is not a change. A file the diff only deletes has no new-side lines. Line numbers are
+    the lines of the file after the diff (the pull-request side), so they match that checkout."""
+    out: dict[str, set[int]] = {}
+    path, new_no, in_hunk = None, 0, False
+    for raw in (diff or "").splitlines():
+        if raw.startswith("diff --git "):
+            path, in_hunk = None, False
+            continue
+        if raw.startswith("+++ "):
+            name = raw[4:].strip()
+            path = None if name == "/dev/null" else (name[2:] if name.startswith("b/") else name)
+            in_hunk = False
+            continue
+        hunk = _HUNK_NEW.match(raw)
+        if hunk:
+            new_no, in_hunk = int(hunk.group(1)), True
+            continue
+        if not in_hunk or path is None:
+            continue
+        if raw.startswith("+"):
+            out.setdefault(path, set()).add(new_no)
+            new_no += 1
+        elif raw.startswith("-") or raw.startswith("\\"):
+            continue
+        else:
+            new_no += 1
+    return out
+
+
 def classify_files(files: list[str], pkg: str) -> dict:
     in_pkg = [f for f in files if f.startswith((pkg + "/", f"src/{pkg}/"))]   # flat or src layout
     py = [f for f in in_pkg if f.endswith((".py", ".pyi"))]
@@ -1315,10 +1350,104 @@ def sides_identical(rec: dict) -> bool:
     return bool(s.get("main_sha")) and s.get("main_sha") == s.get("pr_sha")
 
 
+def authoritative_base(src, env, base_commit: str, head_commit: str) -> dict:
+    """The commit a pull request should be compared with.
+
+    ``base_commit`` is whatever was recorded as the base: GitHub's ``base.sha`` (the target branch tip, by
+    the API's design, not the fork point) or a SHA the caller passed. The merge-base is read from this
+    repository's history and from these two commits only. No other ref is consulted, so a newer tip of a
+    different branch is never substituted.
+
+    When ``base_commit`` is already an ancestor of ``head_commit``, it is the base. The pull request is not
+    behind it, including when that ancestor is an older branch tip. When the two commits have diverged, the
+    pull request is behind ``base_commit``: commits on ``base_commit`` since the fork are not pull-request
+    changes, and the comparison base is the merge-base. When the head is already contained in ``base_commit``,
+    the supplied base is left as given; a later step decides whether the two sides would be the same code.
+    """
+    base_commit, head_commit = str(base_commit or ""), str(head_commit or "")
+    kept = {"base": base_commit, "behind": False, "authoritative_base": "supplied",
+            "reason": "supplied base kept"}
+    if not base_commit or not head_commit:
+        kept["reason"] = "missing commit; supplied base kept"
+        return kept
+    mb = _git_out(src, env, "merge-base", base_commit, head_commit)
+    if not mb:
+        kept["reason"] = "merge-base unavailable; supplied base kept"
+        return kept
+    if mb == base_commit:
+        return {"base": base_commit, "behind": False, "merge_base": mb, "authoritative_base": "supplied",
+                "confirmed_ancestor": True, "reason": "supplied base is an ancestor of the head"}
+    if mb == head_commit:
+        return {"base": base_commit, "behind": False, "merge_base": mb, "authoritative_base": "supplied",
+                "head_contained": True, "reason": "head is already contained in the supplied base"}
+    return {"base": mb, "behind": True, "merge_base": mb, "supplied_base": base_commit,
+            "authoritative_base": "merge-base",
+            "reason": "PR is behind the supplied base; comparison uses their merge-base"}
+
+
+def comparison_choice(src, env, *, head: str, supplied_base: str, target_tip: str) -> dict | None:
+    """The comparison commits when history should override the target tip. None keeps the caller's later choice
+    (a test merge onto the tip, or the existing conflict / moved-head merge-base).
+
+    A pull request that is behind the recorded base is compared at the merge-base of that base and the head,
+    not at the tip and not at a merge of the head into the tip: the tip's tree contains target-branch edits
+    the pull request did not make. A recorded base that is already an ancestor of the head, and that is not
+    the fetched tip, is kept. That is an explicit older base. The fetched tip is not written over it.
+    """
+    supplied_base, target_tip = str(supplied_base or ""), str(target_tip or "")
+    candidate = supplied_base or target_tip
+    if not candidate or not head:
+        return None
+    info = authoritative_base(src, env, candidate, head)
+    if info.get("behind") and info.get("base"):
+        return {"main_sha": info["base"], "pr_sha": head, "behind_target": True, "explicit_base": False,
+                "supplied_base_sha": candidate, "authoritative_base": "merge-base", "target_tip_sha": target_tip,
+                "comparison_basis": "merge-base of the recorded base and the PR head vs PR head "
+                                    "(the PR is behind that base, so commits added to the target after the fork "
+                                    "are not pull-request changes)"}
+    if (supplied_base and info.get("merge_base") == supplied_base and not info.get("head_contained")
+            and supplied_base != target_tip):
+        return {"main_sha": supplied_base, "pr_sha": head, "behind_target": False, "explicit_base": True,
+                "supplied_base_sha": supplied_base, "authoritative_base": "supplied", "target_tip_sha": target_tip,
+                "comparison_basis": "caller-supplied base vs PR head (that base is an ancestor of the head; "
+                                    "a newer target tip was not substituted)"}
+    return None
+
+
+def _commit_diff(src, env, base: str, head: str) -> tuple[str | None, str | None]:
+    """(unified diff, None) of ``base`` ``head``, or (None, why)."""
+    try:
+        got = subprocess.run(["git", "-C", str(src), "diff", "--no-color", "--no-ext-diff", base, head],
+                             capture_output=True, text=True, timeout=600, env=env)
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        return None, f"git diff of the comparison commits failed: {exc}"
+    if got.returncode != 0:
+        return None, f"git diff of the comparison commits failed ({got.returncode})"
+    return got.stdout, None
+
+
+def align_diff_to_commits(item: dict, src, env, base: str, head: str, pkg: str | None = None) -> str | None:
+    """Replace the stored diff with ``git diff base head`` so changed lines, new tests and probes describe the
+    commits that are checked out. None on success, else why."""
+    text, why = _commit_diff(src, env, base, head)
+    if why:
+        return why
+    item["github_diff_ignored"] = True
+    item["diff"] = text
+    item["diff_aligned_to"] = [base, head]
+    item["diff_source"] = "git diff comparison base vs PR head"
+    if pkg:
+        item["files"] = classify_files(diff_files(text or ""), pkg)
+    return None
+
+
 def source_pair(repo: str, item: dict, work: Path, log: Path, python: str, timeout: int, product: bool = False) -> dict:
     """Pure-Python library without nightly wheels: build both sides from git.
-    Conflicting PR (mergeable false / state dirty): main = merge-base(PR head, base branch), PR = PR head.
-    Mergeable PR: main = current base-branch tip, PR = GitHub's test merge commit (refs/pull/N/merge).
+
+    A pull request that is behind its recorded base is compared at the merge-base of that base and the head.
+    A recorded base that is already an ancestor of the head, and is not the fetched target tip, is kept.
+    Otherwise a conflicting pull request uses the merge-base of the head and the target tip, and a mergeable
+    one uses the target tip against GitHub's test merge (refs/pull/N/merge).
     Benchmark mode (ops/bench.py) checks both sides out at pinned SHAs beforehand and passes them in item["bench_sides"]."""
     if item.get("bench_sides"):
         return item["bench_sides"]
@@ -1339,13 +1468,25 @@ def source_pair(repo: str, item: dict, work: Path, log: Path, python: str, timeo
     conflicting = item.get("mergeable") is False or item.get("mergeable_state") == "dirty"
     base_tip = subprocess.run(["git", "-C", src, "rev-parse", f"origin/{item['base_ref']}"], env=env, capture_output=True,
                               text=True).stdout.strip()
-    if conflicting or head != item.get("current_head_sha", head):
+    supplied = str(item.get("base_sha") or "")
+    if supplied and _git_out(src, env, "cat-file", "-t", supplied) != "commit":
+        run(["git", "-C", src, "fetch", "-q", "origin", supplied], log, env=env, timeout=300)
+    choice = comparison_choice(src, env, head=head, supplied_base=supplied, target_tip=base_tip)
+    if choice:
+        res |= choice
+        why = align_diff_to_commits(item, src, env, res["main_sha"], res["pr_sha"])
+        if why:
+            return {"ok": False, "why": why}
+    elif conflicting or head != item.get("current_head_sha", head):
         mb = subprocess.run(["git", "-C", src, "merge-base", head, base_tip], env=env, capture_output=True, text=True).stdout.strip()
         if not mb:
             return {"ok": False, "why": "could not compute merge-base of PR head and base branch"}
         res |= {"comparison_basis": "merge-base vs PR head" + (" (PR conflicts with base)" if conflicting else
                                                              " (pinned head differs from current head)"),
-                "main_sha": mb, "pr_sha": head}
+                "main_sha": mb, "pr_sha": head, "authoritative_base": "merge-base"}
+        why = align_diff_to_commits(item, src, env, mb, head)
+        if why:
+            return {"ok": False, "why": why}
     else:
         merge_fetch = ["git", "-C", src, "fetch", "-q", "origin", f"pull/{item['pr']}/merge"]
         rc, _ = run(merge_fetch, log, env=env, timeout=300)
@@ -1354,7 +1495,12 @@ def source_pair(repo: str, item: dict, work: Path, log: Path, python: str, timeo
         merge = subprocess.run(["git", "-C", src, "rev-parse", "FETCH_HEAD"], env=env, capture_output=True, text=True).stdout.strip()
         if rc != 0 or not merge:
             mb = subprocess.run(["git", "-C", src, "merge-base", head, base_tip], env=env, capture_output=True, text=True).stdout.strip()
-            res |= {"comparison_basis": "merge-base vs PR head (no merge ref available)", "main_sha": mb, "pr_sha": head}
+            res |= {"comparison_basis": "merge-base vs PR head (no merge ref available)", "main_sha": mb, "pr_sha": head,
+                    "authoritative_base": "merge-base", "behind_target": bool(mb and base_tip and mb != base_tip and mb != head)}
+            if mb:
+                why = align_diff_to_commits(item, src, env, mb, head)
+                if why:
+                    return {"ok": False, "why": why}
         else:
             parent1 = subprocess.run(["git", "-C", src, "rev-parse", f"{merge}^1"], env=env, capture_output=True, text=True).stdout.strip()
             parent2 = subprocess.run(["git", "-C", src, "rev-parse", f"{merge}^2"], env=env, capture_output=True,
@@ -1366,6 +1512,11 @@ def source_pair(repo: str, item: dict, work: Path, log: Path, python: str, timeo
         bad = distinct_base(src, env, log, item, res)
         if bad:
             return bad
+    aligned = item.get("diff_aligned_to")
+    if aligned and aligned != [res.get("main_sha"), res.get("pr_sha")]:
+        why = align_diff_to_commits(item, src, env, res["main_sha"], res["pr_sha"])
+        if why:
+            return {"ok": False, "why": why}
     for side in ("main", "pr"):
         # git -C resolves relative worktree paths against src/, not cwd.
         rc, _ = run(["git", "-C", src, "worktree", "add", "-q", "--detach",
@@ -1393,43 +1544,68 @@ def pinned_clone(repo: str, pinned: dict, work: Path, log: Path) -> str | None:
     return None
 
 
+def resolved_pinned(src, env, pinned: dict) -> dict:
+    """The pinned pair, after ancestry is checked against those two commits only.
+
+    The target-branch tip is not fetched and is not substituted. A supplied base that is an ancestor of the
+    head is kept, even when it is older than some other branch. A supplied base the head is behind is replaced
+    by the merge-base of the two supplied commits, so a two-dot diff cannot treat the base's later edits as
+    pull-request edits. When the history cannot be read, the supplied pair is kept."""
+    supplied = str(pinned.get("supplied_main") or pinned.get("main") or "")
+    head = str(pinned.get("pr") or "")
+    info = authoritative_base(src, env, supplied, head) if supplied and head else {}
+    return {**pinned, "main": info.get("base") or supplied, "pr": head, "supplied_main": supplied,
+            "behind": bool(info.get("behind")), "authoritative_base": info.get("authoritative_base") or "supplied",
+            "head_contained": bool(info.get("head_contained")),
+            "confirmed_ancestor": bool(info.get("confirmed_ancestor"))}
+
+
 def apply_pinned_diff(repo: str, item: dict, pkg: str, work: Path, log: Path) -> str | None:
     """When a check is pinned (--base-sha/--head-sha), replace the PR diff and changed-file list taken from GitHub's
-    current PR view with `git diff base_sha head_sha` from the pinned clone, so pr.diff, claims, file mapping and line
-    coverage all describe the commits actually tested. Records head_moved when the live PR head differs from the
-    pinned head. Returns None on success, else why."""
-    pinned = item["pinned_sides"]
-    why = pinned_clone(repo, pinned, work, log)
+    current PR view with the diff of the commits that will be tested. A supplied base the head is behind is the
+    merge-base of those two SHAs, not the supplied tip. A supplied base that is an ancestor of the head is kept.
+    Records head_moved when the live PR head differs from the pinned head. Returns None on success, else why."""
+    env = base_env(work / "home-git")
+    why = pinned_clone(repo, item["pinned_sides"], work, log)
     if why:
         return why
-    try:
-        d = subprocess.run(["git", "-C", str(work / "src"), "diff", "--no-color", "--no-ext-diff",
-                            pinned["main"], pinned["pr"]], capture_output=True, text=True, timeout=600,
-                           env=base_env(work / "home-git"))
-    except (OSError, subprocess.TimeoutExpired) as e:
-        return f"git diff of pinned commits failed: {e}"
-    if d.returncode != 0:
-        return f"git diff of pinned commits failed ({d.returncode})"
-    item["github_diff_ignored"] = True
-    item["diff"] = d.stdout
-    item["files"] = classify_files(diff_files(d.stdout), pkg)
-    item["diff_source"] = "git diff base_sha head_sha (pinned commits)"
+    pinned = resolved_pinned(work / "src", env, item["pinned_sides"])
+    item["pinned_sides"] = pinned
+    why = align_diff_to_commits(item, work / "src", env, pinned["main"], pinned["pr"], pkg)
+    if why:
+        return why
+    if pinned.get("behind"):
+        item["diff_source"] = ("git diff merge-base head (the supplied base is ahead of the fork; "
+                               "target-only commits are excluded)")
+    else:
+        item["diff_source"] = "git diff base_sha head_sha (pinned commits)"
     live = item.get("current_head_sha")
     item["head_moved"] = bool(live) and live != pinned["pr"]
     return None
 
 
 def pinned_source_pair(repo: str, pinned: dict, work: Path, log: Path) -> dict:
-    """Both sides at the exact commits a benchmark case file pins (--base-sha / --head-sha): main = base_sha,
-    PR = head_sha. No base-branch tip, merge ref or merge-base is looked up, so a case keeps testing the commits it
-    was written for after upstream moves on."""
+    """Both sides at the commits ``--base-sha`` / ``--head-sha`` name, after ancestry is checked.
+
+    Only those two commits are consulted. The target-branch tip, a merge ref and any newer tip are not looked
+    up. A base that is an ancestor of the head is checked out as given. A base the head is behind is checked
+    out at the merge-base of the two commits, and the head stays the supplied head."""
     env = base_env(work / "home-git")
     src = work / "src"
     why = pinned_clone(repo, pinned, work, log)
     if why:
         return {"ok": False, "why": why}
-    res = {"comparison_basis": "pinned base vs pinned PR head (benchmark case file)",
-           "main_sha": pinned["main"], "pr_sha": pinned["pr"], "pinned": True}
+    pinned = resolved_pinned(src, env, pinned)
+    if pinned.get("behind"):
+        basis = ("merge-base of the supplied base and the PR head vs PR head "
+                 "(the supplied base is ahead of the fork)")
+    else:
+        basis = "pinned base vs pinned PR head (benchmark case file)"
+    res = {"comparison_basis": basis, "main_sha": pinned["main"], "pr_sha": pinned["pr"], "pinned": True,
+           "supplied_base_sha": pinned.get("supplied_main") or pinned["main"],
+           "behind_target": bool(pinned.get("behind")),
+           "authoritative_base": pinned.get("authoritative_base") or "supplied",
+           "explicit_base": bool(pinned.get("confirmed_ancestor"))}
     for side in ("main", "pr"):
         rc, _ = run(["git", "-C", src, "worktree", "add", "-q", "--detach",
                     (work / f"side-{side}").resolve(), res[f"{side}_sha"]], log, env=env, timeout=900)
@@ -7855,16 +8031,35 @@ def test_source_pair(repo: str, cfg: dict, item: dict, prdir: Path, work: Path, 
         rec["pr"]["merge_commit"] = sp["merge_commit"]
     if sp.get("ok"):
         use_checkout_package(repo, cfg, work / "side-main", item, rec)
-        rec["tested"] = {"main": f"{item['base_ref']} @ {sp['main_sha'][:12]}"
-                                 + (" (merge-base with the PR head)" if "merge-base" in sp["comparison_basis"]
-                                    else " (base tip = first parent of the merge commit)"),
+        if item.get("diff_aligned_to") == [sp.get("main_sha"), sp.get("pr_sha")]:
+            # Changed files, new tests and probes all read this diff. It is the diff of the commits checked out
+            # below, so a target-only edit is not a pull-request change and the base tree is the one setup reads.
+            item["files"] = classify_files(diff_files(item.get("diff") or ""), cfg["pkg"])
+            rec["files"] = dict(item["files"])
+            try:
+                (prdir / "pr.diff").write_text(item.get("diff") or "")
+            except OSError:
+                pass
+        if "merge-base" in sp.get("comparison_basis", ""):
+            base_note = " (merge-base with the PR head)"
+        elif sp.get("explicit_base"):
+            base_note = " (caller-supplied base, an ancestor of the PR head)"
+        else:
+            base_note = " (base tip = first parent of the merge commit)"
+        rec["tested"] = {"main": f"{item['base_ref']} @ {sp['main_sha'][:12]}" + base_note,
                          "pr": (f"GitHub test merge commit {sp['merge_commit'][:12]} (refs/pull/{item['pr']}/merge) of head "
                                 f"{item['head_sha'][:12]}" if sp.get("merge_commit") else f"PR head {sp['pr_sha'][:12]}")}
         if isinstance(sp.get("main_sha"), str) and re.fullmatch(r"[0-9a-f]{7,40}", sp["main_sha"]):
             rec["pr"]["tested_main_sha"] = sp["main_sha"]
-            rec["pr"]["tested_main_sha_label"] = (
-                "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts "
-                "or the pinned head differs from the current head)")
+            if sp.get("behind_target"):
+                label = ("merge-base of the recorded base and the PR head (the recorded base is ahead of that "
+                         "fork; target-branch commits after the fork are not pull-request changes)")
+            elif sp.get("explicit_base"):
+                label = ("caller-supplied base (an ancestor of the PR head; a newer target tip was not used)")
+            else:
+                label = ("main side that was tested (base-branch tip, or the merge-base when the pull request conflicts "
+                         "or the pinned head differs from the current head)")
+            rec["pr"]["tested_main_sha_label"] = label
     cnv, cmp, ex = None, None, None
     if not sp["ok"]:
         cnv = sp["why"]
