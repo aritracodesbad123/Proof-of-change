@@ -8,10 +8,10 @@ dropped a pull request the selection still names.
     python -m ops.chosen_write check PATH [--intended selection.json] [--now 2026-11-06T04:30:00Z]
     python -m ops.chosen_write write PATH --intended selection.json --from-file note.md
 
-On success the command prints the parse as JSON. On failure it exits 2, prints the same JSON
-(what the reader actually kept) and a correctable reason. A failure also leaves
-``<file>.write-failed.json`` beside the note. The daily run stops on that marker before it
-selects any pull request, and it does not replace a note that was already there.
+On success the command prints the parse as JSON. On failure it exits 2, prints the parse the
+reader actually kept, and writes the same no-go summary PDF a refused run leaves
+(``<file>.no-go/SUMMARY.pdf``) with the reason and how to fix the heading. A marker beside the
+note makes the daily run stop before it selects anything. The previous note is not replaced.
 """
 from __future__ import annotations
 
@@ -19,6 +19,7 @@ import argparse
 import datetime as dt
 import json
 import os
+import shutil
 import sys
 import tempfile
 from pathlib import Path
@@ -28,6 +29,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from ops import daily_run  # noqa: E402
+from poc import pdf_always  # noqa: E402
 
 MARKER_SUFFIX = ".write-failed.json"
 SELECTION_SUFFIX = ".selection.json"
@@ -59,6 +61,11 @@ def selection_path(path: Path) -> Path:
 
 def log_path(path: Path) -> Path:
     return Path(str(path) + LOG_SUFFIX)
+
+
+def no_go_dir(path: Path) -> Path:
+    """Folder of the no-go summary written when this note is refused. Not a run folder."""
+    return path.parent / f"{path.name}.no-go"
 
 
 def parse_text(text: str) -> dict:
@@ -161,14 +168,15 @@ def assess(text: str, intended) -> tuple[dict, list[str]]:
     return parsed, problems
 
 
-def _message(problems: list[str], parsed: dict) -> str:
+def _message(problems: list[str], parsed: dict, path: Path) -> str:
     shown = "; ".join(problems[:8])
     found = ", ".join(f"{repo}#{pr}" for repo, pr, _fields in _rows(parsed)) or "nothing"
     extra = "" if len(problems) <= 8 else f" ({len(problems) - 8} more)"
     return ("Stopped: the chosen-PRs file was not accepted. "
             f"{shown}{extra}. The reader got: {found}. "
             "The previous file was left unchanged. "
-            f"The preflight log is the note's name plus {LOG_SUFFIX!r}.")
+            f"No-go summary: {path.name}.no-go/SUMMARY.pdf. "
+            "Fix the heading or the commit, then write the note again.")
 
 
 def _brief(parsed: dict) -> str:
@@ -215,6 +223,20 @@ def _write_marker(path: Path, message: str, problems: list[str], parsed: dict, i
         "ok": False, "error": message, "problems": problems, "parsed": parsed, "intended": intended}))
 
 
+def _surface(path: Path, message: str) -> None:
+    """The same no-go PDF a refused daily run leaves, written here so the reason is not only a log line."""
+    try:
+        pdf_always.nogo_summary(no_go_dir(path), path.name, message)
+    except OSError:
+        pass
+
+
+def _clear_surface(path: Path) -> None:
+    folder = no_go_dir(path)
+    if folder.is_dir():
+        shutil.rmtree(folder)
+
+
 def read_failure(path: Path) -> str | None:
     """The stop line recorded beside ``path``, or None when the last write was accepted."""
     marker = marker_path(path)
@@ -248,12 +270,15 @@ def write_chosen(path: Path, text: str, intended, *, now: dt.datetime | None = N
         raise
     except OSError as exc:
         message = (f"Stopped: the chosen-PRs file could not be read back ({type(exc).__name__}). "
-                   "The previous file was left unchanged.")
+                   "The previous file was left unchanged. "
+                   f"No-go summary: {path.name}.no-go/SUMMARY.pdf.")
+        _surface(path, message)
         _write_marker(path, message, [message], {}, intended)
         _log(path, "FAILED " + message, now)
         raise ChosenWriteError(message, parsed={}, problems=[message]) from exc
     if problems:
-        message = _message(problems, parsed)
+        message = _message(problems, parsed, path)
+        _surface(path, message)
         _write_marker(path, message, problems, parsed, intended)
         _log(path, "FAILED " + message, now)
         raise ChosenWriteError(message, parsed=parsed, problems=problems)
@@ -262,13 +287,16 @@ def write_chosen(path: Path, text: str, intended, *, now: dt.datetime | None = N
         _atomic(selection_path(path), _dump(parsed))
     except OSError as exc:
         message = (f"Stopped: the chosen-PRs file write did not finish ({type(exc).__name__}). "
-                   "A partial file is not the selection. The daily run will stop until a write finishes.")
+                   "A partial file is not the selection. The daily run will stop until a write finishes. "
+                   f"No-go summary: {path.name}.no-go/SUMMARY.pdf.")
+        _surface(path, message)
         _write_marker(path, message, [message], parsed, intended)
         _log(path, "FAILED " + message, now)
         raise ChosenWriteError(message, parsed=parsed, problems=[message]) from exc
     marker = marker_path(path)
     if marker.exists():
         marker.unlink()
+    _clear_surface(path)
     _log(path, "OK " + _brief(parsed), now)
     return parsed
 
@@ -292,7 +320,9 @@ def check_chosen(path: Path, intended=None, *, now: dt.datetime | None = None) -
     path = Path(path)
     blocked = read_failure(path)
     if not path.is_file():
-        message = blocked or f"Stopped: {path.name} is missing, so there is no chosen-PRs file to read."
+        message = blocked or (f"Stopped: {path.name} is missing, so there is no chosen-PRs file to read. "
+                              f"No-go summary: {path.name}.no-go/SUMMARY.pdf.")
+        _surface(path, message)
         _log(path, "FAILED " + message, now)
         raise ChosenWriteError(message, parsed={}, problems=[message])
     if intended is None:
@@ -305,10 +335,12 @@ def check_chosen(path: Path, intended=None, *, now: dt.datetime | None = None) -
     if blocked:
         message = blocked
     elif problems:
-        message = _message(problems, parsed)
+        message = _message(problems, parsed, path)
     else:
+        _clear_surface(path)
         _log(path, "OK " + _brief(parsed), now)
         return parsed
+    _surface(path, message)
     _log(path, "FAILED " + message, now)
     raise ChosenWriteError(message, parsed=parsed, problems=problems or [message])
 

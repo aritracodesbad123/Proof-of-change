@@ -13,22 +13,22 @@ beside the note as JSON (`<file>.selection.json`). That JSON is the parser's res
 rendering of the note.
 
 When the parse drops a section, or disagrees with the selection, the writer refuses. The previous
-note stays in place. The refusal is a non-zero exit, a line on the standard error stream, a line in
-`<file>.preflight.log`, and a marker `<file>.write-failed.json`. The marker holds the reason and the
-parse the reader actually returned, so the writer can correct the heading and try again.
+note stays in place. The refusal is the same no-go summary a refused run already leaves:
+`<file>.no-go/SUMMARY.pdf`, written by `poc/pdf_always.nogo_summary`, naming the section or field
+that disagreed. The standard error stream prints that same reason
+and names the PDF. A marker, `<file>.write-failed.json`, holds the reason and the parse so the note
+can be corrected and written again.
 
-The daily run, before it selects any pull request, reads that marker. If the marker is there it stops
-with the same reason, writes it into the run log, and leaves through the existing no-go path (a
-no-go summary PDF, then the same publish step as any other early stop). If the marker is absent, the
-run's previous rule is unchanged: a file that is present but names no pull request still stops, and a
-file the parser accepts is used as before. Verdict rules are not part of this change.
+The daily run reads that marker before it fetches or selects. If the marker is there it stops with
+the same reason and then follows the existing early-stop path. If the marker is absent, the run's
+previous rule is unchanged: a file that is present but names no pull request still stops, and a file
+the parser accepts is used as before. Verdict rules are not part of this change.
 
 ## Why
 
-The note is written before the daily run. A heading the parser does not accept used to be discovered
-only when the run started, and a parse that kept some pull requests and dropped one could be treated
-as the selection. The dropped pull request was no longer the one that had been chosen. The failure
-has to be visible when the note is written, and a run must not start as if that write had succeeded.
+The note is written before the daily run. A parse that drops a pull request, or that disagrees with
+the selection, must be refused when the note is written. A non-zero exit recorded only in a log is
+not the signal a refused run already uses. The signal is the no-go summary PDF.
 
 ## Decision
 
@@ -40,18 +40,18 @@ has to be visible when the note is written, and a run must not start as if that 
 - A numbered section the parser splits off and then drops is a failure even when other sections survive.
   That is the cleaned-parse case. A number that appears only in a URL is not a pull request number, which
   is the parser's existing rule.
-- Record a failed or unfinished write in `<file>.write-failed.json` before the daily run. The run stops
-  on that marker. A later write that the parser accepts removes the marker.
-- The preflight log stamp can be set with `--now` so a simulated run can record a fixed time. That
-  simulation does not produce a product verdict.
+- On refusal, write `<file>.no-go/SUMMARY.pdf` with the same helper a refused run uses. Name the
+  disagreement. Leave the previous note in place.
+- Record the refusal in `<file>.write-failed.json`. The daily run stops on that marker before it
+  fetches. A later write that the parser accepts removes the marker and the no-go PDF.
 
 ## Alternatives and tradeoffs
 
 Re-rendering every note into one heading form would make the file easy to parse and would change notes
 that the parser already accepts. Refusing at write time keeps those notes and rejects only a mismatch.
 
-Checking the note only inside the daily run would still be after the note was written. The marker is
-what the run looks at, and the writer is what creates it.
+Checking the note only inside the daily run would still be after the note was written. The no-go
+PDF is written at refusal time. The marker is what the run looks at if that PDF was ignored.
 
 Putting the selection only in JSON, and stopping reading the note, would ignore the note the run
 already uses. The note stays the input. The JSON is the parse of that note.
@@ -59,9 +59,10 @@ already uses. The note stays the input. The JSON is the parse of that note.
 ## What it means for you
 
 Write the note with `python -m ops.chosen_write write <file> --intended <selection.json> --from-file <note.md>`.
-The command prints the parse as JSON. A refusal names the section or field to fix and does not replace
-`<file>`. Check an existing note with `python -m ops.chosen_write check <file>`. A saved selection beside
-the file is used when you do not pass `--intended`.
+The command prints the parse as JSON. A refusal does not replace `<file>`. It leaves
+`<file>.no-go/SUMMARY.pdf`, which names the section or field to fix. Check an existing note with
+`python -m ops.chosen_write check <file>`. A saved selection beside the file is used when you do not
+pass `--intended`.
 
-If a write fails or stops halfway, the next daily run stops before selection and says why. Fix the note
-and write it again. The run then reads the note as it did before.
+If a write fails or stops halfway, the next daily run stops before it fetches and says why. Fix the
+note and write it again. The run then reads the note as it did before.

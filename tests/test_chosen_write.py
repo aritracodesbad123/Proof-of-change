@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import datetime as dt
 import json
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -36,6 +37,12 @@ def _run(*args, stdin=None):
     return subprocess.run(
         [sys.executable, "-m", "ops.chosen_write", *args],
         cwd=ROOT, input=stdin, capture_output=True, text=True, check=False)
+
+
+def _pdf_text(path: Path) -> str:
+    if not shutil.which("pdftotext"):
+        pytest.skip("pdftotext is required to read the no-go summary")
+    return subprocess.run(["pdftotext", str(path), "-"], capture_output=True, text=True).stdout
 
 
 def test_three_heading_forms_match_one_selection(tmp_path):
@@ -92,6 +99,9 @@ def test_write_refuses_a_cleaned_subset_and_keeps_the_previous_file(tmp_path):
     log = chosen_write.log_path(dest).read_text(encoding="utf-8")
     assert log.startswith("2026-11-06T04:30:00Z FAILED")
     assert "Stopped:" in log
+    body = _pdf_text(chosen_write.no_go_dir(dest) / "SUMMARY.pdf")
+    assert "NO-GO" in body and "could not run" in body
+    assert "Delgan/loguru#1515" in body and "owner/name #N" in body
     assert not chosen_write.selection_path(dest).exists()
     assert parse_of["Delgan/loguru"][0]["pr"] == 1515
 
@@ -102,11 +112,15 @@ def test_write_stores_the_exact_note_and_the_parse(tmp_path):
     dest = tmp_path / "2026-11-06.md"
     # A previous refusal must clear once a write is accepted.
     chosen_write.marker_path(dest).write_text("{}\n", encoding="utf-8")
+    stale = chosen_write.no_go_dir(dest)
+    stale.mkdir()
+    (stale / "SUMMARY.pdf").write_bytes(b"%PDF-1.4\n")
     parsed = chosen_write.write_chosen(dest, text, intended, now=WHEN)
     assert dest.read_bytes() == CAPTURED.read_bytes()
     assert parsed == intended
     assert json.loads(chosen_write.selection_path(dest).read_text(encoding="utf-8")) == intended
     assert not chosen_write.marker_path(dest).exists()
+    assert not chosen_write.no_go_dir(dest).exists()
     log = chosen_write.log_path(dest).read_text(encoding="utf-8")
     assert "OK" in log and "Delgan/loguru#1515" in log
 
@@ -151,6 +165,7 @@ def test_cli_refuses_the_broken_captured_note_and_prints_the_parse(tmp_path):
                "--now", "2026-11-06T04:30:00Z")
     assert bad.returncode == 2
     assert "Stopped:" in bad.stderr
+    assert "No-go summary:" in bad.stderr
     assert "Delgan/loguru#1515" in bad.stderr
     assert json.loads(bad.stdout)["andialbrecht/sqlparse"][0]["pr"] == 944
     assert "Delgan/loguru" not in json.loads(bad.stdout)
@@ -161,18 +176,40 @@ def test_cli_refuses_the_broken_captured_note_and_prints_the_parse(tmp_path):
     assert check.returncode == 2 and "Stopped:" in check.stderr
 
 
-def test_held_out_note_checks_without_being_a_special_case(tmp_path):
-    """4 Nov uses `owner/name #N: title`. The rules were not fitted to this file."""
+def test_held_out_handwritten_mismatch_is_a_visible_refusal(tmp_path):
+    """4 Nov is handwritten `owner/name #N: title`, not the `owner/name PR #N` form.
+
+    The rules were not fitted to this file. The same text is accepted when the selection is the
+    parse, and refused with a no-go summary when the selection names a different base commit.
+    """
     text = HELD_OUT.read_text(encoding="utf-8")
     assert " PR #" not in text
     assert "#7413:" in text
-    copy = tmp_path / "held.md"
-    copy.write_text(text, encoding="utf-8")
-    proc = _run("check", str(copy), "--now", "2026-11-06T04:30:00Z")
-    assert proc.returncode == 0, proc.stderr
-    printed = json.loads(proc.stdout)
-    assert printed == daily_run.parse_chosen(copy)
-    assert set(printed) == {"psf/requests", "Textualize/rich", "python-attrs/attrs"}
+    parsed = daily_run.parse_chosen(HELD_OUT)
+    intended = tmp_path / "selection.json"
+    intended.write_text(json.dumps(parsed), encoding="utf-8")
+    good = tmp_path / "held.md"
+    ok = _run("write", str(good), "--intended", str(intended), "--from-file", str(HELD_OUT),
+              "--now", "2026-11-06T04:30:00Z")
+    assert ok.returncode == 0, ok.stderr
+    assert good.read_bytes() == HELD_OUT.read_bytes()
+    assert json.loads(ok.stdout) == parsed
+    wrong = json.loads(json.dumps(parsed))
+    wrong["psf/requests"][0]["base_sha"] = "f" * 40
+    wrong_path = tmp_path / "wrong.json"
+    wrong_path.write_text(json.dumps(wrong), encoding="utf-8")
+    refused = tmp_path / "refused.md"
+    refused.write_text("KEEP\n", encoding="utf-8")
+    bad = _run("write", str(refused), "--intended", str(wrong_path), "--from-file", str(HELD_OUT),
+               "--now", "2026-11-06T04:30:00Z")
+    assert bad.returncode == 2
+    assert "Stopped:" in bad.stderr and "No-go summary:" in bad.stderr
+    assert "psf/requests#7413" in bad.stderr and "base_sha" in bad.stderr
+    assert refused.read_text(encoding="utf-8") == "KEEP\n"
+    body = _pdf_text(chosen_write.no_go_dir(refused) / "SUMMARY.pdf")
+    assert "NO-GO" in body and "could not run" in body
+    assert "psf/requests#7413" in body and "base_sha" in body
+    assert "in the file and" in body and "f" * 40 in body
 
 
 def test_daily_run_stops_on_the_marker_before_selection(tmp_path, monkeypatch, capsys):
