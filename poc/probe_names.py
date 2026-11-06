@@ -9,11 +9,18 @@ A name the probe only checks for absence is not required to exist. That is a try
 pytest.raises / contextlib.suppress, of ImportError, ModuleNotFoundError, AttributeError or
 NameError, or the string passed to hasattr or to getattr with a default. A bare except, or
 except Exception, is not that: the probe is still using the name as if it existed.
+
+A call the probe makes on a base function or class is also checked against that definition.
+An unexpected keyword, a missing required argument, or too many positionals is not run as
+written. When the base tree contains a real call of that same function, in its own tests or
+its own source, the arguments are taken from that call. A parameter with a default can be
+omitted. A required parameter with no such call is not invented, and the probe is not run.
 """
 from __future__ import annotations
 
 import ast
 import builtins
+import os
 from pathlib import Path
 
 _BUILTINS = set(dir(builtins))
@@ -49,6 +56,7 @@ def _analyze(code: str, base_root):
     except SyntaxError:
         return None
     checker = _Checker(Path(base_root) if base_root else None, skip_undefined=_cannot_tell(tree))
+    checker.tree = tree
     checker.visit(tree)
     return checker
 
@@ -244,6 +252,8 @@ class _Checker(ast.NodeVisitor):
         self._undef = []
         self.required_missing = []
         self.mentions = {}   # qualified name -> whether each use is only an absence check
+        self.calls = []      # base calls in this probe: {node, sig, dotted}
+        self.tree = None
 
     def messages(self) -> list[str]:
         out = []
@@ -473,7 +483,7 @@ class _Checker(ast.NodeVisitor):
         self.generic_visit(node)
 
     def visit_Call(self, node):
-        self._check_keywords(node)
+        self._check_call(node)
         skip = _presence_skip(node)
         if skip is None:
             self.generic_visit(node)
@@ -658,36 +668,35 @@ class _Checker(ast.NodeVisitor):
                 self._note_missing(qualified)
             return
 
-    def _check_keywords(self, node: ast.Call) -> None:
-        """A keyword on a base-local function or class must be one of its parameters.
+    def _check_call(self, node: ast.Call) -> None:
+        """Record a base call and report a keyword or argument list that cannot run.
 
         Skipped when the callable is not a function or class defined in the base tree, when a
         decorator other than staticmethod/classmethod wraps it, or when the signature accepts
-        **kwargs. Third-party and builtin calls are not checked."""
-        if not node.keywords or any(kw.arg is None for kw in node.keywords):
-            return
-        sig = self._call_signature(node.func)
-        if sig is None or sig.var_keyword:
-            return
-        allowed = [name for name in sig.names if name not in sig.posonly]
-        bad = [kw.arg for kw in node.keywords if kw.arg not in allowed]
-        if not bad:
-            return
-        shown = ", ".join(allowed[:_LIST_LIMIT]) or "(none)"
-        extra = f" (+{len(allowed) - _LIST_LIMIT} more)" if len(allowed) > _LIST_LIMIT else ""
-        quoted = ", ".join(repr(name) for name in bad)
-        self._add(f"{sig.display}() got unexpected keyword(s) {quoted}; parameters: {shown}{extra}")
+        **kwargs. Third-party and builtin calls are not checked. An import that only re-exports
+        the name is followed to the definition, so the parameters are the ones that actually run."""
+        sig, dotted = self._resolve_callable(node.func)
+        if sig is not None and dotted:
+            self.calls.append({"node": node, "sig": sig, "dotted": dotted})
+        problem = _call_problem(node, sig)
+        if problem:
+            self._add(problem)
 
-    def _call_signature(self, func):
+    def _resolve_callable(self, func):
+        """(signature, defining dotted name) of a base call, or (None, None)."""
         if isinstance(func, ast.Name):
             info = self._symbol(func.id)
             if not info or info[0] != "attr":
-                return None
-            return _signature_of(self, info[1], info[2])
+                return None, None
+            return _resolve_named(self, info[1], [info[2]])
         chain = _module_chain(func, self._alias)
         if not chain:
-            return None
-        return _signature_from_chain(self, chain[0], chain[1])
+            return None, None
+        return _resolve_named(self, chain[0], chain[1])
+
+    def _call_signature(self, func):
+        sig, _dotted = self._resolve_callable(func)
+        return sig
 
     def _module_tree(self, module: str):
         loc = locate(self.root, module)
@@ -703,15 +712,30 @@ class _Checker(ast.NodeVisitor):
 
 
 class _Sig:
-    def __init__(self, display: str, names: list[str], posonly: set[str], var_keyword: bool):
+    def __init__(self, display: str, names: list[str], posonly: set[str], var_keyword: bool, *,
+                 required=None, n_positional=None, vararg: bool = False, kwonly=None, explicit: bool = True):
         self.display = display
         self.names = names
         self.posonly = posonly
         self.var_keyword = var_keyword
+        self.kwonly = set(kwonly or ())
+        self.required = list(required or ())
+        self.vararg = vararg
+        self.explicit = explicit
+        self.n_positional = (len([n for n in names if n not in self.kwonly])
+                             if n_positional is None else n_positional)
 
 
-def _signature_from_chain(checker, module: str, attrs: list[str]):
-    """Resolve module.a.b.Callable or module.Class.method to a base signature, or None."""
+def _retarget(sig: _Sig, display: str) -> _Sig:
+    """The same parameters, shown under the class that inherits them."""
+    return _Sig(display, list(sig.names), set(sig.posonly), sig.var_keyword, required=list(sig.required),
+                n_positional=sig.n_positional, vararg=sig.vararg, kwonly=set(sig.kwonly), explicit=sig.explicit)
+
+
+def _resolve_named(checker, module: str, attrs: list[str]):
+    """(signature, defining dotted name) for module.attr.Callable, or (None, None)."""
+    if not attrs:
+        return None, None
     cur = module
     i = 0
     while i < len(attrs) - 1:
@@ -722,33 +746,81 @@ def _signature_from_chain(checker, module: str, attrs: list[str]):
             continue
         break
     name, rest = attrs[i], attrs[i + 1:]
+    found = _lookup_def(checker, cur, name)
+    if found is None:
+        return None, None
+    tree, mod, node = found
+    dotted = f"{mod}.{node.name}"
     if not rest:
-        return _signature_of(checker, cur, name)
-    if len(rest) == 1:
-        return _method_signature(checker, cur, name, rest[0])
-    return None
+        if isinstance(node, ast.ClassDef):
+            return _init_signature(tree, node), dotted
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            return _function_signature(node, drop_first=False, display=node.name), dotted
+        return None, None
+    if len(rest) == 1 and isinstance(node, ast.ClassDef):
+        sig = _method_on(node, rest[0])
+        if sig is None:
+            return None, None
+        return sig, dotted + "." + rest[0]
+    return None, None
 
 
-def _signature_of(checker, module: str, name: str):
+def _lookup_def(checker, module: str, name: str, depth: int = 0):
+    """(tree, module, node) of a class or function, following a re-export a few steps.
+
+    ``from .other import Name`` is not a definition. The parameters live on the class or function
+    that other module defines. A cycle stops."""
+    if depth > 3 or not module or not name:
+        return None
     tree = checker._module_tree(module)
     if tree is None:
         return None
     node = next((n for n in tree.body if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef))
                  and n.name == name), None)
-    if isinstance(node, ast.ClassDef):
-        return _init_signature(tree, node)
-    if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
-        return _function_signature(node, drop_first=False, display=node.name)
+    if node is not None:
+        return tree, module, node
+    imported = _import_of(tree, name)
+    if imported is None:
+        return None
+    level, source, original = imported
+    loc = locate(checker.root, module)
+    is_package = loc is not None and loc.kind == "package"
+    target = _absolute_module(module, is_package, level, source)
+    if not target:
+        return None
+    return _lookup_def(checker, target, original, depth + 1)
+
+
+def _import_of(tree: ast.AST, name: str):
+    """(level, module, original name) when ``name`` is imported by this module, else None."""
+    for node in tree.body:
+        if not isinstance(node, ast.ImportFrom):
+            continue
+        for alias in node.names:
+            if alias.name == "*":
+                continue
+            if (alias.asname or alias.name) == name:
+                return node.level or 0, node.module, alias.name
     return None
 
 
-def _method_signature(checker, module: str, class_name: str, method: str):
-    tree = checker._module_tree(module)
-    if tree is None:
+def _absolute_module(current: str, is_package: bool, level: int, source: str | None) -> str | None:
+    """The absolute module an import refers to. level 0 is an absolute import."""
+    if not level:
+        return source
+    parts = current.split(".") if current else []
+    if not is_package and parts:
+        parts = parts[:-1]
+    up = level - 1
+    if up > len(parts):
         return None
-    cls = next((n for n in tree.body if isinstance(n, ast.ClassDef) and n.name == class_name), None)
-    if cls is None:
-        return None
+    parts = parts[:len(parts) - up] if up else parts
+    if source:
+        parts.extend(source.split("."))
+    return ".".join(parts) if parts else None
+
+
+def _method_on(cls: ast.ClassDef, method: str):
     fn = next((n for n in cls.body if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef)) and n.name == method),
               None)
     if fn is None:
@@ -757,7 +829,7 @@ def _method_signature(checker, module: str, class_name: str, method: str):
     for deco in fn.decorator_list:
         if _decorator_name(deco) == "staticmethod":
             drop = False
-    return _function_signature(fn, drop_first=drop, display=f"{class_name}.{method}")
+    return _function_signature(fn, drop_first=drop, display=f"{cls.name}.{method}")
 
 
 def _init_signature(tree: ast.AST, cls: ast.ClassDef, depth: int = 0):
@@ -767,7 +839,8 @@ def _init_signature(tree: ast.AST, cls: ast.ClassDef, depth: int = 0):
     if init is not None:
         return _function_signature(init, drop_first=True, display=cls.name)
     if not cls.bases:
-        return _Sig(cls.name, [], set(), False)
+        # No constructor in this class. A decorator may still add one, so argument counts are not checked.
+        return _Sig(cls.name, [], set(), False, explicit=False)
     for base in cls.bases:
         if isinstance(base, ast.Name) and base.id == "object":
             continue
@@ -779,8 +852,8 @@ def _init_signature(tree: ast.AST, cls: ast.ClassDef, depth: int = 0):
         sig = _init_signature(tree, parent, depth + 1)
         if sig is None:
             return None
-        return _Sig(cls.name, sig.names, sig.posonly, sig.var_keyword)
-    return _Sig(cls.name, [], set(), False)
+        return _retarget(sig, cls.name)
+    return _Sig(cls.name, [], set(), False, explicit=False)
 
 
 def _decorator_name(node) -> str | None:
@@ -803,13 +876,60 @@ def _function_signature(node, drop_first: bool, display: str):
     args = node.args
     if args.kwarg is not None:
         return _Sig(display, [], set(), True)
-    ordered = list(args.posonlyargs) + list(args.args) + list(args.kwonlyargs)
+    pos = list(args.posonlyargs) + list(args.args)
+    kwonly = list(args.kwonlyargs)
+    n_default = len(args.defaults)
+    required_pos = pos[:len(pos) - n_default] if n_default else list(pos)
+    required_kw = [arg for arg, default in zip(kwonly, args.kw_defaults) if default is None]
     posonly = {arg.arg for arg in args.posonlyargs}
-    if drop_first and ordered:
-        if ordered[0].arg in posonly:
-            posonly.discard(ordered[0].arg)
-        ordered = ordered[1:]
-    return _Sig(display, [arg.arg for arg in ordered], posonly, False)
+    if drop_first and pos:
+        dropped = pos[0].arg
+        posonly.discard(dropped)
+        pos = pos[1:]
+        required_pos = [arg for arg in required_pos if arg.arg != dropped]
+    names = [arg.arg for arg in pos + kwonly]
+    required = [arg.arg for arg in required_pos + required_kw]
+    return _Sig(display, names, posonly, False, required=required, n_positional=len(pos),
+                vararg=args.vararg is not None, kwonly={arg.arg for arg in kwonly}, explicit=True)
+
+
+def _param_list(sig: _Sig) -> str:
+    shown = ", ".join(sig.names[:_LIST_LIMIT]) or "(none)"
+    extra = f" (+{len(sig.names) - _LIST_LIMIT} more)" if len(sig.names) > _LIST_LIMIT else ""
+    return shown + extra
+
+
+def _call_problem(node: ast.Call, sig: _Sig | None) -> str | None:
+    """Why this call cannot match the base signature, or None when it can.
+
+    A signature that accepts **kwargs, or a call that passes **mapping, is not judged: the names
+    are not visible. Counts are judged only for a definition that is actually written (a function,
+    or a class with its own __init__). A class whose constructor is added by a decorator is not
+    counted, so a normal construction is not rejected from an empty parameter list."""
+    if sig is None or sig.var_keyword or any(kw.arg is None for kw in node.keywords):
+        return None
+    bad = [kw.arg for kw in node.keywords if kw.arg not in sig.names or kw.arg in sig.posonly]
+    if bad:
+        quoted = ", ".join(repr(name) for name in bad)
+        return f"{sig.display}() got unexpected keyword(s) {quoted}; parameters: {_param_list(sig)}"
+    if not sig.explicit or any(isinstance(arg, ast.Starred) for arg in node.args):
+        return None
+    positional = list(node.args)
+    if not sig.vararg and len(positional) > sig.n_positional:
+        return (f"{sig.display}() takes {sig.n_positional} positional argument(s) but {len(positional)} "
+                f"were given; parameters: {_param_list(sig)}")
+    pos_names = [name for name in sig.names if name not in sig.kwonly]
+    filled = set(pos_names[:len(positional)])
+    for kw in node.keywords:
+        if kw.arg in sig.names and kw.arg not in sig.posonly:
+            filled.add(kw.arg)
+    missing = [name for name in sig.required if name not in filled]
+    if sig.vararg:
+        missing = [name for name in missing if name in sig.kwonly]
+    if missing:
+        quoted = ", ".join(repr(name) for name in missing)
+        return f"{sig.display}() missing required argument(s) {quoted}; parameters: {_param_list(sig)}"
+    return None
 
 
 def _expr_module(node, alias_of) -> str | None:
@@ -1076,3 +1196,507 @@ def _names_in_file(path: Path) -> set[str] | None:
     if dynamic:
         return None
     return names
+
+
+# How many base files are read while looking for real calls. The walk stops there. It does not
+# import the package and it does not use the network.
+_SITE_FILES = 250
+_SITE_BYTES = 200_000
+_SITES_EACH = 8
+_USAGE_CHARS = 2000
+_SKIP_DIRS = {
+    ".git", "__pycache__", ".venv", "venv", "node_modules", "dist", "build", ".tox", ".eggs",
+    ".mypy_cache", ".ruff_cache", "site-packages",
+}
+
+
+class _Site:
+    def __init__(self, dotted: str, rel: str, lineno: int, call: ast.Call, scope: dict, text: str):
+        self.dotted = dotted
+        self.rel = rel
+        self.lineno = lineno
+        self.call = call
+        self.scope = scope
+        self.text = text
+
+
+def usage_notes(code: str, base_root) -> str:
+    """Text for the one existing model retry: the base signature and real calls of names this probe calls.
+
+    Empty when the probe calls nothing we can resolve, or the base tree is not there. This does not
+    call the model and it does not read the pull-request tree."""
+    checker = _analyze(code, base_root)
+    if checker is None or not checker.calls or base_root is None:
+        return ""
+    order = []
+    for item in checker.calls:
+        if item["dotted"] not in order:
+            order.append(item["dotted"])
+    sites = _collect_sites(base_root, set(order[:6]))
+    lines = []
+    for dotted in order[:6]:
+        sig = next(item["sig"] for item in checker.calls if item["dotted"] == dotted)
+        required = ", ".join(sig.required) or "(none)"
+        bits = [f"{dotted}({_param_list(sig)}); required: {required}"]
+        for site in sites.get(dotted, [])[:4]:
+            bits.append(f"called in {site.rel}:{site.lineno} as {site.text}")
+        lines.append(" | ".join(bits))
+    if not lines:
+        return ""
+    text = "\n".join(lines)
+    if len(text) > _USAGE_CHARS:
+        text = text[:_USAGE_CHARS] + "\n..."
+    return ("\n\nHow the BASE side calls these names, from its own files. Use those parameters and, when "
+            "you need a value, the arguments from one of those calls. A parameter that is not in the list "
+            "does not exist. Do not invent a value from the pull-request text when a call below already "
+            "shows one.\n" + text)
+
+
+def prepare_calls(code: str, base_root):
+    """Bind every unsound base call, or say why the probe must not run.
+
+    Returns (code, notes, reject). notes lists bindings that were applied. reject is a reason when
+    a call does not match the base signature and no base call site (and no default) can fill its
+    required parameters. The probe's callee is kept: only the arguments change. A call that already
+    matches the signature is left as written. Nothing here reads the pull-request tree or the network."""
+    checker = _analyze(code, base_root)
+    if checker is None or base_root is None or not checker.calls:
+        return code or "", [], None
+    unsound = [item for item in checker.calls if _call_problem(item["node"], item["sig"])]
+    if not unsound:
+        return code or "", [], None
+    sites = _collect_sites(base_root, {item["dotted"] for item in unsound})
+    spelling = _spell_map(checker)
+    by_id = {id(item["node"]): item for item in checker.calls}
+    notes = []
+    failed = []
+
+    class _Bind(ast.NodeTransformer):
+        def visit_Call(self, node):
+            info = by_id.get(id(node))
+            if info is not None and _call_problem(node, info["sig"]):
+                built = _bind_call(node, info, sites.get(info["dotted"], []), spelling)
+                if built is None:
+                    failed.append(info)
+                    self.generic_visit(node)
+                    return node
+                notes.append(built[1])
+                return built[0]
+            self.generic_visit(node)
+            return node
+
+    new_tree = _Bind().visit(checker.tree)
+    if failed:
+        info = failed[0]
+        problem = _call_problem(info["node"], info["sig"]) or "the call does not match the base signature"
+        return (code or "", notes,
+                f"cannot bind {info['dotted']}: {problem}; no base call supplies the required arguments, "
+                "so the probe is not run")
+    if not notes:
+        return code or "", [], None
+    ast.fix_missing_locations(new_tree)
+    return ast.unparse(new_tree) + "\n", notes, None
+
+
+def _spell_map(checker) -> dict:
+    """Dotted name or module -> ('name', local) or ('mod', local), from the probe's own imports."""
+    out = {}
+    table = checker.symbols[0] if checker.symbols else {}
+    for local, info in table.items():
+        if not info:
+            continue
+        if info[0] == "mod":
+            out.setdefault(info[1], ("mod", local))
+        elif info[0] == "attr":
+            found = _lookup_def(checker, info[1], info[2])
+            dotted = f"{found[1]}.{found[2].name}" if found else f"{info[1]}.{info[2]}"
+            out.setdefault(dotted, ("name", local))
+    return out
+
+
+def _spell(dotted: str, spelling: dict):
+    """An expression the probe can already write for this base name, or None."""
+    kind = spelling.get(dotted)
+    if kind and kind[0] == "name":
+        return ast.Name(id=kind[1], ctx=ast.Load())
+    parts = dotted.split(".")
+    for i in range(len(parts) - 1, 0, -1):
+        prefix = ".".join(parts[:i])
+        kind = spelling.get(prefix)
+        if kind and kind[0] == "mod":
+            expr = ast.Name(id=kind[1], ctx=ast.Load())
+            for attr in parts[i:]:
+                expr = ast.Attribute(value=expr, attr=attr, ctx=ast.Load())
+            return expr
+    return None
+
+
+def _bind_call(node: ast.Call, info: dict, sites: list, spelling: dict):
+    """A new call with the probe's callee and arguments taken from a base call, or None."""
+    sig = info["sig"]
+    usable = []
+    for site in sites:
+        if _call_problem(site.call, sig):
+            continue
+        rendered = _render_site(site, spelling)
+        if rendered is None:
+            continue
+        passed = len(rendered.args) + len(rendered.keywords)
+        text = ast.unparse(rendered)
+        usable.append((-passed, len(text), site.rel, site.lineno, rendered, site))
+    if usable:
+        usable.sort()
+        rendered, site = usable[0][4], usable[0][5]
+        call = ast.Call(func=node.func, args=rendered.args, keywords=rendered.keywords)
+        return call, {"target": info["dotted"], "how": "call_site", "from": f"{site.rel}:{site.lineno}",
+                      "call": ast.unparse(call)}
+    assembled = _assemble(sig, sites, spelling)
+    if assembled is None:
+        return None
+    args, keywords, origin = assembled
+    call = ast.Call(func=node.func, args=args, keywords=keywords)
+    return call, {"target": info["dotted"], "how": "signature", "from": origin, "call": ast.unparse(call)}
+
+
+def _render_site(site: _Site, spelling: dict):
+    """The site's argument list, with names inlined, or None when a value cannot be copied."""
+    def resolve(func):
+        return _resolve_copied(func, site)
+
+    args = []
+    for arg in site.call.args:
+        if isinstance(arg, ast.Starred):
+            return None
+        got = _reduce(arg, site.scope, resolve, spelling, 0)
+        if got is None:
+            return None
+        args.append(got)
+    keywords = []
+    for kw in site.call.keywords:
+        if kw.arg is None:
+            return None
+        got = _reduce(kw.value, site.scope, resolve, spelling, 0)
+        if got is None:
+            return None
+        keywords.append(ast.keyword(arg=kw.arg, value=got))
+    return ast.Call(func=ast.Name(id="_", ctx=ast.Load()), args=args, keywords=keywords)
+
+
+def _resolve_copied(func, site: _Site) -> str | None:
+    """The defining name of a call used as an argument at this site, when the site already resolved it.
+
+    Nested calls are reduced with the same file's imports. The resolver is attached by the collector."""
+    resolve = getattr(site, "resolve", None)
+    return resolve(func) if resolve else None
+
+
+def _reduce(expr, scope: dict, resolve, spelling: dict, depth: int):
+    """A copy of expr that uses only constants and base calls the probe can spell, or None.
+
+    A name is copied only when this same function assigned it a copyable value before the call.
+    A subscript is not a call and is not a value: the pull request's ``names[0]`` is not an argument."""
+    if depth > 4 or expr is None:
+        return None
+    if isinstance(expr, ast.Constant) and isinstance(expr.value, (int, float, str, bool, type(None))):
+        return ast.Constant(value=expr.value)
+    if isinstance(expr, ast.UnaryOp) and isinstance(expr.op, (ast.USub, ast.UAdd, ast.Not)):
+        operand = _reduce(expr.operand, scope, resolve, spelling, depth + 1)
+        return ast.UnaryOp(op=expr.op, operand=operand) if operand is not None else None
+    if isinstance(expr, (ast.List, ast.Tuple, ast.Set)):
+        elts = []
+        for elt in expr.elts:
+            got = _reduce(elt, scope, resolve, spelling, depth + 1)
+            if got is None:
+                return None
+            elts.append(got)
+        return type(expr)(elts=elts, ctx=ast.Load())
+    if isinstance(expr, ast.Dict):
+        keys, values = [], []
+        for key, value in zip(expr.keys, expr.values):
+            if key is None:
+                return None
+            got_key = _reduce(key, scope, resolve, spelling, depth + 1)
+            got_value = _reduce(value, scope, resolve, spelling, depth + 1)
+            if got_key is None or got_value is None:
+                return None
+            keys.append(got_key)
+            values.append(got_value)
+        return ast.Dict(keys=keys, values=values)
+    if isinstance(expr, ast.Name):
+        if expr.id not in scope:
+            return None
+        return _reduce(scope[expr.id], scope, resolve, spelling, depth + 1)
+    if isinstance(expr, ast.Call):
+        dotted = resolve(expr.func)
+        callee = _spell(dotted, spelling) if dotted else None
+        if callee is None:
+            return None
+        args = []
+        for arg in expr.args:
+            if isinstance(arg, ast.Starred):
+                return None
+            got = _reduce(arg, scope, resolve, spelling, depth + 1)
+            if got is None:
+                return None
+            args.append(got)
+        keywords = []
+        for kw in expr.keywords:
+            if kw.arg is None:
+                return None
+            got = _reduce(kw.value, scope, resolve, spelling, depth + 1)
+            if got is None:
+                return None
+            keywords.append(ast.keyword(arg=kw.arg, value=got))
+        return ast.Call(func=callee, args=args, keywords=keywords)
+    return None
+
+
+def _assemble(sig: _Sig, sites: list, spelling: dict):
+    """Required arguments taken one by one from base calls. None when one required value is missing.
+
+    Parameters that have a default are omitted, so a bad keyword is dropped instead of being copied.
+    Nothing is filled with a guessed None."""
+    if not sig.explicit:
+        return None
+    pos_names = [name for name in sig.names if name not in sig.kwonly]
+    pieces = {}
+    origins = []
+    for name in sig.required:
+        found = _piece(name, pos_names, sites, spelling)
+        if found is None:
+            return None
+        pieces[name], origin = found
+        if origin not in origins:
+            origins.append(origin)
+    args, keywords = [], []
+    for name in pos_names:
+        if name not in sig.required:
+            break
+        if name in sig.posonly:
+            args.append(pieces[name])
+        else:
+            keywords.append(ast.keyword(arg=name, value=pieces[name]))
+    for name in sig.required:
+        if name in sig.kwonly:
+            keywords.append(ast.keyword(arg=name, value=pieces[name]))
+    origin = ", ".join(origins) if origins else "signature"
+    return args, keywords, origin
+
+
+def _piece(name: str, pos_names: list[str], sites: list, spelling: dict):
+    """(expression, where) for one required parameter, from the first base call that shows it."""
+    index = pos_names.index(name) if name in pos_names else None
+    for site in sites:
+        expr = None
+        if index is not None and index < len(site.call.args) and not isinstance(site.call.args[index], ast.Starred):
+            # Only when this positional is not also given as a keyword later. The positional slot is enough.
+            expr = site.call.args[index]
+        for kw in site.call.keywords:
+            if kw.arg == name:
+                expr = kw.value
+        if expr is None:
+            continue
+        got = _reduce(expr, site.scope, lambda func, site=site: _resolve_copied(func, site), spelling, 0)
+        if got is not None:
+            return got, f"{site.rel}:{site.lineno}"
+    return None
+
+
+def _collect_sites(base_root, targets: set[str]) -> dict[str, list]:
+    """Real calls of these defining names, from the base tree only. At most a few per name."""
+    found = {name: [] for name in targets}
+    if not base_root or not targets:
+        return found
+    shorts = {name.split(".")[-1] for name in targets if name}
+    files = []
+    for root in _roots(Path(base_root)):
+        for dirpath, dirnames, filenames in os.walk(root):
+            dirnames[:] = [d for d in dirnames if d not in _SKIP_DIRS and not d.endswith(".egg-info")
+                           and not d.endswith(".dist-info")]
+            for filename in filenames:
+                if filename.endswith(".py"):
+                    files.append((root, Path(dirpath) / filename))
+    files.sort(key=lambda item: (0 if any(part in {"tests", "test", "testing"} for part in item[1].parts) else 1,
+                                 str(item[1])))
+    checker = _Checker(Path(base_root), skip_undefined=True)
+    parsed = 0
+    for root, path in files:
+        if parsed >= _SITE_FILES or all(len(found[name]) >= _SITES_EACH for name in targets):
+            break
+        try:
+            if path.stat().st_size > _SITE_BYTES:
+                continue
+            text = path.read_text(errors="replace")
+        except OSError:
+            continue
+        if shorts and not any(short in text for short in shorts):
+            continue
+        try:
+            tree = ast.parse(text)
+        except SyntaxError:
+            continue
+        module = _module_of(path, root)
+        if not module:
+            continue
+        parsed += 1
+        loc = locate(base_root, module)
+        is_package = loc is not None and loc.kind == "package" and path.name == "__init__.py"
+        try:
+            rel = path.relative_to(base_root).as_posix()
+        except ValueError:
+            rel = path.name
+        _harvest(tree, module, is_package, rel, checker, targets, found)
+
+    return found
+
+
+def _module_of(path: Path, root: Path) -> str | None:
+    try:
+        parts = list(path.relative_to(root).parts)
+    except ValueError:
+        return None
+    if not parts:
+        return None
+    if parts[-1] == "__init__.py":
+        parts = parts[:-1]
+    elif parts[-1].endswith(".py"):
+        parts[-1] = parts[-1][:-3]
+    else:
+        return None
+    if not parts or not all(part.isidentifier() for part in parts):
+        return None
+    return ".".join(parts)
+
+
+def _harvest(tree, module: str, is_package: bool, rel: str, checker, targets: set[str], found: dict) -> None:
+    symbols = _file_symbols(tree, module, is_package, checker)
+
+    def resolve(func):
+        return _resolve_in_file(func, symbols, checker)
+
+    def consider(node: ast.Call, scope: dict) -> None:
+        dotted = resolve(node.func)
+        if dotted not in targets or len(found[dotted]) >= _SITES_EACH:
+            return
+        text = ast.unparse(node)
+        if len(text) > 180:
+            text = text[:177] + "..."
+        site = _Site(dotted, rel, getattr(node, "lineno", 0) or 0, node, dict(scope), text)
+        site.resolve = resolve
+        found[dotted].append(site)
+
+    def walk_body(body, scope: dict) -> None:
+        for stmt in body:
+            if isinstance(stmt, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                for default in list(stmt.args.defaults) + [item for item in stmt.args.kw_defaults if item is not None]:
+                    _consider_tree(default, scope, consider)
+                walk_body(stmt.body, dict(scope))
+                continue
+            if isinstance(stmt, ast.ClassDef):
+                for child in stmt.body:
+                    if isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                        walk_body([child], dict(scope))
+                    else:
+                        walk_body([child], scope)
+                continue
+            if isinstance(stmt, ast.If):
+                _consider_tree(stmt.test, scope, consider)
+                walk_body(stmt.body, dict(scope))
+                walk_body(stmt.orelse, dict(scope))
+                continue
+            if isinstance(stmt, (ast.For, ast.AsyncFor)):
+                _consider_tree(stmt.iter, scope, consider)
+                walk_body(stmt.body, dict(scope))
+                walk_body(stmt.orelse, dict(scope))
+                continue
+            if isinstance(stmt, ast.While):
+                _consider_tree(stmt.test, scope, consider)
+                walk_body(stmt.body, dict(scope))
+                walk_body(stmt.orelse, dict(scope))
+                continue
+            if isinstance(stmt, (ast.With, ast.AsyncWith)):
+                for item in stmt.items:
+                    _consider_tree(item.context_expr, scope, consider)
+                walk_body(stmt.body, dict(scope))
+                continue
+            if isinstance(stmt, ast.Try):
+                walk_body(stmt.body, dict(scope))
+                for handler in stmt.handlers:
+                    walk_body(handler.body, dict(scope))
+                walk_body(stmt.orelse, dict(scope))
+                walk_body(stmt.finalbody, dict(scope))
+                continue
+            _consider_tree(stmt, scope, consider)
+            if isinstance(stmt, ast.Assign) and len(stmt.targets) == 1 and isinstance(stmt.targets[0], ast.Name):
+                scope[stmt.targets[0].id] = stmt.value
+            elif isinstance(stmt, ast.AnnAssign) and isinstance(stmt.target, ast.Name) and stmt.value is not None:
+                scope[stmt.target.id] = stmt.value
+
+    walk_body(tree.body, {})
+
+
+def _consider_tree(node, scope: dict, consider) -> None:
+    for child in ast.walk(node):
+        if isinstance(child, ast.Call):
+            consider(child, scope)
+
+
+def _file_symbols(tree, module: str, is_package: bool, checker) -> dict:
+    """Local name -> ('def', dotted) or ('mod', module) or ('attr', 'module.name') for one base file."""
+    symbols = {}
+    for node in tree.body:
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+            symbols[node.name] = ("def", f"{module}.{node.name}")
+        elif isinstance(node, ast.Import):
+            for alias in node.names:
+                local = alias.asname or alias.name.split(".")[0]
+                dotted = alias.name if alias.asname else alias.name.split(".")[0]
+                symbols[local] = ("mod", dotted)
+        elif isinstance(node, ast.ImportFrom):
+            base = _absolute_module(module, is_package, node.level or 0, node.module)
+            for alias in node.names:
+                if alias.name == "*" or not base:
+                    continue
+                local = alias.asname or alias.name
+                found = _lookup_def(checker, base, alias.name)
+                if found:
+                    symbols[local] = ("def", f"{found[1]}.{found[2].name}")
+                else:
+                    symbols[local] = ("attr", f"{base}.{alias.name}")
+    return symbols
+
+
+def _resolve_in_file(func, symbols: dict, checker) -> str | None:
+    if isinstance(func, ast.Name):
+        info = symbols.get(func.id)
+        if not info:
+            return None
+        if info[0] == "def":
+            return info[1]
+        if info[0] == "attr":
+            module, name = info[1].rsplit(".", 1)
+            found = _lookup_def(checker, module, name)
+            if found:
+                return f"{found[1]}.{found[2].name}"
+        return None
+    parts = []
+    cur = func
+    while isinstance(cur, ast.Attribute):
+        parts.append(cur.attr)
+        cur = cur.value
+    if not isinstance(cur, ast.Name) or not parts:
+        return None
+    parts.reverse()
+    info = symbols.get(cur.id)
+    if not info:
+        return None
+    if info[0] == "mod":
+        _sig, dotted = _resolve_named(checker, info[1], parts)
+        return dotted
+    if info[0] == "def" and len(parts) == 1:
+        return info[1] + "." + parts[0]
+    if info[0] == "attr":
+        module, name = info[1].rsplit(".", 1)
+        sig, dotted = _resolve_named(checker, module, [name, *parts])
+        return dotted
+    return None

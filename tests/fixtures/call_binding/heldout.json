@@ -1,0 +1,10 @@
+{
+  "expect": "mytask",
+  "absent": "contexts=",
+  "probe": "import invoke.program as program\nparser = program.Parser(contexts=[program.Context(name='invoke', aliases=(), help={'task': 'laghi'})])\nprint(parser.initial.name)\n",
+  "files": {
+    "invoke/__init__.py": "",
+    "invoke/program.py": "class Context:\n    def __init__(self, name):\n        self.name = name\n\nclass Parser:\n    def __init__(self, initial=None, core=None, module=None):\n        self.initial = initial\n        self.core = core\n        self.module = module\n",
+    "tests/test_program.py": "from invoke.program import Context, Parser\n\ndef test_builds():\n    ctx = Context(\"mytask\")\n    parser = Parser(initial=ctx)\n    assert parser.initial.name == \"mytask\"\n"
+  }
+}

@@ -934,6 +934,17 @@ def _name_problems(resp, base_root, product: bool, layout: set) -> list[tuple]:
     return broken
 
 
+def _call_usage(resp, base_root, product: bool, layout: set) -> str:
+    """Base signatures and real calls for the one retry. Empty when nothing was resolved. No model call."""
+    from poc import probe_names
+    parts = []
+    for _i, _p, _msgs, code in _name_problems(resp, base_root, product, layout):
+        note = probe_names.usage_notes(code, base_root)
+        if note and note not in parts:
+            parts.append(note)
+    return "".join(parts)
+
+
 def _name_feedback(resp, base_root, product: bool, layout: set) -> str:
     """Text appended to the one existing retry so a missing name or keyword is fixed in that same call.
 
@@ -943,11 +954,14 @@ def _name_feedback(resp, base_root, product: bool, layout: set) -> str:
         return ""
     lines = [f"Probe {p.get('id')!r}: " + "; ".join(msgs) + "\nFull code:\n" + code
              for _, p, msgs, code in broken]
+    usage = _call_usage(resp, base_root, product, layout)
     return ("\n\nThese probes also use an import, call, or keyword that does not exist on the BASE side. "
             "Fix that in this same answer. Every import, and every call or attribute on an imported module, "
             "must name something that exists there. A keyword must be a parameter of that function or class; "
-            "the message lists the parameters. Do not hide the missing name with hasattr, getattr with a "
-            "default, or try/except that records a fallback for that same name.\n\n" + "\n\n".join(lines))
+            "the message lists the parameters. A required parameter must be given. Build it from a call the "
+            "base files already make, not from the pull-request text. Do not hide the missing name with "
+            "hasattr, getattr with a default, or try/except that records a fallback for that same name.\n\n"
+            + "\n\n".join(lines) + usage)
 
 
 def _repair_missing_names(provider, probes_prompt: str, user: str, ctx: dict, resp, base_root, out: dict,
@@ -975,7 +989,9 @@ def _repair_missing_names(provider, probes_prompt: str, user: str, ctx: dict, re
            "or class on the base side; the message lists the parameters. Do not hide the missing name. "
            "hasattr, getattr with a default, or try/except that records a fallback for that same name is not "
            "a fix and is rejected. A probe whose first version already checks that a symbol is absent is a "
-           "different case and is not this repair.\n\n" + "\n\n".join(lines))
+           "different case and is not this repair. A required parameter must be given. When the note below "
+           "shows a call from the base files, use that call's arguments.\n\n" + "\n\n".join(lines)
+           + _call_usage(resp, base_root, product, layout))
     try:
         again = provider.complete_json("probes", probes_prompt, ask, PROBES_SCHEMA, ctx)
     except ProviderError as ex:
@@ -1205,7 +1221,28 @@ def generate(provider: Provider, repo: str, pr: int, title: str, body: str | Non
             from poc import probe_names
             checked = _checked_code(p.get("code") or "", bool(layout), layout)
             missing = probe_names.problems(checked, base_root)
-            if missing:
+            # An unsound call is bound from a base call site, or from the signature when every
+            # required argument is shown there. The callee stays the one the model chose. A call
+            # that already matches is not rewritten. This reads the base tree only, before freeze.
+            bound, bindings, reject = probe_names.prepare_calls(p.get("code") or "", base_root)
+            if bindings:
+                checked_bound = _checked_code(bound, bool(layout), layout)
+                still = probe_names.problems(checked_bound, base_root)
+                hidden_bound = None if still else probe_names.hides_required_miss(
+                    first_codes.get(p.get("id")), checked_bound, base_root)
+                if not still and not hidden_bound:
+                    p["code"] = bound
+                    out.setdefault("call_bindings", []).append({"id": p.get("id"), "bindings": bindings})
+                    missing = []
+                elif reject:
+                    why = reject
+                elif still:
+                    why = "; ".join(still)
+                else:
+                    why = hidden_bound
+            elif reject:
+                why = reject
+            elif missing:
                 why = "; ".join(missing)
             else:
                 hidden = probe_names.hides_required_miss(first_codes.get(p.get("id")), checked, base_root)
