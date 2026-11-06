@@ -9,46 +9,18 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>
 endobj
 4 0 obj
-<< /Length 2300 >>
+<< /Length 226 >>
 stream
 BT
 /F1 11 Tf
 14 TL
 50 800 Td
-(SUMMARY) Tj T*
+(Proof-of-Change summary: refused-2026-11-06-114631: NO-GO) Tj T*
 () Tj T*
-(# Proof-of-Change go/no-go: 2026-11-06 on 4050401) Tj T*
+(Go/no-go: NO-GO, could not run) Tj T*
+(Reason: crashed: _Parsed: ) Tj T*
 () Tj T*
-(3 report\(s\) in this folder: 0 need attention, 2 could not be verified, 1 verified. Built from e) Tj T*
-(very record.json stored in this folder, so a later one-PR run cannot narrow it.) Tj T*
-() Tj T*
-(## Needs a decision first) Tj T*
-() Tj T*
-(- **COULD NOT VERIFY**: pyinvoke/invoke#1097: Use command-line names in missing-argument errors) Tj T*
-(. Could not verify: claim\(s\) C1, C2, C4 expect a difference but no observation matches \(134 tes) Tj T*
-(t\(s\) ran on main, 137 on the PR; 3 new test\(s\) pass, 135 unchanged \(1 of them skipped on both s) Tj T*
-(ides\); probe model-p1 is not_adequate \(the probe crashed or printed no parsed output on every m) Tj T*
-(ain-side run; not counted as ran or adequate\); its matching results do not count\)) Tj T*
-(- **COULD NOT VERIFY**: Delgan/loguru#1515: Evaluate every rotation condition so a skipped one ) Tj T*
-(cannot fire spuriously. Install failed \(1\); see setup-pr.log) Tj T*
-() Tj T*
-(## All reports) Tj T*
-() Tj T*
-(| Verdict | Subject | Why | Report |) Tj T*
-(|---|---|---|---|) Tj T*
-(| COULD NOT VERIFY | pyinvoke/invoke#1097: Use command-line names in missing-argument errors | ) Tj T*
-(Could not verify: claim\(s\) C1, C2, C4 expect a difference but no observation matches \(134 test\() Tj T*
-(s\) ran on main, 137 on the PR; 3 new test\(s\) pass, 135 unchanged \(1 of them skipped on both sid) Tj T*
-(es\); probe model-p1 is not_adequate \(the probe crashed or printed no parsed output on every mai) Tj T*
-(n-side run; not counted as ran or adequate\); its matching results do not count\) | [PDF]\(invoke-) Tj T*
-(1097/REPORT.pdf\) |) Tj T*
-(| COULD NOT VERIFY | Delgan/loguru#1515: Evaluate every rotation condition so a skipped one can) Tj T*
-(not fire spuriously | Install failed \(1\); see setup-pr.log | [PDF]\(loguru-1515/REPORT.pdf\) |) Tj T*
-(| VERIFIED | andialbrecht/sqlparse#944: fix: avoid ValueError on malformed CASE with reindent_a) Tj T*
-(ligned | 175 test\(s\) ran on main, 177 on the PR; 2 new test\(s\) pass, 177 unchanged \(2 of them s) Tj T*
-(kipped on both sides\); probe: claim\(s\) C2 proven | [PDF]\(sqlparse-944/REPORT.pdf\) |) Tj T*
-() Tj T*
-(Written 2026-11-06 11:35 IST) Tj T*
+(Written 2026-11-06 11:46 IST) Tj T*
 ET
 endstream
 endobj
@@ -62,9 +34,9 @@ xref
 0000000058 00000 n 
 0000000115 00000 n 
 0000000241 00000 n 
-0000002593 00000 n 
+0000000518 00000 n 
 trailer
 << /Size 6 /Root 1 0 R >>
 startxref
-2663
+588
 %%EOF
