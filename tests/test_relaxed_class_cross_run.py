@@ -203,14 +203,20 @@ def test_new_tests_that_pass_on_the_base_are_not_a_missing_collection(tmp_path):
     assert info["reproduced"] is False
     assert dr.cross_run_test_ids(cmp, rec["files"]) == []
     before = dr.verdict_for(cmp, None, None, rec["files"])
+    # collection_failed is not a verdict_for input. The tests that ran match, so the default is verified.
+    assert before[0] == "verified"
     dr._store_verdict(rec, cmp, None, None)
-    assert rec["verdict"] == before[0]
+    # The note applies and tests/boom.py failed to collect, so only this verified result is capped.
+    assert rec["verdict"] == "could_not_verify"
+    assert rec["verdict"] != "needs_attention"
+    assert "could not verify:" in rec["reason"]
     assert rec["already_on_base"] == "fix appears already present on main"
     assert "fix appears already present on main" in rec["reason"]
     assert "tests/boom.py" in info["collection_failed"]
     assert "tests/boom.py" in rec["collection_limitation"]
     assert "tests/boom.py" in rec["reason"]
-    assert rec["reason"].index("fix appears already present on main") < rec["reason"].index("tests/boom.py")
+    # The cap names the file, then the note, then the limitation sentence beside the note.
+    assert rec["reason"].index("fix appears already present on main") < rec["reason"].index(rec["collection_limitation"])
     assert "clean verification" not in rec["reason"].lower()
     assert "clean verification" not in rec["collection_limitation"].lower()
     assert not any("boom" in node for node in info["passed_on_base"])
@@ -276,6 +282,53 @@ def test_already_on_base_needs_every_new_test_and_does_not_change_needs_attentio
     assert "clean verification" not in named.lower()
 
 
+def test_default_verdict_inputs_and_the_verified_only_cap():
+    """verdict_for does not read collection_failed. Only a verified result with the note is capped.
+
+    A comparison that needs attention stays needs attention. The note is not removed.
+    """
+    passed = {"tests/test_old.py::test_old": ("passed", "")}
+    files = {"all": ["pkg/mod.py", "tests/other_changed.py"], "package_py": ["pkg/mod.py"], "compiled": []}
+    clean = dr.compare_sides({"main": [passed], "pr": [passed]})
+    default = dr.verdict_for(clean, None, None, files)
+    assert default[0] == "verified"
+    gap = {"ids": ["tests/checks.py::Bucket_::nested::reports_names[param-1]"],
+           "passed_on_base": ["tests/checks.py::Bucket_::nested::reports_names[param-1]"],
+           "failed_on_base": [], "not_collected": [], "reproduced": False,
+           "collection_failed": ["tests/other_changed.py"]}
+    clean["base_new_tests"] = gap
+    still = dr.verdict_for(clean, None, None, files)
+    assert still[0] == "verified"
+    capped_v, capped_reason = dr.cap_for_uncollected_file(clean, still[0], still[1])
+    assert capped_v == "could_not_verify"
+    assert "tests/other_changed.py" in capped_reason
+    assert "clean verification" not in capped_reason.lower()
+    rec = {"verdict": capped_v, "reason": capped_reason, "base_ref": "2.2"}
+    dr._attach_already_on_base(rec, clean)
+    assert rec["verdict"] == "could_not_verify"
+    assert rec["already_on_base"] == "fix appears already present on 2.2"
+    assert "tests/other_changed.py" in rec["reason"]
+    failed = {"tests/test_old.py::test_old": ("failed", "AssertionError: no")}
+    attention = dr.compare_sides({"main": [passed], "pr": [failed]})
+    attention["base_new_tests"] = gap
+    found = dr.verdict_for(attention, None, None, files)
+    assert found[0] == "needs_attention"
+    held_v, held_reason = dr.cap_for_uncollected_file(attention, found[0], found[1])
+    assert (held_v, held_reason) == found[:2]
+    kept = {"verdict": held_v, "reason": held_reason, "base_ref": "master"}
+    dr._attach_already_on_base(kept, attention)
+    assert kept["verdict"] == "needs_attention"
+    assert kept["already_on_base"] == "fix appears already present on master"
+    assert "tests/other_changed.py" in kept["collection_limitation"]
+    # No note: a collection failure alone does not cap a verified result.
+    plain = dr.compare_sides({"main": [passed], "pr": [passed]})
+    plain["base_new_tests"] = {"ids": [], "passed_on_base": [], "failed_on_base": [], "not_collected": [],
+                               "reproduced": False, "collection_failed": ["tests/checks.py"]}
+    again = dr.verdict_for(plain, None, None, files)
+    assert again[0] == "verified"
+    assert dr.cap_for_uncollected_file(plain, again[0], again[1])[0] == "verified"
+
+
 def _report_record(verdict: str, base_ref: str, failed: str) -> dict:
     """A record whose own checks pass, so the report shows the stored verdict."""
     phrase_ref = base_ref or "main"
@@ -312,15 +365,16 @@ def _report_record(verdict: str, base_ref: str, failed: str) -> dict:
 def test_collection_failure_stays_beside_the_note_and_is_not_hidden(tmp_path, monkeypatch):
     """A different changed file that fails to collect is named beside the note.
 
-    The stored verdict is not rewritten. The report and the go/no-go do not call that pair a clear pass,
-    and they do not drop the file name."""
+    needs_attention stays needs attention. A record stored as could_not_verify, because a verified
+    comparison was capped, shows that verdict and still shows the note and the file.
+    """
     from poc import pdf_always
     from reports.pr_report import build
     from reports.reviewer import to_html, to_pdf, write_summary
 
     monkeypatch.setattr("reports.reviewer.latest_replay", lambda: None)
     failed = "tests/other_changed.py"
-    cases = (("verified", "2.2", "VERIFIED", "Approve with notes"),
+    cases = (("could_not_verify", "2.2", "COULD NOT VERIFY", "Re-run"),
              ("needs_attention", "master", "NEEDS ATTENTION", "Reject"))
     for verdict, base_ref, shown, action in cases:
         record = _report_record(verdict, base_ref, failed)
@@ -333,7 +387,8 @@ def test_collection_failure_stays_beside_the_note_and_is_not_hidden(tmp_path, mo
         assert record["verdict"] == verdict
         assert row["verdict"] == shown
         assert row["action"] == action
-        assert row["verdict"] != "COULD NOT VERIFY"
+        if verdict == "needs_attention":
+            assert row["verdict"] != "COULD NOT VERIFY"
         blob = "\n".join(str(block) for block in report.blocks)
         assert phrase in blob
         assert failed in blob
@@ -360,35 +415,36 @@ def test_collection_failure_stays_beside_the_note_and_is_not_hidden(tmp_path, mo
         assert "already present on" in summary
         assert "clean verification" not in summary.lower()
         assert f"**{shown}**" in summary or "**VERIFIED**" in summary or "**NEEDS ATTENTION**" in summary
-        if verdict == "verified":
-            assert "**COULD NOT VERIFY**" not in summary
-            assert "**VERIFIED**" in summary
+        if verdict == "could_not_verify":
+            assert "**COULD NOT VERIFY**" in summary
+            assert "**NEEDS ATTENTION**" not in summary
         else:
             assert "**NEEDS ATTENTION**" in summary
+            assert "**COULD NOT VERIFY**" not in summary
             assert record["verdict"] == "needs_attention"
 
-    verified = _report_record("verified", "2.2", failed)
+    capped = _report_record("could_not_verify", "2.2", failed)
     daily = tmp_path / "daily"
     daily.mkdir()
     (tmp_path / "run-daily").mkdir()
-    _report, row = build(verified, tmp_path / "run-daily", daily)
+    _report, row = build(capped, tmp_path / "run-daily", daily)
     write_summary([row], str(daily), "go", ("md",))
     daily_md = (daily / "SUMMARY.md").read_text()
     assert "Nothing needs attention" not in daily_md
     assert failed in daily_md
     assert "clean verification" not in daily_md.lower()
-    assert "VERIFIED" in daily_md
+    assert "COULD NOT VERIFY" in daily_md
     fallback = tmp_path / "fallback"
-    pdf_always.records_pdfs(fallback, "run", [("widget-1", verified)])
+    pdf_always.records_pdfs(fallback, "run", [("widget-1", capped)])
     summary_pdf = _pdf_strings(fallback / "SUMMARY.pdf")
     per_pdf = _pdf_strings(fallback / "widget-1" / "REPORT.pdf")
     assert failed in summary_pdf and failed in per_pdf
-    assert "NO-GO, a changed test file was not collected" in summary_pdf
+    assert "NO-GO, could not verify" in summary_pdf
     assert "Go/no-go: GO" not in summary_pdf
     assert "clean verification" not in summary_pdf.lower()
     assert "clean verification" not in per_pdf.lower()
-    assert "verified" in per_pdf.lower()
-    assert verified["verdict"] == "verified"
+    assert "could not verify" in per_pdf.lower()
+    assert capped["verdict"] == "could_not_verify"
 
 
 def test_the_note_is_in_the_report_and_the_pdf(tmp_path):

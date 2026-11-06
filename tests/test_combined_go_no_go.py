@@ -42,33 +42,37 @@ def test_all_clear_only_when_every_record_is_verified(tmp_path):
     assert "Nothing needs attention" in (folder / "SUMMARY.md").read_text()
 
 
-def test_verified_with_a_collection_gap_is_not_an_all_clear(tmp_path):
-    """The note can stand, and the verdict stays verified. The folder still does not read as all clear."""
+def test_capped_collection_gap_uses_the_existing_all_clear_rule(tmp_path):
+    """The summary reads the stored verdict. could_not_verify is not an all-clear. needs_attention stays."""
     folder = tmp_path / "f"
     (folder / "b-2").mkdir(parents=True)
     (folder / "b-2" / "record.json").write_text(json.dumps({
-        "verdict": "verified",
-        "reason": "fix appears already present on 2.2",
+        "verdict": "could_not_verify",
+        "reason": "could not verify: pytest could not collect tests/other_changed.py, so that changed test "
+                  "file did not run (tests match); fix appears already present on 2.2; "
+                  "Limitation: pytest could not collect tests/other_changed.py. "
+                  "That changed test file is not a pass, and this result does not cover it.",
         "already_on_base": "fix appears already present on 2.2",
         "base_ref": "2.2",
-        "comparison": {"base_new_tests": {"collection_failed": ["tests/other_changed.py"],
-                                          "ids": ["tests/checks.py::n"],
-                                          "passed_on_base": ["tests/checks.py::n"],
-                                          "failed_on_base": [], "not_collected": [], "reproduced": False}},
         "pr": {"repo": "o/b", "number": 2, "title": "t"},
+    }))
+    (folder / "a-1").mkdir()
+    (folder / "a-1" / "record.json").write_text(json.dumps({
+        "verdict": "needs_attention",
+        "reason": "1 test(s) pass on main but fail on the PR; fix appears already present on master; "
+                  "Limitation: pytest could not collect tests/other_changed.py. "
+                  "That changed test file is not a pass, and this result does not cover it.",
+        "already_on_base": "fix appears already present on master",
+        "pr": {"repo": "o/a", "number": 1, "title": "t"},
     }))
     assert daily_run.rebuild_folder_summary(folder)
     md = (folder / "SUMMARY.md").read_text()
     assert "Nothing needs attention" not in md
     assert "tests/other_changed.py" in md
-    assert "already present on 2.2" in md
+    assert "already present on 2.2" in md and "already present on master" in md
     assert "clean verification" not in md.lower()
-    assert "1 verified" in md and "**VERIFIED**" in md
-    assert "**COULD NOT VERIFY**" not in md
-    (folder / "SUMMARY.md").write_text("Nothing needs attention: every report is VERIFIED.\n")
-    assert daily_run.summary_needs_rebuild(folder, {"f/b-2/record.json"}, "f")
-    with pytest.raises(ValueError):
-        daily_run.check_no_false_all_clear((folder / "SUMMARY.md").read_text(), daily_run.folder_records(folder))
+    assert "**COULD NOT VERIFY**" in md and "**NEEDS ATTENTION**" in md
+    assert "1 need attention" in md and "1 could not be verified" in md
 
 
 @pytest.mark.parametrize("verdict", ["could_not_verify", "needs_attention", None])

@@ -7657,12 +7657,6 @@ def record_collection_gap(rec: dict | None) -> tuple[list[str], str]:
     return files, sentence
 
 
-def record_has_collection_limitation(rec: dict | None) -> bool:
-    """True when a changed test file failed to collect, whether or not the already-on-base note is present."""
-    files, sentence = record_collection_gap(rec)
-    return bool(files or sentence)
-
-
 def _drop_trailing_note(reason: str, previous) -> str:
     """Remove a note this run appended earlier, so a second pass does not repeat it."""
     if not isinstance(previous, str) or not previous:
@@ -8659,6 +8653,25 @@ def cap_for_review(rec: dict, v: str, reason: str) -> tuple[str, str]:
     return v, reason
 
 
+def cap_for_uncollected_file(cmp: dict | None, v: str, reason: str) -> tuple[str, str]:
+    """Lower only a verified result when the already-on-base note applies and another file failed to collect.
+
+    ``verdict_for`` does not read ``collection_failed``. A passing comparison stays verified until this cap.
+    A needs-attention result is returned unchanged. The already-on-base note is attached after this and is
+    not removed."""
+    if v != Verdict.VERIFIED.value or not isinstance(cmp, dict):
+        return v, reason
+    if already_on_base_message(cmp) is None:
+        return v, reason
+    files = collection_failed_paths(cmp)
+    if not files:
+        return v, reason
+    shown = ", ".join(files)
+    noun = "file" if len(files) == 1 else "files"
+    return (Verdict.COULD_NOT_VERIFY.value,
+            f"could not verify: pytest could not collect {shown}, so that changed test {noun} did not run ({reason})")
+
+
 def _store_verdict(rec: dict, cmp, cnv, ex) -> None:
     """Write the verdict. A docstring-only change marks each behaviour claim as holding by construction."""
     same = bool(rec.get("product_check")) and sides_identical(rec)
@@ -8672,6 +8685,8 @@ def _store_verdict(rec: dict, cmp, cnv, ex) -> None:
         v = Verdict.NEEDS_ATTENTION.value
         reason = (f"needs attention: main installed with the same setup, but the PR side failed to build on both "
                   f"tries: {own.get('error') or own.get('why')}")[:400]
+    # After the build-failure promotion, so a needs-attention result is never lowered for a collection gap.
+    v, reason = cap_for_uncollected_file(cmp if isinstance(cmp, dict) else None, v, reason)
     rec["verdict"], rec["reason"] = v, reason
     if rec.get("docstring_only") and v == Verdict.VERIFIED.value:
         rec["behaviour_claims"] = mark_holds_by_construction(rec.get("behaviour_claims"))
@@ -10119,21 +10134,12 @@ def _verdict_key(rec: dict) -> str:
     return str(rec.get("verdict") or "could_not_verify").strip().lower().replace(" ", "_")
 
 
-def _blocks_all_clear(rec: dict) -> bool:
-    """True when this record must not be read as an all-clear.
-
-    A verdict other than verified counts. So does a verified record that still has a changed test file pytest
-    could not collect. The stored verdict stays verified. The gap stays visible, and the all-clear sentence
-    does not."""
-    return _verdict_key(rec) != "verified" or record_has_collection_limitation(rec)
-
-
 def combined_run_summary_md(records: list[dict], title: str) -> str:
     """One go/no-go covering every PR record in a date+commit folder.
 
     A record without a verdict counts as could_not_verify. The all-clear sentence appears only when every
-    record is verified and none of them has a changed test file that failed to collect. That gap does not
-    change the stored verdict. It is listed beside it.
+    record is verified. A collection gap does not add a second rule: when it lowers a result, the stored
+    verdict is already could_not_verify, and this summary reads that verdict.
     """
     order = {"needs_attention": 0, "could_not_verify": 1, "verified": 2}
     recs = sorted(records, key=lambda r: (order.get(_verdict_key(r), 1), str(r.get("_pr_id") or "")))
@@ -10143,28 +10149,14 @@ def combined_run_summary_md(records: list[dict], title: str) -> str:
     lines = [f"# {title}", "",
              f"{len(recs)} report(s) in this folder: {counts['needs_attention']} need attention, "
              f"{counts['could_not_verify']} could not be verified, {counts['verified']} verified. "
-             "Built from every record.json stored in this folder, so a later one-PR run cannot narrow it.", ""]
-    if any(record_has_collection_limitation(r) for r in recs):
-        lines.append("At least one report has a changed test file pytest could not collect. "
-                     "That limitation is named on the report. It is listed below even when the verdict is verified.")
-        lines.append("")
-    lines += ["## Needs a decision first", ""]
+             "Built from every record.json stored in this folder, so a later one-PR run cannot narrow it.", "",
+             "## Needs a decision first", ""]
     need = [r for r in recs if _verdict_key(r) != "verified"]
-    limited = [r for r in recs if _verdict_key(r) == "verified" and record_has_collection_limitation(r)]
     if need:
         for r in need:
             lines.append(f"- **{_verdict_key(r).upper().replace('_', ' ')}**: {_subject_of(r)}. {_reason_of(r)}")
-    elif not limited:
-        lines.append(f"{_ALL_CLEAR_PHRASE}: every report is VERIFIED.")
     else:
-        lines.append("The stored verdicts are verified. "
-                     "A report below still leaves out a changed test file that pytest could not collect.")
-    if limited:
-        if need:
-            lines.append("")
-        lines.append("Verified, with a changed test file pytest could not collect:")
-        for r in limited:
-            lines.append(f"- **VERIFIED**: {_subject_of(r)}. {_reason_of(r)}")
+        lines.append(f"{_ALL_CLEAR_PHRASE}: every report is VERIFIED.")
     lines += ["", "## All reports", "", "| Verdict | Subject | Why | Report |", "|---|---|---|---|"]
     for r in recs:
         pid = r.get("_pr_id") or ""
@@ -10185,21 +10177,15 @@ def _subject_of(rec: dict) -> str:
 
 def _reason_of(rec: dict) -> str:
     reason = str(rec.get("reason") or "no reason recorded").strip()
-    _files, extra = record_collection_gap(rec)
-    if extra and extra not in reason:
-        reason = f"{reason}; {extra}" if reason else extra
     return reason[0].upper() + reason[1:] if reason else reason
 
 
 def check_no_false_all_clear(text: str, records: list[dict]) -> None:
-    """Standing rule: a go/no-go never reads as an all-clear while any record is not a clear pass.
-
-    A record that is not verified blocks the all-clear sentence. So does a verified record whose changed
-    test file failed to collect. The sentence is refused either way. The stored verdict is not rewritten."""
-    bad = [r for r in records if _blocks_all_clear(r)]
+    """Standing rule: a go/no-go never reads as an all-clear while any record is not verified."""
+    bad = [r for r in records if _verdict_key(r) != "verified"]
     if (bad or not records) and _ALL_CLEAR_PHRASE.lower() in text.lower():
         raise ValueError("summary says nothing needs attention, but "
-                         f"{len(bad)} record(s) still need a look" if bad else "summary has no records")
+                         f"{len(bad)} record(s) are not verified" if bad else "summary has no records")
 
 
 def folder_records(folder: Path) -> list[dict]:
@@ -10218,7 +10204,7 @@ def folder_records(folder: Path) -> list[dict]:
 
 def summary_needs_rebuild(folder: Path, pushed: set, prefix: str) -> bool:
     """True when the folder holds a record this push did not write (an earlier one-PR run), or when its
-    SUMMARY.md reads as an all-clear while a record is not verified or still has a collection gap."""
+    SUMMARY.md reads as an all-clear while a record is not verified."""
     folder = Path(folder)
     for path in folder.glob("*/record.json"):
         if f"{prefix}/{path.parent.name}/record.json" not in pushed:
@@ -11232,6 +11218,7 @@ def rejudge(rec: dict, prdir: Path) -> dict:
     v, reason, _ = verdict_for(cmp, None, ex, rec.get("files"), pr_probes, rec.get("behaviour_claims"),
                                rec.get("baseline"))
     v, reason = cap_for_review(rec, v, reason)
+    v, reason = cap_for_uncollected_file(cmp, v, reason)
     out = {k: x for k, x in rec.items() if k not in ("verdict_before_coverage_gate", "reason_before_coverage_gate")}
     out.update(comparison=cmp, exit_check=ex, verdict=v, reason=reason)
     if pr_probes:
