@@ -514,14 +514,16 @@ def test_bad_constructor_keyword_is_repaired_once_or_dropped(tmp_path):
     assert out["name_checks"][0]["outcome"] == "fixed"
     text = out["probes"][0]["path"].read_text()
     assert "takes_value" not in text and "name=" in text
-    # A second answer that still passes the keyword is not written and is not coverage.
     again = Sequence([[_probe(bad)], [_probe(bad)]])
     out2 = model_probes.generate(again, "o/r", 1, "Keep answer", BODY,
                                  {"widget/parser/argument.py": base / "widget" / "parser" / "argument.py"},
                                  base, [tmp_path / "pr"], tmp_path / "out2")
     assert again.probe_calls == 2
-    assert out2["probes"] == []
     assert "unexpected keyword" in out2["name_checks"][0]["outcome"]
+    # takes_value is not a parameter. Deleting it would leave Argument('p'), which is a different
+    # call from the one the probe wrote, so the probe is not written and is not coverage.
+    assert out2["probes"] == []
+    assert any("not removed" in err for err in out2["errors"])
     assert not list((tmp_path / "out2").glob("*.py"))
 
 
