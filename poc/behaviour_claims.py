@@ -154,6 +154,23 @@ def about_tests_or_tools(sentence: str) -> bool:
             and not _WORKFLOW.search(sentence))
 
 
+# An author's aside about their own process, intent or what they did NOT change ("I left it untouched.", "We kept
+# that as is.", "I deliberately didn't touch the formatter") says nothing about the product's behaviour, so it never
+# needs a probe. Narrow on purpose: the sentence must start with "I" or "we" and a process verb, and must not name
+# a behaviour word (results, output, behaviour, values, ...): "I kept the output unchanged" is still a claim.
+_ASIDE = re.compile(
+    r"(?i)^\W*(?:i|we)(?:['’]ve|\s+have)?\s+(?:(?:deliberately|intentionally|purposely|also|just)\s+)?"
+    r"(?:left|kept|chose|decided|opted|did\s+not\s+(?:touch|change|modify)|didn['’]t\s+(?:touch|change|modify)|"
+    r"have\s+not\s+(?:touched|changed)|haven['’]t\s+(?:touched|changed)|wanted|tried|intend(?:ed)?)\b")
+_BEHAVIOUR_WORD = re.compile(rf"(?i)\b{_R}\b|\bapi\b|\breturns?\b|\braises?\b")
+
+
+def is_process_aside(sentence: str) -> bool:
+    """True for an author's narrative aside about process, intent or what was not changed: not a behaviour claim."""
+    s = sentence or ""
+    return bool(_ASIDE.search(s)) and not _BEHAVIOUR_WORD.search(s)
+
+
 _BOUNDARY = re.compile(r"[.!?](?=\s)|\n")
 
 
@@ -234,7 +251,8 @@ def find(title: str, body: str | None, diff: str | None = None) -> list[dict]:
                 if text[line_start:].lstrip().startswith("#"):   # a Markdown heading names a topic, not a claim
                     continue
                 q = _sentence(text, m.start(), m.end())
-                if q and about_tests_or_tools(_sentence(text, m.start(), m.end(), width=10**6)):
+                full = _sentence(text, m.start(), m.end(), width=10**6)
+                if q and (about_tests_or_tools(full) or is_process_aside(full)):
                     continue
                 if q and (source, q) not in seen:
                     seen.add((source, q))
