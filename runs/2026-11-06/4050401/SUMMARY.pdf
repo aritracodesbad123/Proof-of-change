@@ -9,18 +9,18 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>
 endobj
 4 0 obj
-<< /Length 226 >>
+<< /Length 263 >>
 stream
 BT
 /F1 11 Tf
 14 TL
 50 800 Td
-(Proof-of-Change summary: refused-2026-11-06-113823: NO-GO) Tj T*
+(Proof-of-Change summary: refused-2026-11-06-113911: NO-GO) Tj T*
 () Tj T*
 (Go/no-go: NO-GO, could not run) Tj T*
-(Reason: crashed: _Parsed: ) Tj T*
+(Reason: stopped by a stop signal \(SIGTERM\) before it finished) Tj T*
 () Tj T*
-(Written 2026-11-06 11:38 IST) Tj T*
+(Written 2026-11-06 11:39 IST) Tj T*
 ET
 endstream
 endobj
@@ -34,9 +34,9 @@ xref
 0000000058 00000 n 
 0000000115 00000 n 
 0000000241 00000 n 
-0000000518 00000 n 
+0000000555 00000 n 
 trailer
 << /Size 6 /Root 1 0 R >>
 startxref
-588
+625
 %%EOF
