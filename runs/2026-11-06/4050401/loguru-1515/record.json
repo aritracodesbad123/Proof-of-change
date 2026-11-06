@@ -1,0 +1,642 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-Delgan-loguru-1515-6c91de2c42d3-2026-11-06-check-1124",
+ "date_ist": "2026-11-06 11:24 IST",
+ "run_date": "2026-11-06",
+ "who": "ops/daily_run.py",
+ "repo": "Delgan/loguru",
+ "library": "loguru",
+ "pr": {
+  "repo": "Delgan/loguru",
+  "number": 1515,
+  "url": "https://github.com/Delgan/loguru/pull/1515",
+  "title": "Evaluate every rotation condition so a skipped one cannot fire spuriously",
+  "base_sha": "0412a60d6aff63a4ed009c7445993b42d294c2f1",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "6c91de2c42d38e010a68d9618dc6aa4ba01e1372",
+  "merge_commit": null,
+  "tested_main_sha": "0412a60d6aff63a4ed009c7445993b42d294c2f1",
+  "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+ },
+ "author": "januththedev",
+ "base_ref": "master",
+ "updated_at_utc": "2026-11-01T02:17:26Z",
+ "updated_at_ist": "2026-11-01 07:47 IST",
+ "ci_state": "not checked (single-PR check)",
+ "ci_detail": "checked on request with --pr",
+ "tested_at_ist": "2026-11-06 11:24 IST",
+ "files": {
+  "all": [
+   ".github/workflows/docs.yml",
+   ".github/workflows/lint.yml",
+   ".github/workflows/packaging.yml",
+   ".github/workflows/tests.yml",
+   "CHANGELOG.rst",
+   "loguru/_file_sink.py",
+   "pyproject.toml",
+   "tests/test_filesink_rotation.py",
+   "tests/test_type_hinting.py"
+  ],
+  "package_py": [
+   "loguru/_file_sink.py"
+  ],
+  "compiled": [
+   "pyproject.toml"
+  ],
+  "other": [
+   ".github/workflows/docs.yml",
+   ".github/workflows/lint.yml",
+   ".github/workflows/packaging.yml",
+   ".github/workflows/tests.yml",
+   "CHANGELOG.rst",
+   "tests/test_filesink_rotation.py",
+   "tests/test_type_hinting.py"
+  ]
+ },
+ "machine_type": {
+  "arch": "x86_64",
+  "os": "Linux",
+  "platform": "Linux-6.12.94+-x86_64-with-glibc2.41",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": null,
+  "cpu_model": "Intel(R) Xeon(R) Processor",
+  "ram_gb": 15.6
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 0,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.15",
+ "test_selection": "",
+ "per_run": [],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [
+  {
+   "source": "PR description",
+   "quote": "I left it untouched.",
+   "pattern": "untouched"
+  }
+ ],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "local",
+ "sandbox_backend_note": "local bubblewrap",
+ "machine": "local",
+ "tool_setup": {
+  "installed": [],
+  "tries": 0,
+  "note": "All required tools were already installed.",
+  "refused": []
+ },
+ "posted_upstream": false,
+ "logs": "loguru-1515/",
+ "freeze": {
+  "main": "freeze-main.txt"
+ },
+ "coverage": {
+  "status": "not measured",
+  "why": "coverage has not been run for this check"
+ },
+ "poc_commit": "4050401d30fe09fa6a04495c8f41d7203ddf9de8",
+ "route": "source-pair",
+ "current_head_sha": "6c91de2c42d38e010a68d9618dc6aa4ba01e1372",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "head_moved": false,
+ "diff_source": "git diff base_sha head_sha (pinned commits)",
+ "state": "open",
+ "mergeable": true,
+ "mergeable_state": "clean",
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": "[redacted]",
+  "notes": [
+   "Setup check: GitHub token: present.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory 7.5 GB (of 15.6 GB).",
+   "Setup check: free disk 94.7 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: [redacted] results",
+   "Query: loguru python setup install instructions https://github.com/Delgan/loguru site:github.com/Delgan/loguru",
+   "Query: loguru python documentation install https://github.com/Delgan/loguru site:github.com/Delgan/loguru",
+   "Query: loguru python install requirements https://pypi.org/project/loguru/ https://github.com/Delgan/loguru site:pypi.org",
+   "Source: loguru/pyproject.toml at master \u00b7 Delgan/loguru \u00b7 GitHub \u2014 https://github.com/Delgan/loguru/blob/master/pyproject.toml",
+   "Source: lager \u2014 https://pypi.org/project/lager/",
+   "Source: Python Logging (beans-logging) \u2014 https://pypi.org/project/beans-logging/",
+   "Source: loguru \u2014 https://pypi.org/project/loguru/",
+   "Source: loguru/CONTRIBUTING.rst at master \u00b7 Delgan/loguru \u00b7 GitHub \u2014 https://github.com/Delgan/loguru/blob/master/CONTRIBUTING.rst",
+   "Source: GitHub - Delgan/loguru: Python logging made (stupidly) simple \u00b7 GitHub \u2014 https://github.com/delgan/loguru",
+   "Source: Can\u2018t Import loguru \u00b7 Issue #116 \u00b7 Delgan/loguru \u00b7 GitHub \u2014 https://github.com/Delgan/loguru/issues/116",
+   "Source: Suggestion/request: Documentation/tutorial for beginners \u00b7 Issue #71 \u00b7 Delgan/loguru \u00b7 GitHub \u2014 https://github.com/Delgan/loguru/issues/71",
+   "Setup plan: the PR changes install docs (.github/workflows/docs.yml, .github/workflows/lint.yml, .github/workflows/packaging.yml, .github/workflows/tests.yml, pyproject.toml); setup was read from main's copy and applied the same on both sides.",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: colorama is noted, installed with the project.",
+   "Setup plan: aiocontextvars is noted, installed with the project.",
+   "Setup plan: win32-setctime is noted, installed with the project.",
+   "Setup plan: install pre-commit==4.6.0 ; python_version>='3.11' (listed in the dev extra) on main and pr.",
+   "Setup plan: install tox==3.27.1 ; python_version<'3.8' (listed in the dev extra) on main and pr.",
+   "Setup plan: install pytest==6.1.2 ; python_version<'3.8' (listed in the dev extra) on main and pr.",
+   "Setup plan: install pytest-cov==2.12.1 ; python_version<'3.8' (listed in the dev extra) on main and pr.",
+   "Setup plan: install pytest-mypy-plugins==4.0.3 ; python_version>='3.12' and platform_python_implementation!='PyPy' (listed in the dev extra) on main and pr.",
+   "Setup plan: install freezegun==1.1.0 ; python_version<'3.8' (listed in the dev extra) on main and pr.",
+   "Setup plan: install exceptiongroup==1.1.3 ; python_version>='3.7' and python_version<'3.11' (listed in the dev extra) on main and pr.",
+   "Setup plan: install mypy==v0.910 ; python_version<'3.6' (listed in the dev extra) on main and pr.",
+   "Setup plan: install Sphinx==8.2.1 ; python_version>='3.11' (listed in the dev extra) on main and pr.",
+   "Setup plan: install sphinx-rtd-theme==3.1.0 ; python_version>='3.11' (listed in the dev extra) on main and pr.",
+   "Setup plan: install myst-parser==4.0.0 ; python_version>='3.11' (listed in the dev extra) on main and pr.",
+   "Setup plan: install build==1.6.1 ; python_version>='3.11' (listed in the dev extra) on main and pr.",
+   "Setup plan: install twine==7.0.0 ; python_version>='3.11' (listed in the dev extra) on main and pr.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >=3.5, <4.0,>=3.5",
+   "rerun, setup problem: PR install failed after 3 tries.",
+   "Demo helper: setup failure already labelled; the probe was not rerun."
+  ],
+  "install_docs": [
+   "README.md",
+   "CONTRIBUTING.rst",
+   "pyproject.toml",
+   "tox.ini",
+   "docs/Makefile",
+   ".github/workflows/lint.yml",
+   ".github/workflows/packaging.yml",
+   ".github/workflows/docs.yml",
+   ".github/workflows/codeql-analysis.yml",
+   ".github/workflows/tests.yml"
+  ],
+  "install_docs_from": "main",
+  "install_docs_pr_changed": [
+   ".github/workflows/docs.yml",
+   ".github/workflows/lint.yml",
+   ".github/workflows/packaging.yml",
+   ".github/workflows/tests.yml",
+   "pyproject.toml"
+  ],
+  "setup_plan": {
+   "packages": [
+    {
+     "requirement": "colorama>=0.3.4 ; sys_platform=='win32'",
+     "name": "colorama",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "aiocontextvars>=0.2.0 ; python_version<'3.7'",
+     "name": "aiocontextvars",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "win32-setctime>=1.0.0 ; sys_platform=='win32'",
+     "name": "win32-setctime",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pre-commit==4.6.0 ; python_version>='3.11'",
+     "name": "pre-commit",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the dev extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "tox==3.27.1 ; python_version<'3.8'",
+     "name": "tox",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the dev extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest==6.1.2 ; python_version<'3.8'",
+     "name": "pytest",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the dev extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest-cov==2.12.1 ; python_version<'3.8'",
+     "name": "pytest-cov",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the dev extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest-mypy-plugins==4.0.3 ; python_version>='3.12' and platform_python_implementation!='PyPy'",
+     "name": "pytest-mypy-plugins",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the dev extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "freezegun==1.1.0 ; python_version<'3.8'",
+     "name": "freezegun",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the dev extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "exceptiongroup==1.1.3 ; python_version>='3.7' and python_version<'3.11'",
+     "name": "exceptiongroup",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the dev extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "mypy==v0.910 ; python_version<'3.6'",
+     "name": "mypy",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the dev extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "Sphinx==8.2.1 ; python_version>='3.11'",
+     "name": "Sphinx",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the dev extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "sphinx-rtd-theme==3.1.0 ; python_version>='3.11'",
+     "name": "sphinx-rtd-theme",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the dev extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "myst-parser==4.0.0 ; python_version>='3.11'",
+     "name": "myst-parser",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the dev extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "build==1.6.1 ; python_version>='3.11'",
+     "name": "build",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the dev extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "twine==7.0.0 ; python_version>='3.11'",
+     "name": "twine",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the dev extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    }
+   ],
+   "scope_blocked": "",
+   "component": null,
+   "aggregate_names": [],
+   "extra_reqs": [
+    "pre-commit==4.6.0 ; python_version>='3.11'",
+    "tox==3.27.1 ; python_version<'3.8'",
+    "pytest==6.1.2 ; python_version<'3.8'",
+    "pytest-cov==2.12.1 ; python_version<'3.8'",
+    "pytest-mypy-plugins==4.0.3 ; python_version>='3.12' and platform_python_implementation!='PyPy'",
+    "freezegun==1.1.0 ; python_version<'3.8'",
+    "exceptiongroup==1.1.3 ; python_version>='3.7' and python_version<'3.11'",
+    "mypy==v0.910 ; python_version<'3.6'",
+    "Sphinx==8.2.1 ; python_version>='3.11'",
+    "sphinx-rtd-theme==3.1.0 ; python_version>='3.11'",
+    "myst-parser==4.0.0 ; python_version>='3.11'",
+    "build==1.6.1 ; python_version>='3.11'",
+    "twine==7.0.0 ; python_version>='3.11'"
+   ],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >=3.5, <4.0,>=3.5"
+   },
+   "system": [],
+   "refused": [],
+   "groups_blocked": ""
+  },
+  "steps": {
+   "setup_lookup": "Found 16 setup item(s) in the project's files and the web lookup.",
+   "setup_python": "Python 3.12: Python 3.12 already meets >=3.5, <4.0,>=3.5",
+   "install_deps": "Wrote requirements.txt and installed it on main and pr: pre-commit==4.6.0 ; python_version>='3.11', tox==3.27.1 ; python_version<'3.8', pytest==6.1.2 ; python_version<'3.8', pytest-cov==2.12.1 ; python_version<'3.8', pytest-mypy-plugins==4.0.3 ; python_version>='3.12' and platform_python_implementation!='PyPy', freezegun==1.1.0 ; python_version<'3.8', exceptiongroup==1.1.3 ; python_version>='3.7' and python_version<'3.11', mypy==v0.910 ; python_version<'3.6', Sphinx==8.2.1 ; python_version>='3.11', sphinx-rtd-theme==3.1.0 ; python_version>='3.11', myst-parser==4.0.0 ; python_version>='3.11', build==1.6.1 ; python_version>='3.11'. 3 more come with the project install."
+  },
+  "run_files": {
+   "requirements": "requirements.txt",
+   "plan": "setup-plan.json",
+   "count": 13
+  },
+  "setup": {
+   "label": "rerun, setup problem",
+   "counts_as_verdict": false,
+   "step": "PR install",
+   "attempts": 3,
+   "detail": "install failed (1); see setup-pr.log"
+  }
+ },
+ "chosen": {
+  "pr": 1515,
+  "head_sha": "6c91de2c42d38e010a68d9618dc6aa4ba01e1372",
+  "install": null,
+  "test_cmd": null
+ },
+ "sides": {
+  "comparison_basis": "pinned base vs pinned PR head (benchmark case file)",
+  "main_sha": "0412a60d6aff63a4ed009c7445993b42d294c2f1",
+  "pr_sha": "6c91de2c42d38e010a68d9618dc6aa4ba01e1372",
+  "pinned": true
+ },
+ "tested": {
+  "main": "master @ 0412a60d6aff (base tip = first parent of the merge commit)",
+  "pr": "PR head 6c91de2c42d3"
+ },
+ "probe_plan": {
+  "baseline": "full",
+  "model": "model provider: nebius (Token Factory, live)",
+  "errors": [],
+  "model_claims": [
+   {
+    "id": "C1",
+    "text": "Evaluating every rotation condition prevents a skipped condition from firing spuriously.",
+    "source_quote": "Evaluate every rotation condition so a skipped one cannot fire spuriously",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C2",
+    "text": "When the first condition returns True, the remaining conditions are never invoked, so their _limit is never advanced past the current time. A skipped condition is left holding a limit that is now in the past, and it therefore fires on the very next logged message \u2014 producing a second, immediate, spurious rotation.",
+    "source_quote": "When the first condition returns True, the remaining conditions are never invoked, so their _limit is never advanced past the current time. A skipped condition is left holding a limit that is now in the past, and it therefore fires on the very next logged message \u2014 producing a second, immediate, spurious rotation.",
+    "testable": true,
+    "expect": "differs",
+    "quote_match": "loose"
+   },
+   {
+    "id": "C4",
+    "text": "test_multiple_rotation_conditions_all_evaluated is added to tests/test_filesink_rotation.py. - Fails before the change with assert 3 == 2; passes after.",
+    "source_quote": "test_multiple_rotation_conditions_all_evaluated is added to tests/test_filesink_rotation.py.\n- Fails before the change with assert 3 == 2; passes after.",
+    "testable": true,
+    "expect": "differs",
+    "quote_match": "loose"
+   }
+  ],
+  "model_rejected_claims": [
+   {
+    "id": "C3",
+    "text": "Note that the conditions must all be evaluated, even after one of them returned True, because \"RotationTime\" instances keep their limit up-to-date as a side-effect of being called. Skipping them would leave a stale limit in the past, causing a spurious extra rotation on the next logged message.",
+    "source_quote": "Note that the conditions must all be evaluated, even after one of them returned True, because \"RotationTime\" instances keep their limit up-to-date as a side-effect of being called. Skipping them would leave a stale limit in the past, causing a spurious extra rotation on the next logged message.",
+    "testable": true,
+    "expect": "same",
+    "rejected": "source_quote not found in the PR text"
+   }
+  ],
+  "model_loose_quote_matches": [
+   {
+    "claim": "C2",
+    "source_quote": "When the first condition returns True, the remaining conditions are never invoked, so their _limit is never advanced past the current time. A skipped condition is left holding a limit that is now in the past, and it therefore fires on the very next logged message \u2014 producing a second, immediate, spurious rotation."
+   },
+   {
+    "claim": "C4",
+    "source_quote": "test_multiple_rotation_conditions_all_evaluated is added to tests/test_filesink_rotation.py.\n- Fails before the change with assert 3 == 2; passes after."
+   }
+  ],
+  "model_retried": {
+   "why": [
+    "no probe listed the claim ids it checks, so its results could not be tied to any claim; in each probe, \"claims\" must name the claim ids it checks and the observation names that cover them"
+   ]
+  },
+  "diff_targets": [],
+  "frozen": [
+   {
+    "path": "model-probes/model-probe1.py",
+    "source": "model",
+    "sha256": "4745780bea6ad61d98c1d27a3ff32c60c840719eabdfb0e9465aaecf61e8a451",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-06T05:58:53.255539+00:00",
+    "inputs_sha256": "7be977c1fff3eb715e976ea32c76234bbee3f7a4984ceda8e6a56bdbea11e09a",
+    "inputs": {
+     "title_chars": 73,
+     "body_chars": 3344,
+     "base_files": {
+      "loguru/_file_sink.py": "d9f27b56f581db5a178ae6df357107b6b022c6ad94b639b52809c5c7fc9dd0cb"
+     }
+    }
+   }
+  ]
+ },
+ "test_extras": [
+  "pre-commit",
+  "tox",
+  "pytest",
+  "pytest-cov",
+  "pytest-mypy-plugins",
+  "colorama",
+  "freezegun",
+  "exceptiongroup",
+  "mypy",
+  "Sphinx",
+  "sphinx-rtd-theme",
+  "myst-parser",
+  "build",
+  "twine"
+ ],
+ "pr_side_started_at": "2026-11-06T05:58:53.407233+00:00",
+ "verdict": "could_not_verify",
+ "reason": "install failed (1); see setup-pr.log",
+ "verdict_before_coverage_gate": "could_not_verify",
+ "reason_before_coverage_gate": "install failed (1); see setup-pr.log",
+ "changed_lines_total": null,
+ "changed_lines_covered": null,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "lower",
+  "note": "coverage of the changed Python lines was NOT MEASURED (coverage has not been run for this check)",
+  "measurement": "not measured"
+ },
+ "agents": {
+  "status": "skipped",
+  "note": "advisory swarm is off",
+  "roles": []
+ },
+ "explanation": {
+  "status": "not yet wired",
+  "why": "advisory swarm is off"
+ },
+ "swarm_requested": false,
+ "operator_approval_requested": false,
+ "swarm": "off",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [
+   "loguru/_file_sink.py"
+  ],
+  "compiled_files": [
+   "pyproject.toml"
+  ],
+  "other_files": [
+   ".github/workflows/docs.yml",
+   ".github/workflows/lint.yml",
+   ".github/workflows/packaging.yml",
+   ".github/workflows/tests.yml",
+   "CHANGELOG.rst",
+   "tests/test_filesink_rotation.py",
+   "tests/test_type_hinting.py"
+  ]
+ },
+ "duration_s": {
+  "total_wall": 246.9,
+  "tests": 0
+ },
+ "cost": {
+  "ai_calls": 3,
+  "failed_ai_calls": 0,
+  "input_tokens": 11581,
+  "output_tokens": 32323,
+  "thinking_tokens": 30341,
+  "cost_usd": 0.032565,
+  "calls_without_usage": 0,
+  "ai_cost_usd": 0.032565,
+  "cost_complete": true,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 246.9,
+   "tests": 0
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.01646,
+  "total_cost_usd": 0.049025,
+  "swarm": {
+   "ai_calls": 0,
+   "failed_ai_calls": 0,
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "thinking_tokens": 0,
+   "cost_usd": 0.0,
+   "calls_without_usage": 0,
+   "ai_cost_usd": 0.0,
+   "cost_complete": true,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ },
+ "pdf_push": {
+  "ok": true,
+  "attempts": 1,
+  "error": null,
+  "url": "https://github.com/aritracodesbad123/Proof-of-change/tree/runs/runs/2026-11-06/4050401/loguru-1515"
+ }
+}
