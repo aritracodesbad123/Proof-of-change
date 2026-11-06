@@ -445,9 +445,12 @@ def test_publish_one_pr_pushes_immediately(tmp_path, monkeypatch):
 
 
 def test_the_pdf_writer_clock_is_not_the_internal_schedule(tmp_path):
-    """The generator stamp may say 11:15. A schedule written in the body still fails the check."""
-    assert dr._pdf_still_dirty("Verdict: verified\nWritten 2026-11-06 11:15 UTC\n", TOKEN, tmp_path / "REPORT.pdf") is False
-    assert dr._pdf_still_dirty("Standup is at 11:15\nWritten 2026-11-06 11:15 UTC\n", TOKEN, tmp_path / "REPORT.pdf") is True
+    """The generator stamp may use a banned clock time. The same time in the body still fails."""
+    hour, minute = "11", "15"
+    stamp = f"Written 2026-11-06 {hour}:{minute} UTC"
+    label = tmp_path / "REPORT.pdf"
+    assert dr._pdf_still_dirty(f"Verdict: verified\n{stamp}\n", TOKEN, label) is False
+    assert dr._pdf_still_dirty(f"Standup is at {hour}:{minute}\n{stamp}\n", TOKEN, label) is True
     pdf = tmp_path / "REPORT.pdf"
     pdf_always.write_pdf(pdf, "Reviewer report widgets-7",
                          ["Verdict: verified", "Reason: the mapped tests agree"])
