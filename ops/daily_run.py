@@ -1969,6 +1969,33 @@ def pr_side_constraints(main_venv: Path, dist: str, dest: Path) -> Path:
     return dest
 
 
+def pr_side_own_installs(extra_reqs, main_checkout: Path, pr_checkout: Path, constraints: Path | None,
+                         self_dist: str = "") -> tuple[list | None, Path | None]:
+    """The PR side's install inputs, built from the PR checkout's own declarations.
+
+    The setup plan's extras are read from main. On the PR side, each requirement main's checkout declares as a
+    test extra is replaced by what the PR checkout itself declares, so a pin the PR changes is the pin that gets
+    installed. Packages the PR checkout declares (runtime or extra) are removed from the main-side constraints, so a
+    main-side freeze is never forced on top of a version the project pins itself. Everything else is unchanged."""
+    from poc import demo_helper
+    main_extra = {demo_helper.norm(i["name"]) for i in demo_helper.declared_packages(main_checkout, self_dist)
+                  if i.get("kind") == "test-extra"}
+    pr_items = demo_helper.declared_packages(pr_checkout, self_dist)
+    pr_extra = [i["requirement"] for i in pr_items if i.get("kind") == "test-extra"]
+    own = {demo_helper.norm(i["name"]) for i in pr_items}
+    reqs = None
+    if extra_reqs:
+        kept = [r for r in extra_reqs if demo_helper.norm(demo_helper.req_name(str(r))) not in main_extra]
+        added = [r for r in pr_extra if demo_helper.norm(demo_helper.req_name(r)) in main_extra]
+        reqs = list(dict.fromkeys(kept + added)) or None
+    if constraints is not None and Path(constraints).is_file() and own:
+        lines = Path(constraints).read_text().splitlines()
+        keep = [ln for ln in lines if not ln.strip() or demo_helper.norm(re.split(r"[\[<>=!~;\s]", ln.strip(), maxsplit=1)[0])
+                not in own]
+        Path(constraints).write_text("\n".join(k for k in keep if k) + "\n")
+    return reqs, constraints
+
+
 def no_index_config_env(env: dict) -> dict:
     """Product-check install env: index, find-links and trusted-host settings dropped (demo_helper.drop_index_env),
     and no uv or pip config file read (UV_NO_CONFIG=1, PIP_CONFIG_FILE=/dev/null)."""
@@ -7856,11 +7883,13 @@ def test_source_pair(repo: str, cfg: dict, item: dict, prdir: Path, work: Path, 
             rec["freeze"]["main"] = freeze_env(vm, prdir / "freeze-main.txt")
             proj, _extra = side_install_args(item.get("chosen"), cm)
             rec["test_extras"] = recorded_test_extras(cm, with_test_extras(proj, cm))
+            # The PR side installs its own declared extras; main's freeze never overrides a pin the PR declares.
+            pr_extra, cons = pr_side_own_installs(extra, cm, cp, cons, cfg.get("dist") or "")
             rec["pr_side_started_at"] = pr_started = freeze.now()   # nothing below may create or change a probe
             run_progress.emit("install_pr", detail="installing PR side")
             if helper_on:
                 ok, why = _install_with_helper(a, rec, "PR install", vp, cp, item.get("chosen"),
-                                               prdir / "setup-pr.log", a.build_timeout, cons, extra, python=py,
+                                               prdir / "setup-pr.log", a.build_timeout, cons, pr_extra, python=py,
                                                max_retries=_pr_side_retries(a))
                 if not ok:
                     why = _pr_own_failure(a, rec, "PR install", why, prdir / "setup-pr.log", same_setup=True)
