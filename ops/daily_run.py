@@ -2002,9 +2002,13 @@ def pr_side_own_installs(extra_reqs, main_checkout: Path, pr_checkout: Path, con
 
 def no_index_config_env(env: dict) -> dict:
     """Product-check install env: index, find-links and trusted-host settings dropped (demo_helper.drop_index_env),
-    and no uv or pip config file read (UV_NO_CONFIG=1, PIP_CONFIG_FILE=/dev/null)."""
+    and no uv or pip config file read (UV_NO_CONFIG=1, PIP_CONFIG_FILE set to the empty-file sentinel).
+
+    A runner path in PIP_CONFIG_FILE or UV_CONFIG_FILE is dropped first. The sentinel is os.devnull, never that
+    path, so the path is not given to a sandbox subprocess or to an external service."""
+    from guardrails.isolation import without_host_config_paths
     from poc import demo_helper
-    env = demo_helper.drop_index_env(env)
+    env = without_host_config_paths(demo_helper.drop_index_env(dict(env)))
     env["UV_NO_CONFIG"] = "1"
     env["PIP_CONFIG_FILE"] = os.devnull
     return env
@@ -2811,10 +2815,13 @@ def compiler_jobs(ram: float | None = None, configured: int | None = None) -> in
 
 
 def with_compiler_jobs(env: dict, jobs: int | None = None) -> dict:
-    """Copy env and set the compiler job count. The added names are on the install allowlist; values are not secrets."""
-    from guardrails.isolation import INSTALL_ALLOWLIST, check_untrusted_env
+    """Copy env and set the compiler job count. The added names are on the install allowlist; values are not secrets.
+
+    A runner config-file path is removed before the allowlist check, so a product install's empty-file sentinel
+    (PIP_CONFIG_FILE=/dev/null) can proceed. A credential-like name is still refused."""
+    from guardrails.isolation import INSTALL_ALLOWLIST, check_untrusted_env, without_host_config_paths
     n = compiler_jobs(ram_gb()) if jobs is None else max(1, int(jobs))
-    out = dict(env)
+    out = without_host_config_paths(dict(env))
     out["MAX_JOBS"] = str(n)
     out["CMAKE_BUILD_PARALLEL_LEVEL"] = str(n)
     out["NINJAFLAGS"] = f"-j{n}"
@@ -2989,6 +2996,10 @@ def run(cmd, log_path: Path, cwd=None, env=None, timeout=None, sbx=HOST) -> tupl
     side (side_sandbox(...)); every command that may run PR or package code passes one."""
     if env is None:
         raise ValueError("run() needs an explicit allowlisted env (base_env)")
+    from guardrails.isolation import without_host_config_paths
+    # The dict this subprocess receives. A runner config-file path is gone; the empty-file sentinel, proxy
+    # settings and TLS trust settings are kept. The parent environment is not changed.
+    env = without_host_config_paths(dict(env))
     t0 = time.time()
     shown = list(map(str, cmd))
     if sbx is not None and _CONTREE_ONLY:
@@ -8790,6 +8801,8 @@ def _run_batch_order(queue: list, rdir: Path, workroot: Path, a, machine: dict, 
         except model_provider.ProviderRejected:
             raise
         except Exception as e:  # noqa: BLE001
+            if _is_unsafe_env(e):
+                raise abandon_pr_for_unsafe_env(rdir, a, cfg, c, e) from None
             problems.append(f"{repo}#{c['pr']}: harness error: {type(e).__name__}: {e}")
             return harness_error_record(repo, cfg, c, rdir, a, machine, e)
         print(f"    -> {rec['verdict']}: {rec['reason'][:140]} ({rec['duration_s']['total_wall']}s)", flush=True)
@@ -9883,6 +9896,12 @@ def main(argv=None) -> int:
         print(AUTH_FAIL_MESSAGE, file=sys.stderr, flush=True)
         rc = AUTH_FAIL_EXIT
         return rc
+    except EnvInfrastructure as e:
+        # A sandbox environment refusal is a run-level stop. The reason is one line and names no secret value.
+        reason = str(e)
+        print(reason, file=sys.stderr, flush=True)
+        rc = 1
+        return rc
     except SystemExit as e:
         rc = e.code
         if isinstance(e.code, str):
@@ -10295,6 +10314,9 @@ def _main(argv=None) -> int:
                 print(str(e), file=sys.stderr)
                 return 1
             except Exception as e:  # noqa: BLE001
+                if _is_unsafe_env(e):
+                    print(str(abandon_pr_for_unsafe_env(rdir, a, cfg, c, e)), file=sys.stderr, flush=True)
+                    return 1
                 problems.append(f"{repo}#{c['pr']}: harness error: {type(e).__name__}: {e}")
                 rec = harness_error_record(repo, cfg, c, rdir, a, machine, e)
                 if rec is not None:   # reported as could_not_verify; not marked seen, so it is tested again
@@ -10315,6 +10337,9 @@ def _main(argv=None) -> int:
             records.extend(_run_batch_order(batch_queue, rdir, workroot, a, machine, seen, problems))
         except model_provider.ProviderRejected as e:
             print(str(e), file=sys.stderr)
+            return 1
+        except EnvInfrastructure as e:
+            print(str(e), file=sys.stderr, flush=True)
             return 1
         if not moved:
             moved = next((p for p in problems if isinstance(p, str) and p.startswith("Stopped: main")), None)
@@ -10380,6 +10405,59 @@ def pinned_args_problem(a, single: dict) -> str | None:
     if sum(len(v) for v in single.values()) != 1:
         return "refusing: --base-sha / --head-sha need exactly one --pr"
     return None
+
+
+class EnvInfrastructure(RuntimeError):
+    """The runner refused to start a sandbox. This is not a verdict about a pull request."""
+
+
+def _is_unsafe_env(err: BaseException) -> bool:
+    from guardrails.isolation import UnsafeEnv
+    return isinstance(err, UnsafeEnv)
+
+
+def infrastructure_env_reason(err: BaseException) -> str:
+    """One line for the run-level go/no-go. Names the refusal. Does not include a secret or a config-file path."""
+    from guardrails.isolation import HOST_CONFIG_FILES
+    from poc import demo_helper
+    detail = demo_helper.redact(f"{type(err).__name__}: {err}")
+    for name in HOST_CONFIG_FILES:
+        raw = os.environ.get(name)
+        if raw and raw != os.devnull and raw in detail:
+            detail = detail.replace(raw, f"<{name} redacted>")
+    detail = " ".join(detail.split())
+    if len(detail) > 400:
+        detail = detail[:400] + "..."
+    return ("infrastructure failure: the runner refused to start the sandbox because the environment "
+            f"is not safe ({detail}). This is not a result about a pull request.")
+
+
+def discard_placeholder_verdict(rdir: Path, a, cfg: dict, item: dict) -> None:
+    """Remove this check's unfinished placeholder record and PDF.
+
+    A finished record is left untouched. The placeholder says could_not_verify only because the check had
+    started; an environment refusal must not leave that as a verdict about the pull request."""
+    tag = f"{cfg.get('pkg', 'pr')}-{item.get('pr')}"
+    rec_path = Path(rdir) / tag / "record.json"
+    if not rec_path.is_file():
+        return
+    try:
+        data = json.loads(rec_path.read_text())
+    except (OSError, json.JSONDecodeError):
+        return
+    if not isinstance(data, dict) or not (data.get("placeholder") or data.get("record_kind") == "placeholder"):
+        return
+    rec_path.unlink()
+    if getattr(a, "no_report", False):
+        return
+    pdf = report_dir_for(a, Path(rdir)) / tag / "REPORT.pdf"
+    pdf.unlink(missing_ok=True)
+
+
+def abandon_pr_for_unsafe_env(rdir: Path, a, cfg: dict, item: dict, err: BaseException) -> EnvInfrastructure:
+    """Drop the placeholder verdict and build the run-level error. Does not write a per-PR record."""
+    discard_placeholder_verdict(rdir, a, cfg, item)
+    return EnvInfrastructure(infrastructure_env_reason(err))
 
 
 def harness_error_record(repo: str, cfg: dict, item: dict, rdir: Path, a, machine: dict, err: BaseException) -> dict | None:
