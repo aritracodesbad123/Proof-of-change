@@ -9978,8 +9978,20 @@ def _pdf_text(path: Path) -> str | None:
     return cp.stdout.decode("utf-8", "replace")
 
 
+_PDF_STAMP = re.compile(r"^Written \d{4}-\d{2}-\d{2} \d{2}:\d{2}(?: [A-Z]+)?$")
+
+
+def _pdf_check_text(text: str) -> str:
+    """Drop the generator's own timestamp line before the public check.
+
+    ``write_pdf`` appends ``Written YYYY-MM-DD HH:MM UTC``. The public check treats 10:15 and 11:15 as an
+    internal schedule. A PDF written during one of those minutes is not that schedule."""
+    return "\n".join(line for line in text.splitlines() if not _PDF_STAMP.match(line.strip()))
+
+
 def _pdf_still_dirty(text: str, token: str | None, label: Path) -> bool:
     from guardrails.public_hygiene import findings
+    text = _pdf_check_text(text)
     return bool(_text_has_secret(text, token) or _text_has_internal_path(text) or findings(text, label))
 
 
