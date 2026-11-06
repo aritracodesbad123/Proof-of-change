@@ -615,6 +615,10 @@ def build(rec: dict, prdir: Path, out_dir: Path, decision: dict | None = None) -
     plugin_note = rec.get("collection_plugin_note")
     if isinstance(plugin_note, str) and plugin_note.strip():
         R.p(plugin_note.strip())
+    # The phrase is also on the reason. Repeating it here keeps it visible when a later gate rewrites the reason.
+    already = rec.get("already_on_base")
+    if isinstance(already, str) and already.strip():
+        R.p(already.strip())
     from poc import related_reports
     background = rec.get("related_reports") if isinstance(rec.get("related_reports"), dict) else None
     background_text = str((background or {}).get("text") or "").strip()

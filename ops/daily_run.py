@@ -5293,16 +5293,34 @@ def _probe_items(probe_results) -> list:
     return [it for it in probe_results.get("items") or [] if isinstance(it, dict)]
 
 
+def _collected_test_files(cmp: dict | None) -> list[str]:
+    """Test modules this run collected from the diff, including ones pytest's default names would skip.
+
+    Empty on a record that did not collect any. An older record has no such list, so its cross-run set stays
+    the default ``test_*.py`` / ``*_test.py`` files."""
+    if not isinstance(cmp, dict):
+        return []
+    out = []
+    for raw in cmp.get("collected_test_files") or []:
+        rel = _clean_rel(str(raw))
+        if _rel_inside(rel) and rel.endswith(".py"):
+            out.append(rel)
+    return out
+
+
 def cross_run_test_ids(cmp: dict | None, files: dict | None) -> list[str]:
     """The pull request's new or changed tests that fail on the base and pass on the pull request.
 
     Those are the ``fixed`` tests (failed on every base run, passed on every pull-request run) that live in a
     test file the pull request adds or edits. A test that is only ``new_tests_passing`` was absent on the base,
     so it did not fail there. A test in a file the pull request did not touch is not new or changed. No such
-    test means there is no cross-run."""
+    test means there is no cross-run. Files this run collected (nested classes, a project's own python_files)
+    count as well as the default ``test_*.py`` and ``*_test.py`` names."""
     if not isinstance(cmp, dict):
         return []
-    edited = sorted({str(f).lstrip("./") for f in (files or {}).get("all") or [] if is_test_file(str(f))})
+    edited = {str(f).lstrip("./") for f in (files or {}).get("all") or [] if is_test_file(str(f))}
+    edited.update(_collected_test_files(cmp))
+    edited = sorted(edited)
     if not edited:
         return []
     return [str(t) for t in (cmp.get("fixed") or []) if _edited_test_file(str(t), edited)]
@@ -6505,6 +6523,7 @@ def finalize_tests(rec: dict, per_run: list[dict], results: dict, a) -> tuple[di
         where = "both sides" if both else "one side"
         return None, f"tests produced no results on {where} (collection failed; see pytest logs)", None
     cmp = compare_sides(results)
+    _stamp_cross_run(rec, cmp)
     ex = exit_check(per_run, results, cmp)
     rec["comparison"], rec["exit_check"] = cmp, ex
     return cmp, None, ex
@@ -6983,22 +7002,24 @@ def parse_cross_junit(path: Path) -> dict:
 
 def _cross_pytest(side: str, venv: Path, rels: list[str], root: Path, prdir: Path, a, keep: bool,
                   use_contree: bool, files: dict | None, index: int,
-                  plugins_off: list | None = None) -> dict:
+                  plugins_off: list | None = None, nodes: list[str] | None = None) -> dict:
     """One pytest of these files on one side. A start that raises is an empty result, not a pass.
 
     plugins_off is the same list the timed runs use after a collection retry, so the base-side run does not
-    load a plugin that was turned off for the comparison."""
+    load a plugin that was turned off for the comparison. nodes, when set, are the collected node ids to run
+    instead of the whole file. A node id that pytest does not collect is absent from the result, not a pass."""
     stem = _clean_rel(rels[0]).replace("/", "_") if len(rels) == 1 else "all"
     jx = prdir / f"junit-cross-{side}-{index}-{stem}.xml"
     lg = prdir / f"pytest-cross-{side}-{index}-{stem}.log"
+    args = list(nodes) if nodes else list(rels)
     try:
         if use_contree:
-            _contree_pytest_once(side, rels, int(a.test_timeout), int(a.run_timeout), str(a.workers),
+            _contree_pytest_once(side, args, int(a.test_timeout), int(a.run_timeout), str(a.workers),
                                  jx, lg, keep, plugins_off, files=files)
             return parse_cross_junit(jx)
         env = base_env(side_home(venv))
         jin = side_out(venv) / jx.name
-        tg = [str(root / rel) for rel in rels]
+        tg = list(nodes) if nodes else [str(root / rel) for rel in rels]
         _local_pytest_once(venv, tg, int(a.test_timeout), int(a.run_timeout), str(a.workers), jin, lg, keep,
                            root, env, plugins_off)
         jx.unlink(missing_ok=True)
@@ -7086,6 +7107,334 @@ def _cross_files(side: str, venv: Path, rels: list[str], root: Path, prdir: Path
     return merged
 
 
+def _rel_nodeid(nodeid: str, root: Path | None) -> str:
+    """A pytest node id relative to the checkout. An absolute prefix, including the Contree checkout, is dropped."""
+    text = str(nodeid).strip().replace("\\", "/")
+    prefixes = []
+    if root is not None:
+        try:
+            prefixes.append(str(Path(root).resolve()).replace("\\", "/").rstrip("/"))
+        except OSError:
+            prefixes.append(str(root).replace("\\", "/").rstrip("/"))
+    prefixes.append(OWN_CHECKOUT_ROOT.rstrip("/"))
+    for prefix in prefixes:
+        if prefix and text.startswith(prefix + "/"):
+            return text[len(prefix) + 1:]
+    return text
+
+
+def collect_node_ids(text: str, root: Path | None = None) -> list[str]:
+    """Node ids pytest printed for ``--collect-only``.
+
+    A line is a node id when it names a ``.py`` file and a test (``::``). The command line, the summary, and
+    error lines are not node ids. The same id is kept once, in the order pytest printed it. Nothing here names
+    a repository, a class, or a decorator.
+    """
+    found, seen = [], set()
+    for raw in (text or "").splitlines():
+        line = raw.strip()
+        if not line or line.startswith(("$", "=", "ERROR", "FAILED", "PASSED", "SKIPPED", "WARNING", "E ", "!")):
+            continue
+        if ".py::" not in line.replace("\\", "/"):
+            continue
+        node = _rel_nodeid(line, root)
+        if node not in seen:
+            seen.add(node)
+            found.append(node)
+    return found
+
+
+def _collection_succeeded(rc) -> bool:
+    """True when pytest collected (including collecting nothing). A crash, a usage error, or a timeout did not."""
+    return rc in (0, 5)
+
+
+def _candidate_test_files(files: dict | None, checkout: Path) -> list[str]:
+    """Changed Python files that are not already default test names, which collection may still treat as tests.
+
+    Default ``test_*.py`` and ``*_test.py`` files are run as whole files by the existing cross-run. Everything
+    else here is a changed ``.py`` that the project's python_files would collect, or any changed ``.py`` inside
+    a test directory that is not a helper, conftest, or package init. Collection output, not the file name,
+    decides whether it has tests."""
+    patterns = python_file_patterns(checkout)
+    default = set(changed_test_files(files))
+    out = []
+    for raw in (files or {}).get("all") or []:
+        rel = _clean_rel(raw)
+        if not _rel_inside(rel) or not rel.endswith(".py") or rel in default:
+            continue
+        name = rel.rsplit("/", 1)[-1]
+        if name in {"conftest.py", "__init__.py"} or _is_test_support(rel):
+            continue
+        if _is_mapped_test(rel, patterns, checkout):
+            out.append(rel)
+            continue
+        if any(part in _TEST_DIR_NAMES for part in PurePosixPath(rel).parts[:-1]):
+            out.append(rel)
+    return sorted(set(out))
+
+
+def _contree_collect(side: str, rels: list[str], run_timeout: int, log: Path, keep: bool,
+                     plugins_off: list | None, files: dict | None) -> tuple[int | str, str]:
+    """``pytest --collect-only`` in one disposable Contree sandbox. The log text is what was collected."""
+    from poc import contree_sandboxes
+    sess = contree_sandboxes.session()
+    assert sess is not None
+    tg = " ".join(shlex.quote(t) for t in rels)
+    off = plugin_off_shell(plugins_off)
+    py = venv_python(contree=True)
+    shell = (
+        "set +e\ncd /work/src\n"
+        f"{py} -m pytest {tg} -p no:cacheprovider {off}--collect-only -q "
+        f"{repo_addopts_flag(keep)}>/tmp/poc-collect.log 2>&1\n"
+        "ec=$?\n"
+        "printf '___POC_EXIT___%s\\n' \"$ec\"\n"
+        "printf '___POC_LOG___\\n'\ncat /tmp/poc-collect.log 2>/dev/null\n"
+    )
+    op = {"disposable": True, "timeout": run_timeout}
+    if files:
+        op["files"] = files
+    raw = sess.run_op(side, shell, **op)
+    out = (raw.get("stdout") or "") + "\n" + (raw.get("stderr") or "")
+    exit_m = re.search(r"___POC_EXIT___(\S+)", out)
+    body = out.split("___POC_LOG___\n", 1)[-1] if "___POC_LOG___" in out else out
+    try:
+        log.write_text(body)
+    except OSError:
+        pass
+    if exit_m is None:
+        rc: int | str = raw.get("exit_code") if raw.get("exit_code") is not None else "error"
+    else:
+        try:
+            rc = int(exit_m.group(1))
+        except ValueError:
+            rc = exit_m.group(1)
+    return rc, body
+
+
+def _collect_file(side: str, venv: Path, root: Path, rel: str, prdir: Path, a, keep: bool,
+                  use_contree: bool, plugins_off: list | None, files: dict | None) -> tuple[list[str], int | str]:
+    """Collect one file. Returns (node ids, exit). An empty id list with a failed exit is not a pass."""
+    stem = _clean_rel(rel).replace("/", "_")
+    log = prdir / f"collect-cross-{side}-{stem}.log"
+    if use_contree:
+        rc, text = _contree_collect(side, [rel], int(a.run_timeout), log, keep, plugins_off, files)
+    else:
+        env = base_env(side_home(venv))
+        cmd = [venv_python(venv), "-m", "pytest", rel, "-p", "no:cacheprovider",
+               *plugin_off_args(plugins_off), "--collect-only", "-q", *repo_addopts_args(keep)]
+        rc, _secs = run(cmd, log, cwd=root, env=env, timeout=int(a.run_timeout), sbx=side_sandbox(venv))
+        try:
+            text = log.read_text(errors="replace")
+        except OSError:
+            text = ""
+    return collect_node_ids(text, root), rc
+
+
+def _canon_test_id(test_id: str, root: Path | None, known: list[str]) -> str:
+    return resolve_test_id(str(test_id), root=root, known=known)
+
+
+def _by_canon(run: dict, root: Path | None, known: list[str]) -> dict[str, tuple]:
+    """Map a collected node id onto the junit row that names the same test."""
+    out = {}
+    for tid, row in (run or {}).items():
+        out[_canon_test_id(tid, root, known)] = (tid, row)
+    return out
+
+
+def _new_ids_for(files: dict | None, main_root: Path, pr_root: Path, venvs: dict, prdir: Path, a,
+                 keep: bool, use_contree: bool, plugins_off) -> tuple[dict[str, list[str]], dict]:
+    """{file: node ids present on the PR and absent on the base}, plus the collection evidence.
+
+    The base is collected as it is, before any pull-request test file is copied over. A file whose collection
+    fails is recorded and contributes no ids, so a missing collection is not a passing test."""
+    evidence = {"ids": [], "passed_on_base": [], "failed_on_base": [], "not_collected": [],
+                "collection_failed": [], "reproduced": False}
+    found: dict[str, list[str]] = {}
+    for rel in _candidate_test_files(files, pr_root):
+        if not (pr_root / rel).is_file():
+            continue
+        pr_ids, pr_rc = _collect_file("pr", venvs["pr"], pr_root, rel, prdir, a, keep, use_contree,
+                                      plugins_off, None)
+        if not _collection_succeeded(pr_rc):
+            evidence["collection_failed"].append(rel)
+            continue
+        if not pr_ids:
+            continue
+        if (main_root / rel).is_file():
+            base_ids, base_rc = _collect_file("main", venvs["main"], main_root, rel, prdir, a, keep,
+                                              use_contree, plugins_off, None)
+            if not _collection_succeeded(base_rc):
+                evidence["collection_failed"].append(rel)
+                continue
+        else:
+            base_ids = []
+        base_set = set(base_ids)
+        new = [node for node in pr_ids if node not in base_set]
+        if new:
+            found[rel] = new
+    evidence["ids"] = sorted({node for nodes in found.values() for node in nodes})
+    return found, evidence
+
+
+def _run_node_ids(side: str, venv: Path, root: Path, discovered: dict[str, list[str]], prdir: Path, a,
+                  keep: bool, use_contree: bool, plugins_off, uploaded: dict | None, index: int) -> dict:
+    """Run the collected new node ids, one file at a time. A file that fails to collect does not hide another."""
+    merged: dict = {}
+    for rel, nodes in discovered.items():
+        chosen = None
+        if uploaded:
+            key = f"{OWN_CHECKOUT_ROOT}/{_clean_rel(rel)}"
+            if key in uploaded:
+                chosen = {key: uploaded[key]}
+        merged.update(_cross_pytest(side, venv, [rel], root, prdir, a, keep, use_contree, chosen, index,
+                                    plugins_off, nodes=nodes))
+    return merged
+
+
+def _classify_new_on_base(evidence: dict, discovered: dict[str, list[str]], base_runs: list, pr_runs: list,
+                          root: Path, results: dict, prdir: Path) -> None:
+    """Record which new tests passed, failed, or were not collected on the base.
+
+    A pass is written into the base results only when every base run collected that test and passed it, and
+    every pull-request run passed it too. A test that was not collected is left absent. It is not a pass, and
+    it is not evidence that a reported failure is gone. A failure is left for the cross-run fold, which already
+    ran, and is marked reproduced."""
+    known = list(discovered)
+    wanted = set(evidence.get("ids") or [])
+    passed, failed, missing = [], [], []
+    for node in sorted(wanted):
+        base_rows = [_by_canon(run, root, known).get(node) for run in base_runs]
+        pr_rows = [_by_canon(run, root, known).get(node) for run in pr_runs]
+        if any(row is None for row in base_rows) or not base_rows:
+            missing.append(node)
+            continue
+        outcomes = [row[1][0] for row in base_rows]
+        pr_outcomes = [row[1][0] for row in pr_rows] if pr_rows and all(row is not None for row in pr_rows) else []
+        if any(outcome in ("failed", "error", "load_error") for outcome in outcomes):
+            failed.append(node)
+            continue
+        if outcomes and all(outcome == "passed" for outcome in outcomes) and pr_outcomes and all(
+                outcome == "passed" for outcome in pr_outcomes):
+            passed.append(node)
+            for i, row in enumerate(base_rows):
+                original = row[0]
+                if i < len(results.get("main") or []):
+                    results["main"][i][original] = ("passed", "")
+                    _splice_junit(prdir / f"junit-main-{i + 1}.xml", original, "passed", "")
+            continue
+        # Skipped, or no pull-request pass to pair with. Not a reproduced failure and not a pass.
+        missing.append(node)
+    evidence["passed_on_base"] = passed
+    evidence["failed_on_base"] = failed
+    evidence["not_collected"] = missing
+    evidence["reproduced"] = bool(failed)
+
+
+def _pr_runs_cover(runs: list, nodes: list[str], root: Path, known: list[str]) -> bool:
+    """True when every run already has every new node id (the normal test run collected them)."""
+    if not runs or not nodes:
+        return False
+    wanted = set(nodes)
+    for run in runs:
+        got = set(_by_canon(run, root, known))
+        if not wanted <= got:
+            return False
+    return True
+
+
+def _run_discovered_new_tests(rec: dict, venvs: dict, prdir: Path, a, results: dict, main_root: Path,
+                              pr_root: Path, use_contree: bool, keep: bool, plugins_off) -> None:
+    """Collect tests the default file names miss, and run the ones that are new on the base.
+
+    The new ids come from pytest's own collection on each side, not from a class or decorator name. Copying
+    the pull-request test file onto the base happens after that collection, so a test that exists only in the
+    pull request is still new. The copy is removed before this returns."""
+    files = rec.get("files") if isinstance(rec, dict) else None
+    if not _candidate_test_files(files, pr_root):
+        return
+    discovered, evidence = _new_ids_for(files, main_root, pr_root, venvs, prdir, a, keep, use_contree, plugins_off)
+    rec["base_new_tests"] = evidence
+    if not discovered:
+        return
+    rec["cross_run_collected_files"] = sorted(discovered)
+    saved: list = []
+    try:
+        uploaded = _contree_test_files(pr_root, list(discovered)) if use_contree else None
+        if not use_contree:
+            saved = _overlay_pr_tests(main_root, pr_root, list(discovered))
+        n = len(results["main"])
+        base_runs = [_run_node_ids("main", venvs["main"], main_root, discovered, prdir, a, keep, use_contree,
+                                   plugins_off, uploaded, i + 1) for i in range(n)]
+        known = list(discovered)
+        wanted = [node for nodes in discovered.values() for node in nodes]
+        pr_extra = None
+        if not _pr_runs_cover(results["pr"], wanted, pr_root, known):
+            pr_extra = [_run_node_ids("pr", venvs["pr"], pr_root, discovered, prdir, a, keep, use_contree,
+                                      plugins_off, None, i + 1) for i in range(n)]
+        _fold_cross_run(results, base_runs, pr_extra, list(discovered), prdir, files)
+        pr_rows = pr_extra if pr_extra is not None else results["pr"]
+        _classify_new_on_base(evidence, discovered, base_runs, pr_rows, main_root, results, prdir)
+    finally:
+        _restore_overlay(saved)
+
+
+def already_on_base_message(cmp: dict | None, base_ref: str | None = None) -> str | None:
+    """The plain note when the pull request's new tests already pass on the base and the failure is not reproduced.
+
+    It is None unless every new test collected from the diff was collected again on the base and passed there,
+    and none of those tests failed. One unrelated passing test is not enough. A test that was not collected is
+    not a pass. The verdict is not read or changed here."""
+    info = cmp.get("base_new_tests") if isinstance(cmp, dict) else None
+    if not isinstance(info, dict):
+        return None
+    ids = [str(node) for node in info.get("ids") or []]
+    if not ids or info.get("reproduced"):
+        return None
+    missing = [str(node) for node in info.get("not_collected") or []]
+    failed = [str(node) for node in info.get("failed_on_base") or []]
+    passed = [str(node) for node in info.get("passed_on_base") or []]
+    if missing or failed or set(passed) != set(ids):
+        return None
+    ref = str(base_ref or "").strip() or "main"
+    if ref == "main":
+        return "fix appears already present on main"
+    return f"fix appears already present on {ref}"
+
+
+def _attach_already_on_base(rec: dict, cmp: dict | None) -> None:
+    """Put the already-on-base note on the record and at the end of the reason. The verdict is left as it is."""
+    if not isinstance(rec, dict):
+        return
+    note = already_on_base_message(cmp, rec.get("base_ref"))
+    reason = str(rec.get("reason") or "")
+    previous = rec.get("already_on_base")
+    if isinstance(previous, str) and previous:
+        suffix = f"; {previous}"
+        if reason.endswith(suffix):
+            reason = reason[:-len(suffix)]
+        elif reason == previous:
+            reason = ""
+    if note:
+        rec["already_on_base"] = note
+        rec["reason"] = f"{reason}; {note}" if reason else note
+    else:
+        rec.pop("already_on_base", None)
+        if isinstance(previous, str) and previous:
+            rec["reason"] = reason
+
+
+def _stamp_cross_run(rec: dict, cmp: dict) -> None:
+    """Copy the collection evidence onto the comparison the verdict reads."""
+    files = rec.get("cross_run_collected_files") if isinstance(rec, dict) else None
+    if files:
+        cmp["collected_test_files"] = list(files)
+    info = rec.get("base_new_tests") if isinstance(rec, dict) else None
+    if isinstance(info, dict):
+        cmp["base_new_tests"] = info
+
+
 def record_cross_run(rec: dict, venvs: dict, targets: dict | None, prdir: Path, a, results: dict,
                      cwds: dict | None = None) -> dict:
     """Run the pull request's added or edited test files and store the outcomes the cross-run rule reads.
@@ -7110,31 +7459,35 @@ def record_cross_run(rec: dict, venvs: dict, targets: dict | None, prdir: Path, 
         return results
     rels = [rel for rel in changed_test_files(rec.get("files") if isinstance(rec, dict) else None)
             if (pr_root / rel).is_file()]
-    if not rels:
+    file_info = rec.get("files") if isinstance(rec, dict) else None
+    if not rels and not _candidate_test_files(file_info, pr_root):
         return results
     from poc import run_progress
     run_progress.emit("pytest", "code", "PR tests against the base tree")
     use_contree = _contree_ready() and cwds is not None
     keep = product_route(a)
     plugins_off = rec.get("pytest_plugins_off") if isinstance(rec, dict) else None
-    saved: list = []
-    try:
-        if not use_contree:
-            saved = _overlay_pr_tests(main_root, pr_root, rels)
-        uploaded = _contree_test_files(pr_root, rels) if use_contree else None
-        # One file per pytest start. A collection error in one file stops that start, and must not hide
-        # a real failure in another file.
-        base_runs = [_cross_files("main", venvs["main"], rels, main_root, prdir, a, keep, use_contree,
-                                  uploaded, i + 1, plugins_off) for i in range(len(main_runs))]
-        extra = [rel for rel in rels if not _target_covers(rel, (targets or {}).get("pr"))]
-        pr_extra = None
-        if extra:
-            pr_extra = [_cross_files("pr", venvs["pr"], extra, pr_root, prdir, a, keep, use_contree,
-                                     None, i + 1, plugins_off) for i in range(len(pr_runs))]
-        _fold_cross_run(results, base_runs, pr_extra, rels, prdir,
-                        rec.get("files") if isinstance(rec, dict) else None)
-    finally:
-        _restore_overlay(saved)
+    if rels:
+        saved: list = []
+        try:
+            if not use_contree:
+                saved = _overlay_pr_tests(main_root, pr_root, rels)
+            uploaded = _contree_test_files(pr_root, rels) if use_contree else None
+            # One file per pytest start. A collection error in one file stops that start, and must not hide
+            # a real failure in another file.
+            base_runs = [_cross_files("main", venvs["main"], rels, main_root, prdir, a, keep, use_contree,
+                                      uploaded, i + 1, plugins_off) for i in range(len(main_runs))]
+            extra = [rel for rel in rels if not _target_covers(rel, (targets or {}).get("pr"))]
+            pr_extra = None
+            if extra:
+                pr_extra = [_cross_files("pr", venvs["pr"], extra, pr_root, prdir, a, keep, use_contree,
+                                         None, i + 1, plugins_off) for i in range(len(pr_runs))]
+            _fold_cross_run(results, base_runs, pr_extra, rels, prdir, file_info)
+        finally:
+            _restore_overlay(saved)
+    if isinstance(rec, dict):
+        _run_discovered_new_tests(rec, venvs, prdir, a, results, main_root, pr_root, use_contree, keep,
+                                  plugins_off)
     return results
 
 
@@ -8026,6 +8379,7 @@ def _store_verdict(rec: dict, cmp, cnv, ex) -> None:
     rec["verdict"], rec["reason"] = v, reason
     if rec.get("docstring_only") and v == Verdict.VERIFIED.value:
         rec["behaviour_claims"] = mark_holds_by_construction(rec.get("behaviour_claims"))
+    _attach_already_on_base(rec, cmp)
 
 
 # ---------------------------------------------------------------- re-runs, frozen selection, audit trail
@@ -10468,6 +10822,10 @@ def rejudge(rec: dict, prdir: Path) -> dict:
         return rec
     results = {s: [parse_junit(prdir / f"junit-{s}-{i}.xml") for i in range(1, n + 1)] for s in ("main", "pr")}
     cmp = compare_sides(results)
+    if old.get("collected_test_files"):
+        cmp["collected_test_files"] = list(old["collected_test_files"])
+    if isinstance(old.get("base_new_tests"), dict):
+        cmp["base_new_tests"] = old["base_new_tests"]
     kept = {d["test"] for d in old.get("skipped_missing_dependency", [])}
     for d in [d for d in cmp["skipped_missing_dependency"] if d["test"] not in kept]:
         _unconfirmed_dependency(cmp, d)
@@ -10493,6 +10851,7 @@ def rejudge(rec: dict, prdir: Path) -> dict:
             else:
                 out.pop("broad_claims_note", None)
     out = gate(out)
+    _attach_already_on_base(out, out.get("comparison"))
     if (out["verdict"], out["reason"]) != (rec.get("verdict"), rec.get("reason")):
         out["rejudged"] = {"at_ist": now_ist().strftime("%Y-%m-%d %H:%M IST"),
                            "previous_verdict": rec.get("verdict"), "previous_reason": rec.get("reason", "")}
