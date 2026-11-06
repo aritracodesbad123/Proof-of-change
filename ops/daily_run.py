@@ -7690,16 +7690,21 @@ def _sides(runs, node, root, known_files):
     return out
 
 
-def _record_shared(shared, base_runs, pr_runs, results, prdir, root, known_files) -> None:
-    """Write a test both sides already collect. It ran on the base, so it is not a new test."""
+def _record_shared(shared, base_runs, pr_runs, results, prdir, root, known_files, info, rel) -> None:
+    """Write a test both sides already collect, when the base run actually executed it.
+
+    A shared id with no passed, failed, or skipped row on the base did not run there. It is named and removed
+    from the passing set. It is not left for the ordinary comparison to call a new pass."""
     for node in shared:
         base = _sides(base_runs, node, root, known_files)
         pr = _sides(pr_runs, node, root, known_files)
         parts = [part for _tid, part in base]
         pr_parts = [part for _tid, part in pr]
-        if not parts or not all(part and part[0] in ("passed", "failed", "skipped") for part in parts):
-            continue
-        if not pr_parts or not all(part and part[0] in ("passed", "failed", "skipped") for part in pr_parts):
+        genuine = bool(parts) and all(part and part[0] in ("passed", "failed", "skipped") for part in parts)
+        pr_ran = bool(pr_parts) and all(part and part[0] in ("passed", "failed", "skipped") for part in pr_parts)
+        if not genuine or not pr_ran:
+            info["not_executed"].append(node)
+            _add_limit(info, rel, "base_load_error", "shared test did not run on the base")
             continue
         for index, (tid, part) in enumerate(base):
             if str(tid or "").startswith("::") or part is None:
@@ -7719,10 +7724,14 @@ def _classify_nested(info, rel, nodes, tracked, shared, base_runs, pr_runs, resu
                      known_files) -> None:
     """Record one file's base execution. ``nodes`` None means the whole file was the fallback."""
     comparable = nodes is not None
-    _record_shared(shared, base_runs, pr_runs, results, prdir, root, known_files)
+    _record_shared(shared, base_runs, pr_runs, results, prdir, root, known_files, info, rel)
     targets = list(tracked)
     if not comparable:
+        # The base file collected nothing, so these ids are not known to be new. The whole-file run is only
+        # evidence that collection did not see them. It must not turn an old test into fixed.
         _add_limit(info, rel, "base_did_not_collect", "base collected no tests from this changed file")
+        info["not_executed"].extend(targets)
+        return
     for node in targets:
         base = _sides(base_runs, node, root, known_files)
         pr = _sides(pr_runs, node, root, known_files)
@@ -7731,20 +7740,7 @@ def _classify_nested(info, rel, nodes, tracked, shared, base_runs, pr_runs, resu
         genuine = all(part and part[0] in ("passed", "failed", "skipped") for part in base_parts) and base_parts
         if not genuine:
             info["not_executed"].append(node)
-            if comparable:
-                _add_limit(info, rel, "base_load_error", "no base execution")
-            continue
-        if not comparable:
-            # Not a new id. Only a real assertion failure on every base run, passing on the pull request, is fixed.
-            if (all(part[0] == "failed" for part in base_parts) and all(part and part[0] == "passed" for part in pr_parts)
-                    and all(_base_failure_counts(part[0], part[1], part[2], files) for part in base_parts)):
-                info["failed_on_base"].append(node)
-                info["fixed_ids"].append(node)
-                info["new_ids"].append(node)
-                for index, (tid, part) in enumerate(base):
-                    _write_fixed(results, prdir, tid or node, part, index)
-            else:
-                info["not_executed"].append(node)
+            _add_limit(info, rel, "base_load_error", "no base execution")
             continue
         info["new_ids"].append(node)
         if any(part[0] == "skipped" for part in base_parts) or any(part and part[0] == "skipped" for part in pr_parts):

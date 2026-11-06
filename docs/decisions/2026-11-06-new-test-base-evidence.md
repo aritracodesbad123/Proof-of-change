@@ -12,7 +12,12 @@ check cannot be verified. A test that passed only on the pull request is not cou
 and it is not described as a failure that the base reproduced. A skipped new test is not counted as a pass.
 
 The note that new tests already pass names the tested base commit. It is not added from the branch name,
-it is not added when a probe observation is flagged, and it does not change the verdict.
+it is not added when a probe observation is flagged, and it does not change the verdict. Those fixed ids are
+test results. They are not attached to a behaviour-claim id.
+
+A test both sides already collect is not a new test. If the base run does not actually execute it, that file
+is named and the test is not counted as a new pass. When the base collects nothing, the file is run only to
+show that, and no id from that run is stored as fixed.
 
 ## Why
 

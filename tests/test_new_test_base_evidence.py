@@ -344,6 +344,58 @@ def test_overlay_when_the_parent_is_a_file_is_named(tmp_path, sides):
     assert rec.get("already_on_base") is None
 
 
+def test_shared_test_that_does_not_run_on_the_base_is_not_a_new_pass(tmp_path, sides):
+    """A test both sides collect is not a new pass when the base run never executes it.
+
+    The fixture lives only on the pull request. The test file is overlaid alone, so the base import of that
+    fixture fails. The ordinary comparison must not keep the pull-request pass."""
+    work = tmp_path / "work"
+    main, pr = work / "side-main", work / "side-pr"
+    shared = '''
+def test_shared(only_pr):
+    assert only_pr == 1
+
+class Parser_:
+    class parse_argv:
+        class positional_arguments:
+            def omitted_positional_arg_raises_ParseError(self):
+                assert True
+'''
+    added = shared + '''
+            def reports_new(self):
+                assert True
+'''
+    _tree(main, "1", shared)
+    _tree(pr, "1", added)
+    _write(pr / "tests" / "conftest.py", "import pytest\n\n@pytest.fixture\ndef only_pr():\n    return 1\n")
+    files = _files(False)
+    record = {"files": files, "base_ref": "2.2", "pr": {"tested_main_sha": SHA}}
+    rundir = tmp_path / "run"
+    rundir.mkdir()
+    args = SimpleNamespace(runs=1, workers="0", test_timeout=60, run_timeout=180, build_timeout=60,
+                           pr="https://example.test/pull/1", product_check=False, bench=None)
+    from guardrails import sandbox
+    was = sandbox.enabled()
+    sandbox.configure(False)
+    try:
+        cmp, cnv, ex = dr.execute_tests(
+            record, {"main": sides["venv_base"], "pr": sides["venv_pr"]},
+            {"main": ["tests/test_old.py"], "pr": ["tests/test_old.py", "tests/parser_parser.py"]},
+            rundir, work, args, cwds={"main": main, "pr": pr})
+    finally:
+        sandbox.configure(was)
+    assert cnv is None and cmp is not None
+    info = cmp["new_test_evidence"]
+    blob = _names(cmp["new_tests_passing_ids"]) + _names(cmp["fixed"]) + _names(info["fixed_ids"])
+    assert "test_shared" not in blob
+    assert any(item["path"] == "tests/parser_parser.py" for item in info["limitations"])
+    assert any("test_shared" in item for item in info["not_executed"])
+    dr._store_verdict(record, cmp, cnv, ex)
+    record = dr.gate(record)
+    assert record["verdict"] != "verified"
+    assert record.get("already_on_base") is None
+
+
 def test_a_mismatched_tested_sha_is_not_used_as_the_base(tmp_path, sides):
     work = tmp_path / "work"
     main, pr = work / "side-main", work / "side-pr"
