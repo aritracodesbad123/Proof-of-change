@@ -98,9 +98,9 @@ def test_shared_nested_body_is_a_real_base_failure(tmp_path, pythons):
     """The same node id with a stronger assertion fails on the base and is the cross-run id."""
     rec, cmp, cnv, _ex, rundir = _execute(tmp_path, pythons, BASE_NESTED, PR_NESTED)
     assert cnv is None and cmp is not None
-    ids = dr.cross_run_test_ids(cmp, rec["files"])
-    assert ids and all("old_case" in node for node in ids)
     assert any("old_case" in str(t) for t in cmp["fixed"])
+    # The shared id is ordinary fixed evidence. It is not eligible to settle a differs claim.
+    assert dr.cross_run_test_ids(cmp, rec["files"]) == []
     junit = (rundir / "junit-main-1.xml").read_text()
     assert "old_case" in junit and "failure" in junit
     assert not any("old_case" in str(t) for t in cmp.get("new_tests_passing_ids") or [])
@@ -133,7 +133,7 @@ class Bucket_:
     named = " ".join(info.get("environment_limits") or [])
     assert "could not import" not in named
     assert any("old_case" in str(t) for t in cmp["fixed"])
-    assert dr.cross_run_test_ids(cmp, rec["files"])
+    assert dr.cross_run_test_ids(cmp, rec["files"]) == []
 
 
 def test_missing_base_helper_is_not_a_fix_and_not_a_new_pass(tmp_path, pythons):

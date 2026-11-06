@@ -5495,22 +5495,47 @@ def _collected_test_files(cmp: dict | None) -> list[str]:
     return out
 
 
-def cross_run_test_ids(cmp: dict | None, files: dict | None) -> list[str]:
-    """The pull request's new or changed tests that fail on the base and pass on the pull request.
+def _shared_execution_ids(cmp: dict) -> set[str]:
+    """Canonical ids of tests both sides already collected.
 
-    Those are the ``fixed`` tests (failed on every base run, passed on every pull-request run) that live in a
-    test file the pull request adds or edits. A test that is only ``new_tests_passing`` was absent on the base,
-    so it did not fail there. A test in a file the pull request did not touch is not new or changed. No such
-    test means there is no cross-run. Files this run collected (nested classes, a project's own python_files)
-    count as well as the default ``test_*.py`` and ``*_test.py`` names."""
+    A shared id can be in ``fixed`` after the pull-request body is run on the base. That row is ordinary test
+    evidence. It is not, by itself, evidence for a differs claim. Matching uses the same id rewrite as the
+    junit rows (``resolve_test_id``). Claim text and file-name similarity are not read."""
+    info = cmp.get("base_new_tests") if isinstance(cmp.get("base_new_tests"), dict) else None
+    if not info:
+        return set()
+    shared = [str(node) for node in info.get("shared_ids") or [] if str(node).strip()]
+    known = [node.split("::", 1)[0] for node in shared if node.split("::", 1)[0].endswith(".py")]
+    return {resolve_test_id(node, known=known) for node in shared}
+
+
+def cross_run_test_ids(cmp: dict | None, files: dict | None) -> list[str]:
+    """Fixed tests that may settle a differs claim.
+
+    Eligible ids are ``fixed`` rows whose file is a default-named edited test file (``test_*.py`` or
+    ``*_test.py`` in the pull request's changed files). A file that is only in ``collected_test_files``
+    does not qualify, and a shared id does not qualify. Those rows stay in ``fixed`` for the ordinary
+    test verdict. They do not settle a differs claim. No wording or path guess binds a claim to a test."""
     if not isinstance(cmp, dict):
         return []
-    edited = {str(f).lstrip("./") for f in (files or {}).get("all") or [] if is_test_file(str(f))}
-    edited.update(_collected_test_files(cmp))
-    edited = sorted(edited)
+    edited = sorted({str(f).lstrip("./") for f in (files or {}).get("all") or [] if is_test_file(str(f))})
     if not edited:
         return []
-    return [str(t) for t in (cmp.get("fixed") or []) if _edited_test_file(str(t), edited)]
+    shared = _shared_execution_ids(cmp)
+    known = list(edited)
+    for node in shared:
+        path = node.split("::", 1)[0]
+        if path.endswith(".py") and path not in known:
+            known.append(path)
+    out = []
+    for raw in cmp.get("fixed") or []:
+        tid = str(raw)
+        if not _edited_test_file(tid, edited):
+            continue
+        if resolve_test_id(tid, known=known) in shared:
+            continue
+        out.append(tid)
+    return out
 
 
 def _crash_value(value) -> bool:
@@ -6725,9 +6750,7 @@ def finalize_tests(rec: dict, per_run: list[dict], results: dict, a) -> tuple[di
         return None, f"tests produced no results on {where} (collection failed; see pytest logs)", None
     cmp = compare_sides(results)
     _stamp_cross_run(rec, cmp)
-    _drop_unexecuted_shared(cmp)
-    _drop_gap_new_passes(cmp)
-    _drop_environment_fixed(cmp)
+    apply_execution_evidence_filters(cmp)
     ex = exit_check(per_run, results, cmp)
     rec["comparison"], rec["exit_check"] = cmp, ex
     return cmp, None, ex
@@ -7857,6 +7880,19 @@ def _id_in_files(test_id: str, files: set[str]) -> bool:
         return True
     resolved = resolve_test_id(str(test_id), known=sorted(files)).split("::", 1)[0]
     return resolved in files
+
+
+def apply_execution_evidence_filters(cmp: dict) -> None:
+    """The live evidence filters, in live order.
+
+    ``finalize_tests`` calls this after ``_stamp_cross_run``. ``rejudge`` calls it after restoring those
+    stamps from the saved comparison. ``derive_verdict`` calls it on a copy of the saved comparison.
+    All three run it before ``verdict_for``. The saved record's own objects are not replaced here."""
+    if not isinstance(cmp, dict):
+        return
+    _drop_unexecuted_shared(cmp)
+    _drop_gap_new_passes(cmp)
+    _drop_environment_fixed(cmp)
 
 
 def _drop_unexecuted_shared(cmp: dict) -> None:
@@ -11536,7 +11572,8 @@ def rejudge(rec: dict, prdir: Path) -> dict:
     if old.get("collected_test_files"):
         cmp["collected_test_files"] = list(old["collected_test_files"])
     if isinstance(old.get("base_new_tests"), dict):
-        cmp["base_new_tests"] = old["base_new_tests"]
+        cmp["base_new_tests"] = copy.deepcopy(old["base_new_tests"])
+    apply_execution_evidence_filters(cmp)
     kept = {d["test"] for d in old.get("skipped_missing_dependency", [])}
     for d in [d for d in cmp["skipped_missing_dependency"] if d["test"] not in kept]:
         _unconfirmed_dependency(cmp, d)

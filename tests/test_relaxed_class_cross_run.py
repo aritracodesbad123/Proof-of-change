@@ -160,10 +160,10 @@ def test_nested_relaxed_tests_are_collected_and_fail_on_the_base(tmp_path):
     assert not info["not_collected"]
     assert "tests/boom.py" in info["collection_failed"]
     assert "tests/checks.py" not in info["collection_failed"]
-    ids = dr.cross_run_test_ids(cmp, rec["files"])
-    assert ids
-    assert {dr._canon_test_id(tid, pr, ["tests/checks.py"]) for tid in ids} == set(new)
-    assert not any("old_case" in tid or "boom" in tid or "test_old" in tid for tid in ids)
+    # checks.py is not a default test name, so these rows stay fixed and do not settle a differs claim.
+    assert dr.cross_run_test_ids(cmp, rec["files"]) == []
+    fixed_new = [tid for tid in cmp["fixed"] if "old_case" not in tid and "boom" not in tid and "test_old" not in tid]
+    assert {dr._canon_test_id(tid, pr, ["tests/checks.py"]) for tid in fixed_new} == set(new)
     # The base junit, which a re-judge reads, recorded the failure. Nothing from the broken file passed.
     main_junit = dr.parse_junit(rundir / "junit-main-1.xml")
     assert any(row[0] == "failed" for row in main_junit.values())
@@ -185,7 +185,8 @@ def test_pytest_relaxed_finds_nested_classes_without_class_name_globs(tmp_path):
     assert any(node.endswith("[1]") for node in new)
     assert set(cmp["base_new_tests"]["failed_on_base"]) == set(new)
     assert cmp["base_new_tests"]["reproduced"] is True
-    assert dr.cross_run_test_ids(cmp, _rec["files"])
+    assert cmp["fixed"]
+    assert dr.cross_run_test_ids(cmp, _rec["files"]) == []
 
 
 def test_new_tests_that_pass_on_the_base_are_not_a_missing_collection(tmp_path):

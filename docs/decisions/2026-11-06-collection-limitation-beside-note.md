@@ -11,9 +11,9 @@ also stores a limitation sentence, `collection_limitation`, and appends it to th
 sentence names the files that failed to collect. The reviewer report prints that sentence in the paragraph after the note. The stored verdict comes from
 the existing comparison first. ``verdict_for`` does not read the collection-failure list, so a passing
 comparison is verified and a regression is needs attention. One extra cap, the same shape as the review
-cap that only lowers a verified result, then applies: if that verified result also has the already-on-base
-note and another changed file failed to collect, the verdict becomes could not verify and the reason names
-the file. Needs attention is never changed by that cap. The go/no-go is unchanged: it reads the stored
+cap that only lowers a verified result, then applies: any verified result with an unchecked changed test
+file becomes could not verify, and the reason names the file. The already-on-base note is not a condition
+for that cap. Needs attention is never changed by that cap. The go/no-go is unchanged: it reads the stored
 verdict, so a could-not-verify record is not an all-clear and a needs-attention record stays needs attention.
 
 ## Why
@@ -49,8 +49,9 @@ not a pass.
 
 Leaving a verified result in place would let the existing go/no-go call the folder all clear while a changed
 file never ran. Lowering every collection failure, including a needs-attention result, would hide that
-finding. The cap copies the existing review cap: it touches only verified, and only when the note says the
-identified new tests already passed on the base. The file that failed to collect is still named beside the note.
+finding. The cap copies the existing review cap in one way: it touches only a verified result. It does not
+require the already-on-base note. Any verified result with an unchecked changed test file is capped. The
+file that failed to collect is still named beside the note when the note is present.
 
 Ignoring the collection list, as the report used to, would leave the failure only in the machine-readable
 record. That is the gap this change closes.
@@ -61,6 +62,15 @@ A check can say the fix appears already present on `master` or on `2.2`, and in 
 changed test file pytest could not collect. If the tests that ran would have been verified, the verdict line
 is could not verify. If those tests need attention, the verdict line stays needs attention. The file name is
 in the report PDF. The folder summary follows that stored verdict.
+
+A differs claim is settled only by a fixed test in a default-named edited file (`test_*.py` or
+`*_test.py`) that is not a shared id. A nested file that is only in `collected_test_files`, and a shared id
+the base executed, stay in `fixed` for the ordinary test verdict and do not settle the claim. No claim text
+or path similarity is used as a binding. That binding does not exist yet.
+
+A Contree side is a local checkout. The note's commit check reads that tree's git HEAD. The remote commit
+the run was asked to test can be a different sha. When those two disagree the note is left off. Leaving the
+note off is not evidence that the tests ran at the remote sha.
 
 ## Offline proof
 

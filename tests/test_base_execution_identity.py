@@ -1,7 +1,7 @@
 """A shared test the base never runs is not a new pass. An empty base collection is not a new identity.
 
 Both virtualenvs install pytest themselves. Nothing is borrowed through a path file. A pull-request-only
-fixture is the only split. Probes are not changed: a cross-run id is a real base failure, not a claim name.
+fixture is the only split. A nested failure stays in ``fixed``. It does not settle an unmatched differs claim.
 """
 import shutil
 import subprocess
@@ -33,7 +33,7 @@ def _install_pytest(venv: Path) -> None:
 
 
 def _probe():
-    """A differs claim whose observation never matches it. Settlement needs a real cross-run id."""
+    """A differs claim whose cover matches no observation. A nested fixed id does not settle it."""
     body = {"id": "model-p1", "target": "o/r#1", "about": "x",
             "claims": [{"id": "C1", "text": "the score changes", "covers": ["gone.*"], "expect": "differs"}]}
     item = probes.entry(body, {"main": [{"out": 1}] * 3, "pr": [{"out": 1}] * 3}, None, [], "model", None)
@@ -123,7 +123,7 @@ def test_empty_base_collection_does_not_invent_new_tests(tmp_path, pythons):
     assert rec.get("already_on_base") is None
 
 
-def test_nested_fixed_id_is_a_real_base_failure_and_does_not_prove_without_one(tmp_path, pythons):
+def test_nested_fixed_id_stays_fixed_and_does_not_prove_an_unmatched_claim(tmp_path, pythons):
     base = "class Bucket_:\n    class nested:\n        def old_case(self):\n            assert True\n"
     pr = base + """
         def reports_names(self):
@@ -134,18 +134,21 @@ def test_nested_fixed_id_is_a_real_base_failure_and_does_not_prove_without_one(t
         tmp_path, pythons, base, pr,
         {"main": ["tests/test_old.py"], "pr": ["tests/test_old.py"]})
     assert cnv is None and cmp is not None
-    ids = dr.cross_run_test_ids(cmp, rec["files"])
-    assert ids and all("reports_names" in node for node in ids)
+    assert any("reports_names" in str(t) for t in cmp["fixed"])
+    assert dr.cross_run_test_ids(cmp, rec["files"]) == []
     junit = (rundir / "junit-main-1.xml").read_text()
     assert "reports_names" in junit and "failure" in junit
-    assert not any("needs_relaxed" in node for node in ids)
     _v, reason, fl = dr.verdict_for(cmp, None, None, rec["files"], _probe())
-    assert "cross_run_settled" in fl and ids[0] in reason and "as proven" in reason
+    assert _v == "could_not_verify"
+    assert "cross_run_settled" not in fl and "as proven" not in reason
+    assert "C1" in reason
 
     blocked = dict(cmp)
     blocked["fixed"] = []
     blocked["base_new_tests"] = dict(cmp["base_new_tests"], ids=[], failed_on_base=[],
                                      collection_failed=["tests/needs_relaxed.py"])
     assert dr.cross_run_test_ids(blocked, rec["files"]) == []
-    _bv, breason, bfl = dr.verdict_for(blocked, None, None, rec["files"], _probe())
+    bv, breason, bfl = dr.verdict_for(blocked, None, None, rec["files"], _probe())
+    assert bv == "could_not_verify"
     assert "cross_run_settled" not in bfl and "as proven" not in breason
+    assert "C1" in breason
