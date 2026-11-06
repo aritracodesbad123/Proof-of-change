@@ -11074,6 +11074,17 @@ def _main(argv=None) -> int:
     if stop:
         print(stop, file=sys.stderr)
         raise SystemExit(1)
+    if not a.pr and not a.bench and not a.report_only:
+        # Before the checkout is moved: a refused write of today's note must not be hidden by a
+        # later stop (a dirty tree, a failed fetch). Selection and verdicts are untouched.
+        from ops.chosen_write import read_failure
+        if not a.chosen_prs and not local_config.get("chosen_prs_dir") and not a.libraries_file:
+            a.libraries_file = default_libraries_file()
+        early_name = a.date or now_ist().strftime("%Y-%m-%d")
+        failed = read_failure(chosen_prs_path(a, Path(a.ops_dir) / "runs" / early_name))
+        if failed:
+            print(failed, file=sys.stderr)
+            return 2
     pinned = named_expect_commit(a)
     if a.bench or pinned:
         a.poc_commit = given_commit(REPO_ROOT, pinned, bench=bool(a.bench))
@@ -11195,7 +11206,10 @@ def _main(argv=None) -> int:
     chosen_path = chosen_prs_path(a, rdir)
     chosen_prs = parse_chosen(chosen_path)
     if not single:
-        stop = empty_chosen_stop(chosen_path, chosen_prs)
+        # A failed or unfinished write of this file leaves a marker. Stop here, before selection,
+        # with that reason. The reader's own empty-file stop is unchanged when the marker is absent.
+        from ops.chosen_write import run_stop
+        stop = run_stop(chosen_path, chosen_prs)
         if stop:
             print(stop, file=sys.stderr)
             if not a.no_report:
