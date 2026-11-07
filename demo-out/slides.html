@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Proof-of-Change — Demo</title>
+<style>
+  :root {
+    --bg0: #0c1210;
+    --bg1: #14201a;
+    --ink: #e8f0ea;
+    --muted: #9bb0a3;
+    --line: #2a3b32;
+    --accent: #d4a017;
+    --ok: #3d9a6a;
+    --warn: #c47a1a;
+    --soft: #1a2a22;
+    --panel: rgba(20, 32, 26, 0.92);
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; height: 100%; overflow: hidden;
+    background: var(--bg0); color: var(--ink);
+    font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+  }
+  body {
+    background:
+      radial-gradient(1200px 700px at 10% -10%, #1e3a2c 0%, transparent 55%),
+      radial-gradient(900px 600px at 100% 0%, #2a2410 0%, transparent 50%),
+      linear-gradient(160deg, #0c1210, #101816 45%, #0d1411);
+  }
+  .stage {
+    width: 1280px; height: 720px; margin: 0 auto; position: relative;
+    overflow: hidden;
+  }
+  .slide {
+    position: absolute; inset: 0; padding: 56px 64px 110px;
+    opacity: 0; pointer-events: none;
+    transform: translateY(12px);
+    transition: opacity 0.55s ease, transform 0.55s ease;
+    display: flex; flex-direction: column; justify-content: center;
+  }
+  .slide.active { opacity: 1; pointer-events: auto; transform: none; }
+  .brand {
+    font-family: "IBM Plex Serif", Georgia, serif;
+    font-weight: 600; letter-spacing: -0.02em;
+    font-size: 42px; margin: 0 0 18px;
+  }
+  .brand span { color: var(--accent); }
+  h1 {
+    font-family: "IBM Plex Serif", Georgia, serif;
+    font-size: 40px; line-height: 1.15; font-weight: 600;
+    margin: 0 0 18px; max-width: 980px; letter-spacing: -0.02em;
+  }
+  .lead { font-size: 22px; color: var(--muted); max-width: 900px; line-height: 1.45; margin: 0; }
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 22px 26px;
+    max-width: 980px;
+  }
+  .mono {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 18px; line-height: 1.5; white-space: pre-wrap;
+  }
+  .row { display: flex; gap: 18px; align-items: stretch; flex-wrap: wrap; }
+  .col { flex: 1 1 280px; }
+  .chip {
+    display: inline-block; padding: 6px 12px; border-radius: 6px;
+    border: 1px solid var(--line); font-size: 14px; margin: 0 8px 8px 0;
+    background: var(--soft);
+  }
+  .chip.ok { color: #b7efcf; border-color: #2f6b4c; }
+  .chip.warn { color: #ffd9a0; border-color: #8a5a16; background: #2a1f0c; }
+  .chip.mute { color: var(--muted); }
+  .label {
+    font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--muted); margin-bottom: 10px;
+  }
+  .banner {
+    background: #2a1f0c; border: 1px solid #8a5a16; color: #ffd9a0;
+    padding: 12px 16px; border-radius: 8px; font-size: 16px;
+    margin-bottom: 18px; max-width: 980px;
+  }
+  .check {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 16px; border: 1px solid var(--line); border-radius: 8px;
+    background: var(--soft); margin-top: 14px; max-width: 640px;
+  }
+  .dot {
+    width: 12px; height: 12px; border-radius: 50%;
+    background: var(--accent); box-shadow: 0 0 0 4px rgba(212,160,23,0.18);
+    animation: pulse 1.4s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.15); opacity: 0.7; }
+  }
+  table {
+    width: 100%; border-collapse: collapse; font-size: 16px;
+  }
+  th, td {
+    text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line);
+    vertical-align: top;
+  }
+  th { color: var(--muted); font-weight: 500; font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em; }
+  .caption {
+    position: absolute; left: 64px; right: 64px; bottom: 28px;
+    font-size: 17px; line-height: 1.4; color: var(--ink);
+    background: rgba(8, 12, 10, 0.72);
+    border-left: 3px solid var(--accent);
+    padding: 12px 16px; min-height: 58px;
+  }
+  .progress {
+    position: absolute; left: 0; right: 0; top: 0; height: 3px;
+    background: #1a2620;
+  }
+  .progress > i {
+    display: block; height: 100%; width: 0%;
+    background: linear-gradient(90deg, #8a6a12, var(--accent));
+  }
+  .tiny { font-size: 14px; color: var(--muted); margin-top: 10px; }
+  ul.gaps { margin: 0; padding-left: 20px; font-size: 20px; line-height: 1.55; color: var(--ink); }
+  ul.gaps li { margin-bottom: 8px; }
+  .close-url {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 28px; color: var(--accent); margin-top: 18px;
+  }
+  .fade-in { animation: fadeUp 0.7s ease both; }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: none; }
+  }
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@500;600&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div class="stage" id="stage">
+    <div class="progress"><i id="bar"></i></div>
+
+    <!-- 1. Problem 0-20 -->
+    <section class="slide active" data-start="0" data-end="20" data-cap="Coding agents now write pull requests and describe what they changed. But a description is just a claim. Proof-of-Change checks those claims by running the old code and the new code side by side.">
+      <div class="brand fade-in">Proof-of-<span>Change</span></div>
+      <h1>A pull request description is just a claim.</h1>
+      <div class="panel mono">## Summary
+Fixes adjacent tag matching.
+
+Existing behaviour preserved.</div>
+      <p class="lead" style="margin-top:18px">We check the claim by running old code and new code side by side.</p>
+    </section>
+
+    <!-- 2. Open PR 20-45 -->
+    <section class="slide" data-start="20" data-end="45" data-cap="When a PR opens, our app reads the code. The only things it writes are one comment and one check result.">
+      <div class="label">When a PR opens</div>
+      <h1>Proof-of-Change starts a check.</h1>
+      <div class="panel">
+        <div class="label">Pull request</div>
+        <div style="font-size:22px;margin-bottom:8px">Fix adjacent tag matching in ReprHighlighter</div>
+        <div class="tiny">App reads the code. Writes only: one comment + one check result.</div>
+        <div class="check"><span class="dot"></span><div><strong>Proof-of-Change</strong> — check started</div></div>
+      </div>
+    </section>
+
+    <!-- 3. Claims 45-75 -->
+    <section class="slide" data-start="45" data-end="75" data-cap="NVIDIA Nemotron, served through Nebius Token Factory, turns the description into testable claims: what should change and what should stay the same, including nearby inputs just past the edited code.">
+      <div class="label">Nemotron · Nebius Token Factory</div>
+      <h1>Description → testable claims</h1>
+      <div class="row">
+        <div class="panel col">
+          <div class="label">Should change</div>
+          <div>Adjacent tags match as described in the PR.</div>
+          <div class="chip" style="margin-top:14px">expect: change</div>
+        </div>
+        <div class="panel col">
+          <div class="label">Should stay the same</div>
+          <div>Existing behaviour for non-adjacent tags is preserved — including nearby inputs just past the edited code.</div>
+          <div class="chip mute" style="margin-top:14px">expect: same</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. Old vs new 75-110 -->
+    <section class="slide" data-start="75" data-end="110" data-cap="Each claim becomes a small probe. We run it on the code before and after the change and record the real results. If a probe measures nothing, we say we could not verify. We never call an empty check verified.">
+      <div class="label">Probes on old vs new</div>
+      <h1>Real return values — not guesses.</h1>
+      <div class="panel">
+        <table>
+          <thead><tr><th>Input</th><th>Old</th><th>New</th><th>Claim</th></tr></thead>
+          <tbody>
+            <tr><td>plain tag</td><td>same spans</td><td>same spans</td><td><span class="chip ok">verified</span></td></tr>
+            <tr><td>space after tag</td><td>tag + path spans</td><td>path spans only</td><td><span class="chip warn">needs attention</span></td></tr>
+            <tr><td>empty measurement</td><td>—</td><td>—</td><td><span class="chip mute">could not verify</span></td></tr>
+          </tbody>
+        </table>
+        <div class="tiny">Empty probes are never called verified.</div>
+      </div>
+    </section>
+
+    <!-- 5. live140 110-150 -->
+    <section class="slide" data-start="110" data-end="140" data-cap="Here's a recorded example from a saved run. The PR said behaviour was preserved; the probe showed trailing spaces changed. Verdict: needs attention, with the exact input and both outputs attached. Every run saves a PDF report (built-in maker; Chrome not required). Reports are not emailed.">
+      <div class="banner">Recorded example from a saved run (live140) — not a live run on today's code.</div>
+      <div class="row">
+        <div class="panel col">
+          <div class="label">Stay-same claim (C2)</div>
+          <div>ReprHighlighter preserves existing behavior for non-adjacent tags.</div>
+          <div class="tiny" style="margin-top:12px">Observation <strong>C2.space_after</strong></div>
+          <div class="chip warn">false claim</div>
+          <div class="chip warn">needs attention</div>
+        </div>
+        <div class="panel col">
+          <div class="label">Evidence</div>
+          <div class="mono" style="font-size:14px">input: tag with trailing space
+
+old: tag spans + path spans
+new: path spans only
+
+→ output changed while claim said same</div>
+          <div class="tiny">PDF report saved with the run · not emailed · Chrome not required</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. Related + gaps 150-165 -->
+    <section class="slide" data-start="140" data-end="165" data-cap="Tools like ORION and repro-engine already check stay-same and should-change behaviour. ORION is the closest to us, and we don't claim to be first. Our angle is comparing how agent-written and human-written PRs hold up against their own descriptions. What isn't proven yet: no live catch of a known real bug on the current code, and no validated false-alarm rate. Some results are 'could not verify' when probes come back empty.">
+      <div class="row">
+        <div class="panel col">
+          <div class="label">Related work</div>
+          <div style="font-size:18px;line-height:1.45">Closest related work: ORION (arXiv 2610.35223). Also: repro-engine, Testora, PatchGuru, Breakcheck, hearsay. We do not claim to be first.</div>
+          <div class="tiny" style="margin-top:14px">Our angle: do agent-written and human-written PRs hold up against their own descriptions?</div>
+        </div>
+        <div class="panel col">
+          <div class="label">Known gaps</div>
+          <ul class="gaps" style="font-size:16px">
+            <li>No confirmed live catch of a known real bug on current code yet.</li>
+            <li>No validated false-alarm rate yet.</li>
+            <li>Empty probes return 'could not verify' — intended, but lowers coverage.</li>
+            <li>VeeReview failed its own preregistered calibration against human labels.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. Close 165-180 -->
+    <section class="slide" data-start="165" data-end="180" data-cap="Proof-of-Change: don't trust the description — check the behaviour.">
+      <div class="brand">Proof-of-<span>Change</span></div>
+      <h1>Don't trust the description — check the behaviour.</h1>
+      <div class="close-url">github.com/aritracodesbad123/Proof-of-change</div>
+    </section>
+
+    <div class="caption" id="cap"></div>
+  </div>
+<script>
+  const TOTAL = 180;
+  const slides = [...document.querySelectorAll('.slide')];
+  const cap = document.getElementById('cap');
+  const bar = document.getElementById('bar');
+  const started = performance.now();
+
+  function tick(now) {
+    if (window.__DEMO_LOCK) return;
+    const t = Math.min(TOTAL, (now - started) / 1000);
+    bar.style.width = (t / TOTAL * 100) + '%';
+    let active = slides[0];
+    for (const s of slides) {
+      const a = +s.dataset.start, b = +s.dataset.end;
+      if (t >= a && t < b) { active = s; break; }
+      if (t >= b) active = s;
+    }
+    slides.forEach(s => s.classList.toggle('active', s === active));
+    cap.textContent = active.dataset.cap || '';
+    if (t < TOTAL) requestAnimationFrame(tick);
+  }
+  cap.textContent = slides[0].dataset.cap;
+  requestAnimationFrame(tick);
+</script>
+</body>
+</html>
