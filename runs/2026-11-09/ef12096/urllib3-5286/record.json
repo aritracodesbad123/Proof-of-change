@@ -1,0 +1,2258 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-urllib3-urllib3-5286-acadf356c381-2026-11-08",
+ "date_ist": "2026-11-08 12:53 IST",
+ "run_date": "2026-11-08",
+ "who": "ops/daily_run.py",
+ "repo": "urllib3/urllib3",
+ "library": "urllib3",
+ "pr": {
+  "repo": "urllib3/urllib3",
+  "number": 5286,
+  "url": "https://github.com/urllib3/urllib3/pull/5286",
+  "title": "Raise ReadTimeoutError for timeouts while sending the request body",
+  "base_sha": "c5347bbd39203d68d7b0e3ffb83ced3e3b4b9109",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "acadf356c381ff8e3614a059ec62e1ed25bfb7b9",
+  "merge_commit": "217df0e45037d73c4ca671e43feec4b8141415ce",
+  "tested_main_sha": "c5347bbd39203d68d7b0e3ffb83ced3e3b4b9109",
+  "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+ },
+ "author": "00200200",
+ "base_ref": "main",
+ "updated_at_utc": "2026-11-07T09:57:18Z",
+ "updated_at_ist": "2026-11-07 15:27 IST",
+ "ci_state": "passing",
+ "ci_detail": "37 check runs completed without failure",
+ "tested_at_ist": "2026-11-08 12:53 IST",
+ "files": {
+  "all": [
+   "changelog/1981.bugfix.rst",
+   "src/urllib3/connectionpool.py",
+   "test/test_connectionpool.py",
+   "test/with_dummyserver/test_socketlevel.py"
+  ],
+  "package_py": [
+   "src/urllib3/connectionpool.py"
+  ],
+  "compiled": [],
+  "other": [
+   "changelog/1981.bugfix.rst",
+   "test/test_connectionpool.py",
+   "test/with_dummyserver/test_socketlevel.py"
+  ]
+ },
+ "machine_type": {
+  "arch": "x86_64",
+  "os": "Linux",
+  "platform": "Linux-6.12.94+-x86_64-with-glibc2.41",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": "g++ (Debian 14.2.0-19) 14.2.0",
+  "cpu_model": "Intel(R) Xeon(R) Processor",
+  "ram_gb": 15.6
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 3,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.15",
+ "test_selection": "mapped from touched files: test/test_connectionpool.py, test/with_dummyserver/test_socketlevel.py, test/with_dummyserver/test_connectionpool.py",
+ "per_run": [
+  {
+   "side": "old",
+   "run": 1,
+   "passed": 163,
+   "failed": 0,
+   "error": 248,
+   "skipped": 6,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 177.4,
+   "pytest_summary": "130 failed, 163 passed, 6 skipped, 145 warnings, 248 errors in 175.85s (0:02:55)",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 1,
+   "passed": 164,
+   "failed": 0,
+   "error": 249,
+   "skipped": 6,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 178.5,
+   "pytest_summary": "131 failed, 164 passed, 6 skipped, 146 warnings, 249 errors in 176.69s (0:02:56)",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 2,
+   "passed": 163,
+   "failed": 0,
+   "error": 248,
+   "skipped": 6,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 177.6,
+   "pytest_summary": "130 failed, 163 passed, 6 skipped, 145 warnings, 248 errors in 176.06s (0:02:56)",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 2,
+   "passed": 164,
+   "failed": 0,
+   "error": 249,
+   "skipped": 6,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 5422.7,
+   "pytest_summary": "131 failed, 164 passed, 6 skipped, 146 warnings, 249 errors in 182.37s (0:03:02)",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 3,
+   "passed": 163,
+   "failed": 0,
+   "error": 248,
+   "skipped": 6,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 178.3,
+   "pytest_summary": "130 failed, 163 passed, 6 skipped, 145 warnings, 248 errors in 176.40s (0:02:56)",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 3,
+   "passed": 164,
+   "failed": 0,
+   "error": 249,
+   "skipped": 6,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 195.2,
+   "pytest_summary": "131 failed, 164 passed, 6 skipped, 146 warnings, 249 errors in 193.53s (0:03:13)",
+   "junit": true
+  }
+ ],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "local",
+ "sandbox_backend_note": "local bubblewrap",
+ "machine": "local",
+ "tool_setup": {
+  "installed": [],
+  "tries": 0,
+  "note": "All required tools were already installed.",
+  "refused": []
+ },
+ "posted_upstream": false,
+ "logs": "urllib3-5286/",
+ "freeze": {
+  "main": "freeze-main.txt",
+  "pr": "freeze-pr.txt"
+ },
+ "coverage": {
+  "status": "measured",
+  "changed_lines_total": 2,
+  "changed_lines_covered": 2,
+  "files": [
+   {
+    "file": "src/urllib3/connectionpool.py",
+    "changed_lines_total": 2,
+    "changed_lines_covered": 2
+   }
+  ],
+  "seconds": 12189.1,
+  "exit": 1,
+  "log": "coverage-pytest.log"
+ },
+ "poc_commit": "ef12096677e9cf59e8673436d74ec65d53771d7c",
+ "route": "source-pair",
+ "current_head_sha": "acadf356c381ff8e3614a059ec62e1ed25bfb7b9",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "model_provider_fallback": "the AI answered but no probe was usable, so only fixed probes ran",
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": "[redacted]",
+  "notes": [
+   "Setup check: GitHub token: present.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory 11.0 GB (of 15.6 GB).",
+   "Setup check: free disk 92.9 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: [redacted] results",
+   "Query: urllib3 python setup install instructions https://github.com/urllib3/urllib3 site:github.com/urllib3/urllib3",
+   "Query: urllib3 python documentation install https://github.com/urllib3/urllib3 site:github.com/urllib3/urllib3",
+   "Query: urllib3 python install requirements https://pypi.org/project/urllib3/ https://github.com/urllib3/urllib3 site:pypi.org",
+   "Source: urllib3 \u00b7 PyPI \u2014 https://pypi.org/project/urllib3/",
+   "Source: urllib3 installation requires setuptools >= 36.2.5 \u00b7 Issue #1753 \u00b7 urllib3/urllib3 \u00b7 GitHub \u2014 https://github.com/urllib3/urllib3/issues/1753",
+   "Source: urllib3/docs/user-guide.rst at main \u00b7 urllib3/urllib3 \u00b7 GitHub \u2014 https://github.com/urllib3/urllib3/blob/main/docs/user-guide.rst",
+   "Source: ImportError during install of urllib3[secure] on Jython \u00b7 Issue #1133 \u00b7 urllib3/urllib3 \u00b7 GitHub \u2014 https://github.com/urllib3/urllib3/issues/1133",
+   "Source: GitHub - urllib3/urllib3: urllib3 is a user-friendly HTTP client library for Python \u00b7 GitHub \u2014 https://github.com/urllib3/urllib3",
+   "Source: Installing urllib3 \u00b7 Issue #829 \u00b7 urllib3/urllib3 \u00b7 GitHub \u2014 https://github.com/urllib3/urllib3/issues/829",
+   "Source: No module named 'urllib3.packages.six' \u00b7 Issue #1518 \u00b7 urllib3/urllib3 \u00b7 GitHub \u2014 https://github.com/urllib3/urllib3/issues/1518",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: install trustme>=1.2.1 (listed in the test extra) on main and pr.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >=3.10",
+   "Installed trustme 1.2.1 from pyproject (listed in the test extra) on main and pr."
+  ],
+  "install_docs": [
+   "README.md",
+   "setup.cfg",
+   "noxfile.py",
+   "pyproject.toml",
+   "docs/Makefile",
+   "docs/contributing.rst",
+   ".github/workflows/lint.yml",
+   ".github/workflows/publish.yml",
+   ".github/workflows/downstream.yml",
+   ".github/workflows/codeql.yml",
+   ".github/workflows/changelog.yml",
+   ".github/workflows/scorecards.yml",
+   ".github/workflows/ci.yml",
+   "changelog/README.rst"
+  ],
+  "install_docs_from": "main",
+  "setup_plan": {
+   "packages": [
+    {
+     "requirement": "trustme>=1.2.1",
+     "name": "trustme",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the test extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    }
+   ],
+   "scope_blocked": "",
+   "component": null,
+   "aggregate_names": [],
+   "extra_reqs": [
+    "trustme>=1.2.1"
+   ],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >=3.10"
+   },
+   "system": [],
+   "refused": [],
+   "groups_blocked": ""
+  },
+  "steps": {
+   "setup_lookup": "Found 1 setup item(s) in the project's files and the web lookup.",
+   "setup_python": "Python 3.12: Python 3.12 already meets >=3.10",
+   "install_deps": "Wrote requirements.txt and installed it on main and pr: trustme>=1.2.1."
+  },
+  "run_files": {
+   "requirements": "requirements.txt",
+   "plan": "setup-plan.json",
+   "count": 1
+  },
+  "installs": [
+   {
+    "package": "trustme",
+    "requirement": "trustme>=1.2.1",
+    "version": "1.2.1",
+    "versions": {
+     "main": "1.2.1",
+     "pr": "1.2.1"
+    },
+    "source": "pyproject",
+    "reason": "listed in the test extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   }
+  ]
+ },
+ "sides": {
+  "comparison_basis": "base tip vs GitHub test merge (refs/pull/N/merge)",
+  "main_sha": "c5347bbd39203d68d7b0e3ffb83ced3e3b4b9109",
+  "pr_sha": "217df0e45037d73c4ca671e43feec4b8141415ce",
+  "merge_commit": "217df0e45037d73c4ca671e43feec4b8141415ce",
+  "merge_parents": [
+   "c5347bbd39203d68d7b0e3ffb83ced3e3b4b9109",
+   "acadf356c381ff8e3614a059ec62e1ed25bfb7b9"
+  ],
+  "merge_head_matches_pinned_head": true
+ },
+ "tested": {
+  "main": "main @ c5347bbd3920 (base tip = first parent of the merge commit)",
+  "pr": "GitHub test merge commit 217df0e45037 (refs/pull/5286/merge) of head acadf356c381"
+ },
+ "probe_plan": {
+  "baseline": "full",
+  "model": "model provider: nebius (Token Factory, live)",
+  "errors": [
+   "probe 'probe1' rejected: cannot bind urllib3.connectionpool.HTTPConnectionPool: HTTPConnectionPool() accepts **kwargs, so its keywords cannot be checked; the probe is not run"
+  ],
+  "model_claims": [
+   {
+    "id": "C1",
+    "text": "The library raises ReadTimeoutError (or urllib3.exceptions.TimeoutError) when a socket timeout occurs while sending the request body, instead of wrapping it as ProtocolError.",
+    "source_quote": "Raise ReadTimeoutError for timeouts while sending the request body",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C2",
+    "text": "After the change, _make_request maps SocketTimeout through _raise_timeout() and urlopen no longer treats leftover socket.timeout instances as aborted connections, causing send timeouts to be reported as timeout errors.",
+    "source_quote": "This converts send timeouts the same way as read timeouts: `_make_request` maps `SocketTimeout` through `_raise_timeout()`, and `urlopen` no longer treats leftover `socket.timeout` instances as aborted connections.",
+    "testable": true,
+    "expect": "differs"
+   }
+  ],
+  "model_rejected_claims": [],
+  "diff_targets": [],
+  "frozen": []
+ },
+ "test_extras": [
+  "pytest-socket>=0.7.0",
+  "pytest-timeout>=2.3.1",
+  "pytest-memray>=1.11.0 ; python_full_version < '3.16' and implementation_name == 'cpython' and sys_platform != 'win32'",
+  "pytest-xdist>=3.8.0",
+  "pytest-pyodide>=0.58.4"
+ ],
+ "pr_side_started_at": "2026-11-08T07:24:41.810939+00:00",
+ "test_targets": {
+  "main": [
+   "test/test_connectionpool.py",
+   "test/with_dummyserver/test_socketlevel.py",
+   "test/with_dummyserver/test_connectionpool.py"
+  ],
+  "pr": [
+   "test/test_connectionpool.py",
+   "test/with_dummyserver/test_socketlevel.py",
+   "test/with_dummyserver/test_connectionpool.py"
+  ]
+ },
+ "installed_commit": {
+  "main": {
+   "dist": "urllib3",
+   "expected": "c5347bbd39203d68d7b0e3ffb83ced3e3b4b9109",
+   "installed": "c5347bbd39203d68d7b0e3ffb83ced3e3b4b9109",
+   "ok": true
+  },
+  "pr": {
+   "dist": "urllib3",
+   "expected": "217df0e45037d73c4ca671e43feec4b8141415ce",
+   "installed": "217df0e45037d73c4ca671e43feec4b8141415ce",
+   "ok": true
+  }
+ },
+ "declared_test_deps": {
+  "requested": [
+   "pytest-socket>=0.7.0",
+   "pytest-timeout>=2.3.1",
+   "pytest-memray>=1.11.0 ; python_full_version < '3.16' and implementation_name == 'cpython' and sys_platform != 'win32'",
+   "pytest-xdist>=3.8.0",
+   "pytest-pyodide>=0.58.4"
+  ],
+  "installed": true
+ },
+ "pytest_plugins_off": [
+  "asyncio"
+ ],
+ "plugin_retry": {
+  "detection_fired": true,
+  "kind": "startup",
+  "plugins": [
+   "asyncio"
+  ],
+  "plugin_list_read": true,
+  "plugin_list_why": "",
+  "flags": "-p no:asyncio",
+  "outcome": "worked",
+  "main_error": "",
+  "pr_error": ""
+ },
+ "collection_plugin_note": "Setup: pytest plugin asyncio was turned off. Pytest stopped at startup the same way on both sides, and the traceback pointed into that third-party plugin (AttributeError: module 'pytest' has no attribute 'pyodide_options_stack'). The tests were run again with the plugin turned off. This does not change how the verdict is chosen. Detection fired. Pytest stopped at startup the same way on both sides. Plugin chosen: asyncio. The installed pytest plugin list was read. Retry flags: -p no:asyncio. Outcome: worked.",
+ "base_head_sha": "c5347bbd39203d68d7b0e3ffb83ced3e3b4b9109",
+ "comparison": {
+  "same": 417,
+  "same_skipped_both": 6,
+  "regressions": [],
+  "fixed": [],
+  "new_tests_passing": 1,
+  "new_tests_passing_ids": [
+   "test.test_connectionpool.TestConnectionPool::test_write_timeout_during_request_is_read_timeout"
+  ],
+  "new_tests_failing": [
+   "test.with_dummyserver.test_socketlevel.TestSocketClosing::test_request_body_send_timeout_is_read_timeout"
+  ],
+  "new_tests_skipped": [],
+  "removed_tests": [],
+  "reparametrized": [],
+  "skipped_missing_dependency": [],
+  "flaky": [],
+  "pr_unstable": [],
+  "pr_unstable_noisy": [],
+  "environment": [],
+  "other_changes": [],
+  "preexisting_failures": [
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_303_redirect_makes_request_lose_body",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_303_redirect_makes_request_lose_body_framing[header]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_303_redirect_makes_request_lose_body_framing[kwarg]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_bad_connect",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_bad_decode",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_bytes_header",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_check_deflate",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_check_gzip",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_chunked_gzip",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_cleanup_on_connection_error",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_connection_count",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_connection_count_bigpool",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_connection_error_retries",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_debug_log",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_default_user_agent_header",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_defaults_are_applied",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_disable_default_socket_options[None]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_disable_default_socket_options[socket_options1]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_dns_error",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_for_double_release",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_get",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_headers_not_modified_by_request[HTTPHeaderDict-False-False]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_headers_not_modified_by_request[HTTPHeaderDict-False-True]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_headers_not_modified_by_request[HTTPHeaderDict-True-False]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_headers_not_modified_by_request[HTTPHeaderDict-True-True]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_headers_not_modified_by_request[dict-False-False]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_headers_not_modified_by_request[dict-False-True]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_headers_not_modified_by_request[dict-True-False]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_headers_not_modified_by_request[dict-True-True]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_http2_test_error[h11]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_http2_test_error[h2]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_invalid_method_not_allowed[ ]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_invalid_method_not_allowed[\\n]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_invalid_method_not_allowed[\\r]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_invalid_method_not_allowed[\\x00]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_keepalive",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_keepalive_close",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_lazy_load_twice",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_mixed_case_hostname",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_nagle",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_no_decoding_with_redirect_when_preload_disabled",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_no_user_agent_header",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_one_name_multiple_values",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_partial_response",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_percent_encode_invalid_target_chars",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_post_url",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_post_with_multipart",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_post_with_multipart__iter__",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_post_with_urlencode",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_preserves_path_dot_segments",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_read_chunked_on_closed_response",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_read_chunked_short_circuit",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_redirect",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_redirect_relative_url_no_deprecation",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_release_conn_parameter",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_request_chunked_is_deprecated",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_request_method_body",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_shutdown_on_connection_released_to_pool",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_skip_header_non_supported[False-Content-Length]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_skip_header_non_supported[False-content-length]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_skip_header_non_supported[True-Content-Length]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_skip_header_non_supported[True-content-length]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_socket_options[socket_options0]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_socket_options[socket_options1]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_socket_timeout_updated_on_reuse_constructor[1-expect_settimeout_calls0]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_socket_timeout_updated_on_reuse_constructor[None-expect_settimeout_calls1]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_socket_timeout_updated_on_reuse_constructor[timeout2-expect_settimeout_calls2]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_socket_timeout_updated_on_reuse_constructor[timeout3-expect_settimeout_calls3]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_socket_timeout_updated_on_reuse_constructor[timeout4-expect_settimeout_calls4]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_socket_timeout_updated_on_reuse_parameter[1-expect_settimeout_calls0]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_socket_timeout_updated_on_reuse_parameter[None-expect_settimeout_calls1]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_socket_timeout_updated_on_reuse_parameter[timeout2-expect_settimeout_calls2]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_socket_timeout_updated_on_reuse_parameter[timeout3-expect_settimeout_calls3]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_socket_timeout_updated_on_reuse_parameter[timeout4-expect_settimeout_calls4]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_source_address",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_source_address_error[invalid_source_address0-False]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_source_address_error[invalid_source_address1-True]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_stream_keepalive",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_timeout_success",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_tunnel",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_unicode_upload",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_upload",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_urlopen_put",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_user_agent_header_not_sent_twice[False-None]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_user_agent_header_not_sent_twice[False-headers1]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_user_agent_header_not_sent_twice[False-headers2]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_user_agent_header_not_sent_twice[False-headers3]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_user_agent_header_not_sent_twice[False-headers4]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_user_agent_header_not_sent_twice[False-headers5]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_user_agent_header_not_sent_twice[True-None]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_user_agent_header_not_sent_twice[True-headers1]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_user_agent_header_not_sent_twice[True-headers2]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_user_agent_header_not_sent_twice[True-headers3]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_user_agent_header_not_sent_twice[True-headers4]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_user_agent_header_not_sent_twice[True-headers5]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_user_agent_non_ascii_user_agent[Sch\\xf6nefeld/1.18.0_0]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_user_agent_non_ascii_user_agent[Sch\\xf6nefeld/1.18.0_1]",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_wrong_specific_method",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPoolTimeouts::test_conn_closed",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPoolTimeouts::test_create_connection_timeout",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPoolTimeouts::test_timeout",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPoolTimeouts::test_timeout_float",
+   "test.with_dummyserver.test_connectionpool.TestConnectionPoolTimeouts::test_total_timeout",
+   "test.with_dummyserver.test_connectionpool.TestFileBodiesOnRetryOrRedirect::test_303_redirect_with_failed_tell",
+   "test.with_dummyserver.test_connectionpool.TestFileBodiesOnRetryOrRedirect::test_redirect_put_file",
+   "test.with_dummyserver.test_connectionpool.TestFileBodiesOnRetryOrRedirect::test_redirect_with_failed_tell",
+   "test.with_dummyserver.test_connectionpool.TestFileBodiesOnRetryOrRedirect::test_retries_put_filehandle",
+   "test.with_dummyserver.test_connectionpool.TestRedirectPoolSize::test_pool_size_redirect",
+   "test.with_dummyserver.test_connectionpool.TestRetry::test_default_method_forcelist_retried",
+   "test.with_dummyserver.test_connectionpool.TestRetry::test_disabled_retry",
+   "test.with_dummyserver.test_connectionpool.TestRetry::test_max_retry",
+   "test.with_dummyserver.test_connectionpool.TestRetry::test_multi_redirect_history",
+   "test.with_dummyserver.test_connectionpool.TestRetry::test_read_retries",
+   "test.with_dummyserver.test_connectionpool.TestRetry::test_read_retries_unsuccessful",
+   "test.with_dummyserver.test_connectionpool.TestRetry::test_read_total_retries",
+   "test.with_dummyserver.test_connectionpool.TestRetry::test_retries_wrong_forcelist",
+   "test.with_dummyserver.test_connectionpool.TestRetry::test_retries_wrong_method_list",
+   "test.with_dummyserver.test_connectionpool.TestRetry::test_retry_redirect_history",
+   "test.with_dummyserver.test_connectionpool.TestRetry::test_retry_return_in_response",
+   "test.with_dummyserver.test_connectionpool.TestRetry::test_retry_reuse_safe",
+   "test.with_dummyserver.test_connectionpool.TestRetryAfter::test_redirect_after",
+   "test.with_dummyserver.test_connectionpool.TestRetryAfter::test_retry_after",
+   "test.with_dummyserver.test_connectionpool.TestRetryPoolSize::test_pool_size_retry",
+   "test.with_dummyserver.test_socketlevel.TestALPN::test_alpn_protocol_in_first_request_packet",
+   "test.with_dummyserver.test_socketlevel.TestBadContentLength::test_enforce_content_length_get",
+   "test.with_dummyserver.test_socketlevel.TestBadContentLength::test_enforce_content_length_no_body",
+   "test.with_dummyserver.test_socketlevel.TestBrokenHeaders::test_header_without_colon_or_value",
+   "test.with_dummyserver.test_socketlevel.TestBrokenHeaders::test_header_without_name",
+   "test.with_dummyserver.test_socketlevel.TestBrokenHeaders::test_header_without_name_or_value",
+   "test.with_dummyserver.test_socketlevel.TestBrokenPipe::test_ignore_broken_pipe_errors",
+   "test.with_dummyserver.test_socketlevel.TestClientCerts::test_client_cert_with_bytes_password",
+   "test.with_dummyserver.test_socketlevel.TestClientCerts::test_client_cert_with_string_password",
+   "test.with_dummyserver.test_socketlevel.TestClientCerts::test_client_certs_one_file",
+   "test.with_dummyserver.test_socketlevel.TestClientCerts::test_client_certs_two_files",
+   "test.with_dummyserver.test_socketlevel.TestClientCerts::test_missing_client_certs_raises_error",
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_chunked_not_specified[bytearray-PATCH]",
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_chunked_not_specified[bytearray-POST]",
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_chunked_not_specified[bytearray-PUT]",
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_chunked_not_specified[bytes-PATCH]",
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_chunked_not_specified[bytes-POST]",
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_chunked_not_specified[bytes-PUT]",
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_chunked_not_specified[file-PATCH]",
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_chunked_not_specified[file-POST]",
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_chunked_not_specified[file-PUT]",
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_chunked_not_specified[file_text-PATCH]",
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_chunked_not_specified[file_text-POST]",
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_chunked_not_specified[file_text-PUT]",
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_chunked_not_specified[generator-PATCH]",
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_chunked_not_specified[generator-POST]",
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_chunked_not_specified[generator-PUT]",
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_chunked_specified[bytes-PATCH-False]",
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_chunked_specified[bytes-PATCH-True]",
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_chunked_specified[bytes-POST-False]",
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_chunked_specified[bytes-POST-True]",
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_chunked_specified[bytes-PUT-False]",
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_chunked_specified[bytes-PUT-True]",
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_chunked_specified[file-PATCH-False]",
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_chunked_specified[file-PATCH-True]",
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_chunked_specified[file-POST-False]",
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_chunked_specified[file-POST-True]",
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_chunked_specified[file-PUT-False]",
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_chunked_specified[file-PUT-True]",
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_chunked_specified[generator-PATCH-False]",
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_chunked_specified[generator-PATCH-True]",
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_chunked_specified[generator-POST-False]",
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_chunked_specified[generator-POST-True]",
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_chunked_specified[generator-PUT-False]",
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_chunked_specified[generator-PUT-True]",
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_content_length_0_by_default[PATCH-0]",
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_content_length_0_by_default[PATCH-None]",
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_content_length_0_by_default[POST-0]",
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_content_length_0_by_default[POST-None]",
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_content_length_0_by_default[PUT-0]",
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_content_length_0_by_default[PUT-None]",
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_framing_set_via_headers[content-length-10-: 10\\r\\n\\r\\nxxxxxxxx-lower]",
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_framing_set_via_headers[content-length-10-: 10\\r\\n\\r\\nxxxxxxxx-title]",
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_framing_set_via_headers[content-length-10-: 10\\r\\n\\r\\nxxxxxxxx-upper]",
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_framing_set_via_headers[transfer-encoding-chunked-: chunked\\r\\n\\r\\n8\\r\\nxxxxxxxx\\r\\n0\\r\\n\\r\\n-lower]",
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_framing_set_via_headers[transfer-encoding-chunked-: chunked\\r\\n\\r\\n8\\r\\nxxxxxxxx\\r\\n0\\r\\n\\r\\n-title]",
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_framing_set_via_headers[transfer-encoding-chunked-: chunked\\r\\n\\r\\n8\\r\\nxxxxxxxx\\r\\n0\\r\\n\\r\\n-upper]",
+   "test.with_dummyserver.test_socketlevel.TestCookies::test_bare_lf_in_header_value_is_replaced",
+   "test.with_dummyserver.test_socketlevel.TestCookies::test_multi_setcookie",
+   "test.with_dummyserver.test_socketlevel.TestCookies::test_obsolete_line_folding_is_unfolded",
+   "test.with_dummyserver.test_socketlevel.TestErrorWrapping::test_bad_statusline",
+   "test.with_dummyserver.test_socketlevel.TestErrorWrapping::test_unknown_protocol",
+   "test.with_dummyserver.test_socketlevel.TestHEAD::test_chunked_head_response_does_not_hang",
+   "test.with_dummyserver.test_socketlevel.TestHEAD::test_empty_head_response_does_not_hang",
+   "test.with_dummyserver.test_socketlevel.TestHeaderParsingContentType::test_header_message_rfc822",
+   "test.with_dummyserver.test_socketlevel.TestHeaderParsingContentType::test_header_text_plain",
+   "test.with_dummyserver.test_socketlevel.TestHeaders::test_headers_are_sent_with_the_original_case",
+   "test.with_dummyserver.test_socketlevel.TestHeaders::test_headers_sent_with_add[GET-None]",
+   "test.with_dummyserver.test_socketlevel.TestHeaders::test_headers_sent_with_add[POST-None]",
+   "test.with_dummyserver.test_socketlevel.TestHeaders::test_headers_sent_with_add[POST-bytes-io]",
+   "test.with_dummyserver.test_socketlevel.TestHeaders::test_headers_sent_with_add[POST-bytes]",
+   "test.with_dummyserver.test_socketlevel.TestHeaders::test_httplib_headers_case_insensitive",
+   "test.with_dummyserver.test_socketlevel.TestHeaders::test_request_headers_are_sent_in_the_original_order",
+   "test.with_dummyserver.test_socketlevel.TestHeaders::test_response_headers_are_returned_in_the_original_order",
+   "test.with_dummyserver.test_socketlevel.TestHeaders::test_ua_header_can_be_overridden",
+   "test.with_dummyserver.test_socketlevel.TestMultipartResponse::test_multipart_assert_header_parsing_no_defects",
+   "test.with_dummyserver.test_socketlevel.TestProxyManager::test_connect_ipv6_addr_from_host",
+   "test.with_dummyserver.test_socketlevel.TestProxyManager::test_connect_ipv6_addr_from_url",
+   "test.with_dummyserver.test_socketlevel.TestProxyManager::test_connect_reconn",
+   "test.with_dummyserver.test_socketlevel.TestProxyManager::test_debuglevel",
+   "test.with_dummyserver.test_socketlevel.TestProxyManager::test_early_eof_doesnt_cause_infinite_loop",
+   "test.with_dummyserver.test_socketlevel.TestProxyManager::test_header_longer_than_maxline",
+   "test.with_dummyserver.test_socketlevel.TestProxyManager::test_headers",
+   "test.with_dummyserver.test_socketlevel.TestProxyManager::test_https_proxymanager_connected_to_http_proxy[http]",
+   "test.with_dummyserver.test_socketlevel.TestProxyManager::test_https_proxymanager_connected_to_http_proxy[https]",
+   "test.with_dummyserver.test_socketlevel.TestProxyManager::test_proxy_status_not_ok",
+   "test.with_dummyserver.test_socketlevel.TestProxyManager::test_redirect_rewrites_host_and_strips_credentials[cross-host]",
+   "test.with_dummyserver.test_socketlevel.TestProxyManager::test_redirect_rewrites_host_and_strips_credentials[proxy-origin]",
+   "test.with_dummyserver.test_socketlevel.TestProxyManager::test_redirect_rewrites_host_and_strips_credentials[same-host]",
+   "test.with_dummyserver.test_socketlevel.TestProxyManager::test_retries",
+   "test.with_dummyserver.test_socketlevel.TestProxyManager::test_simple[empty-fragment]",
+   "test.with_dummyserver.test_socketlevel.TestProxyManager::test_simple[fragment-after-path]",
+   "test.with_dummyserver.test_socketlevel.TestProxyManager::test_simple[fragment-after-query]",
+   "test.with_dummyserver.test_socketlevel.TestProxyManager::test_simple[root-path-with-fragment]",
+   "test.with_dummyserver.test_socketlevel.TestProxyManager::test_simple[simple]",
+   "test.with_dummyserver.test_socketlevel.TestProxyManager::test_tunnel_sets_http_11_alpn",
+   "test.with_dummyserver.test_socketlevel.TestRetryPoolSizeDrainFail::test_pool_size_retry_drain_fail",
+   "test.with_dummyserver.test_socketlevel.TestSNI::test_hostname_in_first_request_packet",
+   "test.with_dummyserver.test_socketlevel.TestSSL::test_retry_ssl_error",
+   "test.with_dummyserver.test_socketlevel.TestSSL::test_ssl_custom_validation_failure_terminates",
+   "test.with_dummyserver.test_socketlevel.TestSSL::test_ssl_dont_load_default_certs_when_given",
+   "test.with_dummyserver.test_socketlevel.TestSSL::test_ssl_failed_fingerprint_verification",
+   "test.with_dummyserver.test_socketlevel.TestSSL::test_ssl_failure_midway_through_conn",
+   "test.with_dummyserver.test_socketlevel.TestSSL::test_ssl_load_default_certs_when_empty",
+   "test.with_dummyserver.test_socketlevel.TestSSL::test_ssl_read_timeout",
+   "test.with_dummyserver.test_socketlevel.TestSocketClosing::test_closing_response_actually_closes_connection",
+   "test.with_dummyserver.test_socketlevel.TestSocketClosing::test_connection_cleanup_on_protocol_error_during_read",
+   "test.with_dummyserver.test_socketlevel.TestSocketClosing::test_connection_cleanup_on_read_timeout",
+   "test.with_dummyserver.test_socketlevel.TestSocketClosing::test_connection_closed_on_read_timeout_preload_false",
+   "test.with_dummyserver.test_socketlevel.TestSocketClosing::test_connection_read_timeout",
+   "test.with_dummyserver.test_socketlevel.TestSocketClosing::test_delayed_body_read_timeout",
+   "test.with_dummyserver.test_socketlevel.TestSocketClosing::test_delayed_body_read_timeout_with_preload",
+   "test.with_dummyserver.test_socketlevel.TestSocketClosing::test_https_connection_read_timeout",
+   "test.with_dummyserver.test_socketlevel.TestSocketClosing::test_incomplete_response",
+   "test.with_dummyserver.test_socketlevel.TestSocketClosing::test_read_timeout_dont_retry_method_not_in_allowlist",
+   "test.with_dummyserver.test_socketlevel.TestSocketClosing::test_recovery_when_server_closes_connection",
+   "test.with_dummyserver.test_socketlevel.TestSocketClosing::test_release_conn_param_is_respected_after_timeout_retry",
+   "test.with_dummyserver.test_socketlevel.TestSocketClosing::test_retry_weird_http_version",
+   "test.with_dummyserver.test_socketlevel.TestSocketClosing::test_socket_close_socket_then_file",
+   "test.with_dummyserver.test_socketlevel.TestSocketClosing::test_socket_close_stays_open_with_makefile_open",
+   "test.with_dummyserver.test_socketlevel.TestSocketClosing::test_socket_shutdown_stops_recv",
+   "test.with_dummyserver.test_socketlevel.TestSocketClosing::test_timeout_errors_cause_retries",
+   "test.with_dummyserver.test_socketlevel.TestStream::test_chunked_size_line_too_long_does_not_buffer",
+   "test.with_dummyserver.test_socketlevel.TestStream::test_large_compressed_stream",
+   "test.with_dummyserver.test_socketlevel.TestStream::test_stream_none_unchunked_response_does_not_hang"
+  ],
+  "load_failed_both": [],
+  "load_failed_pr": [],
+  "load_failed_main": [],
+  "failure_signatures": {
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_303_redirect_makes_request_lose_body": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_303_redirect_makes_request_lose_body_framing[header]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_303_redirect_makes_request_lose_body_framing[kwarg]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_bad_connect": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_bad_decode": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_bytes_header": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_check_deflate": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_check_gzip": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_chunked_gzip": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_cleanup_on_connection_error": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_connection_count": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_connection_count_bigpool": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_connection_error_retries": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_debug_log": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_default_user_agent_header": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_defaults_are_applied": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_disable_default_socket_options[None]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_disable_default_socket_options[socket_options1]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_dns_error": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_for_double_release": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_get": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_headers_not_modified_by_request[HTTPHeaderDict-False-False]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_headers_not_modified_by_request[HTTPHeaderDict-False-True]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_headers_not_modified_by_request[HTTPHeaderDict-True-False]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_headers_not_modified_by_request[HTTPHeaderDict-True-True]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_headers_not_modified_by_request[dict-False-False]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_headers_not_modified_by_request[dict-False-True]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_headers_not_modified_by_request[dict-True-False]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_headers_not_modified_by_request[dict-True-True]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_http2_test_error[h11]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_http2_test_error[h2]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_invalid_method_not_allowed[ ]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_invalid_method_not_allowed[\\n]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_invalid_method_not_allowed[\\r]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_invalid_method_not_allowed[\\x00]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_keepalive": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_keepalive_close": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_lazy_load_twice": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_mixed_case_hostname": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_nagle": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_no_decoding_with_redirect_when_preload_disabled": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_no_user_agent_header": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_one_name_multiple_values": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_partial_response": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_percent_encode_invalid_target_chars": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_post_url": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_post_with_multipart": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_post_with_multipart__iter__": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_post_with_urlencode": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_preserves_path_dot_segments": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_read_chunked_on_closed_response": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_read_chunked_short_circuit": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_redirect": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_redirect_relative_url_no_deprecation": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_release_conn_parameter": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_request_chunked_is_deprecated": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_request_method_body": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_shutdown_on_connection_released_to_pool": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_skip_header_non_supported[False-Content-Length]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_skip_header_non_supported[False-content-length]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_skip_header_non_supported[True-Content-Length]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_skip_header_non_supported[True-content-length]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_socket_options[socket_options0]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_socket_options[socket_options1]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_socket_timeout_updated_on_reuse_constructor[1-expect_settimeout_calls0]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_socket_timeout_updated_on_reuse_constructor[None-expect_settimeout_calls1]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_socket_timeout_updated_on_reuse_constructor[timeout2-expect_settimeout_calls2]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_socket_timeout_updated_on_reuse_constructor[timeout3-expect_settimeout_calls3]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_socket_timeout_updated_on_reuse_constructor[timeout4-expect_settimeout_calls4]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_socket_timeout_updated_on_reuse_parameter[1-expect_settimeout_calls0]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_socket_timeout_updated_on_reuse_parameter[None-expect_settimeout_calls1]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_socket_timeout_updated_on_reuse_parameter[timeout2-expect_settimeout_calls2]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_socket_timeout_updated_on_reuse_parameter[timeout3-expect_settimeout_calls3]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_socket_timeout_updated_on_reuse_parameter[timeout4-expect_settimeout_calls4]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_source_address": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_source_address_error[invalid_source_address0-False]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_source_address_error[invalid_source_address1-True]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_stream_keepalive": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_timeout_success": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_tunnel": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_unicode_upload": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_upload": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_urlopen_put": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_user_agent_header_not_sent_twice[False-None]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_user_agent_header_not_sent_twice[False-headers1]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_user_agent_header_not_sent_twice[False-headers2]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_user_agent_header_not_sent_twice[False-headers3]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_user_agent_header_not_sent_twice[False-headers4]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_user_agent_header_not_sent_twice[False-headers5]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_user_agent_header_not_sent_twice[True-None]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_user_agent_header_not_sent_twice[True-headers1]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_user_agent_header_not_sent_twice[True-headers2]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_user_agent_header_not_sent_twice[True-headers3]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_user_agent_header_not_sent_twice[True-headers4]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_user_agent_header_not_sent_twice[True-headers5]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_user_agent_non_ascii_user_agent[Sch\\xf6nefeld/1.18.0_0]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_user_agent_non_ascii_user_agent[Sch\\xf6nefeld/1.18.0_1]": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPool::test_wrong_specific_method": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPoolTimeouts::test_conn_closed": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPoolTimeouts::test_create_connection_timeout": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPoolTimeouts::test_timeout": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPoolTimeouts::test_timeout_float": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_connectionpool.TestConnectionPoolTimeouts::test_total_timeout": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_connectionpool.TestFileBodiesOnRetryOrRedirect::test_303_redirect_with_failed_tell": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestFileBodiesOnRetryOrRedirect::test_redirect_put_file": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestFileBodiesOnRetryOrRedirect::test_redirect_with_failed_tell": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestFileBodiesOnRetryOrRedirect::test_retries_put_filehandle": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestRedirectPoolSize::test_pool_size_redirect": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestRetry::test_default_method_forcelist_retried": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestRetry::test_disabled_retry": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestRetry::test_max_retry": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestRetry::test_multi_redirect_history": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestRetry::test_read_retries": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestRetry::test_read_retries_unsuccessful": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestRetry::test_read_total_retries": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestRetry::test_retries_wrong_forcelist": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestRetry::test_retries_wrong_method_list": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestRetry::test_retry_redirect_history": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestRetry::test_retry_return_in_response": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestRetry::test_retry_reuse_safe": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestRetryAfter::test_redirect_after": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestRetryAfter::test_retry_after": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_connectionpool.TestRetryPoolSize::test_pool_size_retry": {
+    "same": true,
+    "outcome": "error",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "test.with_dummyserver.test_socketlevel.TestALPN::test_alpn_protocol_in_first_request_packet": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestBadContentLength::test_enforce_content_length_get": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestBadContentLength::test_enforce_content_length_no_body": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestBrokenHeaders::test_header_without_colon_or_value": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestBrokenHeaders::test_header_without_name": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestBrokenHeaders::test_header_without_name_or_value": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestBrokenPipe::test_ignore_broken_pipe_errors": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestClientCerts::test_client_cert_with_bytes_password": "[redacted]",
+   "test.with_dummyserver.test_socketlevel.TestClientCerts::test_client_cert_with_string_password": "[redacted]",
+   "test.with_dummyserver.test_socketlevel.TestClientCerts::test_client_certs_one_file": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestClientCerts::test_client_certs_two_files": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestClientCerts::test_missing_client_certs_raises_error": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_chunked_not_specified[bytearray-PATCH]": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_chunked_not_specified[bytearray-POST]": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_chunked_not_specified[bytearray-PUT]": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_chunked_not_specified[bytes-PATCH]": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_chunked_not_specified[bytes-POST]": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_chunked_not_specified[bytes-PUT]": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_chunked_not_specified[file-PATCH]": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_chunked_not_specified[file-POST]": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_chunked_not_specified[file-PUT]": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_chunked_not_specified[file_text-PATCH]": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_chunked_not_specified[file_text-POST]": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_chunked_not_specified[file_text-PUT]": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_chunked_not_specified[generator-PATCH]": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_chunked_not_specified[generator-POST]": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_chunked_not_specified[generator-PUT]": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_chunked_specified[bytes-PATCH-False]": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_chunked_specified[bytes-PATCH-True]": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_chunked_specified[bytes-POST-False]": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_chunked_specified[bytes-POST-True]": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_chunked_specified[bytes-PUT-False]": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_chunked_specified[bytes-PUT-True]": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_chunked_specified[file-PATCH-False]": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_chunked_specified[file-PATCH-True]": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_chunked_specified[file-POST-False]": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_chunked_specified[file-POST-True]": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_chunked_specified[file-PUT-False]": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_chunked_specified[file-PUT-True]": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_chunked_specified[generator-PATCH-False]": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_chunked_specified[generator-PATCH-True]": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_chunked_specified[generator-POST-False]": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_chunked_specified[generator-POST-True]": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_chunked_specified[generator-PUT-False]": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_chunked_specified[generator-PUT-True]": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_content_length_0_by_default[PATCH-0]": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_content_length_0_by_default[PATCH-None]": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_content_length_0_by_default[POST-0]": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_content_length_0_by_default[POST-None]": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_content_length_0_by_default[PUT-0]": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_content_length_0_by_default[PUT-None]": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_framing_set_via_headers[content-length-10-: 10\\r\\n\\r\\nxxxxxxxx-lower]": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_framing_set_via_headers[content-length-10-: 10\\r\\n\\r\\nxxxxxxxx-title]": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_framing_set_via_headers[content-length-10-: 10\\r\\n\\r\\nxxxxxxxx-upper]": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_framing_set_via_headers[transfer-encoding-chunked-: chunked\\r\\n\\r\\n8\\r\\nxxxxxxxx\\r\\n0\\r\\n\\r\\n-lower]": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_framing_set_via_headers[transfer-encoding-chunked-: chunked\\r\\n\\r\\n8\\r\\nxxxxxxxx\\r\\n0\\r\\n\\r\\n-title]": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestContentFraming::test_framing_set_via_headers[transfer-encoding-chunked-: chunked\\r\\n\\r\\n8\\r\\nxxxxxxxx\\r\\n0\\r\\n\\r\\n-upper]": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestCookies::test_bare_lf_in_header_value_is_replaced": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestCookies::test_multi_setcookie": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestCookies::test_obsolete_line_folding_is_unfolded": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestErrorWrapping::test_bad_statusline": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestErrorWrapping::test_unknown_protocol": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestHEAD::test_chunked_head_response_does_not_hang": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestHEAD::test_empty_head_response_does_not_hang": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestHeaderParsingContentType::test_header_message_rfc822": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestHeaderParsingContentType::test_header_text_plain": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestHeaders::test_headers_are_sent_with_the_original_case": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestHeaders::test_headers_sent_with_add[GET-None]": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestHeaders::test_headers_sent_with_add[POST-None]": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestHeaders::test_headers_sent_with_add[POST-bytes-io]": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestHeaders::test_headers_sent_with_add[POST-bytes]": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestHeaders::test_httplib_headers_case_insensitive": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestHeaders::test_request_headers_are_sent_in_the_original_order": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestHeaders::test_response_headers_are_returned_in_the_original_order": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestHeaders::test_ua_header_can_be_overridden": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestMultipartResponse::test_multipart_assert_header_parsing_no_defects": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestProxyManager::test_connect_ipv6_addr_from_host": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestProxyManager::test_connect_ipv6_addr_from_url": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestProxyManager::test_connect_reconn": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestProxyManager::test_debuglevel": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestProxyManager::test_early_eof_doesnt_cause_infinite_loop": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestProxyManager::test_header_longer_than_maxline": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestProxyManager::test_headers": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestProxyManager::test_https_proxymanager_connected_to_http_proxy[http]": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestProxyManager::test_https_proxymanager_connected_to_http_proxy[https]": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestProxyManager::test_proxy_status_not_ok": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestProxyManager::test_redirect_rewrites_host_and_strips_credentials[cross-host]": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestProxyManager::test_redirect_rewrites_host_and_strips_credentials[proxy-origin]": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestProxyManager::test_redirect_rewrites_host_and_strips_credentials[same-host]": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestProxyManager::test_retries": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestProxyManager::test_simple[empty-fragment]": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestProxyManager::test_simple[fragment-after-path]": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestProxyManager::test_simple[fragment-after-query]": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestProxyManager::test_simple[root-path-with-fragment]": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestProxyManager::test_simple[simple]": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestProxyManager::test_tunnel_sets_http_11_alpn": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestRetryPoolSizeDrainFail::test_pool_size_retry_drain_fail": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestSNI::test_hostname_in_first_request_packet": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestSSL::test_retry_ssl_error": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestSSL::test_ssl_custom_validation_failure_terminates": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestSSL::test_ssl_dont_load_default_certs_when_given": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestSSL::test_ssl_failed_fingerprint_verification": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestSSL::test_ssl_failure_midway_through_conn": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestSSL::test_ssl_load_default_certs_when_empty": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestSSL::test_ssl_read_timeout": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestSocketClosing::test_closing_response_actually_closes_connection": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestSocketClosing::test_connection_cleanup_on_protocol_error_during_read": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestSocketClosing::test_connection_cleanup_on_read_timeout": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestSocketClosing::test_connection_closed_on_read_timeout_preload_false": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestSocketClosing::test_connection_read_timeout": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestSocketClosing::test_delayed_body_read_timeout": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestSocketClosing::test_delayed_body_read_timeout_with_preload": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestSocketClosing::test_https_connection_read_timeout": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestSocketClosing::test_incomplete_response": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestSocketClosing::test_read_timeout_dont_retry_method_not_in_allowlist": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestSocketClosing::test_recovery_when_server_closes_connection": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestSocketClosing::test_release_conn_param_is_respected_after_timeout_retry": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestSocketClosing::test_retry_weird_http_version": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestSocketClosing::test_socket_close_socket_then_file": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestSocketClosing::test_socket_close_stays_open_with_makefile_open": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestSocketClosing::test_socket_shutdown_stops_recv": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestSocketClosing::test_timeout_errors_cause_retries": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestStream::test_chunked_size_line_too_long_does_not_buffer": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestStream::test_large_compressed_stream": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   },
+   "test.with_dummyserver.test_socketlevel.TestStream::test_stream_none_unchunked_response_does_not_hang": {
+    "same": false,
+    "outcome": "error",
+    "exception": []
+   }
+  },
+  "executed": {
+   "main": 411,
+   "pr": 413
+  },
+  "messages": {
+   "test.with_dummyserver.test_socketlevel.TestSocketClosing::test_request_body_send_timeout_is_read_timeout": "failed on teardown with \"pytest.PytestUnhandledThreadExceptionWarning: Exception in thread Thread-3"
+  }
+ },
+ "exit_check": {
+  "explained": true,
+  "problems": [],
+  "detail": "pytest exit 1; 248 failure(s)/error(s) pre-existing and identical on both sides"
+ },
+ "probes": {
+  "status": "none",
+  "items": []
+ },
+ "probe_changed_line_coverage": {
+  "status": "no probes",
+  "probes": {}
+ },
+ "verdict": "needs_attention",
+ "reason": "1 new test(s) fail on the PR; 411 test(s) ran on main, 413 on the PR; 1 new test(s) pass, 169 unchanged (6 of them skipped on both sides); 248 test failure(s) pre-existing and identical on both sides",
+ "verdict_before_coverage_gate": "needs_attention",
+ "reason_before_coverage_gate": "1 new test(s) fail on the PR; 411 test(s) ran on main, 413 on the PR; 1 new test(s) pass, 169 unchanged (6 of them skipped on both sides); 248 test failure(s) pre-existing and identical on both sides",
+ "changed_lines_total": 2,
+ "changed_lines_covered": 2,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "normal",
+  "note": "2 of 2 changed executable line(s) ran (100%)",
+  "measurement": "measured"
+ },
+ "agents": {
+  "status": "skipped",
+  "note": "advisory swarm is off",
+  "roles": []
+ },
+ "explanation": {
+  "status": "not yet wired",
+  "why": "advisory swarm is off"
+ },
+ "swarm_requested": false,
+ "operator_approval_requested": false,
+ "swarm": "off",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [
+   "src/urllib3/connectionpool.py"
+  ],
+  "compiled_files": [],
+  "other_files": [
+   "changelog/1981.bugfix.rst",
+   "test/test_connectionpool.py",
+   "test/with_dummyserver/test_socketlevel.py"
+  ]
+ },
+ "duration_s": {
+  "total_wall": 19181.4,
+  "tests": 6329.7
+ },
+ "cost": {
+  "ai_calls": 2,
+  "failed_ai_calls": 0,
+  "input_tokens": 11356,
+  "output_tokens": 11497,
+  "thinking_tokens": 10888,
+  "cost_usd": 0.013754,
+  "calls_without_usage": 0,
+  "ai_cost_usd": 0.013754,
+  "cost_complete": true,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 19181.4,
+   "tests": 6329.7
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 1.27876,
+  "total_cost_usd": 1.292514,
+  "swarm": {
+   "ai_calls": 0,
+   "failed_ai_calls": 0,
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "thinking_tokens": 0,
+   "cost_usd": 0.0,
+   "calls_without_usage": 0,
+   "ai_cost_usd": 0.0,
+   "cost_complete": true,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ },
+ "pdf_push": {
+  "ok": true,
+  "attempts": 1,
+  "error": null,
+  "url": "https://github.com/aritracodesbad123/Proof-of-change/tree/runs/runs/2026-11-09/ef12096/urllib3-5286"
+ }
+}
