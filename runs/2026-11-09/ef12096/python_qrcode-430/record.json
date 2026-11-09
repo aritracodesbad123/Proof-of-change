@@ -1,0 +1,1253 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-lincolnloop-python-qrcode-430-2416274db1ac-2026-11-08",
+ "date_ist": "2026-11-08 11:32 IST",
+ "run_date": "2026-11-08",
+ "who": "ops/daily_run.py",
+ "repo": "lincolnloop/python-qrcode",
+ "library": "python-qrcode",
+ "pr": {
+  "repo": "lincolnloop/python-qrcode",
+  "number": 430,
+  "url": "https://github.com/lincolnloop/python-qrcode/pull/430",
+  "title": "Honor --ascii when writing to a file (#428)",
+  "base_sha": "f92c007498d796e4825638b7d50c14ea51e5457a",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "2416274db1ac7e56e453a514fe48fe18234046e6",
+  "merge_commit": "f07902500739a1eb8705f8309493a9139496e287",
+  "tested_main_sha": "f92c007498d796e4825638b7d50c14ea51e5457a",
+  "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+ },
+ "author": "apoorvdarshan",
+ "base_ref": "main",
+ "updated_at_utc": "2026-07-04T20:26:35Z",
+ "updated_at_ist": "2026-07-05 01:56 IST",
+ "ci_state": "not checked (chosen PR)",
+ "ci_detail": "chosen by name; selection filters not applied",
+ "tested_at_ist": "2026-11-08 11:32 IST",
+ "files": {
+  "all": [
+   "CHANGES.rst",
+   "qrcode/console_scripts.py",
+   "qrcode/tests/test_script.py"
+  ],
+  "package_py": [
+   "qrcode/console_scripts.py",
+   "qrcode/tests/test_script.py"
+  ],
+  "compiled": [],
+  "other": [
+   "CHANGES.rst"
+  ]
+ },
+ "machine_type": {
+  "arch": "x86_64",
+  "os": "Linux",
+  "platform": "Linux-6.12.94+-x86_64-with-glibc2.41",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": "g++ (Debian 14.2.0-19) 14.2.0",
+  "cpu_model": "Intel(R) Xeon(R) Processor",
+  "ram_gb": 15.6
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 3,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.15",
+ "test_selection": "mapped from touched files: qrcode/tests/test_script.py, qrcode/tests/test_main.py",
+ "per_run": [
+  {
+   "side": "old",
+   "run": 1,
+   "passed": 9,
+   "failed": 0,
+   "error": 0,
+   "skipped": 5,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.0,
+   "pytest_summary": "9 passed, 5 skipped in 0.54s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 1,
+   "passed": 10,
+   "failed": 0,
+   "error": 0,
+   "skipped": 5,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.0,
+   "pytest_summary": "10 passed, 5 skipped in 0.53s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 2,
+   "passed": 9,
+   "failed": 0,
+   "error": 0,
+   "skipped": 5,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 0.9,
+   "pytest_summary": "9 passed, 5 skipped in 0.53s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 2,
+   "passed": 10,
+   "failed": 0,
+   "error": 0,
+   "skipped": 5,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 0.9,
+   "pytest_summary": "10 passed, 5 skipped in 0.53s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 3,
+   "passed": 9,
+   "failed": 0,
+   "error": 0,
+   "skipped": 5,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 0.9,
+   "pytest_summary": "9 passed, 5 skipped in 0.52s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 3,
+   "passed": 10,
+   "failed": 0,
+   "error": 0,
+   "skipped": 5,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 0.9,
+   "pytest_summary": "10 passed, 5 skipped in 0.52s",
+   "junit": true
+  }
+ ],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "local",
+ "sandbox_backend_note": "local bubblewrap",
+ "machine": "local",
+ "tool_setup": {
+  "installed": [],
+  "tries": 0,
+  "note": "All required tools were already installed.",
+  "refused": []
+ },
+ "posted_upstream": false,
+ "logs": "python_qrcode-430/",
+ "freeze": {
+  "main": "freeze-main.txt",
+  "pr": "freeze-pr.txt"
+ },
+ "coverage": {
+  "status": "measured",
+  "changed_lines_total": 6,
+  "changed_lines_covered": 3,
+  "files": [
+   {
+    "file": "qrcode/console_scripts.py",
+    "changed_lines_total": 6,
+    "changed_lines_covered": 3
+   }
+  ],
+  "seconds": 1.5,
+  "exit": 0,
+  "log": "coverage-pytest.log"
+ },
+ "poc_commit": "ef12096677e9cf59e8673436d74ec65d53771d7c",
+ "route": "source-pair",
+ "current_head_sha": "2416274db1ac7e56e453a514fe48fe18234046e6",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "state": "open",
+ "mergeable": true,
+ "mergeable_state": "clean",
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": "[redacted]",
+  "notes": [
+   "Setup check: GitHub token: present.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory 5.6 GB (of 15.6 GB).",
+   "Setup check: free disk 93.2 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: [redacted] results",
+   "Query: python-qrcode python setup install instructions https://github.com/lincolnloop/python-qrcode site:github.com/lincolnloop/python-qrcode",
+   "Query: python-qrcode python documentation install https://github.com/lincolnloop/python-qrcode site:github.com/lincolnloop/python-qrcode",
+   "Query: python-qrcode python install requirements https://pypi.org/project/python-qrcode/ https://github.com/lincolnloop/python-qrcode site:pypi.org",
+   "Source: ImportError: No module named qrcode \u00b7 Issue #103 \u2014 https://github.com/lincolnloop/python-qrcode/issues/103",
+   "Source: Need to pip install colorama on Windows #131 \u2014 https://github.com/lincolnloop/python-qrcode/issues/131",
+   "Source: import Image error \u00b7 Issue #129 \u00b7 lincolnloop/python-qrcode \u2014 https://github.com/lincolnloop/python-qrcode/issues/129",
+   "Source: GitHub - lincolnloop/python-qrcode: Python QR Code image generator \u00b7 GitHub \u2014 https://github.com/lincolnloop/python-qrcode",
+   "Source: python-qrcode/CHANGES.rst at main - GitHub \u2014 https://github.com/lincolnloop/python-qrcode/blob/main/CHANGES.rst",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: colorama is noted, installed with the project.",
+   "Setup plan: deprecation is noted, installed with the project.",
+   "Setup plan: install qrcode (PyPI page links to this GitHub repository) on main and pr.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >=3.10",
+   "Installed qrcode 8.2 from tavily (PyPI page links to this GitHub repository) on main and pr."
+  ],
+  "install_docs": [
+   "README.rst",
+   "pyproject.toml",
+   ".github/workflows/push.yml",
+   ".github/workflows/linting.yml"
+  ],
+  "install_docs_from": "main",
+  "setup_plan": {
+   "packages": [
+    {
+     "requirement": "colorama; sys_platform == 'win32'",
+     "name": "colorama",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "deprecation",
+     "name": "deprecation",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "qrcode",
+     "name": "qrcode",
+     "kind": "tavily",
+     "action": "install",
+     "source": "tavily",
+     "reason": "PyPI page links to this GitHub repository",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    }
+   ],
+   "scope_blocked": "",
+   "component": null,
+   "aggregate_names": [],
+   "extra_reqs": [
+    "qrcode"
+   ],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >=3.10"
+   },
+   "system": [],
+   "refused": [],
+   "groups_blocked": ""
+  },
+  "steps": {
+   "setup_lookup": "Found 3 setup item(s) in the project's files and the web lookup.",
+   "setup_python": "Python 3.12: Python 3.12 already meets >=3.10",
+   "install_deps": "Wrote requirements.txt and installed it on main and pr: qrcode. 2 more come with the project install."
+  },
+  "run_files": {
+   "requirements": "requirements.txt",
+   "plan": "setup-plan.json",
+   "count": 1
+  },
+  "installs": [
+   {
+    "package": "qrcode",
+    "requirement": "qrcode",
+    "version": "8.2",
+    "versions": {
+     "main": "8.2",
+     "pr": "8.2"
+    },
+    "source": "tavily",
+    "reason": "PyPI page links to this GitHub repository",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   }
+  ]
+ },
+ "chosen": {
+  "pr": 430,
+  "head_sha": "2416274db1ac7e56e453a514fe48fe18234046e6",
+  "base_sha": "f92c007498d796e4825638b7d50c14ea51e5457a",
+  "install": null,
+  "test_cmd": null
+ },
+ "sides": {
+  "comparison_basis": "base tip vs GitHub test merge (refs/pull/N/merge)",
+  "main_sha": "f92c007498d796e4825638b7d50c14ea51e5457a",
+  "pr_sha": "f07902500739a1eb8705f8309493a9139496e287",
+  "merge_commit": "f07902500739a1eb8705f8309493a9139496e287",
+  "merge_parents": [
+   "f92c007498d796e4825638b7d50c14ea51e5457a",
+   "2416274db1ac7e56e453a514fe48fe18234046e6"
+  ],
+  "merge_head_matches_pinned_head": true
+ },
+ "tested": {
+  "main": "main @ f92c007498d7 (base tip = first parent of the merge commit)",
+  "pr": "GitHub test merge commit f07902500739 (refs/pull/430/merge) of head 2416274db1ac"
+ },
+ "probe_plan": {
+  "baseline": "full",
+  "model": "model provider: nebius (Token Factory, live)",
+  "errors": [],
+  "model_claims": [
+   {
+    "id": "C1",
+    "text": "When --ascii and --output are used together without a custom image factory, the program writes ASCII art to the output file instead of a PNG image.",
+    "source_quote": "In the `--output` branch, when `--ascii` is set (and no custom image factory is selected), write the ascii art to the file via `print_ascii(out=...)`",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C2",
+    "text": "Using --ascii with --output no longer requires the Pillow library because it skips calling make_image().",
+    "source_quote": "A nice side effect: `--ascii --output` no longer requires Pillow, since it skips `make_image()`.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C3",
+    "text": "The test qr \"text\" --ascii --output=file.txt expects the output file to contain ASCII art (including the \u2588 character) and not the PNG magic bytes.",
+    "source_quote": "- Added `test_ascii_output`: `qr \"text\" --ascii --output=file.txt` writes ascii art (contains `\u2588`, not the PNG magic bytes). It fails on `main` (the file is a PNG) and passes with this change.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C4",
+    "text": "Running qr \"text\" --output=file.png without --ascii continues to produce a PNG file, showing no regression.",
+    "source_quote": "- Verified no regression: `qr \"text\" --output=file.png` (without `--ascii`) still writes a PNG.",
+    "testable": true,
+    "expect": "same"
+   }
+  ],
+  "model_rejected_claims": [],
+  "model_retried": {
+   "why": [
+    "no probe listed the claim ids it checks, so its results could not be tied to any claim; in each probe, \"claims\" must name the claim ids it checks and the observation names that cover them"
+   ]
+  },
+  "diff_targets": [
+   "qrcode.console_scripts.main"
+  ],
+  "frozen": [
+   {
+    "path": "model-probes/model-probe1.py",
+    "source": "model",
+    "sha256": "a4612c476c7067f2042b287505af6c3ea40aa5416d3e2f616b271745a69bafb2",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-08T06:05:28.418344+00:00",
+    "inputs_sha256": "ba13654aea969b63cfbb92fea6ad5fa562d05196a40dae3a021f63fe6300bdfa",
+    "inputs": {
+     "title_chars": 43,
+     "body_chars": 1950,
+     "base_files": {
+      "qrcode/console_scripts.py": "958b105efaf99f94e506fc1698e95fdb6cfe6ec1d36073e3251d87507da4c0c4"
+     }
+    }
+   },
+   {
+    "path": "model-probes/model-probe2.py",
+    "source": "model",
+    "sha256": "edb116eacffb8381bf24f8c182a7f1269bf2a1699bfdfa9f9579dc1d0041c330",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-08T06:05:28.418492+00:00",
+    "inputs_sha256": "ba13654aea969b63cfbb92fea6ad5fa562d05196a40dae3a021f63fe6300bdfa",
+    "inputs": {
+     "title_chars": 43,
+     "body_chars": 1950,
+     "base_files": {
+      "qrcode/console_scripts.py": "958b105efaf99f94e506fc1698e95fdb6cfe6ec1d36073e3251d87507da4c0c4"
+     }
+    }
+   },
+   {
+    "path": "diff-probes/diff-api.py",
+    "source": "diff",
+    "sha256": "ccc949c5db343d18f4f742c4372683bc5c724f035d8300f1f1bbdb36567abe9a",
+    "generator": {
+     "kind": "diff",
+     "label": "diff (auto-derived from base-side code, model-free)",
+     "model": null,
+     "provider": null,
+     "provenance": "auto-derived",
+     "blind": false
+    },
+    "frozen_at": "2026-11-08T06:05:28.419691+00:00",
+    "inputs_sha256": "24e3c98f9635fa209b2e9c029fe6669229c6fd6291e2b7f5af10e7bb77268347",
+    "inputs": {
+     "title_chars": 0,
+     "body_chars": 0,
+     "base_files": {
+      "qrcode/console_scripts.py": "958b105efaf99f94e506fc1698e95fdb6cfe6ec1d36073e3251d87507da4c0c4"
+     }
+    }
+   }
+  ]
+ },
+ "test_extras": [],
+ "pr_side_started_at": "2026-11-08T06:05:28.533539+00:00",
+ "test_targets": {
+  "main": [
+   "qrcode/tests/test_script.py",
+   "qrcode/tests/test_main.py"
+  ],
+  "pr": [
+   "qrcode/tests/test_script.py",
+   "qrcode/tests/test_main.py"
+  ]
+ },
+ "installed_commit": {
+  "main": {
+   "dist": "qrcode",
+   "expected": "f92c007498d796e4825638b7d50c14ea51e5457a",
+   "installed": "f92c007498d796e4825638b7d50c14ea51e5457a",
+   "ok": true
+  },
+  "pr": {
+   "dist": "qrcode",
+   "expected": "f07902500739a1eb8705f8309493a9139496e287",
+   "installed": "f07902500739a1eb8705f8309493a9139496e287",
+   "ok": true
+  }
+ },
+ "base_head_sha": "f92c007498d796e4825638b7d50c14ea51e5457a",
+ "comparison": {
+  "same": 14,
+  "same_skipped_both": 5,
+  "regressions": [],
+  "fixed": [],
+  "new_tests_passing": 1,
+  "new_tests_passing_ids": [
+   "qrcode.tests.test_script::test_ascii_output"
+  ],
+  "new_tests_failing": [],
+  "new_tests_skipped": [],
+  "removed_tests": [],
+  "reparametrized": [],
+  "skipped_missing_dependency": [],
+  "flaky": [],
+  "pr_unstable": [],
+  "pr_unstable_noisy": [],
+  "environment": [],
+  "other_changes": [],
+  "preexisting_failures": [],
+  "load_failed_both": [],
+  "load_failed_pr": [],
+  "load_failed_main": [],
+  "executed": {
+   "main": 9,
+   "pr": 10
+  },
+  "messages": {}
+ },
+ "exit_check": {
+  "explained": true,
+  "problems": [],
+  "detail": "all runs exited 0"
+ },
+ "probes": {
+  "status": "ran",
+  "items": [
+   {
+    "id": "model-probe1",
+    "source": "model",
+    "path": "model-probes/model-probe1.py",
+    "sha256": "a4612c476c7067f2042b287505af6c3ea40aa5416d3e2f616b271745a69bafb2",
+    "target": "lincolnloop/python-qrcode#430",
+    "about": "Test --ascii --output behavior",
+    "claims": [
+     {
+      "id": "C1",
+      "source": "PR description",
+      "text": "When --ascii and --output are used together without a custom image factory, the program writes ASCII art to the output file instead of a PNG image.",
+      "covers": [
+       "probe1.ascii_output_is_png",
+       "probe1.ascii_output_contains_block"
+      ],
+      "expect": "differs"
+     },
+     {
+      "id": "C2",
+      "source": "PR description",
+      "text": "Using --ascii with --output no longer requires the Pillow library because it skips calling make_image().",
+      "covers": [
+       "probe1.ascii_output_is_png"
+      ],
+      "expect": "differs"
+     },
+     {
+      "id": "C3",
+      "source": "PR description",
+      "text": "The test qr \"text\" --ascii --output=file.txt expects the output file to contain ASCII art (including the \u2588 character) and not the PNG magic bytes.",
+      "covers": [
+       "probe1.ascii_output_is_png",
+       "probe1.ascii_output_contains_block"
+      ],
+      "expect": "differs"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": false
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": false
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": false
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-probe1-main-1.jsonl",
+      "probe-model-probe1-main-2.jsonl",
+      "probe-model-probe1-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-probe1-pr-1.jsonl",
+      "probe-model-probe1-pr-2.jsonl",
+      "probe-model-probe1-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      },
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      },
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      }
+     ],
+     "pr": [
+      {
+       "probe1.ascii_output_is_png": false,
+       "probe1.ascii_output_contains_block": true
+      },
+      {
+       "probe1.ascii_output_is_png": false,
+       "probe1.ascii_output_contains_block": true
+      },
+      {
+       "probe1.ascii_output_is_png": false,
+       "probe1.ascii_output_contains_block": true
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "probe.error",
+      "state": "differs",
+      "label": "unmentioned",
+      "claim": null,
+      "main": {
+       "crash": "non-json output",
+       "exit_code": 1
+      },
+      "pr": "<absent>",
+      "diffs": [
+       {
+        "field": "",
+        "main": {
+         "crash": "non-json output",
+         "exit_code": 1
+        },
+        "pr": "<absent>"
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"probe.error\""
+       }
+      }
+     },
+     {
+      "name": "probe1.ascii_output_contains_block",
+      "state": "differs",
+      "label": "proven",
+      "claim": "C1",
+      "main": "<absent>",
+      "pr": true,
+      "diffs": [
+       {
+        "field": "",
+        "main": "<absent>",
+        "pr": true
+       }
+      ],
+      "citations": {
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"probe1.ascii_output_contains_block\""
+       }
+      }
+     },
+     {
+      "name": "probe1.ascii_output_is_png",
+      "state": "differs",
+      "label": "proven",
+      "claim": "C2",
+      "main": "<absent>",
+      "pr": false,
+      "diffs": [
+       {
+        "field": "",
+        "main": "<absent>",
+        "pr": false
+       }
+      ],
+      "citations": {
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"probe1.ascii_output_is_png\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "a4612c476c7067f2042b287505af6c3ea40aa5416d3e2f616b271745a69bafb2",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-08T06:05:28.418344+00:00",
+     "inputs_sha256": "ba13654aea969b63cfbb92fea6ad5fa562d05196a40dae3a021f63fe6300bdfa",
+     "inputs": {
+      "title_chars": 43,
+      "body_chars": 1950,
+      "base_files": {
+       "qrcode/console_scripts.py": "958b105efaf99f94e506fc1698e95fdb6cfe6ec1d36073e3251d87507da4c0c4"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-08T06:05:28.533539+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 3,
+     "changed_lines_covered": 0,
+     "files": [
+      {
+       "file": "qrcode/console_scripts.py",
+       "changed_lines_total": 3,
+       "changed_lines_covered": 1
+      }
+     ],
+     "adequacy": "not_adequate",
+     "note": "the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate",
+     "exit": 1,
+     "data": "probe-cov-model-probe1.json",
+     "changed_lines_touched": 1
+    },
+    "status": "crashed",
+    "uninformative_reason": "the probe crashed or printed no parsed output on every main-side run"
+   },
+   {
+    "id": "model-probe2",
+    "source": "model",
+    "path": "model-probes/model-probe2.py",
+    "sha256": "edb116eacffb8381bf24f8c182a7f1269bf2a1699bfdfa9f9579dc1d0041c330",
+    "target": "lincolnloop/python-qrcode#430",
+    "about": "Test --output without --ascii behavior",
+    "claims": [
+     {
+      "id": "C4",
+      "source": "PR description",
+      "text": "Running qr \"text\" --output=file.png without --ascii continues to produce a PNG file, showing no regression.",
+      "covers": [
+       "probe2.normal_output_is_png"
+      ],
+      "expect": "same"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": false
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": false
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": false
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": false
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": false
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": false
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-probe2-main-1.jsonl",
+      "probe-model-probe2-main-2.jsonl",
+      "probe-model-probe2-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-probe2-pr-1.jsonl",
+      "probe-model-probe2-pr-2.jsonl",
+      "probe-model-probe2-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      },
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      },
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      }
+     ],
+     "pr": [
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      },
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      },
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "probe.error",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "crash": "non-json output",
+       "exit_code": 1
+      },
+      "pr": {
+       "crash": "non-json output",
+       "exit_code": 1
+      },
+      "citations": {
+       "main": {
+        "file": "probe-model-probe2-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"probe.error\""
+       },
+       "pr": {
+        "file": "probe-model-probe2-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"probe.error\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "edb116eacffb8381bf24f8c182a7f1269bf2a1699bfdfa9f9579dc1d0041c330",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-08T06:05:28.418492+00:00",
+     "inputs_sha256": "ba13654aea969b63cfbb92fea6ad5fa562d05196a40dae3a021f63fe6300bdfa",
+     "inputs": {
+      "title_chars": 43,
+      "body_chars": 1950,
+      "base_files": {
+       "qrcode/console_scripts.py": "958b105efaf99f94e506fc1698e95fdb6cfe6ec1d36073e3251d87507da4c0c4"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-08T06:05:28.533539+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 3,
+     "changed_lines_covered": 0,
+     "files": [
+      {
+       "file": "qrcode/console_scripts.py",
+       "changed_lines_total": 3,
+       "changed_lines_covered": 1
+      }
+     ],
+     "adequacy": "not_adequate",
+     "note": "the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate",
+     "exit": 1,
+     "data": "probe-cov-model-probe2.json",
+     "changed_lines_touched": 1
+    },
+    "status": "crashed",
+    "uninformative_reason": "the probe crashed or printed no parsed output on every main-side run"
+   },
+   {
+    "id": "diff-api",
+    "source": "diff",
+    "path": "diff-probes/diff-api.py",
+    "sha256": "ccc949c5db343d18f4f742c4372683bc5c724f035d8300f1f1bbdb36567abe9a",
+    "target": "lincolnloop/python-qrcode#430",
+    "about": "Public functions touched by the PR, called with type-appropriate inputs on both sides.",
+    "claims": [],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-diff-api-main-1.jsonl",
+      "probe-diff-api-main-2.jsonl",
+      "probe-diff-api-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-diff-api-pr-1.jsonl",
+      "probe-diff-api-pr-2.jsonl",
+      "probe-diff-api-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "qrcode.console_scripts.main.input0": {
+        "raises": "ModuleNotFoundError"
+       }
+      },
+      {
+       "qrcode.console_scripts.main.input0": {
+        "raises": "ModuleNotFoundError"
+       }
+      },
+      {
+       "qrcode.console_scripts.main.input0": {
+        "raises": "ModuleNotFoundError"
+       }
+      }
+     ],
+     "pr": [
+      {
+       "qrcode.console_scripts.main.input0": {
+        "raises": "ModuleNotFoundError"
+       }
+      },
+      {
+       "qrcode.console_scripts.main.input0": {
+        "raises": "ModuleNotFoundError"
+       }
+      },
+      {
+       "qrcode.console_scripts.main.input0": {
+        "raises": "ModuleNotFoundError"
+       }
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "qrcode.console_scripts.main.input0",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "ModuleNotFoundError"
+      },
+      "pr": {
+       "raises": "ModuleNotFoundError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"qrcode.console_scripts.main.input0\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"qrcode.console_scripts.main.input0\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "diff",
+     "label": "diff (auto-derived from base-side code, model-free)",
+     "model": null,
+     "provider": null,
+     "provenance": "auto-derived",
+     "blind": false
+    },
+    "freeze": {
+     "sha256": "ccc949c5db343d18f4f742c4372683bc5c724f035d8300f1f1bbdb36567abe9a",
+     "generator": {
+      "kind": "diff",
+      "label": "diff (auto-derived from base-side code, model-free)",
+      "model": null,
+      "provider": null,
+      "provenance": "auto-derived",
+      "blind": false
+     },
+     "frozen_at": "2026-11-08T06:05:28.419691+00:00",
+     "inputs_sha256": "24e3c98f9635fa209b2e9c029fe6669229c6fd6291e2b7f5af10e7bb77268347",
+     "inputs": {
+      "title_chars": 0,
+      "body_chars": 0,
+      "base_files": {
+       "qrcode/console_scripts.py": "958b105efaf99f94e506fc1698e95fdb6cfe6ec1d36073e3251d87507da4c0c4"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-08T06:05:28.533539+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 3,
+     "changed_lines_covered": 0,
+     "files": [
+      {
+       "file": "qrcode/console_scripts.py",
+       "changed_lines_total": 3,
+       "changed_lines_covered": 0
+      }
+     ],
+     "adequacy": "not_adequate",
+     "note": "uninformative: every observation is probe-broken (the same exception or skip value on both sides); not counted as ran or adequate",
+     "exit": 0,
+     "data": "probe-cov-diff-api.json"
+    },
+    "status": "uninformative",
+    "uninformative_reason": "uninformative: every observation is probe-broken (the same exception or skip value on both sides)"
+   }
+  ],
+  "summary": {
+   "labels": [],
+   "flagged": [],
+   "proven_claims": [],
+   "reason": "the probe crashed or printed no parsed output on every main-side run; the probe crashed or printed no parsed output on every main-side run; uninformative: every observation is probe-broken (the same exception or skip value on both sides)",
+   "ignored_noise": [],
+   "ignored_warning_only": [],
+   "pr_only_noisy": [],
+   "advisory_unchanged_subchecks": [],
+   "advisory_agreeing_differs": [],
+   "advisory_invalid_preservation": []
+  }
+ },
+ "probe_changed_line_coverage": {
+  "status": "measured",
+  "side": "main",
+  "probes": {
+   "model-probe1": {
+    "status": "measured",
+    "changed_lines_covered": 0,
+    "changed_lines_total": 3,
+    "adequacy": "not_adequate"
+   },
+   "model-probe2": {
+    "status": "measured",
+    "changed_lines_covered": 0,
+    "changed_lines_total": 3,
+    "adequacy": "not_adequate"
+   },
+   "diff-api": {
+    "status": "measured",
+    "changed_lines_covered": 0,
+    "changed_lines_total": 3,
+    "adequacy": "not_adequate"
+   }
+  },
+  "not_adequate": [
+   "diff-api",
+   "model-probe1",
+   "model-probe2"
+  ]
+ },
+ "verdict": "needs_attention",
+ "reason": "probe: 1 observation(s) need attention: probe.error differs and no claim covers it; probe model-probe1 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count; probe model-probe2 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count; tests: 9 test(s) ran on main, 10 on the PR; 1 new test(s) pass, 14 unchanged (5 of them skipped on both sides)",
+ "verdict_before_coverage_gate": "needs_attention",
+ "reason_before_coverage_gate": "probe: 1 observation(s) need attention: probe.error differs and no claim covers it; probe model-probe1 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count; probe model-probe2 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count; tests: 9 test(s) ran on main, 10 on the PR; 1 new test(s) pass, 14 unchanged (5 of them skipped on both sides)",
+ "changed_lines_total": 6,
+ "changed_lines_covered": 3,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "normal",
+  "note": "3 of 6 changed executable line(s) ran (50%)",
+  "measurement": "measured"
+ },
+ "agents": {
+  "status": "skipped",
+  "note": "advisory swarm is off",
+  "roles": []
+ },
+ "explanation": {
+  "status": "not yet wired",
+  "why": "advisory swarm is off"
+ },
+ "swarm_requested": false,
+ "operator_approval_requested": false,
+ "swarm": "off",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [
+   "qrcode/console_scripts.py",
+   "qrcode/tests/test_script.py"
+  ],
+  "compiled_files": [],
+  "other_files": [
+   "CHANGES.rst"
+  ]
+ },
+ "duration_s": {
+  "total_wall": 167.0,
+  "tests": 5.6
+ },
+ "cost": {
+  "ai_calls": 3,
+  "failed_ai_calls": 0,
+  "input_tokens": 6514,
+  "output_tokens": 13702,
+  "thinking_tokens": 12045,
+  "cost_usd": 0.014286,
+  "calls_without_usage": 0,
+  "ai_cost_usd": 0.014286,
+  "cost_complete": true,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 167.0,
+   "tests": 5.6
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.011133,
+  "total_cost_usd": 0.025419,
+  "swarm": {
+   "ai_calls": 0,
+   "failed_ai_calls": 0,
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "thinking_tokens": 0,
+   "cost_usd": 0.0,
+   "calls_without_usage": 0,
+   "ai_cost_usd": 0.0,
+   "cost_complete": true,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ },
+ "pdf_push": {
+  "ok": true,
+  "attempts": 1,
+  "error": null,
+  "url": "https://github.com/aritracodesbad123/Proof-of-change/tree/runs/runs/2026-11-09/ef12096/python_qrcode-430"
+ }
+}
