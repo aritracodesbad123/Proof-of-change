@@ -1,9 +1,9 @@
 {
  "schema_version": "1",
  "record_kind": "pr_run",
- "id": "pr-jazzband-prettytable-543-8f3625a012f9-2026-11-08",
- "date_ist": "2026-11-09 10:34 IST",
- "run_date": "2026-11-08",
+ "id": "pr-jazzband-prettytable-543-8f3625a012f9-2026-11-09",
+ "date_ist": "2026-11-09 12:30 IST",
+ "run_date": "2026-11-09",
  "who": "ops/daily_run.py",
  "repo": "jazzband/prettytable",
  "library": "prettytable",
@@ -25,7 +25,7 @@
  "updated_at_ist": "2026-11-09 07:03 IST",
  "ci_state": "none",
  "ci_detail": "no check runs visible",
- "tested_at_ist": "2026-11-09 10:34 IST",
+ "tested_at_ist": "2026-11-09 12:30 IST",
  "files": {
   "all": [
    "src/prettytable/prettytable.py",
@@ -82,8 +82,8 @@
    "skipped": 0,
    "collection_errors": 0,
    "exit": 0,
-   "seconds": 1.4,
-   "pytest_summary": "218 passed in 0.79s",
+   "seconds": 1.6,
+   "pytest_summary": "218 passed in 0.96s",
    "junit": true
   },
   {
@@ -95,8 +95,8 @@
    "skipped": 0,
    "collection_errors": 0,
    "exit": 0,
-   "seconds": 1.5,
-   "pytest_summary": "221 passed in 0.87s",
+   "seconds": 1.6,
+   "pytest_summary": "221 passed in 1.01s",
    "junit": true
   },
   {
@@ -108,8 +108,8 @@
    "skipped": 0,
    "collection_errors": 0,
    "exit": 0,
-   "seconds": 1.4,
-   "pytest_summary": "218 passed in 0.81s",
+   "seconds": 1.6,
+   "pytest_summary": "218 passed in 0.94s",
    "junit": true
   },
   {
@@ -121,8 +121,8 @@
    "skipped": 0,
    "collection_errors": 0,
    "exit": 0,
-   "seconds": 1.4,
-   "pytest_summary": "221 passed in 0.83s",
+   "seconds": 1.6,
+   "pytest_summary": "221 passed in 1.01s",
    "junit": true
   },
   {
@@ -135,7 +135,7 @@
    "collection_errors": 0,
    "exit": 0,
    "seconds": 1.5,
-   "pytest_summary": "218 passed in 0.89s",
+   "pytest_summary": "218 passed in 0.86s",
    "junit": true
   },
   {
@@ -147,8 +147,8 @@
    "skipped": 0,
    "collection_errors": 0,
    "exit": 0,
-   "seconds": 1.4,
-   "pytest_summary": "221 passed in 0.79s",
+   "seconds": 1.9,
+   "pytest_summary": "221 passed in 1.11s",
    "junit": true
   }
  ],
@@ -194,7 +194,7 @@
     "changed_lines_covered": 9
    }
   ],
-  "seconds": 2.3,
+  "seconds": 2.2,
   "exit": 0,
   "log": "coverage-pytest.log"
  },
@@ -203,7 +203,7 @@
  "current_head_sha": "8f3625a012f96b001a00eb0caa68df31f619be70",
  "tested_invocation": 1,
  "model_provider_used": "nebius",
- "model_provider_fallback": "AI call fell back or failed (probes); the AI answered but no probe was usable, so only fixed probes ran",
+ "model_provider_fallback": "the AI answered but no probe was usable, so only fixed probes ran",
  "demo_helper": {
   "preflight": {
    "ok": true
@@ -212,7 +212,7 @@
   "notes": [
    "Setup check: GitHub token: present.",
    "Setup check: Nebius token: present.",
-   "Setup check: free memory 8.4 GB (of 15.6 GB).",
+   "Setup check: free memory 3.4 GB (of 15.6 GB).",
    "Setup check: free disk 92.9 GB.",
    "Demo helper: git is installed.",
    "Demo helper: python3 is installed.",
@@ -223,9 +223,9 @@
    "Query: prettytable python install requirements https://pypi.org/project/prettytable/ https://github.com/jazzband/prettytable site:pypi.org",
    "Source: prettytable/README.md at main \u00b7 prettytable/prettytable \u00b7 GitHub \u2014 https://github.com/jazzband/prettytable/blob/main/README.md",
    "Source: prettytable \u00b7 PyPI \u2014 https://pypi.org/project/prettytable/",
+   "Source: GitHub - prettytable/prettytable: Display tabular data in a visually appealing ASCII table format \u00b7 GitHub \u2014 https://github.com/jazzband/prettytable",
    "Source: Unable to import prettytable \u00b7 Issue #120 \u00b7 prettytable/prettytable \u00b7 GitHub \u2014 https://github.com/jazzband/prettytable/issues/120",
-   "Source: Commits \u00b7 prettytable/prettytable \u00b7 GitHub \u2014 https://github.com/jazzband/prettytable/commits",
-   "Source: prettytable/src/prettytable/prettytable.py at main \u00b7 prettytable/prettytable \u00b7 GitHub \u2014 https://github.com/jazzband/prettytable/blob/main/src/prettytable/prettytable.py",
+   "Source: Align Issue with add_autoindex \u00b7 Issue #199 \u00b7 prettytable/prettytable \u00b7 GitHub \u2014 https://github.com/jazzband/prettytable/issues/199",
    "Setup plan: the same packages on main and pr.",
    "Setup plan: wcwidth is noted, installed with the project.",
    "Setup plan: install pytest>=9 (listed in the tests extra) on main and pr.",
@@ -485,64 +485,70 @@
   "baseline": "full",
   "model": "model provider: nebius (Token Factory, live)",
   "errors": [
-   "retry: nebius probes request failed: TimeoutError",
-   "probe 'p1' rejected: cannot bind prettytable.prettytable.PrettyTable: PrettyTable() accepts **kwargs, so its keywords cannot be checked; the probe is not run"
+   "probe 'probe1' rejected: cannot bind prettytable.prettytable.PrettyTable: PrettyTable() accepts **kwargs, so its keywords cannot be checked; the probe is not run",
+   "probe 'probe2' rejected: cannot bind prettytable.prettytable.PrettyTable: PrettyTable() accepts **kwargs, so its keywords cannot be checked; the probe is not run",
+   "probe 'probe3' rejected: cannot bind prettytable.prettytable.PrettyTable: PrettyTable() accepts **kwargs, so its keywords cannot be checked; the probe is not run",
+   "probe 'probe4' rejected: code does not parse: unexpected character after line continuation character (line 23)"
   ],
   "model_claims": [
    {
     "id": "C1",
-    "text": "`get_latex_string()` emitted header and cell text verbatim in both the simple and the formatted path, so any LaTeX special character in the data either broke compilation or silently changed the table.",
-    "source_quote": "`get_latex_string()` emitted header and cell text verbatim in both the simple and the formatted path, so any LaTeX special character in the data either broke compilation or silently changed the table:",
+    "text": "The fix escapes LaTeX special characters in table output.",
+    "source_quote": "fix: escape LaTeX special characters in table output",
     "testable": true,
     "expect": "differs"
    },
    {
     "id": "C2",
-    "text": "A raw `&` splits the cell into extra columns.",
+    "text": "In the base code, get_latex_string emits header and cell text verbatim (no escaping).",
+    "source_quote": "`get_latex_string()` emitted header and cell text verbatim in both the simple and the formatted path, so any LaTeX special character in the data either broke compilation or silently changed the table:",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C3",
+    "text": "A raw `&` in the data splits the cell into extra columns in the LaTeX output.",
     "source_quote": "- a raw `&` splits the cell into extra columns,",
     "testable": true,
     "expect": "differs"
    },
    {
     "id": "C4",
-    "text": "`_` in headers/cells raises \"Missing $ inserted\".",
-    "source_quote": "- `_` in headers/cells raises \"Missing $ inserted\",",
+    "text": "The HTML and CSV exporters escape their output; LaTeX was the only unescaped path.",
+    "source_quote": "The HTML and CSV exporters escape their output; LaTeX was the only unescaped path (see #542 for the full repro).",
     "testable": true,
     "expect": "differs"
    },
    {
-    "id": "C6",
-    "text": "The fix escapes the ten LaTeX specials (`\\ & % $ # _ { } ~ ^`) in headers and data cells of both emitters via a single-pass `re.sub` with a lookup table \u2014 backslash maps to `\\textbackslash{}` and is handled in the same pass, so escapes inserted by the substitution are never re-escaped.",
+    "id": "C5",
+    "text": "The fix escapes the ten LaTeX specials (`\\ & % $ # _ { } ~ ^`) in headers and data cells of both emitters via a single-pass `re.sub` with a lookup table, handling backslash as `\\textbackslash{}` without re-escaping.",
     "source_quote": "Escape the ten LaTeX specials (`\\ & % $ # _ { } ~ ^`) in headers and data cells of both emitters, via a single-pass `re.sub` with a lookup table \u2014 backslash maps to `\\textbackslash{}` and is handled in the same pass, so escapes inserted by the substitution are never re-escaped.",
     "testable": true,
     "expect": "differs"
    },
    {
+    "id": "C6",
+    "text": "With the patch, the new tests pass; without it they fail.",
+    "source_quote": "On current `main` (d0f528b) the new tests fail with the un-escaped output; with this patch:\n\n```\nPYTHONPATH=src python3 -m pytest tests/test_latex.py tests/test_mediawiki.py -q\n17 passed\n```",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
     "id": "C7",
-    "text": "No existing output changed for plain text (`& `.join structure and `\\r\\n` line joins untouched).",
+    "text": "Three new regression tests were added covering simple path, formatted path, and backslash/`~`/`^` cases to prove single-pass escaping.",
+    "source_quote": "3 new regression tests added: simple path, formatted path, and the backslash/`~`/`^` cases that prove single-pass escaping.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C8",
+    "text": "Existing plain-text output remains unchanged (the `& `.join structure and `\\r\\n` line joins are untouched).",
     "source_quote": "No existing output changed for plain text (`& `.join structure and `\\r\\n` line joins untouched).",
     "testable": true,
     "expect": "same"
    }
   ],
-  "model_rejected_claims": [
-   {
-    "id": "C3",
-    "text": "`%` comments out the `\\` row terminator (the row disappears).",
-    "source_quote": "- `%` comments out the `\\` row terminator (the row disappears),",
-    "testable": true,
-    "expect": "differs",
-    "rejected": "source_quote not found in the PR text"
-   },
-   {
-    "id": "C5",
-    "text": "`#`, `$`, `{`, `}`, `~`, `^`, `\\) all misbehave the same way.",
-    "source_quote": "- `#`, `$`, `{`, `}`, `~`, `^`, `\\) all misbehave the same way.",
-    "testable": true,
-    "expect": "differs",
-    "rejected": "source_quote not found in the PR text"
-   }
-  ],
+  "model_rejected_claims": [],
   "model_retried": {
    "why": [
     "no probe listed the claim ids it checks, so its results could not be tied to any claim; in each probe, \"claims\" must name the claim ids it checks and the observation names that cover them"
@@ -556,7 +562,7 @@
   "pytest-cov",
   "pytest-lazy-fixtures"
  ],
- "pr_side_started_at": "2026-11-09T05:50:42.598055+00:00",
+ "pr_side_started_at": "2026-11-09T07:03:46.012329+00:00",
  "test_targets": {
   "main": [
    "tests/test_latex.py",
@@ -673,28 +679,28 @@
   ]
  },
  "duration_s": {
-  "total_wall": 2812.1,
-  "tests": 8.6
+  "total_wall": 197.8,
+  "tests": 9.8
  },
  "cost": {
   "ai_calls": 3,
-  "failed_ai_calls": 1,
-  "input_tokens": 15804,
-  "output_tokens": 10387,
-  "thinking_tokens": 8994,
-  "cost_usd": 0.014089,
-  "calls_without_usage": 1,
-  "ai_cost_usd": 0.014089,
-  "cost_complete": false,
+  "failed_ai_calls": 0,
+  "input_tokens": 31982,
+  "output_tokens": 27015,
+  "thinking_tokens": 23341,
+  "cost_usd": 0.033908,
+  "calls_without_usage": 0,
+  "ai_cost_usd": 0.033908,
+  "cost_complete": true,
   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
   "compute_seconds": {
-   "total_wall": 2812.1,
-   "tests": 8.6
+   "total_wall": 197.8,
+   "tests": 9.8
   },
   "machine_usd_per_hour": 0.24,
   "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
-  "computer_cost_usd": 0.187473,
-  "total_cost_usd": 0.201562,
+  "computer_cost_usd": 0.013187,
+  "total_cost_usd": 0.047095,
   "swarm": {
    "ai_calls": 0,
    "failed_ai_calls": 0,
