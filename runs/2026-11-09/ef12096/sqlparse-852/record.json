@@ -1,9 +1,9 @@
 {
  "schema_version": "1",
  "record_kind": "pr_run",
- "id": "pr-andialbrecht-sqlparse-852-0262a1a4735f-2026-11-08",
- "date_ist": "2026-11-09 11:43 IST",
- "run_date": "2026-11-08",
+ "id": "pr-andialbrecht-sqlparse-852-0262a1a4735f-2026-11-09",
+ "date_ist": "2026-11-09 12:52 IST",
+ "run_date": "2026-11-09",
  "who": "ops/daily_run.py",
  "repo": "andialbrecht/sqlparse",
  "library": "sqlparse",
@@ -25,7 +25,7 @@
  "updated_at_ist": "2026-11-06 04:14 IST",
  "ci_state": "passing",
  "ci_detail": "11 check runs completed without failure",
- "tested_at_ist": "2026-11-09 11:43 IST",
+ "tested_at_ist": "2026-11-09 12:52 IST",
  "files": {
   "all": [
    "sqlparse/lexer.py",
@@ -83,12 +83,38 @@
    "collection_errors": 0,
    "exit": 0,
    "seconds": 1.2,
-   "pytest_summary": "181 passed, 1 xpassed in 0.77s",
+   "pytest_summary": "181 passed, 1 xpassed in 0.72s",
    "junit": true
   },
   {
    "side": "new",
    "run": 1,
+   "passed": 183,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.1,
+   "pytest_summary": "182 passed, 1 xpassed in 0.71s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 2,
+   "passed": 182,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.2,
+   "pytest_summary": "181 passed, 1 xpassed in 0.75s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 2,
    "passed": 183,
    "failed": 0,
    "error": 0,
@@ -101,32 +127,6 @@
   },
   {
    "side": "old",
-   "run": 2,
-   "passed": 182,
-   "failed": 0,
-   "error": 0,
-   "skipped": 0,
-   "collection_errors": 0,
-   "exit": 0,
-   "seconds": 1.2,
-   "pytest_summary": "181 passed, 1 xpassed in 0.73s",
-   "junit": true
-  },
-  {
-   "side": "new",
-   "run": 2,
-   "passed": 183,
-   "failed": 0,
-   "error": 0,
-   "skipped": 0,
-   "collection_errors": 0,
-   "exit": 0,
-   "seconds": 1.2,
-   "pytest_summary": "182 passed, 1 xpassed in 0.74s",
-   "junit": true
-  },
-  {
-   "side": "old",
    "run": 3,
    "passed": 182,
    "failed": 0,
@@ -135,7 +135,7 @@
    "collection_errors": 0,
    "exit": 0,
    "seconds": 1.2,
-   "pytest_summary": "181 passed, 1 xpassed in 0.72s",
+   "pytest_summary": "181 passed, 1 xpassed in 0.76s",
    "junit": true
   },
   {
@@ -148,7 +148,7 @@
    "collection_errors": 0,
    "exit": 0,
    "seconds": 1.2,
-   "pytest_summary": "182 passed, 1 xpassed in 0.72s",
+   "pytest_summary": "182 passed, 1 xpassed in 0.75s",
    "junit": true
   }
  ],
@@ -188,7 +188,7 @@
     "changed_lines_covered": 1
    }
   ],
-  "seconds": 1.8,
+  "seconds": 1.9,
   "exit": 0,
   "log": "coverage-pytest.log"
  },
@@ -197,7 +197,6 @@
  "current_head_sha": "0262a1a4735f9f7b2f3ad54c08ea3d1e41263d94",
  "tested_invocation": 1,
  "model_provider_used": "nebius",
- "model_provider_fallback": "the AI answered but no probe was usable, so only fixed probes ran",
  "demo_helper": {
   "preflight": {
    "ok": true
@@ -206,8 +205,8 @@
   "notes": [
    "Setup check: GitHub token: present.",
    "Setup check: Nebius token: present.",
-   "Setup check: free memory 6.8 GB (of 15.6 GB).",
-   "Setup check: free disk 92.9 GB.",
+   "Setup check: free memory 9.7 GB (of 15.6 GB).",
+   "Setup check: free disk 92.0 GB.",
    "Demo helper: git is installed.",
    "Demo helper: python3 is installed.",
    "Demo helper: uv is installed.",
@@ -313,45 +312,143 @@
  "probe_plan": {
   "baseline": "full",
   "model": "model provider: nebius (Token Factory, live)",
-  "errors": [
-   "probe 'p1' rejected: empty probe: the code has no test statements (only imports, comments or a docstring)"
-  ],
+  "errors": [],
   "model_claims": [
    {
     "id": "C1",
-    "text": "When parsing non-UTF-8 SQL bytes, the lexer will decode them using latin-1 instead of unicode-escape.",
-    "source_quote": "decode non-utf8 sql bytes as latin-1 not unicode-escape",
+    "text": "The non-UTF-8 fallback in Lexer.get_tokens currently decodes via unicode-escape, which evaluates backslash escape sequences in the SQL bytes.",
+    "source_quote": "Cause: the non-UTF-8 fallback in Lexer.get_tokens decodes via unicode-escape, which evaluates backslash escape sequences in the SQL bytes (\\x41 becomes A, \\n becomes a newline, plus octal and \\u\u2026).",
     "testable": true,
-    "expect": "differs"
+    "expect": "same",
+    "quote_match": "loose"
    },
    {
     "id": "C2",
-    "text": "In the current code, when encountering invalid UTF-8 bytes, the lexer decodes via unicode-escape, which evaluates backslash escape sequences such that \\x41 becomes 'A' and \\n becomes a newline, altering the token stream relative to the original bytes.",
-    "source_quote": "the non-UTF-8 fallback in `Lexer.get_tokens` decodes via `unicode-escape`, which evaluates backslash escape sequences in the SQL bytes (`\\x41` becomes `A`, `\\n` becomes a newline, plus octal and `\\u\u2026`).",
+    "text": "After the fix, non-UTF-8 SQL bytes will be decoded using latin-1, which maps all 256 byte values one-to-one without evaluating escape sequences.",
+    "source_quote": "Fix: decode the fallback as latin-1, which maps all 256 byte values one-to-one without evaluating escapes.",
     "testable": true,
-    "expect": "differs"
+    "expect": "differs",
+    "quote_match": "loose"
    },
    {
     "id": "C3",
-    "text": "For SQL byte inputs that contain no backslash characters, the decoded result will be byte\u2011identical to the current behavior after the change.",
+    "text": "For input without backslashes, decoding as latin-1 yields byte-identical results to the current behavior.",
     "source_quote": "For input without backslashes the result is byte-identical to today; only the escape reinterpretation is dropped.",
     "testable": true,
     "expect": "same"
    }
   ],
   "model_rejected_claims": [],
+  "model_loose_quote_matches": [
+   {
+    "claim": "C1",
+    "source_quote": "Cause: the non-UTF-8 fallback in Lexer.get_tokens decodes via unicode-escape, which evaluates backslash escape sequences in the SQL bytes (\\x41 becomes A, \\n becomes a newline, plus octal and \\u\u2026)."
+   },
+   {
+    "claim": "C2",
+    "source_quote": "Fix: decode the fallback as latin-1, which maps all 256 byte values one-to-one without evaluating escapes."
+   }
+  ],
   "model_retried": {
    "why": [
-    "empty probe: the code has no test statements (only imports, comments or a docstring)"
-   ]
+    "no probe listed the claim ids it checks, so its results could not be tied to any claim; in each probe, \"claims\" must name the claim ids it checks and the observation names that cover them"
+   ],
+   "kept_first_answer": "the retry linked no claim either"
   },
+  "model_claims_filled": [
+   {
+    "id": "probe-c1",
+    "claims": [
+     "C1"
+    ]
+   },
+   {
+    "id": "probe-c2",
+    "claims": [
+     "C2"
+    ]
+   },
+   {
+    "id": "probe-c3",
+    "claims": [
+     "C3"
+    ]
+   }
+  ],
   "diff_targets": [],
-  "frozen": []
+  "frozen": [
+   {
+    "path": "model-probes/model-probe-c1.py",
+    "source": "model",
+    "sha256": "b3225b052c29e193fd317c6277c5cc53b333f09d7ce9e41116a93b4af2d00eaa",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-09T07:24:50.211478+00:00",
+    "inputs_sha256": "3a9bb1bca1fc9602b79687e58b178301e3ff3a1cde611ac5c6261a5164303471",
+    "inputs": {
+     "title_chars": 55,
+     "body_chars": 943,
+     "base_files": {
+      "sqlparse/lexer.py": "d3ecae37a657adb8b3929471622b7c359e8dd254173596d31a2b479505ca0a86"
+     }
+    }
+   },
+   {
+    "path": "model-probes/model-probe-c2.py",
+    "source": "model",
+    "sha256": "17604cad1e5385cf3b8d17de9eb436229478d0b66b27d659510a4035cce84c70",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-09T07:24:50.211652+00:00",
+    "inputs_sha256": "3a9bb1bca1fc9602b79687e58b178301e3ff3a1cde611ac5c6261a5164303471",
+    "inputs": {
+     "title_chars": 55,
+     "body_chars": 943,
+     "base_files": {
+      "sqlparse/lexer.py": "d3ecae37a657adb8b3929471622b7c359e8dd254173596d31a2b479505ca0a86"
+     }
+    }
+   },
+   {
+    "path": "model-probes/model-probe-c3.py",
+    "source": "model",
+    "sha256": "168ed61a03375fa29cb01bea25d59570092420679bfd0ff4715b22138b60c467",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-09T07:24:50.211735+00:00",
+    "inputs_sha256": "3a9bb1bca1fc9602b79687e58b178301e3ff3a1cde611ac5c6261a5164303471",
+    "inputs": {
+     "title_chars": 55,
+     "body_chars": 943,
+     "base_files": {
+      "sqlparse/lexer.py": "d3ecae37a657adb8b3929471622b7c359e8dd254173596d31a2b479505ca0a86"
+     }
+    }
+   }
+  ]
  },
  "test_extras": [
   "build"
  ],
- "pr_side_started_at": "2026-11-09T06:14:56.453748+00:00",
+ "pr_side_started_at": "2026-11-09T07:24:50.346598+00:00",
  "test_targets": {
   "main": [
    "tests/test_parse.py",
@@ -417,17 +514,568 @@
   "detail": "all runs exited 0"
  },
  "probes": {
-  "status": "none",
-  "items": []
+  "status": "ran",
+  "items": [
+   {
+    "id": "model-probe-c1",
+    "source": "model",
+    "path": "model-probes/model-probe-c1.py",
+    "sha256": "b3225b052c29e193fd317c6277c5cc53b333f09d7ce9e41116a93b4af2d00eaa",
+    "target": "andialbrecht/sqlparse#852",
+    "about": "Test claim C1: non-UTF-8 fallback uses unicode-escape (evaluates escape sequences)",
+    "claims": [
+     {
+      "id": "C1",
+      "source": "PR description",
+      "text": "The non-UTF-8 fallback in Lexer.get_tokens currently decodes via unicode-escape, which evaluates backslash escape sequences in the SQL bytes.",
+      "covers": [
+       "c1.*"
+      ],
+      "expect": "same"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-probe-c1-main-1.jsonl",
+      "probe-model-probe-c1-main-2.jsonl",
+      "probe-model-probe-c1-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-probe-c1-pr-1.jsonl",
+      "probe-model-probe-c1-pr-2.jsonl",
+      "probe-model-probe-c1-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "c1.decoded_string": "A\u00ff"
+      },
+      {
+       "c1.decoded_string": "A\u00ff"
+      },
+      {
+       "c1.decoded_string": "A\u00ff"
+      }
+     ],
+     "pr": [
+      {
+       "c1.decoded_string": "\\x41\u00ff"
+      },
+      {
+       "c1.decoded_string": "\\x41\u00ff"
+      },
+      {
+       "c1.decoded_string": "\\x41\u00ff"
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "c1.decoded_string",
+      "state": "differs",
+      "label": "false_claim",
+      "claim": "C1",
+      "main": "A\u00ff",
+      "pr": "\\x41\u00ff",
+      "diffs": [
+       {
+        "field": "",
+        "main": "A\u00ff",
+        "pr": "\\x41\u00ff"
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe-c1-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c1.decoded_string\""
+       },
+       "pr": {
+        "file": "probe-model-probe-c1-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c1.decoded_string\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "b3225b052c29e193fd317c6277c5cc53b333f09d7ce9e41116a93b4af2d00eaa",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-09T07:24:50.211478+00:00",
+     "inputs_sha256": "3a9bb1bca1fc9602b79687e58b178301e3ff3a1cde611ac5c6261a5164303471",
+     "inputs": {
+      "title_chars": 55,
+      "body_chars": 943,
+      "base_files": {
+       "sqlparse/lexer.py": "d3ecae37a657adb8b3929471622b7c359e8dd254173596d31a2b479505ca0a86"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-09T07:24:50.346598+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 1,
+     "changed_lines_covered": 1,
+     "files": [
+      {
+       "file": "sqlparse/lexer.py",
+       "changed_lines_total": 1,
+       "changed_lines_covered": 1
+      }
+     ],
+     "adequacy": "adequate",
+     "note": "ran 1 of 1 changed line(s) on the main side",
+     "exit": 0,
+     "data": "probe-cov-model-probe-c1.json"
+    },
+    "status": "ran"
+   },
+   {
+    "id": "model-probe-c2",
+    "source": "model",
+    "path": "model-probes/model-probe-c2.py",
+    "sha256": "17604cad1e5385cf3b8d17de9eb436229478d0b66b27d659510a4035cce84c70",
+    "target": "andialbrecht/sqlparse#852",
+    "about": "Test claim C2: after fix, non-UTF-8 fallback uses latin-1 (no escape evaluation)",
+    "claims": [
+     {
+      "id": "C2",
+      "source": "PR description",
+      "text": "After the fix, non-UTF-8 SQL bytes will be decoded using latin-1, which maps all 256 byte values one-to-one without evaluating escape sequences.",
+      "covers": [
+       "c2.*"
+      ],
+      "expect": "differs"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-probe-c2-main-1.jsonl",
+      "probe-model-probe-c2-main-2.jsonl",
+      "probe-model-probe-c2-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-probe-c2-pr-1.jsonl",
+      "probe-model-probe-c2-pr-2.jsonl",
+      "probe-model-probe-c2-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "c2.decoded_string": "A\u00ff"
+      },
+      {
+       "c2.decoded_string": "A\u00ff"
+      },
+      {
+       "c2.decoded_string": "A\u00ff"
+      }
+     ],
+     "pr": [
+      {
+       "c2.decoded_string": "\\x41\u00ff"
+      },
+      {
+       "c2.decoded_string": "\\x41\u00ff"
+      },
+      {
+       "c2.decoded_string": "\\x41\u00ff"
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "c2.decoded_string",
+      "state": "differs",
+      "label": "proven",
+      "claim": "C2",
+      "main": "A\u00ff",
+      "pr": "\\x41\u00ff",
+      "diffs": [
+       {
+        "field": "",
+        "main": "A\u00ff",
+        "pr": "\\x41\u00ff"
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe-c2-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c2.decoded_string\""
+       },
+       "pr": {
+        "file": "probe-model-probe-c2-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c2.decoded_string\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "17604cad1e5385cf3b8d17de9eb436229478d0b66b27d659510a4035cce84c70",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-09T07:24:50.211652+00:00",
+     "inputs_sha256": "3a9bb1bca1fc9602b79687e58b178301e3ff3a1cde611ac5c6261a5164303471",
+     "inputs": {
+      "title_chars": 55,
+      "body_chars": 943,
+      "base_files": {
+       "sqlparse/lexer.py": "d3ecae37a657adb8b3929471622b7c359e8dd254173596d31a2b479505ca0a86"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-09T07:24:50.346598+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 1,
+     "changed_lines_covered": 1,
+     "files": [
+      {
+       "file": "sqlparse/lexer.py",
+       "changed_lines_total": 1,
+       "changed_lines_covered": 1
+      }
+     ],
+     "adequacy": "adequate",
+     "note": "ran 1 of 1 changed line(s) on the main side",
+     "exit": 0,
+     "data": "probe-cov-model-probe-c2.json"
+    },
+    "status": "ran"
+   },
+   {
+    "id": "model-probe-c3",
+    "source": "model",
+    "path": "model-probes/model-probe-c3.py",
+    "sha256": "168ed61a03375fa29cb01bea25d59570092420679bfd0ff4715b22138b60c467",
+    "target": "andialbrecht/sqlparse#852",
+    "about": "Test claim C3: for input without backslashes, latin-1 same as unicode-escape",
+    "claims": [
+     {
+      "id": "C3",
+      "source": "PR description",
+      "text": "For input without backslashes, decoding as latin-1 yields byte-identical results to the current behavior.",
+      "covers": [
+       "c3.*"
+      ],
+      "expect": "same"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-probe-c3-main-1.jsonl",
+      "probe-model-probe-c3-main-2.jsonl",
+      "probe-model-probe-c3-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-probe-c3-pr-1.jsonl",
+      "probe-model-probe-c3-pr-2.jsonl",
+      "probe-model-probe-c3-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "c3.decoded_string": "\u00ff"
+      },
+      {
+       "c3.decoded_string": "\u00ff"
+      },
+      {
+       "c3.decoded_string": "\u00ff"
+      }
+     ],
+     "pr": [
+      {
+       "c3.decoded_string": "\u00ff"
+      },
+      {
+       "c3.decoded_string": "\u00ff"
+      },
+      {
+       "c3.decoded_string": "\u00ff"
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "c3.decoded_string",
+      "state": "same",
+      "label": "proven",
+      "claim": "C3",
+      "main": "\u00ff",
+      "pr": "\u00ff",
+      "citations": {
+       "main": {
+        "file": "probe-model-probe-c3-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c3.decoded_string\""
+       },
+       "pr": {
+        "file": "probe-model-probe-c3-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c3.decoded_string\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "168ed61a03375fa29cb01bea25d59570092420679bfd0ff4715b22138b60c467",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-09T07:24:50.211735+00:00",
+     "inputs_sha256": "3a9bb1bca1fc9602b79687e58b178301e3ff3a1cde611ac5c6261a5164303471",
+     "inputs": {
+      "title_chars": 55,
+      "body_chars": 943,
+      "base_files": {
+       "sqlparse/lexer.py": "d3ecae37a657adb8b3929471622b7c359e8dd254173596d31a2b479505ca0a86"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-09T07:24:50.346598+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 1,
+     "changed_lines_covered": 1,
+     "files": [
+      {
+       "file": "sqlparse/lexer.py",
+       "changed_lines_total": 1,
+       "changed_lines_covered": 1
+      }
+     ],
+     "adequacy": "adequate",
+     "note": "ran 1 of 1 changed line(s) on the main side",
+     "exit": 0,
+     "data": "probe-cov-model-probe-c3.json"
+    },
+    "status": "ran"
+   }
+  ],
+  "summary": {
+   "labels": [
+    "false_claim",
+    "proven",
+    "proven"
+   ],
+   "flagged": [
+    {
+     "probe": "model-probe-c1",
+     "name": "c1.decoded_string",
+     "label": "false_claim",
+     "claim": "C1"
+    }
+   ],
+   "proven_claims": [
+    "C2",
+    "C3"
+   ],
+   "reason": "probe: 1 observation(s) need attention: c1.decoded_string differs although the claim says it does not (C1); probe: claim(s) C2, C3 proven",
+   "ignored_noise": [],
+   "ignored_warning_only": [],
+   "pr_only_noisy": [],
+   "advisory_unchanged_subchecks": [],
+   "advisory_agreeing_differs": [],
+   "advisory_invalid_preservation": []
+  }
  },
  "probe_changed_line_coverage": {
-  "status": "no probes",
-  "probes": {}
+  "status": "measured",
+  "side": "main",
+  "probes": {
+   "model-probe-c1": {
+    "status": "measured",
+    "changed_lines_covered": 1,
+    "changed_lines_total": 1,
+    "adequacy": "adequate"
+   },
+   "model-probe-c2": {
+    "status": "measured",
+    "changed_lines_covered": 1,
+    "changed_lines_total": 1,
+    "adequacy": "adequate"
+   },
+   "model-probe-c3": {
+    "status": "measured",
+    "changed_lines_covered": 1,
+    "changed_lines_total": 1,
+    "adequacy": "adequate"
+   }
+  },
+  "not_adequate": []
  },
- "verdict": "could_not_verify",
- "reason": "not verified: no AI-written probe ran any changed line, so the change itself was not exercised by a probe; 1 test(s) fail on main and pass on the PR; 183 test(s) ran on main, 183 on the PR; 0 new test(s) pass, 182 unchanged",
- "verdict_before_coverage_gate": "verified",
- "reason_before_coverage_gate": "1 test(s) fail on main and pass on the PR; 183 test(s) ran on main, 183 on the PR; 0 new test(s) pass, 182 unchanged",
+ "verdict": "needs_attention",
+ "reason": "probe: 1 observation(s) need attention: c1.decoded_string differs although the claim says it does not (C1); probe: claim(s) C2, C3 proven; tests: 1 test(s) fail on main and pass on the PR; 183 test(s) ran on main, 183 on the PR; 0 new test(s) pass, 182 unchanged",
+ "verdict_before_coverage_gate": "needs_attention",
+ "reason_before_coverage_gate": "probe: 1 observation(s) need attention: c1.decoded_string differs although the claim says it does not (C1); probe: claim(s) C2, C3 proven; tests: 1 test(s) fail on main and pass on the PR; 183 test(s) ran on main, 183 on the PR; 0 new test(s) pass, 182 unchanged",
  "changed_lines_total": 1,
  "changed_lines_covered": 1,
  "coverage_gate": {
@@ -437,7 +1085,6 @@
   "note": "1 of 1 changed executable line(s) ran (100%)",
   "measurement": "measured"
  },
- "verdict_before_ai_probe_gate": "verified",
  "agents": {
   "status": "skipped",
   "note": "advisory swarm is off",
@@ -461,28 +1108,28 @@
   ]
  },
  "duration_s": {
-  "total_wall": 83.6,
-  "tests": 7.2
+  "total_wall": 157.3,
+  "tests": 7.1
  },
  "cost": {
   "ai_calls": 3,
   "failed_ai_calls": 0,
-  "input_tokens": 5312,
-  "output_tokens": 9209,
-  "thinking_tokens": 8825,
-  "cost_usd": 0.009882,
+  "input_tokens": 5304,
+  "output_tokens": 24158,
+  "thinking_tokens": 23326,
+  "cost_usd": 0.023333,
   "calls_without_usage": 0,
-  "ai_cost_usd": 0.009882,
+  "ai_cost_usd": 0.023333,
   "cost_complete": true,
   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
   "compute_seconds": {
-   "total_wall": 83.6,
-   "tests": 7.2
+   "total_wall": 157.3,
+   "tests": 7.1
   },
   "machine_usd_per_hour": 0.24,
   "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
-  "computer_cost_usd": 0.005573,
-  "total_cost_usd": 0.015455,
+  "computer_cost_usd": 0.010487,
+  "total_cost_usd": 0.03382,
   "swarm": {
    "ai_calls": 0,
    "failed_ai_calls": 0,
