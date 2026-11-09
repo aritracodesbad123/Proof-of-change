@@ -1,9 +1,9 @@
 {
  "schema_version": "1",
  "record_kind": "pr_run",
- "id": "pr-pyinvoke-invoke-1100-2596db3869b2-2026-11-08",
- "date_ist": "2026-11-09 11:53 IST",
- "run_date": "2026-11-08",
+ "id": "pr-pyinvoke-invoke-1100-2596db3869b2-2026-11-09",
+ "date_ist": "2026-11-09 13:07 IST",
+ "run_date": "2026-11-09",
  "who": "ops/daily_run.py",
  "repo": "pyinvoke/invoke",
  "library": "invoke",
@@ -25,7 +25,7 @@
  "updated_at_ist": "2026-11-08 12:54 IST",
  "ci_state": "passing",
  "ci_detail": "3 check runs completed without failure",
- "tested_at_ist": "2026-11-09 11:53 IST",
+ "tested_at_ist": "2026-11-09 13:07 IST",
  "files": {
   "all": [
    "invoke/context.py",
@@ -84,8 +84,8 @@
    "skipped": 3,
    "collection_errors": 0,
    "exit": 0,
-   "seconds": 1.7,
-   "pytest_summary": "208 passed, 3 skipped, 5 warnings in 1.03s",
+   "seconds": 2.2,
+   "pytest_summary": "208 passed, 3 skipped, 5 warnings in 1.13s",
    "junit": true
   },
   {
@@ -97,8 +97,8 @@
    "skipped": 3,
    "collection_errors": 0,
    "exit": 0,
-   "seconds": 1.7,
-   "pytest_summary": "226 passed, 3 skipped, 5 warnings in 1.07s",
+   "seconds": 1.9,
+   "pytest_summary": "226 passed, 3 skipped, 5 warnings in 1.15s",
    "junit": true
   },
   {
@@ -123,8 +123,8 @@
    "skipped": 3,
    "collection_errors": 0,
    "exit": 0,
-   "seconds": 1.9,
-   "pytest_summary": "226 passed, 3 skipped, 5 warnings in 1.17s",
+   "seconds": 1.8,
+   "pytest_summary": "226 passed, 3 skipped, 5 warnings in 1.08s",
    "junit": true
   },
   {
@@ -137,7 +137,7 @@
    "collection_errors": 0,
    "exit": 0,
    "seconds": 1.8,
-   "pytest_summary": "208 passed, 3 skipped, 5 warnings in 1.06s",
+   "pytest_summary": "208 passed, 3 skipped, 5 warnings in 1.04s",
    "junit": true
   },
   {
@@ -149,8 +149,8 @@
    "skipped": 3,
    "collection_errors": 0,
    "exit": 0,
-   "seconds": 1.9,
-   "pytest_summary": "226 passed, 3 skipped, 5 warnings in 1.14s",
+   "seconds": 1.8,
+   "pytest_summary": "226 passed, 3 skipped, 5 warnings in 1.06s",
    "junit": true
   }
  ],
@@ -190,7 +190,7 @@
     "changed_lines_covered": 8
    }
   ],
-  "seconds": 3.4,
+  "seconds": 3.7,
   "exit": 0,
   "log": "coverage-pytest.log"
  },
@@ -208,8 +208,8 @@
   "notes": [
    "Setup check: GitHub token: present.",
    "Setup check: Nebius token: present.",
-   "Setup check: free memory 6.4 GB (of 15.6 GB).",
-   "Setup check: free disk 92.8 GB.",
+   "Setup check: free memory 3.0 GB (of 15.6 GB).",
+   "Setup check: free disk 92.5 GB.",
    "Demo helper: git is installed.",
    "Demo helper: python3 is installed.",
    "Demo helper: uv is installed.",
@@ -219,10 +219,11 @@
    "Query: invoke python install requirements https://pypi.org/project/invoke/ https://github.com/pyinvoke/invoke site:pypi.org",
    "Source: invoke-common-tasks \u00b7 PyPI \u2014 https://pypi.org/project/invoke-common-tasks/",
    "Source: invoke \u00b7 PyPI \u2014 https://pypi.org/project/invoke/",
+   "Source: invoke/invoke/program.py at main \u00b7 pyinvoke/invoke \u00b7 GitHub \u2014 https://github.com/pyinvoke/invoke/blob/master/invoke/program.py",
    "Source: invoke/invoke/runners.py at main \u00b7 pyinvoke/invoke \u00b7 GitHub \u2014 https://github.com/pyinvoke/invoke/blob/master/invoke/runners.py",
-   "Source: Dealing with virtual environments \u00b7 Issue #838 \u00b7 pyinvoke/invoke \u00b7 GitHub \u2014 https://github.com/pyinvoke/invoke/issues/838",
-   "Source: Support `python -m invoke` \u00b7 Issue #444 \u00b7 pyinvoke/invoke \u00b7 GitHub \u2014 https://github.com/pyinvoke/invoke/issues/444",
+   "Source: ImportError: cannot import name yaml2 \u00b7 Issue #319 \u00b7 pyinvoke/invoke \u00b7 GitHub \u2014 https://github.com/pyinvoke/invoke/issues/319",
    "Source: Invoke 0.13 breaks on Windows (unavailable default shell) \u00b7 Issue #371 \u00b7 pyinvoke/invoke \u00b7 GitHub \u2014 https://github.com/pyinvoke/invoke/issues/371",
+   "Source: Dealing with virtual environments \u00b7 Issue #838 \u00b7 pyinvoke/invoke \u00b7 GitHub \u2014 https://github.com/pyinvoke/invoke/issues/838",
    "Setup plan: the same packages on main and pr.",
    "Setup plan: Python 3.12: Python 3.12 already meets >=3.9",
    "Installed icecream 2.2.0 from project (named by the error and listed in the project) on main and pr.",
@@ -335,22 +336,8 @@
   "model_claims": [
    {
     "id": "C1",
-    "text": "MockContext returns failed command results even when warn=False.",
-    "source_quote": "`MockContext` returns failed command results even when `warn=False`, so tests can miss missing error handling in real tasks.",
-    "testable": true,
-    "expect": "same"
-   },
-   {
-    "id": "C2",
-    "text": "The change makes MockContext honor explicit and configured warn values for both run and sudo.",
-    "source_quote": "Honor explicit and configured `warn` values for both `run` and `sudo`.",
-    "testable": true,
-    "expect": "differs"
-   },
-   {
-    "id": "C3",
-    "text": "New regression cases fail before the fix but pass after the fix (pytest yields 991 passed and 11 skipped).",
-    "source_quote": "Verified: the new regression cases fail before the fix; `pytest -q --capture=no` in a terminal passes with 991 passed and 11 skipped.",
+    "text": "MockContext returns failed command results even when warn=False",
+    "source_quote": "`MockContext` returns failed command results even when `warn=False`",
     "testable": true,
     "expect": "differs"
    }
@@ -362,7 +349,7 @@
  "test_extras": [
   "pytest-relaxed>=2"
  ],
- "pr_side_started_at": "2026-11-09T06:24:19.427194+00:00",
+ "pr_side_started_at": "2026-11-09T07:38:53.853641+00:00",
  "test_targets": {
   "main": [
    "tests/context.py",
@@ -777,28 +764,28 @@
   ]
  },
  "duration_s": {
-  "total_wall": 113.0,
-  "tests": 10.8
+  "total_wall": 115.3,
+  "tests": 11.3
  },
  "cost": {
   "ai_calls": 2,
   "failed_ai_calls": 0,
-  "input_tokens": 6881,
-  "output_tokens": 9497,
-  "thinking_tokens": 7941,
-  "cost_usd": 0.010612,
+  "input_tokens": 6698,
+  "output_tokens": 6061,
+  "thinking_tokens": 5573,
+  "cost_usd": 0.007464,
   "calls_without_usage": 0,
-  "ai_cost_usd": 0.010612,
+  "ai_cost_usd": 0.007464,
   "cost_complete": true,
   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
   "compute_seconds": {
-   "total_wall": 113.0,
-   "tests": 10.8
+   "total_wall": 115.3,
+   "tests": 11.3
   },
   "machine_usd_per_hour": 0.24,
   "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
-  "computer_cost_usd": 0.007533,
-  "total_cost_usd": 0.018145,
+  "computer_cost_usd": 0.007687,
+  "total_cost_usd": 0.015151,
   "swarm": {
    "ai_calls": 0,
    "failed_ai_calls": 0,
