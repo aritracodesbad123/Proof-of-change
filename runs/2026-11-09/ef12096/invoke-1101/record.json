@@ -1,9 +1,9 @@
 {
  "schema_version": "1",
  "record_kind": "pr_run",
- "id": "pr-pyinvoke-invoke-1101-d67a16bfb0fb-2026-11-08",
- "date_ist": "2026-11-09 11:49 IST",
- "run_date": "2026-11-08",
+ "id": "pr-pyinvoke-invoke-1101-d67a16bfb0fb-2026-11-09",
+ "date_ist": "2026-11-09 13:01 IST",
+ "run_date": "2026-11-09",
  "who": "ops/daily_run.py",
  "repo": "pyinvoke/invoke",
  "library": "invoke",
@@ -25,7 +25,7 @@
  "updated_at_ist": "2026-11-08 12:56 IST",
  "ci_state": "passing",
  "ci_detail": "3 check runs completed without failure",
- "tested_at_ist": "2026-11-09 11:49 IST",
+ "tested_at_ist": "2026-11-09 13:01 IST",
  "files": {
   "all": [
    "invoke/runners.py",
@@ -84,8 +84,8 @@
    "skipped": 5,
    "collection_errors": 0,
    "exit": 1,
-   "seconds": 3.0,
-   "pytest_summary": "114 failed, 273 passed, 5 skipped, 5 warnings in 2.31s",
+   "seconds": 2.9,
+   "pytest_summary": "114 failed, 273 passed, 5 skipped, 5 warnings in 2.18s",
    "junit": true
   },
   {
@@ -97,8 +97,8 @@
    "skipped": 5,
    "collection_errors": 0,
    "exit": 1,
-   "seconds": 3.0,
-   "pytest_summary": "117 failed, 273 passed, 5 skipped, 5 warnings in 2.20s",
+   "seconds": 2.9,
+   "pytest_summary": "117 failed, 273 passed, 5 skipped, 5 warnings in 2.19s",
    "junit": true
   },
   {
@@ -110,8 +110,8 @@
    "skipped": 5,
    "collection_errors": 0,
    "exit": 1,
-   "seconds": 3.0,
-   "pytest_summary": "114 failed, 273 passed, 5 skipped, 5 warnings in 2.29s",
+   "seconds": 2.9,
+   "pytest_summary": "114 failed, 273 passed, 5 skipped, 5 warnings in 2.13s",
    "junit": true
   },
   {
@@ -124,7 +124,7 @@
    "collection_errors": 0,
    "exit": 1,
    "seconds": 3.0,
-   "pytest_summary": "117 failed, 273 passed, 5 skipped, 5 warnings in 2.25s",
+   "pytest_summary": "117 failed, 273 passed, 5 skipped, 5 warnings in 2.26s",
    "junit": true
   },
   {
@@ -136,8 +136,8 @@
    "skipped": 5,
    "collection_errors": 0,
    "exit": 1,
-   "seconds": 3.1,
-   "pytest_summary": "114 failed, 273 passed, 5 skipped, 5 warnings in 2.42s",
+   "seconds": 2.8,
+   "pytest_summary": "114 failed, 273 passed, 5 skipped, 5 warnings in 2.14s",
    "junit": true
   },
   {
@@ -149,8 +149,8 @@
    "skipped": 5,
    "collection_errors": 0,
    "exit": 1,
-   "seconds": 3.3,
-   "pytest_summary": "117 failed, 273 passed, 5 skipped, 5 warnings in 2.44s",
+   "seconds": 77.4,
+   "pytest_summary": "117 failed, 273 passed, 5 skipped, 5 warnings in 8.21s",
    "junit": true
   }
  ],
@@ -190,7 +190,7 @@
     "changed_lines_covered": 4
    }
   ],
-  "seconds": 5.6,
+  "seconds": 5.9,
   "exit": 1,
   "log": "coverage-pytest.log"
  },
@@ -207,8 +207,8 @@
   "notes": [
    "Setup check: GitHub token: present.",
    "Setup check: Nebius token: present.",
-   "Setup check: free memory 6.5 GB (of 15.6 GB).",
-   "Setup check: free disk 92.8 GB.",
+   "Setup check: free memory 10.6 GB (of 15.6 GB).",
+   "Setup check: free disk 92.0 GB.",
    "Demo helper: git is installed.",
    "Demo helper: python3 is installed.",
    "Demo helper: uv is installed.",
@@ -218,15 +218,16 @@
    "Query: invoke python install requirements https://pypi.org/project/invoke/ https://github.com/pyinvoke/invoke site:pypi.org",
    "Source: invoke-common-tasks \u00b7 PyPI \u2014 https://pypi.org/project/invoke-common-tasks/",
    "Source: invoke \u00b7 PyPI \u2014 https://pypi.org/project/invoke/",
+   "Source: invoke/invoke/program.py at main \u00b7 pyinvoke/invoke \u00b7 GitHub \u2014 https://github.com/pyinvoke/invoke/blob/master/invoke/program.py",
    "Source: invoke/invoke/runners.py at main \u00b7 pyinvoke/invoke \u00b7 GitHub \u2014 https://github.com/pyinvoke/invoke/blob/master/invoke/runners.py",
-   "Source: Dealing with virtual environments \u00b7 Issue #838 \u00b7 pyinvoke/invoke \u00b7 GitHub \u2014 https://github.com/pyinvoke/invoke/issues/838",
-   "Source: Support `python -m invoke` \u00b7 Issue #444 \u00b7 pyinvoke/invoke \u00b7 GitHub \u2014 https://github.com/pyinvoke/invoke/issues/444",
+   "Source: ImportError: cannot import name yaml2 \u00b7 Issue #319 \u00b7 pyinvoke/invoke \u00b7 GitHub \u2014 https://github.com/pyinvoke/invoke/issues/319",
    "Source: Invoke 0.13 breaks on Windows (unavailable default shell) \u00b7 Issue #371 \u00b7 pyinvoke/invoke \u00b7 GitHub \u2014 https://github.com/pyinvoke/invoke/issues/371",
+   "Source: Dealing with virtual environments \u00b7 Issue #838 \u00b7 pyinvoke/invoke \u00b7 GitHub \u2014 https://github.com/pyinvoke/invoke/issues/838",
    "Setup plan: the same packages on main and pr.",
    "Setup plan: Python 3.12: Python 3.12 already meets >=3.9",
    "Installed icecream 2.2.0 from project (named by the error and listed in the project) on main and pr.",
-   "Before rerun: needs_attention: needs attention: flagged claim(s) C1; no tests ran (tests produced no results on both sides (collection failed; see pytest logs))",
-   "After rerun: needs_attention: 3 new test(s) fail on the PR; 387 test(s) ran on main, 390 on the PR; 0 new test(s) pass, 278 unchanged (5 of them skipped on both sides); 114 test failure(s) pre-existing and identical on both sides; probe: 2 observation(s) need attention: c1.err does not differ although the claim says it does (C1); c1.out does not differ although the claim says it does (C1); probe model-probe1 has no measured line coverage (no coverage data); it does not count as covering the change; Limitation: tests/runners.py::Runner_::hide::explicit_None_overrides_config[True], tests/runners.py::Runner_::hide::explicit_None_overrides_config[out], tests/runners.py::Runner_::hide::explicit_None_overrides_config[err], tests/runners.py::Runner_::warn::honors_config, tests/runners.py::Runner_::warn::kwarg_beats_config, tests/runners.py::Runner_::warn::does_not_apply_to_watcher_errors, tests/runners.py::Runner_::warn::does_not_apply_to_timeout_errors, tests/runners.py::Runner_::hide::honors_config (+109 more) did not run on the base. They are not a new pass, and this result does not cover them."
+   "Before rerun: could_not_verify: tests produced no results on both sides (collection failed; see pytest logs); probe model-p1 is uninformative (uninformative: every observation is probe-broken (the same exception or skip value on both sides)); its matching results do not count",
+   "After rerun: needs_attention: 3 new test(s) fail on the PR; 387 test(s) ran on main, 390 on the PR; 0 new test(s) pass, 278 unchanged (5 of them skipped on both sides); 114 test failure(s) pre-existing and identical on both sides; probe model-p1 is uninformative (uninformative: every observation is probe-broken (the same exception or skip value on both sides)); its matching results do not count; Limitation: tests/runners.py::Runner_::hide::explicit_None_overrides_config[True], tests/runners.py::Runner_::hide::explicit_None_overrides_config[out], tests/runners.py::Runner_::hide::explicit_None_overrides_config[err], tests/runners.py::Runner_::warn::honors_config, tests/runners.py::Runner_::warn::kwarg_beats_config, tests/runners.py::Runner_::warn::does_not_apply_to_watcher_errors, tests/runners.py::Runner_::warn::does_not_apply_to_timeout_errors, tests/runners.py::Runner_::hide::honors_config (+109 more) did not run on the base. They are not a new pass, and this result does not cover them."
   ],
   "install_docs": [
    "README.rst",
@@ -282,13 +283,13 @@
    "rounds": [
     {
      "round": 1,
-     "verdict": "needs_attention",
-     "reason": "needs attention: flagged claim(s) C1; no tests ran (tests produced no results on both sides (collection failed; see pytest logs))"
+     "verdict": "could_not_verify",
+     "reason": "tests produced no results on both sides (collection failed; see pytest logs); probe model-p1 is uninformative (uninformative: every observation is probe-broken (the same exception or skip value on both sides)); its matching results do not count"
     },
     {
      "round": 2,
      "verdict": "needs_attention",
-     "reason": "3 new test(s) fail on the PR; 387 test(s) ran on main, 390 on the PR; 0 new test(s) pass, 278 unchanged (5 of them skipped on both sides); 114 test failure(s) pre-existing and identical on both sides; probe: 2 observation(s) need attention: c1.err does not differ although the claim says it does (C1); c1.out does not differ although the claim says it does (C1); probe model-probe1 has no measured line coverage (no coverage data); it does not count as covering the change; Limitation: tests/runners.py::Runner_::hide::explicit_None_overrides_config[True], tests/runners.py::Runner_::hide::explicit_None_overrides_config[out], tests/runners.py::Runner_::hide::explicit_None_overrides_config[err], tests/runners.py::Runner_::warn::honors_config, tests/runners.py::Runner_::warn::kwarg_beats_config, tests/runners.py::Runner_::warn::does_not_apply_to_watcher_errors, tests/runners.py::Runner_::warn::does_not_apply_to_timeout_errors, tests/runners.py::Runner_::hide::honors_config (+109 more) did not run on the base. They are not a new pass, and this result does not cover them."
+     "reason": "3 new test(s) fail on the PR; 387 test(s) ran on main, 390 on the PR; 0 new test(s) pass, 278 unchanged (5 of them skipped on both sides); 114 test failure(s) pre-existing and identical on both sides; probe model-p1 is uninformative (uninformative: every observation is probe-broken (the same exception or skip value on both sides)); its matching results do not count; Limitation: tests/runners.py::Runner_::hide::explicit_None_overrides_config[True], tests/runners.py::Runner_::hide::explicit_None_overrides_config[out], tests/runners.py::Runner_::hide::explicit_None_overrides_config[err], tests/runners.py::Runner_::warn::honors_config, tests/runners.py::Runner_::warn::kwarg_beats_config, tests/runners.py::Runner_::warn::does_not_apply_to_watcher_errors, tests/runners.py::Runner_::warn::does_not_apply_to_timeout_errors, tests/runners.py::Runner_::hide::honors_config (+109 more) did not run on the base. They are not a new pass, and this result does not cover them."
     }
    ],
    "installed": [
@@ -332,26 +333,59 @@
   "model_claims": [
    {
     "id": "C1",
-    "text": "When hide is explicitly set to None, it overrides any configured output hiding and causes both stdout and stderr to be printed.",
+    "text": "Explicit hide=None should override configured output hiding.",
     "source_quote": "Let explicit hide=None override configured output hiding",
     "testable": true,
     "expect": "differs"
    },
    {
     "id": "C2",
-    "text": "For hide values other than None, the existing fallback to configured output hiding is retained.",
-    "source_quote": "while retaining the existing fallback for other options.",
+    "text": "Explicit hide=None currently falls back to configured output hiding, despite being documented to print both streams.",
+    "source_quote": "Explicit `hide=None` currently falls back to configured output hiding, despite being documented to print both streams.",
+    "testable": true,
+    "expect": "same"
+   },
+   {
+    "id": "C3",
+    "text": "Preserve None as an explicit value for hide, while retaining the existing fallback for other options.",
+    "source_quote": "Preserve `None` as an explicit value for `hide`, while retaining the existing fallback for other options.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C4",
+    "text": "All three regression cases fail before the fix; a real subprocess now displays its output.",
+    "source_quote": "Verified: all three regression cases fail before the fix; a real subprocess now displays its output.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C5",
+    "text": "Running pytest -q --capture=no in a terminal passes with 976 passed and 11 skipped.",
+    "source_quote": "`pytest -q --capture=no` in a terminal passes with 976 passed and 11 skipped.",
+    "testable": true,
+    "expect": "same"
+   },
+   {
+    "id": "C6",
+    "text": "Inv typecheck, scoped Flake8, and Black checks pass.",
+    "source_quote": "`inv typecheck`, scoped Flake8, and Black checks pass.",
     "testable": true,
     "expect": "same"
    }
   ],
   "model_rejected_claims": [],
+  "model_retried": {
+   "why": [
+    "empty probe: the code has no test statements (only imports, comments or a docstring)"
+   ]
+  },
   "diff_targets": [],
   "frozen": [
    {
-    "path": "model-probes/model-probe1.py",
+    "path": "model-probes/model-p1.py",
     "source": "model",
-    "sha256": "a0ea7738cddf2ad29b8a1a331470358157ac288c8a0afc9a2b64fe645e8741f8",
+    "sha256": "fa8efca9adcbfa869f10aa4ca30d8c46f8734ecf8ce6488946b87016750bee3d",
     "generator": {
      "kind": "model",
      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
@@ -360,7 +394,7 @@
      "provenance": "live",
      "blind": true
     },
-    "frozen_at": "2026-11-09T06:21:14.812380+00:00",
+    "frozen_at": "2026-11-09T07:34:32.310323+00:00",
     "inputs_sha256": "0630b8e2ef6779f5c0fed46fefad043c82de3a6d2350822f0dade08afd015bb9",
     "inputs": {
      "title_chars": 56,
@@ -375,7 +409,7 @@
  "test_extras": [
   "pytest-relaxed>=2"
  ],
- "pr_side_started_at": "2026-11-09T06:21:14.976795+00:00",
+ "pr_side_started_at": "2026-11-09T07:34:32.455458+00:00",
  "test_targets": {
   "main": [
    "tests/runners.py",
@@ -743,35 +777,52 @@
   "environment_limits": []
  },
  "probes": {
-  "status": "ran",
+  "status": "uninformative",
   "items": [
    {
-    "id": "model-probe1",
+    "id": "model-p1",
     "source": "model",
-    "path": "model-probes/model-probe1.py",
-    "sha256": "a0ea7738cddf2ad29b8a1a331470358157ac288c8a0afc9a2b64fe645e8741f8",
+    "path": "model-probes/model-p1.py",
+    "sha256": "fa8efca9adcbfa869f10aa4ca30d8c46f8734ecf8ce6488946b87016750bee3d",
     "target": "pyinvoke/invoke#1101",
-    "about": "Tests the behavior of the hide parameter in invoke.runners.Local.run",
+    "about": "Probe for claims C1, C2, C3, C4",
     "claims": [
      {
       "id": "C1",
       "source": "PR description",
-      "text": "When hide is explicitly set to None, it overrides any configured output hiding and causes both stdout and stderr to be printed.",
+      "text": "Explicit hide=None should override configured output hiding.",
       "covers": [
-       "c1.out",
-       "c1.err"
+       "c1.hide_value"
       ],
       "expect": "differs"
      },
      {
       "id": "C2",
       "source": "PR description",
-      "text": "For hide values other than None, the existing fallback to configured output hiding is retained.",
+      "text": "Explicit hide=None currently falls back to configured output hiding, despite being documented to print both streams.",
       "covers": [
-       "c2.out",
-       "c2.err"
+       "c2.fallback_indicator"
       ],
       "expect": "same"
+     },
+     {
+      "id": "C3",
+      "source": "PR description",
+      "text": "Preserve None as an explicit value for hide, while retaining the existing fallback for other options.",
+      "covers": [
+       "c3.hide_none",
+       "c3.hide_default"
+      ],
+      "expect": "differs"
+     },
+     {
+      "id": "C4",
+      "source": "PR description",
+      "text": "All three regression cases fail before the fix; a real subprocess now displays its output.",
+      "covers": [
+       "c4.output_displayed"
+      ],
+      "expect": "differs"
      }
     ],
     "runs_per_side": 3,
@@ -815,136 +866,167 @@
     ],
     "outputs": {
      "main": [
-      "probe-model-probe1-main-1.jsonl",
-      "probe-model-probe1-main-2.jsonl",
-      "probe-model-probe1-main-3.jsonl"
+      "probe-model-p1-main-1.jsonl",
+      "probe-model-p1-main-2.jsonl",
+      "probe-model-p1-main-3.jsonl"
      ],
      "pr": [
-      "probe-model-probe1-pr-1.jsonl",
-      "probe-model-probe1-pr-2.jsonl",
-      "probe-model-probe1-pr-3.jsonl"
+      "probe-model-p1-pr-1.jsonl",
+      "probe-model-p1-pr-2.jsonl",
+      "probe-model-p1-pr-3.jsonl"
      ]
     },
     "runs": {
      "main": [
       {
-       "c1.out": "<AttributeError>",
-       "c1.err": "",
-       "c2.out": "<AttributeError>",
-       "c2.err": ""
+       "c1.hide_value": "AttributeError",
+       "c2.fallback_indicator": "AttributeError",
+       "c3.hide_none": "AttributeError",
+       "c4.output_displayed": "AttributeError",
+       "c3.hide_default": "AttributeError"
       },
       {
-       "c1.out": "<AttributeError>",
-       "c1.err": "",
-       "c2.out": "<AttributeError>",
-       "c2.err": ""
+       "c1.hide_value": "AttributeError",
+       "c2.fallback_indicator": "AttributeError",
+       "c3.hide_none": "AttributeError",
+       "c4.output_displayed": "AttributeError",
+       "c3.hide_default": "AttributeError"
       },
       {
-       "c1.out": "<AttributeError>",
-       "c1.err": "",
-       "c2.out": "<AttributeError>",
-       "c2.err": ""
+       "c1.hide_value": "AttributeError",
+       "c2.fallback_indicator": "AttributeError",
+       "c3.hide_none": "AttributeError",
+       "c4.output_displayed": "AttributeError",
+       "c3.hide_default": "AttributeError"
       }
      ],
      "pr": [
       {
-       "c1.out": "<AttributeError>",
-       "c1.err": "",
-       "c2.out": "<AttributeError>",
-       "c2.err": ""
+       "c1.hide_value": "AttributeError",
+       "c2.fallback_indicator": "AttributeError",
+       "c3.hide_none": "AttributeError",
+       "c4.output_displayed": "AttributeError",
+       "c3.hide_default": "AttributeError"
       },
       {
-       "c1.out": "<AttributeError>",
-       "c1.err": "",
-       "c2.out": "<AttributeError>",
-       "c2.err": ""
+       "c1.hide_value": "AttributeError",
+       "c2.fallback_indicator": "AttributeError",
+       "c3.hide_none": "AttributeError",
+       "c4.output_displayed": "AttributeError",
+       "c3.hide_default": "AttributeError"
       },
       {
-       "c1.out": "<AttributeError>",
-       "c1.err": "",
-       "c2.out": "<AttributeError>",
-       "c2.err": ""
+       "c1.hide_value": "AttributeError",
+       "c2.fallback_indicator": "AttributeError",
+       "c3.hide_none": "AttributeError",
+       "c4.output_displayed": "AttributeError",
+       "c3.hide_default": "AttributeError"
       }
      ]
     },
     "observations": [
      {
-      "name": "c1.err",
+      "name": "c1.hide_value",
       "state": "same",
-      "label": "needs_human",
+      "label": "not_testable",
       "claim": "C1",
-      "main": "",
-      "pr": "",
+      "main": "AttributeError",
+      "pr": "AttributeError",
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
       "citations": {
        "main": {
-        "file": "probe-model-probe1-main-1.jsonl",
+        "file": "probe-model-p1-main-1.jsonl",
         "line": 1,
-        "quote": "\"observation\": \"c1.err\""
+        "quote": "\"observation\": \"c1.hide_value\""
        },
        "pr": {
-        "file": "probe-model-probe1-pr-1.jsonl",
+        "file": "probe-model-p1-pr-1.jsonl",
         "line": 1,
-        "quote": "\"observation\": \"c1.err\""
+        "quote": "\"observation\": \"c1.hide_value\""
        }
       }
      },
      {
-      "name": "c1.out",
+      "name": "c2.fallback_indicator",
       "state": "same",
-      "label": "needs_human",
-      "claim": "C1",
-      "main": "<AttributeError>",
-      "pr": "<AttributeError>",
-      "citations": {
-       "main": {
-        "file": "probe-model-probe1-main-1.jsonl",
-        "line": 2,
-        "quote": "\"observation\": \"c1.out\""
-       },
-       "pr": {
-        "file": "probe-model-probe1-pr-1.jsonl",
-        "line": 2,
-        "quote": "\"observation\": \"c1.out\""
-       }
-      }
-     },
-     {
-      "name": "c2.err",
-      "state": "same",
-      "label": "proven",
+      "label": "not_testable",
       "claim": "C2",
-      "main": "",
-      "pr": "",
+      "main": "AttributeError",
+      "pr": "AttributeError",
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
       "citations": {
        "main": {
-        "file": "probe-model-probe1-main-1.jsonl",
-        "line": 3,
-        "quote": "\"observation\": \"c2.err\""
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c2.fallback_indicator\""
        },
        "pr": {
-        "file": "probe-model-probe1-pr-1.jsonl",
-        "line": 3,
-        "quote": "\"observation\": \"c2.err\""
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c2.fallback_indicator\""
        }
       }
      },
      {
-      "name": "c2.out",
+      "name": "c3.hide_default",
       "state": "same",
-      "label": "proven",
-      "claim": "C2",
-      "main": "<AttributeError>",
-      "pr": "<AttributeError>",
+      "label": "not_testable",
+      "claim": "C3",
+      "main": "AttributeError",
+      "pr": "AttributeError",
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
       "citations": {
        "main": {
-        "file": "probe-model-probe1-main-1.jsonl",
-        "line": 4,
-        "quote": "\"observation\": \"c2.out\""
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"c3.hide_default\""
        },
        "pr": {
-        "file": "probe-model-probe1-pr-1.jsonl",
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"c3.hide_default\""
+       }
+      }
+     },
+     {
+      "name": "c3.hide_none",
+      "state": "same",
+      "label": "not_testable",
+      "claim": "C3",
+      "main": "AttributeError",
+      "pr": "AttributeError",
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
         "line": 4,
-        "quote": "\"observation\": \"c2.out\""
+        "quote": "\"observation\": \"c3.hide_none\""
+       },
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"c3.hide_none\""
+       }
+      }
+     },
+     {
+      "name": "c4.output_displayed",
+      "state": "same",
+      "label": "not_testable",
+      "claim": "C4",
+      "main": "AttributeError",
+      "pr": "AttributeError",
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"c4.output_displayed\""
+       },
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"c4.output_displayed\""
        }
       }
      }
@@ -958,7 +1040,7 @@
      "blind": true
     },
     "freeze": {
-     "sha256": "a0ea7738cddf2ad29b8a1a331470358157ac288c8a0afc9a2b64fe645e8741f8",
+     "sha256": "fa8efca9adcbfa869f10aa4ca30d8c46f8734ecf8ce6488946b87016750bee3d",
      "generator": {
       "kind": "model",
       "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
@@ -967,7 +1049,7 @@
       "provenance": "live",
       "blind": true
      },
-     "frozen_at": "2026-11-09T06:21:14.812380+00:00",
+     "frozen_at": "2026-11-09T07:34:32.310323+00:00",
      "inputs_sha256": "0630b8e2ef6779f5c0fed46fefad043c82de3a6d2350822f0dade08afd015bb9",
      "inputs": {
       "title_chars": 56,
@@ -977,36 +1059,23 @@
       }
      },
      "verified": true,
-     "pr_started_at": "2026-11-09T06:21:14.976795+00:00"
+     "pr_started_at": "2026-11-09T07:34:32.455458+00:00"
     },
-    "status": "ran"
+    "status": "uninformative",
+    "uninformative_reason": "uninformative: every observation is probe-broken (the same exception or skip value on both sides)",
+    "probe_changed_line_coverage": {
+     "status": "not measured",
+     "why": "uninformative: every observation is probe-broken (the same exception or skip value on both sides); not counted as ran or adequate",
+     "adequacy": "not_adequate",
+     "note": "uninformative: every observation is probe-broken (the same exception or skip value on both sides); not counted as ran or adequate"
+    }
    }
   ],
   "summary": {
-   "labels": [
-    "needs_human",
-    "needs_human",
-    "proven",
-    "proven"
-   ],
-   "flagged": [
-    {
-     "probe": "model-probe1",
-     "name": "c1.err",
-     "label": "needs_human",
-     "claim": "C1"
-    },
-    {
-     "probe": "model-probe1",
-     "name": "c1.out",
-     "label": "needs_human",
-     "claim": "C1"
-    }
-   ],
-   "proven_claims": [
-    "C2"
-   ],
-   "reason": "probe: 2 observation(s) need attention: c1.err does not differ although the claim says it does (C1); c1.out does not differ although the claim says it does (C1); probe: claim(s) C2 proven",
+   "labels": [],
+   "flagged": [],
+   "proven_claims": [],
+   "reason": "uninformative: every observation is probe-broken (the same exception or skip value on both sides)",
    "ignored_noise": [],
    "ignored_warning_only": [],
    "pr_only_noisy": [],
@@ -1019,17 +1088,19 @@
   "status": "not measured",
   "side": "main",
   "probes": {
-   "model-probe1": {
-    "status": null,
+   "model-p1": {
+    "status": "not measured",
     "changed_lines_covered": null,
     "changed_lines_total": null,
-    "adequacy": null
+    "adequacy": "not_adequate"
    }
   },
-  "not_adequate": []
+  "not_adequate": [
+   "model-p1"
+  ]
  },
  "verdict": "needs_attention",
- "reason": "3 new test(s) fail on the PR; 387 test(s) ran on main, 390 on the PR; 0 new test(s) pass, 278 unchanged (5 of them skipped on both sides); 114 test failure(s) pre-existing and identical on both sides; probe: 2 observation(s) need attention: c1.err does not differ although the claim says it does (C1); c1.out does not differ although the claim says it does (C1); probe model-probe1 has no measured line coverage (no coverage data); it does not count as covering the change; Limitation: tests/runners.py::Runner_::hide::explicit_None_overrides_config[True], tests/runners.py::Runner_::hide::explicit_None_overrides_config[out], tests/runners.py::Runner_::hide::explicit_None_overrides_config[err], tests/runners.py::Runner_::warn::honors_config, tests/runners.py::Runner_::warn::kwarg_beats_config, tests/runners.py::Runner_::warn::does_not_apply_to_watcher_errors, tests/runners.py::Runner_::warn::does_not_apply_to_timeout_errors, tests/runners.py::Runner_::hide::honors_config (+109 more) did not run on the base. They are not a new pass, and this result does not cover them.",
+ "reason": "3 new test(s) fail on the PR; 387 test(s) ran on main, 390 on the PR; 0 new test(s) pass, 278 unchanged (5 of them skipped on both sides); 114 test failure(s) pre-existing and identical on both sides; probe model-p1 is uninformative (uninformative: every observation is probe-broken (the same exception or skip value on both sides)); its matching results do not count; Limitation: tests/runners.py::Runner_::hide::explicit_None_overrides_config[True], tests/runners.py::Runner_::hide::explicit_None_overrides_config[out], tests/runners.py::Runner_::hide::explicit_None_overrides_config[err], tests/runners.py::Runner_::warn::honors_config, tests/runners.py::Runner_::warn::kwarg_beats_config, tests/runners.py::Runner_::warn::does_not_apply_to_watcher_errors, tests/runners.py::Runner_::warn::does_not_apply_to_timeout_errors, tests/runners.py::Runner_::hide::honors_config (+109 more) did not run on the base. They are not a new pass, and this result does not cover them.",
  "cross_run_collected_files": [
   "tests/runners.py"
  ],
@@ -2328,7 +2399,7 @@
  },
  "collection_limitation": "Limitation: tests/runners.py::Runner_::hide::explicit_None_overrides_config[True], tests/runners.py::Runner_::hide::explicit_None_overrides_config[out], tests/runners.py::Runner_::hide::explicit_None_overrides_config[err], tests/runners.py::Runner_::warn::honors_config, tests/runners.py::Runner_::warn::kwarg_beats_config, tests/runners.py::Runner_::warn::does_not_apply_to_watcher_errors, tests/runners.py::Runner_::warn::does_not_apply_to_timeout_errors, tests/runners.py::Runner_::hide::honors_config (+109 more) did not run on the base. They are not a new pass, and this result does not cover them.",
  "verdict_before_coverage_gate": "needs_attention",
- "reason_before_coverage_gate": "3 new test(s) fail on the PR; 387 test(s) ran on main, 390 on the PR; 0 new test(s) pass, 278 unchanged (5 of them skipped on both sides); 114 test failure(s) pre-existing and identical on both sides; probe: 2 observation(s) need attention: c1.err does not differ although the claim says it does (C1); c1.out does not differ although the claim says it does (C1); probe model-probe1 has no measured line coverage (no coverage data); it does not count as covering the change; Limitation: tests/runners.py::Runner_::hide::explicit_None_overrides_config[True], tests/runners.py::Runner_::hide::explicit_None_overrides_config[out], tests/runners.py::Runner_::hide::explicit_None_overrides_config[err], tests/runners.py::Runner_::warn::honors_config, tests/runners.py::Runner_::warn::kwarg_beats_config, tests/runners.py::Runner_::warn::does_not_apply_to_watcher_errors, tests/runners.py::Runner_::warn::does_not_apply_to_timeout_errors, tests/runners.py::Runner_::hide::honors_config (+109 more) did not run on the base. They are not a new pass, and this result does not cover them.",
+ "reason_before_coverage_gate": "3 new test(s) fail on the PR; 387 test(s) ran on main, 390 on the PR; 0 new test(s) pass, 278 unchanged (5 of them skipped on both sides); 114 test failure(s) pre-existing and identical on both sides; probe model-p1 is uninformative (uninformative: every observation is probe-broken (the same exception or skip value on both sides)); its matching results do not count; Limitation: tests/runners.py::Runner_::hide::explicit_None_overrides_config[True], tests/runners.py::Runner_::hide::explicit_None_overrides_config[out], tests/runners.py::Runner_::hide::explicit_None_overrides_config[err], tests/runners.py::Runner_::warn::honors_config, tests/runners.py::Runner_::warn::kwarg_beats_config, tests/runners.py::Runner_::warn::does_not_apply_to_watcher_errors, tests/runners.py::Runner_::warn::does_not_apply_to_timeout_errors, tests/runners.py::Runner_::hide::honors_config (+109 more) did not run on the base. They are not a new pass, and this result does not cover them.",
  "changed_lines_total": 4,
  "changed_lines_covered": 4,
  "coverage_gate": {
@@ -2362,28 +2433,28 @@
   ]
  },
  "duration_s": {
-  "total_wall": 228.1,
-  "tests": 18.4
+  "total_wall": 405.3,
+  "tests": 91.9
  },
  "cost": {
-  "ai_calls": 2,
+  "ai_calls": 3,
   "failed_ai_calls": 0,
-  "input_tokens": 14044,
-  "output_tokens": 17479,
-  "thinking_tokens": 16566,
-  "cost_usd": 0.019944,
+  "input_tokens": 28677,
+  "output_tokens": 34500,
+  "thinking_tokens": 33371,
+  "cost_usd": 0.039653,
   "calls_without_usage": 0,
-  "ai_cost_usd": 0.019944,
+  "ai_cost_usd": 0.039653,
   "cost_complete": true,
   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
   "compute_seconds": {
-   "total_wall": 228.1,
-   "tests": 18.4
+   "total_wall": 405.3,
+   "tests": 91.9
   },
   "machine_usd_per_hour": 0.24,
   "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
-  "computer_cost_usd": 0.015207,
-  "total_cost_usd": 0.035151,
+  "computer_cost_usd": 0.02702,
+  "total_cost_usd": 0.066673,
   "swarm": {
    "ai_calls": 0,
    "failed_ai_calls": 0,
