@@ -1,0 +1,2249 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-Delgan-loguru-1536-b55cf382e1ee-2026-11-08",
+ "date_ist": "2026-11-09 11:34 IST",
+ "run_date": "2026-11-08",
+ "who": "ops/daily_run.py",
+ "repo": "Delgan/loguru",
+ "library": "loguru",
+ "pr": {
+  "repo": "Delgan/loguru",
+  "number": 1536,
+  "url": "https://github.com/Delgan/loguru/pull/1536",
+  "title": "Count bytes, not characters, in size-based rotation",
+  "base_sha": "874aa41019f8a9f943647a0c74445fb7844157da",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "b55cf382e1ee07e4e3b98e6d51e23ade70583505",
+  "merge_commit": null,
+  "tested_main_sha": "874aa41019f8a9f943647a0c74445fb7844157da",
+  "tested_main_sha_label": "caller-supplied base (an ancestor of the PR head; a newer target tip was not used)"
+ },
+ "author": "hamarshehmhmd",
+ "base_ref": "master",
+ "updated_at_utc": "2026-11-02T20:49:46Z",
+ "updated_at_ist": "2026-11-03 02:19 IST",
+ "ci_state": "passing",
+ "ci_detail": "22 check runs completed without failure",
+ "tested_at_ist": "2026-11-09 11:34 IST",
+ "files": {
+  "all": [
+   "CHANGELOG.rst",
+   "loguru/_file_sink.py",
+   "tests/test_filesink_rotation.py"
+  ],
+  "package_py": [
+   "loguru/_file_sink.py"
+  ],
+  "compiled": [],
+  "other": [
+   "CHANGELOG.rst",
+   "tests/test_filesink_rotation.py"
+  ]
+ },
+ "machine_type": {
+  "arch": "x86_64",
+  "os": "Linux",
+  "platform": "Linux-6.12.94+-x86_64-with-glibc2.41",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": "g++ (Debian 14.2.0-19) 14.2.0",
+  "cpu_model": "Intel(R) Xeon(R) Processor",
+  "ram_gb": 15.6
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 3,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.15",
+ "test_selection": "mapped from touched files: tests/test_filesink_rotation.py",
+ "per_run": [
+  {
+   "side": "old",
+   "run": 1,
+   "passed": 150,
+   "failed": 0,
+   "error": 0,
+   "skipped": 3,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 27.4,
+   "pytest_summary": "150 passed, 3 skipped in 26.36s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 1,
+   "passed": 155,
+   "failed": 0,
+   "error": 0,
+   "skipped": 3,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 17.3,
+   "pytest_summary": "155 passed, 3 skipped in 16.35s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 2,
+   "passed": 150,
+   "failed": 0,
+   "error": 0,
+   "skipped": 3,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 27.3,
+   "pytest_summary": "150 passed, 3 skipped in 26.36s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 2,
+   "passed": 155,
+   "failed": 0,
+   "error": 0,
+   "skipped": 3,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 17.3,
+   "pytest_summary": "155 passed, 3 skipped in 16.34s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 3,
+   "passed": 150,
+   "failed": 0,
+   "error": 0,
+   "skipped": 3,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 27.2,
+   "pytest_summary": "150 passed, 3 skipped in 26.31s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 3,
+   "passed": 155,
+   "failed": 0,
+   "error": 0,
+   "skipped": 3,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 17.3,
+   "pytest_summary": "155 passed, 3 skipped in 16.39s",
+   "junit": true
+  }
+ ],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "local",
+ "sandbox_backend_note": "local bubblewrap",
+ "machine": "local",
+ "tool_setup": {
+  "installed": [],
+  "tries": 0,
+  "note": "All required tools were already installed.",
+  "refused": []
+ },
+ "posted_upstream": false,
+ "logs": "loguru-1536/",
+ "freeze": {
+  "main": "freeze-main.txt",
+  "pr": "freeze-pr.txt"
+ },
+ "coverage": {
+  "status": "measured",
+  "changed_lines_total": 14,
+  "changed_lines_covered": 14,
+  "files": [
+   {
+    "file": "loguru/_file_sink.py",
+    "changed_lines_total": 14,
+    "changed_lines_covered": 14
+   }
+  ],
+  "seconds": 17.8,
+  "exit": 0,
+  "log": "coverage-pytest.log"
+ },
+ "poc_commit": "ef12096677e9cf59e8673436d74ec65d53771d7c",
+ "route": "source-pair",
+ "current_head_sha": "b55cf382e1ee07e4e3b98e6d51e23ade70583505",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": "[redacted]",
+  "notes": [
+   "Setup check: GitHub token: present.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory 6.1 GB (of 15.6 GB).",
+   "Setup check: free disk 92.9 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: [redacted] results",
+   "Query: loguru python setup install instructions https://github.com/Delgan/loguru site:github.com/Delgan/loguru",
+   "Query: loguru python documentation install https://github.com/Delgan/loguru site:github.com/Delgan/loguru",
+   "Query: loguru python install requirements https://pypi.org/project/loguru/ https://github.com/Delgan/loguru site:pypi.org",
+   "Source: loguru/pyproject.toml at master \u00b7 Delgan/loguru \u00b7 GitHub \u2014 https://github.com/Delgan/loguru/blob/master/pyproject.toml",
+   "Source: loguru-logging-intercept \u00b7 PyPI \u2014 https://pypi.org/project/loguru-logging-intercept/",
+   "Source: pytest-loguru \u00b7 PyPI \u2014 https://pypi.org/project/pytest-loguru/",
+   "Source: loguru-discord \u00b7 PyPI \u2014 https://pypi.org/project/loguru-discord/",
+   "Source: loguru/CONTRIBUTING.rst at master \u00b7 Delgan/loguru \u00b7 GitHub \u2014 https://github.com/Delgan/loguru/blob/master/CONTRIBUTING.rst",
+   "Source: GitHub - Delgan/loguru: Python logging made (stupidly) simple \u00b7 GitHub \u2014 https://github.com/delgan/loguru",
+   "Source: Can\u2018t Import loguru \u00b7 Issue #116 \u00b7 Delgan/loguru \u00b7 GitHub \u2014 https://github.com/Delgan/loguru/issues/116",
+   "Source: Suggestion/request: Documentation/tutorial for beginners \u00b7 Issue #71 \u00b7 Delgan/loguru \u00b7 GitHub \u2014 https://github.com/Delgan/loguru/issues/71",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: colorama is noted, installed with the project.",
+   "Setup plan: aiocontextvars is noted, installed with the project.",
+   "Setup plan: win32-setctime is noted, installed with the project.",
+   "Setup plan: install pre-commit==4.6.0 ; python_version>='3.11' (listed in the dev extra) on main and pr.",
+   "Setup plan: install tox==3.27.1 ; python_version<'3.8' (listed in the dev extra) on main and pr.",
+   "Setup plan: install pytest==6.1.2 ; python_version<'3.8' (listed in the dev extra) on main and pr.",
+   "Setup plan: install pytest-cov==2.12.1 ; python_version<'3.8' (listed in the dev extra) on main and pr.",
+   "Setup plan: install pytest-mypy-plugins==4.0.3 ; python_version>='3.12' and platform_python_implementation!='PyPy' (listed in the dev extra) on main and pr.",
+   "Setup plan: install freezegun==1.1.0 ; python_version<'3.8' (listed in the dev extra) on main and pr.",
+   "Setup plan: install exceptiongroup==1.1.3 ; python_version>='3.7' and python_version<'3.11' (listed in the dev extra) on main and pr.",
+   "Setup plan: install mypy==v0.910 ; python_version<'3.6' (listed in the dev extra) on main and pr.",
+   "Setup plan: install Sphinx==8.2.1 ; python_version>='3.11' (listed in the dev extra) on main and pr.",
+   "Setup plan: install sphinx-rtd-theme==3.1.0 ; python_version>='3.11' (listed in the dev extra) on main and pr.",
+   "Setup plan: install myst-parser==4.0.0 ; python_version>='3.11' (listed in the dev extra) on main and pr.",
+   "Setup plan: install build==1.6.1 ; python_version>='3.11' (listed in the dev extra) on main and pr.",
+   "Setup plan: install twine==7.0.0 ; python_version>='3.11' (listed in the dev extra) on main and pr.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >=3.5, <4.0,>=3.5",
+   "Installed pre-commit 4.6.0 from pyproject (listed in the dev extra) on main and pr.",
+   "Installed tox 4.64.4 from pyproject (listed in the dev extra) on main and pr.",
+   "Installed pytest 9.1.1 from pyproject (listed in the dev extra) on main and pr.",
+   "Installed pytest-cov 6.2.1 from pyproject (listed in the dev extra) on main and pr.",
+   "Installed pytest-mypy-plugins 4.0.3 from pyproject (listed in the dev extra) on main and pr.",
+   "Installed freezegun 1.5.0 from pyproject (listed in the dev extra) on main and pr.",
+   "Installed exceptiongroup  from pyproject (listed in the dev extra) on main and pr.",
+   "Installed mypy 2.3.1 from pyproject (listed in the dev extra) on main and pr.",
+   "Installed Sphinx 8.2.1 from pyproject (listed in the dev extra) on main and pr.",
+   "Installed sphinx-rtd-theme 3.1.0 from pyproject (listed in the dev extra) on main and pr.",
+   "Installed myst-parser 4.0.0 from pyproject (listed in the dev extra) on main and pr.",
+   "Installed build 1.6.1 from pyproject (listed in the dev extra) on main and pr.",
+   "Installed twine 7.0.0 from pyproject (listed in the dev extra) on main and pr."
+  ],
+  "install_docs": [
+   "README.md",
+   "CONTRIBUTING.rst",
+   "pyproject.toml",
+   "tox.ini",
+   "docs/Makefile",
+   ".github/workflows/lint.yml",
+   ".github/workflows/packaging.yml",
+   ".github/workflows/docs.yml",
+   ".github/workflows/codeql-analysis.yml",
+   ".github/workflows/tests.yml"
+  ],
+  "install_docs_from": "main",
+  "setup_plan": {
+   "packages": [
+    {
+     "requirement": "colorama>=0.3.4 ; sys_platform=='win32'",
+     "name": "colorama",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "aiocontextvars>=0.2.0 ; python_version<'3.7'",
+     "name": "aiocontextvars",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "win32-setctime>=1.0.0 ; sys_platform=='win32'",
+     "name": "win32-setctime",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pre-commit==4.6.0 ; python_version>='3.11'",
+     "name": "pre-commit",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the dev extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "tox==3.27.1 ; python_version<'3.8'",
+     "name": "tox",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the dev extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest==6.1.2 ; python_version<'3.8'",
+     "name": "pytest",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the dev extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest-cov==2.12.1 ; python_version<'3.8'",
+     "name": "pytest-cov",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the dev extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest-mypy-plugins==4.0.3 ; python_version>='3.12' and platform_python_implementation!='PyPy'",
+     "name": "pytest-mypy-plugins",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the dev extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "freezegun==1.1.0 ; python_version<'3.8'",
+     "name": "freezegun",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the dev extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "exceptiongroup==1.1.3 ; python_version>='3.7' and python_version<'3.11'",
+     "name": "exceptiongroup",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the dev extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "mypy==v0.910 ; python_version<'3.6'",
+     "name": "mypy",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the dev extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "Sphinx==8.2.1 ; python_version>='3.11'",
+     "name": "Sphinx",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the dev extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "sphinx-rtd-theme==3.1.0 ; python_version>='3.11'",
+     "name": "sphinx-rtd-theme",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the dev extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "myst-parser==4.0.0 ; python_version>='3.11'",
+     "name": "myst-parser",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the dev extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "build==1.6.1 ; python_version>='3.11'",
+     "name": "build",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the dev extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "twine==7.0.0 ; python_version>='3.11'",
+     "name": "twine",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the dev extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    }
+   ],
+   "scope_blocked": "",
+   "component": null,
+   "aggregate_names": [],
+   "extra_reqs": [
+    "pre-commit==4.6.0 ; python_version>='3.11'",
+    "tox==3.27.1 ; python_version<'3.8'",
+    "pytest==6.1.2 ; python_version<'3.8'",
+    "pytest-cov==2.12.1 ; python_version<'3.8'",
+    "pytest-mypy-plugins==4.0.3 ; python_version>='3.12' and platform_python_implementation!='PyPy'",
+    "freezegun==1.1.0 ; python_version<'3.8'",
+    "exceptiongroup==1.1.3 ; python_version>='3.7' and python_version<'3.11'",
+    "mypy==v0.910 ; python_version<'3.6'",
+    "Sphinx==8.2.1 ; python_version>='3.11'",
+    "sphinx-rtd-theme==3.1.0 ; python_version>='3.11'",
+    "myst-parser==4.0.0 ; python_version>='3.11'",
+    "build==1.6.1 ; python_version>='3.11'",
+    "twine==7.0.0 ; python_version>='3.11'"
+   ],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >=3.5, <4.0,>=3.5"
+   },
+   "system": [],
+   "refused": [],
+   "groups_blocked": ""
+  },
+  "steps": {
+   "setup_lookup": "Found 16 setup item(s) in the project's files and the web lookup.",
+   "setup_python": "Python 3.12: Python 3.12 already meets >=3.5, <4.0,>=3.5",
+   "install_deps": "Wrote requirements.txt and installed it on main and pr: pre-commit==4.6.0 ; python_version>='3.11', tox==3.27.1 ; python_version<'3.8', pytest==6.1.2 ; python_version<'3.8', pytest-cov==2.12.1 ; python_version<'3.8', pytest-mypy-plugins==4.0.3 ; python_version>='3.12' and platform_python_implementation!='PyPy', freezegun==1.1.0 ; python_version<'3.8', exceptiongroup==1.1.3 ; python_version>='3.7' and python_version<'3.11', mypy==v0.910 ; python_version<'3.6', Sphinx==8.2.1 ; python_version>='3.11', sphinx-rtd-theme==3.1.0 ; python_version>='3.11', myst-parser==4.0.0 ; python_version>='3.11', build==1.6.1 ; python_version>='3.11'. 3 more come with the project install."
+  },
+  "run_files": {
+   "requirements": "requirements.txt",
+   "plan": "setup-plan.json",
+   "count": 13
+  },
+  "installs": [
+   {
+    "package": "pre-commit",
+    "requirement": "pre-commit==4.6.0 ; python_version>='3.11'",
+    "version": "4.6.0",
+    "versions": {
+     "main": "4.6.0",
+     "pr": "4.6.0"
+    },
+    "source": "pyproject",
+    "reason": "listed in the dev extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "tox",
+    "requirement": "tox==3.27.1 ; python_version<'3.8'",
+    "version": "4.64.4",
+    "versions": {
+     "main": "4.64.4",
+     "pr": "4.64.4"
+    },
+    "source": "pyproject",
+    "reason": "listed in the dev extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "pytest",
+    "requirement": "pytest==6.1.2 ; python_version<'3.8'",
+    "version": "9.1.1",
+    "versions": {
+     "main": "9.1.1",
+     "pr": "9.1.1"
+    },
+    "source": "pyproject",
+    "reason": "listed in the dev extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "pytest-cov",
+    "requirement": "pytest-cov==2.12.1 ; python_version<'3.8'",
+    "version": "6.2.1",
+    "versions": {
+     "main": "6.2.1",
+     "pr": "6.2.1"
+    },
+    "source": "pyproject",
+    "reason": "listed in the dev extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "pytest-mypy-plugins",
+    "requirement": "pytest-mypy-plugins==4.0.3 ; python_version>='3.12' and platform_python_implementation!='PyPy'",
+    "version": "4.0.3",
+    "versions": {
+     "main": "4.0.3",
+     "pr": "4.0.3"
+    },
+    "source": "pyproject",
+    "reason": "listed in the dev extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "freezegun",
+    "requirement": "freezegun==1.1.0 ; python_version<'3.8'",
+    "version": "1.5.0",
+    "versions": {
+     "main": "1.5.0",
+     "pr": "1.5.0"
+    },
+    "source": "pyproject",
+    "reason": "listed in the dev extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "exceptiongroup",
+    "requirement": "exceptiongroup==1.1.3 ; python_version>='3.7' and python_version<'3.11'",
+    "version": "",
+    "versions": {
+     "main": "",
+     "pr": ""
+    },
+    "source": "pyproject",
+    "reason": "listed in the dev extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "mypy",
+    "requirement": "mypy==v0.910 ; python_version<'3.6'",
+    "version": "2.3.1",
+    "versions": {
+     "main": "2.3.1",
+     "pr": "2.3.1"
+    },
+    "source": "pyproject",
+    "reason": "listed in the dev extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "Sphinx",
+    "requirement": "Sphinx==8.2.1 ; python_version>='3.11'",
+    "version": "8.2.1",
+    "versions": {
+     "main": "8.2.1",
+     "pr": "8.2.1"
+    },
+    "source": "pyproject",
+    "reason": "listed in the dev extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "sphinx-rtd-theme",
+    "requirement": "sphinx-rtd-theme==3.1.0 ; python_version>='3.11'",
+    "version": "3.1.0",
+    "versions": {
+     "main": "3.1.0",
+     "pr": "3.1.0"
+    },
+    "source": "pyproject",
+    "reason": "listed in the dev extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "myst-parser",
+    "requirement": "myst-parser==4.0.0 ; python_version>='3.11'",
+    "version": "4.0.0",
+    "versions": {
+     "main": "4.0.0",
+     "pr": "4.0.0"
+    },
+    "source": "pyproject",
+    "reason": "listed in the dev extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "build",
+    "requirement": "build==1.6.1 ; python_version>='3.11'",
+    "version": "1.6.1",
+    "versions": {
+     "main": "1.6.1",
+     "pr": "1.6.1"
+    },
+    "source": "pyproject",
+    "reason": "listed in the dev extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "twine",
+    "requirement": "twine==7.0.0 ; python_version>='3.11'",
+    "version": "7.0.0",
+    "versions": {
+     "main": "7.0.0",
+     "pr": "7.0.0"
+    },
+    "source": "pyproject",
+    "reason": "listed in the dev extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   }
+  ]
+ },
+ "sides": {
+  "main_sha": "874aa41019f8a9f943647a0c74445fb7844157da",
+  "pr_sha": "b55cf382e1ee07e4e3b98e6d51e23ade70583505",
+  "behind_target": false,
+  "explicit_base": true,
+  "supplied_base_sha": "874aa41019f8a9f943647a0c74445fb7844157da",
+  "authoritative_base": "supplied",
+  "target_tip_sha": "26fc3e4a15f2a24d363c62b89c4d8651e4fdfb94",
+  "comparison_basis": "caller-supplied base vs PR head (that base is an ancestor of the head; a newer target tip was not substituted)"
+ },
+ "tested": {
+  "main": "master @ 874aa41019f8 (caller-supplied base, an ancestor of the PR head)",
+  "pr": "PR head b55cf382e1ee"
+ },
+ "probe_plan": {
+  "baseline": "full",
+  "model": "model provider: nebius (Token Factory, live)",
+  "errors": [],
+  "model_claims": [
+   {
+    "id": "C1",
+    "text": "Prior to this change, rotation size check compared file.tell() (bytes) with len(message) (code points) instead of measuring the message as bytes.",
+    "source_quote": "`Rotation.rotation_size` compared `file.tell()` (bytes) with `len(message)` (code points)",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C2",
+    "text": "After the change, the message size is calculated by translating newlines according to the sink's newline argument (or os.linesep if None) and then encoding with the file's encoding and error handler.",
+    "source_quote": "The message is now measured as it will be written: newlines are translated the same way the text-mode file does (the sink's `newline` argument, or `os.linesep` when it is `None`), then encoded with the file's encoding and error handler.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C3",
+    "text": "The newline argument is propagated from FileSink through _make_rotation_function, applying to string sizes and rotation lists.",
+    "source_quote": "`newline` is passed from `FileSink` through `_make_rotation_function`, including for string sizes and rotation lists.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C4",
+    "text": "Non\u2011ASCII messages now trigger rotation exactly at the byte limit.",
+    "source_quote": "- non-ASCII message rotates at the byte limit",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C5",
+    "text": "Rotation works correctly for newline=\"\\r\\n\", \"\\n\", and \"\" (empty string), with the \\r\\n case reproducing Windows line\u2011ending behavior on any OS.",
+    "source_quote": "- `newline=\"\\r\\n\"`, `\"\\n\"` and `\"\"` (the `\\r\\n` case covers the Windows behavior on any OS)",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C6",
+    "text": "When newline is left as the default None, rotation follows os.linesep (as verified by monkeypatching in tests).",
+    "source_quote": "- default `newline=None` follows `os.linesep` (monkeypatched)",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C7",
+    "text": "With this change the test suite passes (1647 tests passed, 46 skipped on Linux, Python\u00a03.13), whereas the new tests fail without the modification.",
+    "source_quote": "`pytest tests --ignore=tests/typesafety`: 1647 passed, 46 skipped (Linux, Python 3.13). The new tests fail without the change.",
+    "testable": true,
+    "expect": "differs"
+   }
+  ],
+  "model_rejected_claims": [],
+  "model_retried": {
+   "why": [
+    "no probe listed the claim ids it checks, so its results could not be tied to any claim; in each probe, \"claims\" must name the claim ids it checks and the observation names that cover them"
+   ],
+   "kept_first_answer": "the retry linked no claim either"
+  },
+  "model_claims_filled": [
+   {
+    "id": "p-c1",
+    "claims": [
+     "C1"
+    ]
+   },
+   {
+    "id": "p-c2",
+    "claims": [
+     "C2"
+    ]
+   },
+   {
+    "id": "p-c3",
+    "claims": [
+     "C3"
+    ]
+   },
+   {
+    "id": "p-c4",
+    "claims": [
+     "C4"
+    ]
+   }
+  ],
+  "diff_targets": [],
+  "frozen": [
+   {
+    "path": "model-probes/model-p-c1.py",
+    "source": "model",
+    "sha256": "615ae1173cbf4832473f895947f2ad3822471d43d8c713dd518f4843963cc6f6",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-09T06:09:16.404548+00:00",
+    "inputs_sha256": "fa157aeee19e5942e0679fa5489188b4230f9a02d5c9a079ab4b59f54e677f5f",
+    "inputs": {
+     "title_chars": 51,
+     "body_chars": 1027,
+     "base_files": {
+      "loguru/_file_sink.py": "841319369da691023f12165e3819d5a5c11e6e440ebba4f2a310f20cc47b9f77"
+     }
+    }
+   },
+   {
+    "path": "model-probes/model-p-c2.py",
+    "source": "model",
+    "sha256": "67ccc845a3b28b528b3764f8ff75013fb79f0690e83ccc8bad152aa88f665c0c",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-09T06:09:16.404794+00:00",
+    "inputs_sha256": "fa157aeee19e5942e0679fa5489188b4230f9a02d5c9a079ab4b59f54e677f5f",
+    "inputs": {
+     "title_chars": 51,
+     "body_chars": 1027,
+     "base_files": {
+      "loguru/_file_sink.py": "841319369da691023f12165e3819d5a5c11e6e440ebba4f2a310f20cc47b9f77"
+     }
+    }
+   },
+   {
+    "path": "model-probes/model-p-c3.py",
+    "source": "model",
+    "sha256": "a0c590db2d816afca56051aefd736f298c368cfd6dd144735caa6281caf8f807",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-09T06:09:16.404911+00:00",
+    "inputs_sha256": "fa157aeee19e5942e0679fa5489188b4230f9a02d5c9a079ab4b59f54e677f5f",
+    "inputs": {
+     "title_chars": 51,
+     "body_chars": 1027,
+     "base_files": {
+      "loguru/_file_sink.py": "841319369da691023f12165e3819d5a5c11e6e440ebba4f2a310f20cc47b9f77"
+     }
+    }
+   },
+   {
+    "path": "model-probes/model-p-c4.py",
+    "source": "model",
+    "sha256": "c5d12ebedfdb4ce1e6133cf9228ad03f932fc5a4b88e0c7fd3f8362c62fbc39f",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-09T06:09:16.405024+00:00",
+    "inputs_sha256": "fa157aeee19e5942e0679fa5489188b4230f9a02d5c9a079ab4b59f54e677f5f",
+    "inputs": {
+     "title_chars": 51,
+     "body_chars": 1027,
+     "base_files": {
+      "loguru/_file_sink.py": "841319369da691023f12165e3819d5a5c11e6e440ebba4f2a310f20cc47b9f77"
+     }
+    }
+   }
+  ]
+ },
+ "test_extras": [
+  "pre-commit",
+  "tox",
+  "pytest",
+  "pytest-cov",
+  "pytest-mypy-plugins",
+  "colorama",
+  "freezegun",
+  "exceptiongroup",
+  "mypy",
+  "Sphinx",
+  "sphinx-rtd-theme",
+  "myst-parser",
+  "build",
+  "twine"
+ ],
+ "pr_side_started_at": "2026-11-09T06:09:16.573534+00:00",
+ "test_targets": {
+  "main": [
+   "tests/test_filesink_rotation.py"
+  ],
+  "pr": [
+   "tests/test_filesink_rotation.py"
+  ]
+ },
+ "installed_commit": {
+  "main": {
+   "dist": "loguru",
+   "expected": "874aa41019f8a9f943647a0c74445fb7844157da",
+   "installed": "874aa41019f8a9f943647a0c74445fb7844157da",
+   "ok": true
+  },
+  "pr": {
+   "dist": "loguru",
+   "expected": "b55cf382e1ee07e4e3b98e6d51e23ade70583505",
+   "installed": "b55cf382e1ee07e4e3b98e6d51e23ade70583505",
+   "ok": true
+  }
+ },
+ "base_head_sha": "874aa41019f8a9f943647a0c74445fb7844157da",
+ "comparison": {
+  "same": 153,
+  "same_skipped_both": 3,
+  "regressions": [],
+  "fixed": [
+   "tests.test_filesink_rotation::test_size_rotation_counts_encoded_bytes",
+   "tests.test_filesink_rotation::test_size_rotation_counts_translated_newlines[\\r\\n-3]"
+  ],
+  "new_tests_passing": 3,
+  "new_tests_passing_ids": [
+   "tests.test_filesink_rotation::test_size_rotation_counts_translated_newlines[-2]",
+   "tests.test_filesink_rotation::test_size_rotation_counts_translated_newlines[\\n-2]",
+   "tests.test_filesink_rotation::test_size_rotation_default_newline_uses_os_linesep"
+  ],
+  "new_tests_failing": [],
+  "new_tests_skipped": [],
+  "removed_tests": [],
+  "reparametrized": [],
+  "skipped_missing_dependency": [],
+  "flaky": [],
+  "pr_unstable": [],
+  "pr_unstable_noisy": [],
+  "environment": [],
+  "other_changes": [],
+  "preexisting_failures": [],
+  "load_failed_both": [],
+  "load_failed_pr": [],
+  "load_failed_main": [],
+  "executed": {
+   "main": 152,
+   "pr": 155
+  },
+  "messages": {},
+  "base_messages": {
+   "tests.test_filesink_rotation::test_size_rotation_counts_encoded_bytes": "AssertionError: assert 1 == 2",
+   "tests.test_filesink_rotation::test_size_rotation_counts_translated_newlines[\\r\\n-3]": "AssertionError: assert 2 == 3"
+  }
+ },
+ "exit_check": {
+  "explained": true,
+  "problems": [],
+  "detail": "all runs exited 0"
+ },
+ "probes": {
+  "status": "ran",
+  "items": [
+   {
+    "id": "model-p-c1",
+    "source": "model",
+    "path": "model-probes/model-p-c1.py",
+    "sha256": "615ae1173cbf4832473f895947f2ad3822471d43d8c713dd518f4843963cc6f6",
+    "target": "Delgan/loguru#1536",
+    "about": "Test that Rotation.rotation_size uses len(message) (code points) and not byte length.",
+    "claims": [
+     {
+      "id": "C1",
+      "source": "PR description",
+      "text": "Prior to this change, rotation size check compared file.tell() (bytes) with len(message) (code points) instead of measuring the message as bytes.",
+      "covers": [
+       "c1.*"
+      ],
+      "expect": "differs"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-p-c1-main-1.jsonl",
+      "probe-model-p-c1-main-2.jsonl",
+      "probe-model-p-c1-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-p-c1-pr-1.jsonl",
+      "probe-model-p-c1-pr-2.jsonl",
+      "probe-model-p-c1-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "c1.message": "'\u00e9'",
+       "c1.message_code_point_length": 1,
+       "c1.message_byte_length_utf8": 2,
+       "c1.file_position": 10,
+       "c1.size_limit": 11,
+       "c1.result": false
+      },
+      {
+       "c1.message": "'\u00e9'",
+       "c1.message_code_point_length": 1,
+       "c1.message_byte_length_utf8": 2,
+       "c1.file_position": 10,
+       "c1.size_limit": 11,
+       "c1.result": false
+      },
+      {
+       "c1.message": "'\u00e9'",
+       "c1.message_code_point_length": 1,
+       "c1.message_byte_length_utf8": 2,
+       "c1.file_position": 10,
+       "c1.size_limit": 11,
+       "c1.result": false
+      }
+     ],
+     "pr": [
+      {
+       "c1.message": "'\u00e9'",
+       "c1.message_code_point_length": 1,
+       "c1.message_byte_length_utf8": 2,
+       "c1.file_position": 10,
+       "c1.size_limit": 11,
+       "c1.result": true
+      },
+      {
+       "c1.message": "'\u00e9'",
+       "c1.message_code_point_length": 1,
+       "c1.message_byte_length_utf8": 2,
+       "c1.file_position": 10,
+       "c1.size_limit": 11,
+       "c1.result": true
+      },
+      {
+       "c1.message": "'\u00e9'",
+       "c1.message_code_point_length": 1,
+       "c1.message_byte_length_utf8": 2,
+       "c1.file_position": 10,
+       "c1.size_limit": 11,
+       "c1.result": true
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "c1.file_position",
+      "state": "same",
+      "label": "needs_human",
+      "claim": "C1",
+      "main": 10,
+      "pr": 10,
+      "citations": {
+       "main": {
+        "file": "probe-model-p-c1-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c1.file_position\""
+       },
+       "pr": {
+        "file": "probe-model-p-c1-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c1.file_position\""
+       }
+      }
+     },
+     {
+      "name": "c1.message",
+      "state": "same",
+      "label": "needs_human",
+      "claim": "C1",
+      "main": "'\u00e9'",
+      "pr": "'\u00e9'",
+      "citations": {
+       "main": {
+        "file": "probe-model-p-c1-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c1.message\""
+       },
+       "pr": {
+        "file": "probe-model-p-c1-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c1.message\""
+       }
+      }
+     },
+     {
+      "name": "c1.message_byte_length_utf8",
+      "state": "same",
+      "label": "needs_human",
+      "claim": "C1",
+      "main": 2,
+      "pr": 2,
+      "citations": {
+       "main": {
+        "file": "probe-model-p-c1-main-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"c1.message_byte_length_utf8\""
+       },
+       "pr": {
+        "file": "probe-model-p-c1-pr-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"c1.message_byte_length_utf8\""
+       }
+      }
+     },
+     {
+      "name": "c1.message_code_point_length",
+      "state": "same",
+      "label": "needs_human",
+      "claim": "C1",
+      "main": 1,
+      "pr": 1,
+      "citations": {
+       "main": {
+        "file": "probe-model-p-c1-main-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"c1.message_code_point_length\""
+       },
+       "pr": {
+        "file": "probe-model-p-c1-pr-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"c1.message_code_point_length\""
+       }
+      }
+     },
+     {
+      "name": "c1.result",
+      "state": "differs",
+      "label": "proven",
+      "claim": "C1",
+      "main": false,
+      "pr": true,
+      "diffs": [
+       {
+        "field": "",
+        "main": false,
+        "pr": true
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-p-c1-main-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"c1.result\""
+       },
+       "pr": {
+        "file": "probe-model-p-c1-pr-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"c1.result\""
+       }
+      }
+     },
+     {
+      "name": "c1.size_limit",
+      "state": "same",
+      "label": "needs_human",
+      "claim": "C1",
+      "main": 11,
+      "pr": 11,
+      "citations": {
+       "main": {
+        "file": "probe-model-p-c1-main-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"c1.size_limit\""
+       },
+       "pr": {
+        "file": "probe-model-p-c1-pr-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"c1.size_limit\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "615ae1173cbf4832473f895947f2ad3822471d43d8c713dd518f4843963cc6f6",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-09T06:09:16.404548+00:00",
+     "inputs_sha256": "fa157aeee19e5942e0679fa5489188b4230f9a02d5c9a079ab4b59f54e677f5f",
+     "inputs": {
+      "title_chars": 51,
+      "body_chars": 1027,
+      "base_files": {
+       "loguru/_file_sink.py": "841319369da691023f12165e3819d5a5c11e6e440ebba4f2a310f20cc47b9f77"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-09T06:09:16.573534+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 9,
+     "changed_lines_covered": 3,
+     "files": [
+      {
+       "file": "loguru/_file_sink.py",
+       "changed_lines_total": 9,
+       "changed_lines_covered": 3
+      }
+     ],
+     "adequacy": "adequate",
+     "note": "ran 3 of 9 changed line(s) on the main side",
+     "exit": 0,
+     "data": "probe-cov-model-p-c1.json"
+    },
+    "status": "ran"
+   },
+   {
+    "id": "model-p-c2",
+    "source": "model",
+    "path": "model-probes/model-p-c2.py",
+    "sha256": "67ccc845a3b28b528b3764f8ff75013fb79f0690e83ccc8bad152aa88f665c0c",
+    "target": "Delgan/loguru#1536",
+    "about": "Test that the base code does not translate newlines or encode the message for size calculation.",
+    "claims": [
+     {
+      "id": "C2",
+      "source": "PR description",
+      "text": "After the change, the message size is calculated by translating newlines according to the sink's newline argument (or os.linesep if None) and then encoding with the file's encoding and error handler.",
+      "covers": [
+       "c2.*"
+      ],
+      "expect": "differs"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-p-c2-main-1.jsonl",
+      "probe-model-p-c2-main-2.jsonl",
+      "probe-model-p-c2-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-p-c2-pr-1.jsonl",
+      "probe-model-p-c2-pr-2.jsonl",
+      "probe-model-p-c2-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "c2.message": "'a\u00e9\\n'",
+       "c2.message_code_point_length": 3,
+       "c2.message_byte_length_utf8": 4,
+       "c2.file_position": 10,
+       "c2.size_limit": 13,
+       "c2.result": false
+      },
+      {
+       "c2.message": "'a\u00e9\\n'",
+       "c2.message_code_point_length": 3,
+       "c2.message_byte_length_utf8": 4,
+       "c2.file_position": 10,
+       "c2.size_limit": 13,
+       "c2.result": false
+      },
+      {
+       "c2.message": "'a\u00e9\\n'",
+       "c2.message_code_point_length": 3,
+       "c2.message_byte_length_utf8": 4,
+       "c2.file_position": 10,
+       "c2.size_limit": 13,
+       "c2.result": false
+      }
+     ],
+     "pr": [
+      {
+       "c2.message": "'a\u00e9\\n'",
+       "c2.message_code_point_length": 3,
+       "c2.message_byte_length_utf8": 4,
+       "c2.file_position": 10,
+       "c2.size_limit": 13,
+       "c2.result": true
+      },
+      {
+       "c2.message": "'a\u00e9\\n'",
+       "c2.message_code_point_length": 3,
+       "c2.message_byte_length_utf8": 4,
+       "c2.file_position": 10,
+       "c2.size_limit": 13,
+       "c2.result": true
+      },
+      {
+       "c2.message": "'a\u00e9\\n'",
+       "c2.message_code_point_length": 3,
+       "c2.message_byte_length_utf8": 4,
+       "c2.file_position": 10,
+       "c2.size_limit": 13,
+       "c2.result": true
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "c2.file_position",
+      "state": "same",
+      "label": "needs_human",
+      "claim": "C2",
+      "main": 10,
+      "pr": 10,
+      "citations": {
+       "main": {
+        "file": "probe-model-p-c2-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c2.file_position\""
+       },
+       "pr": {
+        "file": "probe-model-p-c2-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c2.file_position\""
+       }
+      }
+     },
+     {
+      "name": "c2.message",
+      "state": "same",
+      "label": "needs_human",
+      "claim": "C2",
+      "main": "'a\u00e9\\n'",
+      "pr": "'a\u00e9\\n'",
+      "citations": {
+       "main": {
+        "file": "probe-model-p-c2-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c2.message\""
+       },
+       "pr": {
+        "file": "probe-model-p-c2-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c2.message\""
+       }
+      }
+     },
+     {
+      "name": "c2.message_byte_length_utf8",
+      "state": "same",
+      "label": "needs_human",
+      "claim": "C2",
+      "main": 4,
+      "pr": 4,
+      "citations": {
+       "main": {
+        "file": "probe-model-p-c2-main-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"c2.message_byte_length_utf8\""
+       },
+       "pr": {
+        "file": "probe-model-p-c2-pr-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"c2.message_byte_length_utf8\""
+       }
+      }
+     },
+     {
+      "name": "c2.message_code_point_length",
+      "state": "same",
+      "label": "needs_human",
+      "claim": "C2",
+      "main": 3,
+      "pr": 3,
+      "citations": {
+       "main": {
+        "file": "probe-model-p-c2-main-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"c2.message_code_point_length\""
+       },
+       "pr": {
+        "file": "probe-model-p-c2-pr-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"c2.message_code_point_length\""
+       }
+      }
+     },
+     {
+      "name": "c2.result",
+      "state": "differs",
+      "label": "proven",
+      "claim": "C2",
+      "main": false,
+      "pr": true,
+      "diffs": [
+       {
+        "field": "",
+        "main": false,
+        "pr": true
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-p-c2-main-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"c2.result\""
+       },
+       "pr": {
+        "file": "probe-model-p-c2-pr-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"c2.result\""
+       }
+      }
+     },
+     {
+      "name": "c2.size_limit",
+      "state": "same",
+      "label": "needs_human",
+      "claim": "C2",
+      "main": 13,
+      "pr": 13,
+      "citations": {
+       "main": {
+        "file": "probe-model-p-c2-main-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"c2.size_limit\""
+       },
+       "pr": {
+        "file": "probe-model-p-c2-pr-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"c2.size_limit\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "67ccc845a3b28b528b3764f8ff75013fb79f0690e83ccc8bad152aa88f665c0c",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-09T06:09:16.404794+00:00",
+     "inputs_sha256": "fa157aeee19e5942e0679fa5489188b4230f9a02d5c9a079ab4b59f54e677f5f",
+     "inputs": {
+      "title_chars": 51,
+      "body_chars": 1027,
+      "base_files": {
+       "loguru/_file_sink.py": "841319369da691023f12165e3819d5a5c11e6e440ebba4f2a310f20cc47b9f77"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-09T06:09:16.573534+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 9,
+     "changed_lines_covered": 3,
+     "files": [
+      {
+       "file": "loguru/_file_sink.py",
+       "changed_lines_total": 9,
+       "changed_lines_covered": 3
+      }
+     ],
+     "adequacy": "adequate",
+     "note": "ran 3 of 9 changed line(s) on the main side",
+     "exit": 0,
+     "data": "probe-cov-model-p-c2.json"
+    },
+    "status": "ran"
+   },
+   {
+    "id": "model-p-c3",
+    "source": "model",
+    "path": "model-probes/model-p-c3.py",
+    "sha256": "a0c590db2d816afca56051aefd736f298c368cfd6dd144735caa6281caf8f807",
+    "target": "Delgan/loguru#1536",
+    "about": "Test that _make_rotation_function does not take a newline argument.",
+    "claims": [
+     {
+      "id": "C3",
+      "source": "PR description",
+      "text": "The newline argument is propagated from FileSink through _make_rotation_function, applying to string sizes and rotation lists.",
+      "covers": [
+       "c3.*"
+      ],
+      "expect": "differs"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-p-c3-main-1.jsonl",
+      "probe-model-p-c3-main-2.jsonl",
+      "probe-model-p-c3-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-p-c3-pr-1.jsonl",
+      "probe-model-p-c3-pr-2.jsonl",
+      "probe-model-p-c3-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "c3.parameters": [
+        "rotation"
+       ],
+       "c3.has_newline_argument": false
+      },
+      {
+       "c3.parameters": [
+        "rotation"
+       ],
+       "c3.has_newline_argument": false
+      },
+      {
+       "c3.parameters": [
+        "rotation"
+       ],
+       "c3.has_newline_argument": false
+      }
+     ],
+     "pr": [
+      {
+       "c3.parameters": [
+        "rotation",
+        "newline"
+       ],
+       "c3.has_newline_argument": true
+      },
+      {
+       "c3.parameters": [
+        "rotation",
+        "newline"
+       ],
+       "c3.has_newline_argument": true
+      },
+      {
+       "c3.parameters": [
+        "rotation",
+        "newline"
+       ],
+       "c3.has_newline_argument": true
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "c3.has_newline_argument",
+      "state": "differs",
+      "label": "proven",
+      "claim": "C3",
+      "main": false,
+      "pr": true,
+      "diffs": [
+       {
+        "field": "",
+        "main": false,
+        "pr": true
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-p-c3-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c3.has_newline_argument\""
+       },
+       "pr": {
+        "file": "probe-model-p-c3-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c3.has_newline_argument\""
+       }
+      }
+     },
+     {
+      "name": "c3.parameters",
+      "state": "differs",
+      "label": "proven",
+      "claim": "C3",
+      "main": [
+       "rotation"
+      ],
+      "pr": [
+       "rotation",
+       "newline"
+      ],
+      "diffs": [
+       {
+        "field": "",
+        "main": [
+         "rotation"
+        ],
+        "pr": [
+         "rotation",
+         "newline"
+        ]
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-p-c3-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c3.parameters\""
+       },
+       "pr": {
+        "file": "probe-model-p-c3-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c3.parameters\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "a0c590db2d816afca56051aefd736f298c368cfd6dd144735caa6281caf8f807",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-09T06:09:16.404911+00:00",
+     "inputs_sha256": "fa157aeee19e5942e0679fa5489188b4230f9a02d5c9a079ab4b59f54e677f5f",
+     "inputs": {
+      "title_chars": 51,
+      "body_chars": 1027,
+      "base_files": {
+       "loguru/_file_sink.py": "841319369da691023f12165e3819d5a5c11e6e440ebba4f2a310f20cc47b9f77"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-09T06:09:16.573534+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 9,
+     "changed_lines_covered": 2,
+     "files": [
+      {
+       "file": "loguru/_file_sink.py",
+       "changed_lines_total": 9,
+       "changed_lines_covered": 2
+      }
+     ],
+     "adequacy": "adequate",
+     "note": "ran 2 of 9 changed line(s) on the main side",
+     "exit": 0,
+     "data": "probe-cov-model-p-c3.json"
+    },
+    "status": "ran"
+   },
+   {
+    "id": "model-p-c4",
+    "source": "model",
+    "path": "model-probes/model-p-c4.py",
+    "sha256": "c5d12ebedfdb4ce1e6133cf9228ad03f932fc5a4b88e0c7fd3f8362c62fbc39f",
+    "target": "Delgan/loguru#1536",
+    "about": "Test that non-ASCII messages do not trigger rotation at the byte limit in the base code.",
+    "claims": [
+     {
+      "id": "C4",
+      "source": "PR description",
+      "text": "Non\u2011ASCII messages now trigger rotation exactly at the byte limit.",
+      "covers": [
+       "c4.*"
+      ],
+      "expect": "differs"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-p-c4-main-1.jsonl",
+      "probe-model-p-c4-main-2.jsonl",
+      "probe-model-p-c4-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-p-c4-pr-1.jsonl",
+      "probe-model-p-c4-pr-2.jsonl",
+      "probe-model-p-c4-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "c4.message": "'\u00e9'",
+       "c4.message_byte_length": 2,
+       "c4.initial_file_size": 10,
+       "c4.size_limit": 11,
+       "c4.result": false
+      },
+      {
+       "c4.message": "'\u00e9'",
+       "c4.message_byte_length": 2,
+       "c4.initial_file_size": 10,
+       "c4.size_limit": 11,
+       "c4.result": false
+      },
+      {
+       "c4.message": "'\u00e9'",
+       "c4.message_byte_length": 2,
+       "c4.initial_file_size": 10,
+       "c4.size_limit": 11,
+       "c4.result": false
+      }
+     ],
+     "pr": [
+      {
+       "c4.message": "'\u00e9'",
+       "c4.message_byte_length": 2,
+       "c4.initial_file_size": 10,
+       "c4.size_limit": 11,
+       "c4.result": true
+      },
+      {
+       "c4.message": "'\u00e9'",
+       "c4.message_byte_length": 2,
+       "c4.initial_file_size": 10,
+       "c4.size_limit": 11,
+       "c4.result": true
+      },
+      {
+       "c4.message": "'\u00e9'",
+       "c4.message_byte_length": 2,
+       "c4.initial_file_size": 10,
+       "c4.size_limit": 11,
+       "c4.result": true
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "c4.initial_file_size",
+      "state": "same",
+      "label": "needs_human",
+      "claim": "C4",
+      "main": 10,
+      "pr": 10,
+      "citations": {
+       "main": {
+        "file": "probe-model-p-c4-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c4.initial_file_size\""
+       },
+       "pr": {
+        "file": "probe-model-p-c4-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c4.initial_file_size\""
+       }
+      }
+     },
+     {
+      "name": "c4.message",
+      "state": "same",
+      "label": "needs_human",
+      "claim": "C4",
+      "main": "'\u00e9'",
+      "pr": "'\u00e9'",
+      "citations": {
+       "main": {
+        "file": "probe-model-p-c4-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c4.message\""
+       },
+       "pr": {
+        "file": "probe-model-p-c4-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c4.message\""
+       }
+      }
+     },
+     {
+      "name": "c4.message_byte_length",
+      "state": "same",
+      "label": "needs_human",
+      "claim": "C4",
+      "main": 2,
+      "pr": 2,
+      "citations": {
+       "main": {
+        "file": "probe-model-p-c4-main-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"c4.message_byte_length\""
+       },
+       "pr": {
+        "file": "probe-model-p-c4-pr-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"c4.message_byte_length\""
+       }
+      }
+     },
+     {
+      "name": "c4.result",
+      "state": "differs",
+      "label": "proven",
+      "claim": "C4",
+      "main": false,
+      "pr": true,
+      "diffs": [
+       {
+        "field": "",
+        "main": false,
+        "pr": true
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-p-c4-main-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"c4.result\""
+       },
+       "pr": {
+        "file": "probe-model-p-c4-pr-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"c4.result\""
+       }
+      }
+     },
+     {
+      "name": "c4.size_limit",
+      "state": "same",
+      "label": "needs_human",
+      "claim": "C4",
+      "main": 11,
+      "pr": 11,
+      "citations": {
+       "main": {
+        "file": "probe-model-p-c4-main-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"c4.size_limit\""
+       },
+       "pr": {
+        "file": "probe-model-p-c4-pr-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"c4.size_limit\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "c5d12ebedfdb4ce1e6133cf9228ad03f932fc5a4b88e0c7fd3f8362c62fbc39f",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-09T06:09:16.405024+00:00",
+     "inputs_sha256": "fa157aeee19e5942e0679fa5489188b4230f9a02d5c9a079ab4b59f54e677f5f",
+     "inputs": {
+      "title_chars": 51,
+      "body_chars": 1027,
+      "base_files": {
+       "loguru/_file_sink.py": "841319369da691023f12165e3819d5a5c11e6e440ebba4f2a310f20cc47b9f77"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-09T06:09:16.573534+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 9,
+     "changed_lines_covered": 3,
+     "files": [
+      {
+       "file": "loguru/_file_sink.py",
+       "changed_lines_total": 9,
+       "changed_lines_covered": 3
+      }
+     ],
+     "adequacy": "adequate",
+     "note": "ran 3 of 9 changed line(s) on the main side",
+     "exit": 0,
+     "data": "probe-cov-model-p-c4.json"
+    },
+    "status": "ran"
+   }
+  ],
+  "summary": {
+   "labels": [
+    "needs_human",
+    "needs_human",
+    "needs_human",
+    "needs_human",
+    "proven",
+    "needs_human",
+    "needs_human",
+    "needs_human",
+    "needs_human",
+    "needs_human",
+    "proven",
+    "needs_human",
+    "proven",
+    "proven",
+    "needs_human",
+    "needs_human",
+    "needs_human",
+    "proven",
+    "needs_human"
+   ],
+   "flagged": [],
+   "proven_claims": [
+    "C1",
+    "C2",
+    "C3",
+    "C4"
+   ],
+   "reason": "probe: 14 unchanged sub-check(s) of an input where the claim's change was seen, shown as advisory only: c1.file_position (C1); c1.message (C1); c1.message_byte_length_utf8 (C1); c1.message_code_point_length (C1); probe: claim(s) C1, C2, C3, C4 proven",
+   "ignored_noise": [],
+   "ignored_warning_only": [],
+   "pr_only_noisy": [],
+   "advisory_unchanged_subchecks": [
+    "c1.file_position",
+    "c1.message",
+    "c1.message_byte_length_utf8",
+    "c1.message_code_point_length",
+    "c1.size_limit",
+    "c2.file_position",
+    "c2.message",
+    "c2.message_byte_length_utf8",
+    "c2.message_code_point_length",
+    "c2.size_limit",
+    "c4.initial_file_size",
+    "c4.message",
+    "c4.message_byte_length",
+    "c4.size_limit"
+   ],
+   "advisory_agreeing_differs": [],
+   "advisory_invalid_preservation": []
+  }
+ },
+ "probe_changed_line_coverage": {
+  "status": "measured",
+  "side": "main",
+  "probes": {
+   "model-p-c1": {
+    "status": "measured",
+    "changed_lines_covered": 3,
+    "changed_lines_total": 9,
+    "adequacy": "adequate"
+   },
+   "model-p-c2": {
+    "status": "measured",
+    "changed_lines_covered": 3,
+    "changed_lines_total": 9,
+    "adequacy": "adequate"
+   },
+   "model-p-c3": {
+    "status": "measured",
+    "changed_lines_covered": 2,
+    "changed_lines_total": 9,
+    "adequacy": "adequate"
+   },
+   "model-p-c4": {
+    "status": "measured",
+    "changed_lines_covered": 3,
+    "changed_lines_total": 9,
+    "adequacy": "adequate"
+   }
+  },
+  "not_adequate": []
+ },
+ "verdict": "verified",
+ "reason": "2 test(s) fail on main and pass on the PR; 152 test(s) ran on main, 155 on the PR; 3 new test(s) pass, 153 unchanged (3 of them skipped on both sides); probe: 14 unchanged sub-check(s) of an input where the claim's change was seen, shown as advisory only: c1.file_position (C1); c1.message (C1); c1.message_byte_length_utf8 (C1); c1.message_code_point_length (C1); probe: claim(s) C1, C2, C3, C4 proven",
+ "verdict_before_coverage_gate": "verified",
+ "reason_before_coverage_gate": "2 test(s) fail on main and pass on the PR; 152 test(s) ran on main, 155 on the PR; 3 new test(s) pass, 153 unchanged (3 of them skipped on both sides); probe: 14 unchanged sub-check(s) of an input where the claim's change was seen, shown as advisory only: c1.file_position (C1); c1.message (C1); c1.message_byte_length_utf8 (C1); c1.message_code_point_length (C1); probe: claim(s) C1, C2, C3, C4 proven",
+ "changed_lines_total": 14,
+ "changed_lines_covered": 14,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "normal",
+  "note": "14 of 14 changed executable line(s) ran (100%)",
+  "measurement": "measured"
+ },
+ "agents": {
+  "status": "skipped",
+  "note": "advisory swarm is off",
+  "roles": []
+ },
+ "explanation": {
+  "status": "not yet wired",
+  "why": "advisory swarm is off"
+ },
+ "swarm_requested": false,
+ "operator_approval_requested": false,
+ "swarm": "off",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [
+   "loguru/_file_sink.py"
+  ],
+  "compiled_files": [],
+  "other_files": [
+   "CHANGELOG.rst",
+   "tests/test_filesink_rotation.py"
+  ]
+ },
+ "duration_s": {
+  "total_wall": 473.9,
+  "tests": 133.8
+ },
+ "cost": {
+  "ai_calls": 3,
+  "failed_ai_calls": 0,
+  "input_tokens": 11191,
+  "output_tokens": 30410,
+  "thinking_tokens": 27023,
+  "cost_usd": 0.030726,
+  "calls_without_usage": 0,
+  "ai_cost_usd": 0.030726,
+  "cost_complete": true,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 473.9,
+   "tests": 133.8
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.031593,
+  "total_cost_usd": 0.062319,
+  "swarm": {
+   "ai_calls": 0,
+   "failed_ai_calls": 0,
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "thinking_tokens": 0,
+   "cost_usd": 0.0,
+   "calls_without_usage": 0,
+   "ai_cost_usd": 0.0,
+   "cost_complete": true,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ },
+ "pdf_push": {
+  "ok": true,
+  "attempts": 1,
+  "error": null,
+  "url": "https://github.com/aritracodesbad123/Proof-of-change/tree/runs/runs/2026-11-09/ef12096/loguru-1536"
+ }
+}
