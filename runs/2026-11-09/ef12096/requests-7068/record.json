@@ -1,0 +1,3693 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-psf-requests-7068-1667efd1c4da-2026-11-08",
+ "date_ist": "2026-11-08 11:50 IST",
+ "run_date": "2026-11-08",
+ "who": "ops/daily_run.py",
+ "repo": "psf/requests",
+ "library": "requests",
+ "pr": {
+  "repo": "psf/requests",
+  "number": 7068,
+  "url": "https://github.com/psf/requests/pull/7068",
+  "title": "Fix: Respect no_proxy in proxies dictionary and NO_PROXY env var",
+  "base_sha": "3c7baaa05ab4aa49cc819ce3a819d260de19c157",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "1667efd1c4dab05a049f56b43cf8bb60b107ede8",
+  "merge_commit": "ec5a029f86662481b65cda59d4a6cb3458f8d369",
+  "tested_main_sha": "3c7baaa05ab4aa49cc819ce3a819d260de19c157",
+  "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+ },
+ "author": "cjac",
+ "base_ref": "main",
+ "updated_at_utc": "2026-11-02T19:22:43Z",
+ "updated_at_ist": "2026-11-03 00:52 IST",
+ "ci_state": "none",
+ "ci_detail": "no check runs visible",
+ "tested_at_ist": "2026-11-08 11:50 IST",
+ "files": {
+  "all": [
+   "src/requests/adapters.py",
+   "src/requests/api.py",
+   "src/requests/sessions.py",
+   "src/requests/utils.py",
+   "tests/test_requests.py",
+   "tests/test_utils.py"
+  ],
+  "package_py": [
+   "src/requests/adapters.py",
+   "src/requests/api.py",
+   "src/requests/sessions.py",
+   "src/requests/utils.py"
+  ],
+  "compiled": [],
+  "other": [
+   "tests/test_requests.py",
+   "tests/test_utils.py"
+  ]
+ },
+ "machine_type": {
+  "arch": "x86_64",
+  "os": "Linux",
+  "platform": "Linux-6.12.94+-x86_64-with-glibc2.41",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": "g++ (Debian 14.2.0-19) 14.2.0",
+  "cpu_model": "Intel(R) Xeon(R) Processor",
+  "ram_gb": 15.6
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 3,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.15",
+ "test_selection": "mapped from touched files: tests/test_requests.py, tests/test_utils.py, tests/test_adapters.py, tests/test_lowlevel.py",
+ "per_run": [
+  {
+   "side": "old",
+   "run": 1,
+   "passed": 548,
+   "failed": 28,
+   "error": 0,
+   "skipped": 15,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 34.0,
+   "pytest_summary": "28 failed, 548 passed, 14 skipped, 1 xfailed, 38 warnings in 32.01s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 1,
+   "passed": 572,
+   "failed": 28,
+   "error": 0,
+   "skipped": 15,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 32.4,
+   "pytest_summary": "28 failed, 572 passed, 14 skipped, 1 xfailed, 44 warnings in 31.51s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 2,
+   "passed": 548,
+   "failed": 28,
+   "error": 0,
+   "skipped": 15,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 32.8,
+   "pytest_summary": "28 failed, 548 passed, 14 skipped, 1 xfailed, 38 warnings in 31.93s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 2,
+   "passed": 572,
+   "failed": 28,
+   "error": 0,
+   "skipped": 15,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 32.8,
+   "pytest_summary": "28 failed, 572 passed, 14 skipped, 1 xfailed, 44 warnings in 31.98s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 3,
+   "passed": 548,
+   "failed": 28,
+   "error": 0,
+   "skipped": 15,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 32.8,
+   "pytest_summary": "28 failed, 548 passed, 14 skipped, 1 xfailed, 38 warnings in 31.91s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 3,
+   "passed": 572,
+   "failed": 28,
+   "error": 0,
+   "skipped": 15,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 32.9,
+   "pytest_summary": "28 failed, 572 passed, 14 skipped, 1 xfailed, 44 warnings in 32.00s",
+   "junit": true
+  }
+ ],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [
+  {
+   "source": "PR description",
+   "quote": "When an explicit `proxies` mapping is passed to a request or configured on `Session.proxies`, `merge_environment_settings` and `resolve_proxies` only use `no_proxy` to decide whether to merge *miss...",
+   "pattern": "untouched"
+  }
+ ],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "local",
+ "sandbox_backend_note": "local bubblewrap",
+ "machine": "local",
+ "tool_setup": {
+  "installed": [],
+  "tries": 0,
+  "note": "All required tools were already installed.",
+  "refused": []
+ },
+ "posted_upstream": false,
+ "logs": "requests-7068/",
+ "freeze": {
+  "main": "freeze-main.txt",
+  "pr": "freeze-pr.txt"
+ },
+ "coverage": {
+  "status": "measured",
+  "changed_lines_total": 30,
+  "changed_lines_covered": 28,
+  "files": [
+   {
+    "file": "src/requests/adapters.py",
+    "changed_lines_total": 3,
+    "changed_lines_covered": 2
+   },
+   {
+    "file": "src/requests/api.py",
+    "changed_lines_total": 0,
+    "changed_lines_covered": 0
+   },
+   {
+    "file": "src/requests/sessions.py",
+    "changed_lines_total": 7,
+    "changed_lines_covered": 7
+   },
+   {
+    "file": "src/requests/utils.py",
+    "changed_lines_total": 20,
+    "changed_lines_covered": 19
+   }
+  ],
+  "seconds": 356.4,
+  "exit": 1,
+  "log": "coverage-pytest.log"
+ },
+ "poc_commit": "ef12096677e9cf59e8673436d74ec65d53771d7c",
+ "route": "source-pair",
+ "current_head_sha": "1667efd1c4dab05a049f56b43cf8bb60b107ede8",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "model_provider_fallback": "the AI answered but no probe was usable, so only fixed probes ran",
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": "[redacted]",
+  "notes": [
+   "Setup check: GitHub token: present.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory 7.1 GB (of 15.6 GB).",
+   "Setup check: free disk 93.2 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: [redacted] results",
+   "Query: requests python setup install instructions https://github.com/psf/requests site:github.com/psf/requests",
+   "Query: requests python documentation install https://github.com/psf/requests site:github.com/psf/requests",
+   "Query: requests python install requirements https://pypi.org/project/requests/ https://github.com/psf/requests site:pypi.org",
+   "Source: requests/docs/user/install.rst at main \u00b7 psf/requests \u00b7 GitHub \u2014 https://github.com/psf/requests/blob/main/docs/user/install.rst",
+   "Source: requests \u2014 https://pypi.org/project/requests/",
+   "Source: Trying to install requests \u00b7 Issue #4530 \u00b7 psf/requests \u00b7 GitHub \u2014 https://github.com/psf/requests/issues/4530",
+   "Source: Regenerating tests/certs/ with OpenSSL >= 3.2.0 causes test failures \u00b7 Issue #6896 \u00b7 psf/requests \u00b7 GitHub \u2014 https://github.com/psf/requests/issues/6896",
+   "Source: requests/HISTORY.md at main \u00b7 psf/requests \u00b7 GitHub \u2014 https://github.com/psf/requests/blob/main/HISTORY.md",
+   "Source: GitHub - psf/requests at www.awesomepython.org \u00b7 GitHub \u2014 https://github.com/psf/requests?ref=www.awesomepython.org",
+   "Source: requests/.readthedocs.yaml at main \u00b7 psf/requests \u00b7 GitHub \u2014 https://github.com/psf/requests/blob/main/.readthedocs.yaml",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: charset_normalizer is noted, installed with the project.",
+   "Setup plan: idna is noted, installed with the project.",
+   "Setup plan: urllib3 is noted, installed with the project.",
+   "Setup plan: certifi is noted, installed with the project.",
+   "Setup plan: install pytest-httpbin==2.1.0 (listed in the test extra) on main and pr.",
+   "Setup plan: install httpbin~=0.10.0 (listed in the test extra) on main and pr.",
+   "Setup plan: install pytest-cov (listed in the test extra) on main and pr.",
+   "Setup plan: install pytest-mock (listed in the test extra) on main and pr.",
+   "Setup plan: install pytest-xdist (listed in the test extra) on main and pr.",
+   "Setup plan: install pytest>=3 (listed in the test extra) on main and pr.",
+   "Setup plan: install trustme (listed in the test extra) on main and pr.",
+   "Setup plan: install wheel (listed in requirements-dev.txt) on main and pr.",
+   "Setup plan: install Sphinx==7.2.6 (listed in requirements.txt) on main and pr.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >=3.10",
+   "Installed pytest-httpbin 2.1.0 from pyproject (listed in the test extra) on main and pr.",
+   "Installed httpbin 0.10.4 from pyproject (listed in the test extra) on main and pr.",
+   "Installed pytest-cov 7.1.0 from pyproject (listed in the test extra) on main and pr.",
+   "Installed pytest-mock 3.17.0 from pyproject (listed in the test extra) on main and pr.",
+   "Installed pytest-xdist 3.8.0 from pyproject (listed in the test extra) on main and pr.",
+   "Installed pytest 9.2.0 from pyproject (listed in the test extra) on main and pr.",
+   "Installed trustme 1.2.1 from pyproject (listed in the test extra) on main and pr.",
+   "Installed wheel 0.48.0 from requirements-dev.txt (listed in requirements-dev.txt) on main and pr.",
+   "Installed Sphinx 7.2.6 from requirements.txt (listed in requirements.txt) on main and pr."
+  ],
+  "install_docs": [
+   "setup.py",
+   "Makefile",
+   "README.md",
+   "pyproject.toml",
+   "tox.ini",
+   "docs/Makefile",
+   ".github/CONTRIBUTING.md",
+   ".github/workflows/lint.yml",
+   ".github/workflows/close-issues.yml",
+   ".github/workflows/publish.yml",
+   ".github/workflows/lock-issues.yml",
+   ".github/workflows/run-tests.yml",
+   ".github/workflows/zizmor.yml",
+   ".github/workflows/typecheck.yml",
+   ".github/workflows/codeql-analysis.yml"
+  ],
+  "install_docs_from": "main",
+  "setup_plan": {
+   "packages": [
+    {
+     "requirement": "charset_normalizer>=2,<4",
+     "name": "charset_normalizer",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "idna>=2.5,<4",
+     "name": "idna",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "urllib3>=1.26,<3",
+     "name": "urllib3",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "certifi>=2023.5.7",
+     "name": "certifi",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest-httpbin==2.1.0",
+     "name": "pytest-httpbin",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the test extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "httpbin~=0.10.0",
+     "name": "httpbin",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the test extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest-cov",
+     "name": "pytest-cov",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the test extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest-mock",
+     "name": "pytest-mock",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the test extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest-xdist",
+     "name": "pytest-xdist",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the test extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest>=3",
+     "name": "pytest",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the test extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "trustme",
+     "name": "trustme",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the test extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "wheel",
+     "name": "wheel",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements-dev.txt",
+     "reason": "listed in requirements-dev.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "Sphinx==7.2.6",
+     "name": "Sphinx",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    }
+   ],
+   "scope_blocked": "",
+   "component": null,
+   "aggregate_names": [],
+   "extra_reqs": [
+    "pytest-httpbin==2.1.0",
+    "httpbin~=0.10.0",
+    "pytest-cov",
+    "pytest-mock",
+    "pytest-xdist",
+    "pytest>=3",
+    "trustme",
+    "wheel",
+    "Sphinx==7.2.6"
+   ],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >=3.10"
+   },
+   "system": [],
+   "refused": [],
+   "groups_blocked": ""
+  },
+  "steps": {
+   "setup_lookup": "Found 13 setup item(s) in the project's files and the web lookup.",
+   "setup_python": "Python 3.12: Python 3.12 already meets >=3.10",
+   "install_deps": "Wrote requirements.txt and installed it on main and pr: pytest-httpbin==2.1.0, httpbin~=0.10.0, pytest-cov, pytest-mock, pytest-xdist, pytest>=3, trustme, wheel, Sphinx==7.2.6. 4 more come with the project install."
+  },
+  "run_files": {
+   "requirements": "requirements.txt",
+   "plan": "setup-plan.json",
+   "count": 9
+  },
+  "installs": [
+   {
+    "package": "pytest-httpbin",
+    "requirement": "pytest-httpbin==2.1.0",
+    "version": "2.1.0",
+    "versions": {
+     "main": "2.1.0",
+     "pr": "2.1.0"
+    },
+    "source": "pyproject",
+    "reason": "listed in the test extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "httpbin",
+    "requirement": "httpbin~=0.10.0",
+    "version": "0.10.4",
+    "versions": {
+     "main": "0.10.4",
+     "pr": "0.10.4"
+    },
+    "source": "pyproject",
+    "reason": "listed in the test extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "pytest-cov",
+    "requirement": "pytest-cov",
+    "version": "7.1.0",
+    "versions": {
+     "main": "7.1.0",
+     "pr": "7.1.0"
+    },
+    "source": "pyproject",
+    "reason": "listed in the test extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "pytest-mock",
+    "requirement": "pytest-mock",
+    "version": "3.17.0",
+    "versions": {
+     "main": "3.17.0",
+     "pr": "3.17.0"
+    },
+    "source": "pyproject",
+    "reason": "listed in the test extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "pytest-xdist",
+    "requirement": "pytest-xdist",
+    "version": "3.8.0",
+    "versions": {
+     "main": "3.8.0",
+     "pr": "3.8.0"
+    },
+    "source": "pyproject",
+    "reason": "listed in the test extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "pytest",
+    "requirement": "pytest>=3",
+    "version": "9.2.0",
+    "versions": {
+     "main": "9.2.0",
+     "pr": "9.2.0"
+    },
+    "source": "pyproject",
+    "reason": "listed in the test extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "trustme",
+    "requirement": "trustme",
+    "version": "1.2.1",
+    "versions": {
+     "main": "1.2.1",
+     "pr": "1.2.1"
+    },
+    "source": "pyproject",
+    "reason": "listed in the test extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "wheel",
+    "requirement": "wheel",
+    "version": "0.48.0",
+    "versions": {
+     "main": "0.48.0",
+     "pr": "0.48.0"
+    },
+    "source": "requirements-dev.txt",
+    "reason": "listed in requirements-dev.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "Sphinx",
+    "requirement": "Sphinx==7.2.6",
+    "version": "7.2.6",
+    "versions": {
+     "main": "7.2.6",
+     "pr": "7.2.6"
+    },
+    "source": "requirements.txt",
+    "reason": "listed in requirements.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   }
+  ]
+ },
+ "sides": {
+  "comparison_basis": "base tip vs GitHub test merge (refs/pull/N/merge)",
+  "main_sha": "3c7baaa05ab4aa49cc819ce3a819d260de19c157",
+  "pr_sha": "ec5a029f86662481b65cda59d4a6cb3458f8d369",
+  "merge_commit": "ec5a029f86662481b65cda59d4a6cb3458f8d369",
+  "merge_parents": [
+   "3c7baaa05ab4aa49cc819ce3a819d260de19c157",
+   "1667efd1c4dab05a049f56b43cf8bb60b107ede8"
+  ],
+  "merge_head_matches_pinned_head": true
+ },
+ "tested": {
+  "main": "main @ 3c7baaa05ab4 (base tip = first parent of the merge commit)",
+  "pr": "GitHub test merge commit ec5a029f8666 (refs/pull/7068/merge) of head 1667efd1c4da"
+ },
+ "probe_plan": {
+  "baseline": "full",
+  "model": "model provider: nebius (Token Factory, live)",
+  "errors": [
+   "probe 'probe1' rejected: cannot bind requests.sessions.Session: Session() got unexpected keyword(s) 'trust_env'; parameters: (none); an unknown keyword was not removed, because dropping it would discard the scenario, and it was not mapped to a base parameter. A base call exists (tests/test_requests.py:171 requests.Session(); tests/test_requests.py:197 requests.Session()) and was not copied in its place. The probe is not run"
+  ],
+  "model_claims": [
+   {
+    "id": "C1",
+    "text": "When an explicit `proxies` mapping is passed to a request or configured on `Session.proxies`, `merge_environment_settings` and `resolve_proxies` only use `no_proxy` to decide whether to merge *missing* schemes from `os.environ`, leaving explicit entries in `proxies` untouched.",
+    "source_quote": "When an explicit `proxies` mapping is passed to a request or configured on `Session.proxies`, `merge_environment_settings` and `resolve_proxies` only use `no_proxy` to decide whether to merge *missing* schemes from `os.environ`, leaving explicit entries in `proxies` untouched.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C2",
+    "text": "Explicit `'no_proxy'` or `'no'` keys in `proxies` (including mappings returned directly by `urllib.request.getproxies()`) did not bypass explicit proxies.",
+    "source_quote": "- Explicit `'no_proxy'` or `'no'` keys in `proxies` (including mappings returned directly by `urllib.request.getproxies()`) did not bypass explicit proxies.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C3",
+    "text": "`no_proxy` / `NO_PROXY` environment variables were ignored whenever an explicit proxy was configured for that scheme.",
+    "source_quote": "- `no_proxy` / `NO_PROXY` environment variables were ignored whenever an explicit proxy was configured for that scheme.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C4",
+    "text": "Extract `'no_proxy'` and `'no'` by key presence (`_extract_no_proxy`) rather than truthiness.",
+    "source_quote": "Extract `'no_proxy'` and `'no'` by key presence (`_extract_no_proxy`) rather than truthiness.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C5",
+    "text": "Non-empty rules always apply.",
+    "source_quote": "Non-empty rules always apply",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C6",
+    "text": "An explicit empty string (`'no_proxy': ''` or `'no': ''`) disables bypass so callers can force an explicit proxy without disabling `trust_env` for `.netrc` or CA bundles.",
+    "source_quote": "an explicit empty string (`'no_proxy': ''` or `'no': ''`) disables bypass so callers can force an explicit proxy without disabling `trust_env` for `.netrc` or CA bundles",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C7",
+    "text": "Fall back to environment/OS bypass rules only when `trust_env=True` (`_should_bypass_proxies_with_trust_env`).",
+    "source_quote": "Fall back to environment/OS bypass rules only when `trust_env=True` (`_should_bypass_proxies_with_trust_env`).",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C8",
+    "text": "`select_proxy` accepts `trust_env: bool = True` to match `resolve_proxies`.",
+    "source_quote": "`select_proxy` accepts `trust_env: bool = True` to match `resolve_proxies`",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C9",
+    "text": "`HTTPAdapter` passes `trust_env=False` since `Session` evaluates `self.trust_env` upstream.",
+    "source_quote": "`HTTPAdapter` passes `trust_env=False` since `Session` evaluates `self.trust_env` upstream.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C10",
+    "text": "In `Session.send`, clear `proxies` on a shallow copy of `kwargs` passed to `adapter.send`.",
+    "source_quote": "In `Session.send`, clear `proxies` on a shallow copy of `kwargs` passed to `adapter.send`",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C11",
+    "text": "explicit `proxies` survive for response hooks and subsequent redirects to non-bypassed hosts.",
+    "source_quote": "so explicit `proxies` survive for response hooks and subsequent redirects to non-bypassed hosts.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C12",
+    "text": "The fix respects `no_proxy` in proxies dictionary and `NO_PROXY` env var.",
+    "source_quote": "Fix: Respect no_proxy in proxies dictionary and NO_PROXY env var",
+    "testable": true,
+    "expect": "differs"
+   }
+  ],
+  "model_rejected_claims": [],
+  "model_retried": {
+   "why": [
+    "no probe listed the claim ids it checks, so its results could not be tied to any claim; in each probe, \"claims\" must name the claim ids it checks and the observation names that cover them"
+   ]
+  },
+  "diff_targets": [
+   "requests.api.request",
+   "requests.utils.should_bypass_proxies",
+   "requests.utils.get_environ_proxies",
+   "requests.utils.select_proxy",
+   "requests.utils.resolve_proxies"
+  ],
+  "frozen": [
+   {
+    "path": "diff-probes/diff-api.py",
+    "source": "diff",
+    "sha256": "77df5f86801d52d78fe7cbefa4ce34ab4a565982d5bbdef5bdde21d7a3982ebe",
+    "generator": {
+     "kind": "diff",
+     "label": "diff (auto-derived from base-side code, model-free)",
+     "model": null,
+     "provider": null,
+     "provenance": "auto-derived",
+     "blind": false
+    },
+    "frozen_at": "2026-11-08T06:26:48.176232+00:00",
+    "inputs_sha256": "cbc8588de57b9c5c54445d52878db411d499be21b3c48d0d0eae87d15a0ae36d",
+    "inputs": {
+     "title_chars": 0,
+     "body_chars": 0,
+     "base_files": {
+      "src/requests/adapters.py": "cc9b1b02694fee0353481fbad84fe3ddbedec4441dba54df7914c63f2aa85937",
+      "src/requests/api.py": "4d15480ac046f089209798e8650476ef4a28ebe6f81b400758f8ef42ec6b5509",
+      "src/requests/sessions.py": "3d2089736ced93b2b405624a943f866d22652b17df06a85eb010f86272fc3e7d",
+      "src/requests/utils.py": "b879cb3f671cf1c28e8ff9b2b02151bcdb8974b4820a514cfdd1f5a038443cd2"
+     }
+    }
+   }
+  ]
+ },
+ "test_extras": [
+  "pytest-httpbin==2.1.0",
+  "pytest-mock",
+  "pytest-xdist"
+ ],
+ "pr_side_started_at": "2026-11-08T06:26:48.372803+00:00",
+ "test_targets": {
+  "main": [
+   "tests/test_requests.py",
+   "tests/test_utils.py",
+   "tests/test_adapters.py",
+   "tests/test_lowlevel.py"
+  ],
+  "pr": [
+   "tests/test_requests.py",
+   "tests/test_utils.py",
+   "tests/test_adapters.py",
+   "tests/test_lowlevel.py"
+  ]
+ },
+ "installed_commit": {
+  "main": {
+   "dist": "requests",
+   "expected": "3c7baaa05ab4aa49cc819ce3a819d260de19c157",
+   "installed": "3c7baaa05ab4aa49cc819ce3a819d260de19c157",
+   "ok": true
+  },
+  "pr": {
+   "dist": "requests",
+   "expected": "ec5a029f86662481b65cda59d4a6cb3458f8d369",
+   "installed": "ec5a029f86662481b65cda59d4a6cb3458f8d369",
+   "ok": true
+  }
+ },
+ "declared_test_deps": {
+  "requested": [
+   "pytest-httpbin==2.1.0",
+   "pytest-mock",
+   "pytest-xdist"
+  ],
+  "installed": true
+ },
+ "base_head_sha": "3c7baaa05ab4aa49cc819ce3a819d260de19c157",
+ "comparison": {
+  "same": 589,
+  "same_skipped_both": 15,
+  "regressions": [],
+  "fixed": [
+   "tests.test_requests.TestRequests::test_no_proxy_in_proxies_dict[no]",
+   "tests.test_requests.TestRequests::test_no_proxy_in_proxies_dict[no_proxy]",
+   "tests.test_requests.TestRequests::test_no_proxy_star_in_proxies_dict[no]",
+   "tests.test_requests.TestRequests::test_no_proxy_star_in_proxies_dict[no_proxy]",
+   "tests.test_requests.TestRequests::test_trust_env_false_honors_explicit_no_proxy[no]",
+   "tests.test_requests.TestRequests::test_trust_env_false_honors_explicit_no_proxy[no_proxy]",
+   "tests.test_utils::test_select_proxy_with_no_proxy[http://example.com-*-proxies3-None]",
+   "tests.test_utils::test_select_proxy_with_no_proxy[http://example.com-example.com-proxies0-None]",
+   "tests.test_utils::test_select_proxy_with_no_proxy[http://internal.com-internal.com-proxies5-None]",
+   "tests.test_utils::test_select_proxy_with_no_proxy[http://test.example.com-example.com-proxies2-None]",
+   "tests.test_utils::test_select_proxy_with_no_proxy[https://internal.com-internal.com-proxies6-None]"
+  ],
+  "new_tests_passing": 15,
+  "new_tests_passing_ids": [
+   "tests.test_requests.TestRequests::test_empty_no_proxy_in_proxies_overrides_env[no]",
+   "tests.test_requests.TestRequests::test_empty_no_proxy_in_proxies_overrides_env[no_proxy]",
+   "tests.test_requests.TestRequests::test_no_proxy_not_matching_in_proxies_dict[no]",
+   "tests.test_requests.TestRequests::test_no_proxy_not_matching_in_proxies_dict[no_proxy]",
+   "tests.test_requests.TestRequests::test_no_proxy_redirect_preserves_explicit_proxies",
+   "tests.test_requests.TestRequests::test_trust_env_false_ignores_no_proxy_env",
+   "tests.test_utils.TestExtractZippedPaths::test_unzipped_paths_unchanged[poc-main/ops/work/requests-7068/side-pr/tests/test_utils.py]",
+   "tests.test_utils.TestExtractZippedPaths::test_unzipped_paths_unchanged[poc-main/ops/work/requests-7068/venv-pr/lib/python3.12/site-packages/pytest/__init__.py]",
+   "tests.test_utils::test_select_proxy_trust_env_and_explicit_bypass[http://example.com-example.com-proxies0-False-http://proxy.com]",
+   "tests.test_utils::test_select_proxy_trust_env_and_explicit_bypass[http://example.com-example.com-proxies3-True-http://proxy.com]",
+   "tests.test_utils::test_select_proxy_trust_env_and_explicit_bypass[http://example.com-example.com-proxies4-True-http://proxy.com]",
+   "tests.test_utils::test_select_proxy_trust_env_and_explicit_bypass[http://example.com-other.com-proxies1-False-None]",
+   "tests.test_utils::test_select_proxy_trust_env_and_explicit_bypass[http://example.com-other.com-proxies2-False-None]",
+   "tests.test_utils::test_select_proxy_with_no_proxy[http://example.com-None-proxies4-http://proxy.com]",
+   "tests.test_utils::test_select_proxy_with_no_proxy[http://example.com-other.com-proxies1-http://proxy.com]"
+  ],
+  "new_tests_failing": [],
+  "new_tests_skipped": [],
+  "removed_tests": [],
+  "reparametrized": [
+   {
+    "test": "tests.test_utils.TestExtractZippedPaths::test_unzipped_paths_unchanged",
+    "removed_ids": [
+     "tests.test_utils.TestExtractZippedPaths::test_unzipped_paths_unchanged[poc-main/ops/work/requests-7068/side-main/tests/test_utils.py]",
+     "tests.test_utils.TestExtractZippedPaths::test_unzipped_paths_unchanged[poc-main/ops/work/requests-7068/venv-main/lib/python3.12/site-packages/pytest/__init__.py]"
+    ],
+    "added_ids": [
+     "tests.test_utils.TestExtractZippedPaths::test_unzipped_paths_unchanged[poc-main/ops/work/requests-7068/side-pr/tests/test_utils.py]",
+     "tests.test_utils.TestExtractZippedPaths::test_unzipped_paths_unchanged[poc-main/ops/work/requests-7068/venv-pr/lib/python3.12/site-packages/pytest/__init__.py]"
+    ]
+   }
+  ],
+  "skipped_missing_dependency": [],
+  "flaky": [],
+  "pr_unstable": [],
+  "pr_unstable_noisy": [],
+  "environment": [],
+  "other_changes": [],
+  "preexisting_failures": [
+   "tests.test_lowlevel::test_chunked_encoding_error",
+   "tests.test_lowlevel::test_chunked_upload",
+   "tests.test_lowlevel::test_chunked_upload_doesnt_skip_host_header",
+   "tests.test_lowlevel::test_chunked_upload_uses_only_specified_host_header",
+   "tests.test_lowlevel::test_conflicting_content_lengths",
+   "tests.test_lowlevel::test_digestauth_401_count_reset_on_redirect",
+   "tests.test_lowlevel::test_digestauth_401_only_sent_once",
+   "tests.test_lowlevel::test_digestauth_only_on_4xx",
+   "tests.test_lowlevel::test_fragment_not_sent_with_request",
+   "tests.test_lowlevel::test_fragment_update_on_redirect",
+   "tests.test_lowlevel::test_json_decode_compatibility_for_alt_utf_encodings",
+   "tests.test_lowlevel::test_redirect_rfc1808_to_non_ascii_location",
+   "tests.test_lowlevel::test_use_proxy_from_environment[ALL_PROXY-http]",
+   "tests.test_lowlevel::test_use_proxy_from_environment[ALL_PROXY-https]",
+   "tests.test_lowlevel::test_use_proxy_from_environment[HTTPS_PROXY-https]",
+   "tests.test_lowlevel::test_use_proxy_from_environment[HTTP_PROXY-http]",
+   "tests.test_lowlevel::test_use_proxy_from_environment[all_proxy-http]",
+   "tests.test_lowlevel::test_use_proxy_from_environment[all_proxy-https]",
+   "tests.test_lowlevel::test_use_proxy_from_environment[http_proxy-http]",
+   "tests.test_lowlevel::test_use_proxy_from_environment[https_proxy-https]",
+   "tests.test_requests.TestPreparingURLs::test_different_connection_pool_for_mtls_settings",
+   "tests.test_requests.TestPreparingURLs::test_different_connection_pool_for_tls_settings_verify_True",
+   "tests.test_requests.TestPreparingURLs::test_different_connection_pool_for_tls_settings_verify_bundle_expired_cert",
+   "tests.test_requests.TestPreparingURLs::test_different_connection_pool_for_tls_settings_verify_bundle_unexpired_cert",
+   "tests.test_requests.TestTimeout::test_connect_timeout[timeout0]",
+   "tests.test_requests.TestTimeout::test_connect_timeout[timeout1]",
+   "tests.test_requests.TestTimeout::test_total_timeout_connect[timeout0]",
+   "tests.test_requests.TestTimeout::test_total_timeout_connect[timeout1]"
+  ],
+  "load_failed_both": [],
+  "load_failed_pr": [],
+  "load_failed_main": [],
+  "failure_signatures": {
+   "tests.test_lowlevel::test_chunked_encoding_error": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "AttributeError"
+    ]
+   },
+   "tests.test_lowlevel::test_chunked_upload": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "AttributeError"
+    ]
+   },
+   "tests.test_lowlevel::test_chunked_upload_doesnt_skip_host_header": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "AttributeError"
+    ]
+   },
+   "tests.test_lowlevel::test_chunked_upload_uses_only_specified_host_header": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "AttributeError"
+    ]
+   },
+   "tests.test_lowlevel::test_conflicting_content_lengths": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "AttributeError"
+    ]
+   },
+   "tests.test_lowlevel::test_digestauth_401_count_reset_on_redirect": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "AttributeError"
+    ]
+   },
+   "tests.test_lowlevel::test_digestauth_401_only_sent_once": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "AttributeError"
+    ]
+   },
+   "tests.test_lowlevel::test_digestauth_only_on_4xx": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "AttributeError"
+    ]
+   },
+   "tests.test_lowlevel::test_fragment_not_sent_with_request": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "AttributeError"
+    ]
+   },
+   "tests.test_lowlevel::test_fragment_update_on_redirect": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "AttributeError"
+    ]
+   },
+   "tests.test_lowlevel::test_json_decode_compatibility_for_alt_utf_encodings": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "AttributeError"
+    ]
+   },
+   "tests.test_lowlevel::test_redirect_rfc1808_to_non_ascii_location": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "AttributeError"
+    ]
+   },
+   "tests.test_lowlevel::test_use_proxy_from_environment[ALL_PROXY-http]": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "AttributeError"
+    ]
+   },
+   "tests.test_lowlevel::test_use_proxy_from_environment[ALL_PROXY-https]": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "AttributeError"
+    ]
+   },
+   "tests.test_lowlevel::test_use_proxy_from_environment[HTTPS_PROXY-https]": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "AttributeError"
+    ]
+   },
+   "tests.test_lowlevel::test_use_proxy_from_environment[HTTP_PROXY-http]": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "AttributeError"
+    ]
+   },
+   "tests.test_lowlevel::test_use_proxy_from_environment[all_proxy-http]": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "AttributeError"
+    ]
+   },
+   "tests.test_lowlevel::test_use_proxy_from_environment[all_proxy-https]": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "AttributeError"
+    ]
+   },
+   "tests.test_lowlevel::test_use_proxy_from_environment[http_proxy-http]": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "AttributeError"
+    ]
+   },
+   "tests.test_lowlevel::test_use_proxy_from_environment[https_proxy-https]": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "AttributeError"
+    ]
+   },
+   "tests.test_requests.TestPreparingURLs::test_different_connection_pool_for_mtls_settings": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "AttributeError"
+    ]
+   },
+   "tests.test_requests.TestPreparingURLs::test_different_connection_pool_for_tls_settings_verify_True": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "AttributeError"
+    ]
+   },
+   "tests.test_requests.TestPreparingURLs::test_different_connection_pool_for_tls_settings_verify_bundle_expired_cert": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "AttributeError"
+    ]
+   },
+   "tests.test_requests.TestPreparingURLs::test_different_connection_pool_for_tls_settings_verify_bundle_unexpired_cert": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "AttributeError"
+    ]
+   },
+   "tests.test_requests.TestTimeout::test_connect_timeout[timeout0]": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ConnectionError",
+     "NewConnectionError"
+    ]
+   },
+   "tests.test_requests.TestTimeout::test_connect_timeout[timeout1]": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ConnectionError",
+     "NewConnectionError"
+    ]
+   },
+   "tests.test_requests.TestTimeout::test_total_timeout_connect[timeout0]": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ConnectionError",
+     "NewConnectionError"
+    ]
+   },
+   "tests.test_requests.TestTimeout::test_total_timeout_connect[timeout1]": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ConnectionError",
+     "NewConnectionError"
+    ]
+   }
+  },
+  "executed": {
+   "main": 587,
+   "pr": 600
+  },
+  "messages": {},
+  "base_messages": {
+   "tests.test_requests.TestRequests::test_no_proxy_in_proxies_dict[no]": "try",
+   "tests.test_requests.TestRequests::test_no_proxy_in_proxies_dict[no_proxy]": "try",
+   "tests.test_requests.TestRequests::test_no_proxy_star_in_proxies_dict[no]": "try",
+   "tests.test_requests.TestRequests::test_no_proxy_star_in_proxies_dict[no_proxy]": "try",
+   "tests.test_requests.TestRequests::test_trust_env_false_honors_explicit_no_proxy[no]": "try",
+   "tests.test_requests.TestRequests::test_trust_env_false_honors_explicit_no_proxy[no_proxy]": "try",
+   "tests.test_utils::test_select_proxy_with_no_proxy[http://example.com-*-proxies3-None]": "AssertionError: assert 'http://proxy.com' == None",
+   "tests.test_utils::test_select_proxy_with_no_proxy[http://example.com-example.com-proxies0-None]": "AssertionError: assert 'http://proxy.com' == None",
+   "tests.test_utils::test_select_proxy_with_no_proxy[http://internal.com-internal.com-proxies5-None]": "AssertionError: assert 'http://proxy.com' == None",
+   "tests.test_utils::test_select_proxy_with_no_proxy[http://test.example.com-example.com-proxies2-None]": "AssertionError: assert 'http://proxy.com' == None",
+   "tests.test_utils::test_select_proxy_with_no_proxy[https://internal.com-internal.com-proxies6-None]": "AssertionError: assert 'http://proxy.com' == None"
+  }
+ },
+ "exit_check": {
+  "explained": true,
+  "problems": [],
+  "detail": "pytest exit 1; 28 failure(s)/error(s) pre-existing and identical on both sides"
+ },
+ "probes": {
+  "status": "ran",
+  "items": [
+   {
+    "id": "diff-api",
+    "source": "diff",
+    "path": "diff-probes/diff-api.py",
+    "sha256": "77df5f86801d52d78fe7cbefa4ce34ab4a565982d5bbdef5bdde21d7a3982ebe",
+    "target": "psf/requests#7068",
+    "about": "Public functions touched by the PR, called with type-appropriate inputs on both sides.",
+    "claims": [],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.3,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.3,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.3,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.3,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.3,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.2,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-diff-api-main-1.jsonl",
+      "probe-diff-api-main-2.jsonl",
+      "probe-diff-api-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-diff-api-pr-1.jsonl",
+      "probe-diff-api-pr-2.jsonl",
+      "probe-diff-api-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "requests.api.request.input0": {
+        "raises": "AttributeError"
+       },
+       "requests.api.request.input1": {
+        "raises": "AttributeError"
+       },
+       "requests.api.request.input10": {
+        "raises": "AttributeError"
+       },
+       "requests.api.request.input11": {
+        "raises": "AttributeError"
+       },
+       "requests.api.request.input2": {
+        "raises": "AttributeError"
+       },
+       "requests.api.request.input3": {
+        "raises": "AttributeError"
+       },
+       "requests.api.request.input4": {
+        "raises": "MissingSchema"
+       },
+       "requests.api.request.input5": {
+        "raises": "AttributeError"
+       },
+       "requests.api.request.input6": {
+        "raises": "AttributeError"
+       },
+       "requests.api.request.input7": {
+        "raises": "AttributeError"
+       },
+       "requests.api.request.input8": {
+        "raises": "AttributeError"
+       },
+       "requests.api.request.input9": {
+        "raises": "MissingSchema"
+       },
+       "requests.utils.get_environ_proxies.input0": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.get_environ_proxies.input1": {},
+       "requests.utils.get_environ_proxies.input10": {},
+       "requests.utils.get_environ_proxies.input11": {},
+       "requests.utils.get_environ_proxies.input2": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.get_environ_proxies.input3": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.get_environ_proxies.input4": {},
+       "requests.utils.get_environ_proxies.input5": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.get_environ_proxies.input6": {},
+       "requests.utils.get_environ_proxies.input7": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.get_environ_proxies.input8": {},
+       "requests.utils.get_environ_proxies.input9": {},
+       "requests.utils.resolve_proxies.input0": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.resolve_proxies.input1": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.resolve_proxies.input10": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.resolve_proxies.input11": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.resolve_proxies.input2": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.resolve_proxies.input3": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.resolve_proxies.input4": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.resolve_proxies.input5": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.resolve_proxies.input6": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.resolve_proxies.input7": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.resolve_proxies.input8": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.resolve_proxies.input9": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.select_proxy.input0": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.select_proxy.input1": null,
+       "requests.utils.select_proxy.input10": null,
+       "requests.utils.select_proxy.input11": null,
+       "requests.utils.select_proxy.input2": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.select_proxy.input3": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.select_proxy.input4": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.select_proxy.input5": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.select_proxy.input6": null,
+       "requests.utils.select_proxy.input7": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.select_proxy.input8": null,
+       "requests.utils.select_proxy.input9": null,
+       "requests.utils.should_bypass_proxies.input0": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.should_bypass_proxies.input1": true,
+       "requests.utils.should_bypass_proxies.input10": true,
+       "requests.utils.should_bypass_proxies.input11": true,
+       "requests.utils.should_bypass_proxies.input2": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.should_bypass_proxies.input3": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.should_bypass_proxies.input4": true,
+       "requests.utils.should_bypass_proxies.input5": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.should_bypass_proxies.input6": true,
+       "requests.utils.should_bypass_proxies.input7": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.should_bypass_proxies.input8": true,
+       "requests.utils.should_bypass_proxies.input9": true
+      },
+      {
+       "requests.api.request.input0": {
+        "raises": "AttributeError"
+       },
+       "requests.api.request.input1": {
+        "raises": "AttributeError"
+       },
+       "requests.api.request.input10": {
+        "raises": "AttributeError"
+       },
+       "requests.api.request.input11": {
+        "raises": "AttributeError"
+       },
+       "requests.api.request.input2": {
+        "raises": "AttributeError"
+       },
+       "requests.api.request.input3": {
+        "raises": "AttributeError"
+       },
+       "requests.api.request.input4": {
+        "raises": "MissingSchema"
+       },
+       "requests.api.request.input5": {
+        "raises": "AttributeError"
+       },
+       "requests.api.request.input6": {
+        "raises": "AttributeError"
+       },
+       "requests.api.request.input7": {
+        "raises": "AttributeError"
+       },
+       "requests.api.request.input8": {
+        "raises": "AttributeError"
+       },
+       "requests.api.request.input9": {
+        "raises": "MissingSchema"
+       },
+       "requests.utils.get_environ_proxies.input0": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.get_environ_proxies.input1": {},
+       "requests.utils.get_environ_proxies.input10": {},
+       "requests.utils.get_environ_proxies.input11": {},
+       "requests.utils.get_environ_proxies.input2": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.get_environ_proxies.input3": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.get_environ_proxies.input4": {},
+       "requests.utils.get_environ_proxies.input5": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.get_environ_proxies.input6": {},
+       "requests.utils.get_environ_proxies.input7": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.get_environ_proxies.input8": {},
+       "requests.utils.get_environ_proxies.input9": {},
+       "requests.utils.resolve_proxies.input0": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.resolve_proxies.input1": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.resolve_proxies.input10": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.resolve_proxies.input11": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.resolve_proxies.input2": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.resolve_proxies.input3": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.resolve_proxies.input4": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.resolve_proxies.input5": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.resolve_proxies.input6": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.resolve_proxies.input7": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.resolve_proxies.input8": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.resolve_proxies.input9": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.select_proxy.input0": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.select_proxy.input1": null,
+       "requests.utils.select_proxy.input10": null,
+       "requests.utils.select_proxy.input11": null,
+       "requests.utils.select_proxy.input2": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.select_proxy.input3": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.select_proxy.input4": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.select_proxy.input5": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.select_proxy.input6": null,
+       "requests.utils.select_proxy.input7": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.select_proxy.input8": null,
+       "requests.utils.select_proxy.input9": null,
+       "requests.utils.should_bypass_proxies.input0": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.should_bypass_proxies.input1": true,
+       "requests.utils.should_bypass_proxies.input10": true,
+       "requests.utils.should_bypass_proxies.input11": true,
+       "requests.utils.should_bypass_proxies.input2": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.should_bypass_proxies.input3": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.should_bypass_proxies.input4": true,
+       "requests.utils.should_bypass_proxies.input5": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.should_bypass_proxies.input6": true,
+       "requests.utils.should_bypass_proxies.input7": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.should_bypass_proxies.input8": true,
+       "requests.utils.should_bypass_proxies.input9": true
+      },
+      {
+       "requests.api.request.input0": {
+        "raises": "AttributeError"
+       },
+       "requests.api.request.input1": {
+        "raises": "AttributeError"
+       },
+       "requests.api.request.input10": {
+        "raises": "AttributeError"
+       },
+       "requests.api.request.input11": {
+        "raises": "AttributeError"
+       },
+       "requests.api.request.input2": {
+        "raises": "AttributeError"
+       },
+       "requests.api.request.input3": {
+        "raises": "AttributeError"
+       },
+       "requests.api.request.input4": {
+        "raises": "MissingSchema"
+       },
+       "requests.api.request.input5": {
+        "raises": "AttributeError"
+       },
+       "requests.api.request.input6": {
+        "raises": "AttributeError"
+       },
+       "requests.api.request.input7": {
+        "raises": "AttributeError"
+       },
+       "requests.api.request.input8": {
+        "raises": "AttributeError"
+       },
+       "requests.api.request.input9": {
+        "raises": "MissingSchema"
+       },
+       "requests.utils.get_environ_proxies.input0": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.get_environ_proxies.input1": {},
+       "requests.utils.get_environ_proxies.input10": {},
+       "requests.utils.get_environ_proxies.input11": {},
+       "requests.utils.get_environ_proxies.input2": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.get_environ_proxies.input3": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.get_environ_proxies.input4": {},
+       "requests.utils.get_environ_proxies.input5": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.get_environ_proxies.input6": {},
+       "requests.utils.get_environ_proxies.input7": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.get_environ_proxies.input8": {},
+       "requests.utils.get_environ_proxies.input9": {},
+       "requests.utils.resolve_proxies.input0": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.resolve_proxies.input1": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.resolve_proxies.input10": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.resolve_proxies.input11": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.resolve_proxies.input2": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.resolve_proxies.input3": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.resolve_proxies.input4": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.resolve_proxies.input5": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.resolve_proxies.input6": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.resolve_proxies.input7": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.resolve_proxies.input8": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.resolve_proxies.input9": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.select_proxy.input0": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.select_proxy.input1": null,
+       "requests.utils.select_proxy.input10": null,
+       "requests.utils.select_proxy.input11": null,
+       "requests.utils.select_proxy.input2": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.select_proxy.input3": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.select_proxy.input4": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.select_proxy.input5": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.select_proxy.input6": null,
+       "requests.utils.select_proxy.input7": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.select_proxy.input8": null,
+       "requests.utils.select_proxy.input9": null,
+       "requests.utils.should_bypass_proxies.input0": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.should_bypass_proxies.input1": true,
+       "requests.utils.should_bypass_proxies.input10": true,
+       "requests.utils.should_bypass_proxies.input11": true,
+       "requests.utils.should_bypass_proxies.input2": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.should_bypass_proxies.input3": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.should_bypass_proxies.input4": true,
+       "requests.utils.should_bypass_proxies.input5": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.should_bypass_proxies.input6": true,
+       "requests.utils.should_bypass_proxies.input7": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.should_bypass_proxies.input8": true,
+       "requests.utils.should_bypass_proxies.input9": true
+      }
+     ],
+     "pr": [
+      {
+       "requests.api.request.input0": {
+        "raises": "AttributeError"
+       },
+       "requests.api.request.input1": {
+        "raises": "AttributeError"
+       },
+       "requests.api.request.input10": {
+        "raises": "AttributeError"
+       },
+       "requests.api.request.input11": {
+        "raises": "AttributeError"
+       },
+       "requests.api.request.input2": {
+        "raises": "AttributeError"
+       },
+       "requests.api.request.input3": {
+        "raises": "AttributeError"
+       },
+       "requests.api.request.input4": {
+        "raises": "MissingSchema"
+       },
+       "requests.api.request.input5": {
+        "raises": "AttributeError"
+       },
+       "requests.api.request.input6": {
+        "raises": "AttributeError"
+       },
+       "requests.api.request.input7": {
+        "raises": "AttributeError"
+       },
+       "requests.api.request.input8": {
+        "raises": "AttributeError"
+       },
+       "requests.api.request.input9": {
+        "raises": "MissingSchema"
+       },
+       "requests.utils.get_environ_proxies.input0": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.get_environ_proxies.input1": {},
+       "requests.utils.get_environ_proxies.input10": {},
+       "requests.utils.get_environ_proxies.input11": {},
+       "requests.utils.get_environ_proxies.input2": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.get_environ_proxies.input3": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.get_environ_proxies.input4": {},
+       "requests.utils.get_environ_proxies.input5": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.get_environ_proxies.input6": {},
+       "requests.utils.get_environ_proxies.input7": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.get_environ_proxies.input8": {},
+       "requests.utils.get_environ_proxies.input9": {},
+       "requests.utils.resolve_proxies.input0": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.resolve_proxies.input1": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.resolve_proxies.input10": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.resolve_proxies.input11": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.resolve_proxies.input2": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.resolve_proxies.input3": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.resolve_proxies.input4": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.resolve_proxies.input5": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.resolve_proxies.input6": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.resolve_proxies.input7": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.resolve_proxies.input8": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.resolve_proxies.input9": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.select_proxy.input0": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.select_proxy.input1": null,
+       "requests.utils.select_proxy.input10": null,
+       "requests.utils.select_proxy.input11": null,
+       "requests.utils.select_proxy.input2": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.select_proxy.input3": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.select_proxy.input4": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.select_proxy.input5": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.select_proxy.input6": null,
+       "requests.utils.select_proxy.input7": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.select_proxy.input8": null,
+       "requests.utils.select_proxy.input9": null,
+       "requests.utils.should_bypass_proxies.input0": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.should_bypass_proxies.input1": true,
+       "requests.utils.should_bypass_proxies.input10": true,
+       "requests.utils.should_bypass_proxies.input11": true,
+       "requests.utils.should_bypass_proxies.input2": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.should_bypass_proxies.input3": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.should_bypass_proxies.input4": true,
+       "requests.utils.should_bypass_proxies.input5": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.should_bypass_proxies.input6": true,
+       "requests.utils.should_bypass_proxies.input7": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.should_bypass_proxies.input8": true,
+       "requests.utils.should_bypass_proxies.input9": true
+      },
+      {
+       "requests.api.request.input0": {
+        "raises": "AttributeError"
+       },
+       "requests.api.request.input1": {
+        "raises": "AttributeError"
+       },
+       "requests.api.request.input10": {
+        "raises": "AttributeError"
+       },
+       "requests.api.request.input11": {
+        "raises": "AttributeError"
+       },
+       "requests.api.request.input2": {
+        "raises": "AttributeError"
+       },
+       "requests.api.request.input3": {
+        "raises": "AttributeError"
+       },
+       "requests.api.request.input4": {
+        "raises": "MissingSchema"
+       },
+       "requests.api.request.input5": {
+        "raises": "AttributeError"
+       },
+       "requests.api.request.input6": {
+        "raises": "AttributeError"
+       },
+       "requests.api.request.input7": {
+        "raises": "AttributeError"
+       },
+       "requests.api.request.input8": {
+        "raises": "AttributeError"
+       },
+       "requests.api.request.input9": {
+        "raises": "MissingSchema"
+       },
+       "requests.utils.get_environ_proxies.input0": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.get_environ_proxies.input1": {},
+       "requests.utils.get_environ_proxies.input10": {},
+       "requests.utils.get_environ_proxies.input11": {},
+       "requests.utils.get_environ_proxies.input2": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.get_environ_proxies.input3": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.get_environ_proxies.input4": {},
+       "requests.utils.get_environ_proxies.input5": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.get_environ_proxies.input6": {},
+       "requests.utils.get_environ_proxies.input7": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.get_environ_proxies.input8": {},
+       "requests.utils.get_environ_proxies.input9": {},
+       "requests.utils.resolve_proxies.input0": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.resolve_proxies.input1": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.resolve_proxies.input10": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.resolve_proxies.input11": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.resolve_proxies.input2": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.resolve_proxies.input3": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.resolve_proxies.input4": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.resolve_proxies.input5": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.resolve_proxies.input6": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.resolve_proxies.input7": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.resolve_proxies.input8": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.resolve_proxies.input9": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.select_proxy.input0": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.select_proxy.input1": null,
+       "requests.utils.select_proxy.input10": null,
+       "requests.utils.select_proxy.input11": null,
+       "requests.utils.select_proxy.input2": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.select_proxy.input3": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.select_proxy.input4": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.select_proxy.input5": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.select_proxy.input6": null,
+       "requests.utils.select_proxy.input7": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.select_proxy.input8": null,
+       "requests.utils.select_proxy.input9": null,
+       "requests.utils.should_bypass_proxies.input0": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.should_bypass_proxies.input1": true,
+       "requests.utils.should_bypass_proxies.input10": true,
+       "requests.utils.should_bypass_proxies.input11": true,
+       "requests.utils.should_bypass_proxies.input2": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.should_bypass_proxies.input3": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.should_bypass_proxies.input4": true,
+       "requests.utils.should_bypass_proxies.input5": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.should_bypass_proxies.input6": true,
+       "requests.utils.should_bypass_proxies.input7": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.should_bypass_proxies.input8": true,
+       "requests.utils.should_bypass_proxies.input9": true
+      },
+      {
+       "requests.api.request.input0": {
+        "raises": "AttributeError"
+       },
+       "requests.api.request.input1": {
+        "raises": "AttributeError"
+       },
+       "requests.api.request.input10": {
+        "raises": "AttributeError"
+       },
+       "requests.api.request.input11": {
+        "raises": "AttributeError"
+       },
+       "requests.api.request.input2": {
+        "raises": "AttributeError"
+       },
+       "requests.api.request.input3": {
+        "raises": "AttributeError"
+       },
+       "requests.api.request.input4": {
+        "raises": "MissingSchema"
+       },
+       "requests.api.request.input5": {
+        "raises": "AttributeError"
+       },
+       "requests.api.request.input6": {
+        "raises": "AttributeError"
+       },
+       "requests.api.request.input7": {
+        "raises": "AttributeError"
+       },
+       "requests.api.request.input8": {
+        "raises": "AttributeError"
+       },
+       "requests.api.request.input9": {
+        "raises": "MissingSchema"
+       },
+       "requests.utils.get_environ_proxies.input0": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.get_environ_proxies.input1": {},
+       "requests.utils.get_environ_proxies.input10": {},
+       "requests.utils.get_environ_proxies.input11": {},
+       "requests.utils.get_environ_proxies.input2": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.get_environ_proxies.input3": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.get_environ_proxies.input4": {},
+       "requests.utils.get_environ_proxies.input5": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.get_environ_proxies.input6": {},
+       "requests.utils.get_environ_proxies.input7": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.get_environ_proxies.input8": {},
+       "requests.utils.get_environ_proxies.input9": {},
+       "requests.utils.resolve_proxies.input0": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.resolve_proxies.input1": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.resolve_proxies.input10": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.resolve_proxies.input11": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.resolve_proxies.input2": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.resolve_proxies.input3": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.resolve_proxies.input4": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.resolve_proxies.input5": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.resolve_proxies.input6": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.resolve_proxies.input7": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.resolve_proxies.input8": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.resolve_proxies.input9": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.select_proxy.input0": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.select_proxy.input1": null,
+       "requests.utils.select_proxy.input10": null,
+       "requests.utils.select_proxy.input11": null,
+       "requests.utils.select_proxy.input2": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.select_proxy.input3": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.select_proxy.input4": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.select_proxy.input5": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.select_proxy.input6": null,
+       "requests.utils.select_proxy.input7": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.select_proxy.input8": null,
+       "requests.utils.select_proxy.input9": null,
+       "requests.utils.should_bypass_proxies.input0": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.should_bypass_proxies.input1": true,
+       "requests.utils.should_bypass_proxies.input10": true,
+       "requests.utils.should_bypass_proxies.input11": true,
+       "requests.utils.should_bypass_proxies.input2": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.should_bypass_proxies.input3": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.should_bypass_proxies.input4": true,
+       "requests.utils.should_bypass_proxies.input5": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.should_bypass_proxies.input6": true,
+       "requests.utils.should_bypass_proxies.input7": {
+        "raises": "AttributeError"
+       },
+       "requests.utils.should_bypass_proxies.input8": true,
+       "requests.utils.should_bypass_proxies.input9": true
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "requests.api.request.input0",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"requests.api.request.input0\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"requests.api.request.input0\""
+       }
+      }
+     },
+     {
+      "name": "requests.api.request.input1",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"requests.api.request.input1\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"requests.api.request.input1\""
+       }
+      }
+     },
+     {
+      "name": "requests.api.request.input10",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"requests.api.request.input10\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"requests.api.request.input10\""
+       }
+      }
+     },
+     {
+      "name": "requests.api.request.input11",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"requests.api.request.input11\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"requests.api.request.input11\""
+       }
+      }
+     },
+     {
+      "name": "requests.api.request.input2",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"requests.api.request.input2\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"requests.api.request.input2\""
+       }
+      }
+     },
+     {
+      "name": "requests.api.request.input3",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"requests.api.request.input3\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"requests.api.request.input3\""
+       }
+      }
+     },
+     {
+      "name": "requests.api.request.input4",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "MissingSchema"
+      },
+      "pr": {
+       "raises": "MissingSchema"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 7,
+        "quote": "\"observation\": \"requests.api.request.input4\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 7,
+        "quote": "\"observation\": \"requests.api.request.input4\""
+       }
+      }
+     },
+     {
+      "name": "requests.api.request.input5",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 8,
+        "quote": "\"observation\": \"requests.api.request.input5\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 8,
+        "quote": "\"observation\": \"requests.api.request.input5\""
+       }
+      }
+     },
+     {
+      "name": "requests.api.request.input6",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 9,
+        "quote": "\"observation\": \"requests.api.request.input6\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 9,
+        "quote": "\"observation\": \"requests.api.request.input6\""
+       }
+      }
+     },
+     {
+      "name": "requests.api.request.input7",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 10,
+        "quote": "\"observation\": \"requests.api.request.input7\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 10,
+        "quote": "\"observation\": \"requests.api.request.input7\""
+       }
+      }
+     },
+     {
+      "name": "requests.api.request.input8",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 11,
+        "quote": "\"observation\": \"requests.api.request.input8\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 11,
+        "quote": "\"observation\": \"requests.api.request.input8\""
+       }
+      }
+     },
+     {
+      "name": "requests.api.request.input9",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "MissingSchema"
+      },
+      "pr": {
+       "raises": "MissingSchema"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 12,
+        "quote": "\"observation\": \"requests.api.request.input9\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 12,
+        "quote": "\"observation\": \"requests.api.request.input9\""
+       }
+      }
+     },
+     {
+      "name": "requests.utils.get_environ_proxies.input0",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 13,
+        "quote": "\"observation\": \"requests.utils.get_environ_proxies.input0\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 13,
+        "quote": "\"observation\": \"requests.utils.get_environ_proxies.input0\""
+       }
+      }
+     },
+     {
+      "name": "requests.utils.get_environ_proxies.input1",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": {},
+      "pr": {},
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 14,
+        "quote": "\"observation\": \"requests.utils.get_environ_proxies.input1\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 14,
+        "quote": "\"observation\": \"requests.utils.get_environ_proxies.input1\""
+       }
+      }
+     },
+     {
+      "name": "requests.utils.get_environ_proxies.input10",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": {},
+      "pr": {},
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 15,
+        "quote": "\"observation\": \"requests.utils.get_environ_proxies.input10\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 15,
+        "quote": "\"observation\": \"requests.utils.get_environ_proxies.input10\""
+       }
+      }
+     },
+     {
+      "name": "requests.utils.get_environ_proxies.input11",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": {},
+      "pr": {},
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 16,
+        "quote": "\"observation\": \"requests.utils.get_environ_proxies.input11\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 16,
+        "quote": "\"observation\": \"requests.utils.get_environ_proxies.input11\""
+       }
+      }
+     },
+     {
+      "name": "requests.utils.get_environ_proxies.input2",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 17,
+        "quote": "\"observation\": \"requests.utils.get_environ_proxies.input2\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 17,
+        "quote": "\"observation\": \"requests.utils.get_environ_proxies.input2\""
+       }
+      }
+     },
+     {
+      "name": "requests.utils.get_environ_proxies.input3",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 18,
+        "quote": "\"observation\": \"requests.utils.get_environ_proxies.input3\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 18,
+        "quote": "\"observation\": \"requests.utils.get_environ_proxies.input3\""
+       }
+      }
+     },
+     {
+      "name": "requests.utils.get_environ_proxies.input4",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": {},
+      "pr": {},
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 19,
+        "quote": "\"observation\": \"requests.utils.get_environ_proxies.input4\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 19,
+        "quote": "\"observation\": \"requests.utils.get_environ_proxies.input4\""
+       }
+      }
+     },
+     {
+      "name": "requests.utils.get_environ_proxies.input5",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 20,
+        "quote": "\"observation\": \"requests.utils.get_environ_proxies.input5\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 20,
+        "quote": "\"observation\": \"requests.utils.get_environ_proxies.input5\""
+       }
+      }
+     },
+     {
+      "name": "requests.utils.get_environ_proxies.input6",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": {},
+      "pr": {},
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 21,
+        "quote": "\"observation\": \"requests.utils.get_environ_proxies.input6\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 21,
+        "quote": "\"observation\": \"requests.utils.get_environ_proxies.input6\""
+       }
+      }
+     },
+     {
+      "name": "requests.utils.get_environ_proxies.input7",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 22,
+        "quote": "\"observation\": \"requests.utils.get_environ_proxies.input7\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 22,
+        "quote": "\"observation\": \"requests.utils.get_environ_proxies.input7\""
+       }
+      }
+     },
+     {
+      "name": "requests.utils.get_environ_proxies.input8",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": {},
+      "pr": {},
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 23,
+        "quote": "\"observation\": \"requests.utils.get_environ_proxies.input8\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 23,
+        "quote": "\"observation\": \"requests.utils.get_environ_proxies.input8\""
+       }
+      }
+     },
+     {
+      "name": "requests.utils.get_environ_proxies.input9",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": {},
+      "pr": {},
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 24,
+        "quote": "\"observation\": \"requests.utils.get_environ_proxies.input9\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 24,
+        "quote": "\"observation\": \"requests.utils.get_environ_proxies.input9\""
+       }
+      }
+     },
+     {
+      "name": "requests.utils.resolve_proxies.input0",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 25,
+        "quote": "\"observation\": \"requests.utils.resolve_proxies.input0\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 25,
+        "quote": "\"observation\": \"requests.utils.resolve_proxies.input0\""
+       }
+      }
+     },
+     {
+      "name": "requests.utils.resolve_proxies.input1",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 26,
+        "quote": "\"observation\": \"requests.utils.resolve_proxies.input1\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 26,
+        "quote": "\"observation\": \"requests.utils.resolve_proxies.input1\""
+       }
+      }
+     },
+     {
+      "name": "requests.utils.resolve_proxies.input10",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 27,
+        "quote": "\"observation\": \"requests.utils.resolve_proxies.input10\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 27,
+        "quote": "\"observation\": \"requests.utils.resolve_proxies.input10\""
+       }
+      }
+     },
+     {
+      "name": "requests.utils.resolve_proxies.input11",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 28,
+        "quote": "\"observation\": \"requests.utils.resolve_proxies.input11\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 28,
+        "quote": "\"observation\": \"requests.utils.resolve_proxies.input11\""
+       }
+      }
+     },
+     {
+      "name": "requests.utils.resolve_proxies.input2",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 29,
+        "quote": "\"observation\": \"requests.utils.resolve_proxies.input2\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 29,
+        "quote": "\"observation\": \"requests.utils.resolve_proxies.input2\""
+       }
+      }
+     },
+     {
+      "name": "requests.utils.resolve_proxies.input3",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 30,
+        "quote": "\"observation\": \"requests.utils.resolve_proxies.input3\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 30,
+        "quote": "\"observation\": \"requests.utils.resolve_proxies.input3\""
+       }
+      }
+     },
+     {
+      "name": "requests.utils.resolve_proxies.input4",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 31,
+        "quote": "\"observation\": \"requests.utils.resolve_proxies.input4\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 31,
+        "quote": "\"observation\": \"requests.utils.resolve_proxies.input4\""
+       }
+      }
+     },
+     {
+      "name": "requests.utils.resolve_proxies.input5",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 32,
+        "quote": "\"observation\": \"requests.utils.resolve_proxies.input5\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 32,
+        "quote": "\"observation\": \"requests.utils.resolve_proxies.input5\""
+       }
+      }
+     },
+     {
+      "name": "requests.utils.resolve_proxies.input6",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 33,
+        "quote": "\"observation\": \"requests.utils.resolve_proxies.input6\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 33,
+        "quote": "\"observation\": \"requests.utils.resolve_proxies.input6\""
+       }
+      }
+     },
+     {
+      "name": "requests.utils.resolve_proxies.input7",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 34,
+        "quote": "\"observation\": \"requests.utils.resolve_proxies.input7\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 34,
+        "quote": "\"observation\": \"requests.utils.resolve_proxies.input7\""
+       }
+      }
+     },
+     {
+      "name": "requests.utils.resolve_proxies.input8",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 35,
+        "quote": "\"observation\": \"requests.utils.resolve_proxies.input8\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 35,
+        "quote": "\"observation\": \"requests.utils.resolve_proxies.input8\""
+       }
+      }
+     },
+     {
+      "name": "requests.utils.resolve_proxies.input9",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 36,
+        "quote": "\"observation\": \"requests.utils.resolve_proxies.input9\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 36,
+        "quote": "\"observation\": \"requests.utils.resolve_proxies.input9\""
+       }
+      }
+     },
+     {
+      "name": "requests.utils.select_proxy.input0",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 37,
+        "quote": "\"observation\": \"requests.utils.select_proxy.input0\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 37,
+        "quote": "\"observation\": \"requests.utils.select_proxy.input0\""
+       }
+      }
+     },
+     {
+      "name": "requests.utils.select_proxy.input1",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": null,
+      "pr": null,
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 38,
+        "quote": "\"observation\": \"requests.utils.select_proxy.input1\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 38,
+        "quote": "\"observation\": \"requests.utils.select_proxy.input1\""
+       }
+      }
+     },
+     {
+      "name": "requests.utils.select_proxy.input10",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": null,
+      "pr": null,
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 39,
+        "quote": "\"observation\": \"requests.utils.select_proxy.input10\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 39,
+        "quote": "\"observation\": \"requests.utils.select_proxy.input10\""
+       }
+      }
+     },
+     {
+      "name": "requests.utils.select_proxy.input11",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": null,
+      "pr": null,
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 40,
+        "quote": "\"observation\": \"requests.utils.select_proxy.input11\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 40,
+        "quote": "\"observation\": \"requests.utils.select_proxy.input11\""
+       }
+      }
+     },
+     {
+      "name": "requests.utils.select_proxy.input2",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 41,
+        "quote": "\"observation\": \"requests.utils.select_proxy.input2\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 41,
+        "quote": "\"observation\": \"requests.utils.select_proxy.input2\""
+       }
+      }
+     },
+     {
+      "name": "requests.utils.select_proxy.input3",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 42,
+        "quote": "\"observation\": \"requests.utils.select_proxy.input3\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 42,
+        "quote": "\"observation\": \"requests.utils.select_proxy.input3\""
+       }
+      }
+     },
+     {
+      "name": "requests.utils.select_proxy.input4",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 43,
+        "quote": "\"observation\": \"requests.utils.select_proxy.input4\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 43,
+        "quote": "\"observation\": \"requests.utils.select_proxy.input4\""
+       }
+      }
+     },
+     {
+      "name": "requests.utils.select_proxy.input5",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 44,
+        "quote": "\"observation\": \"requests.utils.select_proxy.input5\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 44,
+        "quote": "\"observation\": \"requests.utils.select_proxy.input5\""
+       }
+      }
+     },
+     {
+      "name": "requests.utils.select_proxy.input6",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": null,
+      "pr": null,
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 45,
+        "quote": "\"observation\": \"requests.utils.select_proxy.input6\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 45,
+        "quote": "\"observation\": \"requests.utils.select_proxy.input6\""
+       }
+      }
+     },
+     {
+      "name": "requests.utils.select_proxy.input7",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 46,
+        "quote": "\"observation\": \"requests.utils.select_proxy.input7\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 46,
+        "quote": "\"observation\": \"requests.utils.select_proxy.input7\""
+       }
+      }
+     },
+     {
+      "name": "requests.utils.select_proxy.input8",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": null,
+      "pr": null,
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 47,
+        "quote": "\"observation\": \"requests.utils.select_proxy.input8\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 47,
+        "quote": "\"observation\": \"requests.utils.select_proxy.input8\""
+       }
+      }
+     },
+     {
+      "name": "requests.utils.select_proxy.input9",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": null,
+      "pr": null,
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 48,
+        "quote": "\"observation\": \"requests.utils.select_proxy.input9\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 48,
+        "quote": "\"observation\": \"requests.utils.select_proxy.input9\""
+       }
+      }
+     },
+     {
+      "name": "requests.utils.should_bypass_proxies.input0",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 49,
+        "quote": "\"observation\": \"requests.utils.should_bypass_proxies.input0\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 49,
+        "quote": "\"observation\": \"requests.utils.should_bypass_proxies.input0\""
+       }
+      }
+     },
+     {
+      "name": "requests.utils.should_bypass_proxies.input1",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": true,
+      "pr": true,
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 50,
+        "quote": "\"observation\": \"requests.utils.should_bypass_proxies.input1\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 50,
+        "quote": "\"observation\": \"requests.utils.should_bypass_proxies.input1\""
+       }
+      }
+     },
+     {
+      "name": "requests.utils.should_bypass_proxies.input10",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": true,
+      "pr": true,
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 51,
+        "quote": "\"observation\": \"requests.utils.should_bypass_proxies.input10\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 51,
+        "quote": "\"observation\": \"requests.utils.should_bypass_proxies.input10\""
+       }
+      }
+     },
+     {
+      "name": "requests.utils.should_bypass_proxies.input11",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": true,
+      "pr": true,
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 52,
+        "quote": "\"observation\": \"requests.utils.should_bypass_proxies.input11\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 52,
+        "quote": "\"observation\": \"requests.utils.should_bypass_proxies.input11\""
+       }
+      }
+     },
+     {
+      "name": "requests.utils.should_bypass_proxies.input2",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 53,
+        "quote": "\"observation\": \"requests.utils.should_bypass_proxies.input2\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 53,
+        "quote": "\"observation\": \"requests.utils.should_bypass_proxies.input2\""
+       }
+      }
+     },
+     {
+      "name": "requests.utils.should_bypass_proxies.input3",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 54,
+        "quote": "\"observation\": \"requests.utils.should_bypass_proxies.input3\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 54,
+        "quote": "\"observation\": \"requests.utils.should_bypass_proxies.input3\""
+       }
+      }
+     },
+     {
+      "name": "requests.utils.should_bypass_proxies.input4",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": true,
+      "pr": true,
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 55,
+        "quote": "\"observation\": \"requests.utils.should_bypass_proxies.input4\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 55,
+        "quote": "\"observation\": \"requests.utils.should_bypass_proxies.input4\""
+       }
+      }
+     },
+     {
+      "name": "requests.utils.should_bypass_proxies.input5",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 56,
+        "quote": "\"observation\": \"requests.utils.should_bypass_proxies.input5\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 56,
+        "quote": "\"observation\": \"requests.utils.should_bypass_proxies.input5\""
+       }
+      }
+     },
+     {
+      "name": "requests.utils.should_bypass_proxies.input6",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": true,
+      "pr": true,
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 57,
+        "quote": "\"observation\": \"requests.utils.should_bypass_proxies.input6\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 57,
+        "quote": "\"observation\": \"requests.utils.should_bypass_proxies.input6\""
+       }
+      }
+     },
+     {
+      "name": "requests.utils.should_bypass_proxies.input7",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 58,
+        "quote": "\"observation\": \"requests.utils.should_bypass_proxies.input7\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 58,
+        "quote": "\"observation\": \"requests.utils.should_bypass_proxies.input7\""
+       }
+      }
+     },
+     {
+      "name": "requests.utils.should_bypass_proxies.input8",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": true,
+      "pr": true,
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 59,
+        "quote": "\"observation\": \"requests.utils.should_bypass_proxies.input8\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 59,
+        "quote": "\"observation\": \"requests.utils.should_bypass_proxies.input8\""
+       }
+      }
+     },
+     {
+      "name": "requests.utils.should_bypass_proxies.input9",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": true,
+      "pr": true,
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 60,
+        "quote": "\"observation\": \"requests.utils.should_bypass_proxies.input9\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 60,
+        "quote": "\"observation\": \"requests.utils.should_bypass_proxies.input9\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "diff",
+     "label": "diff (auto-derived from base-side code, model-free)",
+     "model": null,
+     "provider": null,
+     "provenance": "auto-derived",
+     "blind": false
+    },
+    "freeze": {
+     "sha256": "77df5f86801d52d78fe7cbefa4ce34ab4a565982d5bbdef5bdde21d7a3982ebe",
+     "generator": {
+      "kind": "diff",
+      "label": "diff (auto-derived from base-side code, model-free)",
+      "model": null,
+      "provider": null,
+      "provenance": "auto-derived",
+      "blind": false
+     },
+     "frozen_at": "2026-11-08T06:26:48.176232+00:00",
+     "inputs_sha256": "cbc8588de57b9c5c54445d52878db411d499be21b3c48d0d0eae87d15a0ae36d",
+     "inputs": {
+      "title_chars": 0,
+      "body_chars": 0,
+      "base_files": {
+       "src/requests/adapters.py": "cc9b1b02694fee0353481fbad84fe3ddbedec4441dba54df7914c63f2aa85937",
+       "src/requests/api.py": "4d15480ac046f089209798e8650476ef4a28ebe6f81b400758f8ef42ec6b5509",
+       "src/requests/sessions.py": "3d2089736ced93b2b405624a943f866d22652b17df06a85eb010f86272fc3e7d",
+       "src/requests/utils.py": "b879cb3f671cf1c28e8ff9b2b02151bcdb8974b4820a514cfdd1f5a038443cd2"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-08T06:26:48.372803+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 15,
+     "changed_lines_covered": 5,
+     "files": [
+      {
+       "file": "src/requests/adapters.py",
+       "changed_lines_total": 3,
+       "changed_lines_covered": 0
+      },
+      {
+       "file": "src/requests/api.py",
+       "changed_lines_total": 0,
+       "changed_lines_covered": 0
+      },
+      {
+       "file": "src/requests/sessions.py",
+       "changed_lines_total": 4,
+       "changed_lines_covered": 1
+      },
+      {
+       "file": "src/requests/utils.py",
+       "changed_lines_total": 8,
+       "changed_lines_covered": 4
+      }
+     ],
+     "adequacy": "adequate",
+     "note": "ran 5 of 15 changed line(s) on the main side",
+     "exit": 0,
+     "data": "probe-cov-diff-api.json"
+    },
+    "status": "ran"
+   }
+  ],
+  "summary": {
+   "labels": [
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "not_testable",
+    "not_testable",
+    "no_difference",
+    "not_testable",
+    "no_difference",
+    "not_testable",
+    "no_difference",
+    "no_difference",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "no_difference",
+    "not_testable",
+    "no_difference",
+    "no_difference",
+    "not_testable",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "not_testable",
+    "not_testable",
+    "no_difference",
+    "not_testable",
+    "no_difference",
+    "not_testable",
+    "no_difference",
+    "no_difference"
+   ],
+   "flagged": [],
+   "proven_claims": [],
+   "reason": "probe: 20 other observation(s) identical on both sides; probe: 40 probe(s) could not run on either side",
+   "ignored_noise": [],
+   "ignored_warning_only": [],
+   "pr_only_noisy": [],
+   "advisory_unchanged_subchecks": [],
+   "advisory_agreeing_differs": [],
+   "advisory_invalid_preservation": []
+  }
+ },
+ "probe_changed_line_coverage": {
+  "status": "measured",
+  "side": "main",
+  "probes": {
+   "diff-api": {
+    "status": "measured",
+    "changed_lines_covered": 5,
+    "changed_lines_total": 15,
+    "adequacy": "adequate"
+   }
+  },
+  "not_adequate": []
+ },
+ "verdict": "could_not_verify",
+ "reason": "unverified behaviour claim: \"When an explicit `proxies` mapping is passed to a request or configured on `Session.proxies`, `merge_environment_settings` and `resolve_proxies` only use `no_proxy` to decide whether to merge *miss...\"; needs a probe (11 test(s) fail on main and pass on the PR; 1 test(s) re-parametrized (2 -> 2 ids); 587 test(s) ran on main, 600 on the PR; 15 new test(s) pass, 561 unchanged (15 of them skipped on both sides); 28 test failure(s) pre-existing and identical on both sides)",
+ "verdict_before_coverage_gate": "could_not_verify",
+ "reason_before_coverage_gate": "unverified behaviour claim: \"When an explicit `proxies` mapping is passed to a request or configured on `Session.proxies`, `merge_environment_settings` and `resolve_proxies` only use `no_proxy` to decide whether to merge *miss...\"; needs a probe (11 test(s) fail on main and pass on the PR; 1 test(s) re-parametrized (2 -> 2 ids); 587 test(s) ran on main, 600 on the PR; 15 new test(s) pass, 561 unchanged (15 of them skipped on both sides); 28 test failure(s) pre-existing and identical on both sides)",
+ "changed_lines_total": 30,
+ "changed_lines_covered": 28,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "normal",
+  "note": "28 of 30 changed executable line(s) ran (93%)",
+  "measurement": "measured"
+ },
+ "agents": {
+  "status": "skipped",
+  "note": "advisory swarm is off",
+  "roles": []
+ },
+ "explanation": {
+  "status": "not yet wired",
+  "why": "advisory swarm is off"
+ },
+ "swarm_requested": false,
+ "operator_approval_requested": false,
+ "swarm": "off",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [
+   "src/requests/adapters.py",
+   "src/requests/api.py",
+   "src/requests/sessions.py",
+   "src/requests/utils.py"
+  ],
+  "compiled_files": [],
+  "other_files": [
+   "tests/test_requests.py",
+   "tests/test_utils.py"
+  ]
+ },
+ "duration_s": {
+  "total_wall": 995.7,
+  "tests": 197.7
+ },
+ "cost": {
+  "ai_calls": 3,
+  "failed_ai_calls": 0,
+  "input_tokens": 34037,
+  "output_tokens": 23549,
+  "thinking_tokens": 18639,
+  "cost_usd": 0.031405,
+  "calls_without_usage": 0,
+  "ai_cost_usd": 0.031405,
+  "cost_complete": true,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 995.7,
+   "tests": 197.7
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.06638,
+  "total_cost_usd": 0.097785,
+  "swarm": {
+   "ai_calls": 0,
+   "failed_ai_calls": 0,
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "thinking_tokens": 0,
+   "cost_usd": 0.0,
+   "calls_without_usage": 0,
+   "ai_cost_usd": 0.0,
+   "cost_complete": true,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ },
+ "pdf_push": {
+  "ok": true,
+  "attempts": 1,
+  "error": null,
+  "url": "https://github.com/aritracodesbad123/Proof-of-change/tree/runs/runs/2026-11-09/ef12096/requests-7068"
+ }
+}
