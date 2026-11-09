@@ -1,0 +1,2406 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-pyinvoke-invoke-1101-d67a16bfb0fb-2026-11-08",
+ "date_ist": "2026-11-09 11:49 IST",
+ "run_date": "2026-11-08",
+ "who": "ops/daily_run.py",
+ "repo": "pyinvoke/invoke",
+ "library": "invoke",
+ "pr": {
+  "repo": "pyinvoke/invoke",
+  "number": 1101,
+  "url": "https://github.com/pyinvoke/invoke/pull/1101",
+  "title": "Let explicit hide=None override configured output hiding",
+  "base_sha": "6a71e680c535ba6520e935c497099fbca011d03c",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "d67a16bfb0fb022c12effa2de1d143ddf108ce4a",
+  "merge_commit": "40826255fe570a047b86f4f2387ab7a8f8565dbc",
+  "tested_main_sha": "6a71e680c535ba6520e935c497099fbca011d03c",
+  "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+ },
+ "author": "Narek-Khachikyan",
+ "base_ref": "3.0",
+ "updated_at_utc": "2026-11-08T07:26:28Z",
+ "updated_at_ist": "2026-11-08 12:56 IST",
+ "ci_state": "passing",
+ "ci_detail": "3 check runs completed without failure",
+ "tested_at_ist": "2026-11-09 11:49 IST",
+ "files": {
+  "all": [
+   "invoke/runners.py",
+   "sites/www/changelog.rst",
+   "tests/runners.py"
+  ],
+  "package_py": [
+   "invoke/runners.py"
+  ],
+  "compiled": [],
+  "other": [
+   "sites/www/changelog.rst",
+   "tests/runners.py"
+  ]
+ },
+ "machine_type": {
+  "arch": "x86_64",
+  "os": "Linux",
+  "platform": "Linux-6.12.94+-x86_64-with-glibc2.41",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": "g++ (Debian 14.2.0-19) 14.2.0",
+  "cpu_model": "Intel(R) Xeon(R) Processor",
+  "ram_gb": 15.6
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 3,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.15",
+ "test_selection": "mapped from touched files: tests/runners.py, tests/config.py, tests/context.py",
+ "per_run": [
+  {
+   "side": "old",
+   "run": 1,
+   "passed": 273,
+   "failed": 114,
+   "error": 0,
+   "skipped": 5,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 3.0,
+   "pytest_summary": "114 failed, 273 passed, 5 skipped, 5 warnings in 2.31s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 1,
+   "passed": 273,
+   "failed": 117,
+   "error": 0,
+   "skipped": 5,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 3.0,
+   "pytest_summary": "117 failed, 273 passed, 5 skipped, 5 warnings in 2.20s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 2,
+   "passed": 273,
+   "failed": 114,
+   "error": 0,
+   "skipped": 5,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 3.0,
+   "pytest_summary": "114 failed, 273 passed, 5 skipped, 5 warnings in 2.29s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 2,
+   "passed": 273,
+   "failed": 117,
+   "error": 0,
+   "skipped": 5,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 3.0,
+   "pytest_summary": "117 failed, 273 passed, 5 skipped, 5 warnings in 2.25s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 3,
+   "passed": 273,
+   "failed": 114,
+   "error": 0,
+   "skipped": 5,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 3.1,
+   "pytest_summary": "114 failed, 273 passed, 5 skipped, 5 warnings in 2.42s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 3,
+   "passed": 273,
+   "failed": 117,
+   "error": 0,
+   "skipped": 5,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 3.3,
+   "pytest_summary": "117 failed, 273 passed, 5 skipped, 5 warnings in 2.44s",
+   "junit": true
+  }
+ ],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "local",
+ "sandbox_backend_note": "local bubblewrap",
+ "machine": "local",
+ "tool_setup": {
+  "installed": [],
+  "tries": 0,
+  "note": "All required tools were already installed.",
+  "refused": []
+ },
+ "posted_upstream": false,
+ "logs": "invoke-1101/",
+ "freeze": {
+  "main": "freeze-main.txt",
+  "pr": "freeze-pr.txt"
+ },
+ "coverage": {
+  "status": "measured",
+  "changed_lines_total": 4,
+  "changed_lines_covered": 4,
+  "files": [
+   {
+    "file": "invoke/runners.py",
+    "changed_lines_total": 4,
+    "changed_lines_covered": 4
+   }
+  ],
+  "seconds": 5.6,
+  "exit": 1,
+  "log": "coverage-pytest.log"
+ },
+ "poc_commit": "ef12096677e9cf59e8673436d74ec65d53771d7c",
+ "route": "source-pair",
+ "current_head_sha": "d67a16bfb0fb022c12effa2de1d143ddf108ce4a",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": "[redacted]",
+  "notes": [
+   "Setup check: GitHub token: present.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory 6.5 GB (of 15.6 GB).",
+   "Setup check: free disk 92.8 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: [redacted] results",
+   "Query: invoke python setup install instructions https://github.com/pyinvoke/invoke site:github.com/pyinvoke/invoke",
+   "Query: invoke python documentation install https://github.com/pyinvoke/invoke site:github.com/pyinvoke/invoke",
+   "Query: invoke python install requirements https://pypi.org/project/invoke/ https://github.com/pyinvoke/invoke site:pypi.org",
+   "Source: invoke-common-tasks \u00b7 PyPI \u2014 https://pypi.org/project/invoke-common-tasks/",
+   "Source: invoke \u00b7 PyPI \u2014 https://pypi.org/project/invoke/",
+   "Source: invoke/invoke/runners.py at main \u00b7 pyinvoke/invoke \u00b7 GitHub \u2014 https://github.com/pyinvoke/invoke/blob/master/invoke/runners.py",
+   "Source: Dealing with virtual environments \u00b7 Issue #838 \u00b7 pyinvoke/invoke \u00b7 GitHub \u2014 https://github.com/pyinvoke/invoke/issues/838",
+   "Source: Support `python -m invoke` \u00b7 Issue #444 \u00b7 pyinvoke/invoke \u00b7 GitHub \u2014 https://github.com/pyinvoke/invoke/issues/444",
+   "Source: Invoke 0.13 breaks on Windows (unavailable default shell) \u00b7 Issue #371 \u00b7 pyinvoke/invoke \u00b7 GitHub \u2014 https://github.com/pyinvoke/invoke/issues/371",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >=3.9",
+   "Installed icecream 2.2.0 from project (named by the error and listed in the project) on main and pr.",
+   "Before rerun: needs_attention: needs attention: flagged claim(s) C1; no tests ran (tests produced no results on both sides (collection failed; see pytest logs))",
+   "After rerun: needs_attention: 3 new test(s) fail on the PR; 387 test(s) ran on main, 390 on the PR; 0 new test(s) pass, 278 unchanged (5 of them skipped on both sides); 114 test failure(s) pre-existing and identical on both sides; probe: 2 observation(s) need attention: c1.err does not differ although the claim says it does (C1); c1.out does not differ although the claim says it does (C1); probe model-probe1 has no measured line coverage (no coverage data); it does not count as covering the change; Limitation: tests/runners.py::Runner_::hide::explicit_None_overrides_config[True], tests/runners.py::Runner_::hide::explicit_None_overrides_config[out], tests/runners.py::Runner_::hide::explicit_None_overrides_config[err], tests/runners.py::Runner_::warn::honors_config, tests/runners.py::Runner_::warn::kwarg_beats_config, tests/runners.py::Runner_::warn::does_not_apply_to_watcher_errors, tests/runners.py::Runner_::warn::does_not_apply_to_timeout_errors, tests/runners.py::Runner_::hide::honors_config (+109 more) did not run on the base. They are not a new pass, and this result does not cover them."
+  ],
+  "install_docs": [
+   "README.rst",
+   "pyproject.toml"
+  ],
+  "install_docs_from": "main",
+  "setup_plan": {
+   "packages": [],
+   "scope_blocked": "",
+   "component": null,
+   "aggregate_names": [],
+   "extra_reqs": [],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >=3.9"
+   },
+   "system": [],
+   "refused": [],
+   "groups_blocked": ""
+  },
+  "steps": {
+   "setup_lookup": "Found 0 setup item(s) in the project's files and the web lookup.",
+   "setup_python": "Python 3.12: Python 3.12 already meets >=3.9",
+   "install_deps": "Nothing extra to install; the project's own install covers it."
+  },
+  "run_files": {
+   "requirements": "requirements.txt",
+   "plan": "setup-plan.json",
+   "count": 0
+  },
+  "installs": [
+   {
+    "package": "icecream",
+    "requirement": "icecream>=2.1",
+    "version": "2.2.0",
+    "versions": {
+     "main": "2.2.0",
+     "pr": "2.2.0"
+    },
+    "source": "project",
+    "reason": "named by the error and listed in the project",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   }
+  ],
+  "gap_retry": {
+   "reran": true,
+   "rounds": [
+    {
+     "round": 1,
+     "verdict": "needs_attention",
+     "reason": "needs attention: flagged claim(s) C1; no tests ran (tests produced no results on both sides (collection failed; see pytest logs))"
+    },
+    {
+     "round": 2,
+     "verdict": "needs_attention",
+     "reason": "3 new test(s) fail on the PR; 387 test(s) ran on main, 390 on the PR; 0 new test(s) pass, 278 unchanged (5 of them skipped on both sides); 114 test failure(s) pre-existing and identical on both sides; probe: 2 observation(s) need attention: c1.err does not differ although the claim says it does (C1); c1.out does not differ although the claim says it does (C1); probe model-probe1 has no measured line coverage (no coverage data); it does not count as covering the change; Limitation: tests/runners.py::Runner_::hide::explicit_None_overrides_config[True], tests/runners.py::Runner_::hide::explicit_None_overrides_config[out], tests/runners.py::Runner_::hide::explicit_None_overrides_config[err], tests/runners.py::Runner_::warn::honors_config, tests/runners.py::Runner_::warn::kwarg_beats_config, tests/runners.py::Runner_::warn::does_not_apply_to_watcher_errors, tests/runners.py::Runner_::warn::does_not_apply_to_timeout_errors, tests/runners.py::Runner_::hide::honors_config (+109 more) did not run on the base. They are not a new pass, and this result does not cover them."
+    }
+   ],
+   "installed": [
+    {
+     "package": "icecream",
+     "requirement": "icecream>=2.1",
+     "version": "2.2.0",
+     "versions": {
+      "main": "2.2.0",
+      "pr": "2.2.0"
+     },
+     "source": "project",
+     "reason": "named by the error and listed in the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    }
+   ]
+  }
+ },
+ "sides": {
+  "comparison_basis": "base tip vs GitHub test merge (refs/pull/N/merge)",
+  "main_sha": "6a71e680c535ba6520e935c497099fbca011d03c",
+  "pr_sha": "40826255fe570a047b86f4f2387ab7a8f8565dbc",
+  "merge_commit": "40826255fe570a047b86f4f2387ab7a8f8565dbc",
+  "merge_parents": [
+   "6a71e680c535ba6520e935c497099fbca011d03c",
+   "d67a16bfb0fb022c12effa2de1d143ddf108ce4a"
+  ],
+  "merge_head_matches_pinned_head": true
+ },
+ "tested": {
+  "main": "3.0 @ 6a71e680c535 (base tip = first parent of the merge commit)",
+  "pr": "GitHub test merge commit 40826255fe57 (refs/pull/1101/merge) of head d67a16bfb0fb"
+ },
+ "probe_plan": {
+  "baseline": "full",
+  "model": "model provider: nebius (Token Factory, live)",
+  "errors": [],
+  "model_claims": [
+   {
+    "id": "C1",
+    "text": "When hide is explicitly set to None, it overrides any configured output hiding and causes both stdout and stderr to be printed.",
+    "source_quote": "Let explicit hide=None override configured output hiding",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C2",
+    "text": "For hide values other than None, the existing fallback to configured output hiding is retained.",
+    "source_quote": "while retaining the existing fallback for other options.",
+    "testable": true,
+    "expect": "same"
+   }
+  ],
+  "model_rejected_claims": [],
+  "diff_targets": [],
+  "frozen": [
+   {
+    "path": "model-probes/model-probe1.py",
+    "source": "model",
+    "sha256": "a0ea7738cddf2ad29b8a1a331470358157ac288c8a0afc9a2b64fe645e8741f8",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-09T06:21:14.812380+00:00",
+    "inputs_sha256": "0630b8e2ef6779f5c0fed46fefad043c82de3a6d2350822f0dade08afd015bb9",
+    "inputs": {
+     "title_chars": 56,
+     "body_chars": 473,
+     "base_files": {
+      "invoke/runners.py": "11980959abe389fa198856e5dfe78248995acb2ec6c6faef4c7a6d85b287a479"
+     }
+    }
+   }
+  ]
+ },
+ "test_extras": [
+  "pytest-relaxed>=2"
+ ],
+ "pr_side_started_at": "2026-11-09T06:21:14.976795+00:00",
+ "test_targets": {
+  "main": [
+   "tests/runners.py",
+   "tests/config.py",
+   "tests/context.py"
+  ],
+  "pr": [
+   "tests/runners.py",
+   "tests/config.py",
+   "tests/context.py"
+  ]
+ },
+ "installed_commit": {
+  "main": {
+   "dist": "invoke",
+   "expected": "6a71e680c535ba6520e935c497099fbca011d03c",
+   "installed": "6a71e680c535ba6520e935c497099fbca011d03c",
+   "ok": true
+  },
+  "pr": {
+   "dist": "invoke",
+   "expected": "40826255fe570a047b86f4f2387ab7a8f8565dbc",
+   "installed": "40826255fe570a047b86f4f2387ab7a8f8565dbc",
+   "ok": true
+  }
+ },
+ "declared_test_deps": {
+  "requested": [
+   "pytest-relaxed>=2"
+  ],
+  "installed": true
+ },
+ "base_head_sha": "6a71e680c535ba6520e935c497099fbca011d03c",
+ "base_new_tests": {
+  "ids": [
+   "tests/runners.py::Runner_::hide::explicit_None_overrides_config[True]",
+   "tests/runners.py::Runner_::hide::explicit_None_overrides_config[err]",
+   "tests/runners.py::Runner_::hide::explicit_None_overrides_config[out]"
+  ],
+  "passed_on_base": [],
+  "failed_on_base": [],
+  "not_collected": [
+   "tests/runners.py::Runner_::hide::explicit_None_overrides_config[True]",
+   "tests/runners.py::Runner_::hide::explicit_None_overrides_config[err]",
+   "tests/runners.py::Runner_::hide::explicit_None_overrides_config[out]"
+  ],
+  "collection_failed": [],
+  "discovery_empty": [],
+  "shared_ids": [
+   "tests/runners.py::Runner_::init::takes_a_context_instance",
+   "tests/runners.py::Runner_::init::context_instance_is_required",
+   "tests/runners.py::Runner_::run::handles_invalid_kwargs_like_any_other_function",
+   "tests/runners.py::Runner_::warn::honors_config",
+   "tests/runners.py::Runner_::warn::kwarg_beats_config",
+   "tests/runners.py::Runner_::warn::does_not_apply_to_watcher_errors",
+   "tests/runners.py::Runner_::warn::does_not_apply_to_timeout_errors",
+   "tests/runners.py::Runner_::hide::honors_config",
+   "tests/runners.py::Runner_::hide::kwarg_beats_config",
+   "tests/runners.py::Runner_::pty::pty_defaults_to_off",
+   "tests/runners.py::Runner_::pty::honors_config",
+   "tests/runners.py::Runner_::pty::kwarg_beats_config",
+   "tests/runners.py::Runner_::shell::defaults_to_bash_or_cmdexe_when_pty_True",
+   "tests/runners.py::Runner_::shell::defaults_to_bash_or_cmdexe_when_pty_False",
+   "tests/runners.py::Runner_::shell::may_be_overridden",
+   "tests/runners.py::Runner_::shell::may_be_configured",
+   "tests/runners.py::Runner_::shell::kwarg_beats_config",
+   "tests/runners.py::Runner_::env::defaults_to_os_environ",
+   "tests/runners.py::Runner_::env::updates_when_dict_given",
+   "tests/runners.py::Runner_::env::replaces_when_replace_env_True",
+   "tests/runners.py::Runner_::env::config_can_be_used",
+   "tests/runners.py::Runner_::env::kwarg_wins_over_config",
+   "tests/runners.py::Runner_::return_value::return_code",
+   "tests/runners.py::Runner_::return_value::ok_attr_indicates_success",
+   "tests/runners.py::Runner_::return_value::ok_attr_indicates_failure",
+   "tests/runners.py::Runner_::return_value::failed_attr_indicates_success",
+   "tests/runners.py::Runner_::return_value::failed_attr_indicates_failure",
+   "tests/runners.py::Runner_::return_value::stdout_attribute_contains_stdout",
+   "tests/runners.py::Runner_::return_value::stderr_attribute_contains_stderr",
+   "tests/runners.py::Runner_::return_value::whether_pty_was_used",
+   "tests/runners.py::Runner_::return_value::command_executed",
+   "tests/runners.py::Runner_::return_value::shell_used",
+   "tests/runners.py::Runner_::return_value::hide_param_exposed_and_normalized",
+   "tests/runners.py::Runner_::command_echoing::off_by_default",
+   "tests/runners.py::Runner_::command_echoing::enabled_via_kwarg",
+   "tests/runners.py::Runner_::command_echoing::enabled_via_config",
+   "tests/runners.py::Runner_::command_echoing::kwarg_beats_config",
+   "tests/runners.py::Runner_::command_echoing::uses_ansi_bold",
+   "tests/runners.py::Runner_::command_echoing::uses_custom_format",
+   "tests/runners.py::Runner_::dry_running::sets_echo_to_True",
+   "tests/runners.py::Runner_::dry_running::short_circuits_with_dummy_result",
+   "tests/runners.py::Runner_::encoding::defaults_to_encoding_method_result",
+   "tests/runners.py::Runner_::encoding::honors_config",
+   "tests/runners.py::Runner_::encoding::honors_kwarg",
+   "tests/runners.py::Runner_::encoding::uses_locale_module_for_default_encoding",
+   "tests/runners.py::Runner_::encoding::falls_back_to_defaultlocale_when_preferredencoding_is_None",
+   "tests/runners.py::Runner_::output_hiding::both_hides_everything",
+   "tests/runners.py::Runner_::output_hiding::True_hides_everything",
+   "tests/runners.py::Runner_::output_hiding::out_only_hides_stdout",
+   "tests/runners.py::Runner_::output_hiding::err_only_hides_stderr",
+   "tests/runners.py::Runner_::output_hiding::accepts_stdout_alias_for_out",
+   "tests/runners.py::Runner_::output_hiding::accepts_stderr_alias_for_err",
+   "tests/runners.py::Runner_::output_hiding::None_hides_nothing",
+   "tests/runners.py::Runner_::output_hiding::False_hides_nothing",
+   "tests/runners.py::Runner_::output_hiding::unknown_vals_raises_ValueError",
+   "tests/runners.py::Runner_::output_hiding::unknown_vals_mention_value_given_in_error",
+   "tests/runners.py::Runner_::output_hiding::does_not_affect_capturing",
+   "tests/runners.py::Runner_::output_hiding::overrides_echoing",
+   "tests/runners.py::Runner_::output_stream_overrides::out_defaults_to_sys_stdout",
+   "tests/runners.py::Runner_::output_stream_overrides::err_defaults_to_sys_stderr",
+   "tests/runners.py::Runner_::output_stream_overrides::out_can_be_overridden",
+   "tests/runners.py::Runner_::output_stream_overrides::overridden_out_is_never_hidden",
+   "tests/runners.py::Runner_::output_stream_overrides::err_can_be_overridden",
+   "tests/runners.py::Runner_::output_stream_overrides::overridden_err_is_never_hidden",
+   "tests/runners.py::Runner_::output_stream_overrides::pty_defaults_to_sys",
+   "tests/runners.py::Runner_::output_stream_overrides::pty_out_can_be_overridden",
+   "tests/runners.py::Runner_::output_stream_handling::writes_and_flushes_to_stdout",
+   "tests/runners.py::Runner_::output_stream_handling::writes_and_flushes_to_stderr",
+   "tests/runners.py::Runner_::input_stream_handling::defaults_to_sys_stdin",
+   "tests/runners.py::Runner_::input_stream_handling::can_be_overridden",
+   "tests/runners.py::Runner_::input_stream_handling::can_be_disabled_entirely",
+   "tests/runners.py::Runner_::input_stream_handling::exceptions_get_logged",
+   "tests/runners.py::Runner_::input_stream_handling::EOF_triggers_closing_of_proc_stdin",
+   "tests/runners.py::Runner_::input_stream_handling::EOF_does_not_close_proc_stdin_when_pty_True",
+   "tests/runners.py::Runner_::input_stream_handling::EBADF_on_stdin_read_ignored",
+   "tests/runners.py::Runner_::input_stream_handling::non_EBADF_on_stdin_read_not_ignored",
+   "tests/runners.py::Runner_::failure_handling::fast_failures",
+   "tests/runners.py::Runner_::failure_handling::non_1_return_codes_still_act_as_failure",
+   "tests/runners.py::Runner_::failure_handling::Failure_repr::defaults_to_just_class_and_command",
+   "tests/runners.py::Runner_::failure_handling::Failure_repr::subclasses_may_add_more_kv_pairs",
+   "tests/runners.py::Runner_::failure_handling::UnexpectedExit_repr::similar_to_just_the_result_repr",
+   "tests/runners.py::Runner_::failure_handling::UnexpectedExit_str::displays_command_and_exit_code_by_default",
+   "tests/runners.py::Runner_::failure_handling::UnexpectedExit_str::does_not_display_stderr_when_pty_True",
+   "tests/runners.py::Runner_::failure_handling::UnexpectedExit_str::pty_stderr_message_wins_over_hidden_stderr",
+   "tests/runners.py::Runner_::failure_handling::UnexpectedExit_str::explicit_hidden_stream_tail_display",
+   "tests/runners.py::Runner_::failure_handling::UnexpectedExit_str::displays_tails_of_streams_only_when_hidden",
+   "tests/runners.py::Runner_::failure_handling::reason::is_None_for_regular_nonzero_exits",
+   "tests/runners.py::Runner_::failure_handling::reason::is_None_for_custom_command_exits",
+   "tests/runners.py::Runner_::failure_handling::reason::is_exception_when_WatcherError_raised_internally",
+   "tests/runners.py::Runner_::failure_handling::wrapped_result::most_attrs_are_always_present",
+   "tests/runners.py::Runner_::failure_handling::wrapped_result::shell_exit_failure::exited_is_integer",
+   "tests/runners.py::Runner_::failure_handling::wrapped_result::shell_exit_failure::ok_bool_etc_are_falsey",
+   "tests/runners.py::Runner_::failure_handling::wrapped_result::shell_exit_failure::stringrep_notes_exit_status",
+   "tests/runners.py::Runner_::failure_handling::wrapped_result::watcher_failure::exited_is_None",
+   "tests/runners.py::Runner_::failure_handling::wrapped_result::watcher_failure::ok_and_bool_still_are_falsey",
+   "tests/runners.py::Runner_::failure_handling::wrapped_result::watcher_failure::stringrep_lacks_exit_status",
+   "tests/runners.py::Runner_::threading::errors_within_io_thread_body_bubble_up",
+   "tests/runners.py::Runner_::threading::io_thread_errors_str_has_details",
+   "tests/runners.py::Runner_::watchers::nothing_is_written_to_stdin_by_default",
+   "tests/runners.py::Runner_::watchers::watchers_responses_get_written_to_proc_stdin",
+   "tests/runners.py::Runner_::watchers::multiple_hits_yields_multiple_responses",
+   "tests/runners.py::Runner_::watchers::chunk_sizes_smaller_than_patterns_still_work_ok",
+   "tests/runners.py::Runner_::watchers::both_out_and_err_are_scanned",
+   "tests/runners.py::Runner_::watchers::multiple_patterns_works_as_expected",
+   "tests/runners.py::Runner_::watchers::multiple_patterns_across_both_streams",
+   "tests/runners.py::Runner_::watchers::honors_watchers_config_option",
+   "tests/runners.py::Runner_::watchers::kwarg_overrides_config",
+   "tests/runners.py::Runner_::io_sleeping::input_sleep_attribute_defaults_to_hundredth_of_second",
+   "tests/runners.py::Runner_::io_sleeping::subclasses_can_override_input_sleep",
+   "tests/runners.py::Runner_::stdin_mirroring::when_pty_is_True_no_mirroring_occurs",
+   "tests/runners.py::Runner_::stdin_mirroring::when_pty_is_False_we_write_in_stream_back_to_out_stream",
+   "tests/runners.py::Runner_::stdin_mirroring::mirroring_is_skipped_when_our_input_is_not_a_tty",
+   "tests/runners.py::Runner_::stdin_mirroring::mirroring_can_be_forced_on",
+   "tests/runners.py::Runner_::stdin_mirroring::mirroring_can_be_forced_off",
+   "tests/runners.py::Runner_::stdin_mirroring::mirroring_honors_configuration",
+   "tests/runners.py::Runner_::stdin_mirroring::reads_FIONREAD_bytes_from_stdin_when_fileno",
+   "tests/runners.py::Runner_::character_buffered_stdin::setcbreak_called_on_tty_stdins",
+   "tests/runners.py::Runner_::character_buffered_stdin::setcbreak_not_called_on_non_tty_stdins",
+   "tests/runners.py::Runner_::character_buffered_stdin::setcbreak_not_called_if_process_not_foregrounded",
+   "tests/runners.py::Runner_::character_buffered_stdin::tty_stdins_have_settings_restored_by_default",
+   "tests/runners.py::Runner_::character_buffered_stdin::tty_stdins_have_settings_restored_on_KeyboardInterrupt",
+   "tests/runners.py::Runner_::character_buffered_stdin::setcbreak_not_called_if_terminal_seems_already_cbroken",
+   "tests/runners.py::Runner_::send_interrupt::called_on_KeyboardInterrupt",
+   "tests/runners.py::Runner_::send_interrupt::not_called_for_other_exceptions",
+   "tests/runners.py::Runner_::send_interrupt::sends_escape_byte_sequence",
+   "tests/runners.py::Runner_::timeout::start_timer_called_with_config_value",
+   "tests/runners.py::Runner_::timeout::run_kwarg_honored",
+   "tests/runners.py::Runner_::timeout::kwarg_wins_over_config",
+   "tests/runners.py::Runner_::timeout::raises_CommandTimedOut_with_timeout_info",
+   "tests/runners.py::Runner_::timeout::start_timer_gives_its_timer_the_kill_method",
+   "tests/runners.py::Runner_::timeout::run_always_stops_timer",
+   "tests/runners.py::Runner_::timeout::timer_aliveness_is_test_of_timing_out",
+   "tests/runners.py::Runner_::timeout::timeout_specified_but_no_timer_means_no_exception",
+   "tests/runners.py::Runner_::stop::always_runs_no_matter_what",
+   "tests/runners.py::Runner_::stop::cancels_timer",
+   "tests/runners.py::Runner_::asynchronous::returns_Promise_immediately_and_finishes_on_join",
+   "tests/runners.py::Runner_::asynchronous::hides_output",
+   "tests/runners.py::Runner_::asynchronous::does_not_forward_stdin",
+   "tests/runners.py::Runner_::asynchronous::leaves_overridden_streams_alone",
+   "tests/runners.py::Runner_::disown::starts_but_does_nothing_else_and_returns_emptyish_Result",
+   "tests/runners.py::Runner_::disown::cannot_be_given_alongside_asynchronous",
+   "tests/runners.py::Runner_::get_pid::returns_None_by_default",
+   "tests/runners.py::Local_::stop::calls_super",
+   "tests/runners.py::Local_::pty::when_pty_True_we_use_pty_fork_and_os_exec",
+   "tests/runners.py::Local_::pty::pty_uses_WEXITSTATUS_if_WIFEXITED",
+   "tests/runners.py::Local_::pty::pty_uses_WTERMSIG_if_WIFSIGNALED",
+   "tests/runners.py::Local_::pty::WTERMSIG_result_turned_negative_to_match_subprocess",
+   "tests/runners.py::Local_::pty::pty_is_set_to_controlling_terminal_size",
+   "tests/runners.py::Local_::pty::warning_only_fires_once",
+   "tests/runners.py::Local_::pty::replaced_stdin_objects_dont_explode",
+   "tests/runners.py::Local_::pty::spurious_OSErrors_handled_gracefully",
+   "tests/runners.py::Local_::pty::other_spurious_OSErrors_handled_gracefully",
+   "tests/runners.py::Local_::pty::non_spurious_OSErrors_bubble_up",
+   "tests/runners.py::Local_::pty::stop_mutes_errors_on_pty_close",
+   "tests/runners.py::Local_::pty::fallback::can_be_overridden_by_kwarg",
+   "tests/runners.py::Local_::pty::fallback::can_be_overridden_by_config",
+   "tests/runners.py::Local_::pty::fallback::affects_result_pty_value",
+   "tests/runners.py::Local_::pty::fallback::overridden_fallback_affects_result_pty_value",
+   "tests/runners.py::Local_::shell::defaults_to_bash_or_cmdexe_when_pty_True",
+   "tests/runners.py::Local_::shell::defaults_to_bash_or_cmdexe_when_pty_False",
+   "tests/runners.py::Local_::shell::may_be_overridden_when_pty_True",
+   "tests/runners.py::Local_::shell::may_be_overridden_when_pty_False",
+   "tests/runners.py::Local_::env::uses_Popen_kwarg_for_pty_False",
+   "tests/runners.py::Local_::env::uses_execve_for_pty_True",
+   "tests/runners.py::Local_::close_proc_stdin::raises_SubprocessPipeError_when_pty_in_use",
+   "tests/runners.py::Local_::close_proc_stdin::closes_process_stdin",
+   "tests/runners.py::Local_::timeout::kill_uses_self_pid_when_pty",
+   "tests/runners.py::Local_::timeout::kill_uses_self_process_pid_when_not_pty",
+   "tests/runners.py::Local_::get_pid::is_top_level_pid_when_using_pty",
+   "tests/runners.py::Local_::get_pid::is_process_attribute_pid_when_no_pty",
+   "tests/runners.py::Result_::nothing_is_required",
+   "tests/runners.py::Result_::first_posarg_is_stdout",
+   "tests/runners.py::Result_::command_defaults_to_empty_string",
+   "tests/runners.py::Result_::shell_defaults_to_empty_string",
+   "tests/runners.py::Result_::encoding_defaults_to_local_default_encoding",
+   "tests/runners.py::Result_::env_defaults_to_empty_dict",
+   "tests/runners.py::Result_::stdout_defaults_to_empty_string",
+   "tests/runners.py::Result_::stderr_defaults_to_empty_string",
+   "tests/runners.py::Result_::exited_defaults_to_zero",
+   "tests/runners.py::Result_::pty_defaults_to_False",
+   "tests/runners.py::Result_::pid_defaults_to_None",
+   "tests/runners.py::Result_::repr_contains_useful_info",
+   "tests/runners.py::Result_::tail::returns_last_10_lines_of_given_stream_plus_whitespace",
+   "tests/runners.py::Result_::tail::line_count_is_configurable",
+   "tests/runners.py::Result_::tail::works_for_stderr_too",
+   "tests/runners.py::Promise_::explicitly_inherits_from_abstract_base_class",
+   "tests/runners.py::Promise_::repr_degrades_gracefully",
+   "tests/runners.py::Promise_::exposes_read_only_run_params",
+   "tests/runners.py::Promise_::join::returns_Result_on_success",
+   "tests/runners.py::Promise_::join::raises_main_thread_exception_on_kaboom",
+   "tests/runners.py::Promise_::join::raises_subthread_exception_on_their_kaboom",
+   "tests/runners.py::Promise_::join::raises_Failure_on_failure",
+   "tests/runners.py::Promise_::context_manager::calls_join_or_wait_on_close_of_block",
+   "tests/runners.py::Promise_::context_manager::yields_self"
+  ],
+  "not_executed": [
+   "tests/runners.py::Runner_::hide::explicit_None_overrides_config[True]",
+   "tests/runners.py::Runner_::hide::explicit_None_overrides_config[out]",
+   "tests/runners.py::Runner_::hide::explicit_None_overrides_config[err]",
+   "tests/runners.py::Runner_::warn::honors_config",
+   "tests/runners.py::Runner_::warn::kwarg_beats_config",
+   "tests/runners.py::Runner_::warn::does_not_apply_to_watcher_errors",
+   "tests/runners.py::Runner_::warn::does_not_apply_to_timeout_errors",
+   "tests/runners.py::Runner_::hide::honors_config",
+   "tests/runners.py::Runner_::hide::kwarg_beats_config",
+   "tests/runners.py::Runner_::pty::pty_defaults_to_off",
+   "tests/runners.py::Runner_::pty::honors_config",
+   "tests/runners.py::Runner_::pty::kwarg_beats_config",
+   "tests/runners.py::Runner_::shell::defaults_to_bash_or_cmdexe_when_pty_True",
+   "tests/runners.py::Runner_::shell::defaults_to_bash_or_cmdexe_when_pty_False",
+   "tests/runners.py::Runner_::shell::may_be_overridden",
+   "tests/runners.py::Runner_::shell::may_be_configured",
+   "tests/runners.py::Runner_::shell::kwarg_beats_config",
+   "tests/runners.py::Runner_::env::defaults_to_os_environ",
+   "tests/runners.py::Runner_::env::updates_when_dict_given",
+   "tests/runners.py::Runner_::env::replaces_when_replace_env_True",
+   "tests/runners.py::Runner_::env::config_can_be_used",
+   "tests/runners.py::Runner_::env::kwarg_wins_over_config",
+   "tests/runners.py::Runner_::return_value::return_code",
+   "tests/runners.py::Runner_::return_value::ok_attr_indicates_success",
+   "tests/runners.py::Runner_::return_value::ok_attr_indicates_failure",
+   "tests/runners.py::Runner_::return_value::failed_attr_indicates_success",
+   "tests/runners.py::Runner_::return_value::failed_attr_indicates_failure",
+   "tests/runners.py::Runner_::return_value::stdout_attribute_contains_stdout",
+   "tests/runners.py::Runner_::return_value::stderr_attribute_contains_stderr",
+   "tests/runners.py::Runner_::return_value::whether_pty_was_used",
+   "tests/runners.py::Runner_::return_value::command_executed",
+   "tests/runners.py::Runner_::return_value::shell_used",
+   "tests/runners.py::Runner_::return_value::hide_param_exposed_and_normalized",
+   "tests/runners.py::Runner_::command_echoing::off_by_default",
+   "tests/runners.py::Runner_::command_echoing::enabled_via_kwarg",
+   "tests/runners.py::Runner_::command_echoing::enabled_via_config",
+   "tests/runners.py::Runner_::command_echoing::kwarg_beats_config",
+   "tests/runners.py::Runner_::command_echoing::uses_ansi_bold",
+   "tests/runners.py::Runner_::command_echoing::uses_custom_format",
+   "tests/runners.py::Runner_::encoding::defaults_to_encoding_method_result",
+   "tests/runners.py::Runner_::encoding::honors_config",
+   "tests/runners.py::Runner_::output_hiding::both_hides_everything",
+   "tests/runners.py::Runner_::output_hiding::True_hides_everything",
+   "tests/runners.py::Runner_::output_hiding::out_only_hides_stdout",
+   "tests/runners.py::Runner_::output_hiding::err_only_hides_stderr",
+   "tests/runners.py::Runner_::output_hiding::accepts_stdout_alias_for_out",
+   "tests/runners.py::Runner_::output_hiding::accepts_stderr_alias_for_err",
+   "tests/runners.py::Runner_::output_hiding::None_hides_nothing",
+   "tests/runners.py::Runner_::output_hiding::False_hides_nothing",
+   "tests/runners.py::Runner_::output_hiding::does_not_affect_capturing",
+   "tests/runners.py::Runner_::output_hiding::overrides_echoing",
+   "tests/runners.py::Runner_::output_stream_overrides::out_defaults_to_sys_stdout",
+   "tests/runners.py::Runner_::output_stream_overrides::err_defaults_to_sys_stderr",
+   "tests/runners.py::Runner_::output_stream_overrides::out_can_be_overridden",
+   "tests/runners.py::Runner_::output_stream_overrides::overridden_out_is_never_hidden",
+   "tests/runners.py::Runner_::output_stream_overrides::err_can_be_overridden",
+   "tests/runners.py::Runner_::output_stream_overrides::overridden_err_is_never_hidden",
+   "tests/runners.py::Runner_::output_stream_overrides::pty_defaults_to_sys",
+   "tests/runners.py::Runner_::output_stream_overrides::pty_out_can_be_overridden",
+   "tests/runners.py::Runner_::output_stream_handling::writes_and_flushes_to_stdout",
+   "tests/runners.py::Runner_::output_stream_handling::writes_and_flushes_to_stderr",
+   "tests/runners.py::Runner_::failure_handling::fast_failures",
+   "tests/runners.py::Runner_::failure_handling::non_1_return_codes_still_act_as_failure",
+   "tests/runners.py::Runner_::failure_handling::UnexpectedExit_repr::similar_to_just_the_result_repr",
+   "tests/runners.py::Runner_::failure_handling::UnexpectedExit_str::displays_command_and_exit_code_by_default",
+   "tests/runners.py::Runner_::failure_handling::UnexpectedExit_str::does_not_display_stderr_when_pty_True",
+   "tests/runners.py::Runner_::failure_handling::UnexpectedExit_str::pty_stderr_message_wins_over_hidden_stderr",
+   "tests/runners.py::Runner_::failure_handling::UnexpectedExit_str::explicit_hidden_stream_tail_display",
+   "tests/runners.py::Runner_::failure_handling::UnexpectedExit_str::displays_tails_of_streams_only_when_hidden",
+   "tests/runners.py::Runner_::failure_handling::reason::is_None_for_regular_nonzero_exits",
+   "tests/runners.py::Runner_::failure_handling::reason::is_exception_when_WatcherError_raised_internally",
+   "tests/runners.py::Runner_::failure_handling::wrapped_result::most_attrs_are_always_present",
+   "tests/runners.py::Runner_::failure_handling::wrapped_result::shell_exit_failure::exited_is_integer",
+   "tests/runners.py::Runner_::failure_handling::wrapped_result::shell_exit_failure::ok_bool_etc_are_falsey",
+   "tests/runners.py::Runner_::failure_handling::wrapped_result::shell_exit_failure::stringrep_notes_exit_status",
+   "tests/runners.py::Runner_::failure_handling::wrapped_result::watcher_failure::exited_is_None",
+   "tests/runners.py::Runner_::failure_handling::wrapped_result::watcher_failure::ok_and_bool_still_are_falsey",
+   "tests/runners.py::Runner_::failure_handling::wrapped_result::watcher_failure::stringrep_lacks_exit_status",
+   "tests/runners.py::Runner_::threading::errors_within_io_thread_body_bubble_up",
+   "tests/runners.py::Runner_::threading::io_thread_errors_str_has_details",
+   "tests/runners.py::Runner_::watchers::nothing_is_written_to_stdin_by_default",
+   "tests/runners.py::Runner_::watchers::watchers_responses_get_written_to_proc_stdin",
+   "tests/runners.py::Runner_::watchers::multiple_hits_yields_multiple_responses",
+   "tests/runners.py::Runner_::watchers::chunk_sizes_smaller_than_patterns_still_work_ok",
+   "tests/runners.py::Runner_::watchers::both_out_and_err_are_scanned",
+   "tests/runners.py::Runner_::watchers::multiple_patterns_works_as_expected",
+   "tests/runners.py::Runner_::watchers::multiple_patterns_across_both_streams",
+   "tests/runners.py::Runner_::watchers::honors_watchers_config_option",
+   "tests/runners.py::Runner_::watchers::kwarg_overrides_config",
+   "tests/runners.py::Runner_::character_buffered_stdin::setcbreak_called_on_tty_stdins",
+   "tests/runners.py::Runner_::character_buffered_stdin::setcbreak_not_called_if_process_not_foregrounded",
+   "tests/runners.py::Runner_::character_buffered_stdin::tty_stdins_have_settings_restored_by_default",
+   "tests/runners.py::Runner_::character_buffered_stdin::tty_stdins_have_settings_restored_on_KeyboardInterrupt",
+   "tests/runners.py::Runner_::character_buffered_stdin::setcbreak_not_called_if_terminal_seems_already_cbroken",
+   "tests/runners.py::Runner_::send_interrupt::called_on_KeyboardInterrupt",
+   "tests/runners.py::Runner_::send_interrupt::sends_escape_byte_sequence",
+   "tests/runners.py::Runner_::timeout::start_timer_called_with_config_value",
+   "tests/runners.py::Runner_::timeout::run_kwarg_honored",
+   "tests/runners.py::Runner_::timeout::kwarg_wins_over_config",
+   "tests/runners.py::Runner_::timeout::raises_CommandTimedOut_with_timeout_info",
+   "tests/runners.py::Runner_::get_pid::returns_None_by_default",
+   "tests/runners.py::Local_::pty::when_pty_True_we_use_pty_fork_and_os_exec",
+   "tests/runners.py::Local_::pty::pty_uses_WEXITSTATUS_if_WIFEXITED",
+   "tests/runners.py::Local_::pty::pty_uses_WTERMSIG_if_WIFSIGNALED",
+   "tests/runners.py::Local_::pty::WTERMSIG_result_turned_negative_to_match_subprocess",
+   "tests/runners.py::Local_::pty::pty_is_set_to_controlling_terminal_size",
+   "tests/runners.py::Local_::pty::spurious_OSErrors_handled_gracefully",
+   "tests/runners.py::Local_::pty::other_spurious_OSErrors_handled_gracefully",
+   "tests/runners.py::Local_::pty::non_spurious_OSErrors_bubble_up",
+   "tests/runners.py::Local_::pty::stop_mutes_errors_on_pty_close",
+   "tests/runners.py::Local_::pty::fallback::can_be_overridden_by_kwarg",
+   "tests/runners.py::Local_::pty::fallback::can_be_overridden_by_config",
+   "tests/runners.py::Local_::pty::fallback::overridden_fallback_affects_result_pty_value",
+   "tests/runners.py::Local_::shell::defaults_to_bash_or_cmdexe_when_pty_True",
+   "tests/runners.py::Local_::shell::may_be_overridden_when_pty_True",
+   "tests/runners.py::Local_::env::uses_execve_for_pty_True",
+   "tests/runners.py::Local_::get_pid::is_top_level_pid_when_using_pty"
+  ],
+  "reproduced": false,
+  "environment_limits": []
+ },
+ "probes": {
+  "status": "ran",
+  "items": [
+   {
+    "id": "model-probe1",
+    "source": "model",
+    "path": "model-probes/model-probe1.py",
+    "sha256": "a0ea7738cddf2ad29b8a1a331470358157ac288c8a0afc9a2b64fe645e8741f8",
+    "target": "pyinvoke/invoke#1101",
+    "about": "Tests the behavior of the hide parameter in invoke.runners.Local.run",
+    "claims": [
+     {
+      "id": "C1",
+      "source": "PR description",
+      "text": "When hide is explicitly set to None, it overrides any configured output hiding and causes both stdout and stderr to be printed.",
+      "covers": [
+       "c1.out",
+       "c1.err"
+      ],
+      "expect": "differs"
+     },
+     {
+      "id": "C2",
+      "source": "PR description",
+      "text": "For hide values other than None, the existing fallback to configured output hiding is retained.",
+      "covers": [
+       "c2.out",
+       "c2.err"
+      ],
+      "expect": "same"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.2,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.2,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-probe1-main-1.jsonl",
+      "probe-model-probe1-main-2.jsonl",
+      "probe-model-probe1-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-probe1-pr-1.jsonl",
+      "probe-model-probe1-pr-2.jsonl",
+      "probe-model-probe1-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "c1.out": "<AttributeError>",
+       "c1.err": "",
+       "c2.out": "<AttributeError>",
+       "c2.err": ""
+      },
+      {
+       "c1.out": "<AttributeError>",
+       "c1.err": "",
+       "c2.out": "<AttributeError>",
+       "c2.err": ""
+      },
+      {
+       "c1.out": "<AttributeError>",
+       "c1.err": "",
+       "c2.out": "<AttributeError>",
+       "c2.err": ""
+      }
+     ],
+     "pr": [
+      {
+       "c1.out": "<AttributeError>",
+       "c1.err": "",
+       "c2.out": "<AttributeError>",
+       "c2.err": ""
+      },
+      {
+       "c1.out": "<AttributeError>",
+       "c1.err": "",
+       "c2.out": "<AttributeError>",
+       "c2.err": ""
+      },
+      {
+       "c1.out": "<AttributeError>",
+       "c1.err": "",
+       "c2.out": "<AttributeError>",
+       "c2.err": ""
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "c1.err",
+      "state": "same",
+      "label": "needs_human",
+      "claim": "C1",
+      "main": "",
+      "pr": "",
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c1.err\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c1.err\""
+       }
+      }
+     },
+     {
+      "name": "c1.out",
+      "state": "same",
+      "label": "needs_human",
+      "claim": "C1",
+      "main": "<AttributeError>",
+      "pr": "<AttributeError>",
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c1.out\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c1.out\""
+       }
+      }
+     },
+     {
+      "name": "c2.err",
+      "state": "same",
+      "label": "proven",
+      "claim": "C2",
+      "main": "",
+      "pr": "",
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-main-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"c2.err\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"c2.err\""
+       }
+      }
+     },
+     {
+      "name": "c2.out",
+      "state": "same",
+      "label": "proven",
+      "claim": "C2",
+      "main": "<AttributeError>",
+      "pr": "<AttributeError>",
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-main-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"c2.out\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"c2.out\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "a0ea7738cddf2ad29b8a1a331470358157ac288c8a0afc9a2b64fe645e8741f8",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-09T06:21:14.812380+00:00",
+     "inputs_sha256": "0630b8e2ef6779f5c0fed46fefad043c82de3a6d2350822f0dade08afd015bb9",
+     "inputs": {
+      "title_chars": 56,
+      "body_chars": 473,
+      "base_files": {
+       "invoke/runners.py": "11980959abe389fa198856e5dfe78248995acb2ec6c6faef4c7a6d85b287a479"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-09T06:21:14.976795+00:00"
+    },
+    "status": "ran"
+   }
+  ],
+  "summary": {
+   "labels": [
+    "needs_human",
+    "needs_human",
+    "proven",
+    "proven"
+   ],
+   "flagged": [
+    {
+     "probe": "model-probe1",
+     "name": "c1.err",
+     "label": "needs_human",
+     "claim": "C1"
+    },
+    {
+     "probe": "model-probe1",
+     "name": "c1.out",
+     "label": "needs_human",
+     "claim": "C1"
+    }
+   ],
+   "proven_claims": [
+    "C2"
+   ],
+   "reason": "probe: 2 observation(s) need attention: c1.err does not differ although the claim says it does (C1); c1.out does not differ although the claim says it does (C1); probe: claim(s) C2 proven",
+   "ignored_noise": [],
+   "ignored_warning_only": [],
+   "pr_only_noisy": [],
+   "advisory_unchanged_subchecks": [],
+   "advisory_agreeing_differs": [],
+   "advisory_invalid_preservation": []
+  }
+ },
+ "probe_changed_line_coverage": {
+  "status": "not measured",
+  "side": "main",
+  "probes": {
+   "model-probe1": {
+    "status": null,
+    "changed_lines_covered": null,
+    "changed_lines_total": null,
+    "adequacy": null
+   }
+  },
+  "not_adequate": []
+ },
+ "verdict": "needs_attention",
+ "reason": "3 new test(s) fail on the PR; 387 test(s) ran on main, 390 on the PR; 0 new test(s) pass, 278 unchanged (5 of them skipped on both sides); 114 test failure(s) pre-existing and identical on both sides; probe: 2 observation(s) need attention: c1.err does not differ although the claim says it does (C1); c1.out does not differ although the claim says it does (C1); probe model-probe1 has no measured line coverage (no coverage data); it does not count as covering the change; Limitation: tests/runners.py::Runner_::hide::explicit_None_overrides_config[True], tests/runners.py::Runner_::hide::explicit_None_overrides_config[out], tests/runners.py::Runner_::hide::explicit_None_overrides_config[err], tests/runners.py::Runner_::warn::honors_config, tests/runners.py::Runner_::warn::kwarg_beats_config, tests/runners.py::Runner_::warn::does_not_apply_to_watcher_errors, tests/runners.py::Runner_::warn::does_not_apply_to_timeout_errors, tests/runners.py::Runner_::hide::honors_config (+109 more) did not run on the base. They are not a new pass, and this result does not cover them.",
+ "cross_run_collected_files": [
+  "tests/runners.py"
+ ],
+ "comparison": {
+  "same": 392,
+  "same_skipped_both": 5,
+  "regressions": [],
+  "fixed": [],
+  "new_tests_passing": 0,
+  "new_tests_passing_ids": [],
+  "new_tests_failing": [
+   "tests.runners.Runner_.hide::explicit_None_overrides_config[True]",
+   "tests.runners.Runner_.hide::explicit_None_overrides_config[err]",
+   "tests.runners.Runner_.hide::explicit_None_overrides_config[out]"
+  ],
+  "new_tests_skipped": [],
+  "removed_tests": [],
+  "reparametrized": [],
+  "skipped_missing_dependency": [],
+  "flaky": [],
+  "pr_unstable": [],
+  "pr_unstable_noisy": [],
+  "environment": [],
+  "other_changes": [],
+  "preexisting_failures": [
+   "tests.runners.Local_.env::uses_execve_for_pty_True",
+   "tests.runners.Local_.get_pid::is_top_level_pid_when_using_pty",
+   "tests.runners.Local_.pty.fallback::can_be_overridden_by_config",
+   "tests.runners.Local_.pty.fallback::can_be_overridden_by_kwarg",
+   "tests.runners.Local_.pty.fallback::overridden_fallback_affects_result_pty_value",
+   "tests.runners.Local_.pty::WTERMSIG_result_turned_negative_to_match_subprocess",
+   "tests.runners.Local_.pty::non_spurious_OSErrors_bubble_up",
+   "tests.runners.Local_.pty::other_spurious_OSErrors_handled_gracefully",
+   "tests.runners.Local_.pty::pty_is_set_to_controlling_terminal_size",
+   "tests.runners.Local_.pty::pty_uses_WEXITSTATUS_if_WIFEXITED",
+   "tests.runners.Local_.pty::pty_uses_WTERMSIG_if_WIFSIGNALED",
+   "tests.runners.Local_.pty::spurious_OSErrors_handled_gracefully",
+   "tests.runners.Local_.pty::stop_mutes_errors_on_pty_close",
+   "tests.runners.Local_.pty::when_pty_True_we_use_pty_fork_and_os_exec",
+   "tests.runners.Local_.shell::defaults_to_bash_or_cmdexe_when_pty_True",
+   "tests.runners.Local_.shell::may_be_overridden_when_pty_True",
+   "tests.runners.Runner_.character_buffered_stdin::setcbreak_called_on_tty_stdins",
+   "tests.runners.Runner_.character_buffered_stdin::setcbreak_not_called_if_process_not_foregrounded",
+   "tests.runners.Runner_.character_buffered_stdin::setcbreak_not_called_if_terminal_seems_already_cbroken",
+   "tests.runners.Runner_.character_buffered_stdin::tty_stdins_have_settings_restored_by_default",
+   "tests.runners.Runner_.character_buffered_stdin::tty_stdins_have_settings_restored_on_KeyboardInterrupt",
+   "tests.runners.Runner_.command_echoing::enabled_via_config",
+   "tests.runners.Runner_.command_echoing::enabled_via_kwarg",
+   "tests.runners.Runner_.command_echoing::kwarg_beats_config",
+   "tests.runners.Runner_.command_echoing::off_by_default",
+   "tests.runners.Runner_.command_echoing::uses_ansi_bold",
+   "tests.runners.Runner_.command_echoing::uses_custom_format",
+   "tests.runners.Runner_.encoding::defaults_to_encoding_method_result",
+   "tests.runners.Runner_.encoding::honors_config",
+   "tests.runners.Runner_.env::config_can_be_used",
+   "tests.runners.Runner_.env::defaults_to_os_environ",
+   "tests.runners.Runner_.env::kwarg_wins_over_config",
+   "tests.runners.Runner_.env::replaces_when_replace_env_True",
+   "tests.runners.Runner_.env::updates_when_dict_given",
+   "tests.runners.Runner_.failure_handling.UnexpectedExit_repr::similar_to_just_the_result_repr",
+   "tests.runners.Runner_.failure_handling.UnexpectedExit_str::displays_command_and_exit_code_by_default",
+   "tests.runners.Runner_.failure_handling.UnexpectedExit_str::displays_tails_of_streams_only_when_hidden",
+   "tests.runners.Runner_.failure_handling.UnexpectedExit_str::does_not_display_stderr_when_pty_True",
+   "tests.runners.Runner_.failure_handling.UnexpectedExit_str::explicit_hidden_stream_tail_display",
+   "tests.runners.Runner_.failure_handling.UnexpectedExit_str::pty_stderr_message_wins_over_hidden_stderr",
+   "tests.runners.Runner_.failure_handling.reason::is_None_for_regular_nonzero_exits",
+   "tests.runners.Runner_.failure_handling.reason::is_exception_when_WatcherError_raised_internally",
+   "tests.runners.Runner_.failure_handling.wrapped_result.shell_exit_failure::exited_is_integer",
+   "tests.runners.Runner_.failure_handling.wrapped_result.shell_exit_failure::ok_bool_etc_are_falsey",
+   "tests.runners.Runner_.failure_handling.wrapped_result.shell_exit_failure::stringrep_notes_exit_status",
+   "tests.runners.Runner_.failure_handling.wrapped_result.watcher_failure::exited_is_None",
+   "tests.runners.Runner_.failure_handling.wrapped_result.watcher_failure::ok_and_bool_still_are_falsey",
+   "tests.runners.Runner_.failure_handling.wrapped_result.watcher_failure::stringrep_lacks_exit_status",
+   "tests.runners.Runner_.failure_handling.wrapped_result::most_attrs_are_always_present",
+   "tests.runners.Runner_.failure_handling::fast_failures",
+   "tests.runners.Runner_.failure_handling::non_1_return_codes_still_act_as_failure",
+   "tests.runners.Runner_.get_pid::returns_None_by_default",
+   "tests.runners.Runner_.hide::honors_config",
+   "tests.runners.Runner_.hide::kwarg_beats_config",
+   "tests.runners.Runner_.output_hiding::False_hides_nothing",
+   "tests.runners.Runner_.output_hiding::None_hides_nothing",
+   "tests.runners.Runner_.output_hiding::True_hides_everything",
+   "tests.runners.Runner_.output_hiding::accepts_stderr_alias_for_err",
+   "tests.runners.Runner_.output_hiding::accepts_stdout_alias_for_out",
+   "tests.runners.Runner_.output_hiding::both_hides_everything",
+   "tests.runners.Runner_.output_hiding::does_not_affect_capturing",
+   "tests.runners.Runner_.output_hiding::err_only_hides_stderr",
+   "tests.runners.Runner_.output_hiding::out_only_hides_stdout",
+   "tests.runners.Runner_.output_hiding::overrides_echoing",
+   "tests.runners.Runner_.output_stream_handling::writes_and_flushes_to_stderr",
+   "tests.runners.Runner_.output_stream_handling::writes_and_flushes_to_stdout",
+   "tests.runners.Runner_.output_stream_overrides::err_can_be_overridden",
+   "tests.runners.Runner_.output_stream_overrides::err_defaults_to_sys_stderr",
+   "tests.runners.Runner_.output_stream_overrides::out_can_be_overridden",
+   "tests.runners.Runner_.output_stream_overrides::out_defaults_to_sys_stdout",
+   "tests.runners.Runner_.output_stream_overrides::overridden_err_is_never_hidden",
+   "tests.runners.Runner_.output_stream_overrides::overridden_out_is_never_hidden",
+   "tests.runners.Runner_.output_stream_overrides::pty_defaults_to_sys",
+   "tests.runners.Runner_.output_stream_overrides::pty_out_can_be_overridden",
+   "tests.runners.Runner_.pty::honors_config",
+   "tests.runners.Runner_.pty::kwarg_beats_config",
+   "tests.runners.Runner_.pty::pty_defaults_to_off",
+   "tests.runners.Runner_.return_value::command_executed",
+   "tests.runners.Runner_.return_value::failed_attr_indicates_failure",
+   "tests.runners.Runner_.return_value::failed_attr_indicates_success",
+   "tests.runners.Runner_.return_value::hide_param_exposed_and_normalized",
+   "tests.runners.Runner_.return_value::ok_attr_indicates_failure",
+   "tests.runners.Runner_.return_value::ok_attr_indicates_success",
+   "tests.runners.Runner_.return_value::return_code",
+   "tests.runners.Runner_.return_value::shell_used",
+   "tests.runners.Runner_.return_value::stderr_attribute_contains_stderr",
+   "tests.runners.Runner_.return_value::stdout_attribute_contains_stdout",
+   "tests.runners.Runner_.return_value::whether_pty_was_used",
+   "tests.runners.Runner_.send_interrupt::called_on_KeyboardInterrupt",
+   "tests.runners.Runner_.send_interrupt::sends_escape_byte_sequence",
+   "tests.runners.Runner_.shell::defaults_to_bash_or_cmdexe_when_pty_False",
+   "tests.runners.Runner_.shell::defaults_to_bash_or_cmdexe_when_pty_True",
+   "tests.runners.Runner_.shell::kwarg_beats_config",
+   "tests.runners.Runner_.shell::may_be_configured",
+   "tests.runners.Runner_.shell::may_be_overridden",
+   "tests.runners.Runner_.threading::errors_within_io_thread_body_bubble_up",
+   "tests.runners.Runner_.threading::io_thread_errors_str_has_details",
+   "tests.runners.Runner_.timeout::kwarg_wins_over_config",
+   "tests.runners.Runner_.timeout::raises_CommandTimedOut_with_timeout_info",
+   "tests.runners.Runner_.timeout::run_kwarg_honored",
+   "tests.runners.Runner_.timeout::start_timer_called_with_config_value",
+   "tests.runners.Runner_.warn::does_not_apply_to_timeout_errors",
+   "tests.runners.Runner_.warn::does_not_apply_to_watcher_errors",
+   "tests.runners.Runner_.warn::honors_config",
+   "tests.runners.Runner_.warn::kwarg_beats_config",
+   "tests.runners.Runner_.watchers::both_out_and_err_are_scanned",
+   "tests.runners.Runner_.watchers::chunk_sizes_smaller_than_patterns_still_work_ok",
+   "tests.runners.Runner_.watchers::honors_watchers_config_option",
+   "tests.runners.Runner_.watchers::kwarg_overrides_config",
+   "tests.runners.Runner_.watchers::multiple_hits_yields_multiple_responses",
+   "tests.runners.Runner_.watchers::multiple_patterns_across_both_streams",
+   "tests.runners.Runner_.watchers::multiple_patterns_works_as_expected",
+   "tests.runners.Runner_.watchers::nothing_is_written_to_stdin_by_default",
+   "tests.runners.Runner_.watchers::watchers_responses_get_written_to_proc_stdin"
+  ],
+  "load_failed_both": [],
+  "load_failed_pr": [],
+  "load_failed_main": [],
+  "failure_signatures": {
+   "tests.runners.Local_.env::uses_execve_for_pty_True": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Local_.get_pid::is_top_level_pid_when_using_pty": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Local_.pty.fallback::can_be_overridden_by_config": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "tests.runners.Local_.pty.fallback::can_be_overridden_by_kwarg": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "tests.runners.Local_.pty.fallback::overridden_fallback_affects_result_pty_value": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "tests.runners.Local_.pty::WTERMSIG_result_turned_negative_to_match_subprocess": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Local_.pty::non_spurious_OSErrors_bubble_up": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "AssertionError",
+     "KeyError",
+     "OSError"
+    ]
+   },
+   "tests.runners.Local_.pty::other_spurious_OSErrors_handled_gracefully": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Local_.pty::pty_is_set_to_controlling_terminal_size": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Local_.pty::pty_uses_WEXITSTATUS_if_WIFEXITED": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Local_.pty::pty_uses_WTERMSIG_if_WIFSIGNALED": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Local_.pty::spurious_OSErrors_handled_gracefully": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Local_.pty::stop_mutes_errors_on_pty_close": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Local_.pty::when_pty_True_we_use_pty_fork_and_os_exec": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Local_.shell::defaults_to_bash_or_cmdexe_when_pty_True": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Local_.shell::may_be_overridden_when_pty_True": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "FileNotFoundError"
+    ]
+   },
+   "tests.runners.Runner_.character_buffered_stdin::setcbreak_called_on_tty_stdins": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.character_buffered_stdin::setcbreak_not_called_if_process_not_foregrounded": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.character_buffered_stdin::setcbreak_not_called_if_terminal_seems_already_cbroken": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.character_buffered_stdin::tty_stdins_have_settings_restored_by_default": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.character_buffered_stdin::tty_stdins_have_settings_restored_on_KeyboardInterrupt": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.command_echoing::enabled_via_config": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.command_echoing::enabled_via_kwarg": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.command_echoing::kwarg_beats_config": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.command_echoing::off_by_default": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.command_echoing::uses_ansi_bold": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.command_echoing::uses_custom_format": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.encoding::defaults_to_encoding_method_result": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.encoding::honors_config": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.env::config_can_be_used": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.env::defaults_to_os_environ": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.env::kwarg_wins_over_config": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.env::replaces_when_replace_env_True": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.env::updates_when_dict_given": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.failure_handling.UnexpectedExit_repr::similar_to_just_the_result_repr": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.failure_handling.UnexpectedExit_str::displays_command_and_exit_code_by_default": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.failure_handling.UnexpectedExit_str::displays_tails_of_streams_only_when_hidden": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.failure_handling.UnexpectedExit_str::does_not_display_stderr_when_pty_True": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.failure_handling.UnexpectedExit_str::explicit_hidden_stream_tail_display": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.failure_handling.UnexpectedExit_str::pty_stderr_message_wins_over_hidden_stderr": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.failure_handling.reason::is_None_for_regular_nonzero_exits": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.failure_handling.reason::is_exception_when_WatcherError_raised_internally": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.failure_handling.wrapped_result.shell_exit_failure::exited_is_integer": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.failure_handling.wrapped_result.shell_exit_failure::ok_bool_etc_are_falsey": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.failure_handling.wrapped_result.shell_exit_failure::stringrep_notes_exit_status": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.failure_handling.wrapped_result.watcher_failure::exited_is_None": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.failure_handling.wrapped_result.watcher_failure::ok_and_bool_still_are_falsey": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.failure_handling.wrapped_result.watcher_failure::stringrep_lacks_exit_status": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.failure_handling.wrapped_result::most_attrs_are_always_present": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.failure_handling::fast_failures": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.failure_handling::non_1_return_codes_still_act_as_failure": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.get_pid::returns_None_by_default": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.hide::honors_config": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.hide::kwarg_beats_config": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.output_hiding::False_hides_nothing": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.output_hiding::None_hides_nothing": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.output_hiding::True_hides_everything": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.output_hiding::accepts_stderr_alias_for_err": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.output_hiding::accepts_stdout_alias_for_out": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.output_hiding::both_hides_everything": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.output_hiding::does_not_affect_capturing": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.output_hiding::err_only_hides_stderr": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.output_hiding::out_only_hides_stdout": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.output_hiding::overrides_echoing": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.output_stream_handling::writes_and_flushes_to_stderr": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.output_stream_handling::writes_and_flushes_to_stdout": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.output_stream_overrides::err_can_be_overridden": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.output_stream_overrides::err_defaults_to_sys_stderr": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.output_stream_overrides::out_can_be_overridden": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.output_stream_overrides::out_defaults_to_sys_stdout": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.output_stream_overrides::overridden_err_is_never_hidden": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.output_stream_overrides::overridden_out_is_never_hidden": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.output_stream_overrides::pty_defaults_to_sys": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.output_stream_overrides::pty_out_can_be_overridden": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.pty::honors_config": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.pty::kwarg_beats_config": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.pty::pty_defaults_to_off": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.return_value::command_executed": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.return_value::failed_attr_indicates_failure": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.return_value::failed_attr_indicates_success": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.return_value::hide_param_exposed_and_normalized": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.return_value::ok_attr_indicates_failure": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.return_value::ok_attr_indicates_success": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.return_value::return_code": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.return_value::shell_used": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.return_value::stderr_attribute_contains_stderr": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.return_value::stdout_attribute_contains_stdout": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.return_value::whether_pty_was_used": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.send_interrupt::called_on_KeyboardInterrupt": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.send_interrupt::sends_escape_byte_sequence": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.shell::defaults_to_bash_or_cmdexe_when_pty_False": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.shell::defaults_to_bash_or_cmdexe_when_pty_True": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.shell::kwarg_beats_config": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.shell::may_be_configured": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.shell::may_be_overridden": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.threading::errors_within_io_thread_body_bubble_up": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "AssertionError"
+    ]
+   },
+   "tests.runners.Runner_.threading::io_thread_errors_str_has_details": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "OSError"
+    ]
+   },
+   "tests.runners.Runner_.timeout::kwarg_wins_over_config": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.timeout::raises_CommandTimedOut_with_timeout_info": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.timeout::run_kwarg_honored": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.timeout::start_timer_called_with_config_value": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.warn::does_not_apply_to_timeout_errors": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.warn::does_not_apply_to_watcher_errors": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.warn::honors_config": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.warn::kwarg_beats_config": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.watchers::both_out_and_err_are_scanned": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.watchers::chunk_sizes_smaller_than_patterns_still_work_ok": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.watchers::honors_watchers_config_option": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.watchers::kwarg_overrides_config": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.watchers::multiple_hits_yields_multiple_responses": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.watchers::multiple_patterns_across_both_streams": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.watchers::multiple_patterns_works_as_expected": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.watchers::nothing_is_written_to_stdin_by_default": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   },
+   "tests.runners.Runner_.watchers::watchers_responses_get_written_to_proc_stdin": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ThreadException"
+    ]
+   }
+  },
+  "executed": {
+   "main": 387,
+   "pr": 390
+  },
+  "messages": {
+   "tests.runners.Runner_.hide::explicit_None_overrides_config[True]": "invoke.exceptions.ThreadException: ",
+   "tests.runners.Runner_.hide::explicit_None_overrides_config[err]": "invoke.exceptions.ThreadException: ",
+   "tests.runners.Runner_.hide::explicit_None_overrides_config[out]": "invoke.exceptions.ThreadException: "
+  },
+  "collected_test_files": [
+   "tests/runners.py"
+  ],
+  "base_new_tests": {
+   "ids": [
+    "tests/runners.py::Runner_::hide::explicit_None_overrides_config[True]",
+    "tests/runners.py::Runner_::hide::explicit_None_overrides_config[err]",
+    "tests/runners.py::Runner_::hide::explicit_None_overrides_config[out]"
+   ],
+   "passed_on_base": [],
+   "failed_on_base": [],
+   "not_collected": [
+    "tests/runners.py::Runner_::hide::explicit_None_overrides_config[True]",
+    "tests/runners.py::Runner_::hide::explicit_None_overrides_config[err]",
+    "tests/runners.py::Runner_::hide::explicit_None_overrides_config[out]"
+   ],
+   "collection_failed": [],
+   "discovery_empty": [],
+   "shared_ids": [
+    "tests/runners.py::Runner_::init::takes_a_context_instance",
+    "tests/runners.py::Runner_::init::context_instance_is_required",
+    "tests/runners.py::Runner_::run::handles_invalid_kwargs_like_any_other_function",
+    "tests/runners.py::Runner_::warn::honors_config",
+    "tests/runners.py::Runner_::warn::kwarg_beats_config",
+    "tests/runners.py::Runner_::warn::does_not_apply_to_watcher_errors",
+    "tests/runners.py::Runner_::warn::does_not_apply_to_timeout_errors",
+    "tests/runners.py::Runner_::hide::honors_config",
+    "tests/runners.py::Runner_::hide::kwarg_beats_config",
+    "tests/runners.py::Runner_::pty::pty_defaults_to_off",
+    "tests/runners.py::Runner_::pty::honors_config",
+    "tests/runners.py::Runner_::pty::kwarg_beats_config",
+    "tests/runners.py::Runner_::shell::defaults_to_bash_or_cmdexe_when_pty_True",
+    "tests/runners.py::Runner_::shell::defaults_to_bash_or_cmdexe_when_pty_False",
+    "tests/runners.py::Runner_::shell::may_be_overridden",
+    "tests/runners.py::Runner_::shell::may_be_configured",
+    "tests/runners.py::Runner_::shell::kwarg_beats_config",
+    "tests/runners.py::Runner_::env::defaults_to_os_environ",
+    "tests/runners.py::Runner_::env::updates_when_dict_given",
+    "tests/runners.py::Runner_::env::replaces_when_replace_env_True",
+    "tests/runners.py::Runner_::env::config_can_be_used",
+    "tests/runners.py::Runner_::env::kwarg_wins_over_config",
+    "tests/runners.py::Runner_::return_value::return_code",
+    "tests/runners.py::Runner_::return_value::ok_attr_indicates_success",
+    "tests/runners.py::Runner_::return_value::ok_attr_indicates_failure",
+    "tests/runners.py::Runner_::return_value::failed_attr_indicates_success",
+    "tests/runners.py::Runner_::return_value::failed_attr_indicates_failure",
+    "tests/runners.py::Runner_::return_value::stdout_attribute_contains_stdout",
+    "tests/runners.py::Runner_::return_value::stderr_attribute_contains_stderr",
+    "tests/runners.py::Runner_::return_value::whether_pty_was_used",
+    "tests/runners.py::Runner_::return_value::command_executed",
+    "tests/runners.py::Runner_::return_value::shell_used",
+    "tests/runners.py::Runner_::return_value::hide_param_exposed_and_normalized",
+    "tests/runners.py::Runner_::command_echoing::off_by_default",
+    "tests/runners.py::Runner_::command_echoing::enabled_via_kwarg",
+    "tests/runners.py::Runner_::command_echoing::enabled_via_config",
+    "tests/runners.py::Runner_::command_echoing::kwarg_beats_config",
+    "tests/runners.py::Runner_::command_echoing::uses_ansi_bold",
+    "tests/runners.py::Runner_::command_echoing::uses_custom_format",
+    "tests/runners.py::Runner_::dry_running::sets_echo_to_True",
+    "tests/runners.py::Runner_::dry_running::short_circuits_with_dummy_result",
+    "tests/runners.py::Runner_::encoding::defaults_to_encoding_method_result",
+    "tests/runners.py::Runner_::encoding::honors_config",
+    "tests/runners.py::Runner_::encoding::honors_kwarg",
+    "tests/runners.py::Runner_::encoding::uses_locale_module_for_default_encoding",
+    "tests/runners.py::Runner_::encoding::falls_back_to_defaultlocale_when_preferredencoding_is_None",
+    "tests/runners.py::Runner_::output_hiding::both_hides_everything",
+    "tests/runners.py::Runner_::output_hiding::True_hides_everything",
+    "tests/runners.py::Runner_::output_hiding::out_only_hides_stdout",
+    "tests/runners.py::Runner_::output_hiding::err_only_hides_stderr",
+    "tests/runners.py::Runner_::output_hiding::accepts_stdout_alias_for_out",
+    "tests/runners.py::Runner_::output_hiding::accepts_stderr_alias_for_err",
+    "tests/runners.py::Runner_::output_hiding::None_hides_nothing",
+    "tests/runners.py::Runner_::output_hiding::False_hides_nothing",
+    "tests/runners.py::Runner_::output_hiding::unknown_vals_raises_ValueError",
+    "tests/runners.py::Runner_::output_hiding::unknown_vals_mention_value_given_in_error",
+    "tests/runners.py::Runner_::output_hiding::does_not_affect_capturing",
+    "tests/runners.py::Runner_::output_hiding::overrides_echoing",
+    "tests/runners.py::Runner_::output_stream_overrides::out_defaults_to_sys_stdout",
+    "tests/runners.py::Runner_::output_stream_overrides::err_defaults_to_sys_stderr",
+    "tests/runners.py::Runner_::output_stream_overrides::out_can_be_overridden",
+    "tests/runners.py::Runner_::output_stream_overrides::overridden_out_is_never_hidden",
+    "tests/runners.py::Runner_::output_stream_overrides::err_can_be_overridden",
+    "tests/runners.py::Runner_::output_stream_overrides::overridden_err_is_never_hidden",
+    "tests/runners.py::Runner_::output_stream_overrides::pty_defaults_to_sys",
+    "tests/runners.py::Runner_::output_stream_overrides::pty_out_can_be_overridden",
+    "tests/runners.py::Runner_::output_stream_handling::writes_and_flushes_to_stdout",
+    "tests/runners.py::Runner_::output_stream_handling::writes_and_flushes_to_stderr",
+    "tests/runners.py::Runner_::input_stream_handling::defaults_to_sys_stdin",
+    "tests/runners.py::Runner_::input_stream_handling::can_be_overridden",
+    "tests/runners.py::Runner_::input_stream_handling::can_be_disabled_entirely",
+    "tests/runners.py::Runner_::input_stream_handling::exceptions_get_logged",
+    "tests/runners.py::Runner_::input_stream_handling::EOF_triggers_closing_of_proc_stdin",
+    "tests/runners.py::Runner_::input_stream_handling::EOF_does_not_close_proc_stdin_when_pty_True",
+    "tests/runners.py::Runner_::input_stream_handling::EBADF_on_stdin_read_ignored",
+    "tests/runners.py::Runner_::input_stream_handling::non_EBADF_on_stdin_read_not_ignored",
+    "tests/runners.py::Runner_::failure_handling::fast_failures",
+    "tests/runners.py::Runner_::failure_handling::non_1_return_codes_still_act_as_failure",
+    "tests/runners.py::Runner_::failure_handling::Failure_repr::defaults_to_just_class_and_command",
+    "tests/runners.py::Runner_::failure_handling::Failure_repr::subclasses_may_add_more_kv_pairs",
+    "tests/runners.py::Runner_::failure_handling::UnexpectedExit_repr::similar_to_just_the_result_repr",
+    "tests/runners.py::Runner_::failure_handling::UnexpectedExit_str::displays_command_and_exit_code_by_default",
+    "tests/runners.py::Runner_::failure_handling::UnexpectedExit_str::does_not_display_stderr_when_pty_True",
+    "tests/runners.py::Runner_::failure_handling::UnexpectedExit_str::pty_stderr_message_wins_over_hidden_stderr",
+    "tests/runners.py::Runner_::failure_handling::UnexpectedExit_str::explicit_hidden_stream_tail_display",
+    "tests/runners.py::Runner_::failure_handling::UnexpectedExit_str::displays_tails_of_streams_only_when_hidden",
+    "tests/runners.py::Runner_::failure_handling::reason::is_None_for_regular_nonzero_exits",
+    "tests/runners.py::Runner_::failure_handling::reason::is_None_for_custom_command_exits",
+    "tests/runners.py::Runner_::failure_handling::reason::is_exception_when_WatcherError_raised_internally",
+    "tests/runners.py::Runner_::failure_handling::wrapped_result::most_attrs_are_always_present",
+    "tests/runners.py::Runner_::failure_handling::wrapped_result::shell_exit_failure::exited_is_integer",
+    "tests/runners.py::Runner_::failure_handling::wrapped_result::shell_exit_failure::ok_bool_etc_are_falsey",
+    "tests/runners.py::Runner_::failure_handling::wrapped_result::shell_exit_failure::stringrep_notes_exit_status",
+    "tests/runners.py::Runner_::failure_handling::wrapped_result::watcher_failure::exited_is_None",
+    "tests/runners.py::Runner_::failure_handling::wrapped_result::watcher_failure::ok_and_bool_still_are_falsey",
+    "tests/runners.py::Runner_::failure_handling::wrapped_result::watcher_failure::stringrep_lacks_exit_status",
+    "tests/runners.py::Runner_::threading::errors_within_io_thread_body_bubble_up",
+    "tests/runners.py::Runner_::threading::io_thread_errors_str_has_details",
+    "tests/runners.py::Runner_::watchers::nothing_is_written_to_stdin_by_default",
+    "tests/runners.py::Runner_::watchers::watchers_responses_get_written_to_proc_stdin",
+    "tests/runners.py::Runner_::watchers::multiple_hits_yields_multiple_responses",
+    "tests/runners.py::Runner_::watchers::chunk_sizes_smaller_than_patterns_still_work_ok",
+    "tests/runners.py::Runner_::watchers::both_out_and_err_are_scanned",
+    "tests/runners.py::Runner_::watchers::multiple_patterns_works_as_expected",
+    "tests/runners.py::Runner_::watchers::multiple_patterns_across_both_streams",
+    "tests/runners.py::Runner_::watchers::honors_watchers_config_option",
+    "tests/runners.py::Runner_::watchers::kwarg_overrides_config",
+    "tests/runners.py::Runner_::io_sleeping::input_sleep_attribute_defaults_to_hundredth_of_second",
+    "tests/runners.py::Runner_::io_sleeping::subclasses_can_override_input_sleep",
+    "tests/runners.py::Runner_::stdin_mirroring::when_pty_is_True_no_mirroring_occurs",
+    "tests/runners.py::Runner_::stdin_mirroring::when_pty_is_False_we_write_in_stream_back_to_out_stream",
+    "tests/runners.py::Runner_::stdin_mirroring::mirroring_is_skipped_when_our_input_is_not_a_tty",
+    "tests/runners.py::Runner_::stdin_mirroring::mirroring_can_be_forced_on",
+    "tests/runners.py::Runner_::stdin_mirroring::mirroring_can_be_forced_off",
+    "tests/runners.py::Runner_::stdin_mirroring::mirroring_honors_configuration",
+    "tests/runners.py::Runner_::stdin_mirroring::reads_FIONREAD_bytes_from_stdin_when_fileno",
+    "tests/runners.py::Runner_::character_buffered_stdin::setcbreak_called_on_tty_stdins",
+    "tests/runners.py::Runner_::character_buffered_stdin::setcbreak_not_called_on_non_tty_stdins",
+    "tests/runners.py::Runner_::character_buffered_stdin::setcbreak_not_called_if_process_not_foregrounded",
+    "tests/runners.py::Runner_::character_buffered_stdin::tty_stdins_have_settings_restored_by_default",
+    "tests/runners.py::Runner_::character_buffered_stdin::tty_stdins_have_settings_restored_on_KeyboardInterrupt",
+    "tests/runners.py::Runner_::character_buffered_stdin::setcbreak_not_called_if_terminal_seems_already_cbroken",
+    "tests/runners.py::Runner_::send_interrupt::called_on_KeyboardInterrupt",
+    "tests/runners.py::Runner_::send_interrupt::not_called_for_other_exceptions",
+    "tests/runners.py::Runner_::send_interrupt::sends_escape_byte_sequence",
+    "tests/runners.py::Runner_::timeout::start_timer_called_with_config_value",
+    "tests/runners.py::Runner_::timeout::run_kwarg_honored",
+    "tests/runners.py::Runner_::timeout::kwarg_wins_over_config",
+    "tests/runners.py::Runner_::timeout::raises_CommandTimedOut_with_timeout_info",
+    "tests/runners.py::Runner_::timeout::start_timer_gives_its_timer_the_kill_method",
+    "tests/runners.py::Runner_::timeout::run_always_stops_timer",
+    "tests/runners.py::Runner_::timeout::timer_aliveness_is_test_of_timing_out",
+    "tests/runners.py::Runner_::timeout::timeout_specified_but_no_timer_means_no_exception",
+    "tests/runners.py::Runner_::stop::always_runs_no_matter_what",
+    "tests/runners.py::Runner_::stop::cancels_timer",
+    "tests/runners.py::Runner_::asynchronous::returns_Promise_immediately_and_finishes_on_join",
+    "tests/runners.py::Runner_::asynchronous::hides_output",
+    "tests/runners.py::Runner_::asynchronous::does_not_forward_stdin",
+    "tests/runners.py::Runner_::asynchronous::leaves_overridden_streams_alone",
+    "tests/runners.py::Runner_::disown::starts_but_does_nothing_else_and_returns_emptyish_Result",
+    "tests/runners.py::Runner_::disown::cannot_be_given_alongside_asynchronous",
+    "tests/runners.py::Runner_::get_pid::returns_None_by_default",
+    "tests/runners.py::Local_::stop::calls_super",
+    "tests/runners.py::Local_::pty::when_pty_True_we_use_pty_fork_and_os_exec",
+    "tests/runners.py::Local_::pty::pty_uses_WEXITSTATUS_if_WIFEXITED",
+    "tests/runners.py::Local_::pty::pty_uses_WTERMSIG_if_WIFSIGNALED",
+    "tests/runners.py::Local_::pty::WTERMSIG_result_turned_negative_to_match_subprocess",
+    "tests/runners.py::Local_::pty::pty_is_set_to_controlling_terminal_size",
+    "tests/runners.py::Local_::pty::warning_only_fires_once",
+    "tests/runners.py::Local_::pty::replaced_stdin_objects_dont_explode",
+    "tests/runners.py::Local_::pty::spurious_OSErrors_handled_gracefully",
+    "tests/runners.py::Local_::pty::other_spurious_OSErrors_handled_gracefully",
+    "tests/runners.py::Local_::pty::non_spurious_OSErrors_bubble_up",
+    "tests/runners.py::Local_::pty::stop_mutes_errors_on_pty_close",
+    "tests/runners.py::Local_::pty::fallback::can_be_overridden_by_kwarg",
+    "tests/runners.py::Local_::pty::fallback::can_be_overridden_by_config",
+    "tests/runners.py::Local_::pty::fallback::affects_result_pty_value",
+    "tests/runners.py::Local_::pty::fallback::overridden_fallback_affects_result_pty_value",
+    "tests/runners.py::Local_::shell::defaults_to_bash_or_cmdexe_when_pty_True",
+    "tests/runners.py::Local_::shell::defaults_to_bash_or_cmdexe_when_pty_False",
+    "tests/runners.py::Local_::shell::may_be_overridden_when_pty_True",
+    "tests/runners.py::Local_::shell::may_be_overridden_when_pty_False",
+    "tests/runners.py::Local_::env::uses_Popen_kwarg_for_pty_False",
+    "tests/runners.py::Local_::env::uses_execve_for_pty_True",
+    "tests/runners.py::Local_::close_proc_stdin::raises_SubprocessPipeError_when_pty_in_use",
+    "tests/runners.py::Local_::close_proc_stdin::closes_process_stdin",
+    "tests/runners.py::Local_::timeout::kill_uses_self_pid_when_pty",
+    "tests/runners.py::Local_::timeout::kill_uses_self_process_pid_when_not_pty",
+    "tests/runners.py::Local_::get_pid::is_top_level_pid_when_using_pty",
+    "tests/runners.py::Local_::get_pid::is_process_attribute_pid_when_no_pty",
+    "tests/runners.py::Result_::nothing_is_required",
+    "tests/runners.py::Result_::first_posarg_is_stdout",
+    "tests/runners.py::Result_::command_defaults_to_empty_string",
+    "tests/runners.py::Result_::shell_defaults_to_empty_string",
+    "tests/runners.py::Result_::encoding_defaults_to_local_default_encoding",
+    "tests/runners.py::Result_::env_defaults_to_empty_dict",
+    "tests/runners.py::Result_::stdout_defaults_to_empty_string",
+    "tests/runners.py::Result_::stderr_defaults_to_empty_string",
+    "tests/runners.py::Result_::exited_defaults_to_zero",
+    "tests/runners.py::Result_::pty_defaults_to_False",
+    "tests/runners.py::Result_::pid_defaults_to_None",
+    "tests/runners.py::Result_::repr_contains_useful_info",
+    "tests/runners.py::Result_::tail::returns_last_10_lines_of_given_stream_plus_whitespace",
+    "tests/runners.py::Result_::tail::line_count_is_configurable",
+    "tests/runners.py::Result_::tail::works_for_stderr_too",
+    "tests/runners.py::Promise_::explicitly_inherits_from_abstract_base_class",
+    "tests/runners.py::Promise_::repr_degrades_gracefully",
+    "tests/runners.py::Promise_::exposes_read_only_run_params",
+    "tests/runners.py::Promise_::join::returns_Result_on_success",
+    "tests/runners.py::Promise_::join::raises_main_thread_exception_on_kaboom",
+    "tests/runners.py::Promise_::join::raises_subthread_exception_on_their_kaboom",
+    "tests/runners.py::Promise_::join::raises_Failure_on_failure",
+    "tests/runners.py::Promise_::context_manager::calls_join_or_wait_on_close_of_block",
+    "tests/runners.py::Promise_::context_manager::yields_self"
+   ],
+   "not_executed": [
+    "tests/runners.py::Runner_::hide::explicit_None_overrides_config[True]",
+    "tests/runners.py::Runner_::hide::explicit_None_overrides_config[out]",
+    "tests/runners.py::Runner_::hide::explicit_None_overrides_config[err]",
+    "tests/runners.py::Runner_::warn::honors_config",
+    "tests/runners.py::Runner_::warn::kwarg_beats_config",
+    "tests/runners.py::Runner_::warn::does_not_apply_to_watcher_errors",
+    "tests/runners.py::Runner_::warn::does_not_apply_to_timeout_errors",
+    "tests/runners.py::Runner_::hide::honors_config",
+    "tests/runners.py::Runner_::hide::kwarg_beats_config",
+    "tests/runners.py::Runner_::pty::pty_defaults_to_off",
+    "tests/runners.py::Runner_::pty::honors_config",
+    "tests/runners.py::Runner_::pty::kwarg_beats_config",
+    "tests/runners.py::Runner_::shell::defaults_to_bash_or_cmdexe_when_pty_True",
+    "tests/runners.py::Runner_::shell::defaults_to_bash_or_cmdexe_when_pty_False",
+    "tests/runners.py::Runner_::shell::may_be_overridden",
+    "tests/runners.py::Runner_::shell::may_be_configured",
+    "tests/runners.py::Runner_::shell::kwarg_beats_config",
+    "tests/runners.py::Runner_::env::defaults_to_os_environ",
+    "tests/runners.py::Runner_::env::updates_when_dict_given",
+    "tests/runners.py::Runner_::env::replaces_when_replace_env_True",
+    "tests/runners.py::Runner_::env::config_can_be_used",
+    "tests/runners.py::Runner_::env::kwarg_wins_over_config",
+    "tests/runners.py::Runner_::return_value::return_code",
+    "tests/runners.py::Runner_::return_value::ok_attr_indicates_success",
+    "tests/runners.py::Runner_::return_value::ok_attr_indicates_failure",
+    "tests/runners.py::Runner_::return_value::failed_attr_indicates_success",
+    "tests/runners.py::Runner_::return_value::failed_attr_indicates_failure",
+    "tests/runners.py::Runner_::return_value::stdout_attribute_contains_stdout",
+    "tests/runners.py::Runner_::return_value::stderr_attribute_contains_stderr",
+    "tests/runners.py::Runner_::return_value::whether_pty_was_used",
+    "tests/runners.py::Runner_::return_value::command_executed",
+    "tests/runners.py::Runner_::return_value::shell_used",
+    "tests/runners.py::Runner_::return_value::hide_param_exposed_and_normalized",
+    "tests/runners.py::Runner_::command_echoing::off_by_default",
+    "tests/runners.py::Runner_::command_echoing::enabled_via_kwarg",
+    "tests/runners.py::Runner_::command_echoing::enabled_via_config",
+    "tests/runners.py::Runner_::command_echoing::kwarg_beats_config",
+    "tests/runners.py::Runner_::command_echoing::uses_ansi_bold",
+    "tests/runners.py::Runner_::command_echoing::uses_custom_format",
+    "tests/runners.py::Runner_::encoding::defaults_to_encoding_method_result",
+    "tests/runners.py::Runner_::encoding::honors_config",
+    "tests/runners.py::Runner_::output_hiding::both_hides_everything",
+    "tests/runners.py::Runner_::output_hiding::True_hides_everything",
+    "tests/runners.py::Runner_::output_hiding::out_only_hides_stdout",
+    "tests/runners.py::Runner_::output_hiding::err_only_hides_stderr",
+    "tests/runners.py::Runner_::output_hiding::accepts_stdout_alias_for_out",
+    "tests/runners.py::Runner_::output_hiding::accepts_stderr_alias_for_err",
+    "tests/runners.py::Runner_::output_hiding::None_hides_nothing",
+    "tests/runners.py::Runner_::output_hiding::False_hides_nothing",
+    "tests/runners.py::Runner_::output_hiding::does_not_affect_capturing",
+    "tests/runners.py::Runner_::output_hiding::overrides_echoing",
+    "tests/runners.py::Runner_::output_stream_overrides::out_defaults_to_sys_stdout",
+    "tests/runners.py::Runner_::output_stream_overrides::err_defaults_to_sys_stderr",
+    "tests/runners.py::Runner_::output_stream_overrides::out_can_be_overridden",
+    "tests/runners.py::Runner_::output_stream_overrides::overridden_out_is_never_hidden",
+    "tests/runners.py::Runner_::output_stream_overrides::err_can_be_overridden",
+    "tests/runners.py::Runner_::output_stream_overrides::overridden_err_is_never_hidden",
+    "tests/runners.py::Runner_::output_stream_overrides::pty_defaults_to_sys",
+    "tests/runners.py::Runner_::output_stream_overrides::pty_out_can_be_overridden",
+    "tests/runners.py::Runner_::output_stream_handling::writes_and_flushes_to_stdout",
+    "tests/runners.py::Runner_::output_stream_handling::writes_and_flushes_to_stderr",
+    "tests/runners.py::Runner_::failure_handling::fast_failures",
+    "tests/runners.py::Runner_::failure_handling::non_1_return_codes_still_act_as_failure",
+    "tests/runners.py::Runner_::failure_handling::UnexpectedExit_repr::similar_to_just_the_result_repr",
+    "tests/runners.py::Runner_::failure_handling::UnexpectedExit_str::displays_command_and_exit_code_by_default",
+    "tests/runners.py::Runner_::failure_handling::UnexpectedExit_str::does_not_display_stderr_when_pty_True",
+    "tests/runners.py::Runner_::failure_handling::UnexpectedExit_str::pty_stderr_message_wins_over_hidden_stderr",
+    "tests/runners.py::Runner_::failure_handling::UnexpectedExit_str::explicit_hidden_stream_tail_display",
+    "tests/runners.py::Runner_::failure_handling::UnexpectedExit_str::displays_tails_of_streams_only_when_hidden",
+    "tests/runners.py::Runner_::failure_handling::reason::is_None_for_regular_nonzero_exits",
+    "tests/runners.py::Runner_::failure_handling::reason::is_exception_when_WatcherError_raised_internally",
+    "tests/runners.py::Runner_::failure_handling::wrapped_result::most_attrs_are_always_present",
+    "tests/runners.py::Runner_::failure_handling::wrapped_result::shell_exit_failure::exited_is_integer",
+    "tests/runners.py::Runner_::failure_handling::wrapped_result::shell_exit_failure::ok_bool_etc_are_falsey",
+    "tests/runners.py::Runner_::failure_handling::wrapped_result::shell_exit_failure::stringrep_notes_exit_status",
+    "tests/runners.py::Runner_::failure_handling::wrapped_result::watcher_failure::exited_is_None",
+    "tests/runners.py::Runner_::failure_handling::wrapped_result::watcher_failure::ok_and_bool_still_are_falsey",
+    "tests/runners.py::Runner_::failure_handling::wrapped_result::watcher_failure::stringrep_lacks_exit_status",
+    "tests/runners.py::Runner_::threading::errors_within_io_thread_body_bubble_up",
+    "tests/runners.py::Runner_::threading::io_thread_errors_str_has_details",
+    "tests/runners.py::Runner_::watchers::nothing_is_written_to_stdin_by_default",
+    "tests/runners.py::Runner_::watchers::watchers_responses_get_written_to_proc_stdin",
+    "tests/runners.py::Runner_::watchers::multiple_hits_yields_multiple_responses",
+    "tests/runners.py::Runner_::watchers::chunk_sizes_smaller_than_patterns_still_work_ok",
+    "tests/runners.py::Runner_::watchers::both_out_and_err_are_scanned",
+    "tests/runners.py::Runner_::watchers::multiple_patterns_works_as_expected",
+    "tests/runners.py::Runner_::watchers::multiple_patterns_across_both_streams",
+    "tests/runners.py::Runner_::watchers::honors_watchers_config_option",
+    "tests/runners.py::Runner_::watchers::kwarg_overrides_config",
+    "tests/runners.py::Runner_::character_buffered_stdin::setcbreak_called_on_tty_stdins",
+    "tests/runners.py::Runner_::character_buffered_stdin::setcbreak_not_called_if_process_not_foregrounded",
+    "tests/runners.py::Runner_::character_buffered_stdin::tty_stdins_have_settings_restored_by_default",
+    "tests/runners.py::Runner_::character_buffered_stdin::tty_stdins_have_settings_restored_on_KeyboardInterrupt",
+    "tests/runners.py::Runner_::character_buffered_stdin::setcbreak_not_called_if_terminal_seems_already_cbroken",
+    "tests/runners.py::Runner_::send_interrupt::called_on_KeyboardInterrupt",
+    "tests/runners.py::Runner_::send_interrupt::sends_escape_byte_sequence",
+    "tests/runners.py::Runner_::timeout::start_timer_called_with_config_value",
+    "tests/runners.py::Runner_::timeout::run_kwarg_honored",
+    "tests/runners.py::Runner_::timeout::kwarg_wins_over_config",
+    "tests/runners.py::Runner_::timeout::raises_CommandTimedOut_with_timeout_info",
+    "tests/runners.py::Runner_::get_pid::returns_None_by_default",
+    "tests/runners.py::Local_::pty::when_pty_True_we_use_pty_fork_and_os_exec",
+    "tests/runners.py::Local_::pty::pty_uses_WEXITSTATUS_if_WIFEXITED",
+    "tests/runners.py::Local_::pty::pty_uses_WTERMSIG_if_WIFSIGNALED",
+    "tests/runners.py::Local_::pty::WTERMSIG_result_turned_negative_to_match_subprocess",
+    "tests/runners.py::Local_::pty::pty_is_set_to_controlling_terminal_size",
+    "tests/runners.py::Local_::pty::spurious_OSErrors_handled_gracefully",
+    "tests/runners.py::Local_::pty::other_spurious_OSErrors_handled_gracefully",
+    "tests/runners.py::Local_::pty::non_spurious_OSErrors_bubble_up",
+    "tests/runners.py::Local_::pty::stop_mutes_errors_on_pty_close",
+    "tests/runners.py::Local_::pty::fallback::can_be_overridden_by_kwarg",
+    "tests/runners.py::Local_::pty::fallback::can_be_overridden_by_config",
+    "tests/runners.py::Local_::pty::fallback::overridden_fallback_affects_result_pty_value",
+    "tests/runners.py::Local_::shell::defaults_to_bash_or_cmdexe_when_pty_True",
+    "tests/runners.py::Local_::shell::may_be_overridden_when_pty_True",
+    "tests/runners.py::Local_::env::uses_execve_for_pty_True",
+    "tests/runners.py::Local_::get_pid::is_top_level_pid_when_using_pty"
+   ],
+   "reproduced": false,
+   "environment_limits": []
+  }
+ },
+ "exit_check": {
+  "explained": true,
+  "problems": [],
+  "detail": "pytest exit 1; 114 failure(s)/error(s) pre-existing and identical on both sides"
+ },
+ "collection_limitation": "Limitation: tests/runners.py::Runner_::hide::explicit_None_overrides_config[True], tests/runners.py::Runner_::hide::explicit_None_overrides_config[out], tests/runners.py::Runner_::hide::explicit_None_overrides_config[err], tests/runners.py::Runner_::warn::honors_config, tests/runners.py::Runner_::warn::kwarg_beats_config, tests/runners.py::Runner_::warn::does_not_apply_to_watcher_errors, tests/runners.py::Runner_::warn::does_not_apply_to_timeout_errors, tests/runners.py::Runner_::hide::honors_config (+109 more) did not run on the base. They are not a new pass, and this result does not cover them.",
+ "verdict_before_coverage_gate": "needs_attention",
+ "reason_before_coverage_gate": "3 new test(s) fail on the PR; 387 test(s) ran on main, 390 on the PR; 0 new test(s) pass, 278 unchanged (5 of them skipped on both sides); 114 test failure(s) pre-existing and identical on both sides; probe: 2 observation(s) need attention: c1.err does not differ although the claim says it does (C1); c1.out does not differ although the claim says it does (C1); probe model-probe1 has no measured line coverage (no coverage data); it does not count as covering the change; Limitation: tests/runners.py::Runner_::hide::explicit_None_overrides_config[True], tests/runners.py::Runner_::hide::explicit_None_overrides_config[out], tests/runners.py::Runner_::hide::explicit_None_overrides_config[err], tests/runners.py::Runner_::warn::honors_config, tests/runners.py::Runner_::warn::kwarg_beats_config, tests/runners.py::Runner_::warn::does_not_apply_to_watcher_errors, tests/runners.py::Runner_::warn::does_not_apply_to_timeout_errors, tests/runners.py::Runner_::hide::honors_config (+109 more) did not run on the base. They are not a new pass, and this result does not cover them.",
+ "changed_lines_total": 4,
+ "changed_lines_covered": 4,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "normal",
+  "note": "4 of 4 changed executable line(s) ran (100%)",
+  "measurement": "measured"
+ },
+ "agents": {
+  "status": "skipped",
+  "note": "advisory swarm is off",
+  "roles": []
+ },
+ "explanation": {
+  "status": "not yet wired",
+  "why": "advisory swarm is off"
+ },
+ "swarm_requested": false,
+ "operator_approval_requested": false,
+ "swarm": "off",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [
+   "invoke/runners.py"
+  ],
+  "compiled_files": [],
+  "other_files": [
+   "sites/www/changelog.rst",
+   "tests/runners.py"
+  ]
+ },
+ "duration_s": {
+  "total_wall": 228.1,
+  "tests": 18.4
+ },
+ "cost": {
+  "ai_calls": 2,
+  "failed_ai_calls": 0,
+  "input_tokens": 14044,
+  "output_tokens": 17479,
+  "thinking_tokens": 16566,
+  "cost_usd": 0.019944,
+  "calls_without_usage": 0,
+  "ai_cost_usd": 0.019944,
+  "cost_complete": true,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 228.1,
+   "tests": 18.4
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.015207,
+  "total_cost_usd": 0.035151,
+  "swarm": {
+   "ai_calls": 0,
+   "failed_ai_calls": 0,
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "thinking_tokens": 0,
+   "cost_usd": 0.0,
+   "calls_without_usage": 0,
+   "ai_cost_usd": 0.0,
+   "cost_complete": true,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ },
+ "pdf_push": {
+  "ok": true,
+  "attempts": 1,
+  "error": null,
+  "url": "https://github.com/aritracodesbad123/Proof-of-change/tree/runs/runs/2026-11-09/ef12096/invoke-1101"
+ }
+}
