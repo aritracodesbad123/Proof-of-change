@@ -1,6 +1,6 @@
 # Proof-of-Change go/no-go: 2026-11-09 on ef12096
 
-34 report(s) in this folder: 9 need attention, 22 could not be verified, 3 verified. Built from every record.json stored in this folder, so a later one-PR run cannot narrow it.
+35 report(s) in this folder: 9 need attention, 22 could not be verified, 4 verified. Built from every record.json stored in this folder, so a later one-PR run cannot narrow it.
 
 ## Needs a decision first
 
@@ -74,3 +74,4 @@
 | VERIFIED | mahmoud/boltons#746: Restore disabled GC state on context exit | 1 test(s) fail on main and pass on the PR; 5 test(s) ran on main, 5 on the PR; 0 new test(s) pass, 4 unchanged; probe: claim(s) C1, C2, C3 proven | [PDF](boltons-746/REPORT.pdf) |
 | VERIFIED | mahmoud/boltons#751: fix: parse hour-only UTC offsets in isoparse | 1 test(s) fail on main and pass on the PR; 18 test(s) ran on main, 18 on the PR; 0 new test(s) pass, 17 unchanged; probe: claim(s) C1, C2, C3, C4, C5, C6 proven | [PDF](boltons-751/REPORT.pdf) |
 | VERIFIED | Delgan/loguru#1515: Evaluate every rotation condition so a skipped one cannot fire spuriously | 1 test(s) fail on main and pass on the PR; 148 test(s) ran on main, 148 on the PR; 0 new test(s) pass, 150 unchanged (3 of them skipped on both sides); probe: 3 unchanged sub-check(s) of an input where the claim's change was seen, shown as advisory only: c1.ret1 (C1); c1.second_limit_advanced (C1); c1.second_limit_after_first (C1); probe: claim(s) C1, C2, C3 proven | [PDF](loguru-1515/REPORT.pdf) |
+| VERIFIED | pytoolz/toolz#658: Fix bytes and bytearray source keyword signatures | Cross-run settled differs claim(s) C1, C2 as proven (4 new or changed test(s) fail on the base and pass on the PR: toolz.tests.test_bytes_source_keyword::test_source_keyword_validation[is_partial_args-bytearray], toolz.tests.test_bytes_source_keyword::test_source_keyword_validation[is_partial_args-bytes], toolz.tests.test_bytes_source_keyword::test_source_keyword_validation[is_valid_args-bytearray] (+1 more)); 4 test(s) fail on main and pass on the PR; 7 test(s) ran on main, 9 on the PR; 2 new test(s) pass, 3 unchanged | [PDF](toolz-658/REPORT.pdf) |
