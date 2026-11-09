@@ -1,9 +1,9 @@
 {
  "schema_version": "1",
  "record_kind": "pr_run",
- "id": "pr-Delgan-loguru-1541-31b68a06456a-2026-11-08",
- "date_ist": "2026-11-09 11:25 IST",
- "run_date": "2026-11-08",
+ "id": "pr-Delgan-loguru-1541-31b68a06456a-2026-11-09",
+ "date_ist": "2026-11-09 12:37 IST",
+ "run_date": "2026-11-09",
  "who": "ops/daily_run.py",
  "repo": "Delgan/loguru",
  "library": "loguru",
@@ -25,7 +25,7 @@
  "updated_at_ist": "2026-11-08 12:48 IST",
  "ci_state": "passing",
  "ci_detail": "22 check runs completed without failure",
- "tested_at_ist": "2026-11-09 11:25 IST",
+ "tested_at_ist": "2026-11-09 12:37 IST",
  "files": {
   "all": [
    "CHANGELOG.rst",
@@ -88,8 +88,8 @@
    "skipped": 2,
    "collection_errors": 0,
    "exit": 0,
-   "seconds": 4.4,
-   "pytest_summary": "100 passed, 2 skipped in 3.40s",
+   "seconds": 4.3,
+   "pytest_summary": "100 passed, 2 skipped in 3.33s",
    "junit": true
   },
   {
@@ -101,8 +101,8 @@
    "skipped": 2,
    "collection_errors": 0,
    "exit": 0,
-   "seconds": 4.3,
-   "pytest_summary": "101 passed, 2 skipped in 3.37s",
+   "seconds": 5.5,
+   "pytest_summary": "101 passed, 2 skipped in 4.49s",
    "junit": true
   },
   {
@@ -114,8 +114,8 @@
    "skipped": 2,
    "collection_errors": 0,
    "exit": 0,
-   "seconds": 4.6,
-   "pytest_summary": "100 passed, 2 skipped in 3.34s",
+   "seconds": 4.4,
+   "pytest_summary": "100 passed, 2 skipped in 3.51s",
    "junit": true
   },
   {
@@ -127,8 +127,8 @@
    "skipped": 2,
    "collection_errors": 0,
    "exit": 0,
-   "seconds": 4.4,
-   "pytest_summary": "101 passed, 2 skipped in 3.52s",
+   "seconds": 4.5,
+   "pytest_summary": "101 passed, 2 skipped in 3.65s",
    "junit": true
   },
   {
@@ -140,8 +140,8 @@
    "skipped": 2,
    "collection_errors": 0,
    "exit": 0,
-   "seconds": 4.4,
-   "pytest_summary": "100 passed, 2 skipped in 3.52s",
+   "seconds": 4.2,
+   "pytest_summary": "100 passed, 2 skipped in 3.26s",
    "junit": true
   },
   {
@@ -153,8 +153,8 @@
    "skipped": 2,
    "collection_errors": 0,
    "exit": 0,
-   "seconds": 4.3,
-   "pytest_summary": "101 passed, 2 skipped in 3.44s",
+   "seconds": 4.4,
+   "pytest_summary": "101 passed, 2 skipped in 3.50s",
    "junit": true
   }
  ],
@@ -200,7 +200,7 @@
     "changed_lines_covered": 7
    }
   ],
-  "seconds": 14.2,
+  "seconds": 16.7,
   "exit": 0,
   "log": "coverage-pytest.log"
  },
@@ -218,8 +218,8 @@
   "notes": [
    "Setup check: GitHub token: present.",
    "Setup check: Nebius token: present.",
-   "Setup check: free memory 6.9 GB (of 15.6 GB).",
-   "Setup check: free disk 92.9 GB.",
+   "Setup check: free memory 9.0 GB (of 15.6 GB).",
+   "Setup check: free disk 92.4 GB.",
    "Demo helper: git is installed.",
    "Demo helper: python3 is installed.",
    "Demo helper: uv is installed.",
@@ -228,9 +228,9 @@
    "Query: loguru python documentation install https://github.com/Delgan/loguru site:github.com/Delgan/loguru",
    "Query: loguru python install requirements https://pypi.org/project/loguru/ https://github.com/Delgan/loguru site:pypi.org",
    "Source: loguru/pyproject.toml at master \u00b7 Delgan/loguru \u00b7 GitHub \u2014 https://github.com/Delgan/loguru/blob/master/pyproject.toml",
-   "Source: loguru-logging-intercept \u00b7 PyPI \u2014 https://pypi.org/project/loguru-logging-intercept/",
-   "Source: pytest-loguru \u00b7 PyPI \u2014 https://pypi.org/project/pytest-loguru/",
-   "Source: loguru-discord \u00b7 PyPI \u2014 https://pypi.org/project/loguru-discord/",
+   "Source: lager \u00b7 PyPI \u2014 https://pypi.org/project/lager/",
+   "Source: Python Logging (beans-logging) - PyPI \u2014 https://pypi.org/project/beans-logging/",
+   "Source: loguru - PyPI \u2014 https://pypi.org/project/loguru/",
    "Source: loguru/CONTRIBUTING.rst at master \u00b7 Delgan/loguru \u00b7 GitHub \u2014 https://github.com/Delgan/loguru/blob/master/CONTRIBUTING.rst",
    "Source: GitHub - Delgan/loguru: Python logging made (stupidly) simple \u00b7 GitHub \u2014 https://github.com/delgan/loguru",
    "Source: Can\u2018t Import loguru \u00b7 Issue #116 \u00b7 Delgan/loguru \u00b7 GitHub \u2014 https://github.com/Delgan/loguru/issues/116",
@@ -731,135 +731,44 @@
   "baseline": "full",
   "model": "model provider: nebius (Token Factory, live)",
   "errors": [
-   "probe 'probe-c1' rejected: loguru._better_exceptions.ExceptionGroup does not exist; loguru._better_exceptions contains: ExceptionFormatter, SyntaxHighlighter, builtins, inspect, io, keyword, linecache, os, re, sys, sysconfig, tokenize (+1 more)",
-   "probe 'probe-c2' rejected: loguru._better_exceptions.ExceptionGroup does not exist; loguru._better_exceptions contains: ExceptionFormatter, SyntaxHighlighter, builtins, inspect, io, keyword, linecache, os, re, sys, sysconfig, tokenize (+1 more)",
-   "probe 'probe-c3' rejected: loguru._better_exceptions.ExceptionGroup does not exist; loguru._better_exceptions contains: ExceptionFormatter, SyntaxHighlighter, builtins, inspect, io, keyword, linecache, os, re, sys, sysconfig, tokenize (+1 more)"
+   "probe 'probe-c2' rejected: empty probe: the code has no test statements (only imports, comments or a docstring)"
   ],
   "model_claims": [
    {
-    "id": "C1",
-    "text": "For an ExceptionGroup with 16 sub-exceptions, Loguru outputs 'and 1 more exceptions' (plural) instead of matching CPython's singular 'and 1 more exception'.",
+    "id": "C2",
+    "text": "The message is always plural, so 16 sub-exceptions give \"and 1 more exceptions\" (CPython: \"and 1 more exception\").",
     "source_quote": "The message is always plural, so 16 sub-exceptions give `and 1 more exceptions` (CPython: `and 1 more exception`).",
     "testable": true,
     "expect": "differs"
    },
    {
-    "id": "C2",
-    "text": "When the first sub-exception not displayed in a truncated ExceptionGroup is itself an ExceptionGroup, Loguru omits the closing ruler line (`+------------------------------------`).",
+    "id": "C3",
+    "text": "If the first sub-exception that is not displayed is itself an ExceptionGroup, the closing `+------------------------------------` ruler is missing.",
     "source_quote": "If the first sub-exception that is not displayed is itself an `ExceptionGroup`, the closing `+------------------------------------` ruler is missing.",
     "testable": true,
     "expect": "differs"
    },
    {
-    "id": "C3",
-    "text": "After the fix, Loguru's truncated ExceptionGroup output matches the standard traceback module's output for 16 and 17 sub-exceptions, a truncated nested group, a nested group in last position, and deep nesting (apart from ruler width).",
-    "source_quote": "I also compared the plain output against `traceback.format_exception()` on 3.11\u20133.14 for 16 and 17 sub-exceptions, a truncated nested group, a nested group in last position, and deep nesting; apart from Loguru's own ruler width, they now match.",
+    "id": "C4",
+    "text": "Before the fix, the output for 16 sub-exceptions shows \"... and 1 more exceptions\" without the closing ruler.",
+    "source_quote": "    +---------------- 15 ---------------\n    | ValueError: 14\n    +--------------- ... ---------------\n    | and 1 more exceptions",
     "testable": true,
     "expect": "differs"
    },
    {
-    "id": "C4",
-    "text": "The test `grouped_max_length_nested` in the exception formatting output test suite fails before the change and passes after the change.",
-    "source_quote": "Tests: added `grouped_max_length_nested` to the exception formatting output tests; it fails before the change and passes after.",
+    "id": "C5",
+    "text": "After the fix, the output shows \"... and 1 more exception\" and includes the closing ruler.",
+    "source_quote": "    +---------------- 15 ---------------\n    | ValueError: 14\n    +--------------- ... ---------------\n    | and 1 more exception\n    +------------------------------------",
     "testable": true,
-    "expect": "differs"
+    "expect": "same"
    }
   ],
   "model_rejected_claims": [],
-  "model_parse_repairs": [
-   {
-    "attempt": 1,
-    "probe": "probe_c1",
-    "error": {
-     "message": "closing parenthesis ')' does not match opening parenthesis '{'",
-     "line": 5,
-     "offset": 62,
-     "code_line": "    print({\"observations\": {\"import_error\": type(e).__name__})"
-    },
-    "outcome": "fixed",
-    "counts": {
-     "before": {
-      "keys": 1,
-      "inputs": 16,
-      "read": "tokens"
-     },
-     "after": {
-      "keys": 1,
-      "inputs": 16,
-      "read": "ast"
-     }
-    }
-   },
-   {
-    "attempt": 1,
-    "probe": "probe_c2",
-    "error": {
-     "message": "closing parenthesis ')' does not match opening parenthesis '{'",
-     "line": 5,
-     "offset": 62,
-     "code_line": "    print({\"observations\": {\"import_error\": type(e).__name__})"
-    },
-    "outcome": "fixed",
-    "counts": {
-     "before": {
-      "keys": 1,
-      "inputs": 15,
-      "read": "tokens"
-     },
-     "after": {
-      "keys": 1,
-      "inputs": 15,
-      "read": "ast"
-     }
-    }
-   },
-   {
-    "attempt": 1,
-    "probe": "probe_c3",
-    "error": {
-     "message": "closing parenthesis ')' does not match opening parenthesis '{'",
-     "line": 5,
-     "offset": 62,
-     "code_line": "    print({\"observations\": {\"import_error\": type(e).__name__})"
-    },
-    "outcome": "fixed",
-    "counts": {
-     "before": {
-      "keys": 5,
-      "inputs": 17,
-      "read": "tokens"
-     },
-     "after": {
-      "keys": 5,
-      "inputs": 17,
-      "read": "ast"
-     }
-    }
-   }
-  ],
-  "model_name_checks": [
-   {
-    "probe": "probe_c1",
-    "error": [
-     "loguru._better_exceptions.ExceptionGroup does not exist; loguru._better_exceptions contains: ExceptionFormatter, SyntaxHighlighter, builtins, inspect, io, keyword, linecache, os, re, sys, sysconfig, tokenize (+1 more)"
-    ],
-    "outcome": "still an empty probe"
-   },
-   {
-    "probe": "probe_c2",
-    "error": [
-     "loguru._better_exceptions.ExceptionGroup does not exist; loguru._better_exceptions contains: ExceptionFormatter, SyntaxHighlighter, builtins, inspect, io, keyword, linecache, os, re, sys, sysconfig, tokenize (+1 more)"
-    ],
-    "outcome": "still an empty probe"
-   },
-   {
-    "probe": "probe_c3",
-    "error": [
-     "loguru._better_exceptions.ExceptionGroup does not exist; loguru._better_exceptions contains: ExceptionFormatter, SyntaxHighlighter, builtins, inspect, io, keyword, linecache, os, re, sys, sysconfig, tokenize (+1 more)"
-    ],
-    "outcome": "still an empty probe"
-   }
-  ],
+  "model_retried": {
+   "why": [
+    "empty probe: the code has no test statements (only imports, comments or a docstring)"
+   ]
+  },
   "diff_targets": [],
   "frozen": []
  },
@@ -879,7 +788,7 @@
   "build",
   "twine"
  ],
- "pr_side_started_at": "2026-11-09T05:57:14.278409+00:00",
+ "pr_side_started_at": "2026-11-09T07:08:44.207314+00:00",
  "test_targets": {
   "main": [
    "tests/test_exceptions_formatting.py"
@@ -1035,28 +944,28 @@
   ]
  },
  "duration_s": {
-  "total_wall": 181.4,
-  "tests": 26.4
+  "total_wall": 137.7,
+  "tests": 27.3
  },
  "cost": {
-  "ai_calls": 4,
+  "ai_calls": 3,
   "failed_ai_calls": 0,
-  "input_tokens": 22901,
-  "output_tokens": 16438,
-  "thinking_tokens": 13234,
-  "cost_usd": 0.021664,
+  "input_tokens": 13747,
+  "output_tokens": 7533,
+  "thinking_tokens": 7092,
+  "cost_usd": 0.010904,
   "calls_without_usage": 0,
-  "ai_cost_usd": 0.021664,
+  "ai_cost_usd": 0.010904,
   "cost_complete": true,
   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
   "compute_seconds": {
-   "total_wall": 181.4,
-   "tests": 26.4
+   "total_wall": 137.7,
+   "tests": 27.3
   },
   "machine_usd_per_hour": 0.24,
   "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
-  "computer_cost_usd": 0.012093,
-  "total_cost_usd": 0.033757,
+  "computer_cost_usd": 0.00918,
+  "total_cost_usd": 0.020084,
   "swarm": {
    "ai_calls": 0,
    "failed_ai_calls": 0,
