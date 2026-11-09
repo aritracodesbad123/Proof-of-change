@@ -1,9 +1,9 @@
 {
  "schema_version": "1",
  "record_kind": "pr_run",
- "id": "pr-jazzband-prettytable-539-9e05594f975f-2026-11-08",
- "date_ist": "2026-11-09 11:21 IST",
- "run_date": "2026-11-08",
+ "id": "pr-jazzband-prettytable-539-9e05594f975f-2026-11-09",
+ "date_ist": "2026-11-09 12:34 IST",
+ "run_date": "2026-11-09",
  "who": "ops/daily_run.py",
  "repo": "jazzband/prettytable",
  "library": "prettytable",
@@ -25,7 +25,7 @@
  "updated_at_ist": "2026-11-07 07:22 IST",
  "ci_state": "none",
  "ci_detail": "no check runs visible",
- "tested_at_ist": "2026-11-09 11:21 IST",
+ "tested_at_ist": "2026-11-09 12:34 IST",
  "files": {
   "all": [
    "src/prettytable/prettytable.py",
@@ -82,8 +82,8 @@
    "skipped": 0,
    "collection_errors": 0,
    "exit": 0,
-   "seconds": 1.7,
-   "pytest_summary": "280 passed in 1.04s",
+   "seconds": 1.5,
+   "pytest_summary": "280 passed in 0.91s",
    "junit": true
   },
   {
@@ -95,8 +95,8 @@
    "skipped": 0,
    "collection_errors": 0,
    "exit": 0,
-   "seconds": 1.8,
-   "pytest_summary": "282 passed in 0.94s",
+   "seconds": 1.7,
+   "pytest_summary": "282 passed in 1.00s",
    "junit": true
   },
   {
@@ -108,8 +108,8 @@
    "skipped": 0,
    "collection_errors": 0,
    "exit": 0,
-   "seconds": 1.5,
-   "pytest_summary": "280 passed in 0.90s",
+   "seconds": 1.6,
+   "pytest_summary": "280 passed in 0.96s",
    "junit": true
   },
   {
@@ -122,7 +122,7 @@
    "collection_errors": 0,
    "exit": 0,
    "seconds": 1.5,
-   "pytest_summary": "282 passed in 0.92s",
+   "pytest_summary": "282 passed in 0.90s",
    "junit": true
   },
   {
@@ -134,8 +134,8 @@
    "skipped": 0,
    "collection_errors": 0,
    "exit": 0,
-   "seconds": 1.5,
-   "pytest_summary": "280 passed in 0.86s",
+   "seconds": 1.7,
+   "pytest_summary": "280 passed in 1.03s",
    "junit": true
   },
   {
@@ -148,7 +148,7 @@
    "collection_errors": 0,
    "exit": 0,
    "seconds": 1.4,
-   "pytest_summary": "282 passed in 0.87s",
+   "pytest_summary": "282 passed in 0.84s",
    "junit": true
   }
  ],
@@ -188,7 +188,7 @@
     "changed_lines_covered": 4
    }
   ],
-  "seconds": 2.5,
+  "seconds": 2.3,
   "exit": 0,
   "log": "coverage-pytest.log"
  },
@@ -197,7 +197,7 @@
  "current_head_sha": "9e05594f975f9f1e8d6cf421cbb183432d49fd92",
  "tested_invocation": 1,
  "model_provider_used": "nebius",
- "model_provider_fallback": "the AI answered but no probe was usable, so only fixed probes ran",
+ "model_provider_fallback": "some AI probes were rejected",
  "demo_helper": {
   "preflight": {
    "ok": true
@@ -206,8 +206,8 @@
   "notes": [
    "Setup check: GitHub token: present.",
    "Setup check: Nebius token: present.",
-   "Setup check: free memory 5.9 GB (of 15.6 GB).",
-   "Setup check: free disk 92.7 GB.",
+   "Setup check: free memory 8.4 GB (of 15.6 GB).",
+   "Setup check: free disk 92.8 GB.",
    "Demo helper: git is installed.",
    "Demo helper: python3 is installed.",
    "Demo helper: uv is installed.",
@@ -478,39 +478,26 @@
   "baseline": "full",
   "model": "model provider: nebius (Token Factory, live)",
   "errors": [
-   "probe 'p1' rejected: cannot bind prettytable.prettytable.from_csv: from_csv() accepts **kwargs, so its keywords cannot be checked; the probe is not run"
+   "probe 'p1' rejected: cannot bind prettytable.prettytable.from_csv: from_csv() accepts **kwargs, so its keywords cannot be checked; the probe is not run",
+   "probe 'p2' rejected: cannot bind prettytable.prettytable.from_csv: from_csv() accepts **kwargs, so its keywords cannot be checked; the probe is not run"
   ],
   "model_claims": [
    {
     "id": "C1",
-    "text": "`from_csv(..., quoting=csv.QUOTE_NONNUMERIC)` raises `AttributeError` on an unquoted number because `csv.reader` returns a `float` and `from_csv` calls `strip()` on every field.",
-    "source_quote": "`from_csv(..., quoting=csv.QUOTE_NONNUMERIC)` raises `AttributeError` on an unquoted number because `csv.reader` returns a `float` and `from_csv` calls `strip()` on every field.",
-    "testable": true,
-    "expect": "differs"
-   },
-   {
-    "id": "C2",
-    "text": "An unquoted numeric header triggers the same error before any data rows are added.",
-    "source_quote": "An unquoted numeric header triggers the same error before any data rows are added.",
-    "testable": true,
-    "expect": "differs"
-   },
-   {
-    "id": "C3",
-    "text": "Trim strings and pass other parsed values through.",
+    "text": "After the change, `from_csv` trims strings and passes other parsed values through (i.e., does not call `strip()` on non\u2011string values).",
     "source_quote": "Trim strings and pass other parsed values through.",
     "testable": true,
     "expect": "differs"
    },
    {
-    "id": "C4",
-    "text": "This preserves numeric cells for sorting and formatting and uses the existing `field_names` setter to convert header values to strings.",
-    "source_quote": "This preserves numeric cells for sorting and formatting and uses the existing `field_names` setter to convert header values to strings.",
+    "id": "C3",
+    "text": "After the change, header values are converted to strings via the existing `field_names` setter.",
+    "source_quote": "uses the existing `field_names` setter to convert header values to strings.",
     "testable": true,
-    "expect": "differs"
+    "expect": "same"
    },
    {
-    "id": "C6",
+    "id": "C5",
     "text": "Both regression cases fail on `main` with `AttributeError` and pass with this change.",
     "source_quote": "Both regression cases fail on `main` with `AttributeError` and pass with this change.",
     "testable": true,
@@ -518,20 +505,114 @@
    },
    {
     "id": "C7",
-    "text": "`python -m pytest -q tests` passes on Windows with Python 3.12 and 3.14 (340 tests each).",
-    "source_quote": "`python -m pytest -q tests` passes on Windows with Python 3.12 and 3.14 (340 tests each).",
+    "text": "Ruff, Black, and mypy pass locally after the change.",
+    "source_quote": "Ruff, Black, and mypy pass locally.",
     "testable": true,
     "expect": "same"
    }
   ],
   "model_rejected_claims": [
    {
-    "id": "C5",
-    "text": "assert table.rows == [\"Ada\", 42.5]",
-    "source_quote": "assert table.rows == [\"Ada\", 42.5]",
+    "id": "C2",
+    "text": "After the change, numeric cells are preserved for sorting and formatting.",
+    "source_quote": "This preserves numeric cells for sorting and formatting.",
     "testable": true,
     "expect": "differs",
     "rejected": "source_quote not found in the PR text"
+   },
+   {
+    "id": "C4",
+    "text": "The reproduction example succeeds: `table.rows == [[\"Ada\", 42.5]]` when using `from_csv` with `quoting=csv.QUOTE_NONNUMERIC`.",
+    "source_quote": "table = from_csv(data, quoting=csv.QUOTE_NONNUMERIC)\\nassert table.rows == [[\"Ada\", 42.5]]",
+    "testable": true,
+    "expect": "differs",
+    "rejected": "source_quote not found in the PR text"
+   },
+   {
+    "id": "C6",
+    "text": "The test suite passes (340 tests) on Windows with Python 3.12 and 3.14 after the change.",
+    "source_quote": "python -m pytest -q tests passes on Windows with Python 3.12 and 3.14 (340 tests each).",
+    "testable": true,
+    "expect": "same",
+    "rejected": "source_quote not found in the PR text"
+   }
+  ],
+  "model_parse_repairs": [
+   {
+    "attempt": 1,
+    "probe": "p1",
+    "error": {
+     "message": "unterminated string literal (detected at line 5)",
+     "line": 5,
+     "offset": 17,
+     "code_line": "data = StringIO('\"Name\",\"Count\""
+    },
+    "outcome": "still fails: unmatched '}' (line 16)",
+    "counts": {
+     "before": {
+      "keys": 3,
+      "inputs": 0,
+      "read": "tokens"
+     },
+     "after": null
+    }
+   },
+   {
+    "attempt": 1,
+    "probe": "p2",
+    "error": {
+     "message": "unterminated string literal (detected at line 5)",
+     "line": 5,
+     "offset": 17,
+     "code_line": "data = StringIO('42, \"Name\""
+    },
+    "outcome": "no fixed probe returned"
+   },
+   {
+    "attempt": 2,
+    "probe": "p1",
+    "error": {
+     "message": "unterminated string literal (detected at line 5)",
+     "line": 5,
+     "offset": 17,
+     "code_line": "data = StringIO('\"Name\",\"Count\""
+    },
+    "outcome": "fixed",
+    "counts": {
+     "before": {
+      "keys": 3,
+      "inputs": 0,
+      "read": "tokens"
+     },
+     "after": {
+      "keys": 3,
+      "inputs": 0,
+      "read": "ast"
+     }
+    }
+   },
+   {
+    "attempt": 2,
+    "probe": "p2",
+    "error": {
+     "message": "unterminated string literal (detected at line 5)",
+     "line": 5,
+     "offset": 17,
+     "code_line": "data = StringIO('42, \"Name\""
+    },
+    "outcome": "fixed",
+    "counts": {
+     "before": {
+      "keys": 3,
+      "inputs": 0,
+      "read": "tokens"
+     },
+     "after": {
+      "keys": 3,
+      "inputs": 0,
+      "read": "ast"
+     }
+    }
    }
   ],
   "model_retried": {
@@ -540,10 +621,40 @@
    ],
    "kept_first_answer": "the retry linked no claim either"
   },
+  "model_claims_filled": [
+   {
+    "id": "p3",
+    "claims": [
+     "C7"
+    ]
+   }
+  ],
   "diff_targets": [
    "prettytable.prettytable.from_csv"
   ],
   "frozen": [
+   {
+    "path": "model-probes/model-p3.py",
+    "source": "model",
+    "sha256": "9e4430165154e40fc795383633c4c06297cafd9ef72074cfd147e22b3d57c614",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-09T07:06:43.610669+00:00",
+    "inputs_sha256": "54716b75ac55f7af661c42ac9a6aaf4b56c0388850fdfbccf2073d2b62ceca58",
+    "inputs": {
+     "title_chars": 42,
+     "body_chars": 930,
+     "base_files": {
+      "src/prettytable/prettytable.py": "cf724d61caa80b76af883a91b1d2646ce911bf545246a16979ff48b36c1b5ddc"
+     }
+    }
+   },
    {
     "path": "diff-probes/diff-api.py",
     "source": "diff",
@@ -556,7 +667,7 @@
      "provenance": "auto-derived",
      "blind": false
     },
-    "frozen_at": "2026-11-09T05:53:43.608618+00:00",
+    "frozen_at": "2026-11-09T07:06:43.624969+00:00",
     "inputs_sha256": "a2eb539ce5040926ac8dcc76fc8de105a600eecae6a5d9f6cccc3d98ac111ed2",
     "inputs": {
      "title_chars": 0,
@@ -573,7 +684,7 @@
   "pytest-cov",
   "pytest-lazy-fixtures"
  ],
- "pr_side_started_at": "2026-11-09T05:53:43.730777+00:00",
+ "pr_side_started_at": "2026-11-09T07:06:43.764025+00:00",
  "test_targets": {
   "main": [
    "tests/test_prettytable.py",
@@ -647,8 +758,213 @@
   "detail": "all runs exited 0"
  },
  "probes": {
-  "status": "uninformative",
+  "status": "ran",
   "items": [
+   {
+    "id": "model-p3",
+    "source": "model",
+    "path": "model-probes/model-p3.py",
+    "sha256": "9e4430165154e40fc795383633c4c06297cafd9ef72074cfd147e22b3d57c614",
+    "target": "jazzband/prettytable#539",
+    "about": "Test C7 (linters)",
+    "claims": [
+     {
+      "id": "C7",
+      "source": "PR description",
+      "text": "Ruff, Black, and mypy pass locally after the change.",
+      "covers": [
+       "c7.*"
+      ],
+      "expect": "same"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.0,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-p3-main-1.jsonl",
+      "probe-model-p3-main-2.jsonl",
+      "probe-model-p3-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-p3-pr-1.jsonl",
+      "probe-model-p3-pr-2.jsonl",
+      "probe-model-p3-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "c7.ruff_returncode": -2,
+       "c7.black_returncode": -2,
+       "c7.mypy_returncode": -2
+      },
+      {
+       "c7.ruff_returncode": -2,
+       "c7.black_returncode": -2,
+       "c7.mypy_returncode": -2
+      },
+      {
+       "c7.ruff_returncode": -2,
+       "c7.black_returncode": -2,
+       "c7.mypy_returncode": -2
+      }
+     ],
+     "pr": [
+      {
+       "c7.ruff_returncode": -2,
+       "c7.black_returncode": -2,
+       "c7.mypy_returncode": -2
+      },
+      {
+       "c7.ruff_returncode": -2,
+       "c7.black_returncode": -2,
+       "c7.mypy_returncode": -2
+      },
+      {
+       "c7.ruff_returncode": -2,
+       "c7.black_returncode": -2,
+       "c7.mypy_returncode": -2
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "c7.black_returncode",
+      "state": "same",
+      "label": "proven",
+      "claim": "C7",
+      "main": -2,
+      "pr": -2,
+      "citations": {
+       "main": {
+        "file": "probe-model-p3-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c7.black_returncode\""
+       },
+       "pr": {
+        "file": "probe-model-p3-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c7.black_returncode\""
+       }
+      }
+     },
+     {
+      "name": "c7.mypy_returncode",
+      "state": "same",
+      "label": "proven",
+      "claim": "C7",
+      "main": -2,
+      "pr": -2,
+      "citations": {
+       "main": {
+        "file": "probe-model-p3-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c7.mypy_returncode\""
+       },
+       "pr": {
+        "file": "probe-model-p3-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c7.mypy_returncode\""
+       }
+      }
+     },
+     {
+      "name": "c7.ruff_returncode",
+      "state": "same",
+      "label": "proven",
+      "claim": "C7",
+      "main": -2,
+      "pr": -2,
+      "citations": {
+       "main": {
+        "file": "probe-model-p3-main-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"c7.ruff_returncode\""
+       },
+       "pr": {
+        "file": "probe-model-p3-pr-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"c7.ruff_returncode\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "9e4430165154e40fc795383633c4c06297cafd9ef72074cfd147e22b3d57c614",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-09T07:06:43.610669+00:00",
+     "inputs_sha256": "54716b75ac55f7af661c42ac9a6aaf4b56c0388850fdfbccf2073d2b62ceca58",
+     "inputs": {
+      "title_chars": 42,
+      "body_chars": 930,
+      "base_files": {
+       "src/prettytable/prettytable.py": "cf724d61caa80b76af883a91b1d2646ce911bf545246a16979ff48b36c1b5ddc"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-09T07:06:43.764025+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "not measured",
+     "why": "coverage produced no data (exit 0); see probe-coverage.log",
+     "adequacy": "unmeasured",
+     "note": "probe coverage not measured (coverage produced no data (exit 0); see probe-coverage.log)"
+    },
+    "status": "ran"
+   },
    {
     "id": "diff-api",
     "source": "diff",
@@ -1262,7 +1578,7 @@
       "provenance": "auto-derived",
       "blind": false
      },
-     "frozen_at": "2026-11-09T05:53:43.608618+00:00",
+     "frozen_at": "2026-11-09T07:06:43.624969+00:00",
      "inputs_sha256": "a2eb539ce5040926ac8dcc76fc8de105a600eecae6a5d9f6cccc3d98ac111ed2",
      "inputs": {
       "title_chars": 0,
@@ -1272,7 +1588,7 @@
       }
      },
      "verified": true,
-     "pr_started_at": "2026-11-09T05:53:43.730777+00:00"
+     "pr_started_at": "2026-11-09T07:06:43.764025+00:00"
     },
     "probe_changed_line_coverage": {
      "status": "measured",
@@ -1295,10 +1611,16 @@
    }
   ],
   "summary": {
-   "labels": [],
+   "labels": [
+    "proven",
+    "proven",
+    "proven"
+   ],
    "flagged": [],
-   "proven_claims": [],
-   "reason": "uninformative: every observation is probe-broken (the same exception or skip value on both sides)",
+   "proven_claims": [
+    "C7"
+   ],
+   "reason": "probe: claim(s) C7 proven; uninformative: every observation is probe-broken (the same exception or skip value on both sides)",
    "ignored_noise": [],
    "ignored_warning_only": [],
    "pr_only_noisy": [],
@@ -1308,9 +1630,15 @@
   }
  },
  "probe_changed_line_coverage": {
-  "status": "measured",
+  "status": "partly measured",
   "side": "main",
   "probes": {
+   "model-p3": {
+    "status": "not measured",
+    "changed_lines_covered": null,
+    "changed_lines_total": null,
+    "adequacy": "unmeasured"
+   },
    "diff-api": {
     "status": "measured",
     "changed_lines_covered": 0,
@@ -1323,9 +1651,9 @@
   ]
  },
  "verdict": "could_not_verify",
- "reason": "not verified: no AI-written probe ran any changed line, so the change itself was not exercised by a probe; 2 test(s) fail on main and pass on the PR; 282 test(s) ran on main, 282 on the PR; 0 new test(s) pass, 280 unchanged",
+ "reason": "not verified: no AI-written probe ran any changed line, so the change itself was not exercised by a probe; 2 test(s) fail on main and pass on the PR; 282 test(s) ran on main, 282 on the PR; 0 new test(s) pass, 280 unchanged; probe model-p3 has no measured line coverage (coverage produced no data (exit 0); see probe-coverage.log); it does not count as covering the change",
  "verdict_before_coverage_gate": "verified",
- "reason_before_coverage_gate": "2 test(s) fail on main and pass on the PR; 282 test(s) ran on main, 282 on the PR; 0 new test(s) pass, 280 unchanged",
+ "reason_before_coverage_gate": "2 test(s) fail on main and pass on the PR; 282 test(s) ran on main, 282 on the PR; 0 new test(s) pass, 280 unchanged; probe model-p3 has no measured line coverage (coverage produced no data (exit 0); see probe-coverage.log); it does not count as covering the change",
  "changed_lines_total": 4,
  "changed_lines_covered": 4,
  "coverage_gate": {
@@ -1359,28 +1687,28 @@
   ]
  },
  "duration_s": {
-  "total_wall": 183.2,
+  "total_wall": 178.8,
   "tests": 9.4
  },
  "cost": {
-  "ai_calls": 3,
+  "ai_calls": 5,
   "failed_ai_calls": 0,
-  "input_tokens": 30928,
-  "output_tokens": 25411,
-  "thinking_tokens": 22802,
-  "cost_usd": 0.032148,
+  "input_tokens": 60893,
+  "output_tokens": 28158,
+  "thinking_tokens": 26463,
+  "cost_usd": 0.04361,
   "calls_without_usage": 0,
-  "ai_cost_usd": 0.032148,
+  "ai_cost_usd": 0.04361,
   "cost_complete": true,
   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
   "compute_seconds": {
-   "total_wall": 183.2,
+   "total_wall": 178.8,
    "tests": 9.4
   },
   "machine_usd_per_hour": 0.24,
   "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
-  "computer_cost_usd": 0.012213,
-  "total_cost_usd": 0.044361,
+  "computer_cost_usd": 0.01192,
+  "total_cost_usd": 0.05553,
   "swarm": {
    "ai_calls": 0,
    "failed_ai_calls": 0,
