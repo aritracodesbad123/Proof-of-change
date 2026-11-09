@@ -1,0 +1,1474 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-pytoolz-toolz-661-f438486fc4fb-2026-11-09",
+ "date_ist": "2026-11-09 13:12 IST",
+ "run_date": "2026-11-09",
+ "who": "ops/daily_run.py",
+ "repo": "pytoolz/toolz",
+ "library": "toolz",
+ "pr": {
+  "repo": "pytoolz/toolz",
+  "number": 661,
+  "url": "https://github.com/pytoolz/toolz/pull/661",
+  "title": "Avoid oversized padding for short partition_all inputs",
+  "base_sha": "451af60dec590a6010e2babdbf391ea8f815122f",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "f438486fc4fb4224cdf72e2cf25fd952e7d4e702",
+  "merge_commit": "050070a3dde50dfd4b17516805ccd089f5288646",
+  "tested_main_sha": "451af60dec590a6010e2babdbf391ea8f815122f",
+  "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+ },
+ "author": "Aschenbath",
+ "base_ref": "master",
+ "updated_at_utc": "2026-11-08T08:18:36Z",
+ "updated_at_ist": "2026-11-08 13:48 IST",
+ "ci_state": "none",
+ "ci_detail": "no check runs visible",
+ "tested_at_ist": "2026-11-09 13:12 IST",
+ "files": {
+  "all": [
+   "toolz/itertoolz.py",
+   "toolz/tests/test_itertoolz.py"
+  ],
+  "package_py": [
+   "toolz/itertoolz.py",
+   "toolz/tests/test_itertoolz.py"
+  ],
+  "compiled": [],
+  "other": []
+ },
+ "machine_type": {
+  "arch": "x86_64",
+  "os": "Linux",
+  "platform": "Linux-6.12.94+-x86_64-with-glibc2.41",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": "g++ (Debian 14.2.0-19) 14.2.0",
+  "cpu_model": "Intel(R) Xeon(R) Processor",
+  "ram_gb": 15.6
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 3,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.15",
+ "test_selection": "mapped from touched files: toolz/tests/test_itertoolz.py, toolz/tests/test_curried.py, toolz/tests/test_inspect_args.py",
+ "per_run": [
+  {
+   "side": "old",
+   "run": 1,
+   "passed": 78,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.6,
+   "pytest_summary": "78 passed in 1.06s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 1,
+   "passed": 83,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.8,
+   "pytest_summary": "83 passed in 1.15s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 2,
+   "passed": 78,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.5,
+   "pytest_summary": "78 passed in 0.97s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 2,
+   "passed": 83,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.3,
+   "pytest_summary": "83 passed in 0.89s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 3,
+   "passed": 78,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.4,
+   "pytest_summary": "78 passed in 0.95s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 3,
+   "passed": 83,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.3,
+   "pytest_summary": "83 passed in 0.81s",
+   "junit": true
+  }
+ ],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "local",
+ "sandbox_backend_note": "local bubblewrap",
+ "machine": "local",
+ "tool_setup": {
+  "installed": [],
+  "tries": 0,
+  "note": "All required tools were already installed.",
+  "refused": []
+ },
+ "posted_upstream": false,
+ "logs": "toolz-661/",
+ "freeze": {
+  "main": "freeze-main.txt",
+  "pr": "freeze-pr.txt"
+ },
+ "coverage": {
+  "status": "measured",
+  "changed_lines_total": 19,
+  "changed_lines_covered": 19,
+  "files": [
+   {
+    "file": "toolz/itertoolz.py",
+    "changed_lines_total": 19,
+    "changed_lines_covered": 19
+   }
+  ],
+  "seconds": 2.1,
+  "exit": 0,
+  "log": "coverage-pytest.log"
+ },
+ "poc_commit": "ef12096677e9cf59e8673436d74ec65d53771d7c",
+ "route": "source-pair",
+ "current_head_sha": "f438486fc4fb4224cdf72e2cf25fd952e7d4e702",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "model_provider_fallback": "the AI answered but no probe was usable, so only fixed probes ran",
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": "[redacted]",
+  "notes": [
+   "Setup check: GitHub token: present.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory 5.8 GB (of 15.6 GB).",
+   "Setup check: free disk 92.5 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: [redacted] results",
+   "Query: toolz python setup install instructions https://github.com/pytoolz/toolz site:github.com/pytoolz/toolz",
+   "Query: toolz python documentation install https://github.com/pytoolz/toolz site:github.com/pytoolz/toolz",
+   "Query: toolz python install requirements https://pypi.org/project/toolz/ https://github.com/pytoolz/toolz site:pypi.org",
+   "Source: toolz/pyproject.toml at master \u00b7 pytoolz/toolz \u00b7 GitHub \u2014 http://github.com/pytoolz/toolz/blob/master/pyproject.toml",
+   "Source: toolz/pyproject.toml at master \u00b7 pytoolz/toolz \u00b7 GitHub \u2014 https://github.com/pytoolz/toolz/blob/master/pyproject.toml",
+   "Source: toolz/README.rst at master \u00b7 pytoolz/toolz \u00b7 GitHub \u2014 https://github.com/pytoolz/toolz/blob/master/README.rst",
+   "Source: toolz/README.rst at master \u00b7 pytoolz/toolz \u00b7 GitHub \u2014 http://github.com/pytoolz/toolz/blob/master/README.rst",
+   "Source: toolz \u2014 https://pypi.org/project/toolz/",
+   "Source: toolz/.github/workflows/test.yml at 451af60dec590a6010e2babdbf391ea8f815122f \u00b7 pytoolz/toolz \u00b7 GitHub \u2014 https://github.com/pytoolz/toolz/blob/451af60dec590a6010e2babdbf391ea8f815122f/.github/workflows/test.yml",
+   "Source: GitHub - pytoolz/toolz: A functional standard library for Python. \u00b7 GitHub \u2014 https://github.com/pytoolz/toolz",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: install coverage (listed in the test extra) on main and pr.",
+   "Setup plan: install pycodestyle (listed in the test extra) on main and pr.",
+   "Setup plan: install pytest (listed in the test extra) on main and pr.",
+   "Setup plan: install sphinx (listed in requirements.txt) on main and pr.",
+   "Setup plan: install furo (listed in requirements.txt) on main and pr.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >=3.9",
+   "Setup plan: refused supports: no network or the package was not found",
+   "Setup plan: refused Python: no network or the package was not found",
+   "Setup plan: refused with: its PyPI page does not link to this GitHub repository",
+   "Setup plan: refused a: its PyPI page does not link to this GitHub repository",
+   "Setup plan: refused common: its PyPI page does not link to this GitHub repository",
+   "Setup plan: refused codebase.: no network or the package was not found",
+   "Setup plan: refused It: its PyPI page does not link to this GitHub repository",
+   "Installed coverage 7.17.2 from pyproject (listed in the test extra) on main and pr.",
+   "Installed pycodestyle 2.15.0 from pyproject (listed in the test extra) on main and pr.",
+   "Installed pytest 9.2.0 from pyproject (listed in the test extra) on main and pr.",
+   "Installed sphinx 9.1.1 from requirements.txt (listed in requirements.txt) on main and pr.",
+   "Installed furo 2025.12.19 from requirements.txt (listed in requirements.txt) on main and pr."
+  ],
+  "install_docs": [
+   "README.rst",
+   "pyproject.toml",
+   "tox.ini",
+   "doc/Makefile",
+   ".github/workflows/publish_pypi.yml",
+   ".github/workflows/pre-commit.yml",
+   ".github/workflows/test.yml"
+  ],
+  "install_docs_from": "main",
+  "setup_plan": {
+   "packages": [
+    {
+     "requirement": "coverage",
+     "name": "coverage",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the test extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pycodestyle",
+     "name": "pycodestyle",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the test extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest",
+     "name": "pytest",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the test extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "sphinx",
+     "name": "sphinx",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "furo",
+     "name": "furo",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    }
+   ],
+   "scope_blocked": "",
+   "component": null,
+   "aggregate_names": [],
+   "extra_reqs": [
+    "coverage",
+    "pycodestyle",
+    "pytest",
+    "sphinx",
+    "furo"
+   ],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >=3.9"
+   },
+   "system": [],
+   "refused": [
+    {
+     "name": "supports",
+     "reason": "no network or the package was not found"
+    },
+    {
+     "name": "Python",
+     "reason": "no network or the package was not found"
+    },
+    {
+     "name": "with",
+     "reason": "its PyPI page does not link to this GitHub repository"
+    },
+    {
+     "name": "a",
+     "reason": "its PyPI page does not link to this GitHub repository"
+    },
+    {
+     "name": "common",
+     "reason": "its PyPI page does not link to this GitHub repository"
+    },
+    {
+     "name": "codebase.",
+     "reason": "no network or the package was not found"
+    },
+    {
+     "name": "It",
+     "reason": "its PyPI page does not link to this GitHub repository"
+    }
+   ],
+   "groups_blocked": ""
+  },
+  "steps": {
+   "setup_lookup": "Found 5 setup item(s) in the project's files and the web lookup. Refused: supports (no network or the package was not found), Python (no network or the package was not found), with (its PyPI page does not link to this GitHub repository), a (its PyPI page does not link to this GitHub repository), common (its PyPI page does not link to this GitHub repository).",
+   "setup_python": "Python 3.12: Python 3.12 already meets >=3.9",
+   "install_deps": "Wrote requirements.txt and installed it on main and pr: coverage, pycodestyle, pytest, sphinx, furo."
+  },
+  "run_files": {
+   "requirements": "requirements.txt",
+   "plan": "setup-plan.json",
+   "count": 5
+  },
+  "installs": [
+   {
+    "package": "coverage",
+    "requirement": "coverage",
+    "version": "7.17.2",
+    "versions": {
+     "main": "7.17.2",
+     "pr": "7.17.2"
+    },
+    "source": "pyproject",
+    "reason": "listed in the test extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "pycodestyle",
+    "requirement": "pycodestyle",
+    "version": "2.15.0",
+    "versions": {
+     "main": "2.15.0",
+     "pr": "2.15.0"
+    },
+    "source": "pyproject",
+    "reason": "listed in the test extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "pytest",
+    "requirement": "pytest",
+    "version": "9.2.0",
+    "versions": {
+     "main": "9.2.0",
+     "pr": "9.2.0"
+    },
+    "source": "pyproject",
+    "reason": "listed in the test extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "sphinx",
+    "requirement": "sphinx",
+    "version": "9.1.1",
+    "versions": {
+     "main": "9.1.1",
+     "pr": "9.1.1"
+    },
+    "source": "requirements.txt",
+    "reason": "listed in requirements.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "furo",
+    "requirement": "furo",
+    "version": "2025.12.19",
+    "versions": {
+     "main": "2025.12.19",
+     "pr": "2025.12.19"
+    },
+    "source": "requirements.txt",
+    "reason": "listed in requirements.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   }
+  ]
+ },
+ "sides": {
+  "comparison_basis": "base tip vs GitHub test merge (refs/pull/N/merge)",
+  "main_sha": "451af60dec590a6010e2babdbf391ea8f815122f",
+  "pr_sha": "050070a3dde50dfd4b17516805ccd089f5288646",
+  "merge_commit": "050070a3dde50dfd4b17516805ccd089f5288646",
+  "merge_parents": [
+   "451af60dec590a6010e2babdbf391ea8f815122f",
+   "f438486fc4fb4224cdf72e2cf25fd952e7d4e702"
+  ],
+  "merge_head_matches_pinned_head": true
+ },
+ "tested": {
+  "main": "master @ 451af60dec59 (base tip = first parent of the merge commit)",
+  "pr": "GitHub test merge commit 050070a3dde5 (refs/pull/661/merge) of head f438486fc4fb"
+ },
+ "probe_plan": {
+  "baseline": "full",
+  "model": "model provider: nebius (Token Factory, live)",
+  "errors": [
+   "probe 'probe-c1' rejected: empty probe: the code has no test statements (only imports, comments or a docstring)",
+   "probe 'probe-c2' rejected: empty probe: the code has no test statements (only imports, comments or a docstring)"
+  ],
+  "model_claims": [
+   {
+    "id": "C1",
+    "text": "When the requested partition size greatly exceeds the input length, `partition_all` now reads the first partition with `islice` and returns short or empty inputs before allocating the full iterator group and padded tuple.",
+    "source_quote": "Read the first partition with `islice` and return short or empty inputs before allocating that group.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C2",
+    "text": "For a three\u2011item input and a partition size of 100,000, the revised `partition_all` reduces peak traced allocation from about 3.2\u202fMB to 2\u202fKB and elapsed time from about 2\u202fms to about 1\u202f\u00b5s.",
+    "source_quote": "For a three-item input and a partition size of 100,000, a local CPython 3.12 benchmark reduced peak traced allocation from about 3.2 MB to 2 KB and elapsed time from about 2 ms to about 1 microsecond.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C3",
+    "text": "When the partition size equals the input length (n == len(seq) == 100,000), the updated `partition_all` incurs extra startup work, increasing peak allocation by about 0.8\u202fMB and elapsed time by 17\u201335\u202f%.",
+    "source_quote": "The tradeoff is extra startup work for a full first partition: at `n == len(seq) == 100,000`, measured peak allocation increased by about 0.8 MB and elapsed time by 17\u201335%.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C4",
+    "text": "For small partitions over long inputs, the performance of the updated `partition_all` stays within about 6\u202f% of the original timings.",
+    "source_quote": "Small partitions over long inputs remained within about 6% of the original timings.",
+    "testable": true,
+    "expect": "same"
+   },
+   {
+    "id": "C5",
+    "text": "Nonpositive partition sizes still return no partitions, and integers outside platform index bounds still raise `OverflowError`.",
+    "source_quote": "Nonpositive sizes still return no partitions, and integers outside platform index bounds still raise `OverflowError`.",
+    "testable": true,
+    "expect": "same"
+   },
+   {
+    "id": "C6",
+    "text": "Normalizing integer\u2011index objects now allows them to work with a short final partition in `partition_all`.",
+    "source_quote": "Normalizing integer-index objects also lets them work with a short final partition.",
+    "testable": true,
+    "expect": "differs"
+   }
+  ],
+  "model_rejected_claims": [],
+  "model_retried": {
+   "why": [
+    "empty probe: the code has no test statements (only imports, comments or a docstring)"
+   ]
+  },
+  "diff_targets": [
+   "toolz.itertoolz.partition_all"
+  ],
+  "frozen": [
+   {
+    "path": "diff-probes/diff-api.py",
+    "source": "diff",
+    "sha256": "e8452a6ec1045516b41bfd13ee65657924b834e8eff476c31395b1064b601ed2",
+    "generator": {
+     "kind": "diff",
+     "label": "diff (auto-derived from base-side code, model-free)",
+     "model": null,
+     "provider": null,
+     "provenance": "auto-derived",
+     "blind": false
+    },
+    "frozen_at": "2026-11-09T07:44:13.992694+00:00",
+    "inputs_sha256": "9bf462c646008198ff284849f66c64bec45f66fb0c21ee19b05578acb11c4064",
+    "inputs": {
+     "title_chars": 0,
+     "body_chars": 0,
+     "base_files": {
+      "toolz/itertoolz.py": "93e4d79bc7c6d68250657846454303ba95c0694c9ef165cb7a8e0bdf150711c6"
+     }
+    }
+   }
+  ]
+ },
+ "test_extras": [],
+ "pr_side_started_at": "2026-11-09T07:44:14.204919+00:00",
+ "test_targets": {
+  "main": [
+   "toolz/tests/test_itertoolz.py",
+   "toolz/tests/test_curried.py",
+   "toolz/tests/test_inspect_args.py"
+  ],
+  "pr": [
+   "toolz/tests/test_itertoolz.py",
+   "toolz/tests/test_curried.py",
+   "toolz/tests/test_inspect_args.py"
+  ]
+ },
+ "installed_commit": {
+  "main": {
+   "dist": "toolz",
+   "expected": "451af60dec590a6010e2babdbf391ea8f815122f",
+   "installed": "451af60dec590a6010e2babdbf391ea8f815122f",
+   "ok": true
+  },
+  "pr": {
+   "dist": "toolz",
+   "expected": "050070a3dde50dfd4b17516805ccd089f5288646",
+   "installed": "050070a3dde50dfd4b17516805ccd089f5288646",
+   "ok": true
+  }
+ },
+ "base_head_sha": "451af60dec590a6010e2babdbf391ea8f815122f",
+ "comparison": {
+  "same": 78,
+  "same_skipped_both": 0,
+  "regressions": [],
+  "fixed": [
+   "toolz.tests.test_itertoolz::test_partition_all_large_size_short_input",
+   "toolz.tests.test_itertoolz::test_partition_all_size_types"
+  ],
+  "new_tests_passing": 3,
+  "new_tests_passing_ids": [
+   "toolz.tests.test_itertoolz::test_partition_all_first_partition_boundaries",
+   "toolz.tests.test_itertoolz::test_partition_all_single_pass",
+   "toolz.tests.test_itertoolz::test_partition_all_source_exception"
+  ],
+  "new_tests_failing": [],
+  "new_tests_skipped": [],
+  "removed_tests": [],
+  "reparametrized": [],
+  "skipped_missing_dependency": [],
+  "flaky": [],
+  "pr_unstable": [],
+  "pr_unstable_noisy": [],
+  "environment": [],
+  "other_changes": [],
+  "preexisting_failures": [],
+  "load_failed_both": [],
+  "load_failed_pr": [],
+  "load_failed_main": [],
+  "executed": {
+   "main": 80,
+   "pr": 83
+  },
+  "messages": {},
+  "base_messages": {
+   "toolz.tests.test_itertoolz::test_partition_all_large_size_short_input": "AssertionError: assert 3200640 < (128 * 1024)",
+   "toolz.tests.test_itertoolz::test_partition_all_size_types": "TypeError: '<' not supported between instances of 'int' and 'Index'"
+  }
+ },
+ "exit_check": {
+  "explained": true,
+  "problems": [],
+  "detail": "all runs exited 0"
+ },
+ "probes": {
+  "status": "ran",
+  "items": [
+   {
+    "id": "diff-api",
+    "source": "diff",
+    "path": "diff-probes/diff-api.py",
+    "sha256": "e8452a6ec1045516b41bfd13ee65657924b834e8eff476c31395b1064b601ed2",
+    "target": "pytoolz/toolz#661",
+    "about": "Public functions touched by the PR, called with type-appropriate inputs on both sides.",
+    "claims": [],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-diff-api-main-1.jsonl",
+      "probe-diff-api-main-2.jsonl",
+      "probe-diff-api-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-diff-api-pr-1.jsonl",
+      "probe-diff-api-pr-2.jsonl",
+      "probe-diff-api-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "toolz.itertoolz.partition_all.input0": {
+        "repr": "<generator object partition_all>",
+        "type": "generator"
+       },
+       "toolz.itertoolz.partition_all.input1": {
+        "repr": "<generator object partition_all>",
+        "type": "generator"
+       },
+       "toolz.itertoolz.partition_all.input10": {
+        "repr": "<generator object partition_all>",
+        "type": "generator"
+       },
+       "toolz.itertoolz.partition_all.input11": {
+        "repr": "<generator object partition_all>",
+        "type": "generator"
+       },
+       "toolz.itertoolz.partition_all.input2": {
+        "repr": "<generator object partition_all>",
+        "type": "generator"
+       },
+       "toolz.itertoolz.partition_all.input3": {
+        "repr": "<generator object partition_all>",
+        "type": "generator"
+       },
+       "toolz.itertoolz.partition_all.input4": {
+        "repr": "<generator object partition_all>",
+        "type": "generator"
+       },
+       "toolz.itertoolz.partition_all.input5": {
+        "repr": "<generator object partition_all>",
+        "type": "generator"
+       },
+       "toolz.itertoolz.partition_all.input6": {
+        "repr": "<generator object partition_all>",
+        "type": "generator"
+       },
+       "toolz.itertoolz.partition_all.input7": {
+        "repr": "<generator object partition_all>",
+        "type": "generator"
+       },
+       "toolz.itertoolz.partition_all.input8": {
+        "repr": "<generator object partition_all>",
+        "type": "generator"
+       },
+       "toolz.itertoolz.partition_all.input9": {
+        "repr": "<generator object partition_all>",
+        "type": "generator"
+       }
+      },
+      {
+       "toolz.itertoolz.partition_all.input0": {
+        "repr": "<generator object partition_all>",
+        "type": "generator"
+       },
+       "toolz.itertoolz.partition_all.input1": {
+        "repr": "<generator object partition_all>",
+        "type": "generator"
+       },
+       "toolz.itertoolz.partition_all.input10": {
+        "repr": "<generator object partition_all>",
+        "type": "generator"
+       },
+       "toolz.itertoolz.partition_all.input11": {
+        "repr": "<generator object partition_all>",
+        "type": "generator"
+       },
+       "toolz.itertoolz.partition_all.input2": {
+        "repr": "<generator object partition_all>",
+        "type": "generator"
+       },
+       "toolz.itertoolz.partition_all.input3": {
+        "repr": "<generator object partition_all>",
+        "type": "generator"
+       },
+       "toolz.itertoolz.partition_all.input4": {
+        "repr": "<generator object partition_all>",
+        "type": "generator"
+       },
+       "toolz.itertoolz.partition_all.input5": {
+        "repr": "<generator object partition_all>",
+        "type": "generator"
+       },
+       "toolz.itertoolz.partition_all.input6": {
+        "repr": "<generator object partition_all>",
+        "type": "generator"
+       },
+       "toolz.itertoolz.partition_all.input7": {
+        "repr": "<generator object partition_all>",
+        "type": "generator"
+       },
+       "toolz.itertoolz.partition_all.input8": {
+        "repr": "<generator object partition_all>",
+        "type": "generator"
+       },
+       "toolz.itertoolz.partition_all.input9": {
+        "repr": "<generator object partition_all>",
+        "type": "generator"
+       }
+      },
+      {
+       "toolz.itertoolz.partition_all.input0": {
+        "repr": "<generator object partition_all>",
+        "type": "generator"
+       },
+       "toolz.itertoolz.partition_all.input1": {
+        "repr": "<generator object partition_all>",
+        "type": "generator"
+       },
+       "toolz.itertoolz.partition_all.input10": {
+        "repr": "<generator object partition_all>",
+        "type": "generator"
+       },
+       "toolz.itertoolz.partition_all.input11": {
+        "repr": "<generator object partition_all>",
+        "type": "generator"
+       },
+       "toolz.itertoolz.partition_all.input2": {
+        "repr": "<generator object partition_all>",
+        "type": "generator"
+       },
+       "toolz.itertoolz.partition_all.input3": {
+        "repr": "<generator object partition_all>",
+        "type": "generator"
+       },
+       "toolz.itertoolz.partition_all.input4": {
+        "repr": "<generator object partition_all>",
+        "type": "generator"
+       },
+       "toolz.itertoolz.partition_all.input5": {
+        "repr": "<generator object partition_all>",
+        "type": "generator"
+       },
+       "toolz.itertoolz.partition_all.input6": {
+        "repr": "<generator object partition_all>",
+        "type": "generator"
+       },
+       "toolz.itertoolz.partition_all.input7": {
+        "repr": "<generator object partition_all>",
+        "type": "generator"
+       },
+       "toolz.itertoolz.partition_all.input8": {
+        "repr": "<generator object partition_all>",
+        "type": "generator"
+       },
+       "toolz.itertoolz.partition_all.input9": {
+        "repr": "<generator object partition_all>",
+        "type": "generator"
+       }
+      }
+     ],
+     "pr": [
+      {
+       "toolz.itertoolz.partition_all.input0": {
+        "repr": "<generator object partition_all>",
+        "type": "generator"
+       },
+       "toolz.itertoolz.partition_all.input1": {
+        "repr": "<generator object partition_all>",
+        "type": "generator"
+       },
+       "toolz.itertoolz.partition_all.input10": {
+        "repr": "<generator object partition_all>",
+        "type": "generator"
+       },
+       "toolz.itertoolz.partition_all.input11": {
+        "repr": "<generator object partition_all>",
+        "type": "generator"
+       },
+       "toolz.itertoolz.partition_all.input2": {
+        "repr": "<generator object partition_all>",
+        "type": "generator"
+       },
+       "toolz.itertoolz.partition_all.input3": {
+        "repr": "<generator object partition_all>",
+        "type": "generator"
+       },
+       "toolz.itertoolz.partition_all.input4": {
+        "repr": "<generator object partition_all>",
+        "type": "generator"
+       },
+       "toolz.itertoolz.partition_all.input5": {
+        "repr": "<generator object partition_all>",
+        "type": "generator"
+       },
+       "toolz.itertoolz.partition_all.input6": {
+        "repr": "<generator object partition_all>",
+        "type": "generator"
+       },
+       "toolz.itertoolz.partition_all.input7": {
+        "repr": "<generator object partition_all>",
+        "type": "generator"
+       },
+       "toolz.itertoolz.partition_all.input8": {
+        "repr": "<generator object partition_all>",
+        "type": "generator"
+       },
+       "toolz.itertoolz.partition_all.input9": {
+        "repr": "<generator object partition_all>",
+        "type": "generator"
+       }
+      },
+      {
+       "toolz.itertoolz.partition_all.input0": {
+        "repr": "<generator object partition_all>",
+        "type": "generator"
+       },
+       "toolz.itertoolz.partition_all.input1": {
+        "repr": "<generator object partition_all>",
+        "type": "generator"
+       },
+       "toolz.itertoolz.partition_all.input10": {
+        "repr": "<generator object partition_all>",
+        "type": "generator"
+       },
+       "toolz.itertoolz.partition_all.input11": {
+        "repr": "<generator object partition_all>",
+        "type": "generator"
+       },
+       "toolz.itertoolz.partition_all.input2": {
+        "repr": "<generator object partition_all>",
+        "type": "generator"
+       },
+       "toolz.itertoolz.partition_all.input3": {
+        "repr": "<generator object partition_all>",
+        "type": "generator"
+       },
+       "toolz.itertoolz.partition_all.input4": {
+        "repr": "<generator object partition_all>",
+        "type": "generator"
+       },
+       "toolz.itertoolz.partition_all.input5": {
+        "repr": "<generator object partition_all>",
+        "type": "generator"
+       },
+       "toolz.itertoolz.partition_all.input6": {
+        "repr": "<generator object partition_all>",
+        "type": "generator"
+       },
+       "toolz.itertoolz.partition_all.input7": {
+        "repr": "<generator object partition_all>",
+        "type": "generator"
+       },
+       "toolz.itertoolz.partition_all.input8": {
+        "repr": "<generator object partition_all>",
+        "type": "generator"
+       },
+       "toolz.itertoolz.partition_all.input9": {
+        "repr": "<generator object partition_all>",
+        "type": "generator"
+       }
+      },
+      {
+       "toolz.itertoolz.partition_all.input0": {
+        "repr": "<generator object partition_all>",
+        "type": "generator"
+       },
+       "toolz.itertoolz.partition_all.input1": {
+        "repr": "<generator object partition_all>",
+        "type": "generator"
+       },
+       "toolz.itertoolz.partition_all.input10": {
+        "repr": "<generator object partition_all>",
+        "type": "generator"
+       },
+       "toolz.itertoolz.partition_all.input11": {
+        "repr": "<generator object partition_all>",
+        "type": "generator"
+       },
+       "toolz.itertoolz.partition_all.input2": {
+        "repr": "<generator object partition_all>",
+        "type": "generator"
+       },
+       "toolz.itertoolz.partition_all.input3": {
+        "repr": "<generator object partition_all>",
+        "type": "generator"
+       },
+       "toolz.itertoolz.partition_all.input4": {
+        "repr": "<generator object partition_all>",
+        "type": "generator"
+       },
+       "toolz.itertoolz.partition_all.input5": {
+        "repr": "<generator object partition_all>",
+        "type": "generator"
+       },
+       "toolz.itertoolz.partition_all.input6": {
+        "repr": "<generator object partition_all>",
+        "type": "generator"
+       },
+       "toolz.itertoolz.partition_all.input7": {
+        "repr": "<generator object partition_all>",
+        "type": "generator"
+       },
+       "toolz.itertoolz.partition_all.input8": {
+        "repr": "<generator object partition_all>",
+        "type": "generator"
+       },
+       "toolz.itertoolz.partition_all.input9": {
+        "repr": "<generator object partition_all>",
+        "type": "generator"
+       }
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "toolz.itertoolz.partition_all.input0",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": {
+       "repr": "<generator object partition_all>",
+       "type": "generator"
+      },
+      "pr": {
+       "repr": "<generator object partition_all>",
+       "type": "generator"
+      },
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"toolz.itertoolz.partition_all.input0\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"toolz.itertoolz.partition_all.input0\""
+       }
+      }
+     },
+     {
+      "name": "toolz.itertoolz.partition_all.input1",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": {
+       "repr": "<generator object partition_all>",
+       "type": "generator"
+      },
+      "pr": {
+       "repr": "<generator object partition_all>",
+       "type": "generator"
+      },
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"toolz.itertoolz.partition_all.input1\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"toolz.itertoolz.partition_all.input1\""
+       }
+      }
+     },
+     {
+      "name": "toolz.itertoolz.partition_all.input10",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": {
+       "repr": "<generator object partition_all>",
+       "type": "generator"
+      },
+      "pr": {
+       "repr": "<generator object partition_all>",
+       "type": "generator"
+      },
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"toolz.itertoolz.partition_all.input10\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"toolz.itertoolz.partition_all.input10\""
+       }
+      }
+     },
+     {
+      "name": "toolz.itertoolz.partition_all.input11",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": {
+       "repr": "<generator object partition_all>",
+       "type": "generator"
+      },
+      "pr": {
+       "repr": "<generator object partition_all>",
+       "type": "generator"
+      },
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"toolz.itertoolz.partition_all.input11\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"toolz.itertoolz.partition_all.input11\""
+       }
+      }
+     },
+     {
+      "name": "toolz.itertoolz.partition_all.input2",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": {
+       "repr": "<generator object partition_all>",
+       "type": "generator"
+      },
+      "pr": {
+       "repr": "<generator object partition_all>",
+       "type": "generator"
+      },
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"toolz.itertoolz.partition_all.input2\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"toolz.itertoolz.partition_all.input2\""
+       }
+      }
+     },
+     {
+      "name": "toolz.itertoolz.partition_all.input3",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": {
+       "repr": "<generator object partition_all>",
+       "type": "generator"
+      },
+      "pr": {
+       "repr": "<generator object partition_all>",
+       "type": "generator"
+      },
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"toolz.itertoolz.partition_all.input3\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"toolz.itertoolz.partition_all.input3\""
+       }
+      }
+     },
+     {
+      "name": "toolz.itertoolz.partition_all.input4",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": {
+       "repr": "<generator object partition_all>",
+       "type": "generator"
+      },
+      "pr": {
+       "repr": "<generator object partition_all>",
+       "type": "generator"
+      },
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 7,
+        "quote": "\"observation\": \"toolz.itertoolz.partition_all.input4\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 7,
+        "quote": "\"observation\": \"toolz.itertoolz.partition_all.input4\""
+       }
+      }
+     },
+     {
+      "name": "toolz.itertoolz.partition_all.input5",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": {
+       "repr": "<generator object partition_all>",
+       "type": "generator"
+      },
+      "pr": {
+       "repr": "<generator object partition_all>",
+       "type": "generator"
+      },
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 8,
+        "quote": "\"observation\": \"toolz.itertoolz.partition_all.input5\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 8,
+        "quote": "\"observation\": \"toolz.itertoolz.partition_all.input5\""
+       }
+      }
+     },
+     {
+      "name": "toolz.itertoolz.partition_all.input6",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": {
+       "repr": "<generator object partition_all>",
+       "type": "generator"
+      },
+      "pr": {
+       "repr": "<generator object partition_all>",
+       "type": "generator"
+      },
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 9,
+        "quote": "\"observation\": \"toolz.itertoolz.partition_all.input6\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 9,
+        "quote": "\"observation\": \"toolz.itertoolz.partition_all.input6\""
+       }
+      }
+     },
+     {
+      "name": "toolz.itertoolz.partition_all.input7",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": {
+       "repr": "<generator object partition_all>",
+       "type": "generator"
+      },
+      "pr": {
+       "repr": "<generator object partition_all>",
+       "type": "generator"
+      },
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 10,
+        "quote": "\"observation\": \"toolz.itertoolz.partition_all.input7\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 10,
+        "quote": "\"observation\": \"toolz.itertoolz.partition_all.input7\""
+       }
+      }
+     },
+     {
+      "name": "toolz.itertoolz.partition_all.input8",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": {
+       "repr": "<generator object partition_all>",
+       "type": "generator"
+      },
+      "pr": {
+       "repr": "<generator object partition_all>",
+       "type": "generator"
+      },
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 11,
+        "quote": "\"observation\": \"toolz.itertoolz.partition_all.input8\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 11,
+        "quote": "\"observation\": \"toolz.itertoolz.partition_all.input8\""
+       }
+      }
+     },
+     {
+      "name": "toolz.itertoolz.partition_all.input9",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": {
+       "repr": "<generator object partition_all>",
+       "type": "generator"
+      },
+      "pr": {
+       "repr": "<generator object partition_all>",
+       "type": "generator"
+      },
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 12,
+        "quote": "\"observation\": \"toolz.itertoolz.partition_all.input9\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 12,
+        "quote": "\"observation\": \"toolz.itertoolz.partition_all.input9\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "diff",
+     "label": "diff (auto-derived from base-side code, model-free)",
+     "model": null,
+     "provider": null,
+     "provenance": "auto-derived",
+     "blind": false
+    },
+    "freeze": {
+     "sha256": "e8452a6ec1045516b41bfd13ee65657924b834e8eff476c31395b1064b601ed2",
+     "generator": {
+      "kind": "diff",
+      "label": "diff (auto-derived from base-side code, model-free)",
+      "model": null,
+      "provider": null,
+      "provenance": "auto-derived",
+      "blind": false
+     },
+     "frozen_at": "2026-11-09T07:44:13.992694+00:00",
+     "inputs_sha256": "9bf462c646008198ff284849f66c64bec45f66fb0c21ee19b05578acb11c4064",
+     "inputs": {
+      "title_chars": 0,
+      "body_chars": 0,
+      "base_files": {
+       "toolz/itertoolz.py": "93e4d79bc7c6d68250657846454303ba95c0694c9ef165cb7a8e0bdf150711c6"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-09T07:44:14.204919+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 7,
+     "changed_lines_covered": 2,
+     "files": [
+      {
+       "file": "toolz/itertoolz.py",
+       "changed_lines_total": 7,
+       "changed_lines_covered": 2
+      }
+     ],
+     "adequacy": "adequate",
+     "note": "ran 2 of 7 changed line(s) on the main side",
+     "exit": 0,
+     "data": "probe-cov-diff-api.json"
+    },
+    "status": "ran"
+   }
+  ],
+  "summary": {
+   "labels": [
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference"
+   ],
+   "flagged": [],
+   "proven_claims": [],
+   "reason": "probe: 12 other observation(s) identical on both sides",
+   "ignored_noise": [],
+   "ignored_warning_only": [],
+   "pr_only_noisy": [],
+   "advisory_unchanged_subchecks": [],
+   "advisory_agreeing_differs": [],
+   "advisory_invalid_preservation": []
+  }
+ },
+ "probe_changed_line_coverage": {
+  "status": "measured",
+  "side": "main",
+  "probes": {
+   "diff-api": {
+    "status": "measured",
+    "changed_lines_covered": 2,
+    "changed_lines_total": 7,
+    "adequacy": "adequate"
+   }
+  },
+  "not_adequate": []
+ },
+ "verdict": "could_not_verify",
+ "reason": "not verified: no AI-written probe ran any changed line, so the change itself was not exercised by a probe; 2 test(s) fail on main and pass on the PR; 80 test(s) ran on main, 83 on the PR; 3 new test(s) pass, 78 unchanged",
+ "verdict_before_coverage_gate": "verified",
+ "reason_before_coverage_gate": "2 test(s) fail on main and pass on the PR; 80 test(s) ran on main, 83 on the PR; 3 new test(s) pass, 78 unchanged",
+ "changed_lines_total": 19,
+ "changed_lines_covered": 19,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "normal",
+  "note": "19 of 19 changed executable line(s) ran (100%)",
+  "measurement": "measured"
+ },
+ "verdict_before_ai_probe_gate": "verified",
+ "agents": {
+  "status": "skipped",
+  "note": "advisory swarm is off",
+  "roles": []
+ },
+ "explanation": {
+  "status": "not yet wired",
+  "why": "advisory swarm is off"
+ },
+ "swarm_requested": false,
+ "operator_approval_requested": false,
+ "swarm": "off",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [
+   "toolz/itertoolz.py",
+   "toolz/tests/test_itertoolz.py"
+  ],
+  "compiled_files": [],
+  "other_files": []
+ },
+ "duration_s": {
+  "total_wall": 137.1,
+  "tests": 8.9
+ },
+ "cost": {
+  "ai_calls": 3,
+  "failed_ai_calls": 0,
+  "input_tokens": 20473,
+  "output_tokens": 9230,
+  "thinking_tokens": 8522,
+  "cost_usd": 0.014449,
+  "calls_without_usage": 0,
+  "ai_cost_usd": 0.014449,
+  "cost_complete": true,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 137.1,
+   "tests": 8.9
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.00914,
+  "total_cost_usd": 0.023589,
+  "swarm": {
+   "ai_calls": 0,
+   "failed_ai_calls": 0,
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "thinking_tokens": 0,
+   "cost_usd": 0.0,
+   "calls_without_usage": 0,
+   "ai_cost_usd": 0.0,
+   "cost_complete": true,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ },
+ "pdf_push": {
+  "ok": true,
+  "attempts": 1,
+  "error": null,
+  "url": "https://github.com/aritracodesbad123/Proof-of-change/tree/runs/runs/2026-11-09/ef12096/toolz-661"
+ }
+}
