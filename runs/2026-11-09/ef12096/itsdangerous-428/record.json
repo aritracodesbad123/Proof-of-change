@@ -1,9 +1,9 @@
 {
  "schema_version": "1",
  "record_kind": "pr_run",
- "id": "pr-pallets-itsdangerous-428-d9f3b250e0ca-2026-11-08",
- "date_ist": "2026-11-09 08:15 IST",
- "run_date": "2026-11-08",
+ "id": "pr-pallets-itsdangerous-428-d9f3b250e0ca-2026-11-09",
+ "date_ist": "2026-11-09 11:59 IST",
+ "run_date": "2026-11-09",
  "who": "ops/daily_run.py",
  "repo": "pallets/itsdangerous",
  "library": "itsdangerous",
@@ -25,7 +25,7 @@
  "updated_at_ist": "2026-08-06 00:00 IST",
  "ci_state": "passing",
  "ci_detail": "9 check runs completed without failure",
- "tested_at_ist": "2026-11-09 08:15 IST",
+ "tested_at_ist": "2026-11-09 11:59 IST",
  "files": {
   "all": [
    "CHANGES.rst",
@@ -83,7 +83,7 @@
    "collection_errors": 0,
    "exit": 0,
    "seconds": 1.0,
-   "pytest_summary": "8 passed in 0.49s",
+   "pytest_summary": "8 passed in 0.56s",
    "junit": true
   },
   {
@@ -95,8 +95,8 @@
    "skipped": 0,
    "collection_errors": 0,
    "exit": 0,
-   "seconds": 0.9,
-   "pytest_summary": "8 passed in 0.49s",
+   "seconds": 1.0,
+   "pytest_summary": "8 passed in 0.55s",
    "junit": true
   },
   {
@@ -108,8 +108,8 @@
    "skipped": 0,
    "collection_errors": 0,
    "exit": 0,
-   "seconds": 0.9,
-   "pytest_summary": "8 passed in 0.49s",
+   "seconds": 1.0,
+   "pytest_summary": "8 passed in 0.55s",
    "junit": true
   },
   {
@@ -121,8 +121,8 @@
    "skipped": 0,
    "collection_errors": 0,
    "exit": 0,
-   "seconds": 0.9,
-   "pytest_summary": "8 passed in 0.50s",
+   "seconds": 1.0,
+   "pytest_summary": "8 passed in 0.55s",
    "junit": true
   },
   {
@@ -135,7 +135,7 @@
    "collection_errors": 0,
    "exit": 0,
    "seconds": 1.0,
-   "pytest_summary": "8 passed in 0.51s",
+   "pytest_summary": "8 passed in 0.57s",
    "junit": true
   },
   {
@@ -147,8 +147,8 @@
    "skipped": 0,
    "collection_errors": 0,
    "exit": 0,
-   "seconds": 0.9,
-   "pytest_summary": "8 passed in 0.48s",
+   "seconds": 1.0,
+   "pytest_summary": "8 passed in 0.55s",
    "junit": true
   }
  ],
@@ -188,7 +188,7 @@
     "changed_lines_covered": 3
    }
   ],
-  "seconds": 1.3,
+  "seconds": 1.4,
   "exit": 0,
   "log": "coverage-pytest.log"
  },
@@ -205,8 +205,8 @@
   "notes": [
    "Setup check: GitHub token: present.",
    "Setup check: Nebius token: present.",
-   "Setup check: free memory 8.9 GB (of 15.6 GB).",
-   "Setup check: free disk 93.1 GB.",
+   "Setup check: free memory 7.0 GB (of 15.6 GB).",
+   "Setup check: free disk 92.9 GB.",
    "Demo helper: git is installed.",
    "Demo helper: python3 is installed.",
    "Demo helper: uv is installed.",
@@ -218,7 +218,7 @@
    "Source: itsdangerous \u00b7 PyPI \u2014 https://pypi.org/project/itsdangerous/",
    "Source: Releases \u00b7 pallets/itsdangerous \u00b7 GitHub \u2014 https://github.com/pallets/itsdangerous/releases",
    "Source: itsdangerous/CHANGES.rst at main \u00b7 pallets/itsdangerous \u00b7 GitHub \u2014 https://github.com/pallets/itsdangerous/blob/main/CHANGES.rst",
-   "Source: itsdangerous/src/itsdangerous/__init__.py at main \u00b7 pallets/itsdangerous \u00b7 GitHub \u2014 https://github.com/pallets/itsdangerous/blob/main/src/itsdangerous/__init__.py",
+   "Source: New PyPI release \u00b7 Issue #92 \u00b7 pallets/itsdangerous \u00b7 GitHub \u2014 https://github.com/pallets/itsdangerous/issues/92",
    "Setup plan: the same packages on main and pr.",
    "Setup plan: install freezegun (listed in the tests extra) on main and pr.",
    "Setup plan: install pytest (listed in the tests extra) on main and pr.",
@@ -346,61 +346,40 @@
   "model_claims": [
    {
     "id": "C1",
-    "text": "On Python 3.15+, urlsafe_b64decode requires proper padding and will reject inputs without it.",
-    "source_quote": "require padding when decoding base64 on Python 3.15+",
+    "text": "On Python 3.15+, urlsafe_b64decode() requires padding (i.e., will reject inputs lacking proper padding).",
+    "source_quote": "Restore the old behavior of `urlsafe_b64decode()` to require padding when running on Python 3.15+",
     "testable": true,
     "expect": "differs"
    },
    {
     "id": "C2",
-    "text": "urlsafe_b64decode will raise BadData for malformed input lacking padding on Python 3.15+.",
-    "source_quote": "in order to fix raising `BadData` in some cases of malformed input",
+    "text": "The PR fixes the test failures in 'bad payload' tests that occur when using zlib-ng as the compression library.",
+    "source_quote": "This fixes the test failures in 'bad payload' tests that incidentally surface when using zlib-ng as the compression library.",
     "testable": true,
-    "expect": "differs"
-   },
-   {
-    "id": "C3",
-    "text": "The PR resolves the test failures in the 'bad payload' tests when using zlib-ng as the compression library.",
-    "source_quote": "This fixes the test failures in \"bad payload\" tests that incidentally surface when using zlib-ng as the compression library.",
-    "testable": true,
-    "expect": "differs"
+    "expect": "differs",
+    "quote_match": "loose"
    }
   ],
   "model_rejected_claims": [],
-  "model_retried": {
-   "why": [
-    "no probe listed the claim ids it checks, so its results could not be tied to any claim; in each probe, \"claims\" must name the claim ids it checks and the observation names that cover them"
-   ],
-   "kept_first_answer": "the retry linked no claim either"
-  },
-  "model_claims_filled": [
+  "model_loose_quote_matches": [
    {
-    "id": "p1",
-    "claims": [
-     "C1"
-    ]
-   },
-   {
-    "id": "p2",
-    "claims": [
-     "C2"
-    ]
-   },
-   {
-    "id": "p3",
-    "claims": [
-     "C3"
-    ]
+    "claim": "C2",
+    "source_quote": "This fixes the test failures in 'bad payload' tests that incidentally surface when using zlib-ng as the compression library."
    }
   ],
+  "model_retried": {
+   "why": [
+    "empty probe: the code has no test statements (only imports, comments or a docstring)"
+   ]
+  },
   "diff_targets": [
    "itsdangerous.encoding.base64_decode"
   ],
   "frozen": [
    {
-    "path": "model-probes/model-p1.py",
+    "path": "model-probes/model-probe1.py",
     "source": "model",
-    "sha256": "8083a3ea26401bf7b456196e128e3008850b5d9958adc8cb9f0239b85d861f92",
+    "sha256": "f18abcf36c27a3c552e4ffddc3392aa5f9b825a315449b0fe26eaeecfedb4660",
     "generator": {
      "kind": "model",
      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
@@ -409,51 +388,7 @@
      "provenance": "live",
      "blind": true
     },
-    "frozen_at": "2026-11-09T02:47:18.341646+00:00",
-    "inputs_sha256": "55726b9377b8192973a811024e955710e5c0f39d20f6b1dc1da3642ccbbee2a8",
-    "inputs": {
-     "title_chars": 52,
-     "body_chars": 306,
-     "base_files": {
-      "src/itsdangerous/encoding.py": "c304f3e6aff7ccb71a01dba793afef4a84adc06a9859edf4ed997f53ceda4453"
-     }
-    }
-   },
-   {
-    "path": "model-probes/model-p2.py",
-    "source": "model",
-    "sha256": "abdd75fab4f6c6b939f2a7b458d616ecce0fc008b137239229f857afd3cd5003",
-    "generator": {
-     "kind": "model",
-     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
-     "model": "nvidia/nemotron-3-super-120b-a12b",
-     "provider": "nebius",
-     "provenance": "live",
-     "blind": true
-    },
-    "frozen_at": "2026-11-09T02:47:18.344576+00:00",
-    "inputs_sha256": "55726b9377b8192973a811024e955710e5c0f39d20f6b1dc1da3642ccbbee2a8",
-    "inputs": {
-     "title_chars": 52,
-     "body_chars": 306,
-     "base_files": {
-      "src/itsdangerous/encoding.py": "c304f3e6aff7ccb71a01dba793afef4a84adc06a9859edf4ed997f53ceda4453"
-     }
-    }
-   },
-   {
-    "path": "model-probes/model-p3.py",
-    "source": "model",
-    "sha256": "18a7fd50a02481ef3ccbea283e14c9f27f02b2eac7c3eb76a7e7d9b7a447b164",
-    "generator": {
-     "kind": "model",
-     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
-     "model": "nvidia/nemotron-3-super-120b-a12b",
-     "provider": "nebius",
-     "provenance": "live",
-     "blind": true
-    },
-    "frozen_at": "2026-11-09T02:47:18.344713+00:00",
+    "frozen_at": "2026-11-09T06:30:04.524558+00:00",
     "inputs_sha256": "55726b9377b8192973a811024e955710e5c0f39d20f6b1dc1da3642ccbbee2a8",
     "inputs": {
      "title_chars": 52,
@@ -475,7 +410,7 @@
      "provenance": "auto-derived",
      "blind": false
     },
-    "frozen_at": "2026-11-09T02:47:18.345680+00:00",
+    "frozen_at": "2026-11-09T06:30:04.525592+00:00",
     "inputs_sha256": "aeb543057f5c0fa8291546fa5547ad1be0437fa9a12ea5c40d82b622ac0ec564",
     "inputs": {
      "title_chars": 0,
@@ -488,7 +423,7 @@
   ]
  },
  "test_extras": [],
- "pr_side_started_at": "2026-11-09T02:47:18.481455+00:00",
+ "pr_side_started_at": "2026-11-09T06:30:04.667993+00:00",
  "test_targets": {
   "main": [
    "tests/test_itsdangerous/test_encoding.py"
@@ -548,208 +483,34 @@
   "status": "ran",
   "items": [
    {
-    "id": "model-p1",
+    "id": "model-probe1",
     "source": "model",
-    "path": "model-probes/model-p1.py",
-    "sha256": "8083a3ea26401bf7b456196e128e3008850b5d9958adc8cb9f0239b85d861f92",
+    "path": "model-probes/model-probe1.py",
+    "sha256": "f18abcf36c27a3c552e4ffddc3392aa5f9b825a315449b0fe26eaeecfedb4660",
     "target": "pallets/itsdangerous#428",
-    "about": "base64_decode padding requirement",
+    "about": "Test base64_decode with padded/unpadded and invalid inputs to detect padding requirement change.",
     "claims": [
      {
       "id": "C1",
       "source": "PR description",
-      "text": "On Python 3.15+, urlsafe_b64decode requires proper padding and will reject inputs without it.",
+      "text": "On Python 3.15+, urlsafe_b64decode() requires padding (i.e., will reject inputs lacking proper padding).",
       "covers": [
-       "c1.*"
+       "c1.unpadded_a",
+       "c1.unpadded_ab",
+       "c1.padded_abc",
+       "c1.invalid"
       ],
       "expect": "differs"
-     }
-    ],
-    "runs_per_side": 3,
-    "per_run": [
-     {
-      "side": "main",
-      "run": 1,
-      "seconds": 0.1,
-      "ok": true
      },
-     {
-      "side": "pr",
-      "run": 1,
-      "seconds": 0.1,
-      "ok": true
-     },
-     {
-      "side": "main",
-      "run": 2,
-      "seconds": 0.0,
-      "ok": true
-     },
-     {
-      "side": "pr",
-      "run": 2,
-      "seconds": 0.1,
-      "ok": true
-     },
-     {
-      "side": "main",
-      "run": 3,
-      "seconds": 0.1,
-      "ok": true
-     },
-     {
-      "side": "pr",
-      "run": 3,
-      "seconds": 0.0,
-      "ok": true
-     }
-    ],
-    "outputs": {
-     "main": [
-      "probe-model-p1-main-1.jsonl",
-      "probe-model-p1-main-2.jsonl",
-      "probe-model-p1-main-3.jsonl"
-     ],
-     "pr": [
-      "probe-model-p1-pr-1.jsonl",
-      "probe-model-p1-pr-2.jsonl",
-      "probe-model-p1-pr-3.jsonl"
-     ]
-    },
-    "runs": {
-     "main": [
-      {
-       "c1.unpadded_valid": "abc",
-       "c1.padded_valid": "abc"
-      },
-      {
-       "c1.unpadded_valid": "abc",
-       "c1.padded_valid": "abc"
-      },
-      {
-       "c1.unpadded_valid": "abc",
-       "c1.padded_valid": "abc"
-      }
-     ],
-     "pr": [
-      {
-       "c1.unpadded_valid": "abc",
-       "c1.padded_valid": "abc"
-      },
-      {
-       "c1.unpadded_valid": "abc",
-       "c1.padded_valid": "abc"
-      },
-      {
-       "c1.unpadded_valid": "abc",
-       "c1.padded_valid": "abc"
-      }
-     ]
-    },
-    "observations": [
-     {
-      "name": "c1.padded_valid",
-      "state": "same",
-      "label": "needs_human",
-      "claim": "C1",
-      "main": "abc",
-      "pr": "abc",
-      "citations": {
-       "main": {
-        "file": "probe-model-p1-main-1.jsonl",
-        "line": 1,
-        "quote": "\"observation\": \"c1.padded_valid\""
-       },
-       "pr": {
-        "file": "probe-model-p1-pr-1.jsonl",
-        "line": 1,
-        "quote": "\"observation\": \"c1.padded_valid\""
-       }
-      }
-     },
-     {
-      "name": "c1.unpadded_valid",
-      "state": "same",
-      "label": "needs_human",
-      "claim": "C1",
-      "main": "abc",
-      "pr": "abc",
-      "citations": {
-       "main": {
-        "file": "probe-model-p1-main-1.jsonl",
-        "line": 2,
-        "quote": "\"observation\": \"c1.unpadded_valid\""
-       },
-       "pr": {
-        "file": "probe-model-p1-pr-1.jsonl",
-        "line": 2,
-        "quote": "\"observation\": \"c1.unpadded_valid\""
-       }
-      }
-     }
-    ],
-    "generator": {
-     "kind": "model",
-     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
-     "model": "nvidia/nemotron-3-super-120b-a12b",
-     "provider": "nebius",
-     "provenance": "live",
-     "blind": true
-    },
-    "freeze": {
-     "sha256": "8083a3ea26401bf7b456196e128e3008850b5d9958adc8cb9f0239b85d861f92",
-     "generator": {
-      "kind": "model",
-      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
-      "model": "nvidia/nemotron-3-super-120b-a12b",
-      "provider": "nebius",
-      "provenance": "live",
-      "blind": true
-     },
-     "frozen_at": "2026-11-09T02:47:18.341646+00:00",
-     "inputs_sha256": "55726b9377b8192973a811024e955710e5c0f39d20f6b1dc1da3642ccbbee2a8",
-     "inputs": {
-      "title_chars": 52,
-      "body_chars": 306,
-      "base_files": {
-       "src/itsdangerous/encoding.py": "c304f3e6aff7ccb71a01dba793afef4a84adc06a9859edf4ed997f53ceda4453"
-      }
-     },
-     "verified": true,
-     "pr_started_at": "2026-11-09T02:47:18.481455+00:00"
-    },
-    "probe_changed_line_coverage": {
-     "status": "measured",
-     "changed_lines_total": 3,
-     "changed_lines_covered": 3,
-     "files": [
-      {
-       "file": "src/itsdangerous/encoding.py",
-       "changed_lines_total": 3,
-       "changed_lines_covered": 3
-      }
-     ],
-     "adequacy": "adequate",
-     "note": "ran 3 of 3 changed line(s) on the main side",
-     "exit": 0,
-     "data": "probe-cov-model-p1.json"
-    },
-    "status": "ran"
-   },
-   {
-    "id": "model-p2",
-    "source": "model",
-    "path": "model-probes/model-p2.py",
-    "sha256": "abdd75fab4f6c6b939f2a7b458d616ecce0fc008b137239229f857afd3cd5003",
-    "target": "pallets/itsdangerous#428",
-    "about": "base64_decode BadData on malformed input lacking padding",
-    "claims": [
      {
       "id": "C2",
       "source": "PR description",
-      "text": "urlsafe_b64decode will raise BadData for malformed input lacking padding on Python 3.15+.",
+      "text": "The PR fixes the test failures in 'bad payload' tests that occur when using zlib-ng as the compression library.",
       "covers": [
-       "c2.*"
+       "c1.unpadded_a",
+       "c1.unpadded_ab",
+       "c1.padded_abc",
+       "c1.invalid"
       ],
       "expect": "differs"
      }
@@ -759,283 +520,172 @@
      {
       "side": "main",
       "run": 1,
-      "seconds": 0.0,
+      "seconds": 0.1,
       "ok": true
      },
      {
       "side": "pr",
       "run": 1,
-      "seconds": 0.0,
+      "seconds": 0.1,
       "ok": true
      },
      {
       "side": "main",
       "run": 2,
-      "seconds": 0.0,
+      "seconds": 0.1,
       "ok": true
      },
      {
       "side": "pr",
       "run": 2,
-      "seconds": 0.0,
+      "seconds": 0.1,
       "ok": true
      },
      {
       "side": "main",
       "run": 3,
-      "seconds": 0.0,
+      "seconds": 0.1,
       "ok": true
      },
      {
       "side": "pr",
       "run": 3,
-      "seconds": 0.0,
+      "seconds": 0.1,
       "ok": true
      }
     ],
     "outputs": {
      "main": [
-      "probe-model-p2-main-1.jsonl",
-      "probe-model-p2-main-2.jsonl",
-      "probe-model-p2-main-3.jsonl"
+      "probe-model-probe1-main-1.jsonl",
+      "probe-model-probe1-main-2.jsonl",
+      "probe-model-probe1-main-3.jsonl"
      ],
      "pr": [
-      "probe-model-p2-pr-1.jsonl",
-      "probe-model-p2-pr-2.jsonl",
-      "probe-model-p2-pr-3.jsonl"
+      "probe-model-probe1-pr-1.jsonl",
+      "probe-model-probe1-pr-2.jsonl",
+      "probe-model-probe1-pr-3.jsonl"
      ]
     },
     "runs": {
      "main": [
       {
-       "c2.malformed_no_padding": "BadData"
+       "c1.unpadded_a": "61",
+       "c1.unpadded_ab": "616262",
+       "c1.padded_abc": "616263",
+       "c1.invalid": ""
       },
       {
-       "c2.malformed_no_padding": "BadData"
+       "c1.unpadded_a": "61",
+       "c1.unpadded_ab": "616262",
+       "c1.padded_abc": "616263",
+       "c1.invalid": ""
       },
       {
-       "c2.malformed_no_padding": "BadData"
+       "c1.unpadded_a": "61",
+       "c1.unpadded_ab": "616262",
+       "c1.padded_abc": "616263",
+       "c1.invalid": ""
       }
      ],
      "pr": [
       {
-       "c2.malformed_no_padding": "BadData"
+       "c1.unpadded_a": "61",
+       "c1.unpadded_ab": "616262",
+       "c1.padded_abc": "616263",
+       "c1.invalid": ""
       },
       {
-       "c2.malformed_no_padding": "BadData"
+       "c1.unpadded_a": "61",
+       "c1.unpadded_ab": "616262",
+       "c1.padded_abc": "616263",
+       "c1.invalid": ""
       },
       {
-       "c2.malformed_no_padding": "BadData"
+       "c1.unpadded_a": "61",
+       "c1.unpadded_ab": "616262",
+       "c1.padded_abc": "616263",
+       "c1.invalid": ""
       }
      ]
     },
     "observations": [
      {
-      "name": "c2.malformed_no_padding",
+      "name": "c1.invalid",
       "state": "same",
       "label": "needs_human",
-      "claim": "C2",
-      "main": "BadData",
-      "pr": "BadData",
-      "citations": {
-       "main": {
-        "file": "probe-model-p2-main-1.jsonl",
-        "line": 1,
-        "quote": "\"observation\": \"c2.malformed_no_padding\""
-       },
-       "pr": {
-        "file": "probe-model-p2-pr-1.jsonl",
-        "line": 1,
-        "quote": "\"observation\": \"c2.malformed_no_padding\""
-       }
-      }
-     }
-    ],
-    "generator": {
-     "kind": "model",
-     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
-     "model": "nvidia/nemotron-3-super-120b-a12b",
-     "provider": "nebius",
-     "provenance": "live",
-     "blind": true
-    },
-    "freeze": {
-     "sha256": "abdd75fab4f6c6b939f2a7b458d616ecce0fc008b137239229f857afd3cd5003",
-     "generator": {
-      "kind": "model",
-      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
-      "model": "nvidia/nemotron-3-super-120b-a12b",
-      "provider": "nebius",
-      "provenance": "live",
-      "blind": true
-     },
-     "frozen_at": "2026-11-09T02:47:18.344576+00:00",
-     "inputs_sha256": "55726b9377b8192973a811024e955710e5c0f39d20f6b1dc1da3642ccbbee2a8",
-     "inputs": {
-      "title_chars": 52,
-      "body_chars": 306,
-      "base_files": {
-       "src/itsdangerous/encoding.py": "c304f3e6aff7ccb71a01dba793afef4a84adc06a9859edf4ed997f53ceda4453"
-      }
-     },
-     "verified": true,
-     "pr_started_at": "2026-11-09T02:47:18.481455+00:00"
-    },
-    "probe_changed_line_coverage": {
-     "status": "measured",
-     "changed_lines_total": 3,
-     "changed_lines_covered": 3,
-     "files": [
-      {
-       "file": "src/itsdangerous/encoding.py",
-       "changed_lines_total": 3,
-       "changed_lines_covered": 3
-      }
-     ],
-     "adequacy": "adequate",
-     "note": "ran 3 of 3 changed line(s) on the main side",
-     "exit": 0,
-     "data": "probe-cov-model-p2.json"
-    },
-    "status": "ran"
-   },
-   {
-    "id": "model-p3",
-    "source": "model",
-    "path": "model-probes/model-p3.py",
-    "sha256": "18a7fd50a02481ef3ccbea283e14c9f27f02b2eac7c3eb76a7e7d9b7a447b164",
-    "target": "pallets/itsdangerous#428",
-    "about": "base64_decode behavior for empty and invalid padded inputs",
-    "claims": [
-     {
-      "id": "C3",
-      "source": "PR description",
-      "text": "The PR resolves the test failures in the 'bad payload' tests when using zlib-ng as the compression library.",
-      "covers": [
-       "c3.*"
-      ],
-      "expect": "differs"
-     }
-    ],
-    "runs_per_side": 3,
-    "per_run": [
-     {
-      "side": "main",
-      "run": 1,
-      "seconds": 0.0,
-      "ok": true
-     },
-     {
-      "side": "pr",
-      "run": 1,
-      "seconds": 0.0,
-      "ok": true
-     },
-     {
-      "side": "main",
-      "run": 2,
-      "seconds": 0.0,
-      "ok": true
-     },
-     {
-      "side": "pr",
-      "run": 2,
-      "seconds": 0.0,
-      "ok": true
-     },
-     {
-      "side": "main",
-      "run": 3,
-      "seconds": 0.0,
-      "ok": true
-     },
-     {
-      "side": "pr",
-      "run": 3,
-      "seconds": 0.0,
-      "ok": true
-     }
-    ],
-    "outputs": {
-     "main": [
-      "probe-model-p3-main-1.jsonl",
-      "probe-model-p3-main-2.jsonl",
-      "probe-model-p3-main-3.jsonl"
-     ],
-     "pr": [
-      "probe-model-p3-pr-1.jsonl",
-      "probe-model-p3-pr-2.jsonl",
-      "probe-model-p3-pr-3.jsonl"
-     ]
-    },
-    "runs": {
-     "main": [
-      {
-       "c3.empty_input": "",
-       "c3.invalid_char_padded": "ab"
-      },
-      {
-       "c3.empty_input": "",
-       "c3.invalid_char_padded": "ab"
-      },
-      {
-       "c3.empty_input": "",
-       "c3.invalid_char_padded": "ab"
-      }
-     ],
-     "pr": [
-      {
-       "c3.empty_input": "",
-       "c3.invalid_char_padded": "ab"
-      },
-      {
-       "c3.empty_input": "",
-       "c3.invalid_char_padded": "ab"
-      },
-      {
-       "c3.empty_input": "",
-       "c3.invalid_char_padded": "ab"
-      }
-     ]
-    },
-    "observations": [
-     {
-      "name": "c3.empty_input",
-      "state": "same",
-      "label": "needs_human",
-      "claim": "C3",
+      "claim": "C1",
       "main": "",
       "pr": "",
       "citations": {
        "main": {
-        "file": "probe-model-p3-main-1.jsonl",
+        "file": "probe-model-probe1-main-1.jsonl",
         "line": 1,
-        "quote": "\"observation\": \"c3.empty_input\""
+        "quote": "\"observation\": \"c1.invalid\""
        },
        "pr": {
-        "file": "probe-model-p3-pr-1.jsonl",
+        "file": "probe-model-probe1-pr-1.jsonl",
         "line": 1,
-        "quote": "\"observation\": \"c3.empty_input\""
+        "quote": "\"observation\": \"c1.invalid\""
        }
       }
      },
      {
-      "name": "c3.invalid_char_padded",
+      "name": "c1.padded_abc",
       "state": "same",
       "label": "needs_human",
-      "claim": "C3",
-      "main": "ab",
-      "pr": "ab",
+      "claim": "C1",
+      "main": "616263",
+      "pr": "616263",
       "citations": {
        "main": {
-        "file": "probe-model-p3-main-1.jsonl",
+        "file": "probe-model-probe1-main-1.jsonl",
         "line": 2,
-        "quote": "\"observation\": \"c3.invalid_char_padded\""
+        "quote": "\"observation\": \"c1.padded_abc\""
        },
        "pr": {
-        "file": "probe-model-p3-pr-1.jsonl",
+        "file": "probe-model-probe1-pr-1.jsonl",
         "line": 2,
-        "quote": "\"observation\": \"c3.invalid_char_padded\""
+        "quote": "\"observation\": \"c1.padded_abc\""
+       }
+      }
+     },
+     {
+      "name": "c1.unpadded_a",
+      "state": "same",
+      "label": "needs_human",
+      "claim": "C1",
+      "main": "61",
+      "pr": "61",
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-main-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"c1.unpadded_a\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"c1.unpadded_a\""
+       }
+      }
+     },
+     {
+      "name": "c1.unpadded_ab",
+      "state": "same",
+      "label": "needs_human",
+      "claim": "C1",
+      "main": "616262",
+      "pr": "616262",
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-main-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"c1.unpadded_ab\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"c1.unpadded_ab\""
        }
       }
      }
@@ -1049,7 +699,7 @@
      "blind": true
     },
     "freeze": {
-     "sha256": "18a7fd50a02481ef3ccbea283e14c9f27f02b2eac7c3eb76a7e7d9b7a447b164",
+     "sha256": "f18abcf36c27a3c552e4ffddc3392aa5f9b825a315449b0fe26eaeecfedb4660",
      "generator": {
       "kind": "model",
       "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
@@ -1058,7 +708,7 @@
       "provenance": "live",
       "blind": true
      },
-     "frozen_at": "2026-11-09T02:47:18.344713+00:00",
+     "frozen_at": "2026-11-09T06:30:04.524558+00:00",
      "inputs_sha256": "55726b9377b8192973a811024e955710e5c0f39d20f6b1dc1da3642ccbbee2a8",
      "inputs": {
       "title_chars": 52,
@@ -1068,7 +718,7 @@
       }
      },
      "verified": true,
-     "pr_started_at": "2026-11-09T02:47:18.481455+00:00"
+     "pr_started_at": "2026-11-09T06:30:04.667993+00:00"
     },
     "probe_changed_line_coverage": {
      "status": "measured",
@@ -1084,7 +734,7 @@
      "adequacy": "adequate",
      "note": "ran 3 of 3 changed line(s) on the main side",
      "exit": 0,
-     "data": "probe-cov-model-p3.json"
+     "data": "probe-cov-model-probe1.json"
     },
     "status": "ran"
    },
@@ -1715,7 +1365,7 @@
       "provenance": "auto-derived",
       "blind": false
      },
-     "frozen_at": "2026-11-09T02:47:18.345680+00:00",
+     "frozen_at": "2026-11-09T06:30:04.525592+00:00",
      "inputs_sha256": "aeb543057f5c0fa8291546fa5547ad1be0437fa9a12ea5c40d82b622ac0ec564",
      "inputs": {
       "title_chars": 0,
@@ -1725,7 +1375,7 @@
       }
      },
      "verified": true,
-     "pr_started_at": "2026-11-09T02:47:18.481455+00:00"
+     "pr_started_at": "2026-11-09T06:30:04.667993+00:00"
     },
     "probe_changed_line_coverage": {
      "status": "measured",
@@ -1752,7 +1402,6 @@
     "needs_human",
     "needs_human",
     "needs_human",
-    "needs_human",
     "not_testable",
     "not_testable",
     "not_testable",
@@ -1768,38 +1417,32 @@
    ],
    "flagged": [
     {
-     "probe": "model-p1",
-     "name": "c1.padded_valid",
+     "probe": "model-probe1",
+     "name": "c1.invalid",
      "label": "needs_human",
      "claim": "C1"
     },
     {
-     "probe": "model-p1",
-     "name": "c1.unpadded_valid",
+     "probe": "model-probe1",
+     "name": "c1.padded_abc",
      "label": "needs_human",
      "claim": "C1"
     },
     {
-     "probe": "model-p2",
-     "name": "c2.malformed_no_padding",
+     "probe": "model-probe1",
+     "name": "c1.unpadded_a",
      "label": "needs_human",
-     "claim": "C2"
+     "claim": "C1"
     },
     {
-     "probe": "model-p3",
-     "name": "c3.empty_input",
+     "probe": "model-probe1",
+     "name": "c1.unpadded_ab",
      "label": "needs_human",
-     "claim": "C3"
-    },
-    {
-     "probe": "model-p3",
-     "name": "c3.invalid_char_padded",
-     "label": "needs_human",
-     "claim": "C3"
+     "claim": "C1"
     }
    ],
    "proven_claims": [],
-   "reason": "probe: 5 observation(s) need attention: c1.padded_valid does not differ although the claim says it does (C1); c1.unpadded_valid does not differ although the claim says it does (C1); c2.malformed_no_padding does not differ although the claim says it does (C2); c3.empty_input does not differ although the claim says it does (C3); probe: 2 other observation(s) identical on both sides; probe: 10 probe(s) could not run on either side",
+   "reason": "probe: 4 observation(s) need attention: c1.invalid does not differ although the claim says it does (C1); c1.padded_abc does not differ although the claim says it does (C1); c1.unpadded_a does not differ although the claim says it does (C1); c1.unpadded_ab does not differ although the claim says it does (C1); probe: 2 other observation(s) identical on both sides; probe: 10 probe(s) could not run on either side",
    "ignored_noise": [],
    "ignored_warning_only": [],
    "pr_only_noisy": [],
@@ -1812,19 +1455,7 @@
   "status": "measured",
   "side": "main",
   "probes": {
-   "model-p1": {
-    "status": "measured",
-    "changed_lines_covered": 3,
-    "changed_lines_total": 3,
-    "adequacy": "adequate"
-   },
-   "model-p2": {
-    "status": "measured",
-    "changed_lines_covered": 3,
-    "changed_lines_total": 3,
-    "adequacy": "adequate"
-   },
-   "model-p3": {
+   "model-probe1": {
     "status": "measured",
     "changed_lines_covered": 3,
     "changed_lines_total": 3,
@@ -1840,9 +1471,9 @@
   "not_adequate": []
  },
  "verdict": "needs_attention",
- "reason": "probe: 5 observation(s) need attention: c1.padded_valid does not differ although the claim says it does (C1); c1.unpadded_valid does not differ although the claim says it does (C1); c2.malformed_no_padding does not differ although the claim says it does (C2); c3.empty_input does not differ although the claim says it does (C3); tests: 8 test(s) ran on main, 8 on the PR; 0 new test(s) pass, 8 unchanged",
+ "reason": "probe: 4 observation(s) need attention: c1.invalid does not differ although the claim says it does (C1); c1.padded_abc does not differ although the claim says it does (C1); c1.unpadded_a does not differ although the claim says it does (C1); c1.unpadded_ab does not differ although the claim says it does (C1); tests: 8 test(s) ran on main, 8 on the PR; 0 new test(s) pass, 8 unchanged",
  "verdict_before_coverage_gate": "needs_attention",
- "reason_before_coverage_gate": "probe: 5 observation(s) need attention: c1.padded_valid does not differ although the claim says it does (C1); c1.unpadded_valid does not differ although the claim says it does (C1); c2.malformed_no_padding does not differ although the claim says it does (C2); c3.empty_input does not differ although the claim says it does (C3); tests: 8 test(s) ran on main, 8 on the PR; 0 new test(s) pass, 8 unchanged",
+ "reason_before_coverage_gate": "probe: 4 observation(s) need attention: c1.invalid does not differ although the claim says it does (C1); c1.padded_abc does not differ although the claim says it does (C1); c1.unpadded_a does not differ although the claim says it does (C1); c1.unpadded_ab does not differ although the claim says it does (C1); tests: 8 test(s) ran on main, 8 on the PR; 0 new test(s) pass, 8 unchanged",
  "changed_lines_total": 4,
  "changed_lines_covered": 3,
  "coverage_gate": {
@@ -1875,28 +1506,28 @@
   ]
  },
  "duration_s": {
-  "total_wall": 98.4,
-  "tests": 5.6
+  "total_wall": 73.7,
+  "tests": 6.0
  },
  "cost": {
   "ai_calls": 3,
   "failed_ai_calls": 0,
-  "input_tokens": 2790,
-  "output_tokens": 9449,
-  "thinking_tokens": 8502,
-  "cost_usd": 0.009341,
+  "input_tokens": 2634,
+  "output_tokens": 4418,
+  "thinking_tokens": 3881,
+  "cost_usd": 0.004766,
   "calls_without_usage": 0,
-  "ai_cost_usd": 0.009341,
+  "ai_cost_usd": 0.004766,
   "cost_complete": true,
   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
   "compute_seconds": {
-   "total_wall": 98.4,
-   "tests": 5.6
+   "total_wall": 73.7,
+   "tests": 6.0
   },
   "machine_usd_per_hour": 0.24,
   "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
-  "computer_cost_usd": 0.00656,
-  "total_cost_usd": 0.015901,
+  "computer_cost_usd": 0.004913,
+  "total_cost_usd": 0.009679,
   "swarm": {
    "ai_calls": 0,
    "failed_ai_calls": 0,
