@@ -1,6 +1,6 @@
 # Proof-of-Change go/no-go: 2026-11-09 on ef12096
 
-14 report(s) in this folder: 4 need attention, 9 could not be verified, 1 verified. Built from every record.json stored in this folder, so a later one-PR run cannot narrow it.
+15 report(s) in this folder: 4 need attention, 10 could not be verified, 1 verified. Built from every record.json stored in this folder, so a later one-PR run cannot narrow it.
 
 ## Needs a decision first
 
@@ -17,6 +17,7 @@
 - **COULD NOT VERIFY**: pallets/markupsafe#512: Add support for t-strings. Not verified: no AI-written probe ran any changed line, so the change itself was not exercised by a probe; 6 new test(s) skipped on the PR (they did not exist before; listed, not a finding); 1 test(s) re-parametrized (4 -> 4 ids); 76 test(s) ran on main, 76 on the PR; 4 new test(s) pass, 72 unchanged
 - **COULD NOT VERIFY**: jazzband/prettytable#539: Preserve numeric values when importing CSV. Not verified: no AI-written probe ran any changed line, so the change itself was not exercised by a probe; 2 test(s) fail on main and pass on the PR; 282 test(s) ran on main, 282 on the PR; 0 new test(s) pass, 280 unchanged
 - **COULD NOT VERIFY**: jazzband/prettytable#543: fix: escape LaTeX special characters in table output. Unverified behaviour claim: "No existing output changed for plain text (`& `.join structure and `\r\n` line joins untouched)."; needs a probe (3 test(s) fail on main and pass on the PR; 221 test(s) ran on main, 221 on the PR; 0 new test(s) pass, 218 unchanged)
+- **COULD NOT VERIFY**: jazzband/prettytable#544: fix: escape MediaWiki markup characters in table output. Not verified: no AI-written probe ran any changed line, so the change itself was not exercised by a probe; 3 test(s) fail on main and pass on the PR; 227 test(s) ran on main, 227 on the PR; 0 new test(s) pass, 224 unchanged
 
 ## All reports
 
@@ -35,4 +36,5 @@
 | COULD NOT VERIFY | pallets/markupsafe#512: Add support for t-strings | Not verified: no AI-written probe ran any changed line, so the change itself was not exercised by a probe; 6 new test(s) skipped on the PR (they did not exist before; listed, not a finding); 1 test(s) re-parametrized (4 -> 4 ids); 76 test(s) ran on main, 76 on the PR; 4 new test(s) pass, 72 unchanged | [PDF](markupsafe-512/REPORT.pdf) |
 | COULD NOT VERIFY | jazzband/prettytable#539: Preserve numeric values when importing CSV | Not verified: no AI-written probe ran any changed line, so the change itself was not exercised by a probe; 2 test(s) fail on main and pass on the PR; 282 test(s) ran on main, 282 on the PR; 0 new test(s) pass, 280 unchanged | [PDF](prettytable-539/REPORT.pdf) |
 | COULD NOT VERIFY | jazzband/prettytable#543: fix: escape LaTeX special characters in table output | Unverified behaviour claim: "No existing output changed for plain text (`& `.join structure and `\r\n` line joins untouched)."; needs a probe (3 test(s) fail on main and pass on the PR; 221 test(s) ran on main, 221 on the PR; 0 new test(s) pass, 218 unchanged) | [PDF](prettytable-543/REPORT.pdf) |
+| COULD NOT VERIFY | jazzband/prettytable#544: fix: escape MediaWiki markup characters in table output | Not verified: no AI-written probe ran any changed line, so the change itself was not exercised by a probe; 3 test(s) fail on main and pass on the PR; 227 test(s) ran on main, 227 on the PR; 0 new test(s) pass, 224 unchanged | [PDF](prettytable-544/REPORT.pdf) |
 | VERIFIED | Delgan/loguru#1536: Count bytes, not characters, in size-based rotation | 2 test(s) fail on main and pass on the PR; 152 test(s) ran on main, 155 on the PR; 3 new test(s) pass, 153 unchanged (3 of them skipped on both sides); probe: 14 unchanged sub-check(s) of an input where the claim's change was seen, shown as advisory only: c1.file_position (C1); c1.message (C1); c1.message_byte_length_utf8 (C1); c1.message_code_point_length (C1); probe: claim(s) C1, C2, C3, C4 proven | [PDF](loguru-1536/REPORT.pdf) |
