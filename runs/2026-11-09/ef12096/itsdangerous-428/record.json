@@ -1,0 +1,1919 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-pallets-itsdangerous-428-d9f3b250e0ca-2026-11-08",
+ "date_ist": "2026-11-09 08:15 IST",
+ "run_date": "2026-11-08",
+ "who": "ops/daily_run.py",
+ "repo": "pallets/itsdangerous",
+ "library": "itsdangerous",
+ "pr": {
+  "repo": "pallets/itsdangerous",
+  "number": 428,
+  "url": "https://github.com/pallets/itsdangerous/pull/428",
+  "title": "require padding when decoding base64 on Python 3.15+",
+  "base_sha": "672971d66a2ef9f85151e53283113f33d642dabd",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "d9f3b250e0cac90529e9dd2c6806d4f9d46901fb",
+  "merge_commit": "08c336cc549ea319f92abf254667c8e6c7789f9f",
+  "tested_main_sha": "672971d66a2ef9f85151e53283113f33d642dabd",
+  "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+ },
+ "author": "mgorny",
+ "base_ref": "main",
+ "updated_at_utc": "2026-08-05T18:30:35Z",
+ "updated_at_ist": "2026-08-06 00:00 IST",
+ "ci_state": "passing",
+ "ci_detail": "9 check runs completed without failure",
+ "tested_at_ist": "2026-11-09 08:15 IST",
+ "files": {
+  "all": [
+   "CHANGES.rst",
+   "src/itsdangerous/encoding.py"
+  ],
+  "package_py": [
+   "src/itsdangerous/encoding.py"
+  ],
+  "compiled": [],
+  "other": [
+   "CHANGES.rst"
+  ]
+ },
+ "machine_type": {
+  "arch": "x86_64",
+  "os": "Linux",
+  "platform": "Linux-6.12.94+-x86_64-with-glibc2.41",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": "g++ (Debian 14.2.0-19) 14.2.0",
+  "cpu_model": "Intel(R) Xeon(R) Processor",
+  "ram_gb": 15.6
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 3,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.15",
+ "test_selection": "mapped from touched files: tests/test_itsdangerous/test_encoding.py",
+ "per_run": [
+  {
+   "side": "old",
+   "run": 1,
+   "passed": 8,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.0,
+   "pytest_summary": "8 passed in 0.49s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 1,
+   "passed": 8,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 0.9,
+   "pytest_summary": "8 passed in 0.49s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 2,
+   "passed": 8,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 0.9,
+   "pytest_summary": "8 passed in 0.49s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 2,
+   "passed": 8,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 0.9,
+   "pytest_summary": "8 passed in 0.50s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 3,
+   "passed": 8,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.0,
+   "pytest_summary": "8 passed in 0.51s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 3,
+   "passed": 8,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 0.9,
+   "pytest_summary": "8 passed in 0.48s",
+   "junit": true
+  }
+ ],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "local",
+ "sandbox_backend_note": "local bubblewrap",
+ "machine": "local",
+ "tool_setup": {
+  "installed": [],
+  "tries": 0,
+  "note": "All required tools were already installed.",
+  "refused": []
+ },
+ "posted_upstream": false,
+ "logs": "itsdangerous-428/",
+ "freeze": {
+  "main": "freeze-main.txt",
+  "pr": "freeze-pr.txt"
+ },
+ "coverage": {
+  "status": "measured",
+  "changed_lines_total": 4,
+  "changed_lines_covered": 3,
+  "files": [
+   {
+    "file": "src/itsdangerous/encoding.py",
+    "changed_lines_total": 4,
+    "changed_lines_covered": 3
+   }
+  ],
+  "seconds": 1.3,
+  "exit": 0,
+  "log": "coverage-pytest.log"
+ },
+ "poc_commit": "ef12096677e9cf59e8673436d74ec65d53771d7c",
+ "route": "source-pair",
+ "current_head_sha": "d9f3b250e0cac90529e9dd2c6806d4f9d46901fb",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": "[redacted]",
+  "notes": [
+   "Setup check: GitHub token: present.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory 8.9 GB (of 15.6 GB).",
+   "Setup check: free disk 93.1 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: [redacted] results",
+   "Query: itsdangerous python setup install instructions https://github.com/pallets/itsdangerous site:github.com/pallets/itsdangerous",
+   "Query: itsdangerous python documentation install https://github.com/pallets/itsdangerous site:github.com/pallets/itsdangerous",
+   "Query: itsdangerous python install requirements https://pypi.org/project/itsdangerous/ https://github.com/pallets/itsdangerous site:pypi.org",
+   "Source: itsdangerous/pyproject.toml at main \u00b7 pallets/itsdangerous \u00b7 GitHub \u2014 https://github.com/pallets/itsdangerous/blob/main/pyproject.toml",
+   "Source: itsdangerous \u00b7 PyPI \u2014 https://pypi.org/project/itsdangerous/",
+   "Source: Releases \u00b7 pallets/itsdangerous \u00b7 GitHub \u2014 https://github.com/pallets/itsdangerous/releases",
+   "Source: itsdangerous/CHANGES.rst at main \u00b7 pallets/itsdangerous \u00b7 GitHub \u2014 https://github.com/pallets/itsdangerous/blob/main/CHANGES.rst",
+   "Source: itsdangerous/src/itsdangerous/__init__.py at main \u00b7 pallets/itsdangerous \u00b7 GitHub \u2014 https://github.com/pallets/itsdangerous/blob/main/src/itsdangerous/__init__.py",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: install freezegun (listed in the tests extra) on main and pr.",
+   "Setup plan: install pytest (listed in the tests extra) on main and pr.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >=3.10, >=3.8",
+   "Installed freezegun 1.5.5 from pyproject (listed in the tests extra) on main and pr.",
+   "Installed pytest 9.2.0 from pyproject (listed in the tests extra) on main and pr."
+  ],
+  "install_docs": [
+   "README.md",
+   "pyproject.toml",
+   "docs/Makefile",
+   ".github/workflows/pre-commit.yaml",
+   ".github/workflows/publish.yaml",
+   ".github/workflows/tests.yaml",
+   ".github/workflows/lock.yaml"
+  ],
+  "install_docs_from": "main",
+  "setup_plan": {
+   "packages": [
+    {
+     "requirement": "freezegun",
+     "name": "freezegun",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the tests extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest",
+     "name": "pytest",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the tests extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    }
+   ],
+   "scope_blocked": "",
+   "component": null,
+   "aggregate_names": [],
+   "extra_reqs": [
+    "freezegun",
+    "pytest"
+   ],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >=3.10, >=3.8"
+   },
+   "system": [],
+   "refused": [],
+   "groups_blocked": ""
+  },
+  "steps": {
+   "setup_lookup": "Found 2 setup item(s) in the project's files and the web lookup.",
+   "setup_python": "Python 3.12: Python 3.12 already meets >=3.10, >=3.8",
+   "install_deps": "Wrote requirements.txt and installed it on main and pr: freezegun, pytest."
+  },
+  "run_files": {
+   "requirements": "requirements.txt",
+   "plan": "setup-plan.json",
+   "count": 2
+  },
+  "installs": [
+   {
+    "package": "freezegun",
+    "requirement": "freezegun",
+    "version": "1.5.5",
+    "versions": {
+     "main": "1.5.5",
+     "pr": "1.5.5"
+    },
+    "source": "pyproject",
+    "reason": "listed in the tests extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "pytest",
+    "requirement": "pytest",
+    "version": "9.2.0",
+    "versions": {
+     "main": "9.2.0",
+     "pr": "9.2.0"
+    },
+    "source": "pyproject",
+    "reason": "listed in the tests extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   }
+  ]
+ },
+ "sides": {
+  "comparison_basis": "base tip vs GitHub test merge (refs/pull/N/merge)",
+  "main_sha": "672971d66a2ef9f85151e53283113f33d642dabd",
+  "pr_sha": "08c336cc549ea319f92abf254667c8e6c7789f9f",
+  "merge_commit": "08c336cc549ea319f92abf254667c8e6c7789f9f",
+  "merge_parents": [
+   "672971d66a2ef9f85151e53283113f33d642dabd",
+   "d9f3b250e0cac90529e9dd2c6806d4f9d46901fb"
+  ],
+  "merge_head_matches_pinned_head": true
+ },
+ "tested": {
+  "main": "main @ 672971d66a2e (base tip = first parent of the merge commit)",
+  "pr": "GitHub test merge commit 08c336cc549e (refs/pull/428/merge) of head d9f3b250e0ca"
+ },
+ "probe_plan": {
+  "baseline": "full",
+  "model": "model provider: nebius (Token Factory, live)",
+  "errors": [],
+  "model_claims": [
+   {
+    "id": "C1",
+    "text": "On Python 3.15+, urlsafe_b64decode requires proper padding and will reject inputs without it.",
+    "source_quote": "require padding when decoding base64 on Python 3.15+",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C2",
+    "text": "urlsafe_b64decode will raise BadData for malformed input lacking padding on Python 3.15+.",
+    "source_quote": "in order to fix raising `BadData` in some cases of malformed input",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C3",
+    "text": "The PR resolves the test failures in the 'bad payload' tests when using zlib-ng as the compression library.",
+    "source_quote": "This fixes the test failures in \"bad payload\" tests that incidentally surface when using zlib-ng as the compression library.",
+    "testable": true,
+    "expect": "differs"
+   }
+  ],
+  "model_rejected_claims": [],
+  "model_retried": {
+   "why": [
+    "no probe listed the claim ids it checks, so its results could not be tied to any claim; in each probe, \"claims\" must name the claim ids it checks and the observation names that cover them"
+   ],
+   "kept_first_answer": "the retry linked no claim either"
+  },
+  "model_claims_filled": [
+   {
+    "id": "p1",
+    "claims": [
+     "C1"
+    ]
+   },
+   {
+    "id": "p2",
+    "claims": [
+     "C2"
+    ]
+   },
+   {
+    "id": "p3",
+    "claims": [
+     "C3"
+    ]
+   }
+  ],
+  "diff_targets": [
+   "itsdangerous.encoding.base64_decode"
+  ],
+  "frozen": [
+   {
+    "path": "model-probes/model-p1.py",
+    "source": "model",
+    "sha256": "8083a3ea26401bf7b456196e128e3008850b5d9958adc8cb9f0239b85d861f92",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-09T02:47:18.341646+00:00",
+    "inputs_sha256": "55726b9377b8192973a811024e955710e5c0f39d20f6b1dc1da3642ccbbee2a8",
+    "inputs": {
+     "title_chars": 52,
+     "body_chars": 306,
+     "base_files": {
+      "src/itsdangerous/encoding.py": "c304f3e6aff7ccb71a01dba793afef4a84adc06a9859edf4ed997f53ceda4453"
+     }
+    }
+   },
+   {
+    "path": "model-probes/model-p2.py",
+    "source": "model",
+    "sha256": "abdd75fab4f6c6b939f2a7b458d616ecce0fc008b137239229f857afd3cd5003",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-09T02:47:18.344576+00:00",
+    "inputs_sha256": "55726b9377b8192973a811024e955710e5c0f39d20f6b1dc1da3642ccbbee2a8",
+    "inputs": {
+     "title_chars": 52,
+     "body_chars": 306,
+     "base_files": {
+      "src/itsdangerous/encoding.py": "c304f3e6aff7ccb71a01dba793afef4a84adc06a9859edf4ed997f53ceda4453"
+     }
+    }
+   },
+   {
+    "path": "model-probes/model-p3.py",
+    "source": "model",
+    "sha256": "18a7fd50a02481ef3ccbea283e14c9f27f02b2eac7c3eb76a7e7d9b7a447b164",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-09T02:47:18.344713+00:00",
+    "inputs_sha256": "55726b9377b8192973a811024e955710e5c0f39d20f6b1dc1da3642ccbbee2a8",
+    "inputs": {
+     "title_chars": 52,
+     "body_chars": 306,
+     "base_files": {
+      "src/itsdangerous/encoding.py": "c304f3e6aff7ccb71a01dba793afef4a84adc06a9859edf4ed997f53ceda4453"
+     }
+    }
+   },
+   {
+    "path": "diff-probes/diff-api.py",
+    "source": "diff",
+    "sha256": "f3e1bb07f6c2282b481b2cf7b076a8dafa3a597a4f8d03a36cd0efbabfb6784d",
+    "generator": {
+     "kind": "diff",
+     "label": "diff (auto-derived from base-side code, model-free)",
+     "model": null,
+     "provider": null,
+     "provenance": "auto-derived",
+     "blind": false
+    },
+    "frozen_at": "2026-11-09T02:47:18.345680+00:00",
+    "inputs_sha256": "aeb543057f5c0fa8291546fa5547ad1be0437fa9a12ea5c40d82b622ac0ec564",
+    "inputs": {
+     "title_chars": 0,
+     "body_chars": 0,
+     "base_files": {
+      "src/itsdangerous/encoding.py": "c304f3e6aff7ccb71a01dba793afef4a84adc06a9859edf4ed997f53ceda4453"
+     }
+    }
+   }
+  ]
+ },
+ "test_extras": [],
+ "pr_side_started_at": "2026-11-09T02:47:18.481455+00:00",
+ "test_targets": {
+  "main": [
+   "tests/test_itsdangerous/test_encoding.py"
+  ],
+  "pr": [
+   "tests/test_itsdangerous/test_encoding.py"
+  ]
+ },
+ "installed_commit": {
+  "main": {
+   "dist": "itsdangerous",
+   "expected": "672971d66a2ef9f85151e53283113f33d642dabd",
+   "installed": "672971d66a2ef9f85151e53283113f33d642dabd",
+   "ok": true
+  },
+  "pr": {
+   "dist": "itsdangerous",
+   "expected": "08c336cc549ea319f92abf254667c8e6c7789f9f",
+   "installed": "08c336cc549ea319f92abf254667c8e6c7789f9f",
+   "ok": true
+  }
+ },
+ "base_head_sha": "672971d66a2ef9f85151e53283113f33d642dabd",
+ "comparison": {
+  "same": 8,
+  "same_skipped_both": 0,
+  "regressions": [],
+  "fixed": [],
+  "new_tests_passing": 0,
+  "new_tests_passing_ids": [],
+  "new_tests_failing": [],
+  "new_tests_skipped": [],
+  "removed_tests": [],
+  "reparametrized": [],
+  "skipped_missing_dependency": [],
+  "flaky": [],
+  "pr_unstable": [],
+  "pr_unstable_noisy": [],
+  "environment": [],
+  "other_changes": [],
+  "preexisting_failures": [],
+  "load_failed_both": [],
+  "load_failed_pr": [],
+  "load_failed_main": [],
+  "executed": {
+   "main": 8,
+   "pr": 8
+  },
+  "messages": {}
+ },
+ "exit_check": {
+  "explained": true,
+  "problems": [],
+  "detail": "all runs exited 0"
+ },
+ "probes": {
+  "status": "ran",
+  "items": [
+   {
+    "id": "model-p1",
+    "source": "model",
+    "path": "model-probes/model-p1.py",
+    "sha256": "8083a3ea26401bf7b456196e128e3008850b5d9958adc8cb9f0239b85d861f92",
+    "target": "pallets/itsdangerous#428",
+    "about": "base64_decode padding requirement",
+    "claims": [
+     {
+      "id": "C1",
+      "source": "PR description",
+      "text": "On Python 3.15+, urlsafe_b64decode requires proper padding and will reject inputs without it.",
+      "covers": [
+       "c1.*"
+      ],
+      "expect": "differs"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.0,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-p1-main-1.jsonl",
+      "probe-model-p1-main-2.jsonl",
+      "probe-model-p1-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-p1-pr-1.jsonl",
+      "probe-model-p1-pr-2.jsonl",
+      "probe-model-p1-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "c1.unpadded_valid": "abc",
+       "c1.padded_valid": "abc"
+      },
+      {
+       "c1.unpadded_valid": "abc",
+       "c1.padded_valid": "abc"
+      },
+      {
+       "c1.unpadded_valid": "abc",
+       "c1.padded_valid": "abc"
+      }
+     ],
+     "pr": [
+      {
+       "c1.unpadded_valid": "abc",
+       "c1.padded_valid": "abc"
+      },
+      {
+       "c1.unpadded_valid": "abc",
+       "c1.padded_valid": "abc"
+      },
+      {
+       "c1.unpadded_valid": "abc",
+       "c1.padded_valid": "abc"
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "c1.padded_valid",
+      "state": "same",
+      "label": "needs_human",
+      "claim": "C1",
+      "main": "abc",
+      "pr": "abc",
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c1.padded_valid\""
+       },
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c1.padded_valid\""
+       }
+      }
+     },
+     {
+      "name": "c1.unpadded_valid",
+      "state": "same",
+      "label": "needs_human",
+      "claim": "C1",
+      "main": "abc",
+      "pr": "abc",
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c1.unpadded_valid\""
+       },
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c1.unpadded_valid\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "8083a3ea26401bf7b456196e128e3008850b5d9958adc8cb9f0239b85d861f92",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-09T02:47:18.341646+00:00",
+     "inputs_sha256": "55726b9377b8192973a811024e955710e5c0f39d20f6b1dc1da3642ccbbee2a8",
+     "inputs": {
+      "title_chars": 52,
+      "body_chars": 306,
+      "base_files": {
+       "src/itsdangerous/encoding.py": "c304f3e6aff7ccb71a01dba793afef4a84adc06a9859edf4ed997f53ceda4453"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-09T02:47:18.481455+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 3,
+     "changed_lines_covered": 3,
+     "files": [
+      {
+       "file": "src/itsdangerous/encoding.py",
+       "changed_lines_total": 3,
+       "changed_lines_covered": 3
+      }
+     ],
+     "adequacy": "adequate",
+     "note": "ran 3 of 3 changed line(s) on the main side",
+     "exit": 0,
+     "data": "probe-cov-model-p1.json"
+    },
+    "status": "ran"
+   },
+   {
+    "id": "model-p2",
+    "source": "model",
+    "path": "model-probes/model-p2.py",
+    "sha256": "abdd75fab4f6c6b939f2a7b458d616ecce0fc008b137239229f857afd3cd5003",
+    "target": "pallets/itsdangerous#428",
+    "about": "base64_decode BadData on malformed input lacking padding",
+    "claims": [
+     {
+      "id": "C2",
+      "source": "PR description",
+      "text": "urlsafe_b64decode will raise BadData for malformed input lacking padding on Python 3.15+.",
+      "covers": [
+       "c2.*"
+      ],
+      "expect": "differs"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.0,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-p2-main-1.jsonl",
+      "probe-model-p2-main-2.jsonl",
+      "probe-model-p2-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-p2-pr-1.jsonl",
+      "probe-model-p2-pr-2.jsonl",
+      "probe-model-p2-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "c2.malformed_no_padding": "BadData"
+      },
+      {
+       "c2.malformed_no_padding": "BadData"
+      },
+      {
+       "c2.malformed_no_padding": "BadData"
+      }
+     ],
+     "pr": [
+      {
+       "c2.malformed_no_padding": "BadData"
+      },
+      {
+       "c2.malformed_no_padding": "BadData"
+      },
+      {
+       "c2.malformed_no_padding": "BadData"
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "c2.malformed_no_padding",
+      "state": "same",
+      "label": "needs_human",
+      "claim": "C2",
+      "main": "BadData",
+      "pr": "BadData",
+      "citations": {
+       "main": {
+        "file": "probe-model-p2-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c2.malformed_no_padding\""
+       },
+       "pr": {
+        "file": "probe-model-p2-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c2.malformed_no_padding\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "abdd75fab4f6c6b939f2a7b458d616ecce0fc008b137239229f857afd3cd5003",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-09T02:47:18.344576+00:00",
+     "inputs_sha256": "55726b9377b8192973a811024e955710e5c0f39d20f6b1dc1da3642ccbbee2a8",
+     "inputs": {
+      "title_chars": 52,
+      "body_chars": 306,
+      "base_files": {
+       "src/itsdangerous/encoding.py": "c304f3e6aff7ccb71a01dba793afef4a84adc06a9859edf4ed997f53ceda4453"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-09T02:47:18.481455+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 3,
+     "changed_lines_covered": 3,
+     "files": [
+      {
+       "file": "src/itsdangerous/encoding.py",
+       "changed_lines_total": 3,
+       "changed_lines_covered": 3
+      }
+     ],
+     "adequacy": "adequate",
+     "note": "ran 3 of 3 changed line(s) on the main side",
+     "exit": 0,
+     "data": "probe-cov-model-p2.json"
+    },
+    "status": "ran"
+   },
+   {
+    "id": "model-p3",
+    "source": "model",
+    "path": "model-probes/model-p3.py",
+    "sha256": "18a7fd50a02481ef3ccbea283e14c9f27f02b2eac7c3eb76a7e7d9b7a447b164",
+    "target": "pallets/itsdangerous#428",
+    "about": "base64_decode behavior for empty and invalid padded inputs",
+    "claims": [
+     {
+      "id": "C3",
+      "source": "PR description",
+      "text": "The PR resolves the test failures in the 'bad payload' tests when using zlib-ng as the compression library.",
+      "covers": [
+       "c3.*"
+      ],
+      "expect": "differs"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.0,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.0,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-p3-main-1.jsonl",
+      "probe-model-p3-main-2.jsonl",
+      "probe-model-p3-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-p3-pr-1.jsonl",
+      "probe-model-p3-pr-2.jsonl",
+      "probe-model-p3-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "c3.empty_input": "",
+       "c3.invalid_char_padded": "ab"
+      },
+      {
+       "c3.empty_input": "",
+       "c3.invalid_char_padded": "ab"
+      },
+      {
+       "c3.empty_input": "",
+       "c3.invalid_char_padded": "ab"
+      }
+     ],
+     "pr": [
+      {
+       "c3.empty_input": "",
+       "c3.invalid_char_padded": "ab"
+      },
+      {
+       "c3.empty_input": "",
+       "c3.invalid_char_padded": "ab"
+      },
+      {
+       "c3.empty_input": "",
+       "c3.invalid_char_padded": "ab"
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "c3.empty_input",
+      "state": "same",
+      "label": "needs_human",
+      "claim": "C3",
+      "main": "",
+      "pr": "",
+      "citations": {
+       "main": {
+        "file": "probe-model-p3-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c3.empty_input\""
+       },
+       "pr": {
+        "file": "probe-model-p3-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c3.empty_input\""
+       }
+      }
+     },
+     {
+      "name": "c3.invalid_char_padded",
+      "state": "same",
+      "label": "needs_human",
+      "claim": "C3",
+      "main": "ab",
+      "pr": "ab",
+      "citations": {
+       "main": {
+        "file": "probe-model-p3-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c3.invalid_char_padded\""
+       },
+       "pr": {
+        "file": "probe-model-p3-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c3.invalid_char_padded\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "18a7fd50a02481ef3ccbea283e14c9f27f02b2eac7c3eb76a7e7d9b7a447b164",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-09T02:47:18.344713+00:00",
+     "inputs_sha256": "55726b9377b8192973a811024e955710e5c0f39d20f6b1dc1da3642ccbbee2a8",
+     "inputs": {
+      "title_chars": 52,
+      "body_chars": 306,
+      "base_files": {
+       "src/itsdangerous/encoding.py": "c304f3e6aff7ccb71a01dba793afef4a84adc06a9859edf4ed997f53ceda4453"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-09T02:47:18.481455+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 3,
+     "changed_lines_covered": 3,
+     "files": [
+      {
+       "file": "src/itsdangerous/encoding.py",
+       "changed_lines_total": 3,
+       "changed_lines_covered": 3
+      }
+     ],
+     "adequacy": "adequate",
+     "note": "ran 3 of 3 changed line(s) on the main side",
+     "exit": 0,
+     "data": "probe-cov-model-p3.json"
+    },
+    "status": "ran"
+   },
+   {
+    "id": "diff-api",
+    "source": "diff",
+    "path": "diff-probes/diff-api.py",
+    "sha256": "f3e1bb07f6c2282b481b2cf7b076a8dafa3a597a4f8d03a36cd0efbabfb6784d",
+    "target": "pallets/itsdangerous#428",
+    "about": "Public functions touched by the PR, called with type-appropriate inputs on both sides.",
+    "claims": [],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-diff-api-main-1.jsonl",
+      "probe-diff-api-main-2.jsonl",
+      "probe-diff-api-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-diff-api-pr-1.jsonl",
+      "probe-diff-api-pr-2.jsonl",
+      "probe-diff-api-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "itsdangerous.encoding.base64_decode.input0": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input1": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input10": {
+        "raises": "BadData"
+       },
+       "itsdangerous.encoding.base64_decode.input11": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input2": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input3": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input4": {
+        "repr": "b'i\\xb7'",
+        "type": "bytes"
+       },
+       "itsdangerous.encoding.base64_decode.input5": {
+        "raises": "BadData"
+       },
+       "itsdangerous.encoding.base64_decode.input6": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input7": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input8": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input9": {
+        "repr": "b''",
+        "type": "bytes"
+       }
+      },
+      {
+       "itsdangerous.encoding.base64_decode.input0": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input1": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input10": {
+        "raises": "BadData"
+       },
+       "itsdangerous.encoding.base64_decode.input11": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input2": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input3": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input4": {
+        "repr": "b'i\\xb7'",
+        "type": "bytes"
+       },
+       "itsdangerous.encoding.base64_decode.input5": {
+        "raises": "BadData"
+       },
+       "itsdangerous.encoding.base64_decode.input6": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input7": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input8": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input9": {
+        "repr": "b''",
+        "type": "bytes"
+       }
+      },
+      {
+       "itsdangerous.encoding.base64_decode.input0": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input1": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input10": {
+        "raises": "BadData"
+       },
+       "itsdangerous.encoding.base64_decode.input11": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input2": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input3": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input4": {
+        "repr": "b'i\\xb7'",
+        "type": "bytes"
+       },
+       "itsdangerous.encoding.base64_decode.input5": {
+        "raises": "BadData"
+       },
+       "itsdangerous.encoding.base64_decode.input6": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input7": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input8": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input9": {
+        "repr": "b''",
+        "type": "bytes"
+       }
+      }
+     ],
+     "pr": [
+      {
+       "itsdangerous.encoding.base64_decode.input0": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input1": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input10": {
+        "raises": "BadData"
+       },
+       "itsdangerous.encoding.base64_decode.input11": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input2": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input3": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input4": {
+        "repr": "b'i\\xb7'",
+        "type": "bytes"
+       },
+       "itsdangerous.encoding.base64_decode.input5": {
+        "raises": "BadData"
+       },
+       "itsdangerous.encoding.base64_decode.input6": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input7": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input8": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input9": {
+        "repr": "b''",
+        "type": "bytes"
+       }
+      },
+      {
+       "itsdangerous.encoding.base64_decode.input0": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input1": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input10": {
+        "raises": "BadData"
+       },
+       "itsdangerous.encoding.base64_decode.input11": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input2": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input3": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input4": {
+        "repr": "b'i\\xb7'",
+        "type": "bytes"
+       },
+       "itsdangerous.encoding.base64_decode.input5": {
+        "raises": "BadData"
+       },
+       "itsdangerous.encoding.base64_decode.input6": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input7": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input8": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input9": {
+        "repr": "b''",
+        "type": "bytes"
+       }
+      },
+      {
+       "itsdangerous.encoding.base64_decode.input0": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input1": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input10": {
+        "raises": "BadData"
+       },
+       "itsdangerous.encoding.base64_decode.input11": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input2": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input3": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input4": {
+        "repr": "b'i\\xb7'",
+        "type": "bytes"
+       },
+       "itsdangerous.encoding.base64_decode.input5": {
+        "raises": "BadData"
+       },
+       "itsdangerous.encoding.base64_decode.input6": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input7": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input8": {
+        "raises": "TypeError"
+       },
+       "itsdangerous.encoding.base64_decode.input9": {
+        "repr": "b''",
+        "type": "bytes"
+       }
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "itsdangerous.encoding.base64_decode.input0",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"itsdangerous.encoding.base64_decode.input0\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"itsdangerous.encoding.base64_decode.input0\""
+       }
+      }
+     },
+     {
+      "name": "itsdangerous.encoding.base64_decode.input1",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"itsdangerous.encoding.base64_decode.input1\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"itsdangerous.encoding.base64_decode.input1\""
+       }
+      }
+     },
+     {
+      "name": "itsdangerous.encoding.base64_decode.input10",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "BadData"
+      },
+      "pr": {
+       "raises": "BadData"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"itsdangerous.encoding.base64_decode.input10\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"itsdangerous.encoding.base64_decode.input10\""
+       }
+      }
+     },
+     {
+      "name": "itsdangerous.encoding.base64_decode.input11",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"itsdangerous.encoding.base64_decode.input11\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"itsdangerous.encoding.base64_decode.input11\""
+       }
+      }
+     },
+     {
+      "name": "itsdangerous.encoding.base64_decode.input2",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"itsdangerous.encoding.base64_decode.input2\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"itsdangerous.encoding.base64_decode.input2\""
+       }
+      }
+     },
+     {
+      "name": "itsdangerous.encoding.base64_decode.input3",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"itsdangerous.encoding.base64_decode.input3\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"itsdangerous.encoding.base64_decode.input3\""
+       }
+      }
+     },
+     {
+      "name": "itsdangerous.encoding.base64_decode.input4",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": {
+       "repr": "b'i\\xb7'",
+       "type": "bytes"
+      },
+      "pr": {
+       "repr": "b'i\\xb7'",
+       "type": "bytes"
+      },
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 7,
+        "quote": "\"observation\": \"itsdangerous.encoding.base64_decode.input4\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 7,
+        "quote": "\"observation\": \"itsdangerous.encoding.base64_decode.input4\""
+       }
+      }
+     },
+     {
+      "name": "itsdangerous.encoding.base64_decode.input5",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "BadData"
+      },
+      "pr": {
+       "raises": "BadData"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 8,
+        "quote": "\"observation\": \"itsdangerous.encoding.base64_decode.input5\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 8,
+        "quote": "\"observation\": \"itsdangerous.encoding.base64_decode.input5\""
+       }
+      }
+     },
+     {
+      "name": "itsdangerous.encoding.base64_decode.input6",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 9,
+        "quote": "\"observation\": \"itsdangerous.encoding.base64_decode.input6\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 9,
+        "quote": "\"observation\": \"itsdangerous.encoding.base64_decode.input6\""
+       }
+      }
+     },
+     {
+      "name": "itsdangerous.encoding.base64_decode.input7",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 10,
+        "quote": "\"observation\": \"itsdangerous.encoding.base64_decode.input7\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 10,
+        "quote": "\"observation\": \"itsdangerous.encoding.base64_decode.input7\""
+       }
+      }
+     },
+     {
+      "name": "itsdangerous.encoding.base64_decode.input8",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 11,
+        "quote": "\"observation\": \"itsdangerous.encoding.base64_decode.input8\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 11,
+        "quote": "\"observation\": \"itsdangerous.encoding.base64_decode.input8\""
+       }
+      }
+     },
+     {
+      "name": "itsdangerous.encoding.base64_decode.input9",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": {
+       "repr": "b''",
+       "type": "bytes"
+      },
+      "pr": {
+       "repr": "b''",
+       "type": "bytes"
+      },
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 12,
+        "quote": "\"observation\": \"itsdangerous.encoding.base64_decode.input9\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 12,
+        "quote": "\"observation\": \"itsdangerous.encoding.base64_decode.input9\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "diff",
+     "label": "diff (auto-derived from base-side code, model-free)",
+     "model": null,
+     "provider": null,
+     "provenance": "auto-derived",
+     "blind": false
+    },
+    "freeze": {
+     "sha256": "f3e1bb07f6c2282b481b2cf7b076a8dafa3a597a4f8d03a36cd0efbabfb6784d",
+     "generator": {
+      "kind": "diff",
+      "label": "diff (auto-derived from base-side code, model-free)",
+      "model": null,
+      "provider": null,
+      "provenance": "auto-derived",
+      "blind": false
+     },
+     "frozen_at": "2026-11-09T02:47:18.345680+00:00",
+     "inputs_sha256": "aeb543057f5c0fa8291546fa5547ad1be0437fa9a12ea5c40d82b622ac0ec564",
+     "inputs": {
+      "title_chars": 0,
+      "body_chars": 0,
+      "base_files": {
+       "src/itsdangerous/encoding.py": "c304f3e6aff7ccb71a01dba793afef4a84adc06a9859edf4ed997f53ceda4453"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-09T02:47:18.481455+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 3,
+     "changed_lines_covered": 3,
+     "files": [
+      {
+       "file": "src/itsdangerous/encoding.py",
+       "changed_lines_total": 3,
+       "changed_lines_covered": 3
+      }
+     ],
+     "adequacy": "adequate",
+     "note": "ran 3 of 3 changed line(s) on the main side",
+     "exit": 0,
+     "data": "probe-cov-diff-api.json"
+    },
+    "status": "ran"
+   }
+  ],
+  "summary": {
+   "labels": [
+    "needs_human",
+    "needs_human",
+    "needs_human",
+    "needs_human",
+    "needs_human",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "no_difference",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "no_difference"
+   ],
+   "flagged": [
+    {
+     "probe": "model-p1",
+     "name": "c1.padded_valid",
+     "label": "needs_human",
+     "claim": "C1"
+    },
+    {
+     "probe": "model-p1",
+     "name": "c1.unpadded_valid",
+     "label": "needs_human",
+     "claim": "C1"
+    },
+    {
+     "probe": "model-p2",
+     "name": "c2.malformed_no_padding",
+     "label": "needs_human",
+     "claim": "C2"
+    },
+    {
+     "probe": "model-p3",
+     "name": "c3.empty_input",
+     "label": "needs_human",
+     "claim": "C3"
+    },
+    {
+     "probe": "model-p3",
+     "name": "c3.invalid_char_padded",
+     "label": "needs_human",
+     "claim": "C3"
+    }
+   ],
+   "proven_claims": [],
+   "reason": "probe: 5 observation(s) need attention: c1.padded_valid does not differ although the claim says it does (C1); c1.unpadded_valid does not differ although the claim says it does (C1); c2.malformed_no_padding does not differ although the claim says it does (C2); c3.empty_input does not differ although the claim says it does (C3); probe: 2 other observation(s) identical on both sides; probe: 10 probe(s) could not run on either side",
+   "ignored_noise": [],
+   "ignored_warning_only": [],
+   "pr_only_noisy": [],
+   "advisory_unchanged_subchecks": [],
+   "advisory_agreeing_differs": [],
+   "advisory_invalid_preservation": []
+  }
+ },
+ "probe_changed_line_coverage": {
+  "status": "measured",
+  "side": "main",
+  "probes": {
+   "model-p1": {
+    "status": "measured",
+    "changed_lines_covered": 3,
+    "changed_lines_total": 3,
+    "adequacy": "adequate"
+   },
+   "model-p2": {
+    "status": "measured",
+    "changed_lines_covered": 3,
+    "changed_lines_total": 3,
+    "adequacy": "adequate"
+   },
+   "model-p3": {
+    "status": "measured",
+    "changed_lines_covered": 3,
+    "changed_lines_total": 3,
+    "adequacy": "adequate"
+   },
+   "diff-api": {
+    "status": "measured",
+    "changed_lines_covered": 3,
+    "changed_lines_total": 3,
+    "adequacy": "adequate"
+   }
+  },
+  "not_adequate": []
+ },
+ "verdict": "needs_attention",
+ "reason": "probe: 5 observation(s) need attention: c1.padded_valid does not differ although the claim says it does (C1); c1.unpadded_valid does not differ although the claim says it does (C1); c2.malformed_no_padding does not differ although the claim says it does (C2); c3.empty_input does not differ although the claim says it does (C3); tests: 8 test(s) ran on main, 8 on the PR; 0 new test(s) pass, 8 unchanged",
+ "verdict_before_coverage_gate": "needs_attention",
+ "reason_before_coverage_gate": "probe: 5 observation(s) need attention: c1.padded_valid does not differ although the claim says it does (C1); c1.unpadded_valid does not differ although the claim says it does (C1); c2.malformed_no_padding does not differ although the claim says it does (C2); c3.empty_input does not differ although the claim says it does (C3); tests: 8 test(s) ran on main, 8 on the PR; 0 new test(s) pass, 8 unchanged",
+ "changed_lines_total": 4,
+ "changed_lines_covered": 3,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "normal",
+  "note": "3 of 4 changed executable line(s) ran (75%)",
+  "measurement": "measured"
+ },
+ "agents": {
+  "status": "skipped",
+  "note": "advisory swarm is off",
+  "roles": []
+ },
+ "explanation": {
+  "status": "not yet wired",
+  "why": "advisory swarm is off"
+ },
+ "swarm_requested": false,
+ "operator_approval_requested": false,
+ "swarm": "off",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [
+   "src/itsdangerous/encoding.py"
+  ],
+  "compiled_files": [],
+  "other_files": [
+   "CHANGES.rst"
+  ]
+ },
+ "duration_s": {
+  "total_wall": 98.4,
+  "tests": 5.6
+ },
+ "cost": {
+  "ai_calls": 3,
+  "failed_ai_calls": 0,
+  "input_tokens": 2790,
+  "output_tokens": 9449,
+  "thinking_tokens": 8502,
+  "cost_usd": 0.009341,
+  "calls_without_usage": 0,
+  "ai_cost_usd": 0.009341,
+  "cost_complete": true,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 98.4,
+   "tests": 5.6
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.00656,
+  "total_cost_usd": 0.015901,
+  "swarm": {
+   "ai_calls": 0,
+   "failed_ai_calls": 0,
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "thinking_tokens": 0,
+   "cost_usd": 0.0,
+   "calls_without_usage": 0,
+   "ai_cost_usd": 0.0,
+   "cost_complete": true,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ },
+ "pdf_push": {
+  "ok": true,
+  "attempts": 1,
+  "error": null,
+  "url": "https://github.com/aritracodesbad123/Proof-of-change/tree/runs/runs/2026-11-09/ef12096/itsdangerous-428"
+ }
+}
