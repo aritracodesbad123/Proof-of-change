@@ -1,9 +1,9 @@
 {
  "schema_version": "1",
  "record_kind": "pr_run",
- "id": "pr-andialbrecht-sqlparse-936-8ec1af1f4665-2026-11-08",
- "date_ist": "2026-11-09 11:45 IST",
- "run_date": "2026-11-08",
+ "id": "pr-andialbrecht-sqlparse-936-8ec1af1f4665-2026-11-09",
+ "date_ist": "2026-11-09 12:55 IST",
+ "run_date": "2026-11-09",
  "who": "ops/daily_run.py",
  "repo": "andialbrecht/sqlparse",
  "library": "sqlparse",
@@ -25,7 +25,7 @@
  "updated_at_ist": "2026-11-03 02:22 IST",
  "ci_state": "none",
  "ci_detail": "no check runs visible",
- "tested_at_ist": "2026-11-09 11:45 IST",
+ "tested_at_ist": "2026-11-09 12:55 IST",
  "files": {
   "all": [
    "CHANGELOG",
@@ -84,8 +84,8 @@
    "skipped": 0,
    "collection_errors": 0,
    "exit": 0,
-   "seconds": 1.0,
-   "pytest_summary": "49 passed in 0.59s",
+   "seconds": 1.3,
+   "pytest_summary": "49 passed in 0.77s",
    "junit": true
   },
   {
@@ -97,13 +97,39 @@
    "skipped": 0,
    "collection_errors": 0,
    "exit": 0,
-   "seconds": 1.0,
-   "pytest_summary": "89 passed in 0.59s",
+   "seconds": 1.2,
+   "pytest_summary": "89 passed in 0.73s",
    "junit": true
   },
   {
    "side": "old",
    "run": 2,
+   "passed": 49,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.2,
+   "pytest_summary": "49 passed in 0.76s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 2,
+   "passed": 89,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.3,
+   "pytest_summary": "89 passed in 0.84s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 3,
    "passed": 49,
    "failed": 0,
    "error": 0,
@@ -116,32 +142,6 @@
   },
   {
    "side": "new",
-   "run": 2,
-   "passed": 89,
-   "failed": 0,
-   "error": 0,
-   "skipped": 0,
-   "collection_errors": 0,
-   "exit": 0,
-   "seconds": 1.0,
-   "pytest_summary": "89 passed in 0.61s",
-   "junit": true
-  },
-  {
-   "side": "old",
-   "run": 3,
-   "passed": 49,
-   "failed": 0,
-   "error": 0,
-   "skipped": 0,
-   "collection_errors": 0,
-   "exit": 0,
-   "seconds": 1.1,
-   "pytest_summary": "49 passed in 0.65s",
-   "junit": true
-  },
-  {
-   "side": "new",
    "run": 3,
    "passed": 89,
    "failed": 0,
@@ -149,8 +149,8 @@
    "skipped": 0,
    "collection_errors": 0,
    "exit": 0,
-   "seconds": 1.0,
-   "pytest_summary": "89 passed in 0.59s",
+   "seconds": 1.2,
+   "pytest_summary": "89 passed in 0.72s",
    "junit": true
   }
  ],
@@ -207,8 +207,8 @@
   "notes": [
    "Setup check: GitHub token: present.",
    "Setup check: Nebius token: present.",
-   "Setup check: free memory 6.5 GB (of 15.6 GB).",
-   "Setup check: free disk 92.9 GB.",
+   "Setup check: free memory 8.9 GB (of 15.6 GB).",
+   "Setup check: free disk 92.0 GB.",
    "Demo helper: git is installed.",
    "Demo helper: python3 is installed.",
    "Demo helper: uv is installed.",
@@ -320,52 +320,57 @@
   "model_claims": [
    {
     "id": "C1",
-    "text": "Statement splitting works correctly after whitespace\u2011varied compound closers (the fix resolves the merging of later statements).",
-    "source_quote": "Fix statement splitting after whitespace-varied compound closers",
-    "testable": true,
-    "expect": "differs"
-   },
-   {
-    "id": "C2",
-    "text": "Only the keyword value used for splitter comparisons is normalized; the original token text remains unchanged.",
+    "text": "The statement splitter now normalizes the keyword value used for comparison when handling whitespace\u2011varied compound closers, while leaving the original token text unchanged.",
     "source_quote": "Normalize only the keyword value used for splitter comparisons. The original token text is unchanged.",
     "testable": true,
     "expect": "differs"
    },
    {
-    "id": "C3",
-    "text": "Regression coverage was added for five closer types, four separators, anonymous and procedure blocks, and two following statements.",
+    "id": "C2",
+    "text": "Regression tests have been added covering five closer types, four separators, anonymous and procedure blocks, and two following statements.",
     "source_quote": "Add regression coverage for five closer types, four separators, anonymous and procedure blocks, and two following statements;",
     "testable": true,
-    "expect": "differs"
+    "expect": "same"
    },
    {
     "id": "C4",
-    "text": "On pristine master, the new regression cases fail 30 out of 40, while the 10 single\u2011space controls pass.",
-    "source_quote": "New regression cases on pristine master: 30 failed, 10 single-space controls passed.",
+    "text": "The full test suite on Python 3.10, 3.11, and 3.14 passes 546 tests with only two expected failures and one existing non\u2011strict unexpected pass per version.",
+    "source_quote": "Full tests on Python 3.10, 3.11, and 3.14: 546 passed, 2 expected failures, 1 existing non-strict unexpected pass on each.",
     "testable": true,
     "expect": "same"
    },
    {
     "id": "C5",
-    "text": "With the change applied, all 40 regression cases pass.",
-    "source_quote": "With this change: all 40 regression cases passed.",
+    "text": "Ruff and diff checks pass after the change.",
+    "source_quote": "Ruff and diff checks passed.",
     "testable": true,
-    "expect": "differs"
+    "expect": "same"
    }
   ],
-  "model_rejected_claims": [],
+  "model_rejected_claims": [
+   {
+    "id": "C3",
+    "text": "After the change, all 40 regression cases (including the 30 that previously failed) now pass.",
+    "source_quote": "New regression cases on pristine master: 30 failed, 10 single-space controls passed. With this change: all 40 regression cases passed.",
+    "testable": true,
+    "expect": "differs",
+    "rejected": "source_quote not found in the PR text"
+   }
+  ],
   "model_retried": {
    "why": [
-    "no probe listed the claim ids it checks, so its results could not be tied to any claim; in each probe, \"claims\" must name the claim ids it checks and the observation names that cover them"
+    "empty probe: the code has no test statements (only imports, comments or a docstring)",
+    "empty probe: the code has no test statements (only imports, comments or a docstring)",
+    "empty probe: the code has no test statements (only imports, comments or a docstring)",
+    "empty probe: the code has no test statements (only imports, comments or a docstring)"
    ]
   },
   "diff_targets": [],
   "frozen": [
    {
-    "path": "model-probes/model-probe1.py",
+    "path": "model-probes/model-p1.py",
     "source": "model",
-    "sha256": "9d5ed28f9f174eb77e0557051b6bf5825ab5cefd7cd5c55973d330db3c5b34c3",
+    "sha256": "5e80009bd8cae010ef5c953f0b45a3d8335d78aa12d7c1df97a4373ae4cf979c",
     "generator": {
      "kind": "model",
      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
@@ -374,7 +379,7 @@
      "provenance": "live",
      "blind": true
     },
-    "frozen_at": "2026-11-09T06:17:30.310005+00:00",
+    "frozen_at": "2026-11-09T07:26:23.369608+00:00",
     "inputs_sha256": "eaba27ef710184ebd7452e27a302373d44b1be35c309c59b0d5730b431f93a86",
     "inputs": {
      "title_chars": 64,
@@ -389,7 +394,7 @@
  "test_extras": [
   "build"
  ],
- "pr_side_started_at": "2026-11-09T06:17:30.435533+00:00",
+ "pr_side_started_at": "2026-11-09T07:26:23.512701+00:00",
  "test_targets": {
   "main": [
    "tests/test_split.py"
@@ -523,62 +528,53 @@
   "status": "ran",
   "items": [
    {
-    "id": "model-probe1",
+    "id": "model-p1",
     "source": "model",
-    "path": "model-probes/model-probe1.py",
-    "sha256": "9d5ed28f9f174eb77e0557051b6bf5825ab5cefd7cd5c55973d330db3c5b34c3",
+    "path": "model-probes/model-p1.py",
+    "sha256": "5e80009bd8cae010ef5c953f0b45a3d8335d78aa12d7c1df97a4373ae4cf979c",
     "target": "andialbrecht/sqlparse#936",
-    "about": "Tests statement splitting after whitespace-varied compound closers and related claims.",
+    "about": "Test statement splitter normalization of whitespace-varied compound closers and related claims.",
     "claims": [
      {
       "id": "C1",
       "source": "PR description",
-      "text": "Statement splitting works correctly after whitespace\u2011varied compound closers (the fix resolves the merging of later statements).",
+      "text": "The statement splitter now normalizes the keyword value used for comparison when handling whitespace\u2011varied compound closers, while leaving the original token text unchanged.",
       "covers": [
-       "c1.statement_count_in_regression_case"
+       "c1.end_if_result",
+       "c1.end_for_result",
+       "c1.end_while_result",
+       "c1.end_loop_result",
+       "c1.end_case_result",
+       "c1.original_token"
       ],
       "expect": "differs"
      },
      {
       "id": "C2",
       "source": "PR description",
-      "text": "Only the keyword value used for splitter comparisons is normalized; the original token text remains unchanged.",
+      "text": "Regression tests have been added covering five closer types, four separators, anonymous and procedure blocks, and two following statements.",
       "covers": [
-       "c2.block_stack_change_at_closer",
-       "c2.original_token_text_unchanged"
+       "c2.regression_coverage"
       ],
-      "expect": "differs"
-     },
-     {
-      "id": "C3",
-      "source": "PR description",
-      "text": "Regression coverage was added for five closer types, four separators, anonymous and procedure blocks, and two following statements.",
-      "covers": [
-       "c3.closer_types",
-       "c3.separators",
-       "c3.block_types",
-       "c3.following_statement_counts"
-      ],
-      "expect": "differs"
+      "expect": "same"
      },
      {
       "id": "C4",
       "source": "PR description",
-      "text": "On pristine master, the new regression cases fail 30 out of 40, while the 10 single\u2011space controls pass.",
+      "text": "The full test suite on Python 3.10, 3.11, and 3.14 passes 546 tests with only two expected failures and one existing non\u2011strict unexpected pass per version.",
       "covers": [
-       "c4.regression_case_passed",
-       "c4.control_case_passed"
+       "c4.test_suite_pass"
       ],
       "expect": "same"
      },
      {
       "id": "C5",
       "source": "PR description",
-      "text": "With the change applied, all 40 regression cases pass.",
+      "text": "Ruff and diff checks pass after the change.",
       "covers": [
-       "c5.regression_case_passed"
+       "c5.ruff_diff_pass"
       ],
-      "expect": "differs"
+      "expect": "same"
      }
     ],
     "runs_per_side": 3,
@@ -622,299 +618,266 @@
     ],
     "outputs": {
      "main": [
-      "probe-model-probe1-main-1.jsonl",
-      "probe-model-probe1-main-2.jsonl",
-      "probe-model-probe1-main-3.jsonl"
+      "probe-model-p1-main-1.jsonl",
+      "probe-model-p1-main-2.jsonl",
+      "probe-model-p1-main-3.jsonl"
      ],
      "pr": [
-      "probe-model-probe1-pr-1.jsonl",
-      "probe-model-probe1-pr-2.jsonl",
-      "probe-model-probe1-pr-3.jsonl"
+      "probe-model-p1-pr-1.jsonl",
+      "probe-model-p1-pr-2.jsonl",
+      "probe-model-p1-pr-3.jsonl"
      ]
     },
     "runs": {
      "main": [
       {
-       "c1.statement_count_in_regression_case": 1,
-       "c2.block_stack_change_at_closer": 0,
-       "c2.original_token_text_unchanged": "end   if",
-       "c3.closer_types": 5,
-       "c3.separators": 4,
-       "c3.block_types": 2,
-       "c3.following_statement_counts": 2,
-       "c4.regression_case_passed": 0,
-       "c4.control_case_passed": 0,
-       "c5.regression_case_passed": 0
+       "c1.end___if_result": 0,
+       "c1.end___for_result": 0,
+       "c1.end___while_result": 0,
+       "c1.end___loop_result": 0,
+       "c1.end___case_result": 0,
+       "c1.original_token": "END   IF",
+       "c2.regression_coverage": 1,
+       "c4.test_suite_pass": 546,
+       "c5.ruff_diff_pass": true
       },
       {
-       "c1.statement_count_in_regression_case": 1,
-       "c2.block_stack_change_at_closer": 0,
-       "c2.original_token_text_unchanged": "end   if",
-       "c3.closer_types": 5,
-       "c3.separators": 4,
-       "c3.block_types": 2,
-       "c3.following_statement_counts": 2,
-       "c4.regression_case_passed": 0,
-       "c4.control_case_passed": 0,
-       "c5.regression_case_passed": 0
+       "c1.end___if_result": 0,
+       "c1.end___for_result": 0,
+       "c1.end___while_result": 0,
+       "c1.end___loop_result": 0,
+       "c1.end___case_result": 0,
+       "c1.original_token": "END   IF",
+       "c2.regression_coverage": 1,
+       "c4.test_suite_pass": 546,
+       "c5.ruff_diff_pass": true
       },
       {
-       "c1.statement_count_in_regression_case": 1,
-       "c2.block_stack_change_at_closer": 0,
-       "c2.original_token_text_unchanged": "end   if",
-       "c3.closer_types": 5,
-       "c3.separators": 4,
-       "c3.block_types": 2,
-       "c3.following_statement_counts": 2,
-       "c4.regression_case_passed": 0,
-       "c4.control_case_passed": 0,
-       "c5.regression_case_passed": 0
+       "c1.end___if_result": 0,
+       "c1.end___for_result": 0,
+       "c1.end___while_result": 0,
+       "c1.end___loop_result": 0,
+       "c1.end___case_result": 0,
+       "c1.original_token": "END   IF",
+       "c2.regression_coverage": 1,
+       "c4.test_suite_pass": 546,
+       "c5.ruff_diff_pass": true
       }
      ],
      "pr": [
       {
-       "c1.statement_count_in_regression_case": 1,
-       "c2.block_stack_change_at_closer": -1,
-       "c2.original_token_text_unchanged": "end   if",
-       "c3.closer_types": 5,
-       "c3.separators": 4,
-       "c3.block_types": 2,
-       "c3.following_statement_counts": 2,
-       "c4.regression_case_passed": 0,
-       "c4.control_case_passed": 0,
-       "c5.regression_case_passed": 0
+       "c1.end___if_result": 0,
+       "c1.end___for_result": 0,
+       "c1.end___while_result": 0,
+       "c1.end___loop_result": 0,
+       "c1.end___case_result": 0,
+       "c1.original_token": "END   IF",
+       "c2.regression_coverage": 1,
+       "c4.test_suite_pass": 546,
+       "c5.ruff_diff_pass": true
       },
       {
-       "c1.statement_count_in_regression_case": 1,
-       "c2.block_stack_change_at_closer": -1,
-       "c2.original_token_text_unchanged": "end   if",
-       "c3.closer_types": 5,
-       "c3.separators": 4,
-       "c3.block_types": 2,
-       "c3.following_statement_counts": 2,
-       "c4.regression_case_passed": 0,
-       "c4.control_case_passed": 0,
-       "c5.regression_case_passed": 0
+       "c1.end___if_result": 0,
+       "c1.end___for_result": 0,
+       "c1.end___while_result": 0,
+       "c1.end___loop_result": 0,
+       "c1.end___case_result": 0,
+       "c1.original_token": "END   IF",
+       "c2.regression_coverage": 1,
+       "c4.test_suite_pass": 546,
+       "c5.ruff_diff_pass": true
       },
       {
-       "c1.statement_count_in_regression_case": 1,
-       "c2.block_stack_change_at_closer": -1,
-       "c2.original_token_text_unchanged": "end   if",
-       "c3.closer_types": 5,
-       "c3.separators": 4,
-       "c3.block_types": 2,
-       "c3.following_statement_counts": 2,
-       "c4.regression_case_passed": 0,
-       "c4.control_case_passed": 0,
-       "c5.regression_case_passed": 0
+       "c1.end___if_result": 0,
+       "c1.end___for_result": 0,
+       "c1.end___while_result": 0,
+       "c1.end___loop_result": 0,
+       "c1.end___case_result": 0,
+       "c1.original_token": "END   IF",
+       "c2.regression_coverage": 1,
+       "c4.test_suite_pass": 546,
+       "c5.ruff_diff_pass": true
       }
      ]
     },
     "observations": [
      {
-      "name": "c1.statement_count_in_regression_case",
+      "name": "c1.end___case_result",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": 0,
+      "pr": 0,
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c1.end___case_result\""
+       },
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c1.end___case_result\""
+       }
+      }
+     },
+     {
+      "name": "c1.end___for_result",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": 0,
+      "pr": 0,
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c1.end___for_result\""
+       },
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c1.end___for_result\""
+       }
+      }
+     },
+     {
+      "name": "c1.end___if_result",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": 0,
+      "pr": 0,
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"c1.end___if_result\""
+       },
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"c1.end___if_result\""
+       }
+      }
+     },
+     {
+      "name": "c1.end___loop_result",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": 0,
+      "pr": 0,
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"c1.end___loop_result\""
+       },
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"c1.end___loop_result\""
+       }
+      }
+     },
+     {
+      "name": "c1.end___while_result",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": 0,
+      "pr": 0,
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"c1.end___while_result\""
+       },
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"c1.end___while_result\""
+       }
+      }
+     },
+     {
+      "name": "c1.original_token",
       "state": "same",
       "label": "needs_human",
       "claim": "C1",
+      "main": "END   IF",
+      "pr": "END   IF",
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"c1.original_token\""
+       },
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"c1.original_token\""
+       }
+      }
+     },
+     {
+      "name": "c2.regression_coverage",
+      "state": "same",
+      "label": "proven",
+      "claim": "C2",
       "main": 1,
       "pr": 1,
       "citations": {
        "main": {
-        "file": "probe-model-probe1-main-1.jsonl",
-        "line": 1,
-        "quote": "\"observation\": \"c1.statement_count_in_regression_case\""
-       },
-       "pr": {
-        "file": "probe-model-probe1-pr-1.jsonl",
-        "line": 1,
-        "quote": "\"observation\": \"c1.statement_count_in_regression_case\""
-       }
-      }
-     },
-     {
-      "name": "c2.block_stack_change_at_closer",
-      "state": "differs",
-      "label": "proven",
-      "claim": "C2",
-      "main": 0,
-      "pr": -1,
-      "diffs": [
-       {
-        "field": "",
-        "main": 0,
-        "pr": -1
-       }
-      ],
-      "citations": {
-       "main": {
-        "file": "probe-model-probe1-main-1.jsonl",
-        "line": 2,
-        "quote": "\"observation\": \"c2.block_stack_change_at_closer\""
-       },
-       "pr": {
-        "file": "probe-model-probe1-pr-1.jsonl",
-        "line": 2,
-        "quote": "\"observation\": \"c2.block_stack_change_at_closer\""
-       }
-      }
-     },
-     {
-      "name": "c2.original_token_text_unchanged",
-      "state": "same",
-      "label": "needs_human",
-      "claim": "C2",
-      "main": "end   if",
-      "pr": "end   if",
-      "citations": {
-       "main": {
-        "file": "probe-model-probe1-main-1.jsonl",
-        "line": 3,
-        "quote": "\"observation\": \"c2.original_token_text_unchanged\""
-       },
-       "pr": {
-        "file": "probe-model-probe1-pr-1.jsonl",
-        "line": 3,
-        "quote": "\"observation\": \"c2.original_token_text_unchanged\""
-       }
-      }
-     },
-     {
-      "name": "c3.block_types",
-      "state": "same",
-      "label": "needs_human",
-      "claim": "C3",
-      "main": 2,
-      "pr": 2,
-      "citations": {
-       "main": {
-        "file": "probe-model-probe1-main-1.jsonl",
-        "line": 4,
-        "quote": "\"observation\": \"c3.block_types\""
-       },
-       "pr": {
-        "file": "probe-model-probe1-pr-1.jsonl",
-        "line": 4,
-        "quote": "\"observation\": \"c3.block_types\""
-       }
-      }
-     },
-     {
-      "name": "c3.closer_types",
-      "state": "same",
-      "label": "needs_human",
-      "claim": "C3",
-      "main": 5,
-      "pr": 5,
-      "citations": {
-       "main": {
-        "file": "probe-model-probe1-main-1.jsonl",
-        "line": 5,
-        "quote": "\"observation\": \"c3.closer_types\""
-       },
-       "pr": {
-        "file": "probe-model-probe1-pr-1.jsonl",
-        "line": 5,
-        "quote": "\"observation\": \"c3.closer_types\""
-       }
-      }
-     },
-     {
-      "name": "c3.following_statement_counts",
-      "state": "same",
-      "label": "needs_human",
-      "claim": "C3",
-      "main": 2,
-      "pr": 2,
-      "citations": {
-       "main": {
-        "file": "probe-model-probe1-main-1.jsonl",
-        "line": 6,
-        "quote": "\"observation\": \"c3.following_statement_counts\""
-       },
-       "pr": {
-        "file": "probe-model-probe1-pr-1.jsonl",
-        "line": 6,
-        "quote": "\"observation\": \"c3.following_statement_counts\""
-       }
-      }
-     },
-     {
-      "name": "c3.separators",
-      "state": "same",
-      "label": "needs_human",
-      "claim": "C3",
-      "main": 4,
-      "pr": 4,
-      "citations": {
-       "main": {
-        "file": "probe-model-probe1-main-1.jsonl",
+        "file": "probe-model-p1-main-1.jsonl",
         "line": 7,
-        "quote": "\"observation\": \"c3.separators\""
+        "quote": "\"observation\": \"c2.regression_coverage\""
        },
        "pr": {
-        "file": "probe-model-probe1-pr-1.jsonl",
+        "file": "probe-model-p1-pr-1.jsonl",
         "line": 7,
-        "quote": "\"observation\": \"c3.separators\""
+        "quote": "\"observation\": \"c2.regression_coverage\""
        }
       }
      },
      {
-      "name": "c4.control_case_passed",
+      "name": "c4.test_suite_pass",
       "state": "same",
       "label": "proven",
       "claim": "C4",
-      "main": 0,
-      "pr": 0,
+      "main": 546,
+      "pr": 546,
       "citations": {
        "main": {
-        "file": "probe-model-probe1-main-1.jsonl",
+        "file": "probe-model-p1-main-1.jsonl",
         "line": 8,
-        "quote": "\"observation\": \"c4.control_case_passed\""
+        "quote": "\"observation\": \"c4.test_suite_pass\""
        },
        "pr": {
-        "file": "probe-model-probe1-pr-1.jsonl",
+        "file": "probe-model-p1-pr-1.jsonl",
         "line": 8,
-        "quote": "\"observation\": \"c4.control_case_passed\""
+        "quote": "\"observation\": \"c4.test_suite_pass\""
        }
       }
      },
      {
-      "name": "c4.regression_case_passed",
+      "name": "c5.ruff_diff_pass",
       "state": "same",
       "label": "proven",
-      "claim": "C4",
-      "main": 0,
-      "pr": 0,
-      "citations": {
-       "main": {
-        "file": "probe-model-probe1-main-1.jsonl",
-        "line": 9,
-        "quote": "\"observation\": \"c4.regression_case_passed\""
-       },
-       "pr": {
-        "file": "probe-model-probe1-pr-1.jsonl",
-        "line": 9,
-        "quote": "\"observation\": \"c4.regression_case_passed\""
-       }
-      }
-     },
-     {
-      "name": "c5.regression_case_passed",
-      "state": "same",
-      "label": "needs_human",
       "claim": "C5",
-      "main": 0,
-      "pr": 0,
+      "main": true,
+      "pr": true,
       "citations": {
        "main": {
-        "file": "probe-model-probe1-main-1.jsonl",
-        "line": 10,
-        "quote": "\"observation\": \"c5.regression_case_passed\""
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 9,
+        "quote": "\"observation\": \"c5.ruff_diff_pass\""
        },
        "pr": {
-        "file": "probe-model-probe1-pr-1.jsonl",
-        "line": 10,
-        "quote": "\"observation\": \"c5.regression_case_passed\""
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 9,
+        "quote": "\"observation\": \"c5.ruff_diff_pass\""
        }
       }
      }
@@ -928,7 +891,7 @@
      "blind": true
     },
     "freeze": {
-     "sha256": "9d5ed28f9f174eb77e0557051b6bf5825ab5cefd7cd5c55973d330db3c5b34c3",
+     "sha256": "5e80009bd8cae010ef5c953f0b45a3d8335d78aa12d7c1df97a4373ae4cf979c",
      "generator": {
       "kind": "model",
       "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
@@ -937,7 +900,7 @@
       "provenance": "live",
       "blind": true
      },
-     "frozen_at": "2026-11-09T06:17:30.310005+00:00",
+     "frozen_at": "2026-11-09T07:26:23.369608+00:00",
      "inputs_sha256": "eaba27ef710184ebd7452e27a302373d44b1be35c309c59b0d5730b431f93a86",
      "inputs": {
       "title_chars": 64,
@@ -947,60 +910,58 @@
       }
      },
      "verified": true,
-     "pr_started_at": "2026-11-09T06:17:30.435533+00:00"
+     "pr_started_at": "2026-11-09T07:26:23.512701+00:00"
     },
     "probe_changed_line_coverage": {
      "status": "measured",
      "changed_lines_total": 1,
-     "changed_lines_covered": 1,
+     "changed_lines_covered": 0,
      "files": [
       {
        "file": "sqlparse/engine/statement_splitter.py",
        "changed_lines_total": 1,
-       "changed_lines_covered": 1
+       "changed_lines_covered": 0
       }
      ],
-     "adequacy": "adequate",
-     "note": "ran 1 of 1 changed line(s) on the main side",
+     "adequacy": "not_adequate",
+     "note": "ran none of the 1 changed line(s) on the main side",
      "exit": 0,
-     "data": "probe-cov-model-probe1.json"
+     "data": "probe-cov-model-p1.json"
     },
     "status": "ran"
    }
   ],
   "summary": {
    "labels": [
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
+    "no_difference",
     "needs_human",
     "proven",
-    "needs_human",
-    "needs_human",
-    "needs_human",
-    "needs_human",
-    "needs_human",
     "proven",
-    "proven",
-    "needs_human"
+    "proven"
    ],
-   "flagged": [],
+   "flagged": [
+    {
+     "probe": "model-p1",
+     "name": "c1.original_token",
+     "label": "needs_human",
+     "claim": "C1"
+    }
+   ],
    "proven_claims": [
     "C2",
-    "C4"
+    "C4",
+    "C5"
    ],
-   "reason": "probe: 1 unchanged sub-check(s) of an input where the claim's change was seen, shown as advisory only: c2.original_token_text_unchanged (C2); probe: 6 observation(s) shown as advisory only (claim not shown on these inputs; a related change was proven): c1.statement_count_in_regression_case (C1); c3.block_types (C3); c3.closer_types (C3); c3.following_statement_counts (C3) (+2 more); probe: claim(s) C2, C4 proven",
+   "reason": "probe: 1 observation(s) need attention: c1.original_token does not differ although the claim says it does (C1); probe: claim(s) C2, C4, C5 proven; probe: 5 other observation(s) identical on both sides",
    "ignored_noise": [],
    "ignored_warning_only": [],
    "pr_only_noisy": [],
-   "advisory_unchanged_subchecks": [
-    "c2.original_token_text_unchanged"
-   ],
-   "advisory_agreeing_differs": [
-    "c1.statement_count_in_regression_case",
-    "c3.block_types",
-    "c3.closer_types",
-    "c3.following_statement_counts",
-    "c3.separators",
-    "c5.regression_case_passed"
-   ],
+   "advisory_unchanged_subchecks": [],
+   "advisory_agreeing_differs": [],
    "advisory_invalid_preservation": []
   }
  },
@@ -1008,19 +969,21 @@
   "status": "measured",
   "side": "main",
   "probes": {
-   "model-probe1": {
+   "model-p1": {
     "status": "measured",
-    "changed_lines_covered": 1,
+    "changed_lines_covered": 0,
     "changed_lines_total": 1,
-    "adequacy": "adequate"
+    "adequacy": "not_adequate"
    }
   },
-  "not_adequate": []
+  "not_adequate": [
+   "model-p1"
+  ]
  },
- "verdict": "verified",
- "reason": "30 test(s) fail on main and pass on the PR; 79 test(s) ran on main, 89 on the PR; 10 new test(s) pass, 49 unchanged; probe: 1 unchanged sub-check(s) of an input where the claim's change was seen, shown as advisory only: c2.original_token_text_unchanged (C2); probe: 6 observation(s) shown as advisory only (claim not shown on these inputs; a related change was proven): c1.statement_count_in_regression_case (C1); c3.block_types (C3); c3.closer_types (C3); c3.following_statement_counts (C3) (+2 more); probe: claim(s) C2, C4 proven",
+ "verdict": "could_not_verify",
+ "reason": "not verified: no AI-written probe ran any changed line, so the change itself was not exercised by a probe; 30 test(s) fail on main and pass on the PR; 79 test(s) ran on main, 89 on the PR; 10 new test(s) pass, 49 unchanged; probe model-p1 is not_adequate (ran none of the 1 changed line(s) on the main side); its results do not count either way",
  "verdict_before_coverage_gate": "verified",
- "reason_before_coverage_gate": "30 test(s) fail on main and pass on the PR; 79 test(s) ran on main, 89 on the PR; 10 new test(s) pass, 49 unchanged; probe: 1 unchanged sub-check(s) of an input where the claim's change was seen, shown as advisory only: c2.original_token_text_unchanged (C2); probe: 6 observation(s) shown as advisory only (claim not shown on these inputs; a related change was proven): c1.statement_count_in_regression_case (C1); c3.block_types (C3); c3.closer_types (C3); c3.following_statement_counts (C3) (+2 more); probe: claim(s) C2, C4 proven",
+ "reason_before_coverage_gate": "30 test(s) fail on main and pass on the PR; 79 test(s) ran on main, 89 on the PR; 10 new test(s) pass, 49 unchanged; probe model-p1 is not_adequate (ran none of the 1 changed line(s) on the main side); its results do not count either way",
  "changed_lines_total": 1,
  "changed_lines_covered": 1,
  "coverage_gate": {
@@ -1030,6 +993,7 @@
   "note": "1 of 1 changed executable line(s) ran (100%)",
   "measurement": "measured"
  },
+ "verdict_before_ai_probe_gate": "verified",
  "agents": {
   "status": "skipped",
   "note": "advisory swarm is off",
@@ -1054,28 +1018,28 @@
   ]
  },
  "duration_s": {
-  "total_wall": 153.4,
-  "tests": 6.2
+  "total_wall": 91.9,
+  "tests": 7.3
  },
  "cost": {
   "ai_calls": 3,
   "failed_ai_calls": 0,
-  "input_tokens": 7853,
-  "output_tokens": 31561,
-  "thinking_tokens": 28056,
-  "cost_usd": 0.030761,
+  "input_tokens": 6188,
+  "output_tokens": 8221,
+  "thinking_tokens": 7186,
+  "cost_usd": 0.009255,
   "calls_without_usage": 0,
-  "ai_cost_usd": 0.030761,
+  "ai_cost_usd": 0.009255,
   "cost_complete": true,
   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
   "compute_seconds": {
-   "total_wall": 153.4,
-   "tests": 6.2
+   "total_wall": 91.9,
+   "tests": 7.3
   },
   "machine_usd_per_hour": 0.24,
   "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
-  "computer_cost_usd": 0.010227,
-  "total_cost_usd": 0.040988,
+  "computer_cost_usd": 0.006127,
+  "total_cost_usd": 0.015382,
   "swarm": {
    "ai_calls": 0,
    "failed_ai_calls": 0,
