@@ -1,9 +1,9 @@
 {
  "schema_version": "1",
  "record_kind": "pr_run",
- "id": "pr-andialbrecht-sqlparse-944-51894597437c-2026-11-08",
- "date_ist": "2026-11-09 11:47 IST",
- "run_date": "2026-11-08",
+ "id": "pr-andialbrecht-sqlparse-944-51894597437c-2026-11-09",
+ "date_ist": "2026-11-09 12:56 IST",
+ "run_date": "2026-11-09",
  "who": "ops/daily_run.py",
  "repo": "andialbrecht/sqlparse",
  "library": "sqlparse",
@@ -25,7 +25,7 @@
  "updated_at_ist": "2026-11-02 07:43 IST",
  "ci_state": "none",
  "ci_detail": "no check runs visible",
- "tested_at_ist": "2026-11-09 11:47 IST",
+ "tested_at_ist": "2026-11-09 12:56 IST",
  "files": {
   "all": [
    "sqlparse/filters/aligned_indent.py",
@@ -84,8 +84,8 @@
    "skipped": 2,
    "collection_errors": 0,
    "exit": 0,
-   "seconds": 1.1,
-   "pytest_summary": "174 passed, 2 xfailed, 1 xpassed in 0.69s",
+   "seconds": 1.2,
+   "pytest_summary": "174 passed, 2 xfailed, 1 xpassed in 0.75s",
    "junit": true
   },
   {
@@ -97,60 +97,60 @@
    "skipped": 2,
    "collection_errors": 0,
    "exit": 0,
-   "seconds": 1.1,
-   "pytest_summary": "176 passed, 2 xfailed, 1 xpassed in 0.69s",
+   "seconds": 1.2,
+   "pytest_summary": "176 passed, 2 xfailed, 1 xpassed in 0.74s",
    "junit": true
   },
   {
    "side": "old",
    "run": 2,
    "passed": 175,
-   "failed": 0,
-   "error": 0,
-   "skipped": 2,
-   "collection_errors": 0,
-   "exit": 0,
-   "seconds": 1.1,
-   "pytest_summary": "174 passed, 2 xfailed, 1 xpassed in 0.69s",
-   "junit": true
-  },
-  {
-   "side": "new",
-   "run": 2,
-   "passed": 177,
-   "failed": 0,
-   "error": 0,
-   "skipped": 2,
-   "collection_errors": 0,
-   "exit": 0,
-   "seconds": 1.1,
-   "pytest_summary": "176 passed, 2 xfailed, 1 xpassed in 0.71s",
-   "junit": true
-  },
-  {
-   "side": "old",
-   "run": 3,
-   "passed": 175,
-   "failed": 0,
-   "error": 0,
-   "skipped": 2,
-   "collection_errors": 0,
-   "exit": 0,
-   "seconds": 1.1,
-   "pytest_summary": "174 passed, 2 xfailed, 1 xpassed in 0.68s",
-   "junit": true
-  },
-  {
-   "side": "new",
-   "run": 3,
-   "passed": 177,
    "failed": 0,
    "error": 0,
    "skipped": 2,
    "collection_errors": 0,
    "exit": 0,
    "seconds": 1.2,
-   "pytest_summary": "176 passed, 2 xfailed, 1 xpassed in 0.81s",
+   "pytest_summary": "174 passed, 2 xfailed, 1 xpassed in 0.72s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 2,
+   "passed": 177,
+   "failed": 0,
+   "error": 0,
+   "skipped": 2,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.3,
+   "pytest_summary": "176 passed, 2 xfailed, 1 xpassed in 0.83s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 3,
+   "passed": 175,
+   "failed": 0,
+   "error": 0,
+   "skipped": 2,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.2,
+   "pytest_summary": "174 passed, 2 xfailed, 1 xpassed in 0.76s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 3,
+   "passed": 177,
+   "failed": 0,
+   "error": 0,
+   "skipped": 2,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.4,
+   "pytest_summary": "176 passed, 2 xfailed, 1 xpassed in 0.94s",
    "junit": true
   }
  ],
@@ -190,7 +190,7 @@
     "changed_lines_covered": 8
    }
   ],
-  "seconds": 1.7,
+  "seconds": 1.9,
   "exit": 0,
   "log": "coverage-pytest.log"
  },
@@ -208,8 +208,8 @@
   "notes": [
    "Setup check: GitHub token: present.",
    "Setup check: Nebius token: present.",
-   "Setup check: free memory 6.7 GB (of 15.6 GB).",
-   "Setup check: free disk 92.8 GB.",
+   "Setup check: free memory 8.9 GB (of 15.6 GB).",
+   "Setup check: free disk 92.0 GB.",
    "Demo helper: git is installed.",
    "Demo helper: python3 is installed.",
    "Demo helper: uv is installed.",
@@ -318,38 +318,57 @@
   "baseline": "full",
   "model": "model provider: nebius (Token Factory, live)",
   "errors": [
-   "probe 'p1' rejected: cannot bind sqlparse.format: format() accepts **kwargs, so its keywords cannot be checked; the probe is not run",
-   "probe 'p2' rejected: cannot bind sqlparse.format: format() accepts **kwargs, so its keywords cannot be checked; the probe is not run"
+   "probe 'p1' rejected: empty probe: the code has no test statements (only imports, comments or a docstring)"
   ],
   "model_claims": [
    {
+    "id": "C1",
+    "text": "Before the fix, calling sqlparse.format with reindent_aligned=True on malformed CASE input such as \"CASE 'a' := WHERE END SELECT GO # ->>\" raises a ValueError.",
+    "source_quote": "raised `ValueError: None is not in list` inside `token_index` / `insert_before`.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
     "id": "C2",
-    "text": "When the END token is missing as a direct child of the CASE statement, token_next_by(END) returns None, causing insert_before(None, ...) to crash.",
-    "source_quote": "When END is missing as a direct child (here it is nested inside an Assignment subgroup), that token is `None`, and the next `insert_before(None, ...)` crashes.",
+    "text": "After the fix, the same call does not raise an exception and returns a formatted string.",
+    "source_quote": "Fixes #886.",
     "testable": true,
     "expect": "differs"
    },
    {
     "id": "C3",
-    "text": "For valid CASE statements, sqlparse.format with reindent_aligned=True produces the same output before and after the fix.",
+    "text": "Valid CASE alignment behavior remains unchanged by the fix.",
     "source_quote": "Valid CASE alignment is unchanged.",
     "testable": true,
     "expect": "same"
-   }
-  ],
-  "model_rejected_claims": [
+   },
    {
-    "id": "C1",
-    "text": "Calling sqlparse.format with reindent_aligned=True on the malformed CASE input \"CASE 'a' := WHERE END SELECT GO # ->>\" raises a ValueError: None is not in list.",
-    "source_quote": "sqlparse.format(\"CASE 'a' := WHERE END SELECT GO # ->>\", reindent_aligned=True) raised `ValueError: None is not in list` inside `token_index` / `insert_before`.",
-    "testable": true,
-    "expect": "differs",
-    "rejected": "source_quote not found in the PR text"
+    "id": "C4",
+    "text": "The fix appends the END aligner only when end_token is not None.",
+    "source_quote": "- Append the END aligner only when `end_token is not None`.",
+    "testable": false,
+    "expect": "same"
+   },
+   {
+    "id": "C5",
+    "text": "The fix skips empty case arms or statements that are None.",
+    "source_quote": "- Skip empty case arms / `stmt is None`.",
+    "testable": false,
+    "expect": "same"
+   },
+   {
+    "id": "C6",
+    "text": "The fix tolerates ValueError from insert_before when the token is not a direct child.",
+    "source_quote": "- Tolerate `ValueError` from `insert_before` when the token is not a direct child.",
+    "testable": false,
+    "expect": "same"
    }
   ],
+  "model_rejected_claims": [],
   "model_retried": {
    "why": [
-    "no probe listed the claim ids it checks, so its results could not be tied to any claim; in each probe, \"claims\" must name the claim ids it checks and the observation names that cover them"
+    "empty probe: the code has no test statements (only imports, comments or a docstring)",
+    "empty probe: the code has no test statements (only imports, comments or a docstring)"
    ]
   },
   "diff_targets": [],
@@ -358,7 +377,7 @@
  "test_extras": [
   "build"
  ],
- "pr_side_started_at": "2026-11-09T06:18:27.601894+00:00",
+ "pr_side_started_at": "2026-11-09T07:30:11.448643+00:00",
  "test_targets": {
   "main": [
    "tests/test_format.py",
@@ -465,28 +484,28 @@
   ]
  },
  "duration_s": {
-  "total_wall": 59.8,
-  "tests": 6.7
+  "total_wall": 230.4,
+  "tests": 7.5
  },
  "cost": {
   "ai_calls": 3,
   "failed_ai_calls": 0,
-  "input_tokens": 4994,
-  "output_tokens": 2940,
-  "thinking_tokens": 2233,
-  "cost_usd": 0.004144,
+  "input_tokens": 5091,
+  "output_tokens": 34320,
+  "thinking_tokens": 33855,
+  "cost_usd": 0.032415,
   "calls_without_usage": 0,
-  "ai_cost_usd": 0.004144,
+  "ai_cost_usd": 0.032415,
   "cost_complete": true,
   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
   "compute_seconds": {
-   "total_wall": 59.8,
-   "tests": 6.7
+   "total_wall": 230.4,
+   "tests": 7.5
   },
   "machine_usd_per_hour": 0.24,
   "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
-  "computer_cost_usd": 0.003987,
-  "total_cost_usd": 0.008131,
+  "computer_cost_usd": 0.01536,
+  "total_cost_usd": 0.047775,
   "swarm": {
    "ai_calls": 0,
    "failed_ai_calls": 0,
