@@ -1,9 +1,9 @@
 {
  "schema_version": "1",
  "record_kind": "pr_run",
- "id": "pr-pallets-markupsafe-438-e395cfa3fbca-2026-11-08",
- "date_ist": "2026-11-09 10:28 IST",
- "run_date": "2026-11-08",
+ "id": "pr-pallets-markupsafe-438-e395cfa3fbca-2026-11-09",
+ "date_ist": "2026-11-09 12:03 IST",
+ "run_date": "2026-11-09",
  "who": "ops/daily_run.py",
  "repo": "pallets/markupsafe",
  "library": "markupsafe",
@@ -25,7 +25,7 @@
  "updated_at_ist": "2025-05-29 09:39 IST",
  "ci_state": "none",
  "ci_detail": "no check runs visible",
- "tested_at_ist": "2026-11-09 10:28 IST",
+ "tested_at_ist": "2026-11-09 12:03 IST",
  "files": {
   "all": [
    ".gitignore",
@@ -99,8 +99,8 @@
    "skipped": 0,
    "collection_errors": 0,
    "exit": 0,
-   "seconds": 1.5,
-   "pytest_summary": "26 passed in 1.08s",
+   "seconds": 1.0,
+   "pytest_summary": "26 passed in 0.53s",
    "junit": true
   },
   {
@@ -112,39 +112,13 @@
    "skipped": 0,
    "collection_errors": 0,
    "exit": 0,
-   "seconds": 1.1,
-   "pytest_summary": "26 passed in 0.58s",
+   "seconds": 0.9,
+   "pytest_summary": "26 passed in 0.51s",
    "junit": true
   },
   {
    "side": "old",
    "run": 2,
-   "passed": 26,
-   "failed": 0,
-   "error": 0,
-   "skipped": 0,
-   "collection_errors": 0,
-   "exit": 0,
-   "seconds": 1.1,
-   "pytest_summary": "26 passed in 0.58s",
-   "junit": true
-  },
-  {
-   "side": "new",
-   "run": 2,
-   "passed": 26,
-   "failed": 0,
-   "error": 0,
-   "skipped": 0,
-   "collection_errors": 0,
-   "exit": 0,
-   "seconds": 1.1,
-   "pytest_summary": "26 passed in 0.62s",
-   "junit": true
-  },
-  {
-   "side": "old",
-   "run": 3,
    "passed": 26,
    "failed": 0,
    "error": 0,
@@ -152,11 +126,24 @@
    "collection_errors": 0,
    "exit": 0,
    "seconds": 1.0,
-   "pytest_summary": "26 passed in 0.59s",
+   "pytest_summary": "26 passed in 0.57s",
    "junit": true
   },
   {
    "side": "new",
+   "run": 2,
+   "passed": 26,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.0,
+   "pytest_summary": "26 passed in 0.53s",
+   "junit": true
+  },
+  {
+   "side": "old",
    "run": 3,
    "passed": 26,
    "failed": 0,
@@ -165,7 +152,20 @@
    "collection_errors": 0,
    "exit": 0,
    "seconds": 0.9,
-   "pytest_summary": "26 passed in 0.53s",
+   "pytest_summary": "26 passed in 0.52s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 3,
+   "passed": 26,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.0,
+   "pytest_summary": "26 passed in 0.55s",
    "junit": true
   }
  ],
@@ -219,6 +219,7 @@
  "current_head_sha": "e395cfa3fbca7edd7c7d29247e39eda16b472941",
  "tested_invocation": 1,
  "model_provider_used": "nebius",
+ "model_provider_fallback": "AI call fell back or failed (probes); the AI answered but no probe was usable, so only fixed probes ran",
  "demo_helper": {
   "preflight": {
    "ok": true
@@ -227,7 +228,7 @@
   "notes": [
    "Setup check: GitHub token: present.",
    "Setup check: Nebius token: present.",
-   "Setup check: free memory 9.1 GB (of 15.6 GB).",
+   "Setup check: free memory 6.3 GB (of 15.6 GB).",
    "Setup check: free disk 92.9 GB.",
    "Demo helper: git is installed.",
    "Demo helper: python3 is installed.",
@@ -237,11 +238,11 @@
    "Query: markupsafe python documentation install https://github.com/pallets/markupsafe site:github.com/pallets/markupsafe",
    "Query: markupsafe python install requirements https://pypi.org/project/markupsafe/ https://github.com/pallets/markupsafe site:pypi.org",
    "Source: markupsafe/pyproject.toml at main \u00b7 pallets/markupsafe \u00b7 GitHub \u2014 https://github.com/pallets/markupsafe/blob/main/pyproject.toml",
-   "Source: markupsafe/pyproject.toml at 4e111271b1494995708a9e878a10829b5e10c7ba \u00b7 pallets/markupsafe \u00b7 GitHub \u2014 https://github.com/pallets/markupsafe/blob/4e111271b1494995708a9e878a10829b5e10c7ba/pyproject.toml",
-   "Source: MarkupSafe \u00b7 PyPI \u2014 https://pypi.org/project/markupsafe/",
-   "Source: Installing MarkupSafe-2.0.1 on macOS 11.5 \u00b7 Issue #241 \u00b7 pallets/markupsafe \u00b7 GitHub \u2014 https://github.com/pallets/markupsafe/issues/241",
+   "Source: MarkupSafe \u2014 https://pypi.org/project/markupsafe/",
+   "Source: Won't install on Windows \u00b7 Issue #67 \u00b7 pallets/markupsafe \u00b7 GitHub \u2014 https://github.com/pallets/markupsafe/issues/67",
    "Source: Fail to install MarkupSafe \u00b7 Issue #167 \u00b7 pallets/markupsafe \u00b7 GitHub \u2014 https://github.com/pallets/markupsafe/issues/167",
-   "Source: \"No module named 'markupsafe'\" when installing MarkupSafe \u00b7 Issue #285 \u00b7 pallets/markupsafe \u00b7 GitHub \u2014 https://github.com/pallets/markupsafe/issues/285",
+   "Source: Installing MarkupSafe-2.0.1 on macOS 11.5 \u00b7 Issue #241 \u00b7 pallets/markupsafe \u00b7 GitHub \u2014 https://github.com/pallets/markupsafe/issues/241",
+   "Source: GitHub - pallets/markupsafe at themecobra.com \u00b7 GitHub \u2014 https://github.com/pallets/markupsafe?ref=themecobra.com",
    "Setup plan: the PR changes install docs (pyproject.toml, setup.py); setup was read from main's copy and applied the same on both sides.",
    "Setup plan: the same packages on main and pr.",
    "Setup plan: install pytest (listed in the tests extra) on main and pr.",
@@ -340,76 +341,145 @@
  "probe_plan": {
   "baseline": "full",
   "model": "model provider: nebius (Token Factory, live)",
-  "errors": [],
+  "errors": [
+   "probe 'p1' rejected: markupsafe._escape_inner does not exist; markupsafe contains: EscapeFormatter, Markup, _native, _speedups, annotations, cabc, escape, escape_silent, soft_str, string, t"
+  ],
   "model_claims": [
    {
     "id": "C1",
-    "text": "pip install -e . in a virtualenv should build src/markupsafe/_rust_speedups.???.so, assuming you have Rust installed.",
+    "text": "Running `pip install -e .` in a virtualenv builds the shared library file src/markupsafe/_rust_speedups.???.so when Rust is installed.",
     "source_quote": "`pip install -e .` in a virtualenv should build src/markupsafe/_rust_speedups.???.so, assuming you have Rust installed.",
     "testable": true,
     "expect": "differs"
    },
    {
     "id": "C2",
-    "text": "python bench.py to run all benchmarks, rust included.",
+    "text": "Executing `python bench.py` runs all benchmarks, including the Rust speedup benchmarks.",
     "source_quote": "`python bench.py` to run all benchmarks, rust included.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C3",
+    "text": "The short escape native benchmark has a mean time of 656 ns with a standard deviation of 12 ns.",
+    "source_quote": "short escape native: Mean +- std dev: 656 ns +- 12 ns",
+    "testable": true,
+    "expect": "same"
+   },
+   {
+    "id": "C4",
+    "text": "The short escape speedups benchmark has a mean time of 417 ns with a standard deviation of 7 ns.",
+    "source_quote": "short escape speedups: Mean +- std dev: 417 ns +- 7 ns",
+    "testable": true,
+    "expect": "same"
+   },
+   {
+    "id": "C5",
+    "text": "The short escape rust_speedups benchmark has a mean time of 522 ns with a standard deviation of 15 ns.",
+    "source_quote": "short escape rust_speedups: Mean +- std dev: 522 ns +- 15 ns",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C6",
+    "text": "The long escape native benchmark has a mean time of 17.3 \u00b5s with a standard deviation of 0.2 \u00b5s.",
+    "source_quote": "long escape native: Mean +- std dev: 17.3 us +- 0.2 us",
+    "testable": true,
+    "expect": "same"
+   },
+   {
+    "id": "C7",
+    "text": "The long escape speedups benchmark has a mean time of 7.79 \u00b5s with a standard deviation of 0.14 \u00b5s.",
+    "source_quote": "long escape speedups: Mean +- std dev: 7.79 us +- 0.14 us",
+    "testable": true,
+    "expect": "same"
+   },
+   {
+    "id": "C8",
+    "text": "The long escape rust_speedups benchmark has a mean time of 6.71 \u00b5s with a standard deviation of 0.08 \u00b5s.",
+    "source_quote": "long escape rust_speedups: Mean +- std dev: 6.71 us +- 0.08 us",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C9",
+    "text": "The short plain native benchmark has a mean time of 505 ns with a standard deviation of 9 ns.",
+    "source_quote": "short plain native: Mean +- std dev: 505 ns +- 9 ns",
+    "testable": true,
+    "expect": "same"
+   },
+   {
+    "id": "C10",
+    "text": "The short plain speedups benchmark has a mean time of 349 ns with a standard deviation of 5 ns.",
+    "source_quote": "short plain speedups: Mean +- std dev: 349 ns +- 5 ns",
+    "testable": true,
+    "expect": "same"
+   },
+   {
+    "id": "C11",
+    "text": "The short plain rust_speedups benchmark has a mean time of 401 ns with a standard deviation of 4 ns.",
+    "source_quote": "short plain rust_speedups: Mean +- std dev: 401 ns +- 4 ns",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C12",
+    "text": "The long plain native benchmark has a mean time of 17.2 \u00b5s with a standard deviation of 0.1 \u00b5s.",
+    "source_quote": "long plain native: Mean +- std dev: 17.2 us +- 0.1 us",
+    "testable": true,
+    "expect": "same"
+   },
+   {
+    "id": "C13",
+    "text": "The long plain speedups benchmark has a mean time of 7.77 \u00b5s with a standard deviation of 0.10 \u00b5s.",
+    "source_quote": "long plain speedups: Mean +- std dev: 7.77 us +- 0.10 us",
+    "testable": true,
+    "expect": "same"
+   },
+   {
+    "id": "C14",
+    "text": "The long plain rust_speedups benchmark has a mean time of 6.73 \u00b5s with a standard deviation of 0.15 \u00b5s.",
+    "source_quote": "long plain rust_speedups: Mean +- std dev: 6.73 us +- 0.15 us",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C15",
+    "text": "The long suffix native benchmark has a mean time of 134 \u00b5s with a standard deviation of 1 \u00b5s.",
+    "source_quote": "long suffix native: Mean +- std dev: 134 us +- 1 us",
+    "testable": true,
+    "expect": "same"
+   },
+   {
+    "id": "C16",
+    "text": "The long suffix speedups benchmark has a mean time of 131 \u00b5s with a standard deviation of 1 \u00b5s.",
+    "source_quote": "long suffix speedups: Mean +- std dev: 131 us +- 1 us",
+    "testable": true,
+    "expect": "same"
+   },
+   {
+    "id": "C17",
+    "text": "The long suffix rust_speedups benchmark has a mean time of 58.3 \u00b5s with a standard deviation of 1.2 \u00b5s.",
+    "source_quote": "long suffix rust_speedups: Mean +- std dev: 58.3 us +- 1.2 us",
     "testable": true,
     "expect": "differs"
    }
   ],
   "model_rejected_claims": [],
-  "diff_targets": [],
-  "frozen": [
+  "model_name_checks": [
    {
-    "path": "model-probes/model-c1-probe.py",
-    "source": "model",
-    "sha256": "f6db4c6a672d3a828f5e6875df37d6693af2ff2d05f4ffa5738a2bf9d40dc463",
-    "generator": {
-     "kind": "model",
-     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
-     "model": "nvidia/nemotron-3-super-120b-a12b",
-     "provider": "nebius",
-     "provenance": "live",
-     "blind": true
-    },
-    "frozen_at": "2026-11-09T04:59:13.661097+00:00",
-    "inputs_sha256": "83f35fa86804f332ddbacbd5ae2f23c20d1fbadf58cddd3a46b102d7b569b3dd",
-    "inputs": {
-     "title_chars": 31,
-     "body_chars": 1120,
-     "base_files": {
-      "bench.py": "a6ee8de5384f23129a36823f2834212ca614074a52dc6941e604c5d2d26929fb",
-      "src/markupsafe/__init__.py": "b6e3b472b60fb708c6fc54fdb36173abe0d4991238bff1b9b26674aaa97e11c8"
-     }
-    }
-   },
-   {
-    "path": "model-probes/model-c2-probe.py",
-    "source": "model",
-    "sha256": "2999ea70e5decb08eab274f77e913241918b507f1ecb7fa1eeea44b58c3e56f4",
-    "generator": {
-     "kind": "model",
-     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
-     "model": "nvidia/nemotron-3-super-120b-a12b",
-     "provider": "nebius",
-     "provenance": "live",
-     "blind": true
-    },
-    "frozen_at": "2026-11-09T04:59:13.661298+00:00",
-    "inputs_sha256": "83f35fa86804f332ddbacbd5ae2f23c20d1fbadf58cddd3a46b102d7b569b3dd",
-    "inputs": {
-     "title_chars": 31,
-     "body_chars": 1120,
-     "base_files": {
-      "bench.py": "a6ee8de5384f23129a36823f2834212ca614074a52dc6941e604c5d2d26929fb",
-      "src/markupsafe/__init__.py": "b6e3b472b60fb708c6fc54fdb36173abe0d4991238bff1b9b26674aaa97e11c8"
-     }
-    }
+    "probe": "P1",
+    "error": [
+     "markupsafe._escape_inner does not exist; markupsafe contains: EscapeFormatter, Markup, _native, _speedups, annotations, cabc, escape, escape_silent, soft_str, string, t"
+    ],
+    "outcome": "provider error: nebius probes request failed: HTTPError"
    }
-  ]
+  ],
+  "diff_targets": [],
+  "frozen": []
  },
  "test_extras": [],
- "pr_side_started_at": "2026-11-09T04:59:13.792212+00:00",
+ "pr_side_started_at": "2026-11-09T06:36:07.540605+00:00",
  "test_targets": {
   "main": [
    "tests/test_escape.py",
@@ -468,419 +538,17 @@
   "detail": "all runs exited 0"
  },
  "probes": {
-  "status": "ran",
-  "items": [
-   {
-    "id": "model-c1-probe",
-    "source": "model",
-    "path": "model-probes/model-c1-probe.py",
-    "sha256": "f6db4c6a672d3a828f5e6875df37d6693af2ff2d05f4ffa5738a2bf9d40dc463",
-    "target": "pallets/markupsafe#438",
-    "about": "Check if rust_speedups module can be imported",
-    "claims": [
-     {
-      "id": "C1",
-      "source": "PR description",
-      "text": "pip install -e . in a virtualenv should build src/markupsafe/_rust_speedups.???.so, assuming you have Rust installed.",
-      "covers": [
-       "c1.import_success"
-      ],
-      "expect": "differs"
-     }
-    ],
-    "runs_per_side": 3,
-    "per_run": [
-     {
-      "side": "main",
-      "run": 1,
-      "seconds": 0.0,
-      "ok": true
-     },
-     {
-      "side": "pr",
-      "run": 1,
-      "seconds": 0.0,
-      "ok": true
-     },
-     {
-      "side": "main",
-      "run": 2,
-      "seconds": 0.0,
-      "ok": true
-     },
-     {
-      "side": "pr",
-      "run": 2,
-      "seconds": 0.0,
-      "ok": true
-     },
-     {
-      "side": "main",
-      "run": 3,
-      "seconds": 0.0,
-      "ok": true
-     },
-     {
-      "side": "pr",
-      "run": 3,
-      "seconds": 0.0,
-      "ok": true
-     }
-    ],
-    "outputs": {
-     "main": [
-      "probe-model-c1-probe-main-1.jsonl",
-      "probe-model-c1-probe-main-2.jsonl",
-      "probe-model-c1-probe-main-3.jsonl"
-     ],
-     "pr": [
-      "probe-model-c1-probe-pr-1.jsonl",
-      "probe-model-c1-probe-pr-2.jsonl",
-      "probe-model-c1-probe-pr-3.jsonl"
-     ]
-    },
-    "runs": {
-     "main": [
-      {
-       "c1.import_success": false,
-       "c1.import_error": "ImportError"
-      },
-      {
-       "c1.import_success": false,
-       "c1.import_error": "ImportError"
-      },
-      {
-       "c1.import_success": false,
-       "c1.import_error": "ImportError"
-      }
-     ],
-     "pr": [
-      {
-       "c1.import_success": true,
-       "c1.import_error": null
-      },
-      {
-       "c1.import_success": true,
-       "c1.import_error": null
-      },
-      {
-       "c1.import_success": true,
-       "c1.import_error": null
-      }
-     ]
-    },
-    "observations": [
-     {
-      "name": "c1.import_error",
-      "state": "differs",
-      "label": "unmentioned",
-      "claim": null,
-      "main": "ImportError",
-      "pr": null,
-      "advisory": true,
-      "linked_by": "id",
-      "diffs": [
-       {
-        "field": "",
-        "main": "ImportError",
-        "pr": null
-       }
-      ],
-      "citations": {
-       "main": {
-        "file": "probe-model-c1-probe-main-1.jsonl",
-        "line": 1,
-        "quote": "\"observation\": \"c1.import_error\""
-       },
-       "pr": {
-        "file": "probe-model-c1-probe-pr-1.jsonl",
-        "line": 1,
-        "quote": "\"observation\": \"c1.import_error\""
-       }
-      }
-     },
-     {
-      "name": "c1.import_success",
-      "state": "differs",
-      "label": "proven",
-      "claim": "C1",
-      "main": false,
-      "pr": true,
-      "diffs": [
-       {
-        "field": "",
-        "main": false,
-        "pr": true
-       }
-      ],
-      "citations": {
-       "main": {
-        "file": "probe-model-c1-probe-main-1.jsonl",
-        "line": 2,
-        "quote": "\"observation\": \"c1.import_success\""
-       },
-       "pr": {
-        "file": "probe-model-c1-probe-pr-1.jsonl",
-        "line": 2,
-        "quote": "\"observation\": \"c1.import_success\""
-       }
-      }
-     }
-    ],
-    "generator": {
-     "kind": "model",
-     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
-     "model": "nvidia/nemotron-3-super-120b-a12b",
-     "provider": "nebius",
-     "provenance": "live",
-     "blind": true
-    },
-    "freeze": {
-     "sha256": "f6db4c6a672d3a828f5e6875df37d6693af2ff2d05f4ffa5738a2bf9d40dc463",
-     "generator": {
-      "kind": "model",
-      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
-      "model": "nvidia/nemotron-3-super-120b-a12b",
-      "provider": "nebius",
-      "provenance": "live",
-      "blind": true
-     },
-     "frozen_at": "2026-11-09T04:59:13.661097+00:00",
-     "inputs_sha256": "83f35fa86804f332ddbacbd5ae2f23c20d1fbadf58cddd3a46b102d7b569b3dd",
-     "inputs": {
-      "title_chars": 31,
-      "body_chars": 1120,
-      "base_files": {
-       "bench.py": "a6ee8de5384f23129a36823f2834212ca614074a52dc6941e604c5d2d26929fb",
-       "src/markupsafe/__init__.py": "b6e3b472b60fb708c6fc54fdb36173abe0d4991238bff1b9b26674aaa97e11c8"
-      }
-     },
-     "verified": true,
-     "pr_started_at": "2026-11-09T04:59:13.792212+00:00"
-    },
-    "probe_changed_line_coverage": {
-     "status": "measured",
-     "changed_lines_total": 1,
-     "changed_lines_covered": 1,
-     "files": [
-      {
-       "file": "bench.py",
-       "changed_lines_total": null,
-       "changed_lines_covered": null,
-       "note": "file not measured by coverage"
-      },
-      {
-       "file": "src/markupsafe/__init__.py",
-       "changed_lines_total": 1,
-       "changed_lines_covered": 1
-      }
-     ],
-     "adequacy": "adequate",
-     "note": "ran 1 of 1 changed line(s) on the main side",
-     "exit": 0,
-     "data": "probe-cov-model-c1-probe.json"
-    },
-    "status": "ran"
-   },
-   {
-    "id": "model-c2-probe",
-    "source": "model",
-    "path": "model-probes/model-c2-probe.py",
-    "sha256": "2999ea70e5decb08eab274f77e913241918b507f1ecb7fa1eeea44b58c3e56f4",
-    "target": "pallets/markupsafe#438",
-    "about": "Check if bench.py contains reference to rust_speedups",
-    "claims": [
-     {
-      "id": "C2",
-      "source": "PR description",
-      "text": "python bench.py to run all benchmarks, rust included.",
-      "covers": [
-       "c2.bench_contains_rust_speedups"
-      ],
-      "expect": "differs"
-     }
-    ],
-    "runs_per_side": 3,
-    "per_run": [
-     {
-      "side": "main",
-      "run": 1,
-      "seconds": 0.0,
-      "ok": true
-     },
-     {
-      "side": "pr",
-      "run": 1,
-      "seconds": 0.0,
-      "ok": true
-     },
-     {
-      "side": "main",
-      "run": 2,
-      "seconds": 0.0,
-      "ok": true
-     },
-     {
-      "side": "pr",
-      "run": 2,
-      "seconds": 0.0,
-      "ok": true
-     },
-     {
-      "side": "main",
-      "run": 3,
-      "seconds": 0.0,
-      "ok": true
-     },
-     {
-      "side": "pr",
-      "run": 3,
-      "seconds": 0.0,
-      "ok": true
-     }
-    ],
-    "outputs": {
-     "main": [
-      "probe-model-c2-probe-main-1.jsonl",
-      "probe-model-c2-probe-main-2.jsonl",
-      "probe-model-c2-probe-main-3.jsonl"
-     ],
-     "pr": [
-      "probe-model-c2-probe-pr-1.jsonl",
-      "probe-model-c2-probe-pr-2.jsonl",
-      "probe-model-c2-probe-pr-3.jsonl"
-     ]
-    },
-    "runs": {
-     "main": [
-      {
-       "c2.bench_contains_rust_speedups": false
-      },
-      {
-       "c2.bench_contains_rust_speedups": false
-      },
-      {
-       "c2.bench_contains_rust_speedups": false
-      }
-     ],
-     "pr": [
-      {
-       "c2.bench_contains_rust_speedups": false
-      },
-      {
-       "c2.bench_contains_rust_speedups": false
-      },
-      {
-       "c2.bench_contains_rust_speedups": false
-      }
-     ]
-    },
-    "observations": [
-     {
-      "name": "c2.bench_contains_rust_speedups",
-      "state": "same",
-      "label": "needs_human",
-      "claim": "C2",
-      "main": false,
-      "pr": false,
-      "citations": {
-       "main": {
-        "file": "probe-model-c2-probe-main-1.jsonl",
-        "line": 1,
-        "quote": "\"observation\": \"c2.bench_contains_rust_speedups\""
-       },
-       "pr": {
-        "file": "probe-model-c2-probe-pr-1.jsonl",
-        "line": 1,
-        "quote": "\"observation\": \"c2.bench_contains_rust_speedups\""
-       }
-      }
-     }
-    ],
-    "generator": {
-     "kind": "model",
-     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
-     "model": "nvidia/nemotron-3-super-120b-a12b",
-     "provider": "nebius",
-     "provenance": "live",
-     "blind": true
-    },
-    "freeze": {
-     "sha256": "2999ea70e5decb08eab274f77e913241918b507f1ecb7fa1eeea44b58c3e56f4",
-     "generator": {
-      "kind": "model",
-      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
-      "model": "nvidia/nemotron-3-super-120b-a12b",
-      "provider": "nebius",
-      "provenance": "live",
-      "blind": true
-     },
-     "frozen_at": "2026-11-09T04:59:13.661298+00:00",
-     "inputs_sha256": "83f35fa86804f332ddbacbd5ae2f23c20d1fbadf58cddd3a46b102d7b569b3dd",
-     "inputs": {
-      "title_chars": 31,
-      "body_chars": 1120,
-      "base_files": {
-       "bench.py": "a6ee8de5384f23129a36823f2834212ca614074a52dc6941e604c5d2d26929fb",
-       "src/markupsafe/__init__.py": "b6e3b472b60fb708c6fc54fdb36173abe0d4991238bff1b9b26674aaa97e11c8"
-      }
-     },
-     "verified": true,
-     "pr_started_at": "2026-11-09T04:59:13.792212+00:00"
-    },
-    "probe_changed_line_coverage": {
-     "status": "not measured",
-     "why": "coverage produced no data (exit 0); see probe-coverage.log",
-     "adequacy": "unmeasured",
-     "note": "probe coverage not measured (coverage produced no data (exit 0); see probe-coverage.log)"
-    },
-    "status": "ran"
-   }
-  ],
-  "summary": {
-   "labels": [
-    "unmentioned",
-    "proven",
-    "needs_human"
-   ],
-   "flagged": [],
-   "proven_claims": [
-    "C1"
-   ],
-   "reason": "probe: 1 difference(s) no linked claim covers, shown as advisory only: c1.import_error; probe: 1 observation(s) shown as advisory only (claim not shown on these inputs; a related change was proven): c2.bench_contains_rust_speedups (C2); probe: claim(s) C1 proven",
-   "ignored_noise": [],
-   "ignored_warning_only": [],
-   "pr_only_noisy": [],
-   "advisory_unchanged_subchecks": [],
-   "advisory_agreeing_differs": [
-    "c2.bench_contains_rust_speedups"
-   ],
-   "advisory_invalid_preservation": []
-  }
+  "status": "none",
+  "items": []
  },
  "probe_changed_line_coverage": {
-  "status": "partly measured",
-  "side": "main",
-  "probes": {
-   "model-c1-probe": {
-    "status": "measured",
-    "changed_lines_covered": 1,
-    "changed_lines_total": 1,
-    "adequacy": "adequate"
-   },
-   "model-c2-probe": {
-    "status": "not measured",
-    "changed_lines_covered": null,
-    "changed_lines_total": null,
-    "adequacy": "unmeasured"
-   }
-  },
-  "not_adequate": []
+  "status": "no probes",
+  "probes": {}
  },
  "verdict": "could_not_verify",
- "reason": "could not verify: difference(s) no linked claim covers (model-c1-probe c1.import_error), so the change is not confirmed (26 test(s) ran on main, 26 on the PR; 0 new test(s) pass, 26 unchanged; probe: 1 difference(s) no linked claim covers, shown as advisory only: c1.import_error; probe: 1 observation(s) shown as advisory only (claim not shown on these inputs; a related change was proven): c2.bench_contains_rust_speedups (C2); probe: claim(s) C1 proven; probe model-c2-probe has no measured line coverage (coverage produced no data (exit 0); see probe-coverage.log); it does not count as covering the change)",
- "verdict_before_coverage_gate": "could_not_verify",
- "reason_before_coverage_gate": "could not verify: difference(s) no linked claim covers (model-c1-probe c1.import_error), so the change is not confirmed (26 test(s) ran on main, 26 on the PR; 0 new test(s) pass, 26 unchanged; probe: 1 difference(s) no linked claim covers, shown as advisory only: c1.import_error; probe: 1 observation(s) shown as advisory only (claim not shown on these inputs; a related change was proven): c2.bench_contains_rust_speedups (C2); probe: claim(s) C1 proven; probe model-c2-probe has no measured line coverage (coverage produced no data (exit 0); see probe-coverage.log); it does not count as covering the change)",
+ "reason": "not verified: no AI-written probe ran any changed line, so the change itself was not exercised by a probe; 26 test(s) ran on main, 26 on the PR; 0 new test(s) pass, 26 unchanged",
+ "verdict_before_coverage_gate": "verified",
+ "reason_before_coverage_gate": "26 test(s) ran on main, 26 on the PR; 0 new test(s) pass, 26 unchanged",
  "changed_lines_total": 2,
  "changed_lines_covered": 1,
  "coverage_gate": {
@@ -890,6 +558,7 @@
   "note": "1 of 2 changed executable line(s) ran (50%)",
   "measurement": "measured"
  },
+ "verdict_before_ai_probe_gate": "verified",
  "agents": {
   "status": "skipped",
   "note": "advisory swarm is off",
@@ -922,28 +591,28 @@
   ]
  },
  "duration_s": {
-  "total_wall": 88.3,
-  "tests": 6.7
+  "total_wall": 161.4,
+  "tests": 5.8
  },
  "cost": {
-  "ai_calls": 2,
-  "failed_ai_calls": 0,
-  "input_tokens": 5311,
-  "output_tokens": 7864,
-  "thinking_tokens": 7384,
-  "cost_usd": 0.008671,
-  "calls_without_usage": 0,
-  "ai_cost_usd": 0.008671,
-  "cost_complete": true,
+  "ai_calls": 3,
+  "failed_ai_calls": 1,
+  "input_tokens": 6743,
+  "output_tokens": 12845,
+  "thinking_tokens": 9537,
+  "cost_usd": 0.013583,
+  "calls_without_usage": 1,
+  "ai_cost_usd": 0.013583,
+  "cost_complete": false,
   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
   "compute_seconds": {
-   "total_wall": 88.3,
-   "tests": 6.7
+   "total_wall": 161.4,
+   "tests": 5.8
   },
   "machine_usd_per_hour": 0.24,
   "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
-  "computer_cost_usd": 0.005887,
-  "total_cost_usd": 0.014558,
+  "computer_cost_usd": 0.01076,
+  "total_cost_usd": 0.024343,
   "swarm": {
    "ai_calls": 0,
    "failed_ai_calls": 0,
