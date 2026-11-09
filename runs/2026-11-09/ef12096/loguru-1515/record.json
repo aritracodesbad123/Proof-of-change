@@ -1,9 +1,9 @@
 {
  "schema_version": "1",
  "record_kind": "pr_run",
- "id": "pr-Delgan-loguru-1515-6c91de2c42d3-2026-11-08",
- "date_ist": "2026-11-09 11:28 IST",
- "run_date": "2026-11-08",
+ "id": "pr-Delgan-loguru-1515-6c91de2c42d3-2026-11-09",
+ "date_ist": "2026-11-09 12:39 IST",
+ "run_date": "2026-11-09",
  "who": "ops/daily_run.py",
  "repo": "Delgan/loguru",
  "library": "loguru",
@@ -25,7 +25,7 @@
  "updated_at_ist": "2026-11-01 07:47 IST",
  "ci_state": "passing",
  "ci_detail": "22 check runs completed without failure",
- "tested_at_ist": "2026-11-09 11:28 IST",
+ "tested_at_ist": "2026-11-09 12:39 IST",
  "files": {
   "all": [
    "CHANGELOG.rst",
@@ -84,8 +84,8 @@
    "skipped": 3,
    "collection_errors": 0,
    "exit": 0,
-   "seconds": 27.3,
-   "pytest_summary": "147 passed, 3 skipped in 26.34s",
+   "seconds": 27.4,
+   "pytest_summary": "147 passed, 3 skipped in 26.37s",
    "junit": true
   },
   {
@@ -98,7 +98,7 @@
    "collection_errors": 0,
    "exit": 0,
    "seconds": 27.3,
-   "pytest_summary": "148 passed, 3 skipped in 26.33s",
+   "pytest_summary": "148 passed, 3 skipped in 26.35s",
    "junit": true
   },
   {
@@ -111,7 +111,7 @@
    "collection_errors": 0,
    "exit": 0,
    "seconds": 27.3,
-   "pytest_summary": "147 passed, 3 skipped in 26.41s",
+   "pytest_summary": "147 passed, 3 skipped in 26.40s",
    "junit": true
   },
   {
@@ -124,7 +124,7 @@
    "collection_errors": 0,
    "exit": 0,
    "seconds": 27.3,
-   "pytest_summary": "148 passed, 3 skipped in 26.36s",
+   "pytest_summary": "148 passed, 3 skipped in 26.30s",
    "junit": true
   },
   {
@@ -136,8 +136,8 @@
    "skipped": 3,
    "collection_errors": 0,
    "exit": 0,
-   "seconds": 27.3,
-   "pytest_summary": "147 passed, 3 skipped in 26.33s",
+   "seconds": 27.4,
+   "pytest_summary": "147 passed, 3 skipped in 26.45s",
    "junit": true
   },
   {
@@ -149,8 +149,8 @@
    "skipped": 3,
    "collection_errors": 0,
    "exit": 0,
-   "seconds": 27.5,
-   "pytest_summary": "148 passed, 3 skipped in 26.59s",
+   "seconds": 27.7,
+   "pytest_summary": "148 passed, 3 skipped in 26.64s",
    "junit": true
   }
  ],
@@ -190,7 +190,7 @@
     "changed_lines_covered": 5
    }
   ],
-  "seconds": 27.8,
+  "seconds": 28.2,
   "exit": 0,
   "log": "coverage-pytest.log"
  },
@@ -199,7 +199,6 @@
  "current_head_sha": "6c91de2c42d38e010a68d9618dc6aa4ba01e1372",
  "tested_invocation": 1,
  "model_provider_used": "nebius",
- "model_provider_fallback": "the AI answered but no probe was usable, so only fixed probes ran",
  "demo_helper": {
   "preflight": {
    "ok": true
@@ -208,8 +207,8 @@
   "notes": [
    "Setup check: GitHub token: present.",
    "Setup check: Nebius token: present.",
-   "Setup check: free memory 5.9 GB (of 15.6 GB).",
-   "Setup check: free disk 92.9 GB.",
+   "Setup check: free memory 9.7 GB (of 15.6 GB).",
+   "Setup check: free disk 92.0 GB.",
    "Demo helper: git is installed.",
    "Demo helper: python3 is installed.",
    "Demo helper: uv is installed.",
@@ -218,9 +217,9 @@
    "Query: loguru python documentation install https://github.com/Delgan/loguru site:github.com/Delgan/loguru",
    "Query: loguru python install requirements https://pypi.org/project/loguru/ https://github.com/Delgan/loguru site:pypi.org",
    "Source: loguru/pyproject.toml at master \u00b7 Delgan/loguru \u00b7 GitHub \u2014 https://github.com/Delgan/loguru/blob/master/pyproject.toml",
-   "Source: loguru-logging-intercept \u00b7 PyPI \u2014 https://pypi.org/project/loguru-logging-intercept/",
-   "Source: pytest-loguru \u00b7 PyPI \u2014 https://pypi.org/project/pytest-loguru/",
-   "Source: loguru-discord \u00b7 PyPI \u2014 https://pypi.org/project/loguru-discord/",
+   "Source: lager \u00b7 PyPI \u2014 https://pypi.org/project/lager/",
+   "Source: Python Logging (beans-logging) - PyPI \u2014 https://pypi.org/project/beans-logging/",
+   "Source: loguru - PyPI \u2014 https://pypi.org/project/loguru/",
    "Source: loguru/CONTRIBUTING.rst at master \u00b7 Delgan/loguru \u00b7 GitHub \u2014 https://github.com/Delgan/loguru/blob/master/CONTRIBUTING.rst",
    "Source: GitHub - Delgan/loguru: Python logging made (stupidly) simple \u00b7 GitHub \u2014 https://github.com/delgan/loguru",
    "Source: Can\u2018t Import loguru \u00b7 Issue #116 \u00b7 Delgan/loguru \u00b7 GitHub \u2014 https://github.com/Delgan/loguru/issues/116",
@@ -719,61 +718,73 @@
  "probe_plan": {
   "baseline": "full",
   "model": "model provider: nebius (Token Factory, live)",
-  "errors": [
-   "probe 'probe-a' rejected: empty probe: the code has no test statements (only imports, comments or a docstring)"
-  ],
+  "errors": [],
   "model_claims": [
    {
     "id": "C1",
-    "text": "Evaluating every rotation condition prevents a skipped condition from firing spuriously.",
-    "source_quote": "Evaluate every rotation condition so a skipped one cannot fire spuriously",
+    "text": "A skipped condition is left holding a limit that is now in the past, and it therefore fires on the very next logged message \u2014 producing a second, immediate, spurious rotation.",
+    "source_quote": "A skipped condition is left holding a limit that is now in the past, and it therefore fires on the very next logged message \u2014 producing a second, immediate, spurious rotation.",
     "testable": true,
-    "expect": "differs"
+    "expect": "differs",
+    "quote_match": "loose"
    },
    {
     "id": "C2",
-    "text": "When using any() short-circuit, skipped RotationTime conditions are not invoked, leaving their _limit stale and causing a spurious rotation on the next message.",
-    "source_quote": "`any()` over a generator **short-circuits**. That is fine for the return value, but each `RotationTime` condition is *stateful*: it lazily computes `self._limit` on first call and then advances it as a side effect of being invoked (`loguru/_file_sink.py:154-157`, the `while self._limit <= record_time: self._step_forward(...)` catch-up loop).",
+    "text": "This keeps the documented 'any of which can trigger the rotation' contract for the return value while restoring the side effect the conditions rely on.",
+    "source_quote": "This keeps the documented 'any of which can trigger the rotation' contract for the return value while restoring the side effect the conditions rely on.",
     "testable": true,
-    "expect": "differs"
+    "expect": "same",
+    "quote_match": "loose"
    },
    {
     "id": "C3",
-    "text": "Evaluating all rotation conditions ensures each condition\u2019s limit is kept up\u2011to\u2011date, avoiding stale limits that cause extra rotations.",
-    "source_quote": "# Note that the conditions must all be evaluated, even after one of them returned\n# True, because \"RotationTime\" instances keep their limit up-to-date as a side-effect\n# of being called. Skipping them would leave a stale limit in the past, causing a\n# spurious extra rotation on the next logged message.",
-    "testable": true,
-    "expect": "differs"
-   },
-   {
-    "id": "C4",
-    "text": "With the bug, two log messages produce three files (an extra spurious rotation); after the fix they produce only two files.",
-    "source_quote": "before \u2014 3 files (BUG):\n  file.2020-01-01_06-00-00_000000.log     'a\\n'\n  file.2020-01-01_13-00-01_000000.log     'b\\n'    <-- spurious extra rotation\n  file.log                                'c\\n'\n\nafter \u2014 2 files (correct):\n  file.2020-01-01_06-00-00_000000.log     'a\\n'\n  file.log                                'b\\nc\\n'",
-    "testable": true,
-    "expect": "differs"
-   },
-   {
-    "id": "C5",
-    "text": "The added test `test_multiple_rotation_conditions_all_evaluated` fails before the change (assert 3 == 2) and passes after the change.",
-    "source_quote": "`test_multiple_rotation_conditions_all_evaluated` is added to `tests/test_filesink_rotation.py`.\n- Fails before the change with `assert 3 == 2`; passes after.",
-    "testable": true,
-    "expect": "differs"
-   },
-   {
-    "id": "C6",
-    "text": "Running the file\u2011sink rotation test suite yields 147 passed and 4 skipped after the change, compared to 146 passed before.",
-    "source_quote": "- `pytest tests/test_filesink_rotation.py` \u2192 **147 passed, 4 skipped** (146 before).",
+    "text": "Fails before the change with `assert 3 == 2`; passes after.",
+    "source_quote": "Fails before the change with `assert 3 == 2`; passes after.",
     "testable": true,
     "expect": "differs"
    }
   ],
   "model_rejected_claims": [],
+  "model_loose_quote_matches": [
+   {
+    "claim": "C1",
+    "source_quote": "A skipped condition is left holding a limit that is now in the past, and it therefore fires on the very next logged message \u2014 producing a second, immediate, spurious rotation."
+   },
+   {
+    "claim": "C2",
+    "source_quote": "This keeps the documented 'any of which can trigger the rotation' contract for the return value while restoring the side effect the conditions rely on."
+   }
+  ],
   "model_retried": {
    "why": [
-    "empty probe: the code has no test statements (only imports, comments or a docstring)"
+    "no probe listed the claim ids it checks, so its results could not be tied to any claim; in each probe, \"claims\" must name the claim ids it checks and the observation names that cover them"
    ]
   },
   "diff_targets": [],
-  "frozen": []
+  "frozen": [
+   {
+    "path": "model-probes/model-p1.py",
+    "source": "model",
+    "sha256": "9e426495dd9243d99661971632cd01c829229028ddca2cd6662a093345679014",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-09T07:12:05.393230+00:00",
+    "inputs_sha256": "7be977c1fff3eb715e976ea32c76234bbee3f7a4984ceda8e6a56bdbea11e09a",
+    "inputs": {
+     "title_chars": 73,
+     "body_chars": 3344,
+     "base_files": {
+      "loguru/_file_sink.py": "d9f27b56f581db5a178ae6df357107b6b022c6ad94b639b52809c5c7fc9dd0cb"
+     }
+    }
+   }
+  ]
  },
  "test_extras": [
   "pre-commit",
@@ -791,7 +802,7 @@
   "build",
   "twine"
  ],
- "pr_side_started_at": "2026-11-09T06:00:16.814767+00:00",
+ "pr_side_started_at": "2026-11-09T07:12:05.540556+00:00",
  "test_targets": {
   "main": [
    "tests/test_filesink_rotation.py"
@@ -853,17 +864,417 @@
   "detail": "all runs exited 0"
  },
  "probes": {
-  "status": "none",
-  "items": []
+  "status": "ran",
+  "items": [
+   {
+    "id": "model-p1",
+    "source": "model",
+    "path": "model-probes/model-p1.py",
+    "sha256": "9e426495dd9243d99661971632cd01c829229028ddca2cd6662a093345679014",
+    "target": "Delgan/loguru#1515",
+    "about": "Test multiple rotation conditions evaluation and side effects.",
+    "claims": [
+     {
+      "id": "C1",
+      "source": "PR description",
+      "text": "A skipped condition is left holding a limit that is now in the past, and it therefore fires on the very next logged message \u2014 producing a second, immediate, spurious rotation.",
+      "covers": [
+       "c1.ret1",
+       "c1.ret2",
+       "c1.total_rotations",
+       "c1.second_limit_after_first",
+       "c1.second_limit_advanced"
+      ],
+      "expect": "differs"
+     },
+     {
+      "id": "C2",
+      "source": "PR description",
+      "text": "This keeps the documented 'any of which can trigger the rotation' contract for the return value while restoring the side effect the conditions rely on.",
+      "covers": [
+       "c2.return_value"
+      ],
+      "expect": "same"
+     },
+     {
+      "id": "C3",
+      "source": "PR description",
+      "text": "Fails before the change with `assert 3 == 2`; passes after.",
+      "covers": [
+       "c3.rotations_count"
+      ],
+      "expect": "differs"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-p1-main-1.jsonl",
+      "probe-model-p1-main-2.jsonl",
+      "probe-model-p1-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-p1-pr-1.jsonl",
+      "probe-model-p1-pr-2.jsonl",
+      "probe-model-p1-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "c1.ret1": true,
+       "c1.ret2": true,
+       "c1.total_rotations": 2,
+       "c1.second_limit_after_first": "2020-01-01T12:00:00",
+       "c1.second_limit_advanced": true,
+       "c2.return_value": true,
+       "c3.rotations_count": 2
+      },
+      {
+       "c1.ret1": true,
+       "c1.ret2": true,
+       "c1.total_rotations": 2,
+       "c1.second_limit_after_first": "2020-01-01T12:00:00",
+       "c1.second_limit_advanced": true,
+       "c2.return_value": true,
+       "c3.rotations_count": 2
+      },
+      {
+       "c1.ret1": true,
+       "c1.ret2": true,
+       "c1.total_rotations": 2,
+       "c1.second_limit_after_first": "2020-01-01T12:00:00",
+       "c1.second_limit_advanced": true,
+       "c2.return_value": true,
+       "c3.rotations_count": 2
+      }
+     ],
+     "pr": [
+      {
+       "c1.ret1": true,
+       "c1.ret2": false,
+       "c1.total_rotations": 1,
+       "c1.second_limit_after_first": "2020-01-02T12:00:00",
+       "c1.second_limit_advanced": true,
+       "c2.return_value": true,
+       "c3.rotations_count": 1
+      },
+      {
+       "c1.ret1": true,
+       "c1.ret2": false,
+       "c1.total_rotations": 1,
+       "c1.second_limit_after_first": "2020-01-02T12:00:00",
+       "c1.second_limit_advanced": true,
+       "c2.return_value": true,
+       "c3.rotations_count": 1
+      },
+      {
+       "c1.ret1": true,
+       "c1.ret2": false,
+       "c1.total_rotations": 1,
+       "c1.second_limit_after_first": "2020-01-02T12:00:00",
+       "c1.second_limit_advanced": true,
+       "c2.return_value": true,
+       "c3.rotations_count": 1
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "c1.ret1",
+      "state": "same",
+      "label": "needs_human",
+      "claim": "C1",
+      "main": true,
+      "pr": true,
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c1.ret1\""
+       },
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c1.ret1\""
+       }
+      }
+     },
+     {
+      "name": "c1.ret2",
+      "state": "differs",
+      "label": "proven",
+      "claim": "C1",
+      "main": true,
+      "pr": false,
+      "diffs": [
+       {
+        "field": "",
+        "main": true,
+        "pr": false
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c1.ret2\""
+       },
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c1.ret2\""
+       }
+      }
+     },
+     {
+      "name": "c1.second_limit_advanced",
+      "state": "same",
+      "label": "needs_human",
+      "claim": "C1",
+      "main": true,
+      "pr": true,
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"c1.second_limit_advanced\""
+       },
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"c1.second_limit_advanced\""
+       }
+      }
+     },
+     {
+      "name": "c1.second_limit_after_first",
+      "state": "same",
+      "label": "needs_human",
+      "claim": "C1",
+      "main": "2020-01-01T12:00:00",
+      "pr": "2020-01-02T12:00:00",
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"c1.second_limit_after_first\""
+       },
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"c1.second_limit_after_first\""
+       }
+      }
+     },
+     {
+      "name": "c1.total_rotations",
+      "state": "differs",
+      "label": "proven",
+      "claim": "C1",
+      "main": 2,
+      "pr": 1,
+      "diffs": [
+       {
+        "field": "",
+        "main": 2,
+        "pr": 1
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"c1.total_rotations\""
+       },
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"c1.total_rotations\""
+       }
+      }
+     },
+     {
+      "name": "c2.return_value",
+      "state": "same",
+      "label": "proven",
+      "claim": "C2",
+      "main": true,
+      "pr": true,
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"c2.return_value\""
+       },
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"c2.return_value\""
+       }
+      }
+     },
+     {
+      "name": "c3.rotations_count",
+      "state": "differs",
+      "label": "proven",
+      "claim": "C3",
+      "main": 2,
+      "pr": 1,
+      "diffs": [
+       {
+        "field": "",
+        "main": 2,
+        "pr": 1
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-p1-main-1.jsonl",
+        "line": 7,
+        "quote": "\"observation\": \"c3.rotations_count\""
+       },
+       "pr": {
+        "file": "probe-model-p1-pr-1.jsonl",
+        "line": 7,
+        "quote": "\"observation\": \"c3.rotations_count\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "9e426495dd9243d99661971632cd01c829229028ddca2cd6662a093345679014",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-09T07:12:05.393230+00:00",
+     "inputs_sha256": "7be977c1fff3eb715e976ea32c76234bbee3f7a4984ceda8e6a56bdbea11e09a",
+     "inputs": {
+      "title_chars": 73,
+      "body_chars": 3344,
+      "base_files": {
+       "loguru/_file_sink.py": "d9f27b56f581db5a178ae6df357107b6b022c6ad94b639b52809c5c7fc9dd0cb"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-09T07:12:05.540556+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 1,
+     "changed_lines_covered": 1,
+     "files": [
+      {
+       "file": "loguru/_file_sink.py",
+       "changed_lines_total": 1,
+       "changed_lines_covered": 1
+      }
+     ],
+     "adequacy": "adequate",
+     "note": "ran 1 of 1 changed line(s) on the main side",
+     "exit": 0,
+     "data": "probe-cov-model-p1.json"
+    },
+    "status": "ran"
+   }
+  ],
+  "summary": {
+   "labels": [
+    "needs_human",
+    "proven",
+    "needs_human",
+    "needs_human",
+    "proven",
+    "proven",
+    "proven"
+   ],
+   "flagged": [],
+   "proven_claims": [
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "reason": "probe: 3 unchanged sub-check(s) of an input where the claim's change was seen, shown as advisory only: c1.ret1 (C1); c1.second_limit_advanced (C1); c1.second_limit_after_first (C1); probe: claim(s) C1, C2, C3 proven",
+   "ignored_noise": [],
+   "ignored_warning_only": [],
+   "pr_only_noisy": [],
+   "advisory_unchanged_subchecks": [
+    "c1.ret1",
+    "c1.second_limit_advanced",
+    "c1.second_limit_after_first"
+   ],
+   "advisory_agreeing_differs": [],
+   "advisory_invalid_preservation": []
+  }
  },
  "probe_changed_line_coverage": {
-  "status": "no probes",
-  "probes": {}
+  "status": "measured",
+  "side": "main",
+  "probes": {
+   "model-p1": {
+    "status": "measured",
+    "changed_lines_covered": 1,
+    "changed_lines_total": 1,
+    "adequacy": "adequate"
+   }
+  },
+  "not_adequate": []
  },
- "verdict": "could_not_verify",
- "reason": "not verified: no AI-written probe ran any changed line, so the change itself was not exercised by a probe; 1 test(s) fail on main and pass on the PR; 148 test(s) ran on main, 148 on the PR; 0 new test(s) pass, 150 unchanged (3 of them skipped on both sides)",
+ "verdict": "verified",
+ "reason": "1 test(s) fail on main and pass on the PR; 148 test(s) ran on main, 148 on the PR; 0 new test(s) pass, 150 unchanged (3 of them skipped on both sides); probe: 3 unchanged sub-check(s) of an input where the claim's change was seen, shown as advisory only: c1.ret1 (C1); c1.second_limit_advanced (C1); c1.second_limit_after_first (C1); probe: claim(s) C1, C2, C3 proven",
  "verdict_before_coverage_gate": "verified",
- "reason_before_coverage_gate": "1 test(s) fail on main and pass on the PR; 148 test(s) ran on main, 148 on the PR; 0 new test(s) pass, 150 unchanged (3 of them skipped on both sides)",
+ "reason_before_coverage_gate": "1 test(s) fail on main and pass on the PR; 148 test(s) ran on main, 148 on the PR; 0 new test(s) pass, 150 unchanged (3 of them skipped on both sides); probe: 3 unchanged sub-check(s) of an input where the claim's change was seen, shown as advisory only: c1.ret1 (C1); c1.second_limit_advanced (C1); c1.second_limit_after_first (C1); probe: claim(s) C1, C2, C3 proven",
  "changed_lines_total": 5,
  "changed_lines_covered": 5,
  "coverage_gate": {
@@ -873,7 +1284,6 @@
   "note": "5 of 5 changed executable line(s) ran (100%)",
   "measurement": "measured"
  },
- "verdict_before_ai_probe_gate": "verified",
  "agents": {
   "status": "skipped",
   "note": "advisory swarm is off",
@@ -898,28 +1308,28 @@
   ]
  },
  "duration_s": {
-  "total_wall": 402.0,
-  "tests": 164.0
+  "total_wall": 417.7,
+  "tests": 164.4
  },
  "cost": {
   "ai_calls": 3,
   "failed_ai_calls": 0,
-  "input_tokens": 12535,
-  "output_tokens": 18590,
-  "thinking_tokens": 17770,
-  "cost_usd": 0.020492,
+  "input_tokens": 11412,
+  "output_tokens": 19476,
+  "thinking_tokens": 17788,
+  "cost_usd": 0.020952,
   "calls_without_usage": 0,
-  "ai_cost_usd": 0.020492,
+  "ai_cost_usd": 0.020952,
   "cost_complete": true,
   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
   "compute_seconds": {
-   "total_wall": 402.0,
-   "tests": 164.0
+   "total_wall": 417.7,
+   "tests": 164.4
   },
   "machine_usd_per_hour": 0.24,
   "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
-  "computer_cost_usd": 0.0268,
-  "total_cost_usd": 0.047292,
+  "computer_cost_usd": 0.027847,
+  "total_cost_usd": 0.048799,
   "swarm": {
    "ai_calls": 0,
    "failed_ai_calls": 0,
