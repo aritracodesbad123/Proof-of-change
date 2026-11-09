@@ -1,9 +1,9 @@
 {
  "schema_version": "1",
  "record_kind": "pr_run",
- "id": "pr-pyinvoke-invoke-1099-06f3320e772b-2026-11-08",
- "date_ist": "2026-11-09 11:55 IST",
- "run_date": "2026-11-08",
+ "id": "pr-pyinvoke-invoke-1099-06f3320e772b-2026-11-09",
+ "date_ist": "2026-11-09 13:09 IST",
+ "run_date": "2026-11-09",
  "who": "ops/daily_run.py",
  "repo": "pyinvoke/invoke",
  "library": "invoke",
@@ -25,7 +25,7 @@
  "updated_at_ist": "2026-11-02 13:19 IST",
  "ci_state": "passing",
  "ci_detail": "3 check runs completed without failure",
- "tested_at_ist": "2026-11-09 11:55 IST",
+ "tested_at_ist": "2026-11-09 13:09 IST",
  "files": {
   "all": [
    "invoke/__init__.py",
@@ -84,8 +84,8 @@
    "skipped": 1,
    "collection_errors": 0,
    "exit": 1,
-   "seconds": 1.8,
-   "pytest_summary": "164 passed, 1 skipped, 5 warnings, 9 errors in 1.12s",
+   "seconds": 1.7,
+   "pytest_summary": "164 passed, 1 skipped, 5 warnings, 9 errors in 1.00s",
    "junit": true
   },
   {
@@ -97,47 +97,47 @@
    "skipped": 1,
    "collection_errors": 0,
    "exit": 1,
-   "seconds": 2.0,
-   "pytest_summary": "196 passed, 1 skipped, 5 warnings, 9 errors in 1.04s",
+   "seconds": 1.9,
+   "pytest_summary": "196 passed, 1 skipped, 5 warnings, 9 errors in 1.19s",
    "junit": true
   },
   {
    "side": "old",
    "run": 2,
    "passed": 164,
-   "failed": 0,
-   "error": 8,
-   "skipped": 1,
-   "collection_errors": 0,
-   "exit": 1,
-   "seconds": 2.0,
-   "pytest_summary": "164 passed, 1 skipped, 5 warnings, 9 errors in 1.30s",
-   "junit": true
-  },
-  {
-   "side": "new",
-   "run": 2,
-   "passed": 196,
    "failed": 0,
    "error": 8,
    "skipped": 1,
    "collection_errors": 0,
    "exit": 1,
    "seconds": 1.9,
-   "pytest_summary": "196 passed, 1 skipped, 5 warnings, 9 errors in 1.12s",
+   "pytest_summary": "164 passed, 1 skipped, 5 warnings, 9 errors in 1.07s",
    "junit": true
   },
   {
-   "side": "old",
-   "run": 3,
-   "passed": 164,
+   "side": "new",
+   "run": 2,
+   "passed": 196,
    "failed": 0,
    "error": 8,
    "skipped": 1,
    "collection_errors": 0,
    "exit": 1,
    "seconds": 1.8,
-   "pytest_summary": "164 passed, 1 skipped, 5 warnings, 9 errors in 1.07s",
+   "pytest_summary": "196 passed, 1 skipped, 5 warnings, 9 errors in 1.09s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 3,
+   "passed": 164,
+   "failed": 0,
+   "error": 8,
+   "skipped": 1,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 1.7,
+   "pytest_summary": "164 passed, 1 skipped, 5 warnings, 9 errors in 1.00s",
    "junit": true
   },
   {
@@ -149,8 +149,8 @@
    "skipped": 1,
    "collection_errors": 0,
    "exit": 1,
-   "seconds": 1.9,
-   "pytest_summary": "196 passed, 1 skipped, 5 warnings, 9 errors in 1.14s",
+   "seconds": 1.8,
+   "pytest_summary": "196 passed, 1 skipped, 5 warnings, 9 errors in 1.03s",
    "junit": true
   }
  ],
@@ -195,7 +195,7 @@
     "changed_lines_covered": 6
    }
   ],
-  "seconds": 3.8,
+  "seconds": 3.7,
   "exit": 1,
   "log": "coverage-pytest.log"
  },
@@ -212,8 +212,8 @@
   "notes": [
    "Setup check: GitHub token: present.",
    "Setup check: Nebius token: present.",
-   "Setup check: free memory 7.1 GB (of 15.6 GB).",
-   "Setup check: free disk 92.8 GB.",
+   "Setup check: free memory 3.5 GB (of 15.6 GB).",
+   "Setup check: free disk 92.5 GB.",
    "Demo helper: git is installed.",
    "Demo helper: python3 is installed.",
    "Demo helper: uv is installed.",
@@ -223,15 +223,16 @@
    "Query: invoke python install requirements https://pypi.org/project/invoke/ https://github.com/pyinvoke/invoke site:pypi.org",
    "Source: invoke-common-tasks \u00b7 PyPI \u2014 https://pypi.org/project/invoke-common-tasks/",
    "Source: invoke \u00b7 PyPI \u2014 https://pypi.org/project/invoke/",
+   "Source: invoke/invoke/program.py at main \u00b7 pyinvoke/invoke \u00b7 GitHub \u2014 https://github.com/pyinvoke/invoke/blob/master/invoke/program.py",
    "Source: invoke/invoke/runners.py at main \u00b7 pyinvoke/invoke \u00b7 GitHub \u2014 https://github.com/pyinvoke/invoke/blob/master/invoke/runners.py",
-   "Source: Dealing with virtual environments \u00b7 Issue #838 \u00b7 pyinvoke/invoke \u00b7 GitHub \u2014 https://github.com/pyinvoke/invoke/issues/838",
-   "Source: Support `python -m invoke` \u00b7 Issue #444 \u00b7 pyinvoke/invoke \u00b7 GitHub \u2014 https://github.com/pyinvoke/invoke/issues/444",
+   "Source: ImportError: cannot import name yaml2 \u00b7 Issue #319 \u00b7 pyinvoke/invoke \u00b7 GitHub \u2014 https://github.com/pyinvoke/invoke/issues/319",
    "Source: Invoke 0.13 breaks on Windows (unavailable default shell) \u00b7 Issue #371 \u00b7 pyinvoke/invoke \u00b7 GitHub \u2014 https://github.com/pyinvoke/invoke/issues/371",
+   "Source: Dealing with virtual environments \u00b7 Issue #838 \u00b7 pyinvoke/invoke \u00b7 GitHub \u2014 https://github.com/pyinvoke/invoke/issues/838",
    "Setup plan: the same packages on main and pr.",
    "Setup plan: Python 3.12: Python 3.12 already meets >=3.9",
    "Installed icecream 2.2.0 from project (named by the error and listed in the project) on main and pr.",
-   "Before rerun: could_not_verify: tests produced no results on both sides (collection failed; see pytest logs); probe: 1 observation(s) shown as advisory only (claim not shown on these inputs; a related change was proven): c5.test_file_exists (C5); probe: claim(s) C1, C2, C3, C4 proven",
-   "After rerun: needs_attention: probe: 1 observation(s) need attention: c5.test_file_exists does not differ although the claim says it does (C5); probe model-p1 has no measured line coverage (no coverage data); it does not count as covering the change; tests: 32 test(s) fail on main and pass on the PR; 204 test(s) ran on main, 204 on the PR; 0 new test(s) pass, 165 unchanged (1 of them skipped on both sides); 8 test failure(s) pre-existing and identical on both sides"
+   "Before rerun: could_not_verify: tests produced no results on both sides (collection failed; see pytest logs); probe: 1 observation(s) shown as advisory only (claim not shown on these inputs; a related change was proven): c4.test_file_exists (C4); probe: claim(s) C1, C2, C3, C5 proven",
+   "After rerun: needs_attention: probe: 1 observation(s) need attention: c4.test_file_exists does not differ although the claim says it does (C4); probe model-probe-public-exports has no measured line coverage (no coverage data); it does not count as covering the change; tests: 32 test(s) fail on main and pass on the PR; 204 test(s) ran on main, 204 on the PR; 0 new test(s) pass, 165 unchanged (1 of them skipped on both sides); 8 test failure(s) pre-existing and identical on both sides"
   ],
   "install_docs": [
    "README.rst",
@@ -288,12 +289,12 @@
     {
      "round": 1,
      "verdict": "could_not_verify",
-     "reason": "tests produced no results on both sides (collection failed; see pytest logs); probe: 1 observation(s) shown as advisory only (claim not shown on these inputs; a related change was proven): c5.test_file_exists (C5); probe: claim(s) C1, C2, C3, C4 proven"
+     "reason": "tests produced no results on both sides (collection failed; see pytest logs); probe: 1 observation(s) shown as advisory only (claim not shown on these inputs; a related change was proven): c4.test_file_exists (C4); probe: claim(s) C1, C2, C3, C5 proven"
     },
     {
      "round": 2,
      "verdict": "needs_attention",
-     "reason": "probe: 1 observation(s) need attention: c5.test_file_exists does not differ although the claim says it does (C5); probe model-p1 has no measured line coverage (no coverage data); it does not count as covering the change; tests: 32 test(s) fail on main and pass on the PR; 204 test(s) ran on main, 204 on the PR; 0 new test(s) pass, 165 unchanged (1 of them skipped on both sides); 8 test failure(s) pre-existing and identical on both sides"
+     "reason": "probe: 1 observation(s) need attention: c4.test_file_exists does not differ although the claim says it does (C4); probe model-probe-public-exports has no measured line coverage (no coverage data); it does not count as covering the change; tests: 32 test(s) fail on main and pass on the PR; 204 test(s) ran on main, 204 on the PR; 0 new test(s) pass, 165 unchanged (1 of them skipped on both sides); 8 test failure(s) pre-existing and identical on both sides"
     }
    ],
    "installed": [
@@ -337,52 +338,47 @@
   "model_claims": [
    {
     "id": "C1",
-    "text": "`from invoke import task` fails type checking when mypy runs with `implicit-reexport = false`.",
-    "source_quote": "`from invoke import task` fails type checking when mypy runs with `implicit-reexport = false`",
-    "testable": true,
-    "expect": "same"
-   },
-   {
-    "id": "C2",
-    "text": "After applying the PR, `from invoke import task` passes type checking under mypy --no-implicit-reexport.",
+    "text": "After applying the PR, running `mypy --no-implicit-reexport` on `from invoke import task` passes type checking.",
     "source_quote": "Repro from the issue: mypy --no-implicit-reexport on from invoke import task and other public imports fails on the original code and passes with this change",
     "testable": true,
     "expect": "differs"
    },
    {
-    "id": "C3",
+    "id": "C2",
     "text": "After applying the PR, `from invoke import *` does not leak internal names such as `metadata`.",
     "source_quote": "`from invoke import *` is now restricted by `__all__` and no longer leaks internals such as `metadata`.",
     "testable": true,
     "expect": "differs"
    },
    {
+    "id": "C3",
+    "text": "After applying the PR, both `invoke/__init__.py` and `invoke/parser/__init__.py` define an `__all__` variable listing the public names.",
+    "source_quote": "defines `__all__` in both packages to list the public names",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
     "id": "C4",
-    "text": "After applying the PR, both `invoke/__init__.py` and `invoke/parser/__init__.py` define `__all__` listing public names.",
-    "source_quote": "This change converts top-level imports to `X as X` form to mark them as explicit re-exports, and defines `__all__` in both packages to list the public names.",
+    "text": "The new test file `tests/test_public_exports.py` contains tests that fail on the original code and pass with this change.",
+    "source_quote": "New tests (`tests/test_public_exports.py`) fail on the original code and pass with this change.",
     "testable": true,
     "expect": "differs"
    },
    {
     "id": "C5",
-    "text": "The new tests in `tests/test_public_exports.py` fail on the original code and pass with the PR.",
-    "source_quote": "New tests (`tests/test_public_exports.py`) fail on the original code and pass with this change.",
+    "text": "Applying the PR does not introduce any new test failures; the number of failing tests remains the same as in the original code (114 pre\u2011existing failures).",
+    "source_quote": "Sandbox: 891/1016 tests pass, 114 failing (114 of them already failed on the original code and are not caused by the patch).",
     "testable": true,
-    "expect": "differs"
+    "expect": "same"
    }
   ],
   "model_rejected_claims": [],
-  "model_retried": {
-   "why": [
-    "no probe listed the claim ids it checks, so its results could not be tied to any claim; in each probe, \"claims\" must name the claim ids it checks and the observation names that cover them"
-   ]
-  },
   "diff_targets": [],
   "frozen": [
    {
-    "path": "model-probes/model-p1.py",
+    "path": "model-probes/model-probe-public-exports.py",
     "source": "model",
-    "sha256": "3ffc92986b27fbb7cf9e99e98b72da2cc257e04ecaf123d429f02e590f3c9e3c",
+    "sha256": "10501b6c105f7a7ac9075382401973f45a95a26b2178a9d23df7bb305b6e87e9",
     "generator": {
      "kind": "model",
      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
@@ -391,7 +387,7 @@
      "provenance": "live",
      "blind": true
     },
-    "frozen_at": "2026-11-09T06:26:04.866693+00:00",
+    "frozen_at": "2026-11-09T07:41:05.057107+00:00",
     "inputs_sha256": "cbc2cc5b0e7a0e84d45c33f317fd424c73efcbca64cb59a2565562d8b21bc556",
     "inputs": {
      "title_chars": 44,
@@ -407,7 +403,7 @@
  "test_extras": [
   "pytest-relaxed>=2"
  ],
- "pr_side_started_at": "2026-11-09T06:26:05.069243+00:00",
+ "pr_side_started_at": "2026-11-09T07:41:05.315317+00:00",
  "test_targets": {
   "main": [
    "tests/_support/depth_first.py",
@@ -448,57 +444,59 @@
   "status": "ran",
   "items": [
    {
-    "id": "model-p1",
+    "id": "model-probe-public-exports",
     "source": "model",
-    "path": "model-probes/model-p1.py",
-    "sha256": "3ffc92986b27fbb7cf9e99e98b72da2cc257e04ecaf123d429f02e590f3c9e3c",
+    "path": "model-probes/model-probe-public-exports.py",
+    "sha256": "10501b6c105f7a7ac9075382401973f45a95a26b2178a9d23df7bb305b6e87e9",
     "target": "pyinvoke/invoke#1099",
-    "about": "Check import task success, __all__ definitions, star import leakage, and test file existence.",
+    "about": "Check public exports and star import behavior",
     "claims": [
      {
       "id": "C1",
       "source": "PR description",
-      "text": "`from invoke import task` fails type checking when mypy runs with `implicit-reexport = false`.",
+      "text": "After applying the PR, running `mypy --no-implicit-reexport` on `from invoke import task` passes type checking.",
       "covers": [
-       "c1.import_task_success"
+       "c1.invoke_has_all",
+       "c1.parser_has_all"
       ],
-      "expect": "same"
+      "expect": "differs"
      },
      {
       "id": "C2",
       "source": "PR description",
-      "text": "After applying the PR, `from invoke import task` passes type checking under mypy --no-implicit-reexport.",
+      "text": "After applying the PR, `from invoke import *` does not leak internal names such as `metadata`.",
       "covers": [
-       "c2.mypy_pass"
+       "c2.star_import_leaks_metadata"
       ],
       "expect": "differs"
      },
      {
       "id": "C3",
       "source": "PR description",
-      "text": "After applying the PR, `from invoke import *` does not leak internal names such as `metadata`.",
+      "text": "After applying the PR, both `invoke/__init__.py` and `invoke/parser/__init__.py` define an `__all__` variable listing the public names.",
       "covers": [
-       "c3.star_leaks_metadata"
+       "c3.invoke_has_all",
+       "c3.parser_has_all"
       ],
       "expect": "differs"
      },
      {
       "id": "C4",
       "source": "PR description",
-      "text": "After applying the PR, both `invoke/__init__.py` and `invoke/parser/__init__.py` define `__all__` listing public names.",
+      "text": "The new test file `tests/test_public_exports.py` contains tests that fail on the original code and pass with this change.",
       "covers": [
-       "c4.both_have_all"
+       "c4.test_file_exists"
       ],
       "expect": "differs"
      },
      {
       "id": "C5",
       "source": "PR description",
-      "text": "The new tests in `tests/test_public_exports.py` fail on the original code and pass with the PR.",
+      "text": "Applying the PR does not introduce any new test failures; the number of failing tests remains the same as in the original code (114 pre\u2011existing failures).",
       "covers": [
-       "c5.test_file_exists"
+       "c5.invoke_imports_without_error"
       ],
-      "expect": "differs"
+      "expect": "same"
      }
     ],
     "runs_per_side": 3,
@@ -542,90 +540,82 @@
     ],
     "outputs": {
      "main": [
-      "probe-model-p1-main-1.jsonl",
-      "probe-model-p1-main-2.jsonl",
-      "probe-model-p1-main-3.jsonl"
+      "probe-model-probe-public-exports-main-1.jsonl",
+      "probe-model-probe-public-exports-main-2.jsonl",
+      "probe-model-probe-public-exports-main-3.jsonl"
      ],
      "pr": [
-      "probe-model-p1-pr-1.jsonl",
-      "probe-model-p1-pr-2.jsonl",
-      "probe-model-p1-pr-3.jsonl"
+      "probe-model-probe-public-exports-pr-1.jsonl",
+      "probe-model-probe-public-exports-pr-2.jsonl",
+      "probe-model-probe-public-exports-pr-3.jsonl"
      ]
     },
     "runs": {
      "main": [
       {
-       "c1.import_task_success": true,
-       "c2.mypy_pass": false,
-       "c3.star_leaks_metadata": true,
-       "c4.both_have_all": false,
-       "c5.test_file_exists": false
+       "c1.invoke_has_all": false,
+       "c3.invoke_has_all": false,
+       "c1.parser_has_all": false,
+       "c3.parser_has_all": false,
+       "c2.star_import_leaks_metadata": true,
+       "c4.test_file_exists": false,
+       "c5.invoke_imports_without_error": true
       },
       {
-       "c1.import_task_success": true,
-       "c2.mypy_pass": false,
-       "c3.star_leaks_metadata": true,
-       "c4.both_have_all": false,
-       "c5.test_file_exists": false
+       "c1.invoke_has_all": false,
+       "c3.invoke_has_all": false,
+       "c1.parser_has_all": false,
+       "c3.parser_has_all": false,
+       "c2.star_import_leaks_metadata": true,
+       "c4.test_file_exists": false,
+       "c5.invoke_imports_without_error": true
       },
       {
-       "c1.import_task_success": true,
-       "c2.mypy_pass": false,
-       "c3.star_leaks_metadata": true,
-       "c4.both_have_all": false,
-       "c5.test_file_exists": false
+       "c1.invoke_has_all": false,
+       "c3.invoke_has_all": false,
+       "c1.parser_has_all": false,
+       "c3.parser_has_all": false,
+       "c2.star_import_leaks_metadata": true,
+       "c4.test_file_exists": false,
+       "c5.invoke_imports_without_error": true
       }
      ],
      "pr": [
       {
-       "c1.import_task_success": true,
-       "c2.mypy_pass": true,
-       "c3.star_leaks_metadata": false,
-       "c4.both_have_all": true,
-       "c5.test_file_exists": false
+       "c1.invoke_has_all": true,
+       "c3.invoke_has_all": true,
+       "c1.parser_has_all": true,
+       "c3.parser_has_all": true,
+       "c2.star_import_leaks_metadata": false,
+       "c4.test_file_exists": false,
+       "c5.invoke_imports_without_error": true
       },
       {
-       "c1.import_task_success": true,
-       "c2.mypy_pass": true,
-       "c3.star_leaks_metadata": false,
-       "c4.both_have_all": true,
-       "c5.test_file_exists": false
+       "c1.invoke_has_all": true,
+       "c3.invoke_has_all": true,
+       "c1.parser_has_all": true,
+       "c3.parser_has_all": true,
+       "c2.star_import_leaks_metadata": false,
+       "c4.test_file_exists": false,
+       "c5.invoke_imports_without_error": true
       },
       {
-       "c1.import_task_success": true,
-       "c2.mypy_pass": true,
-       "c3.star_leaks_metadata": false,
-       "c4.both_have_all": true,
-       "c5.test_file_exists": false
+       "c1.invoke_has_all": true,
+       "c3.invoke_has_all": true,
+       "c1.parser_has_all": true,
+       "c3.parser_has_all": true,
+       "c2.star_import_leaks_metadata": false,
+       "c4.test_file_exists": false,
+       "c5.invoke_imports_without_error": true
       }
      ]
     },
     "observations": [
      {
-      "name": "c1.import_task_success",
-      "state": "same",
-      "label": "proven",
-      "claim": "C1",
-      "main": true,
-      "pr": true,
-      "citations": {
-       "main": {
-        "file": "probe-model-p1-main-1.jsonl",
-        "line": 1,
-        "quote": "\"observation\": \"c1.import_task_success\""
-       },
-       "pr": {
-        "file": "probe-model-p1-pr-1.jsonl",
-        "line": 1,
-        "quote": "\"observation\": \"c1.import_task_success\""
-       }
-      }
-     },
-     {
-      "name": "c2.mypy_pass",
+      "name": "c1.invoke_has_all",
       "state": "differs",
       "label": "proven",
-      "claim": "C2",
+      "claim": "C1",
       "main": false,
       "pr": true,
       "diffs": [
@@ -637,22 +627,49 @@
       ],
       "citations": {
        "main": {
-        "file": "probe-model-p1-main-1.jsonl",
-        "line": 2,
-        "quote": "\"observation\": \"c2.mypy_pass\""
+        "file": "probe-model-probe-public-exports-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c1.invoke_has_all\""
        },
        "pr": {
-        "file": "probe-model-p1-pr-1.jsonl",
-        "line": 2,
-        "quote": "\"observation\": \"c2.mypy_pass\""
+        "file": "probe-model-probe-public-exports-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c1.invoke_has_all\""
        }
       }
      },
      {
-      "name": "c3.star_leaks_metadata",
+      "name": "c1.parser_has_all",
       "state": "differs",
       "label": "proven",
-      "claim": "C3",
+      "claim": "C1",
+      "main": false,
+      "pr": true,
+      "diffs": [
+       {
+        "field": "",
+        "main": false,
+        "pr": true
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe-public-exports-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c1.parser_has_all\""
+       },
+       "pr": {
+        "file": "probe-model-probe-public-exports-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c1.parser_has_all\""
+       }
+      }
+     },
+     {
+      "name": "c2.star_import_leaks_metadata",
+      "state": "differs",
+      "label": "proven",
+      "claim": "C2",
       "main": true,
       "pr": false,
       "diffs": [
@@ -664,22 +681,22 @@
       ],
       "citations": {
        "main": {
-        "file": "probe-model-p1-main-1.jsonl",
+        "file": "probe-model-probe-public-exports-main-1.jsonl",
         "line": 3,
-        "quote": "\"observation\": \"c3.star_leaks_metadata\""
+        "quote": "\"observation\": \"c2.star_import_leaks_metadata\""
        },
        "pr": {
-        "file": "probe-model-p1-pr-1.jsonl",
+        "file": "probe-model-probe-public-exports-pr-1.jsonl",
         "line": 3,
-        "quote": "\"observation\": \"c3.star_leaks_metadata\""
+        "quote": "\"observation\": \"c2.star_import_leaks_metadata\""
        }
       }
      },
      {
-      "name": "c4.both_have_all",
+      "name": "c3.invoke_has_all",
       "state": "differs",
       "label": "proven",
-      "claim": "C4",
+      "claim": "C3",
       "main": false,
       "pr": true,
       "diffs": [
@@ -691,34 +708,81 @@
       ],
       "citations": {
        "main": {
-        "file": "probe-model-p1-main-1.jsonl",
+        "file": "probe-model-probe-public-exports-main-1.jsonl",
         "line": 4,
-        "quote": "\"observation\": \"c4.both_have_all\""
+        "quote": "\"observation\": \"c3.invoke_has_all\""
        },
        "pr": {
-        "file": "probe-model-p1-pr-1.jsonl",
+        "file": "probe-model-probe-public-exports-pr-1.jsonl",
         "line": 4,
-        "quote": "\"observation\": \"c4.both_have_all\""
+        "quote": "\"observation\": \"c3.invoke_has_all\""
        }
       }
      },
      {
-      "name": "c5.test_file_exists",
+      "name": "c3.parser_has_all",
+      "state": "differs",
+      "label": "proven",
+      "claim": "C3",
+      "main": false,
+      "pr": true,
+      "diffs": [
+       {
+        "field": "",
+        "main": false,
+        "pr": true
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe-public-exports-main-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"c3.parser_has_all\""
+       },
+       "pr": {
+        "file": "probe-model-probe-public-exports-pr-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"c3.parser_has_all\""
+       }
+      }
+     },
+     {
+      "name": "c4.test_file_exists",
       "state": "same",
       "label": "needs_human",
-      "claim": "C5",
+      "claim": "C4",
       "main": false,
       "pr": false,
       "citations": {
        "main": {
-        "file": "probe-model-p1-main-1.jsonl",
-        "line": 5,
-        "quote": "\"observation\": \"c5.test_file_exists\""
+        "file": "probe-model-probe-public-exports-main-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"c4.test_file_exists\""
        },
        "pr": {
-        "file": "probe-model-p1-pr-1.jsonl",
-        "line": 5,
-        "quote": "\"observation\": \"c5.test_file_exists\""
+        "file": "probe-model-probe-public-exports-pr-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"c4.test_file_exists\""
+       }
+      }
+     },
+     {
+      "name": "c5.invoke_imports_without_error",
+      "state": "same",
+      "label": "proven",
+      "claim": "C5",
+      "main": true,
+      "pr": true,
+      "citations": {
+       "main": {
+        "file": "probe-model-probe-public-exports-main-1.jsonl",
+        "line": 7,
+        "quote": "\"observation\": \"c5.invoke_imports_without_error\""
+       },
+       "pr": {
+        "file": "probe-model-probe-public-exports-pr-1.jsonl",
+        "line": 7,
+        "quote": "\"observation\": \"c5.invoke_imports_without_error\""
        }
       }
      }
@@ -732,7 +796,7 @@
      "blind": true
     },
     "freeze": {
-     "sha256": "3ffc92986b27fbb7cf9e99e98b72da2cc257e04ecaf123d429f02e590f3c9e3c",
+     "sha256": "10501b6c105f7a7ac9075382401973f45a95a26b2178a9d23df7bb305b6e87e9",
      "generator": {
       "kind": "model",
       "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
@@ -741,7 +805,7 @@
       "provenance": "live",
       "blind": true
      },
-     "frozen_at": "2026-11-09T06:26:04.866693+00:00",
+     "frozen_at": "2026-11-09T07:41:05.057107+00:00",
      "inputs_sha256": "cbc2cc5b0e7a0e84d45c33f317fd424c73efcbca64cb59a2565562d8b21bc556",
      "inputs": {
       "title_chars": 44,
@@ -752,7 +816,7 @@
       }
      },
      "verified": true,
-     "pr_started_at": "2026-11-09T06:26:05.069243+00:00"
+     "pr_started_at": "2026-11-09T07:41:05.315317+00:00"
     },
     "status": "ran"
    }
@@ -763,22 +827,24 @@
     "proven",
     "proven",
     "proven",
-    "needs_human"
+    "proven",
+    "needs_human",
+    "proven"
    ],
    "flagged": [],
    "proven_claims": [
     "C1",
     "C2",
     "C3",
-    "C4"
+    "C5"
    ],
-   "reason": "probe: 1 observation(s) shown as advisory only (claim not shown on these inputs; a related change was proven): c5.test_file_exists (C5); probe: claim(s) C1, C2, C3, C4 proven",
+   "reason": "probe: 1 observation(s) shown as advisory only (claim not shown on these inputs; a related change was proven): c4.test_file_exists (C4); probe: claim(s) C1, C2, C3, C5 proven",
    "ignored_noise": [],
    "ignored_warning_only": [],
    "pr_only_noisy": [],
    "advisory_unchanged_subchecks": [],
    "advisory_agreeing_differs": [
-    "c5.test_file_exists"
+    "c4.test_file_exists"
    ],
    "advisory_invalid_preservation": []
   }
@@ -787,7 +853,7 @@
   "status": "not measured",
   "side": "main",
   "probes": {
-   "model-p1": {
+   "model-probe-public-exports": {
     "status": null,
     "changed_lines_covered": null,
     "changed_lines_total": null,
@@ -797,7 +863,7 @@
   "not_adequate": []
  },
  "verdict": "needs_attention",
- "reason": "probe: 1 observation(s) need attention: c5.test_file_exists does not differ although the claim says it does (C5); probe model-p1 has no measured line coverage (no coverage data); it does not count as covering the change; tests: 32 test(s) fail on main and pass on the PR; 204 test(s) ran on main, 204 on the PR; 0 new test(s) pass, 165 unchanged (1 of them skipped on both sides); 8 test failure(s) pre-existing and identical on both sides",
+ "reason": "probe: 1 observation(s) need attention: c4.test_file_exists does not differ although the claim says it does (C4); probe model-probe-public-exports has no measured line coverage (no coverage data); it does not count as covering the change; tests: 32 test(s) fail on main and pass on the PR; 204 test(s) ran on main, 204 on the PR; 0 new test(s) pass, 165 unchanged (1 of them skipped on both sides); 8 test failure(s) pre-existing and identical on both sides",
  "comparison": {
   "same": 173,
   "same_skipped_both": 1,
@@ -949,7 +1015,7 @@
   "detail": "pytest exit 1; 8 failure(s)/error(s) pre-existing and identical on both sides"
  },
  "verdict_before_coverage_gate": "needs_attention",
- "reason_before_coverage_gate": "probe: 1 observation(s) need attention: c5.test_file_exists does not differ although the claim says it does (C5); probe model-p1 has no measured line coverage (no coverage data); it does not count as covering the change; tests: 32 test(s) fail on main and pass on the PR; 204 test(s) ran on main, 204 on the PR; 0 new test(s) pass, 165 unchanged (1 of them skipped on both sides); 8 test failure(s) pre-existing and identical on both sides",
+ "reason_before_coverage_gate": "probe: 1 observation(s) need attention: c4.test_file_exists does not differ although the claim says it does (C4); probe model-probe-public-exports has no measured line coverage (no coverage data); it does not count as covering the change; tests: 32 test(s) fail on main and pass on the PR; 204 test(s) ran on main, 204 on the PR; 0 new test(s) pass, 165 unchanged (1 of them skipped on both sides); 8 test failure(s) pre-existing and identical on both sides",
  "changed_lines_total": 19,
  "changed_lines_covered": 19,
  "coverage_gate": {
@@ -983,28 +1049,28 @@
   ]
  },
  "duration_s": {
-  "total_wall": 87.3,
-  "tests": 11.4
+  "total_wall": 111.8,
+  "tests": 10.8
  },
  "cost": {
-  "ai_calls": 3,
+  "ai_calls": 2,
   "failed_ai_calls": 0,
-  "input_tokens": 5891,
-  "output_tokens": 6212,
-  "thinking_tokens": 4579,
-  "cost_usd": 0.007358,
+  "input_tokens": 3329,
+  "output_tokens": 9493,
+  "thinking_tokens": 8428,
+  "cost_usd": 0.009542,
   "calls_without_usage": 0,
-  "ai_cost_usd": 0.007358,
+  "ai_cost_usd": 0.009542,
   "cost_complete": true,
   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
   "compute_seconds": {
-   "total_wall": 87.3,
-   "tests": 11.4
+   "total_wall": 111.8,
+   "tests": 10.8
   },
   "machine_usd_per_hour": 0.24,
   "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
-  "computer_cost_usd": 0.00582,
-  "total_cost_usd": 0.013178,
+  "computer_cost_usd": 0.007453,
+  "total_cost_usd": 0.016995,
   "swarm": {
    "ai_calls": 0,
    "failed_ai_calls": 0,
