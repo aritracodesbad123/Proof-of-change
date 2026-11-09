@@ -1,0 +1,939 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-psf-requests-7513-254195ec43d7-2026-11-08",
+ "date_ist": "2026-11-08 11:44 IST",
+ "run_date": "2026-11-08",
+ "who": "ops/daily_run.py",
+ "repo": "psf/requests",
+ "library": "requests",
+ "pr": {
+  "repo": "psf/requests",
+  "number": 7513,
+  "url": "https://github.com/psf/requests/pull/7513",
+  "title": "Make RequestsCookieJar.popitem() work",
+  "base_sha": "6f66281a1d6326b1b9c4ac09ca30de0fc4e6ef43",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "254195ec43d7045b4061d29649e543ccb3882183",
+  "merge_commit": null,
+  "tested_main_sha": "6f66281a1d6326b1b9c4ac09ca30de0fc4e6ef43",
+  "tested_main_sha_label": "caller-supplied base (an ancestor of the PR head; a newer target tip was not used)"
+ },
+ "author": "vineethsaivs",
+ "base_ref": "main",
+ "updated_at_utc": "2026-11-07T23:52:44Z",
+ "updated_at_ist": "2026-11-08 05:22 IST",
+ "ci_state": "none",
+ "ci_detail": "no check runs visible",
+ "tested_at_ist": "2026-11-08 11:44 IST",
+ "files": {
+  "all": [
+   "src/requests/cookies.py",
+   "tests/test_requests.py"
+  ],
+  "package_py": [
+   "src/requests/cookies.py"
+  ],
+  "compiled": [],
+  "other": [
+   "tests/test_requests.py"
+  ]
+ },
+ "machine_type": {
+  "arch": "x86_64",
+  "os": "Linux",
+  "platform": "Linux-6.12.94+-x86_64-with-glibc2.41",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": "g++ (Debian 14.2.0-19) 14.2.0",
+  "cpu_model": "Intel(R) Xeon(R) Processor",
+  "ram_gb": 15.6
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 3,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.15",
+ "test_selection": "mapped from touched files: tests/test_requests.py, tests/test_utils.py",
+ "per_run": [
+  {
+   "side": "old",
+   "run": 1,
+   "passed": 547,
+   "failed": 8,
+   "error": 0,
+   "skipped": 15,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 32.9,
+   "pytest_summary": "8 failed, 547 passed, 14 skipped, 1 xfailed, 18 warnings in 31.96s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 1,
+   "passed": 550,
+   "failed": 8,
+   "error": 0,
+   "skipped": 15,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 23.3,
+   "pytest_summary": "8 failed, 550 passed, 14 skipped, 1 xfailed, 18 warnings in 22.34s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 2,
+   "passed": 547,
+   "failed": 8,
+   "error": 0,
+   "skipped": 15,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 32.4,
+   "pytest_summary": "8 failed, 547 passed, 14 skipped, 1 xfailed, 18 warnings in 31.50s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 2,
+   "passed": 550,
+   "failed": 8,
+   "error": 0,
+   "skipped": 15,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 22.9,
+   "pytest_summary": "8 failed, 550 passed, 14 skipped, 1 xfailed, 18 warnings in 21.99s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 3,
+   "passed": 547,
+   "failed": 8,
+   "error": 0,
+   "skipped": 15,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 33.9,
+   "pytest_summary": "8 failed, 547 passed, 14 skipped, 1 xfailed, 18 warnings in 33.02s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 3,
+   "passed": 550,
+   "failed": 8,
+   "error": 0,
+   "skipped": 15,
+   "collection_errors": 0,
+   "exit": 1,
+   "seconds": 22.7,
+   "pytest_summary": "8 failed, 550 passed, 14 skipped, 1 xfailed, 18 warnings in 21.84s",
+   "junit": true
+  }
+ ],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "local",
+ "sandbox_backend_note": "local bubblewrap",
+ "machine": "local",
+ "tool_setup": {
+  "installed": [],
+  "tries": 0,
+  "note": "All required tools were already installed.",
+  "refused": []
+ },
+ "posted_upstream": false,
+ "logs": "requests-7513/",
+ "freeze": {
+  "main": "freeze-main.txt",
+  "pr": "freeze-pr.txt"
+ },
+ "coverage": {
+  "status": "measured",
+  "changed_lines_total": 7,
+  "changed_lines_covered": 7,
+  "files": [
+   {
+    "file": "src/requests/cookies.py",
+    "changed_lines_total": 7,
+    "changed_lines_covered": 7
+   }
+  ],
+  "seconds": 23.9,
+  "exit": 1,
+  "log": "coverage-pytest.log"
+ },
+ "poc_commit": "ef12096677e9cf59e8673436d74ec65d53771d7c",
+ "route": "source-pair",
+ "current_head_sha": "254195ec43d7045b4061d29649e543ccb3882183",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "model_provider_fallback": "the AI answered but no probe was usable, so only fixed probes ran",
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": "[redacted]",
+  "notes": [
+   "Setup check: GitHub token: present.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory 2.5 GB (of 15.6 GB).",
+   "Setup check: free disk 93.2 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: [redacted] results",
+   "Query: requests python setup install instructions https://github.com/psf/requests site:github.com/psf/requests",
+   "Query: requests python documentation install https://github.com/psf/requests site:github.com/psf/requests",
+   "Query: requests python install requirements https://pypi.org/project/requests/ https://github.com/psf/requests site:pypi.org",
+   "Source: requests/docs/user/install.rst at main \u00b7 psf/requests \u00b7 GitHub \u2014 https://github.com/psf/requests/blob/main/docs/user/install.rst",
+   "Source: requests \u2014 https://pypi.org/project/requests/",
+   "Source: Trying to install requests \u00b7 Issue #4530 \u00b7 psf/requests \u00b7 GitHub \u2014 https://github.com/psf/requests/issues/4530",
+   "Source: Regenerating tests/certs/ with OpenSSL >= 3.2.0 causes test failures \u00b7 Issue #6896 \u00b7 psf/requests \u00b7 GitHub \u2014 https://github.com/psf/requests/issues/6896",
+   "Source: requests/HISTORY.md at main \u00b7 psf/requests \u00b7 GitHub \u2014 https://github.com/psf/requests/blob/main/HISTORY.md",
+   "Source: GitHub - psf/requests at www.awesomepython.org \u00b7 GitHub \u2014 https://github.com/psf/requests?ref=www.awesomepython.org",
+   "Source: requests/.readthedocs.yaml at main \u00b7 psf/requests \u00b7 GitHub \u2014 https://github.com/psf/requests/blob/main/.readthedocs.yaml",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: charset_normalizer is noted, installed with the project.",
+   "Setup plan: idna is noted, installed with the project.",
+   "Setup plan: urllib3 is noted, installed with the project.",
+   "Setup plan: certifi is noted, installed with the project.",
+   "Setup plan: install pytest-httpbin==2.1.0 (listed in the test extra) on main and pr.",
+   "Setup plan: install httpbin~=0.10.0 (listed in the test extra) on main and pr.",
+   "Setup plan: install pytest-cov (listed in the test extra) on main and pr.",
+   "Setup plan: install pytest-mock (listed in the test extra) on main and pr.",
+   "Setup plan: install pytest-xdist (listed in the test extra) on main and pr.",
+   "Setup plan: install pytest>=3 (listed in the test extra) on main and pr.",
+   "Setup plan: install trustme (listed in the test extra) on main and pr.",
+   "Setup plan: install wheel (listed in requirements-dev.txt) on main and pr.",
+   "Setup plan: install Sphinx==7.2.6 (listed in requirements.txt) on main and pr.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >=3.10",
+   "Installed pytest-httpbin 2.1.0 from pyproject (listed in the test extra) on main and pr.",
+   "Installed httpbin 0.10.4 from pyproject (listed in the test extra) on main and pr.",
+   "Installed pytest-cov 7.1.0 from pyproject (listed in the test extra) on main and pr.",
+   "Installed pytest-mock 3.17.0 from pyproject (listed in the test extra) on main and pr.",
+   "Installed pytest-xdist 3.8.0 from pyproject (listed in the test extra) on main and pr.",
+   "Installed pytest 9.2.0 from pyproject (listed in the test extra) on main and pr.",
+   "Installed trustme 1.2.1 from pyproject (listed in the test extra) on main and pr.",
+   "Installed wheel 0.48.0 from requirements-dev.txt (listed in requirements-dev.txt) on main and pr.",
+   "Installed Sphinx 7.2.6 from requirements.txt (listed in requirements.txt) on main and pr."
+  ],
+  "install_docs": [
+   "setup.py",
+   "Makefile",
+   "README.md",
+   "pyproject.toml",
+   "tox.ini",
+   "docs/Makefile",
+   ".github/CONTRIBUTING.md",
+   ".github/workflows/lint.yml",
+   ".github/workflows/close-issues.yml",
+   ".github/workflows/publish.yml",
+   ".github/workflows/lock-issues.yml",
+   ".github/workflows/run-tests.yml",
+   ".github/workflows/zizmor.yml",
+   ".github/workflows/typecheck.yml",
+   ".github/workflows/codeql-analysis.yml"
+  ],
+  "install_docs_from": "main",
+  "setup_plan": {
+   "packages": [
+    {
+     "requirement": "charset_normalizer>=2,<4",
+     "name": "charset_normalizer",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "idna>=2.5,<4",
+     "name": "idna",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "urllib3>=1.26,<3",
+     "name": "urllib3",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "certifi>=2023.5.7",
+     "name": "certifi",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest-httpbin==2.1.0",
+     "name": "pytest-httpbin",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the test extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "httpbin~=0.10.0",
+     "name": "httpbin",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the test extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest-cov",
+     "name": "pytest-cov",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the test extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest-mock",
+     "name": "pytest-mock",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the test extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest-xdist",
+     "name": "pytest-xdist",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the test extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest>=3",
+     "name": "pytest",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the test extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "trustme",
+     "name": "trustme",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the test extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "wheel",
+     "name": "wheel",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements-dev.txt",
+     "reason": "listed in requirements-dev.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "Sphinx==7.2.6",
+     "name": "Sphinx",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    }
+   ],
+   "scope_blocked": "",
+   "component": null,
+   "aggregate_names": [],
+   "extra_reqs": [
+    "pytest-httpbin==2.1.0",
+    "httpbin~=0.10.0",
+    "pytest-cov",
+    "pytest-mock",
+    "pytest-xdist",
+    "pytest>=3",
+    "trustme",
+    "wheel",
+    "Sphinx==7.2.6"
+   ],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >=3.10"
+   },
+   "system": [],
+   "refused": [],
+   "groups_blocked": ""
+  },
+  "steps": {
+   "setup_lookup": "Found 13 setup item(s) in the project's files and the web lookup.",
+   "setup_python": "Python 3.12: Python 3.12 already meets >=3.10",
+   "install_deps": "Wrote requirements.txt and installed it on main and pr: pytest-httpbin==2.1.0, httpbin~=0.10.0, pytest-cov, pytest-mock, pytest-xdist, pytest>=3, trustme, wheel, Sphinx==7.2.6. 4 more come with the project install."
+  },
+  "run_files": {
+   "requirements": "requirements.txt",
+   "plan": "setup-plan.json",
+   "count": 9
+  },
+  "installs": [
+   {
+    "package": "pytest-httpbin",
+    "requirement": "pytest-httpbin==2.1.0",
+    "version": "2.1.0",
+    "versions": {
+     "main": "2.1.0",
+     "pr": "2.1.0"
+    },
+    "source": "pyproject",
+    "reason": "listed in the test extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "httpbin",
+    "requirement": "httpbin~=0.10.0",
+    "version": "0.10.4",
+    "versions": {
+     "main": "0.10.4",
+     "pr": "0.10.4"
+    },
+    "source": "pyproject",
+    "reason": "listed in the test extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "pytest-cov",
+    "requirement": "pytest-cov",
+    "version": "7.1.0",
+    "versions": {
+     "main": "7.1.0",
+     "pr": "7.1.0"
+    },
+    "source": "pyproject",
+    "reason": "listed in the test extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "pytest-mock",
+    "requirement": "pytest-mock",
+    "version": "3.17.0",
+    "versions": {
+     "main": "3.17.0",
+     "pr": "3.17.0"
+    },
+    "source": "pyproject",
+    "reason": "listed in the test extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "pytest-xdist",
+    "requirement": "pytest-xdist",
+    "version": "3.8.0",
+    "versions": {
+     "main": "3.8.0",
+     "pr": "3.8.0"
+    },
+    "source": "pyproject",
+    "reason": "listed in the test extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "pytest",
+    "requirement": "pytest>=3",
+    "version": "9.2.0",
+    "versions": {
+     "main": "9.2.0",
+     "pr": "9.2.0"
+    },
+    "source": "pyproject",
+    "reason": "listed in the test extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "trustme",
+    "requirement": "trustme",
+    "version": "1.2.1",
+    "versions": {
+     "main": "1.2.1",
+     "pr": "1.2.1"
+    },
+    "source": "pyproject",
+    "reason": "listed in the test extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "wheel",
+    "requirement": "wheel",
+    "version": "0.48.0",
+    "versions": {
+     "main": "0.48.0",
+     "pr": "0.48.0"
+    },
+    "source": "requirements-dev.txt",
+    "reason": "listed in requirements-dev.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "Sphinx",
+    "requirement": "Sphinx==7.2.6",
+    "version": "7.2.6",
+    "versions": {
+     "main": "7.2.6",
+     "pr": "7.2.6"
+    },
+    "source": "requirements.txt",
+    "reason": "listed in requirements.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   }
+  ]
+ },
+ "sides": {
+  "main_sha": "6f66281a1d6326b1b9c4ac09ca30de0fc4e6ef43",
+  "pr_sha": "254195ec43d7045b4061d29649e543ccb3882183",
+  "behind_target": false,
+  "explicit_base": true,
+  "supplied_base_sha": "6f66281a1d6326b1b9c4ac09ca30de0fc4e6ef43",
+  "authoritative_base": "supplied",
+  "target_tip_sha": "3c7baaa05ab4aa49cc819ce3a819d260de19c157",
+  "comparison_basis": "caller-supplied base vs PR head (that base is an ancestor of the head; a newer target tip was not substituted)"
+ },
+ "tested": {
+  "main": "main @ 6f66281a1d63 (caller-supplied base, an ancestor of the PR head)",
+  "pr": "PR head 254195ec43d7"
+ },
+ "probe_plan": {
+  "baseline": "full",
+  "model": "model provider: nebius (Token Factory, live)",
+  "errors": [
+   "probe 'p-c1' rejected: cannot check requests.cookies.RequestsCookieJar: its parameters are not in this file (an inherited constructor or method we cannot read); the probe is not run",
+   "probe 'p-c2' rejected: cannot check requests.cookies.RequestsCookieJar: its parameters are not in this file (an inherited constructor or method we cannot read); the probe is not run",
+   "probe 'p-c3' rejected: cannot check requests.cookies.RequestsCookieJar: its parameters are not in this file (an inherited constructor or method we cannot read); the probe is not run",
+   "probe 'p-c4' rejected: cannot check requests.cookies.RequestsCookieJar: its parameters are not in this file (an inherited constructor or method we cannot read); the probe is not run"
+  ],
+  "model_claims": [
+   {
+    "id": "C1",
+    "text": "RequestsCookieJar.popitem() always raises KeyError even on a non\u2011empty jar because its __iter__ yields Cookie objects and __getitem__ looks up by name.",
+    "source_quote": "`popitem()` always raised `KeyError`, even on a non-empty jar:",
+    "testable": true,
+    "expect": "same"
+   },
+   {
+    "id": "C2",
+    "text": "After the override, RequestsCookieJar.popitem() removes and returns a (name, value) pair using iteritems() and raises KeyError only when the jar is empty.",
+    "source_quote": "This overrides `popitem()` to remove and return a `(name, value)` pair using the jar's existing dict-like view (`iteritems()`), and to raise `KeyError` only when the jar is empty",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C3",
+    "text": "The regression test test_cookie_popitem fails on main but passes with this change.",
+    "source_quote": "It fails on `main` and passes with this change.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C4",
+    "text": "RequestsCookieJar.__iter__ yields Cookie objects rather than names, as it is inherited from CookieJar.",
+    "source_quote": "Its `__iter__` is inherited from `CookieJar` and yields `Cookie` objects rather than names.",
+    "testable": true,
+    "expect": "same"
+   }
+  ],
+  "model_rejected_claims": [],
+  "model_parse_repairs": [
+   {
+    "attempt": 1,
+    "probe": "p_c4",
+    "error": {
+     "message": "unmatched '}'",
+     "line": 12,
+     "offset": 56,
+     "code_line": "print('{\"observations\":', json.dumps(obs), '}', sep='')}], \"claims\": {\"C1\": {\"id\": \"C1\", \"text\": \"RequestsCookieJar.popitem() always raises KeyError even on a non\\u2011empty jar because its __iter__ yields Cookie objects and __getitem__ looks up by name.\", \"source_quote\": \"`popitem()` always raised "
+    },
+    "outcome": "fixed",
+    "counts": {
+     "before": {
+      "keys": 4,
+      "inputs": 0,
+      "read": "tokens"
+     },
+     "after": {
+      "keys": 4,
+      "inputs": 0,
+      "read": "ast"
+     }
+    }
+   }
+  ],
+  "model_retried": {
+   "why": [
+    "no probe listed the claim ids it checks, so its results could not be tied to any claim; in each probe, \"claims\" must name the claim ids it checks and the observation names that cover them"
+   ],
+   "kept_first_answer": "the retry linked no claim either"
+  },
+  "diff_targets": [],
+  "frozen": []
+ },
+ "test_extras": [
+  "pytest-httpbin==2.1.0",
+  "pytest-mock",
+  "pytest-xdist"
+ ],
+ "pr_side_started_at": "2026-11-08T06:16:43.924351+00:00",
+ "test_targets": {
+  "main": [
+   "tests/test_requests.py",
+   "tests/test_utils.py"
+  ],
+  "pr": [
+   "tests/test_requests.py",
+   "tests/test_utils.py"
+  ]
+ },
+ "installed_commit": {
+  "main": {
+   "dist": "requests",
+   "expected": "6f66281a1d6326b1b9c4ac09ca30de0fc4e6ef43",
+   "installed": "6f66281a1d6326b1b9c4ac09ca30de0fc4e6ef43",
+   "ok": true
+  },
+  "pr": {
+   "dist": "requests",
+   "expected": "254195ec43d7045b4061d29649e543ccb3882183",
+   "installed": "254195ec43d7045b4061d29649e543ccb3882183",
+   "ok": true
+  }
+ },
+ "declared_test_deps": {
+  "requested": [
+   "pytest-httpbin==2.1.0",
+   "pytest-mock",
+   "pytest-xdist"
+  ],
+  "installed": true
+ },
+ "base_head_sha": "6f66281a1d6326b1b9c4ac09ca30de0fc4e6ef43",
+ "comparison": {
+  "same": 568,
+  "same_skipped_both": 15,
+  "regressions": [],
+  "fixed": [
+   "tests.test_requests.TestRequests::test_cookie_popitem",
+   "tests.test_requests.TestRequests::test_cookie_popitem_removes_only_the_selected_cookie"
+  ],
+  "new_tests_passing": 3,
+  "new_tests_passing_ids": [
+   "tests.test_requests.TestRequests::test_cookie_popitem_on_empty_jar_raises_keyerror",
+   "tests.test_utils.TestExtractZippedPaths::test_unzipped_paths_unchanged[poc-main/ops/work/requests-7513/side-pr/tests/test_utils.py]",
+   "tests.test_utils.TestExtractZippedPaths::test_unzipped_paths_unchanged[poc-main/ops/work/requests-7513/venv-pr/lib/python3.12/site-packages/pytest/__init__.py]"
+  ],
+  "new_tests_failing": [],
+  "new_tests_skipped": [],
+  "removed_tests": [],
+  "reparametrized": [
+   {
+    "test": "tests.test_utils.TestExtractZippedPaths::test_unzipped_paths_unchanged",
+    "removed_ids": [
+     "tests.test_utils.TestExtractZippedPaths::test_unzipped_paths_unchanged[poc-main/ops/work/requests-7513/side-main/tests/test_utils.py]",
+     "tests.test_utils.TestExtractZippedPaths::test_unzipped_paths_unchanged[poc-main/ops/work/requests-7513/venv-main/lib/python3.12/site-packages/pytest/__init__.py]"
+    ],
+    "added_ids": [
+     "tests.test_utils.TestExtractZippedPaths::test_unzipped_paths_unchanged[poc-main/ops/work/requests-7513/side-pr/tests/test_utils.py]",
+     "tests.test_utils.TestExtractZippedPaths::test_unzipped_paths_unchanged[poc-main/ops/work/requests-7513/venv-pr/lib/python3.12/site-packages/pytest/__init__.py]"
+    ]
+   }
+  ],
+  "skipped_missing_dependency": [],
+  "flaky": [],
+  "pr_unstable": [],
+  "pr_unstable_noisy": [],
+  "environment": [],
+  "other_changes": [],
+  "preexisting_failures": [
+   "tests.test_requests.TestPreparingURLs::test_different_connection_pool_for_mtls_settings",
+   "tests.test_requests.TestPreparingURLs::test_different_connection_pool_for_tls_settings_verify_True",
+   "tests.test_requests.TestPreparingURLs::test_different_connection_pool_for_tls_settings_verify_bundle_expired_cert",
+   "tests.test_requests.TestPreparingURLs::test_different_connection_pool_for_tls_settings_verify_bundle_unexpired_cert",
+   "tests.test_requests.TestTimeout::test_connect_timeout[timeout0]",
+   "tests.test_requests.TestTimeout::test_connect_timeout[timeout1]",
+   "tests.test_requests.TestTimeout::test_total_timeout_connect[timeout0]",
+   "tests.test_requests.TestTimeout::test_total_timeout_connect[timeout1]"
+  ],
+  "load_failed_both": [],
+  "load_failed_pr": [],
+  "load_failed_main": [],
+  "failure_signatures": {
+   "tests.test_requests.TestPreparingURLs::test_different_connection_pool_for_mtls_settings": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "AttributeError"
+    ]
+   },
+   "tests.test_requests.TestPreparingURLs::test_different_connection_pool_for_tls_settings_verify_True": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "AttributeError"
+    ]
+   },
+   "tests.test_requests.TestPreparingURLs::test_different_connection_pool_for_tls_settings_verify_bundle_expired_cert": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "AttributeError"
+    ]
+   },
+   "tests.test_requests.TestPreparingURLs::test_different_connection_pool_for_tls_settings_verify_bundle_unexpired_cert": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "AttributeError"
+    ]
+   },
+   "tests.test_requests.TestTimeout::test_connect_timeout[timeout0]": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ConnectionError",
+     "NewConnectionError"
+    ]
+   },
+   "tests.test_requests.TestTimeout::test_connect_timeout[timeout1]": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ConnectionError",
+     "NewConnectionError"
+    ]
+   },
+   "tests.test_requests.TestTimeout::test_total_timeout_connect[timeout0]": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ConnectionError",
+     "NewConnectionError"
+    ]
+   },
+   "tests.test_requests.TestTimeout::test_total_timeout_connect[timeout1]": {
+    "same": true,
+    "outcome": "failed",
+    "exception": [
+     "ConnectionError",
+     "NewConnectionError"
+    ]
+   }
+  },
+  "executed": {
+   "main": 557,
+   "pr": 558
+  },
+  "messages": {},
+  "base_messages": {
+   "tests.test_requests.TestRequests::test_cookie_popitem": "KeyError: \"name=Cookie(version=0, name='some_cookie', value='some_value', port=None, port_specified=False, domain='', domain_specified=False, domain_initial_dot=False, path='/', path_specified=True, s",
+   "tests.test_requests.TestRequests::test_cookie_popitem_removes_only_the_selected_cookie": "KeyError: \"name=Cookie(version=0, name='dup', value='value-a', port=None, port_specified=False, domain='a.example.com', domain_specified=True, domain_initial_dot=False, path='/', path_specified=True,"
+  }
+ },
+ "exit_check": {
+  "explained": true,
+  "problems": [],
+  "detail": "pytest exit 1; 8 failure(s)/error(s) pre-existing and identical on both sides"
+ },
+ "probes": {
+  "status": "none",
+  "items": []
+ },
+ "probe_changed_line_coverage": {
+  "status": "no probes",
+  "probes": {}
+ },
+ "verdict": "could_not_verify",
+ "reason": "not verified: no AI-written probe ran any changed line, so the change itself was not exercised by a probe; 2 test(s) fail on main and pass on the PR; 1 test(s) re-parametrized (2 -> 2 ids); 557 test(s) ran on main, 558 on the PR; 3 new test(s) pass, 560 unchanged (15 of them skipped on both sides); 8 test failure(s) pre-existing and identical on both sides",
+ "verdict_before_coverage_gate": "verified",
+ "reason_before_coverage_gate": "2 test(s) fail on main and pass on the PR; 1 test(s) re-parametrized (2 -> 2 ids); 557 test(s) ran on main, 558 on the PR; 3 new test(s) pass, 560 unchanged (15 of them skipped on both sides); 8 test failure(s) pre-existing and identical on both sides",
+ "changed_lines_total": 7,
+ "changed_lines_covered": 7,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "normal",
+  "note": "7 of 7 changed executable line(s) ran (100%)",
+  "measurement": "measured"
+ },
+ "verdict_before_ai_probe_gate": "verified",
+ "agents": {
+  "status": "skipped",
+  "note": "advisory swarm is off",
+  "roles": []
+ },
+ "explanation": {
+  "status": "not yet wired",
+  "why": "advisory swarm is off"
+ },
+ "swarm_requested": false,
+ "operator_approval_requested": false,
+ "swarm": "off",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [
+   "src/requests/cookies.py"
+  ],
+  "compiled_files": [],
+  "other_files": [
+   "tests/test_requests.py"
+  ]
+ },
+ "duration_s": {
+  "total_wall": 381.0,
+  "tests": 168.1
+ },
+ "cost": {
+  "ai_calls": 4,
+  "failed_ai_calls": 0,
+  "input_tokens": 20046,
+  "output_tokens": 14856,
+  "thinking_tokens": 11712,
+  "cost_usd": 0.019384,
+  "calls_without_usage": 0,
+  "ai_cost_usd": 0.019384,
+  "cost_complete": true,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 381.0,
+   "tests": 168.1
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.0254,
+  "total_cost_usd": 0.044784,
+  "swarm": {
+   "ai_calls": 0,
+   "failed_ai_calls": 0,
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "thinking_tokens": 0,
+   "cost_usd": 0.0,
+   "calls_without_usage": 0,
+   "ai_cost_usd": 0.0,
+   "cost_complete": true,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ },
+ "pdf_push": {
+  "ok": true,
+  "attempts": 1,
+  "error": null,
+  "url": "https://github.com/aritracodesbad123/Proof-of-change/tree/runs/runs/2026-11-08/ef12096/requests-7513"
+ }
+}

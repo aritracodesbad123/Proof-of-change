@@ -1,0 +1,1403 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-jazzband-prettytable-539-9e05594f975f-2026-11-08",
+ "date_ist": "2026-11-09 11:21 IST",
+ "run_date": "2026-11-08",
+ "who": "ops/daily_run.py",
+ "repo": "jazzband/prettytable",
+ "library": "prettytable",
+ "pr": {
+  "repo": "jazzband/prettytable",
+  "number": 539,
+  "url": "https://github.com/prettytable/prettytable/pull/539",
+  "title": "Preserve numeric values when importing CSV",
+  "base_sha": "8eda8ac64493a85209ec99edbd1ce23921b62093",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "9e05594f975f9f1e8d6cf421cbb183432d49fd92",
+  "merge_commit": null,
+  "tested_main_sha": "8eda8ac64493a85209ec99edbd1ce23921b62093",
+  "tested_main_sha_label": "caller-supplied base (an ancestor of the PR head; a newer target tip was not used)"
+ },
+ "author": "Jinyong-Li",
+ "base_ref": "main",
+ "updated_at_utc": "2026-11-07T01:52:36Z",
+ "updated_at_ist": "2026-11-07 07:22 IST",
+ "ci_state": "none",
+ "ci_detail": "no check runs visible",
+ "tested_at_ist": "2026-11-09 11:21 IST",
+ "files": {
+  "all": [
+   "src/prettytable/prettytable.py",
+   "tests/test_prettytable.py"
+  ],
+  "package_py": [
+   "src/prettytable/prettytable.py"
+  ],
+  "compiled": [],
+  "other": [
+   "tests/test_prettytable.py"
+  ]
+ },
+ "machine_type": {
+  "arch": "x86_64",
+  "os": "Linux",
+  "platform": "Linux-6.12.94+-x86_64-with-glibc2.41",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": "g++ (Debian 14.2.0-19) 14.2.0",
+  "cpu_model": "Intel(R) Xeon(R) Processor",
+  "ram_gb": 15.6
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 3,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.15",
+ "test_selection": "mapped from touched files: tests/test_prettytable.py, tests/test_style.py, tests/test_colortable.py",
+ "per_run": [
+  {
+   "side": "old",
+   "run": 1,
+   "passed": 280,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.7,
+   "pytest_summary": "280 passed in 1.04s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 1,
+   "passed": 282,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.8,
+   "pytest_summary": "282 passed in 0.94s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 2,
+   "passed": 280,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.5,
+   "pytest_summary": "280 passed in 0.90s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 2,
+   "passed": 282,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.5,
+   "pytest_summary": "282 passed in 0.92s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 3,
+   "passed": 280,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.5,
+   "pytest_summary": "280 passed in 0.86s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 3,
+   "passed": 282,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.4,
+   "pytest_summary": "282 passed in 0.87s",
+   "junit": true
+  }
+ ],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "local",
+ "sandbox_backend_note": "local bubblewrap",
+ "machine": "local",
+ "tool_setup": {
+  "installed": [],
+  "tries": 0,
+  "note": "All required tools were already installed.",
+  "refused": []
+ },
+ "posted_upstream": false,
+ "logs": "prettytable-539/",
+ "freeze": {
+  "main": "freeze-main.txt",
+  "pr": "freeze-pr.txt"
+ },
+ "coverage": {
+  "status": "measured",
+  "changed_lines_total": 4,
+  "changed_lines_covered": 4,
+  "files": [
+   {
+    "file": "src/prettytable/prettytable.py",
+    "changed_lines_total": 4,
+    "changed_lines_covered": 4
+   }
+  ],
+  "seconds": 2.5,
+  "exit": 0,
+  "log": "coverage-pytest.log"
+ },
+ "poc_commit": "ef12096677e9cf59e8673436d74ec65d53771d7c",
+ "route": "source-pair",
+ "current_head_sha": "9e05594f975f9f1e8d6cf421cbb183432d49fd92",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "model_provider_fallback": "the AI answered but no probe was usable, so only fixed probes ran",
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": "[redacted]",
+  "notes": [
+   "Setup check: GitHub token: present.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory 5.9 GB (of 15.6 GB).",
+   "Setup check: free disk 92.7 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: [redacted] results",
+   "Query: prettytable python setup install instructions https://github.com/jazzband/prettytable site:github.com/jazzband/prettytable",
+   "Query: prettytable python documentation install https://github.com/jazzband/prettytable site:github.com/jazzband/prettytable",
+   "Query: prettytable python install requirements https://pypi.org/project/prettytable/ https://github.com/jazzband/prettytable site:pypi.org",
+   "Source: prettytable/README.md at main \u00b7 prettytable/prettytable \u00b7 GitHub \u2014 https://github.com/jazzband/prettytable/blob/main/README.md",
+   "Source: prettytable \u00b7 PyPI \u2014 https://pypi.org/project/prettytable/",
+   "Source: GitHub - prettytable/prettytable: Display tabular data in a visually appealing ASCII table format \u00b7 GitHub \u2014 https://github.com/jazzband/prettytable",
+   "Source: Unable to import prettytable \u00b7 Issue #120 \u00b7 prettytable/prettytable \u00b7 GitHub \u2014 https://github.com/jazzband/prettytable/issues/120",
+   "Source: Align Issue with add_autoindex \u00b7 Issue #199 \u00b7 prettytable/prettytable \u00b7 GitHub \u2014 https://github.com/jazzband/prettytable/issues/199",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: wcwidth is noted, installed with the project.",
+   "Setup plan: install pytest>=9 (listed in the tests extra) on main and pr.",
+   "Setup plan: install pytest-cov (listed in the tests extra) on main and pr.",
+   "Setup plan: install pytest-lazy-fixtures (listed in the tests extra) on main and pr.",
+   "Setup plan: install mypy==2.4.0 (listed in requirements-mypy.txt) on main and pr.",
+   "Setup plan: install types-colorama (listed in requirements-mypy.txt) on main and pr.",
+   "Setup plan: install prek (listed in tox.ini deps) on main and pr.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >=3.11",
+   "Installed pytest 9.2.0 from pyproject (listed in the tests extra) on main and pr.",
+   "Installed pytest-cov 7.1.0 from pyproject (listed in the tests extra) on main and pr.",
+   "Installed pytest-lazy-fixtures 1.4.1 from pyproject (listed in the tests extra) on main and pr.",
+   "Installed mypy 2.4.0 from requirements-mypy.txt (listed in requirements-mypy.txt) on main and pr.",
+   "Installed types-colorama 0.4.15.20260508 from requirements-mypy.txt (listed in requirements-mypy.txt) on main and pr.",
+   "Installed prek 0.5.10 from tox.ini (listed in tox.ini deps) on main and pr."
+  ],
+  "install_docs": [
+   "README.md",
+   "pyproject.toml",
+   "tox.ini",
+   ".github/workflows/lint.yml",
+   ".github/workflows/require-pr-label.yml",
+   ".github/workflows/release-drafter.yml",
+   ".github/workflows/release.yml",
+   ".github/workflows/labels.yml",
+   ".github/workflows/test.yml"
+  ],
+  "install_docs_from": "main",
+  "setup_plan": {
+   "packages": [
+    {
+     "requirement": "wcwidth>=0.3.5",
+     "name": "wcwidth",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest>=9",
+     "name": "pytest",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the tests extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest-cov",
+     "name": "pytest-cov",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the tests extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest-lazy-fixtures",
+     "name": "pytest-lazy-fixtures",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the tests extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "mypy==2.4.0",
+     "name": "mypy",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements-mypy.txt",
+     "reason": "listed in requirements-mypy.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "types-colorama",
+     "name": "types-colorama",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements-mypy.txt",
+     "reason": "listed in requirements-mypy.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "prek",
+     "name": "prek",
+     "kind": "requirements",
+     "action": "install",
+     "source": "tox.ini",
+     "reason": "listed in tox.ini deps",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    }
+   ],
+   "scope_blocked": "",
+   "component": null,
+   "aggregate_names": [],
+   "extra_reqs": [
+    "pytest>=9",
+    "pytest-cov",
+    "pytest-lazy-fixtures",
+    "mypy==2.4.0",
+    "types-colorama",
+    "prek"
+   ],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >=3.11"
+   },
+   "system": [],
+   "refused": [],
+   "groups_blocked": ""
+  },
+  "steps": {
+   "setup_lookup": "Found 7 setup item(s) in the project's files and the web lookup.",
+   "setup_python": "Python 3.12: Python 3.12 already meets >=3.11",
+   "install_deps": "Wrote requirements.txt and installed it on main and pr: pytest>=9, pytest-cov, pytest-lazy-fixtures, mypy==2.4.0, types-colorama, prek. 1 more come with the project install."
+  },
+  "run_files": {
+   "requirements": "requirements.txt",
+   "plan": "setup-plan.json",
+   "count": 6
+  },
+  "installs": [
+   {
+    "package": "pytest",
+    "requirement": "pytest>=9",
+    "version": "9.2.0",
+    "versions": {
+     "main": "9.2.0",
+     "pr": "9.2.0"
+    },
+    "source": "pyproject",
+    "reason": "listed in the tests extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "pytest-cov",
+    "requirement": "pytest-cov",
+    "version": "7.1.0",
+    "versions": {
+     "main": "7.1.0",
+     "pr": "7.1.0"
+    },
+    "source": "pyproject",
+    "reason": "listed in the tests extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "pytest-lazy-fixtures",
+    "requirement": "pytest-lazy-fixtures",
+    "version": "1.4.1",
+    "versions": {
+     "main": "1.4.1",
+     "pr": "1.4.1"
+    },
+    "source": "pyproject",
+    "reason": "listed in the tests extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "mypy",
+    "requirement": "mypy==2.4.0",
+    "version": "2.4.0",
+    "versions": {
+     "main": "2.4.0",
+     "pr": "2.4.0"
+    },
+    "source": "requirements-mypy.txt",
+    "reason": "listed in requirements-mypy.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "types-colorama",
+    "requirement": "types-colorama",
+    "version": "0.4.15.20260508",
+    "versions": {
+     "main": "0.4.15.20260508",
+     "pr": "0.4.15.20260508"
+    },
+    "source": "requirements-mypy.txt",
+    "reason": "listed in requirements-mypy.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "prek",
+    "requirement": "prek",
+    "version": "0.5.10",
+    "versions": {
+     "main": "0.5.10",
+     "pr": "0.5.10"
+    },
+    "source": "tox.ini",
+    "reason": "listed in tox.ini deps",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   }
+  ]
+ },
+ "sides": {
+  "main_sha": "8eda8ac64493a85209ec99edbd1ce23921b62093",
+  "pr_sha": "9e05594f975f9f1e8d6cf421cbb183432d49fd92",
+  "behind_target": false,
+  "explicit_base": true,
+  "supplied_base_sha": "8eda8ac64493a85209ec99edbd1ce23921b62093",
+  "authoritative_base": "supplied",
+  "target_tip_sha": "d0f528b05769519fa7b86d190c30bb5a457ea344",
+  "comparison_basis": "caller-supplied base vs PR head (that base is an ancestor of the head; a newer target tip was not substituted)"
+ },
+ "tested": {
+  "main": "main @ 8eda8ac64493 (caller-supplied base, an ancestor of the PR head)",
+  "pr": "PR head 9e05594f975f"
+ },
+ "probe_plan": {
+  "baseline": "full",
+  "model": "model provider: nebius (Token Factory, live)",
+  "errors": [
+   "probe 'p1' rejected: cannot bind prettytable.prettytable.from_csv: from_csv() accepts **kwargs, so its keywords cannot be checked; the probe is not run"
+  ],
+  "model_claims": [
+   {
+    "id": "C1",
+    "text": "`from_csv(..., quoting=csv.QUOTE_NONNUMERIC)` raises `AttributeError` on an unquoted number because `csv.reader` returns a `float` and `from_csv` calls `strip()` on every field.",
+    "source_quote": "`from_csv(..., quoting=csv.QUOTE_NONNUMERIC)` raises `AttributeError` on an unquoted number because `csv.reader` returns a `float` and `from_csv` calls `strip()` on every field.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C2",
+    "text": "An unquoted numeric header triggers the same error before any data rows are added.",
+    "source_quote": "An unquoted numeric header triggers the same error before any data rows are added.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C3",
+    "text": "Trim strings and pass other parsed values through.",
+    "source_quote": "Trim strings and pass other parsed values through.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C4",
+    "text": "This preserves numeric cells for sorting and formatting and uses the existing `field_names` setter to convert header values to strings.",
+    "source_quote": "This preserves numeric cells for sorting and formatting and uses the existing `field_names` setter to convert header values to strings.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C6",
+    "text": "Both regression cases fail on `main` with `AttributeError` and pass with this change.",
+    "source_quote": "Both regression cases fail on `main` with `AttributeError` and pass with this change.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C7",
+    "text": "`python -m pytest -q tests` passes on Windows with Python 3.12 and 3.14 (340 tests each).",
+    "source_quote": "`python -m pytest -q tests` passes on Windows with Python 3.12 and 3.14 (340 tests each).",
+    "testable": true,
+    "expect": "same"
+   }
+  ],
+  "model_rejected_claims": [
+   {
+    "id": "C5",
+    "text": "assert table.rows == [\"Ada\", 42.5]",
+    "source_quote": "assert table.rows == [\"Ada\", 42.5]",
+    "testable": true,
+    "expect": "differs",
+    "rejected": "source_quote not found in the PR text"
+   }
+  ],
+  "model_retried": {
+   "why": [
+    "no probe listed the claim ids it checks, so its results could not be tied to any claim; in each probe, \"claims\" must name the claim ids it checks and the observation names that cover them"
+   ],
+   "kept_first_answer": "the retry linked no claim either"
+  },
+  "diff_targets": [
+   "prettytable.prettytable.from_csv"
+  ],
+  "frozen": [
+   {
+    "path": "diff-probes/diff-api.py",
+    "source": "diff",
+    "sha256": "9cf3360da9aeedc9c5ac2bc4f78ce9ccf2ef867144930122650751e594e4c1ed",
+    "generator": {
+     "kind": "diff",
+     "label": "diff (auto-derived from base-side code, model-free)",
+     "model": null,
+     "provider": null,
+     "provenance": "auto-derived",
+     "blind": false
+    },
+    "frozen_at": "2026-11-09T05:53:43.608618+00:00",
+    "inputs_sha256": "a2eb539ce5040926ac8dcc76fc8de105a600eecae6a5d9f6cccc3d98ac111ed2",
+    "inputs": {
+     "title_chars": 0,
+     "body_chars": 0,
+     "base_files": {
+      "src/prettytable/prettytable.py": "cf724d61caa80b76af883a91b1d2646ce911bf545246a16979ff48b36c1b5ddc"
+     }
+    }
+   }
+  ]
+ },
+ "test_extras": [
+  "pytest",
+  "pytest-cov",
+  "pytest-lazy-fixtures"
+ ],
+ "pr_side_started_at": "2026-11-09T05:53:43.730777+00:00",
+ "test_targets": {
+  "main": [
+   "tests/test_prettytable.py",
+   "tests/test_style.py",
+   "tests/test_colortable.py"
+  ],
+  "pr": [
+   "tests/test_prettytable.py",
+   "tests/test_style.py",
+   "tests/test_colortable.py"
+  ]
+ },
+ "installed_commit": {
+  "main": {
+   "dist": "prettytable",
+   "expected": "8eda8ac64493a85209ec99edbd1ce23921b62093",
+   "installed": "8eda8ac64493a85209ec99edbd1ce23921b62093",
+   "ok": true
+  },
+  "pr": {
+   "dist": "prettytable",
+   "expected": "9e05594f975f9f1e8d6cf421cbb183432d49fd92",
+   "installed": "9e05594f975f9f1e8d6cf421cbb183432d49fd92",
+   "ok": true
+  }
+ },
+ "declared_test_deps": {
+  "requested": [
+   "pytest-lazy-fixtures"
+  ],
+  "installed": true
+ },
+ "base_head_sha": "8eda8ac64493a85209ec99edbd1ce23921b62093",
+ "comparison": {
+  "same": 280,
+  "same_skipped_both": 0,
+  "regressions": [],
+  "fixed": [
+   "tests.test_prettytable.TestBasic::test_from_csv_quote_nonnumeric[\" Count \"-Count]",
+   "tests.test_prettytable.TestBasic::test_from_csv_quote_nonnumeric[2026-2026.0]"
+  ],
+  "new_tests_passing": 0,
+  "new_tests_passing_ids": [],
+  "new_tests_failing": [],
+  "new_tests_skipped": [],
+  "removed_tests": [],
+  "reparametrized": [],
+  "skipped_missing_dependency": [],
+  "flaky": [],
+  "pr_unstable": [],
+  "pr_unstable_noisy": [],
+  "environment": [],
+  "other_changes": [],
+  "preexisting_failures": [],
+  "load_failed_both": [],
+  "load_failed_pr": [],
+  "load_failed_main": [],
+  "executed": {
+   "main": 282,
+   "pr": 282
+  },
+  "messages": {},
+  "base_messages": {
+   "tests.test_prettytable.TestBasic::test_from_csv_quote_nonnumeric[\" Count \"-Count]": "AttributeError: 'float' object has no attribute 'strip'",
+   "tests.test_prettytable.TestBasic::test_from_csv_quote_nonnumeric[2026-2026.0]": "AttributeError: 'float' object has no attribute 'strip'"
+  }
+ },
+ "exit_check": {
+  "explained": true,
+  "problems": [],
+  "detail": "all runs exited 0"
+ },
+ "probes": {
+  "status": "uninformative",
+  "items": [
+   {
+    "id": "diff-api",
+    "source": "diff",
+    "path": "diff-probes/diff-api.py",
+    "sha256": "9cf3360da9aeedc9c5ac2bc4f78ce9ccf2ef867144930122650751e594e4c1ed",
+    "target": "jazzband/prettytable#539",
+    "about": "Public functions touched by the PR, called with type-appropriate inputs on both sides.",
+    "claims": [],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-diff-api-main-1.jsonl",
+      "probe-diff-api-main-2.jsonl",
+      "probe-diff-api-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-diff-api-pr-1.jsonl",
+      "probe-diff-api-pr-2.jsonl",
+      "probe-diff-api-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "prettytable.prettytable.from_csv.input0": {
+        "raises": "AttributeError"
+       },
+       "prettytable.prettytable.from_csv.input1": {
+        "raises": "AttributeError"
+       },
+       "prettytable.prettytable.from_csv.input10": {
+        "raises": "AttributeError"
+       },
+       "prettytable.prettytable.from_csv.input11": {
+        "raises": "AttributeError"
+       },
+       "prettytable.prettytable.from_csv.input2": {
+        "raises": "AttributeError"
+       },
+       "prettytable.prettytable.from_csv.input3": {
+        "raises": "AttributeError"
+       },
+       "prettytable.prettytable.from_csv.input4": {
+        "raises": "AttributeError"
+       },
+       "prettytable.prettytable.from_csv.input5": {
+        "raises": "AttributeError"
+       },
+       "prettytable.prettytable.from_csv.input6": {
+        "raises": "AttributeError"
+       },
+       "prettytable.prettytable.from_csv.input7": {
+        "raises": "AttributeError"
+       },
+       "prettytable.prettytable.from_csv.input8": {
+        "raises": "AttributeError"
+       },
+       "prettytable.prettytable.from_csv.input9": {
+        "raises": "AttributeError"
+       }
+      },
+      {
+       "prettytable.prettytable.from_csv.input0": {
+        "raises": "AttributeError"
+       },
+       "prettytable.prettytable.from_csv.input1": {
+        "raises": "AttributeError"
+       },
+       "prettytable.prettytable.from_csv.input10": {
+        "raises": "AttributeError"
+       },
+       "prettytable.prettytable.from_csv.input11": {
+        "raises": "AttributeError"
+       },
+       "prettytable.prettytable.from_csv.input2": {
+        "raises": "AttributeError"
+       },
+       "prettytable.prettytable.from_csv.input3": {
+        "raises": "AttributeError"
+       },
+       "prettytable.prettytable.from_csv.input4": {
+        "raises": "AttributeError"
+       },
+       "prettytable.prettytable.from_csv.input5": {
+        "raises": "AttributeError"
+       },
+       "prettytable.prettytable.from_csv.input6": {
+        "raises": "AttributeError"
+       },
+       "prettytable.prettytable.from_csv.input7": {
+        "raises": "AttributeError"
+       },
+       "prettytable.prettytable.from_csv.input8": {
+        "raises": "AttributeError"
+       },
+       "prettytable.prettytable.from_csv.input9": {
+        "raises": "AttributeError"
+       }
+      },
+      {
+       "prettytable.prettytable.from_csv.input0": {
+        "raises": "AttributeError"
+       },
+       "prettytable.prettytable.from_csv.input1": {
+        "raises": "AttributeError"
+       },
+       "prettytable.prettytable.from_csv.input10": {
+        "raises": "AttributeError"
+       },
+       "prettytable.prettytable.from_csv.input11": {
+        "raises": "AttributeError"
+       },
+       "prettytable.prettytable.from_csv.input2": {
+        "raises": "AttributeError"
+       },
+       "prettytable.prettytable.from_csv.input3": {
+        "raises": "AttributeError"
+       },
+       "prettytable.prettytable.from_csv.input4": {
+        "raises": "AttributeError"
+       },
+       "prettytable.prettytable.from_csv.input5": {
+        "raises": "AttributeError"
+       },
+       "prettytable.prettytable.from_csv.input6": {
+        "raises": "AttributeError"
+       },
+       "prettytable.prettytable.from_csv.input7": {
+        "raises": "AttributeError"
+       },
+       "prettytable.prettytable.from_csv.input8": {
+        "raises": "AttributeError"
+       },
+       "prettytable.prettytable.from_csv.input9": {
+        "raises": "AttributeError"
+       }
+      }
+     ],
+     "pr": [
+      {
+       "prettytable.prettytable.from_csv.input0": {
+        "raises": "AttributeError"
+       },
+       "prettytable.prettytable.from_csv.input1": {
+        "raises": "AttributeError"
+       },
+       "prettytable.prettytable.from_csv.input10": {
+        "raises": "AttributeError"
+       },
+       "prettytable.prettytable.from_csv.input11": {
+        "raises": "AttributeError"
+       },
+       "prettytable.prettytable.from_csv.input2": {
+        "raises": "AttributeError"
+       },
+       "prettytable.prettytable.from_csv.input3": {
+        "raises": "AttributeError"
+       },
+       "prettytable.prettytable.from_csv.input4": {
+        "raises": "AttributeError"
+       },
+       "prettytable.prettytable.from_csv.input5": {
+        "raises": "AttributeError"
+       },
+       "prettytable.prettytable.from_csv.input6": {
+        "raises": "AttributeError"
+       },
+       "prettytable.prettytable.from_csv.input7": {
+        "raises": "AttributeError"
+       },
+       "prettytable.prettytable.from_csv.input8": {
+        "raises": "AttributeError"
+       },
+       "prettytable.prettytable.from_csv.input9": {
+        "raises": "AttributeError"
+       }
+      },
+      {
+       "prettytable.prettytable.from_csv.input0": {
+        "raises": "AttributeError"
+       },
+       "prettytable.prettytable.from_csv.input1": {
+        "raises": "AttributeError"
+       },
+       "prettytable.prettytable.from_csv.input10": {
+        "raises": "AttributeError"
+       },
+       "prettytable.prettytable.from_csv.input11": {
+        "raises": "AttributeError"
+       },
+       "prettytable.prettytable.from_csv.input2": {
+        "raises": "AttributeError"
+       },
+       "prettytable.prettytable.from_csv.input3": {
+        "raises": "AttributeError"
+       },
+       "prettytable.prettytable.from_csv.input4": {
+        "raises": "AttributeError"
+       },
+       "prettytable.prettytable.from_csv.input5": {
+        "raises": "AttributeError"
+       },
+       "prettytable.prettytable.from_csv.input6": {
+        "raises": "AttributeError"
+       },
+       "prettytable.prettytable.from_csv.input7": {
+        "raises": "AttributeError"
+       },
+       "prettytable.prettytable.from_csv.input8": {
+        "raises": "AttributeError"
+       },
+       "prettytable.prettytable.from_csv.input9": {
+        "raises": "AttributeError"
+       }
+      },
+      {
+       "prettytable.prettytable.from_csv.input0": {
+        "raises": "AttributeError"
+       },
+       "prettytable.prettytable.from_csv.input1": {
+        "raises": "AttributeError"
+       },
+       "prettytable.prettytable.from_csv.input10": {
+        "raises": "AttributeError"
+       },
+       "prettytable.prettytable.from_csv.input11": {
+        "raises": "AttributeError"
+       },
+       "prettytable.prettytable.from_csv.input2": {
+        "raises": "AttributeError"
+       },
+       "prettytable.prettytable.from_csv.input3": {
+        "raises": "AttributeError"
+       },
+       "prettytable.prettytable.from_csv.input4": {
+        "raises": "AttributeError"
+       },
+       "prettytable.prettytable.from_csv.input5": {
+        "raises": "AttributeError"
+       },
+       "prettytable.prettytable.from_csv.input6": {
+        "raises": "AttributeError"
+       },
+       "prettytable.prettytable.from_csv.input7": {
+        "raises": "AttributeError"
+       },
+       "prettytable.prettytable.from_csv.input8": {
+        "raises": "AttributeError"
+       },
+       "prettytable.prettytable.from_csv.input9": {
+        "raises": "AttributeError"
+       }
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "prettytable.prettytable.from_csv.input0",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"prettytable.prettytable.from_csv.input0\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"prettytable.prettytable.from_csv.input0\""
+       }
+      }
+     },
+     {
+      "name": "prettytable.prettytable.from_csv.input1",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"prettytable.prettytable.from_csv.input1\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"prettytable.prettytable.from_csv.input1\""
+       }
+      }
+     },
+     {
+      "name": "prettytable.prettytable.from_csv.input10",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"prettytable.prettytable.from_csv.input10\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"prettytable.prettytable.from_csv.input10\""
+       }
+      }
+     },
+     {
+      "name": "prettytable.prettytable.from_csv.input11",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"prettytable.prettytable.from_csv.input11\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"prettytable.prettytable.from_csv.input11\""
+       }
+      }
+     },
+     {
+      "name": "prettytable.prettytable.from_csv.input2",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"prettytable.prettytable.from_csv.input2\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"prettytable.prettytable.from_csv.input2\""
+       }
+      }
+     },
+     {
+      "name": "prettytable.prettytable.from_csv.input3",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"prettytable.prettytable.from_csv.input3\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"prettytable.prettytable.from_csv.input3\""
+       }
+      }
+     },
+     {
+      "name": "prettytable.prettytable.from_csv.input4",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 7,
+        "quote": "\"observation\": \"prettytable.prettytable.from_csv.input4\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 7,
+        "quote": "\"observation\": \"prettytable.prettytable.from_csv.input4\""
+       }
+      }
+     },
+     {
+      "name": "prettytable.prettytable.from_csv.input5",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 8,
+        "quote": "\"observation\": \"prettytable.prettytable.from_csv.input5\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 8,
+        "quote": "\"observation\": \"prettytable.prettytable.from_csv.input5\""
+       }
+      }
+     },
+     {
+      "name": "prettytable.prettytable.from_csv.input6",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 9,
+        "quote": "\"observation\": \"prettytable.prettytable.from_csv.input6\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 9,
+        "quote": "\"observation\": \"prettytable.prettytable.from_csv.input6\""
+       }
+      }
+     },
+     {
+      "name": "prettytable.prettytable.from_csv.input7",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 10,
+        "quote": "\"observation\": \"prettytable.prettytable.from_csv.input7\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 10,
+        "quote": "\"observation\": \"prettytable.prettytable.from_csv.input7\""
+       }
+      }
+     },
+     {
+      "name": "prettytable.prettytable.from_csv.input8",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 11,
+        "quote": "\"observation\": \"prettytable.prettytable.from_csv.input8\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 11,
+        "quote": "\"observation\": \"prettytable.prettytable.from_csv.input8\""
+       }
+      }
+     },
+     {
+      "name": "prettytable.prettytable.from_csv.input9",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "AttributeError"
+      },
+      "pr": {
+       "raises": "AttributeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 12,
+        "quote": "\"observation\": \"prettytable.prettytable.from_csv.input9\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 12,
+        "quote": "\"observation\": \"prettytable.prettytable.from_csv.input9\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "diff",
+     "label": "diff (auto-derived from base-side code, model-free)",
+     "model": null,
+     "provider": null,
+     "provenance": "auto-derived",
+     "blind": false
+    },
+    "freeze": {
+     "sha256": "9cf3360da9aeedc9c5ac2bc4f78ce9ccf2ef867144930122650751e594e4c1ed",
+     "generator": {
+      "kind": "diff",
+      "label": "diff (auto-derived from base-side code, model-free)",
+      "model": null,
+      "provider": null,
+      "provenance": "auto-derived",
+      "blind": false
+     },
+     "frozen_at": "2026-11-09T05:53:43.608618+00:00",
+     "inputs_sha256": "a2eb539ce5040926ac8dcc76fc8de105a600eecae6a5d9f6cccc3d98ac111ed2",
+     "inputs": {
+      "title_chars": 0,
+      "body_chars": 0,
+      "base_files": {
+       "src/prettytable/prettytable.py": "cf724d61caa80b76af883a91b1d2646ce911bf545246a16979ff48b36c1b5ddc"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-09T05:53:43.730777+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 5,
+     "changed_lines_covered": 0,
+     "files": [
+      {
+       "file": "src/prettytable/prettytable.py",
+       "changed_lines_total": 5,
+       "changed_lines_covered": 0
+      }
+     ],
+     "adequacy": "not_adequate",
+     "note": "uninformative: every observation is probe-broken (the same exception or skip value on both sides); not counted as ran or adequate",
+     "exit": 0,
+     "data": "probe-cov-diff-api.json"
+    },
+    "status": "uninformative",
+    "uninformative_reason": "uninformative: every observation is probe-broken (the same exception or skip value on both sides)"
+   }
+  ],
+  "summary": {
+   "labels": [],
+   "flagged": [],
+   "proven_claims": [],
+   "reason": "uninformative: every observation is probe-broken (the same exception or skip value on both sides)",
+   "ignored_noise": [],
+   "ignored_warning_only": [],
+   "pr_only_noisy": [],
+   "advisory_unchanged_subchecks": [],
+   "advisory_agreeing_differs": [],
+   "advisory_invalid_preservation": []
+  }
+ },
+ "probe_changed_line_coverage": {
+  "status": "measured",
+  "side": "main",
+  "probes": {
+   "diff-api": {
+    "status": "measured",
+    "changed_lines_covered": 0,
+    "changed_lines_total": 5,
+    "adequacy": "not_adequate"
+   }
+  },
+  "not_adequate": [
+   "diff-api"
+  ]
+ },
+ "verdict": "could_not_verify",
+ "reason": "not verified: no AI-written probe ran any changed line, so the change itself was not exercised by a probe; 2 test(s) fail on main and pass on the PR; 282 test(s) ran on main, 282 on the PR; 0 new test(s) pass, 280 unchanged",
+ "verdict_before_coverage_gate": "verified",
+ "reason_before_coverage_gate": "2 test(s) fail on main and pass on the PR; 282 test(s) ran on main, 282 on the PR; 0 new test(s) pass, 280 unchanged",
+ "changed_lines_total": 4,
+ "changed_lines_covered": 4,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "normal",
+  "note": "4 of 4 changed executable line(s) ran (100%)",
+  "measurement": "measured"
+ },
+ "verdict_before_ai_probe_gate": "verified",
+ "agents": {
+  "status": "skipped",
+  "note": "advisory swarm is off",
+  "roles": []
+ },
+ "explanation": {
+  "status": "not yet wired",
+  "why": "advisory swarm is off"
+ },
+ "swarm_requested": false,
+ "operator_approval_requested": false,
+ "swarm": "off",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [
+   "src/prettytable/prettytable.py"
+  ],
+  "compiled_files": [],
+  "other_files": [
+   "tests/test_prettytable.py"
+  ]
+ },
+ "duration_s": {
+  "total_wall": 183.2,
+  "tests": 9.4
+ },
+ "cost": {
+  "ai_calls": 3,
+  "failed_ai_calls": 0,
+  "input_tokens": 30928,
+  "output_tokens": 25411,
+  "thinking_tokens": 22802,
+  "cost_usd": 0.032148,
+  "calls_without_usage": 0,
+  "ai_cost_usd": 0.032148,
+  "cost_complete": true,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 183.2,
+   "tests": 9.4
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.012213,
+  "total_cost_usd": 0.044361,
+  "swarm": {
+   "ai_calls": 0,
+   "failed_ai_calls": 0,
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "thinking_tokens": 0,
+   "cost_usd": 0.0,
+   "calls_without_usage": 0,
+   "ai_cost_usd": 0.0,
+   "cost_complete": true,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ },
+ "pdf_push": {
+  "ok": true,
+  "attempts": 1,
+  "error": null,
+  "url": "https://github.com/aritracodesbad123/Proof-of-change/tree/runs/runs/2026-11-08/ef12096/prettytable-539"
+ }
+}
