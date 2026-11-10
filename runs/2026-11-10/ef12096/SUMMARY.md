@@ -1,6 +1,6 @@
 # Proof-of-Change go/no-go: 2026-11-10 on ef12096
 
-9 report(s) in this folder: 1 need attention, 7 could not be verified, 1 verified. Built from every record.json stored in this folder, so a later one-PR run cannot narrow it.
+10 report(s) in this folder: 1 need attention, 7 could not be verified, 2 verified. Built from every record.json stored in this folder, so a later one-PR run cannot narrow it.
 
 ## Needs a decision first
 
@@ -26,3 +26,4 @@
 | COULD NOT VERIFY | psf/requests#7513: Make RequestsCookieJar.popitem() work | Not verified: no AI-written probe ran any changed line, so the change itself was not exercised by a probe; 2 test(s) fail on main and pass on the PR; 1 test(s) re-parametrized (2 -> 2 ids); 557 test(s) ran on main, 558 on the PR; 3 new test(s) pass, 560 unchanged (15 of them skipped on both sides); 8 test failure(s) pre-existing and identical on both sides | [PDF](requests-7513/REPORT.pdf) |
 | COULD NOT VERIFY | Textualize/rich#4110: Fix hyperlinks being split into multiple links when text is highlighted | Install failed (2); see setup-main.log | [PDF](rich-4110/REPORT.pdf) |
 | VERIFIED | mahmoud/boltons#740: strutils.strip_ansi: strip OSC sequences (fixes #739) | 52 test(s) fail on main and pass on the PR; 98 test(s) ran on main, 101 on the PR; 3 new test(s) pass, 46 unchanged; probe: claim(s) C1, C2, C3, C4, C5 proven | [PDF](boltons-740/REPORT.pdf) |
+| VERIFIED | urllib3/urllib3#5370: Preserve chunked streaming after a partial read | 4 test(s) fail on main and pass on the PR; 200 test(s) ran on main, 200 on the PR; 0 new test(s) pass, 243 unchanged (47 of them skipped on both sides); probe: claim(s) C1, C3 proven; probe model-probe-c5 is not_adequate (ran none of the 1 changed line(s) on the main side); its results do not count either way | [PDF](urllib3-5370/REPORT.pdf) |
