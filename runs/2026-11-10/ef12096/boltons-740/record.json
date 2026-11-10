@@ -1,0 +1,2313 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-mahmoud-boltons-740-77da04eacc7d-2026-11-10",
+ "date_ist": "2026-11-10 11:28 IST",
+ "run_date": "2026-11-10",
+ "who": "ops/daily_run.py",
+ "repo": "mahmoud/boltons",
+ "library": "boltons",
+ "pr": {
+  "repo": "mahmoud/boltons",
+  "number": 740,
+  "url": "https://github.com/mahmoud/boltons/pull/740",
+  "title": "strutils.strip_ansi: strip OSC sequences (fixes #739)",
+  "base_sha": "d31d821d56c8f7756af9c30a864077f2e5855321",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "77da04eacc7de61e12da0f03986943c03f0bd134",
+  "merge_commit": "843a99a8f8d848ff3dec57a8e1a8b8dbb134adf2",
+  "tested_main_sha": "d31d821d56c8f7756af9c30a864077f2e5855321",
+  "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+ },
+ "author": "RealBhupesh",
+ "base_ref": "master",
+ "updated_at_utc": "2026-11-06T09:05:47Z",
+ "updated_at_ist": "2026-11-06 14:35 IST",
+ "ci_state": "not checked (chosen PR)",
+ "ci_detail": "chosen by name; selection filters not applied",
+ "tested_at_ist": "2026-11-10 11:28 IST",
+ "files": {
+  "all": [
+   "boltons/strutils.py",
+   "tests/test_strutils.py"
+  ],
+  "package_py": [
+   "boltons/strutils.py"
+  ],
+  "compiled": [],
+  "other": [
+   "tests/test_strutils.py"
+  ]
+ },
+ "machine_type": {
+  "arch": "x86_64",
+  "os": "Linux",
+  "platform": "Linux-6.12.94+-x86_64-with-glibc2.41",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": "g++ (Debian 14.2.0-19) 14.2.0",
+  "cpu_model": "Intel(R) Xeon(R) Processor",
+  "ram_gb": 15.6
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 3,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.15",
+ "test_selection": "mapped from touched files: tests/test_strutils.py, tests/test_fileutils.py",
+ "per_run": [
+  {
+   "side": "old",
+   "run": 1,
+   "passed": 46,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.2,
+   "pytest_summary": "46 passed in 0.69s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 1,
+   "passed": 101,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.1,
+   "pytest_summary": "101 passed in 0.66s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 2,
+   "passed": 46,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.1,
+   "pytest_summary": "46 passed in 0.67s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 2,
+   "passed": 101,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.2,
+   "pytest_summary": "101 passed in 0.71s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 3,
+   "passed": 46,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.2,
+   "pytest_summary": "46 passed in 0.70s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 3,
+   "passed": 101,
+   "failed": 0,
+   "error": 0,
+   "skipped": 0,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.1,
+   "pytest_summary": "101 passed in 0.66s",
+   "junit": true
+  }
+ ],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [
+  {
+   "source": "PR description",
+   "quote": "CSI handling and the `ESC(B` behaviour are unchanged.",
+   "pattern": "unchanged"
+  },
+  {
+   "source": "PR description",
+   "quote": "An unterminated OSC (no BEL or ST) is returned untouched, including whatever follows it, rather than dropping the rest of the input.",
+   "pattern": "untouched"
+  },
+  {
+   "source": "PR description",
+   "quote": "CHANGELOG is untouched; happy to add an entry.",
+   "pattern": "untouched"
+  }
+ ],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "local",
+ "sandbox_backend_note": "local bubblewrap",
+ "machine": "local",
+ "tool_setup": {
+  "installed": [],
+  "tries": 0,
+  "note": "All required tools were already installed.",
+  "refused": []
+ },
+ "posted_upstream": false,
+ "logs": "boltons-740/",
+ "freeze": {
+  "main": "freeze-main.txt",
+  "pr": "freeze-pr.txt"
+ },
+ "coverage": {
+  "status": "measured",
+  "changed_lines_total": 2,
+  "changed_lines_covered": 2,
+  "files": [
+   {
+    "file": "boltons/strutils.py",
+    "changed_lines_total": 2,
+    "changed_lines_covered": 2
+   }
+  ],
+  "seconds": 2.6,
+  "exit": 0,
+  "log": "coverage-pytest.log"
+ },
+ "poc_commit": "ef12096677e9cf59e8673436d74ec65d53771d7c",
+ "route": "source-pair",
+ "current_head_sha": "77da04eacc7de61e12da0f03986943c03f0bd134",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "state": "open",
+ "mergeable": true,
+ "mergeable_state": "unstable",
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": "[redacted]",
+  "notes": [
+   "Setup check: GitHub token: present.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory 9.1 GB (of 15.6 GB).",
+   "Setup check: free disk 92.4 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: [redacted] results",
+   "Query: boltons python setup install instructions https://github.com/mahmoud/boltons site:github.com/mahmoud/boltons",
+   "Query: boltons python documentation install https://github.com/mahmoud/boltons site:github.com/mahmoud/boltons",
+   "Query: boltons python install requirements https://pypi.org/project/boltons/ https://github.com/mahmoud/boltons site:pypi.org",
+   "Source: boltons/pyproject.toml at 4e5faa3d7e4008d89e0d8bf1ea87b6d9a061a16d \u00b7 mahmoud/boltons \u00b7 GitHub \u2014 https://github.com/mahmoud/boltons/blob/4e5faa3d7e4008d89e0d8bf1ea87b6d9a061a16d/pyproject.toml",
+   "Source: boltons \u00b7 PyPI \u2014 https://pypi.org/project/boltons/",
+   "Source: boltons/docs/index.rst at master \u00b7 mahmoud/boltons \u00b7 GitHub \u2014 https://github.com/mahmoud/boltons/blob/master/docs/index.rst",
+   "Source: boltons/.readthedocs.yaml at master \u00b7 mahmoud/boltons \u00b7 GitHub \u2014 https://github.com/mahmoud/boltons/blob/master/.readthedocs.yaml",
+   "Source: GitHub - mahmoud/boltons: \ud83d\udd29 Like builtins, but boltons. 250+ constructs, recipes, and snippets which extend (and rely on nothing but) the Python standard library. Nothing like Michael Bolton. \u00b7 GitHub \u2014 https://github.com/mahmoud/boltons",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >=3.7"
+  ],
+  "install_docs": [
+   "README.md",
+   "setup.cfg",
+   "pyproject.toml",
+   "tox.ini",
+   "docs/Makefile",
+   ".github/workflows/publish.yml",
+   ".github/workflows/tests.yaml"
+  ],
+  "install_docs_from": "main",
+  "setup_plan": {
+   "packages": [],
+   "scope_blocked": "",
+   "component": null,
+   "aggregate_names": [],
+   "extra_reqs": [],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >=3.7"
+   },
+   "system": [],
+   "refused": [],
+   "groups_blocked": ""
+  },
+  "steps": {
+   "setup_lookup": "Found 0 setup item(s) in the project's files and the web lookup.",
+   "setup_python": "Python 3.12: Python 3.12 already meets >=3.7",
+   "install_deps": "Nothing extra to install; the project's own install covers it."
+  },
+  "run_files": {
+   "requirements": "requirements.txt",
+   "plan": "setup-plan.json",
+   "count": 0
+  }
+ },
+ "chosen": {
+  "pr": 740,
+  "head_sha": "77da04eacc7de61e12da0f03986943c03f0bd134",
+  "base_sha": "d31d821d56c8f7756af9c30a864077f2e5855321",
+  "install": null,
+  "test_cmd": null
+ },
+ "sides": {
+  "comparison_basis": "base tip vs GitHub test merge (refs/pull/N/merge)",
+  "main_sha": "d31d821d56c8f7756af9c30a864077f2e5855321",
+  "pr_sha": "843a99a8f8d848ff3dec57a8e1a8b8dbb134adf2",
+  "merge_commit": "843a99a8f8d848ff3dec57a8e1a8b8dbb134adf2",
+  "merge_parents": [
+   "d31d821d56c8f7756af9c30a864077f2e5855321",
+   "77da04eacc7de61e12da0f03986943c03f0bd134"
+  ],
+  "merge_head_matches_pinned_head": true
+ },
+ "tested": {
+  "main": "master @ d31d821d56c8 (base tip = first parent of the merge commit)",
+  "pr": "GitHub test merge commit 843a99a8f8d8 (refs/pull/740/merge) of head 77da04eacc7d"
+ },
+ "probe_plan": {
+  "baseline": "full",
+  "model": "model provider: nebius (Token Factory, live)",
+  "errors": [],
+  "model_claims": [
+   {
+    "id": "C1",
+    "text": "After the change, OSC sequences that end with BEL or ST are stripped from the output.",
+    "source_quote": "This change makes the regex match complete OSC sequences ending in BEL or ST (`ESC \\`).",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C2",
+    "text": "The function accepts str, bytes, or bytearray input and returns a value of the same type as the input.",
+    "source_quote": "- `str`, `bytes` and `bytearray` input all work, and the return type is unchanged.",
+    "testable": true,
+    "expect": "same"
+   },
+   {
+    "id": "C3",
+    "text": "CSI handling and the ESC(B behavior remain unchanged by this PR.",
+    "source_quote": "- CSI handling and the `ESC(B` behaviour are unchanged.",
+    "testable": true,
+    "expect": "same"
+   },
+   {
+    "id": "C4",
+    "text": "If an OSC sequence lacks a BEL or ST terminator, the function leaves it and any following text untouched in the output.",
+    "source_quote": "- An unterminated OSC (no BEL or ST) is returned untouched, including whatever follows it, rather than dropping the rest of the input.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C5",
+    "text": "The ANSI_SEQUENCES regular expression now contains a named group, which could affect code that uses it directly and expects no groups.",
+    "source_quote": "- `ANSI_SEQUENCES` gains a named group. It isn't in `__all__`, but code that uses the regex directly and assumes no groups could notice.",
+    "testable": true,
+    "expect": "differs"
+   }
+  ],
+  "model_rejected_claims": [],
+  "model_retried": {
+   "why": [
+    "no probe listed the claim ids it checks, so its results could not be tied to any claim; in each probe, \"claims\" must name the claim ids it checks and the observation names that cover them"
+   ],
+   "kept_first_answer": "the retry linked no claim either"
+  },
+  "model_claims_filled": [
+   {
+    "id": "probe1",
+    "claims": [
+     "C1",
+     "C2",
+     "C3",
+     "C4",
+     "C5"
+    ]
+   }
+  ],
+  "diff_targets": [
+   "boltons.strutils.strip_ansi",
+   "boltons.strutils.ellipsize"
+  ],
+  "frozen": [
+   {
+    "path": "model-probes/model-probe1.py",
+    "source": "model",
+    "sha256": "9fae4671933e02c4a3bf6d894955dd5c7da5634520be47fac6690b97aaf6ebeb",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-10T05:59:44.044352+00:00",
+    "inputs_sha256": "818c8052a30eac287eb46608ce39dd082d1909e9cb868417a18ab393bd3ab7e7",
+    "inputs": {
+     "title_chars": 53,
+     "body_chars": 1180,
+     "base_files": {
+      "boltons/strutils.py": "0ec4e98a5fa6368199915d0f488b129e4e5cb8d330b6663d76a79992beb15dd3"
+     }
+    }
+   },
+   {
+    "path": "diff-probes/diff-api.py",
+    "source": "diff",
+    "sha256": "dd85be1be5925ac27c02dfa9f4d3172063d93f30732989a19ba579b4d1876502",
+    "generator": {
+     "kind": "diff",
+     "label": "diff (auto-derived from base-side code, model-free)",
+     "model": null,
+     "provider": null,
+     "provenance": "auto-derived",
+     "blind": false
+    },
+    "frozen_at": "2026-11-10T05:59:44.048244+00:00",
+    "inputs_sha256": "7fa135da5f4cd9de2b3818563558a6af745cdaa1cd23ca0a62e7fe49d0d2a28b",
+    "inputs": {
+     "title_chars": 0,
+     "body_chars": 0,
+     "base_files": {
+      "boltons/strutils.py": "0ec4e98a5fa6368199915d0f488b129e4e5cb8d330b6663d76a79992beb15dd3"
+     }
+    }
+   }
+  ]
+ },
+ "test_extras": [],
+ "pr_side_started_at": "2026-11-10T05:59:44.188849+00:00",
+ "test_targets": {
+  "main": [
+   "tests/test_strutils.py",
+   "tests/test_fileutils.py"
+  ],
+  "pr": [
+   "tests/test_strutils.py",
+   "tests/test_fileutils.py"
+  ]
+ },
+ "installed_commit": {
+  "main": {
+   "dist": "boltons",
+   "expected": "d31d821d56c8f7756af9c30a864077f2e5855321",
+   "installed": "d31d821d56c8f7756af9c30a864077f2e5855321",
+   "ok": true
+  },
+  "pr": {
+   "dist": "boltons",
+   "expected": "843a99a8f8d848ff3dec57a8e1a8b8dbb134adf2",
+   "installed": "843a99a8f8d848ff3dec57a8e1a8b8dbb134adf2",
+   "ok": true
+  }
+ },
+ "base_head_sha": "d31d821d56c8f7756af9c30a864077f2e5855321",
+ "comparison": {
+  "same": 46,
+  "same_skipped_both": 0,
+  "regressions": [],
+  "fixed": [
+   "tests.test_strutils::test_strip_ansi_osc[\\x1b]-\\x1b]-bytearray]",
+   "tests.test_strutils::test_strip_ansi_osc[\\x1b]-\\x1b]-bytes]",
+   "tests.test_strutils::test_strip_ansi_osc[\\x1b]-\\x1b]-str]",
+   "tests.test_strutils::test_strip_ansi_osc[\\xff\\x1b]title\\x07\\x1b[31m\\xfe\\x1b[0m-\\xff\\xfe-bytearray]",
+   "tests.test_strutils::test_strip_ansi_osc[\\xff\\x1b]title\\x07\\x1b[31m\\xfe\\x1b[0m-\\xff\\xfe-bytes]",
+   "tests.test_strutils::test_strip_ansi_osc[\\xff\\x1b]title\\x07\\x1b[31m\\xfe\\x1b[0m-\\xff\\xfe-str]",
+   "tests.test_strutils::test_strip_ansi_osc[a\\x1b[31m\\x1b]open\\n\\x1b[0m-a\\x1b]open\\n\\x1b[0m-bytearray]",
+   "tests.test_strutils::test_strip_ansi_osc[a\\x1b[31m\\x1b]open\\n\\x1b[0m-a\\x1b]open\\n\\x1b[0m-bytes]",
+   "tests.test_strutils::test_strip_ansi_osc[a\\x1b[31m\\x1b]open\\n\\x1b[0m-a\\x1b]open\\n\\x1b[0m-str]",
+   "tests.test_strutils::test_strip_ansi_osc[a\\x1b]line1\\n\\x1b[31mline2\\x1b\\\\b-ab-bytearray]",
+   "tests.test_strutils::test_strip_ansi_osc[a\\x1b]line1\\n\\x1b[31mline2\\x1b\\\\b-ab-bytes]",
+   "tests.test_strutils::test_strip_ansi_osc[a\\x1b]line1\\n\\x1b[31mline2\\x1b\\\\b-ab-str]",
+   "tests.test_strutils::test_strip_ansi_osc[a\\x1b]line1\\nline2\\x07b-ab-bytearray]",
+   "tests.test_strutils::test_strip_ansi_osc[a\\x1b]line1\\nline2\\x07b-ab-bytes]",
+   "tests.test_strutils::test_strip_ansi_osc[a\\x1b]line1\\nline2\\x07b-ab-str]",
+   "tests.test_strutils::test_strip_ansi_osc[a\\x1b]open\\x1b-a\\x1b]open\\x1b-bytearray]",
+   "tests.test_strutils::test_strip_ansi_osc[a\\x1b]open\\x1b-a\\x1b]open\\x1b-bytes]",
+   "tests.test_strutils::test_strip_ansi_osc[a\\x1b]open\\x1b-a\\x1b]open\\x1b-str]",
+   "tests.test_strutils::test_strip_ansi_osc[a\\x1b]title\\x07b-ab-bytearray]",
+   "tests.test_strutils::test_strip_ansi_osc[a\\x1b]title\\x07b-ab-bytes]",
+   "tests.test_strutils::test_strip_ansi_osc[a\\x1b]title\\x07b-ab-str]",
+   "tests.test_strutils::test_strip_ansi_osc[a\\x1b]title\\x1b\\\\b-ab-bytearray]",
+   "tests.test_strutils::test_strip_ansi_osc[a\\x1b]title\\x1b\\\\b-ab-bytes]",
+   "tests.test_strutils::test_strip_ansi_osc[a\\x1b]title\\x1b\\\\b-ab-str]",
+   "tests.test_strutils::test_strip_ansi_osc_boundaries[\\x1b[31mred\\x1b[0m\\x1b]open-red\\x1b]open-bytearray]",
+   "tests.test_strutils::test_strip_ansi_osc_boundaries[\\x1b[31mred\\x1b[0m\\x1b]open-red\\x1b]open-bytes]",
+   "tests.test_strutils::test_strip_ansi_osc_boundaries[\\x1b[31mred\\x1b[0m\\x1b]open-red\\x1b]open-str]",
+   "tests.test_strutils::test_strip_ansi_osc_boundaries[\\x1b]8;;https://example.com\\x07link\\x1b]8;;\\x07-link-bytearray]",
+   "tests.test_strutils::test_strip_ansi_osc_boundaries[\\x1b]8;;https://example.com\\x07link\\x1b]8;;\\x07-link-bytes]",
+   "tests.test_strutils::test_strip_ansi_osc_boundaries[\\x1b]8;;https://example.com\\x07link\\x1b]8;;\\x07-link-str]",
+   "tests.test_strutils::test_strip_ansi_osc_boundaries[\\x1b]8;;https://example.com\\x1b\\\\link\\x1b]8;;\\x1b\\\\-link-bytearray]",
+   "tests.test_strutils::test_strip_ansi_osc_boundaries[\\x1b]8;;https://example.com\\x1b\\\\link\\x1b]8;;\\x1b\\\\-link-bytes]",
+   "tests.test_strutils::test_strip_ansi_osc_boundaries[\\x1b]8;;https://example.com\\x1b\\\\link\\x1b]8;;\\x1b\\\\-link-str]",
+   "tests.test_strutils::test_strip_ansi_osc_boundaries[\\x1b]open\\x1b[31mtext-\\x1b]open\\x1b[31mtext-bytearray]",
+   "tests.test_strutils::test_strip_ansi_osc_boundaries[\\x1b]open\\x1b[31mtext-\\x1b]open\\x1b[31mtext-bytes]",
+   "tests.test_strutils::test_strip_ansi_osc_boundaries[\\x1b]open\\x1b[31mtext-\\x1b]open\\x1b[31mtext-str]",
+   "tests.test_strutils::test_strip_ansi_osc_boundaries[a\\x1b]\\x07\\x1b]0;title\\x1b\\\\b-ab-bytearray]",
+   "tests.test_strutils::test_strip_ansi_osc_boundaries[a\\x1b]\\x07\\x1b]0;title\\x1b\\\\b-ab-bytes]",
+   "tests.test_strutils::test_strip_ansi_osc_boundaries[a\\x1b]\\x07\\x1b]0;title\\x1b\\\\b-ab-str]",
+   "tests.test_strutils::test_strip_ansi_osc_boundaries[a\\x1b]one\\x07b\\x1b]open-ab\\x1b]open-bytearray]",
+   "tests.test_strutils::test_strip_ansi_osc_boundaries[a\\x1b]one\\x07b\\x1b]open-ab\\x1b]open-bytes]",
+   "tests.test_strutils::test_strip_ansi_osc_boundaries[a\\x1b]one\\x07b\\x1b]open-ab\\x1b]open-str]",
+   "tests.test_strutils::test_strip_ansi_osc_boundaries[a\\x1b]title\\x07b\\x1b\\\\c-abc-bytearray]",
+   "tests.test_strutils::test_strip_ansi_osc_boundaries[a\\x1b]title\\x07b\\x1b\\\\c-abc-bytes]",
+   "tests.test_strutils::test_strip_ansi_osc_boundaries[a\\x1b]title\\x07b\\x1b\\\\c-abc-str]",
+   "tests.test_strutils::test_strip_ansi_osc_boundaries[a\\x1b]title\\x1b\\\\b\\x07c-ab\\x07c-bytearray]",
+   "tests.test_strutils::test_strip_ansi_osc_boundaries[a\\x1b]title\\x1b\\\\b\\x07c-ab\\x07c-bytes]",
+   "tests.test_strutils::test_strip_ansi_osc_boundaries[a\\x1b]title\\x1b\\\\b\\x07c-ab\\x07c-str]",
+   "tests.test_strutils::test_strip_ansi_osc_boundaries[a\\x1b]x\\x1bXy\\x07b-ab-bytearray]",
+   "tests.test_strutils::test_strip_ansi_osc_boundaries[a\\x1b]x\\x1bXy\\x07b-ab-bytes]",
+   "tests.test_strutils::test_strip_ansi_osc_boundaries[a\\x1b]x\\x1bXy\\x07b-ab-str]",
+   "tests.test_strutils::test_strip_ansi_osc_unicode"
+  ],
+  "new_tests_passing": 3,
+  "new_tests_passing_ids": [
+   "tests.test_strutils::test_strip_ansi_osc[\\x1b(B\\x1b[31mred\\x1b[0m-\\x1b(Bred-bytearray]",
+   "tests.test_strutils::test_strip_ansi_osc[\\x1b(B\\x1b[31mred\\x1b[0m-\\x1b(Bred-bytes]",
+   "tests.test_strutils::test_strip_ansi_osc[\\x1b(B\\x1b[31mred\\x1b[0m-\\x1b(Bred-str]"
+  ],
+  "new_tests_failing": [],
+  "new_tests_skipped": [],
+  "removed_tests": [],
+  "reparametrized": [],
+  "skipped_missing_dependency": [],
+  "flaky": [],
+  "pr_unstable": [],
+  "pr_unstable_noisy": [],
+  "environment": [],
+  "other_changes": [],
+  "preexisting_failures": [],
+  "load_failed_both": [],
+  "load_failed_pr": [],
+  "load_failed_main": [],
+  "executed": {
+   "main": 98,
+   "pr": 101
+  },
+  "messages": {},
+  "base_messages": {
+   "tests.test_strutils::test_strip_ansi_osc[\\x1b]-\\x1b]-bytearray]": "AssertionError: assert bytearray(b'') == bytearray(b'\\x1b]')",
+   "tests.test_strutils::test_strip_ansi_osc[\\x1b]-\\x1b]-bytes]": "AssertionError: assert b'' == b'\\x1b]'",
+   "tests.test_strutils::test_strip_ansi_osc[\\x1b]-\\x1b]-str]": "AssertionError: assert '' == '\\x1b]'",
+   "tests.test_strutils::test_strip_ansi_osc[\\xff\\x1b]title\\x07\\x1b[31m\\xfe\\x1b[0m-\\xff\\xfe-bytearray]": "AssertionError: assert bytearray(b'\\...itle\\x07\\xfe') == bytearray(b'\\xff\\xfe')",
+   "tests.test_strutils::test_strip_ansi_osc[\\xff\\x1b]title\\x07\\x1b[31m\\xfe\\x1b[0m-\\xff\\xfe-bytes]": "AssertionError: assert b'\\xfftitle\\x07\\xfe' == b'\\xff\\xfe'",
+   "tests.test_strutils::test_strip_ansi_osc[\\xff\\x1b]title\\x07\\x1b[31m\\xfe\\x1b[0m-\\xff\\xfe-str]": "AssertionError: assert '\u00fftitle\\x07\u00fe' == '\u00ff\u00fe'",
+   "tests.test_strutils::test_strip_ansi_osc[a\\x1b[31m\\x1b]open\\n\\x1b[0m-a\\x1b]open\\n\\x1b[0m-bytearray]": "AssertionError: assert bytearray(b'aopen\\n') == bytearray(b'a...pen\\n\\x1b[0m')",
+   "tests.test_strutils::test_strip_ansi_osc[a\\x1b[31m\\x1b]open\\n\\x1b[0m-a\\x1b]open\\n\\x1b[0m-bytes]": "AssertionError: assert b'aopen\\n' == b'a\\x1b]open\\n\\x1b[0m'",
+   "tests.test_strutils::test_strip_ansi_osc[a\\x1b[31m\\x1b]open\\n\\x1b[0m-a\\x1b]open\\n\\x1b[0m-str]": "AssertionError: assert 'aopen\\n' == 'a\\x1b]open\\n\\x1b[0m'",
+   "tests.test_strutils::test_strip_ansi_osc[a\\x1b]line1\\n\\x1b[31mline2\\x1b\\\\b-ab-bytearray]": "AssertionError: assert bytearray(b'aline1\\nline2b') == bytearray(b'ab')",
+   "tests.test_strutils::test_strip_ansi_osc[a\\x1b]line1\\n\\x1b[31mline2\\x1b\\\\b-ab-bytes]": "AssertionError: assert b'aline1\\nline2b' == b'ab'",
+   "tests.test_strutils::test_strip_ansi_osc[a\\x1b]line1\\n\\x1b[31mline2\\x1b\\\\b-ab-str]": "AssertionError: assert 'aline1\\nline2b' == 'ab'",
+   "tests.test_strutils::test_strip_ansi_osc[a\\x1b]line1\\nline2\\x07b-ab-bytearray]": "AssertionError: assert bytearray(b'a...\\nline2\\x07b') == bytearray(b'ab')",
+   "tests.test_strutils::test_strip_ansi_osc[a\\x1b]line1\\nline2\\x07b-ab-bytes]": "AssertionError: assert b'aline1\\nline2\\x07b' == b'ab'",
+   "tests.test_strutils::test_strip_ansi_osc[a\\x1b]line1\\nline2\\x07b-ab-str]": "AssertionError: assert 'aline1\\nline2\\x07b' == 'ab'",
+   "tests.test_strutils::test_strip_ansi_osc[a\\x1b]open\\x1b-a\\x1b]open\\x1b-bytearray]": "AssertionError: assert bytearray(b'aopen\\x1b') == bytearray(b'a\\x1b]open\\x1b')",
+   "tests.test_strutils::test_strip_ansi_osc[a\\x1b]open\\x1b-a\\x1b]open\\x1b-bytes]": "AssertionError: assert b'aopen\\x1b' == b'a\\x1b]open\\x1b'",
+   "tests.test_strutils::test_strip_ansi_osc[a\\x1b]open\\x1b-a\\x1b]open\\x1b-str]": "AssertionError: assert 'aopen\\x1b' == 'a\\x1b]open\\x1b'",
+   "tests.test_strutils::test_strip_ansi_osc[a\\x1b]title\\x07b-ab-bytearray]": "AssertionError: assert bytearray(b'atitle\\x07b') == bytearray(b'ab')",
+   "tests.test_strutils::test_strip_ansi_osc[a\\x1b]title\\x07b-ab-bytes]": "AssertionError: assert b'atitle\\x07b' == b'ab'",
+   "tests.test_strutils::test_strip_ansi_osc[a\\x1b]title\\x07b-ab-str]": "AssertionError: assert 'atitle\\x07b' == 'ab'",
+   "tests.test_strutils::test_strip_ansi_osc[a\\x1b]title\\x1b\\\\b-ab-bytearray]": "AssertionError: assert bytearray(b'atitleb') == bytearray(b'ab')",
+   "tests.test_strutils::test_strip_ansi_osc[a\\x1b]title\\x1b\\\\b-ab-bytes]": "AssertionError: assert b'atitleb' == b'ab'",
+   "tests.test_strutils::test_strip_ansi_osc[a\\x1b]title\\x1b\\\\b-ab-str]": "AssertionError: assert 'atitleb' == 'ab'",
+   "tests.test_strutils::test_strip_ansi_osc_boundaries[\\x1b[31mred\\x1b[0m\\x1b]open-red\\x1b]open-bytearray]": "AssertionError: assert bytearray(b'redopen') == bytearray(b'red\\x1b]open')",
+   "tests.test_strutils::test_strip_ansi_osc_boundaries[\\x1b[31mred\\x1b[0m\\x1b]open-red\\x1b]open-bytes]": "AssertionError: assert b'redopen' == b'red\\x1b]open'",
+   "tests.test_strutils::test_strip_ansi_osc_boundaries[\\x1b[31mred\\x1b[0m\\x1b]open-red\\x1b]open-str]": "AssertionError: assert 'redopen' == 'red\\x1b]open'",
+   "tests.test_strutils::test_strip_ansi_osc_boundaries[\\x1b]8;;https://example.com\\x07link\\x1b]8;;\\x07-link-bytearray]": "AssertionError: assert bytearray(b'8...7link8;;\\x07') == bytearray(b'link')",
+   "tests.test_strutils::test_strip_ansi_osc_boundaries[\\x1b]8;;https://example.com\\x07link\\x1b]8;;\\x07-link-bytes]": "AssertionError: assert b'8;;https://...07link8;;\\x07' == b'link'",
+   "tests.test_strutils::test_strip_ansi_osc_boundaries[\\x1b]8;;https://example.com\\x07link\\x1b]8;;\\x07-link-str]": "AssertionError: assert '8;;https://e...07link8;;\\x07' == 'link'",
+   "tests.test_strutils::test_strip_ansi_osc_boundaries[\\x1b]8;;https://example.com\\x1b\\\\link\\x1b]8;;\\x1b\\\\-link-bytearray]": "AssertionError: assert bytearray(b'8...e.comlink8;;') == bytearray(b'link')",
+   "tests.test_strutils::test_strip_ansi_osc_boundaries[\\x1b]8;;https://example.com\\x1b\\\\link\\x1b]8;;\\x1b\\\\-link-bytes]": "AssertionError: assert b'8;;https://...le.comlink8;;' == b'link'",
+   "tests.test_strutils::test_strip_ansi_osc_boundaries[\\x1b]8;;https://example.com\\x1b\\\\link\\x1b]8;;\\x1b\\\\-link-str]": "AssertionError: assert '8;;https://e...le.comlink8;;' == 'link'",
+   "tests.test_strutils::test_strip_ansi_osc_boundaries[\\x1b]open\\x1b[31mtext-\\x1b]open\\x1b[31mtext-bytearray]": "AssertionError: assert bytearray(b'opentext') == bytearray(b'\\...\\x1b[31mtext')",
+   "tests.test_strutils::test_strip_ansi_osc_boundaries[\\x1b]open\\x1b[31mtext-\\x1b]open\\x1b[31mtext-bytes]": "AssertionError: assert b'opentext' == b'\\x1b]open\\x1b[31mtext'",
+   "tests.test_strutils::test_strip_ansi_osc_boundaries[\\x1b]open\\x1b[31mtext-\\x1b]open\\x1b[31mtext-str]": "AssertionError: assert 'opentext' == '\\x1b]open\\x1b[31mtext'",
+   "tests.test_strutils::test_strip_ansi_osc_boundaries[a\\x1b]\\x07\\x1b]0;title\\x1b\\\\b-ab-bytearray]": "AssertionError: assert bytearray(b'a\\x070;titleb') == bytearray(b'ab')",
+   "tests.test_strutils::test_strip_ansi_osc_boundaries[a\\x1b]\\x07\\x1b]0;title\\x1b\\\\b-ab-bytes]": "AssertionError: assert b'a\\x070;titleb' == b'ab'",
+   "tests.test_strutils::test_strip_ansi_osc_boundaries[a\\x1b]\\x07\\x1b]0;title\\x1b\\\\b-ab-str]": "AssertionError: assert 'a\\x070;titleb' == 'ab'",
+   "tests.test_strutils::test_strip_ansi_osc_boundaries[a\\x1b]one\\x07b\\x1b]open-ab\\x1b]open-bytearray]": "AssertionError: assert bytearray(b'aone\\x07bopen') == bytearray(b'ab\\x1b]open')",
+   "tests.test_strutils::test_strip_ansi_osc_boundaries[a\\x1b]one\\x07b\\x1b]open-ab\\x1b]open-bytes]": "AssertionError: assert b'aone\\x07bopen' == b'ab\\x1b]open'",
+   "tests.test_strutils::test_strip_ansi_osc_boundaries[a\\x1b]one\\x07b\\x1b]open-ab\\x1b]open-str]": "AssertionError: assert 'aone\\x07bopen' == 'ab\\x1b]open'",
+   "tests.test_strutils::test_strip_ansi_osc_boundaries[a\\x1b]title\\x07b\\x1b\\\\c-abc-bytearray]": "AssertionError: assert bytearray(b'atitle\\x07bc') == bytearray(b'abc')",
+   "tests.test_strutils::test_strip_ansi_osc_boundaries[a\\x1b]title\\x07b\\x1b\\\\c-abc-bytes]": "AssertionError: assert b'atitle\\x07bc' == b'abc'",
+   "tests.test_strutils::test_strip_ansi_osc_boundaries[a\\x1b]title\\x07b\\x1b\\\\c-abc-str]": "AssertionError: assert 'atitle\\x07bc' == 'abc'",
+   "tests.test_strutils::test_strip_ansi_osc_boundaries[a\\x1b]title\\x1b\\\\b\\x07c-ab\\x07c-bytearray]": "AssertionError: assert bytearray(b'atitleb\\x07c') == bytearray(b'ab\\x07c')",
+   "tests.test_strutils::test_strip_ansi_osc_boundaries[a\\x1b]title\\x1b\\\\b\\x07c-ab\\x07c-bytes]": "AssertionError: assert b'atitleb\\x07c' == b'ab\\x07c'",
+   "tests.test_strutils::test_strip_ansi_osc_boundaries[a\\x1b]title\\x1b\\\\b\\x07c-ab\\x07c-str]": "AssertionError: assert 'atitleb\\x07c' == 'ab\\x07c'",
+   "tests.test_strutils::test_strip_ansi_osc_boundaries[a\\x1b]x\\x1bXy\\x07b-ab-bytearray]": "AssertionError: assert bytearray(b'axy\\x07b') == bytearray(b'ab')",
+   "tests.test_strutils::test_strip_ansi_osc_boundaries[a\\x1b]x\\x1bXy\\x07b-ab-bytes]": "AssertionError: assert b'axy\\x07b' == b'ab'",
+   "tests.test_strutils::test_strip_ansi_osc_boundaries[a\\x1b]x\\x1bXy\\x07b-ab-str]": "AssertionError: assert 'axy\\x07b' == 'ab'",
+   "tests.test_strutils::test_strip_ansi_osc_unicode": "AssertionError: assert '\u96ea0;\u7a97\u53e3\\x07\u00dc' == '\u96ea\u00dc'"
+  }
+ },
+ "exit_check": {
+  "explained": true,
+  "problems": [],
+  "detail": "all runs exited 0"
+ },
+ "probes": {
+  "status": "ran",
+  "items": [
+   {
+    "id": "model-probe1",
+    "source": "model",
+    "path": "model-probes/model-probe1.py",
+    "sha256": "9fae4671933e02c4a3bf6d894955dd5c7da5634520be47fac6690b97aaf6ebeb",
+    "target": "mahmoud/boltons#740",
+    "about": "Testing strip_ansi and ANSI_SEQUENCES for claims C1-C5",
+    "claims": [
+     {
+      "id": "C1",
+      "source": "PR description",
+      "text": "After the change, OSC sequences that end with BEL or ST are stripped from the output.",
+      "covers": [
+       "c1.*"
+      ],
+      "expect": "differs"
+     },
+     {
+      "id": "C2",
+      "source": "PR description",
+      "text": "The function accepts str, bytes, or bytearray input and returns a value of the same type as the input.",
+      "covers": [
+       "c2.*"
+      ],
+      "expect": "same"
+     },
+     {
+      "id": "C3",
+      "source": "PR description",
+      "text": "CSI handling and the ESC(B behavior remain unchanged by this PR.",
+      "covers": [
+       "c3.*"
+      ],
+      "expect": "same"
+     },
+     {
+      "id": "C4",
+      "source": "PR description",
+      "text": "If an OSC sequence lacks a BEL or ST terminator, the function leaves it and any following text untouched in the output.",
+      "covers": [
+       "c4.*"
+      ],
+      "expect": "differs"
+     },
+     {
+      "id": "C5",
+      "source": "PR description",
+      "text": "The ANSI_SEQUENCES regular expression now contains a named group, which could affect code that uses it directly and expects no groups.",
+      "covers": [
+       "c5.*"
+      ],
+      "expect": "differs"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-probe1-main-1.jsonl",
+      "probe-model-probe1-main-2.jsonl",
+      "probe-model-probe1-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-probe1-pr-1.jsonl",
+      "probe-model-probe1-pr-2.jsonl",
+      "probe-model-probe1-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "c1.osc_bel_output": "0;title\u0007rest",
+       "c1.osc_st_output": "0;titlerest",
+       "c2.str_out_type": "str",
+       "c2.bytes_out_type": "bytes",
+       "c2.bytearray_out_type": "bytearray",
+       "c3.csi_output": "red",
+       "c3.escb_output": "\u001b(B",
+       "c4.unterminated_output": "0;title without terminatorrest",
+       "c5.regex_pattern": "\n    \\x1B            # Sequence starts with ESC, i.e. hex 0x1B\n    (?:\n        [@-Z\\\\-_]   # Second byte:\n                    #   all 0x40\u20130x5F range but CSI char, i.e ASCII @A\u2013Z\\]^_\n    |               # Or\n        \\[          # CSI sequences, starting with [\n        [0-?]*      # Parameter bytes:\n                    #   range 0x30\u20130x3F, ASCII 0\u20139:;<=>?\n        [ -/]*      # Intermediate bytes:\n                    #   range 0x20\u20130x2F, ASCII space and !\"#$%&'()*+,-./\n        [@-~]       # Final byte\n                    #   range 0x40\u20130x7E, ASCII @A\u2013Z[\\]^_`a\u2013z{|}~\n    )\n",
+       "c5.num_groups": 0,
+       "c5.has_named_group": false
+      },
+      {
+       "c1.osc_bel_output": "0;title\u0007rest",
+       "c1.osc_st_output": "0;titlerest",
+       "c2.str_out_type": "str",
+       "c2.bytes_out_type": "bytes",
+       "c2.bytearray_out_type": "bytearray",
+       "c3.csi_output": "red",
+       "c3.escb_output": "\u001b(B",
+       "c4.unterminated_output": "0;title without terminatorrest",
+       "c5.regex_pattern": "\n    \\x1B            # Sequence starts with ESC, i.e. hex 0x1B\n    (?:\n        [@-Z\\\\-_]   # Second byte:\n                    #   all 0x40\u20130x5F range but CSI char, i.e ASCII @A\u2013Z\\]^_\n    |               # Or\n        \\[          # CSI sequences, starting with [\n        [0-?]*      # Parameter bytes:\n                    #   range 0x30\u20130x3F, ASCII 0\u20139:;<=>?\n        [ -/]*      # Intermediate bytes:\n                    #   range 0x20\u20130x2F, ASCII space and !\"#$%&'()*+,-./\n        [@-~]       # Final byte\n                    #   range 0x40\u20130x7E, ASCII @A\u2013Z[\\]^_`a\u2013z{|}~\n    )\n",
+       "c5.num_groups": 0,
+       "c5.has_named_group": false
+      },
+      {
+       "c1.osc_bel_output": "0;title\u0007rest",
+       "c1.osc_st_output": "0;titlerest",
+       "c2.str_out_type": "str",
+       "c2.bytes_out_type": "bytes",
+       "c2.bytearray_out_type": "bytearray",
+       "c3.csi_output": "red",
+       "c3.escb_output": "\u001b(B",
+       "c4.unterminated_output": "0;title without terminatorrest",
+       "c5.regex_pattern": "\n    \\x1B            # Sequence starts with ESC, i.e. hex 0x1B\n    (?:\n        [@-Z\\\\-_]   # Second byte:\n                    #   all 0x40\u20130x5F range but CSI char, i.e ASCII @A\u2013Z\\]^_\n    |               # Or\n        \\[          # CSI sequences, starting with [\n        [0-?]*      # Parameter bytes:\n                    #   range 0x30\u20130x3F, ASCII 0\u20139:;<=>?\n        [ -/]*      # Intermediate bytes:\n                    #   range 0x20\u20130x2F, ASCII space and !\"#$%&'()*+,-./\n        [@-~]       # Final byte\n                    #   range 0x40\u20130x7E, ASCII @A\u2013Z[\\]^_`a\u2013z{|}~\n    )\n",
+       "c5.num_groups": 0,
+       "c5.has_named_group": false
+      }
+     ],
+     "pr": [
+      {
+       "c1.osc_bel_output": "rest",
+       "c1.osc_st_output": "rest",
+       "c2.str_out_type": "str",
+       "c2.bytes_out_type": "bytes",
+       "c2.bytearray_out_type": "bytearray",
+       "c3.csi_output": "red",
+       "c3.escb_output": "\u001b(B",
+       "c4.unterminated_output": "\u001b]0;title without terminatorrest",
+       "c5.regex_pattern": "\n    \\x1B            # Sequence starts with ESC, i.e. hex 0x1B\n    (?:\n        \\] [\\s\\S]*? (?: \\x07 | \\x1B\\\\ | (?P<unterminated_osc>\\Z) )\n                    # OSC ends at BEL, ST, or end of unterminated input\n    |               # Or\n        [@-Z\\\\-_]   # Second byte:\n                    #   all 0x40\u20130x5F range but CSI char, i.e ASCII @A\u2013Z\\]^_\n    |               # Or\n        \\[          # CSI sequences, starting with [\n        [0-?]*      # Parameter bytes:\n                    #   range 0x30\u20130x3F, ASCII 0\u20139:;<=>?\n        [ -/]*      # Intermediate bytes:\n                    #   range 0x20\u20130x2F, ASCII space and !\"#$%&'()*+,-./\n        [@-~]       # Final byte\n                    #   range 0x40\u20130x7E, ASCII @A\u2013Z[\\]^_`a\u2013z{|}~\n    )\n",
+       "c5.num_groups": 1,
+       "c5.has_named_group": true
+      },
+      {
+       "c1.osc_bel_output": "rest",
+       "c1.osc_st_output": "rest",
+       "c2.str_out_type": "str",
+       "c2.bytes_out_type": "bytes",
+       "c2.bytearray_out_type": "bytearray",
+       "c3.csi_output": "red",
+       "c3.escb_output": "\u001b(B",
+       "c4.unterminated_output": "\u001b]0;title without terminatorrest",
+       "c5.regex_pattern": "\n    \\x1B            # Sequence starts with ESC, i.e. hex 0x1B\n    (?:\n        \\] [\\s\\S]*? (?: \\x07 | \\x1B\\\\ | (?P<unterminated_osc>\\Z) )\n                    # OSC ends at BEL, ST, or end of unterminated input\n    |               # Or\n        [@-Z\\\\-_]   # Second byte:\n                    #   all 0x40\u20130x5F range but CSI char, i.e ASCII @A\u2013Z\\]^_\n    |               # Or\n        \\[          # CSI sequences, starting with [\n        [0-?]*      # Parameter bytes:\n                    #   range 0x30\u20130x3F, ASCII 0\u20139:;<=>?\n        [ -/]*      # Intermediate bytes:\n                    #   range 0x20\u20130x2F, ASCII space and !\"#$%&'()*+,-./\n        [@-~]       # Final byte\n                    #   range 0x40\u20130x7E, ASCII @A\u2013Z[\\]^_`a\u2013z{|}~\n    )\n",
+       "c5.num_groups": 1,
+       "c5.has_named_group": true
+      },
+      {
+       "c1.osc_bel_output": "rest",
+       "c1.osc_st_output": "rest",
+       "c2.str_out_type": "str",
+       "c2.bytes_out_type": "bytes",
+       "c2.bytearray_out_type": "bytearray",
+       "c3.csi_output": "red",
+       "c3.escb_output": "\u001b(B",
+       "c4.unterminated_output": "\u001b]0;title without terminatorrest",
+       "c5.regex_pattern": "\n    \\x1B            # Sequence starts with ESC, i.e. hex 0x1B\n    (?:\n        \\] [\\s\\S]*? (?: \\x07 | \\x1B\\\\ | (?P<unterminated_osc>\\Z) )\n                    # OSC ends at BEL, ST, or end of unterminated input\n    |               # Or\n        [@-Z\\\\-_]   # Second byte:\n                    #   all 0x40\u20130x5F range but CSI char, i.e ASCII @A\u2013Z\\]^_\n    |               # Or\n        \\[          # CSI sequences, starting with [\n        [0-?]*      # Parameter bytes:\n                    #   range 0x30\u20130x3F, ASCII 0\u20139:;<=>?\n        [ -/]*      # Intermediate bytes:\n                    #   range 0x20\u20130x2F, ASCII space and !\"#$%&'()*+,-./\n        [@-~]       # Final byte\n                    #   range 0x40\u20130x7E, ASCII @A\u2013Z[\\]^_`a\u2013z{|}~\n    )\n",
+       "c5.num_groups": 1,
+       "c5.has_named_group": true
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "c1.osc_bel_output",
+      "state": "differs",
+      "label": "proven",
+      "claim": "C1",
+      "main": "0;title\u0007rest",
+      "pr": "rest",
+      "diffs": [
+       {
+        "field": "",
+        "main": "0;title\u0007rest",
+        "pr": "rest"
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c1.osc_bel_output\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c1.osc_bel_output\""
+       }
+      }
+     },
+     {
+      "name": "c1.osc_st_output",
+      "state": "differs",
+      "label": "proven",
+      "claim": "C1",
+      "main": "0;titlerest",
+      "pr": "rest",
+      "diffs": [
+       {
+        "field": "",
+        "main": "0;titlerest",
+        "pr": "rest"
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c1.osc_st_output\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"c1.osc_st_output\""
+       }
+      }
+     },
+     {
+      "name": "c2.bytearray_out_type",
+      "state": "same",
+      "label": "proven",
+      "claim": "C2",
+      "main": "bytearray",
+      "pr": "bytearray",
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-main-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"c2.bytearray_out_type\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"c2.bytearray_out_type\""
+       }
+      }
+     },
+     {
+      "name": "c2.bytes_out_type",
+      "state": "same",
+      "label": "proven",
+      "claim": "C2",
+      "main": "bytes",
+      "pr": "bytes",
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-main-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"c2.bytes_out_type\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"c2.bytes_out_type\""
+       }
+      }
+     },
+     {
+      "name": "c2.str_out_type",
+      "state": "same",
+      "label": "proven",
+      "claim": "C2",
+      "main": "str",
+      "pr": "str",
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-main-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"c2.str_out_type\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"c2.str_out_type\""
+       }
+      }
+     },
+     {
+      "name": "c3.csi_output",
+      "state": "same",
+      "label": "proven",
+      "claim": "C3",
+      "main": "red",
+      "pr": "red",
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-main-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"c3.csi_output\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"c3.csi_output\""
+       }
+      }
+     },
+     {
+      "name": "c3.escb_output",
+      "state": "same",
+      "label": "proven",
+      "claim": "C3",
+      "main": "\u001b(B",
+      "pr": "\u001b(B",
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-main-1.jsonl",
+        "line": 7,
+        "quote": "\"observation\": \"c3.escb_output\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 7,
+        "quote": "\"observation\": \"c3.escb_output\""
+       }
+      }
+     },
+     {
+      "name": "c4.unterminated_output",
+      "state": "differs",
+      "label": "proven",
+      "claim": "C4",
+      "main": "0;title without terminatorrest",
+      "pr": "\u001b]0;title without terminatorrest",
+      "diffs": [
+       {
+        "field": "",
+        "main": "0;title without terminatorrest",
+        "pr": "\u001b]0;title without terminatorrest"
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-main-1.jsonl",
+        "line": 8,
+        "quote": "\"observation\": \"c4.unterminated_output\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 8,
+        "quote": "\"observation\": \"c4.unterminated_output\""
+       }
+      }
+     },
+     {
+      "name": "c5.has_named_group",
+      "state": "differs",
+      "label": "proven",
+      "claim": "C5",
+      "main": false,
+      "pr": true,
+      "diffs": [
+       {
+        "field": "",
+        "main": false,
+        "pr": true
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-main-1.jsonl",
+        "line": 9,
+        "quote": "\"observation\": \"c5.has_named_group\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 9,
+        "quote": "\"observation\": \"c5.has_named_group\""
+       }
+      }
+     },
+     {
+      "name": "c5.num_groups",
+      "state": "differs",
+      "label": "proven",
+      "claim": "C5",
+      "main": 0,
+      "pr": 1,
+      "diffs": [
+       {
+        "field": "",
+        "main": 0,
+        "pr": 1
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-main-1.jsonl",
+        "line": 10,
+        "quote": "\"observation\": \"c5.num_groups\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 10,
+        "quote": "\"observation\": \"c5.num_groups\""
+       }
+      }
+     },
+     {
+      "name": "c5.regex_pattern",
+      "state": "differs",
+      "label": "proven",
+      "claim": "C5",
+      "main": "\n    \\x1B            # Sequence starts with ESC, i.e. hex 0x1B\n    (?:\n        [@-Z\\\\-_]   # Second byte:\n                    #   all 0x40\u20130x5F range but CSI char, i.e ASCII @A\u2013Z\\]^_\n    |               # Or\n        \\[          # CSI sequences, starting with [\n        [0-?]*      # Parameter bytes:\n                    #   range 0x30\u20130x3F, ASCII 0\u20139:;<=>?\n        [ -/]*      # Intermediate bytes:\n                    #   range 0x20\u20130x2F, ASCII space and !\"#$%&'()*+,-./\n        [@-~]       # Final byte\n                    #   range 0x40\u20130x7E, ASCII @A\u2013Z[\\]^_`a\u2013z{|}~\n    )\n",
+      "pr": "\n    \\x1B            # Sequence starts with ESC, i.e. hex 0x1B\n    (?:\n        \\] [\\s\\S]*? (?: \\x07 | \\x1B\\\\ | (?P<unterminated_osc>\\Z) )\n                    # OSC ends at BEL, ST, or end of unterminated input\n    |               # Or\n        [@-Z\\\\-_]   # Second byte:\n                    #   all 0x40\u20130x5F range but CSI char, i.e ASCII @A\u2013Z\\]^_\n    |               # Or\n        \\[          # CSI sequences, starting with [\n        [0-?]*      # Parameter bytes:\n                    #   range 0x30\u20130x3F, ASCII 0\u20139:;<=>?\n        [ -/]*      # Intermediate bytes:\n                    #   range 0x20\u20130x2F, ASCII space and !\"#$%&'()*+,-./\n        [@-~]       # Final byte\n                    #   range 0x40\u20130x7E, ASCII @A\u2013Z[\\]^_`a\u2013z{|}~\n    )\n",
+      "diffs": [
+       {
+        "field": "",
+        "main": "\n    \\x1B            # Sequence starts with ESC, i.e. hex 0x1B\n    (?:\n        [@-Z\\\\-_]   # Second byte:\n                    #   all 0x40\u20130x5F range but CSI char, i.e ASCII @A\u2013Z\\]^_\n    |               # Or\n        \\[          # CSI sequences, starting with [\n        [0-?]*      # Parameter bytes:\n                    #   range 0x30\u20130x3F, ASCII 0\u20139:;<=>?\n        [ -/]*      # Intermediate bytes:\n                    #   range 0x20\u20130x2F, ASCII space and !\"#$%&'()*+,-./\n        [@-~]       # Final byte\n                    #   range 0x40\u20130x7E, ASCII @A\u2013Z[\\]^_`a\u2013z{|}~\n    )\n",
+        "pr": "\n    \\x1B            # Sequence starts with ESC, i.e. hex 0x1B\n    (?:\n        \\] [\\s\\S]*? (?: \\x07 | \\x1B\\\\ | (?P<unterminated_osc>\\Z) )\n                    # OSC ends at BEL, ST, or end of unterminated input\n    |               # Or\n        [@-Z\\\\-_]   # Second byte:\n                    #   all 0x40\u20130x5F range but CSI char, i.e ASCII @A\u2013Z\\]^_\n    |               # Or\n        \\[          # CSI sequences, starting with [\n        [0-?]*      # Parameter bytes:\n                    #   range 0x30\u20130x3F, ASCII 0\u20139:;<=>?\n        [ -/]*      # Intermediate bytes:\n                    #   range 0x20\u20130x2F, ASCII space and !\"#$%&'()*+,-./\n        [@-~]       # Final byte\n                    #   range 0x40\u20130x7E, ASCII @A\u2013Z[\\]^_`a\u2013z{|}~\n    )\n"
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe1-main-1.jsonl",
+        "line": 11,
+        "quote": "\"observation\": \"c5.regex_pattern\""
+       },
+       "pr": {
+        "file": "probe-model-probe1-pr-1.jsonl",
+        "line": 11,
+        "quote": "\"observation\": \"c5.regex_pattern\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "9fae4671933e02c4a3bf6d894955dd5c7da5634520be47fac6690b97aaf6ebeb",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-10T05:59:44.044352+00:00",
+     "inputs_sha256": "818c8052a30eac287eb46608ce39dd082d1909e9cb868417a18ab393bd3ab7e7",
+     "inputs": {
+      "title_chars": 53,
+      "body_chars": 1180,
+      "base_files": {
+       "boltons/strutils.py": "0ec4e98a5fa6368199915d0f488b129e4e5cb8d330b6663d76a79992beb15dd3"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-10T05:59:44.188849+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 2,
+     "changed_lines_covered": 2,
+     "files": [
+      {
+       "file": "boltons/strutils.py",
+       "changed_lines_total": 2,
+       "changed_lines_covered": 2
+      }
+     ],
+     "adequacy": "adequate",
+     "note": "ran 2 of 2 changed line(s) on the main side",
+     "exit": 0,
+     "data": "probe-cov-model-probe1.json"
+    },
+    "status": "ran"
+   },
+   {
+    "id": "diff-api",
+    "source": "diff",
+    "path": "diff-probes/diff-api.py",
+    "sha256": "dd85be1be5925ac27c02dfa9f4d3172063d93f30732989a19ba579b4d1876502",
+    "target": "mahmoud/boltons#740",
+    "about": "Public functions touched by the PR, called with type-appropriate inputs on both sides.",
+    "claims": [],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-diff-api-main-1.jsonl",
+      "probe-diff-api-main-2.jsonl",
+      "probe-diff-api-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-diff-api-pr-1.jsonl",
+      "probe-diff-api-pr-2.jsonl",
+      "probe-diff-api-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "boltons.strutils.ellipsize.input0": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.ellipsize.input1": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.ellipsize.input10": [],
+       "boltons.strutils.ellipsize.input11": {},
+       "boltons.strutils.ellipsize.input2": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.ellipsize.input3": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.ellipsize.input4": "abc",
+       "boltons.strutils.ellipsize.input5": [
+        1,
+        2,
+        3
+       ],
+       "boltons.strutils.ellipsize.input6": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.ellipsize.input7": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.ellipsize.input8": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.ellipsize.input9": "",
+       "boltons.strutils.strip_ansi.input0": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.strip_ansi.input1": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.strip_ansi.input10": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.strip_ansi.input11": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.strip_ansi.input2": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.strip_ansi.input3": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.strip_ansi.input4": "abc",
+       "boltons.strutils.strip_ansi.input5": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.strip_ansi.input6": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.strip_ansi.input7": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.strip_ansi.input8": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.strip_ansi.input9": ""
+      },
+      {
+       "boltons.strutils.ellipsize.input0": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.ellipsize.input1": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.ellipsize.input10": [],
+       "boltons.strutils.ellipsize.input11": {},
+       "boltons.strutils.ellipsize.input2": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.ellipsize.input3": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.ellipsize.input4": "abc",
+       "boltons.strutils.ellipsize.input5": [
+        1,
+        2,
+        3
+       ],
+       "boltons.strutils.ellipsize.input6": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.ellipsize.input7": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.ellipsize.input8": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.ellipsize.input9": "",
+       "boltons.strutils.strip_ansi.input0": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.strip_ansi.input1": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.strip_ansi.input10": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.strip_ansi.input11": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.strip_ansi.input2": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.strip_ansi.input3": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.strip_ansi.input4": "abc",
+       "boltons.strutils.strip_ansi.input5": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.strip_ansi.input6": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.strip_ansi.input7": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.strip_ansi.input8": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.strip_ansi.input9": ""
+      },
+      {
+       "boltons.strutils.ellipsize.input0": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.ellipsize.input1": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.ellipsize.input10": [],
+       "boltons.strutils.ellipsize.input11": {},
+       "boltons.strutils.ellipsize.input2": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.ellipsize.input3": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.ellipsize.input4": "abc",
+       "boltons.strutils.ellipsize.input5": [
+        1,
+        2,
+        3
+       ],
+       "boltons.strutils.ellipsize.input6": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.ellipsize.input7": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.ellipsize.input8": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.ellipsize.input9": "",
+       "boltons.strutils.strip_ansi.input0": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.strip_ansi.input1": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.strip_ansi.input10": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.strip_ansi.input11": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.strip_ansi.input2": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.strip_ansi.input3": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.strip_ansi.input4": "abc",
+       "boltons.strutils.strip_ansi.input5": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.strip_ansi.input6": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.strip_ansi.input7": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.strip_ansi.input8": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.strip_ansi.input9": ""
+      }
+     ],
+     "pr": [
+      {
+       "boltons.strutils.ellipsize.input0": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.ellipsize.input1": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.ellipsize.input10": [],
+       "boltons.strutils.ellipsize.input11": {},
+       "boltons.strutils.ellipsize.input2": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.ellipsize.input3": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.ellipsize.input4": "abc",
+       "boltons.strutils.ellipsize.input5": [
+        1,
+        2,
+        3
+       ],
+       "boltons.strutils.ellipsize.input6": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.ellipsize.input7": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.ellipsize.input8": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.ellipsize.input9": "",
+       "boltons.strutils.strip_ansi.input0": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.strip_ansi.input1": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.strip_ansi.input10": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.strip_ansi.input11": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.strip_ansi.input2": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.strip_ansi.input3": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.strip_ansi.input4": "abc",
+       "boltons.strutils.strip_ansi.input5": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.strip_ansi.input6": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.strip_ansi.input7": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.strip_ansi.input8": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.strip_ansi.input9": ""
+      },
+      {
+       "boltons.strutils.ellipsize.input0": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.ellipsize.input1": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.ellipsize.input10": [],
+       "boltons.strutils.ellipsize.input11": {},
+       "boltons.strutils.ellipsize.input2": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.ellipsize.input3": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.ellipsize.input4": "abc",
+       "boltons.strutils.ellipsize.input5": [
+        1,
+        2,
+        3
+       ],
+       "boltons.strutils.ellipsize.input6": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.ellipsize.input7": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.ellipsize.input8": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.ellipsize.input9": "",
+       "boltons.strutils.strip_ansi.input0": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.strip_ansi.input1": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.strip_ansi.input10": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.strip_ansi.input11": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.strip_ansi.input2": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.strip_ansi.input3": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.strip_ansi.input4": "abc",
+       "boltons.strutils.strip_ansi.input5": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.strip_ansi.input6": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.strip_ansi.input7": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.strip_ansi.input8": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.strip_ansi.input9": ""
+      },
+      {
+       "boltons.strutils.ellipsize.input0": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.ellipsize.input1": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.ellipsize.input10": [],
+       "boltons.strutils.ellipsize.input11": {},
+       "boltons.strutils.ellipsize.input2": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.ellipsize.input3": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.ellipsize.input4": "abc",
+       "boltons.strutils.ellipsize.input5": [
+        1,
+        2,
+        3
+       ],
+       "boltons.strutils.ellipsize.input6": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.ellipsize.input7": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.ellipsize.input8": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.ellipsize.input9": "",
+       "boltons.strutils.strip_ansi.input0": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.strip_ansi.input1": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.strip_ansi.input10": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.strip_ansi.input11": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.strip_ansi.input2": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.strip_ansi.input3": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.strip_ansi.input4": "abc",
+       "boltons.strutils.strip_ansi.input5": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.strip_ansi.input6": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.strip_ansi.input7": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.strip_ansi.input8": {
+        "raises": "TypeError"
+       },
+       "boltons.strutils.strip_ansi.input9": ""
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "boltons.strutils.ellipsize.input0",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"boltons.strutils.ellipsize.input0\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"boltons.strutils.ellipsize.input0\""
+       }
+      }
+     },
+     {
+      "name": "boltons.strutils.ellipsize.input1",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"boltons.strutils.ellipsize.input1\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"boltons.strutils.ellipsize.input1\""
+       }
+      }
+     },
+     {
+      "name": "boltons.strutils.ellipsize.input10",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": [],
+      "pr": [],
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"boltons.strutils.ellipsize.input10\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"boltons.strutils.ellipsize.input10\""
+       }
+      }
+     },
+     {
+      "name": "boltons.strutils.ellipsize.input11",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": {},
+      "pr": {},
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"boltons.strutils.ellipsize.input11\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"boltons.strutils.ellipsize.input11\""
+       }
+      }
+     },
+     {
+      "name": "boltons.strutils.ellipsize.input2",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"boltons.strutils.ellipsize.input2\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"boltons.strutils.ellipsize.input2\""
+       }
+      }
+     },
+     {
+      "name": "boltons.strutils.ellipsize.input3",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"boltons.strutils.ellipsize.input3\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"boltons.strutils.ellipsize.input3\""
+       }
+      }
+     },
+     {
+      "name": "boltons.strutils.ellipsize.input4",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": "abc",
+      "pr": "abc",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 7,
+        "quote": "\"observation\": \"boltons.strutils.ellipsize.input4\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 7,
+        "quote": "\"observation\": \"boltons.strutils.ellipsize.input4\""
+       }
+      }
+     },
+     {
+      "name": "boltons.strutils.ellipsize.input5",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": [
+       1,
+       2,
+       3
+      ],
+      "pr": [
+       1,
+       2,
+       3
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 8,
+        "quote": "\"observation\": \"boltons.strutils.ellipsize.input5\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 8,
+        "quote": "\"observation\": \"boltons.strutils.ellipsize.input5\""
+       }
+      }
+     },
+     {
+      "name": "boltons.strutils.ellipsize.input6",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 9,
+        "quote": "\"observation\": \"boltons.strutils.ellipsize.input6\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 9,
+        "quote": "\"observation\": \"boltons.strutils.ellipsize.input6\""
+       }
+      }
+     },
+     {
+      "name": "boltons.strutils.ellipsize.input7",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 10,
+        "quote": "\"observation\": \"boltons.strutils.ellipsize.input7\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 10,
+        "quote": "\"observation\": \"boltons.strutils.ellipsize.input7\""
+       }
+      }
+     },
+     {
+      "name": "boltons.strutils.ellipsize.input8",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 11,
+        "quote": "\"observation\": \"boltons.strutils.ellipsize.input8\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 11,
+        "quote": "\"observation\": \"boltons.strutils.ellipsize.input8\""
+       }
+      }
+     },
+     {
+      "name": "boltons.strutils.ellipsize.input9",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": "",
+      "pr": "",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 12,
+        "quote": "\"observation\": \"boltons.strutils.ellipsize.input9\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 12,
+        "quote": "\"observation\": \"boltons.strutils.ellipsize.input9\""
+       }
+      }
+     },
+     {
+      "name": "boltons.strutils.strip_ansi.input0",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 13,
+        "quote": "\"observation\": \"boltons.strutils.strip_ansi.input0\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 13,
+        "quote": "\"observation\": \"boltons.strutils.strip_ansi.input0\""
+       }
+      }
+     },
+     {
+      "name": "boltons.strutils.strip_ansi.input1",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 14,
+        "quote": "\"observation\": \"boltons.strutils.strip_ansi.input1\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 14,
+        "quote": "\"observation\": \"boltons.strutils.strip_ansi.input1\""
+       }
+      }
+     },
+     {
+      "name": "boltons.strutils.strip_ansi.input10",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 15,
+        "quote": "\"observation\": \"boltons.strutils.strip_ansi.input10\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 15,
+        "quote": "\"observation\": \"boltons.strutils.strip_ansi.input10\""
+       }
+      }
+     },
+     {
+      "name": "boltons.strutils.strip_ansi.input11",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 16,
+        "quote": "\"observation\": \"boltons.strutils.strip_ansi.input11\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 16,
+        "quote": "\"observation\": \"boltons.strutils.strip_ansi.input11\""
+       }
+      }
+     },
+     {
+      "name": "boltons.strutils.strip_ansi.input2",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 17,
+        "quote": "\"observation\": \"boltons.strutils.strip_ansi.input2\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 17,
+        "quote": "\"observation\": \"boltons.strutils.strip_ansi.input2\""
+       }
+      }
+     },
+     {
+      "name": "boltons.strutils.strip_ansi.input3",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 18,
+        "quote": "\"observation\": \"boltons.strutils.strip_ansi.input3\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 18,
+        "quote": "\"observation\": \"boltons.strutils.strip_ansi.input3\""
+       }
+      }
+     },
+     {
+      "name": "boltons.strutils.strip_ansi.input4",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": "abc",
+      "pr": "abc",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 19,
+        "quote": "\"observation\": \"boltons.strutils.strip_ansi.input4\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 19,
+        "quote": "\"observation\": \"boltons.strutils.strip_ansi.input4\""
+       }
+      }
+     },
+     {
+      "name": "boltons.strutils.strip_ansi.input5",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 20,
+        "quote": "\"observation\": \"boltons.strutils.strip_ansi.input5\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 20,
+        "quote": "\"observation\": \"boltons.strutils.strip_ansi.input5\""
+       }
+      }
+     },
+     {
+      "name": "boltons.strutils.strip_ansi.input6",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 21,
+        "quote": "\"observation\": \"boltons.strutils.strip_ansi.input6\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 21,
+        "quote": "\"observation\": \"boltons.strutils.strip_ansi.input6\""
+       }
+      }
+     },
+     {
+      "name": "boltons.strutils.strip_ansi.input7",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 22,
+        "quote": "\"observation\": \"boltons.strutils.strip_ansi.input7\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 22,
+        "quote": "\"observation\": \"boltons.strutils.strip_ansi.input7\""
+       }
+      }
+     },
+     {
+      "name": "boltons.strutils.strip_ansi.input8",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 23,
+        "quote": "\"observation\": \"boltons.strutils.strip_ansi.input8\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 23,
+        "quote": "\"observation\": \"boltons.strutils.strip_ansi.input8\""
+       }
+      }
+     },
+     {
+      "name": "boltons.strutils.strip_ansi.input9",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": "",
+      "pr": "",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 24,
+        "quote": "\"observation\": \"boltons.strutils.strip_ansi.input9\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 24,
+        "quote": "\"observation\": \"boltons.strutils.strip_ansi.input9\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "diff",
+     "label": "diff (auto-derived from base-side code, model-free)",
+     "model": null,
+     "provider": null,
+     "provenance": "auto-derived",
+     "blind": false
+    },
+    "freeze": {
+     "sha256": "dd85be1be5925ac27c02dfa9f4d3172063d93f30732989a19ba579b4d1876502",
+     "generator": {
+      "kind": "diff",
+      "label": "diff (auto-derived from base-side code, model-free)",
+      "model": null,
+      "provider": null,
+      "provenance": "auto-derived",
+      "blind": false
+     },
+     "frozen_at": "2026-11-10T05:59:44.048244+00:00",
+     "inputs_sha256": "7fa135da5f4cd9de2b3818563558a6af745cdaa1cd23ca0a62e7fe49d0d2a28b",
+     "inputs": {
+      "title_chars": 0,
+      "body_chars": 0,
+      "base_files": {
+       "boltons/strutils.py": "0ec4e98a5fa6368199915d0f488b129e4e5cb8d330b6663d76a79992beb15dd3"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-10T05:59:44.188849+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 2,
+     "changed_lines_covered": 2,
+     "files": [
+      {
+       "file": "boltons/strutils.py",
+       "changed_lines_total": 2,
+       "changed_lines_covered": 2
+      }
+     ],
+     "adequacy": "adequate",
+     "note": "ran 2 of 2 changed line(s) on the main side",
+     "exit": 0,
+     "data": "probe-cov-diff-api.json"
+    },
+    "status": "ran"
+   }
+  ],
+  "summary": {
+   "labels": [
+    "proven",
+    "proven",
+    "proven",
+    "proven",
+    "proven",
+    "proven",
+    "proven",
+    "proven",
+    "proven",
+    "proven",
+    "proven",
+    "not_testable",
+    "not_testable",
+    "no_difference",
+    "no_difference",
+    "not_testable",
+    "not_testable",
+    "no_difference",
+    "no_difference",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "no_difference",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "no_difference",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "no_difference"
+   ],
+   "flagged": [],
+   "proven_claims": [
+    "C1",
+    "C2",
+    "C3",
+    "C4",
+    "C5"
+   ],
+   "reason": "probe: claim(s) C1, C2, C3, C4, C5 proven; probe: 7 other observation(s) identical on both sides; probe: 17 probe(s) could not run on either side",
+   "ignored_noise": [],
+   "ignored_warning_only": [],
+   "pr_only_noisy": [],
+   "advisory_unchanged_subchecks": [],
+   "advisory_agreeing_differs": [],
+   "advisory_invalid_preservation": []
+  }
+ },
+ "probe_changed_line_coverage": {
+  "status": "measured",
+  "side": "main",
+  "probes": {
+   "model-probe1": {
+    "status": "measured",
+    "changed_lines_covered": 2,
+    "changed_lines_total": 2,
+    "adequacy": "adequate"
+   },
+   "diff-api": {
+    "status": "measured",
+    "changed_lines_covered": 2,
+    "changed_lines_total": 2,
+    "adequacy": "adequate"
+   }
+  },
+  "not_adequate": []
+ },
+ "verdict": "verified",
+ "reason": "52 test(s) fail on main and pass on the PR; 98 test(s) ran on main, 101 on the PR; 3 new test(s) pass, 46 unchanged; probe: claim(s) C1, C2, C3, C4, C5 proven",
+ "verdict_before_coverage_gate": "verified",
+ "reason_before_coverage_gate": "52 test(s) fail on main and pass on the PR; 98 test(s) ran on main, 101 on the PR; 3 new test(s) pass, 46 unchanged; probe: claim(s) C1, C2, C3, C4, C5 proven",
+ "changed_lines_total": 2,
+ "changed_lines_covered": 2,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "normal",
+  "note": "2 of 2 changed executable line(s) ran (100%)",
+  "measurement": "measured"
+ },
+ "agents": {
+  "status": "skipped",
+  "note": "advisory swarm is off",
+  "roles": []
+ },
+ "explanation": {
+  "status": "not yet wired",
+  "why": "advisory swarm is off"
+ },
+ "swarm_requested": false,
+ "operator_approval_requested": false,
+ "swarm": "off",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [
+   "boltons/strutils.py"
+  ],
+  "compiled_files": [],
+  "other_files": [
+   "tests/test_strutils.py"
+  ]
+ },
+ "duration_s": {
+  "total_wall": 113.6,
+  "tests": 6.9
+ },
+ "cost": {
+  "ai_calls": 3,
+  "failed_ai_calls": 0,
+  "input_tokens": 30742,
+  "output_tokens": 12448,
+  "thinking_tokens": 10986,
+  "cost_usd": 0.020426,
+  "calls_without_usage": 0,
+  "ai_cost_usd": 0.020426,
+  "cost_complete": true,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 113.6,
+   "tests": 6.9
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.007573,
+  "total_cost_usd": 0.027999,
+  "swarm": {
+   "ai_calls": 0,
+   "failed_ai_calls": 0,
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "thinking_tokens": 0,
+   "cost_usd": 0.0,
+   "calls_without_usage": 0,
+   "ai_cost_usd": 0.0,
+   "cost_complete": true,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ },
+ "pdf_push": {
+  "ok": true,
+  "attempts": 1,
+  "error": null,
+  "url": "https://github.com/aritracodesbad123/Proof-of-change/tree/runs/runs/2026-11-10/ef12096/boltons-740"
+ }
+}
