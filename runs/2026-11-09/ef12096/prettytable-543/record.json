@@ -716,7 +716,7 @@
  },
  "pdf_push": {
   "ok": true,
-  "attempts": 1,
+  "attempts": 2,
   "error": null,
   "url": "https://github.com/aritracodesbad123/Proof-of-change/tree/runs/runs/2026-11-09/ef12096/prettytable-543"
  }
