@@ -1,0 +1,480 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-Textualize-rich-4110-266bde4c8baa-2026-11-10",
+ "date_ist": "2026-11-10 12:52 IST",
+ "run_date": "2026-11-10",
+ "who": "ops/daily_run.py",
+ "repo": "Textualize/rich",
+ "library": "rich",
+ "pr": {
+  "repo": "Textualize/rich",
+  "number": 4110,
+  "url": "https://github.com/Textualize/rich/pull/4110",
+  "title": "Fix hyperlinks being split into multiple links when text is highlighted",
+  "base_sha": "3a109ccdffe5b2d0e30684a304fbd388e99ce57b",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "266bde4c8baa437e127af1c53ea519ab00699266",
+  "merge_commit": "800dfd509c3e5570e9d8405ebaf6da285f8bedf2",
+  "tested_main_sha": "3a109ccdffe5b2d0e30684a304fbd388e99ce57b",
+  "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+ },
+ "author": "filbranden",
+ "base_ref": "main",
+ "updated_at_utc": "2026-11-09T18:57:25Z",
+ "updated_at_ist": "2026-11-10 00:27 IST",
+ "ci_state": "none",
+ "ci_detail": "no check runs visible",
+ "tested_at_ist": "2026-11-10 12:52 IST",
+ "files": {
+  "all": [
+   "CHANGELOG.md",
+   "CONTRIBUTORS.md",
+   "rich/segment.py",
+   "rich/style.py",
+   "rich/text.py",
+   "tests/test_highlighter.py",
+   "tests/test_segment.py",
+   "tests/test_style.py",
+   "tests/test_text.py"
+  ],
+  "package_py": [
+   "rich/segment.py",
+   "rich/style.py",
+   "rich/text.py"
+  ],
+  "compiled": [],
+  "other": [
+   "CHANGELOG.md",
+   "CONTRIBUTORS.md",
+   "tests/test_highlighter.py",
+   "tests/test_segment.py",
+   "tests/test_style.py",
+   "tests/test_text.py"
+  ]
+ },
+ "machine_type": {
+  "arch": "x86_64",
+  "os": "Linux",
+  "platform": "Linux-6.12.94+-x86_64-with-glibc2.41",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": "g++ (Debian 14.2.0-19) 14.2.0",
+  "cpu_model": "Intel(R) Xeon(R) Processor",
+  "ram_gb": 15.6
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 0,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.15",
+ "test_selection": "",
+ "per_run": [],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": null,
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "local",
+ "sandbox_backend_note": "local bubblewrap",
+ "machine": "local",
+ "tool_setup": {
+  "installed": [],
+  "tries": 0,
+  "note": "All required tools were already installed.",
+  "refused": []
+ },
+ "posted_upstream": false,
+ "logs": "rich-4110/",
+ "freeze": {},
+ "coverage": {
+  "status": "not measured",
+  "why": "coverage has not been run for this check"
+ },
+ "poc_commit": "ef12096677e9cf59e8673436d74ec65d53771d7c",
+ "route": "source-pair",
+ "current_head_sha": "266bde4c8baa437e127af1c53ea519ab00699266",
+ "tested_invocation": 1,
+ "model_provider_used": "none",
+ "model_provider_fallback": "no AI call ran (asked for nebius)",
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": "[redacted]",
+  "notes": [
+   "Setup check: GitHub token: present.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory 11.5 GB (of 15.6 GB).",
+   "Setup check: free disk 92.1 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: [redacted] results",
+   "Query: rich python setup install instructions https://github.com/Textualize/rich site:github.com/Textualize/rich",
+   "Query: rich python documentation install https://github.com/Textualize/rich site:github.com/Textualize/rich",
+   "Query: rich python install requirements https://pypi.org/project/rich/ https://github.com/Textualize/rich site:pypi.org",
+   "Source: rich \u2014 https://pypi.org/project/rich/",
+   "Source: rich-pyfiglet \u2014 https://pypi.org/project/rich-pyfiglet/",
+   "Source: GitHub - Textualize/rich: Rich is a Python library for rich text and beautiful formatting in the terminal. \u00b7 GitHub \u2014 https://github.com/textualize/rich",
+   "Source: [BUG] rich fails to install using pip in editable mode \u00b7 Issue #346 \u00b7 Textualize/rich \u00b7 GitHub \u2014 https://github.com/Textualize/rich/issues/346",
+   "Source: GitHub - Textualize/rich-cli: Rich-cli is a command line toolbox for fancy output in the terminal \u00b7 GitHub \u2014 https://github.com/textualize/rich-cli",
+   "Source: rich/.readthedocs.yml at main \u00b7 Textualize/rich \u00b7 GitHub \u2014 https://github.com/Textualize/rich/blob/main/.readthedocs.yml",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: markdown-it-py is noted, installed with the project.",
+   "Setup plan: pygments is noted, installed with the project.",
+   "Setup plan: install alabaster==1.0.0 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install Sphinx==8.2.3 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install sphinx-rtd-theme==3.0.2 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install sphinx-copybutton==0.5.2 (listed in requirements.txt) on main and pr.",
+   "Setup plan: install pytest (listed in tox.ini deps) on main and pr.",
+   "Setup plan: install pytest-cov (listed in tox.ini deps) on main and pr.",
+   "Setup plan: install attrs (listed in tox.ini deps) on main and pr.",
+   "Setup plan: install typing-extensions (listed in tox.ini deps) on main and pr.",
+   "Setup plan: install uv (listed in tox.ini deps) on main and pr.",
+   "Setup plan: Python 3.15: switched the local sandbox to .local/bin/python3.15",
+   "Setup plan: refused rich-cli: its PyPI page does not link to this GitHub repository",
+   "rerun, setup problem: main install failed after 3 tries.",
+   "Demo helper: setup failure already labelled; the probe was not rerun."
+  ],
+  "install_docs": [
+   "README.kr.md",
+   "CONTRIBUTING.md",
+   "Makefile",
+   "README.md",
+   "README.zh-tw.md",
+   "README.hi.md",
+   "README.id.md",
+   "README.ru.md",
+   "README.es.md",
+   "README.ja.md",
+   "README.sv.md",
+   "README.tr.md",
+   "README.cn.md",
+   "README.pl.md",
+   "README.fa.md",
+   "README.it.md",
+   "README.de.md",
+   "README.de-ch.md",
+   "pyproject.toml",
+   "README.pt-br.md",
+   "README.fr.md",
+   "tox.ini",
+   "questions/README.md",
+   "docs/Makefile",
+   ".github/workflows/pythonpackage.yml",
+   ".github/workflows/readmechanged.yml",
+   ".github/workflows/codeql.yml",
+   ".github/workflows/comment.yml",
+   ".github/workflows/codespell.yml",
+   ".github/workflows/newissue.yml",
+   "tools/README.md",
+   "benchmarks/README.md",
+   "examples/README.md"
+  ],
+  "install_docs_from": "main",
+  "setup_plan": {
+   "packages": [
+    {
+     "requirement": "markdown-it-py>=2.2.0",
+     "name": "markdown-it-py",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pygments>=2.13.0,<3.0.0",
+     "name": "pygments",
+     "kind": "runtime",
+     "action": "noted",
+     "source": "pyproject",
+     "reason": "runtime dependency, installed with the project",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "alabaster==1.0.0",
+     "name": "alabaster",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "Sphinx==8.2.3",
+     "name": "Sphinx",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "sphinx-rtd-theme==3.0.2",
+     "name": "sphinx-rtd-theme",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "sphinx-copybutton==0.5.2",
+     "name": "sphinx-copybutton",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest",
+     "name": "pytest",
+     "kind": "requirements",
+     "action": "install",
+     "source": "tox.ini",
+     "reason": "listed in tox.ini deps",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest-cov",
+     "name": "pytest-cov",
+     "kind": "requirements",
+     "action": "install",
+     "source": "tox.ini",
+     "reason": "listed in tox.ini deps",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "attrs",
+     "name": "attrs",
+     "kind": "requirements",
+     "action": "install",
+     "source": "tox.ini",
+     "reason": "listed in tox.ini deps",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "typing-extensions",
+     "name": "typing-extensions",
+     "kind": "requirements",
+     "action": "install",
+     "source": "tox.ini",
+     "reason": "listed in tox.ini deps",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "uv",
+     "name": "uv",
+     "kind": "requirements",
+     "action": "install",
+     "source": "tox.ini",
+     "reason": "listed in tox.ini deps",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    }
+   ],
+   "scope_blocked": "",
+   "component": null,
+   "aggregate_names": [],
+   "extra_reqs": [
+    "alabaster==1.0.0",
+    "Sphinx==8.2.3",
+    "sphinx-rtd-theme==3.0.2",
+    "sphinx-copybutton==0.5.2",
+    "pytest",
+    "pytest-cov",
+    "attrs",
+    "typing-extensions",
+    "uv"
+   ],
+   "python": {
+    "requested": "3.15",
+    "current": "3.12",
+    "applied": true,
+    "switch": ".local/bin/python3.15",
+    "reason": "switched the local sandbox to .local/bin/python3.15"
+   },
+   "system": [],
+   "refused": [
+    {
+     "name": "rich-cli",
+     "reason": "its PyPI page does not link to this GitHub repository"
+    }
+   ],
+   "groups_blocked": ""
+  },
+  "steps": {
+   "setup_lookup": "Found 11 setup item(s) in the project's files and the web lookup. Refused: rich-cli (its PyPI page does not link to this GitHub repository).",
+   "setup_python": "Using Python .local/bin/python3.15: switched the local sandbox to .local/bin/python3.15.",
+   "install_deps": "Wrote requirements.txt and installed it on main and pr: alabaster==1.0.0, Sphinx==8.2.3, sphinx-rtd-theme==3.0.2, sphinx-copybutton==0.5.2, pytest, pytest-cov, attrs, typing-extensions, uv. 2 more come with the project install."
+  },
+  "run_files": {
+   "requirements": "requirements.txt",
+   "plan": "setup-plan.json",
+   "count": 9
+  },
+  "setup": {
+   "label": "rerun, setup problem",
+   "counts_as_verdict": false,
+   "step": "main install",
+   "attempts": 3,
+   "detail": "install failed (2); see setup-main.log"
+  }
+ },
+ "sides": {
+  "comparison_basis": "base tip vs GitHub test merge (refs/pull/N/merge)",
+  "main_sha": "3a109ccdffe5b2d0e30684a304fbd388e99ce57b",
+  "pr_sha": "800dfd509c3e5570e9d8405ebaf6da285f8bedf2",
+  "merge_commit": "800dfd509c3e5570e9d8405ebaf6da285f8bedf2",
+  "merge_parents": [
+   "3a109ccdffe5b2d0e30684a304fbd388e99ce57b",
+   "266bde4c8baa437e127af1c53ea519ab00699266"
+  ],
+  "merge_head_matches_pinned_head": true
+ },
+ "tested": {
+  "main": "main @ 3a109ccdffe5 (base tip = first parent of the merge commit)",
+  "pr": "GitHub test merge commit 800dfd509c3e (refs/pull/4110/merge) of head 266bde4c8baa"
+ },
+ "verdict": "could_not_verify",
+ "reason": "install failed (2); see setup-main.log",
+ "verdict_before_coverage_gate": "could_not_verify",
+ "reason_before_coverage_gate": "install failed (2); see setup-main.log",
+ "changed_lines_total": null,
+ "changed_lines_covered": null,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "lower",
+  "note": "coverage of the changed Python lines was NOT MEASURED (coverage has not been run for this check)",
+  "measurement": "not measured"
+ },
+ "agents": {
+  "status": "skipped",
+  "note": "advisory swarm is off",
+  "roles": []
+ },
+ "explanation": {
+  "status": "not yet wired",
+  "why": "advisory swarm is off"
+ },
+ "swarm_requested": false,
+ "operator_approval_requested": false,
+ "swarm": "off",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [
+   "rich/segment.py",
+   "rich/style.py",
+   "rich/text.py"
+  ],
+  "compiled_files": [],
+  "other_files": [
+   "CHANGELOG.md",
+   "CONTRIBUTORS.md",
+   "tests/test_highlighter.py",
+   "tests/test_segment.py",
+   "tests/test_style.py",
+   "tests/test_text.py"
+  ]
+ },
+ "duration_s": {
+  "total_wall": 106.6,
+  "tests": 0
+ },
+ "cost": {
+  "ai_calls": 0,
+  "failed_ai_calls": 0,
+  "input_tokens": 0,
+  "output_tokens": 0,
+  "thinking_tokens": 0,
+  "cost_usd": 0.0,
+  "calls_without_usage": 0,
+  "ai_cost_usd": 0.0,
+  "cost_complete": true,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 106.6,
+   "tests": 0
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.007107,
+  "total_cost_usd": 0.007107,
+  "swarm": {
+   "ai_calls": 0,
+   "failed_ai_calls": 0,
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "thinking_tokens": 0,
+   "cost_usd": 0.0,
+   "calls_without_usage": 0,
+   "ai_cost_usd": 0.0,
+   "cost_complete": true,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ },
+ "pdf_push": {
+  "ok": true,
+  "attempts": 1,
+  "error": null,
+  "url": "https://github.com/aritracodesbad123/Proof-of-change/tree/runs/runs/2026-11-10/ef12096/rich-4110"
+ }
+}
