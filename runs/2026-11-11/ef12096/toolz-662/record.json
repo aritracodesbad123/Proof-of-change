@@ -1,0 +1,2827 @@
+{
+ "schema_version": "1",
+ "record_kind": "pr_run",
+ "id": "pr-pytoolz-toolz-662-a033e5da039d-2026-11-11",
+ "date_ist": "2026-11-11 12:39 IST",
+ "run_date": "2026-11-11",
+ "who": "ops/daily_run.py",
+ "repo": "pytoolz/toolz",
+ "library": "toolz",
+ "pr": {
+  "repo": "pytoolz/toolz",
+  "number": 662,
+  "url": "https://github.com/pytoolz/toolz/pull/662",
+  "title": "Add immutable nested dictionary deletion with dissoc_in",
+  "base_sha": "451af60dec590a6010e2babdbf391ea8f815122f",
+  "base_sha_label": "pull request base (the commit the pull request was opened against; not necessarily the main side that was tested)",
+  "head_sha": "a033e5da039df75fde7247dadd45dd0a3a3c0499",
+  "merge_commit": "ffbb15d40bd909091502d33af9a4495ff2497b29",
+  "tested_main_sha": "451af60dec590a6010e2babdbf391ea8f815122f",
+  "tested_main_sha_label": "main side that was tested (base-branch tip, or the merge-base when the pull request conflicts or the pinned head differs from the current head)"
+ },
+ "author": "kushaldave002",
+ "base_ref": "master",
+ "updated_at_utc": "2026-11-10T14:27:57Z",
+ "updated_at_ist": "2026-11-10 19:57 IST",
+ "ci_state": "none",
+ "ci_detail": "no check runs visible",
+ "tested_at_ist": "2026-11-11 12:39 IST",
+ "files": {
+  "all": [
+   "doc/source/api.rst",
+   "toolz/curried/__init__.py",
+   "toolz/dicttoolz.py",
+   "toolz/tests/test_dissoc_in.py"
+  ],
+  "package_py": [
+   "toolz/curried/__init__.py",
+   "toolz/dicttoolz.py",
+   "toolz/tests/test_dissoc_in.py"
+  ],
+  "compiled": [],
+  "other": [
+   "doc/source/api.rst"
+  ]
+ },
+ "machine_type": {
+  "arch": "x86_64",
+  "os": "Linux",
+  "platform": "Linux-6.12.94+-x86_64-with-glibc2.41",
+  "cpu_count": 8,
+  "ci": null,
+  "runner_name": null,
+  "runner_os": null,
+  "runner_arch": null,
+  "runner_environment": null,
+  "image": null,
+  "label": "local",
+  "gxx": "g++ (Debian 14.2.0-19) 14.2.0",
+  "cpu_model": "Intel(R) Xeon(R) Processor",
+  "ram_gb": 15.6
+ },
+ "thread_env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "NUMEXPR_NUM_THREADS": "1",
+  "VECLIB_MAXIMUM_THREADS": "1",
+  "BLIS_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0"
+ },
+ "runs_per_side": 3,
+ "runs_per_side_planned": 3,
+ "workers": "4",
+ "test_timeout_s": 120,
+ "run_timeout_s": 900,
+ "build_timeout_s": 1800,
+ "python": "3.12.15",
+ "test_selection": "mapped from touched files: toolz/tests/test_dissoc_in.py, toolz/tests/test_curried.py, toolz/tests/test_functoolz.py, toolz/tests/test_dicttoolz.py",
+ "per_run": [
+  {
+   "side": "old",
+   "run": 1,
+   "passed": 100,
+   "failed": 0,
+   "error": 0,
+   "skipped": 1,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.5,
+   "pytest_summary": "100 passed, 1 skipped in 0.98s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 1,
+   "passed": 112,
+   "failed": 0,
+   "error": 0,
+   "skipped": 1,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.5,
+   "pytest_summary": "112 passed, 1 skipped in 0.94s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 2,
+   "passed": 100,
+   "failed": 0,
+   "error": 0,
+   "skipped": 1,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.5,
+   "pytest_summary": "100 passed, 1 skipped in 1.03s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 2,
+   "passed": 112,
+   "failed": 0,
+   "error": 0,
+   "skipped": 1,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.3,
+   "pytest_summary": "112 passed, 1 skipped in 0.81s",
+   "junit": true
+  },
+  {
+   "side": "old",
+   "run": 3,
+   "passed": 100,
+   "failed": 0,
+   "error": 0,
+   "skipped": 1,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.3,
+   "pytest_summary": "100 passed, 1 skipped in 0.81s",
+   "junit": true
+  },
+  {
+   "side": "new",
+   "run": 3,
+   "passed": 112,
+   "failed": 0,
+   "error": 0,
+   "skipped": 1,
+   "collection_errors": 0,
+   "exit": 0,
+   "seconds": 1.5,
+   "pytest_summary": "112 passed, 1 skipped in 1.00s",
+   "junit": true
+  }
+ ],
+ "notes": null,
+ "network": "installs/builds only, inside the sandbox; tests, coverage and probes have no network",
+ "behaviour_claims": [],
+ "baseline": "full",
+ "model_provider": {
+  "requested": "nebius",
+  "used": "nebius",
+  "note": "model provider: nebius (Token Factory, live)",
+  "blind": false
+ },
+ "sandbox_backend": "local",
+ "sandbox_backend_note": "local bubblewrap",
+ "machine": "local",
+ "tool_setup": {
+  "installed": [],
+  "tries": 0,
+  "note": "All required tools were already installed.",
+  "refused": []
+ },
+ "posted_upstream": false,
+ "logs": "toolz-662/",
+ "freeze": {
+  "main": "freeze-main.txt",
+  "pr": "freeze-pr.txt"
+ },
+ "coverage": {
+  "status": "measured",
+  "changed_lines_total": 24,
+  "changed_lines_covered": 24,
+  "files": [
+   {
+    "file": "toolz/curried/__init__.py",
+    "changed_lines_total": 1,
+    "changed_lines_covered": 1
+   },
+   {
+    "file": "toolz/dicttoolz.py",
+    "changed_lines_total": 23,
+    "changed_lines_covered": 23
+   }
+  ],
+  "seconds": 2.5,
+  "exit": 0,
+  "log": "coverage-pytest.log"
+ },
+ "poc_commit": "ef12096677e9cf59e8673436d74ec65d53771d7c",
+ "route": "source-pair",
+ "current_head_sha": "a033e5da039df75fde7247dadd45dd0a3a3c0499",
+ "tested_invocation": 1,
+ "model_provider_used": "nebius",
+ "demo_helper": {
+  "preflight": {
+   "ok": true
+  },
+  "tavily": "[redacted]",
+  "notes": [
+   "Setup check: GitHub token: present.",
+   "Setup check: Nebius token: present.",
+   "Setup check: free memory 9.3 GB (of 15.6 GB).",
+   "Setup check: free disk 92.1 GB.",
+   "Demo helper: git is installed.",
+   "Demo helper: python3 is installed.",
+   "Demo helper: uv is installed.",
+   "Looked up with Tavily: [redacted] results",
+   "Query: toolz python setup install instructions https://github.com/pytoolz/toolz site:github.com/pytoolz/toolz",
+   "Query: toolz python documentation install https://github.com/pytoolz/toolz site:github.com/pytoolz/toolz",
+   "Query: toolz python install requirements https://pypi.org/project/toolz/ https://github.com/pytoolz/toolz site:pypi.org",
+   "Source: toolz/pyproject.toml at master \u00b7 pytoolz/toolz \u00b7 GitHub \u2014 http://github.com/pytoolz/toolz/blob/master/pyproject.toml",
+   "Source: toolz/pyproject.toml at master \u00b7 pytoolz/toolz \u00b7 GitHub \u2014 https://github.com/pytoolz/toolz/blob/master/pyproject.toml",
+   "Source: toolz/README.rst at master \u00b7 pytoolz/toolz \u00b7 GitHub \u2014 https://github.com/pytoolz/toolz/blob/master/README.rst",
+   "Source: toolz/README.rst at master \u00b7 pytoolz/toolz \u00b7 GitHub \u2014 http://github.com/pytoolz/toolz/blob/master/README.rst",
+   "Source: toolz - PyPI \u2014 https://pypi.org/project/toolz/",
+   "Source: toolz/.github/workflows/test.yml at 451af60dec590a6010e2babdbf391ea8f815122f \u00b7 pytoolz/toolz \u00b7 GitHub \u2014 https://github.com/pytoolz/toolz/blob/451af60dec590a6010e2babdbf391ea8f815122f/.github/workflows/test.yml",
+   "Source: GitHub - pytoolz/toolz: A functional standard library for Python. \u00b7 GitHub \u2014 https://github.com/pytoolz/toolz",
+   "Setup plan: the same packages on main and pr.",
+   "Setup plan: install coverage (listed in the test extra) on main and pr.",
+   "Setup plan: install pycodestyle (listed in the test extra) on main and pr.",
+   "Setup plan: install pytest (listed in the test extra) on main and pr.",
+   "Setup plan: install sphinx (listed in requirements.txt) on main and pr.",
+   "Setup plan: install furo (listed in requirements.txt) on main and pr.",
+   "Setup plan: Python 3.12: Python 3.12 already meets >=3.9",
+   "Setup plan: refused pip: its PyPI page does not link to this GitHub repository",
+   "Setup plan: refused test: no network or the package was not found",
+   "Installed coverage 7.17.2 from pyproject (listed in the test extra) on main and pr.",
+   "Installed pycodestyle 2.15.0 from pyproject (listed in the test extra) on main and pr.",
+   "Installed pytest 9.2.0 from pyproject (listed in the test extra) on main and pr.",
+   "Installed sphinx 9.1.1 from requirements.txt (listed in requirements.txt) on main and pr.",
+   "Installed furo 2025.12.19 from requirements.txt (listed in requirements.txt) on main and pr."
+  ],
+  "install_docs": [
+   "README.rst",
+   "pyproject.toml",
+   "tox.ini",
+   "doc/Makefile",
+   ".github/workflows/publish_pypi.yml",
+   ".github/workflows/pre-commit.yml",
+   ".github/workflows/test.yml"
+  ],
+  "install_docs_from": "main",
+  "setup_plan": {
+   "packages": [
+    {
+     "requirement": "coverage",
+     "name": "coverage",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the test extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pycodestyle",
+     "name": "pycodestyle",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the test extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "pytest",
+     "name": "pytest",
+     "kind": "test-extra",
+     "action": "install",
+     "source": "pyproject",
+     "reason": "listed in the test extra",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "sphinx",
+     "name": "sphinx",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    },
+    {
+     "requirement": "furo",
+     "name": "furo",
+     "kind": "requirements",
+     "action": "install",
+     "source": "requirements.txt",
+     "reason": "listed in requirements.txt",
+     "sides": [
+      "main",
+      "pr"
+     ]
+    }
+   ],
+   "scope_blocked": "",
+   "component": null,
+   "aggregate_names": [],
+   "extra_reqs": [
+    "coverage",
+    "pycodestyle",
+    "pytest",
+    "sphinx",
+    "furo"
+   ],
+   "python": {
+    "requested": "3.12",
+    "current": "3.12",
+    "applied": true,
+    "switch": null,
+    "reason": "Python 3.12 already meets >=3.9"
+   },
+   "system": [],
+   "refused": [
+    {
+     "name": "pip",
+     "reason": "its PyPI page does not link to this GitHub repository"
+    },
+    {
+     "name": "test",
+     "reason": "no network or the package was not found"
+    }
+   ],
+   "groups_blocked": ""
+  },
+  "steps": {
+   "setup_lookup": "Found 5 setup item(s) in the project's files and the web lookup. Refused: pip (its PyPI page does not link to this GitHub repository), test (no network or the package was not found).",
+   "setup_python": "Python 3.12: Python 3.12 already meets >=3.9",
+   "install_deps": "Wrote requirements.txt and installed it on main and pr: coverage, pycodestyle, pytest, sphinx, furo."
+  },
+  "run_files": {
+   "requirements": "requirements.txt",
+   "plan": "setup-plan.json",
+   "count": 5
+  },
+  "installs": [
+   {
+    "package": "coverage",
+    "requirement": "coverage",
+    "version": "7.17.2",
+    "versions": {
+     "main": "7.17.2",
+     "pr": "7.17.2"
+    },
+    "source": "pyproject",
+    "reason": "listed in the test extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "pycodestyle",
+    "requirement": "pycodestyle",
+    "version": "2.15.0",
+    "versions": {
+     "main": "2.15.0",
+     "pr": "2.15.0"
+    },
+    "source": "pyproject",
+    "reason": "listed in the test extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "pytest",
+    "requirement": "pytest",
+    "version": "9.2.0",
+    "versions": {
+     "main": "9.2.0",
+     "pr": "9.2.0"
+    },
+    "source": "pyproject",
+    "reason": "listed in the test extra",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "sphinx",
+    "requirement": "sphinx",
+    "version": "9.1.1",
+    "versions": {
+     "main": "9.1.1",
+     "pr": "9.1.1"
+    },
+    "source": "requirements.txt",
+    "reason": "listed in requirements.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   },
+   {
+    "package": "furo",
+    "requirement": "furo",
+    "version": "2025.12.19",
+    "versions": {
+     "main": "2025.12.19",
+     "pr": "2025.12.19"
+    },
+    "source": "requirements.txt",
+    "reason": "listed in requirements.txt",
+    "sides": [
+     "main",
+     "pr"
+    ]
+   }
+  ]
+ },
+ "sides": {
+  "comparison_basis": "base tip vs GitHub test merge (refs/pull/N/merge)",
+  "main_sha": "451af60dec590a6010e2babdbf391ea8f815122f",
+  "pr_sha": "ffbb15d40bd909091502d33af9a4495ff2497b29",
+  "merge_commit": "ffbb15d40bd909091502d33af9a4495ff2497b29",
+  "merge_parents": [
+   "451af60dec590a6010e2babdbf391ea8f815122f",
+   "a033e5da039df75fde7247dadd45dd0a3a3c0499"
+  ],
+  "merge_head_matches_pinned_head": true
+ },
+ "tested": {
+  "main": "master @ 451af60dec59 (base tip = first parent of the merge commit)",
+  "pr": "GitHub test merge commit ffbb15d40bd9 (refs/pull/662/merge) of head a033e5da039d"
+ },
+ "probe_plan": {
+  "baseline": "full",
+  "model": "model provider: nebius (Token Factory, live)",
+  "errors": [],
+  "model_claims": [
+   {
+    "id": "C1",
+    "text": "The function dissoc_in(d, keys, factory=dict) provides immutable nested dictionary deletion.",
+    "source_quote": "Add dissoc_in(d, keys, factory=dict) for immutable nested dictionary deletion.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C2",
+    "text": "dissoc_in copies mappings along the selected path while preserving unrelated values by identity.",
+    "source_quote": "Copy mappings along the selected path while preserving unrelated values by identity.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C3",
+    "text": "dissoc_in ignores missing keys in the path without raising an error.",
+    "source_quote": "Ignore missing keys",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C4",
+    "text": "dissoc_in retains empty parent mappings after deletion.",
+    "source_quote": "retain empty parent mappings",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C5",
+    "text": "dissoc_in explicitly rejects empty paths or non\u2011mapping intermediate values.",
+    "source_quote": "explicitly reject empty paths or nonmapping intermediate values.",
+    "testable": true,
+    "expect": "differs"
+   },
+   {
+    "id": "C6",
+    "text": "dissoc_in is exposed through the modules toolz, toolz.dicttoolz, toolz.curried, and tlz.",
+    "source_quote": "Expose the function through toolz, toolz.dicttoolz, toolz.curried, and tlz",
+    "testable": true,
+    "expect": "differs"
+   }
+  ],
+  "model_rejected_claims": [],
+  "model_retried": {
+   "why": [
+    "no probe listed the claim ids it checks, so its results could not be tied to any claim; in each probe, \"claims\" must name the claim ids it checks and the observation names that cover them"
+   ]
+  },
+  "diff_targets": [
+   "toolz.dicttoolz.dissoc",
+   "toolz.dicttoolz.assoc_in"
+  ],
+  "frozen": [
+   {
+    "path": "model-probes/model-probe-c1.py",
+    "source": "model",
+    "sha256": "57290ecd691c847c082ab6fe5c4800164b647d05d6cc354ddf37d0ab80c78b0f",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-11T07:11:37.196440+00:00",
+    "inputs_sha256": "ca447855333fa2319545859462c7af02d7648626bcdaa6ab7178f806445ac0fe",
+    "inputs": {
+     "title_chars": 55,
+     "body_chars": 823,
+     "base_files": {
+      "toolz/curried/__init__.py": "53f7749c594e5983750c97399f9276ad3a1ab8753b4047b8e42304d6344b4f56",
+      "toolz/dicttoolz.py": "b04f3094634b7b385d9a446a07681073149bc1b3baf9cfb84956d8fb2163ba81"
+     }
+    }
+   },
+   {
+    "path": "model-probes/model-probe-c2.py",
+    "source": "model",
+    "sha256": "dc6ae5ec7e047f22871a3cce4d7663e0aba43f8c30719a55067f71eaf0b8323c",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-11T07:11:37.196593+00:00",
+    "inputs_sha256": "ca447855333fa2319545859462c7af02d7648626bcdaa6ab7178f806445ac0fe",
+    "inputs": {
+     "title_chars": 55,
+     "body_chars": 823,
+     "base_files": {
+      "toolz/curried/__init__.py": "53f7749c594e5983750c97399f9276ad3a1ab8753b4047b8e42304d6344b4f56",
+      "toolz/dicttoolz.py": "b04f3094634b7b385d9a446a07681073149bc1b3baf9cfb84956d8fb2163ba81"
+     }
+    }
+   },
+   {
+    "path": "model-probes/model-probe-c3.py",
+    "source": "model",
+    "sha256": "c1e4c279ee43fc9bc3a8f9c1834b4070ab1981558a2d86b5c9f4800f784899bc",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-11T07:11:37.196676+00:00",
+    "inputs_sha256": "ca447855333fa2319545859462c7af02d7648626bcdaa6ab7178f806445ac0fe",
+    "inputs": {
+     "title_chars": 55,
+     "body_chars": 823,
+     "base_files": {
+      "toolz/curried/__init__.py": "53f7749c594e5983750c97399f9276ad3a1ab8753b4047b8e42304d6344b4f56",
+      "toolz/dicttoolz.py": "b04f3094634b7b385d9a446a07681073149bc1b3baf9cfb84956d8fb2163ba81"
+     }
+    }
+   },
+   {
+    "path": "model-probes/model-probe-c4.py",
+    "source": "model",
+    "sha256": "ee9e5807a7078595e9dd541b282cea660b05ac49a493a4b1eaefe05af387df3e",
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "frozen_at": "2026-11-11T07:11:37.196755+00:00",
+    "inputs_sha256": "ca447855333fa2319545859462c7af02d7648626bcdaa6ab7178f806445ac0fe",
+    "inputs": {
+     "title_chars": 55,
+     "body_chars": 823,
+     "base_files": {
+      "toolz/curried/__init__.py": "53f7749c594e5983750c97399f9276ad3a1ab8753b4047b8e42304d6344b4f56",
+      "toolz/dicttoolz.py": "b04f3094634b7b385d9a446a07681073149bc1b3baf9cfb84956d8fb2163ba81"
+     }
+    }
+   },
+   {
+    "path": "diff-probes/diff-api.py",
+    "source": "diff",
+    "sha256": "44bf4a0a3bdf490195c078cdd465b3befd8c803923b84f7ae92fd6567c742164",
+    "generator": {
+     "kind": "diff",
+     "label": "diff (auto-derived from base-side code, model-free)",
+     "model": null,
+     "provider": null,
+     "provenance": "auto-derived",
+     "blind": false
+    },
+    "frozen_at": "2026-11-11T07:11:37.198558+00:00",
+    "inputs_sha256": "901ebd26b1e24105c1aaea6367c20b9c51006880c7ab8d77dbb5400cba0be89e",
+    "inputs": {
+     "title_chars": 0,
+     "body_chars": 0,
+     "base_files": {
+      "toolz/curried/__init__.py": "53f7749c594e5983750c97399f9276ad3a1ab8753b4047b8e42304d6344b4f56",
+      "toolz/dicttoolz.py": "b04f3094634b7b385d9a446a07681073149bc1b3baf9cfb84956d8fb2163ba81"
+     }
+    }
+   }
+  ]
+ },
+ "test_extras": [],
+ "pr_side_started_at": "2026-11-11T07:11:37.369447+00:00",
+ "test_targets": {
+  "main": [
+   "toolz/tests/test_curried.py",
+   "toolz/tests/test_functoolz.py",
+   "toolz/tests/test_dicttoolz.py"
+  ],
+  "pr": [
+   "toolz/tests/test_dissoc_in.py",
+   "toolz/tests/test_curried.py",
+   "toolz/tests/test_functoolz.py",
+   "toolz/tests/test_dicttoolz.py"
+  ]
+ },
+ "installed_commit": {
+  "main": {
+   "dist": "toolz",
+   "expected": "451af60dec590a6010e2babdbf391ea8f815122f",
+   "installed": "451af60dec590a6010e2babdbf391ea8f815122f",
+   "ok": true
+  },
+  "pr": {
+   "dist": "toolz",
+   "expected": "ffbb15d40bd909091502d33af9a4495ff2497b29",
+   "installed": "ffbb15d40bd909091502d33af9a4495ff2497b29",
+   "ok": true
+  }
+ },
+ "base_head_sha": "451af60dec590a6010e2babdbf391ea8f815122f",
+ "comparison": {
+  "same": 101,
+  "same_skipped_both": 1,
+  "regressions": [],
+  "fixed": [],
+  "new_tests_passing": 12,
+  "new_tests_passing_ids": [
+   "toolz.tests.test_dissoc_in::test_deep_paths_do_not_require_recursion",
+   "toolz.tests.test_dissoc_in::test_empty_parent_is_retained",
+   "toolz.tests.test_dissoc_in::test_empty_path_is_rejected",
+   "toolz.tests.test_dissoc_in::test_mapping_inputs_and_factory_preserve_order",
+   "toolz.tests.test_dissoc_in::test_missing_paths_do_not_create_keys[keys0]",
+   "toolz.tests.test_dissoc_in::test_missing_paths_do_not_create_keys[keys1]",
+   "toolz.tests.test_dissoc_in::test_missing_paths_do_not_create_keys[keys2]",
+   "toolz.tests.test_dissoc_in::test_nested_deletion_does_not_mutate_or_copy_unrelated_values[keys0]",
+   "toolz.tests.test_dissoc_in::test_nested_deletion_does_not_mutate_or_copy_unrelated_values[keys1]",
+   "toolz.tests.test_dissoc_in::test_nested_deletion_does_not_mutate_or_copy_unrelated_values[keys2]",
+   "toolz.tests.test_dissoc_in::test_nonmapping_intermediate_is_rejected",
+   "toolz.tests.test_dissoc_in::test_public_and_curried_namespaces"
+  ],
+  "new_tests_failing": [],
+  "new_tests_skipped": [],
+  "removed_tests": [],
+  "reparametrized": [],
+  "skipped_missing_dependency": [],
+  "flaky": [],
+  "pr_unstable": [],
+  "pr_unstable_noisy": [],
+  "environment": [],
+  "other_changes": [],
+  "preexisting_failures": [],
+  "load_failed_both": [],
+  "load_failed_pr": [],
+  "load_failed_main": [],
+  "executed": {
+   "main": 100,
+   "pr": 112
+  },
+  "messages": {}
+ },
+ "exit_check": {
+  "explained": true,
+  "problems": [],
+  "detail": "all runs exited 0"
+ },
+ "probes": {
+  "status": "ran",
+  "items": [
+   {
+    "id": "model-probe-c1",
+    "source": "model",
+    "path": "model-probes/model-probe-c1.py",
+    "sha256": "57290ecd691c847c082ab6fe5c4800164b647d05d6cc354ddf37d0ab80c78b0f",
+    "target": "pytoolz/toolz#662",
+    "about": "Check existence of dissoc_in in top-level toolz module.",
+    "claims": [
+     {
+      "id": "C1",
+      "source": "PR description",
+      "text": "The function dissoc_in(d, keys, factory=dict) provides immutable nested dictionary deletion.",
+      "covers": [
+       "c1.present"
+      ],
+      "expect": "differs"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": false
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": false
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": false
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-probe-c1-main-1.jsonl",
+      "probe-model-probe-c1-main-2.jsonl",
+      "probe-model-probe-c1-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-probe-c1-pr-1.jsonl",
+      "probe-model-probe-c1-pr-2.jsonl",
+      "probe-model-probe-c1-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      },
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      },
+      {
+       "probe.error": {
+        "crash": "non-json output",
+        "exit_code": 1
+       }
+      }
+     ],
+     "pr": [
+      {
+       "c1.present": true
+      },
+      {
+       "c1.present": true
+      },
+      {
+       "c1.present": true
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "c1.present",
+      "state": "differs",
+      "label": "proven",
+      "claim": "C1",
+      "main": "<absent>",
+      "pr": true,
+      "diffs": [
+       {
+        "field": "",
+        "main": "<absent>",
+        "pr": true
+       }
+      ],
+      "citations": {
+       "pr": {
+        "file": "probe-model-probe-c1-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c1.present\""
+       }
+      }
+     },
+     {
+      "name": "probe.error",
+      "state": "differs",
+      "label": "unmentioned",
+      "claim": null,
+      "main": {
+       "crash": "non-json output",
+       "exit_code": 1
+      },
+      "pr": "<absent>",
+      "diffs": [
+       {
+        "field": "",
+        "main": {
+         "crash": "non-json output",
+         "exit_code": 1
+        },
+        "pr": "<absent>"
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe-c1-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"probe.error\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "57290ecd691c847c082ab6fe5c4800164b647d05d6cc354ddf37d0ab80c78b0f",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-11T07:11:37.196440+00:00",
+     "inputs_sha256": "ca447855333fa2319545859462c7af02d7648626bcdaa6ab7178f806445ac0fe",
+     "inputs": {
+      "title_chars": 55,
+      "body_chars": 823,
+      "base_files": {
+       "toolz/curried/__init__.py": "53f7749c594e5983750c97399f9276ad3a1ab8753b4047b8e42304d6344b4f56",
+       "toolz/dicttoolz.py": "b04f3094634b7b385d9a446a07681073149bc1b3baf9cfb84956d8fb2163ba81"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-11T07:11:37.369447+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 5,
+     "changed_lines_covered": 0,
+     "files": [
+      {
+       "file": "toolz/curried/__init__.py",
+       "changed_lines_total": 2,
+       "changed_lines_covered": 2
+      },
+      {
+       "file": "toolz/dicttoolz.py",
+       "changed_lines_total": 3,
+       "changed_lines_covered": 2
+      }
+     ],
+     "adequacy": "not_adequate",
+     "note": "the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate",
+     "exit": 1,
+     "data": "probe-cov-model-probe-c1.json",
+     "changed_lines_touched": 4
+    },
+    "status": "crashed",
+    "uninformative_reason": "the probe crashed or printed no parsed output on every main-side run"
+   },
+   {
+    "id": "model-probe-c2",
+    "source": "model",
+    "path": "model-probes/model-probe-c2.py",
+    "sha256": "dc6ae5ec7e047f22871a3cce4d7663e0aba43f8c30719a55067f71eaf0b8323c",
+    "target": "pytoolz/toolz#662",
+    "about": "Attempt to call dissoc_in to see if it copies mappings and preserves identity (will fail if missing).",
+    "claims": [
+     {
+      "id": "C2",
+      "source": "PR description",
+      "text": "dissoc_in copies mappings along the selected path while preserving unrelated values by identity.",
+      "covers": [
+       "c2.result",
+       "c2.exception"
+      ],
+      "expect": "differs"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-probe-c2-main-1.jsonl",
+      "probe-model-probe-c2-main-2.jsonl",
+      "probe-model-probe-c2-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-probe-c2-pr-1.jsonl",
+      "probe-model-probe-c2-pr-2.jsonl",
+      "probe-model-probe-c2-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "c2.exception": "ImportError"
+      },
+      {
+       "c2.exception": "ImportError"
+      },
+      {
+       "c2.exception": "ImportError"
+      }
+     ],
+     "pr": [
+      {
+       "c2.result": {
+        "a": {}
+       }
+      },
+      {
+       "c2.result": {
+        "a": {}
+       }
+      },
+      {
+       "c2.result": {
+        "a": {}
+       }
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "c2.exception",
+      "state": "differs",
+      "label": "proven",
+      "claim": "C2",
+      "main": "ImportError",
+      "pr": "<absent>",
+      "diffs": [
+       {
+        "field": "",
+        "main": "ImportError",
+        "pr": "<absent>"
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe-c2-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c2.exception\""
+       }
+      },
+      "split_shape": "ImportError"
+     },
+     {
+      "name": "c2.result",
+      "state": "differs",
+      "label": "proven",
+      "claim": "C2",
+      "main": "<absent>",
+      "pr": {
+       "a": {}
+      },
+      "diffs": [
+       {
+        "field": "",
+        "main": "<absent>",
+        "pr": {
+         "a": {}
+        }
+       }
+      ],
+      "citations": {
+       "pr": {
+        "file": "probe-model-probe-c2-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c2.result\""
+       }
+      },
+      "split_shape": "ImportError"
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "dc6ae5ec7e047f22871a3cce4d7663e0aba43f8c30719a55067f71eaf0b8323c",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-11T07:11:37.196593+00:00",
+     "inputs_sha256": "ca447855333fa2319545859462c7af02d7648626bcdaa6ab7178f806445ac0fe",
+     "inputs": {
+      "title_chars": 55,
+      "body_chars": 823,
+      "base_files": {
+       "toolz/curried/__init__.py": "53f7749c594e5983750c97399f9276ad3a1ab8753b4047b8e42304d6344b4f56",
+       "toolz/dicttoolz.py": "b04f3094634b7b385d9a446a07681073149bc1b3baf9cfb84956d8fb2163ba81"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-11T07:11:37.369447+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 5,
+     "changed_lines_covered": 4,
+     "files": [
+      {
+       "file": "toolz/curried/__init__.py",
+       "changed_lines_total": 2,
+       "changed_lines_covered": 2
+      },
+      {
+       "file": "toolz/dicttoolz.py",
+       "changed_lines_total": 3,
+       "changed_lines_covered": 2
+      }
+     ],
+     "adequacy": "adequate",
+     "note": "ran 4 of 5 changed line(s) on the main side",
+     "exit": 0,
+     "data": "probe-cov-model-probe-c2.json"
+    },
+    "status": "ran"
+   },
+   {
+    "id": "model-probe-c3",
+    "source": "model",
+    "path": "model-probes/model-probe-c3.py",
+    "sha256": "c1e4c279ee43fc9bc3a8f9c1834b4070ab1981558a2d86b5c9f4800f784899bc",
+    "target": "pytoolz/toolz#662",
+    "about": "Attempt to call dissoc_in with missing key in path to see if it ignores missing keys (will fail if missing).",
+    "claims": [
+     {
+      "id": "C3",
+      "source": "PR description",
+      "text": "dissoc_in ignores missing keys in the path without raising an error.",
+      "covers": [
+       "c3.result",
+       "c3.exception"
+      ],
+      "expect": "differs"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-probe-c3-main-1.jsonl",
+      "probe-model-probe-c3-main-2.jsonl",
+      "probe-model-probe-c3-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-probe-c3-pr-1.jsonl",
+      "probe-model-probe-c3-pr-2.jsonl",
+      "probe-model-probe-c3-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "c3.exception": "ImportError"
+      },
+      {
+       "c3.exception": "ImportError"
+      },
+      {
+       "c3.exception": "ImportError"
+      }
+     ],
+     "pr": [
+      {
+       "c3.result": {
+        "a": {
+         "b": 1
+        }
+       }
+      },
+      {
+       "c3.result": {
+        "a": {
+         "b": 1
+        }
+       }
+      },
+      {
+       "c3.result": {
+        "a": {
+         "b": 1
+        }
+       }
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "c3.exception",
+      "state": "differs",
+      "label": "proven",
+      "claim": "C3",
+      "main": "ImportError",
+      "pr": "<absent>",
+      "diffs": [
+       {
+        "field": "",
+        "main": "ImportError",
+        "pr": "<absent>"
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe-c3-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c3.exception\""
+       }
+      },
+      "split_shape": "ImportError"
+     },
+     {
+      "name": "c3.result",
+      "state": "differs",
+      "label": "proven",
+      "claim": "C3",
+      "main": "<absent>",
+      "pr": {
+       "a": {
+        "b": 1
+       }
+      },
+      "diffs": [
+       {
+        "field": "",
+        "main": "<absent>",
+        "pr": {
+         "a": {
+          "b": 1
+         }
+        }
+       }
+      ],
+      "citations": {
+       "pr": {
+        "file": "probe-model-probe-c3-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c3.result\""
+       }
+      },
+      "split_shape": "ImportError"
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "c1e4c279ee43fc9bc3a8f9c1834b4070ab1981558a2d86b5c9f4800f784899bc",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-11T07:11:37.196676+00:00",
+     "inputs_sha256": "ca447855333fa2319545859462c7af02d7648626bcdaa6ab7178f806445ac0fe",
+     "inputs": {
+      "title_chars": 55,
+      "body_chars": 823,
+      "base_files": {
+       "toolz/curried/__init__.py": "53f7749c594e5983750c97399f9276ad3a1ab8753b4047b8e42304d6344b4f56",
+       "toolz/dicttoolz.py": "b04f3094634b7b385d9a446a07681073149bc1b3baf9cfb84956d8fb2163ba81"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-11T07:11:37.369447+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 5,
+     "changed_lines_covered": 4,
+     "files": [
+      {
+       "file": "toolz/curried/__init__.py",
+       "changed_lines_total": 2,
+       "changed_lines_covered": 2
+      },
+      {
+       "file": "toolz/dicttoolz.py",
+       "changed_lines_total": 3,
+       "changed_lines_covered": 2
+      }
+     ],
+     "adequacy": "adequate",
+     "note": "ran 4 of 5 changed line(s) on the main side",
+     "exit": 0,
+     "data": "probe-cov-model-probe-c3.json"
+    },
+    "status": "ran"
+   },
+   {
+    "id": "model-probe-c4",
+    "source": "model",
+    "path": "model-probes/model-probe-c4.py",
+    "sha256": "ee9e5807a7078595e9dd541b282cea660b05ac49a493a4b1eaefe05af387df3e",
+    "target": "pytoolz/toolz#662",
+    "about": "Attempt to call dissoc_in deleting an empty mapping to see if empty parent mappings are retained (will fail if missing).",
+    "claims": [
+     {
+      "id": "C4",
+      "source": "PR description",
+      "text": "dissoc_in retains empty parent mappings after deletion.",
+      "covers": [
+       "c4.result",
+       "c4.exception"
+      ],
+      "expect": "differs"
+     }
+    ],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-model-probe-c4-main-1.jsonl",
+      "probe-model-probe-c4-main-2.jsonl",
+      "probe-model-probe-c4-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-model-probe-c4-pr-1.jsonl",
+      "probe-model-probe-c4-pr-2.jsonl",
+      "probe-model-probe-c4-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "c4.exception": "ImportError"
+      },
+      {
+       "c4.exception": "ImportError"
+      },
+      {
+       "c4.exception": "ImportError"
+      }
+     ],
+     "pr": [
+      {
+       "c4.result": {
+        "a": {}
+       }
+      },
+      {
+       "c4.result": {
+        "a": {}
+       }
+      },
+      {
+       "c4.result": {
+        "a": {}
+       }
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "c4.exception",
+      "state": "differs",
+      "label": "proven",
+      "claim": "C4",
+      "main": "ImportError",
+      "pr": "<absent>",
+      "diffs": [
+       {
+        "field": "",
+        "main": "ImportError",
+        "pr": "<absent>"
+       }
+      ],
+      "citations": {
+       "main": {
+        "file": "probe-model-probe-c4-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c4.exception\""
+       }
+      },
+      "split_shape": "ImportError"
+     },
+     {
+      "name": "c4.result",
+      "state": "differs",
+      "label": "proven",
+      "claim": "C4",
+      "main": "<absent>",
+      "pr": {
+       "a": {}
+      },
+      "diffs": [
+       {
+        "field": "",
+        "main": "<absent>",
+        "pr": {
+         "a": {}
+        }
+       }
+      ],
+      "citations": {
+       "pr": {
+        "file": "probe-model-probe-c4-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"c4.result\""
+       }
+      },
+      "split_shape": "ImportError"
+     }
+    ],
+    "generator": {
+     "kind": "model",
+     "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+     "model": "nvidia/nemotron-3-super-120b-a12b",
+     "provider": "nebius",
+     "provenance": "live",
+     "blind": true
+    },
+    "freeze": {
+     "sha256": "ee9e5807a7078595e9dd541b282cea660b05ac49a493a4b1eaefe05af387df3e",
+     "generator": {
+      "kind": "model",
+      "label": "model (nvidia/nemotron-3-super-120b-a12b, live)",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "provider": "nebius",
+      "provenance": "live",
+      "blind": true
+     },
+     "frozen_at": "2026-11-11T07:11:37.196755+00:00",
+     "inputs_sha256": "ca447855333fa2319545859462c7af02d7648626bcdaa6ab7178f806445ac0fe",
+     "inputs": {
+      "title_chars": 55,
+      "body_chars": 823,
+      "base_files": {
+       "toolz/curried/__init__.py": "53f7749c594e5983750c97399f9276ad3a1ab8753b4047b8e42304d6344b4f56",
+       "toolz/dicttoolz.py": "b04f3094634b7b385d9a446a07681073149bc1b3baf9cfb84956d8fb2163ba81"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-11T07:11:37.369447+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 5,
+     "changed_lines_covered": 4,
+     "files": [
+      {
+       "file": "toolz/curried/__init__.py",
+       "changed_lines_total": 2,
+       "changed_lines_covered": 2
+      },
+      {
+       "file": "toolz/dicttoolz.py",
+       "changed_lines_total": 3,
+       "changed_lines_covered": 2
+      }
+     ],
+     "adequacy": "adequate",
+     "note": "ran 4 of 5 changed line(s) on the main side",
+     "exit": 0,
+     "data": "probe-cov-model-probe-c4.json"
+    },
+    "status": "ran"
+   },
+   {
+    "id": "diff-api",
+    "source": "diff",
+    "path": "diff-probes/diff-api.py",
+    "sha256": "44bf4a0a3bdf490195c078cdd465b3befd8c803923b84f7ae92fd6567c742164",
+    "target": "pytoolz/toolz#662",
+    "about": "Public functions touched by the PR, called with type-appropriate inputs on both sides.",
+    "claims": [],
+    "runs_per_side": 3,
+    "per_run": [
+     {
+      "side": "main",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 1,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 2,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "main",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     },
+     {
+      "side": "pr",
+      "run": 3,
+      "seconds": 0.1,
+      "ok": true
+     }
+    ],
+    "outputs": {
+     "main": [
+      "probe-diff-api-main-1.jsonl",
+      "probe-diff-api-main-2.jsonl",
+      "probe-diff-api-main-3.jsonl"
+     ],
+     "pr": [
+      "probe-diff-api-pr-1.jsonl",
+      "probe-diff-api-pr-2.jsonl",
+      "probe-diff-api-pr-3.jsonl"
+     ]
+    },
+    "runs": {
+     "main": [
+      {
+       "toolz.dicttoolz.assoc_in.input0": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.assoc_in.input1": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.assoc_in.input10": {
+        "raises": "StopIteration"
+       },
+       "toolz.dicttoolz.assoc_in.input11": {
+        "raises": "StopIteration"
+       },
+       "toolz.dicttoolz.assoc_in.input2": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.assoc_in.input3": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.assoc_in.input4": {
+        "raises": "ValueError"
+       },
+       "toolz.dicttoolz.assoc_in.input5": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.assoc_in.input6": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.assoc_in.input7": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.assoc_in.input8": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.assoc_in.input9": {
+        "raises": "StopIteration"
+       },
+       "toolz.dicttoolz.dissoc.input0": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input1": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input10": {},
+       "toolz.dicttoolz.dissoc.input11": {},
+       "toolz.dicttoolz.dissoc.input2": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input3": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input4": {
+        "raises": "ValueError"
+       },
+       "toolz.dicttoolz.dissoc.input5": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input6": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input7": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input8": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input9": {}
+      },
+      {
+       "toolz.dicttoolz.assoc_in.input0": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.assoc_in.input1": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.assoc_in.input10": {
+        "raises": "StopIteration"
+       },
+       "toolz.dicttoolz.assoc_in.input11": {
+        "raises": "StopIteration"
+       },
+       "toolz.dicttoolz.assoc_in.input2": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.assoc_in.input3": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.assoc_in.input4": {
+        "raises": "ValueError"
+       },
+       "toolz.dicttoolz.assoc_in.input5": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.assoc_in.input6": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.assoc_in.input7": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.assoc_in.input8": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.assoc_in.input9": {
+        "raises": "StopIteration"
+       },
+       "toolz.dicttoolz.dissoc.input0": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input1": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input10": {},
+       "toolz.dicttoolz.dissoc.input11": {},
+       "toolz.dicttoolz.dissoc.input2": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input3": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input4": {
+        "raises": "ValueError"
+       },
+       "toolz.dicttoolz.dissoc.input5": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input6": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input7": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input8": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input9": {}
+      },
+      {
+       "toolz.dicttoolz.assoc_in.input0": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.assoc_in.input1": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.assoc_in.input10": {
+        "raises": "StopIteration"
+       },
+       "toolz.dicttoolz.assoc_in.input11": {
+        "raises": "StopIteration"
+       },
+       "toolz.dicttoolz.assoc_in.input2": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.assoc_in.input3": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.assoc_in.input4": {
+        "raises": "ValueError"
+       },
+       "toolz.dicttoolz.assoc_in.input5": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.assoc_in.input6": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.assoc_in.input7": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.assoc_in.input8": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.assoc_in.input9": {
+        "raises": "StopIteration"
+       },
+       "toolz.dicttoolz.dissoc.input0": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input1": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input10": {},
+       "toolz.dicttoolz.dissoc.input11": {},
+       "toolz.dicttoolz.dissoc.input2": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input3": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input4": {
+        "raises": "ValueError"
+       },
+       "toolz.dicttoolz.dissoc.input5": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input6": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input7": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input8": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input9": {}
+      }
+     ],
+     "pr": [
+      {
+       "toolz.dicttoolz.assoc_in.input0": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.assoc_in.input1": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.assoc_in.input10": {
+        "raises": "StopIteration"
+       },
+       "toolz.dicttoolz.assoc_in.input11": {
+        "raises": "StopIteration"
+       },
+       "toolz.dicttoolz.assoc_in.input2": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.assoc_in.input3": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.assoc_in.input4": {
+        "raises": "ValueError"
+       },
+       "toolz.dicttoolz.assoc_in.input5": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.assoc_in.input6": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.assoc_in.input7": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.assoc_in.input8": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.assoc_in.input9": {
+        "raises": "StopIteration"
+       },
+       "toolz.dicttoolz.dissoc.input0": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input1": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input10": {},
+       "toolz.dicttoolz.dissoc.input11": {},
+       "toolz.dicttoolz.dissoc.input2": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input3": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input4": {
+        "raises": "ValueError"
+       },
+       "toolz.dicttoolz.dissoc.input5": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input6": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input7": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input8": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input9": {}
+      },
+      {
+       "toolz.dicttoolz.assoc_in.input0": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.assoc_in.input1": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.assoc_in.input10": {
+        "raises": "StopIteration"
+       },
+       "toolz.dicttoolz.assoc_in.input11": {
+        "raises": "StopIteration"
+       },
+       "toolz.dicttoolz.assoc_in.input2": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.assoc_in.input3": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.assoc_in.input4": {
+        "raises": "ValueError"
+       },
+       "toolz.dicttoolz.assoc_in.input5": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.assoc_in.input6": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.assoc_in.input7": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.assoc_in.input8": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.assoc_in.input9": {
+        "raises": "StopIteration"
+       },
+       "toolz.dicttoolz.dissoc.input0": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input1": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input10": {},
+       "toolz.dicttoolz.dissoc.input11": {},
+       "toolz.dicttoolz.dissoc.input2": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input3": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input4": {
+        "raises": "ValueError"
+       },
+       "toolz.dicttoolz.dissoc.input5": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input6": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input7": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input8": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input9": {}
+      },
+      {
+       "toolz.dicttoolz.assoc_in.input0": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.assoc_in.input1": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.assoc_in.input10": {
+        "raises": "StopIteration"
+       },
+       "toolz.dicttoolz.assoc_in.input11": {
+        "raises": "StopIteration"
+       },
+       "toolz.dicttoolz.assoc_in.input2": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.assoc_in.input3": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.assoc_in.input4": {
+        "raises": "ValueError"
+       },
+       "toolz.dicttoolz.assoc_in.input5": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.assoc_in.input6": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.assoc_in.input7": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.assoc_in.input8": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.assoc_in.input9": {
+        "raises": "StopIteration"
+       },
+       "toolz.dicttoolz.dissoc.input0": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input1": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input10": {},
+       "toolz.dicttoolz.dissoc.input11": {},
+       "toolz.dicttoolz.dissoc.input2": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input3": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input4": {
+        "raises": "ValueError"
+       },
+       "toolz.dicttoolz.dissoc.input5": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input6": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input7": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input8": {
+        "raises": "TypeError"
+       },
+       "toolz.dicttoolz.dissoc.input9": {}
+      }
+     ]
+    },
+    "observations": [
+     {
+      "name": "toolz.dicttoolz.assoc_in.input0",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"toolz.dicttoolz.assoc_in.input0\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 1,
+        "quote": "\"observation\": \"toolz.dicttoolz.assoc_in.input0\""
+       }
+      }
+     },
+     {
+      "name": "toolz.dicttoolz.assoc_in.input1",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"toolz.dicttoolz.assoc_in.input1\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 2,
+        "quote": "\"observation\": \"toolz.dicttoolz.assoc_in.input1\""
+       }
+      }
+     },
+     {
+      "name": "toolz.dicttoolz.assoc_in.input10",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "StopIteration"
+      },
+      "pr": {
+       "raises": "StopIteration"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"toolz.dicttoolz.assoc_in.input10\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 3,
+        "quote": "\"observation\": \"toolz.dicttoolz.assoc_in.input10\""
+       }
+      }
+     },
+     {
+      "name": "toolz.dicttoolz.assoc_in.input11",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "StopIteration"
+      },
+      "pr": {
+       "raises": "StopIteration"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"toolz.dicttoolz.assoc_in.input11\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 4,
+        "quote": "\"observation\": \"toolz.dicttoolz.assoc_in.input11\""
+       }
+      }
+     },
+     {
+      "name": "toolz.dicttoolz.assoc_in.input2",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"toolz.dicttoolz.assoc_in.input2\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 5,
+        "quote": "\"observation\": \"toolz.dicttoolz.assoc_in.input2\""
+       }
+      }
+     },
+     {
+      "name": "toolz.dicttoolz.assoc_in.input3",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"toolz.dicttoolz.assoc_in.input3\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 6,
+        "quote": "\"observation\": \"toolz.dicttoolz.assoc_in.input3\""
+       }
+      }
+     },
+     {
+      "name": "toolz.dicttoolz.assoc_in.input4",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "ValueError"
+      },
+      "pr": {
+       "raises": "ValueError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 7,
+        "quote": "\"observation\": \"toolz.dicttoolz.assoc_in.input4\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 7,
+        "quote": "\"observation\": \"toolz.dicttoolz.assoc_in.input4\""
+       }
+      }
+     },
+     {
+      "name": "toolz.dicttoolz.assoc_in.input5",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 8,
+        "quote": "\"observation\": \"toolz.dicttoolz.assoc_in.input5\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 8,
+        "quote": "\"observation\": \"toolz.dicttoolz.assoc_in.input5\""
+       }
+      }
+     },
+     {
+      "name": "toolz.dicttoolz.assoc_in.input6",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 9,
+        "quote": "\"observation\": \"toolz.dicttoolz.assoc_in.input6\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 9,
+        "quote": "\"observation\": \"toolz.dicttoolz.assoc_in.input6\""
+       }
+      }
+     },
+     {
+      "name": "toolz.dicttoolz.assoc_in.input7",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 10,
+        "quote": "\"observation\": \"toolz.dicttoolz.assoc_in.input7\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 10,
+        "quote": "\"observation\": \"toolz.dicttoolz.assoc_in.input7\""
+       }
+      }
+     },
+     {
+      "name": "toolz.dicttoolz.assoc_in.input8",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 11,
+        "quote": "\"observation\": \"toolz.dicttoolz.assoc_in.input8\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 11,
+        "quote": "\"observation\": \"toolz.dicttoolz.assoc_in.input8\""
+       }
+      }
+     },
+     {
+      "name": "toolz.dicttoolz.assoc_in.input9",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "StopIteration"
+      },
+      "pr": {
+       "raises": "StopIteration"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 12,
+        "quote": "\"observation\": \"toolz.dicttoolz.assoc_in.input9\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 12,
+        "quote": "\"observation\": \"toolz.dicttoolz.assoc_in.input9\""
+       }
+      }
+     },
+     {
+      "name": "toolz.dicttoolz.dissoc.input0",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 13,
+        "quote": "\"observation\": \"toolz.dicttoolz.dissoc.input0\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 13,
+        "quote": "\"observation\": \"toolz.dicttoolz.dissoc.input0\""
+       }
+      }
+     },
+     {
+      "name": "toolz.dicttoolz.dissoc.input1",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 14,
+        "quote": "\"observation\": \"toolz.dicttoolz.dissoc.input1\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 14,
+        "quote": "\"observation\": \"toolz.dicttoolz.dissoc.input1\""
+       }
+      }
+     },
+     {
+      "name": "toolz.dicttoolz.dissoc.input10",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": {},
+      "pr": {},
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 15,
+        "quote": "\"observation\": \"toolz.dicttoolz.dissoc.input10\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 15,
+        "quote": "\"observation\": \"toolz.dicttoolz.dissoc.input10\""
+       }
+      }
+     },
+     {
+      "name": "toolz.dicttoolz.dissoc.input11",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": {},
+      "pr": {},
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 16,
+        "quote": "\"observation\": \"toolz.dicttoolz.dissoc.input11\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 16,
+        "quote": "\"observation\": \"toolz.dicttoolz.dissoc.input11\""
+       }
+      }
+     },
+     {
+      "name": "toolz.dicttoolz.dissoc.input2",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 17,
+        "quote": "\"observation\": \"toolz.dicttoolz.dissoc.input2\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 17,
+        "quote": "\"observation\": \"toolz.dicttoolz.dissoc.input2\""
+       }
+      }
+     },
+     {
+      "name": "toolz.dicttoolz.dissoc.input3",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 18,
+        "quote": "\"observation\": \"toolz.dicttoolz.dissoc.input3\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 18,
+        "quote": "\"observation\": \"toolz.dicttoolz.dissoc.input3\""
+       }
+      }
+     },
+     {
+      "name": "toolz.dicttoolz.dissoc.input4",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "ValueError"
+      },
+      "pr": {
+       "raises": "ValueError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 19,
+        "quote": "\"observation\": \"toolz.dicttoolz.dissoc.input4\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 19,
+        "quote": "\"observation\": \"toolz.dicttoolz.dissoc.input4\""
+       }
+      }
+     },
+     {
+      "name": "toolz.dicttoolz.dissoc.input5",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 20,
+        "quote": "\"observation\": \"toolz.dicttoolz.dissoc.input5\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 20,
+        "quote": "\"observation\": \"toolz.dicttoolz.dissoc.input5\""
+       }
+      }
+     },
+     {
+      "name": "toolz.dicttoolz.dissoc.input6",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 21,
+        "quote": "\"observation\": \"toolz.dicttoolz.dissoc.input6\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 21,
+        "quote": "\"observation\": \"toolz.dicttoolz.dissoc.input6\""
+       }
+      }
+     },
+     {
+      "name": "toolz.dicttoolz.dissoc.input7",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 22,
+        "quote": "\"observation\": \"toolz.dicttoolz.dissoc.input7\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 22,
+        "quote": "\"observation\": \"toolz.dicttoolz.dissoc.input7\""
+       }
+      }
+     },
+     {
+      "name": "toolz.dicttoolz.dissoc.input8",
+      "state": "same",
+      "label": "not_testable",
+      "claim": null,
+      "main": {
+       "raises": "TypeError"
+      },
+      "pr": {
+       "raises": "TypeError"
+      },
+      "probe_broken": "the same exception or skip value on both sides: the probe never reached the call",
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 23,
+        "quote": "\"observation\": \"toolz.dicttoolz.dissoc.input8\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 23,
+        "quote": "\"observation\": \"toolz.dicttoolz.dissoc.input8\""
+       }
+      }
+     },
+     {
+      "name": "toolz.dicttoolz.dissoc.input9",
+      "state": "same",
+      "label": "no_difference",
+      "claim": null,
+      "main": {},
+      "pr": {},
+      "citations": {
+       "main": {
+        "file": "probe-diff-api-main-1.jsonl",
+        "line": 24,
+        "quote": "\"observation\": \"toolz.dicttoolz.dissoc.input9\""
+       },
+       "pr": {
+        "file": "probe-diff-api-pr-1.jsonl",
+        "line": 24,
+        "quote": "\"observation\": \"toolz.dicttoolz.dissoc.input9\""
+       }
+      }
+     }
+    ],
+    "generator": {
+     "kind": "diff",
+     "label": "diff (auto-derived from base-side code, model-free)",
+     "model": null,
+     "provider": null,
+     "provenance": "auto-derived",
+     "blind": false
+    },
+    "freeze": {
+     "sha256": "44bf4a0a3bdf490195c078cdd465b3befd8c803923b84f7ae92fd6567c742164",
+     "generator": {
+      "kind": "diff",
+      "label": "diff (auto-derived from base-side code, model-free)",
+      "model": null,
+      "provider": null,
+      "provenance": "auto-derived",
+      "blind": false
+     },
+     "frozen_at": "2026-11-11T07:11:37.198558+00:00",
+     "inputs_sha256": "901ebd26b1e24105c1aaea6367c20b9c51006880c7ab8d77dbb5400cba0be89e",
+     "inputs": {
+      "title_chars": 0,
+      "body_chars": 0,
+      "base_files": {
+       "toolz/curried/__init__.py": "53f7749c594e5983750c97399f9276ad3a1ab8753b4047b8e42304d6344b4f56",
+       "toolz/dicttoolz.py": "b04f3094634b7b385d9a446a07681073149bc1b3baf9cfb84956d8fb2163ba81"
+      }
+     },
+     "verified": true,
+     "pr_started_at": "2026-11-11T07:11:37.369447+00:00"
+    },
+    "probe_changed_line_coverage": {
+     "status": "measured",
+     "changed_lines_total": 5,
+     "changed_lines_covered": 5,
+     "files": [
+      {
+       "file": "toolz/curried/__init__.py",
+       "changed_lines_total": 2,
+       "changed_lines_covered": 2
+      },
+      {
+       "file": "toolz/dicttoolz.py",
+       "changed_lines_total": 3,
+       "changed_lines_covered": 3
+      }
+     ],
+     "adequacy": "adequate",
+     "note": "ran 5 of 5 changed line(s) on the main side",
+     "exit": 0,
+     "data": "probe-cov-diff-api.json"
+    },
+    "status": "ran"
+   }
+  ],
+  "summary": {
+   "labels": [
+    "proven",
+    "proven",
+    "proven",
+    "proven",
+    "proven",
+    "proven",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "no_difference",
+    "no_difference",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "not_testable",
+    "no_difference"
+   ],
+   "flagged": [],
+   "proven_claims": [
+    "C2",
+    "C3",
+    "C4"
+   ],
+   "reason": "probe: claim(s) C2, C3, C4 proven; probe: 3 other observation(s) identical on both sides; probe: 21 probe(s) could not run on either side; the probe crashed or printed no parsed output on every main-side run",
+   "ignored_noise": [],
+   "ignored_warning_only": [],
+   "pr_only_noisy": [],
+   "advisory_unchanged_subchecks": [],
+   "advisory_agreeing_differs": [],
+   "advisory_invalid_preservation": []
+  }
+ },
+ "probe_changed_line_coverage": {
+  "status": "measured",
+  "side": "main",
+  "probes": {
+   "model-probe-c1": {
+    "status": "measured",
+    "changed_lines_covered": 0,
+    "changed_lines_total": 5,
+    "adequacy": "not_adequate"
+   },
+   "model-probe-c2": {
+    "status": "measured",
+    "changed_lines_covered": 4,
+    "changed_lines_total": 5,
+    "adequacy": "adequate"
+   },
+   "model-probe-c3": {
+    "status": "measured",
+    "changed_lines_covered": 4,
+    "changed_lines_total": 5,
+    "adequacy": "adequate"
+   },
+   "model-probe-c4": {
+    "status": "measured",
+    "changed_lines_covered": 4,
+    "changed_lines_total": 5,
+    "adequacy": "adequate"
+   },
+   "diff-api": {
+    "status": "measured",
+    "changed_lines_covered": 5,
+    "changed_lines_total": 5,
+    "adequacy": "adequate"
+   }
+  },
+  "not_adequate": [
+   "model-probe-c1"
+  ]
+ },
+ "verdict": "needs_attention",
+ "reason": "probe: 1 observation(s) need attention: probe.error differs and no claim covers it; probe: claim(s) C2, C3, C4 proven; probe model-probe-c1 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count; tests: 100 test(s) ran on main, 112 on the PR; 12 new test(s) pass, 101 unchanged (1 of them skipped on both sides)",
+ "verdict_before_coverage_gate": "needs_attention",
+ "reason_before_coverage_gate": "probe: 1 observation(s) need attention: probe.error differs and no claim covers it; probe: claim(s) C2, C3, C4 proven; probe model-probe-c1 is not_adequate (the probe crashed or printed no parsed output on every main-side run; not counted as ran or adequate); its matching results do not count; tests: 100 test(s) ran on main, 112 on the PR; 12 new test(s) pass, 101 unchanged (1 of them skipped on both sides)",
+ "changed_lines_total": 24,
+ "changed_lines_covered": 24,
+ "coverage_gate": {
+  "kind": "python",
+  "changed": false,
+  "confidence": "normal",
+  "note": "24 of 24 changed executable line(s) ran (100%)",
+  "measurement": "measured"
+ },
+ "agents": {
+  "status": "skipped",
+  "note": "advisory swarm is off",
+  "roles": []
+ },
+ "explanation": {
+  "status": "not yet wired",
+  "why": "advisory swarm is off"
+ },
+ "swarm_requested": false,
+ "operator_approval_requested": false,
+ "swarm": "off",
+ "operator_approval": "off",
+ "what_changed": {
+  "package_python_files": [
+   "toolz/curried/__init__.py",
+   "toolz/dicttoolz.py",
+   "toolz/tests/test_dissoc_in.py"
+  ],
+  "compiled_files": [],
+  "other_files": [
+   "doc/source/api.rst"
+  ]
+ },
+ "duration_s": {
+  "total_wall": 123.8,
+  "tests": 8.6
+ },
+ "cost": {
+  "ai_calls": 3,
+  "failed_ai_calls": 0,
+  "input_tokens": 10118,
+  "output_tokens": 15581,
+  "thinking_tokens": 13396,
+  "cost_usd": 0.017058,
+  "calls_without_usage": 0,
+  "ai_cost_usd": 0.017058,
+  "cost_complete": true,
+  "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)",
+  "compute_seconds": {
+   "total_wall": 123.8,
+   "tests": 8.6
+  },
+  "machine_usd_per_hour": 0.24,
+  "machine_rate_source": "Nebius AI Cloud compute pricing, https://docs.nebius.com/compute/resources/pricing (checked 2026-10-13; prices from 2026-10-01): Intel Ice Lake cpu-d3 preset 8vcpu-32gb, 8 x $0.012/vCPU-h + 32 x $0.0045/GiB-h",
+  "computer_cost_usd": 0.008253,
+  "total_cost_usd": 0.025311,
+  "swarm": {
+   "ai_calls": 0,
+   "failed_ai_calls": 0,
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "thinking_tokens": 0,
+   "cost_usd": 0.0,
+   "calls_without_usage": 0,
+   "ai_cost_usd": 0.0,
+   "cost_complete": true,
+   "rate_source": "Nebius Token Factory list price, https://nebius.com/services/token-factory/models/nvidia-nemotron-models-inference (checked 2026-10-13)"
+  }
+ },
+ "pdf_push": {
+  "ok": true,
+  "attempts": 1,
+  "error": null,
+  "url": "https://github.com/aritracodesbad123/Proof-of-change/tree/runs/runs/2026-11-11/ef12096/toolz-662"
+ }
+}
